@@ -4,16 +4,16 @@
   "dependencies": {
     "@emotion/cache": "latest",
     "@emotion/react": "latest",
-    "@emotion/styled": "latest",
     "@emotion/server": "latest",
+    "@emotion/styled": "latest",
     "@mui/material": "latest",
+    "@mui/studio-core": "^0.0.1",
     "clsx": "latest",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest"
   },
   "scripts": {
-    "ja": "echo 'ja'",
     "dev": "next",
     "build": "next build",
     "start": "next start",

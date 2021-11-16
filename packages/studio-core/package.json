@@ -1,35 +1,27 @@
 {
-  "name": "@mui/studio",
+  "name": "@mui/studio-core",
   "version": "0.0.1",
   "description": "Build MUI apps quickly",
   "author": "MUI Studio team",
   "homepage": "https://github.com/mui-org/mui-studio#readme",
   "license": "ISC",
-  "main": "src/index.ts",
+  "main": "dist",
+  "type": "module",
   "files": [
-    "src"
+    "dist"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mui-org/mui-studio.git"
   },
   "scripts": {
-    "build": "echo \"TODO: build cli here and replace ts-node in yarn start\"",
-    "start": "ts-node src/index.ts",
-    "dev": "nodemon src/index.ts --dev",
+    "build": "tsc",
+    "dev": "tsc --watch --preserveWatchOutput",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
     "url": "https://github.com/mui-org/mui-studio/issues"
   },
-  "dependencies": {
-    "@mui/studio-core": "^0.0.1",
-    "@mui/studio-ui": "^0.0.1",
-    "arg": "^5.0.1",
-    "execa": "^5.1.1"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.15",
-    "ts-node": "^10.4.0"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }

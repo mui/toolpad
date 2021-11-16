@@ -26,7 +26,6 @@ execa('next', [NEXT_CMD], {
   preferLocal: true,
   stdio: 'inherit',
   extendEnv: false,
-  // @ts-expect-error We're deliberately not setting NODE_ENV as we want the Next.js CLI to do that
   env: {
     FORCE_COLOR: process.env.FORCE_COLOR,
     STUDIO_UI_CONFIG: JSON.stringify(studioUiConfig),

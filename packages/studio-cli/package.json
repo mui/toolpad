@@ -5,9 +5,9 @@
   "author": "MUI Studio team",
   "homepage": "https://github.com/mui-org/mui-studio#readme",
   "license": "ISC",
-  "main": "lib/index.ts",
+  "main": "src/index.ts",
   "files": [
-    "lib"
+    "src"
   ],
   "repository": {
     "type": "git",
@@ -15,8 +15,8 @@
   },
   "scripts": {
     "build": "echo \"TODO: build cli here and replace ts-node in yarn start\"",
-    "start": "ts-node lib/index.ts",
-    "dev": "nodemon lib/index.ts --dev",
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts --dev",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {

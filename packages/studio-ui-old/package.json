@@ -1,5 +1,5 @@
 {
-  "name": "@mui/studio-ui",
+  "name": "@mui/studio-ui-old",
   "version": "0.0.1",
   "dependencies": {
     "@emotion/cache": "latest",

@@ -1,12 +1,25 @@
 import * as React from 'react';
-import { NodeId, StudioComponentDefinition, StudioNodeProps } from '../../types';
-import { getDefaultPropValues, getStudioComponent } from '../../studioComponents';
+import {
+  NodeId,
+  StudioComponentDefinition,
+  StudioComponentProps,
+  StudioNodeProps,
+} from '../../types';
+import { getStudioComponent } from '../../studioComponents';
 import { PageStateObservable, usePageStateObservable } from '../PageStateProvider';
 import { getNode } from '../../studioPage';
 import { ExactEntriesOf } from '../../utils/types';
 import NodeContext from './NodeContext';
 import { useCurrentPage } from './PageContext';
 import { DATA_PROP_NODE_ID } from './contants';
+
+function getDefaultPropValues<P = {}>(definition: StudioComponentDefinition<P>): Partial<P> {
+  return Object.fromEntries(
+    (Object.entries(definition.props) as ExactEntriesOf<StudioComponentProps<P>>).map(
+      ([name, prop]) => [name, prop.defaultValue],
+    ),
+  ) as Partial<P>;
+}
 
 function getCurrentBoundProps<P>(
   nodeProps: StudioNodeProps<P>,

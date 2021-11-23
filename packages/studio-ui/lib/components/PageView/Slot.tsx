@@ -1,9 +1,16 @@
 import { Box, BoxProps } from '@mui/material';
 import React from 'react';
-import type { SlotDirection, SlotLayout, SlotLayoutCenter, SlotLayoutInsert } from '../../types';
+import type {
+  SlotDirection,
+  SlotLayout,
+  SlotLayoutCenter,
+  SlotLayoutInsert,
+  NodeId,
+} from '../../types';
 import { getRelativeBoundingBox } from '../../utils/geometry';
 import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from './contants';
 import NodeContext from './NodeContext';
+import RenderedNode from './RenderedNode';
 
 type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
@@ -132,7 +139,7 @@ export function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
 export interface SlotsProps {
   name: string;
   direction: FlowDirection;
-  children?: React.ReactNode;
+  children: NodeId[];
 }
 
 export function Slots({ children, name, direction }: SlotsProps) {
@@ -147,34 +154,36 @@ export function Slots({ children, name, direction }: SlotsProps) {
       style={{ display: 'contents' }}
       {...{ [DATA_PROP_SLOT]: name, [DATA_PROP_SLOT_DIRECTION]: direction }}
     >
-      {children}
+      {children.map((childnodeId) => (
+        <RenderedNode key={childnodeId} nodeId={childnodeId} />
+      ))}
     </div>
   );
 }
 
 export interface SlotProps extends BoxProps {
   name: string;
-  children?: React.ReactElement | null;
+  content?: NodeId | null;
 }
 
-export default function Slot({ name, children, ...props }: SlotProps) {
+export default function Slot({ name, content, ...props }: SlotProps) {
   const node = React.useContext(NodeContext);
 
   if (!node) {
     throw new Error(`Invariant: Slot used outside of a rendered node`);
   }
 
-  return (
-    children || (
-      <Box
-        display="block"
-        minHeight={40}
-        minWidth={200}
-        {...props}
-        {...{
-          [DATA_PROP_SLOT]: name,
-        }}
-      />
-    )
+  return content ? (
+    <RenderedNode nodeId={content} />
+  ) : (
+    <Box
+      display="block"
+      minHeight={40}
+      minWidth={200}
+      {...props}
+      {...{
+        [DATA_PROP_SLOT]: name,
+      }}
+    />
   );
 }

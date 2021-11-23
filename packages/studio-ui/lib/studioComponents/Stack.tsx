@@ -3,7 +3,6 @@ import React from 'react';
 import type { StudioComponentDefinition, NodeId } from '../types';
 import Slot, { Slots } from '../components/PageView/Slot';
 import { setConstProp } from '../studioPage';
-import RenderedNode from '../components/PageView/RenderedNode';
 
 const PAGE_DEFAULT_SLOTS: NodeId[] = [];
 
@@ -19,12 +18,10 @@ function StackComponent({ studioSlots, ...props }: StackComponentProps) {
     <InnerStackComponent {...props}>
       {studioSlots.length > 0 ? (
         <Slots name="slots" direction={props.direction || 'row'}>
-          {studioSlots.map((childnodeId) => (
-            <RenderedNode key={childnodeId} nodeId={childnodeId} />
-          ))}
+          {studioSlots}
         </Slots>
       ) : (
-        <Slot name="slot" />
+        <Slot name="slot" content={null} />
       )}
     </InnerStackComponent>
   );

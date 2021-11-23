@@ -3,7 +3,6 @@ import { Paper as InnerPaper, PaperProps as InnerPaperProps } from '@mui/materia
 import type { NodeId, StudioComponentDefinition } from '../types';
 import { setConstProp } from '../studioPage';
 import Slot from '../components/PageView/Slot';
-import RenderedNode from '../components/PageView/RenderedNode';
 
 interface PaperComponentProps extends InnerPaperProps {
   studioSlot: NodeId | null;
@@ -12,7 +11,7 @@ interface PaperComponentProps extends InnerPaperProps {
 function PaperComponent({ studioSlot, ...props }: PaperComponentProps) {
   return (
     <InnerPaper {...props} sx={{ padding: 1 }}>
-      <Slot name="content">{studioSlot ? <RenderedNode nodeId={studioSlot} /> : null}</Slot>
+      <Slot name={'content'} content={studioSlot} />
     </InnerPaper>
   );
 }

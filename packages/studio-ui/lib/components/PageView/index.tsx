@@ -5,6 +5,7 @@ import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry'
 import PageContext from './PageContext';
 import { DATA_PROP_NODE_ID } from './contants';
 import RenderedNode from './RenderedNode';
+import RenderNodeContext from './RenderNodeContext';
 
 const PageViewRoot = styled('div')({});
 
@@ -28,9 +29,8 @@ export function getViewCoordinates(
   const rect = viewElm.getBoundingClientRect();
   if (rectContainsPoint(rect, clientX, clientY)) {
     return { x: clientX - rect.x, y: clientY - rect.y };
-  } 
-    return null;
-  
+  }
+  return null;
 }
 
 export interface PageViewProps {
@@ -38,15 +38,17 @@ export interface PageViewProps {
   page: StudioPage;
 }
 
+const renderNode = (nodeId: NodeId) => <RenderedNode nodeId={nodeId} />;
+
 export default React.forwardRef(function PageView(
   { className, page }: PageViewProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   return (
     <PageViewRoot ref={ref} className={className}>
-      <PageContext.Provider value={page}>
-        {<RenderedNode nodeId={page.root} />}
-      </PageContext.Provider>
+      <RenderNodeContext.Provider value={renderNode}>
+        <PageContext.Provider value={page}>{renderNode(page.root)}</PageContext.Provider>
+      </RenderNodeContext.Provider>
     </PageViewRoot>
   );
 });

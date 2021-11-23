@@ -10,7 +10,7 @@ import type {
 import { getRelativeBoundingBox } from '../../utils/geometry';
 import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from './contants';
 import NodeContext from './NodeContext';
-import RenderedNode from './RenderedNode';
+import RenderNodeContext from './RenderNodeContext';
 
 type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
@@ -144,6 +144,7 @@ export interface SlotsProps {
 
 export function Slots({ children, name, direction }: SlotsProps) {
   const node = React.useContext(NodeContext);
+  const renderNode = React.useContext(RenderNodeContext);
 
   if (!node) {
     throw new Error(`Invariant: Slot used outside of a rendered node`);
@@ -154,9 +155,7 @@ export function Slots({ children, name, direction }: SlotsProps) {
       style={{ display: 'contents' }}
       {...{ [DATA_PROP_SLOT]: name, [DATA_PROP_SLOT_DIRECTION]: direction }}
     >
-      {children.map((childnodeId) => (
-        <RenderedNode key={childnodeId} nodeId={childnodeId} />
-      ))}
+      {children.map((childnodeId) => renderNode(childnodeId))}
     </div>
   );
 }
@@ -168,13 +167,14 @@ export interface SlotProps extends BoxProps {
 
 export default function Slot({ name, content, ...props }: SlotProps) {
   const node = React.useContext(NodeContext);
+  const renderNode = React.useContext(RenderNodeContext);
 
   if (!node) {
     throw new Error(`Invariant: Slot used outside of a rendered node`);
   }
 
   return content ? (
-    <RenderedNode nodeId={content} />
+    <React.Fragment>{renderNode(content)}</React.Fragment>
   ) : (
     <Box
       display="block"

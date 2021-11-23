@@ -175,7 +175,8 @@ function findClosestSlot(slots: SlotLayout[], x: number, y: number): SlotLayout 
   let closestDistance = Infinity;
   let closestSlot: SlotLayout | null = null;
 
-  for (const slotLayout of slots) {
+  for (let i = 0; i < slots.length; i += 1) {
+    const slotLayout = slots[i];
     let distance: number;
     if (slotLayout.type === 'slot') {
       distance = distanceToRect(slotLayout.rect, x, y);
@@ -311,10 +312,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       }
 
       const observer = observerRef.current;
-
-      for (const elm of elms) {
-        observer.observe(elm);
-      }
+      elms.forEach((elm) => observer.observe(elm));
 
       return () => observer.disconnect();
     }
@@ -464,6 +462,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
   return (
     <StudioViewEditorRoot className={className}>
       <StudioView className={classes.view} ref={viewRef} page={state.page} />
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
       <div
         className={clsx(classes.hud, {
           [classes.componentDragging]: state.highlightLayout,

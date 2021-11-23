@@ -18,11 +18,11 @@ export function getDefaultPropValues<P = {}>(definition: StudioComponentDefiniti
   const entries = Object.entries(definition.props) as ExactEntriesOf<
     StudioComponentPropDefinitions<P>
   >;
-  for (const [name, prop] of entries) {
+  entries.forEach(([name, prop]) => {
     if (prop) {
       result[name] = prop.defaultValue;
     }
-  }
+  });
 
   return result;
 }
@@ -78,7 +78,6 @@ interface RenderedNodeProps {
 export default function RenderedNode<P>({ nodeId }: RenderedNodeProps) {
   const page = useCurrentPage();
   const node = getNode(page, nodeId);
-  console.log(node);
 
   const definition = getStudioComponent(node.component);
 
@@ -97,24 +96,22 @@ export default function RenderedNode<P>({ nodeId }: RenderedNodeProps) {
 
   React.useEffect(() => {
     const unsubscribes: (() => void)[] = [];
-    for (const [propName, prop] of Object.entries(node.props) as ExactEntriesOf<
-      StudioNodeProps<P>
-    >) {
-      if (prop?.type === 'binding') {
-        const unsubscribe = stateObservable.subscribe(prop.state, () => {
-          setBoundProps((props) => ({
-            ...props,
-            [propName]: stateObservable.getValue(prop.state),
-          }));
-        });
-        unsubscribes.push(unsubscribe);
-      }
-    }
-    return () => {
-      for (const unsubscribe of unsubscribes) {
-        unsubscribe();
-      }
-    };
+
+    (Object.entries(node.props) as ExactEntriesOf<StudioNodeProps<P>>).forEach(
+      ([propName, prop]) => {
+        if (prop?.type === 'binding') {
+          const unsubscribe = stateObservable.subscribe(prop.state, () => {
+            setBoundProps((props) => ({
+              ...props,
+              [propName]: stateObservable.getValue(prop.state),
+            }));
+          });
+          unsubscribes.push(unsubscribe);
+        }
+      },
+    );
+
+    return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
   }, [node, stateObservable]);
 
   if (!definition) {

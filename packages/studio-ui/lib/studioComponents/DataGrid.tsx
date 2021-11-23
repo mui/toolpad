@@ -11,10 +11,11 @@ interface DataGridWithQueryProps extends DataGridProps {
 function FixedSizeGrid(props: DataGridWithQueryProps) {
   const dataGridProps = { ...props };
   const rootProps: any = {};
-  for (const prop of STUDIO_PROPS) {
+
+  STUDIO_PROPS.forEach((prop) => {
     rootProps[prop] = (dataGridProps as any)[prop];
     delete (dataGridProps as any)[prop];
-  }
+  });
 
   const queryProps = useDataQuery(dataGridProps.studioDataQuery);
 

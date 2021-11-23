@@ -37,6 +37,7 @@ const CustomContent = React.forwardRef(function CustomContent(props: TreeItemCon
   };
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className={clsx(className, classes.root, {
         [classes.expanded]: expanded,
@@ -47,6 +48,7 @@ const CustomContent = React.forwardRef(function CustomContent(props: TreeItemCon
       onMouseDown={handleMouseDown}
       ref={ref as React.Ref<HTMLDivElement>}
     >
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
       <div onClick={handleExpansionClick} className={classes.iconContainer}>
         {icon}
       </div>

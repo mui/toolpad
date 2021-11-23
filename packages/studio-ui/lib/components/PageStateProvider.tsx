@@ -22,9 +22,7 @@ const PageStateContext = React.createContext<PageStateObservable>({
 function fireHandlers(handlers: Map<string, Set<Handler>>, key: string) {
   const handlersToRun = handlers.get(key);
   if (handlersToRun) {
-    for (const handler of handlersToRun) {
-      handler();
-    }
+    handlersToRun.forEach((handler) => handler());
   }
 }
 
@@ -45,12 +43,12 @@ export default function PageStateProvider({ children, page }: PageStateProps) {
   );
 
   React.useEffect(() => {
-    for (const [key, stateDef] of Object.entries(page.state)) {
+    Object.entries(page.state).forEach(([key, stateDef]) => {
       if (!Object.prototype.hasOwnProperty.call(state.current, key)) {
         state.current[key] = stateDef.initialValue;
         fireHandlers(handlers.current, key);
       }
-    }
+    });
   }, [page.state]);
 
   const ctx = React.useMemo(() => {

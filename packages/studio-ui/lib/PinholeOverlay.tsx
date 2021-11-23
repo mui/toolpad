@@ -86,16 +86,25 @@ export function PinholeOverlay({ className, onClick, pinhole }: PinholeOverlaypr
     <PinholeOverlayRoot className={className}>
       {pinhole ? (
         <React.Fragment>
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           <div key="left" ref={left} onClick={handleClick} />
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           <div key="topLeft" ref={topLeft} onClick={handleClick} />
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           <div key="top" ref={top} onClick={handleClick} />
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           <div key="topRight" ref={topRight} onClick={handleClick} />
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           <div key="right" ref={right} onClick={handleClick} />
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           <div key="bottomRight" ref={bottomRight} onClick={handleClick} />
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           <div key="bottom" ref={bottom} onClick={handleClick} />
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           <div key="bottomLeft" ref={bottomLeft} onClick={handleClick} />
         </React.Fragment>
       ) : (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
         <div key="full" onClick={handleClick} />
       )}
     </PinholeOverlayRoot>

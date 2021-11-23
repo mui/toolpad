@@ -9,7 +9,7 @@
     "fix": "next lint --fix && prettier --write ."
   },
   "dependencies": {
-    "@emotion/cache": "latest",
+    "@emotion/cache": "^11.6.0",
     "@emotion/react": "^11.4.1",
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.3.0",

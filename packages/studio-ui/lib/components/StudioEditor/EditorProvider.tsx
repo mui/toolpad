@@ -36,8 +36,8 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
     setComponentPanelTab(tab: ComponentPanelTab) {
       dispatch({ type: 'SET_COMPONENT_PANEL_TAB', tab });
     },
-    addComponentDragStart(component: string, props: StudioNodeProps) {
-      dispatch({ type: 'ADD_COMPONENT_DRAG_START', component, props });
+    addComponentDragStart(component: string) {
+      dispatch({ type: 'ADD_COMPONENT_DRAG_START', component });
     },
     nodeDragStart(nodeId: NodeId) {
       dispatch({ type: 'NODE_DRAG_START', nodeId });

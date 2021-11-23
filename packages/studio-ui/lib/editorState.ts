@@ -1,7 +1,7 @@
 import { getStudioComponent } from './studioComponents';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
-import { createNode, getChildren, getNode, setNodeName, setNodeProps } from './studioPage';
+import { createNode, getNode, setNodeName, setNodeProps } from './studioPage';
 import {
   NodeId,
   SlotLocation,
@@ -60,7 +60,6 @@ export type EditorAction =
   | {
       type: 'ADD_COMPONENT_DRAG_START';
       component: string;
-      props: StudioNodeProps;
     }
   | {
       type: 'NODE_DRAG_START';
@@ -188,7 +187,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       if (state.newNode) {
         return state;
       }
-      const newNode = createNode(state.page, action.component, action.props);
+      const newNode = createNode(state.page, action.component, {});
       return update(state, {
         selection: null,
         newNode,
@@ -215,7 +214,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         if (newNode.parentId === action.location?.nodeId) {
           // The following removal will reduce the children, so we adjust the index
           // if we're moving a node down within the same parent.
-          const siblings = getChildren(state.page, newNode.parentId);
+          const siblings = newNode.children;
           const currentIndex = siblings.indexOf(newNode.id);
           if (action.location.index > currentIndex) {
             indexOffset = -1;

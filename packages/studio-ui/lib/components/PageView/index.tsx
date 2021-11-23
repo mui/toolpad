@@ -38,7 +38,7 @@ export interface PageViewProps {
   page: StudioPage;
 }
 
-const renderNode = (nodeId: NodeId) => <RenderedNode nodeId={nodeId} />;
+const renderNode = (nodeId: NodeId) => <RenderedNode key={nodeId} nodeId={nodeId} />;
 
 export default React.forwardRef(function PageView(
   { className, page }: PageViewProps,

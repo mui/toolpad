@@ -51,7 +51,7 @@ export interface StudioConstantProp<V> {
 export type StudioNodeProp<V> = StudioConstantProp<V> | StudioBoundProp;
 
 export type StudioNodeProps<P = DefaultNodeProps> = {
-  readonly [K in keyof P]: StudioNodeProp<P[K]> | undefined;
+  readonly [K in Exclude<keyof P, 'children'>]: StudioNodeProp<P[K]> | undefined;
 };
 
 export type NodeId = Branded<string, 'NodeId'>;
@@ -62,6 +62,7 @@ export interface StudioNode<P = DefaultNodeProps> {
   readonly component: string;
   readonly name: string;
   readonly props: Partial<StudioNodeProps<P>>;
+  readonly children: NodeId[];
 }
 
 export interface StudioPageSummary {
@@ -99,8 +100,8 @@ export interface StudioComponentProp<K extends keyof P, P = DefaultNodeProps> {
   onChangeTransform?: (...props: any) => any;
 }
 
-export type StudioComponentProps<P = DefaultNodeProps> = {
-  [K in keyof P]: StudioComponentProp<K, P>;
+export type StudioComponentPropDefinitions<P = DefaultNodeProps> = {
+  [K in Exclude<keyof P, 'children'>]?: StudioComponentProp<K, P>;
 };
 
 export type SlotPosition = 'start' | 'end' | 'center';
@@ -127,9 +128,8 @@ export type NodeReducer<P> = (props: StudioNode<P>, action: PropsAction) => Stud
 
 export interface StudioComponentDefinition<P = DefaultNodeProps> {
   Component: React.FC<P>;
-  props: StudioComponentProps<P>;
+  props: StudioComponentPropDefinitions<P>;
   reducer?: NodeReducer<P>;
-  getChildren?: (node: StudioNode<P>) => readonly NodeId[];
 }
 
 export interface StudioComponentDefinitions {

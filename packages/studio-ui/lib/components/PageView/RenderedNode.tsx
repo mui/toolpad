@@ -2,7 +2,7 @@ import * as React from 'react';
 import {
   NodeId,
   StudioComponentDefinition,
-  StudioComponentProps,
+  StudioComponentPropDefinitions,
   StudioNodeProps,
 } from '../../types';
 import { getStudioComponent } from '../../studioComponents';
@@ -13,12 +13,18 @@ import NodeContext from './NodeContext';
 import { useCurrentPage } from './PageContext';
 import { DATA_PROP_NODE_ID } from './contants';
 
-function getDefaultPropValues<P = {}>(definition: StudioComponentDefinition<P>): Partial<P> {
-  return Object.fromEntries(
-    (Object.entries(definition.props) as ExactEntriesOf<StudioComponentProps<P>>).map(
-      ([name, prop]) => [name, prop.defaultValue],
-    ),
-  ) as Partial<P>;
+export function getDefaultPropValues<P = {}>(definition: StudioComponentDefinition<P>): Partial<P> {
+  const result: Partial<P> = {};
+  const entries = Object.entries(definition.props) as ExactEntriesOf<
+    StudioComponentPropDefinitions<P>
+  >;
+  for (const [name, prop] of entries) {
+    if (prop) {
+      result[name] = prop.defaultValue;
+    }
+  }
+
+  return result;
 }
 
 function getCurrentBoundProps<P>(
@@ -72,6 +78,7 @@ interface RenderedNodeProps {
 export default function RenderedNode<P>({ nodeId }: RenderedNodeProps) {
   const page = useCurrentPage();
   const node = getNode(page, nodeId);
+  console.log(node);
 
   const definition = getStudioComponent(node.component);
 
@@ -123,7 +130,7 @@ export default function RenderedNode<P>({ nodeId }: RenderedNodeProps) {
 
   return (
     <NodeContext.Provider value={node}>
-      <definition.Component {...componentProps} />
+      <definition.Component {...componentProps}>{node.children}</definition.Component>
     </NodeContext.Provider>
   );
 }

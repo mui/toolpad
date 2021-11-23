@@ -1,15 +1,15 @@
 // Immutable DOM structures
 
-import { update, updateOrCreate } from './utils/immutability';
+import { update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import type { NodeId, StudioNode, StudioNodeProp, StudioNodeProps, StudioPage } from './types';
-import { getStudioComponent } from './studioComponents';
 
 function createNodeInternal<P>(
   id: NodeId,
   component: string,
   props: Partial<StudioNodeProps<P>> = {},
   name: string,
+  children: NodeId[],
 ): StudioNode<P> {
   return {
     id,
@@ -17,6 +17,7 @@ function createNodeInternal<P>(
     name,
     component,
     props,
+    children,
   };
 }
 
@@ -43,6 +44,7 @@ export function createNode<P>(
   component: string,
   props: Partial<StudioNodeProps<P>> = {},
   name?: string,
+  children: NodeId[] = [],
 ): StudioNode {
   const existingNames = getNodeNames(page);
   return createNodeInternal(
@@ -52,12 +54,13 @@ export function createNode<P>(
     name
       ? generateUniqueName(name, existingNames)
       : generateUniqueName(component, existingNames, true),
+    children,
   );
 }
 
 export function createPage(id: string): StudioPage {
   const rootId = generateUniqueId(new Set()) as NodeId;
-  const root = createNodeInternal(rootId, 'Page', {}, 'Page');
+  const root = createNodeInternal(rootId, 'Page', {}, 'Page', []);
   return {
     id,
     nodes: {
@@ -77,15 +80,9 @@ export function getNode(page: StudioPage, nodeId: NodeId): StudioNode {
   return node;
 }
 
-export function getChildren(page: StudioPage, nodeId: NodeId): readonly NodeId[] {
-  const node = getNode(page, nodeId);
-  const { getChildren: componentGetChildren } = getStudioComponent(node.component);
-  return componentGetChildren?.(node) ?? [];
-}
-
 export function getDecendants(page: StudioPage, nodeId: NodeId): readonly NodeId[] {
-  const children = getChildren(page, nodeId);
-  return [...children, ...children.flatMap((child) => getChildren(page, child))];
+  const node = getNode(page, nodeId);
+  return [...node.children, ...node.children.flatMap((child) => getDecendants(page, child))];
 }
 
 export function getAncestors(page: StudioPage, nodeId: NodeId): readonly NodeId[] {
@@ -101,8 +98,8 @@ export function getNodes(page: StudioPage): NodeId[] {
  * Nodes on a page, sorted by depth, root first
  */
 export function nodesByDepth(page: StudioPage, nodeId: NodeId = page.root): NodeId[] {
-  const children = getChildren(page, nodeId);
-  return [nodeId, ...children.flatMap((child) => nodesByDepth(page, child))];
+  const node = getNode(page, nodeId);
+  return [nodeId, ...node.children.flatMap((child) => nodesByDepth(page, child))];
 }
 
 export function setNodeName(page: StudioPage, nodeId: NodeId, name: string): StudioPage {
@@ -147,21 +144,6 @@ export function setNodeProps<P>(
         props,
       }),
     }),
-  });
-}
-
-export function setConstProp<P, K extends keyof P>(
-  node: StudioNode<P>,
-  prop: K,
-  value: P[K],
-): StudioNode<P> {
-  return update(node, {
-    props: update(node.props, {
-      [prop]: updateOrCreate(node.props[prop], {
-        type: 'const',
-        value,
-      }),
-    } as Partial<StudioNodeProps<P>>),
   });
 }
 

@@ -3,11 +3,17 @@ import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { getStudioComponent } from '../../studioComponents';
-import { PropTypeDefinition, StudioComponentProp, StudioNode } from '../../types';
+import {
+  PropTypeDefinition,
+  StudioComponentProp,
+  StudioComponentPropDefinitions,
+  StudioNode,
+} from '../../types';
 import { usePageStateObservable } from '../PageStateProvider';
 import { getNode } from '../../studioPage';
 import propTypes from '../../studioPropTypes';
 import { useEditorApi, useEditorState } from './EditorProvider';
+import { ExactEntriesOf } from '../../utils/types';
 
 const classes = {
   control: 'StudioControl',
@@ -19,26 +25,26 @@ const ComponentPropsEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-interface ComponentPropEditorProps<P, K extends keyof P & string> {
+interface ComponentPropEditorProps<P, K extends Exclude<keyof P, 'children'>> {
   name: K;
   node: StudioNode<P>;
   prop: StudioComponentProp<K, P>;
 }
 
-function ComponentPropEditor<P, K extends keyof P & string>({
+function ComponentPropEditor<P, K extends Exclude<keyof P, 'children'>>({
   name,
-  prop,
   node,
+  prop,
 }: ComponentPropEditorProps<P, K>) {
   const api = useEditorApi();
 
   const handleChange = React.useCallback(
-    (value: unknown) => api.setNodeProp(node.id, name, { type: 'const', value }),
+    (value: unknown) => api.setNodeProp(node.id, name as string, { type: 'const', value }),
     [api, node.id, name],
   );
 
   const handleClickBind = React.useCallback(
-    () => api.openBindingEditor(node.id, name),
+    () => api.openBindingEditor(node.id, name as string),
     [api, node.id, name],
   );
 
@@ -73,7 +79,12 @@ function ComponentPropEditor<P, K extends keyof P & string>({
 
   return (
     <Stack direction="row" alignItems="flex-start">
-      <propTypeDef.Editor name={name} disabled={hasBinding} value={value} onChange={handleChange} />
+      <propTypeDef.Editor
+        name={name as string}
+        disabled={hasBinding}
+        value={value}
+        onChange={handleChange}
+      />
       <IconButton size="small" onClick={handleClickBind} color={hasBinding ? 'primary' : 'inherit'}>
         {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
       </IconButton>
@@ -81,19 +92,23 @@ function ComponentPropEditor<P, K extends keyof P & string>({
   );
 }
 
-interface ComponentPropsEditorProps {
-  node: StudioNode;
+interface ComponentPropsEditorProps<P> {
+  node: StudioNode<P>;
 }
 
-function ComponentPropsEditor({ node }: ComponentPropsEditorProps) {
+function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
   const definition = getStudioComponent(node.component);
+
   return (
     <ComponentPropsEditorRoot>
-      {Object.entries(definition.props).map(([propName, prop]) => (
-        <div key={propName} className={classes.control}>
-          <ComponentPropEditor name={propName} prop={prop} node={node} />
-        </div>
-      ))}
+      {(Object.entries(definition.props) as ExactEntriesOf<StudioComponentPropDefinitions<P>>).map(
+        ([propName, prop]) =>
+          prop ? (
+            <div key={propName as string} className={classes.control}>
+              <ComponentPropEditor name={propName} prop={prop} node={node} />
+            </div>
+          ) : null,
+      )}
     </ComponentPropsEditorRoot>
   );
 }

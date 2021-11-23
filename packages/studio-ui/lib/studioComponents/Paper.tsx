@@ -1,17 +1,17 @@
 import * as React from 'react';
 import { Paper as InnerPaper, PaperProps as InnerPaperProps } from '@mui/material';
 import type { NodeId, StudioComponentDefinition } from '../types';
-import { setConstProp } from '../studioPage';
 import Slot from '../components/PageView/Slot';
+import { update } from '../utils/immutability';
 
 interface PaperComponentProps extends InnerPaperProps {
-  studioSlot: NodeId | null;
+  children: NodeId[];
 }
 
-function PaperComponent({ studioSlot, ...props }: PaperComponentProps) {
+function PaperComponent({ children, ...props }: PaperComponentProps) {
   return (
     <InnerPaper {...props} sx={{ padding: 1 }}>
-      <Slot name={'content'} content={studioSlot} />
+      <Slot name={'content'} content={children.length > 0 ? children[0] : null} />
     </InnerPaper>
   );
 }
@@ -23,27 +23,23 @@ const Paper: StudioComponentDefinition<PaperComponentProps> = {
       type: 'number',
       defaultValue: 1,
     },
-    studioSlot: {
-      type: 'Node',
-      defaultValue: null,
-    },
   },
   reducer: (node, action) => {
     switch (action.type) {
       case 'FILL_SLOT': {
-        return setConstProp(node, 'studioSlot', action.nodeId);
+        return update(node, {
+          children: [action.nodeId],
+        });
       }
       case 'CLEAR_SLOT': {
-        return setConstProp(node, 'studioSlot', null);
+        return update(node, {
+          children: [],
+        });
       }
       default:
         return node;
     }
   },
-  getChildren: (node) =>
-    node.props.studioSlot?.type === 'const' && node.props.studioSlot.value
-      ? [node.props.studioSlot.value]
-      : [],
 };
 
 export default Paper;

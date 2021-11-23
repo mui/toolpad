@@ -1,7 +1,6 @@
 import type { StudioComponentDefinition, StudioComponentDefinitions } from '../types';
 
 import Page from './Page';
-import GridRow from './GridRow';
 import Text from './Text';
 import TextField from './TextField';
 import Button from './Button';
@@ -11,7 +10,6 @@ import DataGrid from './DataGrid';
 
 const studioComponents: StudioComponentDefinitions = {
   Page,
-  GridRow,
   TextField,
   Text,
   Button,

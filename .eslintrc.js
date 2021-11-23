@@ -22,7 +22,6 @@ module.exports = {
     'jsdoc/require-returns-type': ['error', { contexts: ['TSFunctionType'] }],
     'jsdoc/require-returns-description': ['error', { contexts: ['TSFunctionType'] }],
     // TODO: solve later, non critical for prototype
-    'import/no-cycle': ['off'],
     'no-restricted-syntax': ['off'],
     'jsx-a11y/click-events-have-key-events': ['off'],
     'jsx-a11y/no-static-element-interactions': ['off'],

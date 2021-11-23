@@ -37,15 +37,23 @@ export function AddBindingEditor<P, K extends keyof P & string>({
 
   const srcNodeId = srcNode.id;
   const srcDefinition = getStudioComponent(srcNode.component);
+  const srcPropDefinition = srcDefinition.props[srcProp];
 
-  const { type: srcType } = srcDefinition.props[srcProp];
+  if (!srcPropDefinition) {
+    throw new Error(`Invariant: trying to bind an unknown property "${srcProp}"`);
+  }
+  const srcType = srcPropDefinition.type;
 
   const bindableProps = React.useMemo(() => {
     return Object.values(state.page.nodes).flatMap((destNode) => {
       const destDefinition = getStudioComponent(destNode.component);
 
       return Object.entries(destDefinition.props).flatMap(([destProp]) => {
-        const { type: destType } = destDefinition.props[destProp];
+        const destPropDefinition = destDefinition.props[destProp];
+        if (!destPropDefinition) {
+          throw new Error(`Invariant: trying to bind an unknown property "${srcProp}"`);
+        }
+        const destType = destPropDefinition.type;
         if ((destNode.id === srcNodeId && destProp === srcProp) || destType !== srcType) {
           return [];
         }
@@ -72,10 +80,10 @@ export function AddBindingEditor<P, K extends keyof P & string>({
         srcProp,
         selection.nodeId,
         selection.propName,
-        srcDefinition.props[srcProp].defaultValue,
+        srcPropDefinition.defaultValue,
       );
     }
-  }, [api, srcNodeId, srcProp, bindableProps, selectedIdx, srcDefinition.props]);
+  }, [api, srcNodeId, srcProp, bindableProps, selectedIdx, srcPropDefinition]);
 
   return (
     <React.Fragment>
@@ -145,8 +153,8 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
         <Stack direction="row" gap={1}>
           {boundProps.map((boundProp) => (
             <Chip
-              key={`${boundProp.node.id}.${boundProp.prop}`}
-              label={`${boundProp.node.name}.${boundProp.prop}`}
+              key={`${boundProp.node.id}.${String(boundProp.prop)}`}
+              label={`${boundProp.node.name}.${String(boundProp.prop)}`}
             />
           ))}
         </Stack>

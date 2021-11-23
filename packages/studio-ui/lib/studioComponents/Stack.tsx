@@ -2,23 +2,21 @@ import { Stack as InnerStackComponent, StackProps } from '@mui/material';
 import React from 'react';
 import type { StudioComponentDefinition, NodeId } from '../types';
 import Slot, { Slots } from '../components/PageView/Slot';
-import { setConstProp } from '../studioPage';
-
-const PAGE_DEFAULT_SLOTS: NodeId[] = [];
+import { update } from '../utils/immutability';
 
 interface StackComponentProps extends StackProps {
   // TODO: support more values for gap and direction
   gap?: number;
   direction?: 'row' | 'column';
-  studioSlots: NodeId[];
+  children: NodeId[];
 }
 
-function StackComponent({ studioSlots, ...props }: StackComponentProps) {
+function StackComponent({ children, ...props }: StackComponentProps) {
   return (
     <InnerStackComponent {...props}>
-      {studioSlots.length > 0 ? (
+      {children.length > 0 ? (
         <Slots name="slots" direction={props.direction || 'row'}>
-          {studioSlots}
+          {children}
         </Slots>
       ) : (
         <Slot name="slot" content={null} />
@@ -39,43 +37,31 @@ const Stack: StudioComponentDefinition<StackComponentProps> = {
       type: 'StackAlignment',
       defaultValue: 'center',
     },
-    studioSlots: {
-      type: 'Nodes',
-      defaultValue: PAGE_DEFAULT_SLOTS,
-    },
   },
   reducer: (node, action) => {
     switch (action.type) {
       case 'FILL_SLOT': {
-        const oldValue =
-          node.props.studioSlots?.type === 'const'
-            ? node.props.studioSlots.value
-            : PAGE_DEFAULT_SLOTS;
+        const oldValue = node.children;
 
-        const newValue = [
-          ...oldValue.slice(0, action.index),
-          action.nodeId,
-          ...oldValue.slice(action.index),
-        ];
-
-        return setConstProp(node, 'studioSlots', newValue);
+        return update(node, {
+          children: [
+            ...oldValue.slice(0, action.index),
+            action.nodeId,
+            ...oldValue.slice(action.index),
+          ],
+        });
       }
       case 'CLEAR_SLOT': {
-        const oldValue =
-          node.props.studioSlots?.type === 'const'
-            ? node.props.studioSlots.value
-            : PAGE_DEFAULT_SLOTS;
+        const oldValue = node.children;
 
-        const newValue = oldValue.filter((slot) => slot !== action.nodeId);
-
-        return setConstProp(node, 'studioSlots', newValue);
+        return update(node, {
+          children: oldValue.filter((slot) => slot !== action.nodeId),
+        });
       }
       default:
         return node;
     }
   },
-  getChildren: (node) =>
-    node.props.studioSlots?.type === 'const' ? node.props.studioSlots.value : [],
 };
 
 export default Stack;

@@ -7,7 +7,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { NodeId } from '../../types';
 import { getNode } from '../../studioPage';
-import { getStudioComponent } from '../../studioComponents';
 import { useEditorApi, useEditorState } from './EditorProvider';
 
 const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
@@ -66,15 +65,11 @@ function HierarchyExplorerItem({ nodeId }: HierarchyExplorerItemProps) {
   const state = useEditorState();
   const item = getNode(state.page, nodeId);
 
-  const componentDef = getStudioComponent(item.component);
-
   return (
     <TreeItem ContentComponent={CustomContent} nodeId={item.id} label={`${item.name} (${item.id})`}>
-      {componentDef
-        .getChildren?.(item)
-        .map((childId) =>
-          childId ? <HierarchyExplorerItem key={childId} nodeId={childId} /> : null,
-        )}
+      {item.children.map((childId) =>
+        childId ? <HierarchyExplorerItem key={childId} nodeId={childId} /> : null,
+      )}
     </TreeItem>
   );
 }

@@ -1,16 +1,7 @@
 import * as React from 'react';
 import { List, ListItem } from '@mui/material';
-import { StudioComponentDefinition } from '../../types';
 import componentDefinitions from '../../studioComponents';
 import { useEditorApi } from './EditorProvider';
-
-function getDefaultProps(definition: StudioComponentDefinition): Record<string, any> {
-  return Object.fromEntries(
-    Object.entries(definition.props).flatMap(([name, prop]) =>
-      prop.defaultValue !== undefined ? [[name, prop.defaultValue]] : [],
-    ),
-  );
-}
 
 export interface ComponentCatalogProps {
   className?: string;
@@ -19,20 +10,20 @@ export interface ComponentCatalogProps {
 export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = useEditorApi();
 
-  const handleDragStart =
-    (id: string, definition: StudioComponentDefinition) =>
-    (event: React.DragEvent<HTMLLIElement>) => {
-      event.dataTransfer.dropEffect = 'copy';
-      api.addComponentDragStart(id, getDefaultProps(definition));
-    };
+  const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLLIElement>) => {
+    event.dataTransfer.dropEffect = 'copy';
+    api.addComponentDragStart(componentType);
+  };
 
   return (
     <List className={className}>
-      {Object.entries(componentDefinitions).map(([id, definition]) => {
-        if (!definition) {return null;}
+      {Object.entries(componentDefinitions).map(([componentType, definition]) => {
+        if (!definition) {
+          return null;
+        }
         return (
-          <ListItem key={id} draggable onDragStart={handleDragStart(id, definition)}>
-            {id}
+          <ListItem key={componentType} draggable onDragStart={handleDragStart(componentType)}>
+            {componentType}
           </ListItem>
         );
       })}

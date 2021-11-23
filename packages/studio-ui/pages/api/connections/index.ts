@@ -20,16 +20,15 @@ export default (async (req, res) => {
       // TODO: secure this
       if (req.query.full) {
         return res.json(await getConnections());
-      } 
-        return res.json(await getConnectionSummaries());
-      
+      }
+      return res.json(await getConnectionSummaries());
+
     case 'POST': {
       if (req.body.test) {
         const status = await testConnection(req.body.type, req.body.params);
         return res.json({ ...req.body, status });
-      } 
-        return res.json(await addConnection(req.body));
-      
+      }
+      return res.json(await addConnection(req.body));
     }
     default: {
       return res.status(404).end();

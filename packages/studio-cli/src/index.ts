@@ -1,7 +1,8 @@
 import arg from 'arg';
 import * as path from 'path';
-import execa from 'execa';
+import { execa } from 'execa';
 import { StudioConfiguration } from '@mui/studio-core';
+import { createRequire } from 'module';
 
 const args = arg({
   // Types
@@ -28,7 +29,10 @@ const studioUiConfig: StudioConfiguration = {
   dir: PROJECT_DIR,
 };
 
-const studioUiDir = path.dirname(require.resolve('@mui/studio-ui/package.json'));
+const studioUiDir = path.dirname(
+  createRequire(import.meta.url).resolve('@mui/studio-ui/package.json'),
+);
+
 const cp = execa('next', [NEXT_CMD], {
   cwd: studioUiDir,
   preferLocal: true,

@@ -6,6 +6,7 @@
   "homepage": "https://github.com/mui-org/mui-studio#readme",
   "license": "ISC",
   "main": "src/index.ts",
+  "type": "module",
   "files": [
     "src"
   ],
@@ -26,7 +27,7 @@
     "@mui/studio-core": "^0.0.1",
     "@mui/studio-ui": "^0.0.1",
     "arg": "^5.0.1",
-    "execa": "^5.1.1"
+    "execa": "^6.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15",

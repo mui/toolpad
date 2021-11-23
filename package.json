@@ -23,9 +23,9 @@
   },
   "devDependencies": {
     "@material-ui/monorepo": "https://github.com/mui-org/material-ui.git#master",
-    "@swc/core": "^1.2.108",
+    "@swc/core": "^1.2.111",
     "@swc/helpers": "^0.2.14",
-    "@types/node": "^16.11.7",
+    "@types/node": "^16.11.9",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "cross-env": "^7.0.3",
@@ -44,7 +44,7 @@
     "lerna": "^4.0.0",
     "prettier": "^2.4.1",
     "regenerator-runtime": "^0.13.9",
-    "typescript": "^4.4.4"
+    "typescript": "^4.5.2"
   },
   "resolutions": {
     "eslint-plugin-react": "7.27.1"

@@ -1,6 +1,7 @@
 import arg from 'arg';
 import * as path from 'path';
 import execa from 'execa';
+import { StudioConfiguration } from '@mui/studio-core';
 
 const args = arg({
   // Types
@@ -16,9 +17,9 @@ const NEXT_CMD = DEV_MODE ? 'dev' : 'start';
 
 const studioUiDir = path.dirname(require.resolve('@mui/studio-ui/package.json'));
 
-// TODO: read configuration here
-const studioUiConfig = {
-  foo: 'hello world',
+// TODO: read a real configuration here
+const studioUiConfig: StudioConfiguration = {
+  foo: 'bar',
 };
 
 execa('next', [NEXT_CMD], {

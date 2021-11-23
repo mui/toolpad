@@ -1,28 +1,37 @@
 {
   "name": "@mui/studio-ui",
   "version": "0.0.1",
-  "dependencies": {
-    "@emotion/cache": "latest",
-    "@emotion/react": "latest",
-    "@emotion/server": "latest",
-    "@emotion/styled": "latest",
-    "@mui/material": "latest",
-    "@mui/studio-core": "^0.0.1",
-    "clsx": "latest",
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
-  },
   "scripts": {
-    "dev": "next",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "post-update": "echo \"codesandbox preview only, need an update\" && yarn upgrade --latest"
+    "lint": "next lint && prettier --check .",
+    "fix": "next lint --fix && prettier --write ."
+  },
+  "dependencies": {
+    "@emotion/cache": "^11.6.0",
+    "@emotion/react": "^11.4.1",
+    "@emotion/server": "^11.4.0",
+    "@emotion/styled": "^11.3.0",
+    "@mui/icons-material": "^5.1.0",
+    "@mui/lab": "^5.0.0-alpha.54",
+    "@mui/material": "^5.1.0",
+    "@mui/studio-core": "^0.0.1",
+    "@mui/styles": "^5.1.0",
+    "@mui/x-data-grid": "^5.0.0-beta.7",
+    "clsx": "^1.1.1",
+    "next": "^12.0.4",
+    "prettier": "^2.4.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "swr": "^1.0.1"
   },
   "devDependencies": {
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "typescript": "latest"
+    "@types/react": "^17.0.34",
+    "eslint": "7",
+    "eslint-config-next": "^12.0.3",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.3",
+    "typescript": "^4.4.3"
   }
 }

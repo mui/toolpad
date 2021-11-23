@@ -21,5 +21,8 @@ module.exports = {
     'jsdoc/require-returns': ['error', { contexts: ['TSFunctionType'] }],
     'jsdoc/require-returns-type': ['error', { contexts: ['TSFunctionType'] }],
     'jsdoc/require-returns-description': ['error', { contexts: ['TSFunctionType'] }],
+    // TODO: resolve these, non critical for pathfinder prototype
+    'no-alert': ['off'],
+    'no-console': ['off'],
   },
 };

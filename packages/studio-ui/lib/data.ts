@@ -3,6 +3,9 @@ import * as path from 'path';
 import { createPage } from './studioPage';
 import { StudioConnection, StudioConnectionSummary, StudioPage, StudioPageSummary } from './types';
 import { generateRandomId } from './utils/randomId';
+import config from './config';
+
+const DATA_ROOT = path.resolve(config.dir, './.studio-data');
 
 interface KindObjectMap {
   page: {
@@ -33,8 +36,6 @@ const kindUtil: {
     mapToSummary: ({ id, type, name }) => ({ id, type, name }),
   },
 };
-
-const DATA_ROOT = path.resolve(process.cwd(), './data');
 
 function resolveKindPath(unsafeKind: Kind): string {
   const kind = path.normalize(unsafeKind);
@@ -67,9 +68,20 @@ async function objectExists(kind: Kind, id: string): Promise<boolean> {
   }
 }
 
+async function readDirRecursive(dir: string): Promise<string[]> {
+  try {
+    return await fs.readdir(dir);
+  } catch (err: any) {
+    if (err.code === 'ENOENT') {
+      return [];
+    }
+    throw err;
+  }
+}
+
 async function getObjectIds(kind: Kind): Promise<string[]> {
   const kindDir = resolveKindPath(kind);
-  const entries = await fs.readdir(kindDir);
+  const entries = await readDirRecursive(kindDir);
   return entries.flatMap((entry) => (entry.endsWith('.json') ? [entry.slice(0, -5)] : []));
 }
 

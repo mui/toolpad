@@ -14,9 +14,9 @@
     "url": "git+https://github.com/mui-org/mui-studio.git"
   },
   "scripts": {
-    "build": "echo \"TODO: build cli here and replace ts-node in yarn start\"",
-    "start": "ts-node src/index.ts",
-    "dev": "nodemon src/index.ts --dev",
+    "build": "tsc",
+    "dev": "tsc --pretty --watch --preserveWatchOutput",
+    "start": "node ./dist",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {

@@ -12,23 +12,34 @@ const args = arg({
   '-p': '--port',
 });
 
+function resolveStudioDir({ _: positional = [] }: { _?: string[] }): string {
+  const dirArg: string = positional.length > 0 ? positional[0] : '.';
+  return dirArg ? path.resolve(process.cwd(), dirArg) : process.cwd();
+}
+
+const PROJECT_DIR = resolveStudioDir(args);
 const DEV_MODE = args['--dev'];
 const NEXT_CMD = DEV_MODE ? 'dev' : 'start';
 
-const studioUiDir = path.dirname(require.resolve('@mui/studio-ui/package.json'));
+console.log(`Starting Studio in "${PROJECT_DIR}"`);
 
 // TODO: read a real configuration here
 const studioUiConfig: StudioConfiguration = {
-  foo: 'bar',
+  dir: PROJECT_DIR,
 };
 
-execa('next', [NEXT_CMD], {
+const studioUiDir = path.dirname(require.resolve('@mui/studio-ui/package.json'));
+const cp = execa('next', [NEXT_CMD], {
   cwd: studioUiDir,
   preferLocal: true,
-  stdio: 'inherit',
+  stdio: 'pipe',
   extendEnv: false,
   env: {
     FORCE_COLOR: process.env.FORCE_COLOR,
     STUDIO_UI_CONFIG: JSON.stringify(studioUiConfig),
   },
 });
+
+process.stdin.pipe(cp.stdin!);
+cp.stdout?.pipe(process.stdout);
+cp.stderr?.pipe(process.stdout);

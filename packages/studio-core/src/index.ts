@@ -1,3 +1,3 @@
 export interface StudioConfiguration {
-  foo: 'bar';
+  dir: string;
 }

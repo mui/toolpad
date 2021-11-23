@@ -1,8 +1,10 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    // Do we want to go esnext already?
     "module": "CommonJS",
-    "alwaysStrict": true
+    "alwaysStrict": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "declaration": true
   }
 }

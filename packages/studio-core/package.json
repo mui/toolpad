@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch --preserveWatchOutput",
+    "dev": "tsc --pretty --watch --preserveWatchOutput",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {

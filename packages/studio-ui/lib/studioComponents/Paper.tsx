@@ -40,6 +40,14 @@ const Paper: StudioComponentDefinition<PaperComponentProps> = {
         return node;
     }
   },
+  render(context, node) {
+    context.addImport('@mui/material/Paper', 'default', 'Paper');
+    return `
+      <Paper ${context.renderProps(node.id)}>
+          ${node.children.length > 0 ? context.renderNode(node.children[0]) : ''}
+      </Paper>
+    `;
+  },
 };
 
 export default Paper;

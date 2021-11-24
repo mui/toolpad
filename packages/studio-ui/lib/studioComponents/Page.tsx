@@ -9,10 +9,9 @@ interface PageComponentProps {
 }
 
 function PageComponent({ children, ...props }: PageComponentProps) {
-  const gap = 2;
   return (
     <Container {...props}>
-      <Stack direction="column" gap={gap} my={2}>
+      <Stack direction="column" gap={2} my={2}>
         {children.length > 0 ? (
           <Slots name="slots" direction="column">
             {children}
@@ -51,6 +50,17 @@ const Page: StudioComponentDefinition<PageComponentProps> = {
       default:
         return node;
     }
+  },
+  render(context, node) {
+    context.addImport('@mui/material/Container', 'default', 'Container');
+    context.addImport('@mui/material/Stack', 'default', 'Stack');
+    return `
+      <Container ${context.renderProps(node.id)}>
+        <Stack direction="column" gap={2} my={2}>
+          ${node.children.map((childId) => context.renderNode(childId)).join('\n')}
+        </Stack>
+      </Container>
+    `;
   },
 };
 

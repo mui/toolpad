@@ -10,15 +10,26 @@ function StudioButtonComponent({ text, ...props }: StudioButtonprops) {
   return <ButtonComponent {...props}>{text}</ButtonComponent>;
 }
 
+const defaultText = 'Button Text';
+
 const Button: StudioComponentDefinition<StudioButtonprops> = {
   Component: React.memo(StudioButtonComponent),
   props: {
-    text: { type: 'string', defaultValue: 'Button Text' },
+    text: { type: 'string', defaultValue: defaultText },
     disabled: { type: 'boolean', defaultValue: false },
     variant: {
       type: 'ButtonVariant',
       defaultValue: 'contained',
     },
+  },
+  render(context, node) {
+    context.addImport('@mui/material/Button', 'default', 'Button');
+    const otherProps = Object.keys(node.props).filter((prop) => prop !== 'text');
+    return `
+      <Button ${context.renderProps(node.id, otherProps)}>
+        ${context.renderPropValue(node.id, 'text') || ''}
+      </Button>
+    `;
   },
 };
 

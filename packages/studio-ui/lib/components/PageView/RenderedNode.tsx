@@ -13,7 +13,7 @@ import NodeContext from './NodeContext';
 import { useCurrentPage } from './PageContext';
 import { DATA_PROP_NODE_ID } from './contants';
 
-export function getDefaultPropValues<P = {}>(definition: StudioComponentDefinition<P>): Partial<P> {
+function getDefaultPropValues<P = {}>(definition: StudioComponentDefinition<P>): Partial<P> {
   const result: Partial<P> = {};
   const entries = Object.entries(definition.props) as ExactEntriesOf<
     StudioComponentPropDefinitions<P>

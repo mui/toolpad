@@ -17,6 +17,12 @@ const TextField: StudioComponentDefinition<TextFieldProps> = {
       onChangeTransform: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
     },
   },
+  render(context, node) {
+    context.addImport('@mui/material/TextField', 'default', 'TextField');
+    return `
+      <TextField ${context.renderProps(node.id)} />
+    `;
+  },
 };
 
 export default TextField;

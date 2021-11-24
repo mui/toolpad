@@ -62,6 +62,14 @@ const Stack: StudioComponentDefinition<StackComponentProps> = {
         return node;
     }
   },
+  render(context, node) {
+    context.addImport('@mui/material/Stack', 'default', 'Stack');
+    return `
+      <Stack ${context.renderProps(node.id)}>
+        ${node.children.map((childId) => context.renderNode(childId)).join('\n')}
+      </Stack>
+    `;
+  },
 };
 
 export default Stack;

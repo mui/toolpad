@@ -126,10 +126,18 @@ export type PropsAction =
 
 export type NodeReducer<P> = (props: StudioNode<P>, action: PropsAction) => StudioNode<P>;
 
+export interface CodeGenContext {
+  addImport: (moduleId: string, importedName: string, alias?: string) => void;
+  renderNode: (nodeId: NodeId) => string;
+  renderPropValue: (nodeId: NodeId, prop: string) => unknown;
+  renderProps: (nodeId: NodeId, props?: string[]) => string;
+}
+
 export interface StudioComponentDefinition<P = DefaultNodeProps> {
   Component: React.FC<P>;
   props: StudioComponentPropDefinitions<P>;
   reducer?: NodeReducer<P>;
+  render: (context: CodeGenContext, node: StudioNode<P>) => string;
 }
 
 export interface StudioComponentDefinitions {

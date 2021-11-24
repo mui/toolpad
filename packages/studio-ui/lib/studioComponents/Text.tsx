@@ -13,9 +13,20 @@ function TextComponent({ value, ...props }: TextComponentProps) {
   );
 }
 
+const defaultValue = 'Text';
+
 const Text: StudioComponentDefinition<TextComponentProps> = {
   Component: React.memo(TextComponent),
-  props: { value: { type: 'string', defaultValue: 'Text' } },
+  props: { value: { type: 'string', defaultValue } },
+  render(context, node) {
+    context.addImport('@mui/material/Button', 'default', 'Button');
+    const otherProps = Object.keys(node.props).filter((prop) => prop !== 'value');
+    return `
+      <div ${context.renderProps(node.id, otherProps)}>
+        ${context.renderPropValue(node.id, 'value') || ''}
+      </div>
+    `;
+  },
 };
 
 export default Text;

@@ -24,7 +24,6 @@ const NEXT_CMD = DEV_MODE ? 'dev' : 'start';
 
 console.log(`Starting Studio in "${PROJECT_DIR}"`);
 
-// TODO: read a real configuration here
 const studioUiConfig: StudioConfiguration = {
   dir: PROJECT_DIR,
 };

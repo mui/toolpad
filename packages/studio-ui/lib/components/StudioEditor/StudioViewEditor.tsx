@@ -295,6 +295,8 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const observerRef = React.useRef<ResizeObserver | undefined>();
 
+  const [isFocused, setIsFocused] = React.useState(false);
+
   const cleanup = React.useRef<(() => void) | null>(null);
   const handleRender = React.useCallback(() => {
     if (cleanup.current) {
@@ -444,7 +446,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Backspace') {
+      if (isFocused && event.key === 'Backspace') {
         api.selectionRemove();
       }
     };
@@ -452,7 +454,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [api]);
+  }, [api, isFocused]);
 
   const selectedRect = state.selection ? viewLayout[state.selection]?.rect : null;
 
@@ -462,8 +464,16 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       : new Set();
   }, [state.selection, state.page]);
 
+  const handleFocus = React.useCallback(() => setIsFocused(true), []);
+  const handleBlur = React.useCallback(() => setIsFocused(false), []);
+
   return (
-    <StudioViewEditorRoot className={className}>
+    <StudioViewEditorRoot
+      className={className}
+      tabIndex={0}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+    >
       <StudioView
         className={classes.view}
         ref={viewRef}
@@ -483,7 +493,6 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
           if (!nodeLayout) {
             return null;
           }
-          console.log(nodeId, state.selection);
           const node = state.page.nodes[nodeId];
           return node ? (
             <React.Fragment key={nodeId}>

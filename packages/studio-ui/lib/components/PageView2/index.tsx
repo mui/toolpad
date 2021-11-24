@@ -185,6 +185,7 @@ function renderPage(page: StudioPage) {
 
 export interface PageViewProps {
   className?: string;
+  // Callback for when the view has rendered. Make sure this value is stable
   onAfterRender?: () => void;
   page: StudioPage;
 }
@@ -229,14 +230,23 @@ export default React.forwardRef(function PageView(
       };
       run(require, mod, mod.exports);
       const App = mod.exports.default;
+      ReactDOM.unmountComponentAtNode(container);
       ReactDOM.render(<App />, container, onAfterRender);
     });
 
     return () => {
       canceled = true;
-      ReactDOM.unmountComponentAtNode(container);
     };
   }, [renderedPage, onAfterRender]);
+
+  React.useEffect(() => {
+    const container = containerRef.current;
+    return () => {
+      if (container) {
+        ReactDOM.unmountComponentAtNode(container);
+      }
+    };
+  }, []);
 
   return (
     <PageViewRoot ref={ref} className={className}>

@@ -22,7 +22,7 @@ const Text: StudioComponentDefinition<TextComponentProps> = {
     context.addImport('@mui/material/Button', 'default', 'Button');
     const otherProps = Object.keys(node.props).filter((prop) => prop !== 'value');
     return `
-      <div ${context.renderProps(node.id, otherProps)}>
+      <div ${context.renderRootprops(node.id)} ${context.renderProps(node.id, otherProps)}>
         ${context.renderPropValue(node.id, 'value') || ''}
       </div>
     `;

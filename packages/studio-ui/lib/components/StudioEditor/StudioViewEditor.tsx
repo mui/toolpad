@@ -295,8 +295,12 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const observerRef = React.useRef<ResizeObserver | undefined>();
 
-  React.useEffect(() => {
-    // Running this in an effect as we want to capture the DOM state of the view after render has happened
+  const cleanup = React.useRef<(() => void) | null>(null);
+  const handleRender = React.useCallback(() => {
+    if (cleanup.current) {
+      cleanup.current();
+      cleanup.current = null;
+    }
     if (viewRef.current) {
       const { layout, elms } = getViewLayout(viewRef.current);
       setViewLayout(layout);
@@ -314,10 +318,9 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       const observer = observerRef.current;
       elms.forEach((elm) => observer.observe(elm));
 
-      return () => observer.disconnect();
+      cleanup.current = () => observer.disconnect();
     }
-    return () => {};
-  }, [state.page]);
+  }, []);
 
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<Element>) => {
@@ -461,7 +464,12 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   return (
     <StudioViewEditorRoot className={className}>
-      <StudioView className={classes.view} ref={viewRef} page={state.page} />
+      <StudioView
+        className={classes.view}
+        ref={viewRef}
+        page={state.page}
+        onAfterRender={handleRender}
+      />
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
       <div
         className={clsx(classes.hud, {
@@ -475,6 +483,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
           if (!nodeLayout) {
             return null;
           }
+          console.log(nodeId, state.selection);
           const node = state.page.nodes[nodeId];
           return node ? (
             <React.Fragment key={nodeId}>

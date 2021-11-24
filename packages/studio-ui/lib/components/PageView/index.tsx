@@ -35,15 +35,20 @@ export function getViewCoordinates(
 
 export interface PageViewProps {
   className?: string;
+  // Callback for when the view has rendered. Make sure this value is stable
+  onAfterRender?: () => void;
   page: StudioPage;
 }
 
 const renderNode = (nodeId: NodeId) => <RenderedNode key={nodeId} nodeId={nodeId} />;
 
 export default React.forwardRef(function PageView(
-  { className, page }: PageViewProps,
+  { className, page, onAfterRender }: PageViewProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  React.useEffect(() => {
+    onAfterRender?.();
+  }, [onAfterRender]);
   return (
     <PageViewRoot ref={ref} className={className}>
       <RenderNodeContext.Provider value={renderNode}>

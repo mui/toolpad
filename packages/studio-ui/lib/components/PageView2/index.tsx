@@ -2,21 +2,23 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { styled } from '@mui/material';
 import { transform } from 'sucrase';
-import {
-  StudioPage,
-  NodeLayout,
-  NodeId,
-  CodeGenContext,
-  StudioNodeProp,
-  StudioNodeProps,
-} from '../../types';
+import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry';
+import { StudioPage, NodeLayout, NodeId, CodeGenContext } from '../../types';
 import { getNode } from '../../studioPage';
 import { getStudioComponent } from '../../studioComponents';
+import { DATA_PROP_NODE_ID } from '../PageView/contants';
 
 const PageViewRoot = styled('div')({});
 
 export function getNodeLayout(viewElm: HTMLElement, elm: HTMLElement): NodeLayout | null {
-  // TODO
+  const nodeId = (elm.getAttribute(DATA_PROP_NODE_ID) as NodeId | undefined) || null;
+  if (nodeId) {
+    return {
+      nodeId,
+      rect: getRelativeBoundingBox(viewElm, elm),
+      slots: [],
+    };
+  }
   return null;
 }
 
@@ -25,7 +27,10 @@ export function getViewCoordinates(
   clientX: number,
   clientY: number,
 ): { x: number; y: number } | null {
-  // TODO
+  const rect = viewElm.getBoundingClientRect();
+  if (rectContainsPoint(rect, clientX, clientY)) {
+    return { x: clientX - rect.x, y: clientY - rect.y };
+  }
   return null;
 }
 
@@ -46,8 +51,15 @@ interface Import {
   named: { imported: string; local: string }[];
 }
 
+interface ContextConstructorParams {
+  // whether we're in the context of an editor
+  editor: boolean;
+}
+
 class Context implements CodeGenContext {
   private page: StudioPage;
+
+  private editor: boolean;
 
   private imports = new Map<string, Import>([
     [
@@ -59,8 +71,9 @@ class Context implements CodeGenContext {
     ],
   ]);
 
-  constructor(page: StudioPage) {
+  constructor(page: StudioPage, { editor }: ContextConstructorParams) {
     this.page = page;
+    this.editor = editor;
   }
 
   renderNode(nodeId: NodeId): string {
@@ -96,6 +109,11 @@ class Context implements CodeGenContext {
         return `${prop}={${JSON.stringify(this.renderPropValue(nodeId, prop))}}`;
       })
       .join(' ');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  renderRootprops(nodeId: NodeId): string {
+    return this.editor ? `${DATA_PROP_NODE_ID}="${nodeId}"` : '';
   }
 
   addImport(source: string, imported: string, local: string = imported) {
@@ -151,7 +169,7 @@ class Context implements CodeGenContext {
 }
 
 function renderPage(page: StudioPage) {
-  const ctx = new Context(page);
+  const ctx = new Context(page, { editor: true });
   const root = ctx.renderNode(page.root);
 
   const code = `
@@ -167,11 +185,12 @@ function renderPage(page: StudioPage) {
 
 export interface PageViewProps {
   className?: string;
+  onAfterRender?: () => void;
   page: StudioPage;
 }
 
 export default React.forwardRef(function PageView(
-  { className, page }: PageViewProps,
+  { className, page, onAfterRender }: PageViewProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -210,14 +229,14 @@ export default React.forwardRef(function PageView(
       };
       run(require, mod, mod.exports);
       const App = mod.exports.default;
-      ReactDOM.render(<App />, container);
+      ReactDOM.render(<App />, container, onAfterRender);
     });
 
     return () => {
       canceled = true;
       ReactDOM.unmountComponentAtNode(container);
     };
-  }, [renderedPage]);
+  }, [renderedPage, onAfterRender]);
 
   return (
     <PageViewRoot ref={ref} className={className}>

@@ -131,6 +131,7 @@ export interface CodeGenContext {
   renderNode: (nodeId: NodeId) => string;
   renderPropValue: (nodeId: NodeId, prop: string) => unknown;
   renderProps: (nodeId: NodeId, props?: string[]) => string;
+  renderRootprops: (nodeId: NodeId) => string;
 }
 
 export interface StudioComponentDefinition<P = DefaultNodeProps> {

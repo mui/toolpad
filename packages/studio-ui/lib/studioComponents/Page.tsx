@@ -55,7 +55,7 @@ const Page: StudioComponentDefinition<PageComponentProps> = {
     context.addImport('@mui/material/Container', 'default', 'Container');
     context.addImport('@mui/material/Stack', 'default', 'Stack');
     return `
-      <Container ${context.renderProps(node.id)}>
+      <Container ${context.renderRootprops(node.id)} ${context.renderProps(node.id)}>
         <Stack direction="column" gap={2} my={2}>
           ${node.children.map((childId) => context.renderNode(childId)).join('\n')}
         </Stack>

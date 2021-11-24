@@ -6,7 +6,7 @@ import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry'
 import { StudioPage, NodeLayout, NodeId, CodeGenContext } from '../../types';
 import { getNode } from '../../studioPage';
 import { getStudioComponent } from '../../studioComponents';
-import { DATA_PROP_NODE_ID } from '../PageView/contants';
+import { DATA_PROP_NODE_ID, DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from '../PageView/contants';
 
 const PageViewRoot = styled('div')({});
 
@@ -38,6 +38,7 @@ const dependencies: {
   [source: string]: (() => Promise<any>) | undefined;
 } = {
   react: () => import('react'),
+  '@mui/material/Box': () => import('@mui/material/Box'),
   '@mui/material/Button': () => import('@mui/material/Button'),
   '@mui/x-data-grid': () => import('@mui/x-data-grid'),
   '@mui/material/Container': () => import('@mui/material/Container'),
@@ -82,38 +83,62 @@ class Context implements CodeGenContext {
     return component.render(this, node);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  renderPropValue(nodeId: NodeId, prop: string): unknown {
+  renderPropValueExpression(nodeId: NodeId, prop: string): unknown {
     const node = getNode(this.page, nodeId);
     const component = getStudioComponent(node.component);
     const propDefinition = component.props[prop];
     const nodeProp = node.props[prop];
     if (propDefinition) {
       if (nodeProp?.type === 'const') {
-        return nodeProp.value;
+        return JSON.stringify(nodeProp.value);
       }
       if (nodeProp?.type === 'binding') {
-        return '[[TODO]]';
+        return '"[[TODO]]"';
       }
-      return undefined;
+      return 'undefined';
     }
     throw new Error(`Unknown prop "${prop}" for component "${node.component}" on node "${nodeId}"`);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   renderProps(nodeId: NodeId, props?: string[]): string {
     const node = getNode(this.page, nodeId);
     const renderedProps = props || Object.keys(node.props);
     return renderedProps
       .map((prop) => {
-        return `${prop}={${JSON.stringify(this.renderPropValue(nodeId, prop))}}`;
+        return `${prop}={${this.renderPropValueExpression(nodeId, prop)}}`;
       })
       .join(' ');
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  renderRootprops(nodeId: NodeId): string {
-    return this.editor ? `${DATA_PROP_NODE_ID}="${nodeId}"` : '';
+  renderRootProps(nodeId: NodeId): string {
+    if (!this.editor) {
+      return '';
+    }
+    return `${DATA_PROP_NODE_ID}="${nodeId}"`;
+  }
+
+  renderSlots(name: string, direction: string | undefined): string {
+    if (!this.editor) {
+      return '';
+    }
+    return (
+      `${DATA_PROP_SLOT}="${name}" ${DATA_PROP_SLOT_DIRECTION}={${direction || '"column"'}}` || ''
+    );
+  }
+
+  renderPlaceholder(name: string): string {
+    if (!this.editor) {
+      return '';
+    }
+    this.addImport('@mui/material/Box', 'default', 'Box');
+    return `
+      <Box
+        ${DATA_PROP_SLOT}="${name}"
+        display="block"
+        minHeight={40}
+        minWidth={200}
+      />
+    `;
   }
 
   addImport(source: string, imported: string, local: string = imported) {

@@ -1,4 +1,4 @@
-import { Box, BoxProps } from '@mui/material';
+import { Box } from '@mui/material';
 import React from 'react';
 import type {
   SlotDirection,
@@ -6,13 +6,12 @@ import type {
   SlotLayoutCenter,
   SlotLayoutInsert,
   NodeId,
+  FlowDirection,
 } from '../../types';
 import { getRelativeBoundingBox } from '../../utils/geometry';
 import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from './contants';
 import NodeContext from './NodeContext';
 import RenderNodeContext from './RenderNodeContext';
-
-type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
 function getSlotDirection(flow: FlowDirection): SlotDirection {
   switch (flow) {
@@ -160,12 +159,12 @@ export function Slots({ children, name, direction }: SlotsProps) {
   );
 }
 
-export interface SlotProps extends BoxProps {
+export interface SlotProps {
   name: string;
   content?: NodeId | null;
 }
 
-export default function Slot({ name, content, ...props }: SlotProps) {
+export default function Slot({ name, content }: SlotProps) {
   const node = React.useContext(NodeContext);
   const renderNode = React.useContext(RenderNodeContext);
 
@@ -180,7 +179,6 @@ export default function Slot({ name, content, ...props }: SlotProps) {
       display="block"
       minHeight={40}
       minWidth={200}
-      {...props}
       {...{
         [DATA_PROP_SLOT]: name,
       }}

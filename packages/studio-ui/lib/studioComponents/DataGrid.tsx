@@ -42,7 +42,7 @@ const DataGrid: StudioComponentDefinition<DataGridWithQueryProps> = {
   render(context, node) {
     context.addImport('@mui/x-data-grid', 'DataGrid', 'DataGrid');
     return `
-      <div ${context.renderRootprops(node.id)} style={{ height: 350, width: '100%' }}>
+      <div ${context.renderRootProps(node.id)} style={{ height: 350, width: '100%' }}>
         <DataGrid rows={[]} columns={[]} ${context.renderProps(node.id)} />
       </div>
     `;

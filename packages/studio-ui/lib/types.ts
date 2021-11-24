@@ -104,7 +104,7 @@ export type StudioComponentPropDefinitions<P = DefaultNodeProps> = {
   [K in Exclude<keyof P, 'children'>]?: StudioComponentProp<K, P>;
 };
 
-export type SlotPosition = 'start' | 'end' | 'center';
+export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
 export interface SlotLocation {
   nodeId: NodeId;
@@ -129,9 +129,11 @@ export type NodeReducer<P> = (props: StudioNode<P>, action: PropsAction) => Stud
 export interface CodeGenContext {
   addImport: (moduleId: string, importedName: string, alias?: string) => void;
   renderNode: (nodeId: NodeId) => string;
-  renderPropValue: (nodeId: NodeId, prop: string) => unknown;
+  renderPropValueExpression: (nodeId: NodeId, prop: string) => any;
   renderProps: (nodeId: NodeId, props?: string[]) => string;
-  renderRootprops: (nodeId: NodeId) => string;
+  renderRootProps: (nodeId: NodeId) => string;
+  renderSlots(name: string, direction: string | undefined): string;
+  renderPlaceholder(name: string): string;
 }
 
 export interface StudioComponentDefinition<P = DefaultNodeProps> {

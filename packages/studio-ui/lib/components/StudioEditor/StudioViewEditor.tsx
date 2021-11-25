@@ -46,6 +46,7 @@ const StudioViewEditorRoot = styled('div')({
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
+    minHeight: '100%',
   },
 
   [`& .${classes.hud}`]: {
@@ -466,11 +467,17 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       : new Set();
   }, [state.selection, state.page]);
 
-  const handleFocus = React.useCallback(() => setIsFocused(true), []);
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const handleFocus = React.useCallback((event: React.FocusEvent<HTMLDivElement>) => {
+    if (event.target === rootRef.current) {
+      setIsFocused(true);
+    }
+  }, []);
   const handleBlur = React.useCallback(() => setIsFocused(false), []);
 
   return (
     <StudioViewEditorRoot
+      ref={rootRef}
       className={className}
       tabIndex={0}
       onFocus={handleFocus}

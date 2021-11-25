@@ -8,3 +8,7 @@ TO DO:
 - Rename studio-ui lib folder to src?
 - set up CI
 - ...
+
+- data loading
+- esm loader
+- iframe app renderer

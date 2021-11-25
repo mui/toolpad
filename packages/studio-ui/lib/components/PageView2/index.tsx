@@ -72,6 +72,8 @@ class Context implements CodeGenContext {
     ],
   ]);
 
+  private requireDataLoader = false;
+
   constructor(page: StudioPage, { editor }: ContextConstructorParams) {
     this.page = page;
     this.editor = editor;
@@ -89,8 +91,7 @@ class Context implements CodeGenContext {
       }
       if (propValue.type === 'const') {
         result[propName] = JSON.stringify(propValue.value);
-      }
-      if (propValue.type === 'binding') {
+      } else if (propValue.type === 'binding') {
         result[propName] = `_${propValue.state}`;
         if (propDefinition.onChangeProp) {
           const setStateIdentifier = `set_${propValue.state}`;
@@ -102,6 +103,9 @@ class Context implements CodeGenContext {
             result[propDefinition.onChangeProp] = setStateIdentifier;
           }
         }
+      }
+      if (propDefinition.type === 'DataQuery') {
+        this.requireDataLoader = true;
       }
     });
     return result;
@@ -191,6 +195,55 @@ class Context implements CodeGenContext {
     }).join('\n');
   }
 
+  renderDataLoader(): string {
+    if (!this.requireDataLoader) {
+      return '';
+    }
+    const query = {};
+    return `
+      function useDataQuery(queryId) {
+        const [result, setResult] = React.useState({});
+      
+        React.useEffect(() => {
+          if (!queryId) {
+            return;
+          }
+          setResult({ loading: true });
+          fetch(\`/api/data/\${queryId}\`, {
+            method: 'POST',
+            ${this.editor ? `body: JSON.stringify(${query}),` : ''}
+            headers: {
+              'content-type': 'application/json',
+            },
+          }).then(
+            async (res) => {
+              const body = (await res.json());
+              if (typeof body.error === 'string') {
+                setResult({ loading: false, error: body.error });
+              } else if (body.result) {
+                const { fields, data: rows } = body.result;
+                const columns = (Object.entries(fields) as [string, object][]).map(([field, def]) => ({
+                  ...def,
+                  field,
+                }));
+      
+                const columnsFingerPrint = JSON.stringify(columns);
+                setResult({ loading: false, rows, columns, key: columnsFingerPrint });
+              } else {
+                throw new Error(\`Invariant: \${queryId} returned invalid result\`);
+              }
+            },
+            (error) => {
+              setResult({ loading: false, error: error.message });
+            },
+          );
+        }, [queryId]);
+      
+        return result;
+      }
+    `;
+  }
+
   renderStateHooks(): string {
     return Object.entries(this.page.state)
       .map(([key, state]) => {
@@ -223,6 +276,8 @@ function renderPage(page: StudioPage) {
 
   const code = `
     ${ctx.renderImports()}
+
+    ${ctx.renderDataLoader()}
 
     export default function App () {
       ${ctx.renderStateHooks()}

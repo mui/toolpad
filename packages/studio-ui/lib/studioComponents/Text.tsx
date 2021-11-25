@@ -26,7 +26,7 @@ const Text: StudioComponentDefinition<TextComponentProps> = {
       node.id,
       otherProps,
     )}>
-        ${context.renderPropValueExpression(node.id, 'value') || ''}
+        {${context.renderPropValueExpression(node.id, 'value') || '""'}}
       </div>
     `;
   },

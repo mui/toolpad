@@ -48,7 +48,7 @@ export default React.forwardRef(function PageView(
 ) {
   React.useEffect(() => {
     onAfterRender?.();
-  }, [onAfterRender]);
+  }, [page, onAfterRender]);
   return (
     <PageViewRoot ref={ref} className={className}>
       <RenderNodeContext.Provider value={renderNode}>

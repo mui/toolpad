@@ -27,7 +27,7 @@ const Button: StudioComponentDefinition<StudioButtonprops> = {
     const otherProps = Object.keys(node.props).filter((prop) => prop !== 'text');
     return `
       <Button ${context.renderRootProps(node.id)} ${context.renderProps(node.id, otherProps)}>
-        ${context.renderPropValueExpression(node.id, 'text') || ''}
+        {${context.renderPropValueExpression(node.id, 'text') || '""'}}
       </Button>
     `;
   },

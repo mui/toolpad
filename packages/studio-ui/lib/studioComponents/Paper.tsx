@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Paper as InnerPaper, PaperProps as InnerPaperProps } from '@mui/material';
 import type { NodeId, StudioComponentDefinition } from '../types';
-import Slot from '../components/PageView/Slot';
+import Slot from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface PaperComponentProps extends InnerPaperProps {

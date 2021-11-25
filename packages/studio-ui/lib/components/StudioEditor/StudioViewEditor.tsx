@@ -10,7 +10,7 @@ import {
   ViewLayout,
 } from '../../types';
 import { getAncestors, getDecendants, nodesByDepth } from '../../studioPage';
-import PageView, { getNodeLayout, getViewCoordinates } from '../PageView2';
+import PageView, { getNodeLayout, getViewCoordinates } from '../PageView';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -18,7 +18,7 @@ import {
   rectContainsPoint,
 } from '../../utils/geometry';
 import { ExactEntriesOf } from '../../utils/types';
-import { getSlots } from '../PageView/Slot';
+import { getSlots } from '../PageViewLegacy/Slot';
 import { EditorState } from '../../editorState';
 import { PinholeOverlay } from '../../PinholeOverlay';
 import { useEditorApi, useEditorState } from './EditorProvider';

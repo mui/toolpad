@@ -1,7 +1,7 @@
 import { Stack as InnerStackComponent, StackProps } from '@mui/material';
 import React from 'react';
 import type { StudioComponentDefinition, NodeId } from '../types';
-import Slot, { Slots } from '../components/PageView/Slot';
+import Slot, { Slots } from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface StackComponentProps extends StackProps {

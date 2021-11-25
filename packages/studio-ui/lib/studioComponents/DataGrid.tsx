@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { DataGrid as DataGridComponent, DataGridProps } from '@mui/x-data-grid';
 import type { StudioComponentDefinition } from '../types';
-import { useDataQuery } from '../components/PageView/useDataQuery';
-import { STUDIO_PROPS } from '../components/PageView/contants';
+import { useDataQuery } from '../components/PageViewLegacy/useDataQuery';
+import { STUDIO_PROPS } from '../components/PageViewLegacy/contants';
 
 interface DataGridWithQueryProps extends DataGridProps {
   studioDataQuery: string | null;
@@ -41,12 +41,15 @@ const DataGrid: StudioComponentDefinition<DataGridWithQueryProps> = {
   },
   render(context, node, resolvedProps) {
     context.addImport('@mui/x-data-grid', 'DataGrid', 'DataGrid');
+
+    const { studioDataQuery, ...other } = resolvedProps;
     return `
       <div ${context.renderRootProps(node.id)} style={{ height: 350, width: '100%' }}>
         <DataGrid 
           rows={[]} 
           columns={[]} 
-          ${context.renderProps(resolvedProps)} 
+          ${context.renderProps(other)}
+          {...${studioDataQuery}}
         />
       </div>
     `;

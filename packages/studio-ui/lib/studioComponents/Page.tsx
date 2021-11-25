@@ -1,7 +1,7 @@
 import { Container, Stack } from '@mui/material';
 import * as React from 'react';
 import type { StudioComponentDefinition, NodeId } from '../types';
-import Slot, { Slots } from '../components/PageView/Slot';
+import Slot, { Slots } from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface PageComponentProps {

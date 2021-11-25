@@ -95,6 +95,7 @@ class Context implements CodeGenContext {
         if (propDefinition.onChangeProp) {
           const setStateIdentifier = `set_${propValue.state}`;
           if (propDefinition.onChangeEventHandler) {
+            // TODO: React.useCallback for this one
             result[propDefinition.onChangeProp] =
               propDefinition.onChangeEventHandler(setStateIdentifier);
           } else {

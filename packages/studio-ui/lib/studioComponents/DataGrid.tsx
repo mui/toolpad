@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DataGrid as DataGridComponent, DataGridProps } from '@mui/x-data-grid';
 import type { StudioComponentDefinition } from '../types';
 import { useDataQuery } from '../components/PageViewLegacy/useDataQuery';
-import { STUDIO_PROPS } from '../components/PageViewLegacy/contants';
+import { STUDIO_PROPS } from '../constants';
 
 interface DataGridWithQueryProps extends DataGridProps {
   studioDataQuery: string | null;

@@ -6,11 +6,7 @@ import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry'
 import { StudioPage, NodeLayout, NodeId, CodeGenContext, StudioNode } from '../../types';
 import { getNode } from '../../studioPage';
 import { getStudioComponent } from '../../studioComponents';
-import {
-  DATA_PROP_NODE_ID,
-  DATA_PROP_SLOT,
-  DATA_PROP_SLOT_DIRECTION,
-} from '../PageViewLegacy/contants';
+import { DATA_PROP_NODE_ID, DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from '../../constants';
 
 const PageViewRoot = styled('div')({});
 

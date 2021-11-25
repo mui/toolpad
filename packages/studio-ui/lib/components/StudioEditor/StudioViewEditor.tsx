@@ -18,10 +18,10 @@ import {
   rectContainsPoint,
 } from '../../utils/geometry';
 import { ExactEntriesOf } from '../../utils/types';
-import { getSlots } from '../PageViewLegacy/Slot';
 import { EditorState } from '../../editorState';
 import { PinholeOverlay } from '../../PinholeOverlay';
 import { useEditorApi, useEditorState } from './EditorProvider';
+import { getSlots } from './slots';
 
 const classes = {
   scrollContainer: 'StudioScrollContainer',

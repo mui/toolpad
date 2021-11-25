@@ -6,7 +6,7 @@ import { getNode } from '../../studioPage';
 import { ExactEntriesOf } from '../../utils/types';
 import NodeContext from './NodeContext';
 import { useCurrentPage } from './PageContext';
-import { DATA_PROP_NODE_ID } from './contants';
+import { DATA_PROP_NODE_ID } from '../../constants';
 
 function getCurrentBoundProps<P>(
   nodeProps: StudioNodeProps<P>,

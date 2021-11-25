@@ -3,7 +3,7 @@ import { styled } from '@mui/material';
 import { NodeId, StudioPage, NodeLayout } from '../../types';
 import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry';
 import PageContext from './PageContext';
-import { DATA_PROP_NODE_ID } from './contants';
+import { DATA_PROP_NODE_ID } from '../../constants';
 import RenderedNode from './RenderedNode';
 import RenderNodeContext from './RenderNodeContext';
 

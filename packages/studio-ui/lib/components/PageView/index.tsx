@@ -316,22 +316,21 @@ export interface PageViewProps {
   page: StudioPage;
 }
 
+function Noop() {
+  return <React.Fragment />;
+}
+
 export default React.forwardRef(function PageView(
   { className, page, onAfterRender }: PageViewProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [result, setResult] = React.useState<{ App: React.FC }>({ App: Noop });
 
   const renderedPage = React.useMemo(() => {
     return renderPage(page);
   }, [page]);
 
   React.useEffect(() => {
-    if (!containerRef.current) {
-      return () => {};
-    }
-    const container = containerRef.current;
-
     let canceled = false;
     renderedPage.loadDependencies().then((importedModules) => {
       if (canceled) {
@@ -356,27 +355,22 @@ export default React.forwardRef(function PageView(
       };
       run(require, mod, mod.exports);
       const App = mod.exports.default;
-      ReactDOM.unmountComponentAtNode(container);
-      ReactDOM.render(<App />, container, onAfterRender);
+
+      setResult({ App });
     });
 
     return () => {
       canceled = true;
     };
-  }, [renderedPage, onAfterRender]);
+  }, [renderedPage]);
 
   React.useEffect(() => {
-    const container = containerRef.current;
-    return () => {
-      if (container) {
-        ReactDOM.unmountComponentAtNode(container);
-      }
-    };
-  }, []);
+    onAfterRender?.();
+  }, [onAfterRender, result.App]);
 
   return (
     <PageViewRoot ref={ref} className={className}>
-      <div ref={containerRef} />
+      <result.App />
     </PageViewRoot>
   );
 });

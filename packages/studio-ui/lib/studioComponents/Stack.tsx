@@ -62,17 +62,13 @@ const Stack: StudioComponentDefinition<StackComponentProps> = {
         return node;
     }
   },
-  render(context, node) {
+  render(context, node, resolvedProps) {
     context.addImport('@mui/material/Stack', 'default', 'Stack');
     return `
       <Stack 
         ${context.renderRootProps(node.id)} 
-        ${
-          node.children.length > 0
-            ? context.renderSlots('slots', context.renderPropValueExpression(node.id, 'direction'))
-            : ''
-        } 
-        ${context.renderProps(node.id)}
+        ${node.children.length > 0 ? context.renderSlots('slots', resolvedProps.direction) : ''} 
+        ${context.renderProps(resolvedProps)}
       >
         ${
           node.children.length > 0

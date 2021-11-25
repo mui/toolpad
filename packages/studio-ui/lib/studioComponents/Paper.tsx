@@ -40,12 +40,14 @@ const Paper: StudioComponentDefinition<PaperComponentProps> = {
         return node;
     }
   },
-  render(context, node) {
+  render(context, node, resolvedProps) {
     context.addImport('@mui/material/Paper', 'default', 'Paper');
     return `
-      <Paper ${context.renderRootProps(node.id)} sx={{ padding: 1 }} ${context.renderProps(
-      node.id,
-    )}>
+      <Paper 
+        ${context.renderRootProps(node.id)} 
+        sx={{ padding: 1 }} 
+        ${context.renderProps(resolvedProps)}
+      >
         ${
           node.children.length > 0
             ? context.renderNode(node.children[0])

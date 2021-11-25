@@ -18,15 +18,16 @@ const defaultValue = 'Text';
 const Text: StudioComponentDefinition<TextComponentProps> = {
   Component: React.memo(TextComponent),
   props: { value: { type: 'string', defaultValue } },
-  render(context, node) {
+  render(context, node, resolvedProps) {
     context.addImport('@mui/material/Button', 'default', 'Button');
-    const otherProps = Object.keys(node.props).filter((prop) => prop !== 'value');
+    const { value, ...other } = resolvedProps;
     return `
-      <div ${context.renderRootProps(node.id)} style={{ padding: 10 }} ${context.renderProps(
-      node.id,
-      otherProps,
-    )}>
-        {${context.renderPropValueExpression(node.id, 'value') || '""'}}
+      <div 
+        ${context.renderRootProps(node.id)} 
+        style={{ padding: 10 }} 
+        ${context.renderProps(other)}
+      >
+        {${value || '""'}}
       </div>
     `;
   },

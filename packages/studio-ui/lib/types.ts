@@ -98,6 +98,7 @@ export interface StudioComponentProp<K extends keyof P, P = DefaultNodeProps> {
   onChangeProp?: keyof P;
   // TODO: type this
   onChangeTransform?: (...props: any) => any;
+  onChangeEventHandler?: (setStateIdentifier: string) => string;
 }
 
 export type StudioComponentPropDefinitions<P = DefaultNodeProps> = {
@@ -129,8 +130,7 @@ export type NodeReducer<P> = (props: StudioNode<P>, action: PropsAction) => Stud
 export interface CodeGenContext {
   addImport: (moduleId: string, importedName: string, alias?: string) => void;
   renderNode: (nodeId: NodeId) => string;
-  renderPropValueExpression: (nodeId: NodeId, prop: string) => any;
-  renderProps: (nodeId: NodeId, props?: string[]) => string;
+  renderProps: (resolvedProps: Record<string, string>) => string;
   renderRootProps: (nodeId: NodeId) => string;
   renderSlots(name: string, direction: string | undefined): string;
   renderPlaceholder(name: string): string;
@@ -140,7 +140,11 @@ export interface StudioComponentDefinition<P = DefaultNodeProps> {
   Component: React.FC<P>;
   props: StudioComponentPropDefinitions<P>;
   reducer?: NodeReducer<P>;
-  render: (context: CodeGenContext, node: StudioNode<P>) => string;
+  render: (
+    context: CodeGenContext,
+    node: StudioNode<P>,
+    resolvedProps: Record<string, string>,
+  ) => string;
 }
 
 export interface StudioComponentDefinitions {

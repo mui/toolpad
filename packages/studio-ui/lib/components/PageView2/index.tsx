@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { styled } from '@mui/material';
 import { transform } from 'sucrase';
 import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry';
-import { StudioPage, NodeLayout, NodeId, CodeGenContext } from '../../types';
+import { StudioPage, NodeLayout, NodeId, CodeGenContext, StudioNode } from '../../types';
 import { getNode } from '../../studioPage';
 import { getStudioComponent } from '../../studioComponents';
 import { DATA_PROP_NODE_ID, DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from '../PageView/contants';
@@ -77,35 +77,47 @@ class Context implements CodeGenContext {
     this.editor = editor;
   }
 
+  // resolve props to expressions
+  // eslint-disable-next-line class-methods-use-this
+  resolveProps(node: StudioNode): Record<string, string> {
+    const result: Record<string, string> = {};
+    const component = getStudioComponent(node.component);
+    Object.entries(node.props).forEach(([propName, propValue]) => {
+      const propDefinition = component.props[propName];
+      if (!propDefinition || !propValue) {
+        return;
+      }
+      if (propValue.type === 'const') {
+        result[propName] = JSON.stringify(propValue.value);
+      }
+      if (propValue.type === 'binding') {
+        result[propName] = `_${propValue.state}`;
+        if (propDefinition.onChangeProp) {
+          const setStateIdentifier = `set_${propValue.state}`;
+          if (propDefinition.onChangeEventHandler) {
+            result[propDefinition.onChangeProp] =
+              propDefinition.onChangeEventHandler(setStateIdentifier);
+          } else {
+            result[propDefinition.onChangeProp] = setStateIdentifier;
+          }
+        }
+      }
+    });
+    return result;
+  }
+
   renderNode(nodeId: NodeId): string {
     const node = getNode(this.page, nodeId);
     const component = getStudioComponent(node.component);
-    return component.render(this, node);
+    const props = this.resolveProps(node);
+    return component.render(this, node, props);
   }
 
-  renderPropValueExpression(nodeId: NodeId, prop: string): unknown {
-    const node = getNode(this.page, nodeId);
-    const component = getStudioComponent(node.component);
-    const propDefinition = component.props[prop];
-    const nodeProp = node.props[prop];
-    if (propDefinition) {
-      if (nodeProp?.type === 'const') {
-        return JSON.stringify(nodeProp.value);
-      }
-      if (nodeProp?.type === 'binding') {
-        return '"[[TODO]]"';
-      }
-      return 'undefined';
-    }
-    throw new Error(`Unknown prop "${prop}" for component "${node.component}" on node "${nodeId}"`);
-  }
-
-  renderProps(nodeId: NodeId, props?: string[]): string {
-    const node = getNode(this.page, nodeId);
-    const renderedProps = props || Object.keys(node.props);
-    return renderedProps
-      .map((prop) => {
-        return `${prop}={${this.renderPropValueExpression(nodeId, prop)}}`;
+  // eslint-disable-next-line class-methods-use-this
+  renderProps(resolvedProps: Record<string, string>): string {
+    return Object.entries(resolvedProps)
+      .map(([name, value]) => {
+        return `${name}={${value}}`;
       })
       .join(' ');
   }
@@ -178,6 +190,17 @@ class Context implements CodeGenContext {
     }).join('\n');
   }
 
+  renderStateHooks(): string {
+    return Object.entries(this.page.state)
+      .map(([key, state]) => {
+        // TODO: figure out proper variable naming
+        return `const [_${key}, set_${key}] = React.useState(${JSON.stringify(
+          state.initialValue,
+        )});`;
+      })
+      .join('\n');
+  }
+
   async loadDependencies(): Promise<any> {
     return Object.fromEntries(
       await Promise.all(
@@ -201,6 +224,7 @@ function renderPage(page: StudioPage) {
     ${ctx.renderImports()}
 
     export default function App () {
+      ${ctx.renderStateHooks()}
       return (${root});
     }
   `;

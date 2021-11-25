@@ -22,12 +22,12 @@ const Button: StudioComponentDefinition<StudioButtonprops> = {
       defaultValue: 'contained',
     },
   },
-  render(context, node) {
+  render(context, node, resolvedProps) {
     context.addImport('@mui/material/Button', 'default', 'Button');
-    const otherProps = Object.keys(node.props).filter((prop) => prop !== 'text');
+    const { text, ...other } = resolvedProps;
     return `
-      <Button ${context.renderRootProps(node.id)} ${context.renderProps(node.id, otherProps)}>
-        {${context.renderPropValueExpression(node.id, 'text') || '""'}}
+      <Button ${context.renderRootProps(node.id)} ${context.renderProps(other)}>
+        {${text || '""'}}
       </Button>
     `;
   },

@@ -51,11 +51,14 @@ const Page: StudioComponentDefinition<PageComponentProps> = {
         return node;
     }
   },
-  render(context, node) {
+  render(context, node, resolvedProps) {
     context.addImport('@mui/material/Container', 'default', 'Container');
     context.addImport('@mui/material/Stack', 'default', 'Stack');
     return `
-      <Container ${context.renderRootProps(node.id)} ${context.renderProps(node.id)}>
+      <Container 
+        ${context.renderRootProps(node.id)} 
+        ${context.renderProps(resolvedProps)}
+      >
         <Stack 
           ${node.children.length > 0 ? context.renderSlots('slots', '"column"') : ''}
           direction="column" 

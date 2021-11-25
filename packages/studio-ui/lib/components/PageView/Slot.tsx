@@ -27,10 +27,10 @@ function getSlotDirection(flow: FlowDirection): SlotDirection {
 }
 
 interface GetInsertSlotsParams {
-  nodeElm: HTMLElement;
+  nodeElm: Element;
   name: string;
   direction?: FlowDirection;
-  container?: HTMLElement;
+  container?: Element;
   items?: Iterable<Element>;
 }
 
@@ -92,7 +92,7 @@ function getInsertSlots({
 }
 
 interface GetSlotParams {
-  nodeElm: HTMLElement;
+  nodeElm: Element;
   name: string;
   container?: Element;
 }
@@ -118,12 +118,15 @@ export function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
       if (!elm.parentElement) {
         throw new Error(`Invariant: Slots element must have a parent`);
       }
+      // TODO: This can be removed once we have the code generation version of pageview working
+      // it can then just be set to elm
+      const container = (elm as HTMLElement).style.display === 'contents' ? elm.parentElement : elm;
       result.push(
         ...getInsertSlots({
           nodeElm,
           name: slotName,
           direction,
-          container: elm.parentElement,
+          container,
           items: elm.children,
         }),
       );

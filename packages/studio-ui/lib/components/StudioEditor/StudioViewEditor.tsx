@@ -274,7 +274,8 @@ function getViewLayout(viewElm: HTMLElement): {
       currentNode = nodeLayout;
       currentNodeElm = elm;
       layout[nodeLayout.nodeId] = currentNode;
-    } else if (currentNode && currentNodeElm) {
+    }
+    if (currentNode && currentNodeElm) {
       currentNode.slots.push(...getSlots(currentNodeElm, elm));
     }
   }

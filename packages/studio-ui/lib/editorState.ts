@@ -5,12 +5,34 @@ import { createNode, getNode, setNodeName, setNodeProps } from './studioPage';
 import {
   NodeId,
   SlotLocation,
+  StudioComponentDefinition,
+  StudioComponentPropDefinitions,
   StudioNode,
   StudioNodeProp,
   StudioNodeProps,
   StudioPage,
   StudioPageQuery,
 } from './types';
+import { ExactEntriesOf } from './utils/types';
+
+function getDefaultPropValues<P = {}>(
+  definition: StudioComponentDefinition<P>,
+): Partial<StudioNodeProps<P>> {
+  const result: Partial<StudioNodeProps<P>> = {};
+  const entries = Object.entries(definition.props) as ExactEntriesOf<
+    StudioComponentPropDefinitions<P>
+  >;
+  entries.forEach(([name, prop]) => {
+    if (prop) {
+      result[name] = {
+        type: 'const',
+        value: prop.defaultValue,
+      };
+    }
+  });
+
+  return result;
+}
 
 export type ComponentPanelTab = 'catalog' | 'component';
 
@@ -187,7 +209,8 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       if (state.newNode) {
         return state;
       }
-      const newNode = createNode(state.page, action.component, {});
+      const componentDef = getStudioComponent(action.component);
+      const newNode = createNode(state.page, action.component, getDefaultPropValues(componentDef));
       return update(state, {
         selection: null,
         newNode,

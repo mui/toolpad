@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Paper as InnerPaper, PaperProps as InnerPaperProps } from '@mui/material';
 import type { NodeId, StudioComponentDefinition } from '../types';
-import Slot from '../components/PageView/Slot';
+import Slot from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface PaperComponentProps extends InnerPaperProps {
@@ -39,6 +39,22 @@ const Paper: StudioComponentDefinition<PaperComponentProps> = {
       default:
         return node;
     }
+  },
+  render(context, node, resolvedProps) {
+    context.addImport('@mui/material/Paper', 'default', 'Paper');
+    return `
+      <Paper 
+        ${context.renderRootProps(node.id)} 
+        sx={{ padding: 1 }} 
+        ${context.renderProps(resolvedProps)}
+      >
+        ${
+          node.children.length > 0
+            ? context.renderNode(node.children[0])
+            : context.renderPlaceholder('content')
+        }
+      </Paper>
+    `;
   },
 };
 

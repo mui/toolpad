@@ -1,31 +1,12 @@
 import * as React from 'react';
-import {
-  NodeId,
-  StudioComponentDefinition,
-  StudioComponentPropDefinitions,
-  StudioNodeProps,
-} from '../../types';
+import { NodeId, StudioComponentDefinition, StudioNodeProps } from '../../types';
 import { getStudioComponent } from '../../studioComponents';
 import { PageStateObservable, usePageStateObservable } from '../PageStateProvider';
 import { getNode } from '../../studioPage';
 import { ExactEntriesOf } from '../../utils/types';
 import NodeContext from './NodeContext';
 import { useCurrentPage } from './PageContext';
-import { DATA_PROP_NODE_ID } from './contants';
-
-export function getDefaultPropValues<P = {}>(definition: StudioComponentDefinition<P>): Partial<P> {
-  const result: Partial<P> = {};
-  const entries = Object.entries(definition.props) as ExactEntriesOf<
-    StudioComponentPropDefinitions<P>
-  >;
-  entries.forEach(([name, prop]) => {
-    if (prop) {
-      result[name] = prop.defaultValue;
-    }
-  });
-
-  return result;
-}
+import { DATA_PROP_NODE_ID } from '../../constants';
 
 function getCurrentBoundProps<P>(
   nodeProps: StudioNodeProps<P>,
@@ -86,8 +67,6 @@ export default function RenderedNode<P>({ nodeId }: RenderedNodeProps) {
     getCurrentBoundProps(node.props, stateObservable, definition),
   );
 
-  const defaultProps = React.useMemo(() => getDefaultPropValues(definition), [definition]);
-
   const constProps = React.useMemo(() => getConstProps(node.props), [node.props]);
 
   React.useEffect(() => {
@@ -119,7 +98,6 @@ export default function RenderedNode<P>({ nodeId }: RenderedNodeProps) {
   }
 
   const componentProps: Record<string, unknown> = {
-    ...defaultProps,
     ...constProps,
     ...boundProps,
     [DATA_PROP_NODE_ID]: node.id,

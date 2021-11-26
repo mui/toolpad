@@ -1,7 +1,7 @@
 import { Stack as InnerStackComponent, StackProps } from '@mui/material';
 import React from 'react';
 import type { StudioComponentDefinition, NodeId } from '../types';
-import Slot, { Slots } from '../components/PageView/Slot';
+import Slot, { Slots } from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface StackComponentProps extends StackProps {
@@ -61,6 +61,22 @@ const Stack: StudioComponentDefinition<StackComponentProps> = {
       default:
         return node;
     }
+  },
+  render(context, node, resolvedProps) {
+    context.addImport('@mui/material/Stack', 'default', 'Stack');
+    return `
+      <Stack 
+        ${context.renderRootProps(node.id)} 
+        ${node.children.length > 0 ? context.renderSlots('slots', resolvedProps.direction) : ''} 
+        ${context.renderProps(resolvedProps)}
+      >
+        ${
+          node.children.length > 0
+            ? node.children.map((childId) => context.renderNode(childId)).join('\n')
+            : context.renderPlaceholder('slot')
+        }
+      </Stack>
+    `;
   },
 };
 

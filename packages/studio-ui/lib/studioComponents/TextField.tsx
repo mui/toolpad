@@ -15,7 +15,15 @@ const TextField: StudioComponentDefinition<TextFieldProps> = {
       defaultValue: '',
       onChangeProp: 'onChange',
       onChangeTransform: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
+      onChangeEventHandler: (setStateIdentifier) =>
+        `(event) => ${setStateIdentifier}(event.target.value)`,
     },
+  },
+  render(context, node, resolvedProps) {
+    context.addImport('@mui/material/TextField', 'default', 'TextField');
+    return `
+      <TextField ${context.renderRootProps(node.id)} ${context.renderProps(resolvedProps)} />
+    `;
   },
 };
 

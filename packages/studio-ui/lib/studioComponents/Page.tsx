@@ -1,7 +1,7 @@
 import { Container, Stack } from '@mui/material';
 import * as React from 'react';
 import type { StudioComponentDefinition, NodeId } from '../types';
-import Slot, { Slots } from '../components/PageView/Slot';
+import Slot, { Slots } from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface PageComponentProps {
@@ -9,10 +9,9 @@ interface PageComponentProps {
 }
 
 function PageComponent({ children, ...props }: PageComponentProps) {
-  const gap = 2;
   return (
     <Container {...props}>
-      <Stack direction="column" gap={gap} my={2}>
+      <Stack direction="column" gap={2} my={2}>
         {children.length > 0 ? (
           <Slots name="slots" direction="column">
             {children}
@@ -51,6 +50,29 @@ const Page: StudioComponentDefinition<PageComponentProps> = {
       default:
         return node;
     }
+  },
+  render(context, node, resolvedProps) {
+    context.addImport('@mui/material/Container', 'default', 'Container');
+    context.addImport('@mui/material/Stack', 'default', 'Stack');
+    return `
+      <Container 
+        ${context.renderRootProps(node.id)} 
+        ${context.renderProps(resolvedProps)}
+      >
+        <Stack 
+          ${node.children.length > 0 ? context.renderSlots('slots', '"column"') : ''}
+          direction="column" 
+          gap={2} 
+          my={2}
+        >
+          ${
+            node.children.length > 0
+              ? node.children.map((childId) => context.renderNode(childId)).join('\n')
+              : context.renderPlaceholder('slot')
+          }
+        </Stack>
+      </Container>
+    `;
   },
 };
 

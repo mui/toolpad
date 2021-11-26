@@ -1,18 +1,12 @@
-import { Box, BoxProps } from '@mui/material';
-import React from 'react';
 import type {
   SlotDirection,
   SlotLayout,
   SlotLayoutCenter,
   SlotLayoutInsert,
-  NodeId,
+  FlowDirection,
 } from '../../types';
 import { getRelativeBoundingBox } from '../../utils/geometry';
-import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from './contants';
-import NodeContext from './NodeContext';
-import RenderNodeContext from './RenderNodeContext';
-
-type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
+import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from '../../constants';
 
 function getSlotDirection(flow: FlowDirection): SlotDirection {
   switch (flow) {
@@ -28,10 +22,10 @@ function getSlotDirection(flow: FlowDirection): SlotDirection {
 }
 
 interface GetInsertSlotsParams {
-  nodeElm: HTMLElement;
+  nodeElm: Element;
   name: string;
   direction?: FlowDirection;
-  container?: HTMLElement;
+  container?: Element;
   items?: Iterable<Element>;
 }
 
@@ -93,7 +87,7 @@ function getInsertSlots({
 }
 
 interface GetSlotParams {
-  nodeElm: HTMLElement;
+  nodeElm: Element;
   name: string;
   container?: Element;
 }
@@ -119,12 +113,15 @@ export function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
       if (!elm.parentElement) {
         throw new Error(`Invariant: Slots element must have a parent`);
       }
+      // TODO: This can be removed once we have the code generation version of pageview working
+      // it can then just be set to elm
+      const container = (elm as HTMLElement).style.display === 'contents' ? elm.parentElement : elm;
       result.push(
         ...getInsertSlots({
           nodeElm,
           name: slotName,
           direction,
-          container: elm.parentElement,
+          container,
           items: elm.children,
         }),
       );
@@ -134,56 +131,4 @@ export function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
   }
 
   return result;
-}
-
-export interface SlotsProps {
-  name: string;
-  direction: FlowDirection;
-  children: NodeId[];
-}
-
-export function Slots({ children, name, direction }: SlotsProps) {
-  const node = React.useContext(NodeContext);
-  const renderNode = React.useContext(RenderNodeContext);
-
-  if (!node) {
-    throw new Error(`Invariant: Slot used outside of a rendered node`);
-  }
-
-  return (
-    <div
-      style={{ display: 'contents' }}
-      {...{ [DATA_PROP_SLOT]: name, [DATA_PROP_SLOT_DIRECTION]: direction }}
-    >
-      {children.map((childnodeId) => renderNode(childnodeId))}
-    </div>
-  );
-}
-
-export interface SlotProps extends BoxProps {
-  name: string;
-  content?: NodeId | null;
-}
-
-export default function Slot({ name, content, ...props }: SlotProps) {
-  const node = React.useContext(NodeContext);
-  const renderNode = React.useContext(RenderNodeContext);
-
-  if (!node) {
-    throw new Error(`Invariant: Slot used outside of a rendered node`);
-  }
-
-  return content ? (
-    <React.Fragment>{renderNode(content)}</React.Fragment>
-  ) : (
-    <Box
-      display="block"
-      minHeight={40}
-      minWidth={200}
-      {...props}
-      {...{
-        [DATA_PROP_SLOT]: name,
-      }}
-    />
-  );
 }

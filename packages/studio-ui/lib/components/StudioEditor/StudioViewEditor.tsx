@@ -10,7 +10,7 @@ import {
   ViewLayout,
 } from '../../types';
 import { getAncestors, getDecendants, nodesByDepth } from '../../studioPage';
-import StudioView, { getNodeLayout, getViewCoordinates } from '../PageView';
+import PageView, { getNodeLayout, getViewCoordinates } from '../PageView';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -18,12 +18,13 @@ import {
   rectContainsPoint,
 } from '../../utils/geometry';
 import { ExactEntriesOf } from '../../utils/types';
-import { getSlots } from '../PageView/Slot';
 import { EditorState } from '../../editorState';
 import { PinholeOverlay } from '../../PinholeOverlay';
 import { useEditorApi, useEditorState } from './EditorProvider';
+import { getSlots } from './slots';
 
 const classes = {
+  scrollContainer: 'StudioScrollContainer',
   hud: 'StudioHud',
   view: 'StudioView',
   nodeHud: 'StudioNodeHud',
@@ -41,6 +42,13 @@ const StudioViewEditorRoot = styled('div')({
   position: 'relative',
   overflow: 'auto',
 
+  [`& .${classes.scrollContainer}`]: {
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100%',
+  },
+
   [`& .${classes.hud}`]: {
     pointerEvents: 'none',
     position: 'absolute',
@@ -50,13 +58,7 @@ const StudioViewEditorRoot = styled('div')({
     left: 0,
   },
 
-  [`& .${classes.view}`]: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
+  [`& .${classes.view}`]: {},
 
   [`& .${classes.selectionHint}`]: {
     // capture mouse events
@@ -273,7 +275,8 @@ function getViewLayout(viewElm: HTMLElement): {
       currentNode = nodeLayout;
       currentNodeElm = elm;
       layout[nodeLayout.nodeId] = currentNode;
-    } else if (currentNode && currentNodeElm) {
+    }
+    if (currentNode && currentNodeElm) {
       currentNode.slots.push(...getSlots(currentNodeElm, elm));
     }
   }
@@ -295,8 +298,14 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const observerRef = React.useRef<ResizeObserver | undefined>();
 
-  React.useEffect(() => {
-    // Running this in an effect as we want to capture the DOM state of the view after render has happened
+  const [isFocused, setIsFocused] = React.useState(false);
+
+  const cleanup = React.useRef<(() => void) | null>(null);
+  const handleRender = React.useCallback(() => {
+    if (cleanup.current) {
+      cleanup.current();
+      cleanup.current = null;
+    }
     if (viewRef.current) {
       const { layout, elms } = getViewLayout(viewRef.current);
       setViewLayout(layout);
@@ -314,10 +323,9 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       const observer = observerRef.current;
       elms.forEach((elm) => observer.observe(elm));
 
-      return () => observer.disconnect();
+      cleanup.current = () => observer.disconnect();
     }
-    return () => {};
-  }, [state.page]);
+  }, []);
 
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<Element>) => {
@@ -441,7 +449,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Backspace') {
+      if (isFocused && event.key === 'Backspace') {
         api.selectionRemove();
       }
     };
@@ -449,7 +457,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [api]);
+  }, [api, isFocused]);
 
   const selectedRect = state.selection ? viewLayout[state.selection]?.rect : null;
 
@@ -459,75 +467,98 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       : new Set();
   }, [state.selection, state.page]);
 
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const handleFocus = React.useCallback((event: React.FocusEvent<HTMLDivElement>) => {
+    if (event.target === rootRef.current) {
+      setIsFocused(true);
+    }
+  }, []);
+  const handleBlur = React.useCallback(() => setIsFocused(false), []);
+
   return (
-    <StudioViewEditorRoot className={className}>
-      <StudioView className={classes.view} ref={viewRef} page={state.page} />
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-      <div
-        className={clsx(classes.hud, {
-          [classes.componentDragging]: state.highlightLayout,
-        })}
-        // This component has `pointer-events: none`, but we will slectively enable pointer-events
-        // for its children. We can still capture the click gobally
-        onClick={handleClick}
-      >
-        {(Object.entries(viewLayout) as ExactEntriesOf<ViewLayout>).map(([nodeId, nodeLayout]) => {
-          if (!nodeLayout) {
-            return null;
-          }
-          const node = state.page.nodes[nodeId];
-          return node ? (
-            <React.Fragment key={nodeId}>
-              <div
-                draggable
-                onDragStart={handleDragStart}
-                style={absolutePositionCss(nodeLayout.rect)}
-                className={clsx(classes.nodeHud, {
-                  [classes.selected]: state.selection === nodeId,
-                  [classes.allowNodeInteraction]: nodesWithInteraction.has(nodeId),
-                })}
-              >
-                <div className={classes.selectionHint}>{node.component}</div>
-                {nodeLayout.slots.map((slotLayout, index) =>
-                  slotLayout.type === 'insert' ? (
-                    <div
-                      key={`${slotLayout.name}:${slotLayout.index}`}
-                      style={insertSlotAbsolutePositionCss(slotLayout)}
-                      className={clsx(classes.insertSlotHud, {
-                        [classes.active]:
-                          state.highlightedSlot?.nodeId === nodeId &&
-                          state.highlightedSlot?.slot === slotLayout.name &&
-                          state.highlightedSlot?.index === index,
-                      })}
-                    />
-                  ) : (
-                    <div
-                      key={slotLayout.name}
-                      style={absolutePositionCss(slotLayout.rect)}
-                      className={clsx(classes.slotHud, {
-                        [classes.active]:
-                          state.highlightedSlot?.nodeId === nodeId &&
-                          state.highlightedSlot?.slot === slotLayout.name,
-                      })}
-                    >
-                      Insert Here
-                    </div>
-                  ),
-                )}
-              </div>
-            </React.Fragment>
-          ) : null;
-        })}
-        {/* 
+    <StudioViewEditorRoot
+      ref={rootRef}
+      className={className}
+      tabIndex={0}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+    >
+      <div className={classes.scrollContainer}>
+        <PageView
+          className={classes.view}
+          ref={viewRef}
+          page={state.page}
+          onAfterRender={handleRender}
+        />
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+        <div
+          className={clsx(classes.hud, {
+            [classes.componentDragging]: state.highlightLayout,
+          })}
+          // This component has `pointer-events: none`, but we will slectively enable pointer-events
+          // for its children. We can still capture the click gobally
+          onClick={handleClick}
+        >
+          {(Object.entries(viewLayout) as ExactEntriesOf<ViewLayout>).map(
+            ([nodeId, nodeLayout]) => {
+              if (!nodeLayout) {
+                return null;
+              }
+              const node = state.page.nodes[nodeId];
+              return node ? (
+                <React.Fragment key={nodeId}>
+                  <div
+                    draggable
+                    onDragStart={handleDragStart}
+                    style={absolutePositionCss(nodeLayout.rect)}
+                    className={clsx(classes.nodeHud, {
+                      [classes.selected]: state.selection === nodeId,
+                      [classes.allowNodeInteraction]: nodesWithInteraction.has(nodeId),
+                    })}
+                  >
+                    <div className={classes.selectionHint}>{node.component}</div>
+                    {nodeLayout.slots.map((slotLayout, index) =>
+                      slotLayout.type === 'insert' ? (
+                        <div
+                          key={`${slotLayout.name}:${slotLayout.index}`}
+                          style={insertSlotAbsolutePositionCss(slotLayout)}
+                          className={clsx(classes.insertSlotHud, {
+                            [classes.active]:
+                              state.highlightedSlot?.nodeId === nodeId &&
+                              state.highlightedSlot?.slot === slotLayout.name &&
+                              state.highlightedSlot?.index === index,
+                          })}
+                        />
+                      ) : (
+                        <div
+                          key={slotLayout.name}
+                          style={absolutePositionCss(slotLayout.rect)}
+                          className={clsx(classes.slotHud, {
+                            [classes.active]:
+                              state.highlightedSlot?.nodeId === nodeId &&
+                              state.highlightedSlot?.slot === slotLayout.name,
+                          })}
+                        >
+                          Insert Here
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </React.Fragment>
+              ) : null;
+            },
+          )}
+          {/* 
           This overlay allows passing through pointer-events through a pinhole
           This allows interactivity on the selected element only, while maintaining
           a reliable click target for the rest of the page
         */}
-        <PinholeOverlay
-          className={classes.hudOverlay}
-          onClick={handleClick}
-          pinhole={selectedRect}
-        />
+          <PinholeOverlay
+            className={classes.hudOverlay}
+            onClick={handleClick}
+            pinhole={selectedRect}
+          />
+        </div>
       </div>
     </StudioViewEditorRoot>
   );

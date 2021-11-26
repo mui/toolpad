@@ -29,6 +29,23 @@ export function Slots({ children, name, direction }: SlotsProps) {
   );
 }
 
+export interface PlaceholderProps {
+  name: string;
+}
+
+export function Placeholder({ name }: PlaceholderProps) {
+  return (
+    <Box
+      display="block"
+      minHeight={40}
+      minWidth={200}
+      {...{
+        [DATA_PROP_SLOT]: name,
+      }}
+    />
+  );
+}
+
 export interface SlotProps {
   name: string;
   content?: NodeId | null;
@@ -45,13 +62,6 @@ export default function Slot({ name, content }: SlotProps) {
   return content ? (
     <React.Fragment>{renderNode(content)}</React.Fragment>
   ) : (
-    <Box
-      display="block"
-      minHeight={40}
-      minWidth={200}
-      {...{
-        [DATA_PROP_SLOT]: name,
-      }}
-    />
+    <Placeholder name={name} />
   );
 }

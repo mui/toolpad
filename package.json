@@ -25,7 +25,7 @@
     "@material-ui/monorepo": "https://github.com/mui-org/material-ui.git#master",
     "@swc/core": "^1.2.111",
     "@swc/helpers": "^0.2.14",
-    "@types/node": "^16.11.9",
+    "@types/node": "16.11.10",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "cross-env": "^7.0.3",

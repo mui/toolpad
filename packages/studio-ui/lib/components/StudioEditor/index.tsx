@@ -1,7 +1,8 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
 import SaveIcon from '@mui/icons-material/Save';
-import { IconButton } from '@mui/material';
+import CodeIcon from '@mui/icons-material/Code';
+import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { useRouter } from 'next/router';
 import { createEditorState } from '../../editorState';
 import { StudioPage } from '../../types';
@@ -12,6 +13,8 @@ import ComponentPanel from './ComponentPanel';
 import EditorProvider, { useEditorState } from './EditorProvider';
 import StudioViewEditor from './StudioViewEditor';
 import PagePanel from './PagePanel';
+import renderPageAsCode from '../../renderPageAsCode';
+import useLatest from '../../utils/useLatest';
 
 const classes = {
   content: 'StudioContent',
@@ -49,6 +52,8 @@ function EditorContent() {
   const state = useEditorState();
   const router = useRouter();
 
+  const [viewedSource, setViewedSource] = React.useState<string | null>(null);
+
   const handleSave = React.useCallback(async () => {
     try {
       const res = await fetch(`/api/pages/${state.page.id}`, {
@@ -69,13 +74,28 @@ function EditorContent() {
     }
   }, [router, state.page]);
 
+  const handleViewSource = React.useCallback(() => {
+    const { code } = renderPageAsCode(state.page, { editor: false });
+    setViewedSource(code);
+  }, [state.page]);
+
+  const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
+
+  // To keep it around during closing animation
+  const dialogSourceContent = useLatest(viewedSource);
+
   return (
     <PageProvider page={state.page}>
       <StudioAppBar
         actions={
-          <IconButton color="inherit" onClick={handleSave}>
-            <SaveIcon />
-          </IconButton>
+          <React.Fragment>
+            <IconButton color="inherit" onClick={handleViewSource}>
+              <CodeIcon />
+            </IconButton>
+            <IconButton color="inherit" onClick={handleSave}>
+              <SaveIcon />
+            </IconButton>
+          </React.Fragment>
         }
       />
       <div className={classes.content}>
@@ -84,6 +104,12 @@ function EditorContent() {
         <ComponentPanel className={classes.componentPanel} />
       </div>
       <BindingEditor />
+      <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>
+        <DialogTitle>View Source</DialogTitle>
+        <DialogContent>
+          <pre>{dialogSourceContent}</pre>
+        </DialogContent>
+      </Dialog>
     </PageProvider>
   );
 }

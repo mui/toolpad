@@ -23,7 +23,7 @@ const Button: StudioComponentDefinition<StudioButtonprops> = {
     },
   },
   render(context, node, resolvedProps) {
-    context.addImport('@mui/material/Button', 'default', 'Button');
+    context.addImport('@mui/material', 'Button', 'Button');
     const { text, ...other } = resolvedProps;
     return `
       <Button ${context.renderRootProps(node.id)} ${context.renderProps(other)}>

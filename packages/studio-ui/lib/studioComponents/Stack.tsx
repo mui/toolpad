@@ -59,7 +59,7 @@ const Stack: StudioComponentDefinition<StackComponentProps> = {
     }
   },
   render(context, node, resolvedProps) {
-    context.addImport('@mui/material/Stack', 'default', 'Stack');
+    context.addImport('@mui/material', 'Stack', 'Stack');
     return `
       <Stack 
         ${context.renderRootProps(node.id)} 

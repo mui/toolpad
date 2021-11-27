@@ -19,7 +19,6 @@ const Text: StudioComponentDefinition<TextComponentProps> = {
   Component: React.memo(TextComponent),
   props: { value: { type: 'string', defaultValue } },
   render(context, node, resolvedProps) {
-    context.addImport('@mui/material/Button', 'default', 'Button');
     const { value, ...other } = resolvedProps;
     return `
       <div 

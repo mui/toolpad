@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { transform } from 'sucrase';
 import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry';
 import { StudioPage, NodeLayout, NodeId } from '../../types';
 import { DATA_PROP_NODE_ID } from '../../constants';
@@ -36,6 +35,7 @@ const dependencies: {
   [source: string]: (() => Promise<any>) | undefined;
 } = {
   react: () => import('react'),
+  '@mui/material': () => import('@mui/material'),
   '@mui/material/Box': () => import('@mui/material/Box'),
   '@mui/material/Button': () => import('@mui/material/Button'),
   '@mui/x-data-grid': () => import('@mui/x-data-grid'),
@@ -77,7 +77,7 @@ export default React.forwardRef(function PageView(
   const [result, setResult] = React.useState<{ App: React.FC }>({ App: Noop });
 
   const renderedPage = React.useMemo(() => {
-    return renderPageAsCode(page, { editor: true });
+    return renderPageAsCode(page, { editor: true, transforms: ['jsx', 'typescript', 'imports'] });
   }, [page]);
 
   React.useEffect(() => {
@@ -87,13 +87,7 @@ export default React.forwardRef(function PageView(
         return;
       }
 
-      console.log(renderedPage.code, importedModules);
-
-      const { code: compiledCode } = transform(renderedPage.code, {
-        transforms: ['jsx', 'typescript', 'imports'],
-      });
-
-      const run = new Function('require', 'module', 'exports', compiledCode);
+      const run = new Function('require', 'module', 'exports', renderedPage.code);
 
       const require = (moduleId: string) => {
         return importedModules[moduleId];

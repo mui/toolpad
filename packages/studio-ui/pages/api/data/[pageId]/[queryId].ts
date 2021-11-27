@@ -1,8 +1,9 @@
 import { NextApiHandler } from 'next';
-import NextCors from 'nextjs-cors';
+import Cors from 'cors';
 import { getConnection, getPage } from '../../../../lib/data';
 import studioDataSources from '../../../../lib/studioDataSources/server';
 import { StudioPageQuery, StudioQueryResult } from '../../../../lib/types';
+import initMiddleware from '../../../../lib/initMiddleware';
 
 export type DataApiResult<Q> =
   | {
@@ -14,13 +15,17 @@ export type DataApiResult<Q> =
       error: string;
     };
 
-export default (async (req, res) => {
-  await NextCors(req, res, {
-    // Options
+// Initialize the cors middleware
+const cors = initMiddleware<any>(
+  // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
+  Cors({
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     origin: '*',
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  });
+  }),
+);
+
+export default (async (req, res) => {
+  await cors(req, res);
 
   // TODO: IMPORTANT this should only read the query from the body when the session has editing rights
   //       replace this with a real session check

@@ -7,6 +7,7 @@ import { ExactEntriesOf } from '../../utils/types';
 import NodeContext from './NodeContext';
 import { useCurrentPage } from './PageContext';
 import { DATA_PROP_NODE_ID } from '../../constants';
+import RenderNodeContext from './RenderNodeContext';
 
 function getCurrentBoundProps<P>(
   nodeProps: StudioNodeProps<P>,
@@ -59,6 +60,7 @@ interface RenderedNodeProps {
 export default function RenderedNode<P>({ nodeId }: RenderedNodeProps) {
   const page = useCurrentPage();
   const node = getNode(page, nodeId);
+  const renderNode = React.useContext(RenderNodeContext);
 
   const definition = getStudioComponent(node.component);
 
@@ -105,7 +107,9 @@ export default function RenderedNode<P>({ nodeId }: RenderedNodeProps) {
 
   return (
     <NodeContext.Provider value={node}>
-      <definition.Component {...componentProps}>{node.children}</definition.Component>
+      <definition.Component {...componentProps}>
+        {node.children.map((childId) => renderNode(childId))}
+      </definition.Component>
     </NodeContext.Provider>
   );
 }

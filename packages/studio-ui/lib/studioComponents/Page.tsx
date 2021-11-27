@@ -1,24 +1,20 @@
 import { Container, Stack } from '@mui/material';
 import * as React from 'react';
-import type { StudioComponentDefinition, NodeId } from '../types';
-import Slot, { Slots } from '../components/PageViewLegacy/Slot';
+import type { StudioComponentDefinition } from '../types';
+import { Slots } from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface PageComponentProps {
-  children: NodeId[];
+  children?: React.ReactNode;
 }
 
 function PageComponent({ children, ...props }: PageComponentProps) {
   return (
     <Container {...props}>
       <Stack direction="column" gap={2} my={2}>
-        {children.length > 0 ? (
-          <Slots name="slots" direction="column">
-            {children}
-          </Slots>
-        ) : (
-          <Slot name="slot" content={null} />
-        )}
+        <Slots name="slots" direction="column">
+          {children}
+        </Slots>
       </Stack>
     </Container>
   );
@@ -52,8 +48,8 @@ const Page: StudioComponentDefinition<PageComponentProps> = {
     }
   },
   render(context, node, resolvedProps) {
-    context.addImport('@mui/material/Container', 'default', 'Container');
-    context.addImport('@mui/material/Stack', 'default', 'Stack');
+    context.addImport('@mui/material', 'Container', 'Container');
+    context.addImport('@mui/material', 'Stack', 'Stack');
     return `
       <Container 
         ${context.renderRootProps(node.id)} 

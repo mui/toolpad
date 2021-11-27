@@ -1,17 +1,17 @@
 import * as React from 'react';
 import { Paper as InnerPaper, PaperProps as InnerPaperProps } from '@mui/material';
-import type { NodeId, StudioComponentDefinition } from '../types';
+import type { StudioComponentDefinition } from '../types';
 import Slot from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface PaperComponentProps extends InnerPaperProps {
-  children: NodeId[];
+  children?: React.ReactNode;
 }
 
 function PaperComponent({ children, ...props }: PaperComponentProps) {
   return (
     <InnerPaper {...props} sx={{ padding: 1 }}>
-      <Slot name={'content'} content={children.length > 0 ? children[0] : null} />
+      <Slot name={'content'}>{children}</Slot>
     </InnerPaper>
   );
 }
@@ -41,7 +41,7 @@ const Paper: StudioComponentDefinition<PaperComponentProps> = {
     }
   },
   render(context, node, resolvedProps) {
-    context.addImport('@mui/material/Paper', 'default', 'Paper');
+    context.addImport('@mui/material', 'Paper', 'Paper');
     return `
       <Paper 
         ${context.renderRootProps(node.id)} 

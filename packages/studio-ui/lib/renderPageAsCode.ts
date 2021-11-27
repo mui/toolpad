@@ -1,13 +1,23 @@
 import * as prettier from 'prettier';
 import parserTypescript from 'prettier/parser-typescript';
+import { transform, Transform } from 'sucrase';
 import { StudioPage, NodeId, StudioNode, CodeGenContext } from './types';
 import { getNode } from './studioPage';
 import { getStudioComponent } from './studioComponents';
 import { DATA_PROP_NODE_ID, DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from './constants';
 
+export interface RenderPageConfig {
+  // whether we're in the context of an editor
+  editor: boolean;
+  // sucrase transforms
+  transforms: Transform[];
+  // prettify output
+  pretty: boolean;
+}
+
 interface Import {
   default: string | null;
-  named: { imported: string; local: string }[];
+  named: Map<string, string>;
 }
 
 class Context implements CodeGenContext {
@@ -20,7 +30,7 @@ class Context implements CodeGenContext {
       'react',
       {
         default: 'React',
-        named: [],
+        named: new Map(),
       },
     ],
   ]);
@@ -108,7 +118,7 @@ class Context implements CodeGenContext {
     if (!this.editor) {
       return '';
     }
-    this.addImport('@mui/material/Box', 'default', 'Box');
+    this.addImport('@mui/material', 'Box', 'Box');
     return `
       <Box
         ${DATA_PROP_SLOT}="${name}"
@@ -122,7 +132,7 @@ class Context implements CodeGenContext {
   addImport(source: string, imported: string, local: string = imported) {
     let specifiers = this.imports.get(source);
     if (!specifiers) {
-      specifiers = { default: null, named: [] };
+      specifiers = { default: null, named: new Map() };
       this.imports.set(source, specifiers);
     }
     if (imported === 'default') {
@@ -132,7 +142,15 @@ class Context implements CodeGenContext {
         specifiers.default = local;
       }
     } else {
-      specifiers.named.push({ imported, local });
+      const existing = specifiers.named.get(imported);
+      if (!existing) {
+        specifiers.named.set(imported, local);
+      } else if (existing !== local) {
+        // TODO: we can reassign to a local variable
+        throw new Error(
+          `Trying to import "${imported}" as "${local}" but it is already imported as "${existing}"`,
+        );
+      }
     }
   }
 
@@ -142,14 +160,13 @@ class Context implements CodeGenContext {
       if (specifiers.default) {
         renderedSpecifiers.push(specifiers.default);
       }
-      if (specifiers.named.length > 0) {
-        const renderedNamedSpecifiers = specifiers.named
-          .map((specifier) => {
-            return specifier.imported === specifier.local
-              ? specifier.imported
-              : `${specifier.imported} as ${specifier.local}`;
-          })
-          .join(',');
+      if (specifiers.named.size > 0) {
+        const renderedNamedSpecifiers = Array.from(
+          specifiers.named.entries(),
+          ([imported, local]) => {
+            return imported === local ? imported : `${imported} as ${local}`;
+          },
+        ).join(',');
         renderedSpecifiers.push(`{ ${renderedNamedSpecifiers} }`);
       }
       return `import ${renderedSpecifiers.join(', ')} from '${source}';`;
@@ -160,6 +177,7 @@ class Context implements CodeGenContext {
     if (this.dataLoaders.length <= 0) {
       return '';
     }
+    const host = 'http://localhost:3000';
     return `
       function useDataQuery(queryId) {
         const [result, setResult] = React.useState({});
@@ -169,7 +187,7 @@ class Context implements CodeGenContext {
             return;
           }
           setResult({ loading: true });
-          fetch(\`/api/data/\${queryId}\`, {
+          fetch(\`${host}/api/data/${this.page.id}/\${queryId}\`, {
             method: 'POST',
             ${
               this.editor
@@ -187,7 +205,7 @@ class Context implements CodeGenContext {
                 setResult({ loading: false, error: body.error });
               } else if (body.result) {
                 const { fields, data: rows } = body.result;
-                const columns = (Object.entries(fields) as [string, object][]).map(([field, def]) => ({
+                const columns = Object.entries(fields).map(([field, def]) => ({
                   ...def,
                   field,
                 }));
@@ -233,15 +251,17 @@ class Context implements CodeGenContext {
   }
 }
 
-export interface RenderPageConfig {
-  // whether we're in the context of an editor
-  editor: boolean;
-}
-
 export default function renderPageAsCode(
   page: StudioPage,
-  config: RenderPageConfig = { editor: false },
+  configInit: Partial<RenderPageConfig> = {},
 ) {
+  const config: RenderPageConfig = {
+    editor: false,
+    transforms: [],
+    pretty: false,
+    ...configInit,
+  };
+
   const ctx = new Context(page, config);
   const root = ctx.renderNode(page.root);
 
@@ -257,7 +277,14 @@ export default function renderPageAsCode(
     }
   `;
 
-  if (!config.editor) {
+  if (config.transforms.length > 0) {
+    const { code: compiledCode } = transform(code, {
+      transforms: config.transforms,
+    });
+    code = compiledCode;
+  }
+
+  if (config.pretty) {
     code = prettier.format(code, {
       parser: 'typescript',
       plugins: [parserTypescript],

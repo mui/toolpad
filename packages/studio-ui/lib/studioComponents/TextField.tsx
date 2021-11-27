@@ -20,7 +20,7 @@ const TextField: StudioComponentDefinition<TextFieldProps> = {
     },
   },
   render(context, node, resolvedProps) {
-    context.addImport('@mui/material/TextField', 'default', 'TextField');
+    context.addImport('@mui/material', 'TextField', 'TextField');
     return `
       <TextField ${context.renderRootProps(node.id)} ${context.renderProps(resolvedProps)} />
     `;

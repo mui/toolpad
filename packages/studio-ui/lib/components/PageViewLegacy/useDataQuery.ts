@@ -1,6 +1,6 @@
 import { DataGridProps } from '@mui/x-data-grid';
 import * as React from 'react';
-import type { DataApiResult } from '../../../pages/api/data/[queryId]';
+import type { DataApiResult } from '../../../pages/api/data/[pageId]/[queryId]';
 import { useCurrentPage } from './PageContext';
 
 // TODO: is there a built-in type for this?
@@ -21,7 +21,7 @@ export function useDataQuery(queryId: string | null): DataQueryResult {
       return;
     }
     setResult({ loading: true });
-    fetch(`/api/data/${queryId}`, {
+    fetch(`/api/data/${page.id}/${queryId}`, {
       method: 'POST',
       body: JSON.stringify(query),
       headers: {

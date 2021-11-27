@@ -1,26 +1,22 @@
 import { Stack as InnerStackComponent, StackProps } from '@mui/material';
 import React from 'react';
-import type { StudioComponentDefinition, NodeId } from '../types';
-import Slot, { Slots } from '../components/PageViewLegacy/Slot';
+import type { StudioComponentDefinition } from '../types';
+import { Slots } from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface StackComponentProps extends StackProps {
   // TODO: support more values for gap and direction
   gap?: number;
   direction?: 'row' | 'column';
-  children: NodeId[];
+  children?: React.ReactNode;
 }
 
 function StackComponent({ children, ...props }: StackComponentProps) {
   return (
     <InnerStackComponent {...props}>
-      {children.length > 0 ? (
-        <Slots name="slots" direction={props.direction || 'row'}>
-          {children}
-        </Slots>
-      ) : (
-        <Slot name="slot" content={null} />
-      )}
+      <Slots name="slots" direction={props.direction || 'row'}>
+        {children}
+      </Slots>
     </InnerStackComponent>
   );
 }
@@ -63,7 +59,7 @@ const Stack: StudioComponentDefinition<StackComponentProps> = {
     }
   },
   render(context, node, resolvedProps) {
-    context.addImport('@mui/material/Stack', 'default', 'Stack');
+    context.addImport('@mui/material', 'Stack', 'Stack');
     return `
       <Stack 
         ${context.renderRootProps(node.id)} 

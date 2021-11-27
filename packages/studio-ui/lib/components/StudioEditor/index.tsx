@@ -75,7 +75,7 @@ function EditorContent() {
   }, [router, state.page]);
 
   const handleViewSource = React.useCallback(() => {
-    const { code } = renderPageAsCode(state.page, { editor: false });
+    const { code } = renderPageAsCode(state.page, { pretty: true });
     setViewedSource(code);
   }, [state.page]);
 

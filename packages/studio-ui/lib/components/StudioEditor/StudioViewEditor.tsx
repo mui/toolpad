@@ -21,7 +21,7 @@ import { ExactEntriesOf } from '../../utils/types';
 import { EditorState } from '../../editorState';
 import { PinholeOverlay } from '../../PinholeOverlay';
 import { useEditorApi, useEditorState } from './EditorProvider';
-import { getPageLayout } from '../../viewLayout';
+import { getPageLayout } from '../../pageLayout';
 
 const classes = {
   scrollContainer: 'StudioScrollContainer',

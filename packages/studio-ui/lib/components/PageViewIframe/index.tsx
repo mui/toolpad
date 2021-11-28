@@ -58,11 +58,11 @@ export default React.forwardRef(function PageView(
       return () => {};
     }
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.source === 'studio-sandbox-ready') {
+      if (event.data.type === 'studio-sandbox-ready') {
         setSandboxReady(true);
-      } else if (event.data.source === 'studio-sandbox-resize') {
+      } else if (event.data.type === 'studio-sandbox-resize') {
         setHeight(event.data.height);
-      } else if (event.data.source === 'studio-sandbox-render') {
+      } else if (event.data.type === 'studio-sandbox-render') {
         onAfterRender?.();
       }
     };
@@ -81,6 +81,7 @@ export default React.forwardRef(function PageView(
     });
     frameRef.current.contentWindow?.postMessage(
       {
+        type: 'studio-sandbox-accept',
         code,
       },
       window.location.origin,

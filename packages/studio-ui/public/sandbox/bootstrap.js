@@ -3,8 +3,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { jsx } from 'react/jsx-runtime';
 
-let currentCode = 'export default () => null';
-let onCurrentCodeChange = () => {};
+let PageComponent = () => null;
+let onPageChange = () => {};
 
 function postToParent(message) {
   window.parent?.postMessage(message, window.location.origin);
@@ -16,43 +16,44 @@ window.addEventListener(
     if (event.origin !== window.location.origin) {
       return;
     }
-    const { code } = event.data;
-    currentCode = code;
-    onCurrentCodeChange();
+    if (event.data.type === 'studio-sandbox-accept') {
+      import(`data:text/javascript;charset=utf-8,${event.data.code}`).then((mod) => {
+        if (mod.default) {
+          PageComponent = mod.default;
+          onPageChange();
+        }
+      });
+    }
   },
   false,
 );
 
 function AppHost() {
-  const [rendered, setRendered] = React.useState({ Component: () => null });
+  const [counter, setCounter] = React.useState(0);
 
   React.useEffect(() => {
-    const renderCode = () => {
-      import(`data:text/javascript;charset=utf-8,${currentCode}`).then((mod) => {
-        if (mod.default) {
-          setRendered({ Component: mod.default });
-        }
-      });
+    onPageChange = () => {
+      setCounter((count) => count + 1);
     };
-
-    onCurrentCodeChange = renderCode;
-    renderCode();
+    return () => {
+      onPageChange = () => {};
+    };
   }, []);
 
   React.useEffect(() => {
     postToParent({
-      source: 'studio-sandbox-render',
+      type: 'studio-sandbox-render',
     });
-  }, [rendered]);
+  }, [counter]);
 
-  return jsx(rendered.Component, {});
+  return jsx(PageComponent, {});
 }
 
 const observer = new ResizeObserver((entries) => {
   const [documentEntry] = entries;
   const { width, height } = documentEntry.contentRect;
   postToParent({
-    source: 'studio-sandbox-resize',
+    type: 'studio-sandbox-resize',
     width,
     height,
   });
@@ -62,5 +63,5 @@ observer.observe(window.document.documentElement);
 ReactDOM.render(jsx(AppHost, {}), document.getElementById('root'));
 
 postToParent({
-  source: 'studio-sandbox-ready',
+  type: 'studio-sandbox-ready',
 });

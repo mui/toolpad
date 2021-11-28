@@ -10,7 +10,7 @@ import {
   ViewLayout,
 } from '../../types';
 import { getAncestors, getDecendants, nodesByDepth } from '../../studioPage';
-import PageView, { PageViewHandle } from '../PageView';
+import PageView, { PageViewHandle } from '../PageViewIframe';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -274,6 +274,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
   const api = useEditorApi();
 
   const viewRef = React.useRef<PageViewHandle>(null);
+  const overlayRef = React.useRef<HTMLDivElement>(null);
 
   const [viewLayout, setViewLayout] = React.useState<ViewLayout>({});
 
@@ -311,7 +312,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const rootElm = viewRef.current?.getRootElm();
+      const rootElm = overlayRef.current;
       if (!rootElm) {
         return;
       }
@@ -334,7 +335,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   React.useEffect(() => {
     const handleDragOver = (event: DragEvent) => {
-      const rootElm = viewRef.current?.getRootElm();
+      const rootElm = overlayRef.current;
       if (!rootElm || (!state.newNode && !state.selection)) {
         return;
       }
@@ -368,7 +369,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
     };
 
     const handleDrop = (event: DragEvent) => {
-      const rootElm = viewRef.current?.getRootElm();
+      const rootElm = overlayRef.current;
       if (!rootElm || (!state.newNode && !state.selection)) {
         return;
       }
@@ -416,7 +417,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const rootElm = viewRef.current?.getRootElm();
+      const rootElm = overlayRef.current;
       if (!rootElm) {
         return;
       }
@@ -540,6 +541,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
           a reliable click target for the rest of the page
         */}
           <PinholeOverlay
+            ref={overlayRef}
             className={classes.hudOverlay}
             onClick={handleClick}
             pinhole={selectedRect}

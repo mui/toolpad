@@ -15,6 +15,15 @@ export default (async (req, res) => {
             }
           }
         </script>
+        <style>
+          html, body {
+            margin: 0
+          }
+
+          #root {
+            overflow: auto
+          }
+        </style>
       </head>
       <body>
         <div id="root"></div>

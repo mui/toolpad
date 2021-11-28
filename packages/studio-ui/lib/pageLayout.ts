@@ -151,7 +151,11 @@ export function getPageLayout(containerElm: HTMLElement): {
   layout: ViewLayout;
   elms: HTMLElement[];
 } {
-  const walker = document.createTreeWalker(containerElm, NodeFilter.SHOW_ELEMENT, null);
+  const walker = containerElm.ownerDocument.createTreeWalker(
+    containerElm,
+    NodeFilter.SHOW_ELEMENT,
+    null,
+  );
 
   const layout: ViewLayout = {};
   const elms: HTMLElement[] = [];

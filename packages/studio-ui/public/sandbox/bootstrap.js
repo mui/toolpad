@@ -6,6 +6,10 @@ import { jsx } from 'react/jsx-runtime';
 let currentCode = 'export default () => null';
 let onCurrentCodeChange = () => {};
 
+function postToParent(message) {
+  window.parent?.postMessage(message, window.location.origin);
+}
+
 window.addEventListener(
   'message',
   (event) => {
@@ -35,28 +39,28 @@ function AppHost() {
     renderCode();
   }, []);
 
+  React.useEffect(() => {
+    postToParent({
+      source: 'studio-sandbox-render',
+    });
+  }, [rendered]);
+
   return jsx(rendered.Component, {});
 }
 
 const observer = new ResizeObserver((entries) => {
   const [documentEntry] = entries;
   const { width, height } = documentEntry.contentRect;
-  window.parent?.postMessage(
-    {
-      source: 'studio-sandbox-resize',
-      width,
-      height,
-    },
-    window.location.origin,
-  );
+  postToParent({
+    source: 'studio-sandbox-resize',
+    width,
+    height,
+  });
 });
 observer.observe(window.document.documentElement);
 
 ReactDOM.render(jsx(AppHost, {}), document.getElementById('root'));
 
-window.parent?.postMessage(
-  {
-    source: 'studio-sandbox-ready',
-  },
-  window.location.origin,
-);
+postToParent({
+  source: 'studio-sandbox-ready',
+});

@@ -5,7 +5,6 @@ import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry'
 import PageContext from './PageContext';
 import { DATA_PROP_NODE_ID } from '../../constants';
 import RenderedNode from './RenderedNode';
-import RenderNodeContext from './RenderNodeContext';
 
 const PageViewRoot = styled('div')({});
 
@@ -40,20 +39,17 @@ export interface PageViewProps {
   page: StudioPage;
 }
 
-const renderNode = (nodeId: NodeId) => <RenderedNode key={nodeId} nodeId={nodeId} />;
-
 export default React.forwardRef(function PageView(
   { className, page, onAfterRender }: PageViewProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  React.useEffect(() => {
-    onAfterRender?.();
-  }, [page, onAfterRender]);
+  React.useEffect(() => onAfterRender?.(), [page, onAfterRender]);
+
   return (
     <PageViewRoot ref={ref} className={className}>
-      <RenderNodeContext.Provider value={renderNode}>
-        <PageContext.Provider value={page}>{renderNode(page.root)}</PageContext.Provider>
-      </RenderNodeContext.Provider>
+      <PageContext.Provider value={page}>
+        <RenderedNode nodeId={page.root} />
+      </PageContext.Provider>
     </PageViewRoot>
   );
 });

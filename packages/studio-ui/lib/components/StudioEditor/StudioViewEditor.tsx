@@ -10,7 +10,7 @@ import {
   ViewLayout,
 } from '../../types';
 import { getAncestors, getDecendants, nodesByDepth } from '../../studioPage';
-import PageView, { getNodeLayout, getViewCoordinates } from '../PageViewLegacy';
+import PageView, { getNodeLayout, getViewCoordinates } from '../PageView';
 import {
   absolutePositionCss,
   distanceToLine,

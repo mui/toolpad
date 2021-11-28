@@ -47,6 +47,10 @@ export default React.forwardRef(function PageView(
   const [sandboxReady, setSandboxReady] = React.useState(false);
   const [height, setHeight] = React.useState(0);
 
+  const postMessageToFrame = React.useCallback((message) => {
+    frameRef.current?.contentWindow?.postMessage(message, window.location.origin);
+  }, []);
+
   React.useImperativeHandle(ref, () => ({
     getRootElm() {
       return frameRef.current?.contentWindow?.document.getElementById('root') ?? null;
@@ -79,14 +83,11 @@ export default React.forwardRef(function PageView(
       editor: true,
       transforms: ['jsx', 'typescript'],
     });
-    frameRef.current.contentWindow?.postMessage(
-      {
-        type: 'studio-sandbox-accept',
-        code,
-      },
-      window.location.origin,
-    );
-  }, [sandboxReady, page]);
+    postMessageToFrame({
+      type: 'studio-sandbox-accept',
+      code,
+    });
+  }, [sandboxReady, page, postMessageToFrame]);
 
   return (
     <PageViewRoot className={className}>

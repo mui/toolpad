@@ -6,7 +6,7 @@ import { jsx } from 'react/jsx-runtime';
 let PageComponent = () => null;
 let onPageChange = () => {};
 
-function postToParent(message) {
+function postMessageToParent(message) {
   window.parent?.postMessage(message, window.location.origin);
 }
 
@@ -41,9 +41,7 @@ function AppHost() {
   }, []);
 
   React.useEffect(() => {
-    postToParent({
-      type: 'studio-sandbox-render',
-    });
+    postMessageToParent({ type: 'studio-sandbox-render' });
   }, [counter]);
 
   return jsx(PageComponent, {});
@@ -52,7 +50,7 @@ function AppHost() {
 const observer = new ResizeObserver((entries) => {
   const [documentEntry] = entries;
   const { width, height } = documentEntry.contentRect;
-  postToParent({
+  postMessageToParent({
     type: 'studio-sandbox-resize',
     width,
     height,
@@ -62,6 +60,4 @@ observer.observe(window.document.documentElement);
 
 ReactDOM.render(jsx(AppHost, {}), document.getElementById('root'));
 
-postToParent({
-  type: 'studio-sandbox-ready',
-});
+postMessageToParent({ type: 'studio-sandbox-ready' });

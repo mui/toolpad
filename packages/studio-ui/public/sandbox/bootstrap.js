@@ -1,3 +1,4 @@
+// TODO: build this file from javascript (esbuild?)
 // look into https://github.com/guybedford/es-module-shims
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -17,12 +18,18 @@ window.addEventListener(
       return;
     }
     if (event.data.type === 'studio-sandbox-accept') {
-      import(`data:text/javascript;charset=utf-8,${event.data.code}`).then((mod) => {
-        if (mod.default) {
-          PageComponent = mod.default;
-          onPageChange();
-        }
-      });
+      console.log(event.data.code);
+      import(`data:text/javascript;charset=utf-8,${event.data.code}`).then(
+        (mod) => {
+          if (mod.default) {
+            PageComponent = mod.default;
+            onPageChange();
+          }
+        },
+        (err) => {
+          console.log(`here`, err);
+        },
+      );
     }
   },
   false,

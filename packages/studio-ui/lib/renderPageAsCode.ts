@@ -241,7 +241,7 @@ class Context implements CodeGenContext {
   renderDataLoaderHooks(): string {
     return this.dataLoaders
       .map((queryId) => {
-        return `const _${queryId} = useDataQuery("${queryId}")`;
+        return `const _${queryId} = useDataQuery("${queryId}");`;
       })
       .join('\n');
   }

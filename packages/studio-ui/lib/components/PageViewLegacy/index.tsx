@@ -1,25 +1,11 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { NodeId, StudioPage, NodeLayout } from '../../types';
-import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry';
+import { StudioPage } from '../../types';
+import { rectContainsPoint } from '../../utils/geometry';
 import PageContext from './PageContext';
-import { DATA_PROP_NODE_ID } from '../../constants';
 import RenderedNode from './RenderedNode';
-import RenderNodeContext from './RenderNodeContext';
 
 const PageViewRoot = styled('div')({});
-
-export function getNodeLayout(viewElm: HTMLElement, elm: HTMLElement): NodeLayout | null {
-  const nodeId = (elm.getAttribute(DATA_PROP_NODE_ID) as NodeId | undefined) || null;
-  if (nodeId) {
-    return {
-      nodeId,
-      rect: getRelativeBoundingBox(viewElm, elm),
-      slots: [],
-    };
-  }
-  return null;
-}
 
 export function getViewCoordinates(
   viewElm: HTMLElement,
@@ -33,6 +19,10 @@ export function getViewCoordinates(
   return null;
 }
 
+export interface PageViewHandle {
+  getRootElm: () => HTMLElement | null;
+}
+
 export interface PageViewProps {
   className?: string;
   // Callback for when the view has rendered. Make sure this value is stable
@@ -40,20 +30,24 @@ export interface PageViewProps {
   page: StudioPage;
 }
 
-const renderNode = (nodeId: NodeId) => <RenderedNode key={nodeId} nodeId={nodeId} />;
-
 export default React.forwardRef(function PageView(
   { className, page, onAfterRender }: PageViewProps,
-  ref: React.ForwardedRef<HTMLDivElement>,
+  ref: React.ForwardedRef<PageViewHandle>,
 ) {
-  React.useEffect(() => {
-    onAfterRender?.();
-  }, [page, onAfterRender]);
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => onAfterRender?.(), [page, onAfterRender]);
+
+  React.useImperativeHandle(ref, () => ({
+    getRootElm() {
+      return rootRef.current;
+    },
+  }));
+
   return (
-    <PageViewRoot ref={ref} className={className}>
-      <RenderNodeContext.Provider value={renderNode}>
-        <PageContext.Provider value={page}>{renderNode(page.root)}</PageContext.Provider>
-      </RenderNodeContext.Provider>
+    <PageViewRoot ref={rootRef} className={className}>
+      <PageContext.Provider value={page}>
+        <RenderedNode nodeId={page.root} />
+      </PageContext.Provider>
     </PageViewRoot>
   );
 });

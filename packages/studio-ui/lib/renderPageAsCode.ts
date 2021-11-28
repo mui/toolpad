@@ -1,5 +1,5 @@
 import * as prettier from 'prettier';
-import parserTypescript from 'prettier/parser-typescript';
+import parserBabel from 'prettier/parser-babel';
 import { transform, Transform } from 'sucrase';
 import { StudioPage, NodeId, StudioNode, CodeGenContext } from './types';
 import { getNode } from './studioPage';
@@ -241,7 +241,7 @@ class Context implements CodeGenContext {
   renderDataLoaderHooks(): string {
     return this.dataLoaders
       .map((queryId) => {
-        return `const _${queryId} = useDataQuery("${queryId}")`;
+        return `const _${queryId} = useDataQuery("${queryId}");`;
       })
       .join('\n');
   }
@@ -286,8 +286,8 @@ export default function renderPageAsCode(
 
   if (config.pretty) {
     code = prettier.format(code, {
-      parser: 'typescript',
-      plugins: [parserTypescript],
+      parser: 'babel-ts',
+      plugins: [parserBabel],
     });
   }
 

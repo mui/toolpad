@@ -23,7 +23,10 @@ export interface PinholeOverlayprops {
   pinhole?: Rectangle | null;
 }
 
-export function PinholeOverlay({ className, onClick, pinhole }: PinholeOverlayprops) {
+const PinholeOverlay = React.forwardRef(function PinholeOverlay(
+  { className, onClick, pinhole }: PinholeOverlayprops,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
   const left = React.useRef<HTMLDivElement>(null);
   const topLeft = React.useRef<HTMLDivElement>(null);
   const top = React.useRef<HTMLDivElement>(null);
@@ -83,7 +86,7 @@ export function PinholeOverlay({ className, onClick, pinhole }: PinholeOverlaypr
 
   // We key the elements so that React doesn't reuse between pinhole off or on
   return (
-    <PinholeOverlayRoot className={className}>
+    <PinholeOverlayRoot ref={ref} className={className}>
       {pinhole ? (
         <React.Fragment>
           {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
@@ -109,4 +112,6 @@ export function PinholeOverlay({ className, onClick, pinhole }: PinholeOverlaypr
       )}
     </PinholeOverlayRoot>
   );
-}
+});
+
+export { PinholeOverlay };

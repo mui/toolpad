@@ -1,12 +1,27 @@
-import type {
-  SlotDirection,
+import {
+  NodeId,
+  NodeLayout,
   SlotLayout,
-  SlotLayoutCenter,
   SlotLayoutInsert,
+  ViewLayout,
+  SlotDirection,
+  SlotLayoutCenter,
   FlowDirection,
-} from '../../types';
-import { getRelativeBoundingBox } from '../../utils/geometry';
-import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from '../../constants';
+} from './types';
+import { getRelativeBoundingBox } from './utils/geometry';
+import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION, DATA_PROP_NODE_ID } from './constants';
+
+function getNodeLayout(viewElm: HTMLElement, elm: HTMLElement): NodeLayout | null {
+  const nodeId = (elm.getAttribute(DATA_PROP_NODE_ID) as NodeId | undefined) || null;
+  if (nodeId) {
+    return {
+      nodeId,
+      rect: getRelativeBoundingBox(viewElm, elm),
+      slots: [],
+    };
+  }
+  return null;
+}
 
 function getSlotDirection(flow: FlowDirection): SlotDirection {
   switch (flow) {
@@ -102,7 +117,7 @@ function getSlot({ nodeElm, name, container = nodeElm }: GetSlotParams): SlotLay
   };
 }
 
-export function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
+function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
   const result: SlotLayout[] = [];
 
   const slotName = elm.getAttribute(DATA_PROP_SLOT);
@@ -113,8 +128,7 @@ export function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
       if (!elm.parentElement) {
         throw new Error(`Invariant: Slots element must have a parent`);
       }
-      // TODO: This can be removed once we have the code generation version of pageview working
-      // it can then just be set to elm
+      // TODO: This can be removed once we remove PageVieLegacy
       const container = (elm as HTMLElement).style.display === 'contents' ? elm.parentElement : elm;
       result.push(
         ...getInsertSlots({
@@ -131,4 +145,35 @@ export function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
   }
 
   return result;
+}
+
+export function getPageLayout(containerElm: HTMLElement): {
+  layout: ViewLayout;
+  elms: HTMLElement[];
+} {
+  const walker = containerElm.ownerDocument.createTreeWalker(
+    containerElm,
+    NodeFilter.SHOW_ELEMENT,
+    null,
+  );
+
+  const layout: ViewLayout = {};
+  const elms: HTMLElement[] = [];
+  let currentNode: NodeLayout | undefined;
+  let currentNodeElm: HTMLElement | undefined;
+  while (walker.nextNode()) {
+    const elm = walker.currentNode as HTMLElement;
+    const nodeLayout = getNodeLayout(containerElm, elm);
+    if (nodeLayout) {
+      elms.push(elm);
+      currentNode = nodeLayout;
+      currentNodeElm = elm;
+      layout[nodeLayout.nodeId] = currentNode;
+    }
+    if (currentNode && currentNodeElm) {
+      currentNode.slots.push(...getSlots(currentNodeElm, elm));
+    }
+  }
+
+  return { layout, elms };
 }

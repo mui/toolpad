@@ -10,7 +10,7 @@ import {
   ViewLayout,
 } from '../../types';
 import { getAncestors, getDecendants, nodesByDepth } from '../../studioPage';
-import PageView, { getNodeLayout, getViewCoordinates } from '../PageViewLegacy';
+import PageView, { PageViewHandle } from '../PageViewIframe';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -21,7 +21,7 @@ import { ExactEntriesOf } from '../../utils/types';
 import { EditorState } from '../../editorState';
 import { PinholeOverlay } from '../../PinholeOverlay';
 import { useEditorApi, useEditorState } from './EditorProvider';
-import { getSlots } from './slots';
+import { getPageLayout } from '../../pageLayout';
 
 const classes = {
   scrollContainer: 'StudioScrollContainer',
@@ -123,6 +123,18 @@ const StudioViewEditorRoot = styled('div')({
     inset: '0 0 0 0',
   },
 });
+
+function getViewCoordinates(
+  viewElm: HTMLElement,
+  clientX: number,
+  clientY: number,
+): { x: number; y: number } | null {
+  const rect = viewElm.getBoundingClientRect();
+  if (rectContainsPoint(rect, clientX, clientY)) {
+    return { x: clientX - rect.x, y: clientY - rect.y };
+  }
+  return null;
+}
 
 function insertSlotAbsolutePositionCss(slot: SlotLayoutInsert): React.CSSProperties {
   return slot.direction === 'horizontal'
@@ -253,37 +265,6 @@ function findActiveSlotAt(
   return null;
 }
 
-/**
- * We explictly calculate this through ES6 exports so they can be tree-shaken
- * when not running the editor.
- */
-function getViewLayout(viewElm: HTMLElement): {
-  layout: ViewLayout;
-  elms: HTMLElement[];
-} {
-  const walker = document.createTreeWalker(viewElm, NodeFilter.SHOW_ELEMENT, null);
-
-  const layout: ViewLayout = {};
-  const elms: HTMLElement[] = [];
-  let currentNode: NodeLayout | undefined;
-  let currentNodeElm: HTMLElement | undefined;
-  while (walker.nextNode()) {
-    const elm = walker.currentNode as HTMLElement;
-    const nodeLayout = getNodeLayout(viewElm, elm);
-    if (nodeLayout) {
-      elms.push(elm);
-      currentNode = nodeLayout;
-      currentNodeElm = elm;
-      layout[nodeLayout.nodeId] = currentNode;
-    }
-    if (currentNode && currentNodeElm) {
-      currentNode.slots.push(...getSlots(currentNodeElm, elm));
-    }
-  }
-
-  return { layout, elms };
-}
-
 export interface StudioViewEditorProps {
   className?: string;
 }
@@ -292,7 +273,8 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
   const state = useEditorState();
   const api = useEditorApi();
 
-  const viewRef = React.useRef<HTMLDivElement>(null);
+  const viewRef = React.useRef<PageViewHandle>(null);
+  const overlayRef = React.useRef<HTMLDivElement>(null);
 
   const [viewLayout, setViewLayout] = React.useState<ViewLayout>({});
 
@@ -306,14 +288,15 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       cleanup.current();
       cleanup.current = null;
     }
-    if (viewRef.current) {
-      const { layout, elms } = getViewLayout(viewRef.current);
+    const rootElm = viewRef.current?.getRootElm();
+    if (rootElm) {
+      const { layout, elms } = getPageLayout(rootElm);
       setViewLayout(layout);
 
       if (!observerRef.current) {
         observerRef.current = new ResizeObserver(() => {
-          if (viewRef.current) {
-            const { layout: newLayout } = getViewLayout(viewRef.current);
+          if (rootElm) {
+            const { layout: newLayout } = getPageLayout(rootElm);
             // TODO: any way we can update this without triggering rerenders if nothing changed?
             setViewLayout(newLayout);
           }
@@ -329,12 +312,13 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      if (!viewRef.current) {
+      const rootElm = overlayRef.current;
+      if (!rootElm) {
         return;
       }
 
       event.dataTransfer.dropEffect = 'move';
-      const cursorPos = getViewCoordinates(viewRef.current, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -351,11 +335,12 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   React.useEffect(() => {
     const handleDragOver = (event: DragEvent) => {
-      if (!viewRef.current || (!state.newNode && !state.selection)) {
+      const rootElm = overlayRef.current;
+      if (!rootElm || (!state.newNode && !state.selection)) {
         return;
       }
 
-      const cursorPos = getViewCoordinates(viewRef.current, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
 
       if (!cursorPos) {
         api.addComponentDragOver(null);
@@ -384,11 +369,12 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
     };
 
     const handleDrop = (event: DragEvent) => {
-      if (!viewRef.current || (!state.newNode && !state.selection)) {
+      const rootElm = overlayRef.current;
+      if (!rootElm || (!state.newNode && !state.selection)) {
         return;
       }
 
-      const cursorPos = getViewCoordinates(viewRef.current, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -431,11 +417,12 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      if (!viewRef.current) {
+      const rootElm = overlayRef.current;
+      if (!rootElm) {
         return;
       }
 
-      const cursorPos = getViewCoordinates(viewRef.current, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -554,6 +541,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
           a reliable click target for the rest of the page
         */}
           <PinholeOverlay
+            ref={overlayRef}
             className={classes.hudOverlay}
             onClick={handleClick}
             pinhole={selectedRect}

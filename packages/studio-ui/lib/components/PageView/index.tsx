@@ -1,35 +1,11 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry';
-import { StudioPage, NodeLayout, NodeId } from '../../types';
-import { DATA_PROP_NODE_ID } from '../../constants';
+import { StudioPage } from '../../types';
 import renderPageAsCode from '../../renderPageAsCode';
 
-const PageViewRoot = styled('div')({});
-
-export function getNodeLayout(viewElm: HTMLElement, elm: HTMLElement): NodeLayout | null {
-  const nodeId = (elm.getAttribute(DATA_PROP_NODE_ID) as NodeId | undefined) || null;
-  if (nodeId) {
-    return {
-      nodeId,
-      rect: getRelativeBoundingBox(viewElm, elm),
-      slots: [],
-    };
-  }
-  return null;
-}
-
-export function getViewCoordinates(
-  viewElm: HTMLElement,
-  clientX: number,
-  clientY: number,
-): { x: number; y: number } | null {
-  const rect = viewElm.getBoundingClientRect();
-  if (rectContainsPoint(rect, clientX, clientY)) {
-    return { x: clientX - rect.x, y: clientY - rect.y };
-  }
-  return null;
-}
+const PageViewRoot = styled('div')({
+  overflow: 'auto',
+});
 
 const dependencies: {
   [source: string]: (() => Promise<any>) | undefined;
@@ -59,6 +35,10 @@ async function loadDependencies(moduleIds: string[]): Promise<any> {
   );
 }
 
+export interface PageViewHandle {
+  getRootElm: () => HTMLElement | null;
+}
+
 export interface PageViewProps {
   className?: string;
   // Callback for when the view has rendered. Make sure this value is stable
@@ -72,9 +52,16 @@ function Noop() {
 
 export default React.forwardRef(function PageView(
   { className, page, onAfterRender }: PageViewProps,
-  ref: React.ForwardedRef<HTMLDivElement>,
+  ref: React.ForwardedRef<PageViewHandle>,
 ) {
+  const rootRef = React.useRef<HTMLDivElement>(null);
   const [result, setResult] = React.useState<{ App: React.FC }>({ App: Noop });
+
+  React.useImperativeHandle(ref, () => ({
+    getRootElm() {
+      return rootRef.current;
+    },
+  }));
 
   const renderedPage = React.useMemo(() => {
     return renderPageAsCode(page, { editor: true, transforms: ['jsx', 'typescript', 'imports'] });
@@ -113,7 +100,7 @@ export default React.forwardRef(function PageView(
   }, [onAfterRender, result.App]);
 
   return (
-    <PageViewRoot ref={ref} className={className}>
+    <PageViewRoot ref={rootRef} className={className}>
       <result.App />
     </PageViewRoot>
   );

@@ -19,6 +19,10 @@ export function getViewCoordinates(
   return null;
 }
 
+export interface PageViewHandle {
+  getRootElm: () => HTMLElement | null;
+}
+
 export interface PageViewProps {
   className?: string;
   // Callback for when the view has rendered. Make sure this value is stable
@@ -28,12 +32,19 @@ export interface PageViewProps {
 
 export default React.forwardRef(function PageView(
   { className, page, onAfterRender }: PageViewProps,
-  ref: React.ForwardedRef<HTMLDivElement>,
+  ref: React.ForwardedRef<PageViewHandle>,
 ) {
+  const rootRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => onAfterRender?.(), [page, onAfterRender]);
 
+  React.useImperativeHandle(ref, () => ({
+    getRootElm() {
+      return rootRef.current;
+    },
+  }));
+
   return (
-    <PageViewRoot ref={ref} className={className}>
+    <PageViewRoot ref={rootRef} className={className}>
       <PageContext.Provider value={page}>
         <RenderedNode nodeId={page.root} />
       </PageContext.Provider>

@@ -4,7 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { StudioPage } from '../../types';
 import PageProvider from '../PageStateProvider';
 import StudioAppBar from '../StudioAppBar';
-import PageView from '../PageView';
+import PageView from '../PageViewIframe';
 import { NextLinkComposed } from '../Link';
 
 const classes = {

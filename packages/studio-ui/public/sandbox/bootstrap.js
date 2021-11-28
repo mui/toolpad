@@ -38,6 +38,20 @@ function AppHost() {
   return jsx(rendered.Component, {});
 }
 
+const observer = new ResizeObserver((entries) => {
+  const [documentEntry] = entries;
+  const { width, height } = documentEntry.contentRect;
+  window.parent?.postMessage(
+    {
+      source: 'studio-sandbox-resize',
+      width,
+      height,
+    },
+    window.location.origin,
+  );
+});
+observer.observe(window.document.documentElement);
+
 ReactDOM.render(jsx(AppHost, {}), document.getElementById('root'));
 
 window.parent?.postMessage(

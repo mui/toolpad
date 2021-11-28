@@ -10,7 +10,7 @@ import {
   ViewLayout,
 } from '../../types';
 import { getAncestors, getDecendants, nodesByDepth } from '../../studioPage';
-import PageView, { getViewCoordinates } from '../PageView';
+import PageView, { PageViewHandle } from '../PageView';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -123,6 +123,18 @@ const StudioViewEditorRoot = styled('div')({
     inset: '0 0 0 0',
   },
 });
+
+function getViewCoordinates(
+  viewElm: HTMLElement,
+  clientX: number,
+  clientY: number,
+): { x: number; y: number } | null {
+  const rect = viewElm.getBoundingClientRect();
+  if (rectContainsPoint(rect, clientX, clientY)) {
+    return { x: clientX - rect.x, y: clientY - rect.y };
+  }
+  return null;
+}
 
 function insertSlotAbsolutePositionCss(slot: SlotLayoutInsert): React.CSSProperties {
   return slot.direction === 'horizontal'
@@ -261,7 +273,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
   const state = useEditorState();
   const api = useEditorApi();
 
-  const viewRef = React.useRef<HTMLDivElement>(null);
+  const viewRef = React.useRef<PageViewHandle>(null);
 
   const [viewLayout, setViewLayout] = React.useState<ViewLayout>({});
 
@@ -275,14 +287,15 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       cleanup.current();
       cleanup.current = null;
     }
-    if (viewRef.current) {
-      const { layout, elms } = getPageLayout(viewRef.current);
+    const rootElm = viewRef.current?.getRootElm();
+    if (rootElm) {
+      const { layout, elms } = getPageLayout(rootElm);
       setViewLayout(layout);
 
       if (!observerRef.current) {
         observerRef.current = new ResizeObserver(() => {
-          if (viewRef.current) {
-            const { layout: newLayout } = getPageLayout(viewRef.current);
+          if (rootElm) {
+            const { layout: newLayout } = getPageLayout(rootElm);
             // TODO: any way we can update this without triggering rerenders if nothing changed?
             setViewLayout(newLayout);
           }
@@ -298,12 +311,13 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      if (!viewRef.current) {
+      const rootElm = viewRef.current?.getRootElm();
+      if (!rootElm) {
         return;
       }
 
       event.dataTransfer.dropEffect = 'move';
-      const cursorPos = getViewCoordinates(viewRef.current, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -320,11 +334,12 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   React.useEffect(() => {
     const handleDragOver = (event: DragEvent) => {
-      if (!viewRef.current || (!state.newNode && !state.selection)) {
+      const rootElm = viewRef.current?.getRootElm();
+      if (!rootElm || (!state.newNode && !state.selection)) {
         return;
       }
 
-      const cursorPos = getViewCoordinates(viewRef.current, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
 
       if (!cursorPos) {
         api.addComponentDragOver(null);
@@ -353,11 +368,12 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
     };
 
     const handleDrop = (event: DragEvent) => {
-      if (!viewRef.current || (!state.newNode && !state.selection)) {
+      const rootElm = viewRef.current?.getRootElm();
+      if (!rootElm || (!state.newNode && !state.selection)) {
         return;
       }
 
-      const cursorPos = getViewCoordinates(viewRef.current, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -400,11 +416,12 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      if (!viewRef.current) {
+      const rootElm = viewRef.current?.getRootElm();
+      if (!rootElm) {
         return;
       }
 
-      const cursorPos = getViewCoordinates(viewRef.current, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;

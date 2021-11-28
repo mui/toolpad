@@ -11,9 +11,8 @@ const classes = {
 const PageViewRoot = styled('div')({
   position: 'relative',
   [`& .${classes.iframe}`]: {
-    width: '100%',
-    height: '100%',
     border: 'none',
+    width: '100%',
   },
 });
 
@@ -29,6 +28,10 @@ export function getViewCoordinates(
   return null;
 }
 
+export interface PageViewHandle {
+  getRootElm: () => HTMLElement | null;
+}
+
 export interface PageViewProps {
   className?: string;
   // Callback for when the view has rendered. Make sure this value is stable
@@ -38,10 +41,17 @@ export interface PageViewProps {
 
 export default React.forwardRef(function PageView(
   { className, page, onAfterRender }: PageViewProps,
-  ref: React.ForwardedRef<HTMLDivElement>,
+  ref: React.ForwardedRef<PageViewHandle>,
 ) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
   const [sandboxReady, setSandboxReady] = React.useState(false);
+  const [height, setHeight] = React.useState(0);
+
+  React.useImperativeHandle(ref, () => ({
+    getRootElm() {
+      return frameRef.current?.contentWindow?.document.getElementById('root') ?? null;
+    },
+  }));
 
   React.useEffect(() => {
     if (!frameRef.current) {
@@ -50,12 +60,16 @@ export default React.forwardRef(function PageView(
     const handleMessage = (event: MessageEvent) => {
       if (event.data.source === 'studio-sandbox-ready') {
         setSandboxReady(true);
+      } else if (event.data.source === 'studio-sandbox-resize') {
+        setHeight(event.data.height);
+      } else if (event.data.source === 'studio-sandbox-render') {
+        onAfterRender?.();
       }
     };
     window.addEventListener('message', handleMessage);
     frameRef.current.src = '/api/sandbox';
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [onAfterRender]);
 
   React.useEffect(() => {
     if (!frameRef.current || !sandboxReady) {
@@ -74,8 +88,8 @@ export default React.forwardRef(function PageView(
   }, [sandboxReady, page]);
 
   return (
-    <PageViewRoot ref={ref} className={className}>
-      <iframe ref={frameRef} className={classes.iframe} title="sandbox" />
+    <PageViewRoot className={className}>
+      <iframe ref={frameRef} className={classes.iframe} title="sandbox" style={{ height }} />
     </PageViewRoot>
   );
 });

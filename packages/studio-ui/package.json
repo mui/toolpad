@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@emotion/cache": "^11.6.0",
-    "@emotion/react": "^11.4.1",
+    "@emotion/react": "^11.7.0",
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.3.0",
     "@mui/icons-material": "^5.2.0",

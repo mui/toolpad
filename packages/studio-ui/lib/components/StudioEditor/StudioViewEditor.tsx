@@ -10,7 +10,7 @@ import {
   ViewLayout,
 } from '../../types';
 import { getAncestors, getDecendants, nodesByDepth } from '../../studioPage';
-import PageView, { getNodeLayout, getViewCoordinates } from '../PageView';
+import PageView, { getViewCoordinates } from '../PageView';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -21,7 +21,7 @@ import { ExactEntriesOf } from '../../utils/types';
 import { EditorState } from '../../editorState';
 import { PinholeOverlay } from '../../PinholeOverlay';
 import { useEditorApi, useEditorState } from './EditorProvider';
-import { getSlots } from './slots';
+import { getPageLayout } from '../../viewLayout';
 
 const classes = {
   scrollContainer: 'StudioScrollContainer',
@@ -253,37 +253,6 @@ function findActiveSlotAt(
   return null;
 }
 
-/**
- * We explictly calculate this through ES6 exports so they can be tree-shaken
- * when not running the editor.
- */
-function getViewLayout(viewElm: HTMLElement): {
-  layout: ViewLayout;
-  elms: HTMLElement[];
-} {
-  const walker = document.createTreeWalker(viewElm, NodeFilter.SHOW_ELEMENT, null);
-
-  const layout: ViewLayout = {};
-  const elms: HTMLElement[] = [];
-  let currentNode: NodeLayout | undefined;
-  let currentNodeElm: HTMLElement | undefined;
-  while (walker.nextNode()) {
-    const elm = walker.currentNode as HTMLElement;
-    const nodeLayout = getNodeLayout(viewElm, elm);
-    if (nodeLayout) {
-      elms.push(elm);
-      currentNode = nodeLayout;
-      currentNodeElm = elm;
-      layout[nodeLayout.nodeId] = currentNode;
-    }
-    if (currentNode && currentNodeElm) {
-      currentNode.slots.push(...getSlots(currentNodeElm, elm));
-    }
-  }
-
-  return { layout, elms };
-}
-
 export interface StudioViewEditorProps {
   className?: string;
 }
@@ -307,13 +276,13 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       cleanup.current = null;
     }
     if (viewRef.current) {
-      const { layout, elms } = getViewLayout(viewRef.current);
+      const { layout, elms } = getPageLayout(viewRef.current);
       setViewLayout(layout);
 
       if (!observerRef.current) {
         observerRef.current = new ResizeObserver(() => {
           if (viewRef.current) {
-            const { layout: newLayout } = getViewLayout(viewRef.current);
+            const { layout: newLayout } = getPageLayout(viewRef.current);
             // TODO: any way we can update this without triggering rerenders if nothing changed?
             setViewLayout(newLayout);
           }

@@ -5,7 +5,9 @@ import { StudioPage, NodeLayout, NodeId } from '../../types';
 import { DATA_PROP_NODE_ID } from '../../constants';
 import renderPageAsCode from '../../renderPageAsCode';
 
-const PageViewRoot = styled('div')({});
+const PageViewRoot = styled('div')({
+  overflow: 'auto',
+});
 
 export function getNodeLayout(viewElm: HTMLElement, elm: HTMLElement): NodeLayout | null {
   const nodeId = (elm.getAttribute(DATA_PROP_NODE_ID) as NodeId | undefined) || null;

@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry';
-import { StudioPage, NodeLayout, NodeId } from '../../types';
-import { DATA_PROP_NODE_ID } from '../../constants';
+import { rectContainsPoint } from '../../utils/geometry';
+import { StudioPage } from '../../types';
 import renderPageAsCode from '../../renderPageAsCode';
 
 const classes = {
@@ -17,18 +16,6 @@ const PageViewRoot = styled('div')({
     border: 'none',
   },
 });
-
-export function getNodeLayout(viewElm: HTMLElement, elm: HTMLElement): NodeLayout | null {
-  const nodeId = (elm.getAttribute(DATA_PROP_NODE_ID) as NodeId | undefined) || null;
-  if (nodeId) {
-    return {
-      nodeId,
-      rect: getRelativeBoundingBox(viewElm, elm),
-      slots: [],
-    };
-  }
-  return null;
-}
 
 export function getViewCoordinates(
   viewElm: HTMLElement,

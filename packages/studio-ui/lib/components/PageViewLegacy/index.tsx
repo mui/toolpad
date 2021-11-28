@@ -1,24 +1,11 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { NodeId, StudioPage, NodeLayout } from '../../types';
-import { getRelativeBoundingBox, rectContainsPoint } from '../../utils/geometry';
+import { StudioPage } from '../../types';
+import { rectContainsPoint } from '../../utils/geometry';
 import PageContext from './PageContext';
-import { DATA_PROP_NODE_ID } from '../../constants';
 import RenderedNode from './RenderedNode';
 
 const PageViewRoot = styled('div')({});
-
-export function getNodeLayout(viewElm: HTMLElement, elm: HTMLElement): NodeLayout | null {
-  const nodeId = (elm.getAttribute(DATA_PROP_NODE_ID) as NodeId | undefined) || null;
-  if (nodeId) {
-    return {
-      nodeId,
-      rect: getRelativeBoundingBox(viewElm, elm),
-      slots: [],
-    };
-  }
-  return null;
-}
 
 export function getViewCoordinates(
   viewElm: HTMLElement,

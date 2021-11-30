@@ -60,7 +60,9 @@ class Context implements CodeGenContext {
         if (propValue.type !== 'const') {
           throw new Error(`Invariant: Invalid prop type for query "${propValue.type}"`);
         }
-        result[propName] = this.useDataLoader(propValue.value as string);
+        if (propValue.value) {
+          result[propName] = this.useDataLoader(propValue.value as string);
+        }
       } else if (propValue.type === 'const') {
         result[propName] = JSON.stringify(propValue.value);
       } else if (propValue.type === 'binding') {
@@ -241,7 +243,7 @@ class Context implements CodeGenContext {
   renderDataLoaderHooks(): string {
     return this.dataLoaders
       .map((queryId) => {
-        return `const _${queryId} = useDataQuery("${queryId}");`;
+        return `const _${queryId} = useDataQuery(${JSON.stringify(queryId)});`;
       })
       .join('\n');
   }

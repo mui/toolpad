@@ -1,5 +1,25 @@
 # MUI Studio
 
+## Instructions
+
+Run this first to build/watch:
+
+```
+yarn dev
+```
+
+Then start MUI Studio in CWD:
+
+```sh
+yarn cli
+```
+
+or start MUI Studio in a different folder:
+
+```sh
+yarn cli ./my-app
+```
+
 TO DO:
 
 - Add LICENSE (+ in package.json, also update for individual packages)

@@ -2,34 +2,48 @@
 // look into https://github.com/guybedford/es-module-shims
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { jsx } from 'react/jsx-runtime';
+
+export type OutboundMessage = {};
+export type IncomingMessage = {
+  type: 'studio-sandbox-accept';
+  code: string;
+};
 
 let PageComponent = () => null;
 let onPageChange = () => {};
 
-function postMessageToParent(message) {
+function postMessageToParent(message: OutboundMessage) {
   window.parent?.postMessage(message, window.location.origin);
 }
 
 window.addEventListener(
   'message',
-  (event) => {
-    if (event.origin !== window.location.origin) {
+  (event: MessageEvent<IncomingMessage>) => {
+    if (
+      event.origin !== window.location.origin ||
+      typeof event.data !== 'object' ||
+      !event.data ||
+      typeof event.data.type !== 'string'
+    ) {
       return;
     }
-    if (event.data.type === 'studio-sandbox-accept') {
-      console.log(event.data.code);
-      import(`data:text/javascript;charset=utf-8,${event.data.code}`).then(
-        (mod) => {
-          if (mod.default) {
-            PageComponent = mod.default;
-            onPageChange();
-          }
-        },
-        (err) => {
-          console.log(`here`, err);
-        },
-      );
+    switch (event.data.type) {
+      case 'studio-sandbox-accept': {
+        import(`data:text/javascript;charset=utf-8,${event.data.code}`).then(
+          (mod) => {
+            if (mod.default) {
+              PageComponent = mod.default;
+              onPageChange();
+            }
+          },
+          (err) => {
+            console.log(`here`, err);
+          },
+        );
+        break;
+      }
+      default:
+        break;
     }
   },
   false,
@@ -51,7 +65,7 @@ function AppHost() {
     postMessageToParent({ type: 'studio-sandbox-render' });
   }, [counter]);
 
-  return jsx(PageComponent, {});
+  return <PageComponent />;
 }
 
 const observer = new ResizeObserver((entries) => {
@@ -65,6 +79,6 @@ const observer = new ResizeObserver((entries) => {
 });
 observer.observe(window.document.documentElement);
 
-ReactDOM.render(jsx(AppHost, {}), document.getElementById('root'));
+ReactDOM.render(<AppHost />, document.getElementById('root'));
 
 postMessageToParent({ type: 'studio-sandbox-ready' });

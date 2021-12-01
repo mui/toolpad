@@ -71,7 +71,7 @@ export default React.forwardRef(function PageView(
       }
     };
     window.addEventListener('message', handleMessage);
-    frameRef.current.src = '/sandbox/bootstrap.html';
+    frameRef.current.src = '/api/sandbox';
     return () => window.removeEventListener('message', handleMessage);
   }, [onAfterRender]);
 

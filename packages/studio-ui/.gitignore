@@ -34,3 +34,6 @@ yarn-error.log*
 .vercel
 
 /data/
+
+/public/web_modules
+/public/sandbox

@@ -32,7 +32,7 @@ const studioUiDir = path.dirname(
   createRequire(import.meta.url).resolve('@mui/studio-ui/package.json'),
 );
 
-const cp = execa('next', [NEXT_CMD], {
+const cp = execa('yarn', [NEXT_CMD], {
   cwd: studioUiDir,
   preferLocal: true,
   stdio: 'pipe',

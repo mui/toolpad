@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { rectContainsPoint } from '../../utils/geometry';
 import { StudioPage } from '../../types';
 import renderPageAsCode from '../../renderPageAsCode';
 
@@ -15,18 +14,6 @@ const PageViewRoot = styled('div')({
     width: '100%',
   },
 });
-
-export function getViewCoordinates(
-  viewElm: HTMLElement,
-  clientX: number,
-  clientY: number,
-): { x: number; y: number } | null {
-  const rect = viewElm.getBoundingClientRect();
-  if (rectContainsPoint(rect, clientX, clientY)) {
-    return { x: clientX - rect.x, y: clientY - rect.y };
-  }
-  return null;
-}
 
 export interface PageViewHandle {
   getRootElm: () => HTMLElement | null;

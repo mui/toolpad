@@ -124,18 +124,6 @@ const StudioViewEditorRoot = styled('div')({
   },
 });
 
-function getViewCoordinates(
-  viewElm: HTMLElement,
-  clientX: number,
-  clientY: number,
-): { x: number; y: number } | null {
-  const rect = viewElm.getBoundingClientRect();
-  if (rectContainsPoint(rect, clientX, clientY)) {
-    return { x: clientX - rect.x, y: clientY - rect.y };
-  }
-  return null;
-}
-
 function insertSlotAbsolutePositionCss(slot: SlotLayoutInsert): React.CSSProperties {
   return slot.direction === 'horizontal'
     ? {
@@ -310,19 +298,30 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
     }
   }, []);
 
-  const handleDragStart = React.useCallback(
-    (event: React.DragEvent<Element>) => {
+  const getViewCoordinates = React.useCallback(
+    (clientX: number, clientY: number): { x: number; y: number } | null => {
       const rootElm = overlayRef.current;
       if (!rootElm) {
-        return;
+        return null;
       }
+      const rect = rootElm.getBoundingClientRect();
+      if (rectContainsPoint(rect, clientX, clientY)) {
+        return { x: clientX - rect.x, y: clientY - rect.y };
+      }
+      return null;
+    },
+    [],
+  );
 
-      event.dataTransfer.dropEffect = 'move';
-      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
+  const handleDragStart = React.useCallback(
+    (event: React.DragEvent<Element>) => {
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
       }
+
+      event.dataTransfer.dropEffect = 'move';
 
       const nodeId = findNodeAt(state.page, viewLayout, cursorPos.x, cursorPos.y);
 
@@ -330,17 +329,12 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
         api.nodeDragStart(nodeId);
       }
     },
-    [api, state.page, viewLayout],
+    [api, getViewCoordinates, state.page, viewLayout],
   );
 
   React.useEffect(() => {
     const handleDragOver = (event: DragEvent) => {
-      const rootElm = overlayRef.current;
-      if (!rootElm || (!state.newNode && !state.selection)) {
-        return;
-      }
-
-      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
         api.addComponentDragOver(null);
@@ -369,12 +363,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
     };
 
     const handleDrop = (event: DragEvent) => {
-      const rootElm = overlayRef.current;
-      if (!rootElm || (!state.newNode && !state.selection)) {
-        return;
-      }
-
-      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -413,16 +402,11 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       window.removeEventListener('drop', handleDrop);
       window.removeEventListener('dragend', handleDragEnd);
     };
-  }, [state, viewLayout, api]);
+  }, [state, getViewCoordinates, viewLayout, api]);
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const rootElm = overlayRef.current;
-      if (!rootElm) {
-        return;
-      }
-
-      const cursorPos = getViewCoordinates(rootElm, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -431,7 +415,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
       const selectedNode = findNodeAt(state.page, viewLayout, cursorPos.x, cursorPos.y);
       api.select(selectedNode);
     },
-    [api, state.page, viewLayout],
+    [api, getViewCoordinates, state.page, viewLayout],
   );
 
   React.useEffect(() => {

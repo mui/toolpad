@@ -1,27 +1,12 @@
-import { Container, Stack } from '@mui/material';
 import * as React from 'react';
 import type { StudioComponentDefinition } from '../types';
-import { Slots } from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface PageComponentProps {
   children?: React.ReactNode;
 }
 
-function PageComponent({ children, ...props }: PageComponentProps) {
-  return (
-    <Container {...props}>
-      <Stack direction="column" gap={2} my={2}>
-        <Slots name="slots" direction="column">
-          {children}
-        </Slots>
-      </Stack>
-    </Container>
-  );
-}
-
 const Page: StudioComponentDefinition<PageComponentProps> = {
-  Component: React.memo(PageComponent),
   props: {},
   reducer: (node, action) => {
     switch (action.type) {

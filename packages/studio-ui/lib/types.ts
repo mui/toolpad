@@ -136,7 +136,6 @@ export interface CodeGenContext {
 }
 
 export interface StudioComponentDefinition<P = DefaultNodeProps> {
-  Component: React.FC<P & { children?: React.ReactNode }>;
   props: StudioComponentPropDefinitions<P>;
   reducer?: NodeReducer<P>;
   render: (

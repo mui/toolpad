@@ -1,7 +1,6 @@
-import { Stack as InnerStackComponent, StackProps } from '@mui/material';
+import { StackProps } from '@mui/material';
 import React from 'react';
 import type { StudioComponentDefinition } from '../types';
-import { Slots } from '../components/PageViewLegacy/Slot';
 import { update } from '../utils/immutability';
 
 interface StackComponentProps extends StackProps {
@@ -11,18 +10,7 @@ interface StackComponentProps extends StackProps {
   children?: React.ReactNode;
 }
 
-function StackComponent({ children, ...props }: StackComponentProps) {
-  return (
-    <InnerStackComponent {...props}>
-      <Slots name="slots" direction={props.direction || 'row'}>
-        {children}
-      </Slots>
-    </InnerStackComponent>
-  );
-}
-
 const Stack: StudioComponentDefinition<StackComponentProps> = {
-  Component: React.memo(StackComponent),
   props: {
     gap: { type: 'number', defaultValue: 2 },
     direction: {

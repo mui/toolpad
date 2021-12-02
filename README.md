@@ -38,6 +38,8 @@ code <- datamodel -> render -> designer
            |______________________|
 ```
 
+Removed by now, we will always render code
+
 ### prototype two: `PageView`:
 
 ```

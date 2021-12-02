@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { TextField as TextFieldComponent, TextFieldProps } from '@mui/material';
+import { TextFieldProps } from '@mui/material';
 import type { StudioComponentDefinition } from '../types';
 
 const TextField: StudioComponentDefinition<TextFieldProps> = {
-  Component: React.memo(TextFieldComponent),
   props: {
     label: { type: 'string', defaultValue: '' },
     variant: {

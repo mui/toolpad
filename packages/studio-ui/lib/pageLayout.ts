@@ -128,14 +128,12 @@ function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
       if (!elm.parentElement) {
         throw new Error(`Invariant: Slots element must have a parent`);
       }
-      // TODO: This can be removed once we remove PageVieLegacy
-      const container = (elm as HTMLElement).style.display === 'contents' ? elm.parentElement : elm;
       result.push(
         ...getInsertSlots({
           nodeElm,
           name: slotName,
           direction,
-          container,
+          container: elm,
           items: elm.children,
         }),
       );

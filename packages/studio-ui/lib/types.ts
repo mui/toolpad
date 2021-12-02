@@ -131,7 +131,6 @@ export interface CodeGenContext {
   addImport: (moduleId: string, importedName: string, alias?: string) => void;
   renderNode: (nodeId: NodeId) => string;
   renderProps: (resolvedProps: Record<string, string>) => string;
-  renderRootProps: (nodeId: NodeId) => string;
   renderSlots(name: string, direction: string | undefined): string;
   renderPlaceholder(name: string): string;
 }

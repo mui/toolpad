@@ -44,7 +44,6 @@ const Paper: StudioComponentDefinition<PaperComponentProps> = {
     context.addImport('@mui/material', 'Paper', 'Paper');
     return `
       <Paper 
-        ${context.renderRootProps(node.id)} 
         sx={{ padding: 1 }} 
         ${context.renderProps(resolvedProps)}
       >

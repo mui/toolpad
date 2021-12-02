@@ -22,7 +22,6 @@ const Text: StudioComponentDefinition<TextComponentProps> = {
     const { value, ...other } = resolvedProps;
     return `
       <div 
-        ${context.renderRootProps(node.id)} 
         style={{ padding: 10 }} 
         ${context.renderProps(other)}
       >

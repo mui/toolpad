@@ -44,7 +44,7 @@ const DataGrid: StudioComponentDefinition<DataGridWithQueryProps> = {
 
     const { studioDataQuery, ...other } = resolvedProps;
     return `
-      <div ${context.renderRootProps(node.id)} style={{ height: 350, width: '100%' }}>
+      <div style={{ height: 350, width: '100%' }}>
         <DataGrid
           ${context.renderProps(other)}
           {...${studioDataQuery}}

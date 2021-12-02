@@ -26,7 +26,7 @@ const Button: StudioComponentDefinition<StudioButtonprops> = {
     context.addImport('@mui/material', 'Button', 'Button');
     const { text, ...other } = resolvedProps;
     return `
-      <Button ${context.renderRootProps(node.id)} ${context.renderProps(other)}>
+      <Button ${context.renderProps(other)}>
         {${text || '""'}}
       </Button>
     `;

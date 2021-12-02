@@ -52,7 +52,6 @@ const Page: StudioComponentDefinition<PageComponentProps> = {
     context.addImport('@mui/material', 'Stack', 'Stack');
     return `
       <Container 
-        ${context.renderRootProps(node.id)} 
         ${context.renderProps(resolvedProps)}
       >
         <Stack 

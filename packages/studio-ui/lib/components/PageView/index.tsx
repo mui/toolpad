@@ -64,7 +64,11 @@ export default React.forwardRef(function PageView(
   }));
 
   const renderedPage = React.useMemo(() => {
-    return renderPageAsCode(page, { editor: true, transforms: ['jsx', 'typescript', 'imports'] });
+    return renderPageAsCode(page, {
+      editor: true,
+      inlineQueries: true,
+      transforms: ['jsx', 'typescript', 'imports'],
+    });
   }, [page]);
 
   React.useEffect(() => {

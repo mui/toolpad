@@ -68,6 +68,7 @@ export default React.forwardRef(function PageView(
     }
     const { code } = renderPageAsCode(page, {
       editor: true,
+      inlineQueries: true,
       transforms: ['jsx', 'typescript'],
     });
     postMessageToFrame({

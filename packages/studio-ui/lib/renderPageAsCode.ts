@@ -9,6 +9,8 @@ import { DATA_PROP_NODE_ID, DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from './c
 export interface RenderPageConfig {
   // whether we're in the context of an editor
   editor: boolean;
+  // whether we have to pass on query body instead of id
+  inlineQueries: boolean;
   // sucrase transforms
   transforms: Transform[];
   // prettify output
@@ -25,6 +27,8 @@ class Context implements CodeGenContext {
 
   private editor: boolean;
 
+  private inlineQueries: boolean;
+
   private imports = new Map<string, Import>([
     [
       'react',
@@ -37,9 +41,10 @@ class Context implements CodeGenContext {
 
   private dataLoaders: string[] = [];
 
-  constructor(page: StudioPage, { editor }: RenderPageConfig) {
+  constructor(page: StudioPage, { editor, inlineQueries }: RenderPageConfig) {
     this.page = page;
     this.editor = editor;
+    this.inlineQueries = inlineQueries;
   }
 
   useDataLoader(queryId: string): string {
@@ -88,7 +93,14 @@ class Context implements CodeGenContext {
     const node = getNode(this.page, nodeId);
     const component = getStudioComponent(node.component);
     const props = this.resolveProps(node);
-    return component.render(this, node, props);
+    const rendered = component.render(this, node, props);
+    return this.editor
+      ? `
+        <__studioRuntime.StudioNodeWrapper id="${node.id}">
+          ${rendered}
+        </__studioRuntime.StudioNodeWrapper>
+      `
+      : rendered;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -98,13 +110,6 @@ class Context implements CodeGenContext {
         return `${name}={${value}}`;
       })
       .join(' ');
-  }
-
-  renderRootProps(nodeId: NodeId): string {
-    if (!this.editor) {
-      return '';
-    }
-    return `${DATA_PROP_NODE_ID}="${nodeId}"`;
   }
 
   renderSlots(name: string, direction: string | undefined): string {
@@ -192,7 +197,7 @@ class Context implements CodeGenContext {
           fetch(\`${host}/api/data/${this.page.id}/\${queryId}\`, {
             method: 'POST',
             ${
-              this.editor
+              this.inlineQueries
                 ? // This is very sketchy, let's make sure we have query provider for this in the editor
                   `body: JSON.stringify(${JSON.stringify(this.page.queries)}[queryId]),`
                 : ''
@@ -259,6 +264,7 @@ export default function renderPageAsCode(
 ) {
   const config: RenderPageConfig = {
     editor: false,
+    inlineQueries: false,
     transforms: [],
     pretty: false,
     ...configInit,
@@ -269,6 +275,20 @@ export default function renderPageAsCode(
 
   let code: string = `
     ${ctx.renderImports()}
+
+    ${
+      config.editor
+        ? `
+          const __studioRuntime = {
+            StudioNodeWrapper ({ children, id }) {
+              return React.cloneElement(children, {
+                ['${DATA_PROP_NODE_ID}']: id
+              })
+            }
+          };
+          `
+        : ''
+    }
 
     ${ctx.renderDataLoader()}
 

@@ -10,7 +10,7 @@ import {
   ViewLayout,
 } from '../../types';
 import { getAncestors, getDecendants, nodesByDepth } from '../../studioPage';
-import PageView, { PageViewHandle } from '../PageViewIframe';
+import PageView, { PageViewHandle } from '../PageView';
 import {
   absolutePositionCss,
   distanceToLine,

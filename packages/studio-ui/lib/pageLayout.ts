@@ -133,7 +133,7 @@ function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
           nodeElm,
           name: slotName,
           direction,
-          container: elm,
+          container: elm.parentElement,
           items: elm.children,
         }),
       );

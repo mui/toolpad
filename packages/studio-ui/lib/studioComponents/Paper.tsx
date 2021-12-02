@@ -13,18 +13,18 @@ const Paper: StudioComponentDefinition<PaperComponentProps> = {
       defaultValue: 1,
     },
   },
-  render(context, node, resolvedProps) {
+
+  render(context, resolvedProps, children) {
     context.addImport('@mui/material', 'Paper', 'Paper');
+    context.addImport('@mui/studio-core', 'Slot', 'Slot');
     return `
       <Paper 
         sx={{ padding: 1 }} 
         ${context.renderProps(resolvedProps)}
       >
-        ${
-          node.children.length > 0
-            ? context.renderNode(node.children[0])
-            : context.renderPlaceholder('content')
-        }
+        <Slot>
+          ${children}
+        </Slot>
       </Paper>
     `;
   },

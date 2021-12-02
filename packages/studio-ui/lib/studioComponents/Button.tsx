@@ -16,7 +16,7 @@ const Button: StudioComponentDefinition<StudioButtonprops> = {
       defaultValue: 'contained',
     },
   },
-  render(context, node, resolvedProps) {
+  render(context, resolvedProps) {
     context.addImport('@mui/material', 'Button', 'Button');
     const { text, ...other } = resolvedProps;
     return `

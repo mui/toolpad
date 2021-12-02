@@ -7,24 +7,19 @@ interface PageComponentProps {
 
 const Page: StudioComponentDefinition<PageComponentProps> = {
   props: {},
-  render(context, node, resolvedProps) {
+  render(context, resolvedProps, children) {
     context.addImport('@mui/material', 'Container', 'Container');
     context.addImport('@mui/material', 'Stack', 'Stack');
     return `
-      <Container 
-        ${context.renderProps(resolvedProps)}
-      >
+      <Container ${context.renderProps(resolvedProps)}>
         <Stack 
-          ${node.children.length > 0 ? context.renderSlots('slots', '"column"') : ''}
           direction="column" 
           gap={2} 
           my={2}
         >
-          ${
-            node.children.length > 0
-              ? node.children.map((childId) => context.renderNode(childId)).join('\n')
-              : context.renderPlaceholder('slot')
-          }
+          <Slots direction="column">
+            ${children}
+          </Slots>
         </Stack>
       </Container>
     `;

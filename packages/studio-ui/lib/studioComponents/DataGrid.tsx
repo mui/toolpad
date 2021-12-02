@@ -17,7 +17,7 @@ const DataGrid: StudioComponentDefinition<DataGridWithQueryProps> = {
       defaultValue: null,
     },
   },
-  render(context, node, resolvedProps) {
+  render(context, resolvedProps) {
     context.addImport('@mui/x-data-grid', 'DataGrid', 'DataGrid');
 
     const { studioDataQuery, ...other } = resolvedProps;

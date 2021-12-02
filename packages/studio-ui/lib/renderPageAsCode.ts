@@ -93,7 +93,8 @@ class Context implements CodeGenContext {
     const node = getNode(this.page, nodeId);
     const component = getStudioComponent(node.component);
     const props = this.resolveProps(node);
-    const rendered = component.render(this, node, props);
+    const renderedChildren = node.children.map((childId) => this.renderNode(childId)).join('\n');
+    const rendered = component.render(this, props, renderedChildren);
     return this.editor
       ? `
         <__studioRuntime.StudioNodeWrapper id="${node.id}">

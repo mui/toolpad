@@ -139,8 +139,8 @@ export interface StudioComponentDefinition<P = DefaultNodeProps> {
   props: StudioComponentPropDefinitions<P>;
   render: (
     context: CodeGenContext,
-    node: StudioNode<P>,
     resolvedProps: Record<string, string>,
+    children: string,
   ) => string;
 }
 

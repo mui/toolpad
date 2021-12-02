@@ -8,7 +8,7 @@ const defaultValue = 'Text';
 
 const Text: StudioComponentDefinition<TextComponentProps> = {
   props: { value: { type: 'string', defaultValue } },
-  render(context, node, resolvedProps) {
+  render(context, resolvedProps) {
     const { value, ...other } = resolvedProps;
     return `
       <div 

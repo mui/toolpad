@@ -18,7 +18,7 @@ const TextField: StudioComponentDefinition<TextFieldProps> = {
         `(event) => ${setStateIdentifier}(event.target.value)`,
     },
   },
-  render(context, node, resolvedProps) {
+  render(context, resolvedProps) {
     context.addImport('@mui/material', 'TextField', 'TextField');
     return `
       <TextField ${context.renderProps(resolvedProps)} />

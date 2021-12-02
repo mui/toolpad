@@ -1,6 +1,5 @@
 import * as React from 'react';
 import type { StudioComponentDefinition } from '../types';
-import { update } from '../utils/immutability';
 
 interface PageComponentProps {
   children?: React.ReactNode;
@@ -8,30 +7,6 @@ interface PageComponentProps {
 
 const Page: StudioComponentDefinition<PageComponentProps> = {
   props: {},
-  reducer: (node, action) => {
-    switch (action.type) {
-      case 'FILL_SLOT': {
-        const oldValue = node.children;
-
-        return update(node, {
-          children: [
-            ...oldValue.slice(0, action.index),
-            action.nodeId,
-            ...oldValue.slice(action.index),
-          ],
-        });
-      }
-      case 'CLEAR_SLOT': {
-        const oldValue = node.children;
-
-        return update(node, {
-          children: oldValue.filter((slot) => slot !== action.nodeId),
-        });
-      }
-      default:
-        return node;
-    }
-  },
   render(context, node, resolvedProps) {
     context.addImport('@mui/material', 'Container', 'Container');
     context.addImport('@mui/material', 'Stack', 'Stack');

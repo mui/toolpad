@@ -37,7 +37,8 @@ window.addEventListener(
             }
           },
           (err) => {
-            console.log(`here`, err);
+            // TODO should we reload here? will that kick off a reload loop?
+            console.log(`Error updating module`, err);
           },
         );
         break;

@@ -1,7 +1,6 @@
 import { StackProps } from '@mui/material';
 import React from 'react';
 import type { StudioComponentDefinition } from '../types';
-import { update } from '../utils/immutability';
 
 interface StackComponentProps extends StackProps {
   // TODO: support more values for gap and direction
@@ -21,30 +20,6 @@ const Stack: StudioComponentDefinition<StackComponentProps> = {
       type: 'StackAlignment',
       defaultValue: 'center',
     },
-  },
-  reducer: (node, action) => {
-    switch (action.type) {
-      case 'FILL_SLOT': {
-        const oldValue = node.children;
-
-        return update(node, {
-          children: [
-            ...oldValue.slice(0, action.index),
-            action.nodeId,
-            ...oldValue.slice(action.index),
-          ],
-        });
-      }
-      case 'CLEAR_SLOT': {
-        const oldValue = node.children;
-
-        return update(node, {
-          children: oldValue.filter((slot) => slot !== action.nodeId),
-        });
-      }
-      default:
-        return node;
-    }
   },
   render(context, node, resolvedProps) {
     context.addImport('@mui/material', 'Stack', 'Stack');

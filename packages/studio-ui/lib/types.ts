@@ -137,7 +137,6 @@ export interface CodeGenContext {
 
 export interface StudioComponentDefinition<P = DefaultNodeProps> {
   props: StudioComponentPropDefinitions<P>;
-  reducer?: NodeReducer<P>;
   render: (
     context: CodeGenContext,
     node: StudioNode<P>,

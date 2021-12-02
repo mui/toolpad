@@ -22,6 +22,8 @@
   "bugs": {
     "url": "https://github.com/mui-org/mui-studio/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "react": "^17.0.2"
+  },
   "devDependencies": {}
 }

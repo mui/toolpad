@@ -1,9 +1,5 @@
 import * as React from 'react';
 
-export interface StudioConfiguration {
-  dir: string;
-}
-
 export interface PropDefinition<K extends keyof P, P = {}> {
   defaultValue: P[K];
   type: string;
@@ -21,7 +17,7 @@ export function createComponent<P = {}>(
   Component: React.FC<P>,
   definition: ComponenentDefinition<P>,
 ) {
-  (Component as any)._studioDefinition = definition;
+  (Component as any).studioDefinition = definition;
   return Component;
 }
 

@@ -82,4 +82,10 @@ observer.observe(window.document.documentElement);
 
 ReactDOM.render(<AppHost />, document.getElementById('root'));
 
+navigator.serviceWorker
+  .register('/sandbox/serviceWorker/index.js', { type: 'module', scope: '/' })
+  .then(() => {
+    console.log('Service Worker Registered');
+  });
+
 postMessageToParent({ type: 'studio-sandbox-ready' });

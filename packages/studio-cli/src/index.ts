@@ -1,7 +1,7 @@
 import arg from 'arg';
 import * as path from 'path';
 import { execa } from 'execa';
-import { StudioConfiguration } from '@mui/studio-core';
+import type { StudioConfiguration } from '@mui/studio-ui';
 import { createRequire } from 'module';
 
 const args = arg({

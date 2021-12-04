@@ -8,6 +8,14 @@ const PageViewRoot = styled('div')({
   overflow: 'auto',
 });
 
+const appIndex = `
+  import * as React from 'react';
+  import * as ReactDOM from 'react-dom';
+  import Page from './page.js';
+
+  ReactDOM.render(React.createElement(Page), document.getElementById('root'));
+`;
+
 export interface PageViewHandle {
   getRootElm: () => HTMLElement | null;
 }
@@ -41,7 +49,16 @@ export default React.forwardRef(function PageView(
 
   return (
     <PageViewRoot className={className}>
-      <StudioSandbox ref={frameRef} code={renderedPage.code} onAfterRender={onAfterRender} />
+      <StudioSandbox
+        ref={frameRef}
+        code={renderedPage.code}
+        onAfterRender={onAfterRender}
+        files={{
+          '/index.js': appIndex,
+          '/page.js': renderedPage.code,
+        }}
+        entry="/index.js"
+      />
     </PageViewRoot>
   );
 });

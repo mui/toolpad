@@ -266,35 +266,13 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const [viewLayout, setViewLayout] = React.useState<ViewLayout>({});
 
-  const observerRef = React.useRef<ResizeObserver | undefined>();
-
   const [isFocused, setIsFocused] = React.useState(false);
 
-  const cleanup = React.useRef<(() => void) | null>(null);
   const handleRender = React.useCallback(() => {
-    if (cleanup.current) {
-      cleanup.current();
-      cleanup.current = null;
-    }
     const rootElm = viewRef.current?.getRootElm();
     if (rootElm) {
-      const { layout, elms } = getPageLayout(rootElm);
+      const { layout } = getPageLayout(rootElm);
       setViewLayout(layout);
-
-      if (!observerRef.current) {
-        observerRef.current = new ResizeObserver(() => {
-          if (rootElm) {
-            const { layout: newLayout } = getPageLayout(rootElm);
-            // TODO: any way we can update this without triggering rerenders if nothing changed?
-            setViewLayout(newLayout);
-          }
-        });
-      }
-
-      const observer = observerRef.current;
-      elms.forEach((elm) => observer.observe(elm));
-
-      cleanup.current = () => observer.disconnect();
     }
   }, []);
 

@@ -14,7 +14,7 @@ function rewriteImports(map: ImportMap): ImportMap {
   };
 }
 
-async function createSandboxHtml(): Promise<string> {
+async function createSandboxHtml(entry: string = '/sandbox/main/index.js'): Promise<string> {
   return `
     <!DOCTYPE html>
     <html>
@@ -42,7 +42,7 @@ async function createSandboxHtml(): Promise<string> {
         <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
         <script async src="/web_modules/es-module-shims.js" type="module"></script>
 
-        <script type="module" src="/sandbox/main/index.js"></script>
+        <script type="module" src="${entry}"></script>
       </body>
     </html>
   `;
@@ -50,5 +50,5 @@ async function createSandboxHtml(): Promise<string> {
 
 export default (async (req, res) => {
   res.setHeader('content-type', 'text/html');
-  res.send(await createSandboxHtml());
+  res.send(await createSandboxHtml(req.query.entry as string));
 }) as NextApiHandler<string>;

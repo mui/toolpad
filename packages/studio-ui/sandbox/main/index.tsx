@@ -1,54 +1,62 @@
-// TODO: build this file from javascript (esbuild?)
-// look into https://github.com/guybedford/es-module-shims
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-
-export type OutboundMessage = {};
-export type IncomingMessage = {
-  type: 'studio-sandbox-accept';
-  code: string;
-};
+import { Channel } from './channel.js';
 
 let PageComponent = () => null;
 let onPageChange = () => {};
 
-function postMessageToParent(message: OutboundMessage) {
-  window.parent?.postMessage(message, window.location.origin);
-}
+export type SandboxCommand =
+  | {
+      type: 'studio-sandbox-accept';
+      code: string;
+    }
+  | {
+      type: 'studio-sandbox-refresh';
+      updates: string[];
+    };
 
-window.addEventListener(
-  'message',
-  (event: MessageEvent<IncomingMessage>) => {
-    if (
-      event.origin !== window.location.origin ||
-      typeof event.data !== 'object' ||
-      !event.data ||
-      typeof event.data.type !== 'string'
-    ) {
-      return;
+export type SandboxEvent =
+  | {
+      type: 'studio-sandbox-resized';
+      width: number;
+      height: number;
     }
-    switch (event.data.type) {
-      case 'studio-sandbox-accept': {
-        import(`data:text/javascript;charset=utf-8,${event.data.code}`).then(
-          (mod) => {
-            if (mod.default) {
-              PageComponent = mod.default;
-              onPageChange();
-            }
-          },
-          (err) => {
-            // TODO should we reload here? will that kick off a reload loop?
-            console.log(`Error updating module`, err);
-          },
-        );
-        break;
-      }
-      default:
-        break;
+  | {
+      type: 'studio-sandbox-rendered';
     }
-  },
-  false,
-);
+  | {
+      type: 'studio-sandbox-ready';
+    };
+
+const channel = new Channel<SandboxCommand, SandboxEvent>(window.parent);
+
+channel.addListener((cmd) => {
+  switch (cmd.type) {
+    case 'studio-sandbox-accept': {
+      import(`data:text/javascript;charset=utf-8,${cmd.code}`).then(
+        (mod) => {
+          if (mod.default) {
+            PageComponent = mod.default;
+            onPageChange();
+          }
+        },
+        (err) => {
+          // TODO should we reload here? will that kick off a reload loop?
+          console.log(`Error updating module`, err);
+        },
+      );
+      break;
+    }
+    case 'studio-sandbox-refresh': {
+      console.log(cmd.updates);
+      break;
+    }
+    default:
+      break;
+  }
+});
+
+channel.sendMessage({ type: 'studio-sandbox-ready' });
 
 function AppHost() {
   const [counter, setCounter] = React.useState(0);
@@ -63,7 +71,7 @@ function AppHost() {
   }, []);
 
   React.useEffect(() => {
-    postMessageToParent({ type: 'studio-sandbox-render' });
+    channel.sendMessage({ type: 'studio-sandbox-rendered' });
   }, [counter]);
 
   return <PageComponent />;
@@ -72,20 +80,16 @@ function AppHost() {
 const observer = new ResizeObserver((entries) => {
   const [documentEntry] = entries;
   const { width, height } = documentEntry.contentRect;
-  postMessageToParent({
-    type: 'studio-sandbox-resize',
-    width,
-    height,
-  });
+  window.parent.postMessage(
+    {
+      type: 'studio-sandbox-resized',
+      width,
+      height,
+    },
+    window.location.origin,
+  );
 });
+
 observer.observe(window.document.documentElement);
 
 ReactDOM.render(<AppHost />, document.getElementById('root'));
-
-navigator.serviceWorker
-  .register('/sandbox/serviceWorker/index.js', { type: 'module', scope: '/' })
-  .then(() => {
-    console.log('Service Worker Registered');
-  });
-
-postMessageToParent({ type: 'studio-sandbox-ready' });

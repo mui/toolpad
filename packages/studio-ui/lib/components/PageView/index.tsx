@@ -9,11 +9,28 @@ const PageViewRoot = styled('div')({
 });
 
 const appIndex = `
+  if (window.__HMR) {
+    import.meta.hot = window.__HMR.createHotContext(import.meta.url);
+  }
+
   import * as React from 'react';
   import * as ReactDOM from 'react-dom';
   import Page from './page.js';
 
   ReactDOM.render(React.createElement(Page), document.getElementById('root'));
+
+  if (import.meta.hot) {
+    import.meta.hot.accept(({ module }) => {
+      try {
+        // do nothing
+      } catch (err) {
+        import.meta.hot.invalidate();
+      }
+    });
+    import.meta.hot.dispose(() => {
+      ReactDOM.unmountComponentAtNode(document.getElementById('root'))
+    });
+  }
 `;
 
 export interface PageViewHandle {

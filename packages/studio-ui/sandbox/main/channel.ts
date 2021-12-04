@@ -1,6 +1,6 @@
-export type Handler<IncomingMessage> = (msg: IncomingMessage) => void;
+export type Handler<IncomingMessage = unknown> = (msg: IncomingMessage) => void;
 
-export class Channel<IncomingMessage, OutGoingMessage> {
+export class Channel<IncomingMessage = unknown, OutGoingMessage = unknown> {
   private targetWindow;
 
   private handlers: Map<

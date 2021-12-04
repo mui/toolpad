@@ -42,6 +42,7 @@ async function createSandboxHtml(entry: string = '/sandbox/main/index.js'): Prom
         <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
         <script async src="/web_modules/es-module-shims.js" type="module"></script>
 
+        <script type="module" src="/sandbox/main/index.js"></script>
         <script type="module" src="${entry}"></script>
       </body>
     </html>

@@ -47,7 +47,6 @@ export default React.forwardRef(function StudioSandbox(
 
   React.useImperativeHandle(ref, () => ({
     getRootElm() {
-      console.log('root', frameRef.current?.contentWindow?.document.getElementById('root'));
       return frameRef.current?.contentWindow?.document.getElementById('root') ?? null;
     },
   }));
@@ -56,7 +55,6 @@ export default React.forwardRef(function StudioSandbox(
     resizeObserverRef.current?.disconnect();
     mutationObserverRef.current?.disconnect();
 
-    console.log('onload');
     if (!frameRef.current?.contentWindow) {
       throw new Error(`Invariant: frameRef not correctly attached`);
     }
@@ -113,10 +111,10 @@ export default React.forwardRef(function StudioSandbox(
             ),
           ),
         );
-        const updatedPaths = updates.map(([path]) => path);
-        console.log(updatedPaths);
-        // TODO: figure out a HMR solution here
-        frameRef.current?.contentWindow?.location.reload();
+        updates.forEach(([path]) => {
+          const url = basePath + path;
+          frameRef.current?.contentWindow?.postMessage({ type: 'update', url });
+        });
       }
     };
     initCache();

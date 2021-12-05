@@ -10,7 +10,7 @@ export type AcceptCallbackObject = {
 };
 
 function debug(...args: any[]) {
-  console.log('[ESM-HMR]', ...args);
+  // console.log('[ESM-HMR]', ...args);
 }
 
 function reload() {
@@ -72,12 +72,6 @@ class HotModuleContext {
       callback = () => {};
     }
     const deps = _deps.map((dep) => {
-      const ext = dep.split('.').pop();
-      if (!ext) {
-        dep += '.js';
-      } else if (ext !== 'js') {
-        dep += '.proxy.js';
-      }
       return new URL(dep, `${window.location.origin}${this.id}`).pathname;
     });
     this.acceptCallbacks.push({
@@ -92,6 +86,14 @@ function hasOwnProperty<X extends {}, Y extends PropertyKey>(
   prop: Y,
 ): obj is X & Record<Y, unknown> {
   return obj.hasOwnProperty(prop);
+}
+
+async function getDependants(id: string): Promise<{ dependants: string[] }> {
+  return new Promise((resolve) => {
+    const { port1, port2 } = new MessageChannel();
+    port1.onmessage = (event) => resolve(event.data);
+    navigator.serviceWorker.controller?.postMessage({ type: 'getDependants', id }, [port2]);
+  });
 }
 
 export class HotModulesProvider {
@@ -150,7 +152,7 @@ export class HotModulesProvider {
     return true;
   }
 
-  private async applyUpdate(id: string) {
+  private async applyUpdate(id: string): Promise<boolean> {
     const ctx = this.registeredModules.get(id);
 
     if (!ctx) {
@@ -168,6 +170,17 @@ export class HotModulesProvider {
 
     disposeCallbacks.map((callback) => callback());
     const updateID = Date.now();
+
+    if (acceptCallbacks.length <= 0) {
+      const { dependants } = await getDependants(id);
+      if (dependants.length <= 0) {
+        return false;
+      }
+      const applyResults = await Promise.all(
+        dependants.map((dependant) => this.applyUpdate(dependant)),
+      );
+      return applyResults.every(Boolean);
+    }
 
     // eslint-disable-next-line no-restricted-syntax
     for (const { deps, callback: acceptCallback } of acceptCallbacks) {

@@ -26,14 +26,24 @@ export interface StudioSandboxHandle {
 }
 
 if (typeof window !== 'undefined') {
-  navigator.serviceWorker
-    .register('/sandbox/serviceWorker/index.js', {
-      type: 'module',
-      scope: '/api/sandbox',
-    })
-    .then((registration) => {
-      console.log(`Service Worker Registered, scope: "${registration.scope}"`);
-    });
+  navigator.serviceWorker.register('/sandbox/serviceWorker/index.js', {
+    type: 'module',
+    scope: '/',
+  });
+}
+
+async function addFiles(files: SandboxFiles) {
+  const cache = await caches.open('rawFiles');
+  await Promise.all(
+    Object.entries(files).map(([path, content]) => {
+      return cache.put(
+        basePath + path,
+        new Response(new Blob([content], { type: 'application/javascript' }), {
+          status: 200,
+        }),
+      );
+    }),
+  );
 }
 
 export default React.forwardRef(function StudioSandbox(
@@ -88,6 +98,7 @@ export default React.forwardRef(function StudioSandbox(
   );
 
   const prevPages = React.useRef<SandboxFiles>({});
+  const prevEntry = React.useRef<string>();
   React.useEffect(() => {
     const initCache = async () => {
       const updates = Object.entries(files).filter(([path, content]) => {
@@ -98,32 +109,25 @@ export default React.forwardRef(function StudioSandbox(
       });
       prevPages.current = files;
 
-      const cache = await caches.open('app');
-
       if (updates.length > 0) {
-        await Promise.all(
-          updates.map(([path, content]) =>
-            cache.put(
-              basePath + path,
-              new Response(new Blob([content], { type: 'application/javascript' }), {
-                status: 200,
-              }),
-            ),
-          ),
-        );
+        await addFiles(Object.fromEntries(updates));
         updates.forEach(([path]) => {
           const url = basePath + path;
           frameRef.current?.contentWindow?.postMessage({ type: 'update', url });
         });
       }
+
+      if (frameRef.current && entry !== prevEntry.current) {
+        prevEntry.current = entry;
+        frameRef.current.src = `/api/sandbox?entry=${encodeURIComponent(basePath + entry)}`;
+      }
     };
     initCache();
-  }, [files]);
+  }, [files, entry]);
 
   return (
     <StudioSandboxRoot
       ref={frameRef}
-      src={`/api/sandbox?entry=${encodeURIComponent(basePath + entry)}`}
       className={className}
       title="sandbox"
       style={{ height }}

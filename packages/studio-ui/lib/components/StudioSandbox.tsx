@@ -28,7 +28,7 @@ export interface StudioSandboxHandle {
 if (typeof window !== 'undefined') {
   navigator.serviceWorker.register('/sandbox/serviceWorker/index.js', {
     type: 'module',
-    scope: '/',
+    scope: '/api/sandbox',
   });
 }
 

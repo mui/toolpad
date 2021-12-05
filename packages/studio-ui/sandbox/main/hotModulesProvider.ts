@@ -165,7 +165,6 @@ export class HotModulesProvider {
     const acceptCallbacks = ctx.acceptCallbacks;
     const disposeCallbacks = ctx.disposeCallbacks;
     ctx.disposeCallbacks = [];
-    ctx.data = {};
 
     disposeCallbacks.map((callback) => callback());
     const updateID = Date.now();
@@ -190,6 +189,8 @@ export class HotModulesProvider {
       ]);
       acceptCallback({ module, deps: depModules });
     }
+
+    ctx.data = {};
 
     return true;
   }

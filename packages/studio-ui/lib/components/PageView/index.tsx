@@ -13,13 +13,21 @@ const appIndex = `
   import * as ReactDOM from 'react-dom';
   import Page from './page.js';
 
-  ReactDOM.render(React.createElement(Page), document.getElementById('root'));
-
+  // Poor man's refresh implementation
   if (import.meta.hot) {
+    if (!import.meta.hot.data.isRefresh) {
+      ReactDOM.render(React.createElement(Page), document.getElementById('root'));
+    }
+
     import.meta.hot.accept(['./page.js'], ({ module, deps }) => {
-      ReactDOM.unmountComponentAtNode(document.getElementById('root'))
       ReactDOM.render(React.createElement(deps[0].default), document.getElementById('root'));
     });
+
+    import.meta.hot.dispose(() => {
+      import.meta.hot.data.isRefresh = true;
+    });
+  } else {
+    ReactDOM.render(React.createElement(Page), document.getElementById('root'));
   }
 `;
 

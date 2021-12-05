@@ -2,6 +2,23 @@ const global: ServiceWorkerGlobalScope = globalThis as any;
 
 const dependencies = new Map<string, Set<string>>();
 
+// ppor man's compiler for now
+function findImportedModuleIDs(source: string): string[] {
+  const importRegex = /^\s*import\s+(.*)\s+from\s+'(.*)'\s*;?$/;
+  return source
+    .replace(/{\n/gm, '{')
+    .replace(/,\n/gm, ',')
+    .replace(/,}/gm, ' }')
+    .replace(/ {2}/gm, ' ')
+    .split('\n')
+    .map((line) => {
+      const result = importRegex.exec(line);
+
+      return result ? result[2] : null;
+    })
+    .filter(Boolean) as string[];
+}
+
 global.addEventListener('install', (event) => {
   event.waitUntil(global.skipWaiting());
 });
@@ -37,10 +54,12 @@ global.addEventListener('fetch', (event) => {
         dependencies.set(pathname, existingDeps);
       }
 
-      if (pathname.endsWith('/index.js')) {
-        const { pathname: resolved } = new URL('./page.js', event.request.url);
-        existingDeps.add(resolved);
-      }
+      findImportedModuleIDs(content).forEach((id) => {
+        if (id.startsWith('.')) {
+          const { pathname: resolved } = new URL(id, event.request.url);
+          existingDeps!.add(resolved);
+        }
+      });
 
       return new Response(new Blob([compiled], { type: 'application/javascript' }), {
         status: 200,

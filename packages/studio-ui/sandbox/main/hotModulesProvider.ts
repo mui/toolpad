@@ -10,7 +10,7 @@ export type AcceptCallbackObject = {
 };
 
 function debug(...args: any[]) {
-  // console.log('[ESM-HMR]', ...args);
+  console.log('[ESM-HMR]', ...args);
 }
 
 function reload() {
@@ -126,7 +126,6 @@ export class HotModulesProvider {
         return;
       }
       debug('message: update', msg);
-      debug(msg.url, this.registeredModules.keys());
       this.applyUpdate(msg.url)
         .then((ok) => {
           if (!ok) {

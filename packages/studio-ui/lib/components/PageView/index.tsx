@@ -3,6 +3,7 @@ import { styled } from '@mui/material';
 import { StudioPage } from '../../types';
 import renderPageAsCode from '../../renderPageAsCode';
 import StudioSandbox, { StudioSandboxHandle } from '../StudioSandbox';
+import getImportMap from '../../getImportMap';
 
 const PageViewRoot = styled('div')({
   overflow: 'auto',
@@ -66,11 +67,12 @@ export default React.forwardRef(function PageView(
     <PageViewRoot className={className}>
       <StudioSandbox
         ref={frameRef}
-        code={renderedPage.code}
         onAfterRender={onAfterRender}
+        base="/app/1234"
+        importMap={getImportMap()}
         files={{
-          '/index.js': appIndex,
-          '/page.js': renderedPage.code,
+          '/index.js': { code: appIndex },
+          '/page.js': { code: renderedPage.code },
         }}
         entry="/index.js"
       />

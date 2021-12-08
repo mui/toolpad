@@ -1,44 +1,50 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
+import { ImportMap } from 'esinstall';
 
 const StudioSandboxRoot = styled('iframe')({
   border: 'none',
   width: '100%',
 });
 
-interface SandboxFiles {
-  [path: string]: string;
+interface SandboxFile {
+  code: string;
+  type?: 'application/javascript' | 'text/html';
+}
+
+type SandboxFiles = {
+  [path in string]?: SandboxFile;
+};
+
+function isSameFile(file1: SandboxFile, file2: SandboxFile): boolean {
+  return file1.code === file2.code && file1.type === file2.type;
 }
 
 export interface StudioSandboxProps {
   className?: string;
-  code: string;
+  base: string;
+  importMap?: ImportMap;
   files: SandboxFiles;
   entry: string;
   // Callback for when the view has rendered. Make sure this value is stable
   onAfterRender?: () => void;
 }
 
-const basePath = '/sandbox/serviceWorker/app';
-
 export interface StudioSandboxHandle {
   getRootElm: () => HTMLElement | null;
 }
 
-if (typeof window !== 'undefined') {
-  navigator.serviceWorker.register('/sandbox/serviceWorker/index.js', {
-    type: 'module',
-    scope: '/api/sandbox',
-  });
-}
-
-async function addFiles(files: SandboxFiles) {
+async function addFiles(files: SandboxFiles, base: string) {
   const cache = await caches.open('rawFiles');
   await Promise.all(
-    Object.entries(files).map(([path, content]) => {
-      return cache.put(
-        basePath + path,
-        new Response(new Blob([content], { type: 'application/javascript' }), {
+    Object.entries(files).map(async ([path, file]) => {
+      if (!file) {
+        return;
+      }
+      const { code, type = 'application/javascript' } = file;
+      await cache.put(
+        base + path,
+        new Response(new Blob([code], { type }), {
           status: 200,
         }),
       );
@@ -46,14 +52,82 @@ async function addFiles(files: SandboxFiles) {
   );
 }
 
+interface CreatePageParams {
+  entry: string;
+  importMap: string;
+}
+
+function createPage({ entry, importMap }: CreatePageParams) {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Studio Sandbox</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+          html,
+          body {
+            margin: 0;
+          }
+
+          #root {
+            overflow: auto;
+          }
+        </style>
+      </head>
+      <body>
+      <div id="root"></div>
+        <script type="importmap">
+          ${importMap}
+        </script>
+
+        <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
+        <script async src="/web_modules/es-module-shims.js" type="module"></script>
+
+        <script type="module" src="/sandbox/main/index.js"></script>
+        <script type="module" src="${entry}"></script>
+      </body>
+    </html>
+  `;
+}
+
 export default React.forwardRef(function StudioSandbox(
-  { className, onAfterRender, files, entry }: StudioSandboxProps,
+  { className, onAfterRender, files, entry, base, importMap = { imports: {} } }: StudioSandboxProps,
   ref: React.ForwardedRef<StudioSandboxHandle>,
 ) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
   const [height, setHeight] = React.useState(0);
   const resizeObserverRef = React.useRef<ResizeObserver>();
   const mutationObserverRef = React.useRef<MutationObserver>();
+
+  const serializedImportMap = JSON.stringify(importMap);
+  const prevFiles = React.useRef<SandboxFiles>(files);
+  React.useEffect(() => {
+    if (!frameRef.current) {
+      return;
+    }
+    const init = async (iframe: HTMLIFrameElement) => {
+      // TODO: probably just want to update if already exists?
+      await navigator.serviceWorker.register('/sandbox/serviceWorker/index.js', {
+        type: 'module',
+        scope: base,
+      });
+      await addFiles(
+        {
+          ...prevFiles.current,
+          '/': {
+            code: createPage({ entry: base + entry, importMap: serializedImportMap }),
+            type: 'text/html',
+          },
+        },
+        base,
+      );
+      iframe.src = `${base}/`;
+    };
+    init(frameRef.current);
+    // TODO: cleanup service worker/cache? what if multiple sandboxes are initialized?
+  }, [base, entry, serializedImportMap]);
 
   React.useImperativeHandle(ref, () => ({
     getRootElm() {
@@ -97,33 +171,30 @@ export default React.forwardRef(function StudioSandbox(
     [],
   );
 
-  const prevPages = React.useRef<SandboxFiles>({});
-  const prevEntry = React.useRef<string>();
   React.useEffect(() => {
     const initCache = async () => {
       const updates = Object.entries(files).filter(([path, content]) => {
+        if (!content) {
+          return false;
+        }
         if (!path.startsWith('/')) {
           throw new Error(`invalid file name "${path}"`);
         }
-        return prevPages.current[path] !== content;
+        const currentFile = prevFiles.current[path];
+        return !currentFile || !isSameFile(currentFile, content);
       });
-      prevPages.current = files;
+      prevFiles.current = files;
 
       if (updates.length > 0) {
-        await addFiles(Object.fromEntries(updates));
+        await addFiles(Object.fromEntries(updates), base);
         updates.forEach(([path]) => {
-          const url = basePath + path;
+          const url = base + path;
           frameRef.current?.contentWindow?.postMessage({ type: 'update', url });
         });
       }
-
-      if (frameRef.current && entry !== prevEntry.current) {
-        prevEntry.current = entry;
-        frameRef.current.src = `/api/sandbox?entry=${encodeURIComponent(basePath + entry)}`;
-      }
     };
     initCache();
-  }, [files, entry]);
+  }, [files, base]);
 
   return (
     <StudioSandboxRoot

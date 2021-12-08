@@ -28,6 +28,7 @@ global.addEventListener('activate', (event) => {
 });
 
 global.addEventListener('fetch', (event) => {
+  console.log(event.request.url);
   event.respondWith(
     Promise.resolve().then(async () => {
       const rawFilesCache = await caches.open('rawFiles');
@@ -38,32 +39,36 @@ global.addEventListener('fetch', (event) => {
         return fetch(event.request);
       }
 
-      const content = await rawFile.text();
+      if (rawFile.headers.get('content-type') === 'application/javascript') {
+        const content = await rawFile.text();
 
-      const compiled = `
-        if (window.__HMR) {
-          import.meta.hot = window.__HMR.createHotContext(import.meta.url);
+        const compiled = `
+          if (window.__HMR) {
+            import.meta.hot = window.__HMR.createHotContext(import.meta.url);
+          }
+      
+          ${content}
+        `;
+
+        let existingDeps = dependencies.get(pathname);
+        if (!existingDeps) {
+          existingDeps = new Set();
+          dependencies.set(pathname, existingDeps);
         }
-    
-        ${content}
-      `;
 
-      let existingDeps = dependencies.get(pathname);
-      if (!existingDeps) {
-        existingDeps = new Set();
-        dependencies.set(pathname, existingDeps);
+        findImportedModuleIDs(content).forEach((id) => {
+          if (id.startsWith('.')) {
+            const { pathname: resolved } = new URL(id, event.request.url);
+            existingDeps!.add(resolved);
+          }
+        });
+
+        return new Response(new Blob([compiled], { type: 'application/javascript' }), {
+          status: 200,
+        });
       }
 
-      findImportedModuleIDs(content).forEach((id) => {
-        if (id.startsWith('.')) {
-          const { pathname: resolved } = new URL(id, event.request.url);
-          existingDeps!.add(resolved);
-        }
-      });
-
-      return new Response(new Blob([compiled], { type: 'application/javascript' }), {
-        status: 200,
-      });
+      return rawFile;
     }),
   );
 });

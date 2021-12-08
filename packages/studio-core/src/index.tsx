@@ -70,3 +70,7 @@ export function Slot({ children }: SlotProps) {
   const count = React.Children.count(children);
   return count > 0 ? <React.Fragment>{children}</React.Fragment> : <Placeholder />;
 }
+
+export { default as useDataQuery } from './useDataQuery';
+export { PageContext } from './PageContext';
+export { EditorContext } from './EditorContext';

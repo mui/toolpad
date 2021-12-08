@@ -2,19 +2,19 @@ import { createComponent } from '@mui/studio-core';
 import * as React from 'react';
 
 interface TextComponentProps {
-  value: string;
+  children: string;
 }
 
 const defaultValue = 'Text';
 
-function TextComponent({ value, ...props }: TextComponentProps) {
+function TextComponent({ children, ...props }: TextComponentProps) {
   return (
     <div style={{ padding: 10 }} {...props}>
-      {value}
+      {children}
     </div>
   );
 }
 
 export default createComponent(TextComponent, {
-  props: { value: { type: 'string', defaultValue } },
+  props: { children: { type: 'string', defaultValue } },
 });

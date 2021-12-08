@@ -63,6 +63,8 @@ export default React.forwardRef(function PageView(
     });
   }, [page]);
 
+  console.log(renderedPage.code);
+
   return (
     <PageViewRoot className={className}>
       <StudioSandbox

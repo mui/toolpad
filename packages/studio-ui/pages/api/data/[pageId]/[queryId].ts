@@ -29,7 +29,7 @@ export default (async (req, res) => {
 
   // TODO: IMPORTANT this should only read the query from the body when the session has editing rights
   //       replace this with a real session check
-  const isEditorSession = !!req.body?.id;
+  const isEditorSession = !!req.body;
   let pageQuery: StudioPageQuery<any>;
   if (isEditorSession) {
     pageQuery = req.body as StudioPageQuery<any>;

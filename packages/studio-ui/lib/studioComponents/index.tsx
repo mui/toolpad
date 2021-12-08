@@ -8,6 +8,16 @@ import Paper from './Paper';
 import Stack from './Stack';
 import DataGrid from './DataGrid';
 
+const components = new Map([
+  ['@mui/studio-components', 'Button'],
+  ['@mui/studio-components', 'DataGrid'],
+  ['@mui/studio-components', 'Page'],
+  ['@mui/studio-components', 'Paper'],
+  ['@mui/studio-components', 'Stack'],
+  ['@mui/studio-components', 'Text'],
+  ['@mui/studio-components', 'TextField'],
+]);
+
 const studioComponents: StudioComponentDefinitions = {
   Page,
   TextField,

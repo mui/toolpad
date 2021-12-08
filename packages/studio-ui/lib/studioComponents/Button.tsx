@@ -1,30 +1,23 @@
 import { ButtonProps } from '@mui/material';
 import type { StudioComponentDefinition } from '../types';
 
-interface StudioButtonprops extends Omit<ButtonProps, 'children>'> {
-  text: string;
+interface StudioButtonprops extends ButtonProps {
+  children: string;
 }
 
 const defaultText = 'Button Text';
 
 const Button: StudioComponentDefinition<StudioButtonprops> = {
   props: {
-    text: { type: 'string', defaultValue: defaultText },
+    children: { type: 'string', defaultValue: defaultText },
     disabled: { type: 'boolean', defaultValue: false },
     variant: {
       type: 'ButtonVariant',
       defaultValue: 'contained',
     },
   },
-  render(context, resolvedProps) {
-    context.addImport('@mui/material', 'Button', 'Button');
-    const { text, ...other } = resolvedProps;
-    return `
-      <Button ${context.renderProps(other)}>
-        {${text || '""'}}
-      </Button>
-    `;
-  },
+  module: '@mui/studio-components',
+  importedName: 'Button',
 };
 
 export default Button;

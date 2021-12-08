@@ -13,21 +13,8 @@ const Paper: StudioComponentDefinition<PaperComponentProps> = {
       defaultValue: 1,
     },
   },
-
-  render(context, resolvedProps, children) {
-    context.addImport('@mui/material', 'Paper', 'Paper');
-    context.addImport('@mui/studio-core', 'Slot', 'Slot');
-    return `
-      <Paper 
-        sx={{ padding: 1 }} 
-        ${context.renderProps(resolvedProps)}
-      >
-        <Slot>
-          ${children}
-        </Slot>
-      </Paper>
-    `;
-  },
+  module: '@mui/studio-components',
+  importedName: 'Paper',
 };
 
 export default Paper;

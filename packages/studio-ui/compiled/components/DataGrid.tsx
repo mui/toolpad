@@ -6,10 +6,13 @@ interface DataGridWithQueryProps extends DataGridProps {
   studioDataQuery: string | null;
 }
 
-function DataGridComponent({ studioDataQuery, ...props }: DataGridWithQueryProps) {
-  console.log(`TDO: handle query ${studioDataQuery}`);
+function DataGridComponent(props: DataGridWithQueryProps) {
+  // TODO: we need to find a solution for this:
+  const studioId: string = (props as any)['data-studio-id'];
+  delete (props as any)['data-studio-id'];
+
   return (
-    <div style={{ height: 350, width: '100%' }}>
+    <div {...{ 'data-studio-id': studioId }} style={{ height: 350, width: '100%' }}>
       <DataGrid {...props} />
     </div>
   );

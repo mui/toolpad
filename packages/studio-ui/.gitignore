@@ -36,4 +36,4 @@ yarn-error.log*
 /data/
 
 /public/web_modules
-/public/sandbox
+/public/compiled

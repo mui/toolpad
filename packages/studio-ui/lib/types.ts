@@ -137,11 +137,8 @@ export interface CodeGenContext {
 
 export interface StudioComponentDefinition<P = DefaultNodeProps> {
   props: StudioComponentPropDefinitions<P>;
-  render: (
-    context: CodeGenContext,
-    resolvedProps: Record<string, string>,
-    children: string,
-  ) => string;
+  module: string;
+  importedName: string;
 }
 
 export interface StudioComponentDefinitions {

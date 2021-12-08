@@ -18,12 +18,8 @@ const TextField: StudioComponentDefinition<TextFieldProps> = {
         `(event) => ${setStateIdentifier}(event.target.value)`,
     },
   },
-  render(context, resolvedProps) {
-    context.addImport('@mui/material', 'TextField', 'TextField');
-    return `
-      <TextField ${context.renderProps(resolvedProps)} />
-    `;
-  },
+  module: '@mui/studio-components',
+  importedName: 'TextField',
 };
 
 export default TextField;

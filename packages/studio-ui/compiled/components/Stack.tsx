@@ -1,6 +1,6 @@
 import { Stack, StackProps } from '@mui/material';
-import { createComponent } from '@mui/studio-core';
-import React from 'react';
+import { createComponent, Slots } from '@mui/studio-core';
+import * as React from 'react';
 
 interface StackComponentProps extends StackProps {
   gap?: number;
@@ -8,7 +8,11 @@ interface StackComponentProps extends StackProps {
 }
 
 function StackComponent({ children, ...props }: StackComponentProps) {
-  return <Stack {...props}>{children}</Stack>;
+  return (
+    <Stack {...props}>
+      <Slots direction={props.direction || 'column'}>{children}</Slots>
+    </Stack>
+  );
 }
 
 export default createComponent(StackComponent, {

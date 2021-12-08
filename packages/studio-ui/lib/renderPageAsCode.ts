@@ -37,6 +37,13 @@ class Context implements CodeGenContext {
         named: new Map(),
       },
     ],
+    [
+      '@mui/studio-core',
+      {
+        default: null,
+        named: new Map([['useDataQuery', 'useDataQuery']]),
+      },
+    ],
   ]);
 
   private dataLoaders: string[] = [];
@@ -66,7 +73,8 @@ class Context implements CodeGenContext {
           throw new Error(`Invariant: Invalid prop type for query "${propValue.type}"`);
         }
         if (propValue.value) {
-          result[propName] = this.useDataLoader(propValue.value as string);
+          const spreadedValue = this.useDataLoader(propValue.value as string);
+          result.$spread = `${result.$spread ? `${result.$spread} ` : ''}{...${spreadedValue}}`;
         }
       } else if (propValue.type === 'const') {
         result[propName] = JSON.stringify(propValue.value);
@@ -94,7 +102,12 @@ class Context implements CodeGenContext {
     const component = getStudioComponent(node.component);
     const props = this.resolveProps(node);
     const renderedChildren = node.children.map((childId) => this.renderNode(childId)).join('\n');
-    const rendered = component.render(this, props, renderedChildren);
+    const rendered = `
+      <${component.importedName} ${this.renderProps(props)}>
+        ${renderedChildren}
+      </${component.importedName}>
+    `;
+    this.addImport(component.module, component.importedName, component.importedName);
     return this.editor
       ? `
         <__studioRuntime.StudioNodeWrapper id="${node.id}">
@@ -108,6 +121,10 @@ class Context implements CodeGenContext {
   renderProps(resolvedProps: Record<string, string>): string {
     return Object.entries(resolvedProps)
       .map(([name, value]) => {
+        if (name === '$spread') {
+          console.log(value);
+          return value;
+        }
         return `${name}={${value}}`;
       })
       .join(' ');
@@ -181,60 +198,6 @@ class Context implements CodeGenContext {
     }).join('\n');
   }
 
-  renderDataLoader(): string {
-    if (this.dataLoaders.length <= 0) {
-      return '';
-    }
-    const host = 'http://localhost:3000';
-    return `
-      function useDataQuery(queryId) {
-        const [result, setResult] = React.useState({});
-      
-        React.useEffect(() => {
-          if (!queryId) {
-            return;
-          }
-          setResult({ loading: true });
-          fetch(\`${host}/api/data/${this.page.id}/\${queryId}\`, {
-            method: 'POST',
-            ${
-              this.inlineQueries
-                ? // This is very sketchy, let's make sure we have query provider for this in the editor
-                  `body: JSON.stringify(${JSON.stringify(this.page.queries)}[queryId]),`
-                : ''
-            }
-            headers: {
-              'content-type': 'application/json',
-            },
-          }).then(
-            async (res) => {
-              const body = (await res.json());
-              if (typeof body.error === 'string') {
-                setResult({ loading: false, error: body.error });
-              } else if (body.result) {
-                const { fields, data: rows } = body.result;
-                const columns = Object.entries(fields).map(([field, def]) => ({
-                  ...def,
-                  field,
-                }));
-      
-                const columnsFingerPrint = JSON.stringify(columns);
-                setResult({ loading: false, rows, columns, key: columnsFingerPrint });
-              } else {
-                throw new Error(\`Invariant: \${queryId} returned invalid result\`);
-              }
-            },
-            (error) => {
-              setResult({ loading: false, error: error.message });
-            },
-          );
-        }, [queryId]);
-      
-        return result;
-      }
-    `;
-  }
-
   renderStateHooks(): string {
     return Object.entries(this.page.state)
       .map(([key, state]) => {
@@ -249,7 +212,10 @@ class Context implements CodeGenContext {
   renderDataLoaderHooks(): string {
     return this.dataLoaders
       .map((queryId) => {
-        return `const _${queryId} = useDataQuery(${JSON.stringify(queryId)});`;
+        const override = this.inlineQueries ? JSON.stringify(this.page.queries[queryId]) : null;
+        return `const _${queryId} = useDataQuery(${JSON.stringify(
+          `${this.page.id}/${queryId}`,
+        )}, ${override});`;
       })
       .join('\n');
   }
@@ -291,12 +257,12 @@ export default function renderPageAsCode(
         : ''
     }
 
-    ${ctx.renderDataLoader()}
-
     export default function App () {
       ${ctx.renderStateHooks()}
       ${ctx.renderDataLoaderHooks()}
-      return (${root});
+      return (
+        ${root}
+      );
     }
   `;
 

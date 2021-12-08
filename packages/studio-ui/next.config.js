@@ -4,7 +4,7 @@ module.exports = {
   async headers() {
     return [
       {
-        source: '/sandbox/serviceWorker/index.js',
+        source: '/compiled/serviceWorker/index.js',
         headers: [
           {
             key: 'service-worker-allowed',

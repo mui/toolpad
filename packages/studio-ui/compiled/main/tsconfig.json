@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["esnext", "dom"],
+    "jsx": "react"
+  },
+  "references": [
+    { "path": "../serviceWorker" },
+    { "path": "../sandbox" },
+    { "path": "../components" }
+  ]
+}

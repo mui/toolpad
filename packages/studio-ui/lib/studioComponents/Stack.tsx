@@ -21,17 +21,8 @@ const Stack: StudioComponentDefinition<StackComponentProps> = {
       defaultValue: 'center',
     },
   },
-  render(context, resolvedProps, children) {
-    context.addImport('@mui/material', 'Stack', 'Stack');
-    context.addImport('@mui/studio-core', 'Slots', 'Slots');
-    return `
-      <Stack ${context.renderProps(resolvedProps)}>
-        <Slots direction={${resolvedProps.direction}}>
-          ${children}
-        </Slots>
-      </Stack>
-    `;
-  },
+  module: '@mui/studio-components',
+  importedName: 'Stack',
 };
 
 export default Stack;

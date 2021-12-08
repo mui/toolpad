@@ -1,5 +1,5 @@
 import { Channel } from './channel.js';
-import { HotModulesProvider } from './HotModulesProvider.js';
+import { HotModulesProvider } from './hotModulesProvider.js';
 
 declare global {
   interface Window {

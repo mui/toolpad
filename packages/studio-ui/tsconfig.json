@@ -18,5 +18,5 @@
     "noUnusedLocals": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "./sandbox", "./scripts"]
+  "exclude": ["node_modules", "compiled", "./scripts"]
 }

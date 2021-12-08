@@ -1,0 +1,34 @@
+{
+  "name": "@mui/studio-components",
+  "version": "0.0.1",
+  "description": "Build MUI apps quickly",
+  "author": "MUI Studio team",
+  "homepage": "https://github.com/mui-org/mui-studio#readme",
+  "license": "ISC",
+  "main": "dist",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mui-org/mui-studio.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --pretty --watch --preserveWatchOutput",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/mui-org/mui-studio/issues"
+  },
+  "dependencies": {
+    "@mui/material": "^5.2.3",
+    "@mui/studio-core": "0.0.1",
+    "react": "^17.0.2"
+  },
+  "devDependencies": {}
+}

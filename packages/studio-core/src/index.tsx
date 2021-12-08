@@ -72,5 +72,3 @@ export function Slot({ children }: SlotProps) {
 }
 
 export { default as useDataQuery } from './useDataQuery';
-export { PageContext } from './PageContext';
-export { EditorContext } from './EditorContext';

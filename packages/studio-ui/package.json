@@ -9,8 +9,8 @@
     "fix": "next lint --fix && prettier --write .",
     "build:next": "next build",
     "dev:next": "next dev",
-    "build:sandbox": "esbuild --target=es2021 --format=esm --platform=browser --sourcemap --outdir=./public/sandbox ./sandbox/*",
-    "dev:sandbox": "yarn build:sandbox --watch",
+    "build:sandbox": "tsc --build ./sandbox/main",
+    "dev:sandbox": "yarn build:sandbox --pretty --preserveWatchOutput --watch",
     "esinstall": "node ./scripts/esinstall.mjs"
   },
   "dependencies": {
@@ -47,5 +47,6 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "typescript": "^4.4.3"
-  }
+  },
+  "typings": "./index.d.ts"
 }

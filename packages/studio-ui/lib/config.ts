@@ -1,4 +1,6 @@
-import { StudioConfiguration } from '@mui/studio-core';
+export interface StudioConfiguration {
+  dir: string;
+}
 
 const serializedConfig = process.env.STUDIO_UI_CONFIG;
 if (!serializedConfig) {

@@ -137,17 +137,11 @@ function removeNode(page: StudioPage, nodeId: NodeId): StudioPage {
 
   const parent = getNode(page, node.parentId);
 
-  const parentComponentDef = getStudioComponent(parent.component);
-  if (!parentComponentDef.reducer) {
-    throw new Error(`Invariant: need a props reducer if a component provides children`);
-  }
-
   return update(page, {
     nodes: omit(
       update(page.nodes, {
-        [parent.id]: parentComponentDef.reducer(parent, {
-          type: 'CLEAR_SLOT',
-          nodeId: node.id,
+        [parent.id]: update(parent, {
+          children: parent.children.filter((slot) => slot !== node.id),
         }),
       }),
       node.id,
@@ -235,9 +229,10 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       if (!newNode && state.selection) {
         newNode = getNode(page, state.selection);
         if (newNode.parentId === action.location?.nodeId) {
+          const parent = getNode(page, newNode.parentId);
           // The following removal will reduce the children, so we adjust the index
           // if we're moving a node down within the same parent.
-          const siblings = newNode.children;
+          const siblings = parent.children;
           const currentIndex = siblings.indexOf(newNode.id);
           if (action.location.index > currentIndex) {
             indexOffset = -1;
@@ -254,22 +249,20 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         });
       }
 
-      const { nodeId, slot, index } = action.location;
+      const { nodeId, index } = action.location;
       const node = getNode(page, nodeId);
-      const componentDef = getStudioComponent(node.component);
 
-      if (!componentDef.reducer) {
-        throw new Error(`Invariant: need a props reducer if a component provides slots`);
-      }
+      const sliceIndex = index + indexOffset;
 
       return update(state, {
         page: update(page, {
           nodes: update(page.nodes, {
-            [node.id]: componentDef.reducer(node, {
-              type: 'FILL_SLOT',
-              slot,
-              nodeId: newNode.id,
-              index: index + indexOffset,
+            [node.id]: update(node, {
+              children: [
+                ...node.children.slice(0, sliceIndex),
+                newNode.id,
+                ...node.children.slice(sliceIndex),
+              ],
             }),
             [newNode.id]: update(newNode, {
               parentId: nodeId,

@@ -7,6 +7,9 @@
   "license": "ISC",
   "main": "dist",
   "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "files": [
     "dist"
   ],
@@ -22,6 +25,8 @@
   "bugs": {
     "url": "https://github.com/mui-org/mui-studio/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "react": "^17.0.2"
+  },
   "devDependencies": {}
 }

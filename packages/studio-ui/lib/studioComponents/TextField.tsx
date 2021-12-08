@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { TextField as TextFieldComponent, TextFieldProps } from '@mui/material';
+import { TextFieldProps } from '@mui/material';
 import type { StudioComponentDefinition } from '../types';
 
 const TextField: StudioComponentDefinition<TextFieldProps> = {
-  Component: React.memo(TextFieldComponent),
   props: {
     label: { type: 'string', defaultValue: '' },
     variant: {
@@ -19,10 +18,10 @@ const TextField: StudioComponentDefinition<TextFieldProps> = {
         `(event) => ${setStateIdentifier}(event.target.value)`,
     },
   },
-  render(context, node, resolvedProps) {
+  render(context, resolvedProps) {
     context.addImport('@mui/material', 'TextField', 'TextField');
     return `
-      <TextField ${context.renderRootProps(node.id)} ${context.renderProps(resolvedProps)} />
+      <TextField ${context.renderProps(resolvedProps)} />
     `;
   },
 };

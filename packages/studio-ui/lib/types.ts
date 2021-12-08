@@ -131,19 +131,16 @@ export interface CodeGenContext {
   addImport: (moduleId: string, importedName: string, alias?: string) => void;
   renderNode: (nodeId: NodeId) => string;
   renderProps: (resolvedProps: Record<string, string>) => string;
-  renderRootProps: (nodeId: NodeId) => string;
   renderSlots(name: string, direction: string | undefined): string;
   renderPlaceholder(name: string): string;
 }
 
 export interface StudioComponentDefinition<P = DefaultNodeProps> {
-  Component: React.FC<P & { children?: React.ReactNode }>;
   props: StudioComponentPropDefinitions<P>;
-  reducer?: NodeReducer<P>;
   render: (
     context: CodeGenContext,
-    node: StudioNode<P>,
     resolvedProps: Record<string, string>,
+    children: string,
   ) => string;
 }
 

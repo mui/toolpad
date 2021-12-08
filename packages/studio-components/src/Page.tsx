@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { createComponent, Slots } from '@mui/studio-core';
-import { Container, Stack } from '@mui/material';
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
 
 interface PageComponentProps {
   children?: React.ReactNode;

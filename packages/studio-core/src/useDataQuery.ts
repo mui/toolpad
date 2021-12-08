@@ -27,7 +27,7 @@ export default function useDataQuery(queryId: string, override?: object | null) 
         } else if (body.result) {
           const { fields, data: rows } = body.result;
           const columns = Object.entries(fields).map(([field, def]) => ({
-            ...def,
+            ...(def as any),
             field,
           }));
 

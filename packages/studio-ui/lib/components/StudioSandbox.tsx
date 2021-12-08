@@ -110,7 +110,8 @@ export default React.forwardRef(function StudioSandbox(
     const init = async (iframe: HTMLIFrameElement) => {
       // TODO: probably just want to update if already exists?
       await navigator.serviceWorker.register('/sandbox/serviceWorker/index.js', {
-        type: 'module',
+        // Not supported in FF and Safari
+        // type: 'module',
         scope: base,
       });
       await addFiles(

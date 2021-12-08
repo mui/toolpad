@@ -11,6 +11,7 @@ const { stats } = await install(
     'react',
     'react-dom',
     '@mui/studio-core',
+    '@mui/studio-components',
     '@mui/x-data-grid',
     '@mui/material',
     '@mui/material/styles',

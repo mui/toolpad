@@ -1,15 +1,7 @@
 import * as studioComponentLib from '@mui/studio-components';
-import type { StudioComponentDefinition, StudioComponentDefinitions } from '../types';
+import type { StudioComponentDefinition } from '../types';
 
-import Page from './Page';
-import Text from './Text';
-import TextField from './TextField';
-import Button from './Button';
-import Paper from './Paper';
-import Stack from './Stack';
-import DataGrid from './DataGrid';
-
-const components = new Map([
+export const components = new Map([
   ['Button', { module: '@mui/studio-components', importedName: 'Button' }],
   ['DataGrid', { module: '@mui/studio-components', importedName: 'DataGrid' }],
   ['Page', { module: '@mui/studio-components', importedName: 'Page' }],
@@ -18,20 +10,6 @@ const components = new Map([
   ['Text', { module: '@mui/studio-components', importedName: 'Text' }],
   ['TextField', { module: '@mui/studio-components', importedName: 'TextField' }],
 ]);
-
-const studioComponents: StudioComponentDefinitions = {
-  Page,
-  TextField,
-  Text,
-  Button,
-  Stack,
-  Paper,
-  DataGrid,
-};
-
-export default studioComponents;
-
-export type ComponentName = keyof typeof studioComponents;
 
 export function getStudioComponent(componentName: string): StudioComponentDefinition {
   const component = components.get(componentName);

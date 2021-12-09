@@ -4,9 +4,5 @@
     "lib": ["esnext", "dom"],
     "jsx": "react"
   },
-  "references": [
-    { "path": "../serviceWorker" },
-    { "path": "../sandbox" },
-    { "path": "../components" }
-  ]
+  "references": [{ "path": "../serviceWorker" }, { "path": "../sandbox" }]
 }

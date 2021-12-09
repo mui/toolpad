@@ -9,27 +9,56 @@ const PageViewRoot = styled('div')({
   overflow: 'auto',
 });
 
+const theme = `
+import { createTheme } from '@mui/material/styles';
+import { green, orange } from '@mui/material/colors';
+
+export default createTheme({
+  palette: {
+    primary: {
+      main: orange[500],
+    },
+    secondary: {
+      main: green[500],
+    },
+  },
+})
+`;
+
 const appIndex = `
-  import * as React from 'react';
-  import * as ReactDOM from 'react-dom';
-  import Page from './page.js';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { ThemeProvider } from '@mui/material/styles';
+import Page from './page.js';
+import theme from './lib/theme.js';
 
-  // Poor man's refresh implementation
-  if (import.meta.hot) {
-    if (!import.meta.hot.data.isRefresh) {
-      ReactDOM.render(React.createElement(Page), document.getElementById('root'));
-    }
+function render (Page, theme) {
+  ReactDOM.render(
+    <ThemeProvider theme={theme}>
+      <Page />
+    </ThemeProvider>, 
+    document.getElementById('root')
+  );
+}
 
-    import.meta.hot.accept(['./page.js'], ({ module, deps }) => {
-      ReactDOM.render(React.createElement(deps[0].default), document.getElementById('root'));
-    });
-
-    import.meta.hot.dispose(() => {
-      import.meta.hot.data.isRefresh = true;
-    });
-  } else {
-    ReactDOM.render(React.createElement(Page), document.getElementById('root'));
+// Poor man's refresh implementation
+// TODO: react-refresh implementation, move to worker
+if (import.meta.hot) {
+  if (!import.meta.hot.data.isRefresh) {
+    render(Page, theme);
   }
+
+  import.meta.hot.accept(['./page.js', './lib/theme.js'], ({ module, deps }) => {
+    const [{ default: Page }, { default: theme }] = deps 
+    render(Page, theme);
+  });
+
+  import.meta.hot.dispose(() => {
+    import.meta.hot.data.isRefresh = true;
+  });
+} else {
+  render(Page, theme);
+}
 `;
 
 export interface PageViewHandle {
@@ -59,11 +88,8 @@ export default React.forwardRef(function PageView(
     return renderPageAsCode(page, {
       editor: true,
       inlineQueries: true,
-      transforms: ['jsx', 'typescript'],
     });
   }, [page]);
-
-  console.log(renderedPage.code);
 
   return (
     <PageViewRoot className={className}>
@@ -73,6 +99,7 @@ export default React.forwardRef(function PageView(
         base="/app/1234"
         importMap={getImportMap()}
         files={{
+          '/lib/theme.js': { code: theme },
           '/index.js': { code: appIndex },
           '/page.js': { code: renderedPage.code },
         }}

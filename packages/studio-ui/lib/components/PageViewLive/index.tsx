@@ -59,7 +59,6 @@ export default React.forwardRef(function PageView(
     return renderPageAsCode(page, {
       editor: true,
       inlineQueries: true,
-      transforms: ['jsx', 'typescript'],
     });
   }, [page]);
 

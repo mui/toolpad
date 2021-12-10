@@ -1,4 +1,4 @@
-import { TextField } from '@mui/material';
+import TextField from '@mui/material/TextField';
 import { createComponent } from '@mui/studio-core';
 
 export default createComponent(TextField, {

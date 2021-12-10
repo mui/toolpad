@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { ImportMap } from 'esinstall';
+import { transform } from 'sucrase';
 
 const StudioSandboxRoot = styled('iframe')({
   border: 'none',
@@ -41,7 +42,15 @@ async function addFiles(files: SandboxFiles, base: string) {
       if (!file) {
         return;
       }
-      const { code, type = 'application/javascript' } = file;
+      let { code } = file;
+      const { type = 'application/javascript' } = file;
+      if (type === 'application/javascript') {
+        // TODO: compilation belongs in the worker?
+        const transformed = transform(code, {
+          transforms: ['jsx', 'typescript'],
+        });
+        code = transformed.code;
+      }
       await cache.put(
         base + path,
         new Response(new Blob([code], { type }), {

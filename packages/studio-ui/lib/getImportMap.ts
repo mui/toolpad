@@ -11,7 +11,7 @@ function rewriteImports(map: ImportMap): ImportMap {
           return [specifier, pathname];
         }),
       ),
-      '@mui/studio-components': '/compiled/components/index.js',
+      '@mui/studio-components': '/api/esm/@mui/studio-components',
     },
   };
 }

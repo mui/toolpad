@@ -16,6 +16,11 @@ const { stats } = await install(
     '@mui/material',
     '@mui/material/styles',
     '@mui/material/colors',
+    '@mui/material/Container',
+    '@mui/material/Stack',
+    '@mui/material/Paper',
+    '@mui/material/Button',
+    '@mui/material/TextField',
   ],
   {
     cwd: path.resolve(dirname, '..'),

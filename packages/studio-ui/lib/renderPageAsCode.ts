@@ -1,6 +1,5 @@
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
-import { transform, Transform } from 'sucrase';
 import { StudioPage, NodeId, StudioNode, CodeGenContext } from './types';
 import { getNode } from './studioPage';
 import { getStudioComponent } from './studioComponents';
@@ -11,8 +10,6 @@ export interface RenderPageConfig {
   editor: boolean;
   // whether we have to pass on query body instead of id
   inlineQueries: boolean;
-  // sucrase transforms
-  transforms: Transform[];
   // prettify output
   pretty: boolean;
 }
@@ -122,7 +119,6 @@ class Context implements CodeGenContext {
     return Object.entries(resolvedProps)
       .map(([name, value]) => {
         if (name === '$spread') {
-          console.log(value);
           return value;
         }
         return `${name}={${value}}`;
@@ -232,7 +228,6 @@ export default function renderPageAsCode(
   const config: RenderPageConfig = {
     editor: false,
     inlineQueries: false,
-    transforms: [],
     pretty: false,
     ...configInit,
   };
@@ -265,13 +260,6 @@ export default function renderPageAsCode(
       );
     }
   `;
-
-  if (config.transforms.length > 0) {
-    const { code: compiledCode } = transform(code, {
-      transforms: config.transforms,
-    });
-    code = compiledCode;
-  }
 
   if (config.pretty) {
     code = prettier.format(code, {

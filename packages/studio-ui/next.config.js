@@ -4,7 +4,7 @@ module.exports = {
   async headers() {
     return [
       {
-        source: '/compiled/serviceWorker/index.js',
+        source: '/_next/static/chunks/:path*',
         headers: [
           {
             key: 'service-worker-allowed',

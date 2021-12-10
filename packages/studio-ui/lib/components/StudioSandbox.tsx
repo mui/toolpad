@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { ImportMap } from 'esinstall';
-import { transform } from 'sucrase';
 
 const StudioSandboxRoot = styled('iframe')({
   border: 'none',
@@ -42,15 +41,7 @@ async function addFiles(files: SandboxFiles, base: string) {
       if (!file) {
         return;
       }
-      let { code } = file;
-      const { type = 'application/javascript' } = file;
-      if (type === 'application/javascript') {
-        // TODO: compilation belongs in the worker?
-        const transformed = transform(code, {
-          transforms: ['jsx', 'typescript'],
-        });
-        code = transformed.code;
-      }
+      const { code, type = 'application/javascript' } = file;
       await cache.put(
         base + path,
         new Response(new Blob([code], { type }), {
@@ -94,7 +85,7 @@ function createPage({ entry, importMap }: CreatePageParams) {
         <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
         <script async src="/web_modules/es-module-shims.js" type="module"></script>
 
-        <script type="module" src="/compiled/sandbox/index.js"></script>
+        <script type="module" src="/sandbox/index.js"></script>
         <script type="module" src="${entry}"></script>
       </body>
     </html>
@@ -118,11 +109,13 @@ export default React.forwardRef(function StudioSandbox(
     }
     const init = async (iframe: HTMLIFrameElement) => {
       // TODO: probably just want to update if already exists?
-      await navigator.serviceWorker.register('/compiled/serviceWorker/index.js', {
-        // Not supported in FF and Safari
-        // type: 'module',
-        scope: base,
-      });
+      await navigator.serviceWorker.register(
+        new URL('../../serviceWorker/index', import.meta.url),
+        {
+          type: 'module',
+          scope: base,
+        },
+      );
       await addFiles(
         {
           ...prevFiles.current,

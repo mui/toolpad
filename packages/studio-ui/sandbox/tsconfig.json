@@ -5,9 +5,11 @@
     "strict": true,
     "moduleResolution": "node",
     "rootDir": ".",
-    "outDir": "../public/compiled",
+    "outDir": "../public/sandbox",
     "composite": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "lib": ["esnext", "dom"],
+    "jsx": "react"
   }
 }

@@ -1,3 +1,4 @@
+import { PropDefinitions } from '@mui/studio-core';
 import { getStudioComponent } from './studioComponents';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
@@ -6,7 +7,6 @@ import {
   NodeId,
   SlotLocation,
   StudioComponentDefinition,
-  StudioComponentPropDefinitions,
   StudioNode,
   StudioNodeProp,
   StudioNodeProps,
@@ -19,9 +19,7 @@ function getDefaultPropValues<P = {}>(
   definition: StudioComponentDefinition<P>,
 ): Partial<StudioNodeProps<P>> {
   const result: Partial<StudioNodeProps<P>> = {};
-  const entries = Object.entries(definition.props) as ExactEntriesOf<
-    StudioComponentPropDefinitions<P>
-  >;
+  const entries = Object.entries(definition.props) as ExactEntriesOf<PropDefinitions<P>>;
   entries.forEach(([name, prop]) => {
     if (prop) {
       result[name] = {

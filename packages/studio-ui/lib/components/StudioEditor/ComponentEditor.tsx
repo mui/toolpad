@@ -1,14 +1,10 @@
-import { IconButton, Stack, styled, TextField } from '@mui/material';
+import { Alert, IconButton, Stack, styled, TextField } from '@mui/material';
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
+import { PropDefinition, PropDefinitions } from '@mui/studio-core';
 import { getStudioComponent } from '../../studioComponents';
-import {
-  PropTypeDefinition,
-  StudioComponentProp,
-  StudioComponentPropDefinitions,
-  StudioNode,
-} from '../../types';
+import { StudioNode } from '../../types';
 import { usePageStateObservable } from '../PageStateProvider';
 import { getNode } from '../../studioPage';
 import propTypes from '../../studioPropTypes';
@@ -25,13 +21,13 @@ const ComponentPropsEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-interface ComponentPropEditorProps<P, K extends Exclude<keyof P, 'children'>> {
+interface ComponentPropEditorProps<P, K extends keyof P> {
   name: K;
   node: StudioNode<P>;
-  prop: StudioComponentProp<K, P>;
+  prop: PropDefinition<K, P>;
 }
 
-function ComponentPropEditor<P, K extends Exclude<keyof P, 'children'>>({
+function ComponentPropEditor<P, K extends keyof P & string>({
   name,
   node,
   prop,
@@ -39,16 +35,16 @@ function ComponentPropEditor<P, K extends Exclude<keyof P, 'children'>>({
   const api = useEditorApi();
 
   const handleChange = React.useCallback(
-    (value: unknown) => api.setNodeProp(node.id, name as string, { type: 'const', value }),
+    (value: unknown) => api.setNodeProp(node.id, name, { type: 'const', value }),
     [api, node.id, name],
   );
 
   const handleClickBind = React.useCallback(
-    () => api.openBindingEditor(node.id, name as string),
+    () => api.openBindingEditor(node.id, name),
     [api, node.id, name],
   );
 
-  const propTypeDef = propTypes[prop.type] as PropTypeDefinition<typeof prop.type>;
+  const propTypeDef = propTypes[prop.type];
 
   const observableState = usePageStateObservable();
   const propValue = node.props[name];
@@ -79,15 +75,27 @@ function ComponentPropEditor<P, K extends Exclude<keyof P, 'children'>>({
 
   return (
     <Stack direction="row" alignItems="flex-start">
-      <propTypeDef.Editor
-        name={name as string}
-        disabled={hasBinding}
-        value={value}
-        onChange={handleChange}
-      />
-      <IconButton size="small" onClick={handleClickBind} color={hasBinding ? 'primary' : 'inherit'}>
-        {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
-      </IconButton>
+      {propTypeDef ? (
+        <React.Fragment>
+          <propTypeDef.Editor
+            name={name}
+            disabled={hasBinding}
+            value={value}
+            onChange={handleChange}
+          />
+          <IconButton
+            size="small"
+            onClick={handleClickBind}
+            color={hasBinding ? 'primary' : 'inherit'}
+          >
+            {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
+          </IconButton>{' '}
+        </React.Fragment>
+      ) : (
+        <Alert severity="warning">
+          Unknown type &quot;{prop.type}&quot; for property &quot;{name}&quot;
+        </Alert>
+      )}
     </Stack>
   );
 }
@@ -101,10 +109,10 @@ function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
 
   return (
     <ComponentPropsEditorRoot>
-      {(Object.entries(definition.props) as ExactEntriesOf<StudioComponentPropDefinitions<P>>).map(
+      {(Object.entries(definition.props) as ExactEntriesOf<PropDefinitions<P>>).map(
         ([propName, prop]) =>
-          prop ? (
-            <div key={propName as string} className={classes.control}>
+          typeof propName === 'string' && prop ? (
+            <div key={propName} className={classes.control}>
               <ComponentPropEditor name={propName} prop={prop} node={node} />
             </div>
           ) : null,

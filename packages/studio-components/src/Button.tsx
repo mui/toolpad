@@ -9,5 +9,9 @@ export default createComponent(Button, {
       type: 'ButtonVariant',
       defaultValue: 'contained',
     },
+    color: {
+      type: 'Color',
+      defaultValue: 'primary',
+    },
   },
 });

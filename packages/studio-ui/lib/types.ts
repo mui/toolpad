@@ -52,7 +52,7 @@ export interface StudioConstantProp<V> {
 export type StudioNodeProp<V> = StudioConstantProp<V> | StudioBoundProp;
 
 export type StudioNodeProps<P = DefaultNodeProps> = {
-  readonly [K in Exclude<keyof P, 'children'>]: StudioNodeProp<P[K]> | undefined;
+  readonly [K in keyof P]: StudioNodeProp<P[K]> | undefined;
 };
 
 export type NodeId = Branded<string, 'NodeId'>;

@@ -11,8 +11,12 @@ import DataGridRows from './DataGridRows';
 import Node from './Node';
 import StackAlignment from './StackAlignment';
 import DataQuery from './DataQuery';
+import Color from './Color';
+import { PropTypeDefinition } from '../types';
 
-const propTypes = {
+const propTypes: {
+  [key: string]: PropTypeDefinition<any> | undefined;
+} = {
   string,
   boolean,
   number,
@@ -26,6 +30,7 @@ const propTypes = {
   Node,
   StackAlignment,
   DataQuery,
+  Color,
 };
 
 export default propTypes;

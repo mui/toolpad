@@ -1,24 +1,38 @@
 import * as React from 'react';
 
+export const DEFINITION_KEY = Symbol('Component definition');
+
+export interface OnChangeHandler {
+  params: ['event'];
+  valueGetter: 'event.target.value';
+}
+
 export interface PropDefinition<K extends keyof P, P = {}> {
   defaultValue: P[K];
   type: string;
+  onChangeProp?: string;
+  onChangeHandler?: OnChangeHandler;
 }
 
 export type PropDefinitions<P = {}> = {
   [K in keyof P]?: PropDefinition<K, P>;
 };
 
-export interface ComponenentDefinition<P> {
+export interface ComponentDefinition<P> {
   props: PropDefinitions<P>;
 }
 
+export type StudioComponent<P> = React.FC<P> & {
+  [DEFINITION_KEY]: ComponentDefinition<P>;
+};
+
 export function createComponent<P = {}>(
   Component: React.FC<P>,
-  definition: ComponenentDefinition<P>,
-) {
-  (Component as any).studioDefinition = definition;
-  return Component;
+  definition: ComponentDefinition<P>,
+): StudioComponent<P> {
+  return Object.assign(Component, {
+    [DEFINITION_KEY]: definition,
+  });
 }
 
 export const DATA_PROP_SLOT = `data-studio-slot`;

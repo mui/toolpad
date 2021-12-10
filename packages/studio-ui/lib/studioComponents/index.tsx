@@ -1,4 +1,5 @@
 import * as studioComponentLib from '@mui/studio-components';
+import { DEFINITION_KEY } from '@mui/studio-core';
 import type { StudioComponentDefinition } from '../types';
 
 export const components = new Map([
@@ -18,6 +19,6 @@ export function getStudioComponent(componentName: string): StudioComponentDefini
   }
   return {
     ...component,
-    props: (studioComponentLib as any)[componentName].studioDefinition.props,
+    props: (studioComponentLib as any)[componentName][DEFINITION_KEY].props,
   };
 }

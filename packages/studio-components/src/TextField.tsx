@@ -11,6 +11,11 @@ export default createComponent(TextField, {
     value: {
       type: 'string',
       defaultValue: '',
+      onChangeProp: 'onChange',
+      onChangeHandler: {
+        params: ['event'],
+        valueGetter: 'event.target.value',
+      },
     },
   },
 });

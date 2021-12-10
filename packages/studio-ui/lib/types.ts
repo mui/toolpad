@@ -1,4 +1,5 @@
 import type * as React from 'react';
+import { PropDefinitions } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type propTypes from './studioPropTypes';
 import type { Rectangle } from './utils/geometry';
@@ -92,19 +93,6 @@ export interface StudioPage extends StudioPageSummary {
   };
 }
 
-export interface StudioComponentProp<K extends keyof P, P = DefaultNodeProps> {
-  defaultValue: P[K];
-  type: TypeIdentifier;
-  onChangeProp?: keyof P;
-  // TODO: type this
-  onChangeTransform?: (...props: any) => any;
-  onChangeEventHandler?: (setStateIdentifier: string) => string;
-}
-
-export type StudioComponentPropDefinitions<P = DefaultNodeProps> = {
-  [K in Exclude<keyof P, 'children'>]?: StudioComponentProp<K, P>;
-};
-
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
 export interface SlotLocation {
@@ -136,7 +124,7 @@ export interface CodeGenContext {
 }
 
 export interface StudioComponentDefinition<P = DefaultNodeProps> {
-  props: StudioComponentPropDefinitions<P>;
+  props: PropDefinitions<P>;
   module: string;
   importedName: string;
 }

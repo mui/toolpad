@@ -9,7 +9,8 @@
     "fix": "next lint --fix && prettier --write .",
     "build:next": "next build",
     "dev:next": "next dev",
-    "build:compiled": "tsc --build ./compiled/main",
+    "build:rollup": "rollup --config rollup.config.ts --configPlugin typescript",
+    "build:compiled": "tsc --build ./sandbox",
     "dev:compiled": "yarn build:compiled --pretty --preserveWatchOutput --watch",
     "esinstall": "node ./scripts/esinstall.mjs"
   },

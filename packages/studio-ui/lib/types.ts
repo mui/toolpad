@@ -115,14 +115,6 @@ export type PropsAction =
 
 export type NodeReducer<P> = (props: StudioNode<P>, action: PropsAction) => StudioNode<P>;
 
-export interface CodeGenContext {
-  addImport: (moduleId: string, importedName: string, alias?: string) => void;
-  renderNode: (nodeId: NodeId) => string;
-  renderProps: (resolvedProps: Record<string, string>) => string;
-  renderSlots(name: string, direction: string | undefined): string;
-  renderPlaceholder(name: string): string;
-}
-
 export interface StudioComponentDefinition<P = DefaultNodeProps> {
   props: PropDefinitions<P>;
   module: string;

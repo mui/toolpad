@@ -1,7 +1,6 @@
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
-import { DATA_PROP_NODE_ID, DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from '@mui/studio-core';
-import { StudioPage, NodeId, StudioNode, CodeGenContext } from './types';
+import { StudioPage, NodeId, StudioNode } from './types';
 import { getNode } from './studioPage';
 import { getStudioComponent } from './studioComponents';
 
@@ -19,7 +18,7 @@ interface Import {
   all?: string;
 }
 
-class Context implements CodeGenContext {
+class Context {
   private page: StudioPage;
 
   private editor: boolean;
@@ -131,30 +130,6 @@ class Context implements CodeGenContext {
         return `${name}={${value}}`;
       })
       .join(' ');
-  }
-
-  renderSlots(name: string, direction: string | undefined): string {
-    if (!this.editor) {
-      return '';
-    }
-    return (
-      `${DATA_PROP_SLOT}="${name}" ${DATA_PROP_SLOT_DIRECTION}={${direction || '"column"'}}` || ''
-    );
-  }
-
-  renderPlaceholder(name: string): string {
-    if (!this.editor) {
-      return '';
-    }
-    this.addImport('@mui/material', 'Box', 'Box');
-    return `
-      <Box
-        ${DATA_PROP_SLOT}="${name}"
-        display="block"
-        minHeight={40}
-        minWidth={200}
-      />
-    `;
   }
 
   addImport(source: string, imported: string, local: string = imported) {

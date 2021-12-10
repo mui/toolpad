@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from './constants';
 
 export const DEFINITION_KEY = Symbol('Component definition');
 
@@ -15,7 +16,7 @@ export interface PropDefinition<K extends keyof P, P = {}> {
 }
 
 export type PropDefinitions<P = {}> = {
-  [K in keyof P]?: PropDefinition<K, P>;
+  [K in keyof P & string]?: PropDefinition<K, P>;
 };
 
 export interface ComponentDefinition<P> {
@@ -34,9 +35,6 @@ export function createComponent<P = {}>(
     [DEFINITION_KEY]: definition,
   });
 }
-
-export const DATA_PROP_SLOT = `data-studio-slot`;
-export const DATA_PROP_SLOT_DIRECTION = `data-studio-slot-direction`;
 
 export function Placeholder() {
   return (
@@ -86,3 +84,4 @@ export function Slot({ children }: SlotProps) {
 }
 
 export { default as useDataQuery } from './useDataQuery';
+export * from './constants';

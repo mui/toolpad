@@ -7,13 +7,16 @@ interface TextComponentProps {
 
 const defaultValue = 'Text';
 
-function TextComponent({ children, ...props }: TextComponentProps) {
+const TextComponent = React.forwardRef(function TextComponent(
+  { children, ...props }: TextComponentProps,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
   return (
-    <div style={{ padding: 10 }} {...props}>
+    <div ref={ref} style={{ padding: 10 }} {...props}>
       {children}
     </div>
   );
-}
+});
 
 export default createComponent(TextComponent, {
   props: { children: { type: 'string', defaultValue } },

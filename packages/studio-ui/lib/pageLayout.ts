@@ -1,3 +1,4 @@
+import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION, DATA_PROP_NODE_ID } from '@mui/studio-core';
 import {
   NodeId,
   NodeLayout,
@@ -9,7 +10,6 @@ import {
   FlowDirection,
 } from './types';
 import { getRelativeBoundingBox } from './utils/geometry';
-import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION, DATA_PROP_NODE_ID } from './constants';
 
 function getNodeLayout(viewElm: HTMLElement, elm: HTMLElement): NodeLayout | null {
   const nodeId = (elm.getAttribute(DATA_PROP_NODE_ID) as NodeId | undefined) || null;

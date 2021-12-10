@@ -7,13 +7,16 @@ interface StackComponentProps extends StackProps {
   direction?: 'row' | 'column';
 }
 
-function StackComponent({ children, ...props }: StackComponentProps) {
+const StackComponent = React.forwardRef(function StackComponent(
+  { children, ...props }: StackComponentProps,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
   return (
-    <Stack {...props}>
+    <Stack ref={ref} {...props}>
       <Slots direction={props.direction || 'column'}>{children}</Slots>
     </Stack>
   );
-}
+});
 
 export default createComponent(StackComponent, {
   props: {

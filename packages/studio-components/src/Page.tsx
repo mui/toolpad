@@ -7,15 +7,18 @@ interface PageComponentProps {
   children?: React.ReactNode;
 }
 
-function PageComponent({ children, ...props }: PageComponentProps) {
+const PageComponent = React.forwardRef(function PageComponent(
+  { children, ...props }: PageComponentProps,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
   return (
-    <Container {...props}>
+    <Container ref={ref} {...props}>
       <Stack direction="column" gap={2} my={2}>
         <Slots direction="column">{children}</Slots>
       </Stack>
     </Container>
   );
-}
+});
 
 export default createComponent(PageComponent, {
   props: {},

@@ -1,9 +1,9 @@
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
+import { DATA_PROP_NODE_ID, DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from '@mui/studio-core';
 import { StudioPage, NodeId, StudioNode, CodeGenContext } from './types';
 import { getNode } from './studioPage';
 import { getStudioComponent } from './studioComponents';
-import { DATA_PROP_NODE_ID, DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from './constants';
 
 export interface RenderPageConfig {
   // whether we're in the context of an editor
@@ -15,8 +15,8 @@ export interface RenderPageConfig {
 }
 
 interface Import {
-  default: string | null;
   named: Map<string, string>;
+  all?: string;
 }
 
 class Context implements CodeGenContext {
@@ -30,15 +30,20 @@ class Context implements CodeGenContext {
     [
       'react',
       {
-        default: 'React',
-        named: new Map(),
+        named: new Map([['default', 'React']]),
       },
     ],
     [
       '@mui/studio-core',
       {
-        default: null,
         named: new Map([['useDataQuery', 'useDataQuery']]),
+      },
+    ],
+    [
+      '@mui/studio-core/runtime',
+      {
+        named: new Map(),
+        all: '__studioRuntime',
       },
     ],
   ]);
@@ -109,9 +114,9 @@ class Context implements CodeGenContext {
     this.addImport(component.module, component.importedName, component.importedName);
     return this.editor
       ? `
-        <__studioRuntime.StudioNodeWrapper id="${node.id}">
+        <__studioRuntime.WrappedStudioNode id="${node.id}">
           ${rendered}
-        </__studioRuntime.StudioNodeWrapper>
+        </__studioRuntime.WrappedStudioNode>
       `
       : rendered;
   }
@@ -155,42 +160,43 @@ class Context implements CodeGenContext {
   addImport(source: string, imported: string, local: string = imported) {
     let specifiers = this.imports.get(source);
     if (!specifiers) {
-      specifiers = { default: null, named: new Map() };
+      specifiers = { named: new Map() };
       this.imports.set(source, specifiers);
     }
-    if (imported === 'default') {
-      if (specifiers.default && specifiers.default !== local) {
-        throw new Error(`Default import specifier for "${source}" already defined as "${local}"`);
-      } else {
-        specifiers.default = local;
-      }
-    } else {
-      const existing = specifiers.named.get(imported);
-      if (!existing) {
-        specifiers.named.set(imported, local);
-      } else if (existing !== local) {
-        // TODO: we can reassign to a local variable
-        throw new Error(
-          `Trying to import "${imported}" as "${local}" but it is already imported as "${existing}"`,
-        );
-      }
+
+    const existing = specifiers.named.get(imported);
+    if (!existing) {
+      specifiers.named.set(imported, local);
+    } else if (existing !== local) {
+      // TODO: we can reassign to a local variable
+      throw new Error(
+        `Trying to import "${imported}" as "${local}" but it is already imported as "${existing}"`,
+      );
     }
   }
 
   renderImports(): string {
+    console.log(this.imports.entries());
     return Array.from(this.imports.entries(), ([source, specifiers]) => {
       const renderedSpecifiers = [];
-      if (specifiers.default) {
-        renderedSpecifiers.push(specifiers.default);
-      }
       if (specifiers.named.size > 0) {
-        const renderedNamedSpecifiers = Array.from(
-          specifiers.named.entries(),
-          ([imported, local]) => {
-            return imported === local ? imported : `${imported} as ${local}`;
-          },
-        ).join(',');
-        renderedSpecifiers.push(`{ ${renderedNamedSpecifiers} }`);
+        const renderedNamedSpecifiers = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const [imported, local] of specifiers.named.entries()) {
+          if (imported === 'default') {
+            renderedSpecifiers.push(local);
+          } else {
+            renderedNamedSpecifiers.push(imported === local ? imported : `${imported} as ${local}`);
+          }
+        }
+
+        if (renderedNamedSpecifiers.length > 0) {
+          renderedSpecifiers.push(`{ ${renderedNamedSpecifiers.join(', ')} }`);
+        }
+      }
+
+      if (specifiers.all) {
+        renderedSpecifiers.push(`* as ${specifiers.all}`);
       }
       return `import ${renderedSpecifiers.join(', ')} from '${source}';`;
     }).join('\n');
@@ -239,20 +245,6 @@ export default function renderPageAsCode(
 
   let code: string = `
     ${ctx.renderImports()}
-
-    ${
-      config.editor
-        ? `
-          const __studioRuntime = {
-            StudioNodeWrapper ({ children, id }) {
-              return React.cloneElement(children, {
-                ['${DATA_PROP_NODE_ID}']: id
-              })
-            }
-          };
-          `
-        : ''
-    }
 
     export default function App () {
       ${ctx.renderStateHooks()}

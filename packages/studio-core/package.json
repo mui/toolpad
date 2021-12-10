@@ -8,7 +8,9 @@
   "main": "dist",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./constants": "./dist/constants.js",
+    "./runtime": "./dist/runtime.js"
   },
   "files": [
     "dist"

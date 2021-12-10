@@ -6,17 +6,16 @@ interface DataGridWithQueryProps extends DataGridProps {
   studioDataQuery: string | null;
 }
 
-function DataGridComponent(props: DataGridWithQueryProps) {
-  // TODO: we need to find a solution for this:
-  const studioId: string = (props as any)['data-studio-id'];
-  delete (props as any)['data-studio-id'];
-
+const DataGridComponent = React.forwardRef(function DataGridComponent(
+  props: DataGridWithQueryProps,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
   return (
-    <div {...{ 'data-studio-id': studioId }} style={{ height: 350, width: '100%' }}>
+    <div ref={ref} style={{ height: 350, width: '100%' }}>
       <DataGrid {...props} />
     </div>
   );
-}
+});
 
 export default createComponent(DataGridComponent, {
   props: {

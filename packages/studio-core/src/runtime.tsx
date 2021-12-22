@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ComponentDefinition, FlowDirection } from './index';
-import { DATA_PROP_NODE_ID, DEFINITION_KEY } from './constants';
+import { DEFINITION_KEY } from './constants';
 
 export interface SlotsWrapperProps {
   children?: React.ReactNode;
@@ -13,6 +13,25 @@ export function SlotsWrapper({ children }: SlotsWrapperProps) {
   return <React.Fragment>{children}</React.Fragment>;
 }
 
+export interface PlaceHolderProps {
+  __studioSlots: string;
+  parentId: string;
+}
+
+// We want typescript to enforce these props, even when they're not used
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function PlaceHolder(props: PlaceHolderProps) {
+  return (
+    <div
+      style={{
+        display: 'block',
+        minHeight: 40,
+        minWidth: 200,
+      }}
+    />
+  );
+}
+
 export interface WrappedStudioNodeProps {
   children: React.ReactElement;
   id: string;
@@ -22,25 +41,11 @@ export const WrappedStudioNode = React.forwardRef(function WrappedStudioNode(
   { children, id }: WrappedStudioNodeProps,
   ref,
 ) {
-  const newRef = React.useCallback(
-    (elm) => {
-      if (elm) {
-        elm.setAttribute(DATA_PROP_NODE_ID, id);
-      }
-      if (typeof ref === 'function') {
-        ref(elm);
-      } else if (ref) {
-        ref.current = elm;
-      }
-    },
-    [id, ref],
-  );
-
   const child = React.Children.only(children);
   const definition = (child.type as any)[DEFINITION_KEY] as ComponentDefinition<any> | undefined;
 
   const newProps: any = {
-    ref: newRef,
+    ref,
     __studioNodeId: id,
   };
 
@@ -48,15 +53,24 @@ export const WrappedStudioNode = React.forwardRef(function WrappedStudioNode(
     Object.entries(child.props).forEach(([name, value]) => {
       const propDef = definition.props[name];
       if (propDef?.type === 'slots') {
-        newProps[name] = (
-          <SlotsWrapper
-            __studioSlots={name}
-            parentId={id}
-            direction={propDef.getDirection(child.props)}
-          >
-            {value as any}
-          </SlotsWrapper>
-        );
+        const valueAsArray = React.Children.toArray(value as any);
+        newProps[name] =
+          valueAsArray.length > 0 ? (
+            <SlotsWrapper
+              __studioSlots={name}
+              parentId={id}
+              direction={propDef.getDirection(child.props)}
+            >
+              {valueAsArray}
+            </SlotsWrapper>
+          ) : (
+            <PlaceHolder __studioSlots={name} parentId={id} />
+          );
+      } else if (propDef?.type === 'slot') {
+        const valueAsArray = React.Children.toArray(value as any);
+        if (valueAsArray.length <= 0) {
+          newProps[name] = <PlaceHolder __studioSlots={name} parentId={id} />;
+        }
       }
     });
   }

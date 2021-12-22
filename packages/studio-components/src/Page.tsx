@@ -14,7 +14,7 @@ const PageComponent = React.forwardRef(function PageComponent(
   return (
     <Container ref={ref} {...props}>
       <Stack direction="column" gap={2} my={2}>
-        <Slots direction="column">{children}</Slots>
+        {children}
       </Stack>
     </Container>
   );

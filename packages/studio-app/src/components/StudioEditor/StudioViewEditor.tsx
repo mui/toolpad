@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import {
   NodeId,
   NodeLayout,
+  NodeLayoutSlots,
   SlotLayout,
   SlotLayoutInsert,
   StudioPage,
@@ -173,43 +174,47 @@ interface SlotIndex {
 /**
  * From an array of slots, returns the index of the closest one to a certain point
  */
-function findClosestSlot(slots: SlotLayout[], x: number, y: number): SlotLayout | null {
+function findClosestSlot(slots: NodeLayoutSlots, x: number, y: number): SlotLayout | null {
   let closestDistance = Infinity;
   let closestSlot: SlotLayout | null = null;
+  const namedSlotArrays = Object.values(slots);
 
-  for (let i = 0; i < slots.length; i += 1) {
-    const slotLayout = slots[i];
-    let distance: number;
-    if (slotLayout.type === 'slot') {
-      distance = distanceToRect(slotLayout.rect, x, y);
-    } else {
-      distance =
-        slotLayout.direction === 'horizontal'
-          ? distanceToLine(
-              slotLayout.x,
-              slotLayout.y,
-              slotLayout.x,
-              slotLayout.y + slotLayout.size,
-              x,
-              y,
-            )
-          : distanceToLine(
-              slotLayout.x,
-              slotLayout.y,
-              slotLayout.x + slotLayout.size,
-              slotLayout.y,
-              x,
-              y,
-            );
-    }
+  for (let i = 0; i < namedSlotArrays.length; i += 1) {
+    const namedSlots = namedSlotArrays[i] || [];
+    for (let j = 0; j < namedSlots.length; j += 1) {
+      const slotLayout = namedSlots[j];
+      let distance: number;
+      if (slotLayout.type === 'slot') {
+        distance = distanceToRect(slotLayout.rect, x, y);
+      } else {
+        distance =
+          slotLayout.direction === 'horizontal'
+            ? distanceToLine(
+                slotLayout.x,
+                slotLayout.y,
+                slotLayout.x,
+                slotLayout.y + slotLayout.size,
+                x,
+                y,
+              )
+            : distanceToLine(
+                slotLayout.x,
+                slotLayout.y,
+                slotLayout.x + slotLayout.size,
+                slotLayout.y,
+                x,
+                y,
+              );
+      }
 
-    if (distance <= 0) {
-      // We can bail out early
-      return slotLayout;
-    }
-    if (distance < closestDistance) {
-      closestDistance = distance;
-      closestSlot = slotLayout;
+      if (distance <= 0) {
+        // We can bail out early
+        return slotLayout;
+      }
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestSlot = slotLayout;
+      }
     }
   }
 
@@ -324,7 +329,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
       const activeSlot =
         slotIndex &&
-        viewLayout[slotIndex.nodeId]?.slots?.find(
+        viewLayout[slotIndex.nodeId]?.slots?.[slotIndex.slot]?.find(
           (slot) => slot.name === slotIndex.slot && slot.index === slotIndex.index,
         );
 
@@ -352,7 +357,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
       const activeSlot =
         slotIndex &&
-        viewLayout[slotIndex.nodeId]?.slots?.find(
+        viewLayout[slotIndex.nodeId]?.slots?.[slotIndex.slot]?.find(
           (slot) => slot.name === slotIndex.slot && slot.index === slotIndex.index,
         );
 
@@ -423,7 +428,6 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
     }
   }, []);
   const handleBlur = React.useCallback(() => setIsFocused(false), []);
-
   return (
     <StudioViewEditorRoot
       ref={rootRef}
@@ -466,30 +470,32 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
                     })}
                   >
                     <div className={classes.selectionHint}>{node.component}</div>
-                    {nodeLayout.slots.map((slotLayout, index) =>
-                      slotLayout.type === 'insert' ? (
-                        <div
-                          key={`${slotLayout.name}:${slotLayout.index}`}
-                          style={insertSlotAbsolutePositionCss(slotLayout)}
-                          className={clsx(classes.insertSlotHud, {
-                            [classes.active]:
-                              state.highlightedSlot?.nodeId === nodeId &&
-                              state.highlightedSlot?.slot === slotLayout.name &&
-                              state.highlightedSlot?.index === index,
-                          })}
-                        />
-                      ) : (
-                        <div
-                          key={slotLayout.name}
-                          style={absolutePositionCss(slotLayout.rect)}
-                          className={clsx(classes.slotHud, {
-                            [classes.active]:
-                              state.highlightedSlot?.nodeId === nodeId &&
-                              state.highlightedSlot?.slot === slotLayout.name,
-                          })}
-                        >
-                          Insert Here
-                        </div>
+                    {Object.values(nodeLayout.slots).map((nodeSlots = []) =>
+                      nodeSlots.map((slotLayout, index) =>
+                        slotLayout.type === 'insert' ? (
+                          <div
+                            key={`${slotLayout.name}:${slotLayout.index}`}
+                            style={insertSlotAbsolutePositionCss(slotLayout)}
+                            className={clsx(classes.insertSlotHud, {
+                              [classes.active]:
+                                state.highlightedSlot?.nodeId === nodeId &&
+                                state.highlightedSlot?.slot === slotLayout.name &&
+                                state.highlightedSlot?.index === index,
+                            })}
+                          />
+                        ) : (
+                          <div
+                            key={slotLayout.name}
+                            style={absolutePositionCss(slotLayout.rect)}
+                            className={clsx(classes.slotHud, {
+                              [classes.active]:
+                                state.highlightedSlot?.nodeId === nodeId &&
+                                state.highlightedSlot?.slot === slotLayout.name,
+                            })}
+                          >
+                            Insert Here
+                          </div>
+                        ),
                       ),
                     )}
                   </div>

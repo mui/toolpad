@@ -1,6 +1,6 @@
 import { NextApiHandler } from 'next';
-import { StudioConnection } from '../../../lib/types';
-import { getConnection, updateConnection } from '../../../lib/data';
+import { StudioConnection } from '../../../src/types';
+import { getConnection, updateConnection } from '../../../src/data';
 
 export default (async (req, res) => {
   switch (req.method) {

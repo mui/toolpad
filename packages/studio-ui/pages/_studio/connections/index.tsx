@@ -22,10 +22,10 @@ import useSWR from 'swr';
 import { LoadingButton } from '@mui/lab';
 import CheckIcon from '@mui/icons-material/Check';
 import CrossIcon from '@mui/icons-material/Clear';
-import dataSources from '../../../lib/studioDataSources/client';
-import { ExactEntriesOf, WithControlledProp } from '../../../lib/utils/types';
-import { ConnectionStatus, StudioConnection, StudioDataSourceClient } from '../../../lib/types';
-import fetcher from '../../../lib/fetcher';
+import dataSources from '../../../src/studioDataSources/client';
+import { ExactEntriesOf, WithControlledProp } from '../../../src/utils/types';
+import { ConnectionStatus, StudioConnection, StudioDataSourceClient } from '../../../src/types';
+import fetcher from '../../../src/fetcher';
 
 async function createConnection(connection: StudioConnection): Promise<StudioConnection> {
   const res = await fetch('/api/connections', {

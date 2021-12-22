@@ -1,6 +1,6 @@
 import { NextApiHandler } from 'next';
-import { StudioPage, StudioPageSummary } from '../../../lib/types';
-import { addPage, getPages } from '../../../lib/data';
+import { StudioPage, StudioPageSummary } from '../../../src/types';
+import { addPage, getPages } from '../../../src/data';
 
 export default (async (req, res) => {
   switch (req.method) {

@@ -1,8 +1,8 @@
 import type { NextPage } from 'next';
 import * as React from 'react';
 import { useRouter } from 'next/router';
-import { StudioPage } from '../../../lib/types';
-import Editor from '../../../lib/components/StudioEditor';
+import { StudioPage } from '../../../src/types';
+import Editor from '../../../src/components/StudioEditor';
 
 const Home: NextPage = () => {
   const router = useRouter();

@@ -1,9 +1,9 @@
 import { NextApiHandler } from 'next';
 import Cors from 'cors';
-import { getConnection, getPage } from '../../../../lib/data';
-import studioDataSources from '../../../../lib/studioDataSources/server';
-import { StudioPageQuery, StudioQueryResult } from '../../../../lib/types';
-import initMiddleware from '../../../../lib/initMiddleware';
+import { getConnection, getPage } from '../../../../src/data';
+import studioDataSources from '../../../../src/studioDataSources/server';
+import { StudioPageQuery, StudioQueryResult } from '../../../../src/types';
+import initMiddleware from '../../../../src/initMiddleware';
 
 export type DataApiResult<Q> =
   | {

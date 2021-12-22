@@ -1,7 +1,7 @@
 import { NextApiHandler } from 'next';
 import { transform } from 'sucrase';
-import { getPage } from '../../../lib/data';
-import renderPageAsCode from '../../../lib/renderPageAsCode';
+import { getPage } from '../../../src/data';
+import renderPageAsCode from '../../../src/renderPageAsCode';
 
 export default (async (req, res) => {
   const page = await getPage(req.query.pageId as string);

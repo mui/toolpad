@@ -1,7 +1,7 @@
 import { NextApiHandler } from 'next';
-import { ConnectionStatus, StudioConnection, StudioConnectionSummary } from '../../../lib/types';
-import { addConnection, getConnections, getConnectionSummaries } from '../../../lib/data';
-import dataSources from '../../../lib/studioDataSources/server';
+import { ConnectionStatus, StudioConnection, StudioConnectionSummary } from '../../../src/types';
+import { addConnection, getConnections, getConnectionSummaries } from '../../../src/data';
+import dataSources from '../../../src/studioDataSources/server';
 
 async function testConnection<P = any>(
   type: string,

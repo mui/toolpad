@@ -1,1 +1,1 @@
-export { StudioConfiguration } from './lib/config';
+export { StudioConfiguration } from './src/config';

@@ -8,7 +8,7 @@ import config from './config';
 export const DATA_ROOT = path.resolve(config.dir, './.studio-data');
 
 let connectionPromise: Promise<typeorm.Connection>;
-async function getConnection() {
+export async function getConnection() {
   if (!connectionPromise) {
     connectionPromise = (async () => {
       // clean up old connection that references outdated hot-reload classes
@@ -37,19 +37,21 @@ async function getConnection() {
 }
 
 // This is just a test
-getConnection()
-  .then(async (connection) => {
-    console.log('Inserting a new page into the database...');
+export function test() {
+  return getConnection()
+    .then(async (connection) => {
+      console.log('Inserting a new page into the database...');
 
-    const page = await connection.getRepository<Page>(PageEntity).save({
-      name: 'Timber',
-      content: '{}',
-    });
+      const page = await connection.getRepository<Page>(PageEntity).save({
+        name: 'Timber',
+        content: '{}',
+      });
 
-    console.log(`Saved a new page with id: ${page.id}`);
+      console.log(`Saved a new page with id: ${page.id}`);
 
-    console.log('Loading pages from the database...');
-    const pages = await connection.getRepository<Page>(PageEntity).find();
-    console.log('Loaded pages: ', pages);
-  })
-  .catch((error) => console.error(error));
+      console.log('Loading pages from the database...');
+      const pages = await connection.getRepository<Page>(PageEntity).find();
+      console.log('Loaded pages: ', pages);
+    })
+    .catch((error) => console.error(error));
+}

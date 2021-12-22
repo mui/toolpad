@@ -68,12 +68,12 @@ export interface PageViewHandle {
 export interface PageViewProps {
   className?: string;
   // Callback for when the view has rendered. Make sure this value is stable
-  onAfterRender?: () => void;
+  onUpdate?: () => void;
   page: StudioPage;
 }
 
 export default React.forwardRef(function PageView(
-  { className, page, onAfterRender }: PageViewProps,
+  { className, page, onUpdate }: PageViewProps,
   ref: React.ForwardedRef<PageViewHandle>,
 ) {
   const frameRef = React.useRef<StudioSandboxHandle>(null);
@@ -95,7 +95,7 @@ export default React.forwardRef(function PageView(
     <PageViewRoot className={className}>
       <StudioSandbox
         ref={frameRef}
-        onAfterRender={onAfterRender}
+        onUpdate={onUpdate}
         base="/app/1234"
         importMap={getImportMap()}
         files={{

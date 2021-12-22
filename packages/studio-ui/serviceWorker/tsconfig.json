@@ -1,13 +1,8 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "strict": true,
-    "moduleResolution": "node",
-    "rootDir": ".",
-    "composite": true,
-    "declarationMap": true,
-    "sourceMap": true,
     "lib": ["esnext", "webworker"]
-  }
+  },
+  "include": ["**/*.ts"],
+  "exclude": []
 }

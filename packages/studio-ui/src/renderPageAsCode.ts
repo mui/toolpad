@@ -151,7 +151,6 @@ class Context {
   }
 
   renderImports(): string {
-    console.log(this.imports.entries());
     return Array.from(this.imports.entries(), ([source, specifiers]) => {
       const renderedSpecifiers = [];
       if (specifiers.named.size > 0) {

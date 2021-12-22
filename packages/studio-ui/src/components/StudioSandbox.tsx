@@ -28,7 +28,7 @@ export interface StudioSandboxProps {
   files: SandboxFiles;
   entry: string;
   // Callback for when the view has rendered. Make sure this value is stable
-  onAfterRender?: () => void;
+  onUpdate?: () => void;
 }
 
 export interface StudioSandboxHandle {
@@ -102,7 +102,7 @@ function createPage({ entry, importMap }: CreatePageParams) {
 }
 
 export default React.forwardRef(function StudioSandbox(
-  { className, onAfterRender, files, entry, base, importMap = { imports: {} } }: StudioSandboxProps,
+  { className, onUpdate, files, entry, base, importMap = { imports: {} } }: StudioSandboxProps,
   ref: React.ForwardedRef<StudioSandboxHandle>,
 ) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
@@ -164,7 +164,7 @@ export default React.forwardRef(function StudioSandbox(
 
     mutationObserverRef.current = new MutationObserver(() => {
       // TODO: debounce?
-      onAfterRender?.();
+      onUpdate?.();
     });
 
     mutationObserverRef.current.observe(frameRef.current.contentWindow.document.body, {
@@ -172,7 +172,10 @@ export default React.forwardRef(function StudioSandbox(
       childList: true,
       subtree: true,
     });
-  }, [onAfterRender]);
+
+    // Technically can be called when page hasn't rendered yet
+    onUpdate?.();
+  }, [onUpdate]);
 
   React.useEffect(
     () => () => {

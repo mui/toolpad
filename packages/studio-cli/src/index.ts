@@ -1,7 +1,7 @@
 import arg from 'arg';
 import * as path from 'path';
 import { execa } from 'execa';
-import type { StudioConfiguration } from '@mui/studio-ui';
+import type { StudioConfiguration } from '@mui/studio-app';
 import { createRequire } from 'module';
 
 const args = arg({
@@ -29,7 +29,7 @@ const studioUiConfig: StudioConfiguration = {
 };
 
 const studioUiDir = path.dirname(
-  createRequire(import.meta.url).resolve('@mui/studio-ui/package.json'),
+  createRequire(import.meta.url).resolve('@mui/studio-app/package.json'),
 );
 
 const cp = execa('yarn', [NEXT_CMD], {

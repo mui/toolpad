@@ -149,6 +149,7 @@ export function getPageLayout(containerElm: HTMLElement): {
   layout: ViewLayout;
   elms: HTMLElement[];
 } {
+  const devtoolsHook = containerElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
   const walker = containerElm.ownerDocument.createTreeWalker(
     containerElm,
     NodeFilter.SHOW_ELEMENT,

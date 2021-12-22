@@ -2,6 +2,9 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { ImportMap } from 'esinstall';
 import { transform } from 'sucrase';
+import { initialize as initializeDevtoolsBackend } from 'react-devtools-inline/backend';
+
+const ENTRY_SCRIPT_ID = 'entry-script';
 
 const StudioSandboxRoot = styled('iframe')({
   border: 'none',
@@ -62,11 +65,10 @@ async function addFiles(files: SandboxFiles, base: string) {
 }
 
 interface CreatePageParams {
-  entry: string;
   importMap: string;
 }
 
-function createPage({ entry, importMap }: CreatePageParams) {
+function createPage({ importMap }: CreatePageParams) {
   return `
     <!DOCTYPE html>
     <html>
@@ -95,7 +97,6 @@ function createPage({ entry, importMap }: CreatePageParams) {
         <script async src="/web_modules/es-module-shims.js" type="module"></script>
 
         <script type="module" src="/sandbox/index.js"></script>
-        <script type="module" src="${entry}"></script>
       </body>
     </html>
   `;
@@ -129,12 +130,13 @@ export default React.forwardRef(function StudioSandbox(
         {
           ...prevFiles.current,
           '/': {
-            code: createPage({ entry: base + entry, importMap: serializedImportMap }),
+            code: createPage({ importMap: serializedImportMap }),
             type: 'text/html',
           },
         },
         base,
       );
+
       iframe.src = `${base}/`;
     };
     init(frameRef.current);
@@ -147,11 +149,14 @@ export default React.forwardRef(function StudioSandbox(
     },
   }));
 
+  const resolvedEntry = base + entry;
   const handleFrameLoad = React.useCallback(() => {
     resizeObserverRef.current?.disconnect();
     mutationObserverRef.current?.disconnect();
 
-    if (!frameRef.current?.contentWindow) {
+    const frameWindow = frameRef.current?.contentWindow;
+
+    if (!frameWindow) {
       throw new Error(`Invariant: frameRef not correctly attached`);
     }
 
@@ -173,9 +178,14 @@ export default React.forwardRef(function StudioSandbox(
       subtree: true,
     });
 
-    // Technically can be called when page hasn't rendered yet
-    onUpdate?.();
-  }, [onUpdate]);
+    initializeDevtoolsBackend(frameWindow);
+
+    const entryScript = frameWindow.document.createElement('script');
+    entryScript.type = 'module';
+    entryScript.src = resolvedEntry;
+    entryScript.id = ENTRY_SCRIPT_ID;
+    frameWindow.document.body.appendChild(entryScript);
+  }, [onUpdate, resolvedEntry]);
 
   React.useEffect(
     () => () => {

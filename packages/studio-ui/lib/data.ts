@@ -3,9 +3,8 @@ import * as path from 'path';
 import { createPage } from './studioPage';
 import { StudioConnection, StudioConnectionSummary, StudioPage, StudioPageSummary } from './types';
 import { generateRandomId } from './utils/randomId';
-import config from './config';
 
-const DATA_ROOT = path.resolve(config.dir, './.studio-data');
+import { DATA_ROOT } from './db';
 
 interface KindObjectMap {
   page: {

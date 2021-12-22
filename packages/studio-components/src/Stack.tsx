@@ -29,5 +29,9 @@ export default createComponent(StackComponent, {
       type: 'StackAlignment',
       defaultValue: 'center',
     },
+    children: {
+      type: 'slots',
+      getDirection: (props) => props.direction,
+    },
   },
 });

@@ -271,7 +271,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
   const handleRender = React.useCallback(() => {
     const rootElm = viewRef.current?.getRootElm();
     if (rootElm) {
-      const { layout } = getPageLayout(rootElm);
+      const layout = getPageLayout(rootElm);
       setViewLayout(layout);
     }
   }, []);

@@ -21,5 +21,10 @@ const PageComponent = React.forwardRef(function PageComponent(
 });
 
 export default createComponent(PageComponent, {
-  props: {},
+  props: {
+    children: {
+      type: 'slots',
+      getDirection: () => 'column',
+    },
+  },
 });

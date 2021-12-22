@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION } from './constants';
-
-export const DEFINITION_KEY = Symbol('Component definition');
+import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION, DEFINITION_KEY } from './constants';
 
 export interface OnChangeHandler {
   params: ['event'];
@@ -23,12 +21,14 @@ export interface ComponentDefinition<P> {
   props: PropDefinitions<P>;
 }
 
-export type StudioComponent<P> = React.FC<P> & {
-  [DEFINITION_KEY]: ComponentDefinition<P>;
-};
+export type StudioComponent<P> =
+  | React.FunctionComponent<P>
+  | (React.ComponentClass<P> & {
+      [DEFINITION_KEY]: ComponentDefinition<P>;
+    });
 
 export function createComponent<P = {}>(
-  Component: React.FC<P>,
+  Component: React.FunctionComponent<P> | React.ComponentClass<P>,
   definition: ComponentDefinition<P>,
 ): StudioComponent<P> {
   return Object.assign(Component, {

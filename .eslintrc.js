@@ -1,5 +1,6 @@
 const baseline = require('@material-ui/monorepo/.eslintrc');
 
+console.log(JSON.stringify(baseline, null, 2));
 module.exports = {
   ...baseline,
   plugins: [...baseline.plugins, 'jsdoc'],

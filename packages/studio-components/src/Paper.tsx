@@ -19,5 +19,8 @@ export default createComponent(PaperComponent, {
       type: 'number',
       defaultValue: 1,
     },
+    children: {
+      type: 'slot',
+    },
   },
 });

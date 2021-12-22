@@ -1,4 +1,5 @@
 import { DATA_PROP_SLOT, DATA_PROP_SLOT_DIRECTION, DATA_PROP_NODE_ID } from '@mui/studio-core';
+import { FiberNode, Hook } from 'react-devtools-inline';
 import {
   NodeId,
   NodeLayout,
@@ -11,8 +12,13 @@ import {
 } from './types';
 import { getRelativeBoundingBox } from './utils/geometry';
 
-function getNodeLayout(viewElm: HTMLElement, elm: HTMLElement): NodeLayout | null {
-  const nodeId = (elm.getAttribute(DATA_PROP_NODE_ID) as NodeId | undefined) || null;
+declare global {
+  interface Window {
+    __REACT_DEVTOOLS_GLOBAL_HOOK__?: Hook;
+  }
+}
+
+function getNodeLayout(viewElm: Element, elm: Element, nodeId: NodeId): NodeLayout | null {
   if (nodeId) {
     return {
       nodeId,
@@ -117,11 +123,13 @@ function getSlot({ nodeElm, name, container = nodeElm }: GetSlotParams): SlotLay
   };
 }
 
-function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
+function getSlots(
+  nodeElm: Element,
+  elm: Element,
+  slotName: string,
+  direction: FlowDirection | undefined,
+): SlotLayout[] {
   const result: SlotLayout[] = [];
-
-  const slotName = elm.getAttribute(DATA_PROP_SLOT);
-  const direction = elm.getAttribute(DATA_PROP_SLOT_DIRECTION) as FlowDirection | undefined;
 
   if (slotName) {
     if (direction) {
@@ -145,34 +153,121 @@ function getSlots(nodeElm: HTMLElement, elm: Element): SlotLayout[] {
   return result;
 }
 
-export function getPageLayout(containerElm: HTMLElement): {
-  layout: ViewLayout;
-  elms: HTMLElement[];
-} {
+function walkFibers(node: FiberNode, visitor: (node: FiberNode) => void) {
+  visitor(node);
+  if (node.child) {
+    walkFibers(node.child, visitor);
+  }
+  if (node.sibling) {
+    walkFibers(node.sibling, visitor);
+  }
+}
+
+function getChildFibers(fiber: FiberNode) {
+  const children: FiberNode[] = [];
+  let current = fiber.child;
+  while (current) {
+    children.push(current);
+    current = current.sibling;
+  }
+  return children;
+}
+
+function ensureEntry<K, V>(map: Map<K, V>, key: K, defaultValue: V): V {
+  const existing = map.get(key);
+  if (existing) {
+    return existing;
+  }
+  map.set(key, defaultValue);
+  return defaultValue;
+}
+
+export function getPageLayout(containerElm: HTMLElement): ViewLayout {
+  // eslint-disable-next-line no-underscore-dangle
   const devtoolsHook = containerElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+
+  if (!devtoolsHook) {
+    console.warn(`Can't read page layout as react devtools are not installed`);
+    return {};
+  }
+
+  const layout: ViewLayout = {};
+  const layout2: ViewLayout = {};
+  let currentNode: NodeLayout | undefined;
+  let currentNodeElm: Element | undefined;
+
+  const rendererId = 1;
+  const nodeElms = new Map<NodeId, Element>();
+  const allSlots = new Map<NodeId, Map<string, SlotLayoutInsert[]>>();
+  Array.from(devtoolsHook.getFiberRoots(rendererId)).forEach((fiberRoot) => {
+    if (fiberRoot.current) {
+      walkFibers(fiberRoot.current, (fiber) => {
+        if (fiber.memoizedProps?.__studioNodeId) {
+          const nodeId: NodeId = fiber.memoizedProps?.__studioNodeId as NodeId;
+          const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
+          if (elm) {
+            nodeElms.set(nodeId, elm);
+            const nodeLayout = getNodeLayout(containerElm, elm, nodeId);
+            if (nodeLayout) {
+              layout2[nodeId] = currentNode;
+              console.log('studio node:', nodeLayout);
+            }
+          }
+        }
+
+        if (fiber.memoizedProps?.__studioSlots) {
+          const name = fiber.memoizedProps?.__studioSlots as string;
+          const childfibers = getChildFibers(fiber);
+          const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
+          const parentElm = nodeElms.get(parentId);
+          const direction = fiber.memoizedProps.direction as FlowDirection;
+          const items = childfibers
+            .map((childFiber) =>
+              devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(childFiber),
+            )
+            .filter(Boolean) as Element[];
+          if (parentElm) {
+            const slots = getInsertSlots({
+              nodeElm: parentElm,
+              items,
+              direction,
+              name,
+              container: containerElm,
+            });
+            const nodeSlots = ensureEntry(allSlots, parentId, new Map());
+            const namedNodeSlots = nodeSlots.get(name);
+            if (!namedNodeSlots) {
+              nodeSlots.set(name, slots);
+              console.log('studio slots:', slots);
+            }
+          }
+        }
+      });
+    }
+  });
+
   const walker = containerElm.ownerDocument.createTreeWalker(
     containerElm,
     NodeFilter.SHOW_ELEMENT,
     null,
   );
-
-  const layout: ViewLayout = {};
-  const elms: HTMLElement[] = [];
-  let currentNode: NodeLayout | undefined;
-  let currentNodeElm: HTMLElement | undefined;
   while (walker.nextNode()) {
     const elm = walker.currentNode as HTMLElement;
-    const nodeLayout = getNodeLayout(containerElm, elm);
+    const nodeId = (elm.getAttribute(DATA_PROP_NODE_ID) as NodeId | undefined) || null;
+    const nodeLayout = nodeId && getNodeLayout(containerElm, elm, nodeId);
     if (nodeLayout) {
-      elms.push(elm);
       currentNode = nodeLayout;
       currentNodeElm = elm;
       layout[nodeLayout.nodeId] = currentNode;
     }
     if (currentNode && currentNodeElm) {
-      currentNode.slots.push(...getSlots(currentNodeElm, elm));
+      const slotName = elm.getAttribute(DATA_PROP_SLOT);
+      if (slotName) {
+        const direction = elm.getAttribute(DATA_PROP_SLOT_DIRECTION) as FlowDirection | undefined;
+        currentNode.slots.push(...getSlots(currentNodeElm, elm, slotName, direction));
+      }
     }
   }
 
-  return { layout, elms };
+  return layout;
 }

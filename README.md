@@ -25,6 +25,7 @@ TO DO:
 - Add LICENSE (+ in package.json, also update for individual packages)
 - docs: How will we do docs? Same as on mui.com? Do we create something new? Do we want to embed them in the app as well?
 - set up CI
+- iframe needs to be sandboxed + CSP
 - ...
 
 ## prototypes

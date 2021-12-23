@@ -17,6 +17,12 @@
     "incremental": true,
     "noUnusedLocals": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "../studio-api/src/db.ts",
+    "../studio-api/src/entity/App.ts"
+  ],
   "exclude": ["node_modules", "sandbox", "serviceWorker", "./scripts"]
 }

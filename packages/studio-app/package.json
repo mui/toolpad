@@ -21,6 +21,7 @@
     "@mui/icons-material": "^5.2.5",
     "@mui/lab": "^5.0.0-alpha.61",
     "@mui/material": "^5.2.5",
+    "@mui/studio-api": "^0.0.1",
     "@mui/studio-components": "0.0.1",
     "@mui/studio-core": "^0.0.1",
     "@mui/styles": "^5.2.3",
@@ -41,11 +42,10 @@
     "react": "^17.0.2",
     "react-devtools-inline": "^4.22.1",
     "react-dom": "^17.0.2",
-    "reflect-metadata": "^0.1.13",
+    "react-query": "^3.34.6",
     "sqlite3": "^5.0.2",
     "sucrase": "^3.20.3",
-    "swr": "^1.1.1",
-    "typeorm": "^0.2.41"
+    "swr": "^1.1.1"
   },
   "devDependencies": {
     "@types/react": "^17.0.34",

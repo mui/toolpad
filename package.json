@@ -16,7 +16,7 @@
   "scripts": {
     "prettier": "prettier --check .",
     "start": "cross-env FORCE_COLOR=1 lerna run --stream --scope @mui/studio start",
-    "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/studio-core --scope @mui/studio-components --scope @mui/studio",
+    "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/studio-core --scope @mui/studio-components --scope @mui/studio-api --scope @mui/studio",
     "cli": "cross-env FORCE_COLOR=1 packages/studio-cli/cli.js --dev",
     "build": "lerna run --stream build",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx"

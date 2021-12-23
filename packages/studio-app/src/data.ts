@@ -1,10 +1,17 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { test } from '@mui/studio-api';
 import { createPage } from './studioPage';
 import { StudioConnection, StudioConnectionSummary, StudioPage, StudioPageSummary } from './types';
 import { generateRandomId } from './utils/randomId';
+import config from './config';
 
-import { DATA_ROOT } from './db';
+export const DATA_ROOT = path.resolve(config.dir, './.studio-data');
+
+test({
+  type: 'sqlite',
+  database: path.resolve(DATA_ROOT, 'database.sqlite'),
+});
 
 interface KindObjectMap {
   page: {

@@ -4,6 +4,11 @@ import type { Branded, WithControlledProp } from './utils/types';
 import type propTypes from './studioPropTypes';
 import type { Rectangle } from './utils/geometry';
 
+export interface StudioApp {
+  id: string;
+  name: string;
+}
+
 export type TypeIdentifier = keyof typeof propTypes;
 
 export interface DefaultNodeProps {

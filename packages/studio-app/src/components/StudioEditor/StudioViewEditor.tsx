@@ -504,10 +504,10 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
             },
           )}
           {/* 
-          This overlay allows passing through pointer-events through a pinhole
-          This allows interactivity on the selected element only, while maintaining
-          a reliable click target for the rest of the page
-        */}
+            This overlay allows passing through pointer-events through a pinhole
+            This allows interactivity on the selected element only, while maintaining
+            a reliable click target for the rest of the page
+          */}
           <PinholeOverlay
             ref={overlayRef}
             className={classes.hudOverlay}

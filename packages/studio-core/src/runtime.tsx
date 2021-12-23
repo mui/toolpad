@@ -2,25 +2,32 @@ import * as React from 'react';
 import { ComponentDefinition, FlowDirection } from './index';
 import { DEFINITION_KEY, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants';
 
-export interface SlotsWrapperProps {
+// NOTE: These props aren't used, they are only there to transfer information from the
+// React elements to the fibers.
+interface SlotsWrapperProps {
   children?: React.ReactNode;
+  // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_STUDIO_SLOTS]: string;
+  // eslint-disable-next-line react/no-unused-prop-types
   parentId: string;
+  // eslint-disable-next-line react/no-unused-prop-types
   direction: FlowDirection;
 }
 
-export function SlotsWrapper({ children }: SlotsWrapperProps) {
+function SlotsWrapper({ children }: SlotsWrapperProps) {
   return <React.Fragment>{children}</React.Fragment>;
 }
 
-export interface PlaceHolderProps {
+interface PlaceHolderProps {
+  // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_STUDIO_SLOTS]: string;
+  // eslint-disable-next-line react/no-unused-prop-types
   parentId: string;
 }
 
 // We want typescript to enforce these props, even when they're not used
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function PlaceHolder(props: PlaceHolderProps) {
+function PlaceHolder(props: PlaceHolderProps) {
   return (
     <div
       style={{
@@ -32,48 +39,66 @@ export function PlaceHolder(props: PlaceHolderProps) {
   );
 }
 
-export interface WrappedStudioNodeProps {
+interface WrappedStudioNodeInternalProps {
   children: React.ReactElement;
-  id: string;
+  [RUNTIME_PROP_NODE_ID]: string;
 }
 
-export const WrappedStudioNode = React.forwardRef(function WrappedStudioNode(
-  { children, id }: WrappedStudioNodeProps,
-  ref,
-) {
+// We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect elements of this type
+// We will wrap any slot/slots props with elements that have a [RUNTIME_PROP_STUDIO_SLOTS] so
+// that we can detect these as well in the fibers.
+function WrappedStudioNodeInternal({
+  children,
+  [RUNTIME_PROP_NODE_ID]: studioNodeId,
+}: WrappedStudioNodeInternalProps) {
   const child = React.Children.only(children);
   const definition = (child.type as any)[DEFINITION_KEY] as ComponentDefinition<any> | undefined;
 
-  const newProps: any = {
-    ref,
-    [RUNTIME_PROP_NODE_ID]: id,
-  };
+  let newProps: { [key: string]: unknown } | undefined;
 
   if (definition) {
     Object.entries(child.props).forEach(([name, value]) => {
       const propDef = definition.props[name];
       if (propDef?.type === 'slots') {
         const valueAsArray = React.Children.toArray(value as any);
+        newProps = newProps ?? {};
         newProps[name] =
           valueAsArray.length > 0 ? (
             <SlotsWrapper
               {...{ [RUNTIME_PROP_STUDIO_SLOTS]: name }}
-              parentId={id}
+              parentId={studioNodeId}
               direction={propDef.getDirection?.(child.props) || 'column'}
             >
               {valueAsArray}
             </SlotsWrapper>
           ) : (
-            <PlaceHolder {...{ [RUNTIME_PROP_STUDIO_SLOTS]: name }} parentId={id} />
+            <PlaceHolder {...{ [RUNTIME_PROP_STUDIO_SLOTS]: name }} parentId={studioNodeId} />
           );
       } else if (propDef?.type === 'slot') {
         const valueAsArray = React.Children.toArray(value as any);
         if (valueAsArray.length <= 0) {
-          newProps[name] = <PlaceHolder {...{ [RUNTIME_PROP_STUDIO_SLOTS]: name }} parentId={id} />;
+          newProps = newProps ?? {};
+          newProps[name] = (
+            <PlaceHolder {...{ [RUNTIME_PROP_STUDIO_SLOTS]: name }} parentId={studioNodeId} />
+          );
         }
       }
     });
   }
 
-  return React.cloneElement(child, newProps);
-});
+  return newProps ? React.cloneElement(child, newProps) : child;
+}
+
+export interface WrappedStudioNodeProps {
+  children: React.ReactElement;
+  id: string;
+}
+
+// Public interface with an `id` prop that will translate it into [RUNTIME_PROP_NODE_ID]
+export function WrappedStudioNode({ children, id }: WrappedStudioNodeProps) {
+  return (
+    <WrappedStudioNodeInternal {...{ [RUNTIME_PROP_NODE_ID]: id }}>
+      {children}
+    </WrappedStudioNodeInternal>
+  );
+}

@@ -146,10 +146,14 @@ export interface SlotLayoutInsert {
 
 export type SlotLayout = SlotLayoutCenter | SlotLayoutInsert;
 
+export interface NodeLayoutSlots {
+  [name: string]: SlotLayout[] | undefined;
+}
+
 export interface NodeLayout {
   nodeId: NodeId;
   rect: Rectangle;
-  slots: SlotLayout[];
+  slots: NodeLayoutSlots;
 }
 
 export interface ViewLayout {

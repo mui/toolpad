@@ -1,24 +1,16 @@
 import Stack, { StackProps } from '@mui/material/Stack';
-import { createComponent, Slots } from '@mui/studio-core';
-import * as React from 'react';
+import { createComponent, FlowDirection } from '@mui/studio-core';
 
-interface StackComponentProps extends StackProps {
-  gap?: number;
-  direction?: 'row' | 'column';
+function getDirection({ direction }: StackProps): FlowDirection {
+  return direction === 'row' ||
+    direction === 'column' ||
+    direction === 'row-reverse' ||
+    direction === 'column-reverse'
+    ? direction
+    : 'column';
 }
 
-const StackComponent = React.forwardRef(function StackComponent(
-  { children, ...props }: StackComponentProps,
-  ref: React.ForwardedRef<HTMLDivElement>,
-) {
-  return (
-    <Stack ref={ref} {...props}>
-      <Slots direction={props.direction || 'column'}>{children}</Slots>
-    </Stack>
-  );
-});
-
-export default createComponent(StackComponent, {
+export default createComponent(Stack, {
   props: {
     gap: { type: 'number', defaultValue: 2 },
     direction: {
@@ -28,6 +20,11 @@ export default createComponent(StackComponent, {
     alignItems: {
       type: 'StackAlignment',
       defaultValue: 'center',
+    },
+    children: {
+      type: 'slots',
+      defaultValue: null,
+      getDirection,
     },
   },
 });

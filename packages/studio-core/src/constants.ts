@@ -1,3 +1,3 @@
-export const DATA_PROP_NODE_ID = `data-studio-id`;
-export const DATA_PROP_SLOT = `data-studio-slot`;
-export const DATA_PROP_SLOT_DIRECTION = `data-studio-slot-direction`;
+export const DEFINITION_KEY = Symbol.for('studio.componentDefinition');
+export const RUNTIME_PROP_NODE_ID = '__studioNodeId';
+export const RUNTIME_PROP_STUDIO_SLOTS = '__studioSlots';

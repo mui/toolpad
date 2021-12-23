@@ -9,8 +9,8 @@ declare module 'react-devtools-inline' {
     child: FiberNode | null;
     return: FiberNode | null;
     sibling: FiberNode | null;
-    memoizedProps: { [key: string]: unknown };
-    pendingProps: { [key: string]: unknown };
+    memoizedProps: { [key: string]: unknown } | null;
+    pendingProps: { [key: string]: unknown } | null;
     elementType:
       | React.FunctionComponent<P>
       | React.ComponentClass<P>

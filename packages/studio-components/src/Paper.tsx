@@ -9,6 +9,7 @@ export default createComponent(Paper, {
     },
     children: {
       type: 'slot',
+      defaultValue: null,
     },
   },
 });

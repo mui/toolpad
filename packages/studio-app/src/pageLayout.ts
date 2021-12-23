@@ -1,3 +1,4 @@
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import {
   NodeId,
@@ -157,8 +158,13 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
   Array.from(devtoolsHook.getFiberRoots(rendererId)).forEach((fiberRoot) => {
     if (fiberRoot.current) {
       walkFibers(fiberRoot.current, (fiber) => {
-        if (fiber.memoizedProps?.__studioNodeId) {
-          const nodeId: NodeId = fiber.memoizedProps?.__studioNodeId as NodeId;
+        if (!fiber.memoizedProps) {
+          return;
+        }
+
+        const studioNodeId = fiber.memoizedProps[RUNTIME_PROP_NODE_ID] as string | undefined;
+        if (studioNodeId) {
+          const nodeId: NodeId = studioNodeId as NodeId;
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {
             nodeElms.set(nodeId, elm);
@@ -169,13 +175,15 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
           }
         }
 
-        if (fiber.memoizedProps?.__studioSlots) {
-          const name = fiber.memoizedProps?.__studioSlots as string;
+        const studioSlots = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS] as string | undefined;
+        if (studioSlots) {
+          const name = studioSlots as string;
           const childfibers = getChildFibers(fiber);
+          const direction = fiber.memoizedProps.direction as FlowDirection | undefined;
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
           const parentElm = nodeElms.get(parentId);
-          if (parentElm) {
-            const direction = fiber.memoizedProps.direction as FlowDirection | undefined;
+          const nodeLayout = layout[parentId];
+          if (parentElm && nodeLayout) {
             if (direction) {
               const items = childfibers
                 .map((childFiber) =>
@@ -189,21 +197,17 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
                 name,
                 container: parentElm,
               });
-              const nodeLayout = layout[parentId];
-              if (nodeLayout) {
-                nodeLayout.slots[name] = slots;
-              }
+              nodeLayout.slots[name] = slots;
             } else {
               const nodeElm = devtoolsHook.renderers
                 .get(rendererId)
                 ?.findHostInstanceByFiber(fiber);
-              const slot = getSlot({
-                nodeElm,
-                name,
-                container: nodeElm,
-              });
-              const nodeLayout = layout[parentId];
-              if (nodeLayout) {
+              if (nodeElm) {
+                const slot = getSlot({
+                  nodeElm,
+                  name,
+                  container: nodeElm,
+                });
                 nodeLayout.slots[name] = [slot];
               }
             }

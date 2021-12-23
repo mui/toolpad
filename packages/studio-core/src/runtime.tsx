@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { ComponentDefinition, FlowDirection } from './index';
-import { DEFINITION_KEY } from './constants';
+import { DEFINITION_KEY, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants';
 
 export interface SlotsWrapperProps {
   children?: React.ReactNode;
-  __studioSlots: string;
+  [RUNTIME_PROP_STUDIO_SLOTS]: string;
   parentId: string;
   direction: FlowDirection;
 }
@@ -14,7 +14,7 @@ export function SlotsWrapper({ children }: SlotsWrapperProps) {
 }
 
 export interface PlaceHolderProps {
-  __studioSlots: string;
+  [RUNTIME_PROP_STUDIO_SLOTS]: string;
   parentId: string;
 }
 
@@ -46,7 +46,7 @@ export const WrappedStudioNode = React.forwardRef(function WrappedStudioNode(
 
   const newProps: any = {
     ref,
-    __studioNodeId: id,
+    [RUNTIME_PROP_NODE_ID]: id,
   };
 
   if (definition) {
@@ -57,19 +57,19 @@ export const WrappedStudioNode = React.forwardRef(function WrappedStudioNode(
         newProps[name] =
           valueAsArray.length > 0 ? (
             <SlotsWrapper
-              __studioSlots={name}
+              {...{ [RUNTIME_PROP_STUDIO_SLOTS]: name }}
               parentId={id}
-              direction={propDef.getDirection(child.props)}
+              direction={propDef.getDirection?.(child.props) || 'column'}
             >
               {valueAsArray}
             </SlotsWrapper>
           ) : (
-            <PlaceHolder __studioSlots={name} parentId={id} />
+            <PlaceHolder {...{ [RUNTIME_PROP_STUDIO_SLOTS]: name }} parentId={id} />
           );
       } else if (propDef?.type === 'slot') {
         const valueAsArray = React.Children.toArray(value as any);
         if (valueAsArray.length <= 0) {
-          newProps[name] = <PlaceHolder __studioSlots={name} parentId={id} />;
+          newProps[name] = <PlaceHolder {...{ [RUNTIME_PROP_STUDIO_SLOTS]: name }} parentId={id} />;
         }
       }
     });

@@ -1,8 +1,8 @@
-import { Entity, Column, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
 // eslint-disable-next-line import/no-cycle
-import { App } from './App';
+import { Query } from './Query';
 
-@Entity()
+@Entity({ name: 'connection' })
 export class Connection {
   @PrimaryColumn()
   id: string;
@@ -16,6 +16,6 @@ export class Connection {
   @Column()
   params: string;
 
-  @ManyToOne(() => App, (app) => app.connections)
-  app: App;
+  @OneToMany(() => Query, (query) => query.connection)
+  queries;
 }

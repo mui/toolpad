@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import * as typeorm from 'typeorm';
-import { App } from './entity/App';
 import { Connection } from './entity/Connection';
 import { Page } from './entity/Page';
+import { Query } from './entity/Query';
 
 let connectionPromise: Promise<typeorm.Connection>;
 export async function getConnection(config: typeorm.ConnectionOptions) {
@@ -25,7 +25,7 @@ export async function getConnection(config: typeorm.ConnectionOptions) {
         name,
         synchronize: true,
         logging: false,
-        entities: [App, Page, Connection],
+        entities: [Page, Connection, Query],
         migrations: [],
         subscribers: [],
       });
@@ -42,7 +42,9 @@ export function test(config) {
 
       const newPage = new Page();
       newPage.id = String(Math.random());
-      newPage.name = 'hello';
+      newPage.pathname = '/';
+      newPage.title = 'hello';
+      newPage.content = '{}';
 
       const page = await connection.getRepository(Page).save(newPage);
 

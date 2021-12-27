@@ -1,18 +1,16 @@
-import { Entity, Column, ManyToOne, PrimaryColumn } from 'typeorm';
-// eslint-disable-next-line import/no-cycle
-import { App } from './App';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'page' })
 export class Page {
   @PrimaryColumn()
   id: string;
 
   @Column({ nullable: false })
-  name: string;
+  pathname: string;
+
+  @Column({ nullable: false })
+  title: string;
 
   @Column({ nullable: false })
   content: string;
-
-  @ManyToOne(() => App, (app) => app.pages)
-  app: App;
 }

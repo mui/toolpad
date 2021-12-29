@@ -7,13 +7,7 @@ import {
   EditorState,
 } from '../../editorState';
 import { createPage } from '../../studioPage';
-import {
-  NodeId,
-  SlotLocation,
-  StudioNodeProp,
-  StudioNodeProps,
-  StudioPageQuery,
-} from '../../types';
+import { NodeId, SlotLocation, StudioNodeProp, StudioNodeProps } from '../../types';
 
 const EditorStateContext = React.createContext<EditorState>(
   createEditorState(createPage('default')),
@@ -84,13 +78,6 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
         type: 'REMOVE_BINDING',
         nodeId,
         prop,
-      });
-    },
-    saveQuery(queryId: string, query: StudioPageQuery<any> | null) {
-      dispatch({
-        type: 'SET_QUERY',
-        queryId,
-        query,
       });
     },
   };

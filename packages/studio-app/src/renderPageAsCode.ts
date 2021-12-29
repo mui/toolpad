@@ -7,8 +7,6 @@ import { getStudioComponent } from './studioComponents';
 export interface RenderPageConfig {
   // whether we're in the context of an editor
   editor: boolean;
-  // whether we have to pass on query body instead of id
-  inlineQueries: boolean;
   // prettify output
   pretty: boolean;
 }
@@ -22,8 +20,6 @@ class Context {
   private page: StudioPage;
 
   private editor: boolean;
-
-  private inlineQueries: boolean;
 
   private imports = new Map<string, Import>([
     [
@@ -49,10 +45,9 @@ class Context {
 
   private dataLoaders: string[] = [];
 
-  constructor(page: StudioPage, { editor, inlineQueries }: RenderPageConfig) {
+  constructor(page: StudioPage, { editor }: RenderPageConfig) {
     this.page = page;
     this.editor = editor;
-    this.inlineQueries = inlineQueries;
   }
 
   useDataLoader(queryId: string): string {
@@ -203,10 +198,7 @@ class Context {
   renderDataLoaderHooks(): string {
     return this.dataLoaders
       .map((queryId) => {
-        const override = this.inlineQueries ? JSON.stringify(this.page.queries[queryId]) : null;
-        return `const _${queryId} = useDataQuery(${JSON.stringify(
-          `${this.page.id}/${queryId}`,
-        )}, ${override});`;
+        return `const _${queryId} = useDataQuery(${JSON.stringify(queryId)});`;
       })
       .join('\n');
   }
@@ -222,7 +214,6 @@ export default function renderPageAsCode(
 ) {
   const config: RenderPageConfig = {
     editor: false,
-    inlineQueries: false,
     pretty: false,
     ...configInit,
   };

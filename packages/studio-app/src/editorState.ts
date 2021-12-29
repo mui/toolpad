@@ -11,7 +11,6 @@ import {
   StudioNodeProp,
   StudioNodeProps,
   StudioPage,
-  StudioPageQuery,
 } from './types';
 import { ExactEntriesOf } from './utils/types';
 
@@ -119,11 +118,6 @@ export type EditorAction =
       type: 'REMOVE_BINDING';
       nodeId: NodeId;
       prop: string;
-    }
-  | {
-      type: 'SET_QUERY';
-      queryId: string;
-      query: StudioPageQuery<any> | null;
     };
 
 function removeNode(page: StudioPage, nodeId: NodeId): StudioPage {
@@ -327,15 +321,6 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
             [nodeId]: update(node, {
               props: omit(node.props, prop),
             }),
-          }),
-        }),
-      });
-    }
-    case 'SET_QUERY': {
-      return update(state, {
-        page: update(state.page, {
-          queries: update(state.page.queries, {
-            [action.queryId]: action.query || undefined,
           }),
         }),
       });

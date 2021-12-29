@@ -94,9 +94,6 @@ export interface StudioPageContent {
   nodes: StudioNodes;
   root: NodeId;
   state: Record<string, StudioStateDefinition>;
-  queries: {
-    [id: string]: StudioPageQuery<any> | undefined;
-  };
 }
 
 export interface StudioPage extends StudioPageSummary, StudioPageContent {}

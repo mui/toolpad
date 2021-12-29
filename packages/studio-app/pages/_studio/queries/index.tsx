@@ -24,7 +24,7 @@ import { LoadingButton } from '@mui/lab';
 import StudioAppBar from '../../../src/components/StudioAppBar';
 import client from '../../../src/api';
 import { NextLinkComposed } from '../../../src/components/Link';
-import { uuidv4 } from '../../../src/utils/uuid';
+import { generateRandomId } from '../../../src/utils/randomId';
 
 const CreateNewButton = styled(Button)(({ theme }) => ({
   width: '100%',
@@ -66,7 +66,7 @@ function CreateStudioQueryDialog({ onClose, ...props }: DialogProps) {
         onSubmit={(e) => {
           e.preventDefault();
           createQueryMutation.mutate({
-            id: uuidv4(),
+            id: generateRandomId(),
             connectionId,
             query: {},
           });

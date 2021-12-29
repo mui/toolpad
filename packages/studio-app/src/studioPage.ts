@@ -68,7 +68,6 @@ export function createPage(id: string): StudioPage {
     },
     state: {},
     root: rootId,
-    queries: {},
   };
 }
 
@@ -145,8 +144,4 @@ export function setNodeProps<P>(
       }),
     }),
   });
-}
-
-export function newQueryId(page: StudioPage): string {
-  return generateUniqueId(new Set(Object.keys(page.queries)));
 }

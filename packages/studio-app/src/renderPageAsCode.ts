@@ -69,9 +69,22 @@ class Context {
       if (!propDefinition || !propValue) {
         return;
       }
-      if (propDefinition.type === 'DataQuery') {
+
+      if (propDefinition.type === 'Node') {
         if (propValue.type !== 'const') {
-          throw new Error(`Invariant: Invalid prop type for query "${propValue.type}"`);
+          throw new Error(`TODO: make this work for bindings`);
+        }
+        result[propName] = this.renderNode(propValue.value as NodeId);
+      } else if (propDefinition.type === 'Nodes') {
+        if (propValue.type !== 'const') {
+          throw new Error(`TODO: make this work for bindings`);
+        }
+        result[propName] = (propValue.value as NodeId[])
+          .map((nodeId) => this.renderNode(nodeId))
+          .join('\n');
+      } else if (propDefinition.type === 'DataQuery') {
+        if (propValue.type !== 'const') {
+          throw new Error(`TODO: make this work for bindings`);
         }
         if (propValue.value) {
           const spreadedValue = this.useDataLoader(propValue.value as string);

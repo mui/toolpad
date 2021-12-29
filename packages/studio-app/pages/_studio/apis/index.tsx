@@ -11,7 +11,9 @@ import {
   DialogContent,
   DialogProps,
   DialogTitle,
+  FormControl,
   Grid,
+  InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -40,12 +42,7 @@ function CreateStudioApiDialog({ onClose, ...props }: DialogProps) {
   const connectionsQuery = useQuery('connections', client.query.getConnections);
 
   const queryClient = useQueryClient();
-  const createApiMutation = useMutation(client.mutation.addApi, {
-    onSuccess: (data) => {
-      queryClient.invalidateQueries('apis');
-      router.push(`/_studio/apis/${encodeURIComponent(data.id)}`);
-    },
-  });
+  const createApiMutation = useMutation(client.mutation.addApi);
 
   const handleClose = React.useCallback(
     (event, reason) => {
@@ -65,11 +62,22 @@ function CreateStudioApiDialog({ onClose, ...props }: DialogProps) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          createApiMutation.mutate({
-            id: generateRandomId(),
-            connectionId,
-            query: {},
-          });
+          createApiMutation.mutate(
+            {
+              // TODO: move ID generation serverside
+              id: generateRandomId(),
+              // TODO: move name generation serverside and ensure uniqueness
+              name: 'Dummy Name',
+              connectionId,
+              query: {},
+            },
+            {
+              onSuccess: (data) => {
+                queryClient.invalidateQueries('apis');
+                router.push(`/_studio/apis/${encodeURIComponent(data.id)}`);
+              },
+            },
+          );
         }}
         style={{
           overflowY: 'auto',
@@ -80,18 +88,23 @@ function CreateStudioApiDialog({ onClose, ...props }: DialogProps) {
         <DialogTitle>Create a new MUI Studio API</DialogTitle>
         <DialogContent>
           <Typography>Please select a connection for your API</Typography>
-          <Select
-            value={connectionId}
-            labelId="select-connection"
-            label="Connection"
-            onChange={handleSelectionChange}
-          >
-            {(connectionsQuery.data || []).map(({ id, type, name }) => (
-              <MenuItem key={id} value={id}>
-                {name} | {type}
-              </MenuItem>
-            ))}
-          </Select>
+          <FormControl size="small" fullWidth>
+            <InputLabel id="select-connection-type">Connection</InputLabel>
+            <Select
+              size="small"
+              fullWidth
+              value={connectionId}
+              labelId="select-connection-type"
+              label="Connection"
+              onChange={handleSelectionChange}
+            >
+              {(connectionsQuery.data || []).map(({ id, type, name }) => (
+                <MenuItem key={id} value={id}>
+                  {name} | {type}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <LoadingButton
@@ -127,7 +140,9 @@ const Home: NextPage = () => {
             <Grid item key={api.id} xs={12} sm={6} md={4} lg={3} sx={{ justifyContent: 'stretch' }}>
               <Card>
                 <CardContent>
-                  <Typography variant="h5" component="div" />
+                  <Typography variant="h5" component="div">
+                    {api.name}
+                  </Typography>
                   <Typography sx={{ mb: 1.5 }} color="text.secondary">
                     {api.id}
                   </Typography>

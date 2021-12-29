@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import * as React from 'react';
 import { useQuery, useMutation } from 'react-query';
-import { Container, Typography } from '@mui/material';
+import { Container, Stack, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { DataGrid } from '@mui/x-data-grid';
 import { StudioConnection, StudioDataSourceClient, StudioApi } from '../../../src/types';
@@ -19,9 +19,9 @@ interface ApiEditorProps<Q = unknown> {
 }
 
 function ApiEditor({ api }: ApiEditorProps) {
-  const [value, setValue] = React.useState(api.query ?? {});
-  const savedValue = React.useRef(value);
-  const isDirty = savedValue.current !== value;
+  const [value, setValue] = React.useState(api);
+  const savedApi = React.useRef(api);
+  const isDirty = savedApi.current !== value;
 
   const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
     client.query.getConnection(api.connectionId),
@@ -29,17 +29,16 @@ function ApiEditor({ api }: ApiEditorProps) {
 
   const updateApiMutation = useMutation(client.mutation.updateApi, {
     onSuccess: () => {
-      savedValue.current = value;
+      savedApi.current = value;
     },
   });
 
   const datasource = connectionData && getDataSource(connectionData);
 
-  const { data: previewData } = useQuery(['api', value], () =>
-    client.query.execApi({
-      ...api,
-      query: value,
-    }),
+  // Stable version of the API
+  const previewApi = { ...value, name: 'Preview' };
+  const { data: previewData } = useQuery(['api', previewApi], () =>
+    client.query.execApi(previewApi),
   );
 
   const { fields = {}, data: rows = [] } = previewData ?? {};
@@ -56,8 +55,17 @@ function ApiEditor({ api }: ApiEditorProps) {
   const columnsFingerPrint = React.useMemo(() => JSON.stringify(columns), [columns]);
 
   return datasource ? (
-    <div>
-      <datasource.QueryEditor value={value} onChange={setValue} />
+    <Stack direction="column" spacing={3} mt={3}>
+      <TextField
+        label="name"
+        size="small"
+        value={value.name}
+        onChange={(event) => setValue((oldApi) => ({ ...oldApi, name: event.target.value }))}
+      />
+      <datasource.QueryEditor
+        value={value.query}
+        onChange={(query) => setValue((oldApi) => ({ ...oldApi, query }))}
+      />
       {updateApiMutation.error}
       <Typography variant="h4">Preview</Typography>
       <div style={{ height: 300, width: '100%' }}>
@@ -67,15 +75,12 @@ function ApiEditor({ api }: ApiEditorProps) {
         disabled={!isDirty}
         loading={updateApiMutation.isLoading}
         onClick={() => {
-          updateApiMutation.mutate({
-            id: api.id,
-            query: value,
-          });
+          updateApiMutation.mutate(value);
         }}
       >
         Save
       </LoadingButton>
-    </div>
+    </Stack>
   ) : null;
 }
 

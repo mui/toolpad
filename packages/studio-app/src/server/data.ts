@@ -49,7 +49,7 @@ const kindUtil: {
     mapToSummary: ({ id, type, name }) => ({ id, type, name }),
   },
   api: {
-    mapToSummary: ({ id }) => ({ id }),
+    mapToSummary: ({ id, name }) => ({ id, name }),
   },
 };
 

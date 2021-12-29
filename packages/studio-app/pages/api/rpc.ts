@@ -35,9 +35,9 @@ export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
 }
 
-export type Methods = {
-  readonly [key in string]?: Method;
-};
+export interface Methods {
+  readonly [key: string]: Method;
+}
 
 export interface Definition {
   readonly query: Methods;

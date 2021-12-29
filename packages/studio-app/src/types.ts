@@ -86,6 +86,7 @@ export interface StudioNodes {
 
 export interface StudioApiSummary {
   id: string;
+  name: string;
 }
 
 export interface StudioApi<Q = unknown> extends StudioApiSummary {

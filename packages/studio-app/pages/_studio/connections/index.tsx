@@ -3,6 +3,7 @@ import * as React from 'react';
 import {
   Box,
   Button,
+  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -26,6 +27,7 @@ import dataSources from '../../../src/studioDataSources/client';
 import { ExactEntriesOf, WithControlledProp } from '../../../src/utils/types';
 import { ConnectionStatus, StudioConnection, StudioDataSourceClient } from '../../../src/types';
 import client from '../../../src/api';
+import StudioAppBar from '../../../src/components/StudioAppBar';
 
 interface ConnectionParamsEditorProps<P> extends WithControlledProp<P> {
   dataSource: StudioDataSourceClient<P, any>;
@@ -243,28 +245,31 @@ const Connections: NextPage = () => {
 
   return (
     <div>
-      <EditConnectionDialog
-        connection={editedConnection}
-        open={dialogOpen}
-        onClose={handleEditDialogClose}
-      />
-      <List>
-        {(() => {
-          if (error) {
-            return (error as Error).message;
-          }
-          if (data) {
-            return data.map((connection) => (
-              <ListItem button key={connection.id} onClick={handleConnectionRowClick(connection)}>
-                {connection.type} | {connection.id} | {connection.name}
-              </ListItem>
-            ));
-          }
+      <StudioAppBar actions={null} />
+      <Container>
+        <EditConnectionDialog
+          connection={editedConnection}
+          open={dialogOpen}
+          onClose={handleEditDialogClose}
+        />
+        <List>
+          {(() => {
+            if (error) {
+              return (error as Error).message;
+            }
+            if (data) {
+              return data.map((connection) => (
+                <ListItem button key={connection.id} onClick={handleConnectionRowClick(connection)}>
+                  {connection.type} | {connection.id} | {connection.name}
+                </ListItem>
+              ));
+            }
 
-          return 'loading...';
-        })()}
-      </List>
-      <Button onClick={handleAddConnectionClick}>Add connection</Button>
+            return 'loading...';
+          })()}
+        </List>
+        <Button onClick={handleAddConnectionClick}>Add connection</Button>
+      </Container>
     </div>
   );
 };

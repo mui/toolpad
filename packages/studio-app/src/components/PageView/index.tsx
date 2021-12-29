@@ -92,7 +92,6 @@ export default React.forwardRef(function PageView(
   const renderedPage = React.useMemo(() => {
     return renderPageAsCode(page, {
       editor: true,
-      inlineQueries: true,
     });
   }, [page]);
 

@@ -115,7 +115,7 @@ const Home: NextPage = () => {
   const queriesQuery = useQuery('queries', client.query.getQueries);
 
   return (
-    <React.Fragment>
+    <div>
       <StudioAppBar actions={null} />
       <Container>
         <Typography variant="h2">Queries</Typography>
@@ -159,7 +159,7 @@ const Home: NextPage = () => {
         open={createQueryDialogOpen}
         onClose={handleCreateQueryDialogClose}
       />
-    </React.Fragment>
+    </div>
   );
 };
 

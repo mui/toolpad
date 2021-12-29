@@ -6,6 +6,7 @@ import { LoadingButton } from '@mui/lab';
 import { StudioConnection, StudioDataSourceClient, StudioPageQuery } from '../../../src/types';
 import dataSources from '../../../src/studioDataSources/client';
 import client from '../../../src/api';
+import StudioAppBar from '../../../src/components/StudioAppBar';
 
 function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {
   const dataSource = dataSources[connection.type] as StudioDataSourceClient<any, Q>;
@@ -59,9 +60,12 @@ export default function QueryEditorPage() {
   );
 
   return (
-    <Container>
-      <Typography variant="h2">Edit Query</Typography>
-      {queryData && <QueryEditor query={queryData} />}
-    </Container>
+    <div>
+      <StudioAppBar actions={null} />
+      <Container>
+        <Typography variant="h2">Edit Query</Typography>
+        {queryData && <QueryEditor query={queryData} />}
+      </Container>
+    </div>
   );
 }

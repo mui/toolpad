@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@material-ui/monorepo": "git+https://github.com/mui-org/material-ui.git#master",
-    "@swc/core": "^1.2.121",
+    "@swc/core": "^1.2.124",
     "@swc/helpers": "^0.3.2",
     "@types/node": "^17.0.2",
     "@typescript-eslint/eslint-plugin": "^5.4.0",

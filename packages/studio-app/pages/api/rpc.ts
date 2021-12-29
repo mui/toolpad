@@ -15,6 +15,7 @@ import {
   addQuery,
   updatePage,
   updateQuery,
+  fetchQueryData,
 } from '../../src/server/data';
 
 const DEFAULT_CONTEXT = {};
@@ -79,6 +80,7 @@ const rpcServer = {
 
     getQueries,
     getQuery,
+    fetchQueryData,
   },
   mutation: {
     addPage,

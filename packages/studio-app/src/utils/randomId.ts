@@ -1,9 +1,15 @@
 const ID_CHAR_FIRST = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const ID_CHAR_REST = `${ID_CHAR_FIRST}0123456789`;
-const ID_LENGTH = 6;
+const ID_LENGTH = 12;
+
+function randomIndex(length: number): number {
+  return typeof crypto !== 'undefined'
+    ? crypto.getRandomValues(new Uint8Array(1))[0] % length
+    : Math.floor(Math.random() * length);
+}
 
 function randomChar(chars: string): string {
-  return chars[Math.floor(Math.random() * chars.length)];
+  return chars[randomIndex(chars.length)];
 }
 
 export function generateRandomId(): string {

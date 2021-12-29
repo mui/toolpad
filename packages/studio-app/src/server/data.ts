@@ -9,9 +9,10 @@ import {
   StudioPageSummary,
   StudioPageQuery,
   ConnectionStatus,
+  StudioQueryResult,
 } from '../types';
 import { generateRandomId } from '../utils/randomId';
-import dataSources from '../studioDataSources/server';
+import studioDataSources from '../studioDataSources/server';
 
 interface KindObjectMap {
   page: {
@@ -171,7 +172,7 @@ export async function getConnectionSummaries(): Promise<StudioConnectionSummary[
 }
 
 export async function testConnection(connection: StudioConnection): Promise<ConnectionStatus> {
-  const dataSource = dataSources[connection.type];
+  const dataSource = studioDataSources[connection.type];
   if (!dataSource) {
     return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
   }
@@ -205,10 +206,22 @@ export async function getQuerySummaries(): Promise<StudioPageQuery[]> {
 export async function addQuery(query: StudioPageQuery): Promise<StudioPageQuery> {
   return addObject('query', query);
 }
+
 export async function getQuery(id: string): Promise<StudioPageQuery> {
   return getObject('query', id);
 }
 
 export async function updateQuery(query: Updates<StudioPageQuery>): Promise<StudioPageQuery> {
   return updateObject('query', query);
+}
+
+export async function fetchQueryData(query: StudioPageQuery): Promise<StudioQueryResult<any>> {
+  const connection = await getConnection(query.connectionId);
+  const dataSource = studioDataSources[connection.type];
+  if (!dataSource) {
+    throw new Error(
+      `Unknown connection type "${connection.type}" for connection "${query.connectionId}"`,
+    );
+  }
+  return dataSource.query(connection, query.query);
 }

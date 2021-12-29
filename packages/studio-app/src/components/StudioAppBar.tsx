@@ -21,7 +21,7 @@ export default function StudioAppBar({ actions }: StudioAppBarProps) {
         <Button component={NextLinkComposed} to="/_studio/connections" color="inherit">
           Connections
         </Button>
-        <Button component={NextLinkComposed} to="/_sstudio/queries" color="inherit">
+        <Button component={NextLinkComposed} to="/_studio/queries" color="inherit">
           Apis
         </Button>
         <Box flex={1} />

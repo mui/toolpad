@@ -28,7 +28,7 @@
     "url": "https://github.com/mui-org/mui-studio/issues"
   },
   "dependencies": {
-    "@mui/material": "^5.2.5",
+    "@mui/material": "^5.2.6",
     "@mui/studio-core": "0.0.1",
     "react": "^17.0.2"
   },

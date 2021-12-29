@@ -7,14 +7,17 @@ async function fetchData(queryId: string) {
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} while fetching "${url}"`);
   }
-  const { error, result } = await res.json();
-  if (typeof error === 'string') {
-    throw new Error(error);
-  }
-  return result;
+  return res.json();
 }
 
-export default function useDataQuery(queryId: string) {
+export interface UseDataQuery {
+  loading: boolean;
+  columns: { field: string }[];
+  rows: any[];
+  key: string;
+}
+
+export default function useDataQuery(queryId: string): UseDataQuery {
   const { isLoading: loading, data = {} } = useQuery(queryId, () => fetchData(queryId));
 
   const { fields = {}, data: rows = [] } = data;

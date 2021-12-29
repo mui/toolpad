@@ -10,6 +10,7 @@ const { stats } = await install(
     'es-module-shims',
     'react',
     'react-dom',
+    'react-query',
     '@mui/studio-core',
     '@mui/studio-core/runtime',
     '@mui/studio-components',

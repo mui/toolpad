@@ -31,12 +31,17 @@ import * as ReactDOM from 'react-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import Page from './page.js';
 import theme from './lib/theme.js';
+import { QueryClient, QueryClientProvider } from 'react-query'
+
+const queryClient = new QueryClient()
 
 function render (Page, theme) {
   ReactDOM.render(
-    <ThemeProvider theme={theme}>
-      <Page />
-    </ThemeProvider>, 
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <Page />
+      </ThemeProvider>
+    </QueryClientProvider>, 
     document.getElementById('root')
   );
 }

@@ -1,17 +1,15 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { test } from '@mui/studio-api';
-import { createPage } from './studioPage';
-import { StudioConnection, StudioConnectionSummary, StudioPage, StudioPageSummary } from './types';
-import { generateRandomId } from './utils/randomId';
-import config from './config';
-
-export const DATA_ROOT = path.resolve(config.dir, './.studio-data');
-
-test({
-  type: 'sqlite',
-  database: path.resolve(DATA_ROOT, 'database.sqlite'),
-});
+import { DATA_ROOT } from './db';
+import { createPage } from '../studioPage';
+import {
+  StudioConnection,
+  StudioConnectionSummary,
+  StudioPage,
+  StudioPageSummary,
+  StudioPageQuery,
+} from '../types';
+import { generateRandomId } from '../utils/randomId';
 
 interface KindObjectMap {
   page: {
@@ -22,10 +20,15 @@ interface KindObjectMap {
     full: StudioConnection;
     summary: StudioConnectionSummary;
   };
+  query: {
+    full: StudioPageQuery;
+    summary: StudioPageQuery;
+  };
 }
 
 type Kind = keyof KindObjectMap;
 type FullObject<K extends Kind> = KindObjectMap[K]['full'];
+type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
 type SummaryObject<K extends Kind> = KindObjectMap[K]['summary'];
 type SummaryMapper<K extends Kind> = (full: FullObject<K>) => SummaryObject<K>;
 interface KindUtil<K extends Kind> {
@@ -40,6 +43,9 @@ const kindUtil: {
   },
   connection: {
     mapToSummary: ({ id, type, name }) => ({ id, type, name }),
+  },
+  query: {
+    mapToSummary: (query) => query,
   },
 };
 
@@ -120,11 +126,16 @@ async function addObject<K extends Kind>(kind: K, object: FullObject<K>): Promis
 
 async function updateObject<K extends Kind>(
   kind: K,
-  object: FullObject<K>,
+  object: Updates<FullObject<K>>,
 ): Promise<FullObject<K>> {
-  if (await objectExists(kind, object.id)) {
-    await writeObject(kind, object);
-    return object;
+  const existing = await getObject(kind, object.id);
+  if (existing) {
+    const updated = {
+      ...existing,
+      ...object,
+    };
+    await writeObject(kind, updated);
+    return updated;
   }
   throw new Error(`Trying to update non-existing ${kind} "${object.id}"`);
 }
@@ -145,7 +156,7 @@ export async function getPage(pageId: string): Promise<StudioPage> {
   return getObject('page', pageId);
 }
 
-export async function updatePage(newPage: StudioPage): Promise<StudioPage> {
+export async function updatePage(newPage: Updates<StudioPage>): Promise<StudioPage> {
   return updateObject('page', newPage);
 }
 
@@ -167,6 +178,27 @@ export async function getConnection(id: string): Promise<StudioConnection> {
   return getObject('connection', id);
 }
 
-export async function updateConnection(connection: StudioConnection): Promise<StudioConnection> {
+export async function updateConnection(
+  connection: Updates<StudioConnection>,
+): Promise<StudioConnection> {
   return updateObject('connection', connection);
+}
+
+export async function getQueries(): Promise<StudioPageQuery[]> {
+  return getObjects('query');
+}
+
+export async function getQuerySummaries(): Promise<StudioPageQuery[]> {
+  return getObjectSummaries('query');
+}
+
+export async function addQuery(query: StudioPageQuery): Promise<StudioPageQuery> {
+  return addObject('query', query);
+}
+export async function getQuery(id: string): Promise<StudioPageQuery> {
+  return getObject('query', id);
+}
+
+export async function updateQuery(query: Updates<StudioPageQuery>): Promise<StudioPageQuery> {
+  return updateObject('query', query);
 }

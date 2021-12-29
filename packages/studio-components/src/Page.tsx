@@ -23,6 +23,7 @@ const PageComponent = React.forwardRef<HTMLDivElement, PageComponentProps>(funct
 export default createComponent(PageComponent, {
   props: {
     children: {
+      // Let's go for a single "element" type with slots: boolean to enable/disable UI for it
       type: 'slots',
       defaultValue: null,
       getDirection: () => 'column',

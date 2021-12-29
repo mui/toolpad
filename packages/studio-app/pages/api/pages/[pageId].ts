@@ -1,14 +1,17 @@
 import { NextApiHandler } from 'next';
 import { StudioPage } from '../../../src/types';
-import { getPage, updatePage } from '../../../src/data';
+import { getPage, updatePage } from '../../../src/server/data';
+import { createEndpoint } from '../../../src/utils/server';
 
-export default (async (req, res) => {
-  switch (req.method) {
-    case 'GET':
-      return res.json(await getPage(req.query.pageId as string));
-    case 'PUT':
-      return res.json(await updatePage(req.body as StudioPage));
-    default:
-      return res.status(404).end();
-  }
-}) as NextApiHandler<StudioPage>;
+const getPageHandler: NextApiHandler<StudioPage> = async (req, res) => {
+  return res.json(await getPage(req.query.pageId as string));
+};
+
+const updatePageHandler: NextApiHandler<StudioPage> = async (req, res) => {
+  return res.json(await updatePage(req.body as StudioPage));
+};
+
+export default createEndpoint({
+  GET: getPageHandler,
+  PUT: updatePageHandler,
+});

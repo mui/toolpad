@@ -1,6 +1,6 @@
 import { NextApiHandler } from 'next';
 import { transform } from 'sucrase';
-import { getPage } from '../../../src/data';
+import { getPage } from '../../../src/server/data';
 import renderPageAsCode from '../../../src/renderPageAsCode';
 
 export default (async (req, res) => {

@@ -15,6 +15,7 @@ import StudioViewEditor from './StudioViewEditor';
 import PagePanel from './PagePanel';
 import renderPageAsCode from '../../renderPageAsCode';
 import useLatest from '../../utils/useLatest';
+import client from '../../api';
 
 const classes = {
   content: 'StudioContent',
@@ -56,19 +57,8 @@ function EditorContent() {
 
   const handleSave = React.useCallback(async () => {
     try {
-      const res = await fetch(`/api/pages/${state.page.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(state.page),
-        headers: {
-          'content-type': 'application/json',
-        },
-      });
-
-      if (res.ok) {
-        router.push(`/${state.page.id}`);
-      } else {
-        alert(`HTTP error ${res.status}`);
-      }
+      await client.mutation.updatePage(state.page);
+      router.push(`/${state.page.id}`);
     } catch (err: any) {
       alert(err.message);
     }

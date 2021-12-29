@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { ComponentDefinition, FlowDirection } from './index';
-import { DEFINITION_KEY, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants';
+import type { ComponentDefinition, FlowDirection } from './index';
+import { DEFINITION_KEY, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.

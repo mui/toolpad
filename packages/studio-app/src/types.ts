@@ -84,12 +84,13 @@ export interface StudioNodes {
   [id: NodeId]: StudioNode | undefined;
 }
 
-export interface StudioPageQuery<Q> {
+export interface StudioPageQuery<Q = unknown> {
+  id: string;
   connectionId: string;
   query: Q;
 }
 
-export interface StudioPage extends StudioPageSummary {
+export interface StudioPageContent {
   nodes: StudioNodes;
   root: NodeId;
   state: Record<string, StudioStateDefinition>;
@@ -97,6 +98,8 @@ export interface StudioPage extends StudioPageSummary {
     [id: string]: StudioPageQuery<any> | undefined;
   };
 }
+
+export interface StudioPage extends StudioPageSummary, StudioPageContent {}
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 

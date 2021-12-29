@@ -1,19 +1,20 @@
 import { NextApiHandler } from 'next';
 import { StudioPage, StudioPageSummary } from '../../../src/types';
-import { addPage, getPages } from '../../../src/data';
+import { addPage, getPages } from '../../../src/server/data';
+import { createEndpoint } from '../../../src/utils/server';
 
-export default (async (req, res) => {
-  switch (req.method) {
-    case 'GET':
-      return res.json(await getPages());
-    case 'POST': {
-      if (!req.body.id) {
-        throw new Error('missing page ID');
-      }
-      return res.json(await addPage(req.body.id));
-    }
-    default: {
-      return res.status(404).end();
-    }
+const getPagesHandler: NextApiHandler<StudioPageSummary[]> = async (req, res) => {
+  return res.json(await getPages());
+};
+
+const createPageHandler: NextApiHandler<StudioPage> = async (req, res) => {
+  if (!req.body.id) {
+    throw new Error('missing page ID');
   }
-}) as NextApiHandler<StudioPageSummary[] | StudioPage>;
+  return res.json(await addPage(req.body.id));
+};
+
+export default createEndpoint({
+  GET: getPagesHandler,
+  POST: createPageHandler,
+});

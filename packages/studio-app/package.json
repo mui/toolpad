@@ -21,7 +21,6 @@
     "@mui/icons-material": "^5.2.5",
     "@mui/lab": "^5.0.0-alpha.61",
     "@mui/material": "^5.2.5",
-    "@mui/studio-api": "^0.0.1",
     "@mui/studio-components": "0.0.1",
     "@mui/studio-core": "^0.0.1",
     "@mui/styles": "^5.2.3",
@@ -45,15 +44,15 @@
     "react-query": "^3.34.6",
     "sqlite3": "^5.0.2",
     "sucrase": "^3.20.3",
-    "swr": "^1.1.1"
+    "typeorm": "^0.2.41",
+    "typescript": "^4.5.4"
   },
   "devDependencies": {
     "@types/react": "^17.0.34",
     "eslint": "7",
     "eslint-config-next": "^12.0.3",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.25.3",
-    "typescript": "^4.5.3"
+    "eslint-plugin-import": "^2.25.3"
   },
   "typings": "./index.d.ts"
 }

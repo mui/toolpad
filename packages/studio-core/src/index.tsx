@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DEFINITION_KEY } from './constants';
+import { DEFINITION_KEY } from './constants.js';
 
 export interface OnChangeHandler {
   params: ['event'];
@@ -39,5 +39,5 @@ export function createComponent<P = {}>(
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
-export { default as useDataQuery } from './useDataQuery';
-export * from './constants';
+export { default as useDataQuery } from './useDataQuery.js';
+export * from './constants.js';

@@ -8,8 +8,10 @@ import {
   StudioPage,
   StudioPageSummary,
   StudioPageQuery,
+  ConnectionStatus,
 } from '../types';
 import { generateRandomId } from '../utils/randomId';
+import dataSources from '../studioDataSources/server';
 
 interface KindObjectMap {
   page: {
@@ -166,6 +168,14 @@ export async function getConnections(): Promise<StudioConnection[]> {
 
 export async function getConnectionSummaries(): Promise<StudioConnectionSummary[]> {
   return getObjectSummaries('connection');
+}
+
+export async function testConnection(connection: StudioConnection): Promise<ConnectionStatus> {
+  const dataSource = dataSources[connection.type];
+  if (!dataSource) {
+    return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
+  }
+  return dataSource.test(connection);
 }
 
 export async function addConnection(connection: StudioConnection): Promise<StudioConnection> {

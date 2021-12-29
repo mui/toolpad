@@ -18,56 +18,14 @@ import {
   Stack,
   TextField,
 } from '@mui/material';
-import useSWR from 'swr';
 import { LoadingButton } from '@mui/lab';
 import CheckIcon from '@mui/icons-material/Check';
 import CrossIcon from '@mui/icons-material/Clear';
+import { useQuery } from 'react-query';
 import dataSources from '../../../src/studioDataSources/client';
 import { ExactEntriesOf, WithControlledProp } from '../../../src/utils/types';
 import { ConnectionStatus, StudioConnection, StudioDataSourceClient } from '../../../src/types';
-import fetcher from '../../../src/fetcher';
-
-async function createConnection(connection: StudioConnection): Promise<StudioConnection> {
-  const res = await fetch('/api/connections', {
-    method: 'POST',
-    body: JSON.stringify(connection),
-    headers: {
-      'content-type': 'application/json',
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`failed with ${res.status}`);
-  }
-  return res.json();
-}
-
-async function testConnection(connection: StudioConnection): Promise<StudioConnection> {
-  const res = await fetch('/api/connections', {
-    method: 'POST',
-    body: JSON.stringify({ test: true, ...connection }),
-    headers: {
-      'content-type': 'application/json',
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`failed with ${res.status}`);
-  }
-  return res.json();
-}
-
-async function updateConnection(connection: StudioConnection): Promise<StudioConnection> {
-  const res = await fetch(`/api/connections/${connection.id}`, {
-    method: 'PUT',
-    body: JSON.stringify(connection),
-    headers: {
-      'content-type': 'application/json',
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`failed with ${res.status}`);
-  }
-  return res.json();
-}
+import client from '../../../src/api';
 
 interface ConnectionParamsEditorProps<P> extends WithControlledProp<P> {
   dataSource: StudioDataSourceClient<P, any>;
@@ -161,9 +119,9 @@ function EditConnectionDialog<P>({ connection, open, onClose }: EditConnectionDi
     try {
       setLoading(true);
       if (isCreate) {
-        await createConnection(newConnection);
+        await client.mutation.addConnection(newConnection);
       } else {
-        await updateConnection(newConnection);
+        await client.mutation.updateConnection(newConnection);
       }
       onClose();
     } catch (err: any) {
@@ -185,7 +143,7 @@ function EditConnectionDialog<P>({ connection, open, onClose }: EditConnectionDi
     }
     try {
       setIsTesting(true);
-      const { status } = await testConnection(newConnection);
+      const status = await client.mutation.testConnection(newConnection);
       if (status) {
         setTestResult({ connection: newConnection, status });
         if (status.error) {
@@ -264,14 +222,14 @@ function EditConnectionDialog<P>({ connection, open, onClose }: EditConnectionDi
 }
 
 const Connections: NextPage = () => {
-  const { mutate, data, error } = useSWR<StudioConnection[]>('/api/connections?full=1', fetcher);
+  const { refetch, data, error } = useQuery('connections', client.query.getConnections);
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [editedConnection, setEditedConnection] = React.useState<StudioConnection | null>(null);
   const handleEditDialogClose = React.useCallback(() => {
     setDialogOpen(false);
-    mutate();
-  }, [mutate]);
+    refetch();
+  }, [refetch]);
 
   const handleConnectionRowClick = (connection: StudioConnection) => () => {
     setEditedConnection(connection);
@@ -293,7 +251,7 @@ const Connections: NextPage = () => {
       <List>
         {(() => {
           if (error) {
-            return error.message;
+            return (error as Error).message;
           }
           if (data) {
             return data.map((connection) => (

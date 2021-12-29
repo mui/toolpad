@@ -8,6 +8,8 @@ import {
   getPage,
   getConnections,
   addConnection,
+  updateConnection,
+  testConnection,
   getQueries,
   getQuery,
   addQuery,
@@ -83,6 +85,8 @@ const rpcServer = {
     updatePage,
 
     addConnection,
+    updateConnection,
+    testConnection,
 
     addQuery,
     updateQuery,

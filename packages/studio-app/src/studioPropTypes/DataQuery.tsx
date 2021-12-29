@@ -5,7 +5,7 @@ import type { PropTypeDefinition, EditorProps } from '../types';
 import client from '../api';
 
 function DataQueryEditor({ value, onChange }: EditorProps<string | null>) {
-  const queriesQuery = useQuery('queries', client.query.getQueries);
+  const queriesQuery = useQuery('apis', client.query.getApis);
 
   const handleSelectionChange = React.useCallback(
     (event: SelectChangeEvent<string>) => {

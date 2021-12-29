@@ -84,8 +84,11 @@ export interface StudioNodes {
   [id: NodeId]: StudioNode | undefined;
 }
 
-export interface StudioPageQuery<Q = unknown> {
+export interface StudioApiSummary {
   id: string;
+}
+
+export interface StudioApi<Q = unknown> extends StudioApiSummary {
   connectionId: string;
   query: Q;
 }
@@ -165,34 +168,14 @@ export interface ViewLayout {
   [nodeId: NodeId]: NodeLayout | undefined;
 }
 
-export interface SqlDataQuery {
-  connection: 'sql';
-  query: string;
-  params: {
-    [key: string]: any;
-  };
-}
-
-export interface MovieDataQuery {
-  connection: 'movies';
-  genre: string | null;
-}
-
-export type DataQuery = SqlDataQuery | MovieDataQuery;
-
-export type QueryResultFields<D = {}> = {
+export type StudioApiResultFields<D = {}> = {
   [K in keyof D]?: {
     type: string;
   };
 };
 
-export interface QueryEditorProps<Q> {
-  value: Q;
-  onChange: (newQuery: Q) => void;
-}
-
-export interface StudioQueryResult<D = {}> {
-  fields: QueryResultFields<D>;
+export interface StudioApiResult<D = {}> {
+  fields: StudioApiResultFields<D>;
   data: D[];
 }
 
@@ -216,7 +199,7 @@ export interface StudioDataSourceClient<P = {}, Q = {}> {
 
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
-  query: (connection: StudioConnection<P>, query: Q) => Promise<StudioQueryResult<D>>;
+  exec: (connection: StudioConnection<P>, query: Q) => Promise<StudioApiResult<D>>;
 }
 
 export interface StudioConnectionSummary {

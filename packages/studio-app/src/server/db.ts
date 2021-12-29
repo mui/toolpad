@@ -4,11 +4,11 @@ import * as path from 'path';
 import config from '../config';
 import { ConnectionEntity } from './entities/Connection';
 import { Page, PageEntity } from './entities/Page';
-import { QueryEntity } from './entities/Query';
+import { ApiEntity } from './entities/Api';
 
 export const DATA_ROOT = path.resolve(config.dir, './.studio-data');
 
-const entities = [PageEntity, ConnectionEntity, QueryEntity];
+const entities = [PageEntity, ConnectionEntity, ApiEntity];
 
 const connectionOptions: typeorm.ConnectionOptions = {
   name: 'default',

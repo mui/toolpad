@@ -1,13 +1,13 @@
 import { EntitySchema } from 'typeorm';
 // eslint-disable-next-line import/no-cycle
-import { Query } from './Query';
+import { Api } from './Api';
 
 export interface Connection {
   id: string;
   name: string;
   type: string;
   params: string;
-  queries: Query[];
+  queries: Api[];
 }
 
 export const ConnectionEntity = new EntitySchema<Connection>({
@@ -34,8 +34,8 @@ export const ConnectionEntity = new EntitySchema<Connection>({
   relations: {
     queries: {
       type: 'one-to-many',
-      target: 'query',
-      inverseSide: 'query.connection',
+      target: 'api',
+      inverseSide: 'api.connection',
     },
   },
 });

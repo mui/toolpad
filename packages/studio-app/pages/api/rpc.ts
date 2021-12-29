@@ -10,12 +10,12 @@ import {
   addConnection,
   updateConnection,
   testConnection,
-  getQueries,
-  getQuery,
-  addQuery,
+  getApis,
+  getApi,
+  addApi,
   updatePage,
-  updateQuery,
-  fetchQueryData,
+  updateApi,
+  execApi,
 } from '../../src/server/data';
 
 const DEFAULT_CONTEXT = {};
@@ -78,9 +78,9 @@ const rpcServer = {
     getConnections,
     getConnection,
 
-    getQueries,
-    getQuery,
-    fetchQueryData,
+    getApis,
+    getApi,
+    execApi,
   },
   mutation: {
     addPage,
@@ -90,8 +90,8 @@ const rpcServer = {
     updateConnection,
     testConnection,
 
-    addQuery,
-    updateQuery,
+    addApi,
+    updateApi,
   },
 } as const;
 

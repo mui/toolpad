@@ -33,27 +33,27 @@ const CreateNewButton = styled(Button)(({ theme }) => ({
   border: `2px dashed ${theme.palette.divider}`,
 }));
 
-function CreateStudioQueryDialog({ onClose, ...props }: DialogProps) {
+function CreateStudioApiDialog({ onClose, ...props }: DialogProps) {
   const [connectionId, setConnectionID] = React.useState('');
   const router = useRouter();
 
   const connectionsQuery = useQuery('connections', client.query.getConnections);
 
   const queryClient = useQueryClient();
-  const createQueryMutation = useMutation(client.mutation.addQuery, {
+  const createApiMutation = useMutation(client.mutation.addApi, {
     onSuccess: (data) => {
-      queryClient.invalidateQueries('queries');
-      router.push(`/_studio/queries/${encodeURIComponent(data.id)}`);
+      queryClient.invalidateQueries('apis');
+      router.push(`/_studio/apis/${encodeURIComponent(data.id)}`);
     },
   });
 
   const handleClose = React.useCallback(
     (event, reason) => {
-      if (!createQueryMutation.isLoading) {
+      if (!createApiMutation.isLoading) {
         onClose?.(event, reason);
       }
     },
-    [onClose, createQueryMutation.isLoading],
+    [onClose, createApiMutation.isLoading],
   );
 
   const handleSelectionChange = React.useCallback((event: SelectChangeEvent<string>) => {
@@ -65,7 +65,7 @@ function CreateStudioQueryDialog({ onClose, ...props }: DialogProps) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          createQueryMutation.mutate({
+          createApiMutation.mutate({
             id: generateRandomId(),
             connectionId,
             query: {},
@@ -77,9 +77,9 @@ function CreateStudioQueryDialog({ onClose, ...props }: DialogProps) {
           flexDirection: 'column',
         }}
       >
-        <DialogTitle>Create a new MUI Studio query</DialogTitle>
+        <DialogTitle>Create a new MUI Studio API</DialogTitle>
         <DialogContent>
-          <Typography>Please select a connection for your query</Typography>
+          <Typography>Please select a connection for your API</Typography>
           <Select
             value={connectionId}
             labelId="select-connection"
@@ -97,7 +97,7 @@ function CreateStudioQueryDialog({ onClose, ...props }: DialogProps) {
           <LoadingButton
             type="submit"
             disabled={!connectionId}
-            loading={createQueryMutation.isLoading}
+            loading={createApiMutation.isLoading}
           >
             Create
           </LoadingButton>
@@ -108,43 +108,35 @@ function CreateStudioQueryDialog({ onClose, ...props }: DialogProps) {
 }
 
 const Home: NextPage = () => {
-  const [createQueryDialogOpen, setCreateQueryDialogOpen] = React.useState(false);
-  const handleCreateQueryDialogOpen = React.useCallback(() => setCreateQueryDialogOpen(true), []);
-  const handleCreateQueryDialogClose = React.useCallback(() => setCreateQueryDialogOpen(false), []);
+  const [createApiDialogOpen, setCreateApiDialogOpen] = React.useState(false);
+  const handleCreateApiDialogOpen = React.useCallback(() => setCreateApiDialogOpen(true), []);
+  const handleCreateApiDialogClose = React.useCallback(() => setCreateApiDialogOpen(false), []);
 
-  const queriesQuery = useQuery('queries', client.query.getQueries);
+  const apisQuery = useQuery('apis', client.query.getApis);
 
   return (
     <div>
       <StudioAppBar actions={null} />
       <Container>
-        <Typography variant="h2">Queries</Typography>
+        <Typography variant="h2">Apis</Typography>
         <Grid container spacing={3} mt={2}>
           <Grid item xs={12} sm={6} md={4} lg={3}>
-            <CreateNewButton onClick={handleCreateQueryDialogOpen}>Create New</CreateNewButton>
+            <CreateNewButton onClick={handleCreateApiDialogOpen}>Create New</CreateNewButton>
           </Grid>
-          {queriesQuery.data?.map((query) => (
-            <Grid
-              item
-              key={query.id}
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-              sx={{ justifyContent: 'stretch' }}
-            >
+          {apisQuery.data?.map((api) => (
+            <Grid item key={api.id} xs={12} sm={6} md={4} lg={3} sx={{ justifyContent: 'stretch' }}>
               <Card>
                 <CardContent>
                   <Typography variant="h5" component="div" />
                   <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                    {query.id}
+                    {api.id}
                   </Typography>
                   <Typography variant="body2">Last updated: {Date.now()}</Typography>
                 </CardContent>
                 <CardActions>
                   <Button
                     component={NextLinkComposed}
-                    to={`/_studio/queries/${encodeURIComponent(query.id)}`}
+                    to={`/_studio/apis/${encodeURIComponent(api.id)}`}
                     size="small"
                   >
                     Edit
@@ -155,10 +147,7 @@ const Home: NextPage = () => {
           ))}
         </Grid>
       </Container>
-      <CreateStudioQueryDialog
-        open={createQueryDialogOpen}
-        onClose={handleCreateQueryDialogClose}
-      />
+      <CreateStudioApiDialog open={createApiDialogOpen} onClose={handleCreateApiDialogClose} />
     </div>
   );
 };

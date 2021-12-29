@@ -2,14 +2,14 @@ import { EntitySchema } from 'typeorm';
 // eslint-disable-next-line import/no-cycle
 import { Connection } from './Connection';
 
-export interface Query {
+export interface Api {
   id: string;
   data: string;
   connection?: Connection;
 }
 
-export const QueryEntity = new EntitySchema<Query>({
-  name: 'query',
+export const ApiEntity = new EntitySchema<Api>({
+  name: 'api',
   columns: {
     id: {
       type: String,
@@ -25,7 +25,7 @@ export const QueryEntity = new EntitySchema<Query>({
     connection: {
       type: 'many-to-one',
       target: 'connection',
-      inverseSide: 'connection.queries',
+      inverseSide: 'connection.apis',
     },
   },
 });

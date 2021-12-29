@@ -1,5 +1,5 @@
 import {
-  StudioQueryResult,
+  StudioApiResult,
   StudioDataSourceServer,
   ConnectionStatus,
   StudioConnection,
@@ -14,10 +14,10 @@ async function test(
   return { timestamp: Date.now() };
 }
 
-async function query(
+async function exec(
   connection: StudioConnection<PostgresConnectionParams>,
   postgresQuery: PostgresQuery,
-): Promise<StudioQueryResult<any>> {
+): Promise<StudioApiResult<any>> {
   console.log(
     `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection.params.host}"`,
   );
@@ -29,7 +29,7 @@ async function query(
 
 const dataSource: StudioDataSourceServer<PostgresConnectionParams, PostgresQuery, any> = {
   test,
-  query,
+  exec,
 };
 
 export default dataSource;

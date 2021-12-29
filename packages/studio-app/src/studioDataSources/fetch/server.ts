@@ -1,4 +1,4 @@
-import { ConnectionStatus, StudioDataSourceServer, StudioQueryResult } from '../../types';
+import { ConnectionStatus, StudioDataSourceServer, StudioApiResult } from '../../types';
 import { FetchQuery } from './types';
 
 async function test(): Promise<ConnectionStatus> {
@@ -6,14 +6,14 @@ async function test(): Promise<ConnectionStatus> {
   return { timestamp: Date.now() };
 }
 
-async function query(connection: {}, fetchQuery: FetchQuery): Promise<StudioQueryResult<any>> {
+async function exec(connection: {}, fetchQuery: FetchQuery): Promise<StudioApiResult<any>> {
   const res = await fetch(fetchQuery.url, fetchQuery);
   return res.json();
 }
 
 const dataSource: StudioDataSourceServer<{}, FetchQuery, any> = {
   test,
-  query,
+  exec,
 };
 
 export default dataSource;

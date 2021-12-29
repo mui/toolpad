@@ -7,9 +7,10 @@ import {
   StudioConnectionSummary,
   StudioPage,
   StudioPageSummary,
-  StudioPageQuery,
+  StudioApi,
   ConnectionStatus,
-  StudioQueryResult,
+  StudioApiResult,
+  StudioApiSummary,
 } from '../types';
 import { generateRandomId } from '../utils/randomId';
 import studioDataSources from '../studioDataSources/server';
@@ -23,9 +24,9 @@ interface KindObjectMap {
     full: StudioConnection;
     summary: StudioConnectionSummary;
   };
-  query: {
-    full: StudioPageQuery;
-    summary: StudioPageQuery;
+  api: {
+    full: StudioApi;
+    summary: StudioApiSummary;
   };
 }
 
@@ -47,8 +48,8 @@ const kindUtil: {
   connection: {
     mapToSummary: ({ id, type, name }) => ({ id, type, name }),
   },
-  query: {
-    mapToSummary: (query) => query,
+  api: {
+    mapToSummary: ({ id }) => ({ id }),
   },
 };
 
@@ -195,33 +196,33 @@ export async function updateConnection(
   return updateObject('connection', connection);
 }
 
-export async function getQueries(): Promise<StudioPageQuery[]> {
-  return getObjects('query');
+export async function getApis(): Promise<StudioApi[]> {
+  return getObjects('api');
 }
 
-export async function getQuerySummaries(): Promise<StudioPageQuery[]> {
-  return getObjectSummaries('query');
+export async function getApiSummaries(): Promise<StudioApiSummary[]> {
+  return getObjectSummaries('api');
 }
 
-export async function addQuery(query: StudioPageQuery): Promise<StudioPageQuery> {
-  return addObject('query', query);
+export async function addApi(api: StudioApi): Promise<StudioApi> {
+  return addObject('api', api);
 }
 
-export async function getQuery(id: string): Promise<StudioPageQuery> {
-  return getObject('query', id);
+export async function getApi(id: string): Promise<StudioApi> {
+  return getObject('api', id);
 }
 
-export async function updateQuery(query: Updates<StudioPageQuery>): Promise<StudioPageQuery> {
-  return updateObject('query', query);
+export async function updateApi(api: Updates<StudioApi>): Promise<StudioApi> {
+  return updateObject('api', api);
 }
 
-export async function fetchQueryData(query: StudioPageQuery): Promise<StudioQueryResult<any>> {
-  const connection = await getConnection(query.connectionId);
+export async function execApi(api: StudioApi): Promise<StudioApiResult<any>> {
+  const connection = await getConnection(api.connectionId);
   const dataSource = studioDataSources[connection.type];
   if (!dataSource) {
     throw new Error(
-      `Unknown connection type "${connection.type}" for connection "${query.connectionId}"`,
+      `Unknown connection type "${connection.type}" for connection "${api.connectionId}"`,
     );
   }
-  return dataSource.query(connection, query.query);
+  return dataSource.exec(connection, api.query);
 }

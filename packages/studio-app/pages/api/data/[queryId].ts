@@ -1,7 +1,7 @@
 import { NextApiHandler } from 'next';
 import Cors from 'cors';
-import { fetchQueryData, getQuery } from '../../../src/server/data';
-import { StudioQueryResult } from '../../../src/types';
+import { execApi, getApi } from '../../../src/server/data';
+import { StudioApiResult } from '../../../src/types';
 import initMiddleware from '../../../src/initMiddleware';
 
 // Initialize the cors middleware
@@ -16,6 +16,6 @@ const cors = initMiddleware<any>(
 
 export default (async (req, res) => {
   await cors(req, res);
-  const query = await getQuery(req.query.queryId as string);
-  res.json(await fetchQueryData(query));
-}) as NextApiHandler<StudioQueryResult<any>>;
+  const query = await getApi(req.query.queryId as string);
+  res.json(await execApi(query));
+}) as NextApiHandler<StudioApiResult<any>>;

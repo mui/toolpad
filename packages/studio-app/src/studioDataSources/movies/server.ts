@@ -2,7 +2,7 @@ import {
   ConnectionStatus,
   StudioConnection,
   StudioDataSourceServer,
-  StudioQueryResult,
+  StudioApiResult,
 } from '../../types';
 import data from '../../../movies.json';
 import { MoviesConnectionParams, MoviesQuery, Movie } from './types';
@@ -15,10 +15,10 @@ async function test(
   return { timestamp: Date.now(), error: 'Failed to connect. (ERR-123)' };
 }
 
-async function query(
+async function exec(
   connection: StudioConnection<MoviesConnectionParams>,
   moviesQuery: MoviesQuery,
-): Promise<StudioQueryResult<Movie>> {
+): Promise<StudioApiResult<Movie>> {
   return {
     fields: {
       id: { type: 'string' },
@@ -39,7 +39,7 @@ async function query(
 
 const dataSource: StudioDataSourceServer<MoviesConnectionParams, MoviesQuery, Movie> = {
   test,
-  query,
+  exec,
 };
 
 export default dataSource;

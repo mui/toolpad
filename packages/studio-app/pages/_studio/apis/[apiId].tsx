@@ -4,7 +4,7 @@ import { useQuery, useMutation } from 'react-query';
 import { Container, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { DataGrid } from '@mui/x-data-grid';
-import { StudioConnection, StudioDataSourceClient, StudioPageQuery } from '../../../src/types';
+import { StudioConnection, StudioDataSourceClient, StudioApi } from '../../../src/types';
 import dataSources from '../../../src/studioDataSources/client';
 import client from '../../../src/api';
 import StudioAppBar from '../../../src/components/StudioAppBar';
@@ -14,20 +14,20 @@ function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<
   return dataSource || null;
 }
 
-interface QueryEditorProps<Q = unknown> {
-  query: StudioPageQuery<Q>;
+interface ApiEditorProps<Q = unknown> {
+  api: StudioApi<Q>;
 }
 
-function QueryEditor({ query }: QueryEditorProps) {
-  const [value, setValue] = React.useState(query.query ?? {});
+function ApiEditor({ api }: ApiEditorProps) {
+  const [value, setValue] = React.useState(api.query ?? {});
   const savedValue = React.useRef(value);
   const isDirty = savedValue.current !== value;
 
-  const { data: connectionData } = useQuery(['connection', query?.connectionId], () =>
-    client.query.getConnection(query.connectionId),
+  const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
+    client.query.getConnection(api.connectionId),
   );
 
-  const updateQueryMutation = useMutation(client.mutation.updateQuery, {
+  const updateApiMutation = useMutation(client.mutation.updateApi, {
     onSuccess: () => {
       savedValue.current = value;
     },
@@ -35,9 +35,9 @@ function QueryEditor({ query }: QueryEditorProps) {
 
   const datasource = connectionData && getDataSource(connectionData);
 
-  const { data: previewData } = useQuery(['query', value], () =>
-    client.query.fetchQueryData({
-      ...query,
+  const { data: previewData } = useQuery(['api', value], () =>
+    client.query.execApi({
+      ...api,
       query: value,
     }),
   );
@@ -58,17 +58,17 @@ function QueryEditor({ query }: QueryEditorProps) {
   return datasource ? (
     <div>
       <datasource.QueryEditor value={value} onChange={setValue} />
-      {updateQueryMutation.error}
+      {updateApiMutation.error}
       <Typography variant="h4">Preview</Typography>
       <div style={{ height: 300, width: '100%' }}>
         <DataGrid rows={rows} columns={columns} key={columnsFingerPrint} />
       </div>
       <LoadingButton
         disabled={!isDirty}
-        loading={updateQueryMutation.isLoading}
+        loading={updateApiMutation.isLoading}
         onClick={() => {
-          updateQueryMutation.mutate({
-            id: query.id,
+          updateApiMutation.mutate({
+            id: api.id,
             query: value,
           });
         }}
@@ -79,24 +79,20 @@ function QueryEditor({ query }: QueryEditorProps) {
   ) : null;
 }
 
-export default function QueryEditorPage() {
+export default function ApiEditorPage() {
   const router = useRouter();
-  const { queryId } = router.query;
+  const { apiId } = router.query;
 
-  const { data: queryData } = useQuery(
-    ['query', queryId],
-    () => client.query.getQuery(queryId as string),
-    {
-      enabled: router.isReady,
-    },
-  );
+  const { data: apiData } = useQuery(['api', apiId], () => client.query.getApi(apiId as string), {
+    enabled: router.isReady,
+  });
 
   return (
     <div>
       <StudioAppBar actions={null} />
       <Container>
-        <Typography variant="h3">Edit Query</Typography>
-        {queryData && <QueryEditor query={queryData} />}
+        <Typography variant="h3">Edit Api</Typography>
+        {apiData && <ApiEditor api={apiData} />}
       </Container>
     </div>
   );

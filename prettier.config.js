@@ -1,5 +1,5 @@
-// TODO: maybe we should create/publish a @material-ui/scripts package?
-const baseline = require('@material-ui/monorepo/prettier.config');
+// TODO: maybe we should create/publish a @mui/scripts package?
+const baseline = require('@mui/monorepo/prettier.config');
 
 module.exports = {
   ...baseline,

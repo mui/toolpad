@@ -110,7 +110,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
 
   return (
     <div className={className}>
-      <Typography>Page Hierarchy</Typography>
+      <Typography>App Hierarchy</Typography>
       <TreeView
         aria-label="hierarchy explorer"
         selected={selected}

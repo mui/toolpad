@@ -8,17 +8,13 @@ import Editor from '../../../src/components/StudioEditor';
 const Home: NextPage = () => {
   const router = useRouter();
 
-  const pageQuery = useQuery(
-    ['page', router.query.pageId],
-    () => client.query.getPage(router.query.pageId as string),
-    {
-      enabled: router.isReady,
-    },
-  );
+  const appQuery = useQuery(['app'], () => client.query.loadApp(), {
+    enabled: router.isReady,
+  });
 
   return (
     <div>
-      {(pageQuery.error as any) || (pageQuery.data ? <Editor page={pageQuery.data} /> : 'loading')}
+      {(appQuery.error as any) || (appQuery.data ? <Editor dom={appQuery.data} /> : 'loading')}
     </div>
   );
 };

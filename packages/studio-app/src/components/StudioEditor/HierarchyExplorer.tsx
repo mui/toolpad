@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { NodeId } from '../../types';
-import { getNode } from '../../studioPage';
+import * as studioDom from '../../studioDom';
 import { useEditorApi, useEditorState } from './EditorProvider';
 
 const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
@@ -59,19 +59,35 @@ const CustomContent = React.forwardRef(function CustomContent(props: TreeItemCon
   );
 });
 
-interface HierarchyExplorerItemProps {
-  nodeId: NodeId;
+interface HierarchyExplorerElementItemProps {
+  element: studioDom.StudioElementNode;
 }
 
-function HierarchyExplorerItem({ nodeId }: HierarchyExplorerItemProps) {
+function HierarchyExplorerElementItem({ element }: HierarchyExplorerElementItemProps) {
   const state = useEditorState();
-  const item = getNode(state.page, nodeId);
-
   return (
-    <TreeItem ContentComponent={CustomContent} nodeId={item.id} label={`${item.name} (${item.id})`}>
-      {item.children.map((childId) =>
-        childId ? <HierarchyExplorerItem key={childId} nodeId={childId} /> : null,
-      )}
+    <TreeItem
+      ContentComponent={CustomContent}
+      nodeId={element.id}
+      label={`${element.name} (${element.id})`}
+    >
+      {studioDom.getChildren(state.dom, element).map((child) => (
+        <HierarchyExplorerElementItem key={child.id} element={child} />
+      ))}
+    </TreeItem>
+  );
+}
+
+interface HierarchyExplorerPageItemProps {
+  page: studioDom.StudioPageNode;
+}
+
+function HierarchyExplorerPageItem({ page }: HierarchyExplorerPageItemProps) {
+  const state = useEditorState();
+  const root = studioDom.getPageRoot(state.dom, page);
+  return (
+    <TreeItem ContentComponent={CustomContent} nodeId={page.id} label={`${page.name} (${page.id})`}>
+      <HierarchyExplorerElementItem element={root} />
     </TreeItem>
   );
 }
@@ -89,6 +105,9 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
 
   const selected = state.selection ? [state.selection] : [];
 
+  const app = studioDom.getApp(state.dom);
+  const pages = studioDom.getPages(state.dom, app);
+
   return (
     <div className={className}>
       <Typography>Page Hierarchy</Typography>
@@ -100,7 +119,11 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
       >
-        <HierarchyExplorerItem nodeId={state.page.root} />
+        <TreeItem ContentComponent={CustomContent} nodeId="pages" label="Pages">
+          {pages.map((page) => (
+            <HierarchyExplorerPageItem key={page.id} page={page} />
+          ))}
+        </TreeItem>
       </TreeView>
     </div>
   );

@@ -7,10 +7,9 @@ import {
   NodeLayoutSlots,
   SlotLayout,
   SlotLayoutInsert,
-  StudioPage,
   ViewLayout,
 } from '../../types';
-import { getAncestors, getDecendants, nodesByDepth } from '../../studioPage';
+import * as studioDom from '../../studioDom';
 import PageView, { PageViewHandle } from '../PageView';
 import {
   absolutePositionCss,
@@ -139,14 +138,22 @@ function insertSlotAbsolutePositionCss(slot: SlotLayoutInsert): React.CSSPropert
       };
 }
 
-function findNodeAt(page: StudioPage, viewLayout: ViewLayout, x: number, y: number): NodeId | null {
-  const nodes = nodesByDepth(page);
+function findNodeAt(
+  state: EditorState,
+  viewLayout: ViewLayout,
+  x: number,
+  y: number,
+): NodeId | null {
+  const page = studioDom.getNode(state.dom, state.pageNodeId);
+  studioDom.assertIsPage(page);
+  const rootElement = studioDom.getPageRoot(state.dom, page);
+  const nodes = studioDom.elementsByDepth(state.dom, rootElement);
   // Search deepest nested first
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
-    const nodeId = nodes[i];
-    const nodeLayout = viewLayout[nodeId];
+    const node = nodes[i];
+    const nodeLayout = viewLayout[node.id];
     if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
-      return nodeId;
+      return node.id;
     }
   }
   return null;
@@ -157,12 +164,21 @@ function findNodeAt(page: StudioPage, viewLayout: ViewLayout, x: number, y: numb
  * i.e. Exclude all decendants of the current selection since inserting in one of
  * them would create a cyclic structure.
  */
-function getAvailableNode(state: EditorState): NodeId[] {
-  const nodes = nodesByDepth(state.page);
+function getAvailableNode(
+  state: EditorState,
+): readonly (studioDom.StudioElementNode | studioDom.StudioPageNode)[] {
+  const page = studioDom.getNode(state.dom, state.pageNodeId);
+  studioDom.assertIsPage(page);
+  const rootElement = studioDom.getPageRoot(state.dom, page);
+  const nodes = studioDom.elementsByDepth(state.dom, rootElement);
+  const selection = state.selection && studioDom.getNode(state.dom, state.selection);
+  if (selection) {
+    studioDom.assertIsElement(selection);
+  }
   const excludedNodes = new Set(
-    state.selection ? [state.selection, ...getDecendants(state.page, state.selection)] : [],
+    selection ? [state.selection, ...studioDom.getDecendants(state.dom, selection)] : [],
   );
-  return nodes.filter((nodeId) => !excludedNodes.has(nodeId));
+  return nodes.filter((node) => !excludedNodes.has(node));
 }
 
 interface SlotIndex {
@@ -232,7 +248,7 @@ function findActiveSlotInNode(nodeLayout: NodeLayout, x: number, y: number): Slo
 }
 
 function findActiveSlotAt(
-  nodes: NodeId[],
+  nodes: readonly studioDom.StudioNode[],
   viewLayout: ViewLayout,
   x: number,
   y: number,
@@ -240,8 +256,8 @@ function findActiveSlotAt(
   // Search deepest nested first
   let nodeLayout: NodeLayout | undefined;
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
-    const nodeId = nodes[i];
-    nodeLayout = viewLayout[nodeId];
+    const node = nodes[i];
+    nodeLayout = viewLayout[node.id];
     if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
       // Initially only consider slots of the node we're hovering
       const slotIndex = findActiveSlotInNode(nodeLayout, x, y);
@@ -306,13 +322,16 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
       event.dataTransfer.dropEffect = 'move';
 
-      const nodeId = findNodeAt(state.page, viewLayout, cursorPos.x, cursorPos.y);
+      const page = studioDom.getNode(state.dom, state.pageNodeId);
+      studioDom.assertIsPage(page);
+
+      const nodeId = findNodeAt(state, viewLayout, cursorPos.x, cursorPos.y);
 
       if (nodeId) {
         api.nodeDragStart(nodeId);
       }
     },
-    [api, getViewCoordinates, state.page, viewLayout],
+    [api, getViewCoordinates, state, viewLayout],
   );
 
   React.useEffect(() => {
@@ -395,10 +414,10 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
         return;
       }
 
-      const selectedNode = findNodeAt(state.page, viewLayout, cursorPos.x, cursorPos.y);
+      const selectedNode = findNodeAt(state, viewLayout, cursorPos.x, cursorPos.y);
       api.select(selectedNode);
     },
-    [api, getViewCoordinates, state.page, viewLayout],
+    [api, getViewCoordinates, state, viewLayout],
   );
 
   React.useEffect(() => {
@@ -416,10 +435,15 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
   const selectedRect = state.selection ? viewLayout[state.selection]?.rect : null;
 
   const nodesWithInteraction = React.useMemo<Set<NodeId>>(() => {
-    return state.selection
-      ? new Set([...getAncestors(state.page, state.selection), state.selection])
-      : new Set();
-  }, [state.selection, state.page]);
+    if (!state.selection) {
+      return new Set();
+    }
+    const selection = studioDom.getNode(state.dom, state.selection);
+    studioDom.assertIsElement(selection);
+    return new Set(
+      [...studioDom.getAncestors(state.dom, selection), selection].map((node) => node.id),
+    );
+  }, [state]);
 
   const rootRef = React.useRef<HTMLDivElement>(null);
   const handleFocus = React.useCallback((event: React.FocusEvent<HTMLDivElement>) => {
@@ -440,7 +464,8 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
         <PageView
           className={classes.view}
           ref={viewRef}
-          page={state.page}
+          dom={state.dom}
+          pageNodeId={state.pageNodeId}
           onUpdate={handleRender}
         />
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
@@ -457,7 +482,8 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
               if (!nodeLayout) {
                 return null;
               }
-              const node = state.page.nodes[nodeId];
+              const node = studioDom.getNode(state.dom, nodeId);
+              studioDom.assertIsElement(node);
               return node ? (
                 <React.Fragment key={nodeId}>
                   <div

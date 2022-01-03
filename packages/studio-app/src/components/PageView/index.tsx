@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { StudioPage } from '../../types';
+import { NodeId } from '../../types';
+import * as studioDom from '../../studioDom';
 import renderPageAsCode from '../../renderPageAsCode';
 import StudioSandbox, { StudioSandboxHandle } from '../StudioSandbox';
 import getImportMap from '../../getImportMap';
@@ -74,11 +75,12 @@ export interface PageViewProps {
   className?: string;
   // Callback for when the view has rendered. Make sure this value is stable
   onUpdate?: () => void;
-  page: StudioPage;
+  dom: studioDom.StudioDom;
+  pageNodeId: NodeId;
 }
 
 export default React.forwardRef(function PageView(
-  { className, page, onUpdate }: PageViewProps,
+  { className, dom, pageNodeId, onUpdate }: PageViewProps,
   ref: React.ForwardedRef<PageViewHandle>,
 ) {
   const frameRef = React.useRef<StudioSandboxHandle>(null);
@@ -90,10 +92,10 @@ export default React.forwardRef(function PageView(
   }));
 
   const renderedPage = React.useMemo(() => {
-    return renderPageAsCode(page, {
+    return renderPageAsCode(dom, pageNodeId, {
       editor: true,
     });
-  }, [page]);
+  }, [dom, pageNodeId]);
 
   return (
     <PageViewRoot className={className}>

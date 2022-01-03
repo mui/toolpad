@@ -2,10 +2,7 @@ import { NextApiHandler } from 'next';
 import { AsyncLocalStorage } from 'async_hooks';
 import type { IncomingMessage, ServerResponse } from 'http';
 import {
-  addPage,
   getConnection,
-  getPages,
-  getPage,
   getConnections,
   addConnection,
   updateConnection,
@@ -13,7 +10,6 @@ import {
   getApis,
   getApi,
   addApi,
-  updatePage,
   updateApi,
   execApi,
   loadApp,
@@ -74,9 +70,6 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
 
 const rpcServer = {
   query: {
-    getPages,
-    getPage,
-
     getConnections,
     getConnection,
 
@@ -87,9 +80,6 @@ const rpcServer = {
     loadApp,
   },
   mutation: {
-    addPage,
-    updatePage,
-
     addConnection,
     updateConnection,
     testConnection,

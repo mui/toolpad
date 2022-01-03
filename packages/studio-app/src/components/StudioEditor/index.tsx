@@ -11,7 +11,7 @@ import ComponentPanel from './ComponentPanel';
 import EditorProvider, { useEditorState } from './EditorProvider';
 import StudioViewEditor from './StudioViewEditor';
 import PagePanel from './PagePanel';
-import renderPageAsCode from '../../renderPageAsCode2';
+import renderPageAsCode from '../../renderPageAsCode';
 import useLatest from '../../utils/useLatest';
 import client from '../../api';
 

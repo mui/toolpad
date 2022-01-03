@@ -32,7 +32,7 @@ export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
 export interface StudioPageNode extends StudioNodeBase {
   readonly type: 'page';
   readonly title: string;
-  readonly children: NodeId[];
+  readonly root: NodeId;
   readonly state: Record<string, StudioStateDefinition>;
 }
 
@@ -141,10 +141,13 @@ export function getTheme(dom: StudioDom, root: StudioAppNode): StudioThemeNode {
   return theme;
 }
 
-export function getChildren(
-  dom: StudioDom,
-  parent: StudioPageNode | StudioElementNode,
-): StudioElementNode[] {
+export function getPageRoot(dom: StudioDom, page: StudioPageNode): StudioElementNode {
+  const element = getNode(dom, page.root);
+  assertIsElement(element);
+  return element;
+}
+
+export function getChildren(dom: StudioDom, parent: StudioElementNode): StudioElementNode[] {
   return parent.children.map((nodeId) => {
     const page = getNode(dom, nodeId);
     assertIsElement(page);
@@ -231,4 +234,42 @@ export function createElement<P>(
       : generateUniqueName(component, existingNames, true),
     children,
   };
+}
+
+/**
+ * Nodes on a page, sorted by depth, root first
+ */
+export function elementsByDepth(
+  dom: StudioDom,
+  node: StudioElementNode | StudioPageNode,
+): readonly StudioElementNode[] {
+  if (isPage(node)) {
+    const root = getPageRoot(dom, node);
+    return elementsByDepth(dom, root);
+  }
+  return [node, ...getChildren(dom, node).flatMap((child) => elementsByDepth(dom, child))];
+}
+
+export function getDecendants(
+  dom: StudioDom,
+  node: StudioElementNode,
+): readonly StudioElementNode[] {
+  const children = getChildren(dom, node);
+  return [...children, ...children.flatMap((child) => getDecendants(dom, child))];
+}
+
+export function getAncestors(
+  dom: StudioDom,
+  node: StudioElementNode,
+): readonly (StudioElementNode | StudioPageNode)[] {
+  const parent = getParent(dom, node);
+  return parent && isElement(parent) ? [...getAncestors(dom, parent), parent] : [];
+}
+
+export function getElementPage(dom: StudioDom, node: StudioElementNode): StudioPageNode | null {
+  const parent = getParent(dom, node);
+  if (parent) {
+    return isPage(parent) ? parent : getElementPage(dom, parent);
+  }
+  return null;
 }

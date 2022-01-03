@@ -119,8 +119,8 @@ function removeNode(
 ): studioDom.StudioDom {
   const parent = studioDom.getParent(dom, node);
 
-  if (!parent) {
-    throw new Error(`Invariant: Node: "${node.id}" has no parent`);
+  if (!parent || studioDom.isPage(parent)) {
+    throw new Error(`Invariant: Node: "${node.id}" can not be removed`);
   }
 
   return update(dom, {
@@ -230,7 +230,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         newNode = selection;
         if (newNode && newNode.parentId === action.location?.nodeId) {
           const parent = studioDom.getNode(dom, newNode.parentId);
-          if (!studioDom.isPage(parent) && !studioDom.isElement(parent)) {
+          if (!studioDom.isElement(parent)) {
             throw new Error(`Invariant: Inavlid node type in drop parent "${parent.type}"`);
           }
 
@@ -255,7 +255,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
 
       const { nodeId, index } = action.location;
       const node = studioDom.getNode(dom, nodeId);
-      if (!studioDom.isPage(node) && !studioDom.isElement(node)) {
+      if (!studioDom.isElement(node)) {
         throw new Error(`Invariant: Inavlid node type in drop parent "${node.type}"`);
       }
 

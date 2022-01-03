@@ -1,7 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { DATA_ROOT } from './db';
-import { createPage } from '../studioPage';
 import {
   StudioConnection,
   StudioConnectionSummary,
@@ -157,18 +156,6 @@ async function updateObject<K extends Kind>(
   throw new Error(`Trying to update non-existing ${kind} "${object.id}"`);
 }
 
-export async function pageExists(id: string): Promise<boolean> {
-  return objectExists('page', id);
-}
-
-export async function getPages(): Promise<StudioPageSummary[]> {
-  return getObjectSummaries('page');
-}
-
-export async function addPage(id: string): Promise<StudioPage> {
-  return addObject('page', createPage(id));
-}
-
 export async function getPage(pageId: string): Promise<StudioPage> {
   return getObject('page', pageId);
 }
@@ -264,6 +251,12 @@ function createDefaultApp(): StudioDom {
   ids.add(themeId);
   const pageId = generateUniqueId(ids) as NodeId;
   ids.add(pageId);
+  const rootId = generateUniqueId(ids) as NodeId;
+  ids.add(rootId);
+  const stackId = generateUniqueId(ids) as NodeId;
+  ids.add(stackId);
+  const buttonId = generateUniqueId(ids) as NodeId;
+  ids.add(buttonId);
   return {
     nodes: {
       [appId]: {
@@ -288,8 +281,35 @@ function createDefaultApp(): StudioDom {
         name: 'DefaultPage',
         parentId: appId,
         title: 'Default',
-        children: [],
+        root: rootId,
         state: {},
+      },
+      [rootId]: {
+        id: rootId,
+        type: 'element',
+        name: 'Page',
+        parentId: pageId,
+        component: 'Page',
+        children: [stackId],
+        props: {},
+      },
+      [stackId]: {
+        id: stackId,
+        type: 'element',
+        name: 'Stack',
+        parentId: rootId,
+        component: 'Stack',
+        children: [buttonId],
+        props: {},
+      },
+      [buttonId]: {
+        id: buttonId,
+        type: 'element',
+        name: 'Button',
+        parentId: stackId,
+        component: 'Button',
+        children: [],
+        props: { children: { type: 'const', value: 'Hello' } },
       },
     },
     root: appId,

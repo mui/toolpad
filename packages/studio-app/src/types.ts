@@ -1,15 +1,6 @@
 import type * as React from 'react';
-import { PropDefinitions } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
-import type propTypes from './studioPropTypes';
 import type { Rectangle } from './utils/geometry';
-
-export interface StudioApp {
-  id: string;
-  name: string;
-}
-
-export type TypeIdentifier = keyof typeof propTypes;
 
 export interface DefaultNodeProps {
   [prop: string]: unknown;
@@ -71,15 +62,6 @@ export interface StudioNode<P = DefaultNodeProps> {
   readonly children: NodeId[];
 }
 
-export interface StudioPageSummary {
-  id: string;
-}
-
-export interface GridSlot {
-  span: number;
-  content: NodeId | null;
-}
-
 export interface StudioNodes {
   [id: NodeId]: StudioNode | undefined;
 }
@@ -92,6 +74,10 @@ export interface StudioApiSummary {
 export interface StudioApi<Q = unknown> extends StudioApiSummary {
   connectionId: string;
   query: Q;
+}
+
+export interface StudioPageSummary {
+  id: string;
 }
 
 export interface StudioPageContent {
@@ -108,30 +94,6 @@ export interface SlotLocation {
   nodeId: NodeId;
   slot: string;
   index: number;
-}
-
-export type PropsAction =
-  | {
-      type: 'FILL_SLOT';
-      nodeId: NodeId;
-      slot: string;
-      index: number;
-    }
-  | {
-      type: 'CLEAR_SLOT';
-      nodeId: NodeId;
-    };
-
-export type NodeReducer<P> = (props: StudioNode<P>, action: PropsAction) => StudioNode<P>;
-
-export interface StudioComponentDefinition<P = DefaultNodeProps> {
-  props: PropDefinitions<P>;
-  module: string;
-  importedName: string;
-}
-
-export interface StudioComponentDefinitions {
-  readonly [id: string]: StudioComponentDefinition<any> | undefined;
 }
 
 export interface SlotLayoutCenter {

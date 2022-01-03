@@ -1,7 +1,6 @@
 import string from './string';
 import boolean from './boolean';
 import number from './number';
-import GridSlots from './GridSlots';
 import TextFieldVariant from './TextFieldVariant';
 import ButtonVariant from './ButtonVariant';
 import Direction from './Direction';
@@ -20,7 +19,6 @@ const propTypes: {
   string,
   boolean,
   number,
-  GridSlots,
   TextFieldVariant,
   ButtonVariant,
   Direction,

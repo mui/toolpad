@@ -989,7 +989,7 @@
     npmlog "^4.1.2"
     write-file-atomic "^3.0.3"
 
-"@material-ui/monorepo@git+https://github.com/mui-org/material-ui.git#master":
+"@mui/monorepo@git+https://github.com/mui-org/material-ui.git#master":
   version "5.2.6"
   resolved "git+https://github.com/mui-org/material-ui.git#98c9aad08696f44976f55aa1e254d013df6c38e1"
 

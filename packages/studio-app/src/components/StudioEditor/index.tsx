@@ -5,7 +5,6 @@ import CodeIcon from '@mui/icons-material/Code';
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { createEditorState } from '../../editorState';
 import * as studioDom from '../../studioDom';
-import PageProvider from '../PageStateProvider';
 import StudioAppBar from '../StudioAppBar';
 import BindingEditor from './BindingEditor';
 import ComponentPanel from './ComponentPanel';
@@ -72,7 +71,7 @@ function EditorContent() {
   const dialogSourceContent = useLatest(viewedSource);
 
   return (
-    <PageProvider page={state.dom}>
+    <React.Fragment>
       <StudioAppBar
         actions={
           <React.Fragment>
@@ -97,7 +96,7 @@ function EditorContent() {
           <pre>{dialogSourceContent}</pre>
         </DialogContent>
       </Dialog>
-    </PageProvider>
+    </React.Fragment>
   );
 }
 

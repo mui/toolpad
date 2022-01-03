@@ -2,7 +2,6 @@ import { IconButton, styled } from '@mui/material';
 import React from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import { StudioPage } from '../../types';
-import PageProvider from '../PageStateProvider';
 import StudioAppBar from '../StudioAppBar';
 import PageView from '../PageView';
 import { NextLinkComposed } from '../Link';
@@ -42,9 +41,9 @@ export default function Viewer({ page }: ViewerProps) {
         }
       />
       <div className={classes.content}>
-        <PageProvider page={page}>
+        <React.Fragment>
           <PageView page={page} />
-        </PageProvider>
+        </React.Fragment>
       </div>
     </ViewerRoot>
   );

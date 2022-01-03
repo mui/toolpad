@@ -16,6 +16,8 @@ import {
   updatePage,
   updateApi,
   execApi,
+  loadApp,
+  saveApp,
 } from '../../src/server/data';
 
 const DEFAULT_CONTEXT = {};
@@ -81,6 +83,8 @@ const rpcServer = {
     getApis,
     getApi,
     execApi,
+
+    loadApp,
   },
   mutation: {
     addPage,
@@ -92,6 +96,8 @@ const rpcServer = {
 
     addApi,
     updateApi,
+
+    saveApp,
   },
 } as const;
 

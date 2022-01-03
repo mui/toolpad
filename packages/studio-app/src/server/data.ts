@@ -11,11 +11,21 @@ import {
   ConnectionStatus,
   StudioApiResult,
   StudioApiSummary,
+  NodeId,
 } from '../types';
-import { generateRandomId } from '../utils/randomId';
+import { generateRandomId, generateUniqueId } from '../utils/randomId';
 import studioDataSources from '../studioDataSources/server';
+import { StudioDom } from '../studioDom';
+
+interface StoredstudioDom extends StudioDom {
+  id: 'default';
+}
 
 interface KindObjectMap {
+  app: {
+    full: StoredstudioDom;
+    summary: StoredstudioDom;
+  };
   page: {
     full: StudioPage;
     summary: StudioPageSummary;
@@ -42,6 +52,9 @@ interface KindUtil<K extends Kind> {
 const kindUtil: {
   [K in Kind]: KindUtil<K>;
 } = {
+  app: {
+    mapToSummary: (app) => app,
+  },
   page: {
     mapToSummary: ({ id }) => ({ id }),
   },
@@ -225,4 +238,73 @@ export async function execApi(api: StudioApi): Promise<StudioApiResult<any>> {
     );
   }
   return dataSource.exec(connection, api.query);
+}
+
+const DEFAULT_THEME_CONTENT = `
+import { createTheme } from '@mui/material/styles';
+import { green, orange } from '@mui/material/colors';
+
+export default createTheme({
+  palette: {
+    primary: {
+      main: orange[500],
+    },
+    secondary: {
+      main: green[500],
+    },
+  },
+});
+`;
+
+function createDefaultApp(): StudioDom {
+  const ids = new Set<NodeId>();
+  const appId = generateUniqueId(ids) as NodeId;
+  ids.add(appId);
+  const themeId = generateUniqueId(ids) as NodeId;
+  ids.add(themeId);
+  const pageId = generateUniqueId(ids) as NodeId;
+  ids.add(pageId);
+  return {
+    nodes: {
+      [appId]: {
+        id: appId,
+        type: 'app',
+        parentId: null,
+        apis: [],
+        pages: [pageId],
+        theme: themeId,
+      },
+      [themeId]: {
+        id: themeId,
+        type: 'theme',
+        parentId: appId,
+        content: DEFAULT_THEME_CONTENT,
+      },
+      [pageId]: {
+        id: pageId,
+        type: 'page',
+        parentId: appId,
+        title: 'Default',
+        children: [],
+        state: {},
+      },
+    },
+    root: appId,
+  };
+}
+
+export async function loadApp(): Promise<StudioDom> {
+  try {
+    const app = await getObject('app', 'default');
+    return app;
+  } catch (err) {
+    return createDefaultApp();
+  }
+}
+
+export async function saveApp(app: StudioDom): Promise<void> {
+  await writeObject('app', {
+    id: 'default',
+    ...app,
+  });
 }

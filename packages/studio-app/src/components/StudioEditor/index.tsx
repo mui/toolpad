@@ -6,7 +6,6 @@ import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { useRouter } from 'next/router';
 import { createEditorState } from '../../editorState';
 import { StudioPage } from '../../types';
-import PageProvider from '../PageStateProvider';
 import StudioAppBar from '../StudioAppBar';
 import BindingEditor from './BindingEditor';
 import ComponentPanel from './ComponentPanel';
@@ -75,7 +74,7 @@ function EditorContent() {
   const dialogSourceContent = useLatest(viewedSource);
 
   return (
-    <PageProvider page={state.page}>
+    <React.Fragment>
       <StudioAppBar
         actions={
           <React.Fragment>
@@ -100,7 +99,7 @@ function EditorContent() {
           <pre>{dialogSourceContent}</pre>
         </DialogContent>
       </Dialog>
-    </PageProvider>
+    </React.Fragment>
   );
 }
 

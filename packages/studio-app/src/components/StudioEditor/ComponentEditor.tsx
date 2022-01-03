@@ -5,7 +5,6 @@ import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { PropDefinition, PropDefinitions } from '@mui/studio-core';
 import { getStudioComponent } from '../../studioComponents';
 import { StudioNode } from '../../types';
-import { usePageStateObservable } from '../PageStateProvider';
 import { getNode } from '../../studioPage';
 import propTypes from '../../studioPropTypes';
 import { useEditorApi, useEditorState } from './EditorProvider';
@@ -46,30 +45,21 @@ function ComponentPropEditor<P, K extends keyof P & string>({
 
   const propTypeDef = propTypes[prop.type];
 
-  const observableState = usePageStateObservable();
   const propValue = node.props[name];
 
   const initPropValue = React.useCallback(() => {
-    if (propValue?.type === 'binding') {
-      return observableState.getValue(propValue.state);
-    }
     if (propValue?.type === 'const') {
       return propValue.value;
     }
     return prop.defaultValue;
-  }, [observableState, prop.defaultValue, propValue]);
+  }, [prop.defaultValue, propValue]);
 
   const [value, setValue] = React.useState(initPropValue);
 
   React.useEffect(() => {
     setValue(initPropValue());
-    if (propValue?.type === 'binding') {
-      return observableState.subscribe(propValue.state, () => {
-        setValue(observableState.getValue(propValue.state));
-      });
-    }
     return () => {};
-  }, [observableState, propValue, initPropValue]);
+  }, [propValue, initPropValue]);
 
   const hasBinding = propValue?.type === 'binding';
 

@@ -989,10 +989,6 @@
     npmlog "^4.1.2"
     write-file-atomic "^3.0.3"
 
-"@mui/monorepo@git+https://github.com/mui-org/material-ui.git#master":
-  version "5.2.6"
-  resolved "git+https://github.com/mui-org/material-ui.git#98c9aad08696f44976f55aa1e254d013df6c38e1"
-
 "@mui/base@5.0.0-alpha.62":
   version "5.0.0-alpha.62"
   resolved "https://registry.yarnpkg.com/@mui/base/-/base-5.0.0-alpha.62.tgz#d86ff07f33d7b49ebb545f29e184750c0270c3f8"
@@ -1049,6 +1045,10 @@
     prop-types "^15.7.2"
     react-is "^17.0.2"
     react-transition-group "^4.4.2"
+
+"@mui/monorepo@git+https://github.com/mui-org/material-ui.git#master":
+  version "5.2.6"
+  resolved "git+https://github.com/mui-org/material-ui.git#98c9aad08696f44976f55aa1e254d013df6c38e1"
 
 "@mui/private-theming@^5.2.3":
   version "5.2.3"

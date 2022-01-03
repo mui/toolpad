@@ -1,17 +1,8 @@
 import * as React from 'react';
-import {
-  ComponentPanelTab,
-  createEditorState,
-  EditorAction,
-  editorReducer,
-  EditorState,
-} from '../../editorState';
-import { createPage } from '../../studioPage';
+import { ComponentPanelTab, EditorAction, editorReducer, EditorState } from '../../editorState';
 import { NodeId, SlotLocation, StudioNodeProp, StudioNodeProps } from '../../types';
 
-const EditorStateContext = React.createContext<EditorState>(
-  createEditorState(createPage('default')),
-);
+const EditorStateContext = React.createContext<EditorState | null>(null);
 
 function createApi(dispatch: React.Dispatch<EditorAction>) {
   return {
@@ -93,7 +84,11 @@ export interface EditorContextProps {
 }
 
 export function useEditorState(): EditorState {
-  return React.useContext(EditorStateContext);
+  const stateContext = React.useContext(EditorStateContext);
+  if (!stateContext) {
+    throw new Error(`No provider found for editor state`);
+  }
+  return stateContext;
 }
 
 export function useEditorApi(): EditorApi {

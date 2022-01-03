@@ -1,1 +1,1 @@
-module.exports = require('@material-ui/monorepo/packages/eslint-plugin-material-ui');
+module.exports = require('@mui/monorepo/packages/eslint-plugin-material-ui');

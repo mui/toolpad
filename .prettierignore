@@ -2,3 +2,5 @@
 .studio-data
 /packages/*/dist
 /packages/*/.next
+
+/packages/studio-app/public

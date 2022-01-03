@@ -15,6 +15,7 @@
   },
   "scripts": {
     "prettier": "prettier --check .",
+    "deduplicate": "node scripts/deduplicate.js",
     "start": "cross-env FORCE_COLOR=1 lerna run --stream --scope @mui/studio start",
     "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/studio-core --scope @mui/studio-components --scope @mui/studio",
     "cli": "cross-env FORCE_COLOR=1 packages/studio-cli/cli.js --dev",
@@ -44,7 +45,8 @@
     "lerna": "^4.0.0",
     "prettier": "^2.5.1",
     "regenerator-runtime": "^0.13.9",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "yarn-deduplicate": "^3.1.0"
   },
   "resolutions": {
     "eslint-plugin-react": "7.27.1"

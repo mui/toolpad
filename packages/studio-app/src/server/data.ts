@@ -269,6 +269,7 @@ function createDefaultApp(): StudioDom {
       [appId]: {
         id: appId,
         type: 'app',
+        name: 'App',
         parentId: null,
         apis: [],
         pages: [pageId],
@@ -277,12 +278,14 @@ function createDefaultApp(): StudioDom {
       [themeId]: {
         id: themeId,
         type: 'theme',
+        name: 'Theme',
         parentId: appId,
         content: DEFAULT_THEME_CONTENT,
       },
       [pageId]: {
         id: pageId,
         type: 'page',
+        name: 'DefaultPage',
         parentId: appId,
         title: 'Default',
         children: [],

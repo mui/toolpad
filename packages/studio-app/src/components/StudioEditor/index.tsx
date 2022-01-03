@@ -3,9 +3,8 @@ import * as React from 'react';
 import SaveIcon from '@mui/icons-material/Save';
 import CodeIcon from '@mui/icons-material/Code';
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import { useRouter } from 'next/router';
 import { createEditorState } from '../../editorState';
-import { StudioPage } from '../../types';
+import * as studioDom from '../../studioDom';
 import PageProvider from '../PageStateProvider';
 import StudioAppBar from '../StudioAppBar';
 import BindingEditor from './BindingEditor';
@@ -13,7 +12,7 @@ import ComponentPanel from './ComponentPanel';
 import EditorProvider, { useEditorState } from './EditorProvider';
 import StudioViewEditor from './StudioViewEditor';
 import PagePanel from './PagePanel';
-import renderPageAsCode from '../../renderPageAsCode';
+import renderPageAsCode from '../../renderPageAsCode2';
 import useLatest from '../../utils/useLatest';
 import client from '../../api';
 
@@ -51,23 +50,21 @@ const EditorRoot = styled('div')(({ theme }) => ({
 
 function EditorContent() {
   const state = useEditorState();
-  const router = useRouter();
 
   const [viewedSource, setViewedSource] = React.useState<string | null>(null);
 
   const handleSave = React.useCallback(async () => {
     try {
-      await client.mutation.updatePage(state.page);
-      router.push(`/${state.page.id}`);
+      await client.mutation.saveApp(state.dom);
     } catch (err: any) {
       alert(err.message);
     }
-  }, [router, state.page]);
+  }, [state.dom]);
 
   const handleViewSource = React.useCallback(() => {
-    const { code } = renderPageAsCode(state.page, { pretty: true });
+    const { code } = renderPageAsCode(state.dom, state.pageNodeId, { pretty: true });
     setViewedSource(code);
-  }, [state.page]);
+  }, [state.dom, state.pageNodeId]);
 
   const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
 
@@ -75,7 +72,7 @@ function EditorContent() {
   const dialogSourceContent = useLatest(viewedSource);
 
   return (
-    <PageProvider page={state.page}>
+    <PageProvider page={state.dom}>
       <StudioAppBar
         actions={
           <React.Fragment>
@@ -105,11 +102,14 @@ function EditorContent() {
 }
 
 interface EditorProps {
-  page: StudioPage;
+  dom: studioDom.StudioDom;
 }
 
-export default function Editor({ page }: EditorProps) {
-  const initialState = React.useMemo(() => createEditorState(page), [page]);
+export default function Editor({ dom }: EditorProps) {
+  const initialState = React.useMemo(() => {
+    const pageNodeId = studioDom.getApp(dom).pages[0];
+    return createEditorState(dom, pageNodeId);
+  }, [dom]);
   return (
     <EditorRoot>
       <EditorProvider initialState={initialState}>

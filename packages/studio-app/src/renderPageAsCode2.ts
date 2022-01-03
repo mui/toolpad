@@ -2,6 +2,7 @@ import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
+import { NodeId } from './types';
 
 export interface RenderPageConfig {
   // whether we're in the context of an editor
@@ -46,7 +47,11 @@ class Context {
 
   private dataLoaders: string[] = [];
 
-  constructor(dom: studioDom.StudioDom, page: studioDom.StudioPageNode, { editor }: RenderPageConfig) {
+  constructor(
+    dom: studioDom.StudioDom,
+    page: studioDom.StudioPageNode,
+    { editor }: RenderPageConfig,
+  ) {
     this.dom = dom;
     this.page = page;
     this.editor = editor;
@@ -99,7 +104,10 @@ class Context {
   }
 
   renderPage(node: studioDom.StudioPageNode): string {
-    const renderedChildren = studioDom.getChildren(this.dom, node).map((child) => this.renderNode(child)).join('\n');
+    const renderedChildren = studioDom
+      .getChildren(this.dom, node)
+      .map((child) => this.renderNode(child))
+      .join('\n');
     const rendered = `
       <Page>
         ${renderedChildren}
@@ -118,7 +126,10 @@ class Context {
   renderNode(node: studioDom.StudioElementNode): string {
     const component = getStudioComponent(node.component);
     const props = this.resolveProps(node);
-    const renderedChildren = studioDom.getChildren(this.dom, node).map((child) => this.renderNode(child)).join('\n');
+    const renderedChildren = studioDom
+      .getChildren(this.dom, node)
+      .map((child) => this.renderNode(child))
+      .join('\n');
     const rendered = `
       <${component.importedName} ${this.renderProps(props)}>
         ${renderedChildren}
@@ -216,7 +227,7 @@ class Context {
 
 export default function renderPageAsCode(
   dom: studioDom.StudioDom,
-  page: studioDom.StudioPageNode,
+  pageNodeId: NodeId,
   configInit: Partial<RenderPageConfig> = {},
 ) {
   const config: RenderPageConfig = {
@@ -225,6 +236,8 @@ export default function renderPageAsCode(
     ...configInit,
   };
 
+  const page = studioDom.getNode(dom, pageNodeId);
+  studioDom.assertIsPage(page);
   const ctx = new Context(dom, page, config);
   const root = ctx.renderPage(page);
 

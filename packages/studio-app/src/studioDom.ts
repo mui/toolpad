@@ -1,13 +1,15 @@
 import { DefaultNodeProps, NodeId, StudioNodeProps, StudioStateDefinition } from './types';
+import { update } from './utils/immutability';
+import { generateUniqueId } from './utils/randomId';
 
 export interface StudioNodeBase {
   readonly id: NodeId;
   readonly type: 'app' | 'theme' | 'api' | 'page' | 'element';
   readonly parentId: NodeId | null;
+  readonly name: string;
 }
 
 export interface StudioAppNode extends StudioNodeBase {
-  readonly id: NodeId;
   readonly type: 'app';
   readonly parentId: null;
   readonly apis: NodeId[];
@@ -16,34 +18,26 @@ export interface StudioAppNode extends StudioNodeBase {
 }
 
 export interface StudioThemeNode extends StudioNodeBase {
-  readonly id: NodeId;
   readonly type: 'theme';
-  readonly parentId: NodeId;
   readonly content: string;
 }
 
 export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
-  readonly id: NodeId;
   readonly type: 'api';
-  readonly parentId: NodeId;
   readonly name: string;
   readonly connectionId: string;
   readonly query: Q;
 }
 
 export interface StudioPageNode extends StudioNodeBase {
-  readonly id: NodeId;
   readonly type: 'page';
-  readonly parentId: NodeId;
   readonly title: string;
   readonly children: NodeId[];
   readonly state: Record<string, StudioStateDefinition>;
 }
 
 export interface StudioElementNode<P = DefaultNodeProps> extends StudioNodeBase {
-  readonly id: NodeId;
   readonly type: 'element';
-  readonly parentId: NodeId;
   readonly component: string;
   readonly name: string;
   readonly props: Partial<StudioNodeProps<P>>;
@@ -75,7 +69,7 @@ function assertIsType<T extends StudioNode>(node: StudioNode, type: T['type']): 
     throw new Error(`Invariant: expected node type "${type}" but got "${node.type}"`);
   }
 }
-function getNode(dom: StudioDom, nodeId: NodeId): StudioNode {
+export function getNode(dom: StudioDom, nodeId: NodeId): StudioNode {
   return dom.nodes[nodeId];
 }
 
@@ -159,17 +153,82 @@ export function getChildren(
 }
 
 export function getParent(dom: StudioDom, child: StudioAppNode): null;
-export function getParent(dom: StudioDom, child: StudioApiNode): StudioAppNode;
-export function getParent(dom: StudioDom, child: StudioPageNode): StudioAppNode;
-export function getParent(dom: StudioDom, child: StudioThemeNode): StudioAppNode;
+export function getParent(dom: StudioDom, child: StudioApiNode): StudioAppNode | null;
+export function getParent(dom: StudioDom, child: StudioPageNode): StudioAppNode | null;
+export function getParent(dom: StudioDom, child: StudioThemeNode): StudioAppNode | null;
 export function getParent(
   dom: StudioDom,
   child: StudioElementNode,
-): StudioPageNode | StudioElementNode;
+): StudioPageNode | StudioElementNode | null;
+export function getParent(dom: StudioDom, child: StudioNode): StudioNode | null;
 export function getParent(dom: StudioDom, child: StudioNode): StudioNode | null {
   if (child.parentId) {
     const parent = getNode(dom, child.parentId);
     return parent;
   }
   return null;
+}
+
+export function setNodeName(dom: StudioDom, node: StudioNode, name: string): StudioDom {
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: {
+        ...node,
+        name,
+      },
+    }),
+  });
+}
+
+export function setNodeProps<P>(
+  page: StudioDom,
+  node: StudioElementNode,
+  props: StudioNodeProps<P>,
+): StudioDom {
+  return update(page, {
+    nodes: update(page.nodes, {
+      [node.id]: update(node, {
+        props,
+      }),
+    }),
+  });
+}
+
+function generateUniqueName(baseName: string, existingNames: Set<string>, alwaysIndex = false) {
+  let i = 1;
+  let suggestion = baseName;
+  if (alwaysIndex) {
+    suggestion += String(i);
+    i += 1;
+  }
+  while (existingNames.has(suggestion)) {
+    suggestion = baseName + String(i);
+    i += 1;
+  }
+  return suggestion;
+}
+
+function getNodeNames(dom: StudioDom): Set<string> {
+  return new Set(Object.values(dom.nodes).map(({ name }) => name));
+}
+
+export function createElement<P>(
+  dom: StudioDom,
+  component: string,
+  props: Partial<StudioNodeProps<P>> = {},
+  name?: string,
+  children: NodeId[] = [],
+): StudioElementNode {
+  const existingNames = getNodeNames(dom);
+  return {
+    id: generateUniqueId(new Set(Object.keys(dom.nodes))) as NodeId,
+    type: 'element',
+    parentId: null,
+    component,
+    props,
+    name: name
+      ? generateUniqueName(name, existingNames)
+      : generateUniqueName(component, existingNames, true),
+    children,
+  };
 }

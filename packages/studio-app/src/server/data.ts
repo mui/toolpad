@@ -4,8 +4,6 @@ import { DATA_ROOT } from './db';
 import {
   StudioConnection,
   StudioConnectionSummary,
-  StudioPage,
-  StudioPageSummary,
   StudioApi,
   ConnectionStatus,
   StudioApiResult,
@@ -24,10 +22,6 @@ interface KindObjectMap {
   app: {
     full: StoredstudioDom;
     summary: StoredstudioDom;
-  };
-  page: {
-    full: StudioPage;
-    summary: StudioPageSummary;
   };
   connection: {
     full: StudioConnection;
@@ -53,9 +47,6 @@ const kindUtil: {
 } = {
   app: {
     mapToSummary: (app) => app,
-  },
-  page: {
-    mapToSummary: ({ id }) => ({ id }),
   },
   connection: {
     mapToSummary: ({ id, type, name }) => ({ id, type, name }),
@@ -154,14 +145,6 @@ async function updateObject<K extends Kind>(
     return updated;
   }
   throw new Error(`Trying to update non-existing ${kind} "${object.id}"`);
-}
-
-export async function getPage(pageId: string): Promise<StudioPage> {
-  return getObject('page', pageId);
-}
-
-export async function updatePage(newPage: Updates<StudioPage>): Promise<StudioPage> {
-  return updateObject('page', newPage);
 }
 
 export async function getConnections(): Promise<StudioConnection[]> {

@@ -53,19 +53,6 @@ export type StudioNodeProps<P = DefaultNodeProps> = {
 
 export type NodeId = Branded<string, 'NodeId'>;
 
-export interface StudioNode<P = DefaultNodeProps> {
-  readonly id: NodeId;
-  readonly parentId: NodeId | null;
-  readonly component: string;
-  readonly name: string;
-  readonly props: Partial<StudioNodeProps<P>>;
-  readonly children: NodeId[];
-}
-
-export interface StudioNodes {
-  [id: NodeId]: StudioNode | undefined;
-}
-
 export interface StudioApiSummary {
   id: string;
   name: string;
@@ -75,18 +62,6 @@ export interface StudioApi<Q = unknown> extends StudioApiSummary {
   connectionId: string;
   query: Q;
 }
-
-export interface StudioPageSummary {
-  id: string;
-}
-
-export interface StudioPageContent {
-  nodes: StudioNodes;
-  root: NodeId;
-  state: Record<string, StudioStateDefinition>;
-}
-
-export interface StudioPage extends StudioPageSummary, StudioPageContent {}
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 

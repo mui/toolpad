@@ -74,6 +74,9 @@ jobs:
       - run:
           name: '`yarn prettier` changes committed?'
           command: yarn prettier check-changed
+      - run:
+          name: 'Build packages'
+          command: yarn build
 workflows:
   version: 2
   pipeline:

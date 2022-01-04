@@ -18,7 +18,7 @@ function findImportedModuleIDs(source: string): string[] {
 
       return result ? result[2] : null;
     })
-    .filter(Boolean) as string[];
+    .filter(Boolean);
 }
 
 self.addEventListener('install', (event) => {

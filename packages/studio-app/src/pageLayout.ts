@@ -189,7 +189,7 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
                 .map((childFiber) =>
                   devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(childFiber),
                 )
-                .filter(Boolean) as Element[];
+                .filter(Boolean);
               const slots = getInsertSlots({
                 nodeElm: parentElm,
                 items,

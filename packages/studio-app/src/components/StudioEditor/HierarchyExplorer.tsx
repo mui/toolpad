@@ -100,13 +100,17 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   const state = useEditorState();
   const api = useEditorApi();
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
-    api.select(nodeIds[0] as NodeId);
+    const selectedNode = nodeIds[0];
+    if (selectedNode) {
+      api.select(selectedNode as NodeId);
+    }
   };
 
-  const selected = state.selection ? [state.selection] : [];
+  const selected = state.editorType === 'page' && state.selection ? [state.selection] : [];
 
   const app = studioDom.getApp(state.dom);
   const pages = studioDom.getPages(state.dom, app);
+  const theme = studioDom.getTheme(state.dom, app);
 
   return (
     <div className={className}>
@@ -119,7 +123,8 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
       >
-        <TreeItem ContentComponent={CustomContent} nodeId="pages" label="Pages">
+        <TreeItem ContentComponent={CustomContent} nodeId={theme.id} label="Theme" />
+        <TreeItem ContentComponent={CustomContent} nodeId="" label="Pages">
           {pages.map((page) => (
             <HierarchyExplorerPageItem key={page.id} page={page} />
           ))}

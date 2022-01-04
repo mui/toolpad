@@ -18,7 +18,7 @@ import {
   rectContainsPoint,
 } from '../../utils/geometry';
 import { ExactEntriesOf } from '../../utils/types';
-import { EditorState } from '../../editorState';
+import { PageEditorState } from '../../editorState';
 import { PinholeOverlay } from '../../PinholeOverlay';
 import { useEditorApi, useEditorState } from './EditorProvider';
 import { getPageLayout } from '../../pageLayout';
@@ -139,7 +139,7 @@ function insertSlotAbsolutePositionCss(slot: SlotLayoutInsert): React.CSSPropert
 }
 
 function findNodeAt(
-  state: EditorState,
+  state: PageEditorState,
   viewLayout: ViewLayout,
   x: number,
   y: number,
@@ -165,7 +165,7 @@ function findNodeAt(
  * them would create a cyclic structure.
  */
 function getAvailableNode(
-  state: EditorState,
+  state: PageEditorState,
 ): readonly (studioDom.StudioElementNode | studioDom.StudioPageNode)[] {
   const page = studioDom.getNode(state.dom, state.pageNodeId);
   studioDom.assertIsPage(page);
@@ -281,6 +281,10 @@ export interface StudioViewEditorProps {
 export default function StudioViewEditor({ className }: StudioViewEditorProps) {
   const state = useEditorState();
   const api = useEditorApi();
+
+  if (state.editorType !== 'page') {
+    throw new Error(`Invariant: can't use page editor under "${state.editorType}" state`);
+  }
 
   const viewRef = React.useRef<PageViewHandle>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);

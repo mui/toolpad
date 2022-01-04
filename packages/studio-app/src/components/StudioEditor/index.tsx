@@ -47,6 +47,33 @@ const EditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
+interface ToDoEditorProps {
+  className?: string;
+}
+
+function ToDoFileEditor({ className }: ToDoEditorProps) {
+  return <div className={className}>To Do</div>;
+}
+
+interface FileEditorProps {
+  className?: string;
+  type: 'page' | 'api' | 'theme';
+}
+
+function FileEditor({ type, className }: FileEditorProps) {
+  switch (type) {
+    case 'page':
+      return (
+        <React.Fragment>
+          <StudioViewEditor className={className} />
+          <ComponentPanel className={classes.componentPanel} />
+        </React.Fragment>
+      );
+    default:
+      return <ToDoFileEditor className={className} />;
+  }
+}
+
 function EditorContent() {
   const state = useEditorState();
 
@@ -61,9 +88,15 @@ function EditorContent() {
   }, [state.dom]);
 
   const handleViewSource = React.useCallback(() => {
+    if (state.editorType !== 'page') {
+      setViewedSource(`
+      // not yet supported
+      `);
+      return;
+    }
     const { code } = renderPageAsCode(state.dom, state.pageNodeId, { pretty: true });
     setViewedSource(code);
-  }, [state.dom, state.pageNodeId]);
+  }, [state]);
 
   const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
 
@@ -86,8 +119,7 @@ function EditorContent() {
       />
       <div className={classes.content}>
         <PagePanel className={classes.pagePanel} />
-        <StudioViewEditor className={classes.renderPanel} />
-        <ComponentPanel className={classes.componentPanel} />
+        <FileEditor type={state.editorType} className={classes.renderPanel} />
       </div>
       <BindingEditor />
       <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>
@@ -105,10 +137,7 @@ interface EditorProps {
 }
 
 export default function Editor({ dom }: EditorProps) {
-  const initialState = React.useMemo(() => {
-    const pageNodeId = studioDom.getApp(dom).pages[0];
-    return createEditorState(dom, pageNodeId);
-  }, [dom]);
+  const initialState = React.useMemo(() => createEditorState(dom), [dom]);
   return (
     <EditorRoot>
       <EditorProvider initialState={initialState}>

@@ -30,8 +30,23 @@ export interface BindingEditorState {
   readonly prop: string;
 }
 
-export interface EditorState {
+export interface BaseEditorState {
+  readonly editorType: 'page' | 'theme' | 'api';
   readonly dom: studioDom.StudioDom;
+}
+
+export interface ThemeEditorState extends BaseEditorState {
+  readonly editorType: 'theme';
+  readonly themeNodeId: NodeId;
+}
+
+export interface ApiEditorState extends BaseEditorState {
+  readonly editorType: 'api';
+  readonly apiNodeId: NodeId;
+}
+
+export interface PageEditorState extends BaseEditorState {
+  readonly editorType: 'page';
   readonly pageNodeId: NodeId;
   readonly selection: NodeId | null;
   readonly componentPanelTab: ComponentPanelTab;
@@ -40,6 +55,8 @@ export interface EditorState {
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
 }
+
+export type EditorState = PageEditorState | ThemeEditorState | ApiEditorState;
 
 export type EditorAction =
   | {
@@ -135,15 +152,67 @@ function removeNode(
   });
 }
 
-export function editorReducer(state: EditorState, action: EditorAction): EditorState {
+export function createThemeEditorState(
+  dom: studioDom.StudioDom,
+  themeNodeId: NodeId,
+): ThemeEditorState {
+  return {
+    editorType: 'theme',
+    dom,
+    themeNodeId,
+  };
+}
+
+export function createApiEditorState(dom: studioDom.StudioDom, apiNodeId: NodeId): ApiEditorState {
+  return {
+    editorType: 'api',
+    dom,
+    apiNodeId,
+  };
+}
+
+export function createPageEditorState(
+  dom: studioDom.StudioDom,
+  pageNodeId: NodeId,
+): PageEditorState {
+  return {
+    editorType: 'page',
+    dom,
+    pageNodeId,
+    selection: null,
+    componentPanelTab: 'catalog',
+    newNode: null,
+    bindingEditor: null,
+    highlightLayout: false,
+    highlightedSlot: null,
+  };
+}
+
+export function createEditorState(dom: studioDom.StudioDom): EditorState {
+  const pageNodeId = studioDom.getApp(dom).pages[0];
+  return createPageEditorState(dom, pageNodeId);
+}
+
+export function pageEditorReducer(state: PageEditorState, action: EditorAction): EditorState {
   switch (action.type) {
     case 'NOOP':
       return state;
-    case 'SELECT_NODE':
+    case 'SELECT_NODE': {
+      if (action.nodeId) {
+        const node = studioDom.getNode(state.dom, action.nodeId);
+        if (studioDom.isElement(node)) {
+          return update(state, {
+            selection: node.id,
+            componentPanelTab: 'component',
+          });
+        }
+        return state;
+      }
       return update(state, {
-        selection: action.nodeId || null,
+        selection: null,
         componentPanelTab: 'component',
       });
+    }
     case 'SET_NODE_NAME': {
       const node = studioDom.getNode(state.dom, action.nodeId);
       return update(state, {
@@ -353,15 +422,56 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
   }
 }
 
-export function createEditorState(dom: studioDom.StudioDom, pageNodeId: NodeId): EditorState {
-  return {
-    dom,
-    pageNodeId,
-    selection: null,
-    componentPanelTab: 'catalog',
-    newNode: null,
-    bindingEditor: null,
-    highlightLayout: false,
-    highlightedSlot: null,
-  };
+export function themeEditorReducer(state: ThemeEditorState, action: EditorAction): EditorState {
+  switch (action.type) {
+    default:
+      return state;
+  }
+}
+
+export function apiEditorReducer(state: ApiEditorState, action: EditorAction): EditorState {
+  switch (action.type) {
+    default:
+      return state;
+  }
+}
+
+export function baseEditorReducer(state: EditorState, action: EditorAction): EditorState {
+  switch (action.type) {
+    case 'SELECT_NODE': {
+      if (action.nodeId) {
+        const node = studioDom.getNode(state.dom, action.nodeId);
+        if (studioDom.isPage(node)) {
+          if (state.editorType === 'page' && node.id === state.pageNodeId) {
+            return state;
+          }
+          return createPageEditorState(state.dom, action.nodeId);
+        }
+        if (studioDom.isTheme(node)) {
+          return createThemeEditorState(state.dom, action.nodeId);
+        }
+        if (studioDom.isTheme(node)) {
+          return createApiEditorState(state.dom, action.nodeId);
+        }
+      }
+      return state;
+    }
+    default:
+      return state;
+  }
+}
+
+export function editorReducer(state: EditorState, action: EditorAction): EditorState {
+  state = baseEditorReducer(state, action);
+
+  switch (state.editorType) {
+    case 'page':
+      return pageEditorReducer(state, action);
+    case 'theme':
+      return themeEditorReducer(state, action);
+    case 'api':
+      return apiEditorReducer(state, action);
+    default:
+      return state;
+  }
 }

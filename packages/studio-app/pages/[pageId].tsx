@@ -3,17 +3,23 @@ import * as React from 'react';
 import { useRouter } from 'next/router';
 import client from '../src/api';
 import Viewer from '../src/components/StudioViewer';
+import { NodeId } from '../src/types';
 
 const Home: NextPage = () => {
   const router = useRouter();
 
-  const pageQuery = client.useQuery('getPage', [router.query.pageId as string], {
+  const appQuery = client.useQuery('loadApp', [], {
     enabled: router.isReady,
   });
 
   return (
     <div>
-      {(pageQuery.error as any) || (pageQuery.data ? <Viewer page={pageQuery.data} /> : 'loading')}
+      {(appQuery.error as any) ||
+        (appQuery.data ? (
+          <Viewer dom={appQuery.data} pageNodeId={router.query.pageId as NodeId} />
+        ) : (
+          'loading'
+        ))}
     </div>
   );
 };

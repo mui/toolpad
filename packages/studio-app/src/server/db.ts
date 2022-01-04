@@ -2,13 +2,12 @@ import 'reflect-metadata';
 import * as typeorm from 'typeorm';
 import * as path from 'path';
 import config from '../config';
-import { ConnectionEntity } from './entities/Connection';
-import { Page, PageEntity } from './entities/Page';
+import { Connection, ConnectionEntity } from './entities/Connection';
 import { ApiEntity } from './entities/Api';
 
 export const DATA_ROOT = path.resolve(config.dir, './.studio-data');
 
-const entities = [PageEntity, ConnectionEntity, ApiEntity];
+const entities = [ConnectionEntity, ApiEntity];
 
 const connectionOptions: typeorm.ConnectionOptions = {
   name: 'default',
@@ -41,28 +40,24 @@ export async function getConnection() {
   return connectionPromise;
 }
 
-const SUMMARY_FIELDS = ['id', 'pathname', 'title'] as const;
+const SUMMARY_FIELDS = ['id'] as const;
 
-export async function getPages(): Promise<Pick<Page, typeof SUMMARY_FIELDS[number]>[]> {
+export async function getStudioConnections(): Promise<
+  Pick<Connection, typeof SUMMARY_FIELDS[number]>[]
+> {
   const connection = await getConnection();
-  const pagerepository = connection.getRepository<Page>(PageEntity);
-  return pagerepository.find({ select: [...SUMMARY_FIELDS] });
+  const connectionRepository = connection.getRepository<Connection>(ConnectionEntity);
+  return connectionRepository.find({ select: [...SUMMARY_FIELDS] });
 }
 
-export async function getPage(id: string) {
+export async function getStudioConnection(id: string) {
   const connection = await getConnection();
-  const pagerepository = connection.getRepository<Page>(PageEntity);
-  await pagerepository.findOneOrFail({ id });
+  const connectionRepository = connection.getRepository<Connection>(ConnectionEntity);
+  await connectionRepository.findOneOrFail({ id });
 }
 
-export async function getPageByPath(pathname: string) {
+export async function saveStudioConnection(conn: Connection) {
   const connection = await getConnection();
-  const pagerepository = connection.getRepository<Page>(PageEntity);
-  await pagerepository.findOneOrFail({ pathname });
-}
-
-export async function savePage(page: Page) {
-  const connection = await getConnection();
-  const pagerepository = connection.getRepository<Page>(PageEntity);
-  return pagerepository.save(page);
+  const connectionRepository = connection.getRepository<Connection>(ConnectionEntity);
+  return connectionRepository.save(conn);
 }

@@ -73,8 +73,10 @@ jobs:
       - install_js
       - run:
           name: '`yarn prettier` changes committed?'
-          # TODO command: yarn prettier check-changed
-          command: yarn prettier
+          command: yarn prettier check-changed
+      - run:
+          name: 'Build packages'
+          command: yarn build
 workflows:
   version: 2
   pipeline:

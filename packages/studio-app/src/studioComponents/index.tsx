@@ -1,6 +1,11 @@
 import * as studioComponentLib from '@mui/studio-components';
 import { DEFINITION_KEY } from '@mui/studio-core';
-import type { StudioComponentDefinition } from '../types';
+
+interface StudioComponentDefinition {
+  props: any;
+  module: string;
+  importedName: string;
+}
 
 export const components = new Map([
   ['Button', { module: '@mui/studio-components', importedName: 'Button' }],

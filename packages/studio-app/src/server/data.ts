@@ -299,18 +299,22 @@ function createDefaultApp(): StudioDom {
   };
 }
 
-export async function loadApp(): Promise<StudioDom> {
-  try {
-    const app = await getObject('app', 'default');
-    return app;
-  } catch (err) {
-    return createDefaultApp();
-  }
-}
+const APP_ID = 'default';
 
 export async function saveApp(app: StudioDom): Promise<void> {
   await writeObject('app', {
-    id: 'default',
+    id: APP_ID,
     ...app,
   });
+}
+
+export async function loadApp(): Promise<StudioDom> {
+  try {
+    const app = await getObject('app', APP_ID);
+    return app;
+  } catch (err) {
+    const app = createDefaultApp();
+    await saveApp(app);
+    return app;
+  }
 }

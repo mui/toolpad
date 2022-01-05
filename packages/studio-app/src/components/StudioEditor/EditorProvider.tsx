@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { ComponentPanelTab, EditorAction, editorReducer, EditorState } from '../../editorState';
+import {
+  ApiEditorState,
+  ComponentPanelTab,
+  EditorAction,
+  editorReducer,
+  EditorState,
+  PageEditorState,
+  ThemeEditorState,
+} from '../../editorState';
 import { NodeId, SlotLocation, StudioNodeProp, StudioNodeProps } from '../../types';
 
 const EditorStateContext = React.createContext<EditorState | null>(null);
@@ -89,6 +97,30 @@ export function useEditorState(): EditorState {
     throw new Error(`No provider found for editor state`);
   }
   return stateContext;
+}
+
+export function usePageEditorState(): PageEditorState {
+  const state = useEditorState();
+  if (state.editorType !== 'page') {
+    throw new Error(`PageEditorState state requested out of context`);
+  }
+  return state;
+}
+
+export function useThemeEditorState(): ThemeEditorState {
+  const state = useEditorState();
+  if (state.editorType !== 'theme') {
+    throw new Error(`ThemeEditorState state requested out of context`);
+  }
+  return state;
+}
+
+export function useApiEditorState(): ApiEditorState {
+  const state = useEditorState();
+  if (state.editorType !== 'api') {
+    throw new Error(`ApiEditorState state requested out of context`);
+  }
+  return state;
 }
 
 export function useEditorApi(): EditorApi {

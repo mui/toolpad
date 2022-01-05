@@ -19,7 +19,7 @@ import {
 } from '../../utils/geometry';
 import { PageEditorState } from '../../editorState';
 import { PinholeOverlay } from '../../PinholeOverlay';
-import { useEditorApi, useEditorState } from './EditorProvider';
+import { useEditorApi, usePageEditorState } from './EditorProvider';
 import { getPageLayout } from '../../pageLayout';
 
 const classes = {
@@ -273,12 +273,8 @@ export interface PageFileEditorProps {
 }
 
 export default function PageFileEditor({ className }: PageFileEditorProps) {
-  const state = useEditorState();
+  const state = usePageEditorState();
   const api = useEditorApi();
-
-  if (state.editorType !== 'page') {
-    throw new Error(`Invariant: can't use page editor under "${state.editorType}" state`);
-  }
 
   const viewRef = React.useRef<PageViewHandle>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);

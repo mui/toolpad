@@ -5,7 +5,7 @@ import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { PropDefinition, PropDefinitions } from '@mui/studio-core';
 import { getStudioComponent } from '../../studioComponents';
 import propTypes from '../../studioPropTypes';
-import { useEditorApi, useEditorState } from './EditorProvider';
+import { useEditorApi, usePageEditorState } from './EditorProvider';
 import { ExactEntriesOf } from '../../utils/types';
 import * as studioDom from '../../studioDom';
 
@@ -161,12 +161,9 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const state = useEditorState();
+  const state = usePageEditorState();
 
-  const selectedNode =
-    state.editorType === 'page' && state.selection
-      ? studioDom.getNode(state.dom, state.selection)
-      : null;
+  const selectedNode = state.selection ? studioDom.getNode(state.dom, state.selection) : null;
 
   if (selectedNode) {
     studioDom.assertIsElement(selectedNode);

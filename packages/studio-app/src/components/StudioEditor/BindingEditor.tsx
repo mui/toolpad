@@ -16,7 +16,7 @@ import * as studioDom from '../../studioDom';
 import { NodeId, StudioBoundProp, StudioNodeProps } from '../../types';
 import { ExactEntriesOf } from '../../utils/types';
 import useLatest from '../../utils/useLatest';
-import { useEditorApi, useEditorState } from './EditorProvider';
+import { useEditorApi, usePageEditorState } from './EditorProvider';
 
 export interface BindingEditorContentProps {
   nodeId: NodeId;
@@ -32,7 +32,7 @@ export function AddBindingEditor<P, K extends keyof P & string>({
   node: srcNode,
   prop: srcProp,
 }: BindingEditorTabProps<P, K>) {
-  const state = useEditorState();
+  const state = usePageEditorState();
   const api = useEditorApi();
 
   const srcNodeId = srcNode.id;
@@ -129,7 +129,7 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
   propValue,
 }: RemoveBindingEditorProps<P, K>) {
   const api = useEditorApi();
-  const state = useEditorState();
+  const state = usePageEditorState();
 
   const nodeId = node.id;
   const stateKey = propValue.state;
@@ -180,7 +180,7 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
 }
 
 export function BindingEditorContent({ nodeId, prop }: BindingEditorContentProps) {
-  const state = useEditorState();
+  const state = usePageEditorState();
 
   const node = studioDom.getNode(state.dom, nodeId);
   studioDom.assertIsElement(node);
@@ -195,10 +195,7 @@ export function BindingEditorContent({ nodeId, prop }: BindingEditorContentProps
 }
 
 export default function BindingEditor() {
-  const state = useEditorState();
-  if (state.editorType !== 'page') {
-    throw new Error(`Invariant: BindingEditor used outside of page context`);
-  }
+  const state = usePageEditorState();
   const api = useEditorApi();
   const handleClose = React.useCallback(() => api.closeBindingEditor(), [api]);
   const bindingEditorProps = useLatest(state.bindingEditor);

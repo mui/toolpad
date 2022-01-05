@@ -11,12 +11,12 @@ import {
   Stack,
 } from '@mui/material';
 import React from 'react';
-import { getStudioComponent } from '../../studioComponents';
-import * as studioDom from '../../studioDom';
-import { NodeId, StudioBoundProp, StudioNodeProps } from '../../types';
-import { ExactEntriesOf } from '../../utils/types';
-import useLatest from '../../utils/useLatest';
-import { useEditorApi, usePageEditorState } from './EditorProvider';
+import { getStudioComponent } from '../../../studioComponents';
+import * as studioDom from '../../../studioDom';
+import { NodeId, StudioBoundProp, StudioNodeProps } from '../../../types';
+import { ExactEntriesOf } from '../../../utils/types';
+import useLatest from '../../../utils/useLatest';
+import { useEditorApi, usePageEditorState } from '../EditorProvider';
 
 export interface BindingEditorContentProps {
   nodeId: NodeId;

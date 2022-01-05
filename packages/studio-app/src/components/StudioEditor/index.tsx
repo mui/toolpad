@@ -6,8 +6,6 @@ import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import { createEditorState } from '../../editorState';
 import * as studioDom from '../../studioDom';
 import StudioAppBar from '../StudioAppBar';
-import BindingEditor from './BindingEditor';
-import ComponentPanel from './ComponentPanel';
 import EditorProvider, { useEditorState } from './EditorProvider';
 import PageFileEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
@@ -64,13 +62,7 @@ interface FileEditorProps {
 function FileEditor({ type, className }: FileEditorProps) {
   switch (type) {
     case 'page':
-      return (
-        <React.Fragment>
-          <PageFileEditor className={className} />
-          <ComponentPanel className={classes.componentPanel} />
-          <BindingEditor />
-        </React.Fragment>
-      );
+      return <PageFileEditor className={className} />;
     case 'theme':
       return <ThemeFileEditor className={className} />;
     default:

@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-function getNodeLayout(
+function getNodeViewState(
   fiber: FiberNode,
   viewElm: Element,
   elm: Element,
@@ -28,7 +28,7 @@ function getNodeLayout(
       nodeId,
       rect: getRelativeBoundingBox(viewElm, elm),
       slots: {},
-      props: fiber.memoizedProps ?? {},
+      props: fiber.child?.memoizedProps ?? {},
     };
   }
   return null;
@@ -157,7 +157,7 @@ export function getViewState(containerElm: HTMLElement): ViewState {
     return {};
   }
 
-  const layout: ViewState = {};
+  const viewState: ViewState = {};
 
   const rendererId = 1;
   const nodeElms = new Map<NodeId, Element>();
@@ -174,9 +174,9 @@ export function getViewState(containerElm: HTMLElement): ViewState {
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {
             nodeElms.set(nodeId, elm);
-            const nodeLayout = getNodeLayout(fiber, containerElm, elm, nodeId);
-            if (nodeLayout) {
-              layout[nodeId] = nodeLayout;
+            const nodeViewState = getNodeViewState(fiber, containerElm, elm, nodeId);
+            if (nodeViewState) {
+              viewState[nodeId] = nodeViewState;
             }
           }
         }
@@ -188,8 +188,8 @@ export function getViewState(containerElm: HTMLElement): ViewState {
           const direction = fiber.memoizedProps.direction as FlowDirection | undefined;
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
           const parentElm = nodeElms.get(parentId);
-          const nodeLayout = layout[parentId];
-          if (parentElm && nodeLayout) {
+          const nodeViewState = viewState[parentId];
+          if (parentElm && nodeViewState) {
             if (direction) {
               const items = childfibers
                 .map((childFiber) =>
@@ -203,7 +203,7 @@ export function getViewState(containerElm: HTMLElement): ViewState {
                 name,
                 container: parentElm,
               });
-              nodeLayout.slots[name] = slots;
+              nodeViewState.slots[name] = slots;
             } else {
               const slotContainerElm = devtoolsHook.renderers
                 .get(rendererId)
@@ -214,7 +214,7 @@ export function getViewState(containerElm: HTMLElement): ViewState {
                   name,
                   container: slotContainerElm,
                 });
-                nodeLayout.slots[name] = [slot];
+                nodeViewState.slots[name] = [slot];
               }
             }
           }
@@ -223,5 +223,5 @@ export function getViewState(containerElm: HTMLElement): ViewState {
     }
   });
 
-  return layout;
+  return viewState;
 }

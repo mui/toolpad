@@ -17,7 +17,6 @@ import {
   distanceToRect,
   rectContainsPoint,
 } from '../../utils/geometry';
-import { ExactEntriesOf } from '../../utils/types';
 import { PageEditorState } from '../../editorState';
 import { PinholeOverlay } from '../../PinholeOverlay';
 import { useEditorApi, useEditorState } from './EditorProvider';
@@ -139,15 +138,11 @@ function insertSlotAbsolutePositionCss(slot: SlotLayoutInsert): React.CSSPropert
 }
 
 function findNodeAt(
-  state: PageEditorState,
+  nodes: readonly studioDom.StudioElementNode[],
   viewLayout: ViewLayout,
   x: number,
   y: number,
 ): NodeId | null {
-  const page = studioDom.getNode(state.dom, state.pageNodeId);
-  studioDom.assertIsPage(page);
-  const rootElement = studioDom.getPageRoot(state.dom, page);
-  const nodes = studioDom.elementsByDepth(state.dom, rootElement);
   // Search deepest nested first
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
@@ -164,19 +159,18 @@ function findNodeAt(
  * i.e. Exclude all decendants of the current selection since inserting in one of
  * them would create a cyclic structure.
  */
-function getAvailableNode(
+function getAvailableNodes(
   state: PageEditorState,
 ): readonly (studioDom.StudioElementNode | studioDom.StudioPageNode)[] {
   const page = studioDom.getNode(state.dom, state.pageNodeId);
   studioDom.assertIsPage(page);
-  const rootElement = studioDom.getPageRoot(state.dom, page);
-  const nodes = studioDom.elementsByDepth(state.dom, rootElement);
+  const nodes = studioDom.elementsByDepth(state.dom, page);
   const selection = state.selection && studioDom.getNode(state.dom, state.selection);
   if (selection) {
     studioDom.assertIsElement(selection);
   }
-  const excludedNodes = new Set(
-    selection ? [state.selection, ...studioDom.getDecendants(state.dom, selection)] : [],
+  const excludedNodes = new Set<studioDom.StudioElementNode>(
+    selection ? [selection, ...studioDom.getDecendants(state.dom, selection)] : [],
   );
   return nodes.filter((node) => !excludedNodes.has(node));
 }
@@ -293,6 +287,12 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
   const [isFocused, setIsFocused] = React.useState(false);
 
+  const pageNodes = React.useMemo(() => {
+    const page = studioDom.getNode(state.dom, state.pageNodeId);
+    studioDom.assertIsPage(page);
+    return studioDom.elementsByDepth(state.dom, page);
+  }, [state]);
+
   const handleRender = React.useCallback(() => {
     const rootElm = viewRef.current?.getRootElm();
     if (rootElm) {
@@ -326,16 +326,13 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
 
       event.dataTransfer.dropEffect = 'move';
 
-      const page = studioDom.getNode(state.dom, state.pageNodeId);
-      studioDom.assertIsPage(page);
-
-      const nodeId = findNodeAt(state, viewLayout, cursorPos.x, cursorPos.y);
+      const nodeId = findNodeAt(pageNodes, viewLayout, cursorPos.x, cursorPos.y);
 
       if (nodeId) {
         api.nodeDragStart(nodeId);
       }
     },
-    [api, getViewCoordinates, state, viewLayout],
+    [api, getViewCoordinates, pageNodes, viewLayout],
   );
 
   React.useEffect(() => {
@@ -347,7 +344,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
         return;
       }
 
-      const nodes = getAvailableNode(state);
+      const nodes = getAvailableNodes(state);
       const slotIndex = findActiveSlotAt(nodes, viewLayout, cursorPos.x, cursorPos.y);
 
       const activeSlot =
@@ -375,7 +372,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
         return;
       }
 
-      const nodes = getAvailableNode(state);
+      const nodes = getAvailableNodes(state);
       const slotIndex = findActiveSlotAt(nodes, viewLayout, cursorPos.x, cursorPos.y);
 
       const activeSlot =
@@ -418,10 +415,10 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
         return;
       }
 
-      const selectedNode = findNodeAt(state, viewLayout, cursorPos.x, cursorPos.y);
+      const selectedNode = findNodeAt(pageNodes, viewLayout, cursorPos.x, cursorPos.y);
       api.select(selectedNode);
     },
-    [api, getViewCoordinates, state, viewLayout],
+    [api, getViewCoordinates, pageNodes, viewLayout],
   );
 
   React.useEffect(() => {
@@ -456,6 +453,7 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
     }
   }, []);
   const handleBlur = React.useCallback(() => setIsFocused(false), []);
+
   return (
     <StudioViewEditorRoot
       ref={rootRef}
@@ -481,58 +479,56 @@ export default function StudioViewEditor({ className }: StudioViewEditorProps) {
           // for its children. We can still capture the click gobally
           onClick={handleClick}
         >
-          {(Object.entries(viewLayout) as ExactEntriesOf<ViewLayout>).map(
-            ([nodeId, nodeLayout]) => {
-              if (!nodeLayout) {
-                return null;
-              }
-              const node = studioDom.getNode(state.dom, nodeId);
-              studioDom.assertIsElement(node);
-              return node ? (
-                <React.Fragment key={nodeId}>
-                  <div
-                    draggable
-                    onDragStart={handleDragStart}
-                    style={absolutePositionCss(nodeLayout.rect)}
-                    className={clsx(classes.nodeHud, {
-                      [classes.selected]: state.selection === nodeId,
-                      [classes.allowNodeInteraction]: nodesWithInteraction.has(nodeId),
-                    })}
-                  >
-                    <div className={classes.selectionHint}>{node.component}</div>
-                    {Object.values(nodeLayout.slots).map((nodeSlots = []) =>
-                      nodeSlots.map((slotLayout, index) =>
-                        slotLayout.type === 'insert' ? (
-                          <div
-                            key={`${slotLayout.name}:${slotLayout.index}`}
-                            style={insertSlotAbsolutePositionCss(slotLayout)}
-                            className={clsx(classes.insertSlotHud, {
-                              [classes.active]:
-                                state.highlightedSlot?.nodeId === nodeId &&
-                                state.highlightedSlot?.slot === slotLayout.name &&
-                                state.highlightedSlot?.index === index,
-                            })}
-                          />
-                        ) : (
-                          <div
-                            key={slotLayout.name}
-                            style={absolutePositionCss(slotLayout.rect)}
-                            className={clsx(classes.slotHud, {
-                              [classes.active]:
-                                state.highlightedSlot?.nodeId === nodeId &&
-                                state.highlightedSlot?.slot === slotLayout.name,
-                            })}
-                          >
-                            Insert Here
-                          </div>
-                        ),
+          {pageNodes.map((node) => {
+            const nodeId = node.id;
+            const nodeLayout = viewLayout[nodeId];
+            if (!nodeLayout) {
+              return null;
+            }
+            return node ? (
+              <React.Fragment key={nodeId}>
+                <div
+                  draggable
+                  onDragStart={handleDragStart}
+                  style={absolutePositionCss(nodeLayout.rect)}
+                  className={clsx(classes.nodeHud, {
+                    [classes.selected]: state.selection === nodeId,
+                    [classes.allowNodeInteraction]: nodesWithInteraction.has(nodeId),
+                  })}
+                >
+                  <div className={classes.selectionHint}>{node.component}</div>
+                  {Object.values(nodeLayout.slots).map((nodeSlots = []) =>
+                    nodeSlots.map((slotLayout, index) =>
+                      slotLayout.type === 'insert' ? (
+                        <div
+                          key={`${slotLayout.name}:${slotLayout.index}`}
+                          style={insertSlotAbsolutePositionCss(slotLayout)}
+                          className={clsx(classes.insertSlotHud, {
+                            [classes.active]:
+                              state.highlightedSlot?.nodeId === nodeId &&
+                              state.highlightedSlot?.slot === slotLayout.name &&
+                              state.highlightedSlot?.index === index,
+                          })}
+                        />
+                      ) : (
+                        <div
+                          key={slotLayout.name}
+                          style={absolutePositionCss(slotLayout.rect)}
+                          className={clsx(classes.slotHud, {
+                            [classes.active]:
+                              state.highlightedSlot?.nodeId === nodeId &&
+                              state.highlightedSlot?.slot === slotLayout.name,
+                          })}
+                        >
+                          Insert Here
+                        </div>
                       ),
-                    )}
-                  </div>
-                </React.Fragment>
-              ) : null;
-            },
-          )}
+                    ),
+                  )}
+                </div>
+              </React.Fragment>
+            ) : null;
+          })}
           {/* 
             This overlay allows passing through pointer-events through a pinhole
             This allows interactivity on the selected element only, while maintaining

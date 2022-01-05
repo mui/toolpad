@@ -440,18 +440,24 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
   switch (action.type) {
     case 'SELECT_NODE': {
       if (action.nodeId) {
-        const node = studioDom.getNode(state.dom, action.nodeId);
+        let node = studioDom.getNode(state.dom, action.nodeId);
+        if (studioDom.isElement(node)) {
+          const page = studioDom.getElementPage(state.dom, node);
+          if (page) {
+            node = page;
+          }
+        }
         if (studioDom.isPage(node)) {
           if (state.editorType === 'page' && node.id === state.pageNodeId) {
             return state;
           }
-          return createPageEditorState(state.dom, action.nodeId);
+          return createPageEditorState(state.dom, node.id);
         }
         if (studioDom.isTheme(node)) {
-          return createThemeEditorState(state.dom, action.nodeId);
+          return createThemeEditorState(state.dom, node.id);
         }
-        if (studioDom.isTheme(node)) {
-          return createApiEditorState(state.dom, action.nodeId);
+        if (studioDom.isApi(node)) {
+          return createApiEditorState(state.dom, node.id);
         }
       }
       return state;

@@ -68,6 +68,7 @@ function FileEditor({ type, className }: FileEditorProps) {
         <React.Fragment>
           <PageFileEditor className={className} />
           <ComponentPanel className={classes.componentPanel} />
+          <BindingEditor />
         </React.Fragment>
       );
     case 'theme':
@@ -124,7 +125,6 @@ function EditorContent() {
         <PagePanel className={classes.pagePanel} />
         <FileEditor type={state.editorType} className={classes.renderPanel} />
       </div>
-      <BindingEditor />
       <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>
         <DialogTitle>View Source</DialogTitle>
         <DialogContent>

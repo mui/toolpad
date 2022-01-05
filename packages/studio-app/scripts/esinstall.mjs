@@ -23,6 +23,7 @@ const { stats } = await install(
     '@mui/material/Paper',
     '@mui/material/Button',
     '@mui/material/TextField',
+    '@mui/material/Typography',
   ],
   {
     cwd: path.resolve(dirname, '..'),

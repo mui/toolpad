@@ -13,8 +13,8 @@ export const components = new Map([
   ['Page', { module: '@mui/studio-components', importedName: 'Page' }],
   ['Paper', { module: '@mui/studio-components', importedName: 'Paper' }],
   ['Stack', { module: '@mui/studio-components', importedName: 'Stack' }],
-  ['Text', { module: '@mui/studio-components', importedName: 'Text' }],
   ['TextField', { module: '@mui/studio-components', importedName: 'TextField' }],
+  ['Typography', { module: '@mui/studio-components', importedName: 'Typography' }],
 ]);
 
 export function getStudioComponent(componentName: string): StudioComponentDefinition {

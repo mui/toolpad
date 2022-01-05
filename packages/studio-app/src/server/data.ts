@@ -1,24 +1,27 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { DATA_ROOT } from './db';
-import { createPage } from '../studioPage';
 import {
   StudioConnection,
   StudioConnectionSummary,
-  StudioPage,
-  StudioPageSummary,
   StudioApi,
   ConnectionStatus,
   StudioApiResult,
   StudioApiSummary,
+  NodeId,
 } from '../types';
-import { generateRandomId } from '../utils/randomId';
+import { generateRandomId, generateUniqueId } from '../utils/randomId';
 import studioDataSources from '../studioDataSources/server';
+import { StudioDom } from '../studioDom';
+
+interface StoredstudioDom extends StudioDom {
+  id: 'default';
+}
 
 interface KindObjectMap {
-  page: {
-    full: StudioPage;
-    summary: StudioPageSummary;
+  app: {
+    full: StoredstudioDom;
+    summary: StoredstudioDom;
   };
   connection: {
     full: StudioConnection;
@@ -42,8 +45,8 @@ interface KindUtil<K extends Kind> {
 const kindUtil: {
   [K in Kind]: KindUtil<K>;
 } = {
-  page: {
-    mapToSummary: ({ id }) => ({ id }),
+  app: {
+    mapToSummary: (app) => app,
   },
   connection: {
     mapToSummary: ({ id, type, name }) => ({ id, type, name }),
@@ -144,26 +147,6 @@ async function updateObject<K extends Kind>(
   throw new Error(`Trying to update non-existing ${kind} "${object.id}"`);
 }
 
-export async function pageExists(id: string): Promise<boolean> {
-  return objectExists('page', id);
-}
-
-export async function getPages(): Promise<StudioPageSummary[]> {
-  return getObjectSummaries('page');
-}
-
-export async function addPage(id: string): Promise<StudioPage> {
-  return addObject('page', createPage(id));
-}
-
-export async function getPage(pageId: string): Promise<StudioPage> {
-  return getObject('page', pageId);
-}
-
-export async function updatePage(newPage: Updates<StudioPage>): Promise<StudioPage> {
-  return updateObject('page', newPage);
-}
-
 export async function getConnections(): Promise<StudioConnection[]> {
   return getObjects('connection');
 }
@@ -225,4 +208,91 @@ export async function execApi(api: StudioApi): Promise<StudioApiResult<any>> {
     );
   }
   return dataSource.exec(connection, api.query);
+}
+
+const DEFAULT_THEME_CONTENT = `
+import { createTheme } from '@mui/material/styles';
+import { green, orange } from '@mui/material/colors';
+
+export default createTheme({
+  palette: {
+    primary: {
+      main: orange[500],
+    },
+    secondary: {
+      main: green[500],
+    },
+  },
+});
+`;
+
+function createDefaultApp(): StudioDom {
+  const ids = new Set<NodeId>();
+  const appId = generateUniqueId(ids) as NodeId;
+  ids.add(appId);
+  const themeId = generateUniqueId(ids) as NodeId;
+  ids.add(themeId);
+  const pageId = generateUniqueId(ids) as NodeId;
+  ids.add(pageId);
+  const rootId = generateUniqueId(ids) as NodeId;
+  ids.add(rootId);
+  return {
+    nodes: {
+      [appId]: {
+        id: appId,
+        type: 'app',
+        name: 'App',
+        parentId: null,
+        apis: [],
+        pages: [pageId],
+        theme: themeId,
+      },
+      [themeId]: {
+        id: themeId,
+        type: 'theme',
+        name: 'Theme',
+        parentId: appId,
+        content: DEFAULT_THEME_CONTENT,
+      },
+      [pageId]: {
+        id: pageId,
+        type: 'page',
+        name: 'DefaultPage',
+        parentId: appId,
+        title: 'Default',
+        root: rootId,
+        state: {},
+      },
+      [rootId]: {
+        id: rootId,
+        type: 'element',
+        name: 'Page',
+        parentId: pageId,
+        component: 'Page',
+        children: [],
+        props: {},
+      },
+    },
+    root: appId,
+  };
+}
+
+const APP_ID = 'default';
+
+export async function saveApp(app: StudioDom): Promise<void> {
+  await writeObject('app', {
+    id: APP_ID,
+    ...app,
+  });
+}
+
+export async function loadApp(): Promise<StudioDom> {
+  try {
+    const app = await getObject('app', APP_ID);
+    return app;
+  } catch (err) {
+    const app = createDefaultApp();
+    await saveApp(app);
+    return app;
+  }
 }

@@ -12,11 +12,11 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { getStudioComponent } from '../../studioComponents';
-import { getNode } from '../../studioPage';
-import { NodeId, StudioBoundProp, StudioNode, StudioNodeProps } from '../../types';
+import * as studioDom from '../../studioDom';
+import { NodeId, StudioBoundProp, StudioNodeProps } from '../../types';
 import { ExactEntriesOf } from '../../utils/types';
 import useLatest from '../../utils/useLatest';
-import { useEditorApi, useEditorState } from './EditorProvider';
+import { useEditorApi, usePageEditorState } from './EditorProvider';
 
 export interface BindingEditorContentProps {
   nodeId: NodeId;
@@ -24,7 +24,7 @@ export interface BindingEditorContentProps {
 }
 
 export interface BindingEditorTabProps<P, K extends keyof P & string> {
-  node: StudioNode<P>;
+  node: studioDom.StudioElementNode<P>;
   prop: K;
 }
 
@@ -32,7 +32,7 @@ export function AddBindingEditor<P, K extends keyof P & string>({
   node: srcNode,
   prop: srcProp,
 }: BindingEditorTabProps<P, K>) {
-  const state = useEditorState();
+  const state = usePageEditorState();
   const api = useEditorApi();
 
   const srcNodeId = srcNode.id;
@@ -45,7 +45,12 @@ export function AddBindingEditor<P, K extends keyof P & string>({
   const srcType = srcPropDefinition.type;
 
   const bindableProps = React.useMemo(() => {
-    return Object.values(state.page.nodes).flatMap((destNode) => {
+    const page = studioDom.getElementPage(state.dom, srcNode);
+    if (!page) {
+      return [];
+    }
+    const nodes = studioDom.elementsByDepth(state.dom, page);
+    return nodes.flatMap((destNode) => {
       const destDefinition = getStudioComponent(destNode.component);
 
       return Object.entries(destDefinition.props).flatMap(([destProp]) => {
@@ -66,7 +71,7 @@ export function AddBindingEditor<P, K extends keyof P & string>({
         ];
       });
     });
-  }, [srcNodeId, srcProp, state.page, srcType]);
+  }, [state.dom, srcNode, srcNodeId, srcProp, srcType]);
 
   const [selectedIdx, setSelectedIdx] = React.useState<number | null>(null);
 
@@ -113,7 +118,7 @@ export function AddBindingEditor<P, K extends keyof P & string>({
 }
 
 export interface RemoveBindingEditorProps<P, K extends keyof P & string> {
-  node: StudioNode<P>;
+  node: studioDom.StudioElementNode<P>;
   prop: K;
   propValue: StudioBoundProp;
 }
@@ -124,7 +129,7 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
   propValue,
 }: RemoveBindingEditorProps<P, K>) {
   const api = useEditorApi();
-  const state = useEditorState();
+  const state = usePageEditorState();
 
   const nodeId = node.id;
   const stateKey = propValue.state;
@@ -134,7 +139,12 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
   }, [api, nodeId, prop]);
 
   const boundProps = React.useMemo(() => {
-    return Object.values(state.page.nodes).flatMap((pageNode) =>
+    const page = studioDom.getElementPage(state.dom, node);
+    if (!page) {
+      return [];
+    }
+    const nodes = studioDom.elementsByDepth(state.dom, page);
+    return nodes.flatMap((pageNode) =>
       (Object.entries(pageNode.props) as ExactEntriesOf<StudioNodeProps<any>>).flatMap(
         ([nodeProp, nodePropValue]) => {
           if (nodePropValue?.type === 'binding' && nodePropValue.state === stateKey) {
@@ -144,7 +154,7 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
         },
       ),
     );
-  }, [state.page.nodes, stateKey]);
+  }, [state.dom, node, stateKey]);
 
   return (
     <React.Fragment>
@@ -170,9 +180,10 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
 }
 
 export function BindingEditorContent({ nodeId, prop }: BindingEditorContentProps) {
-  const state = useEditorState();
+  const state = usePageEditorState();
 
-  const node = getNode(state.page, nodeId);
+  const node = studioDom.getNode(state.dom, nodeId);
+  studioDom.assertIsElement(node);
   const propValue = node.props[prop];
   const hasBinding = propValue?.type === 'binding';
 
@@ -184,7 +195,7 @@ export function BindingEditorContent({ nodeId, prop }: BindingEditorContentProps
 }
 
 export default function BindingEditor() {
-  const state = useEditorState();
+  const state = usePageEditorState();
   const api = useEditorApi();
   const handleClose = React.useCallback(() => api.closeBindingEditor(), [api]);
   const bindingEditorProps = useLatest(state.bindingEditor);

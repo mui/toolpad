@@ -2,16 +2,9 @@ import { PropDefinitions, ComponentDefinition } from '@mui/studio-core';
 import { getStudioComponent } from './studioComponents';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
-import { createNode, getNode, setNodeName, setNodeProps } from './studioPage';
-import {
-  NodeId,
-  SlotLocation,
-  StudioNode,
-  StudioNodeProp,
-  StudioNodeProps,
-  StudioPage,
-} from './types';
+import { NodeId, SlotLocation, StudioNodeProp, StudioNodeProps } from './types';
 import { ExactEntriesOf } from './utils/types';
+import * as studioDom from './studioDom';
 
 function getDefaultPropValues<P = {}>(
   definition: ComponentDefinition<P>,
@@ -37,15 +30,33 @@ export interface BindingEditorState {
   readonly prop: string;
 }
 
-export interface EditorState {
-  readonly page: StudioPage;
+export interface BaseEditorState {
+  readonly editorType: 'page' | 'theme' | 'api';
+  readonly dom: studioDom.StudioDom;
+}
+
+export interface ThemeEditorState extends BaseEditorState {
+  readonly editorType: 'theme';
+  readonly themeNodeId: NodeId;
+}
+
+export interface ApiEditorState extends BaseEditorState {
+  readonly editorType: 'api';
+  readonly apiNodeId: NodeId;
+}
+
+export interface PageEditorState extends BaseEditorState {
+  readonly editorType: 'page';
+  readonly pageNodeId: NodeId;
   readonly selection: NodeId | null;
   readonly componentPanelTab: ComponentPanelTab;
-  readonly newNode: StudioNode | null;
+  readonly newNode: studioDom.StudioNode | null;
   readonly bindingEditor: BindingEditorState | null;
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
 }
+
+export type EditorState = PageEditorState | ThemeEditorState | ApiEditorState;
 
 export type EditorAction =
   | {
@@ -119,18 +130,19 @@ export type EditorAction =
       prop: string;
     };
 
-function removeNode(page: StudioPage, nodeId: NodeId): StudioPage {
-  const node = getNode(page, nodeId);
+function removeNode(
+  dom: studioDom.StudioDom,
+  node: studioDom.StudioElementNode,
+): studioDom.StudioDom {
+  const parent = studioDom.getParent(dom, node);
 
-  if (!node.parentId) {
-    return page;
+  if (!parent || studioDom.isPage(parent)) {
+    throw new Error(`Invariant: Node: "${node.id}" can not be removed`);
   }
 
-  const parent = getNode(page, node.parentId);
-
-  return update(page, {
+  return update(dom, {
     nodes: omit(
-      update(page.nodes, {
+      update(dom.nodes, {
         [parent.id]: update(parent, {
           children: parent.children.filter((slot) => slot !== node.id),
         }),
@@ -140,25 +152,80 @@ function removeNode(page: StudioPage, nodeId: NodeId): StudioPage {
   });
 }
 
-export function editorReducer(state: EditorState, action: EditorAction): EditorState {
+export function createThemeEditorState(
+  dom: studioDom.StudioDom,
+  themeNodeId: NodeId,
+): ThemeEditorState {
+  return {
+    editorType: 'theme',
+    dom,
+    themeNodeId,
+  };
+}
+
+export function createApiEditorState(dom: studioDom.StudioDom, apiNodeId: NodeId): ApiEditorState {
+  return {
+    editorType: 'api',
+    dom,
+    apiNodeId,
+  };
+}
+
+export function createPageEditorState(
+  dom: studioDom.StudioDom,
+  pageNodeId: NodeId,
+): PageEditorState {
+  return {
+    editorType: 'page',
+    dom,
+    pageNodeId,
+    selection: null,
+    componentPanelTab: 'catalog',
+    newNode: null,
+    bindingEditor: null,
+    highlightLayout: false,
+    highlightedSlot: null,
+  };
+}
+
+export function createEditorState(dom: studioDom.StudioDom): EditorState {
+  const pageNodeId = studioDom.getApp(dom).pages[0];
+  return createPageEditorState(dom, pageNodeId);
+}
+
+export function pageEditorReducer(state: PageEditorState, action: EditorAction): EditorState {
   switch (action.type) {
     case 'NOOP':
       return state;
-    case 'SELECT_NODE':
+    case 'SELECT_NODE': {
+      if (action.nodeId) {
+        const node = studioDom.getNode(state.dom, action.nodeId);
+        if (studioDom.isElement(node)) {
+          return update(state, {
+            selection: node.id,
+            componentPanelTab: 'component',
+          });
+        }
+        return state;
+      }
       return update(state, {
-        selection: action.nodeId || null,
+        selection: null,
         componentPanelTab: 'component',
       });
-    case 'SET_NODE_NAME':
+    }
+    case 'SET_NODE_NAME': {
+      const node = studioDom.getNode(state.dom, action.nodeId);
       return update(state, {
-        page: setNodeName(state.page, action.nodeId, action.name),
+        dom: studioDom.setNodeName(state.dom, node, action.name),
       });
+    }
     case 'SET_NODE_PROP': {
-      const node = getNode(state.page, action.nodeId);
+      const node = studioDom.getNode(state.dom, action.nodeId);
+      studioDom.assertIsElement(node);
       return update(state, {
-        page: setNodeProps(
-          state.page,
-          action.nodeId,
+        dom: studioDom.setNodeProps(
+          state.dom,
+          node,
           update(node.props, {
             [action.prop]: action.value,
           }),
@@ -166,8 +233,10 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       });
     }
     case 'SET_NODE_PROPS': {
+      const node = studioDom.getNode(state.dom, action.nodeId);
+      studioDom.assertIsElement(node);
       return update(state, {
-        page: setNodeProps(state.page, action.nodeId, action.props),
+        dom: studioDom.setNodeProps(state.dom, node, action.props),
       });
     }
     case 'SET_COMPONENT_PANEL_TAB':
@@ -184,10 +253,13 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         return state;
       }
 
+      const node = studioDom.getNode(state.dom, state.selection);
+      studioDom.assertIsElement(node);
+
       // TODO: also clean up orphaned state and bindings
       return update(state, {
         selection: null,
-        page: removeNode(state.page, state.selection),
+        dom: removeNode(state.dom, node),
       });
     }
     case 'ADD_COMPONENT_DRAG_START': {
@@ -195,7 +267,11 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         return state;
       }
       const componentDef = getStudioComponent(action.component);
-      const newNode = createNode(state.page, action.component, getDefaultPropValues(componentDef));
+      const newNode = studioDom.createElement(
+        state.dom,
+        action.component,
+        getDefaultPropValues(componentDef),
+      );
       return update(state, {
         selection: null,
         newNode,
@@ -214,13 +290,19 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       });
     }
     case 'ADD_COMPONENT_DROP': {
-      let { newNode, page } = state;
+      let { newNode, dom } = state;
       let indexOffset = 0;
 
       if (!newNode && state.selection) {
-        newNode = getNode(page, state.selection);
-        if (newNode.parentId === action.location?.nodeId) {
-          const parent = getNode(page, newNode.parentId);
+        const selection = studioDom.getNode(dom, state.selection);
+        studioDom.assertIsElement(selection);
+        newNode = selection;
+        if (newNode && newNode.parentId === action.location?.nodeId) {
+          const parent = studioDom.getNode(dom, newNode.parentId);
+          if (!studioDom.isElement(parent)) {
+            throw new Error(`Invariant: Inavlid node type in drop parent "${parent.type}"`);
+          }
+
           // The following removal will reduce the children, so we adjust the index
           // if we're moving a node down within the same parent.
           const siblings = parent.children;
@@ -229,7 +311,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
             indexOffset = -1;
           }
         }
-        page = removeNode(page, state.selection);
+        dom = removeNode(dom, selection);
       }
 
       if (!action.location || !newNode) {
@@ -241,13 +323,16 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       }
 
       const { nodeId, index } = action.location;
-      const node = getNode(page, nodeId);
+      const node = studioDom.getNode(dom, nodeId);
+      if (!studioDom.isElement(node)) {
+        throw new Error(`Invariant: Inavlid node type in drop parent "${node.type}"`);
+      }
 
       const sliceIndex = index + indexOffset;
 
       return update(state, {
-        page: update(page, {
-          nodes: update(page.nodes, {
+        dom: update(dom, {
+          nodes: update(dom.nodes, {
             [node.id]: update(node, {
               children: [
                 ...node.children.slice(0, sliceIndex),
@@ -277,23 +362,30 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     }
     case 'ADD_BINDING': {
       const { srcNodeId, srcProp, destNodeId, destProp, initialValue } = action;
-      const srcNode = getNode(state.page, srcNodeId);
-      const destNode = getNode(state.page, destNodeId);
+      const srcNode = studioDom.getNode(state.dom, srcNodeId);
+      studioDom.assertIsElement(srcNode);
+      const destNode = studioDom.getNode(state.dom, destNodeId);
+      studioDom.assertIsElement(destNode);
       const destPropValue = destNode.props[destProp];
       let stateKey = destPropValue?.type === 'binding' ? destPropValue.state : null;
 
-      let pageState = state.page.state;
+      const page = studioDom.getNode(state.dom, state.pageNodeId);
+      studioDom.assertIsPage(page);
+
+      let pageState = page.state;
       if (!stateKey) {
-        stateKey = generateUniqueId(new Set(Object.keys(state.page.state)));
+        stateKey = generateUniqueId(new Set(Object.keys(page.state)));
         pageState = update(pageState, {
           [stateKey]: { name: '', initialValue },
         });
       }
 
       return update(state, {
-        page: update(state.page, {
-          state: pageState,
-          nodes: update(state.page.nodes, {
+        dom: update(state.dom, {
+          nodes: update(state.dom.nodes, {
+            [page.id]: update(page, {
+              state: pageState,
+            }),
             [srcNodeId]: update(srcNode, {
               props: update(srcNode.props, {
                 [srcProp]: { type: 'binding', state: stateKey },
@@ -311,12 +403,13 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case 'REMOVE_BINDING': {
       const { nodeId, prop } = action;
 
-      const node = getNode(state.page, nodeId);
+      const node = studioDom.getNode(state.dom, nodeId);
+      studioDom.assertIsElement(node);
 
       // TODO: also clean up orphaned state and bindings
       return update(state, {
-        page: update(state.page, {
-          nodes: update(state.page.nodes, {
+        dom: update(state.dom, {
+          nodes: update(state.dom.nodes, {
             [nodeId]: update(node, {
               props: omit(node.props, prop),
             }),
@@ -329,14 +422,62 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
   }
 }
 
-export function createEditorState(page: StudioPage): EditorState {
-  return {
-    page,
-    selection: null,
-    componentPanelTab: 'catalog',
-    newNode: null,
-    bindingEditor: null,
-    highlightLayout: false,
-    highlightedSlot: null,
-  };
+export function themeEditorReducer(state: ThemeEditorState, action: EditorAction): EditorState {
+  switch (action.type) {
+    default:
+      return state;
+  }
+}
+
+export function apiEditorReducer(state: ApiEditorState, action: EditorAction): EditorState {
+  switch (action.type) {
+    default:
+      return state;
+  }
+}
+
+export function baseEditorReducer(state: EditorState, action: EditorAction): EditorState {
+  switch (action.type) {
+    case 'SELECT_NODE': {
+      if (action.nodeId) {
+        let node = studioDom.getNode(state.dom, action.nodeId);
+        if (studioDom.isElement(node)) {
+          const page = studioDom.getElementPage(state.dom, node);
+          if (page) {
+            node = page;
+          }
+        }
+        if (studioDom.isPage(node)) {
+          if (state.editorType === 'page' && node.id === state.pageNodeId) {
+            return state;
+          }
+          return createPageEditorState(state.dom, node.id);
+        }
+        if (studioDom.isTheme(node)) {
+          return createThemeEditorState(state.dom, node.id);
+        }
+        if (studioDom.isApi(node)) {
+          return createApiEditorState(state.dom, node.id);
+        }
+      }
+      return state;
+    }
+    default:
+      return state;
+  }
+}
+
+export function editorReducer(state: EditorState, action: EditorAction): EditorState {
+  state = baseEditorReducer(state, action);
+
+  switch (state.editorType) {
+    case 'page':
+      return pageEditorReducer(state, action);
+    case 'theme':
+      return themeEditorReducer(state, action);
+    case 'api':
+      return apiEditorReducer(state, action);
+    default:
+      return state;
+  }
 }

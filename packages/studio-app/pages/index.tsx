@@ -1,38 +1,36 @@
 import type { NextPage } from 'next';
 import * as React from 'react';
-import { Button, Container, TextField } from '@mui/material';
+import { Button, Container, List, ListItem, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import StudioAppBar from '../src/components/StudioAppBar';
+import { NextLinkComposed } from '../src/components/Link';
 import client from '../src/api';
+import * as studioDom from '../src/studioDom';
 
 const Home: NextPage = () => {
   const router = useRouter();
 
-  const [pageId, setPageId] = React.useState('');
-  const [error, setError] = React.useState('');
+  const domQuery = client.useQuery('loadApp', [], {
+    enabled: router.isReady,
+  });
 
-  const handleCreateClick = React.useCallback(async () => {
-    try {
-      await client.mutation.addPage(pageId);
-      router.push(`/_studio/editor/${pageId}`);
-    } catch (err: any) {
-      setError(err.message);
-    }
-  }, [pageId, router]);
+  const app = domQuery.data && studioDom.getApp(domQuery.data);
+  const pages = app ? studioDom.getPages(domQuery.data, app) : [];
 
   return (
     <React.Fragment>
       <StudioAppBar actions={null} />
       <Container>
-        <TextField
-          label="page name"
-          value={pageId}
-          onChange={(event) => setPageId(event.target.value)}
-          error={!!error}
-          helperText={error}
-        />
-        <Button disabled={!pageId} onClick={handleCreateClick}>
-          Create
+        <Typography variant="h4">Pages</Typography>
+        <List>
+          {pages.map((page) => (
+            <ListItem key={page.id} button component={NextLinkComposed} to={`/pages/${page.id}`}>
+              {page.title}
+            </ListItem>
+          ))}
+        </List>
+        <Button component={NextLinkComposed} to="/_studio/editor">
+          Editor
         </Button>
       </Container>
     </React.Fragment>

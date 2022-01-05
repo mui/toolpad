@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { StudioPage } from '../../types';
+import { NodeId } from '../../types';
+import * as studioDom from '../../studioDom';
 import renderPageAsCode from '../../renderPageAsCode';
 import StudioSandbox, { StudioSandboxHandle } from '../StudioSandbox';
 import getImportMap from '../../getImportMap';
@@ -8,22 +9,6 @@ import getImportMap from '../../getImportMap';
 const PageViewRoot = styled('div')({
   overflow: 'auto',
 });
-
-const theme = `
-import { createTheme } from '@mui/material/styles';
-import { green, orange } from '@mui/material/colors';
-
-export default createTheme({
-  palette: {
-    primary: {
-      main: orange[500],
-    },
-    secondary: {
-      main: green[500],
-    },
-  },
-})
-`;
 
 const appIndex = `
 import * as React from 'react';
@@ -74,11 +59,12 @@ export interface PageViewProps {
   className?: string;
   // Callback for when the view has rendered. Make sure this value is stable
   onUpdate?: () => void;
-  page: StudioPage;
+  dom: studioDom.StudioDom;
+  pageNodeId: NodeId;
 }
 
 export default React.forwardRef(function PageView(
-  { className, page, onUpdate }: PageViewProps,
+  { className, dom, pageNodeId, onUpdate }: PageViewProps,
   ref: React.ForwardedRef<PageViewHandle>,
 ) {
   const frameRef = React.useRef<StudioSandboxHandle>(null);
@@ -89,11 +75,14 @@ export default React.forwardRef(function PageView(
     },
   }));
 
+  const app = studioDom.getApp(dom);
+  const theme = studioDom.getTheme(dom, app);
+
   const renderedPage = React.useMemo(() => {
-    return renderPageAsCode(page, {
+    return renderPageAsCode(dom, pageNodeId, {
       editor: true,
     });
-  }, [page]);
+  }, [dom, pageNodeId]);
 
   return (
     <PageViewRoot className={className}>
@@ -103,7 +92,7 @@ export default React.forwardRef(function PageView(
         base="/app/1234"
         importMap={getImportMap()}
         files={{
-          '/lib/theme.js': { code: theme },
+          '/lib/theme.js': { code: theme.content },
           '/index.js': { code: appIndex },
           '/page.js': { code: renderedPage.code },
         }}

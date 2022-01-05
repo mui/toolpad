@@ -189,7 +189,7 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
                 .map((childFiber) =>
                   devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(childFiber),
                 )
-                .filter(Boolean) as Element[];
+                .filter(Boolean);
               const slots = getInsertSlots({
                 nodeElm: parentElm,
                 items,
@@ -199,14 +199,14 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
               });
               nodeLayout.slots[name] = slots;
             } else {
-              const nodeElm = devtoolsHook.renderers
+              const slotContainerElm = devtoolsHook.renderers
                 .get(rendererId)
                 ?.findHostInstanceByFiber(fiber);
-              if (nodeElm) {
+              if (slotContainerElm) {
                 const slot = getSlot({
-                  nodeElm,
+                  nodeElm: parentElm,
                   name,
-                  container: nodeElm,
+                  container: slotContainerElm,
                 });
                 nodeLayout.slots[name] = [slot];
               }

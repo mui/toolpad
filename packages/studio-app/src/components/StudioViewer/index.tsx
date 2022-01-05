@@ -1,10 +1,11 @@
 import { IconButton, styled } from '@mui/material';
 import React from 'react';
 import EditIcon from '@mui/icons-material/Edit';
-import { StudioPage } from '../../types';
+import * as studioDom from '../../studioDom';
 import StudioAppBar from '../StudioAppBar';
 import PageView from '../PageView';
 import { NextLinkComposed } from '../Link';
+import { NodeId } from '../../types';
 
 const classes = {
   content: 'StudioContent',
@@ -23,26 +24,23 @@ const ViewerRoot = styled('div')({
 });
 
 export interface ViewerProps {
-  page: StudioPage;
+  dom: studioDom.StudioDom;
+  pageNodeId: NodeId;
 }
 
-export default function Viewer({ page }: ViewerProps) {
+export default function Viewer({ dom, pageNodeId }: ViewerProps) {
   return (
     <ViewerRoot>
       <StudioAppBar
         actions={
-          <IconButton
-            color="inherit"
-            component={NextLinkComposed}
-            to={`/_studio/editor/${page.id}`}
-          >
+          <IconButton color="inherit" component={NextLinkComposed} to={`/_studio/editor`}>
             <EditIcon />
           </IconButton>
         }
       />
       <div className={classes.content}>
         <React.Fragment>
-          <PageView page={page} />
+          <PageView dom={dom} pageNodeId={pageNodeId} />
         </React.Fragment>
       </div>
     </ViewerRoot>

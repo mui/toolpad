@@ -1,8 +1,8 @@
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
-import { StudioPage, NodeId, StudioNode } from './types';
-import { getNode } from './studioPage';
 import { getStudioComponent } from './studioComponents';
+import * as studioDom from './studioDom';
+import { NodeId } from './types';
 
 export interface RenderPageConfig {
   // whether we're in the context of an editor
@@ -17,7 +17,9 @@ interface Import {
 }
 
 class Context {
-  private page: StudioPage;
+  private dom: studioDom.StudioDom;
+
+  private page: studioDom.StudioPageNode;
 
   private editor: boolean;
 
@@ -45,7 +47,12 @@ class Context {
 
   private dataLoaders: string[] = [];
 
-  constructor(page: StudioPage, { editor }: RenderPageConfig) {
+  constructor(
+    dom: studioDom.StudioDom,
+    page: studioDom.StudioPageNode,
+    { editor }: RenderPageConfig,
+  ) {
+    this.dom = dom;
     this.page = page;
     this.editor = editor;
   }
@@ -56,7 +63,7 @@ class Context {
   }
 
   // resolve props to expressions
-  resolveProps(node: StudioNode): Record<string, string> {
+  resolveProps(node: studioDom.StudioElementNode): Record<string, string> {
     const result: Record<string, string> = {};
     const component = getStudioComponent(node.component);
     Object.entries(node.props).forEach(([propName, propValue]) => {
@@ -65,19 +72,7 @@ class Context {
         return;
       }
 
-      if (propDefinition.type === 'Node') {
-        if (propValue.type !== 'const') {
-          throw new Error(`TODO: make this work for bindings`);
-        }
-        result[propName] = this.renderNode(propValue.value as NodeId);
-      } else if (propDefinition.type === 'Nodes') {
-        if (propValue.type !== 'const') {
-          throw new Error(`TODO: make this work for bindings`);
-        }
-        result[propName] = (propValue.value as NodeId[])
-          .map((nodeId) => this.renderNode(nodeId))
-          .join('\n');
-      } else if (propDefinition.type === 'DataQuery') {
+      if (propDefinition.type === 'DataQuery') {
         if (propValue.type !== 'const') {
           throw new Error(`TODO: make this work for bindings`);
         }
@@ -108,11 +103,18 @@ class Context {
     return result;
   }
 
-  renderNode(nodeId: NodeId): string {
-    const node = getNode(this.page, nodeId);
+  renderPage(page: studioDom.StudioPageNode): string {
+    const rootNode = studioDom.getPageRoot(this.dom, page);
+    return this.renderNode(rootNode);
+  }
+
+  renderNode(node: studioDom.StudioElementNode): string {
     const component = getStudioComponent(node.component);
     const props = this.resolveProps(node);
-    const renderedChildren = node.children.map((childId) => this.renderNode(childId)).join('\n');
+    const renderedChildren = studioDom
+      .getChildren(this.dom, node)
+      .map((child) => this.renderNode(child))
+      .join('\n');
     const rendered = `
       <${component.importedName} ${this.renderProps(props)}>
         ${renderedChildren}
@@ -209,7 +211,8 @@ class Context {
 }
 
 export default function renderPageAsCode(
-  page: StudioPage,
+  dom: studioDom.StudioDom,
+  pageNodeId: NodeId,
   configInit: Partial<RenderPageConfig> = {},
 ) {
   const config: RenderPageConfig = {
@@ -218,8 +221,10 @@ export default function renderPageAsCode(
     ...configInit,
   };
 
-  const ctx = new Context(page, config);
-  const root = ctx.renderNode(page.root);
+  const page = studioDom.getNode(dom, pageNodeId);
+  studioDom.assertIsPage(page);
+  const ctx = new Context(dom, page, config);
+  const root = ctx.renderPage(page);
 
   let code: string = `
     ${ctx.renderImports()}

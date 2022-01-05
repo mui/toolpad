@@ -57,10 +57,10 @@ function WrappedStudioNodeInternal({
   let newProps: { [key: string]: unknown } | undefined;
 
   if (definition) {
-    Object.entries(child.props).forEach(([name, value]) => {
-      const propDef = definition.props[name];
+    Object.entries(definition.props).forEach(([name, propDef]) => {
+      const value = child.props[name];
       if (propDef?.type === 'slots') {
-        const valueAsArray = React.Children.toArray(value as any);
+        const valueAsArray = React.Children.toArray(value);
         newProps = newProps ?? {};
         newProps[name] =
           valueAsArray.length > 0 ? (
@@ -75,7 +75,7 @@ function WrappedStudioNodeInternal({
             <PlaceHolder {...{ [RUNTIME_PROP_STUDIO_SLOTS]: name }} parentId={studioNodeId} />
           );
       } else if (propDef?.type === 'slot') {
-        const valueAsArray = React.Children.toArray(value as any);
+        const valueAsArray = React.Children.toArray(value);
         if (valueAsArray.length <= 0) {
           newProps = newProps ?? {};
           newProps[name] = (

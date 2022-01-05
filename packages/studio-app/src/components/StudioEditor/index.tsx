@@ -3,18 +3,18 @@ import * as React from 'react';
 import SaveIcon from '@mui/icons-material/Save';
 import CodeIcon from '@mui/icons-material/Code';
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import { useRouter } from 'next/router';
 import { createEditorState } from '../../editorState';
-import { StudioPage } from '../../types';
+import * as studioDom from '../../studioDom';
 import StudioAppBar from '../StudioAppBar';
 import BindingEditor from './BindingEditor';
 import ComponentPanel from './ComponentPanel';
 import EditorProvider, { useEditorState } from './EditorProvider';
-import StudioViewEditor from './StudioViewEditor';
+import PageFileEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
 import renderPageAsCode from '../../renderPageAsCode';
 import useLatest from '../../utils/useLatest';
 import client from '../../api';
+import ThemeFileEditor from './ThemeFileEditor';
 
 const classes = {
   content: 'StudioContent',
@@ -48,25 +48,58 @@ const EditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
+interface ToDoEditorProps {
+  className?: string;
+}
+
+function ToDoFileEditor({ className }: ToDoEditorProps) {
+  return <div className={className}>To Do</div>;
+}
+
+interface FileEditorProps {
+  className?: string;
+  type: 'page' | 'api' | 'theme';
+}
+
+function FileEditor({ type, className }: FileEditorProps) {
+  switch (type) {
+    case 'page':
+      return (
+        <React.Fragment>
+          <PageFileEditor className={className} />
+          <ComponentPanel className={classes.componentPanel} />
+        </React.Fragment>
+      );
+    case 'theme':
+      return <ThemeFileEditor className={className} />;
+    default:
+      return <ToDoFileEditor className={className} />;
+  }
+}
+
 function EditorContent() {
   const state = useEditorState();
-  const router = useRouter();
 
   const [viewedSource, setViewedSource] = React.useState<string | null>(null);
 
   const handleSave = React.useCallback(async () => {
     try {
-      await client.mutation.updatePage(state.page);
-      router.push(`/${state.page.id}`);
+      await client.mutation.saveApp(state.dom);
     } catch (err: any) {
       alert(err.message);
     }
-  }, [router, state.page]);
+  }, [state.dom]);
 
   const handleViewSource = React.useCallback(() => {
-    const { code } = renderPageAsCode(state.page, { pretty: true });
+    if (state.editorType !== 'page') {
+      setViewedSource(`
+      // not yet supported
+      `);
+      return;
+    }
+    const { code } = renderPageAsCode(state.dom, state.pageNodeId, { pretty: true });
     setViewedSource(code);
-  }, [state.page]);
+  }, [state]);
 
   const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
 
@@ -89,8 +122,7 @@ function EditorContent() {
       />
       <div className={classes.content}>
         <PagePanel className={classes.pagePanel} />
-        <StudioViewEditor className={classes.renderPanel} />
-        <ComponentPanel className={classes.componentPanel} />
+        <FileEditor type={state.editorType} className={classes.renderPanel} />
       </div>
       <BindingEditor />
       <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>
@@ -104,11 +136,11 @@ function EditorContent() {
 }
 
 interface EditorProps {
-  page: StudioPage;
+  dom: studioDom.StudioDom;
 }
 
-export default function Editor({ page }: EditorProps) {
-  const initialState = React.useMemo(() => createEditorState(page), [page]);
+export default function Editor({ dom }: EditorProps) {
+  const initialState = React.useMemo(() => createEditorState(dom), [dom]);
   return (
     <EditorRoot>
       <EditorProvider initialState={initialState}>

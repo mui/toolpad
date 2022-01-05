@@ -4,11 +4,10 @@ import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { PropDefinition, PropDefinitions } from '@mui/studio-core';
 import { getStudioComponent } from '../../studioComponents';
-import { StudioNode } from '../../types';
-import { getNode } from '../../studioPage';
 import propTypes from '../../studioPropTypes';
-import { useEditorApi, useEditorState } from './EditorProvider';
+import { useEditorApi, usePageEditorState } from './EditorProvider';
 import { ExactEntriesOf } from '../../utils/types';
+import * as studioDom from '../../studioDom';
 
 const classes = {
   control: 'StudioControl',
@@ -22,7 +21,7 @@ const ComponentPropsEditorRoot = styled('div')(({ theme }) => ({
 
 interface ComponentPropEditorProps<P, K extends keyof P> {
   name: K;
-  node: StudioNode<P>;
+  node: studioDom.StudioElementNode<P>;
   prop: PropDefinition<K, P>;
 }
 
@@ -91,7 +90,7 @@ function ComponentPropEditor<P, K extends keyof P & string>({
 }
 
 interface ComponentPropsEditorProps<P> {
-  node: StudioNode<P>;
+  node: studioDom.StudioElementNode<P>;
 }
 
 function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
@@ -112,7 +111,7 @@ function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
 }
 
 interface SelectedNodeEditorProps {
-  node: StudioNode;
+  node: studioDom.StudioElementNode;
 }
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
@@ -162,9 +161,13 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const state = useEditorState();
+  const state = usePageEditorState();
 
-  const selectedNode = state.selection ? getNode(state.page, state.selection) : null;
+  const selectedNode = state.selection ? studioDom.getNode(state.dom, state.selection) : null;
+
+  if (selectedNode) {
+    studioDom.assertIsElement(selectedNode);
+  }
 
   return (
     <div className={className}>

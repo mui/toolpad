@@ -26,6 +26,9 @@ export interface ComponentPanelProps {
 
 export default function ComponentPanel({ className }: ComponentPanelProps) {
   const state = useEditorState();
+  if (state.editorType !== 'page') {
+    throw new Error(`Invariant: ComponentPanel used outside of page context`);
+  }
   const api = useEditorApi();
 
   const handleChange = (event: React.SyntheticEvent, newValue: ComponentPanelTab) =>

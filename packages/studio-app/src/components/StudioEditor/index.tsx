@@ -9,11 +9,12 @@ import StudioAppBar from '../StudioAppBar';
 import BindingEditor from './BindingEditor';
 import ComponentPanel from './ComponentPanel';
 import EditorProvider, { useEditorState } from './EditorProvider';
-import StudioViewEditor from './StudioViewEditor';
+import PageFileEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
 import renderPageAsCode from '../../renderPageAsCode';
 import useLatest from '../../utils/useLatest';
 import client from '../../api';
+import ThemeFileEditor from './ThemeFileEditor';
 
 const classes = {
   content: 'StudioContent',
@@ -65,10 +66,12 @@ function FileEditor({ type, className }: FileEditorProps) {
     case 'page':
       return (
         <React.Fragment>
-          <StudioViewEditor className={className} />
+          <PageFileEditor className={className} />
           <ComponentPanel className={classes.componentPanel} />
         </React.Fragment>
       );
+    case 'theme':
+      return <ThemeFileEditor className={className} />;
     default:
       return <ToDoFileEditor className={className} />;
   }

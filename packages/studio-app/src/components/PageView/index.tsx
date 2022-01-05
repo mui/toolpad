@@ -10,22 +10,6 @@ const PageViewRoot = styled('div')({
   overflow: 'auto',
 });
 
-const theme = `
-import { createTheme } from '@mui/material/styles';
-import { green, orange } from '@mui/material/colors';
-
-export default createTheme({
-  palette: {
-    primary: {
-      main: orange[500],
-    },
-    secondary: {
-      main: green[500],
-    },
-  },
-})
-`;
-
 const appIndex = `
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -91,6 +75,9 @@ export default React.forwardRef(function PageView(
     },
   }));
 
+  const app = studioDom.getApp(dom);
+  const theme = studioDom.getTheme(dom, app);
+
   const renderedPage = React.useMemo(() => {
     return renderPageAsCode(dom, pageNodeId, {
       editor: true,
@@ -105,7 +92,7 @@ export default React.forwardRef(function PageView(
         base="/app/1234"
         importMap={getImportMap()}
         files={{
-          '/lib/theme.js': { code: theme },
+          '/lib/theme.js': { code: theme.content },
           '/index.js': { code: appIndex },
           '/page.js': { code: renderedPage.code },
         }}

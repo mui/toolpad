@@ -268,11 +268,11 @@ function findActiveSlotAt(
   return null;
 }
 
-export interface StudioViewEditorProps {
+export interface PageFileEditorProps {
   className?: string;
 }
 
-export default function StudioViewEditor({ className }: StudioViewEditorProps) {
+export default function PageFileEditor({ className }: PageFileEditorProps) {
   const state = useEditorState();
   const api = useEditorApi();
 

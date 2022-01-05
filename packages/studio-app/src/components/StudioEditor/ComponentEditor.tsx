@@ -23,12 +23,14 @@ interface ComponentPropEditorProps<P, K extends keyof P> {
   name: K;
   node: studioDom.StudioElementNode<P>;
   prop: PropDefinition<K, P>;
+  actualValue: unknown;
 }
 
 function ComponentPropEditor<P, K extends keyof P & string>({
   name,
   node,
   prop,
+  actualValue,
 }: ComponentPropEditorProps<P, K>) {
   const api = useEditorApi();
 
@@ -50,8 +52,8 @@ function ComponentPropEditor<P, K extends keyof P & string>({
     if (propValue?.type === 'const') {
       return propValue.value;
     }
-    return prop.defaultValue;
-  }, [prop.defaultValue, propValue]);
+    return actualValue;
+  }, [actualValue, propValue]);
 
   const [value, setValue] = React.useState(initPropValue);
 
@@ -91,9 +93,10 @@ function ComponentPropEditor<P, K extends keyof P & string>({
 
 interface ComponentPropsEditorProps<P> {
   node: studioDom.StudioElementNode<P>;
+  actualValues: { [key: string]: unknown };
 }
 
-function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
+function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorProps<P>) {
   const definition = getStudioComponent(node.component);
 
   return (
@@ -102,7 +105,12 @@ function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
         ([propName, prop]) =>
           typeof propName === 'string' && prop ? (
             <div key={propName} className={classes.control}>
-              <ComponentPropEditor name={propName} prop={prop} node={node} />
+              <ComponentPropEditor
+                name={propName}
+                prop={prop}
+                node={node}
+                actualValue={actualValues[propName]}
+              />
             </div>
           ) : null,
       )}
@@ -114,8 +122,12 @@ interface SelectedNodeEditorProps {
   node: studioDom.StudioElementNode;
 }
 
+const DEFAULT_ACTUAL_VALUES = {};
+
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const api = useEditorApi();
+  const { viewState } = usePageEditorState();
+  const actualValues = viewState[node.id]?.props ?? DEFAULT_ACTUAL_VALUES;
 
   const [nameInput, setNameInput] = React.useState(node.name);
 
@@ -151,7 +163,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         onKeyPress={handleKeyPress}
       />
       <div>props:</div>
-      {node ? <ComponentPropsEditor node={node} /> : null}
+      {node ? <ComponentPropsEditor node={node} actualValues={actualValues} /> : null}
     </React.Fragment>
   );
 }
@@ -161,9 +173,9 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const state = usePageEditorState();
+  const { dom, selection } = usePageEditorState();
 
-  const selectedNode = state.selection ? studioDom.getNode(state.dom, state.selection) : null;
+  const selectedNode = selection ? studioDom.getNode(dom, selection) : null;
 
   if (selectedNode) {
     studioDom.assertIsElement(selectedNode);

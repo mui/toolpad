@@ -8,7 +8,7 @@ import {
   PageEditorState,
   ThemeEditorState,
 } from '../../editorState';
-import { NodeId, SlotLocation, StudioNodeProp, StudioNodeProps } from '../../types';
+import { NodeId, SlotLocation, StudioNodeProp, StudioNodeProps, ViewState } from '../../types';
 
 const EditorStateContext = React.createContext<EditorState | null>(null);
 
@@ -77,6 +77,12 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
         type: 'REMOVE_BINDING',
         nodeId,
         prop,
+      });
+    },
+    pageViewStateUpdate(viewState: ViewState) {
+      dispatch({
+        type: 'PAGE_VIEW_STATE_UPDATE',
+        viewState,
       });
     },
   };

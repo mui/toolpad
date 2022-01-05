@@ -2,7 +2,7 @@ import { PropDefinitions, ComponentDefinition } from '@mui/studio-core';
 import { getStudioComponent } from './studioComponents';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
-import { NodeId, SlotLocation, StudioNodeProp, StudioNodeProps } from './types';
+import { NodeId, SlotLocation, StudioNodeProp, StudioNodeProps, ViewState } from './types';
 import { ExactEntriesOf } from './utils/types';
 import * as studioDom from './studioDom';
 
@@ -54,6 +54,7 @@ export interface PageEditorState extends BaseEditorState {
   readonly bindingEditor: BindingEditorState | null;
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
+  readonly viewState: ViewState;
 }
 
 export type EditorState = PageEditorState | ThemeEditorState | ApiEditorState;
@@ -128,6 +129,10 @@ export type EditorAction =
       type: 'REMOVE_BINDING';
       nodeId: NodeId;
       prop: string;
+    }
+  | {
+      type: 'PAGE_VIEW_STATE_UPDATE';
+      viewState: ViewState;
     };
 
 function removeNode(
@@ -185,6 +190,7 @@ export function createPageEditorState(
     bindingEditor: null,
     highlightLayout: false,
     highlightedSlot: null,
+    viewState: {},
   };
 }
 
@@ -415,6 +421,12 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
             }),
           }),
         }),
+      });
+    }
+    case 'PAGE_VIEW_STATE_UPDATE': {
+      const { viewState } = action;
+      return update(state, {
+        viewState,
       });
     }
     default:

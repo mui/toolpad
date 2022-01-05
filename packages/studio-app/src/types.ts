@@ -96,14 +96,17 @@ export interface NodeLayoutSlots {
   [name: string]: SlotLayout[] | undefined;
 }
 
-export interface NodeLayout {
+export interface NodeState {
   nodeId: NodeId;
   rect: Rectangle;
   slots: NodeLayoutSlots;
+  props: {
+    [key: string]: unknown;
+  };
 }
 
-export interface ViewLayout {
-  [nodeId: NodeId]: NodeLayout | undefined;
+export interface ViewState {
+  [nodeId: NodeId]: NodeState | undefined;
 }
 
 export type StudioApiResultFields<D = {}> = {

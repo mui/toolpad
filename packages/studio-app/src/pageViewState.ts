@@ -2,9 +2,9 @@ import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from '@mui/studio-cor
 import { FiberNode, Hook } from 'react-devtools-inline';
 import {
   NodeId,
-  NodeLayout,
+  NodeState,
   SlotLayoutInsert,
-  ViewLayout,
+  ViewState,
   SlotDirection,
   SlotLayoutCenter,
   FlowDirection,
@@ -17,12 +17,18 @@ declare global {
   }
 }
 
-function getNodeLayout(viewElm: Element, elm: Element, nodeId: NodeId): NodeLayout | null {
+function getNodeViewState(
+  fiber: FiberNode,
+  viewElm: Element,
+  elm: Element,
+  nodeId: NodeId,
+): NodeState | null {
   if (nodeId) {
     return {
       nodeId,
       rect: getRelativeBoundingBox(viewElm, elm),
       slots: {},
+      props: fiber.child?.memoizedProps ?? {},
     };
   }
   return null;
@@ -142,7 +148,7 @@ function getChildFibers(fiber: FiberNode) {
   return children;
 }
 
-export function getPageLayout(containerElm: HTMLElement): ViewLayout {
+export function getViewState(containerElm: HTMLElement): ViewState {
   // eslint-disable-next-line no-underscore-dangle
   const devtoolsHook = containerElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
@@ -151,7 +157,7 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
     return {};
   }
 
-  const layout: ViewLayout = {};
+  const viewState: ViewState = {};
 
   const rendererId = 1;
   const nodeElms = new Map<NodeId, Element>();
@@ -168,9 +174,9 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {
             nodeElms.set(nodeId, elm);
-            const nodeLayout = getNodeLayout(containerElm, elm, nodeId);
-            if (nodeLayout) {
-              layout[nodeId] = nodeLayout;
+            const nodeViewState = getNodeViewState(fiber, containerElm, elm, nodeId);
+            if (nodeViewState) {
+              viewState[nodeId] = nodeViewState;
             }
           }
         }
@@ -182,8 +188,8 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
           const direction = fiber.memoizedProps.direction as FlowDirection | undefined;
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
           const parentElm = nodeElms.get(parentId);
-          const nodeLayout = layout[parentId];
-          if (parentElm && nodeLayout) {
+          const nodeViewState = viewState[parentId];
+          if (parentElm && nodeViewState) {
             if (direction) {
               const items = childfibers
                 .map((childFiber) =>
@@ -197,7 +203,7 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
                 name,
                 container: parentElm,
               });
-              nodeLayout.slots[name] = slots;
+              nodeViewState.slots[name] = slots;
             } else {
               const slotContainerElm = devtoolsHook.renderers
                 .get(rendererId)
@@ -208,7 +214,7 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
                   name,
                   container: slotContainerElm,
                 });
-                nodeLayout.slots[name] = [slot];
+                nodeViewState.slots[name] = [slot];
               }
             }
           }
@@ -217,5 +223,5 @@ export function getPageLayout(containerElm: HTMLElement): ViewLayout {
     }
   });
 
-  return layout;
+  return viewState;
 }

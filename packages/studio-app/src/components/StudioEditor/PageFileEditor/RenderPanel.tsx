@@ -3,24 +3,24 @@ import * as React from 'react';
 import clsx from 'clsx';
 import {
   NodeId,
-  NodeLayout,
+  NodeState,
   NodeLayoutSlots,
   SlotLayout,
   SlotLayoutInsert,
-  ViewLayout,
-} from '../../types';
-import * as studioDom from '../../studioDom';
-import PageView, { PageViewHandle } from '../PageView';
+  ViewState,
+} from '../../../types';
+import * as studioDom from '../../../studioDom';
+import PageView, { PageViewHandle } from '../../PageView';
 import {
   absolutePositionCss,
   distanceToLine,
   distanceToRect,
   rectContainsPoint,
-} from '../../utils/geometry';
-import { PageEditorState } from '../../editorState';
-import { PinholeOverlay } from '../../PinholeOverlay';
-import { useEditorApi, usePageEditorState } from './EditorProvider';
-import { getPageLayout } from '../../pageLayout';
+} from '../../../utils/geometry';
+import { PageEditorState } from '../../../editorState';
+import { PinholeOverlay } from '../../../PinholeOverlay';
+import { useEditorApi, usePageEditorState } from '../EditorProvider';
+import { getViewState } from '../../../pageViewState';
 
 const classes = {
   scrollContainer: 'StudioScrollContainer',
@@ -37,7 +37,7 @@ const classes = {
   hudOverlay: 'StudioHudOverlay',
 };
 
-const StudioViewEditorRoot = styled('div')({
+const RenderPanelRoot = styled('div')({
   position: 'relative',
   overflow: 'auto',
 
@@ -139,7 +139,7 @@ function insertSlotAbsolutePositionCss(slot: SlotLayoutInsert): React.CSSPropert
 
 function findNodeAt(
   nodes: readonly studioDom.StudioElementNode[],
-  viewLayout: ViewLayout,
+  viewLayout: ViewState,
   x: number,
   y: number,
 ): NodeId | null {
@@ -160,11 +160,9 @@ function findNodeAt(
  * them would create a cyclic structure.
  */
 function getAvailableNodes(
+  nodes: readonly studioDom.StudioElementNode[],
   state: PageEditorState,
 ): readonly (studioDom.StudioElementNode | studioDom.StudioPageNode)[] {
-  const page = studioDom.getNode(state.dom, state.pageNodeId);
-  studioDom.assertIsPage(page);
-  const nodes = studioDom.elementsByDepth(state.dom, page);
   const selection = state.selection && studioDom.getNode(state.dom, state.selection);
   if (selection) {
     studioDom.assertIsElement(selection);
@@ -231,7 +229,7 @@ function findClosestSlot(slots: NodeLayoutSlots, x: number, y: number): SlotLayo
   return closestSlot;
 }
 
-function findActiveSlotInNode(nodeLayout: NodeLayout, x: number, y: number): SlotIndex | null {
+function findActiveSlotInNode(nodeLayout: NodeState, x: number, y: number): SlotIndex | null {
   const { nodeId } = nodeLayout;
   const slots = nodeLayout.slots ?? [];
   const closestSlot = findClosestSlot(slots, x, y);
@@ -243,12 +241,12 @@ function findActiveSlotInNode(nodeLayout: NodeLayout, x: number, y: number): Slo
 
 function findActiveSlotAt(
   nodes: readonly studioDom.StudioNode[],
-  viewLayout: ViewLayout,
+  viewLayout: ViewState,
   x: number,
   y: number,
 ): SlotIndex | null {
   // Search deepest nested first
-  let nodeLayout: NodeLayout | undefined;
+  let nodeLayout: NodeState | undefined;
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
     nodeLayout = viewLayout[node.id];
@@ -268,34 +266,43 @@ function findActiveSlotAt(
   return null;
 }
 
-export interface PageFileEditorProps {
+export interface RenderPanelProps {
   className?: string;
 }
 
-export default function PageFileEditor({ className }: PageFileEditorProps) {
+export default function RenderPanel({ className }: RenderPanelProps) {
   const state = usePageEditorState();
   const api = useEditorApi();
 
   const viewRef = React.useRef<PageViewHandle>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
 
-  const [viewLayout, setViewLayout] = React.useState<ViewLayout>({});
+  const { viewState, dom, pageNodeId, highlightedSlot, selection } = state;
 
   const [isFocused, setIsFocused] = React.useState(false);
 
   const pageNodes = React.useMemo(() => {
-    const page = studioDom.getNode(state.dom, state.pageNodeId);
+    const page = studioDom.getNode(dom, pageNodeId);
     studioDom.assertIsPage(page);
-    return studioDom.elementsByDepth(state.dom, page);
-  }, [state]);
+    return studioDom.elementsByDepth(dom, page);
+  }, [dom, pageNodeId]);
+
+  const selectedNode = selection && studioDom.getNode(state.dom, selection);
+  if (selectedNode) {
+    studioDom.assertIsElement(selectedNode);
+  }
+
+  const availableNodes = React.useMemo(
+    () => getAvailableNodes(pageNodes, state),
+    [pageNodes, state],
+  );
 
   const handleRender = React.useCallback(() => {
     const rootElm = viewRef.current?.getRootElm();
     if (rootElm) {
-      const layout = getPageLayout(rootElm);
-      setViewLayout(layout);
+      api.pageViewStateUpdate(getViewState(rootElm));
     }
-  }, []);
+  }, [api]);
 
   const getViewCoordinates = React.useCallback(
     (clientX: number, clientY: number): { x: number; y: number } | null => {
@@ -322,13 +329,13 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
 
       event.dataTransfer.dropEffect = 'move';
 
-      const nodeId = findNodeAt(pageNodes, viewLayout, cursorPos.x, cursorPos.y);
+      const nodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
 
       if (nodeId) {
         api.nodeDragStart(nodeId);
       }
     },
-    [api, getViewCoordinates, pageNodes, viewLayout],
+    [api, getViewCoordinates, pageNodes, viewState],
   );
 
   React.useEffect(() => {
@@ -340,12 +347,11 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
         return;
       }
 
-      const nodes = getAvailableNodes(state);
-      const slotIndex = findActiveSlotAt(nodes, viewLayout, cursorPos.x, cursorPos.y);
+      const slotIndex = findActiveSlotAt(availableNodes, viewState, cursorPos.x, cursorPos.y);
 
       const activeSlot =
         slotIndex &&
-        viewLayout[slotIndex.nodeId]?.slots?.[slotIndex.slot]?.find(
+        viewState[slotIndex.nodeId]?.slots?.[slotIndex.slot]?.find(
           (slot) => slot.name === slotIndex.slot && slot.index === slotIndex.index,
         );
 
@@ -368,12 +374,11 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
         return;
       }
 
-      const nodes = getAvailableNodes(state);
-      const slotIndex = findActiveSlotAt(nodes, viewLayout, cursorPos.x, cursorPos.y);
+      const slotIndex = findActiveSlotAt(availableNodes, viewState, cursorPos.x, cursorPos.y);
 
       const activeSlot =
         slotIndex &&
-        viewLayout[slotIndex.nodeId]?.slots?.[slotIndex.slot]?.find(
+        viewState[slotIndex.nodeId]?.slots?.[slotIndex.slot]?.find(
           (slot) => slot.name === slotIndex.slot && slot.index === slotIndex.index,
         );
 
@@ -401,7 +406,7 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
       window.removeEventListener('drop', handleDrop);
       window.removeEventListener('dragend', handleDragEnd);
     };
-  }, [state, getViewCoordinates, viewLayout, api]);
+  }, [availableNodes, getViewCoordinates, viewState, api]);
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -411,10 +416,10 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
         return;
       }
 
-      const selectedNode = findNodeAt(pageNodes, viewLayout, cursorPos.x, cursorPos.y);
-      api.select(selectedNode);
+      const newSelectedNodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
+      api.select(newSelectedNodeId);
     },
-    [api, getViewCoordinates, pageNodes, viewLayout],
+    [api, getViewCoordinates, pageNodes, viewState],
   );
 
   React.useEffect(() => {
@@ -429,18 +434,16 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
     };
   }, [api, isFocused]);
 
-  const selectedRect = state.selection ? viewLayout[state.selection]?.rect : null;
+  const selectedRect = selectedNode ? viewState[selectedNode.id]?.rect : null;
 
   const nodesWithInteraction = React.useMemo<Set<NodeId>>(() => {
-    if (!state.selection) {
+    if (!selectedNode) {
       return new Set();
     }
-    const selection = studioDom.getNode(state.dom, state.selection);
-    studioDom.assertIsElement(selection);
     return new Set(
-      [...studioDom.getAncestors(state.dom, selection), selection].map((node) => node.id),
+      [...studioDom.getAncestors(dom, selectedNode), selectedNode].map((node) => node.id),
     );
-  }, [state]);
+  }, [dom, selectedNode]);
 
   const rootRef = React.useRef<HTMLDivElement>(null);
   const handleFocus = React.useCallback((event: React.FocusEvent<HTMLDivElement>) => {
@@ -451,7 +454,7 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
   const handleBlur = React.useCallback(() => setIsFocused(false), []);
 
   return (
-    <StudioViewEditorRoot
+    <RenderPanelRoot
       ref={rootRef}
       className={className}
       tabIndex={0}
@@ -477,7 +480,7 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
         >
           {pageNodes.map((node) => {
             const nodeId = node.id;
-            const nodeLayout = viewLayout[nodeId];
+            const nodeLayout = viewState[nodeId];
             if (!nodeLayout) {
               return null;
             }
@@ -488,7 +491,7 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
                   onDragStart={handleDragStart}
                   style={absolutePositionCss(nodeLayout.rect)}
                   className={clsx(classes.nodeHud, {
-                    [classes.selected]: state.selection === nodeId,
+                    [classes.selected]: selectedNode?.id === nodeId,
                     [classes.allowNodeInteraction]: nodesWithInteraction.has(nodeId),
                   })}
                 >
@@ -501,9 +504,9 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
                           style={insertSlotAbsolutePositionCss(slotLayout)}
                           className={clsx(classes.insertSlotHud, {
                             [classes.active]:
-                              state.highlightedSlot?.nodeId === nodeId &&
-                              state.highlightedSlot?.slot === slotLayout.name &&
-                              state.highlightedSlot?.index === index,
+                              highlightedSlot?.nodeId === nodeId &&
+                              highlightedSlot?.slot === slotLayout.name &&
+                              highlightedSlot?.index === index,
                           })}
                         />
                       ) : (
@@ -512,8 +515,8 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
                           style={absolutePositionCss(slotLayout.rect)}
                           className={clsx(classes.slotHud, {
                             [classes.active]:
-                              state.highlightedSlot?.nodeId === nodeId &&
-                              state.highlightedSlot?.slot === slotLayout.name,
+                              highlightedSlot?.nodeId === nodeId &&
+                              highlightedSlot?.slot === slotLayout.name,
                           })}
                         >
                           Insert Here
@@ -538,6 +541,6 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
           />
         </div>
       </div>
-    </StudioViewEditorRoot>
+    </RenderPanelRoot>
   );
 }

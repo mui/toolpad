@@ -2,10 +2,10 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Tab } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import * as React from 'react';
-import { ComponentPanelTab } from '../../editorState';
-import ComponentCatalog from './ComponentCatalog';
-import ComponentEditor from './ComponentEditor';
-import { useEditorApi, useEditorState } from './EditorProvider';
+import { ComponentPanelTab } from '../../../editorState';
+import ComponentCatalog from '../ComponentCatalog';
+import ComponentEditor from '../ComponentEditor';
+import { useEditorApi, usePageEditorState } from '../EditorProvider';
 
 const classes = {
   panel: 'StudioPanel',
@@ -25,10 +25,7 @@ export interface ComponentPanelProps {
 }
 
 export default function ComponentPanel({ className }: ComponentPanelProps) {
-  const state = useEditorState();
-  if (state.editorType !== 'page') {
-    throw new Error(`Invariant: ComponentPanel used outside of page context`);
-  }
+  const state = usePageEditorState();
   const api = useEditorApi();
 
   const handleChange = (event: React.SyntheticEvent, newValue: ComponentPanelTab) =>

@@ -163,7 +163,10 @@ export interface ComponentEditorProps {
 export default function ComponentEditor({ className }: ComponentEditorProps) {
   const state = useEditorState();
 
-  const selectedNode = state.selection ? studioDom.getNode(state.dom, state.selection) : null;
+  const selectedNode =
+    state.editorType === 'page' && state.selection
+      ? studioDom.getNode(state.dom, state.selection)
+      : null;
 
   if (selectedNode) {
     studioDom.assertIsElement(selectedNode);

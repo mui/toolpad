@@ -196,6 +196,9 @@ export function BindingEditorContent({ nodeId, prop }: BindingEditorContentProps
 
 export default function BindingEditor() {
   const state = useEditorState();
+  if (state.editorType !== 'page') {
+    throw new Error(`Invariant: BindingEditor used outside of page context`);
+  }
   const api = useEditorApi();
   const handleClose = React.useCallback(() => api.closeBindingEditor(), [api]);
   const bindingEditorProps = useLatest(state.bindingEditor);

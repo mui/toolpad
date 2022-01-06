@@ -8,13 +8,12 @@ import {
   ConnectionStatus,
   StudioApiResult,
   StudioApiSummary,
-  NodeId,
 } from '../types';
-import { generateRandomId, generateUniqueId } from '../utils/randomId';
+import { generateRandomId } from '../utils/randomId';
 import studioDataSources from '../studioDataSources/server';
-import { StudioDom } from '../studioDom';
+import * as studioDom from '../studioDom';
 
-interface StoredstudioDom extends StudioDom {
+interface StoredstudioDom extends studioDom.StudioDom {
   id: 'default';
 }
 
@@ -225,66 +224,38 @@ export default {
 };
 `;
 
-function createDefaultApp(): StudioDom {
-  const ids = new Set<NodeId>();
-  const appId = generateUniqueId(ids) as NodeId;
-  ids.add(appId);
-  const themeId = generateUniqueId(ids) as NodeId;
-  ids.add(themeId);
-  const pageId = generateUniqueId(ids) as NodeId;
-  ids.add(pageId);
-  const rootId = generateUniqueId(ids) as NodeId;
-  ids.add(rootId);
-  return {
-    nodes: {
-      [appId]: {
-        id: appId,
-        type: 'app',
-        name: 'App',
-        parentId: null,
-        parentIndex: null,
-      },
-      [themeId]: {
-        id: themeId,
-        type: 'theme',
-        name: 'Theme',
-        parentId: appId,
-        parentIndex: 0.5,
-        content: DEFAULT_THEME_CONTENT,
-      },
-      [pageId]: {
-        id: pageId,
-        type: 'page',
-        name: 'DefaultPage',
-        parentId: appId,
-        parentIndex: 0.5,
-        title: 'Default',
-        state: {},
-      },
-      [rootId]: {
-        id: rootId,
-        type: 'element',
-        name: 'Page',
-        parentId: pageId,
-        parentIndex: 0.5,
-        component: 'Page',
-        props: {},
-      },
-    },
-    root: appId,
-  };
+function createDefaultApp(): studioDom.StudioDom {
+  let dom = studioDom.createDom();
+  const theme = studioDom.createNode(dom, 'theme', {
+    name: 'Theme',
+    content: DEFAULT_THEME_CONTENT,
+  });
+  dom = studioDom.moveNode(dom, theme, dom.root);
+  const page = studioDom.createNode(dom, 'page', {
+    name: 'DefaultPage',
+    title: 'Default',
+    state: {},
+  });
+  dom = studioDom.moveNode(dom, page, dom.root);
+  const pageRoot = studioDom.createNode(dom, 'element', {
+    name: 'PageRoot',
+    component: 'Page',
+    props: {},
+  });
+  dom = studioDom.moveNode(dom, pageRoot, page.id);
+  return dom;
 }
 
 const APP_ID = 'default';
 
-export async function saveApp(app: StudioDom): Promise<void> {
+export async function saveApp(app: studioDom.StudioDom): Promise<void> {
   await writeObject('app', {
     id: APP_ID,
     ...app,
   });
 }
 
-export async function loadApp(): Promise<StudioDom> {
+export async function loadApp(): Promise<studioDom.StudioDom> {
   try {
     const app = await getObject('app', APP_ID);
     return app;

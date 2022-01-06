@@ -212,15 +212,16 @@ function getNodeNames(dom: StudioDom): Set<string> {
   return new Set(Object.values(dom.nodes).map(({ name }) => name));
 }
 
-export function createElement<P>(
+export function createElementInternal<P>(
   dom: StudioDom,
+  id: NodeId,
   component: string,
   props: Partial<StudioNodeProps<P>> = {},
   name?: string,
 ): StudioElementNode {
   const existingNames = getNodeNames(dom);
   return {
-    id: generateUniqueId(new Set(Object.keys(dom.nodes))) as NodeId,
+    id,
     type: 'element',
     parentId: null,
     parentIndex: null,
@@ -230,6 +231,57 @@ export function createElement<P>(
       ? generateUniqueName(name, existingNames)
       : generateUniqueName(component, existingNames, true),
   };
+}
+
+type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
+  StudioNodeOfType<T>,
+  'id' | 'type' | 'parentId' | 'parentIndex'
+>;
+
+export function createNode<T extends StudioNodeType>(
+  dom: StudioDom,
+  type: T,
+  { name, ...init }: StudioNodeInitOfType<T>,
+): StudioNodeOfType<T> {
+  const id = generateUniqueId(new Set(Object.keys(dom.nodes))) as NodeId;
+  const existingNames = getNodeNames(dom);
+  return {
+    id,
+    type,
+    parentId: null,
+    parentIndex: null,
+    name: generateUniqueName(name, existingNames),
+    ...init,
+  } as StudioNodeOfType<T>;
+}
+
+export function createDom(): StudioDom {
+  const rootId = generateUniqueId(new Set()) as NodeId;
+  return {
+    nodes: {
+      [rootId]: {
+        id: rootId,
+        type: 'app',
+        parentId: null,
+        parentIndex: null,
+        name: 'Application',
+      },
+    },
+    root: rootId,
+  };
+}
+
+export function createElement<P>(
+  dom: StudioDom,
+  component: string,
+  props: Partial<StudioNodeProps<P>> = {},
+  name?: string,
+): StudioElementNode {
+  return createNode(dom, 'element', {
+    component,
+    props,
+    name: name || component,
+  });
 }
 
 /**

@@ -300,7 +300,7 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
       const parentIndex = studioDom.createFractionalIndex(left, right);
 
       return update(state, {
-        dom: studioDom.addChild(dom, addedNode, action.location.nodeId, parentIndex),
+        dom: studioDom.moveNode(dom, addedNode, action.location.nodeId, parentIndex),
         newNode: null,
         highlightLayout: false,
         highlightedSlot: null,

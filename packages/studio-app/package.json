@@ -35,6 +35,7 @@
     "esbuild": "^0.14.9",
     "esinstall": "^1.1.7",
     "find-up": "^6.2.0",
+    "fractional-indexing": "^2.0.0",
     "import-meta-resolve": "^1.1.1",
     "next": "^12.0.7",
     "prettier": "^2.5.1",

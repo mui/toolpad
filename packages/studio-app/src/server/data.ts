@@ -237,12 +237,6 @@ function createDefaultApp(): studioDom.StudioDom {
     state: {},
   });
   dom = studioDom.moveNode(dom, page, dom.root);
-  const pageRoot = studioDom.createNode(dom, 'element', {
-    name: 'PageRoot',
-    component: 'Page',
-    props: {},
-  });
-  dom = studioDom.moveNode(dom, pageRoot, page.id);
   return dom;
 }
 

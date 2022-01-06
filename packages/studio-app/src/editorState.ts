@@ -290,9 +290,6 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
 
       const { nodeId, index } = action.location;
       const parent = studioDom.getNode(dom, nodeId);
-      if (!studioDom.isElement(parent)) {
-        throw new Error(`Invariant: Inavlid node type in drop parent "${parent.type}"`);
-      }
 
       const siblings = studioDom.getChildren(dom, parent);
       const left = siblings[index - 1]?.parentIndex || null;

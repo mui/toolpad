@@ -2,7 +2,7 @@ import * as studioComponentLib from '@mui/studio-components';
 import { DEFINITION_KEY } from '@mui/studio-core';
 import * as studioDom from '../studioDom';
 
-interface StudioComponentDefinition {
+export interface StudioComponentDefinition {
   props: any;
   module: string;
   importedName: string;

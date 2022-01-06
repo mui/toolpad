@@ -103,31 +103,48 @@ class Context {
     return result;
   }
 
-  renderPage(page: studioDom.StudioPageNode): string {
-    const rootNode = studioDom.getPageRoot(this.dom, page);
-    return this.renderNode(rootNode);
-  }
-
-  renderNode(node: studioDom.StudioElementNode): string {
-    const component = getStudioComponent(this.dom, node.component);
-    const props = this.resolveProps(node);
-    const renderedChildren = studioDom
-      .getChildren(this.dom, node)
-      .map((child) => this.renderNode(child))
-      .join('\n');
+  renderNodeInternal(
+    id: string,
+    componentName: string,
+    resolvedProps: Record<string, string>,
+    renderedChildren: string,
+  ): string {
     const rendered = `
-      <${component.importedName} ${this.renderProps(props)}>
+      <${componentName} ${this.renderProps(resolvedProps)}>
         ${renderedChildren}
-      </${component.importedName}>
+      </${componentName}>
     `;
-    this.addImport(component.module, component.importedName, component.importedName);
     return this.editor
       ? `
-        <__studioRuntime.WrappedStudioNode id="${node.id}">
+        <__studioRuntime.WrappedStudioNode id="${id}">
           ${rendered}
         </__studioRuntime.WrappedStudioNode>
       `
       : rendered;
+  }
+
+  renderChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): string {
+    return studioDom
+      .getChildren(this.dom, node)
+      .map((child) => this.renderNode(child))
+      .join('\n');
+  }
+
+  renderPage(page: studioDom.StudioPageNode): string {
+    const pageImportedName = 'Page';
+    this.addImport('@mui/studio-components', pageImportedName, pageImportedName);
+    return this.renderNodeInternal(page.id, pageImportedName, {}, this.renderChildren(page));
+  }
+
+  renderNode(node: studioDom.StudioElementNode): string {
+    const component = getStudioComponent(this.dom, node.component);
+    this.addImport(component.module, component.importedName, component.importedName);
+    return this.renderNodeInternal(
+      node.id,
+      component.importedName,
+      this.resolveProps(node),
+      this.renderChildren(node),
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this

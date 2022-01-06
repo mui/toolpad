@@ -189,11 +189,6 @@ export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode | 
   return getChildren(dom, app).find((node) => isTheme(node)) as StudioThemeNode | undefined;
 }
 
-export function getPageRoot(dom: StudioDom, page: StudioPageNode): StudioElementNode {
-  const [root] = getChildren(dom, page);
-  return root;
-}
-
 function generateUniqueName(baseName: string, existingNames: Set<string>, alwaysIndex = false) {
   let i = 1;
   let suggestion = baseName;
@@ -284,26 +279,14 @@ export function createElement<P>(
   });
 }
 
-/**
- * Nodes on a page, sorted by depth, root first
- */
-export function elementsByDepth(
+export function getDescendants(
   dom: StudioDom,
   node: StudioElementNode | StudioPageNode,
-): readonly StudioElementNode[] {
-  if (isPage(node)) {
-    const root = getPageRoot(dom, node);
-    return elementsByDepth(dom, root);
-  }
-  return [node, ...getChildren(dom, node).flatMap((child) => elementsByDepth(dom, child))];
-}
-
-export function getDecendants(
-  dom: StudioDom,
-  node: StudioElementNode,
-): readonly StudioElementNode[] {
+): readonly StudioElementNode[];
+export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[];
+export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
   const children = getChildren(dom, node);
-  return [...children, ...children.flatMap((child) => getDecendants(dom, child))];
+  return [...children, ...children.flatMap((child) => getDescendants(dom, child))];
 }
 
 export function getAncestors(

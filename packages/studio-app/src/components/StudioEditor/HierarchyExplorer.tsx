@@ -84,10 +84,12 @@ interface HierarchyExplorerPageItemProps {
 
 function HierarchyExplorerPageItem({ page }: HierarchyExplorerPageItemProps) {
   const state = useEditorState();
-  const root = studioDom.getPageRoot(state.dom, page);
+  const children = studioDom.getChildren(state.dom, page);
   return (
     <TreeItem ContentComponent={CustomContent} nodeId={page.id} label={`${page.name} (${page.id})`}>
-      <HierarchyExplorerElementItem element={root} />
+      {children.map((child) => (
+        <HierarchyExplorerElementItem key={child.id} element={child} />
+      ))}
     </TreeItem>
   );
 }

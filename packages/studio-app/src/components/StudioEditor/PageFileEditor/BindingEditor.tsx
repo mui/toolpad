@@ -49,7 +49,7 @@ export function AddBindingEditor<P, K extends keyof P & string>({
     if (!page) {
       return [];
     }
-    const nodes = studioDom.elementsByDepth(state.dom, page);
+    const nodes = studioDom.getDescendants(state.dom, page);
     return nodes.flatMap((destNode) => {
       const destDefinition = getStudioComponent(state.dom, destNode.component);
 
@@ -143,7 +143,7 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
     if (!page) {
       return [];
     }
-    const nodes = studioDom.elementsByDepth(state.dom, page);
+    const nodes = studioDom.getDescendants(state.dom, page);
     return nodes.flatMap((pageNode) =>
       (Object.entries(pageNode.props) as ExactEntriesOf<StudioNodeProps<any>>).flatMap(
         ([nodeProp, nodePropValue]) => {

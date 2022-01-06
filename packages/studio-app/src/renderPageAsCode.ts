@@ -131,9 +131,7 @@ class Context {
   }
 
   renderPage(page: studioDom.StudioPageNode): string {
-    const pageImportedName = 'Page';
-    this.addImport('@mui/studio-components', pageImportedName, pageImportedName);
-    return this.renderNodeInternal(page.id, pageImportedName, {}, this.renderChildren(page));
+    return this.renderNodeInternal(page.id, '__studioRuntime.Page', {}, this.renderChildren(page));
   }
 
   renderNode(node: studioDom.StudioElementNode): string {

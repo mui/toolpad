@@ -195,8 +195,8 @@ export function createPageEditorState(
 }
 
 export function createEditorState(dom: studioDom.StudioDom): EditorState {
-  const pageNodeId = studioDom.getApp(dom).pages[0];
-  return createPageEditorState(dom, pageNodeId);
+  const pageNode = studioDom.getPages(dom, studioDom.getApp(dom))[0];
+  return createPageEditorState(dom, pageNode.id);
 }
 
 export function pageEditorReducer(state: PageEditorState, action: EditorAction): EditorState {

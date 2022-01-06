@@ -7,14 +7,12 @@ export interface StudioNodeBase {
   readonly type: 'app' | 'theme' | 'api' | 'page' | 'element';
   readonly parentId: NodeId | null;
   readonly name: string;
+  readonly children: NodeId[];
 }
 
 export interface StudioAppNode extends StudioNodeBase {
   readonly type: 'app';
   readonly parentId: null;
-  readonly apis: NodeId[];
-  readonly pages: NodeId[];
-  readonly theme: NodeId;
 }
 
 export interface StudioThemeNode extends StudioNodeBase {
@@ -32,7 +30,6 @@ export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
 export interface StudioPageNode extends StudioNodeBase {
   readonly type: 'page';
   readonly title: string;
-  readonly root: NodeId;
   readonly state: Record<string, StudioStateDefinition>;
 }
 
@@ -41,7 +38,6 @@ export interface StudioElementNode<P = DefaultNodeProps> extends StudioNodeBase 
   readonly component: string;
   readonly name: string;
   readonly props: Partial<StudioNodeProps<P>>;
-  readonly children: NodeId[];
 }
 
 export type StudioNode =
@@ -119,40 +115,36 @@ export function getApp(dom: StudioDom): StudioAppNode {
   return rootNode;
 }
 
-export function getPages(dom: StudioDom, root: StudioAppNode): StudioPageNode[] {
-  return root.pages.map((nodeId) => {
-    const page = getNode(dom, nodeId);
-    assertIsPage(page);
-    return page;
-  });
+// TODO: overloads
+export function getChildren(
+  dom: StudioDom,
+  parent: StudioAppNode,
+): (StudioPageNode | StudioApiNode | StudioThemeNode)[];
+export function getChildren(
+  dom: StudioDom,
+  child: StudioElementNode | StudioPageNode,
+): StudioElementNode[];
+export function getChildren(dom: StudioDom, parent: StudioNode): StudioNode[];
+export function getChildren(dom: StudioDom, parent: StudioNode): StudioNode[] {
+  return parent.children.map((nodeId) => getNode(dom, nodeId));
 }
 
-export function getApis(dom: StudioDom, root: StudioAppNode): StudioApiNode[] {
-  return root.apis.map((nodeId) => {
-    const page = getNode(dom, nodeId);
-    assertIsApi(page);
-    return page;
-  });
+export function getPages(dom: StudioDom, app: StudioAppNode): StudioPageNode[] {
+  return getChildren(dom, app).filter((node) => isPage(node)) as StudioPageNode[];
 }
 
-export function getTheme(dom: StudioDom, root: StudioAppNode): StudioThemeNode {
-  const theme = getNode(dom, root.theme);
-  assertIsTheme(theme);
-  return theme;
+export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
+  return getChildren(dom, app).filter((node) => isApi(node)) as StudioApiNode[];
+}
+
+// TODO: make theme optional by returning undefined
+export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode {
+  return getChildren(dom, app).find((node) => isTheme(node)) as StudioThemeNode;
 }
 
 export function getPageRoot(dom: StudioDom, page: StudioPageNode): StudioElementNode {
-  const element = getNode(dom, page.root);
-  assertIsElement(element);
-  return element;
-}
-
-export function getChildren(dom: StudioDom, parent: StudioElementNode): StudioElementNode[] {
-  return parent.children.map((nodeId) => {
-    const page = getNode(dom, nodeId);
-    assertIsElement(page);
-    return page;
-  });
+  const [root] = getChildren(dom, page);
+  return root;
 }
 
 export function getParent(dom: StudioDom, child: StudioAppNode): null;

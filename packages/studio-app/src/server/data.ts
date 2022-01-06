@@ -243,7 +243,6 @@ function createDefaultApp(): StudioDom {
         name: 'App',
         parentId: null,
         parentIndex: null,
-        children: [themeId, pageId],
       },
       [themeId]: {
         id: themeId,
@@ -252,7 +251,6 @@ function createDefaultApp(): StudioDom {
         parentId: appId,
         parentIndex: 0.5,
         content: DEFAULT_THEME_CONTENT,
-        children: [],
       },
       [pageId]: {
         id: pageId,
@@ -261,7 +259,6 @@ function createDefaultApp(): StudioDom {
         parentId: appId,
         parentIndex: 0.5,
         title: 'Default',
-        children: [rootId],
         state: {},
       },
       [rootId]: {
@@ -271,7 +268,6 @@ function createDefaultApp(): StudioDom {
         parentId: pageId,
         parentIndex: 0.5,
         component: 'Page',
-        children: [],
         props: {},
       },
     },

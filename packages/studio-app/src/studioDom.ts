@@ -1,15 +1,33 @@
 import { DefaultNodeProps, NodeId, StudioNodeProps, StudioStateDefinition } from './types';
-import { update } from './utils/immutability';
+import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
+
+// Naive fractional index implementation
+// TODO: improve: https://observablehq.com/@dgreensp/implementing-fractional-indexing
+export function createFractionalIndex(index1: number | null, index2: number | null) {
+  if (typeof index1 === 'number') {
+    console.assert(index1 > 0 && index1 < 1);
+  }
+  if (typeof index2 === 'number') {
+    console.assert(index2 > 0 && index2 < 1);
+  }
+  if (typeof index1 === 'number' && typeof index2 === 'number') {
+    console.assert(index1 < index2);
+  }
+  return ((index1 || 0) + (index2 || 1)) / 2;
+}
+
+export function compareFractionalIndex(index1: number, index2: number): number {
+  return index1 - index2;
+}
 
 export interface StudioNodeBase {
   readonly id: NodeId;
   readonly type: 'app' | 'theme' | 'api' | 'page' | 'element';
   readonly parentId: NodeId | null;
-  // TODO: Use fractional index instead https://observablehq.com/@dgreensp/implementing-fractional-indexing
   readonly parentIndex: number | null;
   readonly name: string;
-  readonly children: NodeId[];
+  // readonly children: NodeId[];
 }
 
 export interface StudioAppNode extends StudioNodeBase {
@@ -127,7 +145,17 @@ export function getChildren(
 ): StudioElementNode[];
 export function getChildren(dom: StudioDom, parent: StudioNode): StudioNode[];
 export function getChildren(dom: StudioDom, parent: StudioNode): StudioNode[] {
-  return parent.children.map((nodeId) => getNode(dom, nodeId));
+  // TODO: memoize this per node in the dom object
+  return Object.values(dom.nodes)
+    .filter((node: StudioNode) => node.parentId === parent.id)
+    .sort((node1: StudioNode, node2: StudioNode) => {
+      if (!node1.parentIndex || !node2.parentIndex) {
+        throw new Error(
+          `Invariant: nodes inside the dom should have a parentIndex if they have a parent`,
+        );
+      }
+      return compareFractionalIndex(node1.parentIndex, node2.parentIndex);
+    });
 }
 
 export function getParent(dom: StudioDom, child: StudioAppNode): null;
@@ -213,7 +241,6 @@ export function createElement<P>(
   component: string,
   props: Partial<StudioNodeProps<P>> = {},
   name?: string,
-  children: NodeId[] = [],
 ): StudioElementNode {
   const existingNames = getNodeNames(dom);
   return {
@@ -226,7 +253,6 @@ export function createElement<P>(
     name: name
       ? generateUniqueName(name, existingNames)
       : generateUniqueName(component, existingNames, true),
-    children,
   };
 }
 
@@ -266,4 +292,39 @@ export function getElementPage(dom: StudioDom, node: StudioElementNode): StudioP
     return isPage(parent) ? parent : getElementPage(dom, parent);
   }
   return null;
+}
+
+export function addChild(
+  dom: StudioDom,
+  newNode: StudioNode,
+  parentId: NodeId,
+  parentIndex?: number,
+) {
+  if (!parentIndex) {
+    const parent = getNode(dom, parentId);
+    const siblings = getChildren(dom, parent);
+    const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
+    parentIndex = createFractionalIndex(lastIndex, null);
+  }
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [newNode.id]: update(newNode, {
+        parentId,
+        parentIndex,
+      }),
+    }),
+  });
+}
+
+export function removeNode(dom: StudioDom, nodeId: NodeId) {
+  const node = getNode(dom, nodeId);
+  const parent = getParent(dom, node);
+
+  if (!parent) {
+    throw new Error(`Invariant: Node: "${node.id}" can not be removed`);
+  }
+
+  return update(dom, {
+    nodes: omit(dom.nodes, node.id),
+  });
 }

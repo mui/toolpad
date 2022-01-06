@@ -93,7 +93,7 @@ export default React.forwardRef(function PageView(
         base="/app/1234"
         importMap={getImportMap()}
         files={{
-          '/lib/theme.js': { code: theme.content },
+          '/lib/theme.js': { code: theme?.content ?? 'export default {};' },
           '/index.js': { code: appIndex },
           '/page.js': { code: renderedPage.code },
         }}

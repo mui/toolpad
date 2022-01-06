@@ -1,3 +1,4 @@
+import { generateKeyBetween } from 'fractional-indexing';
 import { DefaultNodeProps, NodeId, StudioNodeProps, StudioStateDefinition } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
@@ -10,30 +11,19 @@ const ALLOWED_PARENTS = {
   element: ['page', 'element'],
 } as const;
 
-// Naive fractional index implementation
-// TODO: improve: https://observablehq.com/@dgreensp/implementing-fractional-indexing
-export function createFractionalIndex(index1: number | null, index2: number | null) {
-  if (typeof index1 === 'number') {
-    console.assert(index1 > 0 && index1 < 1);
-  }
-  if (typeof index2 === 'number') {
-    console.assert(index2 > 0 && index2 < 1);
-  }
-  if (typeof index1 === 'number' && typeof index2 === 'number') {
-    console.assert(index1 < index2);
-  }
-  return ((index1 || 0) + (index2 || 1)) / 2;
+export function createFractionalIndex(index1: string | null, index2: string | null) {
+  return generateKeyBetween(index1, index2);
 }
 
-export function compareFractionalIndex(index1: number, index2: number): number {
-  return index1 - index2;
+export function compareFractionalIndex(index1: string, index2: string): number {
+  return index1.localeCompare(index2);
 }
 
 export interface StudioNodeBase {
   readonly id: NodeId;
   readonly type: 'app' | 'theme' | 'api' | 'page' | 'element';
   readonly parentId: NodeId | null;
-  readonly parentIndex: number | null;
+  readonly parentIndex: string | null;
   readonly name: string;
 }
 
@@ -155,7 +145,7 @@ export function getApp(dom: StudioDom): StudioAppNode {
 }
 
 export function getChildren<N extends StudioNode>(dom: StudioDom, parent: N): ChildOf<N>[] {
-  // TODO: memoize this per node in the dom object
+  // TODO: memoize this per node?
   return Object.values(dom.nodes)
     .filter((node: StudioNode) => node.parentId === parent.id)
     .sort((node1: StudioNode, node2: StudioNode) => {
@@ -351,7 +341,7 @@ export function moveNode(
   dom: StudioDom,
   newNode: StudioNode,
   parentId: NodeId,
-  parentIndex?: number,
+  parentIndex?: string,
 ) {
   const parent = getNode(dom, parentId);
 
@@ -361,6 +351,7 @@ export function moveNode(
       `Node "${newNode.id}" of type "${newNode.type}" can't be added to a node of type "${parent.type}"`,
     );
   }
+
   if (!parentIndex) {
     const siblings = getChildren(dom, parent);
     const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;

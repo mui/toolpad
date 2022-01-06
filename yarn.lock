@@ -4211,6 +4211,11 @@ format-util@^1.0.5:
   resolved "https://registry.yarnpkg.com/format-util/-/format-util-1.0.5.tgz#1ffb450c8a03e7bccffe40643180918cc297d271"
   integrity sha512-varLbTj0e0yVyRpqQhuWV+8hlePAgaoFRhNFj50BNjEIrw1/DphHSObtqwskVCPWNgzwPoQrZAbfa/SBiicNeg==
 
+fractional-indexing@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/fractional-indexing/-/fractional-indexing-2.0.0.tgz#82a02fb8fd95a0099568ab2a2ccd4fc2ec814854"
+  integrity sha512-x2wQciIdQtA14J+mLc3lV/e9CeT/xmPfUqwvz6RvJop2bH2v7CIbad/mXIFyeO8bQ4DbM36+4uhAO3UfjPIUTQ==
+
 fs-extra@^9.1.0:
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.1.0.tgz#5954460c764a8da2094ba3554bf839e6b9a7c86d"

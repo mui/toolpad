@@ -27,7 +27,6 @@ export interface StudioNodeBase {
   readonly parentId: NodeId | null;
   readonly parentIndex: number | null;
   readonly name: string;
-  // readonly children: NodeId[];
 }
 
 export interface StudioAppNode extends StudioNodeBase {
@@ -42,7 +41,6 @@ export interface StudioThemeNode extends StudioNodeBase {
 
 export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
   readonly type: 'api';
-  readonly name: string;
   readonly connectionId: string;
   readonly query: Q;
 }
@@ -56,7 +54,6 @@ export interface StudioPageNode extends StudioNodeBase {
 export interface StudioElementNode<P = DefaultNodeProps> extends StudioNodeBase {
   readonly type: 'element';
   readonly component: string;
-  readonly name: string;
   readonly props: Partial<StudioNodeProps<P>>;
 }
 

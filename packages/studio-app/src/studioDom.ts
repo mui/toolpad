@@ -6,6 +6,8 @@ export interface StudioNodeBase {
   readonly id: NodeId;
   readonly type: 'app' | 'theme' | 'api' | 'page' | 'element';
   readonly parentId: NodeId | null;
+  // TODO: Use fractional index instead https://observablehq.com/@dgreensp/implementing-fractional-indexing
+  readonly parentIndex: number | null;
   readonly name: string;
   readonly children: NodeId[];
 }
@@ -115,7 +117,6 @@ export function getApp(dom: StudioDom): StudioAppNode {
   return rootNode;
 }
 
-// TODO: overloads
 export function getChildren(
   dom: StudioDom,
   parent: StudioAppNode,
@@ -127,24 +128,6 @@ export function getChildren(
 export function getChildren(dom: StudioDom, parent: StudioNode): StudioNode[];
 export function getChildren(dom: StudioDom, parent: StudioNode): StudioNode[] {
   return parent.children.map((nodeId) => getNode(dom, nodeId));
-}
-
-export function getPages(dom: StudioDom, app: StudioAppNode): StudioPageNode[] {
-  return getChildren(dom, app).filter((node) => isPage(node)) as StudioPageNode[];
-}
-
-export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
-  return getChildren(dom, app).filter((node) => isApi(node)) as StudioApiNode[];
-}
-
-// TODO: make theme optional by returning undefined
-export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode {
-  return getChildren(dom, app).find((node) => isTheme(node)) as StudioThemeNode;
-}
-
-export function getPageRoot(dom: StudioDom, page: StudioPageNode): StudioElementNode {
-  const [root] = getChildren(dom, page);
-  return root;
 }
 
 export function getParent(dom: StudioDom, child: StudioAppNode): null;
@@ -162,6 +145,24 @@ export function getParent(dom: StudioDom, child: StudioNode): StudioNode | null 
     return parent;
   }
   return null;
+}
+
+export function getPages(dom: StudioDom, app: StudioAppNode): StudioPageNode[] {
+  return getChildren(dom, app).filter((node) => isPage(node)) as StudioPageNode[];
+}
+
+export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
+  return getChildren(dom, app).filter((node) => isApi(node)) as StudioApiNode[];
+}
+
+// TODO: make theme optional by returning undefined
+export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode | undefined {
+  return getChildren(dom, app).find((node) => isTheme(node)) as StudioThemeNode | undefined;
+}
+
+export function getPageRoot(dom: StudioDom, page: StudioPageNode): StudioElementNode {
+  const [root] = getChildren(dom, page);
+  return root;
 }
 
 export function setNodeName(dom: StudioDom, node: StudioNode, name: string): StudioDom {
@@ -219,6 +220,7 @@ export function createElement<P>(
     id: generateUniqueId(new Set(Object.keys(dom.nodes))) as NodeId,
     type: 'element',
     parentId: null,
+    parentIndex: null,
     component,
     props,
     name: name

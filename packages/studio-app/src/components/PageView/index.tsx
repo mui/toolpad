@@ -13,17 +13,18 @@ const PageViewRoot = styled('div')({
 const appIndex = `
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Page from './page.js';
 import theme from './lib/theme.js';
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 function render (Page, theme) {
+  const appTheme = createTheme(theme);
   ReactDOM.render(
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={appTheme}>
         <Page />
       </ThemeProvider>
     </QueryClientProvider>, 

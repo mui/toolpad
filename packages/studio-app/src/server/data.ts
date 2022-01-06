@@ -211,10 +211,9 @@ export async function execApi(api: StudioApi): Promise<StudioApiResult<any>> {
 }
 
 const DEFAULT_THEME_CONTENT = `
-import { createTheme } from '@mui/material/styles';
 import { green, orange } from '@mui/material/colors';
 
-export default createTheme({
+export default {
   palette: {
     primary: {
       main: orange[500],
@@ -223,7 +222,7 @@ export default createTheme({
       main: green[500],
     },
   },
-});
+};
 `;
 
 function createDefaultApp(): StudioDom {
@@ -243,6 +242,7 @@ function createDefaultApp(): StudioDom {
         type: 'app',
         name: 'App',
         parentId: null,
+        parentIndex: null,
         children: [themeId, pageId],
       },
       [themeId]: {
@@ -250,6 +250,7 @@ function createDefaultApp(): StudioDom {
         type: 'theme',
         name: 'Theme',
         parentId: appId,
+        parentIndex: 0.5,
         content: DEFAULT_THEME_CONTENT,
         children: [],
       },
@@ -258,6 +259,7 @@ function createDefaultApp(): StudioDom {
         type: 'page',
         name: 'DefaultPage',
         parentId: appId,
+        parentIndex: 0.5,
         title: 'Default',
         children: [rootId],
         state: {},
@@ -267,6 +269,7 @@ function createDefaultApp(): StudioDom {
         type: 'element',
         name: 'Page',
         parentId: pageId,
+        parentIndex: 0.5,
         component: 'Page',
         children: [],
         props: {},

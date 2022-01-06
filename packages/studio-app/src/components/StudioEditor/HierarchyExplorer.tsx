@@ -123,7 +123,9 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
       >
-        <TreeItem ContentComponent={CustomContent} nodeId={theme.id} label="Theme" />
+        {theme ? (
+          <TreeItem ContentComponent={CustomContent} nodeId={theme.id} label="Theme" />
+        ) : null}
         <TreeItem ContentComponent={CustomContent} nodeId="" label="Pages">
           {pages.map((page) => (
             <HierarchyExplorerPageItem key={page.id} page={page} />

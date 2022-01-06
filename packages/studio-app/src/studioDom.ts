@@ -321,7 +321,7 @@ export function removeNode(dom: StudioDom, nodeId: NodeId) {
   const parent = getParent(dom, node);
 
   if (!parent) {
-    throw new Error(`Invariant: Node: "${node.id}" can not be removed`);
+    throw new Error(`Invariant: Node: "${node.id}" can't be removed`);
   }
 
   return update(dom, {

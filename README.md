@@ -30,6 +30,7 @@ TO DO:
 - make APIs bindable
 - Move API editor under app editor
 - Should we move Connection editor under app editor?
+- Nested paths pages
 - iframe needs to be sandboxed + CSP?
 - StudioSandbox => add react-refresh (or decide on alternative, bundler in teh browser?)
 - decide on persistence, json files vs. sqlite vs. postgres?

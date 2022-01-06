@@ -82,7 +82,6 @@ export interface StudioNodes {
 
 export interface StudioDom {
   nodes: StudioNodes;
-  children: { [nodeId: NodeId]: NodeId[] };
   root: NodeId;
 }
 
@@ -253,9 +252,6 @@ export function createDom(): StudioDom {
         name: 'Application',
       },
     },
-    children: {
-      [rootId]: [],
-    },
     root: rootId,
   };
 }
@@ -338,13 +334,6 @@ export function setNodeProp<P, K extends keyof P>(
         }),
       }),
     }),
-  });
-}
-
-function recalculateChildren(dom: StudioDom, nodes: NodeId[] = []): StudioDom {
-  nodes.map((node) => {});
-  return update(dom, {
-    children: update(),
   });
 }
 

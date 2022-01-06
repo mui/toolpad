@@ -135,28 +135,6 @@ export type EditorAction =
       viewState: ViewState;
     };
 
-function removeNode(
-  dom: studioDom.StudioDom,
-  node: studioDom.StudioElementNode,
-): studioDom.StudioDom {
-  const parent = studioDom.getParent(dom, node);
-
-  if (!parent || studioDom.isPage(parent)) {
-    throw new Error(`Invariant: Node: "${node.id}" can not be removed`);
-  }
-
-  return update(dom, {
-    nodes: omit(
-      update(dom.nodes, {
-        [parent.id]: update(parent, {
-          children: parent.children.filter((slot) => slot !== node.id),
-        }),
-      }),
-      node.id,
-    ),
-  });
-}
-
 export function createThemeEditorState(
   dom: studioDom.StudioDom,
   themeNodeId: NodeId,
@@ -195,8 +173,8 @@ export function createPageEditorState(
 }
 
 export function createEditorState(dom: studioDom.StudioDom): EditorState {
-  const pageNodeId = studioDom.getApp(dom).pages[0];
-  return createPageEditorState(dom, pageNodeId);
+  const pageNode = studioDom.getPages(dom, studioDom.getApp(dom))[0];
+  return createPageEditorState(dom, pageNode.id);
 }
 
 export function pageEditorReducer(state: PageEditorState, action: EditorAction): EditorState {
@@ -259,20 +237,17 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
         return state;
       }
 
-      const node = studioDom.getNode(state.dom, state.selection);
-      studioDom.assertIsElement(node);
-
       // TODO: also clean up orphaned state and bindings
       return update(state, {
         selection: null,
-        dom: removeNode(state.dom, node),
+        dom: studioDom.removeNode(state.dom, state.selection),
       });
     }
     case 'ADD_COMPONENT_DRAG_START': {
       if (state.newNode) {
         return state;
       }
-      const componentDef = getStudioComponent(action.component);
+      const componentDef = getStudioComponent(state.dom, action.component);
       const newNode = studioDom.createElement(
         state.dom,
         action.component,
@@ -296,31 +271,16 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
       });
     }
     case 'ADD_COMPONENT_DROP': {
-      let { newNode, dom } = state;
-      let indexOffset = 0;
+      const { newNode, dom } = state;
+      let addedNode: studioDom.StudioNode | null = newNode;
 
-      if (!newNode && state.selection) {
+      if (!addedNode && state.selection) {
         const selection = studioDom.getNode(dom, state.selection);
         studioDom.assertIsElement(selection);
-        newNode = selection;
-        if (newNode && newNode.parentId === action.location?.nodeId) {
-          const parent = studioDom.getNode(dom, newNode.parentId);
-          if (!studioDom.isElement(parent)) {
-            throw new Error(`Invariant: Inavlid node type in drop parent "${parent.type}"`);
-          }
-
-          // The following removal will reduce the children, so we adjust the index
-          // if we're moving a node down within the same parent.
-          const siblings = parent.children;
-          const currentIndex = siblings.indexOf(newNode.id);
-          if (action.location.index > currentIndex) {
-            indexOffset = -1;
-          }
-        }
-        dom = removeNode(dom, selection);
+        addedNode = selection;
       }
 
-      if (!action.location || !newNode) {
+      if (!action.location || !addedNode) {
         return update(state, {
           newNode: null,
           highlightLayout: false,
@@ -329,28 +289,15 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
       }
 
       const { nodeId, index } = action.location;
-      const node = studioDom.getNode(dom, nodeId);
-      if (!studioDom.isElement(node)) {
-        throw new Error(`Invariant: Inavlid node type in drop parent "${node.type}"`);
-      }
+      const parent = studioDom.getNode(dom, nodeId);
 
-      const sliceIndex = index + indexOffset;
+      const siblings = studioDom.getChildren(dom, parent);
+      const left = siblings[index - 1]?.parentIndex || null;
+      const right = siblings[index]?.parentIndex || null;
+      const parentIndex = studioDom.createFractionalIndex(left, right);
 
       return update(state, {
-        dom: update(dom, {
-          nodes: update(dom.nodes, {
-            [node.id]: update(node, {
-              children: [
-                ...node.children.slice(0, sliceIndex),
-                newNode.id,
-                ...node.children.slice(sliceIndex),
-              ],
-            }),
-            [newNode.id]: update(newNode, {
-              parentId: nodeId,
-            }),
-          }),
-        }),
+        dom: studioDom.moveNode(dom, addedNode, action.location.nodeId, parentIndex),
         newNode: null,
         highlightLayout: false,
         highlightedSlot: null,

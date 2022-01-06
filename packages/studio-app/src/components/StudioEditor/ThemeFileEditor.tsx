@@ -12,7 +12,7 @@ export default function ThemeFileEditor({ className }: ThemeFileEditorProps) {
   const theme = studioDom.getTheme(state.dom, app);
   return (
     <div className={className}>
-      <pre>{theme.content}</pre>
+      <pre>{theme?.content ?? '// No theme yet'}</pre>
     </div>
   );
 }

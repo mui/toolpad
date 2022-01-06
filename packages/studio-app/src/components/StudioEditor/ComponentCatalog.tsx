@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { List, ListItem } from '@mui/material';
-import { components } from '../../studioComponents';
+import { DEFAULT_COMPONENTS } from '../../studioComponents';
 import { useEditorApi } from './EditorProvider';
 
 export interface ComponentCatalogProps {
@@ -17,7 +17,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   return (
     <List className={className}>
-      {Array.from(components.keys(), (componentType) => {
+      {Array.from(DEFAULT_COMPONENTS.keys(), (componentType) => {
         return (
           <ListItem key={componentType} draggable onDragStart={handleDragStart(componentType)}>
             {componentType}

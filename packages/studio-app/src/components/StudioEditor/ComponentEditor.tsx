@@ -97,7 +97,8 @@ interface ComponentPropsEditorProps<P> {
 }
 
 function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorProps<P>) {
-  const definition = getStudioComponent(node.component);
+  const { dom } = usePageEditorState();
+  const definition = getStudioComponent(dom, node.component);
 
   return (
     <ComponentPropsEditorRoot>

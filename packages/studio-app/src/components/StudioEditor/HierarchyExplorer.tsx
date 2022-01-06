@@ -84,10 +84,12 @@ interface HierarchyExplorerPageItemProps {
 
 function HierarchyExplorerPageItem({ page }: HierarchyExplorerPageItemProps) {
   const state = useEditorState();
-  const root = studioDom.getPageRoot(state.dom, page);
+  const children = studioDom.getChildren(state.dom, page);
   return (
     <TreeItem ContentComponent={CustomContent} nodeId={page.id} label={`${page.name} (${page.id})`}>
-      <HierarchyExplorerElementItem element={root} />
+      {children.map((child) => (
+        <HierarchyExplorerElementItem key={child.id} element={child} />
+      ))}
     </TreeItem>
   );
 }
@@ -123,7 +125,9 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
       >
-        <TreeItem ContentComponent={CustomContent} nodeId={theme.id} label="Theme" />
+        {theme ? (
+          <TreeItem ContentComponent={CustomContent} nodeId={theme.id} label="Theme" />
+        ) : null}
         <TreeItem ContentComponent={CustomContent} nodeId="" label="Pages">
           {pages.map((page) => (
             <HierarchyExplorerPageItem key={page.id} page={page} />

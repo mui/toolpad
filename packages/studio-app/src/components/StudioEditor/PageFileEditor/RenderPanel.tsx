@@ -138,7 +138,7 @@ function insertSlotAbsolutePositionCss(slot: SlotLayoutInsert): React.CSSPropert
 }
 
 function findNodeAt(
-  nodes: readonly studioDom.StudioElementNode[],
+  nodes: readonly PageOrElementNode[],
   viewLayout: ViewState,
   x: number,
   y: number,
@@ -156,19 +156,16 @@ function findNodeAt(
 
 /**
  * Return all nodes that are available for insertion.
- * i.e. Exclude all decendants of the current selection since inserting in one of
+ * i.e. Exclude all descendants of the current selection since inserting in one of
  * them would create a cyclic structure.
  */
 function getAvailableNodes(
-  nodes: readonly studioDom.StudioElementNode[],
+  nodes: readonly PageOrElementNode[],
   state: PageEditorState,
-): readonly (studioDom.StudioElementNode | studioDom.StudioPageNode)[] {
+): readonly PageOrElementNode[] {
   const selection = state.selection && studioDom.getNode(state.dom, state.selection);
-  if (selection) {
-    studioDom.assertIsElement(selection);
-  }
-  const excludedNodes = new Set<studioDom.StudioElementNode>(
-    selection ? [selection, ...studioDom.getDecendants(state.dom, selection)] : [],
+  const excludedNodes = new Set<studioDom.StudioNode>(
+    selection ? [selection, ...studioDom.getDescendants(state.dom, selection)] : [],
   );
   return nodes.filter((node) => !excludedNodes.has(node));
 }
@@ -266,6 +263,8 @@ function findActiveSlotAt(
   return null;
 }
 
+type PageOrElementNode = studioDom.StudioPageNode | studioDom.StudioElementNode;
+
 export interface RenderPanelProps {
   className?: string;
 }
@@ -281,11 +280,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const [isFocused, setIsFocused] = React.useState(false);
 
-  const pageNodes = React.useMemo(() => {
-    const page = studioDom.getNode(dom, pageNodeId);
-    studioDom.assertIsPage(page);
-    return studioDom.elementsByDepth(dom, page);
-  }, [dom, pageNodeId]);
+  const pageNode = studioDom.getNode(dom, pageNodeId);
+  studioDom.assertIsPage(pageNode);
+
+  const pageNodes: readonly PageOrElementNode[] = React.useMemo(() => {
+    return [pageNode, ...studioDom.getDescendants(dom, pageNode)];
+  }, [dom, pageNode]);
 
   const selectedNode = selection && studioDom.getNode(state.dom, selection);
   if (selectedNode) {
@@ -484,6 +484,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             if (!nodeLayout) {
               return null;
             }
+            const selectable = studioDom.isElement(node);
             return node ? (
               <React.Fragment key={nodeId}>
                 <div
@@ -495,7 +496,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     [classes.allowNodeInteraction]: nodesWithInteraction.has(nodeId),
                   })}
                 >
-                  <div className={classes.selectionHint}>{node.component}</div>
+                  {selectable ? (
+                    <div className={classes.selectionHint}>{node.component}</div>
+                  ) : null}
                   {Object.values(nodeLayout.slots).map((nodeSlots = []) =>
                     nodeSlots.map((slotLayout, index) =>
                       slotLayout.type === 'insert' ? (

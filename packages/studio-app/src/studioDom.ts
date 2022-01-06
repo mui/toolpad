@@ -1,20 +1,45 @@
 import { DefaultNodeProps, NodeId, StudioNodeProps, StudioStateDefinition } from './types';
-import { update } from './utils/immutability';
+import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
+
+const ALLOWED_PARENTS = {
+  app: [],
+  theme: ['app'],
+  api: ['app'],
+  page: ['app'],
+  element: ['page', 'element'],
+} as const;
+
+// Naive fractional index implementation
+// TODO: improve: https://observablehq.com/@dgreensp/implementing-fractional-indexing
+export function createFractionalIndex(index1: number | null, index2: number | null) {
+  if (typeof index1 === 'number') {
+    console.assert(index1 > 0 && index1 < 1);
+  }
+  if (typeof index2 === 'number') {
+    console.assert(index2 > 0 && index2 < 1);
+  }
+  if (typeof index1 === 'number' && typeof index2 === 'number') {
+    console.assert(index1 < index2);
+  }
+  return ((index1 || 0) + (index2 || 1)) / 2;
+}
+
+export function compareFractionalIndex(index1: number, index2: number): number {
+  return index1 - index2;
+}
 
 export interface StudioNodeBase {
   readonly id: NodeId;
   readonly type: 'app' | 'theme' | 'api' | 'page' | 'element';
   readonly parentId: NodeId | null;
+  readonly parentIndex: number | null;
   readonly name: string;
 }
 
 export interface StudioAppNode extends StudioNodeBase {
   readonly type: 'app';
   readonly parentId: null;
-  readonly apis: NodeId[];
-  readonly pages: NodeId[];
-  readonly theme: NodeId;
 }
 
 export interface StudioThemeNode extends StudioNodeBase {
@@ -24,7 +49,6 @@ export interface StudioThemeNode extends StudioNodeBase {
 
 export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
   readonly type: 'api';
-  readonly name: string;
   readonly connectionId: string;
   readonly query: Q;
 }
@@ -32,24 +56,35 @@ export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
 export interface StudioPageNode extends StudioNodeBase {
   readonly type: 'page';
   readonly title: string;
-  readonly root: NodeId;
   readonly state: Record<string, StudioStateDefinition>;
 }
 
 export interface StudioElementNode<P = DefaultNodeProps> extends StudioNodeBase {
   readonly type: 'element';
   readonly component: string;
-  readonly name: string;
   readonly props: Partial<StudioNodeProps<P>>;
-  readonly children: NodeId[];
 }
 
-export type StudioNode =
-  | StudioAppNode
-  | StudioThemeNode
-  | StudioApiNode
-  | StudioPageNode
-  | StudioElementNode;
+type StudioNodeOfType<K extends StudioNodeBase['type']> = {
+  app: StudioAppNode;
+  api: StudioApiNode;
+  theme: StudioThemeNode;
+  page: StudioPageNode;
+  element: StudioElementNode;
+}[K];
+
+export type StudioNodeType = StudioNodeBase['type'];
+
+export type StudioNode = StudioNodeOfType<StudioNodeType>;
+
+type AllowedParents = typeof ALLOWED_PARENTS;
+type ParentTypeOfType<T extends StudioNodeType> = AllowedParents[T][number];
+export type ParentOf<N extends StudioNode> = StudioNodeOfType<ParentTypeOfType<N['type']>> | null;
+
+type ChildTypeOfType<T extends StudioNodeType> = {
+  [K in keyof AllowedParents]: T extends AllowedParents[K][number] ? K : never;
+}[keyof AllowedParents];
+export type ChildOf<N extends StudioNode> = StudioNodeOfType<ChildTypeOfType<N['type']>>;
 
 export interface StudioNodes {
   [id: NodeId]: StudioNode;
@@ -119,55 +154,153 @@ export function getApp(dom: StudioDom): StudioAppNode {
   return rootNode;
 }
 
-export function getPages(dom: StudioDom, root: StudioAppNode): StudioPageNode[] {
-  return root.pages.map((nodeId) => {
-    const page = getNode(dom, nodeId);
-    assertIsPage(page);
-    return page;
-  });
+export function getChildren<N extends StudioNode>(dom: StudioDom, parent: N): ChildOf<N>[] {
+  // TODO: memoize this per node in the dom object
+  return Object.values(dom.nodes)
+    .filter((node: StudioNode) => node.parentId === parent.id)
+    .sort((node1: StudioNode, node2: StudioNode) => {
+      if (!node1.parentIndex || !node2.parentIndex) {
+        throw new Error(
+          `Invariant: nodes inside the dom should have a parentIndex if they have a parent`,
+        );
+      }
+      return compareFractionalIndex(node1.parentIndex, node2.parentIndex);
+    }) as ChildOf<N>[];
 }
 
-export function getApis(dom: StudioDom, root: StudioAppNode): StudioApiNode[] {
-  return root.apis.map((nodeId) => {
-    const page = getNode(dom, nodeId);
-    assertIsApi(page);
-    return page;
-  });
-}
-
-export function getTheme(dom: StudioDom, root: StudioAppNode): StudioThemeNode {
-  const theme = getNode(dom, root.theme);
-  assertIsTheme(theme);
-  return theme;
-}
-
-export function getPageRoot(dom: StudioDom, page: StudioPageNode): StudioElementNode {
-  const element = getNode(dom, page.root);
-  assertIsElement(element);
-  return element;
-}
-
-export function getChildren(dom: StudioDom, parent: StudioElementNode): StudioElementNode[] {
-  return parent.children.map((nodeId) => {
-    const page = getNode(dom, nodeId);
-    assertIsElement(page);
-    return page;
-  });
-}
-
-export function getParent(dom: StudioDom, child: StudioAppNode): null;
-export function getParent(dom: StudioDom, child: StudioApiNode): StudioAppNode | null;
-export function getParent(dom: StudioDom, child: StudioPageNode): StudioAppNode | null;
-export function getParent(dom: StudioDom, child: StudioThemeNode): StudioAppNode | null;
-export function getParent(
-  dom: StudioDom,
-  child: StudioElementNode,
-): StudioPageNode | StudioElementNode | null;
-export function getParent(dom: StudioDom, child: StudioNode): StudioNode | null;
-export function getParent(dom: StudioDom, child: StudioNode): StudioNode | null {
+export function getParent<N extends StudioNode>(dom: StudioDom, child: N): ParentOf<N> {
   if (child.parentId) {
     const parent = getNode(dom, child.parentId);
-    return parent;
+    return parent as ParentOf<N>;
+  }
+  return null;
+}
+
+export function getPages(dom: StudioDom, app: StudioAppNode): StudioPageNode[] {
+  return getChildren(dom, app).filter((node) => isPage(node)) as StudioPageNode[];
+}
+
+export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
+  return getChildren(dom, app).filter((node) => isApi(node)) as StudioApiNode[];
+}
+
+// TODO: make theme optional by returning undefined
+export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode | undefined {
+  return getChildren(dom, app).find((node) => isTheme(node)) as StudioThemeNode | undefined;
+}
+
+function generateUniqueName(baseName: string, existingNames: Set<string>, alwaysIndex = false) {
+  let i = 1;
+  let suggestion = baseName;
+  if (alwaysIndex) {
+    suggestion += String(i);
+    i += 1;
+  }
+  while (existingNames.has(suggestion)) {
+    suggestion = baseName + String(i);
+    i += 1;
+  }
+  return suggestion;
+}
+
+function getNodeNames(dom: StudioDom): Set<string> {
+  return new Set(Object.values(dom.nodes).map(({ name }) => name));
+}
+
+export function createElementInternal<P>(
+  dom: StudioDom,
+  id: NodeId,
+  component: string,
+  props: Partial<StudioNodeProps<P>> = {},
+  name?: string,
+): StudioElementNode {
+  const existingNames = getNodeNames(dom);
+  return {
+    id,
+    type: 'element',
+    parentId: null,
+    parentIndex: null,
+    component,
+    props,
+    name: name
+      ? generateUniqueName(name, existingNames)
+      : generateUniqueName(component, existingNames, true),
+  };
+}
+
+type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
+  StudioNodeOfType<T>,
+  'id' | 'type' | 'parentId' | 'parentIndex'
+>;
+
+export function createNode<T extends StudioNodeType>(
+  dom: StudioDom,
+  type: T,
+  { name, ...init }: StudioNodeInitOfType<T>,
+): StudioNodeOfType<T> {
+  const id = generateUniqueId(new Set(Object.keys(dom.nodes))) as NodeId;
+  const existingNames = getNodeNames(dom);
+  return {
+    id,
+    type,
+    parentId: null,
+    parentIndex: null,
+    name: generateUniqueName(name, existingNames),
+    ...init,
+  } as StudioNodeOfType<T>;
+}
+
+export function createDom(): StudioDom {
+  const rootId = generateUniqueId(new Set()) as NodeId;
+  return {
+    nodes: {
+      [rootId]: {
+        id: rootId,
+        type: 'app',
+        parentId: null,
+        parentIndex: null,
+        name: 'Application',
+      },
+    },
+    root: rootId,
+  };
+}
+
+export function createElement<P>(
+  dom: StudioDom,
+  component: string,
+  props: Partial<StudioNodeProps<P>> = {},
+  name?: string,
+): StudioElementNode {
+  return createNode(dom, 'element', {
+    component,
+    props,
+    name: name || component,
+  });
+}
+
+export function getDescendants(
+  dom: StudioDom,
+  node: StudioElementNode | StudioPageNode,
+): readonly StudioElementNode[];
+export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[];
+export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
+  const children = getChildren(dom, node);
+  return [...children, ...children.flatMap((child) => getDescendants(dom, child))];
+}
+
+export function getAncestors(
+  dom: StudioDom,
+  node: StudioElementNode,
+): readonly (StudioElementNode | StudioPageNode)[] {
+  const parent = getParent(dom, node);
+  return parent && isElement(parent) ? [...getAncestors(dom, parent), parent] : [];
+}
+
+export function getElementPage(dom: StudioDom, node: StudioElementNode): StudioPageNode | null {
+  const parent = getParent(dom, node);
+  if (parent) {
+    return isPage(parent) ? parent : getElementPage(dom, parent);
   }
   return null;
 }
@@ -197,79 +330,62 @@ export function setNodeProps<P>(
   });
 }
 
-function generateUniqueName(baseName: string, existingNames: Set<string>, alwaysIndex = false) {
-  let i = 1;
-  let suggestion = baseName;
-  if (alwaysIndex) {
-    suggestion += String(i);
-    i += 1;
-  }
-  while (existingNames.has(suggestion)) {
-    suggestion = baseName + String(i);
-    i += 1;
-  }
-  return suggestion;
-}
-
-function getNodeNames(dom: StudioDom): Set<string> {
-  return new Set(Object.values(dom.nodes).map(({ name }) => name));
-}
-
-export function createElement<P>(
-  dom: StudioDom,
-  component: string,
-  props: Partial<StudioNodeProps<P>> = {},
-  name?: string,
-  children: NodeId[] = [],
-): StudioElementNode {
-  const existingNames = getNodeNames(dom);
-  return {
-    id: generateUniqueId(new Set(Object.keys(dom.nodes))) as NodeId,
-    type: 'element',
-    parentId: null,
-    component,
-    props,
-    name: name
-      ? generateUniqueName(name, existingNames)
-      : generateUniqueName(component, existingNames, true),
-    children,
-  };
-}
-
-/**
- * Nodes on a page, sorted by depth, root first
- */
-export function elementsByDepth(
-  dom: StudioDom,
-  node: StudioElementNode | StudioPageNode,
-): readonly StudioElementNode[] {
-  if (isPage(node)) {
-    const root = getPageRoot(dom, node);
-    return elementsByDepth(dom, root);
-  }
-  return [node, ...getChildren(dom, node).flatMap((child) => elementsByDepth(dom, child))];
-}
-
-export function getDecendants(
-  dom: StudioDom,
+export function setNodeProp<P, K extends keyof P>(
+  page: StudioDom,
   node: StudioElementNode,
-): readonly StudioElementNode[] {
-  const children = getChildren(dom, node);
-  return [...children, ...children.flatMap((child) => getDecendants(dom, child))];
+  prop: K,
+  value: StudioNodeProps<P>[K],
+): StudioDom {
+  return update(page, {
+    nodes: update(page.nodes, {
+      [node.id]: update(node, {
+        props: update(node.props, {
+          [prop]: value,
+        }),
+      }),
+    }),
+  });
 }
 
-export function getAncestors(
+export function moveNode(
   dom: StudioDom,
-  node: StudioElementNode,
-): readonly (StudioElementNode | StudioPageNode)[] {
-  const parent = getParent(dom, node);
-  return parent && isElement(parent) ? [...getAncestors(dom, parent), parent] : [];
+  newNode: StudioNode,
+  parentId: NodeId,
+  parentIndex?: number,
+) {
+  const parent = getNode(dom, parentId);
+
+  const allowedParents: readonly StudioNodeBase['type'][] = ALLOWED_PARENTS[newNode.type];
+  if (!allowedParents.includes(parent.type)) {
+    throw new Error(
+      `Node "${newNode.id}" of type "${newNode.type}" can't be added to a node of type "${parent.type}"`,
+    );
+  }
+  if (!parentIndex) {
+    const siblings = getChildren(dom, parent);
+    const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
+    parentIndex = createFractionalIndex(lastIndex, null);
+  }
+
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [newNode.id]: update(newNode, {
+        parentId,
+        parentIndex,
+      }),
+    }),
+  });
 }
 
-export function getElementPage(dom: StudioDom, node: StudioElementNode): StudioPageNode | null {
+export function removeNode(dom: StudioDom, nodeId: NodeId) {
+  const node = getNode(dom, nodeId);
   const parent = getParent(dom, node);
-  if (parent) {
-    return isPage(parent) ? parent : getElementPage(dom, parent);
+
+  if (!parent) {
+    throw new Error(`Invariant: Node: "${node.id}" can't be removed`);
   }
-  return null;
+
+  return update(dom, {
+    nodes: omit(dom.nodes, node.id),
+  });
 }

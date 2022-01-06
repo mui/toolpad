@@ -272,7 +272,7 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
       if (state.newNode) {
         return state;
       }
-      const componentDef = getStudioComponent(action.component);
+      const componentDef = getStudioComponent(state.dom, action.component);
       const newNode = studioDom.createElement(
         state.dom,
         action.component,

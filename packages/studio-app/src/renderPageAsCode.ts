@@ -65,7 +65,7 @@ class Context {
   // resolve props to expressions
   resolveProps(node: studioDom.StudioElementNode): Record<string, string> {
     const result: Record<string, string> = {};
-    const component = getStudioComponent(node.component);
+    const component = getStudioComponent(this.dom, node.component);
     Object.entries(node.props).forEach(([propName, propValue]) => {
       const propDefinition = component.props[propName];
       if (!propDefinition || !propValue) {
@@ -109,7 +109,7 @@ class Context {
   }
 
   renderNode(node: studioDom.StudioElementNode): string {
-    const component = getStudioComponent(node.component);
+    const component = getStudioComponent(this.dom, node.component);
     const props = this.resolveProps(node);
     const renderedChildren = studioDom
       .getChildren(this.dom, node)

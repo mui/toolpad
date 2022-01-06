@@ -2,6 +2,14 @@ import { DefaultNodeProps, NodeId, StudioNodeProps, StudioStateDefinition } from
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 
+const ALLOWED_PARENTS = {
+  app: [],
+  theme: ['app'],
+  api: ['app'],
+  page: ['app'],
+  element: ['page', 'element'],
+} as const;
+
 // Naive fractional index implementation
 // TODO: improve: https://observablehq.com/@dgreensp/implementing-fractional-indexing
 export function createFractionalIndex(index1: number | null, index2: number | null) {
@@ -57,12 +65,26 @@ export interface StudioElementNode<P = DefaultNodeProps> extends StudioNodeBase 
   readonly props: Partial<StudioNodeProps<P>>;
 }
 
-export type StudioNode =
-  | StudioAppNode
-  | StudioThemeNode
-  | StudioApiNode
-  | StudioPageNode
-  | StudioElementNode;
+type StudioNodeOfType<K extends StudioNodeBase['type']> = {
+  app: StudioAppNode;
+  api: StudioApiNode;
+  theme: StudioThemeNode;
+  page: StudioPageNode;
+  element: StudioElementNode;
+}[K];
+
+export type StudioNodeType = StudioNodeBase['type'];
+
+export type StudioNode = StudioNodeOfType<StudioNodeType>;
+
+type AllowedParents = typeof ALLOWED_PARENTS;
+type ParentTypeOfType<T extends StudioNodeType> = AllowedParents[T][number];
+export type ParentOf<N extends StudioNode> = StudioNodeOfType<ParentTypeOfType<N['type']>> | null;
+
+type ChildTypeOfType<T extends StudioNodeType> = {
+  [K in keyof AllowedParents]: T extends AllowedParents[K][number] ? K : never;
+}[keyof AllowedParents];
+export type ChildOf<N extends StudioNode> = StudioNodeOfType<ChildTypeOfType<N['type']>>;
 
 export interface StudioNodes {
   [id: NodeId]: StudioNode;
@@ -132,16 +154,7 @@ export function getApp(dom: StudioDom): StudioAppNode {
   return rootNode;
 }
 
-export function getChildren(
-  dom: StudioDom,
-  parent: StudioAppNode,
-): (StudioPageNode | StudioApiNode | StudioThemeNode)[];
-export function getChildren(
-  dom: StudioDom,
-  child: StudioElementNode | StudioPageNode,
-): StudioElementNode[];
-export function getChildren(dom: StudioDom, parent: StudioNode): StudioNode[];
-export function getChildren(dom: StudioDom, parent: StudioNode): StudioNode[] {
+export function getChildren<N extends StudioNode>(dom: StudioDom, parent: N): ChildOf<N>[] {
   // TODO: memoize this per node in the dom object
   return Object.values(dom.nodes)
     .filter((node: StudioNode) => node.parentId === parent.id)
@@ -152,22 +165,13 @@ export function getChildren(dom: StudioDom, parent: StudioNode): StudioNode[] {
         );
       }
       return compareFractionalIndex(node1.parentIndex, node2.parentIndex);
-    });
+    }) as ChildOf<N>[];
 }
 
-export function getParent(dom: StudioDom, child: StudioAppNode): null;
-export function getParent(dom: StudioDom, child: StudioApiNode): StudioAppNode | null;
-export function getParent(dom: StudioDom, child: StudioPageNode): StudioAppNode | null;
-export function getParent(dom: StudioDom, child: StudioThemeNode): StudioAppNode | null;
-export function getParent(
-  dom: StudioDom,
-  child: StudioElementNode,
-): StudioPageNode | StudioElementNode | null;
-export function getParent(dom: StudioDom, child: StudioNode): StudioNode | null;
-export function getParent(dom: StudioDom, child: StudioNode): StudioNode | null {
+export function getParent<N extends StudioNode>(dom: StudioDom, child: N): ParentOf<N> {
   if (child.parentId) {
     const parent = getNode(dom, child.parentId);
-    return parent;
+    return parent as ParentOf<N>;
   }
   return null;
 }
@@ -188,31 +192,6 @@ export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode | 
 export function getPageRoot(dom: StudioDom, page: StudioPageNode): StudioElementNode {
   const [root] = getChildren(dom, page);
   return root;
-}
-
-export function setNodeName(dom: StudioDom, node: StudioNode, name: string): StudioDom {
-  return update(dom, {
-    nodes: update(dom.nodes, {
-      [node.id]: {
-        ...node,
-        name,
-      },
-    }),
-  });
-}
-
-export function setNodeProps<P>(
-  page: StudioDom,
-  node: StudioElementNode,
-  props: StudioNodeProps<P>,
-): StudioDom {
-  return update(page, {
-    nodes: update(page.nodes, {
-      [node.id]: update(node, {
-        props,
-      }),
-    }),
-  });
 }
 
 function generateUniqueName(baseName: string, existingNames: Set<string>, alwaysIndex = false) {
@@ -291,18 +270,68 @@ export function getElementPage(dom: StudioDom, node: StudioElementNode): StudioP
   return null;
 }
 
-export function addChild(
+export function setNodeName(dom: StudioDom, node: StudioNode, name: string): StudioDom {
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: {
+        ...node,
+        name,
+      },
+    }),
+  });
+}
+
+export function setNodeProps<P>(
+  page: StudioDom,
+  node: StudioElementNode,
+  props: StudioNodeProps<P>,
+): StudioDom {
+  return update(page, {
+    nodes: update(page.nodes, {
+      [node.id]: update(node, {
+        props,
+      }),
+    }),
+  });
+}
+
+export function setNodeProp<P, K extends keyof P>(
+  page: StudioDom,
+  node: StudioElementNode,
+  prop: K,
+  value: StudioNodeProps<P>[K],
+): StudioDom {
+  return update(page, {
+    nodes: update(page.nodes, {
+      [node.id]: update(node, {
+        props: update(node.props, {
+          [prop]: value,
+        }),
+      }),
+    }),
+  });
+}
+
+export function moveNode(
   dom: StudioDom,
   newNode: StudioNode,
   parentId: NodeId,
   parentIndex?: number,
 ) {
+  const parent = getNode(dom, parentId);
+
+  const allowedParents: readonly StudioNodeBase['type'][] = ALLOWED_PARENTS[newNode.type];
+  if (!allowedParents.includes(parent.type)) {
+    throw new Error(
+      `Node "${newNode.id}" of type "${newNode.type}" can't be added to a node of type "${parent.type}"`,
+    );
+  }
   if (!parentIndex) {
-    const parent = getNode(dom, parentId);
     const siblings = getChildren(dom, parent);
     const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
     parentIndex = createFractionalIndex(lastIndex, null);
   }
+
   return update(dom, {
     nodes: update(dom.nodes, {
       [newNode.id]: update(newNode, {

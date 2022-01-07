@@ -484,7 +484,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               return null;
             }
             const selectable = studioDom.isElement(node);
-            return node ? (
+            const children = studioDom.getChildren(dom, node);
+            return (
               <React.Fragment key={node.id}>
                 <div
                   draggable
@@ -528,7 +529,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                   )}
                 </div>
               </React.Fragment>
-            ) : null;
+            );
           })}
           {/* 
             This overlay allows passing through pointer-events through a pinhole

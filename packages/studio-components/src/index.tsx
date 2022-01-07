@@ -1,4 +1,3 @@
-export { default as Page } from './Page.js';
 export { default as TextField } from './TextField.js';
 export { default as Button } from './Button.js';
 export { default as Paper } from './Paper.js';

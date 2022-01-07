@@ -11,7 +11,6 @@ export interface StudioComponentDefinition {
 export const DEFAULT_COMPONENTS = new Map([
   ['Button', { module: '@mui/studio-components', importedName: 'Button' }],
   ['DataGrid', { module: '@mui/studio-components', importedName: 'DataGrid' }],
-  ['Page', { module: '@mui/studio-components', importedName: 'Page' }],
   ['Paper', { module: '@mui/studio-components', importedName: 'Paper' }],
   ['Stack', { module: '@mui/studio-components', importedName: 'Stack' }],
   ['TextField', { module: '@mui/studio-components', importedName: 'TextField' }],

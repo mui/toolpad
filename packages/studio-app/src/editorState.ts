@@ -288,10 +288,10 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
         });
       }
 
-      const { parentId, parentIndex } = action.location;
+      const { parentId, parentProp, parentIndex } = action.location;
 
       return update(state, {
-        dom: studioDom.moveNode(dom, addedNode, parentId, parentIndex),
+        dom: studioDom.moveNode(dom, addedNode, parentId, parentProp, parentIndex),
         newNode: null,
         highlightLayout: false,
         highlightedSlot: null,

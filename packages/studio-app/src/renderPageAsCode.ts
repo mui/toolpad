@@ -123,15 +123,27 @@ class Context {
       : rendered;
   }
 
-  renderChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): string {
-    return studioDom
-      .getChildren(this.dom, node)
-      .map((child) => this.renderNode(child))
-      .join('\n');
+  renderChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): {
+    [prop: string]: string | undefined;
+  } {
+    const result: { [prop: string]: string | undefined } = {};
+    const nodeChildren = studioDom.getChildren(this.dom, node);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [prop, children] of Object.entries(nodeChildren)) {
+      if (children) {
+        result[prop] = children.map((child) => this.renderNode(child)).join('\n');
+      }
+    }
+    return result;
   }
 
   renderPage(page: studioDom.StudioPageNode): string {
-    return this.renderNodeInternal(page.id, '__studioRuntime.Page', {}, this.renderChildren(page));
+    return this.renderNodeInternal(
+      page.id,
+      '__studioRuntime.Page',
+      {},
+      this.renderChildren(page).children ?? '',
+    );
   }
 
   renderNode(node: studioDom.StudioElementNode): string {
@@ -141,7 +153,7 @@ class Context {
       node.id,
       component.importedName,
       this.resolveProps(node),
-      this.renderChildren(node),
+      this.renderChildren(node).children ?? '',
     );
   }
 

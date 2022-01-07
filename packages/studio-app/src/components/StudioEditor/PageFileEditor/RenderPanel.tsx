@@ -226,7 +226,7 @@ function findActiveSlotInNode(
   const { nodeId } = nodeLayout;
   const closestSlot = findClosestSlot(slots, x, y);
   if (closestSlot) {
-    return { parentId: nodeId, parentIndex: closestSlot.parentIndex };
+    return { parentId: nodeId, parentProp: 'children', parentIndex: closestSlot.parentIndex };
   }
   return null;
 }
@@ -448,7 +448,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const slots: ViewSlots = React.useMemo(() => {
     const result: ViewSlots = {};
     pageNodes.forEach((node) => {
-      result[node.id] = calculateSlots(node, studioDom.getChildren(dom, node), viewState);
+      result[node.id] = calculateSlots(
+        node,
+        // TODO: all slots
+        studioDom.getChildren(dom, node).children ?? [],
+        viewState,
+      );
     });
     return result;
   }, [pageNodes, dom, viewState]);

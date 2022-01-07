@@ -23,12 +23,14 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-export interface StudioNodeBase {
+export interface StudioNodeBase<P = DefaultNodeProps> {
   readonly id: NodeId;
   readonly type: 'app' | 'theme' | 'api' | 'page' | 'element';
-  readonly parentId: NodeId | null;
-  readonly parentIndex: string | null;
   readonly name: string;
+  readonly parentId: NodeId | null;
+  readonly parentProp: string | null;
+  readonly parentIndex: string | null;
+  readonly props: Partial<StudioNodeProps<P>>;
 }
 
 export interface StudioAppNode extends StudioNodeBase {
@@ -53,10 +55,9 @@ export interface StudioPageNode extends StudioNodeBase {
   readonly state: Record<string, StudioStateDefinition>;
 }
 
-export interface StudioElementNode<P = DefaultNodeProps> extends StudioNodeBase {
+export interface StudioElementNode<P = DefaultNodeProps> extends StudioNodeBase<P> {
   readonly type: 'element';
   readonly component: string;
-  readonly props: Partial<StudioNodeProps<P>>;
 }
 
 type StudioNodeOfType<K extends StudioNodeBase['type']> = {
@@ -148,18 +149,53 @@ export function getApp(dom: StudioDom): StudioAppNode {
   return rootNode;
 }
 
-export function getChildren<N extends StudioNode>(dom: StudioDom, parent: N): ChildOf<N>[] {
-  // TODO: memoize this per node? Perhaps we could memoize all children precalculated in a WeakMap?
-  return Object.values(dom.nodes)
-    .filter((node: StudioNode) => node.parentId === parent.id)
-    .sort((node1: StudioNode, node2: StudioNode) => {
-      if (!node1.parentIndex || !node2.parentIndex) {
-        throw new Error(
-          `Invariant: nodes inside the dom should have a parentIndex if they have a parent`,
-        );
+export interface NodeChildren<N extends StudioNode> {
+  [prop: string]: ChildOf<N>[] | undefined;
+}
+
+// TODO: memoize the result of this function per dom in a WeakMap?
+const childrenMemo = new WeakMap<StudioDom, Map<NodeId, NodeChildren<any>>>();
+export function getChildren<N extends StudioNode>(dom: StudioDom, parent: N): NodeChildren<N> {
+  let domChildrenMemo = childrenMemo.get(dom);
+  if (!domChildrenMemo) {
+    domChildrenMemo = new Map();
+    childrenMemo.set(dom, domChildrenMemo);
+  }
+
+  let result = domChildrenMemo.get(parent.id);
+  if (!result) {
+    result = {};
+    domChildrenMemo.set(parent.id, result);
+
+    const allNodeChildren: ChildOf<N>[] = Object.values(dom.nodes).filter(
+      (node: StudioNode) => node.parentId === parent.id,
+    ) as ChildOf<N>[];
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const child of allNodeChildren) {
+      const prop = child.parentProp || 'children';
+      let existing = result[prop];
+      if (!existing) {
+        existing = [];
+        result[prop] = existing;
       }
-      return compareFractionalIndex(node1.parentIndex, node2.parentIndex);
-    }) as ChildOf<N>[];
+      existing.push(child);
+    }
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const childArray of Object.values(result)) {
+      childArray?.sort((node1: StudioNode, node2: StudioNode) => {
+        if (!node1.parentIndex || !node2.parentIndex) {
+          throw new Error(
+            `Invariant: nodes inside the dom should have a parentIndex if they have a parent`,
+          );
+        }
+        return compareFractionalIndex(node1.parentIndex, node2.parentIndex);
+      });
+    }
+  }
+
+  return result;
 }
 
 export function getParent<N extends StudioNode>(dom: StudioDom, child: N): ParentOf<N> {
@@ -171,16 +207,18 @@ export function getParent<N extends StudioNode>(dom: StudioDom, child: N): Paren
 }
 
 export function getPages(dom: StudioDom, app: StudioAppNode): StudioPageNode[] {
-  return getChildren(dom, app).filter((node) => isPage(node)) as StudioPageNode[];
+  return (getChildren(dom, app).children?.filter((node) => isPage(node)) ?? []) as StudioPageNode[];
 }
 
 export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
-  return getChildren(dom, app).filter((node) => isApi(node)) as StudioApiNode[];
+  return (getChildren(dom, app).children?.filter((node) => isApi(node)) ?? []) as StudioApiNode[];
 }
 
 // TODO: make theme optional by returning undefined
 export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode | undefined {
-  return getChildren(dom, app).find((node) => isTheme(node)) as StudioThemeNode | undefined;
+  return (getChildren(dom, app).children?.find((node) => isTheme(node)) ?? []) as
+    | StudioThemeNode
+    | undefined;
 }
 
 function generateUniqueName(baseName: string, existingNames: Set<string>, alwaysIndex = false) {
@@ -213,6 +251,7 @@ export function createElementInternal<P>(
     id,
     type: 'element',
     parentId: null,
+    parentProp: null,
     parentIndex: null,
     component,
     props,
@@ -224,8 +263,25 @@ export function createElementInternal<P>(
 
 type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
   StudioNodeOfType<T>,
-  'id' | 'type' | 'parentId' | 'parentIndex'
+  'id' | 'type' | 'parentId' | 'parentProp' | 'parentIndex'
 >;
+
+function createNodeInternal<T extends StudioNodeType>(
+  id: NodeId,
+  type: T,
+  name: string,
+  init: Omit<StudioNodeInitOfType<T>, 'name'>,
+): StudioNodeOfType<T> {
+  return {
+    id,
+    name,
+    type,
+    parentId: null,
+    parentProp: null,
+    parentIndex: null,
+    ...init,
+  } as StudioNodeOfType<T>;
+}
 
 export function createNode<T extends StudioNodeType>(
   dom: StudioDom,
@@ -234,27 +290,16 @@ export function createNode<T extends StudioNodeType>(
 ): StudioNodeOfType<T> {
   const id = generateUniqueId(new Set(Object.keys(dom.nodes))) as NodeId;
   const existingNames = getNodeNames(dom);
-  return {
-    id,
-    type,
-    parentId: null,
-    parentIndex: null,
-    name: generateUniqueName(name, existingNames),
-    ...init,
-  } as StudioNodeOfType<T>;
+  return createNodeInternal(id, type, generateUniqueName(name, existingNames), init);
 }
 
 export function createDom(): StudioDom {
   const rootId = generateUniqueId(new Set()) as NodeId;
   return {
     nodes: {
-      [rootId]: {
-        id: rootId,
-        type: 'app',
-        parentId: null,
-        parentIndex: null,
-        name: 'Application',
-      },
+      [rootId]: createNodeInternal(rootId, 'app', 'Application', {
+        props: {},
+      }),
     },
     root: rootId,
   };
@@ -279,7 +324,7 @@ export function getDescendants(
 ): readonly StudioElementNode[];
 export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[];
 export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
-  const children = getChildren(dom, node);
+  const children = Object.values(getChildren(dom, node)).flat().filter(Boolean);
   return [...children, ...children.flatMap((child) => getDescendants(dom, child))];
 }
 
@@ -352,6 +397,7 @@ export function moveNode(
   dom: StudioDom,
   newNode: StudioNode,
   parentId: NodeId,
+  parentProp: string,
   parentIndex?: string,
 ) {
   const parent = getNode(dom, parentId);
@@ -364,7 +410,7 @@ export function moveNode(
   }
 
   if (!parentIndex) {
-    const siblings = getChildren(dom, parent);
+    const siblings = getChildren(dom, parent)[parentProp] ?? [];
     const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
     parentIndex = createFractionalIndex(lastIndex, null);
   }
@@ -373,6 +419,7 @@ export function moveNode(
     nodes: update(dom.nodes, {
       [newNode.id]: update(newNode, {
         parentId,
+        parentProp,
         parentIndex,
       }),
     }),

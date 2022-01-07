@@ -67,6 +67,7 @@ export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
 export interface SlotLocation {
   parentId: NodeId;
+  parentProp: string;
   parentIndex: string;
 }
 

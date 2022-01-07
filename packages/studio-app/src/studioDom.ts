@@ -15,6 +15,7 @@ export function createFractionalIndex(index1: string | null, index2: string | nu
   return generateKeyBetween(index1, index2);
 }
 
+// Compares two strings lexicographically
 export function compareFractionalIndex(index1: string, index2: string): number {
   return index1.localeCompare(index2);
 }

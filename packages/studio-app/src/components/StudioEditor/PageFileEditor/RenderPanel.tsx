@@ -479,21 +479,20 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           onClick={handleClick}
         >
           {pageNodes.map((node) => {
-            const nodeId = node.id;
-            const nodeLayout = viewState[nodeId];
+            const nodeLayout = viewState[node.id];
             if (!nodeLayout) {
               return null;
             }
             const selectable = studioDom.isElement(node);
             return node ? (
-              <React.Fragment key={nodeId}>
+              <React.Fragment key={node.id}>
                 <div
                   draggable
                   onDragStart={handleDragStart}
                   style={absolutePositionCss(nodeLayout.rect)}
                   className={clsx(classes.nodeHud, {
-                    [classes.selected]: selectedNode?.id === nodeId,
-                    [classes.allowNodeInteraction]: nodesWithInteraction.has(nodeId),
+                    [classes.selected]: selectedNode?.id === node.id,
+                    [classes.allowNodeInteraction]: nodesWithInteraction.has(node.id),
                   })}
                 >
                   {selectable ? (
@@ -507,7 +506,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                           style={insertSlotAbsolutePositionCss(slotLayout)}
                           className={clsx(classes.insertSlotHud, {
                             [classes.active]:
-                              highlightedSlot?.nodeId === nodeId &&
+                              highlightedSlot?.nodeId === node.id &&
                               highlightedSlot?.slot === slotLayout.name &&
                               highlightedSlot?.index === index,
                           })}
@@ -518,7 +517,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                           style={absolutePositionCss(slotLayout.rect)}
                           className={clsx(classes.slotHud, {
                             [classes.active]:
-                              highlightedSlot?.nodeId === nodeId &&
+                              highlightedSlot?.nodeId === node.id &&
                               highlightedSlot?.slot === slotLayout.name,
                           })}
                         >

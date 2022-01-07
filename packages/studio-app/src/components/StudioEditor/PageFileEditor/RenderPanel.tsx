@@ -4,10 +4,10 @@ import clsx from 'clsx';
 import {
   NodeId,
   NodeState,
-  NodeLayoutSlots,
-  SlotLayout,
-  SlotLayoutInsert,
   ViewState,
+  FlowDirection,
+  SlotDirection,
+  SlotLocation,
 } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import PageView, { PageViewHandle } from '../../PageView';
@@ -15,6 +15,7 @@ import {
   absolutePositionCss,
   distanceToLine,
   distanceToRect,
+  Rectangle,
   rectContainsPoint,
 } from '../../../utils/geometry';
 import { PageEditorState } from '../../../editorState';
@@ -123,7 +124,12 @@ const RenderPanelRoot = styled('div')({
   },
 });
 
-function insertSlotAbsolutePositionCss(slot: SlotLayoutInsert): React.CSSProperties {
+function insertSlotAbsolutePositionCss(slot: {
+  direction: SlotDirection;
+  x: number;
+  y: number;
+  size: number;
+}): React.CSSProperties {
   return slot.direction === 'horizontal'
     ? {
         left: slot.x,
@@ -170,68 +176,62 @@ function getAvailableNodes(
   return nodes.filter((node) => !excludedNodes.has(node));
 }
 
-interface SlotIndex {
-  nodeId: NodeId;
-  slot: string;
-  index?: number;
-}
-
 /**
  * From an array of slots, returns the index of the closest one to a certain point
  */
-function findClosestSlot(slots: NodeLayoutSlots, x: number, y: number): SlotLayout | null {
+function findClosestSlot(slots: RenderedSlot[], x: number, y: number): RenderedSlot | null {
   let closestDistance = Infinity;
-  let closestSlot: SlotLayout | null = null;
-  const namedSlotArrays = Object.values(slots);
+  let closestSlot: RenderedSlot | null = null;
 
-  for (let i = 0; i < namedSlotArrays.length; i += 1) {
-    const namedSlots = namedSlotArrays[i] || [];
-    for (let j = 0; j < namedSlots.length; j += 1) {
-      const slotLayout = namedSlots[j];
-      let distance: number;
-      if (slotLayout.type === 'slot') {
-        distance = distanceToRect(slotLayout.rect, x, y);
-      } else {
-        distance =
-          slotLayout.direction === 'horizontal'
-            ? distanceToLine(
-                slotLayout.x,
-                slotLayout.y,
-                slotLayout.x,
-                slotLayout.y + slotLayout.size,
-                x,
-                y,
-              )
-            : distanceToLine(
-                slotLayout.x,
-                slotLayout.y,
-                slotLayout.x + slotLayout.size,
-                slotLayout.y,
-                x,
-                y,
-              );
-      }
+  for (let j = 0; j < slots.length; j += 1) {
+    const slotLayout = slots[j];
+    let distance: number;
+    if (slotLayout.type === 'single') {
+      distance = distanceToRect(slotLayout.rect, x, y);
+    } else {
+      distance =
+        slotLayout.direction === 'horizontal'
+          ? distanceToLine(
+              slotLayout.x,
+              slotLayout.y,
+              slotLayout.x,
+              slotLayout.y + slotLayout.size,
+              x,
+              y,
+            )
+          : distanceToLine(
+              slotLayout.x,
+              slotLayout.y,
+              slotLayout.x + slotLayout.size,
+              slotLayout.y,
+              x,
+              y,
+            );
+    }
 
-      if (distance <= 0) {
-        // We can bail out early
-        return slotLayout;
-      }
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestSlot = slotLayout;
-      }
+    if (distance <= 0) {
+      // We can bail out early
+      return slotLayout;
+    }
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestSlot = slotLayout;
     }
   }
 
   return closestSlot;
 }
 
-function findActiveSlotInNode(nodeLayout: NodeState, x: number, y: number): SlotIndex | null {
+function findActiveSlotInNode(
+  nodeLayout: NodeState,
+  slots: RenderedSlot[],
+  x: number,
+  y: number,
+): SlotLocation | null {
   const { nodeId } = nodeLayout;
-  const slots = nodeLayout.slots ?? [];
   const closestSlot = findClosestSlot(slots, x, y);
   if (closestSlot) {
-    return { slot: closestSlot.name, nodeId, index: closestSlot.index };
+    return { parentId: nodeId, parentIndex: closestSlot.parentIndex };
   }
   return null;
 }
@@ -239,17 +239,20 @@ function findActiveSlotInNode(nodeLayout: NodeState, x: number, y: number): Slot
 function findActiveSlotAt(
   nodes: readonly studioDom.StudioNode[],
   viewLayout: ViewState,
+  slots: ViewSlots,
   x: number,
   y: number,
-): SlotIndex | null {
+): SlotLocation | null {
   // Search deepest nested first
   let nodeLayout: NodeState | undefined;
+  let nodeSlots: RenderedSlot[] = [];
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
     nodeLayout = viewLayout[node.id];
+    nodeSlots = slots[node.id] || [];
     if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
       // Initially only consider slots of the node we're hovering
-      const slotIndex = findActiveSlotInNode(nodeLayout, x, y);
+      const slotIndex = findActiveSlotInNode(nodeLayout, nodeSlots, x, y);
       if (slotIndex) {
         return slotIndex;
       }
@@ -258,12 +261,164 @@ function findActiveSlotAt(
   // One last attempt, using the most shallow nodeLayout we found, regardless of
   // whether we are hovering it
   if (nodeLayout) {
-    return findActiveSlotInNode(nodeLayout, x, y);
+    return findActiveSlotInNode(nodeLayout, nodeSlots, x, y);
   }
   return null;
 }
 
 type PageOrElementNode = studioDom.StudioPageNode | studioDom.StudioElementNode;
+
+function getSlotDirection(flow: FlowDirection): SlotDirection {
+  switch (flow) {
+    case 'row':
+    case 'row-reverse':
+      return 'horizontal';
+    case 'column':
+    case 'column-reverse':
+      return 'vertical';
+    default:
+      throw new Error(`Invariant: Unrecognized direction "${flow}"`);
+  }
+}
+
+interface RenderedSingleSlot {
+  readonly type: 'single';
+  readonly parentIndex: string;
+  readonly rect: Rectangle;
+}
+
+interface RenderedInsertSlot {
+  readonly type: 'insert';
+  readonly parentIndex: string;
+  readonly direction: SlotDirection;
+  readonly x: number;
+  readonly y: number;
+  readonly size: number;
+}
+
+type RenderedSlot = RenderedInsertSlot | RenderedSingleSlot;
+
+function calculateSlots(
+  parent: PageOrElementNode,
+  children: PageOrElementNode[],
+  viewState: ViewState,
+): RenderedSlot[] {
+  const parentState = viewState[parent.id];
+
+  if (!parentState) {
+    return [];
+  }
+
+  if (parentState.slotType === 'none') {
+    return [];
+  }
+
+  const rect = parentState.innerRect;
+
+  if (parentState.slotType === 'single') {
+    return [
+      {
+        type: 'single',
+        parentIndex: studioDom.createFractionalIndex(null, null),
+        rect,
+      },
+    ];
+  }
+
+  const slotDirection = getSlotDirection(parentState.direction);
+
+  const size = slotDirection === 'horizontal' ? rect.height : rect.width;
+
+  const boundaries: { start: number; end: number; parentIndex: string }[] = [];
+
+  for (let i = 0; i < children.length; i += 1) {
+    const child = children[i];
+    const childState = viewState[child.id];
+
+    if (!childState) {
+      return [];
+    }
+
+    const childRect = childState.rect;
+
+    switch (parentState.direction) {
+      case 'row':
+        boundaries.push({
+          start: childRect.x,
+          end: childRect.x + childRect.width,
+          parentIndex: child.parentIndex,
+        });
+        break;
+      case 'column':
+        boundaries.push({
+          start: childRect.y,
+          end: childRect.y + childRect.height,
+          parentIndex: child.parentIndex,
+        });
+        break;
+      case 'row-reverse':
+        boundaries.push({
+          start: childRect.x + childRect.width,
+          end: childRect.x,
+          parentIndex: child.parentIndex,
+        });
+        break;
+      case 'column-reverse':
+        boundaries.push({
+          start: childRect.y + childRect.height,
+          end: childRect.y,
+          parentIndex: child.parentIndex,
+        });
+        break;
+      default:
+        throw new Error(`Invariant: Unrecognized direction "${parentState.direction}"`);
+    }
+  }
+
+  try {
+    const offsets: { offset: number; parentIndex: string }[] = [];
+    if (boundaries.length > 0) {
+      const first = boundaries[0];
+      offsets.push({
+        offset: first.start,
+        parentIndex: studioDom.createFractionalIndex(null, first.parentIndex),
+      });
+      const lastIdx = boundaries.length - 1;
+      for (let i = 0; i < lastIdx; i += 1) {
+        const prev = boundaries[i];
+        const current = boundaries[i + 1];
+        offsets.push({
+          offset: (prev.end + current.start) / 2,
+          parentIndex: studioDom.createFractionalIndex(prev.parentIndex, current.parentIndex),
+        });
+      }
+      const last = boundaries[lastIdx];
+      offsets.push({
+        offset: last.end,
+        parentIndex: studioDom.createFractionalIndex(last.parentIndex, null),
+      });
+    }
+    console.log(boundaries);
+
+    return offsets.map(
+      ({ offset, parentIndex }) =>
+        ({
+          type: 'insert',
+          parentIndex,
+          direction: slotDirection,
+          x: slotDirection === 'horizontal' ? offset : rect.x,
+          y: slotDirection === 'horizontal' ? rect.y : offset,
+          size,
+        } as const),
+    );
+  } catch (err) {
+    return [];
+  }
+}
+
+interface ViewSlots {
+  [node: NodeId]: RenderedSlot[] | undefined;
+}
 
 export interface RenderPanelProps {
   className?: string;
@@ -291,6 +446,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   if (selectedNode) {
     studioDom.assertIsElement(selectedNode);
   }
+
+  const slots: ViewSlots = React.useMemo(() => {
+    const result: ViewSlots = {};
+    pageNodes.forEach((node) => {
+      result[node.id] = calculateSlots(node, studioDom.getChildren(dom, node), viewState);
+    });
+    return result;
+  }, [pageNodes, dom, viewState]);
 
   const availableNodes = React.useMemo(
     () => getAvailableNodes(pageNodes, state),
@@ -347,21 +510,19 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const slotIndex = findActiveSlotAt(availableNodes, viewState, cursorPos.x, cursorPos.y);
+      const slotIndex = findActiveSlotAt(
+        availableNodes,
+        viewState,
+        slots,
+        cursorPos.x,
+        cursorPos.y,
+      );
 
-      const activeSlot =
-        slotIndex &&
-        viewState[slotIndex.nodeId]?.slots?.[slotIndex.slot]?.find(
-          (slot) => slot.name === slotIndex.slot && slot.index === slotIndex.index,
-        );
+      const activeSlot = slotIndex;
 
       event.preventDefault();
       if (activeSlot) {
-        api.addComponentDragOver({
-          nodeId: slotIndex.nodeId,
-          slot: activeSlot.name,
-          index: activeSlot.index,
-        });
+        api.addComponentDragOver(activeSlot);
       } else {
         api.addComponentDragOver(null);
       }
@@ -374,20 +535,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const slotIndex = findActiveSlotAt(availableNodes, viewState, cursorPos.x, cursorPos.y);
+      const slotIndex = findActiveSlotAt(
+        availableNodes,
+        viewState,
+        slots,
+        cursorPos.x,
+        cursorPos.y,
+      );
 
-      const activeSlot =
-        slotIndex &&
-        viewState[slotIndex.nodeId]?.slots?.[slotIndex.slot]?.find(
-          (slot) => slot.name === slotIndex.slot && slot.index === slotIndex.index,
-        );
+      const activeSlot = slotIndex;
 
       if (activeSlot) {
-        api.addComponentDrop({
-          nodeId: slotIndex.nodeId,
-          slot: activeSlot.name,
-          index: activeSlot.index,
-        });
+        api.addComponentDrop(activeSlot);
       } else {
         api.addComponentDrop(null);
       }
@@ -406,7 +565,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       window.removeEventListener('drop', handleDrop);
       window.removeEventListener('dragend', handleDragEnd);
     };
-  }, [availableNodes, getViewCoordinates, viewState, api]);
+  }, [availableNodes, getViewCoordinates, viewState, api, slots]);
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -484,7 +643,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               return null;
             }
             const selectable = studioDom.isElement(node);
-            const children = studioDom.getChildren(dom, node);
+
             return (
               <React.Fragment key={node.id}>
                 <div
@@ -499,38 +658,35 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                   {selectable ? (
                     <div className={classes.selectionHint}>{node.component}</div>
                   ) : null}
-                  {Object.values(nodeLayout.slots).map((nodeSlots = []) =>
-                    nodeSlots.map((slotLayout, index) =>
-                      slotLayout.type === 'insert' ? (
-                        <div
-                          key={`${slotLayout.name}:${slotLayout.index}`}
-                          style={insertSlotAbsolutePositionCss(slotLayout)}
-                          className={clsx(classes.insertSlotHud, {
-                            [classes.active]:
-                              highlightedSlot?.nodeId === node.id &&
-                              highlightedSlot?.slot === slotLayout.name &&
-                              highlightedSlot?.index === index,
-                          })}
-                        />
-                      ) : (
-                        <div
-                          key={slotLayout.name}
-                          style={absolutePositionCss(slotLayout.rect)}
-                          className={clsx(classes.slotHud, {
-                            [classes.active]:
-                              highlightedSlot?.nodeId === node.id &&
-                              highlightedSlot?.slot === slotLayout.name,
-                          })}
-                        >
-                          Insert Here
-                        </div>
-                      ),
-                    ),
-                  )}
                 </div>
               </React.Fragment>
             );
           })}
+          {Object.entries(slots).map(([nodeId, nodeSlots = []]) =>
+            nodeSlots.map((slot: RenderedSlot) =>
+              slot.type === 'insert' ? (
+                <div
+                  key={`${nodeId}:${slot.parentIndex}`}
+                  style={insertSlotAbsolutePositionCss(slot)}
+                  className={clsx(classes.insertSlotHud, {
+                    [classes.active]:
+                      highlightedSlot?.parentId === nodeId &&
+                      highlightedSlot?.parentIndex === slot.parentIndex,
+                  })}
+                />
+              ) : (
+                <div
+                  key={`${nodeId}:${slot.parentIndex}`}
+                  style={absolutePositionCss(slot.rect)}
+                  className={clsx(classes.slotHud, {
+                    [classes.active]: highlightedSlot?.parentId === nodeId,
+                  })}
+                >
+                  Insert Here
+                </div>
+              ),
+            ),
+          )}
           {/* 
             This overlay allows passing through pointer-events through a pinhole
             This allows interactivity on the selected element only, while maintaining

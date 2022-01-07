@@ -24,6 +24,16 @@ interface Array<T> {
    * @param thisArg An object to which the this keyword can refer in the predicate function. If thisArg is omitted, undefined is used as the this value.
    */
   filter<S extends T>(predicate: BooleanConstructor, thisArg?: any): Exclude<S, Falsy>[];
+
+  /**
+   * Determines whether all the members of an array satisfy the specified test.
+   * @param predicate A function that accepts up to three arguments. The every method calls
+   * the predicate function for each element in the array until the predicate returns a value
+   * which is coercible to the Boolean value false, or until the end of the array.
+   * @param thisArg An object to which the this keyword can refer in the predicate function.
+   * If thisArg is omitted, undefined is used as the this value.
+   */
+  every<S extends T>(predicate: BooleanConstructor, thisArg?: any): S is Exclude<S, Falsy>[];
 }
 
 interface ReadonlyArray<T> {

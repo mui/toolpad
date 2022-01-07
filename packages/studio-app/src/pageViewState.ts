@@ -24,11 +24,15 @@ function getNodeViewState(
   nodeId: NodeId,
 ): NodeState | null {
   if (nodeId) {
+    const rect = getRelativeBoundingBox(viewElm, elm);
     return {
       nodeId,
-      rect: getRelativeBoundingBox(viewElm, elm),
+      rect,
       slots: {},
       props: fiber.child?.memoizedProps ?? {},
+      innerRect: rect,
+      direction: 'column',
+      slotType: 'none',
     };
   }
   return null;
@@ -148,9 +152,9 @@ function getChildFibers(fiber: FiberNode) {
   return children;
 }
 
-export function getViewState(containerElm: HTMLElement): ViewState {
+export function getViewState(viewElm: HTMLElement): ViewState {
   // eslint-disable-next-line no-underscore-dangle
-  const devtoolsHook = containerElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+  const devtoolsHook = viewElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
   if (!devtoolsHook) {
     console.warn(`Can't read page layout as react devtools are not installed`);
@@ -174,7 +178,7 @@ export function getViewState(containerElm: HTMLElement): ViewState {
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {
             nodeElms.set(nodeId, elm);
-            const nodeViewState = getNodeViewState(fiber, containerElm, elm, nodeId);
+            const nodeViewState = getNodeViewState(fiber, viewElm, elm, nodeId);
             if (nodeViewState) {
               viewState[nodeId] = nodeViewState;
             }
@@ -189,6 +193,20 @@ export function getViewState(containerElm: HTMLElement): ViewState {
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
           const parentElm = nodeElms.get(parentId);
           const nodeViewState = viewState[parentId];
+
+          if (name === 'children') {
+            const firstChildElm = devtoolsHook.renderers
+              .get(rendererId)
+              ?.findHostInstanceByFiber(fiber);
+            const childContainerElm = firstChildElm?.parentElement;
+            if (childContainerElm && nodeViewState) {
+              nodeViewState.innerRect = getRelativeBoundingBox(viewElm, childContainerElm);
+              nodeViewState.direction = window.getComputedStyle(childContainerElm)
+                .flexDirection as FlowDirection;
+              nodeViewState.slotType = direction ? 'multiple' : 'single';
+            }
+          }
+
           if (parentElm && nodeViewState) {
             if (direction) {
               const items = childfibers

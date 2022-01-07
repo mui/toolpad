@@ -1,4 +1,9 @@
-import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from '@mui/studio-core';
+import {
+  RUNTIME_PROP_NODE_ID,
+  RUNTIME_PROP_STUDIO_SLOTS,
+  RUNTIME_PROP_STUDIO_SLOTS_TYPE,
+  SlotType,
+} from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, NodeState, ViewState, FlowDirection } from './types';
 import { getRelativeBoundingBox } from './utils/geometry';
@@ -23,7 +28,7 @@ function getNodeViewState(
       props: fiber.child?.memoizedProps ?? {},
       innerRect: rect,
       direction: 'column',
-      slotType: 'none',
+      slotType: null,
     };
   }
   return null;
@@ -74,7 +79,7 @@ export function getViewState(viewElm: HTMLElement): ViewState {
 
         const studioSlots = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS] as string | undefined;
         if (studioSlots) {
-          const slotType = studioSlots as 'single' | 'multiple';
+          const slotType = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS_TYPE] as SlotType;
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
           const nodeViewState = viewState[parentId];
 

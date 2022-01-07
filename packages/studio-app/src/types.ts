@@ -1,4 +1,5 @@
 import type * as React from 'react';
+import { SlotType } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
@@ -81,7 +82,7 @@ export interface NodeState {
   };
   innerRect: Rectangle;
   direction: FlowDirection;
-  slotType: 'none' | 'single' | 'multiple';
+  slotType: null | SlotType;
 }
 
 export interface ViewState {

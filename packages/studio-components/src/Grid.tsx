@@ -13,7 +13,8 @@ function StudioGrid({ children }: StudioGridProps) {
 export default createComponent(StudioGrid, {
   props: {
     children: {
-      type: 'GridItems',
+      type: 'elements',
+      control: 'GridItems',
       defaultValue: null,
     },
   },

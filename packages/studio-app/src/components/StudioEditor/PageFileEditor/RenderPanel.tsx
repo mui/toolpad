@@ -1,6 +1,7 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
 import clsx from 'clsx';
+import { SlotType } from '@mui/studio-core';
 import { NodeId, NodeState, ViewState, FlowDirection, SlotLocation } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import PageView, { PageViewHandle } from '../../PageView';
@@ -276,14 +277,19 @@ function getSlotDirection(flow: FlowDirection): SlotDirection {
   }
 }
 
-interface RenderedSingleSlot {
+interface RenderedSlotBase {
+  readonly type: SlotType;
+  readonly parentIndex: string;
+}
+
+interface RenderedSingleSlot extends RenderedSlotBase {
   readonly type: 'single';
   readonly parentIndex: string;
   readonly rect: Rectangle;
 }
 
-interface RenderedInsertSlot {
-  readonly type: 'insert';
+interface RenderedInsertSlot extends RenderedSlotBase {
+  readonly type: 'multiple';
   readonly parentIndex: string;
   readonly direction: SlotDirection;
   readonly x: number;
@@ -304,7 +310,7 @@ function calculateSlots(
     return [];
   }
 
-  if (parentState.slotType === 'none') {
+  if (!parentState.slotType) {
     return [];
   }
 
@@ -374,44 +380,40 @@ function calculateSlots(
     }
   }
 
-  try {
-    const offsets: { offset: number; parentIndex: string }[] = [];
-    if (boundaries.length > 0) {
-      const first = boundaries[0];
+  const offsets: { offset: number; parentIndex: string }[] = [];
+  if (boundaries.length > 0) {
+    const first = boundaries[0];
+    offsets.push({
+      offset: first.start,
+      parentIndex: studioDom.createFractionalIndex(null, first.parentIndex),
+    });
+    const lastIdx = boundaries.length - 1;
+    for (let i = 0; i < lastIdx; i += 1) {
+      const prev = boundaries[i];
+      const current = boundaries[i + 1];
       offsets.push({
-        offset: first.start,
-        parentIndex: studioDom.createFractionalIndex(null, first.parentIndex),
-      });
-      const lastIdx = boundaries.length - 1;
-      for (let i = 0; i < lastIdx; i += 1) {
-        const prev = boundaries[i];
-        const current = boundaries[i + 1];
-        offsets.push({
-          offset: (prev.end + current.start) / 2,
-          parentIndex: studioDom.createFractionalIndex(prev.parentIndex, current.parentIndex),
-        });
-      }
-      const last = boundaries[lastIdx];
-      offsets.push({
-        offset: last.end,
-        parentIndex: studioDom.createFractionalIndex(last.parentIndex, null),
+        offset: (prev.end + current.start) / 2,
+        parentIndex: studioDom.createFractionalIndex(prev.parentIndex, current.parentIndex),
       });
     }
-
-    return offsets.map(
-      ({ offset, parentIndex }) =>
-        ({
-          type: 'insert',
-          parentIndex,
-          direction: slotDirection,
-          x: slotDirection === 'horizontal' ? offset : rect.x,
-          y: slotDirection === 'horizontal' ? rect.y : offset,
-          size,
-        } as const),
-    );
-  } catch (err) {
-    return [];
+    const last = boundaries[lastIdx];
+    offsets.push({
+      offset: last.end,
+      parentIndex: studioDom.createFractionalIndex(last.parentIndex, null),
+    });
   }
+
+  return offsets.map(
+    ({ offset, parentIndex }) =>
+      ({
+        type: 'multiple',
+        parentIndex,
+        direction: slotDirection,
+        x: slotDirection === 'horizontal' ? offset : rect.x,
+        y: slotDirection === 'horizontal' ? rect.y : offset,
+        size,
+      } as const),
+  );
 }
 
 interface ViewSlots {
@@ -615,8 +617,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   }, []);
   const handleBlur = React.useCallback(() => setIsFocused(false), []);
 
-  console.log(selectedRect);
-
   return (
     <RenderPanelRoot
       ref={rootRef}
@@ -669,7 +669,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           })}
           {Object.entries(slots).map(([nodeId, nodeSlots = []]) =>
             nodeSlots.map((slot: RenderedSlot) =>
-              slot.type === 'insert' ? (
+              slot.type === 'multiple' ? (
                 <div
                   key={`${nodeId}:${slot.parentIndex}`}
                   style={insertSlotAbsolutePositionCss(slot)}

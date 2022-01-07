@@ -16,7 +16,10 @@ export function createFractionalIndex(index1: string | null, index2: string | nu
 }
 
 export function compareFractionalIndex(index1: string, index2: string): number {
-  return index1.localeCompare(index2);
+  if (index1 === index2) {
+    return 0;
+  }
+  return index1 > index2 ? 1 : -1;
 }
 
 export interface StudioNodeBase {

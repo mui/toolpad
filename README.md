@@ -35,7 +35,7 @@ TO DO:
 - StudioSandbox => add react-refresh (or decide on alternative, bundler in teh browser?)
 - deployments/releases
 
-- redo slots implementation to better understand the flow direction and leverage parentIndex better
+- separate prop types from prop controls
 - single "element" type with slots: boolean to enable/disable UI for it
 
 - decide on persistence, json files vs. sqlite vs. postgres?

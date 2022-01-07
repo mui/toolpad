@@ -1,14 +1,7 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
 import clsx from 'clsx';
-import {
-  NodeId,
-  NodeState,
-  ViewState,
-  FlowDirection,
-  SlotDirection,
-  SlotLocation,
-} from '../../../types';
+import { NodeId, NodeState, ViewState, FlowDirection, SlotLocation } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import PageView, { PageViewHandle } from '../../PageView';
 import {
@@ -22,6 +15,8 @@ import { PageEditorState } from '../../../editorState';
 import { PinholeOverlay } from '../../../PinholeOverlay';
 import { useEditorApi, usePageEditorState } from '../EditorProvider';
 import { getViewState } from '../../../pageViewState';
+
+type SlotDirection = 'horizontal' | 'vertical';
 
 const classes = {
   scrollContainer: 'StudioScrollContainer',
@@ -335,6 +330,10 @@ function calculateSlots(
     const child = children[i];
     const childState = viewState[child.id];
 
+    if (!child.parentIndex) {
+      throw new Error(`Invariant: Node "${child.id}" has no parent`);
+    }
+
     if (!childState) {
       return [];
     }
@@ -398,7 +397,6 @@ function calculateSlots(
         parentIndex: studioDom.createFractionalIndex(last.parentIndex, null),
       });
     }
-    console.log(boundaries);
 
     return offsets.map(
       ({ offset, parentIndex }) =>
@@ -600,7 +598,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       return new Set();
     }
     return new Set(
-      [...studioDom.getAncestors(dom, selectedNode), selectedNode].map((node) => node.id),
+      [...studioDom.getPageAncestors(dom, selectedNode), selectedNode].map((node) => node.id),
     );
   }, [dom, selectedNode]);
 
@@ -611,6 +609,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     }
   }, []);
   const handleBlur = React.useCallback(() => setIsFocused(false), []);
+
+  console.log(selectedRect);
 
   return (
     <RenderPanelRoot

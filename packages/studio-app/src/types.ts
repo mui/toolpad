@@ -70,35 +70,11 @@ export interface SlotLocation {
   parentIndex: string;
 }
 
-export interface SlotLayoutCenter {
-  type: 'slot';
-  name: string;
-  index: number;
-  rect: Rectangle;
-}
-
 export type SlotDirection = 'horizontal' | 'vertical';
-
-export interface SlotLayoutInsert {
-  type: 'insert';
-  name: string;
-  index: number;
-  direction: SlotDirection;
-  x: number;
-  y: number;
-  size: number;
-}
-
-export type SlotLayout = SlotLayoutCenter | SlotLayoutInsert;
-
-export interface NodeLayoutSlots {
-  [name: string]: SlotLayout[] | undefined;
-}
 
 export interface NodeState {
   nodeId: NodeId;
   rect: Rectangle;
-  slots: NodeLayoutSlots;
   props: {
     [key: string]: unknown;
   };

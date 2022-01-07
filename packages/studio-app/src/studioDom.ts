@@ -283,12 +283,19 @@ export function getDescendants(dom: StudioDom, node: StudioNode): readonly Studi
   return [...children, ...children.flatMap((child) => getDescendants(dom, child))];
 }
 
-export function getAncestors(
+export function getAncestors(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
+  const parent = getParent(dom, node);
+  return parent ? [...getAncestors(dom, parent), parent] : [];
+}
+
+export function getPageAncestors(
   dom: StudioDom,
-  node: StudioElementNode,
+  node: StudioElementNode | StudioPageNode,
 ): readonly (StudioElementNode | StudioPageNode)[] {
   const parent = getParent(dom, node);
-  return parent && isElement(parent) ? [...getAncestors(dom, parent), parent] : [];
+  return parent && (isElement(parent) || isPage(parent))
+    ? [...getPageAncestors(dom, parent), parent]
+    : [];
 }
 
 export function getElementPage(dom: StudioDom, node: StudioElementNode): StudioPageNode | null {

@@ -122,7 +122,6 @@ export const Page = createComponent(PageComponent, {
     children: {
       type: 'slots',
       defaultValue: null,
-      getDirection: () => 'column',
     },
   },
 });

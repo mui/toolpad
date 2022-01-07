@@ -1,14 +1,5 @@
-import Stack, { StackProps } from '@mui/material/Stack';
-import { createComponent, FlowDirection } from '@mui/studio-core';
-
-function getDirection({ direction }: StackProps): FlowDirection {
-  return direction === 'row' ||
-    direction === 'column' ||
-    direction === 'row-reverse' ||
-    direction === 'column-reverse'
-    ? direction
-    : 'column';
-}
+import Stack from '@mui/material/Stack';
+import { createComponent } from '@mui/studio-core';
 
 export default createComponent(Stack, {
   props: {
@@ -24,7 +15,6 @@ export default createComponent(Stack, {
     children: {
       type: 'slots',
       defaultValue: null,
-      getDirection,
     },
   },
 });

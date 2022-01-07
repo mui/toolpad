@@ -11,7 +11,6 @@ export interface PropDefinition<K extends keyof P, P = {}> {
   type: string;
   onChangeProp?: string;
   onChangeHandler?: OnChangeHandler;
-  getDirection?: (props: P) => FlowDirection;
 }
 
 export type PropDefinitions<P = {}> = {

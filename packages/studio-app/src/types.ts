@@ -66,43 +66,21 @@ export interface StudioApi<Q = unknown> extends StudioApiSummary {
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
 export interface SlotLocation {
-  nodeId: NodeId;
-  slot: string;
-  index: number;
-}
-
-export interface SlotLayoutCenter {
-  type: 'slot';
-  name: string;
-  index: number;
-  rect: Rectangle;
+  parentId: NodeId;
+  parentIndex: string;
 }
 
 export type SlotDirection = 'horizontal' | 'vertical';
 
-export interface SlotLayoutInsert {
-  type: 'insert';
-  name: string;
-  index: number;
-  direction: SlotDirection;
-  x: number;
-  y: number;
-  size: number;
-}
-
-export type SlotLayout = SlotLayoutCenter | SlotLayoutInsert;
-
-export interface NodeLayoutSlots {
-  [name: string]: SlotLayout[] | undefined;
-}
-
 export interface NodeState {
   nodeId: NodeId;
   rect: Rectangle;
-  slots: NodeLayoutSlots;
   props: {
     [key: string]: unknown;
   };
+  innerRect: Rectangle;
+  direction: FlowDirection;
+  slotType: 'none' | 'single' | 'multiple';
 }
 
 export interface ViewState {

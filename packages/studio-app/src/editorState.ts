@@ -288,16 +288,10 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
         });
       }
 
-      const { nodeId, index } = action.location;
-      const parent = studioDom.getNode(dom, nodeId);
-
-      const siblings = studioDom.getChildren(dom, parent);
-      const left = siblings[index - 1]?.parentIndex || null;
-      const right = siblings[index]?.parentIndex || null;
-      const parentIndex = studioDom.createFractionalIndex(left, right);
+      const { parentId, parentIndex } = action.location;
 
       return update(state, {
-        dom: studioDom.moveNode(dom, addedNode, action.location.nodeId, parentIndex),
+        dom: studioDom.moveNode(dom, addedNode, parentId, parentIndex),
         newNode: null,
         highlightLayout: false,
         highlightedSlot: null,

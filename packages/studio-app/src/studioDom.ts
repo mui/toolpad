@@ -16,7 +16,10 @@ export function createFractionalIndex(index1: string | null, index2: string | nu
 }
 
 export function compareFractionalIndex(index1: string, index2: string): number {
-  return index1.localeCompare(index2);
+  if (index1 === index2) {
+    return 0;
+  }
+  return index1 > index2 ? 1 : -1;
 }
 
 export interface StudioNodeBase {
@@ -145,7 +148,7 @@ export function getApp(dom: StudioDom): StudioAppNode {
 }
 
 export function getChildren<N extends StudioNode>(dom: StudioDom, parent: N): ChildOf<N>[] {
-  // TODO: memoize this per node?
+  // TODO: memoize this per node? Perhaps we could memoize all children precalculated in a WeakMap?
   return Object.values(dom.nodes)
     .filter((node: StudioNode) => node.parentId === parent.id)
     .sort((node1: StudioNode, node2: StudioNode) => {

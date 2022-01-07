@@ -33,6 +33,11 @@ TO DO:
 - Nested paths pages
 - iframe needs to be sandboxed + CSP?
 - StudioSandbox => add react-refresh (or decide on alternative, bundler in teh browser?)
+- deployments/releases
+
+- redo slots implementation to better understand the flow direction and leverage parentIndex better
+- single "element" type with slots: boolean to enable/disable UI for it
+
 - decide on persistence, json files vs. sqlite vs. postgres?
 - integration tests, (let's consolidate the architecture a bit more first)
 - expand @mui/components

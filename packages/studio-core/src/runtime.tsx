@@ -1,6 +1,10 @@
 import * as React from 'react';
-import type { ComponentDefinition, FlowDirection } from './index';
+
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
 import { DEFINITION_KEY, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
+import type { ComponentDefinition, FlowDirection } from './index';
+import { createComponent } from './index';
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.
@@ -102,3 +106,30 @@ export function WrappedStudioNode({ children, id }: WrappedStudioNodeProps) {
     </WrappedStudioNodeInternal>
   );
 }
+
+interface PageComponentProps {
+  children?: React.ReactNode;
+}
+
+const PageComponent = React.forwardRef<HTMLDivElement, PageComponentProps>(function PageComponent(
+  { children, ...props }: PageComponentProps,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
+  return (
+    <Container ref={ref} {...props}>
+      <Stack direction="column" gap={2} my={2}>
+        {children}
+      </Stack>
+    </Container>
+  );
+});
+
+export const Page = createComponent(PageComponent, {
+  props: {
+    children: {
+      type: 'slots',
+      defaultValue: null,
+      getDirection: () => 'column',
+    },
+  },
+});

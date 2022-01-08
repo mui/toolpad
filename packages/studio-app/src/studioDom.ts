@@ -149,13 +149,13 @@ export function getApp(dom: StudioDom): StudioAppNode {
   return rootNode;
 }
 
-export interface NodeChildren<N extends StudioNode> {
+export interface NodeChildren<N extends StudioNode = any> {
   [prop: string]: ChildOf<N>[] | undefined;
 }
 
 // TODO: memoize the result of this function per dom in a WeakMap?
 const childrenMemo = new WeakMap<StudioDom, Map<NodeId, NodeChildren<any>>>();
-export function getChildren<N extends StudioNode>(dom: StudioDom, parent: N): NodeChildren<N> {
+export function getChildNodes<N extends StudioNode>(dom: StudioDom, parent: N): NodeChildren<N> {
   let domChildrenMemo = childrenMemo.get(dom);
   if (!domChildrenMemo) {
     domChildrenMemo = new Map();
@@ -207,16 +207,17 @@ export function getParent<N extends StudioNode>(dom: StudioDom, child: N): Paren
 }
 
 export function getPages(dom: StudioDom, app: StudioAppNode): StudioPageNode[] {
-  return (getChildren(dom, app).children?.filter((node) => isPage(node)) ?? []) as StudioPageNode[];
+  return (getChildNodes(dom, app).children?.filter((node) => isPage(node)) ??
+    []) as StudioPageNode[];
 }
 
 export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
-  return (getChildren(dom, app).children?.filter((node) => isApi(node)) ?? []) as StudioApiNode[];
+  return (getChildNodes(dom, app).children?.filter((node) => isApi(node)) ?? []) as StudioApiNode[];
 }
 
 // TODO: make theme optional by returning undefined
 export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode | undefined {
-  return (getChildren(dom, app).children?.find((node) => isTheme(node)) ?? []) as
+  return (getChildNodes(dom, app).children?.find((node) => isTheme(node)) ?? []) as
     | StudioThemeNode
     | undefined;
 }
@@ -324,7 +325,7 @@ export function getDescendants(
 ): readonly StudioElementNode[];
 export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[];
 export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
-  const children = Object.values(getChildren(dom, node)).flat().filter(Boolean);
+  const children = Object.values(getChildNodes(dom, node)).flat().filter(Boolean);
   return [...children, ...children.flatMap((child) => getDescendants(dom, child))];
 }
 
@@ -410,7 +411,7 @@ export function moveNode(
   }
 
   if (!parentIndex) {
-    const siblings = getChildren(dom, parent)[parentProp] ?? [];
+    const siblings = getChildNodes(dom, parent)[parentProp] ?? [];
     const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
     parentIndex = createFractionalIndex(lastIndex, null);
   }

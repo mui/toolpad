@@ -127,7 +127,7 @@ class Context {
     [prop: string]: string | undefined;
   } {
     const result: { [prop: string]: string | undefined } = {};
-    const nodeChildren = studioDom.getChildren(this.dom, node);
+    const nodeChildren = studioDom.getChildNodes(this.dom, node);
     // eslint-disable-next-line no-restricted-syntax
     for (const [prop, children] of Object.entries(nodeChildren)) {
       if (children) {

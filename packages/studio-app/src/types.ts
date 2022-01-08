@@ -74,15 +74,23 @@ export interface SlotLocation {
 
 export type SlotDirection = 'horizontal' | 'vertical';
 
+export interface SlotState {
+  type: SlotType;
+  rect: Rectangle;
+  direction: FlowDirection;
+}
+
+export interface SlotsState {
+  [prop: string]: SlotState | undefined;
+}
+
 export interface NodeState {
   nodeId: NodeId;
   rect: Rectangle;
   props: {
     [key: string]: unknown;
   };
-  innerRect: Rectangle;
-  direction: FlowDirection;
-  slotType: null | SlotType;
+  slots: SlotsState;
 }
 
 export interface ViewState {

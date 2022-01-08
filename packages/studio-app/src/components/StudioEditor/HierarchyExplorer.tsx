@@ -65,15 +65,21 @@ interface HierarchyExplorerElementItemProps {
 
 function HierarchyExplorerElementItem({ element }: HierarchyExplorerElementItemProps) {
   const state = useEditorState();
+  const { children = [], ...namedChildren } = studioDom.getChildNodes(state.dom, element);
   return (
     <TreeItem
       ContentComponent={CustomContent}
       nodeId={element.id}
       label={`${element.name} (${element.id})`}
     >
-      {studioDom.getChildren(state.dom, element).children?.map((child) => (
+      {children.map((child) => (
         <HierarchyExplorerElementItem key={child.id} element={child} />
       ))}
+
+      {Object.entries(namedChildren).map(() => {
+        // TODO: display `namedChildren` in the tree as well
+        return null;
+      })}
     </TreeItem>
   );
 }
@@ -84,7 +90,7 @@ interface HierarchyExplorerPageItemProps {
 
 function HierarchyExplorerPageItem({ page }: HierarchyExplorerPageItemProps) {
   const state = useEditorState();
-  const children = studioDom.getChildren(state.dom, page).children ?? [];
+  const children = studioDom.getChildNodes(state.dom, page).children ?? [];
   return (
     <TreeItem ContentComponent={CustomContent} nodeId={page.id} label={`${page.name} (${page.id})`}>
       {children.map((child) => (

@@ -29,4 +29,18 @@ export default createComponent(DataGridComponent, {
       defaultValue: null,
     },
   },
+  argTypes: {
+    rows: {
+      typeDef: { type: 'array', items: { type: 'object' } },
+      defaultValue: [],
+    },
+    columns: {
+      typeDef: { type: 'array', items: { type: 'object' } },
+      defaultValue: [],
+    },
+    studioDataQuery: {
+      typeDef: { type: 'string' },
+      control: { type: 'dataQuery' },
+    },
+  },
 });

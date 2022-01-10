@@ -12,4 +12,14 @@ export default createComponent(Paper, {
       defaultValue: null,
     },
   },
+  argTypes: {
+    elevation: {
+      typeDef: { type: 'number', minimum: 0 },
+      defaultValue: 1,
+    },
+    children: {
+      typeDef: { type: 'element' },
+      control: { type: 'slot' },
+    },
+  },
 });

@@ -65,44 +65,46 @@ function WrappedStudioNodeInternal({
 
   let newProps: { [key: string]: unknown } | undefined;
 
-  Object.entries(definition?.props || {}).forEach(([propName, propDef]) => {
-    const value = child.props[propName];
-    if (propDef?.type === 'slots') {
-      const valueAsArray = React.Children.toArray(value);
-      newProps = newProps ?? {};
-      newProps[propName] =
-        valueAsArray.length > 0 ? (
-          <SlotsWrapper
-            {...{
-              [RUNTIME_PROP_STUDIO_SLOTS]: propName,
-              [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
-            }}
-            parentId={studioNodeId}
-          >
-            {valueAsArray}
-          </SlotsWrapper>
-        ) : (
-          <PlaceHolder
-            {...{
-              [RUNTIME_PROP_STUDIO_SLOTS]: propName,
-              [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
-            }}
-            parentId={studioNodeId}
-          />
-        );
-    } else if (propDef?.type === 'slot') {
-      const valueAsArray = React.Children.toArray(value);
-      if (valueAsArray.length <= 0) {
+  Object.entries(definition?.argTypes || {}).forEach(([argName, argDef]) => {
+    const value = child.props[argName];
+    if (argDef?.typeDef.type === 'element') {
+      if (argDef.control?.type === 'slots') {
+        const valueAsArray = React.Children.toArray(value);
         newProps = newProps ?? {};
-        newProps[propName] = (
-          <PlaceHolder
-            {...{
-              [RUNTIME_PROP_STUDIO_SLOTS]: propName,
-              [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
-            }}
-            parentId={studioNodeId}
-          />
-        );
+        newProps[argName] =
+          valueAsArray.length > 0 ? (
+            <SlotsWrapper
+              {...{
+                [RUNTIME_PROP_STUDIO_SLOTS]: argName,
+                [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
+              }}
+              parentId={studioNodeId}
+            >
+              {valueAsArray}
+            </SlotsWrapper>
+          ) : (
+            <PlaceHolder
+              {...{
+                [RUNTIME_PROP_STUDIO_SLOTS]: argName,
+                [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
+              }}
+              parentId={studioNodeId}
+            />
+          );
+      } else if (argDef.control?.type === 'slot') {
+        const valueAsArray = React.Children.toArray(value);
+        if (valueAsArray.length <= 0) {
+          newProps = newProps ?? {};
+          newProps[argName] = (
+            <PlaceHolder
+              {...{
+                [RUNTIME_PROP_STUDIO_SLOTS]: argName,
+                [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
+              }}
+              parentId={studioNodeId}
+            />
+          );
+        }
       }
     }
   });
@@ -142,10 +144,10 @@ const PageComponent = React.forwardRef<HTMLDivElement, PageComponentProps>(funct
 });
 
 export const Page = createComponent(PageComponent, {
-  props: {
+  argTypes: {
     children: {
-      type: 'slots',
-      defaultValue: null,
+      typeDef: { type: 'element' },
+      control: { type: 'slots' },
     },
   },
 });

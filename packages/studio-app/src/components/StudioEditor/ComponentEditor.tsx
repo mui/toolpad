@@ -2,12 +2,34 @@ import { Alert, IconButton, Stack, styled, TextField } from '@mui/material';
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
-import { PropDefinition, PropDefinitions } from '@mui/studio-core';
+import {
+  ArgTypeDefinitions,
+  ArgTypeDefinition,
+  ArgControlSpec,
+  PropValueType,
+} from '@mui/studio-core';
 import { getStudioComponent } from '../../studioComponents';
-import propTypes from '../../studioPropTypes';
+import studioPropControls from '../../studioPropTypeControls';
 import { useEditorApi, usePageEditorState } from './EditorProvider';
 import { ExactEntriesOf } from '../../utils/types';
 import * as studioDom from '../../studioDom';
+
+function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
+  switch (typeDef.type) {
+    case 'string':
+      return typeDef.enum ? { type: 'select' } : { type: 'string' };
+    case 'number':
+      return { type: 'number' };
+    case 'boolean':
+      return { type: 'boolean' };
+    case 'object':
+      return { type: 'object' };
+    case 'array':
+      return { type: 'object' };
+    default:
+      return null;
+  }
+}
 
 const classes = {
   control: 'StudioControl',
@@ -22,14 +44,14 @@ const ComponentPropsEditorRoot = styled('div')(({ theme }) => ({
 interface ComponentPropEditorProps<P, K extends keyof P> {
   name: K;
   node: studioDom.StudioElementNode<P>;
-  prop: PropDefinition<K, P>;
+  argType: ArgTypeDefinition;
   actualValue: unknown;
 }
 
 function ComponentPropEditor<P, K extends keyof P & string>({
   name,
   node,
-  prop,
+  argType,
   actualValue,
 }: ComponentPropEditorProps<P, K>) {
   const api = useEditorApi();
@@ -44,7 +66,8 @@ function ComponentPropEditor<P, K extends keyof P & string>({
     [api, node.id, name],
   );
 
-  const propTypeDef = propTypes[prop.type];
+  const controlSpec = argType.control ?? getDefaultControl(argType.typeDef);
+  const control = controlSpec ? studioPropControls[controlSpec.type] : null;
 
   const propValue = node.props[name];
 
@@ -66,10 +89,11 @@ function ComponentPropEditor<P, K extends keyof P & string>({
 
   return (
     <Stack direction="row" alignItems="flex-start">
-      {propTypeDef ? (
+      {control ? (
         <React.Fragment>
-          <propTypeDef.Editor
+          <control.Editor
             name={name}
+            argType={argType}
             disabled={hasBinding}
             value={value}
             onChange={handleChange}
@@ -84,7 +108,7 @@ function ComponentPropEditor<P, K extends keyof P & string>({
         </React.Fragment>
       ) : (
         <Alert severity="warning">
-          Unknown type &quot;{prop.type}&quot; for property &quot;{name}&quot;
+          Unknown type &quot;{argType.typeDef.type}&quot; for property &quot;{name}&quot;
         </Alert>
       )}
     </Stack>
@@ -102,13 +126,13 @@ function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorPro
 
   return (
     <ComponentPropsEditorRoot>
-      {(Object.entries(definition.props) as ExactEntriesOf<PropDefinitions<P>>).map(
-        ([propName, prop]) =>
-          typeof propName === 'string' && prop ? (
+      {(Object.entries(definition.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
+        ([propName, propTypeDef]) =>
+          typeof propName === 'string' && propTypeDef ? (
             <div key={propName} className={classes.control}>
               <ComponentPropEditor
                 name={propName}
-                prop={prop}
+                argType={propTypeDef}
                 node={node}
                 actualValue={actualValues[propName]}
               />

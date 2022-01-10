@@ -1,3 +1,4 @@
+import { ArgTypeDefinition } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 import { getStudioComponent } from './studioComponents';
@@ -67,12 +68,12 @@ class Context {
     const result: Record<string, string> = {};
     const component = getStudioComponent(this.dom, node.component);
     Object.entries(node.props).forEach(([propName, propValue]) => {
-      const propDefinition = component.props[propName];
-      if (!propDefinition || !propValue) {
+      const argDef: ArgTypeDefinition | undefined = component.argTypes[propName];
+      if (!argDef || !propValue) {
         return;
       }
 
-      if (propDefinition.type === 'DataQuery') {
+      if (argDef.typeDef.type === 'string' && argDef.control?.type === 'dataQuery') {
         if (propValue.type !== 'const') {
           throw new Error(`TODO: make this work for bindings`);
         }
@@ -84,16 +85,16 @@ class Context {
         result[propName] = JSON.stringify(propValue.value);
       } else if (propValue.type === 'binding') {
         result[propName] = `_${propValue.state}`;
-        if (propDefinition.onChangeProp) {
+        if (argDef.onChangeProp) {
           const setStateIdentifier = `set_${propValue.state}`;
-          if (propDefinition.onChangeHandler) {
+          if (argDef.onChangeHandler) {
             // TODO: React.useCallback for this one
-            const { params, valueGetter } = propDefinition.onChangeHandler;
-            result[propDefinition.onChangeProp] = `(${params.join(
+            const { params, valueGetter } = argDef.onChangeHandler;
+            result[argDef.onChangeProp] = `(${params.join(
               ', ',
             )}) => ${setStateIdentifier}(${valueGetter})`;
           } else {
-            result[propDefinition.onChangeProp] = setStateIdentifier;
+            result[argDef.onChangeProp] = setStateIdentifier;
           }
         }
       } else {

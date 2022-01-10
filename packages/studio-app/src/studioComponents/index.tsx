@@ -1,9 +1,9 @@
 import * as studioComponentLib from '@mui/studio-components';
-import { DEFINITION_KEY } from '@mui/studio-core';
+import { ArgTypeDefinitions, DEFINITION_KEY } from '@mui/studio-core';
 import * as studioDom from '../studioDom';
 
 export interface StudioComponentDefinition {
-  props: any;
+  argTypes: ArgTypeDefinitions;
   module: string;
   importedName: string;
 }
@@ -32,6 +32,6 @@ export function getStudioComponent(
   }
   return {
     ...component,
-    props: (studioComponentLib as any)[componentName][DEFINITION_KEY].props,
+    argTypes: (studioComponentLib as any)[componentName][DEFINITION_KEY].argTypes,
   };
 }

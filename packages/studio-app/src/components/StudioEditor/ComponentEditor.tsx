@@ -26,6 +26,8 @@ function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
       return { type: 'object' };
     case 'array':
       return { type: 'object' };
+    case 'dataQuery':
+      return { type: 'dataQuery' };
     default:
       return null;
   }

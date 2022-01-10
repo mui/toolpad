@@ -73,7 +73,7 @@ class Context {
         return;
       }
 
-      if (argDef.typeDef.type === 'string' && argDef.control?.type === 'dataQuery') {
+      if (argDef.typeDef.type === 'dataQuery') {
         if (propValue.type !== 'const') {
           throw new Error(`TODO: make this work for bindings`);
         }

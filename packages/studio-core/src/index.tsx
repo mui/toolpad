@@ -9,7 +9,7 @@ export interface OnChangeHandler {
 }
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'dataQuery';
 }
 
 export interface StringValueType extends ValueTypeBase {
@@ -41,6 +41,10 @@ export interface ElementValueType extends ValueTypeBase {
   type: 'element';
 }
 
+export interface DataQueryValueType extends ValueTypeBase {
+  type: 'dataQuery';
+}
+
 export interface ArgControlSpec {
   type:
     | 'boolean' // checkbox
@@ -66,7 +70,7 @@ export type PrimitiveValueType =
   | ObjectValueType
   | ArrayValueType;
 
-export type PropValueType = PrimitiveValueType | ElementValueType;
+export type PropValueType = PrimitiveValueType | ElementValueType | DataQueryValueType;
 
 export interface ArgTypeDefinition {
   name?: string;

@@ -231,14 +231,14 @@ function createDefaultApp(): studioDom.StudioDom {
     props: {},
     content: DEFAULT_THEME_CONTENT,
   });
-  dom = studioDom.moveNode(dom, theme, dom.root, 'children');
+  dom = studioDom.addNode(dom, theme, dom.root, 'children');
   const page = studioDom.createNode(dom, 'page', {
     name: 'DefaultPage',
     props: {},
     title: 'Default',
     state: {},
   });
-  dom = studioDom.moveNode(dom, page, dom.root, 'children');
+  dom = studioDom.addNode(dom, page, dom.root, 'children');
   return dom;
 }
 

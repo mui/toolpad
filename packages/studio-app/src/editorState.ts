@@ -272,15 +272,8 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
     }
     case 'ADD_COMPONENT_DROP': {
       const { newNode, dom } = state;
-      let addedNode: studioDom.StudioNode | null = newNode;
 
-      if (!addedNode && state.selection) {
-        const selection = studioDom.getNode(dom, state.selection);
-        studioDom.assertIsElement(selection);
-        addedNode = selection;
-      }
-
-      if (!action.location || !addedNode) {
+      if (!action.location) {
         return update(state, {
           newNode: null,
           highlightLayout: false,
@@ -288,14 +281,27 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
         });
       }
 
-      const { parentId, parentIndex } = action.location;
+      const { parentId, parentProp, parentIndex } = action.location;
 
-      return update(state, {
-        dom: studioDom.moveNode(dom, addedNode, parentId, parentIndex),
-        newNode: null,
-        highlightLayout: false,
-        highlightedSlot: null,
-      });
+      if (newNode) {
+        return update(state, {
+          dom: studioDom.addNode(dom, newNode, parentId, parentProp, parentIndex),
+          newNode: null,
+          highlightLayout: false,
+          highlightedSlot: null,
+        });
+      }
+
+      if (state.selection) {
+        return update(state, {
+          dom: studioDom.moveNode(dom, state.selection, parentId, parentProp, parentIndex),
+          newNode: null,
+          highlightLayout: false,
+          highlightedSlot: null,
+        });
+      }
+
+      return state;
     }
     case 'OPEN_BINDING_EDITOR': {
       return update(state, {

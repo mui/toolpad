@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { DEFINITION_KEY } from './constants.js';
 
+export type SlotType = 'single' | 'multiple';
+
 export interface OnChangeHandler {
   params: ['event'];
   valueGetter: 'event.target.value';

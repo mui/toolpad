@@ -1,6 +1,11 @@
 import * as React from 'react';
 import { styled } from '@mui/system';
+import clsx from 'clsx';
 import { Rectangle } from './utils/geometry';
+
+const classes = {
+  active: 'StudioPinholeActive',
+};
 
 const PinholeOverlayRoot = styled('div')({
   pointerEvents: 'none !important' as 'none',
@@ -13,6 +18,9 @@ const PinholeOverlayRoot = styled('div')({
     right: 0,
     bottom: 0,
     background: '#000',
+    opacity: 0,
+  },
+  [`&.${classes.active} > div`]: {
     opacity: 0.03,
   },
 });
@@ -27,6 +35,7 @@ const PinholeOverlay = React.forwardRef(function PinholeOverlay(
   { className, onClick, pinhole }: PinholeOverlayprops,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const [active, setActive] = React.useState(false);
   const left = React.useRef<HTMLDivElement>(null);
   const topLeft = React.useRef<HTMLDivElement>(null);
   const top = React.useRef<HTMLDivElement>(null);
@@ -37,6 +46,10 @@ const PinholeOverlay = React.forwardRef(function PinholeOverlay(
   const bottomLeft = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
+    setActive(!!pinhole);
+    if (!pinhole) {
+      return;
+    }
     if (left.current) {
       left.current.style.top = pinhole ? `${pinhole.y}px` : '0';
       left.current.style.width = pinhole ? `${pinhole.x}px` : 'unset';
@@ -86,7 +99,7 @@ const PinholeOverlay = React.forwardRef(function PinholeOverlay(
 
   // We key the elements so that React doesn't reuse between pinhole off or on
   return (
-    <PinholeOverlayRoot ref={ref} className={className}>
+    <PinholeOverlayRoot ref={ref} className={clsx(className, { [classes.active]: active })}>
       {pinhole ? (
         <React.Fragment>
           {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}

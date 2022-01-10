@@ -1,7 +1,15 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
 import clsx from 'clsx';
-import { NodeId, NodeState, ViewState, FlowDirection, SlotLocation } from '../../../types';
+import { SlotType } from '@mui/studio-core';
+import {
+  NodeId,
+  NodeState,
+  ViewState,
+  FlowDirection,
+  SlotLocation,
+  SlotState,
+} from '../../../types';
 import * as studioDom from '../../../studioDom';
 import PageView, { PageViewHandle } from '../../PageView';
 import {
@@ -15,6 +23,7 @@ import { PageEditorState } from '../../../editorState';
 import { PinholeOverlay } from '../../../PinholeOverlay';
 import { useEditorApi, usePageEditorState } from '../EditorProvider';
 import { getViewState } from '../../../pageViewState';
+import { ExactEntriesOf } from '../../../utils/types';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -174,59 +183,58 @@ function getAvailableNodes(
 /**
  * From an array of slots, returns the index of the closest one to a certain point
  */
-function findClosestSlot(slots: RenderedSlot[], x: number, y: number): RenderedSlot | null {
-  let closestDistance = Infinity;
-  let closestSlot: RenderedSlot | null = null;
-
-  for (let j = 0; j < slots.length; j += 1) {
-    const slotLayout = slots[j];
-    let distance: number;
-    if (slotLayout.type === 'single') {
-      distance = distanceToRect(slotLayout.rect, x, y);
-    } else {
-      distance =
-        slotLayout.direction === 'horizontal'
-          ? distanceToLine(
-              slotLayout.x,
-              slotLayout.y,
-              slotLayout.x,
-              slotLayout.y + slotLayout.size,
-              x,
-              y,
-            )
-          : distanceToLine(
-              slotLayout.x,
-              slotLayout.y,
-              slotLayout.x + slotLayout.size,
-              slotLayout.y,
-              x,
-              y,
-            );
-    }
-
-    if (distance <= 0) {
-      // We can bail out early
-      return slotLayout;
-    }
-    if (distance < closestDistance) {
-      closestDistance = distance;
-      closestSlot = slotLayout;
-    }
-  }
-
-  return closestSlot;
-}
-
 function findActiveSlotInNode(
-  nodeLayout: NodeState,
-  slots: RenderedSlot[],
+  parentId: NodeId,
+  slots: NodeSlots,
   x: number,
   y: number,
 ): SlotLocation | null {
-  const { nodeId } = nodeLayout;
-  const closestSlot = findClosestSlot(slots, x, y);
-  if (closestSlot) {
-    return { parentId: nodeId, parentIndex: closestSlot.parentIndex };
+  let closestDistance = Infinity;
+  let closestSlot: RenderedSlot | null = null;
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [parentProp, namedSlots] of Object.entries(slots)) {
+    if (namedSlots) {
+      for (let j = 0; j < namedSlots.length; j += 1) {
+        const namedSlot = namedSlots[j];
+        let distance: number;
+        if (namedSlot.type === 'single') {
+          distance = distanceToRect(namedSlot.rect, x, y);
+        } else {
+          distance =
+            namedSlot.direction === 'horizontal'
+              ? distanceToLine(
+                  namedSlot.x,
+                  namedSlot.y,
+                  namedSlot.x,
+                  namedSlot.y + namedSlot.size,
+                  x,
+                  y,
+                )
+              : distanceToLine(
+                  namedSlot.x,
+                  namedSlot.y,
+                  namedSlot.x + namedSlot.size,
+                  namedSlot.y,
+                  x,
+                  y,
+                );
+        }
+
+        if (distance <= 0) {
+          // We can bail out early
+          return { parentId, parentIndex: namedSlot.parentIndex, parentProp };
+        }
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestSlot = namedSlot;
+        }
+      }
+
+      if (closestSlot) {
+        return { parentId, parentIndex: closestSlot.parentIndex, parentProp };
+      }
+    }
   }
   return null;
 }
@@ -240,14 +248,14 @@ function findActiveSlotAt(
 ): SlotLocation | null {
   // Search deepest nested first
   let nodeLayout: NodeState | undefined;
-  let nodeSlots: RenderedSlot[] = [];
+  let nodeSlots: NodeSlots = {};
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
     nodeLayout = viewLayout[node.id];
-    nodeSlots = slots[node.id] || [];
+    nodeSlots = slots[node.id] || {};
     if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
       // Initially only consider slots of the node we're hovering
-      const slotIndex = findActiveSlotInNode(nodeLayout, nodeSlots, x, y);
+      const slotIndex = findActiveSlotInNode(nodeLayout.nodeId, nodeSlots, x, y);
       if (slotIndex) {
         return slotIndex;
       }
@@ -256,7 +264,7 @@ function findActiveSlotAt(
   // One last attempt, using the most shallow nodeLayout we found, regardless of
   // whether we are hovering it
   if (nodeLayout) {
-    return findActiveSlotInNode(nodeLayout, nodeSlots, x, y);
+    return findActiveSlotInNode(nodeLayout.nodeId, nodeSlots, x, y);
   }
   return null;
 }
@@ -276,14 +284,19 @@ function getSlotDirection(flow: FlowDirection): SlotDirection {
   }
 }
 
-interface RenderedSingleSlot {
+interface RenderedSlotBase {
+  readonly type: SlotType;
+  readonly parentIndex: string;
+}
+
+interface RenderedSingleSlot extends RenderedSlotBase {
   readonly type: 'single';
   readonly parentIndex: string;
   readonly rect: Rectangle;
 }
 
-interface RenderedInsertSlot {
-  readonly type: 'insert';
+interface RenderedInsertSlot extends RenderedSlotBase {
+  readonly type: 'multiple';
   readonly parentIndex: string;
   readonly direction: SlotDirection;
   readonly x: number;
@@ -294,23 +307,13 @@ interface RenderedInsertSlot {
 type RenderedSlot = RenderedInsertSlot | RenderedSingleSlot;
 
 function calculateSlots(
-  parent: PageOrElementNode,
-  children: PageOrElementNode[],
+  slotState: SlotState,
+  children: studioDom.StudioNode[],
   viewState: ViewState,
 ): RenderedSlot[] {
-  const parentState = viewState[parent.id];
+  const rect = slotState.rect;
 
-  if (!parentState) {
-    return [];
-  }
-
-  if (parentState.slotType === 'none') {
-    return [];
-  }
-
-  const rect = parentState.innerRect;
-
-  if (parentState.slotType === 'single') {
+  if (slotState.type === 'single') {
     return [
       {
         type: 'single',
@@ -320,7 +323,7 @@ function calculateSlots(
     ];
   }
 
-  const slotDirection = getSlotDirection(parentState.direction);
+  const slotDirection = getSlotDirection(slotState.direction);
 
   const size = slotDirection === 'horizontal' ? rect.height : rect.width;
 
@@ -340,7 +343,7 @@ function calculateSlots(
 
     const childRect = childState.rect;
 
-    switch (parentState.direction) {
+    switch (slotState.direction) {
       case 'row':
         boundaries.push({
           start: childRect.x,
@@ -370,52 +373,76 @@ function calculateSlots(
         });
         break;
       default:
-        throw new Error(`Invariant: Unrecognized direction "${parentState.direction}"`);
+        throw new Error(`Invariant: Unrecognized direction "${slotState.direction}"`);
     }
   }
 
-  try {
-    const offsets: { offset: number; parentIndex: string }[] = [];
-    if (boundaries.length > 0) {
-      const first = boundaries[0];
+  const offsets: { offset: number; parentIndex: string }[] = [];
+  if (boundaries.length > 0) {
+    const first = boundaries[0];
+    offsets.push({
+      offset: first.start,
+      parentIndex: studioDom.createFractionalIndex(null, first.parentIndex),
+    });
+    const lastIdx = boundaries.length - 1;
+    for (let i = 0; i < lastIdx; i += 1) {
+      const prev = boundaries[i];
+      const current = boundaries[i + 1];
       offsets.push({
-        offset: first.start,
-        parentIndex: studioDom.createFractionalIndex(null, first.parentIndex),
-      });
-      const lastIdx = boundaries.length - 1;
-      for (let i = 0; i < lastIdx; i += 1) {
-        const prev = boundaries[i];
-        const current = boundaries[i + 1];
-        offsets.push({
-          offset: (prev.end + current.start) / 2,
-          parentIndex: studioDom.createFractionalIndex(prev.parentIndex, current.parentIndex),
-        });
-      }
-      const last = boundaries[lastIdx];
-      offsets.push({
-        offset: last.end,
-        parentIndex: studioDom.createFractionalIndex(last.parentIndex, null),
+        offset: (prev.end + current.start) / 2,
+        parentIndex: studioDom.createFractionalIndex(prev.parentIndex, current.parentIndex),
       });
     }
-
-    return offsets.map(
-      ({ offset, parentIndex }) =>
-        ({
-          type: 'insert',
-          parentIndex,
-          direction: slotDirection,
-          x: slotDirection === 'horizontal' ? offset : rect.x,
-          y: slotDirection === 'horizontal' ? rect.y : offset,
-          size,
-        } as const),
-    );
-  } catch (err) {
-    return [];
+    const last = boundaries[lastIdx];
+    offsets.push({
+      offset: last.end,
+      parentIndex: studioDom.createFractionalIndex(last.parentIndex, null),
+    });
   }
+
+  return offsets.map(
+    ({ offset, parentIndex }) =>
+      ({
+        type: 'multiple',
+        parentIndex,
+        direction: slotDirection,
+        x: slotDirection === 'horizontal' ? offset : rect.x,
+        y: slotDirection === 'horizontal' ? rect.y : offset,
+        size,
+      } as const),
+  );
+}
+
+function calculateNodeSlots(
+  parent: PageOrElementNode,
+  children: studioDom.NodeChildren,
+  viewState: ViewState,
+): NodeSlots {
+  const parentState = viewState[parent.id];
+
+  if (!parentState) {
+    return {};
+  }
+
+  const result: NodeSlots = {};
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [parentProp, slotState] of Object.entries(parentState.slots)) {
+    if (slotState) {
+      const namedChildren = children[parentProp] ?? [];
+      result[parentProp] = calculateSlots(slotState, namedChildren, viewState);
+    }
+  }
+
+  return result;
+}
+
+interface NodeSlots {
+  [key: string]: RenderedSlot[] | undefined;
 }
 
 interface ViewSlots {
-  [node: NodeId]: RenderedSlot[] | undefined;
+  [node: NodeId]: NodeSlots | undefined;
 }
 
 export interface RenderPanelProps {
@@ -448,7 +475,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const slots: ViewSlots = React.useMemo(() => {
     const result: ViewSlots = {};
     pageNodes.forEach((node) => {
-      result[node.id] = calculateSlots(node, studioDom.getChildren(dom, node), viewState);
+      result[node.id] = calculateNodeSlots(node, studioDom.getChildNodes(dom, node), viewState);
     });
     return result;
   }, [pageNodes, dom, viewState]);
@@ -609,9 +636,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     }
   }, []);
   const handleBlur = React.useCallback(() => setIsFocused(false), []);
-
-  console.log(selectedRect);
-
   return (
     <RenderPanelRoot
       ref={rootRef}
@@ -662,31 +686,38 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               </React.Fragment>
             );
           })}
-          {Object.entries(slots).map(([nodeId, nodeSlots = []]) =>
-            nodeSlots.map((slot: RenderedSlot) =>
-              slot.type === 'insert' ? (
-                <div
-                  key={`${nodeId}:${slot.parentIndex}`}
-                  style={insertSlotAbsolutePositionCss(slot)}
-                  className={clsx(classes.insertSlotHud, {
-                    [classes.active]:
-                      highlightedSlot?.parentId === nodeId &&
-                      highlightedSlot?.parentIndex === slot.parentIndex,
-                  })}
-                />
-              ) : (
-                <div
-                  key={`${nodeId}:${slot.parentIndex}`}
-                  style={absolutePositionCss(slot.rect)}
-                  className={clsx(classes.slotHud, {
-                    [classes.active]: highlightedSlot?.parentId === nodeId,
-                  })}
-                >
-                  Insert Here
-                </div>
-              ),
-            ),
-          )}
+          {(Object.entries(slots) as ExactEntriesOf<ViewSlots>).map(([nodeId, nodeSlots = {}]) => {
+            return (Object.entries(nodeSlots) as ExactEntriesOf<NodeSlots>).map(
+              ([parentProp, namedSlots = []]) => {
+                return namedSlots.map((slot: RenderedSlot) =>
+                  slot.type === 'multiple' ? (
+                    <div
+                      key={`${nodeId}:${slot.parentIndex}`}
+                      style={insertSlotAbsolutePositionCss(slot)}
+                      className={clsx(classes.insertSlotHud, {
+                        [classes.active]:
+                          highlightedSlot?.parentId === nodeId &&
+                          highlightedSlot?.parentProp === parentProp &&
+                          highlightedSlot?.parentIndex === slot.parentIndex,
+                      })}
+                    />
+                  ) : (
+                    <div
+                      key={`${nodeId}:${slot.parentIndex}`}
+                      style={absolutePositionCss(slot.rect)}
+                      className={clsx(classes.slotHud, {
+                        [classes.active]:
+                          highlightedSlot?.parentId === nodeId &&
+                          highlightedSlot?.parentProp === parentProp,
+                      })}
+                    >
+                      Insert Here
+                    </div>
+                  ),
+                );
+              },
+            );
+          })}
           {/* 
             This overlay allows passing through pointer-events through a pinhole
             This allows interactivity on the selected element only, while maintaining

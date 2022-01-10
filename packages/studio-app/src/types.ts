@@ -1,4 +1,5 @@
 import type * as React from 'react';
+import { SlotType } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
@@ -67,10 +68,21 @@ export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
 export interface SlotLocation {
   parentId: NodeId;
+  parentProp: string;
   parentIndex: string;
 }
 
 export type SlotDirection = 'horizontal' | 'vertical';
+
+export interface SlotState {
+  type: SlotType;
+  rect: Rectangle;
+  direction: FlowDirection;
+}
+
+export interface SlotsState {
+  [prop: string]: SlotState | undefined;
+}
 
 export interface NodeState {
   nodeId: NodeId;
@@ -78,9 +90,7 @@ export interface NodeState {
   props: {
     [key: string]: unknown;
   };
-  innerRect: Rectangle;
-  direction: FlowDirection;
-  slotType: 'none' | 'single' | 'multiple';
+  slots: SlotsState;
 }
 
 export interface ViewState {

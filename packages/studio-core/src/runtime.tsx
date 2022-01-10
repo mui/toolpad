@@ -2,8 +2,13 @@ import * as React from 'react';
 
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
-import { DEFINITION_KEY, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
-import type { ComponentDefinition } from './index';
+import {
+  DEFINITION_KEY,
+  RUNTIME_PROP_NODE_ID,
+  RUNTIME_PROP_STUDIO_SLOTS,
+  RUNTIME_PROP_STUDIO_SLOTS_TYPE,
+} from './constants.js';
+import type { ComponentDefinition, SlotType } from './index';
 import { createComponent } from './index';
 
 // NOTE: These props aren't used, they are only there to transfer information from the
@@ -11,7 +16,9 @@ import { createComponent } from './index';
 interface SlotsWrapperProps {
   children?: React.ReactNode;
   // eslint-disable-next-line react/no-unused-prop-types
-  [RUNTIME_PROP_STUDIO_SLOTS]: 'single' | 'multiple';
+  [RUNTIME_PROP_STUDIO_SLOTS]: string;
+  // eslint-disable-next-line react/no-unused-prop-types
+  [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: SlotType;
   // eslint-disable-next-line react/no-unused-prop-types
   parentId: string;
 }
@@ -58,30 +65,47 @@ function WrappedStudioNodeInternal({
 
   let newProps: { [key: string]: unknown } | undefined;
 
-  if (definition?.props.children) {
-    const propDef = definition.props.children;
-    const value = child.props.children;
+  Object.entries(definition?.props || {}).forEach(([propName, propDef]) => {
+    const value = child.props[propName];
     if (propDef?.type === 'slots') {
       const valueAsArray = React.Children.toArray(value);
       newProps = newProps ?? {};
-      newProps.children =
+      newProps[propName] =
         valueAsArray.length > 0 ? (
-          <SlotsWrapper {...{ [RUNTIME_PROP_STUDIO_SLOTS]: 'multiple' }} parentId={studioNodeId}>
+          <SlotsWrapper
+            {...{
+              [RUNTIME_PROP_STUDIO_SLOTS]: propName,
+              [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
+            }}
+            parentId={studioNodeId}
+          >
             {valueAsArray}
           </SlotsWrapper>
         ) : (
-          <PlaceHolder {...{ [RUNTIME_PROP_STUDIO_SLOTS]: 'single' }} parentId={studioNodeId} />
+          <PlaceHolder
+            {...{
+              [RUNTIME_PROP_STUDIO_SLOTS]: propName,
+              [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
+            }}
+            parentId={studioNodeId}
+          />
         );
     } else if (propDef?.type === 'slot') {
       const valueAsArray = React.Children.toArray(value);
       if (valueAsArray.length <= 0) {
         newProps = newProps ?? {};
-        newProps.children = (
-          <PlaceHolder {...{ [RUNTIME_PROP_STUDIO_SLOTS]: 'single' }} parentId={studioNodeId} />
+        newProps[propName] = (
+          <PlaceHolder
+            {...{
+              [RUNTIME_PROP_STUDIO_SLOTS]: propName,
+              [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
+            }}
+            parentId={studioNodeId}
+          />
         );
       }
     }
-  }
+  });
 
   return newProps ? React.cloneElement(child, newProps) : child;
 }

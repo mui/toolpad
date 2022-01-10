@@ -228,15 +228,17 @@ function createDefaultApp(): studioDom.StudioDom {
   let dom = studioDom.createDom();
   const theme = studioDom.createNode(dom, 'theme', {
     name: 'Theme',
+    props: {},
     content: DEFAULT_THEME_CONTENT,
   });
-  dom = studioDom.moveNode(dom, theme, dom.root);
+  dom = studioDom.addNode(dom, theme, dom.root, 'children');
   const page = studioDom.createNode(dom, 'page', {
     name: 'DefaultPage',
+    props: {},
     title: 'Default',
     state: {},
   });
-  dom = studioDom.moveNode(dom, page, dom.root);
+  dom = studioDom.addNode(dom, page, dom.root, 'children');
   return dom;
 }
 

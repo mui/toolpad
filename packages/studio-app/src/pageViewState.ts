@@ -1,4 +1,9 @@
-import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from '@mui/studio-core';
+import {
+  RUNTIME_PROP_NODE_ID,
+  RUNTIME_PROP_STUDIO_SLOTS,
+  RUNTIME_PROP_STUDIO_SLOTS_TYPE,
+  SlotType,
+} from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, NodeState, ViewState, FlowDirection } from './types';
 import { getRelativeBoundingBox } from './utils/geometry';
@@ -21,9 +26,7 @@ function getNodeViewState(
       nodeId,
       rect,
       props: fiber.child?.memoizedProps ?? {},
-      innerRect: rect,
-      direction: 'column',
-      slotType: 'none',
+      slots: {},
     };
   }
   return null;
@@ -72,9 +75,9 @@ export function getViewState(viewElm: HTMLElement): ViewState {
           }
         }
 
-        const studioSlots = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS] as string | undefined;
-        if (studioSlots) {
-          const slotType = studioSlots as 'single' | 'multiple';
+        const studioSlotName = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS] as string | undefined;
+        if (studioSlotName) {
+          const slotType = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS_TYPE] as SlotType;
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
           const nodeViewState = viewState[parentId];
 
@@ -83,10 +86,14 @@ export function getViewState(viewElm: HTMLElement): ViewState {
             ?.findHostInstanceByFiber(fiber);
           const childContainerElm = firstChildElm?.parentElement;
           if (childContainerElm && nodeViewState) {
-            nodeViewState.innerRect = getRelativeBoundingBox(viewElm, childContainerElm);
-            nodeViewState.direction = window.getComputedStyle(childContainerElm)
+            const rect = getRelativeBoundingBox(viewElm, childContainerElm);
+            const direction = window.getComputedStyle(childContainerElm)
               .flexDirection as FlowDirection;
-            nodeViewState.slotType = slotType;
+            nodeViewState.slots[studioSlotName] = {
+              type: slotType,
+              rect,
+              direction,
+            };
           }
         }
       });

@@ -34,11 +34,17 @@ TO DO:
 - iframe needs to be sandboxed + CSP?
 - StudioSandbox => add react-refresh (or decide on alternative, bundler in teh browser?)
 - deployments/releases
+- secrets encryption and redaction on client
 
 - separate prop types from prop controls
-- single "element" type with slots: boolean to enable/disable UI for it
+- single "element" type with slots: `'none' | 'single' | 'multiple'` to enable/disable UI for it.
 
-- decide on persistence, json files vs. sqlite vs. postgres?
+- unbound textfield can't do input
+- RPC mechanism, make sure we can check context for authorization
+- test drive pomerium
+
+- docker image + compose file for installation
+- build persistence in postgres
 - integration tests, (let's consolidate the architecture a bit more first)
 - expand @mui/components
 - editor:

@@ -394,19 +394,19 @@ export function setNodeProp<P, K extends keyof P>(
   });
 }
 
-export function moveNode(
+function setNodeParent(
   dom: StudioDom,
-  newNode: StudioNode,
+  node: StudioNode,
   parentId: NodeId,
   parentProp: string,
   parentIndex?: string,
 ) {
   const parent = getNode(dom, parentId);
 
-  const allowedParents: readonly StudioNodeBase['type'][] = ALLOWED_PARENTS[newNode.type];
+  const allowedParents: readonly StudioNodeBase['type'][] = ALLOWED_PARENTS[node.type];
   if (!allowedParents.includes(parent.type)) {
     throw new Error(
-      `Node "${newNode.id}" of type "${newNode.type}" can't be added to a node of type "${parent.type}"`,
+      `Node "${node.id}" of type "${node.type}" can't be added to a node of type "${parent.type}"`,
     );
   }
 
@@ -418,13 +418,38 @@ export function moveNode(
 
   return update(dom, {
     nodes: update(dom.nodes, {
-      [newNode.id]: update(newNode, {
+      [node.id]: update(node, {
         parentId,
         parentProp,
         parentIndex,
       }),
     }),
   });
+}
+
+export function addNode(
+  dom: StudioDom,
+  newNode: StudioNode,
+  parentId: NodeId,
+  parentProp: string,
+  parentIndex?: string,
+) {
+  if (newNode.parentId) {
+    throw new Error(`Node "${newNode.id}" is already attached to a parent`);
+  }
+
+  return setNodeParent(dom, newNode, parentId, parentProp, parentIndex);
+}
+
+export function moveNode(
+  dom: StudioDom,
+  nodeId: NodeId,
+  parentId: NodeId,
+  parentProp: string,
+  parentIndex?: string,
+) {
+  const node = getNode(dom, nodeId);
+  return setNodeParent(dom, node, parentId, parentProp, parentIndex);
 }
 
 export function removeNode(dom: StudioDom, nodeId: NodeId) {

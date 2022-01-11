@@ -31,13 +31,8 @@ export interface BindingEditorState {
 }
 
 export interface BaseEditorState {
-  readonly editorType: 'page' | 'theme' | 'api';
+  readonly editorType: 'page' | 'api';
   readonly dom: studioDom.StudioDom;
-}
-
-export interface ThemeEditorState extends BaseEditorState {
-  readonly editorType: 'theme';
-  readonly themeNodeId: NodeId;
 }
 
 export interface ApiEditorState extends BaseEditorState {
@@ -57,7 +52,7 @@ export interface PageEditorState extends BaseEditorState {
   readonly viewState: ViewState;
 }
 
-export type EditorState = PageEditorState | ThemeEditorState | ApiEditorState;
+export type EditorState = PageEditorState | ApiEditorState;
 
 export type EditorAction =
   | {
@@ -137,17 +132,6 @@ export type EditorAction =
   | {
       type: 'ADD_THEME';
     };
-
-export function createThemeEditorState(
-  dom: studioDom.StudioDom,
-  themeNodeId: NodeId,
-): ThemeEditorState {
-  return {
-    editorType: 'theme',
-    dom,
-    themeNodeId,
-  };
-}
 
 export function createApiEditorState(dom: studioDom.StudioDom, apiNodeId: NodeId): ApiEditorState {
   return {
@@ -388,13 +372,6 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
   }
 }
 
-export function themeEditorReducer(state: ThemeEditorState, action: EditorAction): EditorState {
-  switch (action.type) {
-    default:
-      return state;
-  }
-}
-
 export function apiEditorReducer(state: ApiEditorState, action: EditorAction): EditorState {
   switch (action.type) {
     default:
@@ -419,9 +396,6 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
           }
           return createPageEditorState(state.dom, node.id);
         }
-        if (studioDom.isTheme(node)) {
-          return createThemeEditorState(state.dom, node.id);
-        }
         if (studioDom.isApi(node)) {
           return createApiEditorState(state.dom, node.id);
         }
@@ -439,8 +413,6 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
   switch (state.editorType) {
     case 'page':
       return pageEditorReducer(state, action);
-    case 'theme':
-      return themeEditorReducer(state, action);
     case 'api':
       return apiEditorReducer(state, action);
     default:

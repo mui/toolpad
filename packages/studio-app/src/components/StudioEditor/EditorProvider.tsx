@@ -6,7 +6,6 @@ import {
   editorReducer,
   EditorState,
   PageEditorState,
-  ThemeEditorState,
 } from '../../editorState';
 import { StudioNodeBase } from '../../studioDom';
 import { NodeId, SlotLocation, StudioNodeProps, ViewState } from '../../types';
@@ -119,14 +118,6 @@ export function usePageEditorState(): PageEditorState {
   const state = useEditorState();
   if (state.editorType !== 'page') {
     throw new Error(`PageEditorState state requested out of context`);
-  }
-  return state;
-}
-
-export function useThemeEditorState(): ThemeEditorState {
-  const state = useEditorState();
-  if (state.editorType !== 'theme') {
-    throw new Error(`ThemeEditorState state requested out of context`);
   }
   return state;
 }

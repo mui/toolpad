@@ -12,7 +12,6 @@ import PagePanel from './PagePanel';
 import renderPageCode from '../../renderPageCode';
 import useLatest from '../../utils/useLatest';
 import client from '../../api';
-import ThemeFileEditor from './ThemeFileEditor';
 
 const classes = {
   content: 'StudioContent',
@@ -63,8 +62,6 @@ function FileEditor({ type, className }: FileEditorProps) {
   switch (type) {
     case 'page':
       return <PageFileEditor className={className} />;
-    case 'theme':
-      return <ThemeFileEditor className={className} />;
     default:
       return <ToDoFileEditor className={className} />;
   }

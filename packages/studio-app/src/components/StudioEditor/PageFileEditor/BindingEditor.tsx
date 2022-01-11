@@ -37,12 +37,12 @@ export function AddBindingEditor<P, K extends keyof P & string>({
 
   const srcNodeId = srcNode.id;
   const srcDefinition = getStudioComponent(state.dom, srcNode.component);
-  const srcPropDefinition = srcDefinition.props[srcProp];
+  const srcPropDefinition = srcDefinition.argTypes[srcProp];
 
   if (!srcPropDefinition) {
     throw new Error(`Invariant: trying to bind an unknown property "${srcProp}"`);
   }
-  const srcType = srcPropDefinition.type;
+  const srcType = srcPropDefinition.typeDef.type;
 
   const bindableProps = React.useMemo(() => {
     const page = studioDom.getElementPage(state.dom, srcNode);
@@ -53,12 +53,12 @@ export function AddBindingEditor<P, K extends keyof P & string>({
     return nodes.flatMap((destNode) => {
       const destDefinition = getStudioComponent(state.dom, destNode.component);
 
-      return Object.entries(destDefinition.props).flatMap(([destProp]) => {
-        const destPropDefinition = destDefinition.props[destProp];
+      return Object.entries(destDefinition.argTypes).flatMap(([destProp]) => {
+        const destPropDefinition = destDefinition.argTypes[destProp];
         if (!destPropDefinition) {
           throw new Error(`Invariant: trying to bind an unknown property "${srcProp}"`);
         }
-        const destType = destPropDefinition.type;
+        const destType = destPropDefinition.typeDef.type;
         if ((destNode.id === srcNodeId && destProp === srcProp) || destType !== srcType) {
           return [];
         }

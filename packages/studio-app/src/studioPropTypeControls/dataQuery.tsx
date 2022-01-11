@@ -1,7 +1,7 @@
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import type { PropTypeDefinition, EditorProps } from '../types';
+import type { PropControlDefinition, EditorProps } from '../types';
 import client from '../api';
 
 function DataQueryEditor({ value, onChange }: EditorProps<string | null>) {
@@ -32,7 +32,7 @@ function DataQueryEditor({ value, onChange }: EditorProps<string | null>) {
   );
 }
 
-const dataQueryType: PropTypeDefinition<string | null> = {
+const dataQueryType: PropControlDefinition<string | null> = {
   Editor: DataQueryEditor,
 };
 

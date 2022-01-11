@@ -2,14 +2,14 @@ import Paper from '@mui/material/Paper';
 import { createComponent } from '@mui/studio-core';
 
 export default createComponent(Paper, {
-  props: {
+  argTypes: {
     elevation: {
-      type: 'number',
+      typeDef: { type: 'number', minimum: 0 },
       defaultValue: 1,
     },
     children: {
-      type: 'slot',
-      defaultValue: null,
+      typeDef: { type: 'element' },
+      control: { type: 'slot' },
     },
   },
 });

@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import { SlotType } from '@mui/studio-core';
+import { ArgTypeDefinition, SlotType } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
@@ -9,18 +9,15 @@ export interface DefaultNodeProps {
 
 export interface EditorProps<T> {
   name: string;
+  argType: ArgTypeDefinition;
   disabled?: boolean;
   value: T;
   onChange: (newValue: T) => void;
 }
 
-export interface PropTypeDefinition<T> {
+export interface PropControlDefinition<T = any> {
   Editor: React.FC<EditorProps<T>>;
 }
-
-export type PropTypeOf<T extends PropTypeDefinition<any>> = T extends PropTypeDefinition<infer U>
-  ? U
-  : never;
 
 export interface StudioNodeBindings {
   [destProp: string]: string;

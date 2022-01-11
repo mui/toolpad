@@ -18,15 +18,17 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 });
 
 export default createComponent(DataGridComponent, {
-  props: {
-    rows: { type: 'DataGridRows', defaultValue: [] },
+  argTypes: {
+    rows: {
+      typeDef: { type: 'array', items: { type: 'object' } },
+      defaultValue: [],
+    },
     columns: {
-      type: 'DataGridColumns',
+      typeDef: { type: 'array', items: { type: 'object' } },
       defaultValue: [],
     },
     studioDataQuery: {
-      type: 'DataQuery',
-      defaultValue: null,
+      typeDef: { type: 'dataQuery' },
     },
   },
 });

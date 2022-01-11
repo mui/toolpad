@@ -1,21 +1,19 @@
 import { TextField } from '@mui/material';
 import * as React from 'react';
-import type { EditorProps, PropTypeDefinition } from '../types';
+import type { EditorProps, PropControlDefinition } from '../types';
 
-function NumberPropEditor({ name, value, onChange, disabled }: EditorProps<number>) {
+function StringPropEditor({ name, value, onChange, disabled }: EditorProps<string>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(Number(event.target.value));
+      onChange(event.target.value);
     },
     [onChange],
   );
-
   return (
     <TextField
       fullWidth
-      value={String(value)}
+      value={value}
       disabled={disabled}
-      type="number"
       onChange={handleChange}
       label={name}
       size="small"
@@ -23,8 +21,8 @@ function NumberPropEditor({ name, value, onChange, disabled }: EditorProps<numbe
   );
 }
 
-const numberType: PropTypeDefinition<number> = {
-  Editor: NumberPropEditor,
+const stringType: PropControlDefinition<string> = {
+  Editor: StringPropEditor,
 };
 
-export default numberType;
+export default stringType;

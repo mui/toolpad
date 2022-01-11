@@ -2,15 +2,16 @@ import TextField from '@mui/material/TextField';
 import { createComponent } from '@mui/studio-core';
 
 export default createComponent(TextField, {
-  props: {
-    label: { type: 'string', defaultValue: '' },
+  argTypes: {
+    label: {
+      typeDef: { type: 'string' },
+    },
     variant: {
-      type: 'TextFieldVariant',
+      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
       defaultValue: 'outlined',
     },
     value: {
-      type: 'string',
-      defaultValue: '',
+      typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       onChangeHandler: {
         params: ['event'],

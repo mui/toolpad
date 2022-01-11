@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { List, ListItem } from '@mui/material';
-import { DEFAULT_COMPONENTS } from '../../studioComponents';
-import { useEditorApi } from './EditorProvider';
+import { DEFAULT_COMPONENTS } from '../../../studioComponents';
+import { useEditorApi } from '../EditorProvider';
 
 export interface ComponentCatalogProps {
   className?: string;

@@ -209,29 +209,8 @@ export async function execApi(api: StudioApi): Promise<StudioApiResult<any>> {
   return dataSource.exec(connection, api.query);
 }
 
-const DEFAULT_THEME_CONTENT = `
-import { green, orange } from '@mui/material/colors';
-
-export default {
-  palette: {
-    primary: {
-      main: orange[500],
-    },
-    secondary: {
-      main: green[500],
-    },
-  },
-};
-`;
-
 function createDefaultApp(): studioDom.StudioDom {
   let dom = studioDom.createDom();
-  const theme = studioDom.createNode(dom, 'theme', {
-    name: 'Theme',
-    props: {},
-    content: DEFAULT_THEME_CONTENT,
-  });
-  dom = studioDom.addNode(dom, theme, dom.root, 'children');
   const page = studioDom.createNode(dom, 'page', {
     name: 'DefaultPage',
     props: {},

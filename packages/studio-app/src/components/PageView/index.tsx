@@ -2,9 +2,10 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
-import renderPageAsCode from '../../renderPageAsCode';
+import renderPageCode from '../../renderPageCode';
 import StudioSandbox, { StudioSandboxHandle } from '../StudioSandbox';
 import getImportMap from '../../getImportMap';
+import renderThemeCode from '../../renderThemeCode';
 
 const PageViewRoot = styled('div')({
   overflow: 'auto',
@@ -76,14 +77,17 @@ export default React.forwardRef(function PageView(
     },
   }));
 
-  const app = studioDom.getApp(dom);
-  const theme = studioDom.getTheme(dom, app);
-
   const renderedPage = React.useMemo(() => {
-    return renderPageAsCode(dom, pageNodeId, {
+    return renderPageCode(dom, pageNodeId, {
       editor: true,
     });
   }, [dom, pageNodeId]);
+
+  const renderedTheme = React.useMemo(() => {
+    return renderThemeCode(dom, {
+      editor: true,
+    });
+  }, [dom]);
 
   return (
     <PageViewRoot className={className}>
@@ -93,7 +97,7 @@ export default React.forwardRef(function PageView(
         base="/app/1234"
         importMap={getImportMap()}
         files={{
-          '/lib/theme.js': { code: theme?.content ?? 'export default {};' },
+          '/lib/theme.js': { code: renderedTheme.code },
           '/index.js': { code: appIndex },
           '/page.js': { code: renderedPage.code },
         }}

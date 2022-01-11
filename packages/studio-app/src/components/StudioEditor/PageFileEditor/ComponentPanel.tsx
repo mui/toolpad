@@ -3,8 +3,9 @@ import { Tab } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import * as React from 'react';
 import { ComponentPanelTab } from '../../../editorState';
-import ComponentCatalog from '../ComponentCatalog';
-import ComponentEditor from '../ComponentEditor';
+import ComponentCatalog from './ComponentCatalog';
+import ComponentEditor from './ComponentEditor';
+import ThemeEditor from './ThemeEditor';
 import { useEditorApi, usePageEditorState } from '../EditorProvider';
 
 const classes = {
@@ -38,6 +39,7 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
           <TabList onChange={handleChange} aria-label="lab API tabs example">
             <Tab label="Catalog" value="catalog" />
             <Tab label="Component" value="component" />
+            <Tab label="Theme" value="theme" />
           </TabList>
         </Box>
         <TabPanel value="catalog" className={classes.panel}>
@@ -45,6 +47,9 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
         </TabPanel>
         <TabPanel value="component" className={classes.panel}>
           <ComponentEditor />
+        </TabPanel>
+        <TabPanel value="theme" className={classes.panel}>
+          <ThemeEditor />
         </TabPanel>
       </TabContext>
     </ComponentPanelRoot>

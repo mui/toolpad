@@ -238,7 +238,7 @@ class Context {
   }
 }
 
-export default function renderPageAsCode(
+export default function renderPageCode(
   dom: studioDom.StudioDom,
   pageNodeId: NodeId,
   configInit: Partial<RenderPageConfig> = {},

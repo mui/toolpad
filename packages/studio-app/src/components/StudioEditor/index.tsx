@@ -9,7 +9,7 @@ import StudioAppBar from '../StudioAppBar';
 import EditorProvider, { useEditorState } from './EditorProvider';
 import PageFileEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
-import renderPageAsCode from '../../renderPageAsCode';
+import renderPageCode from '../../renderPageCode';
 import useLatest from '../../utils/useLatest';
 import client from '../../api';
 import ThemeFileEditor from './ThemeFileEditor';
@@ -90,7 +90,7 @@ function EditorContent() {
       `);
       return;
     }
-    const { code } = renderPageAsCode(state.dom, state.pageNodeId, { pretty: true });
+    const { code } = renderPageCode(state.dom, state.pageNodeId, { pretty: true });
     setViewedSource(code);
   }, [state]);
 

@@ -8,7 +8,8 @@ import {
   PageEditorState,
   ThemeEditorState,
 } from '../../editorState';
-import { NodeId, SlotLocation, StudioNodeProp, StudioNodeProps, ViewState } from '../../types';
+import { StudioNodeBase } from '../../studioDom';
+import { NodeId, SlotLocation, StudioNodeProps, ViewState } from '../../types';
 
 const EditorStateContext = React.createContext<EditorState | null>(null);
 
@@ -20,8 +21,12 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'SET_NODE_NAME', nodeId, name });
     },
-    setNodeProp(nodeId: NodeId, prop: string, value: StudioNodeProp<unknown>) {
-      dispatch({ type: 'SET_NODE_PROP', nodeId, prop, value });
+    setNodeConstPropValue<P, K extends keyof P & string>(
+      node: StudioNodeBase<P>,
+      prop: K,
+      value: P[K],
+    ) {
+      dispatch({ type: 'SET_NODE_PROP', nodeId: node.id, prop, value: { type: 'const', value } });
     },
     setNodeProps(nodeId: NodeId, props: StudioNodeProps) {
       dispatch({ type: 'SET_NODE_PROPS', nodeId, props });
@@ -83,6 +88,11 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
       dispatch({
         type: 'PAGE_VIEW_STATE_UPDATE',
         viewState,
+      });
+    },
+    addTheme() {
+      dispatch({
+        type: 'ADD_THEME',
       });
     },
   };

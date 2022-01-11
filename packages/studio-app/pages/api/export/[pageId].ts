@@ -1,13 +1,13 @@
 import { NextApiHandler } from 'next';
 import { transform } from 'sucrase';
 import { loadApp } from '../../../src/server/data';
-import renderPageAsCode from '../../../src/renderPageAsCode';
+import renderPageCode from '../../../src/renderPageCode';
 import { NodeId } from '../../../src/types';
 
 export default (async (req, res) => {
   const dom = await loadApp();
   const pageNodeId = req.query.pageId as NodeId;
-  const generated = renderPageAsCode(dom, pageNodeId, { pretty: true });
+  const generated = renderPageCode(dom, pageNodeId, { pretty: true });
   const transformed = transform(generated.code, {
     transforms: ['jsx', 'typescript'],
   });

@@ -38,9 +38,13 @@ export interface StudioAppNode extends StudioNodeBase {
   readonly parentId: null;
 }
 
-export interface StudioThemeNode extends StudioNodeBase {
+export interface StudioTheme {
+  'palette.primary.main': string;
+  'palette.secondary.main': string;
+}
+
+export interface StudioThemeNode extends StudioNodeBase<StudioTheme> {
   readonly type: 'theme';
-  readonly content: string;
 }
 
 export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
@@ -217,7 +221,7 @@ export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
 
 // TODO: make theme optional by returning undefined
 export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode | undefined {
-  return (getChildNodes(dom, app).children?.find((node) => isTheme(node)) ?? []) as
+  return getChildNodes(dom, app).children?.find((node) => isTheme(node)) as
     | StudioThemeNode
     | undefined;
 }
@@ -365,7 +369,7 @@ export function setNodeName(dom: StudioDom, node: StudioNode, name: string): Stu
 
 export function setNodeProps<P>(
   page: StudioDom,
-  node: StudioElementNode,
+  node: StudioNode,
   props: StudioNodeProps<P>,
 ): StudioDom {
   return update(page, {
@@ -379,7 +383,7 @@ export function setNodeProps<P>(
 
 export function setNodeProp<P, K extends keyof P>(
   page: StudioDom,
-  node: StudioElementNode,
+  node: StudioNode,
   prop: K,
   value: StudioNodeProps<P>[K],
 ): StudioDom {
@@ -463,4 +467,12 @@ export function removeNode(dom: StudioDom, nodeId: NodeId) {
   return update(dom, {
     nodes: omit(dom.nodes, node.id),
   });
+}
+
+export function getConstPropValue<P, K extends keyof P>(
+  node: StudioNodeBase<P>,
+  propName: K,
+): P[K] | undefined {
+  const prop = node.props[propName];
+  return prop?.type === 'const' ? prop.value : undefined;
 }

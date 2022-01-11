@@ -23,7 +23,7 @@ function getDefaultPropValues<P = {}>(
   return result;
 }
 
-export type ComponentPanelTab = 'catalog' | 'component';
+export type ComponentPanelTab = 'catalog' | 'component' | 'theme';
 
 export interface BindingEditorState {
   readonly nodeId: NodeId;
@@ -133,6 +133,9 @@ export type EditorAction =
   | {
       type: 'PAGE_VIEW_STATE_UPDATE';
       viewState: ViewState;
+    }
+  | {
+      type: 'ADD_THEME';
     };
 
 export function createThemeEditorState(
@@ -205,15 +208,8 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
     }
     case 'SET_NODE_PROP': {
       const node = studioDom.getNode(state.dom, action.nodeId);
-      studioDom.assertIsElement(node);
       return update(state, {
-        dom: studioDom.setNodeProps(
-          state.dom,
-          node,
-          update(node.props, {
-            [action.prop]: action.value,
-          }),
-        ),
+        dom: studioDom.setNodeProp<any, any>(state.dom, node, action.prop, action.value),
       });
     }
     case 'SET_NODE_PROPS': {
@@ -374,6 +370,17 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
       const { viewState } = action;
       return update(state, {
         viewState,
+      });
+    }
+    case 'ADD_THEME': {
+      const app = studioDom.getApp(state.dom);
+      return update(state, {
+        dom: studioDom.addNode(
+          state.dom,
+          studioDom.createNode(state.dom, 'theme', { name: 'Theme', props: {} }),
+          app.id,
+          'children',
+        ),
       });
     }
     default:

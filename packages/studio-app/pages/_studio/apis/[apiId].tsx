@@ -4,39 +4,43 @@ import { useQuery, useMutation } from 'react-query';
 import { Container, Stack, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { DataGrid } from '@mui/x-data-grid';
-import { StudioConnection, StudioDataSourceClient, StudioApi } from '../../../src/types';
+import {
+  DefaultNodeProps,
+  NodeId,
+  StudioConnection,
+  StudioDataSourceClient,
+} from '../../../src/types';
 import dataSources from '../../../src/studioDataSources/client';
 import client from '../../../src/api';
 import StudioAppBar from '../../../src/components/StudioAppBar';
+import * as studioDom from '../../../src/studioDom';
 
 function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {
   const dataSource = dataSources[connection.type] as StudioDataSourceClient<any, Q>;
   return dataSource || null;
 }
 
-interface ApiEditorProps<Q = unknown> {
-  api: StudioApi<Q>;
+interface ApiEditorProps {
+  dom: studioDom.StudioDom;
+  apiNodeId: NodeId;
 }
 
-function ApiEditor({ api }: ApiEditorProps) {
-  const [value, setValue] = React.useState(api);
-  const savedApi = React.useRef(api);
-  const isDirty = savedApi.current !== value;
+function ApiEditor<Q extends DefaultNodeProps>({ dom, apiNodeId }: ApiEditorProps) {
+  const api = studioDom.getNode(dom, apiNodeId);
+  studioDom.assertIsApi<Q>(api);
+
+  const [name, setName] = React.useState(api.name);
+  const [query, setQuery] = React.useState(studioDom.getConstPropValues(api) as Q);
 
   const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
     client.query.getConnection(api.connectionId),
   );
 
-  const updateApiMutation = useMutation(client.mutation.updateApi, {
-    onSuccess: () => {
-      savedApi.current = value;
-    },
-  });
+  const saveDomMutation = useMutation(client.mutation.saveApp);
 
-  const datasource = connectionData && getDataSource(connectionData);
+  const datasource = connectionData && getDataSource<Q>(connectionData);
 
-  // Stable version of the API
-  const previewApi = { ...value, name: 'Preview' };
+  const previewApi = { ...api, query };
   const { data: previewData } = useQuery(['api', previewApi], () =>
     client.query.execApi(previewApi),
   );
@@ -59,23 +63,20 @@ function ApiEditor({ api }: ApiEditorProps) {
       <TextField
         label="name"
         size="small"
-        value={value.name}
-        onChange={(event) => setValue((oldApi) => ({ ...oldApi, name: event.target.value }))}
+        value={name}
+        onChange={(event) => setName(event.target.value)}
       />
-      <datasource.QueryEditor
-        value={value.query}
-        onChange={(query) => setValue((oldApi) => ({ ...oldApi, query }))}
-      />
-      {updateApiMutation.error}
+      <datasource.QueryEditor value={query} onChange={(newQuery) => setQuery(newQuery)} />
+      {saveDomMutation.error}
       <Typography variant="h4">Preview</Typography>
       <div style={{ height: 300, width: '100%' }}>
         <DataGrid rows={rows} columns={columns} key={columnsFingerPrint} />
       </div>
       <LoadingButton
-        disabled={!isDirty}
-        loading={updateApiMutation.isLoading}
+        loading={saveDomMutation.isLoading}
         onClick={() => {
-          updateApiMutation.mutate(value);
+          const toSaveDom = studioDom.setNodePropConstValues(dom, api, query);
+          saveDomMutation.mutate(toSaveDom);
         }}
       >
         Save
@@ -88,16 +89,16 @@ export default function ApiEditorPage() {
   const router = useRouter();
   const { apiId } = router.query;
 
-  const { data: apiData } = useQuery(['api', apiId], () => client.query.getApi(apiId as string), {
-    enabled: router.isReady,
-  });
+  const domQuery = useQuery('dom', client.query.loadApp);
 
   return (
     <div>
       <StudioAppBar actions={null} />
       <Container>
         <Typography variant="h3">Edit Api</Typography>
-        {apiData && <ApiEditor api={apiData} />}
+        {domQuery.data && router.isReady && (
+          <ApiEditor dom={domQuery.data} apiNodeId={apiId as NodeId} />
+        )}
       </Container>
     </div>
   );

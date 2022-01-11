@@ -7,10 +7,6 @@ import {
   addConnection,
   updateConnection,
   testConnection,
-  getApis,
-  getApi,
-  addApi,
-  updateApi,
   execApi,
   loadApp,
   saveApp,
@@ -73,8 +69,6 @@ const rpcServer = {
     getConnections,
     getConnection,
 
-    getApis,
-    getApi,
     execApi,
 
     loadApp,
@@ -83,9 +77,6 @@ const rpcServer = {
     addConnection,
     updateConnection,
     testConnection,
-
-    addApi,
-    updateApi,
 
     saveApp,
   },

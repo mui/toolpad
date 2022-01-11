@@ -45,21 +45,11 @@ export interface StudioConstantProp<V> {
 
 export type StudioNodeProp<V> = StudioConstantProp<V> | StudioBoundProp;
 
-export type StudioNodeProps<P = DefaultNodeProps> = {
-  readonly [K in keyof P]: StudioNodeProp<P[K]> | undefined;
+export type StudioNodeProps<P> = {
+  readonly [K in keyof P]?: StudioNodeProp<P[K]>;
 };
 
 export type NodeId = Branded<string, 'NodeId'>;
-
-export interface StudioApiSummary {
-  id: string;
-  name: string;
-}
-
-export interface StudioApi<Q = unknown> extends StudioApiSummary {
-  connectionId: string;
-  query: Q;
-}
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 

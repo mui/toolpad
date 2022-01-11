@@ -18,6 +18,9 @@ export default function StudioAppBar({ actions }: StudioAppBarProps) {
         <Typography variant="h6" color="inherit" component="div">
           MUI Studio
         </Typography>
+        <Button component={NextLinkComposed} to="/_studio/editor" color="inherit">
+          Editor
+        </Button>
         <Button component={NextLinkComposed} to="/_studio/connections" color="inherit">
           Connections
         </Button>

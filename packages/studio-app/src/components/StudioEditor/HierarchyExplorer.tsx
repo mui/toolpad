@@ -118,7 +118,6 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
 
   const app = studioDom.getApp(state.dom);
   const pages = studioDom.getPages(state.dom, app);
-  const theme = studioDom.getTheme(state.dom, app);
 
   return (
     <div className={className}>
@@ -131,9 +130,6 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
       >
-        {theme ? (
-          <TreeItem ContentComponent={CustomContent} nodeId={theme.id} label="Theme" />
-        ) : null}
         <TreeItem ContentComponent={CustomContent} nodeId="" label="Pages">
           {pages.map((page) => (
             <HierarchyExplorerPageItem key={page.id} page={page} />

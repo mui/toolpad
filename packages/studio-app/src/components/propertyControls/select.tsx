@@ -1,6 +1,6 @@
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import * as React from 'react';
-import type { EditorProps, PropControlDefinition } from '../types';
+import type { EditorProps, PropControlDefinition } from '../../types';
 
 function SelectPropEditor({ name, argType, value, onChange, disabled }: EditorProps<string>) {
   const items = argType.typeDef.type === 'string' ? argType.typeDef.enum ?? [] : [];

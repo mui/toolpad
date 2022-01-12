@@ -65,14 +65,14 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
         <Stack spacing={2}>
           <PaletteColorPicker
             name="primary"
-            value={studioDom.getConstPropValue(theme, 'palette.primary.main') || ''}
+            value={studioDom.getPropConstValue(theme, 'palette.primary.main') || ''}
             onChange={(newValue) =>
               api.setNodeConstPropValue(theme, 'palette.primary.main', newValue)
             }
           />
           <PaletteColorPicker
             name="secondary"
-            value={studioDom.getConstPropValue(theme, 'palette.secondary.main') || ''}
+            value={studioDom.getPropConstValue(theme, 'palette.secondary.main') || ''}
             onChange={(newValue) =>
               api.setNodeConstPropValue(theme, 'palette.secondary.main', newValue)
             }

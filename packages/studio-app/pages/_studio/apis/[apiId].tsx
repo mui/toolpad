@@ -30,7 +30,7 @@ function ApiEditor<Q extends DefaultNodeProps>({ dom, apiNodeId }: ApiEditorProp
   studioDom.assertIsApi<Q>(api);
 
   const [name, setName] = React.useState(api.name);
-  const [query, setQuery] = React.useState(studioDom.getConstPropValues(api) as Q);
+  const [query, setQuery] = React.useState(studioDom.getPropConstValues(api) as Q);
 
   const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
     client.query.getConnection(api.connectionId),
@@ -40,7 +40,7 @@ function ApiEditor<Q extends DefaultNodeProps>({ dom, apiNodeId }: ApiEditorProp
 
   const datasource = connectionData && getDataSource<Q>(connectionData);
 
-  const previewApi = { ...api, query };
+  const previewApi: studioDom.StudioApiNode<Q> = studioDom.setPropConstValues(api, query);
   const { data: previewData } = useQuery(['api', previewApi], () =>
     client.query.execApi(previewApi),
   );

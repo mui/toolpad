@@ -476,7 +476,7 @@ export function removeNode(dom: StudioDom, nodeId: NodeId) {
   });
 }
 
-export function getConstPropValue<P, K extends keyof P>(
+export function getPropConstValue<P, K extends keyof P>(
   node: StudioNodeBase<P>,
   propName: keyof P,
 ): P[K] | undefined {
@@ -484,12 +484,32 @@ export function getConstPropValue<P, K extends keyof P>(
   return prop?.type === 'const' ? (prop.value as P[K]) : undefined;
 }
 
-export function getConstPropValues<P>(node: StudioNodeBase<P>): Partial<P> {
+export function getPropConstValues<P>(node: StudioNodeBase<P>): Partial<P> {
   const result: Partial<P> = {};
   (Object.keys(node.props) as (keyof P)[]).forEach((prop) => {
-    result[prop] = getConstPropValue(node, prop as keyof P);
+    result[prop] = getPropConstValue(node, prop as keyof P);
   });
   return result;
+}
+
+export function setPropConstValues<P>(node: StudioApiNode<P>, values: Partial<P>): StudioApiNode<P>;
+export function setPropConstValues<P>(
+  node: StudioElementNode<P>,
+  values: Partial<P>,
+): StudioElementNode<P>;
+export function setPropConstValues<P>(node: StudioThemeNode, values: Partial<P>): StudioThemeNode;
+export function setPropConstValues<P>(node: StudioNode, values: Partial<P>): StudioNode;
+export function setPropConstValues<P>(node: StudioNode, values: Partial<P>): StudioNode {
+  const propUpdates: Partial<StudioNodeProps<P>> = {};
+  (Object.entries(values) as ExactEntriesOf<P>).forEach(([prop, value]) => {
+    propUpdates[prop] = {
+      type: 'const',
+      value,
+    };
+  });
+  return update(node, {
+    props: update(node.props, propUpdates),
+  });
 }
 
 export function setNodePropConstValue<P, K extends keyof P>(
@@ -509,7 +529,27 @@ export function setNodePropConstValue<P, K extends keyof P>(
 
 export function setNodePropConstValues<P>(
   dom: StudioDom,
-  node: StudioNodeBase<P>,
+  node: StudioApiNode<P>,
+  values: Partial<P>,
+): StudioDom;
+export function setNodePropConstValues<P>(
+  dom: StudioDom,
+  node: StudioElementNode<P>,
+  values: Partial<P>,
+): StudioDom;
+export function setNodePropConstValues<P>(
+  dom: StudioDom,
+  node: StudioThemeNode,
+  values: Partial<P>,
+): StudioDom;
+export function setNodePropConstValues<P>(
+  dom: StudioDom,
+  node: StudioNode,
+  values: Partial<P>,
+): StudioDom;
+export function setNodePropConstValues<P>(
+  dom: StudioDom,
+  node: StudioNode,
   values: Partial<P>,
 ): StudioDom {
   const propUpdates: Partial<StudioNodeProps<P>> = {};
@@ -519,5 +559,9 @@ export function setNodePropConstValues<P>(
       value,
     };
   });
-  return setNodeProps(dom, node, propUpdates);
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: setPropConstValues(node, values),
+    }),
+  });
 }

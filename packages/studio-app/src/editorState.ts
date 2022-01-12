@@ -10,7 +10,8 @@ export interface BindingEditorState {
   readonly prop: string;
 }
 
-export interface PageEditorState2 {
+export interface PageEditorState {
+  readonly pageNodeId: NodeId;
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: studioDom.StudioNode | null;
   readonly bindingEditor: BindingEditorState | null;
@@ -25,19 +26,17 @@ export interface BaseEditorState {
   readonly selection: NodeId | null;
 }
 
-export interface PageEditorState extends BaseEditorState {
+export interface BaseEditorWithPageState extends BaseEditorState {
   readonly editorType: 'page';
-  readonly pageNodeId: NodeId;
-  readonly pageEditor: PageEditorState2;
+  readonly pageEditor: PageEditorState;
 }
 
-export interface ApiEditorState extends BaseEditorState {
+export interface BaseEditorWithApiState extends BaseEditorState {
   readonly editorType: 'api';
-  readonly apiNodeId: NodeId;
   readonly apiEditor: {};
 }
 
-export type EditorState = PageEditorState | ApiEditorState;
+export type EditorState = BaseEditorWithPageState | BaseEditorWithApiState;
 
 export type BaseAction =
   | {
@@ -215,8 +214,9 @@ export function domReducer(dom: studioDom.StudioDom, action: EditorAction): stud
   }
 }
 
-export function createPageEditorState(): PageEditorState2 {
+export function createPageEditorState(nodeId: NodeId): PageEditorState {
   return {
+    pageNodeId: nodeId,
     componentPanelTab: 'catalog',
     newNode: null,
     bindingEditor: null,
@@ -232,12 +232,11 @@ export function createEditorState(dom: studioDom.StudioDom): EditorState {
     dom,
     selection: null,
     editorType: 'page',
-    pageNodeId: pageNode.id,
-    pageEditor: createPageEditorState(),
+    pageEditor: createPageEditorState(pageNode.id),
   };
 }
 
-export function pageEditorReducer(state: PageEditorState2, action: EditorAction): PageEditorState2 {
+export function pageEditorReducer(state: PageEditorState, action: EditorAction): PageEditorState {
   switch (action.type) {
     case 'PAGE_SET_COMPONENT_PANEL_TAB':
       return update(state, {
@@ -292,7 +291,7 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
         if (studioDom.isElement(node)) {
           const page = studioDom.getElementPage(state.dom, node);
           if (page) {
-            if (state.editorType === 'page' && page.id === state.pageNodeId) {
+            if (state.editorType === 'page' && page.id === state.pageEditor.pageNodeId) {
               return update(state, {
                 selection: action.nodeId,
               });
@@ -301,12 +300,12 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
           }
         }
         if (studioDom.isPage(node)) {
-          if (state.editorType === 'page' && node.id === state.pageNodeId) {
+          if (state.editorType === 'page' && node.id === state.pageEditor.pageNodeId) {
             return state;
           }
           return update(state, {
             selection: null,
-            pageEditor: createPageEditorState(),
+            pageEditor: createPageEditorState(node.id),
           });
         }
       }

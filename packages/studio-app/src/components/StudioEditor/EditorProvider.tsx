@@ -4,7 +4,7 @@ import {
   EditorAction,
   editorReducer,
   EditorState,
-  PageEditorState2,
+  PageEditorState,
 } from '../../editorState';
 import * as studioDom from '../../studioDom';
 import { NodeId, SlotLocation, ViewState } from '../../types';
@@ -141,7 +141,7 @@ export function useEditorState(): EditorState {
   return stateContext;
 }
 
-export function usePageEditorState(): PageEditorState2 {
+export function usePageEditorState(): PageEditorState {
   const state = useEditorState();
   if (state.editorType !== 'page') {
     throw new Error(`PageEditorState state requested out of context`);

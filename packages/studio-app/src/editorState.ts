@@ -34,62 +34,25 @@ export interface PageEditorState extends BaseEditorState {
 
 export type EditorState = PageEditorState | ApiEditorState;
 
-export type EditorAction =
+export type DomAction =
   | {
-      type: 'NOOP';
-    }
-  | {
-      type: 'SELECT_NODE';
-      nodeId: NodeId | null;
-    }
-  | {
-      type: 'DESELECT_NODE';
-    }
-  | {
-      type: 'SET_NODE_NAME';
+      type: 'DOM_SET_NODE_NAME';
       nodeId: NodeId;
       name: string;
     }
   | {
-      type: 'SET_NODE_PROP';
+      type: 'DOM_SET_NODE_PROP';
       nodeId: NodeId;
       prop: string;
       value: StudioNodeProp<unknown>;
     }
   | {
-      type: 'SET_NODE_PROPS';
+      type: 'DOM_SET_NODE_PROPS';
       nodeId: NodeId;
       props: StudioNodeProps<unknown>;
     }
   | {
-      type: 'SET_COMPONENT_PANEL_TAB';
-      tab: ComponentPanelTab;
-    }
-  | {
-      type: 'NODE_DRAG_START';
-      nodeId: NodeId;
-    }
-  | {
-      type: 'NEW_NODE_DRAG_START';
-      newNode: studioDom.StudioNode;
-    }
-  | {
-      type: 'NODE_DRAG_OVER';
-      slot: SlotLocation | null;
-    }
-  | {
-      type: 'NODE_DRAG_END';
-    }
-  | {
-      type: 'OPEN_BINDING_EDITOR';
-      nodeId: NodeId;
-      prop: string;
-    }
-  | {
-      type: 'CLOSE_BINDING_EDITOR';
-    }
-  | {
-      type: 'ADD_BINDING';
+      type: 'DOM_ADD_BINDING';
       srcNodeId: NodeId;
       srcProp: string;
       destNodeId: NodeId;
@@ -97,32 +60,167 @@ export type EditorAction =
       initialValue: string;
     }
   | {
-      type: 'REMOVE_BINDING';
+      type: 'DOM_REMOVE_BINDING';
       nodeId: NodeId;
       prop: string;
     }
   | {
-      type: 'PAGE_VIEW_STATE_UPDATE';
-      viewState: ViewState;
-    }
-  | {
-      type: 'ADD_NODE';
+      type: 'DOM_ADD_NODE';
       node: studioDom.StudioNode;
       parentId: NodeId;
       parentProp: string;
       parentIndex?: string;
     }
   | {
-      type: 'MOVE_NODE';
+      type: 'DOM_MOVE_NODE';
       nodeId: NodeId;
       parentId: NodeId;
       parentProp: string;
       parentIndex: string;
     }
   | {
-      type: 'REMOVE_NODE';
+      type: 'DOM_REMOVE_NODE';
       nodeId: NodeId;
     };
+
+export type PageEditorAction =
+  | {
+      type: 'PAGE_SELECT_NODE';
+      nodeId: NodeId | null;
+    }
+  | {
+      type: 'PAGE_DESELECT_NODE';
+    }
+  | {
+      type: 'PAGE_SET_COMPONENT_PANEL_TAB';
+      tab: ComponentPanelTab;
+    }
+  | {
+      type: 'PAGE_NODE_DRAG_START';
+      nodeId: NodeId;
+    }
+  | {
+      type: 'PAGE_NEW_NODE_DRAG_START';
+      newNode: studioDom.StudioNode;
+    }
+  | {
+      type: 'PAGE_NODE_DRAG_OVER';
+      slot: SlotLocation | null;
+    }
+  | {
+      type: 'PAGE_NODE_DRAG_END';
+    }
+  | {
+      type: 'PAGE_OPEN_BINDING_EDITOR';
+      nodeId: NodeId;
+      prop: string;
+    }
+  | {
+      type: 'PAGE_CLOSE_BINDING_EDITOR';
+    }
+  | {
+      type: 'PAGE_VIEW_STATE_UPDATE';
+      viewState: ViewState;
+    };
+
+export type EditorAction = DomAction | PageEditorAction;
+
+export function domReducer(dom: studioDom.StudioDom, action: EditorAction): studioDom.StudioDom {
+  switch (action.type) {
+    case 'DOM_SET_NODE_NAME': {
+      const node = studioDom.getNode(dom, action.nodeId);
+      return studioDom.setNodeName(dom, node, action.name);
+    }
+    case 'DOM_SET_NODE_PROP': {
+      const node = studioDom.getNode(dom, action.nodeId);
+      return studioDom.setNodeProp<any, any>(dom, node, action.prop, action.value);
+    }
+    case 'DOM_SET_NODE_PROPS': {
+      const node = studioDom.getNode(dom, action.nodeId);
+      studioDom.assertIsElement(node);
+      return studioDom.setNodeProps(dom, node, action.props);
+    }
+    case 'DOM_ADD_NODE': {
+      return studioDom.addNode(
+        dom,
+        action.node,
+        action.parentId,
+        action.parentProp,
+        action.parentIndex,
+      );
+    }
+    case 'DOM_MOVE_NODE': {
+      return studioDom.moveNode(
+        dom,
+        action.nodeId,
+        action.parentId,
+        action.parentProp,
+        action.parentIndex,
+      );
+    }
+    case 'DOM_REMOVE_NODE': {
+      // TODO: also clean up orphaned state and bindings
+      return studioDom.removeNode(dom, action.nodeId);
+    }
+    case 'DOM_ADD_BINDING': {
+      const { srcNodeId, srcProp, destNodeId, destProp, initialValue } = action;
+      const srcNode = studioDom.getNode(dom, srcNodeId);
+      studioDom.assertIsElement<Record<string, unknown>>(srcNode);
+      const destNode = studioDom.getNode(dom, destNodeId);
+      studioDom.assertIsElement(destNode);
+      const destPropValue = (destNode.props as StudioNodeProps<Record<string, unknown>>)[destProp];
+      let stateKey = destPropValue?.type === 'binding' ? destPropValue.state : null;
+
+      const page = studioDom.getElementPage(dom, srcNode);
+      if (!page) {
+        return dom;
+      }
+
+      let pageState = page.state;
+      if (!stateKey) {
+        stateKey = generateUniqueId(new Set(Object.keys(page.state)));
+        pageState = update(pageState, {
+          [stateKey]: { name: '', initialValue },
+        });
+      }
+
+      return update(dom, {
+        nodes: update(dom.nodes, {
+          [page.id]: update(page, {
+            state: pageState,
+          }),
+          [srcNodeId]: update(srcNode, {
+            props: update(srcNode.props, {
+              [srcProp]: { type: 'binding', state: stateKey },
+            }),
+          }),
+          [destNodeId]: update(destNode, {
+            props: update(destNode.props, {
+              [destProp]: { type: 'binding', state: stateKey },
+            }),
+          }),
+        }),
+      });
+    }
+    case 'DOM_REMOVE_BINDING': {
+      const { nodeId, prop } = action;
+
+      const node = studioDom.getNode(dom, nodeId);
+      studioDom.assertIsElement(node);
+
+      // TODO: also clean up orphaned state and bindings
+      return update(dom, {
+        nodes: update(dom.nodes, {
+          [nodeId]: update(node, {
+            props: omit(node.props, prop),
+          }),
+        }),
+      });
+    }
+    default:
+      throw new Error('Invariant');
+  }
+}
 
 export function createApiEditorState(dom: studioDom.StudioDom, apiNodeId: NodeId): ApiEditorState {
   return {
@@ -156,115 +254,12 @@ export function createEditorState(dom: studioDom.StudioDom): EditorState {
 }
 
 export function pageEditorReducer(state: PageEditorState, action: EditorAction): EditorState {
+  state = update(state, {
+    dom: domReducer(state.dom, action),
+  });
+
   switch (action.type) {
-    case 'NOOP':
-      return state;
-    case 'SET_NODE_NAME': {
-      const node = studioDom.getNode(state.dom, action.nodeId);
-      return update(state, {
-        dom: studioDom.setNodeName(state.dom, node, action.name),
-      });
-    }
-    case 'SET_NODE_PROP': {
-      const node = studioDom.getNode(state.dom, action.nodeId);
-      return update(state, {
-        dom: studioDom.setNodeProp<any, any>(state.dom, node, action.prop, action.value),
-      });
-    }
-    case 'SET_NODE_PROPS': {
-      const node = studioDom.getNode(state.dom, action.nodeId);
-      studioDom.assertIsElement(node);
-      return update(state, {
-        dom: studioDom.setNodeProps(state.dom, node, action.props),
-      });
-    }
-    case 'ADD_NODE': {
-      return update(state, {
-        dom: studioDom.addNode(
-          state.dom,
-          action.node,
-          action.parentId,
-          action.parentProp,
-          action.parentIndex,
-        ),
-      });
-    }
-    case 'MOVE_NODE': {
-      return update(state, {
-        dom: studioDom.moveNode(
-          state.dom,
-          action.nodeId,
-          action.parentId,
-          action.parentProp,
-          action.parentIndex,
-        ),
-      });
-    }
-    case 'REMOVE_NODE': {
-      // TODO: also clean up orphaned state and bindings
-      return update(state, {
-        dom: studioDom.removeNode(state.dom, action.nodeId),
-      });
-    }
-    case 'ADD_BINDING': {
-      const { srcNodeId, srcProp, destNodeId, destProp, initialValue } = action;
-      const srcNode = studioDom.getNode(state.dom, srcNodeId);
-      studioDom.assertIsElement<Record<string, unknown>>(srcNode);
-      const destNode = studioDom.getNode(state.dom, destNodeId);
-      studioDom.assertIsElement(destNode);
-      const destPropValue = (destNode.props as StudioNodeProps<Record<string, unknown>>)[destProp];
-      let stateKey = destPropValue?.type === 'binding' ? destPropValue.state : null;
-
-      const page = studioDom.getNode(state.dom, state.pageNodeId);
-      studioDom.assertIsPage(page);
-
-      let pageState = page.state;
-      if (!stateKey) {
-        stateKey = generateUniqueId(new Set(Object.keys(page.state)));
-        pageState = update(pageState, {
-          [stateKey]: { name: '', initialValue },
-        });
-      }
-
-      return update(state, {
-        dom: update(state.dom, {
-          nodes: update(state.dom.nodes, {
-            [page.id]: update(page, {
-              state: pageState,
-            }),
-            [srcNodeId]: update(srcNode, {
-              props: update(srcNode.props, {
-                [srcProp]: { type: 'binding', state: stateKey },
-              }),
-            }),
-            [destNodeId]: update(destNode, {
-              props: update(destNode.props, {
-                [destProp]: { type: 'binding', state: stateKey },
-              }),
-            }),
-          }),
-        }),
-      });
-    }
-    case 'REMOVE_BINDING': {
-      const { nodeId, prop } = action;
-
-      const node = studioDom.getNode(state.dom, nodeId);
-      studioDom.assertIsElement(node);
-
-      // TODO: also clean up orphaned state and bindings
-      return update(state, {
-        dom: update(state.dom, {
-          nodes: update(state.dom.nodes, {
-            [nodeId]: update(node, {
-              props: omit(node.props, prop),
-            }),
-          }),
-        }),
-      });
-    }
-
-    case 'SELECT_NODE': {
+    case 'PAGE_SELECT_NODE': {
       if (action.nodeId) {
         const node = studioDom.getNode(state.dom, action.nodeId);
         if (studioDom.isElement(node)) {
@@ -280,21 +275,21 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
         componentPanelTab: 'component',
       });
     }
-    case 'DESELECT_NODE': {
+    case 'PAGE_DESELECT_NODE': {
       return update(state, {
         selection: null,
       });
     }
-    case 'SET_COMPONENT_PANEL_TAB':
+    case 'PAGE_SET_COMPONENT_PANEL_TAB':
       return update(state, {
         componentPanelTab: action.tab,
       });
-    case 'NODE_DRAG_START': {
+    case 'PAGE_NODE_DRAG_START': {
       return update(state, {
         selection: action.nodeId,
       });
     }
-    case 'NEW_NODE_DRAG_START': {
+    case 'PAGE_NEW_NODE_DRAG_START': {
       if (state.newNode) {
         return state;
       }
@@ -303,24 +298,24 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
         newNode: action.newNode,
       });
     }
-    case 'NODE_DRAG_END':
+    case 'PAGE_NODE_DRAG_END':
       return update(state, {
         newNode: null,
         highlightLayout: false,
         highlightedSlot: null,
       });
-    case 'NODE_DRAG_OVER': {
+    case 'PAGE_NODE_DRAG_OVER': {
       return update(state, {
         highlightLayout: true,
         highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,
       });
     }
-    case 'OPEN_BINDING_EDITOR': {
+    case 'PAGE_OPEN_BINDING_EDITOR': {
       return update(state, {
         bindingEditor: action,
       });
     }
-    case 'CLOSE_BINDING_EDITOR': {
+    case 'PAGE_CLOSE_BINDING_EDITOR': {
       return update(state, {
         bindingEditor: null,
       });
@@ -345,7 +340,7 @@ export function apiEditorReducer(state: ApiEditorState, action: EditorAction): E
 
 export function baseEditorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
-    case 'SELECT_NODE': {
+    case 'PAGE_SELECT_NODE': {
       if (action.nodeId) {
         let node = studioDom.getNode(state.dom, action.nodeId);
         if (studioDom.isElement(node)) {

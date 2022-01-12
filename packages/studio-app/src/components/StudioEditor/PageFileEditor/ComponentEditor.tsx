@@ -2,7 +2,7 @@ import { styled, TextField } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import { getStudioComponent } from '../../../studioComponents';
-import { useEditorApi, usePageEditorState } from '../EditorProvider';
+import { useDom, useEditorApi, useEditorState, usePageEditorState } from '../EditorProvider';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
 import ComponentPropEditor from './ComponentPropEditor';
@@ -23,7 +23,7 @@ interface ComponentPropsEditorProps<P> {
 }
 
 function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorProps<P>) {
-  const { dom } = usePageEditorState();
+  const dom = useDom();
   const definition = getStudioComponent(dom, node.component);
 
   return (
@@ -100,7 +100,8 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom, selection } = usePageEditorState();
+  const dom = useDom();
+  const { selection } = useEditorState();
 
   const selectedNode = selection ? studioDom.getNode(dom, selection) : null;
 

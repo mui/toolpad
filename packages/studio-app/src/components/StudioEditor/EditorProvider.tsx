@@ -1,11 +1,10 @@
 import * as React from 'react';
 import {
-  ApiEditorState,
   ComponentPanelTab,
   EditorAction,
   editorReducer,
   EditorState,
-  PageEditorState,
+  PageEditorState2,
 } from '../../editorState';
 import * as studioDom from '../../studioDom';
 import { NodeId, SlotLocation, ViewState } from '../../types';
@@ -84,17 +83,8 @@ function createDomApi(dispatch: React.Dispatch<EditorAction>) {
 
 function createEditorApi(dispatch: React.Dispatch<EditorAction>) {
   return {
-    select(nodeId: NodeId | null) {
-      dispatch({ type: 'PAGE_SELECT_NODE', nodeId });
-    },
-    deselect() {
-      dispatch({ type: 'PAGE_DESELECT_NODE' });
-    },
     setComponentPanelTab(tab: ComponentPanelTab) {
       dispatch({ type: 'PAGE_SET_COMPONENT_PANEL_TAB', tab });
-    },
-    nodeDragStart(nodeId: NodeId) {
-      dispatch({ type: 'PAGE_NODE_DRAG_START', nodeId });
     },
     newNodeDragStart(newNode: studioDom.StudioNode) {
       dispatch({ type: 'PAGE_NEW_NODE_DRAG_START', newNode });
@@ -129,6 +119,8 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
   return {
     dom: createDomApi(dispatch),
     pageEditor: createEditorApi(dispatch),
+    select: (nodeId: NodeId | null) => dispatch({ type: 'SELECT_NODE', nodeId }),
+    deselect: () => dispatch({ type: 'DESELECT_NODE' }),
   };
 }
 
@@ -149,20 +141,17 @@ export function useEditorState(): EditorState {
   return stateContext;
 }
 
-export function usePageEditorState(): PageEditorState {
+export function usePageEditorState(): PageEditorState2 {
   const state = useEditorState();
   if (state.editorType !== 'page') {
     throw new Error(`PageEditorState state requested out of context`);
   }
-  return state;
+  return state.pageEditor;
 }
 
-export function useApiEditorState(): ApiEditorState {
-  const state = useEditorState();
-  if (state.editorType !== 'api') {
-    throw new Error(`ApiEditorState state requested out of context`);
-  }
-  return state;
+export function useDom(): studioDom.StudioDom {
+  const { dom } = useEditorState();
+  return dom;
 }
 
 export function useEditorApi(): EditorApi {

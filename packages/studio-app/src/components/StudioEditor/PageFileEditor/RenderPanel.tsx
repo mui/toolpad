@@ -19,9 +19,8 @@ import {
   Rectangle,
   rectContainsPoint,
 } from '../../../utils/geometry';
-import { PageEditorState } from '../../../editorState';
 import { PinholeOverlay } from '../../../PinholeOverlay';
-import { useEditorApi, usePageEditorState } from '../EditorProvider';
+import { useDom, useEditorApi, useEditorState, usePageEditorState } from '../EditorProvider';
 import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
 
@@ -162,22 +161,6 @@ function findNodeAt(
     }
   }
   return null;
-}
-
-/**
- * Return all nodes that are available for insertion.
- * i.e. Exclude all descendants of the current selection since inserting in one of
- * them would create a cyclic structure.
- */
-function getAvailableNodes(
-  nodes: readonly PageOrElementNode[],
-  state: PageEditorState,
-): readonly PageOrElementNode[] {
-  const selection = state.selection && studioDom.getNode(state.dom, state.selection);
-  const excludedNodes = new Set<studioDom.StudioNode>(
-    selection ? [selection, ...studioDom.getDescendants(state.dom, selection)] : [],
-  );
-  return nodes.filter((node) => !excludedNodes.has(node));
 }
 
 /**
@@ -450,13 +433,14 @@ export interface RenderPanelProps {
 }
 
 export default function RenderPanel({ className }: RenderPanelProps) {
+  const dom = useDom();
   const state = usePageEditorState();
   const api = useEditorApi();
 
   const viewRef = React.useRef<PageViewHandle>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
-
-  const { viewState, dom, pageNodeId, highlightedSlot, selection } = state;
+  const { selection } = useEditorState();
+  const { viewState, pageNodeId, highlightedSlot } = state;
 
   const [isFocused, setIsFocused] = React.useState(false);
 
@@ -467,7 +451,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return [pageNode, ...studioDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
-  const selectedNode = selection && studioDom.getNode(state.dom, selection);
+  const selectedNode = selection && studioDom.getNode(dom, selection);
   if (selectedNode) {
     studioDom.assertIsElement(selectedNode);
   }
@@ -480,10 +464,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return result;
   }, [pageNodes, dom, viewState]);
 
-  const availableNodes = React.useMemo(
-    () => getAvailableNodes(pageNodes, state),
-    [pageNodes, state],
-  );
+  const availableNodes = React.useMemo(() => {
+    /**
+     * Return all nodes that are available for insertion.
+     * i.e. Exclude all descendants of the current selection since inserting in one of
+     * them would create a cyclic structure.
+     */
+    const excludedNodes = new Set<studioDom.StudioNode>(
+      selectedNode ? [selectedNode, ...studioDom.getDescendants(dom, selectedNode)] : [],
+    );
+    return pageNodes.filter((node) => !excludedNodes.has(node));
+  }, [dom, pageNodes, selectedNode]);
 
   const handleRender = React.useCallback(() => {
     const rootElm = viewRef.current?.getRootElm();
@@ -520,7 +511,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const nodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
 
       if (nodeId) {
-        api.pageEditor.nodeDragStart(nodeId);
+        api.select(nodeId);
       }
     },
     [api, getViewCoordinates, pageNodes, viewState],
@@ -576,9 +567,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             activeSlot.parentProp,
             activeSlot.parentIndex,
           );
-        } else if (state.selection) {
+        } else if (selection) {
           api.dom.moveNode(
-            state.selection,
+            selection,
             activeSlot.parentId,
             activeSlot.parentProp,
             activeSlot.parentIndex,
@@ -602,7 +593,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       window.removeEventListener('drop', handleDrop);
       window.removeEventListener('dragend', handleDragEnd);
     };
-  }, [availableNodes, getViewCoordinates, viewState, api, slots, state.selection, state.newNode]);
+  }, [availableNodes, getViewCoordinates, viewState, api, slots, state.newNode, selection]);
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -613,23 +604,24 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       const newSelectedNodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
-      api.pageEditor.select(newSelectedNodeId);
+      console.log('clicky', newSelectedNodeId);
+      api.select(newSelectedNodeId);
     },
     [api, getViewCoordinates, pageNodes, viewState],
   );
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isFocused && state.selection && event.key === 'Backspace') {
-        api.dom.removeNode(state.selection);
-        api.pageEditor.deselect();
+      if (isFocused && selection && event.key === 'Backspace') {
+        api.dom.removeNode(selection);
+        api.deselect();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [api, isFocused, state.selection]);
+  }, [api, isFocused, selection]);
 
   const selectedRect = selectedNode ? viewState[selectedNode.id]?.rect : null;
 
@@ -661,7 +653,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         <PageView
           className={classes.view}
           ref={viewRef}
-          dom={state.dom}
+          dom={dom}
           pageNodeId={state.pageNodeId}
           onUpdate={handleRender}
         />

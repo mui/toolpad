@@ -10,19 +10,7 @@ export interface BindingEditorState {
   readonly prop: string;
 }
 
-export interface BaseEditorState {
-  readonly editorType: 'page' | 'api';
-  readonly dom: studioDom.StudioDom;
-}
-
-export interface ApiEditorState extends BaseEditorState {
-  readonly editorType: 'api';
-  readonly apiNodeId: NodeId;
-}
-
 export interface PageEditorState2 {
-  readonly pageNodeId: NodeId;
-  readonly selection: NodeId | null;
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: studioDom.StudioNode | null;
   readonly bindingEditor: BindingEditorState | null;
@@ -31,11 +19,34 @@ export interface PageEditorState2 {
   readonly viewState: ViewState;
 }
 
-export interface PageEditorState extends BaseEditorState, PageEditorState2 {
+export interface BaseEditorState {
+  readonly editorType: 'page' | 'api';
+  readonly dom: studioDom.StudioDom;
+  readonly selection: NodeId | null;
+}
+
+export interface PageEditorState extends BaseEditorState {
   readonly editorType: 'page';
+  readonly pageNodeId: NodeId;
+  readonly pageEditor: PageEditorState2;
+}
+
+export interface ApiEditorState extends BaseEditorState {
+  readonly editorType: 'api';
+  readonly apiNodeId: NodeId;
+  readonly apiEditor: {};
 }
 
 export type EditorState = PageEditorState | ApiEditorState;
+
+export type BaseAction =
+  | {
+      type: 'SELECT_NODE';
+      nodeId: NodeId | null;
+    }
+  | {
+      type: 'DESELECT_NODE';
+    };
 
 export type DomAction =
   | {
@@ -83,19 +94,8 @@ export type DomAction =
 
 export type PageEditorAction =
   | {
-      type: 'PAGE_SELECT_NODE';
-      nodeId: NodeId | null;
-    }
-  | {
-      type: 'PAGE_DESELECT_NODE';
-    }
-  | {
       type: 'PAGE_SET_COMPONENT_PANEL_TAB';
       tab: ComponentPanelTab;
-    }
-  | {
-      type: 'PAGE_NODE_DRAG_START';
-      nodeId: NodeId;
     }
   | {
       type: 'PAGE_NEW_NODE_DRAG_START';
@@ -121,7 +121,7 @@ export type PageEditorAction =
       viewState: ViewState;
     };
 
-export type EditorAction = DomAction | PageEditorAction;
+export type EditorAction = BaseAction | DomAction | PageEditorAction;
 
 export function domReducer(dom: studioDom.StudioDom, action: EditorAction): studioDom.StudioDom {
   switch (action.type) {
@@ -215,23 +215,8 @@ export function domReducer(dom: studioDom.StudioDom, action: EditorAction): stud
   }
 }
 
-export function createApiEditorState(dom: studioDom.StudioDom, apiNodeId: NodeId): ApiEditorState {
+export function createPageEditorState(): PageEditorState2 {
   return {
-    editorType: 'api',
-    dom,
-    apiNodeId,
-  };
-}
-
-export function createPageEditorState(
-  dom: studioDom.StudioDom,
-  pageNodeId: NodeId,
-): PageEditorState {
-  return {
-    editorType: 'page',
-    dom,
-    pageNodeId,
-    selection: null,
     componentPanelTab: 'catalog',
     newNode: null,
     bindingEditor: null,
@@ -243,40 +228,26 @@ export function createPageEditorState(
 
 export function createEditorState(dom: studioDom.StudioDom): EditorState {
   const pageNode = studioDom.getPages(dom, studioDom.getApp(dom))[0];
-  return createPageEditorState(dom, pageNode.id);
+  return {
+    dom,
+    selection: null,
+    editorType: 'page',
+    pageNodeId: pageNode.id,
+    pageEditor: createPageEditorState(),
+  };
 }
 
-export function pageEditorReducer2(
-  state: PageEditorState2,
-  action: EditorAction,
-): PageEditorState2 {
+export function pageEditorReducer(state: PageEditorState2, action: EditorAction): PageEditorState2 {
   switch (action.type) {
-    case 'PAGE_SELECT_NODE': {
-      return update(state, {
-        selection: null,
-        componentPanelTab: 'component',
-      });
-    }
-    case 'PAGE_DESELECT_NODE': {
-      return update(state, {
-        selection: null,
-      });
-    }
     case 'PAGE_SET_COMPONENT_PANEL_TAB':
       return update(state, {
         componentPanelTab: action.tab,
       });
-    case 'PAGE_NODE_DRAG_START': {
-      return update(state, {
-        selection: action.nodeId,
-      });
-    }
     case 'PAGE_NEW_NODE_DRAG_START': {
       if (state.newNode) {
         return state;
       }
       return update(state, {
-        selection: null,
         newNode: action.newNode,
       });
     }
@@ -308,91 +279,6 @@ export function pageEditorReducer2(
         viewState,
       });
     }
-    default:
-      return state;
-  }
-}
-
-export function pageEditorReducer(state: PageEditorState, action: EditorAction): EditorState {
-  state = update(state, {
-    dom: domReducer(state.dom, action),
-  });
-
-  switch (action.type) {
-    case 'PAGE_SELECT_NODE': {
-      if (action.nodeId) {
-        const node = studioDom.getNode(state.dom, action.nodeId);
-        if (studioDom.isElement(node)) {
-          return update(state, {
-            selection: node.id,
-            componentPanelTab: 'component',
-          });
-        }
-        return state;
-      }
-      return update(state, {
-        selection: null,
-        componentPanelTab: 'component',
-      });
-    }
-    case 'PAGE_DESELECT_NODE': {
-      return update(state, {
-        selection: null,
-      });
-    }
-    case 'PAGE_SET_COMPONENT_PANEL_TAB':
-      return update(state, {
-        componentPanelTab: action.tab,
-      });
-    case 'PAGE_NODE_DRAG_START': {
-      return update(state, {
-        selection: action.nodeId,
-      });
-    }
-    case 'PAGE_NEW_NODE_DRAG_START': {
-      if (state.newNode) {
-        return state;
-      }
-      return update(state, {
-        selection: null,
-        newNode: action.newNode,
-      });
-    }
-    case 'PAGE_NODE_DRAG_END':
-      return update(state, {
-        newNode: null,
-        highlightLayout: false,
-        highlightedSlot: null,
-      });
-    case 'PAGE_NODE_DRAG_OVER': {
-      return update(state, {
-        highlightLayout: true,
-        highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,
-      });
-    }
-    case 'PAGE_OPEN_BINDING_EDITOR': {
-      return update(state, {
-        bindingEditor: action,
-      });
-    }
-    case 'PAGE_CLOSE_BINDING_EDITOR': {
-      return update(state, {
-        bindingEditor: null,
-      });
-    }
-    case 'PAGE_VIEW_STATE_UPDATE': {
-      const { viewState } = action;
-      return update(state, {
-        viewState,
-      });
-    }
-    default:
-      return state;
-  }
-}
-
-export function apiEditorReducer(state: ApiEditorState, action: EditorAction): EditorState {
-  switch (action.type) {
     default:
       return state;
   }
@@ -400,12 +286,17 @@ export function apiEditorReducer(state: ApiEditorState, action: EditorAction): E
 
 export function baseEditorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
-    case 'PAGE_SELECT_NODE': {
+    case 'SELECT_NODE': {
       if (action.nodeId) {
         let node = studioDom.getNode(state.dom, action.nodeId);
         if (studioDom.isElement(node)) {
           const page = studioDom.getElementPage(state.dom, node);
           if (page) {
+            if (state.editorType === 'page' && page.id === state.pageNodeId) {
+              return update(state, {
+                selection: action.nodeId,
+              });
+            }
             node = page;
           }
         }
@@ -413,13 +304,20 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
           if (state.editorType === 'page' && node.id === state.pageNodeId) {
             return state;
           }
-          return createPageEditorState(state.dom, node.id);
-        }
-        if (studioDom.isApi(node)) {
-          return createApiEditorState(state.dom, node.id);
+          return update(state, {
+            selection: null,
+            pageEditor: createPageEditorState(),
+          });
         }
       }
-      return state;
+      return update(state, {
+        selection: action.nodeId,
+      });
+    }
+    case 'DESELECT_NODE': {
+      return update(state, {
+        selection: null,
+      });
     }
     default:
       return state;
@@ -429,12 +327,15 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
 export function editorReducer(state: EditorState, action: EditorAction): EditorState {
   state = baseEditorReducer(state, action);
 
-  switch (state.editorType) {
-    case 'page':
-      return pageEditorReducer(state, action);
-    case 'api':
-      return apiEditorReducer(state, action);
-    default:
-      return state;
+  state = update(state, {
+    dom: domReducer(state.dom, action),
+  });
+
+  if (state.editorType === 'page') {
+    state = update(state, {
+      pageEditor: pageEditorReducer(state.pageEditor, action),
+    });
   }
+
+  return state;
 }

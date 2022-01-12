@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FormControl, InputLabel, Select, MenuItem, Stack, Button } from '@mui/material';
-import { useEditorApi, usePageEditorState } from '../EditorProvider';
+import { useDom, useEditorApi } from '../EditorProvider';
 import * as studioDom from '../../../studioDom';
 import { WithControlledProp } from '../../../utils/types';
 
@@ -53,7 +53,7 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom } = usePageEditorState();
+  const dom = useDom();
   const api = useEditorApi();
 
   const app = studioDom.getApp(dom);

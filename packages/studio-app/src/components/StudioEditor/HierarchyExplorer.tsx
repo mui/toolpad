@@ -108,9 +108,9 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   const state = useEditorState();
   const api = useEditorApi();
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
-    const selectedNode = nodeIds[0];
-    if (selectedNode) {
-      api.select(selectedNode as NodeId);
+    const selectedNodeId = nodeIds[0] as NodeId | undefined;
+    if (selectedNodeId) {
+      api.select(selectedNodeId);
     }
   };
 

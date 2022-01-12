@@ -7,7 +7,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
-import { useDom } from './EditorProvider';
+import { useEditorApi, useEditorState } from './EditorProvider';
 
 const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
   const { classes, className, label, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;
@@ -64,8 +64,8 @@ interface HierarchyExplorerElementItemProps {
 }
 
 function HierarchyExplorerElementItem({ element }: HierarchyExplorerElementItemProps) {
-  const dom = useDom();
-  const { children = [], ...namedChildren } = studioDom.getChildNodes(dom, element);
+  const state = useEditorState();
+  const { children = [], ...namedChildren } = studioDom.getChildNodes(state.dom, element);
   return (
     <TreeItem
       ContentComponent={CustomContent}
@@ -89,8 +89,8 @@ interface HierarchyExplorerPageItemProps {
 }
 
 function HierarchyExplorerPageItem({ page }: HierarchyExplorerPageItemProps) {
-  const dom = useDom();
-  const children = studioDom.getChildNodes(dom, page).children ?? [];
+  const state = useEditorState();
+  const children = studioDom.getChildNodes(state.dom, page).children ?? [];
   return (
     <TreeItem ContentComponent={CustomContent} nodeId={page.id} label={`${page.name} (${page.id})`}>
       {children.map((child) => (
@@ -102,25 +102,22 @@ function HierarchyExplorerPageItem({ page }: HierarchyExplorerPageItemProps) {
 
 export interface HierarchyExplorerProps {
   className?: string;
-  selection?: NodeId | null;
-  onSelect?: (nodeId: NodeId | null) => void;
 }
 
-export default function HierarchyExplorer({
-  className,
-  onSelect,
-  selection,
-}: HierarchyExplorerProps) {
+export default function HierarchyExplorer({ className }: HierarchyExplorerProps) {
+  const state = useEditorState();
+  const api = useEditorApi();
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
     const selectedNodeId = nodeIds[0] as NodeId | undefined;
-    onSelect?.(selectedNodeId ?? null);
+    if (selectedNodeId) {
+      api.select(selectedNodeId);
+    }
   };
 
-  const selected = selection ? [selection] : [];
+  const selected = state.selection ? [state.selection] : [];
 
-  const dom = useDom();
-  const app = studioDom.getApp(dom);
-  const pages = studioDom.getPages(dom, app);
+  const app = studioDom.getApp(state.dom);
+  const pages = studioDom.getPages(state.dom, app);
 
   return (
     <div className={className}>

@@ -106,14 +106,11 @@ export type EditorAction =
       viewState: ViewState;
     }
   | {
-      type: 'ADD_THEME';
-    }
-  | {
       type: 'ADD_NODE';
       node: studioDom.StudioNode;
       parentId: NodeId;
       parentProp: string;
-      parentIndex: string;
+      parentIndex?: string;
     }
   | {
       type: 'MOVE_NODE';
@@ -264,17 +261,6 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
             }),
           }),
         }),
-      });
-    }
-    case 'ADD_THEME': {
-      const app = studioDom.getApp(state.dom);
-      return update(state, {
-        dom: studioDom.addNode(
-          state.dom,
-          studioDom.createNode(state.dom, 'theme', { name: 'Theme', props: {} }),
-          app.id,
-          'children',
-        ),
       });
     }
 

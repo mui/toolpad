@@ -17,7 +17,12 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'SET_NODE_NAME', nodeId, name });
     },
-    addNode(node: studioDom.StudioNode, parentId: NodeId, parentProp: string, parentIndex: string) {
+    addNode(
+      node: studioDom.StudioNode,
+      parentId: NodeId,
+      parentProp: string,
+      parentIndex?: string,
+    ) {
       dispatch({
         type: 'ADD_NODE',
         node,
@@ -41,7 +46,7 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
         nodeId,
       });
     },
-    setNodeConstPropValue<P, K extends keyof P & string>(
+    setNodeConstPropValue<P, K extends keyof P & string = keyof P & string>(
       node: studioDom.StudioNode,
       prop: K,
       value: P[K],
@@ -72,11 +77,6 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
         type: 'REMOVE_BINDING',
         nodeId,
         prop,
-      });
-    },
-    addTheme() {
-      dispatch({
-        type: 'ADD_THEME',
       });
     },
 

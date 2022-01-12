@@ -476,7 +476,7 @@ export function removeNode(dom: StudioDom, nodeId: NodeId) {
   });
 }
 
-export function getPropConstValue<P, K extends keyof P>(
+export function getConstPropValue<P, K extends keyof P>(
   node: StudioNodeBase<P>,
   propName: keyof P,
 ): P[K] | undefined {
@@ -487,7 +487,7 @@ export function getPropConstValue<P, K extends keyof P>(
 export function getPropConstValues<P>(node: StudioNodeBase<P>): Partial<P> {
   const result: Partial<P> = {};
   (Object.keys(node.props) as (keyof P)[]).forEach((prop) => {
-    result[prop] = getPropConstValue(node, prop as keyof P);
+    result[prop] = getConstPropValue(node, prop as keyof P);
   });
   return result;
 }

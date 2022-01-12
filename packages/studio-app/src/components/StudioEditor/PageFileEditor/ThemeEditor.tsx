@@ -59,27 +59,40 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
   const app = studioDom.getApp(dom);
   const theme = studioDom.getTheme(dom, app);
 
+  const handleAddThemeClick = () => {
+    const newTheme = studioDom.createNode(dom, 'theme', { name: 'Theme', props: {} });
+    api.addNode(newTheme, app.id, 'children');
+  };
+
   return (
     <div className={className}>
       {theme ? (
         <Stack spacing={2}>
           <PaletteColorPicker
             name="primary"
-            value={studioDom.getPropConstValue(theme, 'palette.primary.main') || ''}
+            value={studioDom.getConstPropValue(theme, 'palette.primary.main') || ''}
             onChange={(newValue) =>
-              api.setNodeConstPropValue(theme, 'palette.primary.main', newValue)
+              api.setNodeConstPropValue<studioDom.StudioTheme>(
+                theme,
+                'palette.primary.main',
+                newValue,
+              )
             }
           />
           <PaletteColorPicker
             name="secondary"
-            value={studioDom.getPropConstValue(theme, 'palette.secondary.main') || ''}
+            value={studioDom.getConstPropValue(theme, 'palette.secondary.main') || ''}
             onChange={(newValue) =>
-              api.setNodeConstPropValue(theme, 'palette.secondary.main', newValue)
+              api.setNodeConstPropValue<studioDom.StudioTheme>(
+                theme,
+                'palette.secondary.main',
+                newValue,
+              )
             }
           />
         </Stack>
       ) : (
-        <Button onClick={() => api.addTheme()}>Add theme</Button>
+        <Button onClick={handleAddThemeClick}>Add theme</Button>
       )}
     </div>
   );

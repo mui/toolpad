@@ -4,7 +4,7 @@ import boolean from './boolean';
 import number from './number';
 import select from './select';
 import dataQuery from './dataQuery';
-import { PropControlDefinition } from '../types';
+import { PropControlDefinition } from '../../types';
 
 const propTypeControls: {
   [key in ArgControlSpec['type']]?: PropControlDefinition;

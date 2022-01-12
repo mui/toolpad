@@ -1,6 +1,6 @@
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import * as React from 'react';
-import type { EditorProps } from '../types';
+import type { EditorProps } from '../../types';
 
 export function createSelectEditor<T extends string = string>(items: T[]) {
   return function ListPropEditor({ name, value, onChange, disabled }: EditorProps<T>) {

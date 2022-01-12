@@ -13,14 +13,14 @@ import {
 import React from 'react';
 import { getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
-import { NodeId, StudioBoundProp, StudioNodeProps } from '../../../types';
+import { NodeId, StudioBoundProp, StudioNodeProp, StudioNodeProps } from '../../../types';
 import { ExactEntriesOf } from '../../../utils/types';
 import useLatest from '../../../utils/useLatest';
 import { useEditorApi, usePageEditorState } from '../EditorProvider';
 
-export interface BindingEditorContentProps {
+export interface BindingEditorContentProps<K> {
   nodeId: NodeId;
-  prop: string;
+  prop: K;
 }
 
 export interface BindingEditorTabProps<P, K extends keyof P & string> {
@@ -179,12 +179,15 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
   );
 }
 
-export function BindingEditorContent({ nodeId, prop }: BindingEditorContentProps) {
+export function BindingEditorContent<P, K extends keyof P & string>({
+  nodeId,
+  prop,
+}: BindingEditorContentProps<K>) {
   const state = usePageEditorState();
 
   const node = studioDom.getNode(state.dom, nodeId);
-  studioDom.assertIsElement(node);
-  const propValue = node.props[prop];
+  studioDom.assertIsElement<P>(node);
+  const propValue: StudioNodeProp<P[K]> | undefined = node.props[prop];
   const hasBinding = propValue?.type === 'binding';
 
   return hasBinding ? (
@@ -201,7 +204,7 @@ export default function BindingEditor() {
   const bindingEditorProps = useLatest(state.bindingEditor);
   return (
     <Dialog onClose={handleClose} open={!!state.bindingEditor} fullWidth>
-      {bindingEditorProps ? <BindingEditorContent {...bindingEditorProps} /> : null}
+      {bindingEditorProps ? <BindingEditorContent<any, any> {...bindingEditorProps} /> : null}
     </Dialog>
   );
 }

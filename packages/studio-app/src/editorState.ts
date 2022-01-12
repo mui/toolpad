@@ -76,7 +76,7 @@ export type EditorAction =
   | {
       type: 'SET_NODE_PROPS';
       nodeId: NodeId;
-      props: StudioNodeProps;
+      props: StudioNodeProps<unknown>;
     }
   | {
       type: 'SET_COMPONENT_PANEL_TAB';
@@ -296,10 +296,10 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
     case 'ADD_BINDING': {
       const { srcNodeId, srcProp, destNodeId, destProp, initialValue } = action;
       const srcNode = studioDom.getNode(state.dom, srcNodeId);
-      studioDom.assertIsElement(srcNode);
+      studioDom.assertIsElement<Record<string, unknown>>(srcNode);
       const destNode = studioDom.getNode(state.dom, destNodeId);
       studioDom.assertIsElement(destNode);
-      const destPropValue = destNode.props[destProp];
+      const destPropValue = (destNode.props as StudioNodeProps<Record<string, unknown>>)[destProp];
       let stateKey = destPropValue?.type === 'binding' ? destPropValue.state : null;
 
       const page = studioDom.getNode(state.dom, state.pageNodeId);

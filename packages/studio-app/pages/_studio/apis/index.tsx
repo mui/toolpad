@@ -21,12 +21,13 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { LoadingButton } from '@mui/lab';
 import StudioAppBar from '../../../src/components/StudioAppBar';
 import client from '../../../src/api';
 import { NextLinkComposed } from '../../../src/components/Link';
-import { generateRandomId } from '../../../src/utils/randomId';
+import * as studioDom from '../../../src/studioDom';
+import { NodeId } from '../../../src/types';
 
 const CreateNewButton = styled(Button)(({ theme }) => ({
   width: '100%',
@@ -35,22 +36,26 @@ const CreateNewButton = styled(Button)(({ theme }) => ({
   border: `2px dashed ${theme.palette.divider}`,
 }));
 
-function CreateStudioApiDialog({ onClose, ...props }: DialogProps) {
+interface CreateStudioApiDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {
+  dom: studioDom.StudioDom;
+  appNodeId: NodeId;
+}
+
+function CreateStudioApiDialog({ dom, appNodeId, onClose, ...props }: CreateStudioApiDialogProps) {
   const [connectionId, setConnectionID] = React.useState('');
   const router = useRouter();
 
   const connectionsQuery = useQuery('connections', client.query.getConnections);
 
-  const queryClient = useQueryClient();
-  const createApiMutation = useMutation(client.mutation.addApi);
+  const saveDomMutation = useMutation(client.mutation.saveApp);
 
   const handleClose = React.useCallback(
     (event, reason) => {
-      if (!createApiMutation.isLoading) {
+      if (!saveDomMutation.isLoading) {
         onClose?.(event, reason);
       }
     },
-    [onClose, createApiMutation.isLoading],
+    [onClose, saveDomMutation.isLoading],
   );
 
   const handleSelectionChange = React.useCallback((event: SelectChangeEvent<string>) => {
@@ -62,22 +67,16 @@ function CreateStudioApiDialog({ onClose, ...props }: DialogProps) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          createApiMutation.mutate(
-            {
-              // TODO: move ID generation serverside
-              id: generateRandomId(),
-              // TODO: move name generation serverside and ensure uniqueness
-              name: 'Dummy Name',
-              connectionId,
-              query: {},
+          const newApiNode = studioDom.createNode(dom, 'api', {
+            props: {},
+            connectionId,
+          });
+          const toSaveDom = studioDom.addNode(dom, newApiNode, appNodeId, 'children');
+          saveDomMutation.mutate(toSaveDom, {
+            onSuccess: () => {
+              router.push(`/_studio/apis/${encodeURIComponent(newApiNode.id)}`);
             },
-            {
-              onSuccess: (data) => {
-                queryClient.invalidateQueries('apis');
-                router.push(`/_studio/apis/${encodeURIComponent(data.id)}`);
-              },
-            },
-          );
+          });
         }}
         style={{
           overflowY: 'auto',
@@ -107,11 +106,7 @@ function CreateStudioApiDialog({ onClose, ...props }: DialogProps) {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <LoadingButton
-            type="submit"
-            disabled={!connectionId}
-            loading={createApiMutation.isLoading}
-          >
+          <LoadingButton type="submit" disabled={!connectionId} loading={saveDomMutation.isLoading}>
             Create
           </LoadingButton>
         </DialogActions>
@@ -125,7 +120,9 @@ const Home: NextPage = () => {
   const handleCreateApiDialogOpen = React.useCallback(() => setCreateApiDialogOpen(true), []);
   const handleCreateApiDialogClose = React.useCallback(() => setCreateApiDialogOpen(false), []);
 
-  const apisQuery = useQuery('apis', client.query.getApis);
+  const domQuery = useQuery('dom', client.query.loadApp);
+  const app = domQuery.data ? studioDom.getApp(domQuery.data) : null;
+  const apis = domQuery.data && app ? studioDom.getApis(domQuery.data, app) : [];
 
   return (
     <div>
@@ -136,7 +133,7 @@ const Home: NextPage = () => {
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <CreateNewButton onClick={handleCreateApiDialogOpen}>Create New</CreateNewButton>
           </Grid>
-          {apisQuery.data?.map((api) => (
+          {apis.map((api) => (
             <Grid item key={api.id} xs={12} sm={6} md={4} lg={3} sx={{ justifyContent: 'stretch' }}>
               <Card>
                 <CardContent>
@@ -162,7 +159,14 @@ const Home: NextPage = () => {
           ))}
         </Grid>
       </Container>
-      <CreateStudioApiDialog open={createApiDialogOpen} onClose={handleCreateApiDialogClose} />
+      {domQuery.data && app ? (
+        <CreateStudioApiDialog
+          open={createApiDialogOpen}
+          onClose={handleCreateApiDialogClose}
+          dom={domQuery.data}
+          appNodeId={app.id}
+        />
+      ) : null}
     </div>
   );
 };

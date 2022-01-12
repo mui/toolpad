@@ -3,7 +3,8 @@ import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
-import { NodeId } from './types';
+import { NodeId, StudioNodeProps } from './types';
+import { ExactEntriesOf } from './utils/types';
 
 export interface RenderPageConfig {
   // whether we're in the context of an editor
@@ -64,43 +65,45 @@ class Context {
   }
 
   // resolve props to expressions
-  resolveProps(node: studioDom.StudioElementNode): Record<string, string> {
+  resolveProps<P>(node: studioDom.StudioElementNode): Record<string, string> {
     const result: Record<string, string> = {};
     const component = getStudioComponent(this.dom, node.component);
-    Object.entries(node.props).forEach(([propName, propValue]) => {
-      const argDef: ArgTypeDefinition | undefined = component.argTypes[propName];
-      if (!argDef || !propValue) {
-        return;
-      }
+    (Object.entries(node.props) as ExactEntriesOf<StudioNodeProps<P>>).forEach(
+      ([propName, propValue]) => {
+        const argDef: ArgTypeDefinition | undefined = component.argTypes[propName];
+        if (!argDef || !propValue || typeof propName !== 'string') {
+          return;
+        }
 
-      if (argDef.typeDef.type === 'dataQuery') {
-        if (propValue.type !== 'const') {
-          throw new Error(`TODO: make this work for bindings`);
-        }
-        if (propValue.value) {
-          const spreadedValue = this.useDataLoader(propValue.value as string);
-          result.$spread = `${result.$spread ? `${result.$spread} ` : ''}{...${spreadedValue}}`;
-        }
-      } else if (propValue.type === 'const') {
-        result[propName] = JSON.stringify(propValue.value);
-      } else if (propValue.type === 'binding') {
-        result[propName] = `_${propValue.state}`;
-        if (argDef.onChangeProp) {
-          const setStateIdentifier = `set_${propValue.state}`;
-          if (argDef.onChangeHandler) {
-            // TODO: React.useCallback for this one
-            const { params, valueGetter } = argDef.onChangeHandler;
-            result[argDef.onChangeProp] = `(${params.join(
-              ', ',
-            )}) => ${setStateIdentifier}(${valueGetter})`;
-          } else {
-            result[argDef.onChangeProp] = setStateIdentifier;
+        if (argDef.typeDef.type === 'dataQuery') {
+          if (propValue.type !== 'const') {
+            throw new Error(`TODO: make this work for bindings`);
           }
+          if (propValue.value && typeof propValue.value === 'string') {
+            const spreadedValue = this.useDataLoader(propValue.value);
+            result.$spread = `${result.$spread ? `${result.$spread} ` : ''}{...${spreadedValue}}`;
+          }
+        } else if (propValue.type === 'const') {
+          result[propName] = JSON.stringify(propValue.value);
+        } else if (propValue.type === 'binding') {
+          result[propName] = `_${propValue.state}`;
+          if (argDef.onChangeProp) {
+            const setStateIdentifier = `set_${propValue.state}`;
+            if (argDef.onChangeHandler) {
+              // TODO: React.useCallback for this one
+              const { params, valueGetter } = argDef.onChangeHandler;
+              result[argDef.onChangeProp] = `(${params.join(
+                ', ',
+              )}) => ${setStateIdentifier}(${valueGetter})`;
+            } else {
+              result[argDef.onChangeProp] = setStateIdentifier;
+            }
+          }
+        } else {
+          throw new Error(`Invariant: Unkown prop type "${(propValue as any).type}"`);
         }
-      } else {
-        throw new Error(`Invariant: Unkown prop type "${(propValue as any).type}"`);
-      }
-    });
+      },
+    );
     return result;
   }
 

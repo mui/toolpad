@@ -4,10 +4,9 @@ import { DATA_ROOT } from './db';
 import {
   StudioConnection,
   StudioConnectionSummary,
-  StudioApi,
   ConnectionStatus,
+  StudioDataSourceServer,
   StudioApiResult,
-  StudioApiSummary,
 } from '../types';
 import { generateRandomId } from '../utils/randomId';
 import studioDataSources from '../studioDataSources/server';
@@ -25,10 +24,6 @@ interface KindObjectMap {
   connection: {
     full: StudioConnection;
     summary: StudioConnectionSummary;
-  };
-  api: {
-    full: StudioApi;
-    summary: StudioApiSummary;
   };
 }
 
@@ -49,9 +44,6 @@ const kindUtil: {
   },
   connection: {
     mapToSummary: ({ id, type, name }) => ({ id, type, name }),
-  },
-  api: {
-    mapToSummary: ({ id, name }) => ({ id, name }),
   },
 };
 
@@ -178,35 +170,16 @@ export async function updateConnection(
   return updateObject('connection', connection);
 }
 
-export async function getApis(): Promise<StudioApi[]> {
-  return getObjects('api');
-}
-
-export async function getApiSummaries(): Promise<StudioApiSummary[]> {
-  return getObjectSummaries('api');
-}
-
-export async function addApi(api: StudioApi): Promise<StudioApi> {
-  return addObject('api', api);
-}
-
-export async function getApi(id: string): Promise<StudioApi> {
-  return getObject('api', id);
-}
-
-export async function updateApi(api: Updates<StudioApi>): Promise<StudioApi> {
-  return updateObject('api', api);
-}
-
-export async function execApi(api: StudioApi): Promise<StudioApiResult<any>> {
+export async function execApi<Q>(api: studioDom.StudioApiNode<Q>): Promise<StudioApiResult<any>> {
   const connection = await getConnection(api.connectionId);
-  const dataSource = studioDataSources[connection.type];
+  const dataSource: StudioDataSourceServer<any, Q, any> | undefined =
+    studioDataSources[connection.type];
   if (!dataSource) {
     throw new Error(
       `Unknown connection type "${connection.type}" for connection "${api.connectionId}"`,
     );
   }
-  return dataSource.exec(connection, api.query);
+  return dataSource.exec(connection, studioDom.getPropConstValues(api) as Q);
 }
 
 function createDefaultApp(): studioDom.StudioDom {

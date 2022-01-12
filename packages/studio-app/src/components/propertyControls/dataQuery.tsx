@@ -1,11 +1,13 @@
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import * as React from 'react';
-import { useQuery } from 'react-query';
-import type { PropControlDefinition, EditorProps } from '../types';
-import client from '../api';
+import type { PropControlDefinition, EditorProps } from '../../types';
+import { useEditorState } from '../StudioEditor/EditorProvider';
+import * as studioDom from '../../studioDom';
 
 function DataQueryEditor({ value, onChange }: EditorProps<string | null>) {
-  const queriesQuery = useQuery('apis', client.query.getApis);
+  const state = useEditorState();
+  const app = studioDom.getApp(state.dom);
+  const apis = studioDom.getApis(state.dom, app);
 
   const handleSelectionChange = React.useCallback(
     (event: SelectChangeEvent<string>) => {
@@ -23,7 +25,7 @@ function DataQueryEditor({ value, onChange }: EditorProps<string | null>) {
       size="small"
     >
       <MenuItem value="">---</MenuItem>
-      {(queriesQuery.data || []).map(({ id }) => (
+      {apis.map(({ id }) => (
         <MenuItem key={id} value={id}>
           {id}
         </MenuItem>

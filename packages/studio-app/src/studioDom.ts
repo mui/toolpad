@@ -1,7 +1,8 @@
 import { generateKeyBetween } from 'fractional-indexing';
-import { DefaultNodeProps, NodeId, StudioNodeProps, StudioStateDefinition } from './types';
+import { NodeId, StudioNodeProps, StudioStateDefinition } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
+import { ExactEntriesOf } from './utils/types';
 
 const ALLOWED_PARENTS = {
   app: [],
@@ -23,14 +24,16 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-export interface StudioNodeBase<P = DefaultNodeProps> {
+type StudioNodeType = 'app' | 'theme' | 'api' | 'page' | 'element';
+
+export interface StudioNodeBase<P = {}> {
   readonly id: NodeId;
-  readonly type: 'app' | 'theme' | 'api' | 'page' | 'element';
+  readonly type: StudioNodeType;
   readonly name: string;
   readonly parentId: NodeId | null;
   readonly parentProp: string | null;
   readonly parentIndex: string | null;
-  readonly props: Partial<StudioNodeProps<P>>;
+  readonly props: StudioNodeProps<P>;
 }
 
 export interface StudioAppNode extends StudioNodeBase {
@@ -39,18 +42,17 @@ export interface StudioAppNode extends StudioNodeBase {
 }
 
 export interface StudioTheme {
-  'palette.primary.main': string;
-  'palette.secondary.main': string;
+  'palette.primary.main'?: string;
+  'palette.secondary.main'?: string;
 }
 
 export interface StudioThemeNode extends StudioNodeBase<StudioTheme> {
   readonly type: 'theme';
 }
 
-export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
+export interface StudioApiNode<P = {}> extends StudioNodeBase<P> {
   readonly type: 'api';
   readonly connectionId: string;
-  readonly query: Q;
 }
 
 export interface StudioPageNode extends StudioNodeBase {
@@ -59,7 +61,7 @@ export interface StudioPageNode extends StudioNodeBase {
   readonly state: Record<string, StudioStateDefinition>;
 }
 
-export interface StudioElementNode<P = DefaultNodeProps> extends StudioNodeBase<P> {
+export interface StudioElementNode<P = {}> extends StudioNodeBase<P> {
   readonly type: 'element';
   readonly component: string;
 }
@@ -72,9 +74,12 @@ type StudioNodeOfType<K extends StudioNodeBase['type']> = {
   element: StudioElementNode;
 }[K];
 
-export type StudioNodeType = StudioNodeBase['type'];
-
-export type StudioNode = StudioNodeOfType<StudioNodeType>;
+export type StudioNode =
+  | StudioAppNode
+  | StudioApiNode
+  | StudioThemeNode
+  | StudioPageNode
+  | StudioElementNode;
 
 type AllowedParents = typeof ALLOWED_PARENTS;
 type ParentTypeOfType<T extends StudioNodeType> = AllowedParents[T][number];
@@ -123,11 +128,11 @@ export function assertIsPage(node: StudioNode): asserts node is StudioPageNode {
   assertIsType<StudioPageNode>(node, 'page');
 }
 
-export function isApi(node: StudioNode): node is StudioApiNode {
+export function isApi<P>(node: StudioNode): node is StudioApiNode<P> {
   return isType<StudioApiNode>(node, 'api');
 }
 
-export function assertIsApi(node: StudioNode): asserts node is StudioApiNode {
+export function assertIsApi<P>(node: StudioNode): asserts node is StudioApiNode<P> {
   assertIsType<StudioApiNode>(node, 'api');
 }
 
@@ -139,11 +144,11 @@ export function assertIsTheme(node: StudioNode): asserts node is StudioThemeNode
   assertIsType<StudioThemeNode>(node, 'theme');
 }
 
-export function isElement(node: StudioNode): node is StudioElementNode {
+export function isElement<P>(node: StudioNode): node is StudioElementNode<P> {
   return isType<StudioElementNode>(node, 'element');
 }
 
-export function assertIsElement(node: StudioNode): asserts node is StudioElementNode {
+export function assertIsElement<P>(node: StudioNode): asserts node is StudioElementNode<P> {
   assertIsType<StudioElementNode>(node, 'element');
 }
 
@@ -268,41 +273,43 @@ export function createElementInternal<P>(
 
 type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
   StudioNodeOfType<T>,
-  'id' | 'type' | 'parentId' | 'parentProp' | 'parentIndex'
->;
+  'id' | 'type' | 'parentId' | 'parentProp' | 'parentIndex' | 'name'
+> & { name?: string };
 
 function createNodeInternal<T extends StudioNodeType>(
   id: NodeId,
   type: T,
-  name: string,
-  init: Omit<StudioNodeInitOfType<T>, 'name'>,
+  init: StudioNodeInitOfType<T> & { name: string },
 ): StudioNodeOfType<T> {
   return {
+    ...init,
     id,
-    name,
     type,
     parentId: null,
     parentProp: null,
     parentIndex: null,
-    ...init,
   } as StudioNodeOfType<T>;
 }
 
 export function createNode<T extends StudioNodeType>(
   dom: StudioDom,
   type: T,
-  { name, ...init }: StudioNodeInitOfType<T>,
+  init: StudioNodeInitOfType<T>,
 ): StudioNodeOfType<T> {
   const id = generateUniqueId(new Set(Object.keys(dom.nodes))) as NodeId;
   const existingNames = getNodeNames(dom);
-  return createNodeInternal(id, type, generateUniqueName(name, existingNames), init);
+  return createNodeInternal(id, type, {
+    ...init,
+    name: generateUniqueName(init.name || type, existingNames),
+  });
 }
 
 export function createDom(): StudioDom {
   const rootId = generateUniqueId(new Set()) as NodeId;
   return {
     nodes: {
-      [rootId]: createNodeInternal(rootId, 'app', 'Application', {
+      [rootId]: createNodeInternal(rootId, 'app', {
+        name: 'Application',
         props: {},
       }),
     },
@@ -369,14 +376,14 @@ export function setNodeName(dom: StudioDom, node: StudioNode, name: string): Stu
 
 export function setNodeProps<P>(
   page: StudioDom,
-  node: StudioNode,
+  node: StudioNodeBase<P>,
   props: StudioNodeProps<P>,
 ): StudioDom {
   return update(page, {
     nodes: update(page.nodes, {
       [node.id]: update(node, {
         props,
-      }),
+      }) as StudioNode,
     }),
   });
 }
@@ -469,10 +476,92 @@ export function removeNode(dom: StudioDom, nodeId: NodeId) {
   });
 }
 
-export function getConstPropValue<P, K extends keyof P>(
+export function getPropConstValue<P, K extends keyof P>(
   node: StudioNodeBase<P>,
-  propName: K,
+  propName: keyof P,
 ): P[K] | undefined {
   const prop = node.props[propName];
-  return prop?.type === 'const' ? prop.value : undefined;
+  return prop?.type === 'const' ? (prop.value as P[K]) : undefined;
+}
+
+export function getPropConstValues<P>(node: StudioNodeBase<P>): Partial<P> {
+  const result: Partial<P> = {};
+  (Object.keys(node.props) as (keyof P)[]).forEach((prop) => {
+    result[prop] = getPropConstValue(node, prop as keyof P);
+  });
+  return result;
+}
+
+export function setPropConstValues<P>(node: StudioApiNode<P>, values: Partial<P>): StudioApiNode<P>;
+export function setPropConstValues<P>(
+  node: StudioElementNode<P>,
+  values: Partial<P>,
+): StudioElementNode<P>;
+export function setPropConstValues<P>(node: StudioThemeNode, values: Partial<P>): StudioThemeNode;
+export function setPropConstValues<P>(node: StudioNode, values: Partial<P>): StudioNode;
+export function setPropConstValues<P>(node: StudioNode, values: Partial<P>): StudioNode {
+  const propUpdates: Partial<StudioNodeProps<P>> = {};
+  (Object.entries(values) as ExactEntriesOf<P>).forEach(([prop, value]) => {
+    propUpdates[prop] = {
+      type: 'const',
+      value,
+    };
+  });
+  return update(node, {
+    props: update(node.props, propUpdates),
+  });
+}
+
+export function setNodePropConstValue<P, K extends keyof P>(
+  node: StudioNodeBase<P>,
+  key: K,
+  value: P[K],
+): StudioNodeBase<P> {
+  const propUpdates: Partial<StudioNodeProps<P>> = {};
+  propUpdates[key] = {
+    type: 'const',
+    value,
+  };
+  return update(node, {
+    props: update(node.props, propUpdates),
+  });
+}
+
+export function setNodePropConstValues<P>(
+  dom: StudioDom,
+  node: StudioApiNode<P>,
+  values: Partial<P>,
+): StudioDom;
+export function setNodePropConstValues<P>(
+  dom: StudioDom,
+  node: StudioElementNode<P>,
+  values: Partial<P>,
+): StudioDom;
+export function setNodePropConstValues<P>(
+  dom: StudioDom,
+  node: StudioThemeNode,
+  values: Partial<P>,
+): StudioDom;
+export function setNodePropConstValues<P>(
+  dom: StudioDom,
+  node: StudioNode,
+  values: Partial<P>,
+): StudioDom;
+export function setNodePropConstValues<P>(
+  dom: StudioDom,
+  node: StudioNode,
+  values: Partial<P>,
+): StudioDom {
+  const propUpdates: Partial<StudioNodeProps<P>> = {};
+  (Object.entries(values) as ExactEntriesOf<P>).forEach(([prop, value]) => {
+    propUpdates[prop] = {
+      type: 'const',
+      value,
+    };
+  });
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: setPropConstValues(node, values),
+    }),
+  });
 }

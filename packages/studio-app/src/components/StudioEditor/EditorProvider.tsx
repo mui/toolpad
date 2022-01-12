@@ -27,7 +27,7 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
     ) {
       dispatch({ type: 'SET_NODE_PROP', nodeId: node.id, prop, value: { type: 'const', value } });
     },
-    setNodeProps(nodeId: NodeId, props: StudioNodeProps) {
+    setNodeProps<P>(nodeId: NodeId, props: StudioNodeProps<P>) {
       dispatch({ type: 'SET_NODE_PROPS', nodeId, props });
     },
     setComponentPanelTab(tab: ComponentPanelTab) {

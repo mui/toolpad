@@ -531,7 +531,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
-        api.addComponentDragOver(null);
+        api.nodeDragOver(null);
         return;
       }
 
@@ -547,9 +547,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       event.preventDefault();
       if (activeSlot) {
-        api.addComponentDragOver(activeSlot);
+        api.nodeDragOver(activeSlot);
       } else {
-        api.addComponentDragOver(null);
+        api.nodeDragOver(null);
       }
     };
 
@@ -586,12 +586,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
       }
 
-      api.addComponentDragEnd();
+      api.nodeDragEnd();
     };
 
     const handleDragEnd = (event: DragEvent) => {
       event.preventDefault();
-      api.addComponentDragEnd();
+      api.nodeDragEnd();
     };
 
     window.addEventListener('dragover', handleDragOver);

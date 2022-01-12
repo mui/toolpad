@@ -89,18 +89,18 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
     setComponentPanelTab(tab: ComponentPanelTab) {
       dispatch({ type: 'SET_COMPONENT_PANEL_TAB', tab });
     },
-    addComponentDragStart(component: string) {
-      dispatch({ type: 'ADD_COMPONENT_DRAG_START', component });
-    },
     nodeDragStart(nodeId: NodeId) {
       dispatch({ type: 'NODE_DRAG_START', nodeId });
     },
-    addComponentDragEnd() {
-      dispatch({ type: 'ADD_COMPONENT_DRAG_END' });
+    newNodeDragStart(newNode: studioDom.StudioNode) {
+      dispatch({ type: 'NEW_NODE_DRAG_START', newNode });
     },
-    addComponentDragOver(slot: SlotLocation | null) {
+    nodeDragEnd() {
+      dispatch({ type: 'NODE_DRAG_END' });
+    },
+    nodeDragOver(slot: SlotLocation | null) {
       dispatch({
-        type: 'ADD_COMPONENT_DRAG_OVER',
+        type: 'NODE_DRAG_OVER',
         slot,
       });
     },

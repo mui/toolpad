@@ -1,27 +1,7 @@
-import { ComponentDefinition, ArgTypeDefinitions } from '@mui/studio-core';
-import { getStudioComponent } from './studioComponents';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { NodeId, SlotLocation, StudioNodeProp, StudioNodeProps, ViewState } from './types';
-import { ExactEntriesOf } from './utils/types';
 import * as studioDom from './studioDom';
-
-function getDefaultPropValues<P = {}>(
-  definition: ComponentDefinition<P>,
-): Partial<StudioNodeProps<P>> {
-  const result: Partial<StudioNodeProps<P>> = {};
-  const entries = Object.entries(definition.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>;
-  entries.forEach(([name, prop]) => {
-    if (prop) {
-      result[name] = {
-        type: 'const',
-        value: prop.defaultValue,
-      };
-    }
-  });
-
-  return result;
-}
 
 export type ComponentPanelTab = 'catalog' | 'component' | 'theme';
 
@@ -86,19 +66,19 @@ export type EditorAction =
       tab: ComponentPanelTab;
     }
   | {
-      type: 'ADD_COMPONENT_DRAG_START';
-      component: string;
-    }
-  | {
       type: 'NODE_DRAG_START';
       nodeId: NodeId;
     }
   | {
-      type: 'ADD_COMPONENT_DRAG_OVER';
+      type: 'NEW_NODE_DRAG_START';
+      newNode: studioDom.StudioNode;
+    }
+  | {
+      type: 'NODE_DRAG_OVER';
       slot: SlotLocation | null;
     }
   | {
-      type: 'ADD_COMPONENT_DRAG_END';
+      type: 'NODE_DRAG_END';
     }
   | {
       type: 'OPEN_BINDING_EDITOR';
@@ -328,28 +308,22 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
         selection: action.nodeId,
       });
     }
-    case 'ADD_COMPONENT_DRAG_START': {
+    case 'NEW_NODE_DRAG_START': {
       if (state.newNode) {
         return state;
       }
-      const componentDef = getStudioComponent(state.dom, action.component);
-      const newNode = studioDom.createElement(
-        state.dom,
-        action.component,
-        getDefaultPropValues(componentDef),
-      );
       return update(state, {
         selection: null,
-        newNode,
+        newNode: action.newNode,
       });
     }
-    case 'ADD_COMPONENT_DRAG_END':
+    case 'NODE_DRAG_END':
       return update(state, {
         newNode: null,
         highlightLayout: false,
         highlightedSlot: null,
       });
-    case 'ADD_COMPONENT_DRAG_OVER': {
+    case 'NODE_DRAG_OVER': {
       return update(state, {
         highlightLayout: true,
         highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,

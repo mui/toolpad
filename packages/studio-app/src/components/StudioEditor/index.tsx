@@ -87,7 +87,7 @@ function EditorContent() {
       `);
       return;
     }
-    const { code } = renderPageCode(state.dom, state.pageNodeId, { pretty: true });
+    const { code } = renderPageCode(state.dom, state.pageEditor.nodeId, { pretty: true });
     setViewedSource(code);
   }, [state]);
 

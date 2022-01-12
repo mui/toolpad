@@ -64,7 +64,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   );
 
   const handleNameCommit = React.useCallback(
-    () => api.setNodeName(node.id, nameInput),
+    () => api.dom.setNodeName(node.id, nameInput),
     [api, node.id, nameInput],
   );
 

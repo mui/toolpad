@@ -80,7 +80,7 @@ export function AddBindingEditor<P, K extends keyof P & string>({
   const handleBind = React.useCallback(() => {
     if (typeof selectedIdx === 'number') {
       const selection = bindableProps[selectedIdx];
-      api.addBinding(
+      api.dom.addBinding(
         srcNodeId,
         srcProp,
         selection.nodeId,
@@ -135,7 +135,7 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
   const stateKey = propValue.state;
 
   const handleRemoveClick = React.useCallback(() => {
-    api.removeBinding(nodeId, prop);
+    api.dom.removeBinding(nodeId, prop);
   }, [api, nodeId, prop]);
 
   const boundProps = React.useMemo(() => {

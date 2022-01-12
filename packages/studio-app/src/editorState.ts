@@ -47,11 +47,6 @@ export type DomAction =
       value: StudioNodeProp<unknown>;
     }
   | {
-      type: 'DOM_SET_NODE_PROPS';
-      nodeId: NodeId;
-      props: StudioNodeProps<unknown>;
-    }
-  | {
       type: 'DOM_ADD_BINDING';
       srcNodeId: NodeId;
       srcProp: string;
@@ -134,11 +129,6 @@ export function domReducer(dom: studioDom.StudioDom, action: EditorAction): stud
     case 'DOM_SET_NODE_PROP': {
       const node = studioDom.getNode(dom, action.nodeId);
       return studioDom.setNodeProp<any, any>(dom, node, action.prop, action.value);
-    }
-    case 'DOM_SET_NODE_PROPS': {
-      const node = studioDom.getNode(dom, action.nodeId);
-      studioDom.assertIsElement(node);
-      return studioDom.setNodeProps(dom, node, action.props);
     }
     case 'DOM_ADD_NODE': {
       return studioDom.addNode(

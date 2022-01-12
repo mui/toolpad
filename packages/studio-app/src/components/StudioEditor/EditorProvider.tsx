@@ -8,11 +8,9 @@ import {
   PageEditorState,
 } from '../../editorState';
 import * as studioDom from '../../studioDom';
-import { NodeId, SlotLocation, StudioNodeProps, ViewState } from '../../types';
+import { NodeId, SlotLocation, ViewState } from '../../types';
 
-const EditorStateContext = React.createContext<EditorState | null>(null);
-
-function createApi(dispatch: React.Dispatch<EditorAction>) {
+function createDomApi(dispatch: React.Dispatch<EditorAction>) {
   return {
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
@@ -58,9 +56,6 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
         value: { type: 'const', value },
       });
     },
-    setNodeProps<P>(nodeId: NodeId, props: StudioNodeProps<P>) {
-      dispatch({ type: 'DOM_SET_NODE_PROPS', nodeId, props });
-    },
     addBinding(
       srcNodeId: NodeId,
       srcProp: string,
@@ -84,6 +79,14 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
         prop,
       });
     },
+  };
+}
+
+const EditorStateContext = React.createContext<EditorState | null>(null);
+
+function createApi(dispatch: React.Dispatch<EditorAction>) {
+  return {
+    dom: createDomApi(dispatch),
 
     select(nodeId: NodeId | null) {
       dispatch({ type: 'PAGE_SELECT_NODE', nodeId });

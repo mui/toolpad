@@ -42,7 +42,7 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
   const api = useEditorApi();
 
   const handleChange = React.useCallback(
-    (value: any) => api.setNodeConstPropValue(node, name, value),
+    (value: any) => api.dom.setNodeConstPropValue(node, name, value),
     [api, node, name],
   );
 

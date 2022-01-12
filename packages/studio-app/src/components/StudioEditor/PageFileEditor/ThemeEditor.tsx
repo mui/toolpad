@@ -61,7 +61,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
 
   const handleAddThemeClick = () => {
     const newTheme = studioDom.createNode(dom, 'theme', { name: 'Theme', props: {} });
-    api.addNode(newTheme, app.id, 'children');
+    api.dom.addNode(newTheme, app.id, 'children');
   };
 
   return (
@@ -72,7 +72,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             name="primary"
             value={studioDom.getConstPropValue(theme, 'palette.primary.main') || ''}
             onChange={(newValue) =>
-              api.setNodeConstPropValue<studioDom.StudioTheme>(
+              api.dom.setNodeConstPropValue<studioDom.StudioTheme>(
                 theme,
                 'palette.primary.main',
                 newValue,
@@ -83,7 +83,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             name="secondary"
             value={studioDom.getConstPropValue(theme, 'palette.secondary.main') || ''}
             onChange={(newValue) =>
-              api.setNodeConstPropValue<studioDom.StudioTheme>(
+              api.dom.setNodeConstPropValue<studioDom.StudioTheme>(
                 theme,
                 'palette.secondary.main',
                 newValue,

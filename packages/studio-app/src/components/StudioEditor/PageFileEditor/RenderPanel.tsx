@@ -570,14 +570,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       if (activeSlot) {
         if (state.newNode) {
-          api.addNode(
+          api.dom.addNode(
             state.newNode,
             activeSlot.parentId,
             activeSlot.parentProp,
             activeSlot.parentIndex,
           );
         } else if (state.selection) {
-          api.moveNode(
+          api.dom.moveNode(
             state.selection,
             activeSlot.parentId,
             activeSlot.parentProp,
@@ -621,7 +621,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (isFocused && state.selection && event.key === 'Backspace') {
-        api.removeNode(state.selection);
+        api.dom.removeNode(state.selection);
         api.deselect();
       }
     };

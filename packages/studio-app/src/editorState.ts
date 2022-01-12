@@ -298,7 +298,7 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
       const srcNode = studioDom.getNode(state.dom, srcNodeId);
       studioDom.assertIsElement<Record<string, unknown>>(srcNode);
       const destNode = studioDom.getNode(state.dom, destNodeId);
-      studioDom.assertIsApi(destNode);
+      studioDom.assertIsElement(destNode);
       const destPropValue = (destNode.props as StudioNodeProps<Record<string, unknown>>)[destProp];
       let stateKey = destPropValue?.type === 'binding' ? destPropValue.state : null;
 

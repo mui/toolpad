@@ -3,7 +3,7 @@ import { List, ListItem } from '@mui/material';
 import { ComponentDefinition, ArgTypeDefinitions } from '@mui/studio-core';
 import { DEFAULT_COMPONENTS, getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
-import { useEditorApi, useEditorState } from '../EditorProvider';
+import { useDom, useEditorApi } from '../EditorProvider';
 import { StudioNodeProps } from '../../../types';
 import { ExactEntriesOf } from '../../../utils/types';
 
@@ -30,12 +30,13 @@ export interface ComponentCatalogProps {
 
 export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = useEditorApi();
-  const { dom } = useEditorState();
+  const dom = useDom();
 
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLLIElement>) => {
     event.dataTransfer.dropEffect = 'copy';
     const componentDef = getStudioComponent(dom, componentType);
     const newNode = studioDom.createElement(dom, componentType, getDefaultPropValues(componentDef));
+    api.deselect();
     api.pageEditor.newNodeDragStart(newNode);
   };
 

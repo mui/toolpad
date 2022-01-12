@@ -218,7 +218,7 @@ export function domReducer(dom: studioDom.StudioDom, action: EditorAction): stud
       });
     }
     default:
-      throw new Error('Invariant');
+      return dom;
   }
 }
 
@@ -327,7 +327,7 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
       });
     }
     default:
-      throw new Error('Invariant');
+      return state;
   }
 }
 

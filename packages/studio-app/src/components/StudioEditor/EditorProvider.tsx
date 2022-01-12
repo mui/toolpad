@@ -7,21 +7,36 @@ import {
   EditorState,
   PageEditorState,
 } from '../../editorState';
-import { StudioNodeBase } from '../../studioDom';
+import * as studioDom from '../../studioDom';
 import { NodeId, SlotLocation, StudioNodeProps, ViewState } from '../../types';
 
 const EditorStateContext = React.createContext<EditorState | null>(null);
 
 function createApi(dispatch: React.Dispatch<EditorAction>) {
   return {
-    select(nodeId: NodeId | null) {
-      dispatch({ type: 'SELECT_NODE', nodeId });
-    },
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'SET_NODE_NAME', nodeId, name });
     },
+    addNode(node: studioDom.StudioNode, parentId: NodeId, parentProp: string, parentIndex: string) {
+      dispatch({
+        type: 'ADD_NODE',
+        node,
+        parentId,
+        parentProp,
+        parentIndex,
+      });
+    },
+    moveNode(nodeId: NodeId, parentId: NodeId, parentProp: string, parentIndex: string) {
+      dispatch({
+        type: 'MOVE_NODE',
+        nodeId,
+        parentId,
+        parentProp,
+        parentIndex,
+      });
+    },
     setNodeConstPropValue<P, K extends keyof P & string>(
-      node: StudioNodeBase<P>,
+      node: studioDom.StudioNode,
       prop: K,
       value: P[K],
     ) {
@@ -29,36 +44,6 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
     },
     setNodeProps<P>(nodeId: NodeId, props: StudioNodeProps<P>) {
       dispatch({ type: 'SET_NODE_PROPS', nodeId, props });
-    },
-    setComponentPanelTab(tab: ComponentPanelTab) {
-      dispatch({ type: 'SET_COMPONENT_PANEL_TAB', tab });
-    },
-    addComponentDragStart(component: string) {
-      dispatch({ type: 'ADD_COMPONENT_DRAG_START', component });
-    },
-    nodeDragStart(nodeId: NodeId) {
-      dispatch({ type: 'NODE_DRAG_START', nodeId });
-    },
-    selectionRemove() {
-      dispatch({ type: 'SELECTION_REMOVE' });
-    },
-    addComponentDragEnd() {
-      dispatch({ type: 'ADD_COMPONENT_DRAG_END' });
-    },
-    addComponentDragOver(slot: SlotLocation | null) {
-      dispatch({
-        type: 'ADD_COMPONENT_DRAG_OVER',
-        slot,
-      });
-    },
-    addComponentDrop(location: SlotLocation | null) {
-      dispatch({ type: 'ADD_COMPONENT_DROP', location });
-    },
-    openBindingEditor(nodeId: NodeId, prop: string) {
-      dispatch({ type: 'OPEN_BINDING_EDITOR', nodeId, prop });
-    },
-    closeBindingEditor() {
-      dispatch({ type: 'CLOSE_BINDING_EDITOR' });
     },
     addBinding(
       srcNodeId: NodeId,
@@ -83,15 +68,46 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
         prop,
       });
     },
+    addTheme() {
+      dispatch({
+        type: 'ADD_THEME',
+      });
+    },
+
+    select(nodeId: NodeId | null) {
+      dispatch({ type: 'SELECT_NODE', nodeId });
+    },
+    setComponentPanelTab(tab: ComponentPanelTab) {
+      dispatch({ type: 'SET_COMPONENT_PANEL_TAB', tab });
+    },
+    addComponentDragStart(component: string) {
+      dispatch({ type: 'ADD_COMPONENT_DRAG_START', component });
+    },
+    nodeDragStart(nodeId: NodeId) {
+      dispatch({ type: 'NODE_DRAG_START', nodeId });
+    },
+    selectionRemove() {
+      dispatch({ type: 'SELECTION_REMOVE' });
+    },
+    addComponentDragEnd() {
+      dispatch({ type: 'ADD_COMPONENT_DRAG_END' });
+    },
+    addComponentDragOver(slot: SlotLocation | null) {
+      dispatch({
+        type: 'ADD_COMPONENT_DRAG_OVER',
+        slot,
+      });
+    },
+    openBindingEditor(nodeId: NodeId, prop: string) {
+      dispatch({ type: 'OPEN_BINDING_EDITOR', nodeId, prop });
+    },
+    closeBindingEditor() {
+      dispatch({ type: 'CLOSE_BINDING_EDITOR' });
+    },
     pageViewStateUpdate(viewState: ViewState) {
       dispatch({
         type: 'PAGE_VIEW_STATE_UPDATE',
         viewState,
-      });
-    },
-    addTheme() {
-      dispatch({
-        type: 'ADD_THEME',
       });
     },
   };

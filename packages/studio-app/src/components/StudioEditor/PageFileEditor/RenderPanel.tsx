@@ -560,7 +560,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const slotIndex = findActiveSlotAt(
+      const activeSlot = findActiveSlotAt(
         availableNodes,
         viewState,
         slots,
@@ -568,13 +568,25 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         cursorPos.y,
       );
 
-      const activeSlot = slotIndex;
-
       if (activeSlot) {
-        api.addComponentDrop(activeSlot);
-      } else {
-        api.addComponentDrop(null);
+        if (state.newNode) {
+          api.addNode(
+            state.newNode,
+            activeSlot.parentId,
+            activeSlot.parentProp,
+            activeSlot.parentIndex,
+          );
+        } else if (state.selection) {
+          api.moveNode(
+            state.selection,
+            activeSlot.parentId,
+            activeSlot.parentProp,
+            activeSlot.parentIndex,
+          );
+        }
       }
+
+      api.addComponentDragEnd();
     };
 
     const handleDragEnd = (event: DragEvent) => {
@@ -590,7 +602,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       window.removeEventListener('drop', handleDrop);
       window.removeEventListener('dragend', handleDragEnd);
     };
-  }, [availableNodes, getViewCoordinates, viewState, api, slots]);
+  }, [availableNodes, getViewCoordinates, viewState, api, slots, state.selection, state.newNode]);
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {

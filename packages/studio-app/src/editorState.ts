@@ -91,15 +91,11 @@ export type EditorAction =
       nodeId: NodeId;
     }
   | {
-      type: 'ADD_COMPONENT_DRAG_END';
-    }
-  | {
       type: 'ADD_COMPONENT_DRAG_OVER';
       slot: SlotLocation | null;
     }
   | {
-      type: 'ADD_COMPONENT_DROP';
-      location: SlotLocation | null;
+      type: 'ADD_COMPONENT_DRAG_END';
     }
   | {
       type: 'SELECTION_REMOVE';
@@ -131,6 +127,20 @@ export type EditorAction =
     }
   | {
       type: 'ADD_THEME';
+    }
+  | {
+      type: 'ADD_NODE';
+      node: studioDom.StudioNode;
+      parentId: NodeId;
+      parentProp: string;
+      parentIndex: string;
+    }
+  | {
+      type: 'MOVE_NODE';
+      nodeId: NodeId;
+      parentId: NodeId;
+      parentProp: string;
+      parentIndex: string;
     };
 
 export function createApiEditorState(dom: studioDom.StudioDom, apiNodeId: NodeId): ApiEditorState {
@@ -168,22 +178,6 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
   switch (action.type) {
     case 'NOOP':
       return state;
-    case 'SELECT_NODE': {
-      if (action.nodeId) {
-        const node = studioDom.getNode(state.dom, action.nodeId);
-        if (studioDom.isElement(node)) {
-          return update(state, {
-            selection: node.id,
-            componentPanelTab: 'component',
-          });
-        }
-        return state;
-      }
-      return update(state, {
-        selection: null,
-        componentPanelTab: 'component',
-      });
-    }
     case 'SET_NODE_NAME': {
       const node = studioDom.getNode(state.dom, action.nodeId);
       return update(state, {
@@ -203,94 +197,32 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
         dom: studioDom.setNodeProps(state.dom, node, action.props),
       });
     }
-    case 'SET_COMPONENT_PANEL_TAB':
+    case 'ADD_NODE': {
       return update(state, {
-        componentPanelTab: action.tab,
-      });
-    case 'NODE_DRAG_START': {
-      return update(state, {
-        selection: action.nodeId,
-      });
-    }
-    case 'SELECTION_REMOVE': {
-      if (!state.selection || state.newNode) {
-        return state;
-      }
-
-      // TODO: also clean up orphaned state and bindings
-      return update(state, {
-        selection: null,
-        dom: studioDom.removeNode(state.dom, state.selection),
-      });
-    }
-    case 'ADD_COMPONENT_DRAG_START': {
-      if (state.newNode) {
-        return state;
-      }
-      const componentDef = getStudioComponent(state.dom, action.component);
-      const newNode = studioDom.createElement(
-        state.dom,
-        action.component,
-        getDefaultPropValues(componentDef),
-      );
-      return update(state, {
-        selection: null,
-        newNode,
-      });
-    }
-    case 'ADD_COMPONENT_DRAG_END':
-      return update(state, {
+        dom: studioDom.addNode(
+          state.dom,
+          action.node,
+          action.parentId,
+          action.parentProp,
+          action.parentIndex,
+        ),
         newNode: null,
         highlightLayout: false,
         highlightedSlot: null,
       });
-    case 'ADD_COMPONENT_DRAG_OVER': {
-      return update(state, {
-        highlightLayout: true,
-        highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,
-      });
     }
-    case 'ADD_COMPONENT_DROP': {
-      const { newNode, dom } = state;
-
-      if (!action.location) {
-        return update(state, {
-          newNode: null,
-          highlightLayout: false,
-          highlightedSlot: null,
-        });
-      }
-
-      const { parentId, parentProp, parentIndex } = action.location;
-
-      if (newNode) {
-        return update(state, {
-          dom: studioDom.addNode(dom, newNode, parentId, parentProp, parentIndex),
-          newNode: null,
-          highlightLayout: false,
-          highlightedSlot: null,
-        });
-      }
-
-      if (state.selection) {
-        return update(state, {
-          dom: studioDom.moveNode(dom, state.selection, parentId, parentProp, parentIndex),
-          newNode: null,
-          highlightLayout: false,
-          highlightedSlot: null,
-        });
-      }
-
-      return state;
-    }
-    case 'OPEN_BINDING_EDITOR': {
+    case 'MOVE_NODE': {
       return update(state, {
-        bindingEditor: action,
-      });
-    }
-    case 'CLOSE_BINDING_EDITOR': {
-      return update(state, {
-        bindingEditor: null,
+        dom: studioDom.moveNode(
+          state.dom,
+          action.nodeId,
+          action.parentId,
+          action.parentProp,
+          action.parentIndex,
+        ),
+        newNode: null,
+        highlightLayout: false,
+        highlightedSlot: null,
       });
     }
     case 'ADD_BINDING': {
@@ -350,12 +282,6 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
         }),
       });
     }
-    case 'PAGE_VIEW_STATE_UPDATE': {
-      const { viewState } = action;
-      return update(state, {
-        viewState,
-      });
-    }
     case 'ADD_THEME': {
       const app = studioDom.getApp(state.dom);
       return update(state, {
@@ -365,6 +291,86 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
           app.id,
           'children',
         ),
+      });
+    }
+
+    case 'SELECT_NODE': {
+      if (action.nodeId) {
+        const node = studioDom.getNode(state.dom, action.nodeId);
+        if (studioDom.isElement(node)) {
+          return update(state, {
+            selection: node.id,
+            componentPanelTab: 'component',
+          });
+        }
+        return state;
+      }
+      return update(state, {
+        selection: null,
+        componentPanelTab: 'component',
+      });
+    }
+    case 'SET_COMPONENT_PANEL_TAB':
+      return update(state, {
+        componentPanelTab: action.tab,
+      });
+    case 'NODE_DRAG_START': {
+      return update(state, {
+        selection: action.nodeId,
+      });
+    }
+    case 'SELECTION_REMOVE': {
+      if (!state.selection || state.newNode) {
+        return state;
+      }
+
+      // TODO: also clean up orphaned state and bindings
+      return update(state, {
+        selection: null,
+        dom: studioDom.removeNode(state.dom, state.selection),
+      });
+    }
+    case 'ADD_COMPONENT_DRAG_START': {
+      if (state.newNode) {
+        return state;
+      }
+      const componentDef = getStudioComponent(state.dom, action.component);
+      const newNode = studioDom.createElement(
+        state.dom,
+        action.component,
+        getDefaultPropValues(componentDef),
+      );
+      return update(state, {
+        selection: null,
+        newNode,
+      });
+    }
+    case 'ADD_COMPONENT_DRAG_END':
+      return update(state, {
+        newNode: null,
+        highlightLayout: false,
+        highlightedSlot: null,
+      });
+    case 'ADD_COMPONENT_DRAG_OVER': {
+      return update(state, {
+        highlightLayout: true,
+        highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,
+      });
+    }
+    case 'OPEN_BINDING_EDITOR': {
+      return update(state, {
+        bindingEditor: action,
+      });
+    }
+    case 'CLOSE_BINDING_EDITOR': {
+      return update(state, {
+        bindingEditor: null,
+      });
+    }
+    case 'PAGE_VIEW_STATE_UPDATE': {
+      const { viewState } = action;
+      return update(state, {
+        viewState,
       });
     }
     default:

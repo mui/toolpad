@@ -63,6 +63,9 @@ export type EditorAction =
       nodeId: NodeId | null;
     }
   | {
+      type: 'DESELECT_NODE';
+    }
+  | {
       type: 'SET_NODE_NAME';
       nodeId: NodeId;
       name: string;
@@ -96,9 +99,6 @@ export type EditorAction =
     }
   | {
       type: 'ADD_COMPONENT_DRAG_END';
-    }
-  | {
-      type: 'SELECTION_REMOVE';
     }
   | {
       type: 'OPEN_BINDING_EDITOR';
@@ -141,6 +141,10 @@ export type EditorAction =
       parentId: NodeId;
       parentProp: string;
       parentIndex: string;
+    }
+  | {
+      type: 'REMOVE_NODE';
+      nodeId: NodeId;
     };
 
 export function createApiEditorState(dom: studioDom.StudioDom, apiNodeId: NodeId): ApiEditorState {
@@ -206,9 +210,6 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
           action.parentProp,
           action.parentIndex,
         ),
-        newNode: null,
-        highlightLayout: false,
-        highlightedSlot: null,
       });
     }
     case 'MOVE_NODE': {
@@ -220,9 +221,12 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
           action.parentProp,
           action.parentIndex,
         ),
-        newNode: null,
-        highlightLayout: false,
-        highlightedSlot: null,
+      });
+    }
+    case 'REMOVE_NODE': {
+      // TODO: also clean up orphaned state and bindings
+      return update(state, {
+        dom: studioDom.removeNode(state.dom, action.nodeId),
       });
     }
     case 'ADD_BINDING': {
@@ -310,6 +314,11 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
         componentPanelTab: 'component',
       });
     }
+    case 'DESELECT_NODE': {
+      return update(state, {
+        selection: null,
+      });
+    }
     case 'SET_COMPONENT_PANEL_TAB':
       return update(state, {
         componentPanelTab: action.tab,
@@ -317,17 +326,6 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
     case 'NODE_DRAG_START': {
       return update(state, {
         selection: action.nodeId,
-      });
-    }
-    case 'SELECTION_REMOVE': {
-      if (!state.selection || state.newNode) {
-        return state;
-      }
-
-      // TODO: also clean up orphaned state and bindings
-      return update(state, {
-        selection: null,
-        dom: studioDom.removeNode(state.dom, state.selection),
       });
     }
     case 'ADD_COMPONENT_DRAG_START': {

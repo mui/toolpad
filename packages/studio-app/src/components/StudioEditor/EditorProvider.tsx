@@ -35,6 +35,12 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
         parentIndex,
       });
     },
+    removeNode(nodeId: NodeId) {
+      dispatch({
+        type: 'REMOVE_NODE',
+        nodeId,
+      });
+    },
     setNodeConstPropValue<P, K extends keyof P & string>(
       node: studioDom.StudioNode,
       prop: K,
@@ -77,6 +83,9 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
     select(nodeId: NodeId | null) {
       dispatch({ type: 'SELECT_NODE', nodeId });
     },
+    deselect() {
+      dispatch({ type: 'DESELECT_NODE' });
+    },
     setComponentPanelTab(tab: ComponentPanelTab) {
       dispatch({ type: 'SET_COMPONENT_PANEL_TAB', tab });
     },
@@ -85,9 +94,6 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
     },
     nodeDragStart(nodeId: NodeId) {
       dispatch({ type: 'NODE_DRAG_START', nodeId });
-    },
-    selectionRemove() {
-      dispatch({ type: 'SELECTION_REMOVE' });
     },
     addComponentDragEnd() {
       dispatch({ type: 'ADD_COMPONENT_DRAG_END' });

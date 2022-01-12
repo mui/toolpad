@@ -620,15 +620,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isFocused && event.key === 'Backspace') {
-        api.selectionRemove();
+      if (isFocused && state.selection && event.key === 'Backspace') {
+        api.removeNode(state.selection);
+        api.deselect();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [api, isFocused]);
+  }, [api, isFocused, state.selection]);
 
   const selectedRect = selectedNode ? viewState[selectedNode.id]?.rect : null;
 

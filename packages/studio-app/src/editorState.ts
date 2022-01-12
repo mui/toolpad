@@ -11,13 +11,17 @@ export interface BindingEditorState {
 }
 
 export interface PageEditorState {
-  readonly pageNodeId: NodeId;
+  readonly nodeId: NodeId;
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: studioDom.StudioNode | null;
   readonly bindingEditor: BindingEditorState | null;
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
   readonly viewState: ViewState;
+}
+
+export interface ApiEditorState {
+  readonly nodeId: NodeId;
 }
 
 export interface BaseEditorState {
@@ -33,7 +37,7 @@ export interface BaseEditorWithPageState extends BaseEditorState {
 
 export interface BaseEditorWithApiState extends BaseEditorState {
   readonly editorType: 'api';
-  readonly apiEditor: {};
+  readonly apiEditor: ApiEditorState;
 }
 
 export type EditorState = BaseEditorWithPageState | BaseEditorWithApiState;
@@ -216,7 +220,7 @@ export function domReducer(dom: studioDom.StudioDom, action: EditorAction): stud
 
 export function createPageEditorState(nodeId: NodeId): PageEditorState {
   return {
-    pageNodeId: nodeId,
+    nodeId,
     componentPanelTab: 'catalog',
     newNode: null,
     bindingEditor: null,
@@ -291,7 +295,7 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
         if (studioDom.isElement(node)) {
           const page = studioDom.getElementPage(state.dom, node);
           if (page) {
-            if (state.editorType === 'page' && page.id === state.pageEditor.pageNodeId) {
+            if (state.editorType === 'page' && page.id === state.pageEditor.nodeId) {
               return update(state, {
                 selection: action.nodeId,
               });
@@ -300,7 +304,7 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
           }
         }
         if (studioDom.isPage(node)) {
-          if (state.editorType === 'page' && node.id === state.pageEditor.pageNodeId) {
+          if (state.editorType === 'page' && node.id === state.pageEditor.nodeId) {
             return state;
           }
           return update(state, {

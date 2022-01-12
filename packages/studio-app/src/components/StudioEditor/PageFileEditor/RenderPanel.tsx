@@ -440,7 +440,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const viewRef = React.useRef<PageViewHandle>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
   const { selection } = useEditorState();
-  const { viewState, pageNodeId, highlightedSlot } = state;
+  const { viewState, nodeId: pageNodeId, highlightedSlot } = state;
 
   const [isFocused, setIsFocused] = React.useState(false);
 
@@ -654,7 +654,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           className={classes.view}
           ref={viewRef}
           dom={dom}
-          pageNodeId={state.pageNodeId}
+          pageNodeId={state.nodeId}
           onUpdate={handleRender}
         />
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}

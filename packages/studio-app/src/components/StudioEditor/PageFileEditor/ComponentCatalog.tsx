@@ -36,7 +36,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     event.dataTransfer.dropEffect = 'copy';
     const componentDef = getStudioComponent(dom, componentType);
     const newNode = studioDom.createElement(dom, componentType, getDefaultPropValues(componentDef));
-    api.newNodeDragStart(newNode);
+    api.pageEditor.newNodeDragStart(newNode);
   };
 
   return (

@@ -200,7 +200,7 @@ export function BindingEditorContent<P, K extends keyof P & string>({
 export default function BindingEditor() {
   const state = usePageEditorState();
   const api = useEditorApi();
-  const handleClose = React.useCallback(() => api.closeBindingEditor(), [api]);
+  const handleClose = React.useCallback(() => api.pageEditor.closeBindingEditor(), [api]);
   const bindingEditorProps = useLatest(state.bindingEditor);
   return (
     <Dialog onClose={handleClose} open={!!state.bindingEditor} fullWidth>

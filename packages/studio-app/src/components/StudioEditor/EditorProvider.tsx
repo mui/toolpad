@@ -82,12 +82,8 @@ function createDomApi(dispatch: React.Dispatch<EditorAction>) {
   };
 }
 
-const EditorStateContext = React.createContext<EditorState | null>(null);
-
-function createApi(dispatch: React.Dispatch<EditorAction>) {
+function createEditorApi(dispatch: React.Dispatch<EditorAction>) {
   return {
-    dom: createDomApi(dispatch),
-
     select(nodeId: NodeId | null) {
       dispatch({ type: 'PAGE_SELECT_NODE', nodeId });
     },
@@ -124,6 +120,15 @@ function createApi(dispatch: React.Dispatch<EditorAction>) {
         viewState,
       });
     },
+  };
+}
+
+const EditorStateContext = React.createContext<EditorState | null>(null);
+
+function createApi(dispatch: React.Dispatch<EditorAction>) {
+  return {
+    dom: createDomApi(dispatch),
+    pageEditor: createEditorApi(dispatch),
   };
 }
 

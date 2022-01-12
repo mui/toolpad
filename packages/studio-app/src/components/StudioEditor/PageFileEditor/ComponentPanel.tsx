@@ -30,7 +30,7 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
   const api = useEditorApi();
 
   const handleChange = (event: React.SyntheticEvent, newValue: ComponentPanelTab) =>
-    api.setComponentPanelTab(newValue);
+    api.pageEditor.setComponentPanelTab(newValue);
 
   return (
     <ComponentPanelRoot className={className}>

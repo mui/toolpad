@@ -42,12 +42,12 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
   const api = useEditorApi();
 
   const handleChange = React.useCallback(
-    (value: any) => api.dom.setNodeConstPropValue(node, name, value),
+    (value: any) => api.dom.setNodeConstPropValue<P>(node, name, value),
     [api, node, name],
   );
 
   const handleClickBind = React.useCallback(
-    () => api.openBindingEditor(node.id, name),
+    () => api.pageEditor.openBindingEditor(node.id, name),
     [api, node.id, name],
   );
 

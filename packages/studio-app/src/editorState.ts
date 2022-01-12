@@ -20,8 +20,7 @@ export interface ApiEditorState extends BaseEditorState {
   readonly apiNodeId: NodeId;
 }
 
-export interface PageEditorState extends BaseEditorState {
-  readonly editorType: 'page';
+export interface PageEditorState2 {
   readonly pageNodeId: NodeId;
   readonly selection: NodeId | null;
   readonly componentPanelTab: ComponentPanelTab;
@@ -30,6 +29,10 @@ export interface PageEditorState extends BaseEditorState {
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
   readonly viewState: ViewState;
+}
+
+export interface PageEditorState extends BaseEditorState, PageEditorState2 {
+  readonly editorType: 'page';
 }
 
 export type EditorState = PageEditorState | ApiEditorState;
@@ -241,6 +244,73 @@ export function createPageEditorState(
 export function createEditorState(dom: studioDom.StudioDom): EditorState {
   const pageNode = studioDom.getPages(dom, studioDom.getApp(dom))[0];
   return createPageEditorState(dom, pageNode.id);
+}
+
+export function pageEditorReducer2(
+  state: PageEditorState2,
+  action: EditorAction,
+): PageEditorState2 {
+  switch (action.type) {
+    case 'PAGE_SELECT_NODE': {
+      return update(state, {
+        selection: null,
+        componentPanelTab: 'component',
+      });
+    }
+    case 'PAGE_DESELECT_NODE': {
+      return update(state, {
+        selection: null,
+      });
+    }
+    case 'PAGE_SET_COMPONENT_PANEL_TAB':
+      return update(state, {
+        componentPanelTab: action.tab,
+      });
+    case 'PAGE_NODE_DRAG_START': {
+      return update(state, {
+        selection: action.nodeId,
+      });
+    }
+    case 'PAGE_NEW_NODE_DRAG_START': {
+      if (state.newNode) {
+        return state;
+      }
+      return update(state, {
+        selection: null,
+        newNode: action.newNode,
+      });
+    }
+    case 'PAGE_NODE_DRAG_END':
+      return update(state, {
+        newNode: null,
+        highlightLayout: false,
+        highlightedSlot: null,
+      });
+    case 'PAGE_NODE_DRAG_OVER': {
+      return update(state, {
+        highlightLayout: true,
+        highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,
+      });
+    }
+    case 'PAGE_OPEN_BINDING_EDITOR': {
+      return update(state, {
+        bindingEditor: action,
+      });
+    }
+    case 'PAGE_CLOSE_BINDING_EDITOR': {
+      return update(state, {
+        bindingEditor: null,
+      });
+    }
+    case 'PAGE_VIEW_STATE_UPDATE': {
+      const { viewState } = action;
+      return update(state, {
+        viewState,
+      });
+    }
+    default:
+      return state;
+  }
 }
 
 export function pageEditorReducer(state: PageEditorState, action: EditorAction): EditorState {

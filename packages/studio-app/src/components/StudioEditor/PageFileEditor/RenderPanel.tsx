@@ -488,7 +488,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleRender = React.useCallback(() => {
     const rootElm = viewRef.current?.getRootElm();
     if (rootElm) {
-      api.pageViewStateUpdate(getViewState(rootElm));
+      api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
     }
   }, [api]);
 
@@ -520,7 +520,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const nodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
 
       if (nodeId) {
-        api.nodeDragStart(nodeId);
+        api.pageEditor.nodeDragStart(nodeId);
       }
     },
     [api, getViewCoordinates, pageNodes, viewState],
@@ -531,7 +531,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
-        api.nodeDragOver(null);
+        api.pageEditor.nodeDragOver(null);
         return;
       }
 
@@ -547,9 +547,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       event.preventDefault();
       if (activeSlot) {
-        api.nodeDragOver(activeSlot);
+        api.pageEditor.nodeDragOver(activeSlot);
       } else {
-        api.nodeDragOver(null);
+        api.pageEditor.nodeDragOver(null);
       }
     };
 
@@ -586,12 +586,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
       }
 
-      api.nodeDragEnd();
+      api.pageEditor.nodeDragEnd();
     };
 
     const handleDragEnd = (event: DragEvent) => {
       event.preventDefault();
-      api.nodeDragEnd();
+      api.pageEditor.nodeDragEnd();
     };
 
     window.addEventListener('dragover', handleDragOver);
@@ -613,7 +613,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       const newSelectedNodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
-      api.select(newSelectedNodeId);
+      api.pageEditor.select(newSelectedNodeId);
     },
     [api, getViewCoordinates, pageNodes, viewState],
   );
@@ -622,7 +622,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (isFocused && state.selection && event.key === 'Backspace') {
         api.dom.removeNode(state.selection);
-        api.deselect();
+        api.pageEditor.deselect();
       }
     };
     window.addEventListener('keydown', handleKeyDown);

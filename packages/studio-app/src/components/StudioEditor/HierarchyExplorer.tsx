@@ -83,20 +83,22 @@ interface HierarchyExplorerElementItemProps {
 function HierarchyExplorerElementItem({ element }: HierarchyExplorerElementItemProps) {
   const dom = useDom();
   const { children = [], ...namedChildren } = studioDom.getChildNodes(dom, element);
+
+  const defaultChildrenContent = children.map((child) => (
+    <HierarchyExplorerElementItem key={child.id} element={child} />
+  ));
+  const namedChildrenContent = Object.entries(namedChildren).map(() => {
+    // TODO: display `namedChildren` in the tree as well
+    return null;
+  });
+
   return (
     <TreeItem
       ContentComponent={CustomContent}
       nodeId={element.id}
       label={`${element.name} (${element.id})`}
     >
-      {children.map((child) => (
-        <HierarchyExplorerElementItem key={child.id} element={child} />
-      ))}
-
-      {Object.entries(namedChildren).map(() => {
-        // TODO: display `namedChildren` in the tree as well
-        return null;
-      })}
+      {[...defaultChildrenContent, ...namedChildrenContent]}
     </TreeItem>
   );
 }

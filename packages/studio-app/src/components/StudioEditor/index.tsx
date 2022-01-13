@@ -2,7 +2,7 @@ import { styled } from '@mui/system';
 import * as React from 'react';
 import SaveIcon from '@mui/icons-material/Save';
 import CodeIcon from '@mui/icons-material/Code';
-import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { CircularProgress, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import StudioAppBar from '../StudioAppBar';
 import EditorProvider, { createEditorState, useEditorState } from './EditorProvider';
 import PageFileEditor from './PageFileEditor';
@@ -10,7 +10,7 @@ import PagePanel from './PagePanel';
 import renderPageCode from '../../renderPageCode';
 import useLatest from '../../utils/useLatest';
 import client from '../../api';
-import DomProvider, { useDom } from '../DomProvider';
+import DomProvider, { useDom, useDomState } from '../DomProvider';
 
 const classes = {
   content: 'StudioContent',
@@ -68,6 +68,7 @@ function FileEditor({ type, className }: FileEditorProps) {
 
 function EditorContent() {
   const state = useEditorState();
+  const domState = useDomState();
   const dom = useDom();
 
   const [viewedSource, setViewedSource] = React.useState<string | null>(null);
@@ -111,8 +112,19 @@ function EditorContent() {
         }
       />
       <div className={classes.content}>
-        <PagePanel className={classes.pagePanel} />
-        <FileEditor type={state.editorType} className={classes.renderPanel} />
+        {
+          // eslint-disable-next-line no-nested-ternary
+          domState.loading ? (
+            <CircularProgress />
+          ) : domState.error ? (
+            domState.error
+          ) : (
+            <React.Fragment>
+              <PagePanel className={classes.pagePanel} />
+              <FileEditor type={state.editorType} className={classes.renderPanel} />
+            </React.Fragment>
+          )
+        }
       </div>
       <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>
         <DialogTitle>View Source</DialogTitle>

@@ -273,8 +273,12 @@ const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined))
 
 export type DomApi = ReturnType<typeof createDomApi>;
 
+export function useDomState(): DomState {
+  return React.useContext(DomStateContext);
+}
+
 export function useDom(): studioDom.StudioDom {
-  const { dom } = React.useContext(DomStateContext);
+  const { dom } = useDomState();
   return dom;
 }
 

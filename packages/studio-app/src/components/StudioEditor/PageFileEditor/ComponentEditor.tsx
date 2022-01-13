@@ -2,10 +2,11 @@ import { styled, TextField } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import { getStudioComponent } from '../../../studioComponents';
-import { useDom, useEditorApi, useEditorState, usePageEditorState } from '../EditorProvider';
+import { useEditorState, usePageEditorState } from '../EditorProvider';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
 import ComponentPropEditor from './ComponentPropEditor';
+import { useDom, useDomApi } from '../../DomProvider';
 
 const classes = {
   control: 'StudioControl',
@@ -52,7 +53,7 @@ interface SelectedNodeEditorProps {
 const DEFAULT_ACTUAL_VALUES = {};
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
-  const api = useEditorApi();
+  const domApi = useDomApi();
   const { viewState } = usePageEditorState();
   const actualValues = viewState[node.id]?.props ?? DEFAULT_ACTUAL_VALUES;
 
@@ -64,8 +65,8 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   );
 
   const handleNameCommit = React.useCallback(
-    () => api.dom.setNodeName(node.id, nameInput),
-    [api, node.id, nameInput],
+    () => domApi.setNodeName(node.id, nameInput),
+    [domApi, node.id, nameInput],
   );
 
   const handleKeyPress = React.useCallback(

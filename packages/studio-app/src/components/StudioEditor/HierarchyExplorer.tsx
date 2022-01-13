@@ -8,6 +8,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
 import { useEditorApi, useEditorState } from './EditorProvider';
+import { useDom } from '../DomProvider';
 
 const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
   const { classes, className, label, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;
@@ -64,8 +65,8 @@ interface HierarchyExplorerElementItemProps {
 }
 
 function HierarchyExplorerElementItem({ element }: HierarchyExplorerElementItemProps) {
-  const state = useEditorState();
-  const { children = [], ...namedChildren } = studioDom.getChildNodes(state.dom, element);
+  const dom = useDom();
+  const { children = [], ...namedChildren } = studioDom.getChildNodes(dom, element);
   return (
     <TreeItem
       ContentComponent={CustomContent}
@@ -89,8 +90,8 @@ interface HierarchyExplorerPageItemProps {
 }
 
 function HierarchyExplorerPageItem({ page }: HierarchyExplorerPageItemProps) {
-  const state = useEditorState();
-  const children = studioDom.getChildNodes(state.dom, page).children ?? [];
+  const dom = useDom();
+  const children = studioDom.getChildNodes(dom, page).children ?? [];
   return (
     <TreeItem ContentComponent={CustomContent} nodeId={page.id} label={`${page.name} (${page.id})`}>
       {children.map((child) => (
@@ -106,18 +107,39 @@ export interface HierarchyExplorerProps {
 
 export default function HierarchyExplorer({ className }: HierarchyExplorerProps) {
   const state = useEditorState();
+  const dom = useDom();
   const api = useEditorApi();
+
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
     const selectedNodeId = nodeIds[0] as NodeId | undefined;
     if (selectedNodeId) {
       api.select(selectedNodeId);
+
+      let node = studioDom.getNode(dom, selectedNodeId);
+      if (studioDom.isElement(node)) {
+        const page = studioDom.getElementPage(dom, node);
+        if (page) {
+          if (state.editorType === 'page' && page.id === state.pageEditor.nodeId) {
+            api.select(selectedNodeId);
+          } else {
+            node = page;
+          }
+        }
+      }
+      if (studioDom.isPage(node)) {
+        if (state.editorType === 'page' && node.id === state.pageEditor.nodeId) {
+          api.deselect();
+          return;
+        }
+        api.openPageEditor(node.id);
+      }
     }
   };
 
   const selected = state.selection ? [state.selection] : [];
 
-  const app = studioDom.getApp(state.dom);
-  const pages = studioDom.getPages(state.dom, app);
+  const app = studioDom.getApp(dom);
+  const pages = studioDom.getPages(dom, app);
 
   return (
     <div className={className}>

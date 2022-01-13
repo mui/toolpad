@@ -4,13 +4,19 @@ import SaveIcon from '@mui/icons-material/Save';
 import CodeIcon from '@mui/icons-material/Code';
 import { CircularProgress, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import StudioAppBar from '../StudioAppBar';
-import EditorProvider, { createEditorState, useEditorState } from './EditorProvider';
+import EditorProvider, {
+  ApiEditorState,
+  createEditorState,
+  PageEditorState,
+  useEditorState,
+} from './EditorProvider';
 import PageFileEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
 import renderPageCode from '../../renderPageCode';
 import useLatest from '../../utils/useLatest';
 import client from '../../api';
 import DomProvider, { useDom, useDomState } from '../DomProvider';
+import ApiFileEditor from './ApiFileEditor';
 
 const classes = {
   content: 'StudioContent',
@@ -54,15 +60,20 @@ function ToDoFileEditor({ className }: ToDoEditorProps) {
 
 interface FileEditorProps {
   className?: string;
-  type: 'page' | 'api' | null;
+  editor: PageEditorState | ApiEditorState | null;
 }
 
-function FileEditor({ type, className }: FileEditorProps) {
-  switch (type) {
+function FileEditor({ editor, className }: FileEditorProps) {
+  if (!editor) {
+    return <ToDoFileEditor className={className} />;
+  }
+  switch (editor.type) {
     case 'page':
-      return <PageFileEditor className={className} />;
+      return <PageFileEditor key={editor.nodeId} className={className} />;
+    case 'api':
+      return <ApiFileEditor key={editor.nodeId} className={className} />;
     default:
-      return <ToDoFileEditor className={className} />;
+      throw new Error(`Invariant: unrecognized file editor "${(editor as any).type}"`);
   }
 }
 
@@ -88,7 +99,7 @@ function EditorContent() {
       `);
       return;
     }
-    const { code } = renderPageCode(dom, state.pageEditor.nodeId, { pretty: true });
+    const { code } = renderPageCode(dom, state.editor.nodeId, { pretty: true });
     setViewedSource(code);
   }, [state, dom]);
 
@@ -121,7 +132,7 @@ function EditorContent() {
           ) : (
             <React.Fragment>
               <PagePanel className={classes.pagePanel} />
-              <FileEditor type={state.editorType} className={classes.renderPanel} />
+              <FileEditor editor={state.editor} className={classes.renderPanel} />
             </React.Fragment>
           )
         }

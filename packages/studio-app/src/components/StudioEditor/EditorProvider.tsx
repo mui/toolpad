@@ -11,6 +11,7 @@ export interface BindingEditorState {
 }
 
 export interface PageEditorState {
+  readonly type: 'page';
   readonly nodeId: NodeId;
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: studioDom.StudioNode | null;
@@ -21,12 +22,16 @@ export interface PageEditorState {
 }
 
 export interface ApiEditorState {
+  readonly type: 'api';
   readonly nodeId: NodeId;
 }
 
+type EditorType = 'page' | 'api';
+
 export interface BaseEditorState {
-  readonly editorType: 'page' | 'api' | null;
+  readonly editorType: EditorType | null;
   readonly selection: NodeId | null;
+  readonly editor: PageEditorState | ApiEditorState | null;
 }
 
 export interface BaseEditorInitial extends BaseEditorState {
@@ -35,19 +40,20 @@ export interface BaseEditorInitial extends BaseEditorState {
 
 export interface BaseEditorWithPageState extends BaseEditorState {
   readonly editorType: 'page';
-  readonly pageEditor: PageEditorState;
+  readonly editor: PageEditorState;
 }
 
 export interface BaseEditorWithApiState extends BaseEditorState {
   readonly editorType: 'api';
-  readonly apiEditor: ApiEditorState;
+  readonly editor: ApiEditorState;
 }
 
 export type EditorState = BaseEditorInitial | BaseEditorWithPageState | BaseEditorWithApiState;
 
 export type BaseAction =
   | {
-      type: 'OPEN_PAGE_EDITOR';
+      type: 'OPEN_EDITOR';
+      editorType: EditorType;
       nodeId: NodeId;
     }
   | {
@@ -91,6 +97,7 @@ export type EditorAction = BaseAction | PageEditorAction;
 
 export function createPageEditorState(nodeId: NodeId): PageEditorState {
   return {
+    type: 'page',
     nodeId,
     componentPanelTab: 'catalog',
     newNode: null,
@@ -101,10 +108,18 @@ export function createPageEditorState(nodeId: NodeId): PageEditorState {
   };
 }
 
+export function createApiEditorState(nodeId: NodeId): ApiEditorState {
+  return {
+    type: 'api',
+    nodeId,
+  };
+}
+
 export function createEditorState(): EditorState {
   return {
     selection: null,
     editorType: null,
+    editor: null,
   };
 }
 
@@ -157,12 +172,23 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
 
 export function baseEditorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
-    case 'OPEN_PAGE_EDITOR': {
-      return update(state, {
-        selection: null,
-        editorType: 'page',
-        pageEditor: createPageEditorState(action.nodeId),
-      });
+    case 'OPEN_EDITOR': {
+      switch (action.editorType) {
+        case 'page':
+          return update(state, {
+            selection: null,
+            editorType: 'page',
+            editor: createPageEditorState(action.nodeId),
+          });
+        case 'api':
+          return update(state, {
+            selection: null,
+            editorType: 'api',
+            editor: createApiEditorState(action.nodeId),
+          });
+        default:
+          throw new Error(`Invariant: unknown editor type "${action.editorType}"`);
+      }
     }
     case 'SELECT_NODE': {
       return update(state, {
@@ -184,7 +210,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
 
   if (state.editorType === 'page') {
     state = update(state, {
-      pageEditor: pageEditorReducer(state.pageEditor, action),
+      editor: pageEditorReducer(state.editor, action),
     });
   }
 
@@ -228,7 +254,9 @@ const EditorStateContext = React.createContext<EditorState | null>(null);
 function createApi(dispatch: React.Dispatch<EditorAction>) {
   return {
     pageEditor: createEditorApi(dispatch),
-    openPageEditor: (nodeId: NodeId) => dispatch({ type: 'OPEN_PAGE_EDITOR', nodeId }),
+    openPageEditor: (nodeId: NodeId) =>
+      dispatch({ type: 'OPEN_EDITOR', editorType: 'page', nodeId }),
+    openApiEditor: (nodeId: NodeId) => dispatch({ type: 'OPEN_EDITOR', editorType: 'api', nodeId }),
     select: (nodeId: NodeId | null) => dispatch({ type: 'SELECT_NODE', nodeId }),
     deselect: () => dispatch({ type: 'DESELECT_NODE' }),
   };
@@ -256,7 +284,7 @@ export function usePageEditorState(): PageEditorState {
   if (state.editorType !== 'page') {
     throw new Error(`PageEditorState state requested out of context`);
   }
-  return state.pageEditor;
+  return state.editor;
 }
 
 export function useEditorApi(): EditorApi {

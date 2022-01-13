@@ -28,27 +28,10 @@ export interface ApiEditorState {
 
 type EditorType = 'page' | 'api';
 
-export interface BaseEditorState {
-  readonly editorType: EditorType | null;
+export interface EditorState {
   readonly selection: NodeId | null;
   readonly editor: PageEditorState | ApiEditorState | null;
 }
-
-export interface BaseEditorInitial extends BaseEditorState {
-  readonly editorType: null;
-}
-
-export interface BaseEditorWithPageState extends BaseEditorState {
-  readonly editorType: 'page';
-  readonly editor: PageEditorState;
-}
-
-export interface BaseEditorWithApiState extends BaseEditorState {
-  readonly editorType: 'api';
-  readonly editor: ApiEditorState;
-}
-
-export type EditorState = BaseEditorInitial | BaseEditorWithPageState | BaseEditorWithApiState;
 
 export type BaseAction =
   | {
@@ -118,7 +101,6 @@ export function createApiEditorState(nodeId: NodeId): ApiEditorState {
 export function createEditorState(): EditorState {
   return {
     selection: null,
-    editorType: null,
     editor: null,
   };
 }
@@ -177,13 +159,11 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
         case 'page':
           return update(state, {
             selection: null,
-            editorType: 'page',
             editor: createPageEditorState(action.nodeId),
           });
         case 'api':
           return update(state, {
             selection: null,
-            editorType: 'api',
             editor: createApiEditorState(action.nodeId),
           });
         default:
@@ -208,7 +188,7 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
 export function editorReducer(state: EditorState, action: EditorAction): EditorState {
   state = baseEditorReducer(state, action);
 
-  if (state.editorType === 'page') {
+  if (state.editor?.type === 'page') {
     state = update(state, {
       editor: pageEditorReducer(state.editor, action),
     });
@@ -281,7 +261,7 @@ export function useEditorState(): EditorState {
 
 export function usePageEditorState(): PageEditorState {
   const state = useEditorState();
-  if (state.editorType !== 'page') {
+  if (state.editor?.type !== 'page') {
     throw new Error(`PageEditorState state requested out of context`);
   }
   return state.editor;

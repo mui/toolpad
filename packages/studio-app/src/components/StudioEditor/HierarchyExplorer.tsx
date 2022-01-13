@@ -277,7 +277,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
       if (studioDom.isElement(node)) {
         const page = studioDom.getElementPage(dom, node);
         if (page) {
-          if (state.editorType === 'page' && page.id === state.editor.nodeId) {
+          if (state.editor?.type === 'page' && page.id === state.editor.nodeId) {
             api.select(selectedNodeId);
           } else {
             node = page;
@@ -286,7 +286,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
       }
 
       if (studioDom.isPage(node)) {
-        if (state.editorType === 'page' && node.id === state.editor.nodeId) {
+        if (state.editor?.type === 'page' && node.id === state.editor.nodeId) {
           api.deselect();
           return;
         }
@@ -294,7 +294,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
       }
 
       if (studioDom.isApi(node)) {
-        if (state.editorType === 'api' && node.id === state.editor.nodeId) {
+        if (state.editor?.type === 'api' && node.id === state.editor.nodeId) {
           return;
         }
         api.openApiEditor(node.id);

@@ -93,7 +93,7 @@ function EditorContent() {
   }, [dom]);
 
   const handleViewSource = React.useCallback(() => {
-    if (state.editorType !== 'page') {
+    if (state.editor?.type !== 'page') {
       setViewedSource(`
       // not yet supported
       `);

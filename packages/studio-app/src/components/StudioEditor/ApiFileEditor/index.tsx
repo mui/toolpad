@@ -92,7 +92,7 @@ interface ApiFileEditorProps {
 
 export default function ApiFileEditor({ className }: ApiFileEditorProps) {
   const state = useEditorState();
-  if (state.editorType !== 'api') {
+  if (state.editor?.type !== 'api') {
     return null;
   }
   return (

@@ -16,7 +16,8 @@ import * as studioDom from '../../../studioDom';
 import { NodeId, StudioBoundProp, StudioNodeProp, StudioNodeProps } from '../../../types';
 import { ExactEntriesOf } from '../../../utils/types';
 import useLatest from '../../../utils/useLatest';
-import { useDom, useEditorApi, usePageEditorState } from '../EditorProvider';
+import { useDom, useDomApi } from '../../DomProvider';
+import { useEditorApi, usePageEditorState } from '../EditorProvider';
 
 export interface BindingEditorContentProps<K> {
   nodeId: NodeId;
@@ -33,7 +34,7 @@ export function AddBindingEditor<P, K extends keyof P & string>({
   prop: srcProp,
 }: BindingEditorTabProps<P, K>) {
   const dom = useDom();
-  const api = useEditorApi();
+  const domApi = useDomApi();
 
   const srcNodeId = srcNode.id;
   const srcDefinition = getStudioComponent(dom, srcNode.component);
@@ -80,7 +81,7 @@ export function AddBindingEditor<P, K extends keyof P & string>({
   const handleBind = React.useCallback(() => {
     if (typeof selectedIdx === 'number') {
       const selection = bindableProps[selectedIdx];
-      api.dom.addBinding(
+      domApi.addBinding(
         srcNodeId,
         srcProp,
         selection.nodeId,
@@ -88,7 +89,7 @@ export function AddBindingEditor<P, K extends keyof P & string>({
         srcPropDefinition.defaultValue,
       );
     }
-  }, [api, srcNodeId, srcProp, bindableProps, selectedIdx, srcPropDefinition]);
+  }, [domApi, srcNodeId, srcProp, bindableProps, selectedIdx, srcPropDefinition]);
 
   return (
     <React.Fragment>
@@ -129,14 +130,14 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
   propValue,
 }: RemoveBindingEditorProps<P, K>) {
   const dom = useDom();
-  const api = useEditorApi();
+  const domApi = useDomApi();
 
   const nodeId = node.id;
   const stateKey = propValue.state;
 
   const handleRemoveClick = React.useCallback(() => {
-    api.dom.removeBinding(nodeId, prop);
-  }, [api, nodeId, prop]);
+    domApi.removeBinding(nodeId, prop);
+  }, [domApi, nodeId, prop]);
 
   const boundProps = React.useMemo(() => {
     const page = studioDom.getElementPage(dom, node);

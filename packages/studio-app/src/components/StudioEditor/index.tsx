@@ -3,15 +3,15 @@ import * as React from 'react';
 import SaveIcon from '@mui/icons-material/Save';
 import CodeIcon from '@mui/icons-material/Code';
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import { createEditorState } from '../../editorState';
 import * as studioDom from '../../studioDom';
 import StudioAppBar from '../StudioAppBar';
-import EditorProvider, { useEditorState } from './EditorProvider';
+import EditorProvider, { createEditorState, useEditorState } from './EditorProvider';
 import PageFileEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
 import renderPageCode from '../../renderPageCode';
 import useLatest from '../../utils/useLatest';
 import client from '../../api';
+import DomProvider, { useDom } from '../DomProvider';
 
 const classes = {
   content: 'StudioContent',
@@ -69,16 +69,17 @@ function FileEditor({ type, className }: FileEditorProps) {
 
 function EditorContent() {
   const state = useEditorState();
+  const dom = useDom();
 
   const [viewedSource, setViewedSource] = React.useState<string | null>(null);
 
   const handleSave = React.useCallback(async () => {
     try {
-      await client.mutation.saveApp(state.dom);
+      await client.mutation.saveApp(dom);
     } catch (err: any) {
       alert(err.message);
     }
-  }, [state.dom]);
+  }, [dom]);
 
   const handleViewSource = React.useCallback(() => {
     if (state.editorType !== 'page') {
@@ -87,9 +88,9 @@ function EditorContent() {
       `);
       return;
     }
-    const { code } = renderPageCode(state.dom, state.pageEditor.nodeId, { pretty: true });
+    const { code } = renderPageCode(dom, state.pageEditor.nodeId, { pretty: true });
     setViewedSource(code);
-  }, [state]);
+  }, [state, dom]);
 
   const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
 
@@ -132,9 +133,11 @@ export default function Editor({ dom }: EditorProps) {
   const initialState = React.useMemo(() => createEditorState(dom), [dom]);
   return (
     <EditorRoot>
-      <EditorProvider initialState={initialState}>
-        <EditorContent />
-      </EditorProvider>
+      <DomProvider initialDom={dom}>
+        <EditorProvider initialState={initialState}>
+          <EditorContent />
+        </EditorProvider>
+      </DomProvider>
     </EditorRoot>
   );
 }

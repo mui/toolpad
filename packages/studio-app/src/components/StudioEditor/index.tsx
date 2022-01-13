@@ -2,16 +2,21 @@ import { styled } from '@mui/system';
 import * as React from 'react';
 import SaveIcon from '@mui/icons-material/Save';
 import CodeIcon from '@mui/icons-material/Code';
-import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import { createEditorState } from '../../editorState';
-import * as studioDom from '../../studioDom';
+import { CircularProgress, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import StudioAppBar from '../StudioAppBar';
-import EditorProvider, { useEditorState } from './EditorProvider';
+import EditorProvider, {
+  ApiEditorState,
+  createEditorState,
+  PageEditorState,
+  useEditorState,
+} from './EditorProvider';
 import PageFileEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
 import renderPageCode from '../../renderPageCode';
 import useLatest from '../../utils/useLatest';
 import client from '../../api';
+import DomProvider, { useDom, useDomState } from '../DomProvider';
+import ApiFileEditor from './ApiFileEditor';
 
 const classes = {
   content: 'StudioContent',
@@ -55,41 +60,48 @@ function ToDoFileEditor({ className }: ToDoEditorProps) {
 
 interface FileEditorProps {
   className?: string;
-  type: 'page' | 'api' | 'theme';
+  editor: PageEditorState | ApiEditorState | null;
 }
 
-function FileEditor({ type, className }: FileEditorProps) {
-  switch (type) {
+function FileEditor({ editor, className }: FileEditorProps) {
+  if (!editor) {
+    return <ToDoFileEditor className={className} />;
+  }
+  switch (editor.type) {
     case 'page':
-      return <PageFileEditor className={className} />;
+      return <PageFileEditor key={editor.nodeId} className={className} />;
+    case 'api':
+      return <ApiFileEditor key={editor.nodeId} className={className} />;
     default:
-      return <ToDoFileEditor className={className} />;
+      throw new Error(`Invariant: unrecognized file editor "${(editor as any).type}"`);
   }
 }
 
 function EditorContent() {
   const state = useEditorState();
+  const domState = useDomState();
+  const dom = useDom();
 
   const [viewedSource, setViewedSource] = React.useState<string | null>(null);
 
   const handleSave = React.useCallback(async () => {
     try {
-      await client.mutation.saveApp(state.dom);
+      await client.mutation.saveApp(dom);
     } catch (err: any) {
       alert(err.message);
     }
-  }, [state.dom]);
+  }, [dom]);
 
   const handleViewSource = React.useCallback(() => {
-    if (state.editorType !== 'page') {
+    if (state.editor?.type !== 'page') {
       setViewedSource(`
       // not yet supported
       `);
       return;
     }
-    const { code } = renderPageCode(state.dom, state.pageNodeId, { pretty: true });
+    const { code } = renderPageCode(dom, state.editor.nodeId, { pretty: true });
     setViewedSource(code);
-  }, [state]);
+  }, [state, dom]);
 
   const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
 
@@ -111,8 +123,19 @@ function EditorContent() {
         }
       />
       <div className={classes.content}>
-        <PagePanel className={classes.pagePanel} />
-        <FileEditor type={state.editorType} className={classes.renderPanel} />
+        {
+          // eslint-disable-next-line no-nested-ternary
+          domState.loading ? (
+            <CircularProgress />
+          ) : domState.error ? (
+            domState.error
+          ) : (
+            <React.Fragment>
+              <PagePanel className={classes.pagePanel} />
+              <FileEditor editor={state.editor} className={classes.renderPanel} />
+            </React.Fragment>
+          )
+        }
       </div>
       <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>
         <DialogTitle>View Source</DialogTitle>
@@ -123,18 +146,15 @@ function EditorContent() {
     </React.Fragment>
   );
 }
-
-interface EditorProps {
-  dom: studioDom.StudioDom;
-}
-
-export default function Editor({ dom }: EditorProps) {
-  const initialState = React.useMemo(() => createEditorState(dom), [dom]);
+export default function Editor() {
+  const initialState = React.useMemo(() => createEditorState(), []);
   return (
-    <EditorRoot>
-      <EditorProvider initialState={initialState}>
-        <EditorContent />
-      </EditorProvider>
-    </EditorRoot>
+    <DomProvider>
+      <EditorRoot>
+        <EditorProvider initialState={initialState}>
+          <EditorContent />
+        </EditorProvider>
+      </EditorRoot>
+    </DomProvider>
   );
 }

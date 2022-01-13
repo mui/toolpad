@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { FormControl, InputLabel, Select, MenuItem, Stack, Button } from '@mui/material';
-import { useEditorApi, usePageEditorState } from '../EditorProvider';
 import * as studioDom from '../../../studioDom';
 import { WithControlledProp } from '../../../utils/types';
+import { useDom, useDomApi } from '../../DomProvider';
 
 const THEME_COLORS = [
   'red',
@@ -53,11 +53,16 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom } = usePageEditorState();
-  const api = useEditorApi();
+  const dom = useDom();
+  const domApi = useDomApi();
 
   const app = studioDom.getApp(dom);
   const theme = studioDom.getTheme(dom, app);
+
+  const handleAddThemeClick = () => {
+    const newTheme = studioDom.createNode(dom, 'theme', { name: 'Theme', props: {} });
+    domApi.addNode(newTheme, app.id, 'children');
+  };
 
   return (
     <div className={className}>
@@ -65,21 +70,29 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
         <Stack spacing={2}>
           <PaletteColorPicker
             name="primary"
-            value={studioDom.getPropConstValue(theme, 'palette.primary.main') || ''}
+            value={studioDom.getConstPropValue(theme, 'palette.primary.main') || ''}
             onChange={(newValue) =>
-              api.setNodeConstPropValue(theme, 'palette.primary.main', newValue)
+              domApi.setNodeConstPropValue<studioDom.StudioTheme>(
+                theme,
+                'palette.primary.main',
+                newValue,
+              )
             }
           />
           <PaletteColorPicker
             name="secondary"
-            value={studioDom.getPropConstValue(theme, 'palette.secondary.main') || ''}
+            value={studioDom.getConstPropValue(theme, 'palette.secondary.main') || ''}
             onChange={(newValue) =>
-              api.setNodeConstPropValue(theme, 'palette.secondary.main', newValue)
+              domApi.setNodeConstPropValue<studioDom.StudioTheme>(
+                theme,
+                'palette.secondary.main',
+                newValue,
+              )
             }
           />
         </Stack>
       ) : (
-        <Button onClick={() => api.addTheme()}>Add theme</Button>
+        <Button onClick={handleAddThemeClick}>Add theme</Button>
       )}
     </div>
   );

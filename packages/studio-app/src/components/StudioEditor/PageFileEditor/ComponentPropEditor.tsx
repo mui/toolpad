@@ -6,6 +6,7 @@ import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-co
 import studioPropControls from '../../propertyControls';
 import { useEditorApi } from '../EditorProvider';
 import * as studioDom from '../../../studioDom';
+import { useDomApi } from '../../DomProvider';
 
 function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
   switch (typeDef.type) {
@@ -40,14 +41,15 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
   actualValue,
 }: ComponentPropEditorProps<P, K>) {
   const api = useEditorApi();
+  const domApi = useDomApi();
 
   const handleChange = React.useCallback(
-    (value: any) => api.setNodeConstPropValue(node, name, value),
-    [api, node, name],
+    (value: any) => domApi.setNodeConstPropValue<P>(node, name, value),
+    [domApi, node, name],
   );
 
   const handleClickBind = React.useCallback(
-    () => api.openBindingEditor(node.id, name),
+    () => api.pageEditor.openBindingEditor(node.id, name),
     [api, node.id, name],
   );
 

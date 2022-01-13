@@ -19,11 +19,11 @@ import {
   Rectangle,
   rectContainsPoint,
 } from '../../../utils/geometry';
-import { PageEditorState } from '../../../editorState';
 import { PinholeOverlay } from '../../../PinholeOverlay';
-import { useEditorApi, usePageEditorState } from '../EditorProvider';
+import { useEditorApi, useEditorState, usePageEditorState } from '../EditorProvider';
 import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
+import { useDom, useDomApi } from '../../DomProvider';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -162,22 +162,6 @@ function findNodeAt(
     }
   }
   return null;
-}
-
-/**
- * Return all nodes that are available for insertion.
- * i.e. Exclude all descendants of the current selection since inserting in one of
- * them would create a cyclic structure.
- */
-function getAvailableNodes(
-  nodes: readonly PageOrElementNode[],
-  state: PageEditorState,
-): readonly PageOrElementNode[] {
-  const selection = state.selection && studioDom.getNode(state.dom, state.selection);
-  const excludedNodes = new Set<studioDom.StudioNode>(
-    selection ? [selection, ...studioDom.getDescendants(state.dom, selection)] : [],
-  );
-  return nodes.filter((node) => !excludedNodes.has(node));
 }
 
 /**
@@ -450,13 +434,15 @@ export interface RenderPanelProps {
 }
 
 export default function RenderPanel({ className }: RenderPanelProps) {
+  const dom = useDom();
+  const domApi = useDomApi();
   const state = usePageEditorState();
   const api = useEditorApi();
 
   const viewRef = React.useRef<PageViewHandle>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
-
-  const { viewState, dom, pageNodeId, highlightedSlot, selection } = state;
+  const { selection } = useEditorState();
+  const { viewState, nodeId: pageNodeId, highlightedSlot } = state;
 
   const [isFocused, setIsFocused] = React.useState(false);
 
@@ -467,7 +453,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return [pageNode, ...studioDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
-  const selectedNode = selection && studioDom.getNode(state.dom, selection);
+  const selectedNode = selection && studioDom.getNode(dom, selection);
   if (selectedNode) {
     studioDom.assertIsElement(selectedNode);
   }
@@ -480,15 +466,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return result;
   }, [pageNodes, dom, viewState]);
 
-  const availableNodes = React.useMemo(
-    () => getAvailableNodes(pageNodes, state),
-    [pageNodes, state],
-  );
+  const availableNodes = React.useMemo(() => {
+    /**
+     * Return all nodes that are available for insertion.
+     * i.e. Exclude all descendants of the current selection since inserting in one of
+     * them would create a cyclic structure.
+     */
+    const excludedNodes = new Set<studioDom.StudioNode>(
+      selectedNode ? [selectedNode, ...studioDom.getDescendants(dom, selectedNode)] : [],
+    );
+    return pageNodes.filter((node) => !excludedNodes.has(node));
+  }, [dom, pageNodes, selectedNode]);
 
   const handleRender = React.useCallback(() => {
     const rootElm = viewRef.current?.getRootElm();
     if (rootElm) {
-      api.pageViewStateUpdate(getViewState(rootElm));
+      api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
     }
   }, [api]);
 
@@ -520,7 +513,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const nodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
 
       if (nodeId) {
-        api.nodeDragStart(nodeId);
+        api.select(nodeId);
       }
     },
     [api, getViewCoordinates, pageNodes, viewState],
@@ -531,7 +524,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
-        api.addComponentDragOver(null);
+        api.pageEditor.nodeDragOver(null);
         return;
       }
 
@@ -547,9 +540,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       event.preventDefault();
       if (activeSlot) {
-        api.addComponentDragOver(activeSlot);
+        api.pageEditor.nodeDragOver(activeSlot);
       } else {
-        api.addComponentDragOver(null);
+        api.pageEditor.nodeDragOver(null);
       }
     };
 
@@ -560,7 +553,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const slotIndex = findActiveSlotAt(
+      const activeSlot = findActiveSlotAt(
         availableNodes,
         viewState,
         slots,
@@ -568,18 +561,30 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         cursorPos.y,
       );
 
-      const activeSlot = slotIndex;
-
       if (activeSlot) {
-        api.addComponentDrop(activeSlot);
-      } else {
-        api.addComponentDrop(null);
+        if (state.newNode) {
+          domApi.addNode(
+            state.newNode,
+            activeSlot.parentId,
+            activeSlot.parentProp,
+            activeSlot.parentIndex,
+          );
+        } else if (selection) {
+          domApi.moveNode(
+            selection,
+            activeSlot.parentId,
+            activeSlot.parentProp,
+            activeSlot.parentIndex,
+          );
+        }
       }
+
+      api.pageEditor.nodeDragEnd();
     };
 
     const handleDragEnd = (event: DragEvent) => {
       event.preventDefault();
-      api.addComponentDragEnd();
+      api.pageEditor.nodeDragEnd();
     };
 
     window.addEventListener('dragover', handleDragOver);
@@ -590,7 +595,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       window.removeEventListener('drop', handleDrop);
       window.removeEventListener('dragend', handleDragEnd);
     };
-  }, [availableNodes, getViewCoordinates, viewState, api, slots]);
+  }, [availableNodes, getViewCoordinates, viewState, domApi, api, slots, state.newNode, selection]);
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -608,15 +613,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isFocused && event.key === 'Backspace') {
-        api.selectionRemove();
+      if (isFocused && selection && event.key === 'Backspace') {
+        domApi.removeNode(selection);
+        api.deselect();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [api, isFocused]);
+  }, [domApi, api, isFocused, selection]);
 
   const selectedRect = selectedNode ? viewState[selectedNode.id]?.rect : null;
 
@@ -648,8 +654,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         <PageView
           className={classes.view}
           ref={viewRef}
-          dom={state.dom}
-          pageNodeId={state.pageNodeId}
+          dom={dom}
+          pageNodeId={state.nodeId}
           onUpdate={handleRender}
         />
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}

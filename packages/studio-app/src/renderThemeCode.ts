@@ -25,16 +25,16 @@ export default function renderThemeCode(
 
   const app = studioDom.getApp(dom);
   const theme = studioDom.getTheme(dom, app);
-  console.log(theme);
+
   if (theme) {
     const importedColors = new Set();
     const paletteProps: [string, string][] = [];
-    const primary = studioDom.getPropConstValue(theme, 'palette.primary.main');
+    const primary = studioDom.getConstPropValue(theme, 'palette.primary.main');
     if (primary) {
       importedColors.add(primary);
       paletteProps.push(['primary', `{ main: ${primary}[500] }`]);
     }
-    const secondary = studioDom.getPropConstValue(theme, 'palette.secondary.main');
+    const secondary = studioDom.getConstPropValue(theme, 'palette.secondary.main');
     if (secondary) {
       importedColors.add(secondary);
       paletteProps.push(['secondary', `{ main: ${secondary}[500] }`]);

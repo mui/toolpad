@@ -20,7 +20,7 @@ import {
   rectContainsPoint,
 } from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
-import { useDom, useEditorApi, useEditorState, usePageEditorState } from '../EditorProvider';
+import { useDom, useEditorApi, useEditorState, usePageEditorState } from '../../StoreProvider';
 import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
 

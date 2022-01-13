@@ -25,7 +25,7 @@ export default function renderThemeCode(
 
   const app = studioDom.getApp(dom);
   const theme = studioDom.getTheme(dom, app);
-  console.log(theme);
+
   if (theme) {
     const importedColors = new Set();
     const paletteProps: [string, string][] = [];

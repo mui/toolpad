@@ -606,7 +606,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       const newSelectedNodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
-      console.log('clicky', newSelectedNodeId);
       api.select(newSelectedNodeId);
     },
     [api, getViewCoordinates, pageNodes, viewState],

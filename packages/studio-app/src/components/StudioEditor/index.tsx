@@ -3,7 +3,6 @@ import * as React from 'react';
 import SaveIcon from '@mui/icons-material/Save';
 import CodeIcon from '@mui/icons-material/Code';
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import * as studioDom from '../../studioDom';
 import StudioAppBar from '../StudioAppBar';
 import EditorProvider, { createEditorState, useEditorState } from './EditorProvider';
 import PageFileEditor from './PageFileEditor';
@@ -55,7 +54,7 @@ function ToDoFileEditor({ className }: ToDoEditorProps) {
 
 interface FileEditorProps {
   className?: string;
-  type: 'page' | 'api' | 'theme';
+  type: 'page' | 'api' | null;
 }
 
 function FileEditor({ type, className }: FileEditorProps) {
@@ -124,20 +123,15 @@ function EditorContent() {
     </React.Fragment>
   );
 }
-
-interface EditorProps {
-  dom: studioDom.StudioDom;
-}
-
-export default function Editor({ dom }: EditorProps) {
-  const initialState = React.useMemo(() => createEditorState(dom), [dom]);
+export default function Editor() {
+  const initialState = React.useMemo(() => createEditorState(), []);
   return (
-    <EditorRoot>
-      <DomProvider initialDom={dom}>
+    <DomProvider>
+      <EditorRoot>
         <EditorProvider initialState={initialState}>
           <EditorContent />
         </EditorProvider>
-      </DomProvider>
-    </EditorRoot>
+      </EditorRoot>
+    </DomProvider>
   );
 }

@@ -3,8 +3,20 @@ import * as studioDom from '../studioDom';
 import { NodeId, StudioNodeProp, StudioNodeProps } from '../types';
 import { update, omit } from '../utils/immutability';
 import { generateUniqueId } from '../utils/randomId';
+import client from '../api';
 
 export type DomAction =
+  | {
+      type: 'DOM_LOADING';
+    }
+  | {
+      type: 'DOM_LOADED';
+      dom: studioDom.StudioDom;
+    }
+  | {
+      type: 'DOM_LOADING_ERROR';
+      error: string;
+    }
   | {
       type: 'DOM_SET_NODE_NAME';
       nodeId: NodeId;
@@ -48,50 +60,79 @@ export type DomAction =
       nodeId: NodeId;
     };
 
-export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioDom.StudioDom {
+export function domReducer(state: DomState, action: DomAction): DomState {
   switch (action.type) {
+    case 'DOM_LOADING': {
+      return update(state, {
+        loading: true,
+        error: null,
+      });
+    }
+    case 'DOM_LOADED': {
+      return update(state, {
+        loading: false,
+        error: null,
+        dom: action.dom,
+      });
+    }
+    case 'DOM_LOADING_ERROR': {
+      return update(state, {
+        loading: false,
+        error: action.error,
+      });
+    }
     case 'DOM_SET_NODE_NAME': {
-      const node = studioDom.getNode(dom, action.nodeId);
-      return studioDom.setNodeName(dom, node, action.name);
+      const node = studioDom.getNode(state.dom, action.nodeId);
+      return update(state, {
+        dom: studioDom.setNodeName(state.dom, node, action.name),
+      });
     }
     case 'DOM_SET_NODE_PROP': {
-      const node = studioDom.getNode(dom, action.nodeId);
-      return studioDom.setNodeProp<any, any>(dom, node, action.prop, action.value);
+      const node = studioDom.getNode(state.dom, action.nodeId);
+      return update(state, {
+        dom: studioDom.setNodeProp<any, any>(state.dom, node, action.prop, action.value),
+      });
     }
     case 'DOM_ADD_NODE': {
-      return studioDom.addNode(
-        dom,
-        action.node,
-        action.parentId,
-        action.parentProp,
-        action.parentIndex,
-      );
+      return update(state, {
+        dom: studioDom.addNode(
+          state.dom,
+          action.node,
+          action.parentId,
+          action.parentProp,
+          action.parentIndex,
+        ),
+      });
     }
     case 'DOM_MOVE_NODE': {
-      return studioDom.moveNode(
-        dom,
-        action.nodeId,
-        action.parentId,
-        action.parentProp,
-        action.parentIndex,
-      );
+      return update(state, {
+        dom: studioDom.moveNode(
+          state.dom,
+          action.nodeId,
+          action.parentId,
+          action.parentProp,
+          action.parentIndex,
+        ),
+      });
     }
     case 'DOM_REMOVE_NODE': {
       // TODO: also clean up orphaned state and bindings
-      return studioDom.removeNode(dom, action.nodeId);
+      return update(state, {
+        dom: studioDom.removeNode(state.dom, action.nodeId),
+      });
     }
     case 'DOM_ADD_BINDING': {
       const { srcNodeId, srcProp, destNodeId, destProp, initialValue } = action;
-      const srcNode = studioDom.getNode(dom, srcNodeId);
+      const srcNode = studioDom.getNode(state.dom, srcNodeId);
       studioDom.assertIsElement<Record<string, unknown>>(srcNode);
-      const destNode = studioDom.getNode(dom, destNodeId);
+      const destNode = studioDom.getNode(state.dom, destNodeId);
       studioDom.assertIsElement(destNode);
       const destPropValue = (destNode.props as StudioNodeProps<Record<string, unknown>>)[destProp];
       let stateKey = destPropValue?.type === 'binding' ? destPropValue.state : null;
 
-      const page = studioDom.getElementPage(dom, srcNode);
+      const page = studioDom.getElementPage(state.dom, srcNode);
       if (!page) {
-        return dom;
+        return state;
       }
 
       let pageState = page.state;
@@ -102,19 +143,21 @@ export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioD
         });
       }
 
-      return update(dom, {
-        nodes: update(dom.nodes, {
-          [page.id]: update(page, {
-            state: pageState,
-          }),
-          [srcNodeId]: update(srcNode, {
-            props: update(srcNode.props, {
-              [srcProp]: { type: 'binding', state: stateKey },
+      return update(state, {
+        dom: update(state.dom, {
+          nodes: update(state.dom.nodes, {
+            [page.id]: update(page, {
+              state: pageState,
             }),
-          }),
-          [destNodeId]: update(destNode, {
-            props: update(destNode.props, {
-              [destProp]: { type: 'binding', state: stateKey },
+            [srcNodeId]: update(srcNode, {
+              props: update(srcNode.props, {
+                [srcProp]: { type: 'binding', state: stateKey },
+              }),
+            }),
+            [destNodeId]: update(destNode, {
+              props: update(destNode.props, {
+                [destProp]: { type: 'binding', state: stateKey },
+              }),
             }),
           }),
         }),
@@ -123,20 +166,22 @@ export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioD
     case 'DOM_REMOVE_BINDING': {
       const { nodeId, prop } = action;
 
-      const node = studioDom.getNode(dom, nodeId);
+      const node = studioDom.getNode(state.dom, nodeId);
       studioDom.assertIsElement(node);
 
       // TODO: also clean up orphaned state and bindings
-      return update(dom, {
-        nodes: update(dom.nodes, {
-          [nodeId]: update(node, {
-            props: omit(node.props, prop),
+      return update(state, {
+        dom: update(state.dom, {
+          nodes: update(state.dom.nodes, {
+            [nodeId]: update(node, {
+              props: omit(node.props, prop),
+            }),
           }),
         }),
       });
     }
     default:
-      return dom;
+      return state;
   }
 }
 
@@ -212,14 +257,25 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
   };
 }
 
-const DomStateContext = React.createContext<studioDom.StudioDom>(studioDom.createDom());
+interface DomState {
+  dom: studioDom.StudioDom;
+  loading: boolean;
+  error: string | null;
+}
+
+const DomStateContext = React.createContext<DomState>({
+  loading: false,
+  error: null,
+  dom: studioDom.createDom(),
+});
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
 
 export type DomApi = ReturnType<typeof createDomApi>;
 
 export function useDom(): studioDom.StudioDom {
-  return React.useContext(DomStateContext);
+  const { dom } = React.useContext(DomStateContext);
+  return dom;
 }
 
 export function useDomApi(): DomApi {
@@ -227,13 +283,28 @@ export function useDomApi(): DomApi {
 }
 
 export interface DomContextProps {
-  initialDom: studioDom.StudioDom;
   children?: React.ReactNode;
 }
 
-export default function DomProvider({ initialDom, children }: DomContextProps) {
-  const [state, dispatch] = React.useReducer(domReducer, initialDom);
+export default function DomProvider({ children }: DomContextProps) {
+  const [state, dispatch] = React.useReducer(domReducer, {
+    loading: false,
+    error: null,
+    dom: studioDom.createDom(),
+  });
   const api = React.useMemo(() => createDomApi(dispatch), []);
+
+  React.useEffect(() => {
+    dispatch({ type: 'DOM_LOADING' });
+    client.query
+      .loadApp()
+      .then((dom) => {
+        dispatch({ type: 'DOM_LOADED', dom });
+      })
+      .catch((err) => {
+        dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
+      });
+  }, []);
 
   return (
     <DomStateContext.Provider value={state}>

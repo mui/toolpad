@@ -25,8 +25,12 @@ export interface ApiEditorState {
 }
 
 export interface BaseEditorState {
-  readonly editorType: 'page' | 'api';
+  readonly editorType: 'page' | 'api' | null;
   readonly selection: NodeId | null;
+}
+
+export interface BaseEditorInitial extends BaseEditorState {
+  readonly editorType: null;
 }
 
 export interface BaseEditorWithPageState extends BaseEditorState {
@@ -39,7 +43,7 @@ export interface BaseEditorWithApiState extends BaseEditorState {
   readonly apiEditor: ApiEditorState;
 }
 
-export type EditorState = BaseEditorWithPageState | BaseEditorWithApiState;
+export type EditorState = BaseEditorInitial | BaseEditorWithPageState | BaseEditorWithApiState;
 
 export type BaseAction =
   | {
@@ -97,12 +101,10 @@ export function createPageEditorState(nodeId: NodeId): PageEditorState {
   };
 }
 
-export function createEditorState(dom: studioDom.StudioDom): EditorState {
-  const pageNode = studioDom.getPages(dom, studioDom.getApp(dom))[0];
+export function createEditorState(): EditorState {
   return {
     selection: null,
-    editorType: 'page',
-    pageEditor: createPageEditorState(pageNode.id),
+    editorType: null,
   };
 }
 
@@ -158,6 +160,7 @@ export function baseEditorReducer(state: EditorState, action: EditorAction): Edi
     case 'OPEN_PAGE_EDITOR': {
       return update(state, {
         selection: null,
+        editorType: 'page',
         pageEditor: createPageEditorState(action.nodeId),
       });
     }

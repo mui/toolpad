@@ -3,10 +3,9 @@ import { List, ListItem } from '@mui/material';
 import { ComponentDefinition, ArgTypeDefinitions } from '@mui/studio-core';
 import { DEFAULT_COMPONENTS, getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
-import { useEditorApi } from '../EditorProvider';
+import { useDom, useEditorApi } from '../EditorProvider';
 import { StudioNodeProps } from '../../../types';
 import { ExactEntriesOf } from '../../../utils/types';
-import { useDom } from '../../DomProvider';
 
 function getDefaultPropValues<P = {}>(
   definition: ComponentDefinition<P>,

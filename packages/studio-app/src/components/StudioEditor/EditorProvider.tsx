@@ -1,191 +1,84 @@
 import * as React from 'react';
+import {
+  ComponentPanelTab,
+  EditorAction,
+  editorReducer,
+  EditorState,
+  PageEditorState,
+} from '../../editorState';
 import * as studioDom from '../../studioDom';
 import { NodeId, SlotLocation, ViewState } from '../../types';
-import { update, updateOrCreate } from '../../utils/immutability';
 
-export type ComponentPanelTab = 'catalog' | 'component' | 'theme';
-
-export interface BindingEditorState {
-  readonly nodeId: NodeId;
-  readonly prop: string;
-}
-
-export interface PageEditorState {
-  readonly nodeId: NodeId;
-  readonly componentPanelTab: ComponentPanelTab;
-  readonly newNode: studioDom.StudioNode | null;
-  readonly bindingEditor: BindingEditorState | null;
-  readonly highlightLayout: boolean;
-  readonly highlightedSlot: SlotLocation | null;
-  readonly viewState: ViewState;
-}
-
-export interface ApiEditorState {
-  readonly nodeId: NodeId;
-}
-
-export interface BaseEditorState {
-  readonly editorType: 'page' | 'api';
-  readonly selection: NodeId | null;
-}
-
-export interface BaseEditorWithPageState extends BaseEditorState {
-  readonly editorType: 'page';
-  readonly pageEditor: PageEditorState;
-}
-
-export interface BaseEditorWithApiState extends BaseEditorState {
-  readonly editorType: 'api';
-  readonly apiEditor: ApiEditorState;
-}
-
-export type EditorState = BaseEditorWithPageState | BaseEditorWithApiState;
-
-export type BaseAction =
-  | {
-      type: 'OPEN_PAGE_EDITOR';
-      nodeId: NodeId;
-    }
-  | {
-      type: 'SELECT_NODE';
-      nodeId: NodeId | null;
-    }
-  | {
-      type: 'DESELECT_NODE';
-    };
-
-export type PageEditorAction =
-  | {
-      type: 'PAGE_SET_COMPONENT_PANEL_TAB';
-      tab: ComponentPanelTab;
-    }
-  | {
-      type: 'PAGE_NEW_NODE_DRAG_START';
-      newNode: studioDom.StudioNode;
-    }
-  | {
-      type: 'PAGE_NODE_DRAG_OVER';
-      slot: SlotLocation | null;
-    }
-  | {
-      type: 'PAGE_NODE_DRAG_END';
-    }
-  | {
-      type: 'PAGE_OPEN_BINDING_EDITOR';
-      nodeId: NodeId;
-      prop: string;
-    }
-  | {
-      type: 'PAGE_CLOSE_BINDING_EDITOR';
-    }
-  | {
-      type: 'PAGE_VIEW_STATE_UPDATE';
-      viewState: ViewState;
-    };
-
-export type EditorAction = BaseAction | PageEditorAction;
-
-export function createPageEditorState(nodeId: NodeId): PageEditorState {
+function createDomApi(dispatch: React.Dispatch<EditorAction>) {
   return {
-    nodeId,
-    componentPanelTab: 'catalog',
-    newNode: null,
-    bindingEditor: null,
-    highlightLayout: false,
-    highlightedSlot: null,
-    viewState: {},
+    setNodeName(nodeId: NodeId, name: string) {
+      dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
+    },
+    addNode(
+      node: studioDom.StudioNode,
+      parentId: NodeId,
+      parentProp: string,
+      parentIndex?: string,
+    ) {
+      dispatch({
+        type: 'DOM_ADD_NODE',
+        node,
+        parentId,
+        parentProp,
+        parentIndex,
+      });
+    },
+    moveNode(nodeId: NodeId, parentId: NodeId, parentProp: string, parentIndex: string) {
+      dispatch({
+        type: 'DOM_MOVE_NODE',
+        nodeId,
+        parentId,
+        parentProp,
+        parentIndex,
+      });
+    },
+    removeNode(nodeId: NodeId) {
+      dispatch({
+        type: 'DOM_REMOVE_NODE',
+        nodeId,
+      });
+    },
+    setNodeConstPropValue<P, K extends keyof P & string = keyof P & string>(
+      node: studioDom.StudioNode,
+      prop: K,
+      value: P[K],
+    ) {
+      dispatch({
+        type: 'DOM_SET_NODE_PROP',
+        nodeId: node.id,
+        prop,
+        value: { type: 'const', value },
+      });
+    },
+    addBinding(
+      srcNodeId: NodeId,
+      srcProp: string,
+      destNodeId: NodeId,
+      destProp: string,
+      initialValue: any,
+    ) {
+      dispatch({
+        type: 'DOM_ADD_BINDING',
+        srcNodeId,
+        srcProp,
+        destNodeId,
+        destProp,
+        initialValue,
+      });
+    },
+    removeBinding(nodeId: NodeId, prop: string) {
+      dispatch({
+        type: 'DOM_REMOVE_BINDING',
+        nodeId,
+        prop,
+      });
+    },
   };
-}
-
-export function createEditorState(dom: studioDom.StudioDom): EditorState {
-  const pageNode = studioDom.getPages(dom, studioDom.getApp(dom))[0];
-  return {
-    selection: null,
-    editorType: 'page',
-    pageEditor: createPageEditorState(pageNode.id),
-  };
-}
-
-export function pageEditorReducer(state: PageEditorState, action: EditorAction): PageEditorState {
-  switch (action.type) {
-    case 'PAGE_SET_COMPONENT_PANEL_TAB':
-      return update(state, {
-        componentPanelTab: action.tab,
-      });
-    case 'PAGE_NEW_NODE_DRAG_START': {
-      if (state.newNode) {
-        return state;
-      }
-      return update(state, {
-        newNode: action.newNode,
-      });
-    }
-    case 'PAGE_NODE_DRAG_END':
-      return update(state, {
-        newNode: null,
-        highlightLayout: false,
-        highlightedSlot: null,
-      });
-    case 'PAGE_NODE_DRAG_OVER': {
-      return update(state, {
-        highlightLayout: true,
-        highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,
-      });
-    }
-    case 'PAGE_OPEN_BINDING_EDITOR': {
-      return update(state, {
-        bindingEditor: action,
-      });
-    }
-    case 'PAGE_CLOSE_BINDING_EDITOR': {
-      return update(state, {
-        bindingEditor: null,
-      });
-    }
-    case 'PAGE_VIEW_STATE_UPDATE': {
-      const { viewState } = action;
-      return update(state, {
-        viewState,
-      });
-    }
-    default:
-      return state;
-  }
-}
-
-export function baseEditorReducer(state: EditorState, action: EditorAction): EditorState {
-  switch (action.type) {
-    case 'OPEN_PAGE_EDITOR': {
-      return update(state, {
-        selection: null,
-        pageEditor: createPageEditorState(action.nodeId),
-      });
-    }
-    case 'SELECT_NODE': {
-      return update(state, {
-        selection: action.nodeId,
-      });
-    }
-    case 'DESELECT_NODE': {
-      return update(state, {
-        selection: null,
-      });
-    }
-    default:
-      return state;
-  }
-}
-
-export function editorReducer(state: EditorState, action: EditorAction): EditorState {
-  state = baseEditorReducer(state, action);
-
-  if (state.editorType === 'page') {
-    state = update(state, {
-      pageEditor: pageEditorReducer(state.pageEditor, action),
-    });
-  }
-
-  return state;
 }
 
 function createEditorApi(dispatch: React.Dispatch<EditorAction>) {
@@ -224,8 +117,8 @@ const EditorStateContext = React.createContext<EditorState | null>(null);
 
 function createApi(dispatch: React.Dispatch<EditorAction>) {
   return {
+    dom: createDomApi(dispatch),
     pageEditor: createEditorApi(dispatch),
-    openPageEditor: (nodeId: NodeId) => dispatch({ type: 'OPEN_PAGE_EDITOR', nodeId }),
     select: (nodeId: NodeId | null) => dispatch({ type: 'SELECT_NODE', nodeId }),
     deselect: () => dispatch({ type: 'DESELECT_NODE' }),
   };
@@ -254,6 +147,11 @@ export function usePageEditorState(): PageEditorState {
     throw new Error(`PageEditorState state requested out of context`);
   }
   return state.pageEditor;
+}
+
+export function useDom(): studioDom.StudioDom {
+  const { dom } = useEditorState();
+  return dom;
 }
 
 export function useEditorApi(): EditorApi {

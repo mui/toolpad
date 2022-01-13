@@ -20,10 +20,9 @@ import {
   rectContainsPoint,
 } from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
-import { useEditorApi, useEditorState, usePageEditorState } from '../EditorProvider';
+import { useDom, useEditorApi, useEditorState, usePageEditorState } from '../EditorProvider';
 import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
-import { useDom, useDomApi } from '../../DomProvider';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -435,7 +434,6 @@ export interface RenderPanelProps {
 
 export default function RenderPanel({ className }: RenderPanelProps) {
   const dom = useDom();
-  const domApi = useDomApi();
   const state = usePageEditorState();
   const api = useEditorApi();
 
@@ -563,14 +561,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       if (activeSlot) {
         if (state.newNode) {
-          domApi.addNode(
+          api.dom.addNode(
             state.newNode,
             activeSlot.parentId,
             activeSlot.parentProp,
             activeSlot.parentIndex,
           );
         } else if (selection) {
-          domApi.moveNode(
+          api.dom.moveNode(
             selection,
             activeSlot.parentId,
             activeSlot.parentProp,
@@ -595,7 +593,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       window.removeEventListener('drop', handleDrop);
       window.removeEventListener('dragend', handleDragEnd);
     };
-  }, [availableNodes, getViewCoordinates, viewState, domApi, api, slots, state.newNode, selection]);
+  }, [availableNodes, getViewCoordinates, viewState, api, slots, state.newNode, selection]);
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -615,7 +613,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (isFocused && selection && event.key === 'Backspace') {
-        domApi.removeNode(selection);
+        api.dom.removeNode(selection);
         api.deselect();
       }
     };
@@ -623,7 +621,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [domApi, api, isFocused, selection]);
+  }, [api, isFocused, selection]);
 
   const selectedRect = selectedNode ? viewState[selectedNode.id]?.rect : null;
 

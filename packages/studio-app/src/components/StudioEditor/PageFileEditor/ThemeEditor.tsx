@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { FormControl, InputLabel, Select, MenuItem, Stack, Button } from '@mui/material';
+import { useDom, useEditorApi } from '../EditorProvider';
 import * as studioDom from '../../../studioDom';
 import { WithControlledProp } from '../../../utils/types';
-import { useDom, useDomApi } from '../../DomProvider';
 
 const THEME_COLORS = [
   'red',
@@ -54,14 +54,14 @@ export interface ComponentEditorProps {
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
   const dom = useDom();
-  const domApi = useDomApi();
+  const api = useEditorApi();
 
   const app = studioDom.getApp(dom);
   const theme = studioDom.getTheme(dom, app);
 
   const handleAddThemeClick = () => {
     const newTheme = studioDom.createNode(dom, 'theme', { name: 'Theme', props: {} });
-    domApi.addNode(newTheme, app.id, 'children');
+    api.dom.addNode(newTheme, app.id, 'children');
   };
 
   return (
@@ -72,7 +72,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             name="primary"
             value={studioDom.getConstPropValue(theme, 'palette.primary.main') || ''}
             onChange={(newValue) =>
-              domApi.setNodeConstPropValue<studioDom.StudioTheme>(
+              api.dom.setNodeConstPropValue<studioDom.StudioTheme>(
                 theme,
                 'palette.primary.main',
                 newValue,
@@ -83,7 +83,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             name="secondary"
             value={studioDom.getConstPropValue(theme, 'palette.secondary.main') || ''}
             onChange={(newValue) =>
-              domApi.setNodeConstPropValue<studioDom.StudioTheme>(
+              api.dom.setNodeConstPropValue<studioDom.StudioTheme>(
                 theme,
                 'palette.secondary.main',
                 newValue,

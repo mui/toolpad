@@ -4,7 +4,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-core';
 import studioPropControls from '../../propertyControls';
-import { useEditorApi } from '../../StoreProvider';
+import { useEditorApi } from '../EditorProvider';
 import * as studioDom from '../../../studioDom';
 
 function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {

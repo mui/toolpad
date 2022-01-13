@@ -126,141 +126,6 @@ export type PageEditorAction =
 
 export type EditorAction = BaseAction | DomAction | PageEditorAction;
 
-export function createDomApi(dispatch: React.Dispatch<EditorAction>) {
-  return {
-    setNodeName(nodeId: NodeId, name: string) {
-      dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
-    },
-    addNode(
-      node: studioDom.StudioNode,
-      parentId: NodeId,
-      parentProp: string,
-      parentIndex?: string,
-    ) {
-      dispatch({
-        type: 'DOM_ADD_NODE',
-        node,
-        parentId,
-        parentProp,
-        parentIndex,
-      });
-    },
-    moveNode(nodeId: NodeId, parentId: NodeId, parentProp: string, parentIndex: string) {
-      dispatch({
-        type: 'DOM_MOVE_NODE',
-        nodeId,
-        parentId,
-        parentProp,
-        parentIndex,
-      });
-    },
-    removeNode(nodeId: NodeId) {
-      dispatch({
-        type: 'DOM_REMOVE_NODE',
-        nodeId,
-      });
-    },
-    setNodeConstPropValue<P, K extends keyof P & string = keyof P & string>(
-      node: studioDom.StudioNode,
-      prop: K,
-      value: P[K],
-    ) {
-      dispatch({
-        type: 'DOM_SET_NODE_PROP',
-        nodeId: node.id,
-        prop,
-        value: { type: 'const', value },
-      });
-    },
-    addBinding(
-      srcNodeId: NodeId,
-      srcProp: string,
-      destNodeId: NodeId,
-      destProp: string,
-      initialValue: any,
-    ) {
-      dispatch({
-        type: 'DOM_ADD_BINDING',
-        srcNodeId,
-        srcProp,
-        destNodeId,
-        destProp,
-        initialValue,
-      });
-    },
-    removeBinding(nodeId: NodeId, prop: string) {
-      dispatch({
-        type: 'DOM_REMOVE_BINDING',
-        nodeId,
-        prop,
-      });
-    },
-  };
-}
-
-export function createEditorApi(dispatch: React.Dispatch<EditorAction>) {
-  return {
-    setComponentPanelTab(tab: ComponentPanelTab) {
-      dispatch({ type: 'PAGE_SET_COMPONENT_PANEL_TAB', tab });
-    },
-    newNodeDragStart(newNode: studioDom.StudioNode) {
-      dispatch({ type: 'PAGE_NEW_NODE_DRAG_START', newNode });
-    },
-    nodeDragEnd() {
-      dispatch({ type: 'PAGE_NODE_DRAG_END' });
-    },
-    nodeDragOver(slot: SlotLocation | null) {
-      dispatch({
-        type: 'PAGE_NODE_DRAG_OVER',
-        slot,
-      });
-    },
-    openBindingEditor(nodeId: NodeId, prop: string) {
-      dispatch({ type: 'PAGE_OPEN_BINDING_EDITOR', nodeId, prop });
-    },
-    closeBindingEditor() {
-      dispatch({ type: 'PAGE_CLOSE_BINDING_EDITOR' });
-    },
-    pageViewStateUpdate(viewState: ViewState) {
-      dispatch({
-        type: 'PAGE_VIEW_STATE_UPDATE',
-        viewState,
-      });
-    },
-  };
-}
-
-export function createApi(dispatch: React.Dispatch<EditorAction>) {
-  return {
-    dom: createDomApi(dispatch),
-    pageEditor: createEditorApi(dispatch),
-    select: (nodeId: NodeId | null) => dispatch({ type: 'SELECT_NODE', nodeId }),
-    deselect: () => dispatch({ type: 'DESELECT_NODE' }),
-  };
-}
-
-export function createPageEditorState(nodeId: NodeId): PageEditorState {
-  return {
-    nodeId,
-    componentPanelTab: 'catalog',
-    newNode: null,
-    bindingEditor: null,
-    highlightLayout: false,
-    highlightedSlot: null,
-    viewState: {},
-  };
-}
-
-export function createEditorState(dom: studioDom.StudioDom): EditorState {
-  const pageNode = studioDom.getPages(dom, studioDom.getApp(dom))[0];
-  return {
-    dom,
-    selection: null,
-    editorType: 'page',
-    pageEditor: createPageEditorState(pageNode.id),
-  };
-}
-
 export function domReducer(dom: studioDom.StudioDom, action: EditorAction): studioDom.StudioDom {
   switch (action.type) {
     case 'DOM_SET_NODE_NAME': {
@@ -353,23 +218,30 @@ export function domReducer(dom: studioDom.StudioDom, action: EditorAction): stud
   }
 }
 
-export function pageEditorReducer(
-  state: PageEditorState,
-  action: EditorAction,
-  globalState: EditorState,
-): PageEditorState {
+export function createPageEditorState(nodeId: NodeId): PageEditorState {
+  return {
+    nodeId,
+    componentPanelTab: 'catalog',
+    newNode: null,
+    bindingEditor: null,
+    highlightLayout: false,
+    highlightedSlot: null,
+    viewState: {},
+  };
+}
+
+export function createEditorState(dom: studioDom.StudioDom): EditorState {
+  const pageNode = studioDom.getPages(dom, studioDom.getApp(dom))[0];
+  return {
+    dom,
+    selection: null,
+    editorType: 'page',
+    pageEditor: createPageEditorState(pageNode.id),
+  };
+}
+
+export function pageEditorReducer(state: PageEditorState, action: EditorAction): PageEditorState {
   switch (action.type) {
-    case 'SELECT_NODE': {
-      if (action.nodeId) {
-        const node = studioDom.getNode(globalState.dom, action.nodeId);
-        if (studioDom.isElement(node)) {
-          return update(state, {
-            componentPanelTab: 'component',
-          });
-        }
-      }
-      return state;
-    }
     case 'PAGE_SET_COMPONENT_PANEL_TAB':
       return update(state, {
         componentPanelTab: action.tab,
@@ -415,7 +287,7 @@ export function pageEditorReducer(
   }
 }
 
-export function baseReducer(state: EditorState, action: EditorAction): EditorState {
+export function baseEditorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
     case 'SELECT_NODE': {
       if (action.nodeId) {
@@ -455,8 +327,8 @@ export function baseReducer(state: EditorState, action: EditorAction): EditorSta
   }
 }
 
-export function storeReducer(state: EditorState, action: EditorAction): EditorState {
-  state = baseReducer(state, action);
+export function editorReducer(state: EditorState, action: EditorAction): EditorState {
+  state = baseEditorReducer(state, action);
 
   state = update(state, {
     dom: domReducer(state.dom, action),
@@ -464,7 +336,7 @@ export function storeReducer(state: EditorState, action: EditorAction): EditorSt
 
   if (state.editorType === 'page') {
     state = update(state, {
-      pageEditor: pageEditorReducer(state.pageEditor, action, state),
+      pageEditor: pageEditorReducer(state.pageEditor, action),
     });
   }
 

@@ -7,7 +7,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
-import { useEditorApi, useEditorState } from '../StoreProvider';
+import { useEditorApi, useEditorState } from './EditorProvider';
 
 const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
   const { classes, className, label, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;

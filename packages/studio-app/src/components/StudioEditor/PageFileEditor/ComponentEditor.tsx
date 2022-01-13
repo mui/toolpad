@@ -2,7 +2,7 @@ import { styled, TextField } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import { getStudioComponent } from '../../../studioComponents';
-import { useDom, useEditorApi, useEditorState, usePageEditorState } from '../../StoreProvider';
+import { useDom, useEditorApi, useEditorState, usePageEditorState } from '../EditorProvider';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
 import ComponentPropEditor from './ComponentPropEditor';

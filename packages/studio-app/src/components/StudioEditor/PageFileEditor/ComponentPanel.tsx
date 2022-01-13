@@ -2,11 +2,11 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Tab } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import * as React from 'react';
-import { ComponentPanelTab } from '../../../store';
+import { ComponentPanelTab } from '../../../editorState';
 import ComponentCatalog from './ComponentCatalog';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
-import { useEditorApi, usePageEditorState } from '../../StoreProvider';
+import { useEditorApi, usePageEditorState } from '../EditorProvider';
 
 const classes = {
   panel: 'StudioPanel',

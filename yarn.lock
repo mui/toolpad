@@ -1121,6 +1121,17 @@
     prop-types "^15.7.2"
     react-is "^17.0.2"
 
+"@mui/x-data-grid-pro@^5.2.2":
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid-pro/-/x-data-grid-pro-5.2.2.tgz#c1999d974e9f8aff179fc832b8506ffe2fde2f51"
+  integrity sha512-tfY/CEii2jgpwvnQWqMnWXp6+w7GYg6k+YJZmK3i5dOeGleNEJSyPAZb9vpnf99cZpN+N55VyY2KBgzQlsq2zg==
+  dependencies:
+    "@mui/utils" "^5.2.3"
+    "@mui/x-license-pro" "5.2.2"
+    clsx "^1.0.4"
+    prop-types "^15.8.0"
+    reselect "^4.1.5"
+
 "@mui/x-data-grid@^5.2.1":
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-5.2.1.tgz#5c60e62e35d01507c9ec3b670d20a1cd408d312a"
@@ -1130,6 +1141,15 @@
     clsx "^1.1.1"
     prop-types "^15.7.2"
     reselect "^4.1.5"
+
+"@mui/x-license-pro@5.2.2":
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/@mui/x-license-pro/-/x-license-pro-5.2.2.tgz#8868924e9ac3fdb74ef5d65167e183d2fdc6bbbd"
+  integrity sha512-wvamuRSMXEBcOMXv2snRW5I7a4wfFi9txGI3zBkAnGvyFjtuBNMDXI6AHVBh4vA62TJ0J8ju2CLWpNmRXn3kiQ==
+  dependencies:
+    "@mui/utils" "^5.2.3"
+    esm "^3.2.25"
+    yargs "^17.3.1"
 
 "@napi-rs/triples@1.0.3":
   version "1.0.3"
@@ -2706,7 +2726,7 @@ clone@^1.0.2:
   resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
   integrity sha1-2jCcwmPfFZlMaIypAheco8fNfH4=
 
-clsx@^1.1.1:
+clsx@^1.0.4, clsx@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/clsx/-/clsx-1.1.1.tgz#98b3134f9abbdf23b2663491ace13c5c03a73188"
   integrity sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==
@@ -3840,7 +3860,7 @@ eslint-plugin-react-hooks@^4.2.0, eslint-plugin-react-hooks@^4.3.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.3.0.tgz#318dbf312e06fab1c835a4abef00121751ac1172"
   integrity sha512-XslZy0LnMn+84NEG9jSGR6eGqaZB3133L8xewQo3fQagbQuGt7a63gf+P1NGKZavEYEC3UXaWEAA/AqDkuN6xA==
 
-eslint-plugin-react@7.27.1, eslint-plugin-react@^7.27.0:
+eslint-plugin-react@^7.27.0:
   version "7.27.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.27.1.tgz#469202442506616f77a854d91babaae1ec174b45"
   integrity sha512-meyunDjMMYeWr/4EBLTV1op3iSG3mjT/pz5gti38UzfM4OPpNc2m0t2xvKCOMU5D6FSdd34BIMFOvQbW+i8GAA==
@@ -3942,6 +3962,11 @@ eslint@7, eslint@^7.32.0:
     table "^6.0.9"
     text-table "^0.2.0"
     v8-compile-cache "^2.0.3"
+
+esm@^3.2.25:
+  version "3.2.25"
+  resolved "https://registry.yarnpkg.com/esm/-/esm-3.2.25.tgz#342c18c29d56157688ba5ce31f8431fbb795cc10"
+  integrity sha512-U1suiZ2oDVWv4zPO56S0NcR5QriEahGtdN2OR6FiOG4WJvcjBVFB0qI4+eKoWFH483PKGuLuu6V8Z4T5g63UVA==
 
 espree@^7.3.0, espree@^7.3.1:
   version "7.3.1"
@@ -6920,6 +6945,15 @@ prop-types@^15.6.2, prop-types@^15.7.2:
     object-assign "^4.1.1"
     react-is "^16.13.1"
 
+prop-types@^15.8.0:
+  version "15.8.1"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
+  integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
+  dependencies:
+    loose-envify "^1.4.0"
+    object-assign "^4.1.1"
+    react-is "^16.13.1"
+
 proto-list@~1.2.1:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/proto-list/-/proto-list-1.2.4.tgz#212d5bfe1318306a420f6402b8e26ff39647a849"
@@ -8839,7 +8873,7 @@ yargs@^16.0.0, yargs@^16.2.0:
     y18n "^5.0.5"
     yargs-parser "^20.2.2"
 
-yargs@^17.0.1:
+yargs@^17.0.1, yargs@^17.3.1:
   version "17.3.1"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.3.1.tgz#da56b28f32e2fd45aefb402ed9c26f42be4c07b9"
   integrity sha512-WUANQeVgjLbNsEmGk20f+nlHgOqzRFpiGWVaBrYGYIGANIIu3lWjoyi0fNlFmJkvfhCZ6BXINe7/W2O2bV4iaA==

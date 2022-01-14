@@ -14,7 +14,7 @@ const { stats } = await install(
     '@mui/studio-core',
     '@mui/studio-core/runtime',
     '@mui/studio-components',
-    '@mui/x-data-grid',
+    '@mui/x-data-grid-pro',
     '@mui/material',
     '@mui/material/styles',
     '@mui/material/colors',

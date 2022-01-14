@@ -2,11 +2,11 @@ import { styled, TextField } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import { getStudioComponent } from '../../../studioComponents';
-import { useEditorState, usePageEditorState } from '../EditorProvider';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
 import ComponentPropEditor from './ComponentPropEditor';
 import { useDom, useDomApi } from '../../DomProvider';
+import { usePageEditorState } from './PageFileEditorProvider';
 
 const classes = {
   control: 'StudioControl',
@@ -102,17 +102,15 @@ export interface ComponentEditorProps {
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
   const dom = useDom();
-  const { selection } = useEditorState();
+  const editor = usePageEditorState();
+
+  const { selection } = editor;
 
   const selectedNode = selection ? studioDom.getNode(dom, selection) : null;
 
-  if (selectedNode) {
-    studioDom.assertIsElement(selectedNode);
-  }
-
   return (
     <div className={className}>
-      {selectedNode ? (
+      {selectedNode && studioDom.isElement(selectedNode) ? (
         // Add key to make sure it mounts every time selected node changes
         <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
       ) : null}

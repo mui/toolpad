@@ -20,10 +20,11 @@ import {
   rectContainsPoint,
 } from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
-import { useEditorApi, useEditorState, usePageEditorState } from '../EditorProvider';
+import { useEditorApi } from '../EditorProvider';
 import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomProvider';
+import { usePageEditorState } from './PageFileEditorProvider';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -436,13 +437,18 @@ export interface RenderPanelProps {
 export default function RenderPanel({ className }: RenderPanelProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const state = usePageEditorState();
   const api = useEditorApi();
+  const {
+    selection,
+    newNode,
+    viewState,
+    nodeId: pageNodeId,
+    highlightLayout,
+    highlightedSlot,
+  } = usePageEditorState();
 
   const viewRef = React.useRef<PageViewHandle>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
-  const { selection } = useEditorState();
-  const { viewState, nodeId: pageNodeId, highlightedSlot } = state;
 
   const [isFocused, setIsFocused] = React.useState(false);
 
@@ -454,9 +460,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   }, [dom, pageNode]);
 
   const selectedNode = selection && studioDom.getNode(dom, selection);
-  if (selectedNode) {
-    studioDom.assertIsElement(selectedNode);
-  }
 
   const slots: ViewSlots = React.useMemo(() => {
     const result: ViewSlots = {};
@@ -562,9 +565,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       );
 
       if (activeSlot) {
-        if (state.newNode) {
+        if (newNode) {
           domApi.addNode(
-            state.newNode,
+            newNode,
             activeSlot.parentId,
             activeSlot.parentProp,
             activeSlot.parentIndex,
@@ -595,7 +598,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       window.removeEventListener('drop', handleDrop);
       window.removeEventListener('dragend', handleDragEnd);
     };
-  }, [availableNodes, getViewCoordinates, viewState, domApi, api, slots, state.newNode, selection]);
+  }, [availableNodes, getViewCoordinates, viewState, domApi, api, slots, newNode, selection]);
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -655,13 +658,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           className={classes.view}
           ref={viewRef}
           dom={dom}
-          pageNodeId={state.nodeId}
+          pageNodeId={pageNodeId}
           onUpdate={handleRender}
         />
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <div
           className={clsx(classes.hud, {
-            [classes.componentDragging]: state.highlightLayout,
+            [classes.componentDragging]: highlightLayout,
           })}
           // This component has `pointer-events: none`, but we will slectively enable pointer-events
           // for its children. We can still capture the click gobally

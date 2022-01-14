@@ -5,7 +5,8 @@ import * as React from 'react';
 import ComponentCatalog from './ComponentCatalog';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
-import { ComponentPanelTab, useEditorApi, usePageEditorState } from '../EditorProvider';
+import { ComponentPanelTab, useEditorApi } from '../EditorProvider';
+import { usePageEditorState } from './PageFileEditorProvider';
 
 const classes = {
   panel: 'StudioPanel',

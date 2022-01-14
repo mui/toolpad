@@ -3,7 +3,8 @@ import { styled } from '@mui/system';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import BindingEditor from './BindingEditor';
-import { useEditorApi, useEditorState } from '../EditorProvider';
+import { PageEditorProvider } from './PageFileEditorProvider';
+import { useEditorState } from '../EditorProvider';
 
 const classes = {
   content: 'StudioContent',
@@ -30,21 +31,14 @@ interface PageFileEditorProps {
 }
 
 export default function PageFileEditor({ className }: PageFileEditorProps) {
-  const state = useEditorState();
-  const api = useEditorApi();
-
-  React.useEffect(() => {
-    // TODO: better way for this?
-    if (state.selection) {
-      api.pageEditor.setComponentPanelTab('component');
-    }
-  }, [api, state.selection]);
-
-  return (
-    <PageFileEditorRoot className={className}>
-      <RenderPanel className={classes.renderPanel} />
-      <ComponentPanel className={classes.componentPanel} />
-      <BindingEditor />
-    </PageFileEditorRoot>
-  );
+  const { editor } = useEditorState();
+  return editor?.type === 'page' ? (
+    <PageEditorProvider state={editor}>
+      <PageFileEditorRoot className={className}>
+        <RenderPanel className={classes.renderPanel} />
+        <ComponentPanel className={classes.componentPanel} />
+        <BindingEditor />
+      </PageFileEditorRoot>
+    </PageEditorProvider>
+  ) : null;
 }

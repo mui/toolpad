@@ -347,7 +347,7 @@ export function getAncestors(dom: StudioDom, node: StudioNode): readonly StudioN
 
 export function getPageAncestors(
   dom: StudioDom,
-  node: StudioElementNode | StudioPageNode,
+  node: StudioNode,
 ): readonly (StudioElementNode | StudioPageNode)[] {
   const parent = getParent(dom, node);
   return parent && (isElement(parent) || isPage(parent))

@@ -10,6 +10,10 @@ export default createComponent(TextField, {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
       defaultValue: 'outlined',
     },
+    size: {
+      typeDef: { type: 'string', enum: ['small', 'normal'] },
+      defaultValue: 'outlined',
+    },
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',

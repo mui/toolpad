@@ -67,9 +67,10 @@ async function addFiles(files: SandboxFiles, base: string) {
 
 interface CreatePageParams {
   importMap: string;
+  preload: string;
 }
 
-function createPage({ importMap }: CreatePageParams) {
+function createPage({ importMap, preload }: CreatePageParams) {
   return `
     <!DOCTYPE html>
     <html>
@@ -93,6 +94,8 @@ function createPage({ importMap }: CreatePageParams) {
         <script type="importmap">
           ${importMap}
         </script>
+
+        ${preload}
 
         <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
         <script async src="/web_modules/es-module-shims.js" type="module"></script>
@@ -121,6 +124,9 @@ export default React.forwardRef(function StudioSandbox(
   const mutationObserverRef = React.useRef<MutationObserver>();
 
   const serializedImportMap = JSON.stringify(importMap);
+  const serializedPreload = Object.values(importMap.imports)
+    .map((url) => `<link rel="modulepreload" href="${url}" />`)
+    .join('\n');
   const prevFiles = React.useRef<SandboxFiles>(files);
   React.useEffect(() => {
     if (!frameRef.current) {
@@ -139,7 +145,7 @@ export default React.forwardRef(function StudioSandbox(
         {
           ...prevFiles.current,
           '/': {
-            code: createPage({ importMap: serializedImportMap }),
+            code: createPage({ importMap: serializedImportMap, preload: serializedPreload }),
             type: 'text/html',
           },
         },
@@ -150,7 +156,7 @@ export default React.forwardRef(function StudioSandbox(
     };
     init(frameRef.current);
     // TODO: cleanup service worker/cache? what if multiple sandboxes are initialized?
-  }, [base, entry, serializedImportMap]);
+  }, [base, entry, serializedImportMap, serializedPreload]);
 
   React.useImperativeHandle(ref, () => ({
     getRootElm() {

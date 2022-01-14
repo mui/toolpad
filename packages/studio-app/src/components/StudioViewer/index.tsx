@@ -14,7 +14,6 @@ export interface ViewerProps {
 
 function ViewerContent({ pageNodeId }: ViewerProps) {
   const domState = useDomState();
-  console.log(domState.dom);
   return domState.loaded ? <ViewerRoot dom={domState.dom} pageNodeId={pageNodeId} /> : null;
 }
 

@@ -1,4 +1,6 @@
 import * as React from 'react';
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
 import { DEFINITION_KEY } from './constants.js';
 
 export type SlotType = 'single' | 'multiple';
@@ -107,7 +109,36 @@ export function createComponent<P = {}>(
   });
 }
 
+export type { PlaceholderProps, SlotsProps, StudioRuntimeNode } from './runtime';
+export { Placeholder, Slots, useStudioNode } from './runtime';
+
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
 export { default as useDataQuery } from './useDataQuery.js';
 export * from './constants.js';
+
+interface PageComponentProps {
+  children?: React.ReactNode;
+}
+
+const PageComponent = React.forwardRef<HTMLDivElement, PageComponentProps>(function PageComponent(
+  { children, ...props }: PageComponentProps,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
+  return (
+    <Container ref={ref} {...props}>
+      <Stack direction="column" gap={2} my={2}>
+        {children}
+      </Stack>
+    </Container>
+  );
+});
+
+export const Page = createComponent(PageComponent, {
+  argTypes: {
+    children: {
+      typeDef: { type: 'element' },
+      control: { type: 'slots' },
+    },
+  },
+});

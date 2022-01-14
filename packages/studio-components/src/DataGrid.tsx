@@ -1,10 +1,18 @@
-import { DataGridProProps, DataGridPro, LicenseInfo } from '@mui/x-data-grid-pro';
+import {
+  DataGridProProps,
+  DataGridPro,
+  GridToolbar,
+  LicenseInfo,
+  GridColumnResizeParams,
+  GridCallbackDetails,
+  MuiEvent,
+} from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { createComponent } from '@mui/studio-core';
+import { createComponent, useStudioNode } from '@mui/studio-core';
+import { debounce } from '@mui/material/utils';
 
 // TODO: Generate a specific license for Studio (This one comes from CI)
-const LICENSE =
-  '0f94d8b65161817ca5d7f7af8ac2f042T1JERVI6TVVJLVN0b3J5Ym9vayxFWFBJUlk9MTY1NDg1ODc1MzU1MCxLRVlWRVJTSU9OPTE=';
+const LICENSE = '<REDACTED>';
 
 LicenseInfo.setLicenseKey(LICENSE);
 
@@ -16,9 +24,24 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   props: DataGridWithQueryProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const studioNode = useStudioNode<DataGridProProps>();
+
+  const handleResize = React.useMemo(
+    () =>
+      debounce((params: GridColumnResizeParams, event: MuiEvent, details: GridCallbackDetails) => {
+        console.log(params, event, details);
+        if (!studioNode) {
+          return;
+        }
+
+        studioNode.setProp('columns', (columns) => columns);
+      }, 500),
+    [studioNode],
+  );
+
   return (
     <div ref={ref} style={{ height: 350, width: '100%' }}>
-      <DataGridPro {...props} />
+      <DataGridPro components={{ Toolbar: GridToolbar }} onColumnResize={handleResize} {...props} />
     </div>
   );
 });
@@ -32,6 +55,9 @@ export default createComponent(DataGridComponent, {
     columns: {
       typeDef: { type: 'array', items: { type: 'object' } },
       defaultValue: [],
+    },
+    density: {
+      typeDef: { type: 'string', enum: ['comfortable', 'compact', 'standard'] },
     },
     studioDataQuery: {
       typeDef: { type: 'dataQuery' },

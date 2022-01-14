@@ -1,7 +1,4 @@
 import * as React from 'react';
-
-import Container from '@mui/material/Container';
-import Stack from '@mui/material/Stack';
 import {
   DEFINITION_KEY,
   RUNTIME_PROP_NODE_ID,
@@ -9,11 +6,12 @@ import {
   RUNTIME_PROP_STUDIO_SLOTS_TYPE,
 } from './constants.js';
 import type { ComponentDefinition, SlotType } from './index';
-import { createComponent } from './index';
+
+export const StudioNodeContext = React.createContext<string | null>(null);
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.
-interface SlotsWrapperProps {
+export interface SlotsInternalProps {
   children?: React.ReactNode;
   // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_STUDIO_SLOTS]: string;
@@ -23,11 +21,11 @@ interface SlotsWrapperProps {
   parentId: string;
 }
 
-function SlotsWrapper({ children }: SlotsWrapperProps) {
+export function SlotsInternal({ children }: SlotsInternalProps) {
   return <React.Fragment>{children}</React.Fragment>;
 }
 
-interface PlaceHolderProps {
+export interface PlaceholderInternalProps {
   // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_STUDIO_SLOTS]: string;
   // eslint-disable-next-line react/no-unused-prop-types
@@ -36,7 +34,7 @@ interface PlaceHolderProps {
 
 // We want typescript to enforce these props, even when they're not used
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function PlaceHolder(props: PlaceHolderProps) {
+export function PlaceholderInternal(props: PlaceholderInternalProps) {
   return (
     <div
       style={{
@@ -73,7 +71,7 @@ function WrappedStudioNodeInternal({
         newProps = newProps ?? {};
         newProps[argName] =
           valueAsArray.length > 0 ? (
-            <SlotsWrapper
+            <SlotsInternal
               {...{
                 [RUNTIME_PROP_STUDIO_SLOTS]: argName,
                 [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
@@ -81,9 +79,9 @@ function WrappedStudioNodeInternal({
               parentId={studioNodeId}
             >
               {valueAsArray}
-            </SlotsWrapper>
+            </SlotsInternal>
           ) : (
-            <PlaceHolder
+            <PlaceholderInternal
               {...{
                 [RUNTIME_PROP_STUDIO_SLOTS]: argName,
                 [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
@@ -96,7 +94,7 @@ function WrappedStudioNodeInternal({
         if (valueAsArray.length <= 0) {
           newProps = newProps ?? {};
           newProps[argName] = (
-            <PlaceHolder
+            <PlaceholderInternal
               {...{
                 [RUNTIME_PROP_STUDIO_SLOTS]: argName,
                 [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
@@ -109,7 +107,11 @@ function WrappedStudioNodeInternal({
     }
   });
 
-  return newProps ? React.cloneElement(child, newProps) : child;
+  return (
+    <StudioNodeContext.Provider value={studioNodeId}>
+      {newProps ? React.cloneElement(child, newProps) : child}
+    </StudioNodeContext.Provider>
+  );
 }
 
 export interface WrappedStudioNodeProps {
@@ -126,28 +128,74 @@ export function WrappedStudioNode({ children, id }: WrappedStudioNodeProps) {
   );
 }
 
-interface PageComponentProps {
+export interface StudioRuntimeNode<P> {
+  setProp: <K extends keyof P>(key: K, value: P[K] | ((newValue: P[K]) => P[K])) => void;
+}
+
+export function useStudioNode<P = {}>(): StudioRuntimeNode<P> | null {
+  const nodeId = React.useContext(StudioNodeContext);
+
+  return React.useMemo(() => {
+    if (!nodeId) {
+      return null;
+    }
+    return {
+      setProp: (prop, value) => {
+        window.parent.postMessage({
+          type: 'setProp',
+          nodeId,
+          prop,
+          value,
+        });
+        console.log(`setting prop "${prop}" to "${value}" on node "${nodeId}"`);
+      },
+    };
+  }, [nodeId]);
+}
+
+export interface SlotsProps {
+  prop: string;
   children?: React.ReactNode;
 }
 
-const PageComponent = React.forwardRef<HTMLDivElement, PageComponentProps>(function PageComponent(
-  { children, ...props }: PageComponentProps,
-  ref: React.ForwardedRef<HTMLDivElement>,
-) {
+export function Slots({ prop, children }: SlotsProps) {
+  const nodeId = React.useContext(StudioNodeContext);
+  if (!nodeId) {
+    return children;
+  }
   return (
-    <Container ref={ref} {...props}>
-      <Stack direction="column" gap={2} my={2}>
-        {children}
-      </Stack>
-    </Container>
+    <SlotsInternal
+      parentId={nodeId}
+      {...{
+        [RUNTIME_PROP_STUDIO_SLOTS]: prop,
+        [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
+      }}
+    >
+      {children}
+    </SlotsInternal>
   );
-});
+}
 
-export const Page = createComponent(PageComponent, {
-  argTypes: {
-    children: {
-      typeDef: { type: 'element' },
-      control: { type: 'slots' },
-    },
-  },
-});
+export interface PlaceholderProps {
+  prop: string;
+  children?: React.ReactNode;
+}
+
+export function Placeholder({ prop, children }: PlaceholderProps) {
+  const nodeId = React.useContext(StudioNodeContext);
+  if (!nodeId) {
+    return <React.Fragment>{children}</React.Fragment>;
+  }
+  const count = React.Children.count(children);
+  return count > 0 ? (
+    <React.Fragment>{children}</React.Fragment>
+  ) : (
+    <PlaceholderInternal
+      parentId={nodeId}
+      {...{
+        [RUNTIME_PROP_STUDIO_SLOTS]: prop,
+        [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
+      }}
+    />
+  );
+}

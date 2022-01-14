@@ -71,6 +71,7 @@ export function domReducer(state: DomState, action: DomAction): DomState {
     case 'DOM_LOADED': {
       return update(state, {
         loading: false,
+        loaded: true,
         error: null,
         dom: action.dom,
       });
@@ -259,11 +260,13 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
 
 interface DomState {
   dom: studioDom.StudioDom;
+  loaded: boolean;
   loading: boolean;
   error: string | null;
 }
 
 const DomStateContext = React.createContext<DomState>({
+  loaded: false,
   loading: false,
   error: null,
   dom: studioDom.createDom(),
@@ -293,6 +296,7 @@ export interface DomContextProps {
 export default function DomProvider({ children }: DomContextProps) {
   const [state, dispatch] = React.useReducer(domReducer, {
     loading: false,
+    loaded: false,
     error: null,
     dom: studioDom.createDom(),
   });

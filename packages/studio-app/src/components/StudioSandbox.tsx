@@ -30,6 +30,7 @@ export interface StudioSandboxProps {
   importMap?: ImportMap;
   files: SandboxFiles;
   entry: string;
+  resizeWithContent?: boolean;
   // Callback for when the view has rendered. Make sure this value is stable
   onUpdate?: () => void;
 }
@@ -103,11 +104,19 @@ function createPage({ importMap }: CreatePageParams) {
 }
 
 export default React.forwardRef(function StudioSandbox(
-  { className, onUpdate, files, entry, base, importMap = { imports: {} } }: StudioSandboxProps,
+  {
+    className,
+    onUpdate,
+    files,
+    entry,
+    base,
+    resizeWithContent,
+    importMap = { imports: {} },
+  }: StudioSandboxProps,
   ref: React.ForwardedRef<StudioSandboxHandle>,
 ) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
-  const [height, setHeight] = React.useState(0);
+  const [height, setHeight] = React.useState<number>();
   const resizeObserverRef = React.useRef<ResizeObserver>();
   const mutationObserverRef = React.useRef<MutationObserver>();
 
@@ -160,12 +169,15 @@ export default React.forwardRef(function StudioSandbox(
       throw new Error(`Invariant: frameRef not correctly attached`);
     }
 
-    resizeObserverRef.current = new ResizeObserver((entries) => {
-      const [documentEntry] = entries;
-      setHeight(documentEntry.contentRect.height);
-    });
+    // TODO: aim at eliminating the need for resizing with the content
+    if (resizeWithContent) {
+      resizeObserverRef.current = new ResizeObserver((entries) => {
+        const [documentEntry] = entries;
+        setHeight(documentEntry.contentRect.height);
+      });
 
-    resizeObserverRef.current.observe(frameRef.current.contentWindow.document.body);
+      resizeObserverRef.current.observe(frameRef.current.contentWindow.document.body);
+    }
 
     mutationObserverRef.current = new MutationObserver(() => {
       // TODO: debounce?
@@ -185,7 +197,7 @@ export default React.forwardRef(function StudioSandbox(
     entryScript.src = resolvedEntry;
     entryScript.id = ENTRY_SCRIPT_ID;
     frameWindow.document.body.appendChild(entryScript);
-  }, [onUpdate, resolvedEntry]);
+  }, [onUpdate, resolvedEntry, resizeWithContent]);
 
   React.useEffect(
     () => () => {

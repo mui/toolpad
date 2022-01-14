@@ -17,7 +17,8 @@ import { NodeId, StudioBoundProp, StudioNodeProp, StudioNodeProps } from '../../
 import { ExactEntriesOf } from '../../../utils/types';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomProvider';
-import { useEditorApi, usePageEditorState } from '../EditorProvider';
+import { useEditorApi } from '../EditorProvider';
+import { usePageEditorState } from './PageFileEditorProvider';
 
 export interface BindingEditorContentProps<K> {
   nodeId: NodeId;

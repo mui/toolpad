@@ -10,9 +10,17 @@ export interface BindingEditorState {
   readonly prop: string;
 }
 
-export interface PageEditorState {
+type EditorType = 'page' | 'api';
+
+export interface BaseEditorState {
+  readonly type: EditorType;
+  readonly nodeId: NodeId;
+}
+
+export interface PageEditorState extends BaseEditorState {
   readonly type: 'page';
   readonly nodeId: NodeId;
+  readonly selection: NodeId | null;
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: studioDom.StudioNode | null;
   readonly bindingEditor: BindingEditorState | null;
@@ -21,33 +29,34 @@ export interface PageEditorState {
   readonly viewState: ViewState;
 }
 
-export interface ApiEditorState {
+type PageEditorStateInit = BaseEditorState & Partial<PageEditorState>;
+
+export interface ApiEditorState extends BaseEditorState {
   readonly type: 'api';
   readonly nodeId: NodeId;
 }
 
-type EditorType = 'page' | 'api';
+type ApiEditorStateInit = BaseEditorState & Partial<ApiEditorState>;
+
+type FileEditorState = PageEditorState | ApiEditorState;
 
 export interface EditorState {
-  readonly selection: NodeId | null;
-  readonly editor: PageEditorState | ApiEditorState | null;
+  readonly editor: FileEditorState | null;
 }
 
-export type BaseAction =
-  | {
-      type: 'OPEN_EDITOR';
-      editorType: EditorType;
-      nodeId: NodeId;
-    }
+export type BaseAction = {
+  type: 'OPEN_EDITOR';
+  editor: PageEditorStateInit | ApiEditorStateInit;
+};
+
+export type PageEditorAction =
   | {
       type: 'SELECT_NODE';
       nodeId: NodeId | null;
     }
   | {
       type: 'DESELECT_NODE';
-    };
-
-export type PageEditorAction =
+    }
   | {
       type: 'PAGE_SET_COMPONENT_PANEL_TAB';
       tab: ComponentPanelTab;
@@ -78,35 +87,44 @@ export type PageEditorAction =
 
 export type EditorAction = BaseAction | PageEditorAction;
 
-export function createPageEditorState(nodeId: NodeId): PageEditorState {
+export function createPageEditorState(init: PageEditorStateInit): PageEditorState {
   return {
-    type: 'page',
-    nodeId,
+    selection: null,
     componentPanelTab: 'catalog',
     newNode: null,
     bindingEditor: null,
     highlightLayout: false,
     highlightedSlot: null,
     viewState: {},
+    ...init,
   };
 }
 
-export function createApiEditorState(nodeId: NodeId): ApiEditorState {
+export function createApiEditorState(init: ApiEditorStateInit): ApiEditorState {
   return {
-    type: 'api',
-    nodeId,
+    ...init,
   };
 }
 
 export function createEditorState(): EditorState {
   return {
-    selection: null,
     editor: null,
   };
 }
 
 export function pageEditorReducer(state: PageEditorState, action: EditorAction): PageEditorState {
   switch (action.type) {
+    case 'SELECT_NODE': {
+      return update(state, {
+        selection: action.nodeId,
+        componentPanelTab: 'component',
+      });
+    }
+    case 'DESELECT_NODE': {
+      return update(state, {
+        selection: null,
+      });
+    }
     case 'PAGE_SET_COMPONENT_PANEL_TAB':
       return update(state, {
         componentPanelTab: action.tab,
@@ -155,30 +173,20 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
 export function baseEditorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
     case 'OPEN_EDITOR': {
-      switch (action.editorType) {
+      switch (action.editor.type) {
         case 'page':
           return update(state, {
-            selection: null,
-            editor: createPageEditorState(action.nodeId),
+            editor: createPageEditorState(action.editor),
           });
         case 'api':
           return update(state, {
-            selection: null,
-            editor: createApiEditorState(action.nodeId),
+            editor: createApiEditorState(action.editor),
           });
         default:
-          throw new Error(`Invariant: unknown editor type "${action.editorType}"`);
+          throw new Error(
+            `Invariant: unknown editor type "${(action.editor as BaseEditorState).type}"`,
+          );
       }
-    }
-    case 'SELECT_NODE': {
-      return update(state, {
-        selection: action.nodeId,
-      });
-    }
-    case 'DESELECT_NODE': {
-      return update(state, {
-        selection: null,
-      });
     }
     default:
       return state;
@@ -197,8 +205,10 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
   return state;
 }
 
-function createEditorApi(dispatch: React.Dispatch<EditorAction>) {
+function createPageEditorApi(dispatch: React.Dispatch<EditorAction>) {
   return {
+    select: (nodeId: NodeId | null) => dispatch({ type: 'SELECT_NODE', nodeId }),
+    deselect: () => dispatch({ type: 'DESELECT_NODE' }),
     setComponentPanelTab(tab: ComponentPanelTab) {
       dispatch({ type: 'PAGE_SET_COMPONENT_PANEL_TAB', tab });
     },
@@ -233,10 +243,18 @@ const EditorStateContext = React.createContext<EditorState | null>(null);
 
 function createApi(dispatch: React.Dispatch<EditorAction>) {
   return {
-    pageEditor: createEditorApi(dispatch),
-    openPageEditor: (nodeId: NodeId) =>
-      dispatch({ type: 'OPEN_EDITOR', editorType: 'page', nodeId }),
-    openApiEditor: (nodeId: NodeId) => dispatch({ type: 'OPEN_EDITOR', editorType: 'api', nodeId }),
+    pageEditor: createPageEditorApi(dispatch),
+    openPageEditor: (nodeId: NodeId, selection: NodeId | null) =>
+      dispatch({
+        type: 'OPEN_EDITOR',
+        editor: {
+          type: 'page',
+          nodeId,
+          ...(selection ? { selection, componentPanelTab: 'component' } : {}),
+        },
+      }),
+    openApiEditor: (nodeId: NodeId) =>
+      dispatch({ type: 'OPEN_EDITOR', editor: { type: 'api', nodeId } }),
     select: (nodeId: NodeId | null) => dispatch({ type: 'SELECT_NODE', nodeId }),
     deselect: () => dispatch({ type: 'DESELECT_NODE' }),
   };
@@ -257,14 +275,6 @@ export function useEditorState(): EditorState {
     throw new Error(`No provider found for editor state`);
   }
   return stateContext;
-}
-
-export function usePageEditorState(): PageEditorState {
-  const state = useEditorState();
-  if (state.editor?.type !== 'page') {
-    throw new Error(`PageEditorState state requested out of context`);
-  }
-  return state.editor;
 }
 
 export function useEditorApi(): EditorApi {

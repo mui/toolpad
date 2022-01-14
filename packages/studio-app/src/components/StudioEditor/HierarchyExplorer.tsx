@@ -216,7 +216,7 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newPageNode, appNode.id, 'children');
           onClose?.(e, 'backdropClick');
-          editorApi.openPageEditor(newPageNode.id);
+          editorApi.openPageEditor(newPageNode.id, null);
         }}
         style={{
           overflowY: 'auto',
@@ -264,7 +264,8 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
     ...pages.map((pageNode) => pageNode.id),
   ]);
 
-  const selected = state.selection ? [state.selection] : [];
+  const selected =
+    state.editor?.type === 'page' && state.editor.selection ? [state.editor.selection] : [];
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);
@@ -275,14 +276,14 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
     if (selectedNodeId) {
       api.select(selectedNodeId);
 
-      let node = studioDom.getNode(dom, selectedNodeId);
+      const node = studioDom.getNode(dom, selectedNodeId);
       if (studioDom.isElement(node)) {
         const page = studioDom.getElementPage(dom, node);
         if (page) {
           if (state.editor?.type === 'page' && page.id === state.editor.nodeId) {
-            api.select(selectedNodeId);
+            api.pageEditor.select(selectedNodeId);
           } else {
-            node = page;
+            api.openPageEditor(page.id, node.id);
           }
         }
       }
@@ -292,7 +293,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
           api.deselect();
           return;
         }
-        api.openPageEditor(node.id);
+        api.openPageEditor(node.id, null);
       }
 
       if (studioDom.isApi(node)) {

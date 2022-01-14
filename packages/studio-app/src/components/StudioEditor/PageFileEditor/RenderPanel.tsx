@@ -166,7 +166,8 @@ function findNodeAt(
 }
 
 /**
- * From an array of slots, returns the index of the closest one to a certain point
+ * From a collection of slots belonging to a single parent, returns the index of the
+ * closest one to a certain point
  */
 function findActiveSlotInNode(
   parentId: NodeId,
@@ -175,7 +176,8 @@ function findActiveSlotInNode(
   y: number,
 ): SlotLocation | null {
   let closestDistance = Infinity;
-  let closestSlot: RenderedSlot | null = null;
+  let closestParentProp: string | null = null;
+  let closestParentIndex: string | null = null;
 
   // eslint-disable-next-line no-restricted-syntax
   for (const [parentProp, namedSlots] of Object.entries(slots)) {
@@ -207,20 +209,23 @@ function findActiveSlotInNode(
         }
 
         if (distance <= 0) {
-          // We can bail out early
+          // We can bail out early here
           return { parentId, parentIndex: namedSlot.parentIndex, parentProp };
         }
+
         if (distance < closestDistance) {
           closestDistance = distance;
-          closestSlot = namedSlot;
+          closestParentProp = parentProp;
+          closestParentIndex = namedSlot.parentIndex;
         }
-      }
-
-      if (closestSlot) {
-        return { parentId, parentIndex: closestSlot.parentIndex, parentProp };
       }
     }
   }
+
+  if (closestParentProp && closestParentIndex) {
+    return { parentId, parentProp: closestParentProp, parentIndex: closestParentIndex };
+  }
+
   return null;
 }
 

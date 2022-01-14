@@ -7,6 +7,10 @@ export default createComponent(Stack, {
       typeDef: { type: 'number' },
       defaultValue: 2,
     },
+    margin: {
+      typeDef: { type: 'number' },
+      defaultValue: 1,
+    },
     direction: {
       typeDef: {
         type: 'string',

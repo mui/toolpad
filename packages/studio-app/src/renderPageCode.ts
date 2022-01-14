@@ -65,13 +65,16 @@ class Context {
   }
 
   // resolve props to expressions
-  resolveProps<P>(node: studioDom.StudioElementNode): Record<string, string> {
-    const result: Record<string, string> = {};
+  resolveProps<P>(
+    node: studioDom.StudioElementNode,
+    resolvedChildren: Record<string, string>,
+  ): Record<string, string> {
+    const result: Record<string, string> = resolvedChildren;
     const component = getStudioComponent(this.dom, node.component);
     (Object.entries(node.props) as ExactEntriesOf<StudioNodeProps<P>>).forEach(
       ([propName, propValue]) => {
         const argDef: ArgTypeDefinition | undefined = component.argTypes[propName];
-        if (!argDef || !propValue || typeof propName !== 'string') {
+        if (!argDef || !propValue || typeof propName !== 'string' || result[propName]) {
           return;
         }
 
@@ -104,6 +107,7 @@ class Context {
         }
       },
     );
+
     return result;
   }
 
@@ -118,6 +122,7 @@ class Context {
         ${renderedChildren}
       </${componentName}>
     `;
+
     return this.editor
       ? `
         <__studioRuntime.WrappedStudioNode id="${id}">
@@ -127,10 +132,10 @@ class Context {
       : rendered;
   }
 
-  renderChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): {
-    [prop: string]: string | undefined;
-  } {
-    const result: { [prop: string]: string | undefined } = {};
+  renderChildren(
+    node: studioDom.StudioElementNode | studioDom.StudioPageNode,
+  ): Record<string, string> {
+    const result: Record<string, string> = {};
     const nodeChildren = studioDom.getChildNodes(this.dom, node);
     // eslint-disable-next-line no-restricted-syntax
     for (const [prop, children] of Object.entries(nodeChildren)) {
@@ -142,23 +147,16 @@ class Context {
   }
 
   renderPage(page: studioDom.StudioPageNode): string {
-    return this.renderNodeInternal(
-      page.id,
-      '__studioRuntime.Page',
-      {},
-      this.renderChildren(page).children ?? '',
-    );
+    this.addImport('@mui/studio-core', 'Page', 'Page');
+    return this.renderNodeInternal(page.id, 'Page', {}, this.renderChildren(page).children ?? '');
   }
 
   renderNode(node: studioDom.StudioElementNode): string {
     const component = getStudioComponent(this.dom, node.component);
     this.addImport(component.module, component.importedName, component.importedName);
-    return this.renderNodeInternal(
-      node.id,
-      component.importedName,
-      this.resolveProps(node),
-      this.renderChildren(node).children ?? '',
-    );
+    const { children, ...namedChildren } = this.renderChildren(node);
+    const resolvedProps = this.resolveProps(node, namedChildren);
+    return this.renderNodeInternal(node.id, component.importedName, resolvedProps, children ?? '');
   }
 
   // eslint-disable-next-line class-methods-use-this

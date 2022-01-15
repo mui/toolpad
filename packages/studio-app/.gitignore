@@ -37,3 +37,4 @@ yarn-error.log*
 
 /public/web_modules
 /public/sandbox
+/public/editorRuntime

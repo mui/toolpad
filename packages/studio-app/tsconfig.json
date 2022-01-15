@@ -15,8 +15,11 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "paths": {
+      "@mui/studio-core/constants": ["../studio-core/dist/constants"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "typings/**/*.d.ts"],
-  "exclude": ["node_modules", "sandbox", "serviceWorker", "./scripts"]
+  "exclude": ["node_modules", "serviceWorker", "./scripts"]
 }

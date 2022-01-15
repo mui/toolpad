@@ -2,11 +2,11 @@ import {
   RUNTIME_PROP_NODE_ID,
   RUNTIME_PROP_STUDIO_SLOTS,
   RUNTIME_PROP_STUDIO_SLOTS_TYPE,
-  SlotType,
-} from '@mui/studio-core';
-import { FiberNode, Hook } from 'react-devtools-inline';
-import { NodeId, NodeState, ViewState, FlowDirection } from './types';
-import { getRelativeBoundingBox } from './utils/geometry';
+} from '@mui/studio-core/constants';
+import type { SlotType } from '@mui/studio-core';
+import type { FiberNode, Hook } from 'react-devtools-inline';
+import { NodeId, NodeState, ViewState, FlowDirection } from '../src/types';
+import { getRelativeBoundingBox } from '../src/utils/geometry';
 
 declare global {
   interface Window {
@@ -64,6 +64,7 @@ export function getViewState(viewElm: HTMLElement): ViewState {
 
         const studioNodeId = fiber.memoizedProps[RUNTIME_PROP_NODE_ID] as string | undefined;
         if (studioNodeId) {
+          console.log(studioNodeId);
           const nodeId: NodeId = studioNodeId as NodeId;
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {

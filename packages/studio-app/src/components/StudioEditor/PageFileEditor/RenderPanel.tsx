@@ -9,6 +9,7 @@ import {
   FlowDirection,
   SlotLocation,
   SlotState,
+  StudioBridge,
 } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import PageView, { PageViewHandle } from '../../PageView';
@@ -21,7 +22,6 @@ import {
 } from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
 import { useEditorApi } from '../EditorProvider';
-import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomProvider';
 import { usePageEditorState } from './PageFileEditorProvider';
@@ -460,6 +460,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const pageNode = studioDom.getNode(dom, pageNodeId);
   studioDom.assertIsPage(pageNode);
 
+  const getStudioBridge = React.useCallback((): StudioBridge => {
+    const studioWindow = viewRef.current?.getRootElm()?.ownerDocument.defaultView;
+    // eslint-disable-next-line no-underscore-dangle
+    const bridge = (studioWindow as any)?.__STUDIO;
+    if (!bridge) {
+      throw new Error(`Can't connect to bridge`);
+    }
+    return bridge;
+  }, []);
+
   const pageNodes: readonly PageOrElementNode[] = React.useMemo(() => {
     return [pageNode, ...studioDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
@@ -489,9 +499,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleRender = React.useCallback(() => {
     const rootElm = viewRef.current?.getRootElm();
     if (rootElm) {
-      api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
+      api.pageEditor.pageViewStateUpdate(getStudioBridge().getViewState());
     }
-  }, [api]);
+  }, [api, getStudioBridge]);
 
   const getViewCoordinates = React.useCallback(
     (clientX: number, clientY: number): { x: number; y: number } | null => {

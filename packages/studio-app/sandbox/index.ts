@@ -1,4 +1,3 @@
-import { initialize as initializeDevtoolsBackend } from 'react-devtools-inline/backend';
 import { Channel } from './channel.js';
 import { HotModulesProvider } from './hotModulesProvider.js';
 
@@ -15,5 +14,3 @@ const hotModulesProvider = new HotModulesProvider(channel);
 // eslint-disable-next-line no-underscore-dangle
 window.__HMR = hotModulesProvider;
 hotModulesProvider.start();
-
-initializeDevtoolsBackend(window);

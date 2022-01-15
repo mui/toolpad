@@ -65,9 +65,10 @@ async function addFiles(files: SandboxFiles, base: string) {
 
 interface CreatePageParams {
   importMap: string;
+  entry: string;
 }
 
-function createPage({ importMap }: CreatePageParams) {
+function createPage({ importMap, entry }: CreatePageParams) {
   return `
     <!DOCTYPE html>
     <html>
@@ -87,7 +88,8 @@ function createPage({ importMap }: CreatePageParams) {
         </style>
       </head>
       <body>
-      <div id="root"></div>
+        <div id="root"></div>
+
         <script type="importmap">
           ${importMap}
         </script>
@@ -96,6 +98,8 @@ function createPage({ importMap }: CreatePageParams) {
         <script async src="/web_modules/es-module-shims.js" type="module"></script>
 
         <script type="module" src="/sandbox/index.js"></script>
+
+        <script type="module" src="/editorRuntime/index.js"></script>
       </body>
     </html>
   `;
@@ -149,6 +153,7 @@ export default React.forwardRef(function StudioSandbox(
   }));
 
   const resolvedEntry = base + entry;
+
   const handleFrameLoad = React.useCallback(() => {
     resizeObserverRef.current?.disconnect();
     mutationObserverRef.current?.disconnect();

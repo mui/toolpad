@@ -1,5 +1,6 @@
 import type * as React from 'react';
 import { ArgTypeDefinition, SlotType } from '@mui/studio-core';
+import { Emitter } from 'mitt';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
@@ -127,4 +128,15 @@ export interface StudioConnectionSummary {
 export interface StudioConnection<P = {}> extends StudioConnectionSummary {
   params: P;
   status: ConnectionStatus | null;
+}
+
+export type StudioBridgeEvents = {
+  update: {};
+};
+
+// Used for communication between the editor UI and the sandboxed application
+export interface StudioBridge {
+  events: Emitter<StudioBridgeEvents>;
+  setSelection: (nodeId: NodeId | null) => void;
+  getViewState: () => ViewState;
 }

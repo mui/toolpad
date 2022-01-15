@@ -463,7 +463,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const getStudioBridge = React.useCallback((): StudioBridge => {
     const studioWindow = viewRef.current?.getRootElm()?.ownerDocument.defaultView;
     // eslint-disable-next-line no-underscore-dangle
-    const bridge = (studioWindow as any)?.__STUDIO;
+    const bridge = studioWindow?.__STUDIO;
     if (!bridge) {
       throw new Error(`Can't connect to bridge`);
     }

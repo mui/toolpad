@@ -64,7 +64,6 @@ export function getViewState(viewElm: HTMLElement): ViewState {
 
         const studioNodeId = fiber.memoizedProps[RUNTIME_PROP_NODE_ID] as string | undefined;
         if (studioNodeId) {
-          console.log(studioNodeId);
           const nodeId: NodeId = studioNodeId as NodeId;
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {

@@ -89,11 +89,26 @@ export default React.forwardRef(function PageView(
     });
   }, [dom]);
 
+  const handleLoad = React.useCallback(
+    (window: Window) => {
+      // eslint-disable-next-line no-underscore-dangle
+      const bridge = window.__STUDIO;
+      if (bridge && onUpdate) {
+        bridge.events.on('update', onUpdate);
+        return () => {
+          bridge.events.off('update', onUpdate);
+        };
+      }
+      return () => {};
+    },
+    [onUpdate],
+  );
+
   return (
     <PageViewRoot className={className}>
       <StudioSandbox
         ref={frameRef}
-        onUpdate={onUpdate}
+        onLoad={handleLoad}
         base="/app/1234"
         importMap={getImportMap()}
         files={{

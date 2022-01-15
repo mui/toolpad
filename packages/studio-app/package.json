@@ -10,7 +10,7 @@
     "build:next": "next build",
     "dev:next": "next dev",
     "build:esbuild": "esbuild ./sandbox/index.ts ./editorRuntime/index.ts --target=es6 --bundle --outdir=./public",
-    "dev:esbuild": "yarn build:sandbox --watch",
+    "dev:esbuild": "yarn build:esbuild --watch",
     "esinstall": "node ./scripts/esinstall.mjs"
   },
   "dependencies": {

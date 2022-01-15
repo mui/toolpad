@@ -3,8 +3,6 @@ import { styled } from '@mui/material';
 import { ImportMap } from 'esinstall';
 import { transform } from 'sucrase';
 
-const ENTRY_SCRIPT_ID = 'entry-script';
-
 const StudioSandboxRoot = styled('iframe')({
   border: 'none',
   width: '100%',
@@ -30,7 +28,7 @@ export interface StudioSandboxProps {
   files: SandboxFiles;
   entry: string;
   // Callback for when the view has rendered. Make sure this value is stable
-  onUpdate?: () => void;
+  onLoad?: (window: Window) => void;
 }
 
 export interface StudioSandboxHandle {
@@ -100,13 +98,15 @@ function createPage({ importMap, entry }: CreatePageParams) {
         <script type="module" src="/sandbox/index.js"></script>
 
         <script type="module" src="/editorRuntime/index.js"></script>
+
+        <script type="module" src="${entry}"></script>
       </body>
     </html>
   `;
 }
 
 export default React.forwardRef(function StudioSandbox(
-  { className, onUpdate, files, entry, base, importMap = { imports: {} } }: StudioSandboxProps,
+  { className, onLoad, files, entry, base, importMap = { imports: {} } }: StudioSandboxProps,
   ref: React.ForwardedRef<StudioSandboxHandle>,
 ) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
@@ -116,6 +116,8 @@ export default React.forwardRef(function StudioSandbox(
 
   const serializedImportMap = JSON.stringify(importMap);
   const prevFiles = React.useRef<SandboxFiles>(files);
+  const resolvedEntry = base + entry;
+
   React.useEffect(() => {
     if (!frameRef.current) {
       return;
@@ -133,7 +135,7 @@ export default React.forwardRef(function StudioSandbox(
         {
           ...prevFiles.current,
           '/': {
-            code: createPage({ importMap: serializedImportMap }),
+            code: createPage({ importMap: serializedImportMap, entry: resolvedEntry }),
             type: 'text/html',
           },
         },
@@ -144,7 +146,7 @@ export default React.forwardRef(function StudioSandbox(
     };
     init(frameRef.current);
     // TODO: cleanup service worker/cache? what if multiple sandboxes are initialized?
-  }, [base, entry, serializedImportMap]);
+  }, [base, entry, serializedImportMap, resolvedEntry]);
 
   React.useImperativeHandle(ref, () => ({
     getRootElm() {
@@ -152,11 +154,8 @@ export default React.forwardRef(function StudioSandbox(
     },
   }));
 
-  const resolvedEntry = base + entry;
-
   const handleFrameLoad = React.useCallback(() => {
     resizeObserverRef.current?.disconnect();
-    mutationObserverRef.current?.disconnect();
 
     const frameWindow = frameRef.current?.contentWindow;
 
@@ -171,23 +170,8 @@ export default React.forwardRef(function StudioSandbox(
 
     resizeObserverRef.current.observe(frameRef.current.contentWindow.document.body);
 
-    mutationObserverRef.current = new MutationObserver(() => {
-      // TODO: debounce?
-      onUpdate?.();
-    });
-
-    mutationObserverRef.current.observe(frameRef.current.contentWindow.document.body, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-    });
-
-    const entryScript = frameWindow.document.createElement('script');
-    entryScript.type = 'module';
-    entryScript.src = resolvedEntry;
-    entryScript.id = ENTRY_SCRIPT_ID;
-    frameWindow.document.body.appendChild(entryScript);
-  }, [onUpdate, resolvedEntry]);
+    onLoad?.(frameWindow);
+  }, [onLoad]);
 
   React.useEffect(
     () => () => {

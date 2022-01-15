@@ -12,7 +12,8 @@ import { createComponent, useStudioNode } from '@mui/studio-core';
 import { debounce } from '@mui/material/utils';
 
 // TODO: Generate a specific license for Studio (This one comes from CI)
-const LICENSE = '<REDACTED>';
+const LICENSE =
+  '0f94d8b65161817ca5d7f7af8ac2f042T1JERVI6TVVJLVN0b3J5Ym9vayxFWFBJUlk9MTY1NDg1ODc1MzU1MCxLRVlWRVJTSU9OPTE=';
 
 LicenseInfo.setLicenseKey(LICENSE);
 

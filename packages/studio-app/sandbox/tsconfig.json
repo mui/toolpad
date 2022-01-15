@@ -9,7 +9,8 @@
     "composite": true,
     "declarationMap": true,
     "sourceMap": true,
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext", "dom", "dom.iterable"],
     "jsx": "react"
-  }
+  },
+  "include": [".", "../typings"]
 }

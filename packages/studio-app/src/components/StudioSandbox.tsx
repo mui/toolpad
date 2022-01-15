@@ -2,7 +2,6 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { ImportMap } from 'esinstall';
 import { transform } from 'sucrase';
-import { initialize as initializeDevtoolsBackend } from 'react-devtools-inline/backend';
 
 const ENTRY_SCRIPT_ID = 'entry-script';
 
@@ -177,8 +176,6 @@ export default React.forwardRef(function StudioSandbox(
       childList: true,
       subtree: true,
     });
-
-    initializeDevtoolsBackend(frameWindow);
 
     const entryScript = frameWindow.document.createElement('script');
     entryScript.type = 'module';

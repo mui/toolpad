@@ -1,5 +1,5 @@
 import mitt from 'mitt';
-import { getViewState } from './pageViewState';
+import { getViewState, findNodeAt } from './pageViewState';
 import { NodeId, StudioBridge, StudioBridgeEvents, ViewState } from '../src/types';
 import PinholeOverlay from './PinholeOverlay';
 import { Rectangle } from '../src/utils/geometry';
@@ -10,12 +10,15 @@ function throttle<T extends () => void>(fn: T, time: number): T {
 }
 
 class SelectionOverlay {
-  pinhole: PinholeOverlay;
+  private pinhole: PinholeOverlay;
 
-  rect: HTMLDivElement;
+  private rect: HTMLDivElement;
+
+  public onClick?: (event: MouseEvent) => void;
 
   constructor(doc: Document, container: HTMLElement) {
     this.pinhole = new PinholeOverlay(doc, container);
+    this.pinhole.onClick = (event) => this.onClick?.(event);
 
     this.rect = doc.createElement('div');
   }
@@ -50,6 +53,8 @@ class StudioBridgeImpl implements StudioBridge {
 
   constructor(doc: Document, container: HTMLElement, studioRoot: HTMLElement) {
     this.selectionOverlay = new SelectionOverlay(doc, container);
+    this.selectionOverlay.onClick = (event) => this.onOverlayClick(event);
+
     this.studioRoot = studioRoot;
 
     this.mutationObserver.observe(this.studioRoot, {
@@ -58,7 +63,19 @@ class StudioBridgeImpl implements StudioBridge {
       subtree: true,
     });
     this.resizeObserver.observe(this.studioRoot);
+
     this.update();
+  }
+
+  // findNodeAt(x: number, y: number): NodeId | null {}
+
+  onOverlayClick(event: MouseEvent) {
+    const x = event.clientX;
+    const y = event.clientY;
+    const clickedNode = findNodeAt(this.studioRoot, this.viewState, x, y);
+    if (clickedNode) {
+      this.events.emit('click', { tragetNode: clickedNode, x, y });
+    }
   }
 
   setSelection(nodeId: NodeId | null) {

@@ -1,25 +1,29 @@
 import { Rectangle } from '../src/utils/geometry';
 
 export default class PinholeOverlay {
-  root: HTMLDivElement;
+  private root: HTMLDivElement;
 
-  left: HTMLDivElement;
+  private center: HTMLDivElement;
 
-  topLeft: HTMLDivElement;
+  private left: HTMLDivElement;
 
-  top: HTMLDivElement;
+  private topLeft: HTMLDivElement;
 
-  topRight: HTMLDivElement;
+  private top: HTMLDivElement;
 
-  right: HTMLDivElement;
+  private topRight: HTMLDivElement;
 
-  bottomRight: HTMLDivElement;
+  private right: HTMLDivElement;
 
-  bottom: HTMLDivElement;
+  private bottomRight: HTMLDivElement;
 
-  bottomLeft: HTMLDivElement;
+  private bottom: HTMLDivElement;
 
-  rect: Rectangle | null;
+  private bottomLeft: HTMLDivElement;
+
+  private rect: Rectangle | null;
+
+  public onClick?: (event: MouseEvent) => void;
 
   constructor(doc: Document, container: HTMLElement) {
     this.root = doc.createElement('div');
@@ -33,6 +37,7 @@ export default class PinholeOverlay {
     this.root.style.height = '100%';
     container.appendChild(this.root);
 
+    this.center = this.createSegment(doc, this.root);
     this.left = this.createSegment(doc, this.root);
     this.topLeft = this.createSegment(doc, this.root);
     this.top = this.createSegment(doc, this.root);
@@ -43,13 +48,13 @@ export default class PinholeOverlay {
     this.bottomLeft = this.createSegment(doc, this.root);
 
     this.rect = null;
+    this.update();
   }
 
   // eslint-disable-next-line class-methods-use-this
-  createSegment(doc: Document, container: HTMLElement) {
+  private createSegment(doc: Document, container: HTMLElement) {
     const segment = doc.createElement('div');
     container.appendChild(segment);
-    segment.style.display = 'none';
     segment.style.pointerEvents = 'initial';
     segment.style.position = 'absolute';
     segment.style.left = '0';
@@ -58,18 +63,21 @@ export default class PinholeOverlay {
     segment.style.bottom = '0';
     segment.style.background = '#000';
     segment.style.opacity = '0.1';
+    segment.addEventListener('click', (event) => this.onClick?.(event));
     return segment;
   }
 
-  updateVisibility(visible: boolean) {
-    this.left.style.display = visible ? 'block' : 'none';
-    this.topLeft.style.display = visible ? 'block' : 'none';
-    this.top.style.display = visible ? 'block' : 'none';
-    this.topRight.style.display = visible ? 'block' : 'none';
-    this.right.style.display = visible ? 'block' : 'none';
-    this.bottomRight.style.display = visible ? 'block' : 'none';
-    this.bottom.style.display = visible ? 'block' : 'none';
-    this.bottomLeft.style.display = visible ? 'block' : 'none';
+  private updateVisibility(pinhole: boolean) {
+    this.center.style.display = pinhole ? 'none' : 'block';
+
+    this.left.style.display = pinhole ? 'block' : 'none';
+    this.topLeft.style.display = pinhole ? 'block' : 'none';
+    this.top.style.display = pinhole ? 'block' : 'none';
+    this.topRight.style.display = pinhole ? 'block' : 'none';
+    this.right.style.display = pinhole ? 'block' : 'none';
+    this.bottomRight.style.display = pinhole ? 'block' : 'none';
+    this.bottom.style.display = pinhole ? 'block' : 'none';
+    this.bottomLeft.style.display = pinhole ? 'block' : 'none';
   }
 
   update() {

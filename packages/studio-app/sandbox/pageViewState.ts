@@ -2,9 +2,9 @@ import {
   RUNTIME_PROP_NODE_ID,
   RUNTIME_PROP_STUDIO_SLOTS,
   RUNTIME_PROP_STUDIO_SLOTS_TYPE,
-} from '@mui/studio-core/constants';
-import type { SlotType } from '@mui/studio-core';
-import type { FiberNode, Hook } from 'react-devtools-inline';
+  SlotType,
+} from '@mui/studio-core';
+import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, NodeState, ViewState, FlowDirection } from '../src/types';
 import { getRelativeBoundingBox } from '../src/utils/geometry';
 
@@ -42,53 +42,14 @@ function walkFibers(node: FiberNode, visitor: (node: FiberNode) => void) {
   }
 }
 
-function getDevtoolsHook(contentWindow: Window): Hook {
+export function getViewState(viewElm: HTMLElement): ViewState {
   // eslint-disable-next-line no-underscore-dangle
-  const devtoolsHook = contentWindow.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+  const devtoolsHook = viewElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
   if (!devtoolsHook) {
-    throw new Error(`Can't read page layout as react devtools are not installed`);
+    console.warn(`Can't read page layout as react devtools are not installed`);
+    return {};
   }
-
-  return devtoolsHook;
-}
-
-function findNodeUpFiberTree(fiber: FiberNode): NodeId | null {
-  if (fiber.memoizedProps) {
-    const studioNodeId = fiber.memoizedProps[RUNTIME_PROP_NODE_ID] as NodeId | undefined;
-    if (studioNodeId) {
-      return studioNodeId;
-    }
-    if (fiber.return) {
-      return findNodeUpFiberTree(fiber.return);
-    }
-  }
-  return null;
-}
-
-export function findNodeAt(
-  viewElm: HTMLElement,
-  viewState: ViewState,
-  x: number,
-  y: number,
-): NodeId | null {
-  const devtoolsHook = getDevtoolsHook(viewElm.ownerDocument.defaultView!);
-  const elms = window.document.elementsFromPoint(x, y);
-  // eslint-disable-next-line no-restricted-syntax
-  for (const elm of elms) {
-    const fiber = devtoolsHook.renderers.get(1)?.findFiberByHostInstance(elm);
-    if (fiber) {
-      const studioNode = findNodeUpFiberTree(fiber);
-      if (studioNode) {
-        return studioNode;
-      }
-    }
-  }
-  return null;
-}
-
-export function getViewState(viewElm: HTMLElement): ViewState {
-  const devtoolsHook = getDevtoolsHook(viewElm.ownerDocument.defaultView!);
 
   const viewState: ViewState = {};
 
@@ -103,6 +64,7 @@ export function getViewState(viewElm: HTMLElement): ViewState {
 
         const studioNodeId = fiber.memoizedProps[RUNTIME_PROP_NODE_ID] as string | undefined;
         if (studioNodeId) {
+          console.log(studioNodeId);
           const nodeId: NodeId = studioNodeId as NodeId;
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {

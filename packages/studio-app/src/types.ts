@@ -132,6 +132,7 @@ export interface StudioConnection<P = {}> extends StudioConnectionSummary {
 
 export type StudioBridgeEvents = {
   update: {};
+  click: { x: number; y: number; tragetNode: NodeId };
 };
 
 // Used for communication between the editor UI and the sandboxed application

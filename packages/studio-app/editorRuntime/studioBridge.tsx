@@ -1,4 +1,6 @@
 import mitt from 'mitt';
+import ReactDOM from 'react-dom';
+import * as React from 'react';
 import { getViewState, findNodeAt } from './pageViewState';
 import { NodeId, StudioBridge, StudioBridgeEvents, ViewState } from '../src/types';
 import PinholeOverlay from './PinholeOverlay';
@@ -36,7 +38,7 @@ class SelectionOverlay {
   }
 }
 
-class StudioBridgeImpl implements StudioBridge {
+class EditorRuntime implements StudioBridge {
   private selectionOverlay: SelectionOverlay;
 
   private viewState: ViewState = {};
@@ -74,7 +76,7 @@ class StudioBridgeImpl implements StudioBridge {
     const y = event.clientY;
     const clickedNode = findNodeAt(this.studioRoot, this.viewState, x, y);
     if (clickedNode) {
-      this.events.emit('click', { tragetNode: clickedNode, x, y });
+      this.events.emit('click', { targetNode: clickedNode, x, y });
     }
   }
 
@@ -98,8 +100,36 @@ class StudioBridgeImpl implements StudioBridge {
   getViewState() {
     return this.viewState;
   }
+
+  getRootElm() {
+    return this.studioRoot;
+  }
 }
 
 export function createStudioBridge(window: Window, studioRoot: HTMLElement): StudioBridge {
-  return new StudioBridgeImpl(window.document, window.document.body, studioRoot);
+  const editorRuntime = new EditorRuntime(window.document, window.document.body, studioRoot);
+  return {
+    events: editorRuntime.events,
+    getViewState: () => editorRuntime.getViewState(),
+    setSelection: (...args) => editorRuntime.setSelection(...args),
+    getRootElm: () => editorRuntime.getRootElm(),
+  };
 }
+
+function renderOverlay() {
+  const overlayRoot = window.document.createElement('div');
+  overlayRoot.style.position = 'fixed';
+  overlayRoot.style.top = '0';
+  overlayRoot.style.left = '0';
+  overlayRoot.style.right = '0';
+  overlayRoot.style.bottom = '0';
+  overlayRoot.style.width = '100%';
+  overlayRoot.style.height = '100%';
+  overlayRoot.style.pointerEvents = 'none';
+  document.body.appendChild(overlayRoot);
+
+  console.log('rendering overlat');
+  ReactDOM.render(<div>HELLOOO</div>, overlayRoot);
+}
+
+renderOverlay();

@@ -130,9 +130,15 @@ export interface StudioConnection<P = {}> extends StudioConnectionSummary {
   status: ConnectionStatus | null;
 }
 
+export interface StudioBridgeClickEvent {
+  x: number;
+  y: number;
+  targetNode: NodeId;
+}
+
 export type StudioBridgeEvents = {
   update: {};
-  click: { x: number; y: number; tragetNode: NodeId };
+  click: StudioBridgeClickEvent;
 };
 
 // Used for communication between the editor UI and the sandboxed application
@@ -140,4 +146,5 @@ export interface StudioBridge {
   events: Emitter<StudioBridgeEvents>;
   setSelection: (nodeId: NodeId | null) => void;
   getViewState: () => ViewState;
+  getRootElm: () => HTMLElement | null;
 }

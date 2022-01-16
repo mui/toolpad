@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { NodeId } from '../../types';
+import mitt from 'mitt';
+import { NodeId, StudioBridge } from '../../types';
 import * as studioDom from '../../studioDom';
 import renderPageCode from '../../renderPageCode';
 import StudioSandbox, { StudioSandboxHandle } from '../StudioSandbox';
@@ -54,24 +55,16 @@ export interface PageViewHandle {
 
 export interface PageViewProps {
   className?: string;
-  // Callback for when the view has rendered. Make sure this value is stable
-  onUpdate?: () => void;
   dom: studioDom.StudioDom;
   pageNodeId: NodeId;
   resizeWithContent?: boolean;
 }
 
 export default React.forwardRef(function PageView(
-  { className, dom, pageNodeId, resizeWithContent, onUpdate }: PageViewProps,
+  { className, dom, pageNodeId, resizeWithContent }: PageViewProps,
   ref: React.ForwardedRef<PageViewHandle>,
 ) {
   const frameRef = React.useRef<StudioSandboxHandle>(null);
-
-  React.useImperativeHandle(ref, () => ({
-    getRootElm() {
-      return frameRef.current?.getRootElm() ?? null;
-    },
-  }));
 
   const renderedPage = React.useMemo(() => {
     return renderPageCode(dom, pageNodeId, {
@@ -85,20 +78,30 @@ export default React.forwardRef(function PageView(
     });
   }, [dom]);
 
-  const handleLoad = React.useCallback(
-    (window: Window) => {
-      // eslint-disable-next-line no-underscore-dangle
-      const bridge = window.__STUDIO;
-      if (bridge && onUpdate) {
-        bridge.events.on('update', onUpdate);
-        return () => {
-          bridge.events.off('update', onUpdate);
-        };
+  const bridgeProxy = React.useRef<StudioBridge>({
+    events: mitt(),
+    getViewState: () => ({}),
+    setSelection: () => {},
+    getRootElm: () => null,
+  });
+
+  const bridgeRef = React.useRef<StudioBridge | null>(null);
+  const handleLoad = React.useCallback((window: Window) => {
+    // eslint-disable-next-line no-underscore-dangle
+    const bridge = window.__STUDIO;
+    if (bridge) {
+      if (bridgeRef.current) {
+        bridgeRef.current.events.all.clear();
       }
-      return () => {};
-    },
-    [onUpdate],
-  );
+
+      bridgeRef.current = bridge;
+      const { events, ...rest } = bridge;
+      Object.assign(bridgeProxy.current, rest);
+      events.on('*', (type, event) => bridgeProxy.current.events.emit(type, event));
+    }
+  }, []);
+
+  React.useImperativeHandle(ref, () => bridgeProxy.current);
 
   return (
     <StudioSandbox

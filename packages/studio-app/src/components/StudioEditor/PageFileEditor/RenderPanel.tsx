@@ -10,9 +10,10 @@ import {
   SlotLocation,
   SlotState,
   StudioBridge,
+  StudioBridgeClickEvent,
 } from '../../../types';
 import * as studioDom from '../../../studioDom';
-import PageView, { PageViewHandle } from '../../PageView';
+import PageView from '../../PageView';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -452,23 +453,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     highlightedSlot,
   } = usePageEditorState();
 
-  const viewRef = React.useRef<PageViewHandle>(null);
+  const viewRef = React.useRef<StudioBridge>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
 
   const [isFocused, setIsFocused] = React.useState(false);
 
   const pageNode = studioDom.getNode(dom, pageNodeId);
   studioDom.assertIsPage(pageNode);
-
-  const getStudioBridge = React.useCallback((): StudioBridge => {
-    const studioWindow = viewRef.current?.getRootElm()?.ownerDocument.defaultView;
-    // eslint-disable-next-line no-underscore-dangle
-    const bridge = studioWindow?.__STUDIO;
-    if (!bridge) {
-      throw new Error(`Can't connect to bridge`);
-    }
-    return bridge;
-  }, []);
 
   const pageNodes: readonly PageOrElementNode[] = React.useMemo(() => {
     return [pageNode, ...studioDom.getDescendants(dom, pageNode)];
@@ -496,12 +487,34 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return pageNodes.filter((node) => !excludedNodes.has(node));
   }, [dom, pageNodes, selectedNode]);
 
-  const handleRender = React.useCallback(() => {
-    const rootElm = viewRef.current?.getRootElm();
-    if (rootElm) {
-      api.pageEditor.pageViewStateUpdate(getStudioBridge().getViewState());
+  React.useEffect(() => {
+    const bridge = viewRef.current;
+
+    if (bridge) {
+      const handleRender = () => api.pageEditor.pageViewStateUpdate(bridge.getViewState());
+
+      const handleClick = (event: StudioBridgeClickEvent) => {
+        if (event.targetNode) {
+          api.select(event.targetNode);
+        }
+      };
+
+      bridge.events.on('update', handleRender);
+      bridge.events.on('click', handleClick);
+      return () => {
+        bridge.events.off('update', handleRender);
+        bridge.events.off('click', handleClick);
+      };
     }
-  }, [api, getStudioBridge]);
+    return () => {};
+  }, [api]);
+
+  React.useEffect(() => {
+    const bridge = viewRef.current;
+    if (bridge) {
+      // bridge.setSelection(selection);
+    }
+  }, [selection]);
 
   const getViewCoordinates = React.useCallback(
     (clientX: number, clientY: number): { x: number; y: number } | null => {
@@ -660,6 +673,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     }
   }, []);
   const handleBlur = React.useCallback(() => setIsFocused(false), []);
+
   return (
     <RenderPanelRoot
       ref={rootRef}
@@ -676,7 +690,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           ref={viewRef}
           dom={dom}
           pageNodeId={pageNodeId}
-          onUpdate={handleRender}
         />
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <div

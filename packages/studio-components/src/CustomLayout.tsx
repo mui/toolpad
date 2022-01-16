@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createComponent, Placeholder } from '@mui/studio-core';
-import Grid from '@mui/material/Grid';
+import { Grid } from '@mui/material';
 
 export interface CustomLayoutProps {
   child1: React.ReactNode;

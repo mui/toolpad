@@ -1,4 +1,4 @@
-import Stack from '@mui/material/Stack';
+import { Stack } from '@mui/material';
 import { createComponent } from '@mui/studio-core';
 
 export default createComponent(Stack, {

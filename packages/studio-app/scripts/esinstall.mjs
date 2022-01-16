@@ -2,6 +2,12 @@
 import { install } from 'esinstall';
 import * as path from 'path';
 import * as url from 'url';
+import arg from 'arg';
+
+const args = arg({
+  // Types
+  '--dev': Boolean,
+});
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
@@ -19,13 +25,6 @@ const { stats } = await install(
     '@mui/material/utils',
     '@mui/material/styles',
     '@mui/material/colors',
-    '@mui/material/Container',
-    '@mui/material/Grid',
-    '@mui/material/Stack',
-    '@mui/material/Paper',
-    '@mui/material/Button',
-    '@mui/material/TextField',
-    '@mui/material/Typography',
   ],
   {
     cwd: path.resolve(dirname, '..'),
@@ -33,7 +32,7 @@ const { stats } = await install(
     // logger: console,
     packageLookupFields: ['module', 'main'],
     env: {
-      NODE_ENV: 'production',
+      NODE_ENV: args['--dev'] ? 'development' : 'production',
     },
   },
 );

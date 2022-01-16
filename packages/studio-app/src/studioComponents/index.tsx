@@ -16,6 +16,7 @@ export const DEFAULT_COMPONENTS = new Map([
   ['TextField', { module: '@mui/studio-components', importedName: 'TextField' }],
   ['Typography', { module: '@mui/studio-components', importedName: 'Typography' }],
   ['CustomLayout', { module: '@mui/studio-components', importedName: 'CustomLayout' }],
+  ['Select', { module: '@mui/studio-components', importedName: 'Select' }],
 ]);
 
 export function getStudioComponent(

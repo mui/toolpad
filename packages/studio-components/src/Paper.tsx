@@ -1,4 +1,4 @@
-import Paper from '@mui/material/Paper';
+import { Paper } from '@mui/material';
 import { createComponent } from '@mui/studio-core';
 
 export default createComponent(Paper, {

@@ -13,7 +13,7 @@ function NumberPropEditor({ name, value, onChange, disabled }: EditorProps<numbe
   return (
     <TextField
       fullWidth
-      value={String(value)}
+      value={String(value ?? 0)}
       disabled={disabled}
       type="number"
       onChange={handleChange}

@@ -1,4 +1,4 @@
-import Button from '@mui/material/Button';
+import { Button } from '@mui/material';
 import { createComponent } from '@mui/studio-core';
 
 export default createComponent(Button, {

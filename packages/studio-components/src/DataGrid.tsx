@@ -9,7 +9,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { createComponent, useStudioNode } from '@mui/studio-core';
-import { debounce } from '@mui/material/utils';
+import { debounce } from '@mui/material';
 
 // TODO: Generate a specific license for Studio (This one comes from CI)
 const LICENSE = '<REDACTED>';

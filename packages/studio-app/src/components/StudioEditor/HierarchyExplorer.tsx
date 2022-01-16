@@ -155,7 +155,6 @@ function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newApiNode, appNode.id, 'children');
           onClose?.(e, 'backdropClick');
-          console.log(newApiNode.id);
           editorApi.openApiEditor(newApiNode.id);
         }}
         style={{

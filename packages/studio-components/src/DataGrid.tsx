@@ -29,7 +29,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const handleResize = React.useMemo(
     () =>
       debounce((params: GridColumnResizeParams, event: MuiEvent, details: GridCallbackDetails) => {
-        console.log(params, event, details);
         if (!studioNode) {
           return;
         }

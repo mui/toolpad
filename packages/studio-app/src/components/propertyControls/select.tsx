@@ -17,7 +17,7 @@ function SelectPropEditor({ name, argType, value, onChange, disabled }: EditorPr
         labelId={`select-${name}`}
         size="small"
         label={name}
-        value={value}
+        value={value ?? ''}
         disabled={disabled}
         onChange={handleChange}
       >

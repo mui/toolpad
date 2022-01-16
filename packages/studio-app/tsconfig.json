@@ -18,5 +18,5 @@
     "noUnusedLocals": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "typings/**/*.d.ts"],
-  "exclude": ["node_modules", "sandbox", "serviceWorker", "./scripts"]
+  "exclude": ["node_modules", "serviceWorker", "./scripts"]
 }

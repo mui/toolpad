@@ -9,8 +9,8 @@
     "fix": "next lint --fix && prettier --write .",
     "build:next": "next build",
     "dev:next": "next dev",
-    "build:compiled": "tsc --build ./sandbox",
-    "dev:compiled": "yarn build:compiled --pretty --preserveWatchOutput --watch",
+    "build:esbuild": "esbuild ./sandbox/index.ts ./editorRuntime/index.ts --target=es6 --bundle --outdir=./public",
+    "dev:esbuild": "yarn build:esbuild --watch",
     "esinstall": "node ./scripts/esinstall.mjs"
   },
   "dependencies": {

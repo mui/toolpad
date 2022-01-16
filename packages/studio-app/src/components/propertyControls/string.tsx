@@ -12,7 +12,7 @@ function StringPropEditor({ name, value, onChange, disabled }: EditorProps<strin
   return (
     <TextField
       fullWidth
-      value={value}
+      value={value ?? ''}
       disabled={disabled}
       onChange={handleChange}
       label={name}

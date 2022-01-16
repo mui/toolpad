@@ -1,4 +1,4 @@
-import TextField from '@mui/material/TextField';
+import { TextField } from '@mui/material';
 import { createComponent } from '@mui/studio-core';
 
 export default createComponent(TextField, {
@@ -12,7 +12,7 @@ export default createComponent(TextField, {
     },
     size: {
       typeDef: { type: 'string', enum: ['small', 'normal'] },
-      defaultValue: 'outlined',
+      defaultValue: 'small',
     },
     value: {
       typeDef: { type: 'string' },

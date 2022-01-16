@@ -1,5 +1,5 @@
 import { createComponent } from '@mui/studio-core';
-import Typography from '@mui/material/Typography';
+import { Typography } from '@mui/material';
 
 export default createComponent(Typography, {
   argTypes: {

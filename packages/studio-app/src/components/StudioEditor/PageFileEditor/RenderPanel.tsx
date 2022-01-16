@@ -739,12 +739,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             This allows interactivity on the selected element only, while maintaining
             a reliable click target for the rest of the page
           */}
-          <PinholeOverlay
-            ref={overlayRef}
-            className={classes.hudOverlay}
-            onClick={handleClick}
-            pinhole={selectedRect}
-          />
+          <PinholeOverlay ref={overlayRef} className={classes.hudOverlay} pinhole={selectedRect} />
         </div>
       </div>
     </RenderPanelRoot>

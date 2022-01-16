@@ -43,7 +43,7 @@ commands:
             yarn cache list
       - run:
           name: Install js dependencies
-          command: yarn install --verbose
+          command: yarn install --frozen-lockfile --verbose
           environment:
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: <<# parameters.browsers >>0<</ parameters.browsers >><<^ parameters.browsers >>1<</ parameters.browsers >>
       - save_cache:

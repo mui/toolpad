@@ -5,3 +5,4 @@ export { default as Stack } from './Stack.js';
 export { default as DataGrid } from './DataGrid.js';
 export { default as Typography } from './Typography.js';
 export { default as CustomLayout } from './CustomLayout.js';
+export { default as Select } from './Select.js';

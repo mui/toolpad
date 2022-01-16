@@ -670,6 +670,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     >
       <div className={classes.scrollContainer}>
         <PageView
+          // TODO: aim to get rid of this resizing behavior
+          resizeWithContent
           className={classes.view}
           ref={viewRef}
           dom={dom}

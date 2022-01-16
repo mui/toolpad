@@ -1,15 +1,10 @@
 import * as React from 'react';
-import { styled } from '@mui/material';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
 import renderPageCode from '../../renderPageCode';
 import StudioSandbox, { StudioSandboxHandle } from '../StudioSandbox';
 import getImportMap from '../../getImportMap';
 import renderThemeCode from '../../renderThemeCode';
-
-const PageViewRoot = styled('div')({
-  overflow: 'auto',
-});
 
 const appIndex = `
 import * as React from 'react';
@@ -63,10 +58,11 @@ export interface PageViewProps {
   onUpdate?: () => void;
   dom: studioDom.StudioDom;
   pageNodeId: NodeId;
+  resizeWithContent?: boolean;
 }
 
 export default React.forwardRef(function PageView(
-  { className, dom, pageNodeId, onUpdate }: PageViewProps,
+  { className, dom, pageNodeId, resizeWithContent, onUpdate }: PageViewProps,
   ref: React.ForwardedRef<PageViewHandle>,
 ) {
   const frameRef = React.useRef<StudioSandboxHandle>(null);
@@ -105,19 +101,19 @@ export default React.forwardRef(function PageView(
   );
 
   return (
-    <PageViewRoot className={className}>
-      <StudioSandbox
-        ref={frameRef}
-        onLoad={handleLoad}
-        base="/app/1234"
-        importMap={getImportMap()}
-        files={{
-          '/lib/theme.js': { code: renderedTheme.code },
-          '/index.js': { code: appIndex },
-          '/page.js': { code: renderedPage.code },
-        }}
-        entry="/index.js"
-      />
-    </PageViewRoot>
+    <StudioSandbox
+      className={className}
+      ref={frameRef}
+      resizeWithContent={resizeWithContent}
+      onLoad={handleLoad}
+      base="/app/1234"
+      importMap={getImportMap()}
+      files={{
+        '/lib/theme.js': { code: renderedTheme.code },
+        '/index.js': { code: appIndex },
+        '/page.js': { code: renderedPage.code },
+      }}
+      entry="/index.js"
+    />
   );
 });

@@ -27,6 +27,7 @@ export interface StudioSandboxProps {
   importMap?: ImportMap;
   files: SandboxFiles;
   entry: string;
+  resizeWithContent?: boolean;
   // Callback for when the view has rendered. Make sure this value is stable
   onLoad?: (window: Window) => void;
 }
@@ -64,9 +65,10 @@ async function addFiles(files: SandboxFiles, base: string) {
 interface CreatePageParams {
   importMap: string;
   entry: string;
+  preload: string;
 }
 
-function createPage({ importMap, entry }: CreatePageParams) {
+function createPage({ importMap, preload, entry }: CreatePageParams) {
   return `
     <!DOCTYPE html>
     <html>
@@ -92,6 +94,8 @@ function createPage({ importMap, entry }: CreatePageParams) {
           ${importMap}
         </script>
 
+        ${preload}
+
         <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
         <script async src="/web_modules/es-module-shims.js" type="module"></script>
 
@@ -106,15 +110,27 @@ function createPage({ importMap, entry }: CreatePageParams) {
 }
 
 export default React.forwardRef(function StudioSandbox(
-  { className, onLoad, files, entry, base, importMap = { imports: {} } }: StudioSandboxProps,
+  {
+    className,
+    onLoad,
+    files,
+    entry,
+    base,
+    resizeWithContent,
+    importMap = { imports: {} },
+  }: StudioSandboxProps,
+
   ref: React.ForwardedRef<StudioSandboxHandle>,
 ) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
-  const [height, setHeight] = React.useState(0);
+  const [height, setHeight] = React.useState<number>();
   const resizeObserverRef = React.useRef<ResizeObserver>();
   const mutationObserverRef = React.useRef<MutationObserver>();
 
   const serializedImportMap = JSON.stringify(importMap);
+  const serializedPreload = Object.values(importMap.imports)
+    .map((url) => `<link rel="modulepreload" href="${url}" />`)
+    .join('\n');
   const prevFiles = React.useRef<SandboxFiles>(files);
   const resolvedEntry = base + entry;
 
@@ -135,7 +151,12 @@ export default React.forwardRef(function StudioSandbox(
         {
           ...prevFiles.current,
           '/': {
-            code: createPage({ importMap: serializedImportMap, entry: resolvedEntry }),
+            code: createPage({
+              importMap: serializedImportMap,
+              preload: serializedPreload,
+              entry: resolvedEntry,
+            }),
+
             type: 'text/html',
           },
         },
@@ -146,7 +167,7 @@ export default React.forwardRef(function StudioSandbox(
     };
     init(frameRef.current);
     // TODO: cleanup service worker/cache? what if multiple sandboxes are initialized?
-  }, [base, entry, serializedImportMap, resolvedEntry]);
+  }, [base, entry, serializedImportMap, serializedPreload, resolvedEntry]);
 
   React.useImperativeHandle(ref, () => ({
     getRootElm() {
@@ -163,15 +184,18 @@ export default React.forwardRef(function StudioSandbox(
       throw new Error(`Invariant: frameRef not correctly attached`);
     }
 
-    resizeObserverRef.current = new ResizeObserver((entries) => {
-      const [documentEntry] = entries;
-      setHeight(documentEntry.contentRect.height);
-    });
+    // TODO: aim at eliminating the need for resizing with the content
+    if (resizeWithContent) {
+      resizeObserverRef.current = new ResizeObserver((entries) => {
+        const [documentEntry] = entries;
+        setHeight(documentEntry.contentRect.height);
+      });
 
-    resizeObserverRef.current.observe(frameRef.current.contentWindow.document.body);
+      resizeObserverRef.current.observe(frameRef.current.contentWindow.document.body);
+    }
 
     onLoad?.(frameWindow);
-  }, [onLoad]);
+  }, [onLoad, resizeWithContent]);
 
   React.useEffect(
     () => () => {

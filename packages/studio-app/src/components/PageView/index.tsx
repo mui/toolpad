@@ -55,13 +55,12 @@ export interface PageViewHandle {
 export interface PageViewProps {
   className?: string;
   // Callback for when the view has rendered. Make sure this value is stable
-  onUpdate?: () => void;
   onLoad?: (window: Window) => void;
   dom: studioDom.StudioDom;
   pageNodeId: NodeId;
 }
 
-export default function PageView({ className, dom, pageNodeId, onUpdate, onLoad }: PageViewProps) {
+export default function PageView({ className, dom, pageNodeId, onLoad }: PageViewProps) {
   const renderedPage = React.useMemo(() => {
     return renderPageCode(dom, pageNodeId, {
       editor: true,
@@ -77,7 +76,6 @@ export default function PageView({ className, dom, pageNodeId, onUpdate, onLoad 
   return (
     <StudioSandbox
       className={className}
-      onUpdate={onUpdate}
       onLoad={onLoad}
       base="/app/1234"
       importMap={getImportMap()}

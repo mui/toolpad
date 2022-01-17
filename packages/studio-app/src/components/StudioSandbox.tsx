@@ -27,8 +27,7 @@ export interface StudioSandboxProps {
   importMap?: ImportMap;
   files: SandboxFiles;
   entry: string;
-  // Callback for when the view has rendered. Make sure this value is stable
-  onUpdate?: () => void;
+  // Callback for when the view has loaded. Make sure this value is stable
   onLoad?: (windiw: Window) => void;
 }
 

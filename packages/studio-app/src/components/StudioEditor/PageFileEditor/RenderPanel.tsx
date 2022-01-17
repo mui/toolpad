@@ -445,8 +445,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     highlightedSlot,
   } = usePageEditorState();
 
-  const overlayRef = React.useRef<HTMLDivElement>(null);
-
   const pageNode = studioDom.getNode(dom, pageNodeId);
   studioDom.assertIsPage(pageNode);
 
@@ -476,55 +474,27 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return pageNodes.filter((node) => !excludedNodes.has(node));
   }, [dom, pageNodes, selectedNode]);
 
-  const getViewCoordinates = React.useCallback(
-    (clientX: number, clientY: number): { x: number; y: number } | null => {
-      const rootElm = overlayRef.current;
-      if (!rootElm) {
-        return null;
-      }
-      const rect = rootElm.getBoundingClientRect();
-      if (rectContainsPoint(rect, clientX, clientY)) {
-        return { x: clientX - rect.x, y: clientY - rect.y };
-      }
-      return null;
-    },
-    [],
-  );
-
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-
-      if (!cursorPos) {
-        return;
-      }
-
       event.dataTransfer.dropEffect = 'move';
 
-      const nodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
+      const nodeId = findNodeAt(pageNodes, viewState, event.clientX, event.clientY);
 
       if (nodeId) {
         api.select(nodeId);
       }
     },
-    [api, getViewCoordinates, pageNodes, viewState],
+    [api, pageNodes, viewState],
   );
 
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-
-      if (!cursorPos) {
-        api.pageEditor.nodeDragOver(null);
-        return;
-      }
-
       const slotIndex = findActiveSlotAt(
         availableNodes,
         viewState,
         slots,
-        cursorPos.x,
-        cursorPos.y,
+        event.clientX,
+        event.clientY,
       );
 
       const activeSlot = slotIndex;
@@ -536,23 +506,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.pageEditor.nodeDragOver(null);
       }
     },
-    [availableNodes, getViewCoordinates, viewState, api, slots],
+    [availableNodes, viewState, api, slots],
   );
 
   const handleDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-
-      if (!cursorPos) {
-        return;
-      }
-
       const activeSlot = findActiveSlotAt(
         availableNodes,
         viewState,
         slots,
-        cursorPos.x,
-        cursorPos.y,
+        event.clientX,
+        event.clientY,
       );
 
       if (activeSlot) {
@@ -575,7 +539,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.pageEditor.nodeDragEnd();
     },
-    [availableNodes, getViewCoordinates, viewState, domApi, api, slots, newNode, selection],
+    [availableNodes, viewState, domApi, api, slots, newNode, selection],
   );
 
   const handleDragEnd = React.useCallback(
@@ -595,16 +559,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-
-      if (!cursorPos) {
-        return;
-      }
-
-      const newSelectedNodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
+      const newSelectedNodeId = findNodeAt(pageNodes, viewState, event.clientX, event.clientY);
       api.select(newSelectedNodeId);
     },
-    [api, getViewCoordinates, pageNodes, viewState],
+    [api, pageNodes, viewState],
   );
 
   const handleKeyDown = React.useCallback(
@@ -628,22 +586,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     );
   }, [dom, selectedNode]);
 
-  const [editorDoc, setEditorDoc] = React.useState<Document>();
-  const handleLoad = React.useCallback((window: Window) => setEditorDoc(window.document), []);
+  // We will use this key to remount the overlay after page load
+  const [overlayKey, setOverlayKey] = React.useState(1);
+  const editorWindowRef = React.useRef<Window>();
 
-  const mutationObserverRef = React.useRef<MutationObserver>();
+  const handleLoad = React.useCallback((frameWindow: Window) => {
+    editorWindowRef.current = frameWindow;
+    setOverlayKey((key) => key + 1);
+  }, []);
+
   React.useEffect(() => {
-    const rootElm = editorDoc?.getElementById('root');
-
+    const rootElm = editorWindowRef.current?.document.getElementById('root');
     if (rootElm) {
-      let observer = mutationObserverRef.current;
-      if (!observer) {
-        observer = new MutationObserver(() => {
-          // TODO: debounce?
-          api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
-        });
-        mutationObserverRef.current = observer;
-      }
+      const observer = new MutationObserver(() => {
+        // TODO: Do we need to throttle this?
+        api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
+      });
 
       observer.observe(rootElm, {
         attributes: true,
@@ -651,16 +609,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         subtree: true,
       });
 
-      return () => observer?.disconnect();
+      return () => observer.disconnect();
     }
-
     return () => {};
-  }, [editorDoc, api]);
+  }, [overlayKey, api]);
 
   return (
     <RenderPanelRoot className={className}>
       <PageView className={classes.view} dom={dom} pageNodeId={pageNodeId} onLoad={handleLoad} />
-      <EditorOverlay document={editorDoc}>
+      <EditorOverlay key={overlayKey} window={editorWindowRef.current}>
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <OverlayRoot
           className={clsx({
@@ -736,7 +693,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             This allows interactivity on the selected element only, while maintaining
             a reliable click target for the rest of the page
           */}
-          <PinholeOverlay ref={overlayRef} className={classes.hudOverlay} pinhole={selectedRect} />
+          <PinholeOverlay className={classes.hudOverlay} pinhole={selectedRect} />
         </OverlayRoot>
       </EditorOverlay>
     </RenderPanelRoot>

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import Portal from '@mui/material/Portal';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
+import ReactDOM from 'react-dom';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -25,7 +25,7 @@ function Overlay(props: OverlayProps) {
 }
 
 export interface EditorOverlayProps {
-  document?: Document;
+  window?: Window;
   children?: React.ReactNode;
 }
 
@@ -33,25 +33,28 @@ export interface EditorOverlayProps {
  * Responsible for creating the portal that will render the overlay inside of the editor
  * iframe.
  */
-export default function EditorOverlay({ document, children }: EditorOverlayProps) {
-  const overlayContainerRef = React.useRef<HTMLDivElement>();
+export default function EditorOverlay({ window, children }: EditorOverlayProps) {
+  const [overlayContainer, setOverlayContainer] = React.useState<HTMLDivElement>();
+
   React.useEffect(() => {
-    if (document) {
-      const container = document.createElement('div');
+    if (window) {
+      const container = window.document.createElement('div');
       container.style.position = 'absolute';
       container.style.left = '0';
       container.style.top = '0';
       container.style.right = '0';
       container.style.bottom = '0';
       container.style.pointerEvents = 'none';
-      document.body.appendChild(container);
-      overlayContainerRef.current = container;
+      window.document.body.appendChild(container);
+      setOverlayContainer(container);
     }
-  }, [document]);
+    return () => {};
+  }, [window]);
 
-  return overlayContainerRef.current ? (
-    <Portal container={overlayContainerRef.current}>
-      <Overlay container={overlayContainerRef.current}>{children}</Overlay>
-    </Portal>
-  ) : null;
+  return overlayContainer
+    ? ReactDOM.createPortal(
+        <Overlay container={overlayContainer}>{children}</Overlay>,
+        overlayContainer,
+      )
+    : null;
 }

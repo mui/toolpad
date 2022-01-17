@@ -154,15 +154,16 @@ export default function StudioSandbox({
     // TODO: cleanup service worker/cache? what if multiple sandboxes are initialized?
   }, [base, entry, serializedImportMap, serializedPreload, resolvedEntry]);
 
-  const handleFrameLoad = React.useCallback(() => {
-    const frameWindow = frameRef.current?.contentWindow;
-
-    if (!frameWindow) {
-      throw new Error(`Invariant: frameRef not correctly attached`);
-    }
-
-    onLoad?.(frameWindow);
-  }, [onLoad]);
+  const handleFrameLoad = React.useCallback<React.ReactEventHandler<HTMLIFrameElement>>(
+    (event) => {
+      const frameWindow = event.currentTarget.contentWindow;
+      if (!frameWindow) {
+        throw new Error(`Invariant: Missing frame window`);
+      }
+      onLoad?.(frameWindow);
+    },
+    [onLoad],
+  );
 
   React.useEffect(() => {
     const initCache = async () => {

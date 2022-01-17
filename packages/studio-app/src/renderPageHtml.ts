@@ -31,7 +31,8 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
-        <div id="root"></div>
+        <!-- "overflow: hidden;" prevents children margins from collapsing -->
+        <div id="root" style="overflow: hidden;"></div>
 
         <script type="importmap">
           ${serializedImportMap}

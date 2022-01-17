@@ -6,6 +6,7 @@ import {
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, NodeState, ViewState, FlowDirection } from './types';
+import { getRelativeBoundingBox } from './utils/geometry';
 
 declare global {
   interface Window {
@@ -20,7 +21,7 @@ function getNodeViewState(
   nodeId: NodeId,
 ): NodeState | null {
   if (nodeId) {
-    const rect = elm.getBoundingClientRect();
+    const rect = getRelativeBoundingBox(viewElm, elm);
     return {
       nodeId,
       rect,
@@ -41,9 +42,9 @@ function walkFibers(node: FiberNode, visitor: (node: FiberNode) => void) {
   }
 }
 
-export function getViewState(viewElm: HTMLElement): ViewState {
+export function getViewState(rootElm: HTMLElement): ViewState {
   // eslint-disable-next-line no-underscore-dangle
-  const devtoolsHook = viewElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+  const devtoolsHook = rootElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
   if (!devtoolsHook) {
     console.warn(`Can't read page layout as react devtools are not installed`);
@@ -67,7 +68,7 @@ export function getViewState(viewElm: HTMLElement): ViewState {
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {
             nodeElms.set(nodeId, elm);
-            const nodeViewState = getNodeViewState(fiber, viewElm, elm, nodeId);
+            const nodeViewState = getNodeViewState(fiber, rootElm, elm, nodeId);
             if (nodeViewState) {
               viewState[nodeId] = nodeViewState;
             }
@@ -85,7 +86,7 @@ export function getViewState(viewElm: HTMLElement): ViewState {
             ?.findHostInstanceByFiber(fiber);
           const childContainerElm = firstChildElm?.parentElement;
           if (childContainerElm && nodeViewState) {
-            const rect = childContainerElm.getBoundingClientRect();
+            const rect = getRelativeBoundingBox(rootElm, childContainerElm);
             const direction = window.getComputedStyle(childContainerElm)
               .flexDirection as FlowDirection;
             nodeViewState.slots[studioSlotName] = {

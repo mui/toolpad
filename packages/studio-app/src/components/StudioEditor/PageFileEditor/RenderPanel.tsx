@@ -454,6 +454,25 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const selectedNode = selection && studioDom.getNode(dom, selection);
 
+  // We will use this key to remount the overlay after page load
+  const [overlayKey, setOverlayKey] = React.useState(1);
+  const editorWindowRef = React.useRef<Window>();
+
+  const getViewCoordinates = React.useCallback(
+    (clientX: number, clientY: number): { x: number; y: number } | null => {
+      const rootElm = editorWindowRef.current?.document.getElementById('root');
+      if (!rootElm) {
+        return null;
+      }
+      const rect = rootElm.getBoundingClientRect();
+      if (rectContainsPoint(rect, clientX, clientY)) {
+        return { x: clientX - rect.x, y: clientY - rect.y };
+      }
+      return null;
+    },
+    [],
+  );
+
   const slots: ViewSlots = React.useMemo(() => {
     const result: ViewSlots = {};
     pageNodes.forEach((node) => {
@@ -476,25 +495,37 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<Element>) => {
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+
+      if (!cursorPos) {
+        return;
+      }
+
       event.dataTransfer.dropEffect = 'move';
 
-      const nodeId = findNodeAt(pageNodes, viewState, event.clientX, event.clientY);
+      const nodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
 
       if (nodeId) {
         api.select(nodeId);
       }
     },
-    [api, pageNodes, viewState],
+    [api, pageNodes, viewState, getViewCoordinates],
   );
 
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+
+      if (!cursorPos) {
+        return;
+      }
+
       const slotIndex = findActiveSlotAt(
         availableNodes,
         viewState,
         slots,
-        event.clientX,
-        event.clientY,
+        cursorPos.x,
+        cursorPos.y,
       );
 
       const activeSlot = slotIndex;
@@ -506,17 +537,23 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.pageEditor.nodeDragOver(null);
       }
     },
-    [availableNodes, viewState, api, slots],
+    [availableNodes, viewState, api, slots, getViewCoordinates],
   );
 
   const handleDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+
+      if (!cursorPos) {
+        return;
+      }
+
       const activeSlot = findActiveSlotAt(
         availableNodes,
         viewState,
         slots,
-        event.clientX,
-        event.clientY,
+        cursorPos.x,
+        cursorPos.y,
       );
 
       if (activeSlot) {
@@ -539,7 +576,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.pageEditor.nodeDragEnd();
     },
-    [availableNodes, viewState, domApi, api, slots, newNode, selection],
+    [availableNodes, viewState, domApi, api, slots, newNode, selection, getViewCoordinates],
   );
 
   const handleDragEnd = React.useCallback(
@@ -559,10 +596,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const newSelectedNodeId = findNodeAt(pageNodes, viewState, event.clientX, event.clientY);
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+
+      if (!cursorPos) {
+        return;
+      }
+
+      const newSelectedNodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
       api.select(newSelectedNodeId);
     },
-    [api, pageNodes, viewState],
+    [api, pageNodes, viewState, getViewCoordinates],
   );
 
   const handleKeyDown = React.useCallback(
@@ -585,10 +628,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       [...studioDom.getPageAncestors(dom, selectedNode), selectedNode].map((node) => node.id),
     );
   }, [dom, selectedNode]);
-
-  // We will use this key to remount the overlay after page load
-  const [overlayKey, setOverlayKey] = React.useState(1);
-  const editorWindowRef = React.useRef<Window>();
 
   const handleLoad = React.useCallback((frameWindow: Window) => {
     editorWindowRef.current = frameWindow;

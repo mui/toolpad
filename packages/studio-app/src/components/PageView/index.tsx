@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
 import renderPageCode from '../../renderPageCode';
-import StudioSandbox, { StudioSandboxHandle } from '../StudioSandbox';
+import StudioSandbox from '../StudioSandbox';
 import getImportMap from '../../getImportMap';
 import renderThemeCode from '../../renderThemeCode';
 
@@ -55,24 +55,12 @@ export interface PageViewHandle {
 export interface PageViewProps {
   className?: string;
   // Callback for when the view has rendered. Make sure this value is stable
-  onUpdate?: () => void;
+  onLoad?: (window: Window) => void;
   dom: studioDom.StudioDom;
   pageNodeId: NodeId;
-  resizeWithContent?: boolean;
 }
 
-export default React.forwardRef(function PageView(
-  { className, dom, pageNodeId, resizeWithContent, onUpdate }: PageViewProps,
-  ref: React.ForwardedRef<PageViewHandle>,
-) {
-  const frameRef = React.useRef<StudioSandboxHandle>(null);
-
-  React.useImperativeHandle(ref, () => ({
-    getRootElm() {
-      return frameRef.current?.getRootElm() ?? null;
-    },
-  }));
-
+export default function PageView({ className, dom, pageNodeId, onLoad }: PageViewProps) {
   const renderedPage = React.useMemo(() => {
     return renderPageCode(dom, pageNodeId, {
       editor: true,
@@ -88,9 +76,7 @@ export default React.forwardRef(function PageView(
   return (
     <StudioSandbox
       className={className}
-      ref={frameRef}
-      resizeWithContent={resizeWithContent}
-      onUpdate={onUpdate}
+      onLoad={onLoad}
       base="/app/1234"
       importMap={getImportMap()}
       files={{
@@ -101,4 +87,4 @@ export default React.forwardRef(function PageView(
       entry="/index.js"
     />
   );
-});
+}

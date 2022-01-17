@@ -11,7 +11,7 @@ import {
   SlotState,
 } from '../../../types';
 import * as studioDom from '../../../studioDom';
-import PageView, { PageViewHandle } from '../../PageView';
+import PageView from '../../PageView';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -25,6 +25,7 @@ import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomProvider';
 import { usePageEditorState } from './PageFileEditorProvider';
+import EditorOverlay from './EditorOverlay';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -45,25 +46,17 @@ const classes = {
 
 const RenderPanelRoot = styled('div')({
   position: 'relative',
-  overflow: 'auto',
+  overflow: 'hidden',
 
-  [`& .${classes.scrollContainer}`]: {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100%',
+  [`& .${classes.view}`]: {
+    height: '100%',
   },
+});
 
-  [`& .${classes.hud}`]: {
-    pointerEvents: 'none',
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
-
-  [`& .${classes.view}`]: {},
+const OverlayRoot = styled('div')({
+  pointerEvents: 'none',
+  width: '100%',
+  height: '100%',
 
   [`& .${classes.selectionHint}`]: {
     // capture mouse events
@@ -94,7 +87,7 @@ const RenderPanelRoot = styled('div')({
     },
   },
 
-  [`& .${classes.componentDragging}`]: {
+  [`&.${classes.componentDragging}`]: {
     [`& .${classes.insertSlotHud}`]: {
       border: '1px dashed #DDD',
     },
@@ -452,11 +445,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     highlightedSlot,
   } = usePageEditorState();
 
-  const viewRef = React.useRef<PageViewHandle>(null);
-  const overlayRef = React.useRef<HTMLDivElement>(null);
-
-  const [isFocused, setIsFocused] = React.useState(false);
-
   const pageNode = studioDom.getNode(dom, pageNodeId);
   studioDom.assertIsPage(pageNode);
 
@@ -486,62 +474,27 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return pageNodes.filter((node) => !excludedNodes.has(node));
   }, [dom, pageNodes, selectedNode]);
 
-  const handleRender = React.useCallback(() => {
-    const rootElm = viewRef.current?.getRootElm();
-    if (rootElm) {
-      api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
-    }
-  }, [api]);
-
-  const getViewCoordinates = React.useCallback(
-    (clientX: number, clientY: number): { x: number; y: number } | null => {
-      const rootElm = overlayRef.current;
-      if (!rootElm) {
-        return null;
-      }
-      const rect = rootElm.getBoundingClientRect();
-      if (rectContainsPoint(rect, clientX, clientY)) {
-        return { x: clientX - rect.x, y: clientY - rect.y };
-      }
-      return null;
-    },
-    [],
-  );
-
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-
-      if (!cursorPos) {
-        return;
-      }
-
       event.dataTransfer.dropEffect = 'move';
 
-      const nodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
+      const nodeId = findNodeAt(pageNodes, viewState, event.clientX, event.clientY);
 
       if (nodeId) {
         api.select(nodeId);
       }
     },
-    [api, getViewCoordinates, pageNodes, viewState],
+    [api, pageNodes, viewState],
   );
 
-  React.useEffect(() => {
-    const handleDragOver = (event: DragEvent) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-
-      if (!cursorPos) {
-        api.pageEditor.nodeDragOver(null);
-        return;
-      }
-
+  const handleDragOver = React.useCallback(
+    (event: React.DragEvent<Element>) => {
       const slotIndex = findActiveSlotAt(
         availableNodes,
         viewState,
         slots,
-        cursorPos.x,
-        cursorPos.y,
+        event.clientX,
+        event.clientY,
       );
 
       const activeSlot = slotIndex;
@@ -552,21 +505,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       } else {
         api.pageEditor.nodeDragOver(null);
       }
-    };
+    },
+    [availableNodes, viewState, api, slots],
+  );
 
-    const handleDrop = (event: DragEvent) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-
-      if (!cursorPos) {
-        return;
-      }
-
+  const handleDrop = React.useCallback(
+    (event: React.DragEvent<Element>) => {
       const activeSlot = findActiveSlotAt(
         availableNodes,
         viewState,
         slots,
-        cursorPos.x,
-        cursorPos.y,
+        event.clientX,
+        event.clientY,
       );
 
       if (activeSlot) {
@@ -588,49 +538,42 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       api.pageEditor.nodeDragEnd();
-    };
+    },
+    [availableNodes, viewState, domApi, api, slots, newNode, selection],
+  );
 
-    const handleDragEnd = (event: DragEvent) => {
+  const handleDragEnd = React.useCallback(
+    (event: DragEvent) => {
       event.preventDefault();
       api.pageEditor.nodeDragEnd();
-    };
-
-    window.addEventListener('dragover', handleDragOver);
-    window.addEventListener('drop', handleDrop);
-    window.addEventListener('dragend', handleDragEnd);
-    return () => {
-      window.removeEventListener('dragover', handleDragOver);
-      window.removeEventListener('drop', handleDrop);
-      window.removeEventListener('dragend', handleDragEnd);
-    };
-  }, [availableNodes, getViewCoordinates, viewState, domApi, api, slots, newNode, selection]);
-
-  const handleClick = React.useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-
-      if (!cursorPos) {
-        return;
-      }
-
-      const newSelectedNodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
-      api.select(newSelectedNodeId);
     },
-    [api, getViewCoordinates, pageNodes, viewState],
+    [api],
   );
 
   React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (isFocused && selection && event.key === 'Backspace') {
+    window.addEventListener('dragend', handleDragEnd);
+    return () => {
+      window.removeEventListener('dragend', handleDragEnd);
+    };
+  }, [handleDragEnd]);
+
+  const handleClick = React.useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      const newSelectedNodeId = findNodeAt(pageNodes, viewState, event.clientX, event.clientY);
+      api.select(newSelectedNodeId);
+    },
+    [api, pageNodes, viewState],
+  );
+
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (selection && event.key === 'Backspace') {
         domApi.removeNode(selection);
         api.deselect();
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [domApi, api, isFocused, selection]);
+    },
+    [domApi, api, selection],
+  );
 
   const selectedRect = selectedNode ? viewState[selectedNode.id]?.rect : null;
 
@@ -643,39 +586,50 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     );
   }, [dom, selectedNode]);
 
-  const rootRef = React.useRef<HTMLDivElement>(null);
-  const handleFocus = React.useCallback((event: React.FocusEvent<HTMLDivElement>) => {
-    if (event.target === rootRef.current) {
-      setIsFocused(true);
-    }
+  // We will use this key to remount the overlay after page load
+  const [overlayKey, setOverlayKey] = React.useState(1);
+  const editorWindowRef = React.useRef<Window>();
+
+  const handleLoad = React.useCallback((frameWindow: Window) => {
+    editorWindowRef.current = frameWindow;
+    setOverlayKey((key) => key + 1);
   }, []);
-  const handleBlur = React.useCallback(() => setIsFocused(false), []);
+
+  React.useEffect(() => {
+    const rootElm = editorWindowRef.current?.document.getElementById('root');
+    if (rootElm) {
+      const observer = new MutationObserver(() => {
+        // TODO: Do we need to throttle this?
+        api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
+      });
+
+      observer.observe(rootElm, {
+        attributes: true,
+        childList: true,
+        subtree: true,
+      });
+
+      return () => observer.disconnect();
+    }
+    return () => {};
+  }, [overlayKey, api]);
+
   return (
-    <RenderPanelRoot
-      ref={rootRef}
-      className={className}
-      tabIndex={0}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-    >
-      <div className={classes.scrollContainer}>
-        <PageView
-          // TODO: aim to get rid of this resizing behavior
-          resizeWithContent
-          className={classes.view}
-          ref={viewRef}
-          dom={dom}
-          pageNodeId={pageNodeId}
-          onUpdate={handleRender}
-        />
+    <RenderPanelRoot className={className}>
+      <PageView className={classes.view} dom={dom} pageNodeId={pageNodeId} onLoad={handleLoad} />
+      <EditorOverlay key={overlayKey} window={editorWindowRef.current}>
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-        <div
-          className={clsx(classes.hud, {
+        <OverlayRoot
+          className={clsx({
             [classes.componentDragging]: highlightLayout,
           })}
-          // This component has `pointer-events: none`, but we will slectively enable pointer-events
+          tabIndex={0}
+          // This component has `pointer-events: none`, but we will selectively enable pointer-events
           // for its children. We can still capture the click gobally
           onClick={handleClick}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onKeyDown={handleKeyDown}
         >
           {pageNodes.map((node) => {
             const nodeLayout = viewState[node.id];
@@ -739,9 +693,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             This allows interactivity on the selected element only, while maintaining
             a reliable click target for the rest of the page
           */}
-          <PinholeOverlay ref={overlayRef} className={classes.hudOverlay} pinhole={selectedRect} />
-        </div>
-      </div>
+          <PinholeOverlay className={classes.hudOverlay} pinhole={selectedRect} />
+        </OverlayRoot>
+      </EditorOverlay>
     </RenderPanelRoot>
   );
 }

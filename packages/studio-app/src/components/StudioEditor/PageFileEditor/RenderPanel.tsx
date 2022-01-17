@@ -580,7 +580,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   const handleDragEnd = React.useCallback(
-    (event: DragEvent) => {
+    (event: DragEvent | React.DragEvent) => {
       event.preventDefault();
       api.pageEditor.nodeDragEnd();
     },
@@ -676,6 +676,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onKeyDown={handleKeyDown}
+          onDragEnd={handleDragEnd}
         >
           {pageNodes.map((node) => {
             const nodeLayout = viewState[node.id];

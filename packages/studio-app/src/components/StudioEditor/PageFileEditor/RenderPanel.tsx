@@ -2,6 +2,9 @@ import { styled } from '@mui/system';
 import * as React from 'react';
 import clsx from 'clsx';
 import { SlotType } from '@mui/studio-core';
+import Portal from '@mui/material/Portal';
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
 import {
   NodeId,
   NodeState,
@@ -45,25 +48,38 @@ const classes = {
 
 const RenderPanelRoot = styled('div')({
   position: 'relative',
-  overflow: 'auto',
+  overflow: 'hidden',
 
-  [`& .${classes.scrollContainer}`]: {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100%',
+  [`& .${classes.view}`]: {
+    height: '100%',
   },
+});
 
-  [`& .${classes.hud}`]: {
-    pointerEvents: 'none',
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
+interface OverlayProps {
+  children?: React.ReactNode;
+  container: HTMLDivElement;
+}
 
-  [`& .${classes.view}`]: {},
+function Overlay(props: OverlayProps) {
+  const { children, container } = props;
+
+  const cache = React.useMemo(
+    () =>
+      createCache({
+        key: `iframe-overlay`,
+        prepend: true,
+        container,
+      }),
+    [container],
+  );
+
+  return <CacheProvider value={cache}>{children}</CacheProvider>;
+}
+
+const OverlayRoot = styled('div')({
+  pointerEvents: 'none',
+  width: '100%',
+  height: '100%',
 
   [`& .${classes.selectionHint}`]: {
     // capture mouse events
@@ -94,7 +110,7 @@ const RenderPanelRoot = styled('div')({
     },
   },
 
-  [`& .${classes.componentDragging}`]: {
+  [`&.${classes.componentDragging}`]: {
     [`& .${classes.insertSlotHud}`]: {
       border: '1px dashed #DDD',
     },
@@ -455,8 +471,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const viewRef = React.useRef<PageViewHandle>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
 
-  const [isFocused, setIsFocused] = React.useState(false);
-
   const pageNode = studioDom.getNode(dom, pageNodeId);
   studioDom.assertIsPage(pageNode);
 
@@ -527,8 +541,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [api, getViewCoordinates, pageNodes, viewState],
   );
 
-  React.useEffect(() => {
-    const handleDragOver = (event: DragEvent) => {
+  const handleDragOver = React.useCallback(
+    (event: React.DragEvent<Element>) => {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
@@ -552,9 +566,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       } else {
         api.pageEditor.nodeDragOver(null);
       }
-    };
+    },
+    [availableNodes, getViewCoordinates, viewState, api, slots],
+  );
 
-    const handleDrop = (event: DragEvent) => {
+  const handleDrop = React.useCallback(
+    (event: React.DragEvent<Element>) => {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
@@ -588,22 +605,24 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       api.pageEditor.nodeDragEnd();
-    };
+    },
+    [availableNodes, getViewCoordinates, viewState, domApi, api, slots, newNode, selection],
+  );
 
-    const handleDragEnd = (event: DragEvent) => {
+  const handleDragEnd = React.useCallback(
+    (event: DragEvent) => {
       event.preventDefault();
       api.pageEditor.nodeDragEnd();
-    };
+    },
+    [api],
+  );
 
-    window.addEventListener('dragover', handleDragOver);
-    window.addEventListener('drop', handleDrop);
+  React.useEffect(() => {
     window.addEventListener('dragend', handleDragEnd);
     return () => {
-      window.removeEventListener('dragover', handleDragOver);
-      window.removeEventListener('drop', handleDrop);
       window.removeEventListener('dragend', handleDragEnd);
     };
-  }, [availableNodes, getViewCoordinates, viewState, domApi, api, slots, newNode, selection]);
+  }, [handleDragEnd]);
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -619,18 +638,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [api, getViewCoordinates, pageNodes, viewState],
   );
 
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (isFocused && selection && event.key === 'Backspace') {
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (selection && event.key === 'Backspace') {
         domApi.removeNode(selection);
         api.deselect();
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [domApi, api, isFocused, selection]);
+    },
+    [domApi, api, selection],
+  );
 
   const selectedRect = selectedNode ? viewState[selectedNode.id]?.rect : null;
 
@@ -643,105 +659,118 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     );
   }, [dom, selectedNode]);
 
-  const rootRef = React.useRef<HTMLDivElement>(null);
-  const handleFocus = React.useCallback((event: React.FocusEvent<HTMLDivElement>) => {
-    if (event.target === rootRef.current) {
-      setIsFocused(true);
-    }
+  const overlayContainerRef = React.useRef<HTMLDivElement>();
+  const handleLoad = React.useCallback((window: Window) => {
+    const container = window.document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '0';
+    container.style.top = '0';
+    container.style.right = '0';
+    container.style.bottom = '0';
+    container.style.pointerEvents = 'none';
+    window.document.body.appendChild(container);
+    overlayContainerRef.current = container;
   }, []);
-  const handleBlur = React.useCallback(() => setIsFocused(false), []);
-  return (
-    <RenderPanelRoot
-      ref={rootRef}
-      className={className}
-      tabIndex={0}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-    >
-      <div className={classes.scrollContainer}>
-        <PageView
-          // TODO: aim to get rid of this resizing behavior
-          resizeWithContent
-          className={classes.view}
-          ref={viewRef}
-          dom={dom}
-          pageNodeId={pageNodeId}
-          onUpdate={handleRender}
-        />
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-        <div
-          className={clsx(classes.hud, {
-            [classes.componentDragging]: highlightLayout,
-          })}
-          // This component has `pointer-events: none`, but we will slectively enable pointer-events
-          // for its children. We can still capture the click gobally
-          onClick={handleClick}
-        >
-          {pageNodes.map((node) => {
-            const nodeLayout = viewState[node.id];
-            if (!nodeLayout) {
-              return null;
-            }
-            const selectable = studioDom.isElement(node);
 
-            return (
-              <React.Fragment key={node.id}>
-                <div
-                  draggable
-                  onDragStart={handleDragStart}
-                  style={absolutePositionCss(nodeLayout.rect)}
-                  className={clsx(classes.nodeHud, {
-                    [classes.selected]: selectedNode?.id === node.id,
-                    [classes.allowNodeInteraction]: nodesWithInteraction.has(node.id),
-                  })}
-                >
-                  {selectable ? (
-                    <div className={classes.selectionHint}>{node.component}</div>
-                  ) : null}
-                </div>
-              </React.Fragment>
-            );
-          })}
-          {(Object.entries(slots) as ExactEntriesOf<ViewSlots>).map(([nodeId, nodeSlots = {}]) => {
-            return (Object.entries(nodeSlots) as ExactEntriesOf<NodeSlots>).map(
-              ([parentProp, namedSlots = []]) => {
-                return namedSlots.map((slot: RenderedSlot) =>
-                  slot.type === 'multiple' ? (
+  return (
+    <RenderPanelRoot className={className}>
+      <PageView
+        className={classes.view}
+        ref={viewRef}
+        dom={dom}
+        pageNodeId={pageNodeId}
+        onUpdate={handleRender}
+        onLoad={handleLoad}
+      />
+      {overlayContainerRef.current && (
+        <Portal container={overlayContainerRef.current}>
+          <Overlay container={overlayContainerRef.current}>
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+            <OverlayRoot
+              className={clsx({
+                [classes.componentDragging]: highlightLayout,
+              })}
+              tabIndex={0}
+              // This component has `pointer-events: none`, but we will selectively enable pointer-events
+              // for its children. We can still capture the click gobally
+              onClick={handleClick}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onKeyDown={handleKeyDown}
+            >
+              {pageNodes.map((node) => {
+                const nodeLayout = viewState[node.id];
+                if (!nodeLayout) {
+                  return null;
+                }
+                const selectable = studioDom.isElement(node);
+
+                return (
+                  <React.Fragment key={node.id}>
                     <div
-                      key={`${nodeId}:${slot.parentIndex}`}
-                      style={insertSlotAbsolutePositionCss(slot)}
-                      className={clsx(classes.insertSlotHud, {
-                        [classes.active]:
-                          highlightedSlot?.parentId === nodeId &&
-                          highlightedSlot?.parentProp === parentProp &&
-                          highlightedSlot?.parentIndex === slot.parentIndex,
-                      })}
-                    />
-                  ) : (
-                    <div
-                      key={`${nodeId}:${slot.parentIndex}`}
-                      style={absolutePositionCss(slot.rect)}
-                      className={clsx(classes.slotHud, {
-                        [classes.active]:
-                          highlightedSlot?.parentId === nodeId &&
-                          highlightedSlot?.parentProp === parentProp,
+                      draggable
+                      onDragStart={handleDragStart}
+                      style={absolutePositionCss(nodeLayout.rect)}
+                      className={clsx(classes.nodeHud, {
+                        [classes.selected]: selectedNode?.id === node.id,
+                        [classes.allowNodeInteraction]: nodesWithInteraction.has(node.id),
                       })}
                     >
-                      Insert Here
+                      {selectable ? (
+                        <div className={classes.selectionHint}>{node.component}</div>
+                      ) : null}
                     </div>
-                  ),
+                  </React.Fragment>
                 );
-              },
-            );
-          })}
-          {/* 
-            This overlay allows passing through pointer-events through a pinhole
-            This allows interactivity on the selected element only, while maintaining
-            a reliable click target for the rest of the page
-          */}
-          <PinholeOverlay ref={overlayRef} className={classes.hudOverlay} pinhole={selectedRect} />
-        </div>
-      </div>
+              })}
+              {(Object.entries(slots) as ExactEntriesOf<ViewSlots>).map(
+                ([nodeId, nodeSlots = {}]) => {
+                  return (Object.entries(nodeSlots) as ExactEntriesOf<NodeSlots>).map(
+                    ([parentProp, namedSlots = []]) => {
+                      return namedSlots.map((slot: RenderedSlot) =>
+                        slot.type === 'multiple' ? (
+                          <div
+                            key={`${nodeId}:${slot.parentIndex}`}
+                            style={insertSlotAbsolutePositionCss(slot)}
+                            className={clsx(classes.insertSlotHud, {
+                              [classes.active]:
+                                highlightedSlot?.parentId === nodeId &&
+                                highlightedSlot?.parentProp === parentProp &&
+                                highlightedSlot?.parentIndex === slot.parentIndex,
+                            })}
+                          />
+                        ) : (
+                          <div
+                            key={`${nodeId}:${slot.parentIndex}`}
+                            style={absolutePositionCss(slot.rect)}
+                            className={clsx(classes.slotHud, {
+                              [classes.active]:
+                                highlightedSlot?.parentId === nodeId &&
+                                highlightedSlot?.parentProp === parentProp,
+                            })}
+                          >
+                            Insert Here
+                          </div>
+                        ),
+                      );
+                    },
+                  );
+                },
+              )}
+              {/* 
+                This overlay allows passing through pointer-events through a pinhole
+                This allows interactivity on the selected element only, while maintaining
+                a reliable click target for the rest of the page
+              */}
+              <PinholeOverlay
+                ref={overlayRef}
+                className={classes.hudOverlay}
+                pinhole={selectedRect}
+              />
+            </OverlayRoot>
+          </Overlay>
+        </Portal>
+      )}
     </RenderPanelRoot>
   );
 }

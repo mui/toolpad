@@ -27,9 +27,9 @@ export interface StudioSandboxProps {
   importMap?: ImportMap;
   files: SandboxFiles;
   entry: string;
-  resizeWithContent?: boolean;
   // Callback for when the view has rendered. Make sure this value is stable
   onUpdate?: () => void;
+  onLoad?: (windiw: Window) => void;
 }
 
 export interface StudioSandboxHandle {
@@ -113,17 +113,15 @@ export default React.forwardRef(function StudioSandbox(
   {
     className,
     onUpdate,
+    onLoad,
     files,
     entry,
     base,
-    resizeWithContent,
     importMap = { imports: {} },
   }: StudioSandboxProps,
   ref: React.ForwardedRef<StudioSandboxHandle>,
 ) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
-  const [height, setHeight] = React.useState(0);
-  const resizeObserverRef = React.useRef<ResizeObserver>();
   const mutationObserverRef = React.useRef<MutationObserver>();
 
   const resolvedEntry = base + entry;
@@ -166,14 +164,17 @@ export default React.forwardRef(function StudioSandbox(
     // TODO: cleanup service worker/cache? what if multiple sandboxes are initialized?
   }, [base, entry, serializedImportMap, serializedPreload, resolvedEntry]);
 
-  React.useImperativeHandle(ref, () => ({
-    getRootElm() {
-      return frameRef.current?.contentWindow?.document.getElementById('root') ?? null;
-    },
-  }));
+  React.useImperativeHandle(
+    ref,
+    () => ({
+      getRootElm() {
+        return frameRef.current?.contentWindow?.document.getElementById('root') ?? null;
+      },
+    }),
+    [],
+  );
 
   const handleFrameLoad = React.useCallback(() => {
-    resizeObserverRef.current?.disconnect();
     mutationObserverRef.current?.disconnect();
 
     const frameWindow = frameRef.current?.contentWindow;
@@ -181,13 +182,6 @@ export default React.forwardRef(function StudioSandbox(
     if (!frameWindow) {
       throw new Error(`Invariant: frameRef not correctly attached`);
     }
-
-    resizeObserverRef.current = new ResizeObserver((entries) => {
-      const [documentEntry] = entries;
-      setHeight(documentEntry.contentRect.height);
-    });
-
-    resizeObserverRef.current.observe(frameRef.current.contentWindow.document.body);
 
     mutationObserverRef.current = new MutationObserver(() => {
       // TODO: debounce?
@@ -200,13 +194,13 @@ export default React.forwardRef(function StudioSandbox(
       subtree: true,
     });
 
+    onLoad?.(frameWindow);
     onUpdate?.();
-  }, [onUpdate]);
+  }, [onUpdate, onLoad]);
 
   React.useEffect(
     () => () => {
-      // make sure to clean up the ResizeObserver
-      resizeObserverRef.current?.disconnect();
+      // make sure to clean up the Observers
       mutationObserverRef.current?.disconnect();
     },
     [],
@@ -242,7 +236,6 @@ export default React.forwardRef(function StudioSandbox(
       ref={frameRef}
       className={className}
       title="sandbox"
-      style={resizeWithContent ? { height } : {}}
       onLoad={handleFrameLoad}
     />
   );

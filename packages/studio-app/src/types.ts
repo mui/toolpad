@@ -128,5 +128,3 @@ export interface StudioConnection<P = {}> extends StudioConnectionSummary {
   params: P;
   status: ConnectionStatus | null;
 }
-
-export interface StudioEditorRuntimeBridge {}

@@ -32,10 +32,6 @@ export interface StudioSandboxProps {
   onLoad?: (windiw: Window) => void;
 }
 
-export interface StudioSandboxHandle {
-  getRootElm: () => HTMLElement | null;
-}
-
 async function addFiles(files: SandboxFiles, base: string) {
   const cache = await caches.open('rawFiles');
   await Promise.all(
@@ -109,20 +105,15 @@ function createPage({ importMap, preload, entry }: CreatePageParams) {
   `;
 }
 
-export default React.forwardRef(function StudioSandbox(
-  {
-    className,
-    onUpdate,
-    onLoad,
-    files,
-    entry,
-    base,
-    importMap = { imports: {} },
-  }: StudioSandboxProps,
-  ref: React.ForwardedRef<StudioSandboxHandle>,
-) {
+export default function StudioSandbox({
+  className,
+  onLoad,
+  files,
+  entry,
+  base,
+  importMap = { imports: {} },
+}: StudioSandboxProps) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
-  const mutationObserverRef = React.useRef<MutationObserver>();
 
   const resolvedEntry = base + entry;
   const serializedImportMap = JSON.stringify(importMap);
@@ -164,47 +155,15 @@ export default React.forwardRef(function StudioSandbox(
     // TODO: cleanup service worker/cache? what if multiple sandboxes are initialized?
   }, [base, entry, serializedImportMap, serializedPreload, resolvedEntry]);
 
-  React.useImperativeHandle(
-    ref,
-    () => ({
-      getRootElm() {
-        return frameRef.current?.contentWindow?.document.getElementById('root') ?? null;
-      },
-    }),
-    [],
-  );
-
   const handleFrameLoad = React.useCallback(() => {
-    mutationObserverRef.current?.disconnect();
-
     const frameWindow = frameRef.current?.contentWindow;
 
     if (!frameWindow) {
       throw new Error(`Invariant: frameRef not correctly attached`);
     }
 
-    mutationObserverRef.current = new MutationObserver(() => {
-      // TODO: debounce?
-      onUpdate?.();
-    });
-
-    mutationObserverRef.current.observe(frameRef.current.contentWindow.document.body, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-    });
-
     onLoad?.(frameWindow);
-    onUpdate?.();
-  }, [onUpdate, onLoad]);
-
-  React.useEffect(
-    () => () => {
-      // make sure to clean up the Observers
-      mutationObserverRef.current?.disconnect();
-    },
-    [],
-  );
+  }, [onLoad]);
 
   React.useEffect(() => {
     const initCache = async () => {
@@ -239,4 +198,4 @@ export default React.forwardRef(function StudioSandbox(
       onLoad={handleFrameLoad}
     />
   );
-});
+}

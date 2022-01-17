@@ -11,7 +11,7 @@ import {
   SlotState,
 } from '../../../types';
 import * as studioDom from '../../../studioDom';
-import PageView, { PageViewHandle } from '../../PageView';
+import PageView from '../../PageView';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -445,7 +445,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     highlightedSlot,
   } = usePageEditorState();
 
-  const viewRef = React.useRef<PageViewHandle>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
 
   const pageNode = studioDom.getNode(dom, pageNodeId);
@@ -476,13 +475,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     );
     return pageNodes.filter((node) => !excludedNodes.has(node));
   }, [dom, pageNodes, selectedNode]);
-
-  const handleRender = React.useCallback(() => {
-    const rootElm = viewRef.current?.getRootElm();
-    if (rootElm) {
-      api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
-    }
-  }, [api]);
 
   const getViewCoordinates = React.useCallback(
     (clientX: number, clientY: number): { x: number; y: number } | null => {
@@ -639,16 +631,35 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const [editorDoc, setEditorDoc] = React.useState<Document>();
   const handleLoad = React.useCallback((window: Window) => setEditorDoc(window.document), []);
 
+  const mutationObserverRef = React.useRef<MutationObserver>();
+  React.useEffect(() => {
+    const rootElm = editorDoc?.getElementById('root');
+
+    if (rootElm) {
+      let observer = mutationObserverRef.current;
+      if (!observer) {
+        observer = new MutationObserver(() => {
+          // TODO: debounce?
+          api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
+        });
+        mutationObserverRef.current = observer;
+      }
+
+      observer.observe(rootElm, {
+        attributes: true,
+        childList: true,
+        subtree: true,
+      });
+
+      return () => observer?.disconnect();
+    }
+
+    return () => {};
+  }, [editorDoc, api]);
+
   return (
     <RenderPanelRoot className={className}>
-      <PageView
-        className={classes.view}
-        ref={viewRef}
-        dom={dom}
-        pageNodeId={pageNodeId}
-        onUpdate={handleRender}
-        onLoad={handleLoad}
-      />
+      <PageView className={classes.view} dom={dom} pageNodeId={pageNodeId} onLoad={handleLoad} />
       <EditorOverlay document={editorDoc}>
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <OverlayRoot

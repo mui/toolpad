@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
 import renderPageCode from '../../renderPageCode';
-import StudioSandbox, { StudioSandboxHandle } from '../StudioSandbox';
+import StudioSandbox from '../StudioSandbox';
 import getImportMap from '../../getImportMap';
 import renderThemeCode from '../../renderThemeCode';
 
@@ -61,22 +61,7 @@ export interface PageViewProps {
   pageNodeId: NodeId;
 }
 
-export default React.forwardRef(function PageView(
-  { className, dom, pageNodeId, onUpdate, onLoad }: PageViewProps,
-  ref: React.ForwardedRef<PageViewHandle>,
-) {
-  const frameRef = React.useRef<StudioSandboxHandle>(null);
-
-  React.useImperativeHandle(
-    ref,
-    () => ({
-      getRootElm() {
-        return frameRef.current?.getRootElm() ?? null;
-      },
-    }),
-    [],
-  );
-
+export default function PageView({ className, dom, pageNodeId, onUpdate, onLoad }: PageViewProps) {
   const renderedPage = React.useMemo(() => {
     return renderPageCode(dom, pageNodeId, {
       editor: true,
@@ -92,7 +77,6 @@ export default React.forwardRef(function PageView(
   return (
     <StudioSandbox
       className={className}
-      ref={frameRef}
       onUpdate={onUpdate}
       onLoad={onLoad}
       base="/app/1234"
@@ -105,4 +89,4 @@ export default React.forwardRef(function PageView(
       entry="/index.js"
     />
   );
-});
+}

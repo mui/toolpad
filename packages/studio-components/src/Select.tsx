@@ -8,7 +8,7 @@ export interface SelectComponentProps extends SelectProps {
 
 function SelectComponent({ label, value, options = '', ...props }: SelectComponentProps) {
   return (
-    <FormControl fullWidth size="small">
+    <FormControl size="small">
       <InputLabel id={`select-data-query`}>{label}</InputLabel>
       <Select value={value || ''} labelId="select-data-query" label={label} {...props}>
         {options.split(',').map((option) => (

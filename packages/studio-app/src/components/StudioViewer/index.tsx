@@ -5,6 +5,7 @@ import { NodeId } from '../../types';
 import DomProvider, { useDomState } from '../DomProvider';
 
 const ViewerRoot = styled(PageView)({
+  display: 'block',
   height: '100vh',
 });
 

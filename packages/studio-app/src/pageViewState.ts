@@ -6,7 +6,6 @@ import {
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, NodeState, ViewState, FlowDirection } from './types';
-import { getRelativeBoundingBox } from './utils/geometry';
 
 declare global {
   interface Window {
@@ -21,7 +20,7 @@ function getNodeViewState(
   nodeId: NodeId,
 ): NodeState | null {
   if (nodeId) {
-    const rect = getRelativeBoundingBox(viewElm, elm);
+    const rect = elm.getBoundingClientRect();
     return {
       nodeId,
       rect,
@@ -86,7 +85,7 @@ export function getViewState(viewElm: HTMLElement): ViewState {
             ?.findHostInstanceByFiber(fiber);
           const childContainerElm = firstChildElm?.parentElement;
           if (childContainerElm && nodeViewState) {
-            const rect = getRelativeBoundingBox(viewElm, childContainerElm);
+            const rect = childContainerElm.getBoundingClientRect();
             const direction = window.getComputedStyle(childContainerElm)
               .flexDirection as FlowDirection;
             nodeViewState.slots[studioSlotName] = {

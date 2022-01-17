@@ -596,8 +596,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   }, []);
 
   React.useEffect(() => {
-    const rootElm = editorWindowRef.current?.document.getElementById('root');
-    if (rootElm) {
+    if (editorWindowRef.current) {
+      const rootElm = editorWindowRef.current.document.getElementById('root');
+
+      if (!rootElm) {
+        throw new Error(`Invariant: Unable to locate Studio App root element`);
+      }
+
+      api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
+
       const observer = new MutationObserver(() => {
         // TODO: Do we need to throttle this?
         api.pageEditor.pageViewStateUpdate(getViewState(rootElm));

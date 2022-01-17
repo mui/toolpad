@@ -63,5 +63,5 @@ export default function renderThemeCode(
     });
   }
 
-  return { code, dependencies: [] };
+  return { code };
 }

@@ -25,7 +25,7 @@ function Overlay(props: OverlayProps) {
 }
 
 export interface EditorOverlayProps {
-  container?: HTMLElement;
+  document?: Document;
   children?: React.ReactNode;
 }
 
@@ -33,28 +33,25 @@ export interface EditorOverlayProps {
  * Responsible for creating the portal that will render the overlay inside of the editor
  * iframe.
  */
-export default function EditorOverlay({ container, children }: EditorOverlayProps) {
-  const overlayHostRef = React.useRef<HTMLDivElement>();
+export default function EditorOverlay({ document, children }: EditorOverlayProps) {
+  const overlayContainerRef = React.useRef<HTMLDivElement>();
   React.useEffect(() => {
-    const doc = container?.ownerDocument.defaultView?.document;
-    if (doc) {
-      const overlayHost = doc.createElement('div');
-      overlayHost.style.position = 'absolute';
-      overlayHost.style.left = '0';
-      overlayHost.style.top = '0';
-      overlayHost.style.right = '0';
-      overlayHost.style.bottom = '0';
-      overlayHost.style.pointerEvents = 'none';
-      doc.body.appendChild(overlayHost);
-      overlayHostRef.current = overlayHost;
+    if (document) {
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '0';
+      container.style.top = '0';
+      container.style.right = '0';
+      container.style.bottom = '0';
+      container.style.pointerEvents = 'none';
+      document.body.appendChild(container);
+      overlayContainerRef.current = container;
     }
-  }, [container]);
+  }, [document]);
 
-  return (
-    overlayHostRef.current && (
-      <Portal container={overlayHostRef.current}>
-        <Overlay container={overlayHostRef.current}>{children}</Overlay>
-      </Portal>
-    )
-  );
+  return overlayContainerRef.current ? (
+    <Portal container={overlayContainerRef.current}>
+      <Overlay container={overlayContainerRef.current}>{children}</Overlay>
+    </Portal>
+  ) : null;
 }

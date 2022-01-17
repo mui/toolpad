@@ -2,9 +2,6 @@ import { styled } from '@mui/system';
 import * as React from 'react';
 import clsx from 'clsx';
 import { SlotType } from '@mui/studio-core';
-import Portal from '@mui/material/Portal';
-import createCache from '@emotion/cache';
-import { CacheProvider } from '@emotion/react';
 import {
   NodeId,
   NodeState,
@@ -28,6 +25,7 @@ import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomProvider';
 import { usePageEditorState } from './PageFileEditorProvider';
+import EditorOverlay from './EditorOverlay';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -54,27 +52,6 @@ const RenderPanelRoot = styled('div')({
     height: '100%',
   },
 });
-
-interface OverlayProps {
-  children?: React.ReactNode;
-  container: HTMLDivElement;
-}
-
-function Overlay(props: OverlayProps) {
-  const { children, container } = props;
-
-  const cache = React.useMemo(
-    () =>
-      createCache({
-        key: `iframe-overlay`,
-        prepend: true,
-        container,
-      }),
-    [container],
-  );
-
-  return <CacheProvider value={cache}>{children}</CacheProvider>;
-}
 
 const OverlayRoot = styled('div')({
   pointerEvents: 'none',
@@ -659,18 +636,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     );
   }, [dom, selectedNode]);
 
-  const overlayContainerRef = React.useRef<HTMLDivElement>();
-  const handleLoad = React.useCallback((window: Window) => {
-    const container = window.document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '0';
-    container.style.top = '0';
-    container.style.right = '0';
-    container.style.bottom = '0';
-    container.style.pointerEvents = 'none';
-    window.document.body.appendChild(container);
-    overlayContainerRef.current = container;
-  }, []);
+  const [editorDoc, setEditorDoc] = React.useState<Document>();
+  const handleLoad = React.useCallback((window: Window) => setEditorDoc(window.document), []);
 
   return (
     <RenderPanelRoot className={className}>
@@ -682,95 +649,85 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         onUpdate={handleRender}
         onLoad={handleLoad}
       />
-      {overlayContainerRef.current && (
-        <Portal container={overlayContainerRef.current}>
-          <Overlay container={overlayContainerRef.current}>
-            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-            <OverlayRoot
-              className={clsx({
-                [classes.componentDragging]: highlightLayout,
-              })}
-              tabIndex={0}
-              // This component has `pointer-events: none`, but we will selectively enable pointer-events
-              // for its children. We can still capture the click gobally
-              onClick={handleClick}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              onKeyDown={handleKeyDown}
-            >
-              {pageNodes.map((node) => {
-                const nodeLayout = viewState[node.id];
-                if (!nodeLayout) {
-                  return null;
-                }
-                const selectable = studioDom.isElement(node);
+      <EditorOverlay document={editorDoc}>
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+        <OverlayRoot
+          className={clsx({
+            [classes.componentDragging]: highlightLayout,
+          })}
+          tabIndex={0}
+          // This component has `pointer-events: none`, but we will selectively enable pointer-events
+          // for its children. We can still capture the click gobally
+          onClick={handleClick}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onKeyDown={handleKeyDown}
+        >
+          {pageNodes.map((node) => {
+            const nodeLayout = viewState[node.id];
+            if (!nodeLayout) {
+              return null;
+            }
+            const selectable = studioDom.isElement(node);
 
-                return (
-                  <React.Fragment key={node.id}>
+            return (
+              <React.Fragment key={node.id}>
+                <div
+                  draggable
+                  onDragStart={handleDragStart}
+                  style={absolutePositionCss(nodeLayout.rect)}
+                  className={clsx(classes.nodeHud, {
+                    [classes.selected]: selectedNode?.id === node.id,
+                    [classes.allowNodeInteraction]: nodesWithInteraction.has(node.id),
+                  })}
+                >
+                  {selectable ? (
+                    <div className={classes.selectionHint}>{node.component}</div>
+                  ) : null}
+                </div>
+              </React.Fragment>
+            );
+          })}
+          {(Object.entries(slots) as ExactEntriesOf<ViewSlots>).map(([nodeId, nodeSlots = {}]) => {
+            return (Object.entries(nodeSlots) as ExactEntriesOf<NodeSlots>).map(
+              ([parentProp, namedSlots = []]) => {
+                return namedSlots.map((slot: RenderedSlot) =>
+                  slot.type === 'multiple' ? (
                     <div
-                      draggable
-                      onDragStart={handleDragStart}
-                      style={absolutePositionCss(nodeLayout.rect)}
-                      className={clsx(classes.nodeHud, {
-                        [classes.selected]: selectedNode?.id === node.id,
-                        [classes.allowNodeInteraction]: nodesWithInteraction.has(node.id),
+                      key={`${nodeId}:${slot.parentIndex}`}
+                      style={insertSlotAbsolutePositionCss(slot)}
+                      className={clsx(classes.insertSlotHud, {
+                        [classes.active]:
+                          highlightedSlot?.parentId === nodeId &&
+                          highlightedSlot?.parentProp === parentProp &&
+                          highlightedSlot?.parentIndex === slot.parentIndex,
+                      })}
+                    />
+                  ) : (
+                    <div
+                      key={`${nodeId}:${slot.parentIndex}`}
+                      style={absolutePositionCss(slot.rect)}
+                      className={clsx(classes.slotHud, {
+                        [classes.active]:
+                          highlightedSlot?.parentId === nodeId &&
+                          highlightedSlot?.parentProp === parentProp,
                       })}
                     >
-                      {selectable ? (
-                        <div className={classes.selectionHint}>{node.component}</div>
-                      ) : null}
+                      Insert Here
                     </div>
-                  </React.Fragment>
+                  ),
                 );
-              })}
-              {(Object.entries(slots) as ExactEntriesOf<ViewSlots>).map(
-                ([nodeId, nodeSlots = {}]) => {
-                  return (Object.entries(nodeSlots) as ExactEntriesOf<NodeSlots>).map(
-                    ([parentProp, namedSlots = []]) => {
-                      return namedSlots.map((slot: RenderedSlot) =>
-                        slot.type === 'multiple' ? (
-                          <div
-                            key={`${nodeId}:${slot.parentIndex}`}
-                            style={insertSlotAbsolutePositionCss(slot)}
-                            className={clsx(classes.insertSlotHud, {
-                              [classes.active]:
-                                highlightedSlot?.parentId === nodeId &&
-                                highlightedSlot?.parentProp === parentProp &&
-                                highlightedSlot?.parentIndex === slot.parentIndex,
-                            })}
-                          />
-                        ) : (
-                          <div
-                            key={`${nodeId}:${slot.parentIndex}`}
-                            style={absolutePositionCss(slot.rect)}
-                            className={clsx(classes.slotHud, {
-                              [classes.active]:
-                                highlightedSlot?.parentId === nodeId &&
-                                highlightedSlot?.parentProp === parentProp,
-                            })}
-                          >
-                            Insert Here
-                          </div>
-                        ),
-                      );
-                    },
-                  );
-                },
-              )}
-              {/* 
-                This overlay allows passing through pointer-events through a pinhole
-                This allows interactivity on the selected element only, while maintaining
-                a reliable click target for the rest of the page
-              */}
-              <PinholeOverlay
-                ref={overlayRef}
-                className={classes.hudOverlay}
-                pinhole={selectedRect}
-              />
-            </OverlayRoot>
-          </Overlay>
-        </Portal>
-      )}
+              },
+            );
+          })}
+          {/* 
+            This overlay allows passing through pointer-events through a pinhole
+            This allows interactivity on the selected element only, while maintaining
+            a reliable click target for the rest of the page
+          */}
+          <PinholeOverlay ref={overlayRef} className={classes.hudOverlay} pinhole={selectedRect} />
+        </OverlayRoot>
+      </EditorOverlay>
     </RenderPanelRoot>
   );
 }

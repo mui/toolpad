@@ -13,9 +13,29 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
-export type RenderComponent = (ctx: Context, resolvedProps: Record<string, string>) => string;
+type PropExpression =
+  | {
+      type: 'stringLiteral';
+      value: string;
+    }
+  | {
+      type: 'expression';
+      value: string;
+    }
+  | {
+      type: 'jsxLiteral';
+      value: string;
+    }
+  | {
+      type: 'jsxFragment';
+      value: string;
+    };
 
-function renderPage(ctx: Context, props: Record<string, string>) {
+type ResolvedProps = Record<string, PropExpression | undefined> & { $spread?: string };
+
+export type RenderComponent = (ctx: Context, resolvedProps: ResolvedProps) => string;
+
+function renderPage(ctx: Context, props: ResolvedProps) {
   ctx.addImport('@mui/material', 'Container', 'Container');
   ctx.addImport('@mui/material', 'Stack', 'MuiStack');
   ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
@@ -25,9 +45,7 @@ function renderPage(ctx: Context, props: Record<string, string>) {
   return `
     <Container ${ctx.renderProps(other)} sx={{ py:2 }}>
       <MuiStack direction="column" gap={2}>
-        <Slots prop="children">
-          {${children}}
-        </Slots>
+        <Slots prop="children">${ctx.renderJsxChildren(children)}</Slots>
       </MuiStack>
     </Container>
   `;
@@ -87,9 +105,9 @@ class Context {
   // resolve props to expressions
   resolveProps<P>(
     node: studioDom.StudioElementNode,
-    resolvedChildren: Record<string, string>,
-  ): Record<string, string> {
-    const result: Record<string, string> = resolvedChildren;
+    resolvedChildren: ResolvedProps,
+  ): ResolvedProps {
+    const result: ResolvedProps = resolvedChildren;
     const component = getStudioComponent(this.dom, node.component);
     (Object.entries(node.props) as ExactEntriesOf<StudioNodeProps<P>>).forEach(
       ([propName, propValue]) => {
@@ -107,19 +125,29 @@ class Context {
             result.$spread = `${result.$spread ? `${result.$spread} ` : ''}{...${spreadedValue}}`;
           }
         } else if (propValue.type === 'const') {
-          result[propName] = JSON.stringify(propValue.value);
+          result[propName] = {
+            type: typeof propValue.value === 'string' ? 'stringLiteral' : 'expression',
+            value: JSON.stringify(propValue.value),
+          };
         } else if (propValue.type === 'binding') {
-          result[propName] = `_${propValue.state}`;
+          result[propName] = {
+            type: 'expression',
+            value: `_${propValue.state}`,
+          };
           if (argDef.onChangeProp) {
             const setStateIdentifier = `set_${propValue.state}`;
             if (argDef.onChangeHandler) {
-              // TODO: React.useCallback for this one
+              // TODO: React.useCallback for this one?
               const { params, valueGetter } = argDef.onChangeHandler;
-              result[argDef.onChangeProp] = `(${params.join(
-                ', ',
-              )}) => ${setStateIdentifier}(${valueGetter})`;
+              result[argDef.onChangeProp] = {
+                type: 'expression',
+                value: `(${params.join(', ')}) => ${setStateIdentifier}(${valueGetter})`,
+              };
             } else {
-              result[argDef.onChangeProp] = setStateIdentifier;
+              result[argDef.onChangeProp] = {
+                type: 'expression',
+                value: setStateIdentifier,
+              };
             }
           }
         } else {
@@ -131,14 +159,21 @@ class Context {
     return result;
   }
 
+  renderComponent(name: string, resolvedProps: ResolvedProps): string {
+    const { children, ...props } = resolvedProps;
+    return children
+      ? `<${name} ${this.renderProps(props)}>${this.renderJsxChildren(children)}</${name}>`
+      : `<${name} ${this.renderProps(props)}/>`;
+  }
+
   renderNodeInternal(
     id: string,
     componentName: string | RenderComponent,
-    resolvedProps: Record<string, string>,
+    resolvedProps: ResolvedProps,
   ): string {
     const rendered =
       typeof componentName === 'string'
-        ? `<${componentName} ${this.renderProps(resolvedProps)} />`
+        ? this.renderComponent(componentName, resolvedProps)
         : componentName(this, resolvedProps);
 
     return this.editor
@@ -150,15 +185,23 @@ class Context {
       : rendered;
   }
 
-  renderChildren(
-    node: studioDom.StudioElementNode | studioDom.StudioPageNode,
-  ): Record<string, string> {
-    const result: Record<string, string> = {};
+  renderChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): ResolvedProps {
+    const result: ResolvedProps = {};
     const nodeChildren = studioDom.getChildNodes(this.dom, node);
     // eslint-disable-next-line no-restricted-syntax
     for (const [prop, children] of Object.entries(nodeChildren)) {
       if (children) {
-        result[prop] = `<>${children.map((child) => this.renderNode(child)).join('\n')}</>`;
+        if (children.length === 1) {
+          result[prop] = {
+            type: 'jsxLiteral',
+            value: this.renderNode(children[0]),
+          };
+        } else if (children.length > 1) {
+          result[prop] = {
+            type: 'jsxFragment',
+            value: children.map((child) => this.renderNode(child)).join('\n'),
+          };
+        }
       }
     }
     return result;
@@ -179,15 +222,35 @@ class Context {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  renderProps(resolvedProps: Record<string, string>): string {
-    return Object.entries(resolvedProps)
-      .map(([name, value]) => {
-        if (name === '$spread') {
-          return value;
+  renderProps(resolvedProps: ResolvedProps): string {
+    return (Object.entries(resolvedProps) as ExactEntriesOf<ResolvedProps>)
+      .map(([name, expr]) => {
+        if (!expr) {
+          return '';
         }
-        return `${name}={${value}}`;
+        if (name === '$spread') {
+          return expr;
+        }
+        if (expr.type === 'stringLiteral') {
+          return `${name}=${expr.value}`;
+        }
+        if (expr.type === 'jsxFragment') {
+          return `${name}={<>${expr.value}</>}`;
+        }
+        return `${name}={${expr.value}}`;
       })
       .join(' ');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  renderJsxChildren(expr?: PropExpression): string {
+    if (!expr) {
+      return '';
+    }
+    if (expr.type === 'jsxLiteral' || expr.type === 'jsxFragment') {
+      return expr.value;
+    }
+    return `{${expr.value}}`;
   }
 
   addImport(source: string, imported: string, local: string = imported) {

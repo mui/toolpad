@@ -6,7 +6,7 @@ const dependencies = new Map<string, Set<string>>();
 
 // poor man's compiler for now
 function findImportedModuleIDs(source: string): string[] {
-  const importRegex = /^\s*import\s+(.*)\s+from\s+'(.*)'\s*;?$/;
+  const importRegex = /^\s*import\s+(.*)\s+from\s+['"](.*)['"]\s*;?$/;
   return source
     .replace(/{\n/gm, '{')
     .replace(/,\n/gm, ',')

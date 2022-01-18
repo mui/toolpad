@@ -5,52 +5,7 @@ import renderPageCode from '../../renderPageCode';
 import StudioSandbox from '../StudioSandbox';
 import getImportMap from '../../getImportMap';
 import renderThemeCode from '../../renderThemeCode';
-
-const appIndex = `
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import Page from './page.js';
-import theme from './lib/theme.js';
-import { QueryClient, QueryClientProvider } from 'react-query'
-
-const queryClient = new QueryClient();
-
-function render (Page, theme) {
-  const appTheme = createTheme(theme);
-  ReactDOM.render(
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={appTheme}>
-        <Page />
-      </ThemeProvider>
-    </QueryClientProvider>, 
-    document.getElementById('root')
-  );
-}
-
-// Poor man's refresh implementation
-// TODO: react-refresh implementation, move to worker
-if (import.meta.hot) {
-  if (!import.meta.hot.data.isRefresh) {
-    render(Page, theme);
-  }
-
-  import.meta.hot.accept(['./page.js', './lib/theme.js'], ({ module, deps }) => {
-    const [{ default: Page }, { default: theme }] = deps 
-    render(Page, theme);
-  });
-
-  import.meta.hot.dispose(() => {
-    import.meta.hot.data.isRefresh = true;
-  });
-} else {
-  render(Page, theme);
-}
-`;
-
-export interface PageViewHandle {
-  getRootElm: () => HTMLElement | null;
-}
+import renderEntryPoint from '../../renderPageEntryCode';
 
 export interface PageViewProps {
   className?: string;
@@ -61,6 +16,10 @@ export interface PageViewProps {
 }
 
 export default function PageView({ className, dom, pageNodeId, onLoad }: PageViewProps) {
+  const themePath = './lib/theme.js';
+  const entryPath = `./${pageNodeId}.js`;
+  const pagePath = `./pages/${pageNodeId}.js`;
+
   const renderedPage = React.useMemo(() => {
     return renderPageCode(dom, pageNodeId, {
       editor: true,
@@ -73,18 +32,26 @@ export default function PageView({ className, dom, pageNodeId, onLoad }: PageVie
     });
   }, [dom]);
 
+  const renderedEntrypoint = React.useMemo(() => {
+    return renderEntryPoint({
+      pagePath,
+      themePath,
+      editor: true,
+    });
+  }, [pagePath, themePath]);
+
   return (
     <StudioSandbox
       className={className}
       onLoad={onLoad}
-      base="/app/1234"
+      base={`/app/${dom.root}/`}
       importMap={getImportMap()}
       files={{
-        '/lib/theme.js': { code: renderedTheme.code },
-        '/index.js': { code: appIndex },
-        '/page.js': { code: renderedPage.code },
+        [themePath]: { code: renderedTheme.code },
+        [entryPath]: { code: renderedEntrypoint.code },
+        [pagePath]: { code: renderedPage.code },
       }}
-      entry="/index.js"
+      entry={entryPath}
     />
   );
 }

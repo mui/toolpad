@@ -2,6 +2,7 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { ImportMap } from 'esinstall';
 import { transform } from 'sucrase';
+import renderPageHtml from '../renderPageHtml';
 
 const StudioSandboxRoot = styled('iframe')({
   border: 'none',
@@ -31,6 +32,12 @@ export interface StudioSandboxProps {
   onLoad?: (windiw: Window) => void;
 }
 
+function resolvePathname(relative: string, base: string) {
+  const absolute = new URL(base, 'https://x');
+  const { pathname, search, hash } = new URL(relative, absolute);
+  return pathname + search + hash;
+}
+
 async function addFiles(files: SandboxFiles, base: string) {
   const cache = await caches.open('rawFiles');
   await Promise.all(
@@ -48,60 +55,13 @@ async function addFiles(files: SandboxFiles, base: string) {
         code = transformed.code;
       }
       await cache.put(
-        base + path,
+        resolvePathname(path, base),
         new Response(new Blob([code], { type }), {
           status: 200,
         }),
       );
     }),
   );
-}
-
-interface CreatePageParams {
-  importMap: string;
-  preload: string;
-  entry: string;
-}
-
-function createPage({ importMap, preload, entry }: CreatePageParams) {
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8" />
-        <title>Studio Sandbox</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <style>
-          html,
-          body {
-            margin: 0;
-          }
-
-          #root {
-            overflow: auto;
-          }
-        </style>
-      </head>
-      <body>
-        <div id="root"></div>
-
-        <script type="importmap">
-          ${importMap}
-        </script>
-
-        ${preload}
-
-        <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
-        <script async src="/web_modules/es-module-shims.js" type="module"></script>
-
-        <script type="module" src="/sandbox/index.js"></script>
-
-        <script type="module" src="/editorRuntime/index.js"></script>
-
-        <script type="module" src="${entry}"></script>
-        </body>
-    </html>
-  `;
 }
 
 export default function StudioSandbox({
@@ -114,11 +74,16 @@ export default function StudioSandbox({
 }: StudioSandboxProps) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
-  const resolvedEntry = base + entry;
-  const serializedImportMap = JSON.stringify(importMap);
-  const serializedPreload = Object.values(importMap.imports)
-    .map((url) => `<link rel="modulepreload" href="${url}" />`)
-    .join('\n');
+  if (!base.endsWith('/')) {
+    throw new Error(`Invariant: "${base}" is an invalid bas url`);
+  }
+
+  const { code: pageCode } = renderPageHtml({
+    editor: true,
+    importMap,
+    entry: resolvePathname(entry, base),
+  });
+
   const prevFiles = React.useRef<SandboxFiles>(files);
   React.useEffect(() => {
     if (!frameRef.current) {
@@ -136,23 +101,19 @@ export default function StudioSandbox({
       await addFiles(
         {
           ...prevFiles.current,
-          '/': {
-            code: createPage({
-              importMap: serializedImportMap,
-              preload: serializedPreload,
-              entry: resolvedEntry,
-            }),
+          [base]: {
+            code: pageCode,
             type: 'text/html',
           },
         },
         base,
       );
 
-      iframe.src = `${base}/`;
+      iframe.src = base;
     };
     init(frameRef.current);
     // TODO: cleanup service worker/cache? what if multiple sandboxes are initialized?
-  }, [base, entry, serializedImportMap, serializedPreload, resolvedEntry]);
+  }, [base, entry, pageCode]);
 
   const handleFrameLoad = React.useCallback<React.ReactEventHandler<HTMLIFrameElement>>(
     (event) => {
@@ -171,9 +132,6 @@ export default function StudioSandbox({
         if (!content) {
           return false;
         }
-        if (!path.startsWith('/')) {
-          throw new Error(`invalid file name "${path}"`);
-        }
         const currentFile = prevFiles.current[path];
         return !currentFile || !isSameFile(currentFile, content);
       });
@@ -182,7 +140,7 @@ export default function StudioSandbox({
       if (updates.length > 0) {
         await addFiles(Object.fromEntries(updates), base);
         updates.forEach(([path]) => {
-          const url = base + path;
+          const url = resolvePathname(path, base);
           frameRef.current?.contentWindow?.postMessage({ type: 'update', url });
         });
       }

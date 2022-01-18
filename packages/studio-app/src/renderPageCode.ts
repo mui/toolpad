@@ -13,6 +13,26 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
+export type RenderComponent = (ctx: Context, resolvedProps: Record<string, string>) => string;
+
+function renderPage(ctx: Context, props: Record<string, string>) {
+  ctx.addImport('@mui/material', 'Container', 'Container');
+  ctx.addImport('@mui/material', 'Stack', 'MuiStack');
+  ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
+
+  const { children, ...other } = props;
+
+  return `
+    <Container ${ctx.renderProps(other)} sx={{ py:2 }}>
+      <MuiStack direction="column" gap={2}>
+        <Slots prop="children">
+          {${children}}
+        </Slots>
+      </MuiStack>
+    </Container>
+  `;
+}
+
 interface Import {
   named: Map<string, string>;
   all?: string;
@@ -113,15 +133,13 @@ class Context {
 
   renderNodeInternal(
     id: string,
-    componentName: string,
+    componentName: string | RenderComponent,
     resolvedProps: Record<string, string>,
-    renderedChildren: string,
   ): string {
-    const rendered = `
-      <${componentName} ${this.renderProps(resolvedProps)}>
-        ${renderedChildren}
-      </${componentName}>
-    `;
+    const rendered =
+      typeof componentName === 'string'
+        ? `<${componentName} ${this.renderProps(resolvedProps)} />`
+        : componentName(this, resolvedProps);
 
     return this.editor
       ? `
@@ -140,23 +158,24 @@ class Context {
     // eslint-disable-next-line no-restricted-syntax
     for (const [prop, children] of Object.entries(nodeChildren)) {
       if (children) {
-        result[prop] = children.map((child) => this.renderNode(child)).join('\n');
+        result[prop] = `<>${children.map((child) => this.renderNode(child)).join('\n')}</>`;
       }
     }
     return result;
   }
 
   renderPage(page: studioDom.StudioPageNode): string {
-    this.addImport('@mui/studio-core', 'Page', 'Page');
-    return this.renderNodeInternal(page.id, 'Page', {}, this.renderChildren(page).children ?? '');
+    return this.renderNodeInternal(page.id, renderPage, {
+      children: this.renderChildren(page).children,
+    });
   }
 
   renderNode(node: studioDom.StudioElementNode): string {
     const component = getStudioComponent(this.dom, node.component);
     this.addImport(component.module, component.importedName, component.importedName);
-    const { children, ...namedChildren } = this.renderChildren(node);
-    const resolvedProps = this.resolveProps(node, namedChildren);
-    return this.renderNodeInternal(node.id, component.importedName, resolvedProps, children ?? '');
+    const nodeChildren = this.renderChildren(node);
+    const resolvedProps = this.resolveProps(node, nodeChildren);
+    return this.renderNodeInternal(node.id, component.importedName, resolvedProps);
   }
 
   // eslint-disable-next-line class-methods-use-this

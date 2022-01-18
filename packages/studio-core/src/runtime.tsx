@@ -206,29 +206,6 @@ export function useStudioNode<P = {}>(): StudioRuntimeNode<P> | null {
   }, [nodeId]);
 }
 
-export interface SlotsProps {
-  prop: string;
-  children?: React.ReactNode;
-}
-
-export function Slots({ prop, children }: SlotsProps) {
-  const nodeId = React.useContext(StudioNodeContext);
-  if (!nodeId) {
-    return children;
-  }
-  return (
-    <SlotsInternal
-      parentId={nodeId}
-      {...{
-        [RUNTIME_PROP_STUDIO_SLOTS]: prop,
-        [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
-      }}
-    >
-      {children}
-    </SlotsInternal>
-  );
-}
-
 export interface PlaceholderProps {
   prop: string;
   children?: React.ReactNode;
@@ -250,5 +227,31 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
         [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
       }}
     />
+  );
+}
+
+export interface SlotsProps {
+  prop: string;
+  children?: React.ReactNode;
+}
+
+export function Slots({ prop, children }: SlotsProps) {
+  const nodeId = React.useContext(StudioNodeContext);
+  if (!nodeId) {
+    return children;
+  }
+  const count = React.Children.count(children);
+  return count > 0 ? (
+    <SlotsInternal
+      parentId={nodeId}
+      {...{
+        [RUNTIME_PROP_STUDIO_SLOTS]: prop,
+        [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
+      }}
+    >
+      {children}
+    </SlotsInternal>
+  ) : (
+    <Placeholder prop={prop} />
   );
 }

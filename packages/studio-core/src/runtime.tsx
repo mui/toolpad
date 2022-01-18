@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import * as React from 'react';
 import {
   DEFINITION_KEY,
@@ -44,6 +45,56 @@ export function PlaceholderInternal(props: PlaceholderInternalProps) {
       }}
     />
   );
+}
+
+interface ComponentErrorBoundaryProps {
+  children?: React.ReactNode;
+}
+interface ComponentErrorBoundaryState {
+  error: string;
+}
+
+class ComponentErrorBoundary extends React.Component<
+  ComponentErrorBoundaryProps,
+  ComponentErrorBoundaryState
+> {
+  state: ComponentErrorBoundaryState;
+
+  constructor(props: ComponentErrorBoundaryProps) {
+    super(props);
+    this.state = { error: '' };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { error: error.message };
+  }
+
+  componentDidUpdate(
+    prevProps: ComponentErrorBoundaryProps,
+    prevState: ComponentErrorBoundaryState,
+  ) {
+    if (prevState.error && !this.state.error) {
+      // TODO: signal runtime that the error has disappeared
+    }
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // TODO: signal runtime that an error has appeared
+    console.error(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <Box
+          sx={{ width: 60, height: 40, background: 'red', pointerEvents: 'initial' }}
+          title={this.state.error}
+        />
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 interface WrappedStudioNodeInternalProps {
@@ -109,7 +160,9 @@ function WrappedStudioNodeInternal({
 
   return (
     <StudioNodeContext.Provider value={studioNodeId}>
-      {newProps ? React.cloneElement(child, newProps) : child}
+      <ComponentErrorBoundary>
+        {newProps ? React.cloneElement(child, newProps) : child}
+      </ComponentErrorBoundary>
     </StudioNodeContext.Provider>
   );
 }

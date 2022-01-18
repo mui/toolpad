@@ -87,14 +87,30 @@ export function absolutePositionCss({ x, y, width, height }: Rectangle): React.C
   return { left: x, top: y, width, height };
 }
 
+// Returns the bounding box of an element against another element.
+// Considers the box model to return the full dimensions, including padding/border/margin.
 export function getRelativeBoundingBox(containerElm: Element, childElm: Element): Rectangle {
   const containerRect = containerElm.getBoundingClientRect();
   const childRect = childElm.getBoundingClientRect();
+  const styles = window.getComputedStyle(childElm);
+
+  let offsetLeft = parseFloat(styles.marginLeft);
+  let offsetRight = parseFloat(styles.marginRight);
+  let offsetTop = parseFloat(styles.marginTop);
+  let offsetBottom = parseFloat(styles.marginBottom);
+
+  if (styles.boxSizing === 'content-box') {
+    offsetLeft += parseFloat(styles.paddingLeft) + parseFloat(styles.borderLeftWidth);
+    offsetRight += parseFloat(styles.paddingRight) + parseFloat(styles.borderRightWidth);
+    offsetTop += parseFloat(styles.paddingTop) + parseFloat(styles.borderTopWidth);
+    offsetBottom += parseFloat(styles.paddingBottom) + parseFloat(styles.borderBottomWidth);
+  }
+
   return {
-    x: childRect.x - containerRect.x,
-    y: childRect.y - containerRect.y,
-    width: childRect.width,
-    height: childRect.height,
+    x: childRect.x - containerRect.x - offsetLeft,
+    y: childRect.y - containerRect.y - offsetTop,
+    width: childRect.width + offsetLeft + offsetRight,
+    height: childRect.height + offsetTop + offsetBottom,
   };
 }
 

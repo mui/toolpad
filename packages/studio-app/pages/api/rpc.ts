@@ -11,18 +11,21 @@ import {
   loadApp,
   saveApp,
 } from '../../src/server/data';
-
-const DEFAULT_CONTEXT = {};
+import { hasOwnProperty } from '../../src/utils/collections';
 
 const asyncLocalStorage = new AsyncLocalStorage<NextRpcContext>();
 
 export function getContext(): NextRpcContext {
-  return asyncLocalStorage.getStore() || DEFAULT_CONTEXT;
+  const ctx = asyncLocalStorage.getStore();
+  if (!ctx) {
+    throw new Error('Not in a request context');
+  }
+  return ctx;
 }
 
 interface NextRpcContext {
-  req?: IncomingMessage;
-  res?: ServerResponse;
+  req: IncomingMessage;
+  res: ServerResponse;
 }
 
 export interface Method<P extends any[] = any[], R = any> {
@@ -54,10 +57,11 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       return res.status(405).end();
     }
     const { type, name, params } = req.body as RpcRequest;
-    const method = definition[type][name];
-    if (!method) {
+    if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
+      // This is important to avoid RCE
       return res.status(404).end();
     }
+    const method = definition[type][name];
     const context = { req, res };
     const result = await asyncLocalStorage.run(context, () => method(...params));
     return res.json({ result });
@@ -66,7 +70,12 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
 
 const rpcServer = {
   query: {
-    getConnections,
+    getConnections: () => {
+      // DEMO: how we can add authentication in the mix:
+      //   const ctx = getContext();
+      //   console.log(ctx.req.headers);
+      return getConnections();
+    },
     getConnection,
 
     execApi,

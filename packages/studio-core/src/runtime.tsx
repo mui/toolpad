@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import * as React from 'react';
 import {
   DEFINITION_KEY,
@@ -44,6 +45,56 @@ export function PlaceholderInternal(props: PlaceholderInternalProps) {
       }}
     />
   );
+}
+
+interface ComponentErrorBoundaryProps {
+  children?: React.ReactNode;
+}
+interface ComponentErrorBoundaryState {
+  error: { message: string } | null;
+}
+
+class ComponentErrorBoundary extends React.Component<
+  ComponentErrorBoundaryProps,
+  ComponentErrorBoundaryState
+> {
+  state: ComponentErrorBoundaryState;
+
+  constructor(props: ComponentErrorBoundaryProps) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { error: { message: error.message } };
+  }
+
+  componentDidUpdate(
+    prevProps: ComponentErrorBoundaryProps,
+    prevState: ComponentErrorBoundaryState,
+  ) {
+    if (prevState.error && !this.state.error) {
+      // TODO: signal the editor that the error has disappeared
+    }
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // TODO: signal the editor that an error has appeared
+    console.error(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <Box
+          sx={{ width: 60, height: 40, background: 'red', pointerEvents: 'initial' }}
+          title={this.state.error.message}
+        />
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 interface WrappedStudioNodeInternalProps {
@@ -109,7 +160,9 @@ function WrappedStudioNodeInternal({
 
   return (
     <StudioNodeContext.Provider value={studioNodeId}>
-      {newProps ? React.cloneElement(child, newProps) : child}
+      <ComponentErrorBoundary>
+        {newProps ? React.cloneElement(child, newProps) : child}
+      </ComponentErrorBoundary>
     </StudioNodeContext.Provider>
   );
 }
@@ -153,29 +206,6 @@ export function useStudioNode<P = {}>(): StudioRuntimeNode<P> | null {
   }, [nodeId]);
 }
 
-export interface SlotsProps {
-  prop: string;
-  children?: React.ReactNode;
-}
-
-export function Slots({ prop, children }: SlotsProps) {
-  const nodeId = React.useContext(StudioNodeContext);
-  if (!nodeId) {
-    return children;
-  }
-  return (
-    <SlotsInternal
-      parentId={nodeId}
-      {...{
-        [RUNTIME_PROP_STUDIO_SLOTS]: prop,
-        [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
-      }}
-    >
-      {children}
-    </SlotsInternal>
-  );
-}
-
 export interface PlaceholderProps {
   prop: string;
   children?: React.ReactNode;
@@ -197,5 +227,31 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
         [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
       }}
     />
+  );
+}
+
+export interface SlotsProps {
+  prop: string;
+  children?: React.ReactNode;
+}
+
+export function Slots({ prop, children }: SlotsProps) {
+  const nodeId = React.useContext(StudioNodeContext);
+  if (!nodeId) {
+    return children;
+  }
+  const count = React.Children.count(children);
+  return count > 0 ? (
+    <SlotsInternal
+      parentId={nodeId}
+      {...{
+        [RUNTIME_PROP_STUDIO_SLOTS]: prop,
+        [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
+      }}
+    >
+      {children}
+    </SlotsInternal>
+  ) : (
+    <Placeholder prop={prop} />
   );
 }

@@ -123,6 +123,8 @@ export function pageEditorReducer(state: PageEditorState, action: EditorAction):
     case 'DESELECT_NODE': {
       return update(state, {
         selection: null,
+        componentPanelTab:
+          state.componentPanelTab === 'component' ? 'catalog' : state.componentPanelTab,
       });
     }
     case 'PAGE_SET_COMPONENT_PANEL_TAB':

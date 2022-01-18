@@ -29,10 +29,15 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+          #root {
+            overflow: hidden; /* prevents margins from collapsing into root */
+            min-height: 100vh;
+          }
+        </style>
       </head>
       <body>
-        <!-- "overflow: hidden;" prevents children margins from collapsing -->
-        <div id="root" style="overflow: hidden;"></div>
+        <div id="root"></div>
 
         <script type="importmap">
           ${serializedImportMap}

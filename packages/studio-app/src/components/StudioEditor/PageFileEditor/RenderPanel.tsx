@@ -30,18 +30,7 @@ import EditorOverlay from './EditorOverlay';
 type SlotDirection = 'horizontal' | 'vertical';
 
 const classes = {
-  scrollContainer: 'StudioScrollContainer',
-  hud: 'StudioHud',
   view: 'StudioView',
-  nodeHud: 'StudioNodeHud',
-  slotHud: 'StudioSlotHud',
-  insertSlotHud: 'StudioInsertSlotHud',
-  selected: 'StudioSelected',
-  allowNodeInteraction: 'StudioAllowNodeInteraction',
-  active: 'StudioActive',
-  componentDragging: 'StudioComponentDragging',
-  selectionHint: 'StudioSelectionHint',
-  hudOverlay: 'StudioHudOverlay',
 };
 
 const RenderPanelRoot = styled('div')({
@@ -53,12 +42,29 @@ const RenderPanelRoot = styled('div')({
   },
 });
 
+const overlayClasses = {
+  hud: 'StudioHud',
+  nodeHud: 'StudioNodeHud',
+  slotHud: 'StudioSlotHud',
+  insertSlotHud: 'StudioInsertSlotHud',
+  selected: 'StudioSelected',
+  allowNodeInteraction: 'StudioAllowNodeInteraction',
+  active: 'StudioActive',
+  componentDragging: 'StudioComponentDragging',
+  selectionHint: 'StudioSelectionHint',
+  hudOverlay: 'StudioHudOverlay',
+};
+
 const OverlayRoot = styled('div')({
   pointerEvents: 'none',
   width: '100%',
   height: '100%',
 
-  [`& .${classes.selectionHint}`]: {
+  '&:focus': {
+    outline: 'none',
+  },
+
+  [`& .${overlayClasses.selectionHint}`]: {
     // capture mouse events
     pointerEvents: 'initial',
     cursor: 'grab',
@@ -71,37 +77,37 @@ const OverlayRoot = styled('div')({
     padding: `0 4px`,
   },
 
-  [`& .${classes.nodeHud}`]: {
+  [`& .${overlayClasses.nodeHud}`]: {
     // capture mouse events
     pointerEvents: 'initial',
     position: 'absolute',
-    [`&.${classes.selected}`]: {
+    [`&.${overlayClasses.selected}`]: {
       border: '1px solid red',
-      [`& .${classes.selectionHint}`]: {
+      [`& .${overlayClasses.selectionHint}`]: {
         display: 'block',
       },
     },
-    [`&.${classes.allowNodeInteraction}`]: {
+    [`&.${overlayClasses.allowNodeInteraction}`]: {
       // block pointer-events so we can interact with the selection
       pointerEvents: 'none',
     },
   },
 
-  [`&.${classes.componentDragging}`]: {
-    [`& .${classes.insertSlotHud}`]: {
+  [`&.${overlayClasses.componentDragging}`]: {
+    [`& .${overlayClasses.insertSlotHud}`]: {
       border: '1px dashed #DDD',
     },
   },
 
-  [`& .${classes.insertSlotHud}`]: {
+  [`& .${overlayClasses.insertSlotHud}`]: {
     position: 'absolute',
 
-    [`&.${classes.active}`]: {
+    [`&.${overlayClasses.active}`]: {
       border: '1px solid green',
     },
   },
 
-  [`& .${classes.slotHud}`]: {
+  [`& .${overlayClasses.slotHud}`]: {
     position: 'absolute',
     display: 'flex',
     alignItems: 'center',
@@ -110,13 +116,13 @@ const OverlayRoot = styled('div')({
     color: 'green',
     border: '1px dashed green',
     opacity: 0.5,
-    [`&.${classes.active}`]: {
+    [`&.${overlayClasses.active}`]: {
       border: '1px solid green',
       opacity: 1,
     },
   },
 
-  [`& .${classes.hudOverlay}`]: {
+  [`& .${overlayClasses.hudOverlay}`]: {
     position: 'absolute',
     inset: '0 0 0 0',
   },
@@ -540,6 +546,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [availableNodes, viewState, api, slots, getViewCoordinates],
   );
 
+  const handleDragLeave = React.useCallback(() => api.pageEditor.nodeDragOver(null), [api]);
+
   const handleDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
@@ -588,8 +596,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   React.useEffect(() => {
+    const handleDragOverDefault = (event: DragEvent) => {
+      // Make the whole window a drop target to prevent the return animation happening on dragend
+      event.preventDefault();
+    };
+    window.addEventListener('dragover', handleDragOverDefault);
     window.addEventListener('dragend', handleDragEnd);
     return () => {
+      window.removeEventListener('dragover', handleDragOverDefault);
       window.removeEventListener('dragend', handleDragEnd);
     };
   }, [handleDragEnd]);
@@ -667,13 +681,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <OverlayRoot
           className={clsx({
-            [classes.componentDragging]: highlightLayout,
+            [overlayClasses.componentDragging]: highlightLayout,
           })}
+          // Need this to be able to capture key events
           tabIndex={0}
           // This component has `pointer-events: none`, but we will selectively enable pointer-events
           // for its children. We can still capture the click gobally
           onClick={handleClick}
           onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onKeyDown={handleKeyDown}
           onDragEnd={handleDragEnd}
@@ -683,7 +699,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             if (!nodeLayout) {
               return null;
             }
-            const selectable = studioDom.isElement(node);
+
+            const showSelected = studioDom.isElement(node) && selectedNode?.id === node.id;
 
             return (
               <React.Fragment key={node.id}>
@@ -691,14 +708,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                   draggable
                   onDragStart={handleDragStart}
                   style={absolutePositionCss(nodeLayout.rect)}
-                  className={clsx(classes.nodeHud, {
-                    [classes.selected]: selectedNode?.id === node.id,
-                    [classes.allowNodeInteraction]: nodesWithInteraction.has(node.id),
+                  className={clsx(overlayClasses.nodeHud, {
+                    [overlayClasses.selected]: showSelected,
+                    [overlayClasses.allowNodeInteraction]: nodesWithInteraction.has(node.id),
                   })}
                 >
-                  {selectable ? (
-                    <div className={classes.selectionHint}>{node.component}</div>
-                  ) : null}
+                  <div className={overlayClasses.selectionHint}>
+                    {studioDom.isElement(node) ? node.component : ''}
+                  </div>
                 </div>
               </React.Fragment>
             );
@@ -711,8 +728,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     <div
                       key={`${nodeId}:${slot.parentIndex}`}
                       style={insertSlotAbsolutePositionCss(slot)}
-                      className={clsx(classes.insertSlotHud, {
-                        [classes.active]:
+                      className={clsx(overlayClasses.insertSlotHud, {
+                        [overlayClasses.active]:
                           highlightedSlot?.parentId === nodeId &&
                           highlightedSlot?.parentProp === parentProp &&
                           highlightedSlot?.parentIndex === slot.parentIndex,
@@ -722,8 +739,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     <div
                       key={`${nodeId}:${slot.parentIndex}`}
                       style={absolutePositionCss(slot.rect)}
-                      className={clsx(classes.slotHud, {
-                        [classes.active]:
+                      className={clsx(overlayClasses.slotHud, {
+                        [overlayClasses.active]:
                           highlightedSlot?.parentId === nodeId &&
                           highlightedSlot?.parentProp === parentProp,
                       })}
@@ -740,7 +757,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             This allows interactivity on the selected element only, while maintaining
             a reliable click target for the rest of the page
           */}
-          <PinholeOverlay className={classes.hudOverlay} pinhole={selectedRect} />
+          <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
         </OverlayRoot>
       </EditorOverlay>
     </RenderPanelRoot>

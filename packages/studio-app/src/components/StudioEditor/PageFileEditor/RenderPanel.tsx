@@ -700,6 +700,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               return null;
             }
 
+            const showSelected = studioDom.isElement(node) && selectedNode?.id === node.id;
+
             return (
               <React.Fragment key={node.id}>
                 <div
@@ -707,12 +709,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                   onDragStart={handleDragStart}
                   style={absolutePositionCss(nodeLayout.rect)}
                   className={clsx(overlayClasses.nodeHud, {
-                    [overlayClasses.selected]: selectedNode?.id === node.id,
+                    [overlayClasses.selected]: showSelected,
                     [overlayClasses.allowNodeInteraction]: nodesWithInteraction.has(node.id),
                   })}
                 >
                   <div className={overlayClasses.selectionHint}>
-                    {studioDom.isElement(node) ? node.component : node.type}
+                    {studioDom.isElement(node) ? node.component : ''}
                   </div>
                 </div>
               </React.Fragment>

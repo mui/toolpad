@@ -1,5 +1,3 @@
-import { style } from '@mui/system';
-
 export interface Rectangle {
   x: number;
   y: number;

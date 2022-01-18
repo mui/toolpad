@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { List, ListItem } from '@mui/material';
+import { styled, Typography } from '@mui/material';
 import { ComponentDefinition, ArgTypeDefinitions } from '@mui/studio-core';
 import { DEFAULT_COMPONENTS, getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
@@ -7,6 +7,27 @@ import { useEditorApi } from '../EditorProvider';
 import { StudioNodeProps } from '../../../types';
 import { ExactEntriesOf } from '../../../utils/types';
 import { useDom } from '../../DomProvider';
+
+const ComponentCatalogRoot = styled('div')({
+  display: 'flex',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+});
+
+const ComponentCatalogItem = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  aspectRatio: '1',
+  margin: theme.spacing(1),
+  width: '40%',
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${theme.palette.divider}`,
+  cursor: 'grab',
+  '&:hover': {
+    background: theme.palette.action.hover,
+  },
+}));
 
 function getDefaultPropValues<P = {}>(
   definition: ComponentDefinition<P>,
@@ -33,7 +54,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = useEditorApi();
   const dom = useDom();
 
-  const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLLIElement>) => {
+  const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
     event.dataTransfer.dropEffect = 'copy';
     const componentDef = getStudioComponent(dom, componentType);
     const newNode = studioDom.createElement(dom, componentType, getDefaultPropValues(componentDef));
@@ -42,14 +63,19 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   };
 
   return (
-    <List className={className}>
+    <ComponentCatalogRoot className={className}>
+      <Typography>Drag components on the canvas:</Typography>
       {Array.from(DEFAULT_COMPONENTS.keys(), (componentType) => {
         return (
-          <ListItem key={componentType} draggable onDragStart={handleDragStart(componentType)}>
+          <ComponentCatalogItem
+            key={componentType}
+            draggable
+            onDragStart={handleDragStart(componentType)}
+          >
             {componentType}
-          </ListItem>
+          </ComponentCatalogItem>
         );
       })}
-    </List>
+    </ComponentCatalogRoot>
   );
 }

@@ -93,11 +93,7 @@ function HierarchyExplorerElementItem({ element }: HierarchyExplorerElementItemP
   });
 
   return (
-    <TreeItem
-      ContentComponent={CustomContent}
-      nodeId={element.id}
-      label={`${element.name} (${element.id})`}
-    >
+    <TreeItem ContentComponent={CustomContent} nodeId={element.id} label={element.name}>
       {[...defaultChildrenContent, ...namedChildrenContent]}
     </TreeItem>
   );
@@ -111,7 +107,7 @@ function HierarchyExplorerPageItem({ page }: HierarchyExplorerPageItemProps) {
   const dom = useDom();
   const children = studioDom.getChildNodes(dom, page).children ?? [];
   return (
-    <TreeItem ContentComponent={CustomContent} nodeId={page.id} label={`${page.name} (${page.id})`}>
+    <TreeItem ContentComponent={CustomContent} nodeId={page.id} label={page.name}>
       {children.map((child) => (
         <HierarchyExplorerElementItem key={child.id} element={child} />
       ))}
@@ -124,9 +120,7 @@ interface HierarchyExplorerApiItemProps {
 }
 
 function HierarchyExplorerApiItem({ api }: HierarchyExplorerApiItemProps) {
-  return (
-    <TreeItem ContentComponent={CustomContent} nodeId={api.id} label={`${api.name} (${api.id})`} />
-  );
+  return <TreeItem ContentComponent={CustomContent} nodeId={api.id} label={api.name} />;
 }
 
 interface CreateStudioApiDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {}
@@ -289,7 +283,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
 
       if (studioDom.isPage(node)) {
         if (state.editor?.type === 'page' && node.id === state.editor.nodeId) {
-          api.deselect();
+          api.pageEditor.select(node.id);
           return;
         }
         api.openPageEditor(node.id, null);

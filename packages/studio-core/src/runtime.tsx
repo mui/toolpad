@@ -51,7 +51,7 @@ interface ComponentErrorBoundaryProps {
   children?: React.ReactNode;
 }
 interface ComponentErrorBoundaryState {
-  error: string;
+  error: { message: string } | null;
 }
 
 class ComponentErrorBoundary extends React.Component<
@@ -62,11 +62,11 @@ class ComponentErrorBoundary extends React.Component<
 
   constructor(props: ComponentErrorBoundaryProps) {
     super(props);
-    this.state = { error: '' };
+    this.state = { error: null };
   }
 
   static getDerivedStateFromError(error: Error) {
-    return { error: error.message };
+    return { error: { message: error.message } };
   }
 
   componentDidUpdate(
@@ -74,12 +74,12 @@ class ComponentErrorBoundary extends React.Component<
     prevState: ComponentErrorBoundaryState,
   ) {
     if (prevState.error && !this.state.error) {
-      // TODO: signal runtime that the error has disappeared
+      // TODO: signal the editor that the error has disappeared
     }
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // TODO: signal runtime that an error has appeared
+    // TODO: signal the editor that an error has appeared
     console.error(error, errorInfo);
   }
 
@@ -88,7 +88,7 @@ class ComponentErrorBoundary extends React.Component<
       return (
         <Box
           sx={{ width: 60, height: 40, background: 'red', pointerEvents: 'initial' }}
-          title={this.state.error}
+          title={this.state.error.message}
         />
       );
     }

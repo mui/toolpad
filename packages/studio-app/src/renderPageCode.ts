@@ -337,10 +337,6 @@ class Context implements RenderContext {
       })
       .join('\n');
   }
-
-  getDependencies(): string[] {
-    return Array.from(this.imports.keys());
-  }
 }
 
 export default function renderPageCode(
@@ -378,5 +374,5 @@ export default function renderPageCode(
     });
   }
 
-  return { code, dependencies: ctx.getDependencies() };
+  return { code };
 }

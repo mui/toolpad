@@ -20,12 +20,17 @@
     "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/studio-core --scope @mui/studio-components --scope @mui/studio",
     "cli": "cross-env FORCE_COLOR=1 packages/studio-cli/cli.js --dev",
     "build": "lerna run --stream build",
-    "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx"
+    "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
+    "test": "jest"
   },
   "devDependencies": {
     "@mui/monorepo": "git+https://github.com/mui-org/material-ui.git#master",
     "@swc/core": "^1.2.124",
     "@swc/helpers": "^0.3.2",
+    "@swc/jest": "^0.2.17",
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/react": "^12.1.2",
+    "@types/jest": "^27.4.0",
     "@types/node": "^17.0.2",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
@@ -42,6 +47,7 @@
     "eslint-plugin-react": "^7.27.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "format-util": "^1.0.5",
+    "jest": "^27.4.7",
     "lerna": "^4.0.0",
     "prettier": "^2.5.1",
     "regenerator-runtime": "^0.13.9",

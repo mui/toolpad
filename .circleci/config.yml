@@ -85,6 +85,7 @@ jobs:
       - run:
           name: Tests fake browser
           command: yarn test
+
 workflows:
   version: 2
   pipeline:

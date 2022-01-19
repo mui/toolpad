@@ -23,8 +23,8 @@ const PAGE_COMPONENT = {
     const { children, ...other } = props;
 
     return `
-      <Container ${ctx.renderProps(other)} sx={{ py:2 }}>
-        <MuiStack direction="column" gap={2}>
+      <Container ${ctx.renderProps(other)}>
+        <MuiStack direction="column" gap={2} my={2}>
           <Slots prop="children">${ctx.renderJsxContent(children)}</Slots>
         </MuiStack>
       </Container>

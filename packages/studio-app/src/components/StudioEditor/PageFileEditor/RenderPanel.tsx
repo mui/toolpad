@@ -694,32 +694,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           onKeyDown={handleKeyDown}
           onDragEnd={handleDragEnd}
         >
-          {pageNodes.map((node) => {
-            const nodeLayout = viewState[node.id];
-            if (!nodeLayout) {
-              return null;
-            }
-
-            const showSelected = studioDom.isElement(node) && selectedNode?.id === node.id;
-
-            return (
-              <React.Fragment key={node.id}>
-                <div
-                  draggable
-                  onDragStart={handleDragStart}
-                  style={absolutePositionCss(nodeLayout.rect)}
-                  className={clsx(overlayClasses.nodeHud, {
-                    [overlayClasses.selected]: showSelected,
-                    [overlayClasses.allowNodeInteraction]: nodesWithInteraction.has(node.id),
-                  })}
-                >
-                  <div className={overlayClasses.selectionHint}>
-                    {studioDom.isElement(node) ? node.component : ''}
-                  </div>
-                </div>
-              </React.Fragment>
-            );
-          })}
           {(Object.entries(slots) as ExactEntriesOf<ViewSlots>).map(([nodeId, nodeSlots = {}]) => {
             return (Object.entries(nodeSlots) as ExactEntriesOf<NodeSlots>).map(
               ([parentProp, namedSlots = []]) => {
@@ -750,6 +724,32 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                   ),
                 );
               },
+            );
+          })}
+          {pageNodes.map((node) => {
+            const nodeLayout = viewState[node.id];
+            if (!nodeLayout) {
+              return null;
+            }
+
+            const showSelected = studioDom.isElement(node) && selectedNode?.id === node.id;
+
+            return (
+              <React.Fragment key={node.id}>
+                <div
+                  draggable
+                  onDragStart={handleDragStart}
+                  style={absolutePositionCss(nodeLayout.rect)}
+                  className={clsx(overlayClasses.nodeHud, {
+                    [overlayClasses.selected]: showSelected,
+                    [overlayClasses.allowNodeInteraction]: nodesWithInteraction.has(node.id),
+                  })}
+                >
+                  <div className={overlayClasses.selectionHint}>
+                    {studioDom.isElement(node) ? node.component : ''}
+                  </div>
+                </div>
+              </React.Fragment>
             );
           })}
           {/* 

@@ -18,7 +18,7 @@ async function bundle(files: Record<string, string>, entry: string): Promise<str
     format: 'iife',
     bundle: true,
     globalName: 'exports',
-    external: ['react', 'react-dom', '@mui/studio-components', '@mui/studio-core'],
+    external: ['react', 'react-dom'],
     plugins: [
       {
         name: 'resolver',

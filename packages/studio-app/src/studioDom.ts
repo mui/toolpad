@@ -283,8 +283,8 @@ export function createElementInternal<P>(
 
 type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
   StudioNodeOfType<T>,
-  'id' | 'type' | 'parentId' | 'parentProp' | 'parentIndex' | 'name'
-> & { name?: string };
+  'id' | 'type' | 'parentId' | 'parentProp' | 'parentIndex' | 'name' | 'props'
+> & { name?: string; props?: {} };
 
 function createNodeInternal<T extends StudioNodeType>(
   id: NodeId,
@@ -292,6 +292,7 @@ function createNodeInternal<T extends StudioNodeType>(
   init: StudioNodeInitOfType<T> & { name: string },
 ): StudioNodeOfType<T> {
   return {
+    props: {},
     ...init,
     id,
     type,

@@ -1,12 +1,19 @@
 import * as studioComponentLib from '@mui/studio-components';
 import { ArgTypeDefinitions, DEFINITION_KEY, StudioComponent } from '@mui/studio-core';
 import * as studioDom from '../studioDom';
+import { RenderComponent } from '../types';
 
-export interface StudioComponentDefinition {
-  argTypes: ArgTypeDefinitions;
-  module: string;
-  importedName: string;
-}
+export type StudioComponentDefinition =
+  | {
+      argTypes: ArgTypeDefinitions;
+      module: string;
+      importedName: string;
+      render?: undefined;
+    }
+  | {
+      argTypes: ArgTypeDefinitions;
+      render: RenderComponent;
+    };
 
 export const DEFAULT_COMPONENTS = new Map([
   ['Button', { module: '@mui/studio-components', importedName: 'Button' }],

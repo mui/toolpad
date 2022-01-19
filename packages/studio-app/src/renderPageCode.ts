@@ -23,7 +23,7 @@ function renderPage(ctx: RenderContext, props: ResolvedProps) {
   return `
     <Container ${ctx.renderProps(other)} sx={{ py:2 }}>
       <MuiStack direction="column" gap={2}>
-        <Slots prop="children">${ctx.renderJsxChildren(children)}</Slots>
+        <Slots prop="children">${ctx.renderJsxContent(children)}</Slots>
       </MuiStack>
     </Container>
   `;
@@ -153,31 +153,8 @@ class Context implements RenderContext {
   renderComponent(name: string, resolvedProps: ResolvedProps): string {
     const { children, ...props } = resolvedProps;
     return children
-      ? `<${name} ${this.renderProps(props)}>${this.renderJsxChildren(children)}</${name}>`
+      ? `<${name} ${this.renderProps(props)}>${this.renderJsxContent(children)}</${name}>`
       : `<${name} ${this.renderProps(props)}/>`;
-  }
-
-  renderNodeInternal(
-    id: string,
-    component: StudioComponentDefinition,
-    resolvedProps: ResolvedProps,
-  ): string {
-    let rendered: string;
-
-    if (component.render) {
-      rendered = component.render(this, resolvedProps);
-    } else {
-      this.addImport(component.module, component.importedName, component.importedName);
-      rendered = this.renderComponent(component.importedName, resolvedProps);
-    }
-
-    return this.editor
-      ? `
-        <__studioRuntime.WrappedStudioNode id="${id}">
-          ${rendered}
-        </__studioRuntime.WrappedStudioNode>
-      `
-      : rendered;
   }
 
   renderNodeChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): ResolvedProps {
@@ -187,14 +164,13 @@ class Context implements RenderContext {
     for (const [prop, children] of Object.entries(nodeChildren)) {
       if (children) {
         if (children.length === 1) {
-          result[prop] = {
-            type: 'jsxLiteral',
-            value: this.renderNode(children[0]),
-          };
+          result[prop] = this.renderNode(children[0]);
         } else if (children.length > 1) {
           result[prop] = {
             type: 'jsxFragment',
-            value: children.map((child) => this.renderNode(child)).join('\n'),
+            value: children
+              .map((child): string => this.renderJsxContent(this.renderNode(child)))
+              .join('\n'),
           };
         }
       }
@@ -202,17 +178,55 @@ class Context implements RenderContext {
     return result;
   }
 
-  renderNode(node: studioDom.StudioElementNode | studioDom.StudioPageNode): string {
+  renderNode(node: studioDom.StudioElementNode | studioDom.StudioPageNode): PropExpression {
     const component = this.getComponentDefinition(node);
     if (!component) {
-      return '<></>';
+      return {
+        type: 'expression',
+        value: 'null',
+      };
     }
+
     const nodeChildren = this.renderNodeChildren(node);
     const resolvedProps = this.resolveProps(node, nodeChildren);
-    return this.renderNodeInternal(node.id, component, resolvedProps);
+
+    let rendered: string;
+
+    if (component.render) {
+      rendered = component.render(this, resolvedProps);
+    } else {
+      this.addImport(component.module, component.importedName, component.importedName);
+      rendered = this.renderComponent(component.importedName, resolvedProps);
+    }
+
+    return {
+      type: 'jsxElement',
+      value: this.editor
+        ? `
+        <__studioRuntime.WrappedStudioNode id="${node.id}">
+          ${rendered}
+        </__studioRuntime.WrappedStudioNode>
+      `
+        : rendered,
+    };
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  /**
+   * Renders a node to a string that can be inlined as the return value of a React component
+   * @example
+   * `function Hello () {
+   *   return ${RESULT};
+   * }`
+   */
+  renderRoot(node: studioDom.StudioPageNode): string {
+    const expr = this.renderNode(node);
+    return this.renderJsExpression(expr);
+  }
+
+  /**
+   * Renders resolved properties to a string that can be inlined as JSX attrinutes
+   * @example `<Hello ${RESULT} />`
+   */
   renderProps(resolvedProps: ResolvedProps): string {
     return (Object.entries(resolvedProps) as ExactEntriesOf<ResolvedProps>)
       .map(([name, expr]) => {
@@ -230,6 +244,7 @@ class Context implements RenderContext {
   /**
    * Renders an expression to a string that can be used as a javascript
    * expression. e.g. as the RHS of an assignment statement
+   * @example `const hello = ${RESULT}`
    */
   // eslint-disable-next-line class-methods-use-this
   renderJsExpression(expr?: PropExpression): string {
@@ -245,13 +260,14 @@ class Context implements RenderContext {
   /**
    * Renders an expression to a string that can be inlined as children in
    * a JSX element.
+   * @example `<Hello>${RESULT}</Hello>`
    */
   // eslint-disable-next-line class-methods-use-this
-  renderJsxChildren(expr?: PropExpression): string {
+  renderJsxContent(expr?: PropExpression): string {
     if (!expr) {
       return '';
     }
-    if (expr.type === 'jsxLiteral' || expr.type === 'jsxFragment') {
+    if (expr.type === 'jsxElement' || expr.type === 'jsxFragment') {
       return expr.value;
     }
     return `{${this.renderJsExpression(expr)}}`;
@@ -339,7 +355,7 @@ export default function renderPageCode(
   const page = studioDom.getNode(dom, pageNodeId);
   studioDom.assertIsPage(page);
   const ctx = new Context(dom, page, config);
-  const root = ctx.renderNode(page);
+  const root: string = ctx.renderRoot(page);
 
   let code: string = `
     ${ctx.renderImports()}

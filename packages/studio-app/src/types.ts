@@ -128,3 +128,40 @@ export interface StudioConnection<P = {}> extends StudioConnectionSummary {
   params: P;
   status: ConnectionStatus | null;
 }
+
+/**
+ * Anything that can be inlined as the content of a JSX element
+ */
+export interface JsxFragmentExpression {
+  type: 'jsxFragment';
+  value: string;
+}
+
+/**
+ * Anything that can be inlined as the RHS of an assignment
+ */
+export interface JsExpression {
+  type: 'expression';
+  value: string;
+}
+
+/**
+ * Anything that can be inlined as a single JSX element
+ */
+export interface JsxElement {
+  type: 'jsxElement';
+  value: string;
+}
+
+export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
+
+export type ResolvedProps = Record<string, PropExpression | undefined> & { $spread?: string };
+
+export interface RenderContext {
+  addImport(source: string, imported: string, local: string): void;
+  renderProps(resolvedProps: ResolvedProps): string;
+  renderJsExpression(expr?: PropExpression): string;
+  renderJsxContent(expr?: PropExpression): string;
+}
+
+export type RenderComponent = (ctx: RenderContext, resolvedProps: ResolvedProps) => string;

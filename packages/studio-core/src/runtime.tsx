@@ -238,7 +238,7 @@ export interface SlotsProps {
 export function Slots({ prop, children }: SlotsProps) {
   const nodeId = React.useContext(StudioNodeContext);
   if (!nodeId) {
-    return children;
+    return <React.Fragment>{children}</React.Fragment>;
   }
   const count = React.Children.count(children);
   return count > 0 ? (

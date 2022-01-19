@@ -8,5 +8,5 @@
     "declaration": true,
     "target": "ES2020"
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

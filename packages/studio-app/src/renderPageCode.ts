@@ -1,9 +1,9 @@
 import { ArgTypeDefinition } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
-import { getStudioComponent } from './studioComponents';
+import { getStudioComponent, StudioComponentDefinition } from './studioComponents';
 import * as studioDom from './studioDom';
-import { NodeId, StudioNodeProps } from './types';
+import { NodeId, PropExpression, RenderContext, ResolvedProps, StudioNodeProps } from './types';
 import { ExactEntriesOf } from './utils/types';
 
 export interface RenderPageConfig {
@@ -13,32 +13,31 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
-export type RenderComponent = (ctx: Context, resolvedProps: Record<string, string>) => string;
+const PAGE_COMPONENT = {
+  argTypes: {},
+  render(ctx: RenderContext, props: ResolvedProps) {
+    ctx.addImport('@mui/material', 'Container', 'Container');
+    ctx.addImport('@mui/material', 'Stack', 'MuiStack');
+    ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
 
-function renderPage(ctx: Context, props: Record<string, string>) {
-  ctx.addImport('@mui/material', 'Container', 'Container');
-  ctx.addImport('@mui/material', 'Stack', 'MuiStack');
-  ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
+    const { children, ...other } = props;
 
-  const { children, ...other } = props;
-
-  return `
-    <Container ${ctx.renderProps(other)}>
-      <MuiStack direction="column" gap={2} my={2}>
-        <Slots prop="children">
-          {${children}}
-        </Slots>
-      </MuiStack>
-    </Container>
-  `;
-}
+    return `
+      <Container ${ctx.renderProps(other)}>
+        <MuiStack direction="column" gap={2} my={2}>
+          <Slots prop="children">${ctx.renderJsxContent(children)}</Slots>
+        </MuiStack>
+      </Container>
+    `;
+  },
+};
 
 interface Import {
   named: Map<string, string>;
   all?: string;
 }
 
-class Context {
+class Context implements RenderContext {
   private dom: studioDom.StudioDom;
 
   private page: studioDom.StudioPageNode;
@@ -84,16 +83,29 @@ class Context {
     return `_${queryId}`;
   }
 
-  // resolve props to expressions
+  getComponentDefinition(node: studioDom.StudioNode): StudioComponentDefinition | null {
+    if (studioDom.isPage(node)) {
+      return PAGE_COMPONENT;
+    }
+    if (studioDom.isElement(node)) {
+      return getStudioComponent(this.dom, node.component);
+    }
+    return null;
+  }
+
+  /**
+   * Resolves StudioNode properties to expressions we can render in the code.
+   * This will set up databinding if necessary
+   */
   resolveProps<P>(
-    node: studioDom.StudioElementNode,
-    resolvedChildren: Record<string, string>,
-  ): Record<string, string> {
-    const result: Record<string, string> = resolvedChildren;
-    const component = getStudioComponent(this.dom, node.component);
+    node: studioDom.StudioElementNode | studioDom.StudioPageNode,
+    resolvedChildren: ResolvedProps,
+  ): ResolvedProps {
+    const result: ResolvedProps = resolvedChildren;
+    const component = this.getComponentDefinition(node);
     (Object.entries(node.props) as ExactEntriesOf<StudioNodeProps<P>>).forEach(
       ([propName, propValue]) => {
-        const argDef: ArgTypeDefinition | undefined = component.argTypes[propName];
+        const argDef: ArgTypeDefinition | undefined = component?.argTypes[propName];
         if (!argDef || !propValue || typeof propName !== 'string' || result[propName]) {
           return;
         }
@@ -107,19 +119,29 @@ class Context {
             result.$spread = `${result.$spread ? `${result.$spread} ` : ''}{...${spreadedValue}}`;
           }
         } else if (propValue.type === 'const') {
-          result[propName] = JSON.stringify(propValue.value);
+          result[propName] = {
+            type: 'expression',
+            value: JSON.stringify(propValue.value),
+          };
         } else if (propValue.type === 'binding') {
-          result[propName] = `_${propValue.state}`;
+          result[propName] = {
+            type: 'expression',
+            value: `_${propValue.state}`,
+          };
           if (argDef.onChangeProp) {
             const setStateIdentifier = `set_${propValue.state}`;
             if (argDef.onChangeHandler) {
-              // TODO: React.useCallback for this one
+              // TODO: React.useCallback for this one?
               const { params, valueGetter } = argDef.onChangeHandler;
-              result[argDef.onChangeProp] = `(${params.join(
-                ', ',
-              )}) => ${setStateIdentifier}(${valueGetter})`;
+              result[argDef.onChangeProp] = {
+                type: 'expression',
+                value: `(${params.join(', ')}) => ${setStateIdentifier}(${valueGetter})`,
+              };
             } else {
-              result[argDef.onChangeProp] = setStateIdentifier;
+              result[argDef.onChangeProp] = {
+                type: 'expression',
+                value: setStateIdentifier,
+              };
             }
           }
         } else {
@@ -131,63 +153,126 @@ class Context {
     return result;
   }
 
-  renderNodeInternal(
-    id: string,
-    componentName: string | RenderComponent,
-    resolvedProps: Record<string, string>,
-  ): string {
-    const rendered =
-      typeof componentName === 'string'
-        ? `<${componentName} ${this.renderProps(resolvedProps)} />`
-        : componentName(this, resolvedProps);
-
-    return this.editor
-      ? `
-        <__studioRuntime.WrappedStudioNode id="${id}">
-          ${rendered}
-        </__studioRuntime.WrappedStudioNode>
-      `
-      : rendered;
+  renderComponent(name: string, resolvedProps: ResolvedProps): string {
+    const { children, ...props } = resolvedProps;
+    return children
+      ? `<${name} ${this.renderProps(props)}>${this.renderJsxContent(children)}</${name}>`
+      : `<${name} ${this.renderProps(props)}/>`;
   }
 
-  renderChildren(
-    node: studioDom.StudioElementNode | studioDom.StudioPageNode,
-  ): Record<string, string> {
-    const result: Record<string, string> = {};
+  renderNodeChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): ResolvedProps {
+    const result: ResolvedProps = {};
     const nodeChildren = studioDom.getChildNodes(this.dom, node);
     // eslint-disable-next-line no-restricted-syntax
     for (const [prop, children] of Object.entries(nodeChildren)) {
       if (children) {
-        result[prop] = `<>${children.map((child) => this.renderNode(child)).join('\n')}</>`;
+        if (children.length === 1) {
+          result[prop] = this.renderNode(children[0]);
+        } else if (children.length > 1) {
+          result[prop] = {
+            type: 'jsxFragment',
+            value: children
+              .map((child): string => this.renderJsxContent(this.renderNode(child)))
+              .join('\n'),
+          };
+        }
       }
     }
     return result;
   }
 
-  renderPage(page: studioDom.StudioPageNode): string {
-    return this.renderNodeInternal(page.id, renderPage, {
-      children: this.renderChildren(page).children,
-    });
-  }
+  renderNode(node: studioDom.StudioElementNode | studioDom.StudioPageNode): PropExpression {
+    const component = this.getComponentDefinition(node);
+    if (!component) {
+      return {
+        type: 'expression',
+        value: 'null',
+      };
+    }
 
-  renderNode(node: studioDom.StudioElementNode): string {
-    const component = getStudioComponent(this.dom, node.component);
-    this.addImport(component.module, component.importedName, component.importedName);
-    const nodeChildren = this.renderChildren(node);
+    const nodeChildren = this.renderNodeChildren(node);
     const resolvedProps = this.resolveProps(node, nodeChildren);
-    return this.renderNodeInternal(node.id, component.importedName, resolvedProps);
+
+    let rendered: string;
+
+    if (component.render) {
+      rendered = component.render(this, resolvedProps);
+    } else {
+      this.addImport(component.module, component.importedName, component.importedName);
+      rendered = this.renderComponent(component.importedName, resolvedProps);
+    }
+
+    return {
+      type: 'jsxElement',
+      value: this.editor
+        ? `
+        <__studioRuntime.WrappedStudioNode id="${node.id}">
+          ${rendered}
+        </__studioRuntime.WrappedStudioNode>
+      `
+        : rendered,
+    };
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  renderProps(resolvedProps: Record<string, string>): string {
-    return Object.entries(resolvedProps)
-      .map(([name, value]) => {
-        if (name === '$spread') {
-          return value;
+  /**
+   * Renders a node to a string that can be inlined as the return value of a React component
+   * @example
+   * `function Hello () {
+   *   return ${RESULT};
+   * }`
+   */
+  renderRoot(node: studioDom.StudioPageNode): string {
+    const expr = this.renderNode(node);
+    return this.renderJsExpression(expr);
+  }
+
+  /**
+   * Renders resolved properties to a string that can be inlined as JSX attrinutes
+   * @example `<Hello ${RESULT} />`
+   */
+  renderProps(resolvedProps: ResolvedProps): string {
+    return (Object.entries(resolvedProps) as ExactEntriesOf<ResolvedProps>)
+      .map(([name, expr]) => {
+        if (!expr) {
+          return '';
         }
-        return `${name}={${value}}`;
+        if (name === '$spread') {
+          return expr;
+        }
+        return `${name}={${this.renderJsExpression(expr)}}`;
       })
       .join(' ');
+  }
+
+  /**
+   * Renders an expression to a string that can be used as a javascript
+   * expression. e.g. as the RHS of an assignment statement
+   * @example `const hello = ${RESULT}`
+   */
+  // eslint-disable-next-line class-methods-use-this
+  renderJsExpression(expr?: PropExpression): string {
+    if (!expr) {
+      return 'undefined';
+    }
+    if (expr.type === 'jsxFragment') {
+      return `<>${expr.value}</>`;
+    }
+    return expr.value;
+  }
+
+  /**
+   * Renders an expression to a string that can be inlined as children in
+   * a JSX element.
+   * @example `<Hello>${RESULT}</Hello>`
+   */
+  renderJsxContent(expr?: PropExpression): string {
+    if (!expr) {
+      return '';
+    }
+    if (expr.type === 'jsxElement' || expr.type === 'jsxFragment') {
+      return expr.value;
+    }
+    return `{${this.renderJsExpression(expr)}}`;
   }
 
   addImport(source: string, imported: string, local: string = imported) {
@@ -252,10 +337,6 @@ class Context {
       })
       .join('\n');
   }
-
-  getDependencies(): string[] {
-    return Array.from(this.imports.keys());
-  }
 }
 
 export default function renderPageCode(
@@ -272,7 +353,7 @@ export default function renderPageCode(
   const page = studioDom.getNode(dom, pageNodeId);
   studioDom.assertIsPage(page);
   const ctx = new Context(dom, page, config);
-  const root = ctx.renderPage(page);
+  const root: string = ctx.renderRoot(page);
 
   let code: string = `
     ${ctx.renderImports()}
@@ -293,5 +374,5 @@ export default function renderPageCode(
     });
   }
 
-  return { code, dependencies: ctx.getDependencies() };
+  return { code };
 }

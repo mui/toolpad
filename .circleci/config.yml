@@ -93,3 +93,6 @@ workflows:
       - test_static:
           requires:
             - checkout
+      - test_unit:
+          requires:
+            - checkout

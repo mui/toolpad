@@ -77,6 +77,14 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn build
+  test_unit:
+    <<: *defaults
+    steps:
+      - checkout
+      - install_js
+      - run:
+          name: Tests fake browser
+          command: yarn test
 workflows:
   version: 2
   pipeline:

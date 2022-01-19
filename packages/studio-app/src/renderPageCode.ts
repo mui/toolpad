@@ -13,21 +13,24 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
-function renderPage(ctx: RenderContext, props: ResolvedProps) {
-  ctx.addImport('@mui/material', 'Container', 'Container');
-  ctx.addImport('@mui/material', 'Stack', 'MuiStack');
-  ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
+const PAGE_COMPONENT = {
+  argTypes: {},
+  render(ctx: RenderContext, props: ResolvedProps) {
+    ctx.addImport('@mui/material', 'Container', 'Container');
+    ctx.addImport('@mui/material', 'Stack', 'MuiStack');
+    ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
 
-  const { children, ...other } = props;
+    const { children, ...other } = props;
 
-  return `
-    <Container ${ctx.renderProps(other)} sx={{ py:2 }}>
-      <MuiStack direction="column" gap={2}>
-        <Slots prop="children">${ctx.renderJsxContent(children)}</Slots>
-      </MuiStack>
-    </Container>
-  `;
-}
+    return `
+      <Container ${ctx.renderProps(other)} sx={{ py:2 }}>
+        <MuiStack direction="column" gap={2}>
+          <Slots prop="children">${ctx.renderJsxContent(children)}</Slots>
+        </MuiStack>
+      </Container>
+    `;
+  },
+};
 
 interface Import {
   named: Map<string, string>;
@@ -82,10 +85,7 @@ class Context implements RenderContext {
 
   getComponentDefinition(node: studioDom.StudioNode): StudioComponentDefinition | null {
     if (studioDom.isPage(node)) {
-      return {
-        argTypes: {},
-        render: renderPage,
-      };
+      return PAGE_COMPONENT;
     }
     if (studioDom.isElement(node)) {
       return getStudioComponent(this.dom, node.component);
@@ -93,7 +93,10 @@ class Context implements RenderContext {
     return null;
   }
 
-  // resolve props to expressions
+  /**
+   * Resolves StudioNode properties to expressions we can render in the code.
+   * This will set up databinding if necessary
+   */
   resolveProps<P>(
     node: studioDom.StudioElementNode | studioDom.StudioPageNode,
     resolvedChildren: ResolvedProps,
@@ -262,7 +265,6 @@ class Context implements RenderContext {
    * a JSX element.
    * @example `<Hello>${RESULT}</Hello>`
    */
-  // eslint-disable-next-line class-methods-use-this
   renderJsxContent(expr?: PropExpression): string {
     if (!expr) {
       return '';

@@ -1,3 +1,4 @@
+import { ArgTypeDefinitions } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
 import { NodeId, StudioNodeProps, StudioStateDefinition } from './types';
 import { omit, update } from './utils/immutability';
@@ -9,6 +10,7 @@ const ALLOWED_PARENTS = {
   theme: ['app'],
   api: ['app'],
   page: ['app'],
+  codeComponent: ['app'],
   element: ['page', 'element'],
 } as const;
 
@@ -24,7 +26,7 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-type StudioNodeType = 'app' | 'theme' | 'api' | 'page' | 'element';
+type StudioNodeType = 'app' | 'theme' | 'api' | 'page' | 'element' | 'codeComponent';
 
 export interface StudioNodeBase<P = {}> {
   readonly id: NodeId;
@@ -66,12 +68,19 @@ export interface StudioElementNode<P = {}> extends StudioNodeBase<P> {
   readonly component: string;
 }
 
+export interface StudioCodeComponentNode<P = {}> extends StudioNodeBase<P> {
+  readonly type: 'codeComponent';
+  readonly code: string;
+  readonly argTypes: ArgTypeDefinitions;
+}
+
 type StudioNodeOfType<K extends StudioNodeBase['type']> = {
   app: StudioAppNode;
   api: StudioApiNode;
   theme: StudioThemeNode;
   page: StudioPageNode;
   element: StudioElementNode;
+  codeComponent: StudioCodeComponentNode;
 }[K];
 
 export type StudioNode =
@@ -79,7 +88,8 @@ export type StudioNode =
   | StudioApiNode
   | StudioThemeNode
   | StudioPageNode
-  | StudioElementNode;
+  | StudioElementNode
+  | StudioCodeComponentNode;
 
 type AllowedParents = typeof ALLOWED_PARENTS;
 type ParentTypeOfType<T extends StudioNodeType> = AllowedParents[T][number];

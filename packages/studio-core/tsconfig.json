@@ -7,6 +7,5 @@
     "outDir": "dist",
     "declaration": true,
     "target": "ES2020"
-  },
-  "include": ["**/*.ts"]
+  }
 }

@@ -128,3 +128,28 @@ export interface StudioConnection<P = {}> extends StudioConnectionSummary {
   params: P;
   status: ConnectionStatus | null;
 }
+
+export type PropExpression =
+  | {
+      type: 'expression';
+      value: string;
+    }
+  | {
+      type: 'jsxLiteral';
+      value: string;
+    }
+  | {
+      type: 'jsxFragment';
+      value: string;
+    };
+
+export type ResolvedProps = Record<string, PropExpression | undefined> & { $spread?: string };
+
+export interface RenderContext {
+  addImport(source: string, imported: string, local: string): void;
+  renderProps(resolvedProps: ResolvedProps): string;
+  renderJsExpression(expr?: PropExpression): string;
+  renderJsxChildren(expr?: PropExpression): string;
+}
+
+export type RenderComponent = (ctx: RenderContext, resolvedProps: ResolvedProps) => string;

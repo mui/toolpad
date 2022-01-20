@@ -1,101 +1,27 @@
 import * as React from 'react';
-import * as studioComponentLib from '@mui/studio-components';
-import { ArgTypeDefinitions, DEFINITION_KEY } from '@mui/studio-core';
 import * as studioDom from '../studioDom';
-import { RenderComponent } from '../types';
+import { StudioComponentDefinition } from '../types';
+import importedComponentRenderer from './importedComponentRenderer';
 
-export interface StudioComponentDefinition {
-  id: string;
-  displayName: string;
-  argTypes: ArgTypeDefinitions;
-  render: RenderComponent;
-}
-
-function importedComponentRenderer(
-  moduleName: string,
-  importedName: string,
-  suggestedLocalName: string = importedName,
-): RenderComponent {
-  return (ctx, resolvedProps) => {
-    const localName = ctx.addImport(moduleName, importedName, suggestedLocalName);
-    return `<${localName} ${ctx.renderProps(resolvedProps)} />`;
-  };
-}
+import CustomLayout from './CustomLayout';
+import Button from './Button';
+import DataGrid from './DataGrid';
+import Paper from './Paper';
+import Stack from './Stack';
+import Typography from './Typography';
+import TextField from './TextField';
+import Select from './Select';
 
 // TODO: bring these back to @mui/studio repo and make them import @mui/material
 const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
-  [
-    'Button',
-    {
-      id: 'Button',
-      displayName: 'Button',
-      render: importedComponentRenderer('@mui/studio-components', 'Button'),
-      argTypes: (studioComponentLib.Button as any)[DEFINITION_KEY].argTypes,
-    },
-  ],
-  [
-    'DataGrid',
-    {
-      id: 'DataGrid',
-      displayName: 'DataGrid',
-      render: importedComponentRenderer('@mui/studio-components', 'DataGrid'),
-      argTypes: (studioComponentLib.DataGrid as any)[DEFINITION_KEY].argTypes,
-    },
-  ],
-  [
-    'Paper',
-    {
-      id: 'Paper',
-      displayName: 'Paper',
-      render: importedComponentRenderer('@mui/studio-components', 'Paper'),
-      argTypes: (studioComponentLib.Paper as any)[DEFINITION_KEY].argTypes,
-    },
-  ],
-  [
-    'Stack',
-    {
-      id: 'Stack',
-      displayName: 'Stack',
-      render: importedComponentRenderer('@mui/studio-components', 'Stack'),
-      argTypes: (studioComponentLib.Stack as any)[DEFINITION_KEY].argTypes,
-    },
-  ],
-  [
-    'TextField',
-    {
-      id: 'TextField',
-      displayName: 'TextField',
-      render: importedComponentRenderer('@mui/studio-components', 'TextField'),
-      argTypes: (studioComponentLib.TextField as any)[DEFINITION_KEY].argTypes,
-    },
-  ],
-  [
-    'Typography',
-    {
-      id: 'Typography',
-      displayName: 'Typography',
-      render: importedComponentRenderer('@mui/studio-components', 'Typography'),
-      argTypes: (studioComponentLib.Typography as any)[DEFINITION_KEY].argTypes,
-    },
-  ],
-  [
-    'CustomLayout',
-    {
-      id: 'CustomLayout',
-      displayName: 'CustomLayout',
-      render: importedComponentRenderer('@mui/studio-components', 'CustomLayout'),
-      argTypes: (studioComponentLib.CustomLayout as any)[DEFINITION_KEY].argTypes,
-    },
-  ],
-  [
-    'Select',
-    {
-      id: 'Select',
-      displayName: 'Select',
-      render: importedComponentRenderer('@mui/studio-components', 'Select'),
-      argTypes: (studioComponentLib.Select as any)[DEFINITION_KEY].argTypes,
-    },
-  ],
+  ['Button', Button],
+  ['DataGrid', DataGrid],
+  ['Paper', Paper],
+  ['Stack', Stack],
+  ['TextField', TextField],
+  ['Typography', Typography],
+  ['CustomLayout', CustomLayout],
+  ['Select', Select],
 ]);
 
 function createCodeComponent(

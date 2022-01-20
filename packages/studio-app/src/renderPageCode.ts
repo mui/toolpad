@@ -1,9 +1,16 @@
 import { ArgTypeDefinition } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
-import { getStudioComponent, StudioComponentDefinition } from './studioComponents';
+import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
-import { NodeId, PropExpression, RenderContext, ResolvedProps, StudioNodeProps } from './types';
+import {
+  NodeId,
+  PropExpression,
+  RenderContext,
+  ResolvedProps,
+  StudioComponentDefinition,
+  StudioNodeProps,
+} from './types';
 import { ExactEntriesOf } from './utils/types';
 
 export interface RenderPageConfig {
@@ -19,7 +26,7 @@ const PAGE_COMPONENT = {
   argTypes: {},
   render(ctx: RenderContext, props: ResolvedProps) {
     const Container = ctx.addImport('@mui/material', 'Container', 'Container');
-    const Stack = ctx.addImport('@mui/material', 'Stack', 'MuiStack');
+    const Stack = ctx.addImport('@mui/material', 'Stack', 'Stack');
     const Slots = ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
 
     const { children, ...other } = props;

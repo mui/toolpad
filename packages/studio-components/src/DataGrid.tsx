@@ -8,7 +8,7 @@ import {
   MuiEvent,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { createComponent, useStudioNode } from '@mui/studio-core';
+import { useStudioNode } from '@mui/studio-core';
 import { debounce } from '@mui/material';
 
 // TODO: Generate a specific license for Studio (This one comes from CI)
@@ -45,21 +45,4 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 });
 
-export default createComponent(DataGridComponent, {
-  argTypes: {
-    rows: {
-      typeDef: { type: 'array', items: { type: 'object' } },
-      defaultValue: [],
-    },
-    columns: {
-      typeDef: { type: 'array', items: { type: 'object' } },
-      defaultValue: [],
-    },
-    density: {
-      typeDef: { type: 'string', enum: ['comfortable', 'compact', 'standard'] },
-    },
-    studioDataQuery: {
-      typeDef: { type: 'dataQuery' },
-    },
-  },
-});
+export default DataGridComponent;

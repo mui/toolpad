@@ -1,23 +1,25 @@
 import * as studioComponentLib from '@mui/studio-components';
 import { ArgTypeDefinitions, DEFINITION_KEY } from '@mui/studio-core';
 import * as studioDom from '../studioDom';
-import { RenderComponent, RenderContext, ResolvedProps } from '../types';
+import { RenderComponent } from '../types';
 
-export type StudioComponentDefinition =
-  | {
-      id: string;
-      displayName: string;
-      argTypes: ArgTypeDefinitions;
-      module: string;
-      importedName: string;
-      render?: undefined;
-    }
-  | {
-      id: string;
-      displayName: string;
-      argTypes: ArgTypeDefinitions;
-      render: RenderComponent;
-    };
+export interface StudioComponentDefinition {
+  id: string;
+  displayName: string;
+  argTypes: ArgTypeDefinitions;
+  render: RenderComponent;
+}
+
+function importedComponentRenderer(
+  moduleName: string,
+  importedName: string,
+  suggestedLocalName: string = importedName,
+): RenderComponent {
+  return (ctx, resolvedProps) => {
+    const localName = ctx.addImport(moduleName, importedName, suggestedLocalName);
+    return `<${localName} ${ctx.renderProps(resolvedProps)} />`;
+  };
+}
 
 const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
   [
@@ -25,8 +27,7 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
     {
       id: 'Button',
       displayName: 'Button',
-      module: '@mui/studio-components',
-      importedName: 'Button',
+      render: importedComponentRenderer('@mui/studio-components', 'Button'),
       argTypes: (studioComponentLib.Button as any)[DEFINITION_KEY].argTypes,
     },
   ],
@@ -35,8 +36,7 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
     {
       id: 'DataGrid',
       displayName: 'DataGrid',
-      module: '@mui/studio-components',
-      importedName: 'DataGrid',
+      render: importedComponentRenderer('@mui/studio-components', 'DataGrid'),
       argTypes: (studioComponentLib.DataGrid as any)[DEFINITION_KEY].argTypes,
     },
   ],
@@ -45,8 +45,7 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
     {
       id: 'Paper',
       displayName: 'Paper',
-      module: '@mui/studio-components',
-      importedName: 'Paper',
+      render: importedComponentRenderer('@mui/studio-components', 'Paper'),
       argTypes: (studioComponentLib.Paper as any)[DEFINITION_KEY].argTypes,
     },
   ],
@@ -55,8 +54,7 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
     {
       id: 'Stack',
       displayName: 'Stack',
-      module: '@mui/studio-components',
-      importedName: 'Stack',
+      render: importedComponentRenderer('@mui/studio-components', 'Stack'),
       argTypes: (studioComponentLib.Stack as any)[DEFINITION_KEY].argTypes,
     },
   ],
@@ -65,8 +63,7 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
     {
       id: 'TextField',
       displayName: 'TextField',
-      module: '@mui/studio-components',
-      importedName: 'TextField',
+      render: importedComponentRenderer('@mui/studio-components', 'TextField'),
       argTypes: (studioComponentLib.TextField as any)[DEFINITION_KEY].argTypes,
     },
   ],
@@ -75,8 +72,7 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
     {
       id: 'Typography',
       displayName: 'Typography',
-      module: '@mui/studio-components',
-      importedName: 'Typography',
+      render: importedComponentRenderer('@mui/studio-components', 'Typography'),
       argTypes: (studioComponentLib.Typography as any)[DEFINITION_KEY].argTypes,
     },
   ],
@@ -85,8 +81,7 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
     {
       id: 'CustomLayout',
       displayName: 'CustomLayout',
-      module: '@mui/studio-components',
-      importedName: 'CustomLayout',
+      render: importedComponentRenderer('@mui/studio-components', 'CustomLayout'),
       argTypes: (studioComponentLib.CustomLayout as any)[DEFINITION_KEY].argTypes,
     },
   ],
@@ -95,8 +90,7 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
     {
       id: 'Select',
       displayName: 'Select',
-      module: '@mui/studio-components',
-      importedName: 'Select',
+      render: importedComponentRenderer('@mui/studio-components', 'Select'),
       argTypes: (studioComponentLib.Select as any)[DEFINITION_KEY].argTypes,
     },
   ],
@@ -109,11 +103,11 @@ function createCodeComponent(
     id: `codeComponent.${domNode.id}`,
     displayName: domNode.name,
     argTypes: domNode.argTypes,
-    render: (ctx: RenderContext, resolvedProps: ResolvedProps) => {
-      const localName = `Custom_${domNode.id}`;
-      ctx.addImport(`../components/${domNode.id}.tsx`, `default`, localName);
-      return `<${localName} ${ctx.renderProps(resolvedProps)} />`;
-    },
+    render: importedComponentRenderer(
+      `../components/${domNode.id}.tsx`,
+      `default`,
+      `Custom_${domNode.id}`,
+    ),
   };
 }
 

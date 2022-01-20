@@ -14,20 +14,22 @@ export interface RenderPageConfig {
 }
 
 const PAGE_COMPONENT = {
+  id: 'Page',
+  displayName: 'Page',
   argTypes: {},
   render(ctx: RenderContext, props: ResolvedProps) {
-    ctx.addImport('@mui/material', 'Container', 'Container');
-    ctx.addImport('@mui/material', 'Stack', 'MuiStack');
-    ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
+    const Container = ctx.addImport('@mui/material', 'Container', 'Container');
+    const Stack = ctx.addImport('@mui/material', 'Stack', 'MuiStack');
+    const Slots = ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
 
     const { children, ...other } = props;
 
     return `
-      <Container ${ctx.renderProps(other)}>
-        <MuiStack direction="column" gap={2} my={2}>
-          <Slots prop="children">${ctx.renderJsxContent(children)}</Slots>
-        </MuiStack>
-      </Container>
+      <${Container} ${ctx.renderProps(other)}>
+        <${Stack} direction="column" gap={2} my={2}>
+          <${Slots} prop="children">${ctx.renderJsxContent(children)}</${Slots}>
+        </${Stack}>
+      </${Container}>
     `;
   },
 };
@@ -198,8 +200,12 @@ class Context implements RenderContext {
     if (component.render) {
       rendered = component.render(this, resolvedProps);
     } else {
-      this.addImport(component.module, component.importedName, component.importedName);
-      rendered = this.renderComponent(component.importedName, resolvedProps);
+      const localName = this.addImport(
+        component.module,
+        component.importedName,
+        component.importedName,
+      );
+      rendered = this.renderComponent(localName, resolvedProps);
     }
 
     return {
@@ -275,7 +281,13 @@ class Context implements RenderContext {
     return `{${this.renderJsExpression(expr)}}`;
   }
 
-  addImport(source: string, imported: string, local: string = imported) {
+  /**
+   * Adds an import to the page module. Returns an identifier that's based on local that can
+   * be used to reference the import.
+   */
+  addImport(source: string, imported: string, localName: string = imported): string {
+    // TODO: introduce concept of scope and make sure local is unique
+
     let specifiers = this.imports.get(source);
     if (!specifiers) {
       specifiers = { named: new Map() };
@@ -284,13 +296,15 @@ class Context implements RenderContext {
 
     const existing = specifiers.named.get(imported);
     if (!existing) {
-      specifiers.named.set(imported, local);
-    } else if (existing !== local) {
+      specifiers.named.set(imported, localName);
+    } else if (existing !== localName) {
       // TODO: we can reassign to a local variable
       throw new Error(
-        `Trying to import "${imported}" as "${local}" but it is already imported as "${existing}"`,
+        `Trying to import "${imported}" as "${localName}" but it is already imported as "${existing}"`,
       );
     }
+
+    return localName;
   }
 
   renderImports(): string {

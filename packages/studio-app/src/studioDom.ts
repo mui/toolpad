@@ -146,6 +146,16 @@ export function assertIsApi<P>(node: StudioNode): asserts node is StudioApiNode<
   assertIsType<StudioApiNode>(node, 'api');
 }
 
+export function isCodeComponent<P>(node: StudioNode): node is StudioCodeComponentNode<P> {
+  return isType<StudioCodeComponentNode>(node, 'codeComponent');
+}
+
+export function assertIsCodeComponent<P>(
+  node: StudioNode,
+): asserts node is StudioCodeComponentNode<P> {
+  assertIsType<StudioCodeComponentNode>(node, 'codeComponent');
+}
+
 export function isTheme(node: StudioNode): node is StudioThemeNode {
   return isType<StudioThemeNode>(node, 'theme');
 }
@@ -232,6 +242,11 @@ export function getPages(dom: StudioDom, app: StudioAppNode): StudioPageNode[] {
 
 export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
   return (getChildNodes(dom, app).children?.filter((node) => isApi(node)) ?? []) as StudioApiNode[];
+}
+
+export function getCodeComponents(dom: StudioDom, app: StudioAppNode): StudioCodeComponentNode[] {
+  return (getChildNodes(dom, app).children?.filter((node) => isCodeComponent(node)) ??
+    []) as StudioCodeComponentNode[];
 }
 
 // TODO: make theme optional by returning undefined

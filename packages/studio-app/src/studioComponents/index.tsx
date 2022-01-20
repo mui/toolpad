@@ -1,54 +1,153 @@
 import * as studioComponentLib from '@mui/studio-components';
-import { ArgTypeDefinitions, DEFINITION_KEY, StudioComponent } from '@mui/studio-core';
+import { ArgTypeDefinitions, DEFINITION_KEY } from '@mui/studio-core';
 import * as studioDom from '../studioDom';
-import { RenderComponent } from '../types';
+import { RenderComponent, RenderContext, ResolvedProps } from '../types';
 
 export type StudioComponentDefinition =
   | {
+      id: string;
+      displayName: string;
       argTypes: ArgTypeDefinitions;
       module: string;
       importedName: string;
       render?: undefined;
     }
   | {
+      id: string;
+      displayName: string;
       argTypes: ArgTypeDefinitions;
       render: RenderComponent;
     };
 
-export const DEFAULT_COMPONENTS = new Map([
-  ['Button', { module: '@mui/studio-components', importedName: 'Button' }],
-  ['DataGrid', { module: '@mui/studio-components', importedName: 'DataGrid' }],
-  ['Paper', { module: '@mui/studio-components', importedName: 'Paper' }],
-  ['Stack', { module: '@mui/studio-components', importedName: 'Stack' }],
-  ['TextField', { module: '@mui/studio-components', importedName: 'TextField' }],
-  ['Typography', { module: '@mui/studio-components', importedName: 'Typography' }],
-  ['CustomLayout', { module: '@mui/studio-components', importedName: 'CustomLayout' }],
-  ['Select', { module: '@mui/studio-components', importedName: 'Select' }],
+const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
+  [
+    'Button',
+    {
+      id: 'Button',
+      displayName: 'Button',
+      module: '@mui/studio-components',
+      importedName: 'Button',
+      argTypes: (studioComponentLib.Button as any)[DEFINITION_KEY].argTypes,
+    },
+  ],
+  [
+    'DataGrid',
+    {
+      id: 'DataGrid',
+      displayName: 'DataGrid',
+      module: '@mui/studio-components',
+      importedName: 'DataGrid',
+      argTypes: (studioComponentLib.DataGrid as any)[DEFINITION_KEY].argTypes,
+    },
+  ],
+  [
+    'Paper',
+    {
+      id: 'Paper',
+      displayName: 'Paper',
+      module: '@mui/studio-components',
+      importedName: 'Paper',
+      argTypes: (studioComponentLib.Paper as any)[DEFINITION_KEY].argTypes,
+    },
+  ],
+  [
+    'Stack',
+    {
+      id: 'Stack',
+      displayName: 'Stack',
+      module: '@mui/studio-components',
+      importedName: 'Stack',
+      argTypes: (studioComponentLib.Stack as any)[DEFINITION_KEY].argTypes,
+    },
+  ],
+  [
+    'TextField',
+    {
+      id: 'TextField',
+      displayName: 'TextField',
+      module: '@mui/studio-components',
+      importedName: 'TextField',
+      argTypes: (studioComponentLib.TextField as any)[DEFINITION_KEY].argTypes,
+    },
+  ],
+  [
+    'Typography',
+    {
+      id: 'Typography',
+      displayName: 'Typography',
+      module: '@mui/studio-components',
+      importedName: 'Typography',
+      argTypes: (studioComponentLib.Typography as any)[DEFINITION_KEY].argTypes,
+    },
+  ],
+  [
+    'CustomLayout',
+    {
+      id: 'CustomLayout',
+      displayName: 'CustomLayout',
+      module: '@mui/studio-components',
+      importedName: 'CustomLayout',
+      argTypes: (studioComponentLib.CustomLayout as any)[DEFINITION_KEY].argTypes,
+    },
+  ],
+  [
+    'Select',
+    {
+      id: 'Select',
+      displayName: 'Select',
+      module: '@mui/studio-components',
+      importedName: 'Select',
+      argTypes: (studioComponentLib.Select as any)[DEFINITION_KEY].argTypes,
+    },
+  ],
 ]);
 
-export function getStudioComponent(
-  // TODO: remove this comment when custom components are implemented
-  // dom is unused yet, but added as a paramater because that is where we will store
-  // custom components or imported components for an application.
-  // The parameter serves as a constraint on all callsites that this is a use case
-  // that we need to keep in mind.
-  dom: studioDom.StudioDom,
-  componentName: string,
+function createCodeComponent(
+  domNode: studioDom.StudioCodeComponentNode,
 ): StudioComponentDefinition {
-  const component = DEFAULT_COMPONENTS.get(componentName);
-  if (!component) {
-    throw new Error(`Invariant: Accessing unknown component "${componentName}"`);
-  }
-
-  const componentLibImport: StudioComponent<any> | undefined =
-    studioComponentLib[componentName as keyof typeof studioComponentLib];
-
-  if (!componentLibImport) {
-    throw new Error(`Component "${componentName}" is not exported from '@mui/studio-components'`);
-  }
-
   return {
-    ...component,
-    argTypes: (componentLibImport as any)[DEFINITION_KEY]?.argTypes || {},
+    id: `codeComponent.${domNode.id}`,
+    displayName: domNode.name,
+    argTypes: domNode.argTypes,
+    render: (ctx: RenderContext, resolvedProps: ResolvedProps) => {
+      const localName = `Custom_${domNode.id}`;
+      ctx.addImport(`../components/${domNode.id}.tsx`, `default`, localName);
+      return `<${localName} ${ctx.renderProps(resolvedProps)} />`;
+    },
   };
+}
+
+export function getStudioComponents(dom: studioDom.StudioDom): StudioComponentDefinition[] {
+  const app = studioDom.getApp(dom);
+  const studioCodeComponents = studioDom.getCodeComponents(dom, app);
+  return [
+    ...INTERNAL_COMPONENTS.values(),
+    ...studioCodeComponents.map((studioCodeComponent) => createCodeComponent(studioCodeComponent)),
+  ];
+}
+
+export function getStudioComponent(
+  dom: studioDom.StudioDom,
+  componentId: string,
+): StudioComponentDefinition {
+  const component = INTERNAL_COMPONENTS.get(componentId);
+
+  if (component) {
+    return component;
+  }
+
+  const app = studioDom.getApp(dom);
+  const studioCodeComponents = studioDom.getCodeComponents(dom, app);
+  const nodeId = componentId.split('.')[1];
+  const domNode = studioCodeComponents.find((node) => node.id === nodeId);
+
+  if (domNode) {
+    return createCodeComponent(domNode);
+  }
+
+  throw new Error(`Invariant: Accessing unknown component "${componentId}"`);
+}
+
+export default function Test() {
+  return <div style={{ background: 'green' }}>Hello, this is a test</div>;
 }

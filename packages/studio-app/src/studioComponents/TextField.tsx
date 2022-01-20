@@ -1,7 +1,10 @@
-import { TextField } from '@mui/material';
-import { createComponent } from '@mui/studio-core';
+import { StudioComponentDefinition } from '../types';
+import importedComponentRenderer from './importedComponentRenderer';
 
-export default createComponent(TextField, {
+export default {
+  id: 'TextField',
+  displayName: 'TextField',
+  render: importedComponentRenderer('@mui/material', 'TextField'),
   argTypes: {
     label: {
       typeDef: { type: 'string' },
@@ -23,4 +26,4 @@ export default createComponent(TextField, {
       },
     },
   },
-});
+} as StudioComponentDefinition;

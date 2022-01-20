@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled, Typography } from '@mui/material';
 import { ComponentDefinition, ArgTypeDefinitions } from '@mui/studio-core';
-import { getStudioComponent, getStudioComponents } from '../../../studioComponents';
+import { getStudioComponent, useStudioComponents } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
 import { useEditorApi } from '../EditorProvider';
 import { StudioNodeProps } from '../../../types';
@@ -62,7 +62,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     api.pageEditor.newNodeDragStart(newNode);
   };
 
-  const studioComponents = React.useMemo(() => getStudioComponents(dom), [dom]);
+  const studioComponents = useStudioComponents(dom);
 
   return (
     <ComponentCatalogRoot className={className}>

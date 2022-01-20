@@ -26,6 +26,7 @@ import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomProvider';
 import { usePageEditorState } from './PageFileEditorProvider';
 import EditorOverlay from './EditorOverlay';
+import { useStudioComponent } from '../../../studioComponents';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -434,6 +435,32 @@ interface ViewSlots {
   [node: NodeId]: NodeSlots | undefined;
 }
 
+interface SelectionHudProps {
+  node: studioDom.StudioElementNode;
+  rect: Rectangle;
+  selected?: boolean;
+  allowInteraction?: boolean;
+  onDragStart?: React.DragEventHandler<HTMLElement>;
+}
+
+function NodeHud({ node, selected, allowInteraction, rect, onDragStart }: SelectionHudProps) {
+  const dom = useDom();
+  const component = useStudioComponent(dom, node.component);
+  return (
+    <div
+      draggable
+      onDragStart={onDragStart}
+      style={absolutePositionCss(rect)}
+      className={clsx(overlayClasses.nodeHud, {
+        [overlayClasses.selected]: selected,
+        [overlayClasses.allowNodeInteraction]: allowInteraction,
+      })}
+    >
+      <div className={overlayClasses.selectionHint}>{component.displayName}</div>
+    </div>
+  );
+}
+
 export interface RenderPanelProps {
   className?: string;
 }
@@ -676,7 +703,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   return (
     <RenderPanelRoot className={className}>
-      <PageView className={classes.view} dom={dom} pageNodeId={pageNodeId} onLoad={handleLoad} />
+      <PageView
+        editor
+        className={classes.view}
+        dom={dom}
+        pageNodeId={pageNodeId}
+        onLoad={handleLoad}
+      />
       <EditorOverlay key={overlayKey} window={editorWindowRef.current}>
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <OverlayRoot
@@ -732,24 +765,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               return null;
             }
 
-            const showSelected = studioDom.isElement(node) && selectedNode?.id === node.id;
-
             return (
-              <React.Fragment key={node.id}>
-                <div
-                  draggable
+              studioDom.isElement(node) && (
+                <NodeHud
+                  key={node.id}
+                  node={node}
+                  rect={nodeLayout.rect}
+                  selected={selectedNode?.id === node.id}
+                  allowInteraction={nodesWithInteraction.has(node.id)}
                   onDragStart={handleDragStart}
-                  style={absolutePositionCss(nodeLayout.rect)}
-                  className={clsx(overlayClasses.nodeHud, {
-                    [overlayClasses.selected]: showSelected,
-                    [overlayClasses.allowNodeInteraction]: nodesWithInteraction.has(node.id),
-                  })}
-                >
-                  <div className={overlayClasses.selectionHint}>
-                    {studioDom.isElement(node) ? node.component : ''}
-                  </div>
-                </div>
-              </React.Fragment>
+                />
+              )
             );
           })}
           {/* 

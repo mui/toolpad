@@ -1,3 +1,4 @@
+import * as React from 'react';
 import * as studioComponentLib from '@mui/studio-components';
 import { ArgTypeDefinitions, DEFINITION_KEY } from '@mui/studio-core';
 import * as studioDom from '../studioDom';
@@ -141,4 +142,15 @@ export function getStudioComponent(
   }
 
   throw new Error(`Invariant: Accessing unknown component "${componentId}"`);
+}
+
+export function useStudioComponents(dom: studioDom.StudioDom): StudioComponentDefinition[] {
+  return React.useMemo(() => getStudioComponents(dom), [dom]);
+}
+
+export function useStudioComponent(
+  dom: studioDom.StudioDom,
+  id: string,
+): StudioComponentDefinition {
+  return React.useMemo(() => getStudioComponent(dom, id), [dom, id]);
 }

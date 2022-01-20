@@ -1,7 +1,7 @@
-import { styled, TextField } from '@mui/material';
+import { styled, TextField, Typography } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
-import { getStudioComponent } from '../../../studioComponents';
+import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
 import ComponentPropEditor from './ComponentPropEditor';
@@ -53,6 +53,7 @@ interface SelectedNodeEditorProps {
 const DEFAULT_ACTUAL_VALUES = {};
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
+  const dom = useDom();
   const domApi = useDomApi();
   const { viewState } = usePageEditorState();
   const actualValues = viewState[node.id]?.props ?? DEFAULT_ACTUAL_VALUES;
@@ -78,9 +79,12 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
     [handleNameCommit],
   );
 
+  const component = useStudioComponent(dom, node.component);
+
   return (
     <React.Fragment>
-      <div>{`${node.component} (${node.id})`}</div>
+      <Typography variant="subtitle1">{component.displayName}</Typography>
+      <Typography variant="subtitle2">ID: {node.id}</Typography>
       <TextField
         fullWidth
         size="small"

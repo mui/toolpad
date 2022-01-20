@@ -62,10 +62,12 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     api.pageEditor.newNodeDragStart(newNode);
   };
 
+  const studioComponents = React.useMemo(() => getStudioComponents(dom), [dom]);
+
   return (
     <ComponentCatalogRoot className={className}>
       <Typography>Drag components on the canvas:</Typography>
-      {getStudioComponents(dom).map((componentType) => {
+      {studioComponents.map((componentType) => {
         return (
           <ComponentCatalogItem
             key={componentType.id}

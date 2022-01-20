@@ -194,19 +194,7 @@ class Context implements RenderContext {
 
     const nodeChildren = this.renderNodeChildren(node);
     const resolvedProps = this.resolveProps(node, nodeChildren);
-
-    let rendered: string;
-
-    if (component.render) {
-      rendered = component.render(this, resolvedProps);
-    } else {
-      const localName = this.addImport(
-        component.module,
-        component.importedName,
-        component.importedName,
-      );
-      rendered = this.renderComponent(localName, resolvedProps);
-    }
+    const rendered = component.render(this, resolvedProps);
 
     return {
       type: 'jsxElement',

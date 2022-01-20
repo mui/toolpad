@@ -6,7 +6,6 @@ import StudioSandbox from '../StudioSandbox';
 import getImportMap from '../../getImportMap';
 import renderThemeCode from '../../renderThemeCode';
 import renderEntryPoint from '../../renderPageEntryCode';
-import { useStudioComponents } from '../../studioComponents';
 
 export interface PageViewProps {
   className?: string;
@@ -49,26 +48,6 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
     );
   }, [dom]);
 
-  const studioComponents = useStudioComponents(dom);
-  const componentDefinitions = React.useMemo(() => {
-    if (!editor) {
-      return {};
-    }
-
-    const definitions = Object.fromEntries(
-      studioComponents.map((studioComponent) => [
-        studioComponent.id,
-        { argTypes: studioComponent.argTypes },
-      ]),
-    );
-
-    return {
-      './system/components.ts': {
-        code: `export default ${JSON.stringify(definitions)};`,
-      },
-    };
-  }, [studioComponents, editor]);
-
   return (
     <StudioSandbox
       className={className}
@@ -76,7 +55,6 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
       base={`/app/${dom.root}/`}
       importMap={getImportMap()}
       files={{
-        ...componentDefinitions,
         ...codeComponents,
         [themePath]: { code: renderedTheme.code },
         [entryPath]: { code: renderedEntrypoint.code },

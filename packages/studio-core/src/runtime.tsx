@@ -108,61 +108,10 @@ interface WrappedStudioNodeInternalProps {
 function WrappedStudioNodeInternal({
   children,
   [RUNTIME_PROP_NODE_ID]: studioNodeId,
-  component,
 }: WrappedStudioNodeInternalProps) {
-  const child = React.Children.only(children);
-
-  let newProps: { [key: string]: unknown } | undefined;
-
-  Object.entries(component?.argTypes || {}).forEach(([argName, argDef]) => {
-    const value = child.props[argName];
-    if (argDef?.typeDef.type === 'element') {
-      if (argDef.control?.type === 'slots') {
-        const valueAsArray = React.Children.toArray(value);
-        newProps = newProps ?? {};
-        newProps[argName] =
-          valueAsArray.length > 0 ? (
-            <SlotsInternal
-              {...{
-                [RUNTIME_PROP_STUDIO_SLOTS]: argName,
-                [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
-              }}
-              parentId={studioNodeId}
-            >
-              {valueAsArray}
-            </SlotsInternal>
-          ) : (
-            <PlaceholderInternal
-              {...{
-                [RUNTIME_PROP_STUDIO_SLOTS]: argName,
-                [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
-              }}
-              parentId={studioNodeId}
-            />
-          );
-      } else if (argDef.control?.type === 'slot') {
-        const valueAsArray = React.Children.toArray(value);
-        if (valueAsArray.length <= 0) {
-          newProps = newProps ?? {};
-          newProps[argName] = (
-            <PlaceholderInternal
-              {...{
-                [RUNTIME_PROP_STUDIO_SLOTS]: argName,
-                [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
-              }}
-              parentId={studioNodeId}
-            />
-          );
-        }
-      }
-    }
-  });
-
   return (
     <StudioNodeContext.Provider value={studioNodeId}>
-      <ComponentErrorBoundary>
-        {newProps ? React.cloneElement(child, newProps) : child}
-      </ComponentErrorBoundary>
+      <ComponentErrorBoundary>{children}</ComponentErrorBoundary>
     </StudioNodeContext.Provider>
   );
 }

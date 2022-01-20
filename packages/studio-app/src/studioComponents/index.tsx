@@ -11,9 +11,11 @@ import Stack from './Stack';
 import Typography from './Typography';
 import TextField from './TextField';
 import Select from './Select';
+import Page from './Page';
 
 // TODO: bring these back to @mui/studio repo and make them import @mui/material
 const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
+  ['Page', Page],
   ['Button', Button],
   ['DataGrid', DataGrid],
   ['Paper', Paper],

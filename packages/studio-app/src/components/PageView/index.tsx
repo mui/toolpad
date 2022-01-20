@@ -16,9 +16,9 @@ export interface PageViewProps {
 }
 
 export default function PageView({ className, dom, pageNodeId, onLoad }: PageViewProps) {
-  const themePath = './lib/theme.js';
-  const entryPath = `./${pageNodeId}.js`;
-  const pagePath = `./pages/${pageNodeId}.js`;
+  const themePath = './lib/theme.ts';
+  const entryPath = `./${pageNodeId}.tsx`;
+  const pagePath = `./pages/${pageNodeId}.tsx`;
 
   const renderedPage = React.useMemo(() => {
     return renderPageCode(dom, pageNodeId, {
@@ -40,6 +40,17 @@ export default function PageView({ className, dom, pageNodeId, onLoad }: PageVie
     });
   }, [pagePath, themePath]);
 
+  const components = React.useMemo(() => {
+    const app = studioDom.getApp(dom);
+    const studioCodeComponents = studioDom.getCodeComponents(dom, app);
+    return Object.fromEntries(
+      studioCodeComponents.map((component) => [
+        `./components/${component.id}.tsx`,
+        { code: component.code },
+      ]),
+    );
+  }, [dom]);
+
   return (
     <StudioSandbox
       className={className}
@@ -47,6 +58,7 @@ export default function PageView({ className, dom, pageNodeId, onLoad }: PageVie
       base={`/app/${dom.root}/`}
       importMap={getImportMap()}
       files={{
+        ...components,
         [themePath]: { code: renderedTheme.code },
         [entryPath]: { code: renderedEntrypoint.code },
         [pagePath]: { code: renderedPage.code },

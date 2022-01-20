@@ -123,6 +123,22 @@ function HierarchyExplorerApiItem({ api }: HierarchyExplorerApiItemProps) {
   return <TreeItem ContentComponent={CustomContent} nodeId={api.id} label={api.name} />;
 }
 
+interface HierarchyExplorerCodeComponentItemProps {
+  codeComponent: studioDom.StudioCodeComponentNode;
+}
+
+function HierarchyExplorerCodeComponentItem({
+  codeComponent,
+}: HierarchyExplorerCodeComponentItemProps) {
+  return (
+    <TreeItem
+      ContentComponent={CustomContent}
+      nodeId={codeComponent.id}
+      label={codeComponent.name}
+    />
+  );
+}
+
 interface CreateStudioApiDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {}
 
 function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps) {
@@ -238,6 +254,58 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
   );
 }
 
+interface CreateStudioCodeComponentDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {}
+
+function CreateStudioCodeComponentDialog({
+  onClose,
+  ...props
+}: CreateStudioCodeComponentDialogProps) {
+  const dom = useDom();
+  const domApi = useDomApi();
+  const [code, setCode] = React.useState('');
+
+  return (
+    <Dialog {...props} onClose={onClose}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          const newPageNode = studioDom.createNode(dom, 'codeComponent', {
+            code,
+            argTypes: {},
+          });
+          const appNode = studioDom.getApp(dom);
+          domApi.addNode(newPageNode, appNode.id, 'children');
+          onClose?.(e, 'backdropClick');
+        }}
+        style={{
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <DialogTitle>Create a new MUI Studio Code Component</DialogTitle>
+        <DialogContent>
+          <TextField
+            sx={{ my: 1 }}
+            autoFocus
+            fullWidth
+            multiline
+            rows={10}
+            label="title"
+            value={code}
+            onChange={(event) => setCode(event.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button type="submit" disabled={!code}>
+            Create
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+}
+
 export interface HierarchyExplorerProps {
   className?: string;
 }
@@ -248,8 +316,9 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   const api = useEditorApi();
 
   const app = studioDom.getApp(dom);
-  const pages = studioDom.getPages(dom, app);
   const apis = studioDom.getApis(dom, app);
+  const codeComponents = studioDom.getCodeComponents(dom, app);
+  const pages = studioDom.getPages(dom, app);
 
   const [expanded, setExpanded] = React.useState<('' | NodeId)[]>([
     '',
@@ -312,10 +381,21 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   );
   const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
 
+  const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(0);
+  const handleCreateCodeComponentDialogOpen = React.useCallback(
+    () => setCreateCodeComponentDialogOpen(Math.random()),
+    [],
+  );
+  const handleCreateCodeComponentDialogClose = React.useCallback(
+    () => setCreateCodeComponentDialogOpen(0),
+    [],
+  );
+
   return (
     <div className={className}>
       <Button onClick={handleCreateApiDialogOpen}>New Api</Button>
       <Button onClick={handleCreatePageDialogOpen}>New Page</Button>
+      <Button onClick={handleCreateCodeComponentDialogOpen}>New Component</Button>
       <CreateStudioApiDialog
         key={createApiDialogOpen || undefined}
         open={!!createApiDialogOpen}
@@ -325,6 +405,11 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         key={createPageDialogOpen || undefined}
         open={!!createPageDialogOpen}
         onClose={handleCreatepageDialogClose}
+      />
+      <CreateStudioCodeComponentDialog
+        key={createCodeComponentDialogOpen || undefined}
+        open={!!createCodeComponentDialogOpen}
+        onClose={handleCreateCodeComponentDialogClose}
       />
       <Typography>App Hierarchy</Typography>
       <TreeView
@@ -340,6 +425,14 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         <TreeItem ContentComponent={CustomContent} nodeId="" label="Apis">
           {apis.map((apiNode) => (
             <HierarchyExplorerApiItem key={apiNode.id} api={apiNode} />
+          ))}
+        </TreeItem>
+        <TreeItem ContentComponent={CustomContent} nodeId="" label="Components">
+          {codeComponents.map((codeComponent) => (
+            <HierarchyExplorerCodeComponentItem
+              key={codeComponent.id}
+              codeComponent={codeComponent}
+            />
           ))}
         </TreeItem>
         <TreeItem ContentComponent={CustomContent} nodeId="" label="Pages">

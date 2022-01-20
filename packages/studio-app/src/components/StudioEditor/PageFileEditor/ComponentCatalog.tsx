@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled, Typography } from '@mui/material';
 import { ComponentDefinition, ArgTypeDefinitions } from '@mui/studio-core';
-import { DEFAULT_COMPONENTS, getStudioComponent } from '../../../studioComponents';
+import { getStudioComponent, getStudioComponents } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
 import { useEditorApi } from '../EditorProvider';
 import { StudioNodeProps } from '../../../types';
@@ -62,17 +62,19 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     api.pageEditor.newNodeDragStart(newNode);
   };
 
+  const studioComponents = React.useMemo(() => getStudioComponents(dom), [dom]);
+
   return (
     <ComponentCatalogRoot className={className}>
       <Typography>Drag components on the canvas:</Typography>
-      {Array.from(DEFAULT_COMPONENTS.keys(), (componentType) => {
+      {studioComponents.map((componentType) => {
         return (
           <ComponentCatalogItem
-            key={componentType}
+            key={componentType.id}
             draggable
-            onDragStart={handleDragStart(componentType)}
+            onDragStart={handleDragStart(componentType.id)}
           >
-            {componentType}
+            {componentType.displayName}
           </ComponentCatalogItem>
         );
       })}

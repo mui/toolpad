@@ -158,7 +158,7 @@ export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
 export type ResolvedProps = Record<string, PropExpression | undefined> & { $spread?: string };
 
 export interface RenderContext {
-  addImport(source: string, imported: string, local: string): void;
+  addImport(source: string, imported: string, local: string): string;
   renderProps(resolvedProps: ResolvedProps): string;
   renderJsExpression(expr?: PropExpression): string;
   renderJsxContent(expr?: PropExpression): string;

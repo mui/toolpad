@@ -14,7 +14,7 @@ export interface RenderPageConfig {
 }
 
 const PAGE_COMPONENT = {
-  id: 'Page',
+  id: '__Page',
   displayName: 'Page',
   argTypes: {},
   render(ctx: RenderContext, props: ResolvedProps) {
@@ -46,27 +46,7 @@ class Context implements RenderContext {
 
   private editor: boolean;
 
-  private imports = new Map<string, Import>([
-    [
-      'react',
-      {
-        named: new Map([['default', 'React']]),
-      },
-    ],
-    [
-      '@mui/studio-core',
-      {
-        named: new Map([['useDataQuery', 'useDataQuery']]),
-      },
-    ],
-    [
-      '@mui/studio-core/runtime',
-      {
-        named: new Map(),
-        all: '__studioRuntime',
-      },
-    ],
-  ]);
+  private imports: Map<string, Import>;
 
   private dataLoaders: string[] = [];
 
@@ -78,9 +58,30 @@ class Context implements RenderContext {
     this.dom = dom;
     this.page = page;
     this.editor = editor;
+
+    this.imports = new Map<string, Import>([
+      [
+        'react',
+        {
+          named: new Map([['default', 'React']]),
+        },
+      ],
+    ]);
+
+    if (this.editor) {
+      this.imports.set('@mui/studio-core/runtime', {
+        named: new Map(),
+        all: '__studioRuntime',
+      });
+
+      this.imports.set('../system/components.ts', {
+        named: new Map([['default', '__studioComponents']]),
+      });
+    }
   }
 
   useDataLoader(queryId: string): string {
+    this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
     this.dataLoaders.push(queryId);
     return `_${queryId}`;
   }
@@ -195,12 +196,17 @@ class Context implements RenderContext {
     const nodeChildren = this.renderNodeChildren(node);
     const resolvedProps = this.resolveProps(node, nodeChildren);
     const rendered = component.render(this, resolvedProps);
+    const componentDef = this.getComponentDefinition(node);
+    const componentId = componentDef?.id;
 
     return {
       type: 'jsxElement',
       value: this.editor
         ? `
-        <__studioRuntime.WrappedStudioNode id="${node.id}">
+        <__studioRuntime.WrappedStudioNode 
+          id="${node.id}"
+          ${componentId ? `component={__studioComponents[${JSON.stringify(componentId)}]}` : ''}
+        >
           ${rendered}
         </__studioRuntime.WrappedStudioNode>
       `
@@ -368,6 +374,8 @@ export default function renderPageCode(
       );
     }
   `;
+
+  console.log(code);
 
   if (config.pretty) {
     code = prettier.format(code, {

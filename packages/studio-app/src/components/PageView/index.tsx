@@ -6,6 +6,7 @@ import StudioSandbox from '../StudioSandbox';
 import getImportMap from '../../getImportMap';
 import renderThemeCode from '../../renderThemeCode';
 import renderEntryPoint from '../../renderPageEntryCode';
+import { useStudioComponents } from '../../studioComponents';
 
 export interface PageViewProps {
   className?: string;
@@ -22,15 +23,11 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
   const pagePath = `./pages/${pageNodeId}.tsx`;
 
   const renderedPage = React.useMemo(() => {
-    return renderPageCode(dom, pageNodeId, {
-      editor,
-    });
+    return renderPageCode(dom, pageNodeId, { editor });
   }, [dom, pageNodeId, editor]);
 
   const renderedTheme = React.useMemo(() => {
-    return renderThemeCode(dom, {
-      editor,
-    });
+    return renderThemeCode(dom, { editor });
   }, [dom, editor]);
 
   const renderedEntrypoint = React.useMemo(() => {
@@ -41,7 +38,7 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
     });
   }, [pagePath, themePath, editor]);
 
-  const components = React.useMemo(() => {
+  const codeComponents = React.useMemo(() => {
     const app = studioDom.getApp(dom);
     const studioCodeComponents = studioDom.getCodeComponents(dom, app);
     return Object.fromEntries(
@@ -52,6 +49,26 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
     );
   }, [dom]);
 
+  const studioComponents = useStudioComponents(dom);
+  const componentDefinitions = React.useMemo(() => {
+    if (!editor) {
+      return {};
+    }
+
+    const definitions = Object.fromEntries(
+      studioComponents.map((studioComponent) => [
+        studioComponent.id,
+        { argTypes: studioComponent.argTypes },
+      ]),
+    );
+
+    return {
+      './system/components.ts': {
+        code: `export default ${JSON.stringify(definitions)};`,
+      },
+    };
+  }, [studioComponents, editor]);
+
   return (
     <StudioSandbox
       className={className}
@@ -59,7 +76,8 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
       base={`/app/${dom.root}/`}
       importMap={getImportMap()}
       files={{
-        ...components,
+        ...componentDefinitions,
+        ...codeComponents,
         [themePath]: { code: renderedTheme.code },
         [entryPath]: { code: renderedEntrypoint.code },
         [pagePath]: { code: renderedPage.code },

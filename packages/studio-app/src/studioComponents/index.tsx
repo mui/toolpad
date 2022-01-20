@@ -147,7 +147,3 @@ export function getStudioComponent(
 
   throw new Error(`Invariant: Accessing unknown component "${componentId}"`);
 }
-
-export default function Test() {
-  return <div style={{ background: 'green' }}>Hello, this is a test</div>;
-}

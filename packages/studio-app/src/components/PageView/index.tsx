@@ -9,7 +9,6 @@ import renderEntryPoint from '../../renderPageEntryCode';
 
 export interface PageViewProps {
   className?: string;
-  // Callback for when the view has rendered. Make sure this value is stable
   editor?: boolean;
   onLoad?: (window: Window) => void;
   dom: studioDom.StudioDom;
@@ -40,6 +39,7 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
   const codeComponents = React.useMemo(() => {
     const app = studioDom.getApp(dom);
     const studioCodeComponents = studioDom.getCodeComponents(dom, app);
+    // TODO: only render the components used by the page
     return Object.fromEntries(
       studioCodeComponents.map((component) => [
         `./components/${component.id}.tsx`,

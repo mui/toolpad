@@ -262,7 +262,20 @@ function CreateStudioCodeComponentDialog({
 }: CreateStudioCodeComponentDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const [code, setCode] = React.useState('');
+  const [code, setCode] = React.useState(`import * as React from 'react';
+
+export interface MyComponentProps {
+
+}
+
+export default function MyComponent (props: MyComponentProps) {
+  return (
+    <div>
+      Hello World!
+    </div>
+  );
+}
+  `);
 
   return (
     <Dialog {...props} onClose={onClose}>
@@ -291,7 +304,7 @@ function CreateStudioCodeComponentDialog({
             fullWidth
             multiline
             rows={10}
-            label="title"
+            label="code"
             value={code}
             onChange={(event) => setCode(event.target.value)}
           />

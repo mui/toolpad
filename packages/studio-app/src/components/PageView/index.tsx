@@ -6,11 +6,9 @@ import StudioSandbox from '../StudioSandbox';
 import getImportMap from '../../getImportMap';
 import renderThemeCode from '../../renderThemeCode';
 import renderEntryPoint from '../../renderPageEntryCode';
-import { useStudioComponents } from '../../studioComponents';
 
 export interface PageViewProps {
   className?: string;
-  // Callback for when the view has rendered. Make sure this value is stable
   editor?: boolean;
   onLoad?: (window: Window) => void;
   dom: studioDom.StudioDom;
@@ -41,6 +39,7 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
   const codeComponents = React.useMemo(() => {
     const app = studioDom.getApp(dom);
     const studioCodeComponents = studioDom.getCodeComponents(dom, app);
+    // TODO: only render the components used by the page
     return Object.fromEntries(
       studioCodeComponents.map((component) => [
         `./components/${component.id}.tsx`,
@@ -49,26 +48,6 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
     );
   }, [dom]);
 
-  const studioComponents = useStudioComponents(dom);
-  const componentDefinitions = React.useMemo(() => {
-    if (!editor) {
-      return {};
-    }
-
-    const definitions = Object.fromEntries(
-      studioComponents.map((studioComponent) => [
-        studioComponent.id,
-        { argTypes: studioComponent.argTypes },
-      ]),
-    );
-
-    return {
-      './system/components.ts': {
-        code: `export default ${JSON.stringify(definitions)};`,
-      },
-    };
-  }, [studioComponents, editor]);
-
   return (
     <StudioSandbox
       className={className}
@@ -76,7 +55,6 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
       base={`/app/${dom.root}/`}
       importMap={getImportMap()}
       files={{
-        ...componentDefinitions,
         ...codeComponents,
         [themePath]: { code: renderedTheme.code },
         [entryPath]: { code: renderedEntrypoint.code },

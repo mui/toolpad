@@ -20,27 +20,6 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
-const PAGE_COMPONENT = {
-  id: '__Page',
-  displayName: 'Page',
-  argTypes: {},
-  render(ctx: RenderContext, props: ResolvedProps) {
-    const Container = ctx.addImport('@mui/material', 'Container', 'Container');
-    const Stack = ctx.addImport('@mui/material', 'Stack', 'Stack');
-    const Slots = ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
-
-    const { children, ...other } = props;
-
-    return `
-      <${Container} ${ctx.renderProps(other)}>
-        <${Stack} direction="column" gap={2} my={2}>
-          <${Slots} prop="children">${ctx.renderJsxContent(children)}</${Slots}>
-        </${Stack}>
-      </${Container}>
-    `;
-  },
-};
-
 interface Import {
   named: Map<string, string>;
   all?: string;
@@ -95,7 +74,7 @@ class Context implements RenderContext {
 
   getComponentDefinition(node: studioDom.StudioNode): StudioComponentDefinition | null {
     if (studioDom.isPage(node)) {
-      return PAGE_COMPONENT;
+      return getStudioComponent(this.dom, 'Page');
     }
     if (studioDom.isElement(node)) {
       return getStudioComponent(this.dom, node.component);
@@ -188,6 +167,40 @@ class Context implements RenderContext {
         }
       }
     }
+
+    const component = this.getComponentDefinition(node);
+
+    if (this.editor && component) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [prop, argType] of Object.entries(component.argTypes)) {
+        if (argType?.typeDef.type === 'element') {
+          if (argType.control?.type === 'slots') {
+            const existingProp = result[prop];
+
+            result[prop] = {
+              type: 'jsxElement',
+              value: `
+                <__studioRuntime.Slots prop=${JSON.stringify(prop)}>
+                  ${existingProp ? this.renderJsxContent(existingProp) : ''}
+                </__studioRuntime.Slots>
+              `,
+            };
+          } else if (argType.control?.type === 'slot') {
+            const existingProp = result[prop];
+
+            result[prop] = {
+              type: 'jsxElement',
+              value: `
+                <__studioRuntime.Slot prop=${JSON.stringify(prop)}>
+                  ${existingProp ? this.renderJsxContent(existingProp) : ''}
+                </__studioRuntime.Slot>
+              `,
+            };
+          }
+        }
+      }
+    }
+
     return result;
   }
 
@@ -203,20 +216,16 @@ class Context implements RenderContext {
     const nodeChildren = this.renderNodeChildren(node);
     const resolvedProps = this.resolveProps(node, nodeChildren);
     const rendered = component.render(this, resolvedProps);
-    const componentDef = this.getComponentDefinition(node);
-    const componentId = componentDef?.id;
 
+    // TODO: We may not need the `component` prop anymore. Remove?
     return {
       type: 'jsxElement',
       value: this.editor
         ? `
-        <__studioRuntime.WrappedStudioNode 
-          id="${node.id}"
-          ${componentId ? `component={__studioComponents[${JSON.stringify(componentId)}]}` : ''}
-        >
-          ${rendered}
-        </__studioRuntime.WrappedStudioNode>
-      `
+          <__studioRuntime.WrappedStudioNode id="${node.id}">
+            ${rendered}
+          </__studioRuntime.WrappedStudioNode>
+        `
         : rendered,
     };
   }
@@ -372,6 +381,8 @@ export default function renderPageCode(
 
   let code: string = `
     ${ctx.renderImports()}
+
+    console.log(__studioComponents)
 
     export default function App () {
       ${ctx.renderStateHooks()}

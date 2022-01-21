@@ -29,6 +29,12 @@ export type DomAction =
       value: StudioNodeProp<unknown>;
     }
   | {
+      type: 'DOM_SET_NODE_ATTR';
+      nodeId: NodeId;
+      attr: string;
+      value: unknown;
+    }
+  | {
       type: 'DOM_ADD_BINDING';
       srcNodeId: NodeId;
       srcProp: string;
@@ -92,6 +98,12 @@ export function domReducer(state: DomState, action: DomAction): DomState {
       const node = studioDom.getNode(state.dom, action.nodeId);
       return update(state, {
         dom: studioDom.setNodeProp<any, any>(state.dom, node, action.prop, action.value),
+      });
+    }
+    case 'DOM_SET_NODE_ATTR': {
+      const node = studioDom.getNode(state.dom, action.nodeId);
+      return update(state, {
+        dom: studioDom.setNodeAttribute<any, any>(state.dom, node, action.attr, action.value),
       });
     }
     case 'DOM_ADD_NODE': {
@@ -230,6 +242,18 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         nodeId: node.id,
         prop,
         value: { type: 'const', value },
+      });
+    },
+    setNodeAttribute<N extends studioDom.StudioNode, K extends studioDom.Attributes<N>>(
+      node: studioDom.StudioNode,
+      attr: K,
+      value: N[K],
+    ) {
+      dispatch({
+        type: 'DOM_SET_NODE_ATTR',
+        nodeId: node.id,
+        attr,
+        value,
       });
     },
     addBinding(

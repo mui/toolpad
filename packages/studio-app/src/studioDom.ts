@@ -299,7 +299,7 @@ export function createElementInternal<P>(
 type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
   StudioNodeOfType<T>,
   'id' | 'type' | 'parentId' | 'parentProp' | 'parentIndex' | 'name' | 'props'
-> & { name?: string; props?: {} };
+> & { name?: string; props?: StudioNodeOfType<T>['props'] };
 
 function createNodeInternal<T extends StudioNodeType>(
   id: NodeId,
@@ -588,6 +588,23 @@ export function setNodePropConstValues<P>(
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: setPropConstValues(node, values),
+    }),
+  });
+}
+
+export type Attributes<N extends StudioNode> = Exclude<keyof N & string, keyof StudioNodeBase>;
+
+export function setNodeAttribute<N extends StudioNode, K extends Attributes<N>>(
+  dom: StudioDom,
+  node: N,
+  attribute: K,
+  value: N[K],
+): StudioDom {
+  const updates: Partial<N> = {};
+  updates[attribute] = value;
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: update(node, updates),
     }),
   });
 }

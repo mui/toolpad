@@ -71,7 +71,6 @@ function FileEditor({ className }: FileEditorProps) {
 }
 
 function EditorContent() {
-  const domState = useDomState();
   const dom = useDom();
 
   const handleSave = React.useCallback(async () => {
@@ -94,19 +93,8 @@ function EditorContent() {
         }
       />
       <div className={classes.content}>
-        {
-          // eslint-disable-next-line no-nested-ternary
-          domState.loading ? (
-            <CircularProgress />
-          ) : domState.error ? (
-            domState.error
-          ) : (
-            <React.Fragment>
-              <PagePanel className={classes.pagePanel} />
-              <FileEditor className={classes.renderPanel} />
-            </React.Fragment>
-          )
-        }
+        <PagePanel className={classes.pagePanel} />
+        <FileEditor className={classes.renderPanel} />
       </div>
     </EditorRoot>
   );

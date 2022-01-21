@@ -187,9 +187,9 @@ class Context implements RenderContext {
             result[prop] = {
               type: 'jsxElement',
               value: `
-                <__studioRuntime.Slot prop=${JSON.stringify(prop)}>
+                <__studioRuntime.Placeholder prop=${JSON.stringify(prop)}>
                   ${existingProp ? this.renderJsxContent(existingProp) : ''}
-                </__studioRuntime.Slot>
+                </__studioRuntime.Placeholder>
               `,
             };
           }

@@ -217,15 +217,15 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          const newPageNode = studioDom.createNode(dom, 'page', {
+          const newNode = studioDom.createNode(dom, 'page', {
             title,
             state: {},
             props: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode(newPageNode, appNode.id, 'children');
+          domApi.addNode(newNode, appNode.id, 'children');
           onClose?.(e, 'backdropClick');
-          navigate(`/pages/${newPageNode.id}`);
+          navigate(`/pages/${newNode.id}`);
         }}
         style={{
           overflowY: 'auto',
@@ -262,33 +262,35 @@ function CreateStudioCodeComponentDialog({
 }: CreateStudioCodeComponentDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const [code, setCode] = React.useState(`import * as React from 'react';
-
-export interface MyComponentProps {
-
-}
-
-export default function MyComponent (props: MyComponentProps) {
-  return (
-    <div>
-      Hello World!
-    </div>
-  );
-}
-  `);
+  const [name, setName] = React.useState(`MyComponent`);
+  const navigate = useNavigate();
 
   return (
     <Dialog {...props} onClose={onClose}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          const newPageNode = studioDom.createNode(dom, 'codeComponent', {
-            code,
+          const newNode = studioDom.createNode(dom, 'codeComponent', {
+            name,
+            code: `import * as React from 'react';
+
+            export interface MyComponentProps {
+            
+            }
+            
+            export default function MyComponent (props: MyComponentProps) {
+              return (
+                <div>
+                  Hello World!
+                </div>
+              );
+            }\n`,
             argTypes: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode(newPageNode, appNode.id, 'children');
+          domApi.addNode(newNode, appNode.id, 'children');
           onClose?.(e, 'backdropClick');
+          navigate(`/codeComponents/${newNode.id}`);
         }}
         style={{
           overflowY: 'auto',
@@ -302,15 +304,13 @@ export default function MyComponent (props: MyComponentProps) {
             sx={{ my: 1 }}
             autoFocus
             fullWidth
-            multiline
-            rows={10}
-            label="code"
-            value={code}
-            onChange={(event) => setCode(event.target.value)}
+            label="name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
           />
         </DialogContent>
         <DialogActions>
-          <Button type="submit" disabled={!code}>
+          <Button type="submit" disabled={!name}>
             Create
           </Button>
         </DialogActions>

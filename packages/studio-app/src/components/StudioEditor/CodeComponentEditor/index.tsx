@@ -50,6 +50,7 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
         noSyntaxValidation: false,
       });
 
+      // TODO: figure this out better, add @mui/material support
       monaco.languages.typescript.typescriptDefaults.addExtraLib(
         defs,
         `file:///node_modules/@types/react/index.d.ts`,

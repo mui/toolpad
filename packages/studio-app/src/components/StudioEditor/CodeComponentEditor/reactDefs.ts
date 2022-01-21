@@ -357,7 +357,7 @@ declare namespace React {
          * **NOTE**: Exotic components are not callable.
          */
         (props: P): (ReactElement|null);
-        readonly \$\$typeof: symbol;
+        readonly $$typeof: symbol;
     }
 
     interface NamedExoticComponent<P = {}> extends ExoticComponent<P> {

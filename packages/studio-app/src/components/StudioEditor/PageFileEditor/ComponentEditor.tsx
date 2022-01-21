@@ -3,6 +3,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  Stack,
   styled,
   TextField,
   Typography,
@@ -10,6 +11,7 @@ import {
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import CodeIcon from '@mui/icons-material/Code';
+import PageIcon from '@mui/icons-material/Web';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
@@ -127,9 +129,19 @@ function DefaultPanel() {
   const dialogSourceContent = useLatest(viewedSource);
   return (
     <div>
-      <Button startIcon={<CodeIcon />} color="inherit" onClick={handleViewSource}>
-        View Page Source
-      </Button>
+      <Stack spacing={1} alignItems="start">
+        <Button
+          startIcon={<PageIcon />}
+          color="inherit"
+          component="a"
+          href={`/pages/${state.nodeId}`}
+        >
+          View Page
+        </Button>
+        <Button startIcon={<CodeIcon />} color="inherit" onClick={handleViewSource}>
+          View Page Source
+        </Button>
+      </Stack>
       <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>
         <DialogTitle>Page component</DialogTitle>
         <DialogContent>

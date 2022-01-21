@@ -1,19 +1,11 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
 import SaveIcon from '@mui/icons-material/Save';
-import CodeIcon from '@mui/icons-material/Code';
-import { CircularProgress, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { CircularProgress, IconButton } from '@mui/material';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import StudioAppBar from '../StudioAppBar';
-import EditorProvider, {
-  ApiEditorState,
-  createEditorState,
-  PageEditorState,
-  useEditorState,
-} from './EditorProvider';
 import PageFileEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
-import renderPageCode from '../../renderPageCode';
-import useLatest from '../../utils/useLatest';
 import client from '../../api';
 import DomProvider, { useDom, useDomState } from '../DomProvider';
 import ApiFileEditor from './ApiFileEditor';
@@ -60,29 +52,27 @@ function ToDoFileEditor({ className }: ToDoEditorProps) {
 
 interface FileEditorProps {
   className?: string;
-  editor: PageEditorState | ApiEditorState | null;
 }
 
-function FileEditor({ editor, className }: FileEditorProps) {
-  if (!editor) {
-    return <ToDoFileEditor className={className} />;
-  }
-  switch (editor.type) {
-    case 'page':
-      return <PageFileEditor key={editor.nodeId} className={className} />;
-    case 'api':
-      return <ApiFileEditor key={editor.nodeId} className={className} />;
-    default:
-      throw new Error(`Invariant: unrecognized file editor "${(editor as any).type}"`);
-  }
+function FileEditor({ className }: FileEditorProps) {
+  const domState = useDomState();
+  return domState.loaded ? (
+    <Routes>
+      <Route path="pages/:pageNodeId" element={<PageFileEditor className={className} />} />
+      <Route path="apis/:apiNodeId" element={<ApiFileEditor className={className} />} />
+      <Route
+        path="codeComponents/:componentNodeId"
+        element={<ToDoFileEditor className={className} />}
+      />
+    </Routes>
+  ) : (
+    <CircularProgress />
+  );
 }
 
 function EditorContent() {
-  const state = useEditorState();
   const domState = useDomState();
   const dom = useDom();
-
-  const [viewedSource, setViewedSource] = React.useState<string | null>(null);
 
   const handleSave = React.useCallback(async () => {
     try {
@@ -92,30 +82,11 @@ function EditorContent() {
     }
   }, [dom]);
 
-  const handleViewSource = React.useCallback(() => {
-    if (state.editor?.type !== 'page') {
-      setViewedSource(`
-      // not yet supported
-      `);
-      return;
-    }
-    const { code } = renderPageCode(dom, state.editor.nodeId, { pretty: true });
-    setViewedSource(code);
-  }, [state, dom]);
-
-  const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
-
-  // To keep it around during closing animation
-  const dialogSourceContent = useLatest(viewedSource);
-
   return (
-    <React.Fragment>
+    <EditorRoot>
       <StudioAppBar
         actions={
           <React.Fragment>
-            <IconButton color="inherit" onClick={handleViewSource}>
-              <CodeIcon />
-            </IconButton>
             <IconButton color="inherit" onClick={handleSave}>
               <SaveIcon />
             </IconButton>
@@ -132,29 +103,22 @@ function EditorContent() {
           ) : (
             <React.Fragment>
               <PagePanel className={classes.pagePanel} />
-              <FileEditor editor={state.editor} className={classes.renderPanel} />
+              <FileEditor className={classes.renderPanel} />
             </React.Fragment>
           )
         }
       </div>
-      <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>
-        <DialogTitle>View Source</DialogTitle>
-        <DialogContent>
-          <pre>{dialogSourceContent}</pre>
-        </DialogContent>
-      </Dialog>
-    </React.Fragment>
+    </EditorRoot>
   );
 }
 export default function Editor() {
-  const initialState = React.useMemo(() => createEditorState(), []);
   return (
     <DomProvider>
-      <EditorRoot>
-        <EditorProvider initialState={initialState}>
-          <EditorContent />
-        </EditorProvider>
-      </EditorRoot>
+      <BrowserRouter basename="_studio/editor">
+        <Routes>
+          <Route path="/*" element={<EditorContent />} />
+        </Routes>
+      </BrowserRouter>
     </DomProvider>
   );
 }

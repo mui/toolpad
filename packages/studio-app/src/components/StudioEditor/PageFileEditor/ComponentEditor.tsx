@@ -1,12 +1,23 @@
-import { styled, TextField, Typography } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  styled,
+  TextField,
+  Typography,
+} from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
+import CodeIcon from '@mui/icons-material/Code';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
 import ComponentPropEditor from './ComponentPropEditor';
 import { useDom, useDomApi } from '../../DomProvider';
-import { usePageEditorState } from './PageFileEditorProvider';
+import { usePageEditorState } from './PageEditorProvider';
+import useLatest from '../../../utils/useLatest';
+import renderPageCode from '../../../renderPageCode';
 
 const classes = {
   control: 'StudioControl',
@@ -100,6 +111,35 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   );
 }
 
+function DefaultPanel() {
+  const dom = useDom();
+  const state = usePageEditorState();
+  const [viewedSource, setViewedSource] = React.useState<string | null>(null);
+
+  const handleViewSource = React.useCallback(() => {
+    const { code } = renderPageCode(dom, state.nodeId, { pretty: true });
+    setViewedSource(code);
+  }, [dom, state.nodeId]);
+
+  const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
+
+  // To keep it around during closing animation
+  const dialogSourceContent = useLatest(viewedSource);
+  return (
+    <div>
+      <Button startIcon={<CodeIcon />} color="inherit" onClick={handleViewSource}>
+        View Page Source
+      </Button>
+      <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>
+        <DialogTitle>Page component</DialogTitle>
+        <DialogContent>
+          <pre>{dialogSourceContent}</pre>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
 export interface ComponentEditorProps {
   className?: string;
 }
@@ -117,7 +157,9 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
       {selectedNode && studioDom.isElement(selectedNode) ? (
         // Add key to make sure it mounts every time selected node changes
         <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
-      ) : null}
+      ) : (
+        <DefaultPanel />
+      )}
     </div>
   );
 }

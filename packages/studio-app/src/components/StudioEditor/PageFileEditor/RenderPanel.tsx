@@ -20,11 +20,10 @@ import {
   rectContainsPoint,
 } from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
-import { useEditorApi } from '../EditorProvider';
 import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomProvider';
-import { usePageEditorState } from './PageFileEditorProvider';
+import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { useStudioComponent } from '../../../studioComponents';
 
@@ -468,7 +467,7 @@ export interface RenderPanelProps {
 export default function RenderPanel({ className }: RenderPanelProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const api = useEditorApi();
+  const api = usePageEditorApi();
   const {
     selection,
     newNode,
@@ -565,15 +564,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       event.preventDefault();
       if (activeSlot) {
-        api.pageEditor.nodeDragOver(activeSlot);
+        api.nodeDragOver(activeSlot);
       } else {
-        api.pageEditor.nodeDragOver(null);
+        api.nodeDragOver(null);
       }
     },
     [availableNodes, viewState, api, slots, getViewCoordinates],
   );
 
-  const handleDragLeave = React.useCallback(() => api.pageEditor.nodeDragOver(null), [api]);
+  const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
 
   const handleDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
@@ -609,7 +608,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
       }
 
-      api.pageEditor.nodeDragEnd();
+      api.nodeDragEnd();
     },
     [availableNodes, viewState, domApi, api, slots, newNode, selection, getViewCoordinates],
   );
@@ -617,7 +616,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleDragEnd = React.useCallback(
     (event: DragEvent | React.DragEvent) => {
       event.preventDefault();
-      api.pageEditor.nodeDragEnd();
+      api.nodeDragEnd();
     },
     [api],
   );
@@ -683,11 +682,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         throw new Error(`Invariant: Unable to locate Studio App root element`);
       }
 
-      api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
+      api.pageViewStateUpdate(getViewState(rootElm));
 
       const observer = new MutationObserver(() => {
         // TODO: Do we need to throttle this?
-        api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
+        api.pageViewStateUpdate(getViewState(rootElm));
       });
 
       observer.observe(rootElm, {

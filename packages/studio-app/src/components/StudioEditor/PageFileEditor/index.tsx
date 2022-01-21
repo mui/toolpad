@@ -32,9 +32,9 @@ interface PageFileEditorProps {
 }
 
 export default function PageFileEditor({ className }: PageFileEditorProps) {
-  const { pageNodeId } = useParams();
+  const { nodeId } = useParams();
   return (
-    <PageEditorProvider key={pageNodeId} nodeId={pageNodeId as NodeId}>
+    <PageEditorProvider key={nodeId} nodeId={nodeId as NodeId}>
       <PageFileEditorRoot className={className}>
         <RenderPanel className={classes.renderPanel} />
         <ComponentPanel className={classes.componentPanel} />

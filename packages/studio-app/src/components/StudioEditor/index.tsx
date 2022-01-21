@@ -4,11 +4,12 @@ import SaveIcon from '@mui/icons-material/Save';
 import { CircularProgress, IconButton } from '@mui/material';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import StudioAppBar from '../StudioAppBar';
-import PageFileEditor from './PageFileEditor';
+import PageEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
 import client from '../../api';
 import DomProvider, { useDom, useDomState } from '../DomProvider';
-import ApiFileEditor from './ApiFileEditor';
+import ApiEditor from './ApiFileEditor';
+import CodeComponentEditor from './CodeComponentEditor';
 
 const classes = {
   content: 'StudioContent',
@@ -42,14 +43,6 @@ const EditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-interface ToDoEditorProps {
-  className?: string;
-}
-
-function ToDoFileEditor({ className }: ToDoEditorProps) {
-  return <div className={className}>To Do</div>;
-}
-
 interface FileEditorProps {
   className?: string;
 }
@@ -58,11 +51,11 @@ function FileEditor({ className }: FileEditorProps) {
   const domState = useDomState();
   return domState.loaded ? (
     <Routes>
-      <Route path="pages/:pageNodeId" element={<PageFileEditor className={className} />} />
-      <Route path="apis/:apiNodeId" element={<ApiFileEditor className={className} />} />
+      <Route path="pages/:nodeId" element={<PageEditor className={className} />} />
+      <Route path="apis/:nodeId" element={<ApiEditor className={className} />} />
       <Route
-        path="codeComponents/:componentNodeId"
-        element={<ToDoFileEditor className={className} />}
+        path="codeComponents/:nodeId"
+        element={<CodeComponentEditor className={className} />}
       />
     </Routes>
   ) : (

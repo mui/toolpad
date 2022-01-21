@@ -272,19 +272,22 @@ function CreateStudioCodeComponentDialog({
           e.preventDefault();
           const newNode = studioDom.createNode(dom, 'codeComponent', {
             name,
-            code: `import * as React from 'react';
-
-            export interface MyComponentProps {
-            
-            }
-            
-            export default function MyComponent (props: MyComponentProps) {
-              return (
-                <div>
-                  Hello World!
-                </div>
-              );
-            }\n`,
+            code: [
+              "import * as React from 'react';",
+              '',
+              'export interface MyComponentProps {',
+              '',
+              '}',
+              '',
+              'export default function MyComponent (props: MyComponentProps) {',
+              '  return (',
+              '    <div>',
+              '      Hello World!',
+              '    </div>',
+              '  );',
+              '}',
+              '',
+            ].join('\n'),
             argTypes: {},
           });
           const appNode = studioDom.getApp(dom);

@@ -3,12 +3,12 @@ import { useQuery } from 'react-query';
 import { Box, Stack, TextField, Toolbar } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { LoadingButton } from '@mui/lab';
+import { useParams } from 'react-router-dom';
 import { DefaultNodeProps, NodeId, StudioConnection, StudioDataSourceClient } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomProvider';
-import { useEditorState } from '../EditorProvider';
 
 function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {
   const dataSource = dataSources[connection.type] as StudioDataSourceClient<any, Q>;
@@ -91,13 +91,10 @@ interface ApiFileEditorProps {
 }
 
 export default function ApiFileEditor({ className }: ApiFileEditorProps) {
-  const state = useEditorState();
-  if (state.editor?.type !== 'api') {
-    return null;
-  }
+  const { apiNodeId } = useParams();
   return (
     <Box className={className}>
-      <ApiEditorContent apiNodeId={state.editor.nodeId} />
+      <ApiEditorContent key={apiNodeId} apiNodeId={apiNodeId as NodeId} />
     </Box>
   );
 }

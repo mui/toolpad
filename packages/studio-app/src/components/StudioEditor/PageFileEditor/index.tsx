@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { styled } from '@mui/system';
+import { useParams } from 'react-router-dom';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import BindingEditor from './BindingEditor';
-import { PageEditorProvider } from './PageFileEditorProvider';
-import { useEditorState } from '../EditorProvider';
+import { PageEditorProvider } from './PageEditorProvider';
+import { NodeId } from '../../../types';
 
 const classes = {
   content: 'StudioContent',
@@ -31,14 +32,14 @@ interface PageFileEditorProps {
 }
 
 export default function PageFileEditor({ className }: PageFileEditorProps) {
-  const { editor } = useEditorState();
-  return editor?.type === 'page' ? (
-    <PageEditorProvider state={editor}>
+  const { pageNodeId } = useParams();
+  return (
+    <PageEditorProvider key={pageNodeId} nodeId={pageNodeId as NodeId}>
       <PageFileEditorRoot className={className}>
         <RenderPanel className={classes.renderPanel} />
         <ComponentPanel className={classes.componentPanel} />
         <BindingEditor />
       </PageFileEditorRoot>
     </PageEditorProvider>
-  ) : null;
+  );
 }

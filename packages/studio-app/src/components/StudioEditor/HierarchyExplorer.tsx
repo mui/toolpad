@@ -20,9 +20,9 @@ import clsx from 'clsx';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
-import { useEditorApi, useEditorState } from './EditorProvider';
 import { useDom, useDomApi } from '../DomProvider';
 import client from '../../api';
 
@@ -145,7 +145,7 @@ function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps
   const [connectionId, setConnectionID] = React.useState('');
   const dom = useDom();
   const domApi = useDomApi();
-  const editorApi = useEditorApi();
+  const navigate = useNavigate();
 
   const connectionsQuery = useQuery('connections', client.query.getConnections);
 
@@ -165,7 +165,7 @@ function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newApiNode, appNode.id, 'children');
           onClose?.(e, 'backdropClick');
-          editorApi.openApiEditor(newApiNode.id);
+          navigate(`/apis/${newApiNode.id}`);
         }}
         style={{
           overflowY: 'auto',
@@ -209,8 +209,8 @@ interface CreateStudioPageDialogProps extends Pick<DialogProps, 'open' | 'onClos
 function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const editorApi = useEditorApi();
   const [title, setTitle] = React.useState('');
+  const navigate = useNavigate();
 
   return (
     <Dialog {...props} onClose={onClose}>
@@ -225,7 +225,7 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newPageNode, appNode.id, 'children');
           onClose?.(e, 'backdropClick');
-          editorApi.openPageEditor(newPageNode.id, null);
+          navigate(`/pages/${newPageNode.id}`);
         }}
         style={{
           overflowY: 'auto',
@@ -324,9 +324,7 @@ export interface HierarchyExplorerProps {
 }
 
 export default function HierarchyExplorer({ className }: HierarchyExplorerProps) {
-  const state = useEditorState();
   const dom = useDom();
-  const api = useEditorApi();
 
   const app = studioDom.getApp(dom);
   const apis = studioDom.getApis(dom, app);
@@ -339,43 +337,36 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
     ...pages.map((pageNode) => pageNode.id),
   ]);
 
-  const selected =
-    state.editor?.type === 'page' && state.editor.selection ? [state.editor.selection] : [];
+  const selected: NodeId[] = [];
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);
   };
 
+  const navigate = useNavigate();
+
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
     const selectedNodeId: NodeId | undefined = nodeIds[0] as NodeId | undefined;
     if (selectedNodeId) {
-      api.select(selectedNodeId);
-
       const node = studioDom.getNode(dom, selectedNodeId);
       if (studioDom.isElement(node)) {
+        // TODO: sort out in-page selection
         const page = studioDom.getElementPage(dom, node);
         if (page) {
-          if (state.editor?.type === 'page' && page.id === state.editor.nodeId) {
-            api.pageEditor.select(selectedNodeId);
-          } else {
-            api.openPageEditor(page.id, node.id);
-          }
+          navigate(`/pages/${page.id}`);
         }
       }
 
       if (studioDom.isPage(node)) {
-        if (state.editor?.type === 'page' && node.id === state.editor.nodeId) {
-          api.pageEditor.select(node.id);
-          return;
-        }
-        api.openPageEditor(node.id, null);
+        navigate(`/pages/${node.id}`);
       }
 
       if (studioDom.isApi(node)) {
-        if (state.editor?.type === 'api' && node.id === state.editor.nodeId) {
-          return;
-        }
-        api.openApiEditor(node.id);
+        navigate(`/apis/${node.id}`);
+      }
+
+      if (studioDom.isCodeComponent(node)) {
+        navigate(`/codeComponents/${node.id}`);
       }
     }
   };

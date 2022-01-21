@@ -17,8 +17,7 @@ import { NodeId, StudioBoundProp, StudioNodeProp, StudioNodeProps } from '../../
 import { ExactEntriesOf } from '../../../utils/types';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomProvider';
-import { useEditorApi } from '../EditorProvider';
-import { usePageEditorState } from './PageFileEditorProvider';
+import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 
 export interface BindingEditorContentProps<K> {
   nodeId: NodeId;
@@ -201,8 +200,8 @@ export function BindingEditorContent<P, K extends keyof P & string>({
 
 export default function BindingEditor() {
   const state = usePageEditorState();
-  const api = useEditorApi();
-  const handleClose = React.useCallback(() => api.pageEditor.closeBindingEditor(), [api]);
+  const api = usePageEditorApi();
+  const handleClose = React.useCallback(() => api.closeBindingEditor(), [api]);
   const bindingEditorProps = useLatest(state.bindingEditor);
   return (
     <Dialog onClose={handleClose} open={!!state.bindingEditor} fullWidth>

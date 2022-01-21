@@ -59,10 +59,6 @@ class Context implements RenderContext {
         named: new Map(),
         all: '__studioRuntime',
       });
-
-      this.imports.set('../system/components.ts', {
-        named: new Map([['default', '__studioComponents']]),
-      });
     }
   }
 
@@ -191,9 +187,9 @@ class Context implements RenderContext {
             result[prop] = {
               type: 'jsxElement',
               value: `
-                <__studioRuntime.Slot prop=${JSON.stringify(prop)}>
+                <__studioRuntime.Placeholder prop=${JSON.stringify(prop)}>
                   ${existingProp ? this.renderJsxContent(existingProp) : ''}
-                </__studioRuntime.Slot>
+                </__studioRuntime.Placeholder>
               `,
             };
           }
@@ -382,8 +378,6 @@ export default function renderPageCode(
   let code: string = `
     ${ctx.renderImports()}
 
-    console.log(__studioComponents)
-
     export default function App () {
       ${ctx.renderStateHooks()}
       ${ctx.renderDataLoaderHooks()}
@@ -392,8 +386,6 @@ export default function renderPageCode(
       );
     }
   `;
-
-  console.log(code);
 
   if (config.pretty) {
     code = prettier.format(code, {

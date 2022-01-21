@@ -3,10 +3,10 @@ import { styled, Typography } from '@mui/material';
 import { ComponentDefinition, ArgTypeDefinitions } from '@mui/studio-core';
 import { getStudioComponent, useStudioComponents } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
-import { useEditorApi } from '../EditorProvider';
 import { StudioNodeProps } from '../../../types';
 import { ExactEntriesOf } from '../../../utils/types';
 import { useDom } from '../../DomProvider';
+import { usePageEditorApi } from './PageEditorProvider';
 
 const ComponentCatalogRoot = styled('div')({
   display: 'flex',
@@ -51,7 +51,7 @@ export interface ComponentCatalogProps {
 }
 
 export default function ComponentCatalog({ className }: ComponentCatalogProps) {
-  const api = useEditorApi();
+  const api = usePageEditorApi();
   const dom = useDom();
 
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
@@ -59,7 +59,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     const componentDef = getStudioComponent(dom, componentType);
     const newNode = studioDom.createElement(dom, componentType, getDefaultPropValues(componentDef));
     api.deselect();
-    api.pageEditor.newNodeDragStart(newNode);
+    api.newNodeDragStart(newNode);
   };
 
   const studioComponents = useStudioComponents(dom);

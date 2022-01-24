@@ -51,6 +51,25 @@ export function omit<K extends string, T extends Record<K, unknown>>(
   return result || obj;
 }
 
+export function take<K extends string, T extends Record<K, unknown>>(
+  obj: T,
+  ...keys: readonly K[]
+): Omit<T, Exclude<keyof T, K>> {
+  const keySet = new Set<string>(keys);
+  let result: T | undefined;
+
+  Object.keys(obj).forEach((key) => {
+    if (!keySet.has(key)) {
+      if (!result) {
+        result = { ...obj };
+      }
+      delete result[key as keyof T];
+    }
+  });
+
+  return result || obj;
+}
+
 export function without<T>(array: readonly T[], value: T): readonly T[] {
   const result: T[] = [];
 

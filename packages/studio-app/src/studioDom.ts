@@ -1,3 +1,4 @@
+import { ArgTypeDefinitions } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
 import { NodeId, StudioNodeProps, StudioStateDefinition } from './types';
 import { omit, update } from './utils/immutability';
@@ -9,6 +10,7 @@ const ALLOWED_PARENTS = {
   theme: ['app'],
   api: ['app'],
   page: ['app'],
+  codeComponent: ['app'],
   element: ['page', 'element'],
 } as const;
 
@@ -24,7 +26,7 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-type StudioNodeType = 'app' | 'theme' | 'api' | 'page' | 'element';
+type StudioNodeType = 'app' | 'theme' | 'api' | 'page' | 'element' | 'codeComponent';
 
 export interface StudioNodeBase<P = {}> {
   readonly id: NodeId;
@@ -66,12 +68,19 @@ export interface StudioElementNode<P = {}> extends StudioNodeBase<P> {
   readonly component: string;
 }
 
+export interface StudioCodeComponentNode<P = {}> extends StudioNodeBase<P> {
+  readonly type: 'codeComponent';
+  readonly code: string;
+  readonly argTypes: ArgTypeDefinitions;
+}
+
 type StudioNodeOfType<K extends StudioNodeBase['type']> = {
   app: StudioAppNode;
   api: StudioApiNode;
   theme: StudioThemeNode;
   page: StudioPageNode;
   element: StudioElementNode;
+  codeComponent: StudioCodeComponentNode;
 }[K];
 
 export type StudioNode =
@@ -79,7 +88,8 @@ export type StudioNode =
   | StudioApiNode
   | StudioThemeNode
   | StudioPageNode
-  | StudioElementNode;
+  | StudioElementNode
+  | StudioCodeComponentNode;
 
 type AllowedParents = typeof ALLOWED_PARENTS;
 type ParentTypeOfType<T extends StudioNodeType> = AllowedParents[T][number];
@@ -134,6 +144,16 @@ export function isApi<P>(node: StudioNode): node is StudioApiNode<P> {
 
 export function assertIsApi<P>(node: StudioNode): asserts node is StudioApiNode<P> {
   assertIsType<StudioApiNode>(node, 'api');
+}
+
+export function isCodeComponent<P>(node: StudioNode): node is StudioCodeComponentNode<P> {
+  return isType<StudioCodeComponentNode>(node, 'codeComponent');
+}
+
+export function assertIsCodeComponent<P>(
+  node: StudioNode,
+): asserts node is StudioCodeComponentNode<P> {
+  assertIsType<StudioCodeComponentNode>(node, 'codeComponent');
 }
 
 export function isTheme(node: StudioNode): node is StudioThemeNode {
@@ -224,6 +244,11 @@ export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
   return (getChildNodes(dom, app).children?.filter((node) => isApi(node)) ?? []) as StudioApiNode[];
 }
 
+export function getCodeComponents(dom: StudioDom, app: StudioAppNode): StudioCodeComponentNode[] {
+  return (getChildNodes(dom, app).children?.filter((node) => isCodeComponent(node)) ??
+    []) as StudioCodeComponentNode[];
+}
+
 // TODO: make theme optional by returning undefined
 export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode | undefined {
   return getChildNodes(dom, app).children?.find((node) => isTheme(node)) as
@@ -274,7 +299,7 @@ export function createElementInternal<P>(
 type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
   StudioNodeOfType<T>,
   'id' | 'type' | 'parentId' | 'parentProp' | 'parentIndex' | 'name' | 'props'
-> & { name?: string; props?: {} };
+> & { name?: string; props?: StudioNodeOfType<T>['props'] };
 
 function createNodeInternal<T extends StudioNodeType>(
   id: NodeId,
@@ -563,6 +588,23 @@ export function setNodePropConstValues<P>(
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: setPropConstValues(node, values),
+    }),
+  });
+}
+
+export type Attributes<N extends StudioNode> = Exclude<keyof N & string, keyof StudioNodeBase>;
+
+export function setNodeAttribute<N extends StudioNode, K extends Attributes<N>>(
+  dom: StudioDom,
+  node: N,
+  attribute: K,
+  value: N[K],
+): StudioDom {
+  const updates: Partial<N> = {};
+  updates[attribute] = value;
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: update(node, updates),
     }),
   });
 }

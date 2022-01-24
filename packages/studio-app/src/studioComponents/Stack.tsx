@@ -1,7 +1,10 @@
-import { Stack } from '@mui/material';
-import { createComponent } from '@mui/studio-core';
+import { StudioComponentDefinition } from '../types';
+import importedComponentRenderer from './importedComponentRenderer';
 
-export default createComponent(Stack, {
+export default {
+  id: 'Stack',
+  displayName: 'Stack',
+  render: importedComponentRenderer('@mui/material', 'Stack'),
   argTypes: {
     gap: {
       typeDef: { type: 'number' },
@@ -30,4 +33,4 @@ export default createComponent(Stack, {
       control: { type: 'slots' },
     },
   },
-});
+} as StudioComponentDefinition;

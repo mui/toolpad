@@ -1,6 +1,3 @@
-import * as React from 'react';
-import { DEFINITION_KEY } from './constants.js';
-
 export type SlotType = 'single' | 'multiple';
 
 export interface OnChangeHandler {
@@ -90,21 +87,6 @@ export type ArgTypeDefinitions<P = any> = {
 export interface ComponentDefinition<P> {
   // props: PropDefinitions<P>;
   argTypes: ArgTypeDefinitions<P>;
-}
-
-export type StudioComponent<P> =
-  | React.FunctionComponent<P>
-  | (React.ComponentClass<P> & {
-      [DEFINITION_KEY]: ComponentDefinition<P>;
-    });
-
-export function createComponent<P = {}>(
-  Component: React.FunctionComponent<P> | React.ComponentClass<P>,
-  definition: ComponentDefinition<P>,
-): StudioComponent<P> {
-  return Object.assign(Component, {
-    [DEFINITION_KEY]: definition,
-  });
 }
 
 export type { PlaceholderProps, SlotsProps, StudioRuntimeNode } from './runtime';

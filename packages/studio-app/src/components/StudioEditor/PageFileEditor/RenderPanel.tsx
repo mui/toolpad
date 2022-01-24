@@ -20,12 +20,12 @@ import {
   rectContainsPoint,
 } from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
-import { useEditorApi } from '../EditorProvider';
 import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomProvider';
-import { usePageEditorState } from './PageFileEditorProvider';
+import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
+import { useStudioComponent } from '../../../studioComponents';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -434,6 +434,32 @@ interface ViewSlots {
   [node: NodeId]: NodeSlots | undefined;
 }
 
+interface SelectionHudProps {
+  node: studioDom.StudioElementNode;
+  rect: Rectangle;
+  selected?: boolean;
+  allowInteraction?: boolean;
+  onDragStart?: React.DragEventHandler<HTMLElement>;
+}
+
+function NodeHud({ node, selected, allowInteraction, rect, onDragStart }: SelectionHudProps) {
+  const dom = useDom();
+  const component = useStudioComponent(dom, node.component);
+  return (
+    <div
+      draggable
+      onDragStart={onDragStart}
+      style={absolutePositionCss(rect)}
+      className={clsx(overlayClasses.nodeHud, {
+        [overlayClasses.selected]: selected,
+        [overlayClasses.allowNodeInteraction]: allowInteraction,
+      })}
+    >
+      <div className={overlayClasses.selectionHint}>{component.displayName}</div>
+    </div>
+  );
+}
+
 export interface RenderPanelProps {
   className?: string;
 }
@@ -441,7 +467,7 @@ export interface RenderPanelProps {
 export default function RenderPanel({ className }: RenderPanelProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const api = useEditorApi();
+  const api = usePageEditorApi();
   const {
     selection,
     newNode,
@@ -538,15 +564,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       event.preventDefault();
       if (activeSlot) {
-        api.pageEditor.nodeDragOver(activeSlot);
+        api.nodeDragOver(activeSlot);
       } else {
-        api.pageEditor.nodeDragOver(null);
+        api.nodeDragOver(null);
       }
     },
     [availableNodes, viewState, api, slots, getViewCoordinates],
   );
 
-  const handleDragLeave = React.useCallback(() => api.pageEditor.nodeDragOver(null), [api]);
+  const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
 
   const handleDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
@@ -582,7 +608,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
       }
 
-      api.pageEditor.nodeDragEnd();
+      api.nodeDragEnd();
     },
     [availableNodes, viewState, domApi, api, slots, newNode, selection, getViewCoordinates],
   );
@@ -590,7 +616,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleDragEnd = React.useCallback(
     (event: DragEvent | React.DragEvent) => {
       event.preventDefault();
-      api.pageEditor.nodeDragEnd();
+      api.nodeDragEnd();
     },
     [api],
   );
@@ -656,11 +682,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         throw new Error(`Invariant: Unable to locate Studio App root element`);
       }
 
-      api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
+      api.pageViewStateUpdate(getViewState(rootElm));
 
       const observer = new MutationObserver(() => {
         // TODO: Do we need to throttle this?
-        api.pageEditor.pageViewStateUpdate(getViewState(rootElm));
+        api.pageViewStateUpdate(getViewState(rootElm));
       });
 
       observer.observe(rootElm, {
@@ -676,7 +702,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   return (
     <RenderPanelRoot className={className}>
-      <PageView className={classes.view} dom={dom} pageNodeId={pageNodeId} onLoad={handleLoad} />
+      <PageView
+        editor
+        className={classes.view}
+        dom={dom}
+        pageNodeId={pageNodeId}
+        onLoad={handleLoad}
+      />
       <EditorOverlay key={overlayKey} window={editorWindowRef.current}>
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <OverlayRoot
@@ -732,24 +764,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               return null;
             }
 
-            const showSelected = studioDom.isElement(node) && selectedNode?.id === node.id;
-
             return (
-              <React.Fragment key={node.id}>
-                <div
-                  draggable
+              studioDom.isElement(node) && (
+                <NodeHud
+                  key={node.id}
+                  node={node}
+                  rect={nodeLayout.rect}
+                  selected={selectedNode?.id === node.id}
+                  allowInteraction={nodesWithInteraction.has(node.id)}
                   onDragStart={handleDragStart}
-                  style={absolutePositionCss(nodeLayout.rect)}
-                  className={clsx(overlayClasses.nodeHud, {
-                    [overlayClasses.selected]: showSelected,
-                    [overlayClasses.allowNodeInteraction]: nodesWithInteraction.has(node.id),
-                  })}
-                >
-                  <div className={overlayClasses.selectionHint}>
-                    {studioDom.isElement(node) ? node.component : ''}
-                  </div>
-                </div>
-              </React.Fragment>
+                />
+              )
             );
           })}
           {/* 

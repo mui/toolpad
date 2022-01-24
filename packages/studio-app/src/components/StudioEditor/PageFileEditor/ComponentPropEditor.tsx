@@ -4,9 +4,9 @@ import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-core';
 import studioPropControls from '../../propertyControls';
-import { useEditorApi } from '../EditorProvider';
 import * as studioDom from '../../../studioDom';
 import { useDomApi } from '../../DomProvider';
+import { usePageEditorApi } from './PageEditorProvider';
 
 function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
   switch (typeDef.type) {
@@ -40,7 +40,7 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
   argType,
   actualValue,
 }: ComponentPropEditorProps<P, K>) {
-  const api = useEditorApi();
+  const api = usePageEditorApi();
   const domApi = useDomApi();
 
   const handleChange = React.useCallback(
@@ -49,7 +49,7 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
   );
 
   const handleClickBind = React.useCallback(
-    () => api.pageEditor.openBindingEditor(node.id, name),
+    () => api.openBindingEditor(node.id, name),
     [api, node.id, name],
   );
 

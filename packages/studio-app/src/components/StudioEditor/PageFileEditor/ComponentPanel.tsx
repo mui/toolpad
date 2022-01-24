@@ -5,8 +5,7 @@ import * as React from 'react';
 import ComponentCatalog from './ComponentCatalog';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
-import { ComponentPanelTab, useEditorApi } from '../EditorProvider';
-import { usePageEditorState } from './PageFileEditorProvider';
+import { ComponentPanelTab, usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 
 const classes = {
   panel: 'StudioPanel',
@@ -27,10 +26,10 @@ export interface ComponentPanelProps {
 
 export default function ComponentPanel({ className }: ComponentPanelProps) {
   const state = usePageEditorState();
-  const api = useEditorApi();
+  const api = usePageEditorApi();
 
   const handleChange = (event: React.SyntheticEvent, newValue: ComponentPanelTab) =>
-    api.pageEditor.setComponentPanelTab(newValue);
+    api.setComponentPanelTab(newValue);
 
   return (
     <ComponentPanelRoot className={className}>

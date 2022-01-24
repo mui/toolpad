@@ -20,9 +20,9 @@ import clsx from 'clsx';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
-import { useEditorApi, useEditorState } from './EditorProvider';
 import { useDom, useDomApi } from '../DomProvider';
 import client from '../../api';
 
@@ -123,13 +123,29 @@ function HierarchyExplorerApiItem({ api }: HierarchyExplorerApiItemProps) {
   return <TreeItem ContentComponent={CustomContent} nodeId={api.id} label={api.name} />;
 }
 
+interface HierarchyExplorerCodeComponentItemProps {
+  codeComponent: studioDom.StudioCodeComponentNode;
+}
+
+function HierarchyExplorerCodeComponentItem({
+  codeComponent,
+}: HierarchyExplorerCodeComponentItemProps) {
+  return (
+    <TreeItem
+      ContentComponent={CustomContent}
+      nodeId={codeComponent.id}
+      label={codeComponent.name}
+    />
+  );
+}
+
 interface CreateStudioApiDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {}
 
 function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps) {
   const [connectionId, setConnectionID] = React.useState('');
   const dom = useDom();
   const domApi = useDomApi();
-  const editorApi = useEditorApi();
+  const navigate = useNavigate();
 
   const connectionsQuery = useQuery('connections', client.query.getConnections);
 
@@ -149,7 +165,7 @@ function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newApiNode, appNode.id, 'children');
           onClose?.(e, 'backdropClick');
-          editorApi.openApiEditor(newApiNode.id);
+          navigate(`/apis/${newApiNode.id}`);
         }}
         style={{
           overflowY: 'auto',
@@ -193,23 +209,23 @@ interface CreateStudioPageDialogProps extends Pick<DialogProps, 'open' | 'onClos
 function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const editorApi = useEditorApi();
   const [title, setTitle] = React.useState('');
+  const navigate = useNavigate();
 
   return (
     <Dialog {...props} onClose={onClose}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          const newPageNode = studioDom.createNode(dom, 'page', {
+          const newNode = studioDom.createNode(dom, 'page', {
             title,
             state: {},
             props: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode(newPageNode, appNode.id, 'children');
+          domApi.addNode(newNode, appNode.id, 'children');
           onClose?.(e, 'backdropClick');
-          editorApi.openPageEditor(newPageNode.id, null);
+          navigate(`/pages/${newNode.id}`);
         }}
         style={{
           overflowY: 'auto',
@@ -238,18 +254,85 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
   );
 }
 
+interface CreateStudioCodeComponentDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {}
+
+function CreateStudioCodeComponentDialog({
+  onClose,
+  ...props
+}: CreateStudioCodeComponentDialogProps) {
+  const dom = useDom();
+  const domApi = useDomApi();
+  const [name, setName] = React.useState(`MyComponent`);
+  const navigate = useNavigate();
+
+  return (
+    <Dialog {...props} onClose={onClose}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          const newNode = studioDom.createNode(dom, 'codeComponent', {
+            name,
+            code: [
+              "import * as React from 'react';",
+              '',
+              'export interface MyComponentProps {',
+              '',
+              '}',
+              '',
+              'export default function MyComponent (props: MyComponentProps) {',
+              '  return (',
+              '    <div>',
+              '      Hello World!',
+              '    </div>',
+              '  );',
+              '}',
+              '',
+            ].join('\n'),
+            argTypes: {},
+          });
+          const appNode = studioDom.getApp(dom);
+          domApi.addNode(newNode, appNode.id, 'children');
+          onClose?.(e, 'backdropClick');
+          navigate(`/codeComponents/${newNode.id}`);
+        }}
+        style={{
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <DialogTitle>Create a new MUI Studio Code Component</DialogTitle>
+        <DialogContent>
+          <TextField
+            sx={{ my: 1 }}
+            autoFocus
+            fullWidth
+            label="name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button type="submit" disabled={!name}>
+            Create
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+}
+
 export interface HierarchyExplorerProps {
   className?: string;
 }
 
 export default function HierarchyExplorer({ className }: HierarchyExplorerProps) {
-  const state = useEditorState();
   const dom = useDom();
-  const api = useEditorApi();
 
   const app = studioDom.getApp(dom);
-  const pages = studioDom.getPages(dom, app);
   const apis = studioDom.getApis(dom, app);
+  const codeComponents = studioDom.getCodeComponents(dom, app);
+  const pages = studioDom.getPages(dom, app);
 
   const [expanded, setExpanded] = React.useState<('' | NodeId)[]>([
     '',
@@ -257,43 +340,36 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
     ...pages.map((pageNode) => pageNode.id),
   ]);
 
-  const selected =
-    state.editor?.type === 'page' && state.editor.selection ? [state.editor.selection] : [];
+  const selected: NodeId[] = [];
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);
   };
 
+  const navigate = useNavigate();
+
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
     const selectedNodeId: NodeId | undefined = nodeIds[0] as NodeId | undefined;
     if (selectedNodeId) {
-      api.select(selectedNodeId);
-
       const node = studioDom.getNode(dom, selectedNodeId);
       if (studioDom.isElement(node)) {
+        // TODO: sort out in-page selection
         const page = studioDom.getElementPage(dom, node);
         if (page) {
-          if (state.editor?.type === 'page' && page.id === state.editor.nodeId) {
-            api.pageEditor.select(selectedNodeId);
-          } else {
-            api.openPageEditor(page.id, node.id);
-          }
+          navigate(`/pages/${page.id}`);
         }
       }
 
       if (studioDom.isPage(node)) {
-        if (state.editor?.type === 'page' && node.id === state.editor.nodeId) {
-          api.pageEditor.select(node.id);
-          return;
-        }
-        api.openPageEditor(node.id, null);
+        navigate(`/pages/${node.id}`);
       }
 
       if (studioDom.isApi(node)) {
-        if (state.editor?.type === 'api' && node.id === state.editor.nodeId) {
-          return;
-        }
-        api.openApiEditor(node.id);
+        navigate(`/apis/${node.id}`);
+      }
+
+      if (studioDom.isCodeComponent(node)) {
+        navigate(`/codeComponents/${node.id}`);
       }
     }
   };
@@ -312,10 +388,21 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   );
   const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
 
+  const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(0);
+  const handleCreateCodeComponentDialogOpen = React.useCallback(
+    () => setCreateCodeComponentDialogOpen(Math.random()),
+    [],
+  );
+  const handleCreateCodeComponentDialogClose = React.useCallback(
+    () => setCreateCodeComponentDialogOpen(0),
+    [],
+  );
+
   return (
     <div className={className}>
       <Button onClick={handleCreateApiDialogOpen}>New Api</Button>
       <Button onClick={handleCreatePageDialogOpen}>New Page</Button>
+      <Button onClick={handleCreateCodeComponentDialogOpen}>New Component</Button>
       <CreateStudioApiDialog
         key={createApiDialogOpen || undefined}
         open={!!createApiDialogOpen}
@@ -325,6 +412,11 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         key={createPageDialogOpen || undefined}
         open={!!createPageDialogOpen}
         onClose={handleCreatepageDialogClose}
+      />
+      <CreateStudioCodeComponentDialog
+        key={createCodeComponentDialogOpen || undefined}
+        open={!!createCodeComponentDialogOpen}
+        onClose={handleCreateCodeComponentDialogClose}
       />
       <Typography>App Hierarchy</Typography>
       <TreeView
@@ -340,6 +432,14 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         <TreeItem ContentComponent={CustomContent} nodeId="" label="Apis">
           {apis.map((apiNode) => (
             <HierarchyExplorerApiItem key={apiNode.id} api={apiNode} />
+          ))}
+        </TreeItem>
+        <TreeItem ContentComponent={CustomContent} nodeId="" label="Components">
+          {codeComponents.map((codeComponent) => (
+            <HierarchyExplorerCodeComponentItem
+              key={codeComponent.id}
+              codeComponent={codeComponent}
+            />
           ))}
         </TreeItem>
         <TreeItem ContentComponent={CustomContent} nodeId="" label="Pages">

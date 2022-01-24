@@ -1,14 +1,13 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { Box, Stack, TextField, Toolbar } from '@mui/material';
+import { Box, Button, Stack, TextField, Toolbar } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { LoadingButton } from '@mui/lab';
+import { useParams } from 'react-router-dom';
 import { DefaultNodeProps, NodeId, StudioConnection, StudioDataSourceClient } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomProvider';
-import { useEditorState } from '../EditorProvider';
 
 function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {
   const dataSource = dataSources[connection.type] as StudioDataSourceClient<any, Q>;
@@ -16,13 +15,13 @@ function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<
 }
 
 interface ApiEditorProps {
-  apiNodeId: NodeId;
+  nodeId: NodeId;
 }
 
-function ApiEditorContent<Q extends DefaultNodeProps>({ apiNodeId }: ApiEditorProps) {
+function ApiEditorContent<Q extends DefaultNodeProps>({ nodeId }: ApiEditorProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const api = studioDom.getNode(dom, apiNodeId);
+  const api = studioDom.getNode(dom, nodeId);
   studioDom.assertIsApi<Q>(api);
 
   const [name, setName] = React.useState(api.name);
@@ -58,16 +57,16 @@ function ApiEditorContent<Q extends DefaultNodeProps>({ apiNodeId }: ApiEditorPr
         Always hit the save button (top right) after clicking &quot;update&quot;. Will implement
         automatic save later.
         <Toolbar>
-          <LoadingButton
+          <Button
             onClick={() => {
-              domApi.setNodeName(apiNodeId, name);
+              domApi.setNodeName(nodeId, name);
               Object.keys(query).forEach((prop: keyof Q & string) => {
                 domApi.setNodeConstPropValue<Q>(api, prop, query[prop]);
               });
             }}
           >
             Update
-          </LoadingButton>
+          </Button>
         </Toolbar>
         <Stack spacing={2} p={2}>
           <TextField
@@ -91,13 +90,10 @@ interface ApiFileEditorProps {
 }
 
 export default function ApiFileEditor({ className }: ApiFileEditorProps) {
-  const state = useEditorState();
-  if (state.editor?.type !== 'api') {
-    return null;
-  }
+  const { nodeId } = useParams();
   return (
     <Box className={className}>
-      <ApiEditorContent apiNodeId={state.editor.nodeId} />
+      <ApiEditorContent key={nodeId} nodeId={nodeId as NodeId} />
     </Box>
   );
 }

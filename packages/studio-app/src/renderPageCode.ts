@@ -1,9 +1,16 @@
 import { ArgTypeDefinition } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
-import { getStudioComponent, StudioComponentDefinition } from './studioComponents';
+import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
-import { NodeId, PropExpression, RenderContext, ResolvedProps, StudioNodeProps } from './types';
+import {
+  NodeId,
+  PropExpression,
+  RenderContext,
+  ResolvedProps,
+  StudioComponentDefinition,
+  StudioNodeProps,
+} from './types';
 import { ExactEntriesOf } from './utils/types';
 
 export interface RenderPageConfig {
@@ -12,25 +19,6 @@ export interface RenderPageConfig {
   // prettify output
   pretty: boolean;
 }
-
-const PAGE_COMPONENT = {
-  argTypes: {},
-  render(ctx: RenderContext, props: ResolvedProps) {
-    ctx.addImport('@mui/material', 'Container', 'Container');
-    ctx.addImport('@mui/material', 'Stack', 'MuiStack');
-    ctx.addImport('@mui/studio-core', 'Slots', 'Slots');
-
-    const { children, ...other } = props;
-
-    return `
-      <Container ${ctx.renderProps(other)}>
-        <MuiStack direction="column" gap={2} my={2}>
-          <Slots prop="children">${ctx.renderJsxContent(children)}</Slots>
-        </MuiStack>
-      </Container>
-    `;
-  },
-};
 
 interface Import {
   named: Map<string, string>;
@@ -44,27 +32,7 @@ class Context implements RenderContext {
 
   private editor: boolean;
 
-  private imports = new Map<string, Import>([
-    [
-      'react',
-      {
-        named: new Map([['default', 'React']]),
-      },
-    ],
-    [
-      '@mui/studio-core',
-      {
-        named: new Map([['useDataQuery', 'useDataQuery']]),
-      },
-    ],
-    [
-      '@mui/studio-core/runtime',
-      {
-        named: new Map(),
-        all: '__studioRuntime',
-      },
-    ],
-  ]);
+  private imports: Map<string, Import>;
 
   private dataLoaders: string[] = [];
 
@@ -76,16 +44,33 @@ class Context implements RenderContext {
     this.dom = dom;
     this.page = page;
     this.editor = editor;
+
+    this.imports = new Map<string, Import>([
+      [
+        'react',
+        {
+          named: new Map([['default', 'React']]),
+        },
+      ],
+    ]);
+
+    if (this.editor) {
+      this.imports.set('@mui/studio-core/runtime', {
+        named: new Map(),
+        all: '__studioRuntime',
+      });
+    }
   }
 
   useDataLoader(queryId: string): string {
+    this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
     this.dataLoaders.push(queryId);
     return `_${queryId}`;
   }
 
   getComponentDefinition(node: studioDom.StudioNode): StudioComponentDefinition | null {
     if (studioDom.isPage(node)) {
-      return PAGE_COMPONENT;
+      return getStudioComponent(this.dom, 'Page');
     }
     if (studioDom.isElement(node)) {
       return getStudioComponent(this.dom, node.component);
@@ -178,6 +163,40 @@ class Context implements RenderContext {
         }
       }
     }
+
+    const component = this.getComponentDefinition(node);
+
+    if (this.editor && component) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const [prop, argType] of Object.entries(component.argTypes)) {
+        if (argType?.typeDef.type === 'element') {
+          if (argType.control?.type === 'slots') {
+            const existingProp = result[prop];
+
+            result[prop] = {
+              type: 'jsxElement',
+              value: `
+                <__studioRuntime.Slots prop=${JSON.stringify(prop)}>
+                  ${existingProp ? this.renderJsxContent(existingProp) : ''}
+                </__studioRuntime.Slots>
+              `,
+            };
+          } else if (argType.control?.type === 'slot') {
+            const existingProp = result[prop];
+
+            result[prop] = {
+              type: 'jsxElement',
+              value: `
+                <__studioRuntime.Placeholder prop=${JSON.stringify(prop)}>
+                  ${existingProp ? this.renderJsxContent(existingProp) : ''}
+                </__studioRuntime.Placeholder>
+              `,
+            };
+          }
+        }
+      }
+    }
+
     return result;
   }
 
@@ -192,24 +211,17 @@ class Context implements RenderContext {
 
     const nodeChildren = this.renderNodeChildren(node);
     const resolvedProps = this.resolveProps(node, nodeChildren);
+    const rendered = component.render(this, resolvedProps);
 
-    let rendered: string;
-
-    if (component.render) {
-      rendered = component.render(this, resolvedProps);
-    } else {
-      this.addImport(component.module, component.importedName, component.importedName);
-      rendered = this.renderComponent(component.importedName, resolvedProps);
-    }
-
+    // TODO: We may not need the `component` prop anymore. Remove?
     return {
       type: 'jsxElement',
       value: this.editor
         ? `
-        <__studioRuntime.WrappedStudioNode id="${node.id}">
-          ${rendered}
-        </__studioRuntime.WrappedStudioNode>
-      `
+          <__studioRuntime.WrappedStudioNode id="${node.id}">
+            ${rendered}
+          </__studioRuntime.WrappedStudioNode>
+        `
         : rendered,
     };
   }
@@ -275,7 +287,13 @@ class Context implements RenderContext {
     return `{${this.renderJsExpression(expr)}}`;
   }
 
-  addImport(source: string, imported: string, local: string = imported) {
+  /**
+   * Adds an import to the page module. Returns an identifier that's based on local that can
+   * be used to reference the import.
+   */
+  addImport(source: string, imported: string, localName: string = imported): string {
+    // TODO: introduce concept of scope and make sure local is unique
+
     let specifiers = this.imports.get(source);
     if (!specifiers) {
       specifiers = { named: new Map() };
@@ -284,13 +302,15 @@ class Context implements RenderContext {
 
     const existing = specifiers.named.get(imported);
     if (!existing) {
-      specifiers.named.set(imported, local);
-    } else if (existing !== local) {
+      specifiers.named.set(imported, localName);
+    } else if (existing !== localName) {
       // TODO: we can reassign to a local variable
       throw new Error(
-        `Trying to import "${imported}" as "${local}" but it is already imported as "${existing}"`,
+        `Trying to import "${imported}" as "${localName}" but it is already imported as "${existing}"`,
       );
     }
+
+    return localName;
   }
 
   renderImports(): string {

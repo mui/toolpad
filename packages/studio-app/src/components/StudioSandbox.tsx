@@ -3,6 +3,7 @@ import { styled } from '@mui/material';
 import { ImportMap } from 'esinstall';
 import { transform } from 'sucrase';
 import renderPageHtml from '../renderPageHtml';
+import { omit, take } from '../utils/immutability';
 
 const StudioSandboxRoot = styled('iframe')({
   border: 'none',
@@ -38,32 +39,6 @@ function resolvePathname(relative: string, base: string) {
   return pathname + search + hash;
 }
 
-async function addFiles(files: SandboxFiles, base: string) {
-  const cache = await caches.open('rawFiles');
-  await Promise.all(
-    Object.entries(files).map(async ([path, file]) => {
-      if (!file) {
-        return;
-      }
-      let { code } = file;
-      const { type = 'application/javascript' } = file;
-      if (type === 'application/javascript') {
-        // TODO: compilation belongs in the worker?
-        const transformed = transform(code, {
-          transforms: ['jsx', 'typescript'],
-        });
-        code = transformed.code;
-      }
-      await cache.put(
-        resolvePathname(path, base),
-        new Response(new Blob([code], { type }), {
-          status: 200,
-        }),
-      );
-    }),
-  );
-}
-
 export default function StudioSandbox({
   className,
   onLoad,
@@ -73,10 +48,57 @@ export default function StudioSandbox({
   importMap = { imports: {} },
 }: StudioSandboxProps) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
+  const [frameSrc, setFrameSrc] = React.useState<string>();
+
+  const [transformErrors, setTransformErrors] = React.useState<Record<string, string>>({});
 
   if (!base.endsWith('/')) {
     throw new Error(`Invariant: "${base}" is an invalid bas url`);
   }
+
+  const addFiles = React.useCallback(
+    async (newFiles: SandboxFiles, hotUpdate?: boolean) => {
+      const cache = await caches.open('rawFiles');
+      await Promise.all(
+        Object.entries(newFiles).map(async ([path, file]) => {
+          if (!file) {
+            return;
+          }
+
+          const resolvedPath = resolvePathname(path, base);
+
+          try {
+            let { code } = file;
+            const { type = 'application/javascript' } = file;
+            if (type === 'application/javascript') {
+              // TODO: compilation belongs in a worker?
+              const transformed = transform(code, {
+                transforms: ['jsx', 'typescript'],
+              });
+              code = transformed.code;
+            }
+
+            // TODO: Building on top of cache feels a bit hacky, should we build it on top of indexeddb?
+            await cache.put(
+              resolvedPath,
+              new Response(new Blob([code], { type }), {
+                status: 200,
+              }),
+            );
+
+            if (hotUpdate) {
+              frameRef.current?.contentWindow?.postMessage({ type: 'update', url: resolvedPath });
+            }
+
+            setTransformErrors((errors) => omit(errors, path));
+          } catch (err: any) {
+            setTransformErrors((errors) => ({ ...errors, [path]: err.message }));
+          }
+        }),
+      );
+    },
+    [base],
+  );
 
   const { code: pageCode } = renderPageHtml({
     editor: true,
@@ -86,10 +108,7 @@ export default function StudioSandbox({
 
   const prevFiles = React.useRef<SandboxFiles>(files);
   React.useEffect(() => {
-    if (!frameRef.current) {
-      return;
-    }
-    const init = async (iframe: HTMLIFrameElement) => {
+    const init = async () => {
       // TODO: probably just want to update if already exists?
       await navigator.serviceWorker.register(
         new URL('../../serviceWorker/index', import.meta.url),
@@ -98,22 +117,19 @@ export default function StudioSandbox({
           scope: base,
         },
       );
-      await addFiles(
-        {
-          ...prevFiles.current,
-          [base]: {
-            code: pageCode,
-            type: 'text/html',
-          },
+      await addFiles({
+        ...prevFiles.current,
+        [base]: {
+          code: pageCode,
+          type: 'text/html',
         },
-        base,
-      );
+      });
 
-      iframe.src = base;
+      setFrameSrc(base);
     };
-    init(frameRef.current);
+    init();
     // TODO: cleanup service worker/cache? what if multiple sandboxes are initialized?
-  }, [base, entry, pageCode]);
+  }, [base, entry, pageCode, addFiles]);
 
   const handleFrameLoad = React.useCallback<React.ReactEventHandler<HTMLIFrameElement>>(
     (event) => {
@@ -128,6 +144,9 @@ export default function StudioSandbox({
 
   React.useEffect(() => {
     const initCache = async () => {
+      // Make sure we drop errors for removed files
+      setTransformErrors((errors) => take(errors, ...Object.keys(files)));
+
       const updates = Object.entries(files).filter(([path, content]) => {
         if (!content) {
           return false;
@@ -138,19 +157,21 @@ export default function StudioSandbox({
       prevFiles.current = files;
 
       if (updates.length > 0) {
-        await addFiles(Object.fromEntries(updates), base);
-        updates.forEach(([path]) => {
-          const url = resolvePathname(path, base);
-          frameRef.current?.contentWindow?.postMessage({ type: 'update', url });
-        });
+        await addFiles(Object.fromEntries(updates), true);
       }
     };
     initCache();
-  }, [files, base]);
+  }, [files, base, addFiles]);
 
-  return (
+  const error = Object.values(transformErrors)[0];
+  console.log(error);
+
+  return error ? (
+    <div className={className}>{error}</div>
+  ) : (
     <StudioSandboxRoot
       ref={frameRef}
+      src={frameSrc}
       className={className}
       title="sandbox"
       onLoad={handleFrameLoad}

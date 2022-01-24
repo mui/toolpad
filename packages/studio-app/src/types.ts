@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import { ArgTypeDefinition, SlotType } from '@mui/studio-core';
+import { ArgTypeDefinition, ArgTypeDefinitions, SlotType } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
@@ -158,10 +158,17 @@ export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
 export type ResolvedProps = Record<string, PropExpression | undefined> & { $spread?: string };
 
 export interface RenderContext {
-  addImport(source: string, imported: string, local: string): void;
+  addImport(source: string, imported: string, local: string): string;
   renderProps(resolvedProps: ResolvedProps): string;
   renderJsExpression(expr?: PropExpression): string;
   renderJsxContent(expr?: PropExpression): string;
 }
 
 export type RenderComponent = (ctx: RenderContext, resolvedProps: ResolvedProps) => string;
+
+export interface StudioComponentDefinition {
+  id: string;
+  displayName: string;
+  argTypes: ArgTypeDefinitions;
+  render: RenderComponent;
+}

@@ -1,7 +1,6 @@
 import { Box } from '@mui/material';
 import * as React from 'react';
 import {
-  DEFINITION_KEY,
   RUNTIME_PROP_NODE_ID,
   RUNTIME_PROP_STUDIO_SLOTS,
   RUNTIME_PROP_STUDIO_SLOTS_TYPE,
@@ -100,6 +99,7 @@ class ComponentErrorBoundary extends React.Component<
 interface WrappedStudioNodeInternalProps {
   children: React.ReactElement;
   [RUNTIME_PROP_NODE_ID]: string;
+  component?: ComponentDefinition<any>;
 }
 
 // We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect elements of this type
@@ -109,60 +109,9 @@ function WrappedStudioNodeInternal({
   children,
   [RUNTIME_PROP_NODE_ID]: studioNodeId,
 }: WrappedStudioNodeInternalProps) {
-  const child = React.Children.only(children);
-  const definition = (child.type as any)[DEFINITION_KEY] as ComponentDefinition<any> | undefined;
-
-  let newProps: { [key: string]: unknown } | undefined;
-
-  Object.entries(definition?.argTypes || {}).forEach(([argName, argDef]) => {
-    const value = child.props[argName];
-    if (argDef?.typeDef.type === 'element') {
-      if (argDef.control?.type === 'slots') {
-        const valueAsArray = React.Children.toArray(value);
-        newProps = newProps ?? {};
-        newProps[argName] =
-          valueAsArray.length > 0 ? (
-            <SlotsInternal
-              {...{
-                [RUNTIME_PROP_STUDIO_SLOTS]: argName,
-                [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
-              }}
-              parentId={studioNodeId}
-            >
-              {valueAsArray}
-            </SlotsInternal>
-          ) : (
-            <PlaceholderInternal
-              {...{
-                [RUNTIME_PROP_STUDIO_SLOTS]: argName,
-                [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
-              }}
-              parentId={studioNodeId}
-            />
-          );
-      } else if (argDef.control?.type === 'slot') {
-        const valueAsArray = React.Children.toArray(value);
-        if (valueAsArray.length <= 0) {
-          newProps = newProps ?? {};
-          newProps[argName] = (
-            <PlaceholderInternal
-              {...{
-                [RUNTIME_PROP_STUDIO_SLOTS]: argName,
-                [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
-              }}
-              parentId={studioNodeId}
-            />
-          );
-        }
-      }
-    }
-  });
-
   return (
     <StudioNodeContext.Provider value={studioNodeId}>
-      <ComponentErrorBoundary>
-        {newProps ? React.cloneElement(child, newProps) : child}
-      </ComponentErrorBoundary>
+      <ComponentErrorBoundary>{children}</ComponentErrorBoundary>
     </StudioNodeContext.Provider>
   );
 }
@@ -170,12 +119,13 @@ function WrappedStudioNodeInternal({
 export interface WrappedStudioNodeProps {
   children: React.ReactElement;
   id: string;
+  component?: ComponentDefinition<any>;
 }
 
 // Public interface with an `id` prop that will translate it into [RUNTIME_PROP_NODE_ID]
-export function WrappedStudioNode({ children, id }: WrappedStudioNodeProps) {
+export function WrappedStudioNode({ children, id, component }: WrappedStudioNodeProps) {
   return (
-    <WrappedStudioNodeInternal {...{ [RUNTIME_PROP_NODE_ID]: id }}>
+    <WrappedStudioNodeInternal {...{ [RUNTIME_PROP_NODE_ID]: id, component }}>
       {children}
     </WrappedStudioNodeInternal>
   );

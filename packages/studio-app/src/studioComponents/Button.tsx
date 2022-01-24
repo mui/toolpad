@@ -1,7 +1,10 @@
-import { Button } from '@mui/material';
-import { createComponent } from '@mui/studio-core';
+import { StudioComponentDefinition } from '../types';
+import importedComponentRenderer from './importedComponentRenderer';
 
-export default createComponent(Button, {
+export default {
+  id: 'Button',
+  displayName: 'Button',
+  render: importedComponentRenderer('@mui/material', 'Button'),
   argTypes: {
     children: {
       name: 'content',
@@ -20,4 +23,4 @@ export default createComponent(Button, {
       defaultValue: 'primary',
     },
   },
-});
+} as StudioComponentDefinition;

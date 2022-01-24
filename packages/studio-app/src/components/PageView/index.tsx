@@ -9,36 +9,44 @@ import renderEntryPoint from '../../renderPageEntryCode';
 
 export interface PageViewProps {
   className?: string;
-  // Callback for when the view has rendered. Make sure this value is stable
+  editor?: boolean;
   onLoad?: (window: Window) => void;
   dom: studioDom.StudioDom;
   pageNodeId: NodeId;
 }
 
-export default function PageView({ className, dom, pageNodeId, onLoad }: PageViewProps) {
-  const themePath = './lib/theme.js';
-  const entryPath = `./${pageNodeId}.js`;
-  const pagePath = `./pages/${pageNodeId}.js`;
+export default function PageView({ className, editor, dom, pageNodeId, onLoad }: PageViewProps) {
+  const themePath = './lib/theme.ts';
+  const entryPath = `./${pageNodeId}.tsx`;
+  const pagePath = `./pages/${pageNodeId}.tsx`;
 
   const renderedPage = React.useMemo(() => {
-    return renderPageCode(dom, pageNodeId, {
-      editor: true,
-    });
-  }, [dom, pageNodeId]);
+    return renderPageCode(dom, pageNodeId, { editor });
+  }, [dom, pageNodeId, editor]);
 
   const renderedTheme = React.useMemo(() => {
-    return renderThemeCode(dom, {
-      editor: true,
-    });
-  }, [dom]);
+    return renderThemeCode(dom, { editor });
+  }, [dom, editor]);
 
   const renderedEntrypoint = React.useMemo(() => {
     return renderEntryPoint({
       pagePath,
       themePath,
-      editor: true,
+      editor,
     });
-  }, [pagePath, themePath]);
+  }, [pagePath, themePath, editor]);
+
+  const codeComponents = React.useMemo(() => {
+    const app = studioDom.getApp(dom);
+    const studioCodeComponents = studioDom.getCodeComponents(dom, app);
+    // TODO: only render the components used by the page
+    return Object.fromEntries(
+      studioCodeComponents.map((component) => [
+        `./components/${component.id}.tsx`,
+        { code: component.code },
+      ]),
+    );
+  }, [dom]);
 
   return (
     <StudioSandbox
@@ -47,6 +55,7 @@ export default function PageView({ className, dom, pageNodeId, onLoad }: PageVie
       base={`/app/${dom.root}/`}
       importMap={getImportMap()}
       files={{
+        ...codeComponents,
         [themePath]: { code: renderedTheme.code },
         [entryPath]: { code: renderedEntrypoint.code },
         [pagePath]: { code: renderedPage.code },

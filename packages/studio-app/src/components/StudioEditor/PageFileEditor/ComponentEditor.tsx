@@ -1,12 +1,25 @@
-import { styled, TextField } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Stack,
+  styled,
+  TextField,
+  Typography,
+} from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
-import { getStudioComponent } from '../../../studioComponents';
+import CodeIcon from '@mui/icons-material/Code';
+import PageIcon from '@mui/icons-material/Web';
+import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
 import ComponentPropEditor from './ComponentPropEditor';
 import { useDom, useDomApi } from '../../DomProvider';
-import { usePageEditorState } from './PageFileEditorProvider';
+import { usePageEditorState } from './PageEditorProvider';
+import useLatest from '../../../utils/useLatest';
+import renderPageCode from '../../../renderPageCode';
 
 const classes = {
   control: 'StudioControl',
@@ -53,6 +66,7 @@ interface SelectedNodeEditorProps {
 const DEFAULT_ACTUAL_VALUES = {};
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
+  const dom = useDom();
   const domApi = useDomApi();
   const { viewState } = usePageEditorState();
   const actualValues = viewState[node.id]?.props ?? DEFAULT_ACTUAL_VALUES;
@@ -78,9 +92,12 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
     [handleNameCommit],
   );
 
+  const component = useStudioComponent(dom, node.component);
+
   return (
     <React.Fragment>
-      <div>{`${node.component} (${node.id})`}</div>
+      <Typography variant="subtitle1">{component.displayName}</Typography>
+      <Typography variant="subtitle2">ID: {node.id}</Typography>
       <TextField
         fullWidth
         size="small"
@@ -93,6 +110,45 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
       <div>props:</div>
       {node ? <ComponentPropsEditor node={node} actualValues={actualValues} /> : null}
     </React.Fragment>
+  );
+}
+
+function DefaultPanel() {
+  const dom = useDom();
+  const state = usePageEditorState();
+  const [viewedSource, setViewedSource] = React.useState<string | null>(null);
+
+  const handleViewSource = React.useCallback(() => {
+    const { code } = renderPageCode(dom, state.nodeId, { pretty: true });
+    setViewedSource(code);
+  }, [dom, state.nodeId]);
+
+  const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
+
+  // To keep it around during closing animation
+  const dialogSourceContent = useLatest(viewedSource);
+  return (
+    <div>
+      <Stack spacing={1} alignItems="start">
+        <Button
+          startIcon={<PageIcon />}
+          color="inherit"
+          component="a"
+          href={`/pages/${state.nodeId}`}
+        >
+          View Page
+        </Button>
+        <Button startIcon={<CodeIcon />} color="inherit" onClick={handleViewSource}>
+          View Page Source
+        </Button>
+      </Stack>
+      <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>
+        <DialogTitle>Page component</DialogTitle>
+        <DialogContent>
+          <pre>{dialogSourceContent}</pre>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
 
@@ -113,7 +169,9 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
       {selectedNode && studioDom.isElement(selectedNode) ? (
         // Add key to make sure it mounts every time selected node changes
         <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
-      ) : null}
+      ) : (
+        <DefaultPanel />
+      )}
     </div>
   );
 }

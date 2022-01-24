@@ -83,6 +83,9 @@ jobs:
       - checkout
       - install_js
       - run:
+          name: try
+          command: npx lerna bootstrap
+      - run:
           name: Tests fake browser
           command: yarn test
 

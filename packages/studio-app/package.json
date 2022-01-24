@@ -11,7 +11,8 @@
     "dev:next": "next dev",
     "build:esbuild": "esbuild ./sandbox/index.ts ./editorRuntime/index.ts --target=es6 --bundle --outdir=./public",
     "dev:esbuild": "yarn build:esbuild --watch",
-    "esinstall": "node ./scripts/esinstall.mjs"
+    "esinstall": "ts-node ./scripts/esinstall.ts",
+    "typings": "ts-node ./scripts/typings.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.7.1",
@@ -49,6 +50,7 @@
     "react-router-dom": "^6.2.1",
     "sqlite3": "^5.0.2",
     "sucrase": "^3.20.3",
+    "ts-node": "^10.4.0",
     "typeorm": "^0.2.41",
     "typescript": "^4.5.4"
   },

@@ -50,7 +50,16 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
         noSyntaxValidation: false,
       });
 
-      // TODO: figure this out better, add @mui/material support
+      // TODO: We must figure this out better
+      //       We must create a more sustainable way to load definition files.
+      //       look into: https://github.com/lukasbach/monaco-editor-auto-typings
+      //       but probably not the greatest solution:
+      //         - how to version packages?
+      //         - We should rather load it from our own webserver.
+      //         - Can we bundle .d.ts files somehow and host that statically?
+      //         - no @mui/material support. See
+      //             - https://github.com/lukasbach/monaco-editor-auto-typings/issues/7
+      //             - https://github.com/microsoft/monaco-editor/issues/2295
       monaco.languages.typescript.typescriptDefaults.addExtraLib(
         defs,
         `file:///node_modules/@types/react/index.d.ts`,

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Button, Stack, Toolbar } from '@mui/material';
+import { Box, Button, Stack, styled, Toolbar } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
@@ -11,6 +11,10 @@ import StudioSandbox from '../../StudioSandbox';
 import getImportMap from '../../../getImportMap';
 import renderThemeCode from '../../../renderThemeCode';
 import renderEntryPoint from '../../../renderPageEntryCode';
+
+const ComponentSandbox = styled(StudioSandbox)({
+  height: '100%',
+});
 
 interface CodeComponentEditorContentProps {
   nodeId: NodeId;
@@ -111,7 +115,7 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
           />
         </Box>
         <Box flex={1}>
-          <StudioSandbox
+          <ComponentSandbox
             base={`/components/${domNode.id}/`}
             importMap={getImportMap()}
             files={{

@@ -3,10 +3,11 @@ import { Box, Button, Stack, styled, Toolbar } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
+import * as prettier from 'prettier';
+import parserBabel from 'prettier/parser-babel';
 import { NodeId } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomProvider';
-import defs from './reactDefs';
 import StudioSandbox from '../../StudioSandbox';
 import getImportMap from '../../../getImportMap';
 import renderThemeCode from '../../../renderThemeCode';
@@ -28,6 +29,24 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
 
   const [input, setInput] = React.useState(domNode.code);
 
+  const updateDomActionRef = React.useRef(() => {});
+
+  React.useEffect(() => {
+    updateDomActionRef.current = () => {
+      try {
+        const pretty = prettier.format(input, {
+          parser: 'babel-ts',
+          plugins: [parserBabel],
+        });
+        setInput(pretty);
+        domApi.setNodeAttribute<studioDom.StudioCodeComponentNode, 'code'>(domNode, 'code', pretty);
+        // eslint-disable-next-line no-empty
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  }, [domApi, domNode, input]);
+
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
@@ -35,6 +54,7 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
 
       editor.updateOptions({
         minimap: { enabled: false },
+        accessibilitySupport: 'off',
       });
 
       monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
@@ -49,25 +69,31 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
         allowJs: true,
         typeRoots: ['node_modules/@types'],
       });
+
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: false,
         noSyntaxValidation: false,
       });
 
-      // TODO: We must figure this out better
-      //       We must create a more sustainable way to load definition files.
-      //       look into: https://github.com/lukasbach/monaco-editor-auto-typings
-      //       but probably not the greatest solution:
-      //         - how to version packages?
-      //         - We should rather load it from our own webserver.
-      //         - Can we bundle .d.ts files somehow and host that statically?
-      //         - no @mui/material support. See
-      //             - https://github.com/lukasbach/monaco-editor-auto-typings/issues/7
-      //             - https://github.com/microsoft/monaco-editor/issues/2295
-      monaco.languages.typescript.typescriptDefaults.addExtraLib(
-        defs,
-        `file:///node_modules/@types/react/index.d.ts`,
-      );
+      // The types for `monaco.KeyCode` seem to be messed up
+      // eslint-disable-next-line no-bitwise
+      editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => {
+        updateDomActionRef.current();
+      });
+
+      fetch('/typings.json')
+        .then((res) => res.json())
+        .then((typings) => {
+          Array.from(Object.entries(typings)).forEach(([path, content]) => {
+            monaco.languages.typescript.typescriptDefaults.addExtraLib(
+              content as string,
+              `file:///${path}`,
+            );
+          });
+        })
+        .catch((err) =>
+          console.error(`Failed to initialize typescript types on editor: ${err.message}`),
+        );
     },
     [],
   );
@@ -91,15 +117,7 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
   return (
     <Stack sx={{ height: '100%' }}>
       <Toolbar>
-        <Button
-          onClick={() => {
-            domApi.setNodeAttribute<studioDom.StudioCodeComponentNode, 'code'>(
-              domNode,
-              'code',
-              input,
-            );
-          }}
-        >
+        <Button disabled={domNode.code === input} onClick={() => updateDomActionRef.current()}>
           Update
         </Button>
       </Toolbar>

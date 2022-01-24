@@ -38,3 +38,4 @@ yarn-error.log*
 /public/web_modules
 /public/editorRuntime
 /public/sandbox
+/public/typings.json

@@ -2,8 +2,8 @@
   "name": "@mui/studio-app",
   "version": "0.0.1",
   "scripts": {
-    "dev": "yarn esinstall --dev && concurrently \"yarn:dev:*\"",
-    "build": "yarn esinstall && concurrently \"yarn:build:*\"",
+    "dev": "yarn esinstall --dev && yarn bundle-types && concurrently \"yarn:dev:*\"",
+    "build": "yarn esinstall && yarn bundle-types && concurrently \"yarn:build:*\"",
     "start": "next start",
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",
@@ -12,7 +12,7 @@
     "build:esbuild": "esbuild ./sandbox/index.ts ./editorRuntime/index.ts --target=es6 --bundle --outdir=./public",
     "dev:esbuild": "yarn build:esbuild --watch",
     "esinstall": "ts-node ./scripts/esinstall.ts",
-    "typings": "ts-node ./scripts/typings.ts"
+    "bundle-types": "ts-node ./scripts/typings.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.7.1",
@@ -55,11 +55,13 @@
     "typescript": "^4.5.4"
   },
   "devDependencies": {
+    "@types/glob": "^7.2.0",
     "@types/react": "^17.0.34",
     "eslint": "7",
     "eslint-config-next": "^12.0.3",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.25.3"
+    "eslint-plugin-import": "^2.25.3",
+    "glob": "^7.2.0"
   },
   "typings": "./index.d.ts"
 }

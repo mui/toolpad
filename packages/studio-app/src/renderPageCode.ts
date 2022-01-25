@@ -45,7 +45,7 @@ class JavascriptScope {
 
   createUniqueBinding(suggestedName: string): string {
     let index = 1;
-    let binding = suggestedName;
+    let binding = /^\d/.test(suggestedName) ? `_${suggestedName}` : suggestedName;
     while (this.hasBinding(binding)) {
       binding = `${suggestedName}${index}`;
       index += 1;
@@ -64,7 +64,7 @@ class Context implements RenderContext {
 
   private imports = new Map<string, Map<string, string>>();
 
-  private dataLoaders: string[] = [];
+  private dataLoaders: { queryId: string; variable: string }[] = [];
 
   private moduleScope: JavascriptScope;
 
@@ -73,6 +73,8 @@ class Context implements RenderContext {
   private reactAlias: string = 'undefined';
 
   private runtimeAlias: string = 'undefined';
+
+  private useDataQueryAlias: string = 'undefined';
 
   constructor(
     dom: studioDom.StudioDom,
@@ -94,9 +96,10 @@ class Context implements RenderContext {
   }
 
   useDataLoader(queryId: string): string {
-    this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
-    this.dataLoaders.push(queryId);
-    return `_${queryId}`;
+    this.useDataQueryAlias = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
+    const variable = this.componentScope.createUniqueBinding(queryId);
+    this.dataLoaders.push({ queryId, variable });
+    return variable;
   }
 
   getComponentDefinition(node: studioDom.StudioNode): StudioComponentDefinition | null {
@@ -392,8 +395,8 @@ class Context implements RenderContext {
 
   renderDataLoaderHooks(): string {
     return this.dataLoaders
-      .map((queryId) => {
-        return `const _${queryId} = useDataQuery(${JSON.stringify(queryId)});`;
+      .map(({ queryId, variable }) => {
+        return `const ${variable} = ${this.useDataQueryAlias}(${JSON.stringify(queryId)});`;
       })
       .join('\n');
   }
@@ -426,6 +429,8 @@ export default function renderPageCode(
       );
     }
   `;
+
+  console.log(code);
 
   if (config.pretty) {
     code = prettier.format(code, {

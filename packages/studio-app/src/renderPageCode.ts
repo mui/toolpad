@@ -430,8 +430,6 @@ export default function renderPageCode(
     }
   `;
 
-  console.log(code);
-
   if (config.pretty) {
     code = prettier.format(code, {
       parser: 'babel-ts',

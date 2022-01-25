@@ -55,11 +55,6 @@ class JavascriptScope {
   }
 }
 
-interface Import {
-  named: Map<string, string>;
-  all?: string;
-}
-
 class Context implements RenderContext {
   private dom: studioDom.StudioDom;
 
@@ -67,13 +62,17 @@ class Context implements RenderContext {
 
   private editor: boolean;
 
-  private imports = new Map<string, Import>();
+  private imports = new Map<string, Map<string, string>>();
 
   private dataLoaders: string[] = [];
 
   private moduleScope: JavascriptScope;
 
   private componentScope: JavascriptScope;
+
+  private reactAlias: string = 'undefined';
+
+  private runtimeAlias: string = 'undefined';
 
   constructor(
     dom: studioDom.StudioDom,
@@ -87,14 +86,10 @@ class Context implements RenderContext {
     this.moduleScope = new JavascriptScope(null);
     this.componentScope = new JavascriptScope(this.moduleScope);
 
-    this.addImport('react', 'default', 'React');
+    this.reactAlias = this.addImport('react', 'default', 'React');
 
     if (this.editor) {
-      // this.addImport('@mui/studio-core/runtime', '*', '__studioRuntime');
-      this.imports.set('@mui/studio-core/runtime', {
-        named: new Map(),
-        all: '__studioRuntime',
-      });
+      this.runtimeAlias = this.addImport('@mui/studio-core/runtime', '*', '__studioRuntime');
     }
   }
 
@@ -212,9 +207,9 @@ class Context implements RenderContext {
             result[prop] = {
               type: 'jsxElement',
               value: `
-                <__studioRuntime.Slots prop=${JSON.stringify(prop)}>
+                <${this.runtimeAlias}.Slots prop=${JSON.stringify(prop)}>
                   ${existingProp ? this.renderJsxContent(existingProp) : ''}
-                </__studioRuntime.Slots>
+                </${this.runtimeAlias}.Slots>
               `,
             };
           } else if (argType.control?.type === 'slot') {
@@ -223,9 +218,9 @@ class Context implements RenderContext {
             result[prop] = {
               type: 'jsxElement',
               value: `
-                <__studioRuntime.Placeholder prop=${JSON.stringify(prop)}>
+                <${this.runtimeAlias}.Placeholder prop=${JSON.stringify(prop)}>
                   ${existingProp ? this.renderJsxContent(existingProp) : ''}
-                </__studioRuntime.Placeholder>
+                </${this.runtimeAlias}.Placeholder>
               `,
             };
           }
@@ -254,9 +249,9 @@ class Context implements RenderContext {
       type: 'jsxElement',
       value: this.editor
         ? `
-          <__studioRuntime.WrappedStudioNode id="${node.id}">
+          <${this.runtimeAlias}.WrappedStudioNode id="${node.id}">
             ${rendered}
-          </__studioRuntime.WrappedStudioNode>
+          </${this.runtimeAlias}.WrappedStudioNode>
         `
         : rendered,
     };
@@ -324,25 +319,27 @@ class Context implements RenderContext {
   }
 
   /**
-   * Adds an import to the page module. Returns an identifier that's based on local that can
+   * Adds an import to the page module. Returns an identifier that's based on [suggestedName] that can
    * be used to reference the import.
    */
-  addImport(source: string, imported: string, suggestedName: string = imported): string {
-    // TODO: introduce concept of scope and make sure local is unique
-
+  addImport(
+    source: string,
+    imported: '*' | 'default' | string,
+    suggestedName: string = imported,
+  ): string {
     let specifiers = this.imports.get(source);
     if (!specifiers) {
-      specifiers = { named: new Map() };
+      specifiers = new Map();
       this.imports.set(source, specifiers);
     }
 
-    const existing = specifiers.named.get(imported);
+    const existing = specifiers.get(imported);
     if (existing) {
       return existing;
     }
 
     const localName = this.moduleScope.createUniqueBinding(suggestedName);
-    specifiers.named.set(imported, localName);
+    specifiers.set(imported, localName);
     return localName;
   }
 
@@ -352,27 +349,25 @@ class Context implements RenderContext {
     const importLines = Array.from(this.imports.entries(), ([source, specifiers]) => {
       const renderedSpecifiers = [];
       const renderedNamedSpecifiers = [];
-      // const importAll = specifiers.named.get('*')
+      const importAllName = specifiers.get('*');
 
-      if (specifiers.named.size > 0) {
+      if (specifiers.size > 0) {
         // eslint-disable-next-line no-restricted-syntax
-        for (const [imported, local] of specifiers.named.entries()) {
+        for (const [imported, local] of specifiers.entries()) {
           if (imported === 'default') {
             renderedSpecifiers.push(local);
-          } else {
+          } else if (imported !== '*') {
             renderedNamedSpecifiers.push(
-              imported === local
-                ? imported
-                : [imported, local].join(specifiers.all ? ': ' : ' as '),
+              imported === local ? imported : [imported, local].join(importAllName ? ': ' : ' as '),
             );
           }
         }
       }
 
-      if (specifiers.all) {
-        renderedSpecifiers.push(`* as ${specifiers.all}`);
+      if (importAllName) {
+        renderedSpecifiers.push(`* as ${importAllName}`);
         if (renderedNamedSpecifiers.length > 0) {
-          aliasLines.push(`const ${renderedNamedSpecifiers.join(', ')} = ${specifiers.all};`);
+          aliasLines.push(`const ${renderedNamedSpecifiers.join(', ')} = ${importAllName};`);
         }
       } else if (renderedNamedSpecifiers.length > 0) {
         renderedSpecifiers.push(`{ ${renderedNamedSpecifiers.join(', ')} }`);
@@ -388,7 +383,7 @@ class Context implements RenderContext {
     return Object.entries(this.page.state)
       .map(([key, state]) => {
         // TODO: figure out proper variable naming
-        return `const [_${key}, set_${key}] = React.useState(${JSON.stringify(
+        return `const [_${key}, set_${key}] = ${this.reactAlias}.useState(${JSON.stringify(
           state.initialValue,
         )});`;
       })

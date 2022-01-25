@@ -20,6 +20,41 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
+/**
+ * Represents a javascript scope and helpers to create variable bindings in it.
+ */
+class JavascriptScope {
+  parent: JavascriptScope | null = null;
+
+  bindings = new Set<string>();
+
+  constructor(parent: JavascriptScope | null = null) {
+    this.parent = parent;
+  }
+
+  addBinding(binding: string): void {
+    if (this.bindings.has(binding)) {
+      throw new Error(`There's already a binding in scope for "${binding}"`);
+    }
+    this.bindings.add(binding);
+  }
+
+  hasBinding(binding: string): boolean {
+    return this.bindings.has(binding) || (this.parent && this.parent.hasBinding(binding)) || false;
+  }
+
+  createUniqueBinding(suggestedName: string): string {
+    let index = 1;
+    let binding = suggestedName;
+    while (this.hasBinding(binding)) {
+      binding = `${suggestedName}${index}`;
+      index += 1;
+    }
+    this.addBinding(binding);
+    return binding;
+  }
+}
+
 interface Import {
   named: Map<string, string>;
   all?: string;
@@ -32,9 +67,13 @@ class Context implements RenderContext {
 
   private editor: boolean;
 
-  private imports: Map<string, Import>;
+  private imports = new Map<string, Import>();
 
   private dataLoaders: string[] = [];
+
+  private moduleScope: JavascriptScope;
+
+  private componentScope: JavascriptScope;
 
   constructor(
     dom: studioDom.StudioDom,
@@ -45,16 +84,13 @@ class Context implements RenderContext {
     this.page = page;
     this.editor = editor;
 
-    this.imports = new Map<string, Import>([
-      [
-        'react',
-        {
-          named: new Map([['default', 'React']]),
-        },
-      ],
-    ]);
+    this.moduleScope = new JavascriptScope(null);
+    this.componentScope = new JavascriptScope(this.moduleScope);
+
+    this.addImport('react', 'default', 'React');
 
     if (this.editor) {
+      // this.addImport('@mui/studio-core/runtime', '*', '__studioRuntime');
       this.imports.set('@mui/studio-core/runtime', {
         named: new Map(),
         all: '__studioRuntime',
@@ -291,7 +327,7 @@ class Context implements RenderContext {
    * Adds an import to the page module. Returns an identifier that's based on local that can
    * be used to reference the import.
    */
-  addImport(source: string, imported: string, localName: string = imported): string {
+  addImport(source: string, imported: string, suggestedName: string = imported): string {
     // TODO: introduce concept of scope and make sure local is unique
 
     let specifiers = this.imports.get(source);
@@ -301,42 +337,51 @@ class Context implements RenderContext {
     }
 
     const existing = specifiers.named.get(imported);
-    if (!existing) {
-      specifiers.named.set(imported, localName);
-    } else if (existing !== localName) {
-      // TODO: we can reassign to a local variable
-      throw new Error(
-        `Trying to import "${imported}" as "${localName}" but it is already imported as "${existing}"`,
-      );
+    if (existing) {
+      return existing;
     }
 
+    const localName = this.moduleScope.createUniqueBinding(suggestedName);
+    specifiers.named.set(imported, localName);
     return localName;
   }
 
   renderImports(): string {
-    return Array.from(this.imports.entries(), ([source, specifiers]) => {
+    const aliasLines: string[] = [];
+
+    const importLines = Array.from(this.imports.entries(), ([source, specifiers]) => {
       const renderedSpecifiers = [];
+      const renderedNamedSpecifiers = [];
+      // const importAll = specifiers.named.get('*')
+
       if (specifiers.named.size > 0) {
-        const renderedNamedSpecifiers = [];
         // eslint-disable-next-line no-restricted-syntax
         for (const [imported, local] of specifiers.named.entries()) {
           if (imported === 'default') {
             renderedSpecifiers.push(local);
           } else {
-            renderedNamedSpecifiers.push(imported === local ? imported : `${imported} as ${local}`);
+            renderedNamedSpecifiers.push(
+              imported === local
+                ? imported
+                : [imported, local].join(specifiers.all ? ': ' : ' as '),
+            );
           }
-        }
-
-        if (renderedNamedSpecifiers.length > 0) {
-          renderedSpecifiers.push(`{ ${renderedNamedSpecifiers.join(', ')} }`);
         }
       }
 
       if (specifiers.all) {
         renderedSpecifiers.push(`* as ${specifiers.all}`);
+        if (renderedNamedSpecifiers.length > 0) {
+          aliasLines.push(`const ${renderedNamedSpecifiers.join(', ')} = ${specifiers.all};`);
+        }
+      } else if (renderedNamedSpecifiers.length > 0) {
+        renderedSpecifiers.push(`{ ${renderedNamedSpecifiers.join(', ')} }`);
       }
+
       return `import ${renderedSpecifiers.join(', ')} from '${source}';`;
-    }).join('\n');
+    });
+
+    return [...importLines, ...aliasLines].join('\n');
   }
 
   renderStateHooks(): string {

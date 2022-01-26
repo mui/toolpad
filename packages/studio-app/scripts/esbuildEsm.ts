@@ -6,6 +6,12 @@ import path from 'path';
 import resolve from 'resolve';
 import fs from 'fs';
 
+function resolveAsync(id: string, options: resolve.AsyncOpts): Promise<string> {
+  return new Promise((_resolve, _reject) =>
+    resolve(id, options, (err, result) => (err ? _reject(err) : _resolve(result))),
+  );
+}
+
 function Resolver(): Plugin {
   const namespace = 'resolver';
 
@@ -13,15 +19,20 @@ function Resolver(): Plugin {
     name: namespace,
     setup({ onLoad, onResolve }) {
       const resolver = async (args: OnResolveArgs) => {
-        const resolved = resolve.sync(args.path, {
-          basedir: args.resolveDir,
-          packageFilter: (pkg) => {
-            pkg.main = pkg.module || pkg.main;
-            return pkg;
-          },
-        });
-        // resolved = path.relative(process.cwd(), resolved)
-        // console.log({ resolved })
+        let resolved;
+
+        try {
+          resolved = await resolveAsync(args.path, {
+            basedir: args.resolveDir,
+            packageFilter: (pkg) => {
+              pkg.main = pkg.module || pkg.main;
+              return pkg;
+            },
+          });
+        } catch (err) {
+          resolved = require.resolve(args.path);
+        }
+
         return {
           path: resolved,
           namespace,
@@ -61,7 +72,7 @@ build({
     'react-dom',
     'react-query',
     '@mui/studio-core',
-    // '@mui/studio-core/runtime',
+    '@mui/studio-core/runtime',
     '@mui/studio-components',
     '@mui/x-data-grid-pro',
     '@mui/material',

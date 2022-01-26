@@ -1,6 +1,8 @@
 import { ArgTypeDefinition } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
+import Imports from './codeGen/Imports';
+import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
 import {
@@ -20,11 +22,6 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
-interface Import {
-  named: Map<string, string>;
-  all?: string;
-}
-
 class Context implements RenderContext {
   private dom: studioDom.StudioDom;
 
@@ -32,9 +29,17 @@ class Context implements RenderContext {
 
   private editor: boolean;
 
-  private imports: Map<string, Import>;
+  private imports: Imports;
 
-  private dataLoaders: string[] = [];
+  private dataLoaders: { queryId: string; variable: string }[] = [];
+
+  private moduleScope: Scope;
+
+  private componentScope: Scope;
+
+  private reactAlias: string = 'undefined';
+
+  private runtimeAlias: string = 'undefined';
 
   constructor(
     dom: studioDom.StudioDom,
@@ -45,27 +50,21 @@ class Context implements RenderContext {
     this.page = page;
     this.editor = editor;
 
-    this.imports = new Map<string, Import>([
-      [
-        'react',
-        {
-          named: new Map([['default', 'React']]),
-        },
-      ],
-    ]);
+    this.moduleScope = new Scope(null);
+    this.componentScope = new Scope(this.moduleScope);
+    this.imports = new Imports(this.moduleScope);
+
+    this.reactAlias = this.addImport('react', 'default', 'React');
 
     if (this.editor) {
-      this.imports.set('@mui/studio-core/runtime', {
-        named: new Map(),
-        all: '__studioRuntime',
-      });
+      this.runtimeAlias = this.addImport('@mui/studio-core/runtime', '*', '__studioRuntime');
     }
   }
 
   useDataLoader(queryId: string): string {
-    this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
-    this.dataLoaders.push(queryId);
-    return `_${queryId}`;
+    const variable = this.componentScope.createUniqueBinding(queryId);
+    this.dataLoaders.push({ queryId, variable });
+    return variable;
   }
 
   getComponentDefinition(node: studioDom.StudioNode): StudioComponentDefinition | null {
@@ -176,9 +175,9 @@ class Context implements RenderContext {
             result[prop] = {
               type: 'jsxElement',
               value: `
-                <__studioRuntime.Slots prop=${JSON.stringify(prop)}>
+                <${this.runtimeAlias}.Slots prop=${JSON.stringify(prop)}>
                   ${existingProp ? this.renderJsxContent(existingProp) : ''}
-                </__studioRuntime.Slots>
+                </${this.runtimeAlias}.Slots>
               `,
             };
           } else if (argType.control?.type === 'slot') {
@@ -187,9 +186,9 @@ class Context implements RenderContext {
             result[prop] = {
               type: 'jsxElement',
               value: `
-                <__studioRuntime.Placeholder prop=${JSON.stringify(prop)}>
+                <${this.runtimeAlias}.Placeholder prop=${JSON.stringify(prop)}>
                   ${existingProp ? this.renderJsxContent(existingProp) : ''}
-                </__studioRuntime.Placeholder>
+                </${this.runtimeAlias}.Placeholder>
               `,
             };
           }
@@ -218,9 +217,9 @@ class Context implements RenderContext {
       type: 'jsxElement',
       value: this.editor
         ? `
-          <__studioRuntime.WrappedStudioNode id="${node.id}">
+          <${this.runtimeAlias}.WrappedStudioNode id="${node.id}">
             ${rendered}
-          </__studioRuntime.WrappedStudioNode>
+          </${this.runtimeAlias}.WrappedStudioNode>
         `
         : rendered,
     };
@@ -288,62 +287,22 @@ class Context implements RenderContext {
   }
 
   /**
-   * Adds an import to the page module. Returns an identifier that's based on local that can
+   * Adds an import to the page module. Returns an identifier that's based on [suggestedName] that can
    * be used to reference the import.
    */
-  addImport(source: string, imported: string, localName: string = imported): string {
-    // TODO: introduce concept of scope and make sure local is unique
-
-    let specifiers = this.imports.get(source);
-    if (!specifiers) {
-      specifiers = { named: new Map() };
-      this.imports.set(source, specifiers);
-    }
-
-    const existing = specifiers.named.get(imported);
-    if (!existing) {
-      specifiers.named.set(imported, localName);
-    } else if (existing !== localName) {
-      // TODO: we can reassign to a local variable
-      throw new Error(
-        `Trying to import "${imported}" as "${localName}" but it is already imported as "${existing}"`,
-      );
-    }
-
-    return localName;
-  }
-
-  renderImports(): string {
-    return Array.from(this.imports.entries(), ([source, specifiers]) => {
-      const renderedSpecifiers = [];
-      if (specifiers.named.size > 0) {
-        const renderedNamedSpecifiers = [];
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [imported, local] of specifiers.named.entries()) {
-          if (imported === 'default') {
-            renderedSpecifiers.push(local);
-          } else {
-            renderedNamedSpecifiers.push(imported === local ? imported : `${imported} as ${local}`);
-          }
-        }
-
-        if (renderedNamedSpecifiers.length > 0) {
-          renderedSpecifiers.push(`{ ${renderedNamedSpecifiers.join(', ')} }`);
-        }
-      }
-
-      if (specifiers.all) {
-        renderedSpecifiers.push(`* as ${specifiers.all}`);
-      }
-      return `import ${renderedSpecifiers.join(', ')} from '${source}';`;
-    }).join('\n');
+  addImport(
+    source: string,
+    imported: '*' | 'default' | string,
+    suggestedName: string = imported,
+  ): string {
+    return this.imports.add(source, imported, suggestedName);
   }
 
   renderStateHooks(): string {
     return Object.entries(this.page.state)
       .map(([key, state]) => {
         // TODO: figure out proper variable naming
-        return `const [_${key}, set_${key}] = React.useState(${JSON.stringify(
+        return `const [_${key}, set_${key}] = ${this.reactAlias}.useState(${JSON.stringify(
           state.initialValue,
         )});`;
       })
@@ -351,11 +310,39 @@ class Context implements RenderContext {
   }
 
   renderDataLoaderHooks(): string {
+    if (this.dataLoaders.length <= 0) {
+      return '';
+    }
+
+    const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
     return this.dataLoaders
-      .map((queryId) => {
-        return `const _${queryId} = useDataQuery(${JSON.stringify(queryId)});`;
-      })
+      .map(
+        ({ queryId, variable }) =>
+          `const ${variable} = ${useDataQuery}(${JSON.stringify(queryId)});`,
+      )
       .join('\n');
+  }
+
+  render() {
+    const root: string = this.renderRoot(this.page);
+    const stateHooks = this.renderStateHooks();
+    const dataQueryHooks = this.renderDataLoaderHooks();
+
+    this.imports.seal();
+
+    const imports = this.imports.render();
+
+    return `
+      ${imports}
+
+      export default function App () {
+        ${stateHooks}
+        ${dataQueryHooks}
+        return (
+          ${root}
+        );
+      }
+    `;
   }
 }
 
@@ -372,20 +359,9 @@ export default function renderPageCode(
 
   const page = studioDom.getNode(dom, pageNodeId);
   studioDom.assertIsPage(page);
+
   const ctx = new Context(dom, page, config);
-  const root: string = ctx.renderRoot(page);
-
-  let code: string = `
-    ${ctx.renderImports()}
-
-    export default function App () {
-      ${ctx.renderStateHooks()}
-      ${ctx.renderDataLoaderHooks()}
-      return (
-        ${root}
-      );
-    }
-  `;
+  let code: string = ctx.render();
 
   if (config.pretty) {
     code = prettier.format(code, {

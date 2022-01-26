@@ -1,11 +1,6 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
-import {
-  RUNTIME_PROP_NODE_ERROR,
-  RUNTIME_PROP_NODE_ID,
-  RUNTIME_PROP_STUDIO_SLOTS,
-  RUNTIME_PROP_STUDIO_SLOTS_TYPE,
-} from './constants.js';
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
 import type { SlotType } from './index';
 
 export const StudioNodeContext = React.createContext<string | null>(null);
@@ -17,7 +12,7 @@ export interface SlotsInternalProps {
   // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_STUDIO_SLOTS]: string;
   // eslint-disable-next-line react/no-unused-prop-types
-  [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: SlotType;
+  slotType: SlotType;
   // eslint-disable-next-line react/no-unused-prop-types
   parentId: string;
 }
@@ -52,71 +47,77 @@ export interface RuntimeError {
   stack?: string;
 }
 
-interface ComponentErrorBoundaryProps {
-  children?: React.ReactNode;
+export interface RuntimeStudioNodeProps {
+  children: React.ReactElement;
   nodeId: string;
 }
 
-interface ComponentErrorBoundaryState {
+interface RuntimeStudioNodeState {
   error: RuntimeError | null;
 }
 
-class ComponentErrorBoundary extends React.Component<
-  ComponentErrorBoundaryProps,
-  ComponentErrorBoundaryState
-> {
-  state: ComponentErrorBoundaryState;
+interface RuntimeNodeWrapperProps {
+  children: React.ReactElement;
+  [RUNTIME_PROP_NODE_ID]: string;
+  nodeError?: RuntimeError;
+}
 
-  constructor(props: ComponentErrorBoundaryProps) {
+// We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
+// represent StudioNodes. We use a wrapper to ensure only one element exists in the React tree
+// that has [RUNTIME_PROP_NODE_ID] property with this nodeId.
+// IMPORTANT! This node must directly wrap the React Element for the studioNode
+function RuntimeNodeWrapper({ children }: RuntimeNodeWrapperProps) {
+  return children;
+}
+
+export class RuntimeStudioNode extends React.Component<
+  RuntimeStudioNodeProps,
+  RuntimeStudioNodeState
+> {
+  state: RuntimeStudioNodeState;
+
+  constructor(props: RuntimeStudioNodeProps) {
     super(props);
     this.state = { error: null };
   }
 
-  static getDerivedStateFromError(error: Error): ComponentErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): RuntimeStudioNodeState {
     return { error: { message: error.message, stack: error.stack } };
   }
 
   render() {
     if (this.state.error) {
       return (
-        <span
+        <RuntimeNodeWrapper
           {...{
             [RUNTIME_PROP_NODE_ID]: this.props.nodeId,
-            [RUNTIME_PROP_NODE_ERROR]: this.state.error,
-          }}
-          style={{
-            display: 'inline-flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 8,
-            background: 'red',
-            color: 'white',
+            nodeError: this.state.error,
           }}
         >
-          <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
-        </span>
+          <span
+            style={{
+              display: 'inline-flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              padding: 8,
+              background: 'red',
+              color: 'white',
+            }}
+          >
+            <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
+          </span>
+        </RuntimeNodeWrapper>
       );
     }
 
-    return this.props.children;
+    return (
+      <StudioNodeContext.Provider value={this.props.nodeId}>
+        <RuntimeNodeWrapper {...{ [RUNTIME_PROP_NODE_ID]: this.props.nodeId }}>
+          {this.props.children}
+        </RuntimeNodeWrapper>
+      </StudioNodeContext.Provider>
+    );
   }
-}
-
-export interface RuntimeStudioNodeProps {
-  children: React.ReactElement;
-  id: string;
-}
-
-// We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
-// represent StudioNodes
-export function RuntimeStudioNode({ children, id }: RuntimeStudioNodeProps) {
-  return (
-    <StudioNodeContext.Provider value={id}>
-      <ComponentErrorBoundary nodeId={id}>
-        {React.cloneElement(children, { [RUNTIME_PROP_NODE_ID]: id })}
-      </ComponentErrorBoundary>
-    </StudioNodeContext.Provider>
-  );
 }
 
 export interface StudioRuntimeNode<P> {
@@ -162,7 +163,7 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_STUDIO_SLOTS]: prop,
-        [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
+        slotType: 'single',
       }}
     />
   );
@@ -184,7 +185,7 @@ export function Slots({ prop, children }: SlotsProps) {
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_STUDIO_SLOTS]: prop,
-        [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
+        slotType: 'multiple',
       }}
     >
       {children}

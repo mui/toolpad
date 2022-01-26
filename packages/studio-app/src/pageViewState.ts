@@ -1,8 +1,6 @@
 import {
   RUNTIME_PROP_NODE_ID,
   RUNTIME_PROP_STUDIO_SLOTS,
-  RUNTIME_PROP_STUDIO_SLOTS_TYPE,
-  RUNTIME_PROP_NODE_ERROR,
   SlotType,
   RuntimeError,
 } from '@mui/studio-core';
@@ -24,13 +22,15 @@ function getNodeViewState(
 ): NodeState | null {
   if (nodeId) {
     const rect = getRelativeOuterRect(viewElm, elm);
-    const error = fiber.memoizedProps?.[RUNTIME_PROP_NODE_ERROR] as RuntimeError | undefined;
+    const error = fiber.memoizedProps?.nodeError as RuntimeError | undefined;
+    // We get the props from the child fiber because the current fiber is for the wrapper element
+    const props = fiber.child?.memoizedProps ?? {};
 
     return {
       nodeId,
       error,
       rect,
-      props: fiber.memoizedProps ?? {},
+      props,
       slots: {},
     };
   }
@@ -90,7 +90,7 @@ export function getViewState(rootElm: HTMLElement): ViewState {
 
         const studioSlotName = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS] as string | undefined;
         if (studioSlotName) {
-          const slotType = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS_TYPE] as SlotType;
+          const slotType = fiber.memoizedProps.slotType as SlotType;
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
           const nodeViewState = viewState[parentId];
 

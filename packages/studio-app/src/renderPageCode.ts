@@ -217,7 +217,7 @@ class Context implements RenderContext {
       type: 'jsxElement',
       value: this.editor
         ? `
-          <${this.runtimeAlias}.RuntimeStudioNode id="${node.id}">
+          <${this.runtimeAlias}.RuntimeStudioNode nodeId="${node.id}">
             ${rendered}
           </${this.runtimeAlias}.RuntimeStudioNode>
         `

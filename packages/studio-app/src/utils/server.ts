@@ -4,11 +4,12 @@ export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export type MethodMap = Partial<Record<Method, NextApiHandler>>;
 
 export function createEndpoint(handlers: MethodMap): NextApiHandler {
-  return async (req, res) => {
+  return async (req, res): Promise<void> => {
     const handler = handlers[req.method as Method];
     if (handler) {
-      return handler(req, res);
+      await handler(req, res);
+      return;
     }
-    return res.status(404).end();
+    res.status(404).end();
   };
 }

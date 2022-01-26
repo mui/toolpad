@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
 import { Box, Button, Stack, TextField, Toolbar } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGridPro } from '@mui/x-data-grid-pro';
 import { useParams } from 'react-router-dom';
 import { DefaultNodeProps, NodeId, StudioConnection, StudioDataSourceClient } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
@@ -79,7 +79,7 @@ function ApiEditorContent<Q extends DefaultNodeProps>({ nodeId }: ApiEditorProps
         </Stack>
       </Box>
       <Box sx={{ flex: 1, overflow: 'hidden' }}>
-        <DataGrid rows={rows} columns={columns} key={columnsFingerPrint} />
+        <DataGridPro rows={rows} columns={columns} key={columnsFingerPrint} />
       </Box>
     </Box>
   ) : null;

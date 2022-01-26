@@ -54,17 +54,19 @@ export interface RpcResponse {
 function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
   return async (req, res) => {
     if (req.method !== 'POST') {
-      return res.status(405).end();
+      res.status(405).end();
+      return;
     }
     const { type, name, params } = req.body as RpcRequest;
     if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
       // This is important to avoid RCE
-      return res.status(404).end();
+      res.status(404).end();
+      return;
     }
     const method = definition[type][name];
     const context = { req, res };
     const result = await asyncLocalStorage.run(context, () => method(...params));
-    return res.json({ result });
+    res.json({ result });
   };
 }
 

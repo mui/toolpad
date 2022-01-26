@@ -14,6 +14,7 @@ import * as React from 'react';
 import { ArgTypeDefinitions, RuntimeError } from '@mui/studio-core';
 import CodeIcon from '@mui/icons-material/Code';
 import PageIcon from '@mui/icons-material/Web';
+import SourceIcon from '@mui/icons-material/Source';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
@@ -161,8 +162,16 @@ function DefaultPanel() {
         >
           View Page
         </Button>
-        <Button startIcon={<CodeIcon />} color="inherit" onClick={handleViewSource}>
+        <Button startIcon={<SourceIcon />} color="inherit" onClick={handleViewSource}>
           View Page Source
+        </Button>
+        <Button
+          startIcon={<CodeIcon />}
+          color="inherit"
+          component="a"
+          href={`/api/export/${state.nodeId}`}
+        >
+          Page Component
         </Button>
       </Stack>
       <Dialog fullWidth maxWidth="lg" onClose={handleViewedSourceDialogClose} open={!!viewedSource}>

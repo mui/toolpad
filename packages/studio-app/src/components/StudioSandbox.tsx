@@ -164,7 +164,6 @@ export default function StudioSandbox({
   }, [files, base, addFiles]);
 
   const error = Object.values(transformErrors)[0];
-  console.log(error);
 
   return error ? (
     <div className={className}>{error}</div>

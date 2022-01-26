@@ -1,6 +1,8 @@
 import { ArgTypeDefinition } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
+import Imports from './codeGen/Imports';
+import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
 import {
@@ -20,41 +22,6 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
-/**
- * Represents a javascript scope and helpers to create variable bindings in it.
- */
-class JavascriptScope {
-  parent: JavascriptScope | null = null;
-
-  bindings = new Set<string>();
-
-  constructor(parent: JavascriptScope | null = null) {
-    this.parent = parent;
-  }
-
-  addBinding(binding: string): void {
-    if (this.bindings.has(binding)) {
-      throw new Error(`There's already a binding in scope for "${binding}"`);
-    }
-    this.bindings.add(binding);
-  }
-
-  hasBinding(binding: string): boolean {
-    return this.bindings.has(binding) || (this.parent && this.parent.hasBinding(binding)) || false;
-  }
-
-  createUniqueBinding(suggestedName: string): string {
-    let index = 1;
-    let binding = /^\d/.test(suggestedName) ? `_${suggestedName}` : suggestedName;
-    while (this.hasBinding(binding)) {
-      binding = `${suggestedName}${index}`;
-      index += 1;
-    }
-    this.addBinding(binding);
-    return binding;
-  }
-}
-
 class Context implements RenderContext {
   private dom: studioDom.StudioDom;
 
@@ -62,19 +29,17 @@ class Context implements RenderContext {
 
   private editor: boolean;
 
-  private imports = new Map<string, Map<string, string>>();
+  private imports: Imports;
 
   private dataLoaders: { queryId: string; variable: string }[] = [];
 
-  private moduleScope: JavascriptScope;
+  private moduleScope: Scope;
 
-  private componentScope: JavascriptScope;
+  private componentScope: Scope;
 
   private reactAlias: string = 'undefined';
 
   private runtimeAlias: string = 'undefined';
-
-  private useDataQueryAlias: string = 'undefined';
 
   constructor(
     dom: studioDom.StudioDom,
@@ -85,8 +50,9 @@ class Context implements RenderContext {
     this.page = page;
     this.editor = editor;
 
-    this.moduleScope = new JavascriptScope(null);
-    this.componentScope = new JavascriptScope(this.moduleScope);
+    this.moduleScope = new Scope(null);
+    this.componentScope = new Scope(this.moduleScope);
+    this.imports = new Imports(this.moduleScope);
 
     this.reactAlias = this.addImport('react', 'default', 'React');
 
@@ -96,7 +62,6 @@ class Context implements RenderContext {
   }
 
   useDataLoader(queryId: string): string {
-    this.useDataQueryAlias = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
     const variable = this.componentScope.createUniqueBinding(queryId);
     this.dataLoaders.push({ queryId, variable });
     return variable;
@@ -330,56 +295,7 @@ class Context implements RenderContext {
     imported: '*' | 'default' | string,
     suggestedName: string = imported,
   ): string {
-    let specifiers = this.imports.get(source);
-    if (!specifiers) {
-      specifiers = new Map();
-      this.imports.set(source, specifiers);
-    }
-
-    const existing = specifiers.get(imported);
-    if (existing) {
-      return existing;
-    }
-
-    const localName = this.moduleScope.createUniqueBinding(suggestedName);
-    specifiers.set(imported, localName);
-    return localName;
-  }
-
-  renderImports(): string {
-    const aliasLines: string[] = [];
-
-    const importLines = Array.from(this.imports.entries(), ([source, specifiers]) => {
-      const renderedSpecifiers = [];
-      const renderedNamedSpecifiers = [];
-      const importAllName = specifiers.get('*');
-
-      if (specifiers.size > 0) {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [imported, local] of specifiers.entries()) {
-          if (imported === 'default') {
-            renderedSpecifiers.push(local);
-          } else if (imported !== '*') {
-            renderedNamedSpecifiers.push(
-              imported === local ? imported : [imported, local].join(importAllName ? ': ' : ' as '),
-            );
-          }
-        }
-      }
-
-      if (importAllName) {
-        renderedSpecifiers.push(`* as ${importAllName}`);
-        if (renderedNamedSpecifiers.length > 0) {
-          aliasLines.push(`const ${renderedNamedSpecifiers.join(', ')} = ${importAllName};`);
-        }
-      } else if (renderedNamedSpecifiers.length > 0) {
-        renderedSpecifiers.push(`{ ${renderedNamedSpecifiers.join(', ')} }`);
-      }
-
-      return `import ${renderedSpecifiers.join(', ')} from '${source}';`;
-    });
-
-    return [...importLines, ...aliasLines].join('\n');
+    return this.imports.add(source, imported, suggestedName);
   }
 
   renderStateHooks(): string {
@@ -394,11 +310,39 @@ class Context implements RenderContext {
   }
 
   renderDataLoaderHooks(): string {
+    if (this.dataLoaders.length <= 0) {
+      return '';
+    }
+
+    const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
     return this.dataLoaders
-      .map(({ queryId, variable }) => {
-        return `const ${variable} = ${this.useDataQueryAlias}(${JSON.stringify(queryId)});`;
-      })
+      .map(
+        ({ queryId, variable }) =>
+          `const ${variable} = ${useDataQuery}(${JSON.stringify(queryId)});`,
+      )
       .join('\n');
+  }
+
+  render() {
+    const root: string = this.renderRoot(this.page);
+    const stateHooks = this.renderStateHooks();
+    const dataQueryHooks = this.renderDataLoaderHooks();
+
+    this.imports.seal();
+
+    const imports = this.imports.render();
+
+    return `
+      ${imports}
+
+      export default function App () {
+        ${stateHooks}
+        ${dataQueryHooks}
+        return (
+          ${root}
+        );
+      }
+    `;
   }
 }
 
@@ -415,20 +359,9 @@ export default function renderPageCode(
 
   const page = studioDom.getNode(dom, pageNodeId);
   studioDom.assertIsPage(page);
+
   const ctx = new Context(dom, page, config);
-  const root: string = ctx.renderRoot(page);
-
-  let code: string = `
-    ${ctx.renderImports()}
-
-    export default function App () {
-      ${ctx.renderStateHooks()}
-      ${ctx.renderDataLoaderHooks()}
-      return (
-        ${root}
-      );
-    }
-  `;
+  let code: string = ctx.render();
 
   if (config.pretty) {
     code = prettier.format(code, {

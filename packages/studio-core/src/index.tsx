@@ -89,7 +89,7 @@ export interface ComponentDefinition<P> {
   argTypes: ArgTypeDefinitions<P>;
 }
 
-export type { PlaceholderProps, SlotsProps, StudioRuntimeNode } from './runtime';
+export type { PlaceholderProps, SlotsProps, StudioRuntimeNode, RuntimeError } from './runtime';
 export { Placeholder, Slots, useStudioNode } from './runtime';
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';

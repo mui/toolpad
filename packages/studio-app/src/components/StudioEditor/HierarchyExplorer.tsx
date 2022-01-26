@@ -13,6 +13,7 @@ import {
   SelectChangeEvent,
   TextField,
   Typography,
+  styled,
 } from '@mui/material';
 import * as React from 'react';
 import TreeItem, { useTreeItem, TreeItemContentProps } from '@mui/lab/TreeItem';
@@ -25,6 +26,10 @@ import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
 import { useDom, useDomApi } from '../DomProvider';
 import client from '../../api';
+
+const HierarchyExplorerRoot = styled('div')({
+  overflow: 'auto',
+});
 
 const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
   const { classes, className, label, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;
@@ -399,7 +404,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   );
 
   return (
-    <div className={className}>
+    <HierarchyExplorerRoot className={className}>
       <Button onClick={handleCreateApiDialogOpen}>New Api</Button>
       <Button onClick={handleCreatePageDialogOpen}>New Page</Button>
       <Button onClick={handleCreateCodeComponentDialogOpen}>New Component</Button>
@@ -448,6 +453,6 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
           ))}
         </TreeItem>
       </TreeView>
-    </div>
+    </HierarchyExplorerRoot>
   );
 }

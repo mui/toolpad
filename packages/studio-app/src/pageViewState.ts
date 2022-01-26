@@ -1,8 +1,8 @@
 import {
   RUNTIME_PROP_NODE_ID,
   RUNTIME_PROP_STUDIO_SLOTS,
-  RUNTIME_PROP_STUDIO_SLOTS_TYPE,
   SlotType,
+  RuntimeError,
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, NodeState, ViewState, FlowDirection } from './types';
@@ -22,10 +22,15 @@ function getNodeViewState(
 ): NodeState | null {
   if (nodeId) {
     const rect = getRelativeOuterRect(viewElm, elm);
+    const error = fiber.memoizedProps?.nodeError as RuntimeError | undefined;
+    // We get the props from the child fiber because the current fiber is for the wrapper element
+    const props = fiber.child?.memoizedProps ?? {};
+
     return {
       nodeId,
+      error,
       rect,
-      props: fiber.child?.memoizedProps ?? {},
+      props,
       slots: {},
     };
   }
@@ -63,8 +68,16 @@ export function getViewState(rootElm: HTMLElement): ViewState {
         }
 
         const studioNodeId = fiber.memoizedProps[RUNTIME_PROP_NODE_ID] as string | undefined;
+
         if (studioNodeId) {
           const nodeId: NodeId = studioNodeId as NodeId;
+          if (viewState[nodeId]) {
+            // We can get multiple fibers with the [RUNTIME_PROP_NODE_ID] if the component
+            // spreads its props. Let's assume the first we encounter is the one wrapped by
+            // the code generator and bail out on any subsequent ones.
+            return;
+          }
+
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {
             nodeElms.set(nodeId, elm);
@@ -77,7 +90,7 @@ export function getViewState(rootElm: HTMLElement): ViewState {
 
         const studioSlotName = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS] as string | undefined;
         if (studioSlotName) {
-          const slotType = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS_TYPE] as SlotType;
+          const slotType = fiber.memoizedProps.slotType as SlotType;
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
           const nodeViewState = viewState[parentId];
 

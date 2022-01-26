@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import { ArgTypeDefinition, ArgTypeDefinitions, SlotType } from '@mui/studio-core';
+import { ArgTypeDefinition, ArgTypeDefinitions, SlotType, RuntimeError } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
@@ -78,6 +78,7 @@ export interface NodeState {
     [key: string]: unknown;
   };
   slots: SlotsState;
+  error?: RuntimeError;
 }
 
 export interface ViewState {

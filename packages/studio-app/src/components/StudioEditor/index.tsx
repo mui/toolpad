@@ -13,9 +13,8 @@ import CodeComponentEditor from './CodeComponentEditor';
 
 const classes = {
   content: 'StudioContent',
-  componentPanel: 'StudioComponentPanel',
-  renderPanel: 'StudioRenderPanel',
-  pagePanel: 'StudioPagePanel',
+  hierarchyPanel: 'StudioHierarchyPanel',
+  editorPanel: 'StudioEditorPanel',
 };
 
 const EditorRoot = styled('div')(({ theme }) => ({
@@ -30,16 +29,12 @@ const EditorRoot = styled('div')(({ theme }) => ({
     flexDirection: 'row',
     overflow: 'hidden',
   },
-  [`& .${classes.pagePanel}`]: {
+  [`& .${classes.hierarchyPanel}`]: {
     width: 250,
     borderRight: `1px solid ${theme.palette.divider}`,
   },
-  [`& .${classes.renderPanel}`]: {
+  [`& .${classes.editorPanel}`]: {
     flex: 1,
-  },
-  [`& .${classes.componentPanel}`]: {
-    width: 300,
-    borderLeft: `1px solid ${theme.palette.divider}`,
   },
 }));
 
@@ -86,8 +81,8 @@ function EditorContent() {
         }
       />
       <div className={classes.content}>
-        <PagePanel className={classes.pagePanel} />
-        <FileEditor className={classes.renderPanel} />
+        <PagePanel className={classes.hierarchyPanel} />
+        <FileEditor className={classes.editorPanel} />
       </div>
     </EditorRoot>
   );

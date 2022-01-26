@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertTitle,
   Button,
   Dialog,
   DialogContent,
@@ -9,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinitions } from '@mui/studio-core';
+import { ArgTypeDefinitions, RuntimeError } from '@mui/studio-core';
 import CodeIcon from '@mui/icons-material/Code';
 import PageIcon from '@mui/icons-material/Web';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
@@ -59,6 +61,19 @@ function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorPro
   );
 }
 
+interface RuntimeErrorAlertProps {
+  error: RuntimeError;
+}
+
+function RuntimeErrorAlert({ error }: RuntimeErrorAlertProps) {
+  return (
+    <Alert severity="error" sx={{ overflow: 'auto' }}>
+      <AlertTitle>Error</AlertTitle>
+      <pre>{error.stack}</pre>
+    </Alert>
+  );
+}
+
 interface SelectedNodeEditorProps {
   node: studioDom.StudioElementNode;
 }
@@ -69,6 +84,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const { viewState } = usePageEditorState();
+  const nodeError = viewState[node.id]?.error;
   const actualValues = viewState[node.id]?.props ?? DEFAULT_ACTUAL_VALUES;
 
   const [nameInput, setNameInput] = React.useState(node.name);
@@ -107,8 +123,15 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         onBlur={handleNameCommit}
         onKeyPress={handleKeyPress}
       />
-      <div>props:</div>
-      {node ? <ComponentPropsEditor node={node} actualValues={actualValues} /> : null}
+      {/* eslint-disable-next-line no-nested-ternary */}
+      {nodeError ? (
+        <RuntimeErrorAlert error={nodeError} />
+      ) : node ? (
+        <React.Fragment>
+          <div>props:</div>
+          <ComponentPropsEditor node={node} actualValues={actualValues} />
+        </React.Fragment>
+      ) : null}
     </React.Fragment>
   );
 }

@@ -64,7 +64,9 @@ interface RuntimeNodeWrapperProps {
 
 // We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
 // represent StudioNodes. We use a wrapper to ensure only one element exists in the React tree
-// that has [RUNTIME_PROP_NODE_ID] property with this nodeId.
+// that has [RUNTIME_PROP_NODE_ID] property with this nodeId (We could clone the child and add
+// the prop, but the child may be spreading its props to other elements). We also don't want this
+// property to end up on DOM nodes.
 // IMPORTANT! This node must directly wrap the React Element for the studioNode
 function RuntimeNodeWrapper({ children }: RuntimeNodeWrapperProps) {
   return children;

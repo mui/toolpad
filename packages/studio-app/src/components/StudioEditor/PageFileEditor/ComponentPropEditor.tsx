@@ -62,6 +62,7 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
     if (propValue?.type === 'const') {
       return propValue.value;
     }
+
     return actualValue;
   }, [actualValue, propValue]);
 

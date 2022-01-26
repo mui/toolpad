@@ -1,11 +1,12 @@
-import { Box } from '@mui/material';
 import * as React from 'react';
+import ErrorIcon from '@mui/icons-material/Error';
 import {
+  RUNTIME_PROP_NODE_ERROR,
   RUNTIME_PROP_NODE_ID,
   RUNTIME_PROP_STUDIO_SLOTS,
   RUNTIME_PROP_STUDIO_SLOTS_TYPE,
 } from './constants.js';
-import type { ComponentDefinition, SlotType } from './index';
+import type { SlotType } from './index';
 
 export const StudioNodeContext = React.createContext<string | null>(null);
 
@@ -46,11 +47,18 @@ export function PlaceholderInternal(props: PlaceholderInternalProps) {
   );
 }
 
+export interface RuntimeError {
+  message: string;
+  stack?: string;
+}
+
 interface ComponentErrorBoundaryProps {
   children?: React.ReactNode;
+  nodeId: string;
 }
+
 interface ComponentErrorBoundaryState {
-  error: { message: string } | null;
+  error: RuntimeError | null;
 }
 
 class ComponentErrorBoundary extends React.Component<
@@ -64,31 +72,29 @@ class ComponentErrorBoundary extends React.Component<
     this.state = { error: null };
   }
 
-  static getDerivedStateFromError(error: Error) {
-    return { error: { message: error.message } };
-  }
-
-  componentDidUpdate(
-    prevProps: ComponentErrorBoundaryProps,
-    prevState: ComponentErrorBoundaryState,
-  ) {
-    if (prevState.error && !this.state.error) {
-      // TODO: signal the editor that the error has disappeared
-    }
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // TODO: signal the editor that an error has appeared
-    console.error(error, errorInfo);
+  static getDerivedStateFromError(error: Error): ComponentErrorBoundaryState {
+    return { error: { message: error.message, stack: error.stack } };
   }
 
   render() {
     if (this.state.error) {
       return (
-        <Box
-          sx={{ width: 60, height: 40, background: 'red', pointerEvents: 'initial' }}
-          title={this.state.error.message}
-        />
+        <span
+          {...{
+            [RUNTIME_PROP_NODE_ID]: this.props.nodeId,
+            [RUNTIME_PROP_NODE_ERROR]: this.state.error,
+          }}
+          style={{
+            display: 'inline-flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 8,
+            background: 'red',
+            color: 'white',
+          }}
+        >
+          <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
+        </span>
       );
     }
 
@@ -96,38 +102,20 @@ class ComponentErrorBoundary extends React.Component<
   }
 }
 
-interface WrappedStudioNodeInternalProps {
-  children: React.ReactElement;
-  [RUNTIME_PROP_NODE_ID]: string;
-  component?: ComponentDefinition<any>;
-}
-
-// We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect elements of this type
-// We will wrap any slot/slots props with elements that have a [RUNTIME_PROP_STUDIO_SLOTS] so
-// that we can detect these as well in the fibers.
-function WrappedStudioNodeInternal({
-  children,
-  [RUNTIME_PROP_NODE_ID]: studioNodeId,
-}: WrappedStudioNodeInternalProps) {
-  return (
-    <StudioNodeContext.Provider value={studioNodeId}>
-      <ComponentErrorBoundary>{children}</ComponentErrorBoundary>
-    </StudioNodeContext.Provider>
-  );
-}
-
-export interface WrappedStudioNodeProps {
+export interface RuntimeStudioNodeProps {
   children: React.ReactElement;
   id: string;
-  component?: ComponentDefinition<any>;
 }
 
-// Public interface with an `id` prop that will translate it into [RUNTIME_PROP_NODE_ID]
-export function WrappedStudioNode({ children, id, component }: WrappedStudioNodeProps) {
+// We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
+// represent StudioNodes
+export function RuntimeStudioNode({ children, id }: RuntimeStudioNodeProps) {
   return (
-    <WrappedStudioNodeInternal {...{ [RUNTIME_PROP_NODE_ID]: id, component }}>
-      {children}
-    </WrappedStudioNodeInternal>
+    <StudioNodeContext.Provider value={id}>
+      <ComponentErrorBoundary nodeId={id}>
+        {React.cloneElement(children, { [RUNTIME_PROP_NODE_ID]: id })}
+      </ComponentErrorBoundary>
+    </StudioNodeContext.Provider>
   );
 }
 

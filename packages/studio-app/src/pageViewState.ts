@@ -2,7 +2,9 @@ import {
   RUNTIME_PROP_NODE_ID,
   RUNTIME_PROP_STUDIO_SLOTS,
   RUNTIME_PROP_STUDIO_SLOTS_TYPE,
+  RUNTIME_PROP_NODE_ERROR,
   SlotType,
+  RuntimeError,
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, NodeState, ViewState, FlowDirection } from './types';
@@ -22,10 +24,13 @@ function getNodeViewState(
 ): NodeState | null {
   if (nodeId) {
     const rect = getRelativeOuterRect(viewElm, elm);
+    const error = fiber.memoizedProps?.[RUNTIME_PROP_NODE_ERROR] as RuntimeError | undefined;
+
     return {
       nodeId,
+      error,
       rect,
-      props: fiber.child?.memoizedProps ?? {},
+      props: fiber.memoizedProps ?? {},
       slots: {},
     };
   }
@@ -63,8 +68,16 @@ export function getViewState(rootElm: HTMLElement): ViewState {
         }
 
         const studioNodeId = fiber.memoizedProps[RUNTIME_PROP_NODE_ID] as string | undefined;
+
         if (studioNodeId) {
           const nodeId: NodeId = studioNodeId as NodeId;
+          if (viewState[nodeId]) {
+            // We can get multiple fibers with the [RUNTIME_PROP_NODE_ID] if the component
+            // spreads its props. Let's assume the first we encounter is the one wrapped by
+            // the code generator and bail out on any subsequent ones.
+            return;
+          }
+
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {
             nodeElms.set(nodeId, elm);

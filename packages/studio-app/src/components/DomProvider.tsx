@@ -272,6 +272,14 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         initialValue,
       });
     },
+    setNodeExpressionPropValue(nodeId: NodeId, prop: string, value: string) {
+      dispatch({
+        type: 'DOM_SET_NODE_PROP',
+        nodeId,
+        prop,
+        value: { type: 'expression', value },
+      });
+    },
     removeBinding(nodeId: NodeId, prop: string) {
       dispatch({
         type: 'DOM_REMOVE_BINDING',

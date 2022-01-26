@@ -11,9 +11,52 @@ import {
   RenderContext,
   ResolvedProps,
   StudioComponentDefinition,
+  StudioNodeProp,
   StudioNodeProps,
 } from './types';
 import { ExactEntriesOf } from './utils/types';
+
+function uncapitalize(str: string): string {
+  return str[0].toLowerCase() + str.slice(1);
+}
+
+function capitalize(str: string): string {
+  return str[0].toUpperCase() + str.slice(1);
+}
+
+function camelCase(...parts: string[]): string {
+  if (parts.length <= 0) {
+    return '';
+  }
+  const [first, ...rest] = parts;
+  return uncapitalize(first) + rest.map((part) => capitalize(part)).join('');
+}
+
+type ExpressionPart =
+  | {
+      type: 'literal';
+      value: string;
+    }
+  | {
+      type: 'binding';
+      id: string;
+    };
+
+function parseBindingExpression(expr: string): ExpressionPart[] {
+  const parts = expr.split(/{{\s*([a-zA-Z0-9.]+?)\s*}}/);
+  return parts.map((part, i) => {
+    if (i % 2 === 0) {
+      return {
+        type: 'literal',
+        value: part,
+      };
+    }
+    return {
+      type: 'binding',
+      id: part,
+    };
+  });
+}
 
 export interface RenderPageConfig {
   // whether we're in the context of an editor
@@ -40,6 +83,12 @@ class Context implements RenderContext {
   private reactAlias: string = 'undefined';
 
   private runtimeAlias: string = 'undefined';
+
+  private useStateHooks: {
+    [id in string]?: { state: string; setState: string; defaultValue?: unknown };
+  } = {};
+
+  private state: { [id: string]: string } = {};
 
   constructor(
     dom: studioDom.StudioDom,
@@ -77,6 +126,73 @@ class Context implements RenderContext {
     return null;
   }
 
+  collectState() {
+    const nodes = studioDom.getDescendants(this.dom, this.page);
+    nodes.forEach((node) => {
+      (Object.values(node.props) as StudioNodeProp<unknown>[]).forEach((prop) => {
+        if (prop?.type === 'expression') {
+          const parsedExpr = parseBindingExpression(prop.value);
+          parsedExpr.forEach((part) => {
+            if (part.type === 'binding') {
+              this.addState(part.id);
+            }
+          });
+        }
+      });
+    });
+  }
+
+  addState(id: string) {
+    const [nodeName, prop] = id.split('.');
+    const nodeId = studioDom.getNodeIdByName(this.dom, nodeName);
+
+    if (!nodeId) {
+      throw new Error(`Can't find node with name "${nodeName}"`);
+    }
+
+    const stateId = `${nodeId}.${prop}`;
+    let stateHook = this.useStateHooks[stateId];
+
+    if (!stateHook) {
+      const node = studioDom.getNode(this.dom, nodeId);
+
+      if (!studioDom.isElement(node)) {
+        // TODO: support other nodes
+        throw new Error(`Unsupported node type "${node.type}" in binding "${id}"`);
+      }
+
+      const component = this.getComponentDefinition(node);
+
+      if (!component) {
+        throw new Error(`Can't find component for node "${node.id}"`);
+      }
+
+      const argType = component.argTypes[prop];
+
+      if (!argType) {
+        throw new Error(`Can't find argType for "${node.name}.${prop}"`);
+      }
+
+      if (!argType.onChangeHandler) {
+        throw new Error(`"${node.name}.${prop}" is not a controlled property`);
+      }
+
+      const stateVarSuggestion = camelCase(nodeName, prop);
+      const state = this.componentScope.createUniqueBinding(stateVarSuggestion);
+
+      const setStateVarSuggestion = camelCase('set', nodeName, prop);
+      const setState = this.componentScope.createUniqueBinding(setStateVarSuggestion);
+
+      stateHook = {
+        state,
+        setState,
+        defaultValue: argType.defaultValue,
+      };
+      this.useStateHooks[stateId] = stateHook;
+      this.state[stateId] = state;
+    }
+  }
+
   /**
    * Resolves StudioNode properties to expressions we can render in the code.
    * This will set up databinding if necessary
@@ -94,6 +210,9 @@ class Context implements RenderContext {
           return;
         }
 
+        const stateId = `${node.id}.${propName}`;
+        const hook = this.useStateHooks[stateId];
+
         if (argDef.typeDef.type === 'dataQuery') {
           if (propValue.type !== 'const') {
             throw new Error(`TODO: make this work for bindings`);
@@ -101,6 +220,26 @@ class Context implements RenderContext {
           if (propValue.value && typeof propValue.value === 'string') {
             const spreadedValue = this.useDataLoader(propValue.value);
             result.$spread = `${result.$spread ? `${result.$spread} ` : ''}{...${spreadedValue}}`;
+          }
+        } else if (hook) {
+          result[propName] = {
+            type: 'expression',
+            value: hook.state,
+          };
+          if (argDef.onChangeProp) {
+            if (argDef.onChangeHandler) {
+              // TODO: React.useCallback for this one?
+              const { params, valueGetter } = argDef.onChangeHandler;
+              result[argDef.onChangeProp] = {
+                type: 'expression',
+                value: `(${params.join(', ')}) => ${hook.setState}(${valueGetter})`,
+              };
+            } else {
+              result[argDef.onChangeProp] = {
+                type: 'expression',
+                value: hook.setState,
+              };
+            }
           }
         } else if (propValue.type === 'const') {
           result[propName] = {
@@ -128,6 +267,26 @@ class Context implements RenderContext {
               };
             }
           }
+        } else if (propValue.type === 'expression') {
+          const parsedExpr = parseBindingExpression(propValue.value);
+          const resolvedExpr = parsedExpr.map((part) => {
+            if (part.type === 'binding') {
+              const [nodeName, prop, ...path] = part.id.split('.');
+              const nodeId = studioDom.getNodeIdByName(this.dom, nodeName);
+              const partStateId = `${nodeId}.${prop}`;
+              const baseState = this.state[partStateId];
+              const interpolated = path.length > 0 ? `${baseState}.${path.join('.')}` : baseState;
+              return `\${${interpolated}}`;
+            }
+            return part.value.replaceAll('`', '\\`');
+          });
+
+          const value = `\`${resolvedExpr.join('')}\``;
+
+          result[propName] = {
+            type: 'expression',
+            value,
+          };
         } else {
           throw new Error(`Invariant: Unkown prop type "${(propValue as any).type}"`);
         }
@@ -299,7 +458,7 @@ class Context implements RenderContext {
   }
 
   renderStateHooks(): string {
-    return Object.entries(this.page.state)
+    const legacyHooks = Object.entries(this.page.state)
       .map(([key, state]) => {
         // TODO: figure out proper variable naming
         return `const [_${key}, set_${key}] = ${this.reactAlias}.useState(${JSON.stringify(
@@ -307,6 +466,20 @@ class Context implements RenderContext {
         )});`;
       })
       .join('\n');
+
+    const hooks = Object.values(this.useStateHooks)
+      .map((state) => {
+        if (!state) {
+          return '';
+        }
+        // TODO: figure out proper variable naming
+        return `const [${state.state}, ${state.setState}] = ${
+          this.reactAlias
+        }.useState(${JSON.stringify(state.defaultValue)});`;
+      })
+      .join('\n');
+
+    return `${legacyHooks}\n${hooks}`;
   }
 
   renderDataLoaderHooks(): string {
@@ -324,6 +497,7 @@ class Context implements RenderContext {
   }
 
   render() {
+    this.collectState();
     const root: string = this.renderRoot(this.page);
     const stateHooks = this.renderStateHooks();
     const dataQueryHooks = this.renderDataLoaderHooks();

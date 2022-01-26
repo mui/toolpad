@@ -38,12 +38,17 @@ export interface StudioBoundProp {
   state: string;
 }
 
+export interface StudioExpressionProp {
+  type: 'expression';
+  value: string;
+}
+
 export interface StudioConstantProp<V> {
   type: 'const';
   value: V;
 }
 
-export type StudioNodeProp<V> = StudioConstantProp<V> | StudioBoundProp;
+export type StudioNodeProp<V> = StudioConstantProp<V> | StudioBoundProp | StudioExpressionProp;
 
 export type StudioNodeProps<P> = {
   readonly [K in keyof P]?: StudioNodeProp<P[K]>;

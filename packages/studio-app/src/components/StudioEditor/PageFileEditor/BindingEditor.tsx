@@ -9,6 +9,7 @@ import {
   ListItemButton,
   ListItemText,
   Stack,
+  TextField,
 } from '@mui/material';
 import React from 'react';
 import { getStudioComponent } from '../../../studioComponents';
@@ -24,12 +25,58 @@ export interface BindingEditorContentProps<K> {
   prop: K;
 }
 
-export interface BindingEditorTabProps<P, K extends keyof P & string> {
+interface AddExpressionEditorProps<P, K extends keyof P & string> {
   node: studioDom.StudioElementNode<P>;
   prop: K;
 }
 
-export function AddBindingEditor<P, K extends keyof P & string>({
+function AddExpressionEditor<P, K extends keyof P & string>({
+  node,
+  prop,
+}: AddExpressionEditorProps<P, K>) {
+  const dom = useDom();
+  const domApi = useDomApi();
+
+  const definition = getStudioComponent(dom, node.component);
+  const propDefinition = definition.argTypes[prop];
+
+  if (!propDefinition) {
+    throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
+  }
+  const argType = propDefinition.typeDef.type;
+
+  const nodeProp = node.props[prop];
+  const initialValue = nodeProp?.type === 'expression' ? nodeProp.value : '';
+  const [input, setInput] = React.useState(initialValue);
+
+  const handleBind = React.useCallback(() => {
+    domApi.setNodeExpressionPropValue(node.id, prop, input);
+  }, [domApi, node.id, prop, input]);
+
+  return (
+    <React.Fragment>
+      <DialogTitle>Bind a property</DialogTitle>
+
+      <DialogContent sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        Type: {argType}
+        <TextField value={input} onChange={(event) => setInput(event.target.value)} />
+      </DialogContent>
+
+      <DialogActions>
+        <Button disabled={!input} color="primary" onClick={handleBind}>
+          Bind Property
+        </Button>
+      </DialogActions>
+    </React.Fragment>
+  );
+}
+
+interface BindingEditorTabProps<P, K extends keyof P & string> {
+  node: studioDom.StudioElementNode<P>;
+  prop: K;
+}
+
+function AddBindingEditor<P, K extends keyof P & string>({
   node: srcNode,
   prop: srcProp,
 }: BindingEditorTabProps<P, K>) {
@@ -94,6 +141,7 @@ export function AddBindingEditor<P, K extends keyof P & string>({
   return (
     <React.Fragment>
       <DialogTitle>Bind a property</DialogTitle>
+
       <DialogContent sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div>Type: {srcType}</div>
         <List sx={{ flex: 1, overflow: 'scroll' }}>
@@ -118,13 +166,13 @@ export function AddBindingEditor<P, K extends keyof P & string>({
   );
 }
 
-export interface RemoveBindingEditorProps<P, K extends keyof P & string> {
+interface RemoveBindingEditorProps<P, K extends keyof P & string> {
   node: studioDom.StudioElementNode<P>;
   prop: K;
   propValue: StudioBoundProp;
 }
 
-export function RemoveBindingEditor<P, K extends keyof P & string>({
+function RemoveBindingEditor<P, K extends keyof P & string>({
   node,
   prop,
   propValue,
@@ -180,6 +228,8 @@ export function RemoveBindingEditor<P, K extends keyof P & string>({
   );
 }
 
+const EXPERIMENTAL_BINDING = true;
+
 export function BindingEditorContent<P, K extends keyof P & string>({
   nodeId,
   prop,
@@ -191,8 +241,11 @@ export function BindingEditorContent<P, K extends keyof P & string>({
   const propValue: StudioNodeProp<P[K]> | undefined = node.props[prop];
   const hasBinding = propValue?.type === 'binding';
 
+  // eslint-disable-next-line no-nested-ternary
   return hasBinding ? (
     <RemoveBindingEditor node={node} prop={prop} propValue={propValue} />
+  ) : EXPERIMENTAL_BINDING ? (
+    <AddExpressionEditor node={node} prop={prop} />
   ) : (
     <AddBindingEditor node={node} prop={prop} />
   );

@@ -608,3 +608,19 @@ export function setNodeAttribute<N extends StudioNode, K extends Attributes<N>>(
     }),
   });
 }
+
+const nodeByNameCache = new WeakMap<StudioDom, Map<string, NodeId>>();
+function getNodeIdByNameIndex(dom: StudioDom): Map<string, NodeId> {
+  let cached = nodeByNameCache.get(dom);
+  if (!cached) {
+    cached = new Map(Array.from(Object.values(dom.nodes), (node) => [node.name, node.id]));
+    nodeByNameCache.set(dom, cached);
+  }
+  return cached;
+}
+
+export function getNodeIdByName(dom: StudioDom, name: string): NodeId | null {
+  const index = getNodeIdByNameIndex(dom);
+  console.log(index);
+  return index.get(name) ?? null;
+}

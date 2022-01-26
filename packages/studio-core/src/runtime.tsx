@@ -7,7 +7,7 @@ export const StudioNodeContext = React.createContext<string | null>(null);
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.
-export interface SlotsInternalProps {
+interface SlotsWrapperProps {
   children?: React.ReactNode;
   // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_STUDIO_SLOTS]: string;
@@ -17,11 +17,11 @@ export interface SlotsInternalProps {
   parentId: string;
 }
 
-export function SlotsInternal({ children }: SlotsInternalProps) {
+function SlotsWrapper({ children }: SlotsWrapperProps) {
   return <React.Fragment>{children}</React.Fragment>;
 }
 
-export interface PlaceholderInternalProps {
+interface PlaceholderWrapperProps {
   // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_STUDIO_SLOTS]: string;
   // eslint-disable-next-line react/no-unused-prop-types
@@ -30,7 +30,7 @@ export interface PlaceholderInternalProps {
 
 // We want typescript to enforce these props, even when they're not used
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function PlaceholderInternal(props: PlaceholderInternalProps) {
+function PlaceholderWrapper(props: PlaceholderWrapperProps) {
   return (
     <div
       style={{
@@ -161,7 +161,7 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
   return count > 0 ? (
     <React.Fragment>{children}</React.Fragment>
   ) : (
-    <PlaceholderInternal
+    <PlaceholderWrapper
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_STUDIO_SLOTS]: prop,
@@ -183,7 +183,7 @@ export function Slots({ prop, children }: SlotsProps) {
   }
   const count = React.Children.count(children);
   return count > 0 ? (
-    <SlotsInternal
+    <SlotsWrapper
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_STUDIO_SLOTS]: prop,
@@ -191,7 +191,7 @@ export function Slots({ prop, children }: SlotsProps) {
       }}
     >
       {children}
-    </SlotsInternal>
+    </SlotsWrapper>
   ) : (
     <Placeholder prop={prop} />
   );

@@ -8,10 +8,8 @@ import { PageEditorProvider } from './PageEditorProvider';
 import { NodeId } from '../../../types';
 
 const classes = {
-  content: 'StudioContent',
   componentPanel: 'StudioComponentPanel',
   renderPanel: 'StudioRenderPanel',
-  pagePanel: 'StudioPagePanel',
 };
 
 const PageFileEditorRoot = styled('div')(({ theme }) => ({

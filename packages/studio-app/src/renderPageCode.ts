@@ -132,7 +132,8 @@ class Context implements RenderContext {
     const nodeId = studioDom.getNodeIdByName(this.dom, nodeName);
 
     if (!nodeId) {
-      throw new Error(`Can't find node with name "${nodeName}"`);
+      console.warn(`Can't find node with name "${nodeName}"`);
+      return;
     }
 
     const stateId = `${nodeId}.${prop}`;
@@ -252,7 +253,7 @@ class Context implements RenderContext {
             value,
           };
         } else {
-          throw new Error(`Invariant: Unkown prop type "${(propValue as any).type}"`);
+          console.warn(`Invariant: Unkown prop type "${(propValue as any).type}"`);
         }
       },
     );

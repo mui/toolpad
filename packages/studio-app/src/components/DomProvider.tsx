@@ -1,8 +1,7 @@
 import * as React from 'react';
 import * as studioDom from '../studioDom';
-import { NodeId, StudioNodeProp, StudioNodeProps } from '../types';
+import { NodeId, StudioBindingFormat, StudioNodeProp } from '../types';
 import { update, omit } from '../utils/immutability';
-import { generateUniqueId } from '../utils/randomId';
 import client from '../api';
 
 export type DomAction =
@@ -33,14 +32,6 @@ export type DomAction =
       nodeId: NodeId;
       attr: string;
       value: unknown;
-    }
-  | {
-      type: 'DOM_ADD_BINDING';
-      srcNodeId: NodeId;
-      srcProp: string;
-      destNodeId: NodeId;
-      destProp: string;
-      initialValue: string;
     }
   | {
       type: 'DOM_REMOVE_BINDING';
@@ -89,6 +80,7 @@ export function domReducer(state: DomState, action: DomAction): DomState {
       });
     }
     case 'DOM_SET_NODE_NAME': {
+      // TODO: Also update all bindings on the page that use this name
       const node = studioDom.getNode(state.dom, action.nodeId);
       return update(state, {
         dom: studioDom.setNodeName(state.dom, node, action.name),
@@ -129,51 +121,8 @@ export function domReducer(state: DomState, action: DomAction): DomState {
       });
     }
     case 'DOM_REMOVE_NODE': {
-      // TODO: also clean up orphaned state and bindings
       return update(state, {
         dom: studioDom.removeNode(state.dom, action.nodeId),
-      });
-    }
-    case 'DOM_ADD_BINDING': {
-      const { srcNodeId, srcProp, destNodeId, destProp, initialValue } = action;
-      const srcNode = studioDom.getNode(state.dom, srcNodeId);
-      studioDom.assertIsElement<Record<string, unknown>>(srcNode);
-      const destNode = studioDom.getNode(state.dom, destNodeId);
-      studioDom.assertIsElement(destNode);
-      const destPropValue = (destNode.props as StudioNodeProps<Record<string, unknown>>)[destProp];
-      let stateKey = destPropValue?.type === 'binding' ? destPropValue.state : null;
-
-      const page = studioDom.getElementPage(state.dom, srcNode);
-      if (!page) {
-        return state;
-      }
-
-      let pageState = page.state;
-      if (!stateKey) {
-        stateKey = generateUniqueId(new Set(Object.keys(page.state)));
-        pageState = update(pageState, {
-          [stateKey]: { name: '', initialValue },
-        });
-      }
-
-      return update(state, {
-        dom: update(state.dom, {
-          nodes: update(state.dom.nodes, {
-            [page.id]: update(page, {
-              state: pageState,
-            }),
-            [srcNodeId]: update(srcNode, {
-              props: update(srcNode.props, {
-                [srcProp]: { type: 'binding', state: stateKey },
-              }),
-            }),
-            [destNodeId]: update(destNode, {
-              props: update(destNode.props, {
-                [destProp]: { type: 'binding', state: stateKey },
-              }),
-            }),
-          }),
-        }),
       });
     }
     case 'DOM_REMOVE_BINDING': {
@@ -182,7 +131,6 @@ export function domReducer(state: DomState, action: DomAction): DomState {
       const node = studioDom.getNode(state.dom, nodeId);
       studioDom.assertIsElement(node);
 
-      // TODO: also clean up orphaned state and bindings
       return update(state, {
         dom: update(state.dom, {
           nodes: update(state.dom.nodes, {
@@ -256,20 +204,17 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         value,
       });
     },
-    addBinding(
-      srcNodeId: NodeId,
-      srcProp: string,
-      destNodeId: NodeId,
-      destProp: string,
-      initialValue: any,
+    setNodeExpressionPropValue(
+      nodeId: NodeId,
+      prop: string,
+      value: string,
+      format: StudioBindingFormat,
     ) {
       dispatch({
-        type: 'DOM_ADD_BINDING',
-        srcNodeId,
-        srcProp,
-        destNodeId,
-        destProp,
-        initialValue,
+        type: 'DOM_SET_NODE_PROP',
+        nodeId,
+        prop,
+        value: { type: 'binding', value, format },
       });
     },
     removeBinding(nodeId: NodeId, prop: string) {

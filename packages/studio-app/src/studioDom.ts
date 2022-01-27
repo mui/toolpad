@@ -1,6 +1,6 @@
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
-import { NodeId, StudioNodeProps, StudioStateDefinition } from './types';
+import { NodeId, StudioNodeProps } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { ExactEntriesOf } from './utils/types';
@@ -60,7 +60,6 @@ export interface StudioApiNode<P = {}> extends StudioNodeBase<P> {
 export interface StudioPageNode extends StudioNodeBase {
   readonly type: 'page';
   readonly title: string;
-  readonly state: Record<string, StudioStateDefinition>;
 }
 
 export interface StudioElementNode<P = {}> extends StudioNodeBase<P> {
@@ -607,4 +606,19 @@ export function setNodeAttribute<N extends StudioNode, K extends Attributes<N>>(
       [node.id]: update(node, updates),
     }),
   });
+}
+
+const nodeByNameCache = new WeakMap<StudioDom, Map<string, NodeId>>();
+function getNodeIdByNameIndex(dom: StudioDom): Map<string, NodeId> {
+  let cached = nodeByNameCache.get(dom);
+  if (!cached) {
+    cached = new Map(Array.from(Object.values(dom.nodes), (node) => [node.name, node.id]));
+    nodeByNameCache.set(dom, cached);
+  }
+  return cached;
+}
+
+export function getNodeIdByName(dom: StudioDom, name: string): NodeId | null {
+  const index = getNodeIdByNameIndex(dom);
+  return index.get(name) ?? null;
 }

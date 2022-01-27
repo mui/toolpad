@@ -27,15 +27,12 @@ export interface StudioPageBindings {
   [destNodeId: NodeId]: StudioNodeBindings | undefined;
 }
 
-export interface StudioStateDefinition {
-  name: string;
-  initialValue: any;
-  // TODO: state type?
-}
+export type StudioBindingFormat = 'stringLiteral' | 'default';
 
 export interface StudioBoundProp {
   type: 'binding';
-  state: string;
+  value: string;
+  format?: StudioBindingFormat;
 }
 
 export interface StudioConstantProp<V> {

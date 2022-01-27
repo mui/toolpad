@@ -78,6 +78,7 @@ export interface ArgTypeDefinition {
   control?: ArgControlSpec;
   onChangeProp?: string;
   onChangeHandler?: OnChangeHandler;
+  defaultValueProp?: string;
 }
 
 export type ArgTypeDefinitions<P = any> = {

@@ -14,23 +14,8 @@ import {
   StudioNodeProp,
   StudioNodeProps,
 } from './types';
+import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
-
-function uncapitalize(str: string): string {
-  return str[0].toLowerCase() + str.slice(1);
-}
-
-function capitalize(str: string): string {
-  return str[0].toUpperCase() + str.slice(1);
-}
-
-function camelCase(...parts: string[]): string {
-  if (parts.length <= 0) {
-    return '';
-  }
-  const [first, ...rest] = parts;
-  return uncapitalize(first) + rest.map((part) => capitalize(part)).join('');
-}
 
 type ExpressionPart =
   | {

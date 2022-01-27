@@ -27,17 +27,6 @@ export interface StudioPageBindings {
   [destNodeId: NodeId]: StudioNodeBindings | undefined;
 }
 
-export interface StudioStateDefinition {
-  name: string;
-  initialValue: any;
-  // TODO: state type?
-}
-
-export interface StudioBoundProp {
-  type: 'binding';
-  state: string;
-}
-
 export interface StudioExpressionProp {
   type: 'expression';
   value: string;
@@ -48,7 +37,7 @@ export interface StudioConstantProp<V> {
   value: V;
 }
 
-export type StudioNodeProp<V> = StudioConstantProp<V> | StudioBoundProp | StudioExpressionProp;
+export type StudioNodeProp<V> = StudioConstantProp<V> | StudioExpressionProp;
 
 export type StudioNodeProps<P> = {
   readonly [K in keyof P]?: StudioNodeProp<P[K]>;

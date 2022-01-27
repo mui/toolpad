@@ -43,12 +43,13 @@ function AddExpressionEditor<P, K extends keyof P & string>({
   const argType = propDefinition.typeDef.type;
 
   const nodeProp = node.props[prop];
-  const initialValue = nodeProp?.type === 'expression' ? nodeProp.value : '';
+  const initialValue = nodeProp?.type === 'binding' ? nodeProp.value : '';
   const [input, setInput] = React.useState(initialValue);
+  const format = argType === 'string' ? 'stringLiteral' : 'default';
 
   const handleBind = React.useCallback(() => {
-    domApi.setNodeExpressionPropValue(node.id, prop, input);
-  }, [domApi, node.id, prop, input]);
+    domApi.setNodeExpressionPropValue(node.id, prop, input, format);
+  }, [domApi, node.id, prop, input, format]);
 
   const handleRemove = React.useCallback(() => {
     domApi.removeBinding(node.id, prop);
@@ -137,10 +138,11 @@ function AddBindingEditor<P, K extends keyof P & string>({
   const [selection, setSelection] = React.useState<string | null>(null);
 
   const handleSelect = (bindableProp: string) => () => setSelection(bindableProp);
+  const format = srcType === 'string' ? 'stringLiteral' : 'default';
 
   const handleBind = React.useCallback(() => {
-    domApi.setNodeExpressionPropValue(srcNodeId, srcProp, `{{${selection}}}`);
-  }, [domApi, srcNodeId, srcProp, selection]);
+    domApi.setNodeExpressionPropValue(srcNodeId, srcProp, `{{${selection}}}`, format);
+  }, [domApi, srcNodeId, srcProp, selection, format]);
 
   return (
     <React.Fragment>
@@ -179,7 +181,7 @@ export function BindingEditorContent<P, K extends keyof P & string>({
   const node = studioDom.getNode(dom, nodeId);
   studioDom.assertIsElement<P>(node);
   const propValue: StudioNodeProp<P[K]> | undefined = node.props[prop];
-  const hasBinding = propValue?.type === 'expression';
+  const hasBinding = propValue?.type === 'binding';
 
   return hasBinding ? (
     <AddExpressionEditor node={node} prop={prop} />

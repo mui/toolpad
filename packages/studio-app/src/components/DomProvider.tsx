@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as studioDom from '../studioDom';
-import { NodeId, StudioNodeProp } from '../types';
+import { NodeId, StudioBindingFormat, StudioNodeProp } from '../types';
 import { update, omit } from '../utils/immutability';
 import client from '../api';
 
@@ -204,12 +204,17 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         value,
       });
     },
-    setNodeExpressionPropValue(nodeId: NodeId, prop: string, value: string) {
+    setNodeExpressionPropValue(
+      nodeId: NodeId,
+      prop: string,
+      value: string,
+      format: StudioBindingFormat,
+    ) {
       dispatch({
         type: 'DOM_SET_NODE_PROP',
         nodeId,
         prop,
-        value: { type: 'expression', value },
+        value: { type: 'binding', value, format },
       });
     },
     removeBinding(nodeId: NodeId, prop: string) {

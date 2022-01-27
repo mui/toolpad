@@ -16,17 +16,7 @@ import {
 } from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
-
-function parseBindingExpression(expr: string): string[] {
-  return expr.split(/{{\s*([a-zA-Z0-9.]+?)\s*}}/);
-}
-
-function toTemplateStringExpression(parts: string[]): string {
-  const transformedParts = parts.map((part, i) =>
-    i % 2 === 0 ? part.replaceAll('`', '\\`') : `\${${part}}`,
-  );
-  return `\`${transformedParts.join('')}\``;
-}
+import * as bindings from './utils/bindings';
 
 export interface RenderPageConfig {
   // whether we're in the context of an editor
@@ -100,13 +90,11 @@ class Context implements RenderContext {
     const nodes = studioDom.getDescendants(this.dom, this.page);
     nodes.forEach((node) => {
       (Object.values(node.props) as StudioNodeProp<unknown>[]).forEach((prop) => {
-        if (prop?.type === 'expression') {
-          const parsedExpr = parseBindingExpression(prop.value);
-          parsedExpr.forEach((part, i) => {
-            if (i % 2 === 1) {
-              this.addState(part);
-            }
-          });
+        if (prop?.type === 'binding') {
+          const parsedExpr = bindings.parse(prop.value);
+          bindings
+            .getInterpolations(parsedExpr)
+            .forEach((interpolation) => this.addState(interpolation));
         }
       });
     });
@@ -194,7 +182,7 @@ class Context implements RenderContext {
           }
         } else if (hook) {
           result[propName] = {
-            type: 'expression',
+            type: 'binding',
             value: hook.state,
           };
           if (argDef.onChangeProp) {
@@ -202,46 +190,37 @@ class Context implements RenderContext {
               // TODO: React.useCallback for this one?
               const { params, valueGetter } = argDef.onChangeHandler;
               result[argDef.onChangeProp] = {
-                type: 'expression',
+                type: 'binding',
                 value: `(${params.join(', ')}) => ${hook.setState}(${valueGetter})`,
               };
             } else {
               result[argDef.onChangeProp] = {
-                type: 'expression',
+                type: 'binding',
                 value: hook.setState,
               };
             }
           }
         } else if (propValue.type === 'const') {
           result[propName] = {
-            type: 'expression',
+            type: 'binding',
             value: JSON.stringify(propValue.value),
           };
-        } else if (propValue.type === 'expression') {
-          const parsedExpr = parseBindingExpression(propValue.value);
+        } else if (propValue.type === 'binding') {
+          const parsedExpr = bindings.parse(propValue.value);
 
           // Resolve each named variable to its resolved variable in code
-          const resolvedExpr = parsedExpr.map((part, i) => {
-            if (i % 2 === 1) {
-              const [nodeName, prop, ...path] = part.split('.');
-              const nodeId = studioDom.getNodeIdByName(this.dom, nodeName);
-              const partStateId = `${nodeId}.${prop}`;
-              const baseState = this.state[partStateId];
-              const interpolated = path.length > 0 ? `${baseState}.${path.join('.')}` : baseState;
-              return interpolated;
-            }
-            return part;
+          const resolvedExpr = bindings.resolve(parsedExpr, (part) => {
+            const [nodeName, prop, ...path] = part.split('.');
+            const nodeId = studioDom.getNodeIdByName(this.dom, nodeName);
+            const partStateId = `${nodeId}.${prop}`;
+            const baseState = this.state[partStateId];
+            return path.length > 0 ? `${baseState}.${path.join('.')}` : baseState;
           });
 
-          let value: string;
-          if (argDef.typeDef.type === 'string') {
-            value = toTemplateStringExpression(resolvedExpr);
-          } else {
-            value = resolvedExpr.join('');
-          }
+          const value = bindings.format(resolvedExpr, propValue.format);
 
           result[propName] = {
-            type: 'expression',
+            type: 'binding',
             value,
           };
         } else {
@@ -319,7 +298,7 @@ class Context implements RenderContext {
     const component = this.getComponentDefinition(node);
     if (!component) {
       return {
-        type: 'expression',
+        type: 'binding',
         value: 'null',
       };
     }
@@ -480,6 +459,8 @@ export default function renderPageCode(
 
   const ctx = new Context(dom, page, config);
   let code: string = ctx.render();
+
+  console.log(code);
 
   if (config.pretty) {
     code = prettier.format(code, {

@@ -27,9 +27,12 @@ export interface StudioPageBindings {
   [destNodeId: NodeId]: StudioNodeBindings | undefined;
 }
 
-export interface StudioExpressionProp {
-  type: 'expression';
+export type StudioBindingFormat = 'stringLiteral' | 'default';
+
+export interface StudioBoundProp {
+  type: 'binding';
   value: string;
+  format?: StudioBindingFormat;
 }
 
 export interface StudioConstantProp<V> {
@@ -37,7 +40,7 @@ export interface StudioConstantProp<V> {
   value: V;
 }
 
-export type StudioNodeProp<V> = StudioConstantProp<V> | StudioExpressionProp;
+export type StudioNodeProp<V> = StudioConstantProp<V> | StudioBoundProp;
 
 export type StudioNodeProps<P> = {
   readonly [K in keyof P]?: StudioNodeProp<P[K]>;
@@ -136,7 +139,7 @@ export interface JsxFragmentExpression {
  * Anything that can be inlined as the RHS of an assignment
  */
 export interface JsExpression {
-  type: 'expression';
+  type: 'binding';
   value: string;
 }
 

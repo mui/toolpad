@@ -162,15 +162,14 @@ class Context implements RenderContext {
   ): ResolvedProps {
     const result: ResolvedProps = resolvedChildren;
     const component = this.getComponentDefinition(node);
+
+    // User props
     (Object.entries(node.props) as ExactEntriesOf<StudioNodeProps<P>>).forEach(
       ([propName, propValue]) => {
         const argDef: ArgTypeDefinition | undefined = component?.argTypes[propName];
         if (!argDef || !propValue || typeof propName !== 'string' || result[propName]) {
           return;
         }
-
-        const stateId = `${node.id}.${propName}`;
-        const hook = this.useStateHooks[stateId];
 
         if (argDef.typeDef.type === 'dataQuery') {
           if (propValue.type !== 'const') {
@@ -180,29 +179,9 @@ class Context implements RenderContext {
             const spreadedValue = this.useDataLoader(propValue.value);
             result.$spread = `${result.$spread ? `${result.$spread} ` : ''}{...${spreadedValue}}`;
           }
-        } else if (hook) {
-          result[propName] = {
-            type: 'binding',
-            value: hook.state,
-          };
-          if (argDef.onChangeProp) {
-            if (argDef.onChangeHandler) {
-              // TODO: React.useCallback for this one?
-              const { params, valueGetter } = argDef.onChangeHandler;
-              result[argDef.onChangeProp] = {
-                type: 'binding',
-                value: `(${params.join(', ')}) => ${hook.setState}(${valueGetter})`,
-              };
-            } else {
-              result[argDef.onChangeProp] = {
-                type: 'binding',
-                value: hook.setState,
-              };
-            }
-          }
         } else if (propValue.type === 'const') {
           result[propName] = {
-            type: 'binding',
+            type: 'expression',
             value: JSON.stringify(propValue.value),
           };
         } else if (propValue.type === 'binding') {
@@ -220,7 +199,7 @@ class Context implements RenderContext {
           const value = bindings.format(resolvedExpr, propValue.format);
 
           result[propName] = {
-            type: 'binding',
+            type: 'expression',
             value,
           };
         } else {
@@ -228,6 +207,56 @@ class Context implements RenderContext {
         }
       },
     );
+
+    // Hooks
+    if (component) {
+      Object.entries(component.argTypes).forEach(([propName, argType]) => {
+        if (!argType) {
+          return;
+        }
+
+        const stateId = `${node.id}.${propName}`;
+        const hook = this.useStateHooks[stateId];
+
+        if (!hook) {
+          return;
+        }
+
+        result[propName] = {
+          type: 'expression',
+          value: hook.state,
+        };
+
+        if (argType.onChangeProp) {
+          if (argType.onChangeHandler) {
+            // TODO: React.useCallback for this?
+            const { params, valueGetter } = argType.onChangeHandler;
+            result[argType.onChangeProp] = {
+              type: 'expression',
+              value: `(${params.join(', ')}) => ${hook.setState}(${valueGetter})`,
+            };
+          } else {
+            result[argType.onChangeProp] = {
+              type: 'expression',
+              value: hook.setState,
+            };
+          }
+        }
+      });
+    }
+
+    // Default values
+    if (component) {
+      Object.entries(component.argTypes).forEach(([propName, argType]) => {
+        if (argType && argType.defaultValue !== undefined && !result[propName]) {
+          const defaultPropName = argType.defaultValueProp ?? propName;
+          result[defaultPropName] = {
+            type: 'expression',
+            value: JSON.stringify(argType.defaultValue),
+          };
+        }
+      });
+    }
 
     return result;
   }
@@ -298,7 +327,7 @@ class Context implements RenderContext {
     const component = this.getComponentDefinition(node);
     if (!component) {
       return {
-        type: 'binding',
+        type: 'expression',
         value: 'null',
       };
     }
@@ -459,8 +488,6 @@ export default function renderPageCode(
 
   const ctx = new Context(dom, page, config);
   let code: string = ctx.render();
-
-  console.log(code);
 
   if (config.pretty) {
     code = prettier.format(code, {

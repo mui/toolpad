@@ -24,6 +24,8 @@ export default {
         params: ['event'],
         valueGetter: 'event.target.value',
       },
+      defaultValue: '',
+      defaultValueProp: 'defaultValue',
     },
   },
 } as StudioComponentDefinition;

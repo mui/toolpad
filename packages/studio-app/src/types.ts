@@ -139,7 +139,7 @@ export interface JsxFragmentExpression {
  * Anything that can be inlined as the RHS of an assignment
  */
 export interface JsExpression {
-  type: 'binding';
+  type: 'expression';
   value: string;
 }
 

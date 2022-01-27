@@ -73,7 +73,7 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
     return () => {};
   }, [propValue, initPropValue]);
 
-  const hasBinding = propValue?.type === 'binding';
+  const hasBinding = propValue?.type === 'expression';
 
   return (
     <Stack direction="row" alignItems="flex-start">

@@ -246,27 +246,6 @@ class Context implements RenderContext {
             type: 'expression',
             value: JSON.stringify(propValue.value),
           };
-        } else if (propValue.type === 'binding') {
-          result[propName] = {
-            type: 'expression',
-            value: `_${propValue.state}`,
-          };
-          if (argDef.onChangeProp) {
-            const setStateIdentifier = `set_${propValue.state}`;
-            if (argDef.onChangeHandler) {
-              // TODO: React.useCallback for this one?
-              const { params, valueGetter } = argDef.onChangeHandler;
-              result[argDef.onChangeProp] = {
-                type: 'expression',
-                value: `(${params.join(', ')}) => ${setStateIdentifier}(${valueGetter})`,
-              };
-            } else {
-              result[argDef.onChangeProp] = {
-                type: 'expression',
-                value: setStateIdentifier,
-              };
-            }
-          }
         } else if (propValue.type === 'expression') {
           const parsedExpr = parseBindingExpression(propValue.value);
           const resolvedExpr = parsedExpr.map((part) => {
@@ -458,28 +437,15 @@ class Context implements RenderContext {
   }
 
   renderStateHooks(): string {
-    const legacyHooks = Object.entries(this.page.state)
-      .map(([key, state]) => {
-        // TODO: figure out proper variable naming
-        return `const [_${key}, set_${key}] = ${this.reactAlias}.useState(${JSON.stringify(
-          state.initialValue,
-        )});`;
-      })
-      .join('\n');
-
-    const hooks = Object.values(this.useStateHooks)
+    return Object.values(this.useStateHooks)
       .map((state) => {
         if (!state) {
           return '';
         }
-        // TODO: figure out proper variable naming
-        return `const [${state.state}, ${state.setState}] = ${
-          this.reactAlias
-        }.useState(${JSON.stringify(state.defaultValue)});`;
+        const defaultValue = JSON.stringify(state.defaultValue);
+        return `const [${state.state}, ${state.setState}] = ${this.reactAlias}.useState(${defaultValue});`;
       })
       .join('\n');
-
-    return `${legacyHooks}\n${hooks}`;
   }
 
   renderDataLoaderHooks(): string {

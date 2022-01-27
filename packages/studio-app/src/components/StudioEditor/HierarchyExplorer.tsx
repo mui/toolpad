@@ -224,7 +224,6 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
           e.preventDefault();
           const newNode = studioDom.createNode(dom, 'page', {
             title,
-            state: {},
             props: {},
           });
           const appNode = studioDom.getApp(dom);

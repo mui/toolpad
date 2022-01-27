@@ -1,6 +1,6 @@
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
-import { NodeId, StudioNodeProps, StudioStateDefinition } from './types';
+import { NodeId, StudioNodeProps } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { ExactEntriesOf } from './utils/types';
@@ -60,7 +60,6 @@ export interface StudioApiNode<P = {}> extends StudioNodeBase<P> {
 export interface StudioPageNode extends StudioNodeBase {
   readonly type: 'page';
   readonly title: string;
-  readonly state: Record<string, StudioStateDefinition>;
 }
 
 export interface StudioElementNode<P = {}> extends StudioNodeBase<P> {
@@ -621,6 +620,5 @@ function getNodeIdByNameIndex(dom: StudioDom): Map<string, NodeId> {
 
 export function getNodeIdByName(dom: StudioDom, name: string): NodeId | null {
   const index = getNodeIdByNameIndex(dom);
-  console.log(index);
   return index.get(name) ?? null;
 }

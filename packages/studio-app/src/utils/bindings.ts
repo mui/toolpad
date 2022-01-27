@@ -11,6 +11,9 @@ export function getInterpolations(parts: ParsedBinding): string[] {
 }
 
 function toTemplateStringExpression(parts: ParsedBinding): string {
+  if (parts.length === 3 && !parts[0] && !parts[2]) {
+    return parts[1];
+  }
   const transformedParts = parts.map((part, i) =>
     i % 2 === 0 ? part.replaceAll('`', '\\`') : `\${${part}}`,
   );

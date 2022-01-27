@@ -102,7 +102,11 @@ function getBindablePropsInScope(dom: studioDom.StudioDom, nodeId: NodeId, prop:
         throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
       }
       const destType = destPropDefinition.typeDef.type;
-      if ((destNode.id === node.id && destProp === prop) || destType !== srcType) {
+      if (
+        (destNode.id === node.id && destProp === prop) ||
+        destType !== srcType ||
+        !destPropDefinition.onChangeHandler
+      ) {
         return [];
       }
       return [`${destNode.name}.${destProp}`];

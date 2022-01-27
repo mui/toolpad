@@ -17,30 +17,15 @@ import {
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 
-type ExpressionPart =
-  | {
-      type: 'literal';
-      value: string;
-    }
-  | {
-      type: 'binding';
-      id: string;
-    };
+function parseBindingExpression(expr: string): string[] {
+  return expr.split(/{{\s*([a-zA-Z0-9.]+?)\s*}}/);
+}
 
-function parseBindingExpression(expr: string): ExpressionPart[] {
-  const parts = expr.split(/{{\s*([a-zA-Z0-9.]+?)\s*}}/);
-  return parts.map((part, i) => {
-    if (i % 2 === 0) {
-      return {
-        type: 'literal',
-        value: part,
-      };
-    }
-    return {
-      type: 'binding',
-      id: part,
-    };
-  });
+function toTemplateStringExpression(parts: string[]): string {
+  const transformedParts = parts.map((part, i) =>
+    i % 2 === 0 ? part.replaceAll('`', '\\`') : `\${${part}}`,
+  );
+  return `\`${transformedParts.join('')}\``;
 }
 
 export interface RenderPageConfig {
@@ -117,9 +102,9 @@ class Context implements RenderContext {
       (Object.values(node.props) as StudioNodeProp<unknown>[]).forEach((prop) => {
         if (prop?.type === 'expression') {
           const parsedExpr = parseBindingExpression(prop.value);
-          parsedExpr.forEach((part) => {
-            if (part.type === 'binding') {
-              this.addState(part.id);
+          parsedExpr.forEach((part, i) => {
+            if (i % 2 === 1) {
+              this.addState(part);
             }
           });
         }
@@ -234,19 +219,26 @@ class Context implements RenderContext {
           };
         } else if (propValue.type === 'expression') {
           const parsedExpr = parseBindingExpression(propValue.value);
-          const resolvedExpr = parsedExpr.map((part) => {
-            if (part.type === 'binding') {
-              const [nodeName, prop, ...path] = part.id.split('.');
+
+          // Resolve each named variable to its resolved variable in code
+          const resolvedExpr = parsedExpr.map((part, i) => {
+            if (i % 2 === 1) {
+              const [nodeName, prop, ...path] = part.split('.');
               const nodeId = studioDom.getNodeIdByName(this.dom, nodeName);
               const partStateId = `${nodeId}.${prop}`;
               const baseState = this.state[partStateId];
               const interpolated = path.length > 0 ? `${baseState}.${path.join('.')}` : baseState;
-              return `\${${interpolated}}`;
+              return interpolated;
             }
-            return part.value.replaceAll('`', '\\`');
+            return part;
           });
 
-          const value = `\`${resolvedExpr.join('')}\``;
+          let value: string;
+          if (argDef.typeDef.type === 'string') {
+            value = toTemplateStringExpression(resolvedExpr);
+          } else {
+            value = resolvedExpr.join('');
+          }
 
           result[propName] = {
             type: 'expression',

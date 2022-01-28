@@ -1,17 +1,21 @@
-import { ArgTypeDefinitions } from '@mui/studio-core';
+import { ArgTypeDefinitions, PrimitiveValueType, PrimitiveValueTypes } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
 import { NodeId, StudioNodeProps } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { ExactEntriesOf } from './utils/types';
 
-const ALLOWED_PARENTS = {
-  app: [],
-  theme: ['app'],
-  api: ['app'],
-  page: ['app'],
-  codeComponent: ['app'],
-  element: ['page', 'element'],
+const ALLOWED_CHILDREN = {
+  app: {
+    children: ['page', 'api', 'theme', 'codeComponent'],
+  },
+  page: {
+    children: ['element'],
+    state: ['derivedState'],
+  },
+  element: {
+    children: ['element'],
+  },
 } as const;
 
 export function createFractionalIndex(index1: string | null, index2: string | null) {
@@ -26,7 +30,14 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-type StudioNodeType = 'app' | 'theme' | 'api' | 'page' | 'element' | 'codeComponent';
+type StudioNodeType =
+  | 'app'
+  | 'theme'
+  | 'api'
+  | 'page'
+  | 'element'
+  | 'codeComponent'
+  | 'derivedState';
 
 export interface StudioNodeBase<P = {}> {
   readonly id: NodeId;
@@ -73,6 +84,14 @@ export interface StudioCodeComponentNode<P = {}> extends StudioNodeBase<P> {
   readonly argTypes: ArgTypeDefinitions;
 }
 
+export interface StudioDerivedStateNode<P = {}> extends StudioNodeBase<P> {
+  readonly type: 'derivedState';
+  readonly code: string;
+  readonly props: StudioNodeProps<P>;
+  readonly paramTypes: PrimitiveValueTypes<P>;
+  readonly returnType: PrimitiveValueType;
+}
+
 type StudioNodeOfType<K extends StudioNodeBase['type']> = {
   app: StudioAppNode;
   api: StudioApiNode;
@@ -80,6 +99,7 @@ type StudioNodeOfType<K extends StudioNodeBase['type']> = {
   page: StudioPageNode;
   element: StudioElementNode;
   codeComponent: StudioCodeComponentNode;
+  derivedState: StudioDerivedStateNode;
 }[K];
 
 export type StudioNode =
@@ -88,16 +108,38 @@ export type StudioNode =
   | StudioThemeNode
   | StudioPageNode
   | StudioElementNode
-  | StudioCodeComponentNode;
+  | StudioCodeComponentNode
+  | StudioDerivedStateNode;
 
-type AllowedParents = typeof ALLOWED_PARENTS;
-type ParentTypeOfType<T extends StudioNodeType> = AllowedParents[T][number];
-export type ParentOf<N extends StudioNode> = StudioNodeOfType<ParentTypeOfType<N['type']>> | null;
+type AllowedChildren = typeof ALLOWED_CHILDREN;
+type TypeOf<N extends StudioNode> = N['type'];
+type AllowedChildTypesOfType<T extends StudioNodeType> = T extends keyof AllowedChildren
+  ? AllowedChildren[T]
+  : {};
+type AllowedChildTypesOf<N extends StudioNode> = AllowedChildTypesOfType<TypeOf<N>>;
 
-type ChildTypeOfType<T extends StudioNodeType> = {
-  [K in keyof AllowedParents]: T extends AllowedParents[K][number] ? K : never;
-}[keyof AllowedParents];
-export type ChildOf<N extends StudioNode> = StudioNodeOfType<ChildTypeOfType<N['type']>>;
+export type ChildNodesOf<N extends StudioNode> = {
+  [K in keyof AllowedChildTypesOf<N>]: AllowedChildTypesOf<N>[K] extends readonly StudioNodeType[]
+    ? StudioNodeOfType<AllowedChildTypesOf<N>[K][number]>[]
+    : never;
+};
+
+type CombinedChildrenOf<T extends { readonly [K in string]: readonly StudioNodeType[] }> = {
+  [K in keyof T]: T[K][number];
+}[keyof T];
+
+type CombinedChildrenOfType<T extends StudioNodeType> = T extends keyof AllowedChildren
+  ? CombinedChildrenOf<AllowedChildren[T]>
+  : never;
+
+type CombinedAllowedChildren = {
+  [K in StudioNodeType]: CombinedChildrenOfType<K>;
+};
+
+type ParentTypeOfType<T extends StudioNodeType> = {
+  [K in StudioNodeType]: T extends CombinedAllowedChildren[K] ? K : never;
+}[StudioNodeType];
+export type ParentOf<N extends StudioNode> = StudioNodeOfType<ParentTypeOfType<TypeOf<N>>> | null;
 
 export interface StudioNodes {
   [id: NodeId]: StudioNode;
@@ -177,9 +219,7 @@ export function getApp(dom: StudioDom): StudioAppNode {
   return rootNode;
 }
 
-export interface NodeChildren<N extends StudioNode = any> {
-  [prop: string]: ChildOf<N>[] | undefined;
-}
+export type NodeChildren<N extends StudioNode = any> = ChildNodesOf<N>;
 
 // TODO: memoize the result of this function per dom in a WeakMap?
 const childrenMemo = new WeakMap<StudioDom, Map<NodeId, NodeChildren<any>>>();
@@ -195,9 +235,9 @@ export function getChildNodes<N extends StudioNode>(dom: StudioDom, parent: N): 
     result = {};
     domChildrenMemo.set(parent.id, result);
 
-    const allNodeChildren: ChildOf<N>[] = Object.values(dom.nodes).filter(
+    const allNodeChildren: StudioNode[] = Object.values(dom.nodes).filter(
       (node: StudioNode) => node.parentId === parent.id,
-    ) as ChildOf<N>[];
+    );
 
     // eslint-disable-next-line no-restricted-syntax
     for (const child of allNodeChildren) {
@@ -361,7 +401,9 @@ export function getDescendants(
 ): readonly StudioElementNode[];
 export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[];
 export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
-  const children = Object.values(getChildNodes(dom, node)).flat().filter(Boolean);
+  const children: readonly StudioNode[] = Object.values(getChildNodes(dom, node))
+    .flat()
+    .filter(Boolean);
   return [...children, ...children.flatMap((child) => getDescendants(dom, child))];
 }
 
@@ -430,31 +472,33 @@ export function setNodeProp<P, K extends keyof P>(
   });
 }
 
-function setNodeParent(
+function setNodeParent<N extends StudioNode>(
   dom: StudioDom,
-  node: StudioNode,
+  node: N,
   parentId: NodeId,
   parentProp: string,
   parentIndex?: string,
 ) {
   const parent = getNode(dom, parentId);
 
-  const allowedParents: readonly StudioNodeBase['type'][] = ALLOWED_PARENTS[node.type];
-  if (!allowedParents.includes(parent.type)) {
+  const allowedChildren: readonly StudioNodeType[] = (ALLOWED_CHILDREN as any)[
+    parent.type as StudioNodeType
+  ]?.[parentProp];
+  if (!allowedChildren.includes(node.type)) {
     throw new Error(
       `Node "${node.id}" of type "${node.type}" can't be added to a node of type "${parent.type}"`,
     );
   }
 
   if (!parentIndex) {
-    const siblings = getChildNodes(dom, parent)[parentProp] ?? [];
+    const siblings: readonly StudioNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
     const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
     parentIndex = createFractionalIndex(lastIndex, null);
   }
 
   return update(dom, {
     nodes: update(dom.nodes, {
-      [node.id]: update(node, {
+      [node.id]: update(node as StudioNode, {
         parentId,
         parentProp,
         parentIndex,

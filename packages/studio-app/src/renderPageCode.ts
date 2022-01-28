@@ -271,8 +271,13 @@ class Context implements RenderContext {
   renderNodeChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): ResolvedProps {
     const result: ResolvedProps = {};
     const nodeChildren = studioDom.getChildNodes(this.dom, node);
+
+    const renderableNodeChildren = studioDom.isPage(node)
+      ? { children: nodeChildren.children }
+      : nodeChildren;
+
     // eslint-disable-next-line no-restricted-syntax
-    for (const [prop, children] of Object.entries(nodeChildren)) {
+    for (const [prop, children] of Object.entries(renderableNodeChildren)) {
       if (children) {
         if (children.length === 1) {
           result[prop] = this.renderNode(children[0]);

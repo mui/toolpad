@@ -31,7 +31,7 @@ export interface ObjectValueType extends ValueTypeBase {
 
 export interface ArrayValueType extends ValueTypeBase {
   type: 'array';
-  items: PrimitiveValueType;
+  items?: PrimitiveValueType;
 }
 
 export interface ElementValueType extends ValueTypeBase {

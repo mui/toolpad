@@ -1,12 +1,10 @@
-import { Alert, IconButton, Stack } from '@mui/material';
+import { Alert, Stack } from '@mui/material';
 import * as React from 'react';
-import LinkIcon from '@mui/icons-material/Link';
-import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-core';
 import studioPropControls from '../../propertyControls';
 import * as studioDom from '../../../studioDom';
 import { useDomApi } from '../../DomProvider';
-import { usePageEditorApi } from './PageEditorProvider';
+import BindingEditor from './BindingEditor';
 
 function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
   switch (typeDef.type) {
@@ -40,17 +38,11 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
   argType,
   actualValue,
 }: ComponentPropEditorProps<P, K>) {
-  const api = usePageEditorApi();
   const domApi = useDomApi();
 
   const handleChange = React.useCallback(
     (value: any) => domApi.setNodeConstPropValue<P>(node, name, value),
     [domApi, node, name],
-  );
-
-  const handleClickBind = React.useCallback(
-    () => api.openBindingEditor(node.id, name),
-    [api, node.id, name],
   );
 
   const controlSpec = argType.control ?? getDefaultControl(argType.typeDef);
@@ -86,13 +78,7 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
             value={value}
             onChange={handleChange}
           />
-          <IconButton
-            size="small"
-            onClick={handleClickBind}
-            color={hasBinding ? 'primary' : 'inherit'}
-          >
-            {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
-          </IconButton>{' '}
+          <BindingEditor nodeId={node.id} prop={name} />
         </React.Fragment>
       ) : (
         <Alert severity="warning">

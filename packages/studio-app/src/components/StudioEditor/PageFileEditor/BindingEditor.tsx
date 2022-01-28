@@ -4,18 +4,19 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   List,
   ListItemButton,
   ListItemText,
   TextField,
 } from '@mui/material';
 import React from 'react';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
-import { NodeId, StudioNodeProp } from '../../../types';
-import useLatest from '../../../utils/useLatest';
+import { NodeId } from '../../../types';
 import { useDom, useDomApi } from '../../DomProvider';
-import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 
 export interface BindingEditorContentProps<K> {
   nodeId: NodeId;
@@ -176,32 +177,39 @@ function AddBindingEditor<P, K extends keyof P & string>({
   );
 }
 
-export function BindingEditorContent<P, K extends keyof P & string>({
+export interface BindingEditorProps<K extends string> {
+  nodeId: NodeId;
+  prop: K;
+}
+
+export default function BindingEditor<P = any>({
   nodeId,
   prop,
-}: BindingEditorContentProps<K>) {
+}: BindingEditorProps<keyof P & string>) {
   const dom = useDom();
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = React.useCallback(() => setOpen(true), []);
+  const handleClose = React.useCallback(() => setOpen(false), []);
 
   const node = studioDom.getNode(dom, nodeId);
   studioDom.assertIsElement<P>(node);
-  const propValue: StudioNodeProp<P[K]> | undefined = node.props[prop];
+  const propValue = node.props[prop];
+
   const hasBinding = propValue?.type === 'binding';
 
-  return hasBinding ? (
-    <AddExpressionEditor node={node} prop={prop} />
-  ) : (
-    <AddBindingEditor node={node} prop={prop} />
-  );
-}
-
-export default function BindingEditor() {
-  const state = usePageEditorState();
-  const api = usePageEditorApi();
-  const handleClose = React.useCallback(() => api.closeBindingEditor(), [api]);
-  const bindingEditorProps = useLatest(state.bindingEditor);
   return (
-    <Dialog onClose={handleClose} open={!!state.bindingEditor} fullWidth>
-      {bindingEditorProps ? <BindingEditorContent<any, any> {...bindingEditorProps} /> : null}
-    </Dialog>
+    <React.Fragment>
+      <IconButton size="small" onClick={handleOpen} color={hasBinding ? 'primary' : 'inherit'}>
+        {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
+      </IconButton>
+      <Dialog onClose={handleClose} open={open} fullWidth>
+        {hasBinding ? (
+          <AddExpressionEditor node={node} prop={prop} />
+        ) : (
+          <AddBindingEditor node={node} prop={prop} />
+        )}
+      </Dialog>
+    </React.Fragment>
   );
 }

@@ -10,6 +10,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  IconButton,
 } from '@mui/material';
 import React from 'react';
 import CodeIcon from '@mui/icons-material/Code';
@@ -18,18 +19,19 @@ import SourceIcon from '@mui/icons-material/Source';
 import Editor from '@monaco-editor/react';
 import { PropValueType, PrimitiveValueType } from '@mui/studio-core';
 import type * as monacoEditor from 'monaco-editor';
+import CloseIcon from '@mui/icons-material/Close';
 import renderPageCode from '../../../renderPageCode';
 import useLatest from '../../../utils/useLatest';
 import { useDom } from '../../DomProvider';
 import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { StudioNodeProps } from '../../../types';
-import { update } from '../../../utils/immutability';
+import { omit, update } from '../../../utils/immutability';
 
 const DERIVED_STATE_PARAMS = 'StudioDerivedStateParams';
 const DERIVED_STATE_RESULT = 'StudioDerivedStateResult';
 
-type ParamTypes<P> = {
+type ParamTypes<P = any> = {
   [K in keyof P & string]: PrimitiveValueType;
 };
 
@@ -40,7 +42,7 @@ interface DerivedStateNode<P = {}> {
   returnType: PrimitiveValueType;
 }
 
-interface DerivedStateEditorProps<P> extends WithControlledProp<DerivedStateNode<P>> {}
+interface DerivedStateEditorProps<P = any> extends WithControlledProp<DerivedStateNode<P>> {}
 
 function tsTypeForPropValueType(propValueType: PropValueType): string {
   switch (propValueType.type) {
@@ -98,11 +100,11 @@ function PropValueTypeSelector({ value, onChange, disabled }: PropValueTypeSelec
   );
 }
 
-function DerivedStateEditor<P>({ value, onChange }: DerivedStateEditorProps<P>) {
+function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
   const monacoRef = React.useRef<typeof monacoEditor>();
 
   const libSource = React.useMemo(() => {
-    const args = (Object.entries(value.paramTypes) as ExactEntriesOf<ParamTypes<P>>).map(
+    const args = (Object.entries(value.paramTypes) as ExactEntriesOf<ParamTypes>).map(
       ([propName, paramType]) => {
         const tsType = paramType ? tsTypeForPropValueType(paramType) : 'unknown';
         return `${propName}: ${tsType};`;
@@ -192,6 +194,18 @@ function DerivedStateEditor<P>({ value, onChange }: DerivedStateEditorProps<P>) 
     [onChange, value],
   );
 
+  const handlePropRemove = React.useCallback(
+    (propName: string) => () => {
+      onChange(
+        update(value, {
+          ...value,
+          paramTypes: omit(value.paramTypes, propName),
+        }),
+      );
+    },
+    [onChange, value],
+  );
+
   const handleReturnTypeChange = React.useCallback(
     (newReturnType: PrimitiveValueType) => {
       onChange(
@@ -207,7 +221,7 @@ function DerivedStateEditor<P>({ value, onChange }: DerivedStateEditorProps<P>) 
   return (
     <div>
       <Stack gap={1} my={1}>
-        {(Object.entries(value.paramTypes) as ExactEntriesOf<ParamTypes<P>>).map(
+        {(Object.entries(value.paramTypes) as ExactEntriesOf<ParamTypes>).map(
           ([propName, propType]) => {
             const isBound = !!value.props[propName];
             return (
@@ -218,6 +232,9 @@ function DerivedStateEditor<P>({ value, onChange }: DerivedStateEditorProps<P>) 
                   onChange={handlePropTypeChange(propName)}
                   disabled={isBound}
                 />
+                <IconButton onClick={handlePropRemove(propName)}>
+                  <CloseIcon />
+                </IconButton>
               </Stack>
             );
           },
@@ -261,8 +278,8 @@ function CreateDerivedStateDialog(props: DialogProps) {
     },
     props: {},
     code: `/**
-* TODO: comment explaining how to derive state...
-*/
+ * TODO: comment explaining how to derive state...
+ */
 
 export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DERIVED_STATE_RESULT} {
   return 'Hello World!';

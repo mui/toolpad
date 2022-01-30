@@ -11,6 +11,9 @@ import {
   MenuItem,
   Select,
   IconButton,
+  DialogActions,
+  List,
+  ListItem,
 } from '@mui/material';
 import React from 'react';
 import CodeIcon from '@mui/icons-material/Code';
@@ -22,11 +25,12 @@ import type * as monacoEditor from 'monaco-editor';
 import CloseIcon from '@mui/icons-material/Close';
 import renderPageCode from '../../../renderPageCode';
 import useLatest from '../../../utils/useLatest';
-import { useDom } from '../../DomProvider';
+import { useDom, useDomApi } from '../../DomProvider';
 import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
-import { StudioNodeProps } from '../../../types';
 import { omit, update } from '../../../utils/immutability';
+import * as studioDom from '../../../studioDom';
+import { NodeId } from '../../../types';
 
 const DERIVED_STATE_PARAMS = 'StudioDerivedStateParams';
 const DERIVED_STATE_RESULT = 'StudioDerivedStateResult';
@@ -35,14 +39,8 @@ type ParamTypes<P = any> = {
   [K in keyof P & string]: PrimitiveValueType;
 };
 
-interface DerivedStateNode<P = {}> {
-  code: string;
-  props: StudioNodeProps<P>;
-  paramTypes: ParamTypes<P>;
-  returnType: PrimitiveValueType;
-}
-
-interface DerivedStateEditorProps<P = any> extends WithControlledProp<DerivedStateNode<P>> {}
+interface DerivedStateEditorProps<P = any>
+  extends WithControlledProp<studioDom.StudioDerivedStateNode<P>> {}
 
 function tsTypeForPropValueType(propValueType: PropValueType): string {
   switch (propValueType.type) {
@@ -104,7 +102,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
   const monacoRef = React.useRef<typeof monacoEditor>();
 
   const libSource = React.useMemo(() => {
-    const args = (Object.entries(value.paramTypes) as ExactEntriesOf<ParamTypes>).map(
+    const args = (Object.entries(value.argTypes) as ExactEntriesOf<ParamTypes>).map(
       ([propName, paramType]) => {
         const tsType = paramType ? tsTypeForPropValueType(paramType) : 'unknown';
         return `${propName}: ${tsType};`;
@@ -118,7 +116,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
 
       declare type ${DERIVED_STATE_RESULT} = ${tsTypeForPropValueType(value.returnType)}
     `;
-  }, [value.paramTypes, value.returnType]);
+  }, [value.argTypes, value.returnType]);
 
   const libSourceDisposable = React.useRef<monacoEditor.IDisposable>();
   const setLibSource = React.useCallback(() => {
@@ -172,7 +170,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
     onChange(
       update(value, {
         ...value,
-        paramTypes: update(value.paramTypes, {
+        argTypes: update(value.argTypes, {
           [newPropName]: { type: 'string' },
         }),
       }),
@@ -185,7 +183,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
       onChange(
         update(value, {
           ...value,
-          paramTypes: update(value.paramTypes, {
+          argTypes: update(value.argTypes, {
             [propName]: newPropType,
           }),
         }),
@@ -199,7 +197,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
       onChange(
         update(value, {
           ...value,
-          paramTypes: omit(value.paramTypes, propName),
+          argTypes: omit(value.argTypes, propName),
         }),
       );
     },
@@ -221,7 +219,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
   return (
     <div>
       <Stack gap={1} my={1}>
-        {(Object.entries(value.paramTypes) as ExactEntriesOf<ParamTypes>).map(
+        {(Object.entries(value.argTypes) as ExactEntriesOf<ParamTypes>).map(
           ([propName, propType]) => {
             const isBound = !!value.props[propName];
             return (
@@ -246,7 +244,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
             size="small"
           />
           <Button
-            disabled={!newPropName || Object.keys(value.paramTypes).includes(newPropName)}
+            disabled={!newPropName || Object.keys(value.argTypes).includes(newPropName)}
             onClick={handleAddProp}
           >
             Add prop
@@ -270,28 +268,38 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
   );
 }
 
-function CreateDerivedStateDialog(props: DialogProps) {
-  const [input, setInput] = React.useState<DerivedStateNode>({
-    paramTypes: {},
-    returnType: {
-      type: 'string',
-    },
-    props: {},
-    code: `/**
- * TODO: comment explaining how to derive state...
- */
+interface EditDerivedStateDialogProps {
+  open: boolean;
+  onClose: () => void;
+  nodeId: NodeId;
+}
 
-export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DERIVED_STATE_RESULT} {
-  return 'Hello World!';
-}\n`,
-  });
+function EditDerivedStateDialog({ nodeId, open, onClose }: EditDerivedStateDialogProps) {
+  const dom = useDom();
+  const domApi = useDomApi();
+
+  const node = studioDom.getNode(dom, nodeId);
+  studioDom.assertIsDerivedState(node);
+
+  const [input, setInput] = React.useState<studioDom.StudioDerivedStateNode<any>>(node);
+  React.useEffect(() => setInput(node), [node]);
+
+  const handleSave = React.useCallback(() => {
+    domApi.saveNode(input);
+    onClose();
+  }, [domApi, input, onClose]);
 
   return (
-    <Dialog fullWidth maxWidth="lg" {...props}>
-      <DialogTitle>Create Derived State</DialogTitle>
+    <Dialog fullWidth maxWidth="lg" open={open} onClose={onClose}>
+      <DialogTitle>Edit Derived State ({input.id})</DialogTitle>
       <DialogContent>
         <DerivedStateEditor value={input} onChange={setInput} />
       </DialogContent>
+      <DialogActions>
+        <Button disabled={input === node} onClick={handleSave}>
+          Save
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
@@ -300,7 +308,7 @@ export default function PageOptionsPanel() {
   const dom = useDom();
   const state = usePageEditorState();
   const [viewedSource, setViewedSource] = React.useState<string | null>(null);
-  const [createStateDialogOpen, setCreateStateDialogOpen] = React.useState(false);
+  const domApi = useDomApi();
 
   const handleViewSource = React.useCallback(() => {
     const { code } = renderPageCode(dom, state.nodeId, { pretty: true });
@@ -309,8 +317,34 @@ export default function PageOptionsPanel() {
 
   const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
 
-  const handleCreateStateDialogOpen = React.useCallback(() => setCreateStateDialogOpen(true), []);
-  const handleCreateStateDialogClose = React.useCallback(() => setCreateStateDialogOpen(false), []);
+  const [editedStateNode, setEditedState] = React.useState<NodeId | null>(null);
+  const handleEditStateDialogClose = React.useCallback(() => setEditedState(null), []);
+
+  const page = studioDom.getNode(dom, state.nodeId);
+  studioDom.assertIsPage(page);
+  const stateNodes = studioDom.getChildNodes(dom, page).state ?? [];
+
+  const pageNodeId = state.nodeId;
+  const handleCreate = React.useCallback(() => {
+    const stateNode = studioDom.createNode(dom, 'derivedState', {
+      argTypes: {},
+      returnType: {
+        type: 'string',
+      },
+      props: {},
+      code: `/**
+ * TODO: comment explaining how to derive state...
+ */
+
+export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DERIVED_STATE_RESULT} {
+  return 'Hello World!';
+}\n`,
+    });
+    domApi.addNode(stateNode, pageNodeId, 'state');
+    setEditedState(stateNode.id);
+  }, [dom, domApi, pageNodeId]);
+
+  const lastEditedStateNode = useLatest(editedStateNode);
 
   // To keep it around during closing animation
   const dialogSourceContent = useLatest(viewedSource);
@@ -336,9 +370,18 @@ export default function PageOptionsPanel() {
         >
           Page Component
         </Button>
-        <Button color="inherit" onClick={handleCreateStateDialogOpen}>
+        <Button color="inherit" onClick={handleCreate}>
           create derived state
         </Button>
+        <List>
+          {stateNodes.map((stateNode) => {
+            return (
+              <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode.id)}>
+                {stateNode.name}
+              </ListItem>
+            );
+          })}
+        </List>
       </Stack>
       <Dialog fullWidth maxWidth="lg" open={!!viewedSource} onClose={handleViewedSourceDialogClose}>
         <DialogTitle>Page component</DialogTitle>
@@ -346,10 +389,13 @@ export default function PageOptionsPanel() {
           <pre>{dialogSourceContent}</pre>
         </DialogContent>
       </Dialog>
-      <CreateDerivedStateDialog
-        open={createStateDialogOpen}
-        onClose={handleCreateStateDialogClose}
-      />
+      {lastEditedStateNode ? (
+        <EditDerivedStateDialog
+          nodeId={lastEditedStateNode}
+          open={!!editedStateNode}
+          onClose={handleEditStateDialogClose}
+        />
+      ) : null}
     </div>
   );
 }

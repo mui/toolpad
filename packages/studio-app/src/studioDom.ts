@@ -9,6 +9,8 @@ const ALLOWED_CHILDREN = {
   app: {
     children: ['page', 'api', 'theme', 'codeComponent'],
   },
+  theme: {},
+  api: {},
   page: {
     children: ['element'],
     state: ['derivedState'],
@@ -16,6 +18,8 @@ const ALLOWED_CHILDREN = {
   element: {
     children: ['element'],
   },
+  codeComponent: {},
+  derivedState: {},
 } as const;
 
 export function createFractionalIndex(index1: string | null, index2: string | null) {
@@ -88,7 +92,7 @@ export interface StudioDerivedStateNode<P = {}> extends StudioNodeBase<P> {
   readonly type: 'derivedState';
   readonly code: string;
   readonly props: StudioNodeProps<P>;
-  readonly paramTypes: PrimitiveValueTypes<P>;
+  readonly argTypes: PrimitiveValueTypes<P>;
   readonly returnType: PrimitiveValueType;
 }
 
@@ -120,7 +124,7 @@ type AllowedChildTypesOf<N extends StudioNode> = AllowedChildTypesOfType<TypeOf<
 
 export type ChildNodesOf<N extends StudioNode> = {
   [K in keyof AllowedChildTypesOf<N>]: AllowedChildTypesOf<N>[K] extends readonly StudioNodeType[]
-    ? StudioNodeOfType<AllowedChildTypesOf<N>[K][number]>[]
+    ? StudioNodeOfType<AllowedChildTypesOf<N>[K][number]>[] | undefined
     : never;
 };
 
@@ -211,6 +215,16 @@ export function isElement<P>(node: StudioNode): node is StudioElementNode<P> {
 
 export function assertIsElement<P>(node: StudioNode): asserts node is StudioElementNode<P> {
   assertIsType<StudioElementNode>(node, 'element');
+}
+
+export function isDerivedState<P>(node: StudioNode): node is StudioDerivedStateNode<P> {
+  return isType<StudioDerivedStateNode>(node, 'derivedState');
+}
+
+export function assertIsDerivedState<P>(
+  node: StudioNode,
+): asserts node is StudioDerivedStateNode<P> {
+  assertIsType<StudioDerivedStateNode>(node, 'derivedState');
 }
 
 export function getApp(dom: StudioDom): StudioAppNode {
@@ -519,6 +533,16 @@ export function addNode(
   }
 
   return setNodeParent(dom, newNode, parentId, parentProp, parentIndex);
+}
+
+export function saveNode(dom: StudioDom, node: StudioNode) {
+  const nodeId = node.id;
+  const updates = omit(node, 'id', 'type', 'name', 'parentId', 'parentProp', 'parentIndex');
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [nodeId]: update(node, updates),
+    }),
+  });
 }
 
 export function moveNode(

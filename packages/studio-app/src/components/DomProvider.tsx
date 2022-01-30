@@ -55,6 +55,10 @@ export type DomAction =
   | {
       type: 'DOM_REMOVE_NODE';
       nodeId: NodeId;
+    }
+  | {
+      type: 'SAVE_NODE';
+      node: studioDom.StudioNode;
     };
 
 export function domReducer(state: DomState, action: DomAction): DomState {
@@ -125,6 +129,11 @@ export function domReducer(state: DomState, action: DomAction): DomState {
         dom: studioDom.removeNode(state.dom, action.nodeId),
       });
     }
+    case 'SAVE_NODE': {
+      return update(state, {
+        dom: studioDom.saveNode(state.dom, action.node),
+      });
+    }
     case 'DOM_REMOVE_BINDING': {
       const { nodeId, prop } = action;
 
@@ -172,6 +181,12 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parentId,
         parentProp,
         parentIndex,
+      });
+    },
+    saveNode(node: studioDom.StudioNode) {
+      dispatch({
+        type: 'SAVE_NODE',
+        node,
       });
     },
     removeNode(nodeId: NodeId) {

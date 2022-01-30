@@ -358,7 +358,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
       const node = studioDom.getNode(dom, selectedNodeId);
       if (studioDom.isElement(node)) {
         // TODO: sort out in-page selection
-        const page = studioDom.getElementPage(dom, node);
+        const page = studioDom.getPageAncestor(dom, node);
         if (page) {
           navigate(`/pages/${page.id}`);
         }

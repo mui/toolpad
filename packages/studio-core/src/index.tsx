@@ -67,8 +67,8 @@ export type PrimitiveValueType =
   | ObjectValueType
   | ArrayValueType;
 
-export type PrimitiveValueTypes<P = any> = {
-  [key in keyof P]: PrimitiveValueType;
+export type PrimitiveValueTypes = {
+  [key: string]: PrimitiveValueType;
 };
 
 export type PropValueType = PrimitiveValueType | ElementValueType | DataQueryValueType;

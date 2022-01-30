@@ -13,9 +13,10 @@ import {
 import React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
+import { PropValueType } from '@mui/studio-core';
 import { getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
-import { NodeId } from '../../../types';
+import { NodeId, StudioNodeProp } from '../../../types';
 import { useDom, useDomApi } from '../../DomProvider';
 
 export interface BindingEditorContentProps<K> {
@@ -23,27 +24,18 @@ export interface BindingEditorContentProps<K> {
   prop: K;
 }
 
-interface AddExpressionEditorProps<P, K extends keyof P & string> {
-  node: studioDom.StudioElementNode<P>;
-  prop: K;
+interface AddExpressionEditorProps {
+  node: studioDom.StudioNode;
+  prop: string;
+  propType: PropValueType;
 }
 
-function AddExpressionEditor<P, K extends keyof P & string>({
-  node,
-  prop,
-}: AddExpressionEditorProps<P, K>) {
-  const dom = useDom();
+function AddExpressionEditor({ node, prop, propType }: AddExpressionEditorProps) {
   const domApi = useDomApi();
 
-  const definition = getStudioComponent(dom, node.component);
-  const propDefinition = definition.argTypes[prop];
+  const argType = propType.type;
 
-  if (!propDefinition) {
-    throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
-  }
-  const argType = propDefinition.typeDef.type;
-
-  const nodeProp = node.props[prop];
+  const nodeProp: StudioNodeProp<any> = node.props[prop];
   const initialValue = nodeProp?.type === 'binding' ? nodeProp.value : '';
   const [input, setInput] = React.useState(initialValue);
   const format = argType === 'string' ? 'stringLiteral' : 'default';
@@ -75,70 +67,68 @@ function AddExpressionEditor<P, K extends keyof P & string>({
   );
 }
 
-function getBindablePropsInScope(dom: studioDom.StudioDom, nodeId: NodeId, prop: string) {
+function getBindablePropsInScope(
+  dom: studioDom.StudioDom,
+  nodeId: NodeId,
+  prop: string,
+  propType: PropValueType,
+): string[] {
   const node = studioDom.getNode(dom, nodeId);
-  if (!studioDom.isElement(node)) {
+  if (!studioDom.isElement(node) && !studioDom.isDerivedState(node)) {
     return [];
   }
-  const page = studioDom.getElementPage(dom, node);
+  const page = studioDom.getPageAncestor(dom, node);
   if (!page) {
     return [];
   }
 
-  const srcDefinition = getStudioComponent(dom, node.component);
-  const srcPropDefinition = srcDefinition.argTypes[prop];
-
-  if (!srcPropDefinition) {
-    throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
-  }
-  const srcType = srcPropDefinition.typeDef.type;
+  const srcType = propType.type;
 
   const nodes = studioDom.getDescendants(dom, page);
   return nodes.flatMap((destNode) => {
-    const destDefinition = getStudioComponent(dom, destNode.component);
+    if (studioDom.isElement(destNode)) {
+      const destDefinition = getStudioComponent(dom, destNode.component);
 
-    return Object.entries(destDefinition.argTypes).flatMap(([destProp]) => {
-      const destPropDefinition = destDefinition.argTypes[destProp];
-      if (!destPropDefinition) {
-        throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
-      }
-      const destType = destPropDefinition.typeDef.type;
-      if (
-        (destNode.id === node.id && destProp === prop) ||
-        destType !== srcType ||
-        !destPropDefinition.onChangeHandler
-      ) {
-        return [];
-      }
-      return [`${destNode.name}.${destProp}`];
-    });
+      return Object.entries(destDefinition.argTypes).flatMap(([destProp]) => {
+        const destPropDefinition = destDefinition.argTypes[destProp];
+        if (!destPropDefinition) {
+          throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
+        }
+        const destType = destPropDefinition.typeDef.type;
+        console.log(destProp);
+        if (
+          (destNode.id === node.id && destProp === prop) ||
+          destType !== srcType ||
+          !destPropDefinition.onChangeHandler
+        ) {
+          return [];
+        }
+        return [`${destNode.name}.${destProp}`];
+      });
+    }
+    if (studioDom.isDerivedState(destNode)) {
+      return [destNode.name];
+    }
+    return [];
   });
 }
 
-interface BindingEditorTabProps<P, K extends keyof P & string> {
-  node: studioDom.StudioElementNode<P>;
-  prop: K;
+interface BindingEditorTabProps {
+  node: studioDom.StudioNode;
+  prop: string;
+  propType: PropValueType;
 }
 
-function AddBindingEditor<P, K extends keyof P & string>({
-  node: srcNode,
-  prop: srcProp,
-}: BindingEditorTabProps<P, K>) {
+function AddBindingEditor({ node: srcNode, prop: srcProp, propType }: BindingEditorTabProps) {
   const dom = useDom();
   const domApi = useDomApi();
 
   const srcNodeId = srcNode.id;
-  const srcDefinition = getStudioComponent(dom, srcNode.component);
-  const srcPropDefinition = srcDefinition.argTypes[srcProp];
-
-  if (!srcPropDefinition) {
-    throw new Error(`Invariant: trying to bind an unknown property "${srcProp}"`);
-  }
-  const srcType = srcPropDefinition.typeDef.type;
+  const srcType = propType.type;
 
   const bindableProps = React.useMemo(() => {
-    return getBindablePropsInScope(dom, srcNodeId, srcProp);
-  }, [dom, srcNodeId, srcProp]);
+    return getBindablePropsInScope(dom, srcNodeId, srcProp, propType);
+  }, [dom, srcNodeId, srcProp, propType]);
 
   const [selection, setSelection] = React.useState<string | null>(null);
 
@@ -180,11 +170,13 @@ function AddBindingEditor<P, K extends keyof P & string>({
 export interface BindingEditorProps<K extends string> {
   nodeId: NodeId;
   prop: K;
+  propType: PropValueType;
 }
 
 export default function BindingEditor<P = any>({
   nodeId,
   prop,
+  propType,
 }: BindingEditorProps<keyof P & string>) {
   const dom = useDom();
 
@@ -193,8 +185,7 @@ export default function BindingEditor<P = any>({
   const handleClose = React.useCallback(() => setOpen(false), []);
 
   const node = studioDom.getNode(dom, nodeId);
-  studioDom.assertIsElement<P>(node);
-  const propValue = node.props[prop];
+  const propValue: StudioNodeProp<any> = node.props[prop];
 
   const hasBinding = propValue?.type === 'binding';
 
@@ -205,9 +196,9 @@ export default function BindingEditor<P = any>({
       </IconButton>
       <Dialog onClose={handleClose} open={open} fullWidth>
         {hasBinding ? (
-          <AddExpressionEditor node={node} prop={prop} />
+          <AddExpressionEditor node={node} prop={prop} propType={propType} />
         ) : (
-          <AddBindingEditor node={node} prop={prop} />
+          <AddBindingEditor node={node} prop={prop} propType={propType} />
         )}
       </Dialog>
     </React.Fragment>

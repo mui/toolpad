@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogProps,
   TextField,
   FormControl,
   InputLabel,
@@ -31,6 +30,7 @@ import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';
 import * as studioDom from '../../../studioDom';
 import { NodeId } from '../../../types';
+import BindingEditor from './BindingEditor';
 
 const DERIVED_STATE_PARAMS = 'StudioDerivedStateParams';
 const DERIVED_STATE_RESULT = 'StudioDerivedStateResult';
@@ -230,6 +230,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
                   onChange={handlePropTypeChange(propName)}
                   disabled={isBound}
                 />
+                <BindingEditor nodeId={value.id} prop={propName} propType={propType} />
                 <IconButton onClick={handlePropRemove(propName)}>
                   <CloseIcon />
                 </IconButton>

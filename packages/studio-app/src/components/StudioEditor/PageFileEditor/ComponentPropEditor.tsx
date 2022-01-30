@@ -78,7 +78,7 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
             value={value}
             onChange={handleChange}
           />
-          <BindingEditor nodeId={node.id} prop={name} />
+          <BindingEditor nodeId={node.id} prop={name} propType={argType.typeDef} />
         </React.Fragment>
       ) : (
         <Alert severity="warning">

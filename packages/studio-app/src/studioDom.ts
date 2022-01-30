@@ -43,7 +43,7 @@ type StudioNodeType =
   | 'codeComponent'
   | 'derivedState';
 
-export interface StudioNodeBase<P = {}> {
+export interface StudioNodeBase<P = any> {
   readonly id: NodeId;
   readonly type: StudioNodeType;
   readonly name: string;
@@ -92,7 +92,7 @@ export interface StudioDerivedStateNode<P = {}> extends StudioNodeBase<P> {
   readonly type: 'derivedState';
   readonly code: string;
   readonly props: StudioNodeProps<P>;
-  readonly argTypes: PrimitiveValueTypes<P>;
+  readonly argTypes: PrimitiveValueTypes;
   readonly returnType: PrimitiveValueType;
 }
 
@@ -409,11 +409,6 @@ export function createElement<P>(
   });
 }
 
-export function getDescendants(
-  dom: StudioDom,
-  node: StudioElementNode | StudioPageNode,
-): readonly StudioElementNode[];
-export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[];
 export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
   const children: readonly StudioNode[] = Object.values(getChildNodes(dom, node))
     .flat()
@@ -436,10 +431,13 @@ export function getPageAncestors(
     : [];
 }
 
-export function getElementPage(dom: StudioDom, node: StudioElementNode): StudioPageNode | null {
+export function getPageAncestor(
+  dom: StudioDom,
+  node: StudioElementNode | StudioDerivedStateNode,
+): StudioPageNode | null {
   const parent = getParent(dom, node);
   if (parent) {
-    return isPage(parent) ? parent : getElementPage(dom, parent);
+    return isPage(parent) ? parent : getPageAncestor(dom, parent);
   }
   return null;
 }

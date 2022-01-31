@@ -103,7 +103,7 @@ export interface StudioDerivedStateNode<P = {}> extends StudioNodeBase<P> {
 
 export interface StudioQueryStateNode<P = {}> extends StudioNodeBase<P> {
   readonly type: 'queryState';
-  readonly api: NodeId;
+  readonly api: NodeId | null;
   readonly props: StudioNodeProps<P>;
 }
 
@@ -256,7 +256,7 @@ export function getApp(dom: StudioDom): StudioAppNode {
 
 export type NodeChildren<N extends StudioNode = any> = ChildNodesOf<N>;
 
-// TODO: memoize the result of this function per dom in a WeakMap?
+// TODO: memoize the result of this function per dom in a WeakMap
 const childrenMemo = new WeakMap<StudioDom, Map<NodeId, NodeChildren<any>>>();
 export function getChildNodes<N extends StudioNode>(dom: StudioDom, parent: N): NodeChildren<N> {
   let domChildrenMemo = childrenMemo.get(dom);

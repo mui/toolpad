@@ -24,8 +24,8 @@ import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';
 import * as studioDom from '../../../studioDom';
-import { NodeId } from '../../../types';
-import BindingEditor from './BindingEditor';
+import { NodeId, StudioNodeProp } from '../../../types';
+import { BindingEditor } from './BindingEditor';
 
 const DERIVED_STATE_PARAMS = 'StudioDerivedStateParams';
 const DERIVED_STATE_RESULT = 'StudioDerivedStateResult';
@@ -89,6 +89,77 @@ function PropValueTypeSelector({ value, onChange, disabled }: PropValueTypeSelec
         <MenuItem value="boolean">boolean</MenuItem>
       </Select>
     </FormControl>
+  );
+}
+
+interface StudioNodePropsEditorProps extends WithControlledProp<PropValueTypes, 'argTypes'> {
+  nodeId: NodeId;
+}
+
+function StudioNodePropsEditor({ nodeId, argTypes, onArgTypesChange }: StudioNodePropsEditorProps) {
+  const dom = useDom();
+  const domApi = useDomApi();
+
+  const node = studioDom.getNode(dom, nodeId) as studioDom.StudioNodeBase<any>;
+
+  const handlePropValueChange = React.useCallback(
+    (propName: string) => (newValue: StudioNodeProp<any> | null) => {
+      if (newValue) {
+        domApi.setNodePropValue<any>(nodeId, propName, newValue);
+      }
+    },
+    [domApi, nodeId],
+  );
+
+  const handlePropTypeChange = React.useCallback(
+    (propName: string) => (newPropType: PropValueType) => {
+      onArgTypesChange(
+        update(argTypes, {
+          [propName]: newPropType,
+        }),
+      );
+    },
+    [onArgTypesChange, argTypes],
+  );
+
+  const handlePropRemove = React.useCallback(
+    (propName: string) => () => {
+      domApi.setNodePropValue<any>(nodeId, propName, null);
+      onArgTypesChange(omit(argTypes, propName));
+    },
+    [domApi, nodeId, onArgTypesChange, argTypes],
+  );
+
+  return (
+    <Stack>
+      {(Object.entries(argTypes) as ExactEntriesOf<PropValueTypes>).map(([propName, propType]) => {
+        if (!propType) {
+          return null;
+        }
+        const propValue: StudioNodeProp<any> | null = node.props[propName] ?? null;
+        const isBound = !!propValue;
+        return (
+          <Stack key={propName} direction="row" alignItems="center" gap={1}>
+            {propName}:
+            <PropValueTypeSelector
+              value={propType}
+              onChange={handlePropTypeChange(propName)}
+              disabled={isBound}
+            />
+            <BindingEditor
+              nodeId={nodeId}
+              prop={propName}
+              propType={propType}
+              value={propValue}
+              onChange={handlePropValueChange(propName)}
+            />
+            <IconButton onClick={handlePropRemove(propName)}>
+              <CloseIcon />
+            </IconButton>
+          </Stack>
+        );
+      })}
+    </Stack>
   );
 }
 
@@ -179,25 +250,12 @@ function EditDerivedStateDialog<P>({ nodeId, open, onClose }: EditDerivedStateDi
     setnewPropName('');
   }, [domApi, value, newPropName]);
 
-  const handlePropTypeChange = React.useCallback(
-    (propName: string) => (newPropType: PropValueType) => {
+  const handlePropTypesChange = React.useCallback(
+    (newPropTypes: PropValueTypes) => {
       domApi.setNodeAttribute<studioDom.StudioDerivedStateNode, 'argTypes'>(
         value,
         'argTypes',
-        update(value.argTypes, {
-          [propName]: newPropType,
-        }),
-      );
-    },
-    [domApi, value],
-  );
-
-  const handlePropRemove = React.useCallback(
-    (propName: string) => () => {
-      domApi.setNodeAttribute<studioDom.StudioDerivedStateNode, 'argTypes'>(
-        value,
-        'argTypes',
-        omit(value.argTypes, propName),
+        newPropTypes,
       );
     },
     [domApi, value],
@@ -223,28 +281,11 @@ function EditDerivedStateDialog<P>({ nodeId, open, onClose }: EditDerivedStateDi
       <DialogTitle>Edit Derived State ({nodeId})</DialogTitle>
       <DialogContent>
         <Stack gap={1} my={1}>
-          {(Object.entries(value.argTypes) as ExactEntriesOf<PropValueTypes>).map(
-            ([propName, propType]) => {
-              if (!propType) {
-                return null;
-              }
-              const isBound = !!value.props[propName as keyof P];
-              return (
-                <Stack key={propName} direction="row" alignItems="center" gap={1}>
-                  {propName}:
-                  <PropValueTypeSelector
-                    value={propType}
-                    onChange={handlePropTypeChange(propName)}
-                    disabled={isBound}
-                  />
-                  <BindingEditor nodeId={value.id} prop={propName} propType={propType} />
-                  <IconButton onClick={handlePropRemove(propName)}>
-                    <CloseIcon />
-                  </IconButton>
-                </Stack>
-              );
-            },
-          )}
+          <StudioNodePropsEditor
+            nodeId={value.id}
+            argTypes={value.argTypes}
+            onArgTypesChange={handlePropTypesChange}
+          />
           <Stack direction="row" alignItems="center" gap={1}>
             <TextField
               value={newPropName}

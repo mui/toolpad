@@ -20,7 +20,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
 import { NodeId, StudioNodeProp } from '../../../types';
-import { useDom, useDomApi } from '../../DomProvider';
+import { useDom } from '../../DomProvider';
 import { WithControlledProp } from '../../../utils/types';
 
 export interface BindingEditorContentProps<K> {
@@ -166,22 +166,26 @@ function AddBindingEditor({
   );
 }
 
-export interface BindingEditor2Props<K extends string>
+export interface BindingEditorProps<K extends string>
   extends WithControlledProp<StudioNodeProp<unknown> | null> {
   nodeId: NodeId;
   prop: K;
   propType: PropValueType;
 }
 
-export function BindingEditor2<P = any>({
+export function BindingEditor<P = any>({
   nodeId,
   prop,
   propType,
   value,
   onChange,
-}: BindingEditor2Props<keyof P & string>) {
+}: BindingEditorProps<keyof P & string>) {
   const dom = useDom();
   const node = studioDom.getNode(dom, nodeId);
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = React.useCallback(() => setOpen(true), []);
+  const handleClose = React.useCallback(() => setOpen(false), []);
 
   const [bindingType, setBindingType] = React.useState<'binding' | 'boundExpression'>(
     value?.type === 'boundExpression' ? 'boundExpression' : 'binding',
@@ -191,60 +195,14 @@ export function BindingEditor2<P = any>({
     [value?.type],
   );
 
-  return (
-    <TabContext value={bindingType}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <TabList onChange={(event, newValue) => setBindingType(newValue)}>
-          <Tab label="Binding" value="binding" />
-          <Tab label="Expression" value="boundExpression" />
-        </TabList>
-      </Box>
-      <TabPanel value="binding">
-        <AddBindingEditor
-          node={node}
-          prop={prop}
-          propType={propType}
-          value={value}
-          onChange={onChange}
-        />
-      </TabPanel>
-      <TabPanel value="boundExpression">
-        <BoundExpressionEditor propType={propType} value={value} onChange={onChange} />
-      </TabPanel>
-    </TabContext>
-  );
-}
+  const hasBinding = value?.type === 'boundExpression' || value?.type === 'binding';
 
-export interface BindingEditorProps<K extends string> {
-  nodeId: NodeId;
-  prop: K;
-  propType: PropValueType;
-}
-
-export default function BindingEditor<P = any>({
-  nodeId,
-  prop,
-  propType,
-}: BindingEditorProps<keyof P & string>) {
-  const dom = useDom();
-  const domApi = useDomApi();
-
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = React.useCallback(() => setOpen(true), []);
-  const handleClose = React.useCallback(() => setOpen(false), []);
-
-  const node = studioDom.getNode(dom, nodeId);
-  const propValue: StudioNodeProp<unknown> | null =
-    (node as studioDom.StudioNodeBase<P>).props[prop] ?? null;
-
-  const hasBinding = propValue?.type === 'boundExpression' || propValue?.type === 'binding';
-
-  const handleBind = React.useCallback(
-    (newValue) => {
-      domApi.setNodePropValue<P>(nodeId, prop, newValue);
+  const handleChange = React.useCallback(
+    (newValue: StudioNodeProp<unknown> | null) => {
+      onChange(newValue);
       handleClose();
     },
-    [domApi, nodeId, prop, handleClose],
+    [onChange, handleClose],
   );
 
   return (
@@ -253,13 +211,26 @@ export default function BindingEditor<P = any>({
         {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
       </IconButton>
       <Dialog onClose={handleClose} open={open} fullWidth>
-        <BindingEditor2
-          nodeId={nodeId}
-          prop={prop}
-          propType={propType}
-          value={propValue}
-          onChange={handleBind}
-        />
+        <TabContext value={bindingType}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <TabList onChange={(event, newValue) => setBindingType(newValue)}>
+              <Tab label="Binding" value="binding" />
+              <Tab label="Expression" value="boundExpression" />
+            </TabList>
+          </Box>
+          <TabPanel value="binding">
+            <AddBindingEditor
+              node={node}
+              prop={prop}
+              propType={propType}
+              value={value}
+              onChange={handleChange}
+            />
+          </TabPanel>
+          <TabPanel value="boundExpression">
+            <BoundExpressionEditor propType={propType} value={value} onChange={handleChange} />
+          </TabPanel>
+        </TabContext>
       </Dialog>
     </React.Fragment>
   );

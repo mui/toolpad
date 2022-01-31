@@ -21,6 +21,7 @@ function resolveStudioDir({ _: positional = [] }: { _?: string[] }): string {
 
 const STUDIO_DIR = resolveStudioDir(args);
 const DEV_MODE = args['--dev'];
+// const GOOGLE_SHEETS_CLIENT_ID = process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_ID;
 const NEXT_CMD = DEV_MODE ? 'dev' : 'start';
 
 console.log(`Starting Studio in "${STUDIO_DIR}"`);

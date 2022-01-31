@@ -18,35 +18,27 @@ import { getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
 import { NodeId, StudioNodeProp } from '../../../types';
 import { useDom, useDomApi } from '../../DomProvider';
+import { WithControlledProp } from '../../../utils/types';
 
 export interface BindingEditorContentProps<K> {
   nodeId: NodeId;
   prop: K;
 }
 
-interface AddExpressionEditorProps<P> {
-  node: studioDom.StudioNodeBase<P>;
-  prop: keyof P & string;
+interface EditExpressionEditorProps extends WithControlledProp<StudioNodeProp<unknown> | null> {
   propType: PropValueType;
 }
 
-function AddExpressionEditor<P>({ node, prop, propType }: AddExpressionEditorProps<P>) {
-  const domApi = useDomApi();
-
+function EditExpressionEditor({ propType, value, onChange }: EditExpressionEditorProps) {
   const argType = propType.type;
 
-  const nodeProp: StudioNodeProp<any> | undefined = node.props[prop];
-  const initialValue = nodeProp?.type === 'binding' ? nodeProp.value : '';
+  const initialValue = value?.type === 'binding' ? value.value : '';
   const [input, setInput] = React.useState(initialValue);
   const format = argType === 'string' ? 'stringLiteral' : 'default';
 
   const handleBind = React.useCallback(() => {
-    domApi.setNodeExpressionPropValue(node.id, prop, input, format);
-  }, [domApi, node.id, prop, input, format]);
-
-  const handleRemove = React.useCallback(() => {
-    domApi.removeBinding(node.id, prop);
-  }, [domApi, node.id, prop]);
+    onChange({ type: 'binding', value: input, format });
+  }, [onChange, input, format]);
 
   return (
     <React.Fragment>
@@ -58,9 +50,9 @@ function AddExpressionEditor<P>({ node, prop, propType }: AddExpressionEditorPro
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={handleRemove}>Remove</Button>
+        <Button onClick={() => onChange(null)}>Remove</Button>
         <Button disabled={!input} color="primary" onClick={handleBind}>
-          Update
+          Update binding
         </Button>
       </DialogActions>
     </React.Fragment>
@@ -113,15 +105,20 @@ function getBindablePropsInScope(
   });
 }
 
-interface BindingEditorTabProps {
+interface BindingEditorTabProps extends WithControlledProp<StudioNodeProp<unknown> | null> {
   node: studioDom.StudioNode;
   prop: string;
   propType: PropValueType;
 }
 
-function AddBindingEditor({ node: srcNode, prop: srcProp, propType }: BindingEditorTabProps) {
+function AddBindingEditor({
+  node: srcNode,
+  prop: srcProp,
+  propType,
+
+  onChange,
+}: BindingEditorTabProps) {
   const dom = useDom();
-  const domApi = useDomApi();
 
   const srcNodeId = srcNode.id;
   const srcType = propType.type;
@@ -136,8 +133,8 @@ function AddBindingEditor({ node: srcNode, prop: srcProp, propType }: BindingEdi
   const format = srcType === 'string' ? 'stringLiteral' : 'default';
 
   const handleBind = React.useCallback(() => {
-    domApi.setNodeExpressionPropValue(srcNodeId, srcProp, `{{${selection}}}`, format);
-  }, [domApi, srcNodeId, srcProp, selection, format]);
+    onChange({ type: 'binding', value: `{{${selection}}}`, format });
+  }, [onChange, selection, format]);
 
   return (
     <React.Fragment>
@@ -167,6 +164,37 @@ function AddBindingEditor({ node: srcNode, prop: srcProp, propType }: BindingEdi
   );
 }
 
+export interface BindingEditor2Props<K extends string>
+  extends WithControlledProp<StudioNodeProp<unknown> | null> {
+  nodeId: NodeId;
+  prop: K;
+  propType: PropValueType;
+}
+
+export function BindingEditor2<P = any>({
+  nodeId,
+  prop,
+  propType,
+  value,
+  onChange,
+}: BindingEditor2Props<keyof P & string>) {
+  const dom = useDom();
+  const node = studioDom.getNode(dom, nodeId);
+  const hasBinding = value?.type === 'binding';
+
+  return hasBinding ? (
+    <EditExpressionEditor propType={propType} value={value} onChange={onChange} />
+  ) : (
+    <AddBindingEditor
+      node={node}
+      prop={prop}
+      propType={propType}
+      value={value}
+      onChange={onChange}
+    />
+  );
+}
+
 export interface BindingEditorProps<K extends string> {
   nodeId: NodeId;
   prop: K;
@@ -179,16 +207,24 @@ export default function BindingEditor<P = any>({
   propType,
 }: BindingEditorProps<keyof P & string>) {
   const dom = useDom();
+  const domApi = useDomApi();
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 
   const node = studioDom.getNode(dom, nodeId);
-  const propValue: StudioNodeProp<unknown> | undefined = (node as studioDom.StudioNodeBase<P>)
-    .props[prop];
+  const propValue: StudioNodeProp<unknown> | null =
+    (node as studioDom.StudioNodeBase<P>).props[prop] ?? null;
 
   const hasBinding = propValue?.type === 'binding';
+
+  const handleBind = React.useCallback(
+    (newValue) => {
+      domApi.setNodePropValue<P>(nodeId, prop, newValue);
+    },
+    [domApi, nodeId, prop],
+  );
 
   return (
     <React.Fragment>
@@ -196,11 +232,13 @@ export default function BindingEditor<P = any>({
         {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
       </IconButton>
       <Dialog onClose={handleClose} open={open} fullWidth>
-        {hasBinding ? (
-          <AddExpressionEditor node={node} prop={prop} propType={propType} />
-        ) : (
-          <AddBindingEditor node={node} prop={prop} propType={propType} />
-        )}
+        <BindingEditor2
+          nodeId={nodeId}
+          prop={prop}
+          propType={propType}
+          value={propValue}
+          onChange={handleBind}
+        />
       </Dialog>
     </React.Fragment>
   );

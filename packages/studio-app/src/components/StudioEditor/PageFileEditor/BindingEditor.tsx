@@ -242,8 +242,9 @@ export default function BindingEditor<P = any>({
   const handleBind = React.useCallback(
     (newValue) => {
       domApi.setNodePropValue<P>(nodeId, prop, newValue);
+      handleClose();
     },
-    [domApi, nodeId, prop],
+    [domApi, nodeId, prop, handleClose],
   );
 
   return (

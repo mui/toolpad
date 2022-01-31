@@ -100,7 +100,7 @@ function getBindablePropsInScope(
         return [`${destNode.name}.${destProp}`];
       });
     }
-    if (studioDom.isDerivedState(destNode)) {
+    if (studioDom.isDerivedState(destNode) && destNode.returnType.type === srcType) {
       return [destNode.name];
     }
     return [];

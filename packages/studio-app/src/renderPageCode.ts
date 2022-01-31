@@ -1,4 +1,4 @@
-import { ArgTypeDefinition, PropValueTypes } from '@mui/studio-core';
+import { PropValueTypes } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 import Imports from './codeGen/Imports';

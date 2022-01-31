@@ -24,18 +24,18 @@ export interface BindingEditorContentProps<K> {
   prop: K;
 }
 
-interface AddExpressionEditorProps {
-  node: studioDom.StudioNode;
-  prop: string;
+interface AddExpressionEditorProps<P> {
+  node: studioDom.StudioNodeBase<P>;
+  prop: keyof P & string;
   propType: PropValueType;
 }
 
-function AddExpressionEditor({ node, prop, propType }: AddExpressionEditorProps) {
+function AddExpressionEditor<P>({ node, prop, propType }: AddExpressionEditorProps<P>) {
   const domApi = useDomApi();
 
   const argType = propType.type;
 
-  const nodeProp: StudioNodeProp<any> = node.props[prop];
+  const nodeProp: StudioNodeProp<any> | undefined = node.props[prop];
   const initialValue = nodeProp?.type === 'binding' ? nodeProp.value : '';
   const [input, setInput] = React.useState(initialValue);
   const format = argType === 'string' ? 'stringLiteral' : 'default';
@@ -185,7 +185,8 @@ export default function BindingEditor<P = any>({
   const handleClose = React.useCallback(() => setOpen(false), []);
 
   const node = studioDom.getNode(dom, nodeId);
-  const propValue: StudioNodeProp<any> = node.props[prop];
+  const propValue: StudioNodeProp<unknown> | undefined = (node as studioDom.StudioNodeBase<P>)
+    .props[prop];
 
   const hasBinding = propValue?.type === 'binding';
 

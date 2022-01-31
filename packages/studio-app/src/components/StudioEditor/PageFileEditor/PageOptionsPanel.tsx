@@ -217,6 +217,9 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
       <Stack gap={1} my={1}>
         {(Object.entries(value.argTypes) as ExactEntriesOf<PropValueTypes>).map(
           ([propName, propType]) => {
+            if (!propType) {
+              return null;
+            }
             const isBound = !!value.props[propName];
             return (
               <Stack key={propName} direction="row" alignItems="center" gap={1}>

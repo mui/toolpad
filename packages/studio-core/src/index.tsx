@@ -60,18 +60,18 @@ export interface ArgControlSpec {
     | 'date'; // date picker
 }
 
-export type PrimitiveValueType =
+type PrimitiveValueType =
   | StringValueType
   | NumberValueType
   | BooleanValueType
   | ObjectValueType
   | ArrayValueType;
 
-export type PrimitiveValueTypes = {
-  [key: string]: PrimitiveValueType;
-};
-
 export type PropValueType = PrimitiveValueType | ElementValueType | DataQueryValueType;
+
+export type PropValueTypes = {
+  [key in string]?: PropValueType;
+};
 
 export interface ArgTypeDefinition {
   name?: string;

@@ -19,7 +19,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import PageIcon from '@mui/icons-material/Web';
 import SourceIcon from '@mui/icons-material/Source';
 import Editor from '@monaco-editor/react';
-import { PropValueType, PrimitiveValueType } from '@mui/studio-core';
+import { PropValueType, PropValueTypes } from '@mui/studio-core';
 import type * as monacoEditor from 'monaco-editor';
 import CloseIcon from '@mui/icons-material/Close';
 import renderPageCode from '../../../renderPageCode';
@@ -34,10 +34,6 @@ import BindingEditor from './BindingEditor';
 
 const DERIVED_STATE_PARAMS = 'StudioDerivedStateParams';
 const DERIVED_STATE_RESULT = 'StudioDerivedStateResult';
-
-type ParamTypes<P = any> = {
-  [K in keyof P & string]: PrimitiveValueType;
-};
 
 interface DerivedStateEditorProps<P = any>
   extends WithControlledProp<studioDom.StudioDerivedStateNode<P>> {}
@@ -74,7 +70,7 @@ function tsTypeForPropValueType(propValueType: PropValueType): string {
   }
 }
 
-interface PropValueTypeSelectorProps extends WithControlledProp<PrimitiveValueType> {
+interface PropValueTypeSelectorProps extends WithControlledProp<PropValueType> {
   disabled?: boolean;
 }
 
@@ -88,7 +84,7 @@ function PropValueTypeSelector({ value, onChange, disabled }: PropValueTypeSelec
         size="small"
         value={value.type}
         label="Type"
-        onChange={(event) => onChange({ type: event.target.value as PrimitiveValueType['type'] })}
+        onChange={(event) => onChange({ type: event.target.value as PropValueType['type'] })}
       >
         <MenuItem value="string">string</MenuItem>
         <MenuItem value="number">number</MenuItem>
@@ -102,7 +98,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
   const monacoRef = React.useRef<typeof monacoEditor>();
 
   const libSource = React.useMemo(() => {
-    const args = (Object.entries(value.argTypes) as ExactEntriesOf<ParamTypes>).map(
+    const args = (Object.entries(value.argTypes) as ExactEntriesOf<PropValueTypes>).map(
       ([propName, paramType]) => {
         const tsType = paramType ? tsTypeForPropValueType(paramType) : 'unknown';
         return `${propName}: ${tsType};`;
@@ -179,7 +175,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
   }, [onChange, value, newPropName]);
 
   const handlePropTypeChange = React.useCallback(
-    (propName: string) => (newPropType: PrimitiveValueType) => {
+    (propName: string) => (newPropType: PropValueType) => {
       onChange(
         update(value, {
           ...value,
@@ -205,7 +201,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
   );
 
   const handleReturnTypeChange = React.useCallback(
-    (newReturnType: PrimitiveValueType) => {
+    (newReturnType: PropValueType) => {
       onChange(
         update(value, {
           ...value,
@@ -219,7 +215,7 @@ function DerivedStateEditor({ value, onChange }: DerivedStateEditorProps) {
   return (
     <div>
       <Stack gap={1} my={1}>
-        {(Object.entries(value.argTypes) as ExactEntriesOf<ParamTypes>).map(
+        {(Object.entries(value.argTypes) as ExactEntriesOf<PropValueTypes>).map(
           ([propName, propType]) => {
             const isBound = !!value.props[propName];
             return (

@@ -1,4 +1,4 @@
-import { ArgTypeDefinitions, PrimitiveValueType, PrimitiveValueTypes } from '@mui/studio-core';
+import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
 import { NodeId, StudioNodeProps } from './types';
 import { omit, update } from './utils/immutability';
@@ -92,8 +92,8 @@ export interface StudioDerivedStateNode<P = {}> extends StudioNodeBase<P> {
   readonly type: 'derivedState';
   readonly code: string;
   readonly props: StudioNodeProps<P>;
-  readonly argTypes: PrimitiveValueTypes;
-  readonly returnType: PrimitiveValueType;
+  readonly argTypes: PropValueTypes;
+  readonly returnType: PropValueType;
 }
 
 type StudioNodeOfType<K extends StudioNodeBase['type']> = {

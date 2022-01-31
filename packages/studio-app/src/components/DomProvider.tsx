@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as studioDom from '../studioDom';
 import { NodeId, StudioNodeProp } from '../types';
-import { update, omit } from '../utils/immutability';
+import { update } from '../utils/immutability';
 import client from '../api';
 
 export type DomAction =
@@ -25,18 +25,13 @@ export type DomAction =
       type: 'DOM_SET_NODE_PROP';
       nodeId: NodeId;
       prop: string;
-      value: StudioNodeProp<unknown>;
+      value: StudioNodeProp<unknown> | null;
     }
   | {
       type: 'DOM_SET_NODE_ATTR';
       nodeId: NodeId;
       attr: string;
       value: unknown;
-    }
-  | {
-      type: 'DOM_REMOVE_BINDING';
-      nodeId: NodeId;
-      prop: string;
     }
   | {
       type: 'DOM_ADD_NODE';
@@ -134,22 +129,6 @@ export function domReducer(state: DomState, action: DomAction): DomState {
         dom: studioDom.saveNode(state.dom, action.node),
       });
     }
-    case 'DOM_REMOVE_BINDING': {
-      const { nodeId, prop } = action;
-
-      const node = studioDom.getNode(state.dom, nodeId);
-      studioDom.assertIsElement(node);
-
-      return update(state, {
-        dom: update(state.dom, {
-          nodes: update(state.dom.nodes, {
-            [nodeId]: update(node, {
-              props: omit(node.props, prop),
-            }),
-          }),
-        }),
-      });
-    }
     default:
       return state;
   }
@@ -210,7 +189,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
     setNodePropValue<P, K extends keyof P & string = keyof P & string>(
       nodeId: NodeId,
       prop: K,
-      value: StudioNodeProp<P[K]>,
+      value: StudioNodeProp<P[K]> | null,
     ) {
       dispatch({
         type: 'DOM_SET_NODE_PROP',
@@ -229,13 +208,6 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         nodeId: node.id,
         attr,
         value,
-      });
-    },
-    removeBinding(nodeId: NodeId, prop: string) {
-      dispatch({
-        type: 'DOM_REMOVE_BINDING',
-        nodeId,
-        prop,
       });
     },
   };

@@ -69,8 +69,8 @@ type PrimitiveValueType =
 
 export type PropValueType = PrimitiveValueType | ElementValueType | DataQueryValueType;
 
-export type PropValueTypes = {
-  [key in string]?: PropValueType;
+export type PropValueTypes<K extends string = string> = {
+  [key in K]?: PropValueType;
 };
 
 export interface ArgTypeDefinition {

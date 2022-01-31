@@ -467,18 +467,27 @@ export function setNodeProps<P>(
   });
 }
 
-export function setNodeProp<P, K extends keyof P>(
+export function setNodeProp<P, K extends keyof P & string>(
   page: StudioDom,
   node: StudioNode,
   prop: K,
-  value: StudioNodeProps<P>[K],
+  value: StudioNodeProps<P>[K] | null,
 ): StudioDom {
+  if (value) {
+    return update(page, {
+      nodes: update(page.nodes, {
+        [node.id]: update(node, {
+          props: update(node.props, {
+            [prop]: value,
+          }),
+        }),
+      }),
+    });
+  }
   return update(page, {
     nodes: update(page.nodes, {
       [node.id]: update(node, {
-        props: update(node.props, {
-          [prop]: value,
-        }),
+        props: omit(node.props as any, prop),
       }),
     }),
   });

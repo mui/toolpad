@@ -4,7 +4,7 @@ import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-co
 import studioPropControls from '../../propertyControls';
 import * as studioDom from '../../../studioDom';
 import { useDomApi } from '../../DomProvider';
-import BindingEditor from './BindingEditor';
+import { BindingEditor } from './BindingEditor';
 
 function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
   switch (typeDef.type) {
@@ -40,15 +40,22 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
 }: ComponentPropEditorProps<P, K>) {
   const domApi = useDomApi();
 
-  const handleChange = React.useCallback(
-    (value: any) => domApi.setNodeConstPropValue<P>(node, name, value),
-    [domApi, node, name],
+  const handlePropChange = React.useCallback(
+    (newValue) => {
+      domApi.setNodePropValue<P>(node.id, name, newValue);
+    },
+    [domApi, node.id, name],
+  );
+
+  const handlePropConstChange = React.useCallback(
+    (value: any) => handlePropChange({ type: 'const', value }),
+    [handlePropChange],
   );
 
   const controlSpec = argType.control ?? getDefaultControl(argType.typeDef);
   const control = controlSpec ? studioPropControls[controlSpec.type] : null;
 
-  const propValue = node.props[name];
+  const propValue = node.props[name] ?? null;
 
   const initPropValue = React.useCallback(() => {
     if (propValue?.type === 'const') {
@@ -76,9 +83,15 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
             argType={argType}
             disabled={hasBinding}
             value={value}
-            onChange={handleChange}
+            onChange={handlePropConstChange}
           />
-          <BindingEditor nodeId={node.id} prop={name} propType={argType.typeDef} />
+          <BindingEditor
+            nodeId={node.id}
+            prop={name}
+            propType={argType.typeDef}
+            value={propValue}
+            onChange={handlePropChange}
+          />
         </React.Fragment>
       ) : (
         <Alert severity="warning">

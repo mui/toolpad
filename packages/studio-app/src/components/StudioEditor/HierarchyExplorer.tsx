@@ -334,9 +334,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   const dom = useDom();
 
   const app = studioDom.getApp(dom);
-  const apis = studioDom.getApis(dom, app);
-  const codeComponents = studioDom.getCodeComponents(dom, app);
-  const pages = studioDom.getPages(dom, app);
+  const { apis = [], codeComponents = [], pages = [] } = studioDom.getChildNodes(dom, app);
 
   const [expanded, setExpanded] = React.useState<('' | NodeId)[]>([
     '',

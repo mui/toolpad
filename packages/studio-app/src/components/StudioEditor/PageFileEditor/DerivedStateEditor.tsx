@@ -331,7 +331,7 @@ export default function DerivedStateEditor() {
 
   const page = studioDom.getNode(dom, state.nodeId);
   studioDom.assertIsPage(page);
-  const stateNodes = studioDom.getChildNodes(dom, page).state ?? [];
+  const { derivedStates = [] } = studioDom.getChildNodes(dom, page);
 
   const pageNodeId = state.nodeId;
   const handleCreate = React.useCallback(() => {
@@ -361,7 +361,7 @@ export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DER
         create derived state
       </Button>
       <List>
-        {stateNodes.map((stateNode) => {
+        {derivedStates.map((stateNode) => {
           return (
             <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode.id)}>
               {stateNode.name}

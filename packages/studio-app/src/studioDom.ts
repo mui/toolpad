@@ -7,13 +7,17 @@ import { ExactEntriesOf } from './utils/types';
 
 const ALLOWED_CHILDREN = {
   app: {
-    children: ['page', 'api', 'theme', 'codeComponent'],
+    pages: ['page'],
+    apis: ['api'],
+    themes: ['theme'],
+    codeComponents: ['codeComponent'],
   },
   theme: {},
   api: {},
   page: {
     children: ['element'],
-    state: ['derivedState'],
+    derivedStates: ['derivedState'],
+    queryStates: ['queryState'],
   },
   element: {
     children: ['element'],
@@ -41,7 +45,8 @@ type StudioNodeType =
   | 'page'
   | 'element'
   | 'codeComponent'
-  | 'derivedState';
+  | 'derivedState'
+  | 'queryState';
 
 export interface StudioNodeBase<P = any> {
   readonly id: NodeId;
@@ -96,6 +101,12 @@ export interface StudioDerivedStateNode<P = {}> extends StudioNodeBase<P> {
   readonly returnType: PropValueType;
 }
 
+export interface StudioQueryStateNode<P = {}> extends StudioNodeBase<P> {
+  readonly type: 'queryState';
+  readonly api: NodeId;
+  readonly props: StudioNodeProps<P>;
+}
+
 type StudioNodeOfType<K extends StudioNodeBase['type']> = {
   app: StudioAppNode;
   api: StudioApiNode;
@@ -104,6 +115,7 @@ type StudioNodeOfType<K extends StudioNodeBase['type']> = {
   element: StudioElementNode;
   codeComponent: StudioCodeComponentNode;
   derivedState: StudioDerivedStateNode;
+  queryState: StudioQueryStateNode;
 }[K];
 
 export type StudioNode =
@@ -113,7 +125,8 @@ export type StudioNode =
   | StudioPageNode
   | StudioElementNode
   | StudioCodeComponentNode
-  | StudioDerivedStateNode;
+  | StudioDerivedStateNode
+  | StudioQueryStateNode;
 
 type AllowedChildren = typeof ALLOWED_CHILDREN;
 type TypeOf<N extends StudioNode> = N['type'];
@@ -227,6 +240,14 @@ export function assertIsDerivedState<P>(
   assertIsType<StudioDerivedStateNode>(node, 'derivedState');
 }
 
+export function isQueryState<P>(node: StudioNode): node is StudioQueryStateNode<P> {
+  return isType<StudioQueryStateNode>(node, 'queryState');
+}
+
+export function assertIsQueryState<P>(node: StudioNode): asserts node is StudioQueryStateNode<P> {
+  assertIsType<StudioQueryStateNode>(node, 'queryState');
+}
+
 export function getApp(dom: StudioDom): StudioAppNode {
   const rootNode = getNode(dom, dom.root);
   assertIsApp(rootNode);
@@ -286,27 +307,6 @@ export function getParent<N extends StudioNode>(dom: StudioDom, child: N): Paren
     return parent as ParentOf<N>;
   }
   return null;
-}
-
-export function getPages(dom: StudioDom, app: StudioAppNode): StudioPageNode[] {
-  return (getChildNodes(dom, app).children?.filter((node) => isPage(node)) ??
-    []) as StudioPageNode[];
-}
-
-export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
-  return (getChildNodes(dom, app).children?.filter((node) => isApi(node)) ?? []) as StudioApiNode[];
-}
-
-export function getCodeComponents(dom: StudioDom, app: StudioAppNode): StudioCodeComponentNode[] {
-  return (getChildNodes(dom, app).children?.filter((node) => isCodeComponent(node)) ??
-    []) as StudioCodeComponentNode[];
-}
-
-// TODO: make theme optional by returning undefined
-export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode | undefined {
-  return getChildNodes(dom, app).children?.find((node) => isTheme(node)) as
-    | StudioThemeNode
-    | undefined;
 }
 
 function generateUniqueName(baseName: string, existingNames: Set<string>, alwaysIndex = false) {

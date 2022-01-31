@@ -92,11 +92,13 @@ class Context implements RenderContext {
     const nodes = studioDom.getDescendants(this.dom, this.page);
     nodes.forEach((node) => {
       (Object.values(node.props) as StudioNodeProp<unknown>[]).forEach((prop) => {
-        if (prop?.type === 'binding') {
+        if (prop?.type === 'boundExpression') {
           const parsedExpr = bindings.parse(prop.value);
           bindings
             .getInterpolations(parsedExpr)
             .forEach((interpolation) => this.collectInterpolation(interpolation));
+        } else if (prop?.type === 'binding') {
+          this.collectInterpolation(prop.value);
         }
       });
     });
@@ -208,7 +210,7 @@ class Context implements RenderContext {
             type: 'expression',
             value: JSON.stringify(propValue.value),
           };
-        } else if (propValue.type === 'binding') {
+        } else if (propValue.type === 'boundExpression') {
           const parsedExpr = bindings.parse(propValue.value);
 
           // Resolve each named variable to its resolved variable in code
@@ -219,6 +221,11 @@ class Context implements RenderContext {
           result[propName] = {
             type: 'expression',
             value,
+          };
+        } else if (propValue.type === 'binding') {
+          result[propName] = {
+            type: 'expression',
+            value: this.state[propValue.value],
           };
         } else {
           console.warn(`Invariant: Unkown prop type "${(propValue as any).type}"`);

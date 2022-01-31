@@ -29,10 +29,16 @@ export interface StudioPageBindings {
 
 export type StudioBindingFormat = 'stringLiteral' | 'default';
 
+// TODO: Get rid of StudioBoundExpressionProp? Its function can be fulfilled by derivedState as well
+export interface StudioBoundExpressionProp {
+  type: 'boundExpression';
+  value: string;
+  format?: StudioBindingFormat;
+}
+
 export interface StudioBoundProp {
   type: 'binding';
   value: string;
-  format?: StudioBindingFormat;
 }
 
 export interface StudioConstantProp<V> {
@@ -40,7 +46,7 @@ export interface StudioConstantProp<V> {
   value: V;
 }
 
-export type StudioNodeProp<V> = StudioConstantProp<V> | StudioBoundProp;
+export type StudioNodeProp<V> = StudioConstantProp<V> | StudioBoundProp | StudioBoundExpressionProp;
 
 export type StudioNodeProps<P> = {
   readonly [K in keyof P]?: StudioNodeProp<P[K]>;

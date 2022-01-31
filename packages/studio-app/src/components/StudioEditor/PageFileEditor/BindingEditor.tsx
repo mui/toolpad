@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -8,12 +9,14 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  Tab,
   TextField,
 } from '@mui/material';
 import React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { PropValueType } from '@mui/studio-core';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
 import { NodeId, StudioNodeProp } from '../../../types';
@@ -25,19 +28,19 @@ export interface BindingEditorContentProps<K> {
   prop: K;
 }
 
-interface EditExpressionEditorProps extends WithControlledProp<StudioNodeProp<unknown> | null> {
+interface BoundExpressionEditorProps extends WithControlledProp<StudioNodeProp<unknown> | null> {
   propType: PropValueType;
 }
 
-function EditExpressionEditor({ propType, value, onChange }: EditExpressionEditorProps) {
+function BoundExpressionEditor({ propType, value, onChange }: BoundExpressionEditorProps) {
   const argType = propType.type;
 
-  const initialValue = value?.type === 'binding' ? value.value : '';
+  const initialValue = value?.type === 'boundExpression' ? value.value : '';
   const [input, setInput] = React.useState(initialValue);
   const format = argType === 'string' ? 'stringLiteral' : 'default';
 
   const handleBind = React.useCallback(() => {
-    onChange({ type: 'binding', value: input, format });
+    onChange({ type: 'boundExpression', value: input, format });
   }, [onChange, input, format]);
 
   return (
@@ -87,7 +90,6 @@ function getBindablePropsInScope(
           throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
         }
         const destType = destPropDefinition.typeDef.type;
-        console.log(destProp);
         if (
           (destNode.id === node.id && destProp === prop) ||
           destType !== srcType ||
@@ -115,7 +117,7 @@ function AddBindingEditor({
   node: srcNode,
   prop: srcProp,
   propType,
-
+  value,
   onChange,
 }: BindingEditorTabProps) {
   const dom = useDom();
@@ -127,19 +129,19 @@ function AddBindingEditor({
     return getBindablePropsInScope(dom, srcNodeId, srcProp, propType);
   }, [dom, srcNodeId, srcProp, propType]);
 
-  const [selection, setSelection] = React.useState<string | null>(null);
+  const [selection, setSelection] = React.useState<string | null>(
+    value?.type === 'binding' ? value.value : null,
+  );
+  React.useEffect(() => setSelection(value?.type === 'binding' ? value.value : null), [value]);
 
   const handleSelect = (bindableProp: string) => () => setSelection(bindableProp);
-  const format = srcType === 'string' ? 'stringLiteral' : 'default';
 
   const handleBind = React.useCallback(() => {
-    onChange({ type: 'binding', value: `{{${selection}}}`, format });
-  }, [onChange, selection, format]);
+    onChange(selection ? { type: 'binding', value: selection } : null);
+  }, [onChange, selection]);
 
   return (
     <React.Fragment>
-      <DialogTitle>Bind a property</DialogTitle>
-
       <DialogContent sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div>Type: {srcType}</div>
         <List sx={{ flex: 1, overflow: 'scroll' }}>
@@ -180,18 +182,36 @@ export function BindingEditor2<P = any>({
 }: BindingEditor2Props<keyof P & string>) {
   const dom = useDom();
   const node = studioDom.getNode(dom, nodeId);
-  const hasBinding = value?.type === 'binding';
 
-  return hasBinding ? (
-    <EditExpressionEditor propType={propType} value={value} onChange={onChange} />
-  ) : (
-    <AddBindingEditor
-      node={node}
-      prop={prop}
-      propType={propType}
-      value={value}
-      onChange={onChange}
-    />
+  const [bindingType, setBindingType] = React.useState<'binding' | 'boundExpression'>(
+    value?.type === 'boundExpression' ? 'boundExpression' : 'binding',
+  );
+  React.useEffect(
+    () => setBindingType(value?.type === 'boundExpression' ? 'boundExpression' : 'binding'),
+    [value?.type],
+  );
+
+  return (
+    <TabContext value={bindingType}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <TabList onChange={(event, newValue) => setBindingType(newValue)}>
+          <Tab label="Binding" value="binding" />
+          <Tab label="Expression" value="boundExpression" />
+        </TabList>
+      </Box>
+      <TabPanel value="binding">
+        <AddBindingEditor
+          node={node}
+          prop={prop}
+          propType={propType}
+          value={value}
+          onChange={onChange}
+        />
+      </TabPanel>
+      <TabPanel value="boundExpression">
+        <BoundExpressionEditor propType={propType} value={value} onChange={onChange} />
+      </TabPanel>
+    </TabContext>
   );
 }
 
@@ -217,7 +237,7 @@ export default function BindingEditor<P = any>({
   const propValue: StudioNodeProp<unknown> | null =
     (node as studioDom.StudioNodeBase<P>).props[prop] ?? null;
 
-  const hasBinding = propValue?.type === 'binding';
+  const hasBinding = propValue?.type === 'boundExpression' || propValue?.type === 'binding';
 
   const handleBind = React.useCallback(
     (newValue) => {

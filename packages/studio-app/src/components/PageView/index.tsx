@@ -39,7 +39,7 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
   const codeComponents = React.useMemo(() => {
     const app = studioDom.getApp(dom);
     const studioCodeComponents = studioDom.getCodeComponents(dom, app);
-    // TODO: only render the components used by the page
+    // TODO: only render the components that were used on the page?
     return Object.fromEntries(
       studioCodeComponents.map((component) => [
         `./components/${component.id}.tsx`,
@@ -47,6 +47,18 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
       ]),
     );
   }, [dom]);
+
+  const derivedStateHooks = React.useMemo(() => {
+    const page = studioDom.getNode(dom, pageNodeId);
+    studioDom.assertIsPage(page);
+    const stateNodes = studioDom.getChildNodes(dom, page).state ?? [];
+    return Object.fromEntries(
+      stateNodes.map((derivedState) => [
+        `./derivedState/${derivedState.id}.ts`,
+        { code: derivedState.code },
+      ]),
+    );
+  }, [dom, pageNodeId]);
 
   return (
     <StudioSandbox
@@ -56,6 +68,7 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
       importMap={getImportMap()}
       files={{
         ...codeComponents,
+        ...derivedStateHooks,
         [themePath]: { code: renderedTheme.code },
         [entryPath]: { code: renderedEntrypoint.code },
         [pagePath]: { code: renderedPage.code },

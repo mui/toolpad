@@ -148,7 +148,7 @@ function insertSlotAbsolutePositionCss(slot: {
 }
 
 function findNodeAt(
-  nodes: readonly PageOrElementNode[],
+  nodes: readonly studioDom.StudioNode[],
   viewLayout: ViewState,
   x: number,
   y: number,
@@ -257,8 +257,6 @@ function findActiveSlotAt(
   }
   return null;
 }
-
-type PageOrElementNode = studioDom.StudioPageNode | studioDom.StudioElementNode;
 
 function getSlotDirection(flow: FlowDirection): SlotDirection {
   switch (flow) {
@@ -403,7 +401,7 @@ function calculateSlots(
 }
 
 function calculateNodeSlots(
-  parent: PageOrElementNode,
+  parent: studioDom.StudioNode,
   children: studioDom.NodeChildren,
   viewState: ViewState,
 ): NodeSlots {
@@ -480,7 +478,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const pageNode = studioDom.getNode(dom, pageNodeId);
   studioDom.assertIsPage(pageNode);
 
-  const pageNodes: readonly PageOrElementNode[] = React.useMemo(() => {
+  const pageNodes = React.useMemo(() => {
     return [pageNode, ...studioDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 

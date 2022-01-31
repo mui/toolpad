@@ -1,59 +1,47 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   List,
   ListItemButton,
   ListItemText,
+  Tab,
   TextField,
 } from '@mui/material';
 import React from 'react';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
+import { PropValueType } from '@mui/studio-core';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
 import { NodeId, StudioNodeProp } from '../../../types';
-import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomProvider';
-import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
+import { WithControlledProp } from '../../../utils/types';
 
 export interface BindingEditorContentProps<K> {
   nodeId: NodeId;
   prop: K;
 }
 
-interface AddExpressionEditorProps<P, K extends keyof P & string> {
-  node: studioDom.StudioElementNode<P>;
-  prop: K;
+interface BoundExpressionEditorProps extends WithControlledProp<StudioNodeProp<unknown> | null> {
+  propType: PropValueType;
 }
 
-function AddExpressionEditor<P, K extends keyof P & string>({
-  node,
-  prop,
-}: AddExpressionEditorProps<P, K>) {
-  const dom = useDom();
-  const domApi = useDomApi();
+function BoundExpressionEditor({ propType, value, onChange }: BoundExpressionEditorProps) {
+  const argType = propType.type;
 
-  const definition = getStudioComponent(dom, node.component);
-  const propDefinition = definition.argTypes[prop];
-
-  if (!propDefinition) {
-    throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
-  }
-  const argType = propDefinition.typeDef.type;
-
-  const nodeProp = node.props[prop];
-  const initialValue = nodeProp?.type === 'binding' ? nodeProp.value : '';
+  const initialValue = value?.type === 'boundExpression' ? value.value : '';
   const [input, setInput] = React.useState(initialValue);
   const format = argType === 'string' ? 'stringLiteral' : 'default';
 
   const handleBind = React.useCallback(() => {
-    domApi.setNodeExpressionPropValue(node.id, prop, input, format);
-  }, [domApi, node.id, prop, input, format]);
-
-  const handleRemove = React.useCallback(() => {
-    domApi.removeBinding(node.id, prop);
-  }, [domApi, node.id, prop]);
+    onChange({ type: 'boundExpression', value: input, format });
+  }, [onChange, input, format]);
 
   return (
     <React.Fragment>
@@ -65,93 +53,95 @@ function AddExpressionEditor<P, K extends keyof P & string>({
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={handleRemove}>Remove</Button>
+        <Button onClick={() => onChange(null)}>Remove</Button>
         <Button disabled={!input} color="primary" onClick={handleBind}>
-          Update
+          Update binding
         </Button>
       </DialogActions>
     </React.Fragment>
   );
 }
 
-function getBindablePropsInScope(dom: studioDom.StudioDom, nodeId: NodeId, prop: string) {
+function getBindablePropsInScope(
+  dom: studioDom.StudioDom,
+  nodeId: NodeId,
+  prop: string,
+  propType: PropValueType,
+): string[] {
   const node = studioDom.getNode(dom, nodeId);
-  if (!studioDom.isElement(node)) {
+  if (!studioDom.isElement(node) && !studioDom.isDerivedState(node)) {
     return [];
   }
-  const page = studioDom.getElementPage(dom, node);
+  const page = studioDom.getPageAncestor(dom, node);
   if (!page) {
     return [];
   }
 
-  const srcDefinition = getStudioComponent(dom, node.component);
-  const srcPropDefinition = srcDefinition.argTypes[prop];
-
-  if (!srcPropDefinition) {
-    throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
-  }
-  const srcType = srcPropDefinition.typeDef.type;
+  const srcType = propType.type;
 
   const nodes = studioDom.getDescendants(dom, page);
   return nodes.flatMap((destNode) => {
-    const destDefinition = getStudioComponent(dom, destNode.component);
+    if (studioDom.isElement(destNode)) {
+      const destDefinition = getStudioComponent(dom, destNode.component);
 
-    return Object.entries(destDefinition.argTypes).flatMap(([destProp]) => {
-      const destPropDefinition = destDefinition.argTypes[destProp];
-      if (!destPropDefinition) {
-        throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
-      }
-      const destType = destPropDefinition.typeDef.type;
-      if (
-        (destNode.id === node.id && destProp === prop) ||
-        destType !== srcType ||
-        !destPropDefinition.onChangeHandler
-      ) {
-        return [];
-      }
-      return [`${destNode.name}.${destProp}`];
-    });
+      return Object.entries(destDefinition.argTypes).flatMap(([destProp]) => {
+        const destPropDefinition = destDefinition.argTypes[destProp];
+        if (!destPropDefinition) {
+          throw new Error(`Invariant: trying to bind an unknown property "${prop}"`);
+        }
+        const destType = destPropDefinition.typeDef.type;
+        if (
+          (destNode.id === node.id && destProp === prop) ||
+          destType !== srcType ||
+          !destPropDefinition.onChangeHandler
+        ) {
+          return [];
+        }
+        return [`${destNode.name}.${destProp}`];
+      });
+    }
+    if (studioDom.isDerivedState(destNode) && destNode.returnType.type === srcType) {
+      return [destNode.name];
+    }
+    return [];
   });
 }
 
-interface BindingEditorTabProps<P, K extends keyof P & string> {
-  node: studioDom.StudioElementNode<P>;
-  prop: K;
+interface BindingEditorTabProps extends WithControlledProp<StudioNodeProp<unknown> | null> {
+  node: studioDom.StudioNode;
+  prop: string;
+  propType: PropValueType;
 }
 
-function AddBindingEditor<P, K extends keyof P & string>({
+function AddBindingEditor({
   node: srcNode,
   prop: srcProp,
-}: BindingEditorTabProps<P, K>) {
+  propType,
+  value,
+  onChange,
+}: BindingEditorTabProps) {
   const dom = useDom();
-  const domApi = useDomApi();
 
   const srcNodeId = srcNode.id;
-  const srcDefinition = getStudioComponent(dom, srcNode.component);
-  const srcPropDefinition = srcDefinition.argTypes[srcProp];
-
-  if (!srcPropDefinition) {
-    throw new Error(`Invariant: trying to bind an unknown property "${srcProp}"`);
-  }
-  const srcType = srcPropDefinition.typeDef.type;
+  const srcType = propType.type;
 
   const bindableProps = React.useMemo(() => {
-    return getBindablePropsInScope(dom, srcNodeId, srcProp);
-  }, [dom, srcNodeId, srcProp]);
+    return getBindablePropsInScope(dom, srcNodeId, srcProp, propType);
+  }, [dom, srcNodeId, srcProp, propType]);
 
-  const [selection, setSelection] = React.useState<string | null>(null);
+  const [selection, setSelection] = React.useState<string | null>(
+    value?.type === 'binding' ? value.value : null,
+  );
+  React.useEffect(() => setSelection(value?.type === 'binding' ? value.value : null), [value]);
 
   const handleSelect = (bindableProp: string) => () => setSelection(bindableProp);
-  const format = srcType === 'string' ? 'stringLiteral' : 'default';
 
   const handleBind = React.useCallback(() => {
-    domApi.setNodeExpressionPropValue(srcNodeId, srcProp, `{{${selection}}}`, format);
-  }, [domApi, srcNodeId, srcProp, selection, format]);
+    onChange(selection ? { type: 'binding', value: selection } : null);
+  }, [onChange, selection]);
 
   return (
     <React.Fragment>
-      <DialogTitle>Bind a property</DialogTitle>
-
       <DialogContent sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div>Type: {srcType}</div>
         <List sx={{ flex: 1, overflow: 'scroll' }}>
@@ -176,32 +166,100 @@ function AddBindingEditor<P, K extends keyof P & string>({
   );
 }
 
-export function BindingEditorContent<P, K extends keyof P & string>({
+export interface BindingEditor2Props<K extends string>
+  extends WithControlledProp<StudioNodeProp<unknown> | null> {
+  nodeId: NodeId;
+  prop: K;
+  propType: PropValueType;
+}
+
+export function BindingEditor2<P = any>({
   nodeId,
   prop,
-}: BindingEditorContentProps<K>) {
+  propType,
+  value,
+  onChange,
+}: BindingEditor2Props<keyof P & string>) {
   const dom = useDom();
-
   const node = studioDom.getNode(dom, nodeId);
-  studioDom.assertIsElement<P>(node);
-  const propValue: StudioNodeProp<P[K]> | undefined = node.props[prop];
-  const hasBinding = propValue?.type === 'binding';
 
-  return hasBinding ? (
-    <AddExpressionEditor node={node} prop={prop} />
-  ) : (
-    <AddBindingEditor node={node} prop={prop} />
+  const [bindingType, setBindingType] = React.useState<'binding' | 'boundExpression'>(
+    value?.type === 'boundExpression' ? 'boundExpression' : 'binding',
+  );
+  React.useEffect(
+    () => setBindingType(value?.type === 'boundExpression' ? 'boundExpression' : 'binding'),
+    [value?.type],
+  );
+
+  return (
+    <TabContext value={bindingType}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <TabList onChange={(event, newValue) => setBindingType(newValue)}>
+          <Tab label="Binding" value="binding" />
+          <Tab label="Expression" value="boundExpression" />
+        </TabList>
+      </Box>
+      <TabPanel value="binding">
+        <AddBindingEditor
+          node={node}
+          prop={prop}
+          propType={propType}
+          value={value}
+          onChange={onChange}
+        />
+      </TabPanel>
+      <TabPanel value="boundExpression">
+        <BoundExpressionEditor propType={propType} value={value} onChange={onChange} />
+      </TabPanel>
+    </TabContext>
   );
 }
 
-export default function BindingEditor() {
-  const state = usePageEditorState();
-  const api = usePageEditorApi();
-  const handleClose = React.useCallback(() => api.closeBindingEditor(), [api]);
-  const bindingEditorProps = useLatest(state.bindingEditor);
+export interface BindingEditorProps<K extends string> {
+  nodeId: NodeId;
+  prop: K;
+  propType: PropValueType;
+}
+
+export default function BindingEditor<P = any>({
+  nodeId,
+  prop,
+  propType,
+}: BindingEditorProps<keyof P & string>) {
+  const dom = useDom();
+  const domApi = useDomApi();
+
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = React.useCallback(() => setOpen(true), []);
+  const handleClose = React.useCallback(() => setOpen(false), []);
+
+  const node = studioDom.getNode(dom, nodeId);
+  const propValue: StudioNodeProp<unknown> | null =
+    (node as studioDom.StudioNodeBase<P>).props[prop] ?? null;
+
+  const hasBinding = propValue?.type === 'boundExpression' || propValue?.type === 'binding';
+
+  const handleBind = React.useCallback(
+    (newValue) => {
+      domApi.setNodePropValue<P>(nodeId, prop, newValue);
+    },
+    [domApi, nodeId, prop],
+  );
+
   return (
-    <Dialog onClose={handleClose} open={!!state.bindingEditor} fullWidth>
-      {bindingEditorProps ? <BindingEditorContent<any, any> {...bindingEditorProps} /> : null}
-    </Dialog>
+    <React.Fragment>
+      <IconButton size="small" onClick={handleOpen} color={hasBinding ? 'primary' : 'inherit'}>
+        {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
+      </IconButton>
+      <Dialog onClose={handleClose} open={open} fullWidth>
+        <BindingEditor2
+          nodeId={nodeId}
+          prop={prop}
+          propType={propType}
+          value={propValue}
+          onChange={handleBind}
+        />
+      </Dialog>
+    </React.Fragment>
   );
 }

@@ -31,7 +31,7 @@ export interface ObjectValueType extends ValueTypeBase {
 
 export interface ArrayValueType extends ValueTypeBase {
   type: 'array';
-  items: PrimitiveValueType;
+  items?: PrimitiveValueType;
 }
 
 export interface ElementValueType extends ValueTypeBase {
@@ -60,7 +60,7 @@ export interface ArgControlSpec {
     | 'date'; // date picker
 }
 
-export type PrimitiveValueType =
+type PrimitiveValueType =
   | StringValueType
   | NumberValueType
   | BooleanValueType
@@ -68,6 +68,10 @@ export type PrimitiveValueType =
   | ArrayValueType;
 
 export type PropValueType = PrimitiveValueType | ElementValueType | DataQueryValueType;
+
+export type PropValueTypes = {
+  [key in string]?: PropValueType;
+};
 
 export interface ArgTypeDefinition {
   name?: string;

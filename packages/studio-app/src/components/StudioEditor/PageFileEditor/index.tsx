@@ -3,7 +3,6 @@ import { styled } from '@mui/system';
 import { useParams } from 'react-router-dom';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
-import BindingEditor from './BindingEditor';
 import { PageEditorProvider } from './PageEditorProvider';
 import { NodeId } from '../../../types';
 
@@ -36,7 +35,6 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
       <PageFileEditorRoot className={className}>
         <RenderPanel className={classes.renderPanel} />
         <ComponentPanel className={classes.componentPanel} />
-        <BindingEditor />
       </PageFileEditorRoot>
     </PageEditorProvider>
   );

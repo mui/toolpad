@@ -5,18 +5,12 @@ import { update, updateOrCreate } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'catalog' | 'component' | 'theme';
 
-export interface BindingEditorState {
-  readonly nodeId: NodeId;
-  readonly prop: string;
-}
-
 export interface PageEditorState {
   readonly type: 'page';
   readonly nodeId: NodeId;
   readonly selection: NodeId | null;
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: studioDom.StudioNode | null;
-  readonly bindingEditor: BindingEditorState | null;
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
   readonly viewState: ViewState;
@@ -50,14 +44,6 @@ export type PageEditorAction =
       type: 'PAGE_NODE_DRAG_END';
     }
   | {
-      type: 'PAGE_OPEN_BINDING_EDITOR';
-      nodeId: NodeId;
-      prop: string;
-    }
-  | {
-      type: 'PAGE_CLOSE_BINDING_EDITOR';
-    }
-  | {
       type: 'PAGE_VIEW_STATE_UPDATE';
       viewState: ViewState;
     };
@@ -69,7 +55,6 @@ export function createPageEditorState(nodeId: NodeId): PageEditorState {
     selection: null,
     componentPanelTab: 'catalog',
     newNode: null,
-    bindingEditor: null,
     highlightLayout: false,
     highlightedSlot: null,
     viewState: {},
@@ -121,16 +106,6 @@ export function pageEditorReducer(
         highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,
       });
     }
-    case 'PAGE_OPEN_BINDING_EDITOR': {
-      return update(state, {
-        bindingEditor: action,
-      });
-    }
-    case 'PAGE_CLOSE_BINDING_EDITOR': {
-      return update(state, {
-        bindingEditor: null,
-      });
-    }
     case 'PAGE_VIEW_STATE_UPDATE': {
       const { viewState } = action;
       return update(state, {
@@ -161,12 +136,6 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         type: 'PAGE_NODE_DRAG_OVER',
         slot,
       });
-    },
-    openBindingEditor(nodeId: NodeId, prop: string) {
-      dispatch({ type: 'PAGE_OPEN_BINDING_EDITOR', nodeId, prop });
-    },
-    closeBindingEditor() {
-      dispatch({ type: 'PAGE_CLOSE_BINDING_EDITOR' });
     },
     pageViewStateUpdate(viewState: ViewState) {
       dispatch({

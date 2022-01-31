@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as studioDom from '../studioDom';
-import { NodeId, StudioBindingFormat, StudioNodeProp } from '../types';
+import { NodeId, StudioNodeProp } from '../types';
 import { update, omit } from '../utils/immutability';
 import client from '../api';
 
@@ -55,6 +55,10 @@ export type DomAction =
   | {
       type: 'DOM_REMOVE_NODE';
       nodeId: NodeId;
+    }
+  | {
+      type: 'SAVE_NODE';
+      node: studioDom.StudioNode;
     };
 
 export function domReducer(state: DomState, action: DomAction): DomState {
@@ -125,6 +129,11 @@ export function domReducer(state: DomState, action: DomAction): DomState {
         dom: studioDom.removeNode(state.dom, action.nodeId),
       });
     }
+    case 'SAVE_NODE': {
+      return update(state, {
+        dom: studioDom.saveNode(state.dom, action.node),
+      });
+    }
     case 'DOM_REMOVE_BINDING': {
       const { nodeId, prop } = action;
 
@@ -174,6 +183,12 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parentIndex,
       });
     },
+    saveNode(node: studioDom.StudioNode) {
+      dispatch({
+        type: 'SAVE_NODE',
+        node,
+      });
+    },
     removeNode(nodeId: NodeId) {
       dispatch({
         type: 'DOM_REMOVE_NODE',
@@ -192,6 +207,18 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         value: { type: 'const', value },
       });
     },
+    setNodePropValue<P, K extends keyof P & string = keyof P & string>(
+      nodeId: NodeId,
+      prop: K,
+      value: StudioNodeProp<P[K]>,
+    ) {
+      dispatch({
+        type: 'DOM_SET_NODE_PROP',
+        nodeId,
+        prop,
+        value,
+      });
+    },
     setNodeAttribute<N extends studioDom.StudioNode, K extends studioDom.Attributes<N>>(
       node: studioDom.StudioNode,
       attr: K,
@@ -202,19 +229,6 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         nodeId: node.id,
         attr,
         value,
-      });
-    },
-    setNodeExpressionPropValue(
-      nodeId: NodeId,
-      prop: string,
-      value: string,
-      format: StudioBindingFormat,
-    ) {
-      dispatch({
-        type: 'DOM_SET_NODE_PROP',
-        nodeId,
-        prop,
-        value: { type: 'binding', value, format },
       });
     },
     removeBinding(nodeId: NodeId, prop: string) {

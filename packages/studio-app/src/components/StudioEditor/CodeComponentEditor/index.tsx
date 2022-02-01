@@ -39,7 +39,7 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
           plugins: [parserBabel],
         });
         setInput(pretty);
-        domApi.setNodeAttribute<studioDom.StudioCodeComponentNode, 'code'>(domNode, 'code', pretty);
+        domApi.setNodeAttribute(domNode, 'code', pretty);
         // eslint-disable-next-line no-empty
       } catch (err) {
         console.error(err);

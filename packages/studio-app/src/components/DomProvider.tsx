@@ -184,7 +184,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
       });
     },
     setNodeAttribute<N extends studioDom.StudioNode, K extends studioDom.Attributes<N>>(
-      node: studioDom.StudioNode,
+      node: N,
       attr: K,
       value: N[K],
     ) {

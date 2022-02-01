@@ -169,7 +169,7 @@ function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps
             argTypes: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode2(newApiNode, appNode, 'apis');
+          domApi.addNode(newApiNode, appNode, 'apis');
           onClose?.(e, 'backdropClick');
           navigate(`/apis/${newApiNode.id}`);
         }}
@@ -228,7 +228,7 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
             props: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode2(newNode, appNode, 'pages');
+          domApi.addNode(newNode, appNode, 'pages');
           onClose?.(e, 'backdropClick');
           navigate(`/pages/${newNode.id}`);
         }}
@@ -296,7 +296,7 @@ function CreateStudioCodeComponentDialog({
             argTypes: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode2(newNode, appNode, 'codeComponents');
+          domApi.addNode(newNode, appNode, 'codeComponents');
           onClose?.(e, 'backdropClick');
           navigate(`/codeComponents/${newNode.id}`);
         }}

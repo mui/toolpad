@@ -348,7 +348,7 @@ export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DER
   return 'Hello World!';
 }\n`,
     });
-    domApi.addNode2(stateNode, page, 'derivedStates');
+    domApi.addNode(stateNode, page, 'derivedStates');
     setEditedState(stateNode.id);
   }, [dom, domApi, page]);
 

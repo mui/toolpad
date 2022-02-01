@@ -592,9 +592,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         if (newNode) {
           const parent = studioDom.getNode(dom, activeSlot.parentId);
           if (studioDom.isElement(parent)) {
-            domApi.addNode2(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
+            domApi.addNode(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
           } else if (studioDom.isPage(parent)) {
-            domApi.addNode2(newNode, parent, 'children', activeSlot.parentIndex);
+            domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
           } else {
             throw new Error(
               `Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`,

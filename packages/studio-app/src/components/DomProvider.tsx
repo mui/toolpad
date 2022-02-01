@@ -50,10 +50,6 @@ export type DomAction =
   | {
       type: 'DOM_REMOVE_NODE';
       nodeId: NodeId;
-    }
-  | {
-      type: 'SAVE_NODE';
-      node: studioDom.StudioNode;
     };
 
 export function domReducer(state: DomState, action: DomAction): DomState {
@@ -99,7 +95,7 @@ export function domReducer(state: DomState, action: DomAction): DomState {
     }
     case 'DOM_ADD_NODE': {
       return update(state, {
-        dom: studioDom.addNode2<any, any>(
+        dom: studioDom.addNode<any, any>(
           state.dom,
           action.node,
           action.parent,
@@ -124,11 +120,6 @@ export function domReducer(state: DomState, action: DomAction): DomState {
         dom: studioDom.removeNode(state.dom, action.nodeId),
       });
     }
-    case 'SAVE_NODE': {
-      return update(state, {
-        dom: studioDom.saveNode(state.dom, action.node),
-      });
-    }
     default:
       return state;
   }
@@ -139,7 +130,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
-    addNode2<Parent extends studioDom.StudioNode, Child extends studioDom.StudioNode>(
+    addNode<Parent extends studioDom.StudioNode, Child extends studioDom.StudioNode>(
       node: Child,
       parent: Parent,
       parentProp: studioDom.ParentPropOf<Child, Parent>,
@@ -160,12 +151,6 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parentId,
         parentProp,
         parentIndex,
-      });
-    },
-    saveNode(node: studioDom.StudioNode) {
-      dispatch({
-        type: 'SAVE_NODE',
-        node,
       });
     },
     removeNode(nodeId: NodeId) {

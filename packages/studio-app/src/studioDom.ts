@@ -522,20 +522,6 @@ function setNodeParent<N extends StudioNode>(
 export function addNode<Parent extends StudioNode, Child extends StudioNode>(
   dom: StudioDom,
   newNode: Child,
-  parentId: NodeId,
-  parentProp: ParentPropOf<Child, Parent>,
-  parentIndex?: string,
-) {
-  if (newNode.parentId) {
-    throw new Error(`Node "${newNode.id}" is already attached to a parent`);
-  }
-
-  return setNodeParent(dom, newNode, parentId, parentProp, parentIndex);
-}
-
-export function addNode2<Parent extends StudioNode, Child extends StudioNode>(
-  dom: StudioDom,
-  newNode: Child,
   parent: Parent,
   parentProp: ParentPropOf<Child, Parent>,
   parentIndex?: string,
@@ -545,16 +531,6 @@ export function addNode2<Parent extends StudioNode, Child extends StudioNode>(
   }
 
   return setNodeParent(dom, newNode, parent.id, parentProp, parentIndex);
-}
-
-export function saveNode(dom: StudioDom, node: StudioNode) {
-  const nodeId = node.id;
-  const updates = omit(node, 'id', 'type', 'name', 'parentId', 'parentProp', 'parentIndex');
-  return update(dom, {
-    nodes: update(dom.nodes, {
-      [nodeId]: update(node, updates),
-    }),
-  });
 }
 
 export function moveNode(

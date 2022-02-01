@@ -190,7 +190,7 @@ function createDefaultApp(): studioDom.StudioDom {
     title: 'Default',
   });
   const app = studioDom.getApp(dom);
-  dom = studioDom.addNode2(dom, page, app, 'pages');
+  dom = studioDom.addNode(dom, page, app, 'pages');
   return dom;
 }
 

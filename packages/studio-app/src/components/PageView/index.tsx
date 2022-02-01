@@ -36,24 +36,24 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
     });
   }, [pagePath, themePath, editor]);
 
-  const codeComponents = React.useMemo(() => {
+  const codeComponentsFiles = React.useMemo(() => {
     const app = studioDom.getApp(dom);
-    const studioCodeComponents = studioDom.getCodeComponents(dom, app);
+    const { codeComponents = [] } = studioDom.getChildNodes(dom, app);
     // TODO: only render the components that were used on the page?
     return Object.fromEntries(
-      studioCodeComponents.map((component) => [
+      codeComponents.map((component) => [
         `./components/${component.id}.tsx`,
         { code: component.code },
       ]),
     );
   }, [dom]);
 
-  const derivedStateHooks = React.useMemo(() => {
+  const derivedStateHookFiles = React.useMemo(() => {
     const page = studioDom.getNode(dom, pageNodeId);
     studioDom.assertIsPage(page);
-    const stateNodes = studioDom.getChildNodes(dom, page).state ?? [];
+    const { derivedStates = [] } = studioDom.getChildNodes(dom, page);
     return Object.fromEntries(
-      stateNodes.map((derivedState) => [
+      derivedStates.map((derivedState) => [
         `./derivedState/${derivedState.id}.ts`,
         { code: derivedState.code },
       ]),
@@ -67,8 +67,8 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
       base={`/app/${dom.root}/`}
       importMap={getImportMap()}
       files={{
-        ...codeComponents,
-        ...derivedStateHooks,
+        ...codeComponentsFiles,
+        ...derivedStateHookFiles,
         [themePath]: { code: renderedTheme.code },
         [entryPath]: { code: renderedEntrypoint.code },
         [pagePath]: { code: renderedPage.code },

@@ -24,9 +24,10 @@ export default function renderThemeCode(
   `;
 
   const app = studioDom.getApp(dom);
-  const theme = studioDom.getTheme(dom, app);
+  const { themes = [] } = studioDom.getChildNodes(dom, app);
 
-  if (theme) {
+  if (themes.length > 0) {
+    const theme = themes[0];
     const importedColors = new Set();
     const paletteProps: [string, string][] = [];
     const primary = studioDom.getConstPropValue(theme, 'palette.primary.main');

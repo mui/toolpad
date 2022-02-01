@@ -5,22 +5,27 @@ import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { ExactEntriesOf } from './utils/types';
 
-const ALLOWED_CHILDREN = {
+type AllowedChildren = {
   app: {
-    children: ['page', 'api', 'theme', 'codeComponent'],
-  },
-  theme: {},
-  api: {},
+    pages: 'page';
+    apis: 'api';
+    themes: 'theme';
+    codeComponents: 'codeComponent';
+  };
+  theme: {};
+  api: {};
   page: {
-    children: ['element'],
-    state: ['derivedState'],
-  },
+    children: 'element';
+    derivedStates: 'derivedState';
+    queryStates: 'queryState';
+  };
   element: {
-    children: ['element'],
-  },
-  codeComponent: {},
-  derivedState: {},
-} as const;
+    [prop: string]: 'element';
+  };
+  codeComponent: {};
+  derivedState: {};
+  queryState: {};
+};
 
 export function createFractionalIndex(index1: string | null, index2: string | null) {
   return generateKeyBetween(index1, index2);
@@ -41,7 +46,8 @@ type StudioNodeType =
   | 'page'
   | 'element'
   | 'codeComponent'
-  | 'derivedState';
+  | 'derivedState'
+  | 'queryState';
 
 export interface StudioNodeBase<P = any> {
   readonly id: NodeId;
@@ -70,6 +76,7 @@ export interface StudioThemeNode extends StudioNodeBase<StudioTheme> {
 export interface StudioApiNode<P = {}> extends StudioNodeBase<P> {
   readonly type: 'api';
   readonly connectionId: string;
+  readonly argTypes: ArgTypeDefinitions;
 }
 
 export interface StudioPageNode extends StudioNodeBase {
@@ -96,7 +103,13 @@ export interface StudioDerivedStateNode<P = {}> extends StudioNodeBase<P> {
   readonly returnType: PropValueType;
 }
 
-type StudioNodeOfType<K extends StudioNodeBase['type']> = {
+export interface StudioQueryStateNode<P = {}> extends StudioNodeBase<P> {
+  readonly type: 'queryState';
+  readonly api: NodeId | null;
+  readonly props: StudioNodeProps<P>;
+}
+
+type StudioNodeOfType<K extends StudioNodeType> = {
   app: StudioAppNode;
   api: StudioApiNode;
   theme: StudioThemeNode;
@@ -104,6 +117,7 @@ type StudioNodeOfType<K extends StudioNodeBase['type']> = {
   element: StudioElementNode;
   codeComponent: StudioCodeComponentNode;
   derivedState: StudioDerivedStateNode;
+  queryState: StudioQueryStateNode;
 }[K];
 
 export type StudioNode =
@@ -113,28 +127,21 @@ export type StudioNode =
   | StudioPageNode
   | StudioElementNode
   | StudioCodeComponentNode
-  | StudioDerivedStateNode;
+  | StudioDerivedStateNode
+  | StudioQueryStateNode;
 
-type AllowedChildren = typeof ALLOWED_CHILDREN;
 type TypeOf<N extends StudioNode> = N['type'];
-type AllowedChildTypesOfType<T extends StudioNodeType> = T extends keyof AllowedChildren
-  ? AllowedChildren[T]
-  : {};
+type AllowedChildTypesOfType<T extends StudioNodeType> = AllowedChildren[T];
 type AllowedChildTypesOf<N extends StudioNode> = AllowedChildTypesOfType<TypeOf<N>>;
 
 export type ChildNodesOf<N extends StudioNode> = {
-  [K in keyof AllowedChildTypesOf<N>]: AllowedChildTypesOf<N>[K] extends readonly StudioNodeType[]
-    ? StudioNodeOfType<AllowedChildTypesOf<N>[K][number]>[] | undefined
+  [K in keyof AllowedChildTypesOf<N>]: AllowedChildTypesOf<N>[K] extends StudioNodeType
+    ? StudioNodeOfType<AllowedChildTypesOf<N>[K]>[]
     : never;
 };
 
-type CombinedChildrenOf<T extends { readonly [K in string]: readonly StudioNodeType[] }> = {
-  [K in keyof T]: T[K][number];
-}[keyof T];
-
-type CombinedChildrenOfType<T extends StudioNodeType> = T extends keyof AllowedChildren
-  ? CombinedChildrenOf<AllowedChildren[T]>
-  : never;
+type CombinedChildrenOfType<T extends StudioNodeType> =
+  AllowedChildren[T][keyof AllowedChildren[T]];
 
 type CombinedAllowedChildren = {
   [K in StudioNodeType]: CombinedChildrenOfType<K>;
@@ -144,6 +151,12 @@ type ParentTypeOfType<T extends StudioNodeType> = {
   [K in StudioNodeType]: T extends CombinedAllowedChildren[K] ? K : never;
 }[StudioNodeType];
 export type ParentOf<N extends StudioNode> = StudioNodeOfType<ParentTypeOfType<TypeOf<N>>> | null;
+
+export type ParentPropOf<Child extends StudioNode, Parent extends StudioNode> = {
+  [K in keyof AllowedChildren[TypeOf<Parent>]]: TypeOf<Child> extends AllowedChildren[TypeOf<Parent>][K]
+    ? K & string
+    : never;
+}[keyof AllowedChildren[TypeOf<Parent>]];
 
 export interface StudioNodes {
   [id: NodeId]: StudioNode;
@@ -227,6 +240,14 @@ export function assertIsDerivedState<P>(
   assertIsType<StudioDerivedStateNode>(node, 'derivedState');
 }
 
+export function isQueryState<P>(node: StudioNode): node is StudioQueryStateNode<P> {
+  return isType<StudioQueryStateNode>(node, 'queryState');
+}
+
+export function assertIsQueryState<P>(node: StudioNode): asserts node is StudioQueryStateNode<P> {
+  assertIsType<StudioQueryStateNode>(node, 'queryState');
+}
+
 export function getApp(dom: StudioDom): StudioAppNode {
   const rootNode = getNode(dom, dom.root);
   assertIsApp(rootNode);
@@ -235,7 +256,7 @@ export function getApp(dom: StudioDom): StudioAppNode {
 
 export type NodeChildren<N extends StudioNode = any> = ChildNodesOf<N>;
 
-// TODO: memoize the result of this function per dom in a WeakMap?
+// TODO: memoize the result of this function per dom in a WeakMap
 const childrenMemo = new WeakMap<StudioDom, Map<NodeId, NodeChildren<any>>>();
 export function getChildNodes<N extends StudioNode>(dom: StudioDom, parent: N): NodeChildren<N> {
   let domChildrenMemo = childrenMemo.get(dom);
@@ -286,27 +307,6 @@ export function getParent<N extends StudioNode>(dom: StudioDom, child: N): Paren
     return parent as ParentOf<N>;
   }
   return null;
-}
-
-export function getPages(dom: StudioDom, app: StudioAppNode): StudioPageNode[] {
-  return (getChildNodes(dom, app).children?.filter((node) => isPage(node)) ??
-    []) as StudioPageNode[];
-}
-
-export function getApis(dom: StudioDom, app: StudioAppNode): StudioApiNode[] {
-  return (getChildNodes(dom, app).children?.filter((node) => isApi(node)) ?? []) as StudioApiNode[];
-}
-
-export function getCodeComponents(dom: StudioDom, app: StudioAppNode): StudioCodeComponentNode[] {
-  return (getChildNodes(dom, app).children?.filter((node) => isCodeComponent(node)) ??
-    []) as StudioCodeComponentNode[];
-}
-
-// TODO: make theme optional by returning undefined
-export function getTheme(dom: StudioDom, app: StudioAppNode): StudioThemeNode | undefined {
-  return getChildNodes(dom, app).children?.find((node) => isTheme(node)) as
-    | StudioThemeNode
-    | undefined;
 }
 
 function generateUniqueName(baseName: string, existingNames: Set<string>, alwaysIndex = false) {
@@ -502,15 +502,6 @@ function setNodeParent<N extends StudioNode>(
 ) {
   const parent = getNode(dom, parentId);
 
-  const allowedChildren: readonly StudioNodeType[] = (ALLOWED_CHILDREN as any)[
-    parent.type as StudioNodeType
-  ]?.[parentProp];
-  if (!allowedChildren.includes(node.type)) {
-    throw new Error(
-      `Node "${node.id}" of type "${node.type}" can't be added to a node of type "${parent.type}"`,
-    );
-  }
-
   if (!parentIndex) {
     const siblings: readonly StudioNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
     const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
@@ -528,28 +519,18 @@ function setNodeParent<N extends StudioNode>(
   });
 }
 
-export function addNode(
+export function addNode<Parent extends StudioNode, Child extends StudioNode>(
   dom: StudioDom,
-  newNode: StudioNode,
-  parentId: NodeId,
-  parentProp: string,
+  newNode: Child,
+  parent: Parent,
+  parentProp: ParentPropOf<Child, Parent>,
   parentIndex?: string,
 ) {
   if (newNode.parentId) {
     throw new Error(`Node "${newNode.id}" is already attached to a parent`);
   }
 
-  return setNodeParent(dom, newNode, parentId, parentProp, parentIndex);
-}
-
-export function saveNode(dom: StudioDom, node: StudioNode) {
-  const nodeId = node.id;
-  const updates = omit(node, 'id', 'type', 'name', 'parentId', 'parentProp', 'parentIndex');
-  return update(dom, {
-    nodes: update(dom.nodes, {
-      [nodeId]: update(node, updates),
-    }),
-  });
+  return setNodeParent(dom, newNode, parent.id, parentProp, parentIndex);
 }
 
 export function moveNode(

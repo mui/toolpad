@@ -10,7 +10,7 @@ export interface PageEditorState {
   readonly nodeId: NodeId;
   readonly selection: NodeId | null;
   readonly componentPanelTab: ComponentPanelTab;
-  readonly newNode: studioDom.StudioNode | null;
+  readonly newNode: studioDom.StudioElementNode | null;
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
   readonly viewState: ViewState;
@@ -34,7 +34,7 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_NEW_NODE_DRAG_START';
-      newNode: studioDom.StudioNode;
+      newNode: studioDom.StudioElementNode;
     }
   | {
       type: 'PAGE_NODE_DRAG_OVER';
@@ -125,7 +125,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     setComponentPanelTab(tab: ComponentPanelTab) {
       dispatch({ type: 'PAGE_SET_COMPONENT_PANEL_TAB', tab });
     },
-    newNodeDragStart(newNode: studioDom.StudioNode) {
+    newNodeDragStart(newNode: studioDom.StudioElementNode) {
       dispatch({ type: 'PAGE_NEW_NODE_DRAG_START', newNode });
     },
     nodeDragEnd() {

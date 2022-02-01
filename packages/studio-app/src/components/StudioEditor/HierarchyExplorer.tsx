@@ -166,9 +166,10 @@ function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps
           const newApiNode = studioDom.createNode(dom, 'api', {
             props: {},
             connectionId,
+            argTypes: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode(newApiNode, appNode.id, 'children');
+          domApi.addNode(newApiNode, appNode, 'apis');
           onClose?.(e, 'backdropClick');
           navigate(`/apis/${newApiNode.id}`);
         }}
@@ -227,7 +228,7 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
             props: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode(newNode, appNode.id, 'children');
+          domApi.addNode(newNode, appNode, 'pages');
           onClose?.(e, 'backdropClick');
           navigate(`/pages/${newNode.id}`);
         }}
@@ -295,7 +296,7 @@ function CreateStudioCodeComponentDialog({
             argTypes: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode(newNode, appNode.id, 'children');
+          domApi.addNode(newNode, appNode, 'codeComponents');
           onClose?.(e, 'backdropClick');
           navigate(`/codeComponents/${newNode.id}`);
         }}
@@ -334,9 +335,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   const dom = useDom();
 
   const app = studioDom.getApp(dom);
-  const apis = studioDom.getApis(dom, app);
-  const codeComponents = studioDom.getCodeComponents(dom, app);
-  const pages = studioDom.getPages(dom, app);
+  const { apis = [], codeComponents = [], pages = [] } = studioDom.getChildNodes(dom, app);
 
   const [expanded, setExpanded] = React.useState<('' | NodeId)[]>([
     '',

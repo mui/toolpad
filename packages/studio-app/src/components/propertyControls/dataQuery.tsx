@@ -7,7 +7,7 @@ import { useDom } from '../DomProvider';
 function DataQueryEditor({ value, onChange }: EditorProps<string | null>) {
   const dom = useDom();
   const app = studioDom.getApp(dom);
-  const apis = studioDom.getApis(dom, app);
+  const { apis = [] } = studioDom.getChildNodes(dom, app);
 
   const handleSelectionChange = React.useCallback(
     (event: SelectChangeEvent<string>) => {

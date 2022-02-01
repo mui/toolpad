@@ -240,7 +240,7 @@ function EditDerivedStateDialog<P>({ nodeId, open, onClose }: EditDerivedStateDi
 
   const [newPropName, setnewPropName] = React.useState('');
   const handleAddProp = React.useCallback(() => {
-    domApi.setNodeAttribute<studioDom.StudioDerivedStateNode, 'argTypes'>(
+    domApi.setNodeAttribute(
       value,
       'argTypes',
       update(value.argTypes, {
@@ -252,28 +252,20 @@ function EditDerivedStateDialog<P>({ nodeId, open, onClose }: EditDerivedStateDi
 
   const handlePropTypesChange = React.useCallback(
     (newPropTypes: PropValueTypes) => {
-      domApi.setNodeAttribute<studioDom.StudioDerivedStateNode, 'argTypes'>(
-        value,
-        'argTypes',
-        newPropTypes,
-      );
+      domApi.setNodeAttribute(value, 'argTypes', newPropTypes);
     },
     [domApi, value],
   );
 
   const handleReturnTypeChange = React.useCallback(
     (newReturnType: PropValueType) => {
-      domApi.setNodeAttribute<studioDom.StudioDerivedStateNode, 'returnType'>(
-        value,
-        'returnType',
-        newReturnType,
-      );
+      domApi.setNodeAttribute(value, 'returnType', newReturnType);
     },
     [domApi, value],
   );
 
   const handleSaveCode = React.useCallback(() => {
-    domApi.setNodeAttribute<studioDom.StudioDerivedStateNode, 'code'>(value, 'code', codeInput);
+    domApi.setNodeAttribute(value, 'code', codeInput);
   }, [domApi, value, codeInput]);
 
   return (

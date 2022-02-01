@@ -1,4 +1,4 @@
-import { PropValueTypes } from '@mui/studio-core';
+import { ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 import Imports from './codeGen/Imports';
@@ -17,6 +17,14 @@ import {
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
+
+function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes {
+  return Object.fromEntries(
+    Object.entries(argTypes).flatMap(([propName, argType]) =>
+      argType ? [[propName, argType.typeDef]] : [],
+    ),
+  );
+}
 
 export interface RenderPageConfig {
   // whether we're in the context of an editor
@@ -48,6 +56,8 @@ class Context implements RenderContext {
   >();
 
   private useMemoHooks = new Map<string, string>();
+
+  private useQueryHooks = new Map<string, string>();
 
   // Resolves a named interpolation in a binding expression into an expression available on the page
   private interpolations = new Map<string, string>();
@@ -171,14 +181,17 @@ class Context implements RenderContext {
       if (!component) {
         return {};
       }
-      return Object.fromEntries(
-        Object.entries(component.argTypes).flatMap(([propName, argType]) =>
-          argType ? [[propName, argType.typeDef]] : [],
-        ),
-      );
+      return argTypesToPropValueTypes(component.argTypes);
     }
     if (studioDom.isDerivedState(node)) {
       return node.argTypes;
+    }
+    if (studioDom.isQueryState(node)) {
+      const apiNode = node.api ? studioDom.getNode(this.dom, node.api) : null;
+      if (apiNode) {
+        studioDom.assertIsApi(apiNode);
+      }
+      return apiNode ? argTypesToPropValueTypes(apiNode.argTypes) : {};
     }
     return {};
   }
@@ -238,7 +251,7 @@ class Context implements RenderContext {
       },
     );
 
-    // Hooks
+    // useState Hooks
     const component = this.getComponentDefinition(node);
     if (component) {
       Object.entries(component.argTypes).forEach(([propName, argType]) => {

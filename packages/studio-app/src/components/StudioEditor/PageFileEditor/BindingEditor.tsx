@@ -22,6 +22,7 @@ import * as studioDom from '../../../studioDom';
 import { NodeId, StudioNodeProp } from '../../../types';
 import { useDom } from '../../DomProvider';
 import { WithControlledProp } from '../../../utils/types';
+import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS } from '../../../schemas';
 
 export interface BindingEditorContentProps<K> {
   nodeId: NodeId;
@@ -102,6 +103,21 @@ function getBindablePropsInScope(
     }
     if (studioDom.isDerivedState(destNode) && destNode.returnType.type === srcType) {
       return [destNode.name];
+    }
+    if (studioDom.isQueryState(destNode)) {
+      if (propType.type === 'object' || propType.type === 'array') {
+        if (!propType.schema) {
+          return [];
+        }
+        switch (propType.schema) {
+          case URI_DATAGRID_COLUMNS as string:
+            return [`${destNode.name}.columns`];
+          case URI_DATAGRID_ROWS as string:
+            return [`${destNode.name}.rows`];
+          default:
+            return [];
+        }
+      }
     }
     return [];
   });

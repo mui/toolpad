@@ -16,12 +16,8 @@ const LICENSE = '<REDACTED>';
 
 LicenseInfo.setLicenseKey(LICENSE);
 
-interface DataGridWithQueryProps extends DataGridProProps {
-  studioDataQuery: string | null;
-}
-
 const DataGridComponent = React.forwardRef(function DataGridComponent(
-  props: DataGridWithQueryProps,
+  props: DataGridProProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const studioNode = useStudioNode<DataGridProProps>();

@@ -220,15 +220,7 @@ class Context implements RenderContext {
           return;
         }
 
-        if (propType.type === 'dataQuery') {
-          if (propValue.type !== 'const') {
-            throw new Error(`TODO: make this work for bindings`);
-          }
-          if (propValue.value && typeof propValue.value === 'string') {
-            const spreadedValue = this.useDataLoader(propValue.value);
-            result.$spread = `${result.$spread ? `${result.$spread} ` : ''}{...${spreadedValue}}`;
-          }
-        } else if (propValue.type === 'const') {
+        if (propValue.type === 'const') {
           result[propName] = {
             type: 'expression',
             value: JSON.stringify(propValue.value),
@@ -583,6 +575,7 @@ class Context implements RenderContext {
         ${dataQueryHooks}
         ${derivedStateHooks}
         ${queryStateHooks}
+
         return (
           ${root}
         );

@@ -18,8 +18,5 @@ export default {
     density: {
       typeDef: { type: 'string', enum: ['comfortable', 'compact', 'standard'] },
     },
-    studioDataQuery: {
-      typeDef: { type: 'dataQuery' },
-    },
   },
 } as StudioComponentDefinition;

@@ -189,7 +189,8 @@ function createDefaultApp(): studioDom.StudioDom {
     props: {},
     title: 'Default',
   });
-  dom = studioDom.addNode(dom, page, dom.root, 'children');
+  const app = studioDom.getApp(dom);
+  dom = studioDom.addNode2(dom, page, app, 'pages');
   return dom;
 }
 

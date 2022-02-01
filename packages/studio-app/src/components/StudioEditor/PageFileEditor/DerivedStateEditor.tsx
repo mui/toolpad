@@ -333,7 +333,6 @@ export default function DerivedStateEditor() {
   studioDom.assertIsPage(page);
   const { derivedStates = [] } = studioDom.getChildNodes(dom, page);
 
-  const pageNodeId = state.nodeId;
   const handleCreate = React.useCallback(() => {
     const stateNode = studioDom.createNode(dom, 'derivedState', {
       argTypes: {},
@@ -349,9 +348,9 @@ export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DER
   return 'Hello World!';
 }\n`,
     });
-    domApi.addNode(stateNode, pageNodeId, 'state');
+    domApi.addNode2(stateNode, page, 'derivedStates');
     setEditedState(stateNode.id);
-  }, [dom, domApi, pageNodeId]);
+  }, [dom, domApi, page]);
 
   // To keep it around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);

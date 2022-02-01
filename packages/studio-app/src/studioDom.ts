@@ -5,26 +5,27 @@ import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { ExactEntriesOf } from './utils/types';
 
-const ALLOWED_CHILDREN = {
+type AllowedChildren = {
   app: {
-    pages: ['page'],
-    apis: ['api'],
-    themes: ['theme'],
-    codeComponents: ['codeComponent'],
-  },
-  theme: {},
-  api: {},
+    pages: 'page';
+    apis: 'api';
+    themes: 'theme';
+    codeComponents: 'codeComponent';
+  };
+  theme: {};
+  api: {};
   page: {
-    children: ['element'],
-    derivedStates: ['derivedState'],
-    queryStates: ['queryState'],
-  },
+    children: 'element';
+    derivedStates: 'derivedState';
+    queryStates: 'queryState';
+  };
   element: {
-    children: ['element'],
-  },
-  codeComponent: {},
-  derivedState: {},
-} as const;
+    [prop: string]: 'element';
+  };
+  codeComponent: {};
+  derivedState: {};
+  queryState: {};
+};
 
 export function createFractionalIndex(index1: string | null, index2: string | null) {
   return generateKeyBetween(index1, index2);
@@ -108,7 +109,7 @@ export interface StudioQueryStateNode<P = {}> extends StudioNodeBase<P> {
   readonly props: StudioNodeProps<P>;
 }
 
-type StudioNodeOfType<K extends StudioNodeBase['type']> = {
+type StudioNodeOfType<K extends StudioNodeType> = {
   app: StudioAppNode;
   api: StudioApiNode;
   theme: StudioThemeNode;
@@ -129,26 +130,18 @@ export type StudioNode =
   | StudioDerivedStateNode
   | StudioQueryStateNode;
 
-type AllowedChildren = typeof ALLOWED_CHILDREN;
 type TypeOf<N extends StudioNode> = N['type'];
-type AllowedChildTypesOfType<T extends StudioNodeType> = T extends keyof AllowedChildren
-  ? AllowedChildren[T]
-  : {};
+type AllowedChildTypesOfType<T extends StudioNodeType> = AllowedChildren[T];
 type AllowedChildTypesOf<N extends StudioNode> = AllowedChildTypesOfType<TypeOf<N>>;
 
 export type ChildNodesOf<N extends StudioNode> = {
-  [K in keyof AllowedChildTypesOf<N>]: AllowedChildTypesOf<N>[K] extends readonly StudioNodeType[]
-    ? StudioNodeOfType<AllowedChildTypesOf<N>[K][number]>[] | undefined
+  [K in keyof AllowedChildTypesOf<N>]: AllowedChildTypesOf<N>[K] extends StudioNodeType
+    ? StudioNodeOfType<AllowedChildTypesOf<N>[K]>[]
     : never;
 };
 
-type CombinedChildrenOf<T extends { readonly [K in string]: readonly StudioNodeType[] }> = {
-  [K in keyof T]: T[K][number];
-}[keyof T];
-
-type CombinedChildrenOfType<T extends StudioNodeType> = T extends keyof AllowedChildren
-  ? CombinedChildrenOf<AllowedChildren[T]>
-  : never;
+type CombinedChildrenOfType<T extends StudioNodeType> =
+  AllowedChildren[T][keyof AllowedChildren[T]];
 
 type CombinedAllowedChildren = {
   [K in StudioNodeType]: CombinedChildrenOfType<K>;
@@ -158,6 +151,12 @@ type ParentTypeOfType<T extends StudioNodeType> = {
   [K in StudioNodeType]: T extends CombinedAllowedChildren[K] ? K : never;
 }[StudioNodeType];
 export type ParentOf<N extends StudioNode> = StudioNodeOfType<ParentTypeOfType<TypeOf<N>>> | null;
+
+export type ParentPropOf<Child extends StudioNode, Parent extends StudioNode> = {
+  [K in keyof AllowedChildren[TypeOf<Parent>]]: TypeOf<Child> extends AllowedChildren[TypeOf<Parent>][K]
+    ? K & string
+    : never;
+}[keyof AllowedChildren[TypeOf<Parent>]];
 
 export interface StudioNodes {
   [id: NodeId]: StudioNode;
@@ -503,15 +502,6 @@ function setNodeParent<N extends StudioNode>(
 ) {
   const parent = getNode(dom, parentId);
 
-  const allowedChildren: readonly StudioNodeType[] = (ALLOWED_CHILDREN as any)[
-    parent.type as StudioNodeType
-  ]?.[parentProp];
-  if (!allowedChildren.includes(node.type)) {
-    throw new Error(
-      `Node "${node.id}" of type "${node.type}" can't be added to a node of type "${parent.type}"`,
-    );
-  }
-
   if (!parentIndex) {
     const siblings: readonly StudioNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
     const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
@@ -529,11 +519,11 @@ function setNodeParent<N extends StudioNode>(
   });
 }
 
-export function addNode(
+export function addNode<Parent extends StudioNode, Child extends StudioNode>(
   dom: StudioDom,
-  newNode: StudioNode,
+  newNode: Child,
   parentId: NodeId,
-  parentProp: string,
+  parentProp: ParentPropOf<Child, Parent>,
   parentIndex?: string,
 ) {
   if (newNode.parentId) {
@@ -541,6 +531,20 @@ export function addNode(
   }
 
   return setNodeParent(dom, newNode, parentId, parentProp, parentIndex);
+}
+
+export function addNode2<Parent extends StudioNode, Child extends StudioNode>(
+  dom: StudioDom,
+  newNode: Child,
+  parent: Parent,
+  parentProp: ParentPropOf<Child, Parent>,
+  parentIndex?: string,
+) {
+  if (newNode.parentId) {
+    throw new Error(`Node "${newNode.id}" is already attached to a parent`);
+  }
+
+  return setNodeParent(dom, newNode, parent.id, parentProp, parentIndex);
 }
 
 export function saveNode(dom: StudioDom, node: StudioNode) {

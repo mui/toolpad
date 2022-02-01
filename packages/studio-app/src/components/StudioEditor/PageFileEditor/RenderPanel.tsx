@@ -590,12 +590,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       if (activeSlot) {
         if (newNode) {
-          domApi.addNode(
-            newNode,
-            activeSlot.parentId,
-            activeSlot.parentProp,
-            activeSlot.parentIndex,
-          );
+          const parent = studioDom.getNode(dom, activeSlot.parentId);
+          if (studioDom.isElement(parent)) {
+            domApi.addNode2(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
+          } else if (studioDom.isPage(parent)) {
+            domApi.addNode2(newNode, parent, 'children', activeSlot.parentIndex);
+          } else {
+            throw new Error(
+              `Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`,
+            );
+          }
         } else if (selection) {
           domApi.moveNode(
             selection,
@@ -608,7 +612,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.nodeDragEnd();
     },
-    [availableNodes, viewState, domApi, api, slots, newNode, selection, getViewCoordinates],
+    [dom, availableNodes, viewState, domApi, api, slots, newNode, selection, getViewCoordinates],
   );
 
   const handleDragEnd = React.useCallback(

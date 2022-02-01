@@ -36,7 +36,7 @@ export type DomAction =
   | {
       type: 'DOM_ADD_NODE';
       node: studioDom.StudioNode;
-      parentId: NodeId;
+      parent: studioDom.StudioNode;
       parentProp: string;
       parentIndex?: string;
     }
@@ -99,10 +99,10 @@ export function domReducer(state: DomState, action: DomAction): DomState {
     }
     case 'DOM_ADD_NODE': {
       return update(state, {
-        dom: studioDom.addNode(
+        dom: studioDom.addNode2<any, any>(
           state.dom,
           action.node,
-          action.parentId,
+          action.parent,
           action.parentProp,
           action.parentIndex,
         ),
@@ -139,16 +139,16 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
-    addNode(
-      node: studioDom.StudioNode,
-      parentId: NodeId,
-      parentProp: string,
+    addNode2<Parent extends studioDom.StudioNode, Child extends studioDom.StudioNode>(
+      node: Child,
+      parent: Parent,
+      parentProp: studioDom.ParentPropOf<Child, Parent>,
       parentIndex?: string,
     ) {
       dispatch({
         type: 'DOM_ADD_NODE',
         node,
-        parentId,
+        parent,
         parentProp,
         parentIndex,
       });

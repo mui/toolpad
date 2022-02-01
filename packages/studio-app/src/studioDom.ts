@@ -75,6 +75,7 @@ export interface StudioThemeNode extends StudioNodeBase<StudioTheme> {
 export interface StudioApiNode<P = {}> extends StudioNodeBase<P> {
   readonly type: 'api';
   readonly connectionId: string;
+  readonly argTypes: ArgTypeDefinitions;
 }
 
 export interface StudioPageNode extends StudioNodeBase {

@@ -532,8 +532,10 @@ class Context implements RenderContext {
         const { $spread, ...resolvedProps } = this.resolveProps(node, {});
 
         // TODO: Set up variable binding
+        // @ts-expect-error
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const params = this.renderPropsAsObject(resolvedProps);
+        // @ts-expect-error
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
           this.renderJsExpression(resolvedProp),

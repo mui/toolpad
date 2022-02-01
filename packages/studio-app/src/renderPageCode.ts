@@ -75,7 +75,7 @@ class Context implements RenderContext {
 
     this.imports = new Imports(this.moduleScope);
 
-    this.reactAlias = this.addImport('react', 'default', 'React');
+    this.reactAlias = this.addImport('react', '*', 'React');
 
     if (this.editor) {
       this.runtimeAlias = this.addImport('@mui/studio-core/runtime', '*', '__studioRuntime');

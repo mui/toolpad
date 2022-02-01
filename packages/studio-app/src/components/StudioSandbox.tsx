@@ -117,6 +117,7 @@ export default function StudioSandbox({
           scope: base,
         },
       );
+      await caches.delete('rawFiles');
       await addFiles({
         ...prevFiles.current,
         [base]: {

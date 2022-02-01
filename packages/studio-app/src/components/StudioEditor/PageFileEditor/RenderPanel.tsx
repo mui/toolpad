@@ -681,7 +681,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const rootElm = editorWindowRef.current.document.getElementById('root');
 
       if (!rootElm) {
-        throw new Error(`Invariant: Unable to locate Studio App root element`);
+        console.warn(`Invariant: Unable to locate Studio App root element`);
+        return () => {};
       }
 
       api.pageViewStateUpdate(getViewState(rootElm));

@@ -530,10 +530,15 @@ class Context implements RenderContext {
         const node = studioDom.getNode(this.dom, nodeId as NodeId);
         studioDom.assertIsQueryState(node);
         const { $spread, ...resolvedProps } = this.resolveProps(node, {});
+
+        // TODO: Set up variable binding
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const params = this.renderPropsAsObject(resolvedProps);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
           this.renderJsExpression(resolvedProp),
         );
+
         const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
         return `const ${stateVar} = ${useDataQuery}(${JSON.stringify(node.api)});`;
       }

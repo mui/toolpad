@@ -3,6 +3,7 @@ import string from './string';
 import boolean from './boolean';
 import number from './number';
 import select from './select';
+import json from './json';
 import dataQuery from './dataQuery';
 import { PropControlDefinition } from '../../types';
 
@@ -14,6 +15,7 @@ const propTypeControls: {
   number,
   dataQuery,
   select,
+  json,
 };
 
 export default propTypeControls;

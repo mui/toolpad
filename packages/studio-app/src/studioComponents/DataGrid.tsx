@@ -1,3 +1,4 @@
+import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS } from '../schemas';
 import { StudioComponentDefinition } from '../types';
 import importedComponentRenderer from './importedComponentRenderer';
 
@@ -7,11 +8,11 @@ export default {
   render: importedComponentRenderer('@mui/studio-components', 'DataGrid'),
   argTypes: {
     rows: {
-      typeDef: { type: 'array', items: { type: 'object' } },
+      typeDef: { type: 'array', schema: URI_DATAGRID_ROWS as string },
       defaultValue: [],
     },
     columns: {
-      typeDef: { type: 'array', items: { type: 'object' } },
+      typeDef: { type: 'array', schema: URI_DATAGRID_COLUMNS as string },
       defaultValue: [],
     },
     density: {

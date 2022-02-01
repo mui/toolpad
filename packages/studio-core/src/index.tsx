@@ -26,12 +26,12 @@ export interface BooleanValueType extends ValueTypeBase {
 
 export interface ObjectValueType extends ValueTypeBase {
   type: 'object';
-  properties?: { [key: string]: PrimitiveValueType };
+  schema?: 'string';
 }
 
 export interface ArrayValueType extends ValueTypeBase {
   type: 'array';
-  items?: PrimitiveValueType;
+  schema?: 'string';
 }
 
 export interface ElementValueType extends ValueTypeBase {
@@ -57,7 +57,8 @@ export interface ArgControlSpec {
     | 'slots' // slots in canvas
     | 'dataQuery' // Remove this after we redo bindings
     | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
-    | 'date'; // date picker
+    | 'date' // date picker
+    | 'json'; // JSON editor
 }
 
 type PrimitiveValueType =

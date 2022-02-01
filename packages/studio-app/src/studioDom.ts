@@ -593,60 +593,6 @@ export function setPropConstValues<P>(node: StudioNode, values: Partial<P>): Stu
   });
 }
 
-export function setNodePropConstValue<P, K extends keyof P>(
-  node: StudioNodeBase<P>,
-  key: K,
-  value: P[K],
-): StudioNodeBase<P> {
-  const propUpdates: Partial<StudioNodeProps<P>> = {};
-  propUpdates[key] = {
-    type: 'const',
-    value,
-  };
-  return update(node, {
-    props: update(node.props, propUpdates),
-  });
-}
-
-export function setNodePropConstValues<P>(
-  dom: StudioDom,
-  node: StudioApiNode<P>,
-  values: Partial<P>,
-): StudioDom;
-export function setNodePropConstValues<P>(
-  dom: StudioDom,
-  node: StudioElementNode<P>,
-  values: Partial<P>,
-): StudioDom;
-export function setNodePropConstValues<P>(
-  dom: StudioDom,
-  node: StudioThemeNode,
-  values: Partial<P>,
-): StudioDom;
-export function setNodePropConstValues<P>(
-  dom: StudioDom,
-  node: StudioNode,
-  values: Partial<P>,
-): StudioDom;
-export function setNodePropConstValues<P>(
-  dom: StudioDom,
-  node: StudioNode,
-  values: Partial<P>,
-): StudioDom {
-  const propUpdates: Partial<StudioNodeProps<P>> = {};
-  (Object.entries(values) as ExactEntriesOf<P>).forEach(([prop, value]) => {
-    propUpdates[prop] = {
-      type: 'const',
-      value,
-    };
-  });
-  return update(dom, {
-    nodes: update(dom.nodes, {
-      [node.id]: setPropConstValues(node, values),
-    }),
-  });
-}
-
 export type Attributes<N extends StudioNode> = Exclude<keyof N & string, keyof StudioNodeBase>;
 
 export function setNodeAttribute<N extends StudioNode, K extends Attributes<N>>(

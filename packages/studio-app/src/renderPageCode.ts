@@ -172,6 +172,14 @@ class Context implements RenderContext {
       }
       const resolvedExpr = [state, ...path].join('.');
       this.interpolations.set(interpolation, resolvedExpr);
+    } else if (studioDom.isQueryState(node)) {
+      let state = this.useQueryHooks.get(node.id);
+      if (!state) {
+        state = this.moduleScope.createUniqueBinding(node.name);
+        this.useQueryHooks.set(node.id, state);
+      }
+      const resolvedExpr = [state, ...path].join('.');
+      this.interpolations.set(interpolation, resolvedExpr);
     }
   }
 
@@ -524,6 +532,23 @@ class Context implements RenderContext {
     }).join('\n');
   }
 
+  renderQueryStateHooks(): string {
+    return Array.from(this.useQueryHooks.entries(), ([nodeId, stateVar]) => {
+      if (stateVar) {
+        const node = studioDom.getNode(this.dom, nodeId as NodeId);
+        studioDom.assertIsQueryState(node);
+        const { $spread, ...resolvedProps } = this.resolveProps(node, {});
+        const params = this.renderPropsAsObject(resolvedProps);
+        const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
+          this.renderJsExpression(resolvedProp),
+        );
+        const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
+        return `const ${stateVar} = ${useDataQuery}(${JSON.stringify(node.api)});`;
+      }
+      return '';
+    }).join('\n');
+  }
+
   renderDataLoaderHooks(): string {
     if (this.dataLoaders.length <= 0) {
       return '';
@@ -543,6 +568,7 @@ class Context implements RenderContext {
     const root: string = this.renderRoot(this.page);
     const stateHooks = this.renderStateHooks();
     const derivedStateHooks = this.renderDerivedStateHooks();
+    const queryStateHooks = this.renderQueryStateHooks();
     const dataQueryHooks = this.renderDataLoaderHooks();
 
     this.imports.seal();
@@ -556,6 +582,7 @@ class Context implements RenderContext {
         ${stateHooks}
         ${dataQueryHooks}
         ${derivedStateHooks}
+        ${queryStateHooks}
         return (
           ${root}
         );

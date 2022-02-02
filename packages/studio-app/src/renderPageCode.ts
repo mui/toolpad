@@ -1,4 +1,4 @@
-import { ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
+import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 import Imports from './codeGen/Imports';
@@ -31,14 +31,6 @@ export interface RenderPageConfig {
   editor: boolean;
   // prettify output
   pretty: boolean;
-}
-
-function hasBindablePropsNamespace<P>(
-  node: studioDom.StudioNode,
-): node is studioDom.StudioNode & { props: StudioBindables<P> } {
-  return (
-    studioDom.isElement(node) || studioDom.isDerivedState(node) || studioDom.isQueryState(node)
-  );
 }
 
 class Context implements RenderContext {
@@ -109,12 +101,18 @@ class Context implements RenderContext {
   collectAllState() {
     const nodes = studioDom.getDescendants(this.dom, this.page);
     nodes.forEach((node) => {
-      if (hasBindablePropsNamespace(node)) {
-        Object.values(node.props).forEach((prop) => {
-          if (prop) {
-            this.collectBindablePropState(prop);
-          }
-        });
+      if (studioDom.isElement(node)) {
+        this.collectBindablePropsState(node.props);
+      } else if (studioDom.isDerivedState(node) || studioDom.isQueryState(node)) {
+        this.collectBindablePropsState(node.params);
+      }
+    });
+  }
+
+  collectBindablePropsState(props: StudioBindables<any>) {
+    Object.values(props).forEach((prop) => {
+      if (prop) {
+        this.collectBindablePropState(prop);
       }
     });
   }
@@ -220,49 +218,87 @@ class Context implements RenderContext {
     return {};
   }
 
+  resolveUserProp<P extends studioDom.BindableProps<P>>(
+    propName: string,
+    propValue: StudioBindable<any>,
+    propType: PropValueType,
+  ): PropExpression | null {
+    if (typeof propName !== 'string') {
+      return null;
+    }
+
+    if (!propType || !propValue || typeof propName !== 'string') {
+      return null;
+    }
+
+    if (propValue.type === 'const') {
+      return {
+        type: 'expression',
+        value: JSON.stringify(propValue.value),
+      };
+    }
+
+    if (propValue.type === 'boundExpression') {
+      const parsedExpr = bindings.parse(propValue.value);
+
+      // Resolve each named variable to its resolved variable in code
+      const resolvedExpr = bindings.resolve(
+        parsedExpr,
+        (part) => this.interpolations.get(part) ?? 'undefined',
+      );
+
+      const value = bindings.format(resolvedExpr, propValue.format);
+
+      return {
+        type: 'expression',
+        value,
+      };
+    }
+
+    if (propValue.type === 'binding') {
+      return {
+        type: 'expression',
+        value: this.interpolations.get(propValue.value) ?? 'undefined',
+      };
+    }
+
+    console.warn(`Invariant: Unkown prop type "${(propValue as any).type}"`);
+    return null;
+  }
+
   /**
    * Resolves StudioNode properties to expressions we can render in the code.
    * This will set up databinding if necessary
    */
   resolveProps(node: studioDom.StudioNode, resolvedChildren: ResolvedProps): ResolvedProps {
-    const result: ResolvedProps = resolvedChildren;
+    const result: ResolvedProps = {};
     const propTypes = this.getPropTypes(node);
 
+    if (studioDom.isElement(node) || studioDom.isPage(node)) {
+      Object.assign(result, resolvedChildren);
+    }
+
     // User props
-    if (hasBindablePropsNamespace(node)) {
+    if (studioDom.isElement(node)) {
       Object.entries(node.props).forEach(([propName, propValue]) => {
         const propType = propTypes[propName as string];
-        if (!propType || !propValue || typeof propName !== 'string' || result[propName]) {
-          return;
+        if (propValue && propType && !result[propName]) {
+          const resolved = this.resolveUserProp(propName, propValue, propType);
+          if (resolved) {
+            result[propName] = resolved;
+          }
         }
+      });
+    }
 
-        if (propValue.type === 'const') {
-          result[propName] = {
-            type: 'expression',
-            value: JSON.stringify(propValue.value),
-          };
-        } else if (propValue.type === 'boundExpression') {
-          const parsedExpr = bindings.parse(propValue.value);
-
-          // Resolve each named variable to its resolved variable in code
-          const resolvedExpr = bindings.resolve(
-            parsedExpr,
-            (part) => this.interpolations.get(part) ?? 'undefined',
-          );
-
-          const value = bindings.format(resolvedExpr, propValue.format);
-
-          result[propName] = {
-            type: 'expression',
-            value,
-          };
-        } else if (propValue.type === 'binding') {
-          result[propName] = {
-            type: 'expression',
-            value: this.interpolations.get(propValue.value) ?? 'undefined',
-          };
-        } else {
-          console.warn(`Invariant: Unkown prop type "${(propValue as any).type}"`);
+    if (studioDom.isDerivedState(node) || studioDom.isQueryState(node)) {
+      Object.entries(node.params).forEach(([propName, propValue]) => {
+        const propType = propTypes[propName as string];
+        if (propValue && propType) {
+          const resolved = this.resolveUserProp(propName, propValue, propType);
+          if (resolved) {
+            result[propName] = resolved;
+          }
         }
       });
     }

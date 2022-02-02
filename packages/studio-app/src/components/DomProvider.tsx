@@ -23,8 +23,9 @@ export type DomAction =
     }
   | {
       type: 'DOM_SET_NODE_PROP';
-      nodeId: NodeId;
+      node: studioDom.StudioNode;
       prop: string;
+      namespace: string;
       value: StudioNodeProp<unknown> | null;
     }
   | {
@@ -82,9 +83,14 @@ export function domReducer(state: DomState, action: DomAction): DomState {
       });
     }
     case 'DOM_SET_NODE_PROP': {
-      const node = studioDom.getNode(state.dom, action.nodeId);
       return update(state, {
-        dom: studioDom.setNodeProp<any, any>(state.dom, node, action.prop, action.value),
+        dom: studioDom.setNodeNamespacedProp<any, any, any>(
+          state.dom,
+          action.node,
+          'props',
+          action.prop,
+          action.value,
+        ),
       });
     }
     case 'DOM_SET_NODE_ATTR': {
@@ -159,28 +165,17 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         nodeId,
       });
     },
-    setNodeConstPropValue<P, K extends keyof P & string = keyof P & string>(
-      node: studioDom.StudioNode,
-      prop: K,
-      value: P[K],
-    ) {
+    setNodePropsValue<
+      Node extends studioDom.StudioNode,
+      Namespace extends studioDom.PropNamespaces<Node>,
+      Prop extends keyof Node[Namespace] & string,
+    >(node: Node, namespace: Namespace, prop: Prop, value: Node[Namespace][Prop] | null) {
       dispatch({
         type: 'DOM_SET_NODE_PROP',
-        nodeId: node.id,
+        namespace,
+        node,
         prop,
-        value: { type: 'const', value },
-      });
-    },
-    setNodePropValue<P, K extends keyof P & string = keyof P & string>(
-      nodeId: NodeId,
-      prop: K,
-      value: StudioNodeProp<P[K]> | null,
-    ) {
-      dispatch({
-        type: 'DOM_SET_NODE_PROP',
-        nodeId,
-        prop,
-        value,
+        value: value as StudioNodeProp<unknown> | null,
       });
     },
     setNodeAttribute<N extends studioDom.StudioNode, K extends studioDom.Attributes<N>>(

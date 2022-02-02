@@ -33,6 +33,14 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
+function hasBindablePropsNamespace<P>(
+  node: studioDom.StudioNode,
+): node is studioDom.StudioNode & { props: StudioNodeProps<P> } {
+  return (
+    studioDom.isElement(node) || studioDom.isDerivedState(node) || studioDom.isQueryState(node)
+  );
+}
+
 class Context implements RenderContext {
   private dom: studioDom.StudioDom;
 
@@ -101,17 +109,25 @@ class Context implements RenderContext {
   collectAllState() {
     const nodes = studioDom.getDescendants(this.dom, this.page);
     nodes.forEach((node) => {
-      (Object.values(node.props) as StudioNodeProp<unknown>[]).forEach((prop) => {
-        if (prop?.type === 'boundExpression') {
-          const parsedExpr = bindings.parse(prop.value);
-          bindings
-            .getInterpolations(parsedExpr)
-            .forEach((interpolation) => this.collectInterpolation(interpolation));
-        } else if (prop?.type === 'binding') {
-          this.collectInterpolation(prop.value);
-        }
-      });
+      if (hasBindablePropsNamespace(node)) {
+        Object.values(node.props).forEach((prop) => {
+          if (prop) {
+            this.collectBindablePropState(prop);
+          }
+        });
+      }
     });
+  }
+
+  collectBindablePropState(prop: StudioNodeProp<unknown>) {
+    if (prop?.type === 'boundExpression') {
+      const parsedExpr = bindings.parse(prop.value);
+      bindings
+        .getInterpolations(parsedExpr)
+        .forEach((interpolation) => this.collectInterpolation(interpolation));
+    } else if (prop?.type === 'binding') {
+      this.collectInterpolation(prop.value);
+    }
   }
 
   collectInterpolation(interpolation: string) {
@@ -208,13 +224,13 @@ class Context implements RenderContext {
    * Resolves StudioNode properties to expressions we can render in the code.
    * This will set up databinding if necessary
    */
-  resolveProps<P>(node: studioDom.StudioNode, resolvedChildren: ResolvedProps): ResolvedProps {
+  resolveProps(node: studioDom.StudioNode, resolvedChildren: ResolvedProps): ResolvedProps {
     const result: ResolvedProps = resolvedChildren;
     const propTypes = this.getPropTypes(node);
 
     // User props
-    (Object.entries(node.props) as ExactEntriesOf<StudioNodeProps<P>>).forEach(
-      ([propName, propValue]) => {
+    if (hasBindablePropsNamespace(node)) {
+      Object.entries(node.props).forEach(([propName, propValue]) => {
         const propType = propTypes[propName as string];
         if (!propType || !propValue || typeof propName !== 'string' || result[propName]) {
           return;
@@ -248,8 +264,8 @@ class Context implements RenderContext {
         } else {
           console.warn(`Invariant: Unkown prop type "${(propValue as any).type}"`);
         }
-      },
-    );
+      });
+    }
 
     // useState Hooks
     const component = this.getComponentDefinition(node);

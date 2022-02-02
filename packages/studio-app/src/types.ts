@@ -3,10 +3,6 @@ import { ArgTypeDefinition, ArgTypeDefinitions, SlotType, RuntimeError } from '@
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
-export interface DefaultNodeProps {
-  [prop: string]: unknown;
-}
-
 export interface EditorProps<T> {
   name: string;
   argType: ArgTypeDefinition;

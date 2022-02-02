@@ -40,9 +40,9 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
 
   const handlePropChange = React.useCallback(
     (newValue) => {
-      domApi.setNodePropValue<P>(node.id, name, newValue);
+      domApi.setNodePropsValue(node, 'props', name, newValue);
     },
-    [domApi, node.id, name],
+    [domApi, node, name],
   );
 
   const handlePropConstChange = React.useCallback(

@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import { Box, Button, Stack, TextField, Toolbar } from '@mui/material';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import { useParams } from 'react-router-dom';
-import { DefaultNodeProps, NodeId, StudioConnection, StudioDataSourceClient } from '../../../types';
+import { NodeId, StudioConnection, StudioDataSourceClient } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
@@ -18,14 +18,14 @@ interface ApiEditorProps {
   nodeId: NodeId;
 }
 
-function ApiEditorContent<Q extends DefaultNodeProps>({ nodeId }: ApiEditorProps) {
+function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const api = studioDom.getNode(dom, nodeId);
   studioDom.assertIsApi<Q>(api);
 
   const [name, setName] = React.useState(api.name);
-  const [query, setQuery] = React.useState(studioDom.getPropConstValues(api) as Q);
+  const [query, setQuery] = React.useState(studioDom.fromConstPropValues(api.props) as Q);
 
   const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
     client.query.getConnection(api.connectionId),
@@ -33,7 +33,10 @@ function ApiEditorContent<Q extends DefaultNodeProps>({ nodeId }: ApiEditorProps
 
   const datasource = connectionData && getDataSource<Q>(connectionData);
 
-  const previewApi: studioDom.StudioApiNode<Q> = studioDom.setPropConstValues(api, query);
+  const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
+    return { ...api, props: studioDom.toConstPropValues(query) };
+  }, [api, query]);
+
   const { data: previewData } = useQuery(['api', previewApi], () =>
     client.query.execApi(previewApi),
   );
@@ -60,8 +63,14 @@ function ApiEditorContent<Q extends DefaultNodeProps>({ nodeId }: ApiEditorProps
           <Button
             onClick={() => {
               domApi.setNodeName(nodeId, name);
-              Object.keys(query).forEach((prop: keyof Q & string) => {
-                domApi.setNodeConstPropValue<Q>(api, prop, query[prop]);
+              (Object.keys(query) as (keyof Q)[]).forEach((propName) => {
+                if (typeof propName !== 'string' || !query[propName]) {
+                  return;
+                }
+                domApi.setNodePropsValue(api, 'props', propName, {
+                  type: 'const',
+                  value: query[propName],
+                });
               });
             }}
           >

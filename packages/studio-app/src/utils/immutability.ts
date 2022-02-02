@@ -33,10 +33,7 @@ export function insert<T>(array: readonly T[], value: T, index: number): T[] {
   return [...array.slice(0, index), value, ...array.slice(index)];
 }
 
-export function omit<K extends string, T extends Record<K, unknown>>(
-  obj: T,
-  ...keys: readonly K[]
-): Omit<T, K> {
+export function omit<T, K extends keyof T>(obj: T, ...keys: readonly K[]): Omit<T, K> {
   let result: T | undefined;
 
   keys.forEach((key) => {

@@ -115,7 +115,7 @@ function StudioNodePropsEditor<P>({
       onArgTypesChange(
         update(argTypes, {
           [propName]: newPropType,
-        } as Partial<PropValueTypes>),
+        } as Partial<PropValueTypes<keyof P & string>>),
       );
     },
     [onArgTypesChange, argTypes],

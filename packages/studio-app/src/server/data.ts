@@ -186,7 +186,6 @@ function createDefaultApp(): studioDom.StudioDom {
   let dom = studioDom.createDom();
   const page = studioDom.createNode(dom, 'page', {
     name: 'DefaultPage',
-    props: {},
     title: 'Default',
   });
   const app = studioDom.getApp(dom);

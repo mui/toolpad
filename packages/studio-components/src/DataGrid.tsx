@@ -6,22 +6,30 @@ import {
   GridColumnResizeParams,
   GridCallbackDetails,
   MuiEvent,
+  GridColumns,
+  GridRowsProp,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useStudioNode } from '@mui/studio-core';
 import { debounce } from '@mui/material';
+import { UseDataQuery } from 'packages/studio-core/dist/useDataQuery';
 
 // TODO: Generate a specific license for Studio (This one comes from CI)
 const LICENSE = '<REDACTED>';
 
 LicenseInfo.setLicenseKey(LICENSE);
 
-interface DataGridWithQueryProps extends DataGridProProps {
-  studioDataQuery: string | null;
+const EMPTY_COLUMNS: GridColumns = [];
+const EMPTY_ROWS: GridRowsProp = [];
+
+interface DataGridWithQueryProps extends Omit<DataGridProProps, 'columns' | 'rows'> {
+  rows?: GridRowsProp;
+  columns?: GridColumns;
+  dataQuery?: UseDataQuery;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
-  props: DataGridWithQueryProps,
+  { dataQuery, columns: columnsProp, rows: rowsProp, ...props }: DataGridWithQueryProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const studioNode = useStudioNode<DataGridProProps>();
@@ -38,9 +46,24 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [studioNode],
   );
 
+  const { columns: dataQueryColumns, rows: dataQueryRows, ...dataQueryRest } = dataQuery || {};
+
+  const columns: GridColumns = columnsProp || dataQueryColumns || EMPTY_COLUMNS;
+  const columnsFingerPrint = React.useMemo(() => JSON.stringify(columns), [columns]);
+
+  const rows: GridRowsProp = rowsProp || dataQueryRows || EMPTY_ROWS;
+
   return (
     <div ref={ref} style={{ height: 350, width: '100%' }}>
-      <DataGridPro components={{ Toolbar: GridToolbar }} onColumnResize={handleResize} {...props} />
+      <DataGridPro
+        components={{ Toolbar: GridToolbar }}
+        onColumnResize={handleResize}
+        key={columnsFingerPrint}
+        rows={rows}
+        columns={columns}
+        {...dataQueryRest}
+        {...props}
+      />
     </div>
   );
 });

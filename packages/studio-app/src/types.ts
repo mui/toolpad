@@ -159,7 +159,7 @@ export interface JsxElement {
 
 export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
 
-export type ResolvedProps = Record<string, PropExpression | undefined> & { $spread?: string };
+export type ResolvedProps = Record<string, PropExpression | undefined>;
 
 export interface RenderContext {
   addImport(source: string, imported: string, local: string): string;

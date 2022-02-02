@@ -110,9 +110,8 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         onKeyPress={handleKeyPress}
       />
       {/* eslint-disable-next-line no-nested-ternary */}
-      {nodeError ? (
-        <RuntimeErrorAlert error={nodeError} />
-      ) : node ? (
+      {nodeError ? <RuntimeErrorAlert error={nodeError} /> : null}
+      {node ? (
         <React.Fragment>
           <div>props:</div>
           <ComponentPropsEditor node={node} actualValues={actualValues} />

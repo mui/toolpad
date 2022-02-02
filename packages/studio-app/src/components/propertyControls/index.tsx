@@ -3,7 +3,7 @@ import string from './string';
 import boolean from './boolean';
 import number from './number';
 import select from './select';
-import dataQuery from './dataQuery';
+import json from './json';
 import { PropControlDefinition } from '../../types';
 
 const propTypeControls: {
@@ -12,8 +12,8 @@ const propTypeControls: {
   string,
   boolean,
   number,
-  dataQuery,
   select,
+  json,
 };
 
 export default propTypeControls;

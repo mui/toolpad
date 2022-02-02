@@ -1,4 +1,4 @@
-import { PropValueTypes } from '@mui/studio-core';
+import { ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 import Imports from './codeGen/Imports';
@@ -17,6 +17,14 @@ import {
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
+
+function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes {
+  return Object.fromEntries(
+    Object.entries(argTypes).flatMap(([propName, argType]) =>
+      argType ? [[propName, argType.typeDef]] : [],
+    ),
+  );
+}
 
 export interface RenderPageConfig {
   // whether we're in the context of an editor
@@ -42,15 +50,17 @@ class Context implements RenderContext {
 
   private runtimeAlias: string = 'undefined';
 
-  private useStateHooks: {
-    [id in string]?: { state: string; setState: string; defaultValue?: unknown };
-  } = {};
+  private useStateHooks = new Map<
+    string,
+    { state: string; setState: string; defaultValue?: unknown }
+  >();
 
-  private useMemoHooks: {
-    [id in string]?: string;
-  } = {};
+  private useMemoHooks = new Map<string, string>();
 
-  private state: { [id: string]: string } = {};
+  private useQueryHooks = new Map<string, string>();
+
+  // Resolves a named interpolation in a binding expression into an expression available on the page
+  private interpolations = new Map<string, string>();
 
   constructor(
     dom: studioDom.StudioDom,
@@ -65,7 +75,7 @@ class Context implements RenderContext {
 
     this.imports = new Imports(this.moduleScope);
 
-    this.reactAlias = this.addImport('react', 'default', 'React');
+    this.reactAlias = this.addImport('react', '*', 'React');
 
     if (this.editor) {
       this.runtimeAlias = this.addImport('@mui/studio-core/runtime', '*', '__studioRuntime');
@@ -120,7 +130,7 @@ class Context implements RenderContext {
 
       const stateId = `${nodeId}.${prop}`;
 
-      let stateHook = this.useStateHooks[stateId];
+      let stateHook = this.useStateHooks.get(stateId);
       if (!stateHook) {
         const component = this.getComponentDefinition(node);
 
@@ -149,17 +159,27 @@ class Context implements RenderContext {
           setState,
           defaultValue: argType.defaultValue,
         };
-        this.useStateHooks[stateId] = stateHook;
+        this.useStateHooks.set(stateId, stateHook);
       }
 
-      this.state[interpolation] = [stateHook.state, ...subPath].join('.');
+      const resolvedExpr = [stateHook.state, ...subPath].join('.');
+      this.interpolations.set(interpolation, resolvedExpr);
     } else if (studioDom.isDerivedState(node)) {
-      let state = this.useMemoHooks[node.id];
+      let state = this.useMemoHooks.get(node.id);
       if (!state) {
         state = this.moduleScope.createUniqueBinding(node.name);
-        this.useMemoHooks[node.id] = state;
+        this.useMemoHooks.set(node.id, state);
       }
-      this.state[interpolation] = state;
+      const resolvedExpr = [state, ...path].join('.');
+      this.interpolations.set(interpolation, resolvedExpr);
+    } else if (studioDom.isQueryState(node)) {
+      let state = this.useQueryHooks.get(node.id);
+      if (!state) {
+        state = this.moduleScope.createUniqueBinding(node.name);
+        this.useQueryHooks.set(node.id, state);
+      }
+      const resolvedExpr = [state, ...path].join('.');
+      this.interpolations.set(interpolation, resolvedExpr);
     }
   }
 
@@ -169,14 +189,17 @@ class Context implements RenderContext {
       if (!component) {
         return {};
       }
-      return Object.fromEntries(
-        Object.entries(component.argTypes).flatMap(([propName, argType]) =>
-          argType ? [[propName, argType.typeDef]] : [],
-        ),
-      );
+      return argTypesToPropValueTypes(component.argTypes);
     }
     if (studioDom.isDerivedState(node)) {
       return node.argTypes;
+    }
+    if (studioDom.isQueryState(node)) {
+      const apiNode = node.api ? studioDom.getNode(this.dom, node.api) : null;
+      if (apiNode) {
+        studioDom.assertIsApi(apiNode);
+      }
+      return apiNode ? argTypesToPropValueTypes(apiNode.argTypes) : {};
     }
     return {};
   }
@@ -197,15 +220,7 @@ class Context implements RenderContext {
           return;
         }
 
-        if (propType.type === 'dataQuery') {
-          if (propValue.type !== 'const') {
-            throw new Error(`TODO: make this work for bindings`);
-          }
-          if (propValue.value && typeof propValue.value === 'string') {
-            const spreadedValue = this.useDataLoader(propValue.value);
-            result.$spread = `${result.$spread ? `${result.$spread} ` : ''}{...${spreadedValue}}`;
-          }
-        } else if (propValue.type === 'const') {
+        if (propValue.type === 'const') {
           result[propName] = {
             type: 'expression',
             value: JSON.stringify(propValue.value),
@@ -214,7 +229,10 @@ class Context implements RenderContext {
           const parsedExpr = bindings.parse(propValue.value);
 
           // Resolve each named variable to its resolved variable in code
-          const resolvedExpr = bindings.resolve(parsedExpr, (part) => this.state[part]);
+          const resolvedExpr = bindings.resolve(
+            parsedExpr,
+            (part) => this.interpolations.get(part) ?? 'undefined',
+          );
 
           const value = bindings.format(resolvedExpr, propValue.format);
 
@@ -225,7 +243,7 @@ class Context implements RenderContext {
         } else if (propValue.type === 'binding') {
           result[propName] = {
             type: 'expression',
-            value: this.state[propValue.value],
+            value: this.interpolations.get(propValue.value) ?? 'undefined',
           };
         } else {
           console.warn(`Invariant: Unkown prop type "${(propValue as any).type}"`);
@@ -233,7 +251,7 @@ class Context implements RenderContext {
       },
     );
 
-    // Hooks
+    // useState Hooks
     const component = this.getComponentDefinition(node);
     if (component) {
       Object.entries(component.argTypes).forEach(([propName, argType]) => {
@@ -242,7 +260,7 @@ class Context implements RenderContext {
         }
 
         const stateId = `${node.id}.${propName}`;
-        const hook = this.useStateHooks[stateId];
+        const hook = this.useStateHooks.get(stateId);
 
         if (!hook) {
           return;
@@ -401,9 +419,6 @@ class Context implements RenderContext {
         if (!expr) {
           return '';
         }
-        if (name === '$spread') {
-          return expr;
-        }
         return `${name}={${this.renderJsExpression(expr)}}`;
       })
       .join(' ');
@@ -420,9 +435,6 @@ class Context implements RenderContext {
       ([name, expr]) => {
         if (!expr) {
           return '';
-        }
-        if (name === '$spread') {
-          return expr;
         }
         return `${name}: ${this.renderJsExpression(expr)}`;
       },
@@ -474,40 +486,60 @@ class Context implements RenderContext {
   }
 
   renderStateHooks(): string {
-    return Object.values(this.useStateHooks)
-      .map((state) => {
-        if (!state) {
-          return '';
-        }
-        const defaultValue = JSON.stringify(state.defaultValue);
-        return `const [${state.state}, ${state.setState}] = ${this.reactAlias}.useState(${defaultValue});`;
-      })
-      .join('\n');
+    return Array.from(this.useStateHooks.values(), (state) => {
+      if (!state) {
+        return '';
+      }
+      const defaultValue = JSON.stringify(state.defaultValue);
+      return `const [${state.state}, ${state.setState}] = ${this.reactAlias}.useState(${defaultValue});`;
+    }).join('\n');
   }
 
   renderDerivedStateHooks(): string {
-    return Object.entries(this.useMemoHooks)
-      .map(([nodeId, stateVar]) => {
-        if (stateVar) {
-          const node = studioDom.getNode(this.dom, nodeId as NodeId);
-          studioDom.assertIsDerivedState(node);
-          const { $spread, ...resolvedProps } = this.resolveProps(node, {});
-          const params = this.renderPropsAsObject(resolvedProps);
-          const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
-            this.renderJsExpression(resolvedProp),
-          );
-          const derivedStateGetter = this.addImport(
-            `../derivedState/${node.id}.ts`,
-            'default',
-            node.name,
-          );
-          return `const ${stateVar} = React.useMemo(() => ${derivedStateGetter}(${params}), [${depsArray.join(
-            ', ',
-          )}])`;
-        }
-        return '';
-      })
-      .join('\n');
+    return Array.from(this.useMemoHooks.entries(), ([nodeId, stateVar]) => {
+      if (stateVar) {
+        const node = studioDom.getNode(this.dom, nodeId as NodeId);
+        studioDom.assertIsDerivedState(node);
+        const resolvedProps = this.resolveProps(node, {});
+        const params = this.renderPropsAsObject(resolvedProps);
+        const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
+          this.renderJsExpression(resolvedProp),
+        );
+        const derivedStateGetter = this.addImport(
+          `../derivedState/${node.id}.ts`,
+          'default',
+          node.name,
+        );
+        return `const ${stateVar} = React.useMemo(() => ${derivedStateGetter}(${params}), [${depsArray.join(
+          ', ',
+        )}])`;
+      }
+      return '';
+    }).join('\n');
+  }
+
+  renderQueryStateHooks(): string {
+    return Array.from(this.useQueryHooks.entries(), ([nodeId, stateVar]) => {
+      if (stateVar) {
+        const node = studioDom.getNode(this.dom, nodeId as NodeId);
+        studioDom.assertIsQueryState(node);
+        const resolvedProps = this.resolveProps(node, {});
+
+        // TODO: Set up variable binding
+        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const params = this.renderPropsAsObject(resolvedProps);
+        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
+          this.renderJsExpression(resolvedProp),
+        );
+
+        const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
+        return `const ${stateVar} = ${useDataQuery}(${JSON.stringify(node.api)});`;
+      }
+      return '';
+    }).join('\n');
   }
 
   renderDataLoaderHooks(): string {
@@ -529,6 +561,7 @@ class Context implements RenderContext {
     const root: string = this.renderRoot(this.page);
     const stateHooks = this.renderStateHooks();
     const derivedStateHooks = this.renderDerivedStateHooks();
+    const queryStateHooks = this.renderQueryStateHooks();
     const dataQueryHooks = this.renderDataLoaderHooks();
 
     this.imports.seal();
@@ -542,6 +575,8 @@ class Context implements RenderContext {
         ${stateHooks}
         ${dataQueryHooks}
         ${derivedStateHooks}
+        ${queryStateHooks}
+
         return (
           ${root}
         );

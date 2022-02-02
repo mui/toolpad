@@ -49,19 +49,12 @@ function tsTypeForPropValueType(propValueType: PropValueType): string {
     case 'boolean':
       return 'boolean';
     case 'array': {
-      const itemType = propValueType.items
-        ? tsTypeForPropValueType(propValueType.items)
-        : 'unknown';
-      return `${itemType}[]`;
+      // TODO: use something like https://www.npmjs.com/package/json-schema-to-typescript
+      // to generate types from a provided schema in [propValueType.schema]
+      return `any[]`;
     }
     case 'object': {
-      if (propValueType.properties) {
-        const typeFields = Object.entries(propValueType.properties).map(([propName, propType]) => {
-          return `${propName}: ${tsTypeForPropValueType(propType)}`;
-        });
-        return `{${typeFields.join('; ')}}`;
-      }
-      return '{}';
+      return 'any';
     }
     default:
       throw new Error(`Unsupported argtype "${propValueType.type}"`);

@@ -79,7 +79,7 @@ function ApiEditorContent<Q extends DefaultNodeProps>({ nodeId }: ApiEditorProps
         </Stack>
       </Box>
       <Box sx={{ flex: 1, overflow: 'hidden' }}>
-        <DataGridPro rows={rows} columns={columns} key={columnsFingerPrint} />
+        <DataGridPro density="compact" rows={rows} columns={columns} key={columnsFingerPrint} />
       </Box>
     </Box>
   ) : null;

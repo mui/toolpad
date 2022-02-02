@@ -8,6 +8,7 @@ import useLatest from '../../../utils/useLatest';
 import { useDom } from '../../DomProvider';
 import { usePageEditorState } from './PageEditorProvider';
 import DerivedStateEditor from './DerivedStateEditor';
+import QueryStateEditor from './QueryStateEditor';
 
 export default function PageOptionsPanel() {
   const dom = useDom();
@@ -47,6 +48,7 @@ export default function PageOptionsPanel() {
           Page Component
         </Button>
         <DerivedStateEditor />
+        <QueryStateEditor />
       </Stack>
       <Dialog fullWidth maxWidth="lg" open={!!viewedSource} onClose={handleViewedSourceDialogClose}>
         <DialogTitle>Page component</DialogTitle>

@@ -15,11 +15,9 @@ function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
     case 'boolean':
       return { type: 'boolean' };
     case 'object':
-      return { type: 'object' };
+      return { type: 'json' };
     case 'array':
-      return { type: 'object' };
-    case 'dataQuery':
-      return { type: 'dataQuery' };
+      return { type: 'json' };
     default:
       return null;
   }

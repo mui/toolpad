@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as studioDom from '../studioDom';
-import { NodeId, StudioNodeProp } from '../types';
+import { NodeId, StudioBindable } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
 
@@ -26,7 +26,7 @@ export type DomAction =
       node: studioDom.StudioNode;
       prop: string;
       namespace: string;
-      value: StudioNodeProp<unknown> | null;
+      value: StudioBindable<unknown> | null;
     }
   | {
       type: 'DOM_SET_NODE_ATTR';
@@ -175,7 +175,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         namespace,
         node,
         prop,
-        value: value as StudioNodeProp<unknown> | null,
+        value: value as StudioBindable<unknown> | null,
       });
     },
     setNodeAttribute<N extends studioDom.StudioNode, K extends studioDom.Attributes<N>>(

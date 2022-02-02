@@ -65,9 +65,9 @@ type PrimitiveValueType =
 
 export type PropValueType = PrimitiveValueType | ElementValueType;
 
-export type PropValueTypes<K extends string = string> = {
+export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
-};
+}>;
 
 export interface ArgTypeDefinition {
   name?: string;

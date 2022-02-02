@@ -61,7 +61,10 @@ function ApiEditorContent<Q extends DefaultNodeProps>({ nodeId }: ApiEditorProps
             onClick={() => {
               domApi.setNodeName(nodeId, name);
               Object.keys(query).forEach((prop: keyof Q & string) => {
-                domApi.setNodeConstPropValue<Q>(api, prop, query[prop]);
+                domApi.setNodePropsValue(api, 'props', prop, {
+                  type: 'const',
+                  value: query[prop],
+                });
               });
             }}
           >

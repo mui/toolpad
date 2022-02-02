@@ -85,73 +85,81 @@ function PropValueTypeSelector({ value, onChange, disabled }: PropValueTypeSelec
   );
 }
 
-interface StudioNodePropsEditorProps extends WithControlledProp<PropValueTypes, 'argTypes'> {
+interface StudioNodePropsEditorProps<P>
+  extends WithControlledProp<PropValueTypes<keyof P & string>, 'argTypes'> {
   nodeId: NodeId;
 }
 
-function StudioNodePropsEditor({ nodeId, argTypes, onArgTypesChange }: StudioNodePropsEditorProps) {
+function StudioNodePropsEditor<P>({
+  nodeId,
+  argTypes,
+  onArgTypesChange,
+}: StudioNodePropsEditorProps<P>) {
   const dom = useDom();
   const domApi = useDomApi();
 
-  const node = studioDom.getNode(dom, nodeId) as studioDom.StudioNodeBase<any>;
+  const node = studioDom.getNode(dom, nodeId);
+  studioDom.assertIsDerivedState<P>(node);
 
   const handlePropValueChange = React.useCallback(
-    (propName: string) => (newValue: StudioNodeProp<any> | null) => {
+    (propName: keyof P & string) => (newValue: StudioNodeProp<any> | null) => {
       if (newValue) {
-        domApi.setNodePropValue<any>(nodeId, propName, newValue);
+        domApi.setNodePropsValue(node, 'props', propName, newValue);
       }
     },
-    [domApi, nodeId],
+    [domApi, node],
   );
 
   const handlePropTypeChange = React.useCallback(
-    (propName: string) => (newPropType: PropValueType) => {
+    (propName: keyof P & string) => (newPropType: PropValueType) => {
       onArgTypesChange(
         update(argTypes, {
           [propName]: newPropType,
-        }),
+        } as Partial<PropValueTypes>),
       );
     },
     [onArgTypesChange, argTypes],
   );
 
   const handlePropRemove = React.useCallback(
-    (propName: string) => () => {
-      domApi.setNodePropValue<any>(nodeId, propName, null);
-      onArgTypesChange(omit(argTypes, propName));
+    (propName: keyof P & string) => () => {
+      domApi.setNodePropsValue(node, 'props', propName, null);
+      onArgTypesChange(omit(argTypes, propName) as PropValueTypes);
     },
-    [domApi, nodeId, onArgTypesChange, argTypes],
+    [domApi, node, onArgTypesChange, argTypes],
   );
 
   return (
     <Stack>
-      {(Object.entries(argTypes) as ExactEntriesOf<PropValueTypes>).map(([propName, propType]) => {
-        if (!propType) {
-          return null;
-        }
-        const propValue: StudioNodeProp<any> | null = node.props[propName] ?? null;
-        const isBound = !!propValue;
-        return (
-          <Stack key={propName} direction="row" alignItems="center" gap={1}>
-            {propName}:
-            <PropValueTypeSelector
-              value={propType}
-              onChange={handlePropTypeChange(propName)}
-              disabled={isBound}
-            />
-            <BindingEditor
-              nodeId={nodeId}
-              prop={propName}
-              propType={propType}
-              value={propValue}
-              onChange={handlePropValueChange(propName)}
-            />
-            <IconButton onClick={handlePropRemove(propName)}>
-              <CloseIcon />
-            </IconButton>
-          </Stack>
-        );
-      })}
+      {(Object.entries(argTypes) as ExactEntriesOf<PropValueTypes<keyof P & string>>).map(
+        ([propName, propType]) => {
+          if (!propType) {
+            return null;
+          }
+          const propValue: StudioNodeProp<any> | null = node.props[propName] ?? null;
+          const isBound = !!propValue;
+          return (
+            <Stack key={propName} direction="row" alignItems="center" gap={1}>
+              {propName}:
+              <PropValueTypeSelector
+                value={propType}
+                onChange={handlePropTypeChange(propName)}
+                disabled={isBound}
+              />
+              <BindingEditor
+                nodeId={nodeId}
+                prop={propName}
+                propType={propType}
+                value={propValue}
+                onChange={handlePropValueChange(propName)}
+              />
+              <IconButton onClick={handlePropRemove(propName)}>
+                <CloseIcon />
+              </IconButton>
+            </Stack>
+          );
+        },
+      )}
     </Stack>
   );
 }

@@ -11,8 +11,8 @@ import {
   RenderContext,
   ResolvedProps,
   StudioComponentDefinition,
-  StudioNodeProp,
-  StudioNodeProps,
+  StudioBindable,
+  StudioBindables,
 } from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
@@ -35,7 +35,7 @@ export interface RenderPageConfig {
 
 function hasBindablePropsNamespace<P>(
   node: studioDom.StudioNode,
-): node is studioDom.StudioNode & { props: StudioNodeProps<P> } {
+): node is studioDom.StudioNode & { props: StudioBindables<P> } {
   return (
     studioDom.isElement(node) || studioDom.isDerivedState(node) || studioDom.isQueryState(node)
   );
@@ -119,7 +119,7 @@ class Context implements RenderContext {
     });
   }
 
-  collectBindablePropState(prop: StudioNodeProp<unknown>) {
+  collectBindablePropState(prop: StudioBindable<unknown>) {
     if (prop?.type === 'boundExpression') {
       const parsedExpr = bindings.parse(prop.value);
       bindings

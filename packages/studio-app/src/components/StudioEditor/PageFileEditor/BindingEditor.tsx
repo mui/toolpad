@@ -19,7 +19,7 @@ import { PropValueType } from '@mui/studio-core';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
-import { NodeId, StudioNodeProp } from '../../../types';
+import { NodeId, StudioBindable } from '../../../types';
 import { useDom } from '../../DomProvider';
 import { WithControlledProp } from '../../../utils/types';
 import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../../../schemas';
@@ -29,7 +29,7 @@ export interface BindingEditorContentProps<K> {
   prop: K;
 }
 
-interface BoundExpressionEditorProps extends WithControlledProp<StudioNodeProp<unknown> | null> {
+interface BoundExpressionEditorProps extends WithControlledProp<StudioBindable<unknown> | null> {
   propType: PropValueType;
 }
 
@@ -45,7 +45,14 @@ function BoundExpressionEditor({ propType, value, onChange }: BoundExpressionEdi
     [onChange, format],
   );
 
-  return <TextField fullWidth size="small" value={value} onChange={handleChange} />;
+  return (
+    <TextField
+      fullWidth
+      size="small"
+      value={value?.type === 'boundExpression' ? value.value : ''}
+      onChange={handleChange}
+    />
+  );
 }
 
 function getBindablePropsInScope(
@@ -110,7 +117,7 @@ function getBindablePropsInScope(
   });
 }
 
-interface BindingEditorTabProps extends WithControlledProp<StudioNodeProp<unknown> | null> {
+interface BindingEditorTabProps extends WithControlledProp<StudioBindable<unknown> | null> {
   node: studioDom.StudioNode;
   prop: string;
   propType: PropValueType;
@@ -152,7 +159,7 @@ function AddBindingEditor({
 }
 
 export interface BindingEditorProps<K extends string>
-  extends WithControlledProp<StudioNodeProp<unknown> | null> {
+  extends WithControlledProp<StudioBindable<unknown> | null> {
   nodeId: NodeId;
   prop: K;
   propType: PropValueType;

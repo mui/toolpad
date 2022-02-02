@@ -1,6 +1,6 @@
 import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
-import { NodeId, StudioConstantProp, StudioNodeProp, StudioNodeProps } from './types';
+import { NodeId, StudioConstant, StudioBindable, StudioBindables } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { ExactEntriesOf } from './utils/types';
@@ -70,14 +70,14 @@ export interface StudioTheme {
 
 export interface StudioThemeNode extends StudioNodeBase {
   readonly type: 'theme';
-  readonly props: StudioNodeProps<StudioTheme>;
+  readonly theme: StudioBindables<StudioTheme>;
 }
 
 export interface StudioApiNode<P = any> extends StudioNodeBase {
   readonly type: 'api';
   readonly connectionId: string;
   readonly argTypes: ArgTypeDefinitions;
-  readonly props: StudioNodeProps<P>;
+  readonly query: StudioBindables<P>;
 }
 
 export interface StudioPageNode extends StudioNodeBase {
@@ -88,7 +88,7 @@ export interface StudioPageNode extends StudioNodeBase {
 export interface StudioElementNode<P = any> extends StudioNodeBase {
   readonly type: 'element';
   readonly component: string;
-  readonly props: StudioNodeProps<P>;
+  readonly props: StudioBindables<P>;
 }
 
 export interface StudioCodeComponentNode extends StudioNodeBase {
@@ -100,7 +100,7 @@ export interface StudioCodeComponentNode extends StudioNodeBase {
 export interface StudioDerivedStateNode<P = any> extends StudioNodeBase {
   readonly type: 'derivedState';
   readonly code: string;
-  readonly props: StudioNodeProps<P>;
+  readonly params: StudioBindables<P>;
   readonly argTypes: PropValueTypes;
   readonly returnType: PropValueType;
 }
@@ -108,7 +108,7 @@ export interface StudioDerivedStateNode<P = any> extends StudioNodeBase {
 export interface StudioQueryStateNode<P = any> extends StudioNodeBase {
   readonly type: 'queryState';
   readonly api: NodeId | null;
-  readonly props: StudioNodeProps<P>;
+  readonly params: StudioBindables<P>;
 }
 
 type StudioNodeOfType<K extends StudioNodeType> = {
@@ -331,7 +331,7 @@ export function createElementInternal<P>(
   dom: StudioDom,
   id: NodeId,
   component: string,
-  props: Partial<StudioNodeProps<P>> = {},
+  props: Partial<StudioBindables<P>> = {},
   name?: string,
 ): StudioElementNode {
   const existingNames = getNodeNames(dom);
@@ -398,7 +398,7 @@ export function createDom(): StudioDom {
 export function createElement<P>(
   dom: StudioDom,
   component: string,
-  props: Partial<StudioNodeProps<P>> = {},
+  props: Partial<StudioBindables<P>> = {},
   name?: string,
 ): StudioElementNode {
   return createNode(dom, 'element', {
@@ -453,11 +453,11 @@ export function setNodeName(dom: StudioDom, node: StudioNode, name: string): Stu
 }
 
 export type PropNamespaces<N extends StudioNode> = {
-  [K in keyof N]: N[K] extends StudioNodeProps<any> ? K : never;
+  [K in keyof N]: N[K] extends StudioBindables<any> ? K : never;
 }[keyof N & string];
 
 export type BindableProps<T> = {
-  [K in keyof T]: T[K] extends StudioNodeProp<any> ? K : never;
+  [K in keyof T]: T[K] extends StudioBindable<any> ? K : never;
 }[keyof T & string];
 
 export function setNodeProp<Node extends StudioNode, Prop extends BindableProps<Node>>(
@@ -578,14 +578,14 @@ export function removeNode(dom: StudioDom, nodeId: NodeId) {
   });
 }
 
-export function toConstPropValue<T = any>(value: T): StudioConstantProp<T> {
+export function toConstPropValue<T = any>(value: T): StudioConstant<T> {
   return { type: 'const', value };
 }
 
 export function fromConstPropValue(prop: undefined): undefined;
-export function fromConstPropValue<T>(prop: StudioNodeProp<T>): T;
-export function fromConstPropValue<T>(prop?: StudioNodeProp<T | undefined>): T | undefined;
-export function fromConstPropValue<T>(prop?: StudioNodeProp<T | undefined>): T | undefined {
+export function fromConstPropValue<T>(prop: StudioBindable<T>): T;
+export function fromConstPropValue<T>(prop?: StudioBindable<T | undefined>): T | undefined;
+export function fromConstPropValue<T>(prop?: StudioBindable<T | undefined>): T | undefined {
   if (!prop) {
     return undefined;
   }
@@ -595,19 +595,19 @@ export function fromConstPropValue<T>(prop?: StudioNodeProp<T | undefined>): T |
   return prop.value;
 }
 
-export function toConstPropValues<P = any>(props: Partial<P>): Partial<StudioNodeProps<P>>;
-export function toConstPropValues<P = any>(props: P): StudioNodeProps<P>;
-export function toConstPropValues<P = any>(props: P): StudioNodeProps<P> {
+export function toConstPropValues<P = any>(props: Partial<P>): Partial<StudioBindables<P>>;
+export function toConstPropValues<P = any>(props: P): StudioBindables<P>;
+export function toConstPropValues<P = any>(props: P): StudioBindables<P> {
   return Object.fromEntries(
     Object.entries(props).flatMap(([propName, value]) =>
       value ? [[propName, toConstPropValue(value)]] : [],
     ),
-  ) as StudioNodeProps<P>;
+  ) as StudioBindables<P>;
 }
 
-export function fromConstPropValues<P>(props: StudioNodeProps<P>): Partial<P> {
+export function fromConstPropValues<P>(props: StudioBindables<P>): Partial<P> {
   const result: Partial<P> = {};
-  (Object.entries(props) as ExactEntriesOf<StudioNodeProps<P>>).forEach(([name, prop]) => {
+  (Object.entries(props) as ExactEntriesOf<StudioBindables<P>>).forEach(([name, prop]) => {
     if (prop) {
       result[name] = fromConstPropValue<P[typeof name]>(prop);
     }

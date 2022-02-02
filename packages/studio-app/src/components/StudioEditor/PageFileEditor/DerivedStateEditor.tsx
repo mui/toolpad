@@ -24,7 +24,7 @@ import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';
 import * as studioDom from '../../../studioDom';
-import { NodeId, StudioNodeProp } from '../../../types';
+import { NodeId, StudioBindable } from '../../../types';
 import { BindingEditor } from './BindingEditor';
 
 const DERIVED_STATE_PARAMS = 'StudioDerivedStateParams';
@@ -102,19 +102,19 @@ function StudioNodePropsEditor<P>({
   studioDom.assertIsDerivedState<P>(node);
 
   const handlePropValueChange = React.useCallback(
-    (propName: keyof P & string) => (newValue: StudioNodeProp<any> | null) => {
+    (param: keyof P & string) => (newValue: StudioBindable<any> | null) => {
       if (newValue) {
-        domApi.setNodePropsValue(node, 'props', propName, newValue);
+        domApi.setNodePropsValue(node, 'params', param, newValue);
       }
     },
     [domApi, node],
   );
 
   const handlePropTypeChange = React.useCallback(
-    (propName: keyof P & string) => (newPropType: PropValueType) => {
+    (param: keyof P & string) => (newPropType: PropValueType) => {
       onArgTypesChange(
         update(argTypes, {
-          [propName]: newPropType,
+          [param]: newPropType,
         } as Partial<PropValueTypes<keyof P & string>>),
       );
     },
@@ -122,9 +122,9 @@ function StudioNodePropsEditor<P>({
   );
 
   const handlePropRemove = React.useCallback(
-    (propName: keyof P & string) => () => {
-      domApi.setNodePropsValue(node, 'props', propName, null);
-      onArgTypesChange(omit(argTypes, propName) as PropValueTypes<keyof P & string>);
+    (param: keyof P & string) => () => {
+      domApi.setNodePropsValue(node, 'params', param, null);
+      onArgTypesChange(omit(argTypes, param) as PropValueTypes<keyof P & string>);
     },
     [domApi, node, onArgTypesChange, argTypes],
   );
@@ -136,7 +136,7 @@ function StudioNodePropsEditor<P>({
           if (!propType) {
             return null;
           }
-          const propValue: StudioNodeProp<any> | null = node.props[propName] ?? null;
+          const propValue: StudioBindable<any> | null = node.params[propName] ?? null;
           const isBound = !!propValue;
           return (
             <Stack key={propName} direction="row" alignItems="center" gap={1}>
@@ -332,7 +332,7 @@ export default function DerivedStateEditor() {
       returnType: {
         type: 'string',
       },
-      props: {},
+      params: {},
       code: `/**
  * TODO: comment explaining how to derive state...
  */

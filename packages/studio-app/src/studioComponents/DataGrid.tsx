@@ -1,4 +1,4 @@
-import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS } from '../schemas';
+import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../schemas';
 import { StudioComponentDefinition } from '../types';
 import importedComponentRenderer from './importedComponentRenderer';
 
@@ -9,11 +9,12 @@ export default {
   argTypes: {
     rows: {
       typeDef: { type: 'array', schema: URI_DATAGRID_ROWS as string },
-      defaultValue: [],
     },
     columns: {
       typeDef: { type: 'array', schema: URI_DATAGRID_COLUMNS as string },
-      defaultValue: [],
+    },
+    dataQuery: {
+      typeDef: { type: 'object', schema: URI_DATAQUERY as string },
     },
     density: {
       typeDef: { type: 'string', enum: ['comfortable', 'compact', 'standard'] },

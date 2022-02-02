@@ -1,3 +1,4 @@
+import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery } from 'react-query';
 
@@ -13,12 +14,12 @@ async function fetchData(queryId: string) {
 export interface UseDataQuery {
   loading: boolean;
   columns: { field: string }[];
-  rows: any[];
-  key: string;
+  rows: GridRowsProp[];
+  error: any;
 }
 
 export default function useDataQuery(queryId: string): UseDataQuery {
-  const { isLoading: loading, data = {} } = useQuery(queryId, () => fetchData(queryId));
+  const { isLoading: loading, error, data = {} } = useQuery(queryId, () => fetchData(queryId));
 
   const { fields = {}, data: rows = [] } = data;
 
@@ -31,12 +32,10 @@ export default function useDataQuery(queryId: string): UseDataQuery {
     [fields],
   );
 
-  const columnsFingerPrint = React.useMemo(() => JSON.stringify(columns), [columns]);
-
   return {
     loading,
     columns,
     rows,
-    key: columnsFingerPrint,
+    error,
   };
 }

@@ -1,5 +1,6 @@
 import { JSONSchemaType } from 'ajv';
 import { GridEnrichedColDef } from '@mui/x-data-grid-pro';
+import { UseDataQuery } from '@mui/studio-core/dist/useDataQuery';
 
 type StudioColDef = Pick<GridEnrichedColDef, 'field' | 'align'>;
 type StudioGridColumns = StudioColDef[];
@@ -9,6 +10,7 @@ type StudioRows = { id: string }[];
 export const URI_DATAGRID_COLUMN = 'https://studio.mui.com/DataGridColumn.json';
 export const URI_DATAGRID_COLUMNS = 'https://studio.mui.com/DataGridColumns.json';
 export const URI_DATAGRID_ROWS = 'https://studio.mui.com/DataGridRows.json';
+export const URI_DATAQUERY = 'https://studio.mui.com/DataQuery.json';
 
 export default {
   [URI_DATAGRID_COLUMN]: {
@@ -45,4 +47,13 @@ export default {
       required: ['id'],
     },
   } as JSONSchemaType<StudioRows>,
+  [URI_DATAQUERY]: {
+    type: 'object',
+    properties: {
+      loading: { type: 'boolean' },
+      columns: { $ref: URI_DATAGRID_COLUMNS },
+      rows: { $ref: URI_DATAGRID_ROWS },
+      error: {},
+    },
+  } as JSONSchemaType<UseDataQuery>,
 };

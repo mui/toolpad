@@ -22,7 +22,7 @@ import * as studioDom from '../../../studioDom';
 import { NodeId, StudioNodeProp } from '../../../types';
 import { useDom } from '../../DomProvider';
 import { WithControlledProp } from '../../../utils/types';
-import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS } from '../../../schemas';
+import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../../../schemas';
 
 export interface BindingEditorContentProps<K> {
   nodeId: NodeId;
@@ -36,31 +36,16 @@ interface BoundExpressionEditorProps extends WithControlledProp<StudioNodeProp<u
 function BoundExpressionEditor({ propType, value, onChange }: BoundExpressionEditorProps) {
   const argType = propType.type;
 
-  const initialValue = value?.type === 'boundExpression' ? value.value : '';
-  const [input, setInput] = React.useState(initialValue);
   const format = argType === 'string' ? 'stringLiteral' : 'default';
 
-  const handleBind = React.useCallback(() => {
-    onChange({ type: 'boundExpression', value: input, format });
-  }, [onChange, input, format]);
-
-  return (
-    <React.Fragment>
-      <DialogTitle>Bind a property</DialogTitle>
-
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        Type: {argType}
-        <TextField value={input} onChange={(event) => setInput(event.target.value)} />
-      </DialogContent>
-
-      <DialogActions>
-        <Button onClick={() => onChange(null)}>Remove</Button>
-        <Button disabled={!input} color="primary" onClick={handleBind}>
-          Update binding
-        </Button>
-      </DialogActions>
-    </React.Fragment>
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange({ type: 'boundExpression', value: event.target.value, format });
+    },
+    [onChange, format],
   );
+
+  return <TextField fullWidth size="small" value={value} onChange={handleChange} />;
 }
 
 function getBindablePropsInScope(
@@ -110,6 +95,8 @@ function getBindablePropsInScope(
           return [];
         }
         switch (propType.schema) {
+          case URI_DATAQUERY as string:
+            return [destNode.name];
           case URI_DATAGRID_COLUMNS as string:
             return [`${destNode.name}.columns`];
           case URI_DATAGRID_ROWS as string:
@@ -139,46 +126,28 @@ function AddBindingEditor({
   const dom = useDom();
 
   const srcNodeId = srcNode.id;
-  const srcType = propType.type;
 
   const bindableProps = React.useMemo(() => {
     return getBindablePropsInScope(dom, srcNodeId, srcProp, propType);
   }, [dom, srcNodeId, srcProp, propType]);
 
-  const [selection, setSelection] = React.useState<string | null>(
-    value?.type === 'binding' ? value.value : null,
-  );
-  React.useEffect(() => setSelection(value?.type === 'binding' ? value.value : null), [value]);
-
-  const handleSelect = (bindableProp: string) => () => setSelection(bindableProp);
-
-  const handleBind = React.useCallback(() => {
-    onChange(selection ? { type: 'binding', value: selection } : null);
-  }, [onChange, selection]);
+  const handleSelect = (bindableProp: string) => () =>
+    onChange(bindableProp ? { type: 'binding', value: bindableProp } : null);
 
   return (
-    <React.Fragment>
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div>Type: {srcType}</div>
-        <List sx={{ flex: 1, overflow: 'scroll' }}>
-          {bindableProps.map((bindableProp) => (
-            <ListItemButton
-              key={`item-${bindableProp}`}
-              onClick={handleSelect(bindableProp)}
-              selected={selection === bindableProp}
-            >
-              <ListItemText primary={bindableProp} />
-            </ListItemButton>
-          ))}
-        </List>
-      </DialogContent>
-
-      <DialogActions>
-        <Button disabled={!selection} color="primary" onClick={handleBind}>
-          Add binding
-        </Button>
-      </DialogActions>
-    </React.Fragment>
+    <div>
+      <List sx={{ flex: 1, overflow: 'scroll' }}>
+        {bindableProps.map((bindableProp) => (
+          <ListItemButton
+            key={`item-${bindableProp}`}
+            onClick={handleSelect(bindableProp)}
+            selected={value?.value === bindableProp}
+          >
+            <ListItemText primary={bindableProp} />
+          </ListItemButton>
+        ))}
+      </List>
+    </div>
   );
 }
 
@@ -199,6 +168,9 @@ export function BindingEditor<P = any>({
   const dom = useDom();
   const node = studioDom.getNode(dom, nodeId);
 
+  const [input, setInput] = React.useState(value);
+  React.useEffect(() => setInput(value), [value]);
+
   const [open, setOpen] = React.useState(false);
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
@@ -213,13 +185,12 @@ export function BindingEditor<P = any>({
 
   const hasBinding = value?.type === 'boundExpression' || value?.type === 'binding';
 
-  const handleChange = React.useCallback(
-    (newValue: StudioNodeProp<unknown> | null) => {
-      onChange(newValue);
-      handleClose();
-    },
-    [onChange, handleClose],
-  );
+  const inputValue = input?.type === bindingType ? input : null;
+
+  const handleBind = React.useCallback(() => {
+    onChange(inputValue);
+    handleClose();
+  }, [onChange, inputValue, handleClose]);
 
   return (
     <React.Fragment>
@@ -227,26 +198,42 @@ export function BindingEditor<P = any>({
         {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
       </IconButton>
       <Dialog onClose={handleClose} open={open} fullWidth>
-        <TabContext value={bindingType}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <TabList onChange={(event, newValue) => setBindingType(newValue)}>
-              <Tab label="Binding" value="binding" />
-              <Tab label="Expression" value="boundExpression" />
-            </TabList>
-          </Box>
-          <TabPanel value="binding">
-            <AddBindingEditor
-              node={node}
-              prop={prop}
-              propType={propType}
-              value={value}
-              onChange={handleChange}
-            />
-          </TabPanel>
-          <TabPanel value="boundExpression">
-            <BoundExpressionEditor propType={propType} value={value} onChange={handleChange} />
-          </TabPanel>
-        </TabContext>
+        <DialogTitle>Bind a property</DialogTitle>
+        <DialogContent>
+          <div>Type: {propType.type}</div>
+          <TabContext value={bindingType}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <TabList onChange={(event, newValue) => setBindingType(newValue)}>
+                <Tab label="Binding" value="binding" />
+                <Tab label="Expression" value="boundExpression" />
+              </TabList>
+            </Box>
+            <TabPanel value="binding">
+              <AddBindingEditor
+                node={node}
+                prop={prop}
+                propType={propType}
+                value={inputValue}
+                onChange={(newValue) => setInput(newValue)}
+              />
+            </TabPanel>
+            <TabPanel value="boundExpression">
+              <BoundExpressionEditor
+                propType={propType}
+                value={inputValue}
+                onChange={(newValue) => setInput(newValue)}
+              />
+            </TabPanel>
+          </TabContext>
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={!value} onClick={() => onChange(null)}>
+            Remove
+          </Button>
+          <Button disabled={!inputValue} color="primary" onClick={handleBind}>
+            Add binding
+          </Button>
+        </DialogActions>
       </Dialog>
     </React.Fragment>
   );

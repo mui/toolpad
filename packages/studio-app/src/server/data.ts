@@ -179,7 +179,7 @@ export async function execApi<Q>(api: studioDom.StudioApiNode<Q>): Promise<Studi
       `Unknown connection type "${connection.type}" for connection "${api.connectionId}"`,
     );
   }
-  return dataSource.exec(connection, studioDom.getPropConstValues(api) as Q);
+  return dataSource.exec(connection, studioDom.fromConstPropValues(api.props) as Q);
 }
 
 function createDefaultApp(): studioDom.StudioDom {

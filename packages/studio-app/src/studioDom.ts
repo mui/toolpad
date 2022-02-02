@@ -3,6 +3,7 @@ import { generateKeyBetween } from 'fractional-indexing';
 import { NodeId, StudioConstantProp, StudioNodeProp, StudioNodeProps } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
+import { ExactEntriesOf } from './utils/types';
 
 type AllowedChildren = {
   app: {
@@ -584,32 +585,41 @@ export type NodeWithPropsNamespace<P> =
   | StudioDerivedStateNode<P>
   | StudioQueryStateNode<P>;
 
-export function getConstPropValue<P, K extends keyof P>(
-  node: NodeWithPropsNamespace<P>,
-  propName: keyof P,
-): P[K] | undefined {
-  const prop: StudioNodeProp<P[K]> = (node.props as any)[propName];
-  return prop?.type === 'const' ? (prop.value as P[K]) : undefined;
-}
-
-export function getPropConstValues<P>(node: NodeWithPropsNamespace<P>): Partial<P> {
-  const result: Partial<P> = {};
-  (Object.keys(node.props) as (keyof P)[]).forEach((prop) => {
-    result[prop] = getConstPropValue(node, prop as keyof P);
-  });
-  return result;
-}
-
-export function asConstPropValue<T = any>(value: T): StudioConstantProp<T> {
+export function toConstPropValue<T = any>(value: T): StudioConstantProp<T> {
   return { type: 'const', value };
 }
 
-export function asConstPropValues<P = any>(props: P): StudioNodeProps<P> {
+export function fromConstPropValue(prop: undefined): undefined;
+export function fromConstPropValue<T>(prop: StudioNodeProp<T>): T;
+export function fromConstPropValue<T>(prop?: StudioNodeProp<T | undefined>): T | undefined;
+export function fromConstPropValue<T>(prop?: StudioNodeProp<T | undefined>): T | undefined {
+  if (!prop) {
+    return undefined;
+  }
+  if (prop.type !== 'const') {
+    throw new Error(`trying to unbox a non-constant prop value`);
+  }
+  return prop.value;
+}
+
+export function toConstPropValues<P = any>(props: Partial<P>): Partial<StudioNodeProps<P>>;
+export function toConstPropValues<P = any>(props: P): StudioNodeProps<P>;
+export function toConstPropValues<P = any>(props: P): StudioNodeProps<P> {
   return Object.fromEntries(
     Object.entries(props).flatMap(([propName, value]) =>
-      value ? [[propName, asConstPropValue(value)]] : [],
+      value ? [[propName, toConstPropValue(value)]] : [],
     ),
   ) as StudioNodeProps<P>;
+}
+
+export function fromConstPropValues<P>(props: StudioNodeProps<P>): Partial<P> {
+  const result: Partial<P> = {};
+  (Object.entries(props) as ExactEntriesOf<StudioNodeProps<P>>).forEach(([name, prop]) => {
+    if (prop) {
+      result[name] = fromConstPropValue<P[typeof name]>(prop);
+    }
+  });
+  return result;
 }
 
 export type Attributes<N extends StudioNode> = Exclude<keyof N & string, keyof StudioNodeBase>;

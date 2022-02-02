@@ -26,26 +26,26 @@ export interface StudioPageBindings {
 export type StudioBindingFormat = 'stringLiteral' | 'default';
 
 // TODO: Get rid of StudioBoundExpressionProp? Its function can be fulfilled by derivedState as well
-export interface StudioBoundExpressionProp {
+export interface StudioBoundExpression {
   type: 'boundExpression';
   value: string;
   format?: StudioBindingFormat;
 }
 
-export interface StudioBoundProp {
+export interface StudioBinding {
   type: 'binding';
   value: string;
 }
 
-export interface StudioConstantProp<V> {
+export interface StudioConstant<V> {
   type: 'const';
   value: V;
 }
 
-export type StudioNodeProp<V> = StudioConstantProp<V> | StudioBoundProp | StudioBoundExpressionProp;
+export type StudioBindable<V> = StudioConstant<V> | StudioBinding | StudioBoundExpression;
 
-export type StudioNodeProps<P> = {
-  readonly [K in keyof P]?: StudioNodeProp<P[K]>;
+export type StudioBindables<P> = {
+  readonly [K in keyof P]?: StudioBindable<P[K]>;
 };
 
 export type NodeId = Branded<string, 'NodeId'>;

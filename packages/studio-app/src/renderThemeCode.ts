@@ -31,13 +31,13 @@ export default function renderThemeCode(
     const importedColors = new Set();
     const paletteProps: [string, string][] = [];
 
-    const primary = studioDom.fromConstPropValue(theme.props['palette.primary.main']);
+    const primary = studioDom.fromConstPropValue(theme.theme['palette.primary.main']);
     if (primary) {
       importedColors.add(primary);
       paletteProps.push(['primary', `{ main: ${primary}[500] }`]);
     }
 
-    const secondary = studioDom.fromConstPropValue(theme.props['palette.secondary.main']);
+    const secondary = studioDom.fromConstPropValue(theme.theme['palette.secondary.main']);
     if (secondary) {
       importedColors.add(secondary);
       paletteProps.push(['secondary', `{ main: ${secondary}[500] }`]);

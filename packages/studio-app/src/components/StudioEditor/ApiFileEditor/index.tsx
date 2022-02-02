@@ -25,7 +25,7 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
   studioDom.assertIsApi<Q>(api);
 
   const [name, setName] = React.useState(api.name);
-  const [query, setQuery] = React.useState(studioDom.fromConstPropValues(api.props) as Q);
+  const [query, setQuery] = React.useState(studioDom.fromConstPropValues(api.query) as Q);
 
   const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
     client.query.getConnection(api.connectionId),
@@ -67,7 +67,7 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
                 if (typeof propName !== 'string' || !query[propName]) {
                   return;
                 }
-                domApi.setNodePropsValue(api, 'props', propName, {
+                domApi.setNodePropsValue(api, 'query', propName, {
                   type: 'const',
                   value: query[propName],
                 });

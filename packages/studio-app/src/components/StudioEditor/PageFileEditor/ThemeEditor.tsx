@@ -61,7 +61,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
   const theme = themes.length > 0 ? themes[0] : null;
 
   const handleAddThemeClick = () => {
-    const newTheme = studioDom.createNode(dom, 'theme', { name: 'Theme', props: {} });
+    const newTheme = studioDom.createNode(dom, 'theme', { name: 'Theme', theme: {} });
     domApi.addNode(newTheme, app, 'themes');
   };
 
@@ -71,9 +71,9 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
         <Stack spacing={2}>
           <PaletteColorPicker
             name="primary"
-            value={studioDom.fromConstPropValue(theme.props['palette.primary.main']) || ''}
+            value={studioDom.fromConstPropValue(theme.theme['palette.primary.main']) || ''}
             onChange={(newValue) =>
-              domApi.setNodePropsValue(theme, 'props', 'palette.primary.main', {
+              domApi.setNodePropsValue(theme, 'theme', 'palette.primary.main', {
                 type: 'const',
                 value: newValue,
               })
@@ -81,9 +81,9 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
           />
           <PaletteColorPicker
             name="secondary"
-            value={studioDom.fromConstPropValue(theme.props['palette.secondary.main']) || ''}
+            value={studioDom.fromConstPropValue(theme.theme['palette.secondary.main']) || ''}
             onChange={(newValue) =>
-              domApi.setNodePropsValue(theme, 'props', 'palette.secondary.main', {
+              domApi.setNodePropsValue(theme, 'theme', 'palette.secondary.main', {
                 type: 'const',
                 value: newValue,
               })

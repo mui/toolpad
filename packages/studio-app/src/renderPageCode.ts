@@ -419,9 +419,6 @@ class Context implements RenderContext {
         if (!expr) {
           return '';
         }
-        if (name === '$spread') {
-          return expr;
-        }
         return `${name}={${this.renderJsExpression(expr)}}`;
       })
       .join(' ');
@@ -438,9 +435,6 @@ class Context implements RenderContext {
       ([name, expr]) => {
         if (!expr) {
           return '';
-        }
-        if (name === '$spread') {
-          return expr;
         }
         return `${name}: ${this.renderJsExpression(expr)}`;
       },
@@ -506,7 +500,7 @@ class Context implements RenderContext {
       if (stateVar) {
         const node = studioDom.getNode(this.dom, nodeId as NodeId);
         studioDom.assertIsDerivedState(node);
-        const { $spread, ...resolvedProps } = this.resolveProps(node, {});
+        const resolvedProps = this.resolveProps(node, {});
         const params = this.renderPropsAsObject(resolvedProps);
         const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
           this.renderJsExpression(resolvedProp),
@@ -529,7 +523,7 @@ class Context implements RenderContext {
       if (stateVar) {
         const node = studioDom.getNode(this.dom, nodeId as NodeId);
         studioDom.assertIsQueryState(node);
-        const { $spread, ...resolvedProps } = this.resolveProps(node, {});
+        const resolvedProps = this.resolveProps(node, {});
 
         // TODO: Set up variable binding
         // @ts-expect-error

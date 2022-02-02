@@ -1,9 +1,8 @@
 import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
-import { NodeId, StudioNodeProp, StudioNodeProps } from './types';
+import { NodeId, StudioConstantProp, StudioNodeProp, StudioNodeProps } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
-import { ExactEntriesOf } from './utils/types';
 
 type AllowedChildren = {
   app: {
@@ -601,20 +600,16 @@ export function getPropConstValues<P>(node: NodeWithPropsNamespace<P>): Partial<
   return result;
 }
 
-export function setPropConstValues<P, N extends NodeWithPropsNamespace<P>>(
-  node: N,
-  values: Partial<P>,
-): N {
-  const propUpdates: Partial<StudioNodeProps<P>> = {};
-  (Object.entries(values) as ExactEntriesOf<P>).forEach(([prop, value]) => {
-    propUpdates[prop] = {
-      type: 'const',
-      value,
-    };
-  });
-  return update(node, {
-    props: update(node.props, propUpdates),
-  } as Partial<N>);
+export function asConstPropValue<T = any>(value: T): StudioConstantProp<T> {
+  return { type: 'const', value };
+}
+
+export function asConstPropValues<P = any>(props: P): StudioNodeProps<P> {
+  return Object.fromEntries(
+    Object.entries(props).flatMap(([propName, value]) =>
+      value ? [[propName, asConstPropValue(value)]] : [],
+    ),
+  ) as StudioNodeProps<P>;
 }
 
 export type Attributes<N extends StudioNode> = Exclude<keyof N & string, keyof StudioNodeBase>;

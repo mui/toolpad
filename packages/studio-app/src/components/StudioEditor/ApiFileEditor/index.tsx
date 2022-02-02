@@ -33,7 +33,10 @@ function ApiEditorContent<Q extends DefaultNodeProps>({ nodeId }: ApiEditorProps
 
   const datasource = connectionData && getDataSource<Q>(connectionData);
 
-  const previewApi: studioDom.StudioApiNode<Q> = studioDom.setPropConstValues(api, query);
+  const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
+    return { ...api, props: studioDom.asConstPropValues(query) };
+  }, [api, query]);
+
   const { data: previewData } = useQuery(['api', previewApi], () =>
     client.query.execApi(previewApi),
   );

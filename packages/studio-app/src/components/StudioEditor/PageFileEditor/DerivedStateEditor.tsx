@@ -124,7 +124,7 @@ function StudioNodePropsEditor<P>({
   const handlePropRemove = React.useCallback(
     (propName: keyof P & string) => () => {
       domApi.setNodePropsValue(node, 'props', propName, null);
-      onArgTypesChange(omit(argTypes, propName) as PropValueTypes);
+      onArgTypesChange(omit(argTypes, propName) as PropValueTypes<keyof P & string>);
     },
     [domApi, node, onArgTypesChange, argTypes],
   );

@@ -12,6 +12,7 @@ import {
   ResolvedProps,
   StudioComponentDefinition,
   StudioNodeProp,
+  StudioNodeProps,
 } from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
@@ -32,15 +33,11 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
-function hasPropsNamespace<P>(
+function hasBindablePropsNamespace<P>(
   node: studioDom.StudioNode,
-): node is studioDom.NodeWithPropsNamespace<P> {
+): node is studioDom.StudioNode & { props: StudioNodeProps<P> } {
   return (
-    studioDom.isApi(node) ||
-    studioDom.isTheme(node) ||
-    studioDom.isElement(node) ||
-    studioDom.isDerivedState(node) ||
-    studioDom.isQueryState(node)
+    studioDom.isElement(node) || studioDom.isDerivedState(node) || studioDom.isQueryState(node)
   );
 }
 
@@ -112,7 +109,7 @@ class Context implements RenderContext {
   collectAllState() {
     const nodes = studioDom.getDescendants(this.dom, this.page);
     nodes.forEach((node) => {
-      if (hasPropsNamespace(node)) {
+      if (hasBindablePropsNamespace(node)) {
         Object.values(node.props).forEach((prop) => {
           if (prop) {
             this.collectBindablePropState(prop);
@@ -232,7 +229,7 @@ class Context implements RenderContext {
     const propTypes = this.getPropTypes(node);
 
     // User props
-    if (hasPropsNamespace(node)) {
+    if (hasBindablePropsNamespace(node)) {
       Object.entries(node.props).forEach(([propName, propValue]) => {
         const propType = propTypes[propName as string];
         if (!propType || !propValue || typeof propName !== 'string' || result[propName]) {

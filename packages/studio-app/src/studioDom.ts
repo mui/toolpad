@@ -578,13 +578,6 @@ export function removeNode(dom: StudioDom, nodeId: NodeId) {
   });
 }
 
-export type NodeWithPropsNamespace<P> =
-  | StudioApiNode<P>
-  | StudioThemeNode
-  | StudioElementNode<P>
-  | StudioDerivedStateNode<P>
-  | StudioQueryStateNode<P>;
-
 export function toConstPropValue<T = any>(value: T): StudioConstantProp<T> {
   return { type: 'const', value };
 }

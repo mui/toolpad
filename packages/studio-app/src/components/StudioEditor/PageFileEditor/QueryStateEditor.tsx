@@ -86,7 +86,7 @@ export default function QueryStateEditor() {
   const handleCreate = React.useCallback(() => {
     const stateNode = studioDom.createNode(dom, 'queryState', {
       api: null,
-      props: {},
+      params: {},
     });
     domApi.addNode(stateNode, page, 'queryStates');
     setEditedState(stateNode.id);

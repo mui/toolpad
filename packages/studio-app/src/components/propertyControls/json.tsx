@@ -7,8 +7,10 @@ import type { EditorProps, PropControlDefinition } from '../../types';
 
 function JsonPropEditor({ name, argType, value, onChange, disabled }: EditorProps<any>) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [input, setInput] = React.useState(JSON.stringify(value, null, 2));
-  React.useEffect(() => setInput(JSON.stringify(value, null, 2)), [value]);
+
+  const valueAsString = React.useMemo(() => JSON.stringify(value, null, 2), [value]);
+  const [input, setInput] = React.useState(valueAsString);
+  React.useEffect(() => setInput(valueAsString), [valueAsString]);
 
   const handleSave = React.useCallback(() => {
     try {
@@ -67,9 +69,7 @@ function JsonPropEditor({ name, argType, value, onChange, disabled }: EditorProp
 
   return (
     <React.Fragment>
-      <Button disabled={disabled} onClick={() => setDialogOpen(true)}>
-        {name}
-      </Button>
+      <Button onClick={() => setDialogOpen(true)}>{name}</Button>
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit JSON</DialogTitle>
         <DialogContent>
@@ -79,11 +79,14 @@ function JsonPropEditor({ name, argType, value, onChange, disabled }: EditorProp
             onChange={(newValue = '') => setInput(newValue)}
             path={fileUri}
             language="json"
+            options={{ readOnly: disabled }}
             onMount={HandleEditorMount}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleSave}>Save</Button>
+          <Button disabled={valueAsString === input} onClick={handleSave}>
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>

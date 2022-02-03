@@ -88,16 +88,6 @@ class Context implements RenderContext {
     return variable;
   }
 
-  getComponentDefinition(node: studioDom.StudioNode): StudioComponentDefinition | null {
-    if (studioDom.isPage(node)) {
-      return getStudioComponent(this.dom, 'Page');
-    }
-    if (studioDom.isElement(node)) {
-      return getStudioComponent(this.dom, node.component);
-    }
-    return null;
-  }
-
   collectAllState() {
     const nodes = studioDom.getDescendants(this.dom, this.page);
     nodes.forEach((node) => {
@@ -146,11 +136,7 @@ class Context implements RenderContext {
 
       let stateHook = this.useStateHooks.get(stateId);
       if (!stateHook) {
-        const component = this.getComponentDefinition(node);
-
-        if (!component) {
-          throw new Error(`Can't find component for node "${node.id}"`);
-        }
+        const component = getStudioComponent(this.dom, node.component);
 
         const argType = component.argTypes[prop];
 
@@ -323,13 +309,6 @@ class Context implements RenderContext {
     return result;
   }
 
-  renderComponent(name: string, resolvedProps: ResolvedProps): string {
-    const { children, ...props } = resolvedProps;
-    return children
-      ? `<${name} ${this.renderProps(props)}>${this.renderJsxContent(children)}</${name}>`
-      : `<${name} ${this.renderProps(props)}/>`;
-  }
-
   renderComponentChildren(
     component: StudioComponentDefinition,
     renderableNodeChildren: { [key: string]: studioDom.StudioElementNode<any>[] },
@@ -386,38 +365,17 @@ class Context implements RenderContext {
     return result;
   }
 
-  renderNodeChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): ResolvedProps {
-    const component = this.getComponentDefinition(node);
-
-    if (!component) {
-      return {};
-    }
-
-    const renderableNodeChildren = studioDom.isElement(node)
-      ? studioDom.getChildNodes(this.dom, node)
-      : { children: studioDom.getChildNodes(this.dom, node).children };
-
-    return this.renderComponentChildren(component, renderableNodeChildren);
-  }
-
-  renderElement(node: studioDom.StudioElementNode | studioDom.StudioPageNode): PropExpression {
-    const component = this.getComponentDefinition(node);
-    if (!component) {
-      return {
-        type: 'expression',
-        value: 'null',
-      };
-    }
-
-    const nodeChildren = this.renderNodeChildren(node);
-    const resolvedProps = studioDom.isElement(node) ? this.resolveElementProps(node) : {};
-    const props = {
+  renderComponent(
+    node: studioDom.StudioNode,
+    component: StudioComponentDefinition,
+    resolvedProps: ResolvedProps,
+    resolvedChildren: ResolvedProps,
+  ): PropExpression {
+    const rendered = component.render(this, {
       ...resolvedProps,
-      ...nodeChildren,
-    };
-    const rendered = component.render(this, props);
+      ...resolvedChildren,
+    });
 
-    // TODO: We may not need the `component` prop anymore. Remove?
     return {
       type: 'jsxElement',
       value: this.editor
@@ -430,6 +388,18 @@ class Context implements RenderContext {
     };
   }
 
+  renderElement(node: studioDom.StudioElementNode): PropExpression {
+    const component = getStudioComponent(this.dom, node.component);
+
+    const resolvedProps = studioDom.isElement(node) ? this.resolveElementProps(node) : {};
+    const resolvedChildren = this.renderComponentChildren(
+      component,
+      studioDom.getChildNodes(this.dom, node),
+    );
+
+    return this.renderComponent(node, component, resolvedProps, resolvedChildren);
+  }
+
   /**
    * Renders a node to a string that can be inlined as the return value of a React component
    * @example
@@ -438,7 +408,10 @@ class Context implements RenderContext {
    * }`
    */
   renderRoot(node: studioDom.StudioPageNode): string {
-    const expr = this.renderElement(node);
+    const component = getStudioComponent(this.dom, 'Page');
+    const { children } = studioDom.getChildNodes(this.dom, node);
+    const resolvedChildren = this.renderComponentChildren(component, { children });
+    const expr = this.renderComponent(node, component, {}, resolvedChildren);
     return this.renderJsExpression(expr);
   }
 

@@ -101,7 +101,7 @@ export interface StudioDerivedStateNode<P = any> extends StudioNodeBase {
   readonly type: 'derivedState';
   readonly code: string;
   readonly params: StudioBindables<P>;
-  readonly argTypes: PropValueTypes;
+  readonly argTypes: PropValueTypes<keyof P & string>;
   readonly returnType: PropValueType;
 }
 
@@ -546,7 +546,7 @@ export function addNode<Parent extends StudioNode, Child extends StudioNode>(
   parent: Parent,
   parentProp: ParentPropOf<Child, Parent>,
   parentIndex?: string,
-) {
+): StudioDom {
   if (newNode.parentId) {
     throw new Error(`Node "${newNode.id}" is already attached to a parent`);
   }
@@ -563,6 +563,17 @@ export function moveNode(
 ) {
   const node = getNode(dom, nodeId);
   return setNodeParent(dom, node, parentId, parentProp, parentIndex);
+}
+
+export function saveNode(dom: StudioDom, node: StudioNode) {
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: update(
+        dom.nodes[node.id],
+        omit(node, 'id', 'type', 'name', 'parentId', 'parentProp', 'parentIndex'),
+      ),
+    }),
+  });
 }
 
 export function removeNode(dom: StudioDom, nodeId: NodeId) {

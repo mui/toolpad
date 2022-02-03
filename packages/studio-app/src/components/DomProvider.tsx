@@ -29,6 +29,10 @@ export type DomAction =
       value: StudioBindable<unknown> | null;
     }
   | {
+      type: 'SAVE_NODE';
+      node: studioDom.StudioNode;
+    }
+  | {
       type: 'DOM_SET_NODE_ATTR';
       nodeId: NodeId;
       attr: string;
@@ -93,6 +97,11 @@ export function domReducer(state: DomState, action: DomAction): DomState {
         ),
       });
     }
+    case 'SAVE_NODE': {
+      return update(state, {
+        dom: studioDom.saveNode(state.dom, action.node),
+      });
+    }
     case 'DOM_SET_NODE_ATTR': {
       const node = studioDom.getNode(state.dom, action.nodeId);
       return update(state, {
@@ -148,6 +157,12 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parent,
         parentProp,
         parentIndex,
+      });
+    },
+    saveNode(node: studioDom.StudioNode) {
+      dispatch({
+        type: 'SAVE_NODE',
+        node,
       });
     },
     moveNode(nodeId: NodeId, parentId: NodeId, parentProp: string, parentIndex: string) {

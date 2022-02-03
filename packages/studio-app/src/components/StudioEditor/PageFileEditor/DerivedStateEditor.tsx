@@ -12,6 +12,7 @@ import {
   IconButton,
   List,
   ListItem,
+  DialogActions,
 } from '@mui/material';
 import React from 'react';
 import Editor from '@monaco-editor/react';
@@ -24,17 +25,11 @@ import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';
 import * as studioDom from '../../../studioDom';
-import { NodeId, StudioBindable } from '../../../types';
+import { NodeId, StudioBindable, StudioBindables } from '../../../types';
 import { BindingEditor } from './BindingEditor';
 
 const DERIVED_STATE_PARAMS = 'StudioDerivedStateParams';
 const DERIVED_STATE_RESULT = 'StudioDerivedStateResult';
-
-interface EditDerivedStateDialogProps {
-  open: boolean;
-  onClose: () => void;
-  nodeId: NodeId;
-}
 
 function tsTypeForPropValueType(propValueType: PropValueType): string {
   switch (propValueType.type) {
@@ -86,28 +81,25 @@ function PropValueTypeSelector({ value, onChange, disabled }: PropValueTypeSelec
 }
 
 interface StudioNodePropsEditorProps<P>
-  extends WithControlledProp<PropValueTypes<keyof P & string>, 'argTypes'> {
+  extends WithControlledProp<StudioBindables<P>>,
+    WithControlledProp<PropValueTypes<keyof P & string>, 'argTypes'> {
   nodeId: NodeId;
 }
 
 function StudioNodePropsEditor<P>({
   nodeId,
+  value,
+  onChange,
   argTypes,
   onArgTypesChange,
 }: StudioNodePropsEditorProps<P>) {
-  const dom = useDom();
-  const domApi = useDomApi();
-
-  const node = studioDom.getNode(dom, nodeId);
-  studioDom.assertIsDerivedState<P>(node);
-
   const handlePropValueChange = React.useCallback(
     (param: keyof P & string) => (newValue: StudioBindable<any> | null) => {
       if (newValue) {
-        domApi.setNodePropsValue(node, 'params', param, newValue);
+        onChange({ ...value, [param]: newValue });
       }
     },
-    [domApi, node],
+    [onChange, value],
   );
 
   const handlePropTypeChange = React.useCallback(
@@ -123,10 +115,10 @@ function StudioNodePropsEditor<P>({
 
   const handlePropRemove = React.useCallback(
     (param: keyof P & string) => () => {
-      domApi.setNodePropsValue(node, 'params', param, null);
+      onChange(omit(value, param) as StudioBindables<P>);
       onArgTypesChange(omit(argTypes, param) as PropValueTypes<keyof P & string>);
     },
-    [domApi, node, onArgTypesChange, argTypes],
+    [onChange, value, onArgTypesChange, argTypes],
   );
 
   return (
@@ -136,7 +128,7 @@ function StudioNodePropsEditor<P>({
           if (!propType) {
             return null;
           }
-          const propValue: StudioBindable<any> | null = node.params[propName] ?? null;
+          const propValue: StudioBindable<any> | null = value[propName] ?? null;
           const isBound = !!propValue;
           return (
             <Stack key={propName} direction="row" alignItems="center" gap={1}>
@@ -164,16 +156,11 @@ function StudioNodePropsEditor<P>({
   );
 }
 
-function EditDerivedStateDialog<P>({ nodeId, open, onClose }: EditDerivedStateDialogProps) {
+interface DerivedStateNodeEditorProps<P>
+  extends WithControlledProp<studioDom.StudioDerivedStateNode<P>> {}
+
+function DerivedStateNodeEditor<P>({ value, onChange }: DerivedStateNodeEditorProps<P>) {
   const monacoRef = React.useRef<typeof monacoEditor>();
-
-  const dom = useDom();
-  const domApi = useDomApi();
-  const value = studioDom.getNode(dom, nodeId);
-  studioDom.assertIsDerivedState<P>(value);
-
-  const [codeInput, setCodeInput] = React.useState(value.code);
-  React.useEffect(() => setCodeInput(value.code), [value.code]);
 
   const libSource = React.useMemo(() => {
     const args = (Object.entries(value.argTypes) as ExactEntriesOf<PropValueTypes>).map(
@@ -241,76 +228,91 @@ function EditDerivedStateDialog<P>({ nodeId, open, onClose }: EditDerivedStateDi
 
   const [newPropName, setnewPropName] = React.useState('');
   const handleAddProp = React.useCallback(() => {
-    domApi.setNodeAttribute(
-      value,
-      'argTypes',
-      update(value.argTypes, {
+    onChange({
+      ...value,
+      argTypes: update(value.argTypes, {
         [newPropName]: { type: 'string' },
-      }),
-    );
+      } as Partial<PropValueTypes<keyof P & string>>),
+    });
     setnewPropName('');
-  }, [domApi, value, newPropName]);
+  }, [onChange, value, newPropName]);
 
   const handlePropTypesChange = React.useCallback(
-    (newPropTypes: PropValueTypes) => {
-      domApi.setNodeAttribute(value, 'argTypes', newPropTypes);
+    (newPropTypes: PropValueTypes<keyof P & string>) => {
+      onChange({
+        ...value,
+        argTypes: newPropTypes,
+      });
     },
-    [domApi, value],
+    [onChange, value],
   );
 
   const handleReturnTypeChange = React.useCallback(
     (newReturnType: PropValueType) => {
-      domApi.setNodeAttribute(value, 'returnType', newReturnType);
+      onChange({
+        ...value,
+        returnType: newReturnType,
+      });
     },
-    [domApi, value],
+    [onChange, value],
   );
 
-  const handleSaveCode = React.useCallback(() => {
-    domApi.setNodeAttribute(value, 'code', codeInput);
-  }, [domApi, value, codeInput]);
+  const handleCodeChange = React.useCallback(
+    (code: string = '') => {
+      onChange({
+        ...value,
+        code,
+      });
+    },
+    [onChange, value],
+  );
+
+  const handleParamsChange = React.useCallback(
+    (newParams: StudioBindables<P>) => {
+      onChange({
+        ...value,
+        params: newParams,
+      });
+    },
+    [onChange, value],
+  );
 
   return (
-    <Dialog fullWidth maxWidth="lg" open={open} onClose={onClose}>
-      <DialogTitle>Edit Derived State ({nodeId})</DialogTitle>
-      <DialogContent>
-        <Stack gap={1} my={1}>
-          <StudioNodePropsEditor
-            nodeId={value.id}
-            argTypes={value.argTypes}
-            onArgTypesChange={handlePropTypesChange}
-          />
-          <Stack direction="row" alignItems="center" gap={1}>
-            <TextField
-              value={newPropName}
-              onChange={(event) => setnewPropName(event.target.value)}
-              size="small"
-            />
-            <Button
-              disabled={!newPropName || Object.keys(value.argTypes).includes(newPropName)}
-              onClick={handleAddProp}
-            >
-              Add prop
-            </Button>
-          </Stack>
-
-          <Stack direction="row" alignItems="center" gap={1}>
-            State type:
-            <PropValueTypeSelector value={value.returnType} onChange={handleReturnTypeChange} />
-          </Stack>
-        </Stack>
-        <Editor
-          height="200px"
-          value={codeInput}
-          onChange={(newValue = '') => setCodeInput(newValue)}
-          path="./component.tsx"
-          language="typescript"
-          onMount={HandleEditorMount}
+    <Stack gap={1} my={1}>
+      <StudioNodePropsEditor
+        nodeId={value.id}
+        value={value.params}
+        onChange={handleParamsChange}
+        argTypes={value.argTypes}
+        onArgTypesChange={handlePropTypesChange}
+      />
+      <Stack direction="row" alignItems="center" gap={1}>
+        <TextField
+          value={newPropName}
+          onChange={(event) => setnewPropName(event.target.value)}
+          size="small"
         />
-        <Button disabled={codeInput === value.code} onClick={handleSaveCode}>
-          Save Code
+        <Button
+          disabled={!newPropName || Object.keys(value.argTypes).includes(newPropName)}
+          onClick={handleAddProp}
+        >
+          Add prop
         </Button>
-      </DialogContent>
-    </Dialog>
+      </Stack>
+
+      <Stack direction="row" alignItems="center" gap={1}>
+        State type:
+        <PropValueTypeSelector value={value.returnType} onChange={handleReturnTypeChange} />
+      </Stack>
+      <Editor
+        height="200px"
+        value={value.code}
+        onChange={handleCodeChange}
+        path="./component.tsx"
+        language="typescript"
+        onMount={HandleEditorMount}
+      />
+    </Stack>
   );
 }
 
@@ -319,7 +321,9 @@ export default function DerivedStateEditor() {
   const state = usePageEditorState();
   const domApi = useDomApi();
 
-  const [editedStateNode, setEditedState] = React.useState<NodeId | null>(null);
+  const [editedStateNode, setEditedState] = React.useState<studioDom.StudioDerivedStateNode | null>(
+    null,
+  );
   const handleEditStateDialogClose = React.useCallback(() => setEditedState(null), []);
 
   const page = studioDom.getNode(dom, state.nodeId);
@@ -341,12 +345,27 @@ export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DER
   return 'Hello World!';
 }\n`,
     });
-    domApi.addNode(stateNode, page, 'derivedStates');
-    setEditedState(stateNode.id);
-  }, [dom, domApi, page]);
+    setEditedState(stateNode);
+  }, [dom]);
 
   // To keep it around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);
+
+  const handleSave = React.useCallback(() => {
+    if (editedStateNode?.parentId) {
+      domApi.saveNode(editedStateNode);
+    } else if (editedStateNode) {
+      domApi.addNode(editedStateNode, page, 'derivedStates');
+    }
+    handleEditStateDialogClose();
+  }, [domApi, editedStateNode, handleEditStateDialogClose, page]);
+
+  const handleRemove = React.useCallback(() => {
+    if (editedStateNode) {
+      domApi.removeNode(editedStateNode.id);
+    }
+    handleEditStateDialogClose();
+  }, [editedStateNode, handleEditStateDialogClose, domApi]);
   return (
     <Stack spacing={1} alignItems="start">
       <Button color="inherit" onClick={handleCreate}>
@@ -355,18 +374,32 @@ export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DER
       <List>
         {derivedStates.map((stateNode) => {
           return (
-            <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode.id)}>
+            <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode)}>
               {stateNode.name}
             </ListItem>
           );
         })}
       </List>
+
       {lastEditedStateNode ? (
-        <EditDerivedStateDialog
-          nodeId={lastEditedStateNode}
+        <Dialog
+          fullWidth
+          maxWidth="lg"
           open={!!editedStateNode}
           onClose={handleEditStateDialogClose}
-        />
+        >
+          <DialogTitle>Edit Derived State ({lastEditedStateNode.id})</DialogTitle>
+          <DialogContent>
+            <DerivedStateNodeEditor
+              value={lastEditedStateNode}
+              onChange={(newValue) => setEditedState(newValue)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleSave}>Save</Button>
+            {lastEditedStateNode.parentId ? <Button onClick={handleRemove}>Remove</Button> : null}
+          </DialogActions>
+        </Dialog>
       ) : null}
     </Stack>
   );

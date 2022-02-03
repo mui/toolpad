@@ -5,28 +5,6 @@ import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { ExactEntriesOf } from './utils/types';
 
-type AllowedChildren = {
-  app: {
-    pages: 'page';
-    apis: 'api';
-    themes: 'theme';
-    codeComponents: 'codeComponent';
-  };
-  theme: {};
-  api: {};
-  page: {
-    children: 'element';
-    derivedStates: 'derivedState';
-    queryStates: 'queryState';
-  };
-  element: {
-    [prop: string]: 'element';
-  };
-  codeComponent: {};
-  derivedState: {};
-  queryState: {};
-};
-
 export function createFractionalIndex(index1: string | null, index2: string | null) {
   return generateKeyBetween(index1, index2);
 }
@@ -47,7 +25,8 @@ type StudioNodeType =
   | 'element'
   | 'codeComponent'
   | 'derivedState'
-  | 'queryState';
+  | 'queryState'
+  | 'fetchedState';
 
 export interface StudioNodeBase {
   readonly id: NodeId;
@@ -111,6 +90,13 @@ export interface StudioQueryStateNode<P = any> extends StudioNodeBase {
   readonly params: StudioBindables<P>;
 }
 
+export interface StudioFetchedStateNode extends StudioNodeBase {
+  readonly type: 'fetchedState';
+  readonly url: StudioBindable<string>;
+  readonly collectionPath: string;
+  readonly fieldPaths: Record<string, string>;
+}
+
 type StudioNodeOfType<K extends StudioNodeType> = {
   app: StudioAppNode;
   api: StudioApiNode;
@@ -120,17 +106,34 @@ type StudioNodeOfType<K extends StudioNodeType> = {
   codeComponent: StudioCodeComponentNode;
   derivedState: StudioDerivedStateNode;
   queryState: StudioQueryStateNode;
+  fetchedState: StudioFetchedStateNode;
 }[K];
 
-export type StudioNode =
-  | StudioAppNode
-  | StudioApiNode
-  | StudioThemeNode
-  | StudioPageNode
-  | StudioElementNode
-  | StudioCodeComponentNode
-  | StudioDerivedStateNode
-  | StudioQueryStateNode;
+type AllowedChildren = {
+  app: {
+    pages: 'page';
+    apis: 'api';
+    themes: 'theme';
+    codeComponents: 'codeComponent';
+  };
+  theme: {};
+  api: {};
+  page: {
+    children: 'element';
+    derivedStates: 'derivedState';
+    queryStates: 'queryState';
+    fetchedStates: 'fetchedState';
+  };
+  element: {
+    [prop: string]: 'element';
+  };
+  codeComponent: {};
+  derivedState: {};
+  queryState: {};
+  fetchedState: {};
+};
+
+export type StudioNode = StudioNodeOfType<StudioNodeType>;
 
 type TypeOf<N extends StudioNode> = N['type'];
 type AllowedChildTypesOfType<T extends StudioNodeType> = AllowedChildren[T];
@@ -246,6 +249,14 @@ export function isQueryState<P>(node: StudioNode): node is StudioQueryStateNode<
 
 export function assertIsQueryState<P>(node: StudioNode): asserts node is StudioQueryStateNode<P> {
   assertIsType<StudioQueryStateNode>(node, 'queryState');
+}
+
+export function isFetchedState(node: StudioNode): node is StudioFetchedStateNode {
+  return isType<StudioFetchedStateNode>(node, 'fetchedState');
+}
+
+export function assertIsFetchedState(node: StudioNode): asserts node is StudioFetchedStateNode {
+  assertIsType<StudioFetchedStateNode>(node, 'fetchedState');
 }
 
 export function getApp(dom: StudioDom): StudioAppNode {

@@ -180,7 +180,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         nodeId,
       });
     },
-    setNodePropsValue<
+    setNodeNamespacedProp<
       Node extends studioDom.StudioNode,
       Namespace extends studioDom.PropNamespaces<Node>,
       Prop extends keyof Node[Namespace] & string,

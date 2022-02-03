@@ -5,6 +5,7 @@ import studioPropControls from '../../propertyControls';
 import * as studioDom from '../../../studioDom';
 import { useDomApi } from '../../DomProvider';
 import { BindingEditor } from './BindingEditor';
+import { StudioBindable } from '../../../types';
 
 function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
   switch (typeDef.type) {
@@ -39,8 +40,8 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(
-    (newValue) => {
-      domApi.setNodePropsValue(node, 'props', name, newValue);
+    (newValue: StudioBindable<P[K]> | null) => {
+      domApi.setNodeNamespacedProp(node, 'props', name, newValue);
     },
     [domApi, node, name],
   );

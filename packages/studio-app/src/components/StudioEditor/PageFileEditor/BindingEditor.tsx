@@ -29,11 +29,16 @@ export interface BindingEditorContentProps<K> {
   prop: K;
 }
 
-interface BoundExpressionEditorProps extends WithControlledProp<StudioBindable<unknown> | null> {
+interface BoundExpressionEditorProps<P, K extends keyof P & string>
+  extends WithControlledProp<StudioBindable<P[K]> | null> {
   propType: PropValueType;
 }
 
-function BoundExpressionEditor({ propType, value, onChange }: BoundExpressionEditorProps) {
+function BoundExpressionEditor<P, K extends keyof P & string>({
+  propType,
+  value,
+  onChange,
+}: BoundExpressionEditorProps<P, K>) {
   const argType = propType.type;
 
   const format = argType === 'string' ? 'stringLiteral' : 'default';
@@ -117,19 +122,20 @@ function getBindablePropsInScope(
   });
 }
 
-interface BindingEditorTabProps extends WithControlledProp<StudioBindable<unknown> | null> {
+interface BindingEditorTabProps<P, K extends keyof P & string>
+  extends WithControlledProp<StudioBindable<P[K]> | null> {
   node: studioDom.StudioNode;
-  prop: string;
+  prop: K;
   propType: PropValueType;
 }
 
-function AddBindingEditor({
+function AddBindingEditor<P, K extends keyof P & string>({
   node: srcNode,
   prop: srcProp,
   propType,
   value,
   onChange,
-}: BindingEditorTabProps) {
+}: BindingEditorTabProps<P, K>) {
   const dom = useDom();
 
   const srcNodeId = srcNode.id;
@@ -158,20 +164,20 @@ function AddBindingEditor({
   );
 }
 
-export interface BindingEditorProps<K extends string>
-  extends WithControlledProp<StudioBindable<unknown> | null> {
+export interface BindingEditorProps<P, K extends keyof P & string>
+  extends WithControlledProp<StudioBindable<P[K]> | null> {
   nodeId: NodeId;
   prop: K;
   propType: PropValueType;
 }
 
-export function BindingEditor<P = any>({
+export function BindingEditor<P, K extends keyof P & string>({
   nodeId,
   prop,
   propType,
   value,
   onChange,
-}: BindingEditorProps<keyof P & string>) {
+}: BindingEditorProps<P, K>) {
   const dom = useDom();
   const node = studioDom.getNode(dom, nodeId);
 
@@ -216,7 +222,7 @@ export function BindingEditor<P = any>({
               </TabList>
             </Box>
             <TabPanel value="binding">
-              <AddBindingEditor
+              <AddBindingEditor<P, K>
                 node={node}
                 prop={prop}
                 propType={propType}
@@ -225,7 +231,7 @@ export function BindingEditor<P = any>({
               />
             </TabPanel>
             <TabPanel value="boundExpression">
-              <BoundExpressionEditor
+              <BoundExpressionEditor<P, K>
                 propType={propType}
                 value={inputValue}
                 onChange={(newValue) => setInput(newValue)}

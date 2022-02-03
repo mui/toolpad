@@ -67,7 +67,7 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
                 if (typeof propName !== 'string' || !query[propName]) {
                   return;
                 }
-                domApi.setNodePropsValue(api, 'query', propName, {
+                domApi.setNodeNamespacedProp(api, 'query', propName, {
                   type: 'const',
                   value: query[propName],
                 });

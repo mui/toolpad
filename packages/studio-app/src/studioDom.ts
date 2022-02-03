@@ -441,13 +441,13 @@ export function getPageAncestors(
     : [];
 }
 
-export function getPageAncestor(
-  dom: StudioDom,
-  node: StudioElementNode | StudioDerivedStateNode,
-): StudioPageNode | null {
+export function getPageAncestor(dom: StudioDom, node: StudioNode): StudioPageNode | null {
+  if (isPage(node)) {
+    return node;
+  }
   const parent = getParent(dom, node);
   if (parent) {
-    return isPage(parent) ? parent : getPageAncestor(dom, parent);
+    return getPageAncestor(dom, parent);
   }
   return null;
 }

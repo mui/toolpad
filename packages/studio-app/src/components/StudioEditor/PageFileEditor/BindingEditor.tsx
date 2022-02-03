@@ -24,21 +24,16 @@ import { useDom } from '../../DomProvider';
 import { WithControlledProp } from '../../../utils/types';
 import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../../../schemas';
 
-export interface BindingEditorContentProps<K> {
+export interface BindingEditorContentProps {
   nodeId: NodeId;
-  prop: K;
+  prop: string;
 }
 
-interface BoundExpressionEditorProps<P, K extends keyof P & string>
-  extends WithControlledProp<StudioBindable<P[K]> | null> {
+interface BoundExpressionEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   propType: PropValueType;
 }
 
-function BoundExpressionEditor<P, K extends keyof P & string>({
-  propType,
-  value,
-  onChange,
-}: BoundExpressionEditorProps<P, K>) {
+function BoundExpressionEditor<V>({ propType, value, onChange }: BoundExpressionEditorProps<V>) {
   const argType = propType.type;
 
   const format = argType === 'string' ? 'stringLiteral' : 'default';
@@ -67,10 +62,8 @@ function getBindablePropsInScope(
   propType: PropValueType,
 ): string[] {
   const node = studioDom.getNode(dom, nodeId);
-  if (!studioDom.isElement(node) && !studioDom.isDerivedState(node)) {
-    return [];
-  }
   const page = studioDom.getPageAncestor(dom, node);
+
   if (!page) {
     return [];
   }
@@ -122,20 +115,19 @@ function getBindablePropsInScope(
   });
 }
 
-interface BindingEditorTabProps<P, K extends keyof P & string>
-  extends WithControlledProp<StudioBindable<P[K]> | null> {
+interface BindingEditorTabProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   node: studioDom.StudioNode;
-  prop: K;
+  prop: string;
   propType: PropValueType;
 }
 
-function AddBindingEditor<P, K extends keyof P & string>({
+function AddBindingEditor<V>({
   node: srcNode,
   prop: srcProp,
   propType,
   value,
   onChange,
-}: BindingEditorTabProps<P, K>) {
+}: BindingEditorTabProps<V>) {
   const dom = useDom();
 
   const srcNodeId = srcNode.id;
@@ -164,22 +156,22 @@ function AddBindingEditor<P, K extends keyof P & string>({
   );
 }
 
-export interface BindingEditorProps<P, K extends keyof P & string>
-  extends WithControlledProp<StudioBindable<P[K]> | null> {
+export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   nodeId: NodeId;
-  prop: K;
+  prop: string;
   propType: PropValueType;
 }
 
-export function BindingEditor<P, K extends keyof P & string>({
+export function BindingEditor<V>({
   nodeId,
   prop,
   propType,
   value,
   onChange,
-}: BindingEditorProps<P, K>) {
+}: BindingEditorProps<V>) {
   const dom = useDom();
   const node = studioDom.getNode(dom, nodeId);
+  console.log(nodeId, dom, node);
 
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
@@ -222,7 +214,7 @@ export function BindingEditor<P, K extends keyof P & string>({
               </TabList>
             </Box>
             <TabPanel value="binding">
-              <AddBindingEditor<P, K>
+              <AddBindingEditor<V>
                 node={node}
                 prop={prop}
                 propType={propType}
@@ -231,7 +223,7 @@ export function BindingEditor<P, K extends keyof P & string>({
               />
             </TabPanel>
             <TabPanel value="boundExpression">
-              <BoundExpressionEditor<P, K>
+              <BoundExpressionEditor<V>
                 propType={propType}
                 value={inputValue}
                 onChange={(newValue) => setInput(newValue)}

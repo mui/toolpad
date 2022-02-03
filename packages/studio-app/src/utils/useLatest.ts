@@ -1,6 +1,8 @@
 import * as React from 'react';
 
-export default function useLatest<T>(value: T | null | undefined): T | null | undefined {
+function useLatest<T>(value: T): T;
+function useLatest<T>(value: T | null | undefined): T | null | undefined;
+function useLatest<T>(value: T | null | undefined): T | null | undefined {
   const valueRef = React.useRef(value);
   React.useEffect(() => {
     if (value !== null && value !== undefined) {
@@ -9,3 +11,5 @@ export default function useLatest<T>(value: T | null | undefined): T | null | un
   }, [value]);
   return value ?? valueRef.current;
 }
+
+export default useLatest;

@@ -11,6 +11,7 @@ import {
   List,
   ListItem,
   SelectChangeEvent,
+  DialogActions,
 } from '@mui/material';
 import React from 'react';
 import useLatest from '../../../utils/useLatest';
@@ -18,56 +19,41 @@ import { useDom, useDomApi } from '../../DomProvider';
 import { usePageEditorState } from './PageEditorProvider';
 import * as studioDom from '../../../studioDom';
 import { NodeId } from '../../../types';
+import { WithControlledProp } from '../../../utils/types';
 
-interface EditDerivedStateDialogProps {
-  open: boolean;
-  onClose: () => void;
-  nodeId: NodeId;
-}
+interface QueryStateNodeEditorProps<P>
+  extends WithControlledProp<studioDom.StudioQueryStateNode<P>> {}
 
-function EditQueryStateDialog<P>({ nodeId, open, onClose }: EditDerivedStateDialogProps) {
+function QueryStateNodeEditor<P>({ value, onChange }: QueryStateNodeEditorProps<P>) {
   const dom = useDom();
-  const domApi = useDomApi();
-  const value = studioDom.getNode(dom, nodeId);
-  studioDom.assertIsQueryState<P>(value);
-
   const app = studioDom.getApp(dom);
   const { apis = [] } = studioDom.getChildNodes(dom, app);
 
   const handleSelectionChange = React.useCallback(
     (event: SelectChangeEvent<'' | NodeId>) => {
-      domApi.setNodeAttribute(
-        value,
-        'api',
-        event.target.value ? (event.target.value as NodeId) : null,
-      );
+      onChange({ ...value, api: event.target.value ? (event.target.value as NodeId) : null });
     },
-    [domApi, value],
+    [onChange, value],
   );
 
   return (
-    <Dialog fullWidth maxWidth="lg" open={open} onClose={onClose}>
-      <DialogTitle>Edit Query State ({nodeId})</DialogTitle>
-      <DialogContent>
-        <FormControl fullWidth size="small">
-          <InputLabel id={`select-data-query`}>Query</InputLabel>
-          <Select
-            value={value.api || ''}
-            labelId="select-data-query"
-            label="Query"
-            onChange={handleSelectionChange}
-            size="small"
-          >
-            <MenuItem value="">---</MenuItem>
-            {apis.map(({ id, name }) => (
-              <MenuItem key={id} value={id}>
-                {name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </DialogContent>
-    </Dialog>
+    <FormControl fullWidth size="small">
+      <InputLabel id={`select-data-query`}>Query</InputLabel>
+      <Select
+        value={value.api || ''}
+        labelId="select-data-query"
+        label="Query"
+        onChange={handleSelectionChange}
+        size="small"
+      >
+        <MenuItem value="">---</MenuItem>
+        {apis.map(({ id, name }) => (
+          <MenuItem key={id} value={id}>
+            {name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 }
 
@@ -76,7 +62,9 @@ export default function QueryStateEditor() {
   const state = usePageEditorState();
   const domApi = useDomApi();
 
-  const [editedStateNode, setEditedState] = React.useState<NodeId | null>(null);
+  const [editedStateNode, setEditedState] = React.useState<studioDom.StudioQueryStateNode | null>(
+    null,
+  );
   const handleEditStateDialogClose = React.useCallback(() => setEditedState(null), []);
 
   const page = studioDom.getNode(dom, state.nodeId);
@@ -88,12 +76,28 @@ export default function QueryStateEditor() {
       api: null,
       params: {},
     });
-    domApi.addNode(stateNode, page, 'queryStates');
-    setEditedState(stateNode.id);
-  }, [dom, domApi, page]);
+    setEditedState(stateNode);
+  }, [dom]);
 
   // To keep it around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);
+
+  const handleSave = React.useCallback(() => {
+    if (editedStateNode?.parentId) {
+      domApi.saveNode(editedStateNode);
+    } else if (editedStateNode) {
+      domApi.addNode(editedStateNode, page, 'queryStates');
+    }
+    handleEditStateDialogClose();
+  }, [domApi, editedStateNode, handleEditStateDialogClose, page]);
+
+  const handleRemove = React.useCallback(() => {
+    if (editedStateNode) {
+      domApi.removeNode(editedStateNode.id);
+    }
+    handleEditStateDialogClose();
+  }, [editedStateNode, handleEditStateDialogClose, domApi]);
+
   return (
     <Stack spacing={1} alignItems="start">
       <Button color="inherit" onClick={handleCreate}>
@@ -102,18 +106,31 @@ export default function QueryStateEditor() {
       <List>
         {queryStates.map((stateNode) => {
           return (
-            <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode.id)}>
+            <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode)}>
               {stateNode.name}
             </ListItem>
           );
         })}
       </List>
       {lastEditedStateNode ? (
-        <EditQueryStateDialog
-          nodeId={lastEditedStateNode}
+        <Dialog
+          fullWidth
+          maxWidth="lg"
           open={!!editedStateNode}
           onClose={handleEditStateDialogClose}
-        />
+        >
+          <DialogTitle>Edit Query State ({lastEditedStateNode.id})</DialogTitle>
+          <DialogContent>
+            <QueryStateNodeEditor
+              value={lastEditedStateNode}
+              onChange={(newValue) => setEditedState(newValue)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleSave}>Save</Button>
+            {lastEditedStateNode.parentId ? <Button onClick={handleRemove}>Remove</Button> : null}
+          </DialogActions>
+        </Dialog>
       ) : null}
     </Stack>
   );

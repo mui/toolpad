@@ -197,28 +197,7 @@ class Context implements RenderContext {
     }
   }
 
-  getPropTypes(node: studioDom.StudioNode): PropValueTypes {
-    if (studioDom.isElement(node)) {
-      const component = this.getComponentDefinition(node);
-      if (!component) {
-        return {};
-      }
-      return argTypesToPropValueTypes(component.argTypes);
-    }
-    if (studioDom.isDerivedState(node)) {
-      return node.argTypes;
-    }
-    if (studioDom.isQueryState(node)) {
-      const apiNode = node.api ? studioDom.getNode(this.dom, node.api) : null;
-      if (apiNode) {
-        studioDom.assertIsApi(apiNode);
-      }
-      return apiNode ? argTypesToPropValueTypes(apiNode.argTypes) : {};
-    }
-    return {};
-  }
-
-  resolveUserProp<P extends studioDom.BindableProps<P>>(
+  resolveBindable<P extends studioDom.BindableProps<P>>(
     propName: string,
     propValue: StudioBindable<any>,
     propType: PropValueType,
@@ -267,44 +246,31 @@ class Context implements RenderContext {
   }
 
   /**
-   * Resolves StudioNode properties to expressions we can render in the code.
-   * This will set up databinding if necessary
+   * Resolves StudioBindables to expressions we can render in the code.
    */
-  resolveProps(node: studioDom.StudioNode, resolvedChildren: ResolvedProps): ResolvedProps {
+  resolveBindables(bindables: StudioBindables<any>, propTypes: PropValueTypes): ResolvedProps {
     const result: ResolvedProps = {};
-    const propTypes = this.getPropTypes(node);
 
-    if (studioDom.isElement(node) || studioDom.isPage(node)) {
-      Object.assign(result, resolvedChildren);
-    }
-
-    // User props
-    if (studioDom.isElement(node)) {
-      Object.entries(node.props).forEach(([propName, propValue]) => {
-        const propType = propTypes[propName as string];
-        if (propValue && propType && !result[propName]) {
-          const resolved = this.resolveUserProp(propName, propValue, propType);
-          if (resolved) {
-            result[propName] = resolved;
-          }
+    Object.entries(bindables).forEach(([propName, propValue]) => {
+      const propType = propTypes[propName as string];
+      if (propValue && propType) {
+        const resolved = this.resolveBindable(propName, propValue, propType);
+        if (resolved) {
+          result[propName] = resolved;
         }
-      });
-    }
+      }
+    });
 
-    if (studioDom.isDerivedState(node) || studioDom.isQueryState(node)) {
-      Object.entries(node.params).forEach(([propName, propValue]) => {
-        const propType = propTypes[propName as string];
-        if (propValue && propType) {
-          const resolved = this.resolveUserProp(propName, propValue, propType);
-          if (resolved) {
-            result[propName] = resolved;
-          }
-        }
-      });
-    }
+    return result;
+  }
+
+  resolveElementProps(node: studioDom.StudioElementNode): ResolvedProps {
+    const component = getStudioComponent(this.dom, node.component);
+    const propTypes = argTypesToPropValueTypes(component.argTypes);
+
+    const result: ResolvedProps = this.resolveBindables(node.props, propTypes);
 
     // useState Hooks
-    const component = this.getComponentDefinition(node);
     if (component) {
       Object.entries(component.argTypes).forEach(([propName, argType]) => {
         if (!argType) {
@@ -364,30 +330,27 @@ class Context implements RenderContext {
       : `<${name} ${this.renderProps(props)}/>`;
   }
 
-  renderNodeChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): ResolvedProps {
+  renderComponentChildren(
+    component: StudioComponentDefinition,
+    renderableNodeChildren: { [key: string]: studioDom.StudioElementNode<any>[] },
+  ): ResolvedProps {
     const result: ResolvedProps = {};
-
-    const renderableNodeChildren = studioDom.isElement(node)
-      ? studioDom.getChildNodes(this.dom, node)
-      : { children: studioDom.getChildNodes(this.dom, node).children };
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [prop, children] of Object.entries(renderableNodeChildren)) {
       if (children) {
         if (children.length === 1) {
-          result[prop] = this.renderNode(children[0]);
+          result[prop] = this.renderElement(children[0]);
         } else if (children.length > 1) {
           result[prop] = {
             type: 'jsxFragment',
             value: children
-              .map((child): string => this.renderJsxContent(this.renderNode(child)))
+              .map((child): string => this.renderJsxContent(this.renderElement(child)))
               .join('\n'),
           };
         }
       }
     }
-
-    const component = this.getComponentDefinition(node);
 
     if (this.editor && component) {
       // eslint-disable-next-line no-restricted-syntax
@@ -423,7 +386,21 @@ class Context implements RenderContext {
     return result;
   }
 
-  renderNode(node: studioDom.StudioElementNode | studioDom.StudioPageNode): PropExpression {
+  renderNodeChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): ResolvedProps {
+    const component = this.getComponentDefinition(node);
+
+    if (!component) {
+      return {};
+    }
+
+    const renderableNodeChildren = studioDom.isElement(node)
+      ? studioDom.getChildNodes(this.dom, node)
+      : { children: studioDom.getChildNodes(this.dom, node).children };
+
+    return this.renderComponentChildren(component, renderableNodeChildren);
+  }
+
+  renderElement(node: studioDom.StudioElementNode | studioDom.StudioPageNode): PropExpression {
     const component = this.getComponentDefinition(node);
     if (!component) {
       return {
@@ -433,8 +410,12 @@ class Context implements RenderContext {
     }
 
     const nodeChildren = this.renderNodeChildren(node);
-    const resolvedProps = this.resolveProps(node, nodeChildren);
-    const rendered = component.render(this, resolvedProps);
+    const resolvedProps = studioDom.isElement(node) ? this.resolveElementProps(node) : {};
+    const props = {
+      ...resolvedProps,
+      ...nodeChildren,
+    };
+    const rendered = component.render(this, props);
 
     // TODO: We may not need the `component` prop anymore. Remove?
     return {
@@ -457,7 +438,7 @@ class Context implements RenderContext {
    * }`
    */
   renderRoot(node: studioDom.StudioPageNode): string {
-    const expr = this.renderNode(node);
+    const expr = this.renderElement(node);
     return this.renderJsExpression(expr);
   }
 
@@ -552,9 +533,9 @@ class Context implements RenderContext {
       if (stateVar) {
         const node = studioDom.getNode(this.dom, nodeId as NodeId);
         studioDom.assertIsDerivedState(node);
-        const resolvedProps = this.resolveProps(node, {});
-        const params = this.renderPropsAsObject(resolvedProps);
-        const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
+        const resolvedParams = this.resolveBindables(node.params, node.argTypes);
+        const paramsArg = this.renderPropsAsObject(resolvedParams);
+        const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
           this.renderJsExpression(resolvedProp),
         );
         const derivedStateGetter = this.addImport(
@@ -562,7 +543,7 @@ class Context implements RenderContext {
           'default',
           node.name,
         );
-        return `const ${stateVar} = React.useMemo(() => ${derivedStateGetter}(${params}), [${depsArray.join(
+        return `const ${stateVar} = React.useMemo(() => ${derivedStateGetter}(${paramsArg}), [${depsArray.join(
           ', ',
         )}])`;
       }
@@ -575,7 +556,15 @@ class Context implements RenderContext {
       if (stateVar) {
         const node = studioDom.getNode(this.dom, nodeId as NodeId);
         studioDom.assertIsQueryState(node);
-        const resolvedProps = this.resolveProps(node, {});
+
+        const apiNode = node.api ? studioDom.getNode(this.dom, node.api) : null;
+        if (apiNode) {
+          studioDom.assertIsApi(apiNode);
+        }
+
+        const propTypes = apiNode ? argTypesToPropValueTypes(apiNode.argTypes) : {};
+
+        const resolvedProps = this.resolveBindables(node.params, propTypes);
 
         // TODO: Set up variable binding
         // @ts-expect-error

@@ -406,6 +406,9 @@ export function createDom(): StudioDom {
   };
 }
 
+/**
+ * Creates a new DOM node representing aReact Element
+ */
 export function createElement<P>(
   dom: StudioDom,
   component: string,
@@ -419,6 +422,9 @@ export function createElement<P>(
   });
 }
 
+/**
+ * Get all descendants of a `node`, flattens childNodes objects into one single array
+ */
 export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
   const children: readonly StudioNode[] = Object.values(getChildNodes(dom, node))
     .flat()
@@ -431,6 +437,9 @@ export function getAncestors(dom: StudioDom, node: StudioNode): readonly StudioN
   return parent ? [...getAncestors(dom, parent), parent] : [];
 }
 
+/**
+ * Get all the ancestors of the `node` up until the first StudioPageNode node is encountered
+ */
 export function getPageAncestors(
   dom: StudioDom,
   node: StudioNode,
@@ -441,6 +450,9 @@ export function getPageAncestors(
     : [];
 }
 
+/**
+ * Get the first StudioPageNode node up in the DOM tree starting from `node`
+ */
 export function getPageAncestor(dom: StudioDom, node: StudioNode): StudioPageNode | null {
   if (isPage(node)) {
     return node;

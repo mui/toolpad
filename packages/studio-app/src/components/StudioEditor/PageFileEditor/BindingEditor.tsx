@@ -171,7 +171,6 @@ export function BindingEditor<V>({
 }: BindingEditorProps<V>) {
   const dom = useDom();
   const node = studioDom.getNode(dom, nodeId);
-  console.log(nodeId, dom, node);
 
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);

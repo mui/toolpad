@@ -52,8 +52,6 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
     [fields],
   );
 
-  const columnsFingerPrint = React.useMemo(() => JSON.stringify(columns), [columns]);
-
   return datasource ? (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
@@ -88,7 +86,7 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
         </Stack>
       </Box>
       <Box sx={{ flex: 1, overflow: 'hidden' }}>
-        <DataGridPro density="compact" rows={rows} columns={columns} key={columnsFingerPrint} />
+        <DataGridPro density="compact" rows={rows} columns={columns} />
       </Box>
     </Box>
   ) : null;

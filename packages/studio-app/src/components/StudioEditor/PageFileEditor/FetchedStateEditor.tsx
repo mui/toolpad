@@ -40,6 +40,14 @@ function parseObjectPath(path: string): ObjectPath {
   return path.split('.').filter(Boolean);
 }
 
+function parseObjectPaths(paths: Record<string, string>): Record<string, ObjectPath> {
+  return Object.fromEntries(
+    Object.entries(paths).map(([key, path]) => {
+      return [key, parseObjectPath(path)];
+    }),
+  );
+}
+
 function getObjectPath(object: unknown, path: ObjectPath): unknown | null {
   if (path.length <= 0) {
     return object;
@@ -51,16 +59,24 @@ function getObjectPath(object: unknown, path: ObjectPath): unknown | null {
   return null;
 }
 
-function fromCollection(object: unknown): { id: string; values: unknown }[] {
+function fromCollection(object: unknown): any[] {
   if (Array.isArray(object)) {
-    return object.map((values, i) => ({ id: String(i), values }));
+    return object;
   }
 
   if (typeof object === 'object' && object) {
-    return Object.entries(object).map(([id, values]) => ({ id, values }));
+    return Object.entries(object);
   }
 
   return [];
+}
+
+function select(object: unknown, objectPaths: Record<string, ObjectPath>): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(objectPaths).map(([key, path]) => {
+      return [key, getObjectPath(object, path as ObjectPath)];
+    }),
+  );
 }
 
 const URL_ARGTYPE: ArgTypeDefinition = {
@@ -101,36 +117,39 @@ function FieldsEditor({ value, onChange }: FieldsEditorProps) {
     setNewFieldPath('');
   }, [newFieldName, newFieldPath, onChange, value]);
   return (
-    <Stack direction="column">
+    <Box display="grid" gridTemplateColumns="1fr 2fr auto" alignItems="center" gap={1}>
       {Object.entries(value).map(([field, path]) => (
-        <Stack direction="row">
-          {field}: <TextField size="small" value={path} onChange={handlePathChange(field)} />
-          <IconButton onClick={handleRemove(field)}>
-            <CloseIcon />
+        <React.Fragment>
+          <Box ml={2} justifySelf="end">
+            {field}:
+          </Box>
+          <TextField label="path" size="small" value={path} onChange={handlePathChange(field)} />
+          <IconButton onClick={handleRemove(field)} size="small">
+            <CloseIcon fontSize="small" />
           </IconButton>
-        </Stack>
+        </React.Fragment>
       ))}
-      <Stack direction="row">
-        <TextField
-          size="small"
-          label="field"
-          value={newFieldName}
-          onChange={(event) => setNewFieldName(event.target.value)}
-        />
-        <TextField
-          size="small"
-          label="path"
-          value={newFieldPath}
-          onChange={(event) => setNewFieldPath(event.target.value)}
-        />
-        <IconButton
-          disabled={!newFieldName || hasOwnProperty(value, newFieldName)}
-          onClick={handleNewField}
-        >
-          <AddIcon />
-        </IconButton>
-      </Stack>
-    </Stack>
+
+      <TextField
+        size="small"
+        label="field"
+        value={newFieldName}
+        onChange={(event) => setNewFieldName(event.target.value)}
+      />
+      <TextField
+        size="small"
+        label="path"
+        value={newFieldPath}
+        onChange={(event) => setNewFieldPath(event.target.value)}
+      />
+      <IconButton
+        size="small"
+        disabled={!newFieldName || hasOwnProperty(value, newFieldName)}
+        onClick={handleNewField}
+      >
+        <AddIcon fontSize="small" />
+      </IconButton>
+    </Box>
   );
 }
 
@@ -164,22 +183,30 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
     [onChange, value],
   );
 
-  const [columns, setColumns] = React.useState<GridColumns>([{ field: 'id' }, { field: 'values' }]);
+  const fields = Object.keys(value.fieldPaths).join(',');
+  const columns = React.useMemo(() => fields.split(',').map((field) => ({ field })), [fields]);
 
   const { data, error, isLoading } = useQuery(value.url.value, simpleFetch);
 
   const collection = fromCollection(getObjectPath(data, parseObjectPath(value.collectionPath)));
 
-  const rows = collection;
-
-  const columnsFingerPrint = React.useMemo(() => JSON.stringify(columns), [columns]);
+  const rows = React.useMemo(() => {
+    return collection.map((row, i) => {
+      const paths = parseObjectPaths(value.fieldPaths);
+      const resultRow = select(row, paths);
+      return {
+        id: i,
+        ...resultRow,
+      };
+    });
+  }, [collection, value.fieldPaths]);
 
   const rawDisplay = React.useMemo(() => JSON.stringify(data, null, 2), [data]);
   const collectionDisplay = React.useMemo(() => JSON.stringify(collection, null, 2), [collection]);
 
   return (
-    <Stack direction="column" gap={2} my={1}>
-      <Stack direction="row">
+    <Stack direction="row" gap={2} my={1} flex={1}>
+      <Stack direction="column" gap={2} overflow="auto">
         <BindableEditor
           label="url"
           nodeId={nodeId}
@@ -189,18 +216,18 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
         />
         <TextField
           size="small"
+          label="collection path"
           value={value.collectionPath}
           onChange={handleCollectionPathChange}
         />
+        <FieldsEditor value={value.fieldPaths} onChange={handleFieldPathsChange} />
       </Stack>
-      <FieldsEditor value={value.fieldPaths} onChange={handleFieldPathsChange} />
       <TabContext value={tab}>
-        <Box sx={{ flexGrow: 1, display: 'flex' }}>
+        <Stack sx={{ flex: 1 }}>
           <TabList
-            orientation="vertical"
             onChange={(event, newTab) => setTab(newTab)}
             aria-label="FetchedState node collection display selector"
-            sx={{ borderRight: 1, borderColor: 'divider' }}
+            sx={{ borderBottom: 1, borderColor: 'divider' }}
           >
             <Tab label="Raw" value="raw" />
             <Tab label="Collection" value="collection" />
@@ -214,16 +241,14 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
           </TabPanel>
           <TabPanel value="result" sx={{ flex: 1, p: 1 }}>
             <DataGridPro
-              autoHeight
-              key={columnsFingerPrint}
               columns={columns}
               rows={rows}
               density="compact"
-              pagination
-              pageSize={5}
+              error={error}
+              loading={isLoading}
             />
           </TabPanel>
-        </Box>
+        </Stack>
       </TabContext>
     </Stack>
   );
@@ -238,9 +263,12 @@ export default function FetchedStateEditor({ pageNodeId }: FetchedStateEditorPro
   const state = usePageEditorState();
   const domApi = useDomApi();
 
-  const [editedStateNode, setEditedState] = React.useState<studioDom.StudioFetchedStateNode | null>(
-    null,
-  );
+  const [editedState, setEditedState] = React.useState<NodeId | null>(null);
+  const editedStateNode = editedState ? studioDom.getNode(dom, editedState) : null;
+  if (editedStateNode) {
+    studioDom.assertIsFetchedState(editedStateNode);
+  }
+
   const handleEditStateDialogClose = React.useCallback(() => setEditedState(null), []);
 
   const page = studioDom.getNode(dom, state.nodeId);
@@ -253,20 +281,19 @@ export default function FetchedStateEditor({ pageNodeId }: FetchedStateEditorPro
       collectionPath: '',
       fieldPaths: {},
     });
-    setEditedState(stateNode);
-  }, [dom]);
+    domApi.addNode(stateNode, page, 'fetchedStates');
+    setEditedState(stateNode.id);
+  }, [dom, domApi, page]);
 
   // To keep it around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);
 
-  const handleSave = React.useCallback(() => {
-    if (editedStateNode?.parentId) {
-      domApi.saveNode(editedStateNode);
-    } else if (editedStateNode) {
-      domApi.addNode(editedStateNode, page, 'fetchedStates');
-    }
-    handleEditStateDialogClose();
-  }, [domApi, editedStateNode, handleEditStateDialogClose, page]);
+  const handleSave = React.useCallback(
+    (newNode: studioDom.StudioFetchedStateNode) => {
+      domApi.saveNode(newNode);
+    },
+    [domApi],
+  );
 
   const handleRemove = React.useCallback(() => {
     if (editedStateNode) {
@@ -283,7 +310,7 @@ export default function FetchedStateEditor({ pageNodeId }: FetchedStateEditorPro
       <List>
         {fetchedStates.map((stateNode) => {
           return (
-            <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode)}>
+            <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode.id)}>
               {stateNode.name}
             </ListItem>
           );
@@ -297,16 +324,15 @@ export default function FetchedStateEditor({ pageNodeId }: FetchedStateEditorPro
           onClose={handleEditStateDialogClose}
         >
           <DialogTitle>Edit Fetched State ({lastEditedStateNode.id})</DialogTitle>
-          <DialogContent>
+          <DialogContent sx={{ height: '100vh', display: 'flex' }}>
             <FetchedStateNodeEditor
               nodeId={pageNodeId}
               value={lastEditedStateNode}
-              onChange={(newValue) => setEditedState(newValue)}
+              onChange={handleSave}
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleSave}>Save</Button>
-            {lastEditedStateNode.parentId ? <Button onClick={handleRemove}>Remove</Button> : null}
+            <Button onClick={handleRemove}>Remove</Button>
           </DialogActions>
         </Dialog>
       ) : null}

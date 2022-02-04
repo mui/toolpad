@@ -504,8 +504,7 @@ class Context implements RenderContext {
   renderDerivedStateHooks(): string {
     return Array.from(this.useMemoHooks.entries(), ([nodeId, stateVar]) => {
       if (stateVar) {
-        const node = studioDom.getNode(this.dom, nodeId as NodeId);
-        studioDom.assertIsDerivedState(node);
+        const node = studioDom.getNode(this.dom, nodeId as NodeId, 'derivedState');
         const resolvedParams = this.resolveBindables(node.params, node.argTypes);
         const paramsArg = this.renderPropsAsObject(resolvedParams);
         const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
@@ -527,13 +526,9 @@ class Context implements RenderContext {
   renderQueryStateHooks(): string {
     return Array.from(this.useQueryHooks.entries(), ([nodeId, stateVar]) => {
       if (stateVar) {
-        const node = studioDom.getNode(this.dom, nodeId as NodeId);
-        studioDom.assertIsQueryState(node);
+        const node = studioDom.getNode(this.dom, nodeId as NodeId, 'queryState');
 
-        const apiNode = node.api ? studioDom.getNode(this.dom, node.api) : null;
-        if (apiNode) {
-          studioDom.assertIsApi(apiNode);
-        }
+        const apiNode = node.api ? studioDom.getNode(this.dom, node.api, 'api') : null;
 
         const propTypes = apiNode ? argTypesToPropValueTypes(apiNode.argTypes) : {};
 
@@ -610,8 +605,7 @@ export default function renderPageCode(
     ...configInit,
   };
 
-  const page = studioDom.getNode(dom, pageNodeId);
-  studioDom.assertIsPage(page);
+  const page = studioDom.getNode(dom, pageNodeId, 'page');
 
   const ctx = new Context(dom, page, config);
   let code: string = ctx.render();

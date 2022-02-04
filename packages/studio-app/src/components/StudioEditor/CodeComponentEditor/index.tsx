@@ -24,8 +24,7 @@ interface CodeComponentEditorContentProps {
 function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const domNode = studioDom.getNode(dom, nodeId);
-  studioDom.assertIsCodeComponent(domNode);
+  const domNode = studioDom.getNode(dom, nodeId, 'codeComponent');
 
   const [input, setInput] = React.useState(domNode.code);
 

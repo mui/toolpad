@@ -181,8 +181,27 @@ function assertIsType<T extends StudioNode>(node: StudioNode, type: T['type']): 
     throw new Error(`Invariant: expected node type "${type}" but got "${node.type}"`);
   }
 }
-export function getNode(dom: StudioDom, nodeId: NodeId): StudioNode {
-  return dom.nodes[nodeId];
+
+export function getNode<T extends StudioNodeType>(
+  dom: StudioDom,
+  nodeId: NodeId,
+  type: T,
+): StudioNodeOfType<T>;
+export function getNode<T extends StudioNodeType>(
+  dom: StudioDom,
+  nodeId: NodeId,
+  type?: T,
+): StudioNode;
+export function getNode<T extends StudioNodeType>(
+  dom: StudioDom,
+  nodeId: NodeId,
+  type?: T,
+): StudioNode {
+  const node = dom.nodes[nodeId];
+  if (type) {
+    assertIsType(node, type);
+  }
+  return node;
 }
 
 export function isApp(node: StudioNode): node is StudioAppNode {

@@ -304,15 +304,11 @@ export default function DerivedStateEditor() {
   const domApi = useDomApi();
 
   const [editedState, setEditedState] = React.useState<NodeId | null>(null);
-  const editedStateNode = editedState ? studioDom.getNode(dom, editedState) : null;
-  if (editedStateNode) {
-    studioDom.assertIsDerivedState(editedStateNode);
-  }
+  const editedStateNode = editedState ? studioDom.getNode(dom, editedState, 'derivedState') : null;
 
   const handleEditStateDialogClose = React.useCallback(() => setEditedState(null), []);
 
-  const page = studioDom.getNode(dom, state.nodeId);
-  studioDom.assertIsPage(page);
+  const page = studioDom.getNode(dom, state.nodeId, 'page');
 
   const { derivedStates = [] } = studioDom.getChildNodes(dom, page);
 

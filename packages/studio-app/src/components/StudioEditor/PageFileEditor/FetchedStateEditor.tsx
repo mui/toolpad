@@ -264,15 +264,11 @@ export default function FetchedStateEditor({ pageNodeId }: FetchedStateEditorPro
   const domApi = useDomApi();
 
   const [editedState, setEditedState] = React.useState<NodeId | null>(null);
-  const editedStateNode = editedState ? studioDom.getNode(dom, editedState) : null;
-  if (editedStateNode) {
-    studioDom.assertIsFetchedState(editedStateNode);
-  }
+  const editedStateNode = editedState ? studioDom.getNode(dom, editedState, 'fetchedState') : null;
 
   const handleEditStateDialogClose = React.useCallback(() => setEditedState(null), []);
 
-  const page = studioDom.getNode(dom, state.nodeId);
-  studioDom.assertIsPage(page);
+  const page = studioDom.getNode(dom, state.nodeId, 'page');
   const { fetchedStates = [] } = studioDom.getChildNodes(dom, page) ?? [];
 
   const handleCreate = React.useCallback(() => {

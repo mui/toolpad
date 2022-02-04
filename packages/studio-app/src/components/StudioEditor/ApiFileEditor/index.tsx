@@ -21,8 +21,7 @@ interface ApiEditorProps {
 function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const api = studioDom.getNode(dom, nodeId);
-  studioDom.assertIsApi<Q>(api);
+  const api = studioDom.getNode(dom, nodeId, 'api');
 
   const [name, setName] = React.useState(api.name);
   const [query, setQuery] = React.useState(studioDom.fromConstPropValues(api.query) as Q);

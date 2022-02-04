@@ -475,8 +475,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     highlightedSlot,
   } = usePageEditorState();
 
-  const pageNode = studioDom.getNode(dom, pageNodeId);
-  studioDom.assertIsPage(pageNode);
+  const pageNode = studioDom.getNode(dom, pageNodeId, 'page');
 
   const pageNodes = React.useMemo(() => {
     return [pageNode, ...studioDom.getDescendants(dom, pageNode)];

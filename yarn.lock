@@ -1120,12 +1120,32 @@
     prop-types "^15.8.1"
     reselect "^4.1.5"
 
+"@mui/x-data-grid-pro@^5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid-pro/-/x-data-grid-pro-5.4.0.tgz#77efe91f51825138fd43c98d616934e3b6928c8b"
+  integrity sha512-zolakxbLJh3zTTe1uKnfx1T8w3JC844HMsoZW1O6YJ2LClQpjxR7QCdfTWFtysPjeIR9fZfmuZ0afweevwbHJA==
+  dependencies:
+    "@mui/utils" "^5.3.0"
+    "@mui/x-license-pro" "5.4.0"
+    clsx "^1.0.4"
+    prop-types "^15.8.1"
+    reselect "^4.1.5"
+
 "@mui/x-license-pro@5.3.0":
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/@mui/x-license-pro/-/x-license-pro-5.3.0.tgz#0c117f21ce42c3f07e581cb09c3cf2ab67bc0116"
   integrity sha512-JZFfO9b71ZCv8nQzRE+4vhmiFRWqEpQQhNjDxc7KsK8D1HHchtqL5cCw9tqrSIZPVBXi36b0cEG1mqh+Axi/og==
   dependencies:
     "@mui/utils" "^5.2.3"
+    esm "^3.2.25"
+    yargs "^17.3.1"
+
+"@mui/x-license-pro@5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@mui/x-license-pro/-/x-license-pro-5.4.0.tgz#5c5cfdb53b394e1426ee550f8cf74b89655f07ae"
+  integrity sha512-Awm6/EQcu8TdGKTlTRzWwAc0ukbdGMZ1DgtF7VeI+4j+ZwyY3+VANMDz556WpF1GmC5k+jXH+8+7WUMm4wUPSw==
+  dependencies:
+    "@mui/utils" "^5.3.0"
     esm "^3.2.25"
     yargs "^17.3.1"
 

@@ -13,6 +13,7 @@ import {
   List,
   ListItem,
   DialogActions,
+  debounce,
 } from '@mui/material';
 import React from 'react';
 import Editor from '@monaco-editor/react';
@@ -228,52 +229,33 @@ function DerivedStateNodeEditor<P>({ value, onChange }: DerivedStateNodeEditorPr
 
   const [newPropName, setnewPropName] = React.useState('');
   const handleAddProp = React.useCallback(() => {
-    onChange({
-      ...value,
-      argTypes: update(value.argTypes, {
-        [newPropName]: { type: 'string' },
-      } as Partial<PropValueTypes<keyof P & string>>),
-    });
+    onChange(
+      update(value, {
+        argTypes: update(value.argTypes, {
+          [newPropName]: { type: 'string' },
+        } as Partial<PropValueTypes<keyof P & string>>),
+      }),
+    );
     setnewPropName('');
   }, [onChange, value, newPropName]);
 
   const handlePropTypesChange = React.useCallback(
-    (newPropTypes: PropValueTypes<keyof P & string>) => {
-      onChange({
-        ...value,
-        argTypes: newPropTypes,
-      });
-    },
+    (argTypes: PropValueTypes<keyof P & string>) => onChange(update(value, { argTypes })),
     [onChange, value],
   );
 
   const handleReturnTypeChange = React.useCallback(
-    (newReturnType: PropValueType) => {
-      onChange({
-        ...value,
-        returnType: newReturnType,
-      });
-    },
+    (returnType: PropValueType) => onChange(update(value, { returnType })),
     [onChange, value],
   );
 
-  const handleCodeChange = React.useCallback(
-    (code: string = '') => {
-      onChange({
-        ...value,
-        code,
-      });
-    },
+  const handleCodeChange = React.useMemo(
+    () => debounce((code: string = '') => onChange(update(value, { code })), 240),
     [onChange, value],
   );
 
   const handleParamsChange = React.useCallback(
-    (newParams: StudioBindables<P>) => {
-      onChange({
-        ...value,
-        params: newParams,
-      });
-    },
+    (params: StudioBindables<P>) => onChange(update(value, { params })),
     [onChange, value],
   );
 
@@ -321,13 +303,13 @@ export default function DerivedStateEditor() {
   const state = usePageEditorState();
   const domApi = useDomApi();
 
-  const [editedStateNode, setEditedState] = React.useState<studioDom.StudioDerivedStateNode | null>(
-    null,
-  );
+  const [editedState, setEditedState] = React.useState<NodeId | null>(null);
+  const editedStateNode = editedState ? studioDom.getNode(dom, editedState, 'derivedState') : null;
+
   const handleEditStateDialogClose = React.useCallback(() => setEditedState(null), []);
 
-  const page = studioDom.getNode(dom, state.nodeId);
-  studioDom.assertIsPage(page);
+  const page = studioDom.getNode(dom, state.nodeId, 'page');
+
   const { derivedStates = [] } = studioDom.getChildNodes(dom, page);
 
   const handleCreate = React.useCallback(() => {
@@ -345,20 +327,19 @@ export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DER
   return 'Hello World!';
 }\n`,
     });
-    setEditedState(stateNode);
-  }, [dom]);
+    domApi.addNode(stateNode, page, 'derivedStates');
+    setEditedState(stateNode.id);
+  }, [dom, domApi, page]);
 
   // To keep it around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);
 
-  const handleSave = React.useCallback(() => {
-    if (editedStateNode?.parentId) {
-      domApi.saveNode(editedStateNode);
-    } else if (editedStateNode) {
-      domApi.addNode(editedStateNode, page, 'derivedStates');
-    }
-    handleEditStateDialogClose();
-  }, [domApi, editedStateNode, handleEditStateDialogClose, page]);
+  const handleSave = React.useCallback(
+    (newValue: studioDom.StudioDerivedStateNode) => {
+      domApi.saveNode(newValue);
+    },
+    [domApi],
+  );
 
   const handleRemove = React.useCallback(() => {
     if (editedStateNode) {
@@ -366,6 +347,7 @@ export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DER
     }
     handleEditStateDialogClose();
   }, [editedStateNode, handleEditStateDialogClose, domApi]);
+
   return (
     <Stack spacing={1} alignItems="start">
       <Button color="inherit" onClick={handleCreate}>
@@ -374,7 +356,7 @@ export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DER
       <List>
         {derivedStates.map((stateNode) => {
           return (
-            <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode)}>
+            <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode.id)}>
               {stateNode.name}
             </ListItem>
           );
@@ -390,14 +372,10 @@ export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DER
         >
           <DialogTitle>Edit Derived State ({lastEditedStateNode.id})</DialogTitle>
           <DialogContent>
-            <DerivedStateNodeEditor
-              value={lastEditedStateNode}
-              onChange={(newValue) => setEditedState(newValue)}
-            />
+            <DerivedStateNodeEditor value={lastEditedStateNode} onChange={handleSave} />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleSave}>Save</Button>
-            {lastEditedStateNode.parentId ? <Button onClick={handleRemove}>Remove</Button> : null}
+            <Button onClick={handleRemove}>Remove</Button>
           </DialogActions>
         </Dialog>
       ) : null}

@@ -21,8 +21,7 @@ interface ApiEditorProps {
 function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const api = studioDom.getNode(dom, nodeId);
-  studioDom.assertIsApi<Q>(api);
+  const api = studioDom.getNode(dom, nodeId, 'api');
 
   const [name, setName] = React.useState(api.name);
   const [query, setQuery] = React.useState(studioDom.fromConstPropValues(api.query) as Q);
@@ -52,8 +51,6 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
     [fields],
   );
 
-  const columnsFingerPrint = React.useMemo(() => JSON.stringify(columns), [columns]);
-
   return datasource ? (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
@@ -67,7 +64,7 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
                 if (typeof propName !== 'string' || !query[propName]) {
                   return;
                 }
-                domApi.setNodePropsValue(api, 'query', propName, {
+                domApi.setNodeNamespacedProp(api, 'query', propName, {
                   type: 'const',
                   value: query[propName],
                 });
@@ -88,7 +85,7 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
         </Stack>
       </Box>
       <Box sx={{ flex: 1, overflow: 'hidden' }}>
-        <DataGridPro density="compact" rows={rows} columns={columns} key={columnsFingerPrint} />
+        <DataGridPro density="compact" rows={rows} columns={columns} />
       </Box>
     </Box>
   ) : null;

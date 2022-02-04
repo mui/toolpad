@@ -24,16 +24,16 @@ import { useDom } from '../../DomProvider';
 import { WithControlledProp } from '../../../utils/types';
 import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../../../schemas';
 
-export interface BindingEditorContentProps<K> {
+export interface BindingEditorContentProps {
   nodeId: NodeId;
-  prop: K;
+  prop: string;
 }
 
-interface BoundExpressionEditorProps extends WithControlledProp<StudioBindable<unknown> | null> {
+interface BoundExpressionEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   propType: PropValueType;
 }
 
-function BoundExpressionEditor({ propType, value, onChange }: BoundExpressionEditorProps) {
+function BoundExpressionEditor<V>({ propType, value, onChange }: BoundExpressionEditorProps<V>) {
   const argType = propType.type;
 
   const format = argType === 'string' ? 'stringLiteral' : 'default';
@@ -62,10 +62,8 @@ function getBindablePropsInScope(
   propType: PropValueType,
 ): string[] {
   const node = studioDom.getNode(dom, nodeId);
-  if (!studioDom.isElement(node) && !studioDom.isDerivedState(node)) {
-    return [];
-  }
   const page = studioDom.getPageAncestor(dom, node);
+
   if (!page) {
     return [];
   }
@@ -96,7 +94,7 @@ function getBindablePropsInScope(
     if (studioDom.isDerivedState(destNode) && destNode.returnType.type === srcType) {
       return [destNode.name];
     }
-    if (studioDom.isQueryState(destNode)) {
+    if (studioDom.isQueryState(destNode) || studioDom.isFetchedState(destNode)) {
       if (propType.type === 'object' || propType.type === 'array') {
         if (!propType.schema) {
           return [];
@@ -117,19 +115,19 @@ function getBindablePropsInScope(
   });
 }
 
-interface BindingEditorTabProps extends WithControlledProp<StudioBindable<unknown> | null> {
+interface BindingEditorTabProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   node: studioDom.StudioNode;
   prop: string;
   propType: PropValueType;
 }
 
-function AddBindingEditor({
+function AddBindingEditor<V>({
   node: srcNode,
   prop: srcProp,
   propType,
   value,
   onChange,
-}: BindingEditorTabProps) {
+}: BindingEditorTabProps<V>) {
   const dom = useDom();
 
   const srcNodeId = srcNode.id;
@@ -158,20 +156,19 @@ function AddBindingEditor({
   );
 }
 
-export interface BindingEditorProps<K extends string>
-  extends WithControlledProp<StudioBindable<unknown> | null> {
+export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   nodeId: NodeId;
-  prop: K;
+  prop: string;
   propType: PropValueType;
 }
 
-export function BindingEditor<P = any>({
+export function BindingEditor<V>({
   nodeId,
   prop,
   propType,
   value,
   onChange,
-}: BindingEditorProps<keyof P & string>) {
+}: BindingEditorProps<V>) {
   const dom = useDom();
   const node = studioDom.getNode(dom, nodeId);
 
@@ -216,7 +213,7 @@ export function BindingEditor<P = any>({
               </TabList>
             </Box>
             <TabPanel value="binding">
-              <AddBindingEditor
+              <AddBindingEditor<V>
                 node={node}
                 prop={prop}
                 propType={propType}
@@ -225,7 +222,7 @@ export function BindingEditor<P = any>({
               />
             </TabPanel>
             <TabPanel value="boundExpression">
-              <BoundExpressionEditor
+              <BoundExpressionEditor<V>
                 propType={propType}
                 value={inputValue}
                 onChange={(newValue) => setInput(newValue)}

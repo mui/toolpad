@@ -73,7 +73,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             name="primary"
             value={studioDom.fromConstPropValue(theme.theme['palette.primary.main']) || ''}
             onChange={(newValue) =>
-              domApi.setNodePropsValue(theme, 'theme', 'palette.primary.main', {
+              domApi.setNodeNamespacedProp(theme, 'theme', 'palette.primary.main', {
                 type: 'const',
                 value: newValue,
               })
@@ -83,7 +83,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             name="secondary"
             value={studioDom.fromConstPropValue(theme.theme['palette.secondary.main']) || ''}
             onChange={(newValue) =>
-              domApi.setNodePropsValue(theme, 'theme', 'palette.secondary.main', {
+              domApi.setNodeNamespacedProp(theme, 'theme', 'palette.secondary.main', {
                 type: 'const',
                 value: newValue,
               })

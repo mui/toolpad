@@ -5,28 +5,6 @@ import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { ExactEntriesOf } from './utils/types';
 
-type AllowedChildren = {
-  app: {
-    pages: 'page';
-    apis: 'api';
-    themes: 'theme';
-    codeComponents: 'codeComponent';
-  };
-  theme: {};
-  api: {};
-  page: {
-    children: 'element';
-    derivedStates: 'derivedState';
-    queryStates: 'queryState';
-  };
-  element: {
-    [prop: string]: 'element';
-  };
-  codeComponent: {};
-  derivedState: {};
-  queryState: {};
-};
-
 export function createFractionalIndex(index1: string | null, index2: string | null) {
   return generateKeyBetween(index1, index2);
 }
@@ -47,7 +25,8 @@ type StudioNodeType =
   | 'element'
   | 'codeComponent'
   | 'derivedState'
-  | 'queryState';
+  | 'queryState'
+  | 'fetchedState';
 
 export interface StudioNodeBase {
   readonly id: NodeId;
@@ -111,6 +90,13 @@ export interface StudioQueryStateNode<P = any> extends StudioNodeBase {
   readonly params: StudioBindables<P>;
 }
 
+export interface StudioFetchedStateNode extends StudioNodeBase {
+  readonly type: 'fetchedState';
+  readonly url: StudioBindable<string>;
+  readonly collectionPath: string;
+  readonly fieldPaths: Record<string, string>;
+}
+
 type StudioNodeOfType<K extends StudioNodeType> = {
   app: StudioAppNode;
   api: StudioApiNode;
@@ -120,17 +106,34 @@ type StudioNodeOfType<K extends StudioNodeType> = {
   codeComponent: StudioCodeComponentNode;
   derivedState: StudioDerivedStateNode;
   queryState: StudioQueryStateNode;
+  fetchedState: StudioFetchedStateNode;
 }[K];
 
-export type StudioNode =
-  | StudioAppNode
-  | StudioApiNode
-  | StudioThemeNode
-  | StudioPageNode
-  | StudioElementNode
-  | StudioCodeComponentNode
-  | StudioDerivedStateNode
-  | StudioQueryStateNode;
+type AllowedChildren = {
+  app: {
+    pages: 'page';
+    apis: 'api';
+    themes: 'theme';
+    codeComponents: 'codeComponent';
+  };
+  theme: {};
+  api: {};
+  page: {
+    children: 'element';
+    derivedStates: 'derivedState';
+    queryStates: 'queryState';
+    fetchedStates: 'fetchedState';
+  };
+  element: {
+    [prop: string]: 'element';
+  };
+  codeComponent: {};
+  derivedState: {};
+  queryState: {};
+  fetchedState: {};
+};
+
+export type StudioNode = StudioNodeOfType<StudioNodeType>;
 
 type TypeOf<N extends StudioNode> = N['type'];
 type AllowedChildTypesOfType<T extends StudioNodeType> = AllowedChildren[T];
@@ -178,8 +181,27 @@ function assertIsType<T extends StudioNode>(node: StudioNode, type: T['type']): 
     throw new Error(`Invariant: expected node type "${type}" but got "${node.type}"`);
   }
 }
-export function getNode(dom: StudioDom, nodeId: NodeId): StudioNode {
-  return dom.nodes[nodeId];
+
+export function getNode<T extends StudioNodeType>(
+  dom: StudioDom,
+  nodeId: NodeId,
+  type: T,
+): StudioNodeOfType<T>;
+export function getNode<T extends StudioNodeType>(
+  dom: StudioDom,
+  nodeId: NodeId,
+  type?: T,
+): StudioNode;
+export function getNode<T extends StudioNodeType>(
+  dom: StudioDom,
+  nodeId: NodeId,
+  type?: T,
+): StudioNode {
+  const node = dom.nodes[nodeId];
+  if (type) {
+    assertIsType(node, type);
+  }
+  return node;
 }
 
 export function isApp(node: StudioNode): node is StudioAppNode {
@@ -246,6 +268,14 @@ export function isQueryState<P>(node: StudioNode): node is StudioQueryStateNode<
 
 export function assertIsQueryState<P>(node: StudioNode): asserts node is StudioQueryStateNode<P> {
   assertIsType<StudioQueryStateNode>(node, 'queryState');
+}
+
+export function isFetchedState(node: StudioNode): node is StudioFetchedStateNode {
+  return isType<StudioFetchedStateNode>(node, 'fetchedState');
+}
+
+export function assertIsFetchedState(node: StudioNode): asserts node is StudioFetchedStateNode {
+  assertIsType<StudioFetchedStateNode>(node, 'fetchedState');
 }
 
 export function getApp(dom: StudioDom): StudioAppNode {
@@ -395,6 +425,9 @@ export function createDom(): StudioDom {
   };
 }
 
+/**
+ * Creates a new DOM node representing aReact Element
+ */
 export function createElement<P>(
   dom: StudioDom,
   component: string,
@@ -408,6 +441,9 @@ export function createElement<P>(
   });
 }
 
+/**
+ * Get all descendants of a `node`, flattens childNodes objects into one single array
+ */
 export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
   const children: readonly StudioNode[] = Object.values(getChildNodes(dom, node))
     .flat()
@@ -420,6 +456,9 @@ export function getAncestors(dom: StudioDom, node: StudioNode): readonly StudioN
   return parent ? [...getAncestors(dom, parent), parent] : [];
 }
 
+/**
+ * Get all the ancestors of the `node` up until the first StudioPageNode node is encountered
+ */
 export function getPageAncestors(
   dom: StudioDom,
   node: StudioNode,
@@ -430,13 +469,16 @@ export function getPageAncestors(
     : [];
 }
 
-export function getPageAncestor(
-  dom: StudioDom,
-  node: StudioElementNode | StudioDerivedStateNode,
-): StudioPageNode | null {
+/**
+ * Get the first StudioPageNode node up in the DOM tree starting from `node`
+ */
+export function getPageAncestor(dom: StudioDom, node: StudioNode): StudioPageNode | null {
+  if (isPage(node)) {
+    return node;
+  }
   const parent = getParent(dom, node);
   if (parent) {
-    return isPage(parent) ? parent : getPageAncestor(dom, parent);
+    return getPageAncestor(dom, parent);
   }
   return null;
 }

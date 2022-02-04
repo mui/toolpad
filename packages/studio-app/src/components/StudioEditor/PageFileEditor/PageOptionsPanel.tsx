@@ -9,16 +9,19 @@ import { useDom } from '../../DomProvider';
 import { usePageEditorState } from './PageEditorProvider';
 import DerivedStateEditor from './DerivedStateEditor';
 import QueryStateEditor from './QueryStateEditor';
+import FetchedStateEditor from './FetchedStateEditor';
 
 export default function PageOptionsPanel() {
   const dom = useDom();
   const state = usePageEditorState();
+  const pageNodeId = state.nodeId;
+
   const [viewedSource, setViewedSource] = React.useState<string | null>(null);
 
   const handleViewSource = React.useCallback(() => {
-    const { code } = renderPageCode(dom, state.nodeId, { pretty: true });
+    const { code } = renderPageCode(dom, pageNodeId, { pretty: true });
     setViewedSource(code);
-  }, [dom, state.nodeId]);
+  }, [dom, pageNodeId]);
 
   const handleViewedSourceDialogClose = React.useCallback(() => setViewedSource(null), []);
 
@@ -32,7 +35,7 @@ export default function PageOptionsPanel() {
           startIcon={<PageIcon />}
           color="inherit"
           component="a"
-          href={`/pages/${state.nodeId}`}
+          href={`/pages/${pageNodeId}`}
         >
           View Page
         </Button>
@@ -43,12 +46,13 @@ export default function PageOptionsPanel() {
           startIcon={<CodeIcon />}
           color="inherit"
           component="a"
-          href={`/api/export/${state.nodeId}`}
+          href={`/api/export/${pageNodeId}`}
         >
           Page Component
         </Button>
         <DerivedStateEditor />
         <QueryStateEditor />
+        <FetchedStateEditor pageNodeId={pageNodeId} />
       </Stack>
       <Dialog fullWidth maxWidth="lg" open={!!viewedSource} onClose={handleViewedSourceDialogClose}>
         <DialogTitle>Page component</DialogTitle>

@@ -49,8 +49,7 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
   }, [dom]);
 
   const derivedStateHookFiles = React.useMemo(() => {
-    const page = studioDom.getNode(dom, pageNodeId);
-    studioDom.assertIsPage(page);
+    const page = studioDom.getNode(dom, pageNodeId, 'page');
     const { derivedStates = [] } = studioDom.getChildNodes(dom, page);
     return Object.fromEntries(
       derivedStates.map((derivedState) => [

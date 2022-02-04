@@ -49,7 +49,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const { columns: dataQueryColumns, rows: dataQueryRows, ...dataQueryRest } = dataQuery || {};
 
   const columns: GridColumns = columnsProp || dataQueryColumns || EMPTY_COLUMNS;
-  const columnsFingerPrint = React.useMemo(() => JSON.stringify(columns), [columns]);
 
   const rows: GridRowsProp = rowsProp || dataQueryRows || EMPTY_ROWS;
 
@@ -58,7 +57,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
       <DataGridPro
         components={{ Toolbar: GridToolbar }}
         onColumnResize={handleResize}
-        key={columnsFingerPrint}
         rows={rows}
         columns={columns}
         {...dataQueryRest}

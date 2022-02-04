@@ -27,6 +27,7 @@
     "@mui/studio-components": "0.0.1",
     "@mui/studio-core": "^0.0.1",
     "@mui/styles": "^5.3.0",
+    "@mui/x-data-grid-pro": "^5.4.0",
     "@types/cors": "^2.8.12",
     "@types/prettier": "^2.4.3",
     "@types/react-dom": "^17.0.11",

@@ -21,7 +21,7 @@ const ComponentPropsEditorRoot = styled('div')(({ theme }) => ({
 
 interface ComponentPropsEditorProps<P> {
   node: studioDom.StudioElementNode<P>;
-  actualValues: { [key: string]: unknown };
+  actualValues: Partial<P>;
 }
 
 function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorProps<P>) {

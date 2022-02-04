@@ -62,13 +62,11 @@ export default function QueryStateEditor() {
   const state = usePageEditorState();
   const domApi = useDomApi();
 
-  const [editedStateNode, setEditedState] = React.useState<studioDom.StudioQueryStateNode | null>(
-    null,
-  );
+  const [editedState, setEditedState] = React.useState<NodeId | null>(null);
+  const editedStateNode = editedState ? studioDom.getNode(dom, editedState, 'queryState') : null;
   const handleEditStateDialogClose = React.useCallback(() => setEditedState(null), []);
 
-  const page = studioDom.getNode(dom, state.nodeId);
-  studioDom.assertIsPage(page);
+  const page = studioDom.getNode(dom, state.nodeId, 'page');
   const { queryStates = [] } = studioDom.getChildNodes(dom, page) ?? [];
 
   const handleCreate = React.useCallback(() => {
@@ -76,20 +74,16 @@ export default function QueryStateEditor() {
       api: null,
       params: {},
     });
-    setEditedState(stateNode);
+    setEditedState(stateNode.id);
   }, [dom]);
 
   // To keep it around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);
 
-  const handleSave = React.useCallback(() => {
-    if (editedStateNode?.parentId) {
-      domApi.saveNode(editedStateNode);
-    } else if (editedStateNode) {
-      domApi.addNode(editedStateNode, page, 'queryStates');
-    }
-    handleEditStateDialogClose();
-  }, [domApi, editedStateNode, handleEditStateDialogClose, page]);
+  const handleSave = React.useCallback(
+    (newValue: studioDom.StudioQueryStateNode) => domApi.saveNode(newValue),
+    [domApi],
+  );
 
   const handleRemove = React.useCallback(() => {
     if (editedStateNode) {
@@ -106,7 +100,7 @@ export default function QueryStateEditor() {
       <List>
         {queryStates.map((stateNode) => {
           return (
-            <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode)}>
+            <ListItem key={stateNode.id} button onClick={() => setEditedState(stateNode.id)}>
               {stateNode.name}
             </ListItem>
           );
@@ -121,14 +115,10 @@ export default function QueryStateEditor() {
         >
           <DialogTitle>Edit Query State ({lastEditedStateNode.id})</DialogTitle>
           <DialogContent>
-            <QueryStateNodeEditor
-              value={lastEditedStateNode}
-              onChange={(newValue) => setEditedState(newValue)}
-            />
+            <QueryStateNodeEditor value={lastEditedStateNode} onChange={handleSave} />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleSave}>Save</Button>
-            {lastEditedStateNode.parentId ? <Button onClick={handleRemove}>Remove</Button> : null}
+            <Button onClick={handleRemove}>Remove</Button>
           </DialogActions>
         </Dialog>
       ) : null}

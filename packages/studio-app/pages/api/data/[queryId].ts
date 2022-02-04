@@ -19,7 +19,6 @@ export default (async (req, res) => {
   await cors(req, res);
   const apiNodeId = req.query.queryId as NodeId;
   const dom = await loadApp();
-  const api = studioDom.getNode(dom, apiNodeId);
-  studioDom.assertIsApi(api);
+  const api = studioDom.getNode(dom, apiNodeId, 'api');
   res.json(await execApi(api));
 }) as NextApiHandler<StudioApiResult<any>>;

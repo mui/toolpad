@@ -33,11 +33,7 @@ const URL_ARGTYPE: ArgTypeDefinition = {
 };
 
 function JsonDisplay({ children }: React.PropsWithChildren<{}>) {
-  return (
-    <Box sx={{ height: 224, overflow: 'auto' }}>
-      <pre>{children}</pre>
-    </Box>
-  );
+  return <pre>{children}</pre>;
 }
 
 interface FieldsEditorProps extends WithControlledProp<Record<string, string>> {}
@@ -141,8 +137,8 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
   const rawDisplay = React.useMemo(() => JSON.stringify(raw, null, 2), [raw]);
 
   return (
-    <Stack direction="row" gap={2} my={1} flex={1}>
-      <Stack direction="column" gap={2} overflow="auto">
+    <Stack direction="row" gap={2} flex={1}>
+      <Stack direction="column" gap={2} overflow="auto" py={1}>
         <BindableEditor
           label="url"
           nodeId={nodeId}
@@ -159,7 +155,7 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
         <FieldsEditor value={value.fieldPaths} onChange={handleFieldPathsChange} />
       </Stack>
       <TabContext value={tab}>
-        <Stack sx={{ flex: 1 }}>
+        <Box display="flex" flexDirection="column" flex={1}>
           <TabList
             onChange={(event, newTab) => setTab(newTab)}
             aria-label="FetchedState node collection display selector"
@@ -168,10 +164,10 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
             <Tab label="Raw" value="raw" />
             <Tab label="Result" value="result" />
           </TabList>
-          <TabPanel value="raw" sx={{ flex: 1, p: 1 }}>
+          <TabPanel value="raw" sx={{ flex: 1, overflow: 'auto' }}>
             <JsonDisplay>{rawDisplay}</JsonDisplay>
           </TabPanel>
-          <TabPanel value="result" sx={{ flex: 1, p: 1 }}>
+          <TabPanel value="result" sx={{ flex: 1 }}>
             <DataGridPro
               columns={columns}
               rows={rows}
@@ -180,7 +176,7 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
               loading={loading}
             />
           </TabPanel>
-        </Stack>
+        </Box>
       </TabContext>
     </Stack>
   );

@@ -27,7 +27,9 @@ const studioDir = path.dirname(
   createRequire(import.meta.url).resolve('@mui/studio-app/package.json'),
 );
 
-const cp = execa('yarn', [NEXT_CMD], {
+const port = args['--port'] ?? 3000;
+
+const cp = execa('next', [NEXT_CMD, '--port', String(port)], {
   cwd: studioDir,
   preferLocal: true,
   stdio: 'pipe',

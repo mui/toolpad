@@ -20,6 +20,8 @@ or start MUI Studio in a different folder:
 yarn cli ./my-app
 ```
 
+App will be running under `http://localhost:3000/`
+
 TO DO:
 
 - Add LICENSE (+ in package.json, also update for individual packages)

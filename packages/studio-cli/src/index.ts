@@ -8,6 +8,7 @@ const args = arg({
   '--help': Boolean,
   '--dev': Boolean,
   '--port': Number,
+  '--demo': Boolean,
   // Aliases
   '-p': '--port',
 });
@@ -29,7 +30,7 @@ const studioDir = path.dirname(
 
 const port = args['--port'] ?? 3000;
 
-const cp = execa('next', [NEXT_CMD, '--port', String(port)], {
+const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   cwd: studioDir,
   preferLocal: true,
   stdio: 'pipe',
@@ -37,6 +38,7 @@ const cp = execa('next', [NEXT_CMD, '--port', String(port)], {
   env: {
     FORCE_COLOR: process.env.FORCE_COLOR,
     STUDIO_DIR,
+    DEMO_MODE: String(!!args['--demo']),
   },
 });
 

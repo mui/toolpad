@@ -14,6 +14,8 @@ import type {
   ServerDefinition,
 } from '../pages/api/rpc';
 
+console.log(process.env.DEMO_MODE);
+
 function createResolver(endpoint: string, type: 'query' | 'mutation'): Methods {
   return new Proxy(
     {},

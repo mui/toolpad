@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
+  env: {
+    DEMO_MODE: process.env.DEMO_MODE,
+  },
   async headers() {
     return [
       {

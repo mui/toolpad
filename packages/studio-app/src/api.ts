@@ -13,8 +13,10 @@ import type {
   RpcResponse,
   ServerDefinition,
 } from '../pages/api/rpc';
+import config from './config';
 
-console.log(process.env.DEMO_MODE);
+// TODO: replace API with shim based on window.localStorage
+console.log(`Demo mode: ${config.demoMode}`);
 
 function createResolver(endpoint: string, type: 'query' | 'mutation'): Methods {
   return new Proxy(

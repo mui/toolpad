@@ -94,7 +94,7 @@ function getBindablePropsInScope(
     if (studioDom.isDerivedState(destNode) && destNode.returnType.type === srcType) {
       return [destNode.name];
     }
-    if (studioDom.isQueryState(destNode)) {
+    if (studioDom.isQueryState(destNode) || studioDom.isFetchedState(destNode)) {
       if (propType.type === 'object' || propType.type === 'array') {
         if (!propType.schema) {
           return [];

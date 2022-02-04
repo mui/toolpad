@@ -14,7 +14,7 @@ async function fetchData(queryId: string) {
 export interface UseDataQuery {
   loading: boolean;
   columns: { field: string }[];
-  rows: GridRowsProp[];
+  rows: GridRowsProp;
   error: any;
 }
 

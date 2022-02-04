@@ -1,4 +1,4 @@
-import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/studio-core';
+import { ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 import Imports from './codeGen/Imports';
@@ -17,6 +17,13 @@ import {
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
+
+function literalPropExpression(value: any): PropExpression {
+  return {
+    type: 'expression',
+    value: JSON.stringify(value),
+  };
+}
 
 function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes {
   return Object.fromEntries(
@@ -58,6 +65,8 @@ class Context implements RenderContext {
   private useMemoHooks = new Map<string, string>();
 
   private useQueryHooks = new Map<string, string>();
+
+  private useFetchedStateHooks = new Map<string, string>();
 
   // Resolves a named interpolation in a binding expression into an expression available on the page
   private interpolations = new Map<string, string>();
@@ -180,22 +189,20 @@ class Context implements RenderContext {
       }
       const resolvedExpr = [state, ...path].join('.');
       this.interpolations.set(interpolation, resolvedExpr);
+    } else if (studioDom.isFetchedState(node)) {
+      let state = this.useFetchedStateHooks.get(node.id);
+      if (!state) {
+        state = this.moduleScope.createUniqueBinding(node.name);
+        this.useFetchedStateHooks.set(node.id, state);
+      }
+      const resolvedExpr = [state, ...path].join('.');
+      this.interpolations.set(interpolation, resolvedExpr);
     }
   }
 
   resolveBindable<P extends studioDom.BindableProps<P>>(
-    propName: string,
     propValue: StudioBindable<any>,
-    propType: PropValueType,
-  ): PropExpression | null {
-    if (typeof propName !== 'string') {
-      return null;
-    }
-
-    if (!propType || !propValue || typeof propName !== 'string') {
-      return null;
-    }
-
+  ): PropExpression {
     if (propValue.type === 'const') {
       return {
         type: 'expression',
@@ -228,7 +235,10 @@ class Context implements RenderContext {
     }
 
     console.warn(`Invariant: Unkown prop type "${(propValue as any).type}"`);
-    return null;
+    return {
+      type: 'expression',
+      value: JSON.stringify(undefined),
+    };
   }
 
   /**
@@ -240,7 +250,7 @@ class Context implements RenderContext {
     Object.entries(bindables).forEach(([propName, propValue]) => {
       const propType = propTypes[propName as string];
       if (propValue && propType) {
-        const resolved = this.resolveBindable(propName, propValue, propType);
+        const resolved = this.resolveBindable(propValue);
         if (resolved) {
           result[propName] = resolved;
         }
@@ -551,6 +561,31 @@ class Context implements RenderContext {
     }).join('\n');
   }
 
+  renderFetchedStateHooks(): string {
+    return Array.from(this.useFetchedStateHooks.entries(), ([nodeId, stateVar]) => {
+      if (stateVar) {
+        const node = studioDom.getNode(this.dom, nodeId as NodeId, 'fetchedState');
+
+        const url = this.resolveBindable(node.url);
+
+        const paramsExpr = this.renderPropsAsObject({
+          url,
+          collectionPath: literalPropExpression(node.collectionPath),
+          fieldPaths: literalPropExpression(node.fieldPaths),
+        });
+
+        const useFetchedState = this.addImport(
+          '@mui/studio-core',
+          'useFetchedState',
+          'useFetchedState',
+        );
+
+        return `const ${stateVar} = ${useFetchedState}(${paramsExpr});`;
+      }
+      return '';
+    }).join('\n');
+  }
+
   renderDataLoaderHooks(): string {
     if (this.dataLoaders.length <= 0) {
       return '';
@@ -571,6 +606,7 @@ class Context implements RenderContext {
     const stateHooks = this.renderStateHooks();
     const derivedStateHooks = this.renderDerivedStateHooks();
     const queryStateHooks = this.renderQueryStateHooks();
+    const fetchdStateHooks = this.renderFetchedStateHooks();
     const dataQueryHooks = this.renderDataLoaderHooks();
 
     this.imports.seal();
@@ -585,6 +621,7 @@ class Context implements RenderContext {
         ${dataQueryHooks}
         ${derivedStateHooks}
         ${queryStateHooks}
+        ${fetchdStateHooks}
 
         return (
           ${root}

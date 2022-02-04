@@ -13,8 +13,7 @@ import {
   IconButton,
 } from '@mui/material';
 import React from 'react';
-import { ArgTypeDefinition } from '@mui/studio-core';
-import { QueryFunction, useQuery } from 'react-query';
+import { ArgTypeDefinition, useFetchedState } from '@mui/studio-core';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import AddIcon from '@mui/icons-material/Add';
@@ -28,56 +27,6 @@ import { WithControlledProp } from '../../../utils/types';
 import { BindableEditor } from './ComponentPropEditor';
 import { hasOwnProperty } from '../../../utils/collections';
 import { omit } from '../../../utils/immutability';
-
-const simpleFetch: QueryFunction<unknown, string> = async ({ queryKey }) => {
-  const [url] = queryKey;
-  return fetch(url).then((res) => res.json());
-};
-
-type ObjectPath = string[];
-
-function parseObjectPath(path: string): ObjectPath {
-  return path.split('.').filter(Boolean);
-}
-
-function parseObjectPaths(paths: Record<string, string>): Record<string, ObjectPath> {
-  return Object.fromEntries(
-    Object.entries(paths).map(([key, path]) => {
-      return [key, parseObjectPath(path)];
-    }),
-  );
-}
-
-function getObjectPath(object: unknown, path: ObjectPath): unknown | null {
-  if (path.length <= 0) {
-    return object;
-  }
-  const [first, ...rest] = path;
-  if (typeof object === 'object' && object && hasOwnProperty(object, first)) {
-    return getObjectPath(object[first], rest);
-  }
-  return null;
-}
-
-function fromCollection(object: unknown): any[] {
-  if (Array.isArray(object)) {
-    return object;
-  }
-
-  if (typeof object === 'object' && object) {
-    return Object.entries(object);
-  }
-
-  return [];
-}
-
-function select(object: unknown, objectPaths: Record<string, ObjectPath>): Record<string, unknown> {
-  return Object.fromEntries(
-    Object.entries(objectPaths).map(([key, path]) => {
-      return [key, getObjectPath(object, path as ObjectPath)];
-    }),
-  );
-}
 
 const URL_ARGTYPE: ArgTypeDefinition = {
   typeDef: { type: 'string' },
@@ -183,26 +132,13 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
     [onChange, value],
   );
 
-  const fields = Object.keys(value.fieldPaths).join(',');
-  const columns = React.useMemo(() => fields.split(',').map((field) => ({ field })), [fields]);
+  const { error, loading, rows, columns, raw } = useFetchedState({
+    url: value.url.value,
+    collectionPath: value.collectionPath,
+    fieldPaths: value.fieldPaths,
+  });
 
-  const { data, error, isLoading } = useQuery(value.url.value, simpleFetch);
-
-  const collection = fromCollection(getObjectPath(data, parseObjectPath(value.collectionPath)));
-
-  const rows = React.useMemo(() => {
-    return collection.map((row, i) => {
-      const paths = parseObjectPaths(value.fieldPaths);
-      const resultRow = select(row, paths);
-      return {
-        id: i,
-        ...resultRow,
-      };
-    });
-  }, [collection, value.fieldPaths]);
-
-  const rawDisplay = React.useMemo(() => JSON.stringify(data, null, 2), [data]);
-  const collectionDisplay = React.useMemo(() => JSON.stringify(collection, null, 2), [collection]);
+  const rawDisplay = React.useMemo(() => JSON.stringify(raw, null, 2), [raw]);
 
   return (
     <Stack direction="row" gap={2} my={1} flex={1}>
@@ -230,14 +166,10 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
             sx={{ borderBottom: 1, borderColor: 'divider' }}
           >
             <Tab label="Raw" value="raw" />
-            <Tab label="Collection" value="collection" />
             <Tab label="Result" value="result" />
           </TabList>
           <TabPanel value="raw" sx={{ flex: 1, p: 1 }}>
             <JsonDisplay>{rawDisplay}</JsonDisplay>
-          </TabPanel>
-          <TabPanel value="collection" sx={{ flex: 1, p: 1 }}>
-            <JsonDisplay>{collectionDisplay}</JsonDisplay>
           </TabPanel>
           <TabPanel value="result" sx={{ flex: 1, p: 1 }}>
             <DataGridPro
@@ -245,7 +177,7 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
               rows={rows}
               density="compact"
               error={error}
-              loading={isLoading}
+              loading={loading}
             />
           </TabPanel>
         </Stack>

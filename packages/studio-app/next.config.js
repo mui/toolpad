@@ -1,9 +1,12 @@
+/** @type {import('./src/config').SharedConfig} */
+const sharedConfig = {
+  demoMode: process.env.DEMO_MODE === 'true',
+};
+
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
-  env: {
-    DEMO_MODE: process.env.DEMO_MODE,
-  },
+  publicRuntimeConfig: sharedConfig,
   async headers() {
     return [
       {

@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import * as typeorm from 'typeorm';
 import * as path from 'path';
-import config from '../config';
+import config from './config';
 import { Connection, ConnectionEntity } from './entities/Connection';
 import { ApiEntity } from './entities/Api';
 

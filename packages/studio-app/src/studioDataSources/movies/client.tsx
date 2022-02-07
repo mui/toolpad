@@ -8,8 +8,8 @@ import {
   TextField,
 } from '@mui/material';
 import * as React from 'react';
-import { StudioDataSourceClient } from '../../types';
 import data from '../../../movies.json';
+import { StudioDataSourceClient } from '../../types';
 import { useInput } from '../../utils/forms';
 import { WithControlledProp } from '../../utils/types';
 import { MoviesQuery, MoviesConnectionParams } from './types';
@@ -69,7 +69,6 @@ function getInitialQueryValue(): MoviesQuery {
 
 const dataSource: StudioDataSourceClient<MoviesConnectionParams, MoviesQuery> = {
   displayName: 'Fake Movies API',
-  needsConnection: true,
   ConnectionParamsInput,
   getInitialConnectionValue: getInitialValue,
   isConnectionValid: isValid,

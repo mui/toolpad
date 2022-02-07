@@ -20,7 +20,7 @@ function toTemplateStringExpression(parts: ParsedBinding): string {
   return `\`${transformedParts.join('')}\``;
 }
 
-export function format(
+export function formatExpression(
   expr: ParsedBinding,
   bindingFormat: StudioBindingFormat = 'default',
 ): string {
@@ -32,6 +32,10 @@ export function format(
     default:
       throw new Error(`Invariant: Unrecognized binding format "${bindingFormat}"`);
   }
+}
+
+export function formatStringValue(expr: ParsedBinding): any {
+  return expr.join('');
 }
 
 export function resolve(

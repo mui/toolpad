@@ -164,9 +164,8 @@ function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps
         onSubmit={(e) => {
           e.preventDefault();
           const newApiNode = studioDom.createNode(dom, 'api', {
-            query: {},
+            apiParams: {},
             connectionId,
-            argTypes: {},
           });
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newApiNode, appNode, 'apis');

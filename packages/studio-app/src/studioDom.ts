@@ -55,8 +55,7 @@ export interface StudioThemeNode extends StudioNodeBase {
 export interface StudioApiNode<P = any> extends StudioNodeBase {
   readonly type: 'api';
   readonly connectionId: string;
-  readonly argTypes: ArgTypeDefinitions;
-  readonly query: StudioBindables<P>;
+  readonly apiParams: P;
 }
 
 export interface StudioPageNode extends StudioNodeBase {
@@ -390,7 +389,6 @@ function createNodeInternal<T extends StudioNodeType>(
   init: StudioNodeInitOfType<T> & { name: string },
 ): StudioNodeOfType<T> {
   return {
-    props: {},
     ...init,
     id,
     type,

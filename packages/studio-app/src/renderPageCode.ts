@@ -219,7 +219,7 @@ class Context implements RenderContext {
         (part) => this.interpolations.get(part) ?? 'undefined',
       );
 
-      const value = bindings.format(resolvedExpr, propValue.format);
+      const value = bindings.formatExpression(resolvedExpr, propValue.format);
 
       return {
         type: 'expression',

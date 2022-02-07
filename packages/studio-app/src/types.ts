@@ -95,7 +95,11 @@ export interface StudioApiResult<D = {}> {
   data: D[];
 }
 
-export type StudioConnectionParamsEditor<P = {}> = React.FC<WithControlledProp<P>>;
+export interface StudioConnectionParamsEditorProps<P> extends WithControlledProp<P> {
+  connectionName: string;
+}
+
+export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionParamsEditorProps<P>>;
 export type StudioQueryEditor<Q = {}> = React.FC<WithControlledProp<Q>>;
 
 export interface ConnectionStatus {
@@ -105,7 +109,6 @@ export interface ConnectionStatus {
 
 export interface StudioDataSourceClient<P = {}, Q = {}> {
   displayName: string;
-  needsConnection: boolean;
   ConnectionParamsInput: StudioConnectionParamsEditor<P>;
   getInitialConnectionValue: () => P;
   isConnectionValid: (connection: P) => boolean;
@@ -115,7 +118,7 @@ export interface StudioDataSourceClient<P = {}, Q = {}> {
 
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
-  exec: (connection: StudioConnection<P>, query: Q) => Promise<StudioApiResult<D>>;
+  exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
 }
 
 export interface StudioConnectionSummary {

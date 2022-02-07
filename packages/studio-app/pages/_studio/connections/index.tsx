@@ -24,12 +24,15 @@ import CheckIcon from '@mui/icons-material/Check';
 import CrossIcon from '@mui/icons-material/Clear';
 import { useQuery } from 'react-query';
 import dataSources from '../../../src/studioDataSources/client';
-import { ExactEntriesOf, WithControlledProp } from '../../../src/utils/types';
+import { ExactEntriesOf } from '../../../src/utils/types';
 import { ConnectionStatus, StudioConnection, StudioDataSourceClient } from '../../../src/types';
 import client from '../../../src/api';
 import StudioAppBar from '../../../src/components/StudioAppBar';
+import { StudioConnectionParamsEditorProps } from '../../../src/types';
 
-interface ConnectionParamsEditorProps<P> extends WithControlledProp<P> {
+console.log(dataSources);
+
+interface ConnectionParamsEditorProps<P> extends StudioConnectionParamsEditorProps<P> {
   dataSource: StudioDataSourceClient<P, any>;
 }
 
@@ -37,9 +40,12 @@ function ConnectionParamsEditor<P>({
   dataSource,
   value,
   onChange,
+  connectionName,
 }: ConnectionParamsEditorProps<P>) {
   const { ConnectionParamsInput } = dataSource;
-  return <ConnectionParamsInput value={value} onChange={onChange} />;
+  return (
+    <ConnectionParamsInput connectionName={connectionName} value={value} onChange={onChange} />
+  );
 }
 
 function getConnectionStatusIcon(status: ConnectionStatus) {
@@ -76,11 +82,11 @@ function EditConnectionDialog<P>({ connection, open, onClose }: EditConnectionDi
     );
   }, []);
 
-  const [name, setName] = React.useState(connection?.id || '');
+  const [name, setName] = React.useState(connection?.name || '');
   React.useEffect(() => {
     if (connection) {
       setType(connection.type, connection.params);
-      setName(connection.id);
+      setName(connection.name);
     } else {
       setType('');
       setName('');
@@ -176,8 +182,7 @@ function EditConnectionDialog<P>({ connection, open, onClose }: EditConnectionDi
             >
               {(Object.entries(dataSources) as ExactEntriesOf<typeof dataSources>).map(
                 ([type, dataSource]) =>
-                  dataSource &&
-                  dataSource.needsConnection && (
+                  dataSource && (
                     <MenuItem key={type} value={type}>
                       {dataSource.displayName}
                     </MenuItem>
@@ -197,6 +202,7 @@ function EditConnectionDialog<P>({ connection, open, onClose }: EditConnectionDi
                 dataSource={paramsEditor.dataSource}
                 value={paramsEditor.params}
                 onChange={handleParamsChange}
+                connectionName={name}
               />
             </Box>
           </React.Fragment>

@@ -3,11 +3,12 @@ import { useQuery } from 'react-query';
 import { Box, Button, Stack, TextField, Toolbar } from '@mui/material';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import { useParams } from 'react-router-dom';
-import { NodeId, StudioConnection, StudioDataSourceClient } from '../../../types';
+import { StudioConnection, StudioDataSourceClient } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomProvider';
+import { NodeId } from '../../../types';
 
 function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {
   const dataSource = dataSources[connection.type] as StudioDataSourceClient<any, Q>;
@@ -18,29 +19,32 @@ interface ApiEditorProps {
   nodeId: NodeId;
 }
 
-function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
+function ApiEditorContent<P>({ nodeId }: ApiEditorProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const api = studioDom.getNode(dom, nodeId, 'api');
 
   const [name, setName] = React.useState(api.name);
-  const [query, setQuery] = React.useState(studioDom.fromConstPropValues(api.query) as Q);
+  const [apiParams, setApiParams] = React.useState(api.apiParams);
 
   const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
     client.query.getConnection(api.connectionId),
   );
 
-  const datasource = connectionData && getDataSource<Q>(connectionData);
+  const datasource = connectionData && getDataSource<P>(connectionData);
 
-  const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
-    return { ...api, props: studioDom.toConstPropValues(query) };
-  }, [api, query]);
+  const previewApi: studioDom.StudioApiNode<P> = React.useMemo(() => {
+    return { ...api, apiParams };
+  }, [api, apiParams]);
 
-  const { data: previewData } = useQuery(['api', previewApi], () =>
-    client.query.execApi(previewApi),
-  );
+  const { data: previewData } = useQuery(['api', previewApi], () => {
+    console.log(previewApi);
+    return client.query.execApi(previewApi, {});
+  });
 
   const { fields = {}, data: rows = [] } = previewData ?? {};
+
+  console.log(previewData);
 
   const columns = React.useMemo(
     () =>
@@ -60,14 +64,11 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
           <Button
             onClick={() => {
               domApi.setNodeName(nodeId, name);
-              (Object.keys(query) as (keyof Q)[]).forEach((propName) => {
-                if (typeof propName !== 'string' || !query[propName]) {
+              (Object.keys(apiParams) as (keyof P)[]).forEach((propName) => {
+                if (typeof propName !== 'string' || !apiParams[propName]) {
                   return;
                 }
-                domApi.setNodeNamespacedProp(api, 'query', propName, {
-                  type: 'const',
-                  value: query[propName],
-                });
+                domApi.setNodeAttribute(api, 'apiParams', apiParams);
               });
             }}
           >
@@ -81,7 +82,10 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
-          <datasource.QueryEditor value={query} onChange={(newQuery) => setQuery(newQuery)} />
+          <datasource.QueryEditor
+            value={apiParams}
+            onChange={(newApiParams) => setApiParams(newApiParams)}
+          />
         </Stack>
       </Box>
       <Box sx={{ flex: 1, overflow: 'hidden' }}>

@@ -1,6 +1,6 @@
 import { Stack, TextareaAutosize, TextField } from '@mui/material';
 import * as React from 'react';
-import { StudioDataSourceClient } from '../../types';
+import { StudioDataSourceClient } from '../types';
 import { useInput } from '../../utils/forms';
 import { WithControlledProp } from '../../utils/types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
@@ -72,7 +72,6 @@ function getInitialQueryValue(): PostgresQuery {
 
 const dataSource: StudioDataSourceClient<PostgresConnectionParams, PostgresQuery> = {
   displayName: 'Postgres',
-  needsConnection: true,
   ConnectionParamsInput,
   getInitialConnectionValue: getInitialValue,
   isConnectionValid: isValid,

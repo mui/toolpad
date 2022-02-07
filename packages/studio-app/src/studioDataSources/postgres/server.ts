@@ -3,7 +3,7 @@ import {
   StudioDataSourceServer,
   ConnectionStatus,
   StudioConnection,
-} from '../../types';
+} from '../types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
 
 async function test(

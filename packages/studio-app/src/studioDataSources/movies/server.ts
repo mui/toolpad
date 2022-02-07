@@ -1,10 +1,10 @@
-import {
-  ConnectionStatus,
-  StudioConnection,
-  StudioDataSourceServer,
-  StudioApiResult,
-} from '../../types';
 import data from '../../../movies.json';
+import {
+  StudioConnection,
+  ConnectionStatus,
+  StudioApiResult,
+  StudioDataSourceServer,
+} from '../../types';
 import { MoviesConnectionParams, MoviesQuery, Movie } from './types';
 
 async function test(

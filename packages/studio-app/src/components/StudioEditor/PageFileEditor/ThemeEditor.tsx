@@ -72,12 +72,12 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
           <PaletteColorPicker
             name="primary"
             value={studioDom.fromConstPropValue(theme.theme['palette.primary.main']) || ''}
-            onChange={(newValue) =>
+            onChange={(newValue) => {
               domApi.setNodeNamespacedProp(theme, 'theme', 'palette.primary.main', {
                 type: 'const',
                 value: newValue,
-              })
-            }
+              });
+            }}
           />
           <PaletteColorPicker
             name="secondary"

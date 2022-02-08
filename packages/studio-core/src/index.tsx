@@ -53,7 +53,8 @@ export interface ArgControlSpec {
     | 'slots' // slots in canvas
     | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
     | 'date' // date picker
-    | 'json'; // JSON editor
+    | 'json' // JSON editor
+    | 'GridColumns'; // GridColumns specialized editor
 }
 
 type PrimitiveValueType =

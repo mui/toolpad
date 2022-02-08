@@ -24,3 +24,21 @@ export function camelCase(...parts: string[]): string {
   }
   return '';
 }
+
+export function generateUniqueString(
+  base: string,
+  existingNames: Set<string>,
+  alwaysIndex = false,
+) {
+  let i = 1;
+  let suggestion = base;
+  if (alwaysIndex) {
+    suggestion += String(i);
+    i += 1;
+  }
+  while (existingNames.has(suggestion)) {
+    suggestion = base + String(i);
+    i += 1;
+  }
+  return suggestion;
+}

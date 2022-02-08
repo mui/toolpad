@@ -2,7 +2,7 @@ import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@m
 import * as React from 'react';
 import type { EditorProps, PropControlDefinition } from '../../types';
 
-function SelectPropEditor({ name, argType, value, onChange, disabled }: EditorProps<string>) {
+function SelectPropEditor({ propName, argType, value, onChange, disabled }: EditorProps<string>) {
   const items = argType.typeDef.type === 'string' ? argType.typeDef.enum ?? [] : [];
   const handleChange = React.useCallback(
     (event: SelectChangeEvent<string>) => {
@@ -12,11 +12,11 @@ function SelectPropEditor({ name, argType, value, onChange, disabled }: EditorPr
   );
   return (
     <FormControl fullWidth size="small">
-      <InputLabel id={`select-${name}`}>{name}</InputLabel>
+      <InputLabel id={`select-${propName}`}>{propName}</InputLabel>
       <Select
-        labelId={`select-${name}`}
+        labelId={`select-${propName}`}
         size="small"
-        label={name}
+        label={propName}
         value={value ?? ''}
         disabled={disabled}
         onChange={handleChange}

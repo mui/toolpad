@@ -48,32 +48,18 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
-type StateHook =
-  | {
-      type: 'controlled';
-      dependencies: string[];
-      stateVar: string;
-      setStateVar: string;
-      defaultValue?: unknown;
-    }
-  | {
-      type: 'derived';
-      dependencies: string[];
-      nodeId: NodeId;
-      stateVar: string;
-    }
-  | {
-      type: 'api';
-      dependencies: string[];
-      nodeId: NodeId;
-      stateVar: string;
-    }
-  | {
-      type: 'fetched';
-      dependencies: string[];
-      nodeId: NodeId;
-      stateVar: string;
-    };
+interface ControlledStateHook {
+  stateVar: string;
+  setStateVar: string;
+  defaultValue?: unknown;
+}
+
+interface StateHook {
+  type: 'derived' | 'api' | 'fetched';
+  dependencies: string[];
+  nodeId: NodeId;
+  stateVar: string;
+}
 
 class Context implements RenderContext {
   private dom: studioDom.StudioDom;
@@ -89,6 +75,8 @@ class Context implements RenderContext {
   private reactAlias: string = 'undefined';
 
   private runtimeAlias: string = 'undefined';
+
+  private controlledStateHooks = new Map<string, ControlledStateHook>();
 
   private stateHooks = new Map<string, StateHook>();
 
@@ -196,7 +184,7 @@ class Context implements RenderContext {
 
       const stateId = `${nodeId}.${prop}`;
 
-      let stateHook = this.stateHooks.get(stateId);
+      let stateHook = this.controlledStateHooks.get(stateId);
       if (!stateHook) {
         const component = getStudioComponent(this.dom, node.component);
 
@@ -217,15 +205,11 @@ class Context implements RenderContext {
         const setStateVar = this.moduleScope.createUniqueBinding(setStateVarSuggestion);
 
         stateHook = {
-          type: 'controlled',
-          dependencies: [],
           stateVar,
           setStateVar,
           defaultValue: argType.defaultValue,
         };
-        this.stateHooks.set(stateId, stateHook);
-      } else if (stateHook.type !== 'controlled') {
-        throw new Error(`Invariant: state ID ${stateId} already used as "${stateHook.type}"`);
+        this.controlledStateHooks.set(stateId, stateHook);
       }
 
       const resolvedExpr = [stateHook.stateVar, ...subPath].join('.');
@@ -349,16 +333,10 @@ class Context implements RenderContext {
         }
 
         const stateId = `${node.id}.${propName}`;
-        const hook = this.stateHooks.get(stateId);
+        const hook = this.controlledStateHooks.get(stateId);
 
         if (!hook) {
           return;
-        }
-
-        if (hook.type !== 'controlled') {
-          throw new Error(
-            `Invariant: state "${stateId}" being used in a controlled prop, but it's of type "${hook.type}"`,
-          );
         }
 
         result[propName] = {
@@ -582,13 +560,17 @@ class Context implements RenderContext {
     return this.imports.add(source, imported, suggestedName);
   }
 
+  renderControlledStateHooks(): string {
+    return Array.from(this.controlledStateHooks.values(), (stateHook) => {
+      const defaultValue = JSON.stringify(stateHook.defaultValue);
+      return `const [${stateHook.stateVar}, ${stateHook.setStateVar}] = ${this.reactAlias}.useState(${defaultValue});`;
+    }).join('\n');
+  }
+
   renderStateHooks(): string {
+    console.log(this.stateHooks.values());
     return Array.from(this.stateHooks.values(), (stateHook) => {
       switch (stateHook.type) {
-        case 'controlled': {
-          const defaultValue = JSON.stringify(stateHook.defaultValue);
-          return `const [${stateHook.stateVar}, ${stateHook.setStateVar}] = ${this.reactAlias}.useState(${defaultValue});`;
-        }
         case 'derived': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
           const resolvedParams = this.resolveBindables(node.params, node.argTypes);
@@ -684,7 +666,8 @@ class Context implements RenderContext {
   render() {
     this.collectAllState();
     const root: string = this.renderRoot(this.page);
-    const stateHooks = this.renderStateHooks();
+    const controlledState = this.renderControlledStateHooks();
+    const state = this.renderStateHooks();
 
     this.imports.seal();
 
@@ -694,7 +677,8 @@ class Context implements RenderContext {
       ${imports}
 
       export default function App () {
-        ${stateHooks}
+        ${controlledState}
+        ${state}
 
         return (
           ${root}

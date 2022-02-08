@@ -35,11 +35,12 @@ async function exec(
   fetchQuery: FetchQuery,
   params: any,
 ): Promise<StudioApiResult<any>> {
+  console.log(fetchQuery);
   const boundValues = { ...params, ...fetchQuery.params };
   const resolvedUrl = resolveBindableString(fetchQuery.url, boundValues);
   const res = await fetch(resolvedUrl);
   const data = await res.json();
-  return data;
+  return { data };
 }
 
 const dataSource: StudioDataSourceServer<{}, FetchQuery, any> = {

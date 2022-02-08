@@ -1,4 +1,4 @@
-import data from '../../../movies.json';
+import moviesData from '../../../movies.json';
 import {
   StudioConnection,
   ConnectionStatus,
@@ -18,7 +18,10 @@ async function test(
 async function exec(
   connection: StudioConnection<MoviesConnectionParams>,
   moviesQuery: MoviesQuery,
-): Promise<StudioApiResult<Movie>> {
+): Promise<StudioApiResult<Movie[]>> {
+  const data = moviesData.movies.filter((movie) =>
+    moviesQuery.genre ? movie.genres.includes(moviesQuery.genre) : true,
+  );
   return {
     fields: {
       id: { type: 'string' },
@@ -31,13 +34,11 @@ async function exec(
       plot: { type: 'string' },
       posterUrl: { type: 'string' },
     },
-    data: data.movies.filter((movie) =>
-      moviesQuery.genre ? movie.genres.includes(moviesQuery.genre) : true,
-    ),
+    data,
   };
 }
 
-const dataSource: StudioDataSourceServer<MoviesConnectionParams, MoviesQuery, Movie> = {
+const dataSource: StudioDataSourceServer<MoviesConnectionParams, MoviesQuery, Movie[]> = {
   test,
   exec,
 };

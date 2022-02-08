@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
 import { Box, Button, Stack, TextField, Toolbar } from '@mui/material';
-import { DataGridPro } from '@mui/x-data-grid-pro';
 import { useParams } from 'react-router-dom';
 import { StudioConnection, StudioDataSourceClient, NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomProvider';
+import useDebounced from '../../../utils/useDebounced';
 
 function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {
   const dataSource = dataSources[connection.type] as StudioDataSourceClient<any, Q>;
@@ -24,7 +24,7 @@ function ApiEditorContent<P>({ nodeId }: ApiEditorProps) {
   const api = studioDom.getNode(dom, nodeId, 'api');
 
   const [name, setName] = React.useState(api.name);
-  const [apiParams, setApiParams] = React.useState(api.apiParams);
+  const [apiQuery, setApiQuery] = React.useState(api.query);
 
   const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
     client.query.getConnection(api.connectionId),
@@ -33,22 +33,15 @@ function ApiEditorContent<P>({ nodeId }: ApiEditorProps) {
   const datasource = connectionData && getDataSource<P>(connectionData);
 
   const previewApi: studioDom.StudioApiNode<P> = React.useMemo(() => {
-    return { ...api, apiParams };
-  }, [api, apiParams]);
+    return { ...api, query: apiQuery };
+  }, [api, apiQuery]);
 
-  const { data: previewData } = useQuery(['api', previewApi], () => {
-    return client.query.execApi(previewApi, {});
-  });
+  const debouncedPreviewApi = useDebounced(previewApi, 250);
 
-  const { fields = {}, data: rows = [] } = previewData ?? {};
-
-  const columns = React.useMemo(
-    () =>
-      Object.entries(fields).map(([field, def]) => ({
-        ...(def as any),
-        field,
-      })),
-    [fields],
+  const { data: previewData } = useQuery(
+    ['api', debouncedPreviewApi],
+    () => client.query.execApi(debouncedPreviewApi, {}),
+    {},
   );
 
   return datasource ? (
@@ -60,11 +53,11 @@ function ApiEditorContent<P>({ nodeId }: ApiEditorProps) {
           <Button
             onClick={() => {
               domApi.setNodeName(nodeId, name);
-              (Object.keys(apiParams) as (keyof P)[]).forEach((propName) => {
-                if (typeof propName !== 'string' || !apiParams[propName]) {
+              (Object.keys(apiQuery) as (keyof P)[]).forEach((propName) => {
+                if (typeof propName !== 'string' || !apiQuery[propName]) {
                   return;
                 }
-                domApi.setNodeAttribute(api, 'apiParams', apiParams);
+                domApi.setNodeAttribute(api, 'query', apiQuery);
               });
             }}
           >
@@ -79,13 +72,13 @@ function ApiEditorContent<P>({ nodeId }: ApiEditorProps) {
             onChange={(event) => setName(event.target.value)}
           />
           <datasource.QueryEditor
-            value={apiParams}
-            onChange={(newApiParams) => setApiParams(newApiParams)}
+            value={apiQuery}
+            onChange={(newApiQuery) => setApiQuery(newApiQuery)}
           />
         </Stack>
       </Box>
-      <Box sx={{ flex: 1, overflow: 'hidden' }}>
-        <DataGridPro density="compact" rows={rows} columns={columns} />
+      <Box sx={{ flex: 1, overflow: 'auto', borderTop: 1, borderColor: 'divider' }}>
+        <pre>{JSON.stringify(previewData, null, 2)}</pre>
       </Box>
     </Box>
   ) : null;

@@ -22,7 +22,6 @@ async function exec(
     `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection.params.host}"`,
   );
   return {
-    fields: {},
     data: [],
   };
 }

@@ -20,7 +20,7 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
     [onChange, value],
   );
 
-  const handleApiParamsChange = React.useCallback(
+  const handleApiQueryChange = React.useCallback(
     (newValue: Record<string, string>) => {
       onChange({
         ...value,
@@ -44,7 +44,7 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
         fieldLabel="parameter"
         valueLabel="default value"
         value={value.params || {}}
-        onChange={handleApiParamsChange}
+        onChange={handleApiQueryChange}
       />
       <Box overflow="auto">
         <pre>{JSON.stringify(value, null, 2)}</pre>

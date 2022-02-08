@@ -21,6 +21,8 @@ import * as bindings from './utils/bindings';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getApiNodeArgTypes(node: studioDom.StudioApiNode): ArgTypeDefinitions {
   // TODO:implementation
+  // retrieve datasource type by connectionId
+  // retrieve argtypes from that datasource +
   return {};
 }
 
@@ -546,7 +548,9 @@ class Context implements RenderContext {
 
         const apiNode = node.api ? studioDom.getNode(this.dom, node.api, 'api') : null;
 
-        const propTypes = apiNode ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode)) : {};
+        const propTypes = apiNode
+          ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode.query))
+          : {};
 
         const resolvedProps = this.resolveBindables(node.params, propTypes);
 

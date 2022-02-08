@@ -84,15 +84,15 @@ export interface ViewState {
   [nodeId: NodeId]: NodeState | undefined;
 }
 
-export type StudioApiResultFields<D = {}> = {
+export type StudioApiResultFields<D = any> = {
   [K in keyof D]?: {
     type: string;
   };
 };
 
-export interface StudioApiResult<D = {}> {
-  fields: StudioApiResultFields<D>;
-  data: D[];
+export interface StudioApiResult<D = any> {
+  fields?: StudioApiResultFields;
+  data: D;
 }
 
 export interface StudioConnectionParamsEditorProps<P> extends WithControlledProp<P> {
@@ -114,6 +114,7 @@ export interface StudioDataSourceClient<P = {}, Q = {}> {
   isConnectionValid: (connection: P) => boolean;
   QueryEditor: StudioQueryEditor<Q>;
   getInitialQueryValue: () => Q;
+  getArgTypes?: (query: Q) => ArgTypeDefinitions;
 }
 
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {

@@ -184,7 +184,7 @@ export async function execApi<Q>(
     );
   }
 
-  return dataSource.exec(connection, api.apiParams, params);
+  return dataSource.exec(connection, api.query, params);
 }
 
 function createDefaultApp(): studioDom.StudioDom {

@@ -3,12 +3,11 @@ import { useQuery } from 'react-query';
 import { Box, Button, Stack, TextField, Toolbar } from '@mui/material';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import { useParams } from 'react-router-dom';
-import { StudioConnection, StudioDataSourceClient } from '../../../types';
+import { StudioConnection, StudioDataSourceClient, NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomProvider';
-import { NodeId } from '../../../types';
 
 function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {
   const dataSource = dataSources[connection.type] as StudioDataSourceClient<any, Q>;
@@ -38,13 +37,10 @@ function ApiEditorContent<P>({ nodeId }: ApiEditorProps) {
   }, [api, apiParams]);
 
   const { data: previewData } = useQuery(['api', previewApi], () => {
-    console.log(previewApi);
     return client.query.execApi(previewApi, {});
   });
 
   const { fields = {}, data: rows = [] } = previewData ?? {};
-
-  console.log(previewData);
 
   const columns = React.useMemo(
     () =>

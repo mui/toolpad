@@ -25,12 +25,14 @@ import CrossIcon from '@mui/icons-material/Clear';
 import { useQuery } from 'react-query';
 import dataSources from '../../../src/studioDataSources/client';
 import { ExactEntriesOf } from '../../../src/utils/types';
-import { ConnectionStatus, StudioConnection, StudioDataSourceClient } from '../../../src/types';
+import {
+  ConnectionStatus,
+  StudioConnection,
+  StudioDataSourceClient,
+  StudioConnectionParamsEditorProps,
+} from '../../../src/types';
 import client from '../../../src/api';
 import StudioAppBar from '../../../src/components/StudioAppBar';
-import { StudioConnectionParamsEditorProps } from '../../../src/types';
-
-console.log(dataSources);
 
 interface ConnectionParamsEditorProps<P> extends StudioConnectionParamsEditorProps<P> {
   dataSource: StudioDataSourceClient<P, any>;

@@ -568,74 +568,102 @@ class Context implements RenderContext {
   }
 
   renderStateHooks(): string {
-    console.log(this.stateHooks.values());
-    return Array.from(this.stateHooks.values(), (stateHook) => {
-      switch (stateHook.type) {
-        case 'derived': {
-          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
-          const resolvedParams = this.resolveBindables(node.params, node.argTypes);
-          const paramsArg = this.renderPropsAsObject(resolvedParams);
-          const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
-            this.renderJsExpression(resolvedProp),
-          );
-          const derivedStateGetter = this.addImport(
-            `../derivedState/${node.id}.ts`,
-            'default',
-            node.name,
-          );
-          return `const ${
-            stateHook.stateVar
-          } = React.useMemo(() => ${derivedStateGetter}(${paramsArg}), [${depsArray.join(', ')}])`;
-        }
-        case 'api': {
-          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
+    const orderedHooks: StateHook[] = [];
+    const seenHooks = new Set<string>();
 
-          const apiNode = node.api ? studioDom.getNode(this.dom, node.api, 'api') : null;
-
-          const propTypes = apiNode
-            ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode.query))
-            : {};
-
-          const resolvedProps = this.resolveBindables(node.params, propTypes);
-
-          // TODO: Set up variable binding
-          // @ts-expect-error
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const params = this.renderPropsAsObject(resolvedProps);
-          // @ts-expect-error
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
-            this.renderJsExpression(resolvedProp),
-          );
-
-          const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
-          return `const ${stateHook.stateVar} = ${useDataQuery}(${JSON.stringify(node.api)});`;
-        }
-        case 'fetched': {
-          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
-
-          const url = this.resolveBindable(node.url);
-
-          const paramsExpr = this.renderPropsAsObject({
-            url,
-            collectionPath: literalPropExpression(node.collectionPath),
-            fieldPaths: literalPropExpression(node.fieldPaths),
-          });
-
-          const useFetchedState = this.addImport(
-            '@mui/studio-core',
-            'useFetchedState',
-            'useFetchedState',
-          );
-
-          return `const ${stateHook.stateVar} = ${useFetchedState}(${paramsExpr});`;
-        }
-        default:
-          throw new Error(
-            `Invariant: Missing renderer for state hook of type "${(stateHook as StateHook).type}"`,
-          );
+    const addHook = (id: string, history: string[] = []): void => {
+      const hook = this.stateHooks.get(id);
+      if (!hook) {
+        return;
       }
-    }).join('\n');
+      if (history.includes(id)) {
+        throw new Error(`Cyclic state detected`);
+      }
+      if (hook.dependencies) {
+        hook.dependencies.forEach((depId) => addHook(depId, [...history, id]));
+      }
+      if (!seenHooks.has(id)) {
+        orderedHooks.push(hook);
+        seenHooks.add(id);
+      }
+    };
+
+    // Sort hooks according to their deprendencies
+    [...this.stateHooks.keys()].forEach((nodeId) => addHook(nodeId));
+
+    return orderedHooks
+      .map((stateHook) => {
+        switch (stateHook.type) {
+          case 'derived': {
+            const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
+            const resolvedParams = this.resolveBindables(node.params, node.argTypes);
+            const paramsArg = this.renderPropsAsObject(resolvedParams);
+            const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
+              this.renderJsExpression(resolvedProp),
+            );
+            const derivedStateGetter = this.addImport(
+              `../derivedState/${node.id}.ts`,
+              'default',
+              node.name,
+            );
+            return `const ${
+              stateHook.stateVar
+            } = React.useMemo(() => ${derivedStateGetter}(${paramsArg}), [${depsArray.join(
+              ', ',
+            )}])`;
+          }
+          case 'api': {
+            const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
+
+            const apiNode = node.api ? studioDom.getNode(this.dom, node.api, 'api') : null;
+
+            const propTypes = apiNode
+              ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode.query))
+              : {};
+
+            const resolvedProps = this.resolveBindables(node.params, propTypes);
+
+            // TODO: Set up variable binding
+            // @ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const params = this.renderPropsAsObject(resolvedProps);
+            // @ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
+              this.renderJsExpression(resolvedProp),
+            );
+
+            const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
+            return `const ${stateHook.stateVar} = ${useDataQuery}(${JSON.stringify(node.api)});`;
+          }
+          case 'fetched': {
+            const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
+
+            const url = this.resolveBindable(node.url);
+
+            const paramsExpr = this.renderPropsAsObject({
+              url,
+              collectionPath: literalPropExpression(node.collectionPath),
+              fieldPaths: literalPropExpression(node.fieldPaths),
+            });
+
+            const useFetchedState = this.addImport(
+              '@mui/studio-core',
+              'useFetchedState',
+              'useFetchedState',
+            );
+
+            return `const ${stateHook.stateVar} = ${useFetchedState}(${paramsExpr});`;
+          }
+          default:
+            throw new Error(
+              `Invariant: Missing renderer for state hook of type "${
+                (stateHook as StateHook).type
+              }"`,
+            );
+        }
+      })
+      .join('\n');
   }
 
   renderFetchedStateHooks(): string {

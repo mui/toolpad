@@ -17,7 +17,7 @@ import config from './config';
 
 if (config.demoMode) {
   // TODO: replace API with shim based on window.localStorage
-  console.log(`Startng Studio in demo mode`);
+  console.log(`Starting Studio in demo mode`);
 }
 
 function createResolver(endpoint: string, type: 'query' | 'mutation'): Methods {

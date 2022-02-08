@@ -35,6 +35,7 @@ const EditorRoot = styled('div')(({ theme }) => ({
   },
   [`& .${classes.editorPanel}`]: {
     flex: 1,
+    overflow: 'hidden',
   },
 }));
 

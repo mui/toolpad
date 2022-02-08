@@ -72,7 +72,6 @@ function getInitialQueryValue(): PostgresQuery {
 
 const dataSource: StudioDataSourceClient<PostgresConnectionParams, PostgresQuery> = {
   displayName: 'Postgres',
-  needsConnection: true,
   ConnectionParamsInput,
   getInitialConnectionValue: getInitialValue,
   isConnectionValid: isValid,

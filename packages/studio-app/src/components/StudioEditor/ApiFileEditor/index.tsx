@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
 import { Box, Button, Stack, TextField, Toolbar } from '@mui/material';
-import { DataGridPro } from '@mui/x-data-grid-pro';
 import { useParams } from 'react-router-dom';
-import { NodeId, StudioConnection, StudioDataSourceClient } from '../../../types';
+import { StudioConnection, StudioDataSourceClient, NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomProvider';
+import useDebounced from '../../../utils/useDebounced';
 
 function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {
   const dataSource = dataSources[connection.type] as StudioDataSourceClient<any, Q>;
@@ -18,37 +18,30 @@ interface ApiEditorProps {
   nodeId: NodeId;
 }
 
-function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
+function ApiEditorContent<P>({ nodeId }: ApiEditorProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const api = studioDom.getNode(dom, nodeId, 'api');
 
   const [name, setName] = React.useState(api.name);
-  const [query, setQuery] = React.useState(studioDom.fromConstPropValues(api.query) as Q);
+  const [apiQuery, setApiQuery] = React.useState(api.query);
 
   const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
     client.query.getConnection(api.connectionId),
   );
 
-  const datasource = connectionData && getDataSource<Q>(connectionData);
+  const datasource = connectionData && getDataSource<P>(connectionData);
 
-  const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
-    return { ...api, props: studioDom.toConstPropValues(query) };
-  }, [api, query]);
+  const previewApi: studioDom.StudioApiNode<P> = React.useMemo(() => {
+    return { ...api, query: apiQuery };
+  }, [api, apiQuery]);
 
-  const { data: previewData } = useQuery(['api', previewApi], () =>
-    client.query.execApi(previewApi),
-  );
+  const debouncedPreviewApi = useDebounced(previewApi, 250);
 
-  const { fields = {}, data: rows = [] } = previewData ?? {};
-
-  const columns = React.useMemo(
-    () =>
-      Object.entries(fields).map(([field, def]) => ({
-        ...(def as any),
-        field,
-      })),
-    [fields],
+  const { data: previewData } = useQuery(
+    ['api', debouncedPreviewApi],
+    () => client.query.execApi(debouncedPreviewApi, {}),
+    {},
   );
 
   return datasource ? (
@@ -60,14 +53,11 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
           <Button
             onClick={() => {
               domApi.setNodeName(nodeId, name);
-              (Object.keys(query) as (keyof Q)[]).forEach((propName) => {
-                if (typeof propName !== 'string' || !query[propName]) {
+              (Object.keys(apiQuery) as (keyof P)[]).forEach((propName) => {
+                if (typeof propName !== 'string' || !apiQuery[propName]) {
                   return;
                 }
-                domApi.setNodeNamespacedProp(api, 'query', propName, {
-                  type: 'const',
-                  value: query[propName],
-                });
+                domApi.setNodeAttribute(api, 'query', apiQuery);
               });
             }}
           >
@@ -81,11 +71,14 @@ function ApiEditorContent<Q>({ nodeId }: ApiEditorProps) {
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
-          <datasource.QueryEditor value={query} onChange={(newQuery) => setQuery(newQuery)} />
+          <datasource.QueryEditor
+            value={apiQuery}
+            onChange={(newApiQuery) => setApiQuery(newApiQuery)}
+          />
         </Stack>
       </Box>
-      <Box sx={{ flex: 1, overflow: 'hidden' }}>
-        <DataGridPro density="compact" rows={rows} columns={columns} />
+      <Box sx={{ flex: 1, overflow: 'auto', borderTop: 1, borderColor: 'divider' }}>
+        <pre>{JSON.stringify(previewData, null, 2)}</pre>
       </Box>
     </Box>
   ) : null;

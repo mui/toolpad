@@ -13,15 +13,18 @@ async function fetchData(queryId: string) {
 
 export interface UseDataQuery {
   loading: boolean;
+  error: any;
+  data: any;
   columns: { field: string }[];
   rows: GridRowsProp;
-  error: any;
 }
 
 export default function useDataQuery(queryId: string): UseDataQuery {
   const { isLoading: loading, error, data = {} } = useQuery(queryId, () => fetchData(queryId));
 
-  const { fields = {}, data: rows = [] } = data;
+  const { fields = {}, data: apiData } = data;
+
+  const rows = Array.isArray(data) ? data : [];
 
   const columns = React.useMemo(
     () =>
@@ -34,8 +37,9 @@ export default function useDataQuery(queryId: string): UseDataQuery {
 
   return {
     loading,
+    error,
+    data: apiData,
     columns,
     rows,
-    error,
   };
 }

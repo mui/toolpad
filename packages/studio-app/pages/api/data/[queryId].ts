@@ -20,5 +20,5 @@ export default (async (req, res) => {
   const apiNodeId = req.query.queryId as NodeId;
   const dom = await loadApp();
   const api = studioDom.getNode(dom, apiNodeId, 'api');
-  res.json(await execApi(api));
+  res.json(await execApi(api, req.query.params ? JSON.parse(req.query.params as string) : {}));
 }) as NextApiHandler<StudioApiResult<any>>;

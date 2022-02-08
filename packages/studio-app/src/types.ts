@@ -84,18 +84,22 @@ export interface ViewState {
   [nodeId: NodeId]: NodeState | undefined;
 }
 
-export type StudioApiResultFields<D = {}> = {
+export type StudioApiResultFields<D = any> = {
   [K in keyof D]?: {
     type: string;
   };
 };
 
-export interface StudioApiResult<D = {}> {
-  fields: StudioApiResultFields<D>;
-  data: D[];
+export interface StudioApiResult<D = any> {
+  fields?: StudioApiResultFields;
+  data: D;
 }
 
-export type StudioConnectionParamsEditor<P = {}> = React.FC<WithControlledProp<P>>;
+export interface StudioConnectionParamsEditorProps<P> extends WithControlledProp<P> {
+  connectionName: string;
+}
+
+export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionParamsEditorProps<P>>;
 export type StudioQueryEditor<Q = {}> = React.FC<WithControlledProp<Q>>;
 
 export interface ConnectionStatus {
@@ -105,17 +109,17 @@ export interface ConnectionStatus {
 
 export interface StudioDataSourceClient<P = {}, Q = {}> {
   displayName: string;
-  needsConnection: boolean;
   ConnectionParamsInput: StudioConnectionParamsEditor<P>;
   getInitialConnectionValue: () => P;
   isConnectionValid: (connection: P) => boolean;
   QueryEditor: StudioQueryEditor<Q>;
   getInitialQueryValue: () => Q;
+  getArgTypes?: (query: Q) => ArgTypeDefinitions;
 }
 
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
-  exec: (connection: StudioConnection<P>, query: Q) => Promise<StudioApiResult<D>>;
+  exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
 }
 
 export interface StudioConnectionSummary {

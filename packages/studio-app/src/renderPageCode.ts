@@ -18,6 +18,12 @@ import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getApiNodeArgTypes(node: studioDom.StudioApiNode): ArgTypeDefinitions {
+  // TODO:implementation
+  return {};
+}
+
 function literalPropExpression(value: any): PropExpression {
   return {
     type: 'expression',
@@ -540,7 +546,7 @@ class Context implements RenderContext {
 
         const apiNode = node.api ? studioDom.getNode(this.dom, node.api, 'api') : null;
 
-        const propTypes = apiNode ? argTypesToPropValueTypes(apiNode.argTypes) : {};
+        const propTypes = apiNode ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode)) : {};
 
         const resolvedProps = this.resolveBindables(node.params, propTypes);
 

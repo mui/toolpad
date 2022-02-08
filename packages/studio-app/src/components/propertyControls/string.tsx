@@ -2,7 +2,7 @@ import { TextField } from '@mui/material';
 import * as React from 'react';
 import type { EditorProps, PropControlDefinition } from '../../types';
 
-function StringPropEditor({ name, value, onChange, disabled }: EditorProps<string>) {
+function StringPropEditor({ propName, value, onChange, disabled }: EditorProps<string>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange(event.target.value);
@@ -15,7 +15,7 @@ function StringPropEditor({ name, value, onChange, disabled }: EditorProps<strin
       value={value ?? ''}
       disabled={disabled}
       onChange={handleChange}
-      label={name}
+      label={propName}
       size="small"
     />
   );

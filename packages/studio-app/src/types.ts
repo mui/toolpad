@@ -4,10 +4,11 @@ import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
 export interface EditorProps<T> {
-  name: string;
+  nodeId: NodeId;
+  propName: string;
   argType: ArgTypeDefinition;
   disabled?: boolean;
-  value: T;
+  value: T | undefined;
   onChange: (newValue: T) => void;
 }
 

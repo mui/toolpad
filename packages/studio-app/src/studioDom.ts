@@ -3,6 +3,7 @@ import { generateKeyBetween } from 'fractional-indexing';
 import { NodeId, StudioConstant, StudioBindable, StudioBindables } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
+import { generateUniqueString } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 
 export function createFractionalIndex(index1: string | null, index2: string | null) {
@@ -338,20 +339,6 @@ export function getParent<N extends StudioNode>(dom: StudioDom, child: N): Paren
   return null;
 }
 
-function generateUniqueName(baseName: string, existingNames: Set<string>, alwaysIndex = false) {
-  let i = 1;
-  let suggestion = baseName;
-  if (alwaysIndex) {
-    suggestion += String(i);
-    i += 1;
-  }
-  while (existingNames.has(suggestion)) {
-    suggestion = baseName + String(i);
-    i += 1;
-  }
-  return suggestion;
-}
-
 function getNodeNames(dom: StudioDom): Set<string> {
   return new Set(Object.values(dom.nodes).map(({ name }) => name));
 }
@@ -373,8 +360,8 @@ export function createElementInternal<P>(
     component,
     props,
     name: name
-      ? generateUniqueName(name, existingNames)
-      : generateUniqueName(component, existingNames, true),
+      ? generateUniqueString(name, existingNames)
+      : generateUniqueString(component, existingNames, true),
   };
 }
 
@@ -407,7 +394,7 @@ export function createNode<T extends StudioNodeType>(
   const existingNames = getNodeNames(dom);
   return createNodeInternal(id, type, {
     ...init,
-    name: generateUniqueName(init.name || type, existingNames),
+    name: generateUniqueString(init.name || type, existingNames),
   });
 }
 

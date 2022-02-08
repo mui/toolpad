@@ -5,7 +5,7 @@ import Editor from '@monaco-editor/react';
 import schemas from '../../schemas';
 import type { EditorProps, PropControlDefinition } from '../../types';
 
-function JsonPropEditor({ name, argType, value, onChange, disabled }: EditorProps<any>) {
+function JsonPropEditor({ propName, argType, value, onChange, disabled }: EditorProps<any>) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const valueAsString = React.useMemo(() => JSON.stringify(value, null, 2), [value]);
@@ -69,7 +69,7 @@ function JsonPropEditor({ name, argType, value, onChange, disabled }: EditorProp
 
   return (
     <React.Fragment>
-      <Button onClick={() => setDialogOpen(true)}>{name}</Button>
+      <Button onClick={() => setDialogOpen(true)}>{propName}</Button>
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit JSON</DialogTitle>
         <DialogContent>

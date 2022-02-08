@@ -1,4 +1,4 @@
-import { StudioDataSourceServer } from './types';
+import { StudioDataSourceServer } from '../types';
 import movies from './movies/server';
 import postgres from './postgres/server';
 import rest from './rest/server';

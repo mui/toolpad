@@ -10,6 +10,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Menu,
   MenuItem,
   Select,
   Stack,
@@ -42,13 +43,38 @@ function GridColumnsPropEditor({
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
 
-  console.log(props);
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(menuAnchorEl);
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setMenuAnchorEl(null);
+  };
 
-  const handleCreateColumn = React.useCallback(() => {
-    const existingFields = new Set(value.map(({ field }) => field));
-    const newFieldName = generateUniqueString('new', existingFields);
-    onChange([...value, { field: newFieldName }]);
-  }, [value, onChange]);
+  const definedRows = props.rows;
+  const columnSuggestions = React.useMemo(() => {
+    const allKeys = new Set(
+      (Array.isArray(definedRows) ? definedRows : [])
+        .slice(10)
+        .map((obj) => (obj && typeof obj === 'object' ? Object.keys(obj) : []))
+        .flat(),
+    );
+    value.forEach(({ field }) => allKeys.delete(field));
+    return Array.from(allKeys);
+  }, [definedRows, value]);
+
+  const handleCreateColumn = React.useCallback(
+    (suggestion: string) => () => {
+      const existingFields = new Set(value.map(({ field }) => field));
+      const newFieldName = generateUniqueString(suggestion, existingFields);
+      const newValue = [...value, { field: newFieldName }];
+      onChange(newValue);
+      setEditedIndex(newValue.length - 1);
+      handleClose();
+    },
+    [value, onChange],
+  );
 
   const handleColumnItemClick = React.useCallback(
     (index: number) => () => {
@@ -139,6 +165,25 @@ function GridColumnsPropEditor({
           <React.Fragment>
             <DialogTitle>Edit columns</DialogTitle>
             <DialogContent>
+              <IconButton onClick={handleMenuClick} disabled={disabled}>
+                <AddIcon />
+              </IconButton>
+              <Menu
+                id="new-column-menu"
+                anchorEl={menuAnchorEl}
+                open={menuOpen}
+                onClose={handleClose}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button',
+                }}
+              >
+                {columnSuggestions.map((suggestion) => (
+                  <MenuItem key={suggestion} onClick={handleCreateColumn(suggestion)}>
+                    {suggestion}
+                  </MenuItem>
+                ))}
+                <MenuItem onClick={handleCreateColumn('new')}>new column</MenuItem>
+              </Menu>
               <List dense>
                 {value.map((colDef, i) => {
                   return (
@@ -150,9 +195,6 @@ function GridColumnsPropEditor({
                   );
                 })}
               </List>
-              <IconButton onClick={handleCreateColumn} disabled={disabled}>
-                <AddIcon />
-              </IconButton>
             </DialogContent>
           </React.Fragment>
         )}

@@ -74,8 +74,9 @@ export default function QueryStateEditor() {
       api: null,
       params: {},
     });
+    domApi.addNode(stateNode, page, 'queryStates');
     setEditedState(stateNode.id);
-  }, [dom]);
+  }, [dom, domApi, page]);
 
   // To keep it around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);

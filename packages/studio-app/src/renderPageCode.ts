@@ -147,6 +147,39 @@ class Context implements RenderContext {
     }
   }
 
+  getNodeIdFromInterpolation(interpolation: string): NodeId | null {
+    const [name] = interpolation.split('.');
+    return studioDom.getNodeIdByName(this.dom, name);
+  }
+
+  collectDependentStateNodes(bindable: StudioBindable<any>): string[] {
+    switch (bindable.type) {
+      case 'const':
+        return [];
+      case 'binding': {
+        const nodeId = this.getNodeIdFromInterpolation(bindable.value);
+        return nodeId ? [nodeId] : [];
+      }
+      case 'boundExpression': {
+        const parsed = bindings.parse(bindable.value);
+        const interpolations = bindings.getInterpolations(parsed);
+        return interpolations
+          .map((interpolation) => this.getNodeIdFromInterpolation(interpolation))
+          .filter(Boolean);
+      }
+      default:
+        throw new Error(
+          `Invariant: unhandled bindable type "${(bindable as StudioBindable<unknown>).type}"`,
+        );
+    }
+  }
+
+  collectAllDependentStateNodes(bindables: StudioBindables<any>): string[] {
+    return Object.values(bindables)
+      .map((bindable) => (bindable ? this.collectDependentStateNodes(bindable) : []))
+      .flat();
+  }
+
   collectInterpolation(interpolation: string) {
     const [nodeName, ...path] = interpolation.split('.');
     const nodeId = studioDom.getNodeIdByName(this.dom, nodeName);
@@ -200,9 +233,10 @@ class Context implements RenderContext {
     } else if (studioDom.isDerivedState(node)) {
       let stateHook = this.stateHooks.get(node.id);
       if (!stateHook) {
+        const dependencies = this.collectAllDependentStateNodes(node.params);
         stateHook = {
           type: 'derived',
-          dependencies: [],
+          dependencies,
           nodeId: node.id,
           stateVar: this.moduleScope.createUniqueBinding(node.name),
         };
@@ -213,9 +247,10 @@ class Context implements RenderContext {
     } else if (studioDom.isQueryState(node)) {
       let stateHook = this.stateHooks.get(node.id);
       if (!stateHook) {
+        const dependencies = this.collectAllDependentStateNodes(node.params);
         stateHook = {
           type: 'api',
-          dependencies: [],
+          dependencies,
           nodeId: node.id,
           stateVar: this.moduleScope.createUniqueBinding(node.name),
         };
@@ -226,9 +261,10 @@ class Context implements RenderContext {
     } else if (studioDom.isFetchedState(node)) {
       let stateHook = this.stateHooks.get(node.id);
       if (!stateHook) {
+        const dependencies = this.collectDependentStateNodes(node.url);
         stateHook = {
           type: 'fetched',
-          dependencies: [],
+          dependencies,
           nodeId: node.id,
           stateVar: this.moduleScope.createUniqueBinding(node.name),
         };

@@ -17,13 +17,11 @@ import {
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
+import dataSources from './studioDataSources/client';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getApiNodeArgTypes(node: studioDom.StudioApiNode): ArgTypeDefinitions {
-  // TODO:implementation
-  // retrieve datasource type by connectionId
-  // retrieve argtypes from that datasource +
-  return {};
+  const dataSource = dataSources[node.connectionType];
+  return dataSource?.getArgTypes?.(node.query) || {};
 }
 
 function literalPropExpression(value: any): PropExpression {
@@ -48,6 +46,19 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
+interface ControlledStateHook {
+  stateVar: string;
+  setStateVar: string;
+  defaultValue?: unknown;
+}
+
+interface StateHook {
+  type: 'derived' | 'api' | 'fetched';
+  dependencies: string[];
+  nodeId: NodeId;
+  stateVar: string;
+}
+
 class Context implements RenderContext {
   private dom: studioDom.StudioDom;
 
@@ -57,22 +68,15 @@ class Context implements RenderContext {
 
   private imports: Imports;
 
-  private dataLoaders: { queryId: string; variable: string }[] = [];
-
   private moduleScope: Scope;
 
   private reactAlias: string = 'undefined';
 
   private runtimeAlias: string = 'undefined';
 
-  private useStateHooks = new Map<
-    string,
-    { state: string; setState: string; defaultValue?: unknown }
-  >();
+  private controlledStateHooks = new Map<string, ControlledStateHook>();
 
-  private useMemoHooks = new Map<string, string>();
-
-  private useQueryHooks = new Map<string, string>();
+  private stateHooks = new Map<string, StateHook>();
 
   private useFetchedStateHooks = new Map<string, string>();
 
@@ -97,12 +101,6 @@ class Context implements RenderContext {
     if (this.editor) {
       this.runtimeAlias = this.addImport('@mui/studio-core/runtime', '*', '__studioRuntime');
     }
-  }
-
-  useDataLoader(queryId: string): string {
-    const variable = this.moduleScope.createUniqueBinding(queryId);
-    this.dataLoaders.push({ queryId, variable });
-    return variable;
   }
 
   collectAllState() {
@@ -135,6 +133,39 @@ class Context implements RenderContext {
     }
   }
 
+  getNodeIdFromInterpolation(interpolation: string): NodeId | null {
+    const [name] = interpolation.split('.');
+    return studioDom.getNodeIdByName(this.dom, name);
+  }
+
+  collectDependentStateNodes(bindable: StudioBindable<any>): string[] {
+    switch (bindable.type) {
+      case 'const':
+        return [];
+      case 'binding': {
+        const nodeId = this.getNodeIdFromInterpolation(bindable.value);
+        return nodeId ? [nodeId] : [];
+      }
+      case 'boundExpression': {
+        const parsed = bindings.parse(bindable.value);
+        const interpolations = bindings.getInterpolations(parsed);
+        return interpolations
+          .map((interpolation) => this.getNodeIdFromInterpolation(interpolation))
+          .filter(Boolean);
+      }
+      default:
+        throw new Error(
+          `Invariant: unhandled bindable type "${(bindable as StudioBindable<unknown>).type}"`,
+        );
+    }
+  }
+
+  collectAllDependentStateNodes(bindables: StudioBindables<any>): string[] {
+    return Object.values(bindables)
+      .map((bindable) => (bindable ? this.collectDependentStateNodes(bindable) : []))
+      .flat();
+  }
+
   collectInterpolation(interpolation: string) {
     const [nodeName, ...path] = interpolation.split('.');
     const nodeId = studioDom.getNodeIdByName(this.dom, nodeName);
@@ -151,7 +182,7 @@ class Context implements RenderContext {
 
       const stateId = `${nodeId}.${prop}`;
 
-      let stateHook = this.useStateHooks.get(stateId);
+      let stateHook = this.controlledStateHooks.get(stateId);
       if (!stateHook) {
         const component = getStudioComponent(this.dom, node.component);
 
@@ -166,44 +197,62 @@ class Context implements RenderContext {
         }
 
         const stateVarSuggestion = camelCase(nodeName, prop);
-        const state = this.moduleScope.createUniqueBinding(stateVarSuggestion);
+        const stateVar = this.moduleScope.createUniqueBinding(stateVarSuggestion);
 
         const setStateVarSuggestion = camelCase('set', nodeName, prop);
-        const setState = this.moduleScope.createUniqueBinding(setStateVarSuggestion);
+        const setStateVar = this.moduleScope.createUniqueBinding(setStateVarSuggestion);
 
         stateHook = {
-          state,
-          setState,
+          stateVar,
+          setStateVar,
           defaultValue: argType.defaultValue,
         };
-        this.useStateHooks.set(stateId, stateHook);
+        this.controlledStateHooks.set(stateId, stateHook);
       }
 
-      const resolvedExpr = [stateHook.state, ...subPath].join('.');
+      const resolvedExpr = [stateHook.stateVar, ...subPath].join('.');
       this.interpolations.set(interpolation, resolvedExpr);
     } else if (studioDom.isDerivedState(node)) {
-      let state = this.useMemoHooks.get(node.id);
-      if (!state) {
-        state = this.moduleScope.createUniqueBinding(node.name);
-        this.useMemoHooks.set(node.id, state);
+      let stateHook = this.stateHooks.get(node.id);
+      if (!stateHook) {
+        const dependencies = this.collectAllDependentStateNodes(node.params);
+        stateHook = {
+          type: 'derived',
+          dependencies,
+          nodeId: node.id,
+          stateVar: this.moduleScope.createUniqueBinding(node.name),
+        };
+        this.stateHooks.set(node.id, stateHook);
       }
-      const resolvedExpr = [state, ...path].join('.');
+      const resolvedExpr = [stateHook.stateVar, ...path].join('.');
       this.interpolations.set(interpolation, resolvedExpr);
     } else if (studioDom.isQueryState(node)) {
-      let state = this.useQueryHooks.get(node.id);
-      if (!state) {
-        state = this.moduleScope.createUniqueBinding(node.name);
-        this.useQueryHooks.set(node.id, state);
+      let stateHook = this.stateHooks.get(node.id);
+      if (!stateHook) {
+        const dependencies = this.collectAllDependentStateNodes(node.params);
+        stateHook = {
+          type: 'api',
+          dependencies,
+          nodeId: node.id,
+          stateVar: this.moduleScope.createUniqueBinding(node.name),
+        };
+        this.stateHooks.set(node.id, stateHook);
       }
-      const resolvedExpr = [state, ...path].join('.');
+      const resolvedExpr = [stateHook.stateVar, ...path].join('.');
       this.interpolations.set(interpolation, resolvedExpr);
     } else if (studioDom.isFetchedState(node)) {
-      let state = this.useFetchedStateHooks.get(node.id);
-      if (!state) {
-        state = this.moduleScope.createUniqueBinding(node.name);
-        this.useFetchedStateHooks.set(node.id, state);
+      let stateHook = this.stateHooks.get(node.id);
+      if (!stateHook) {
+        const dependencies = this.collectDependentStateNodes(node.url);
+        stateHook = {
+          type: 'fetched',
+          dependencies,
+          nodeId: node.id,
+          stateVar: this.moduleScope.createUniqueBinding(node.name),
+        };
+        this.stateHooks.set(node.id, stateHook);
       }
-      const resolvedExpr = [state, ...path].join('.');
+      const resolvedExpr = [stateHook.stateVar, ...path].join('.');
       this.interpolations.set(interpolation, resolvedExpr);
     }
   }
@@ -282,7 +331,7 @@ class Context implements RenderContext {
         }
 
         const stateId = `${node.id}.${propName}`;
-        const hook = this.useStateHooks.get(stateId);
+        const hook = this.controlledStateHooks.get(stateId);
 
         if (!hook) {
           return;
@@ -290,7 +339,7 @@ class Context implements RenderContext {
 
         result[propName] = {
           type: 'expression',
-          value: hook.state,
+          value: hook.stateVar,
         };
 
         if (argType.onChangeProp) {
@@ -299,12 +348,12 @@ class Context implements RenderContext {
             const { params, valueGetter } = argType.onChangeHandler;
             result[argType.onChangeProp] = {
               type: 'expression',
-              value: `(${params.join(', ')}) => ${hook.setState}(${valueGetter})`,
+              value: `(${params.join(', ')}) => ${hook.setStateVar}(${valueGetter})`,
             };
           } else {
             result[argType.onChangeProp] = {
               type: 'expression',
-              value: hook.setState,
+              value: hook.setStateVar,
             };
           }
         }
@@ -509,66 +558,108 @@ class Context implements RenderContext {
     return this.imports.add(source, imported, suggestedName);
   }
 
+  renderControlledStateHooks(): string {
+    return Array.from(this.controlledStateHooks.values(), (stateHook) => {
+      const defaultValue = JSON.stringify(stateHook.defaultValue);
+      return `const [${stateHook.stateVar}, ${stateHook.setStateVar}] = ${this.reactAlias}.useState(${defaultValue});`;
+    }).join('\n');
+  }
+
   renderStateHooks(): string {
-    return Array.from(this.useStateHooks.values(), (state) => {
-      if (!state) {
-        return '';
+    const orderedHooks: StateHook[] = [];
+    const seenHooks = new Set<string>();
+
+    const addHook = (id: string, history: string[] = []): void => {
+      const hook = this.stateHooks.get(id);
+      if (!hook) {
+        return;
       }
-      const defaultValue = JSON.stringify(state.defaultValue);
-      return `const [${state.state}, ${state.setState}] = ${this.reactAlias}.useState(${defaultValue});`;
-    }).join('\n');
-  }
-
-  renderDerivedStateHooks(): string {
-    return Array.from(this.useMemoHooks.entries(), ([nodeId, stateVar]) => {
-      if (stateVar) {
-        const node = studioDom.getNode(this.dom, nodeId as NodeId, 'derivedState');
-        const resolvedParams = this.resolveBindables(node.params, node.argTypes);
-        const paramsArg = this.renderPropsAsObject(resolvedParams);
-        const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
-          this.renderJsExpression(resolvedProp),
-        );
-        const derivedStateGetter = this.addImport(
-          `../derivedState/${node.id}.ts`,
-          'default',
-          node.name,
-        );
-        return `const ${stateVar} = React.useMemo(() => ${derivedStateGetter}(${paramsArg}), [${depsArray.join(
-          ', ',
-        )}])`;
+      if (history.includes(id)) {
+        throw new Error(`Cyclic state detected`);
       }
-      return '';
-    }).join('\n');
-  }
-
-  renderQueryStateHooks(): string {
-    return Array.from(this.useQueryHooks.entries(), ([nodeId, stateVar]) => {
-      if (stateVar) {
-        const node = studioDom.getNode(this.dom, nodeId as NodeId, 'queryState');
-
-        const apiNode = node.api ? studioDom.getNode(this.dom, node.api, 'api') : null;
-
-        const propTypes = apiNode
-          ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode.query))
-          : {};
-
-        const resolvedProps = this.resolveBindables(node.params, propTypes);
-
-        // TODO: Set up variable binding
-        // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const params = this.renderPropsAsObject(resolvedProps);
-        // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
-          this.renderJsExpression(resolvedProp),
-        );
-
-        const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
-        return `const ${stateVar} = ${useDataQuery}(${JSON.stringify(node.api)});`;
+      if (hook.dependencies) {
+        hook.dependencies.forEach((depId) => addHook(depId, [...history, id]));
       }
-      return '';
-    }).join('\n');
+      if (!seenHooks.has(id)) {
+        orderedHooks.push(hook);
+        seenHooks.add(id);
+      }
+    };
+
+    // Sort hooks according to their deprendencies
+    [...this.stateHooks.keys()].forEach((nodeId) => addHook(nodeId));
+
+    return orderedHooks
+      .map((stateHook) => {
+        switch (stateHook.type) {
+          case 'derived': {
+            const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
+            const resolvedParams = this.resolveBindables(node.params, node.argTypes);
+            const paramsArg = this.renderPropsAsObject(resolvedParams);
+            const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
+              this.renderJsExpression(resolvedProp),
+            );
+            const derivedStateGetter = this.addImport(
+              `../derivedState/${node.id}.ts`,
+              'default',
+              node.name,
+            );
+            return `const ${
+              stateHook.stateVar
+            } = React.useMemo(() => ${derivedStateGetter}(${paramsArg}), [${depsArray.join(
+              ', ',
+            )}])`;
+          }
+          case 'api': {
+            const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
+
+            const apiNode = node.api ? studioDom.getNode(this.dom, node.api, 'api') : null;
+
+            const propTypes = apiNode ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode)) : {};
+
+            const resolvedProps = this.resolveBindables(node.params, propTypes);
+
+            // TODO: Set up variable binding
+            // @ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const params = this.renderPropsAsObject(resolvedProps);
+            // @ts-expect-error
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
+              this.renderJsExpression(resolvedProp),
+            );
+
+            const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
+            return `const ${stateHook.stateVar} = ${useDataQuery}(${JSON.stringify(node.api)});`;
+          }
+          case 'fetched': {
+            const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
+
+            const url = this.resolveBindable(node.url);
+
+            const paramsExpr = this.renderPropsAsObject({
+              url,
+              collectionPath: literalPropExpression(node.collectionPath),
+              fieldPaths: literalPropExpression(node.fieldPaths),
+            });
+
+            const useFetchedState = this.addImport(
+              '@mui/studio-core',
+              'useFetchedState',
+              'useFetchedState',
+            );
+
+            return `const ${stateHook.stateVar} = ${useFetchedState}(${paramsExpr});`;
+          }
+          default:
+            throw new Error(
+              `Invariant: Missing renderer for state hook of type "${
+                (stateHook as StateHook).type
+              }"`,
+            );
+        }
+      })
+      .join('\n');
   }
 
   renderFetchedStateHooks(): string {
@@ -596,28 +687,11 @@ class Context implements RenderContext {
     }).join('\n');
   }
 
-  renderDataLoaderHooks(): string {
-    if (this.dataLoaders.length <= 0) {
-      return '';
-    }
-
-    const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
-    return this.dataLoaders
-      .map(
-        ({ queryId, variable }) =>
-          `const ${variable} = ${useDataQuery}(${JSON.stringify(queryId)});`,
-      )
-      .join('\n');
-  }
-
   render() {
     this.collectAllState();
     const root: string = this.renderRoot(this.page);
-    const stateHooks = this.renderStateHooks();
-    const derivedStateHooks = this.renderDerivedStateHooks();
-    const queryStateHooks = this.renderQueryStateHooks();
-    const fetchdStateHooks = this.renderFetchedStateHooks();
-    const dataQueryHooks = this.renderDataLoaderHooks();
+    const controlledState = this.renderControlledStateHooks();
+    const state = this.renderStateHooks();
 
     this.imports.seal();
 
@@ -627,11 +701,8 @@ class Context implements RenderContext {
       ${imports}
 
       export default function App () {
-        ${stateHooks}
-        ${dataQueryHooks}
-        ${derivedStateHooks}
-        ${queryStateHooks}
-        ${fetchdStateHooks}
+        ${controlledState}
+        ${state}
 
         return (
           ${root}

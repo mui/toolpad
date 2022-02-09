@@ -53,7 +53,7 @@ export interface StudioThemeNode extends StudioNodeBase {
   readonly theme: StudioBindables<StudioTheme>;
 }
 
-export interface StudioApiNode<Q = any> extends StudioNodeBase {
+export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
   readonly type: 'api';
   readonly connectionId: string;
   readonly connectionType: string;
@@ -181,6 +181,31 @@ function assertIsType<T extends StudioNode>(node: StudioNode, type: T['type']): 
   if (!isType(node, type)) {
     throw new Error(`Invariant: expected node type "${type}" but got "${node.type}"`);
   }
+}
+
+export function getNode2<T extends StudioNodeType>(
+  dom: StudioDom,
+  nodeId: NodeId,
+  type: T,
+): StudioNodeOfType<T> | null;
+export function getNode2<T extends StudioNodeType>(
+  dom: StudioDom,
+  nodeId: NodeId,
+  type?: T,
+): StudioNode | null;
+export function getNode2<T extends StudioNodeType>(
+  dom: StudioDom,
+  nodeId: NodeId,
+  type?: T,
+): StudioNode | null {
+  const node = dom.nodes[nodeId];
+  if (!node) {
+    return null;
+  }
+  if (type) {
+    assertIsType(node, type);
+  }
+  return node;
 }
 
 export function getNode<T extends StudioNodeType>(

@@ -3,6 +3,7 @@ import * as studioDom from '../studioDom';
 import { NodeId, StudioBindable } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
+import useDebounced from '../utils/useDebounced';
 
 export type DomAction =
   | {
@@ -211,12 +212,14 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
 interface DomState {
   dom: studioDom.StudioDom;
   loaded: boolean;
+  saving: boolean;
   loading: boolean;
   error: string | null;
 }
 
 const DomStateContext = React.createContext<DomState>({
   loaded: false,
+  saving: false,
   loading: false,
   error: null,
   dom: studioDom.createDom(),
@@ -246,6 +249,7 @@ export interface DomContextProps {
 export default function DomProvider({ children }: DomContextProps) {
   const [state, dispatch] = React.useReducer(domReducer, {
     loading: false,
+    saving: false,
     loaded: false,
     error: null,
     dom: studioDom.createDom(),
@@ -253,16 +257,48 @@ export default function DomProvider({ children }: DomContextProps) {
   const api = React.useMemo(() => createDomApi(dispatch), []);
 
   React.useEffect(() => {
+    let canceled = false;
+
     dispatch({ type: 'DOM_LOADING' });
     client.query
       .loadApp()
       .then((dom) => {
-        dispatch({ type: 'DOM_LOADED', dom });
+        if (!canceled) {
+          dispatch({ type: 'DOM_LOADED', dom });
+        }
       })
       .catch((err) => {
-        dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
+        if (!canceled) {
+          dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
+        }
       });
+
+    return () => {
+      canceled = true;
+    };
   }, []);
+
+  const debouncedDom = useDebounced(state.dom, 3000);
+  React.useEffect(() => {
+    dispatch({ type: 'DOM_LOADING' });
+
+    client.mutation
+      .saveApp(debouncedDom)
+      .then((dom) => {
+        if (!canceled) {
+          dispatch({ type: 'DOM_LOADED', dom });
+        }
+      })
+      .catch((err) => {
+        if (!canceled) {
+          dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
+        }
+      });
+
+    return () => {
+      canceled = true;
+    };
+  }, [debouncedDom]);
 
   return (
     <DomStateContext.Provider value={state}>

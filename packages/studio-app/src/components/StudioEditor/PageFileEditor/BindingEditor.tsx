@@ -20,7 +20,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { getStudioComponent } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
 import { NodeId, StudioBindable } from '../../../types';
-import { useDom } from '../../DomProvider';
+import { useDom } from '../../DomLoader';
 import { WithControlledProp } from '../../../utils/types';
 import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../../../schemas';
 

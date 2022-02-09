@@ -5,7 +5,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import StudioAppBar from '../StudioAppBar';
 import PageEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
-import DomProvider, { useDomState } from '../DomProvider';
+import DomProvider, { useDomLoader } from '../DomLoader';
 import ApiEditor from './ApiFileEditor';
 import CodeComponentEditor from './CodeComponentEditor';
 
@@ -55,23 +55,23 @@ function FileEditor({ className }: FileEditorProps) {
 }
 
 function EditorContent() {
-  const domState = useDomState();
+  const domLoader = useDomLoader();
 
   return (
     <EditorRoot>
       <StudioAppBar
         actions={
           <React.Fragment>
-            {domState.saving ? (
+            {domLoader.saving ? (
               <Box display="flex" flexDirection="row" alignItems="center">
                 <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
               </Box>
             ) : null}
-            <Typography>{domState.unsavedChanges} unsaved change(s).</Typography>
+            <Typography>{domLoader.unsavedChanges} unsaved change(s).</Typography>
           </React.Fragment>
         }
       />
-      {domState.dom ? (
+      {domLoader.dom ? (
         <div className={classes.content}>
           <PagePanel className={classes.hierarchyPanel} />
           <FileEditor className={classes.editorPanel} />

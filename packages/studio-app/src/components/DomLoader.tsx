@@ -113,7 +113,7 @@ export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioD
   }
 }
 
-export function domStateReducer(state: DomState, action: DomAction): DomState {
+export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader {
   if (state.dom) {
     const newDom = domReducer(state.dom, action);
     const hasUnsavedChanges = newDom !== state.dom;
@@ -232,7 +232,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
   };
 }
 
-interface DomState {
+interface DomLoader {
   dom: studioDom.StudioDom | null;
   saving: boolean;
   unsavedChanges: number;
@@ -240,7 +240,7 @@ interface DomState {
   error: string | null;
 }
 
-const DomStateContext = React.createContext<DomState>({
+const DomLoaderContext = React.createContext<DomLoader>({
   saving: false,
   unsavedChanges: 0,
   loading: false,
@@ -252,12 +252,12 @@ const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined))
 
 export type DomApi = ReturnType<typeof createDomApi>;
 
-export function useDomState(): DomState {
-  return React.useContext(DomStateContext);
+export function useDomLoader(): DomLoader {
+  return React.useContext(DomLoaderContext);
 }
 
 export function useDom(): studioDom.StudioDom {
-  const { dom } = useDomState();
+  const { dom } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");
   }
@@ -273,7 +273,7 @@ export interface DomContextProps {
 }
 
 export default function DomProvider({ children }: DomContextProps) {
-  const [state, dispatch] = React.useReducer(domStateReducer, {
+  const [state, dispatch] = React.useReducer(domLoaderReducer, {
     loading: false,
     saving: false,
     unsavedChanges: 0,
@@ -323,8 +323,8 @@ export default function DomProvider({ children }: DomContextProps) {
   }, [debouncedDom]);
 
   return (
-    <DomStateContext.Provider value={state}>
+    <DomLoaderContext.Provider value={state}>
       <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
-    </DomStateContext.Provider>
+    </DomLoaderContext.Provider>
   );
 }

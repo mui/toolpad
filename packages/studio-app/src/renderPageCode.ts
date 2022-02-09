@@ -17,13 +17,11 @@ import {
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
+import dataSources from './studioDataSources/client';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getApiNodeArgTypes(node: studioDom.StudioApiNode): ArgTypeDefinitions {
-  // TODO:implementation
-  // retrieve datasource type by connectionId
-  // retrieve argtypes from that datasource +
-  return {};
+  const datasource = dataSources[node.connectionType];
+  return datasource?.getArgTypes?.(node.query) || {};
 }
 
 function literalPropExpression(value: any): PropExpression {
@@ -621,6 +619,7 @@ class Context implements RenderContext {
               ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode.query))
               : {};
 
+            console.log(propTypes);
             const resolvedProps = this.resolveBindables(node.params, propTypes);
 
             // TODO: Set up variable binding

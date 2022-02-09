@@ -305,6 +305,7 @@ export default function DomProvider({ children }: DomContextProps) {
   }, []);
 
   const debouncedDom = useDebounced(state.dom, 1000);
+
   React.useEffect(() => {
     if (!debouncedDom) {
       return;
@@ -321,6 +322,20 @@ export default function DomProvider({ children }: DomContextProps) {
         dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
       });
   }, [debouncedDom]);
+
+  React.useEffect(() => {
+    if (state.unsavedChanges <= 0) {
+      return () => {};
+    }
+
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = `You have ${state.unsavedChanges} unsaved change(s), are you sure you want to navigate away?`;
+    };
+
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [state.unsavedChanges]);
 
   return (
     <DomLoaderContext.Provider value={state}>

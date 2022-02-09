@@ -14,23 +14,23 @@ function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<
   return dataSource || null;
 }
 
-interface ApiEditorProps {
-  apiNode: studioDom.StudioApiNode;
+interface ApiEditorProps<Q> {
+  apiNode: studioDom.StudioApiNode<Q>;
 }
 
-function ApiEditorContent<P>({ apiNode }: ApiEditorProps) {
+function ApiEditorContent<Q>({ apiNode }: ApiEditorProps<Q>) {
   const domApi = useDomApi();
 
   const [name, setName] = React.useState(apiNode.name);
-  const [apiQuery, setApiQuery] = React.useState(apiNode.query);
+  const [apiQuery, setApiQuery] = React.useState<Q>(apiNode.query);
 
   const { data: connectionData } = useQuery(['connection', apiNode.connectionId], () =>
     client.query.getConnection(apiNode.connectionId),
   );
 
-  const datasource = connectionData && getDataSource<P>(connectionData);
+  const datasource = connectionData && getDataSource<Q>(connectionData);
 
-  const previewApi: studioDom.StudioApiNode<P> = React.useMemo(() => {
+  const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
     return { ...apiNode, query: apiQuery };
   }, [apiNode, apiQuery]);
 
@@ -49,7 +49,7 @@ function ApiEditorContent<P>({ apiNode }: ApiEditorProps) {
           <Button
             onClick={() => {
               domApi.setNodeName(apiNode.id, name);
-              (Object.keys(apiQuery) as (keyof P)[]).forEach((propName) => {
+              (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
                 if (typeof propName !== 'string' || !apiQuery[propName]) {
                   return;
                 }

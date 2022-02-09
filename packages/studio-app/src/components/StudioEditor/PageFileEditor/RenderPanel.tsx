@@ -22,7 +22,7 @@ import {
 import { PinholeOverlay } from '../../../PinholeOverlay';
 import { getViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
-import { useDom, useDomApi } from '../../DomProvider';
+import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { useStudioComponent } from '../../../studioComponents';

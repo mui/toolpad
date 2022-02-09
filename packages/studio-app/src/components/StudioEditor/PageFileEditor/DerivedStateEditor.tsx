@@ -21,7 +21,7 @@ import { PropValueType, PropValueTypes } from '@mui/studio-core';
 import type * as monacoEditor from 'monaco-editor';
 import CloseIcon from '@mui/icons-material/Close';
 import useLatest from '../../../utils/useLatest';
-import { useDom, useDomApi } from '../../DomProvider';
+import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';

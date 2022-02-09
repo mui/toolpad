@@ -6,7 +6,7 @@ import { StudioConnection, StudioDataSourceClient, NodeId } from '../../../types
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
-import { useDom, useDomApi } from '../../DomProvider';
+import { useDom, useDomApi } from '../../DomLoader';
 import useDebounced from '../../../utils/useDebounced';
 
 function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {

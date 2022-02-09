@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-core';
 import studioPropControls from '../../propertyControls';
 import * as studioDom from '../../../studioDom';
-import { useDomApi } from '../../DomProvider';
+import { useDomApi } from '../../DomLoader';
 import { BindingEditor } from './BindingEditor';
 import { NodeId, StudioBindable } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
@@ -26,14 +26,14 @@ function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
 }
 
 export interface BindableEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
-  label: string;
+  propName: string;
   nodeId: NodeId;
   argType: ArgTypeDefinition;
   actualValue?: V;
 }
 
 export function BindableEditor<V>({
-  label,
+  propName,
   nodeId,
   argType,
   value,
@@ -70,7 +70,8 @@ export function BindableEditor<V>({
       {control ? (
         <React.Fragment>
           <control.Editor
-            name={label}
+            nodeId={nodeId}
+            propName={propName}
             argType={argType}
             disabled={hasBinding}
             value={constValue}
@@ -78,7 +79,7 @@ export function BindableEditor<V>({
           />
           <BindingEditor<V>
             nodeId={nodeId}
-            prop={label}
+            prop={propName}
             propType={argType.typeDef}
             value={value}
             onChange={onChange}
@@ -86,7 +87,7 @@ export function BindableEditor<V>({
         </React.Fragment>
       ) : (
         <Alert severity="warning">
-          {`No control for property '${label}' (type '${argType.typeDef.type}' ${
+          {`No control for property '${propName}' (type '${argType.typeDef.type}' ${
             argType.control ? `, control: '${argType.control.type}'` : ''
           })`}
         </Alert>
@@ -121,7 +122,7 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
 
   return (
     <BindableEditor
-      label={name}
+      propName={name}
       argType={argType}
       nodeId={node.id}
       value={propValue}

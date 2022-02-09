@@ -24,7 +24,7 @@ import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
-import { useDom, useDomApi } from '../DomProvider';
+import { useDom, useDomApi } from '../DomLoader';
 import client from '../../api';
 
 const HierarchyExplorerRoot = styled('div')({
@@ -163,9 +163,18 @@ function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          const connectionType = (connectionsQuery.data || []).find(
+            ({ id }) => id === connectionId,
+          )?.type;
+          if (!connectionType) {
+            throw new Error(
+              `Invariant: can't find a datasource for existing connection "${connectionId}"`,
+            );
+          }
           const newApiNode = studioDom.createNode(dom, 'api', {
             query: {},
             connectionId,
+            connectionType,
           });
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newApiNode, appNode, 'apis');

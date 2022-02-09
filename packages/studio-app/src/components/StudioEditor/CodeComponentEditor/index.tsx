@@ -7,7 +7,7 @@ import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 import { NodeId } from '../../../types';
 import * as studioDom from '../../../studioDom';
-import { useDom, useDomApi } from '../../DomProvider';
+import { useDom, useDomApi } from '../../DomLoader';
 import StudioSandbox from '../../StudioSandbox';
 import getImportMap from '../../../getImportMap';
 import renderThemeCode from '../../../renderThemeCode';

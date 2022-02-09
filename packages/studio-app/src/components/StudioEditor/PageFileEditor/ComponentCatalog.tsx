@@ -2,7 +2,7 @@ import * as React from 'react';
 import { styled, Typography } from '@mui/material';
 import { useStudioComponents } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
-import { useDom } from '../../DomProvider';
+import { useDom } from '../../DomLoader';
 import { usePageEditorApi } from './PageEditorProvider';
 
 const ComponentCatalogRoot = styled('div')({

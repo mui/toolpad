@@ -105,7 +105,7 @@ function getBindablePropsInScope(
           case URI_DATAGRID_COLUMNS as string:
             return [`${destNode.name}.columns`];
           case URI_DATAGRID_ROWS as string:
-            return [`${destNode.name}.rows`];
+            return [`${destNode.name}.rows`, `${destNode.name}.data`];
           default:
             return [];
         }

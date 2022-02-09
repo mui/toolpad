@@ -14,6 +14,12 @@ export type DomAction =
       dom: studioDom.StudioDom;
     }
   | {
+      type: 'DOM_SAVING';
+    }
+  | {
+      type: 'DOM_SAVED';
+    }
+  | {
       type: 'DOM_LOADING_ERROR';
       error: string;
     }
@@ -58,7 +64,66 @@ export type DomAction =
       nodeId: NodeId;
     };
 
-export function domReducer(state: DomState, action: DomAction): DomState {
+export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioDom.StudioDom {
+  switch (action.type) {
+    case 'DOM_SET_NODE_NAME': {
+      // TODO: Also update all bindings on the page that use this name
+      const node = studioDom.getNode(dom, action.nodeId);
+      return studioDom.setNodeName(dom, node, action.name);
+    }
+    case 'DOM_SET_NODE_PROP': {
+      return studioDom.setNodeNamespacedProp<any, any, any>(
+        dom,
+        action.node,
+        action.namespace,
+        action.prop,
+        action.value,
+      );
+    }
+    case 'SAVE_NODE': {
+      return studioDom.saveNode(dom, action.node);
+    }
+    case 'DOM_SET_NODE_ATTR': {
+      const node = studioDom.getNode(dom, action.nodeId);
+      return studioDom.setNodeAttribute<any, any>(dom, node, action.attr, action.value);
+    }
+    case 'DOM_ADD_NODE': {
+      return studioDom.addNode<any, any>(
+        dom,
+        action.node,
+        action.parent,
+        action.parentProp,
+        action.parentIndex,
+      );
+    }
+    case 'DOM_MOVE_NODE': {
+      return studioDom.moveNode(
+        dom,
+        action.nodeId,
+        action.parentId,
+        action.parentProp,
+        action.parentIndex,
+      );
+    }
+    case 'DOM_REMOVE_NODE': {
+      return studioDom.removeNode(dom, action.nodeId);
+    }
+    default:
+      return dom;
+  }
+}
+
+export function domStateReducer(state: DomState, action: DomAction): DomState {
+  if (state.dom) {
+    const newDom = domReducer(state.dom, action);
+    const hasUnsavedChanges = newDom !== state.dom;
+
+    state = update(state, {
+      dom: newDom,
+      unsavedChanges: hasUnsavedChanges ? state.unsavedChanges + 1 : state.unsavedChanges,
+    });
+  }
+
   switch (action.type) {
     case 'DOM_LOADING': {
       return update(state, {
@@ -69,71 +134,29 @@ export function domReducer(state: DomState, action: DomAction): DomState {
     case 'DOM_LOADED': {
       return update(state, {
         loading: false,
-        loaded: true,
         error: null,
         dom: action.dom,
+        unsavedChanges: 0,
+      });
+    }
+    case 'DOM_SAVING': {
+      return update(state, {
+        saving: true,
+        error: null,
+      });
+    }
+    case 'DOM_SAVED': {
+      return update(state, {
+        saving: false,
+        error: null,
+        unsavedChanges: 0,
       });
     }
     case 'DOM_LOADING_ERROR': {
       return update(state, {
         loading: false,
+        saving: false,
         error: action.error,
-      });
-    }
-    case 'DOM_SET_NODE_NAME': {
-      // TODO: Also update all bindings on the page that use this name
-      const node = studioDom.getNode(state.dom, action.nodeId);
-      return update(state, {
-        dom: studioDom.setNodeName(state.dom, node, action.name),
-      });
-    }
-    case 'DOM_SET_NODE_PROP': {
-      return update(state, {
-        dom: studioDom.setNodeNamespacedProp<any, any, any>(
-          state.dom,
-          action.node,
-          action.namespace,
-          action.prop,
-          action.value,
-        ),
-      });
-    }
-    case 'SAVE_NODE': {
-      return update(state, {
-        dom: studioDom.saveNode(state.dom, action.node),
-      });
-    }
-    case 'DOM_SET_NODE_ATTR': {
-      const node = studioDom.getNode(state.dom, action.nodeId);
-      return update(state, {
-        dom: studioDom.setNodeAttribute<any, any>(state.dom, node, action.attr, action.value),
-      });
-    }
-    case 'DOM_ADD_NODE': {
-      return update(state, {
-        dom: studioDom.addNode<any, any>(
-          state.dom,
-          action.node,
-          action.parent,
-          action.parentProp,
-          action.parentIndex,
-        ),
-      });
-    }
-    case 'DOM_MOVE_NODE': {
-      return update(state, {
-        dom: studioDom.moveNode(
-          state.dom,
-          action.nodeId,
-          action.parentId,
-          action.parentProp,
-          action.parentIndex,
-        ),
-      });
-    }
-    case 'DOM_REMOVE_NODE': {
-      return update(state, {
-        dom: studioDom.removeNode(state.dom, action.nodeId),
       });
     }
     default:
@@ -210,19 +233,19 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
 }
 
 interface DomState {
-  dom: studioDom.StudioDom;
-  loaded: boolean;
+  dom: studioDom.StudioDom | null;
   saving: boolean;
+  unsavedChanges: number;
   loading: boolean;
   error: string | null;
 }
 
 const DomStateContext = React.createContext<DomState>({
-  loaded: false,
   saving: false,
+  unsavedChanges: 0,
   loading: false,
   error: null,
-  dom: studioDom.createDom(),
+  dom: null,
 });
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
@@ -235,6 +258,9 @@ export function useDomState(): DomState {
 
 export function useDom(): studioDom.StudioDom {
   const { dom } = useDomState();
+  if (!dom) {
+    throw new Error("Trying to access the DOM before it's loaded");
+  }
   return dom;
 }
 
@@ -247,12 +273,12 @@ export interface DomContextProps {
 }
 
 export default function DomProvider({ children }: DomContextProps) {
-  const [state, dispatch] = React.useReducer(domReducer, {
+  const [state, dispatch] = React.useReducer(domStateReducer, {
     loading: false,
     saving: false,
-    loaded: false,
+    unsavedChanges: 0,
     error: null,
-    dom: studioDom.createDom(),
+    dom: null,
   });
   const api = React.useMemo(() => createDomApi(dispatch), []);
 
@@ -278,26 +304,22 @@ export default function DomProvider({ children }: DomContextProps) {
     };
   }, []);
 
-  const debouncedDom = useDebounced(state.dom, 3000);
+  const debouncedDom = useDebounced(state.dom, 1000);
   React.useEffect(() => {
-    dispatch({ type: 'DOM_LOADING' });
+    if (!debouncedDom) {
+      return;
+    }
+
+    dispatch({ type: 'DOM_SAVING' });
 
     client.mutation
       .saveApp(debouncedDom)
-      .then((dom) => {
-        if (!canceled) {
-          dispatch({ type: 'DOM_LOADED', dom });
-        }
+      .then(() => {
+        dispatch({ type: 'DOM_SAVED' });
       })
       .catch((err) => {
-        if (!canceled) {
-          dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
-        }
+        dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
       });
-
-    return () => {
-      canceled = true;
-    };
   }, [debouncedDom]);
 
   return (

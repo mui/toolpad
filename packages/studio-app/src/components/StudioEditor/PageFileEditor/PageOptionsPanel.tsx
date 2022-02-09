@@ -5,7 +5,7 @@ import PageIcon from '@mui/icons-material/Web';
 import SourceIcon from '@mui/icons-material/Source';
 import renderPageCode from '../../../renderPageCode';
 import useLatest from '../../../utils/useLatest';
-import { useDom } from '../../DomProvider';
+import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import DerivedStateEditor from './DerivedStateEditor';
 import QueryStateEditor from './QueryStateEditor';

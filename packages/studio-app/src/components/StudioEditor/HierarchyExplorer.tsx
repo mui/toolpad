@@ -24,7 +24,7 @@ import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
-import { useDom, useDomApi } from '../DomProvider';
+import { useDom, useDomApi } from '../DomLoader';
 import client from '../../api';
 
 const HierarchyExplorerRoot = styled('div')({

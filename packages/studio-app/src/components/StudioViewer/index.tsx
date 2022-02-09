@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@mui/system';
 import PageView from '../PageView';
 import { NodeId } from '../../types';
-import DomProvider, { useDomState } from '../DomProvider';
+import DomProvider, { useDomLoader } from '../DomLoader';
 
 const ViewerRoot = styled(PageView)({
   display: 'block',
@@ -14,8 +14,8 @@ export interface ViewerProps {
 }
 
 function ViewerContent({ pageNodeId }: ViewerProps) {
-  const domState = useDomState();
-  return domState.loaded ? <ViewerRoot dom={domState.dom} pageNodeId={pageNodeId} /> : null;
+  const domLoader = useDomLoader();
+  return domLoader.dom ? <ViewerRoot dom={domLoader.dom} pageNodeId={pageNodeId} /> : null;
 }
 
 export default function StudioViewer({ pageNodeId }: ViewerProps) {

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-core';
 import studioPropControls from '../../propertyControls';
 import * as studioDom from '../../../studioDom';
-import { useDomApi } from '../../DomProvider';
+import { useDomApi } from '../../DomLoader';
 import { BindingEditor } from './BindingEditor';
 import { NodeId, StudioBindable } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';

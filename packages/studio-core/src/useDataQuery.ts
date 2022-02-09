@@ -24,7 +24,7 @@ export default function useDataQuery(queryId: string): UseDataQuery {
 
   const { fields = {}, data: apiData } = data;
 
-  const rows = Array.isArray(data) ? data : [];
+  const rows = Array.isArray(data.data) ? data.data : [];
 
   const columns = React.useMemo(
     () =>

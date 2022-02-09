@@ -46,3 +46,23 @@ TO DO:
   - fix data binding to APIs (query StudioNode)
   - make connections UI similar to APIs UI (create connection then edit UI)
 - ...
+
+```ts
+import { format } = 'https://esm.sh/date-fns'
+
+format(new Date(2014, 1, 11), 'yyyy-MM-dd')
+```
+
+```ts
+import YouTube from 'https://esm.sh/react-youtube';
+
+return (
+  <YouTube
+    videoId="2g811Eo7K8U"
+    opts={{
+      height: '390',
+      width: '640',
+    }}
+  />
+);
+```

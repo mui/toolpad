@@ -16,7 +16,7 @@ import { ArgTypeDefinition, useFetchedState } from '@mui/studio-core';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import useLatest from '../../../utils/useLatest';
-import { useDom, useDomApi } from '../../DomProvider';
+import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import * as studioDom from '../../../studioDom';
 import { NodeId, StudioBindable } from '../../../types';

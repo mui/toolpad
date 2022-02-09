@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import React from 'react';
 import useLatest from '../../../utils/useLatest';
-import { useDom, useDomApi } from '../../DomProvider';
+import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import * as studioDom from '../../../studioDom';
 import { NodeId } from '../../../types';

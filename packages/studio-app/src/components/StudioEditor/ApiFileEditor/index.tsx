@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { Box, Button, Stack, TextField, Toolbar } from '@mui/material';
+import { Box, Button, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { StudioConnection, StudioDataSourceClient, NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
@@ -15,26 +15,24 @@ function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<
 }
 
 interface ApiEditorProps {
-  nodeId: NodeId;
+  apiNode: studioDom.StudioApiNode;
 }
 
-function ApiEditorContent<P>({ nodeId }: ApiEditorProps) {
-  const dom = useDom();
+function ApiEditorContent<P>({ apiNode }: ApiEditorProps) {
   const domApi = useDomApi();
-  const api = studioDom.getNode(dom, nodeId, 'api');
 
-  const [name, setName] = React.useState(api.name);
-  const [apiQuery, setApiQuery] = React.useState(api.query);
+  const [name, setName] = React.useState(apiNode.name);
+  const [apiQuery, setApiQuery] = React.useState(apiNode.query);
 
-  const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
-    client.query.getConnection(api.connectionId),
+  const { data: connectionData } = useQuery(['connection', apiNode.connectionId], () =>
+    client.query.getConnection(apiNode.connectionId),
   );
 
   const datasource = connectionData && getDataSource<P>(connectionData);
 
   const previewApi: studioDom.StudioApiNode<P> = React.useMemo(() => {
-    return { ...api, query: apiQuery };
-  }, [api, apiQuery]);
+    return { ...apiNode, query: apiQuery };
+  }, [apiNode, apiQuery]);
 
   const debouncedPreviewApi = useDebounced(previewApi, 250);
 
@@ -47,17 +45,15 @@ function ApiEditorContent<P>({ nodeId }: ApiEditorProps) {
   return datasource ? (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-        Always hit the save button (top right) after clicking &quot;update&quot;. Will implement
-        automatic save later.
         <Toolbar>
           <Button
             onClick={() => {
-              domApi.setNodeName(nodeId, name);
+              domApi.setNodeName(apiNode.id, name);
               (Object.keys(apiQuery) as (keyof P)[]).forEach((propName) => {
                 if (typeof propName !== 'string' || !apiQuery[propName]) {
                   return;
                 }
-                domApi.setNodeAttribute(api, 'query', apiQuery);
+                domApi.setNodeAttribute(apiNode, 'query', apiQuery);
               });
             }}
           >
@@ -89,10 +85,16 @@ interface ApiFileEditorProps {
 }
 
 export default function ApiFileEditor({ className }: ApiFileEditorProps) {
+  const dom = useDom();
   const { nodeId } = useParams();
+  const apiNode = studioDom.getNode2(dom, nodeId as NodeId, 'api');
   return (
     <Box className={className}>
-      <ApiEditorContent key={nodeId} nodeId={nodeId as NodeId} />
+      {apiNode ? (
+        <ApiEditorContent key={nodeId} apiNode={apiNode} />
+      ) : (
+        <Typography sx={{ p: 4 }}>Non-existing Api &quot;{nodeId}&quot;</Typography>
+      )}
     </Box>
   );
 }

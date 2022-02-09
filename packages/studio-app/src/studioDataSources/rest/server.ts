@@ -35,7 +35,6 @@ async function exec(
   fetchQuery: FetchQuery,
   params: any,
 ): Promise<StudioApiResult<any>> {
-  console.log(fetchQuery);
   const boundValues = { ...params, ...fetchQuery.params };
   const resolvedUrl = resolveBindableString(fetchQuery.url, boundValues);
   const res = await fetch(resolvedUrl);

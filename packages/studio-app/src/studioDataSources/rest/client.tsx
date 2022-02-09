@@ -1,4 +1,5 @@
 import { Box, TextField } from '@mui/material';
+import { ArgTypeDefinitions } from '@mui/studio-core';
 import * as React from 'react';
 import StringRecordEditor from '../../StringRecordEditor';
 import { StudioDataSourceClient } from '../../types';
@@ -57,6 +58,11 @@ function getInitialQueryValue(): FetchQuery {
   return { url: { type: 'const', value: '' }, method: '', headers: [], params: {} };
 }
 
+function getArgTypes(query: FetchQuery): ArgTypeDefinitions {
+  console.log('argTypes', query);
+  return {};
+}
+
 const dataSource: StudioDataSourceClient<{}, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
@@ -64,6 +70,7 @@ const dataSource: StudioDataSourceClient<{}, FetchQuery> = {
   getInitialConnectionValue: () => ({}),
   QueryEditor,
   getInitialQueryValue,
+  getArgTypes,
 };
 
 export default dataSource;

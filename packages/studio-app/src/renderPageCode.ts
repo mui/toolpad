@@ -20,8 +20,8 @@ import * as bindings from './utils/bindings';
 import dataSources from './studioDataSources/client';
 
 function getApiNodeArgTypes(node: studioDom.StudioApiNode): ArgTypeDefinitions {
-  const datasource = dataSources[node.connectionType];
-  return datasource?.getArgTypes?.(node.query) || {};
+  const dataSource = dataSources[node.connectionType];
+  return dataSource?.getArgTypes?.(node.query) || {};
 }
 
 function literalPropExpression(value: any): PropExpression {
@@ -615,11 +615,8 @@ class Context implements RenderContext {
 
             const apiNode = node.api ? studioDom.getNode(this.dom, node.api, 'api') : null;
 
-            const propTypes = apiNode
-              ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode.query))
-              : {};
+            const propTypes = apiNode ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode)) : {};
 
-            console.log(propTypes);
             const resolvedProps = this.resolveBindables(node.params, propTypes);
 
             // TODO: Set up variable binding

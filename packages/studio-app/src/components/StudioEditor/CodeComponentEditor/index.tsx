@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Button, Stack, styled, Toolbar } from '@mui/material';
+import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
@@ -18,15 +18,14 @@ const ComponentSandbox = styled(StudioSandbox)({
 });
 
 interface CodeComponentEditorContentProps {
-  nodeId: NodeId;
+  codeComponentNode: studioDom.StudioCodeComponentNode;
 }
 
-function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps) {
+function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const domNode = studioDom.getNode(dom, nodeId, 'codeComponent');
 
-  const [input, setInput] = React.useState(domNode.code);
+  const [input, setInput] = React.useState(codeComponentNode.code);
 
   const updateDomActionRef = React.useRef(() => {});
 
@@ -38,13 +37,13 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
           plugins: [parserBabel],
         });
         setInput(pretty);
-        domApi.setNodeAttribute(domNode, 'code', pretty);
+        domApi.setNodeAttribute(codeComponentNode, 'code', pretty);
         // eslint-disable-next-line no-empty
       } catch (err) {
         console.error(err);
       }
     };
-  }, [domApi, domNode, input]);
+  }, [domApi, codeComponentNode, input]);
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const HandleEditorMount = React.useCallback(
@@ -99,7 +98,7 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
 
   const themePath = './lib/theme.ts';
   const entryPath = `./entry.tsx`;
-  const componentPath = `./components/${domNode.id}.tsx`;
+  const componentPath = `./components/${codeComponentNode.id}.tsx`;
 
   const renderedTheme = React.useMemo(() => {
     return renderThemeCode(dom, { editor: true });
@@ -116,7 +115,10 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
   return (
     <Stack sx={{ height: '100%' }}>
       <Toolbar>
-        <Button disabled={domNode.code === input} onClick={() => updateDomActionRef.current()}>
+        <Button
+          disabled={codeComponentNode.code === input}
+          onClick={() => updateDomActionRef.current()}
+        >
           Update
         </Button>
       </Toolbar>
@@ -133,7 +135,7 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
         </Box>
         <Box flex={1}>
           <ComponentSandbox
-            base={`/components/${domNode.id}/`}
+            base={`/components/${codeComponentNode.id}/`}
             importMap={getImportMap()}
             files={{
               [componentPath]: { code: input },
@@ -153,10 +155,16 @@ interface CodeComponentEditorProps {
 }
 
 export default function CodeComponentEditor({ className }: CodeComponentEditorProps) {
+  const dom = useDom();
   const { nodeId } = useParams();
+  const codeComponentNode = studioDom.getNode2(dom, nodeId as NodeId, 'codeComponent');
   return (
     <Box className={className}>
-      <CodeComponentEditorContent key={nodeId} nodeId={nodeId as NodeId} />
+      {codeComponentNode ? (
+        <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
+      ) : (
+        <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
+      )}
     </Box>
   );
 }

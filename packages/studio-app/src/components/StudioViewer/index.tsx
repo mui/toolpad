@@ -15,7 +15,7 @@ export interface ViewerProps {
 
 function ViewerContent({ pageNodeId }: ViewerProps) {
   const domState = useDomState();
-  return domState.loaded ? <ViewerRoot dom={domState.dom} pageNodeId={pageNodeId} /> : null;
+  return domState.dom ? <ViewerRoot dom={domState.dom} pageNodeId={pageNodeId} /> : null;
 }
 
 export default function StudioViewer({ pageNodeId }: ViewerProps) {

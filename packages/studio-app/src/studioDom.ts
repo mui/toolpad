@@ -56,6 +56,7 @@ export interface StudioThemeNode extends StudioNodeBase {
 export interface StudioApiNode<Q = any> extends StudioNodeBase {
   readonly type: 'api';
   readonly connectionId: string;
+  readonly connectionType: string;
   readonly query: Q;
 }
 

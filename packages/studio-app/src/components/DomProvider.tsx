@@ -91,7 +91,7 @@ export function domReducer(state: DomState, action: DomAction): DomState {
         dom: studioDom.setNodeNamespacedProp<any, any, any>(
           state.dom,
           action.node,
-          'props',
+          action.namespace,
           action.prop,
           action.value,
         ),

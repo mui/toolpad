@@ -51,7 +51,6 @@ interface ControlledStateHook {
 
 interface StateHook {
   type: 'derived' | 'api' | 'fetched';
-  dependencies: string[];
   nodeId: NodeId;
   nodeName: string;
   stateVar: string;
@@ -75,10 +74,9 @@ class Context implements RenderContext {
 
   private controlledStateHooks = new Map<string, ControlledStateHook>();
 
-  private stateHooks = new Map<string, StateHook>();
+  private pageStateIdentifier = 'undefined';
 
-  // Resolves a named interpolation in a binding expression into an expression available on the page
-  private interpolations = new Map<string, string>();
+  private stateHooks = new Map<string, StateHook>();
 
   constructor(
     dom: studioDom.StudioDom,
@@ -104,64 +102,15 @@ class Context implements RenderContext {
     const nodes = studioDom.getDescendants(this.dom, this.page);
     nodes.forEach((node) => {
       if (studioDom.isElement(node)) {
-        this.collectBindablePropsState(node.props);
-      } else if (studioDom.isDerivedState(node) || studioDom.isQueryState(node)) {
+        this.collectControlledStateProps(node);
+      } else if (
+        studioDom.isDerivedState(node) ||
+        studioDom.isQueryState(node) ||
+        studioDom.isFetchedState(node)
+      ) {
         this.collectStateNode(node);
-        this.collectBindablePropsState(node.params);
       }
     });
-  }
-
-  collectBindablePropsState(props: StudioBindables<any>) {
-    Object.values(props).forEach((prop) => {
-      if (prop) {
-        this.collectBindablePropState(prop);
-      }
-    });
-  }
-
-  collectBindablePropState(prop: StudioBindable<unknown>) {
-    if (prop?.type === 'boundExpression') {
-      const parsedExpr = bindings.parse(prop.value);
-      bindings
-        .getInterpolations(parsedExpr)
-        .forEach((interpolation) => this.collectInterpolation(interpolation));
-    } else if (prop?.type === 'binding') {
-      this.collectInterpolation(prop.value);
-    }
-  }
-
-  getNodeIdFromInterpolation(interpolation: string): NodeId | null {
-    const [name] = interpolation.split('.');
-    return studioDom.getNodeIdByName(this.dom, name);
-  }
-
-  collectDependentStateNodes(bindable: StudioBindable<any>): string[] {
-    switch (bindable.type) {
-      case 'const':
-        return [];
-      case 'binding': {
-        const nodeId = this.getNodeIdFromInterpolation(bindable.value);
-        return nodeId ? [nodeId] : [];
-      }
-      case 'boundExpression': {
-        const parsed = bindings.parse(bindable.value);
-        const interpolations = bindings.getInterpolations(parsed);
-        return interpolations
-          .map((interpolation) => this.getNodeIdFromInterpolation(interpolation))
-          .filter(Boolean);
-      }
-      default:
-        throw new Error(
-          `Invariant: unhandled bindable type "${(bindable as StudioBindable<unknown>).type}"`,
-        );
-    }
-  }
-
-  collectAllDependentStateNodes(bindables: StudioBindables<any>): string[] {
-    return Object.values(bindables)
-      .map((bindable) => (bindable ? this.collectDependentStateNodes(bindable) : []))
-      .flat();
   }
 
   collectStateNode(
@@ -175,10 +124,8 @@ class Context implements RenderContext {
       const stateVar = this.moduleScope.createUniqueBinding(node.name);
       const setStateVar = this.moduleScope.createUniqueBinding(camelCase('set', node.name));
       if (studioDom.isDerivedState(node)) {
-        const dependencies = this.collectAllDependentStateNodes(node.params);
         stateHook = {
           type: 'derived',
-          dependencies,
           nodeId: node.id,
           nodeName: node.name,
           stateVar,
@@ -186,10 +133,8 @@ class Context implements RenderContext {
         };
         this.stateHooks.set(node.id, stateHook);
       } else if (studioDom.isQueryState(node)) {
-        const dependencies = this.collectAllDependentStateNodes(node.params);
         stateHook = {
           type: 'api',
-          dependencies,
           nodeId: node.id,
           nodeName: node.name,
           stateVar,
@@ -197,10 +142,8 @@ class Context implements RenderContext {
         };
         this.stateHooks.set(node.id, stateHook);
       } else if (studioDom.isFetchedState(node)) {
-        const dependencies = this.collectDependentStateNodes(node.url);
         stateHook = {
           type: 'fetched',
-          dependencies,
           nodeId: node.id,
           nodeName: node.name,
           stateVar,
@@ -214,62 +157,55 @@ class Context implements RenderContext {
     return stateHook;
   }
 
-  collectInterpolation(interpolation: string) {
-    const [nodeName, ...path] = interpolation.split('.');
-    const nodeId = studioDom.getNodeIdByName(this.dom, nodeName);
+  collectControlledStateProp(
+    node: studioDom.StudioElementNode,
+    propName: string,
+  ): ControlledStateHook {
+    const nodeId = node.id;
+    const nodeName = node.name;
+    const stateId = `${nodeId}.${propName}`;
 
-    if (!nodeId) {
-      console.warn(`Can't find node with name "${nodeName}"`);
-      return;
-    }
+    let stateHook = this.controlledStateHooks.get(stateId);
+    if (!stateHook) {
+      const component = getStudioComponent(this.dom, node.component);
 
-    const node = studioDom.getNode(this.dom, nodeId);
+      const argType = component.argTypes[propName];
 
-    if (studioDom.isElement(node)) {
-      const [propName, ...subPath] = path;
-
-      const stateId = `${nodeId}.${propName}`;
-
-      let stateHook = this.controlledStateHooks.get(stateId);
-      if (!stateHook) {
-        const component = getStudioComponent(this.dom, node.component);
-
-        const argType = component.argTypes[propName];
-
-        if (!argType) {
-          throw new Error(`Can't find argType for "${node.name}.${propName}"`);
-        }
-
-        if (!argType.onChangeHandler) {
-          throw new Error(`"${node.name}.${propName}" is not a controlled property`);
-        }
-
-        const stateVarSuggestion = camelCase(nodeName, propName);
-        const stateVar = this.moduleScope.createUniqueBinding(stateVarSuggestion);
-
-        const setStateVarSuggestion = camelCase('set', nodeName, propName);
-        const setStateVar = this.moduleScope.createUniqueBinding(setStateVarSuggestion);
-
-        stateHook = {
-          nodeName,
-          propName,
-          stateVar,
-          setStateVar,
-          defaultValue: argType.defaultValue,
-        };
-        this.controlledStateHooks.set(stateId, stateHook);
+      if (!argType) {
+        throw new Error(`Can't find argType for "${node.name}.${propName}"`);
       }
 
-      const resolvedExpr = [stateHook.stateVar, ...subPath].join('.');
-      this.interpolations.set(interpolation, resolvedExpr);
-    } else if (
-      studioDom.isDerivedState(node) ||
-      studioDom.isQueryState(node) ||
-      studioDom.isFetchedState(node)
-    ) {
-      const stateHook = this.collectStateNode(node);
-      const resolvedExpr = [stateHook.stateVar, ...path].join('.');
-      this.interpolations.set(interpolation, resolvedExpr);
+      if (!argType.onChangeHandler) {
+        throw new Error(`"${node.name}.${propName}" is not a controlled property`);
+      }
+
+      const stateVarSuggestion = camelCase(nodeName, propName);
+      const stateVar = this.moduleScope.createUniqueBinding(stateVarSuggestion);
+
+      const setStateVarSuggestion = camelCase('set', nodeName, propName);
+      const setStateVar = this.moduleScope.createUniqueBinding(setStateVarSuggestion);
+
+      stateHook = {
+        nodeName,
+        propName,
+        stateVar,
+        setStateVar,
+        defaultValue: argType.defaultValue,
+      };
+      this.controlledStateHooks.set(stateId, stateHook);
+    }
+
+    return stateHook;
+  }
+
+  collectControlledStateProps(node: studioDom.StudioElementNode): void {
+    const component = getStudioComponent(this.dom, node.component);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [propName, argType] of Object.entries(component.argTypes)) {
+      if (argType?.onChangeHandler) {
+        this.collectControlledStateProp(node, propName);
+      }
     }
   }
 
@@ -289,7 +225,7 @@ class Context implements RenderContext {
       // Resolve each named variable to its resolved variable in code
       const resolvedExpr = bindings.resolve(
         parsedExpr,
-        (part) => this.interpolations.get(part) ?? 'undefined',
+        (part) => `${this.pageStateIdentifier}.${part}`,
       );
 
       const value = bindings.formatExpression(resolvedExpr, propValue.format);
@@ -303,14 +239,14 @@ class Context implements RenderContext {
     if (propValue.type === 'binding') {
       return {
         type: 'expression',
-        value: this.interpolations.get(propValue.value) ?? 'undefined',
+        value: `${this.pageStateIdentifier}.${propValue.value}`,
       };
     }
 
     if (propValue.type === 'jsExpression') {
       return {
         type: 'expression',
-        value: `((state) => ${propValue.value})(pageState)`,
+        value: `((state) => ${propValue.value})(${this.pageStateIdentifier})`,
       };
     }
 
@@ -589,90 +525,61 @@ class Context implements RenderContext {
   }
 
   renderStateHooks(): string {
-    const orderedHooks: StateHook[] = [];
-    const seenHooks = new Set<string>();
-
-    const addHook = (id: string, history: string[] = []): void => {
-      const hook = this.stateHooks.get(id);
-      if (!hook) {
-        return;
-      }
-      if (history.includes(id)) {
-        throw new Error(`Cyclic state detected`);
-      }
-      if (hook.dependencies) {
-        hook.dependencies.forEach((depId) => addHook(depId, [...history, id]));
-      }
-      if (!seenHooks.has(id)) {
-        orderedHooks.push(hook);
-        seenHooks.add(id);
-      }
-    };
-
-    // Sort hooks according to their deprendencies
-    [...this.stateHooks.keys()].forEach((nodeId) => addHook(nodeId));
-
-    return orderedHooks
-      .map((stateHook) => {
-        switch (stateHook.type) {
-          case 'derived': {
-            const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
-            const resolvedParams = this.resolveBindables(node.params, node.argTypes);
-            const paramsArg = this.renderPropsAsObject(resolvedParams);
-            const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
-              this.renderJsExpression(resolvedProp),
-            );
-            const derivedStateGetter = this.addImport(
-              `../derivedState/${node.id}.ts`,
-              'default',
-              node.name,
-            );
-            return `const ${
-              stateHook.stateVar
-            } = React.useMemo(() => ${derivedStateGetter}(${paramsArg}), [${depsArray.join(
-              ', ',
-            )}])`;
-          }
-          case 'api': {
-            const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
-            const propTypes = argTypesToPropValueTypes(getQueryNodeArgTypes(this.dom, node));
-            const resolvedProps = this.resolveBindables(node.params, propTypes);
-            const params = this.renderPropsAsObject(resolvedProps);
-
-            const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
-
-            return `${useDataQuery}(${stateHook.setStateVar}, ${JSON.stringify(
-              node.api,
-            )}, ${params});`;
-          }
-          case 'fetched': {
-            const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
-
-            const url = this.resolveBindable(node.url);
-
-            const paramsExpr = this.renderPropsAsObject({
-              url,
-              collectionPath: literalPropExpression(node.collectionPath),
-              fieldPaths: literalPropExpression(node.fieldPaths),
-            });
-
-            const useFetchedState = this.addImport(
-              '@mui/studio-core',
-              'useFetchedState',
-              'useFetchedState',
-            );
-
-            return `const ${stateHook.stateVar} = ${useFetchedState}(${paramsExpr});`;
-          }
-          default:
-            throw new Error(
-              `Invariant: Missing renderer for state hook of type "${
-                (stateHook as StateHook).type
-              }"`,
-            );
+    return Array.from(this.stateHooks.values(), (stateHook) => {
+      switch (stateHook.type) {
+        case 'derived': {
+          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
+          const resolvedParams = this.resolveBindables(node.params, node.argTypes);
+          const paramsArg = this.renderPropsAsObject(resolvedParams);
+          const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
+            this.renderJsExpression(resolvedProp),
+          );
+          const derivedStateGetter = this.addImport(
+            `../derivedState/${node.id}.ts`,
+            'default',
+            node.name,
+          );
+          return `const ${
+            stateHook.stateVar
+          } = React.useMemo(() => ${derivedStateGetter}(${paramsArg}), [${depsArray.join(', ')}])`;
         }
-      })
-      .join('\n');
+        case 'api': {
+          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
+          const propTypes = argTypesToPropValueTypes(getQueryNodeArgTypes(this.dom, node));
+          const resolvedProps = this.resolveBindables(node.params, propTypes);
+          const params = this.renderPropsAsObject(resolvedProps);
+
+          const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
+
+          return `${useDataQuery}(${stateHook.setStateVar}, ${JSON.stringify(
+            node.api,
+          )}, ${params});`;
+        }
+        case 'fetched': {
+          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
+
+          const url = this.resolveBindable(node.url);
+
+          const paramsExpr = this.renderPropsAsObject({
+            url,
+            collectionPath: literalPropExpression(node.collectionPath),
+            fieldPaths: literalPropExpression(node.fieldPaths),
+          });
+
+          const useFetchedState = this.addImport(
+            '@mui/studio-core',
+            'useFetchedState',
+            'useFetchedState',
+          );
+
+          return `const ${stateHook.stateVar} = ${useFetchedState}(${paramsExpr});`;
+        }
+        default:
+          throw new Error(
+            `Invariant: Missing renderer for state hook of type "${(stateHook as StateHook).type}"`,
+          );
+      }
+    }).join('\n');
   }
 
   renderPageState(): string {
@@ -713,13 +620,15 @@ class Context implements RenderContext {
   render() {
     this.collectAllState();
 
-    const root: string = this.renderRoot(this.page);
-
     const controlledStateHooks = this.renderControlledStateHooks();
     const dataQueryState = this.renderDataQueryState();
-    const statehooks = this.renderStateHooks();
+
+    this.pageStateIdentifier = this.moduleScope.createUniqueBinding('pageState');
     const pageState = this.renderPageState();
-    const pageStateName = this.moduleScope.createUniqueBinding('pageState');
+
+    const statehooks = this.renderStateHooks();
+
+    const root: string = this.renderRoot(this.page);
 
     this.imports.seal();
 
@@ -732,7 +641,7 @@ class Context implements RenderContext {
         ${controlledStateHooks}
         ${dataQueryState}
 
-        const ${pageStateName} = ${pageState}
+        const ${this.pageStateIdentifier} = ${pageState}
         
         ${statehooks}
 

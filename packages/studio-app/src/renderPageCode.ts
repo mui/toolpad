@@ -105,6 +105,7 @@ class Context implements RenderContext {
       if (studioDom.isElement(node)) {
         this.collectBindablePropsState(node.props);
       } else if (studioDom.isDerivedState(node) || studioDom.isQueryState(node)) {
+        this.collectStateNode(node);
         this.collectBindablePropsState(node.params);
       }
     });
@@ -162,6 +163,51 @@ class Context implements RenderContext {
       .flat();
   }
 
+  collectStateNode(
+    node:
+      | studioDom.StudioDerivedStateNode
+      | studioDom.StudioQueryStateNode
+      | studioDom.StudioFetchedStateNode,
+  ): StateHook {
+    let stateHook = this.stateHooks.get(node.id);
+    if (!stateHook) {
+      if (studioDom.isDerivedState(node)) {
+        const dependencies = this.collectAllDependentStateNodes(node.params);
+        stateHook = {
+          type: 'derived',
+          dependencies,
+          nodeId: node.id,
+          nodeName: node.name,
+          stateVar: this.moduleScope.createUniqueBinding(node.name),
+        };
+        this.stateHooks.set(node.id, stateHook);
+      } else if (studioDom.isQueryState(node)) {
+        const dependencies = this.collectAllDependentStateNodes(node.params);
+        stateHook = {
+          type: 'api',
+          dependencies,
+          nodeId: node.id,
+          nodeName: node.name,
+          stateVar: this.moduleScope.createUniqueBinding(node.name),
+        };
+        this.stateHooks.set(node.id, stateHook);
+      } else if (studioDom.isFetchedState(node)) {
+        const dependencies = this.collectDependentStateNodes(node.url);
+        stateHook = {
+          type: 'fetched',
+          dependencies,
+          nodeId: node.id,
+          nodeName: node.name,
+          stateVar: this.moduleScope.createUniqueBinding(node.name),
+        };
+        this.stateHooks.set(node.id, stateHook);
+      } else {
+        throw new Error(`Invariant: Invalid node type "${(node as studioDom.StudioNode).type}"`);
+      }
+    }
+    return stateHook;
+  }
+
   collectInterpolation(interpolation: string) {
     const [nodeName, ...path] = interpolation.split('.');
     const nodeId = studioDom.getNodeIdByName(this.dom, nodeName);
@@ -210,49 +256,12 @@ class Context implements RenderContext {
 
       const resolvedExpr = [stateHook.stateVar, ...subPath].join('.');
       this.interpolations.set(interpolation, resolvedExpr);
-    } else if (studioDom.isDerivedState(node)) {
-      let stateHook = this.stateHooks.get(node.id);
-      if (!stateHook) {
-        const dependencies = this.collectAllDependentStateNodes(node.params);
-        stateHook = {
-          type: 'derived',
-          dependencies,
-          nodeId: node.id,
-          nodeName: node.name,
-          stateVar: this.moduleScope.createUniqueBinding(node.name),
-        };
-        this.stateHooks.set(node.id, stateHook);
-      }
-      const resolvedExpr = [stateHook.stateVar, ...path].join('.');
-      this.interpolations.set(interpolation, resolvedExpr);
-    } else if (studioDom.isQueryState(node)) {
-      let stateHook = this.stateHooks.get(node.id);
-      if (!stateHook) {
-        const dependencies = this.collectAllDependentStateNodes(node.params);
-        stateHook = {
-          type: 'api',
-          dependencies,
-          nodeId: node.id,
-          nodeName: node.name,
-          stateVar: this.moduleScope.createUniqueBinding(node.name),
-        };
-        this.stateHooks.set(node.id, stateHook);
-      }
-      const resolvedExpr = [stateHook.stateVar, ...path].join('.');
-      this.interpolations.set(interpolation, resolvedExpr);
-    } else if (studioDom.isFetchedState(node)) {
-      let stateHook = this.stateHooks.get(node.id);
-      if (!stateHook) {
-        const dependencies = this.collectDependentStateNodes(node.url);
-        stateHook = {
-          type: 'fetched',
-          dependencies,
-          nodeId: node.id,
-          nodeName: node.name,
-          stateVar: this.moduleScope.createUniqueBinding(node.name),
-        };
-        this.stateHooks.set(node.id, stateHook);
-      }
+    } else if (
+      studioDom.isDerivedState(node) ||
+      studioDom.isQueryState(node) ||
+      studioDom.isFetchedState(node)
+    ) {
+      const stateHook = this.collectStateNode(node);
       const resolvedExpr = [stateHook.stateVar, ...path].join('.');
       this.interpolations.set(interpolation, resolvedExpr);
     }

@@ -55,6 +55,7 @@ interface StateHook {
   nodeId: NodeId;
   nodeName: string;
   stateVar: string;
+  setStateVar: string;
 }
 
 class Context implements RenderContext {
@@ -171,6 +172,8 @@ class Context implements RenderContext {
   ): StateHook {
     let stateHook = this.stateHooks.get(node.id);
     if (!stateHook) {
+      const stateVar = this.moduleScope.createUniqueBinding(node.name);
+      const setStateVar = this.moduleScope.createUniqueBinding(camelCase('set', node.name));
       if (studioDom.isDerivedState(node)) {
         const dependencies = this.collectAllDependentStateNodes(node.params);
         stateHook = {
@@ -178,7 +181,8 @@ class Context implements RenderContext {
           dependencies,
           nodeId: node.id,
           nodeName: node.name,
-          stateVar: this.moduleScope.createUniqueBinding(node.name),
+          stateVar,
+          setStateVar,
         };
         this.stateHooks.set(node.id, stateHook);
       } else if (studioDom.isQueryState(node)) {
@@ -188,7 +192,8 @@ class Context implements RenderContext {
           dependencies,
           nodeId: node.id,
           nodeName: node.name,
-          stateVar: this.moduleScope.createUniqueBinding(node.name),
+          stateVar,
+          setStateVar,
         };
         this.stateHooks.set(node.id, stateHook);
       } else if (studioDom.isFetchedState(node)) {
@@ -198,7 +203,8 @@ class Context implements RenderContext {
           dependencies,
           nodeId: node.id,
           nodeName: node.name,
-          stateVar: this.moduleScope.createUniqueBinding(node.name),
+          stateVar,
+          setStateVar,
         };
         this.stateHooks.set(node.id, stateHook);
       } else {
@@ -635,7 +641,7 @@ class Context implements RenderContext {
 
             const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
 
-            return `const ${stateHook.stateVar} = ${useDataQuery}(${JSON.stringify(
+            return `${useDataQuery}(${stateHook.setStateVar}, ${JSON.stringify(
               node.api,
             )}, ${params});`;
           }
@@ -669,7 +675,7 @@ class Context implements RenderContext {
       .join('\n');
   }
 
-  renderPageState() {
+  renderPageState(): string {
     const stateHookObjects = new Map<string, ResolvedProps>();
     Array.from(this.controlledStateHooks.values()).forEach((hook) => {
       let hookObject = stateHookObjects.get(hook.nodeName);
@@ -693,10 +699,24 @@ class Context implements RenderContext {
     return `{${[...renderedControlledStateProps, ...renderedStateProps].join(',')}}`;
   }
 
+  renderDataQueryState(): string {
+    return Array.from(this.stateHooks.values(), (hook) => {
+      const INITIAL_DATA_QUERY = this.addImport(
+        '@mui/studio-core',
+        'INITIAL_DATA_QUERY',
+        'INITIAL_DATA_QUERY',
+      );
+      return `const [${hook.stateVar}, ${hook.setStateVar}] = React.useState(${INITIAL_DATA_QUERY});`;
+    }).join('\n');
+  }
+
   render() {
     this.collectAllState();
+
     const root: string = this.renderRoot(this.page);
+
     const controlledStateHooks = this.renderControlledStateHooks();
+    const dataQueryState = this.renderDataQueryState();
     const statehooks = this.renderStateHooks();
     const pageState = this.renderPageState();
     const pageStateName = this.moduleScope.createUniqueBinding('pageState');
@@ -710,9 +730,11 @@ class Context implements RenderContext {
 
       export default function App () {
         ${controlledStateHooks}
-        ${statehooks}
+        ${dataQueryState}
 
         const ${pageStateName} = ${pageState}
+        
+        ${statehooks}
 
         return (
           ${root}

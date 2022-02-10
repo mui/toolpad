@@ -97,7 +97,7 @@ export { Placeholder, Slots, useStudioNode } from './runtime';
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
 export type { UseDataQuery } from './useDataQuery.js';
-export { default as useDataQuery } from './useDataQuery.js';
+export * from './useDataQuery.js';
 
 export type { UseFetchedState } from './useFetchedState.js';
 export { default as useFetchedState } from './useFetchedState.js';

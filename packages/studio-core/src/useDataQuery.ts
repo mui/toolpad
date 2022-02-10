@@ -21,31 +21,52 @@ export interface UseDataQuery {
   rows: GridRowsProp;
 }
 
-export default function useDataQuery(queryId: string, params: any): UseDataQuery {
+export const INITIAL_DATA_QUERY: UseDataQuery = {
+  loading: false,
+  error: null,
+  data: null,
+  columns: [],
+  rows: [],
+};
+
+const EMPTY_ARRAY: any[] = [];
+const EMPTY_OBJECT: any = {};
+
+export function useDataQuery(
+  setResult: React.Dispatch<React.SetStateAction<UseDataQuery>>,
+  queryId: string,
+  params: any,
+): void {
   const {
     isLoading: loading,
     error,
-    data = {},
+    data: responseData = EMPTY_OBJECT,
   } = useQuery([queryId, params], () => fetchData(queryId, params));
 
-  const { fields = {}, data: apiData } = data;
+  const { fields, data } = responseData;
 
-  const rows = Array.isArray(data.data) ? data.data : [];
+  const rows = Array.isArray(data) ? data : EMPTY_ARRAY;
 
   const columns = React.useMemo(
     () =>
-      Object.entries(fields).map(([field, def]) => ({
-        ...(def as any),
-        field,
-      })),
+      fields
+        ? Object.entries(fields).map(([field, def]) => ({
+            ...(def as any),
+            field,
+          }))
+        : [],
     [fields],
   );
 
-  return {
-    loading,
-    error,
-    data: apiData,
-    columns,
-    rows,
-  };
+  React.useEffect(
+    () =>
+      setResult({
+        loading,
+        error,
+        data,
+        columns,
+        rows,
+      }),
+    [setResult, loading, error, data, columns, rows],
+  );
 }

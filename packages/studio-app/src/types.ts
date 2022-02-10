@@ -33,6 +33,11 @@ export interface StudioBoundExpression {
   format?: StudioBindingFormat;
 }
 
+export interface StudioJsExpressionBinding {
+  type: 'jsExpression';
+  value: string;
+}
+
 export interface StudioBinding {
   type: 'binding';
   value: string;
@@ -43,7 +48,11 @@ export interface StudioConstant<V> {
   value: V;
 }
 
-export type StudioBindable<V> = StudioConstant<V> | StudioBinding | StudioBoundExpression;
+export type StudioBindable<V> =
+  | StudioConstant<V>
+  | StudioBinding
+  | StudioBoundExpression
+  | StudioJsExpressionBinding;
 
 export type StudioBindables<P> = {
   readonly [K in keyof P]?: StudioBindable<P[K]>;

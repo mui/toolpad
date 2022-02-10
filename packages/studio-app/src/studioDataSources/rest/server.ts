@@ -33,9 +33,9 @@ async function test(): Promise<ConnectionStatus> {
 async function exec(
   connection: RestConnectionParams,
   fetchQuery: FetchQuery,
-  params: any,
+  params: Record<string, string>,
 ): Promise<StudioApiResult<any>> {
-  const boundValues = { ...params, ...fetchQuery.params };
+  const boundValues = { ...fetchQuery.params, ...params };
   const resolvedUrl = resolveBindableString(fetchQuery.url, boundValues);
   const res = await fetch(resolvedUrl);
   const data = await res.json();

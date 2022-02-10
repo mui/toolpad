@@ -55,6 +55,26 @@ function BoundExpressionEditor<V>({ propType, value, onChange }: BoundExpression
   );
 }
 
+interface JsExpressionEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {}
+
+function JsExpressionEditor<V>({ value, onChange }: JsExpressionEditorProps<V>) {
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange({ type: 'jsExpression', value: event.target.value });
+    },
+    [onChange],
+  );
+
+  return (
+    <TextField
+      fullWidth
+      size="small"
+      value={value?.type === 'jsExpression' ? value.value : ''}
+      onChange={handleChange}
+    />
+  );
+}
+
 function getBindablePropsInScope(
   dom: studioDom.StudioDom,
   nodeId: NodeId,
@@ -210,6 +230,7 @@ export function BindingEditor<V>({
               <TabList onChange={(event, newValue) => setBindingType(newValue)}>
                 <Tab label="Binding" value="binding" />
                 <Tab label="Expression" value="boundExpression" />
+                <Tab label="Javascript" value="jsExpression" />
               </TabList>
             </Box>
             <TabPanel value="binding">
@@ -224,6 +245,12 @@ export function BindingEditor<V>({
             <TabPanel value="boundExpression">
               <BoundExpressionEditor<V>
                 propType={propType}
+                value={inputValue}
+                onChange={(newValue) => setInput(newValue)}
+              />
+            </TabPanel>
+            <TabPanel value="jsExpression">
+              <JsExpressionEditor<V>
                 value={inputValue}
                 onChange={(newValue) => setInput(newValue)}
               />

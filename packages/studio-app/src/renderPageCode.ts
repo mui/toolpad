@@ -42,6 +42,8 @@ export interface RenderPageConfig {
 }
 
 interface ControlledStateHook {
+  nodeName: string;
+  propName: string;
   stateVar: string;
   setStateVar: string;
   defaultValue?: unknown;
@@ -51,6 +53,7 @@ interface StateHook {
   type: 'derived' | 'api' | 'fetched';
   dependencies: string[];
   nodeId: NodeId;
+  nodeName: string;
   stateVar: string;
 }
 
@@ -72,8 +75,6 @@ class Context implements RenderContext {
   private controlledStateHooks = new Map<string, ControlledStateHook>();
 
   private stateHooks = new Map<string, StateHook>();
-
-  private useFetchedStateHooks = new Map<string, string>();
 
   // Resolves a named interpolation in a binding expression into an expression available on the page
   private interpolations = new Map<string, string>();
@@ -173,31 +174,33 @@ class Context implements RenderContext {
     const node = studioDom.getNode(this.dom, nodeId);
 
     if (studioDom.isElement(node)) {
-      const [prop, ...subPath] = path;
+      const [propName, ...subPath] = path;
 
-      const stateId = `${nodeId}.${prop}`;
+      const stateId = `${nodeId}.${propName}`;
 
       let stateHook = this.controlledStateHooks.get(stateId);
       if (!stateHook) {
         const component = getStudioComponent(this.dom, node.component);
 
-        const argType = component.argTypes[prop];
+        const argType = component.argTypes[propName];
 
         if (!argType) {
-          throw new Error(`Can't find argType for "${node.name}.${prop}"`);
+          throw new Error(`Can't find argType for "${node.name}.${propName}"`);
         }
 
         if (!argType.onChangeHandler) {
-          throw new Error(`"${node.name}.${prop}" is not a controlled property`);
+          throw new Error(`"${node.name}.${propName}" is not a controlled property`);
         }
 
-        const stateVarSuggestion = camelCase(nodeName, prop);
+        const stateVarSuggestion = camelCase(nodeName, propName);
         const stateVar = this.moduleScope.createUniqueBinding(stateVarSuggestion);
 
-        const setStateVarSuggestion = camelCase('set', nodeName, prop);
+        const setStateVarSuggestion = camelCase('set', nodeName, propName);
         const setStateVar = this.moduleScope.createUniqueBinding(setStateVarSuggestion);
 
         stateHook = {
+          nodeName,
+          propName,
           stateVar,
           setStateVar,
           defaultValue: argType.defaultValue,
@@ -215,6 +218,7 @@ class Context implements RenderContext {
           type: 'derived',
           dependencies,
           nodeId: node.id,
+          nodeName: node.name,
           stateVar: this.moduleScope.createUniqueBinding(node.name),
         };
         this.stateHooks.set(node.id, stateHook);
@@ -229,6 +233,7 @@ class Context implements RenderContext {
           type: 'api',
           dependencies,
           nodeId: node.id,
+          nodeName: node.name,
           stateVar: this.moduleScope.createUniqueBinding(node.name),
         };
         this.stateHooks.set(node.id, stateHook);
@@ -243,6 +248,7 @@ class Context implements RenderContext {
           type: 'fetched',
           dependencies,
           nodeId: node.id,
+          nodeName: node.name,
           stateVar: this.moduleScope.createUniqueBinding(node.name),
         };
         this.stateHooks.set(node.id, stateHook);
@@ -283,6 +289,13 @@ class Context implements RenderContext {
       return {
         type: 'expression',
         value: this.interpolations.get(propValue.value) ?? 'undefined',
+      };
+    }
+
+    if (propValue.type === 'jsExpression') {
+      return {
+        type: 'expression',
+        value: `((state) => ${propValue.value})(pageState)`,
       };
     }
 
@@ -647,36 +660,37 @@ class Context implements RenderContext {
       .join('\n');
   }
 
-  renderFetchedStateHooks(): string {
-    return Array.from(this.useFetchedStateHooks.entries(), ([nodeId, stateVar]) => {
-      if (stateVar) {
-        const node = studioDom.getNode(this.dom, nodeId as NodeId, 'fetchedState');
-
-        const url = this.resolveBindable(node.url);
-
-        const paramsExpr = this.renderPropsAsObject({
-          url,
-          collectionPath: literalPropExpression(node.collectionPath),
-          fieldPaths: literalPropExpression(node.fieldPaths),
-        });
-
-        const useFetchedState = this.addImport(
-          '@mui/studio-core',
-          'useFetchedState',
-          'useFetchedState',
-        );
-
-        return `const ${stateVar} = ${useFetchedState}(${paramsExpr});`;
+  renderPageState() {
+    const stateHookObjects = new Map<string, ResolvedProps>();
+    Array.from(this.controlledStateHooks.values()).forEach((hook) => {
+      let hookObject = stateHookObjects.get(hook.nodeName);
+      if (!hookObject) {
+        hookObject = {};
+        stateHookObjects.set(hook.nodeName, hookObject);
       }
-      return '';
-    }).join('\n');
+      hookObject[hook.propName] = { type: 'expression', value: hook.stateVar };
+    });
+
+    const renderedControlledStateProps = Array.from(
+      stateHookObjects.entries(),
+      ([name, properties]) => `${name}: ${this.renderPropsAsObject(properties)}`,
+    );
+
+    const renderedStateProps = Array.from(
+      this.stateHooks.values(),
+      (hook) => `${hook.nodeName}: ${hook.stateVar}`,
+    );
+
+    return `{${[...renderedControlledStateProps, ...renderedStateProps].join(',')}}`;
   }
 
   render() {
     this.collectAllState();
     const root: string = this.renderRoot(this.page);
-    const controlledState = this.renderControlledStateHooks();
-    const state = this.renderStateHooks();
+    const controlledStateHooks = this.renderControlledStateHooks();
+    const statehooks = this.renderStateHooks();
+    const pageState = this.renderPageState();
+    const pageStateName = this.moduleScope.createUniqueBinding('pageState');
 
     this.imports.seal();
 
@@ -686,8 +700,10 @@ class Context implements RenderContext {
       ${imports}
 
       export default function App () {
-        ${controlledState}
-        ${state}
+        ${controlledStateHooks}
+        ${statehooks}
+
+        const ${pageStateName} = ${pageState}
 
         return (
           ${root}

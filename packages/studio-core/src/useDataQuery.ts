@@ -2,8 +2,10 @@ import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery } from 'react-query';
 
-async function fetchData(queryId: string) {
-  const url = `/api/data/${queryId}`;
+async function fetchData(queryId: string, params: any) {
+  const url = `/api/data/${encodeURIComponent(queryId)}?params=${encodeURIComponent(
+    JSON.stringify(params),
+  )}`;
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} while fetching "${url}"`);
@@ -19,8 +21,12 @@ export interface UseDataQuery {
   rows: GridRowsProp;
 }
 
-export default function useDataQuery(queryId: string): UseDataQuery {
-  const { isLoading: loading, error, data = {} } = useQuery(queryId, () => fetchData(queryId));
+export default function useDataQuery(queryId: string, params: any): UseDataQuery {
+  const {
+    isLoading: loading,
+    error,
+    data = {},
+  } = useQuery([queryId, params], () => fetchData(queryId, params));
 
   const { fields = {}, data: apiData } = data;
 

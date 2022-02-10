@@ -14,12 +14,47 @@ import {
   DialogActions,
 } from '@mui/material';
 import React from 'react';
+import { ArgTypeDefinitions } from '@mui/studio-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import * as studioDom from '../../../studioDom';
-import { NodeId } from '../../../types';
-import { WithControlledProp } from '../../../utils/types';
+import { NodeId, StudioBindable, StudioBindables } from '../../../types';
+import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
+import { getQueryNodeArgTypes } from '../../../studioDataSources/client';
+import { BindableEditor } from './ComponentPropEditor';
+
+interface ParamsEditorProps<Q> extends WithControlledProp<StudioBindables<Q>> {
+  nodeId: NodeId;
+  argTypes: ArgTypeDefinitions<Q>;
+}
+
+function ParamsEditor<Q>({ value, onChange, nodeId, argTypes }: ParamsEditorProps<Q>) {
+  const handleChange = React.useCallback(
+    (propName: keyof Q & string) => (newValue: StudioBindable<Q[typeof propName]> | null) => {
+      onChange({ ...value, [propName]: newValue });
+    },
+    [onChange, value],
+  );
+  return (
+    <div>
+      {(Object.entries(argTypes) as ExactEntriesOf<ArgTypeDefinitions<Q>>).map(
+        ([propName, propTypeDef]) =>
+          propTypeDef ? (
+            <div key={propName}>
+              <BindableEditor
+                propName={propName}
+                nodeId={nodeId}
+                argType={propTypeDef}
+                value={value[propName] || null}
+                onChange={handleChange(propName)}
+              />
+            </div>
+          ) : null,
+      )}
+    </div>
+  );
+}
 
 interface QueryStateNodeEditorProps<P>
   extends WithControlledProp<studioDom.StudioQueryStateNode<P>> {}
@@ -36,24 +71,41 @@ function QueryStateNodeEditor<P>({ value, onChange }: QueryStateNodeEditorProps<
     [onChange, value],
   );
 
+  const handleParamsChange = React.useCallback(
+    (newParams: StudioBindables<P>) => {
+      onChange({ ...value, params: newParams });
+    },
+    [onChange, value],
+  );
+
+  const argTypes = getQueryNodeArgTypes(dom, value);
+
   return (
-    <FormControl fullWidth size="small">
-      <InputLabel id={`select-data-query`}>Query</InputLabel>
-      <Select
-        value={value.api || ''}
-        labelId="select-data-query"
-        label="Query"
-        onChange={handleSelectionChange}
-        size="small"
-      >
-        <MenuItem value="">---</MenuItem>
-        {apis.map(({ id, name }) => (
-          <MenuItem key={id} value={id}>
-            {name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <React.Fragment>
+      <FormControl fullWidth size="small">
+        <InputLabel id={`select-data-query`}>Query</InputLabel>
+        <Select
+          value={value.api || ''}
+          labelId="select-data-query"
+          label="Query"
+          onChange={handleSelectionChange}
+          size="small"
+        >
+          <MenuItem value="">---</MenuItem>
+          {apis.map(({ id, name }) => (
+            <MenuItem key={id} value={id}>
+              {name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <ParamsEditor
+        nodeId={value.id}
+        value={value.params}
+        argTypes={argTypes}
+        onChange={handleParamsChange}
+      />
+    </React.Fragment>
   );
 }
 

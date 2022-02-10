@@ -7,8 +7,9 @@ export default {
     const FormControl = ctx.addImport('@mui/material', 'FormControl', 'FormControl');
     const InputLabel = ctx.addImport('@mui/material', 'InputLabel', 'InputLabel');
     const Select = ctx.addImport('@mui/material', 'Select', 'Select');
+    const MenuItem = ctx.addImport('@mui/material', 'MenuItem', 'MenuItem');
 
-    const { label, value, options, ...props } = resolvedProps;
+    const { label, options, ...props } = resolvedProps;
 
     // TODO: generate a unique id based on node name
     const labelId = 'my-select';
@@ -17,15 +18,14 @@ export default {
       <${FormControl} size="small">
         <${InputLabel} id="${labelId}">${ctx.renderJsxContent(label)}</${InputLabel}>
         <${Select} 
-          value={${ctx.renderJsExpression(value)} || ''} 
           labelId="${labelId}" 
           label={${ctx.renderJsExpression(label)}} 
           ${ctx.renderProps(props)}
         >
           {${ctx.renderJsExpression(options)}?.split(',').map((option) => (
-            <MenuItem key={option} value={option}>
+            <${MenuItem} key={option} value={option}>
               {option}
-            </MenuItem>
+            </${MenuItem}>
           )) ?? null}
         </${Select}>
       </${FormControl}>
@@ -47,6 +47,8 @@ export default {
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
+      defaultValue: '',
+      defaultValueProp: 'defaultValue',
       onChangeHandler: {
         params: ['event'],
         valueGetter: 'event.target.value',

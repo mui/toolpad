@@ -32,7 +32,7 @@ function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorPro
     <ComponentPropsEditorRoot>
       {(Object.entries(definition.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
         ([propName, propTypeDef]) =>
-          typeof propName === 'string' && propTypeDef ? (
+          propTypeDef ? (
             <div key={propName} className={classes.control}>
               <ComponentPropEditor
                 name={propName}

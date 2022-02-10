@@ -59,8 +59,15 @@ function getInitialQueryValue(): FetchQuery {
 }
 
 function getArgTypes(query: FetchQuery): ArgTypeDefinitions {
-  console.log('argTypes', query);
-  return {};
+  return Object.fromEntries(
+    Object.entries(query.params).map(([propName, defaultValue]) => [
+      propName,
+      {
+        typeDef: { type: 'string' },
+        defaultValue,
+      },
+    ]),
+  );
 }
 
 const dataSource: StudioDataSourceClient<{}, FetchQuery> = {

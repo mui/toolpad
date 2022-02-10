@@ -17,12 +17,7 @@ import {
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
-import dataSources from './studioDataSources/client';
-
-function getApiNodeArgTypes(node: studioDom.StudioApiNode): ArgTypeDefinitions {
-  const dataSource = dataSources[node.connectionType];
-  return dataSource?.getArgTypes?.(node.query) || {};
-}
+import { getQueryNodeArgTypes } from './studioDataSources/client';
 
 function literalPropExpression(value: any): PropExpression {
   return {
@@ -612,25 +607,15 @@ class Context implements RenderContext {
           }
           case 'api': {
             const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
-
-            const apiNode = node.api ? studioDom.getNode(this.dom, node.api, 'api') : null;
-
-            const propTypes = apiNode ? argTypesToPropValueTypes(getApiNodeArgTypes(apiNode)) : {};
-
+            const propTypes = argTypesToPropValueTypes(getQueryNodeArgTypes(this.dom, node));
             const resolvedProps = this.resolveBindables(node.params, propTypes);
-
-            // TODO: Set up variable binding
-            // @ts-expect-error
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const params = this.renderPropsAsObject(resolvedProps);
-            // @ts-expect-error
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const depsArray = Object.values(resolvedProps).map((resolvedProp) =>
-              this.renderJsExpression(resolvedProp),
-            );
 
             const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
-            return `const ${stateHook.stateVar} = ${useDataQuery}(${JSON.stringify(node.api)});`;
+
+            return `const ${stateHook.stateVar} = ${useDataQuery}(${JSON.stringify(
+              node.api,
+            )}, ${params});`;
           }
           case 'fetched': {
             const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');

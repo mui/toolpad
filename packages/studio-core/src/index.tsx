@@ -79,6 +79,7 @@ export interface ArgTypeDefinition {
   control?: ArgControlSpec;
   onChangeProp?: string;
   onChangeHandler?: OnChangeHandler;
+  memoize?: boolean;
   defaultValueProp?: string;
 }
 

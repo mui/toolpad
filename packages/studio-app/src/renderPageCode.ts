@@ -1,4 +1,4 @@
-import { ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
+import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
 import * as prettier from 'prettier';
 import parserBabel from 'prettier/parser-babel';
 import Imports from './codeGen/Imports';
@@ -34,6 +34,14 @@ function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes 
   );
 }
 
+function propValueTypesToArgTypesTo(propTypes: PropValueTypes): ArgTypeDefinitions {
+  return Object.fromEntries(
+    Object.entries(propTypes).flatMap(([propName, typeDef]) =>
+      typeDef ? [[propName, { typeDef }]] : [],
+    ),
+  );
+}
+
 export interface RenderPageConfig {
   // whether we're in the context of an editor
   editor: boolean;
@@ -57,6 +65,11 @@ interface StateHook {
   setStateVar: string;
 }
 
+interface MemoizedConst {
+  varName: string;
+  value: string;
+}
+
 class Context implements RenderContext {
   private dom: studioDom.StudioDom;
 
@@ -77,6 +90,8 @@ class Context implements RenderContext {
   private pageStateIdentifier = 'undefined';
 
   private stateHooks = new Map<string, StateHook>();
+
+  private memoizedConsts: MemoizedConst[] = [];
 
   constructor(
     dom: studioDom.StudioDom,
@@ -227,11 +242,20 @@ class Context implements RenderContext {
 
   resolveBindable<P extends studioDom.BindableProps<P>>(
     propValue: StudioBindable<any>,
+    argType: ArgTypeDefinition,
   ): PropExpression {
     if (propValue.type === 'const') {
+      let value = JSON.stringify(propValue.value);
+
+      if (argType.memoize) {
+        const varName = this.moduleScope.createUniqueBinding('memo');
+        this.memoizedConsts.push({ varName, value });
+        value = varName;
+      }
+
       return {
         type: 'expression',
-        value: JSON.stringify(propValue.value),
+        value,
       };
     }
 
@@ -276,13 +300,13 @@ class Context implements RenderContext {
   /**
    * Resolves StudioBindables to expressions we can render in the code.
    */
-  resolveBindables(bindables: StudioBindables<any>, propTypes: PropValueTypes): ResolvedProps {
+  resolveBindables(bindables: StudioBindables<any>, argTypes: ArgTypeDefinitions): ResolvedProps {
     const result: ResolvedProps = {};
 
     Object.entries(bindables).forEach(([propName, propValue]) => {
-      const propType = propTypes[propName as string];
-      if (propValue && propType) {
-        const resolved = this.resolveBindable(propValue);
+      const argType = argTypes[propName as string];
+      if (propValue && argType) {
+        const resolved = this.resolveBindable(propValue, argType);
         if (resolved) {
           result[propName] = resolved;
         }
@@ -294,9 +318,8 @@ class Context implements RenderContext {
 
   resolveElementProps(node: studioDom.StudioElementNode): ResolvedProps {
     const component = getStudioComponent(this.dom, node.component);
-    const propTypes = argTypesToPropValueTypes(component.argTypes);
 
-    const result: ResolvedProps = this.resolveBindables(node.props, propTypes);
+    const result: ResolvedProps = this.resolveBindables(node.props, component.argTypes);
 
     // useState Hooks
     if (component) {
@@ -540,12 +563,26 @@ class Context implements RenderContext {
     }).join('\n');
   }
 
+  renderDataQueryState(): string {
+    return Array.from(this.stateHooks.values(), (hook) => {
+      const INITIAL_DATA_QUERY = this.addImport(
+        '@mui/studio-core',
+        'INITIAL_DATA_QUERY',
+        'INITIAL_DATA_QUERY',
+      );
+      return `const [${hook.stateVar}, ${hook.setStateVar}] = React.useState(${INITIAL_DATA_QUERY});`;
+    }).join('\n');
+  }
+
   renderStateHooks(): string {
     return Array.from(this.stateHooks.values(), (stateHook) => {
       switch (stateHook.type) {
         case 'derived': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
-          const resolvedParams = this.resolveBindables(node.params, node.argTypes);
+          const resolvedParams = this.resolveBindables(
+            node.params,
+            propValueTypesToArgTypesTo(node.argTypes),
+          );
           const paramsArg = this.renderPropsAsObject(resolvedParams);
           const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
             this.renderJsExpression(resolvedProp),
@@ -562,7 +599,10 @@ class Context implements RenderContext {
         case 'api': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
           const propTypes = argTypesToPropValueTypes(getQueryNodeArgTypes(this.dom, node));
-          const resolvedProps = this.resolveBindables(node.params, propTypes);
+          const resolvedProps = this.resolveBindables(
+            node.params,
+            propValueTypesToArgTypesTo(propTypes),
+          );
           const params = this.renderPropsAsObject(resolvedProps);
 
           const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
@@ -574,7 +614,7 @@ class Context implements RenderContext {
         case 'fetched': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
 
-          const url = this.resolveBindable(node.url);
+          const url = this.resolveBindable(node.url, { typeDef: { type: 'string' } });
 
           const paramsExpr = this.renderPropsAsObject({
             url,
@@ -622,15 +662,14 @@ class Context implements RenderContext {
     return `{${[...renderedControlledStateProps, ...renderedStateProps].join(',')}}`;
   }
 
-  renderDataQueryState(): string {
-    return Array.from(this.stateHooks.values(), (hook) => {
-      const INITIAL_DATA_QUERY = this.addImport(
-        '@mui/studio-core',
-        'INITIAL_DATA_QUERY',
-        'INITIAL_DATA_QUERY',
-      );
-      return `const [${hook.stateVar}, ${hook.setStateVar}] = React.useState(${INITIAL_DATA_QUERY});`;
-    }).join('\n');
+  renderMemoizedConsts(): string {
+    console.log(this.memoizedConsts);
+    return this.memoizedConsts
+      .map(
+        ({ varName, value }) =>
+          `const ${varName} = ${this.reactAlias}.useMemo(() => (${value}), [])`,
+      )
+      .join('\n');
   }
 
   render() {
@@ -646,6 +685,9 @@ class Context implements RenderContext {
 
     const root: string = this.renderRoot(this.page);
 
+    // TODO: Add seal for memoized consts as well? It needs to run after renderRoot.
+    const memoizedConsts = this.renderMemoizedConsts();
+
     this.imports.seal();
 
     const imports = this.imports.render();
@@ -660,6 +702,8 @@ class Context implements RenderContext {
         const ${this.pageStateIdentifier} = ${pageState}
         
         ${statehooks}
+
+        ${memoizedConsts}
 
         ${this.editor ? `${this.runtimeAlias}.useDiagnostics(${this.pageStateIdentifier});` : ''}
 

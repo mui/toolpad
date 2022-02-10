@@ -209,6 +209,22 @@ class Context implements RenderContext {
     }
   }
 
+  wrapExpression(expression: string): string {
+    return this.editor
+      ? `
+        (() => {
+          try {
+            return eval(${JSON.stringify(expression)});
+          } catch (err) {
+            // TODO: bring this error to the editor
+            console.warn(err);
+            return undefined;
+          }
+        })()
+      `
+      : expression;
+  }
+
   resolveBindable<P extends studioDom.BindableProps<P>>(
     propValue: StudioBindable<any>,
   ): PropExpression {
@@ -228,25 +244,25 @@ class Context implements RenderContext {
         (part) => `${this.pageStateIdentifier}.${part}`,
       );
 
-      const value = bindings.formatExpression(resolvedExpr, propValue.format);
+      const formatted = bindings.formatExpression(resolvedExpr, propValue.format);
 
       return {
         type: 'expression',
-        value,
+        value: this.wrapExpression(formatted),
       };
     }
 
     if (propValue.type === 'binding') {
       return {
         type: 'expression',
-        value: `${this.pageStateIdentifier}.${propValue.value}`,
+        value: this.wrapExpression(`${this.pageStateIdentifier}.${propValue.value}`),
       };
     }
 
     if (propValue.type === 'jsExpression') {
       return {
         type: 'expression',
-        value: `((state) => ${propValue.value})(${this.pageStateIdentifier})`,
+        value: `((state) => ${this.wrapExpression(propValue.value)})(${this.pageStateIdentifier})`,
       };
     }
 
@@ -644,6 +660,8 @@ class Context implements RenderContext {
         const ${this.pageStateIdentifier} = ${pageState}
         
         ${statehooks}
+
+        ${this.editor ? `${this.runtimeAlias}.useDiagnostics(${this.pageStateIdentifier});` : ''}
 
         return (
           ${root}

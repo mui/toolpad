@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as studioDom from '../../../studioDom';
-import { NodeId, SlotLocation, ViewState } from '../../../types';
+import { NodeId, SlotLocation, PageViewState } from '../../../types';
 import { update, updateOrCreate } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'catalog' | 'component' | 'theme';
@@ -13,7 +13,7 @@ export interface PageEditorState {
   readonly newNode: studioDom.StudioElementNode | null;
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
-  readonly viewState: ViewState;
+  readonly viewState: PageViewState;
 }
 
 export type PageEditorAction =
@@ -45,7 +45,7 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_VIEW_STATE_UPDATE';
-      viewState: ViewState;
+      viewState: PageViewState;
     };
 
 export function createPageEditorState(nodeId: NodeId): PageEditorState {
@@ -57,7 +57,7 @@ export function createPageEditorState(nodeId: NodeId): PageEditorState {
     newNode: null,
     highlightLayout: false,
     highlightedSlot: null,
-    viewState: {},
+    viewState: { nodesState: {}, pageState: {} },
   };
 }
 
@@ -137,7 +137,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         slot,
       });
     },
-    pageViewStateUpdate(viewState: ViewState) {
+    pageViewStateUpdate(viewState: PageViewState) {
       dispatch({
         type: 'PAGE_VIEW_STATE_UPDATE',
         viewState,

@@ -90,8 +90,13 @@ export interface NodeState {
   error?: RuntimeError;
 }
 
-export interface ViewState {
+export interface NodesViewState {
   [nodeId: NodeId]: NodeState | undefined;
+}
+
+export interface PageViewState {
+  nodesState: NodesViewState;
+  pageState: Record<string, unknown>;
 }
 
 export type StudioApiResultFields<D = any> = {

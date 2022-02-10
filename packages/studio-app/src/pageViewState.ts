@@ -5,12 +5,13 @@ import {
   RuntimeError,
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
-import { NodeId, NodeState, ViewState, FlowDirection } from './types';
+import { NodeId, NodeState, NodesViewState, FlowDirection, PageViewState } from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
 
 declare global {
   interface Window {
     __REACT_DEVTOOLS_GLOBAL_HOOK__?: Hook;
+    __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
   }
 }
 
@@ -47,7 +48,7 @@ function walkFibers(node: FiberNode, visitor: (node: FiberNode) => void) {
   }
 }
 
-export function getViewState(rootElm: HTMLElement): ViewState {
+export function getNodesViewState(rootElm: HTMLElement): NodesViewState {
   // eslint-disable-next-line no-underscore-dangle
   const devtoolsHook = rootElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
@@ -56,7 +57,7 @@ export function getViewState(rootElm: HTMLElement): ViewState {
     return {};
   }
 
-  const viewState: ViewState = {};
+  const viewState: NodesViewState = {};
 
   const rendererId = 1;
   const nodeElms = new Map<NodeId, Element>();
@@ -114,4 +115,13 @@ export function getViewState(rootElm: HTMLElement): ViewState {
   });
 
   return viewState;
+}
+
+export function getPageViewState(rootElm: HTMLElement): PageViewState {
+  const contentWindow = rootElm.ownerDocument.defaultView;
+  return {
+    nodesState: getNodesViewState(rootElm),
+    // eslint-disable-next-line no-underscore-dangle
+    pageState: contentWindow?.__STUDIO_RUNTIME_PAGE_STATE__ ?? {},
+  };
 }

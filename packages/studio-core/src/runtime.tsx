@@ -3,6 +3,12 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
 import type { SlotType } from './index';
 
+declare global {
+  interface Window {
+    __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
+  }
+}
+
 export const StudioNodeContext = React.createContext<string | null>(null);
 
 // NOTE: These props aren't used, they are only there to transfer information from the
@@ -120,6 +126,15 @@ export class RuntimeStudioNode extends React.Component<
       </StudioNodeContext.Provider>
     );
   }
+}
+
+export function useDiagnostics(pageState: Record<string, unknown>): void {
+  // Layout effect to make sure it's updated before the DOM is updated (which triggers the editor
+  // to update its view state).
+  React.useLayoutEffect(() => {
+    // eslint-disable-next-line no-underscore-dangle
+    window.__STUDIO_RUNTIME_PAGE_STATE__ = pageState;
+  }, [pageState]);
 }
 
 export interface StudioRuntimeNode<P> {

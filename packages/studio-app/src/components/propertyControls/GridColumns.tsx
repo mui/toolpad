@@ -39,7 +39,7 @@ function GridColumnsPropEditor({
   const [editColumnsDialogOpen, setEditColumnsDialogOpen] = React.useState(false);
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
 
-  const props = state.viewState?.[nodeId]?.props ?? {};
+  const props = state.viewState?.nodesState[nodeId]?.props ?? {};
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
 

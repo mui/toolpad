@@ -63,7 +63,10 @@ export function BindableEditor<V>({
     return () => {};
   }, [value, initConstValue]);
 
-  const hasBinding = value?.type === 'boundExpression' || value?.type === 'binding';
+  const hasBinding =
+    value?.type === 'boundExpression' ||
+    value?.type === 'binding' ||
+    value?.type === 'jsExpression';
 
   return (
     <Stack direction="row" alignItems="flex-start">

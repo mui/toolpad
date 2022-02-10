@@ -5,10 +5,10 @@ import { SlotType } from '@mui/studio-core';
 import {
   NodeId,
   NodeState,
-  ViewState,
   FlowDirection,
   SlotLocation,
   SlotState,
+  NodesViewState,
 } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import PageView from '../../PageView';
@@ -20,7 +20,7 @@ import {
   rectContainsPoint,
 } from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
-import { getViewState } from '../../../pageViewState';
+import { getPageViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
@@ -149,14 +149,14 @@ function insertSlotAbsolutePositionCss(slot: {
 
 function findNodeAt(
   nodes: readonly studioDom.StudioNode[],
-  viewLayout: ViewState,
+  nodesState: NodesViewState,
   x: number,
   y: number,
 ): NodeId | null {
   // Search deepest nested first
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
-    const nodeLayout = viewLayout[node.id];
+    const nodeLayout = nodesState[node.id];
     if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
       return node.id;
     }
@@ -230,7 +230,7 @@ function findActiveSlotInNode(
 
 function findActiveSlotAt(
   nodes: readonly studioDom.StudioNode[],
-  viewLayout: ViewState,
+  nodesState: NodesViewState,
   slots: ViewSlots,
   x: number,
   y: number,
@@ -240,7 +240,7 @@ function findActiveSlotAt(
   let nodeSlots: NodeSlots = {};
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
-    nodeLayout = viewLayout[node.id];
+    nodeLayout = nodesState[node.id];
     nodeSlots = slots[node.id] || {};
     if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
       // Initially only consider slots of the node we're hovering
@@ -296,7 +296,7 @@ type RenderedSlot = RenderedInsertSlot | RenderedSingleSlot;
 function calculateSlots(
   slotState: SlotState,
   children: studioDom.StudioNode[],
-  viewState: ViewState,
+  nodesState: NodesViewState,
 ): RenderedSlot[] {
   const rect = slotState.rect;
 
@@ -318,7 +318,7 @@ function calculateSlots(
 
   for (let i = 0; i < children.length; i += 1) {
     const child = children[i];
-    const childState = viewState[child.id];
+    const childState = nodesState[child.id];
 
     if (!child.parentIndex) {
       throw new Error(`Invariant: Node "${child.id}" has no parent`);
@@ -403,9 +403,9 @@ function calculateSlots(
 function calculateNodeSlots(
   parent: studioDom.StudioNode,
   children: studioDom.NodeChildren,
-  viewState: ViewState,
+  nodesState: NodesViewState,
 ): NodeSlots {
-  const parentState = viewState[parent.id];
+  const parentState = nodesState[parent.id];
 
   if (!parentState) {
     return {};
@@ -417,7 +417,7 @@ function calculateNodeSlots(
   for (const [parentProp, slotState] of Object.entries(parentState.slots)) {
     if (slotState) {
       const namedChildren = children[parentProp] ?? [];
-      result[parentProp] = calculateSlots(slotState, namedChildren, viewState);
+      result[parentProp] = calculateSlots(slotState, namedChildren, nodesState);
     }
   }
 
@@ -475,6 +475,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     highlightedSlot,
   } = usePageEditorState();
 
+  const { nodesState } = viewState;
+
   const pageNode = studioDom.getNode(dom, pageNodeId, 'page');
 
   const pageNodes = React.useMemo(() => {
@@ -505,10 +507,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const slots: ViewSlots = React.useMemo(() => {
     const result: ViewSlots = {};
     pageNodes.forEach((node) => {
-      result[node.id] = calculateNodeSlots(node, studioDom.getChildNodes(dom, node), viewState);
+      result[node.id] = calculateNodeSlots(node, studioDom.getChildNodes(dom, node), nodesState);
     });
     return result;
-  }, [pageNodes, dom, viewState]);
+  }, [pageNodes, dom, nodesState]);
 
   const availableNodes = React.useMemo(() => {
     /**
@@ -532,13 +534,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       event.dataTransfer.dropEffect = 'move';
 
-      const nodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
+      const nodeId = findNodeAt(pageNodes, nodesState, cursorPos.x, cursorPos.y);
 
       if (nodeId) {
         api.select(nodeId);
       }
     },
-    [api, pageNodes, viewState, getViewCoordinates],
+    [api, pageNodes, nodesState, getViewCoordinates],
   );
 
   const handleDragOver = React.useCallback(
@@ -551,7 +553,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const slotIndex = findActiveSlotAt(
         availableNodes,
-        viewState,
+        nodesState,
         slots,
         cursorPos.x,
         cursorPos.y,
@@ -566,7 +568,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.nodeDragOver(null);
       }
     },
-    [availableNodes, viewState, api, slots, getViewCoordinates],
+    [availableNodes, nodesState, api, slots, getViewCoordinates],
   );
 
   const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
@@ -581,7 +583,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const activeSlot = findActiveSlotAt(
         availableNodes,
-        viewState,
+        nodesState,
         slots,
         cursorPos.x,
         cursorPos.y,
@@ -611,7 +613,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.nodeDragEnd();
     },
-    [dom, availableNodes, viewState, domApi, api, slots, newNode, selection, getViewCoordinates],
+    [dom, availableNodes, nodesState, domApi, api, slots, newNode, selection, getViewCoordinates],
   );
 
   const handleDragEnd = React.useCallback(
@@ -643,10 +645,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const newSelectedNodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
+      const newSelectedNodeId = findNodeAt(pageNodes, nodesState, cursorPos.x, cursorPos.y);
       api.select(newSelectedNodeId);
     },
-    [api, pageNodes, viewState, getViewCoordinates],
+    [api, pageNodes, nodesState, getViewCoordinates],
   );
 
   const handleKeyDown = React.useCallback(
@@ -659,7 +661,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [domApi, api, selection],
   );
 
-  const selectedRect = selectedNode ? viewState[selectedNode.id]?.rect : null;
+  const selectedRect = selectedNode ? nodesState[selectedNode.id]?.rect : null;
 
   const nodesWithInteraction = React.useMemo<Set<NodeId>>(() => {
     if (!selectedNode) {
@@ -684,11 +686,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return () => {};
       }
 
-      api.pageViewStateUpdate(getViewState(rootElm));
+      api.pageViewStateUpdate(getPageViewState(rootElm));
 
       const observer = new MutationObserver(() => {
         // TODO: Do we need to throttle this?
-        api.pageViewStateUpdate(getViewState(rootElm));
+        api.pageViewStateUpdate(getPageViewState(rootElm));
       });
 
       observer.observe(rootElm, {
@@ -761,7 +763,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             );
           })}
           {pageNodes.map((node) => {
-            const nodeLayout = viewState[node.id];
+            const nodeLayout = nodesState[node.id];
             if (!nodeLayout) {
               return null;
             }

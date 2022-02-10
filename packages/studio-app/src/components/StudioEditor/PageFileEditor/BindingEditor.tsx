@@ -207,7 +207,10 @@ export function BindingEditor<V>({
     [value?.type],
   );
 
-  const hasBinding = value?.type === 'boundExpression' || value?.type === 'binding';
+  const hasBinding =
+    value?.type === 'boundExpression' ||
+    value?.type === 'binding' ||
+    value?.type === 'jsExpression';
 
   const inputValue = input?.type === bindingType ? input : null;
 

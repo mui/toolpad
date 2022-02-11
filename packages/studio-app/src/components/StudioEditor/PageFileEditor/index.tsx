@@ -8,6 +8,7 @@ import { PageEditorProvider } from './PageEditorProvider';
 import { NodeId } from '../../../types';
 import { useDom } from '../../DomLoader';
 import * as studioDom from '../../../studioDom';
+import ComponentCatalog from './ComponentCatalog';
 
 const classes = {
   componentPanel: 'StudioComponentPanel',
@@ -38,6 +39,7 @@ export default function PageFileEditor({ className }: PageFileEditorProps) {
   return pageNode ? (
     <PageEditorProvider key={nodeId} nodeId={nodeId as NodeId}>
       <PageFileEditorRoot className={className}>
+        <ComponentCatalog />
         <RenderPanel className={classes.renderPanel} />
         <ComponentPanel className={classes.componentPanel} />
       </PageFileEditorRoot>

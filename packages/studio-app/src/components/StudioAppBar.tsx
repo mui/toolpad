@@ -10,7 +10,7 @@ interface StudioAppBarProps {
 
 export default function StudioAppBar({ actions }: StudioAppBarProps) {
   return (
-    <AppBar position="static" sx={{ zIndex: 1 }}>
+    <AppBar position="static" sx={{ zIndex: 2 }}>
       <Toolbar variant="dense">
         <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
           <MenuIcon />

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { styled } from '@mui/system';
 import PageView from '../PageView';
 import { NodeId } from '../../types';

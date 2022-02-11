@@ -12,7 +12,7 @@ import {
   Tab,
   TextField,
 } from '@mui/material';
-import React from 'react';
+import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { PropValueType } from '@mui/studio-core';
@@ -23,6 +23,7 @@ import { NodeId, StudioBindable } from '../../../types';
 import { useDom } from '../../DomLoader';
 import { WithControlledProp } from '../../../utils/types';
 import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../../../schemas';
+import { JsExpressionEditor } from './JsExpressionEditor';
 
 export interface BindingEditorContentProps {
   nodeId: NodeId;
@@ -55,20 +56,16 @@ function BoundExpressionEditor<V>({ propType, value, onChange }: BoundExpression
   );
 }
 
-interface JsExpressionEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {}
+interface JsExpressionBindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {}
 
-function JsExpressionEditor<V>({ value, onChange }: JsExpressionEditorProps<V>) {
+function JsExpressionBindingEditor<V>({ value, onChange }: JsExpressionBindingEditorProps<V>) {
   const handleChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ type: 'jsExpression', value: event.target.value });
-    },
+    (newValue: string) => onChange({ type: 'jsExpression', value: newValue }),
     [onChange],
   );
 
   return (
-    <TextField
-      fullWidth
-      size="small"
+    <JsExpressionEditor
       value={value?.type === 'jsExpression' ? value.value : ''}
       onChange={handleChange}
     />
@@ -253,7 +250,7 @@ export function BindingEditor<V>({
               />
             </TabPanel>
             <TabPanel value="jsExpression">
-              <JsExpressionEditor<V>
+              <JsExpressionBindingEditor<V>
                 value={inputValue}
                 onChange={(newValue) => setInput(newValue)}
               />

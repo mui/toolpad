@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import { AppBar, Toolbar, IconButton, Typography, Button } from '@mui/material';
 import { Box } from '@mui/system';

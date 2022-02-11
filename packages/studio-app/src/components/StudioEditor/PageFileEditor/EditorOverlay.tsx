@@ -1,7 +1,7 @@
 import * as React from 'react';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
-import ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom';
 
 interface OverlayProps {
   children?: React.ReactNode;

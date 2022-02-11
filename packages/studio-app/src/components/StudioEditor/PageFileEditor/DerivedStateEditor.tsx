@@ -15,7 +15,7 @@ import {
   DialogActions,
   debounce,
 } from '@mui/material';
-import React from 'react';
+import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import { PropValueType, PropValueTypes } from '@mui/studio-core';
 import type * as monacoEditor from 'monaco-editor';

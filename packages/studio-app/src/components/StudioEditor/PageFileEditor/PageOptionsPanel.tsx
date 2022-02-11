@@ -1,5 +1,5 @@
 import { Stack, Button, Dialog, DialogTitle, DialogContent } from '@mui/material';
-import React from 'react';
+import * as React from 'react';
 import CodeIcon from '@mui/icons-material/Code';
 import PageIcon from '@mui/icons-material/Web';
 import SourceIcon from '@mui/icons-material/Source';

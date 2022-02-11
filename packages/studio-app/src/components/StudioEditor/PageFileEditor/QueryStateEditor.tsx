@@ -13,7 +13,7 @@ import {
   SelectChangeEvent,
   DialogActions,
 } from '@mui/material';
-import React from 'react';
+import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';

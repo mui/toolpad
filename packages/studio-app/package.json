@@ -41,6 +41,7 @@
     "find-up": "^6.2.0",
     "fractional-indexing": "^2.0.0",
     "import-meta-resolve": "^1.1.1",
+    "json-to-ts": "^1.7.0",
     "monaco-editor": "^0.31.1",
     "next": "^12.0.8",
     "prettier": "^2.5.1",

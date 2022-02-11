@@ -11,7 +11,7 @@ import {
   Box,
   Tab,
 } from '@mui/material';
-import React from 'react';
+import * as React from 'react';
 import { ArgTypeDefinition, useFetchedState } from '@mui/studio-core';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import { TabContext, TabList, TabPanel } from '@mui/lab';

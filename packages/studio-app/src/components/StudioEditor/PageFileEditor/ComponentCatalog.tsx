@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { Box, Collapse, styled, Typography } from '@mui/material';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useStudioComponents } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
 import { useDom } from '../../DomLoader';
@@ -58,56 +60,47 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
       onMouseLeave={handleMouseLeave}
     >
       <Box
-        sx={{
-          height: '100%',
-          position: 'fixed',
-          background: 'white',
-          borderRight: 1,
-          borderColor: 'divider',
-        }}
+        height="100%"
+        display="flex"
+        flexDirection="row"
+        position="fixed"
+        sx={{ background: 'white', borderRight: 1, borderColor: 'divider' }}
       >
-        <Collapse
-          in={open}
-          orientation="horizontal"
-          collapsedSize={WIDTH_COLLAPSED}
-          timeout={100}
-          sx={{ height: '100%' }}
-        >
-          {open ? (
-            <Box width={300} height="100%" overflow="auto">
-              <Box display="grid" gridTemplateColumns="1fr 1fr" gap={3} padding={3}>
-                {studioComponents.map((componentType) => {
-                  return (
-                    <ComponentCatalogItem
-                      key={componentType.id}
-                      draggable
-                      onDragStart={handleDragStart(componentType.id)}
-                    >
-                      {componentType.displayName}
-                    </ComponentCatalogItem>
-                  );
-                })}
-              </Box>
+        <Collapse in={open} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
+          <Box width={300} height="100%" overflow="auto">
+            <Box display="grid" gridTemplateColumns="1fr 1fr" gap={3} padding={3}>
+              {studioComponents.map((componentType) => {
+                return (
+                  <ComponentCatalogItem
+                    key={componentType.id}
+                    draggable
+                    onDragStart={handleDragStart(componentType.id)}
+                  >
+                    {componentType.displayName}
+                  </ComponentCatalogItem>
+                );
+              })}
             </Box>
-          ) : (
+          </Box>
+        </Collapse>
+        <Box display="flex" flexDirection="column" alignItems="center" width={WIDTH_COLLAPSED}>
+          <Box mt={2}>{open ? <ChevronLeftIcon /> : <ChevronRightIcon />}</Box>
+          <Box position="relative">
             <Typography
               sx={{
-                height: WIDTH_COLLAPSED,
                 position: 'absolute',
+                top: 0,
                 display: 'flex',
                 alignItems: 'center',
-                marginTop: 3,
-                top: 0,
-                left: WIDTH_COLLAPSED,
-                transform: 'rotate(90deg)',
-                transformOrigin: '0 0',
                 fontSize: 20,
+                transform: 'rotate(90deg) translate(-10px, 0)',
+                transformOrigin: '0 50%',
               }}
             >
               Components
             </Typography>
-          )}
-        </Collapse>
+          </Box>
+        </Box>
       </Box>
     </ComponentCatalogRoot>
   );

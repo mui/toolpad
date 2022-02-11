@@ -5,7 +5,15 @@ import {
   RuntimeError,
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
-import { NodeId, NodeState, NodesViewState, FlowDirection, PageViewState } from './types';
+import {
+  NodeId,
+  NodeState,
+  NodesState,
+  FlowDirection,
+  PageViewState,
+  NodesLayout,
+  NodeLayout,
+} from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
 
 declare global {
@@ -15,12 +23,12 @@ declare global {
   }
 }
 
-function getNodeViewState(
+function getNodeViewInfo(
   fiber: FiberNode,
   viewElm: Element,
   elm: Element,
   nodeId: NodeId,
-): NodeState | null {
+): { node: NodeState; layout: NodeLayout } | null {
   if (nodeId) {
     const rect = getRelativeOuterRect(viewElm, elm);
     const error = fiber.memoizedProps?.nodeError as RuntimeError | undefined;
@@ -28,11 +36,18 @@ function getNodeViewState(
     const props = fiber.child?.memoizedProps ?? {};
 
     return {
-      nodeId,
-      error,
-      rect,
-      props,
-      slots: {},
+      node: {
+        nodeId,
+        error,
+        attributes: {
+          props,
+        },
+      },
+      layout: {
+        nodeId,
+        rect,
+        slots: {},
+      },
     };
   }
   return null;
@@ -48,16 +63,20 @@ function walkFibers(node: FiberNode, visitor: (node: FiberNode) => void) {
   }
 }
 
-export function getNodesViewState(rootElm: HTMLElement): NodesViewState {
+export function getNodesViewInfo(rootElm: HTMLElement): {
+  nodes: NodesState;
+  layouts: NodesLayout;
+} {
   // eslint-disable-next-line no-underscore-dangle
   const devtoolsHook = rootElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
   if (!devtoolsHook) {
     console.warn(`Can't read page layout as react devtools are not installed`);
-    return {};
+    return { nodes: {}, layouts: {} };
   }
 
-  const viewState: NodesViewState = {};
+  const layouts: NodesLayout = {};
+  const nodes: NodesState = {};
 
   const rendererId = 1;
   const nodeElms = new Map<NodeId, Element>();
@@ -72,7 +91,7 @@ export function getNodesViewState(rootElm: HTMLElement): NodesViewState {
 
         if (studioNodeId) {
           const nodeId: NodeId = studioNodeId as NodeId;
-          if (viewState[nodeId]) {
+          if (nodes[nodeId]) {
             // We can get multiple fibers with the [RUNTIME_PROP_NODE_ID] if the component
             // spreads its props. Let's assume the first we encounter is the one wrapped by
             // the code generator and bail out on any subsequent ones.
@@ -82,9 +101,10 @@ export function getNodesViewState(rootElm: HTMLElement): NodesViewState {
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {
             nodeElms.set(nodeId, elm);
-            const nodeViewState = getNodeViewState(fiber, rootElm, elm, nodeId);
-            if (nodeViewState) {
-              viewState[nodeId] = nodeViewState;
+            const info = getNodeViewInfo(fiber, rootElm, elm, nodeId);
+            if (info) {
+              nodes[nodeId] = info.node;
+              layouts[nodeId] = info.layout;
             }
           }
         }
@@ -93,17 +113,18 @@ export function getNodesViewState(rootElm: HTMLElement): NodesViewState {
         if (studioSlotName) {
           const slotType = fiber.memoizedProps.slotType as SlotType;
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
-          const nodeViewState = viewState[parentId];
+          const nodeLayout = layouts[parentId];
 
           const firstChildElm = devtoolsHook.renderers
             .get(rendererId)
             ?.findHostInstanceByFiber(fiber);
           const childContainerElm = firstChildElm?.parentElement;
-          if (childContainerElm && nodeViewState) {
+
+          if (childContainerElm && nodeLayout) {
             const rect = getRelativeBoundingRect(rootElm, childContainerElm);
             const direction = window.getComputedStyle(childContainerElm)
               .flexDirection as FlowDirection;
-            nodeViewState.slots[studioSlotName] = {
+            nodeLayout.slots[studioSlotName] = {
               type: slotType,
               rect,
               direction,
@@ -114,13 +135,15 @@ export function getNodesViewState(rootElm: HTMLElement): NodesViewState {
     }
   });
 
-  return viewState;
+  return { layouts, nodes };
 }
 
 export function getPageViewState(rootElm: HTMLElement): PageViewState {
   const contentWindow = rootElm.ownerDocument.defaultView;
+  const { nodes, layouts } = getNodesViewInfo(rootElm);
   return {
-    nodesState: getNodesViewState(rootElm),
+    nodes,
+    layouts,
     // eslint-disable-next-line no-underscore-dangle
     pageState: contentWindow?.__STUDIO_RUNTIME_PAGE_STATE__ ?? {},
   };

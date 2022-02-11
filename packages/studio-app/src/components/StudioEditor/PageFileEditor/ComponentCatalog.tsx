@@ -77,14 +77,18 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
       onMouseLeave={handleMouseLeave}
     >
       <Box
-        height="100%"
-        display="flex"
-        flexDirection="row"
-        position="fixed"
-        sx={{ background: 'white', borderRight: 1, borderColor: 'divider' }}
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          position: 'fixed',
+          background: 'white',
+          borderRight: 1,
+          borderColor: 'divider',
+        }}
       >
         <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
-          <Box width={300} height="100%" overflow="auto">
+          <Box sx={{ width: 300, height: '100%', overflow: 'auto' }}>
             <Box display="grid" gridTemplateColumns="1fr 1fr" gap={3} padding={3}>
               {studioComponents.map((componentType) => {
                 return (
@@ -100,8 +104,15 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
             </Box>
           </Box>
         </Collapse>
-        <Box display="flex" flexDirection="column" alignItems="center" width={WIDTH_COLLAPSED}>
-          <Box mt={2}>{openStart ? <ChevronLeftIcon /> : <ChevronRightIcon />}</Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: WIDTH_COLLAPSED,
+          }}
+        >
+          <Box sx={{ mt: 2 }}>{openStart ? <ChevronLeftIcon /> : <ChevronRightIcon />}</Box>
           <Box position="relative">
             <Typography
               sx={{

@@ -80,22 +80,33 @@ export interface SlotsState {
   [prop: string]: SlotState | undefined;
 }
 
-export interface NodeState {
+export interface NodeLayout {
   nodeId: NodeId;
   rect: Rectangle;
-  props: {
-    [key: string]: unknown;
-  };
   slots: SlotsState;
-  error?: RuntimeError;
 }
 
-export interface NodesViewState {
+export interface NodesLayout {
+  [nodeId: NodeId]: NodeLayout | undefined;
+}
+
+export interface NodeState {
+  nodeId: NodeId;
+  error?: RuntimeError;
+  attributes: {
+    props: {
+      [key: string]: unknown;
+    };
+  };
+}
+
+export interface NodesState {
   [nodeId: NodeId]: NodeState | undefined;
 }
 
 export interface PageViewState {
-  nodesState: NodesViewState;
+  layouts: NodesLayout;
+  nodes: NodesState;
   pageState: Record<string, unknown>;
 }
 

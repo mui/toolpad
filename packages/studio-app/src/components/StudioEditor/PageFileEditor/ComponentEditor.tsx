@@ -70,8 +70,8 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const { viewState } = usePageEditorState();
-  const nodeError = viewState.nodesState[node.id]?.error;
-  const actualValues = viewState.nodesState[node.id]?.props ?? DEFAULT_ACTUAL_VALUES;
+  const nodeError = viewState.nodes[node.id]?.error;
+  const actualValues = viewState.nodes[node.id]?.attributes.props ?? DEFAULT_ACTUAL_VALUES;
 
   const [nameInput, setNameInput] = React.useState(node.name);
 

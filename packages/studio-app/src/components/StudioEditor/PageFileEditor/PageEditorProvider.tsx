@@ -3,7 +3,7 @@ import * as studioDom from '../../../studioDom';
 import { NodeId, SlotLocation, PageViewState } from '../../../types';
 import { update, updateOrCreate } from '../../../utils/immutability';
 
-export type ComponentPanelTab = 'catalog' | 'component' | 'theme';
+export type ComponentPanelTab = 'component' | 'theme';
 
 export interface PageEditorState {
   readonly type: 'page';
@@ -53,7 +53,7 @@ export function createPageEditorState(nodeId: NodeId): PageEditorState {
     type: 'page',
     nodeId,
     selection: null,
-    componentPanelTab: 'catalog',
+    componentPanelTab: 'component',
     newNode: null,
     highlightLayout: false,
     highlightedSlot: null,
@@ -78,8 +78,6 @@ export function pageEditorReducer(
     case 'DESELECT_NODE': {
       return update(state, {
         selection: null,
-        componentPanelTab:
-          state.componentPanelTab === 'component' ? 'catalog' : state.componentPanelTab,
       });
     }
     case 'PAGE_SET_COMPONENT_PANEL_TAB':

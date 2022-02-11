@@ -38,20 +38,37 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
   const dom = useDom();
 
-  const [open, setOpen] = React.useState(false);
+  const [openStart, setOpenStart] = React.useState(0);
+
+  const closeTimeoutRef = React.useRef<NodeJS.Timeout>();
+  const openDrawer = React.useCallback(() => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+    }
+    setOpenStart(Date.now());
+  }, []);
+
+  const closeDrawer = React.useCallback(
+    (delay?: number) => {
+      const timeOpen = Date.now() - openStart;
+      const defaultDelay = timeOpen > 750 ? 500 : 0;
+      closeTimeoutRef.current = setTimeout(() => setOpenStart(0), delay ?? defaultDelay);
+    },
+    [openStart],
+  );
 
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
     event.dataTransfer.dropEffect = 'copy';
     const newNode = studioDom.createElement(dom, componentType, {});
     api.deselect();
     api.newNodeDragStart(newNode);
-    setTimeout(() => setOpen(false), 0);
+    closeDrawer();
   };
 
   const studioComponents = useStudioComponents(dom);
 
-  const handleMouseEnter = React.useCallback(() => setOpen(true), []);
-  const handleMouseLeave = React.useCallback(() => setOpen(false), []);
+  const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
+  const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
 
   return (
     <ComponentCatalogRoot
@@ -66,7 +83,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
         position="fixed"
         sx={{ background: 'white', borderRight: 1, borderColor: 'divider' }}
       >
-        <Collapse in={open} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
+        <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
           <Box width={300} height="100%" overflow="auto">
             <Box display="grid" gridTemplateColumns="1fr 1fr" gap={3} padding={3}>
               {studioComponents.map((componentType) => {
@@ -84,7 +101,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           </Box>
         </Collapse>
         <Box display="flex" flexDirection="column" alignItems="center" width={WIDTH_COLLAPSED}>
-          <Box mt={2}>{open ? <ChevronLeftIcon /> : <ChevronRightIcon />}</Box>
+          <Box mt={2}>{openStart ? <ChevronLeftIcon /> : <ChevronRightIcon />}</Box>
           <Box position="relative">
             <Typography
               sx={{

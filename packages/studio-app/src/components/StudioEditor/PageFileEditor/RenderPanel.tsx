@@ -149,14 +149,14 @@ function insertSlotAbsolutePositionCss(slot: {
 
 function findNodeAt(
   nodes: readonly studioDom.StudioNode[],
-  nodesState: NodesLayout,
+  nodesLayout: NodesLayout,
   x: number,
   y: number,
 ): NodeId | null {
   // Search deepest nested first
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
-    const nodeLayout = nodesState[node.id];
+    const nodeLayout = nodesLayout[node.id];
     if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
       return node.id;
     }
@@ -296,7 +296,7 @@ type RenderedSlot = RenderedInsertSlot | RenderedSingleSlot;
 function calculateSlots(
   slotState: SlotState,
   children: studioDom.StudioNode[],
-  nodesState: NodesLayout,
+  nodesLayout: NodesLayout,
 ): RenderedSlot[] {
   const rect = slotState.rect;
 
@@ -318,7 +318,7 @@ function calculateSlots(
 
   for (let i = 0; i < children.length; i += 1) {
     const child = children[i];
-    const childState = nodesState[child.id];
+    const childState = nodesLayout[child.id];
 
     if (!child.parentIndex) {
       throw new Error(`Invariant: Node "${child.id}" has no parent`);
@@ -403,9 +403,9 @@ function calculateSlots(
 function calculateNodeSlots(
   parent: studioDom.StudioNode,
   children: studioDom.NodeChildren,
-  nodesState: NodesLayout,
+  nodesLayout: NodesLayout,
 ): NodeSlots {
-  const parentState = nodesState[parent.id];
+  const parentState = nodesLayout[parent.id];
 
   if (!parentState) {
     return {};
@@ -417,7 +417,7 @@ function calculateNodeSlots(
   for (const [parentProp, slotState] of Object.entries(parentState.slots)) {
     if (slotState) {
       const namedChildren = children[parentProp] ?? [];
-      result[parentProp] = calculateSlots(slotState, namedChildren, nodesState);
+      result[parentProp] = calculateSlots(slotState, namedChildren, nodesLayout);
     }
   }
 

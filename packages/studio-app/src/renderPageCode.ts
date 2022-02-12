@@ -224,23 +224,26 @@ class Context implements RenderContext {
     }
   }
 
-  wrapExpression(expression: string): string {
+  evalExpression(id: string, expression: string): string {
+    const evaluated = `((state) => (${expression}))(${this.pageStateIdentifier})`;
+
     return this.editor
       ? `
         (() => {
           try {
-            return eval(${JSON.stringify(expression)});
+            return eval(${JSON.stringify(evaluated)});
           } catch (err) {
             // TODO: bring this error to the editor
-            console.warn(err);
+            console.warn(${JSON.stringify(id)}, err);
             return undefined;
           }
         })()
       `
-      : expression;
+      : evaluated;
   }
 
   resolveBindable<P extends studioDom.BindableProps<P>>(
+    id: string,
     propValue: StudioBindable<any>,
     argType: ArgTypeDefinition,
   ): PropExpression {
@@ -263,30 +266,27 @@ class Context implements RenderContext {
       const parsedExpr = bindings.parse(propValue.value);
 
       // Resolve each named variable to its resolved variable in code
-      const resolvedExpr = bindings.resolve(
-        parsedExpr,
-        (part) => `${this.pageStateIdentifier}.${part}`,
-      );
+      const resolvedExpr = bindings.resolve(parsedExpr, (part) => `state.${part}`);
 
       const formatted = bindings.formatExpression(resolvedExpr, propValue.format);
 
       return {
         type: 'expression',
-        value: this.wrapExpression(formatted),
+        value: this.evalExpression(id, formatted),
       };
     }
 
     if (propValue.type === 'binding') {
       return {
         type: 'expression',
-        value: this.wrapExpression(`${this.pageStateIdentifier}.${propValue.value}`),
+        value: this.evalExpression(id, `state.${propValue.value}`),
       };
     }
 
     if (propValue.type === 'jsExpression') {
       return {
         type: 'expression',
-        value: `((state) => ${this.wrapExpression(propValue.value)})(${this.pageStateIdentifier})`,
+        value: this.evalExpression(id, propValue.value),
       };
     }
 
@@ -300,13 +300,17 @@ class Context implements RenderContext {
   /**
    * Resolves StudioBindables to expressions we can render in the code.
    */
-  resolveBindables(bindables: StudioBindables<any>, argTypes: ArgTypeDefinitions): ResolvedProps {
+  resolveBindables(
+    id: string,
+    bindables: StudioBindables<any>,
+    argTypes: ArgTypeDefinitions,
+  ): ResolvedProps {
     const result: ResolvedProps = {};
 
     Object.entries(bindables).forEach(([propName, propValue]) => {
       const argType = argTypes[propName as string];
       if (propValue && argType) {
-        const resolved = this.resolveBindable(propValue, argType);
+        const resolved = this.resolveBindable(`${id}.${propName}`, propValue, argType);
         if (resolved) {
           result[propName] = resolved;
         }
@@ -319,7 +323,11 @@ class Context implements RenderContext {
   resolveElementProps(node: studioDom.StudioElementNode): ResolvedProps {
     const component = getStudioComponent(this.dom, node.component);
 
-    const result: ResolvedProps = this.resolveBindables(node.props, component.argTypes);
+    const result: ResolvedProps = this.resolveBindables(
+      `${node.id}.props`,
+      node.props,
+      component.argTypes,
+    );
 
     // useState Hooks
     if (component) {
@@ -580,6 +588,7 @@ class Context implements RenderContext {
         case 'derived': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
           const resolvedParams = this.resolveBindables(
+            `${node.id}.params`,
             node.params,
             propValueTypesToArgTypesTo(node.argTypes),
           );
@@ -600,6 +609,7 @@ class Context implements RenderContext {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
           const propTypes = argTypesToPropValueTypes(getQueryNodeArgTypes(this.dom, node));
           const resolvedProps = this.resolveBindables(
+            `${node.id}.params`,
             node.params,
             propValueTypesToArgTypesTo(propTypes),
           );
@@ -614,7 +624,9 @@ class Context implements RenderContext {
         case 'fetched': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
 
-          const url = this.resolveBindable(node.url, { typeDef: { type: 'string' } });
+          const url = this.resolveBindable(`${node.id}.url`, node.url, {
+            typeDef: { type: 'string' },
+          });
 
           const paramsExpr = this.renderPropsAsObject({
             url,

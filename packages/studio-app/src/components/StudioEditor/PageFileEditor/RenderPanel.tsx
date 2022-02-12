@@ -2,6 +2,7 @@ import { styled } from '@mui/system';
 import * as React from 'react';
 import clsx from 'clsx';
 import { SlotType } from '@mui/studio-core';
+import throttle from 'lodash/throttle';
 import {
   NodeId,
   FlowDirection,
@@ -688,10 +689,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.pageViewStateUpdate(getPageViewState(rootElm));
 
-      const observer = new MutationObserver(() => {
-        // TODO: Do we need to throttle this?
-        api.pageViewStateUpdate(getPageViewState(rootElm));
-      });
+      const handlePageMutation = throttle(
+        () => api.pageViewStateUpdate(getPageViewState(rootElm)),
+        250,
+        { trailing: true },
+      );
+
+      const observer = new MutationObserver(handlePageMutation);
 
       observer.observe(rootElm, {
         attributes: true,
@@ -699,7 +703,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         subtree: true,
       });
 
-      return () => observer.disconnect();
+      return () => {
+        handlePageMutation.cancel();
+        observer.disconnect();
+      };
     }
     return () => {};
   }, [overlayKey, api]);

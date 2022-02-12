@@ -108,6 +108,7 @@ export interface PageViewState {
   layouts: NodesLayout;
   nodes: NodesState;
   pageState: Record<string, unknown>;
+  bindings: Record<string, unknown>;
 }
 
 export type StudioApiResultFields<D = any> = {

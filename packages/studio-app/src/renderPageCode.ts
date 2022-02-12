@@ -89,6 +89,8 @@ class Context implements RenderContext {
 
   private pageStateIdentifier = 'undefined';
 
+  private bindingsStateIdentifier = 'undefined';
+
   private stateHooks = new Map<string, StateHook>();
 
   private memoizedConsts: MemoizedConst[] = [];
@@ -230,12 +232,15 @@ class Context implements RenderContext {
     return this.editor
       ? `
         (() => {
+          let error, result
           try {
-            return eval(${JSON.stringify(evaluated)});
-          } catch (err) {
-            // TODO: bring this error to the editor
-            console.warn(${JSON.stringify(id)}, err);
+            result = eval(${JSON.stringify(evaluated)});
+            return result;
+          } catch (_error) {
+            error = _error;
             return undefined;
+          } finally {
+            ${this.bindingsStateIdentifier}[${JSON.stringify(id)}] = { error, result };
           }
         })()
       `
@@ -690,7 +695,8 @@ class Context implements RenderContext {
     const controlledStateHooks = this.renderControlledStateHooks();
     const dataQueryState = this.renderDataQueryState();
 
-    this.pageStateIdentifier = this.moduleScope.createUniqueBinding('pageState');
+    this.pageStateIdentifier = this.moduleScope.createUniqueBinding('_pageState');
+    this.bindingsStateIdentifier = this.moduleScope.createUniqueBinding('_bindingsState');
     const pageState = this.renderPageState();
 
     const statehooks = this.renderStateHooks();
@@ -711,13 +717,18 @@ class Context implements RenderContext {
         ${controlledStateHooks}
         ${dataQueryState}
 
-        const ${this.pageStateIdentifier} = ${pageState}
+        const ${this.pageStateIdentifier} = ${pageState};
+        const ${this.bindingsStateIdentifier} = {};
         
         ${statehooks}
 
         ${memoizedConsts}
 
-        ${this.editor ? `${this.runtimeAlias}.useDiagnostics(${this.pageStateIdentifier});` : ''}
+        ${
+          this.editor
+            ? `${this.runtimeAlias}.useDiagnostics(${this.pageStateIdentifier}, ${this.bindingsStateIdentifier});`
+            : ''
+        }
 
         return (
           ${root}

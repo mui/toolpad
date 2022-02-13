@@ -232,15 +232,15 @@ class Context implements RenderContext {
     return this.editor
       ? `
         (() => {
-          let error, result
+          let error, value
           try {
-            result = eval(${JSON.stringify(evaluated)});
-            return result;
+            value = eval(${JSON.stringify(evaluated)});
+            return value;
           } catch (_error) {
             error = _error;
             return undefined;
           } finally {
-            ${this.bindingsStateIdentifier}[${JSON.stringify(id)}] = { error, result };
+            ${this.bindingsStateIdentifier}[${JSON.stringify(id)}] = { error, value };
           }
         })()
       `

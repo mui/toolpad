@@ -103,12 +103,16 @@ export interface NodeState {
 export interface NodesState {
   [nodeId: NodeId]: NodeState | undefined;
 }
+export interface LiveBinding {
+  value?: any;
+  error?: Error;
+}
 
 export interface PageViewState {
   layouts: NodesLayout;
   nodes: NodesState;
   pageState: Record<string, unknown>;
-  bindings: Record<string, unknown>;
+  bindings: Partial<Record<string, LiveBinding>>;
 }
 
 export type StudioApiResultFields<D = any> = {

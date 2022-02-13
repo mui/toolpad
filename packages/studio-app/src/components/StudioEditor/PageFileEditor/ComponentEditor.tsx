@@ -1,6 +1,6 @@
-import { Alert, AlertTitle, styled, TextField, Typography } from '@mui/material';
+import { styled, TextField, Typography } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinitions, RuntimeError } from '@mui/studio-core';
+import { ArgTypeDefinitions } from '@mui/studio-core';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
@@ -8,6 +8,7 @@ import ComponentPropEditor from './ComponentPropEditor';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
+import RuntimeErrorAlert from './RuntimeErrorAlert';
 
 const classes = {
   control: 'StudioControl',
@@ -44,19 +45,6 @@ function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorPro
           ) : null,
       )}
     </ComponentPropsEditorRoot>
-  );
-}
-
-interface RuntimeErrorAlertProps {
-  error: RuntimeError;
-}
-
-function RuntimeErrorAlert({ error }: RuntimeErrorAlertProps) {
-  return (
-    <Alert severity="error" sx={{ overflow: 'auto' }}>
-      <AlertTitle>Error</AlertTitle>
-      <pre>{error.stack}</pre>
-    </Alert>
   );
 }
 
@@ -109,7 +97,6 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         onBlur={handleNameCommit}
         onKeyPress={handleKeyPress}
       />
-      {/* eslint-disable-next-line no-nested-ternary */}
       {nodeError ? <RuntimeErrorAlert error={nodeError} /> : null}
       {node ? (
         <React.Fragment>

@@ -24,11 +24,9 @@ import { useDom } from '../../DomLoader';
 import { WithControlledProp } from '../../../utils/types';
 import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../../../schemas';
 import { JsExpressionEditor } from './JsExpressionEditor';
-
-export interface BindingEditorContentProps {
-  nodeId: NodeId;
-  prop: string;
-}
+import { usePageEditorState } from './PageEditorProvider';
+import RuntimeErrorAlert from './RuntimeErrorAlert';
+import JsonView from '../../JsonView';
 
 interface BoundExpressionEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   propType: PropValueType;
@@ -174,12 +172,14 @@ function AddBindingEditor<V>({
 }
 
 export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+  bindingId: string;
   nodeId: NodeId;
   prop: string;
   propType: PropValueType;
 }
 
 export function BindingEditor<V>({
+  bindingId,
   nodeId,
   prop,
   propType,
@@ -188,6 +188,9 @@ export function BindingEditor<V>({
 }: BindingEditorProps<V>) {
   const dom = useDom();
   const node = studioDom.getNode(dom, nodeId);
+  const { viewState } = usePageEditorState();
+
+  const liveBinding = viewState.bindings[bindingId];
 
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
@@ -256,6 +259,14 @@ export function BindingEditor<V>({
               />
             </TabPanel>
           </TabContext>
+          {/* eslint-disable-next-line no-nested-ternary */}
+          {liveBinding ? (
+            liveBinding.error ? (
+              <RuntimeErrorAlert error={liveBinding.error} />
+            ) : (
+              <JsonView name={false} src={liveBinding?.value} />
+            )
+          ) : null}
         </DialogContent>
         <DialogActions>
           <Button disabled={!value} onClick={() => onChange(null)}>

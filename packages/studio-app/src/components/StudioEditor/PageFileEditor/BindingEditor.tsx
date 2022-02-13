@@ -264,7 +264,7 @@ export function BindingEditor<V>({
             liveBinding.error ? (
               <RuntimeErrorAlert error={liveBinding.error} />
             ) : (
-              <JsonView name={false} src={liveBinding?.value} />
+              <JsonView name={false} src={liveBinding.value} />
             )
           ) : null}
         </DialogContent>

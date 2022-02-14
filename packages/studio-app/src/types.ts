@@ -8,6 +8,7 @@ import {
 } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
+import { StudioElementNode } from './studioDom';
 
 export interface EditorProps<T> {
   nodeId: NodeId;
@@ -201,11 +202,8 @@ export interface RenderContext {
   renderJsxContent(expr?: PropExpression): string;
 }
 
-export type RenderComponent = (ctx: RenderContext, resolvedProps: ResolvedProps) => string;
-
-export interface StudioComponentDefinition {
-  id: string;
-  displayName: string;
-  argTypes: ArgTypeDefinitions;
-  render: RenderComponent;
-}
+export type RenderComponent = (
+  ctx: RenderContext,
+  node: StudioElementNode,
+  resolvedProps: ResolvedProps,
+) => string;

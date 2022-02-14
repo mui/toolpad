@@ -1,4 +1,4 @@
-import { StudioComponentDefinition } from '../types';
+import { StudioComponentDefinition } from './studioComponentDefinition';
 import importedComponentRenderer from './importedComponentRenderer';
 
 export default {

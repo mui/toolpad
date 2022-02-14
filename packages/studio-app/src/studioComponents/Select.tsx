@@ -1,9 +1,9 @@
-import { StudioComponentDefinition } from '../types';
+import { StudioComponentDefinition } from './studioComponentDefinition';
 
 export default {
   id: 'Select',
   displayName: 'Select',
-  render(ctx, resolvedProps) {
+  render(ctx, node, resolvedProps) {
     const FormControl = ctx.addImport('@mui/material', 'FormControl', 'FormControl');
     const InputLabel = ctx.addImport('@mui/material', 'InputLabel', 'InputLabel');
     const Select = ctx.addImport('@mui/material', 'Select', 'Select');

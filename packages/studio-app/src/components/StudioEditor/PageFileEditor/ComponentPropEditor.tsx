@@ -86,8 +86,6 @@ export function BindableEditor<V>({
           />
           <BindingEditor<V>
             bindingId={`${nodeId}.props.${propName}`}
-            nodeId={nodeId}
-            prop={propName}
             propType={argType.typeDef}
             value={value}
             onChange={onChange}

@@ -141,8 +141,6 @@ function StudioNodePropsEditor<P>({
               />
               <BindingEditor
                 bindingId={`${nodeId}.props.${propName}`}
-                nodeId={nodeId}
-                prop={propName}
                 propType={propType}
                 value={propValue}
                 onChange={handlePropValueChange(propName)}

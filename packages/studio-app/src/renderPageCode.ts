@@ -682,7 +682,6 @@ class Context implements RenderContext {
   }
 
   renderMemoizedConsts(): string {
-    console.log(this.memoizedConsts);
     return this.memoizedConsts
       .map(
         ({ varName, value }) =>

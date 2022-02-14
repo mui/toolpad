@@ -3,6 +3,7 @@ import {
   RUNTIME_PROP_STUDIO_SLOTS,
   SlotType,
   RuntimeError,
+  LiveBindings,
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import {
@@ -20,7 +21,7 @@ declare global {
   interface Window {
     __REACT_DEVTOOLS_GLOBAL_HOOK__?: Hook;
     __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
-    __STUDIO_RUNTIME_BINDINGS_STATE__?: Record<string, unknown>;
+    __STUDIO_RUNTIME_BINDINGS_STATE__?: LiveBindings;
   }
 }
 

@@ -1,5 +1,11 @@
 import type * as React from 'react';
-import { ArgTypeDefinition, ArgTypeDefinitions, SlotType, RuntimeError } from '@mui/studio-core';
+import {
+  ArgTypeDefinition,
+  ArgTypeDefinitions,
+  SlotType,
+  RuntimeError,
+  LiveBindings,
+} from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
@@ -103,16 +109,12 @@ export interface NodeState {
 export interface NodesState {
   [nodeId: NodeId]: NodeState | undefined;
 }
-export interface LiveBinding {
-  value?: any;
-  error?: Error;
-}
 
 export interface PageViewState {
   layouts: NodesLayout;
   nodes: NodesState;
   pageState: Record<string, unknown>;
-  bindings: Partial<Record<string, LiveBinding>>;
+  bindings: LiveBindings;
 }
 
 export type StudioApiResultFields<D = any> = {

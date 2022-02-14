@@ -5,9 +5,12 @@ import jsonToTs from 'json-to-ts';
 import { WithControlledProp } from '../../../utils/types';
 import { usePageEditorState } from './PageEditorProvider';
 
-export interface JsExpressionEditorProps extends WithControlledProp<string> {}
+export interface JsExpressionEditorProps extends WithControlledProp<string> {
+  onCommit?: () => void;
+}
 
-export function JsExpressionEditor({ value, onChange }: JsExpressionEditorProps) {
+export function JsExpressionEditor({ onCommit, value, onChange }: JsExpressionEditorProps) {
+  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const monacoRef = React.useRef<typeof monacoEditor>();
 
   const state = usePageEditorState();
@@ -41,6 +44,7 @@ export function JsExpressionEditor({ value, onChange }: JsExpressionEditorProps)
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
       monacoRef.current = monaco;
+      editorRef.current = editor;
 
       editor.updateOptions({
         minimap: { enabled: false },
@@ -65,9 +69,13 @@ export function JsExpressionEditor({ value, onChange }: JsExpressionEditorProps)
         noSyntaxValidation: false,
       });
 
+      // The types for `monaco.KeyCode` seem to be messed up
+      // eslint-disable-next-line no-bitwise
+      editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => onCommit?.());
+
       setLibSource();
     },
-    [setLibSource],
+    [setLibSource, onCommit],
   );
 
   return (

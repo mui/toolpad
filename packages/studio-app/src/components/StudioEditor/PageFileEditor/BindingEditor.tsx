@@ -55,9 +55,15 @@ function BoundExpressionEditor<V>({ propType, value, onChange }: BoundExpression
   );
 }
 
-interface JsExpressionBindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {}
+interface JsExpressionBindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+  onCommit?: () => void;
+}
 
-function JsExpressionBindingEditor<V>({ value, onChange }: JsExpressionBindingEditorProps<V>) {
+function JsExpressionBindingEditor<V>({
+  value,
+  onChange,
+  onCommit,
+}: JsExpressionBindingEditorProps<V>) {
   const handleChange = React.useCallback(
     (newValue: string) => onChange({ type: 'jsExpression', value: newValue }),
     [onChange],
@@ -67,6 +73,7 @@ function JsExpressionBindingEditor<V>({ value, onChange }: JsExpressionBindingEd
     <JsExpressionEditor
       value={value?.type === 'jsExpression' ? value.value : ''}
       onChange={handleChange}
+      onCommit={onCommit}
     />
   );
 }
@@ -264,6 +271,7 @@ export function BindingEditor<V>({
             </TabPanel>
             <TabPanel value="jsExpression">
               <JsExpressionBindingEditor<V>
+                onCommit={handleCommit}
                 value={inputValue}
                 onChange={(newValue) => setInput(newValue)}
               />

@@ -92,6 +92,13 @@ export interface ComponentDefinition<P> {
   argTypes: ArgTypeDefinitions<P>;
 }
 
+export interface LiveBinding {
+  value?: any;
+  error?: Error;
+}
+
+export type LiveBindings = Partial<Record<string, LiveBinding>>;
+
 export type { PlaceholderProps, SlotsProps, StudioRuntimeNode, RuntimeError } from './runtime';
 export { Placeholder, Slots, useStudioNode } from './runtime';
 

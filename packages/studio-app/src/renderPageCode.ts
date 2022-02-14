@@ -1,6 +1,4 @@
 import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
-import * as prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel';
 import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
@@ -18,6 +16,7 @@ import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
 import { getQueryNodeArgTypes } from './studioDataSources/client';
+import { tryFormat } from './utils/prettier';
 
 function literalPropExpression(value: any): PropExpression {
   return {
@@ -88,6 +87,8 @@ class Context implements RenderContext {
   private controlledStateHooks = new Map<string, ControlledStateHook>();
 
   private pageStateIdentifier = 'undefined';
+
+  private bindingsStateIdentifier = 'undefined';
 
   private stateHooks = new Map<string, StateHook>();
 
@@ -224,23 +225,29 @@ class Context implements RenderContext {
     }
   }
 
-  wrapExpression(expression: string): string {
+  evalExpression(id: string, expression: string): string {
+    const evaluated = `((state) => (${expression}))(${this.pageStateIdentifier})`;
+
     return this.editor
       ? `
         (() => {
+          let error, value
           try {
-            return eval(${JSON.stringify(expression)});
-          } catch (err) {
-            // TODO: bring this error to the editor
-            console.warn(err);
+            value = eval(${JSON.stringify(evaluated)});
+            return value;
+          } catch (_error) {
+            error = _error;
             return undefined;
+          } finally {
+            ${this.bindingsStateIdentifier}[${JSON.stringify(id)}] = { error, value };
           }
         })()
       `
-      : expression;
+      : evaluated;
   }
 
   resolveBindable<P extends studioDom.BindableProps<P>>(
+    id: string,
     propValue: StudioBindable<any>,
     argType: ArgTypeDefinition,
   ): PropExpression {
@@ -263,30 +270,27 @@ class Context implements RenderContext {
       const parsedExpr = bindings.parse(propValue.value);
 
       // Resolve each named variable to its resolved variable in code
-      const resolvedExpr = bindings.resolve(
-        parsedExpr,
-        (part) => `${this.pageStateIdentifier}.${part}`,
-      );
+      const resolvedExpr = bindings.resolve(parsedExpr, (part) => `state.${part}`);
 
       const formatted = bindings.formatExpression(resolvedExpr, propValue.format);
 
       return {
         type: 'expression',
-        value: this.wrapExpression(formatted),
+        value: this.evalExpression(id, formatted),
       };
     }
 
     if (propValue.type === 'binding') {
       return {
         type: 'expression',
-        value: this.wrapExpression(`${this.pageStateIdentifier}.${propValue.value}`),
+        value: this.evalExpression(id, `state.${propValue.value}`),
       };
     }
 
     if (propValue.type === 'jsExpression') {
       return {
         type: 'expression',
-        value: `((state) => ${this.wrapExpression(propValue.value)})(${this.pageStateIdentifier})`,
+        value: this.evalExpression(id, propValue.value),
       };
     }
 
@@ -300,13 +304,17 @@ class Context implements RenderContext {
   /**
    * Resolves StudioBindables to expressions we can render in the code.
    */
-  resolveBindables(bindables: StudioBindables<any>, argTypes: ArgTypeDefinitions): ResolvedProps {
+  resolveBindables(
+    id: string,
+    bindables: StudioBindables<any>,
+    argTypes: ArgTypeDefinitions,
+  ): ResolvedProps {
     const result: ResolvedProps = {};
 
     Object.entries(bindables).forEach(([propName, propValue]) => {
       const argType = argTypes[propName as string];
       if (propValue && argType) {
-        const resolved = this.resolveBindable(propValue, argType);
+        const resolved = this.resolveBindable(`${id}.${propName}`, propValue, argType);
         if (resolved) {
           result[propName] = resolved;
         }
@@ -319,7 +327,11 @@ class Context implements RenderContext {
   resolveElementProps(node: studioDom.StudioElementNode): ResolvedProps {
     const component = getStudioComponent(this.dom, node.component);
 
-    const result: ResolvedProps = this.resolveBindables(node.props, component.argTypes);
+    const result: ResolvedProps = this.resolveBindables(
+      `${node.id}.props`,
+      node.props,
+      component.argTypes,
+    );
 
     // useState Hooks
     if (component) {
@@ -580,6 +592,7 @@ class Context implements RenderContext {
         case 'derived': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
           const resolvedParams = this.resolveBindables(
+            `${node.id}.params`,
             node.params,
             propValueTypesToArgTypesTo(node.argTypes),
           );
@@ -600,6 +613,7 @@ class Context implements RenderContext {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
           const propTypes = argTypesToPropValueTypes(getQueryNodeArgTypes(this.dom, node));
           const resolvedProps = this.resolveBindables(
+            `${node.id}.params`,
             node.params,
             propValueTypesToArgTypesTo(propTypes),
           );
@@ -614,7 +628,9 @@ class Context implements RenderContext {
         case 'fetched': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
 
-          const url = this.resolveBindable(node.url, { typeDef: { type: 'string' } });
+          const url = this.resolveBindable(`${node.id}.url`, node.url, {
+            typeDef: { type: 'string' },
+          });
 
           const paramsExpr = this.renderPropsAsObject({
             url,
@@ -678,7 +694,8 @@ class Context implements RenderContext {
     const controlledStateHooks = this.renderControlledStateHooks();
     const dataQueryState = this.renderDataQueryState();
 
-    this.pageStateIdentifier = this.moduleScope.createUniqueBinding('pageState');
+    this.pageStateIdentifier = this.moduleScope.createUniqueBinding('_pageState');
+    this.bindingsStateIdentifier = this.moduleScope.createUniqueBinding('_bindingsState');
     const pageState = this.renderPageState();
 
     const statehooks = this.renderStateHooks();
@@ -699,13 +716,18 @@ class Context implements RenderContext {
         ${controlledStateHooks}
         ${dataQueryState}
 
-        const ${this.pageStateIdentifier} = ${pageState}
+        const ${this.pageStateIdentifier} = ${pageState};
+        const ${this.bindingsStateIdentifier} = {};
         
         ${statehooks}
 
         ${memoizedConsts}
 
-        ${this.editor ? `${this.runtimeAlias}.useDiagnostics(${this.pageStateIdentifier});` : ''}
+        ${
+          this.editor
+            ? `${this.runtimeAlias}.useDiagnostics(${this.pageStateIdentifier}, ${this.bindingsStateIdentifier});`
+            : ''
+        }
 
         return (
           ${root}
@@ -732,10 +754,7 @@ export default function renderPageCode(
   let code: string = ctx.render();
 
   if (config.pretty) {
-    code = prettier.format(code, {
-      parser: 'babel-ts',
-      plugins: [parserBabel],
-    });
+    code = tryFormat(code);
   }
 
   return { code };

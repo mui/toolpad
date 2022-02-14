@@ -140,6 +140,7 @@ function StudioNodePropsEditor<P>({
                 disabled={isBound}
               />
               <BindingEditor
+                bindingId={`${nodeId}.props.${propName}`}
                 nodeId={nodeId}
                 prop={propName}
                 propType={propType}

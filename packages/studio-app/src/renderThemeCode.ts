@@ -1,6 +1,5 @@
-import * as prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel';
 import * as studioDom from './studioDom';
+import { tryFormat } from './utils/prettier';
 
 export interface RenderThemeConfig {
   // whether we're in the context of an editor
@@ -60,10 +59,7 @@ export default function renderThemeCode(
   }
 
   if (config.pretty) {
-    code = prettier.format(code, {
-      parser: 'babel-ts',
-      plugins: [parserBabel],
-    });
+    code = tryFormat(code);
   }
 
   return { code };

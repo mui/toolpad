@@ -24,11 +24,10 @@ import { useDom } from '../../DomLoader';
 import { WithControlledProp } from '../../../utils/types';
 import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../../../schemas';
 import { JsExpressionEditor } from './JsExpressionEditor';
-
-export interface BindingEditorContentProps {
-  nodeId: NodeId;
-  prop: string;
-}
+import { usePageEditorState } from './PageEditorProvider';
+import RuntimeErrorAlert from './RuntimeErrorAlert';
+import JsonView from '../../JsonView';
+import { tryFormatExpression } from '../../../utils/prettier';
 
 interface BoundExpressionEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   propType: PropValueType;
@@ -56,9 +55,15 @@ function BoundExpressionEditor<V>({ propType, value, onChange }: BoundExpression
   );
 }
 
-interface JsExpressionBindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {}
+interface JsExpressionBindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+  onCommit?: () => void;
+}
 
-function JsExpressionBindingEditor<V>({ value, onChange }: JsExpressionBindingEditorProps<V>) {
+function JsExpressionBindingEditor<V>({
+  value,
+  onChange,
+  onCommit,
+}: JsExpressionBindingEditorProps<V>) {
   const handleChange = React.useCallback(
     (newValue: string) => onChange({ type: 'jsExpression', value: newValue }),
     [onChange],
@@ -68,6 +73,7 @@ function JsExpressionBindingEditor<V>({ value, onChange }: JsExpressionBindingEd
     <JsExpressionEditor
       value={value?.type === 'jsExpression' ? value.value : ''}
       onChange={handleChange}
+      onCommit={onCommit}
     />
   );
 }
@@ -173,13 +179,21 @@ function AddBindingEditor<V>({
   );
 }
 
+function getInitialBindingType(
+  type?: StudioBindable<unknown>['type'] | null,
+): 'binding' | 'boundExpression' | 'jsExpression' {
+  return type === 'boundExpression' || type === 'binding' ? type : 'jsExpression';
+}
+
 export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+  bindingId: string;
   nodeId: NodeId;
   prop: string;
   propType: PropValueType;
 }
 
 export function BindingEditor<V>({
+  bindingId,
   nodeId,
   prop,
   propType,
@@ -188,6 +202,9 @@ export function BindingEditor<V>({
 }: BindingEditorProps<V>) {
   const dom = useDom();
   const node = studioDom.getNode(dom, nodeId);
+  const { viewState } = usePageEditorState();
+
+  const liveBinding = viewState.bindings[bindingId];
 
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
@@ -196,13 +213,8 @@ export function BindingEditor<V>({
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 
-  const [bindingType, setBindingType] = React.useState<'binding' | 'boundExpression'>(
-    value?.type === 'boundExpression' ? 'boundExpression' : 'binding',
-  );
-  React.useEffect(
-    () => setBindingType(value?.type === 'boundExpression' ? 'boundExpression' : 'binding'),
-    [value?.type],
-  );
+  const [bindingType, setBindingType] = React.useState(getInitialBindingType(value?.type));
+  React.useEffect(() => setBindingType(getInitialBindingType(value?.type)), [value?.type]);
 
   const hasBinding =
     value?.type === 'boundExpression' ||
@@ -211,17 +223,25 @@ export function BindingEditor<V>({
 
   const inputValue = input?.type === bindingType ? input : null;
 
-  const handleBind = React.useCallback(() => {
-    onChange(inputValue);
-    handleClose();
-  }, [onChange, inputValue, handleClose]);
+  const handleCommit = React.useCallback(() => {
+    let newValue = inputValue;
+
+    if (inputValue?.type === 'jsExpression') {
+      newValue = {
+        ...inputValue,
+        value: tryFormatExpression(inputValue.value),
+      };
+    }
+
+    onChange(newValue);
+  }, [onChange, inputValue]);
 
   return (
     <React.Fragment>
       <IconButton size="small" onClick={handleOpen} color={hasBinding ? 'primary' : 'inherit'}>
         {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
       </IconButton>
-      <Dialog onClose={handleClose} open={open} fullWidth>
+      <Dialog onClose={handleClose} open={open} fullWidth scroll="body">
         <DialogTitle>Bind a property</DialogTitle>
         <DialogContent>
           <div>Type: {propType.type}</div>
@@ -251,18 +271,29 @@ export function BindingEditor<V>({
             </TabPanel>
             <TabPanel value="jsExpression">
               <JsExpressionBindingEditor<V>
+                onCommit={handleCommit}
                 value={inputValue}
                 onChange={(newValue) => setInput(newValue)}
               />
             </TabPanel>
           </TabContext>
+          {/* eslint-disable-next-line no-nested-ternary */}
+          {liveBinding ? (
+            liveBinding.error ? (
+              <RuntimeErrorAlert error={liveBinding.error} />
+            ) : (
+              <Box sx={{ maxHeight: 200, overflow: 'auto' }}>
+                <JsonView name={false} src={liveBinding.value} />
+              </Box>
+            )
+          ) : null}
         </DialogContent>
         <DialogActions>
           <Button disabled={!value} onClick={() => onChange(null)}>
             Remove
           </Button>
-          <Button disabled={!inputValue} color="primary" onClick={handleBind}>
-            Add binding
+          <Button disabled={!inputValue} color="primary" onClick={handleCommit}>
+            Update binding
           </Button>
         </DialogActions>
       </Dialog>

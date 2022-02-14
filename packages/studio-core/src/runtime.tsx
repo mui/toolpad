@@ -1,11 +1,12 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
-import type { SlotType } from './index';
+import type { SlotType, LiveBindings } from './index';
 
 declare global {
   interface Window {
     __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
+    __STUDIO_RUNTIME_BINDINGS_STATE__?: LiveBindings;
   }
 }
 
@@ -128,13 +129,18 @@ export class RuntimeStudioNode extends React.Component<
   }
 }
 
-export function useDiagnostics(pageState: Record<string, unknown>): void {
+export function useDiagnostics(
+  pageState: Record<string, unknown>,
+  liveBindings: LiveBindings,
+): void {
   // Layout effect to make sure it's updated before the DOM is updated (which triggers the editor
   // to update its view state).
   React.useLayoutEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
     window.__STUDIO_RUNTIME_PAGE_STATE__ = pageState;
-  }, [pageState]);
+    // eslint-disable-next-line no-underscore-dangle
+    window.__STUDIO_RUNTIME_BINDINGS_STATE__ = liveBindings;
+  }, [pageState, liveBindings]);
 }
 
 export interface StudioRuntimeNode<P> {

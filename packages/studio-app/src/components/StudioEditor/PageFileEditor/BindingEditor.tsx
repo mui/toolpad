@@ -186,6 +186,7 @@ function getInitialBindingType(
 }
 
 export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+  disabled?: boolean;
   bindingId: string;
   nodeId: NodeId;
   prop: string;
@@ -193,6 +194,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable
 }
 
 export function BindingEditor<V>({
+  disabled,
   bindingId,
   nodeId,
   prop,
@@ -238,7 +240,12 @@ export function BindingEditor<V>({
 
   return (
     <React.Fragment>
-      <IconButton size="small" onClick={handleOpen} color={hasBinding ? 'primary' : 'inherit'}>
+      <IconButton
+        disabled={disabled}
+        size="small"
+        onClick={handleOpen}
+        color={hasBinding ? 'primary' : 'inherit'}
+      >
         {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
       </IconButton>
       <Dialog onClose={handleClose} open={open} fullWidth scroll="body">

@@ -45,6 +45,10 @@ export function BindableEditor<V>({
     [onChange],
   );
 
+  // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
+  // to make them bindable to other controlled props only
+  const isBindable = !argType.onChangeHandler;
+
   const controlSpec = argType.control ?? getDefaultControl(argType.typeDef);
   const control = controlSpec ? studioPropControls[controlSpec.type] : null;
 
@@ -85,6 +89,7 @@ export function BindableEditor<V>({
             propType={argType.typeDef}
             value={value}
             onChange={onChange}
+            disabled={!isBindable}
           />
         </React.Fragment>
       ) : (

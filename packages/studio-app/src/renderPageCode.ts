@@ -179,7 +179,7 @@ class Context implements RenderContext {
   ): ControlledStateHook {
     const nodeId = node.id;
     const nodeName = node.name;
-    const stateId = `${nodeId}.${propName}`;
+    const stateId = `${nodeId}.props.${propName}`;
 
     let stateHook = this.controlledStateHooks.get(stateId);
     if (!stateHook) {
@@ -201,12 +201,15 @@ class Context implements RenderContext {
       const setStateVarSuggestion = camelCase('set', nodeName, propName);
       const setStateVar = this.moduleScope.createUniqueBinding(setStateVarSuggestion);
 
+      const propValue = node.props[propName];
+      const defaultValue = propValue?.type === 'const' ? propValue.value : argType.defaultValue;
+
       stateHook = {
         nodeName,
         propName,
         stateVar,
         setStateVar,
-        defaultValue: argType.defaultValue,
+        defaultValue,
       };
       this.controlledStateHooks.set(stateId, stateHook);
     }
@@ -340,7 +343,7 @@ class Context implements RenderContext {
           return;
         }
 
-        const stateId = `${node.id}.${propName}`;
+        const stateId = `${node.id}.props.${propName}`;
         const hook = this.controlledStateHooks.get(stateId);
 
         if (!hook) {

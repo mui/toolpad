@@ -43,11 +43,12 @@ function JsExpressionBindingEditor<V>({
 }
 
 export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+  disabled?: boolean;
   bindingId: string;
   propType: PropValueType;
 }
 
-export function BindingEditor<V>({ bindingId, propType, value, onChange }: BindingEditorProps<V>) {
+export function BindingEditor<V>({ disabled, bindingId, propType, value, onChange }: BindingEditorProps<V>) {
   const { viewState } = usePageEditorState();
 
   const liveBinding = viewState.bindings[bindingId];
@@ -76,7 +77,12 @@ export function BindingEditor<V>({ bindingId, propType, value, onChange }: Bindi
 
   return (
     <React.Fragment>
-      <IconButton size="small" onClick={handleOpen} color={hasBinding ? 'primary' : 'inherit'}>
+      <IconButton
+        disabled={disabled}
+        size="small"
+        onClick={handleOpen}
+        color={hasBinding ? 'primary' : 'inherit'}
+      >
         {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
       </IconButton>
       <Dialog onClose={handleClose} open={open} fullWidth scroll="body">

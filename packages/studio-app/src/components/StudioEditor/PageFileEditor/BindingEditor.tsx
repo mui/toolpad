@@ -171,6 +171,12 @@ function AddBindingEditor<V>({
   );
 }
 
+function getInitialBindingType(
+  type?: StudioBindable<unknown>['type'] | null,
+): 'binding' | 'boundExpression' | 'jsExpression' {
+  return type === 'boundExpression' || type === 'binding' ? type : 'jsExpression';
+}
+
 export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   bindingId: string;
   nodeId: NodeId;
@@ -199,13 +205,8 @@ export function BindingEditor<V>({
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 
-  const [bindingType, setBindingType] = React.useState<'binding' | 'boundExpression'>(
-    value?.type === 'boundExpression' ? 'boundExpression' : 'binding',
-  );
-  React.useEffect(
-    () => setBindingType(value?.type === 'boundExpression' ? 'boundExpression' : 'binding'),
-    [value?.type],
-  );
+  const [bindingType, setBindingType] = React.useState(getInitialBindingType(value?.type));
+  React.useEffect(() => setBindingType(getInitialBindingType(value?.type)), [value?.type]);
 
   const hasBinding =
     value?.type === 'boundExpression' ||
@@ -214,17 +215,14 @@ export function BindingEditor<V>({
 
   const inputValue = input?.type === bindingType ? input : null;
 
-  const handleBind = React.useCallback(() => {
-    onChange(inputValue);
-    handleClose();
-  }, [onChange, inputValue, handleClose]);
+  const handleCommit = React.useCallback(() => onChange(inputValue), [onChange, inputValue]);
 
   return (
     <React.Fragment>
       <IconButton size="small" onClick={handleOpen} color={hasBinding ? 'primary' : 'inherit'}>
         {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
       </IconButton>
-      <Dialog onClose={handleClose} open={open} fullWidth>
+      <Dialog onClose={handleClose} open={open} fullWidth scroll="body">
         <DialogTitle>Bind a property</DialogTitle>
         <DialogContent>
           <div>Type: {propType.type}</div>
@@ -264,7 +262,9 @@ export function BindingEditor<V>({
             liveBinding.error ? (
               <RuntimeErrorAlert error={liveBinding.error} />
             ) : (
-              <JsonView name={false} src={liveBinding.value} />
+              <Box sx={{ maxHeight: 200, overflow: 'auto' }}>
+                <JsonView name={false} src={liveBinding.value} />
+              </Box>
             )
           ) : null}
         </DialogContent>
@@ -272,8 +272,8 @@ export function BindingEditor<V>({
           <Button disabled={!value} onClick={() => onChange(null)}>
             Remove
           </Button>
-          <Button disabled={!inputValue} color="primary" onClick={handleBind}>
-            Add binding
+          <Button disabled={!inputValue} color="primary" onClick={handleCommit}>
+            Update binding
           </Button>
         </DialogActions>
       </Dialog>

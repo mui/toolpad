@@ -3,8 +3,6 @@ import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
-import * as prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel';
 import { NodeId } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -12,6 +10,7 @@ import StudioSandbox from '../../StudioSandbox';
 import getImportMap from '../../../getImportMap';
 import renderThemeCode from '../../../renderThemeCode';
 import renderEntryPoint from '../../../renderPageEntryCode';
+import { tryFormat } from '../../../utils/prettier';
 
 const ComponentSandbox = styled(StudioSandbox)({
   height: '100%',
@@ -31,17 +30,9 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   React.useEffect(() => {
     updateDomActionRef.current = () => {
-      try {
-        const pretty = prettier.format(input, {
-          parser: 'babel-ts',
-          plugins: [parserBabel],
-        });
-        setInput(pretty);
-        domApi.setNodeAttribute(codeComponentNode, 'code', pretty);
-        // eslint-disable-next-line no-empty
-      } catch (err) {
-        console.error(err);
-      }
+      const pretty = tryFormat(input);
+      setInput(pretty);
+      domApi.setNodeAttribute(codeComponentNode, 'code', pretty);
     };
   }, [domApi, codeComponentNode, input]);
 

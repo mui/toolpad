@@ -1,6 +1,4 @@
 import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
-import * as prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel';
 import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
@@ -18,6 +16,7 @@ import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
 import { getQueryNodeArgTypes } from './studioDataSources/client';
+import { tryFormat } from './utils/prettier';
 
 function literalPropExpression(value: any): PropExpression {
   return {
@@ -755,10 +754,7 @@ export default function renderPageCode(
   let code: string = ctx.render();
 
   if (config.pretty) {
-    code = prettier.format(code, {
-      parser: 'babel-ts',
-      plugins: [parserBabel],
-    });
+    code = tryFormat(code);
   }
 
   return { code };

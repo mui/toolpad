@@ -27,6 +27,7 @@ import { JsExpressionEditor } from './JsExpressionEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import RuntimeErrorAlert from './RuntimeErrorAlert';
 import JsonView from '../../JsonView';
+import { tryFormatExpression } from '../../../utils/prettier';
 
 interface BoundExpressionEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   propType: PropValueType;
@@ -215,7 +216,18 @@ export function BindingEditor<V>({
 
   const inputValue = input?.type === bindingType ? input : null;
 
-  const handleCommit = React.useCallback(() => onChange(inputValue), [onChange, inputValue]);
+  const handleCommit = React.useCallback(() => {
+    let newValue = inputValue;
+
+    if (inputValue?.type === 'jsExpression') {
+      newValue = {
+        ...inputValue,
+        value: tryFormatExpression(inputValue.value),
+      };
+    }
+
+    onChange(newValue);
+  }, [onChange, inputValue]);
 
   return (
     <React.Fragment>

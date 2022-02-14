@@ -73,7 +73,7 @@ export function JsExpressionEditor({ value, onChange }: JsExpressionEditorProps)
   return (
     <div>
       <Editor
-        height="200px"
+        height="150px"
         value={value}
         onChange={(code = '') => onChange(code)}
         path="./component.tsx"

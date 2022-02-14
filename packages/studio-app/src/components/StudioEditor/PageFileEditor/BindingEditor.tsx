@@ -48,7 +48,13 @@ export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable
   propType: PropValueType;
 }
 
-export function BindingEditor<V>({ disabled, bindingId, propType, value, onChange }: BindingEditorProps<V>) {
+export function BindingEditor<V>({
+  disabled,
+  bindingId,
+  propType,
+  value,
+  onChange,
+}: BindingEditorProps<V>) {
   const { viewState } = usePageEditorState();
 
   const liveBinding = viewState.bindings[bindingId];

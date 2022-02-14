@@ -389,7 +389,7 @@ class Context implements RenderContext {
     return result;
   }
 
-  renderComponentChildren(
+  resolveElementChildren(
     component: StudioComponentDefinition,
     renderableNodeChildren: { [key: string]: studioDom.StudioElementNode<any>[] },
   ): ResolvedProps {
@@ -471,8 +471,8 @@ class Context implements RenderContext {
   renderElement(node: studioDom.StudioElementNode): PropExpression {
     const component = getStudioComponent(this.dom, node.component);
 
-    const resolvedProps = studioDom.isElement(node) ? this.resolveElementProps(node) : {};
-    const resolvedChildren = this.renderComponentChildren(
+    const resolvedProps = this.resolveElementProps(node);
+    const resolvedChildren = this.resolveElementChildren(
       component,
       studioDom.getChildNodes(this.dom, node),
     );
@@ -490,7 +490,7 @@ class Context implements RenderContext {
   renderRoot(node: studioDom.StudioPageNode): string {
     const component = getStudioComponent(this.dom, 'Page');
     const { children } = studioDom.getChildNodes(this.dom, node);
-    const resolvedChildren = this.renderComponentChildren(component, { children });
+    const resolvedChildren = this.resolveElementChildren(component, { children });
     const expr = this.renderComponent(node, component, {}, resolvedChildren);
     return this.renderJsExpression(expr);
   }

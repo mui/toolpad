@@ -172,6 +172,16 @@ function GridColumnsPropEditor({
                     ))}
                   </Select>
                 </FormControl>
+                <TextField
+                  label="width"
+                  size="small"
+                  type="number"
+                  value={editedColumn.width}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
+                  }
+                />
               </Stack>
             </DialogContent>
           </React.Fragment>

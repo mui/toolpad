@@ -36,15 +36,20 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const handleResize = React.useMemo(
     () =>
-      debounce((params: GridColumnResizeParams, event: MuiEvent, details: GridCallbackDetails) => {
+      debounce((params: GridColumnResizeParams) => {
         if (!studioNode) {
           return;
         }
 
-        studioNode.setProp('columns', (columns) => columns);
+        studioNode.setProp('columns', (columns) =>
+          columns.map((column) =>
+            column.field === params.colDef.field ? { ...column, width: params.width } : column,
+          ),
+        );
       }, 500),
     [studioNode],
   );
+  React.useEffect(() => handleResize.clear(), [handleResize]);
 
   const { columns: dataQueryColumns, rows: dataQueryRows, ...dataQueryRest } = dataQuery || {};
 

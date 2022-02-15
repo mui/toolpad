@@ -1,7 +1,7 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
 import clsx from 'clsx';
-import { SlotType } from '@mui/studio-core';
+import { RuntimeEvent, SlotType } from '@mui/studio-core';
 import throttle from 'lodash/throttle';
 import {
   NodeId,
@@ -678,9 +678,43 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     setOverlayKey((key) => key + 1);
   }, []);
 
+  const handleRuntimeEvent = React.useCallback(
+    (event: RuntimeEvent) => {
+      switch (event.type) {
+        case 'propUpdated': {
+          const node = studioDom.getNode(dom, event.nodeId as NodeId, 'element');
+          const actual = node.props[event.prop];
+          if (!actual || actual.type !== 'const') {
+            console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);
+            return;
+          }
+          const newValue =
+            typeof event.value === 'function' ? event.value(actual.value) : event.value;
+          console.log(`setting prop to ${newValue}`);
+          domApi.setNodeNamespacedProp(node, 'props', event.prop, {
+            type: 'const',
+            value: newValue,
+          });
+          return;
+        }
+        default:
+          throw new Error(
+            `received unrecognized event "${(event as RuntimeEvent).type}" from editor runtime`,
+          );
+      }
+    },
+    [dom, domApi],
+  );
+
+  const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);
+  React.useEffect(() => {
+    handleRuntimeEventRef.current = handleRuntimeEvent;
+  }, [handleRuntimeEvent]);
+
   React.useEffect(() => {
     if (editorWindowRef.current) {
-      const rootElm = editorWindowRef.current.document.getElementById('root');
+      const editorWindow = editorWindowRef.current;
+      const rootElm = editorWindow.document.getElementById('root');
 
       if (!rootElm) {
         console.warn(`Invariant: Unable to locate Studio App root element`);
@@ -703,9 +737,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         subtree: true,
       });
 
+      // eslint-disable-next-line no-underscore-dangle
+      editorWindow.__STUDIO_RUNTIME_EVENT__ = handleRuntimeEventRef.current;
+
       return () => {
         handlePageMutation.cancel();
         observer.disconnect();
+        // eslint-disable-next-line no-underscore-dangle
+        delete editorWindow.__STUDIO_RUNTIME_EVENT__;
       };
     }
     return () => {};

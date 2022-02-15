@@ -19,8 +19,10 @@ import {
 import { GridColumns, GridColDef, GridAlignment } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import type { EditorProps, PropControlDefinition } from '../../types';
+
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../StudioEditor/PageFileEditor/PageEditorProvider';
 import { generateUniqueString } from '../../utils/strings';
@@ -42,6 +44,11 @@ function GridColumnsPropEditor({
   const props = state.viewState?.nodes[nodeId]?.attributes.props ?? {};
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
+  React.useEffect(() => {
+    if (editColumnsDialogOpen) {
+      setEditedIndex(null);
+    }
+  }, [editColumnsDialogOpen]);
 
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
   const menuOpen = Boolean(menuAnchorEl);
@@ -88,6 +95,13 @@ function GridColumnsPropEditor({
       onChange(value.map((column, i) => (i === editedIndex ? newValue : column)));
     },
     [editedIndex, onChange, value],
+  );
+
+  const handleColumnDelete = React.useCallback(
+    (deletedIndex: number) => () => {
+      onChange(value.filter((column, i) => i !== deletedIndex));
+    },
+    [onChange, value],
   );
 
   return (
@@ -187,7 +201,16 @@ function GridColumnsPropEditor({
               <List dense>
                 {value.map((colDef, i) => {
                   return (
-                    <ListItem key={colDef.field} disableGutters onClick={handleColumnItemClick(i)}>
+                    <ListItem
+                      key={colDef.field}
+                      disableGutters
+                      onClick={handleColumnItemClick(i)}
+                      secondaryAction={
+                        <IconButton edge="end" aria-label="delete" onClick={handleColumnDelete(i)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      }
+                    >
                       <ListItemButton>
                         <ListItemText primary={colDef.field} />
                       </ListItemButton>

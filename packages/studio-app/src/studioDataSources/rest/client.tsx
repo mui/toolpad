@@ -1,7 +1,7 @@
 import { Box, TextField } from '@mui/material';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import * as React from 'react';
-import StringRecordEditor from '../../StringRecordEditor';
+import StringRecordEditor from '../../components/StringRecordEditor';
 import { StudioDataSourceClient } from '../../types';
 import { WithControlledProp } from '../../utils/types';
 import { FetchQuery } from './types';

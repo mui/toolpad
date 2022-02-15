@@ -23,7 +23,9 @@ export function tryFormatExpression(code: string): string {
       semi: false,
     });
 
-    return formatted;
+    // There's no mode to format expressions in prettier. It will insert a semicolon in front
+    // in certain occasions. See https://github.com/prettier/prettier/issues/2841
+    return formatted.replace(/^;/, '');
   } catch (err) {
     return code;
   }

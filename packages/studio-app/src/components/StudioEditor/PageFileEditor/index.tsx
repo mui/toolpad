@@ -35,7 +35,7 @@ interface PageFileEditorProps {
 export default function PageFileEditor({ className }: PageFileEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
-  const pageNode = studioDom.getNode2(dom, nodeId as NodeId, 'page');
+  const pageNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'page');
   return pageNode ? (
     <PageEditorProvider key={nodeId} nodeId={nodeId as NodeId}>
       <PageFileEditorRoot className={className}>

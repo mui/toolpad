@@ -41,6 +41,13 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
+interface UrlQueryStateHook {
+  paramName: string;
+  stateVar: string;
+  setStateVar: string;
+  defaultValue?: unknown;
+}
+
 interface ControlledStateHook {
   nodeName: string;
   propName: string;
@@ -77,6 +84,8 @@ class Context implements RenderContext {
 
   private runtimeAlias: string = 'undefined';
 
+  private urlQueryStateHooks = new Map<string, UrlQueryStateHook>();
+
   private controlledStateHooks = new Map<string, ControlledStateHook>();
 
   private pageStateIdentifier = 'undefined';
@@ -107,6 +116,14 @@ class Context implements RenderContext {
     }
   }
 
+  generateControlledStateVars(...parts: string[]) {
+    const stateVarSuggestion = camelCase(...parts);
+    const stateVar = this.moduleScope.createUniqueBinding(stateVarSuggestion);
+    const setStateVarSuggestion = camelCase('set', ...parts);
+    const setStateVar = this.moduleScope.createUniqueBinding(setStateVarSuggestion);
+    return [stateVar, setStateVar];
+  }
+
   collectAllState() {
     const nodes = studioDom.getDescendants(this.dom, this.page);
     nodes.forEach((node) => {
@@ -119,6 +136,17 @@ class Context implements RenderContext {
       ) {
         this.collectStateNode(node);
       }
+    });
+
+    Object.entries(this.page.urlQuery || {}).forEach(([paramName, defaultValue]) => {
+      const [stateVar, setStateVar] = this.generateControlledStateVars(paramName);
+
+      this.urlQueryStateHooks.set(`${this.page.id}.urlQuery.${paramName}`, {
+        paramName,
+        stateVar,
+        setStateVar,
+        defaultValue,
+      });
     });
   }
 
@@ -188,11 +216,7 @@ class Context implements RenderContext {
         throw new Error(`"${node.name}.${propName}" is not a controlled property`);
       }
 
-      const stateVarSuggestion = camelCase(nodeName, propName);
-      const stateVar = this.moduleScope.createUniqueBinding(stateVarSuggestion);
-
-      const setStateVarSuggestion = camelCase('set', nodeName, propName);
-      const setStateVar = this.moduleScope.createUniqueBinding(setStateVarSuggestion);
+      const [stateVar, setStateVar] = this.generateControlledStateVars(nodeName, propName);
 
       const propValue = node.props[propName];
       const defaultValue = propValue?.type === 'const' ? propValue.value : argType.defaultValue;
@@ -532,7 +556,8 @@ class Context implements RenderContext {
         if (!expr) {
           return '';
         }
-        return `${name}: ${this.renderJsExpression(expr)}`;
+        const renderedExpression = this.renderJsExpression(expr);
+        return name === renderedExpression ? name : `${name}: ${renderedExpression}`;
       },
     );
     return `{${keyValuePairs.join(', ')}}`;
@@ -585,6 +610,19 @@ class Context implements RenderContext {
     return Array.from(this.controlledStateHooks.values(), (stateHook) => {
       const defaultValue = JSON.stringify(stateHook.defaultValue);
       return `const [${stateHook.stateVar}, ${stateHook.setStateVar}] = ${this.reactAlias}.useState(${defaultValue});`;
+    }).join('\n');
+  }
+
+  renderUrlQueryStateHooks(): string {
+    return Array.from(this.urlQueryStateHooks.values(), (stateHook) => {
+      const useUrlQueryState = this.addImport(
+        '@mui/studio-core',
+        'useUrlQueryState',
+        'useUrlQueryState',
+      );
+      const paramName = JSON.stringify(stateHook.paramName);
+      const defaultValue = JSON.stringify(stateHook.defaultValue);
+      return `const [${stateHook.stateVar}, ${stateHook.setStateVar}] = ${useUrlQueryState}(${paramName}, ${defaultValue});`;
     }).join('\n');
   }
 
@@ -688,7 +726,19 @@ class Context implements RenderContext {
       (hook) => `${hook.nodeName}: ${hook.stateVar}`,
     );
 
-    return `{${[...renderedControlledStateProps, ...renderedStateProps].join(',')}}`;
+    const renderedUrlQueryState = this.renderPropsAsObject(
+      Object.fromEntries(
+        Array.from(this.urlQueryStateHooks.values(), (hook) => {
+          return [hook.paramName, { type: 'expression', value: hook.stateVar }];
+        }),
+      ),
+    );
+
+    return `{${[
+      `page: ${renderedUrlQueryState}`,
+      ...renderedControlledStateProps,
+      ...renderedStateProps,
+    ].join(',')}}`;
   }
 
   renderMemoizedConsts(): string {
@@ -703,6 +753,7 @@ class Context implements RenderContext {
   render() {
     this.collectAllState();
 
+    const urlQueryStateHooks = this.renderUrlQueryStateHooks();
     const controlledStateHooks = this.renderControlledStateHooks();
     const dataQueryState = this.renderDataQueryState();
 
@@ -725,6 +776,7 @@ class Context implements RenderContext {
       ${imports}
 
       export default function App () {
+        ${urlQueryStateHooks}
         ${controlledStateHooks}
         ${dataQueryState}
 

@@ -23,6 +23,7 @@ import { NodeId, StudioBindable, StudioBindables } from '../../../types';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { getQueryNodeArgTypes } from '../../../studioDataSources/client';
 import { BindableEditor } from './ComponentPropEditor';
+import NodeNameEditor from './NodeNameEditor';
 
 interface ParamsEditorProps<Q> extends WithControlledProp<StudioBindables<Q>> {
   nodeId: NodeId;
@@ -37,7 +38,7 @@ function ParamsEditor<Q>({ value, onChange, nodeId, argTypes }: ParamsEditorProp
     [onChange, value],
   );
   return (
-    <div>
+    <Stack spacing={1}>
       {(Object.entries(argTypes) as ExactEntriesOf<ArgTypeDefinitions<Q>>).map(
         ([propName, propTypeDef]) =>
           propTypeDef ? (
@@ -52,7 +53,7 @@ function ParamsEditor<Q>({ value, onChange, nodeId, argTypes }: ParamsEditorProp
             </div>
           ) : null,
       )}
-    </div>
+    </Stack>
   );
 }
 
@@ -82,29 +83,32 @@ function QueryStateNodeEditor<P>({ value, onChange }: QueryStateNodeEditorProps<
 
   return (
     <React.Fragment>
-      <FormControl fullWidth size="small">
-        <InputLabel id={`select-data-query`}>Query</InputLabel>
-        <Select
-          value={value.api || ''}
-          labelId="select-data-query"
-          label="Query"
-          onChange={handleSelectionChange}
-          size="small"
-        >
-          <MenuItem value="">---</MenuItem>
-          {apis.map(({ id, name }) => (
-            <MenuItem key={id} value={id}>
-              {name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <ParamsEditor
-        nodeId={value.id}
-        value={value.params}
-        argTypes={argTypes}
-        onChange={handleParamsChange}
-      />
+      <Stack spacing={1} py={1}>
+        <NodeNameEditor node={value} />
+        <FormControl fullWidth size="small">
+          <InputLabel id={`select-data-query`}>Query</InputLabel>
+          <Select
+            value={value.api || ''}
+            labelId="select-data-query"
+            label="Query"
+            onChange={handleSelectionChange}
+            size="small"
+          >
+            <MenuItem value="">---</MenuItem>
+            {apis.map(({ id, name }) => (
+              <MenuItem key={id} value={id}>
+                {name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <ParamsEditor
+          nodeId={value.id}
+          value={value.params}
+          argTypes={argTypes}
+          onChange={handleParamsChange}
+        />
+      </Stack>
     </React.Fragment>
   );
 }

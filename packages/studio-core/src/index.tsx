@@ -97,6 +97,13 @@ export interface LiveBinding {
   error?: Error;
 }
 
+export type RuntimeEvent = {
+  type: 'propUpdated';
+  nodeId: string;
+  prop: string;
+  value: React.SetStateAction<unknown>;
+};
+
 export type LiveBindings = Partial<Record<string, LiveBinding>>;
 
 export type { PlaceholderProps, SlotsProps, StudioRuntimeNode, RuntimeError } from './runtime';

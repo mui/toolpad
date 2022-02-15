@@ -4,10 +4,9 @@ import {
   GridToolbar,
   LicenseInfo,
   GridColumnResizeParams,
-  GridCallbackDetails,
-  MuiEvent,
   GridColumns,
   GridRowsProp,
+  GridColumnOrderChangeParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useStudioNode } from '@mui/studio-core';
@@ -36,19 +35,48 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const handleResize = React.useMemo(
     () =>
-      debounce((params: GridColumnResizeParams, event: MuiEvent, details: GridCallbackDetails) => {
+      debounce((params: GridColumnResizeParams) => {
         if (!studioNode) {
           return;
         }
 
-        studioNode.setProp('columns', (columns) => columns);
+        studioNode.setProp('columns', (columns) =>
+          columns.map((column) =>
+            column.field === params.colDef.field ? { ...column, width: params.width } : column,
+          ),
+        );
       }, 500),
     [studioNode],
   );
+  React.useEffect(() => handleResize.clear(), [handleResize]);
 
-  const { columns: dataQueryColumns, rows: dataQueryRows, ...dataQueryRest } = dataQuery || {};
+  const handleColumnOrderChange = React.useMemo(
+    () =>
+      debounce((params: GridColumnOrderChangeParams) => {
+        if (!studioNode) {
+          return;
+        }
 
-  const columns: GridColumns = columnsProp || dataQueryColumns || EMPTY_COLUMNS;
+        studioNode.setProp('columns', (columns) => {
+          const old = columns.find((colDef) => colDef.field === params.field);
+          if (!old) {
+            return columns;
+          }
+          const withoutOld = columns.filter((column) => column.field !== params.field);
+          return [
+            ...withoutOld.slice(0, params.targetIndex),
+            old,
+            ...withoutOld.slice(params.targetIndex),
+          ];
+        });
+      }, 500),
+    [studioNode],
+  );
+  React.useEffect(() => handleColumnOrderChange.clear(), [handleColumnOrderChange]);
+
+  const { rows: dataQueryRows, ...dataQueryRest } = dataQuery || {};
+
+  const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
 
   const rows: GridRowsProp = rowsProp || dataQueryRows || EMPTY_ROWS;
 
@@ -57,6 +85,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
       <DataGridPro
         components={{ Toolbar: GridToolbar }}
         onColumnResize={handleResize}
+        onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
         columns={columns}
         {...dataQueryRest}

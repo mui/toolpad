@@ -4,6 +4,7 @@ import {
   SlotType,
   RuntimeError,
   LiveBindings,
+  RuntimeEvent,
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import {
@@ -22,6 +23,7 @@ declare global {
     __REACT_DEVTOOLS_GLOBAL_HOOK__?: Hook;
     __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
     __STUDIO_RUNTIME_BINDINGS_STATE__?: LiveBindings;
+    __STUDIO_RUNTIME_EVENT__?: (event: RuntimeEvent) => void;
   }
 }
 

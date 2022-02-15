@@ -1,12 +1,13 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
-import type { SlotType, LiveBindings } from './index';
+import type { SlotType, LiveBindings, RuntimeEvent } from './index';
 
 declare global {
   interface Window {
     __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
     __STUDIO_RUNTIME_BINDINGS_STATE__?: LiveBindings;
+    __STUDIO_RUNTIME_EVENT__?: (event: RuntimeEvent) => void;
   }
 }
 
@@ -144,7 +145,7 @@ export function useDiagnostics(
 }
 
 export interface StudioRuntimeNode<P> {
-  setProp: <K extends keyof P>(key: K, value: P[K] | ((newValue: P[K]) => P[K])) => void;
+  setProp: <K extends keyof P & string>(key: K, value: React.SetStateAction<P[K]>) => void;
 }
 
 export function useStudioNode<P = {}>(): StudioRuntimeNode<P> | null {
@@ -156,13 +157,13 @@ export function useStudioNode<P = {}>(): StudioRuntimeNode<P> | null {
     }
     return {
       setProp: (prop, value) => {
-        window.parent.postMessage({
-          type: 'setProp',
+        // eslint-disable-next-line no-underscore-dangle
+        window.__STUDIO_RUNTIME_EVENT__?.({
+          type: 'propUpdated',
           nodeId,
           prop,
           value,
         });
-        console.log(`setting prop "${prop}" to "${value}" on node "${nodeId}"`);
       },
     };
   }, [nodeId]);

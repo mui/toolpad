@@ -9,12 +9,7 @@ export default function useUrlQueryState(
   defaultValue: string = '',
 ): [string, React.Dispatch<React.SetStateAction<string>>] {
   const [value, setValue] = React.useState(defaultValue);
-
   const isInitialized = React.useRef(false);
-
-  React.useEffect(() => {
-    console.log('mounting');
-  }, []);
 
   React.useEffect(() => {
     const url = getLocationUrl();

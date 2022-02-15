@@ -26,14 +26,11 @@ async function getDefinitions() {
       LIBS.map(async (lib) => {
         const files: string[] = [];
         const resolvedPkg = require.resolve(`${lib}/package.json`);
-        let dtsFiles = await glob('**/*.d.ts', {
+        const dtsFiles = await glob('**/*.d.ts', {
           cwd: path.dirname(resolvedPkg),
           absolute: true,
         });
-        if (lib === '@mui/material') {
-          dtsFiles = dtsFiles.map((fileName) => fileName.replace('/dist/', '/'));
-          console.log(resolvedPkg, dtsFiles);
-        }
+
         if (dtsFiles.length > 0) {
           files.push(resolvedPkg, ...dtsFiles);
         }

@@ -192,6 +192,7 @@ function createDefaultApp(): studioDom.StudioDom {
   const page = studioDom.createNode(dom, 'page', {
     name: 'DefaultPage',
     title: 'Default',
+    urlQuery: {},
   });
   const app = studioDom.getApp(dom);
   dom = studioDom.addNode(dom, page, app, 'pages');

@@ -1,4 +1,5 @@
 import { StudioComponentDefinition } from './studioComponentDefinition';
+import { URI_SELECT_OPTIONS } from '../schemas';
 
 export default {
   id: 'Select',
@@ -22,9 +23,9 @@ export default {
           label={${ctx.renderJsExpression(label)}} 
           ${ctx.renderProps(props)}
         >
-          {${ctx.renderJsExpression(options)}?.split(',').map((option) => (
-            <${MenuItem} key={option} value={option}>
-              {option}
+          {${ctx.renderJsExpression(options)}.map((option) => (
+            <${MenuItem} key={option.value} value={option.value}>
+              {option.label ?? option.value}
             </${MenuItem}>
           )) ?? null}
         </${Select}>
@@ -55,9 +56,9 @@ export default {
       },
     },
     options: {
-      typeDef: { type: 'string' },
-      // TODO: make this:
-      // typeDef: { type: 'array', items: { type: 'string' } },
+      typeDef: { type: 'array' },
+      control: { type: 'json', schema: URI_SELECT_OPTIONS },
+      defaultValue: [],
     },
   },
 } as StudioComponentDefinition;

@@ -7,10 +7,16 @@ type StudioGridColumns = StudioColDef[];
 
 type StudioRows = { id: string }[];
 
+type SelectOption = {
+  value: string;
+  label?: string;
+};
+
 export const URI_DATAGRID_COLUMN = 'https://studio.mui.com/DataGridColumn.json';
 export const URI_DATAGRID_COLUMNS = 'https://studio.mui.com/DataGridColumns.json';
 export const URI_DATAGRID_ROWS = 'https://studio.mui.com/DataGridRows.json';
 export const URI_DATAQUERY = 'https://studio.mui.com/DataQuery.json';
+export const URI_SELECT_OPTIONS = 'https://studio.mui.com/SelectOptions.json';
 
 export default {
   [URI_DATAGRID_COLUMN]: {
@@ -56,4 +62,21 @@ export default {
       error: {},
     },
   } as JSONSchemaType<UseDataQuery>,
+  [URI_SELECT_OPTIONS]: {
+    type: 'array',
+    items: {
+      type: 'object',
+      additionalProperties: true,
+      properties: {
+        value: {
+          type: 'string',
+        },
+        label: {
+          type: 'string',
+          nullable: true,
+        },
+      },
+      required: ['value'],
+    },
+  } as JSONSchemaType<SelectOption[]>,
 };

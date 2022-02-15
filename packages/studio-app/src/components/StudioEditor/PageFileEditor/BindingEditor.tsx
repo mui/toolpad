@@ -106,7 +106,7 @@ export function BindingEditor<V>({
               <RuntimeErrorAlert error={liveBinding.error} />
             ) : (
               <Box sx={{ maxHeight: 200, overflow: 'auto' }}>
-                <JsonView name={false} src={liveBinding.value} />
+                <JsonView src={liveBinding.value} />
               </Box>
             )
           ) : null}

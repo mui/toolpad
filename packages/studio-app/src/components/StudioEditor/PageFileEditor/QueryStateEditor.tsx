@@ -44,6 +44,7 @@ function ParamsEditor<Q>({ value, onChange, nodeId, argTypes }: ParamsEditorProp
           propTypeDef ? (
             <div key={propName}>
               <BindableEditor
+                propNamespace={'params'}
                 propName={propName}
                 nodeId={nodeId}
                 argType={propTypeDef}

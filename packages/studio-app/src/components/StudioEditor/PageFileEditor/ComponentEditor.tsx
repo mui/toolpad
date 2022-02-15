@@ -1,14 +1,15 @@
-import { styled, TextField, Typography } from '@mui/material';
+import { styled, Typography } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
 import ComponentPropEditor from './ComponentPropEditor';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
 import RuntimeErrorAlert from './RuntimeErrorAlert';
+import NodeNameEditor from './NodeNameEditor';
 
 const classes = {
   control: 'StudioControl',
@@ -56,31 +57,9 @@ const DEFAULT_ACTUAL_VALUES = {};
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const dom = useDom();
-  const domApi = useDomApi();
   const { viewState } = usePageEditorState();
   const nodeError = viewState.nodes[node.id]?.error;
   const actualValues = viewState.nodes[node.id]?.attributes.props ?? DEFAULT_ACTUAL_VALUES;
-
-  const [nameInput, setNameInput] = React.useState(node.name);
-
-  const handleNameInputChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => setNameInput(event.target.value),
-    [],
-  );
-
-  const handleNameCommit = React.useCallback(
-    () => domApi.setNodeName(node.id, nameInput),
-    [domApi, node.id, nameInput],
-  );
-
-  const handleKeyPress = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === 'Enter') {
-        handleNameCommit();
-      }
-    },
-    [handleNameCommit],
-  );
 
   const component = useStudioComponent(dom, node.component);
 
@@ -88,15 +67,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
     <React.Fragment>
       <Typography variant="subtitle1">{component.displayName}</Typography>
       <Typography variant="subtitle2">ID: {node.id}</Typography>
-      <TextField
-        fullWidth
-        size="small"
-        label="name"
-        value={nameInput}
-        onChange={handleNameInputChange}
-        onBlur={handleNameCommit}
-        onKeyPress={handleKeyPress}
-      />
+      <NodeNameEditor node={node} />
       {nodeError ? <RuntimeErrorAlert error={nodeError} /> : null}
       {node ? (
         <React.Fragment>

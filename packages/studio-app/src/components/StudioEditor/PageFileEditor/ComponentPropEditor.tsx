@@ -67,10 +67,7 @@ export function BindableEditor<V>({
     return () => {};
   }, [value, initConstValue]);
 
-  const hasBinding =
-    value?.type === 'boundExpression' ||
-    value?.type === 'binding' ||
-    value?.type === 'jsExpression';
+  const hasBinding = value && value.type !== 'const';
 
   return (
     <Stack direction="row" alignItems="flex-start">
@@ -80,7 +77,7 @@ export function BindableEditor<V>({
             nodeId={nodeId}
             propName={propName}
             argType={argType}
-            disabled={hasBinding}
+            disabled={!!hasBinding}
             value={constValue}
             onChange={handlePropConstChange}
           />

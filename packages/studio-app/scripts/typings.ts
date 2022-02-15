@@ -20,19 +20,33 @@ const LIBS = [
   '@mui/studio-core',
 ];
 
+function getModuleId(fileName: string, pkgDir: string, pkgName: string) {
+  return path.join(`node_modules/${pkgName}/`, path.relative(pkgDir, fileName));
+}
+
 async function getDefinitions() {
-  const allFiles: string[] = (
+  const allFiles: { filename: string; moduleId: string }[] = (
     await Promise.all(
       LIBS.map(async (lib) => {
-        const files: string[] = [];
+        const files: { filename: string; moduleId: string }[] = [];
         const resolvedPkg = require.resolve(`${lib}/package.json`);
+        const pkgJson = await import(resolvedPkg);
+        const pkgDir = path.dirname(resolvedPkg);
+
         const dtsFiles = await glob('**/*.d.ts', {
-          cwd: path.dirname(resolvedPkg),
+          cwd: pkgDir,
           absolute: true,
         });
 
         if (dtsFiles.length > 0) {
-          files.push(resolvedPkg, ...dtsFiles);
+          files.push(
+            { filename: resolvedPkg, moduleId: getModuleId(resolvedPkg, pkgDir, pkgJson.name) },
+            ...dtsFiles.map((fileName) => ({
+              filename: fileName,
+              // hack around monorepo packages
+              moduleId: getModuleId(fileName, pkgDir, pkgJson.name),
+            })),
+          );
         }
 
         try {
@@ -47,7 +61,17 @@ async function getDefinitions() {
             absolute: true,
           });
           if (typesDtsFiles.length > 0) {
-            files.push(resolvedTypesPkg, ...typesDtsFiles);
+            files.push(
+              {
+                filename: resolvedPkg,
+                moduleId: getModuleId(resolvedTypesPkg, pkgDir, pkgJson.name),
+              },
+              ...typesDtsFiles.map((fileName) => ({
+                filename: fileName,
+                // hack around monorepo packages
+                moduleId: getModuleId(fileName, pkgDir, pkgJson.name),
+              })),
+            );
           }
           // eslint-disable-next-line no-empty
         } catch (err) {}
@@ -57,14 +81,11 @@ async function getDefinitions() {
     )
   ).flat();
 
-  const root = path.resolve(__dirname, '../../..');
-
   const result: Record<string, string> = Object.assign(
     {},
     ...(await Promise.all(
-      allFiles.map(async (file) => {
-        const relative = path.relative(root, file);
-        return { [relative]: await fs.readFile(file, { encoding: 'utf-8' }) };
+      allFiles.map(async ({ filename, moduleId }) => {
+        return { [moduleId]: await fs.readFile(filename, { encoding: 'utf-8' }) };
       }),
     )),
   );

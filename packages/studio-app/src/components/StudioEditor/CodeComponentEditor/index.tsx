@@ -85,6 +85,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         .then((res) => res.json())
         .then((typings) => {
           Array.from(Object.entries(typings)).forEach(([path, content]) => {
+            console.log(path);
             monaco.languages.typescript.typescriptDefaults.addExtraLib(
               content as string,
               `file:///${path}`,

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as studioDom from '../studioDom';
-import { StudioComponentDefinition } from '../types';
 import importedComponentRenderer from './importedComponentRenderer';
 
 import CustomLayout from './CustomLayout';
@@ -11,11 +10,10 @@ import Stack from './Stack';
 import Typography from './Typography';
 import TextField from './TextField';
 import Select from './Select';
-import Page from './Page';
+import { StudioComponentDefinition } from './studioComponentDefinition';
 
 // TODO: bring these back to @mui/studio repo and make them import @mui/material
 const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
-  ['Page', Page],
   ['Button', Button],
   ['DataGrid', DataGrid],
   ['Paper', Paper],

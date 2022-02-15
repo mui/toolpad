@@ -1,5 +1,5 @@
 import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../schemas';
-import { StudioComponentDefinition } from '../types';
+import { StudioComponentDefinition } from './studioComponentDefinition';
 import importedComponentRenderer from './importedComponentRenderer';
 
 export default {

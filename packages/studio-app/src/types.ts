@@ -193,19 +193,3 @@ export interface JsxElement {
 export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
 
 export type ResolvedProps = Record<string, PropExpression | undefined>;
-
-export interface RenderContext {
-  addImport(source: string, imported: string, local: string): string;
-  renderProps(resolvedProps: ResolvedProps): string;
-  renderJsExpression(expr?: PropExpression): string;
-  renderJsxContent(expr?: PropExpression): string;
-}
-
-export type RenderComponent = (ctx: RenderContext, resolvedProps: ResolvedProps) => string;
-
-export interface StudioComponentDefinition {
-  id: string;
-  displayName: string;
-  argTypes: ArgTypeDefinitions;
-  render: RenderComponent;
-}

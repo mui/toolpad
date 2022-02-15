@@ -1,5 +1,5 @@
-import { StudioComponentDefinition } from '../types';
 import importedComponentRenderer from './importedComponentRenderer';
+import { StudioComponentDefinition } from './studioComponentDefinition';
 
 export default {
   id: 'Button',

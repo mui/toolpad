@@ -1,8 +1,8 @@
 export type SlotType = 'single' | 'multiple';
 
 export interface OnChangeHandler {
-  params: ['event'];
-  valueGetter: 'event.target.value';
+  params: string[];
+  valueGetter: string;
 }
 
 export interface ValueTypeBase {

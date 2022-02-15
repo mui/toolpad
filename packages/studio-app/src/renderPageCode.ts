@@ -3,20 +3,13 @@ import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
-import {
-  NodeId,
-  PropExpression,
-  RenderContext,
-  ResolvedProps,
-  StudioComponentDefinition,
-  StudioBindable,
-  StudioBindables,
-} from './types';
+import { NodeId, PropExpression, ResolvedProps, StudioBindable, StudioBindables } from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
 import { getQueryNodeArgTypes } from './studioDataSources/client';
 import { tryFormat } from './utils/prettier';
+import { RenderContext } from './studioComponents/studioComponentDefinition';
 
 function literalPropExpression(value: any): PropExpression {
   return {
@@ -70,7 +63,7 @@ interface MemoizedConst {
 }
 
 class Context implements RenderContext {
-  private dom: studioDom.StudioDom;
+  dom: studioDom.StudioDom;
 
   private page: studioDom.StudioPageNode;
 
@@ -191,7 +184,7 @@ class Context implements RenderContext {
         throw new Error(`Can't find argType for "${node.name}.${propName}"`);
       }
 
-      if (!argType.onChangeHandler) {
+      if (!argType.onChangeProp) {
         throw new Error(`"${node.name}.${propName}" is not a controlled property`);
       }
 
@@ -222,7 +215,7 @@ class Context implements RenderContext {
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [propName, argType] of Object.entries(component.argTypes)) {
-      if (argType?.onChangeHandler) {
+      if (argType?.onChangeProp) {
         this.collectControlledStateProp(node, propName);
       }
     }
@@ -389,9 +382,9 @@ class Context implements RenderContext {
     return result;
   }
 
-  renderComponentChildren(
-    component: StudioComponentDefinition,
+  resolveElementChildren(
     renderableNodeChildren: { [key: string]: studioDom.StudioElementNode<any>[] },
+    argTypes?: ArgTypeDefinitions,
   ): ResolvedProps {
     const result: ResolvedProps = {};
 
@@ -411,9 +404,9 @@ class Context implements RenderContext {
       }
     }
 
-    if (this.editor && component) {
+    if (this.editor && argTypes) {
       // eslint-disable-next-line no-restricted-syntax
-      for (const [prop, argType] of Object.entries(component.argTypes)) {
+      for (const [prop, argType] of Object.entries(argTypes)) {
         if (argType?.typeDef.type === 'element') {
           if (argType.control?.type === 'slots') {
             const existingProp = result[prop];
@@ -445,17 +438,10 @@ class Context implements RenderContext {
     return result;
   }
 
-  renderComponent(
-    node: studioDom.StudioNode,
-    component: StudioComponentDefinition,
-    resolvedProps: ResolvedProps,
-    resolvedChildren: ResolvedProps,
+  wrapComponent(
+    node: studioDom.StudioElementNode | studioDom.StudioPageNode,
+    rendered: string,
   ): PropExpression {
-    const rendered = component.render(this, {
-      ...resolvedProps,
-      ...resolvedChildren,
-    });
-
     return {
       type: 'jsxElement',
       value: this.editor
@@ -471,13 +457,18 @@ class Context implements RenderContext {
   renderElement(node: studioDom.StudioElementNode): PropExpression {
     const component = getStudioComponent(this.dom, node.component);
 
-    const resolvedProps = studioDom.isElement(node) ? this.resolveElementProps(node) : {};
-    const resolvedChildren = this.renderComponentChildren(
-      component,
+    const resolvedProps = this.resolveElementProps(node);
+    const resolvedChildren = this.resolveElementChildren(
       studioDom.getChildNodes(this.dom, node),
+      component.argTypes,
     );
 
-    return this.renderComponent(node, component, resolvedProps, resolvedChildren);
+    const rendered = component.render(this, node, {
+      ...resolvedProps,
+      ...resolvedChildren,
+    });
+
+    return this.wrapComponent(node, rendered);
   }
 
   /**
@@ -488,10 +479,29 @@ class Context implements RenderContext {
    * }`
    */
   renderRoot(node: studioDom.StudioPageNode): string {
-    const component = getStudioComponent(this.dom, 'Page');
     const { children } = studioDom.getChildNodes(this.dom, node);
-    const resolvedChildren = this.renderComponentChildren(component, { children });
-    const expr = this.renderComponent(node, component, {}, resolvedChildren);
+    const resolvedChildren = this.resolveElementChildren(
+      { children },
+      {
+        children: {
+          typeDef: { type: 'element' },
+          control: { type: 'slots' },
+        },
+      },
+    );
+
+    const Container = this.addImport('@mui/material', 'Container', 'Container');
+    const Stack = this.addImport('@mui/material', 'Stack', 'Stack');
+
+    const rendered = `
+      <${Container}>
+        <${Stack} direction="column" gap={2} my={2}>
+          ${this.renderJsxContent(resolvedChildren.children)}
+        </${Stack}>
+      </${Container}>
+    `;
+
+    const expr = this.wrapComponent(node, rendered);
     return this.renderJsExpression(expr);
   }
 

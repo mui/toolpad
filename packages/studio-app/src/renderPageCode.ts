@@ -3,19 +3,13 @@ import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
-import {
-  NodeId,
-  PropExpression,
-  RenderContext,
-  ResolvedProps,
-  StudioBindable,
-  StudioBindables,
-} from './types';
+import { NodeId, PropExpression, ResolvedProps, StudioBindable, StudioBindables } from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
 import { getQueryNodeArgTypes } from './studioDataSources/client';
 import { tryFormat } from './utils/prettier';
+import { RenderContext } from './studioComponents/studioComponentDefinition';
 
 function literalPropExpression(value: any): PropExpression {
   return {
@@ -190,7 +184,7 @@ class Context implements RenderContext {
         throw new Error(`Can't find argType for "${node.name}.${propName}"`);
       }
 
-      if (!argType.onChangeHandler) {
+      if (!argType.onChangeProp) {
         throw new Error(`"${node.name}.${propName}" is not a controlled property`);
       }
 
@@ -221,7 +215,7 @@ class Context implements RenderContext {
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [propName, argType] of Object.entries(component.argTypes)) {
-      if (argType?.onChangeHandler) {
+      if (argType?.onChangeProp) {
         this.collectControlledStateProp(node, propName);
       }
     }

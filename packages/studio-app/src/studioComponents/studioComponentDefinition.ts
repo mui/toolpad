@@ -1,6 +1,14 @@
 import { ArgTypeDefinitions } from '@mui/studio-core';
-import { StudioElementNode } from '../studioDom';
-import { RenderContext, ResolvedProps } from '../types';
+import { StudioDom, StudioElementNode } from '../studioDom';
+import { PropExpression, ResolvedProps } from '../types';
+
+export interface RenderContext {
+  dom: StudioDom;
+  addImport(source: string, imported: string, local: string): string;
+  renderProps(resolvedProps: ResolvedProps): string;
+  renderJsExpression(expr?: PropExpression): string;
+  renderJsxContent(expr?: PropExpression): string;
+}
 
 export type RenderComponent = (
   ctx: RenderContext,
@@ -13,4 +21,5 @@ export interface StudioComponentDefinition {
   displayName: string;
   argTypes: ArgTypeDefinitions;
   render: RenderComponent;
+  extraControls?: Partial<Record<string, { type: string }>>;
 }

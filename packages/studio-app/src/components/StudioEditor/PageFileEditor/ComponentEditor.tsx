@@ -37,9 +37,9 @@ function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorPro
           propTypeDef ? (
             <div key={propName} className={classes.control}>
               <ComponentPropEditor
-                name={propName}
-                argType={propTypeDef}
                 node={node}
+                propName={propName}
+                argType={propTypeDef}
                 actualValue={actualValues[propName]}
               />
             </div>

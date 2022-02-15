@@ -26,6 +26,7 @@ function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
 }
 
 export interface BindableEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+  propNamespace: string | null;
   propName: string;
   nodeId: NodeId;
   argType: ArgTypeDefinition;
@@ -33,6 +34,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<StudioBindabl
 }
 
 export function BindableEditor<V>({
+  propNamespace,
   propName,
   nodeId,
   argType,
@@ -82,7 +84,7 @@ export function BindableEditor<V>({
             onChange={handlePropConstChange}
           />
           <BindingEditor<V>
-            bindingId={`${nodeId}.props.${propName}`}
+            bindingId={`${nodeId}${propNamespace ? `.${propNamespace}` : ''}.${propName}`}
             propType={argType.typeDef}
             value={value}
             onChange={onChange}
@@ -114,10 +116,11 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
   actualValue,
 }: ComponentPropEditorProps<P, K>) {
   const domApi = useDomApi();
+  const propNamespace = 'props';
 
   const handlePropChange = React.useCallback(
     (newValue: StudioBindable<P[K]> | null) => {
-      domApi.setNodeNamespacedProp(node, 'props', name, newValue);
+      domApi.setNodeNamespacedProp(node, propNamespace, name, newValue);
     },
     [domApi, node, name],
   );
@@ -126,6 +129,7 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
 
   return (
     <BindableEditor
+      propNamespace={propNamespace}
       propName={name}
       argType={argType}
       nodeId={node.id}

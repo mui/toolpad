@@ -110,4 +110,6 @@ export * from './useDataQuery.js';
 export type { UseFetchedState } from './useFetchedState.js';
 export { default as useFetchedState } from './useFetchedState.js';
 
+export { default as useUrlQueryState } from './useUrlQueryState.js';
+
 export * from './constants.js';

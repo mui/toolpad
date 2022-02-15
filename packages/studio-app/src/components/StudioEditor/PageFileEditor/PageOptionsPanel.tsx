@@ -10,6 +10,7 @@ import { usePageEditorState } from './PageEditorProvider';
 import DerivedStateEditor from './DerivedStateEditor';
 import QueryStateEditor from './QueryStateEditor';
 import FetchedStateEditor from './FetchedStateEditor';
+import UrlQueryEditor from './UrlQueryEditor';
 
 export default function PageOptionsPanel() {
   const dom = useDom();
@@ -50,6 +51,7 @@ export default function PageOptionsPanel() {
         >
           Page Component
         </Button>
+        <UrlQueryEditor pageNodeId={pageNodeId} />
         <DerivedStateEditor />
         <QueryStateEditor />
         <FetchedStateEditor pageNodeId={pageNodeId} />

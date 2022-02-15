@@ -2,9 +2,9 @@ import { Box, TextField, IconButton } from '@mui/material';
 import * as React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
-import { omit } from './utils/immutability';
-import { WithControlledProp } from './utils/types';
-import { hasOwnProperty } from './utils/collections';
+import { omit } from '../utils/immutability';
+import { WithControlledProp } from '../utils/types';
+import { hasOwnProperty } from '../utils/collections';
 
 export interface StringRecordEditorProps extends WithControlledProp<Record<string, string>> {
   label?: string;

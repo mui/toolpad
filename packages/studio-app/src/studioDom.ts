@@ -63,6 +63,7 @@ export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
 export interface StudioPageNode extends StudioNodeBase {
   readonly type: 'page';
   readonly title: string;
+  readonly urlQuery: Record<string, string>;
 }
 
 export interface StudioElementNode<P = any> extends StudioNodeBase {
@@ -183,17 +184,17 @@ function assertIsType<T extends StudioNode>(node: StudioNode, type: T['type']): 
   }
 }
 
-export function getNode2<T extends StudioNodeType>(
+export function getMaybeNode<T extends StudioNodeType>(
   dom: StudioDom,
   nodeId: NodeId,
   type: T,
 ): StudioNodeOfType<T> | null;
-export function getNode2<T extends StudioNodeType>(
+export function getMaybeNode<T extends StudioNodeType>(
   dom: StudioDom,
   nodeId: NodeId,
   type?: T,
 ): StudioNode | null;
-export function getNode2<T extends StudioNodeType>(
+export function getMaybeNode<T extends StudioNodeType>(
   dom: StudioDom,
   nodeId: NodeId,
   type?: T,
@@ -223,9 +224,9 @@ export function getNode<T extends StudioNodeType>(
   nodeId: NodeId,
   type?: T,
 ): StudioNode {
-  const node = dom.nodes[nodeId];
-  if (type) {
-    assertIsType(node, type);
+  const node = getMaybeNode(dom, nodeId, type);
+  if (!node) {
+    throw new Error(`Node "${nodeId}" not found`);
   }
   return node;
 }

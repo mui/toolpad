@@ -87,7 +87,7 @@ interface ApiFileEditorProps {
 export default function ApiFileEditor({ className }: ApiFileEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
-  const apiNode = studioDom.getNode2(dom, nodeId as NodeId, 'api');
+  const apiNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'api');
   return (
     <Box className={className}>
       {apiNode ? (

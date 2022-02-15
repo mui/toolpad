@@ -58,15 +58,13 @@ export function useDataQuery(
     [fields],
   );
 
-  React.useEffect(
-    () =>
-      setResult({
-        loading,
-        error,
-        data,
-        columns,
-        rows,
-      }),
-    [setResult, loading, error, data, columns, rows],
-  );
+  React.useEffect(() => {
+    setResult({
+      loading,
+      error,
+      data,
+      columns,
+      rows,
+    });
+  }, [setResult, loading, error, data, columns, rows]);
 }

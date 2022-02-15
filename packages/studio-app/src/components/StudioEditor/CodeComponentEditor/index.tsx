@@ -148,7 +148,7 @@ interface CodeComponentEditorProps {
 export default function CodeComponentEditor({ className }: CodeComponentEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
-  const codeComponentNode = studioDom.getNode2(dom, nodeId as NodeId, 'codeComponent');
+  const codeComponentNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
   return (
     <Box className={className}>
       {codeComponentNode ? (

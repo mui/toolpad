@@ -22,7 +22,7 @@ import * as studioDom from '../../../studioDom';
 import { NodeId, StudioBindable } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
 import { BindableEditor } from './ComponentPropEditor';
-import StringRecordEditor from '../../../StringRecordEditor';
+import StringRecordEditor from '../../StringRecordEditor';
 
 const URL_ARGTYPE: ArgTypeDefinition = {
   typeDef: { type: 'string' },

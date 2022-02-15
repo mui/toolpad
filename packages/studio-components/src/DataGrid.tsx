@@ -4,8 +4,6 @@ import {
   GridToolbar,
   LicenseInfo,
   GridColumnResizeParams,
-  GridCallbackDetails,
-  MuiEvent,
   GridColumns,
   GridRowsProp,
 } from '@mui/x-data-grid-pro';

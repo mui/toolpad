@@ -688,9 +688,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);
             return;
           }
-          const newValue =
+
+          const newValue: unknown =
             typeof event.value === 'function' ? event.value(actual.value) : event.value;
-          console.log(`setting prop to ${newValue}`);
+
           domApi.setNodeNamespacedProp(node, 'props', event.prop, {
             type: 'const',
             value: newValue,

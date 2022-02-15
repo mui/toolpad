@@ -23,16 +23,16 @@ import { LoadingButton } from '@mui/lab';
 import CheckIcon from '@mui/icons-material/Check';
 import CrossIcon from '@mui/icons-material/Clear';
 import { useQuery } from 'react-query';
-import dataSources from '../../../src/studioDataSources/client';
-import { ExactEntriesOf } from '../../../src/utils/types';
+import dataSources from 'src/studioDataSources/client';
+import { ExactEntriesOf } from 'src/utils/types';
 import {
   ConnectionStatus,
   StudioConnection,
   StudioDataSourceClient,
   StudioConnectionParamsEditorProps,
-} from '../../../src/types';
-import client from '../../../src/api';
-import StudioAppBar from '../../../src/components/StudioAppBar';
+} from 'src/types';
+import client from 'src/api';
+import StudioAppBar from 'src/components/StudioAppBar';
 
 interface ConnectionParamsEditorProps<P> extends StudioConnectionParamsEditorProps<P> {
   dataSource: StudioDataSourceClient<P, any>;

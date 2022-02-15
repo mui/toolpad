@@ -121,7 +121,6 @@ export interface StudioApiResult<D = any> {
 export interface StudioConnectionParamsEditorProps<P> extends WithControlledProp<P> {
   connectionName: string;
 }
-
 export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionParamsEditorProps<P>>;
 export type StudioQueryEditor<Q = {}> = React.FC<WithControlledProp<Q>>;
 

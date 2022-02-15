@@ -21,7 +21,10 @@ function resolveStudioDir({ _: positional = [] }: { _?: string[] }): string {
 
 const STUDIO_DIR = resolveStudioDir(args);
 const DEV_MODE = args['--dev'];
-// const GOOGLE_SHEETS_CLIENT_ID = process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_ID;
+const STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_ID =
+  process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_ID;
+const STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET =
+  process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET;
 const NEXT_CMD = DEV_MODE ? 'dev' : 'start';
 
 console.log(`Starting Studio in "${STUDIO_DIR}"`);
@@ -40,6 +43,8 @@ const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   env: {
     STUDIO_DATABASE_URL: process.env.STUDIO_DATABASE_URL,
     FORCE_COLOR: process.env.FORCE_COLOR,
+    STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
+    STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
     STUDIO_DIR,
     DEMO_MODE: String(!!args['--demo']),
   },

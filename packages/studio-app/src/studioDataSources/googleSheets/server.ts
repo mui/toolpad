@@ -4,7 +4,7 @@ import {
   ConnectionStatus,
   StudioConnection,
 } from '../../types';
-import { GoogleSheetsConnectionParams, PostgresQuery } from './types';
+import { GoogleSheetsConnectionParams } from './types';
 
 async function test(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
@@ -16,18 +16,15 @@ async function test(
 
 async function exec(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
-  postgresQuery: PostgresQuery,
 ): Promise<StudioApiResult<any>> {
-  console.log(
-    `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection.params.clientId}"`,
-  );
+  console.log(`executing on "${connection.params.clientId}"`);
   return {
     fields: {},
     data: [],
   };
 }
 
-const dataSource: StudioDataSourceServer<GoogleSheetsConnectionParams, PostgresQuery, any> = {
+const dataSource: StudioDataSourceServer<GoogleSheetsConnectionParams, any> = {
   test,
   exec,
 };

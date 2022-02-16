@@ -1,8 +1,8 @@
 import { Stack, TextareaAutosize, TextField } from '@mui/material';
 import * as React from 'react';
+import { useInput } from '@utils/forms';
+import { WithControlledProp } from '@utils/types';
 import { StudioDataSourceClient } from '../../types';
-import { useInput } from '../../utils/forms';
-import { WithControlledProp } from '../../utils/types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
 
 function getInitialValue(): PostgresConnectionParams {

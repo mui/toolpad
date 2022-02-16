@@ -1,14 +1,14 @@
 import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
 import * as studioDom from '@studioDom';
+import { camelCase } from '@utils/strings';
+import { ExactEntriesOf } from '@utils/types';
+import * as bindings from '@utils/bindings';
+import { tryFormat } from '@utils/prettier';
 import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
 import { NodeId, PropExpression, ResolvedProps, StudioBindable, StudioBindables } from './types';
-import { camelCase } from './utils/strings';
-import { ExactEntriesOf } from './utils/types';
-import * as bindings from './utils/bindings';
 import { getQueryNodeArgTypes } from './studioDataSources/client';
-import { tryFormat } from './utils/prettier';
 import { RenderContext } from './studioComponents/studioComponentDefinition';
 
 function literalPropExpression(value: any): PropExpression {

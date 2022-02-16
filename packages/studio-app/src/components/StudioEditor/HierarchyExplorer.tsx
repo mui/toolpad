@@ -26,10 +26,10 @@ import AddIcon from '@mui/icons-material/Add';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import * as studioDom from '@studioDom';
+import { format } from '@utils/prettier';
 import { NodeId } from '../../types';
 import { useDom, useDomApi } from '../DomLoader';
 import client from '../../api';
-import { format } from '../../utils/prettier';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',

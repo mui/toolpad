@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/system';
-import { Rectangle } from './utils/geometry';
+import { Rectangle } from '@utils/geometry';
 
 const PinholeOverlayRoot = styled('div')({
   pointerEvents: 'none !important' as 'none',

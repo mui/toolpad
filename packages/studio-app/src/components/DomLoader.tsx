@@ -1,9 +1,9 @@
 import * as React from 'react';
 import * as studioDom from '@studioDom';
+import { update } from '@utils/immutability';
+import useDebounced from '@utils/useDebounced';
 import { NodeId, StudioBindable } from '../types';
-import { update } from '../utils/immutability';
 import client from '../api';
-import useDebounced from '../utils/useDebounced';
 
 export type DomAction =
   | {

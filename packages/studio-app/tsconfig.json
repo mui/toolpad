@@ -19,7 +19,8 @@
     "incremental": true,
     "noUnusedLocals": true,
     "paths": {
-      "@studioDom": ["./src/studioDom"]
+      "@studioDom": ["./src/studioDom"],
+      "@utils/*": ["./src/utils/*"]
     }
   },
   "include": ["next.config.js", "next-env.d.ts", "**/*.ts", "**/*.tsx", "typings/**/*.d.ts"],

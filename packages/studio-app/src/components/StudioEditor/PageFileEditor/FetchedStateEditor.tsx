@@ -16,11 +16,11 @@ import { ArgTypeDefinition, useFetchedState } from '@mui/studio-core';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import * as studioDom from '@studioDom';
-import useLatest from '../../../utils/useLatest';
+import useLatest from '@utils/useLatest';
+import { WithControlledProp } from '@utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import { NodeId, StudioBindable } from '../../../types';
-import { WithControlledProp } from '../../../utils/types';
 import { BindableEditor } from './ComponentPropEditor';
 import StringRecordEditor from '../../StringRecordEditor';
 

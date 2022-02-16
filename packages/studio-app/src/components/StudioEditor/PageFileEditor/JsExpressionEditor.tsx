@@ -2,7 +2,7 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import jsonToTs from 'json-to-ts';
-import { WithControlledProp } from '../../../utils/types';
+import { WithControlledProp } from '@utils/types';
 import { usePageEditorState } from './PageEditorProvider';
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {

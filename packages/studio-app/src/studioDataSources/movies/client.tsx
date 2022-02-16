@@ -8,10 +8,10 @@ import {
   TextField,
 } from '@mui/material';
 import * as React from 'react';
+import { useInput } from '@utils/forms';
+import { WithControlledProp } from '@utils/types';
 import data from '../../../movies.json';
 import { StudioDataSourceClient } from '../../types';
-import { useInput } from '../../utils/forms';
-import { WithControlledProp } from '../../utils/types';
 import { MoviesQuery, MoviesConnectionParams } from './types';
 
 function ConnectionParamsInput({ value, onChange }: WithControlledProp<MoviesConnectionParams>) {

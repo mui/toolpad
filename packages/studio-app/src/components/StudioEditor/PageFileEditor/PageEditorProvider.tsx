@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as studioDom from '@studioDom';
+import { update, updateOrCreate } from '@utils/immutability';
 import { NodeId, SlotLocation, PageViewState } from '../../../types';
-import { update, updateOrCreate } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'component' | 'theme';
 

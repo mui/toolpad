@@ -7,8 +7,8 @@ import {
   LiveBindings,
   ComponentConfig,
 } from '@mui/studio-core';
-import type { Branded, WithControlledProp } from './utils/types';
-import type { Rectangle } from './utils/geometry';
+import type { Branded, WithControlledProp } from '@utils/types';
+import type { Rectangle } from '@utils/geometry';
 
 export interface EditorProps<T> {
   nodeId: NodeId;

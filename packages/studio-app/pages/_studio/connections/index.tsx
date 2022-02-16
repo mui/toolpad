@@ -23,8 +23,8 @@ import { LoadingButton } from '@mui/lab';
 import CheckIcon from '@mui/icons-material/Check';
 import CrossIcon from '@mui/icons-material/Clear';
 import { useQuery } from 'react-query';
+import { ExactEntriesOf } from '@utils/types';
 import dataSources from '../../../src/studioDataSources/client';
-import { ExactEntriesOf } from '../../../src/utils/types';
 import {
   ConnectionStatus,
   StudioConnection,

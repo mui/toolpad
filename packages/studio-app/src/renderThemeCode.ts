@@ -1,5 +1,5 @@
 import * as studioDom from '@studioDom';
-import { tryFormat } from './utils/prettier';
+import { tryFormat } from '@utils/prettier';
 
 export interface RenderThemeConfig {
   // whether we're in the context of an editor

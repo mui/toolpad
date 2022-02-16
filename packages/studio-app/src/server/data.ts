@@ -1,5 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { generateRandomId } from '@utils/randomId';
+import * as studioDom from '@studioDom';
 import { DATA_ROOT } from './db';
 import {
   StudioConnection,
@@ -8,9 +10,7 @@ import {
   StudioDataSourceServer,
   StudioApiResult,
 } from '../types';
-import { generateRandomId } from '../utils/randomId';
 import studioDataSources from '../studioDataSources/server';
-import * as studioDom from '@studioDom';
 
 interface StoredstudioDom extends studioDom.StudioDom {
   id: 'default';

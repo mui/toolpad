@@ -1,12 +1,12 @@
 import { Alert, Stack } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-core';
-import studioPropControls from '../../propertyControls';
 import * as studioDom from '@studioDom';
+import { WithControlledProp } from '@utils/types';
+import studioPropControls from '../../propertyControls';
 import { useDomApi } from '../../DomLoader';
 import { BindingEditor } from './BindingEditor';
 import { NodeId, StudioBindable } from '../../../types';
-import { WithControlledProp } from '../../../utils/types';
 import { usePageEditorState } from './PageEditorProvider';
 
 function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {

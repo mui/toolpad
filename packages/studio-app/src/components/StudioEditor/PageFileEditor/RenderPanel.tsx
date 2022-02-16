@@ -5,6 +5,14 @@ import { RuntimeEvent, SlotType } from '@mui/studio-core';
 import throttle from 'lodash/throttle';
 import * as studioDom from '@studioDom';
 import {
+  absolutePositionCss,
+  distanceToLine,
+  distanceToRect,
+  Rectangle,
+  rectContainsPoint,
+} from '@utils/geometry';
+import { ExactEntriesOf } from '@utils/types';
+import {
   NodeId,
   FlowDirection,
   SlotLocation,
@@ -13,16 +21,8 @@ import {
   NodesInfo,
 } from '../../../types';
 import PageView from '../../PageView';
-import {
-  absolutePositionCss,
-  distanceToLine,
-  distanceToRect,
-  Rectangle,
-  rectContainsPoint,
-} from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
 import { getPageViewState } from '../../../pageViewState';
-import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';

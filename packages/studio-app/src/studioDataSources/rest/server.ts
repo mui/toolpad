@@ -1,3 +1,4 @@
+import * as bindings from '@utils/bindings';
 import {
   StudioBindable,
   ConnectionStatus,
@@ -5,7 +6,6 @@ import {
   StudioApiResult,
 } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
-import * as bindings from '../../utils/bindings';
 
 function resolveBindableString(
   bindable: StudioBindable<string>,

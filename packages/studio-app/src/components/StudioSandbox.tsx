@@ -2,8 +2,8 @@ import * as React from 'react';
 import { styled, useForkRef } from '@mui/material';
 import { ImportMap } from 'esinstall';
 import { transform } from 'sucrase';
+import { omit, take } from '@utils/immutability';
 import renderPageHtml from '../renderPageHtml';
-import { omit, take } from '../utils/immutability';
 
 const StudioSandboxRoot = styled('iframe')({
   border: 'none',

@@ -5,13 +5,13 @@ import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import { ArgTypeDefinitions, ComponentConfig } from '@mui/studio-core';
 import * as studioDom from '@studioDom';
+import { tryFormat } from '@utils/prettier';
 import { NodeId } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
 import StudioSandbox from '../../StudioSandbox';
 import getImportMap from '../../../getImportMap';
 import renderThemeCode from '../../../renderThemeCode';
 import renderEntryPoint from '../../../renderPageEntryCode';
-import { tryFormat } from '../../../utils/prettier';
 
 const ComponentSandbox = styled(StudioSandbox)({
   height: '100%',

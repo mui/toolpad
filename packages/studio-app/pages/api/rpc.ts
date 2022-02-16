@@ -1,6 +1,7 @@
 import { NextApiHandler } from 'next';
 import { AsyncLocalStorage } from 'async_hooks';
 import type { IncomingMessage, ServerResponse } from 'http';
+import { hasOwnProperty } from '@utils/collections';
 import {
   getConnection,
   getConnections,
@@ -11,7 +12,6 @@ import {
   loadApp,
   saveApp,
 } from '../../src/server/data';
-import { hasOwnProperty } from '../../src/utils/collections';
 
 const asyncLocalStorage = new AsyncLocalStorage<NextRpcContext>();
 

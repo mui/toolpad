@@ -8,8 +8,8 @@ import {
   ComponentConfig,
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
+import { getRelativeBoundingRect, getRelativeOuterRect } from '@utils/geometry';
 import { NodeId, FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
-import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
 
 declare global {
   interface Window {

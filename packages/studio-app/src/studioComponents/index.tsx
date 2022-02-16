@@ -3,6 +3,7 @@ import * as studioDom from '../studioDom';
 
 import CustomLayout from './CustomLayout';
 import Button from './Button';
+import Container from './Container';
 import DataGrid from './DataGrid';
 import Paper from './Paper';
 import Stack from './Stack';
@@ -16,6 +17,7 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
   ['Button', Button],
   ['DataGrid', DataGrid],
   ['Paper', Paper],
+  ['Container', Container],
   ['Stack', Stack],
   ['TextField', TextField],
   ['Typography', Typography],

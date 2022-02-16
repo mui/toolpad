@@ -23,10 +23,9 @@ const ComponentPropsEditorRoot = styled('div')(({ theme }) => ({
 
 interface ComponentPropsEditorProps<P> {
   node: studioDom.StudioElementNode<P>;
-  actualValues: Partial<P>;
 }
 
-function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorProps<P>) {
+function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
   const dom = useDom();
   const definition = getStudioComponent(dom, node.component);
 
@@ -36,12 +35,7 @@ function ComponentPropsEditor<P>({ node, actualValues }: ComponentPropsEditorPro
         ([propName, propTypeDef]) =>
           propTypeDef ? (
             <div key={propName} className={classes.control}>
-              <ComponentPropEditor
-                node={node}
-                propName={propName}
-                argType={propTypeDef}
-                actualValue={actualValues[propName]}
-              />
+              <ComponentPropEditor node={node} propName={propName} argType={propTypeDef} />
             </div>
           ) : null,
       )}
@@ -53,13 +47,10 @@ interface SelectedNodeEditorProps {
   node: studioDom.StudioElementNode;
 }
 
-const DEFAULT_ACTUAL_VALUES = {};
-
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const dom = useDom();
   const { viewState } = usePageEditorState();
   const nodeError = viewState.nodes[node.id]?.error;
-  const actualValues = viewState.nodes[node.id]?.attributes.props ?? DEFAULT_ACTUAL_VALUES;
 
   const component = useStudioComponent(dom, node.component);
 
@@ -72,7 +63,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
       {node ? (
         <React.Fragment>
           <div>props:</div>
-          <ComponentPropsEditor node={node} actualValues={actualValues} />
+          <ComponentPropsEditor node={node} />
         </React.Fragment>
       ) : null}
     </React.Fragment>

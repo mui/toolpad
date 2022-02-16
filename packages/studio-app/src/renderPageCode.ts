@@ -516,15 +516,12 @@ class Context implements RenderContext {
       },
     );
 
-    const Container = this.addImport('@mui/material', 'Container', 'Container');
     const Stack = this.addImport('@mui/material', 'Stack', 'Stack');
 
     const rendered = `
-      <${Container}>
-        <${Stack} direction="column" gap={2} my={2}>
-          ${this.renderJsxContent(resolvedChildren.children)}
-        </${Stack}>
-      </${Container}>
+      <${Stack} direction="column" gap={2} m={2}>
+        ${this.renderJsxContent(resolvedChildren.children)}
+      </${Stack}>
     `;
 
     const expr = this.wrapComponent(node, rendered);

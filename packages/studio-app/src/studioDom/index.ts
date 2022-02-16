@@ -1,10 +1,10 @@
 import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
-import { NodeId, StudioConstant, StudioBindable, StudioBindables } from './types';
-import { omit, update } from './utils/immutability';
-import { generateUniqueId } from './utils/randomId';
-import { generateUniqueString } from './utils/strings';
-import { ExactEntriesOf } from './utils/types';
+import { NodeId, StudioConstant, StudioBindable, StudioBindables } from '../types';
+import { omit, update } from '../utils/immutability';
+import { generateUniqueId } from '../utils/randomId';
+import { generateUniqueString } from '../utils/strings';
+import { ExactEntriesOf } from '../utils/types';
 
 export function createFractionalIndex(index1: string | null, index2: string | null) {
   return generateKeyBetween(index1, index2);

@@ -149,7 +149,7 @@ export interface StudioConnectionSummary {
   name: string;
 }
 
-export interface StudioConnection<P = {}> extends StudioConnectionSummary {
+export interface StudioConnection<P = unknown> extends StudioConnectionSummary {
   params: P;
   status: ConnectionStatus | null;
 }

@@ -56,7 +56,6 @@ export function BindingEditor<V>({
   onChange,
 }: BindingEditorProps<V>) {
   const { viewState } = usePageEditorState();
-
   const liveBinding = viewState.bindings[bindingId];
 
   const [input, setInput] = React.useState(value);

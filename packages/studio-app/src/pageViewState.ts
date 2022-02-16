@@ -30,7 +30,6 @@ function getNodeViewInfo(
     const rect = getRelativeOuterRect(viewElm, elm);
     const error = fiber.memoizedProps?.nodeError as RuntimeError | undefined;
     // We get the props from the child fiber because the current fiber is for the wrapper element
-    const props = fiber.child?.memoizedProps ?? {};
     // eslint-disable-next-line no-underscore-dangle
     const component: ComponentConfig<unknown> | undefined = (fiber.child?.elementType as any)
       ?.__config;
@@ -39,9 +38,6 @@ function getNodeViewInfo(
       nodeId,
       error,
       component,
-      attributes: {
-        props,
-      },
       rect,
       slots: {},
     };

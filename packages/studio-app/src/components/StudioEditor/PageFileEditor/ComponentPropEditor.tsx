@@ -7,6 +7,7 @@ import { useDomApi } from '../../DomLoader';
 import { BindingEditor } from './BindingEditor';
 import { NodeId, StudioBindable } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
+import { usePageEditorState } from './PageEditorProvider';
 
 function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
   switch (typeDef.type) {
@@ -30,7 +31,6 @@ export interface BindableEditorProps<V> extends WithControlledProp<StudioBindabl
   propName: string;
   nodeId: NodeId;
   argType: ArgTypeDefinition;
-  actualValue?: V;
 }
 
 export function BindableEditor<V>({
@@ -40,7 +40,6 @@ export function BindableEditor<V>({
   argType,
   value,
   onChange,
-  actualValue,
 }: BindableEditorProps<V>) {
   const handlePropConstChange = React.useCallback(
     (newValue: V) => onChange({ type: 'const', value: newValue }),
@@ -54,13 +53,17 @@ export function BindableEditor<V>({
   const controlSpec = argType.control ?? getDefaultControl(argType.typeDef);
   const control = controlSpec ? studioPropControls[controlSpec.type] : null;
 
+  const bindingId = `${nodeId}${propNamespace ? `.${propNamespace}` : ''}.${propName}`;
+  const { viewState } = usePageEditorState();
+  const liveBinding = viewState.bindings[bindingId];
+
   const initConstValue = React.useCallback(() => {
     if (value?.type === 'const') {
       return value.value;
     }
 
-    return actualValue;
-  }, [actualValue, value]);
+    return liveBinding?.value;
+  }, [liveBinding, value]);
 
   const [constValue, setConstValue] = React.useState(initConstValue);
 
@@ -106,14 +109,12 @@ export interface ComponentPropEditorProps<P, K extends keyof P> {
   node: studioDom.StudioElementNode<P>;
   propName: K;
   argType: ArgTypeDefinition;
-  actualValue?: P[K];
 }
 
 export default function ComponentPropEditor<P, K extends keyof P & string>({
   node,
   propName,
   argType,
-  actualValue,
 }: ComponentPropEditorProps<P, K>) {
   const domApi = useDomApi();
   const propNamespace = 'props';
@@ -135,7 +136,6 @@ export default function ComponentPropEditor<P, K extends keyof P & string>({
       nodeId={node.id}
       value={propValue}
       onChange={handlePropChange}
-      actualValue={actualValue}
     />
   );
 }

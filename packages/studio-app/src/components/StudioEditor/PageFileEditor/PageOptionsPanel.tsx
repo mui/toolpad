@@ -19,6 +19,8 @@ import QueryStateEditor from './QueryStateEditor';
 import FetchedStateEditor from './FetchedStateEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import { NodeId } from '../../../types';
+import NodeNameEditor from './NodeNameEditor';
+import * as studioDom from '../../../studioDom';
 
 interface PageSourceProps {
   pageNodeId: NodeId;
@@ -39,6 +41,9 @@ function PageSource({ pageNodeId, editor }: PageSourceProps) {
 export default function PageOptionsPanel() {
   const state = usePageEditorState();
   const pageNodeId = state.nodeId;
+  const dom = useDom();
+
+  const page = studioDom.getNode(dom, pageNodeId, 'page');
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [debugEditor, setDebugEditor] = React.useState(false);
@@ -46,6 +51,7 @@ export default function PageOptionsPanel() {
   return (
     <div>
       <Stack spacing={1} alignItems="start">
+        <NodeNameEditor node={page} />
         <Button
           startIcon={<PageIcon />}
           color="inherit"

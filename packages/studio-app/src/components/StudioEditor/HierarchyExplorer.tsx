@@ -29,6 +29,7 @@ import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
 import { useDom, useDomApi } from '../DomLoader';
 import client from '../../api';
+import { format } from '../../utils/prettier';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -193,6 +194,33 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
   );
 }
 
+function createDefaultCodeComponent(name: string): string {
+  const componentId = name.replace(/\s/g, '');
+  const propTypeId = `${componentId}Props`;
+  return format(`
+    import * as React from 'react';
+    import type { ComponentConfig } from "@mui/studio-core";
+    
+    export interface ${propTypeId} {
+      msg: string;
+    }
+    
+    export const config: ComponentConfig<${propTypeId}> = {
+      argTypes: {}
+    }
+    
+    export default function ${componentId}({ msg }: ${propTypeId}) {
+      return (
+        <div>{msg}</div>
+      );
+    }
+
+    ${componentId}.defaultProps = {
+      msg: "Hello world!",
+    };
+  `);
+}
+
 interface CreateStudioCodeComponentDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {}
 
 function CreateStudioCodeComponentDialog({
@@ -209,24 +237,10 @@ function CreateStudioCodeComponentDialog({
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          console.log('name', name);
           const newNode = studioDom.createNode(dom, 'codeComponent', {
             name,
-            code: [
-              "import * as React from 'react';",
-              '',
-              'export interface MyComponentProps {',
-              '',
-              '}',
-              '',
-              'export default function MyComponent (props: MyComponentProps) {',
-              '  return (',
-              '    <div>',
-              '      Hello World!',
-              '    </div>',
-              '  );',
-              '}',
-              '',
-            ].join('\n'),
+            code: createDefaultCodeComponent(name),
             argTypes: {},
           });
           const appNode = studioDom.getApp(dom);

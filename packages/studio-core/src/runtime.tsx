@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
-import type { SlotType, LiveBindings, RuntimeEvent } from './index';
+import type { SlotType, LiveBindings, RuntimeEvent, ComponentConfig } from './index';
 
 declare global {
   interface Window {
@@ -217,4 +217,13 @@ export function Slots({ prop, children }: SlotsProps) {
   ) : (
     <Placeholder prop={prop} />
   );
+}
+
+export async function importCodeComponent<P>(
+  module: Promise<{ default: React.FC<P> | React.Component<P>; config?: ComponentConfig<P> }>,
+): Promise<React.FC<P> | React.Component<P>> {
+  const { default: Component, config } = await module;
+  // eslint-disable-next-line no-underscore-dangle
+  (Component as any).__config = config;
+  return Component;
 }

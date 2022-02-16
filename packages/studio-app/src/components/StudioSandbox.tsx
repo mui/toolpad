@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled } from '@mui/material';
+import { styled, useForkRef } from '@mui/material';
 import { ImportMap } from 'esinstall';
 import { transform } from 'sucrase';
 import renderPageHtml from '../renderPageHtml';
@@ -29,6 +29,7 @@ export interface StudioSandboxProps {
   importMap?: ImportMap;
   files: SandboxFiles;
   entry: string;
+  frameRef?: React.RefObject<HTMLIFrameElement>;
   // Callback for when the view has loaded. Make sure this value is stable
   onLoad?: (windiw: Window) => void;
 }
@@ -45,9 +46,12 @@ export default function StudioSandbox({
   files,
   entry,
   base,
+  frameRef: frameRefProp,
   importMap = { imports: {} },
 }: StudioSandboxProps) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
+  const handleFrameRef = useForkRef(frameRefProp, frameRef);
+
   const [frameSrc, setFrameSrc] = React.useState<string>();
 
   const [transformErrors, setTransformErrors] = React.useState<Record<string, string>>({});
@@ -87,7 +91,10 @@ export default function StudioSandbox({
             );
 
             if (hotUpdate) {
-              frameRef.current?.contentWindow?.postMessage({ type: 'update', url: resolvedPath });
+              frameRef.current?.contentWindow?.postMessage({
+                type: 'update',
+                url: resolvedPath,
+              });
             }
 
             setTransformErrors((errors) => omit(errors, path));
@@ -170,7 +177,7 @@ export default function StudioSandbox({
     <div className={className}>{error}</div>
   ) : (
     <StudioSandboxRoot
-      ref={frameRef}
+      ref={handleFrameRef}
       src={frameSrc}
       className={className}
       title="sandbox"

@@ -3,6 +3,7 @@ import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
+import { ArgTypeDefinitions, ComponentConfig } from '@mui/studio-core';
 import { NodeId } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -20,11 +21,18 @@ interface CodeComponentEditorContentProps {
   codeComponentNode: studioDom.StudioCodeComponentNode;
 }
 
+declare global {
+  interface Window {
+    __STUDIO_EDITOR_UPDATE_COMPONENT_CONFIG__?: React.Dispatch<React.SetStateAction<any>>;
+  }
+}
+
 function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const dom = useDom();
   const domApi = useDomApi();
 
   const [input, setInput] = React.useState(codeComponentNode.code);
+  const [argTypes, setArgTypes] = React.useState<ArgTypeDefinitions>({});
 
   const updateDomActionRef = React.useRef(() => {});
 
@@ -33,8 +41,14 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
       const pretty = tryFormat(input);
       setInput(pretty);
       domApi.setNodeAttribute(codeComponentNode, 'code', pretty);
+      domApi.setNodeAttribute(codeComponentNode, 'argTypes', argTypes);
     };
-  }, [domApi, codeComponentNode, input]);
+  }, [domApi, codeComponentNode, input, argTypes]);
+
+  const handleConfigUpdate = React.useCallback(
+    (newConfig: ComponentConfig<unknown> | undefined) => setArgTypes(newConfig?.argTypes || {}),
+    [],
+  );
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const HandleEditorMount = React.useCallback(
@@ -89,19 +103,35 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const themePath = './lib/theme.ts';
   const entryPath = `./entry.tsx`;
+  const componentWrapperPath = `./componentWrapper.ts`;
   const componentPath = `./components/${codeComponentNode.id}.tsx`;
 
-  const renderedTheme = React.useMemo(() => {
-    return renderThemeCode(dom, { editor: true });
-  }, [dom]);
+  const renderedTheme = React.useMemo(() => renderThemeCode(dom, { editor: true }), [dom]);
+
+  const componentWrapper = `
+    const { default: Component, config } = await import(${JSON.stringify(componentPath)});
+    window.__STUDIO_EDITOR_UPDATE_COMPONENT_CONFIG__?.(config ?? {});
+    export default Component;
+  `;
 
   const renderedEntrypoint = React.useMemo(() => {
     return renderEntryPoint({
-      pagePath: componentPath,
+      pagePath: componentWrapperPath,
       themePath,
       editor: true,
     });
-  }, [componentPath, themePath]);
+  }, [componentWrapperPath, themePath]);
+
+  const frameRef = React.useRef<HTMLIFrameElement>(null);
+
+  const setupFrameWindow = React.useCallback(() => {
+    if (frameRef.current?.contentWindow) {
+      // eslint-disable-next-line no-underscore-dangle
+      frameRef.current.contentWindow.__STUDIO_EDITOR_UPDATE_COMPONENT_CONFIG__ = handleConfigUpdate;
+    }
+  }, [handleConfigUpdate]);
+
+  React.useEffect(() => setupFrameWindow(), [setupFrameWindow]);
 
   return (
     <Stack sx={{ height: '100%' }}>
@@ -129,11 +159,14 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             base={`/components/${codeComponentNode.id}/`}
             importMap={getImportMap()}
             files={{
+              [componentWrapperPath]: { code: componentWrapper },
               [componentPath]: { code: input },
               [themePath]: { code: renderedTheme.code },
               [entryPath]: { code: renderedEntrypoint.code },
             }}
             entry={entryPath}
+            frameRef={frameRef}
+            onLoad={setupFrameWindow}
           />
         </Box>
       </Box>

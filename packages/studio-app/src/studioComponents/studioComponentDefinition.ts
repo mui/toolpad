@@ -5,6 +5,7 @@ import { PropExpression, ResolvedProps } from '../types';
 export interface RenderContext {
   dom: StudioDom;
   addImport(source: string, imported: string, local: string): string;
+  addCodeComponentImport(source: string, local: string): string;
   renderProps(resolvedProps: ResolvedProps): string;
   renderJsExpression(expr?: PropExpression): string;
   renderJsxContent(expr?: PropExpression): string;

@@ -5,6 +5,7 @@ import {
   SlotType,
   RuntimeError,
   LiveBindings,
+  ComponentConfig,
 } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
@@ -86,19 +87,12 @@ export interface SlotsState {
   [prop: string]: SlotState | undefined;
 }
 
-export interface NodeLayout {
-  nodeId: NodeId;
-  rect: Rectangle;
-  slots: SlotsState;
-}
-
-export interface NodesLayout {
-  [nodeId: NodeId]: NodeLayout | undefined;
-}
-
-export interface NodeState {
+export interface NodeInfo {
   nodeId: NodeId;
   error?: RuntimeError;
+  rect?: Rectangle;
+  slots?: SlotsState;
+  component?: ComponentConfig<unknown>;
   attributes: {
     props: {
       [key: string]: unknown;
@@ -106,13 +100,12 @@ export interface NodeState {
   };
 }
 
-export interface NodesState {
-  [nodeId: NodeId]: NodeState | undefined;
+export interface NodesInfo {
+  [nodeId: NodeId]: NodeInfo | undefined;
 }
 
 export interface PageViewState {
-  layouts: NodesLayout;
-  nodes: NodesState;
+  nodes: NodesInfo;
   pageState: Record<string, unknown>;
   bindings: LiveBindings;
 }

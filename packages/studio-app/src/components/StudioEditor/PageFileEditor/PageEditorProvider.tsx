@@ -57,7 +57,7 @@ export function createPageEditorState(nodeId: NodeId): PageEditorState {
     newNode: null,
     highlightLayout: false,
     highlightedSlot: null,
-    viewState: { layouts: {}, nodes: {}, pageState: {}, bindings: {} },
+    viewState: { nodes: {}, pageState: {}, bindings: {} },
   };
 }
 

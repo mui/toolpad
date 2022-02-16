@@ -104,6 +104,10 @@ export type RuntimeEvent = {
   value: React.SetStateAction<unknown>;
 };
 
+export interface ComponentConfig<P> {
+  argTypes: ArgTypeDefinitions<P>;
+}
+
 export type LiveBindings = Partial<Record<string, LiveBinding>>;
 
 export type { PlaceholderProps, SlotsProps, StudioRuntimeNode, RuntimeError } from './runtime';

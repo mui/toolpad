@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as studioDom from '../studioDom';
-import importedComponentRenderer from './importedComponentRenderer';
 
 import CustomLayout from './CustomLayout';
 import Button from './Button';
@@ -10,7 +9,7 @@ import Stack from './Stack';
 import Typography from './Typography';
 import TextField from './TextField';
 import Select from './Select';
-import { StudioComponentDefinition } from './studioComponentDefinition';
+import { RenderComponent, StudioComponentDefinition } from './studioComponentDefinition';
 
 // TODO: bring these back to @mui/studio repo and make them import @mui/material
 const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
@@ -24,6 +23,13 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
   ['Select', Select],
 ]);
 
+function codeComponentRenderer(moduleName: string, suggestedLocalName: string): RenderComponent {
+  return (ctx, node, resolvedProps) => {
+    const localName = ctx.addCodeComponentImport(moduleName, suggestedLocalName);
+    return `<${localName} ${ctx.renderProps(resolvedProps)} />`;
+  };
+}
+
 function createCodeComponent(
   domNode: studioDom.StudioCodeComponentNode,
 ): StudioComponentDefinition {
@@ -31,11 +37,7 @@ function createCodeComponent(
     id: `codeComponent.${domNode.id}`,
     displayName: domNode.name,
     argTypes: domNode.argTypes,
-    render: importedComponentRenderer(
-      `../components/${domNode.id}.tsx`,
-      `default`,
-      `Custom_${domNode.id}`,
-    ),
+    render: codeComponentRenderer(`../components/${domNode.id}.tsx`, domNode.name),
   };
 }
 

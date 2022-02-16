@@ -48,13 +48,14 @@ async function bundle(files: Record<string, string>, entry: string): Promise<str
 describe('renderPageCode', () => {
   test('Basic studio dom rendering Typography component', async () => {
     let dom = studioDom.createDom();
-    const page = studioDom.createNode(dom, 'page', { title: '', state: {} });
-    dom = studioDom.addNode(dom, page, dom.root, 'children');
+    const root = studioDom.getNode(dom, dom.root, 'app');
+    const page = studioDom.createNode(dom, 'page', { title: '', urlQuery: {}, name: 'Page' });
+    dom = studioDom.addNode(dom, page, root, 'pages');
     const text = studioDom.createNode(dom, 'element', {
       component: 'Typography',
       props: { children: { type: 'const', value: 'Hello World' } },
     });
-    dom = studioDom.addNode(dom, text, page.id, 'children');
+    dom = studioDom.addNode(dom, text, page, 'children');
 
     const { code } = renderPageCode(dom, page.id);
 

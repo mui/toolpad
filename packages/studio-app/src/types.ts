@@ -5,6 +5,7 @@ import {
   SlotType,
   RuntimeError,
   LiveBindings,
+  ComponentConfig,
 } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
@@ -104,6 +105,23 @@ export interface NodeState {
       [key: string]: unknown;
     };
   };
+}
+
+export interface NodeInfo {
+  nodeId: NodeId;
+  error?: RuntimeError;
+  rect?: Rectangle;
+  slots?: SlotsState;
+  component?: ComponentConfig<unknown>;
+  attributes: {
+    props: {
+      [key: string]: unknown;
+    };
+  };
+}
+
+export interface NodesInfo {
+  [nodeId: NodeId]: NodeInfo | undefined;
 }
 
 export interface NodesState {

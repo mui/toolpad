@@ -78,6 +78,8 @@ class Context implements RenderContext {
 
   private imports: Imports;
 
+  private codeComponentImports = new Map<string, string>();
+
   private moduleScope: Scope;
 
   private reactAlias: string = 'undefined';
@@ -606,6 +608,32 @@ class Context implements RenderContext {
     return this.imports.add(source, imported, suggestedName);
   }
 
+  addCodeComponentImport(source: string, suggestedName: string = 'CodeComponent'): string {
+    if (this.editor) {
+      const existing = this.codeComponentImports.get(source);
+      if (existing) {
+        return existing;
+      }
+
+      const varName = this.moduleScope.createUniqueBinding(suggestedName);
+      this.codeComponentImports.set(source, varName);
+      return varName;
+    }
+
+    return this.imports.add(source, 'default', suggestedName);
+  }
+
+  renderCodeComponentImports(): string {
+    // TODO: Import concurrently through Promise.all
+    return Array.from(
+      this.codeComponentImports.entries(),
+      ([source, name]) =>
+        `const ${name} = await ${this.runtimeAlias}.importCodeComponent(import(${JSON.stringify(
+          source,
+        )}))`,
+    ).join('\n');
+  }
+
   renderControlledStateHooks(): string {
     return Array.from(this.controlledStateHooks.values(), (stateHook) => {
       const defaultValue = JSON.stringify(stateHook.defaultValue);
@@ -771,9 +799,11 @@ class Context implements RenderContext {
     this.imports.seal();
 
     const imports = this.imports.render();
+    const codeComponentImports = this.renderCodeComponentImports();
 
     return `
       ${imports}
+      ${codeComponentImports}
 
       export default function App () {
         ${urlQueryStateHooks}

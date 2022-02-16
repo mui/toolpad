@@ -5,6 +5,7 @@ import {
   RuntimeError,
   LiveBindings,
   RuntimeEvent,
+  ComponentConfig,
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import {
@@ -15,6 +16,7 @@ import {
   PageViewState,
   NodesLayout,
   NodeLayout,
+  NodesInfo,
 } from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
 
@@ -32,14 +34,17 @@ function getNodeViewInfo(
   viewElm: Element,
   elm: Element,
   nodeId: NodeId,
-): { node: NodeState; layout: NodeLayout } | null {
+): { node: NodeState; layout: NodeLayout; component: ComponentConfig<unknown> } | null {
   if (nodeId) {
     const rect = getRelativeOuterRect(viewElm, elm);
     const error = fiber.memoizedProps?.nodeError as RuntimeError | undefined;
     // We get the props from the child fiber because the current fiber is for the wrapper element
     const props = fiber.child?.memoizedProps ?? {};
+    // eslint-disable-next-line no-underscore-dangle
+    const component: ComponentConfig<unknown> = fiber.child?.elementType?.__config;
 
     return {
+      component,
       node: {
         nodeId,
         error,
@@ -81,6 +86,7 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
 
   const layouts: NodesLayout = {};
   const nodes: NodesState = {};
+  const nodes2: NodesInfo = {};
 
   const rendererId = 1;
   const nodeElms = new Map<NodeId, Element>();
@@ -139,15 +145,14 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
     }
   });
 
-  return { layouts, nodes };
+  return { layouts, nodes, nodes2 };
 }
 
 export function getPageViewState(rootElm: HTMLElement): PageViewState {
   const contentWindow = rootElm.ownerDocument.defaultView;
-  const { nodes, layouts } = getNodesViewInfo(rootElm);
+
   return {
-    nodes,
-    layouts,
+    ...getNodesViewInfo(rootElm),
     // eslint-disable-next-line no-underscore-dangle
     pageState: contentWindow?.__STUDIO_RUNTIME_PAGE_STATE__ ?? {},
     // eslint-disable-next-line no-underscore-dangle

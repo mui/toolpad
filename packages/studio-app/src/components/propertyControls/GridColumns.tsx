@@ -24,7 +24,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import type { EditorProps, PropControlDefinition } from '../../types';
 
 // TODO: this import suggests leaky abstraction
-import { usePageEditorState } from '../StudioEditor/PageFileEditor/PageEditorProvider';
+import { usePageEditorState } from '../StudioEditor/PageEditor/PageEditorProvider';
 import { generateUniqueString } from '../../utils/strings';
 
 const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean'];

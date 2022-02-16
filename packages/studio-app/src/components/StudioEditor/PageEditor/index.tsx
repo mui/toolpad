@@ -15,7 +15,7 @@ const classes = {
   renderPanel: 'StudioRenderPanel',
 };
 
-const PageFileEditorRoot = styled('div')(({ theme }) => ({
+const PageEditorRoot = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   overflow: 'hidden',
@@ -28,21 +28,21 @@ const PageFileEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-interface PageFileEditorProps {
+interface PageEditorProps {
   className?: string;
 }
 
-export default function PageFileEditor({ className }: PageFileEditorProps) {
+export default function PageEditor({ className }: PageEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const pageNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'page');
   return pageNode ? (
     <PageEditorProvider key={nodeId} nodeId={nodeId as NodeId}>
-      <PageFileEditorRoot className={className}>
+      <PageEditorRoot className={className}>
         <ComponentCatalog />
         <RenderPanel className={classes.renderPanel} />
         <ComponentPanel className={classes.componentPanel} />
-      </PageFileEditorRoot>
+      </PageEditorRoot>
     </PageEditorProvider>
   ) : (
     <Typography sx={{ p: 4 }}>Non-existing Page &quot;{nodeId}&quot;</Typography>

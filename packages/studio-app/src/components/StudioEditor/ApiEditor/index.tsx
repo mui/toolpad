@@ -14,11 +14,11 @@ function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<
   return dataSource || null;
 }
 
-interface ApiEditorProps<Q> {
+interface ApiEditorContentProps<Q> {
   apiNode: studioDom.StudioApiNode<Q>;
 }
 
-function ApiEditorContent<Q>({ apiNode }: ApiEditorProps<Q>) {
+function ApiEditorContent<Q>({ apiNode }: ApiEditorContentProps<Q>) {
   const domApi = useDomApi();
 
   const [name, setName] = React.useState(apiNode.name);
@@ -80,11 +80,11 @@ function ApiEditorContent<Q>({ apiNode }: ApiEditorProps<Q>) {
   ) : null;
 }
 
-interface ApiFileEditorProps {
+interface ApiEditorProps {
   className?: string;
 }
 
-export default function ApiFileEditor({ className }: ApiFileEditorProps) {
+export default function ApiEditor({ className }: ApiEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const apiNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'api');

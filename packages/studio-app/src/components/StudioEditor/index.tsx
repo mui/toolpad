@@ -3,11 +3,12 @@ import * as React from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import StudioAppBar from '../StudioAppBar';
-import PageEditor from './PageFileEditor';
+import PageEditor from './PageEditor';
 import PagePanel from './PagePanel';
 import DomProvider, { useDomLoader } from '../DomLoader';
-import ApiEditor from './ApiFileEditor';
+import ApiEditor from './ApiEditor';
 import CodeComponentEditor from './CodeComponentEditor';
+import ConnectionEditor from './ConnectionEditor';
 
 const classes = {
   content: 'StudioContent',
@@ -44,8 +45,9 @@ interface FileEditorProps {
 function FileEditor({ className }: FileEditorProps) {
   return (
     <Routes>
-      <Route path="pages/:nodeId" element={<PageEditor className={className} />} />
+      <Route path="connections/:nodeId" element={<ConnectionEditor className={className} />} />
       <Route path="apis/:nodeId" element={<ApiEditor className={className} />} />
+      <Route path="pages/:nodeId" element={<PageEditor className={className} />} />
       <Route
         path="codeComponents/:nodeId"
         element={<CodeComponentEditor className={className} />}

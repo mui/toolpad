@@ -1,4 +1,4 @@
-import { Box, TextField } from '@mui/material';
+import { Box, TextField, Typography } from '@mui/material';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import * as React from 'react';
 import StringRecordEditor from '../../components/StringRecordEditor';
@@ -7,7 +7,7 @@ import { WithControlledProp } from '../../utils/types';
 import { FetchQuery } from './types';
 
 function ConnectionParamsInput() {
-  return null;
+  return <Typography>No input</Typography>;
 }
 
 function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {

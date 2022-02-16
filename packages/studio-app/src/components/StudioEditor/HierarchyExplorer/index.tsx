@@ -3,15 +3,7 @@ import {
   Button,
   Dialog,
   DialogActions,
-  DialogContent,
-  DialogProps,
   DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
   Typography,
   styled,
   Box,
@@ -23,13 +15,14 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { NodeId } from '../../types';
-import * as studioDom from '../../studioDom';
-import { useDom, useDomApi } from '../DomLoader';
-import client from '../../api';
-import { format } from '../../utils/prettier';
+import { NodeId } from '../../../types';
+import * as studioDom from '../../../studioDom';
+import { useDom, useDomApi } from '../../DomLoader';
+import CreateStudioPageDialog from './CreateStudioPageDialog';
+import CreateStudioCodeComponentDialog from './CreateStudioCodeComponentDialog';
+import CreateStudioApiDialog from './CreateStudioApiDialog';
+import CreateStudioConnectionDialog from './CreateStudioConnectionDialog';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -71,223 +64,28 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   );
 }
 
-interface CreateStudioApiDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {}
-
-function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps) {
-  const [connectionId, setConnectionID] = React.useState('');
-  const dom = useDom();
-  const domApi = useDomApi();
-  const navigate = useNavigate();
-
-  const connectionsQuery = useQuery('connections', client.query.getConnections);
-
-  const handleSelectionChange = React.useCallback((event: SelectChangeEvent<string>) => {
-    setConnectionID(event.target.value);
-  }, []);
-
-  return (
-    <Dialog {...props} onClose={onClose}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const connectionType = (connectionsQuery.data || []).find(
-            ({ id }) => id === connectionId,
-          )?.type;
-          if (!connectionType) {
-            throw new Error(
-              `Invariant: can't find a datasource for existing connection "${connectionId}"`,
-            );
-          }
-          const newApiNode = studioDom.createNode(dom, 'api', {
-            query: {},
-            connectionId,
-            connectionType,
-          });
-          const appNode = studioDom.getApp(dom);
-          domApi.addNode(newApiNode, appNode, 'apis');
-          onClose?.(e, 'backdropClick');
-          navigate(`/apis/${newApiNode.id}`);
-        }}
-        style={{
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <DialogTitle>Create a new MUI Studio API</DialogTitle>
-        <DialogContent>
-          <Typography>Please select a connection for your API</Typography>
-          <FormControl size="small" fullWidth>
-            <InputLabel id="select-connection-type">Connection</InputLabel>
-            <Select
-              size="small"
-              fullWidth
-              value={connectionId}
-              labelId="select-connection-type"
-              label="Connection"
-              onChange={handleSelectionChange}
-            >
-              {(connectionsQuery.data || []).map(({ id, type, name }) => (
-                <MenuItem key={id} value={id}>
-                  {name} | {type}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button type="submit" disabled={!connectionId}>
-            Create
-          </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
-  );
-}
-
-interface CreateStudioPageDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {}
-
-function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogProps) {
-  const dom = useDom();
-  const domApi = useDomApi();
-  const [title, setTitle] = React.useState('');
-  const navigate = useNavigate();
-
-  return (
-    <Dialog {...props} onClose={onClose}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const newNode = studioDom.createNode(dom, 'page', {
-            title,
-            urlQuery: {},
-          });
-          const appNode = studioDom.getApp(dom);
-          domApi.addNode(newNode, appNode, 'pages');
-          onClose?.(e, 'backdropClick');
-          navigate(`/pages/${newNode.id}`);
-        }}
-        style={{
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <DialogTitle>Create a new MUI Studio API</DialogTitle>
-        <DialogContent>
-          <TextField
-            sx={{ my: 1 }}
-            autoFocus
-            fullWidth
-            label="title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button type="submit" disabled={!title}>
-            Create
-          </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
-  );
-}
-
-function createDefaultCodeComponent(name: string): string {
-  const componentId = name.replace(/\s/g, '');
-  const propTypeId = `${componentId}Props`;
-  return format(`
-    import * as React from 'react';
-    import type { ComponentConfig } from "@mui/studio-core";
-    
-    export interface ${propTypeId} {
-      msg: string;
-    }
-    
-    export const config: ComponentConfig<${propTypeId}> = {
-      argTypes: {}
-    }
-    
-    export default function ${componentId}({ msg }: ${propTypeId}) {
-      return (
-        <div>{msg}</div>
-      );
-    }
-
-    ${componentId}.defaultProps = {
-      msg: "Hello world!",
-    };
-  `);
-}
-
-interface CreateStudioCodeComponentDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {}
-
-function CreateStudioCodeComponentDialog({
-  onClose,
-  ...props
-}: CreateStudioCodeComponentDialogProps) {
-  const dom = useDom();
-  const domApi = useDomApi();
-  const [name, setName] = React.useState(`MyComponent`);
-  const navigate = useNavigate();
-
-  return (
-    <Dialog {...props} onClose={onClose}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          console.log('name', name);
-          const newNode = studioDom.createNode(dom, 'codeComponent', {
-            name,
-            code: createDefaultCodeComponent(name),
-            argTypes: {},
-          });
-          const appNode = studioDom.getApp(dom);
-          domApi.addNode(newNode, appNode, 'codeComponents');
-          onClose?.(e, 'backdropClick');
-          navigate(`/codeComponents/${newNode.id}`);
-        }}
-        style={{
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <DialogTitle>Create a new MUI Studio Code Component</DialogTitle>
-        <DialogContent>
-          <TextField
-            sx={{ my: 1 }}
-            autoFocus
-            fullWidth
-            label="name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button type="submit" disabled={!name}>
-            Create
-          </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
-  );
-}
-
 export interface HierarchyExplorerProps {
   className?: string;
 }
 
-// TODO:
 export default function HierarchyExplorer({ className }: HierarchyExplorerProps) {
   const dom = useDom();
   const domApi = useDomApi();
 
   const app = studioDom.getApp(dom);
-  const { apis = [], codeComponents = [], pages = [] } = studioDom.getChildNodes(dom, app);
+  const {
+    apis = [],
+    codeComponents = [],
+    pages = [],
+    connections = [],
+  } = studioDom.getChildNodes(dom, app);
 
-  const [expanded, setExpanded] = React.useState<string[]>([':pages', ':apis', ':codeComponents']);
+  const [expanded, setExpanded] = React.useState<string[]>([
+    ':connections',
+    ':pages',
+    ':apis',
+    ':codeComponents',
+  ]);
 
   const selected: NodeId[] = [];
 
@@ -329,6 +127,16 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
       navigate(`/codeComponents/${node.id}`);
     }
   };
+
+  const [createConnectionDialogOpen, setCreateConnectionDialogOpen] = React.useState(0);
+  const handleCreateConnectionDialogOpen = React.useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    setCreateConnectionDialogOpen(Math.random());
+  }, []);
+  const handleCreateConnectionDialogClose = React.useCallback(
+    () => setCreateConnectionDialogOpen(0),
+    [],
+  );
 
   const [createApiDialogOpen, setCreateApiDialogOpen] = React.useState(0);
   const handleCreateApiDialogOpen = React.useCallback((event: React.MouseEvent) => {
@@ -384,6 +192,20 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         defaultCollapseIcon={<ExpandMoreIcon />}
         defaultExpandIcon={<ChevronRightIcon />}
       >
+        <HierarchyTreeItem
+          nodeId=":connections"
+          labelText="Connections"
+          onCreate={handleCreateConnectionDialogOpen}
+        >
+          {connections.map((connectionNode) => (
+            <HierarchyTreeItem
+              key={connectionNode.id}
+              nodeId={connectionNode.id}
+              labelText={connectionNode.name}
+              onDelete={handleDeleteNodeDialogOpen(connectionNode.id)}
+            />
+          ))}
+        </HierarchyTreeItem>
         <HierarchyTreeItem nodeId=":apis" labelText="Apis" onCreate={handleCreateApiDialogOpen}>
           {apis.map((apiNode) => (
             <HierarchyTreeItem
@@ -420,6 +242,11 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         </HierarchyTreeItem>
       </TreeView>
 
+      <CreateStudioConnectionDialog
+        key={createConnectionDialogOpen || undefined}
+        open={!!createConnectionDialogOpen}
+        onClose={handleCreateConnectionDialogClose}
+      />
       <CreateStudioApiDialog
         key={createApiDialogOpen || undefined}
         open={!!createApiDialogOpen}

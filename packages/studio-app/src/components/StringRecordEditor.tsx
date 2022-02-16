@@ -1,4 +1,4 @@
-import { Box, TextField, IconButton } from '@mui/material';
+import { Box, TextField, IconButton, SxProps } from '@mui/material';
 import * as React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
@@ -10,6 +10,8 @@ export interface StringRecordEditorProps extends WithControlledProp<Record<strin
   label?: string;
   fieldLabel?: string;
   valueLabel?: string;
+  autoFocus?: boolean;
+  sx?: SxProps;
 }
 
 export default function StringRecordEditor({
@@ -18,9 +20,12 @@ export default function StringRecordEditor({
   label,
   fieldLabel = 'field',
   valueLabel = 'value',
+  autoFocus = false,
+  sx,
 }: StringRecordEditorProps) {
   const [newFieldName, setNewFieldName] = React.useState('');
   const [newFieldValue, setNewFieldValue] = React.useState('');
+  const fieldInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFieldValueChange = React.useCallback(
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,14 +41,22 @@ export default function StringRecordEditor({
     [onChange, value],
   );
 
-  const handleNewField = React.useCallback(() => {
-    onChange({ ...value, [newFieldName]: newFieldValue });
-    setNewFieldName('');
-    setNewFieldValue('');
-  }, [newFieldName, newFieldValue, onChange, value]);
+  const handleSubmit = React.useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      onChange({ ...value, [newFieldName]: newFieldValue });
+      setNewFieldName('');
+      setNewFieldValue('');
+      console.log(fieldInputRef.current);
+      fieldInputRef.current?.focus();
+    },
+    [newFieldName, newFieldValue, onChange, value],
+  );
+
+  const canSubmit = newFieldName && !hasOwnProperty(value, newFieldName);
 
   return (
-    <Box display="grid" gridTemplateColumns="1fr 2fr auto" alignItems="center" gap={1}>
+    <Box sx={sx} display="grid" gridTemplateColumns="1fr 2fr auto" alignItems="center" gap={1}>
       {label ? <Box gridColumn="span 3">{label}:</Box> : null}
       {Object.entries(value).map(([field, fieldValue]) => (
         <React.Fragment key={field}>
@@ -62,25 +75,26 @@ export default function StringRecordEditor({
         </React.Fragment>
       ))}
 
-      <TextField
-        size="small"
-        label={fieldLabel}
-        value={newFieldName}
-        onChange={(event) => setNewFieldName(event.target.value)}
-      />
-      <TextField
-        size="small"
-        label={valueLabel}
-        value={newFieldValue}
-        onChange={(event) => setNewFieldValue(event.target.value)}
-      />
-      <IconButton
-        size="small"
-        disabled={!newFieldName || hasOwnProperty(value, newFieldName)}
-        onClick={handleNewField}
-      >
-        <AddIcon fontSize="small" />
-      </IconButton>
+      <form style={{ display: 'contents' }} onSubmit={handleSubmit}>
+        <TextField
+          inputRef={fieldInputRef}
+          size="small"
+          label={fieldLabel}
+          value={newFieldName}
+          onChange={(event) => setNewFieldName(event.target.value)}
+          autoFocus={autoFocus}
+        />
+        <TextField
+          size="small"
+          label={valueLabel}
+          value={newFieldValue}
+          disabled={!canSubmit}
+          onChange={(event) => setNewFieldValue(event.target.value)}
+        />
+        <IconButton size="small" disabled={!canSubmit} type="submit">
+          <AddIcon fontSize="small" />
+        </IconButton>
+      </form>
     </Box>
   );
 }

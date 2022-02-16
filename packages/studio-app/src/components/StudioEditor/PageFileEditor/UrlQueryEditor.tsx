@@ -30,7 +30,14 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit URL query</DialogTitle>
         <DialogContent>
-          <StringRecordEditor value={input} onChange={setInput} />
+          <StringRecordEditor
+            sx={{ my: 1 }}
+            fieldLabel="Parameter"
+            valueLabel="Default value"
+            value={input}
+            onChange={setInput}
+            autoFocus
+          />
         </DialogContent>
         <DialogActions>
           <Button disabled={page.urlQuery === input} onClick={handleSave}>

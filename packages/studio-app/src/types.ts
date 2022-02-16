@@ -181,3 +181,8 @@ export interface JsxElement {
 export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
 
 export type ResolvedProps = Record<string, PropExpression | undefined>;
+
+export interface StudioTheme {
+  'palette.primary.main'?: string;
+  'palette.secondary.main'?: string;
+}

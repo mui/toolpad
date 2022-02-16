@@ -1,6 +1,13 @@
 import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
-import { NodeId, StudioConstant, StudioBindable, StudioBindables } from './types';
+import {
+  NodeId,
+  StudioConstant,
+  StudioBindable,
+  StudioBindables,
+  ConnectionStatus,
+  StudioTheme,
+} from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { generateUniqueString } from './utils/strings';
@@ -20,8 +27,9 @@ export function compareFractionalIndex(index1: string, index2: string): number {
 
 type StudioNodeType =
   | 'app'
-  | 'theme'
+  | 'connection'
   | 'api'
+  | 'theme'
   | 'page'
   | 'element'
   | 'codeComponent'
@@ -43,14 +51,16 @@ export interface StudioAppNode extends StudioNodeBase {
   readonly parentId: null;
 }
 
-export interface StudioTheme {
-  'palette.primary.main'?: string;
-  'palette.secondary.main'?: string;
-}
-
 export interface StudioThemeNode extends StudioNodeBase {
   readonly type: 'theme';
   readonly theme: StudioBindables<StudioTheme>;
+}
+
+export interface StudiConnectionNode<P = unknown> extends StudioNodeBase {
+  readonly type: 'connection';
+  readonly dataSource: string;
+  readonly params: P;
+  readonly status: ConnectionStatus | null;
 }
 
 export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
@@ -101,6 +111,7 @@ export interface StudioFetchedStateNode extends StudioNodeBase {
 
 type StudioNodeOfType<K extends StudioNodeType> = {
   app: StudioAppNode;
+  connection: StudiConnectionNode;
   api: StudioApiNode;
   theme: StudioThemeNode;
   page: StudioPageNode;
@@ -114,12 +125,14 @@ type StudioNodeOfType<K extends StudioNodeType> = {
 type AllowedChildren = {
   app: {
     pages: 'page';
+    connections: 'connection';
     apis: 'api';
     themes: 'theme';
     codeComponents: 'codeComponent';
   };
   theme: {};
   api: {};
+  connection: {};
   page: {
     children: 'element';
     derivedStates: 'derivedState';

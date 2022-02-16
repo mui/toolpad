@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import * as React from 'react';
+import * as studioDom from '@studioDom';
 import StringRecordEditor from '../../StringRecordEditor';
-import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { NodeId } from '../../../types';
 

@@ -3,7 +3,7 @@ import movies from './movies/client';
 import postgres from './postgres/client';
 import rest from './rest/client';
 import { StudioDataSourceClient } from '../types';
-import * as studioDom from '../studioDom';
+import * as studioDom from '@studioDom';
 
 const studioConnections: { [key: string]: StudioDataSourceClient<any, any> | undefined } = {
   movies,

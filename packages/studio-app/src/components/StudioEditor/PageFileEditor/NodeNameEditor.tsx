@@ -1,6 +1,6 @@
 import { TextField } from '@mui/material';
 import * as React from 'react';
-import * as studioDom from '../../../studioDom';
+import * as studioDom from '@studioDom';
 import { useDomApi } from '../../DomLoader';
 
 interface NodeNameEditorProps {

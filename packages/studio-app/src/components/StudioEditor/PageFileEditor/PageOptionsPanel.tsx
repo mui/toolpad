@@ -11,6 +11,7 @@ import * as React from 'react';
 import CodeIcon from '@mui/icons-material/Code';
 import PageIcon from '@mui/icons-material/Web';
 import SourceIcon from '@mui/icons-material/Source';
+import * as studioDom from '@studioDom';
 import renderPageCode from '../../../renderPageCode';
 import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
@@ -20,7 +21,6 @@ import FetchedStateEditor from './FetchedStateEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import { NodeId } from '../../../types';
 import NodeNameEditor from './NodeNameEditor';
-import * as studioDom from '../../../studioDom';
 
 interface PageSourceProps {
   pageNodeId: NodeId;

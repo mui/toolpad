@@ -1,9 +1,9 @@
 import { NextApiHandler } from 'next';
 import Cors from 'cors';
+import * as studioDom from '@studioDom';
 import { execApi, loadApp } from '../../../src/server/data';
 import { NodeId, StudioApiResult } from '../../../src/types';
 import initMiddleware from '../../../src/server/initMiddleware';
-import * as studioDom from '../../../src/studioDom';
 
 // Initialize the cors middleware
 const cors = initMiddleware<any>(

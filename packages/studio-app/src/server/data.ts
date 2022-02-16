@@ -10,7 +10,7 @@ import {
 } from '../types';
 import { generateRandomId } from '../utils/randomId';
 import studioDataSources from '../studioDataSources/server';
-import * as studioDom from '../studioDom';
+import * as studioDom from '@studioDom';
 
 interface StoredstudioDom extends studioDom.StudioDom {
   id: 'default';

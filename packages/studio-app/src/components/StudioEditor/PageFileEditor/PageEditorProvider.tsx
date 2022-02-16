@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as studioDom from '../../../studioDom';
+import * as studioDom from '@studioDom';
 import { NodeId, SlotLocation, PageViewState } from '../../../types';
 import { update, updateOrCreate } from '../../../utils/immutability';
 

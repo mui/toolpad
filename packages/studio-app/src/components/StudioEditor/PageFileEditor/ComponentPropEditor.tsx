@@ -2,7 +2,7 @@ import { Alert, Stack } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-core';
 import studioPropControls from '../../propertyControls';
-import * as studioDom from '../../../studioDom';
+import * as studioDom from '@studioDom';
 import { useDomApi } from '../../DomLoader';
 import { BindingEditor } from './BindingEditor';
 import { NodeId, StudioBindable } from '../../../types';

@@ -1,5 +1,5 @@
 import { ArgTypeDefinitions } from '@mui/studio-core';
-import { StudioDom, StudioElementNode } from '../studioDom';
+import { StudioDom, StudioElementNode } from '@studioDom';
 import { PropExpression, ResolvedProps } from '../types';
 
 export interface RenderContext {

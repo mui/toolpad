@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as studioDom from '../studioDom';
+import * as studioDom from '@studioDom';
 import { NodeId, StudioBindable } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';

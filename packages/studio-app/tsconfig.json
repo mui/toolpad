@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -16,7 +17,10 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "paths": {
+      "@studioDom": ["./src/studioDom"]
+    }
   },
   "include": ["next.config.js", "next-env.d.ts", "**/*.ts", "**/*.tsx", "typings/**/*.d.ts"],
   "exclude": ["node_modules", "serviceWorker", "./scripts"]

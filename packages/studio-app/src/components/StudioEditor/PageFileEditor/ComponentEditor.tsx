@@ -1,9 +1,9 @@
 import { styled, Typography } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
+import * as studioDom from '@studioDom';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
-import * as studioDom from '../../../studioDom';
 import ComponentPropEditor from './ComponentPropEditor';
 import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';

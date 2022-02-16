@@ -2,8 +2,8 @@ import * as React from 'react';
 import { Box, Collapse, styled, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import * as studioDom from '@studioDom';
 import { useStudioComponents } from '../../../studioComponents';
-import * as studioDom from '../../../studioDom';
 import { useDom } from '../../DomLoader';
 import { usePageEditorApi } from './PageEditorProvider';
 

@@ -3,6 +3,7 @@ import * as React from 'react';
 import clsx from 'clsx';
 import { RuntimeEvent, SlotType } from '@mui/studio-core';
 import throttle from 'lodash/throttle';
+import * as studioDom from '@studioDom';
 import {
   NodeId,
   FlowDirection,
@@ -11,7 +12,6 @@ import {
   NodeInfo,
   NodesInfo,
 } from '../../../types';
-import * as studioDom from '../../../studioDom';
 import PageView from '../../PageView';
 import {
   absolutePositionCss,

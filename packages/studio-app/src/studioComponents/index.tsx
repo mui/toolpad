@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as studioDom from '../studioDom';
+import * as studioDom from '@studioDom';
 
 import CustomLayout from './CustomLayout';
 import Button from './Button';

@@ -15,10 +15,10 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/studio-core';
+import * as studioDom from '@studioDom';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
-import * as studioDom from '../../../studioDom';
 import { NodeId, StudioBindable, StudioBindables } from '../../../types';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { getQueryNodeArgTypes } from '../../../studioDataSources/client';

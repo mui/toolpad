@@ -1,6 +1,6 @@
 import * as React from 'react';
+import * as studioDom from '@studioDom';
 import { NodeId } from '../../types';
-import * as studioDom from '../../studioDom';
 import renderPageCode from '../../renderPageCode';
 import StudioSandbox from '../StudioSandbox';
 import getImportMap from '../../getImportMap';

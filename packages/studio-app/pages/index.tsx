@@ -2,10 +2,10 @@ import type { NextPage } from 'next';
 import * as React from 'react';
 import { Button, Container, List, ListItem, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
+import * as studioDom from '@studioDom';
 import StudioAppBar from '../src/components/StudioAppBar';
 import { NextLinkComposed } from '../src/components/Link';
 import client from '../src/api';
-import * as studioDom from '../src/studioDom';
 
 const Home: NextPage = () => {
   const router = useRouter();

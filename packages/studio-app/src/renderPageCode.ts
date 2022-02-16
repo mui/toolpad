@@ -1,8 +1,8 @@
 import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
+import * as studioDom from '@studioDom';
 import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
-import * as studioDom from './studioDom';
 import { NodeId, PropExpression, ResolvedProps, StudioBindable, StudioBindables } from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';

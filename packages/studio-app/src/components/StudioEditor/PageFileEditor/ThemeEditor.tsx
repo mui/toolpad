@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { FormControl, InputLabel, Select, MenuItem, Stack, Button } from '@mui/material';
-import * as studioDom from '../../../studioDom';
+import * as studioDom from '@studioDom';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 

@@ -1,4 +1,4 @@
-import * as studioDom from './studioDom';
+import * as studioDom from '@studioDom';
 import { tryFormat } from './utils/prettier';
 
 export interface RenderThemeConfig {

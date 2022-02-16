@@ -25,7 +25,7 @@ import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';
-import * as studioDom from '../../../studioDom';
+import * as studioDom from '@studioDom';
 import { NodeId, StudioBindable, StudioBindables } from '../../../types';
 import { BindingEditor } from './BindingEditor';
 

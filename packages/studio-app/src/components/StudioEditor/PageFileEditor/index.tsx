@@ -2,12 +2,12 @@ import * as React from 'react';
 import { styled } from '@mui/system';
 import { useParams } from 'react-router-dom';
 import { Typography } from '@mui/material';
+import * as studioDom from '@studioDom';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
 import { NodeId } from '../../../types';
 import { useDom } from '../../DomLoader';
-import * as studioDom from '../../../studioDom';
 import ComponentCatalog from './ComponentCatalog';
 
 const classes = {

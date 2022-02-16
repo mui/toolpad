@@ -2,10 +2,10 @@ import * as React from 'react';
 import { useQuery } from 'react-query';
 import { Box, Button, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import * as studioDom from '@studioDom';
 import { StudioConnection, StudioDataSourceClient, NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
-import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import useDebounced from '../../../utils/useDebounced';
 

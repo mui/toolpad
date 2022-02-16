@@ -23,6 +23,7 @@ import CreateStudioPageDialog from './CreateStudioPageDialog';
 import CreateStudioCodeComponentDialog from './CreateStudioCodeComponentDialog';
 import CreateStudioApiDialog from './CreateStudioApiDialog';
 import CreateStudioConnectionDialog from './CreateStudioConnectionDialog';
+import useLocalStorageState from '../../../utils/useLocalStorageState';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -80,12 +81,10 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
     connections = [],
   } = studioDom.getChildNodes(dom, app);
 
-  const [expanded, setExpanded] = React.useState<string[]>([
-    ':connections',
-    ':pages',
-    ':apis',
-    ':codeComponents',
-  ]);
+  const [expanded, setExpanded] = useLocalStorageState<string[]>(
+    `editor/${app.id}/hierarchy-expansion`,
+    [':connections', ':pages', ':apis', ':codeComponents'],
+  );
 
   const selected: NodeId[] = [];
 

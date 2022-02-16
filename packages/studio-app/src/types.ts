@@ -87,26 +87,6 @@ export interface SlotsState {
   [prop: string]: SlotState | undefined;
 }
 
-export interface NodeLayout {
-  nodeId: NodeId;
-  rect: Rectangle;
-  slots: SlotsState;
-}
-
-export interface NodesLayout {
-  [nodeId: NodeId]: NodeLayout | undefined;
-}
-
-export interface NodeState {
-  nodeId: NodeId;
-  error?: RuntimeError;
-  attributes: {
-    props: {
-      [key: string]: unknown;
-    };
-  };
-}
-
 export interface NodeInfo {
   nodeId: NodeId;
   error?: RuntimeError;
@@ -124,13 +104,8 @@ export interface NodesInfo {
   [nodeId: NodeId]: NodeInfo | undefined;
 }
 
-export interface NodesState {
-  [nodeId: NodeId]: NodeState | undefined;
-}
-
 export interface PageViewState {
-  layouts: NodesLayout;
-  nodes: NodesState;
+  nodes: NodesInfo;
   pageState: Record<string, unknown>;
   bindings: LiveBindings;
 }

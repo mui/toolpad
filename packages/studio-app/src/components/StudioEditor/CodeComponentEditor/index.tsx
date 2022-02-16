@@ -3,6 +3,7 @@ import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
+import { ArgTypeDefinitions, ComponentConfig } from '@mui/studio-core';
 import { NodeId } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -31,6 +32,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const domApi = useDomApi();
 
   const [input, setInput] = React.useState(codeComponentNode.code);
+  const [argTypes, setArgTypes] = React.useState<ArgTypeDefinitions>({});
 
   const updateDomActionRef = React.useRef(() => {});
 
@@ -39,12 +41,13 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
       const pretty = tryFormat(input);
       setInput(pretty);
       domApi.setNodeAttribute(codeComponentNode, 'code', pretty);
+      domApi.setNodeAttribute(codeComponentNode, 'argTypes', argTypes);
     };
-  }, [domApi, codeComponentNode, input]);
+  }, [domApi, codeComponentNode, input, argTypes]);
 
   const handleConfigUpdate = React.useCallback(
-    (newConfig) => domApi.setNodeAttribute(codeComponentNode, 'argTypes', newConfig.argTypes),
-    [codeComponentNode, domApi],
+    (newConfig: ComponentConfig<unknown> | undefined) => setArgTypes(newConfig?.argTypes || {}),
+    [],
   );
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
@@ -85,7 +88,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         .then((res) => res.json())
         .then((typings) => {
           Array.from(Object.entries(typings)).forEach(([path, content]) => {
-            console.log(path);
             monaco.languages.typescript.typescriptDefaults.addExtraLib(
               content as string,
               `file:///${path}`,

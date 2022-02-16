@@ -26,7 +26,7 @@ function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes 
   );
 }
 
-function propValueTypesToArgTypesTo(propTypes: PropValueTypes): ArgTypeDefinitions {
+function propValueTypesToArgTypes(propTypes: PropValueTypes): ArgTypeDefinitions {
   return Object.fromEntries(
     Object.entries(propTypes).flatMap(([propName, typeDef]) =>
       typeDef ? [[propName, { typeDef }]] : [],
@@ -673,7 +673,7 @@ class Context implements RenderContext {
           const resolvedParams = this.resolveBindables(
             `${node.id}.params`,
             node.params,
-            propValueTypesToArgTypesTo(node.argTypes),
+            propValueTypesToArgTypes(node.argTypes),
           );
           const paramsArg = this.renderPropsAsObject(resolvedParams);
           const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
@@ -694,7 +694,7 @@ class Context implements RenderContext {
           const resolvedProps = this.resolveBindables(
             `${node.id}.params`,
             node.params,
-            propValueTypesToArgTypesTo(propTypes),
+            propValueTypesToArgTypes(propTypes),
           );
           const params = this.renderPropsAsObject(resolvedProps);
 

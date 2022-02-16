@@ -8,8 +8,8 @@ import {
   FlowDirection,
   SlotLocation,
   SlotState,
-  NodesLayout,
-  NodeLayout,
+  NodeInfo,
+  NodesInfo,
 } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import PageView from '../../PageView';
@@ -150,15 +150,15 @@ function insertSlotAbsolutePositionCss(slot: {
 
 function findNodeAt(
   nodes: readonly studioDom.StudioNode[],
-  nodesLayout: NodesLayout,
+  nodesInfo: NodesInfo,
   x: number,
   y: number,
 ): NodeId | null {
   // Search deepest nested first
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
-    const nodeLayout = nodesLayout[node.id];
-    if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
+    const nodeInfo = nodesInfo[node.id];
+    if (nodeInfo?.rect && rectContainsPoint(nodeInfo.rect, x, y)) {
       return node.id;
     }
   }
@@ -231,21 +231,21 @@ function findActiveSlotInNode(
 
 function findActiveSlotAt(
   nodes: readonly studioDom.StudioNode[],
-  nodesLayout: NodesLayout,
+  nodesInfo: NodesInfo,
   slots: ViewSlots,
   x: number,
   y: number,
 ): SlotLocation | null {
   // Search deepest nested first
-  let nodeLayout: NodeLayout | undefined;
+  let nodeInfo: NodeInfo | undefined;
   let nodeSlots: NodeSlots = {};
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
-    nodeLayout = nodesLayout[node.id];
+    nodeInfo = nodesInfo[node.id];
     nodeSlots = slots[node.id] || {};
-    if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
+    if (nodeInfo?.rect && rectContainsPoint(nodeInfo.rect, x, y)) {
       // Initially only consider slots of the node we're hovering
-      const slotIndex = findActiveSlotInNode(nodeLayout.nodeId, nodeSlots, x, y);
+      const slotIndex = findActiveSlotInNode(nodeInfo.nodeId, nodeSlots, x, y);
       if (slotIndex) {
         return slotIndex;
       }
@@ -253,8 +253,8 @@ function findActiveSlotAt(
   }
   // One last attempt, using the most shallow nodeLayout we found, regardless of
   // whether we are hovering it
-  if (nodeLayout) {
-    return findActiveSlotInNode(nodeLayout.nodeId, nodeSlots, x, y);
+  if (nodeInfo) {
+    return findActiveSlotInNode(nodeInfo.nodeId, nodeSlots, x, y);
   }
   return null;
 }
@@ -297,7 +297,7 @@ type RenderedSlot = RenderedInsertSlot | RenderedSingleSlot;
 function calculateSlots(
   slotState: SlotState,
   children: studioDom.StudioNode[],
-  nodesLayout: NodesLayout,
+  nodesInfo: NodesInfo,
 ): RenderedSlot[] {
   const rect = slotState.rect;
 
@@ -319,13 +319,13 @@ function calculateSlots(
 
   for (let i = 0; i < children.length; i += 1) {
     const child = children[i];
-    const childState = nodesLayout[child.id];
+    const childState = nodesInfo[child.id];
 
     if (!child.parentIndex) {
       throw new Error(`Invariant: Node "${child.id}" has no parent`);
     }
 
-    if (!childState) {
+    if (!childState?.rect) {
       return [];
     }
 
@@ -404,11 +404,11 @@ function calculateSlots(
 function calculateNodeSlots(
   parent: studioDom.StudioNode,
   children: studioDom.NodeChildren,
-  nodesLayout: NodesLayout,
+  nodesInfo: NodesInfo,
 ): NodeSlots {
-  const parentState = nodesLayout[parent.id];
+  const parentState = nodesInfo[parent.id];
 
-  if (!parentState) {
+  if (!parentState?.slots) {
     return {};
   }
 
@@ -418,7 +418,7 @@ function calculateNodeSlots(
   for (const [parentProp, slotState] of Object.entries(parentState.slots)) {
     if (slotState) {
       const namedChildren = children[parentProp] ?? [];
-      result[parentProp] = calculateSlots(slotState, namedChildren, nodesLayout);
+      result[parentProp] = calculateSlots(slotState, namedChildren, nodesInfo);
     }
   }
 
@@ -476,7 +476,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     highlightedSlot,
   } = usePageEditorState();
 
-  const { layouts: nodesLayout } = viewState;
+  const { nodes: nodesInfo } = viewState;
 
   const pageNode = studioDom.getNode(dom, pageNodeId, 'page');
 
@@ -508,10 +508,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const slots: ViewSlots = React.useMemo(() => {
     const result: ViewSlots = {};
     pageNodes.forEach((node) => {
-      result[node.id] = calculateNodeSlots(node, studioDom.getChildNodes(dom, node), nodesLayout);
+      result[node.id] = calculateNodeSlots(node, studioDom.getChildNodes(dom, node), nodesInfo);
     });
     return result;
-  }, [pageNodes, dom, nodesLayout]);
+  }, [pageNodes, dom, nodesInfo]);
 
   const availableNodes = React.useMemo(() => {
     /**
@@ -535,13 +535,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       event.dataTransfer.dropEffect = 'move';
 
-      const nodeId = findNodeAt(pageNodes, nodesLayout, cursorPos.x, cursorPos.y);
+      const nodeId = findNodeAt(pageNodes, nodesInfo, cursorPos.x, cursorPos.y);
 
       if (nodeId) {
         api.select(nodeId);
       }
     },
-    [api, pageNodes, nodesLayout, getViewCoordinates],
+    [api, pageNodes, nodesInfo, getViewCoordinates],
   );
 
   const handleDragOver = React.useCallback(
@@ -554,7 +554,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const slotIndex = findActiveSlotAt(
         availableNodes,
-        nodesLayout,
+        nodesInfo,
         slots,
         cursorPos.x,
         cursorPos.y,
@@ -569,7 +569,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.nodeDragOver(null);
       }
     },
-    [availableNodes, nodesLayout, api, slots, getViewCoordinates],
+    [availableNodes, nodesInfo, api, slots, getViewCoordinates],
   );
 
   const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
@@ -584,7 +584,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const activeSlot = findActiveSlotAt(
         availableNodes,
-        nodesLayout,
+        nodesInfo,
         slots,
         cursorPos.x,
         cursorPos.y,
@@ -614,7 +614,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.nodeDragEnd();
     },
-    [dom, availableNodes, nodesLayout, domApi, api, slots, newNode, selection, getViewCoordinates],
+    [dom, availableNodes, nodesInfo, domApi, api, slots, newNode, selection, getViewCoordinates],
   );
 
   const handleDragEnd = React.useCallback(
@@ -646,10 +646,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const newSelectedNodeId = findNodeAt(pageNodes, nodesLayout, cursorPos.x, cursorPos.y);
+      const newSelectedNodeId = findNodeAt(pageNodes, nodesInfo, cursorPos.x, cursorPos.y);
       api.select(newSelectedNodeId);
     },
-    [api, pageNodes, nodesLayout, getViewCoordinates],
+    [api, pageNodes, nodesInfo, getViewCoordinates],
   );
 
   const handleKeyDown = React.useCallback(
@@ -662,7 +662,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [domApi, api, selection],
   );
 
-  const selectedRect = selectedNode ? nodesLayout[selectedNode.id]?.rect : null;
+  const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
 
   const nodesWithInteraction = React.useMemo<Set<NodeId>>(() => {
     if (!selectedNode) {
@@ -810,8 +810,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             );
           })}
           {pageNodes.map((node) => {
-            const nodeLayout = nodesLayout[node.id];
-            if (!nodeLayout) {
+            const nodeLayout = nodesInfo[node.id];
+            if (!nodeLayout?.rect) {
               return null;
             }
 

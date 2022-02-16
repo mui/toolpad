@@ -8,16 +8,7 @@ import {
   ComponentConfig,
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
-import {
-  NodeId,
-  NodeState,
-  NodesState,
-  FlowDirection,
-  PageViewState,
-  NodesLayout,
-  NodeLayout,
-  NodesInfo,
-} from './types';
+import { NodeId, FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
 
 declare global {
@@ -34,29 +25,25 @@ function getNodeViewInfo(
   viewElm: Element,
   elm: Element,
   nodeId: NodeId,
-): { node: NodeState; layout: NodeLayout; component: ComponentConfig<unknown> } | null {
+): NodeInfo | null {
   if (nodeId) {
     const rect = getRelativeOuterRect(viewElm, elm);
     const error = fiber.memoizedProps?.nodeError as RuntimeError | undefined;
     // We get the props from the child fiber because the current fiber is for the wrapper element
     const props = fiber.child?.memoizedProps ?? {};
     // eslint-disable-next-line no-underscore-dangle
-    const component: ComponentConfig<unknown> = fiber.child?.elementType?.__config;
+    const component: ComponentConfig<unknown> | undefined = (fiber.child?.elementType as any)
+      ?.__config;
 
     return {
+      nodeId,
+      error,
       component,
-      node: {
-        nodeId,
-        error,
-        attributes: {
-          props,
-        },
+      attributes: {
+        props,
       },
-      layout: {
-        nodeId,
-        rect,
-        slots: {},
-      },
+      rect,
+      slots: {},
     };
   }
   return null;
@@ -73,20 +60,17 @@ function walkFibers(node: FiberNode, visitor: (node: FiberNode) => void) {
 }
 
 export function getNodesViewInfo(rootElm: HTMLElement): {
-  nodes: NodesState;
-  layouts: NodesLayout;
+  nodes: NodesInfo;
 } {
   // eslint-disable-next-line no-underscore-dangle
   const devtoolsHook = rootElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
   if (!devtoolsHook) {
     console.warn(`Can't read page layout as react devtools are not installed`);
-    return { nodes: {}, layouts: {} };
+    return { nodes: {} };
   }
 
-  const layouts: NodesLayout = {};
-  const nodes: NodesState = {};
-  const nodes2: NodesInfo = {};
+  const nodes: NodesInfo = {};
 
   const rendererId = 1;
   const nodeElms = new Map<NodeId, Element>();
@@ -113,8 +97,7 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
             nodeElms.set(nodeId, elm);
             const info = getNodeViewInfo(fiber, rootElm, elm, nodeId);
             if (info) {
-              nodes[nodeId] = info.node;
-              layouts[nodeId] = info.layout;
+              nodes[nodeId] = info;
             }
           }
         }
@@ -123,18 +106,18 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
         if (studioSlotName) {
           const slotType = fiber.memoizedProps.slotType as SlotType;
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
-          const nodeLayout = layouts[parentId];
+          const nodeSlots = nodes[parentId]?.slots;
 
           const firstChildElm = devtoolsHook.renderers
             .get(rendererId)
             ?.findHostInstanceByFiber(fiber);
           const childContainerElm = firstChildElm?.parentElement;
 
-          if (childContainerElm && nodeLayout) {
+          if (childContainerElm && nodeSlots) {
             const rect = getRelativeBoundingRect(rootElm, childContainerElm);
             const direction = window.getComputedStyle(childContainerElm)
               .flexDirection as FlowDirection;
-            nodeLayout.slots[studioSlotName] = {
+            nodeSlots[studioSlotName] = {
               type: slotType,
               rect,
               direction,
@@ -145,7 +128,7 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
     }
   });
 
-  return { layouts, nodes, nodes2 };
+  return { nodes };
 }
 
 export function getPageViewState(rootElm: HTMLElement): PageViewState {

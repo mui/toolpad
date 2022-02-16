@@ -1,67 +1,59 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { Box, Button, Stack, TextField, Toolbar } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { Box, Button, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { DefaultNodeProps, NodeId, StudioConnection, StudioDataSourceClient } from '../../../types';
+import { StudioConnection, StudioDataSourceClient, NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
-import { useDom, useDomApi } from '../../DomProvider';
+import { useDom, useDomApi } from '../../DomLoader';
+import useDebounced from '../../../utils/useDebounced';
 
 function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {
   const dataSource = dataSources[connection.type] as StudioDataSourceClient<any, Q>;
   return dataSource || null;
 }
 
-interface ApiEditorProps {
-  nodeId: NodeId;
+interface ApiEditorProps<Q> {
+  apiNode: studioDom.StudioApiNode<Q>;
 }
 
-function ApiEditorContent<Q extends DefaultNodeProps>({ nodeId }: ApiEditorProps) {
-  const dom = useDom();
+function ApiEditorContent<Q>({ apiNode }: ApiEditorProps<Q>) {
   const domApi = useDomApi();
-  const api = studioDom.getNode(dom, nodeId);
-  studioDom.assertIsApi<Q>(api);
 
-  const [name, setName] = React.useState(api.name);
-  const [query, setQuery] = React.useState(studioDom.getPropConstValues(api) as Q);
+  const [name, setName] = React.useState(apiNode.name);
+  const [apiQuery, setApiQuery] = React.useState<Q>(apiNode.query);
 
-  const { data: connectionData } = useQuery(['connection', api.connectionId], () =>
-    client.query.getConnection(api.connectionId),
+  const { data: connectionData } = useQuery(['connection', apiNode.connectionId], () =>
+    client.query.getConnection(apiNode.connectionId),
   );
 
   const datasource = connectionData && getDataSource<Q>(connectionData);
 
-  const previewApi: studioDom.StudioApiNode<Q> = studioDom.setPropConstValues(api, query);
-  const { data: previewData } = useQuery(['api', previewApi], () =>
-    client.query.execApi(previewApi),
+  const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
+    return { ...apiNode, query: apiQuery };
+  }, [apiNode, apiQuery]);
+
+  const debouncedPreviewApi = useDebounced(previewApi, 250);
+
+  const { data: previewData } = useQuery(
+    ['api', debouncedPreviewApi],
+    () => client.query.execApi(debouncedPreviewApi, {}),
+    {},
   );
-
-  const { fields = {}, data: rows = [] } = previewData ?? {};
-
-  const columns = React.useMemo(
-    () =>
-      Object.entries(fields).map(([field, def]) => ({
-        ...(def as any),
-        field,
-      })),
-    [fields],
-  );
-
-  const columnsFingerPrint = React.useMemo(() => JSON.stringify(columns), [columns]);
 
   return datasource ? (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-        Always hit the save button (top right) after clicking &quot;update&quot;. Will implement
-        automatic save later.
         <Toolbar>
           <Button
             onClick={() => {
-              domApi.setNodeName(nodeId, name);
-              Object.keys(query).forEach((prop: keyof Q & string) => {
-                domApi.setNodeConstPropValue<Q>(api, prop, query[prop]);
+              domApi.setNodeName(apiNode.id, name);
+              (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
+                if (typeof propName !== 'string' || !apiQuery[propName]) {
+                  return;
+                }
+                domApi.setNodeAttribute(apiNode, 'query', apiQuery);
               });
             }}
           >
@@ -75,11 +67,14 @@ function ApiEditorContent<Q extends DefaultNodeProps>({ nodeId }: ApiEditorProps
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
-          <datasource.QueryEditor value={query} onChange={(newQuery) => setQuery(newQuery)} />
+          <datasource.QueryEditor
+            value={apiQuery}
+            onChange={(newApiQuery) => setApiQuery(newApiQuery)}
+          />
         </Stack>
       </Box>
-      <Box sx={{ flex: 1, overflow: 'hidden' }}>
-        <DataGrid rows={rows} columns={columns} key={columnsFingerPrint} />
+      <Box sx={{ flex: 1, overflow: 'auto', borderTop: 1, borderColor: 'divider' }}>
+        <pre>{JSON.stringify(previewData, null, 2)}</pre>
       </Box>
     </Box>
   ) : null;
@@ -90,10 +85,16 @@ interface ApiFileEditorProps {
 }
 
 export default function ApiFileEditor({ className }: ApiFileEditorProps) {
+  const dom = useDom();
   const { nodeId } = useParams();
+  const apiNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'api');
   return (
     <Box className={className}>
-      <ApiEditorContent key={nodeId} nodeId={nodeId as NodeId} />
+      {apiNode ? (
+        <ApiEditorContent key={nodeId} apiNode={apiNode} />
+      ) : (
+        <Typography sx={{ p: 4 }}>Non-existing Api &quot;{nodeId}&quot;</Typography>
+      )}
     </Box>
   );
 }

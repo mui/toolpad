@@ -1,14 +1,16 @@
-import { StudioComponentDefinition } from '../types';
+import { StudioComponentDefinition } from './studioComponentDefinition';
+import { URI_SELECT_OPTIONS } from '../schemas';
 
 export default {
   id: 'Select',
   displayName: 'Select',
-  render(ctx, resolvedProps) {
+  render(ctx, node, resolvedProps) {
     const FormControl = ctx.addImport('@mui/material', 'FormControl', 'FormControl');
     const InputLabel = ctx.addImport('@mui/material', 'InputLabel', 'InputLabel');
     const Select = ctx.addImport('@mui/material', 'Select', 'Select');
+    const MenuItem = ctx.addImport('@mui/material', 'MenuItem', 'MenuItem');
 
-    const { label, value, options, ...props } = resolvedProps;
+    const { label, options, ...props } = resolvedProps;
 
     // TODO: generate a unique id based on node name
     const labelId = 'my-select';
@@ -17,15 +19,14 @@ export default {
       <${FormControl} size="small">
         <${InputLabel} id="${labelId}">${ctx.renderJsxContent(label)}</${InputLabel}>
         <${Select} 
-          value={${ctx.renderJsExpression(value)} || ''} 
           labelId="${labelId}" 
           label={${ctx.renderJsExpression(label)}} 
           ${ctx.renderProps(props)}
         >
-          {${ctx.renderJsExpression(options)}?.split(',').map((option) => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
+          {${ctx.renderJsExpression(options)}.map((option) => (
+            <${MenuItem} key={option.value} value={option.value}>
+              {option.label ?? option.value}
+            </${MenuItem}>
           )) ?? null}
         </${Select}>
       </${FormControl}>
@@ -47,15 +48,17 @@ export default {
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
+      defaultValue: '',
+      defaultValueProp: 'defaultValue',
       onChangeHandler: {
         params: ['event'],
         valueGetter: 'event.target.value',
       },
     },
     options: {
-      typeDef: { type: 'string' },
-      // TODO: make this:
-      // typeDef: { type: 'array', items: { type: 'string' } },
+      typeDef: { type: 'array' },
+      control: { type: 'json', schema: URI_SELECT_OPTIONS },
+      defaultValue: [],
     },
   },
 } as StudioComponentDefinition;

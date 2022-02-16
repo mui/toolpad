@@ -25,6 +25,7 @@ async function main() {
       '@mui/material/utils',
       '@mui/material/styles',
       '@mui/material/colors',
+      '@mui/lab',
     ],
     {
       cwd: path.resolve(__dirname, '..'),

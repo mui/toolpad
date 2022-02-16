@@ -13,128 +13,60 @@ import {
   SelectChangeEvent,
   TextField,
   Typography,
+  styled,
+  Box,
+  IconButton,
 } from '@mui/material';
 import * as React from 'react';
-import TreeItem, { useTreeItem, TreeItemContentProps } from '@mui/lab/TreeItem';
-import clsx from 'clsx';
+import TreeItem, { TreeItemProps } from '@mui/lab/TreeItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { NodeId } from '../../types';
 import * as studioDom from '../../studioDom';
-import { useDom, useDomApi } from '../DomProvider';
+import { useDom, useDomApi } from '../DomLoader';
 import client from '../../api';
+import { format } from '../../utils/prettier';
 
-const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
-  const { classes, className, label, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;
-
-  const {
-    disabled,
-    expanded,
-    selected,
-    focused,
-    handleExpansion,
-    handleSelection,
-    preventSelection,
-  } = useTreeItem(nodeId);
-
-  const icon = iconProp || expansionIcon || displayIcon;
-
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    preventSelection(event);
-  };
-
-  const handleExpansionClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    handleExpansion(event);
-  };
-
-  const handleSelectionClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    handleSelection(event);
-  };
-
-  return (
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-    <div
-      className={clsx(className, classes.root, {
-        [classes.expanded]: expanded,
-        [classes.selected]: selected,
-        [classes.focused]: focused,
-        [classes.disabled]: disabled,
-      })}
-      onMouseDown={handleMouseDown}
-      ref={ref as React.Ref<HTMLDivElement>}
-    >
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-      <div onClick={handleExpansionClick} className={classes.iconContainer}>
-        {icon}
-      </div>
-      <Typography onClick={handleSelectionClick} component="div" className={classes.label}>
-        {label}
-      </Typography>
-    </div>
-  );
+const HierarchyExplorerRoot = styled('div')({
+  overflow: 'auto',
+  width: '100%',
 });
 
-interface HierarchyExplorerElementItemProps {
-  element: studioDom.StudioElementNode;
-}
+type StyledTreeItemProps = TreeItemProps & {
+  onDelete?: React.MouseEventHandler;
+  onCreate?: React.MouseEventHandler;
+  labelIcon?: React.ReactNode;
+  labelText: string;
+};
 
-function HierarchyExplorerElementItem({ element }: HierarchyExplorerElementItemProps) {
-  const dom = useDom();
-  const { children = [], ...namedChildren } = studioDom.getChildNodes(dom, element);
+function HierarchyTreeItem(props: StyledTreeItemProps) {
+  const { labelIcon, labelText, onCreate, onDelete, ...other } = props;
 
-  const defaultChildrenContent = children.map((child) => (
-    <HierarchyExplorerElementItem key={child.id} element={child} />
-  ));
-  const namedChildrenContent = Object.entries(namedChildren).map(() => {
-    // TODO: display `namedChildren` in the tree as well
-    return null;
-  });
-
-  return (
-    <TreeItem ContentComponent={CustomContent} nodeId={element.id} label={element.name}>
-      {[...defaultChildrenContent, ...namedChildrenContent]}
-    </TreeItem>
-  );
-}
-
-interface HierarchyExplorerPageItemProps {
-  page: studioDom.StudioPageNode;
-}
-
-function HierarchyExplorerPageItem({ page }: HierarchyExplorerPageItemProps) {
-  const dom = useDom();
-  const children = studioDom.getChildNodes(dom, page).children ?? [];
-  return (
-    <TreeItem ContentComponent={CustomContent} nodeId={page.id} label={page.name}>
-      {children.map((child) => (
-        <HierarchyExplorerElementItem key={child.id} element={child} />
-      ))}
-    </TreeItem>
-  );
-}
-
-interface HierarchyExplorerApiItemProps {
-  api: studioDom.StudioApiNode;
-}
-
-function HierarchyExplorerApiItem({ api }: HierarchyExplorerApiItemProps) {
-  return <TreeItem ContentComponent={CustomContent} nodeId={api.id} label={api.name} />;
-}
-
-interface HierarchyExplorerCodeComponentItemProps {
-  codeComponent: studioDom.StudioCodeComponentNode;
-}
-
-function HierarchyExplorerCodeComponentItem({
-  codeComponent,
-}: HierarchyExplorerCodeComponentItemProps) {
   return (
     <TreeItem
-      ContentComponent={CustomContent}
-      nodeId={codeComponent.id}
-      label={codeComponent.name}
+      label={
+        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
+          {labelIcon}
+          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+            {labelText}
+          </Typography>
+          {onCreate ? (
+            <IconButton size="small" onClick={onCreate}>
+              <AddIcon fontSize="small" />
+            </IconButton>
+          ) : null}
+          {onDelete ? (
+            <IconButton size="small" onClick={onDelete}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          ) : null}
+        </Box>
+      }
+      {...other}
     />
   );
 }
@@ -158,12 +90,21 @@ function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          const connectionType = (connectionsQuery.data || []).find(
+            ({ id }) => id === connectionId,
+          )?.type;
+          if (!connectionType) {
+            throw new Error(
+              `Invariant: can't find a datasource for existing connection "${connectionId}"`,
+            );
+          }
           const newApiNode = studioDom.createNode(dom, 'api', {
-            props: {},
+            query: {},
             connectionId,
+            connectionType,
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode(newApiNode, appNode.id, 'children');
+          domApi.addNode(newApiNode, appNode, 'apis');
           onClose?.(e, 'backdropClick');
           navigate(`/apis/${newApiNode.id}`);
         }}
@@ -219,11 +160,10 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
           e.preventDefault();
           const newNode = studioDom.createNode(dom, 'page', {
             title,
-            state: {},
-            props: {},
+            urlQuery: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode(newNode, appNode.id, 'children');
+          domApi.addNode(newNode, appNode, 'pages');
           onClose?.(e, 'backdropClick');
           navigate(`/pages/${newNode.id}`);
         }}
@@ -254,6 +194,33 @@ function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogPro
   );
 }
 
+function createDefaultCodeComponent(name: string): string {
+  const componentId = name.replace(/\s/g, '');
+  const propTypeId = `${componentId}Props`;
+  return format(`
+    import * as React from 'react';
+    import type { ComponentConfig } from "@mui/studio-core";
+    
+    export interface ${propTypeId} {
+      msg: string;
+    }
+    
+    export const config: ComponentConfig<${propTypeId}> = {
+      argTypes: {}
+    }
+    
+    export default function ${componentId}({ msg }: ${propTypeId}) {
+      return (
+        <div>{msg}</div>
+      );
+    }
+
+    ${componentId}.defaultProps = {
+      msg: "Hello world!",
+    };
+  `);
+}
+
 interface CreateStudioCodeComponentDialogProps extends Pick<DialogProps, 'open' | 'onClose'> {}
 
 function CreateStudioCodeComponentDialog({
@@ -270,28 +237,14 @@ function CreateStudioCodeComponentDialog({
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          console.log('name', name);
           const newNode = studioDom.createNode(dom, 'codeComponent', {
             name,
-            code: [
-              "import * as React from 'react';",
-              '',
-              'export interface MyComponentProps {',
-              '',
-              '}',
-              '',
-              'export default function MyComponent (props: MyComponentProps) {',
-              '  return (',
-              '    <div>',
-              '      Hello World!',
-              '    </div>',
-              '  );',
-              '}',
-              '',
-            ].join('\n'),
+            code: createDefaultCodeComponent(name),
             argTypes: {},
           });
           const appNode = studioDom.getApp(dom);
-          domApi.addNode(newNode, appNode.id, 'children');
+          domApi.addNode(newNode, appNode, 'codeComponents');
           onClose?.(e, 'backdropClick');
           navigate(`/codeComponents/${newNode.id}`);
         }}
@@ -326,19 +279,15 @@ export interface HierarchyExplorerProps {
   className?: string;
 }
 
+// TODO:
 export default function HierarchyExplorer({ className }: HierarchyExplorerProps) {
   const dom = useDom();
+  const domApi = useDomApi();
 
   const app = studioDom.getApp(dom);
-  const apis = studioDom.getApis(dom, app);
-  const codeComponents = studioDom.getCodeComponents(dom, app);
-  const pages = studioDom.getPages(dom, app);
+  const { apis = [], codeComponents = [], pages = [] } = studioDom.getChildNodes(dom, app);
 
-  const [expanded, setExpanded] = React.useState<('' | NodeId)[]>([
-    '',
-    ...apis.map((apiNode) => apiNode.id),
-    ...pages.map((pageNode) => pageNode.id),
-  ]);
+  const [expanded, setExpanded] = React.useState<string[]>([':pages', ':apis', ':codeComponents']);
 
   const selected: NodeId[] = [];
 
@@ -349,60 +298,128 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
   const navigate = useNavigate();
 
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
-    const selectedNodeId: NodeId | undefined = nodeIds[0] as NodeId | undefined;
-    if (selectedNodeId) {
-      const node = studioDom.getNode(dom, selectedNodeId);
-      if (studioDom.isElement(node)) {
-        // TODO: sort out in-page selection
-        const page = studioDom.getElementPage(dom, node);
-        if (page) {
-          navigate(`/pages/${page.id}`);
-        }
-      }
+    if (nodeIds.length <= 0) {
+      return;
+    }
 
-      if (studioDom.isPage(node)) {
-        navigate(`/pages/${node.id}`);
-      }
+    const rawNodeId = nodeIds[0];
+    if (rawNodeId.startsWith(':')) {
+      return;
+    }
 
-      if (studioDom.isApi(node)) {
-        navigate(`/apis/${node.id}`);
+    const studioNodeId: NodeId = rawNodeId as NodeId;
+    const node = studioDom.getNode(dom, studioNodeId);
+    if (studioDom.isElement(node)) {
+      // TODO: sort out in-page selection
+      const page = studioDom.getPageAncestor(dom, node);
+      if (page) {
+        navigate(`/pages/${page.id}`);
       }
+    }
 
-      if (studioDom.isCodeComponent(node)) {
-        navigate(`/codeComponents/${node.id}`);
-      }
+    if (studioDom.isPage(node)) {
+      navigate(`/pages/${node.id}`);
+    }
+
+    if (studioDom.isApi(node)) {
+      navigate(`/apis/${node.id}`);
+    }
+
+    if (studioDom.isCodeComponent(node)) {
+      navigate(`/codeComponents/${node.id}`);
     }
   };
 
   const [createApiDialogOpen, setCreateApiDialogOpen] = React.useState(0);
-  const handleCreateApiDialogOpen = React.useCallback(
-    () => setCreateApiDialogOpen(Math.random()),
-    [],
-  );
+  const handleCreateApiDialogOpen = React.useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    setCreateApiDialogOpen(Math.random());
+  }, []);
   const handleCreateApiDialogClose = React.useCallback(() => setCreateApiDialogOpen(0), []);
 
   const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
-  const handleCreatePageDialogOpen = React.useCallback(
-    () => setCreatePageDialogOpen(Math.random()),
-    [],
-  );
+  const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    setCreatePageDialogOpen(Math.random());
+  }, []);
   const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
 
   const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(0);
-  const handleCreateCodeComponentDialogOpen = React.useCallback(
-    () => setCreateCodeComponentDialogOpen(Math.random()),
-    [],
-  );
+  const handleCreateCodeComponentDialogOpen = React.useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    setCreateCodeComponentDialogOpen(Math.random());
+  }, []);
   const handleCreateCodeComponentDialogClose = React.useCallback(
     () => setCreateCodeComponentDialogOpen(0),
     [],
   );
 
+  const [deletedNode, setDeletedNode] = React.useState<NodeId | null>(null);
+  const handleDeleteNodeDialogOpen = React.useCallback(
+    (nodeId: NodeId) => (event: React.MouseEvent) => {
+      event.stopPropagation();
+      setDeletedNode(nodeId);
+    },
+    [],
+  );
+  const handledeleteNodeDialogClose = React.useCallback(() => setDeletedNode(null), []);
+
+  const handleDeleteNode = React.useCallback(() => {
+    if (deletedNode) {
+      domApi.removeNode(deletedNode);
+      handledeleteNodeDialogClose();
+    }
+  }, [domApi, deletedNode, handledeleteNodeDialogClose]);
+
   return (
-    <div className={className}>
-      <Button onClick={handleCreateApiDialogOpen}>New Api</Button>
-      <Button onClick={handleCreatePageDialogOpen}>New Page</Button>
-      <Button onClick={handleCreateCodeComponentDialogOpen}>New Component</Button>
+    <HierarchyExplorerRoot className={className}>
+      <Typography sx={{ px: 1, pt: 2 }}>App Hierarchy:</Typography>
+      <TreeView
+        aria-label="hierarchy explorer"
+        selected={selected}
+        onNodeSelect={handleSelect}
+        expanded={expanded}
+        onNodeToggle={handleToggle}
+        multiSelect
+        defaultCollapseIcon={<ExpandMoreIcon />}
+        defaultExpandIcon={<ChevronRightIcon />}
+      >
+        <HierarchyTreeItem nodeId=":apis" labelText="Apis" onCreate={handleCreateApiDialogOpen}>
+          {apis.map((apiNode) => (
+            <HierarchyTreeItem
+              key={apiNode.id}
+              nodeId={apiNode.id}
+              labelText={apiNode.name}
+              onDelete={handleDeleteNodeDialogOpen(apiNode.id)}
+            />
+          ))}
+        </HierarchyTreeItem>
+        <HierarchyTreeItem
+          nodeId=":codeComponents"
+          labelText="Components"
+          onCreate={handleCreateCodeComponentDialogOpen}
+        >
+          {codeComponents.map((codeComponent) => (
+            <HierarchyTreeItem
+              key={codeComponent.id}
+              nodeId={codeComponent.id}
+              labelText={codeComponent.name}
+              onDelete={handleDeleteNodeDialogOpen(codeComponent.id)}
+            />
+          ))}
+        </HierarchyTreeItem>
+        <HierarchyTreeItem nodeId=":pages" labelText="Pages" onCreate={handleCreatePageDialogOpen}>
+          {pages.map((page) => (
+            <HierarchyTreeItem
+              key={page.id}
+              nodeId={page.id}
+              labelText={page.name}
+              onDelete={handleDeleteNodeDialogOpen(page.id)}
+            />
+          ))}
+        </HierarchyTreeItem>
+      </TreeView>
+
       <CreateStudioApiDialog
         key={createApiDialogOpen || undefined}
         open={!!createApiDialogOpen}
@@ -418,36 +435,17 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         open={!!createCodeComponentDialogOpen}
         onClose={handleCreateCodeComponentDialogClose}
       />
-      <Typography>App Hierarchy</Typography>
-      <TreeView
-        aria-label="hierarchy explorer"
-        selected={selected}
-        onNodeSelect={handleSelect}
-        expanded={expanded}
-        onNodeToggle={handleToggle}
-        multiSelect
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
-      >
-        <TreeItem ContentComponent={CustomContent} nodeId="" label="Apis">
-          {apis.map((apiNode) => (
-            <HierarchyExplorerApiItem key={apiNode.id} api={apiNode} />
-          ))}
-        </TreeItem>
-        <TreeItem ContentComponent={CustomContent} nodeId="" label="Components">
-          {codeComponents.map((codeComponent) => (
-            <HierarchyExplorerCodeComponentItem
-              key={codeComponent.id}
-              codeComponent={codeComponent}
-            />
-          ))}
-        </TreeItem>
-        <TreeItem ContentComponent={CustomContent} nodeId="" label="Pages">
-          {pages.map((page) => (
-            <HierarchyExplorerPageItem key={page.id} page={page} />
-          ))}
-        </TreeItem>
-      </TreeView>
-    </div>
+      <Dialog open={!!deletedNode} onClose={handledeleteNodeDialogClose}>
+        <DialogTitle>Delete node {deletedNode}</DialogTitle>
+        <DialogActions>
+          <Button type="submit" onClick={handledeleteNodeDialogClose}>
+            Cancel
+          </Button>
+          <Button type="submit" onClick={handleDeleteNode}>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </HierarchyExplorerRoot>
   );
 }

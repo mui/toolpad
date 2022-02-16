@@ -1,31 +1,35 @@
-import { Box } from '@mui/material';
 import * as React from 'react';
-import {
-  RUNTIME_PROP_NODE_ID,
-  RUNTIME_PROP_STUDIO_SLOTS,
-  RUNTIME_PROP_STUDIO_SLOTS_TYPE,
-} from './constants.js';
-import type { ComponentDefinition, SlotType } from './index';
+import ErrorIcon from '@mui/icons-material/Error';
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
+import type { SlotType, LiveBindings, RuntimeEvent, ComponentConfig } from './index';
+
+declare global {
+  interface Window {
+    __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
+    __STUDIO_RUNTIME_BINDINGS_STATE__?: LiveBindings;
+    __STUDIO_RUNTIME_EVENT__?: (event: RuntimeEvent) => void;
+  }
+}
 
 export const StudioNodeContext = React.createContext<string | null>(null);
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.
-export interface SlotsInternalProps {
+interface SlotsWrapperProps {
   children?: React.ReactNode;
   // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_STUDIO_SLOTS]: string;
   // eslint-disable-next-line react/no-unused-prop-types
-  [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: SlotType;
+  slotType: SlotType;
   // eslint-disable-next-line react/no-unused-prop-types
   parentId: string;
 }
 
-export function SlotsInternal({ children }: SlotsInternalProps) {
+function SlotsWrapper({ children }: SlotsWrapperProps) {
   return <React.Fragment>{children}</React.Fragment>;
 }
 
-export interface PlaceholderInternalProps {
+interface PlaceholderWrapperProps {
   // eslint-disable-next-line react/no-unused-prop-types
   [RUNTIME_PROP_STUDIO_SLOTS]: string;
   // eslint-disable-next-line react/no-unused-prop-types
@@ -34,7 +38,7 @@ export interface PlaceholderInternalProps {
 
 // We want typescript to enforce these props, even when they're not used
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function PlaceholderInternal(props: PlaceholderInternalProps) {
+function PlaceholderWrapper(props: PlaceholderWrapperProps) {
   return (
     <div
       style={{
@@ -46,93 +50,102 @@ export function PlaceholderInternal(props: PlaceholderInternalProps) {
   );
 }
 
-interface ComponentErrorBoundaryProps {
-  children?: React.ReactNode;
-}
-interface ComponentErrorBoundaryState {
-  error: { message: string } | null;
+export interface RuntimeError {
+  message: string;
+  stack?: string;
 }
 
-class ComponentErrorBoundary extends React.Component<
-  ComponentErrorBoundaryProps,
-  ComponentErrorBoundaryState
+export interface RuntimeStudioNodeProps {
+  children: React.ReactElement;
+  nodeId: string;
+}
+
+interface RuntimeStudioNodeState {
+  error: RuntimeError | null;
+}
+
+interface RuntimeNodeWrapperProps {
+  children: React.ReactElement;
+  [RUNTIME_PROP_NODE_ID]: string;
+  nodeError?: RuntimeError;
+}
+
+// We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
+// represent StudioNodes. We use a wrapper to ensure only one element exists in the React tree
+// that has [RUNTIME_PROP_NODE_ID] property with this nodeId (We could clone the child and add
+// the prop, but the child may be spreading its props to other elements). We also don't want this
+// property to end up on DOM nodes.
+// IMPORTANT! This node must directly wrap the React Element for the studioNode
+function RuntimeNodeWrapper({ children }: RuntimeNodeWrapperProps) {
+  return children;
+}
+
+export class RuntimeStudioNode extends React.Component<
+  RuntimeStudioNodeProps,
+  RuntimeStudioNodeState
 > {
-  state: ComponentErrorBoundaryState;
+  state: RuntimeStudioNodeState;
 
-  constructor(props: ComponentErrorBoundaryProps) {
+  constructor(props: RuntimeStudioNodeProps) {
     super(props);
     this.state = { error: null };
   }
 
-  static getDerivedStateFromError(error: Error) {
-    return { error: { message: error.message } };
-  }
-
-  componentDidUpdate(
-    prevProps: ComponentErrorBoundaryProps,
-    prevState: ComponentErrorBoundaryState,
-  ) {
-    if (prevState.error && !this.state.error) {
-      // TODO: signal the editor that the error has disappeared
-    }
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // TODO: signal the editor that an error has appeared
-    console.error(error, errorInfo);
+  static getDerivedStateFromError(error: Error): RuntimeStudioNodeState {
+    return { error: { message: error.message, stack: error.stack } };
   }
 
   render() {
     if (this.state.error) {
       return (
-        <Box
-          sx={{ width: 60, height: 40, background: 'red', pointerEvents: 'initial' }}
-          title={this.state.error.message}
-        />
+        <RuntimeNodeWrapper
+          {...{
+            [RUNTIME_PROP_NODE_ID]: this.props.nodeId,
+            nodeError: this.state.error,
+          }}
+        >
+          <span
+            style={{
+              display: 'inline-flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              padding: 8,
+              background: 'red',
+              color: 'white',
+            }}
+          >
+            <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
+          </span>
+        </RuntimeNodeWrapper>
       );
     }
 
-    return this.props.children;
+    return (
+      <StudioNodeContext.Provider value={this.props.nodeId}>
+        <RuntimeNodeWrapper {...{ [RUNTIME_PROP_NODE_ID]: this.props.nodeId }}>
+          {this.props.children}
+        </RuntimeNodeWrapper>
+      </StudioNodeContext.Provider>
+    );
   }
 }
 
-interface WrappedStudioNodeInternalProps {
-  children: React.ReactElement;
-  [RUNTIME_PROP_NODE_ID]: string;
-  component?: ComponentDefinition<any>;
-}
-
-// We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect elements of this type
-// We will wrap any slot/slots props with elements that have a [RUNTIME_PROP_STUDIO_SLOTS] so
-// that we can detect these as well in the fibers.
-function WrappedStudioNodeInternal({
-  children,
-  [RUNTIME_PROP_NODE_ID]: studioNodeId,
-}: WrappedStudioNodeInternalProps) {
-  return (
-    <StudioNodeContext.Provider value={studioNodeId}>
-      <ComponentErrorBoundary>{children}</ComponentErrorBoundary>
-    </StudioNodeContext.Provider>
-  );
-}
-
-export interface WrappedStudioNodeProps {
-  children: React.ReactElement;
-  id: string;
-  component?: ComponentDefinition<any>;
-}
-
-// Public interface with an `id` prop that will translate it into [RUNTIME_PROP_NODE_ID]
-export function WrappedStudioNode({ children, id, component }: WrappedStudioNodeProps) {
-  return (
-    <WrappedStudioNodeInternal {...{ [RUNTIME_PROP_NODE_ID]: id, component }}>
-      {children}
-    </WrappedStudioNodeInternal>
-  );
+export function useDiagnostics(
+  pageState: Record<string, unknown>,
+  liveBindings: LiveBindings,
+): void {
+  // Layout effect to make sure it's updated before the DOM is updated (which triggers the editor
+  // to update its view state).
+  React.useLayoutEffect(() => {
+    // eslint-disable-next-line no-underscore-dangle
+    window.__STUDIO_RUNTIME_PAGE_STATE__ = pageState;
+    // eslint-disable-next-line no-underscore-dangle
+    window.__STUDIO_RUNTIME_BINDINGS_STATE__ = liveBindings;
+  }, [pageState, liveBindings]);
 }
 
 export interface StudioRuntimeNode<P> {
-  setProp: <K extends keyof P>(key: K, value: P[K] | ((newValue: P[K]) => P[K])) => void;
+  setProp: <K extends keyof P & string>(key: K, value: React.SetStateAction<P[K]>) => void;
 }
 
 export function useStudioNode<P = {}>(): StudioRuntimeNode<P> | null {
@@ -144,13 +157,13 @@ export function useStudioNode<P = {}>(): StudioRuntimeNode<P> | null {
     }
     return {
       setProp: (prop, value) => {
-        window.parent.postMessage({
-          type: 'setProp',
+        // eslint-disable-next-line no-underscore-dangle
+        window.__STUDIO_RUNTIME_EVENT__?.({
+          type: 'propUpdated',
           nodeId,
           prop,
           value,
         });
-        console.log(`setting prop "${prop}" to "${value}" on node "${nodeId}"`);
       },
     };
   }, [nodeId]);
@@ -170,11 +183,11 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
   return count > 0 ? (
     <React.Fragment>{children}</React.Fragment>
   ) : (
-    <PlaceholderInternal
+    <PlaceholderWrapper
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_STUDIO_SLOTS]: prop,
-        [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'single',
+        slotType: 'single',
       }}
     />
   );
@@ -192,16 +205,25 @@ export function Slots({ prop, children }: SlotsProps) {
   }
   const count = React.Children.count(children);
   return count > 0 ? (
-    <SlotsInternal
+    <SlotsWrapper
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_STUDIO_SLOTS]: prop,
-        [RUNTIME_PROP_STUDIO_SLOTS_TYPE]: 'multiple',
+        slotType: 'multiple',
       }}
     >
       {children}
-    </SlotsInternal>
+    </SlotsWrapper>
   ) : (
     <Placeholder prop={prop} />
   );
+}
+
+export async function importCodeComponent<P>(
+  module: Promise<{ default: React.FC<P> | React.Component<P>; config?: ComponentConfig<P> }>,
+): Promise<React.FC<P> | React.Component<P>> {
+  const { default: Component, config } = await module;
+  // eslint-disable-next-line no-underscore-dangle
+  (Component as any).__config = config;
+  return Component;
 }

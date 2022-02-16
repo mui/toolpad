@@ -10,6 +10,7 @@ export default (async (req, res) => {
   const generated = renderPageCode(dom, pageNodeId, { pretty: true });
   const transformed = transform(generated.code, {
     transforms: ['jsx', 'typescript'],
+    filePath: `/pages/${pageNodeId}.tsx`,
   });
   res.setHeader('content-type', 'application/javascript');
   if (req.query.dev) {

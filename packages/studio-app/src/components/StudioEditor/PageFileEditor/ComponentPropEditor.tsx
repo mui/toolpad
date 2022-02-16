@@ -1,12 +1,13 @@
-import { Alert, IconButton, Stack } from '@mui/material';
+import { Alert, Stack } from '@mui/material';
 import * as React from 'react';
-import LinkIcon from '@mui/icons-material/Link';
-import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-core';
 import studioPropControls from '../../propertyControls';
 import * as studioDom from '../../../studioDom';
-import { useDomApi } from '../../DomProvider';
-import { usePageEditorApi } from './PageEditorProvider';
+import { useDomApi } from '../../DomLoader';
+import { BindingEditor } from './BindingEditor';
+import { NodeId, StudioBindable } from '../../../types';
+import { WithControlledProp } from '../../../utils/types';
+import { usePageEditorState } from './PageEditorProvider';
 
 function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
   switch (typeDef.type) {
@@ -17,89 +18,124 @@ function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
     case 'boolean':
       return { type: 'boolean' };
     case 'object':
-      return { type: 'object' };
+      return { type: 'json' };
     case 'array':
-      return { type: 'object' };
-    case 'dataQuery':
-      return { type: 'dataQuery' };
+      return { type: 'json' };
     default:
       return null;
   }
 }
 
-export interface ComponentPropEditorProps<P, K extends keyof P> {
-  name: K;
-  node: studioDom.StudioElementNode<P>;
+export interface BindableEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+  propNamespace: string | null;
+  propName: string;
+  nodeId: NodeId;
   argType: ArgTypeDefinition;
-  actualValue: unknown;
 }
 
-export default function ComponentPropEditor<P, K extends keyof P & string>({
-  name,
-  node,
+export function BindableEditor<V>({
+  propNamespace,
+  propName,
+  nodeId,
   argType,
-  actualValue,
-}: ComponentPropEditorProps<P, K>) {
-  const api = usePageEditorApi();
-  const domApi = useDomApi();
-
-  const handleChange = React.useCallback(
-    (value: any) => domApi.setNodeConstPropValue<P>(node, name, value),
-    [domApi, node, name],
+  value,
+  onChange,
+}: BindableEditorProps<V>) {
+  const handlePropConstChange = React.useCallback(
+    (newValue: V) => onChange({ type: 'const', value: newValue }),
+    [onChange],
   );
 
-  const handleClickBind = React.useCallback(
-    () => api.openBindingEditor(node.id, name),
-    [api, node.id, name],
-  );
+  // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
+  // to make them bindable to other controlled props only
+  const isBindable = !argType.onChangeHandler;
 
   const controlSpec = argType.control ?? getDefaultControl(argType.typeDef);
   const control = controlSpec ? studioPropControls[controlSpec.type] : null;
 
-  const propValue = node.props[name];
+  const bindingId = `${nodeId}${propNamespace ? `.${propNamespace}` : ''}.${propName}`;
+  const { viewState } = usePageEditorState();
+  const liveBinding = viewState.bindings[bindingId];
 
-  const initPropValue = React.useCallback(() => {
-    if (propValue?.type === 'const') {
-      return propValue.value;
+  const initConstValue = React.useCallback(() => {
+    if (value?.type === 'const') {
+      return value.value;
     }
-    return actualValue;
-  }, [actualValue, propValue]);
 
-  const [value, setValue] = React.useState(initPropValue);
+    return liveBinding?.value;
+  }, [liveBinding, value]);
+
+  const [constValue, setConstValue] = React.useState(initConstValue);
 
   React.useEffect(() => {
-    setValue(initPropValue());
+    setConstValue(initConstValue());
     return () => {};
-  }, [propValue, initPropValue]);
+  }, [value, initConstValue]);
 
-  const hasBinding = propValue?.type === 'binding';
+  const hasBinding = value && value.type !== 'const';
 
   return (
     <Stack direction="row" alignItems="flex-start">
       {control ? (
         <React.Fragment>
           <control.Editor
-            name={name}
+            nodeId={nodeId}
+            propName={propName}
             argType={argType}
-            disabled={hasBinding}
-            value={value}
-            onChange={handleChange}
+            disabled={!!hasBinding}
+            value={constValue}
+            onChange={handlePropConstChange}
           />
-          <IconButton
-            size="small"
-            onClick={handleClickBind}
-            color={hasBinding ? 'primary' : 'inherit'}
-          >
-            {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
-          </IconButton>{' '}
+          <BindingEditor<V>
+            bindingId={`${nodeId}${propNamespace ? `.${propNamespace}` : ''}.${propName}`}
+            propType={argType.typeDef}
+            value={value}
+            onChange={onChange}
+            disabled={!isBindable}
+          />
         </React.Fragment>
       ) : (
         <Alert severity="warning">
-          {`No control for property '${name}' (type '${argType.typeDef.type}' ${
+          {`No control for property '${propName}' (type '${argType.typeDef.type}' ${
             argType.control ? `, control: '${argType.control.type}'` : ''
           })`}
         </Alert>
       )}
     </Stack>
+  );
+}
+
+export interface ComponentPropEditorProps<P, K extends keyof P> {
+  node: studioDom.StudioElementNode<P>;
+  propName: K;
+  argType: ArgTypeDefinition;
+}
+
+export default function ComponentPropEditor<P, K extends keyof P & string>({
+  node,
+  propName,
+  argType,
+}: ComponentPropEditorProps<P, K>) {
+  const domApi = useDomApi();
+  const propNamespace = 'props';
+
+  const handlePropChange = React.useCallback(
+    (newValue: StudioBindable<P[K]> | null) => {
+      domApi.setNodeNamespacedProp(node, propNamespace, propName, newValue);
+    },
+    [domApi, node, propName],
+  );
+
+  const propValue = node.props[propName] ?? null;
+
+  return (
+    <BindableEditor
+      propNamespace={propNamespace}
+      propName={propName}
+      argType={argType}
+      nodeId={node.id}
+      value={propValue}
+      onChange={handlePropChange}
+    />
   );
 }

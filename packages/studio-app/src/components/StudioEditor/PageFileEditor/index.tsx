@@ -1,17 +1,18 @@
 import * as React from 'react';
 import { styled } from '@mui/system';
 import { useParams } from 'react-router-dom';
+import { Typography } from '@mui/material';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
-import BindingEditor from './BindingEditor';
 import { PageEditorProvider } from './PageEditorProvider';
 import { NodeId } from '../../../types';
+import { useDom } from '../../DomLoader';
+import * as studioDom from '../../../studioDom';
+import ComponentCatalog from './ComponentCatalog';
 
 const classes = {
-  content: 'StudioContent',
   componentPanel: 'StudioComponentPanel',
   renderPanel: 'StudioRenderPanel',
-  pagePanel: 'StudioPagePanel',
 };
 
 const PageFileEditorRoot = styled('div')(({ theme }) => ({
@@ -32,14 +33,18 @@ interface PageFileEditorProps {
 }
 
 export default function PageFileEditor({ className }: PageFileEditorProps) {
+  const dom = useDom();
   const { nodeId } = useParams();
-  return (
+  const pageNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'page');
+  return pageNode ? (
     <PageEditorProvider key={nodeId} nodeId={nodeId as NodeId}>
       <PageFileEditorRoot className={className}>
+        <ComponentCatalog />
         <RenderPanel className={classes.renderPanel} />
         <ComponentPanel className={classes.componentPanel} />
-        <BindingEditor />
       </PageFileEditorRoot>
     </PageEditorProvider>
+  ) : (
+    <Typography sx={{ p: 4 }}>Non-existing Page &quot;{nodeId}&quot;</Typography>
   );
 }

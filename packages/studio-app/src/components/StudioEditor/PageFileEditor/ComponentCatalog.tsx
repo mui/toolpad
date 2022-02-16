@@ -1,17 +1,20 @@
 import * as React from 'react';
-import { styled, Typography } from '@mui/material';
-import { ComponentDefinition, ArgTypeDefinitions } from '@mui/studio-core';
-import { getStudioComponent, useStudioComponents } from '../../../studioComponents';
+import { Box, Collapse, styled, Typography } from '@mui/material';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { useStudioComponents } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
-import { StudioNodeProps } from '../../../types';
-import { ExactEntriesOf } from '../../../utils/types';
-import { useDom } from '../../DomProvider';
+import { useDom } from '../../DomLoader';
 import { usePageEditorApi } from './PageEditorProvider';
 
+const WIDTH_COLLAPSED = 50;
+
 const ComponentCatalogRoot = styled('div')({
-  display: 'flex',
-  flexDirection: 'row',
-  flexWrap: 'wrap',
+  position: 'relative',
+  width: WIDTH_COLLAPSED,
+  height: '100%',
+  zIndex: 1,
+  overflow: 'visible',
 });
 
 const ComponentCatalogItem = styled('div')(({ theme }) => ({
@@ -19,8 +22,6 @@ const ComponentCatalogItem = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   aspectRatio: '1',
-  margin: theme.spacing(1),
-  width: '40%',
   borderRadius: theme.shape.borderRadius,
   border: `1px solid ${theme.palette.divider}`,
   cursor: 'grab',
@@ -28,23 +29,6 @@ const ComponentCatalogItem = styled('div')(({ theme }) => ({
     background: theme.palette.action.hover,
   },
 }));
-
-function getDefaultPropValues<P = {}>(
-  definition: ComponentDefinition<P>,
-): Partial<StudioNodeProps<P>> {
-  const result: Partial<StudioNodeProps<P>> = {};
-  const entries = Object.entries(definition.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>;
-  entries.forEach(([name, prop]) => {
-    if (prop) {
-      result[name] = {
-        type: 'const',
-        value: prop.defaultValue,
-      };
-    }
-  });
-
-  return result;
-}
 
 export interface ComponentCatalogProps {
   className?: string;
@@ -54,30 +38,98 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const api = usePageEditorApi();
   const dom = useDom();
 
+  const [openStart, setOpenStart] = React.useState(0);
+
+  const closeTimeoutRef = React.useRef<NodeJS.Timeout>();
+  const openDrawer = React.useCallback(() => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+    }
+    setOpenStart(Date.now());
+  }, []);
+
+  const closeDrawer = React.useCallback(
+    (delay?: number) => {
+      const timeOpen = Date.now() - openStart;
+      const defaultDelay = timeOpen > 750 ? 500 : 0;
+      closeTimeoutRef.current = setTimeout(() => setOpenStart(0), delay ?? defaultDelay);
+    },
+    [openStart],
+  );
+
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
     event.dataTransfer.dropEffect = 'copy';
-    const componentDef = getStudioComponent(dom, componentType);
-    const newNode = studioDom.createElement(dom, componentType, getDefaultPropValues(componentDef));
+    const newNode = studioDom.createElement(dom, componentType, {});
     api.deselect();
     api.newNodeDragStart(newNode);
+    closeDrawer();
   };
 
   const studioComponents = useStudioComponents(dom);
 
+  const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
+  const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
+
   return (
-    <ComponentCatalogRoot className={className}>
-      <Typography>Drag components on the canvas:</Typography>
-      {studioComponents.map((componentType) => {
-        return (
-          <ComponentCatalogItem
-            key={componentType.id}
-            draggable
-            onDragStart={handleDragStart(componentType.id)}
-          >
-            {componentType.displayName}
-          </ComponentCatalogItem>
-        );
-      })}
+    <ComponentCatalogRoot
+      className={className}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          position: 'fixed',
+          background: 'white',
+          borderRight: 1,
+          borderColor: 'divider',
+        }}
+      >
+        <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
+          <Box sx={{ width: 300, height: '100%', overflow: 'auto' }}>
+            <Box display="grid" gridTemplateColumns="1fr 1fr" gap={3} padding={3}>
+              {studioComponents.map((componentType) => {
+                return (
+                  <ComponentCatalogItem
+                    key={componentType.id}
+                    draggable
+                    onDragStart={handleDragStart(componentType.id)}
+                  >
+                    {componentType.displayName}
+                  </ComponentCatalogItem>
+                );
+              })}
+            </Box>
+          </Box>
+        </Collapse>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: WIDTH_COLLAPSED,
+          }}
+        >
+          <Box sx={{ mt: 2 }}>{openStart ? <ChevronLeftIcon /> : <ChevronRightIcon />}</Box>
+          <Box position="relative">
+            <Typography
+              sx={{
+                position: 'absolute',
+                top: 0,
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: 20,
+                transform: 'rotate(90deg) translate(-10px, 0)',
+                transformOrigin: '0 50%',
+              }}
+            >
+              Components
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
     </ComponentCatalogRoot>
   );
 }

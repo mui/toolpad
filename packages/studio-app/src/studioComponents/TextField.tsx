@@ -1,4 +1,4 @@
-import { StudioComponentDefinition } from '../types';
+import { StudioComponentDefinition } from './studioComponentDefinition';
 import importedComponentRenderer from './importedComponentRenderer';
 
 export default {
@@ -24,6 +24,8 @@ export default {
         params: ['event'],
         valueGetter: 'event.target.value',
       },
+      defaultValue: '',
+      defaultValueProp: 'defaultValue',
     },
   },
 } as StudioComponentDefinition;

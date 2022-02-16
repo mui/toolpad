@@ -1,17 +1,38 @@
-import { ArgTypeDefinition } from '@mui/studio-core';
-import * as prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel';
+import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/studio-core';
+import Imports from './codeGen/Imports';
+import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
-import {
-  NodeId,
-  PropExpression,
-  RenderContext,
-  ResolvedProps,
-  StudioComponentDefinition,
-  StudioNodeProps,
-} from './types';
+import { NodeId, PropExpression, ResolvedProps, StudioBindable, StudioBindables } from './types';
+import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
+import * as bindings from './utils/bindings';
+import { getQueryNodeArgTypes } from './studioDataSources/client';
+import { tryFormat } from './utils/prettier';
+import { RenderContext } from './studioComponents/studioComponentDefinition';
+
+function literalPropExpression(value: any): PropExpression {
+  return {
+    type: 'expression',
+    value: JSON.stringify(value),
+  };
+}
+
+function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes {
+  return Object.fromEntries(
+    Object.entries(argTypes).flatMap(([propName, argType]) =>
+      argType ? [[propName, argType.typeDef]] : [],
+    ),
+  );
+}
+
+function propValueTypesToArgTypes(propTypes: PropValueTypes): ArgTypeDefinitions {
+  return Object.fromEntries(
+    Object.entries(propTypes).flatMap(([propName, typeDef]) =>
+      typeDef ? [[propName, { typeDef }]] : [],
+    ),
+  );
+}
 
 export interface RenderPageConfig {
   // whether we're in the context of an editor
@@ -20,21 +41,62 @@ export interface RenderPageConfig {
   pretty: boolean;
 }
 
-interface Import {
-  named: Map<string, string>;
-  all?: string;
+interface UrlQueryStateHook {
+  paramName: string;
+  stateVar: string;
+  setStateVar: string;
+  defaultValue?: unknown;
+}
+
+interface ControlledStateHook {
+  nodeName: string;
+  propName: string;
+  stateVar: string;
+  setStateVar: string;
+  defaultValue?: unknown;
+}
+
+interface StateHook {
+  type: 'derived' | 'api' | 'fetched';
+  nodeId: NodeId;
+  nodeName: string;
+  stateVar: string;
+  setStateVar: string;
+}
+
+interface MemoizedConst {
+  varName: string;
+  value: string;
 }
 
 class Context implements RenderContext {
-  private dom: studioDom.StudioDom;
+  dom: studioDom.StudioDom;
 
   private page: studioDom.StudioPageNode;
 
   private editor: boolean;
 
-  private imports: Map<string, Import>;
+  private imports: Imports;
 
-  private dataLoaders: string[] = [];
+  private codeComponentImports = new Map<string, string>();
+
+  private moduleScope: Scope;
+
+  private reactAlias: string = 'undefined';
+
+  private runtimeAlias: string = 'undefined';
+
+  private urlQueryStateHooks = new Map<string, UrlQueryStateHook>();
+
+  private controlledStateHooks = new Map<string, ControlledStateHook>();
+
+  private pageStateIdentifier = 'undefined';
+
+  private bindingsStateIdentifier = 'undefined';
+
+  private stateHooks = new Map<string, StateHook>();
+
+  private memoizedConsts: MemoizedConst[] = [];
 
   constructor(
     dom: studioDom.StudioDom,
@@ -45,130 +107,332 @@ class Context implements RenderContext {
     this.page = page;
     this.editor = editor;
 
-    this.imports = new Map<string, Import>([
-      [
-        'react',
-        {
-          named: new Map([['default', 'React']]),
-        },
-      ],
-    ]);
+    this.moduleScope = new Scope(null);
+
+    this.imports = new Imports(this.moduleScope);
+
+    this.reactAlias = this.addImport('react', '*', 'React');
 
     if (this.editor) {
-      this.imports.set('@mui/studio-core/runtime', {
-        named: new Map(),
-        all: '__studioRuntime',
+      this.runtimeAlias = this.addImport('@mui/studio-core/runtime', '*', '__studioRuntime');
+    }
+  }
+
+  generateControlledStateVars(...parts: string[]) {
+    const stateVarSuggestion = camelCase(...parts);
+    const stateVar = this.moduleScope.createUniqueBinding(stateVarSuggestion);
+    const setStateVarSuggestion = camelCase('set', ...parts);
+    const setStateVar = this.moduleScope.createUniqueBinding(setStateVarSuggestion);
+    return [stateVar, setStateVar];
+  }
+
+  collectAllState() {
+    const nodes = studioDom.getDescendants(this.dom, this.page);
+    nodes.forEach((node) => {
+      if (studioDom.isElement(node)) {
+        this.collectControlledStateProps(node);
+      } else if (
+        studioDom.isDerivedState(node) ||
+        studioDom.isQueryState(node) ||
+        studioDom.isFetchedState(node)
+      ) {
+        this.collectStateNode(node);
+      }
+    });
+
+    Object.entries(this.page.urlQuery || {}).forEach(([paramName, defaultValue]) => {
+      const [stateVar, setStateVar] = this.generateControlledStateVars(paramName);
+
+      this.urlQueryStateHooks.set(`${this.page.id}.urlQuery.${paramName}`, {
+        paramName,
+        stateVar,
+        setStateVar,
+        defaultValue,
       });
+    });
+  }
+
+  collectStateNode(
+    node:
+      | studioDom.StudioDerivedStateNode
+      | studioDom.StudioQueryStateNode
+      | studioDom.StudioFetchedStateNode,
+  ): StateHook {
+    let stateHook = this.stateHooks.get(node.id);
+    if (!stateHook) {
+      const stateVar = this.moduleScope.createUniqueBinding(node.name);
+      const setStateVar = this.moduleScope.createUniqueBinding(camelCase('set', node.name));
+      if (studioDom.isDerivedState(node)) {
+        stateHook = {
+          type: 'derived',
+          nodeId: node.id,
+          nodeName: node.name,
+          stateVar,
+          setStateVar,
+        };
+        this.stateHooks.set(node.id, stateHook);
+      } else if (studioDom.isQueryState(node)) {
+        stateHook = {
+          type: 'api',
+          nodeId: node.id,
+          nodeName: node.name,
+          stateVar,
+          setStateVar,
+        };
+        this.stateHooks.set(node.id, stateHook);
+      } else if (studioDom.isFetchedState(node)) {
+        stateHook = {
+          type: 'fetched',
+          nodeId: node.id,
+          nodeName: node.name,
+          stateVar,
+          setStateVar,
+        };
+        this.stateHooks.set(node.id, stateHook);
+      } else {
+        throw new Error(`Invariant: Invalid node type "${(node as studioDom.StudioNode).type}"`);
+      }
+    }
+    return stateHook;
+  }
+
+  collectControlledStateProp(
+    node: studioDom.StudioElementNode,
+    propName: string,
+  ): ControlledStateHook {
+    const nodeId = node.id;
+    const nodeName = node.name;
+    const stateId = `${nodeId}.props.${propName}`;
+
+    let stateHook = this.controlledStateHooks.get(stateId);
+    if (!stateHook) {
+      const component = getStudioComponent(this.dom, node.component);
+
+      const argType = component.argTypes[propName];
+
+      if (!argType) {
+        throw new Error(`Can't find argType for "${node.name}.${propName}"`);
+      }
+
+      if (!argType.onChangeProp) {
+        throw new Error(`"${node.name}.${propName}" is not a controlled property`);
+      }
+
+      const [stateVar, setStateVar] = this.generateControlledStateVars(nodeName, propName);
+
+      const propValue = node.props[propName];
+      const defaultValue = propValue?.type === 'const' ? propValue.value : argType.defaultValue;
+
+      stateHook = {
+        nodeName,
+        propName,
+        stateVar,
+        setStateVar,
+        defaultValue,
+      };
+      this.controlledStateHooks.set(stateId, stateHook);
+    }
+
+    return stateHook;
+  }
+
+  collectControlledStateProps(node: studioDom.StudioElementNode): void {
+    const component = getStudioComponent(this.dom, node.component);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [propName, argType] of Object.entries(component.argTypes)) {
+      if (argType?.onChangeProp) {
+        this.collectControlledStateProp(node, propName);
+      }
     }
   }
 
-  useDataLoader(queryId: string): string {
-    this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
-    this.dataLoaders.push(queryId);
-    return `_${queryId}`;
+  evalExpression(id: string, expression: string): string {
+    const evaluated = `((state) => (${expression}))(${this.pageStateIdentifier})`;
+
+    return this.editor
+      ? `
+        (() => {
+          let error, value
+          try {
+            value = eval(${JSON.stringify(evaluated)});
+            return value;
+          } catch (_error) {
+            error = _error;
+            return undefined;
+          } finally {
+            ${this.bindingsStateIdentifier}[${JSON.stringify(id)}] = { error, value };
+          }
+        })()
+      `
+      : evaluated;
   }
 
-  getComponentDefinition(node: studioDom.StudioNode): StudioComponentDefinition | null {
-    if (studioDom.isPage(node)) {
-      return getStudioComponent(this.dom, 'Page');
+  resolveBindable<P extends studioDom.BindableProps<P>>(
+    id: string,
+    propValue: StudioBindable<any>,
+    argType: ArgTypeDefinition,
+  ): PropExpression {
+    if (propValue.type === 'const') {
+      let value = JSON.stringify(propValue.value);
+
+      if (argType.memoize) {
+        const varName = this.moduleScope.createUniqueBinding('memo');
+        this.memoizedConsts.push({ varName, value });
+        value = varName;
+      }
+
+      return {
+        type: 'expression',
+        value,
+      };
     }
-    if (studioDom.isElement(node)) {
-      return getStudioComponent(this.dom, node.component);
+
+    if (propValue.type === 'boundExpression') {
+      const parsedExpr = bindings.parse(propValue.value);
+
+      // Resolve each named variable to its resolved variable in code
+      const resolvedExpr = bindings.resolve(parsedExpr, (part) => `state.${part}`);
+
+      const formatted = bindings.formatExpression(resolvedExpr, propValue.format);
+
+      return {
+        type: 'expression',
+        value: this.evalExpression(id, formatted),
+      };
     }
-    return null;
+
+    if (propValue.type === 'binding') {
+      return {
+        type: 'expression',
+        value: this.evalExpression(id, `state.${propValue.value}`),
+      };
+    }
+
+    if (propValue.type === 'jsExpression') {
+      return {
+        type: 'expression',
+        value: this.evalExpression(id, propValue.value),
+      };
+    }
+
+    console.warn(`Invariant: Unkown prop type "${(propValue as any).type}"`);
+    return {
+      type: 'expression',
+      value: JSON.stringify(undefined),
+    };
   }
 
   /**
-   * Resolves StudioNode properties to expressions we can render in the code.
-   * This will set up databinding if necessary
+   * Resolves StudioBindables to expressions we can render in the code.
    */
-  resolveProps<P>(
-    node: studioDom.StudioElementNode | studioDom.StudioPageNode,
-    resolvedChildren: ResolvedProps,
+  resolveBindables(
+    id: string,
+    bindables: StudioBindables<any>,
+    argTypes: ArgTypeDefinitions,
   ): ResolvedProps {
-    const result: ResolvedProps = resolvedChildren;
-    const component = this.getComponentDefinition(node);
-    (Object.entries(node.props) as ExactEntriesOf<StudioNodeProps<P>>).forEach(
-      ([propName, propValue]) => {
-        const argDef: ArgTypeDefinition | undefined = component?.argTypes[propName];
-        if (!argDef || !propValue || typeof propName !== 'string' || result[propName]) {
-          return;
-        }
+    const result: ResolvedProps = {};
 
-        if (argDef.typeDef.type === 'dataQuery') {
-          if (propValue.type !== 'const') {
-            throw new Error(`TODO: make this work for bindings`);
-          }
-          if (propValue.value && typeof propValue.value === 'string') {
-            const spreadedValue = this.useDataLoader(propValue.value);
-            result.$spread = `${result.$spread ? `${result.$spread} ` : ''}{...${spreadedValue}}`;
-          }
-        } else if (propValue.type === 'const') {
-          result[propName] = {
-            type: 'expression',
-            value: JSON.stringify(propValue.value),
-          };
-        } else if (propValue.type === 'binding') {
-          result[propName] = {
-            type: 'expression',
-            value: `_${propValue.state}`,
-          };
-          if (argDef.onChangeProp) {
-            const setStateIdentifier = `set_${propValue.state}`;
-            if (argDef.onChangeHandler) {
-              // TODO: React.useCallback for this one?
-              const { params, valueGetter } = argDef.onChangeHandler;
-              result[argDef.onChangeProp] = {
-                type: 'expression',
-                value: `(${params.join(', ')}) => ${setStateIdentifier}(${valueGetter})`,
-              };
-            } else {
-              result[argDef.onChangeProp] = {
-                type: 'expression',
-                value: setStateIdentifier,
-              };
-            }
-          }
-        } else {
-          throw new Error(`Invariant: Unkown prop type "${(propValue as any).type}"`);
+    Object.entries(bindables).forEach(([propName, propValue]) => {
+      const argType = argTypes[propName as string];
+      if (propValue && argType) {
+        const resolved = this.resolveBindable(`${id}.${propName}`, propValue, argType);
+        if (resolved) {
+          result[propName] = resolved;
         }
-      },
-    );
+      }
+    });
 
     return result;
   }
 
-  renderComponent(name: string, resolvedProps: ResolvedProps): string {
-    const { children, ...props } = resolvedProps;
-    return children
-      ? `<${name} ${this.renderProps(props)}>${this.renderJsxContent(children)}</${name}>`
-      : `<${name} ${this.renderProps(props)}/>`;
+  resolveElementProps(node: studioDom.StudioElementNode): ResolvedProps {
+    const component = getStudioComponent(this.dom, node.component);
+
+    const result: ResolvedProps = this.resolveBindables(
+      `${node.id}.props`,
+      node.props,
+      component.argTypes,
+    );
+
+    // useState Hooks
+    if (component) {
+      Object.entries(component.argTypes).forEach(([propName, argType]) => {
+        if (!argType) {
+          return;
+        }
+
+        const stateId = `${node.id}.props.${propName}`;
+        const hook = this.controlledStateHooks.get(stateId);
+
+        if (!hook) {
+          return;
+        }
+
+        result[propName] = {
+          type: 'expression',
+          value: hook.stateVar,
+        };
+
+        if (argType.onChangeProp) {
+          if (argType.onChangeHandler) {
+            // TODO: React.useCallback for this?
+            const { params, valueGetter } = argType.onChangeHandler;
+            result[argType.onChangeProp] = {
+              type: 'expression',
+              value: `(${params.join(', ')}) => ${hook.setStateVar}(${valueGetter})`,
+            };
+          } else {
+            result[argType.onChangeProp] = {
+              type: 'expression',
+              value: hook.setStateVar,
+            };
+          }
+        }
+      });
+    }
+
+    // Default values
+    if (component) {
+      Object.entries(component.argTypes).forEach(([propName, argType]) => {
+        if (argType && argType.defaultValue !== undefined && !result[propName]) {
+          const defaultPropName = argType.defaultValueProp ?? propName;
+          result[defaultPropName] = {
+            type: 'expression',
+            value: JSON.stringify(argType.defaultValue),
+          };
+        }
+      });
+    }
+
+    return result;
   }
 
-  renderNodeChildren(node: studioDom.StudioElementNode | studioDom.StudioPageNode): ResolvedProps {
+  resolveElementChildren(
+    renderableNodeChildren: { [key: string]: studioDom.StudioElementNode<any>[] },
+    argTypes?: ArgTypeDefinitions,
+  ): ResolvedProps {
     const result: ResolvedProps = {};
-    const nodeChildren = studioDom.getChildNodes(this.dom, node);
+
     // eslint-disable-next-line no-restricted-syntax
-    for (const [prop, children] of Object.entries(nodeChildren)) {
+    for (const [prop, children] of Object.entries(renderableNodeChildren)) {
       if (children) {
         if (children.length === 1) {
-          result[prop] = this.renderNode(children[0]);
+          result[prop] = this.renderElement(children[0]);
         } else if (children.length > 1) {
           result[prop] = {
             type: 'jsxFragment',
             value: children
-              .map((child): string => this.renderJsxContent(this.renderNode(child)))
+              .map((child): string => this.renderJsxContent(this.renderElement(child)))
               .join('\n'),
           };
         }
       }
     }
 
-    const component = this.getComponentDefinition(node);
-
-    if (this.editor && component) {
+    if (this.editor && argTypes) {
       // eslint-disable-next-line no-restricted-syntax
-      for (const [prop, argType] of Object.entries(component.argTypes)) {
+      for (const [prop, argType] of Object.entries(argTypes)) {
         if (argType?.typeDef.type === 'element') {
           if (argType.control?.type === 'slots') {
             const existingProp = result[prop];
@@ -176,9 +440,9 @@ class Context implements RenderContext {
             result[prop] = {
               type: 'jsxElement',
               value: `
-                <__studioRuntime.Slots prop=${JSON.stringify(prop)}>
+                <${this.runtimeAlias}.Slots prop=${JSON.stringify(prop)}>
                   ${existingProp ? this.renderJsxContent(existingProp) : ''}
-                </__studioRuntime.Slots>
+                </${this.runtimeAlias}.Slots>
               `,
             };
           } else if (argType.control?.type === 'slot') {
@@ -187,9 +451,9 @@ class Context implements RenderContext {
             result[prop] = {
               type: 'jsxElement',
               value: `
-                <__studioRuntime.Placeholder prop=${JSON.stringify(prop)}>
+                <${this.runtimeAlias}.Placeholder prop=${JSON.stringify(prop)}>
                   ${existingProp ? this.renderJsxContent(existingProp) : ''}
-                </__studioRuntime.Placeholder>
+                </${this.runtimeAlias}.Placeholder>
               `,
             };
           }
@@ -200,30 +464,37 @@ class Context implements RenderContext {
     return result;
   }
 
-  renderNode(node: studioDom.StudioElementNode | studioDom.StudioPageNode): PropExpression {
-    const component = this.getComponentDefinition(node);
-    if (!component) {
-      return {
-        type: 'expression',
-        value: 'null',
-      };
-    }
-
-    const nodeChildren = this.renderNodeChildren(node);
-    const resolvedProps = this.resolveProps(node, nodeChildren);
-    const rendered = component.render(this, resolvedProps);
-
-    // TODO: We may not need the `component` prop anymore. Remove?
+  wrapComponent(
+    node: studioDom.StudioElementNode | studioDom.StudioPageNode,
+    rendered: string,
+  ): PropExpression {
     return {
       type: 'jsxElement',
       value: this.editor
         ? `
-          <__studioRuntime.WrappedStudioNode id="${node.id}">
+          <${this.runtimeAlias}.RuntimeStudioNode nodeId="${node.id}">
             ${rendered}
-          </__studioRuntime.WrappedStudioNode>
+          </${this.runtimeAlias}.RuntimeStudioNode>
         `
         : rendered,
     };
+  }
+
+  renderElement(node: studioDom.StudioElementNode): PropExpression {
+    const component = getStudioComponent(this.dom, node.component);
+
+    const resolvedProps = this.resolveElementProps(node);
+    const resolvedChildren = this.resolveElementChildren(
+      studioDom.getChildNodes(this.dom, node),
+      component.argTypes,
+    );
+
+    const rendered = component.render(this, node, {
+      ...resolvedProps,
+      ...resolvedChildren,
+    });
+
+    return this.wrapComponent(node, rendered);
   }
 
   /**
@@ -234,7 +505,26 @@ class Context implements RenderContext {
    * }`
    */
   renderRoot(node: studioDom.StudioPageNode): string {
-    const expr = this.renderNode(node);
+    const { children } = studioDom.getChildNodes(this.dom, node);
+    const resolvedChildren = this.resolveElementChildren(
+      { children },
+      {
+        children: {
+          typeDef: { type: 'element' },
+          control: { type: 'slots' },
+        },
+      },
+    );
+
+    const Stack = this.addImport('@mui/material', 'Stack', 'Stack');
+
+    const rendered = `
+      <${Stack} direction="column" gap={2} m={2}>
+        ${this.renderJsxContent(resolvedChildren.children)}
+      </${Stack}>
+    `;
+
+    const expr = this.wrapComponent(node, rendered);
     return this.renderJsExpression(expr);
   }
 
@@ -248,12 +538,28 @@ class Context implements RenderContext {
         if (!expr) {
           return '';
         }
-        if (name === '$spread') {
-          return expr;
-        }
         return `${name}={${this.renderJsExpression(expr)}}`;
       })
       .join(' ');
+  }
+
+  /**
+   * Renders resolved properties to a string that can be inlined as a JS object
+   * @example
+   *     `const hello = ${RESULT}`;
+   *     // "const hello = { foo: 'bar' }"
+   */
+  renderPropsAsObject(resolvedProps: ResolvedProps): string {
+    const keyValuePairs = (Object.entries(resolvedProps) as ExactEntriesOf<ResolvedProps>).map(
+      ([name, expr]) => {
+        if (!expr) {
+          return '';
+        }
+        const renderedExpression = this.renderJsExpression(expr);
+        return name === renderedExpression ? name : `${name}: ${renderedExpression}`;
+      },
+    );
+    return `{${keyValuePairs.join(', ')}}`;
   }
 
   /**
@@ -288,74 +594,237 @@ class Context implements RenderContext {
   }
 
   /**
-   * Adds an import to the page module. Returns an identifier that's based on local that can
+   * Adds an import to the page module. Returns an identifier that's based on [suggestedName] that can
    * be used to reference the import.
    */
-  addImport(source: string, imported: string, localName: string = imported): string {
-    // TODO: introduce concept of scope and make sure local is unique
-
-    let specifiers = this.imports.get(source);
-    if (!specifiers) {
-      specifiers = { named: new Map() };
-      this.imports.set(source, specifiers);
-    }
-
-    const existing = specifiers.named.get(imported);
-    if (!existing) {
-      specifiers.named.set(imported, localName);
-    } else if (existing !== localName) {
-      // TODO: we can reassign to a local variable
-      throw new Error(
-        `Trying to import "${imported}" as "${localName}" but it is already imported as "${existing}"`,
-      );
-    }
-
-    return localName;
+  addImport(
+    source: string,
+    imported: '*' | 'default' | string,
+    suggestedName: string = imported,
+  ): string {
+    return this.imports.add(source, imported, suggestedName);
   }
 
-  renderImports(): string {
-    return Array.from(this.imports.entries(), ([source, specifiers]) => {
-      const renderedSpecifiers = [];
-      if (specifiers.named.size > 0) {
-        const renderedNamedSpecifiers = [];
-        // eslint-disable-next-line no-restricted-syntax
-        for (const [imported, local] of specifiers.named.entries()) {
-          if (imported === 'default') {
-            renderedSpecifiers.push(local);
-          } else {
-            renderedNamedSpecifiers.push(imported === local ? imported : `${imported} as ${local}`);
-          }
-        }
-
-        if (renderedNamedSpecifiers.length > 0) {
-          renderedSpecifiers.push(`{ ${renderedNamedSpecifiers.join(', ')} }`);
-        }
+  addCodeComponentImport(source: string, suggestedName: string = 'CodeComponent'): string {
+    if (this.editor) {
+      const existing = this.codeComponentImports.get(source);
+      if (existing) {
+        return existing;
       }
 
-      if (specifiers.all) {
-        renderedSpecifiers.push(`* as ${specifiers.all}`);
-      }
-      return `import ${renderedSpecifiers.join(', ')} from '${source}';`;
+      const varName = this.moduleScope.createUniqueBinding(suggestedName);
+      this.codeComponentImports.set(source, varName);
+      return varName;
+    }
+
+    return this.imports.add(source, 'default', suggestedName);
+  }
+
+  renderCodeComponentImports(): string {
+    // TODO: Import concurrently through Promise.all
+    return Array.from(
+      this.codeComponentImports.entries(),
+      ([source, name]) =>
+        `const ${name} = await ${this.runtimeAlias}.importCodeComponent(import(${JSON.stringify(
+          source,
+        )}))`,
+    ).join('\n');
+  }
+
+  renderControlledStateHooks(): string {
+    return Array.from(this.controlledStateHooks.values(), (stateHook) => {
+      const defaultValue = JSON.stringify(stateHook.defaultValue);
+      return `const [${stateHook.stateVar}, ${stateHook.setStateVar}] = ${this.reactAlias}.useState(${defaultValue});`;
+    }).join('\n');
+  }
+
+  renderUrlQueryStateHooks(): string {
+    return Array.from(this.urlQueryStateHooks.values(), (stateHook) => {
+      const useUrlQueryState = this.addImport(
+        '@mui/studio-core',
+        'useUrlQueryState',
+        'useUrlQueryState',
+      );
+      const paramName = JSON.stringify(stateHook.paramName);
+      const defaultValue = JSON.stringify(stateHook.defaultValue);
+      return `const [${stateHook.stateVar}, ${stateHook.setStateVar}] = ${useUrlQueryState}(${paramName}, ${defaultValue});`;
+    }).join('\n');
+  }
+
+  renderDataQueryState(): string {
+    return Array.from(this.stateHooks.values(), (hook) => {
+      const INITIAL_DATA_QUERY = this.addImport(
+        '@mui/studio-core',
+        'INITIAL_DATA_QUERY',
+        'INITIAL_DATA_QUERY',
+      );
+      return `const [${hook.stateVar}, ${hook.setStateVar}] = React.useState(${INITIAL_DATA_QUERY});`;
     }).join('\n');
   }
 
   renderStateHooks(): string {
-    return Object.entries(this.page.state)
-      .map(([key, state]) => {
-        // TODO: figure out proper variable naming
-        return `const [_${key}, set_${key}] = React.useState(${JSON.stringify(
-          state.initialValue,
-        )});`;
-      })
+    return Array.from(this.stateHooks.values(), (stateHook) => {
+      switch (stateHook.type) {
+        case 'derived': {
+          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
+          const resolvedParams = this.resolveBindables(
+            `${node.id}.params`,
+            node.params,
+            propValueTypesToArgTypes(node.argTypes),
+          );
+          const paramsArg = this.renderPropsAsObject(resolvedParams);
+          const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
+            this.renderJsExpression(resolvedProp),
+          );
+          const derivedStateGetter = this.addImport(
+            `../derivedState/${node.id}.ts`,
+            'default',
+            node.name,
+          );
+          return `const ${
+            stateHook.stateVar
+          } = React.useMemo(() => ${derivedStateGetter}(${paramsArg}), [${depsArray.join(', ')}])`;
+        }
+        case 'api': {
+          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
+          const propTypes = argTypesToPropValueTypes(getQueryNodeArgTypes(this.dom, node));
+          const resolvedProps = this.resolveBindables(
+            `${node.id}.params`,
+            node.params,
+            propValueTypesToArgTypes(propTypes),
+          );
+          const params = this.renderPropsAsObject(resolvedProps);
+
+          const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
+
+          return `${useDataQuery}(${stateHook.setStateVar}, ${JSON.stringify(
+            node.api,
+          )}, ${params});`;
+        }
+        case 'fetched': {
+          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
+
+          const url = this.resolveBindable(`${node.id}.url`, node.url, {
+            typeDef: { type: 'string' },
+          });
+
+          const paramsExpr = this.renderPropsAsObject({
+            url,
+            collectionPath: literalPropExpression(node.collectionPath),
+            fieldPaths: literalPropExpression(node.fieldPaths),
+          });
+
+          const useFetchedState = this.addImport(
+            '@mui/studio-core',
+            'useFetchedState',
+            'useFetchedState',
+          );
+
+          return `const ${stateHook.stateVar} = ${useFetchedState}(${paramsExpr});`;
+        }
+        default:
+          throw new Error(
+            `Invariant: Missing renderer for state hook of type "${(stateHook as StateHook).type}"`,
+          );
+      }
+    }).join('\n');
+  }
+
+  renderPageState(): string {
+    const stateHookObjects = new Map<string, ResolvedProps>();
+    Array.from(this.controlledStateHooks.values()).forEach((hook) => {
+      let hookObject = stateHookObjects.get(hook.nodeName);
+      if (!hookObject) {
+        hookObject = {};
+        stateHookObjects.set(hook.nodeName, hookObject);
+      }
+      hookObject[hook.propName] = { type: 'expression', value: hook.stateVar };
+    });
+
+    const renderedControlledStateProps = Array.from(
+      stateHookObjects.entries(),
+      ([name, properties]) => `${name}: ${this.renderPropsAsObject(properties)}`,
+    );
+
+    const renderedStateProps = Array.from(
+      this.stateHooks.values(),
+      (hook) => `${hook.nodeName}: ${hook.stateVar}`,
+    );
+
+    const renderedUrlQueryState = this.renderPropsAsObject(
+      Object.fromEntries(
+        Array.from(this.urlQueryStateHooks.values(), (hook) => {
+          return [hook.paramName, { type: 'expression', value: hook.stateVar }];
+        }),
+      ),
+    );
+
+    return `{${[
+      `page: ${renderedUrlQueryState}`,
+      ...renderedControlledStateProps,
+      ...renderedStateProps,
+    ].join(',')}}`;
+  }
+
+  renderMemoizedConsts(): string {
+    return this.memoizedConsts
+      .map(
+        ({ varName, value }) =>
+          `const ${varName} = ${this.reactAlias}.useMemo(() => (${value}), [])`,
+      )
       .join('\n');
   }
 
-  renderDataLoaderHooks(): string {
-    return this.dataLoaders
-      .map((queryId) => {
-        return `const _${queryId} = useDataQuery(${JSON.stringify(queryId)});`;
-      })
-      .join('\n');
+  render() {
+    this.collectAllState();
+
+    const urlQueryStateHooks = this.renderUrlQueryStateHooks();
+    const controlledStateHooks = this.renderControlledStateHooks();
+    const dataQueryState = this.renderDataQueryState();
+
+    this.pageStateIdentifier = this.moduleScope.createUniqueBinding('_pageState');
+    this.bindingsStateIdentifier = this.moduleScope.createUniqueBinding('_bindingsState');
+    const pageState = this.renderPageState();
+
+    const statehooks = this.renderStateHooks();
+
+    const root: string = this.renderRoot(this.page);
+
+    // TODO: Add seal for memoized consts as well? It needs to run after renderRoot.
+    const memoizedConsts = this.renderMemoizedConsts();
+
+    this.imports.seal();
+
+    const imports = this.imports.render();
+    const codeComponentImports = this.renderCodeComponentImports();
+
+    return `
+      ${imports}
+      ${codeComponentImports}
+
+      export default function App () {
+        ${urlQueryStateHooks}
+        ${controlledStateHooks}
+        ${dataQueryState}
+
+        const ${this.pageStateIdentifier} = ${pageState};
+        const ${this.bindingsStateIdentifier} = {};
+        
+        ${statehooks}
+
+        ${memoizedConsts}
+
+        ${
+          this.editor
+            ? `${this.runtimeAlias}.useDiagnostics(${this.pageStateIdentifier}, ${this.bindingsStateIdentifier});`
+            : ''
+        }
+
+        return (
+          ${root}
+        );
+      }
+    `;
   }
 }
 
@@ -370,28 +839,13 @@ export default function renderPageCode(
     ...configInit,
   };
 
-  const page = studioDom.getNode(dom, pageNodeId);
-  studioDom.assertIsPage(page);
+  const page = studioDom.getNode(dom, pageNodeId, 'page');
+
   const ctx = new Context(dom, page, config);
-  const root: string = ctx.renderRoot(page);
-
-  let code: string = `
-    ${ctx.renderImports()}
-
-    export default function App () {
-      ${ctx.renderStateHooks()}
-      ${ctx.renderDataLoaderHooks()}
-      return (
-        ${root}
-      );
-    }
-  `;
+  let code: string = ctx.render();
 
   if (config.pretty) {
-    code = prettier.format(code, {
-      parser: 'babel-ts',
-      plugins: [parserBabel],
-    });
+    code = tryFormat(code);
   }
 
   return { code };

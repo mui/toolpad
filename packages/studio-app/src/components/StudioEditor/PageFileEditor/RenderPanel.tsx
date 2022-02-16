@@ -1,14 +1,15 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
 import clsx from 'clsx';
-import { SlotType } from '@mui/studio-core';
+import { RuntimeEvent, SlotType } from '@mui/studio-core';
+import throttle from 'lodash/throttle';
 import {
   NodeId,
-  NodeState,
-  ViewState,
   FlowDirection,
   SlotLocation,
   SlotState,
+  NodeInfo,
+  NodesInfo,
 } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import PageView from '../../PageView';
@@ -20,9 +21,9 @@ import {
   rectContainsPoint,
 } from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
-import { getViewState } from '../../../pageViewState';
+import { getPageViewState } from '../../../pageViewState';
 import { ExactEntriesOf } from '../../../utils/types';
-import { useDom, useDomApi } from '../../DomProvider';
+import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { useStudioComponent } from '../../../studioComponents';
@@ -148,16 +149,16 @@ function insertSlotAbsolutePositionCss(slot: {
 }
 
 function findNodeAt(
-  nodes: readonly PageOrElementNode[],
-  viewLayout: ViewState,
+  nodes: readonly studioDom.StudioNode[],
+  nodesInfo: NodesInfo,
   x: number,
   y: number,
 ): NodeId | null {
   // Search deepest nested first
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
-    const nodeLayout = viewLayout[node.id];
-    if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
+    const nodeInfo = nodesInfo[node.id];
+    if (nodeInfo?.rect && rectContainsPoint(nodeInfo.rect, x, y)) {
       return node.id;
     }
   }
@@ -230,21 +231,21 @@ function findActiveSlotInNode(
 
 function findActiveSlotAt(
   nodes: readonly studioDom.StudioNode[],
-  viewLayout: ViewState,
+  nodesInfo: NodesInfo,
   slots: ViewSlots,
   x: number,
   y: number,
 ): SlotLocation | null {
   // Search deepest nested first
-  let nodeLayout: NodeState | undefined;
+  let nodeInfo: NodeInfo | undefined;
   let nodeSlots: NodeSlots = {};
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
-    nodeLayout = viewLayout[node.id];
+    nodeInfo = nodesInfo[node.id];
     nodeSlots = slots[node.id] || {};
-    if (nodeLayout && rectContainsPoint(nodeLayout.rect, x, y)) {
+    if (nodeInfo?.rect && rectContainsPoint(nodeInfo.rect, x, y)) {
       // Initially only consider slots of the node we're hovering
-      const slotIndex = findActiveSlotInNode(nodeLayout.nodeId, nodeSlots, x, y);
+      const slotIndex = findActiveSlotInNode(nodeInfo.nodeId, nodeSlots, x, y);
       if (slotIndex) {
         return slotIndex;
       }
@@ -252,13 +253,11 @@ function findActiveSlotAt(
   }
   // One last attempt, using the most shallow nodeLayout we found, regardless of
   // whether we are hovering it
-  if (nodeLayout) {
-    return findActiveSlotInNode(nodeLayout.nodeId, nodeSlots, x, y);
+  if (nodeInfo) {
+    return findActiveSlotInNode(nodeInfo.nodeId, nodeSlots, x, y);
   }
   return null;
 }
-
-type PageOrElementNode = studioDom.StudioPageNode | studioDom.StudioElementNode;
 
 function getSlotDirection(flow: FlowDirection): SlotDirection {
   switch (flow) {
@@ -298,7 +297,7 @@ type RenderedSlot = RenderedInsertSlot | RenderedSingleSlot;
 function calculateSlots(
   slotState: SlotState,
   children: studioDom.StudioNode[],
-  viewState: ViewState,
+  nodesInfo: NodesInfo,
 ): RenderedSlot[] {
   const rect = slotState.rect;
 
@@ -320,13 +319,13 @@ function calculateSlots(
 
   for (let i = 0; i < children.length; i += 1) {
     const child = children[i];
-    const childState = viewState[child.id];
+    const childState = nodesInfo[child.id];
 
     if (!child.parentIndex) {
       throw new Error(`Invariant: Node "${child.id}" has no parent`);
     }
 
-    if (!childState) {
+    if (!childState?.rect) {
       return [];
     }
 
@@ -403,13 +402,13 @@ function calculateSlots(
 }
 
 function calculateNodeSlots(
-  parent: PageOrElementNode,
+  parent: studioDom.StudioNode,
   children: studioDom.NodeChildren,
-  viewState: ViewState,
+  nodesInfo: NodesInfo,
 ): NodeSlots {
-  const parentState = viewState[parent.id];
+  const parentState = nodesInfo[parent.id];
 
-  if (!parentState) {
+  if (!parentState?.slots) {
     return {};
   }
 
@@ -419,7 +418,7 @@ function calculateNodeSlots(
   for (const [parentProp, slotState] of Object.entries(parentState.slots)) {
     if (slotState) {
       const namedChildren = children[parentProp] ?? [];
-      result[parentProp] = calculateSlots(slotState, namedChildren, viewState);
+      result[parentProp] = calculateSlots(slotState, namedChildren, nodesInfo);
     }
   }
 
@@ -477,10 +476,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     highlightedSlot,
   } = usePageEditorState();
 
-  const pageNode = studioDom.getNode(dom, pageNodeId);
-  studioDom.assertIsPage(pageNode);
+  const { nodes: nodesInfo } = viewState;
 
-  const pageNodes: readonly PageOrElementNode[] = React.useMemo(() => {
+  const pageNode = studioDom.getNode(dom, pageNodeId, 'page');
+
+  const pageNodes = React.useMemo(() => {
     return [pageNode, ...studioDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
@@ -508,10 +508,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const slots: ViewSlots = React.useMemo(() => {
     const result: ViewSlots = {};
     pageNodes.forEach((node) => {
-      result[node.id] = calculateNodeSlots(node, studioDom.getChildNodes(dom, node), viewState);
+      result[node.id] = calculateNodeSlots(node, studioDom.getChildNodes(dom, node), nodesInfo);
     });
     return result;
-  }, [pageNodes, dom, viewState]);
+  }, [pageNodes, dom, nodesInfo]);
 
   const availableNodes = React.useMemo(() => {
     /**
@@ -535,13 +535,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       event.dataTransfer.dropEffect = 'move';
 
-      const nodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
+      const nodeId = findNodeAt(pageNodes, nodesInfo, cursorPos.x, cursorPos.y);
 
       if (nodeId) {
         api.select(nodeId);
       }
     },
-    [api, pageNodes, viewState, getViewCoordinates],
+    [api, pageNodes, nodesInfo, getViewCoordinates],
   );
 
   const handleDragOver = React.useCallback(
@@ -554,7 +554,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const slotIndex = findActiveSlotAt(
         availableNodes,
-        viewState,
+        nodesInfo,
         slots,
         cursorPos.x,
         cursorPos.y,
@@ -569,7 +569,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.nodeDragOver(null);
       }
     },
-    [availableNodes, viewState, api, slots, getViewCoordinates],
+    [availableNodes, nodesInfo, api, slots, getViewCoordinates],
   );
 
   const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
@@ -584,7 +584,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const activeSlot = findActiveSlotAt(
         availableNodes,
-        viewState,
+        nodesInfo,
         slots,
         cursorPos.x,
         cursorPos.y,
@@ -592,12 +592,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       if (activeSlot) {
         if (newNode) {
-          domApi.addNode(
-            newNode,
-            activeSlot.parentId,
-            activeSlot.parentProp,
-            activeSlot.parentIndex,
-          );
+          const parent = studioDom.getNode(dom, activeSlot.parentId);
+          if (studioDom.isElement(parent)) {
+            domApi.addNode(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
+          } else if (studioDom.isPage(parent)) {
+            domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
+          } else {
+            throw new Error(
+              `Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`,
+            );
+          }
         } else if (selection) {
           domApi.moveNode(
             selection,
@@ -610,7 +614,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.nodeDragEnd();
     },
-    [availableNodes, viewState, domApi, api, slots, newNode, selection, getViewCoordinates],
+    [dom, availableNodes, nodesInfo, domApi, api, slots, newNode, selection, getViewCoordinates],
   );
 
   const handleDragEnd = React.useCallback(
@@ -642,10 +646,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const newSelectedNodeId = findNodeAt(pageNodes, viewState, cursorPos.x, cursorPos.y);
+      const newSelectedNodeId = findNodeAt(pageNodes, nodesInfo, cursorPos.x, cursorPos.y);
       api.select(newSelectedNodeId);
     },
-    [api, pageNodes, viewState, getViewCoordinates],
+    [api, pageNodes, nodesInfo, getViewCoordinates],
   );
 
   const handleKeyDown = React.useCallback(
@@ -658,7 +662,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [domApi, api, selection],
   );
 
-  const selectedRect = selectedNode ? viewState[selectedNode.id]?.rect : null;
+  const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
 
   const nodesWithInteraction = React.useMemo<Set<NodeId>>(() => {
     if (!selectedNode) {
@@ -674,20 +678,59 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     setOverlayKey((key) => key + 1);
   }, []);
 
+  const handleRuntimeEvent = React.useCallback(
+    (event: RuntimeEvent) => {
+      switch (event.type) {
+        case 'propUpdated': {
+          const node = studioDom.getNode(dom, event.nodeId as NodeId, 'element');
+          const actual = node.props[event.prop];
+          if (!actual || actual.type !== 'const') {
+            console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);
+            return;
+          }
+
+          const newValue: unknown =
+            typeof event.value === 'function' ? event.value(actual.value) : event.value;
+
+          domApi.setNodeNamespacedProp(node, 'props', event.prop, {
+            type: 'const',
+            value: newValue,
+          });
+          return;
+        }
+        default:
+          throw new Error(
+            `received unrecognized event "${(event as RuntimeEvent).type}" from editor runtime`,
+          );
+      }
+    },
+    [dom, domApi],
+  );
+
+  const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);
+  React.useEffect(() => {
+    handleRuntimeEventRef.current = handleRuntimeEvent;
+  }, [handleRuntimeEvent]);
+
   React.useEffect(() => {
     if (editorWindowRef.current) {
-      const rootElm = editorWindowRef.current.document.getElementById('root');
+      const editorWindow = editorWindowRef.current;
+      const rootElm = editorWindow.document.getElementById('root');
 
       if (!rootElm) {
-        throw new Error(`Invariant: Unable to locate Studio App root element`);
+        console.warn(`Invariant: Unable to locate Studio App root element`);
+        return () => {};
       }
 
-      api.pageViewStateUpdate(getViewState(rootElm));
+      api.pageViewStateUpdate(getPageViewState(rootElm));
 
-      const observer = new MutationObserver(() => {
-        // TODO: Do we need to throttle this?
-        api.pageViewStateUpdate(getViewState(rootElm));
-      });
+      const handlePageMutation = throttle(
+        () => api.pageViewStateUpdate(getPageViewState(rootElm)),
+        250,
+        { trailing: true },
+      );
+
+      const observer = new MutationObserver(handlePageMutation);
 
       observer.observe(rootElm, {
         attributes: true,
@@ -695,7 +738,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         subtree: true,
       });
 
-      return () => observer.disconnect();
+      // eslint-disable-next-line no-underscore-dangle
+      editorWindow.__STUDIO_RUNTIME_EVENT__ = handleRuntimeEventRef.current;
+
+      return () => {
+        handlePageMutation.cancel();
+        observer.disconnect();
+        // eslint-disable-next-line no-underscore-dangle
+        delete editorWindow.__STUDIO_RUNTIME_EVENT__;
+      };
     }
     return () => {};
   }, [overlayKey, api]);
@@ -759,8 +810,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             );
           })}
           {pageNodes.map((node) => {
-            const nodeLayout = viewState[node.id];
-            if (!nodeLayout) {
+            const nodeLayout = nodesInfo[node.id];
+            if (!nodeLayout?.rect) {
               return null;
             }
 

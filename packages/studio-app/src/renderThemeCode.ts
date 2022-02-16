@@ -1,6 +1,5 @@
-import * as prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel';
 import * as studioDom from './studioDom';
+import { tryFormat } from './utils/prettier';
 
 export interface RenderThemeConfig {
   // whether we're in the context of an editor
@@ -24,17 +23,20 @@ export default function renderThemeCode(
   `;
 
   const app = studioDom.getApp(dom);
-  const theme = studioDom.getTheme(dom, app);
+  const { themes = [] } = studioDom.getChildNodes(dom, app);
 
-  if (theme) {
+  if (themes.length > 0) {
+    const theme = themes[0];
     const importedColors = new Set();
     const paletteProps: [string, string][] = [];
-    const primary = studioDom.getConstPropValue(theme, 'palette.primary.main');
+
+    const primary = studioDom.fromConstPropValue(theme.theme['palette.primary.main']);
     if (primary) {
       importedColors.add(primary);
       paletteProps.push(['primary', `{ main: ${primary}[500] }`]);
     }
-    const secondary = studioDom.getConstPropValue(theme, 'palette.secondary.main');
+
+    const secondary = studioDom.fromConstPropValue(theme.theme['palette.secondary.main']);
     if (secondary) {
       importedColors.add(secondary);
       paletteProps.push(['secondary', `{ main: ${secondary}[500] }`]);
@@ -57,10 +59,7 @@ export default function renderThemeCode(
   }
 
   if (config.pretty) {
-    code = prettier.format(code, {
-      parser: 'babel-ts',
-      plugins: [parserBabel],
-    });
+    code = tryFormat(code);
   }
 
   return { code };

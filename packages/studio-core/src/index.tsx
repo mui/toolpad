@@ -1,12 +1,12 @@
 export type SlotType = 'single' | 'multiple';
 
 export interface OnChangeHandler {
-  params: ['event'];
-  valueGetter: 'event.target.value';
+  params: string[];
+  valueGetter: string;
 }
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'dataQuery';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element';
 }
 
 export interface StringValueType extends ValueTypeBase {
@@ -26,20 +26,16 @@ export interface BooleanValueType extends ValueTypeBase {
 
 export interface ObjectValueType extends ValueTypeBase {
   type: 'object';
-  properties?: { [key: string]: PrimitiveValueType };
+  schema?: 'string';
 }
 
 export interface ArrayValueType extends ValueTypeBase {
   type: 'array';
-  items: PrimitiveValueType;
+  schema?: 'string';
 }
 
 export interface ElementValueType extends ValueTypeBase {
   type: 'element';
-}
-
-export interface DataQueryValueType extends ValueTypeBase {
-  type: 'dataQuery';
 }
 
 export interface ArgControlSpec {
@@ -55,19 +51,24 @@ export interface ArgControlSpec {
     | 'color' // color picker
     | 'slot' // slot in canvas
     | 'slots' // slots in canvas
-    | 'dataQuery' // Remove this after we redo bindings
     | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
-    | 'date'; // date picker
+    | 'date' // date picker
+    | 'json' // JSON editor
+    | 'GridColumns'; // GridColumns specialized editor
 }
 
-export type PrimitiveValueType =
+type PrimitiveValueType =
   | StringValueType
   | NumberValueType
   | BooleanValueType
   | ObjectValueType
   | ArrayValueType;
 
-export type PropValueType = PrimitiveValueType | ElementValueType | DataQueryValueType;
+export type PropValueType = PrimitiveValueType | ElementValueType;
+
+export type PropValueTypes<K extends string = string> = Partial<{
+  [key in K]?: PropValueType;
+}>;
 
 export interface ArgTypeDefinition {
   name?: string;
@@ -78,6 +79,8 @@ export interface ArgTypeDefinition {
   control?: ArgControlSpec;
   onChangeProp?: string;
   onChangeHandler?: OnChangeHandler;
+  memoize?: boolean;
+  defaultValueProp?: string;
 }
 
 export type ArgTypeDefinitions<P = any> = {
@@ -89,10 +92,35 @@ export interface ComponentDefinition<P> {
   argTypes: ArgTypeDefinitions<P>;
 }
 
-export type { PlaceholderProps, SlotsProps, StudioRuntimeNode } from './runtime';
+export interface LiveBinding {
+  value?: any;
+  error?: Error;
+}
+
+export type RuntimeEvent = {
+  type: 'propUpdated';
+  nodeId: string;
+  prop: string;
+  value: React.SetStateAction<unknown>;
+};
+
+export interface ComponentConfig<P> {
+  argTypes: ArgTypeDefinitions<P>;
+}
+
+export type LiveBindings = Partial<Record<string, LiveBinding>>;
+
+export type { PlaceholderProps, SlotsProps, StudioRuntimeNode, RuntimeError } from './runtime';
 export { Placeholder, Slots, useStudioNode } from './runtime';
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
-export { default as useDataQuery } from './useDataQuery.js';
+export type { UseDataQuery } from './useDataQuery.js';
+export * from './useDataQuery.js';
+
+export type { UseFetchedState } from './useFetchedState.js';
+export { default as useFetchedState } from './useFetchedState.js';
+
+export { default as useUrlQueryState } from './useUrlQueryState.js';
+
 export * from './constants.js';

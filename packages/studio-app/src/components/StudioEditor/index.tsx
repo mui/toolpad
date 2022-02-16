@@ -1,21 +1,18 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
-import SaveIcon from '@mui/icons-material/Save';
-import { CircularProgress, IconButton } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import StudioAppBar from '../StudioAppBar';
 import PageEditor from './PageFileEditor';
 import PagePanel from './PagePanel';
-import client from '../../api';
-import DomProvider, { useDom, useDomState } from '../DomProvider';
+import DomProvider, { useDomLoader } from '../DomLoader';
 import ApiEditor from './ApiFileEditor';
 import CodeComponentEditor from './CodeComponentEditor';
 
 const classes = {
   content: 'StudioContent',
-  componentPanel: 'StudioComponentPanel',
-  renderPanel: 'StudioRenderPanel',
-  pagePanel: 'StudioPagePanel',
+  hierarchyPanel: 'StudioHierarchyPanel',
+  editorPanel: 'StudioEditorPanel',
 };
 
 const EditorRoot = styled('div')(({ theme }) => ({
@@ -30,16 +27,13 @@ const EditorRoot = styled('div')(({ theme }) => ({
     flexDirection: 'row',
     overflow: 'hidden',
   },
-  [`& .${classes.pagePanel}`]: {
+  [`& .${classes.hierarchyPanel}`]: {
     width: 250,
     borderRight: `1px solid ${theme.palette.divider}`,
   },
-  [`& .${classes.renderPanel}`]: {
+  [`& .${classes.editorPanel}`]: {
     flex: 1,
-  },
-  [`& .${classes.componentPanel}`]: {
-    width: 300,
-    borderLeft: `1px solid ${theme.palette.divider}`,
+    overflow: 'hidden',
   },
 }));
 
@@ -48,8 +42,7 @@ interface FileEditorProps {
 }
 
 function FileEditor({ className }: FileEditorProps) {
-  const domState = useDomState();
-  return domState.loaded ? (
+  return (
     <Routes>
       <Route path="pages/:nodeId" element={<PageEditor className={className} />} />
       <Route path="apis/:nodeId" element={<ApiEditor className={className} />} />
@@ -58,37 +51,36 @@ function FileEditor({ className }: FileEditorProps) {
         element={<CodeComponentEditor className={className} />}
       />
     </Routes>
-  ) : (
-    <CircularProgress />
   );
 }
 
 function EditorContent() {
-  const dom = useDom();
-
-  const handleSave = React.useCallback(async () => {
-    try {
-      await client.mutation.saveApp(dom);
-    } catch (err: any) {
-      alert(err.message);
-    }
-  }, [dom]);
+  const domLoader = useDomLoader();
 
   return (
     <EditorRoot>
       <StudioAppBar
         actions={
           <React.Fragment>
-            <IconButton color="inherit" onClick={handleSave}>
-              <SaveIcon />
-            </IconButton>
+            {domLoader.saving ? (
+              <Box display="flex" flexDirection="row" alignItems="center">
+                <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
+              </Box>
+            ) : null}
+            <Typography>{domLoader.unsavedChanges} unsaved change(s).</Typography>
           </React.Fragment>
         }
       />
-      <div className={classes.content}>
-        <PagePanel className={classes.pagePanel} />
-        <FileEditor className={classes.renderPanel} />
-      </div>
+      {domLoader.dom ? (
+        <div className={classes.content}>
+          <PagePanel className={classes.hierarchyPanel} />
+          <FileEditor className={classes.editorPanel} />
+        </div>
+      ) : (
+        <Box flex={1} display="flex" alignItems="center" justifyContent="center">
+          <CircularProgress />
+        </Box>
+      )}
     </EditorRoot>
   );
 }

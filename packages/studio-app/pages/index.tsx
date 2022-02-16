@@ -15,7 +15,7 @@ const Home: NextPage = () => {
   });
 
   const app = domQuery.data && studioDom.getApp(domQuery.data);
-  const pages = app ? studioDom.getPages(domQuery.data, app) : [];
+  const { pages = [] } = app ? studioDom.getChildNodes(domQuery.data, app) : {};
 
   return (
     <React.Fragment>

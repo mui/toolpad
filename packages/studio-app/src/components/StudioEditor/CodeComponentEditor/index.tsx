@@ -1,32 +1,54 @@
 import * as React from 'react';
-import { Box, Button, Stack, styled, Toolbar } from '@mui/material';
+import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
+import { ArgTypeDefinitions, ComponentConfig } from '@mui/studio-core';
 import { NodeId } from '../../../types';
 import * as studioDom from '../../../studioDom';
-import { useDom, useDomApi } from '../../DomProvider';
-import defs from './reactDefs';
+import { useDom, useDomApi } from '../../DomLoader';
 import StudioSandbox from '../../StudioSandbox';
 import getImportMap from '../../../getImportMap';
 import renderThemeCode from '../../../renderThemeCode';
 import renderEntryPoint from '../../../renderPageEntryCode';
+import { tryFormat } from '../../../utils/prettier';
 
 const ComponentSandbox = styled(StudioSandbox)({
   height: '100%',
 });
 
 interface CodeComponentEditorContentProps {
-  nodeId: NodeId;
+  codeComponentNode: studioDom.StudioCodeComponentNode;
 }
 
-function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps) {
+declare global {
+  interface Window {
+    __STUDIO_EDITOR_UPDATE_COMPONENT_CONFIG__?: React.Dispatch<React.SetStateAction<any>>;
+  }
+}
+
+function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const domNode = studioDom.getNode(dom, nodeId);
-  studioDom.assertIsCodeComponent(domNode);
 
-  const [input, setInput] = React.useState(domNode.code);
+  const [input, setInput] = React.useState(codeComponentNode.code);
+  const [argTypes, setArgTypes] = React.useState<ArgTypeDefinitions>({});
+
+  const updateDomActionRef = React.useRef(() => {});
+
+  React.useEffect(() => {
+    updateDomActionRef.current = () => {
+      const pretty = tryFormat(input);
+      setInput(pretty);
+      domApi.setNodeAttribute(codeComponentNode, 'code', pretty);
+      domApi.setNodeAttribute(codeComponentNode, 'argTypes', argTypes);
+    };
+  }, [domApi, codeComponentNode, input, argTypes]);
+
+  const handleConfigUpdate = React.useCallback(
+    (newConfig: ComponentConfig<unknown> | undefined) => setArgTypes(newConfig?.argTypes || {}),
+    [],
+  );
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const HandleEditorMount = React.useCallback(
@@ -35,6 +57,7 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
 
       editor.updateOptions({
         minimap: { enabled: false },
+        accessibilitySupport: 'off',
       });
 
       monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
@@ -49,56 +72,73 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
         allowJs: true,
         typeRoots: ['node_modules/@types'],
       });
+
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: false,
         noSyntaxValidation: false,
       });
 
-      // TODO: We must figure this out better
-      //       We must create a more sustainable way to load definition files.
-      //       look into: https://github.com/lukasbach/monaco-editor-auto-typings
-      //       but probably not the greatest solution:
-      //         - how to version packages?
-      //         - We should rather load it from our own webserver.
-      //         - Can we bundle .d.ts files somehow and host that statically?
-      //         - no @mui/material support. See
-      //             - https://github.com/lukasbach/monaco-editor-auto-typings/issues/7
-      //             - https://github.com/microsoft/monaco-editor/issues/2295
-      monaco.languages.typescript.typescriptDefaults.addExtraLib(
-        defs,
-        `file:///node_modules/@types/react/index.d.ts`,
-      );
+      // The types for `monaco.KeyCode` seem to be messed up
+      // eslint-disable-next-line no-bitwise
+      editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => {
+        updateDomActionRef.current();
+      });
+
+      fetch('/typings.json')
+        .then((res) => res.json())
+        .then((typings) => {
+          Array.from(Object.entries(typings)).forEach(([path, content]) => {
+            monaco.languages.typescript.typescriptDefaults.addExtraLib(
+              content as string,
+              `file:///${path}`,
+            );
+          });
+        })
+        .catch((err) =>
+          console.error(`Failed to initialize typescript types on editor: ${err.message}`),
+        );
     },
     [],
   );
 
   const themePath = './lib/theme.ts';
   const entryPath = `./entry.tsx`;
-  const componentPath = `./components/${domNode.id}.tsx`;
+  const componentWrapperPath = `./componentWrapper.ts`;
+  const componentPath = `./components/${codeComponentNode.id}.tsx`;
 
-  const renderedTheme = React.useMemo(() => {
-    return renderThemeCode(dom, { editor: true });
-  }, [dom]);
+  const renderedTheme = React.useMemo(() => renderThemeCode(dom, { editor: true }), [dom]);
+
+  const componentWrapper = `
+    const { default: Component, config } = await import(${JSON.stringify(componentPath)});
+    window.__STUDIO_EDITOR_UPDATE_COMPONENT_CONFIG__?.(config ?? {});
+    export default Component;
+  `;
 
   const renderedEntrypoint = React.useMemo(() => {
     return renderEntryPoint({
-      pagePath: componentPath,
+      pagePath: componentWrapperPath,
       themePath,
       editor: true,
     });
-  }, [componentPath, themePath]);
+  }, [componentWrapperPath, themePath]);
+
+  const frameRef = React.useRef<HTMLIFrameElement>(null);
+
+  const setupFrameWindow = React.useCallback(() => {
+    if (frameRef.current?.contentWindow) {
+      // eslint-disable-next-line no-underscore-dangle
+      frameRef.current.contentWindow.__STUDIO_EDITOR_UPDATE_COMPONENT_CONFIG__ = handleConfigUpdate;
+    }
+  }, [handleConfigUpdate]);
+
+  React.useEffect(() => setupFrameWindow(), [setupFrameWindow]);
 
   return (
     <Stack sx={{ height: '100%' }}>
       <Toolbar>
         <Button
-          onClick={() => {
-            domApi.setNodeAttribute<studioDom.StudioCodeComponentNode, 'code'>(
-              domNode,
-              'code',
-              input,
-            );
-          }}
+          disabled={codeComponentNode.code === input}
+          onClick={() => updateDomActionRef.current()}
         >
           Update
         </Button>
@@ -116,14 +156,17 @@ function CodeComponentEditorContent({ nodeId }: CodeComponentEditorContentProps)
         </Box>
         <Box flex={1}>
           <ComponentSandbox
-            base={`/components/${domNode.id}/`}
+            base={`/components/${codeComponentNode.id}/`}
             importMap={getImportMap()}
             files={{
+              [componentWrapperPath]: { code: componentWrapper },
               [componentPath]: { code: input },
               [themePath]: { code: renderedTheme.code },
               [entryPath]: { code: renderedEntrypoint.code },
             }}
             entry={entryPath}
+            frameRef={frameRef}
+            onLoad={setupFrameWindow}
           />
         </Box>
       </Box>
@@ -136,10 +179,16 @@ interface CodeComponentEditorProps {
 }
 
 export default function CodeComponentEditor({ className }: CodeComponentEditorProps) {
+  const dom = useDom();
   const { nodeId } = useParams();
+  const codeComponentNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
   return (
     <Box className={className}>
-      <CodeComponentEditorContent key={nodeId} nodeId={nodeId as NodeId} />
+      {codeComponentNode ? (
+        <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
+      ) : (
+        <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
+      )}
     </Box>
   );
 }

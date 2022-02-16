@@ -170,27 +170,32 @@ export async function updateConnection(
   return updateObject('connection', connection);
 }
 
-export async function execApi<Q>(api: studioDom.StudioApiNode<Q>): Promise<StudioApiResult<any>> {
+export async function execApi<Q>(
+  api: studioDom.StudioApiNode<Q>,
+  params: Q,
+): Promise<StudioApiResult<any>> {
   const connection = await getConnection(api.connectionId);
   const dataSource: StudioDataSourceServer<any, Q, any> | undefined =
     studioDataSources[connection.type];
+
   if (!dataSource) {
     throw new Error(
       `Unknown connection type "${connection.type}" for connection "${api.connectionId}"`,
     );
   }
-  return dataSource.exec(connection, studioDom.getPropConstValues(api) as Q);
+
+  return dataSource.exec(connection, api.query, params);
 }
 
 function createDefaultApp(): studioDom.StudioDom {
   let dom = studioDom.createDom();
   const page = studioDom.createNode(dom, 'page', {
     name: 'DefaultPage',
-    props: {},
     title: 'Default',
-    state: {},
+    urlQuery: {},
   });
-  dom = studioDom.addNode(dom, page, dom.root, 'children');
+  const app = studioDom.getApp(dom);
+  dom = studioDom.addNode(dom, page, app, 'pages');
   return dom;
 }
 

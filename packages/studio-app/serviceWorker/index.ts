@@ -5,6 +5,7 @@ declare const self: ServiceWorkerGlobalScope;
 const dependencies = new Map<string, Set<string>>();
 
 // poor man's compiler for now
+// TODO: This is a brittle mechanism, use a real parser for this
 function findImportedModuleIDs(source: string): string[] {
   const importRegex = /^\s*import\s+(.*)\s+from\s+['"](.*)['"]\s*;?$/;
   return source
@@ -33,7 +34,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     Promise.resolve().then(async () => {
       const rawFilesCache = await caches.open('rawFiles');
-      const { pathname } = new URL(event.request.url);
+      const { pathname, searchParams } = new URL(event.request.url);
       const rawFile = await rawFilesCache.match(pathname);
 
       if (!rawFile) {
@@ -43,7 +44,7 @@ self.addEventListener('fetch', (event) => {
       if (rawFile.headers.get('content-type') === 'application/javascript') {
         const content = await rawFile.text();
 
-        const compiled = `
+        let compiled = `
           if (window.__HMR) {
             import.meta.hot = window.__HMR.createHotContext(import.meta.url);
           }
@@ -57,10 +58,16 @@ self.addEventListener('fetch', (event) => {
           dependencies.set(pathname, existingDeps);
         }
 
+        const mtimeParam = searchParams.get('mtime');
         findImportedModuleIDs(content).forEach((id) => {
           if (id.startsWith('.')) {
             const { pathname: resolved } = new URL(id, event.request.url);
             existingDeps!.add(resolved);
+            if (mtimeParam) {
+              // invalidate dependencies
+              // TODO: This is a brittle mechanism, use a real parser for this
+              compiled = compiled.replaceAll(id, `${id}?=${mtimeParam}`);
+            }
           }
         });
 

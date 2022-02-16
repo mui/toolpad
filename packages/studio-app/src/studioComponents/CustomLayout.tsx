@@ -1,9 +1,9 @@
-import { StudioComponentDefinition } from '../types';
+import { StudioComponentDefinition } from './studioComponentDefinition';
 
 export default {
   id: 'CustomLayout',
   displayName: 'CustomLayout',
-  render(ctx, resolvedProps) {
+  render(ctx, node, resolvedProps) {
     const Grid = ctx.addImport('@mui/material', 'Grid', 'Grid');
     const Placeholder = ctx.addImport('@mui/studio-core', 'Placeholder', 'Placeholder');
 

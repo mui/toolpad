@@ -1,30 +1,36 @@
 import * as React from 'react';
 import * as studioDom from '../studioDom';
-import { StudioComponentDefinition } from '../types';
-import importedComponentRenderer from './importedComponentRenderer';
 
 import CustomLayout from './CustomLayout';
 import Button from './Button';
+import Container from './Container';
 import DataGrid from './DataGrid';
 import Paper from './Paper';
 import Stack from './Stack';
 import Typography from './Typography';
 import TextField from './TextField';
 import Select from './Select';
-import Page from './Page';
+import { RenderComponent, StudioComponentDefinition } from './studioComponentDefinition';
 
 // TODO: bring these back to @mui/studio repo and make them import @mui/material
 const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
-  ['Page', Page],
   ['Button', Button],
   ['DataGrid', DataGrid],
   ['Paper', Paper],
+  ['Container', Container],
   ['Stack', Stack],
   ['TextField', TextField],
   ['Typography', Typography],
   ['CustomLayout', CustomLayout],
   ['Select', Select],
 ]);
+
+function codeComponentRenderer(moduleName: string, suggestedLocalName: string): RenderComponent {
+  return (ctx, node, resolvedProps) => {
+    const localName = ctx.addCodeComponentImport(moduleName, suggestedLocalName);
+    return `<${localName} ${ctx.renderProps(resolvedProps)} />`;
+  };
+}
 
 function createCodeComponent(
   domNode: studioDom.StudioCodeComponentNode,
@@ -33,20 +39,16 @@ function createCodeComponent(
     id: `codeComponent.${domNode.id}`,
     displayName: domNode.name,
     argTypes: domNode.argTypes,
-    render: importedComponentRenderer(
-      `../components/${domNode.id}.tsx`,
-      `default`,
-      `Custom_${domNode.id}`,
-    ),
+    render: codeComponentRenderer(`../components/${domNode.id}.tsx`, domNode.name),
   };
 }
 
 export function getStudioComponents(dom: studioDom.StudioDom): StudioComponentDefinition[] {
   const app = studioDom.getApp(dom);
-  const studioCodeComponents = studioDom.getCodeComponents(dom, app);
+  const { codeComponents = [] } = studioDom.getChildNodes(dom, app);
   return [
     ...INTERNAL_COMPONENTS.values(),
-    ...studioCodeComponents.map((studioCodeComponent) => createCodeComponent(studioCodeComponent)),
+    ...codeComponents.map((studioCodeComponent) => createCodeComponent(studioCodeComponent)),
   ];
 }
 
@@ -61,9 +63,9 @@ export function getStudioComponent(
   }
 
   const app = studioDom.getApp(dom);
-  const studioCodeComponents = studioDom.getCodeComponents(dom, app);
+  const { codeComponents = [] } = studioDom.getChildNodes(dom, app);
   const nodeId = componentId.split('.')[1];
-  const domNode = studioCodeComponents.find((node) => node.id === nodeId);
+  const domNode = codeComponents.find((node) => node.id === nodeId);
 
   if (domNode) {
     return createCodeComponent(domNode);

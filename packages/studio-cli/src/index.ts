@@ -1,7 +1,6 @@
 import arg from 'arg';
 import * as path from 'path';
 import { execa } from 'execa';
-import type { StudioConfiguration } from '@mui/studio-app';
 import { createRequire } from 'module';
 
 const args = arg({
@@ -9,6 +8,7 @@ const args = arg({
   '--help': Boolean,
   '--dev': Boolean,
   '--port': Number,
+  '--demo': Boolean,
   // Aliases
   '-p': '--port',
 });
@@ -18,28 +18,27 @@ function resolveStudioDir({ _: positional = [] }: { _?: string[] }): string {
   return dirArg ? path.resolve(process.cwd(), dirArg) : process.cwd();
 }
 
-const PROJECT_DIR = resolveStudioDir(args);
+const STUDIO_DIR = resolveStudioDir(args);
 const DEV_MODE = args['--dev'];
 const NEXT_CMD = DEV_MODE ? 'dev' : 'start';
 
-console.log(`Starting Studio in "${PROJECT_DIR}"`);
+console.log(`Starting Studio in "${STUDIO_DIR}"`);
 
-const studioUiConfig: StudioConfiguration = {
-  dir: PROJECT_DIR,
-};
-
-const studioUiDir = path.dirname(
+const studioDir = path.dirname(
   createRequire(import.meta.url).resolve('@mui/studio-app/package.json'),
 );
 
-const cp = execa('yarn', [NEXT_CMD], {
-  cwd: studioUiDir,
+const port = args['--port'] ?? 3000;
+
+const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
+  cwd: studioDir,
   preferLocal: true,
   stdio: 'pipe',
   extendEnv: false,
   env: {
     FORCE_COLOR: process.env.FORCE_COLOR,
-    STUDIO_UI_CONFIG: JSON.stringify(studioUiConfig),
+    STUDIO_DIR,
+    DEMO_MODE: String(!!args['--demo']),
   },
 });
 

@@ -1,10 +1,9 @@
-export interface StudioConfiguration {
-  dir: string;
+import getConfig from 'next/config';
+
+const { publicRuntimeConfig } = getConfig();
+
+export interface SharedConfig {
+  demoMode: boolean;
 }
 
-const serializedConfig = process.env.STUDIO_UI_CONFIG;
-if (!serializedConfig) {
-  throw new Error(`App started without config enc variable STUDIO_UI_CONFIG`);
-}
-
-export default JSON.parse(serializedConfig) as StudioConfiguration;
+export default publicRuntimeConfig as SharedConfig;

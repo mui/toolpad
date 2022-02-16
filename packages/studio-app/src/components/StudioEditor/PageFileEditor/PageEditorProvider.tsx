@@ -1,25 +1,19 @@
 import * as React from 'react';
 import * as studioDom from '../../../studioDom';
-import { NodeId, SlotLocation, ViewState } from '../../../types';
+import { NodeId, SlotLocation, PageViewState } from '../../../types';
 import { update, updateOrCreate } from '../../../utils/immutability';
 
-export type ComponentPanelTab = 'catalog' | 'component' | 'theme';
-
-export interface BindingEditorState {
-  readonly nodeId: NodeId;
-  readonly prop: string;
-}
+export type ComponentPanelTab = 'component' | 'theme';
 
 export interface PageEditorState {
   readonly type: 'page';
   readonly nodeId: NodeId;
   readonly selection: NodeId | null;
   readonly componentPanelTab: ComponentPanelTab;
-  readonly newNode: studioDom.StudioNode | null;
-  readonly bindingEditor: BindingEditorState | null;
+  readonly newNode: studioDom.StudioElementNode | null;
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
-  readonly viewState: ViewState;
+  readonly viewState: PageViewState;
 }
 
 export type PageEditorAction =
@@ -40,7 +34,7 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_NEW_NODE_DRAG_START';
-      newNode: studioDom.StudioNode;
+      newNode: studioDom.StudioElementNode;
     }
   | {
       type: 'PAGE_NODE_DRAG_OVER';
@@ -50,16 +44,8 @@ export type PageEditorAction =
       type: 'PAGE_NODE_DRAG_END';
     }
   | {
-      type: 'PAGE_OPEN_BINDING_EDITOR';
-      nodeId: NodeId;
-      prop: string;
-    }
-  | {
-      type: 'PAGE_CLOSE_BINDING_EDITOR';
-    }
-  | {
       type: 'PAGE_VIEW_STATE_UPDATE';
-      viewState: ViewState;
+      viewState: PageViewState;
     };
 
 export function createPageEditorState(nodeId: NodeId): PageEditorState {
@@ -67,12 +53,11 @@ export function createPageEditorState(nodeId: NodeId): PageEditorState {
     type: 'page',
     nodeId,
     selection: null,
-    componentPanelTab: 'catalog',
+    componentPanelTab: 'component',
     newNode: null,
-    bindingEditor: null,
     highlightLayout: false,
     highlightedSlot: null,
-    viewState: {},
+    viewState: { nodes: {}, pageState: {}, bindings: {} },
   };
 }
 
@@ -93,8 +78,6 @@ export function pageEditorReducer(
     case 'DESELECT_NODE': {
       return update(state, {
         selection: null,
-        componentPanelTab:
-          state.componentPanelTab === 'component' ? 'catalog' : state.componentPanelTab,
       });
     }
     case 'PAGE_SET_COMPONENT_PANEL_TAB':
@@ -121,16 +104,6 @@ export function pageEditorReducer(
         highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,
       });
     }
-    case 'PAGE_OPEN_BINDING_EDITOR': {
-      return update(state, {
-        bindingEditor: action,
-      });
-    }
-    case 'PAGE_CLOSE_BINDING_EDITOR': {
-      return update(state, {
-        bindingEditor: null,
-      });
-    }
     case 'PAGE_VIEW_STATE_UPDATE': {
       const { viewState } = action;
       return update(state, {
@@ -150,7 +123,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     setComponentPanelTab(tab: ComponentPanelTab) {
       dispatch({ type: 'PAGE_SET_COMPONENT_PANEL_TAB', tab });
     },
-    newNodeDragStart(newNode: studioDom.StudioNode) {
+    newNodeDragStart(newNode: studioDom.StudioElementNode) {
       dispatch({ type: 'PAGE_NEW_NODE_DRAG_START', newNode });
     },
     nodeDragEnd() {
@@ -162,13 +135,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         slot,
       });
     },
-    openBindingEditor(nodeId: NodeId, prop: string) {
-      dispatch({ type: 'PAGE_OPEN_BINDING_EDITOR', nodeId, prop });
-    },
-    closeBindingEditor() {
-      dispatch({ type: 'PAGE_CLOSE_BINDING_EDITOR' });
-    },
-    pageViewStateUpdate(viewState: ViewState) {
+    pageViewStateUpdate(viewState: PageViewState) {
       dispatch({
         type: 'PAGE_VIEW_STATE_UPDATE',
         viewState,

@@ -47,7 +47,6 @@ export default function StringRecordEditor({
       onChange({ ...value, [newFieldName]: newFieldValue });
       setNewFieldName('');
       setNewFieldValue('');
-      console.log(fieldInputRef.current);
       fieldInputRef.current?.focus();
     },
     [newFieldName, newFieldValue, onChange, value],

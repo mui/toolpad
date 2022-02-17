@@ -266,7 +266,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         onClose={handleCreateCodeComponentDialogClose}
       />
       <Dialog open={!!deletedNode} onClose={handledeleteNodeDialogClose}>
-        <DialogTitle>Delete node {deletedNode}</DialogTitle>
+        <DialogTitle>Delete node {deletedNode}?</DialogTitle>
         <DialogActions>
           <Button type="submit" onClick={handledeleteNodeDialogClose}>
             Cancel

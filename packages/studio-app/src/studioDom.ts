@@ -25,7 +25,7 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-type StudioNodeType =
+export type StudioNodeType =
   | 'app'
   | 'connection'
   | 'api'

@@ -1,17 +1,19 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { Box, Button, Stack, TextField, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Stack, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { StudioConnection, StudioDataSourceClient, NodeId } from '../../../types';
+import { StudioDataSourceClient, NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import useDebounced from '../../../utils/useDebounced';
+import NodeNameEditor from '../PageEditor/NodeNameEditor';
 
-function getDataSource<Q>(connection: StudioConnection): StudioDataSourceClient<any, Q> | null {
-  const dataSource = dataSources[connection.type] as StudioDataSourceClient<any, Q>;
-  return dataSource || null;
+function getDataSource<Q>(
+  connection: studioDom.StudioConnectionNode,
+): StudioDataSourceClient<any, Q> | null {
+  return dataSources[connection.dataSource] || null;
 }
 
 interface ApiEditorContentProps<Q> {
@@ -20,15 +22,13 @@ interface ApiEditorContentProps<Q> {
 
 function ApiEditorContent<Q>({ apiNode }: ApiEditorContentProps<Q>) {
   const domApi = useDomApi();
+  const dom = useDom();
 
-  const [name, setName] = React.useState(apiNode.name);
   const [apiQuery, setApiQuery] = React.useState<Q>(apiNode.query);
+  const savedQuery = React.useRef(apiNode.query);
 
-  const { data: connectionData } = useQuery(['connection', apiNode.connectionId], () =>
-    client.query.getConnection(apiNode.connectionId),
-  );
-
-  const datasource = connectionData && getDataSource<Q>(connectionData);
+  const connection = studioDom.getMaybeNode(dom, apiNode.connectionId as NodeId, 'connection');
+  const dataSource = connection && getDataSource<Q>(connection);
 
   const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
     return { ...apiNode, query: apiQuery };
@@ -38,36 +38,40 @@ function ApiEditorContent<Q>({ apiNode }: ApiEditorContentProps<Q>) {
 
   const { data: previewData } = useQuery(
     ['api', debouncedPreviewApi],
-    () => client.query.execApi(debouncedPreviewApi, {}),
+    async () => client.query.execApi(debouncedPreviewApi, {}),
     {},
   );
 
-  return datasource ? (
+  if (!connection) {
+    return <Typography>Connection &quot;{apiNode.connectionId}&quot; not found</Typography>;
+  }
+
+  if (!dataSource) {
+    return <Typography>DataSource &quot;{connection.dataSource}&quot; not found</Typography>;
+  }
+
+  return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
         <Toolbar>
           <Button
             onClick={() => {
-              domApi.setNodeName(apiNode.id, name);
               (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
                 if (typeof propName !== 'string' || !apiQuery[propName]) {
                   return;
                 }
                 domApi.setNodeAttribute(apiNode, 'query', apiQuery);
               });
+              savedQuery.current = apiQuery;
             }}
+            disabled={savedQuery.current === apiQuery}
           >
             Update
           </Button>
         </Toolbar>
         <Stack spacing={2} p={2}>
-          <TextField
-            label="name"
-            size="small"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-          <datasource.QueryEditor
+          <NodeNameEditor node={apiNode} />
+          <dataSource.QueryEditor
             value={apiQuery}
             onChange={(newApiQuery) => setApiQuery(newApiQuery)}
           />
@@ -77,7 +81,7 @@ function ApiEditorContent<Q>({ apiNode }: ApiEditorContentProps<Q>) {
         <pre>{JSON.stringify(previewData, null, 2)}</pre>
       </Box>
     </Box>
-  ) : null;
+  );
 }
 
 interface ApiEditorProps {

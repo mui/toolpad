@@ -202,7 +202,7 @@ function EditConnectionDialog<P>({ connection, open, onClose }: EditConnectionDi
                 dataSource={paramsEditor.dataSource}
                 value={paramsEditor.params}
                 onChange={handleParamsChange}
-                connectionName={name}
+                connectionId={connection?.id || ''}
               />
             </Box>
           </React.Fragment>

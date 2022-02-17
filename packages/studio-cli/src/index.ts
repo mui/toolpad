@@ -43,8 +43,6 @@ const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   env: {
     STUDIO_DATABASE_URL: process.env.STUDIO_DATABASE_URL,
     FORCE_COLOR: process.env.FORCE_COLOR,
-    STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
-    STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
     STUDIO_DIR,
     DEMO_MODE: String(!!args['--demo']),
   },

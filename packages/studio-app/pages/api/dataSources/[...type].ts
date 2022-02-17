@@ -3,9 +3,9 @@ import { asArray } from 'src/utils/collections';
 import studioConnections from 'src/studioDataSources/server';
 
 const handlerMap = new Map<String, Function | null | undefined>();
-for (let dataSource in studioConnections) {
+Object.keys(studioConnections).forEach((dataSource) => {
   handlerMap.set(dataSource, studioConnections[dataSource]?.createHandler);
-}
+});
 
 export default (async (req, res) => {
   if (req.method === 'GET') {
@@ -16,5 +16,6 @@ export default (async (req, res) => {
     }
   } else {
     // Handle any other HTTP method
+    return null;
   }
 }) as NextApiHandler;

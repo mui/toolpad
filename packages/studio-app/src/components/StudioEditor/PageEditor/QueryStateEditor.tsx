@@ -12,9 +12,11 @@ import {
   ListItem,
   SelectChangeEvent,
   DialogActions,
+  Box,
+  Typography,
 } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinitions } from '@mui/studio-core';
+import { ArgTypeDefinitions, UseDataQuery } from '@mui/studio-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
@@ -55,6 +57,24 @@ function ParamsEditor<Q>({ value, onChange, nodeId, argTypes }: ParamsEditorProp
           ) : null,
       )}
     </Stack>
+  );
+}
+
+interface PreviewQueryStateResultProps {
+  node: studioDom.StudioQueryStateNode;
+}
+
+function PreviewQueryStateResult({ node }: PreviewQueryStateResultProps) {
+  const { viewState } = usePageEditorState();
+  const actualNodeState: UseDataQuery | undefined = viewState.pageState[node.name] as any;
+  return (
+    <Box sx={{ maxHeight: 150, overflow: 'auto' }}>
+      {node.api ? (
+        <pre>{JSON.stringify(actualNodeState?.data, null, 2)}</pre>
+      ) : (
+        <Typography>No data</Typography>
+      )}
+    </Box>
   );
 }
 
@@ -109,6 +129,7 @@ function QueryStateNodeEditor<P>({ value, onChange }: QueryStateNodeEditorProps<
           argTypes={argTypes}
           onChange={handleParamsChange}
         />
+        <PreviewQueryStateResult node={value} />
       </Stack>
     </React.Fragment>
   );
@@ -170,6 +191,7 @@ export default function QueryStateEditor() {
           maxWidth="lg"
           open={!!editedStateNode}
           onClose={handleEditStateDialogClose}
+          scroll="body"
         >
           <DialogTitle>Edit Query State ({lastEditedStateNode.id})</DialogTitle>
           <DialogContent>

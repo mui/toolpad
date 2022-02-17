@@ -7,8 +7,8 @@ import {
   ConnectionStatus,
   StudioDataSourceServer,
   StudioApiResult,
+  NodeId,
 } from '../types';
-import { generateRandomId } from '../utils/randomId';
 import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
 
@@ -32,22 +32,6 @@ interface KindObjectMap {
 type Kind = keyof KindObjectMap;
 type FullObject<K extends Kind> = KindObjectMap[K]['full'];
 type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
-type SummaryObject<K extends Kind> = KindObjectMap[K]['summary'];
-type SummaryMapper<K extends Kind> = (full: FullObject<K>) => SummaryObject<K>;
-interface KindUtil<K extends Kind> {
-  mapToSummary: SummaryMapper<K>;
-}
-
-const kindUtil: {
-  [K in Kind]: KindUtil<K>;
-} = {
-  app: {
-    mapToSummary: (app) => app,
-  },
-  connection: {
-    mapToSummary: ({ id, type, name }) => ({ id, type, name }),
-  },
-};
 
 function resolveKindPath(unsafeKind: Kind): string {
   const kind = path.normalize(unsafeKind);
@@ -69,124 +53,11 @@ async function writeObject<K extends Kind>(kind: K, object: FullObject<K>): Prom
   });
 }
 
-async function objectExists(kind: Kind, id: string): Promise<boolean> {
-  const kindDir = resolveKindPath(kind);
-  const objectPath = resolveObjectPath(kindDir, id);
-  try {
-    await fs.stat(objectPath);
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
-
-async function readDirRecursive(dir: string): Promise<string[]> {
-  try {
-    return await fs.readdir(dir);
-  } catch (err: any) {
-    if (err.code === 'ENOENT') {
-      return [];
-    }
-    throw err;
-  }
-}
-
-async function getObjectIds(kind: Kind): Promise<string[]> {
-  const kindDir = resolveKindPath(kind);
-  const entries = await readDirRecursive(kindDir);
-  return entries.flatMap((entry) => (entry.endsWith('.json') ? [entry.slice(0, -5)] : []));
-}
-
 async function getObject<K extends Kind>(kind: K, id: string): Promise<FullObject<K>> {
   const kindDir = resolveKindPath(kind);
   const objectPath = resolveObjectPath(kindDir, id);
   const page = await fs.readFile(objectPath, { encoding: 'utf-8' });
   return JSON.parse(page);
-}
-
-async function getObjects<K extends Kind>(kind: K): Promise<FullObject<K>[]> {
-  const objectIds = await getObjectIds(kind);
-  return Promise.all(objectIds.map((id) => getObject(kind, id)));
-}
-
-async function getObjectSummaries<K extends Kind>(kind: K): Promise<SummaryObject<K>[]> {
-  const objects = await getObjects(kind);
-  const { mapToSummary } = kindUtil[kind] as unknown as KindUtil<K>;
-  return objects.map(mapToSummary);
-}
-
-async function addObject<K extends Kind>(kind: K, object: FullObject<K>): Promise<FullObject<K>> {
-  if (await objectExists(kind, object.id)) {
-    throw new Error(`Trying to add ${kind} "${object.id}" but it already exists`);
-  } else {
-    await writeObject(kind, object);
-    return object;
-  }
-}
-
-async function updateObject<K extends Kind>(
-  kind: K,
-  object: Updates<FullObject<K>>,
-): Promise<FullObject<K>> {
-  const existing = await getObject(kind, object.id);
-  if (existing) {
-    const updated = {
-      ...existing,
-      ...object,
-    };
-    await writeObject(kind, updated);
-    return updated;
-  }
-  throw new Error(`Trying to update non-existing ${kind} "${object.id}"`);
-}
-
-export async function getConnections(): Promise<StudioConnection[]> {
-  return getObjects('connection');
-}
-
-export async function getConnectionSummaries(): Promise<StudioConnectionSummary[]> {
-  return getObjectSummaries('connection');
-}
-
-export async function testConnection(connection: StudioConnection): Promise<ConnectionStatus> {
-  const dataSource = studioDataSources[connection.type];
-  if (!dataSource) {
-    return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
-  }
-  return dataSource.test(connection);
-}
-
-export async function addConnection(connection: StudioConnection): Promise<StudioConnection> {
-  return addObject('connection', {
-    ...connection,
-    id: generateRandomId(),
-  });
-}
-export async function getConnection(id: string): Promise<StudioConnection> {
-  return getObject('connection', id);
-}
-
-export async function updateConnection(
-  connection: Updates<StudioConnection>,
-): Promise<StudioConnection> {
-  return updateObject('connection', connection);
-}
-
-export async function execApi<Q>(
-  api: studioDom.StudioApiNode<Q>,
-  params: Q,
-): Promise<StudioApiResult<any>> {
-  const connection = await getConnection(api.connectionId);
-  const dataSource: StudioDataSourceServer<any, Q, any> | undefined =
-    studioDataSources[connection.type];
-
-  if (!dataSource) {
-    throw new Error(
-      `Unknown connection type "${connection.type}" for connection "${api.connectionId}"`,
-    );
-  }
-
-  return dataSource.exec(connection, api.query, params);
 }
 
 function createDefaultApp(): studioDom.StudioDom {
@@ -219,4 +90,115 @@ export async function loadApp(): Promise<studioDom.StudioDom> {
     await saveApp(app);
     return app;
   }
+}
+
+function fromDomConnection<P>(
+  domConnection: studioDom.StudioConnectionNode<P>,
+): StudioConnection<P> {
+  const { dataSource } = domConnection;
+  return {
+    ...domConnection,
+    type: dataSource,
+  };
+}
+
+export async function getConnections(): Promise<StudioConnection[]> {
+  const dom = await loadApp();
+  const app = studioDom.getApp(dom);
+  const { connections = [] } = studioDom.getChildNodes(dom, app);
+  return connections.map(fromDomConnection);
+}
+
+export async function getConnectionSummaries(): Promise<StudioConnectionSummary[]> {
+  const connections = await getConnections();
+  return connections;
+}
+
+export async function addConnection({
+  params,
+  name,
+  status,
+  type,
+}: StudioConnection): Promise<StudioConnection> {
+  const dom = await loadApp();
+  const app = studioDom.getApp(dom);
+  const newConnection = studioDom.createNode(dom, 'connection', {
+    dataSource: type,
+    params,
+    name,
+    status,
+  });
+
+  const newDom = studioDom.addNode(dom, newConnection, app, 'connections');
+  await saveApp(newDom);
+
+  return fromDomConnection(newConnection);
+}
+
+export async function getConnection(id: string): Promise<StudioConnection> {
+  const dom = await loadApp();
+  return fromDomConnection(studioDom.getNode(dom, id as NodeId, 'connection'));
+}
+
+export async function updateConnection({
+  id,
+  params,
+  name,
+  status,
+  type,
+}: Updates<StudioConnection>): Promise<StudioConnection> {
+  const dom = await loadApp();
+  const existing = studioDom.getNode(dom, id as NodeId, 'connection');
+  const updates = { ...existing };
+  if (params !== undefined) {
+    updates.params = params;
+  }
+  if (name !== undefined) {
+    updates.name = name;
+  }
+  if (status !== undefined) {
+    updates.status = status;
+  }
+  if (type !== undefined) {
+    updates.dataSource = type;
+  }
+  const newDom = studioDom.saveNode(dom, updates);
+  await saveApp(newDom);
+  return fromDomConnection(updates);
+}
+
+// TODO: replace with testConnection2
+export async function testConnection(connection: StudioConnection): Promise<ConnectionStatus> {
+  const dataSource = studioDataSources[connection.type];
+  if (!dataSource) {
+    return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
+  }
+  return dataSource.test(connection);
+}
+
+export async function testConnection2(
+  connection: studioDom.StudioConnectionNode,
+): Promise<ConnectionStatus> {
+  const dataSource = studioDataSources[connection.dataSource];
+  if (!dataSource) {
+    return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
+  }
+  return dataSource.test(connection);
+}
+
+export async function execApi<Q>(
+  api: studioDom.StudioApiNode<Q>,
+  params: Q,
+): Promise<StudioApiResult<any>> {
+  const connection = await getConnection(api.connectionId);
+  const dataSource: StudioDataSourceServer<any, Q, any> | undefined =
+    studioDataSources[connection.type];
+
+  if (!dataSource) {
+    throw new Error(
+      `Unknown connection type "${connection.type}" for connection "${api.connectionId}"`,
+    );
+  }
+
+  return dataSource.exec(connection, api.query, params);
 }

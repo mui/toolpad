@@ -125,6 +125,10 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
     if (studioDom.isCodeComponent(node)) {
       navigate(`/codeComponents/${node.id}`);
     }
+
+    if (studioDom.isConnection(node)) {
+      navigate(`/connections/${node.id}`);
+    }
   };
 
   const [createConnectionDialogOpen, setCreateConnectionDialogOpen] = React.useState(0);
@@ -180,7 +184,6 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
 
   return (
     <HierarchyExplorerRoot className={className}>
-      <Typography sx={{ px: 1, pt: 2 }}>App Hierarchy:</Typography>
       <TreeView
         aria-label="hierarchy explorer"
         selected={selected}
@@ -262,7 +265,7 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
         onClose={handleCreateCodeComponentDialogClose}
       />
       <Dialog open={!!deletedNode} onClose={handledeleteNodeDialogClose}>
-        <DialogTitle>Delete node {deletedNode}</DialogTitle>
+        <DialogTitle>Delete node {deletedNode}?</DialogTitle>
         <DialogActions>
           <Button type="submit" onClick={handledeleteNodeDialogClose}>
             Cancel

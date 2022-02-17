@@ -14,6 +14,7 @@ export default (async (req, res) => {
     if (handler) {
       return handler(req, res);
     }
+    return null;
   } else {
     // Handle any other HTTP method
     return null;

@@ -1,15 +1,26 @@
-import { Stack, Button } from '@mui/material';
+import { Stack, Button, Autocomplete, TextField } from '@mui/material';
 import * as React from 'react';
-import { StudioDataSourceClient } from '../../types';
-import { StudioConnectionParamsEditorProps } from 'src/types';
+import { StudioDataSourceClient, StudioConnectionParamsEditorProps } from 'src/types';
+import { generateRandomId } from 'src/utils/randomId';
 import { GoogleSheetsConnectionParams } from './types';
 
-function getInitialValue(): GoogleSheetsConnectionParams {
-  return {};
+function getInitialQueryValue(): any {
+  return null;
 }
 
 function isValid(connection: GoogleSheetsConnectionParams): boolean {
   return true;
+}
+
+function QueryEditor() {
+  return (
+    <Stack direction="column" gap={2}>
+      <Autocomplete
+        renderInput={(params) => <TextField {...params} label="Spreadsheet" size="small" />}
+        options={getInitialQueryValue()}
+      />
+    </Stack>
+  );
 }
 
 function ConnectionParamsInput({
@@ -19,7 +30,7 @@ function ConnectionParamsInput({
     <Stack direction="column" gap={1}>
       <Button
         component="a"
-        href={`/api/dataSources/googleSheets?name=${connectionName}`}
+        href={`/api/dataSources/googleSheets?id=${generateRandomId()}&name=${connectionName}`}
         variant="outlined"
       >
         Sign in to Google
@@ -30,10 +41,11 @@ function ConnectionParamsInput({
 
 const dataSource: StudioDataSourceClient<GoogleSheetsConnectionParams> = {
   displayName: 'Google Sheets',
-  needsConnection: true,
   ConnectionParamsInput,
-  getInitialConnectionValue: getInitialValue,
+  getInitialConnectionValue: () => null,
   isConnectionValid: isValid,
+  QueryEditor,
+  getInitialQueryValue,
 };
 
 export default dataSource;

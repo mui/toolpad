@@ -1,4 +1,5 @@
 import type * as React from 'react';
+import { NextApiRequest, NextApiResponse } from 'next';
 import {
   ArgTypeDefinition,
   ArgTypeDefinitions,
@@ -9,7 +10,6 @@ import {
 } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
-
 export interface EditorProps<T> {
   nodeId: NodeId;
   propName: string;
@@ -129,6 +129,8 @@ export interface ConnectionStatus {
   error?: string;
 }
 
+export type ConnectionStage = 'CREATE' | 'REDIRECT';
+
 export interface StudioDataSourceClient<P = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: StudioConnectionParamsEditor<P>;
@@ -142,6 +144,7 @@ export interface StudioDataSourceClient<P = {}, Q = {}> {
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
   exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
+  createHandler: (req: NextApiRequest, res: NextApiResponse) => void;
 }
 
 export interface StudioConnectionSummary {

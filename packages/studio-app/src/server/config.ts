@@ -3,6 +3,9 @@ import sharedConfig, { SharedConfig } from '../config';
 export interface ServerConfig extends SharedConfig {
   dir: string;
   databaseUrl: string;
+  googleSheetsClientId?: string;
+  googleSheetsClientSecret?: string;
+  googleSheetsRedirectUri?: string;
 }
 
 function readConfig(): ServerConfig {
@@ -35,6 +38,9 @@ function readConfig(): ServerConfig {
     ...sharedConfig,
     dir: process.env.STUDIO_DIR,
     databaseUrl: process.env.STUDIO_DATABASE_URL,
+    googleSheetsClientId: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
+    googleSheetsClientSecret: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
+    googleSheetsRedirectUri: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_REDIRECT_URI,
   };
 }
 

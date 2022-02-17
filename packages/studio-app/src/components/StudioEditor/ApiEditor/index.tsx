@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { Box, Button, Stack, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Stack, Toolbar } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { StudioDataSourceClient, NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
@@ -9,6 +9,7 @@ import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import useDebounced from '../../../utils/useDebounced';
 import NodeNameEditor from '../PageEditor/NodeNameEditor';
+import NotFoundEditor from '../NotFoundEditor';
 
 function getDataSource<Q>(
   connection: studioDom.StudioConnectionNode,
@@ -17,10 +18,11 @@ function getDataSource<Q>(
 }
 
 interface ApiEditorContentProps<Q> {
+  className?: string;
   apiNode: studioDom.StudioApiNode<Q>;
 }
 
-function ApiEditorContent<Q>({ apiNode }: ApiEditorContentProps<Q>) {
+function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
   const domApi = useDomApi();
   const dom = useDom();
 
@@ -43,17 +45,27 @@ function ApiEditorContent<Q>({ apiNode }: ApiEditorContentProps<Q>) {
   );
 
   if (!connection) {
-    return <Typography>Connection &quot;{apiNode.connectionId}&quot; not found</Typography>;
+    return (
+      <NotFoundEditor
+        className={className}
+        message={`Connection "${apiNode.connectionId}" not found`}
+      />
+    );
   }
 
   if (!dataSource) {
-    return <Typography>DataSource &quot;{connection.dataSource}&quot; not found</Typography>;
+    return (
+      <NotFoundEditor
+        className={className}
+        message={`DataSource "${connection.dataSource}" not found`}
+      />
+    );
   }
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-        <Toolbar>
+    <Box className={className} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', px: 3 }}>
+        <Toolbar disableGutters>
           <Button
             onClick={() => {
               (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
@@ -69,7 +81,7 @@ function ApiEditorContent<Q>({ apiNode }: ApiEditorContentProps<Q>) {
             Update
           </Button>
         </Toolbar>
-        <Stack spacing={2} p={2}>
+        <Stack spacing={2}>
           <NodeNameEditor node={apiNode} />
           <dataSource.QueryEditor
             value={apiQuery}
@@ -92,13 +104,9 @@ export default function ApiEditor({ className }: ApiEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const apiNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'api');
-  return (
-    <Box className={className}>
-      {apiNode ? (
-        <ApiEditorContent key={nodeId} apiNode={apiNode} />
-      ) : (
-        <Typography sx={{ p: 4 }}>Non-existing Api &quot;{nodeId}&quot;</Typography>
-      )}
-    </Box>
+  return apiNode ? (
+    <ApiEditorContent className={className} key={nodeId} apiNode={apiNode} />
+  ) : (
+    <NotFoundEditor className={className} message={`Non-existing api "${nodeId}"`} />
   );
 }

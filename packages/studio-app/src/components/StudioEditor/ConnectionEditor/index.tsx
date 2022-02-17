@@ -6,6 +6,7 @@ import { useDom, useDomApi } from '../../DomLoader';
 import * as studioDom from '../../../studioDom';
 import dataSources from '../../../studioDataSources/client';
 import NodeNameEditor from '../PageEditor/NodeNameEditor';
+import NotFoundEditor from '../NotFoundEditor';
 
 interface ConnectionParamsEditorProps<P> extends StudioConnectionParamsEditorProps<P> {
   dataSource: StudioDataSourceClient<P, any>;
@@ -24,10 +25,14 @@ function ConnectionParamsEditor<P>({
 }
 
 interface ConnectionEditorContentProps<P> {
+  className?: string;
   connectionNode: studioDom.StudioConnectionNode<P>;
 }
 
-function ConnectionEditorContent<P>({ connectionNode }: ConnectionEditorContentProps<P>) {
+function ConnectionEditorContent<P>({
+  className,
+  connectionNode,
+}: ConnectionEditorContentProps<P>) {
   const domApi = useDomApi();
 
   const [connectionParams, setConnectionParams] = React.useState<P>(connectionNode.params);
@@ -36,7 +41,7 @@ function ConnectionEditorContent<P>({ connectionNode }: ConnectionEditorContentP
   const dataSource = dataSources[connectionNode.dataSource];
 
   return (
-    <React.Fragment>
+    <Box className={className} sx={{ px: 3 }}>
       <Toolbar disableGutters>
         <Button
           onClick={() => {
@@ -66,7 +71,7 @@ function ConnectionEditorContent<P>({ connectionNode }: ConnectionEditorContentP
           <Typography>Unrecognized datasource &quot;{connectionNode.dataSource}&quot;</Typography>
         )}
       </Stack>
-    </React.Fragment>
+    </Box>
   );
 }
 
@@ -78,13 +83,9 @@ export default function ConnectionEditor({ className }: ConnectionProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const connectionNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
-  return (
-    <Box className={className} p={3}>
-      {connectionNode ? (
-        <ConnectionEditorContent key={nodeId} connectionNode={connectionNode} />
-      ) : (
-        <Typography sx={{ p: 4 }}>Non-existing Connection &quot;{nodeId}&quot;</Typography>
-      )}
-    </Box>
+  return connectionNode ? (
+    <ConnectionEditorContent className={className} key={nodeId} connectionNode={connectionNode} />
+  ) : (
+    <NotFoundEditor className={className} message={`Non-existing Connection "${nodeId}"`} />
   );
 }

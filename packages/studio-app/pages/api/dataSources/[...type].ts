@@ -2,7 +2,7 @@ import { NextApiHandler } from 'next';
 import { asArray } from 'src/utils/collections';
 import studioConnections from 'src/studioDataSources/server';
 
-const handlerMap = new Map<String, Function | undefined>();
+const handlerMap = new Map<String, Function | null | undefined>();
 for (let dataSource in studioConnections) {
   handlerMap.set(dataSource, studioConnections[dataSource]?.createHandler);
 }

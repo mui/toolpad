@@ -234,6 +234,11 @@ export async function updateConnection({
 }: Updates<StudioConnection>): Promise<StudioConnection> {
   let dom = await loadDom();
   const existing = studioDom.getNode(dom, id as NodeId, 'connection');
+  const updates = { ...existing };
+  if (params !== undefined) {
+    // Only replace new attributes
+    updates.params = Object.assign(params, updates.params);
+  }
   if (name !== undefined) {
     dom = studioDom.setNodeName(dom, existing, name);
   }

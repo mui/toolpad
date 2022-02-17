@@ -42,12 +42,10 @@ function ConnectionParamsEditor<P>({
   dataSource,
   value,
   onChange,
-  connectionName,
+  connectionId,
 }: ConnectionParamsEditorProps<P>) {
   const { ConnectionParamsInput } = dataSource;
-  return (
-    <ConnectionParamsInput connectionName={connectionName} value={value} onChange={onChange} />
-  );
+  return <ConnectionParamsInput connectionId={connectionId} value={value} onChange={onChange} />;
 }
 
 function getConnectionStatusIcon(status: ConnectionStatus) {

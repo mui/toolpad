@@ -119,7 +119,7 @@ export interface StudioApiResult<D = any> {
 }
 
 export interface StudioConnectionParamsEditorProps<P> extends WithControlledProp<P> {
-  connectionName: string;
+  connectionId: string;
 }
 export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionParamsEditorProps<P>>;
 export type StudioQueryEditor<Q = {}> = React.FC<WithControlledProp<Q>>;
@@ -128,7 +128,7 @@ export interface ConnectionStatus {
   timestamp: number;
   error?: string;
 }
-
+//TODO: Add 'REFRESH' for access_token expired cases
 export type ConnectionStage = 'CREATE' | 'REDIRECT';
 
 export interface StudioDataSourceClient<P = {}, Q = {}> {
@@ -144,7 +144,7 @@ export interface StudioDataSourceClient<P = {}, Q = {}> {
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
   exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
-  createHandler: (req: NextApiRequest, res: NextApiResponse) => void;
+  createHandler: ((req: NextApiRequest, res: NextApiResponse) => void) | null;
 }
 
 export interface StudioConnectionSummary {

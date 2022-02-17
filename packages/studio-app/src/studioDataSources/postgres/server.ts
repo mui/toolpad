@@ -29,6 +29,7 @@ async function exec(
 const dataSource: StudioDataSourceServer<PostgresConnectionParams, PostgresQuery, any> = {
   test,
   exec,
+  createHandler: null,
 };
 
 export default dataSource;

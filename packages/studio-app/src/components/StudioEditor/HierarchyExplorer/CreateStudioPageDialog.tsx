@@ -40,7 +40,7 @@ export default function CreateStudioPageDialog({ onClose, ...props }: CreateStud
           navigate(`/pages/${newNode.id}`);
         }}
       >
-        <DialogTitle>Create a new MUI Studio API</DialogTitle>
+        <DialogTitle>Create a new MUI Studio Page</DialogTitle>
         <DialogContent>
           <TextField
             sx={{ my: 1 }}

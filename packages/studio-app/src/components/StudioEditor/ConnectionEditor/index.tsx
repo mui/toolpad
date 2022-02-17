@@ -29,12 +29,10 @@ function ConnectionParamsEditor<P>({
   dataSource,
   value,
   onChange,
-  connectionName,
+  connectionId,
 }: ConnectionParamsEditorProps<P>) {
   const { ConnectionParamsInput } = dataSource;
-  return (
-    <ConnectionParamsInput connectionName={connectionName} value={value} onChange={onChange} />
-  );
+  return <ConnectionParamsInput connectionId={connectionId} value={value} onChange={onChange} />;
 }
 
 interface ConnectionEditorContentProps<P> {
@@ -132,7 +130,7 @@ function ConnectionEditorContent<P>({
             dataSource={dataSource}
             value={connectionParams}
             onChange={setConnectionParams}
-            connectionName={connectionNode.name}
+            connectionId={connectionNode.id}
           />
         ) : (
           <Typography>

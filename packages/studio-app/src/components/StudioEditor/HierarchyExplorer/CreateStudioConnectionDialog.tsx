@@ -53,7 +53,7 @@ export default function CreateStudioConnectionDialog({
           navigate(`/connections/${newNode.id}`);
         }}
       >
-        <DialogTitle>Create a new MUI Studio API</DialogTitle>
+        <DialogTitle>Create a new MUI Studio Connection</DialogTitle>
         <DialogContent>
           <FormControl size="small" fullWidth>
             <InputLabel id="select-connection-type">Type</InputLabel>

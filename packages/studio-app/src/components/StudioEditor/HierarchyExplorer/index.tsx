@@ -184,7 +184,6 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
 
   return (
     <HierarchyExplorerRoot className={className}>
-      <Typography sx={{ px: 1, pt: 2 }}>App Hierarchy:</Typography>
       <TreeView
         aria-label="hierarchy explorer"
         selected={selected}

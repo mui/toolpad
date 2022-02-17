@@ -51,10 +51,8 @@
     "react-json-view": "^1.21.3",
     "react-query": "^3.34.12",
     "react-router-dom": "^6.2.1",
-    "sqlite3": "^5.0.2",
     "sucrase": "^3.20.3",
     "ts-node": "^10.4.0",
-    "typeorm": "^0.2.41",
     "typescript": "^4.5.5"
   },
   "devDependencies": {

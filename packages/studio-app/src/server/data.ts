@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { DATA_ROOT } from './db';
+import config from './config';
 import {
   StudioConnection,
   StudioConnectionSummary,
@@ -11,6 +11,8 @@ import {
 import { generateRandomId } from '../utils/randomId';
 import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
+
+export const DATA_ROOT = path.resolve(config.dir, './.studio-data');
 
 interface StoredstudioDom extends studioDom.StudioDom {
   id: 'default';

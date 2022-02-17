@@ -49,10 +49,7 @@ function createHandler(req: NextApiRequest, res: NextApiResponse): void {
     res.redirect(
       client.generateAuthUrl({
         access_type: 'offline',
-        scope: [
-          'https://www.googleapis.com/auth/drive.readonly',
-          'https://www.googleapis.com/auth/spreadsheets',
-        ],
+        scope: ['https://www.googleapis.com/auth/spreadsheets'],
         state: `${id}-${name}`,
       }),
     );

@@ -93,7 +93,7 @@ export async function loadApp(): Promise<studioDom.StudioDom> {
 }
 
 function fromDomConnection<P>(
-  domConnection: studioDom.StudiConnectionNode<P>,
+  domConnection: studioDom.StudioConnectionNode<P>,
 ): StudioConnection<P> {
   const { dataSource } = domConnection;
   return {
@@ -177,7 +177,7 @@ export async function testConnection(connection: StudioConnection): Promise<Conn
 }
 
 export async function testConnection2(
-  connection: studioDom.StudiConnectionNode,
+  connection: studioDom.StudioConnectionNode,
 ): Promise<ConnectionStatus> {
   const dataSource = studioDataSources[connection.dataSource];
   if (!dataSource) {

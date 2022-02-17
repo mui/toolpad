@@ -125,6 +125,10 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
     if (studioDom.isCodeComponent(node)) {
       navigate(`/codeComponents/${node.id}`);
     }
+
+    if (studioDom.isConnection(node)) {
+      navigate(`/connections/${node.id}`);
+    }
   };
 
   const [createConnectionDialogOpen, setCreateConnectionDialogOpen] = React.useState(0);

@@ -56,7 +56,7 @@ export interface StudioThemeNode extends StudioNodeBase {
   readonly theme: StudioBindables<StudioTheme>;
 }
 
-export interface StudiConnectionNode<P = unknown> extends StudioNodeBase {
+export interface StudioConnectionNode<P = unknown> extends StudioNodeBase {
   readonly type: 'connection';
   readonly dataSource: string;
   readonly params: P;
@@ -111,7 +111,7 @@ export interface StudioFetchedStateNode extends StudioNodeBase {
 
 type StudioNodeOfType<K extends StudioNodeType> = {
   app: StudioAppNode;
-  connection: StudiConnectionNode;
+  connection: StudioConnectionNode;
   api: StudioApiNode;
   theme: StudioThemeNode;
   page: StudioPageNode;
@@ -266,6 +266,14 @@ export function isApi<P>(node: StudioNode): node is StudioApiNode<P> {
 
 export function assertIsApi<P>(node: StudioNode): asserts node is StudioApiNode<P> {
   assertIsType<StudioApiNode>(node, 'api');
+}
+
+export function isConnection<P>(node: StudioNode): node is StudioConnectionNode<P> {
+  return isType<StudioConnectionNode>(node, 'connection');
+}
+
+export function assertIsConnection<P>(node: StudioNode): asserts node is StudioConnectionNode<P> {
+  assertIsType<StudioConnectionNode>(node, 'connection');
 }
 
 export function isCodeComponent(node: StudioNode): node is StudioCodeComponentNode {

@@ -24,14 +24,14 @@ function ConnectionParamsEditor<P>({
 }
 
 interface ConnectionEditorContentProps<P> {
-  connectionNode: studioDom.StudiConnectionNode<P>;
+  connectionNode: studioDom.StudioConnectionNode<P>;
 }
 
 function ConnectionEditorContent<P>({ connectionNode }: ConnectionEditorContentProps<P>) {
   const domApi = useDomApi();
 
   const [connectionParams, setConnectionParams] = React.useState<P>(connectionNode.params);
-  const savedConnectionParams = React.useRef<P | null>(null);
+  const savedConnectionParams = React.useRef<P | null>(connectionNode.params);
 
   const dataSource = dataSources[connectionNode.dataSource];
 

@@ -13,7 +13,8 @@
     "dev:esbuild": "yarn build:esbuild --watch",
     "esinstall": "ts-node ./scripts/esinstall.ts",
     "esbuildEsm": "ts-node ./scripts/esbuildEsm.ts",
-    "bundle-types": "ts-node ./scripts/typings.ts"
+    "bundle-types": "ts-node ./scripts/typings.ts",
+    "prisma": "prisma"
   },
   "dependencies": {
     "@emotion/cache": "^11.7.1",
@@ -28,6 +29,7 @@
     "@mui/studio-core": "^0.0.1",
     "@mui/styles": "^5.3.0",
     "@mui/x-data-grid-pro": "^5.4.0",
+    "@prisma/client": "^3.9.2",
     "@types/cors": "^2.8.12",
     "@types/prettier": "^2.4.3",
     "@types/react-dom": "^17.0.11",
@@ -64,7 +66,8 @@
     "eslint-config-next": "^12.0.3",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
-    "glob": "^7.2.0"
+    "glob": "^7.2.0",
+    "prisma": "^3.9.2"
   },
   "typings": "./index.d.ts"
 }

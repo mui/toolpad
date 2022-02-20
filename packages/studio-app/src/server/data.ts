@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { PrismaClient } from '../../prisma/generated/client';
 import config from './config';
 import {
   StudioConnection,
@@ -11,6 +12,14 @@ import {
 } from '../types';
 import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
+
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: config.databaseUrl,
+    },
+  },
+});
 
 export const DATA_ROOT = path.resolve(config.dir, './.studio-data');
 

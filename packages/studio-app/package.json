@@ -14,6 +14,9 @@
     "esinstall": "ts-node ./scripts/esinstall.ts",
     "esbuildEsm": "ts-node ./scripts/esbuildEsm.ts",
     "bundle-types": "ts-node ./scripts/typings.ts",
+    "build:prisma": "prisma generate",
+    "dev:prisma": "prisma generate --watch",
+    "dev:migrate": "prisma migrate dev",
     "prisma": "prisma"
   },
   "dependencies": {

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import arg from 'arg';
 import * as path from 'path';
 import { execa } from 'execa';

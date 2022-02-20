@@ -38,3 +38,4 @@ lerna-debug.log
 .studio-data
 
 postgres-data
+.env

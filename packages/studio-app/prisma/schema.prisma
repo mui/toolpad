@@ -3,46 +3,47 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("STUDIO_DATABASE_URL")
 }
 
-model DomNode {
-  id          String    @id
-  name        String
-  children    DomNode[] @relation("Children")
-  parent      DomNode   @relation("Children", fields: [parentId], references: [id])
-  parentId    String
-  parentIndex String
-  parentProp  String
+ model DomNode {
+   id          String    @id
+   name        String
+   children    DomNode[] @relation("Children")
+   parent      DomNode   @relation("Children", fields: [parentId], references: [id])
+   parentId    String
+   parentIndex String
+   parentProp  String
 
-  release   Release? @relation("ReleaseNodes", fields: [releaseId], references: [id])
-  releaseId String?
+   release   Release? @relation("ReleaseNodes", fields: [releaseId], references: [id])
+   releaseId String?
 
-  attributes DomNodeAttribute[] @relation("Attributes")
-  @@map("StudioDomNode")
-}
+   attributes DomNodeAttribute[] @relation("Attributes")
+   @@map("StudioDomNode")
+ }
 
-enum AttributeType {
-  const
-  stringExpression
-  jsExpression
-}
+ enum AttributeType {
+   const
+   stringExpression
+   jsExpression
+ }
 
-model DomNodeAttribute {
-  nodeId    String
-  namespace String
-  name      String
-  node      DomNode       @relation("Attributes", fields: [nodeId], references: [id])
-  type      AttributeType
-  value     Json
+ model DomNodeAttribute {
+   nodeId    String
+   namespace String
+   name      String
+   node      DomNode       @relation("Attributes", fields: [nodeId], references: [id])
+   type      AttributeType
+   value     Json
 
-  @@unique([nodeId, namespace, name])
-  @@map("StudioDomNodeAttribute")
-}
+   @@unique([nodeId, namespace, name])
+   @@map("StudioDomNodeAttribute")
+ }
 
 model Release {
   id      String    @id

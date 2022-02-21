@@ -102,10 +102,12 @@ export interface StudioCodeComponentNode extends StudioNodeBase {
 
 export interface StudioDerivedStateNode<P = any> extends StudioNodeBase {
   readonly type: 'derivedState';
-  readonly code: string;
   readonly params: StudioBindables<P>;
-  readonly argTypes: PropValueTypes<keyof P & string>;
-  readonly returnType: PropValueType;
+  readonly attributes: {
+    readonly code: StudioConstant<string>;
+    readonly argTypes: StudioConstant<PropValueTypes<keyof P & string>>;
+    readonly returnType: StudioConstant<PropValueType>;
+  };
 }
 
 export interface StudioQueryStateNode<P = any> extends StudioNodeBase {

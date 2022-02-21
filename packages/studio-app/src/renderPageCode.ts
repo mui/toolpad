@@ -676,7 +676,7 @@ class Context implements RenderContext {
           const resolvedParams = this.resolveBindables(
             `${node.id}.params`,
             node.params,
-            propValueTypesToArgTypes(node.argTypes),
+            propValueTypesToArgTypes(node.attributes.argTypes.value),
           );
           const paramsArg = this.renderPropsAsObject(resolvedParams);
           const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
@@ -687,9 +687,9 @@ class Context implements RenderContext {
             'default',
             node.name,
           );
-          return `const ${
-            stateHook.stateVar
-          } = React.useMemo(() => ${derivedStateGetter}(${paramsArg}), [${depsArray.join(', ')}])`;
+          return `React.useEffect(() => ${
+            stateHook.setStateVar
+          }(${derivedStateGetter}(${paramsArg})), [${depsArray.join(', ')}])`;
         }
         case 'api': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');

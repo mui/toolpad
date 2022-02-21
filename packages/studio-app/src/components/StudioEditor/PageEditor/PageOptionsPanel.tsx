@@ -22,6 +22,9 @@ import { NodeId } from '../../../types';
 import NodeNameEditor from './NodeNameEditor';
 import * as studioDom from '../../../studioDom';
 
+// TODO: remove deprecated state
+const DEPRECATED = false;
+
 interface PageSourceProps {
   pageNodeId: NodeId;
   editor?: boolean;
@@ -72,9 +75,9 @@ export default function PageOptionsPanel() {
           Page Component
         </Button>
         <UrlQueryEditor pageNodeId={pageNodeId} />
-        <DerivedStateEditor />
+        {DEPRECATED && <DerivedStateEditor />}
         <QueryStateEditor />
-        <FetchedStateEditor pageNodeId={pageNodeId} />
+        {DEPRECATED && <FetchedStateEditor pageNodeId={pageNodeId} />}
       </Stack>
       <Dialog fullWidth maxWidth="lg" open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Page component</DialogTitle>

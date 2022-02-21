@@ -38,7 +38,7 @@ function createCodeComponent(
   return {
     id: `codeComponent.${domNode.id}`,
     displayName: domNode.name,
-    argTypes: domNode.argTypes,
+    argTypes: domNode.attributes.argTypes.value,
     render: codeComponentRenderer(`../components/${domNode.id}.tsx`, domNode.name),
   };
 }

@@ -94,8 +94,10 @@ export interface StudioElementNode<P = any> extends StudioNodeBase {
 
 export interface StudioCodeComponentNode extends StudioNodeBase {
   readonly type: 'codeComponent';
-  readonly code: string;
-  readonly argTypes: ArgTypeDefinitions;
+  readonly attributes: {
+    readonly code: StudioConstant<string>;
+    readonly argTypes: StudioConstant<ArgTypeDefinitions>;
+  };
 }
 
 export interface StudioDerivedStateNode<P = any> extends StudioNodeBase {

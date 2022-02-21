@@ -5,12 +5,11 @@ import {
   StudioDataSourceServer,
   ConnectionStatus,
   StudioConnection,
-  ConnectionStage,
-} from 'src/types';
-import config from 'src/server/config';
-import { asArray } from 'src/utils/collections';
-import { GoogleSheetsConnectionParams, GoogleSheetsQuery } from './types';
-import { updateConnection } from 'src/server/data';
+} from '../../../src/types';
+import config from '../../../src/server/config';
+import { asArray } from '../../../src/utils/collections';
+import { updateConnection } from '../../../src/server/data';
+import { GoogleSheetsConnectionParams, GoogleSheetsQuery, ConnectionStage } from './types';
 
 async function test(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
@@ -34,7 +33,7 @@ async function exec(
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: query?.spreadsheetId,
       //TODO: Replace default range with user input
-      range: 'A1:E10',
+      range: 'A1:E20',
     });
     if (response.statusText === 'OK') {
       //TODO: Replace default sheet with user specified sheet
@@ -53,7 +52,6 @@ async function exec(
       return { fields, data };
     }
   } catch (error) {
-    console.error(error);
     throw new Error(`Unable to fetch spreadsheetId ${query?.spreadsheetId}`);
   }
   return {
@@ -68,7 +66,7 @@ async function exec(
  * @param {NextApiResponse} res The response object
  */
 
-function createHandler(req: NextApiRequest, res: NextApiResponse): void {
+function handler(req: NextApiRequest, res: NextApiResponse): void {
   const client = createClient();
   let stage: ConnectionStage = 'CREATE';
 
@@ -119,7 +117,7 @@ function createClient() {
 const dataSource: StudioDataSourceServer<GoogleSheetsConnectionParams, any> = {
   test,
   exec,
-  createHandler,
+  createHandler: () => handler,
 };
 
 export default dataSource;

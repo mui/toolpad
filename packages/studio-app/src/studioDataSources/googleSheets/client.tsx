@@ -1,7 +1,7 @@
 import { Stack, Button, TextField } from '@mui/material';
 import * as React from 'react';
-import { StudioDataSourceClient, StudioConnectionParamsEditorProps } from 'src/types';
-import { WithControlledProp } from 'src/utils/types';
+import { StudioDataSourceClient, StudioConnectionParamsEditorProps } from '../../../src/types';
+import { WithControlledProp } from '../../../src/utils/types';
 import { GoogleSheetsConnectionParams, GoogleSheetsQuery } from './types';
 
 function getInitialQueryValue(): any {
@@ -58,7 +58,7 @@ function ConnectionParamsInput({
 const dataSource: StudioDataSourceClient<GoogleSheetsConnectionParams, GoogleSheetsQuery> = {
   displayName: 'Google Sheets',
   ConnectionParamsInput,
-  getInitialConnectionValue: () => null,
+  getInitialConnectionValue: getInitialQueryValue,
   isConnectionValid: isValid,
   QueryEditor,
   getInitialQueryValue,

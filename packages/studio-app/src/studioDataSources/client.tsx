@@ -20,8 +20,8 @@ export function getQueryNodeArgTypes(
     console.warn(`Can't resolve API node "${node.api}" from query "${node.id}"`);
     return {};
   }
-  const dataSource = studioConnections[apiNode.connectionType];
-  return dataSource?.getArgTypes?.(apiNode.query) || {};
+  const dataSource = studioConnections[apiNode.attributes.connectionType.value];
+  return dataSource?.getArgTypes?.(apiNode.attributes.query.value) || {};
 }
 
 export default studioConnections;

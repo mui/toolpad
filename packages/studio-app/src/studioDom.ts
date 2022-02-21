@@ -69,9 +69,11 @@ export interface StudioConnectionNode<P = unknown> extends StudioNodeBase {
 
 export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
   readonly type: 'api';
-  readonly connectionId: string;
-  readonly connectionType: string;
-  readonly query: Q;
+  readonly attributes: {
+    readonly connectionId: StudioConstant<string>;
+    readonly connectionType: StudioConstant<string>;
+    readonly query: StudioConstant<Q>;
+  };
 }
 
 export interface StudioPageNode extends StudioNodeBase {

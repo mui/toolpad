@@ -44,6 +44,7 @@ export interface StudioNodeBase {
   readonly parentId: NodeId | null;
   readonly parentProp: string | null;
   readonly parentIndex: string | null;
+  readonly attributes: {};
 }
 
 export interface StudioAppNode extends StudioNodeBase {
@@ -391,28 +392,6 @@ function getNodeNames(dom: StudioDom): Set<string> {
   return new Set(Object.values(dom.nodes).map(({ name }) => name));
 }
 
-export function createElementInternal<P>(
-  dom: StudioDom,
-  id: NodeId,
-  component: string,
-  props: Partial<StudioBindables<P>> = {},
-  name?: string,
-): StudioElementNode {
-  const existingNames = getNodeNames(dom);
-  return {
-    id,
-    type: 'element',
-    parentId: null,
-    parentProp: null,
-    parentIndex: null,
-    component,
-    props,
-    name: name
-      ? generateUniqueString(name, existingNames)
-      : generateUniqueString(component, existingNames, true),
-  };
-}
-
 type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
   StudioNodeOfType<T>,
   'id' | 'type' | 'parentId' | 'parentProp' | 'parentIndex' | 'name'
@@ -452,6 +431,7 @@ export function createDom(): StudioDom {
     nodes: {
       [rootId]: createNodeInternal(rootId, 'app', {
         name: 'Application',
+        attributes: {},
       }),
     },
     root: rootId,
@@ -471,6 +451,7 @@ export function createElement<P>(
     component,
     name: name || component,
     props,
+    attributes: {},
   });
 }
 

@@ -30,6 +30,7 @@ export default function CreateStudioPageDialog({ onClose, ...props }: CreateStud
           const newNode = studioDom.createNode(dom, 'page', {
             title,
             urlQuery: {},
+            attributes: {},
           });
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'pages');

@@ -63,6 +63,7 @@ export default function CreateStudioCodeComponentDialog({
             name,
             code: createDefaultCodeComponent(name),
             argTypes: {},
+            attributes: {},
           });
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'codeComponents');

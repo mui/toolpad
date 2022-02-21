@@ -144,6 +144,7 @@ export default function FetchedStateEditor({ pageNodeId }: FetchedStateEditorPro
       url: { type: 'const', value: '' },
       collectionPath: '',
       fieldPaths: {},
+      attributes: {},
     });
     domApi.addNode(stateNode, page, 'fetchedStates');
     setEditedState(stateNode.id);

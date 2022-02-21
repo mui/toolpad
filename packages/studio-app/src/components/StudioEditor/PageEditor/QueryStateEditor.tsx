@@ -151,6 +151,7 @@ export default function QueryStateEditor() {
     const stateNode = studioDom.createNode(dom, 'queryState', {
       api: null,
       params: {},
+      attributes: {},
     });
     domApi.addNode(stateNode, page, 'queryStates');
     setEditedState(stateNode.id);

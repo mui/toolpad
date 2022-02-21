@@ -52,6 +52,7 @@ export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudi
             query: {},
             connectionId,
             connectionType,
+            attributes: {},
           });
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newApiNode, appNode, 'apis');

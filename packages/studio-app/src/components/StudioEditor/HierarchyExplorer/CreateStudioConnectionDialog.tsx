@@ -43,6 +43,7 @@ export default function CreateStudioConnectionDialog({
             dataSource: dataSourceType,
             params: dataSource.getInitialConnectionValue(),
             status: null,
+            attributes: {},
           });
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'connections');

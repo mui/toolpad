@@ -325,6 +325,7 @@ export default function DerivedStateEditor() {
 export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DERIVED_STATE_RESULT} {
   return 'Hello World!';
 }\n`,
+      attributes: {},
     });
     domApi.addNode(stateNode, page, 'derivedStates');
     setEditedState(stateNode.id);

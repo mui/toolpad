@@ -66,6 +66,7 @@ function createDefaultApp(): studioDom.StudioDom {
     name: 'DefaultPage',
     title: 'Default',
     urlQuery: {},
+    attributes: {},
   });
   const app = studioDom.getApp(dom);
   dom = studioDom.addNode(dom, page, app, 'pages');
@@ -127,6 +128,7 @@ export async function addConnection({
     params,
     name,
     status,
+    attributes: {},
   });
 
   const newDom = studioDom.addNode(dom, newConnection, app, 'connections');

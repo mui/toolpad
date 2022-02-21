@@ -25,7 +25,7 @@ const Home: NextPage = () => {
         <List>
           {pages.map((page) => (
             <ListItem key={page.id} button component={NextLinkComposed} to={`/pages/${page.id}`}>
-              {page.title}
+              {page.attributes.title.value}
             </ListItem>
           ))}
         </List>

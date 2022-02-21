@@ -12,7 +12,7 @@ import {
   Tab,
 } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinition, useFetchedState } from '@mui/studio-core';
+import { ArgTypeDefinition, UseFetchedState, useFetchedState } from '@mui/studio-core';
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import useLatest from '../../../utils/useLatest';
@@ -41,7 +41,13 @@ interface FetchedStateNodeEditorProps extends WithControlledProp<studioDom.Studi
 function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEditorProps) {
   const handleUrlChange = React.useCallback(
     (newUrl: StudioBindable<string> | null) => {
-      onChange({ ...value, url: newUrl || { type: 'const', value: '' } });
+      onChange({
+        ...value,
+        attributes: {
+          ...value.attributes,
+          url: newUrl || { type: 'const', value: '' },
+        },
+      });
     },
     [onChange, value],
   );
@@ -50,23 +56,44 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
 
   const handleCollectionPathChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ ...value, collectionPath: event.target.value });
+      onChange({
+        ...value,
+        attributes: {
+          ...value.attributes,
+          collectionPath: studioDom.createConst(event.target.value),
+        },
+      });
     },
     [onChange, value],
   );
 
   const handleFieldPathsChange = React.useCallback(
     (newpaths: Record<string, string>) => {
-      onChange({ ...value, fieldPaths: newpaths });
+      onChange({
+        ...value,
+        attributes: {
+          ...value.attributes,
+          fieldPaths: studioDom.createConst(newpaths),
+        },
+      });
     },
     [onChange, value],
   );
 
-  const { error, loading, rows, columns, raw } = useFetchedState({
-    url: value.url.value,
-    collectionPath: value.collectionPath,
-    fieldPaths: value.fieldPaths,
+  const [fetchedState, setFetchedState] = React.useState<UseFetchedState>({
+    error: null,
+    loading: false,
+    rows: [],
+    columns: [],
+    raw: [],
   });
+  useFetchedState(setFetchedState, {
+    url: value.attributes.url.value,
+    collectionPath: value.attributes.collectionPath.value,
+    fieldPaths: value.attributes.fieldPaths.value,
+  });
+
+  const { error, loading, rows, columns, raw } = fetchedState;
 
   const rawDisplay = React.useMemo(() => JSON.stringify(raw, null, 2), [raw]);
 
@@ -78,19 +105,19 @@ function FetchedStateNodeEditor({ nodeId, value, onChange }: FetchedStateNodeEdi
           propName="url"
           nodeId={nodeId}
           argType={URL_ARGTYPE}
-          value={value.url}
+          value={value.attributes.url}
           onChange={handleUrlChange}
         />
         <TextField
           size="small"
           label="collection path"
-          value={value.collectionPath}
+          value={value.attributes.collectionPath.value}
           onChange={handleCollectionPathChange}
         />
         <StringRecordEditor
           fieldLabel="field"
           valueLabel="path"
-          value={value.fieldPaths}
+          value={value.attributes.fieldPaths.value}
           onChange={handleFieldPathsChange}
         />
       </Stack>
@@ -141,10 +168,11 @@ export default function FetchedStateEditor({ pageNodeId }: FetchedStateEditorPro
 
   const handleCreate = React.useCallback(() => {
     const stateNode = studioDom.createNode(dom, 'fetchedState', {
-      url: { type: 'const', value: '' },
-      collectionPath: '',
-      fieldPaths: {},
-      attributes: {},
+      attributes: {
+        url: studioDom.createConst(''),
+        collectionPath: studioDom.createConst(''),
+        fieldPaths: studioDom.createConst({}),
+      },
     });
     domApi.addNode(stateNode, page, 'fetchedStates');
     setEditedState(stateNode.id);

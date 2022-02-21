@@ -710,14 +710,14 @@ class Context implements RenderContext {
         case 'fetched': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
 
-          const url = this.resolveBindable(`${node.id}.url`, node.url, {
+          const url = this.resolveBindable(`${node.id}.url`, node.attributes.url, {
             typeDef: { type: 'string' },
           });
 
           const paramsExpr = this.renderPropsAsObject({
             url,
-            collectionPath: literalPropExpression(node.collectionPath),
-            fieldPaths: literalPropExpression(node.fieldPaths),
+            collectionPath: literalPropExpression(node.attributes.collectionPath.value),
+            fieldPaths: literalPropExpression(node.attributes.fieldPaths.value),
           });
 
           const useFetchedState = this.addImport(
@@ -726,7 +726,7 @@ class Context implements RenderContext {
             'useFetchedState',
           );
 
-          return `const ${stateHook.stateVar} = ${useFetchedState}(${paramsExpr});`;
+          return `${useFetchedState}(${stateHook.stateVar}, ${paramsExpr});`;
         }
         default:
           throw new Error(

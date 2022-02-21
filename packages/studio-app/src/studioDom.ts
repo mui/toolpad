@@ -120,9 +120,11 @@ export interface StudioQueryStateNode<P = any> extends StudioNodeBase {
 
 export interface StudioFetchedStateNode extends StudioNodeBase {
   readonly type: 'fetchedState';
-  readonly url: StudioBindable<string>;
-  readonly collectionPath: string;
-  readonly fieldPaths: Record<string, string>;
+  readonly attributes: {
+    readonly url: StudioBindable<string>;
+    readonly collectionPath: StudioConstant<string>;
+    readonly fieldPaths: StudioConstant<Record<string, string>>;
+  };
 }
 
 type StudioNodeOfType<K extends StudioNodeType> = {

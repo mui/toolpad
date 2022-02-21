@@ -198,6 +198,10 @@ class Context implements RenderContext {
     return stateHook;
   }
 
+  getStudioComponent(node: studioDom.StudioElementNode) {
+    return getStudioComponent(this.dom, node.attributes.component.value);
+  }
+
   collectControlledStateProp(
     node: studioDom.StudioElementNode,
     propName: string,
@@ -208,7 +212,7 @@ class Context implements RenderContext {
 
     let stateHook = this.controlledStateHooks.get(stateId);
     if (!stateHook) {
-      const component = getStudioComponent(this.dom, node.component);
+      const component = this.getStudioComponent(node);
 
       const argType = component.argTypes[propName];
 
@@ -239,7 +243,7 @@ class Context implements RenderContext {
   }
 
   collectControlledStateProps(node: studioDom.StudioElementNode): void {
-    const component = getStudioComponent(this.dom, node.component);
+    const component = this.getStudioComponent(node);
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [propName, argType] of Object.entries(component.argTypes)) {
@@ -349,7 +353,7 @@ class Context implements RenderContext {
   }
 
   resolveElementProps(node: studioDom.StudioElementNode): ResolvedProps {
-    const component = getStudioComponent(this.dom, node.component);
+    const component = this.getStudioComponent(node);
 
     const result: ResolvedProps = this.resolveBindables(
       `${node.id}.props`,
@@ -483,7 +487,7 @@ class Context implements RenderContext {
   }
 
   renderElement(node: studioDom.StudioElementNode): PropExpression {
-    const component = getStudioComponent(this.dom, node.component);
+    const component = this.getStudioComponent(node);
 
     const resolvedProps = this.resolveElementProps(node);
     const resolvedChildren = this.resolveElementChildren(

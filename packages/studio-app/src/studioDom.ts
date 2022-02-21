@@ -86,7 +86,9 @@ export interface StudioPageNode extends StudioNodeBase {
 
 export interface StudioElementNode<P = any> extends StudioNodeBase {
   readonly type: 'element';
-  readonly component: string;
+  readonly attributes: {
+    readonly component: StudioConstant<string>;
+  };
   readonly props: StudioBindables<P>;
 }
 
@@ -465,10 +467,11 @@ export function createElement<P>(
   name?: string,
 ): StudioElementNode {
   return createNode(dom, 'element', {
-    component,
     name: name || component,
     props,
-    attributes: {},
+    attributes: {
+      component: createConst(component),
+    },
   });
 }
 

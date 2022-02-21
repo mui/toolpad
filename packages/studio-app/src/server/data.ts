@@ -12,6 +12,7 @@ import {
 } from '../types';
 import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
+import { ExactEntriesOf } from '../utils/types';
 
 const prisma = new PrismaClient({
   datasources: {
@@ -83,6 +84,51 @@ function createDefaultApp(): studioDom.StudioDom {
 
 const APP_ID = 'default';
 
+export async function saveDom(app: studioDom.StudioDom): Promise<void> {
+  await prisma.$transaction([
+    prisma.domNodeAttribute.deleteMany(),
+    prisma.domNode.deleteMany(),
+    ...(Object.entries(app.nodes) as ExactEntriesOf<studioDom.StudioNodes>).map(([id, node]) => {
+      /* const attributes = omit(node, ...studioDom.NON_ATTRIBUTES);
+       const attrArray = Object.entries(attributes).flatMap(([name, value]) => {
+
+        if (value && typeof value === 'object') {
+          return Object.entries(value).map(([innerName, innerValue]) => {
+            return {
+              nodeId: node.id,
+              namespace: name
+              name: innerName,
+              type: 
+              value: 
+            }
+          })
+        }
+        return [{ 
+          nodeId: node.id,
+          namespace: null,
+          name,
+          type: 
+          value: 
+        }]
+      }) */
+      return prisma.domNode.create({
+        data: {
+          id,
+          name: node.name,
+          type: node.type,
+          parentId: node.parentId || undefined,
+          parentIndex: node.parentIndex || undefined,
+          parentProp: node.parentProp || undefined,
+          attributes: {
+            // TODO
+            createMany: { data: [] },
+          },
+        },
+      });
+    }),
+  ]);
+}
+
 export async function saveApp(app: studioDom.StudioDom): Promise<void> {
   await writeObject('app', {
     id: APP_ID,
@@ -90,7 +136,27 @@ export async function saveApp(app: studioDom.StudioDom): Promise<void> {
   });
 }
 
+export async function loadDom(): Promise<studioDom.StudioDom> {
+  try {
+    const nodes = await prisma.domNode.findMany({
+      include: { attributes: true },
+    });
+    if (nodes.length <= 0) {
+      const app = createDefaultApp();
+      await saveDom(app);
+    }
+    console.log(nodes);
+    const app = await getObject('app', APP_ID);
+    return app;
+  } catch (err) {
+    const app = createDefaultApp();
+    await saveApp(app);
+    return app;
+  }
+}
+
 export async function loadApp(): Promise<studioDom.StudioDom> {
+  return loadDom();
   try {
     const app = await getObject('app', APP_ID);
     return app;

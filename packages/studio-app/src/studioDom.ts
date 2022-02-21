@@ -7,6 +7,7 @@ import {
   StudioBindables,
   ConnectionStatus,
   StudioTheme,
+  StudioConstants,
 } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
@@ -59,9 +60,11 @@ export interface StudioThemeNode extends StudioNodeBase {
 
 export interface StudioConnectionNode<P = unknown> extends StudioNodeBase {
   readonly type: 'connection';
-  readonly dataSource: string;
-  readonly params: P;
-  readonly status: ConnectionStatus | null;
+  readonly attributes: {
+    readonly dataSource: StudioConstant<string>;
+    readonly params: StudioConstant<P>;
+    readonly status: StudioConstant<ConnectionStatus | null>;
+  };
 }
 
 export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
@@ -196,6 +199,16 @@ function assertIsType<T extends StudioNode>(node: StudioNode, type: T['type']): 
   if (!isType(node, type)) {
     throw new Error(`Invariant: expected node type "${type}" but got "${node.type}"`);
   }
+}
+
+export function createConst<V>(value: V): StudioConstant<V> {
+  return { type: 'const', value };
+}
+
+export function createConsts<P>(values: P): StudioConstants<P> {
+  return Object.fromEntries(
+    Object.entries(values).map(([key, value]) => [key, createConst(value)]),
+  ) as StudioConstants<P>;
 }
 
 export function getMaybeNode<T extends StudioNodeType>(

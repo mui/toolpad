@@ -40,10 +40,11 @@ export default function CreateStudioConnectionDialog({
             throw new Error(`Can't find a datasource for "${dataSourceType}"`);
           }
           const newNode = studioDom.createNode(dom, 'connection', {
-            dataSource: dataSourceType,
-            params: dataSource.getInitialConnectionValue(),
-            status: null,
-            attributes: {},
+            attributes: {
+              dataSource: studioDom.createConst(dataSourceType),
+              params: studioDom.createConst(dataSource.getInitialConnectionValue()),
+              status: studioDom.createConst(null),
+            },
           });
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'connections');

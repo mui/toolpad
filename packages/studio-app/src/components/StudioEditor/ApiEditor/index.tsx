@@ -14,7 +14,7 @@ import NotFoundEditor from '../NotFoundEditor';
 function getDataSource<Q>(
   connection: studioDom.StudioConnectionNode,
 ): StudioDataSourceClient<any, Q> | null {
-  return dataSources[connection.dataSource] || null;
+  return dataSources[connection.attributes.dataSource.value] || null;
 }
 
 interface ApiEditorContentProps<Q> {
@@ -57,7 +57,7 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
     return (
       <NotFoundEditor
         className={className}
-        message={`DataSource "${connection.dataSource}" not found`}
+        message={`DataSource "${connection.attributes.dataSource.value}" not found`}
       />
     );
   }

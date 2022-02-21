@@ -48,10 +48,12 @@ function ConnectionEditorContent<P>({
 }: ConnectionEditorContentProps<P>) {
   const domApi = useDomApi();
 
-  const [connectionParams, setConnectionParams] = React.useState<P>(connectionNode.params);
-  const savedConnectionParams = React.useRef<P | null>(connectionNode.params);
+  const [connectionParams, setConnectionParams] = React.useState<P>(
+    connectionNode.attributes.params.value,
+  );
+  const savedConnectionParams = React.useRef<P | null>(connectionNode.attributes.params.value);
 
-  const dataSource = dataSources[connectionNode.dataSource];
+  const dataSource = dataSources[connectionNode.attributes.dataSource.value];
 
   const [isTesting, setIsTesting] = React.useState(false);
   const [testResult, setTestResult] = React.useState<{
@@ -67,7 +69,10 @@ function ConnectionEditorContent<P>({
       setIsTesting(true);
       const status = await client.mutation.testConnection2({
         ...connectionNode,
-        params: connectionParams,
+        attributes: {
+          ...connectionNode.attributes,
+          params: studioDom.createConst(connectionParams),
+        },
       });
       if (status) {
         setTestResult({
@@ -94,7 +99,12 @@ function ConnectionEditorContent<P>({
               if (typeof propName !== 'string' || !connectionParams[propName]) {
                 return;
               }
-              domApi.setNodeAttribute(connectionNode, 'params', connectionParams);
+              domApi.setNodeNamespacedProp(
+                connectionNode,
+                'attributes',
+                'params',
+                studioDom.createConst(connectionParams),
+              );
             });
             savedConnectionParams.current = connectionParams;
           }}
@@ -125,7 +135,9 @@ function ConnectionEditorContent<P>({
             connectionName={connectionNode.name}
           />
         ) : (
-          <Typography>Unrecognized datasource &quot;{connectionNode.dataSource}&quot;</Typography>
+          <Typography>
+            Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
+          </Typography>
         )}
       </Stack>
     </Box>

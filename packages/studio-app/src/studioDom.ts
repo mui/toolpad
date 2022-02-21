@@ -112,7 +112,9 @@ export interface StudioDerivedStateNode<P = any> extends StudioNodeBase {
 
 export interface StudioQueryStateNode<P = any> extends StudioNodeBase {
   readonly type: 'queryState';
-  readonly api: NodeId | null;
+  readonly attributes: {
+    readonly api: StudioConstant<NodeId | null>;
+  };
   readonly params: StudioBindables<P>;
 }
 

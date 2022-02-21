@@ -69,7 +69,7 @@ function PreviewQueryStateResult({ node }: PreviewQueryStateResultProps) {
   const actualNodeState: UseDataQuery | undefined = viewState.pageState[node.name] as any;
   return (
     <Box sx={{ maxHeight: 150, overflow: 'auto' }}>
-      {node.api ? (
+      {node.attributes.api.value ? (
         <pre>{JSON.stringify(actualNodeState?.data, null, 2)}</pre>
       ) : (
         <Typography>No data</Typography>
@@ -88,7 +88,13 @@ function QueryStateNodeEditor<P>({ value, onChange }: QueryStateNodeEditorProps<
 
   const handleSelectionChange = React.useCallback(
     (event: SelectChangeEvent<'' | NodeId>) => {
-      onChange({ ...value, api: event.target.value ? (event.target.value as NodeId) : null });
+      onChange({
+        ...value,
+        attributes: {
+          ...value.attributes,
+          api: studioDom.createConst(event.target.value ? (event.target.value as NodeId) : null),
+        },
+      });
     },
     [onChange, value],
   );
@@ -109,7 +115,7 @@ function QueryStateNodeEditor<P>({ value, onChange }: QueryStateNodeEditorProps<
         <FormControl fullWidth size="small">
           <InputLabel id={`select-data-query`}>Query</InputLabel>
           <Select
-            value={value.api || ''}
+            value={value.attributes.api.value || ''}
             labelId="select-data-query"
             label="Query"
             onChange={handleSelectionChange}
@@ -149,9 +155,8 @@ export default function QueryStateEditor() {
 
   const handleCreate = React.useCallback(() => {
     const stateNode = studioDom.createNode(dom, 'queryState', {
-      api: null,
       params: {},
-      attributes: {},
+      attributes: { api: studioDom.createConst(null) },
     });
     domApi.addNode(stateNode, page, 'queryStates');
     setEditedState(stateNode.id);

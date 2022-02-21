@@ -704,7 +704,7 @@ class Context implements RenderContext {
           const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
 
           return `${useDataQuery}(${stateHook.setStateVar}, ${JSON.stringify(
-            node.api,
+            node.attributes.api.value,
           )}, ${params});`;
         }
         case 'fetched': {

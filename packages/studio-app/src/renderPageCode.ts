@@ -140,16 +140,18 @@ class Context implements RenderContext {
       }
     });
 
-    Object.entries(this.page.urlQuery || {}).forEach(([paramName, defaultValue]) => {
-      const [stateVar, setStateVar] = this.generateControlledStateVars(paramName);
+    Object.entries(this.page.attributes.urlQuery.value || {}).forEach(
+      ([paramName, defaultValue]) => {
+        const [stateVar, setStateVar] = this.generateControlledStateVars(paramName);
 
-      this.urlQueryStateHooks.set(`${this.page.id}.urlQuery.${paramName}`, {
-        paramName,
-        stateVar,
-        setStateVar,
-        defaultValue,
-      });
-    });
+        this.urlQueryStateHooks.set(`${this.page.id}.urlQuery.${paramName}`, {
+          paramName,
+          stateVar,
+          setStateVar,
+          defaultValue,
+        });
+      },
+    );
   }
 
   collectStateNode(

@@ -78,8 +78,10 @@ export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
 
 export interface StudioPageNode extends StudioNodeBase {
   readonly type: 'page';
-  readonly title: string;
-  readonly urlQuery: Record<string, string>;
+  readonly attributes: {
+    readonly title: StudioConstant<string>;
+    readonly urlQuery: StudioConstant<Record<string, string>>;
+  };
 }
 
 export interface StudioElementNode<P = any> extends StudioNodeBase {

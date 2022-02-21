@@ -11,39 +11,54 @@ datasource db {
   url      = env("STUDIO_DATABASE_URL")
 }
 
- model DomNode {
-   id          String    @id
-   name        String
-   children    DomNode[] @relation("Children")
-   parent      DomNode   @relation("Children", fields: [parentId], references: [id])
-   parentId    String
-   parentIndex String
-   parentProp  String
+enum DomNodeType {
+  app
+  connection
+  api
+  theme
+  page
+  element
+  codeComponent
+  derivedState
+  queryState
+  fetchedState
+}
 
-   release   Release? @relation("ReleaseNodes", fields: [releaseId], references: [id])
-   releaseId String?
+model DomNode {
+  id          String      @id
+  name        String
+  type        DomNodeType
+  children    DomNode[]   @relation("Children")
+  parent      DomNode?    @relation("Children", fields: [parentId], references: [id])
+  parentId    String?
+  parentIndex String?
+  parentProp  String?
 
-   attributes DomNodeAttribute[] @relation("Attributes")
-   @@map("StudioDomNode")
- }
+  release   Release? @relation("ReleaseNodes", fields: [releaseId], references: [id])
+  releaseId String?
 
- enum AttributeType {
-   const
-   stringExpression
-   jsExpression
- }
+  attributes DomNodeAttribute[] @relation("Attributes")
+  @@map("StudioDomNode")
+}
 
- model DomNodeAttribute {
-   nodeId    String
-   namespace String
-   name      String
-   node      DomNode       @relation("Attributes", fields: [nodeId], references: [id])
-   type      AttributeType
-   value     Json
+enum DomNodeAttributeType {
+  const
+  binding
+  boundExpression
+  jsExpression
+}
 
-   @@unique([nodeId, namespace, name])
-   @@map("StudioDomNodeAttribute")
- }
+model DomNodeAttribute {
+  nodeId    String
+  namespace String
+  name      String
+  node      DomNode              @relation("Attributes", fields: [nodeId], references: [id])
+  type      DomNodeAttributeType
+  value     Json
+
+  @@unique([nodeId, namespace, name])
+  @@map("StudioDomNodeAttribute")
+}
 
 model Release {
   id      String    @id

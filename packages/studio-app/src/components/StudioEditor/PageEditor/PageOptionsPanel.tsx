@@ -14,16 +14,11 @@ import SourceIcon from '@mui/icons-material/Source';
 import renderPageCode from '../../../renderPageCode';
 import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
-import DerivedStateEditor from './DerivedStateEditor';
 import QueryStateEditor from './QueryStateEditor';
-import FetchedStateEditor from './FetchedStateEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import { NodeId } from '../../../types';
 import NodeNameEditor from './NodeNameEditor';
 import * as studioDom from '../../../studioDom';
-
-// TODO: remove deprecated state
-const DEPRECATED = false;
 
 interface PageSourceProps {
   pageNodeId: NodeId;
@@ -75,9 +70,7 @@ export default function PageOptionsPanel() {
           Page Component
         </Button>
         <UrlQueryEditor pageNodeId={pageNodeId} />
-        {DEPRECATED && <DerivedStateEditor />}
         <QueryStateEditor />
-        {DEPRECATED && <FetchedStateEditor pageNodeId={pageNodeId} />}
       </Stack>
       <Dialog fullWidth maxWidth="lg" open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Page component</DialogTitle>

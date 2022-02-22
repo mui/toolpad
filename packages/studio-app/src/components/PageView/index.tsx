@@ -48,17 +48,6 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
     );
   }, [dom]);
 
-  const derivedStateHookFiles = React.useMemo(() => {
-    const page = studioDom.getNode(dom, pageNodeId, 'page');
-    const { derivedStates = [] } = studioDom.getChildNodes(dom, page);
-    return Object.fromEntries(
-      derivedStates.map((derivedState) => [
-        `./derivedState/${derivedState.id}.ts`,
-        { code: derivedState.attributes.code.value },
-      ]),
-    );
-  }, [dom, pageNodeId]);
-
   return (
     <StudioSandbox
       className={className}
@@ -67,7 +56,6 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
       importMap={getImportMap()}
       files={{
         ...codeComponentsFiles,
-        ...derivedStateHookFiles,
         [themePath]: { code: renderedTheme.code },
         [entryPath]: { code: renderedEntrypoint.code },
         [pagePath]: { code: renderedPage.code },

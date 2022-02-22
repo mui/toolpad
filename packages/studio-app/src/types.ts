@@ -33,7 +33,6 @@ export interface StudioPageBindings {
 
 export type StudioBindingFormat = 'stringLiteral' | 'default';
 
-// TODO: Get rid of StudioBoundExpressionProp? Its function can be fulfilled by derivedState as well
 export interface StudioBoundExpression {
   type: 'boundExpression';
   value: string;

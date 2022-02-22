@@ -16,6 +16,9 @@ export function getQueryNodeArgTypes(
   node: studioDom.StudioQueryStateNode,
 ): ArgTypeDefinitions {
   const apiNodeId = node.attributes.api.value;
+  if (!apiNodeId) {
+    return {};
+  }
   const apiNode = apiNodeId ? studioDom.getNode(dom, apiNodeId, 'api') : null;
   if (!apiNode) {
     console.warn(`Can't resolve API node "${apiNodeId}" from query "${node.id}"`);

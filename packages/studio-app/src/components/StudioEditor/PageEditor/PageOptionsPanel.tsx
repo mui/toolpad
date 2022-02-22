@@ -23,7 +23,7 @@ import NodeNameEditor from './NodeNameEditor';
 import * as studioDom from '../../../studioDom';
 
 // TODO: remove deprecated state
-const DEPRECATED = false;
+const DEPRECATED = true;
 
 interface PageSourceProps {
   pageNodeId: NodeId;

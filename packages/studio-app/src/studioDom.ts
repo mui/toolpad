@@ -598,6 +598,21 @@ export function setNodeNamespacedProp<
   });
 }
 
+export function setNodeNamespace<Node extends StudioNode, Namespace extends PropNamespaces<Node>>(
+  dom: StudioDom,
+  node: Node,
+  namespace: Namespace,
+  value: Node[Namespace] | null,
+): StudioDom {
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: update(node, {
+        [namespace]: value ? (value as Partial<Node[Namespace]>) : {},
+      } as Partial<Node>),
+    }),
+  });
+}
+
 function setNodeParent<N extends StudioNode>(
   dom: StudioDom,
   node: N,

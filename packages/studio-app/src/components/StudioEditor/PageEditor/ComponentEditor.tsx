@@ -4,7 +4,7 @@ import { ArgTypeDefinitions } from '@mui/studio-core';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
-import ComponentPropEditor from './ComponentPropEditor';
+import NodeAttributeEditor from './NodeAttributeEditor';
 import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
@@ -35,7 +35,12 @@ function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
         ([propName, propTypeDef]) =>
           propTypeDef ? (
             <div key={propName} className={classes.control}>
-              <ComponentPropEditor node={node} propName={propName} argType={propTypeDef} />
+              <NodeAttributeEditor
+                node={node}
+                namespace="props"
+                name={propName}
+                argType={propTypeDef}
+              />
             </div>
           ) : null,
       )}

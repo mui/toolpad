@@ -24,7 +24,7 @@ import * as studioDom from '../../../studioDom';
 import { NodeId, StudioBindable, StudioBindables } from '../../../types';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { getQueryNodeArgTypes } from '../../../studioDataSources/client';
-import { BindableEditor } from './ComponentPropEditor';
+import { BindableEditor } from './NodeAttributeEditor';
 import NodeNameEditor from './NodeNameEditor';
 
 interface ParamsEditorProps<Q> extends WithControlledProp<StudioBindables<Q>> {
@@ -163,7 +163,10 @@ export default function QueryStateEditor() {
   }, [dom, domApi, page]);
 
   // To keep it around during closing animation
-  const lastEditedStateNode = useLatest(editedStateNode);
+  const lastEditedStateNodeId = useLatest(editedStateNode?.id ?? null);
+  // Refetch to avoid errors on remove
+  const lastEditedStateNode =
+    lastEditedStateNodeId && studioDom.getMaybeNode(dom, lastEditedStateNodeId, 'queryState');
 
   const handleSave = React.useCallback(
     (newValue: studioDom.StudioQueryStateNode) => domApi.saveNode(newValue),

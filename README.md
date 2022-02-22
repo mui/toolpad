@@ -1,22 +1,23 @@
 # MUI Studio
 
-## Set up your development environment
+## Local development
 
-Prerequisites:
+### Prerequisites:
 
 - git
 - yarn
 - node.js
 - docker (unless you have a Postgres database ready to connect to)
 
-1. Clone the repository
+### Setting up your development environment:
+
 1. Start a local database:
 
    ```sh
    docker-compose up -V
    ```
 
-   You can skip this step if you have a development database available by other means.
+   You can skip this step if you already have a development database available by other means.
 
 1. Install dependencies:
 
@@ -30,7 +31,7 @@ Prerequisites:
    yarn dev
    ```
 
-1. Initialize the database
+1. Initialize the database:
 
    ```sh
    yarn prisma migrate dev
@@ -48,4 +49,4 @@ Prerequisites:
    yarn cli
    ```
 
-1. Open `http://localhost:3000/` in your browser.
+1. Open [`http://localhost:3000/`](http://localhost:3000/) in your browser.

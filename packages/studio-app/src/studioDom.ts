@@ -144,7 +144,6 @@ type AllowedChildren = {
     children: 'element';
     derivedStates: 'derivedState';
     queryStates: 'queryState';
-    fetchedStates: 'fetchedState';
   };
   element: {
     [prop: string]: 'element';
@@ -152,7 +151,6 @@ type AllowedChildren = {
   codeComponent: {};
   derivedState: {};
   queryState: {};
-  fetchedState: {};
 };
 
 export type StudioNode = StudioNodeOfType<StudioNodeType>;

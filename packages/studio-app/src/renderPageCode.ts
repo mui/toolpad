@@ -659,6 +659,9 @@ class Context implements RenderContext {
 
   renderDataQueryState(): string {
     return Array.from(this.stateHooks.values(), (hook) => {
+      if (hook.type === 'derived') {
+        return `const [${hook.stateVar}, ${hook.setStateVar}] = React.useState();`;
+      }
       const INITIAL_DATA_QUERY = this.addImport(
         '@mui/studio-core',
         'INITIAL_DATA_QUERY',

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as studioDom from '../studioDom';
-import { NodeId, StudioBindable } from '../types';
+import { NodeId, StudioBindable, StudioBindables } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
 import useDebounced from '../utils/useDebounced';
@@ -34,6 +34,12 @@ export type DomAction =
       prop: string;
       namespace: string;
       value: StudioBindable<unknown> | null;
+    }
+  | {
+      type: 'DOM_SET_NODE_NAMESPACE';
+      node: studioDom.StudioNode;
+      namespace: string;
+      value: StudioBindables<unknown> | null;
     }
   | {
       type: 'SAVE_NODE';
@@ -73,6 +79,9 @@ export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioD
         action.prop,
         action.value,
       );
+    }
+    case 'DOM_SET_NODE_NAMESPACE': {
+      return studioDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
     }
     case 'SAVE_NODE': {
       return studioDom.saveNode(dom, action.node);
@@ -205,6 +214,17 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         node,
         prop,
         value: value as StudioBindable<unknown> | null,
+      });
+    },
+    setNodeNamespace<
+      Node extends studioDom.StudioNode,
+      Namespace extends studioDom.PropNamespaces<Node>,
+    >(node: Node, namespace: Namespace, value: Node[Namespace] | null) {
+      dispatch({
+        type: 'DOM_SET_NODE_NAMESPACE',
+        namespace,
+        node,
+        value: value as StudioBindables<unknown> | null,
       });
     },
   };

@@ -9,8 +9,8 @@ import {
   testConnection,
   testConnection2,
   execApi,
-  loadApp,
-  saveApp,
+  loadDom,
+  saveDom,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
@@ -83,7 +83,7 @@ const rpcServer = {
 
     execApi,
 
-    loadApp,
+    loadDom,
   },
   mutation: {
     addConnection,
@@ -91,7 +91,7 @@ const rpcServer = {
     testConnection,
     testConnection2,
 
-    saveApp,
+    saveDom,
   },
 } as const;
 

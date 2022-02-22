@@ -9,10 +9,20 @@ import {
   StudioTheme,
   StudioConstants,
 } from './types';
-import { omit, update } from './utils/immutability';
+import { omit, update, updateOrCreate } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
 import { generateUniqueString } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
+
+export const RESERVED_NODE_PROPERTIES = [
+  'id',
+  'type',
+  'parentId',
+  'parentProp',
+  'parentIndex',
+  'name',
+] as const;
+export type ReservedNodeProperty = typeof RESERVED_NODE_PROPERTIES[number];
 
 export function createFractionalIndex(index1: string | null, index2: string | null) {
   return generateKeyBetween(index1, index2);
@@ -88,7 +98,7 @@ export interface StudioElementNode<P = any> extends StudioNodeBase {
   readonly attributes: {
     readonly component: StudioConstant<string>;
   };
-  readonly props: StudioBindables<P>;
+  readonly props?: StudioBindables<P>;
 }
 
 export interface StudioCodeComponentNode extends StudioNodeBase {
@@ -101,7 +111,7 @@ export interface StudioCodeComponentNode extends StudioNodeBase {
 
 export interface StudioDerivedStateNode<P = any> extends StudioNodeBase {
   readonly type: 'derivedState';
-  readonly params: StudioBindables<P>;
+  readonly params?: StudioBindables<P>;
   readonly attributes: {
     readonly code: StudioConstant<string>;
     readonly argTypes: StudioConstant<PropValueTypes<keyof P & string>>;
@@ -114,7 +124,7 @@ export interface StudioQueryStateNode<P = any> extends StudioNodeBase {
   readonly attributes: {
     readonly api: StudioConstant<NodeId | null>;
   };
-  readonly params: StudioBindables<P>;
+  readonly params?: StudioBindables<P>;
 }
 
 type StudioNodeOfType<K extends StudioNodeType> = {
@@ -400,7 +410,7 @@ function getNodeNames(dom: StudioDom): Set<string> {
 
 type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
   StudioNodeOfType<T>,
-  'id' | 'type' | 'parentId' | 'parentProp' | 'parentIndex' | 'name'
+  ReservedNodeProperty
 > & { name?: string };
 
 function createNodeInternal<T extends StudioNodeType>(
@@ -516,7 +526,7 @@ export function setNodeName(dom: StudioDom, node: StudioNode, name: string): Stu
 }
 
 export type PropNamespaces<N extends StudioNode> = {
-  [K in keyof N]: N[K] extends StudioBindables<any> ? K : never;
+  [K in keyof N]: N[K] extends StudioBindables<any> | undefined ? K : never;
 }[keyof N & string];
 
 export type BindableProps<T> = {
@@ -561,7 +571,7 @@ export function setNodeNamespacedProp<
     return update(dom, {
       nodes: update(dom.nodes, {
         [node.id]: update(node, {
-          [namespace]: update(node[namespace], {
+          [namespace]: updateOrCreate(node[namespace], {
             [prop]: value,
           } as any) as Partial<Node[Namespace]>,
         } as Partial<Node>),

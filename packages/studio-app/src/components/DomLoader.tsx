@@ -272,7 +272,7 @@ export default function DomProvider({ children }: DomContextProps) {
 
     dispatch({ type: 'DOM_LOADING' });
     client.query
-      .loadApp()
+      .loadDom()
       .then((dom) => {
         if (!canceled) {
           dispatch({ type: 'DOM_LOADED', dom });
@@ -299,7 +299,7 @@ export default function DomProvider({ children }: DomContextProps) {
     dispatch({ type: 'DOM_SAVING' });
 
     client.mutation
-      .saveApp(debouncedDom)
+      .saveDom(debouncedDom)
       .then(() => {
         dispatch({ type: 'DOM_SAVED' });
       })

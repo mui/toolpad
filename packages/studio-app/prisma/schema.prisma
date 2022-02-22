@@ -21,7 +21,6 @@ enum DomNodeType {
   codeComponent
   derivedState
   queryState
-  fetchedState
 }
 
 model DomNode {
@@ -33,9 +32,6 @@ model DomNode {
   parentId    String?
   parentIndex String?
   parentProp  String?
-
-  release   Release? @relation("ReleaseNodes", fields: [releaseId], references: [id])
-  releaseId String?
 
   attributes DomNodeAttribute[] @relation("Attributes")
   @@map("StudioDomNode")
@@ -61,8 +57,8 @@ model DomNodeAttribute {
 }
 
 model Release {
-  id      String    @id
-  nodes   DomNode[] @relation("ReleaseNodes")
-  version String    @unique
-  notes   String
+  id       String @id
+  version  String @unique
+  notes    String
+  snapshot Bytes
 }

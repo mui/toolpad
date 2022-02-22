@@ -203,7 +203,7 @@ class Context implements RenderContext {
 
       const [stateVar, setStateVar] = this.generateControlledStateVars(nodeName, propName);
 
-      const propValue = node.props[propName];
+      const propValue = node.props?.[propName];
       const defaultValue = propValue?.type === 'const' ? propValue.value : argType.defaultValue;
 
       stateHook = {
@@ -334,7 +334,7 @@ class Context implements RenderContext {
 
     const result: ResolvedProps = this.resolveBindables(
       `${node.id}.props`,
-      node.props,
+      node.props ?? {},
       component.argTypes,
     );
 
@@ -655,7 +655,7 @@ class Context implements RenderContext {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
           const resolvedParams = this.resolveBindables(
             `${node.id}.params`,
-            node.params,
+            node.params ?? {},
             propValueTypesToArgTypes(node.attributes.argTypes.value),
           );
           const paramsArg = this.renderPropsAsObject(resolvedParams);
@@ -676,7 +676,7 @@ class Context implements RenderContext {
           const propTypes = argTypesToPropValueTypes(getQueryNodeArgTypes(this.dom, node));
           const resolvedProps = this.resolveBindables(
             `${node.id}.params`,
-            node.params,
+            node.params ?? {},
             propValueTypesToArgTypes(propTypes),
           );
           const params = this.renderPropsAsObject(resolvedProps);

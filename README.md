@@ -1,68 +1,51 @@
 # MUI Studio
 
-## Instructions
+## Set up your development environment
 
-Run this first to build/watch:
+Prerequisites:
 
-```
-yarn dev
-```
+- git
+- yarn
+- node.js
+- docker (unless you have a Postgres database ready to connect to)
 
-Then start MUI Studio in CWD:
+1. Clone the repository
+1. Start a local database:
 
-```sh
-yarn cli
-```
+   ```sh
+   docker-compose up -V
+   ```
 
-or start MUI Studio in a different folder:
+   You can skip this step if you already have a development database available
 
-```sh
-yarn cli ./my-app
-```
+1. Install dependencies:
 
-App will be running under `http://localhost:3000/`
+   ```sh
+   yarn install
+   ```
 
-TO DO:
+1. Start building the project in watch mode:
 
-- Add LICENSE (+ in package.json, also update for individual packages)
-- docs: How will we do docs? Same as on mui.com? Do we create something new? Do we want to embed them in the app as well?
-- studio DOM patches instead of saving the whole DOM as a blob
-- Should we move Connection editor under app editor?
-- Nested paths pages
-- iframe needs to be sandboxed + CSP?
-- StudioSandbox => add react-refresh (or decide on alternative, bundler in teh browser?)
-- deployments/releases
-- secrets encryption and redaction on client
-- test drive pomerium
+   ```sh
+   yarn dev
+   ```
 
-- docker image + compose file for installation
-- build persistence in postgres
-- integration tests, (let's consolidate the architecture a bit more first)
-- expand @mui/components
-- editor:
-  - loops StudioNode
-  - export code as next.js project
-  - data binding => javascript
-  - fix data binding to APIs (query StudioNode)
-  - make connections UI similar to APIs UI (create connection then edit UI)
-- ...
+1. Initialize the database
 
-```ts
-import { format } = 'https://esm.sh/date-fns'
+   ```sh
+   yarn prisma migrate dev
+   ```
 
-format(new Date(2014, 1, 11), 'yyyy-MM-dd')
-```
+   and create a `.env` file in the root of the project
 
-```ts
-import YouTube from 'https://esm.sh/react-youtube';
+   ```sh
+   STUDIO_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
+   ```
 
-return (
-  <YouTube
-    videoId="2g811Eo7K8U"
-    opts={{
-      height: '390',
-      width: '640',
-    }}
-  />
-);
-```
+1. Now you can run the MUI Studio cli to start the application
+
+   ```sh
+   yarn cli
+   ```
+
+1. Open `http://localhost:3000/` in your browser.

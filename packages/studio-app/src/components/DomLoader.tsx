@@ -42,10 +42,6 @@ export type DomAction =
       value: StudioBindables<unknown> | null;
     }
   | {
-      type: 'SAVE_NODE';
-      node: studioDom.StudioNode;
-    }
-  | {
       type: 'DOM_ADD_NODE';
       node: studioDom.StudioNode;
       parent: studioDom.StudioNode;
@@ -82,9 +78,6 @@ export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioD
     }
     case 'DOM_SET_NODE_NAMESPACE': {
       return studioDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
-    }
-    case 'SAVE_NODE': {
-      return studioDom.saveNode(dom, action.node);
     }
     case 'DOM_ADD_NODE': {
       return studioDom.addNode<any, any>(
@@ -180,12 +173,6 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parent,
         parentProp,
         parentIndex,
-      });
-    },
-    saveNode(node: studioDom.StudioNode) {
-      dispatch({
-        type: 'SAVE_NODE',
-        node,
       });
     },
     moveNode(nodeId: NodeId, parentId: NodeId, parentProp: string, parentIndex: string) {

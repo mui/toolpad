@@ -229,24 +229,40 @@ export async function updateConnection({
   status,
   type,
 }: Updates<StudioConnection>): Promise<StudioConnection> {
-  const dom = await loadApp();
+  let dom = await loadApp();
   const existing = studioDom.getNode(dom, id as NodeId, 'connection');
-  const updates = { ...existing, attributes: { ...existing.attributes } };
   if (name !== undefined) {
-    updates.name = name;
+    dom = studioDom.setNodeName(dom, existing, name);
   }
   if (params !== undefined) {
-    updates.attributes.params = studioDom.createConst(params);
+    dom = studioDom.setNodeNamespacedProp(
+      dom,
+      existing,
+      'attributes',
+      'params',
+      studioDom.createConst(params),
+    );
   }
   if (status !== undefined) {
-    updates.attributes.status = studioDom.createConst(status);
+    dom = studioDom.setNodeNamespacedProp(
+      dom,
+      existing,
+      'attributes',
+      'status',
+      studioDom.createConst(status),
+    );
   }
   if (type !== undefined) {
-    updates.attributes.dataSource = studioDom.createConst(type);
+    dom = studioDom.setNodeNamespacedProp(
+      dom,
+      existing,
+      'attributes',
+      'dataSource',
+      studioDom.createConst(type),
+    );
   }
-  const newDom = studioDom.saveNode(dom, updates);
-  await saveApp(newDom);
-  return fromDomConnection(updates);
+  await saveApp(dom);
+  return fromDomConnection(studioDom.getNode(dom, id as NodeId, 'connection'));
 }
 
 // TODO: replace with testConnection2

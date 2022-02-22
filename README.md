@@ -16,7 +16,7 @@ Prerequisites:
    docker-compose up -V
    ```
 
-   You can skip this step if you already have a development database available
+   You can skip this step if you have a development database available by other means.
 
 1. Install dependencies:
 

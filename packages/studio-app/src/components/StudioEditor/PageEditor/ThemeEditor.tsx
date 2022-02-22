@@ -61,7 +61,11 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
   const theme = themes.length > 0 ? themes[0] : null;
 
   const handleAddThemeClick = () => {
-    const newTheme = studioDom.createNode(dom, 'theme', { name: 'Theme', theme: {} });
+    const newTheme = studioDom.createNode(dom, 'theme', {
+      name: 'Theme',
+      theme: {},
+      attributes: {},
+    });
     domApi.addNode(newTheme, app, 'themes');
   };
 

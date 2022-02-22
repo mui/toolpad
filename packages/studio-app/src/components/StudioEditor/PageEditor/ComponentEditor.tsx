@@ -27,7 +27,7 @@ interface ComponentPropsEditorProps<P> {
 
 function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
   const dom = useDom();
-  const definition = getStudioComponent(dom, node.component);
+  const definition = getStudioComponent(dom, node.attributes.component.value);
 
   return (
     <ComponentPropsEditorRoot>
@@ -52,7 +52,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const { viewState } = usePageEditorState();
   const nodeError = viewState.nodes[node.id]?.error;
 
-  const component = useStudioComponent(dom, node.component);
+  const component = useStudioComponent(dom, node.attributes.component.value);
 
   return (
     <React.Fragment>

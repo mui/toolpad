@@ -443,7 +443,7 @@ interface SelectionHudProps {
 
 function NodeHud({ node, selected, allowInteraction, rect, onDragStart }: SelectionHudProps) {
   const dom = useDom();
-  const component = useStudioComponent(dom, node.component);
+  const component = useStudioComponent(dom, node.attributes.component.value);
   return (
     <div
       draggable

@@ -1,4 +1,5 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
+import React from 'react';
 import { QueryFunction, useQuery } from 'react-query';
 
 type ObjectPath = string[];
@@ -96,16 +97,23 @@ export interface UseFetchedState {
   error: any;
 }
 
-export default function useFetchedState(input: FetchFetchedStateParams): UseFetchedState {
+export default function useFetchedState(
+  setResult: React.Dispatch<React.SetStateAction<UseFetchedState>>,
+  input: FetchFetchedStateParams,
+) {
   const { isLoading: loading, error, data } = useQuery([input], fetchFetchedState);
 
   const { columns = [], rows = [], raw } = data || {};
 
-  return {
-    loading,
-    columns,
-    raw,
-    rows,
-    error,
-  };
+  React.useEffect(
+    () =>
+      setResult({
+        loading,
+        columns,
+        raw,
+        rows,
+        error,
+      }),
+    [setResult, loading, columns, raw, rows, error],
+  );
 }

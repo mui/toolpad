@@ -15,13 +15,14 @@ export function getQueryNodeArgTypes(
   dom: studioDom.StudioDom,
   node: studioDom.StudioQueryStateNode,
 ): ArgTypeDefinitions {
-  const apiNode = node.api ? studioDom.getNode(dom, node.api, 'api') : null;
+  const apiNodeId = node.attributes.api.value;
+  const apiNode = apiNodeId ? studioDom.getNode(dom, apiNodeId, 'api') : null;
   if (!apiNode) {
-    console.warn(`Can't resolve API node "${node.api}" from query "${node.id}"`);
+    console.warn(`Can't resolve API node "${apiNodeId}" from query "${node.id}"`);
     return {};
   }
-  const dataSource = studioConnections[apiNode.connectionType];
-  return dataSource?.getArgTypes?.(apiNode.query) || {};
+  const dataSource = studioConnections[apiNode.attributes.connectionType.value];
+  return dataSource?.getArgTypes?.(apiNode.attributes.query.value) || {};
 }
 
 export default studioConnections;

@@ -14,7 +14,7 @@ import NotFoundEditor from '../NotFoundEditor';
 function getDataSource<Q>(
   connection: studioDom.StudioConnectionNode,
 ): StudioDataSourceClient<any, Q> | null {
-  return dataSources[connection.dataSource] || null;
+  return dataSources[connection.attributes.dataSource.value] || null;
 }
 
 interface ApiEditorContentProps<Q> {
@@ -26,10 +26,14 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
   const domApi = useDomApi();
   const dom = useDom();
 
-  const [apiQuery, setApiQuery] = React.useState<Q>(apiNode.query);
-  const savedQuery = React.useRef(apiNode.query);
+  const [apiQuery, setApiQuery] = React.useState<Q>(apiNode.attributes.query.value);
+  const savedQuery = React.useRef(apiNode.attributes.query.value);
 
-  const connection = studioDom.getMaybeNode(dom, apiNode.connectionId as NodeId, 'connection');
+  const connection = studioDom.getMaybeNode(
+    dom,
+    apiNode.attributes.connectionId.value as NodeId,
+    'connection',
+  );
   const dataSource = connection && getDataSource<Q>(connection);
 
   const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
@@ -48,7 +52,7 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
     return (
       <NotFoundEditor
         className={className}
-        message={`Connection "${apiNode.connectionId}" not found`}
+        message={`Connection "${apiNode.attributes.connectionId.value}" not found`}
       />
     );
   }
@@ -57,7 +61,7 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
     return (
       <NotFoundEditor
         className={className}
-        message={`DataSource "${connection.dataSource}" not found`}
+        message={`DataSource "${connection.attributes.dataSource.value}" not found`}
       />
     );
   }
@@ -72,7 +76,12 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
                 if (typeof propName !== 'string' || !apiQuery[propName]) {
                   return;
                 }
-                domApi.setNodeAttribute(apiNode, 'query', apiQuery);
+                domApi.setNodeNamespacedProp(
+                  apiNode,
+                  'attributes',
+                  'query',
+                  studioDom.createConst(apiQuery),
+                );
               });
               savedQuery.current = apiQuery;
             }}

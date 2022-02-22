@@ -163,21 +163,23 @@ function DerivedStateNodeEditor<P>({ value, onChange }: DerivedStateNodeEditorPr
   const monacoRef = React.useRef<typeof monacoEditor>();
 
   const libSource = React.useMemo(() => {
-    const args = (Object.entries(value.argTypes) as ExactEntriesOf<PropValueTypes>).map(
-      ([propName, paramType]) => {
-        const tsType = paramType ? tsTypeForPropValueType(paramType) : 'unknown';
-        return `${propName}: ${tsType};`;
-      },
-    );
+    const args = (
+      Object.entries(value.attributes.argTypes.value) as ExactEntriesOf<PropValueTypes>
+    ).map(([propName, paramType]) => {
+      const tsType = paramType ? tsTypeForPropValueType(paramType) : 'unknown';
+      return `${propName}: ${tsType};`;
+    });
 
     return `
       declare interface ${DERIVED_STATE_PARAMS} {
         ${args.join('\n')}
       }
 
-      declare type ${DERIVED_STATE_RESULT} = ${tsTypeForPropValueType(value.returnType)}
+      declare type ${DERIVED_STATE_RESULT} = ${tsTypeForPropValueType(
+      value.attributes.returnType.value,
+    )}
     `;
-  }, [value.argTypes, value.returnType]);
+  }, [value.attributes.argTypes.value, value.attributes.returnType.value]);
 
   const libSourceDisposable = React.useRef<monacoEditor.IDisposable>();
   const setLibSource = React.useCallback(() => {
@@ -230,26 +232,55 @@ function DerivedStateNodeEditor<P>({ value, onChange }: DerivedStateNodeEditorPr
   const handleAddProp = React.useCallback(() => {
     onChange(
       update(value, {
-        argTypes: update(value.argTypes, {
-          [newPropName]: { type: 'string' },
-        } as Partial<PropValueTypes<keyof P & string>>),
+        attributes: update(value.attributes, {
+          argTypes: update(value.attributes.argTypes, {
+            value: update(value.attributes.argTypes.value, {
+              [newPropName]: { type: 'string' },
+            } as Partial<PropValueTypes<keyof P & string>>),
+          }),
+        }),
       }),
     );
     setnewPropName('');
   }, [onChange, value, newPropName]);
 
   const handlePropTypesChange = React.useCallback(
-    (argTypes: PropValueTypes<keyof P & string>) => onChange(update(value, { argTypes })),
+    (argTypes: PropValueTypes<keyof P & string>) =>
+      onChange(
+        update(value, {
+          attributes: update(value.attributes, {
+            argTypes: update(value.attributes.argTypes, { value: argTypes }),
+          }),
+        }),
+      ),
     [onChange, value],
   );
 
   const handleReturnTypeChange = React.useCallback(
-    (returnType: PropValueType) => onChange(update(value, { returnType })),
+    (returnType: PropValueType) =>
+      onChange(
+        update(value, {
+          attributes: update(value.attributes, {
+            returnType: update(value.attributes.returnType, { value: returnType }),
+          }),
+        }),
+      ),
     [onChange, value],
   );
 
   const handleCodeChange = React.useMemo(
-    () => debounce((code: string = '') => onChange(update(value, { code })), 240),
+    () =>
+      debounce(
+        (code: string = '') =>
+          onChange(
+            update(value, {
+              attributes: update(value.attributes, {
+                code: update(value.attributes.code, { value: code }),
+              }),
+            }),
+          ),
+        240,
+      ),
     [onChange, value],
   );
 
@@ -264,7 +295,7 @@ function DerivedStateNodeEditor<P>({ value, onChange }: DerivedStateNodeEditorPr
         nodeId={value.id}
         value={value.params}
         onChange={handleParamsChange}
-        argTypes={value.argTypes}
+        argTypes={value.attributes.argTypes.value}
         onArgTypesChange={handlePropTypesChange}
       />
       <Stack direction="row" alignItems="center" gap={1}>
@@ -274,7 +305,9 @@ function DerivedStateNodeEditor<P>({ value, onChange }: DerivedStateNodeEditorPr
           size="small"
         />
         <Button
-          disabled={!newPropName || Object.keys(value.argTypes).includes(newPropName)}
+          disabled={
+            !newPropName || Object.keys(value.attributes.argTypes.value).includes(newPropName)
+          }
           onClick={handleAddProp}
         >
           Add prop
@@ -283,11 +316,14 @@ function DerivedStateNodeEditor<P>({ value, onChange }: DerivedStateNodeEditorPr
 
       <Stack direction="row" alignItems="center" gap={1}>
         State type:
-        <PropValueTypeSelector value={value.returnType} onChange={handleReturnTypeChange} />
+        <PropValueTypeSelector
+          value={value.attributes.returnType.value}
+          onChange={handleReturnTypeChange}
+        />
       </Stack>
       <Editor
         height="200px"
-        value={value.code}
+        value={value.attributes.code.value}
         onChange={handleCodeChange}
         path="./component.tsx"
         language="typescript"
@@ -313,18 +349,20 @@ export default function DerivedStateEditor() {
 
   const handleCreate = React.useCallback(() => {
     const stateNode = studioDom.createNode(dom, 'derivedState', {
-      argTypes: {},
-      returnType: {
-        type: 'string',
-      },
       params: {},
-      code: `/**
- * TODO: comment explaining how to derive state...
- */
-
-export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DERIVED_STATE_RESULT} {
-  return 'Hello World!';
-}\n`,
+      attributes: {
+        argTypes: studioDom.createConst({}),
+        returnType: studioDom.createConst({
+          type: 'string',
+        }),
+        code: studioDom.createConst(`/**
+   * TODO: comment explaining how to derive state...
+   */
+  
+  export default function getDerivedState (params: ${DERIVED_STATE_PARAMS}): ${DERIVED_STATE_RESULT} {
+    return 'Hello World!';
+  }\n`),
+      },
     });
     domApi.addNode(stateNode, page, 'derivedStates');
     setEditedState(stateNode.id);

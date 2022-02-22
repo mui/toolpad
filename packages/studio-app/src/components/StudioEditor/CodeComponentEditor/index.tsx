@@ -31,7 +31,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const dom = useDom();
   const domApi = useDomApi();
 
-  const [input, setInput] = React.useState(codeComponentNode.code);
+  const [input, setInput] = React.useState(codeComponentNode.attributes.code.value);
   const [argTypes, setArgTypes] = React.useState<ArgTypeDefinitions>({});
 
   const updateDomActionRef = React.useRef(() => {});
@@ -40,8 +40,18 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     updateDomActionRef.current = () => {
       const pretty = tryFormat(input);
       setInput(pretty);
-      domApi.setNodeAttribute(codeComponentNode, 'code', pretty);
-      domApi.setNodeAttribute(codeComponentNode, 'argTypes', argTypes);
+      domApi.setNodeNamespacedProp(
+        codeComponentNode,
+        'attributes',
+        'code',
+        studioDom.createConst(pretty),
+      );
+      domApi.setNodeNamespacedProp(
+        codeComponentNode,
+        'attributes',
+        'argTypes',
+        studioDom.createConst(argTypes),
+      );
     };
   }, [domApi, codeComponentNode, input, argTypes]);
 
@@ -137,7 +147,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     <Stack sx={{ height: '100%' }}>
       <Toolbar>
         <Button
-          disabled={codeComponentNode.code === input}
+          disabled={codeComponentNode.attributes.code.value === input}
           onClick={() => updateDomActionRef.current()}
         >
           Update

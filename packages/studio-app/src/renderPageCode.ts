@@ -140,16 +140,18 @@ class Context implements RenderContext {
       }
     });
 
-    Object.entries(this.page.urlQuery || {}).forEach(([paramName, defaultValue]) => {
-      const [stateVar, setStateVar] = this.generateControlledStateVars(paramName);
+    Object.entries(this.page.attributes.urlQuery.value || {}).forEach(
+      ([paramName, defaultValue]) => {
+        const [stateVar, setStateVar] = this.generateControlledStateVars(paramName);
 
-      this.urlQueryStateHooks.set(`${this.page.id}.urlQuery.${paramName}`, {
-        paramName,
-        stateVar,
-        setStateVar,
-        defaultValue,
-      });
-    });
+        this.urlQueryStateHooks.set(`${this.page.id}.urlQuery.${paramName}`, {
+          paramName,
+          stateVar,
+          setStateVar,
+          defaultValue,
+        });
+      },
+    );
   }
 
   collectStateNode(
@@ -196,6 +198,10 @@ class Context implements RenderContext {
     return stateHook;
   }
 
+  getStudioComponent(node: studioDom.StudioElementNode) {
+    return getStudioComponent(this.dom, node.attributes.component.value);
+  }
+
   collectControlledStateProp(
     node: studioDom.StudioElementNode,
     propName: string,
@@ -206,7 +212,7 @@ class Context implements RenderContext {
 
     let stateHook = this.controlledStateHooks.get(stateId);
     if (!stateHook) {
-      const component = getStudioComponent(this.dom, node.component);
+      const component = this.getStudioComponent(node);
 
       const argType = component.argTypes[propName];
 
@@ -237,7 +243,7 @@ class Context implements RenderContext {
   }
 
   collectControlledStateProps(node: studioDom.StudioElementNode): void {
-    const component = getStudioComponent(this.dom, node.component);
+    const component = this.getStudioComponent(node);
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [propName, argType] of Object.entries(component.argTypes)) {
@@ -347,7 +353,7 @@ class Context implements RenderContext {
   }
 
   resolveElementProps(node: studioDom.StudioElementNode): ResolvedProps {
-    const component = getStudioComponent(this.dom, node.component);
+    const component = this.getStudioComponent(node);
 
     const result: ResolvedProps = this.resolveBindables(
       `${node.id}.props`,
@@ -481,7 +487,7 @@ class Context implements RenderContext {
   }
 
   renderElement(node: studioDom.StudioElementNode): PropExpression {
-    const component = getStudioComponent(this.dom, node.component);
+    const component = this.getStudioComponent(node);
 
     const resolvedProps = this.resolveElementProps(node);
     const resolvedChildren = this.resolveElementChildren(
@@ -670,7 +676,7 @@ class Context implements RenderContext {
           const resolvedParams = this.resolveBindables(
             `${node.id}.params`,
             node.params,
-            propValueTypesToArgTypes(node.argTypes),
+            propValueTypesToArgTypes(node.attributes.argTypes.value),
           );
           const paramsArg = this.renderPropsAsObject(resolvedParams);
           const depsArray = Object.values(resolvedParams).map((resolvedProp) =>
@@ -681,9 +687,9 @@ class Context implements RenderContext {
             'default',
             node.name,
           );
-          return `const ${
-            stateHook.stateVar
-          } = React.useMemo(() => ${derivedStateGetter}(${paramsArg}), [${depsArray.join(', ')}])`;
+          return `React.useEffect(() => ${
+            stateHook.setStateVar
+          }(${derivedStateGetter}(${paramsArg})), [${depsArray.join(', ')}])`;
         }
         case 'api': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
@@ -698,20 +704,20 @@ class Context implements RenderContext {
           const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
 
           return `${useDataQuery}(${stateHook.setStateVar}, ${JSON.stringify(
-            node.api,
+            node.attributes.api.value,
           )}, ${params});`;
         }
         case 'fetched': {
           const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
 
-          const url = this.resolveBindable(`${node.id}.url`, node.url, {
+          const url = this.resolveBindable(`${node.id}.url`, node.attributes.url, {
             typeDef: { type: 'string' },
           });
 
           const paramsExpr = this.renderPropsAsObject({
             url,
-            collectionPath: literalPropExpression(node.collectionPath),
-            fieldPaths: literalPropExpression(node.fieldPaths),
+            collectionPath: literalPropExpression(node.attributes.collectionPath.value),
+            fieldPaths: literalPropExpression(node.attributes.fieldPaths.value),
           });
 
           const useFetchedState = this.addImport(
@@ -720,7 +726,7 @@ class Context implements RenderContext {
             'useFetchedState',
           );
 
-          return `const ${stateHook.stateVar} = ${useFetchedState}(${paramsExpr});`;
+          return `${useFetchedState}(${stateHook.stateVar}, ${paramsExpr});`;
         }
         default:
           throw new Error(

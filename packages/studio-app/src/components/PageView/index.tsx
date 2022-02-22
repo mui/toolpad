@@ -43,7 +43,7 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
     return Object.fromEntries(
       codeComponents.map((component) => [
         `./components/${component.id}.tsx`,
-        { code: component.code },
+        { code: component.attributes.code.value },
       ]),
     );
   }, [dom]);
@@ -54,7 +54,7 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
     return Object.fromEntries(
       derivedStates.map((derivedState) => [
         `./derivedState/${derivedState.id}.ts`,
-        { code: derivedState.code },
+        { code: derivedState.attributes.code.value },
       ]),
     );
   }, [dom, pageNodeId]);

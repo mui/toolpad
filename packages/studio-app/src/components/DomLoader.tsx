@@ -40,12 +40,6 @@ export type DomAction =
       node: studioDom.StudioNode;
     }
   | {
-      type: 'DOM_SET_NODE_ATTR';
-      nodeId: NodeId;
-      attr: string;
-      value: unknown;
-    }
-  | {
       type: 'DOM_ADD_NODE';
       node: studioDom.StudioNode;
       parent: studioDom.StudioNode;
@@ -82,10 +76,6 @@ export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioD
     }
     case 'SAVE_NODE': {
       return studioDom.saveNode(dom, action.node);
-    }
-    case 'DOM_SET_NODE_ATTR': {
-      const node = studioDom.getNode(dom, action.nodeId);
-      return studioDom.setNodeAttribute<any, any>(dom, node, action.attr, action.value);
     }
     case 'DOM_ADD_NODE': {
       return studioDom.addNode<any, any>(
@@ -215,18 +205,6 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         node,
         prop,
         value: value as StudioBindable<unknown> | null,
-      });
-    },
-    setNodeAttribute<N extends studioDom.StudioNode, K extends studioDom.Attributes<N>>(
-      node: N,
-      attr: K,
-      value: N[K],
-    ) {
-      dispatch({
-        type: 'DOM_SET_NODE_ATTR',
-        nodeId: node.id,
-        attr,
-        value,
       });
     },
   };

@@ -710,23 +710,6 @@ export function fromConstPropValues<P>(props: StudioBindables<P>): Partial<P> {
   return result;
 }
 
-export type Attributes<N extends StudioNode> = Exclude<keyof N & string, keyof StudioNodeBase>;
-
-export function setNodeAttribute<N extends StudioNode, K extends Attributes<N>>(
-  dom: StudioDom,
-  node: N,
-  attribute: K,
-  value: N[K],
-): StudioDom {
-  const updates: Partial<N> = {};
-  updates[attribute] = value;
-  return update(dom, {
-    nodes: update(dom.nodes, {
-      [node.id]: update(node, updates),
-    }),
-  });
-}
-
 const nodeByNameCache = new WeakMap<StudioDom, Map<string, NodeId>>();
 function getNodeIdByNameIndex(dom: StudioDom): Map<string, NodeId> {
   let cached = nodeByNameCache.get(dom);

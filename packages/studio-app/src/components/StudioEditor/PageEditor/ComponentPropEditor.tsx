@@ -65,12 +65,7 @@ export function BindableEditor<V>({
     return liveBinding?.value;
   }, [liveBinding, value]);
 
-  const [constValue, setConstValue] = React.useState(initConstValue);
-
-  React.useEffect(() => {
-    setConstValue(initConstValue());
-    return () => {};
-  }, [value, initConstValue]);
+  const constValue = React.useMemo(initConstValue, [value, initConstValue]);
 
   const hasBinding = value && value.type !== 'const';
 

@@ -643,17 +643,6 @@ export function moveNode(
   return setNodeParent(dom, node, parentId, parentProp, parentIndex);
 }
 
-export function saveNode(dom: StudioDom, node: StudioNode) {
-  return update(dom, {
-    nodes: update(dom.nodes, {
-      [node.id]: update(
-        dom.nodes[node.id],
-        omit(node, 'id', 'type', 'name', 'parentId', 'parentProp', 'parentIndex'),
-      ),
-    }),
-  });
-}
-
 export function removeNode(dom: StudioDom, nodeId: NodeId) {
   const node = getNode(dom, nodeId);
   const parent = getParent(dom, node);

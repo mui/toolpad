@@ -100,33 +100,34 @@ export function BindableEditor<V>({
   );
 }
 
-export interface ComponentPropEditorProps<P, K extends keyof P> {
-  node: studioDom.StudioElementNode<P>;
-  propName: K;
+export interface NodeAttributeEditorProps {
+  node: studioDom.StudioNode;
+  namespace?: string;
+  name: string;
   argType: ArgTypeDefinition;
 }
 
-export default function ComponentPropEditor<P, K extends keyof P & string>({
+export default function NodeAttributeEditor({
   node,
-  propName,
+  namespace = 'attributes',
+  name,
   argType,
-}: ComponentPropEditorProps<P, K>) {
+}: NodeAttributeEditorProps) {
   const domApi = useDomApi();
-  const propNamespace = 'props';
 
   const handlePropChange = React.useCallback(
-    (newValue: StudioBindable<P[K]> | null) => {
-      domApi.setNodeNamespacedProp(node, propNamespace, propName, newValue);
+    (newValue: StudioBindable<unknown> | null) => {
+      domApi.setNodeNamespacedProp(node, namespace as any, name, newValue);
     },
-    [domApi, node, propName],
+    [domApi, node, namespace, name],
   );
 
-  const propValue = node.props[propName] ?? null;
+  const propValue: StudioBindable<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   return (
     <BindableEditor
-      propNamespace={propNamespace}
-      propName={propName}
+      propNamespace={namespace}
+      propName={name}
       argType={argType}
       nodeId={node.id}
       value={propValue}

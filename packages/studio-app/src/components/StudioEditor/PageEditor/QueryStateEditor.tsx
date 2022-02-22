@@ -24,7 +24,7 @@ import * as studioDom from '../../../studioDom';
 import { NodeId, StudioBindable, StudioBindables } from '../../../types';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { getQueryNodeArgTypes } from '../../../studioDataSources/client';
-import { BindableEditor } from './ComponentPropEditor';
+import { BindableEditor } from './NodeAttributeEditor';
 import NodeNameEditor from './NodeNameEditor';
 
 interface ParamsEditorProps<Q> extends WithControlledProp<StudioBindables<Q>> {

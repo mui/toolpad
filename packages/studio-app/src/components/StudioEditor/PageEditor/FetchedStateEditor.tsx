@@ -21,7 +21,7 @@ import { usePageEditorState } from './PageEditorProvider';
 import * as studioDom from '../../../studioDom';
 import { NodeId, StudioBindable } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
-import { BindableEditor } from './ComponentPropEditor';
+import { BindableEditor } from './NodeAttributeEditor';
 import StringRecordEditor from '../../StringRecordEditor';
 
 const URL_ARGTYPE: ArgTypeDefinition = {

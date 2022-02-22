@@ -7,6 +7,7 @@ import {
   StudioBindables,
   ConnectionStatus,
   StudioTheme,
+  StudioConstants,
 } from './types';
 import { omit, update } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
@@ -34,8 +35,7 @@ export type StudioNodeType =
   | 'element'
   | 'codeComponent'
   | 'derivedState'
-  | 'queryState'
-  | 'fetchedState';
+  | 'queryState';
 
 export interface StudioNodeBase {
   readonly id: NodeId;
@@ -44,6 +44,7 @@ export interface StudioNodeBase {
   readonly parentId: NodeId | null;
   readonly parentProp: string | null;
   readonly parentIndex: string | null;
+  readonly attributes: {};
 }
 
 export interface StudioAppNode extends StudioNodeBase {
@@ -58,55 +59,62 @@ export interface StudioThemeNode extends StudioNodeBase {
 
 export interface StudioConnectionNode<P = unknown> extends StudioNodeBase {
   readonly type: 'connection';
-  readonly dataSource: string;
-  readonly params: P;
-  readonly status: ConnectionStatus | null;
+  readonly attributes: {
+    readonly dataSource: StudioConstant<string>;
+    readonly params: StudioConstant<P>;
+    readonly status: StudioConstant<ConnectionStatus | null>;
+  };
 }
 
 export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
   readonly type: 'api';
-  readonly connectionId: string;
-  readonly connectionType: string;
-  readonly query: Q;
+  readonly attributes: {
+    readonly connectionId: StudioConstant<string>;
+    readonly connectionType: StudioConstant<string>;
+    readonly query: StudioConstant<Q>;
+  };
 }
 
 export interface StudioPageNode extends StudioNodeBase {
   readonly type: 'page';
-  readonly title: string;
-  readonly urlQuery: Record<string, string>;
+  readonly attributes: {
+    readonly title: StudioConstant<string>;
+    readonly urlQuery: StudioConstant<Record<string, string>>;
+  };
 }
 
 export interface StudioElementNode<P = any> extends StudioNodeBase {
   readonly type: 'element';
-  readonly component: string;
+  readonly attributes: {
+    readonly component: StudioConstant<string>;
+  };
   readonly props: StudioBindables<P>;
 }
 
 export interface StudioCodeComponentNode extends StudioNodeBase {
   readonly type: 'codeComponent';
-  readonly code: string;
-  readonly argTypes: ArgTypeDefinitions;
+  readonly attributes: {
+    readonly code: StudioConstant<string>;
+    readonly argTypes: StudioConstant<ArgTypeDefinitions>;
+  };
 }
 
 export interface StudioDerivedStateNode<P = any> extends StudioNodeBase {
   readonly type: 'derivedState';
-  readonly code: string;
   readonly params: StudioBindables<P>;
-  readonly argTypes: PropValueTypes<keyof P & string>;
-  readonly returnType: PropValueType;
+  readonly attributes: {
+    readonly code: StudioConstant<string>;
+    readonly argTypes: StudioConstant<PropValueTypes<keyof P & string>>;
+    readonly returnType: StudioConstant<PropValueType>;
+  };
 }
 
 export interface StudioQueryStateNode<P = any> extends StudioNodeBase {
   readonly type: 'queryState';
-  readonly api: NodeId | null;
+  readonly attributes: {
+    readonly api: StudioConstant<NodeId | null>;
+  };
   readonly params: StudioBindables<P>;
-}
-
-export interface StudioFetchedStateNode extends StudioNodeBase {
-  readonly type: 'fetchedState';
-  readonly url: StudioBindable<string>;
-  readonly collectionPath: string;
-  readonly fieldPaths: Record<string, string>;
 }
 
 type StudioNodeOfType<K extends StudioNodeType> = {
@@ -119,7 +127,6 @@ type StudioNodeOfType<K extends StudioNodeType> = {
   codeComponent: StudioCodeComponentNode;
   derivedState: StudioDerivedStateNode;
   queryState: StudioQueryStateNode;
-  fetchedState: StudioFetchedStateNode;
 }[K];
 
 type AllowedChildren = {
@@ -137,7 +144,6 @@ type AllowedChildren = {
     children: 'element';
     derivedStates: 'derivedState';
     queryStates: 'queryState';
-    fetchedStates: 'fetchedState';
   };
   element: {
     [prop: string]: 'element';
@@ -145,7 +151,6 @@ type AllowedChildren = {
   codeComponent: {};
   derivedState: {};
   queryState: {};
-  fetchedState: {};
 };
 
 export type StudioNode = StudioNodeOfType<StudioNodeType>;
@@ -195,6 +200,16 @@ function assertIsType<T extends StudioNode>(node: StudioNode, type: T['type']): 
   if (!isType(node, type)) {
     throw new Error(`Invariant: expected node type "${type}" but got "${node.type}"`);
   }
+}
+
+export function createConst<V>(value: V): StudioConstant<V> {
+  return { type: 'const', value };
+}
+
+export function createConsts<P>(values: P): StudioConstants<P> {
+  return Object.fromEntries(
+    Object.entries(values).map(([key, value]) => [key, createConst(value)]),
+  ) as StudioConstants<P>;
 }
 
 export function getMaybeNode<T extends StudioNodeType>(
@@ -318,14 +333,6 @@ export function assertIsQueryState<P>(node: StudioNode): asserts node is StudioQ
   assertIsType<StudioQueryStateNode>(node, 'queryState');
 }
 
-export function isFetchedState(node: StudioNode): node is StudioFetchedStateNode {
-  return isType<StudioFetchedStateNode>(node, 'fetchedState');
-}
-
-export function assertIsFetchedState(node: StudioNode): asserts node is StudioFetchedStateNode {
-  assertIsType<StudioFetchedStateNode>(node, 'fetchedState');
-}
-
 export function getApp(dom: StudioDom): StudioAppNode {
   const rootNode = getNode(dom, dom.root);
   assertIsApp(rootNode);
@@ -391,28 +398,6 @@ function getNodeNames(dom: StudioDom): Set<string> {
   return new Set(Object.values(dom.nodes).map(({ name }) => name));
 }
 
-export function createElementInternal<P>(
-  dom: StudioDom,
-  id: NodeId,
-  component: string,
-  props: Partial<StudioBindables<P>> = {},
-  name?: string,
-): StudioElementNode {
-  const existingNames = getNodeNames(dom);
-  return {
-    id,
-    type: 'element',
-    parentId: null,
-    parentProp: null,
-    parentIndex: null,
-    component,
-    props,
-    name: name
-      ? generateUniqueString(name, existingNames)
-      : generateUniqueString(component, existingNames, true),
-  };
-}
-
 type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
   StudioNodeOfType<T>,
   'id' | 'type' | 'parentId' | 'parentProp' | 'parentIndex' | 'name'
@@ -452,6 +437,7 @@ export function createDom(): StudioDom {
     nodes: {
       [rootId]: createNodeInternal(rootId, 'app', {
         name: 'Application',
+        attributes: {},
       }),
     },
     root: rootId,
@@ -468,9 +454,11 @@ export function createElement<P>(
   name?: string,
 ): StudioElementNode {
   return createNode(dom, 'element', {
-    component,
     name: name || component,
     props,
+    attributes: {
+      component: createConst(component),
+    },
   });
 }
 
@@ -589,6 +577,21 @@ export function setNodeNamespacedProp<
   });
 }
 
+export function setNodeNamespace<Node extends StudioNode, Namespace extends PropNamespaces<Node>>(
+  dom: StudioDom,
+  node: Node,
+  namespace: Namespace,
+  value: Node[Namespace] | null,
+): StudioDom {
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: update(node, {
+        [namespace]: value ? (value as Partial<Node[Namespace]>) : {},
+      } as Partial<Node>),
+    }),
+  });
+}
+
 function setNodeParent<N extends StudioNode>(
   dom: StudioDom,
   node: N,
@@ -699,23 +702,6 @@ export function fromConstPropValues<P>(props: StudioBindables<P>): Partial<P> {
     }
   });
   return result;
-}
-
-export type Attributes<N extends StudioNode> = Exclude<keyof N & string, keyof StudioNodeBase>;
-
-export function setNodeAttribute<N extends StudioNode, K extends Attributes<N>>(
-  dom: StudioDom,
-  node: N,
-  attribute: K,
-  value: N[K],
-): StudioDom {
-  const updates: Partial<N> = {};
-  updates[attribute] = value;
-  return update(dom, {
-    nodes: update(dom.nodes, {
-      [node.id]: update(node, updates),
-    }),
-  });
 }
 
 const nodeByNameCache = new WeakMap<StudioDom, Map<string, NodeId>>();

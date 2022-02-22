@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as studioDom from '../studioDom';
-import { NodeId, StudioBindable } from '../types';
+import { NodeId, StudioBindable, StudioBindables } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
 import useDebounced from '../utils/useDebounced';
@@ -36,14 +36,14 @@ export type DomAction =
       value: StudioBindable<unknown> | null;
     }
   | {
-      type: 'SAVE_NODE';
+      type: 'DOM_SET_NODE_NAMESPACE';
       node: studioDom.StudioNode;
+      namespace: string;
+      value: StudioBindables<unknown> | null;
     }
   | {
-      type: 'DOM_SET_NODE_ATTR';
-      nodeId: NodeId;
-      attr: string;
-      value: unknown;
+      type: 'SAVE_NODE';
+      node: studioDom.StudioNode;
     }
   | {
       type: 'DOM_ADD_NODE';
@@ -80,12 +80,11 @@ export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioD
         action.value,
       );
     }
+    case 'DOM_SET_NODE_NAMESPACE': {
+      return studioDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
+    }
     case 'SAVE_NODE': {
       return studioDom.saveNode(dom, action.node);
-    }
-    case 'DOM_SET_NODE_ATTR': {
-      const node = studioDom.getNode(dom, action.nodeId);
-      return studioDom.setNodeAttribute<any, any>(dom, node, action.attr, action.value);
     }
     case 'DOM_ADD_NODE': {
       return studioDom.addNode<any, any>(
@@ -217,16 +216,15 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         value: value as StudioBindable<unknown> | null,
       });
     },
-    setNodeAttribute<N extends studioDom.StudioNode, K extends studioDom.Attributes<N>>(
-      node: N,
-      attr: K,
-      value: N[K],
-    ) {
+    setNodeNamespace<
+      Node extends studioDom.StudioNode,
+      Namespace extends studioDom.PropNamespaces<Node>,
+    >(node: Node, namespace: Namespace, value: Node[Namespace] | null) {
       dispatch({
-        type: 'DOM_SET_NODE_ATTR',
-        nodeId: node.id,
-        attr,
-        value,
+        type: 'DOM_SET_NODE_NAMESPACE',
+        namespace,
+        node,
+        value: value as StudioBindables<unknown> | null,
       });
     },
   };

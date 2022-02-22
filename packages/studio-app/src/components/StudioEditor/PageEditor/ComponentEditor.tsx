@@ -4,7 +4,7 @@ import { ArgTypeDefinitions } from '@mui/studio-core';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
-import ComponentPropEditor from './ComponentPropEditor';
+import NodeAttributeEditor from './NodeAttributeEditor';
 import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
@@ -27,7 +27,7 @@ interface ComponentPropsEditorProps<P> {
 
 function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
   const dom = useDom();
-  const definition = getStudioComponent(dom, node.component);
+  const definition = getStudioComponent(dom, node.attributes.component.value);
 
   return (
     <ComponentPropsEditorRoot>
@@ -35,7 +35,12 @@ function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
         ([propName, propTypeDef]) =>
           propTypeDef ? (
             <div key={propName} className={classes.control}>
-              <ComponentPropEditor node={node} propName={propName} argType={propTypeDef} />
+              <NodeAttributeEditor
+                node={node}
+                namespace="props"
+                name={propName}
+                argType={propTypeDef}
+              />
             </div>
           ) : null,
       )}
@@ -52,7 +57,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const { viewState } = usePageEditorState();
   const nodeError = viewState.nodes[node.id]?.error;
 
-  const component = useStudioComponent(dom, node.component);
+  const component = useStudioComponent(dom, node.attributes.component.value);
 
   return (
     <React.Fragment>

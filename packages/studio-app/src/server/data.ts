@@ -74,8 +74,10 @@ function createDefaultApp(): studioDom.StudioDom {
   let dom = studioDom.createDom();
   const page = studioDom.createNode(dom, 'page', {
     name: 'DefaultPage',
-    title: 'Default',
-    urlQuery: {},
+    attributes: {
+      title: studioDom.createConst('Default'),
+      urlQuery: studioDom.createConst({}),
+    },
   });
   const app = studioDom.getApp(dom);
   dom = studioDom.addNode(dom, page, app, 'pages');
@@ -170,10 +172,13 @@ export async function loadApp(): Promise<studioDom.StudioDom> {
 function fromDomConnection<P>(
   domConnection: studioDom.StudioConnectionNode<P>,
 ): StudioConnection<P> {
-  const { dataSource } = domConnection;
+  const { attributes, id, name } = domConnection;
   return {
-    ...domConnection,
-    type: dataSource,
+    id,
+    name,
+    type: attributes.dataSource.value,
+    params: attributes.params.value,
+    status: attributes.status.value,
   };
 }
 
@@ -198,10 +203,12 @@ export async function addConnection({
   const dom = await loadApp();
   const app = studioDom.getApp(dom);
   const newConnection = studioDom.createNode(dom, 'connection', {
-    dataSource: type,
-    params,
     name,
-    status,
+    attributes: {
+      dataSource: studioDom.createConst(type),
+      params: studioDom.createConst(params),
+      status: studioDom.createConst(status),
+    },
   });
 
   const newDom = studioDom.addNode(dom, newConnection, app, 'connections');
@@ -224,18 +231,18 @@ export async function updateConnection({
 }: Updates<StudioConnection>): Promise<StudioConnection> {
   const dom = await loadApp();
   const existing = studioDom.getNode(dom, id as NodeId, 'connection');
-  const updates = { ...existing };
-  if (params !== undefined) {
-    updates.params = params;
-  }
+  const updates = { ...existing, attributes: { ...existing.attributes } };
   if (name !== undefined) {
     updates.name = name;
   }
+  if (params !== undefined) {
+    updates.attributes.params = studioDom.createConst(params);
+  }
   if (status !== undefined) {
-    updates.status = status;
+    updates.attributes.status = studioDom.createConst(status);
   }
   if (type !== undefined) {
-    updates.dataSource = type;
+    updates.attributes.dataSource = studioDom.createConst(type);
   }
   const newDom = studioDom.saveNode(dom, updates);
   await saveApp(newDom);
@@ -254,26 +261,26 @@ export async function testConnection(connection: StudioConnection): Promise<Conn
 export async function testConnection2(
   connection: studioDom.StudioConnectionNode,
 ): Promise<ConnectionStatus> {
-  const dataSource = studioDataSources[connection.dataSource];
+  const dataSource = studioDataSources[connection.attributes.dataSource.value];
   if (!dataSource) {
     return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
   }
-  return dataSource.test(connection);
+  return dataSource.test(fromDomConnection(connection));
 }
 
 export async function execApi<Q>(
   api: studioDom.StudioApiNode<Q>,
   params: Q,
 ): Promise<StudioApiResult<any>> {
-  const connection = await getConnection(api.connectionId);
+  const connection = await getConnection(api.attributes.connectionId.value);
   const dataSource: StudioDataSourceServer<any, Q, any> | undefined =
     studioDataSources[connection.type];
 
   if (!dataSource) {
     throw new Error(
-      `Unknown connection type "${connection.type}" for connection "${api.connectionId}"`,
+      `Unknown connection type "${connection.type}" for connection "${connection.id}"`,
     );
   }
 
-  return dataSource.exec(connection, api.query, params);
+  return dataSource.exec(connection, api.attributes.query.value, params);
 }

@@ -17,11 +17,14 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
-  const [input, setInput] = React.useState(page.urlQuery || {});
-  React.useEffect(() => setInput(page.urlQuery || {}), [page.urlQuery]);
+  const [input, setInput] = React.useState(page.attributes.urlQuery.value || {});
+  React.useEffect(
+    () => setInput(page.attributes.urlQuery.value || {}),
+    [page.attributes.urlQuery.value],
+  );
 
   const handleSave = React.useCallback(() => {
-    domApi.setNodeAttribute(page, 'urlQuery', input);
+    domApi.setNodeNamespacedProp(page, 'attributes', 'urlQuery', studioDom.createConst(input));
   }, [domApi, page, input]);
 
   return (
@@ -40,7 +43,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
           />
         </DialogContent>
         <DialogActions>
-          <Button disabled={page.urlQuery === input} onClick={handleSave}>
+          <Button disabled={page.attributes.urlQuery.value === input} onClick={handleSave}>
             Save
           </Button>
         </DialogActions>

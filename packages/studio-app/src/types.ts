@@ -61,6 +61,8 @@ export type StudioBindable<V> =
   | StudioBoundExpression
   | StudioJsExpressionBinding;
 
+export type StudioConstants<P> = { [K in keyof P]: StudioConstant<P[K]> };
+
 export type StudioBindables<P> = {
   readonly [K in keyof P]?: StudioBindable<P[K]>;
 };

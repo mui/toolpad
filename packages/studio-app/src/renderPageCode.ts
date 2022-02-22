@@ -11,13 +11,6 @@ import { getQueryNodeArgTypes } from './studioDataSources/client';
 import { tryFormat } from './utils/prettier';
 import { RenderContext } from './studioComponents/studioComponentDefinition';
 
-function literalPropExpression(value: any): PropExpression {
-  return {
-    type: 'expression',
-    value: JSON.stringify(value),
-  };
-}
-
 function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes {
   return Object.fromEntries(
     Object.entries(argTypes).flatMap(([propName, argType]) =>
@@ -131,11 +124,7 @@ class Context implements RenderContext {
     nodes.forEach((node) => {
       if (studioDom.isElement(node)) {
         this.collectControlledStateProps(node);
-      } else if (
-        studioDom.isDerivedState(node) ||
-        studioDom.isQueryState(node) ||
-        studioDom.isFetchedState(node)
-      ) {
+      } else if (studioDom.isDerivedState(node) || studioDom.isQueryState(node)) {
         this.collectStateNode(node);
       }
     });
@@ -155,10 +144,7 @@ class Context implements RenderContext {
   }
 
   collectStateNode(
-    node:
-      | studioDom.StudioDerivedStateNode
-      | studioDom.StudioQueryStateNode
-      | studioDom.StudioFetchedStateNode,
+    node: studioDom.StudioDerivedStateNode | studioDom.StudioQueryStateNode,
   ): StateHook {
     let stateHook = this.stateHooks.get(node.id);
     if (!stateHook) {
@@ -176,15 +162,6 @@ class Context implements RenderContext {
       } else if (studioDom.isQueryState(node)) {
         stateHook = {
           type: 'api',
-          nodeId: node.id,
-          nodeName: node.name,
-          stateVar,
-          setStateVar,
-        };
-        this.stateHooks.set(node.id, stateHook);
-      } else if (studioDom.isFetchedState(node)) {
-        stateHook = {
-          type: 'fetched',
           nodeId: node.id,
           nodeName: node.name,
           stateVar,
@@ -709,27 +686,6 @@ class Context implements RenderContext {
           return `${useDataQuery}(${stateHook.setStateVar}, ${JSON.stringify(
             node.attributes.api.value,
           )}, ${params});`;
-        }
-        case 'fetched': {
-          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'fetchedState');
-
-          const url = this.resolveBindable(`${node.id}.url`, node.attributes.url, {
-            typeDef: { type: 'string' },
-          });
-
-          const paramsExpr = this.renderPropsAsObject({
-            url,
-            collectionPath: literalPropExpression(node.attributes.collectionPath.value),
-            fieldPaths: literalPropExpression(node.attributes.fieldPaths.value),
-          });
-
-          const useFetchedState = this.addImport(
-            '@mui/studio-core',
-            'useFetchedState',
-            'useFetchedState',
-          );
-
-          return `${useFetchedState}(${stateHook.stateVar}, ${paramsExpr});`;
         }
         default:
           throw new Error(

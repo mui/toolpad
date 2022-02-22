@@ -35,8 +35,7 @@ export type StudioNodeType =
   | 'element'
   | 'codeComponent'
   | 'derivedState'
-  | 'queryState'
-  | 'fetchedState';
+  | 'queryState';
 
 export interface StudioNodeBase {
   readonly id: NodeId;
@@ -118,15 +117,6 @@ export interface StudioQueryStateNode<P = any> extends StudioNodeBase {
   readonly params: StudioBindables<P>;
 }
 
-export interface StudioFetchedStateNode extends StudioNodeBase {
-  readonly type: 'fetchedState';
-  readonly attributes: {
-    readonly url: StudioBindable<string>;
-    readonly collectionPath: StudioConstant<string>;
-    readonly fieldPaths: StudioConstant<Record<string, string>>;
-  };
-}
-
 type StudioNodeOfType<K extends StudioNodeType> = {
   app: StudioAppNode;
   connection: StudioConnectionNode;
@@ -137,7 +127,6 @@ type StudioNodeOfType<K extends StudioNodeType> = {
   codeComponent: StudioCodeComponentNode;
   derivedState: StudioDerivedStateNode;
   queryState: StudioQueryStateNode;
-  fetchedState: StudioFetchedStateNode;
 }[K];
 
 type AllowedChildren = {
@@ -344,14 +333,6 @@ export function isQueryState<P>(node: StudioNode): node is StudioQueryStateNode<
 
 export function assertIsQueryState<P>(node: StudioNode): asserts node is StudioQueryStateNode<P> {
   assertIsType<StudioQueryStateNode>(node, 'queryState');
-}
-
-export function isFetchedState(node: StudioNode): node is StudioFetchedStateNode {
-  return isType<StudioFetchedStateNode>(node, 'fetchedState');
-}
-
-export function assertIsFetchedState(node: StudioNode): asserts node is StudioFetchedStateNode {
-  assertIsType<StudioFetchedStateNode>(node, 'fetchedState');
 }
 
 export function getApp(dom: StudioDom): StudioAppNode {

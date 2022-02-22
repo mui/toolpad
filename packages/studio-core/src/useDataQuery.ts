@@ -34,14 +34,16 @@ const EMPTY_OBJECT: any = {};
 
 export function useDataQuery(
   setResult: React.Dispatch<React.SetStateAction<UseDataQuery>>,
-  queryId: string,
+  queryId: string | null,
   params: any,
 ): void {
   const {
     isLoading: loading,
     error,
     data: responseData = EMPTY_OBJECT,
-  } = useQuery([queryId, params], () => fetchData(queryId, params));
+  } = useQuery([queryId, params], () => queryId && fetchData(queryId, params), {
+    enabled: !!queryId,
+  });
 
   const { fields, data } = responseData;
 

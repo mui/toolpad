@@ -21,37 +21,29 @@ import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import * as studioDom from '../../../studioDom';
-import { NodeId, StudioBindable, StudioBindables } from '../../../types';
-import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
+import { NodeId } from '../../../types';
+import { ExactEntriesOf } from '../../../utils/types';
 import { getQueryNodeArgTypes } from '../../../studioDataSources/client';
-import { BindableEditor } from './NodeAttributeEditor';
+import NodeAttributeEditor from './NodeAttributeEditor';
 import NodeNameEditor from './NodeNameEditor';
 
-interface ParamsEditorProps<Q> extends WithControlledProp<StudioBindables<Q>> {
-  nodeId: NodeId;
+interface ParamsEditorProps<Q> {
+  node: studioDom.StudioNode;
   argTypes: ArgTypeDefinitions<Q>;
 }
 
-function ParamsEditor<Q>({ value, onChange, nodeId, argTypes }: ParamsEditorProps<Q>) {
-  const handleChange = React.useCallback(
-    (propName: keyof Q & string) => (newValue: StudioBindable<Q[typeof propName]> | null) => {
-      onChange({ ...value, [propName]: newValue });
-    },
-    [onChange, value],
-  );
+function ParamsEditor<Q>({ node, argTypes }: ParamsEditorProps<Q>) {
   return (
     <Stack spacing={1}>
       {(Object.entries(argTypes) as ExactEntriesOf<ArgTypeDefinitions<Q>>).map(
         ([propName, propTypeDef]) =>
           propTypeDef ? (
             <div key={propName}>
-              <BindableEditor
-                propNamespace={'params'}
-                propName={propName}
-                nodeId={nodeId}
+              <NodeAttributeEditor
+                node={node}
+                namespace="params"
+                name={propName}
                 argType={propTypeDef}
-                value={value[propName] || null}
-                onChange={handleChange(propName)}
               />
             </div>
           ) : null,
@@ -78,44 +70,34 @@ function PreviewQueryStateResult({ node }: PreviewQueryStateResultProps) {
   );
 }
 
-interface QueryStateNodeEditorProps<P>
-  extends WithControlledProp<studioDom.StudioQueryStateNode<P>> {}
+interface QueryStateNodeEditorProps<P> {
+  node: studioDom.StudioQueryStateNode<P>;
+}
 
-function QueryStateNodeEditor<P>({ value, onChange }: QueryStateNodeEditorProps<P>) {
+function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
   const dom = useDom();
+  const domApi = useDomApi();
   const app = studioDom.getApp(dom);
   const { apis = [] } = studioDom.getChildNodes(dom, app);
 
   const handleSelectionChange = React.useCallback(
     (event: SelectChangeEvent<'' | NodeId>) => {
-      onChange({
-        ...value,
-        attributes: {
-          ...value.attributes,
-          api: studioDom.createConst(event.target.value ? (event.target.value as NodeId) : null),
-        },
-      });
+      const apiNodeId = event.target.value ? (event.target.value as NodeId) : null;
+      domApi.setNodeNamespacedProp(node, 'attributes', 'api', studioDom.createConst(apiNodeId));
     },
-    [onChange, value],
+    [domApi, node],
   );
 
-  const handleParamsChange = React.useCallback(
-    (newParams: StudioBindables<P>) => {
-      onChange({ ...value, params: newParams });
-    },
-    [onChange, value],
-  );
-
-  const argTypes = getQueryNodeArgTypes(dom, value);
+  const argTypes = getQueryNodeArgTypes(dom, node);
 
   return (
     <React.Fragment>
       <Stack spacing={1} py={1}>
-        <NodeNameEditor node={value} />
+        <NodeNameEditor node={node} />
         <FormControl fullWidth size="small">
           <InputLabel id={`select-data-query`}>Query</InputLabel>
           <Select
-            value={value.attributes.api.value || ''}
+            value={node.attributes.api.value || ''}
             labelId="select-data-query"
             label="Query"
             onChange={handleSelectionChange}
@@ -129,13 +111,8 @@ function QueryStateNodeEditor<P>({ value, onChange }: QueryStateNodeEditorProps<
             ))}
           </Select>
         </FormControl>
-        <ParamsEditor
-          nodeId={value.id}
-          value={value.params}
-          argTypes={argTypes}
-          onChange={handleParamsChange}
-        />
-        <PreviewQueryStateResult node={value} />
+        <ParamsEditor node={node} argTypes={argTypes} />
+        <PreviewQueryStateResult node={node} />
       </Stack>
     </React.Fragment>
   );
@@ -164,11 +141,6 @@ export default function QueryStateEditor() {
 
   // To keep it around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);
-
-  const handleSave = React.useCallback(
-    (newValue: studioDom.StudioQueryStateNode) => domApi.saveNode(newValue),
-    [domApi],
-  );
 
   const handleRemove = React.useCallback(() => {
     if (editedStateNode) {
@@ -201,7 +173,7 @@ export default function QueryStateEditor() {
         >
           <DialogTitle>Edit Query State ({lastEditedStateNode.id})</DialogTitle>
           <DialogContent>
-            <QueryStateNodeEditor value={lastEditedStateNode} onChange={handleSave} />
+            <QueryStateNodeEditor node={lastEditedStateNode} />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleRemove}>Remove</Button>

@@ -15,7 +15,6 @@
   },
   "scripts": {
     "prettier": "node scripts/prettier.js",
-    "format": "node scripts/prettier.js && yarn prisma format",
     "deduplicate": "node scripts/deduplicate.js",
     "start": "cross-env FORCE_COLOR=1 lerna run --stream --scope @mui/studio start",
     "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/studio-core --scope @mui/studio-components --scope @mui/studio",

@@ -7,7 +7,7 @@
 - git
 - yarn
 - node.js
-- docker (unless you have a Postgres database ready to connect to)
+- docker
 
 ### Setting up your development environment:
 

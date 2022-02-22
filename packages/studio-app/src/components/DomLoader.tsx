@@ -193,8 +193,13 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
     setNodeNamespacedProp<
       Node extends studioDom.StudioNode,
       Namespace extends studioDom.PropNamespaces<Node>,
-      Prop extends keyof Node[Namespace] & string,
-    >(node: Node, namespace: Namespace, prop: Prop, value: Node[Namespace][Prop] | null) {
+      Prop extends keyof NonNullable<Node[Namespace]> & string,
+    >(
+      node: Node,
+      namespace: Namespace,
+      prop: Prop,
+      value: NonNullable<Node[Namespace]>[Prop] | null,
+    ) {
       dispatch({
         type: 'DOM_SET_NODE_PROP',
         namespace,

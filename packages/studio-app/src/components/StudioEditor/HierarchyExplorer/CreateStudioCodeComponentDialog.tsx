@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { format } from '../../../utils/prettier';
+import DialogForm from '../../DialogForm';
 
 function createDefaultCodeComponent(name: string): string {
   const componentId = name.replace(/\s/g, '');
@@ -55,7 +56,7 @@ export default function CreateStudioCodeComponentDialog({
 
   return (
     <Dialog {...props} onClose={onClose}>
-      <form
+      <DialogForm
         onSubmit={(e) => {
           e.preventDefault();
           console.log('name', name);
@@ -70,11 +71,6 @@ export default function CreateStudioCodeComponentDialog({
           domApi.addNode(newNode, appNode, 'codeComponents');
           onClose();
           navigate(`/codeComponents/${newNode.id}`);
-        }}
-        style={{
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
         }}
       >
         <DialogTitle>Create a new MUI Studio Code Component</DialogTitle>
@@ -93,7 +89,7 @@ export default function CreateStudioCodeComponentDialog({
             Create
           </Button>
         </DialogActions>
-      </form>
+      </DialogForm>
     </Dialog>
   );
 }

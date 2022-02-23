@@ -1,7 +1,14 @@
 import { NextApiHandler } from 'next';
 import { AsyncLocalStorage } from 'async_hooks';
 import type { IncomingMessage, ServerResponse } from 'http';
-import { testConnection, execApi, loadDom, saveDom } from '../../src/server/data';
+import {
+  testConnection,
+  execApi,
+  loadDom,
+  saveDom,
+  createRelease,
+  getReleases,
+} from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
 const asyncLocalStorage = new AsyncLocalStorage<NextRpcContext>();
@@ -70,9 +77,12 @@ const rpcServer = {
       return execApi(...args);
     },
 
+    getReleases,
+
     loadDom,
   },
   mutation: {
+    createRelease,
     testConnection,
     saveDom,
   },

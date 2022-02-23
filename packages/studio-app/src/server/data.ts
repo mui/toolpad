@@ -126,6 +126,36 @@ export async function loadDom(): Promise<studioDom.StudioDom> {
   };
 }
 
+interface CreateReleaseParams {
+  version: string;
+  description: string;
+}
+
+export async function createRelease({ version, description }: CreateReleaseParams) {
+  const currentDom = await loadDom();
+  const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
+
+  await prisma.release.create({
+    data: {
+      version,
+      description,
+      snapshot,
+    },
+  });
+}
+
+export async function getReleases() {
+  return prisma.release.findMany({
+    select: {
+      id: true,
+      version: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
 function fromDomConnection<P>(
   domConnection: studioDom.StudioConnectionNode<P>,
 ): StudioConnection<P> {

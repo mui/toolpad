@@ -17,7 +17,6 @@
     "build:types": "ts-node ./scripts/typings.ts",
     "build:prisma": "prisma generate",
     "dev:prisma": "prisma generate --watch",
-    "dev:migrate": "prisma migrate dev",
     "prisma": "prisma"
   },
   "dependencies": {

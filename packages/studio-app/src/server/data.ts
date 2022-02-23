@@ -38,36 +38,46 @@ function createDefaultApp(): studioDom.StudioDom {
   return dom;
 }
 
+function serializeValue(value: unknown): string {
+  return value === undefined ? '' : JSON.stringify(value);
+}
+
+function deserializeValue(dbValue: string): unknown {
+  return dbValue.length <= 0 ? undefined : JSON.parse(dbValue);
+}
+
 export async function saveDom(app: studioDom.StudioDom): Promise<void> {
   await prisma.$transaction([
     prisma.domNodeAttribute.deleteMany(),
     prisma.domNode.deleteMany(),
-    ...(Object.entries(app.nodes) as ExactEntriesOf<studioDom.StudioNodes>).map(([id, node]) => {
-      const namespaces = omit(node, ...studioDom.RESERVED_NODE_PROPERTIES);
-      const attributesData = Object.entries(namespaces).flatMap(([namespace, attributes]) => {
-        return Object.entries(attributes).map(([attributeName, attributeValue]) => {
-          return {
-            namespace,
-            name: attributeName,
-            type: attributeValue.type,
-            value: attributeValue.value as any,
-          };
-        });
-      });
-
-      return prisma.domNode.create({
-        data: {
-          id,
+    prisma.domNode.createMany({
+      data: Array.from(Object.values(app.nodes) as studioDom.StudioNode[], (node) => {
+        return {
+          id: node.id,
           name: node.name,
           type: node.type,
           parentId: node.parentId || undefined,
           parentIndex: node.parentIndex || undefined,
           parentProp: node.parentProp || undefined,
-          attributes: {
-            createMany: { data: attributesData },
-          },
-        },
-      });
+        };
+      }),
+    }),
+    prisma.domNodeAttribute.createMany({
+      data: Object.values(app.nodes).flatMap((node: studioDom.StudioNode) => {
+        const namespaces = omit(node, ...studioDom.RESERVED_NODE_PROPERTIES);
+        const attributesData = Object.entries(namespaces).flatMap(([namespace, attributes]) => {
+          return Object.entries(attributes).map(([attributeName, attributeValue]) => {
+            return {
+              nodeId: node.id,
+              namespace,
+              name: attributeName,
+              type: attributeValue.type,
+              value: serializeValue(attributeValue.value),
+            };
+          });
+        });
+        return attributesData;
+      }),
     }),
   ]);
 }
@@ -102,7 +112,7 @@ export async function loadDom(): Promise<studioDom.StudioDom> {
             }
             result[attribute.namespace][attribute.name] = {
               type: attribute.type,
-              value: attribute.value,
+              value: deserializeValue(attribute.value),
             } as StudioBindable<unknown>;
             return result;
           }, {} as Record<string, Record<string, StudioBindable<unknown>>>),

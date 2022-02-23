@@ -2,9 +2,10 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client-js"
-  output        = "./generated/client"
-  binaryTargets = ["native", "linux-musl"]
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+  // TODO: we will need this when start building docker images
+  // binaryTargets = ["native", "linux-musl"]
 }
 
 datasource db {
@@ -51,7 +52,7 @@ model DomNodeAttribute {
   name      String
   node      DomNode              @relation("Attributes", fields: [nodeId], references: [id])
   type      DomNodeAttributeType
-  value     Json
+  value     String
 
   @@unique([nodeId, namespace, name])
   @@map("StudioDomNodeAttribute")

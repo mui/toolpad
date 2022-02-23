@@ -70,8 +70,8 @@ function handler(req: NextApiRequest, res: NextApiResponse): void {
   const client = createClient();
   let stage: ConnectionStage = 'CREATE';
 
-  if (req.query.type[1]) {
-    stage = req.query.type[1].toUpperCase() as ConnectionStage;
+  if (req.query.path[0]) {
+    stage = req.query.path[0].toUpperCase() as ConnectionStage;
   }
 
   const [state] = asArray(req.query.state);

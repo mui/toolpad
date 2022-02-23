@@ -1,6 +1,6 @@
 import { NextApiHandler } from 'next';
-import { asArray } from '../../../src/utils/collections';
-import studioConnections from '../../../src/studioDataSources/server';
+import { asArray } from '../../../../src/utils/collections';
+import studioConnections from '../../../../src/studioDataSources/server';
 
 const handlerMap = new Map<String, Function | null | undefined>();
 Object.keys(studioConnections).forEach((dataSource) => {
@@ -9,7 +9,7 @@ Object.keys(studioConnections).forEach((dataSource) => {
 
 export default (async (req, res) => {
   if (req.method === 'GET') {
-    const [dataSource] = asArray(req.query.type);
+    const [dataSource] = asArray(req.query.dataSource);
     const handler = handlerMap.get(dataSource);
     if (handler) {
       return handler(req, res);
@@ -20,3 +20,7 @@ export default (async (req, res) => {
     return res.status(405).json({ message: 'Method not supported' });
   }
 }) as NextApiHandler;
+
+// packages/studio-app/pages/api/dataSources/[dataSource]/[...path].ts
+// /api/dataSources/sheets/auth/login
+// /api/dataSources/sheets/auth/callback

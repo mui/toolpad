@@ -94,6 +94,7 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
           <NodeNameEditor node={apiNode} />
           <dataSource.QueryEditor
             value={apiQuery}
+            // connectionId={apiNode.connectionId}
             onChange={(newApiQuery) => setApiQuery(newApiQuery)}
           />
         </Stack>

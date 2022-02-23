@@ -14,10 +14,14 @@
 1. Start a local database:
 
    ```sh
-   docker-compose up -V
+   docker-compose up -d
    ```
 
-   You can skip this step if you already have a development database available by other means.
+   You can skip this step if you already have a development database available by other means. Use the following command to stop the running container:
+
+   ```sh
+   docker-compose stop
+   ```
 
 1. Install dependencies and start building the project in watch mode:
 

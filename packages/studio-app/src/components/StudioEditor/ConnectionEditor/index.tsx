@@ -67,7 +67,7 @@ function ConnectionEditorContent<P>({
     }
     try {
       setIsTesting(true);
-      const status = await client.mutation.testConnection2({
+      const status = await client.mutation.testConnection({
         ...connectionNode,
         attributes: {
           ...connectionNode.attributes,

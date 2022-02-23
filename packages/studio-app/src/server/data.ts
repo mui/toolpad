@@ -190,16 +190,7 @@ export async function updateConnection({
   return fromDomConnection(studioDom.getNode(dom, id as NodeId, 'connection'));
 }
 
-// TODO: replace with testConnection2
-export async function testConnection(connection: StudioConnection): Promise<ConnectionStatus> {
-  const dataSource = studioDataSources[connection.type];
-  if (!dataSource) {
-    return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
-  }
-  return dataSource.test(connection);
-}
-
-export async function testConnection2(
+export async function testConnection(
   connection: studioDom.StudioConnectionNode,
 ): Promise<ConnectionStatus> {
   const dataSource = studioDataSources[connection.attributes.dataSource.value];

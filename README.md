@@ -19,15 +19,10 @@
 
    You can skip this step if you already have a development database available by other means.
 
-1. Install dependencies:
+1. Install dependencies and start building the project in watch mode:
 
    ```sh
    yarn install
-   ```
-
-1. Start building the project in watch mode:
-
-   ```sh
    yarn dev
    ```
 

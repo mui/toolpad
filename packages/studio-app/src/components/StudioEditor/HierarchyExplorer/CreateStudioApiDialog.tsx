@@ -12,11 +12,9 @@ import {
   Typography,
 } from '@mui/material';
 import * as React from 'react';
-import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
-import client from '../../../api';
 
 export interface CreateStudioApiDialogProps {
   open: boolean;
@@ -29,7 +27,8 @@ export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudi
   const domApi = useDomApi();
   const navigate = useNavigate();
 
-  const connectionsQuery = useQuery('connections', client.query.getConnections);
+  const app = studioDom.getApp(dom);
+  const { connections = [] } = studioDom.getChildNodes(dom, app);
 
   const handleSelectionChange = React.useCallback((event: SelectChangeEvent<string>) => {
     setConnectionID(event.target.value);
@@ -40,9 +39,8 @@ export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudi
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          const connectionType = (connectionsQuery.data || []).find(
-            ({ id }) => id === connectionId,
-          )?.type;
+          const connectionType = connections.find(({ id }) => id === connectionId)?.attributes
+            .dataSource?.value;
           if (!connectionType) {
             throw new Error(
               `Invariant: can't find a datasource for existing connection "${connectionId}"`,
@@ -79,9 +77,9 @@ export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudi
               label="Connection"
               onChange={handleSelectionChange}
             >
-              {(connectionsQuery.data || []).map(({ id, type, name }) => (
-                <MenuItem key={id} value={id}>
-                  {name} | {type}
+              {connections.map((connection) => (
+                <MenuItem key={connection.id} value={connection.id}>
+                  {connection.name} | {connection.attributes.dataSource.value}
                 </MenuItem>
               ))}
             </Select>

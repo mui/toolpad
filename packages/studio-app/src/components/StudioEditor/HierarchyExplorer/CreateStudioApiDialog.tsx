@@ -39,18 +39,10 @@ export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudi
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          const connectionType = connections.find(({ id }) => id === connectionId)?.attributes
-            .dataSource?.value;
-          if (!connectionType) {
-            throw new Error(
-              `Invariant: can't find a datasource for existing connection "${connectionId}"`,
-            );
-          }
           const newApiNode = studioDom.createNode(dom, 'api', {
             attributes: {
               query: studioDom.createConst({}),
               connectionId: studioDom.createConst(connectionId),
-              connectionType: studioDom.createConst(connectionType),
             },
           });
           const appNode = studioDom.getApp(dom);

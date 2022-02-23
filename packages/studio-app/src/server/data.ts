@@ -11,7 +11,6 @@ import {
 } from '../types';
 import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
-import { ExactEntriesOf } from '../utils/types';
 import { omit } from '../utils/immutability';
 
 const prisma = new PrismaClient({

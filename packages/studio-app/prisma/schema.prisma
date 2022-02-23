@@ -57,8 +57,10 @@ model DomNodeAttribute {
 }
 
 model Release {
-  id       String @id
-  version  String @unique
-  notes    String
-  snapshot Bytes
+  id          Int      @id @default(autoincrement())
+  version     String   @unique
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  snapshot    Bytes
 }

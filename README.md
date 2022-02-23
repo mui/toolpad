@@ -47,6 +47,12 @@
 
 ### Notes:
 
+- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn cli` command, or by running
+
+  ```sh
+  yarn prisma db push
+  ```
+
 - In some cases, after the schema changes, the app may not start up and you may see the message:
 
   ```sh
@@ -57,9 +63,4 @@
 
   ```sh
   yarn prisma db push --accept-data-loss
-  ```
-
-- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn cli` command, or by running
-  ```sh
-  yarn prisma db push
   ```

@@ -2,7 +2,7 @@ import { ArgTypeDefinitions } from '@mui/studio-core';
 import movies from './movies/client';
 import postgres from './postgres/client';
 import rest from './rest/client';
-import { StudioDataSourceClient } from '../types';
+import { NodeId, StudioDataSourceClient } from '../types';
 import * as studioDom from '../studioDom';
 
 const studioConnections: { [key: string]: StudioDataSourceClient<any, any> | undefined } = {
@@ -24,7 +24,9 @@ export function getQueryNodeArgTypes(
     console.warn(`Can't resolve API node "${apiNodeId}" from query "${node.id}"`);
     return {};
   }
-  const dataSource = studioConnections[apiNode.attributes.connectionType.value];
+  const connectionNodeId = apiNode.attributes.connectionId.value as NodeId;
+  const connectionNode = studioDom.getNode(dom, connectionNodeId, 'connection');
+  const dataSource = studioConnections[connectionNode.attributes.dataSource.value];
   return dataSource?.getArgTypes?.(apiNode.attributes.query.value) || {};
 }
 

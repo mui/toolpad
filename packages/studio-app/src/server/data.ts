@@ -156,6 +156,16 @@ export async function getReleases() {
   });
 }
 
+export async function loadReleaseDom(version: string): Promise<studioDom.StudioDom> {
+  const release = await prisma.release.findUnique({
+    where: { version },
+  });
+  if (!release) {
+    throw new Error(`release doesn't exist`);
+  }
+  return JSON.parse(release.snapshot.toString('utf-8')) as studioDom.StudioDom;
+}
+
 function fromDomConnection<P>(
   domConnection: studioDom.StudioConnectionNode<P>,
 ): StudioConnection<P> {

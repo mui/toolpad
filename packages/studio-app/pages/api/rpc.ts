@@ -8,6 +8,7 @@ import {
   saveDom,
   createRelease,
   getReleases,
+  loadReleaseDom,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
@@ -55,6 +56,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       res.status(405).end();
       return;
     }
+    console.log(req.body);
     const { type, name, params } = req.body as RpcRequest;
     if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
       // This is important to avoid RCE
@@ -78,7 +80,7 @@ const rpcServer = {
     },
 
     getReleases,
-
+    loadReleaseDom,
     loadDom,
   },
   mutation: {

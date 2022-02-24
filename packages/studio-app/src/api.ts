@@ -52,7 +52,7 @@ function createResolver(endpoint: string, type: 'query' | 'mutation'): Methods {
 interface UseQueryFn<M extends Methods> {
   <K extends keyof M & string>(
     name: K,
-    params: Parameters<M[K]>,
+    params: Parameters<M[K]> | null,
     options?: Omit<
       UseQueryOptions<
         Awaited<ReturnType<M[K]>>,
@@ -85,12 +85,23 @@ function createClient<D extends Definition>(endpoint: string): ApiClient<D> {
   return {
     query,
     mutation,
-    useQuery: (key, params, options) =>
-      useQuery({
-        ...options,
-        queryKey: [key, params],
-        queryFn: query[key],
-      }),
+    useQuery: (key, params, options) => {
+      return useQuery(
+        {
+          ...options,
+          queryKey: [key, params],
+          queryFn: () => {
+            if (!params) {
+              throw new Error(`Invariant: 'enabled prop of useQuery should prevent this call'`);
+            }
+            return query[key](...params);
+          },
+        },
+        {
+          enabled: !!params,
+        },
+      );
+    },
     useMutation: (key, options) => useMutation((params) => mutation[key](...params), options),
   };
 }

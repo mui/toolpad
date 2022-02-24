@@ -59,7 +59,6 @@ export default function CreateStudioCodeComponentDialog({
       <DialogForm
         onSubmit={(e) => {
           e.preventDefault();
-          console.log('name', name);
           const newNode = studioDom.createNode(dom, 'codeComponent', {
             name,
             attributes: {

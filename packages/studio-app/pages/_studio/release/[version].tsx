@@ -1,4 +1,4 @@
-import { Container } from '@mui/material';
+import { Container, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@mui/x-data-grid-pro';
 import type { NextPage } from 'next';
@@ -9,6 +9,7 @@ import client from '../../../src/api';
 import * as studioDom from '../../../src/studioDom';
 import { asArray } from '../../../src/utils/collections';
 import { NodeId } from '../../../src/types';
+import StudioAppBar from '../../../src/components/StudioAppBar';
 
 interface NavigateToReleaseActionProps {
   version?: string;
@@ -54,17 +55,21 @@ const Home: NextPage = () => {
   );
 
   return (
-    <Container>
-      <Box sx={{ p: 3, height: 350, width: '100%' }}>
-        <DataGridPro
-          rows={pages}
-          columns={columns}
-          density="compact"
-          loading={isLoading}
-          error={(error as any)?.message}
-        />
-      </Box>
-    </Container>
+    <React.Fragment>
+      <StudioAppBar actions={null} />
+      <Container>
+        <Typography variant="h2">Release &quot;{version}&quot;</Typography>
+        <Box sx={{ my: 3, height: 350, width: '100%' }}>
+          <DataGridPro
+            rows={pages}
+            columns={columns}
+            density="compact"
+            loading={isLoading}
+            error={(error as any)?.message}
+          />
+        </Box>
+      </Container>
+    </React.Fragment>
   );
 };
 

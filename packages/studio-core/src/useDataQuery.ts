@@ -34,6 +34,7 @@ const EMPTY_OBJECT: any = {};
 
 export function useDataQuery(
   setResult: React.Dispatch<React.SetStateAction<UseDataQuery>>,
+  version: string | null,
   queryId: string | null,
   params: any,
 ): void {

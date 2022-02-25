@@ -11,7 +11,9 @@ export default (async (req, res) => {
   const [pageId] = asArray(req.query.pageId);
   const dom = await loadReleaseDom(version);
 
-  const { code: page } = renderPageCode(dom, pageId as NodeId);
+  const { code: page } = renderPageCode(dom, pageId as NodeId, {
+    release: null,
+  });
 
   const { code: compiled } = transform(page, {
     transforms: ['jsx', 'typescript'],

@@ -1,4 +1,4 @@
-import { Container } from '@mui/material';
+import { Container, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@mui/x-data-grid-pro';
 import type { NextPage } from 'next';
@@ -7,6 +7,7 @@ import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import DeleteIcon from '@mui/icons-material/Delete';
 import client from '../../../src/api';
 import { NextLinkComposed } from '../../../src/components/Link';
+import StudioAppBar from '../../../src/components/StudioAppBar';
 
 const Home: NextPage = () => {
   const { data: releases = [], isLoading, error, refetch } = client.useQuery('getReleases', []);
@@ -61,17 +62,21 @@ const Home: NextPage = () => {
   );
 
   return (
-    <Container>
-      <Box sx={{ p: 3, height: 350, width: '100%' }}>
-        <DataGridPro
-          rows={releases}
-          columns={columns}
-          density="compact"
-          loading={isLoading || deleteReleaseMutation.isLoading}
-          error={(error as any)?.message}
-        />
-      </Box>
-    </Container>
+    <React.Fragment>
+      <StudioAppBar actions={null} />
+      <Container>
+        <Typography variant="h2">Releases</Typography>
+        <Box sx={{ my: 3, height: 350, width: '100%' }}>
+          <DataGridPro
+            rows={releases}
+            columns={columns}
+            density="compact"
+            loading={isLoading || deleteReleaseMutation.isLoading}
+            error={(error as any)?.message}
+          />
+        </Box>
+      </Container>
+    </React.Fragment>
   );
 };
 

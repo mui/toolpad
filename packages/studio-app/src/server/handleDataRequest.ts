@@ -1,9 +1,9 @@
-import { NextApiHandler } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
-import { execApi, loadDom } from '../../../src/server/data';
-import { NodeId, StudioApiResult } from '../../../src/types';
-import initMiddleware from '../../../src/server/initMiddleware';
-import * as studioDom from '../../../src/studioDom';
+import { execApi, loadDom, loadReleaseDom } from './data';
+import initMiddleware from './initMiddleware';
+import { NodeId, StudioApiResult } from '../types';
+import * as studioDom from '../studioDom';
 
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
@@ -15,10 +15,18 @@ const cors = initMiddleware<any>(
   }),
 );
 
-export default (async (req, res) => {
+export interface HandleDataRequestParams {
+  release: string | null;
+}
+
+export default async (
+  req: NextApiRequest,
+  res: NextApiResponse<StudioApiResult<any>>,
+  { release }: HandleDataRequestParams,
+) => {
   await cors(req, res);
   const apiNodeId = req.query.queryId as NodeId;
-  const dom = await loadDom();
+  const dom = release ? await loadReleaseDom(release) : await loadDom();
   const api = studioDom.getNode(dom, apiNodeId, 'api');
   res.json(await execApi(api, req.query.params ? JSON.parse(req.query.params as string) : {}));
-}) as NextApiHandler<StudioApiResult<any>>;
+};

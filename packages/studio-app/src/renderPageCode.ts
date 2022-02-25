@@ -681,9 +681,13 @@ class Context implements RenderContext {
 
           const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
 
+          const dataUrl = `/api/data/${
+            this.config.release ? `release/${this.config.release}/` : 'preview/'
+          }`;
+
           return `${useDataQuery}(
             ${stateHook.setStateVar}, 
-            ${JSON.stringify(this.config.release)}, 
+            ${JSON.stringify(dataUrl)}, 
             ${JSON.stringify(node.attributes.api.value)}, 
             ${params}
           );`;

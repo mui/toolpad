@@ -12,7 +12,7 @@ export default (async (req, res) => {
   const dom = await loadReleaseDom(version);
 
   const { code: page } = renderPageCode(dom, pageId as NodeId, {
-    release: null,
+    release: version,
   });
 
   const { code: compiled } = transform(page, {

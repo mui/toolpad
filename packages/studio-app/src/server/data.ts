@@ -156,6 +156,12 @@ export async function getReleases() {
   });
 }
 
+export async function deleteRelease(version: string) {
+  return prisma.release.delete({
+    where: { version },
+  });
+}
+
 export async function loadReleaseDom(version: string): Promise<studioDom.StudioDom> {
   const release = await prisma.release.findUnique({
     where: { version },

@@ -7,6 +7,7 @@ import {
   loadDom,
   saveDom,
   createRelease,
+  deleteRelease,
   getReleases,
   loadReleaseDom,
 } from '../../src/server/data';
@@ -85,6 +86,7 @@ const rpcServer = {
   },
   mutation: {
     createRelease,
+    deleteRelease,
     testConnection,
     saveDom,
   },

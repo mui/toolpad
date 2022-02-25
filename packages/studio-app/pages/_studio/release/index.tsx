@@ -8,50 +8,66 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import client from '../../../src/api';
 import { NextLinkComposed } from '../../../src/components/Link';
 
-interface NavigateToReleaseActionProps {
-  version: string;
-}
-
-function NavigateToReleaseAction({ version }: NavigateToReleaseActionProps) {
-  return (
-    <GridActionsCellItem
-      icon={<PresentToAllIcon />}
-      component={NextLinkComposed}
-      to={`/_studio/release/${version}`}
-      label="Open"
-    />
-  );
-}
-
-function RemoveReleaseAction({ version }: NavigateToReleaseActionProps) {
-  return <GridActionsCellItem icon={<DeleteIcon />} label="Remove Release" />;
-}
-
-const COLUMNS: GridColumns = [
-  { field: 'version' },
-  { field: 'description', flex: 1 },
-  { field: 'createdAt', type: 'date' },
-  {
-    field: 'actions',
-    type: 'actions',
-    getActions: (params: GridRowParams) => [
-      <NavigateToReleaseAction version={params.row.version} />,
-      <RemoveReleaseAction version={params.row.version} />,
-    ],
-  },
-];
-
 const Home: NextPage = () => {
-  const { data: releases = [], isLoading, error } = client.useQuery('getReleases', []);
+  const { data: releases = [], isLoading, error, refetch } = client.useQuery('getReleases', []);
+
+  const deleteReleaseMutation = client.useMutation('deleteRelease');
+
+  const handleDeleteClick = React.useCallback(
+    async (version: string) => {
+      // TODO: confirmation dialog here
+      await deleteReleaseMutation.mutateAsync([version]);
+      refetch();
+    },
+    [deleteReleaseMutation, refetch],
+  );
+
+  const columns = React.useMemo<GridColumns>(
+    () => [
+      {
+        field: 'version',
+        headerName: 'Version',
+      },
+      {
+        field: 'description',
+        headerName: 'Description',
+        flex: 1,
+      },
+      {
+        field: 'createdAt',
+        headerName: 'Created',
+        type: 'date',
+        valueGetter: (params) => new Date(params.value),
+      },
+      {
+        field: 'actions',
+        type: 'actions',
+        getActions: (params: GridRowParams) => [
+          <GridActionsCellItem
+            icon={<PresentToAllIcon />}
+            component={NextLinkComposed}
+            to={`/_studio/release/${params.row.version}`}
+            label="Open"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Remove release"
+            onClick={() => handleDeleteClick(params.row.version)}
+          />,
+        ],
+      },
+    ],
+    [handleDeleteClick],
+  );
 
   return (
     <Container>
       <Box sx={{ p: 3, height: 350, width: '100%' }}>
         <DataGridPro
           rows={releases}
-          columns={COLUMNS}
+          columns={columns}
           density="compact"
-          loading={isLoading}
+          loading={isLoading || deleteReleaseMutation.isLoading}
           error={(error as any)?.message}
         />
       </Box>

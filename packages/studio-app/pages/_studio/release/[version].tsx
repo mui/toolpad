@@ -41,7 +41,7 @@ const Home: NextPage = () => {
   const columns: GridColumns = React.useMemo(
     () => [
       { field: 'name' },
-      { field: 'title' },
+      { field: 'title', flex: 1 },
       {
         field: 'actions',
         type: 'actions',

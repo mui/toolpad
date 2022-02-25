@@ -1,68 +1,65 @@
 # MUI Studio
 
-## Instructions
+## Local development
 
-Run this first to build/watch:
+### Prerequisites:
 
-```
-yarn dev
-```
+- git
+- yarn
+- node.js
+- docker
 
-Then start MUI Studio in CWD:
+### Setting up your development environment:
 
-```sh
-yarn cli
-```
+1. Start a local database:
 
-or start MUI Studio in a different folder:
+   ```sh
+   docker-compose up -d
+   ```
 
-```sh
-yarn cli ./my-app
-```
+   You can skip this step if you already have a development database available by other means. Use the following command to stop the running container:
 
-App will be running under `http://localhost:3000/`
+   ```sh
+   docker-compose stop
+   ```
 
-TO DO:
+1. Install dependencies and start building the project in watch mode:
 
-- Add LICENSE (+ in package.json, also update for individual packages)
-- docs: How will we do docs? Same as on mui.com? Do we create something new? Do we want to embed them in the app as well?
-- studio DOM patches instead of saving the whole DOM as a blob
-- Should we move Connection editor under app editor?
-- Nested paths pages
-- iframe needs to be sandboxed + CSP?
-- StudioSandbox => add react-refresh (or decide on alternative, bundler in teh browser?)
-- deployments/releases
-- secrets encryption and redaction on client
-- test drive pomerium
+   ```sh
+   yarn install
+   yarn dev
+   ```
 
-- docker image + compose file for installation
-- build persistence in postgres
-- integration tests, (let's consolidate the architecture a bit more first)
-- expand @mui/components
-- editor:
-  - loops StudioNode
-  - export code as next.js project
-  - data binding => javascript
-  - fix data binding to APIs (query StudioNode)
-  - make connections UI similar to APIs UI (create connection then edit UI)
-- ...
+1. Create a `.env` file in the root of the project
 
-```ts
-import { format } = 'https://esm.sh/date-fns'
+   ```sh
+   STUDIO_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
+   ```
 
-format(new Date(2014, 1, 11), 'yyyy-MM-dd')
-```
+1. Now you can run the MUI Studio cli to start the application
 
-```ts
-import YouTube from 'https://esm.sh/react-youtube';
+   ```sh
+   yarn cli
+   ```
 
-return (
-  <YouTube
-    videoId="2g811Eo7K8U"
-    opts={{
-      height: '390',
-      width: '640',
-    }}
-  />
-);
-```
+1. Open [`http://localhost:3000/`](http://localhost:3000/) in your browser.
+
+### Notes:
+
+- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn cli` command, or by running
+
+  ```sh
+  yarn prisma db push
+  ```
+
+- In some cases, after the schema changes, the app may not start up and you may see the message:
+
+  ```sh
+  ⚠️  There might be data loss when applying the changes:
+  ```
+
+  This means your database is out of sync with the prisma schema and can't be synchronized without data loss. You can synchronise the database manually using:
+
+  ```sh
+  yarn prisma db push --accept-data-loss
+  ```

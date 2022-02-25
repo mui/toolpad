@@ -10,7 +10,7 @@ import * as studioDom from '../src/studioDom';
 const Home: NextPage = () => {
   const router = useRouter();
 
-  const domQuery = client.useQuery('loadApp', [], {
+  const domQuery = client.useQuery('loadDom', [], {
     enabled: router.isReady,
   });
 

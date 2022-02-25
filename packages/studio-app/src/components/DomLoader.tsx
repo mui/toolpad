@@ -193,8 +193,13 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
     setNodeNamespacedProp<
       Node extends studioDom.StudioNode,
       Namespace extends studioDom.PropNamespaces<Node>,
-      Prop extends keyof Node[Namespace] & string,
-    >(node: Node, namespace: Namespace, prop: Prop, value: Node[Namespace][Prop] | null) {
+      Prop extends keyof NonNullable<Node[Namespace]> & string,
+    >(
+      node: Node,
+      namespace: Namespace,
+      prop: Prop,
+      value: NonNullable<Node[Namespace]>[Prop] | null,
+    ) {
       dispatch({
         type: 'DOM_SET_NODE_PROP',
         namespace,
@@ -272,7 +277,7 @@ export default function DomProvider({ children }: DomContextProps) {
 
     dispatch({ type: 'DOM_LOADING' });
     client.query
-      .loadApp()
+      .loadDom()
       .then((dom) => {
         if (!canceled) {
           dispatch({ type: 'DOM_LOADED', dom });
@@ -299,7 +304,7 @@ export default function DomProvider({ children }: DomContextProps) {
     dispatch({ type: 'DOM_SAVING' });
 
     client.mutation
-      .saveApp(debouncedDom)
+      .saveDom(debouncedDom)
       .then(() => {
         dispatch({ type: 'DOM_SAVED' });
       })

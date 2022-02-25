@@ -36,4 +36,5 @@ yarn-error.log*
 lerna-debug.log
 
 .studio-data
+
 .env

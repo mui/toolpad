@@ -284,7 +284,7 @@ function DerivedStateNodeEditor<P>({ node }: DerivedStateNodeEditorProps<P>) {
     <Stack gap={1} my={1}>
       <StudioNodePropsEditor
         nodeId={node.id}
-        value={node.params}
+        value={node.params ?? {}}
         onChange={handleParamsChange}
         argTypes={node.attributes.argTypes.value}
         onArgTypesChange={handlePropTypesChange}

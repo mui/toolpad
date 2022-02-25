@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import arg from 'arg';
 import * as path from 'path';
 import { execa } from 'execa';
@@ -36,6 +37,7 @@ const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   stdio: 'pipe',
   extendEnv: false,
   env: {
+    STUDIO_DATABASE_URL: process.env.STUDIO_DATABASE_URL,
     FORCE_COLOR: process.env.FORCE_COLOR,
     STUDIO_DIR,
     DEMO_MODE: String(!!args['--demo']),

@@ -683,7 +683,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       switch (event.type) {
         case 'propUpdated': {
           const node = studioDom.getNode(dom, event.nodeId as NodeId, 'element');
-          const actual = node.props[event.prop];
+          const actual = node.props?.[event.prop];
           if (!actual || actual.type !== 'const') {
             console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);
             return;

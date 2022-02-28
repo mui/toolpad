@@ -57,7 +57,6 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       res.status(405).end();
       return;
     }
-    console.log(req.body);
     const { type, name, params } = req.body as RpcRequest;
     if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
       // This is important to avoid RCE

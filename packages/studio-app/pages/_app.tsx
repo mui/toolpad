@@ -5,8 +5,12 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { LicenseInfo } from '@mui/x-data-grid-pro';
 import theme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
+import { MUI_X_PRO_LICENSE } from '../src/constants';
+
+LicenseInfo.setLicenseKey(MUI_X_PRO_LICENSE);
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();

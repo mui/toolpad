@@ -1,6 +1,7 @@
 {
   "name": "mui-studio",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "Build MUI apps quickly",
   "repository": "https://github.com/mui-org/mui-studio.git",
   "private": true,

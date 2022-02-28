@@ -4,7 +4,7 @@
   "description": "Build MUI apps quickly",
   "author": "MUI Studio team",
   "homepage": "https://github.com/mui-org/mui-studio#readme",
-  "license": "ISC",
+  "license": "MIT",
   "main": "src/index.ts",
   "type": "module",
   "files": [

@@ -14,6 +14,7 @@ import {
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as studioDom from '../../../studioDom';
+import DialogForm from '../../DialogForm';
 import { useDom, useDomApi } from '../../DomLoader';
 
 export interface CreateStudioApiDialogProps {
@@ -36,7 +37,7 @@ export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudi
 
   return (
     <Dialog {...props} onClose={onClose}>
-      <form
+      <DialogForm
         onSubmit={(e) => {
           e.preventDefault();
           const newApiNode = studioDom.createNode(dom, 'api', {
@@ -49,11 +50,6 @@ export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudi
           domApi.addNode(newApiNode, appNode, 'apis');
           onClose();
           navigate(`/apis/${newApiNode.id}`);
-        }}
-        style={{
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
         }}
       >
         <DialogTitle>Create a new MUI Studio API</DialogTitle>
@@ -82,7 +78,7 @@ export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudi
             Create
           </Button>
         </DialogActions>
-      </form>
+      </DialogForm>
     </Dialog>
   );
 }

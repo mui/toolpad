@@ -20,7 +20,7 @@
    You can skip this step if you already have a development database available by other means. Use the following command to stop the running container:
 
    ```sh
-   docker-compose stop
+   docker-compose down
    ```
 
 1. Install dependencies and start building the project in watch mode:

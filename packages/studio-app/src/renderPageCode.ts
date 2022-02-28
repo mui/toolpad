@@ -32,6 +32,8 @@ export interface RenderPageConfig {
   editor: boolean;
   // prettify output
   pretty: boolean;
+  // release version
+  release: string | null;
 }
 
 interface UrlQueryStateHook {
@@ -65,9 +67,9 @@ interface MemoizedConst {
 class Context implements RenderContext {
   dom: studioDom.StudioDom;
 
-  private page: studioDom.StudioPageNode;
+  private config: RenderPageConfig;
 
-  private editor: boolean;
+  private page: studioDom.StudioPageNode;
 
   private imports: Imports;
 
@@ -91,14 +93,10 @@ class Context implements RenderContext {
 
   private memoizedConsts: MemoizedConst[] = [];
 
-  constructor(
-    dom: studioDom.StudioDom,
-    page: studioDom.StudioPageNode,
-    { editor }: RenderPageConfig,
-  ) {
+  constructor(dom: studioDom.StudioDom, page: studioDom.StudioPageNode, config: RenderPageConfig) {
     this.dom = dom;
     this.page = page;
-    this.editor = editor;
+    this.config = config;
 
     this.moduleScope = new Scope(null);
 
@@ -106,7 +104,7 @@ class Context implements RenderContext {
 
     this.reactAlias = this.addImport('react', '*', 'React');
 
-    if (this.editor) {
+    if (this.config.editor) {
       this.runtimeAlias = this.addImport('@mui/studio-core/runtime', '*', '__studioRuntime');
     }
   }
@@ -233,7 +231,7 @@ class Context implements RenderContext {
   evalExpression(id: string, expression: string): string {
     const evaluated = `((state) => (${expression}))(${this.pageStateIdentifier})`;
 
-    return this.editor
+    return this.config.editor
       ? `
         (() => {
           let error, value
@@ -413,7 +411,7 @@ class Context implements RenderContext {
       }
     }
 
-    if (this.editor && argTypes) {
+    if (this.config.editor && argTypes) {
       // eslint-disable-next-line no-restricted-syntax
       for (const [prop, argType] of Object.entries(argTypes)) {
         if (argType?.typeDef.type === 'element') {
@@ -453,7 +451,7 @@ class Context implements RenderContext {
   ): PropExpression {
     return {
       type: 'jsxElement',
-      value: this.editor
+      value: this.config.editor
         ? `
           <${this.runtimeAlias}.RuntimeStudioNode nodeId="${node.id}">
             ${rendered}
@@ -589,7 +587,7 @@ class Context implements RenderContext {
   }
 
   addCodeComponentImport(source: string, suggestedName: string = 'CodeComponent'): string {
-    if (this.editor) {
+    if (this.config.editor) {
       const existing = this.codeComponentImports.get(source);
       if (existing) {
         return existing;
@@ -683,9 +681,16 @@ class Context implements RenderContext {
 
           const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
 
-          return `${useDataQuery}(${stateHook.setStateVar}, ${JSON.stringify(
-            node.attributes.api.value,
-          )}, ${params});`;
+          const dataUrl = `/api/data/${
+            this.config.release ? `release/${this.config.release}/` : 'preview/'
+          }`;
+
+          return `${useDataQuery}(
+            ${stateHook.setStateVar}, 
+            ${JSON.stringify(dataUrl)}, 
+            ${JSON.stringify(node.attributes.api.value)}, 
+            ${params}
+          );`;
         }
         default:
           throw new Error(
@@ -780,7 +785,7 @@ class Context implements RenderContext {
         ${memoizedConsts}
 
         ${
-          this.editor
+          this.config.editor
             ? `${this.runtimeAlias}.useDiagnostics(${this.pageStateIdentifier}, ${this.bindingsStateIdentifier});`
             : ''
         }
@@ -801,6 +806,7 @@ export default function renderPageCode(
   const config: RenderPageConfig = {
     editor: false,
     pretty: false,
+    release: null,
     ...configInit,
   };
 

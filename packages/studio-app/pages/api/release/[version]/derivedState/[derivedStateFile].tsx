@@ -8,21 +8,21 @@ import { asArray } from '../../../../../src/utils/collections';
 
 export default (async (req, res) => {
   const [version] = asArray(req.query.version);
-  const [componentFile] = asArray(req.query.componentFile);
+  const [derivedStateFile] = asArray(req.query.derivedStateFile);
 
-  const { name: componentId } = path.parse(componentFile);
+  const { name: stateId } = path.parse(derivedStateFile);
 
   const dom = await loadReleaseDom(version);
 
-  const codeComponent = studioDom.getMaybeNode(dom, componentId as NodeId, 'codeComponent');
+  const derivedState = studioDom.getMaybeNode(dom, stateId as NodeId, 'derivedState');
 
-  if (!codeComponent) {
+  if (!derivedState) {
     res.status(404);
     res.end();
     return;
   }
 
-  const { code: compiled } = transform(codeComponent.attributes.code.value, {
+  const { code: compiled } = transform(derivedState.attributes.code.value, {
     transforms: ['jsx', 'typescript'],
   });
 

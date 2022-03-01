@@ -17,7 +17,7 @@ import DerivedStateEditor from './DerivedStateEditor';
 import QueryStateEditor from './QueryStateEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import { NodeId } from '../../../types';
-import NodeNameEditor from './NodeNameEditor';
+import NodeNameEditor from '../NodeNameEditor';
 import * as studioDom from '../../../studioDom';
 
 // TODO: remove deprecated state

@@ -8,7 +8,7 @@ import client from '../../../api';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import useDebounced from '../../../utils/useDebounced';
-import NodeNameEditor from '../PageEditor/NodeNameEditor';
+import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 
 function getDataSource<Q>(

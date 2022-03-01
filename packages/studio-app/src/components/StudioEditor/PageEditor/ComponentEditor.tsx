@@ -9,7 +9,7 @@ import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
 import RuntimeErrorAlert from './RuntimeErrorAlert';
-import NodeNameEditor from './NodeNameEditor';
+import NodeNameEditor from '../NodeNameEditor';
 
 const classes = {
   control: 'StudioControl',

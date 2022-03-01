@@ -131,27 +131,34 @@ interface CreateReleaseParams {
   description: string;
 }
 
+const SELECT_RELEASE_META = {
+  id: true,
+  version: true,
+  description: true,
+  createdAt: true,
+};
+
 export async function createRelease({ version, description }: CreateReleaseParams) {
   const currentDom = await loadDom();
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
 
-  await prisma.release.create({
+  const release = await prisma.release.create({
+    select: SELECT_RELEASE_META,
     data: {
       version,
       description,
       snapshot,
     },
   });
+
+  return release;
 }
 
 export async function getReleases() {
   return prisma.release.findMany({
-    select: {
-      id: true,
-      version: true,
-      description: true,
-      createdAt: true,
-      updatedAt: true,
+    select: SELECT_RELEASE_META,
+    orderBy: {
+      createdAt: 'desc',
     },
   });
 }
@@ -159,6 +166,22 @@ export async function getReleases() {
 export async function deleteRelease(version: string) {
   return prisma.release.delete({
     where: { version },
+  });
+}
+
+export async function createDeployment(version: string) {
+  return prisma.deployment.create({
+    data: {
+      release: {
+        connect: { version },
+      },
+    },
+  });
+}
+
+export async function findActiveDeployment() {
+  return prisma.deployment.findFirst({
+    orderBy: { createdAt: 'desc' },
   });
 }
 

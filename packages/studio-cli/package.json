@@ -10,6 +10,9 @@
   "files": [
     "src"
   ],
+  "bin": {
+    "mui-studio": "./cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mui-org/mui-studio.git"

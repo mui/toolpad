@@ -13,10 +13,13 @@ import { useStudioNode } from '@mui/studio-core';
 import { debounce } from '@mui/material';
 import { UseDataQuery } from 'packages/studio-core/dist/useDataQuery';
 
-// TODO: Generate a specific license for Studio (This one comes from CI)
-const LICENSE = '<REDACTED>';
+const LICENSE = window?.document
+  .querySelector('meta[name=x-data-grid-pro-license]')
+  ?.getAttribute('content');
 
-LicenseInfo.setLicenseKey(LICENSE);
+if (LICENSE) {
+  LicenseInfo.setLicenseKey(LICENSE);
+}
 
 const EMPTY_COLUMNS: GridColumns = [];
 const EMPTY_ROWS: GridRowsProp = [];

@@ -1,19 +1,24 @@
 {
   "name": "@mui/studio-app",
   "version": "0.0.1",
+  "license": "MIT",
   "scripts": {
-    "dev": "yarn esinstall --dev && yarn bundle-types && concurrently \"yarn:dev:*\"",
-    "build": "yarn esinstall && yarn bundle-types && concurrently \"yarn:build:*\"",
+    "dev": "yarn prisma db push && yarn esinstall --dev && concurrently \"yarn:dev:*\"",
+    "build": "yarn prisma generate && yarn esinstall && concurrently \"yarn:build:*\"",
     "start": "next start",
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",
-    "build:next": "next build",
-    "dev:next": "next dev",
-    "build:esbuild": "esbuild ./sandbox/index.ts ./editorRuntime/index.ts --target=es6 --bundle --outdir=./public",
-    "dev:esbuild": "yarn build:esbuild --watch",
     "esinstall": "ts-node ./scripts/esinstall.ts",
     "esbuildEsm": "ts-node ./scripts/esbuildEsm.ts",
-    "bundle-types": "ts-node ./scripts/typings.ts"
+    "prisma": "prisma",
+    "build:next": "next build",
+    "build:esbuild": "esbuild ./sandbox/index.ts ./editorRuntime/index.ts --target=es6 --bundle --outdir=./public",
+    "build:types": "ts-node ./scripts/typings.ts",
+    "build:prisma": "prisma generate",
+    "dev:next": "next dev",
+    "dev:esbuild": "yarn build:esbuild --watch",
+    "dev:types": "yarn build:types",
+    "dev:prisma": "prisma generate --watch"
   },
   "dependencies": {
     "@emotion/cache": "^11.7.1",
@@ -28,6 +33,7 @@
     "@mui/studio-core": "^0.0.1",
     "@mui/styles": "^5.3.0",
     "@mui/x-data-grid-pro": "^5.4.0",
+    "@prisma/client": "^3.9.2",
     "@types/cors": "^2.8.12",
     "@types/prettier": "^2.4.3",
     "@types/react-dom": "^17.0.11",
@@ -48,6 +54,7 @@
     "react": "^17.0.2",
     "react-devtools-inline": "^4.23.0",
     "react-dom": "^17.0.2",
+    "react-hook-form": "^7.27.1",
     "react-json-view": "^1.21.3",
     "react-query": "^3.34.12",
     "react-router-dom": "^6.2.1",
@@ -64,7 +71,8 @@
     "eslint-config-next": "^12.0.3",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
-    "glob": "^7.2.0"
+    "glob": "^7.2.0",
+    "prisma": "^3.9.2"
   },
   "typings": "./index.d.ts"
 }

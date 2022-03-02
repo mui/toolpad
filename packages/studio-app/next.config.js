@@ -7,6 +7,15 @@ const sharedConfig = {
 module.exports = {
   reactStrictMode: true,
   publicRuntimeConfig: sharedConfig,
+
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // See https://github.com/prisma/prisma/issues/6564#issuecomment-853028373
+      config.externals.push('_http_common');
+    }
+    return config;
+  },
+
   async headers() {
     return [
       {

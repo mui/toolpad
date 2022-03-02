@@ -1,18 +1,13 @@
 import type { NextPage } from 'next';
 import * as React from 'react';
 import { Button, Container, List, ListItem, Typography } from '@mui/material';
-import { useRouter } from 'next/router';
 import StudioAppBar from '../src/components/StudioAppBar';
 import { NextLinkComposed } from '../src/components/Link';
 import client from '../src/api';
 import * as studioDom from '../src/studioDom';
 
 const Home: NextPage = () => {
-  const router = useRouter();
-
-  const domQuery = client.useQuery('loadApp', [], {
-    enabled: router.isReady,
-  });
+  const domQuery = client.useQuery('loadDom', []);
 
   const app = domQuery.data && studioDom.getApp(domQuery.data);
   const { pages = [] } = app ? studioDom.getChildNodes(domQuery.data, app) : {};

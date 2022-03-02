@@ -21,6 +21,9 @@ export default function StudioAppBar({ actions }: StudioAppBarProps) {
         <Button component={NextLinkComposed} to="/_studio/editor" color="inherit">
           Editor
         </Button>
+        <Button component={NextLinkComposed} to="/_studio/release" color="inherit">
+          Releases
+        </Button>
         <Box flex={1} />
         {actions}
       </Toolbar>

@@ -4,7 +4,7 @@
   "description": "Build MUI apps quickly",
   "author": "MUI Studio team",
   "homepage": "https://github.com/mui-org/mui-studio#readme",
-  "license": "ISC",
+  "license": "MIT",
   "main": "src/index.ts",
   "type": "module",
   "files": [
@@ -24,9 +24,10 @@
     "url": "https://github.com/mui-org/mui-studio/issues"
   },
   "dependencies": {
-    "@mui/studio-core": "^0.0.1",
     "@mui/studio-app": "^0.0.1",
+    "@mui/studio-core": "^0.0.1",
     "arg": "^5.0.1",
+    "dotenv": "^16.0.0",
     "execa": "^6.0.0"
   },
   "devDependencies": {

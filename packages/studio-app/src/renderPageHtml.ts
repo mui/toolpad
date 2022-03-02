@@ -1,4 +1,6 @@
 import { ImportMap } from 'esinstall';
+import { MUI_X_PRO_LICENSE } from './constants';
+import { escapeHtml } from './utils/strings';
 
 export interface RenderHtmlConfig {
   importMap: ImportMap;
@@ -15,7 +17,7 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
 
   const serializedImportMap = JSON.stringify(config.importMap);
   const serializedPreload = Object.values(config.importMap.imports)
-    .map((url) => `<link rel="modulepreload" href="${url}" />`)
+    .map((url) => `<link rel="modulepreload" href="${escapeHtml(url)}" />`)
     .join('\n');
 
   const code = `
@@ -23,6 +25,7 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
     <html style="position: relative">
       <head>
         <meta charset="utf-8" />
+        <meta name="x-data-grid-pro-license" content="${MUI_X_PRO_LICENSE}" />
         <title>Studio Sandbox</title>
         <link
           rel="stylesheet"
@@ -57,7 +60,7 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
             : ''
         }
 
-        <script type="module" src="${config.entry}"></script>
+        <script type="module" src="${escapeHtml(config.entry)}"></script>
       </body>
     </html>
   `;

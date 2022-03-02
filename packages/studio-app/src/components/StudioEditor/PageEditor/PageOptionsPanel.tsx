@@ -8,7 +8,6 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import * as React from 'react';
-import CodeIcon from '@mui/icons-material/Code';
 import PageIcon from '@mui/icons-material/Web';
 import SourceIcon from '@mui/icons-material/Source';
 import renderPageCode from '../../../renderPageCode';
@@ -18,7 +17,7 @@ import DerivedStateEditor from './DerivedStateEditor';
 import QueryStateEditor from './QueryStateEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import { NodeId } from '../../../types';
-import NodeNameEditor from './NodeNameEditor';
+import NodeNameEditor from '../NodeNameEditor';
 import * as studioDom from '../../../studioDom';
 
 // TODO: remove deprecated state
@@ -64,14 +63,6 @@ export default function PageOptionsPanel() {
         </Button>
         <Button startIcon={<SourceIcon />} color="inherit" onClick={() => setDialogOpen(true)}>
           View Page Source
-        </Button>
-        <Button
-          startIcon={<CodeIcon />}
-          color="inherit"
-          component="a"
-          href={`/api/export/${pageNodeId}`}
-        >
-          Page Component
         </Button>
         <UrlQueryEditor pageNodeId={pageNodeId} />
         {DEPRECATED && <DerivedStateEditor />}

@@ -15,6 +15,7 @@ import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import dataSources from '../../../studioDataSources/client';
 import { ExactEntriesOf } from '../../../utils/types';
+import DialogForm from '../../DialogForm';
 
 export interface CreateStudioConnectionDialogProps {
   open: boolean;
@@ -32,7 +33,7 @@ export default function CreateStudioConnectionDialog({
 
   return (
     <Dialog {...props} onClose={onClose}>
-      <form
+      <DialogForm
         onSubmit={(e) => {
           e.preventDefault();
           const dataSource = dataSources[dataSourceType];
@@ -50,11 +51,6 @@ export default function CreateStudioConnectionDialog({
           domApi.addNode(newNode, appNode, 'connections');
           onClose();
           navigate(`/connections/${newNode.id}`);
-        }}
-        style={{
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
         }}
       >
         <DialogTitle>Create a new MUI Studio API</DialogTitle>
@@ -84,7 +80,7 @@ export default function CreateStudioConnectionDialog({
             Create
           </Button>
         </DialogActions>
-      </form>
+      </DialogForm>
     </Dialog>
   );
 }

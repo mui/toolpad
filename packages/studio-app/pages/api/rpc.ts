@@ -2,15 +2,16 @@ import { NextApiHandler } from 'next';
 import { AsyncLocalStorage } from 'async_hooks';
 import type { IncomingMessage, ServerResponse } from 'http';
 import {
-  getConnection,
-  getConnections,
-  addConnection,
-  updateConnection,
   testConnection,
-  testConnection2,
   execApi,
-  loadApp,
-  saveApp,
+  loadDom,
+  saveDom,
+  createRelease,
+  deleteRelease,
+  getReleases,
+  loadReleaseDom,
+  createDeployment,
+  findActiveDeployment,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
@@ -73,25 +74,24 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
 
 const rpcServer = {
   query: {
-    getConnections: () => {
+    execApi: (...args: Parameters<typeof execApi>) => {
       // DEMO: how we can add authentication in the mix:
       //   const ctx = getContext();
       //   console.log(ctx.req.headers);
-      return getConnections();
+      return execApi(...args);
     },
-    getConnection,
 
-    execApi,
-
-    loadApp,
+    getReleases,
+    findActiveDeployment,
+    loadReleaseDom,
+    loadDom,
   },
   mutation: {
-    addConnection,
-    updateConnection,
+    createRelease,
+    deleteRelease,
+    createDeployment,
     testConnection,
-    testConnection2,
-
-    saveApp,
+    saveDom,
   },
 } as const;
 

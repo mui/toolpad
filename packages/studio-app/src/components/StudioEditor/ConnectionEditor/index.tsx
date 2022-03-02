@@ -13,7 +13,7 @@ import {
 import { useDom, useDomApi } from '../../DomLoader';
 import * as studioDom from '../../../studioDom';
 import dataSources from '../../../studioDataSources/client';
-import NodeNameEditor from '../PageEditor/NodeNameEditor';
+import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 import client from '../../../api';
 
@@ -67,7 +67,7 @@ function ConnectionEditorContent<P>({
     }
     try {
       setIsTesting(true);
-      const status = await client.mutation.testConnection2({
+      const status = await client.mutation.testConnection({
         ...connectionNode,
         attributes: {
           ...connectionNode.attributes,

@@ -1,6 +1,7 @@
 {
   "name": "mui-studio",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "Build MUI apps quickly",
   "repository": "https://github.com/mui-org/mui-studio.git",
   "private": true,
@@ -20,7 +21,8 @@
     "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/studio-core --scope @mui/studio-components --scope @mui/studio",
     "cli": "cross-env FORCE_COLOR=1 packages/studio-cli/cli.js --dev",
     "build": "lerna run --stream build",
-    "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx"
+    "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
+    "prima": "yarn workspace @mui/studio-app run --cwd=\"./packages/studio-app\"  prisma"
   },
   "devDependencies": {
     "@mui/monorepo": "git+https://github.com/mui-org/material-ui.git#master",
@@ -44,6 +46,7 @@
     "format-util": "^1.0.5",
     "lerna": "^4.0.0",
     "prettier": "^2.5.1",
+    "prettier-plugin-prisma": "^3.9.0",
     "regenerator-runtime": "^0.13.9",
     "typescript": "^4.5.5",
     "yarn-deduplicate": "^3.1.0"

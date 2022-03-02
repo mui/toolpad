@@ -9,6 +9,7 @@ import {
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as studioDom from '../../../studioDom';
+import DialogForm from '../../DialogForm';
 import { useDom, useDomApi } from '../../DomLoader';
 
 export interface CreateStudioPageDialogProps {
@@ -24,7 +25,7 @@ export default function CreateStudioPageDialog({ onClose, ...props }: CreateStud
 
   return (
     <Dialog {...props} onClose={onClose}>
-      <form
+      <DialogForm
         onSubmit={(e) => {
           e.preventDefault();
           const newNode = studioDom.createNode(dom, 'page', {
@@ -37,11 +38,6 @@ export default function CreateStudioPageDialog({ onClose, ...props }: CreateStud
           domApi.addNode(newNode, appNode, 'pages');
           onClose();
           navigate(`/pages/${newNode.id}`);
-        }}
-        style={{
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
         }}
       >
         <DialogTitle>Create a new MUI Studio API</DialogTitle>
@@ -60,7 +56,7 @@ export default function CreateStudioPageDialog({ onClose, ...props }: CreateStud
             Create
           </Button>
         </DialogActions>
-      </form>
+      </DialogForm>
     </Dialog>
   );
 }

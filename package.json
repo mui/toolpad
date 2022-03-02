@@ -24,7 +24,8 @@
     "prima": "yarn workspace @mui/studio-app run --cwd=\"./packages/studio-app\"  prisma",
     "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
     "release:build": "lerna run --stream build",
-    "release:publish": "lerna publish from-package --dist-tag alpha"
+    "release:publish": "lerna publish from-package --dist-tag alpha",
+    "release:publish:dry-run": "yarn release:publish --registry=\"http://localhost:4873/\""
   },
   "devDependencies": {
     "@mui/monorepo": "git+https://github.com/mui-org/material-ui.git#master",

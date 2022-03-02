@@ -22,6 +22,7 @@
     "url": "git+https://github.com/mui/mui-studio.git"
   },
   "scripts": {
+    "prebuild": "rimraf dist",
     "build": "tsc",
     "dev": "tsc --pretty --watch --preserveWatchOutput",
     "test": "echo \"Error: run tests from root\" && exit 1"

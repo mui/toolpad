@@ -1,6 +1,6 @@
 {
   "name": "@mui/studio",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.2-alpha.1",
   "description": "Build MUI apps quickly",
   "author": "MUI Studio team",
   "homepage": "https://github.com/mui/mui-studio#readme",
@@ -28,8 +28,8 @@
     "url": "https://github.com/mui/mui-studio/issues"
   },
   "dependencies": {
-    "@mui/studio-app": "^0.0.2-alpha.0",
-    "@mui/studio-core": "^0.0.2-alpha.0",
+    "@mui/studio-app": "^0.0.2-alpha.1",
+    "@mui/studio-core": "^0.0.2-alpha.1",
     "arg": "^5.0.1",
     "dotenv": "^16.0.0",
     "execa": "^6.0.0"

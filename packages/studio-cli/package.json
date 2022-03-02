@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Build MUI apps quickly",
   "author": "MUI Studio team",
-  "homepage": "https://github.com/mui-org/mui-studio#readme",
+  "homepage": "https://github.com/mui/mui-studio#readme",
   "license": "MIT",
   "main": "src/index.ts",
   "type": "module",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui-org/mui-studio.git"
+    "url": "git+https://github.com/mui/mui-studio.git"
   },
   "scripts": {
     "build": "tsc",
@@ -24,7 +24,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
-    "url": "https://github.com/mui-org/mui-studio/issues"
+    "url": "https://github.com/mui/mui-studio/issues"
   },
   "dependencies": {
     "@mui/studio-app": "^0.0.1",

@@ -22,6 +22,7 @@
   },
   "files": [
     "prisma",
+    "public",
     ".next"
   ],
   "dependencies": {

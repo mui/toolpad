@@ -9,8 +9,8 @@ node_modules
 /coverage
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
 /build
@@ -38,3 +38,10 @@ lerna-debug.log
 .studio-data
 
 .env
+
+packages/studio-app/public/web_modules
+packages/studio-app/public/editorRuntime
+packages/studio-app/public/sandbox
+packages/studio-app/public/typings.json
+packages/studio-app/prisma/generated
+packages/studio-app/prisma/public

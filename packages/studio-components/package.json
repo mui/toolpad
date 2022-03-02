@@ -1,6 +1,6 @@
 {
   "name": "@mui/studio-components",
-  "version": "0.0.2-alpha.10",
+  "version": "0.0.2-alpha.11",
   "description": "Build MUI apps quickly",
   "author": "MUI Studio team",
   "homepage": "https://github.com/mui/mui-studio#readme",
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@mui/material": "^5.3.1",
-    "@mui/studio-core": "^0.0.2-alpha.10",
+    "@mui/studio-core": "^0.0.2-alpha.11",
     "@mui/x-data-grid-pro": "^5.3.0",
     "react": "^17.0.2"
   },

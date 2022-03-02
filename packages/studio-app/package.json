@@ -1,6 +1,6 @@
 {
   "name": "@mui/studio-app",
-  "version": "0.0.2-alpha.11",
+  "version": "0.0.2",
   "license": "MIT",
   "scripts": {
     "dev": "yarn prisma db push && yarn esinstall --dev && concurrently \"yarn:dev:*\"",
@@ -34,8 +34,8 @@
     "@mui/icons-material": "^5.3.1",
     "@mui/lab": "^5.0.0-alpha.66",
     "@mui/material": "^5.3.1",
-    "@mui/studio-components": "^0.0.2-alpha.11",
-    "@mui/studio-core": "^0.0.2-alpha.11",
+    "@mui/studio-components": "^0.0.2",
+    "@mui/studio-core": "^0.0.2",
     "@mui/styles": "^5.3.0",
     "@mui/x-data-grid-pro": "^5.4.0",
     "@prisma/client": "^3.9.2",

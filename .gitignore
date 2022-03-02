@@ -35,9 +35,9 @@ yarn-error.log*
 
 lerna-debug.log
 
-.studio-data
-
 .env
+
+dist/
 
 packages/studio-app/public/web_modules
 packages/studio-app/public/editorRuntime

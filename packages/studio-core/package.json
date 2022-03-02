@@ -34,5 +34,7 @@
     "react": "^17.0.2",
     "react-query": "^3.34.12"
   },
-  "devDependencies": {}
+  "publishConfig": {
+    "access": "public"
+  }
 }

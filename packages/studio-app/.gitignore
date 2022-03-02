@@ -39,3 +39,5 @@ yarn-error.log*
 /public/editorRuntime
 /public/sandbox
 /public/typings.json
+
+/prisma/generated

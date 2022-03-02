@@ -22,8 +22,9 @@
     "cli": "cross-env FORCE_COLOR=1 packages/studio-cli/cli.js --dev",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "prima": "yarn workspace @mui/studio-app run --cwd=\"./packages/studio-app\"  prisma",
+    "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
     "release:build": "lerna run --stream build",
-    "release:publish": "lerna publish from-package --dist-tag latest --canary"
+    "release:publish": "lerna publish from-package --dist-tag alpha"
   },
   "devDependencies": {
     "@mui/monorepo": "git+https://github.com/mui-org/material-ui.git#master",

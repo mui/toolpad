@@ -11,7 +11,7 @@ import {
 } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { generateUniqueId } from './utils/randomId';
-import { generateUniqueString } from './utils/strings';
+import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 
 export const RESERVED_NODE_PROPERTIES = [
@@ -427,16 +427,32 @@ function createNodeInternal<T extends StudioNodeType>(
   } as StudioNodeOfType<T>;
 }
 
+function slugifyNodeName(dom: StudioDom, nameCandidate: string, fallback: string): string {
+  // try to replace accents with relevant ascii
+  let slug = removeDiacritics(nameCandidate);
+  // replace spaces with camelcase
+  slug = camelCase(...slug.split(/\s+/));
+  // replace disallowed characters for js identifiers
+  slug = slug.replace(/[^a-zA-Z0-9]+/g, '_');
+  // remove leading digits
+  slug = slug.replace(/^\d+/g, '');
+  if (!slug) {
+    slug = fallback;
+  }
+  const existingNames = getNodeNames(dom);
+  return generateUniqueString(slug, existingNames);
+}
+
 export function createNode<T extends StudioNodeType>(
   dom: StudioDom,
   type: T,
   init: StudioNodeInitOfType<T>,
 ): StudioNodeOfType<T> {
   const id = generateUniqueId(new Set(Object.keys(dom.nodes))) as NodeId;
-  const existingNames = getNodeNames(dom);
+  const name = slugifyNodeName(dom, init.name || type, type);
   return createNodeInternal(id, type, {
     ...init,
-    name: generateUniqueString(init.name || type, existingNames),
+    name,
   });
 }
 
@@ -512,13 +528,12 @@ export function getPageAncestor(dom: StudioDom, node: StudioNode): StudioPageNod
   }
   return null;
 }
-
 export function setNodeName(dom: StudioDom, node: StudioNode, name: string): StudioDom {
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: {
         ...node,
-        name,
+        name: slugifyNodeName(dom, name, node.type),
       },
     }),
   });

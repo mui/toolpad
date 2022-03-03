@@ -57,7 +57,6 @@ export default {
     type: 'object',
     properties: {
       loading: { type: 'boolean' },
-      columns: { $ref: URI_DATAGRID_COLUMNS },
       rows: { $ref: URI_DATAGRID_ROWS },
       error: {},
     },

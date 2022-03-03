@@ -23,17 +23,6 @@ async function exec(
     moviesQuery.genre ? movie.genres.includes(moviesQuery.genre) : true,
   );
   return {
-    fields: {
-      id: { type: 'string' },
-      title: { type: 'string' },
-      year: { type: 'string' },
-      runtime: { type: 'string' },
-      genres: { type: 'string' },
-      director: { type: 'string' },
-      actors: { type: 'string' },
-      plot: { type: 'string' },
-      posterUrl: { type: 'string' },
-    },
     data,
   };
 }

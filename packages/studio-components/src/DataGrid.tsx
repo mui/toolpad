@@ -88,7 +88,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
   React.useEffect(() => handleColumnOrderChange.clear(), [handleColumnOrderChange]);
 
-  const { rows: dataQueryRows, columns: dataQueryCOlumns, ...dataQueryRest } = dataQuery || {};
+  const { rows: dataQueryRows, ...dataQueryRest } = dataQuery || {};
 
   const rows: GridRowsProp = rowsProp || dataQueryRows || EMPTY_ROWS;
 

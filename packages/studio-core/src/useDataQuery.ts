@@ -16,7 +16,6 @@ export interface UseDataQuery {
   loading: boolean;
   error: any;
   data: any;
-  columns: { field: string }[];
   rows: GridRowsProp;
 }
 
@@ -24,7 +23,6 @@ export const INITIAL_DATA_QUERY: UseDataQuery = {
   loading: false,
   error: null,
   data: null,
-  columns: [],
   rows: [],
 };
 
@@ -45,28 +43,16 @@ export function useDataQuery(
     enabled: !!queryId,
   });
 
-  const { fields, data } = responseData;
+  const { data } = responseData;
 
   const rows = Array.isArray(data) ? data : EMPTY_ARRAY;
-
-  const columns = React.useMemo(
-    () =>
-      fields
-        ? Object.entries(fields).map(([field, def]) => ({
-            ...(def as any),
-            field,
-          }))
-        : [],
-    [fields],
-  );
 
   React.useEffect(() => {
     setResult({
       loading,
       error,
       data,
-      columns,
       rows,
     });
-  }, [setResult, loading, error, data, columns, rows]);
+  }, [setResult, loading, error, data, rows]);
 }

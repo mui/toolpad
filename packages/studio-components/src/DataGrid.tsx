@@ -13,13 +13,31 @@ import { useStudioNode } from '@mui/studio-core';
 import { debounce } from '@mui/material';
 import { UseDataQuery } from 'packages/studio-core/dist/useDataQuery';
 
+function inferColumnType(value: unknown): string | undefined {
+  if (value instanceof Date) {
+    return 'dateTime';
+  }
+  const valueType = typeof value;
+  switch (typeof value) {
+    case 'number':
+    case 'boolean':
+    case 'string':
+      return valueType;
+    default:
+      return undefined;
+  }
+}
+
 export function inferColumns(rows: GridRowsProp): GridColumns {
   if (rows.length < 1) {
     return [];
   }
   // Naive implementation that checks only the first row
   const firstRow = rows[0];
-  return Object.entries(firstRow).map(([field, value]) => ({ field, type: typeof value }));
+  return Object.entries(firstRow).map(([field, value]) => ({
+    field,
+    type: inferColumnType(value),
+  }));
 }
 
 const LICENSE = window?.document

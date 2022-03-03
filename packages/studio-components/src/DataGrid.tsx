@@ -94,7 +94,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const columnsInitRef = React.useRef(false);
   React.useEffect(() => {
-    console.log('hello', rows, columnsProp);
     if (!studioNode || columnsProp || rows.length <= 0 || columnsInitRef.current) {
       return;
     }

@@ -34,12 +34,15 @@ function getNodeViewInfo(
     const component: ComponentConfig<unknown> | undefined = (fiber.child?.elementType as any)
       ?.__config;
 
+    const props = fiber.child?.memoizedProps ?? {};
+
     return {
       nodeId,
       error,
       component,
       rect,
       slots: {},
+      props,
     };
   }
   return null;

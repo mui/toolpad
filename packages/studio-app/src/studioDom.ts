@@ -584,8 +584,8 @@ export function setNodeNamespacedProp<
   if (value) {
     return update(dom, {
       nodes: update(dom.nodes, {
-        [node.id]: update(node, {
-          [namespace]: updateOrCreate(node[namespace], {
+        [node.id]: update(dom.nodes[node.id], {
+          [namespace]: updateOrCreate((dom.nodes[node.id] as Node)[namespace], {
             [prop]: value,
           } as any) as Partial<Node[Namespace]>,
         } as Partial<Node>),

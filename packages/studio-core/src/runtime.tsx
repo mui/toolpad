@@ -1,13 +1,13 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
-import type { SlotType, LiveBindings, RuntimeEvent, ComponentConfig } from './index';
+import type { SlotType, LiveBindings, ComponentConfig, RuntimeEvent } from './index';
 
 declare global {
   interface Window {
     __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
     __STUDIO_RUNTIME_BINDINGS_STATE__?: LiveBindings;
-    __STUDIO_RUNTIME_EVENT__?: (event: RuntimeEvent) => void;
+    __STUDIO_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
   }
 }
 
@@ -155,10 +155,24 @@ export function useStudioNode<P = {}>(): StudioRuntimeNode<P> | null {
     if (!nodeId) {
       return null;
     }
+    const fireEvent = (event: RuntimeEvent) => {
+      // eslint-disable-next-line no-underscore-dangle
+      if (!window.__STUDIO_RUNTIME_EVENT__) {
+        // eslint-disable-next-line no-underscore-dangle
+        window.__STUDIO_RUNTIME_EVENT__ = [] as RuntimeEvent[];
+      }
+      // eslint-disable-next-line no-underscore-dangle
+      if (typeof window.__STUDIO_RUNTIME_EVENT__ === 'function') {
+        // eslint-disable-next-line no-underscore-dangle
+        window.__STUDIO_RUNTIME_EVENT__(event);
+      } else {
+        // eslint-disable-next-line no-underscore-dangle
+        window.__STUDIO_RUNTIME_EVENT__.push(event);
+      }
+    };
     return {
       setProp: (prop, value) => {
-        // eslint-disable-next-line no-underscore-dangle
-        window.__STUDIO_RUNTIME_EVENT__?.({
+        fireEvent({
           type: 'propUpdated',
           nodeId,
           prop,

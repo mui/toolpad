@@ -1,31 +1,35 @@
 {
   "name": "@mui/studio",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Build MUI apps quickly",
   "author": "MUI Studio team",
-  "homepage": "https://github.com/mui-org/mui-studio#readme",
+  "homepage": "https://github.com/mui/mui-studio#readme",
   "license": "MIT",
   "main": "src/index.ts",
   "type": "module",
   "files": [
-    "src"
+    "dist"
   ],
+  "bin": {
+    "mui-studio": "./cli.js"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui-org/mui-studio.git"
+    "url": "git+https://github.com/mui/mui-studio.git"
   },
   "scripts": {
+    "prebuild": "rimraf dist",
     "build": "tsc",
     "dev": "tsc --pretty --watch --preserveWatchOutput",
     "start": "node ./dist",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
-    "url": "https://github.com/mui-org/mui-studio/issues"
+    "url": "https://github.com/mui/mui-studio/issues"
   },
   "dependencies": {
-    "@mui/studio-app": "^0.0.1",
-    "@mui/studio-core": "^0.0.1",
+    "@mui/studio-app": "^0.0.2",
+    "@mui/studio-core": "^0.0.2",
     "arg": "^5.0.1",
     "dotenv": "^16.0.0",
     "execa": "^6.0.0"
@@ -33,5 +37,8 @@
   "devDependencies": {
     "nodemon": "^2.0.15",
     "ts-node": "^10.4.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

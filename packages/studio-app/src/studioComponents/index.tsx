@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { capitalize } from 'lodash';
 import * as studioDom from '../studioDom';
 
 import CustomLayout from './CustomLayout';
@@ -39,7 +40,7 @@ function createCodeComponent(
     id: `codeComponent.${domNode.id}`,
     displayName: domNode.name,
     argTypes: domNode.attributes.argTypes.value,
-    render: codeComponentRenderer(`../components/${domNode.id}.tsx`, domNode.name),
+    render: codeComponentRenderer(`../components/${domNode.id}.tsx`, capitalize(domNode.name)),
   };
 }
 

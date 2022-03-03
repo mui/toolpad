@@ -14,7 +14,7 @@ import { debounce } from '@mui/material';
 import { UseDataQuery } from 'packages/studio-core/dist/useDataQuery';
 
 export function inferColumns(rows: GridRowsProp): GridColumns {
-  if (rows.length < 0) {
+  if (rows.length < 1) {
     return [];
   }
   // Naive implementation that checks only the first row

@@ -1,1 +1,0 @@
-docker build --tag studio-test -f ./docker/images/studio/Dockerfile ./

@@ -114,7 +114,6 @@ export type StudioApiResultFields<D = any> = {
 };
 
 export interface StudioApiResult<D = any> {
-  fields?: StudioApiResultFields;
   data: D;
 }
 

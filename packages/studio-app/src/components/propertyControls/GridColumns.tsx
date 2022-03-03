@@ -98,7 +98,8 @@ function GridColumnsPropEditor({
   );
 
   const handleColumnDelete = React.useCallback(
-    (deletedIndex: number) => () => {
+    (deletedIndex: number) => (event: React.MouseEvent) => {
+      event.stopPropagation();
       onChange(value.filter((column, i) => i !== deletedIndex));
     },
     [onChange, value],

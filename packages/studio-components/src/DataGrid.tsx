@@ -18,7 +18,8 @@ export function inferColumns(rows: GridRowsProp): GridColumns {
     return [];
   }
   // Naive implementation that checks only the first row
-  return Object.entries(rows[0]).map(([field, value]) => ({ field, type: typeof value }));
+  const firstRow = rows[0];
+  return Object.entries(firstRow).map(([field, value]) => ({ field, type: typeof value }));
 }
 
 const LICENSE = window?.document

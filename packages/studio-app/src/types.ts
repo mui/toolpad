@@ -95,6 +95,7 @@ export interface NodeInfo {
   rect?: Rectangle;
   slots?: SlotsState;
   component?: ComponentConfig<unknown>;
+  props: { [key: string]: unknown };
 }
 
 export interface NodesInfo {

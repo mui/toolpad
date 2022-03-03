@@ -13,7 +13,7 @@ import { useStudioNode } from '@mui/studio-core';
 import { debounce } from '@mui/material';
 import { UseDataQuery } from 'packages/studio-core/dist/useDataQuery';
 
-function inferColumns(rows: GridRowsProp): GridColumns {
+export function inferColumns(rows: GridRowsProp): GridColumns {
   if (rows.length < 0) {
     return [];
   }

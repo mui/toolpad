@@ -21,6 +21,7 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { inferColumns } from '@mui/studio-components';
 import type { EditorProps, PropControlDefinition } from '../../types';
 
 // TODO: this import suggests leaky abstraction
@@ -41,8 +42,6 @@ function GridColumnsPropEditor({
   const [editColumnsDialogOpen, setEditColumnsDialogOpen] = React.useState(false);
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
 
-  const rowLiveBinding = viewState.bindings[`${nodeId}.props.rows`];
-
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
   React.useEffect(() => {
     if (editColumnsDialogOpen) {
@@ -59,23 +58,19 @@ function GridColumnsPropEditor({
     setMenuAnchorEl(null);
   };
 
-  const definedRows = rowLiveBinding?.value;
+  const definedRows = viewState.nodes[nodeId]?.props.rows;
+
   const columnSuggestions = React.useMemo(() => {
-    const allKeys = new Set(
-      (Array.isArray(definedRows) ? definedRows : [])
-        .slice(10)
-        .map((obj) => (obj && typeof obj === 'object' ? Object.keys(obj) : []))
-        .flat(),
-    );
-    value.forEach(({ field }) => allKeys.delete(field));
-    return Array.from(allKeys);
+    const inferred = inferColumns(Array.isArray(definedRows) ? definedRows : []);
+    const existingFields = new Set(value.map(({ field }) => field));
+    return inferred.filter((column) => !existingFields.has(column.field));
   }, [definedRows, value]);
 
   const handleCreateColumn = React.useCallback(
-    (suggestion: string) => () => {
+    (suggestion: GridColDef) => () => {
       const existingFields = new Set(value.map(({ field }) => field));
-      const newFieldName = generateUniqueString(suggestion, existingFields);
-      const newValue = [...value, { field: newFieldName }];
+      const newFieldName = generateUniqueString(suggestion.field, existingFields);
+      const newValue = [...value, { ...suggestion, field: newFieldName }];
       onChange(newValue);
       setEditedIndex(newValue.length - 1);
       handleClose();
@@ -203,11 +198,11 @@ function GridColumnsPropEditor({
                 }}
               >
                 {columnSuggestions.map((suggestion) => (
-                  <MenuItem key={suggestion} onClick={handleCreateColumn(suggestion)}>
-                    {suggestion}
+                  <MenuItem key={suggestion.field} onClick={handleCreateColumn(suggestion)}>
+                    {suggestion.field}
                   </MenuItem>
                 ))}
-                <MenuItem onClick={handleCreateColumn('new')}>new column</MenuItem>
+                <MenuItem onClick={handleCreateColumn({ field: 'new' })}>new column</MenuItem>
               </Menu>
               <List dense>
                 {value.map((colDef, i) => {

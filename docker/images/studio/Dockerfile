@@ -1,33 +1,22 @@
-FROM node:16 as builder-base
+# TODO: Move to node:16-alpine when https://github.com/prisma/prisma/issues/8478 gets solved
+FROM node:16 as base
 
 WORKDIR /app
+RUN npm init --yes
+
+
+
+FROM base as builder-base
 
 # RUN apk add --no-cache python3 make g++ git
+RUN npm i -g prisma
+RUN npm i -S @mui/studio@latest
+RUN prisma generate --schema node_modules/@mui/studio-app/prisma/schema.prisma
 
-COPY ./package.json ./yarn.lock ./lerna.json /app/
-COPY ./packages/eslint-plugin-material-ui/package.json /app/packages/eslint-plugin-material-ui/
-COPY ./packages/studio-app/package.json /app/packages/studio-app/
-COPY ./packages/studio-cli/package.json /app/packages/studio-cli/
-COPY ./packages/studio-components/package.json /app/packages/studio-components/
-COPY ./packages/studio-core/package.json /app/packages/studio-core/
 
-FROM builder-base as builder-dev
+FROM base as prod
 
-RUN npm_config_platform=linux yarn install --frozen-lockfile --verbose
-
-COPY ./packages /app/
-
-RUN yarn build
-
-FROM builder-base as builder-prod
-
-RUN npm_config_platform=linux yarn install --frozen-lockfile --verbose --production
-
-FROM node:16 as app
-
+COPY --from=builder-base /app/ /app/
 USER node
 
-COPY --from=builder-prod /app/node_modules /app
-COPY --from=builder-dev /app/package.json /app/packages /app
-
-CMD ["yarn", "cli"]
+CMD ["node_modules/@mui/studio/cli.js"]

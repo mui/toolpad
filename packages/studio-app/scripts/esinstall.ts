@@ -2,15 +2,24 @@
 import { install } from 'esinstall';
 import * as path from 'path';
 import arg from 'arg';
+import rimrafCb from 'rimraf';
+import { promisify } from 'util';
+
+const rimraf = promisify(rimrafCb);
 
 const args = arg({
   // Types
   '--dev': Boolean,
 });
 
-console.log('installing...');
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+const DEST = './public/web_modules/';
 
 async function main() {
+  console.log('installing...');
+
+  await rimraf(path.resolve(PROJECT_ROOT, DEST));
+
   const { stats } = await install(
     [
       'es-module-shims',
@@ -28,8 +37,8 @@ async function main() {
       '@mui/lab',
     ],
     {
-      cwd: path.resolve(__dirname, '..'),
-      dest: './public/web_modules/',
+      cwd: PROJECT_ROOT,
+      dest: DEST,
       // logger: console,
       packageLookupFields: ['module', 'main'],
       env: {

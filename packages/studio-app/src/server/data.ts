@@ -329,5 +329,9 @@ export async function dataSourceFetchPrivate(connectionId: NodeId, query: any): 
     );
   }
 
+  if (!dataSource.execPrivate) {
+    throw new Error(`No execPrivate available on datasource "${connection.type}"`);
+  }
+
   return dataSource.execPrivate(connection, query);
 }

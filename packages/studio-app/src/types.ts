@@ -148,7 +148,7 @@ export interface StudioDataSourceClient<P = {}, Q = {}> {
 
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
-  execPrivate: (connection: StudioConnection<P>, query: any) => Promise<any>;
+  execPrivate?: (connection: StudioConnection<P>, query: any) => Promise<any>;
   exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
 }
 

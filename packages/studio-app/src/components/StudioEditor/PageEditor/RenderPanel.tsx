@@ -684,13 +684,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         case 'propUpdated': {
           const node = studioDom.getNode(dom, event.nodeId as NodeId, 'element');
           const actual = node.props?.[event.prop];
-          if (!actual || actual.type !== 'const') {
+          if (actual && actual.type !== 'const') {
             console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);
             return;
           }
 
           const newValue: unknown =
-            typeof event.value === 'function' ? event.value(actual.value) : event.value;
+            typeof event.value === 'function' ? event.value(actual?.value) : event.value;
 
           domApi.setNodeNamespacedProp(node, 'props', event.prop, {
             type: 'const',
@@ -739,7 +739,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       });
 
       // eslint-disable-next-line no-underscore-dangle
-      editorWindow.__STUDIO_RUNTIME_EVENT__ = handleRuntimeEventRef.current;
+      const queuedEvents = Array.isArray(editorWindow.__STUDIO_RUNTIME_EVENT__)
+        ? // eslint-disable-next-line no-underscore-dangle
+          editorWindow.__STUDIO_RUNTIME_EVENT__
+        : [];
+
+      queuedEvents.forEach((event) => handleRuntimeEventRef.current(event));
+
+      // eslint-disable-next-line no-underscore-dangle
+      editorWindow.__STUDIO_RUNTIME_EVENT__ = (event) => handleRuntimeEventRef.current(event);
 
       return () => {
         handlePageMutation.cancel();

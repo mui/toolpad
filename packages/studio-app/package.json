@@ -1,11 +1,11 @@
 {
   "name": "@mui/studio-app",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "license": "MIT",
   "scripts": {
     "dev": "yarn prisma db push && yarn esinstall --dev && concurrently \"yarn:dev:*\"",
-    "build": "yarn prisma generate && yarn esinstall && concurrently \"yarn:build:*\"",
-    "start": "next start",
+    "build": "yarn prisma generate && yarn esinstall && concurrently \"yarn:build:*\" && rimraf ./.next/cache",
+    "start": "yarn prisma migrate deploy && next start",
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",
     "esinstall": "ts-node ./scripts/esinstall.ts",
@@ -20,6 +20,11 @@
     "dev:types": "yarn build:types",
     "dev:prisma": "prisma generate --watch"
   },
+  "files": [
+    "prisma",
+    "public",
+    ".next"
+  ],
   "dependencies": {
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.7.1",
@@ -29,8 +34,8 @@
     "@mui/icons-material": "^5.3.1",
     "@mui/lab": "^5.0.0-alpha.66",
     "@mui/material": "^5.3.1",
-    "@mui/studio-components": "0.0.1",
-    "@mui/studio-core": "^0.0.1",
+    "@mui/studio-components": "^0.0.3",
+    "@mui/studio-core": "^0.0.3",
     "@mui/styles": "^5.3.0",
     "@mui/x-data-grid-pro": "^5.4.0",
     "@prisma/client": "^3.9.2",
@@ -76,5 +81,8 @@
     "glob": "^7.2.0",
     "prisma": "^3.9.2"
   },
-  "typings": "./index.d.ts"
+  "typings": "./index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  }
 }

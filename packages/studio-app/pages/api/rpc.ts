@@ -10,6 +10,8 @@ import {
   deleteRelease,
   getReleases,
   loadReleaseDom,
+  createDeployment,
+  findActiveDeployment,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
@@ -80,12 +82,14 @@ const rpcServer = {
     },
 
     getReleases,
+    findActiveDeployment,
     loadReleaseDom,
     loadDom,
   },
   mutation: {
     createRelease,
     deleteRelease,
+    createDeployment,
     testConnection,
     saveDom,
   },

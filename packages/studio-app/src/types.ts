@@ -95,6 +95,7 @@ export interface NodeInfo {
   rect?: Rectangle;
   slots?: SlotsState;
   component?: ComponentConfig<unknown>;
+  props: { [key: string]: unknown };
 }
 
 export interface NodesInfo {
@@ -114,7 +115,6 @@ export type StudioApiResultFields<D = any> = {
 };
 
 export interface StudioApiResult<D = any> {
-  fields?: StudioApiResultFields;
   data: D;
 }
 

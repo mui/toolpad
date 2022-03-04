@@ -16,7 +16,7 @@ declare global {
     __REACT_DEVTOOLS_GLOBAL_HOOK__?: Hook;
     __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
     __STUDIO_RUNTIME_BINDINGS_STATE__?: LiveBindings;
-    __STUDIO_RUNTIME_EVENT__?: (event: RuntimeEvent) => void;
+    __STUDIO_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
   }
 }
 
@@ -34,12 +34,15 @@ function getNodeViewInfo(
     const component: ComponentConfig<unknown> | undefined = (fiber.child?.elementType as any)
       ?.__config;
 
+    const props = fiber.child?.memoizedProps ?? {};
+
     return {
       nodeId,
       error,
       component,
       rect,
       slots: {},
+      props,
     };
   }
   return null;

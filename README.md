@@ -1,6 +1,6 @@
 # MUI Studio
 
-## Local development
+## Local development (TODO: let's move this to CONTRIBUTING.md)
 
 ### Prerequisites:
 
@@ -63,3 +63,49 @@
   ```sh
   yarn prisma db push --accept-data-loss
   ```
+
+## Release process (TODO: move to separate internal doc)
+
+### release
+
+1. Build packages
+
+   ```sh
+   yarn release:build
+   ```
+
+1. Cut a new release
+
+   ```sh
+   yarn release:version <prerelease/patch/minor/major>
+   ```
+
+1. Publish release
+
+   ```sh
+   yarn release:publish
+   ```
+
+### Dryrun publish
+
+For testing purposes, it is possible to try out publishing
+
+1. Start local npm registry
+
+   ```sh
+   npx verdaccio
+   ```
+
+1. You may have to increase max allowed uploaded body size. To do so, locate your verdaccio config file and add:
+
+   ```yml
+   max_body_size: 100mb # Or whatever size is needed
+   ```
+
+1. Publish packages using the command
+
+   ```sh
+   yarn release:publish:dry-run
+   ```
+
+1. packages can be installed by appending `--registry=http://localhost:4873/` to `yarn`/`npm` commands, or by providing environment variable `npm_config_registry=http://localhost:4873/` (The latter seems to be needed for `npx`, as in `npm_config_registry=http://localhost:4873/ npx @mui/studio`)

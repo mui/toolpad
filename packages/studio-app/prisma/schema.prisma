@@ -59,10 +59,17 @@ model DomNodeAttribute {
 }
 
 model Release {
-  id          Int      @id @default(autoincrement())
-  version     String   @unique
+  id          Int          @id @default(autoincrement())
+  version     String       @unique
   description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime     @default(now())
   snapshot    Bytes
+  Deployment  Deployment[] @relation("Release")
+}
+
+model Deployment {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  version   String
+  release   Release  @relation("Release", fields: [version], references: [version])
 }

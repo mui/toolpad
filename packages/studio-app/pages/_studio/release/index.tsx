@@ -3,16 +3,18 @@ import { Box } from '@mui/system';
 import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@mui/x-data-grid-pro';
 import type { NextPage } from 'next';
 import * as React from 'react';
-import PresentToAllIcon from '@mui/icons-material/PresentToAll';
 import DeleteIcon from '@mui/icons-material/Delete';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import { useRouter } from 'next/router';
 import client from '../../../src/api';
-import { NextLinkComposed } from '../../../src/components/Link';
 import StudioAppBar from '../../../src/components/StudioAppBar';
 
 const Home: NextPage = () => {
+  const router = useRouter();
   const { data: releases = [], isLoading, error, refetch } = client.useQuery('getReleases', []);
 
   const deleteReleaseMutation = client.useMutation('deleteRelease');
+  const deployReleaseMutation = client.useMutation('createDeployment');
 
   const handleDeleteClick = React.useCallback(
     async (version: string) => {
@@ -21,6 +23,15 @@ const Home: NextPage = () => {
       refetch();
     },
     [deleteReleaseMutation, refetch],
+  );
+
+  const handleDeployClick = React.useCallback(
+    async (version: string) => {
+      // TODO: confirmation dialog here
+      await deployReleaseMutation.mutateAsync([version]);
+      refetch();
+    },
+    [deployReleaseMutation, refetch],
   );
 
   const columns = React.useMemo<GridColumns>(
@@ -45,10 +56,9 @@ const Home: NextPage = () => {
         type: 'actions',
         getActions: (params: GridRowParams) => [
           <GridActionsCellItem
-            icon={<PresentToAllIcon />}
-            component={NextLinkComposed}
-            to={`/_studio/release/${params.row.version}`}
-            label="Open"
+            icon={<RocketLaunchIcon />}
+            label="Deploy release"
+            onClick={() => handleDeployClick(params.row.version)}
           />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
@@ -58,7 +68,7 @@ const Home: NextPage = () => {
         ],
       },
     ],
-    [handleDeleteClick],
+    [handleDeleteClick, handleDeployClick],
   );
 
   return (
@@ -73,6 +83,7 @@ const Home: NextPage = () => {
             density="compact"
             loading={isLoading || deleteReleaseMutation.isLoading}
             error={(error as any)?.message}
+            onRowClick={({ row }) => router.push(`/_studio/release/${row.version}`)}
           />
         </Box>
       </Container>

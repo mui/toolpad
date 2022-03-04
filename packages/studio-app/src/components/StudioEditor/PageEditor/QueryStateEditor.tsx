@@ -25,7 +25,7 @@ import { NodeId } from '../../../types';
 import { ExactEntriesOf } from '../../../utils/types';
 import { getQueryNodeArgTypes } from '../../../studioDataSources/client';
 import NodeAttributeEditor from './NodeAttributeEditor';
-import NodeNameEditor from './NodeNameEditor';
+import NodeNameEditor from '../NodeNameEditor';
 
 interface ParamsEditorProps<Q> {
   node: studioDom.StudioNode;

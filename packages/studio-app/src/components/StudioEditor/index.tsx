@@ -16,6 +16,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/router';
 import StudioAppBar from '../StudioAppBar';
 import PageEditor from './PageEditor';
 import PagePanel from './PagePanel';
@@ -78,6 +79,8 @@ interface CreateReleaseDialogProps {
 }
 
 function CreateReleaseDialog({ open, onClose }: CreateReleaseDialogProps) {
+  const router = useRouter();
+
   const { handleSubmit, register, formState, reset } = useForm({
     defaultValues: {
       version: '',
@@ -88,8 +91,9 @@ function CreateReleaseDialog({ open, onClose }: CreateReleaseDialogProps) {
   const createReleaseMutation = client.useMutation('createRelease');
   const doSubmit = handleSubmit(async (releaseParams) => {
     try {
-      await createReleaseMutation.mutateAsync([releaseParams]);
+      const newRelease = await createReleaseMutation.mutateAsync([releaseParams]);
       reset();
+      router.push(`/_studio/release/${newRelease.version}`);
     } catch (error) {
       onClose();
     }

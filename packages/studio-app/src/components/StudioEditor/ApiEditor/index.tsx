@@ -8,7 +8,7 @@ import client from '../../../api';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import useDebounced from '../../../utils/useDebounced';
-import NodeNameEditor from '../PageEditor/NodeNameEditor';
+import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 
 function getDataSource<Q>(
@@ -37,7 +37,6 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
   const dataSource = connection && getDataSource<Q>(connection);
 
   const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
-    console.log('apiQueryUpdated', apiQuery);
     return {
       ...apiNode,
       attributes: { ...apiNode.attributes, query: studioDom.createConst(apiQuery) },

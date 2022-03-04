@@ -76,7 +76,7 @@ jobs:
           command: yarn prettier check-changed
       - run:
           name: 'Build packages'
-          command: yarn build
+          command: yarn release:build
 workflows:
   version: 2
   pipeline:

@@ -4,6 +4,7 @@ import type { IncomingMessage, ServerResponse } from 'http';
 import {
   testConnection,
   execApi,
+  dataSourceFetchPrivate,
   loadDom,
   saveDom,
   createRelease,
@@ -74,6 +75,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
 
 const rpcServer = {
   query: {
+    dataSourceFetchPrivate,
     execApi: (...args: Parameters<typeof execApi>) => {
       // DEMO: how we can add authentication in the mix:
       //   const ctx = getContext();

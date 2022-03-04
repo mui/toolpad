@@ -29,11 +29,8 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
   const [apiQuery, setApiQuery] = React.useState<Q>(apiNode.attributes.query.value);
   const savedQuery = React.useRef(apiNode.attributes.query.value);
 
-  const connection = studioDom.getMaybeNode(
-    dom,
-    apiNode.attributes.connectionId.value as NodeId,
-    'connection',
-  );
+  const conectionId = apiNode.attributes.connectionId.value as NodeId;
+  const connection = studioDom.getMaybeNode(dom, conectionId, 'connection');
   const dataSource = connection && getDataSource<Q>(connection);
 
   const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
@@ -50,6 +47,12 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
     async () => client.query.execApi(debouncedPreviewApi, {}),
     {},
   );
+
+  const queryEditorApi = React.useMemo(() => {
+    return {
+      fetchPrivate: async (query: any) => client.query.dataSourceFetchPrivate(conectionId, query),
+    };
+  }, [conectionId]);
 
   if (!connection) {
     return (
@@ -96,6 +99,7 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
         <Stack spacing={2}>
           <NodeNameEditor node={apiNode} />
           <dataSource.QueryEditor
+            api={queryEditorApi}
             value={apiQuery}
             onChange={(newApiQuery) => setApiQuery(newApiQuery)}
           />

@@ -317,3 +317,17 @@ export async function execApi<Q>(
 
   return dataSource.exec(connection, api.attributes.query.value, params);
 }
+
+export async function dataSourceFetchPrivate(connectionId: NodeId, query: any): Promise<any> {
+  const connection = await getConnection(connectionId);
+  const dataSource: StudioDataSourceServer<any, any, any> | undefined =
+    studioDataSources[connection.type];
+
+  if (!dataSource) {
+    throw new Error(
+      `Unknown connection type "${connection.type}" for connection "${connection.id}"`,
+    );
+  }
+
+  return dataSource.execPrivate(connection, query);
+}

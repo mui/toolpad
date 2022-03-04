@@ -14,6 +14,17 @@ async function test(
   return { timestamp: Date.now() };
 }
 
+async function execPrivate(
+  connection: StudioConnection<PostgresConnectionParams>,
+  query: any,
+): Promise<any> {
+  console.log(`executing private query "${query}"`);
+  if (query === 'getAllTables') {
+    return ['table1', 'table2'];
+  }
+  throw new Error(`Unknown query "${query}"`);
+}
+
 async function exec(
   connection: StudioConnection<PostgresConnectionParams>,
   postgresQuery: PostgresQuery,
@@ -28,6 +39,7 @@ async function exec(
 
 const dataSource: StudioDataSourceServer<PostgresConnectionParams, PostgresQuery, any> = {
   test,
+  execPrivate,
   exec,
 };
 

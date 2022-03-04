@@ -19,6 +19,7 @@ out/
 .DS_Store
 *.pem
 postgres-data/*
+.studio-data/*
 
 # debug
 npm-debug.log*

@@ -22,5 +22,8 @@ export default (async (req, res) => {
 }) as NextApiHandler;
 
 // packages/studio-app/pages/api/dataSources/[dataSource]/[...path].ts
-// /api/dataSources/sheets/auth/login
-// /api/dataSources/sheets/auth/callback
+
+// /api/dataSources/googleSheets/auth/login
+// /api/dataSources/googleSheets/auth/callback
+// /api/dataSources/googleSheets/data/list
+// /api/dataSources/googleSheets/data/sheet/:sheetId

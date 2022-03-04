@@ -118,11 +118,11 @@ export interface StudioApiResult<D = any> {
   data: D;
 }
 
-export interface StudioConnectionParamsEditorProps<P> extends WithControlledProp<P> {
+export interface StudioConnectionEditorProps<P> extends WithControlledProp<P> {
   connectionId: NodeId;
 }
-export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionParamsEditorProps<P>>;
-export type StudioQueryEditor<Q = {}> = React.FC<WithControlledProp<Q>>;
+export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionEditorProps<P>>;
+export type StudioQueryEditor<Q = {}> = React.FC<StudioConnectionEditorProps<Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;

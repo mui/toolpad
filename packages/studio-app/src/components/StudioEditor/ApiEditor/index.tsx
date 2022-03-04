@@ -37,7 +37,11 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
   const dataSource = connection && getDataSource<Q>(connection);
 
   const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
-    return { ...apiNode, query: apiQuery };
+    console.log('apiQueryUpdated', apiQuery);
+    return {
+      ...apiNode,
+      attributes: { ...apiNode.attributes, query: studioDom.createConst(apiQuery) },
+    };
   }, [apiNode, apiQuery]);
 
   const debouncedPreviewApi = useDebounced(previewApi, 250);
@@ -94,7 +98,7 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
           <NodeNameEditor node={apiNode} />
           <dataSource.QueryEditor
             value={apiQuery}
-            // connectionId={apiNode.connectionId}
+            connectionId={apiNode.attributes.connectionId.value as NodeId}
             onChange={(newApiQuery) => setApiQuery(newApiQuery)}
           />
         </Stack>

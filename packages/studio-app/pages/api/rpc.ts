@@ -88,8 +88,6 @@ const rpcServer = {
     deleteRelease,
     testConnection,
     saveDom,
-    testConnection2,
-    saveApp,
   },
 } as const;
 

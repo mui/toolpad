@@ -7,7 +7,7 @@ import CrossIcon from '@mui/icons-material/Clear';
 import {
   ConnectionStatus,
   NodeId,
-  StudioConnectionParamsEditorProps,
+  StudioConnectionEditorProps,
   StudioDataSourceClient,
 } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -21,7 +21,7 @@ function getConnectionStatusIcon(status: ConnectionStatus) {
   return status.error ? <CrossIcon /> : <CheckIcon />;
 }
 
-interface ConnectionParamsEditorProps<P> extends StudioConnectionParamsEditorProps<P> {
+interface ConnectionParamsEditorProps<P> extends StudioConnectionEditorProps<P> {
   dataSource: StudioDataSourceClient<P, any>;
 }
 

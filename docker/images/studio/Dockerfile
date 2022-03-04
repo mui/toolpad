@@ -1,10 +1,16 @@
 FROM node:16 as base
-# TODO: Move to node:16-alpine when https://github.com/prisma/prisma/issues/8478 gets solved
+# TODO: Move to node:16-alpine once https://github.com/prisma/prisma/issues/8478 gets solved
 
-ARG VERSION=0.0.3
+ARG VERSION
 LABEL version=$VERSION
 
+RUN \
+# Check for mandatory build arguments
+    : "${VERSION:?Build argument needs to be set and non-empty.}" \
+
+RUN mkdir /app
 WORKDIR /app
+
 RUN npm i -g prisma
 RUN npm init --yes
 

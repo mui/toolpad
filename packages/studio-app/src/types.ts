@@ -148,7 +148,9 @@ export interface StudioDataSourceClient<P = {}, Q = {}> {
 
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
+  // Execute a private query on this connection, intended for editors only
   execPrivate?: (connection: StudioConnection<P>, query: any) => Promise<any>;
+  // Execute a query on this connection, intended for viewers
   exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
 }
 

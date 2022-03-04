@@ -17,7 +17,7 @@
   "scripts": {
     "prettier": "node scripts/prettier.js",
     "deduplicate": "node scripts/deduplicate.js",
-    "start": "cross-env FORCE_COLOR=1 lerna run --stream --scope @mui/studio start",
+    "start": "cross-env FORCE_COLOR=1 packages/studio-cli/cli.js",
     "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/studio-core --scope @mui/studio-components --scope @mui/studio",
     "cli": "cross-env FORCE_COLOR=1 packages/studio-cli/cli.js --dev",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
@@ -33,6 +33,7 @@
     "@swc/core": "^1.2.133",
     "@swc/helpers": "^0.3.2",
     "@types/node": "^17.0.12",
+    "@types/rimraf": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "cross-env": "^7.0.3",

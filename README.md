@@ -1,5 +1,11 @@
 # MUI Studio
 
+## Running the docker container
+
+```sh
+docker-compose -f docker/compose/docker-compose.yml up
+```
+
 ## Local development (TODO: let's move this to CONTRIBUTING.md)
 
 ### Prerequisites:

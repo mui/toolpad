@@ -12,7 +12,9 @@ const prisma = new PrismaClient();
 async function main() {
   for (let i = 1; i <= MAX_RETRIES; i += 1) {
     try {
-      console.log(`(${i}/${MAX_RETRIES}) trying to connect db...`);
+      console.log(
+        `(${i}/${MAX_RETRIES}) trying to connect db "${process.env.STUDIO_DATABASE_URL}"...`,
+      );
       // eslint-disable-next-line no-await-in-loop
       await prisma.$connect();
       console.log(`connected!`);

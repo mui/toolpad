@@ -1562,6 +1562,11 @@
   resolved "https://registry.yarnpkg.com/@swc/helpers/-/helpers-0.3.3.tgz#8ea0e4a96ba18c2d33463aa4dbc7b0ef46232cd6"
   integrity sha512-NdRQSjcceaXsQDNYyK0wWyRvrn5rsvugK8vnTiRB2i0UCaD2slUFUq28tmojILW5A04oF+sZRMxd0Cy7xS/y0A==
 
+"@swc/wasm@^1.2.151":
+  version "1.2.151"
+  resolved "https://registry.yarnpkg.com/@swc/wasm/-/wasm-1.2.151.tgz#54b14c7e864a97dd98cbee6f5975d52c5e96f84a"
+  integrity sha512-Uvm8iWroNIo45HW5oGop8kobvwyVhJ7/QX6pVc9RqAEb43fg4ERG7iJAtQo3rza2jvkzZeRjMS6x0To6XTXr9A==
+
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@szmarczak/http-timer/-/http-timer-1.1.2.tgz#b1665e2c461a2cd92f4c1bbf50d5454de0d4b421"
@@ -3516,7 +3521,7 @@ eslint-plugin-react-hooks@^4.2.0, eslint-plugin-react-hooks@^4.3.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.3.0.tgz#318dbf312e06fab1c835a4abef00121751ac1172"
   integrity sha512-XslZy0LnMn+84NEG9jSGR6eGqaZB3133L8xewQo3fQagbQuGt7a63gf+P1NGKZavEYEC3UXaWEAA/AqDkuN6xA==
 
-eslint-plugin-react@7.27.1, eslint-plugin-react@^7.27.0:
+eslint-plugin-react@^7.27.0:
   version "7.27.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.27.1.tgz#469202442506616f77a854d91babaae1ec174b45"
   integrity sha512-meyunDjMMYeWr/4EBLTV1op3iSG3mjT/pz5gti38UzfM4OPpNc2m0t2xvKCOMU5D6FSdd34BIMFOvQbW+i8GAA==

@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   studio:
-    image: janpot/mui-studio:alpha
+    image: janpot/mui-studio:0.0.5-alpha.1
     environment:
       - STUDIO_DATABASE_URL=postgresql://studio-app:secretpw@postgres:5432/db
     ports:

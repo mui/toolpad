@@ -8,6 +8,7 @@ import {
   StudioApiResult,
   NodeId,
   StudioBindable,
+  Updates,
 } from '../types';
 import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
@@ -20,8 +21,6 @@ const prisma = new PrismaClient({
     },
   },
 });
-
-type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
 
 function createDefaultApp(): studioDom.StudioDom {
   let dom = studioDom.createDom();

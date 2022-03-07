@@ -6,16 +6,11 @@ import {
   StudioDataSourceServer,
   ConnectionStatus,
   StudioConnection,
-} from '../../../src/types';
-import config from '../../../src/server/config';
-import { asArray } from '../../../src/utils/collections';
-import { getConnection, updateConnection } from '../../../src/server/data';
-import {
-  GoogleSpreadsheet,
-  GoogleSheetsConnectionParams,
-  GoogleSheetsQuery,
-  GoogleSheet,
-} from './types';
+  CreateHandlerApi,
+} from '../../types';
+import config from '../../server/config';
+import { asArray } from '../../utils/collections';
+import { GoogleSpreadsheet, GoogleSheetsConnectionParams, GoogleSheetsQuery } from './types';
 
 async function test(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
@@ -24,14 +19,34 @@ async function test(
   return { timestamp: Date.now() };
 }
 
+/**
+ * Create an OAuth2 client based on the configuration
+ */
+
+function createOAuthClient() {
+  if (
+    !config.googleSheetsClientId ||
+    !config.googleSheetsClientSecret ||
+    !config.googleSheetsRedirectUri
+  ) {
+    return undefined;
+  }
+  return new google.auth.OAuth2(
+    config.googleSheetsClientId,
+    config.googleSheetsClientSecret,
+    config.googleSheetsRedirectUri,
+  );
+}
+
 async function exec(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
   query: GoogleSheetsQuery,
-  params: any,
 ): Promise<StudioApiResult<any>> {
   const client = createOAuthClient();
   if (client) {
-    if (connection.params) client.setCredentials(connection.params);
+    if (connection.params) {
+      client.setCredentials(connection.params);
+    }
     const sheets = google.sheets({
       version: 'v4',
       auth: client,
@@ -45,13 +60,13 @@ async function exec(
         if (response.statusText === 'OK') {
           const { values } = response.data;
           if (values && values.length > 0) {
-            let headerRow = values.shift() ?? [];
-            let fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
+            const headerRow = values.shift() ?? [];
+            const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
 
-            const data = values.map((row, index) => {
-              let rowObject: any = { id: index };
-              row.forEach((elem, index) => {
-                rowObject[headerRow[index]] = elem;
+            const data = values.map((row, rowIndex) => {
+              const rowObject: any = { id: rowIndex };
+              row.forEach((elem, cellIndex) => {
+                rowObject[headerRow[cellIndex]] = elem;
               });
               return rowObject;
             });
@@ -76,7 +91,11 @@ async function exec(
  * @param {NextApiResponse} res The response object
  */
 
-async function handler(req: NextApiRequest, res: NextApiResponse): Promise<NextApiResponse | void> {
+async function handler(
+  api: CreateHandlerApi,
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<NextApiResponse | void> {
   const client = createOAuthClient();
   const pathname = `/${asArray(req.query.path).join('/')}`;
 
@@ -88,13 +107,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<NextA
 
   const [state] = asArray(req.query.state);
 
-  if (!client)
+  if (!client) {
     return res.status(500).json({ message: 'Missing credentials for establishing connection.' });
+  }
 
   // Check if connection with connectionId exists, if so: merge
-  const savedConnection = await getConnection(state);
-  if (savedConnection?.params)
-    client.setCredentials(savedConnection.params as GoogleSheetsConnectionParams);
+  try {
+    const savedConnection = await api.getConnection(state);
+    if (savedConnection?.params) {
+      client.setCredentials(savedConnection.params as GoogleSheetsConnectionParams);
+    }
+  } catch (err) {
+    console.error(err);
+  }
 
   if (matchAuthLogin(pathname)) {
     return res.redirect(
@@ -107,30 +132,34 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<NextA
         state,
       }),
     );
-  } else if (matchAuthCallback(pathname)) {
+  }
+  if (matchAuthCallback(pathname)) {
     const [code] = asArray(req.query.code);
-    client.getToken(code, async (error, token) => {
-      if (error) throw new Error(error.message);
+    return client.getToken(code, async (error, token) => {
+      if (error) {
+        throw new Error(error.message);
+      }
       if (token) {
         client.setCredentials(token);
-        await updateConnection({
+        await api.updateConnection({
           params: client.credentials,
           id: state,
         });
       }
       return res.redirect(`/_studio/editor/connections/${state}`);
     });
-  } else if (matchDataSpreadsheet(pathname)) {
+  }
+  if (matchDataSpreadsheet(pathname)) {
     const spreadsheetId = (matchDataSpreadsheet(pathname) as MatchResult<GoogleSpreadsheet>).params
       .id;
     if (spreadsheetId) {
-      const sheets = google.sheets({
+      const sheetsClient = google.sheets({
         version: 'v4',
         auth: client,
       });
       try {
-        const response = await sheets.spreadsheets.get({
-          spreadsheetId: spreadsheetId,
+        const response = await sheetsClient.spreadsheets.get({
+          spreadsheetId,
           includeGridData: false,
         });
         if (response.statusText === 'OK') {
@@ -142,38 +171,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<NextA
         return res.status(500).json(error);
       }
     }
-  } else {
-    const drive = google.drive({
-      version: 'v3',
-      auth: client,
-    });
-    try {
-      const response = await drive.files.list({
-        q: "mimeType='application/vnd.google-apps.spreadsheet'",
-      });
-      return res.status(200).json(response.data);
-    } catch (error) {
-      return res.status(500).json(error);
-    }
+    return res.status(404).json('Spreadsheet not found');
   }
-}
-
-/**
- * Create an OAuth2 client based on the configuration
- */
-
-function createOAuthClient() {
-  if (
-    !config.googleSheetsClientId ||
-    !config.googleSheetsClientSecret ||
-    !config.googleSheetsRedirectUri
-  )
-    return undefined;
-  return new google.auth.OAuth2(
-    config.googleSheetsClientId,
-    config.googleSheetsClientSecret,
-    config.googleSheetsRedirectUri,
-  );
+  const drive = google.drive({
+    version: 'v3',
+    auth: client,
+  });
+  try {
+    const response = await drive.files.list({
+      q: "mimeType='application/vnd.google-apps.spreadsheet'",
+    });
+    return res.status(200).json(response.data);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
 }
 
 const dataSource: StudioDataSourceServer<GoogleSheetsConnectionParams, any> = {

@@ -10,6 +10,7 @@ import {
 } from '@mui/studio-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
+
 export interface EditorProps<T> {
   nodeId: NodeId;
   propName: string;
@@ -71,6 +72,8 @@ export type NodeId = Branded<string, 'NodeId'>;
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
+export type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
+
 export interface SlotLocation {
   parentId: NodeId;
   parentProp: string;
@@ -116,8 +119,13 @@ export type StudioApiResultFields<D = any> = {
 
 export interface StudioApiResult<D = any> {
   data: D;
+  fields?: StudioApiResultFields;
 }
 
+export interface CreateHandlerApi {
+  updateConnection: (props: Updates<StudioConnection>) => Promise<StudioConnection>;
+  getConnection: (connectionId: string) => Promise<StudioConnection>;
+}
 export interface StudioConnectionEditorProps<P> extends WithControlledProp<P> {
   connectionId: NodeId;
 }
@@ -142,7 +150,7 @@ export interface StudioDataSourceClient<P = {}, Q = {}> {
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
   exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
-  createHandler?: () => (req: NextApiRequest, res: NextApiResponse) => void;
+  createHandler?: () => (api: CreateHandlerApi, req: NextApiRequest, res: NextApiResponse) => void;
 }
 
 export interface StudioConnectionSummary {

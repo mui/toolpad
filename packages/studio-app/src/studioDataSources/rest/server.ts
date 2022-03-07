@@ -45,7 +45,6 @@ async function exec(
 const dataSource: StudioDataSourceServer<{}, FetchQuery, any> = {
   test,
   exec,
-  createHandler: null,
 };
 
 export default dataSource;

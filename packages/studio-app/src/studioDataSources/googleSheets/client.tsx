@@ -1,7 +1,7 @@
 import { Stack, Button, TextField, Autocomplete } from '@mui/material';
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { StudioDataSourceClient, StudioConnectionEditorProps } from '../../../src/types';
+import { StudioDataSourceClient, StudioConnectionEditorProps } from '../../types';
 import {
   GoogleSheetsConnectionParams,
   GoogleSheetsQuery,
@@ -17,7 +17,9 @@ function getInitialQueryValue(): any {
 
 function isValid(connection: GoogleSheetsConnectionParams): boolean {
   if (connection?.access_token && connection?.expiry_date) {
-    if (connection?.expiry_date >= Date.now()) return true;
+    if (connection?.expiry_date >= Date.now()) {
+      return true;
+    }
   }
   return false;
 }
@@ -27,7 +29,6 @@ const queryReducer = (
   action: GoogleSheetsQueryAction,
 ): GoogleSheetsQuery => {
   const { type, payload } = action;
-  console.log('Who called me', type, state, payload);
   switch (type) {
     case GoogleSheetsActionKind.UPDATE_SPREADSHEET:
       return {
@@ -67,14 +68,14 @@ function QueryEditor({
       if (!response.ok) {
         throw new Error(`Unable to fetch spreadsheets for connection ${connectionId}`);
       }
-      return await response.json();
+      return response.json();
     },
     { enabled: false },
   );
 
   React.useEffect(() => {
     fetchSpreadsheets();
-  }, []);
+  }, [fetchSpreadsheets]);
 
   const [query, dispatch] = React.useReducer(queryReducer, value ?? null);
 
@@ -93,29 +94,25 @@ function QueryEditor({
           `Unable to fetch spreadsheet ${query.spreadsheet?.id} for connection ${connectionId}`,
         );
       }
-      return await response.json();
+      return response.json();
     },
     {
       enabled: Boolean(query.spreadsheet),
     },
   );
 
-  React.useEffect(() => {
-    onChange(query);
-  }, [query.ranges]);
-
   return (
     <Stack direction="column" gap={2}>
       <Autocomplete
         size="small"
         value={query.spreadsheet}
-        fullWidth={true}
+        fullWidth
         loading={isListLoading}
         loadingText={'Loading...'}
         options={isListLoading || isListPending ? [] : listData.files}
         getOptionLabel={(option: GoogleSpreadsheet) => option.name ?? ''}
-        isOptionEqualToValue={(option: GoogleSpreadsheet, value: GoogleSpreadsheet) =>
-          option.id === value.id
+        isOptionEqualToValue={(option: GoogleSpreadsheet, val: GoogleSpreadsheet) =>
+          option.id === val.id
         }
         onChange={(event: any, newValue: GoogleSpreadsheet | null) =>
           dispatch({ type: GoogleSheetsActionKind.UPDATE_SPREADSHEET, payload: newValue })
@@ -126,13 +123,13 @@ function QueryEditor({
         size="small"
         disabled={Boolean(!query.spreadsheet)}
         value={query.sheet}
-        fullWidth={true}
+        fullWidth
         loading={isSpreadsheetLoading}
         loadingText={'Loading...'}
         options={isSpreadsheetLoading || isSpreadsheetPending ? [] : spreadsheetData.sheets}
         getOptionLabel={(option: GoogleSheet) => option.title ?? ''}
-        isOptionEqualToValue={(option: GoogleSheet, value: GoogleSheet) =>
-          option.sheetId === value.sheetId
+        isOptionEqualToValue={(option: GoogleSheet, val: GoogleSheet) =>
+          option.sheetId === val.sheetId
         }
         onChange={(event: any, newValue: GoogleSheet | null) =>
           dispatch({ type: GoogleSheetsActionKind.UPDATE_SHEET, payload: newValue })
@@ -145,9 +142,13 @@ function QueryEditor({
         disabled={Boolean(!query.sheet)}
         helperText={`In the form of A1:B999`}
         defaultValue={value.ranges ?? `A1:Z1000`}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-          dispatch({ type: GoogleSheetsActionKind.UPDATE_RANGE, payload: event?.target.value })
-        }
+        onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
+          await dispatch({
+            type: GoogleSheetsActionKind.UPDATE_RANGE,
+            payload: event?.target.value,
+          });
+          onChange(query);
+        }}
       />
     </Stack>
   );

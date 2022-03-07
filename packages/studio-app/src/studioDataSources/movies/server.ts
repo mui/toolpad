@@ -30,7 +30,6 @@ async function exec(
 const dataSource: StudioDataSourceServer<MoviesConnectionParams, MoviesQuery, Movie[]> = {
   test,
   exec,
-  createHandler: null,
 };
 
 export default dataSource;

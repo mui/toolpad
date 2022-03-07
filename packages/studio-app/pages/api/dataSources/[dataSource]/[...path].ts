@@ -1,6 +1,7 @@
 import { NextApiHandler } from 'next';
 import { asArray } from '../../../../src/utils/collections';
 import studioConnections from '../../../../src/studioDataSources/server';
+import { getConnection, updateConnection } from '../../../../src/server/data';
 
 const handlerMap = new Map<String, Function | null | undefined>();
 Object.keys(studioConnections).forEach((dataSource) => {
@@ -12,13 +13,12 @@ export default (async (req, res) => {
     const [dataSource] = asArray(req.query.dataSource);
     const handler = handlerMap.get(dataSource);
     if (handler) {
-      return handler(req, res);
+      return handler({ getConnection, updateConnection }, req, res);
     }
     return res.status(404).json({ message: 'No handler found' });
-  } else {
-    // Handle any other HTTP method
-    return res.status(405).json({ message: 'Method not supported' });
   }
+  // Handle any other HTTP method
+  return res.status(405).json({ message: 'Method not supported' });
 }) as NextApiHandler;
 
 // packages/studio-app/pages/api/dataSources/[dataSource]/[...path].ts

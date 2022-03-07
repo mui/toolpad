@@ -12,7 +12,7 @@
     "esbuildEsm": "ts-node ./scripts/esbuildEsm.ts",
     "prisma": "prisma",
     "build:next": "next build",
-    "build:esbuild": "esbuild ./sandbox/index.ts ./editorRuntime/index.ts --target=es6 --bundle --outdir=./public",
+    "build:esbuild": "rimraf ./public/sandbox ./public/editorRuntime && esbuild ./sandbox/index.ts ./editorRuntime/index.ts --target=es6 --bundle --outdir=./public",
     "build:types": "ts-node ./scripts/typings.ts",
     "build:prisma": "prisma generate",
     "dev:next": "next dev",

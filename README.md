@@ -86,6 +86,18 @@
    yarn release:publish
    ```
 
+1. Build docker image
+
+   ```sh
+   yarn release:docker:build
+   ```
+
+1. Publish docker images. Make sure you are logged in to docker (`docker login`):
+
+   ```sh
+   yarn release:docker:publish
+   ```
+
 ### Dryrun publish
 
 For testing purposes, it is possible to try out publishing

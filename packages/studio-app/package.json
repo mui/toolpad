@@ -3,9 +3,9 @@
   "version": "0.0.4",
   "license": "MIT",
   "scripts": {
-    "dev": "yarn prisma db push && yarn esinstall --dev && concurrently \"yarn:dev:*\"",
+    "dev": "yarn waitForDb && yarn prisma db push && yarn esinstall --dev && concurrently \"yarn:dev:*\"",
     "build": "yarn prisma generate && yarn esinstall && concurrently \"yarn:build:*\" && rimraf ./.next/cache",
-    "start": "yarn prisma migrate deploy && next start",
+    "start": "yarn waitForDb && yarn prisma migrate deploy && next start",
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",
     "esinstall": "ts-node ./scripts/esinstall.ts",
@@ -18,7 +18,8 @@
     "dev:next": "next dev",
     "dev:esbuild": "yarn build:esbuild --watch",
     "dev:types": "yarn build:types",
-    "dev:prisma": "prisma generate --watch"
+    "dev:prisma": "prisma generate --watch",
+    "waitForDb": "ts-node ./scripts/waitForDb.ts"
   },
   "files": [
     "prisma",

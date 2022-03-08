@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  studio:
+    image: janpot/mui-studio:0.0.5-alpha.2
+    environment:
+      - STUDIO_DATABASE_URL=postgresql://studio-app:secretpw@postgres:5432/postgres
+    ports:
+      - '3000:3000'
+
+  postgres:
+    image: postgres:14.2
+    restart: always
+    environment:
+      - POSTGRES_USER=studio-app
+      - POSTGRES_PASSWORD=secretpw
+    logging:
+      options:
+        max-size: 10m
+        max-file: '3'
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

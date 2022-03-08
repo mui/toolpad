@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "Node",
+    "module": "esnext",
+    "esModuleInterop": true
+  },
+  "ts-node": {
+    "esm": true,
+    "transpileOnly": true,
+    "transpiler": "ts-node/transpilers/swc-experimental"
+  }
+}

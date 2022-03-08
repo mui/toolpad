@@ -15,9 +15,9 @@ import {
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
-const asyncLocalStorage = new AsyncLocalStorage<NextRpcContext>();
+const asyncLocalStorage = new AsyncLocalStorage<RpcContext>();
 
-export function getContext(): NextRpcContext {
+export function getContext(): RpcContext {
   const ctx = asyncLocalStorage.getStore();
   if (!ctx) {
     throw new Error('Not in a request context');
@@ -25,7 +25,7 @@ export function getContext(): NextRpcContext {
   return ctx;
 }
 
-interface NextRpcContext {
+interface RpcContext {
   req: IncomingMessage;
   res: ServerResponse;
 }
@@ -68,7 +68,8 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
     const method = definition[type][name];
     const context = { req, res };
     const result = await asyncLocalStorage.run(context, () => method(...params));
-    res.json({ result });
+    const responseData: RpcResponse = { result };
+    res.json(responseData);
   };
 }
 

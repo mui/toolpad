@@ -16,17 +16,35 @@ const prisma = new PrismaClient();
 
 type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
 
-function createDefaultApp(): studioDom.StudioDom {
-  let dom = studioDom.createDom();
+function createDefaultPage(dom: studioDom.StudioDom, name: string): studioDom.StudioDom {
   const page = studioDom.createNode(dom, 'page', {
-    name: 'DefaultPage',
+    name,
     attributes: {
-      title: studioDom.createConst('Default'),
+      title: studioDom.createConst(name),
       urlQuery: studioDom.createConst({}),
     },
   });
   const app = studioDom.getApp(dom);
   dom = studioDom.addNode(dom, page, app, 'pages');
+
+  const container = studioDom.createElement(dom, 'Container', {
+    sx: studioDom.createConst({ my: 2 }),
+    direction: studioDom.createConst('column'),
+    alignItems: studioDom.createConst('stretch'),
+  });
+  dom = studioDom.addNode(dom, container, page, 'children');
+
+  const stack = studioDom.createElement(dom, 'Stack', {
+    gap: studioDom.createConst(2),
+  });
+  dom = studioDom.addNode(dom, stack, container, 'children');
+
+  return dom;
+}
+
+function createDefaultApp(): studioDom.StudioDom {
+  let dom = studioDom.createDom();
+  dom = createDefaultPage(dom, 'DefaultPage');
   return dom;
 }
 

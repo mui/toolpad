@@ -675,8 +675,10 @@ export function removeNode(dom: StudioDom, nodeId: NodeId) {
     throw new Error(`Invariant: Node: "${node.id}" can't be removed`);
   }
 
+  const descendantIds = getDescendants(dom, node).map(({ id }) => id);
+
   return update(dom, {
-    nodes: omit(dom.nodes, node.id),
+    nodes: omit(dom.nodes, node.id, ...descendantIds),
   });
 }
 

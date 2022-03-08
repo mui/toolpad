@@ -1,16 +1,14 @@
 import { Button, Container, Toolbar, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@mui/x-data-grid-pro';
-import type { NextPage } from 'next';
 import * as React from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { useRouter } from 'next/router';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import client from '../../../src/api';
-import * as studioDom from '../../../src/studioDom';
-import { asArray } from '../../../src/utils/collections';
-import { NodeId } from '../../../src/types';
-import StudioAppBar from '../../../src/components/StudioAppBar';
+import { useParams } from 'react-router-dom';
+import client from '../api';
+import * as studioDom from '../studioDom';
+import { NodeId } from '../types';
+import StudioAppBar from './StudioAppBar';
 
 interface NavigateToReleaseActionProps {
   version?: string;
@@ -30,9 +28,8 @@ function NavigateToReleaseAction({ version, pageNodeId }: NavigateToReleaseActio
   );
 }
 
-const Home: NextPage = () => {
-  const router = useRouter();
-  const [version] = asArray(router.query.version);
+export default function Release() {
+  const { version } = useParams();
   const {
     data: dom,
     isLoading,
@@ -100,6 +97,4 @@ const Home: NextPage = () => {
       </Container>
     </React.Fragment>
   );
-};
-
-export default Home;
+}

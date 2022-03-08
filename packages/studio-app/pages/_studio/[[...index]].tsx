@@ -1,12 +1,12 @@
 import { NoSsr } from '@mui/material';
 import type { NextPage } from 'next';
 import * as React from 'react';
-import StudioEditor from '../../../src/components/StudioEditor';
+import Studio from '../../src/components/Studio';
 
 const Home: NextPage = () => {
   return (
     <NoSsr>
-      <StudioEditor />
+      <Studio />
     </NoSsr>
   );
 };

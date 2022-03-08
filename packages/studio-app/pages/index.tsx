@@ -1,8 +1,6 @@
 import type { NextPage } from 'next';
 import * as React from 'react';
 import { Button, Container, List, ListItem, Typography } from '@mui/material';
-import StudioAppBar from '../src/components/StudioAppBar';
-import { NextLinkComposed } from '../src/components/Link';
 import client from '../src/api';
 import * as studioDom from '../src/studioDom';
 
@@ -14,17 +12,16 @@ const Home: NextPage = () => {
 
   return (
     <React.Fragment>
-      <StudioAppBar actions={null} />
       <Container>
         <Typography variant="h4">Pages</Typography>
         <List>
           {pages.map((page) => (
-            <ListItem key={page.id} button component={NextLinkComposed} to={`/pages/${page.id}`}>
+            <ListItem key={page.id} button component="a" href={`/api/deploy/${page.id}`}>
               {page.attributes.title.value}
             </ListItem>
           ))}
         </List>
-        <Button component={NextLinkComposed} to="/_studio/editor">
+        <Button component="a" href="/_studio/editor">
           Editor
         </Button>
       </Container>

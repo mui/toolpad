@@ -49,7 +49,7 @@ export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudi
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newApiNode, appNode, 'apis');
           onClose();
-          navigate(`/apis/${newApiNode.id}`);
+          navigate(`/editor/apis/${newApiNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Studio API</DialogTitle>

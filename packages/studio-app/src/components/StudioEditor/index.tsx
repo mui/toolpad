@@ -13,10 +13,9 @@ import {
   Typography,
 } from '@mui/material';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/router';
 import StudioAppBar from '../StudioAppBar';
 import PageEditor from './PageEditor';
 import PagePanel from './PagePanel';
@@ -79,7 +78,7 @@ interface CreateReleaseDialogProps {
 }
 
 function CreateReleaseDialog({ open, onClose }: CreateReleaseDialogProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const { handleSubmit, register, formState, reset } = useForm({
     defaultValues: {
@@ -93,7 +92,7 @@ function CreateReleaseDialog({ open, onClose }: CreateReleaseDialogProps) {
     try {
       const newRelease = await createReleaseMutation.mutateAsync([releaseParams]);
       reset();
-      router.push(`/_studio/release/${newRelease.version}`);
+      navigate(`/releases/${newRelease.version}`);
     } catch (error) {
       onClose();
     }
@@ -177,11 +176,7 @@ function EditorContent() {
 export default function Editor() {
   return (
     <DomProvider>
-      <BrowserRouter basename="_studio/editor">
-        <Routes>
-          <Route path="/*" element={<EditorContent />} />
-        </Routes>
-      </BrowserRouter>
+      <EditorContent />
     </DomProvider>
   );
 }

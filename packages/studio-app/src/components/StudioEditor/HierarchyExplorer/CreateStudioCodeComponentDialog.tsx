@@ -69,7 +69,7 @@ export default function CreateStudioCodeComponentDialog({
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'codeComponents');
           onClose();
-          navigate(`/codeComponents/${newNode.id}`);
+          navigate(`/editor/codeComponents/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Studio Code Component</DialogTitle>

@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { IncomingMessage } from 'http';
 
 // Represents what a session is able to do within Studio
 export interface Capabilities {
@@ -18,6 +18,6 @@ export const CAP_EDITOR: Capabilities = {
   edit: true,
 };
 
-export async function getCapabilities(req: NextRequest): Promise<Capabilities | null> {
+export async function getCapabilities(req: IncomingMessage): Promise<Capabilities | null> {
   return CAP_VIEWER;
 }

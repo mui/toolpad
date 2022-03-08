@@ -37,7 +37,7 @@ export default function CreateStudioPageDialog({ onClose, ...props }: CreateStud
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'pages');
           onClose();
-          navigate(`/pages/${newNode.id}`);
+          navigate(`/editor/pages/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Studio API</DialogTitle>

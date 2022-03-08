@@ -1,16 +1,15 @@
 import { Container, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@mui/x-data-grid-pro';
-import type { NextPage } from 'next';
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { useRouter } from 'next/router';
-import client from '../../../src/api';
-import StudioAppBar from '../../../src/components/StudioAppBar';
+import { useNavigate } from 'react-router-dom';
+import client from '../api';
+import StudioAppBar from './StudioAppBar';
 
-const Home: NextPage = () => {
-  const router = useRouter();
+export default function Releases() {
+  const navigate = useNavigate();
   const { data: releases = [], isLoading, error, refetch } = client.useQuery('getReleases', []);
 
   const deleteReleaseMutation = client.useMutation('deleteRelease');
@@ -83,12 +82,10 @@ const Home: NextPage = () => {
             density="compact"
             loading={isLoading || deleteReleaseMutation.isLoading}
             error={(error as any)?.message}
-            onRowClick={({ row }) => router.push(`/_studio/release/${row.version}`)}
+            onRowClick={({ row }) => navigate(`/releases/${row.version}`)}
           />
         </Box>
       </Container>
     </React.Fragment>
   );
-};
-
-export default Home;
+}

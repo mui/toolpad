@@ -50,7 +50,7 @@ export default function CreateStudioConnectionDialog({
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'connections');
           onClose();
-          navigate(`/connections/${newNode.id}`);
+          navigate(`/editor/connections/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Studio API</DialogTitle>

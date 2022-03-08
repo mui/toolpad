@@ -110,24 +110,24 @@ export default function HierarchyExplorer({ className }: HierarchyExplorerProps)
       // TODO: sort out in-page selection
       const page = studioDom.getPageAncestor(dom, node);
       if (page) {
-        navigate(`/pages/${page.id}`);
+        navigate(`/editor/pages/${page.id}`);
       }
     }
 
     if (studioDom.isPage(node)) {
-      navigate(`/pages/${node.id}`);
+      navigate(`/editor/pages/${node.id}`);
     }
 
     if (studioDom.isApi(node)) {
-      navigate(`/apis/${node.id}`);
+      navigate(`/editor/apis/${node.id}`);
     }
 
     if (studioDom.isCodeComponent(node)) {
-      navigate(`/codeComponents/${node.id}`);
+      navigate(`/editor/codeComponents/${node.id}`);
     }
 
     if (studioDom.isConnection(node)) {
-      navigate(`/connections/${node.id}`);
+      navigate(`/editor/connections/${node.id}`);
     }
   };
 

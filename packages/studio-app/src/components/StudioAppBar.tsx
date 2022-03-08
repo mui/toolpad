@@ -2,7 +2,7 @@ import * as React from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import { AppBar, Toolbar, IconButton, Typography, Button } from '@mui/material';
 import { Box } from '@mui/system';
-import { NextLinkComposed } from './Link';
+import { Link } from 'react-router-dom';
 
 interface StudioAppBarProps {
   actions: React.ReactNode;
@@ -18,10 +18,10 @@ export default function StudioAppBar({ actions }: StudioAppBarProps) {
         <Typography variant="h6" color="inherit" component="div">
           MUI Studio
         </Typography>
-        <Button component={NextLinkComposed} to="/_studio/editor" color="inherit">
+        <Button component={Link} to="/editor" color="inherit">
           Editor
         </Button>
-        <Button component={NextLinkComposed} to="/_studio/release" color="inherit">
+        <Button component={Link} to="/releases" color="inherit">
           Releases
         </Button>
         <Box flex={1} />

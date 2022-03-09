@@ -58,7 +58,7 @@ export default function PageOptionsPanel() {
           startIcon={<PageIcon />}
           color="inherit"
           component="a"
-          href={`/pages/${pageNodeId}`}
+          href={`/pages/${state.appId}/${pageNodeId}`}
         >
           View Page
         </Button>

@@ -10,18 +10,21 @@ const ViewerRoot = styled(PageView)({
 });
 
 export interface ViewerProps {
+  appId: string;
   pageNodeId: NodeId;
 }
 
-function ViewerContent({ pageNodeId }: ViewerProps) {
+function ViewerContent({ appId, pageNodeId }: ViewerProps) {
   const domLoader = useDomLoader();
-  return domLoader.dom ? <ViewerRoot dom={domLoader.dom} pageNodeId={pageNodeId} /> : null;
+  return domLoader.dom ? (
+    <ViewerRoot appId={appId} dom={domLoader.dom} pageNodeId={pageNodeId} />
+  ) : null;
 }
 
-export default function StudioViewer({ pageNodeId }: ViewerProps) {
+export default function StudioViewer({ appId, pageNodeId }: ViewerProps) {
   return (
-    <DomProvider>
-      <ViewerContent pageNodeId={pageNodeId} />
+    <DomProvider appId={appId}>
+      <ViewerContent appId={appId} pageNodeId={pageNodeId} />
     </DomProvider>
   );
 }

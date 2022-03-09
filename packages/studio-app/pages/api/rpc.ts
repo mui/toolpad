@@ -34,13 +34,13 @@ export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
 }
 
-export interface Methods {
-  readonly [key: string]: Method;
+export interface MethodResolvers {
+  readonly [key: string]: MethodResolver<any>;
 }
 
 export interface Definition {
-  readonly query: Methods;
-  readonly mutation: Methods;
+  readonly query: MethodResolvers;
+  readonly mutation: MethodResolvers;
 }
 
 export interface RpcRequest {
@@ -65,34 +65,56 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       res.status(404).end();
       return;
     }
-    const method = definition[type][name];
+    const method: MethodResolver<any> = definition[type][name];
     const context = { req, res };
-    const result = await asyncLocalStorage.run(context, () => method(...params));
+    const result = await method(params, context);
     const responseData: RpcResponse = { result };
     res.json(responseData);
   };
 }
 
+interface MethodResolver<F extends Method> {
+  (params: Parameters<F>, ctx: RpcContext): ReturnType<F>;
+}
+
+function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResolver<F> {
+  return handler;
+}
+
 const rpcServer = {
   query: {
-    execApi: (...args: Parameters<typeof execApi>) => {
-      // DEMO: how we can add authentication in the mix:
-      //   const ctx = getContext();
-      //   console.log(ctx.req.headers);
+    execApi: createMethod<typeof execApi>((args) => {
       return execApi(...args);
-    },
-
-    getReleases,
-    findActiveDeployment,
-    loadReleaseDom,
-    loadDom,
+    }),
+    getReleases: createMethod<typeof getReleases>((params) => {
+      return getReleases(...params);
+    }),
+    findActiveDeployment: createMethod<typeof findActiveDeployment>((params) => {
+      return findActiveDeployment(...params);
+    }),
+    loadReleaseDom: createMethod<typeof loadReleaseDom>((params) => {
+      return loadReleaseDom(...params);
+    }),
+    loadDom: createMethod<typeof loadDom>((params) => {
+      return loadDom(...params);
+    }),
   },
   mutation: {
-    createRelease,
-    deleteRelease,
-    createDeployment,
-    testConnection,
-    saveDom,
+    createRelease: createMethod<typeof createRelease>((params) => {
+      return createRelease(...params);
+    }),
+    deleteRelease: createMethod<typeof deleteRelease>((params) => {
+      return deleteRelease(...params);
+    }),
+    createDeployment: createMethod<typeof createDeployment>((params) => {
+      return createDeployment(...params);
+    }),
+    testConnection: createMethod<typeof testConnection>((params) => {
+      return testConnection(...params);
+    }),
+    saveDom: createMethod<typeof saveDom>((params) => {
+      return saveDom(...params);
+    }),
   },
 } as const;
 

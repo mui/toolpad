@@ -18,11 +18,13 @@ import { ExactEntriesOf } from '../../../utils/types';
 import DialogForm from '../../DialogForm';
 
 export interface CreateStudioConnectionDialogProps {
+  appId: string;
   open: boolean;
   onClose: () => void;
 }
 
 export default function CreateStudioConnectionDialog({
+  appId,
   onClose,
   ...props
 }: CreateStudioConnectionDialogProps) {
@@ -50,7 +52,7 @@ export default function CreateStudioConnectionDialog({
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'connections');
           onClose();
-          navigate(`/editor/connections/${newNode.id}`);
+          navigate(`/app/${appId}/editor/connections/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Studio API</DialogTitle>

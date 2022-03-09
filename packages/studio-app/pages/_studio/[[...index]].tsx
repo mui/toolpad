@@ -6,7 +6,7 @@ import Studio from '../../src/components/Studio';
 const Home: NextPage = () => {
   return (
     <NoSsr>
-      <Studio />
+      <Studio basename="/_studio" />
     </NoSsr>
   );
 };

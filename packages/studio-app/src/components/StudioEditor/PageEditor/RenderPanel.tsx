@@ -468,6 +468,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const domApi = useDomApi();
   const api = usePageEditorApi();
   const {
+    appId,
     selection,
     newNode,
     viewState,
@@ -762,6 +763,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   return (
     <RenderPanelRoot className={className}>
       <PageView
+        appId={appId}
         editor
         className={classes.view}
         dom={dom}

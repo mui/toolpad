@@ -41,11 +41,13 @@ function createDefaultCodeComponent(name: string): string {
 }
 
 export interface CreateStudioCodeComponentDialogProps {
+  appId: string;
   open: boolean;
   onClose: () => void;
 }
 
 export default function CreateStudioCodeComponentDialog({
+  appId,
   onClose,
   ...props
 }: CreateStudioCodeComponentDialogProps) {
@@ -69,7 +71,7 @@ export default function CreateStudioCodeComponentDialog({
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'codeComponents');
           onClose();
-          navigate(`/editor/codeComponents/${newNode.id}`);
+          navigate(`/app/${appId}/editor/codeComponents/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Studio Code Component</DialogTitle>

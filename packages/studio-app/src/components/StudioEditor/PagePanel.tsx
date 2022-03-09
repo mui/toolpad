@@ -7,13 +7,14 @@ const PagePanelRoot = styled('div')({
 });
 
 export interface ComponentPanelProps {
+  appId: string;
   className?: string;
 }
 
-export default function PagePanel({ className }: ComponentPanelProps) {
+export default function PagePanel({ appId, className }: ComponentPanelProps) {
   return (
     <PagePanelRoot className={className}>
-      <HierarchyExplorer />
+      <HierarchyExplorer appId={appId} />
     </PagePanelRoot>
   );
 }

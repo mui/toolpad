@@ -4,13 +4,24 @@ import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@m
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import client from '../api';
 import StudioAppBar from './StudioAppBar';
 
 export default function Releases() {
+  const { appId } = useParams();
+
+  if (!appId) {
+    throw new Error(`Missing queryParam "appId"`);
+  }
+
   const navigate = useNavigate();
-  const { data: releases = [], isLoading, error, refetch } = client.useQuery('getReleases', []);
+  const {
+    data: releases = [],
+    isLoading,
+    error,
+    refetch,
+  } = client.useQuery('getReleases', [appId]);
 
   const deleteReleaseMutation = client.useMutation('deleteRelease');
   const deployReleaseMutation = client.useMutation('createDeployment');
@@ -27,10 +38,10 @@ export default function Releases() {
   const handleDeployClick = React.useCallback(
     async (version: string) => {
       // TODO: confirmation dialog here
-      await deployReleaseMutation.mutateAsync([version]);
+      await deployReleaseMutation.mutateAsync([appId, version]);
       refetch();
     },
-    [deployReleaseMutation, refetch],
+    [appId, deployReleaseMutation, refetch],
   );
 
   const columns = React.useMemo<GridColumns>(
@@ -72,7 +83,7 @@ export default function Releases() {
 
   return (
     <React.Fragment>
-      <StudioAppBar actions={null} />
+      <StudioAppBar appId={appId} actions={null} />
       <Container>
         <Typography variant="h2">Releases</Typography>
         <Box sx={{ my: 3, height: 350, width: '100%' }}>
@@ -82,7 +93,7 @@ export default function Releases() {
             density="compact"
             loading={isLoading || deleteReleaseMutation.isLoading}
             error={(error as any)?.message}
-            onRowClick={({ row }) => navigate(`/releases/${row.version}`)}
+            onRowClick={({ row }) => navigate(`/app/${appId}/releases/${row.version}`)}
           />
         </Box>
       </Container>

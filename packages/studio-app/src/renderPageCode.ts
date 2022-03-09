@@ -65,6 +65,8 @@ interface MemoizedConst {
 }
 
 class Context implements RenderContext {
+  appId: string;
+
   dom: studioDom.StudioDom;
 
   private config: RenderPageConfig;
@@ -93,7 +95,13 @@ class Context implements RenderContext {
 
   private memoizedConsts: MemoizedConst[] = [];
 
-  constructor(dom: studioDom.StudioDom, page: studioDom.StudioPageNode, config: RenderPageConfig) {
+  constructor(
+    appId: string,
+    dom: studioDom.StudioDom,
+    page: studioDom.StudioPageNode,
+    config: RenderPageConfig,
+  ) {
+    this.appId = appId;
     this.dom = dom;
     this.page = page;
     this.config = config;
@@ -674,7 +682,7 @@ class Context implements RenderContext {
 
           const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
 
-          const dataUrl = `/api/data/${
+          const dataUrl = `/api/data/${this.appId}/${
             this.config.release ? `release/${this.config.release}/` : 'preview/'
           }`;
 
@@ -792,6 +800,7 @@ class Context implements RenderContext {
 }
 
 export default function renderPageCode(
+  appId: string,
   dom: studioDom.StudioDom,
   pageNodeId: NodeId,
   configInit: Partial<RenderPageConfig> = {},
@@ -805,7 +814,7 @@ export default function renderPageCode(
 
   const page = studioDom.getNode(dom, pageNodeId, 'page');
 
-  const ctx = new Context(dom, page, config);
+  const ctx = new Context(appId, dom, page, config);
   let code: string = ctx.render();
 
   if (config.pretty) {

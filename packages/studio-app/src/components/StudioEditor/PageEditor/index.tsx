@@ -29,15 +29,16 @@ const PageEditorRoot = styled('div')(({ theme }) => ({
 }));
 
 interface PageEditorProps {
+  appId: string;
   className?: string;
 }
 
-export default function PageEditor({ className }: PageEditorProps) {
+export default function PageEditor({ appId, className }: PageEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const pageNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'page');
   return pageNode ? (
-    <PageEditorProvider key={nodeId} nodeId={nodeId as NodeId}>
+    <PageEditorProvider key={nodeId} appId={appId} nodeId={nodeId as NodeId}>
       <PageEditorRoot className={className}>
         <ComponentCatalog />
         <RenderPanel className={classes.renderPanel} />

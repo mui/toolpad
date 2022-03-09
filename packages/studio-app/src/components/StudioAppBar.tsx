@@ -5,10 +5,11 @@ import { Box } from '@mui/system';
 import { Link } from 'react-router-dom';
 
 interface StudioAppBarProps {
+  appId: string;
   actions: React.ReactNode;
 }
 
-export default function StudioAppBar({ actions }: StudioAppBarProps) {
+export default function StudioAppBar({ appId, actions }: StudioAppBarProps) {
   return (
     <AppBar position="static" sx={{ zIndex: 2 }}>
       <Toolbar variant="dense">
@@ -18,10 +19,10 @@ export default function StudioAppBar({ actions }: StudioAppBarProps) {
         <Typography variant="h6" color="inherit" component="div">
           MUI Studio
         </Typography>
-        <Button component={Link} to="/editor" color="inherit">
+        <Button component={Link} to={`/app/${appId}/editor`} color="inherit">
           Editor
         </Button>
-        <Button component={Link} to="/releases" color="inherit">
+        <Button component={Link} to={`/app/${appId}/releases`} color="inherit">
           Releases
         </Button>
         <Box flex={1} />

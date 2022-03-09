@@ -1,6 +1,6 @@
 import { NextApiHandler } from 'next';
 import { transform } from 'sucrase';
-import renderEntryPoint from '../../../../../src/renderPageEntryCode';
+import renderEntryPoint from '../../../../../../src/renderPageEntryCode';
 
 export default (async (req, res) => {
   const { code: entryPoint } = renderEntryPoint({

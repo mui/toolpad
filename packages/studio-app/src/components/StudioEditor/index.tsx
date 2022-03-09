@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
 import StudioAppBar from '../StudioAppBar';
@@ -55,15 +55,16 @@ const EditorRoot = styled('div')(({ theme }) => ({
 }));
 
 interface FileEditorProps {
+  appId: string;
   className?: string;
 }
 
-function FileEditor({ className }: FileEditorProps) {
+function FileEditor({ appId, className }: FileEditorProps) {
   return (
     <Routes>
       <Route path="connections/:nodeId" element={<ConnectionEditor className={className} />} />
-      <Route path="apis/:nodeId" element={<ApiEditor className={className} />} />
-      <Route path="pages/:nodeId" element={<PageEditor className={className} />} />
+      <Route path="apis/:nodeId" element={<ApiEditor appId={appId} className={className} />} />
+      <Route path="pages/:nodeId" element={<PageEditor appId={appId} className={className} />} />
       <Route
         path="codeComponents/:nodeId"
         element={<CodeComponentEditor className={className} />}
@@ -73,11 +74,12 @@ function FileEditor({ className }: FileEditorProps) {
 }
 
 interface CreateReleaseDialogProps {
+  appId: string;
   open: boolean;
   onClose: () => void;
 }
 
-function CreateReleaseDialog({ open, onClose }: CreateReleaseDialogProps) {
+function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps) {
   const navigate = useNavigate();
 
   const { handleSubmit, register, formState, reset } = useForm({
@@ -90,9 +92,9 @@ function CreateReleaseDialog({ open, onClose }: CreateReleaseDialogProps) {
   const createReleaseMutation = client.useMutation('createRelease');
   const doSubmit = handleSubmit(async (releaseParams) => {
     try {
-      const newRelease = await createReleaseMutation.mutateAsync([releaseParams]);
+      const newRelease = await createReleaseMutation.mutateAsync([appId, releaseParams]);
       reset();
-      navigate(`/releases/${newRelease.version}`);
+      navigate(`/app/${appId}/releases/${newRelease.version}`);
     } catch (error) {
       onClose();
     }
@@ -134,7 +136,11 @@ function CreateReleaseDialog({ open, onClose }: CreateReleaseDialogProps) {
   );
 }
 
-function EditorContent() {
+export interface EditorContentProps {
+  appId: string;
+}
+
+function EditorContent({ appId }: EditorContentProps) {
   const domLoader = useDomLoader();
 
   const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
@@ -142,6 +148,7 @@ function EditorContent() {
   return (
     <EditorRoot>
       <StudioAppBar
+        appId={appId}
         actions={
           <React.Fragment>
             {domLoader.saving ? (
@@ -158,8 +165,8 @@ function EditorContent() {
       />
       {domLoader.dom ? (
         <div className={classes.content}>
-          <PagePanel className={classes.hierarchyPanel} />
-          <FileEditor className={classes.editorPanel} />
+          <PagePanel className={classes.hierarchyPanel} appId={appId} />
+          <FileEditor className={classes.editorPanel} appId={appId} />
         </div>
       ) : (
         <Box flex={1} display="flex" alignItems="center" justifyContent="center">
@@ -167,6 +174,7 @@ function EditorContent() {
         </Box>
       )}
       <CreateReleaseDialog
+        appId={appId}
         open={createReleaseDialogOpen}
         onClose={() => setCreateReleaseDialogOpen(false)}
       />
@@ -174,9 +182,15 @@ function EditorContent() {
   );
 }
 export default function Editor() {
+  const { appId } = useParams();
+
+  if (!appId) {
+    throw new Error(`Missing queryParam "appId"`);
+  }
+
   return (
-    <DomProvider>
-      <EditorContent />
+    <DomProvider appId={appId}>
+      <EditorContent appId={appId} />
     </DomProvider>
   );
 }

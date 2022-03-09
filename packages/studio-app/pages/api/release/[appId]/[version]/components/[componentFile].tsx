@@ -1,18 +1,19 @@
 import { NextApiHandler } from 'next';
 import { transform } from 'sucrase';
 import * as path from 'path';
-import { loadReleaseDom } from '../../../../../src/server/data';
-import { NodeId } from '../../../../../src/types';
-import * as studioDom from '../../../../../src/studioDom';
-import { asArray } from '../../../../../src/utils/collections';
+import { loadReleaseDom } from '../../../../../../src/server/data';
+import { NodeId } from '../../../../../../src/types';
+import * as studioDom from '../../../../../../src/studioDom';
+import { asArray } from '../../../../../../src/utils/collections';
 
 export default (async (req, res) => {
+  const [appId] = asArray(req.query.appId);
   const [version] = asArray(req.query.version);
   const [componentFile] = asArray(req.query.componentFile);
 
   const { name: componentId } = path.parse(componentFile);
 
-  const dom = await loadReleaseDom(version);
+  const dom = await loadReleaseDom(appId, version);
 
   const codeComponent = studioDom.getMaybeNode(dom, componentId as NodeId, 'codeComponent');
 

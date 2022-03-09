@@ -16,17 +16,20 @@ const cors = initMiddleware<any>(
 );
 
 export interface HandleDataRequestParams {
+  appId: string;
   release: string | null;
 }
 
 export default async (
   req: NextApiRequest,
   res: NextApiResponse<StudioApiResult<any>>,
-  { release }: HandleDataRequestParams,
+  { appId, release }: HandleDataRequestParams,
 ) => {
   await cors(req, res);
   const apiNodeId = req.query.queryId as NodeId;
-  const dom = release ? await loadReleaseDom(release) : await loadDom();
+  const dom = release ? await loadReleaseDom(appId, release) : await loadDom(appId);
   const api = studioDom.getNode(dom, apiNodeId, 'api');
-  res.json(await execApi(api, req.query.params ? JSON.parse(req.query.params as string) : {}));
+  res.json(
+    await execApi(appId, api, req.query.params ? JSON.parse(req.query.params as string) : {}),
+  );
 };

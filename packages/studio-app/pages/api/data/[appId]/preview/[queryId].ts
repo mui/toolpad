@@ -4,6 +4,6 @@ import { StudioApiResult } from '../../../../../src/types';
 import { asArray } from '../../../../../src/utils/collections';
 
 export default (async (req, res) => {
-  const [release] = asArray(req.query.release);
-  await handleDataRequest(req, res, { release });
+  const [appId] = asArray(req.query.appId);
+  await handleDataRequest(req, res, { appId, release: null });
 }) as NextApiHandler<StudioApiResult<any>>;

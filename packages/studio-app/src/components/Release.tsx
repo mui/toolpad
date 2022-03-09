@@ -11,16 +11,17 @@ import { NodeId } from '../types';
 import StudioAppBar from './StudioAppBar';
 
 interface NavigateToReleaseActionProps {
+  appId: string;
   version?: string;
   pageNodeId: NodeId;
 }
 
-function NavigateToReleaseAction({ version, pageNodeId }: NavigateToReleaseActionProps) {
+function NavigateToReleaseAction({ appId, version, pageNodeId }: NavigateToReleaseActionProps) {
   return (
     <GridActionsCellItem
       icon={<OpenInNewIcon />}
       component="a"
-      href={`/api/release/${version}/${pageNodeId}`}
+      href={`/api/release/${appId}/${version}/${pageNodeId}`}
       target="_blank"
       label="Open"
       disabled={!version}
@@ -29,17 +30,22 @@ function NavigateToReleaseAction({ version, pageNodeId }: NavigateToReleaseActio
 }
 
 export default function Release() {
-  const { version } = useParams();
+  const { version, appId } = useParams();
+
+  if (!appId) {
+    throw new Error(`Missing queryParam "appId"`);
+  }
+
   const {
     data: dom,
     isLoading,
     error,
-  } = client.useQuery('loadReleaseDom', version ? [version] : null);
+  } = client.useQuery('loadReleaseDom', version ? [appId, version] : null);
   const app = dom ? studioDom.getApp(dom) : null;
   const { pages = [] } = dom && app ? studioDom.getChildNodes(dom, app) : {};
 
   const deployReleaseMutation = client.useMutation('createDeployment');
-  const activeDeploymentQuery = client.useQuery('findActiveDeployment', []);
+  const activeDeploymentQuery = client.useQuery('findActiveDeployment', [appId]);
 
   const columns: GridColumns = React.useMemo(
     () => [
@@ -49,19 +55,19 @@ export default function Release() {
         field: 'actions',
         type: 'actions',
         getActions: (params: GridRowParams) => [
-          <NavigateToReleaseAction version={version} pageNodeId={params.row.id} />,
+          <NavigateToReleaseAction appId={appId} version={version} pageNodeId={params.row.id} />,
         ],
       },
     ],
-    [version],
+    [appId, version],
   );
 
   const handleDeployClick = React.useCallback(async () => {
     if (version) {
-      await deployReleaseMutation.mutateAsync([version]);
+      await deployReleaseMutation.mutateAsync([appId, version]);
       activeDeploymentQuery.refetch();
     }
-  }, [activeDeploymentQuery, deployReleaseMutation, version]);
+  }, [appId, activeDeploymentQuery, deployReleaseMutation, version]);
 
   const isActiveDeployment = activeDeploymentQuery.data?.version === version;
 
@@ -70,7 +76,7 @@ export default function Release() {
 
   return (
     <React.Fragment>
-      <StudioAppBar actions={null} />
+      <StudioAppBar appId={appId} actions={null} />
       <Container>
         <Typography variant="h2">Release &quot;{version}&quot;</Typography>
         <Toolbar disableGutters>

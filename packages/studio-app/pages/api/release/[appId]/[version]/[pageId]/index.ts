@@ -1,6 +1,6 @@
 import { NextApiHandler } from 'next';
-import getImportMap from '../../../../../src/getImportMap';
-import renderPageHtml from '../../../../../src/renderPageHtml';
+import getImportMap from '../../../../../../src/getImportMap';
+import renderPageHtml from '../../../../../../src/renderPageHtml';
 
 export default (async (req, res) => {
   const { code: html } = renderPageHtml({

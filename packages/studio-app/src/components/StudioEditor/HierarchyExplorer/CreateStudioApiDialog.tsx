@@ -18,11 +18,16 @@ import DialogForm from '../../DialogForm';
 import { useDom, useDomApi } from '../../DomLoader';
 
 export interface CreateStudioApiDialogProps {
+  appId: string;
   open: boolean;
   onClose: () => void;
 }
 
-export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudioApiDialogProps) {
+export default function CreateStudioApiDialog({
+  appId,
+  onClose,
+  ...props
+}: CreateStudioApiDialogProps) {
   const [connectionId, setConnectionID] = React.useState('');
   const dom = useDom();
   const domApi = useDomApi();
@@ -49,7 +54,7 @@ export default function CreateStudioApiDialog({ onClose, ...props }: CreateStudi
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newApiNode, appNode, 'apis');
           onClose();
-          navigate(`/editor/apis/${newApiNode.id}`);
+          navigate(`/app/${appId}/editor/apis/${newApiNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Studio API</DialogTitle>

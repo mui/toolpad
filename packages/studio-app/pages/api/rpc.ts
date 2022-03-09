@@ -1,6 +1,8 @@
 import { NextApiHandler } from 'next';
 import type { IncomingMessage } from 'http';
 import {
+  getApps,
+  createApp,
   testConnection,
   execApi,
   loadDom,
@@ -83,6 +85,9 @@ function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResol
 
 const rpcServer = {
   query: {
+    getApps: createMethod<typeof getApps>((params) => {
+      return getApps(...params);
+    }),
     execApi: createMethod<typeof execApi>((args) => {
       return execApi(...args);
     }),
@@ -100,6 +105,9 @@ const rpcServer = {
     }),
   },
   mutation: {
+    createApp: createMethod<typeof createApp>((params) => {
+      return createApp(...params);
+    }),
     createRelease: createMethod<typeof createRelease>((params) => {
       return createRelease(...params);
     }),

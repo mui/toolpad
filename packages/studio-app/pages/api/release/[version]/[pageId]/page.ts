@@ -1,5 +1,6 @@
 import { NextApiHandler } from 'next';
 import { transform } from 'sucrase';
+import { getCapabilities } from '../../../../../src/capabilities';
 import renderPageCode from '../../../../../src/renderPageCode';
 import { loadReleaseDom } from '../../../../../src/server/data';
 import { NodeId } from '../../../../../src/types';
@@ -7,6 +8,12 @@ import { NodeId } from '../../../../../src/types';
 import { asArray } from '../../../../../src/utils/collections';
 
 export default (async (req, res) => {
+  const capabilities = await getCapabilities(req);
+  if (!capabilities?.view) {
+    res.status(403).end();
+    return;
+  }
+
   const [version] = asArray(req.query.version);
   const [pageId] = asArray(req.query.pageId);
   const dom = await loadReleaseDom(version);

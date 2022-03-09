@@ -13,6 +13,7 @@ import {
   findActiveDeployment,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
+import { Capabilities, getCapabilities } from '../../src/capabilities';
 
 interface RpcContext {
   req: IncomingMessage;
@@ -83,36 +84,79 @@ function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResol
 
 const rpcServer = {
   query: {
-    execApi: createMethod<typeof execApi>((args) => {
-      return execApi(...args);
+    getCapabilities: createMethod<() => Promise<Capabilities | null>>(async (params, ctx) => {
+      return getCapabilities(ctx.req);
     }),
-    getReleases: createMethod<typeof getReleases>((params) => {
+    execApi: createMethod<typeof execApi>(async (params, ctx) => {
+      const capabilities = await getCapabilities(ctx.req);
+      if (!capabilities?.view) {
+        throw new Error(`Unauthorized`);
+      }
+      return execApi(...params);
+    }),
+    getReleases: createMethod<typeof getReleases>(async (params, ctx) => {
+      const capabilities = await getCapabilities(ctx.req);
+      if (!capabilities?.view) {
+        throw new Error(`Unauthorized`);
+      }
       return getReleases(...params);
     }),
-    findActiveDeployment: createMethod<typeof findActiveDeployment>((params) => {
+    findActiveDeployment: createMethod<typeof findActiveDeployment>(async (params, ctx) => {
+      const capabilities = await getCapabilities(ctx.req);
+      if (!capabilities?.view) {
+        throw new Error(`Unauthorized`);
+      }
       return findActiveDeployment(...params);
     }),
-    loadReleaseDom: createMethod<typeof loadReleaseDom>((params) => {
+    loadReleaseDom: createMethod<typeof loadReleaseDom>(async (params, ctx) => {
+      const capabilities = await getCapabilities(ctx.req);
+      if (!capabilities?.view) {
+        throw new Error(`Unauthorized`);
+      }
       return loadReleaseDom(...params);
     }),
-    loadDom: createMethod<typeof loadDom>((params) => {
+    loadDom: createMethod<typeof loadDom>(async (params, ctx) => {
+      const capabilities = await getCapabilities(ctx.req);
+      if (!capabilities?.view) {
+        throw new Error(`Unauthorized`);
+      }
       return loadDom(...params);
     }),
   },
   mutation: {
-    createRelease: createMethod<typeof createRelease>((params) => {
+    createRelease: createMethod<typeof createRelease>(async (params, ctx) => {
+      const capabilities = await getCapabilities(ctx.req);
+      if (!capabilities?.edit) {
+        throw new Error(`Unauthorized`);
+      }
       return createRelease(...params);
     }),
-    deleteRelease: createMethod<typeof deleteRelease>((params) => {
+    deleteRelease: createMethod<typeof deleteRelease>(async (params, ctx) => {
+      const capabilities = await getCapabilities(ctx.req);
+      if (!capabilities?.edit) {
+        throw new Error(`Unauthorized`);
+      }
       return deleteRelease(...params);
     }),
-    createDeployment: createMethod<typeof createDeployment>((params) => {
+    createDeployment: createMethod<typeof createDeployment>(async (params, ctx) => {
+      const capabilities = await getCapabilities(ctx.req);
+      if (!capabilities?.edit) {
+        throw new Error(`Unauthorized`);
+      }
       return createDeployment(...params);
     }),
-    testConnection: createMethod<typeof testConnection>((params) => {
+    testConnection: createMethod<typeof testConnection>(async (params, ctx) => {
+      const capabilities = await getCapabilities(ctx.req);
+      if (!capabilities?.edit) {
+        throw new Error(`Unauthorized`);
+      }
       return testConnection(...params);
     }),
-    saveDom: createMethod<typeof saveDom>((params) => {
+    saveDom: createMethod<typeof saveDom>(async (params, ctx) => {
+      const capabilities = await getCapabilities(ctx.req);
+      if (!capabilities?.edit) {
+        throw new Error(`Unauthorized`);
+      }
       return saveDom(...params);
     }),
   },

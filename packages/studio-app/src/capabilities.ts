@@ -19,5 +19,6 @@ export const CAP_EDITOR: Capabilities = {
 };
 
 export async function getCapabilities(req: IncomingMessage): Promise<Capabilities | null> {
-  return CAP_VIEWER;
+  // TODO:
+  return CAP_EDITOR;
 }

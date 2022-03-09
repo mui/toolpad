@@ -5,8 +5,15 @@ import { loadReleaseDom } from '../../../../../src/server/data';
 import { NodeId } from '../../../../../src/types';
 import * as studioDom from '../../../../../src/studioDom';
 import { asArray } from '../../../../../src/utils/collections';
+import { getCapabilities } from '../../../../../src/capabilities';
 
 export default (async (req, res) => {
+  const capabilities = await getCapabilities(req);
+  if (!capabilities?.view) {
+    res.status(403).end();
+    return;
+  }
+
   const [version] = asArray(req.query.version);
   const [derivedStateFile] = asArray(req.query.derivedStateFile);
 

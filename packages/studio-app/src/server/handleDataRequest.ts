@@ -4,6 +4,7 @@ import { execApi, loadDom, loadReleaseDom } from './data';
 import initMiddleware from './initMiddleware';
 import { NodeId, StudioApiResult } from '../types';
 import * as studioDom from '../studioDom';
+import { getCapabilities } from '../capabilities';
 
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
@@ -24,6 +25,12 @@ export default async (
   res: NextApiResponse<StudioApiResult<any>>,
   { release }: HandleDataRequestParams,
 ) => {
+  const capabilities = await getCapabilities(req);
+  if (!capabilities?.view) {
+    res.status(403).end();
+    return;
+  }
+
   await cors(req, res);
   const apiNodeId = req.query.queryId as NodeId;
   const dom = release ? await loadReleaseDom(release) : await loadDom();

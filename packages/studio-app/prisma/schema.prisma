@@ -36,7 +36,7 @@ model App {
 
 model DomNode {
   id          String      @id
-  name        String
+  name        String      @unique
   type        DomNodeType
   children    DomNode[]   @relation("Children")
   parent      DomNode?    @relation("Children", fields: [parentId], references: [id])

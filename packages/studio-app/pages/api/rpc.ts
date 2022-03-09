@@ -1,6 +1,5 @@
 import { NextApiHandler } from 'next';
-import { AsyncLocalStorage } from 'async_hooks';
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage } from 'http';
 import {
   testConnection,
   execApi,
@@ -15,19 +14,8 @@ import {
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
-const asyncLocalStorage = new AsyncLocalStorage<RpcContext>();
-
-export function getContext(): RpcContext {
-  const ctx = asyncLocalStorage.getStore();
-  if (!ctx) {
-    throw new Error('Not in a request context');
-  }
-  return ctx;
-}
-
 interface RpcContext {
   req: IncomingMessage;
-  res: ServerResponse;
 }
 
 export interface Method<P extends any[] = any[], R = any> {

@@ -8,7 +8,9 @@ import {
 } from 'react-query';
 import type {
   Definition,
-  MethodResolvers,
+  MethodsGroup,
+  MethodsOf,
+  MethodsOfGroup,
   RpcRequest,
   RpcResponse,
   ServerDefinition,
@@ -19,11 +21,8 @@ if (config.demoMode) {
   // TODO: replace API with shim based on window.localStorage
   console.log(`Starting Studio in demo mode`);
 }
-type Methods<R extends MethodResolvers> = {
-  [K in keyof R]: (...params: Parameters<R[K]>[0]) => ReturnType<R[K]>;
-};
 
-function createFetcher(endpoint: string, type: 'query' | 'mutation'): Methods<any> {
+function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfGroup<any> {
   return new Proxy(
     {},
     {
@@ -52,7 +51,7 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): Methods<an
   );
 }
 
-interface UseQueryFn<M extends MethodResolvers> {
+interface UseQueryFn<M extends MethodsGroup> {
   <K extends keyof M & string>(
     name: K,
     params: Parameters<M[K]> | null,
@@ -68,23 +67,24 @@ interface UseQueryFn<M extends MethodResolvers> {
   ): UseQueryResult<Awaited<ReturnType<M[K]>>>;
 }
 
-interface UseMutationFn<M extends MethodResolvers> {
+interface UseMutationFn<M extends MethodsGroup> {
   <K extends keyof M & string>(
     name: K,
-    options?: UseMutationOptions<unknown, unknown, Parameters<M[K]>>,
+    options?: UseMutationOptions<any, unknown, Parameters<M[K]>>,
   ): UseMutationResult<Awaited<ReturnType<M[K]>>, unknown, Parameters<M[K]>>;
 }
 
 interface ApiClient<D extends Definition> {
-  query: Methods<D['query']>;
-  mutation: Methods<D['mutation']>;
-  useQuery: UseQueryFn<Methods<D['query']>>;
-  useMutation: UseMutationFn<Methods<D['mutation']>>;
+  query: D['query'];
+  mutation: D['mutation'];
+  useQuery: UseQueryFn<D['query']>;
+  useMutation: UseMutationFn<D['mutation']>;
 }
 
-function createClient<D extends Definition>(endpoint: string): ApiClient<D> {
+function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> {
   const query = createFetcher(endpoint, 'query');
   const mutation = createFetcher(endpoint, 'mutation');
+
   return {
     query,
     mutation,

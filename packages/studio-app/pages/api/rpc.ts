@@ -33,6 +33,9 @@ interface RpcContext {
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
 }
+export interface MethodsGroup {
+  readonly [key: string]: Method;
+}
 
 export interface MethodResolvers {
   readonly [key: string]: MethodResolver<any>;
@@ -41,6 +44,15 @@ export interface MethodResolvers {
 export interface Definition {
   readonly query: MethodResolvers;
   readonly mutation: MethodResolvers;
+}
+
+export type MethodsOfGroup<R extends MethodResolvers> = {
+  [K in keyof R]: (...params: Parameters<R[K]>[0]) => ReturnType<R[K]>;
+};
+
+export interface MethodsOf<D extends Definition> {
+  readonly query: MethodsOfGroup<D['query']>;
+  readonly mutation: MethodsOfGroup<D['mutation']>;
 }
 
 export interface RpcRequest {
@@ -118,6 +130,6 @@ const rpcServer = {
   },
 } as const;
 
-export type ServerDefinition = typeof rpcServer;
+export type ServerDefinition = MethodsOf<typeof rpcServer>;
 
 export default createRpcHandler(rpcServer);

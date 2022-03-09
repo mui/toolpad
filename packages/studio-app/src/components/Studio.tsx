@@ -1,25 +1,26 @@
 import {
   Button,
+  Card,
+  CardActions,
+  CardContent,
   Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  List,
-  ListItem,
-  ListItemText,
   TextField,
-  Toolbar,
   Typography,
 } from '@mui/material';
 import * as React from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
+import { Box } from '@mui/system';
 import Release from './Release';
 import Releases from './Releases';
 import StudioEditor from './StudioEditor';
 import client from '../api';
 import DialogForm from './DialogForm';
+import { App } from '../../prisma/generated/client';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -64,6 +65,33 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   );
 }
 
+interface AppCardProps {
+  app: App;
+}
+
+function AppCard({ app }: AppCardProps) {
+  return (
+    <Card sx={{ gridColumn: 'span 1' }}>
+      <CardContent>
+        <Typography gutterBottom variant="h5" component="div">
+          {app.name}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Some app description here
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Button size="small" component={Link} to={`/app/${app.id}/editor`}>
+          Edit
+        </Button>
+        <Button size="small" component="a" href={`/deploy/${app.id}`}>
+          open
+        </Button>
+      </CardActions>
+    </Card>
+  );
+}
+
 function Overview() {
   const { data: apps = [] } = client.useQuery('getApps', []);
 
@@ -72,21 +100,29 @@ function Overview() {
   return (
     <Container>
       <Typography variant="h2">Apps</Typography>
-      <Toolbar>
-        <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-        <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
-      </Toolbar>
-      <List>
+      <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
+
+      <Box
+        sx={{
+          my: 5,
+          display: 'grid',
+          gridTemplateColumns: {
+            lg: 'repeat(4, 1fr)',
+            md: 'repeat(3, 1fr)',
+            sm: 'repeat(2, fr)',
+            xs: 'repeat(1, fr)',
+          },
+          gap: 2,
+        }}
+      >
         {apps.map((app) => (
-          <ListItem button component={Link} to={`/app/${app.id}/editor`} key={app.id}>
-            <ListItemText primary={app.name} />
-          </ListItem>
+          <AppCard key={app.id} app={app} />
         ))}
-      </List>
+        <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+      </Box>
     </Container>
   );
 }
-
 export interface EditorProps {
   basename: string;
 }

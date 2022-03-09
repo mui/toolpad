@@ -1,18 +1,9 @@
 import type { NextPage } from 'next';
 import * as React from 'react';
-import { Button, Container, Typography } from '@mui/material';
+import Home from '../src/components/Home';
 
-const Home: NextPage = () => {
-  return (
-    <React.Fragment>
-      <Container>
-        <Typography variant="h4">Apps</Typography>
-        <Button component="a" href="/_studio/app/default/editor">
-          Editor
-        </Button>
-      </Container>
-    </React.Fragment>
-  );
+const Index: NextPage = () => {
+  return <Home />;
 };
 
-export default Home;
+export default Index;

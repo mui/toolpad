@@ -17,7 +17,7 @@ const cors = initMiddleware<any>(
 
 export interface HandleDataRequestParams {
   appId: string;
-  release: string | null;
+  release: number | null;
 }
 
 export default async (

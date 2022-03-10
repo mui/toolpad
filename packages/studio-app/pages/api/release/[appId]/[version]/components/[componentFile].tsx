@@ -13,7 +13,7 @@ export default (async (req, res) => {
 
   const { name: componentId } = path.parse(componentFile);
 
-  const dom = await loadReleaseDom(appId, version);
+  const dom = await loadReleaseDom(appId, Number(version));
 
   const codeComponent = studioDom.getMaybeNode(dom, componentId as NodeId, 'codeComponent');
 

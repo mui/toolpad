@@ -10,7 +10,7 @@ export default (async (req, res) => {
   const [appId] = asArray(req.query.appId);
   const [version] = asArray(req.query.version);
   const [pageId] = asArray(req.query.pageId);
-  const dom = await loadReleaseDom(appId, version);
+  const dom = await loadReleaseDom(appId, Number(version));
 
   const { code: page } = renderPageCode(appId, dom, pageId as NodeId, {
     release: version,

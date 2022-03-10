@@ -29,9 +29,9 @@ model App {
   id   String @id @default(cuid())
   name String
 
-  nodes      DomNode[]    @relation("AppNodes")
-  releases   Release[]    @relation("AppReleases")
-  deployment Deployment[] @relation("AppDeployment")
+  nodes       DomNode[]    @relation("AppNodes")
+  releases    Release[]    @relation("AppReleases")
+  deployments Deployment[] @relation("AppDeployments")
 }
 
 model DomNode {
@@ -71,27 +71,23 @@ model DomNodeAttribute {
 }
 
 model Release {
-  id          Int          @id @default(autoincrement())
-  version     String       @unique
+  id          String       @id @default(cuid())
+  version     Int
   description String
   createdAt   DateTime     @default(now())
   snapshot    Bytes
   Deployment  Deployment[] @relation("Release")
-
-  app   App    @relation("AppReleases", fields: [appId], references: [id])
-  appId String
+  app         App          @relation("AppReleases", fields: [appId], references: [id])
+  appId       String
 
   @@unique([version, appId], name: "release_app_constraint")
 }
 
 model Deployment {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  version   String
-  release   Release  @relation("Release", fields: [version], references: [version])
-
-  app   App    @relation("AppDeployment", fields: [appId], references: [id])
-  appId String
-
-  @@unique([id, appId], name: "deployment_app_constraint")
+  release   Release  @relation("Release", fields: [releaseId], references: [id])
+  releaseId String
+  app       App      @relation("AppDeployments", fields: [appId], references: [id])
+  appId     String
 }

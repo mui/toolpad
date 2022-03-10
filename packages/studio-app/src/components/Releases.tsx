@@ -1,12 +1,25 @@
 import { Container, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@mui/x-data-grid-pro';
+import {
+  DataGridPro,
+  GridActionsCellItem,
+  GridColumns,
+  GridRowParams,
+  GridValueGetterParams,
+} from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { useNavigate, useParams } from 'react-router-dom';
 import client from '../api';
 import StudioAppBar from './StudioAppBar';
+
+interface ReleaseRow {
+  createdAt: Date;
+  id: string;
+  version: number;
+  description: string;
+}
 
 export default function Releases() {
   const { appId } = useParams();
@@ -27,16 +40,16 @@ export default function Releases() {
   const deployReleaseMutation = client.useMutation('createDeployment');
 
   const handleDeleteClick = React.useCallback(
-    async (version: string) => {
+    async (version: number) => {
       // TODO: confirmation dialog here
-      await deleteReleaseMutation.mutateAsync([version]);
+      await deleteReleaseMutation.mutateAsync([appId, version]);
       refetch();
     },
-    [deleteReleaseMutation, refetch],
+    [appId, deleteReleaseMutation, refetch],
   );
 
   const handleDeployClick = React.useCallback(
-    async (version: string) => {
+    async (version: number) => {
       // TODO: confirmation dialog here
       await deployReleaseMutation.mutateAsync([appId, version]);
       refetch();
@@ -59,7 +72,7 @@ export default function Releases() {
         field: 'createdAt',
         headerName: 'Created',
         type: 'date',
-        valueGetter: (params) => new Date(params.value),
+        valueGetter: (params: GridValueGetterParams<string, Date>) => new Date(params.value),
       },
       {
         field: 'actions',
@@ -68,12 +81,12 @@ export default function Releases() {
           <GridActionsCellItem
             icon={<RocketLaunchIcon />}
             label="Deploy release"
-            onClick={() => handleDeployClick(params.row.version)}
+            onClick={() => handleDeployClick((params.row as ReleaseRow).version)}
           />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Remove release"
-            onClick={() => handleDeleteClick(params.row.version)}
+            onClick={() => handleDeleteClick((params.row as ReleaseRow).version)}
           />,
         ],
       },

@@ -12,7 +12,7 @@ import StudioAppBar from './StudioAppBar';
 
 interface NavigateToReleaseActionProps {
   appId: string;
-  version?: string;
+  version?: number;
   pageNodeId: NodeId;
 }
 
@@ -30,7 +30,8 @@ function NavigateToReleaseAction({ appId, version, pageNodeId }: NavigateToRelea
 }
 
 export default function Release() {
-  const { version, appId } = useParams();
+  const { version: rawVersion, appId } = useParams();
+  const version = Number(rawVersion);
 
   if (!appId) {
     throw new Error(`Missing queryParam "appId"`);
@@ -69,7 +70,7 @@ export default function Release() {
     }
   }, [appId, activeDeploymentQuery, deployReleaseMutation, version]);
 
-  const isActiveDeployment = activeDeploymentQuery.data?.version === version;
+  const isActiveDeployment = activeDeploymentQuery.data?.release.version === version;
 
   const canDeploy =
     deployReleaseMutation.isIdle && activeDeploymentQuery.isSuccess && !isActiveDeployment;

@@ -13,7 +13,7 @@ export default (async (req, res) => {
 
   const { name: stateId } = path.parse(derivedStateFile);
 
-  const dom = await loadReleaseDom(appId, version);
+  const dom = await loadReleaseDom(appId, Number(version));
 
   const derivedState = studioDom.getMaybeNode(dom, stateId as NodeId, 'derivedState');
 

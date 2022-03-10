@@ -17,7 +17,7 @@ export function Preview({ appId }: PreviewProps) {
 
 interface DeploymentProps {
   appId: string;
-  version: string;
+  version: number;
 }
 
 function Deployment({ appId, version }: DeploymentProps) {
@@ -37,7 +37,7 @@ const Deploy: NextPage = () => {
   );
 
   return appId && activeDeployment ? (
-    <Deployment appId={appId} version={activeDeployment.version} />
+    <Deployment appId={appId} version={activeDeployment.release.version} />
   ) : (
     <Container sx={{ my: 5 }}>
       <Typography>

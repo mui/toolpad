@@ -13,6 +13,7 @@ import {
   loadReleaseDom,
   createDeployment,
   findActiveDeployment,
+  findLastRelease,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
@@ -102,6 +103,9 @@ const rpcServer = {
     }),
     loadDom: createMethod<typeof loadDom>((params) => {
       return loadDom(...params);
+    }),
+    findLastRelease: createMethod<typeof findLastRelease>((params) => {
+      return findLastRelease(...params);
     }),
   },
   mutation: {

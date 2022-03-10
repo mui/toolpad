@@ -66,7 +66,6 @@ function deserializeValue(dbValue: string): unknown {
 }
 
 export async function saveDom(appId: string, app: studioDom.StudioDom): Promise<void> {
-  console.log(appId);
   await prisma.$transaction([
     prisma.domNode.deleteMany({ where: { appId } }),
     prisma.domNode.createMany({
@@ -149,7 +148,6 @@ export async function loadDom(appId: string): Promise<studioDom.StudioDom> {
 }
 
 interface CreateReleaseParams {
-  version: string;
   description: string;
 }
 
@@ -160,15 +158,24 @@ const SELECT_RELEASE_META = {
   createdAt: true,
 };
 
-export async function createRelease(appId: string, { version, description }: CreateReleaseParams) {
+export function findLastRelease(appId: string) {
+  return prisma.release.findFirst({
+    where: { appId },
+    orderBy: { version: 'desc' },
+  });
+}
+
+export async function createRelease(appId: string, { description }: CreateReleaseParams) {
   const currentDom = await loadDom(appId);
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
+
+  const lastRelease = await findLastRelease(appId);
 
   const release = await prisma.release.create({
     select: SELECT_RELEASE_META,
     data: {
       appId,
-      version,
+      version: lastRelease ? lastRelease.version + 1 : 1,
       description,
       snapshot,
     },
@@ -187,20 +194,20 @@ export async function getReleases(appId: string) {
   });
 }
 
-export async function deleteRelease(version: string) {
+export async function deleteRelease(appId: string, version: number) {
   return prisma.release.delete({
-    where: { version },
+    where: { release_app_constraint: { appId, version } },
   });
 }
 
-export async function createDeployment(appId: string, version: string) {
+export async function createDeployment(appId: string, version: number) {
   return prisma.deployment.create({
     data: {
       app: {
         connect: { id: appId },
       },
       release: {
-        connect: { version },
+        connect: { release_app_constraint: { appId, version } },
       },
     },
   });
@@ -210,10 +217,15 @@ export async function findActiveDeployment(appId: string) {
   return prisma.deployment.findFirst({
     where: { appId },
     orderBy: { createdAt: 'desc' },
+    include: {
+      release: {
+        select: SELECT_RELEASE_META,
+      },
+    },
   });
 }
 
-export async function loadReleaseDom(appId: string, version: string): Promise<studioDom.StudioDom> {
+export async function loadReleaseDom(appId: string, version: number): Promise<studioDom.StudioDom> {
   const release = await prisma.release.findUnique({
     where: { release_app_constraint: { appId, version } },
   });

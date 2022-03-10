@@ -264,7 +264,6 @@ export interface DomContextProps {
 }
 
 export default function DomProvider({ appId, children }: DomContextProps) {
-  console.log(appId);
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
     loading: false,
     saving: false,

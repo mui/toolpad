@@ -82,9 +82,10 @@ interface CreateReleaseDialogProps {
 function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps) {
   const navigate = useNavigate();
 
+  const lastRelease = client.useQuery('findLastRelease', [appId]);
+
   const { handleSubmit, register, formState, reset } = useForm({
     defaultValues: {
-      version: '',
       description: '',
     },
   });
@@ -105,29 +106,30 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
       <DialogForm onSubmit={doSubmit}>
         <DialogTitle>Create new release</DialogTitle>
         <DialogContent>
-          <Stack spacing={1} my={1}>
-            <TextField
-              label="Version"
-              size="small"
-              fullWidth
-              {...register('version', { required: true, minLength: 1 })}
-              error={Boolean(formState.errors.version)}
-              helperText={formState.errors.version?.message}
-            />
-            <TextField
-              label="description"
-              size="small"
-              fullWidth
-              multiline
-              rows={5}
-              {...register('description')}
-              error={Boolean(formState.errors.description)}
-              helperText={formState.errors.description?.message}
-            />
-          </Stack>
+          {lastRelease.isSuccess ? (
+            <Stack spacing={1} my={1}>
+              <Typography>
+                New version: {lastRelease.data ? lastRelease.data.version + 1 : 1}
+              </Typography>
+              <TextField
+                label="description"
+                size="small"
+                fullWidth
+                multiline
+                rows={5}
+                {...register('description')}
+                error={Boolean(formState.errors.description)}
+                helperText={formState.errors.description?.message}
+              />
+            </Stack>
+          ) : null}
         </DialogContent>
         <DialogActions>
-          <LoadingButton loading={createReleaseMutation.isLoading} type="submit">
+          <LoadingButton
+            disabled={!lastRelease.isSuccess}
+            loading={createReleaseMutation.isLoading}
+            type="submit"
+          >
             Create
           </LoadingButton>
         </DialogActions>

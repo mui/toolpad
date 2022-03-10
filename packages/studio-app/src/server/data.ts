@@ -6,10 +6,12 @@ import {
   StudioApiResult,
   NodeId,
   StudioBindable,
+  VersionOrPreview,
 } from '../types';
 import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
 import { omit } from '../utils/immutability';
+import { asArray } from '../utils/collections';
 
 const prisma = new PrismaClient();
 
@@ -38,13 +40,13 @@ function createDefaultPage(dom: studioDom.StudioDom, name: string): studioDom.St
 
   const container = studioDom.createElement(dom, 'Container', {
     sx: studioDom.createConst({ my: 2 }),
-    direction: studioDom.createConst('column'),
-    alignItems: studioDom.createConst('stretch'),
   });
   dom = studioDom.addNode(dom, container, page, 'children');
 
   const stack = studioDom.createElement(dom, 'Stack', {
     gap: studioDom.createConst(2),
+    direction: studioDom.createConst('column'),
+    alignItems: studioDom.createConst('stretch'),
   });
   dom = studioDom.addNode(dom, stack, container, 'children');
 
@@ -340,4 +342,20 @@ export async function execApi<Q>(
   }
 
   return dataSource.exec(connection, api.attributes.query.value, params);
+}
+
+export function parseVersion(param?: string | string[]): VersionOrPreview | null {
+  if (!param) {
+    return null;
+  }
+  const [maybeVersion] = asArray(param);
+  if (maybeVersion === 'preview') {
+    return maybeVersion;
+  }
+  const parsed = Number(maybeVersion);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+export async function loadVersionedDom(appId: string, version: VersionOrPreview) {
+  return version === 'preview' ? loadDom(appId) : loadReleaseDom(appId, version);
 }

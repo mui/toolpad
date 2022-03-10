@@ -21,7 +21,7 @@ import NodeNameEditor from '../NodeNameEditor';
 import * as studioDom from '../../../studioDom';
 
 // TODO: remove deprecated state
-const DEPRECATED = true;
+const DEPRECATED = false;
 
 interface PageSourceProps {
   appId: string;
@@ -58,9 +58,9 @@ export default function PageOptionsPanel() {
           startIcon={<PageIcon />}
           color="inherit"
           component="a"
-          href={`/pages/${state.appId}/${pageNodeId}`}
+          href={`/api/release/${state.appId}/preview/${pageNodeId}`}
         >
-          View Page
+          Preview Page
         </Button>
         <Button startIcon={<SourceIcon />} color="inherit" onClick={() => setDialogOpen(true)}>
           View Page Source

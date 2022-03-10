@@ -3,7 +3,14 @@ import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
-import { NodeId, PropExpression, ResolvedProps, StudioBindable, StudioBindables } from './types';
+import {
+  NodeId,
+  PropExpression,
+  ResolvedProps,
+  StudioBindable,
+  StudioBindables,
+  VersionOrPreview,
+} from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
@@ -33,7 +40,7 @@ export interface RenderPageConfig {
   // prettify output
   pretty: boolean;
   // release version
-  release: string | null;
+  version: VersionOrPreview;
 }
 
 interface UrlQueryStateHook {
@@ -682,9 +689,7 @@ class Context implements RenderContext {
 
           const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
 
-          const dataUrl = `/api/data/${this.appId}/${
-            this.config.release ? `release/${this.config.release}/` : 'preview/'
-          }`;
+          const dataUrl = `/api/data/${this.appId}/${this.config.version}/`;
 
           return `${useDataQuery}(
             ${stateHook.setStateVar}, 
@@ -808,7 +813,7 @@ export default function renderPageCode(
   const config: RenderPageConfig = {
     editor: false,
     pretty: false,
-    release: null,
+    version: 'preview',
     ...configInit,
   };
 

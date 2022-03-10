@@ -188,3 +188,5 @@ export interface StudioTheme {
   'palette.primary.main'?: string;
   'palette.secondary.main'?: string;
 }
+
+export type VersionOrPreview = 'preview' | number;

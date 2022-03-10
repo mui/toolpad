@@ -1,19 +1,24 @@
 import { NextApiHandler } from 'next';
 import { transform } from 'sucrase';
 import * as path from 'path';
-import { loadReleaseDom } from '../../../../../../src/server/data';
+import { loadVersionedDom, parseVersion } from '../../../../../../src/server/data';
 import { NodeId } from '../../../../../../src/types';
 import * as studioDom from '../../../../../../src/studioDom';
 import { asArray } from '../../../../../../src/utils/collections';
 
 export default (async (req, res) => {
   const [appId] = asArray(req.query.appId);
-  const [version] = asArray(req.query.version);
   const [derivedStateFile] = asArray(req.query.derivedStateFile);
 
   const { name: stateId } = path.parse(derivedStateFile);
 
-  const dom = await loadReleaseDom(appId, Number(version));
+  const version = parseVersion(req.query.version);
+  if (!version) {
+    res.status(404).end();
+    return;
+  }
+
+  const dom = await loadVersionedDom(appId, version);
 
   const derivedState = studioDom.getMaybeNode(dom, stateId as NodeId, 'derivedState');
 

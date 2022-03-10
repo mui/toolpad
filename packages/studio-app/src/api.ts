@@ -15,12 +15,6 @@ import type {
   RpcResponse,
   ServerDefinition,
 } from '../pages/api/rpc';
-import config from './config';
-
-if (config.demoMode) {
-  // TODO: replace API with shim based on window.localStorage
-  console.log(`Starting Studio in demo mode`);
-}
 
 function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfGroup<any> {
   return new Proxy(

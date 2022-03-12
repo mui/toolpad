@@ -11,12 +11,17 @@ interface StudioAppBarProps {
 
 export default function StudioAppBar({ appId, actions }: StudioAppBarProps) {
   return (
-    <AppBar position="static" sx={{ zIndex: 2 }}>
+    <AppBar
+      position="static"
+      color="default"
+      elevation={0}
+      sx={{ zIndex: 2, borderBottom: 1, borderColor: 'divider' }}
+    >
       <Toolbar variant="dense">
         <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" color="inherit" component="div">
+        <Typography variant="h6" color="inherit" component="div" sx={{ mr: 2 }}>
           MUI Studio
         </Typography>
         <Button component={Link} to={`/app/${appId}/editor`} color="inherit">

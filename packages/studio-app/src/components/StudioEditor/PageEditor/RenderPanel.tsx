@@ -168,49 +168,48 @@ function findNodeAt(
 /**
  * From a collection of slots, returns the location of the closest one to a certain point
  */
-function findClosestSlot(slots: NodeSlots, x: number, y: number): SlotLocation | null {
+function findClosestSlot(slots: RenderedSlot[], x: number, y: number): SlotLocation | null {
   let closestDistance = Infinity;
   let closestSlot: RenderedSlot | null = null;
 
   // eslint-disable-next-line no-restricted-syntax
-  for (const [parentProp, namedSlots] of Object.entries(slots)) {
-    if (namedSlots) {
-      for (let j = 0; j < namedSlots.length; j += 1) {
-        const namedSlot = namedSlots[j];
-        let distance: number;
-        if (namedSlot.type === 'single') {
-          distance = distanceToRect(namedSlot.rect, x, y);
-        } else {
-          distance =
-            namedSlot.direction === 'horizontal'
-              ? distanceToLine(
-                  namedSlot.x,
-                  namedSlot.y,
-                  namedSlot.x,
-                  namedSlot.y + namedSlot.size,
-                  x,
-                  y,
-                )
-              : distanceToLine(
-                  namedSlot.x,
-                  namedSlot.y,
-                  namedSlot.x + namedSlot.size,
-                  namedSlot.y,
-                  x,
-                  y,
-                );
-        }
+  for (const namedSlot of slots) {
+    let distance: number;
+    if (namedSlot.type === 'single') {
+      distance = distanceToRect(namedSlot.rect, x, y);
+    } else {
+      distance =
+        namedSlot.direction === 'horizontal'
+          ? distanceToLine(
+              namedSlot.x,
+              namedSlot.y,
+              namedSlot.x,
+              namedSlot.y + namedSlot.size,
+              x,
+              y,
+            )
+          : distanceToLine(
+              namedSlot.x,
+              namedSlot.y,
+              namedSlot.x + namedSlot.size,
+              namedSlot.y,
+              x,
+              y,
+            );
+    }
 
-        if (distance <= 0) {
-          // We can bail out early here
-          return { parentId: namedSlot.parentId, parentIndex: namedSlot.parentIndex, parentProp };
-        }
+    if (distance <= 0) {
+      // We can bail out early here
+      return {
+        parentId: namedSlot.parentId,
+        parentIndex: namedSlot.parentIndex,
+        parentProp: namedSlot.parentProp,
+      };
+    }
 
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestSlot = namedSlot;
-        }
-      }
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestSlot = namedSlot;
     }
   }
 
@@ -234,23 +233,29 @@ function findActiveSlotAt(
 ): SlotLocation | null {
   // Search deepest nested first
   let nodeInfo: NodeInfo | undefined;
-  let nodeSlots: NodeSlots = {};
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
     nodeInfo = nodesInfo[node.id];
-    nodeSlots = slots[node.id] || {};
     if (nodeInfo?.rect && rectContainsPoint(nodeInfo.rect, x, y)) {
       // Initially only consider slots of the node we're hovering
+      const nodeSlots = Object.values(slots[node.id] || {})
+        .flat()
+        .filter(Boolean);
       const slotIndex = findClosestSlot(nodeSlots, x, y);
       if (slotIndex) {
         return slotIndex;
       }
     }
   }
-  // One last attempt, using the most shallow nodeLayout we found, regardless of
-  // whether we are hovering it
+
+  // One last attempt, as a fallback, we find the closest possible slot
   if (nodeInfo) {
-    return findClosestSlot(nodeSlots, x, y);
+    const allSlots: RenderedSlot[] = Object.values(slots)
+      .flatMap((slotState: NodeSlots = {}) => {
+        return Object.values(slotState).flat();
+      })
+      .filter(Boolean);
+    return findClosestSlot(allSlots, x, y);
   }
 
   return null;

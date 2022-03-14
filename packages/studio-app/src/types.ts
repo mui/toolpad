@@ -130,9 +130,23 @@ export interface ConnectionStatus {
   error?: string;
 }
 
+export interface ConnectionParamsEditorApi {
+  setSecret;
+  saveMutation;
+}
+
+export interface ConnectionParamsEditor2Props<P> {
+  api: ConnectionParamsEditorApi;
+}
+
+export type StudioConnectionParamsEditor2<P> = React.FC<ConnectionParamsEditor2Props<P>>;
+
 export interface StudioDataSourceClient<P = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: StudioConnectionParamsEditor<P>;
+  // Next iteration of ConnectionParamsInput, allows Bharat's work to continue without breaking changes
+  // We can move its implementation over once secrets are finshed
+  ConnectionParamsInput2?: StudioConnectionParamsEditor2<P>;
   getInitialConnectionValue: () => P;
   isConnectionValid: (connection: P) => boolean;
   QueryEditor: StudioQueryEditor<Q>;

@@ -97,6 +97,7 @@ model Deployment {
 model PreviewSecret {
   id    String @default(cuid())
   value String
+
   app   App    @relation("AppSecrets", fields: [appId], references: [id], onDelete: Cascade)
   appId String
 
@@ -107,9 +108,8 @@ model ReleaseSecret {
   id    String @default(cuid())
   value String
 
-  app   App    @relation("ReleaseSecrets", fields: [appId], references: [id], onDelete: Cascade)
-  appId String
-
+  app     App     @relation("ReleaseSecrets", fields: [appId], references: [id], onDelete: Cascade)
+  appId   String
   release Release @relation("SecretRelease", fields: [appId, version], references: [appId, version], onDelete: Cascade)
   version Int
 

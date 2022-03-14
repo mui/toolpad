@@ -8,7 +8,7 @@ Quickly build internal tools. MUI Studio is a low-code internal tools builder bu
 [![npm latest package](https://img.shields.io/npm/v/@mui/studio/latest.svg)](https://www.npmjs.com/package/@mui/studio)
 [![npm next package](https://img.shields.io/npm/v/@mui/studio/next.svg)](https://www.npmjs.com/package/@mui/studio@alpha)
 [![npm downloads](https://img.shields.io/npm/dm/@mui/studio.svg)](https://www.npmjs.com/package/@mui/studio)
-[![CircleCI](https://circleci.com/gh/mui/studio/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/mui/studio?branch=master)
+[![CircleCI](https://circleci.com/gh/mui/mui-studio/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/mui/mui-studio?branch=master)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/MUI_hq.svg?label=follow+MUI)](https://twitter.com/MUI_hq)
 [![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-studio/issues/8)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/studio.svg)](https://isitmaintained.com/project/mui/studio 'Average time to resolve an issue')

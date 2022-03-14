@@ -28,3 +28,7 @@ docker-compose -f docker/compose/docker-compose.yml up -d
 ```
 
 MUI Studio will be accessible under `http://localhost:3000/`.
+
+## Heroku
+
+<!-- TODO -->

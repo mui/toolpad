@@ -16,7 +16,7 @@ Quickly build internal tools. MUI Studio is a low-code internal tools builder bu
 
 </div>
 
-## Running the docker container locally
+## Quick setup locally
 
 Check out the repository and run
 
@@ -30,3 +30,40 @@ Read the [contributing guide](/CONTRIBUTING.md) to learn about our development p
 
 Notice that contributions go far beyond pull requests and commits.
 Although we love giving you the opportunity to put your stamp on MUI, we also are thrilled to receive a variety of [other contributions](https://mui.com/getting-started/faq/#mui-is-awesome-how-can-i-support-the-project).
+
+## Changelog
+
+<!-- TODO -->
+
+## Roadmap
+
+<!-- TODO -->
+
+## License
+
+This project is licensed under the terms of the
+[MIT license](/LICENSE).
+
+## Sponsoring services
+
+These great services sponsor MUI's core infrastructure:
+
+[<img loading="lazy" alt="GitHub" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" height="25">](https://github.com/)
+
+GitHub allows us to host the Git repository and coordinate contributions.
+
+[<img loading="lazy" alt="Netlify" src="https://cdn.netlify.com/15ecf59b59c9d04b88097c6b5d2c7e8a7d1302d0/1b6d6/img/press/logos/full-logo-light.svg" height="30">](https://www.netlify.com/)
+
+Netlify allows us to distribute the documentation.
+
+[<img loading="lazy" alt="CrowdIn" src="https://support.crowdin.com/assets/logos/crowdin-logo1-small.png" height="30">](https://crowdin.com/)
+
+CrowdIn allows us to translate the documentation.
+
+[<img loading="lazy" alt="BrowserStack" src="https://www.browserstack.com/images/mail/browserstack-logo-footer.png" height="30">](https://www.browserstack.com/)
+
+BrowserStack allows us to test in real browsers.
+
+[<img loading="lazy" alt="CodeCov" src="https://github.com/codecov.png?size=70" width="35" height="35">](https://codecov.io/)
+
+CodeCov allows us to monitor the test coverage.

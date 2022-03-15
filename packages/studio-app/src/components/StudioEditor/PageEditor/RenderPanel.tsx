@@ -628,6 +628,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       api.nodeDragEnd();
+      if (newNode) {
+        api.select(newNode.id);
+      }
     },
     [dom, availableNodes, nodesInfo, domApi, api, slots, newNode, selection, getViewCoordinates],
   );
@@ -739,19 +742,23 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.pageViewStateUpdate(getPageViewState(rootElm));
 
-      const handlePageMutation = throttle(
+      const handlePageUpdate = throttle(
         () => api.pageViewStateUpdate(getPageViewState(rootElm)),
         250,
         { trailing: true },
       );
 
-      const observer = new MutationObserver(handlePageMutation);
+      const mutationObserver = new MutationObserver(handlePageUpdate);
 
-      observer.observe(rootElm, {
+      mutationObserver.observe(rootElm, {
         attributes: true,
         childList: true,
         subtree: true,
       });
+
+      const resizeObserver = new ResizeObserver(handlePageUpdate);
+
+      resizeObserver.observe(rootElm);
 
       // eslint-disable-next-line no-underscore-dangle
       const queuedEvents = Array.isArray(editorWindow.__STUDIO_RUNTIME_EVENT__)
@@ -765,8 +772,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       editorWindow.__STUDIO_RUNTIME_EVENT__ = (event) => handleRuntimeEventRef.current(event);
 
       return () => {
-        handlePageMutation.cancel();
-        observer.disconnect();
+        handlePageUpdate.cancel();
+        mutationObserver.disconnect();
+        resizeObserver.disconnect();
         // eslint-disable-next-line no-underscore-dangle
         delete editorWindow.__STUDIO_RUNTIME_EVENT__;
       };

@@ -28,38 +28,6 @@ export async function createApp(name: string) {
   });
 }
 
-function createDefaultPage(dom: studioDom.StudioDom, name: string): studioDom.StudioDom {
-  const page = studioDom.createNode(dom, 'page', {
-    name,
-    attributes: {
-      title: studioDom.createConst(name),
-      urlQuery: studioDom.createConst({}),
-    },
-  });
-  const app = studioDom.getApp(dom);
-  dom = studioDom.addNode(dom, page, app, 'pages');
-
-  const container = studioDom.createElement(dom, 'Container', {
-    sx: studioDom.createConst({ my: 2 }),
-  });
-  dom = studioDom.addNode(dom, container, page, 'children');
-
-  const stack = studioDom.createElement(dom, 'Stack', {
-    gap: studioDom.createConst(2),
-    direction: studioDom.createConst('column'),
-    alignItems: studioDom.createConst('stretch'),
-  });
-  dom = studioDom.addNode(dom, stack, container, 'children');
-
-  return dom;
-}
-
-function createDefaultApp(): studioDom.StudioDom {
-  let dom = studioDom.createDom();
-  dom = createDefaultPage(dom, 'DefaultPage');
-  return dom;
-}
-
 function serializeValue(value: unknown): string {
   return value === undefined ? '' : JSON.stringify(value);
 }
@@ -110,9 +78,9 @@ export async function loadDom(appId: string): Promise<studioDom.StudioDom> {
     include: { attributes: true },
   });
   if (dbNodes.length <= 0) {
-    const app = createDefaultApp();
-    await saveDom(appId, app);
-    return app;
+    const dom = studioDom.createDom();
+    await saveDom(appId, dom);
+    return dom;
   }
   const root = dbNodes.find((node) => !node.parentId)?.id as NodeId;
   const nodes = Object.fromEntries(

@@ -12,6 +12,7 @@ import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
+import { decryptSecret, encryptSecret } from './secrets';
 
 const prisma = new PrismaClient();
 
@@ -169,19 +170,26 @@ export function findLastRelease(appId: string) {
 
 export async function createRelease(appId: string, { description }: CreateReleaseParams) {
   const currentDom = await loadDom(appId);
+  const secrets = await prisma.previewSecret.findMany({ where: { appId } });
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
 
   const lastRelease = await findLastRelease(appId);
+  const versionNumber = lastRelease ? lastRelease.version + 1 : 1;
 
-  const release = await prisma.release.create({
-    select: SELECT_RELEASE_META,
-    data: {
-      appId,
-      version: lastRelease ? lastRelease.version + 1 : 1,
-      description,
-      snapshot,
-    },
-  });
+  const [release] = await prisma.$transaction([
+    prisma.release.create({
+      select: SELECT_RELEASE_META,
+      data: {
+        appId,
+        version: versionNumber,
+        description,
+        snapshot,
+      },
+    }),
+    prisma.releaseSecret.createMany({
+      data: secrets.map((secret) => ({ ...secret, version: versionNumber })),
+    }),
+  ]);
 
   return release;
 }
@@ -358,4 +366,66 @@ export function parseVersion(param?: string | string[]): VersionOrPreview | null
 
 export async function loadVersionedDom(appId: string, version: VersionOrPreview) {
   return version === 'preview' ? loadDom(appId) : loadReleaseDom(appId, version);
+}
+
+export async function setSecret(appId: string, id: string, value: string): Promise<string> {
+  const updates = {
+    value: await encryptSecret(value),
+  };
+
+  const secret = await prisma.previewSecret.upsert({
+    where: {
+      secret_app_constraint: {
+        appId,
+        id,
+      },
+    },
+    create: {
+      appId,
+      id,
+      ...updates,
+    },
+    update: updates,
+  });
+
+  return secret.id;
+}
+
+// Do not expose to the browser:
+export async function findSecretServerOnly(
+  appId: string,
+  version: VersionOrPreview,
+  id: string,
+): Promise<string> {
+  const secret =
+    typeof version === 'number'
+      ? await prisma.releaseSecret.findUnique({
+          where: {
+            secret_release_constraint: {
+              appId,
+              version,
+              id,
+            },
+          },
+        })
+      : await prisma.previewSecret.findUnique({
+          where: {
+            secret_app_constraint: {
+              appId,
+              id,
+            },
+          },
+        });
+
+  if (!secret) {
+    throw new Error(`No such secret "${id}"`);
+  }
+
+  return decryptSecret(secret.value);
+}
+
+// This function can be safely exposed to the browser
+export async function previewSecret(appId: string, id: string): Promise<string> {
+  const decrypted = await findSecretServerOnly(appId, 'preview', id);
+  return '*'.repeat(decrypted.length);
 }

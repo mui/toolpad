@@ -38,4 +38,10 @@ Make sure have a running MUI Studio instance. If you don't know how to do that, 
 
 Now that we have our first simple application, let's make sure we can use it outside of the editor. We will deploy our application under a stable url.
 
-1.
+1. First thing we need to do is to create a release for our application. When you create a release, the current state of the application is captured as a snapshot and stored. This snapshot will never change, we will always be able to access this snapshot and see the state of the application at the time that we took the snapshot. To create a release, click the launch icon in the top right corner of the menu bar. In the dialog that opens, write "Initial release" in the description field and click "create". You will be directed to the release's page. Here you'll get a list of all the pages present in this release. Go ahead and click the "open page" icon to see what your released page looks like.
+
+   <!-- TODO: screenshot "Screenshot releases" -->
+
+1. You just created a versioned release of your application. Click the "deploy" button to host this version under the production url of your page. Navigate to the MUI Studio home to get an overview of your application and click the "open" button on the application you just deployed. You'll be presented with an overview of the pages available in this application. Click on a page to see the production version of the application.
+
+   Now, go back to editing your application and change the binding of the Typography component to `` `Goodbye ${state.nameInput.value}!` ``. Create another release. After you've verified that the pages in this release are working correctly, click "deploy" to make this release the prodiction version of your application.

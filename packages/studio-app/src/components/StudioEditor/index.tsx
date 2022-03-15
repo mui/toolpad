@@ -1,7 +1,9 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
 import {
+  Alert,
   Box,
+  Button,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -13,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
 import StudioAppBar from '../StudioAppBar';
@@ -92,13 +94,9 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
 
   const createReleaseMutation = client.useMutation('createRelease');
   const doSubmit = handleSubmit(async (releaseParams) => {
-    try {
-      const newRelease = await createReleaseMutation.mutateAsync([appId, releaseParams]);
-      reset();
-      navigate(`/app/${appId}/releases/${newRelease.version}`);
-    } catch (error) {
-      onClose();
-    }
+    const newRelease = await createReleaseMutation.mutateAsync([appId, releaseParams]);
+    reset();
+    navigate(`/app/${appId}/releases/${newRelease.version}`);
   });
 
   return (
@@ -122,6 +120,10 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
                 helperText={formState.errors.description?.message}
               />
             </Stack>
+          ) : null}
+
+          {createReleaseMutation.isError ? (
+            <Alert severity="error">{(createReleaseMutation.error as Error).message}</Alert>
           ) : null}
         </DialogContent>
         <DialogActions>
@@ -150,7 +152,16 @@ function EditorContent({ appId }: EditorContentProps) {
   return (
     <EditorRoot>
       <StudioAppBar
-        appId={appId}
+        navigation={
+          <React.Fragment>
+            <Button component={Link} to={`/app/${appId}/editor`} color="inherit">
+              Editor
+            </Button>
+            <Button component={Link} to={`/app/${appId}/releases`} color="inherit">
+              Releases
+            </Button>
+          </React.Fragment>
+        }
         actions={
           <React.Fragment>
             {domLoader.saving ? (

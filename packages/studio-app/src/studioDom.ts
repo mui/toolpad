@@ -529,6 +529,9 @@ export function getPageAncestor(dom: StudioDom, node: StudioNode): StudioPageNod
   return null;
 }
 export function setNodeName(dom: StudioDom, node: StudioNode, name: string): StudioDom {
+  if (dom.nodes[node.id].name === name) {
+    return dom;
+  }
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: {

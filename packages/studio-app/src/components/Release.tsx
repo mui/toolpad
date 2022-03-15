@@ -37,6 +37,8 @@ export default function Release() {
     throw new Error(`Missing queryParam "appId"`);
   }
 
+  const releaseQuery = client.useQuery('getRelease', [appId, version]);
+
   const {
     data: dom,
     isLoading,
@@ -80,6 +82,7 @@ export default function Release() {
       <StudioAppBar appId={appId} actions={null} />
       <Container>
         <Typography variant="h2">Release &quot;{version}&quot;</Typography>
+        <Box>{releaseQuery?.data?.description}</Box>
         <Toolbar disableGutters>
           <Button
             disabled={!canDeploy}

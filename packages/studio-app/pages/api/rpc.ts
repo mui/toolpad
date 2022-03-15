@@ -10,6 +10,7 @@ import {
   createRelease,
   deleteRelease,
   getReleases,
+  getRelease,
   loadReleaseDom,
   createDeployment,
   findActiveDeployment,
@@ -94,6 +95,9 @@ const rpcServer = {
     }),
     getReleases: createMethod<typeof getReleases>((params) => {
       return getReleases(...params);
+    }),
+    getRelease: createMethod<typeof getRelease>((params) => {
+      return getRelease(...params);
     }),
     findActiveDeployment: createMethod<typeof findActiveDeployment>((params) => {
       return findActiveDeployment(...params);

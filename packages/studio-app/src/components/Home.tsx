@@ -8,7 +8,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Skeleton,
   TextField,
+  Toolbar,
   Typography,
 } from '@mui/material';
 import * as React from 'react';
@@ -34,8 +36,6 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           event.preventDefault();
 
           const app = await createAppMutation.mutateAsync([name]);
-
-          onClose();
           window.location.href = `/_studio/app/${app.id}/editor`;
         }}
       >
@@ -61,7 +61,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 }
 
 interface AppCardProps {
-  app: App;
+  app?: App;
 }
 
 function AppCard({ app }: AppCardProps) {
@@ -69,17 +69,22 @@ function AppCard({ app }: AppCardProps) {
     <Card sx={{ gridColumn: 'span 1' }}>
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          {app.name}
+          {app ? app.name : <Skeleton />}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Some app description here
+          {app ? `Some app description for "${app.name}" here` : <Skeleton />}
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" component="a" href={`/_studio/app/${app.id}/editor`}>
+        <Button
+          size="small"
+          component="a"
+          href={app ? `/_studio/app/${app.id}/editor` : ''}
+          disabled={!app}
+        >
           Edit
         </Button>
-        <Button size="small" component="a" href={`/deploy/${app.id}`}>
+        <Button size="small" component="a" href={app ? `/deploy/${app.id}` : ''} disabled={!app}>
           open
         </Button>
       </CardActions>
@@ -88,7 +93,7 @@ function AppCard({ app }: AppCardProps) {
 }
 
 export default function Home() {
-  const { data: apps = [] } = client.useQuery('getApps', []);
+  const { data: apps = [], status, error } = client.useQuery('getApps', []);
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
@@ -96,6 +101,10 @@ export default function Home() {
     <Container>
       <Typography variant="h2">Apps</Typography>
       <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
+
+      <Toolbar disableGutters>
+        <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+      </Toolbar>
 
       <Box
         sx={{
@@ -110,10 +119,20 @@ export default function Home() {
           gap: 2,
         }}
       >
-        {apps.map((app) => (
-          <AppCard key={app.id} app={app} />
-        ))}
-        <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+        {(() => {
+          switch (status) {
+            case 'loading':
+              return <AppCard />;
+            case 'error':
+              return (error as Error)?.message;
+            case 'success':
+              return apps.length > 0
+                ? apps.map((app) => <AppCard key={app.id} app={app} />)
+                : 'No apps yet';
+            default:
+              return '';
+          }
+        })()}
       </Box>
     </Container>
   );

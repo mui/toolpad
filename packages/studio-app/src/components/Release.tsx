@@ -79,7 +79,7 @@ export default function Release() {
 
   return (
     <React.Fragment>
-      <StudioAppBar appId={appId} actions={null} />
+      <StudioAppBar navigation={null} actions={null} />
       <Container>
         <Typography variant="h2">Release &quot;{version}&quot;</Typography>
         <Box>{releaseQuery?.data?.description}</Box>

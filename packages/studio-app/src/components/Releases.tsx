@@ -96,7 +96,7 @@ export default function Releases() {
 
   return (
     <React.Fragment>
-      <StudioAppBar appId={appId} actions={null} />
+      <StudioAppBar navigation={null} actions={null} />
       <Container>
         <Typography variant="h2">Releases</Typography>
         <Box sx={{ my: 3, height: 350, width: '100%' }}>

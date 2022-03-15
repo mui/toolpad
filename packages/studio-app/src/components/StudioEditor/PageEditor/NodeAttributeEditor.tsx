@@ -70,7 +70,7 @@ export function BindableEditor<V>({
   const hasBinding = value && value.type !== 'const';
 
   return (
-    <Stack direction="row" alignItems="flex-start">
+    <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
       {control ? (
         <React.Fragment>
           <control.Editor

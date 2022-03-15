@@ -93,7 +93,7 @@ function AppCard({ app }: AppCardProps) {
 }
 
 export default function Home() {
-  const { data: apps = [], isLoading, isSuccess, status, error } = client.useQuery('getApps', []);
+  const { data: apps = [], status, error } = client.useQuery('getApps', []);
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 

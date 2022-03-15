@@ -16,6 +16,10 @@ Quickly build internal tools. MUI Studio is a low-code internal tools builder bu
 
 </div>
 
+## Notice
+
+MUI Studio is in its alpha stages of development. Feel free to run this application for testing purposes, but keep in mind, in no way is it ready or suitable to run it in production. It's both lacking in features and stability.
+
 ## Quick setup locally
 
 Check out the repository and run

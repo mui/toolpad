@@ -1,8 +1,8 @@
 # Getting started
 
-This page will guide you into creating your very first MUI Studio application. We will create an application that will ask for a name and print a greeting.
+This page will guide you into creating your very first MUI Studio application. We will create a "hello world" type of application that will ask for a name and print a greeting.
 
-## Prerequisitos
+## Prerequisites
 
 Make sure have a running MUI Studio instance. If you don't know how to do that, please follow the [setup instructions](./setup.md)
 
@@ -24,6 +24,18 @@ Make sure have a running MUI Studio instance. If you don't know how to do that, 
 
    <!-- TODO: screenshot "page + textfield + component editor with name update" -->
 
-1. open the component catalog again and drag a "Typography" component on the page. This will contain our greeting.
+1. Open the component catalog again and drag a "Typography" component on the page. This will contain our greeting. In the component editor on the right hand side, locate the textfield for the "value" property. Try typing in this field. You'll notice the text on the screen changes. We can also make this value dynamic. To do this, click the link icon to the right of the textfield to open the binding editor.
+
+   <!-- TODO: screenshot "detail value input + link icon" -->
+
+1. In the binding editor you can write any javascript expression. For instance, try typing the javascript string `'Hello everybody!'` and click "update binding". You'll notice that the text on the screen changes to "Hello everybody!".
+
+   Now, change the javascript expression to `` `Hello ${state.nameInput.value}!` ``. Notice how we refer to our textField by the name "nameInput" that we set before. Now click "update binding" and close the binding editor. Select the TextField and try typing your name. See how the Text follows?
+
+   <!-- TODO: screenshot "Show working application" -->
 
 ## Deploying your first application
+
+Now that we have our first simple application, let's make sure we can use it outside of the editor. We will deploy our application under a stable url.
+
+1.

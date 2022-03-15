@@ -29,14 +29,16 @@ model App {
   id   String @id @default(cuid())
   name String
 
-  nodes       DomNode[]    @relation("AppNodes")
-  releases    Release[]    @relation("AppReleases")
-  deployments Deployment[] @relation("AppDeployments")
+  nodes          DomNode[]       @relation("AppNodes")
+  releases       Release[]       @relation("AppReleases")
+  deployments    Deployment[]    @relation("AppDeployments")
+  secrets        PreviewSecret[] @relation("AppSecrets")
+  releaseSecrets ReleaseSecret[] @relation("ReleaseSecrets")
 }
 
 model DomNode {
-  id          String      @id
-  name        String      @unique
+  id          String      @id @default(cuid())
+  name        String
   type        DomNodeType
   children    DomNode[]   @relation("Children")
   parent      DomNode?    @relation("Children", fields: [parentId], references: [id])
@@ -44,12 +46,12 @@ model DomNode {
   parentIndex String?
   parentProp  String?
 
-  app   App    @relation("AppNodes", fields: [appId], references: [id])
+  app   App    @relation("AppNodes", fields: [appId], references: [id], onDelete: Cascade)
   appId String
 
   attributes DomNodeAttribute[] @relation("Attributes")
 
-  @@unique([id, appId], name: "node_app_constraint")
+  @@unique([appId, name], name: "node_name_app_constraint")
 }
 
 enum DomNodeAttributeType {
@@ -71,23 +73,45 @@ model DomNodeAttribute {
 }
 
 model Release {
-  id          String       @id @default(cuid())
   version     Int
   description String
   createdAt   DateTime     @default(now())
   snapshot    Bytes
-  Deployment  Deployment[] @relation("Release")
-  app         App          @relation("AppReleases", fields: [appId], references: [id])
+  deployments Deployment[] @relation("DeploymentRelease")
+  app         App          @relation("AppReleases", fields: [appId], references: [id], onDelete: Cascade)
   appId       String
 
-  @@unique([version, appId], name: "release_app_constraint")
+  secrets ReleaseSecret[] @relation("SecretRelease")
+  @@id([version, appId], name: "release_app_constraint")
 }
 
 model Deployment {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  release   Release  @relation("Release", fields: [releaseId], references: [id])
-  releaseId String
-  app       App      @relation("AppDeployments", fields: [appId], references: [id])
+  release   Release  @relation("DeploymentRelease", fields: [appId, version], references: [appId, version], onDelete: Restrict)
+  version   Int
+  app       App      @relation("AppDeployments", fields: [appId], references: [id], onDelete: Cascade)
   appId     String
+}
+
+model PreviewSecret {
+  id    String @default(cuid())
+  value String
+
+  app   App    @relation("AppSecrets", fields: [appId], references: [id], onDelete: Cascade)
+  appId String
+
+  @@id([appId, id], name: "secret_app_constraint")
+}
+
+model ReleaseSecret {
+  id    String @default(cuid())
+  value String
+
+  app     App     @relation("ReleaseSecrets", fields: [appId], references: [id], onDelete: Cascade)
+  appId   String
+  release Release @relation("SecretRelease", fields: [appId, version], references: [appId, version], onDelete: Cascade)
+  version Int
+
+  @@id([appId, version, id], name: "secret_release_constraint")
 }

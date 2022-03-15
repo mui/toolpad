@@ -1604,6 +1604,11 @@
   resolved "https://registry.yarnpkg.com/@types/cors/-/cors-2.8.12.tgz#6b2c510a7ad7039e98e7b8d3d6598f4359e5c080"
   integrity sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==
 
+"@types/crypto-js@^4.1.1":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-4.1.1.tgz#602859584cecc91894eb23a4892f38cfa927890d"
+  integrity sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==
+
 "@types/eslint@^7.28.2":
   version "7.29.0"
   resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-7.29.0.tgz#e56ddc8e542815272720bb0b4ccc2aff9c3e1c78"
@@ -2810,6 +2815,11 @@ cross-spawn@^7.0.1, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
+crypto-js@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
+  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
+
 crypto-random-string@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-2.0.0.tgz#ef2a7a966ec11083388369baa02ebead229b30d5"
@@ -2827,6 +2837,11 @@ csstype@^3.0.10, csstype@^3.0.2:
   version "3.0.10"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.0.10.tgz#2ad3a7bed70f35b965707c092e5f30b327c290e5"
   integrity sha512-2u44ZG2OcNUO9HDp/Jl8C07x6pU/eTR3ncV91SiK3dhG9TWvRVsCoJw14Ckx5DgWkzGA3waZWO3d7pgqpUI/XA==
+
+cuid@^2.1.8:
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/cuid/-/cuid-2.1.8.tgz#cbb88f954171e0d5747606c0139fb65c5101eac0"
+  integrity sha512-xiEMER6E7TlTPnDxrM4eRiC6TRgjNX9xzEZ5U/Se2YJKr7Mq4pJn/2XEHjl3STcSh96GmkHPcBXLES8M29wyyg==
 
 damerau-levenshtein@^1.0.7:
   version "1.0.8"

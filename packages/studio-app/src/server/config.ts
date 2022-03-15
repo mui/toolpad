@@ -2,6 +2,7 @@ import sharedConfig, { SharedConfig } from '../config';
 
 export interface ServerConfig extends SharedConfig {
   databaseUrl: string;
+  encryptionKeys: string[];
 }
 
 function readConfig(): ServerConfig {
@@ -29,6 +30,8 @@ function readConfig(): ServerConfig {
   return {
     ...sharedConfig,
     databaseUrl: process.env.STUDIO_DATABASE_URL,
+    // Whitespace separated, do not use spaces in your keys
+    encryptionKeys: process.env.STUDIO_ENCRYPTION_KEYS?.split(/\s+/).filter(Boolean) ?? [],
   };
 }
 

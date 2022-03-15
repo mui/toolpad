@@ -69,7 +69,9 @@ function JsonPropEditor({ propName, argType, value, onChange, disabled }: Editor
 
   return (
     <React.Fragment>
-      <Button onClick={() => setDialogOpen(true)}>{propName}</Button>
+      <Button variant="outlined" color="inherit" fullWidth onClick={() => setDialogOpen(true)}>
+        {propName}
+      </Button>
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit JSON</DialogTitle>
         <DialogContent>

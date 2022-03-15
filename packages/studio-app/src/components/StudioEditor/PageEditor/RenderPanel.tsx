@@ -3,6 +3,7 @@ import * as React from 'react';
 import clsx from 'clsx';
 import { RuntimeEvent, SlotType } from '@mui/studio-core';
 import throttle from 'lodash/throttle';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
   NodeId,
   FlowDirection,
@@ -71,11 +72,12 @@ const OverlayRoot = styled('div')({
     cursor: 'grab',
     display: 'none',
     position: 'absolute',
+    alignItems: 'center',
     right: 0,
     background: 'red',
     color: 'white',
     fontSize: 11,
-    padding: `0 4px`,
+    padding: `2px 0 2px 8px`,
   },
 
   [`& .${overlayClasses.nodeHud}`]: {
@@ -85,7 +87,7 @@ const OverlayRoot = styled('div')({
     [`&.${overlayClasses.selected}`]: {
       border: '1px solid red',
       [`& .${overlayClasses.selectionHint}`]: {
-        display: 'block',
+        display: 'flex',
       },
     },
     [`&.${overlayClasses.allowNodeInteraction}`]: {
@@ -468,7 +470,10 @@ function NodeHud({ node, selected, allowInteraction, rect, onDragStart }: Select
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
     >
-      <div className={overlayClasses.selectionHint}>{component.displayName}</div>
+      <div className={overlayClasses.selectionHint}>
+        {component.displayName}
+        <DragIndicatorIcon color="inherit" fontSize="small" />
+      </div>
     </div>
   );
 }

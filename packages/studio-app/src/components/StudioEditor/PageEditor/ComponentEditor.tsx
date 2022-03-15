@@ -62,12 +62,16 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   return (
     <React.Fragment>
       <Typography variant="subtitle1">{component.displayName}</Typography>
-      <Typography variant="subtitle2">ID: {node.id}</Typography>
+      <Typography variant="subtitle2" sx={{ mb: 2 }}>
+        ID: {node.id}
+      </Typography>
       <NodeNameEditor node={node} />
       {nodeError ? <RuntimeErrorAlert error={nodeError} /> : null}
       {node ? (
         <React.Fragment>
-          <div>props:</div>
+          <Typography variant="subtitle1" sx={{ mt: 2 }}>
+            Properties:
+          </Typography>
           <ComponentPropsEditor node={node} />
         </React.Fragment>
       ) : null}

@@ -628,6 +628,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       api.nodeDragEnd();
+      if (newNode) {
+        api.select(newNode.id);
+      }
     },
     [dom, availableNodes, nodesInfo, domApi, api, slots, newNode, selection, getViewCoordinates],
   );

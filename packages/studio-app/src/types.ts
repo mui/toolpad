@@ -13,6 +13,7 @@ import type { Rectangle } from './utils/geometry';
 export interface EditorProps<T> {
   nodeId: NodeId;
   propName: string;
+  label: string;
   argType: ArgTypeDefinition;
   disabled?: boolean;
   value: T | undefined;

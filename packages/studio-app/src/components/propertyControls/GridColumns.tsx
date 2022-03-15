@@ -32,7 +32,7 @@ const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
 function GridColumnsPropEditor({
-  propName,
+  label,
   nodeId,
   value = [],
   onChange,
@@ -102,7 +102,7 @@ function GridColumnsPropEditor({
 
   return (
     <React.Fragment>
-      <Button onClick={() => setEditColumnsDialogOpen(true)}>{propName}</Button>
+      <Button onClick={() => setEditColumnsDialogOpen(true)}>{label}</Button>
       <Dialog
         fullWidth
         open={editColumnsDialogOpen}

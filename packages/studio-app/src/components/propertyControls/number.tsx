@@ -2,7 +2,7 @@ import { TextField } from '@mui/material';
 import * as React from 'react';
 import type { EditorProps, PropControlDefinition } from '../../types';
 
-function NumberPropEditor({ propName, value, onChange, disabled }: EditorProps<number>) {
+function NumberPropEditor({ label, value, onChange, disabled }: EditorProps<number>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange(Number(event.target.value));
@@ -17,7 +17,7 @@ function NumberPropEditor({ propName, value, onChange, disabled }: EditorProps<n
       disabled={disabled}
       type="number"
       onChange={handleChange}
-      label={propName}
+      label={label}
       size="small"
     />
   );

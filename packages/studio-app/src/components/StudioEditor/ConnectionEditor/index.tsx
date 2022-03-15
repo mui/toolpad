@@ -90,7 +90,7 @@ function ConnectionEditorContent<P>({
     }
   }, [connectionNode, connectionParams]);
 
-  return dataSource ? (
+  return (
     <Box className={className} sx={{ px: 3 }}>
       <Toolbar disableGutters>
         <Button
@@ -127,18 +127,20 @@ function ConnectionEditorContent<P>({
       </Toolbar>
       <Stack spacing={1}>
         <NodeNameEditor node={connectionNode} />
-        <ConnectionParamsEditor
-          dataSource={dataSource}
-          value={connectionParams}
-          onChange={setConnectionParams}
-          connectionName={connectionNode.name}
-        />
+        {dataSource ? (
+          <ConnectionParamsEditor
+            dataSource={dataSource}
+            value={connectionParams}
+            onChange={setConnectionParams}
+            connectionName={connectionNode.name}
+          />
+        ) : (
+          <Typography>
+            Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
+          </Typography>
+        )}
       </Stack>
     </Box>
-  ) : (
-    <Typography>
-      Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
-    </Typography>
   );
 }
 

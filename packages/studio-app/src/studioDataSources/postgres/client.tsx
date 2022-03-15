@@ -44,8 +44,6 @@ function ConnectionParamsInput({ value, onChange }: WithControlledProp<PostgresC
   );
 }
 
-function ConnectionParamsInput2() {}
-
 function QueryEditor({ value, onChange }: WithControlledProp<PostgresQuery>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -75,7 +73,6 @@ function getInitialQueryValue(): PostgresQuery {
 const dataSource: StudioDataSourceClient<PostgresConnectionParams, PostgresQuery> = {
   displayName: 'Postgres',
   ConnectionParamsInput,
-  // ConnectionParamsInput2,
   getInitialConnectionValue: getInitialValue,
   isConnectionValid: isValid,
   QueryEditor,

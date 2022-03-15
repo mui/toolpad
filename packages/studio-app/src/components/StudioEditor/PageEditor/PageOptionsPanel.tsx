@@ -8,7 +8,6 @@ import {
   FormControlLabel,
   Typography,
   Divider,
-  Box,
 } from '@mui/material';
 import * as React from 'react';
 import PageIcon from '@mui/icons-material/Web';

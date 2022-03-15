@@ -31,5 +31,8 @@ export default {
       typeDef: { type: 'element' },
       control: { type: 'slots' },
     },
+    sx: {
+      typeDef: { type: 'object' },
+    },
   },
 } as StudioComponentDefinition;

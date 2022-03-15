@@ -78,6 +78,10 @@ const OverlayRoot = styled('div')({
     color: 'white',
     fontSize: 11,
     padding: `2px 0 2px 8px`,
+    // TODO: figure out positioning of this selectionhint, it should
+    //   - prefer top right, above the component
+    //   - if that appears out of bound of the editor, show it bottom or left
+    // transform: `translate(0, -100%)`,
   },
 
   [`& .${overlayClasses.nodeHud}`]: {
@@ -463,6 +467,7 @@ function NodeHud({ node, selected, allowInteraction, rect, onDragStart }: Select
   return (
     <div
       draggable
+      data-node-id={node.id}
       onDragStart={onDragStart}
       style={absolutePositionCss(rect)}
       className={clsx(overlayClasses.nodeHud, {
@@ -470,7 +475,7 @@ function NodeHud({ node, selected, allowInteraction, rect, onDragStart }: Select
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
     >
-      <div className={overlayClasses.selectionHint}>
+      <div draggable className={overlayClasses.selectionHint}>
         {component.displayName}
         <DragIndicatorIcon color="inherit" fontSize="small" />
       </div>
@@ -546,22 +551,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   }, [dom, pageNodes, selectedNode]);
 
   const handleDragStart = React.useCallback(
-    (event: React.DragEvent<Element>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+      const nodeId = event.currentTarget.dataset.nodeId as NodeId | undefined;
 
-      if (!cursorPos) {
+      if (!nodeId) {
         return;
       }
 
       event.dataTransfer.dropEffect = 'move';
-
-      const nodeId = findNodeAt(pageNodes, nodesInfo, cursorPos.x, cursorPos.y);
-
-      if (nodeId) {
-        api.select(nodeId);
-      }
+      api.select(nodeId);
     },
-    [api, pageNodes, nodesInfo, getViewCoordinates],
+    [api],
   );
 
   const handleDragOver = React.useCallback(
@@ -602,33 +603,55 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const activeSlot = findActiveSlotAt(
-        availableNodes,
-        nodesInfo,
-        slots,
-        cursorPos.x,
-        cursorPos.y,
-      );
+      let activeSlot = findActiveSlotAt(availableNodes, nodesInfo, slots, cursorPos.x, cursorPos.y);
 
       if (activeSlot) {
+        let parent = studioDom.getNode(dom, activeSlot.parentId);
+
+        if (!studioDom.isElement(parent) && !studioDom.isPage(parent)) {
+          throw new Error(`Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`);
+        }
+
+        if (studioDom.isPage(parent)) {
+          // TODO: this logic should probably live in the DomReducer?
+          const container = studioDom.createElement(dom, 'Stack', {
+            sx: studioDom.createConst({ p: 2 }),
+          });
+          domApi.addNode(container, parent, 'children');
+          parent = container;
+          activeSlot = { parentId: parent.id, parentProp: 'children' };
+        }
+
         if (newNode) {
-          const parent = studioDom.getNode(dom, activeSlot.parentId);
-          if (studioDom.isElement(parent)) {
-            domApi.addNode(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
-          } else if (studioDom.isPage(parent)) {
-            domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
-          } else {
-            throw new Error(
-              `Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`,
-            );
-          }
+          domApi.addNode(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
         } else if (selection) {
+          // TODO: move this logic into the Dom Reducer?
+          const selectionNode = studioDom.getNode(dom, selection);
+          let toRemove: NodeId | null = null;
+          const originalParent = studioDom.getParent(dom, selectionNode);
+          if (
+            !originalParent ||
+            (!studioDom.isPage(originalParent) && !studioDom.isElement(originalParent))
+          ) {
+            throw new Error(`Invariant: can't remove a child from root node`);
+          }
+          const { children: siblings } = studioDom.getChildNodes(dom, originalParent);
+          const grandParent = studioDom.getParent(dom, originalParent);
+          if (grandParent && studioDom.isPage(grandParent) && siblings.length <= 1) {
+            // We will remove the automatically create ContainerRow if it's the last element
+            toRemove = originalParent.id;
+          }
+
           domApi.moveNode(
             selection,
             activeSlot.parentId,
             activeSlot.parentProp,
             activeSlot.parentIndex,
           );
+
+          if (toRemove) {
+            domApi.removeNode(toRemove);
+          }
         }
       }
 
@@ -678,11 +701,25 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (selection && event.key === 'Backspace') {
-        domApi.removeNode(selection);
+        let toRemove = studioDom.getNode(dom, selection);
+
+        // TODO: move this logic to the Dom Reducer?
+        const parent = studioDom.getParent(dom, toRemove);
+        if (!parent || (!studioDom.isPage(parent) && !studioDom.isElement(parent))) {
+          throw new Error(`Invariant: can't remove a child from root node`);
+        }
+        const { children: siblings } = studioDom.getChildNodes(dom, parent);
+        const grandParent = studioDom.getParent(dom, parent);
+        if (grandParent && studioDom.isPage(grandParent) && siblings.length <= 1) {
+          // We will remove the automatically create ContainerRow if it's the last element
+          toRemove = parent;
+        }
+
+        domApi.removeNode(toRemove.id);
         api.deselect();
       }
     },
-    [domApi, api, selection],
+    [selection, dom, domApi, api],
   );
 
   const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;

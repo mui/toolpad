@@ -53,7 +53,7 @@ export type DomAction =
       nodeId: NodeId;
       parentId: NodeId;
       parentProp: string;
-      parentIndex: string;
+      parentIndex?: string;
     }
   | {
       type: 'DOM_REMOVE_NODE';
@@ -175,7 +175,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parentIndex,
       });
     },
-    moveNode(nodeId: NodeId, parentId: NodeId, parentProp: string, parentIndex: string) {
+    moveNode(nodeId: NodeId, parentId: NodeId, parentProp: string, parentIndex?: string) {
       dispatch({
         type: 'DOM_MOVE_NODE',
         nodeId,

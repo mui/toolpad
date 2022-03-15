@@ -159,7 +159,11 @@ function EditorContent({ appId }: EditorContentProps) {
               </Box>
             ) : null}
             <Typography>{domLoader.unsavedChanges} unsaved change(s).</Typography>
-            <IconButton color="inherit" onClick={() => setCreateReleaseDialogOpen(true)}>
+            <IconButton
+              color="inherit"
+              sx={{ ml: 1 }}
+              onClick={() => setCreateReleaseDialogOpen(true)}
+            >
               <RocketLaunchIcon />
             </IconButton>
           </React.Fragment>

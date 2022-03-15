@@ -51,7 +51,7 @@ model DomNode {
 
   attributes DomNodeAttribute[] @relation("Attributes")
 
-  @@unique([id, name], name: "node_name_constraint")
+  @@unique([appId, name], name: "node_name_app_constraint")
 }
 
 enum DomNodeAttributeType {

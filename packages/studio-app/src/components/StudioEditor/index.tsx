@@ -1,6 +1,7 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
 import {
+  Alert,
   Box,
   CircularProgress,
   Dialog,
@@ -92,13 +93,9 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
 
   const createReleaseMutation = client.useMutation('createRelease');
   const doSubmit = handleSubmit(async (releaseParams) => {
-    try {
-      const newRelease = await createReleaseMutation.mutateAsync([appId, releaseParams]);
-      reset();
-      navigate(`/app/${appId}/releases/${newRelease.version}`);
-    } catch (error) {
-      onClose();
-    }
+    const newRelease = await createReleaseMutation.mutateAsync([appId, releaseParams]);
+    reset();
+    navigate(`/app/${appId}/releases/${newRelease.version}`);
   });
 
   return (
@@ -122,6 +119,10 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
                 helperText={formState.errors.description?.message}
               />
             </Stack>
+          ) : null}
+
+          {createReleaseMutation.isError ? (
+            <Alert severity="error">{(createReleaseMutation.error as Error).message}</Alert>
           ) : null}
         </DialogContent>
         <DialogActions>

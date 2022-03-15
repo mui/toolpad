@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions, UseDataQuery } from '@mui/studio-core';
+import AddIcon from '@mui/icons-material/Add';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
@@ -151,7 +152,7 @@ export default function QueryStateEditor() {
 
   return (
     <Stack spacing={1} alignItems="start">
-      <Button color="inherit" onClick={handleCreate}>
+      <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
         create query state
       </Button>
       <List>

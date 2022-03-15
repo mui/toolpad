@@ -61,7 +61,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
 
   return (
     <React.Fragment>
-      <Typography variant="subtitle1">{component.displayName}</Typography>
+      <Typography variant="subtitle1">Component: {component.displayName}</Typography>
       <Typography variant="subtitle2" sx={{ mb: 2 }}>
         ID: {node.id}
       </Typography>

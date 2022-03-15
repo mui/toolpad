@@ -76,7 +76,7 @@ export function BindableEditor<V>({
           <control.Editor
             nodeId={nodeId}
             propName={propName}
-            label={argType.name || propName}
+            label={argType.label || propName}
             argType={argType}
             disabled={!!hasBinding}
             value={constValue}

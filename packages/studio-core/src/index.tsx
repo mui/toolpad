@@ -71,7 +71,7 @@ export type PropValueTypes<K extends string = string> = Partial<{
 }>;
 
 export interface ArgTypeDefinition {
-  name?: string;
+  label?: string;
   typeDef: PropValueType;
   required?: boolean;
   defaultValue?: any;

@@ -659,7 +659,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
 
         if (newNode) {
-          domApi.addNode(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
+          if (studioDom.isElement(parent)) {
+            domApi.addNode(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
+          } else {
+            domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
+          }
         } else if (selection) {
           domApi.moveNode(
             selection,
@@ -727,20 +731,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (selection && event.key === 'Backspace') {
-        let toRemove = studioDom.getNode(dom, selection);
-
-        // TODO: move this logic to the Dom Reducer?
-        const parent = studioDom.getParent(dom, toRemove);
-        if (!parent || (!studioDom.isPage(parent) && !studioDom.isElement(parent))) {
-          throw new Error(`Invariant: can't remove a child from root node`);
-        }
-        const { children: siblings } = studioDom.getChildNodes(dom, parent);
-        const grandParent = studioDom.getParent(dom, parent);
-        if (grandParent && studioDom.isPage(grandParent) && siblings.length <= 1) {
-          // We will remove the automatically create ContainerRow if it's the last element
-          toRemove = parent;
-        }
-
+        const toRemove = studioDom.getNode(dom, selection);
         domApi.removeNode(toRemove.id);
         api.deselect();
       }

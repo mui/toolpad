@@ -116,10 +116,14 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
           const firstChildElm = devtoolsHook.renderers
             .get(rendererId)
             ?.findHostInstanceByFiber(fiber);
+
           const childContainerElm = firstChildElm?.parentElement;
 
           if (childContainerElm && nodeSlots) {
-            const rect = getRelativeBoundingRect(rootElm, childContainerElm);
+            const rect =
+              slotType === 'single'
+                ? getRelativeBoundingRect(rootElm, firstChildElm)
+                : getRelativeBoundingRect(rootElm, childContainerElm);
             const direction = window.getComputedStyle(childContainerElm)
               .flexDirection as FlowDirection;
             nodeSlots[studioSlotName] = {

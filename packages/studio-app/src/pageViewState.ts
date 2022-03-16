@@ -140,7 +140,6 @@ export function getPageViewState(rootElm: HTMLElement): PageViewState {
   const contentWindow = rootElm.ownerDocument.defaultView;
 
   const nodesViewInfo = getNodesViewInfo(rootElm);
-  console.log(nodesViewInfo.bindings);
 
   return {
     nodes: nodesViewInfo.nodes,

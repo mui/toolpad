@@ -567,7 +567,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const availableDropTargets = React.useMemo((): studioDom.StudioNode[] => {
     const draggedNode = getCurrentlyDraggedNode();
 
-    if (!selectedNode || !draggedNode) {
+    if (!draggedNode) {
       return [];
     }
 
@@ -581,16 +581,24 @@ export default function RenderPanel({ className }: RenderPanelProps) {
      * i.e. Exclude all descendants of the current selection since inserting in one of
      * them would create a cyclic structure.
      */
-    const excludedNodes = new Set<studioDom.StudioNode>([
-      selectedNode,
-      ...studioDom.getDescendants(dom, selectedNode),
-    ]);
+    const excludedNodes = selectedNode
+      ? new Set<studioDom.StudioNode>([
+          selectedNode,
+          ...studioDom.getDescendants(dom, selectedNode),
+        ])
+      : new Set();
     return pageNodes.filter((n) => !excludedNodes.has(n));
   }, [dom, getCurrentlyDraggedNode, pageNodeId, pageNodes, selectedNode]);
+
+  const availableDropTargetIds = React.useMemo(
+    () => new Set(availableDropTargets.map((n) => n.id)),
+    [availableDropTargets],
+  );
 
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+      console.log('hello');
 
       if (!cursorPos) {
         return;
@@ -653,42 +661,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         if (newNode) {
           domApi.addNode(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
         } else if (selection) {
-          // TODO: move this logic into the Dom Reducer?
-          const selectionNode = studioDom.getNode(dom, selection);
-          let toRemove: NodeId | null = null;
-          const originalParent = studioDom.getParent(dom, selectionNode);
-          if (
-            !originalParent ||
-            (!studioDom.isPage(originalParent) && !studioDom.isElement(originalParent))
-          ) {
-            throw new Error(`Invariant: can't remove a child from root node`);
-          }
-          const { children: siblings } = studioDom.getChildNodes(dom, originalParent);
-
-          if (
-            studioDom.isElement(originalParent) &&
-            originalParent.attributes.component.value === ROW_COMPONENT &&
-            siblings.length <= 1
-          ) {
-            // We will remove the automatically create ContainerRow if it's the last element
-            toRemove = originalParent.id;
-          }
-
           domApi.moveNode(
             selection,
             activeSlot.parentId,
             activeSlot.parentProp,
             activeSlot.parentIndex,
           );
-
-          if (toRemove) {
-            domApi.removeNode(toRemove);
-          }
         }
       }
 
       api.nodeDragEnd();
-      if (newNode) {
+      if (activeSlot && newNode) {
         api.select(newNode.id);
       }
     },
@@ -903,7 +886,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                       key={`${nodeId}:${slot.parentIndex}`}
                       style={insertSlotAbsolutePositionCss(slot)}
                       className={clsx(overlayClasses.insertSlotHud, {
-                        [overlayClasses.available]: true,
+                        [overlayClasses.available]:
+                          highlightLayout && availableDropTargetIds.has(nodeId),
                         [overlayClasses.active]:
                           highlightedSlot?.parentId === nodeId &&
                           highlightedSlot?.parentProp === parentProp &&
@@ -915,7 +899,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                       key={`${nodeId}:${slot.parentIndex}`}
                       style={absolutePositionCss(slot.rect)}
                       className={clsx(overlayClasses.slotHud, {
-                        [overlayClasses.available]: true,
+                        [overlayClasses.available]:
+                          highlightLayout && availableDropTargetIds.has(nodeId),
                         [overlayClasses.active]:
                           highlightedSlot?.parentId === nodeId &&
                           highlightedSlot?.parentProp === parentProp,

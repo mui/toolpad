@@ -1,28 +1,21 @@
+import importedComponentRenderer from './importedComponentRenderer';
 import { StudioComponentDefinition } from './studioComponentDefinition';
 
 export default {
   id: 'PageRow',
   displayName: 'PageRow',
-  render(ctx, node, resolvedProps) {
-    const Stack = ctx.addImport('@mui/material', 'Stack', 'Stack');
-
-    const { children, ...props } = resolvedProps;
-
-    return `
-      <${Stack} direction="row" ${ctx.renderProps(props)}>
-        ${ctx.renderJsxContent(children)}
-      </${Stack}>
-    `;
-  },
+  render: importedComponentRenderer('@mui/studio-components', 'PageRow'),
   argTypes: {
-    p: {
+    spacing: {
       typeDef: { type: 'number' },
       defaultValue: 2,
-      label: 'padding',
     },
-    gap: {
-      typeDef: { type: 'number' },
-      defaultValue: 2,
+    alignItems: {
+      typeDef: {
+        type: 'string',
+        enum: ['flex-start', 'center', 'flex-end', 'stretch', 'baseline'],
+      },
+      defaultValue: 'flex-start',
     },
     children: {
       typeDef: { type: 'element' },

@@ -564,44 +564,40 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return newNode || (selection && studioDom.getNode(dom, selection, 'element'));
   }, [dom, newNode, selection]);
 
-  const getAllowedParentsForNode = React.useCallback(
-    (node: studioDom.StudioElementNode): studioDom.StudioNode[] => {
-      if (!selectedNode) {
-        return [];
-      }
+  const availableDropTargets = React.useMemo((): studioDom.StudioNode[] => {
+    const draggedNode = getCurrentlyDraggedNode();
 
-      const component = node.attributes.component.value;
-      if (component === ROW_COMPONENT) {
-        return [studioDom.getNode(dom, pageNodeId, 'page')];
-      }
+    if (!selectedNode || !draggedNode) {
+      return [];
+    }
 
-      /**
-       * Return all nodes that are available for insertion.
-       * i.e. Exclude all descendants of the current selection since inserting in one of
-       * them would create a cyclic structure.
-       */
-      const excludedNodes = new Set<studioDom.StudioNode>([
-        selectedNode,
-        ...studioDom.getDescendants(dom, selectedNode),
-      ]);
-      return pageNodes.filter((n) => !excludedNodes.has(n));
-    },
-    [dom, pageNodeId, pageNodes, selectedNode],
-  );
+    const component = draggedNode.attributes.component.value;
+    if (component === ROW_COMPONENT) {
+      return [studioDom.getNode(dom, pageNodeId, 'page')];
+    }
+
+    /**
+     * Return all nodes that are available for insertion.
+     * i.e. Exclude all descendants of the current selection since inserting in one of
+     * them would create a cyclic structure.
+     */
+    const excludedNodes = new Set<studioDom.StudioNode>([
+      selectedNode,
+      ...studioDom.getDescendants(dom, selectedNode),
+    ]);
+    return pageNodes.filter((n) => !excludedNodes.has(n));
+  }, [dom, getCurrentlyDraggedNode, pageNodeId, pageNodes, selectedNode]);
 
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const draggedNode = getCurrentlyDraggedNode();
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
-      if (!draggedNode || !cursorPos) {
+      if (!cursorPos) {
         return;
       }
 
-      const allowedParents = getAllowedParentsForNode(draggedNode);
-
       const slotIndex = findActiveSlotAt(
-        allowedParents,
+        availableDropTargets,
         nodesInfo,
         slots,
         cursorPos.x,
@@ -617,7 +613,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.nodeDragOver(null);
       }
     },
-    [getCurrentlyDraggedNode, getViewCoordinates, getAllowedParentsForNode, nodesInfo, slots, api],
+    [getViewCoordinates, availableDropTargets, nodesInfo, slots, api],
   );
 
   const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
@@ -631,9 +627,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const allowedParents = getAllowedParentsForNode(draggedNode);
-
-      let activeSlot = findActiveSlotAt(allowedParents, nodesInfo, slots, cursorPos.x, cursorPos.y);
+      let activeSlot = findActiveSlotAt(
+        availableDropTargets,
+        nodesInfo,
+        slots,
+        cursorPos.x,
+        cursorPos.y,
+      );
 
       if (activeSlot) {
         let parent = studioDom.getNode(dom, activeSlot.parentId);
@@ -702,7 +702,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       selection,
       getViewCoordinates,
       getCurrentlyDraggedNode,
-      getAllowedParentsForNode,
+      availableDropTargets,
     ],
   );
 

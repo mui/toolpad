@@ -244,14 +244,18 @@ class Context implements RenderContext {
   }
 
   evalExpression(id: string, expression: string): string {
-    const evaluated = `((state) => (${expression}))(${this.pageStateIdentifier})`;
+    const scope = `{ 
+      state: ${this.pageStateIdentifier},
+      ...${this.pageStateIdentifier}
+    }`;
+    const evaluated = `evalCode(${JSON.stringify(expression.trim())}, ${scope})`;
 
     return this.config.editor
       ? `
         (() => {
           let error, value
           try {
-            value = eval(${JSON.stringify(evaluated)});
+            value = ${evaluated};
             return value;
           } catch (_error) {
             error = _error;
@@ -261,7 +265,15 @@ class Context implements RenderContext {
           }
         })()
       `
-      : evaluated;
+      : `
+        (() => {
+          try {
+            return ${evaluated};
+          } catch () {
+            return undefined;
+          }
+        })()
+      `;
   }
 
   resolveBindable<P extends studioDom.BindableProps<P>>(
@@ -781,10 +793,21 @@ class Context implements RenderContext {
 
     const imports = this.imports.render();
     const codeComponentImports = this.renderCodeComponentImports();
-
     return `
       ${imports}
       ${codeComponentImports}
+
+      let iframe
+      function evalCode(code, scope) {
+        if (!iframe) {
+          iframe = document.createElement('iframe');
+          iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+          iframe.style.display = 'none';
+          document.body.parentElement.appendChild(iframe);
+        }
+        iframe.contentWindow.__SCOPE = scope
+        return iframe.contentWindow.eval(\`with (window.__SCOPE) { \${code} }\`);
+      }
 
       export default function App () {
         ${urlQueryStateHooks}

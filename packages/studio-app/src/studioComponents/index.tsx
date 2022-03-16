@@ -2,28 +2,32 @@ import * as React from 'react';
 import { capitalize } from 'lodash';
 import * as studioDom from '../studioDom';
 
-import CustomLayout from './CustomLayout';
 import Button from './Button';
 import Container from './Container';
 import DataGrid from './DataGrid';
-import Paper from './Paper';
-import Stack from './Stack';
 import Typography from './Typography';
 import TextField from './TextField';
 import Select from './Select';
+import PageRow from './PageRow';
 import { RenderComponent, StudioComponentDefinition } from './studioComponentDefinition';
+// TODO: Still needed?
+// import CustomLayout from './CustomLayout';
+// import Paper from './Paper';
+// import Stack from './Stack';
 
 // TODO: bring these back to @mui/studio repo and make them import @mui/material
 const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
+  ['PageRow', PageRow],
   ['Button', Button],
   ['DataGrid', DataGrid],
-  ['Paper', Paper],
   ['Container', Container],
-  ['Stack', Stack],
   ['TextField', TextField],
   ['Typography', Typography],
-  ['CustomLayout', CustomLayout],
   ['Select', Select],
+  // TODO: Still needed?
+  // ['Paper', Paper],
+  // ['Stack', Stack],
+  // ['CustomLayout', CustomLayout],
 ]);
 
 function codeComponentRenderer(moduleName: string, suggestedLocalName: string): RenderComponent {

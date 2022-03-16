@@ -1,24 +1,14 @@
-import { StudioComponentDefinition } from './studioComponentDefinition';
 import importedComponentRenderer from './importedComponentRenderer';
+import { StudioComponentDefinition } from './studioComponentDefinition';
 
 export default {
-  id: 'Stack',
-  displayName: 'Stack',
-  render: importedComponentRenderer('@mui/material', 'Stack'),
+  id: 'PageRow',
+  displayName: 'PageRow',
+  render: importedComponentRenderer('@mui/studio-components', 'PageRow'),
   argTypes: {
-    gap: {
+    spacing: {
       typeDef: { type: 'number' },
       defaultValue: 2,
-    },
-    margin: {
-      typeDef: { type: 'number' },
-    },
-    direction: {
-      typeDef: {
-        type: 'string',
-        enum: ['row', 'row-reverse', 'column', 'column-reverse'],
-      },
-      defaultValue: 'row',
     },
     alignItems: {
       typeDef: {
@@ -37,9 +27,6 @@ export default {
     children: {
       typeDef: { type: 'element' },
       control: { type: 'slots' },
-    },
-    sx: {
-      typeDef: { type: 'object' },
     },
   },
 } as StudioComponentDefinition;

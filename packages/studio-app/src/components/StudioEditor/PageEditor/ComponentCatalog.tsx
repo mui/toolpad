@@ -12,7 +12,7 @@ const WIDTH_COLLAPSED = 50;
 
 const ComponentCatalogRoot = styled('div')({
   position: 'relative',
-  width: WIDTH_COLLAPSED,
+  width: WIDTH_COLLAPSED + 1,
   height: '100%',
   zIndex: 1,
   overflow: 'visible',
@@ -63,7 +63,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     const newNode = studioDom.createElement(dom, componentType, {});
     api.deselect();
     api.newNodeDragStart(newNode);
-    closeDrawer();
+    closeDrawer(0);
   };
 
   const studioComponents = useStudioComponents(dom);

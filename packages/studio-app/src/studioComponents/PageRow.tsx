@@ -13,9 +13,16 @@ export default {
     alignItems: {
       typeDef: {
         type: 'string',
-        enum: ['flex-start', 'center', 'flex-end', 'stretch', 'baseline'],
+        enum: ['start', 'center', 'end', 'stretch', 'baseline'],
       },
-      defaultValue: 'flex-start',
+      defaultValue: 'start',
+    },
+    justifyContent: {
+      typeDef: {
+        type: 'string',
+        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+      },
+      defaultValue: 'start',
     },
     children: {
       typeDef: { type: 'element' },

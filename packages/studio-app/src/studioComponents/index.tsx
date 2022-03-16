@@ -11,6 +11,7 @@ import Stack from './Stack';
 import Typography from './Typography';
 import TextField from './TextField';
 import Select from './Select';
+import PageRow from './PageRow';
 import { RenderComponent, StudioComponentDefinition } from './studioComponentDefinition';
 
 // TODO: bring these back to @mui/studio repo and make them import @mui/material
@@ -24,6 +25,7 @@ const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
   ['Typography', Typography],
   ['CustomLayout', CustomLayout],
   ['Select', Select],
+  ['PageRow', PageRow],
 ]);
 
 function codeComponentRenderer(moduleName: string, suggestedLocalName: string): RenderComponent {

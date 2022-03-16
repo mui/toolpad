@@ -6,6 +6,7 @@ import {
   LiveBindings,
   RuntimeEvent,
   ComponentConfig,
+  LiveBinding,
 } from '@mui/studio-core';
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
@@ -60,16 +61,18 @@ function walkFibers(node: FiberNode, visitor: (node: FiberNode) => void) {
 
 export function getNodesViewInfo(rootElm: HTMLElement): {
   nodes: NodesInfo;
+  bindings: Record<string, LiveBinding>;
 } {
   // eslint-disable-next-line no-underscore-dangle
   const devtoolsHook = rootElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
   if (!devtoolsHook) {
     console.warn(`Can't read page layout as react devtools are not installed`);
-    return { nodes: {} };
+    return { nodes: {}, bindings: {} };
   }
 
   const nodes: NodesInfo = {};
+  const bindings: Record<string, LiveBinding> = {};
 
   const rendererId = 1;
   const nodeElms = new Map<NodeId, Element>();
@@ -97,6 +100,9 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
             const info = getNodeViewInfo(fiber, rootElm, elm, nodeId);
             if (info) {
               nodes[nodeId] = info;
+              Object.entries(info.props).forEach(([key, value]) => {
+                bindings[`${info.nodeId}.props.${key}`] = { value };
+              });
             }
           }
         }
@@ -127,17 +133,23 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
     }
   });
 
-  return { nodes };
+  return { nodes, bindings };
 }
 
 export function getPageViewState(rootElm: HTMLElement): PageViewState {
   const contentWindow = rootElm.ownerDocument.defaultView;
 
+  const nodesViewInfo = getNodesViewInfo(rootElm);
+  console.log(nodesViewInfo.bindings);
+
   return {
-    ...getNodesViewInfo(rootElm),
+    nodes: nodesViewInfo.nodes,
     // eslint-disable-next-line no-underscore-dangle
     pageState: contentWindow?.__STUDIO_RUNTIME_PAGE_STATE__ ?? {},
-    // eslint-disable-next-line no-underscore-dangle
-    bindings: contentWindow?.__STUDIO_RUNTIME_BINDINGS_STATE__ ?? {},
+    bindings: {
+      ...nodesViewInfo.bindings,
+      // eslint-disable-next-line no-underscore-dangle
+      ...(contentWindow?.__STUDIO_RUNTIME_BINDINGS_STATE__ ?? {}),
+    },
   };
 }

@@ -29,6 +29,8 @@ import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { useStudioComponent } from '../../../studioComponents';
 
+const ROW_COMPONENT = 'PageRow';
+
 type SlotDirection = 'horizontal' | 'vertical';
 
 const classes = {
@@ -52,6 +54,7 @@ const overlayClasses = {
   selected: 'StudioSelected',
   allowNodeInteraction: 'StudioAllowNodeInteraction',
   active: 'StudioActive',
+  available: 'StudioAvailable',
   componentDragging: 'StudioComponentDragging',
   selectionHint: 'StudioSelectionHint',
   hudOverlay: 'StudioHudOverlay',
@@ -100,14 +103,18 @@ const OverlayRoot = styled('div')({
     },
   },
 
-  [`&.${overlayClasses.componentDragging}`]: {
+  /*   [`&.${overlayClasses.componentDragging}`]: {
     [`& .${overlayClasses.insertSlotHud}`]: {
       border: '1px dashed #DDD',
     },
-  },
+  }, */
 
   [`& .${overlayClasses.insertSlotHud}`]: {
     position: 'absolute',
+
+    [`&.${overlayClasses.available}`]: {
+      border: '1px dashed #DDD',
+    },
 
     [`&.${overlayClasses.active}`]: {
       border: '1px solid green',
@@ -538,18 +545,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return result;
   }, [pageNodes, dom, nodesInfo]);
 
-  const availableNodes = React.useMemo(() => {
-    /**
-     * Return all nodes that are available for insertion.
-     * i.e. Exclude all descendants of the current selection since inserting in one of
-     * them would create a cyclic structure.
-     */
-    const excludedNodes = new Set<studioDom.StudioNode>(
-      selectedNode ? [selectedNode, ...studioDom.getDescendants(dom, selectedNode)] : [],
-    );
-    return pageNodes.filter((node) => !excludedNodes.has(node));
-  }, [dom, pageNodes, selectedNode]);
-
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.stopPropagation();
@@ -565,16 +560,48 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [api],
   );
 
+  const getCurrentlyDraggedNode = React.useCallback((): studioDom.StudioElementNode | null => {
+    return newNode || (selection && studioDom.getNode(dom, selection, 'element'));
+  }, [dom, newNode, selection]);
+
+  const getAllowedParentsForNode = React.useCallback(
+    (node: studioDom.StudioElementNode): studioDom.StudioNode[] => {
+      if (!selectedNode) {
+        return [];
+      }
+
+      const component = node.attributes.component.value;
+      if (component === ROW_COMPONENT) {
+        return [studioDom.getNode(dom, pageNodeId, 'page')];
+      }
+
+      /**
+       * Return all nodes that are available for insertion.
+       * i.e. Exclude all descendants of the current selection since inserting in one of
+       * them would create a cyclic structure.
+       */
+      const excludedNodes = new Set<studioDom.StudioNode>([
+        selectedNode,
+        ...studioDom.getDescendants(dom, selectedNode),
+      ]);
+      return pageNodes.filter((n) => !excludedNodes.has(n));
+    },
+    [dom, pageNodeId, pageNodes, selectedNode],
+  );
+
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
+      const draggedNode = getCurrentlyDraggedNode();
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
-      if (!cursorPos) {
+      if (!draggedNode || !cursorPos) {
         return;
       }
 
+      const allowedParents = getAllowedParentsForNode(draggedNode);
+
       const slotIndex = findActiveSlotAt(
-        availableNodes,
+        allowedParents,
         nodesInfo,
         slots,
         cursorPos.x,
@@ -590,20 +617,23 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.nodeDragOver(null);
       }
     },
-    [availableNodes, nodesInfo, api, slots, getViewCoordinates],
+    [getCurrentlyDraggedNode, getViewCoordinates, getAllowedParentsForNode, nodesInfo, slots, api],
   );
 
   const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
 
   const handleDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
+      const draggedNode = getCurrentlyDraggedNode();
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
-      if (!cursorPos) {
+      if (!draggedNode || !cursorPos) {
         return;
       }
 
-      let activeSlot = findActiveSlotAt(availableNodes, nodesInfo, slots, cursorPos.x, cursorPos.y);
+      const allowedParents = getAllowedParentsForNode(draggedNode);
+
+      let activeSlot = findActiveSlotAt(allowedParents, nodesInfo, slots, cursorPos.x, cursorPos.y);
 
       if (activeSlot) {
         let parent = studioDom.getNode(dom, activeSlot.parentId);
@@ -612,11 +642,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           throw new Error(`Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`);
         }
 
-        if (studioDom.isPage(parent)) {
+        if (studioDom.isPage(parent) && draggedNode.attributes.component.value !== ROW_COMPONENT) {
           // TODO: this logic should probably live in the DomReducer?
-          const container = studioDom.createElement(dom, 'Stack', {
-            sx: studioDom.createConst({ p: 2 }),
-          });
+          const container = studioDom.createElement(dom, ROW_COMPONENT, {});
           domApi.addNode(container, parent, 'children');
           parent = container;
           activeSlot = { parentId: parent.id, parentProp: 'children' };
@@ -636,8 +664,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             throw new Error(`Invariant: can't remove a child from root node`);
           }
           const { children: siblings } = studioDom.getChildNodes(dom, originalParent);
-          const grandParent = studioDom.getParent(dom, originalParent);
-          if (grandParent && studioDom.isPage(grandParent) && siblings.length <= 1) {
+
+          if (
+            studioDom.isElement(originalParent) &&
+            originalParent.attributes.component.value === ROW_COMPONENT &&
+            siblings.length <= 1
+          ) {
             // We will remove the automatically create ContainerRow if it's the last element
             toRemove = originalParent.id;
           }
@@ -660,7 +692,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.select(newNode.id);
       }
     },
-    [dom, availableNodes, nodesInfo, domApi, api, slots, newNode, selection, getViewCoordinates],
+    [
+      dom,
+      nodesInfo,
+      domApi,
+      api,
+      slots,
+      newNode,
+      selection,
+      getViewCoordinates,
+      getCurrentlyDraggedNode,
+      getAllowedParentsForNode,
+    ],
   );
 
   const handleDragEnd = React.useCallback(
@@ -860,6 +903,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                       key={`${nodeId}:${slot.parentIndex}`}
                       style={insertSlotAbsolutePositionCss(slot)}
                       className={clsx(overlayClasses.insertSlotHud, {
+                        [overlayClasses.available]: true,
                         [overlayClasses.active]:
                           highlightedSlot?.parentId === nodeId &&
                           highlightedSlot?.parentProp === parentProp &&
@@ -871,6 +915,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                       key={`${nodeId}:${slot.parentIndex}`}
                       style={absolutePositionCss(slot.rect)}
                       className={clsx(overlayClasses.slotHud, {
+                        [overlayClasses.available]: true,
                         [overlayClasses.active]:
                           highlightedSlot?.parentId === nodeId &&
                           highlightedSlot?.parentProp === parentProp,

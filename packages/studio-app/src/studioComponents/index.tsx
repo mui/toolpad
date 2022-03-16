@@ -10,24 +10,22 @@ import TextField from './TextField';
 import Select from './Select';
 import PageRow from './PageRow';
 import { RenderComponent, StudioComponentDefinition } from './studioComponentDefinition';
-// TODO: Still needed?
-// import CustomLayout from './CustomLayout';
-// import Paper from './Paper';
-// import Stack from './Stack';
+import CustomLayout from './CustomLayout';
+import Paper from './Paper';
+import Stack from './Stack';
 
 // TODO: bring these back to @mui/studio repo and make them import @mui/material
 const INTERNAL_COMPONENTS = new Map<string, StudioComponentDefinition>([
   ['PageRow', PageRow],
+  ['Stack', Stack],
   ['Button', Button],
   ['DataGrid', DataGrid],
   ['Container', Container],
   ['TextField', TextField],
   ['Typography', Typography],
   ['Select', Select],
-  // TODO: Still needed?
-  // ['Paper', Paper],
-  // ['Stack', Stack],
-  // ['CustomLayout', CustomLayout],
+  ['Paper', Paper],
+  ['CustomLayout', CustomLayout],
 ]);
 
 function codeComponentRenderer(moduleName: string, suggestedLocalName: string): RenderComponent {

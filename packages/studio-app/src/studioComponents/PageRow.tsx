@@ -16,6 +16,7 @@ export default {
         enum: ['start', 'center', 'end', 'stretch', 'baseline'],
       },
       defaultValue: 'start',
+      label: 'Vertical alignment',
       control: { type: 'VerticalAlign' },
     },
     justifyContent: {
@@ -24,6 +25,7 @@ export default {
         enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
       },
       defaultValue: 'start',
+      label: 'Horizontal alignment',
       control: { type: 'HorizontalAlign' },
     },
     children: {

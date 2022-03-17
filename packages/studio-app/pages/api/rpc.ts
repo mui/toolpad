@@ -5,6 +5,7 @@ import {
   createApp,
   testConnection,
   execApi,
+  dataSourceFetchPrivate,
   loadDom,
   saveDom,
   createRelease,
@@ -87,6 +88,9 @@ function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResol
 
 const rpcServer = {
   query: {
+    dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>((params) => {
+      return dataSourceFetchPrivate(...params);
+    }),
     getApps: createMethod<typeof getApps>((params) => {
       return getApps(...params);
     }),

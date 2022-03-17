@@ -112,6 +112,20 @@ export interface ComponentConfig<P> {
 
 export type LiveBindings = Partial<Record<string, LiveBinding>>;
 
+let iframe: HTMLIFrameElement;
+export function evalCode(code: string, globalScope: Record<string, unknown>) {
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+    iframe.style.display = 'none';
+    document.documentElement.appendChild(iframe);
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  (iframe.contentWindow as any).__SCOPE = globalScope;
+  return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
+}
+
 export type { PlaceholderProps, SlotsProps, StudioRuntimeNode, RuntimeError } from './runtime';
 export { Placeholder, Slots, useStudioNode } from './runtime';
 

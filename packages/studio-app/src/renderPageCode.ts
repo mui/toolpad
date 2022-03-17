@@ -244,14 +244,17 @@ class Context implements RenderContext {
   }
 
   evalExpression(id: string, expression: string): string {
-    const evaluated = `((state) => (${expression}))(${this.pageStateIdentifier})`;
+    const evalCodeId = this.addImport('@mui/studio-core', 'evalCode', 'evalCode');
+    const evaluated = `${evalCodeId}(${JSON.stringify(expression.trim())}, ${
+      this.pageStateIdentifier
+    })`;
 
     return this.config.editor
       ? `
         (() => {
           let error, value
           try {
-            value = eval(${JSON.stringify(evaluated)});
+            value = ${evaluated};
             return value;
           } catch (_error) {
             error = _error;
@@ -261,7 +264,15 @@ class Context implements RenderContext {
           }
         })()
       `
-      : evaluated;
+      : `
+        (() => {
+          try {
+            return ${evaluated};
+          } catch (_error) {
+            return undefined;
+          }
+        })()
+      `;
   }
 
   resolveBindable<P extends studioDom.BindableProps<P>>(
@@ -781,7 +792,6 @@ class Context implements RenderContext {
 
     const imports = this.imports.render();
     const codeComponentImports = this.renderCodeComponentImports();
-
     return `
       ${imports}
       ${codeComponentImports}

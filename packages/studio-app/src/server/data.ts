@@ -326,6 +326,28 @@ export async function execApi<Q>(
   return dataSource.exec(connection, api.attributes.query.value, params);
 }
 
+export async function dataSourceFetchPrivate(
+  appId: string,
+  connectionId: NodeId,
+  query: any,
+): Promise<any> {
+  const connection = await getConnection(appId, connectionId);
+  const dataSource: StudioDataSourceServer<any, any, any> | undefined =
+    studioDataSources[connection.type];
+
+  if (!dataSource) {
+    throw new Error(
+      `Unknown connection type "${connection.type}" for connection "${connection.id}"`,
+    );
+  }
+
+  if (!dataSource.execPrivate) {
+    throw new Error(`No execPrivate available on datasource "${connection.type}"`);
+  }
+
+  return dataSource.execPrivate(connection, query);
+}
+
 export function parseVersion(param?: string | string[]): VersionOrPreview | null {
   if (!param) {
     return null;

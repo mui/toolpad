@@ -124,7 +124,13 @@ export interface StudioConnectionParamsEditorProps<P> extends WithControlledProp
 }
 
 export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionParamsEditorProps<P>>;
-export type StudioQueryEditor<Q = {}> = React.FC<WithControlledProp<Q>>;
+export interface StudioQueryEditorApi {
+  fetchPrivate: (query: any) => Promise<any>;
+}
+export interface StudioQueryEditorProps<Q> extends WithControlledProp<Q> {
+  api: StudioQueryEditorApi;
+}
+export type StudioQueryEditor<Q = {}> = React.FC<StudioQueryEditorProps<Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;
@@ -143,6 +149,9 @@ export interface StudioDataSourceClient<P = {}, Q = {}> {
 
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
+  // Execute a private query on this connection, intended for editors only
+  execPrivate?: (connection: StudioConnection<P>, query: any) => Promise<any>;
+  // Execute a query on this connection, intended for viewers
   exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
 }
 

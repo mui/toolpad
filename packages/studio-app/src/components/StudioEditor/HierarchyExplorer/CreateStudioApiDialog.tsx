@@ -14,8 +14,54 @@ import {
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as studioDom from '../../../studioDom';
+import { NodeId } from '../../../types';
+import { WithControlledProp } from '../../../utils/types';
 import DialogForm from '../../DialogForm';
 import { useDom, useDomApi } from '../../DomLoader';
+
+export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
+  dataSource?: string;
+}
+
+export function ConnectionSelect({ dataSource, value, onChange }: ConnectionSelectProps) {
+  const dom = useDom();
+
+  const app = studioDom.getApp(dom);
+  const { connections = [] } = studioDom.getChildNodes(dom, app);
+
+  const filtered = React.useMemo(() => {
+    return dataSource
+      ? connections.filter((connection) => connection.attributes.dataSource.value === dataSource)
+      : connections;
+  }, [connections, dataSource]);
+
+  const handleSelectionChange = React.useCallback(
+    (event: SelectChangeEvent<string>) => {
+      onChange((event.target.value as NodeId) || null);
+    },
+    [onChange],
+  );
+
+  return (
+    <FormControl size="small" fullWidth>
+      <InputLabel id="select-connection-type">Connection</InputLabel>
+      <Select
+        size="small"
+        fullWidth
+        value={value || ''}
+        labelId="select-connection-type"
+        label="Connection"
+        onChange={handleSelectionChange}
+      >
+        {filtered.map((connection) => (
+          <MenuItem key={connection.id} value={connection.id}>
+            {connection.name} | {connection.attributes.dataSource.value}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+}
 
 export interface CreateStudioApiDialogProps {
   appId: string;
@@ -28,27 +74,28 @@ export default function CreateStudioApiDialog({
   onClose,
   ...props
 }: CreateStudioApiDialogProps) {
-  const [connectionId, setConnectionID] = React.useState('');
+  const [connectionId, setConnectionID] = React.useState<NodeId | null>(null);
   const dom = useDom();
   const domApi = useDomApi();
   const navigate = useNavigate();
-
-  const app = studioDom.getApp(dom);
-  const { connections = [] } = studioDom.getChildNodes(dom, app);
-
-  const handleSelectionChange = React.useCallback((event: SelectChangeEvent<string>) => {
-    setConnectionID(event.target.value);
-  }, []);
 
   return (
     <Dialog {...props} onClose={onClose}>
       <DialogForm
         onSubmit={(e) => {
           e.preventDefault();
+          const connection =
+            connectionId && studioDom.getMaybeNode(dom, connectionId, 'connection');
+
+          if (!connection) {
+            throw new Error(`Invariant: Selected non-existing connection "${connectionId}"`);
+          }
+
           const newApiNode = studioDom.createNode(dom, 'api', {
             attributes: {
               query: studioDom.createConst({}),
               connectionId: studioDom.createConst(connectionId),
+              dataSource: connection.attributes.dataSource,
             },
           });
           const appNode = studioDom.getApp(dom);
@@ -60,23 +107,7 @@ export default function CreateStudioApiDialog({
         <DialogTitle>Create a new MUI Studio API</DialogTitle>
         <DialogContent>
           <Typography>Please select a connection for your API</Typography>
-          <FormControl size="small" fullWidth>
-            <InputLabel id="select-connection-type">Connection</InputLabel>
-            <Select
-              size="small"
-              fullWidth
-              value={connectionId}
-              labelId="select-connection-type"
-              label="Connection"
-              onChange={handleSelectionChange}
-            >
-              {connections.map((connection) => (
-                <MenuItem key={connection.id} value={connection.id}>
-                  {connection.name} | {connection.attributes.dataSource.value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <ConnectionSelect value={connectionId} onChange={setConnectionID} />
         </DialogContent>
         <DialogActions>
           <Button type="submit" disabled={!connectionId}>

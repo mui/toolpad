@@ -80,6 +80,7 @@ export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
   readonly type: 'api';
   readonly attributes: {
     readonly connectionId: StudioConstant<string>;
+    readonly dataSource: StudioConstant<string>;
     readonly query: StudioConstant<Q>;
   };
 }

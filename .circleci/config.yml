@@ -1,11 +1,11 @@
 version: 2.1
 orbs:
-  aws-s3: circleci/aws-s3@3.0.0
+  aws-s3: cimg/aws-s3@3.0.0
 
 defaults: &defaults
   working_directory: /tmp/mui-studio
   docker:
-    - image: circleci/node:14
+    - image: cimg/node:14
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.

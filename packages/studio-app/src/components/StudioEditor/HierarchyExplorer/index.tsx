@@ -166,22 +166,25 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [],
   );
 
-  const [deletedNode, setDeletedNode] = React.useState<NodeId | null>(null);
+  const [deletedNodeId, setDeletedNodeId] = React.useState<NodeId | null>(null);
   const handleDeleteNodeDialogOpen = React.useCallback(
     (nodeId: NodeId) => (event: React.MouseEvent) => {
       event.stopPropagation();
-      setDeletedNode(nodeId);
+      setDeletedNodeId(nodeId);
     },
     [],
   );
-  const handledeleteNodeDialogClose = React.useCallback(() => setDeletedNode(null), []);
+  const handledeleteNodeDialogClose = React.useCallback(() => setDeletedNodeId(null), []);
 
   const handleDeleteNode = React.useCallback(() => {
-    if (deletedNode) {
-      domApi.removeNode(deletedNode);
+    if (deletedNodeId) {
+      domApi.removeNode(deletedNodeId);
+      navigate(`/app/${appId}/editor/`);
       handledeleteNodeDialogClose();
     }
-  }, [domApi, deletedNode, handledeleteNodeDialogClose]);
+  }, [deletedNodeId, domApi, navigate, appId, handledeleteNodeDialogClose]);
+
+  const deletedNode = deletedNodeId && studioDom.getMaybeNode(dom, deletedNodeId);
 
   return (
     <HierarchyExplorerRoot className={className}>
@@ -270,7 +273,9 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         onClose={handleCreateCodeComponentDialogClose}
       />
       <Dialog open={!!deletedNode} onClose={handledeleteNodeDialogClose}>
-        <DialogTitle>Delete node {deletedNode}?</DialogTitle>
+        <DialogTitle>
+          Delete {deletedNode?.type} &quot;{deletedNode?.name}&quot;?
+        </DialogTitle>
         <DialogActions>
           <Button type="submit" onClick={handledeleteNodeDialogClose}>
             Cancel

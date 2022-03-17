@@ -123,11 +123,10 @@ interface CreateReleaseParams {
 }
 
 const SELECT_RELEASE_META = {
-  id: true,
   version: true,
   description: true,
   createdAt: true,
-};
+} as const;
 
 export function findLastRelease(appId: string) {
   return prisma.release.findFirst({
@@ -169,6 +168,13 @@ export async function getReleases(appId: string) {
     orderBy: {
       createdAt: 'desc',
     },
+  });
+}
+
+export async function getRelease(appId: string, version: number) {
+  return prisma.release.findUnique({
+    where: { release_app_constraint: { appId, version } },
+    select: SELECT_RELEASE_META,
   });
 }
 

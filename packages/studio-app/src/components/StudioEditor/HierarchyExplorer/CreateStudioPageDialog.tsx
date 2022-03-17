@@ -43,18 +43,6 @@ export default function CreateStudioPageDialog({
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'pages');
 
-          const container = studioDom.createElement(dom, 'Container', {
-            sx: studioDom.createConst({ my: 2 }),
-          });
-          domApi.addNode(container, newNode, 'children');
-
-          const stack = studioDom.createElement(dom, 'Stack', {
-            gap: studioDom.createConst(2),
-            direction: studioDom.createConst('column'),
-            alignItems: studioDom.createConst('stretch'),
-          });
-          domApi.addNode(stack, container, 'children');
-
           onClose();
           navigate(`/app/${appId}/editor/pages/${newNode.id}`);
         }}

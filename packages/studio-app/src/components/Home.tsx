@@ -19,6 +19,7 @@ import { Box } from '@mui/system';
 import client from '../api';
 import DialogForm from './DialogForm';
 import { App } from '../../prisma/generated/client';
+import StudioAppBar from './StudioAppBar';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -98,42 +99,45 @@ export default function Home() {
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
   return (
-    <Container>
-      <Typography variant="h2">Apps</Typography>
-      <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
+    <React.Fragment>
+      <StudioAppBar navigation={null} actions={null} />
+      <Container>
+        <Typography variant="h2">Apps</Typography>
+        <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
 
-      <Toolbar disableGutters>
-        <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-      </Toolbar>
+        <Toolbar disableGutters>
+          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+        </Toolbar>
 
-      <Box
-        sx={{
-          my: 5,
-          display: 'grid',
-          gridTemplateColumns: {
-            lg: 'repeat(4, 1fr)',
-            md: 'repeat(3, 1fr)',
-            sm: 'repeat(2, fr)',
-            xs: 'repeat(1, fr)',
-          },
-          gap: 2,
-        }}
-      >
-        {(() => {
-          switch (status) {
-            case 'loading':
-              return <AppCard />;
-            case 'error':
-              return (error as Error)?.message;
-            case 'success':
-              return apps.length > 0
-                ? apps.map((app) => <AppCard key={app.id} app={app} />)
-                : 'No apps yet';
-            default:
-              return '';
-          }
-        })()}
-      </Box>
-    </Container>
+        <Box
+          sx={{
+            my: 5,
+            display: 'grid',
+            gridTemplateColumns: {
+              lg: 'repeat(4, 1fr)',
+              md: 'repeat(3, 1fr)',
+              sm: 'repeat(2, fr)',
+              xs: 'repeat(1, fr)',
+            },
+            gap: 2,
+          }}
+        >
+          {(() => {
+            switch (status) {
+              case 'loading':
+                return <AppCard />;
+              case 'error':
+                return (error as Error)?.message;
+              case 'success':
+                return apps.length > 0
+                  ? apps.map((app) => <AppCard key={app.id} app={app} />)
+                  : 'No apps yet';
+              default:
+                return '';
+            }
+          })()}
+        </Box>
+      </Container>
+    </React.Fragment>
   );
 }

@@ -507,12 +507,20 @@ class Context implements RenderContext {
       {
         children: {
           typeDef: { type: 'element' },
-          control: { type: 'slot' },
+          control: { type: 'slots' },
         },
       },
     );
 
-    const rendered = this.renderJsExpression(resolvedChildren.children);
+    const Stack = this.addImport('@mui/material', 'Stack', 'Stack');
+
+    const rendered = `
+      <${Stack} direction="column" alignItems='stretch'>
+        ${this.renderJsxContent(resolvedChildren.children)}
+      </${Stack}>
+    `;
+
+    // const rendered = this.renderJsExpression(resolvedChildren.children);
     const expr = this.wrapComponent(node, rendered);
     return this.renderJsExpression(expr);
   }

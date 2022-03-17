@@ -244,11 +244,7 @@ class Context implements RenderContext {
   }
 
   evalExpression(id: string, expression: string): string {
-    const scope = `{ 
-      state: ${this.pageStateIdentifier},
-      ...${this.pageStateIdentifier}
-    }`;
-    const evaluated = `evalCode(${JSON.stringify(expression.trim())}, ${scope})`;
+    const evaluated = `evalCode(${JSON.stringify(expression.trim())}, ${this.pageStateIdentifier})`;
 
     return this.config.editor
       ? `
@@ -269,7 +265,7 @@ class Context implements RenderContext {
         (() => {
           try {
             return ${evaluated};
-          } catch () {
+          } catch (_error) {
             return undefined;
           }
         })()

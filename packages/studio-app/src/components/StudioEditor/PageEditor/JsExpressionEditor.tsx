@@ -19,10 +19,14 @@ export function JsExpressionEditor({ onCommit, value, onChange }: JsExpressionEd
   const libSource = React.useMemo(() => {
     const type = jsonToTs(pageState);
 
+    const globals = Object.keys(pageState)
+      .map((key) => `declare const ${key}: RootObject[${JSON.stringify(key)}];`)
+      .join('\n');
+
     return `
       ${type.join('\n')}
 
-      declare const state: RootObject;
+      ${globals}
     `;
   }, [pageState]);
 

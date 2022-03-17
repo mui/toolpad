@@ -166,64 +166,59 @@ function findNodeAt(
 }
 
 /**
- * From a collection of slots belonging to a single parent, returns the index of the
- * closest one to a certain point
+ * From a collection of slots, returns the location of the closest one to a certain point
  */
-function findActiveSlotInNode(
-  parentId: NodeId,
-  slots: NodeSlots,
-  x: number,
-  y: number,
-): SlotLocation | null {
+function findClosestSlot(slots: RenderedSlot[], x: number, y: number): SlotLocation | null {
   let closestDistance = Infinity;
-  let closestParentProp: string | null = null;
-  let closestParentIndex: string | null = null;
+  let closestSlot: RenderedSlot | null = null;
 
   // eslint-disable-next-line no-restricted-syntax
-  for (const [parentProp, namedSlots] of Object.entries(slots)) {
-    if (namedSlots) {
-      for (let j = 0; j < namedSlots.length; j += 1) {
-        const namedSlot = namedSlots[j];
-        let distance: number;
-        if (namedSlot.type === 'single') {
-          distance = distanceToRect(namedSlot.rect, x, y);
-        } else {
-          distance =
-            namedSlot.direction === 'horizontal'
-              ? distanceToLine(
-                  namedSlot.x,
-                  namedSlot.y,
-                  namedSlot.x,
-                  namedSlot.y + namedSlot.size,
-                  x,
-                  y,
-                )
-              : distanceToLine(
-                  namedSlot.x,
-                  namedSlot.y,
-                  namedSlot.x + namedSlot.size,
-                  namedSlot.y,
-                  x,
-                  y,
-                );
-        }
+  for (const namedSlot of slots) {
+    let distance: number;
+    if (namedSlot.type === 'single') {
+      distance = distanceToRect(namedSlot.rect, x, y);
+    } else {
+      distance =
+        namedSlot.direction === 'horizontal'
+          ? distanceToLine(
+              namedSlot.x,
+              namedSlot.y,
+              namedSlot.x,
+              namedSlot.y + namedSlot.size,
+              x,
+              y,
+            )
+          : distanceToLine(
+              namedSlot.x,
+              namedSlot.y,
+              namedSlot.x + namedSlot.size,
+              namedSlot.y,
+              x,
+              y,
+            );
+    }
 
-        if (distance <= 0) {
-          // We can bail out early here
-          return { parentId, parentIndex: namedSlot.parentIndex, parentProp };
-        }
+    if (distance <= 0) {
+      // We can bail out early here
+      return {
+        parentId: namedSlot.parentId,
+        parentIndex: namedSlot.parentIndex,
+        parentProp: namedSlot.parentProp,
+      };
+    }
 
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestParentProp = parentProp;
-          closestParentIndex = namedSlot.parentIndex;
-        }
-      }
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestSlot = namedSlot;
     }
   }
 
-  if (closestParentProp && closestParentIndex) {
-    return { parentId, parentProp: closestParentProp, parentIndex: closestParentIndex };
+  if (closestSlot) {
+    return {
+      parentId: closestSlot.parentId,
+      parentProp: closestSlot.parentProp,
+      parentIndex: closestSlot.parentIndex,
+    };
   }
 
   return null;
@@ -238,24 +233,31 @@ function findActiveSlotAt(
 ): SlotLocation | null {
   // Search deepest nested first
   let nodeInfo: NodeInfo | undefined;
-  let nodeSlots: NodeSlots = {};
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
     nodeInfo = nodesInfo[node.id];
-    nodeSlots = slots[node.id] || {};
     if (nodeInfo?.rect && rectContainsPoint(nodeInfo.rect, x, y)) {
       // Initially only consider slots of the node we're hovering
-      const slotIndex = findActiveSlotInNode(nodeInfo.nodeId, nodeSlots, x, y);
+      const nodeSlots = Object.values(slots[node.id] || {})
+        .flat()
+        .filter(Boolean);
+      const slotIndex = findClosestSlot(nodeSlots, x, y);
       if (slotIndex) {
         return slotIndex;
       }
     }
   }
-  // One last attempt, using the most shallow nodeLayout we found, regardless of
-  // whether we are hovering it
+
+  // One last attempt, as a fallback, we find the closest possible slot
   if (nodeInfo) {
-    return findActiveSlotInNode(nodeInfo.nodeId, nodeSlots, x, y);
+    const allSlots: RenderedSlot[] = Object.values(slots)
+      .flatMap((slotState: NodeSlots = {}) => {
+        return Object.values(slotState).flat();
+      })
+      .filter(Boolean);
+    return findClosestSlot(allSlots, x, y);
   }
+
   return null;
 }
 
@@ -274,18 +276,18 @@ function getSlotDirection(flow: FlowDirection): SlotDirection {
 
 interface RenderedSlotBase {
   readonly type: SlotType;
+  readonly parentId: NodeId;
+  readonly parentProp: string;
   readonly parentIndex: string;
 }
 
 interface RenderedSingleSlot extends RenderedSlotBase {
   readonly type: 'single';
-  readonly parentIndex: string;
   readonly rect: Rectangle;
 }
 
 interface RenderedInsertSlot extends RenderedSlotBase {
   readonly type: 'multiple';
-  readonly parentIndex: string;
   readonly direction: SlotDirection;
   readonly x: number;
   readonly y: number;
@@ -295,6 +297,8 @@ interface RenderedInsertSlot extends RenderedSlotBase {
 type RenderedSlot = RenderedInsertSlot | RenderedSingleSlot;
 
 function calculateSlots(
+  parentId: NodeId,
+  parentProp: string,
   slotState: SlotState,
   children: studioDom.StudioNode[],
   nodesInfo: NodesInfo,
@@ -305,6 +309,8 @@ function calculateSlots(
     return [
       {
         type: 'single',
+        parentId,
+        parentProp,
         parentIndex: studioDom.createFractionalIndex(null, null),
         rect,
       },
@@ -392,6 +398,8 @@ function calculateSlots(
     ({ offset, parentIndex }) =>
       ({
         type: 'multiple',
+        parentId,
+        parentProp,
         parentIndex,
         direction: slotDirection,
         x: slotDirection === 'horizontal' ? offset : rect.x,
@@ -418,7 +426,13 @@ function calculateNodeSlots(
   for (const [parentProp, slotState] of Object.entries(parentState.slots)) {
     if (slotState) {
       const namedChildren = children[parentProp] ?? [];
-      result[parentProp] = calculateSlots(slotState, namedChildren, nodesInfo);
+      result[parentProp] = calculateSlots(
+        parentState.nodeId,
+        parentProp,
+        slotState,
+        namedChildren,
+        nodesInfo,
+      );
     }
   }
 
@@ -468,6 +482,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const domApi = useDomApi();
   const api = usePageEditorApi();
   const {
+    appId,
     selection,
     newNode,
     viewState,
@@ -762,6 +777,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   return (
     <RenderPanelRoot className={className}>
       <PageView
+        appId={appId}
         editor
         className={classes.view}
         dom={dom}

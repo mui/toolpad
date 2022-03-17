@@ -1,38 +1,62 @@
 import { PrismaClient } from '../../prisma/generated/client';
-import config from './config';
 import {
   StudioConnection,
-  StudioConnectionSummary,
   ConnectionStatus,
   StudioDataSourceServer,
   StudioApiResult,
   NodeId,
   StudioBindable,
   Updates,
+  VersionOrPreview,
 } from '../types';
 import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
 import { omit } from '../utils/immutability';
+import { asArray } from '../utils/collections';
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: config.databaseUrl,
-    },
-  },
-});
+const prisma = new PrismaClient();
 
-function createDefaultApp(): studioDom.StudioDom {
-  let dom = studioDom.createDom();
+type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
+
+export async function getApps() {
+  return prisma.app.findMany();
+}
+
+export async function createApp(name: string) {
+  return prisma.app.create({
+    data: { name },
+  });
+}
+
+function createDefaultPage(dom: studioDom.StudioDom, name: string): studioDom.StudioDom {
   const page = studioDom.createNode(dom, 'page', {
-    name: 'DefaultPage',
+    name,
     attributes: {
-      title: studioDom.createConst('Default'),
+      title: studioDom.createConst(name),
       urlQuery: studioDom.createConst({}),
     },
   });
   const app = studioDom.getApp(dom);
   dom = studioDom.addNode(dom, page, app, 'pages');
+
+  const container = studioDom.createElement(dom, 'Container', {
+    sx: studioDom.createConst({ my: 2 }),
+  });
+  dom = studioDom.addNode(dom, container, page, 'children');
+
+  const stack = studioDom.createElement(dom, 'Stack', {
+    gap: studioDom.createConst(2),
+    direction: studioDom.createConst('column'),
+    alignItems: studioDom.createConst('stretch'),
+  });
+  dom = studioDom.addNode(dom, stack, container, 'children');
+
+  return dom;
+}
+
+function createDefaultApp(): studioDom.StudioDom {
+  let dom = studioDom.createDom();
+  dom = createDefaultPage(dom, 'DefaultPage');
   return dom;
 }
 
@@ -44,13 +68,13 @@ function deserializeValue(dbValue: string): unknown {
   return dbValue.length <= 0 ? undefined : JSON.parse(dbValue);
 }
 
-export async function saveDom(app: studioDom.StudioDom): Promise<void> {
+export async function saveDom(appId: string, app: studioDom.StudioDom): Promise<void> {
   await prisma.$transaction([
-    prisma.domNodeAttribute.deleteMany(),
-    prisma.domNode.deleteMany(),
+    prisma.domNode.deleteMany({ where: { appId } }),
     prisma.domNode.createMany({
       data: Array.from(Object.values(app.nodes) as studioDom.StudioNode[], (node) => {
         return {
+          appId,
           id: node.id,
           name: node.name,
           type: node.type,
@@ -80,13 +104,14 @@ export async function saveDom(app: studioDom.StudioDom): Promise<void> {
   ]);
 }
 
-export async function loadDom(): Promise<studioDom.StudioDom> {
+export async function loadDom(appId: string): Promise<studioDom.StudioDom> {
   const dbNodes = await prisma.domNode.findMany({
+    where: { appId },
     include: { attributes: true },
   });
   if (dbNodes.length <= 0) {
     const app = createDefaultApp();
-    await saveDom(app);
+    await saveDom(appId, app);
     return app;
   }
   const root = dbNodes.find((node) => !node.parentId)?.id as NodeId;
@@ -126,7 +151,6 @@ export async function loadDom(): Promise<studioDom.StudioDom> {
 }
 
 interface CreateReleaseParams {
-  version: string;
   description: string;
 }
 
@@ -137,14 +161,24 @@ const SELECT_RELEASE_META = {
   createdAt: true,
 };
 
-export async function createRelease({ version, description }: CreateReleaseParams) {
-  const currentDom = await loadDom();
+export function findLastRelease(appId: string) {
+  return prisma.release.findFirst({
+    where: { appId },
+    orderBy: { version: 'desc' },
+  });
+}
+
+export async function createRelease(appId: string, { description }: CreateReleaseParams) {
+  const currentDom = await loadDom(appId);
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
+
+  const lastRelease = await findLastRelease(appId);
 
   const release = await prisma.release.create({
     select: SELECT_RELEASE_META,
     data: {
-      version,
+      appId,
+      version: lastRelease ? lastRelease.version + 1 : 1,
       description,
       snapshot,
     },
@@ -153,8 +187,9 @@ export async function createRelease({ version, description }: CreateReleaseParam
   return release;
 }
 
-export async function getReleases() {
+export async function getReleases(appId: string) {
   return prisma.release.findMany({
+    where: { appId },
     select: SELECT_RELEASE_META,
     orderBy: {
       createdAt: 'desc',
@@ -162,31 +197,40 @@ export async function getReleases() {
   });
 }
 
-export async function deleteRelease(version: string) {
+export async function deleteRelease(appId: string, version: number) {
   return prisma.release.delete({
-    where: { version },
+    where: { release_app_constraint: { appId, version } },
   });
 }
 
-export async function createDeployment(version: string) {
+export async function createDeployment(appId: string, version: number) {
   return prisma.deployment.create({
     data: {
+      app: {
+        connect: { id: appId },
+      },
       release: {
-        connect: { version },
+        connect: { release_app_constraint: { appId, version } },
       },
     },
   });
 }
 
-export async function findActiveDeployment() {
+export async function findActiveDeployment(appId: string) {
   return prisma.deployment.findFirst({
+    where: { appId },
     orderBy: { createdAt: 'desc' },
+    include: {
+      release: {
+        select: SELECT_RELEASE_META,
+      },
+    },
   });
 }
 
-export async function loadReleaseDom(version: string): Promise<studioDom.StudioDom> {
+export async function loadReleaseDom(appId: string, version: number): Promise<studioDom.StudioDom> {
   const release = await prisma.release.findUnique({
-    where: { version },
+    where: { release_app_constraint: { appId, version } },
   });
   if (!release) {
     throw new Error(`release doesn't exist`);
@@ -207,25 +251,11 @@ function fromDomConnection<P>(
   };
 }
 
-export async function getConnections(): Promise<StudioConnection[]> {
-  const dom = await loadDom();
-  const app = studioDom.getApp(dom);
-  const { connections = [] } = studioDom.getChildNodes(dom, app);
-  return connections.map(fromDomConnection);
-}
-
-export async function getConnectionSummaries(): Promise<StudioConnectionSummary[]> {
-  const connections = await getConnections();
-  return connections;
-}
-
-export async function addConnection({
-  params,
-  name,
-  status,
-  type,
-}: StudioConnection): Promise<StudioConnection> {
-  const dom = await loadDom();
+export async function addConnection(
+  appId: string,
+  { params, name, status, type }: StudioConnection,
+): Promise<StudioConnection> {
+  const dom = await loadDom(appId);
   const app = studioDom.getApp(dom);
   const newConnection = studioDom.createNode(dom, 'connection', {
     name,
@@ -237,24 +267,21 @@ export async function addConnection({
   });
 
   const newDom = studioDom.addNode(dom, newConnection, app, 'connections');
-  await saveDom(newDom);
+  await saveDom(appId, newDom);
 
   return fromDomConnection(newConnection);
 }
 
-export async function getConnection(id: string): Promise<StudioConnection> {
-  const dom = await loadDom();
+export async function getConnection(appId: string, id: string): Promise<StudioConnection> {
+  const dom = await loadDom(appId);
   return fromDomConnection(studioDom.getNode(dom, id as NodeId, 'connection'));
 }
 
-export async function updateConnection({
-  id,
-  params,
-  name,
-  status,
-  type,
-}: Updates<StudioConnection>): Promise<StudioConnection> {
-  let dom = await loadDom();
+export async function updateConnection(
+  appId: string,
+  { id, params, name, status, type }: Updates<StudioConnection>,
+): Promise<StudioConnection> {
+  let dom = await loadDom(appId);
   const existing = studioDom.getNode(dom, id as NodeId, 'connection');
   if (name !== undefined) {
     dom = studioDom.setNodeName(dom, existing, name);
@@ -286,7 +313,7 @@ export async function updateConnection({
       studioDom.createConst(type),
     );
   }
-  await saveDom(dom);
+  await saveDom(appId, dom);
   return fromDomConnection(studioDom.getNode(dom, id as NodeId, 'connection'));
 }
 
@@ -301,10 +328,11 @@ export async function testConnection(
 }
 
 export async function execApi<Q>(
+  appId: string,
   api: studioDom.StudioApiNode<Q>,
   params: Q,
 ): Promise<StudioApiResult<any>> {
-  const connection = await getConnection(api.attributes.connectionId.value);
+  const connection = await getConnection(appId, api.attributes.connectionId.value);
   const dataSource: StudioDataSourceServer<any, Q, any> | undefined =
     studioDataSources[connection.type];
   if (!dataSource) {
@@ -314,4 +342,20 @@ export async function execApi<Q>(
   }
 
   return dataSource.exec(connection, api.attributes.query.value, params);
+}
+
+export function parseVersion(param?: string | string[]): VersionOrPreview | null {
+  if (!param) {
+    return null;
+  }
+  const [maybeVersion] = asArray(param);
+  if (maybeVersion === 'preview') {
+    return maybeVersion;
+  }
+  const parsed = Number(maybeVersion);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+export async function loadVersionedDom(appId: string, version: VersionOrPreview) {
+  return version === 'preview' ? loadDom(appId) : loadReleaseDom(appId, version);
 }

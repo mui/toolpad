@@ -1,28 +1,27 @@
 import { Button, Container, Toolbar, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@mui/x-data-grid-pro';
-import type { NextPage } from 'next';
 import * as React from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { useRouter } from 'next/router';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import client from '../../../src/api';
-import * as studioDom from '../../../src/studioDom';
-import { asArray } from '../../../src/utils/collections';
-import { NodeId } from '../../../src/types';
-import StudioAppBar from '../../../src/components/StudioAppBar';
+import { useParams } from 'react-router-dom';
+import client from '../api';
+import * as studioDom from '../studioDom';
+import { NodeId } from '../types';
+import StudioAppBar from './StudioAppBar';
 
 interface NavigateToReleaseActionProps {
-  version?: string;
+  appId: string;
+  version?: number;
   pageNodeId: NodeId;
 }
 
-function NavigateToReleaseAction({ version, pageNodeId }: NavigateToReleaseActionProps) {
+function NavigateToReleaseAction({ appId, version, pageNodeId }: NavigateToReleaseActionProps) {
   return (
     <GridActionsCellItem
       icon={<OpenInNewIcon />}
       component="a"
-      href={`/api/release/${version}/${pageNodeId}`}
+      href={`/api/release/${appId}/${version}/${pageNodeId}`}
       target="_blank"
       label="Open"
       disabled={!version}
@@ -30,19 +29,24 @@ function NavigateToReleaseAction({ version, pageNodeId }: NavigateToReleaseActio
   );
 }
 
-const Home: NextPage = () => {
-  const router = useRouter();
-  const [version] = asArray(router.query.version);
+export default function Release() {
+  const { version: rawVersion, appId } = useParams();
+  const version = Number(rawVersion);
+
+  if (!appId) {
+    throw new Error(`Missing queryParam "appId"`);
+  }
+
   const {
     data: dom,
     isLoading,
     error,
-  } = client.useQuery('loadReleaseDom', version ? [version] : null);
+  } = client.useQuery('loadReleaseDom', version ? [appId, version] : null);
   const app = dom ? studioDom.getApp(dom) : null;
   const { pages = [] } = dom && app ? studioDom.getChildNodes(dom, app) : {};
 
   const deployReleaseMutation = client.useMutation('createDeployment');
-  const activeDeploymentQuery = client.useQuery('findActiveDeployment', []);
+  const activeDeploymentQuery = client.useQuery('findActiveDeployment', [appId]);
 
   const columns: GridColumns = React.useMemo(
     () => [
@@ -52,28 +56,28 @@ const Home: NextPage = () => {
         field: 'actions',
         type: 'actions',
         getActions: (params: GridRowParams) => [
-          <NavigateToReleaseAction version={version} pageNodeId={params.row.id} />,
+          <NavigateToReleaseAction appId={appId} version={version} pageNodeId={params.row.id} />,
         ],
       },
     ],
-    [version],
+    [appId, version],
   );
 
   const handleDeployClick = React.useCallback(async () => {
     if (version) {
-      await deployReleaseMutation.mutateAsync([version]);
+      await deployReleaseMutation.mutateAsync([appId, version]);
       activeDeploymentQuery.refetch();
     }
-  }, [activeDeploymentQuery, deployReleaseMutation, version]);
+  }, [appId, activeDeploymentQuery, deployReleaseMutation, version]);
 
-  const isActiveDeployment = activeDeploymentQuery.data?.version === version;
+  const isActiveDeployment = activeDeploymentQuery.data?.release.version === version;
 
   const canDeploy =
     deployReleaseMutation.isIdle && activeDeploymentQuery.isSuccess && !isActiveDeployment;
 
   return (
     <React.Fragment>
-      <StudioAppBar actions={null} />
+      <StudioAppBar appId={appId} actions={null} />
       <Container>
         <Typography variant="h2">Release &quot;{version}&quot;</Typography>
         <Toolbar disableGutters>
@@ -100,6 +104,4 @@ const Home: NextPage = () => {
       </Container>
     </React.Fragment>
   );
-};
-
-export default Home;
+}

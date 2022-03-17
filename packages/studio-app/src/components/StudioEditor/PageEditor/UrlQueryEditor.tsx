@@ -29,7 +29,9 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   return (
     <React.Fragment>
-      <Button onClick={() => setDialogOpen(true)}>URL query</Button>
+      <Button color="inherit" onClick={() => setDialogOpen(true)}>
+        URL query
+      </Button>
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit URL query</DialogTitle>
         <DialogContent>

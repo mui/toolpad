@@ -1,37 +1,60 @@
 import { Container, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@mui/x-data-grid-pro';
-import type { NextPage } from 'next';
+import {
+  DataGridPro,
+  GridActionsCellItem,
+  GridColumns,
+  GridRowParams,
+  GridValueGetterParams,
+} from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { useRouter } from 'next/router';
-import client from '../../../src/api';
-import StudioAppBar from '../../../src/components/StudioAppBar';
+import { useNavigate, useParams } from 'react-router-dom';
+import client from '../api';
+import StudioAppBar from './StudioAppBar';
 
-const Home: NextPage = () => {
-  const router = useRouter();
-  const { data: releases = [], isLoading, error, refetch } = client.useQuery('getReleases', []);
+interface ReleaseRow {
+  createdAt: Date;
+  id: string;
+  version: number;
+  description: string;
+}
+
+export default function Releases() {
+  const { appId } = useParams();
+
+  if (!appId) {
+    throw new Error(`Missing queryParam "appId"`);
+  }
+
+  const navigate = useNavigate();
+  const {
+    data: releases = [],
+    isLoading,
+    error,
+    refetch,
+  } = client.useQuery('getReleases', [appId]);
 
   const deleteReleaseMutation = client.useMutation('deleteRelease');
   const deployReleaseMutation = client.useMutation('createDeployment');
 
   const handleDeleteClick = React.useCallback(
-    async (version: string) => {
+    async (version: number) => {
       // TODO: confirmation dialog here
-      await deleteReleaseMutation.mutateAsync([version]);
+      await deleteReleaseMutation.mutateAsync([appId, version]);
       refetch();
     },
-    [deleteReleaseMutation, refetch],
+    [appId, deleteReleaseMutation, refetch],
   );
 
   const handleDeployClick = React.useCallback(
-    async (version: string) => {
+    async (version: number) => {
       // TODO: confirmation dialog here
-      await deployReleaseMutation.mutateAsync([version]);
+      await deployReleaseMutation.mutateAsync([appId, version]);
       refetch();
     },
-    [deployReleaseMutation, refetch],
+    [appId, deployReleaseMutation, refetch],
   );
 
   const columns = React.useMemo<GridColumns>(
@@ -49,7 +72,7 @@ const Home: NextPage = () => {
         field: 'createdAt',
         headerName: 'Created',
         type: 'date',
-        valueGetter: (params) => new Date(params.value),
+        valueGetter: (params: GridValueGetterParams<string, Date>) => new Date(params.value),
       },
       {
         field: 'actions',
@@ -58,12 +81,12 @@ const Home: NextPage = () => {
           <GridActionsCellItem
             icon={<RocketLaunchIcon />}
             label="Deploy release"
-            onClick={() => handleDeployClick(params.row.version)}
+            onClick={() => handleDeployClick((params.row as ReleaseRow).version)}
           />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Remove release"
-            onClick={() => handleDeleteClick(params.row.version)}
+            onClick={() => handleDeleteClick((params.row as ReleaseRow).version)}
           />,
         ],
       },
@@ -73,7 +96,7 @@ const Home: NextPage = () => {
 
   return (
     <React.Fragment>
-      <StudioAppBar actions={null} />
+      <StudioAppBar appId={appId} actions={null} />
       <Container>
         <Typography variant="h2">Releases</Typography>
         <Box sx={{ my: 3, height: 350, width: '100%' }}>
@@ -83,12 +106,10 @@ const Home: NextPage = () => {
             density="compact"
             loading={isLoading || deleteReleaseMutation.isLoading}
             error={(error as any)?.message}
-            onRowClick={({ row }) => router.push(`/_studio/release/${row.version}`)}
+            onRowClick={({ row }) => navigate(`/app/${appId}/releases/${row.version}`)}
           />
         </Box>
       </Container>
     </React.Fragment>
   );
-};
-
-export default Home;
+}

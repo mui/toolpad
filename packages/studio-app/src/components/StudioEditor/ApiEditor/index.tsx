@@ -18,11 +18,12 @@ function getDataSource<Q>(
 }
 
 interface ApiEditorContentProps<Q> {
+  appId: string;
   className?: string;
   apiNode: studioDom.StudioApiNode<Q>;
 }
 
-function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
+function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProps<Q>) {
   const domApi = useDomApi();
   const dom = useDom();
 
@@ -47,7 +48,7 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
 
   const { data: previewData } = useQuery(
     ['api', debouncedPreviewApi],
-    async () => client.query.execApi(debouncedPreviewApi, {}),
+    async () => client.query.execApi(appId, debouncedPreviewApi, {}),
     {},
   );
 
@@ -110,15 +111,16 @@ function ApiEditorContent<Q>({ className, apiNode }: ApiEditorContentProps<Q>) {
 }
 
 interface ApiEditorProps {
+  appId: string;
   className?: string;
 }
 
-export default function ApiEditor({ className }: ApiEditorProps) {
+export default function ApiEditor({ appId, className }: ApiEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const apiNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'api');
   return apiNode ? (
-    <ApiEditorContent className={className} key={nodeId} apiNode={apiNode} />
+    <ApiEditorContent className={className} key={nodeId} appId={appId} apiNode={apiNode} />
   ) : (
     <NotFoundEditor className={className} message={`Non-existing api "${nodeId}"`} />
   );

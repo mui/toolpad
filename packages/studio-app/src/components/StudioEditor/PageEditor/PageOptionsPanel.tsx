@@ -21,20 +21,21 @@ import NodeNameEditor from '../NodeNameEditor';
 import * as studioDom from '../../../studioDom';
 
 // TODO: remove deprecated state
-const DEPRECATED = true;
+const DEPRECATED = false;
 
 interface PageSourceProps {
+  appId: string;
   pageNodeId: NodeId;
   editor?: boolean;
 }
 
-function PageSource({ pageNodeId, editor }: PageSourceProps) {
+function PageSource({ appId, pageNodeId, editor }: PageSourceProps) {
   const dom = useDom();
 
   const source = React.useMemo(() => {
-    const { code } = renderPageCode(dom, pageNodeId, { pretty: true, editor });
+    const { code } = renderPageCode(appId, dom, pageNodeId, { pretty: true, editor });
     return code;
-  }, [dom, editor, pageNodeId]);
+  }, [appId, dom, editor, pageNodeId]);
 
   return <pre>{source}</pre>;
 }
@@ -57,9 +58,9 @@ export default function PageOptionsPanel() {
           startIcon={<PageIcon />}
           color="inherit"
           component="a"
-          href={`/pages/${pageNodeId}`}
+          href={`/api/release/${state.appId}/preview/${pageNodeId}`}
         >
-          View Page
+          Preview Page
         </Button>
         <Button startIcon={<SourceIcon />} color="inherit" onClick={() => setDialogOpen(true)}>
           View Page Source
@@ -80,7 +81,7 @@ export default function PageOptionsPanel() {
             }
             label="editor"
           />
-          <PageSource pageNodeId={pageNodeId} editor={debugEditor} />
+          <PageSource pageNodeId={pageNodeId} editor={debugEditor} appId={state.appId} />
         </DialogContent>
       </Dialog>
     </div>

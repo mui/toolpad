@@ -8,19 +8,15 @@ import {
 } from 'react-query';
 import type {
   Definition,
-  Methods,
+  MethodsGroup,
+  MethodsOf,
+  MethodsOfGroup,
   RpcRequest,
   RpcResponse,
   ServerDefinition,
 } from '../pages/api/rpc';
-import config from './config';
 
-if (config.demoMode) {
-  // TODO: replace API with shim based on window.localStorage
-  console.log(`Starting Studio in demo mode`);
-}
-
-function createResolver(endpoint: string, type: 'query' | 'mutation'): Methods {
+function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfGroup<any> {
   return new Proxy(
     {},
     {
@@ -49,7 +45,7 @@ function createResolver(endpoint: string, type: 'query' | 'mutation'): Methods {
   );
 }
 
-interface UseQueryFn<M extends Methods> {
+interface UseQueryFn<M extends MethodsGroup> {
   <K extends keyof M & string>(
     name: K,
     params: Parameters<M[K]> | null,
@@ -65,10 +61,10 @@ interface UseQueryFn<M extends Methods> {
   ): UseQueryResult<Awaited<ReturnType<M[K]>>>;
 }
 
-interface UseMutationFn<M extends Methods> {
+interface UseMutationFn<M extends MethodsGroup> {
   <K extends keyof M & string>(
     name: K,
-    options?: UseMutationOptions<unknown, unknown, Parameters<M[K]>>,
+    options?: UseMutationOptions<any, unknown, Parameters<M[K]>>,
   ): UseMutationResult<Awaited<ReturnType<M[K]>>, unknown, Parameters<M[K]>>;
 }
 
@@ -79,9 +75,10 @@ interface ApiClient<D extends Definition> {
   useMutation: UseMutationFn<D['mutation']>;
 }
 
-function createClient<D extends Definition>(endpoint: string): ApiClient<D> {
-  const query = createResolver(endpoint, 'query');
-  const mutation = createResolver(endpoint, 'mutation');
+function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> {
+  const query = createFetcher(endpoint, 'query');
+  const mutation = createFetcher(endpoint, 'mutation');
+
   return {
     query,
     mutation,

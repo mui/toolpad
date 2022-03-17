@@ -13,14 +13,19 @@ import DialogForm from '../../DialogForm';
 import { useDom, useDomApi } from '../../DomLoader';
 
 export interface CreateStudioPageDialogProps {
+  appId: string;
   open: boolean;
   onClose: () => void;
 }
 
-export default function CreateStudioPageDialog({ onClose, ...props }: CreateStudioPageDialogProps) {
+export default function CreateStudioPageDialog({
+  appId,
+  onClose,
+  ...props
+}: CreateStudioPageDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const [title, setTitle] = React.useState('');
+  const [name, setName] = React.useState('');
   const navigate = useNavigate();
 
   return (
@@ -29,15 +34,29 @@ export default function CreateStudioPageDialog({ onClose, ...props }: CreateStud
         onSubmit={(e) => {
           e.preventDefault();
           const newNode = studioDom.createNode(dom, 'page', {
+            name,
             attributes: {
-              title: studioDom.createConst(title),
+              title: studioDom.createConst(name),
               urlQuery: studioDom.createConst({}),
             },
           });
           const appNode = studioDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'pages');
+
+          const container = studioDom.createElement(dom, 'Container', {
+            sx: studioDom.createConst({ my: 2 }),
+          });
+          domApi.addNode(container, newNode, 'children');
+
+          const stack = studioDom.createElement(dom, 'Stack', {
+            gap: studioDom.createConst(2),
+            direction: studioDom.createConst('column'),
+            alignItems: studioDom.createConst('stretch'),
+          });
+          domApi.addNode(stack, container, 'children');
+
           onClose();
-          navigate(`/pages/${newNode.id}`);
+          navigate(`/app/${appId}/editor/pages/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Studio Page</DialogTitle>
@@ -46,13 +65,13 @@ export default function CreateStudioPageDialog({ onClose, ...props }: CreateStud
             sx={{ my: 1 }}
             autoFocus
             fullWidth
-            label="title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
+            label="name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
           />
         </DialogContent>
         <DialogActions>
-          <Button type="submit" disabled={!title}>
+          <Button type="submit" disabled={!name}>
             Create
           </Button>
         </DialogActions>

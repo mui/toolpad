@@ -12,7 +12,6 @@ export default {
     },
     margin: {
       typeDef: { type: 'number' },
-      defaultValue: 1,
     },
     direction: {
       typeDef: {

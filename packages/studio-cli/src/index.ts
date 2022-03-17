@@ -3,6 +3,7 @@ import arg from 'arg';
 import * as path from 'path';
 import { execa } from 'execa';
 import { createRequire } from 'module';
+import pgConnectionString from 'pg-connection-string';
 
 const args = arg({
   // Types
@@ -14,16 +15,16 @@ const args = arg({
   '-p': '--port',
 });
 
-function resolveStudioDir({ _: positional = [] }: { _?: string[] }): string {
-  const dirArg: string = positional.length > 0 ? positional[0] : '.';
-  return dirArg ? path.resolve(process.cwd(), dirArg) : process.cwd();
-}
-
-const STUDIO_DIR = resolveStudioDir(args);
 const DEV_MODE = args['--dev'];
 const NEXT_CMD = DEV_MODE ? 'dev' : 'start';
 
-console.log(`Starting Studio in "${STUDIO_DIR}"`);
+if (!process.env.STUDIO_DATABASE_URL) {
+  console.error(`Missing environment variable STUDIO_DATABASE_URL`);
+  process.exit(1);
+}
+
+const connectionString = pgConnectionString.parse(process.env.STUDIO_DATABASE_URL);
+console.log(`Starting Studio with db "${connectionString.host}:${connectionString.port}"`);
 
 const studioDir = path.dirname(
   createRequire(import.meta.url).resolve('@mui/studio-app/package.json'),
@@ -39,8 +40,6 @@ const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   env: {
     STUDIO_DATABASE_URL: process.env.STUDIO_DATABASE_URL,
     FORCE_COLOR: process.env.FORCE_COLOR,
-    STUDIO_DIR,
-    DEMO_MODE: String(!!args['--demo']),
   },
 });
 

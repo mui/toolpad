@@ -1,7 +1,6 @@
 import sharedConfig, { SharedConfig } from '../config';
 
 export interface ServerConfig extends SharedConfig {
-  dir: string;
   databaseUrl: string;
   googleSheetsClientId?: string;
   googleSheetsClientSecret?: string;
@@ -26,17 +25,12 @@ function readConfig(): ServerConfig {
   //  - optional: custom formats/validators
   //  - ...?
 
-  if (!process.env.STUDIO_DIR) {
-    throw new Error(`App started without config env variable STUDIO_DIR`);
-  }
-
   if (!process.env.STUDIO_DATABASE_URL) {
     throw new Error(`App started without config env variable STUDIO_DATABASE_URL`);
   }
 
   return {
     ...sharedConfig,
-    dir: process.env.STUDIO_DIR,
     databaseUrl: process.env.STUDIO_DATABASE_URL,
     googleSheetsClientId: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
     googleSheetsClientSecret: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,

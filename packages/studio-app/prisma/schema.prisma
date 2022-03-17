@@ -25,9 +25,18 @@ enum DomNodeType {
   queryState
 }
 
+model App {
+  id   String @id @default(cuid())
+  name String
+
+  nodes       DomNode[]    @relation("AppNodes")
+  releases    Release[]    @relation("AppReleases")
+  deployments Deployment[] @relation("AppDeployments")
+}
+
 model DomNode {
   id          String      @id
-  name        String
+  name        String      @unique
   type        DomNodeType
   children    DomNode[]   @relation("Children")
   parent      DomNode?    @relation("Children", fields: [parentId], references: [id])
@@ -35,8 +44,12 @@ model DomNode {
   parentIndex String?
   parentProp  String?
 
+  app   App    @relation("AppNodes", fields: [appId], references: [id])
+  appId String
+
   attributes DomNodeAttribute[] @relation("Attributes")
-  @@map("StudioDomNode")
+
+  @@unique([id, appId], name: "node_app_constraint")
 }
 
 enum DomNodeAttributeType {
@@ -50,26 +63,31 @@ model DomNodeAttribute {
   nodeId    String
   namespace String
   name      String
-  node      DomNode              @relation("Attributes", fields: [nodeId], references: [id])
+  node      DomNode              @relation("Attributes", fields: [nodeId], references: [id], onDelete: Cascade)
   type      DomNodeAttributeType
   value     String
 
   @@unique([nodeId, namespace, name])
-  @@map("StudioDomNodeAttribute")
 }
 
 model Release {
-  id          Int          @id @default(autoincrement())
-  version     String       @unique
+  id          String       @id @default(cuid())
+  version     Int
   description String
   createdAt   DateTime     @default(now())
   snapshot    Bytes
   Deployment  Deployment[] @relation("Release")
+  app         App          @relation("AppReleases", fields: [appId], references: [id])
+  appId       String
+
+  @@unique([version, appId], name: "release_app_constraint")
 }
 
 model Deployment {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  version   String
-  release   Release  @relation("Release", fields: [version], references: [version])
+  release   Release  @relation("Release", fields: [releaseId], references: [id])
+  releaseId String
+  app       App      @relation("AppDeployments", fields: [appId], references: [id])
+  appId     String
 }

@@ -259,10 +259,11 @@ export function useDomApi(): DomApi {
 }
 
 export interface DomContextProps {
+  appId: string;
   children?: React.ReactNode;
 }
 
-export default function DomProvider({ children }: DomContextProps) {
+export default function DomProvider({ appId, children }: DomContextProps) {
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
     loading: false,
     saving: false,
@@ -277,7 +278,7 @@ export default function DomProvider({ children }: DomContextProps) {
 
     dispatch({ type: 'DOM_LOADING' });
     client.query
-      .loadDom()
+      .loadDom(appId)
       .then((dom) => {
         if (!canceled) {
           dispatch({ type: 'DOM_LOADED', dom });
@@ -292,7 +293,7 @@ export default function DomProvider({ children }: DomContextProps) {
     return () => {
       canceled = true;
     };
-  }, []);
+  }, [appId]);
 
   const debouncedDom = useDebounced(state.dom, 1000);
 
@@ -304,14 +305,14 @@ export default function DomProvider({ children }: DomContextProps) {
     dispatch({ type: 'DOM_SAVING' });
 
     client.mutation
-      .saveDom(debouncedDom)
+      .saveDom(appId, debouncedDom)
       .then(() => {
         dispatch({ type: 'DOM_SAVED' });
       })
       .catch((err) => {
         dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
       });
-  }, [debouncedDom]);
+  }, [appId, debouncedDom]);
 
   React.useEffect(() => {
     if (state.unsavedChanges <= 0) {

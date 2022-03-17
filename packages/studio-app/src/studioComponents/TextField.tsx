@@ -27,5 +27,8 @@ export default {
       defaultValue: '',
       defaultValueProp: 'defaultValue',
     },
+    sx: {
+      typeDef: { type: 'object' },
+    },
   },
 } as StudioComponentDefinition;

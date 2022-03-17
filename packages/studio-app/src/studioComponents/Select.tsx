@@ -10,13 +10,13 @@ export default {
     const Select = ctx.addImport('@mui/material', 'Select', 'Select');
     const MenuItem = ctx.addImport('@mui/material', 'MenuItem', 'MenuItem');
 
-    const { label, options, ...props } = resolvedProps;
+    const { sx, label, options, ...props } = resolvedProps;
 
     // TODO: generate a unique id based on node name
     const labelId = 'my-select';
 
     return `
-      <${FormControl} size="small">
+      <${FormControl} size="small" ${ctx.renderProps({ sx })}>
         <${InputLabel} id="${labelId}">${ctx.renderJsxContent(label)}</${InputLabel}>
         <${Select} 
           labelId="${labelId}" 
@@ -59,6 +59,9 @@ export default {
       typeDef: { type: 'array' },
       control: { type: 'json', schema: URI_SELECT_OPTIONS },
       defaultValue: [],
+    },
+    sx: {
+      typeDef: { type: 'object' },
     },
   },
 } as StudioComponentDefinition;

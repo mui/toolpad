@@ -13,6 +13,7 @@ import type { Rectangle } from './utils/geometry';
 export interface EditorProps<T> {
   nodeId: NodeId;
   propName: string;
+  label: string;
   argType: ArgTypeDefinition;
   disabled?: boolean;
   value: T | undefined;
@@ -74,7 +75,7 @@ export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 export interface SlotLocation {
   parentId: NodeId;
   parentProp: string;
-  parentIndex: string;
+  parentIndex?: string;
 }
 
 export type SlotDirection = 'horizontal' | 'vertical';
@@ -197,3 +198,5 @@ export interface StudioTheme {
   'palette.primary.main'?: string;
   'palette.secondary.main'?: string;
 }
+
+export type VersionOrPreview = 'preview' | number;

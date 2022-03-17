@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Box, Collapse, styled, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { useStudioComponents } from '../../../studioComponents';
 import * as studioDom from '../../../studioDom';
 import { useDom } from '../../DomLoader';
@@ -11,7 +12,7 @@ const WIDTH_COLLAPSED = 50;
 
 const ComponentCatalogRoot = styled('div')({
   position: 'relative',
-  width: WIDTH_COLLAPSED,
+  width: WIDTH_COLLAPSED + 1,
   height: '100%',
   zIndex: 1,
   overflow: 'visible',
@@ -20,10 +21,10 @@ const ComponentCatalogRoot = styled('div')({
 const ComponentCatalogItem = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
-  aspectRatio: '1',
+  padding: theme.spacing(1, 0),
   borderRadius: theme.shape.borderRadius,
   border: `1px solid ${theme.palette.divider}`,
+  color: theme.palette.text.secondary,
   cursor: 'grab',
   '&:hover': {
     background: theme.palette.action.hover,
@@ -62,7 +63,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     const newNode = studioDom.createElement(dom, componentType, {});
     api.deselect();
     api.newNodeDragStart(newNode);
-    closeDrawer();
+    closeDrawer(0);
   };
 
   const studioComponents = useStudioComponents(dom);
@@ -89,7 +90,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
       >
         <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
           <Box sx={{ width: 300, height: '100%', overflow: 'auto' }}>
-            <Box display="grid" gridTemplateColumns="1fr 1fr" gap={3} padding={3}>
+            <Box display="grid" gridTemplateColumns="1fr" gap={1} padding={1}>
               {studioComponents.map((componentType) => {
                 return (
                   <ComponentCatalogItem
@@ -97,6 +98,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     draggable
                     onDragStart={handleDragStart(componentType.id)}
                   >
+                    <DragIndicatorIcon color="inherit" />
                     {componentType.displayName}
                   </ComponentCatalogItem>
                 );

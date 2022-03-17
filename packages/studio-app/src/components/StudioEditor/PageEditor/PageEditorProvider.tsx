@@ -6,6 +6,7 @@ import { update, updateOrCreate } from '../../../utils/immutability';
 export type ComponentPanelTab = 'component' | 'theme';
 
 export interface PageEditorState {
+  readonly appId: string;
   readonly type: 'page';
   readonly nodeId: NodeId;
   readonly selection: NodeId | null;
@@ -48,8 +49,9 @@ export type PageEditorAction =
       viewState: PageViewState;
     };
 
-export function createPageEditorState(nodeId: NodeId): PageEditorState {
+export function createPageEditorState(appId: string, nodeId: NodeId): PageEditorState {
   return {
+    appId,
     type: 'page',
     nodeId,
     selection: null,
@@ -157,6 +159,7 @@ export function usePageEditorState() {
 }
 
 export interface PageEditorProviderProps {
+  appId: string;
   children?: React.ReactNode;
   nodeId: NodeId;
 }
@@ -167,14 +170,14 @@ const PageEditorApiContext = React.createContext<PageEditorApi>(
   createPageEditorApi(() => undefined),
 );
 
-export function PageEditorProvider({ children, nodeId }: PageEditorProviderProps) {
-  const initialState = createPageEditorState(nodeId);
+export function PageEditorProvider({ appId, children, nodeId }: PageEditorProviderProps) {
+  const initialState = createPageEditorState(appId, nodeId);
   const [state, dispatch] = React.useReducer(pageEditorReducer, initialState);
   const api = React.useMemo(() => createPageEditorApi(dispatch), []);
 
   React.useEffect(() => {
-    api.replace(createPageEditorState(nodeId));
-  }, [api, nodeId]);
+    api.replace(createPageEditorState(appId, nodeId));
+  }, [appId, api, nodeId]);
 
   return (
     <PageEditorContext.Provider value={state}>

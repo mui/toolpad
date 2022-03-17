@@ -1,5 +1,11 @@
 # MUI Studio
 
+## Running the docker container
+
+```sh
+docker-compose -f docker/compose/docker-compose.yml up
+```
+
 ## Local development (TODO: let's move this to CONTRIBUTING.md)
 
 ### Prerequisites:
@@ -84,6 +90,18 @@
 
    ```sh
    yarn release:publish
+   ```
+
+1. Build docker image
+
+   ```sh
+   yarn release:docker:build
+   ```
+
+1. Publish docker images. Make sure you are logged in to docker (`docker login`):
+
+   ```sh
+   yarn release:docker:publish
    ```
 
 ### Dryrun publish

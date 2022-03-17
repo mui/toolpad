@@ -1,29 +1,36 @@
 import * as React from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
-import { AppBar, Toolbar, IconButton, Typography, Button } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { NextLinkComposed } from './Link';
 
 interface StudioAppBarProps {
+  navigation: React.ReactNode;
   actions: React.ReactNode;
 }
 
-export default function StudioAppBar({ actions }: StudioAppBarProps) {
+export default function StudioAppBar({ actions, navigation }: StudioAppBarProps) {
   return (
-    <AppBar position="static" sx={{ zIndex: 2 }}>
+    <AppBar
+      position="static"
+      color="default"
+      elevation={0}
+      sx={{ zIndex: 2, borderBottom: 1, borderColor: 'divider' }}
+    >
       <Toolbar variant="dense">
-        <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          sx={{ mr: 2 }}
+          component="a"
+          href={`/`}
+        >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" color="inherit" component="div">
+        <Typography variant="h6" color="inherit" component="div" sx={{ mr: 2 }}>
           MUI Studio
         </Typography>
-        <Button component={NextLinkComposed} to="/_studio/editor" color="inherit">
-          Editor
-        </Button>
-        <Button component={NextLinkComposed} to="/_studio/release" color="inherit">
-          Releases
-        </Button>
+        {navigation}
         <Box flex={1} />
         {actions}
       </Toolbar>

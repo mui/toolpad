@@ -22,5 +22,8 @@ export default {
       typeDef: { type: 'string', enum: ['primary', 'secondary'] },
       defaultValue: 'primary',
     },
+    sx: {
+      typeDef: { type: 'object' },
+    },
   },
 } as StudioComponentDefinition;

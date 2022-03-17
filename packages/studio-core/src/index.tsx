@@ -54,7 +54,9 @@ export interface ArgControlSpec {
     | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
     | 'date' // date picker
     | 'json' // JSON editor
-    | 'GridColumns'; // GridColumns specialized editor
+    | 'GridColumns' // GridColumns specialized editor
+    | 'HorizontalAlign'
+    | 'VerticalAlign';
 }
 
 type PrimitiveValueType =
@@ -71,7 +73,7 @@ export type PropValueTypes<K extends string = string> = Partial<{
 }>;
 
 export interface ArgTypeDefinition {
-  name?: string;
+  label?: string;
   typeDef: PropValueType;
   required?: boolean;
   defaultValue?: any;

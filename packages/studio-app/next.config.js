@@ -1,7 +1,5 @@
 /** @type {import('./src/config').SharedConfig} */
-const sharedConfig = {
-  demoMode: process.env.DEMO_MODE === 'true',
-};
+const sharedConfig = {};
 
 /** @type {import('next').NextConfig} */
 module.exports = {

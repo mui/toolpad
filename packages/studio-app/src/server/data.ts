@@ -1,40 +1,31 @@
 import { PrismaClient } from '../../prisma/generated/client';
-import config from './config';
 import {
   StudioConnection,
-  StudioConnectionSummary,
   ConnectionStatus,
   StudioDataSourceServer,
   StudioApiResult,
   NodeId,
   StudioBindable,
+  VersionOrPreview,
 } from '../types';
 import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
 import { omit } from '../utils/immutability';
+import { asArray } from '../utils/collections';
+import { decryptSecret, encryptSecret } from './secrets';
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: config.databaseUrl,
-    },
-  },
-});
+const prisma = new PrismaClient();
 
 type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
 
-function createDefaultApp(): studioDom.StudioDom {
-  let dom = studioDom.createDom();
-  const page = studioDom.createNode(dom, 'page', {
-    name: 'DefaultPage',
-    attributes: {
-      title: studioDom.createConst('Default'),
-      urlQuery: studioDom.createConst({}),
-    },
+export async function getApps() {
+  return prisma.app.findMany();
+}
+
+export async function createApp(name: string) {
+  return prisma.app.create({
+    data: { name },
   });
-  const app = studioDom.getApp(dom);
-  dom = studioDom.addNode(dom, page, app, 'pages');
-  return dom;
 }
 
 function serializeValue(value: unknown): string {
@@ -45,13 +36,13 @@ function deserializeValue(dbValue: string): unknown {
   return dbValue.length <= 0 ? undefined : JSON.parse(dbValue);
 }
 
-export async function saveDom(app: studioDom.StudioDom): Promise<void> {
+export async function saveDom(appId: string, app: studioDom.StudioDom): Promise<void> {
   await prisma.$transaction([
-    prisma.domNodeAttribute.deleteMany(),
-    prisma.domNode.deleteMany(),
+    prisma.domNode.deleteMany({ where: { appId } }),
     prisma.domNode.createMany({
       data: Array.from(Object.values(app.nodes) as studioDom.StudioNode[], (node) => {
         return {
+          appId,
           id: node.id,
           name: node.name,
           type: node.type,
@@ -81,14 +72,15 @@ export async function saveDom(app: studioDom.StudioDom): Promise<void> {
   ]);
 }
 
-export async function loadDom(): Promise<studioDom.StudioDom> {
+export async function loadDom(appId: string): Promise<studioDom.StudioDom> {
   const dbNodes = await prisma.domNode.findMany({
+    where: { appId },
     include: { attributes: true },
   });
   if (dbNodes.length <= 0) {
-    const app = createDefaultApp();
-    await saveDom(app);
-    return app;
+    const dom = studioDom.createDom();
+    await saveDom(appId, dom);
+    return dom;
   }
   const root = dbNodes.find((node) => !node.parentId)?.id as NodeId;
   const nodes = Object.fromEntries(
@@ -127,35 +119,51 @@ export async function loadDom(): Promise<studioDom.StudioDom> {
 }
 
 interface CreateReleaseParams {
-  version: string;
   description: string;
 }
 
 const SELECT_RELEASE_META = {
-  id: true,
   version: true,
   description: true,
   createdAt: true,
-};
+} as const;
 
-export async function createRelease({ version, description }: CreateReleaseParams) {
-  const currentDom = await loadDom();
+export function findLastRelease(appId: string) {
+  return prisma.release.findFirst({
+    where: { appId },
+    orderBy: { version: 'desc' },
+  });
+}
+
+export async function createRelease(appId: string, { description }: CreateReleaseParams) {
+  const currentDom = await loadDom(appId);
+  const secrets = await prisma.previewSecret.findMany({ where: { appId } });
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
 
-  const release = await prisma.release.create({
-    select: SELECT_RELEASE_META,
-    data: {
-      version,
-      description,
-      snapshot,
-    },
-  });
+  const lastRelease = await findLastRelease(appId);
+  const versionNumber = lastRelease ? lastRelease.version + 1 : 1;
+
+  const [release] = await prisma.$transaction([
+    prisma.release.create({
+      select: SELECT_RELEASE_META,
+      data: {
+        appId,
+        version: versionNumber,
+        description,
+        snapshot,
+      },
+    }),
+    prisma.releaseSecret.createMany({
+      data: secrets.map((secret) => ({ ...secret, version: versionNumber })),
+    }),
+  ]);
 
   return release;
 }
 
-export async function getReleases() {
+export async function getReleases(appId: string) {
   return prisma.release.findMany({
+    where: { appId },
     select: SELECT_RELEASE_META,
     orderBy: {
       createdAt: 'desc',
@@ -163,31 +171,47 @@ export async function getReleases() {
   });
 }
 
-export async function deleteRelease(version: string) {
-  return prisma.release.delete({
-    where: { version },
+export async function getRelease(appId: string, version: number) {
+  return prisma.release.findUnique({
+    where: { release_app_constraint: { appId, version } },
+    select: SELECT_RELEASE_META,
   });
 }
 
-export async function createDeployment(version: string) {
+export async function deleteRelease(appId: string, version: number) {
+  return prisma.release.delete({
+    where: { release_app_constraint: { appId, version } },
+  });
+}
+
+export async function createDeployment(appId: string, version: number) {
   return prisma.deployment.create({
     data: {
+      app: {
+        connect: { id: appId },
+      },
       release: {
-        connect: { version },
+        connect: { release_app_constraint: { appId, version } },
       },
     },
   });
 }
 
-export async function findActiveDeployment() {
+export async function findActiveDeployment(appId: string) {
   return prisma.deployment.findFirst({
+    where: { appId },
     orderBy: { createdAt: 'desc' },
+    include: {
+      release: {
+        select: SELECT_RELEASE_META,
+      },
+    },
   });
 }
 
-export async function loadReleaseDom(version: string): Promise<studioDom.StudioDom> {
+export async function loadReleaseDom(appId: string, version: number): Promise<studioDom.StudioDom> {
   const release = await prisma.release.findUnique({
-    where: { version },
+    where: { release_app_constraint: { appId, version } },
   });
   if (!release) {
     throw new Error(`release doesn't exist`);
@@ -208,25 +232,11 @@ function fromDomConnection<P>(
   };
 }
 
-export async function getConnections(): Promise<StudioConnection[]> {
-  const dom = await loadDom();
-  const app = studioDom.getApp(dom);
-  const { connections = [] } = studioDom.getChildNodes(dom, app);
-  return connections.map(fromDomConnection);
-}
-
-export async function getConnectionSummaries(): Promise<StudioConnectionSummary[]> {
-  const connections = await getConnections();
-  return connections;
-}
-
-export async function addConnection({
-  params,
-  name,
-  status,
-  type,
-}: StudioConnection): Promise<StudioConnection> {
-  const dom = await loadDom();
+export async function addConnection(
+  appId: string,
+  { params, name, status, type }: StudioConnection,
+): Promise<StudioConnection> {
+  const dom = await loadDom(appId);
   const app = studioDom.getApp(dom);
   const newConnection = studioDom.createNode(dom, 'connection', {
     name,
@@ -238,24 +248,21 @@ export async function addConnection({
   });
 
   const newDom = studioDom.addNode(dom, newConnection, app, 'connections');
-  await saveDom(newDom);
+  await saveDom(appId, newDom);
 
   return fromDomConnection(newConnection);
 }
 
-export async function getConnection(id: string): Promise<StudioConnection> {
-  const dom = await loadDom();
+export async function getConnection(appId: string, id: string): Promise<StudioConnection> {
+  const dom = await loadDom(appId);
   return fromDomConnection(studioDom.getNode(dom, id as NodeId, 'connection'));
 }
 
-export async function updateConnection({
-  id,
-  params,
-  name,
-  status,
-  type,
-}: Updates<StudioConnection>): Promise<StudioConnection> {
-  let dom = await loadDom();
+export async function updateConnection(
+  appId: string,
+  { id, params, name, status, type }: Updates<StudioConnection>,
+): Promise<StudioConnection> {
+  let dom = await loadDom(appId);
   const existing = studioDom.getNode(dom, id as NodeId, 'connection');
   if (name !== undefined) {
     dom = studioDom.setNodeName(dom, existing, name);
@@ -287,7 +294,7 @@ export async function updateConnection({
       studioDom.createConst(type),
     );
   }
-  await saveDom(dom);
+  await saveDom(appId, dom);
   return fromDomConnection(studioDom.getNode(dom, id as NodeId, 'connection'));
 }
 
@@ -302,10 +309,11 @@ export async function testConnection(
 }
 
 export async function execApi<Q>(
+  appId: string,
   api: studioDom.StudioApiNode<Q>,
   params: Q,
 ): Promise<StudioApiResult<any>> {
-  const connection = await getConnection(api.attributes.connectionId.value);
+  const connection = await getConnection(appId, api.attributes.connectionId.value);
   const dataSource: StudioDataSourceServer<any, Q, any> | undefined =
     studioDataSources[connection.type];
 
@@ -318,8 +326,12 @@ export async function execApi<Q>(
   return dataSource.exec(connection, api.attributes.query.value, params);
 }
 
-export async function dataSourceFetchPrivate(connectionId: NodeId, query: any): Promise<any> {
-  const connection = await getConnection(connectionId);
+export async function dataSourceFetchPrivate(
+  appId: string,
+  connectionId: NodeId,
+  query: any,
+): Promise<any> {
+  const connection = await getConnection(appId, connectionId);
   const dataSource: StudioDataSourceServer<any, any, any> | undefined =
     studioDataSources[connection.type];
 
@@ -334,4 +346,82 @@ export async function dataSourceFetchPrivate(connectionId: NodeId, query: any): 
   }
 
   return dataSource.execPrivate(connection, query);
+}
+
+export function parseVersion(param?: string | string[]): VersionOrPreview | null {
+  if (!param) {
+    return null;
+  }
+  const [maybeVersion] = asArray(param);
+  if (maybeVersion === 'preview') {
+    return maybeVersion;
+  }
+  const parsed = Number(maybeVersion);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+export async function loadVersionedDom(appId: string, version: VersionOrPreview) {
+  return version === 'preview' ? loadDom(appId) : loadReleaseDom(appId, version);
+}
+
+export async function setSecret(appId: string, id: string, value: string): Promise<string> {
+  const updates = {
+    value: await encryptSecret(value),
+  };
+
+  const secret = await prisma.previewSecret.upsert({
+    where: {
+      secret_app_constraint: {
+        appId,
+        id,
+      },
+    },
+    create: {
+      appId,
+      id,
+      ...updates,
+    },
+    update: updates,
+  });
+
+  return secret.id;
+}
+
+// Do not expose to the browser:
+export async function findSecretServerOnly(
+  appId: string,
+  version: VersionOrPreview,
+  id: string,
+): Promise<string> {
+  const secret =
+    typeof version === 'number'
+      ? await prisma.releaseSecret.findUnique({
+          where: {
+            secret_release_constraint: {
+              appId,
+              version,
+              id,
+            },
+          },
+        })
+      : await prisma.previewSecret.findUnique({
+          where: {
+            secret_app_constraint: {
+              appId,
+              id,
+            },
+          },
+        });
+
+  if (!secret) {
+    throw new Error(`No such secret "${id}"`);
+  }
+
+  return decryptSecret(secret.value);
+}
+
+// This function can be safely exposed to the browser
+export async function previewSecret(appId: string, id: string): Promise<string> {
+  const decrypted = await findSecretServerOnly(appId, 'preview', id);
+  return '*'.repeat(decrypted.length);
 }

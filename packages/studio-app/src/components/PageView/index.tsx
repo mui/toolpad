@@ -11,18 +11,26 @@ export interface PageViewProps {
   className?: string;
   editor?: boolean;
   onLoad?: (window: Window) => void;
+  appId: string;
   dom: studioDom.StudioDom;
   pageNodeId: NodeId;
 }
 
-export default function PageView({ className, editor, dom, pageNodeId, onLoad }: PageViewProps) {
+export default function PageView({
+  appId,
+  className,
+  editor,
+  dom,
+  pageNodeId,
+  onLoad,
+}: PageViewProps) {
   const themePath = './lib/theme.ts';
   const entryPath = `./${pageNodeId}.tsx`;
   const pagePath = `./pages/${pageNodeId}.tsx`;
 
   const renderedPage = React.useMemo(() => {
-    return renderPageCode(dom, pageNodeId, { editor });
-  }, [dom, pageNodeId, editor]);
+    return renderPageCode(appId, dom, pageNodeId, { editor });
+  }, [appId, dom, pageNodeId, editor]);
 
   const renderedTheme = React.useMemo(() => {
     return renderThemeCode(dom, { editor });
@@ -63,7 +71,7 @@ export default function PageView({ className, editor, dom, pageNodeId, onLoad }:
     <StudioSandbox
       className={className}
       onLoad={onLoad}
-      base={`/app/${dom.root}/`}
+      base={`/app/${appId}/${dom.root}/`}
       importMap={getImportMap()}
       files={{
         ...codeComponentsFiles,

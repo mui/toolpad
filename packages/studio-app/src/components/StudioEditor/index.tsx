@@ -1,7 +1,9 @@
 import { styled } from '@mui/system';
 import * as React from 'react';
 import {
+  Alert,
   Box,
+  Button,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -13,10 +15,9 @@ import {
   Typography,
 } from '@mui/material';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/router';
 import StudioAppBar from '../StudioAppBar';
 import PageEditor from './PageEditor';
 import PagePanel from './PagePanel';
@@ -56,15 +57,16 @@ const EditorRoot = styled('div')(({ theme }) => ({
 }));
 
 interface FileEditorProps {
+  appId: string;
   className?: string;
 }
 
-function FileEditor({ className }: FileEditorProps) {
+function FileEditor({ appId, className }: FileEditorProps) {
   return (
     <Routes>
       <Route path="connections/:nodeId" element={<ConnectionEditor className={className} />} />
-      <Route path="apis/:nodeId" element={<ApiEditor className={className} />} />
-      <Route path="pages/:nodeId" element={<PageEditor className={className} />} />
+      <Route path="apis/:nodeId" element={<ApiEditor appId={appId} className={className} />} />
+      <Route path="pages/:nodeId" element={<PageEditor appId={appId} className={className} />} />
       <Route
         path="codeComponents/:nodeId"
         element={<CodeComponentEditor className={className} />}
@@ -74,29 +76,27 @@ function FileEditor({ className }: FileEditorProps) {
 }
 
 interface CreateReleaseDialogProps {
+  appId: string;
   open: boolean;
   onClose: () => void;
 }
 
-function CreateReleaseDialog({ open, onClose }: CreateReleaseDialogProps) {
-  const router = useRouter();
+function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps) {
+  const navigate = useNavigate();
+
+  const lastRelease = client.useQuery('findLastRelease', [appId]);
 
   const { handleSubmit, register, formState, reset } = useForm({
     defaultValues: {
-      version: '',
       description: '',
     },
   });
 
   const createReleaseMutation = client.useMutation('createRelease');
   const doSubmit = handleSubmit(async (releaseParams) => {
-    try {
-      const newRelease = await createReleaseMutation.mutateAsync([releaseParams]);
-      reset();
-      router.push(`/_studio/release/${newRelease.version}`);
-    } catch (error) {
-      onClose();
-    }
+    const newRelease = await createReleaseMutation.mutateAsync([appId, releaseParams]);
+    reset();
+    navigate(`/app/${appId}/releases/${newRelease.version}`);
   });
 
   return (
@@ -104,29 +104,34 @@ function CreateReleaseDialog({ open, onClose }: CreateReleaseDialogProps) {
       <DialogForm onSubmit={doSubmit}>
         <DialogTitle>Create new release</DialogTitle>
         <DialogContent>
-          <Stack spacing={1} my={1}>
-            <TextField
-              label="Version"
-              size="small"
-              fullWidth
-              {...register('version', { required: true, minLength: 1 })}
-              error={Boolean(formState.errors.version)}
-              helperText={formState.errors.version?.message}
-            />
-            <TextField
-              label="description"
-              size="small"
-              fullWidth
-              multiline
-              rows={5}
-              {...register('description')}
-              error={Boolean(formState.errors.description)}
-              helperText={formState.errors.description?.message}
-            />
-          </Stack>
+          {lastRelease.isSuccess ? (
+            <Stack spacing={1} my={1}>
+              <Typography>
+                New version: {lastRelease.data ? lastRelease.data.version + 1 : 1}
+              </Typography>
+              <TextField
+                label="description"
+                size="small"
+                fullWidth
+                multiline
+                rows={5}
+                {...register('description')}
+                error={Boolean(formState.errors.description)}
+                helperText={formState.errors.description?.message}
+              />
+            </Stack>
+          ) : null}
+
+          {createReleaseMutation.isError ? (
+            <Alert severity="error">{(createReleaseMutation.error as Error).message}</Alert>
+          ) : null}
         </DialogContent>
         <DialogActions>
-          <LoadingButton loading={createReleaseMutation.isLoading} type="submit">
+          <LoadingButton
+            disabled={!lastRelease.isSuccess}
+            loading={createReleaseMutation.isLoading}
+            type="submit"
+          >
             Create
           </LoadingButton>
         </DialogActions>
@@ -135,7 +140,11 @@ function CreateReleaseDialog({ open, onClose }: CreateReleaseDialogProps) {
   );
 }
 
-function EditorContent() {
+export interface EditorContentProps {
+  appId: string;
+}
+
+function EditorContent({ appId }: EditorContentProps) {
   const domLoader = useDomLoader();
 
   const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
@@ -143,6 +152,16 @@ function EditorContent() {
   return (
     <EditorRoot>
       <StudioAppBar
+        navigation={
+          <React.Fragment>
+            <Button component={Link} to={`/app/${appId}/editor`} color="inherit">
+              Editor
+            </Button>
+            <Button component={Link} to={`/app/${appId}/releases`} color="inherit">
+              Releases
+            </Button>
+          </React.Fragment>
+        }
         actions={
           <React.Fragment>
             {domLoader.saving ? (
@@ -151,7 +170,11 @@ function EditorContent() {
               </Box>
             ) : null}
             <Typography>{domLoader.unsavedChanges} unsaved change(s).</Typography>
-            <IconButton color="inherit" onClick={() => setCreateReleaseDialogOpen(true)}>
+            <IconButton
+              color="inherit"
+              sx={{ ml: 1 }}
+              onClick={() => setCreateReleaseDialogOpen(true)}
+            >
               <RocketLaunchIcon />
             </IconButton>
           </React.Fragment>
@@ -159,8 +182,8 @@ function EditorContent() {
       />
       {domLoader.dom ? (
         <div className={classes.content}>
-          <PagePanel className={classes.hierarchyPanel} />
-          <FileEditor className={classes.editorPanel} />
+          <PagePanel className={classes.hierarchyPanel} appId={appId} />
+          <FileEditor className={classes.editorPanel} appId={appId} />
         </div>
       ) : (
         <Box flex={1} display="flex" alignItems="center" justifyContent="center">
@@ -168,6 +191,7 @@ function EditorContent() {
         </Box>
       )}
       <CreateReleaseDialog
+        appId={appId}
         open={createReleaseDialogOpen}
         onClose={() => setCreateReleaseDialogOpen(false)}
       />
@@ -175,13 +199,15 @@ function EditorContent() {
   );
 }
 export default function Editor() {
+  const { appId } = useParams();
+
+  if (!appId) {
+    throw new Error(`Missing queryParam "appId"`);
+  }
+
   return (
-    <DomProvider>
-      <BrowserRouter basename="_studio/editor">
-        <Routes>
-          <Route path="/*" element={<EditorContent />} />
-        </Routes>
-      </BrowserRouter>
+    <DomProvider appId={appId}>
+      <EditorContent appId={appId} />
     </DomProvider>
   );
 }

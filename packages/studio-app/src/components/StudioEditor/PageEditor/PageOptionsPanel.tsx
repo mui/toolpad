@@ -6,6 +6,8 @@ import {
   DialogContent,
   Switch,
   FormControlLabel,
+  Typography,
+  Divider,
 } from '@mui/material';
 import * as React from 'react';
 import PageIcon from '@mui/icons-material/Web';
@@ -21,20 +23,21 @@ import NodeNameEditor from '../NodeNameEditor';
 import * as studioDom from '../../../studioDom';
 
 // TODO: remove deprecated state
-const DEPRECATED = true;
+const DEPRECATED = false;
 
 interface PageSourceProps {
+  appId: string;
   pageNodeId: NodeId;
   editor?: boolean;
 }
 
-function PageSource({ pageNodeId, editor }: PageSourceProps) {
+function PageSource({ appId, pageNodeId, editor }: PageSourceProps) {
   const dom = useDom();
 
   const source = React.useMemo(() => {
-    const { code } = renderPageCode(dom, pageNodeId, { pretty: true, editor });
+    const { code } = renderPageCode(appId, dom, pageNodeId, { pretty: true, editor });
     return code;
-  }, [dom, editor, pageNodeId]);
+  }, [appId, dom, editor, pageNodeId]);
 
   return <pre>{source}</pre>;
 }
@@ -52,18 +55,21 @@ export default function PageOptionsPanel() {
   return (
     <div>
       <Stack spacing={1} alignItems="start">
+        <Typography variant="subtitle1">Page:</Typography>
         <NodeNameEditor node={page} />
         <Button
           startIcon={<PageIcon />}
           color="inherit"
           component="a"
-          href={`/pages/${pageNodeId}`}
+          href={`/api/release/${state.appId}/preview/${pageNodeId}`}
         >
-          View Page
+          Preview
         </Button>
         <Button startIcon={<SourceIcon />} color="inherit" onClick={() => setDialogOpen(true)}>
-          View Page Source
+          View Source
         </Button>
+        <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
+        <Typography variant="subtitle1">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />
         {DEPRECATED && <DerivedStateEditor />}
         <QueryStateEditor />
@@ -80,7 +86,7 @@ export default function PageOptionsPanel() {
             }
             label="editor"
           />
-          <PageSource pageNodeId={pageNodeId} editor={debugEditor} />
+          <PageSource pageNodeId={pageNodeId} editor={debugEditor} appId={state.appId} />
         </DialogContent>
       </Dialog>
     </div>

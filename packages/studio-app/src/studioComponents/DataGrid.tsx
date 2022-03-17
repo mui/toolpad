@@ -21,5 +21,8 @@ export default {
     density: {
       typeDef: { type: 'string', enum: ['comfortable', 'compact', 'standard'] },
     },
+    sx: {
+      typeDef: { type: 'object' },
+    },
   },
 } as StudioComponentDefinition;

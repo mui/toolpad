@@ -1,5 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import * as React from 'react';
+import AddIcon from '@mui/icons-material/Add';
 import StringRecordEditor from '../../StringRecordEditor';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -29,7 +30,9 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   return (
     <React.Fragment>
-      <Button onClick={() => setDialogOpen(true)}>URL query</Button>
+      <Button color="inherit" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
+        URL query
+      </Button>
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit URL query</DialogTitle>
         <DialogContent>

@@ -3,7 +3,14 @@ import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';
 import * as studioDom from './studioDom';
-import { NodeId, PropExpression, ResolvedProps, StudioBindable, StudioBindables } from './types';
+import {
+  NodeId,
+  PropExpression,
+  ResolvedProps,
+  StudioBindable,
+  StudioBindables,
+  VersionOrPreview,
+} from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
@@ -33,7 +40,7 @@ export interface RenderPageConfig {
   // prettify output
   pretty: boolean;
   // release version
-  release: string | null;
+  version: VersionOrPreview;
 }
 
 interface UrlQueryStateHook {
@@ -65,6 +72,8 @@ interface MemoizedConst {
 }
 
 class Context implements RenderContext {
+  appId: string;
+
   dom: studioDom.StudioDom;
 
   private config: RenderPageConfig;
@@ -93,7 +102,13 @@ class Context implements RenderContext {
 
   private memoizedConsts: MemoizedConst[] = [];
 
-  constructor(dom: studioDom.StudioDom, page: studioDom.StudioPageNode, config: RenderPageConfig) {
+  constructor(
+    appId: string,
+    dom: studioDom.StudioDom,
+    page: studioDom.StudioPageNode,
+    config: RenderPageConfig,
+  ) {
+    this.appId = appId;
     this.dom = dom;
     this.page = page;
     this.config = config;
@@ -500,11 +515,12 @@ class Context implements RenderContext {
     const Stack = this.addImport('@mui/material', 'Stack', 'Stack');
 
     const rendered = `
-      <${Stack} direction="column" gap={2} m={2}>
+      <${Stack} direction="column" alignItems='stretch'>
         ${this.renderJsxContent(resolvedChildren.children)}
       </${Stack}>
     `;
 
+    // const rendered = this.renderJsExpression(resolvedChildren.children);
     const expr = this.wrapComponent(node, rendered);
     return this.renderJsExpression(expr);
   }
@@ -681,9 +697,7 @@ class Context implements RenderContext {
 
           const useDataQuery = this.addImport('@mui/studio-core', 'useDataQuery', 'useDataQuery');
 
-          const dataUrl = `/api/data/${
-            this.config.release ? `release/${this.config.release}/` : 'preview/'
-          }`;
+          const dataUrl = `/api/data/${this.appId}/${this.config.version}/`;
 
           return `${useDataQuery}(
             ${stateHook.setStateVar}, 
@@ -799,6 +813,7 @@ class Context implements RenderContext {
 }
 
 export default function renderPageCode(
+  appId: string,
   dom: studioDom.StudioDom,
   pageNodeId: NodeId,
   configInit: Partial<RenderPageConfig> = {},
@@ -806,13 +821,13 @@ export default function renderPageCode(
   const config: RenderPageConfig = {
     editor: false,
     pretty: false,
-    release: null,
+    version: 'preview',
     ...configInit,
   };
 
   const page = studioDom.getNode(dom, pageNodeId, 'page');
 
-  const ctx = new Context(dom, page, config);
+  const ctx = new Context(appId, dom, page, config);
   let code: string = ctx.render();
 
   if (config.pretty) {

@@ -1,5 +1,6 @@
 import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/studio-core';
 import { generateKeyBetween } from 'fractional-indexing';
+import cuid from 'cuid';
 import {
   NodeId,
   StudioConstant,
@@ -10,7 +11,6 @@ import {
   StudioConstants,
 } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
-import { generateUniqueId } from './utils/randomId';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 
@@ -448,7 +448,7 @@ export function createNode<T extends StudioNodeType>(
   type: T,
   init: StudioNodeInitOfType<T>,
 ): StudioNodeOfType<T> {
-  const id = generateUniqueId(new Set(Object.keys(dom.nodes))) as NodeId;
+  const id = cuid() as NodeId;
   const name = slugifyNodeName(dom, init.name || type, type);
   return createNodeInternal(id, type, {
     ...init,
@@ -457,7 +457,7 @@ export function createNode<T extends StudioNodeType>(
 }
 
 export function createDom(): StudioDom {
-  const rootId = generateUniqueId(new Set()) as NodeId;
+  const rootId = cuid() as NodeId;
   return {
     nodes: {
       [rootId]: createNodeInternal(rootId, 'app', {
@@ -529,6 +529,9 @@ export function getPageAncestor(dom: StudioDom, node: StudioNode): StudioPageNod
   return null;
 }
 export function setNodeName(dom: StudioDom, node: StudioNode, name: string): StudioDom {
+  if (dom.nodes[node.id].name === name) {
+    return dom;
+  }
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: {
@@ -675,8 +678,10 @@ export function removeNode(dom: StudioDom, nodeId: NodeId) {
     throw new Error(`Invariant: Node: "${node.id}" can't be removed`);
   }
 
+  const descendantIds = getDescendants(dom, node).map(({ id }) => id);
+
   return update(dom, {
-    nodes: omit(dom.nodes, node.id),
+    nodes: omit(dom.nodes, node.id, ...descendantIds),
   });
 }
 

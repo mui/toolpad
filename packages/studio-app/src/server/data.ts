@@ -30,7 +30,6 @@ export async function createApp(name: string) {
 
 function serializeValue(value: unknown, type: DomNodeAttributeType): string {
   const serialized = value === undefined ? '' : JSON.stringify(value);
-  console.log(value, type, serialized, type === 'secret' ? encryptSecret(serialized) : serialized);
   return type === 'secret' ? encryptSecret(serialized) : serialized;
 }
 

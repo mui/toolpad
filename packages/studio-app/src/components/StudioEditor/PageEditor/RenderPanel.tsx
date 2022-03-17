@@ -598,7 +598,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-      console.log('hello');
 
       if (!cursorPos) {
         return;

@@ -41,8 +41,6 @@ const decryptionMethods: ((value: string) => string)[] = [
   }),
 ];
 
-console.log(encryptionMethod);
-
 export function encryptSecret(value: string): string {
   return encryptionMethod(boxSecret(value));
 }

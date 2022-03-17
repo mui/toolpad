@@ -13,7 +13,6 @@ function VerticalAlignPropEditor({
 }: EditorProps<string>) {
   const VerticalAlign = (event: React.MouseEvent<HTMLElement>, newVerticalAlign: string | null) => {
     if (newVerticalAlign) {
-      console.log(newVerticalAlign);
       onChange(newVerticalAlign);
     }
   };

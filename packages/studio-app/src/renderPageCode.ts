@@ -244,7 +244,10 @@ class Context implements RenderContext {
   }
 
   evalExpression(id: string, expression: string): string {
-    const evaluated = `evalCode(${JSON.stringify(expression.trim())}, ${this.pageStateIdentifier})`;
+    const evalCodeId = this.addImport('@mui/studio-core', 'evalCode', 'evalCode');
+    const evaluated = `${evalCodeId}(${JSON.stringify(expression.trim())}, ${
+      this.pageStateIdentifier
+    })`;
 
     return this.config.editor
       ? `
@@ -792,18 +795,6 @@ class Context implements RenderContext {
     return `
       ${imports}
       ${codeComponentImports}
-
-      let iframe
-      function evalCode(code, scope) {
-        if (!iframe) {
-          iframe = document.createElement('iframe');
-          iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
-          iframe.style.display = 'none';
-          document.body.parentElement.appendChild(iframe);
-        }
-        iframe.contentWindow.__SCOPE = scope
-        return iframe.contentWindow.eval(\`with (window.__SCOPE) { \${code} }\`);
-      }
 
       export default function App () {
         ${urlQueryStateHooks}

@@ -16,4 +16,4 @@ yarn add @mui/studio-core
 
 ## Documentation
 
-[The documentation](https://github.com/mui/mui-studio/tree/master/docs)
+[The documentation](./docs)

@@ -4,7 +4,7 @@ This page will guide you into creating your very first MUI Studio application. W
 
 ## Prerequisites
 
-Make sure have a running MUI Studio instance. If you don't know how to do that, please follow the [setup instructions](./setup.md)
+Make sure you have a running MUI Studio instance. If you don't know how to do that, please follow the [setup instructions](./setup.md).
 
 ## building your first application
 

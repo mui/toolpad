@@ -28,6 +28,10 @@ Check out the repository and run
 docker-compose -f docker/compose/docker-compose.yml up
 ```
 
+## documentation
+
+[The documentation](./docs)
+
 ## Contributing
 
 Read the [contributing guide](/CONTRIBUTING.md) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to MUI.

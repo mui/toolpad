@@ -30,7 +30,7 @@ Make sure have a running MUI Studio instance. If you don't know how to do that, 
 
 1. In the binding editor you can write any javascript expression. For instance, try typing the javascript string `'Hello everybody!'` and click "update binding". You'll notice that the text on the screen changes to "Hello everybody!".
 
-   Now, change the javascript expression to `` `Hello ${state.nameInput.value}!` ``. Notice how we refer to our textField by the name "nameInput" that we set before. Now click "update binding" and close the binding editor. Select the TextField and try typing your name. See how the Text follows?
+   Now, change the javascript expression to `` `Hello ${nameInput.value}!` ``. Notice how we refer to our textField by the name "nameInput" that we set before. Now click "update binding" and close the binding editor. Select the TextField and try typing your name. See how the Text follows?
 
    <!-- TODO: screenshot "Show working application" -->
 

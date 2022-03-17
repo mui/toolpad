@@ -51,9 +51,10 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
 
   const queryEditorApi = React.useMemo(() => {
     return {
-      fetchPrivate: async (query: any) => client.query.dataSourceFetchPrivate(conectionId, query),
+      fetchPrivate: async (query: any) =>
+        client.query.dataSourceFetchPrivate(appId, conectionId, query),
     };
-  }, [conectionId]);
+  }, [appId, conectionId]);
 
   if (!connection) {
     return (

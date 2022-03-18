@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../prisma/generated/client';
+import { DomNodeAttributeType, PrismaClient, Release } from '../../prisma/generated/client';
 import {
   StudioConnection,
   ConnectionStatus,
@@ -28,12 +28,14 @@ export async function createApp(name: string) {
   });
 }
 
-function serializeValue(value: unknown): string {
-  return value === undefined ? '' : JSON.stringify(value);
+function serializeValue(value: unknown, type: DomNodeAttributeType): string {
+  const serialized = value === undefined ? '' : JSON.stringify(value);
+  return type === 'secret' ? encryptSecret(serialized) : serialized;
 }
 
-function deserializeValue(dbValue: string): unknown {
-  return dbValue.length <= 0 ? undefined : JSON.parse(dbValue);
+function deserializeValue(dbValue: string, type: DomNodeAttributeType): unknown {
+  const serialized = type === 'secret' ? decryptSecret(dbValue) : dbValue;
+  return serialized.length <= 0 ? undefined : JSON.parse(serialized);
 }
 
 export async function saveDom(appId: string, app: studioDom.StudioDom): Promise<void> {
@@ -62,7 +64,7 @@ export async function saveDom(appId: string, app: studioDom.StudioDom): Promise<
               namespace,
               name: attributeName,
               type: attributeValue.type,
-              value: serializeValue(attributeValue.value),
+              value: serializeValue(attributeValue.value, attributeValue.type),
             };
           });
         });
@@ -103,7 +105,7 @@ export async function loadDom(appId: string): Promise<studioDom.StudioDom> {
             }
             result[attribute.namespace][attribute.name] = {
               type: attribute.type,
-              value: deserializeValue(attribute.value),
+              value: deserializeValue(attribute.value, attribute.type),
             } as StudioBindable<unknown>;
             return result;
           }, {} as Record<string, Record<string, StudioBindable<unknown>>>),
@@ -135,28 +137,25 @@ export function findLastRelease(appId: string) {
   });
 }
 
-export async function createRelease(appId: string, { description }: CreateReleaseParams) {
+export async function createRelease(
+  appId: string,
+  { description }: CreateReleaseParams,
+): Promise<Pick<Release, keyof typeof SELECT_RELEASE_META>> {
   const currentDom = await loadDom(appId);
-  const secrets = await prisma.previewSecret.findMany({ where: { appId } });
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
 
   const lastRelease = await findLastRelease(appId);
   const versionNumber = lastRelease ? lastRelease.version + 1 : 1;
 
-  const [release] = await prisma.$transaction([
-    prisma.release.create({
-      select: SELECT_RELEASE_META,
-      data: {
-        appId,
-        version: versionNumber,
-        description,
-        snapshot,
-      },
-    }),
-    prisma.releaseSecret.createMany({
-      data: secrets.map((secret) => ({ ...secret, version: versionNumber })),
-    }),
-  ]);
+  const release = await prisma.release.create({
+    select: SELECT_RELEASE_META,
+    data: {
+      appId,
+      version: versionNumber,
+      description,
+      snapshot,
+    },
+  });
 
   return release;
 }
@@ -242,7 +241,7 @@ export async function addConnection(
     name,
     attributes: {
       dataSource: studioDom.createConst(type),
-      params: studioDom.createConst(params),
+      params: studioDom.createSecret(params),
       status: studioDom.createConst(status),
     },
   });
@@ -273,7 +272,7 @@ export async function updateConnection(
       existing,
       'attributes',
       'params',
-      studioDom.createConst(params),
+      studioDom.createSecret(params),
     );
   }
   if (status !== undefined) {
@@ -362,66 +361,4 @@ export function parseVersion(param?: string | string[]): VersionOrPreview | null
 
 export async function loadVersionedDom(appId: string, version: VersionOrPreview) {
   return version === 'preview' ? loadDom(appId) : loadReleaseDom(appId, version);
-}
-
-export async function setSecret(appId: string, id: string, value: string): Promise<string> {
-  const updates = {
-    value: await encryptSecret(value),
-  };
-
-  const secret = await prisma.previewSecret.upsert({
-    where: {
-      secret_app_constraint: {
-        appId,
-        id,
-      },
-    },
-    create: {
-      appId,
-      id,
-      ...updates,
-    },
-    update: updates,
-  });
-
-  return secret.id;
-}
-
-// Do not expose to the browser:
-export async function findSecretServerOnly(
-  appId: string,
-  version: VersionOrPreview,
-  id: string,
-): Promise<string> {
-  const secret =
-    typeof version === 'number'
-      ? await prisma.releaseSecret.findUnique({
-          where: {
-            secret_release_constraint: {
-              appId,
-              version,
-              id,
-            },
-          },
-        })
-      : await prisma.previewSecret.findUnique({
-          where: {
-            secret_app_constraint: {
-              appId,
-              id,
-            },
-          },
-        });
-
-  if (!secret) {
-    throw new Error(`No such secret "${id}"`);
-  }
-
-  return decryptSecret(secret.value);
-}
-
-// This function can be safely exposed to the browser
-export async function previewSecret(appId: string, id: string): Promise<string> {
-  const decrypted = await findSecretServerOnly(appId, 'preview', id);
-  return '*'.repeat(decrypted.length);
 }

@@ -45,7 +45,7 @@ export default function CreateStudioConnectionDialog({
           const newNode = studioDom.createNode(dom, 'connection', {
             attributes: {
               dataSource: studioDom.createConst(dataSourceType),
-              params: studioDom.createConst(dataSource.getInitialConnectionValue()),
+              params: studioDom.createSecret(dataSource.getInitialConnectionValue()),
               status: studioDom.createConst(null),
             },
           });

@@ -56,9 +56,15 @@ export interface StudioConstant<V> {
   value: V;
 }
 
+export interface StudioSecret<V> {
+  type: 'secret';
+  value: V;
+}
+
 export type StudioBindable<V> =
   | StudioConstant<V>
   | StudioBinding
+  | StudioSecret<V>
   | StudioBoundExpression
   | StudioJsExpressionBinding;
 

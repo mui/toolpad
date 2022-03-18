@@ -34,10 +34,15 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfG
             },
             body: JSON.stringify(body),
           });
+
           if (res.ok) {
-            const { result } = (await res.json()) as RpcResponse;
-            return result;
+            const response = (await res.json()) as RpcResponse;
+            if (response.error) {
+              throw new Error(response.error.message);
+            }
+            return response.result;
           }
+
           throw new Error(`HTTP ${res.status}`);
         };
       },

@@ -1,6 +1,7 @@
 import {
   Button,
   Card,
+  CardActionArea,
   CardActions,
   CardContent,
   Container,
@@ -66,16 +67,48 @@ interface AppCardProps {
 }
 
 function AppCard({ app }: AppCardProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+
+  const deleteAppMutation = client.useMutation('deleteApp');
+
+  const handleDeleteClick = React.useCallback(async () => {
+    if (app) {
+      await deleteAppMutation.mutateAsync([app.id]);
+    }
+    await client.refetchQueries('getApps');
+    setDeleteDialogOpen(false);
+  }, [app, deleteAppMutation]);
+
   return (
     <Card sx={{ gridColumn: 'span 1' }}>
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {app ? app.name : <Skeleton />}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {app ? `Some app description for "${app.name}" here` : <Skeleton />}
-        </Typography>
-      </CardContent>
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogForm>
+          <DialogTitle>Confirm delete</DialogTitle>
+          <DialogContent>
+            Are you sure you want to delete application &quot;{app?.name}&quot;
+          </DialogContent>
+          <DialogActions>
+            <LoadingButton
+              type="submit"
+              loading={deleteAppMutation.isLoading}
+              onClick={handleDeleteClick}
+              color="error"
+            >
+              Delete
+            </LoadingButton>
+          </DialogActions>
+        </DialogForm>
+      </Dialog>
+      <CardActionArea component="a" href={app ? `/deploy/${app.id}` : ''} disabled={!app}>
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            {app ? app.name : <Skeleton />}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {app ? `Some app description for "${app.name}" here` : <Skeleton />}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
       <CardActions>
         <Button
           size="small"
@@ -85,8 +118,8 @@ function AppCard({ app }: AppCardProps) {
         >
           Edit
         </Button>
-        <Button size="small" component="a" href={app ? `/deploy/${app.id}` : ''} disabled={!app}>
-          open
+        <Button size="small" disabled={!app} onClick={() => setDeleteDialogOpen(true)}>
+          delete
         </Button>
       </CardActions>
     </Card>

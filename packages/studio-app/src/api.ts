@@ -1,4 +1,5 @@
 import {
+  QueryClient,
   useMutation,
   UseMutationOptions,
   UseMutationResult,
@@ -15,6 +16,8 @@ import type {
   RpcResponse,
   ServerDefinition,
 } from '../pages/api/rpc';
+
+export const queryClient = new QueryClient();
 
 function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfGroup<any> {
   return new Proxy(
@@ -78,6 +81,10 @@ interface ApiClient<D extends Definition> {
   mutation: D['mutation'];
   useQuery: UseQueryFn<D['query']>;
   useMutation: UseMutationFn<D['mutation']>;
+  refetchQueries: <K extends keyof D['query']>(
+    key: K,
+    params?: Parameters<D['query'][K]>,
+  ) => Promise<void>;
 }
 
 function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> {
@@ -101,6 +108,9 @@ function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> 
       });
     },
     useMutation: (key, options) => useMutation((params) => mutation[key](...params), options),
+    refetchQueries(key, params?) {
+      return queryClient.refetchQueries(params ? [key, params] : [key]);
+    },
   };
 }
 

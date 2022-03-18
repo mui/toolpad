@@ -187,7 +187,11 @@ function EditorContent({ appId }: EditorContentProps) {
         </div>
       ) : (
         <Box flex={1} display="flex" alignItems="center" justifyContent="center">
-          <CircularProgress />
+          {domLoader.error ? (
+            <Alert severity="error">{domLoader.error}</Alert>
+          ) : (
+            <CircularProgress />
+          )}
         </Box>
       )}
       <CreateReleaseDialog

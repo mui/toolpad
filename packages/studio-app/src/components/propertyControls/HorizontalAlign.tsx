@@ -16,11 +16,9 @@ function HorizontalAlignPropEditor({
     newHorizontalAlign: string | null,
   ) => {
     if (newHorizontalAlign) {
-      console.log('changing', newHorizontalAlign);
       onChange(newHorizontalAlign);
     }
   };
-  console.log('value', value);
 
   return (
     <Box>

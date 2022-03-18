@@ -41,16 +41,16 @@ const decryptionMethods: ((value: string) => string)[] = [
   }),
 ];
 
-export async function encryptSecret(value: string): Promise<string> {
+export function encryptSecret(value: string): string {
   return encryptionMethod(boxSecret(value));
 }
 
-export async function decryptSecret(value: string): Promise<string> {
+export function decryptSecret(value: string): string {
   // eslint-disable-next-line no-restricted-syntax
   for (const decryptionMethod of decryptionMethods) {
     try {
       // eslint-disable-next-line no-await-in-loop
-      return unboxSecret(await decryptionMethod(value));
+      return unboxSecret(decryptionMethod(value));
     } catch {
       // ignore
     }

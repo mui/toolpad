@@ -71,7 +71,7 @@ function ConnectionEditorContent<P>({
         ...connectionNode,
         attributes: {
           ...connectionNode.attributes,
-          params: studioDom.createConst(connectionParams),
+          params: studioDom.createSecret(connectionParams),
         },
       });
       if (status) {
@@ -103,7 +103,7 @@ function ConnectionEditorContent<P>({
                 connectionNode,
                 'attributes',
                 'params',
-                studioDom.createConst(connectionParams),
+                studioDom.createSecret(connectionParams),
               );
             });
             savedConnectionParams.current = connectionParams;

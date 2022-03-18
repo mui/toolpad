@@ -7,10 +7,10 @@ import {
 import { FetchQuery, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';
 
-function resolveBindableString(
+async function resolveBindableString(
   bindable: StudioBindable<string>,
   boundValues: Record<string, string>,
-): string {
+): Promise<string> {
   if (bindable.type === 'const') {
     return bindable.value;
   }
@@ -36,7 +36,7 @@ async function exec(
   params: Record<string, string>,
 ): Promise<StudioApiResult<any>> {
   const boundValues = { ...fetchQuery.params, ...params };
-  const resolvedUrl = resolveBindableString(fetchQuery.url, boundValues);
+  const resolvedUrl = await resolveBindableString(fetchQuery.url, boundValues);
   const res = await fetch(resolvedUrl);
   const data = await res.json();
   return { data };

@@ -6,7 +6,7 @@ import * as path from 'path';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-const DOCKER_IMAGE_NAME = 'janpot/mui-studio';
+const DOCKER_IMAGE_NAME = 'muicom/studio';
 const lernaJsonPath = path.resolve(fileURLToPath(import.meta.url), '../../../lerna.json');
 
 async function getVersion() {

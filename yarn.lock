@@ -117,6 +117,13 @@
   dependencies:
     "@date-io/core" "^2.13.1"
 
+"@devbookhq/splitter@^1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@devbookhq/splitter/-/splitter-1.3.2.tgz#86ce588253b8dba074e74949726f1323a49b1456"
+  integrity sha512-M75y8oGhHPbtIoV3Bo5R5zzQEJzvyA7G7B1R4fOjV12xFQEVJXY6hc/BOy4e7sVFu4MxGCmGeZsAOtoB4l7Fpg==
+  dependencies:
+    react-is "^17.0.2"
+
 "@emotion/babel-plugin@^11.3.0":
   version "11.7.2"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.7.2.tgz#fec75f38a6ab5b304b0601c74e2a5e77c95e5fa0"

@@ -1,6 +1,6 @@
 import { styled, Typography } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinitions } from '@mui/studio-core';
+import { ArgTypeDefinition, ArgTypeDefinitions } from '@mui/studio-core';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';
@@ -21,6 +21,13 @@ const ComponentPropsEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
+function shouldRenderControl(propTypeDef: ArgTypeDefinition) {
+  if (propTypeDef.typeDef.type === 'element') {
+    return propTypeDef.control?.type !== 'slot' && propTypeDef.control?.type !== 'slots';
+  }
+  return true;
+}
+
 interface ComponentPropsEditorProps<P> {
   node: studioDom.StudioElementNode<P>;
 }
@@ -33,7 +40,7 @@ function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
     <ComponentPropsEditorRoot>
       {(Object.entries(definition.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
         ([propName, propTypeDef]) =>
-          propTypeDef ? (
+          propTypeDef && shouldRenderControl(propTypeDef) ? (
             <div key={propName} className={classes.control}>
               <NodeAttributeEditor
                 node={node}

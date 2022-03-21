@@ -1,4 +1,5 @@
 import {
+  QueryClient,
   useMutation,
   UseMutationOptions,
   UseMutationResult,
@@ -15,6 +16,8 @@ import type {
   RpcResponse,
   ServerDefinition,
 } from '../pages/api/rpc';
+
+export const queryClient = new QueryClient();
 
 function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfGroup<any> {
   return new Proxy(
@@ -34,10 +37,15 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfG
             },
             body: JSON.stringify(body),
           });
+
           if (res.ok) {
-            const { result } = (await res.json()) as RpcResponse;
-            return result;
+            const response = (await res.json()) as RpcResponse;
+            if (response.error) {
+              throw new Error(response.error.message);
+            }
+            return response.result;
           }
+
           throw new Error(`HTTP ${res.status}`);
         };
       },
@@ -73,6 +81,10 @@ interface ApiClient<D extends Definition> {
   mutation: D['mutation'];
   useQuery: UseQueryFn<D['query']>;
   useMutation: UseMutationFn<D['mutation']>;
+  refetchQueries: <K extends keyof D['query']>(
+    key: K,
+    params?: Parameters<D['query'][K]>,
+  ) => Promise<void>;
 }
 
 function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> {
@@ -96,6 +108,9 @@ function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> 
       });
     },
     useMutation: (key, options) => useMutation((params) => mutation[key](...params), options),
+    refetchQueries(key, params?) {
+      return queryClient.refetchQueries(params ? [key, params] : [key]);
+    },
   };
 }
 

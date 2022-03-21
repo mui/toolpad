@@ -41,7 +41,7 @@ const Deploy: NextPage = () => {
   ) : (
     <Container sx={{ my: 5 }}>
       <Typography>
-        {isLoading ? 'Loading...' : 'Not deployed yet (TODO: show preview app here)'}
+        {isLoading ? 'Loading...' : 'Not deployed yet (TODO: show instructions here)'}
       </Typography>
     </Container>
   );

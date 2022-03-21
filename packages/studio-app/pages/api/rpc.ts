@@ -16,6 +16,7 @@ import {
   createDeployment,
   findActiveDeployment,
   findLastRelease,
+  deleteApp,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
@@ -54,9 +55,14 @@ export interface RpcRequest {
   params: any[];
 }
 
-export interface RpcResponse {
-  result: any;
-}
+export type RpcResponse =
+  | {
+      result: any;
+      error?: undefined;
+    }
+  | {
+      error: { message: string };
+    };
 
 function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
   return async (req, res) => {
@@ -65,6 +71,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       return;
     }
     const { type, name, params } = req.body as RpcRequest;
+
     if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
       // This is important to avoid RCE
       res.status(404).end();
@@ -72,7 +79,19 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
     }
     const method: MethodResolver<any> = definition[type][name];
     const context = { req, res };
-    const result = await method(params, context);
+
+    let result;
+    try {
+      result = await method(params, context);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.json({ error: { message: error.message } });
+      } else {
+        res.status(500).end();
+      }
+
+      return;
+    }
     const responseData: RpcResponse = { result };
     res.json(responseData);
   };
@@ -119,6 +138,9 @@ const rpcServer = {
   mutation: {
     createApp: createMethod<typeof createApp>((params) => {
       return createApp(...params);
+    }),
+    deleteApp: createMethod<typeof deleteApp>((params) => {
+      return deleteApp(...params);
     }),
     createRelease: createMethod<typeof createRelease>((params) => {
       return createRelease(...params);

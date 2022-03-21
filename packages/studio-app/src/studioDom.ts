@@ -9,6 +9,7 @@ import {
   ConnectionStatus,
   StudioTheme,
   StudioConstants,
+  StudioSecret,
 } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
@@ -71,7 +72,7 @@ export interface StudioConnectionNode<P = unknown> extends StudioNodeBase {
   readonly type: 'connection';
   readonly attributes: {
     readonly dataSource: StudioConstant<string>;
-    readonly params: StudioConstant<P>;
+    readonly params: StudioSecret<P>;
     readonly status: StudioConstant<ConnectionStatus | null>;
   };
 }
@@ -80,6 +81,7 @@ export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
   readonly type: 'api';
   readonly attributes: {
     readonly connectionId: StudioConstant<string>;
+    readonly dataSource: StudioConstant<string>;
     readonly query: StudioConstant<Q>;
   };
 }
@@ -213,6 +215,10 @@ function assertIsType<T extends StudioNode>(node: StudioNode, type: T['type']): 
 
 export function createConst<V>(value: V): StudioConstant<V> {
   return { type: 'const', value };
+}
+
+export function createSecret<V>(value: V): StudioSecret<V> {
+  return { type: 'secret', value };
 }
 
 export function createConsts<P>(values: P): StudioConstants<P> {

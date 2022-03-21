@@ -40,9 +40,10 @@ export function inferColumns(rows: GridRowsProp): GridColumns {
   }));
 }
 
-const LICENSE = window?.document
-  .querySelector('meta[name=x-data-grid-pro-license]')
-  ?.getAttribute('content');
+const LICENSE =
+  typeof window !== 'undefined'
+    ? window.document.querySelector('meta[name=x-data-grid-pro-license]')?.getAttribute('content')
+    : null;
 
 if (LICENSE) {
   LicenseInfo.setLicenseKey(LICENSE);

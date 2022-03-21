@@ -29,11 +29,9 @@ model App {
   id   String @id @default(cuid())
   name String
 
-  nodes          DomNode[]       @relation("AppNodes")
-  releases       Release[]       @relation("AppReleases")
-  deployments    Deployment[]    @relation("AppDeployments")
-  secrets        PreviewSecret[] @relation("AppSecrets")
-  releaseSecrets ReleaseSecret[] @relation("ReleaseSecrets")
+  nodes       DomNode[]    @relation("AppNodes")
+  releases    Release[]    @relation("AppReleases")
+  deployments Deployment[] @relation("AppDeployments")
 }
 
 model DomNode {
@@ -59,6 +57,7 @@ enum DomNodeAttributeType {
   binding
   boundExpression
   jsExpression
+  secret
 }
 
 model DomNodeAttribute {
@@ -81,7 +80,6 @@ model Release {
   app         App          @relation("AppReleases", fields: [appId], references: [id], onDelete: Cascade)
   appId       String
 
-  secrets ReleaseSecret[] @relation("SecretRelease")
   @@id([version, appId], name: "release_app_constraint")
 }
 
@@ -92,26 +90,4 @@ model Deployment {
   version   Int
   app       App      @relation("AppDeployments", fields: [appId], references: [id], onDelete: Cascade)
   appId     String
-}
-
-model PreviewSecret {
-  id    String @default(cuid())
-  value String
-
-  app   App    @relation("AppSecrets", fields: [appId], references: [id], onDelete: Cascade)
-  appId String
-
-  @@id([appId, id], name: "secret_app_constraint")
-}
-
-model ReleaseSecret {
-  id    String @default(cuid())
-  value String
-
-  app     App     @relation("ReleaseSecrets", fields: [appId], references: [id], onDelete: Cascade)
-  appId   String
-  release Release @relation("SecretRelease", fields: [appId, version], references: [appId, version], onDelete: Cascade)
-  version Int
-
-  @@id([appId, version, id], name: "secret_release_constraint")
 }

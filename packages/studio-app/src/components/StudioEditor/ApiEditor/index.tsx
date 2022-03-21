@@ -11,6 +11,7 @@ import useDebounced from '../../../utils/useDebounced';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 import { ConnectionSelect } from '../HierarchyExplorer/CreateStudioApiDialog';
+import JsonView from '../../JsonView';
 
 interface ApiEditorContentProps<Q> {
   appId: string;
@@ -74,9 +75,7 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
 
   return (
     <Box className={className} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box
-        sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', px: 3, pt: 3 }}
-      >
+      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', p: 3 }}>
         <ConnectionSelect
           dataSource={dataSourceName}
           value={connection?.id ?? null}
@@ -118,12 +117,14 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
         {previewQuery.isLoading || (previewIsInvalid && previewQuery.isFetching) ? (
           <LinearProgress />
         ) : null}
-        {previewQuery.isError ? (
-          <Alert severity="error">{(previewQuery.error as Error).message}</Alert>
-        ) : null}
-        {!previewIsInvalid && previewQuery.isSuccess ? (
-          <pre>{JSON.stringify(previewQuery.data, null, 2)}</pre>
-        ) : null}
+        <Box sx={{ p: 2 }}>
+          {previewQuery.isError ? (
+            <Alert severity="error">{(previewQuery.error as Error).message}</Alert>
+          ) : null}
+          {!previewIsInvalid && previewQuery.isSuccess ? (
+            <JsonView src={previewQuery.data} />
+          ) : null}
+        </Box>
       </Box>
     </Box>
   );

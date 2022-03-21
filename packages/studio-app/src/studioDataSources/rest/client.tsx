@@ -1,4 +1,4 @@
-import { Box, TextField, Typography } from '@mui/material';
+import { TextField, Typography } from '@mui/material';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import * as React from 'react';
 import StringRecordEditor from '../../components/StringRecordEditor';
@@ -47,9 +47,6 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
         value={value.params || {}}
         onChange={handleApiQueryChange}
       />
-      <Box overflow="auto">
-        <pre>{JSON.stringify(value, null, 2)}</pre>
-      </Box>
     </div>
   );
 }

@@ -526,7 +526,7 @@ class Context implements RenderContext {
     const Stack = this.addImport('@mui/material', 'Stack', 'Stack');
 
     const rendered = `
-      <${Stack} direction="column" alignItems='stretch'>
+      <${Stack} direction="column" alignItems='stretch' sx={{ my: 2 }}>
         ${this.renderJsxContent(resolvedChildren.children)}
       </${Stack}>
     `;

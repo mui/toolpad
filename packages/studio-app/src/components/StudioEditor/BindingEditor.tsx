@@ -11,12 +11,12 @@ import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { LiveBinding, PropValueType } from '@mui/studio-core';
-import { StudioBindable } from '../../../types';
-import { WithControlledProp } from '../../../utils/types';
-import { JsExpressionEditor } from './JsExpressionEditor';
-import RuntimeErrorAlert from './RuntimeErrorAlert';
-import JsonView from '../../JsonView';
-import { tryFormatExpression } from '../../../utils/prettier';
+import { StudioBindable } from '../../types';
+import { WithControlledProp } from '../../utils/types';
+import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
+import RuntimeErrorAlert from './PageEditor/RuntimeErrorAlert';
+import JsonView from '../JsonView';
+import { tryFormatExpression } from '../../utils/prettier';
 
 interface JsExpressionBindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
   globalScope: Record<string, unknown>;

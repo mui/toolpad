@@ -3,24 +3,25 @@ import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import jsonToTs from 'json-to-ts';
 import { WithControlledProp } from '../../../utils/types';
-import { usePageEditorState } from './PageEditorProvider';
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
   globalScope: Record<string, unknown>;
   onCommit?: () => void;
 }
 
-export function JsExpressionEditor({ onCommit, value, onChange }: JsExpressionEditorProps) {
+export function JsExpressionEditor({
+  onCommit,
+  value,
+  onChange,
+  globalScope,
+}: JsExpressionEditorProps) {
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const monacoRef = React.useRef<typeof monacoEditor>();
 
-  const state = usePageEditorState();
-  const pageState = state.viewState?.pageState;
-
   const libSource = React.useMemo(() => {
-    const type = jsonToTs(pageState);
+    const type = jsonToTs(globalScope);
 
-    const globals = Object.keys(pageState)
+    const globals = Object.keys(globalScope)
       .map((key) => `declare const ${key}: RootObject[${JSON.stringify(key)}];`)
       .join('\n');
 
@@ -29,7 +30,7 @@ export function JsExpressionEditor({ onCommit, value, onChange }: JsExpressionEd
 
       ${globals}
     `;
-  }, [pageState]);
+  }, [globalScope]);
 
   const libSourceDisposable = React.useRef<monacoEditor.IDisposable>();
   const setLibSource = React.useCallback(() => {

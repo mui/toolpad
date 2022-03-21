@@ -2,7 +2,7 @@ import { Alert, Stack } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/studio-core';
 import studioPropControls from '../../propertyControls';
-import { BindingEditor } from './BindingEditor';
+import { BindingEditor } from '../BindingEditor';
 import { NodeId, StudioBindable } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
 import { usePageEditorState } from './PageEditorProvider';

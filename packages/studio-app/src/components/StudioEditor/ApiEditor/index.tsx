@@ -52,7 +52,6 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
 
   const handleConnectionChange = React.useCallback(
     (newConnectionId) => {
-      console.log(newConnectionId);
       if (apiNode) {
         domApi.setNodeNamespacedProp(
           apiNode,

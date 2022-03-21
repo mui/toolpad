@@ -318,13 +318,16 @@ export async function execApi<Q>(
   api: studioDom.StudioApiNode<Q>,
   params: Q,
 ): Promise<StudioApiResult<any>> {
-  const connection = await getConnection(appId, api.attributes.connectionId.value);
   const dataSource: StudioDataSourceServer<any, Q, any> | undefined =
-    studioDataSources[connection.type];
-
+    studioDataSources[api.attributes.dataSource.value];
   if (!dataSource) {
+    throw new Error(`Unknown datasource "${api.attributes.dataSource.value}" for api "${api.id}"`);
+  }
+
+  const connection = await getConnection(appId, api.attributes.connectionId.value);
+  if (!connection) {
     throw new Error(
-      `Unknown connection type "${connection.type}" for connection "${connection.id}"`,
+      `Unknown connection "${api.attributes.connectionId.value}" for api "${api.id}"`,
     );
   }
 

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { Box, Button, Stack, Toolbar } from '@mui/material';
+import { Alert, Box, Button, LinearProgress, Stack, Toolbar } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { StudioDataSourceClient, NodeId } from '../../../types';
+import { NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
@@ -10,12 +10,7 @@ import { useDom, useDomApi } from '../../DomLoader';
 import useDebounced from '../../../utils/useDebounced';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
-
-function getDataSource<Q>(
-  connection: studioDom.StudioConnectionNode,
-): StudioDataSourceClient<any, Q> | null {
-  return dataSources[connection.attributes.dataSource.value] || null;
-}
+import { ConnectionSelect } from '../HierarchyExplorer/CreateStudioApiDialog';
 
 interface ApiEditorContentProps<Q> {
   appId: string;
@@ -30,12 +25,10 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
   const [apiQuery, setApiQuery] = React.useState<Q>(apiNode.attributes.query.value);
   const savedQuery = React.useRef(apiNode.attributes.query.value);
 
-  const connection = studioDom.getMaybeNode(
-    dom,
-    apiNode.attributes.connectionId.value as NodeId,
-    'connection',
-  );
-  const dataSource = connection && getDataSource<Q>(connection);
+  const conectionId = apiNode.attributes.connectionId.value as NodeId;
+  const connection = studioDom.getMaybeNode(dom, conectionId, 'connection');
+  const dataSourceName = apiNode.attributes.dataSource.value;
+  const dataSource = dataSources[dataSourceName] || null;
 
   const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
     return {
@@ -46,33 +39,50 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
 
   const debouncedPreviewApi = useDebounced(previewApi, 250);
 
-  const { data: previewData } = useQuery(
-    ['api', debouncedPreviewApi],
-    async () => client.query.execApi(appId, debouncedPreviewApi, {}),
-    {},
+  const previewQuery = useQuery(['api', debouncedPreviewApi], async () =>
+    client.query.execApi(appId, debouncedPreviewApi, {}),
   );
 
-  if (!connection) {
-    return (
-      <NotFoundEditor
-        className={className}
-        message={`Connection "${apiNode.attributes.connectionId.value}" not found`}
-      />
-    );
-  }
+  const queryEditorApi = React.useMemo(() => {
+    return {
+      fetchPrivate: async (query: any) =>
+        client.query.dataSourceFetchPrivate(appId, conectionId, query),
+    };
+  }, [appId, conectionId]);
+
+  const handleConnectionChange = React.useCallback(
+    (newConnectionId) => {
+      console.log(newConnectionId);
+      if (apiNode) {
+        domApi.setNodeNamespacedProp(
+          apiNode,
+          'attributes',
+          'connectionId',
+          studioDom.createConst(newConnectionId),
+        );
+      }
+    },
+    [apiNode, domApi],
+  );
 
   if (!dataSource) {
     return (
-      <NotFoundEditor
-        className={className}
-        message={`DataSource "${connection.attributes.dataSource.value}" not found`}
-      />
+      <NotFoundEditor className={className} message={`DataSource "${dataSourceName}" not found`} />
     );
   }
 
+  const previewIsInvalid: boolean = !connection && !previewQuery.isError;
+
   return (
     <Box className={className} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', px: 3 }}>
+      <Box
+        sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', px: 3, pt: 3 }}
+      >
+        <ConnectionSelect
+          dataSource={dataSourceName}
+          value={connection?.id ?? null}
+          onChange={handleConnectionChange}
+        />
         <Toolbar disableGutters>
           <Button
             onClick={() => {
@@ -97,6 +107,9 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
         <Stack spacing={2}>
           <NodeNameEditor node={apiNode} />
           <dataSource.QueryEditor
+            api={queryEditorApi}
+            // TODO: Add disabled mode to QueryEditor
+            // disabled={!connection}
             value={apiQuery}
             connectionId={apiNode.attributes.connectionId.value as NodeId}
             onChange={(newApiQuery) => setApiQuery(newApiQuery)}
@@ -104,7 +117,15 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
         </Stack>
       </Box>
       <Box sx={{ flex: 1, overflow: 'auto', borderTop: 1, borderColor: 'divider' }}>
-        <pre>{JSON.stringify(previewData, null, 2)}</pre>
+        {previewQuery.isLoading || (previewIsInvalid && previewQuery.isFetching) ? (
+          <LinearProgress />
+        ) : null}
+        {previewQuery.isError ? (
+          <Alert severity="error">{(previewQuery.error as Error).message}</Alert>
+        ) : null}
+        {!previewIsInvalid && previewQuery.isSuccess ? (
+          <pre>{JSON.stringify(previewQuery.data, null, 2)}</pre>
+        ) : null}
       </Box>
     </Box>
   );

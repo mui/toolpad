@@ -10,14 +10,15 @@ const classes = {
   panel: 'StudioPanel',
 };
 
-const ComponentPanelRoot = styled('div')({
+const ComponentPanelRoot = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   [`& .${classes.panel}`]: {
     flex: 1,
+    padding: theme.spacing(2),
     overflow: 'auto',
   },
-});
+}));
 
 export interface ComponentPanelProps {
   className?: string;

@@ -1,6 +1,6 @@
 {
   "name": "@mui/studio-app",
-  "version": "0.0.5-alpha.2",
+  "version": "0.0.5-alpha.3",
   "license": "MIT",
   "scripts": {
     "dev": "yarn waitForDb && yarn prisma db push && yarn esinstall --dev && concurrently \"yarn:dev:*\"",
@@ -36,8 +36,8 @@
     "@mui/icons-material": "^5.3.1",
     "@mui/lab": "^5.0.0-alpha.66",
     "@mui/material": "^5.3.1",
-    "@mui/studio-components": "^0.0.5-alpha.2",
-    "@mui/studio-core": "^0.0.5-alpha.2",
+    "@mui/studio-components": "^0.0.5-alpha.3",
+    "@mui/studio-core": "^0.0.5-alpha.3",
     "@mui/styles": "^5.3.0",
     "@mui/x-data-grid-pro": "^5.4.0",
     "@prisma/client": "^3.9.2",
@@ -49,6 +49,8 @@
     "clsx": "^1.1.1",
     "concurrently": "^7.0.0",
     "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
+    "cuid": "^2.1.8",
     "es-module-shims": "^1.4.3",
     "esbuild": "^0.14.14",
     "esinstall": "^1.1.7",
@@ -73,6 +75,7 @@
     "typescript": "^4.5.5"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
     "@types/glob": "^7.2.0",
     "@types/lodash": "^4.14.178",
     "@types/react": "^17.0.34",

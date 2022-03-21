@@ -14,6 +14,7 @@ import type { Rectangle } from './utils/geometry';
 export interface EditorProps<T> {
   nodeId: NodeId;
   propName: string;
+  label: string;
   argType: ArgTypeDefinition;
   disabled?: boolean;
   value: T | undefined;
@@ -56,9 +57,15 @@ export interface StudioConstant<V> {
   value: V;
 }
 
+export interface StudioSecret<V> {
+  type: 'secret';
+  value: V;
+}
+
 export type StudioBindable<V> =
   | StudioConstant<V>
   | StudioBinding
+  | StudioSecret<V>
   | StudioBoundExpression
   | StudioJsExpressionBinding;
 
@@ -77,7 +84,7 @@ export type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
 export interface SlotLocation {
   parentId: NodeId;
   parentProp: string;
-  parentIndex: string;
+  parentIndex?: string;
 }
 
 export type SlotDirection = 'horizontal' | 'vertical';
@@ -126,11 +133,18 @@ export interface CreateHandlerApi {
   updateConnection: (props: Updates<StudioConnection>) => Promise<StudioConnection>;
   getConnection: (connectionId: string) => Promise<StudioConnection>;
 }
+
 export interface StudioConnectionEditorProps<P> extends WithControlledProp<P> {
   connectionId: NodeId;
 }
 export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionEditorProps<P>>;
-export type StudioQueryEditor<Q = {}> = React.FC<StudioConnectionEditorProps<Q>>;
+export interface StudioQueryEditorApi {
+  fetchPrivate: (query: any) => Promise<any>;
+}
+export interface StudioQueryEditorProps<Q> extends WithControlledProp<Q> {
+  api: StudioQueryEditorApi;
+}
+export type StudioQueryEditor<Q = {}> = React.FC<StudioQueryEditorProps<Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;
@@ -149,6 +163,9 @@ export interface StudioDataSourceClient<P = {}, Q = {}> {
 
 export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
+  // Execute a private query on this connection, intended for editors only
+  execPrivate?: (connection: StudioConnection<P>, query: any) => Promise<any>;
+  // Execute a query on this connection, intended for viewers
   exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
   createHandler?: () => (api: CreateHandlerApi, req: NextApiRequest, res: NextApiResponse) => void;
 }

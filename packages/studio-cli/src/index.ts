@@ -36,10 +36,10 @@ const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   cwd: studioDir,
   preferLocal: true,
   stdio: 'pipe',
-  extendEnv: false,
   env: {
     STUDIO_DATABASE_URL: process.env.STUDIO_DATABASE_URL,
     FORCE_COLOR: process.env.FORCE_COLOR,
+    PRISMA_HIDE_UPDATE_MESSAGE: '1',
   },
 });
 

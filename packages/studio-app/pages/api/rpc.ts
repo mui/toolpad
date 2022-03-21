@@ -5,15 +5,18 @@ import {
   createApp,
   testConnection,
   execApi,
+  dataSourceFetchPrivate,
   loadDom,
   saveDom,
   createRelease,
   deleteRelease,
   getReleases,
+  getRelease,
   loadReleaseDom,
   createDeployment,
   findActiveDeployment,
   findLastRelease,
+  deleteApp,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
@@ -52,9 +55,14 @@ export interface RpcRequest {
   params: any[];
 }
 
-export interface RpcResponse {
-  result: any;
-}
+export type RpcResponse =
+  | {
+      result: any;
+      error?: undefined;
+    }
+  | {
+      error: { message: string };
+    };
 
 function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
   return async (req, res) => {
@@ -63,6 +71,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       return;
     }
     const { type, name, params } = req.body as RpcRequest;
+
     if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
       // This is important to avoid RCE
       res.status(404).end();
@@ -70,7 +79,19 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
     }
     const method: MethodResolver<any> = definition[type][name];
     const context = { req, res };
-    const result = await method(params, context);
+
+    let result;
+    try {
+      result = await method(params, context);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.json({ error: { message: error.message } });
+      } else {
+        res.status(500).end();
+      }
+
+      return;
+    }
     const responseData: RpcResponse = { result };
     res.json(responseData);
   };
@@ -86,6 +107,9 @@ function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResol
 
 const rpcServer = {
   query: {
+    dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>((params) => {
+      return dataSourceFetchPrivate(...params);
+    }),
     getApps: createMethod<typeof getApps>((params) => {
       return getApps(...params);
     }),
@@ -94,6 +118,9 @@ const rpcServer = {
     }),
     getReleases: createMethod<typeof getReleases>((params) => {
       return getReleases(...params);
+    }),
+    getRelease: createMethod<typeof getRelease>((params) => {
+      return getRelease(...params);
     }),
     findActiveDeployment: createMethod<typeof findActiveDeployment>((params) => {
       return findActiveDeployment(...params);
@@ -111,6 +138,9 @@ const rpcServer = {
   mutation: {
     createApp: createMethod<typeof createApp>((params) => {
       return createApp(...params);
+    }),
+    deleteApp: createMethod<typeof deleteApp>((params) => {
+      return deleteApp(...params);
     }),
     createRelease: createMethod<typeof createRelease>((params) => {
       return createRelease(...params);

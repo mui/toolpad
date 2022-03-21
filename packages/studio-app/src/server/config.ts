@@ -5,6 +5,7 @@ export interface ServerConfig extends SharedConfig {
   googleSheetsClientId?: string;
   googleSheetsClientSecret?: string;
   googleSheetsRedirectUri?: string;
+  encryptionKeys: string[];
 }
 
 function readConfig(): ServerConfig {
@@ -29,12 +30,17 @@ function readConfig(): ServerConfig {
     throw new Error(`App started without config env variable STUDIO_DATABASE_URL`);
   }
 
+  const encryptionKeys: string[] =
+    process.env.STUDIO_ENCRYPTION_KEYS?.split(/\s+/).filter(Boolean) ?? [];
+
   return {
     ...sharedConfig,
     databaseUrl: process.env.STUDIO_DATABASE_URL,
     googleSheetsClientId: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
     googleSheetsClientSecret: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
     googleSheetsRedirectUri: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_REDIRECT_URI,
+    // Whitespace separated, do not use spaces in your keys
+    encryptionKeys,
   };
 }
 

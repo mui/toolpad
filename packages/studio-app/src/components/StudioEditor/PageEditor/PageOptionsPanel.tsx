@@ -6,6 +6,8 @@ import {
   DialogContent,
   Switch,
   FormControlLabel,
+  Typography,
+  Divider,
 } from '@mui/material';
 import * as React from 'react';
 import PageIcon from '@mui/icons-material/Web';
@@ -53,6 +55,7 @@ export default function PageOptionsPanel() {
   return (
     <div>
       <Stack spacing={1} alignItems="start">
+        <Typography variant="subtitle1">Page:</Typography>
         <NodeNameEditor node={page} />
         <Button
           startIcon={<PageIcon />}
@@ -60,11 +63,13 @@ export default function PageOptionsPanel() {
           component="a"
           href={`/api/release/${state.appId}/preview/${pageNodeId}`}
         >
-          Preview Page
+          Preview
         </Button>
         <Button startIcon={<SourceIcon />} color="inherit" onClick={() => setDialogOpen(true)}>
-          View Page Source
+          View Source
         </Button>
+        <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
+        <Typography variant="subtitle1">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />
         {DEPRECATED && <DerivedStateEditor />}
         <QueryStateEditor />

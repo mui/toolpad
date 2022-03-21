@@ -1,6 +1,7 @@
 import {
   Button,
   Card,
+  CardActionArea,
   CardActions,
   CardContent,
   Container,
@@ -8,7 +9,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Skeleton,
   TextField,
+  Toolbar,
   Typography,
 } from '@mui/material';
 import * as React from 'react';
@@ -17,6 +20,7 @@ import { Box } from '@mui/system';
 import client from '../api';
 import DialogForm from './DialogForm';
 import { App } from '../../prisma/generated/client';
+import StudioAppBar from './StudioAppBar';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -34,8 +38,6 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           event.preventDefault();
 
           const app = await createAppMutation.mutateAsync([name]);
-
-          onClose();
           window.location.href = `/_studio/app/${app.id}/editor`;
         }}
       >
@@ -61,26 +63,63 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 }
 
 interface AppCardProps {
-  app: App;
+  app?: App;
 }
 
 function AppCard({ app }: AppCardProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+
+  const deleteAppMutation = client.useMutation('deleteApp');
+
+  const handleDeleteClick = React.useCallback(async () => {
+    if (app) {
+      await deleteAppMutation.mutateAsync([app.id]);
+    }
+    await client.refetchQueries('getApps');
+    setDeleteDialogOpen(false);
+  }, [app, deleteAppMutation]);
+
   return (
     <Card sx={{ gridColumn: 'span 1' }}>
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {app.name}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Some app description here
-        </Typography>
-      </CardContent>
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogForm>
+          <DialogTitle>Confirm delete</DialogTitle>
+          <DialogContent>
+            Are you sure you want to delete application &quot;{app?.name}&quot;
+          </DialogContent>
+          <DialogActions>
+            <LoadingButton
+              type="submit"
+              loading={deleteAppMutation.isLoading}
+              onClick={handleDeleteClick}
+              color="error"
+            >
+              Delete
+            </LoadingButton>
+          </DialogActions>
+        </DialogForm>
+      </Dialog>
+      <CardActionArea component="a" href={app ? `/deploy/${app.id}` : ''} disabled={!app}>
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            {app ? app.name : <Skeleton />}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {app ? `Some app description for "${app.name}" here` : <Skeleton />}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
       <CardActions>
-        <Button size="small" component="a" href={`/_studio/app/${app.id}/editor`}>
+        <Button
+          size="small"
+          component="a"
+          href={app ? `/_studio/app/${app.id}/editor` : ''}
+          disabled={!app}
+        >
           Edit
         </Button>
-        <Button size="small" component="a" href={`/deploy/${app.id}`}>
-          open
+        <Button size="small" disabled={!app} onClick={() => setDeleteDialogOpen(true)}>
+          delete
         </Button>
       </CardActions>
     </Card>
@@ -88,33 +127,50 @@ function AppCard({ app }: AppCardProps) {
 }
 
 export default function Home() {
-  const { data: apps = [] } = client.useQuery('getApps', []);
+  const { data: apps = [], status, error } = client.useQuery('getApps', []);
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
   return (
-    <Container>
-      <Typography variant="h2">Apps</Typography>
-      <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
+    <React.Fragment>
+      <StudioAppBar navigation={null} actions={null} />
+      <Container>
+        <Typography variant="h2">Apps</Typography>
+        <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
 
-      <Box
-        sx={{
-          my: 5,
-          display: 'grid',
-          gridTemplateColumns: {
-            lg: 'repeat(4, 1fr)',
-            md: 'repeat(3, 1fr)',
-            sm: 'repeat(2, fr)',
-            xs: 'repeat(1, fr)',
-          },
-          gap: 2,
-        }}
-      >
-        {apps.map((app) => (
-          <AppCard key={app.id} app={app} />
-        ))}
-        <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-      </Box>
-    </Container>
+        <Toolbar disableGutters>
+          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+        </Toolbar>
+
+        <Box
+          sx={{
+            my: 5,
+            display: 'grid',
+            gridTemplateColumns: {
+              lg: 'repeat(4, 1fr)',
+              md: 'repeat(3, 1fr)',
+              sm: 'repeat(2, fr)',
+              xs: 'repeat(1, fr)',
+            },
+            gap: 2,
+          }}
+        >
+          {(() => {
+            switch (status) {
+              case 'loading':
+                return <AppCard />;
+              case 'error':
+                return (error as Error)?.message;
+              case 'success':
+                return apps.length > 0
+                  ? apps.map((app) => <AppCard key={app.id} app={app} />)
+                  : 'No apps yet';
+              default:
+                return '';
+            }
+          })()}
+        </Box>
+      </Container>
+    </React.Fragment>
   );
 }

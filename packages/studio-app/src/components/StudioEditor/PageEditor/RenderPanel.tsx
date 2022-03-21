@@ -3,6 +3,7 @@ import * as React from 'react';
 import clsx from 'clsx';
 import { RuntimeEvent, SlotType } from '@mui/studio-core';
 import throttle from 'lodash/throttle';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
   NodeId,
   FlowDirection,
@@ -28,6 +29,8 @@ import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { useStudioComponent } from '../../../studioComponents';
 
+const ROW_COMPONENT = 'PageRow';
+
 type SlotDirection = 'horizontal' | 'vertical';
 
 const classes = {
@@ -51,6 +54,7 @@ const overlayClasses = {
   selected: 'StudioSelected',
   allowNodeInteraction: 'StudioAllowNodeInteraction',
   active: 'StudioActive',
+  available: 'StudioAvailable',
   componentDragging: 'StudioComponentDragging',
   selectionHint: 'StudioSelectionHint',
   hudOverlay: 'StudioHudOverlay',
@@ -71,11 +75,16 @@ const OverlayRoot = styled('div')({
     cursor: 'grab',
     display: 'none',
     position: 'absolute',
+    alignItems: 'center',
     right: 0,
     background: 'red',
     color: 'white',
     fontSize: 11,
-    padding: `0 4px`,
+    padding: `2px 0 2px 8px`,
+    // TODO: figure out positioning of this selectionhint, it should
+    //   - prefer top right, above the component
+    //   - if that appears out of bound of the editor, show it bottom or left
+    // transform: `translate(0, -100%)`,
   },
 
   [`& .${overlayClasses.nodeHud}`]: {
@@ -85,7 +94,7 @@ const OverlayRoot = styled('div')({
     [`&.${overlayClasses.selected}`]: {
       border: '1px solid red',
       [`& .${overlayClasses.selectionHint}`]: {
-        display: 'block',
+        display: 'flex',
       },
     },
     [`&.${overlayClasses.allowNodeInteraction}`]: {
@@ -94,14 +103,18 @@ const OverlayRoot = styled('div')({
     },
   },
 
-  [`&.${overlayClasses.componentDragging}`]: {
+  /*   [`&.${overlayClasses.componentDragging}`]: {
     [`& .${overlayClasses.insertSlotHud}`]: {
       border: '1px dashed #DDD',
     },
-  },
+  }, */
 
   [`& .${overlayClasses.insertSlotHud}`]: {
     position: 'absolute',
+
+    [`&.${overlayClasses.available}`]: {
+      border: '1px dashed #DDD',
+    },
 
     [`&.${overlayClasses.active}`]: {
       border: '1px solid green',
@@ -461,6 +474,7 @@ function NodeHud({ node, selected, allowInteraction, rect, onDragStart }: Select
   return (
     <div
       draggable
+      data-node-id={node.id}
       onDragStart={onDragStart}
       style={absolutePositionCss(rect)}
       className={clsx(overlayClasses.nodeHud, {
@@ -468,7 +482,10 @@ function NodeHud({ node, selected, allowInteraction, rect, onDragStart }: Select
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
     >
-      <div className={overlayClasses.selectionHint}>{component.displayName}</div>
+      <div draggable className={overlayClasses.selectionHint}>
+        {component.displayName}
+        <DragIndicatorIcon color="inherit" fontSize="small" />
+      </div>
     </div>
   );
 }
@@ -528,35 +545,54 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return result;
   }, [pageNodes, dom, nodesInfo]);
 
-  const availableNodes = React.useMemo(() => {
+  const handleDragStart = React.useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+      const nodeId = event.currentTarget.dataset.nodeId as NodeId | undefined;
+
+      if (!nodeId) {
+        return;
+      }
+
+      event.dataTransfer.dropEffect = 'move';
+      api.select(nodeId);
+    },
+    [api],
+  );
+
+  const getCurrentlyDraggedNode = React.useCallback((): studioDom.StudioElementNode | null => {
+    return newNode || (selection && studioDom.getNode(dom, selection, 'element'));
+  }, [dom, newNode, selection]);
+
+  const availableDropTargets = React.useMemo((): studioDom.StudioNode[] => {
+    const draggedNode = getCurrentlyDraggedNode();
+
+    if (!draggedNode) {
+      return [];
+    }
+
+    const component = draggedNode.attributes.component.value;
+    if (component === ROW_COMPONENT) {
+      return [studioDom.getNode(dom, pageNodeId, 'page')];
+    }
+
     /**
      * Return all nodes that are available for insertion.
      * i.e. Exclude all descendants of the current selection since inserting in one of
      * them would create a cyclic structure.
      */
-    const excludedNodes = new Set<studioDom.StudioNode>(
-      selectedNode ? [selectedNode, ...studioDom.getDescendants(dom, selectedNode)] : [],
-    );
-    return pageNodes.filter((node) => !excludedNodes.has(node));
-  }, [dom, pageNodes, selectedNode]);
+    const excludedNodes = selectedNode
+      ? new Set<studioDom.StudioNode>([
+          selectedNode,
+          ...studioDom.getDescendants(dom, selectedNode),
+        ])
+      : new Set();
+    return pageNodes.filter((n) => !excludedNodes.has(n));
+  }, [dom, getCurrentlyDraggedNode, pageNodeId, pageNodes, selectedNode]);
 
-  const handleDragStart = React.useCallback(
-    (event: React.DragEvent<Element>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-
-      if (!cursorPos) {
-        return;
-      }
-
-      event.dataTransfer.dropEffect = 'move';
-
-      const nodeId = findNodeAt(pageNodes, nodesInfo, cursorPos.x, cursorPos.y);
-
-      if (nodeId) {
-        api.select(nodeId);
-      }
-    },
-    [api, pageNodes, nodesInfo, getViewCoordinates],
+  const availableDropTargetIds = React.useMemo(
+    () => new Set(availableDropTargets.map((n) => n.id)),
+    [availableDropTargets],
   );
 
   const handleDragOver = React.useCallback(
@@ -568,7 +604,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       const slotIndex = findActiveSlotAt(
-        availableNodes,
+        availableDropTargets,
         nodesInfo,
         slots,
         cursorPos.x,
@@ -584,21 +620,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.nodeDragOver(null);
       }
     },
-    [availableNodes, nodesInfo, api, slots, getViewCoordinates],
+    [getViewCoordinates, availableDropTargets, nodesInfo, slots, api],
   );
 
   const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
 
   const handleDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
+      const draggedNode = getCurrentlyDraggedNode();
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
-      if (!cursorPos) {
+      if (!draggedNode || !cursorPos) {
         return;
       }
 
-      const activeSlot = findActiveSlotAt(
-        availableNodes,
+      let activeSlot = findActiveSlotAt(
+        availableDropTargets,
         nodesInfo,
         slots,
         cursorPos.x,
@@ -606,16 +643,25 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       );
 
       if (activeSlot) {
+        let parent = studioDom.getNode(dom, activeSlot.parentId);
+
+        if (!studioDom.isElement(parent) && !studioDom.isPage(parent)) {
+          throw new Error(`Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`);
+        }
+
+        if (studioDom.isPage(parent) && draggedNode.attributes.component.value !== ROW_COMPONENT) {
+          // TODO: this logic should probably live in the DomReducer?
+          const container = studioDom.createElement(dom, ROW_COMPONENT, {});
+          domApi.addNode(container, parent, 'children');
+          parent = container;
+          activeSlot = { parentId: parent.id, parentProp: 'children' };
+        }
+
         if (newNode) {
-          const parent = studioDom.getNode(dom, activeSlot.parentId);
           if (studioDom.isElement(parent)) {
             domApi.addNode(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
-          } else if (studioDom.isPage(parent)) {
-            domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
           } else {
-            throw new Error(
-              `Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`,
-            );
+            domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
           }
         } else if (selection) {
           domApi.moveNode(
@@ -628,8 +674,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       api.nodeDragEnd();
+      if (activeSlot && newNode) {
+        api.select(newNode.id);
+      }
     },
-    [dom, availableNodes, nodesInfo, domApi, api, slots, newNode, selection, getViewCoordinates],
+    [
+      dom,
+      nodesInfo,
+      domApi,
+      api,
+      slots,
+      newNode,
+      selection,
+      getViewCoordinates,
+      getCurrentlyDraggedNode,
+      availableDropTargets,
+    ],
   );
 
   const handleDragEnd = React.useCallback(
@@ -670,11 +730,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (selection && event.key === 'Backspace') {
-        domApi.removeNode(selection);
+        const toRemove = studioDom.getNode(dom, selection);
+        domApi.removeNode(toRemove.id);
         api.deselect();
       }
     },
-    [domApi, api, selection],
+    [selection, dom, domApi, api],
   );
 
   const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
@@ -739,19 +800,23 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.pageViewStateUpdate(getPageViewState(rootElm));
 
-      const handlePageMutation = throttle(
+      const handlePageUpdate = throttle(
         () => api.pageViewStateUpdate(getPageViewState(rootElm)),
         250,
         { trailing: true },
       );
 
-      const observer = new MutationObserver(handlePageMutation);
+      const mutationObserver = new MutationObserver(handlePageUpdate);
 
-      observer.observe(rootElm, {
+      mutationObserver.observe(rootElm, {
         attributes: true,
         childList: true,
         subtree: true,
       });
+
+      const resizeObserver = new ResizeObserver(handlePageUpdate);
+
+      resizeObserver.observe(rootElm);
 
       // eslint-disable-next-line no-underscore-dangle
       const queuedEvents = Array.isArray(editorWindow.__STUDIO_RUNTIME_EVENT__)
@@ -765,8 +830,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       editorWindow.__STUDIO_RUNTIME_EVENT__ = (event) => handleRuntimeEventRef.current(event);
 
       return () => {
-        handlePageMutation.cancel();
-        observer.disconnect();
+        handlePageUpdate.cancel();
+        mutationObserver.disconnect();
+        resizeObserver.disconnect();
         // eslint-disable-next-line no-underscore-dangle
         delete editorWindow.__STUDIO_RUNTIME_EVENT__;
       };
@@ -810,6 +876,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                       key={`${nodeId}:${slot.parentIndex}`}
                       style={insertSlotAbsolutePositionCss(slot)}
                       className={clsx(overlayClasses.insertSlotHud, {
+                        [overlayClasses.available]:
+                          highlightLayout && availableDropTargetIds.has(nodeId),
                         [overlayClasses.active]:
                           highlightedSlot?.parentId === nodeId &&
                           highlightedSlot?.parentProp === parentProp &&
@@ -821,6 +889,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                       key={`${nodeId}:${slot.parentIndex}`}
                       style={absolutePositionCss(slot.rect)}
                       className={clsx(overlayClasses.slotHud, {
+                        [overlayClasses.available]:
+                          highlightLayout && availableDropTargetIds.has(nodeId),
                         [overlayClasses.active]:
                           highlightedSlot?.parentId === nodeId &&
                           highlightedSlot?.parentProp === parentProp,

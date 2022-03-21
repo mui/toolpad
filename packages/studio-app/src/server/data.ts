@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../prisma/generated/client';
+import { DomNodeAttributeType, PrismaClient, Release } from '../../prisma/generated/client';
 import {
   StudioConnection,
   ConnectionStatus,
@@ -13,6 +13,7 @@ import studioDataSources from '../studioDataSources/server';
 import * as studioDom from '../studioDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
+import { decryptSecret, encryptSecret } from './secrets';
 
 const prisma = new PrismaClient();
 
@@ -28,44 +29,20 @@ export async function createApp(name: string) {
   });
 }
 
-function createDefaultPage(dom: studioDom.StudioDom, name: string): studioDom.StudioDom {
-  const page = studioDom.createNode(dom, 'page', {
-    name,
-    attributes: {
-      title: studioDom.createConst(name),
-      urlQuery: studioDom.createConst({}),
-    },
+export async function deleteApp(id: string) {
+  return prisma.app.delete({
+    where: { id },
   });
-  const app = studioDom.getApp(dom);
-  dom = studioDom.addNode(dom, page, app, 'pages');
-
-  const container = studioDom.createElement(dom, 'Container', {
-    sx: studioDom.createConst({ my: 2 }),
-  });
-  dom = studioDom.addNode(dom, container, page, 'children');
-
-  const stack = studioDom.createElement(dom, 'Stack', {
-    gap: studioDom.createConst(2),
-    direction: studioDom.createConst('column'),
-    alignItems: studioDom.createConst('stretch'),
-  });
-  dom = studioDom.addNode(dom, stack, container, 'children');
-
-  return dom;
 }
 
-function createDefaultApp(): studioDom.StudioDom {
-  let dom = studioDom.createDom();
-  dom = createDefaultPage(dom, 'DefaultPage');
-  return dom;
+function serializeValue(value: unknown, type: DomNodeAttributeType): string {
+  const serialized = value === undefined ? '' : JSON.stringify(value);
+  return type === 'secret' ? encryptSecret(serialized) : serialized;
 }
 
-function serializeValue(value: unknown): string {
-  return value === undefined ? '' : JSON.stringify(value);
-}
-
-function deserializeValue(dbValue: string): unknown {
-  return dbValue.length <= 0 ? undefined : JSON.parse(dbValue);
+function deserializeValue(dbValue: string, type: DomNodeAttributeType): unknown {
+  const serialized = type === 'secret' ? decryptSecret(dbValue) : dbValue;
+  return serialized.length <= 0 ? undefined : JSON.parse(serialized);
 }
 
 export async function saveDom(appId: string, app: studioDom.StudioDom): Promise<void> {
@@ -94,7 +71,7 @@ export async function saveDom(appId: string, app: studioDom.StudioDom): Promise<
               namespace,
               name: attributeName,
               type: attributeValue.type,
-              value: serializeValue(attributeValue.value),
+              value: serializeValue(attributeValue.value, attributeValue.type),
             };
           });
         });
@@ -110,9 +87,9 @@ export async function loadDom(appId: string): Promise<studioDom.StudioDom> {
     include: { attributes: true },
   });
   if (dbNodes.length <= 0) {
-    const app = createDefaultApp();
-    await saveDom(appId, app);
-    return app;
+    const dom = studioDom.createDom();
+    await saveDom(appId, dom);
+    return dom;
   }
   const root = dbNodes.find((node) => !node.parentId)?.id as NodeId;
   const nodes = Object.fromEntries(
@@ -135,7 +112,7 @@ export async function loadDom(appId: string): Promise<studioDom.StudioDom> {
             }
             result[attribute.namespace][attribute.name] = {
               type: attribute.type,
-              value: deserializeValue(attribute.value),
+              value: deserializeValue(attribute.value, attribute.type),
             } as StudioBindable<unknown>;
             return result;
           }, {} as Record<string, Record<string, StudioBindable<unknown>>>),
@@ -155,11 +132,10 @@ interface CreateReleaseParams {
 }
 
 const SELECT_RELEASE_META = {
-  id: true,
   version: true,
   description: true,
   createdAt: true,
-};
+} as const;
 
 export function findLastRelease(appId: string) {
   return prisma.release.findFirst({
@@ -168,17 +144,21 @@ export function findLastRelease(appId: string) {
   });
 }
 
-export async function createRelease(appId: string, { description }: CreateReleaseParams) {
+export async function createRelease(
+  appId: string,
+  { description }: CreateReleaseParams,
+): Promise<Pick<Release, keyof typeof SELECT_RELEASE_META>> {
   const currentDom = await loadDom(appId);
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
 
   const lastRelease = await findLastRelease(appId);
+  const versionNumber = lastRelease ? lastRelease.version + 1 : 1;
 
   const release = await prisma.release.create({
     select: SELECT_RELEASE_META,
     data: {
       appId,
-      version: lastRelease ? lastRelease.version + 1 : 1,
+      version: versionNumber,
       description,
       snapshot,
     },
@@ -194,6 +174,13 @@ export async function getReleases(appId: string) {
     orderBy: {
       createdAt: 'desc',
     },
+  });
+}
+
+export async function getRelease(appId: string, version: number) {
+  return prisma.release.findUnique({
+    where: { release_app_constraint: { appId, version } },
+    select: SELECT_RELEASE_META,
   });
 }
 
@@ -261,7 +248,7 @@ export async function addConnection(
     name,
     attributes: {
       dataSource: studioDom.createConst(type),
-      params: studioDom.createConst(params),
+      params: studioDom.createSecret(params),
       status: studioDom.createConst(status),
     },
   });
@@ -292,7 +279,7 @@ export async function updateConnection(
       existing,
       'attributes',
       'params',
-      studioDom.createConst(params),
+      studioDom.createSecret(params),
     );
   }
   if (status !== undefined) {
@@ -342,6 +329,28 @@ export async function execApi<Q>(
   }
 
   return dataSource.exec(connection, api.attributes.query.value, params);
+}
+
+export async function dataSourceFetchPrivate(
+  appId: string,
+  connectionId: NodeId,
+  query: any,
+): Promise<any> {
+  const connection = await getConnection(appId, connectionId);
+  const dataSource: StudioDataSourceServer<any, any, any> | undefined =
+    studioDataSources[connection.type];
+
+  if (!dataSource) {
+    throw new Error(
+      `Unknown connection type "${connection.type}" for connection "${connection.id}"`,
+    );
+  }
+
+  if (!dataSource.execPrivate) {
+    throw new Error(`No execPrivate available on datasource "${connection.type}"`);
+  }
+
+  return dataSource.execPrivate(connection, query);
 }
 
 export function parseVersion(param?: string | string[]): VersionOrPreview | null {

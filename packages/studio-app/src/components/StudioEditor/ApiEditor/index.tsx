@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useQuery } from 'react-query';
 import { Alert, Box, Button, LinearProgress, Stack, Toolbar } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import Splitter, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
 import { NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
@@ -73,9 +74,18 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
   const previewIsInvalid: boolean = !connection && !previewQuery.isError;
 
   return (
-    <Box className={className} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Splitter direction={SplitDirection.Vertical} gutterTheme={GutterTheme.Light}>
+      {/*  <Box className={className} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}> */}
       <Box
-        sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', px: 3, pt: 3 }}
+        sx={{
+          width: '100%',
+          height: '100%',
+          overflowY: 'auto',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          p: 3,
+        }}
       >
         <ConnectionSelect
           dataSource={dataSourceName}
@@ -114,7 +124,16 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
           />
         </Stack>
       </Box>
-      <Box sx={{ flex: 1, overflow: 'auto', borderTop: 1, borderColor: 'divider' }}>
+      <Box
+        sx={{
+          width: '100%',
+          height: '100%',
+          overflowY: 'auto',
+          flex: 1,
+          borderTop: 1,
+          borderColor: 'divider',
+        }}
+      >
         {previewQuery.isLoading || (previewIsInvalid && previewQuery.isFetching) ? (
           <LinearProgress />
         ) : null}
@@ -125,7 +144,8 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
           <pre>{JSON.stringify(previewQuery.data, null, 2)}</pre>
         ) : null}
       </Box>
-    </Box>
+      {/*     </Box> */}
+    </Splitter>
   );
 }
 

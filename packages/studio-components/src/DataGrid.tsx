@@ -9,9 +9,8 @@ import {
   GridColumnOrderChangeParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useStudioNode } from '@mui/studio-core';
+import { useStudioNode, UseDataQuery } from '@mui/studio-core';
 import { debounce } from '@mui/material';
-import { UseDataQuery } from 'packages/studio-core/dist/useDataQuery';
 
 function inferColumnType(value: unknown): string | undefined {
   if (value instanceof Date) {

@@ -18,6 +18,7 @@ import { NodeId } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
 import DialogForm from '../../DialogForm';
 import { useDom, useDomApi } from '../../DomLoader';
+import dataSources from '../../../studioDataSources/client';
 
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
@@ -91,9 +92,16 @@ export default function CreateStudioApiDialog({
             throw new Error(`Invariant: Selected non-existing connection "${connectionId}"`);
           }
 
+          const dataSource = dataSources[connection.attributes.dataSource.value];
+          if (!dataSource) {
+            throw new Error(
+              `Invariant: Selected non-existing dataSource "${connection.attributes.dataSource.value}"`,
+            );
+          }
+
           const newApiNode = studioDom.createNode(dom, 'api', {
             attributes: {
-              query: studioDom.createConst({}),
+              query: studioDom.createConst(dataSource.getInitialQueryValue()),
               connectionId: studioDom.createConst(connectionId),
               dataSource: connection.attributes.dataSource,
             },

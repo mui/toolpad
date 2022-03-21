@@ -61,7 +61,7 @@ export type RpcResponse =
       error?: undefined;
     }
   | {
-      error: { message: string };
+      error: { message: string; stack?: string };
     };
 
 function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
@@ -85,7 +85,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       result = await method(params, context);
     } catch (error) {
       if (error instanceof Error) {
-        res.json({ error: { message: error.message } });
+        res.json({ error: { message: error.message, stack: error.stack } });
       } else {
         res.status(500).end();
       }

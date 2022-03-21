@@ -4,6 +4,8 @@ import clsx from 'clsx';
 import { RuntimeEvent, SlotType } from '@mui/studio-core';
 import throttle from 'lodash/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { IconButton } from '@mui/material';
 import {
   NodeId,
   FlowDirection,
@@ -84,7 +86,8 @@ const OverlayRoot = styled('div')({
     // TODO: figure out positioning of this selectionhint, it should
     //   - prefer top right, above the component
     //   - if that appears out of bound of the editor, show it bottom or left
-    // transform: `translate(0, -100%)`,
+    zIndex: 1,
+    transform: `translate(0, -100%)`,
   },
 
   [`& .${overlayClasses.nodeHud}`]: {
@@ -466,11 +469,20 @@ interface SelectionHudProps {
   selected?: boolean;
   allowInteraction?: boolean;
   onDragStart?: React.DragEventHandler<HTMLElement>;
+  onDelete?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-function NodeHud({ node, selected, allowInteraction, rect, onDragStart }: SelectionHudProps) {
+function NodeHud({
+  node,
+  selected,
+  allowInteraction,
+  rect,
+  onDragStart,
+  onDelete,
+}: SelectionHudProps) {
   const dom = useDom();
   const component = useStudioComponent(dom, node.attributes.component.value);
+
   return (
     <div
       draggable
@@ -485,6 +497,9 @@ function NodeHud({ node, selected, allowInteraction, rect, onDragStart }: Select
       <div draggable className={overlayClasses.selectionHint}>
         {component.displayName}
         <DragIndicatorIcon color="inherit" fontSize="small" />
+        <IconButton color="inherit" size="small" onClick={onDelete}>
+          <DeleteIcon color="inherit" fontSize="small" />
+        </IconButton>
       </div>
     </div>
   );
@@ -727,17 +742,23 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [api, pageNodes, nodesInfo, getViewCoordinates],
   );
 
+  const handleDelete = React.useCallback(
+    (nodeId: NodeId) => {
+      const toRemove = studioDom.getNode(dom, nodeId);
+      domApi.removeNode(toRemove.id);
+      api.deselect();
+    },
+    [dom, domApi, api],
+  );
+
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (selection && event.key === 'Backspace') {
-        const toRemove = studioDom.getNode(dom, selection);
-        domApi.removeNode(toRemove.id);
-        api.deselect();
+        handleDelete(selection);
       }
     },
-    [selection, dom, domApi, api],
+    [selection, handleDelete],
   );
-
   const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
 
   const nodesWithInteraction = React.useMemo<Set<NodeId>>(() => {
@@ -918,6 +939,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                   selected={selectedNode?.id === node.id}
                   allowInteraction={nodesWithInteraction.has(node.id)}
                   onDragStart={handleDragStart}
+                  onDelete={() => handleDelete(node.id)}
                 />
               )
             );

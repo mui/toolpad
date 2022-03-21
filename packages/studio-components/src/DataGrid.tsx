@@ -113,8 +113,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const rows: GridRowsProp = rowsProp || dataQueryRows || EMPTY_ROWS;
 
   const columnsInitRef = React.useRef(false);
+  const hasColumnsDefined = columnsProp && columnsProp.length > 0;
   React.useEffect(() => {
-    if (!studioNode || columnsProp || rows.length <= 0 || columnsInitRef.current) {
+    if (!studioNode || hasColumnsDefined || rows.length <= 0 || columnsInitRef.current) {
       return;
     }
 
@@ -123,7 +124,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     studioNode.setProp('columns', inferredColumns);
 
     columnsInitRef.current = true;
-  }, [columnsProp, rows, studioNode]);
+  }, [hasColumnsDefined, rows, studioNode]);
 
   const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
 

@@ -28,6 +28,12 @@ export async function createApp(name: string) {
   });
 }
 
+export async function deleteApp(id: string) {
+  return prisma.app.delete({
+    where: { id },
+  });
+}
+
 function serializeValue(value: unknown, type: DomNodeAttributeType): string {
   const serialized = value === undefined ? '' : JSON.stringify(value);
   return type === 'secret' ? encryptSecret(serialized) : serialized;

@@ -16,6 +16,7 @@ import {
   createDeployment,
   findActiveDeployment,
   findLastRelease,
+  deleteApp,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
@@ -137,6 +138,9 @@ const rpcServer = {
   mutation: {
     createApp: createMethod<typeof createApp>((params) => {
       return createApp(...params);
+    }),
+    deleteApp: createMethod<typeof deleteApp>((params) => {
+      return deleteApp(...params);
     }),
     createRelease: createMethod<typeof createRelease>((params) => {
       return createRelease(...params);

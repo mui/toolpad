@@ -1,6 +1,6 @@
 import { JSONSchemaType } from 'ajv';
 import { GridEnrichedColDef } from '@mui/x-data-grid-pro';
-import { UseDataQuery } from '@mui/studio-core/dist/useDataQuery';
+import { UseDataQuery } from '@mui/studio-core';
 
 type StudioColDef = Pick<GridEnrichedColDef, 'field' | 'align'>;
 type StudioGridColumns = StudioColDef[];

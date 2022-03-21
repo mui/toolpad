@@ -56,6 +56,7 @@ export function BindableEditor<V>({
   const bindingId = `${nodeId}${propNamespace ? `.${propNamespace}` : ''}.${propName}`;
   const { viewState } = usePageEditorState();
   const liveBinding = viewState.bindings[bindingId];
+  const globalScope = viewState.pageState;
 
   const initConstValue = React.useCallback(() => {
     if (value?.type === 'const') {
@@ -83,7 +84,8 @@ export function BindableEditor<V>({
             onChange={handlePropConstChange}
           />
           <BindingEditor<V>
-            bindingId={`${nodeId}${propNamespace ? `.${propNamespace}` : ''}.${propName}`}
+            globalScope={globalScope}
+            liveBinding={liveBinding}
             propType={argType.typeDef}
             value={value}
             onChange={onChange}

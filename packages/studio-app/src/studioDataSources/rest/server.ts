@@ -6,6 +6,7 @@ import {
 } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';
+import evalExpression from '../../server/evalExpression';
 
 async function resolveBindableString(
   bindable: StudioBindable<string>,
@@ -21,6 +22,9 @@ async function resolveBindableString(
     const parsed = bindings.parse(bindable.value);
     const resolved = bindings.resolve(parsed, (interpolation) => boundValues[interpolation] || '');
     return bindings.formatStringValue(resolved);
+  }
+  if (bindable.type === 'jsExpression') {
+    return evalExpression(bindable.value, boundValues);
   }
   throw new Error(`Can't resolve bindable of type "${(bindable as StudioBindable<unknown>).type}"`);
 }

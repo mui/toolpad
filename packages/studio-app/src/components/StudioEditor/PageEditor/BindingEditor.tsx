@@ -10,20 +10,21 @@ import {
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
-import { PropValueType } from '@mui/studio-core';
+import { LiveBinding, PropValueType } from '@mui/studio-core';
 import { StudioBindable } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
 import { JsExpressionEditor } from './JsExpressionEditor';
-import { usePageEditorState } from './PageEditorProvider';
 import RuntimeErrorAlert from './RuntimeErrorAlert';
 import JsonView from '../../JsonView';
 import { tryFormatExpression } from '../../../utils/prettier';
 
 interface JsExpressionBindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+  globalScope: Record<string, unknown>;
   onCommit?: () => void;
 }
 
 function JsExpressionBindingEditor<V>({
+  globalScope,
   value,
   onChange,
   onCommit,
@@ -35,6 +36,7 @@ function JsExpressionBindingEditor<V>({
 
   return (
     <JsExpressionEditor
+      globalScope={globalScope}
       value={value?.type === 'jsExpression' ? value.value : ''}
       onChange={handleChange}
       onCommit={onCommit}
@@ -43,21 +45,20 @@ function JsExpressionBindingEditor<V>({
 }
 
 export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+  globalScope: Record<string, unknown>;
+  liveBinding?: LiveBinding;
   disabled?: boolean;
-  bindingId: string;
   propType: PropValueType;
 }
 
 export function BindingEditor<V>({
+  globalScope,
+  liveBinding,
   disabled,
-  bindingId,
   propType,
   value,
   onChange,
 }: BindingEditorProps<V>) {
-  const { viewState } = usePageEditorState();
-  const liveBinding = viewState.bindings[bindingId];
-
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
 
@@ -95,6 +96,7 @@ export function BindingEditor<V>({
         <DialogContent>
           <div>Type: {propType.type}</div>
           <JsExpressionBindingEditor<V>
+            globalScope={globalScope}
             onCommit={handleCommit}
             value={input}
             onChange={(newValue) => setInput(newValue)}

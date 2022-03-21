@@ -6,6 +6,7 @@ import { WithControlledProp } from '../../../utils/types';
 import { usePageEditorState } from './PageEditorProvider';
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
+  globalScope: Record<string, unknown>;
   onCommit?: () => void;
 }
 

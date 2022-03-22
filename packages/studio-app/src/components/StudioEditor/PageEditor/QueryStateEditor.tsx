@@ -27,6 +27,7 @@ import { ExactEntriesOf } from '../../../utils/types';
 import { getQueryNodeArgTypes } from '../../../studioDataSources/client';
 import NodeAttributeEditor from './NodeAttributeEditor';
 import NodeNameEditor from '../NodeNameEditor';
+import JsonView from '../../JsonView';
 
 interface ParamsEditorProps<Q> {
   node: studioDom.StudioNode;
@@ -63,7 +64,7 @@ function PreviewQueryStateResult({ node }: PreviewQueryStateResultProps) {
   return (
     <Box sx={{ maxHeight: 150, overflow: 'auto' }}>
       {node.attributes.api.value ? (
-        <pre>{JSON.stringify(actualNodeState?.data, null, 2)}</pre>
+        <JsonView src={actualNodeState?.data} />
       ) : (
         <Typography>No data</Typography>
       )}

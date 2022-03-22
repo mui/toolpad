@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useQuery } from 'react-query';
 import { Alert, Box, Button, LinearProgress, Stack, Toolbar } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import Splitter, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
+import SplitPane from 'react-split-pane';
 import { NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
@@ -75,21 +75,18 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
   const previewIsInvalid: boolean = !connection && !previewQuery.isError;
 
   return (
-    <Splitter direction={SplitDirection.Vertical} gutterTheme={GutterTheme.Light}>
-      <Box
-        sx={{
+    <Box sx={{ position: 'relative', flex: 1 }}>
+      <SplitPane
+        split="horizontal"
+        allowResize
+        defaultSize="60%"
+        paneStyle={{
           width: '100%',
-          height: '100%',
           overflowY: 'auto',
+          display: 'block',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            p: 3,
-          }}
-        >
+        <Stack sx={{ width: '100%', p: 3 }}>
           <Stack direction="row" gap={2}>
             <NodeNameEditor node={apiNode} />
             <ConnectionSelect
@@ -98,7 +95,7 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
               onChange={handleConnectionChange}
             />
           </Stack>
-          <Toolbar disableGutters sx={{ borderTop: 0, borderColor: 'divider' }}>
+          <Toolbar disableGutters>
             <Button
               onClick={() => {
                 (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
@@ -128,15 +125,7 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
               onChange={(newApiQuery) => setApiQuery(newApiQuery)}
             />
           </Stack>
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          width: '100%',
-          height: '100%',
-          overflowY: 'auto',
-        }}
-      >
+        </Stack>
         {previewQuery.isLoading || (previewIsInvalid && previewQuery.isFetching) ? (
           <LinearProgress />
         ) : null}
@@ -148,8 +137,8 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
             <JsonView src={previewQuery.data} />
           ) : null}
         </Box>
-      </Box>
-    </Splitter>
+      </SplitPane>
+    </Box>
   );
 }
 

@@ -1,10 +1,12 @@
-import { TextField, Typography } from '@mui/material';
+import { Stack, TextField, Typography } from '@mui/material';
 import { ArgTypeDefinitions } from '@mui/studio-core';
 import * as React from 'react';
 import StringRecordEditor from '../../components/StringRecordEditor';
+import { BindingEditor } from '../../components/StudioEditor/BindingEditor';
 import { StudioDataSourceClient } from '../../types';
 import { WithControlledProp } from '../../utils/types';
 import { FetchQuery } from './types';
+import * as studioDom from '../../studioDom';
 
 function ConnectionParamsInput() {
   return <Typography>No input</Typography>;
@@ -15,7 +17,7 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange({
         ...value,
-        url: { type: 'boundExpression', value: event.target.value, format: 'stringLiteral' },
+        url: { type: 'const', value: event.target.value },
       });
     },
     [onChange, value],
@@ -33,13 +35,22 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
 
   return (
     <div>
-      <TextField
-        label="url"
-        size="small"
-        fullWidth
-        value={value.url?.value || ''}
-        onChange={handleUrlChange}
-      />
+      <Stack direction="row" gap={1}>
+        <TextField
+          label="url"
+          size="small"
+          fullWidth
+          value={value.url?.value || ''}
+          onChange={handleUrlChange}
+          disabled={value.url && value.url.type !== 'const'}
+        />
+        <BindingEditor
+          value={value.url}
+          onChange={(url) => onChange({ ...value, url: url || studioDom.createConst('') })}
+          propType={{ type: 'string' }}
+          globalScope={{ query: value.params }}
+        />
+      </Stack>
       <StringRecordEditor
         label="api query"
         fieldLabel="parameter"

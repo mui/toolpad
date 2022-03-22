@@ -6566,6 +6566,11 @@ quick-lru@^4.0.1:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-4.0.1.tgz#5b8878f113a58217848c6482026c73e1ba57727f"
   integrity sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==
 
+quickjs-emscripten@^0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/quickjs-emscripten/-/quickjs-emscripten-0.15.0.tgz#636b87d09a9ae79772fca20cce8ad74a1c1a5542"
+  integrity sha512-7b32VY45/Rmo/S81W0VcHnsPW9yvCbGOCjf+xl8XYcQIL/FmbfmwroJPnyXHRYC0HO8mk8cTkvsMC+0bR/NrJA==
+
 ramda@^0.27.1:
   version "0.27.2"
   resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.27.2.tgz#84463226f7f36dc33592f6f4ed6374c48306c3f1"

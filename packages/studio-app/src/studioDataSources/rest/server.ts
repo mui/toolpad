@@ -24,7 +24,9 @@ async function resolveBindableString(
     return bindings.formatStringValue(resolved);
   }
   if (bindable.type === 'jsExpression') {
-    return evalExpression(bindable.value, boundValues);
+    return evalExpression(bindable.value, {
+      query: boundValues,
+    });
   }
   throw new Error(`Can't resolve bindable of type "${(bindable as StudioBindable<unknown>).type}"`);
 }

@@ -94,7 +94,9 @@ export function BindingEditor<V>({
       <Dialog onClose={handleClose} open={open} fullWidth scroll="body">
         <DialogTitle>Bind a property</DialogTitle>
         <DialogContent>
-          <div>Type: {propType.type}</div>
+          <Box sx={{ mb: 2 }}>
+            Expected type: <code>{propType.type}</code>
+          </Box>
           <JsExpressionBindingEditor<V>
             globalScope={globalScope}
             onCommit={handleCommit}

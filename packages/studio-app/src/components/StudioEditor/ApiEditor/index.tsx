@@ -90,12 +90,15 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
             p: 3,
           }}
         >
-          <ConnectionSelect
-            dataSource={dataSourceName}
-            value={connection?.id ?? null}
-            onChange={handleConnectionChange}
-          />
-          <Toolbar disableGutters>
+          <Stack direction="row" gap={2}>
+            <NodeNameEditor node={apiNode} />
+            <ConnectionSelect
+              dataSource={dataSourceName}
+              value={connection?.id ?? null}
+              onChange={handleConnectionChange}
+            />
+          </Stack>
+          <Toolbar disableGutters sx={{ borderTop: 0, borderColor: 'divider' }}>
             <Button
               onClick={() => {
                 (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
@@ -117,7 +120,6 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
             </Button>
           </Toolbar>
           <Stack spacing={2}>
-            <NodeNameEditor node={apiNode} />
             <dataSource.QueryEditor
               api={queryEditorApi}
               // TODO: Add disabled mode to QueryEditor

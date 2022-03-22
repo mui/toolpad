@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useQuery } from 'react-query';
 import { Alert, Box, Button, LinearProgress, Stack, Toolbar } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import Splitter, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
 import { NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
@@ -11,6 +12,7 @@ import useDebounced from '../../../utils/useDebounced';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 import { ConnectionSelect } from '../HierarchyExplorer/CreateStudioApiDialog';
+import JsonView from '../../JsonView';
 
 interface ApiEditorContentProps<Q> {
   appId: string;
@@ -73,59 +75,81 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
   const previewIsInvalid: boolean = !connection && !previewQuery.isError;
 
   return (
-    <Box className={className} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Splitter direction={SplitDirection.Vertical} gutterTheme={GutterTheme.Light}>
       <Box
-        sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', px: 3, pt: 3 }}
+        sx={{
+          width: '100%',
+          height: '100%',
+          overflowY: 'auto',
+        }}
       >
-        <ConnectionSelect
-          dataSource={dataSourceName}
-          value={connection?.id ?? null}
-          onChange={handleConnectionChange}
-        />
-        <Toolbar disableGutters>
-          <Button
-            onClick={() => {
-              (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
-                if (typeof propName !== 'string' || !apiQuery[propName]) {
-                  return;
-                }
-                domApi.setNodeNamespacedProp(
-                  apiNode,
-                  'attributes',
-                  'query',
-                  studioDom.createConst(apiQuery),
-                );
-              });
-              savedQuery.current = apiQuery;
-            }}
-            disabled={savedQuery.current === apiQuery}
-          >
-            Update
-          </Button>
-        </Toolbar>
-        <Stack spacing={2}>
-          <NodeNameEditor node={apiNode} />
-          <dataSource.QueryEditor
-            api={queryEditorApi}
-            // TODO: Add disabled mode to QueryEditor
-            // disabled={!connection}
-            value={apiQuery}
-            onChange={(newApiQuery) => setApiQuery(newApiQuery)}
-          />
-        </Stack>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            p: 3,
+          }}
+        >
+          <Stack direction="row" gap={2}>
+            <NodeNameEditor node={apiNode} />
+            <ConnectionSelect
+              dataSource={dataSourceName}
+              value={connection?.id ?? null}
+              onChange={handleConnectionChange}
+            />
+          </Stack>
+          <Toolbar disableGutters sx={{ borderTop: 0, borderColor: 'divider' }}>
+            <Button
+              onClick={() => {
+                (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
+                  if (typeof propName !== 'string' || !apiQuery[propName]) {
+                    return;
+                  }
+                  domApi.setNodeNamespacedProp(
+                    apiNode,
+                    'attributes',
+                    'query',
+                    studioDom.createConst(apiQuery),
+                  );
+                });
+                savedQuery.current = apiQuery;
+              }}
+              disabled={savedQuery.current === apiQuery}
+            >
+              Update
+            </Button>
+          </Toolbar>
+          <Stack spacing={2}>
+            <dataSource.QueryEditor
+              api={queryEditorApi}
+              // TODO: Add disabled mode to QueryEditor
+              // disabled={!connection}
+              value={apiQuery}
+              onChange={(newApiQuery) => setApiQuery(newApiQuery)}
+            />
+          </Stack>
+        </Box>
       </Box>
-      <Box sx={{ flex: 1, overflow: 'auto', borderTop: 1, borderColor: 'divider' }}>
+      <Box
+        sx={{
+          width: '100%',
+          height: '100%',
+          overflowY: 'auto',
+        }}
+      >
         {previewQuery.isLoading || (previewIsInvalid && previewQuery.isFetching) ? (
           <LinearProgress />
         ) : null}
-        {previewQuery.isError ? (
-          <Alert severity="error">{(previewQuery.error as Error).message}</Alert>
-        ) : null}
-        {!previewIsInvalid && previewQuery.isSuccess ? (
-          <pre>{JSON.stringify(previewQuery.data, null, 2)}</pre>
-        ) : null}
+        <Box sx={{ p: 2 }}>
+          {previewQuery.isError ? (
+            <Alert severity="error">{(previewQuery.error as Error).message}</Alert>
+          ) : null}
+          {!previewIsInvalid && previewQuery.isSuccess ? (
+            <JsonView src={previewQuery.data} />
+          ) : null}
+        </Box>
       </Box>
-    </Box>
+    </Splitter>
   );
 }
 

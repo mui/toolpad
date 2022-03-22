@@ -4,6 +4,7 @@ orbs:
 
 defaults: &defaults
   working_directory: /tmp/mui-studio
+  resource_class: medium
   docker:
     - image: cimg/node:14.19
 # CircleCI has disabled the cache across forks for security reasons.

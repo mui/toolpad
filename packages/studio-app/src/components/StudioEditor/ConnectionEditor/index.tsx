@@ -30,17 +30,29 @@ function ConnectionParamsEditor<P>({
   value,
   onChange,
   connectionId,
+  appId,
+  handlerBasePath,
 }: ConnectionParamsEditorProps<P>) {
   const { ConnectionParamsInput } = dataSource;
-  return <ConnectionParamsInput connectionId={connectionId} value={value} onChange={onChange} />;
+  return (
+    <ConnectionParamsInput
+      handlerBasePath={handlerBasePath}
+      connectionId={connectionId}
+      value={value}
+      onChange={onChange}
+      appId={appId}
+    />
+  );
 }
 
 interface ConnectionEditorContentProps<P> {
+  appId: string;
   className?: string;
   connectionNode: studioDom.StudioConnectionNode<P>;
 }
 
 function ConnectionEditorContent<P>({
+  appId,
   className,
   connectionNode,
 }: ConnectionEditorContentProps<P>) {
@@ -50,8 +62,9 @@ function ConnectionEditorContent<P>({
     connectionNode.attributes.params.value,
   );
   const savedConnectionParams = React.useRef<P | null>(connectionNode.attributes.params.value);
+  const dataSourceType = connectionNode.attributes.dataSource.value;
 
-  const dataSource = dataSources[connectionNode.attributes.dataSource.value];
+  const dataSource = dataSources[dataSourceType];
 
   const [isTesting, setIsTesting] = React.useState(false);
   const [testResult, setTestResult] = React.useState<{
@@ -130,6 +143,8 @@ function ConnectionEditorContent<P>({
             dataSource={dataSource}
             value={connectionParams}
             onChange={setConnectionParams}
+            handlerBasePath={`/api/dataSources/${dataSourceType}`}
+            appId={appId}
             connectionId={connectionNode.id}
           />
         ) : (
@@ -143,15 +158,21 @@ function ConnectionEditorContent<P>({
 }
 
 export interface ConnectionProps {
+  appId: string;
   className?: string;
 }
 
-export default function ConnectionEditor({ className }: ConnectionProps) {
+export default function ConnectionEditor({ appId, className }: ConnectionProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const connectionNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
   return connectionNode ? (
-    <ConnectionEditorContent className={className} key={nodeId} connectionNode={connectionNode} />
+    <ConnectionEditorContent
+      appId={appId}
+      className={className}
+      key={nodeId}
+      connectionNode={connectionNode}
+    />
   ) : (
     <NotFoundEditor className={className} message={`Non-existing Connection "${nodeId}"`} />
   );

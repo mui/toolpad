@@ -17,8 +17,6 @@ import { decryptSecret, encryptSecret } from './secrets';
 
 const prisma = new PrismaClient();
 
-type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
-
 export async function getApps() {
   return prisma.app.findMany();
 }

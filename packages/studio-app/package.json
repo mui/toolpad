@@ -56,7 +56,7 @@
     "esinstall": "^1.1.7",
     "find-up": "^6.2.0",
     "fractional-indexing": "^2.0.0",
-    "googleapis": "39",
+    "googleapis": "^97.0.0",
     "import-meta-resolve": "^1.1.1",
     "json-to-ts": "^1.7.0",
     "monaco-editor": "^0.32.1",

@@ -20,10 +20,3 @@ export default (async (req, res) => {
   // Handle any other HTTP method
   return res.status(405).json({ message: 'Method not supported' });
 }) as NextApiHandler;
-
-// packages/studio-app/pages/api/dataSources/[dataSource]/[...path].ts
-
-// /api/dataSources/googleSheets/auth/login
-// /api/dataSources/googleSheets/auth/callback
-// /api/dataSources/googleSheets/data/list
-// /api/dataSources/googleSheets/data/sheet/:sheetId

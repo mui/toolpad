@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { google } from 'googleapis';
-import { match, MatchResult } from 'path-to-regexp';
+import { match } from 'path-to-regexp';
 import {
   StudioApiResult,
   StudioDataSourceServer,
@@ -10,7 +10,7 @@ import {
 } from '../../types';
 import config from '../../server/config';
 import { asArray } from '../../utils/collections';
-import { GoogleSpreadsheet, GoogleSheetsConnectionParams, GoogleSheetsQuery } from './types';
+import { GoogleSheetsActionKind, GoogleSheetsConnectionParams, GoogleSheetsQuery } from './types';
 
 async function test(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
@@ -36,6 +36,54 @@ function createOAuthClient() {
     config.googleSheetsClientSecret,
     config.googleSheetsRedirectUri,
   );
+}
+
+async function execPrivate(
+  connection: StudioConnection<GoogleSheetsConnectionParams>,
+  query: GoogleSheetsQuery,
+): Promise<any> {
+  const client = createOAuthClient();
+  if (client) {
+    if (connection.params) {
+      client.setCredentials(connection.params);
+    }
+    if (query.type === GoogleSheetsActionKind.FETCH_SHEET) {
+      const sheetsClient = google.sheets({
+        version: 'v4',
+        auth: client,
+      });
+      const spreadsheetId = query.spreadsheet?.id;
+      try {
+        const response = await sheetsClient.spreadsheets.get({
+          spreadsheetId,
+          includeGridData: false,
+        });
+        if (response.statusText === 'OK') {
+          const { sheets } = response.data;
+          return { sheets: sheets?.map((sheet) => sheet.properties) };
+        }
+      } catch (error) {
+        throw new Error(`Unable to fetch spreadsheetId ${query?.spreadsheet?.id}`);
+      }
+    } else if (query.type === GoogleSheetsActionKind.FETCH_SPREADSHEETS) {
+      const driveClient = google.drive({
+        version: 'v3',
+        auth: client,
+      });
+      try {
+        const response = await driveClient.files.list({
+          q: "mimeType='application/vnd.google-apps.spreadsheet'",
+        });
+        return response.data;
+      } catch (error) {
+        throw new Error(`Unable to fetch spreadsheets`);
+      }
+    }
+  }
+  return {
+    fields: {},
+    data: [],
+  };
 }
 
 async function exec(
@@ -101,11 +149,9 @@ async function handler(
 
   const matchAuthLogin = match('/auth/login', { decode: decodeURIComponent });
   const matchAuthCallback = match('/auth/callback', { decode: decodeURIComponent });
-  const matchDataSpreadsheet = match<GoogleSpreadsheet>('/data/spreadsheet/:id', {
-    decode: decodeURIComponent,
-  });
 
   const [state] = asArray(req.query.state);
+  const { connectionId, appId } = JSON.parse(decodeURIComponent(state));
 
   if (!client) {
     return res.status(500).json({ message: 'Missing credentials for establishing connection.' });
@@ -113,7 +159,7 @@ async function handler(
 
   // Check if connection with connectionId exists, if so: merge
   try {
-    const savedConnection = await api.getConnection(state);
+    const savedConnection = await api.getConnection(appId, connectionId);
     if (savedConnection?.params) {
       client.setCredentials(savedConnection.params as GoogleSheetsConnectionParams);
     }
@@ -141,55 +187,22 @@ async function handler(
       }
       if (token) {
         client.setCredentials(token);
-        await api.updateConnection({
+        await api.updateConnection(appId, {
           params: client.credentials,
-          id: state,
+          id: connectionId,
         });
       }
-      return res.redirect(`/_studio/editor/connections/${state}`);
+      return res.redirect(`/_studio/app/${appId}/editor/connections/${connectionId}`);
     });
   }
-  if (matchDataSpreadsheet(pathname)) {
-    const spreadsheetId = (matchDataSpreadsheet(pathname) as MatchResult<GoogleSpreadsheet>).params
-      .id;
-    if (spreadsheetId) {
-      const sheetsClient = google.sheets({
-        version: 'v4',
-        auth: client,
-      });
-      try {
-        const response = await sheetsClient.spreadsheets.get({
-          spreadsheetId,
-          includeGridData: false,
-        });
-        if (response.statusText === 'OK') {
-          const { sheets } = response.data;
-          return res.status(200).json({ sheets: sheets?.map((sheet) => sheet.properties) });
-        }
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json(error);
-      }
-    }
-    return res.status(404).json('Spreadsheet not found');
-  }
-  const drive = google.drive({
-    version: 'v3',
-    auth: client,
-  });
-  try {
-    const response = await drive.files.list({
-      q: "mimeType='application/vnd.google-apps.spreadsheet'",
-    });
-    return res.status(200).json(response.data);
-  } catch (error) {
-    return res.status(500).json(error);
-  }
+
+  return res.status(404).json({ message: 'No handler exists for the given route' });
 }
 
 const dataSource: StudioDataSourceServer<GoogleSheetsConnectionParams, any> = {
   test,
   exec,
+  execPrivate,
   createHandler: () => handler,
 };
 

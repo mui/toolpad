@@ -130,11 +130,13 @@ export interface StudioApiResult<D = any> {
 }
 
 export interface CreateHandlerApi {
-  updateConnection: (props: Updates<StudioConnection>) => Promise<StudioConnection>;
-  getConnection: (connectionId: string) => Promise<StudioConnection>;
+  updateConnection: (appId: string, props: Updates<StudioConnection>) => Promise<StudioConnection>;
+  getConnection: (appId: string, connectionId: string) => Promise<StudioConnection>;
 }
 
 export interface StudioConnectionEditorProps<P> extends WithControlledProp<P> {
+  handlerBasePath: string;
+  appId: string;
   connectionId: NodeId;
 }
 export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionEditorProps<P>>;

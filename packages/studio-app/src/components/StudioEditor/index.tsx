@@ -64,7 +64,10 @@ interface FileEditorProps {
 function FileEditor({ appId, className }: FileEditorProps) {
   return (
     <Routes>
-      <Route path="connections/:nodeId" element={<ConnectionEditor className={className} />} />
+      <Route
+        path="connections/:nodeId"
+        element={<ConnectionEditor appId={appId} className={className} />}
+      />
       <Route path="apis/:nodeId" element={<ApiEditor appId={appId} className={className} />} />
       <Route path="pages/:nodeId" element={<PageEditor appId={appId} className={className} />} />
       <Route

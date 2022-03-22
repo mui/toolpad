@@ -76,6 +76,10 @@ export type GoogleSheet = {
 
 export type GoogleSheetsQuery = {
   /**
+   * Determining the type of query submitted by the client, maps to an Action kind
+   */
+  type?: GoogleSheetsActionKind;
+  /**
    * True if grid data should be returned. This parameter is ignored if a
    * field mask was set in the request.
    */
@@ -96,6 +100,8 @@ export type GoogleSheetsQuery = {
 
 export enum GoogleSheetsActionKind {
   UPDATE_SPREADSHEET = 'UPDATE_SPREADSHEET',
+  FETCH_SHEET = 'FETCH_SHEET',
+  FETCH_SPREADSHEETS = 'FETCH_SPREADHSHEETS',
   UPDATE_SHEET = 'UPDATE_SHEET',
   UPDATE_RANGE = 'UPDATE_RANGE',
 }

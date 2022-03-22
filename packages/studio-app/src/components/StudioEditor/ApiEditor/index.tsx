@@ -110,7 +110,6 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
             // TODO: Add disabled mode to QueryEditor
             // disabled={!connection}
             value={apiQuery}
-            connectionId={apiNode.attributes.connectionId.value as NodeId}
             onChange={(newApiQuery) => setApiQuery(newApiQuery)}
           />
         </Stack>

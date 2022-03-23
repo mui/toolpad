@@ -1,12 +1,14 @@
   - type: web
-    name: studio
+    name: toolpad
     env: docker
-    region: oregon # optional (defaults to oregon)
-    plan: free # optional (defaults to starter)
-    branch: render # optional (uses repo default)
+    region: oregon
+    plan: free
+    branch: render
     numInstances: 1
     healthCheckPath: /
-    dockerfilePath: ./docker/render/Dockerfile
+    dockerfilePath: ./docker/images/render/Dockerfile
+    dockerContext: ./docker/images/render
+
     envVars:
       - key: STUDIO_DATABASE_URL
         fromDatabase:

@@ -1,1 +1,1 @@
-FROM janpot/mui-studio:alpha
+FROM --platform=linux/amd64 janpot/mui-studio:alpha

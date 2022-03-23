@@ -30,6 +30,12 @@ export default function StringRecordEditor({
   const [editedField, setEditedField] = React.useState<null | string>(null);
   const [editedFieldName, setEditedFieldName] = React.useState<string>('');
 
+  const isValidEditedFieldName: boolean =
+    !!editedFieldName && editedFieldName !== editedField && !hasOwnProperty(value, editedFieldName);
+
+  const isValidNewFieldName: boolean = !hasOwnProperty(value, newFieldName);
+  const isValidNewFieldParams: boolean = !editedField && !!newFieldName && isValidNewFieldName;
+
   const handleFieldValueChange = React.useCallback(
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange({ ...value, [field]: event.target.value });
@@ -44,14 +50,14 @@ export default function StringRecordEditor({
     [onChange, value],
   );
 
-  const handleSave = React.useCallback(() => {
-    if (!editedField || !editedFieldName) {
-      return;
+  const handleSaveEditedFieldName = React.useCallback(() => {
+    if (!editedField || !isValidEditedFieldName) {
+      return false;
     }
     const oldValue = value[editedField];
-    setEditedField(null);
     onChange({ ...omit(value, editedField), [editedFieldName]: oldValue });
-  }, [onChange, value, editedField, editedFieldName]);
+    return true;
+  }, [editedField, isValidEditedFieldName, value, onChange, editedFieldName]);
 
   const handleSubmit = React.useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -64,13 +70,14 @@ export default function StringRecordEditor({
     [newFieldName, newFieldValue, onChange, value],
   );
 
-  const canSubmit = !editedField && newFieldName && !hasOwnProperty(value, newFieldName);
-
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       console.log(event.key);
       if (event.key === 'Enter') {
-        handleSave();
+        const success = handleSaveEditedFieldName();
+        if (success) {
+          setEditedField(null);
+        }
         event.preventDefault();
       }
       if (event.key === 'Escape') {
@@ -78,7 +85,20 @@ export default function StringRecordEditor({
         event.preventDefault();
       }
     },
-    [handleSave],
+    [handleSaveEditedFieldName],
+  );
+
+  const handleBlur = React.useCallback(() => {
+    handleSaveEditedFieldName();
+    setEditedField(null);
+  }, [handleSaveEditedFieldName]);
+
+  const handleFocus = React.useCallback(
+    (field: string) => () => {
+      setEditedField(field);
+      setEditedFieldName(field);
+    },
+    [],
   );
 
   return (
@@ -93,16 +113,23 @@ export default function StringRecordEditor({
               value={editedFieldName}
               autoFocus
               onChange={(event) => setEditedFieldName(event.target.value)}
-              onBlur={handleSave}
+              error={!isValidEditedFieldName}
+              onBlur={handleBlur}
               onKeyDown={handleKeyDown}
             />
           ) : (
             <Box
               ml={2}
               justifySelf="end"
-              onClick={() => {
-                setEditedField(field);
-                setEditedFieldName(field);
+              role="textbox"
+              tabIndex={0}
+              onFocus={handleFocus(field)}
+              onClick={handleFocus(field)}
+              sx={{
+                color: 'text.secondary',
+                [`&:hover`]: {
+                  color: 'text.primary',
+                },
               }}
             >
               {field}:
@@ -129,6 +156,7 @@ export default function StringRecordEditor({
           value={newFieldName}
           onChange={(event) => setNewFieldName(event.target.value)}
           autoFocus={autoFocus}
+          error={!isValidNewFieldName}
         />
         <TextField
           size="small"
@@ -136,7 +164,7 @@ export default function StringRecordEditor({
           value={newFieldValue}
           onChange={(event) => setNewFieldValue(event.target.value)}
         />
-        <IconButton size="small" disabled={!canSubmit} type="submit">
+        <IconButton size="small" disabled={!isValidNewFieldParams} type="submit">
           <AddIcon fontSize="small" />
         </IconButton>
       </form>

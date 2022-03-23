@@ -1,0 +1,4 @@
+databases:
+  - name: postgres
+    databaseName: db # optional (Render may add a suffix)
+    ipAllowList: []

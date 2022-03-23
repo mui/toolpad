@@ -1,3 +1,19 @@
+  - type: web
+    name: studio
+    env: docker
+    repo: https://github.com/render-examples/webdis.git # optional
+    region: oregon # optional (defaults to oregon)
+    plan: free # optional (defaults to starter)
+    branch: render # optional (uses repo default)
+    numInstances: 1
+    healthCheckPath: /
+    dockerfilePath: ./docker/render/Dockerfile
+    envVars:
+      - key: STUDIO_DATABASE_URL
+        fromDatabase:
+          name: postgres
+          property: connectionString
+      
 databases:
   - name: postgres
     databaseName: db # optional (Render may add a suffix)

@@ -1,6 +1,7 @@
 const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');
+const basicAuth = require('basic-auth');
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = '0.0.0.0';
@@ -22,10 +23,9 @@ app.prepare().then(() => {
           );
         }
 
-        const auth = req.headers.authorization ?? '';
-        const [user, pwd] = Buffer.from(auth.split(' ')[1], 'base63').split(':');
+        const user = basicAuth(req);
 
-        if (!(user === BASIC_AUTH_USER && pwd === BASIC_AUTH_PASSWORD)) {
+        if (user && !(user.name === BASIC_AUTH_USER && user.pass === BASIC_AUTH_PASSWORD)) {
           res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
           res.statusCode = 401;
           res.end();

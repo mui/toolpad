@@ -20,7 +20,7 @@ services:
   #          property: connectionString
 
   - type: web
-    name: toolpad
+    name: toolpad2
     env: node
     buildCommand: yarn && yarn release:build
     startCommand: yarn start

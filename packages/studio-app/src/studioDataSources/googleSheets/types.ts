@@ -10,20 +10,20 @@ export type GoogleSpreadsheet = {
   /**
    * The ID of the file.
    */
-  id?: string;
+  id: string;
   /**
    * Identifies what kind of resource this is. Value: the fixed string
    * 'drive#file'.
    */
-  kind?: string;
+  kind: string;
   /**
    * The name of the file.
    */
-  name?: string;
+  name: string;
   /**
    * The MIME type of the file.
    */
-  mimeType?: string;
+  mimeType: string;
   /**
    * The major dimension of the values.  For output, if the spreadsheet data
    * is: `A1=1,B1=2,A2=3,B2=4`, then requesting
@@ -35,14 +35,14 @@ export type GoogleSpreadsheet = {
    * `A1=1,B1=3,A2=2,B2=4`.  When writing, if this field is not set, it
    * defaults to ROWS.
    */
-  majorDimension?: string;
+  majorDimension: string;
   /**
    * The range the values cover, in A1 notation. For output, this range
    * indicates the entire requested range, even though the values will exclude
    * trailing rows and columns. When appending values, this field represents
    * the range to search for a table, after which values will be appended.
    */
-  range?: string;
+  range: string;
   /**
    * The data that was read or to be written.  This is an array of arrays, the
    * outer array representing all the data and each inner array representing a
@@ -52,60 +52,74 @@ export type GoogleSpreadsheet = {
    * will be skipped. To set a cell to an empty value, set the string value to
    * an empty string.
    */
-  values?: any[][];
+  values: any[][];
 };
 
 export type GoogleSheet = {
   /**
    * The index of the sheet within the spreadsheet.
    */
-  index?: number;
+  index: number;
   /**
    * The ID of the sheet. Must be non-negative.
    */
-  sheetId?: number;
+  sheetId: number;
   /**
    * The type of sheet. Defaults to GRID.
    */
-  sheetType?: string;
+  sheetType: string;
   /**
    * The name of the sheet.
    */
-  title?: string;
+  title: string;
 };
 
 export type GoogleSheetsQuery = {
   /**
-   * Determining the type of query submitted by the client, maps to an Action kind
+   * Determining the type of query submitted by the client
    */
-  type?: GoogleSheetsActionKind;
+  type: GoogleSheetsActionType;
   /**
    * True if grid data should be returned. This parameter is ignored if a
    * field mask was set in the request.
    */
-  includeGridData?: boolean;
+  includeGridData: boolean;
   /**
    * The ranges to retrieve from the spreadsheet.
    */
-  ranges?: GoogleSpreadsheet['range'];
+  ranges: string;
   /**
    * The spreadsheet to request.
    */
-  spreadsheet?: GoogleSpreadsheet | null;
+  spreadsheet: GoogleSpreadsheet | null;
   /**
    * The sheet to request.
    */
-  sheet?: GoogleSheet | null;
+  sheet: GoogleSheet | null;
 };
 
-export enum GoogleSheetsActionKind {
+export enum GoogleSheetsActionType {
   UPDATE_SPREADSHEET = 'UPDATE_SPREADSHEET',
   FETCH_SHEET = 'FETCH_SHEET',
   FETCH_SPREADSHEETS = 'FETCH_SPREADHSHEETS',
   UPDATE_SHEET = 'UPDATE_SHEET',
   UPDATE_RANGE = 'UPDATE_RANGE',
 }
-export interface GoogleSheetsQueryAction {
-  type: GoogleSheetsActionKind;
-  payload?: GoogleSpreadsheet | GoogleSheet | GoogleSpreadsheet['range'] | null;
-}
+
+export type GoogleSheetsQueryAction =
+  | {
+      type: GoogleSheetsActionType.FETCH_SPREADSHEETS;
+      payload: null;
+    }
+  | {
+      type: GoogleSheetsActionType.FETCH_SHEET;
+      payload: GoogleSpreadsheet | null;
+    }
+  | {
+      type: GoogleSheetsActionType.UPDATE_SHEET;
+      payload: GoogleSheet | null;
+    }
+  | {
+      type: GoogleSheetsActionType.UPDATE_RANGE;
+      payload: string;
+    };

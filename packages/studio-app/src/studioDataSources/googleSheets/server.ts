@@ -10,7 +10,7 @@ import {
 } from '../../types';
 import config from '../../server/config';
 import { asArray } from '../../utils/collections';
-import { GoogleSheetsActionKind, GoogleSheetsConnectionParams, GoogleSheetsQuery } from './types';
+import { GoogleSheetsActionType, GoogleSheetsConnectionParams, GoogleSheetsQuery } from './types';
 
 async function test(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
@@ -29,7 +29,7 @@ function createOAuthClient() {
     !config.googleSheetsClientSecret ||
     !config.googleSheetsRedirectUri
   ) {
-    return undefined;
+    throw new Error('Missing googleSheets datasource client configuration');
   }
   return new google.auth.OAuth2(
     config.googleSheetsClientId,
@@ -38,16 +38,23 @@ function createOAuthClient() {
   );
 }
 
+/**
+ * Private executor function for this connection
+ * @param {StudioConnection<GoogleSheetsConnectionParams>} connection  The connection object
+ * @param {GoogleSheetsQuery} query  The query object
+ * @returns {Promise<<any>} The private api response
+ */
+
 async function execPrivate(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
   query: GoogleSheetsQuery,
 ): Promise<any> {
-  const client = createOAuthClient();
-  if (client) {
+  try {
+    const client = createOAuthClient();
     if (connection.params) {
       client.setCredentials(connection.params);
     }
-    if (query.type === GoogleSheetsActionKind.FETCH_SHEET) {
+    if (query.type === GoogleSheetsActionType.FETCH_SHEET) {
       const sheetsClient = google.sheets({
         version: 'v4',
         auth: client,
@@ -63,9 +70,9 @@ async function execPrivate(
           return { sheets: sheets?.map((sheet) => sheet.properties) };
         }
       } catch (error) {
-        throw new Error(`Unable to fetch spreadsheetId ${query?.spreadsheet?.id}`);
+        throw new Error(`Unable to fetch spreadsheetId ${query.spreadsheet?.id}`);
       }
-    } else if (query.type === GoogleSheetsActionKind.FETCH_SPREADSHEETS) {
+    } else if (query.type === GoogleSheetsActionType.FETCH_SPREADSHEETS) {
       const driveClient = google.drive({
         version: 'v3',
         auth: client,
@@ -79,19 +86,28 @@ async function execPrivate(
         throw new Error(`Unable to fetch spreadsheets`);
       }
     }
+  } catch (e) {
+    if (e instanceof Error) {
+      console.error(e.message);
+    }
+    console.error(e);
   }
-  return {
-    fields: {},
-    data: [],
-  };
+  throw new Error(`Invariant: Unrecognized googleSheets private query type "${query.type}"`);
 }
+
+/**
+ * Executor function for this connection
+ * @param {StudioConnection<GoogleSheetsConnectionParams>} connection  The connection object
+ * @param {GoogleSheetsQuery} query  The query object
+ * @returns {Promise<StudioApiResult<any>>} The api response
+ */
 
 async function exec(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
   query: GoogleSheetsQuery,
 ): Promise<StudioApiResult<any>> {
-  const client = createOAuthClient();
-  if (client) {
+  try {
+    const client = createOAuthClient();
     if (connection.params) {
       client.setCredentials(connection.params);
     }
@@ -100,7 +116,7 @@ async function exec(
       auth: client,
     });
     try {
-      if (query?.spreadsheet) {
+      if (query.spreadsheet) {
         const response = await sheets.spreadsheets.values.get({
           spreadsheetId: query.spreadsheet.id,
           range: query.ranges,
@@ -124,17 +140,20 @@ async function exec(
         }
       }
     } catch (error) {
-      throw new Error(`Unable to fetch spreadsheetId ${query?.spreadsheet?.id}`);
+      throw new Error(`Unable to fetch spreadsheetId ${query.spreadsheet?.id}`);
     }
+  } catch (e) {
+    if (e instanceof Error) {
+      console.error(e.message);
+    }
+    console.error(e);
   }
-  return {
-    fields: {},
-    data: [],
-  };
+  throw new Error(`Invariant: Unrecognized googleSheets query type "${query.type}"`);
 }
 
 /**
- * Handler for new OAuth2 connections
+ * Handler for new connections
+ * @param {CreateHandlerApi} api  The api for the handler object
  * @param {NextApiRequest} req  The request object
  * @param {NextApiResponse} res The response object
  */
@@ -145,58 +164,55 @@ async function handler(
   res: NextApiResponse,
 ): Promise<NextApiResponse | void> {
   const client = createOAuthClient();
-  const pathname = `/${asArray(req.query.path).join('/')}`;
-
-  const matchAuthLogin = match('/auth/login', { decode: decodeURIComponent });
-  const matchAuthCallback = match('/auth/callback', { decode: decodeURIComponent });
-
-  const [state] = asArray(req.query.state);
-  const { connectionId, appId } = JSON.parse(decodeURIComponent(state));
-
-  if (!client) {
-    return res.status(500).json({ message: 'Missing credentials for establishing connection.' });
-  }
-
-  // Check if connection with connectionId exists, if so: merge
   try {
+    const pathname = `/${asArray(req.query.path).join('/')}`;
+    const matchAuthLogin = match('/auth/login', { decode: decodeURIComponent });
+    const matchAuthCallback = match('/auth/callback', { decode: decodeURIComponent });
+
+    const [state] = asArray(req.query.state);
+    const { connectionId, appId } = JSON.parse(decodeURIComponent(state));
+
+    // Check if connection with connectionId exists, if so: merge
     const savedConnection = await api.getConnection(appId, connectionId);
-    if (savedConnection?.params) {
+    if (savedConnection.params) {
       client.setCredentials(savedConnection.params as GoogleSheetsConnectionParams);
     }
-  } catch (err) {
-    console.error(err);
+    if (matchAuthLogin(pathname)) {
+      return res.redirect(
+        client.generateAuthUrl({
+          access_type: 'offline',
+          scope: [
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/drive',
+          ],
+          state,
+        }),
+      );
+    }
+    if (matchAuthCallback(pathname)) {
+      const [code] = asArray(req.query.code);
+      return client.getToken(code, async (error, token) => {
+        if (error) {
+          throw new Error(error.message);
+        }
+        if (token) {
+          client.setCredentials(token);
+          await api.updateConnection(appId, {
+            params: client.credentials,
+            id: connectionId,
+          });
+        }
+        return res.redirect(`/_studio/app/${appId}/editor/connections/${connectionId}`);
+      });
+    }
+    return res.status(404).send('No handler exists for given path');
+  } catch (e) {
+    if (e instanceof Error) {
+      console.error(e.message);
+      return res.status(500).send(e.message);
+    }
+    return res.status(500).send(e);
   }
-
-  if (matchAuthLogin(pathname)) {
-    return res.redirect(
-      client.generateAuthUrl({
-        access_type: 'offline',
-        scope: [
-          'https://www.googleapis.com/auth/spreadsheets',
-          'https://www.googleapis.com/auth/drive',
-        ],
-        state,
-      }),
-    );
-  }
-  if (matchAuthCallback(pathname)) {
-    const [code] = asArray(req.query.code);
-    return client.getToken(code, async (error, token) => {
-      if (error) {
-        throw new Error(error.message);
-      }
-      if (token) {
-        client.setCredentials(token);
-        await api.updateConnection(appId, {
-          params: client.credentials,
-          id: connectionId,
-        });
-      }
-      return res.redirect(`/_studio/app/${appId}/editor/connections/${connectionId}`);
-    });
-  }
-
-  return res.status(404).json({ message: 'No handler exists for the given route' });
 }
 
 const dataSource: StudioDataSourceServer<GoogleSheetsConnectionParams, any> = {

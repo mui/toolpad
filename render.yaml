@@ -7,8 +7,9 @@ services:
     branch: render
     numInstances: 1
     healthCheckPath: /
-    dockerfilePath: ./docker/images/render/Dockerfile
-    dockerContext: ./docker/images/render
+    dockerCommand: node_modules/@mui/studio/cli.js --port 80
+    dockerfilePath: ./docker/images/studio/Dockerfile
+    dockerContext: ./docker/images/studio
 
     envVars:
       - key: STUDIO_DATABASE_URL

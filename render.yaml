@@ -1,10 +1,11 @@
+previewsEnabled: true
+
 services:
   - type: web
     name: toolpad
     env: node
-    buildCommand: yarn && yarn release:build
+    buildCommand: yarn --frozen-lockfile --prod=false && yarn release:build
     startCommand: yarn start
-    pullRequestPreviewsEnabled: true
     envVars:
       - key: STUDIO_DATABASE_URL
         fromDatabase:

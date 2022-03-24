@@ -19,9 +19,9 @@ function getInitialQueryValue(): any {
   return null;
 }
 
-function isConnectionValid(connection: GoogleSheetsConnectionParams): boolean {
-  if (connection.access_token && connection.expiry_date) {
-    if (connection.expiry_date <= Date.now()) {
+function isConnectionValid(connection: GoogleSheetsConnectionParams | null): boolean {
+  if (connection?.access_token && connection?.expiry_date) {
+    if (connection.expiry_date >= Date.now()) {
       return true;
     }
   }

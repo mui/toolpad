@@ -1,19 +1,30 @@
 services:
+  #  - type: web
+  #    name: toolpad
+  #    env: docker
+  #    region: oregon
+  #    plan: free
+  #    branch: render
+  #    numInstances: 1
+  #    healthCheckPath: /
+  #    dockerCommand: node_modules/@mui/studio/cli.js --port 80
+  #    dockerfilePath: ./docker/images/studio/Dockerfile
+  #    dockerContext: ./docker/images/studio
+  #
+  #    envVars:
+  #      - key: VERSION
+  #        value: alpha
+  #      - key: STUDIO_DATABASE_URL
+  #        fromDatabase:
+  #          name: postgres
+  #          property: connectionString
+
   - type: web
     name: toolpad
-    env: docker
-    region: oregon
-    plan: free
-    branch: render
-    numInstances: 1
-    healthCheckPath: /
-    dockerCommand: node_modules/@mui/studio/cli.js --port 80
-    dockerfilePath: ./docker/images/studio/Dockerfile
-    dockerContext: ./docker/images/studio
-
+    env: node
+    buildCommand: yarn release:build
+    startCommand: yarn start --port 80
     envVars:
-      - key: VERSION
-        value: alpha
       - key: STUDIO_DATABASE_URL
         fromDatabase:
           name: postgres

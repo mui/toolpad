@@ -3,17 +3,26 @@ previewsEnabled: true
 
 services:
   - type: web
-    name: toolpad
+    name: toolpad-app
     env: node
     buildCommand: yarn --frozen-lockfile --prod=false && yarn release:build
     startCommand: yarn start
     envVars:
       - key: STUDIO_DATABASE_URL
         fromDatabase:
-          name: postgres
+          name: toolpad-db
           property: connectionString
+      - fromGroup: basic-auth
 
 databases:
-  - name: postgres
+  - name: toolpad-db
     ipAllowList: []
     plan: free
+
+envVarGroups:
+  - name: basic-auth
+    envVars:
+      - key: STUDIO_BASIC_AUTH_USER
+        sync: false
+      - key: STUDIO_BASIC_AUTH_PASSWORD
+        sync: false

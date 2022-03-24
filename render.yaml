@@ -20,13 +20,11 @@ services:
   #          property: connectionString
 
   - type: web
-    name: toolpad2
+    name: toolpad
     env: node
     buildCommand: yarn && yarn release:build
     startCommand: yarn start
     envVars:
-      - key: PORT
-        value: 81
       - key: STUDIO_DATABASE_URL
         fromDatabase:
           name: postgres

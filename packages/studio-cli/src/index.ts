@@ -32,6 +32,8 @@ const studioDir = path.dirname(
 
 const port = args['--port'] ?? process.env.PORT ?? 3000;
 
+console.log(`CLI uid ${process.getuid()}  euid ${process.geteuid()}`);
+
 const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   cwd: studioDir,
   preferLocal: true,

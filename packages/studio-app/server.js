@@ -1,4 +1,4 @@
-const { createServer } = require('http');
+const { createServer, STATUS_CODES } = require('http');
 const { parse } = require('url');
 const next = require('next');
 const basicAuth = require('basic-auth');
@@ -13,9 +13,20 @@ const handle = app.getRequestHandler();
 const BASIC_AUTH_USER = process.env.STUDIO_BASIC_AUTH_USER;
 const BASIC_AUTH_PASSWORD = process.env.STUDIO_BASIC_AUTH_PASSWORD;
 
+function sendStatus(res, statusCode) {
+  res.statusCode = statusCode;
+  res.write(STATUS_CODES[statusCode]);
+  res.end();
+}
+
 app.prepare().then(() => {
   createServer(async (req, res) => {
     try {
+      if (req.url === '/health-check') {
+        sendStatus(res, 200);
+        return;
+      }
+
       if (BASIC_AUTH_USER) {
         if (!BASIC_AUTH_PASSWORD) {
           throw new Error(
@@ -27,8 +38,7 @@ app.prepare().then(() => {
 
         if (!user || !(user.name === BASIC_AUTH_USER && user.pass === BASIC_AUTH_PASSWORD)) {
           res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
-          res.statusCode = 401;
-          res.end();
+          sendStatus(res, 401);
           return;
         }
       }
@@ -39,8 +49,7 @@ app.prepare().then(() => {
       await handle(req, res, parsedUrl);
     } catch (err) {
       console.error('Error occurred handling', req.url, err);
-      res.statusCode = 500;
-      res.end('internal server error');
+      sendStatus(res, 500);
     }
   }).listen(port, hostname, (err) => {
     if (err) {

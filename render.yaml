@@ -26,7 +26,7 @@ services:
     startCommand: yarn start
     envVars:
       - key: PORT
-        value: 3001
+        value: 81
       - key: STUDIO_DATABASE_URL
         fromDatabase:
           name: postgres

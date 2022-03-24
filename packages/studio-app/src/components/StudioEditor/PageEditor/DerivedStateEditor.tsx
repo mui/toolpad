@@ -27,7 +27,7 @@ import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';
 import * as studioDom from '../../../studioDom';
 import { NodeId, StudioBindable, StudioBindables } from '../../../types';
-import { BindingEditor } from './BindingEditor';
+import { BindingEditor } from '../BindingEditor';
 
 const DERIVED_STATE_PARAMS = 'StudioDerivedStateParams';
 const DERIVED_STATE_RESULT = 'StudioDerivedStateResult';
@@ -94,6 +94,9 @@ function StudioNodePropsEditor<P>({
   argTypes,
   onArgTypesChange,
 }: StudioNodePropsEditorProps<P>) {
+  const { viewState } = usePageEditorState();
+  const globalScope = viewState.pageState;
+
   const handlePropValueChange = React.useCallback(
     (param: keyof P & string) => (newValue: StudioBindable<any> | null) => {
       if (newValue) {
@@ -129,6 +132,8 @@ function StudioNodePropsEditor<P>({
           if (!propType) {
             return null;
           }
+          const bindingId = `${nodeId}.props.${propName}`;
+          const liveBinding = viewState.bindings[bindingId];
           const propValue: StudioBindable<any> | null = value[propName] ?? null;
           const isBound = !!propValue;
           return (
@@ -140,7 +145,8 @@ function StudioNodePropsEditor<P>({
                 disabled={isBound}
               />
               <BindingEditor
-                bindingId={`${nodeId}.props.${propName}`}
+                globalScope={globalScope}
+                liveBinding={liveBinding}
                 propType={propType}
                 value={propValue}
                 onChange={handlePropValueChange(propName)}

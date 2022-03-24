@@ -10,6 +10,7 @@ import theme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import { MUI_X_PRO_LICENSE } from '../src/constants';
 import { queryClient } from '../src/api';
+import './reactSplitPane.css';
 
 LicenseInfo.setLicenseKey(MUI_X_PRO_LICENSE);
 

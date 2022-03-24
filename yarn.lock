@@ -117,13 +117,6 @@
   dependencies:
     "@date-io/core" "^2.13.1"
 
-"@devbookhq/splitter@^1.3.2":
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/@devbookhq/splitter/-/splitter-1.3.2.tgz#86ce588253b8dba074e74949726f1323a49b1456"
-  integrity sha512-M75y8oGhHPbtIoV3Bo5R5zzQEJzvyA7G7B1R4fOjV12xFQEVJXY6hc/BOy4e7sVFu4MxGCmGeZsAOtoB4l7Fpg==
-  dependencies:
-    react-is "^17.0.2"
-
 "@emotion/babel-plugin@^11.3.0":
   version "11.7.2"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.7.2.tgz#fec75f38a6ab5b304b0601c74e2a5e77c95e5fa0"
@@ -6609,7 +6602,7 @@ promzard@^0.3.0:
   dependencies:
     read "1"
 
-prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@^15.5.4, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -6709,6 +6702,11 @@ quick-lru@^4.0.1:
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-4.0.1.tgz#5b8878f113a58217848c6482026c73e1ba57727f"
   integrity sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==
 
+quickjs-emscripten@^0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/quickjs-emscripten/-/quickjs-emscripten-0.15.0.tgz#636b87d09a9ae79772fca20cce8ad74a1c1a5542"
+  integrity sha512-7b32VY45/Rmo/S81W0VcHnsPW9yvCbGOCjf+xl8XYcQIL/FmbfmwroJPnyXHRYC0HO8mk8cTkvsMC+0bR/NrJA==
+
 ramda@^0.27.1:
   version "0.27.2"
   resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.27.2.tgz#84463226f7f36dc33592f6f4ed6374c48306c3f1"
@@ -6804,6 +6802,22 @@ react-router@6.2.1:
   integrity sha512-2fG0udBtxou9lXtK97eJeET2ki5//UWfQSl1rlJ7quwe6jrktK9FCCc8dQb5QY6jAv3jua8bBQRhhDOM/kVRsg==
   dependencies:
     history "^5.2.0"
+
+react-split-pane@^0.1.92:
+  version "0.1.92"
+  resolved "https://registry.yarnpkg.com/react-split-pane/-/react-split-pane-0.1.92.tgz#68242f72138aed95dd5910eeb9d99822c4fc3a41"
+  integrity sha512-GfXP1xSzLMcLJI5BM36Vh7GgZBpy+U/X0no+VM3fxayv+p1Jly5HpMofZJraeaMl73b3hvlr+N9zJKvLB/uz9w==
+  dependencies:
+    prop-types "^15.7.2"
+    react-lifecycles-compat "^3.0.4"
+    react-style-proptype "^3.2.2"
+
+react-style-proptype@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/react-style-proptype/-/react-style-proptype-3.2.2.tgz#d8e998e62ce79ec35b087252b90f19f1c33968a0"
+  integrity sha512-ywYLSjNkxKHiZOqNlso9PZByNEY+FTyh3C+7uuziK0xFXu9xzdyfHwg4S9iyiRRoPCR4k2LqaBBsWVmSBwCWYQ==
+  dependencies:
+    prop-types "^15.5.4"
 
 react-textarea-autosize@^8.3.2:
   version "8.3.3"

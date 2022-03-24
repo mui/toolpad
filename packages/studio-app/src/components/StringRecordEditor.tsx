@@ -1,6 +1,6 @@
 import { Box, TextField, IconButton, SxProps } from '@mui/material';
 import * as React from 'react';
-import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { omit } from '../utils/immutability';
 import { WithControlledProp } from '../utils/types';
@@ -27,6 +27,15 @@ export default function StringRecordEditor({
   const [newFieldValue, setNewFieldValue] = React.useState('');
   const fieldInputRef = React.useRef<HTMLInputElement>(null);
 
+  const [editedField, setEditedField] = React.useState<null | string>(null);
+  const [editedFieldName, setEditedFieldName] = React.useState<string>('');
+
+  const isValidEditedFieldName: boolean =
+    !!editedFieldName && editedFieldName !== editedField && !hasOwnProperty(value, editedFieldName);
+
+  const isValidNewFieldName: boolean = !hasOwnProperty(value, newFieldName);
+  const isValidNewFieldParams: boolean = !editedField && !!newFieldName && isValidNewFieldName;
+
   const handleFieldValueChange = React.useCallback(
     (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange({ ...value, [field]: event.target.value });
@@ -41,6 +50,15 @@ export default function StringRecordEditor({
     [onChange, value],
   );
 
+  const handleSaveEditedFieldName = React.useCallback(() => {
+    if (!editedField || !isValidEditedFieldName) {
+      return false;
+    }
+    const oldValue = value[editedField];
+    onChange({ ...omit(value, editedField), [editedFieldName]: oldValue });
+    return true;
+  }, [editedField, isValidEditedFieldName, value, onChange, editedFieldName]);
+
   const handleSubmit = React.useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -52,24 +70,80 @@ export default function StringRecordEditor({
     [newFieldName, newFieldValue, onChange, value],
   );
 
-  const canSubmit = newFieldName && !hasOwnProperty(value, newFieldName);
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      console.log(event.key);
+      if (event.key === 'Enter') {
+        const success = handleSaveEditedFieldName();
+        if (success) {
+          setEditedField(null);
+        }
+        event.preventDefault();
+      }
+      if (event.key === 'Escape') {
+        setEditedField(null);
+        event.preventDefault();
+      }
+    },
+    [handleSaveEditedFieldName],
+  );
+
+  const handleBlur = React.useCallback(() => {
+    handleSaveEditedFieldName();
+    setEditedField(null);
+  }, [handleSaveEditedFieldName]);
+
+  const handleFocus = React.useCallback(
+    (field: string) => () => {
+      setEditedField(field);
+      setEditedFieldName(field);
+    },
+    [],
+  );
 
   return (
     <Box sx={sx} display="grid" gridTemplateColumns="1fr 2fr auto" alignItems="center" gap={1}>
       {label ? <Box gridColumn="span 3">{label}:</Box> : null}
       {Object.entries(value).map(([field, fieldValue]) => (
         <React.Fragment key={field}>
-          <Box ml={2} justifySelf="end">
-            {field}:
-          </Box>
+          {editedField === field ? (
+            <TextField
+              label={valueLabel}
+              size="small"
+              value={editedFieldName}
+              autoFocus
+              onChange={(event) => setEditedFieldName(event.target.value)}
+              error={!isValidEditedFieldName}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+            />
+          ) : (
+            <Box
+              ml={2}
+              justifySelf="end"
+              role="textbox"
+              tabIndex={0}
+              onFocus={handleFocus(field)}
+              onClick={handleFocus(field)}
+              sx={{
+                color: 'text.secondary',
+                [`&:hover`]: {
+                  color: 'text.primary',
+                },
+              }}
+            >
+              {field}:
+            </Box>
+          )}
           <TextField
             label={valueLabel}
             size="small"
             value={fieldValue}
             onChange={handleFieldValueChange(field)}
           />
+
           <IconButton onClick={handleRemove(field)} size="small">
-            <CloseIcon fontSize="small" />
+            <DeleteIcon fontSize="small" />
           </IconButton>
         </React.Fragment>
       ))}
@@ -82,15 +156,15 @@ export default function StringRecordEditor({
           value={newFieldName}
           onChange={(event) => setNewFieldName(event.target.value)}
           autoFocus={autoFocus}
+          error={!isValidNewFieldName}
         />
         <TextField
           size="small"
           label={valueLabel}
           value={newFieldValue}
-          disabled={!canSubmit}
           onChange={(event) => setNewFieldValue(event.target.value)}
         />
-        <IconButton size="small" disabled={!canSubmit} type="submit">
+        <IconButton size="small" disabled={!isValidNewFieldParams} type="submit">
           <AddIcon fontSize="small" />
         </IconButton>
       </form>

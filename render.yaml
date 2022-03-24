@@ -12,7 +12,7 @@ services:
         fromDatabase:
           name: toolpad-db
           property: connectionString
-      - fromGroup: basic-auth
+      - fromGroup: toolpad-settings
 
 databases:
   - name: toolpad-db

@@ -25,6 +25,8 @@ services:
     buildCommand: yarn && yarn release:build
     startCommand: yarn start
     envVars:
+      - key: PORT
+        value: 3001
       - key: STUDIO_DATABASE_URL
         fromDatabase:
           name: postgres

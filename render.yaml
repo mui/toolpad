@@ -12,6 +12,8 @@ services:
     dockerContext: ./docker/images/studio
 
     envVars:
+      - key: VERSION
+        value: alpha
       - key: STUDIO_DATABASE_URL
         fromDatabase:
           name: postgres

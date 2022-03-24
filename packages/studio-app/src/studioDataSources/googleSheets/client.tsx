@@ -19,9 +19,9 @@ function getInitialQueryValue(): any {
   return null;
 }
 
-function isValid(connection: GoogleSheetsConnectionParams): boolean {
-  if (connection?.access_token && connection?.expiry_date) {
-    if (connection?.expiry_date >= Date.now()) {
+function isConnectionValid(connection: GoogleSheetsConnectionParams): boolean {
+  if (connection.access_token && connection.expiry_date) {
+    if (connection.expiry_date <= Date.now()) {
       return true;
     }
   }
@@ -163,14 +163,14 @@ function ConnectionParamsInput({
     <Stack direction="column" gap={1}>
       <Button
         component="a"
-        disabled={isValid(value)}
+        disabled={isConnectionValid(value)}
         href={`${handlerBasePath}/auth/login?state=${encodeURIComponent(
           JSON.stringify({ appId, connectionId }),
         )}
         `}
         variant="outlined"
       >
-        {isValid(value) ? 'Signed In' : 'Sign In to Google '}
+        {isConnectionValid(value) ? 'Signed In' : 'Sign In to Google '}
       </Button>
     </Stack>
   );
@@ -180,7 +180,7 @@ const dataSource: StudioDataSourceClient<GoogleSheetsConnectionParams, GoogleShe
   displayName: 'Google Sheets',
   ConnectionParamsInput,
   getInitialConnectionValue: getInitialQueryValue,
-  isConnectionValid: isValid,
+  isConnectionValid,
   QueryEditor,
   getInitialQueryValue,
 };

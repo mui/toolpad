@@ -3,7 +3,7 @@ previewsEnabled: false
 
 services:
   - type: web
-    name: toolpad-app
+    name: toolpad
     env: node
     buildCommand: yarn --frozen-lockfile --prod=false && yarn release:build
     startCommand: yarn start

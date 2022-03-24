@@ -25,7 +25,7 @@ app.prepare().then(() => {
 
         const user = basicAuth(req);
 
-        if (user && !(user.name === BASIC_AUTH_USER && user.pass === BASIC_AUTH_PASSWORD)) {
+        if (!user || !(user.name === BASIC_AUTH_USER && user.pass === BASIC_AUTH_PASSWORD)) {
           res.setHeader('WWW-Authenticate', 'Basic realm="Secure Area"');
           res.statusCode = 401;
           res.end();

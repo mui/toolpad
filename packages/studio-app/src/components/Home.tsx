@@ -135,7 +135,7 @@ export default function Home() {
     <React.Fragment>
       <StudioAppBar navigation={null} actions={null} />
       <Container>
-        <Typography variant="h2">Apps:</Typography>
+        <Typography variant="h2">Apps</Typography>
         <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
 
         <Toolbar disableGutters>

@@ -10,6 +10,8 @@ services:
     healthCheckPath: /health-check
     plan: free
     # previewPlan: free
+    # can't have preview environments on free plan but maybe this:
+    pullRequestPreviewsEnabled: true
     envVars:
       - key: STUDIO_DATABASE_URL
         fromDatabase:

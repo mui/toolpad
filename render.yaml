@@ -20,7 +20,7 @@ databases:
     plan: free
 
 envVarGroups:
-  - name: basic-auth
+  - name: toolpad-settings
     envVars:
       - key: STUDIO_BASIC_AUTH_USER
         sync: false

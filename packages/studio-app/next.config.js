@@ -1,8 +1,6 @@
 /** @type {import('./src/config').SharedConfig} */
 const sharedConfig = {};
 
-console.log(`APP uid ${process.getuid()}  euid ${process.geteuid()}`);
-
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,

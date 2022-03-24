@@ -30,9 +30,7 @@ const studioDir = path.dirname(
   createRequire(import.meta.url).resolve('@mui/studio-app/package.json'),
 );
 
-const port = args['--port'] ?? process.env.PORT ?? 3000;
-
-console.log(`CLI uid ${process.getuid()}  euid ${process.geteuid()}`);
+const port = args['--port'] ?? 3000;
 
 const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   cwd: studioDir,

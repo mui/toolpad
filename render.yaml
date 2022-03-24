@@ -22,7 +22,7 @@ services:
   - type: web
     name: toolpad
     env: node
-    buildCommand: yarn release:build
+    buildCommand: yarn && yarn release:build
     startCommand: yarn start --port 80
     envVars:
       - key: STUDIO_DATABASE_URL

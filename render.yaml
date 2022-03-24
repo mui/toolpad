@@ -1,0 +1,28 @@
+# https://render.com/docs/preview-environments
+previewsEnabled: true
+
+services:
+  - type: web
+    name: toolpad-app
+    env: node
+    buildCommand: yarn --frozen-lockfile --prod=false && yarn release:build
+    startCommand: yarn start
+    envVars:
+      - key: STUDIO_DATABASE_URL
+        fromDatabase:
+          name: toolpad-db
+          property: connectionString
+      - fromGroup: toolpad-settings
+
+databases:
+  - name: toolpad-db
+    ipAllowList: []
+    plan: free
+
+envVarGroups:
+  - name: toolpad-settings
+    envVars:
+      - key: STUDIO_BASIC_AUTH_USER
+        sync: false
+      - key: STUDIO_BASIC_AUTH_PASSWORD
+        sync: false

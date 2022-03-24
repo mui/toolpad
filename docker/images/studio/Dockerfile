@@ -26,5 +26,6 @@ FROM base as prod
 
 COPY --from=builder-base /app/ /app/
 USER node
+EXPOSE 3000
 
 CMD ["node_modules/@mui/studio/cli.js"]

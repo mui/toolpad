@@ -1,3 +1,4 @@
+# https://render.com/docs/preview-environments
 previewsEnabled: true
 
 services:
@@ -14,6 +15,5 @@ services:
 
 databases:
   - name: postgres
-    databaseName: db # optional (Render may add a suffix)
     ipAllowList: []
     plan: free

@@ -40,9 +40,9 @@ function createOAuthClient() {
 
 /**
  * Private executor function for this connection
- * @param {StudioConnection<GoogleSheetsConnectionParams>} connection  The connection object
- * @param {GoogleSheetsQuery} query  The query object
- * @returns {Promise<<any>} The private api response
+ * @param connection  The connection object
+ * @param query  The query object
+ * @returns The private api response
  */
 
 async function execPrivate(
@@ -90,9 +90,9 @@ async function execPrivate(
 
 /**
  * Executor function for this connection
- * @param {StudioConnection<GoogleSheetsConnectionParams>} connection  The connection object
- * @param {GoogleSheetsQuery} query  The query object
- * @returns {Promise<StudioApiResult<any>>} The api response
+ * @param connection  The connection object
+ * @param query  The query object
+ * @returns The api response
  */
 
 async function exec(
@@ -139,9 +139,9 @@ async function exec(
 
 /**
  * Handler for new connections
- * @param {CreateHandlerApi} api  The api for the handler object
- * @param {NextApiRequest} req  The request object
- * @param {NextApiResponse} res The response object
+ * @param api  The api for the handler object
+ * @param req  The request object
+ * @param res The response object
  */
 
 async function handler(

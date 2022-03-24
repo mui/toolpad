@@ -109,17 +109,16 @@ export enum GoogleSheetsActionType {
 export type GoogleSheetsQueryAction =
   | {
       type: GoogleSheetsActionType.FETCH_SPREADSHEETS;
-      payload: null;
     }
   | {
       type: GoogleSheetsActionType.FETCH_SHEET;
-      payload: GoogleSpreadsheet | null;
+      spreadsheet: GoogleSpreadsheet | null;
     }
   | {
       type: GoogleSheetsActionType.UPDATE_SHEET;
-      payload: GoogleSheet | null;
+      sheet: GoogleSheet | null;
     }
   | {
       type: GoogleSheetsActionType.UPDATE_RANGE;
-      payload: string;
+      ranges: string;
     };

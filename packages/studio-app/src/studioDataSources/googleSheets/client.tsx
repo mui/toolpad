@@ -32,26 +32,26 @@ const queryReducer = (
   state: GoogleSheetsQuery,
   action: GoogleSheetsQueryAction,
 ): GoogleSheetsQuery => {
-  const { type, payload } = action;
+  const { type } = action;
   switch (type) {
     case GoogleSheetsActionType.FETCH_SHEET:
       return {
         ...state,
         sheet: null,
         type,
-        spreadsheet: payload as GoogleSpreadsheet,
+        spreadsheet: action.spreadsheet,
       };
     case GoogleSheetsActionType.UPDATE_SHEET:
       return {
         ...state,
         type,
-        sheet: payload as GoogleSheet,
+        sheet: action.sheet,
       };
     case GoogleSheetsActionType.UPDATE_RANGE:
       return {
         ...state,
         type,
-        ranges: payload as string,
+        ranges: action.ranges,
       };
     default:
       return state;
@@ -115,7 +115,7 @@ function QueryEditor({ value, onChange, api }: StudioQueryEditorProps<GoogleShee
           option?.id === val?.id
         }
         onChange={(event: any, newValue: GoogleSpreadsheet | null) =>
-          dispatch({ type: GoogleSheetsActionType.FETCH_SHEET, payload: newValue })
+          dispatch({ type: GoogleSheetsActionType.FETCH_SHEET, spreadsheet: newValue })
         }
         renderInput={(params) => <TextField {...params} size="small" label="Select spreadsheet" />}
       />
@@ -132,7 +132,7 @@ function QueryEditor({ value, onChange, api }: StudioQueryEditorProps<GoogleShee
           option?.sheetId === val?.sheetId
         }
         onChange={(event: any, newValue: GoogleSheet | null) =>
-          dispatch({ type: GoogleSheetsActionType.UPDATE_SHEET, payload: newValue })
+          dispatch({ type: GoogleSheetsActionType.UPDATE_SHEET, sheet: newValue })
         }
         renderInput={(params) => <TextField {...params} size="small" label="Select sheet" />}
       />
@@ -145,7 +145,7 @@ function QueryEditor({ value, onChange, api }: StudioQueryEditorProps<GoogleShee
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           dispatch({
             type: GoogleSheetsActionType.UPDATE_RANGE,
-            payload: event.target?.value,
+            ranges: event.target?.value,
           });
         }}
       />

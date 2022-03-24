@@ -1,0 +1,55 @@
+name: Bug report 🐛
+description: Create a bug report for MUI Toolpad.
+labels: ['status: needs triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide a searchable summary of the issue in the title above ⬆️.
+
+        Thanks for contributing by creating an issue! ❤️
+  - type: checkboxes
+    attributes:
+      label: Duplicates
+      description: Please [search the history](https://github.com/mui/mui-toolpad/issues) to see if an issue already exists for the same problem.
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: checkboxes
+    attributes:
+      label: Latest version
+      description: We roll bug fixes, performance enhancements, and other improvements into new releases.
+      options:
+        - label: I have tested the latest version
+          required: true
+  - type: textarea
+    attributes:
+      label: Current behavior 😯
+      description: Describe what happens instead of the expected behavior.
+  - type: textarea
+    attributes:
+      label: Expected behavior 🤔
+      description: Describe what should happen.
+  - type: textarea
+    attributes:
+      label: Steps to reproduce 🕹
+      description: |
+        Provide a link to a live example and an unambiguous set of steps to reproduce this bug.
+        Include code to reproduce, if relevant.
+
+        Issues that we can't reproduce will be closed.
+      value: |
+        Steps:
+
+        1.
+        2.
+        3.
+        4.
+  - type: textarea
+    attributes:
+      label: Context 🔦
+      description: What are you trying to accomplish? How has this issue affected you? Providing context helps us come up with a solution that is more useful in the real world.
+  - type: textarea
+    attributes:
+      label: Your environment 🌎
+      description: The version of your MUI Toolpad intance

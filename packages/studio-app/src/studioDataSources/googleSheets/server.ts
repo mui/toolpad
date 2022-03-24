@@ -151,7 +151,9 @@ async function handler(
 ): Promise<NextApiResponse | void> {
   const client = createOAuthClient();
   try {
-    const pathname = `/${asArray(req.query.path).join('/')}`;
+    const pathname = `/${asArray(req.query.path)
+      .map((segment) => encodeURIComponent(segment))
+      .join('/')}`;
     const matchAuthLogin = match('/auth/login', { decode: decodeURIComponent });
     const matchAuthCallback = match('/auth/callback', { decode: decodeURIComponent });
 
@@ -188,7 +190,11 @@ async function handler(
             id: connectionId,
           });
         }
-        return res.redirect(`/_studio/app/${appId}/editor/connections/${connectionId}`);
+        return res.redirect(
+          `/_studio/app/${encodeURIComponent(appId)}/editor/connections/${encodeURIComponent(
+            connectionId,
+          )}`,
+        );
       });
     }
     return res.status(404).send('No handler exists for given path');

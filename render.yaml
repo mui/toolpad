@@ -7,7 +7,7 @@ services:
     env: node
     buildCommand: yarn --frozen-lockfile --prod=false && yarn release:build
     startCommand: yarn start
-    healthCheckPath: /health-check
+    # healthCheckPath: /health-check
     plan: free
     # previewPlan: free
     # can't have preview environments on free plan but maybe this:

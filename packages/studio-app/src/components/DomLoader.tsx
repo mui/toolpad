@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Alert, Snackbar } from '@mui/material';
 import * as studioDom from '../studioDom';
 import { NodeId, StudioBindable, StudioBindables } from '../types';
 import { update } from '../utils/immutability';
@@ -331,6 +332,11 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   return (
     <DomLoaderContext.Provider value={state}>
       <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
+      <Snackbar open={!!state.error}>
+        <Alert severity="error" sx={{ width: '100%' }}>
+          Failed to save: {state.error}
+        </Alert>
+      </Snackbar>
     </DomLoaderContext.Provider>
   );
 }

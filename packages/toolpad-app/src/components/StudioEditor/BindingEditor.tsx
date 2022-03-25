@@ -10,7 +10,7 @@ import {
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
-import { LiveBinding, PropValueType } from '../../../../toolpad-core/dist';
+import { LiveBinding, PropValueType } from '@mui/toolpad-core';
 import { StudioBindable } from '../../types';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';

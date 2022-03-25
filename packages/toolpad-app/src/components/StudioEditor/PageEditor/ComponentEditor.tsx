@@ -1,6 +1,6 @@
 import { styled, Typography } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinition, ArgTypeDefinitions } from '../../../../../toolpad-core/dist';
+import { ArgTypeDefinition, ArgTypeDefinitions } from '@mui/toolpad-core';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as studioDom from '../../../studioDom';

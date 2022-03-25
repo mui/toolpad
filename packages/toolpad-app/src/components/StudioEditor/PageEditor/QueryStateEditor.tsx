@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { ArgTypeDefinitions, UseDataQuery } from '../../../../../toolpad-core/dist';
+import { ArgTypeDefinitions, UseDataQuery } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';

@@ -3,7 +3,7 @@ import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
-import { ArgTypeDefinitions, ComponentConfig } from '../../../../../toolpad-core/dist';
+import { ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
 import { NodeId } from '../../../types';
 import * as studioDom from '../../../studioDom';
 import { useDom, useDomApi } from '../../DomLoader';

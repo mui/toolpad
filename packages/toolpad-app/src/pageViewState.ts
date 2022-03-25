@@ -8,7 +8,7 @@ import {
   RuntimeEvent,
   ComponentConfig,
   LiveBinding,
-} from '../../toolpad-core/dist';
+} from '@mui/toolpad-core';
 import { NodeId, FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
 

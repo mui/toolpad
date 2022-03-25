@@ -19,7 +19,7 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import CloseIcon from '@mui/icons-material/Close';
-import { PropValueType, PropValueTypes } from '../../../../../toolpad-core/dist';
+import { PropValueType, PropValueTypes } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';

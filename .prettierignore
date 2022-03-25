@@ -1,5 +1,4 @@
 .next
-.toolpad-coredata
 /packages/*/dist
 /packages/*/.next
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ArgTypeDefinition } from '../../../../../toolpad-core/dist';
+import { ArgTypeDefinition } from '@mui/toolpad-core';
 import * as studioDom from '../../../studioDom';
 import { useDomApi } from '../../DomLoader';
 import { StudioBindable } from '../../../types';

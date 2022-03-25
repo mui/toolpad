@@ -1,6 +1,6 @@
 import { Stack, TextField, Typography } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinitions } from '../../../../toolpad-core/dist';
+import { ArgTypeDefinitions } from '@mui/toolpad-core';
 import StringRecordEditor from '../../components/StringRecordEditor';
 import { BindingEditor } from '../../components/StudioEditor/BindingEditor';
 import { StudioDataSourceClient } from '../../types';

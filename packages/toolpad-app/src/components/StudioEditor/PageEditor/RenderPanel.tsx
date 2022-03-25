@@ -5,7 +5,7 @@ import throttle from 'lodash/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton } from '@mui/material';
-import { RuntimeEvent, SlotType } from '../../../../../toolpad-core/dist';
+import { RuntimeEvent, SlotType } from '@mui/toolpad-core';
 import {
   NodeId,
   FlowDirection,

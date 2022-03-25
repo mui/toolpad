@@ -1,4 +1,4 @@
-import { ArgTypeDefinitions } from '../../../toolpad-core/dist';
+import { ArgTypeDefinitions } from '@mui/toolpad-core';
 import { StudioDom, StudioElementNode } from '../studioDom';
 import { PropExpression, ResolvedProps } from '../types';
 

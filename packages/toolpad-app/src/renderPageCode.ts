@@ -1,4 +1,4 @@
-import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '../../toolpad-core/dist';
+import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/toolpad-core';
 import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getStudioComponent } from './studioComponents';

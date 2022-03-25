@@ -1,6 +1,6 @@
 import { generateKeyBetween } from 'fractional-indexing';
 import cuid from 'cuid';
-import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '../../toolpad-core/dist';
+import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/toolpad-core';
 import {
   NodeId,
   StudioConstant,

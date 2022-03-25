@@ -1,4 +1,4 @@
-import { ArgTypeDefinitions } from '../../../toolpad-core/dist';
+import { ArgTypeDefinitions } from '@mui/toolpad-core';
 import movies from './movies/client';
 import postgres from './postgres/client';
 import rest from './rest/client';

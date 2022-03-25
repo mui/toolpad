@@ -7,7 +7,7 @@ import {
   RuntimeError,
   LiveBindings,
   ComponentConfig,
-} from '../../toolpad-core/dist';
+} from '@mui/toolpad-core';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 

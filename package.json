@@ -1,9 +1,9 @@
 {
-  "name": "mui-studio",
+  "name": "mui-toolpad",
   "version": "0.0.1",
   "license": "MIT",
   "description": "Build MUI apps quickly",
-  "repository": "https://github.com/mui-org/mui-studio.git",
+  "repository": "https://github.com/mui-org/mui-toolpad.git",
   "private": true,
   "workspaces": {
     "packages": [
@@ -12,7 +12,7 @@
     ]
   },
   "bin": {
-    "studio": "./dist/index.js"
+    "toolpad": "./dist/index.js"
   },
   "scripts": {
     "prettier": "node scripts/prettier.js",

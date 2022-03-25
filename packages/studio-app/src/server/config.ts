@@ -4,7 +4,7 @@ export interface ServerConfig extends SharedConfig {
   databaseUrl: string;
   googleSheetsClientId?: string;
   googleSheetsClientSecret?: string;
-  googleSheetsRedirectUri?: string;
+  studioExternalUrl?: string;
   encryptionKeys: string[];
 }
 
@@ -38,7 +38,7 @@ function readConfig(): ServerConfig {
     databaseUrl: process.env.STUDIO_DATABASE_URL,
     googleSheetsClientId: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
     googleSheetsClientSecret: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
-    googleSheetsRedirectUri: process.env.STUDIO_DATASOURCE_GOOGLESHEETS_REDIRECT_URI,
+    studioExternalUrl: process.env.STUDIO_EXTERNAL_URL,
     // Whitespace separated, do not use spaces in your keys
     encryptionKeys,
   };

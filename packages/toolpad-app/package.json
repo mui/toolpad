@@ -3,7 +3,7 @@
   "version": "0.0.5-alpha.3",
   "license": "MIT",
   "scripts": {
-    "dev": "yarn waitForDb && yarn prisma db push && yarn esinstall --dev && concurrently \"yarn:dev:*\"",
+    "dev": "yarn prisma generate && yarn waitForDb && yarn prisma db push --skip-generate && yarn esinstall --dev && concurrently \"yarn:dev:*\"",
     "build": "yarn prisma generate && yarn esinstall && concurrently \"yarn:build:*\" && rimraf ./.next/cache",
     "start": "yarn waitForDb && yarn prisma migrate deploy && NODE_ENV=production node ./server.js",
     "lint": "next lint && prettier --check .",

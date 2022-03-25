@@ -1,4 +1,4 @@
-# @mui/studio-app
+# @mui/toolpad-app
 
 Low-code tool, powered by MUI
 
@@ -8,10 +8,10 @@ Install the package in your project directory with:
 
 ```sh
 // with npm
-npm install @mui/studio-app
+npm install @mui/toolpad-app
 
 // with yarn
-yarn add @mui/studio-app
+yarn add @mui/toolpad-app
 ```
 
 ## Documentation

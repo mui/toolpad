@@ -59,6 +59,7 @@ export default function CreateStudioCodeComponentDialog({
   return (
     <Dialog {...props} onClose={onClose}>
       <DialogForm
+        autoComplete="off"
         onSubmit={(e) => {
           e.preventDefault();
           const newNode = studioDom.createNode(dom, 'codeComponent', {

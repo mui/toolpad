@@ -31,6 +31,7 @@ export default function CreateStudioPageDialog({
   return (
     <Dialog {...props} onClose={onClose}>
       <DialogForm
+        autoComplete="off"
         onSubmit={(e) => {
           e.preventDefault();
           const newNode = studioDom.createNode(dom, 'page', {

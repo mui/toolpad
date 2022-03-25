@@ -148,7 +148,7 @@ export default function StringRecordEditor({
         </React.Fragment>
       ))}
 
-      <form style={{ display: 'contents' }} onSubmit={handleSubmit}>
+      <form autoComplete="off" style={{ display: 'contents' }} onSubmit={handleSubmit}>
         <TextField
           inputRef={fieldInputRef}
           size="small"

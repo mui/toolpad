@@ -1,6 +1,6 @@
 .next
-.studio-data
+.toolpad-coredata
 /packages/*/dist
 /packages/*/.next
 
-/packages/studio-app/public
+/packages/toolpad-app/public

@@ -39,8 +39,8 @@ lerna-debug.log
 
 dist/
 
-packages/studio-app/public/web_modules
-packages/studio-app/public/editorRuntime
-packages/studio-app/public/sandbox
-packages/studio-app/public/typings.json
-packages/studio-app/prisma/generated
+packages/toolpad-app/public/web_modules
+packages/toolpad-app/public/editorRuntime
+packages/toolpad-app/public/sandbox
+packages/toolpad-app/public/typings.json
+packages/toolpad-app/prisma/generated

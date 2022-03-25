@@ -28,7 +28,7 @@ export default function StudioAppBar({ actions, navigation }: StudioAppBarProps)
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" color="inherit" component="div" sx={{ mr: 2 }}>
-          MUI Studio
+          MUI Toolpad
         </Typography>
         {navigation}
         <Box flex={1} />

@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.0.5-alpha.3",
+  "version": "0.0.5-alpha.4",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -28,8 +28,8 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/toolpad-app": "^0.0.5-alpha.3",
-    "@mui/toolpad-core": "^0.0.5-alpha.3",
+    "@mui/toolpad-app": "^0.0.5-alpha.4",
+    "@mui/toolpad-core": "^0.0.5-alpha.4",
     "arg": "^5.0.1",
     "dotenv": "^16.0.0",
     "execa": "^6.0.0",

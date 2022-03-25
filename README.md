@@ -1,4 +1,4 @@
-<h1 align="center">MUI Studio</h1>
+<h1 align="center">MUI Toolpad</h1>
 
 <div align="center">
 

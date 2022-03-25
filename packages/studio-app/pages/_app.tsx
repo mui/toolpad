@@ -4,11 +4,13 @@ import { AppProps } from 'next/app';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClientProvider } from 'react-query';
 import { LicenseInfo } from '@mui/x-data-grid-pro';
 import theme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import { MUI_X_PRO_LICENSE } from '../src/constants';
+import { queryClient } from '../src/api';
+import './reactSplitPane.css';
 
 LicenseInfo.setLicenseKey(MUI_X_PRO_LICENSE);
 
@@ -18,8 +20,6 @@ const clientSideEmotionCache = createEmotionCache();
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
-
-const queryClient = new QueryClient();
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;

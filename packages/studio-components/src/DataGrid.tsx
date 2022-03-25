@@ -9,9 +9,8 @@ import {
   GridColumnOrderChangeParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useStudioNode } from '@mui/studio-core';
+import { useStudioNode, UseDataQuery } from '@mui/studio-core';
 import { debounce } from '@mui/material';
-import { UseDataQuery } from 'packages/studio-core/dist/useDataQuery';
 
 function inferColumnType(value: unknown): string | undefined {
   if (value instanceof Date) {
@@ -40,9 +39,10 @@ export function inferColumns(rows: GridRowsProp): GridColumns {
   }));
 }
 
-const LICENSE = window?.document
-  .querySelector('meta[name=x-data-grid-pro-license]')
-  ?.getAttribute('content');
+const LICENSE =
+  typeof window !== 'undefined'
+    ? window.document.querySelector('meta[name=x-data-grid-pro-license]')?.getAttribute('content')
+    : null;
 
 if (LICENSE) {
   LicenseInfo.setLicenseKey(LICENSE);
@@ -112,8 +112,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const rows: GridRowsProp = rowsProp || dataQueryRows || EMPTY_ROWS;
 
   const columnsInitRef = React.useRef(false);
+  const hasColumnsDefined = columnsProp && columnsProp.length > 0;
   React.useEffect(() => {
-    if (!studioNode || columnsProp || rows.length <= 0 || columnsInitRef.current) {
+    if (!studioNode || hasColumnsDefined || rows.length <= 0 || columnsInitRef.current) {
       return;
     }
 
@@ -122,7 +123,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     studioNode.setProp('columns', inferredColumns);
 
     columnsInitRef.current = true;
-  }, [columnsProp, rows, studioNode]);
+  }, [hasColumnsDefined, rows, studioNode]);
 
   const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
 

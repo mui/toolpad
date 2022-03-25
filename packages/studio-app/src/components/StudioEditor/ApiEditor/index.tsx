@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { Box, Button, Stack, Toolbar } from '@mui/material';
+import { Alert, Box, Button, LinearProgress, Stack, Toolbar } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { StudioDataSourceClient, NodeId } from '../../../types';
+import SplitPane from 'react-split-pane';
+import { NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
 import * as studioDom from '../../../studioDom';
@@ -10,12 +11,8 @@ import { useDom, useDomApi } from '../../DomLoader';
 import useDebounced from '../../../utils/useDebounced';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
-
-function getDataSource<Q>(
-  connection: studioDom.StudioConnectionNode,
-): StudioDataSourceClient<any, Q> | null {
-  return dataSources[connection.attributes.dataSource.value] || null;
-}
+import { ConnectionSelect } from '../HierarchyExplorer/CreateStudioApiDialog';
+import JsonView from '../../JsonView';
 
 interface ApiEditorContentProps<Q> {
   appId: string;
@@ -32,7 +29,8 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
 
   const conectionId = apiNode.attributes.connectionId.value as NodeId;
   const connection = studioDom.getMaybeNode(dom, conectionId, 'connection');
-  const dataSource = connection && getDataSource<Q>(connection);
+  const dataSourceName = apiNode.attributes.dataSource.value;
+  const dataSource = dataSources[dataSourceName] || null;
 
   const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
     return {
@@ -43,10 +41,8 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
 
   const debouncedPreviewApi = useDebounced(previewApi, 250);
 
-  const { data: previewData } = useQuery(
-    ['api', debouncedPreviewApi],
-    async () => client.query.execApi(appId, debouncedPreviewApi, {}),
-    {},
+  const previewQuery = useQuery(['api', debouncedPreviewApi], async () =>
+    client.query.execApi(appId, debouncedPreviewApi, {}),
   );
 
   const queryEditorApi = React.useMemo(() => {
@@ -56,60 +52,92 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
     };
   }, [appId, conectionId]);
 
-  if (!connection) {
-    return (
-      <NotFoundEditor
-        className={className}
-        message={`Connection "${apiNode.attributes.connectionId.value}" not found`}
-      />
-    );
-  }
+  const handleConnectionChange = React.useCallback(
+    (newConnectionId) => {
+      if (apiNode) {
+        domApi.setNodeNamespacedProp(
+          apiNode,
+          'attributes',
+          'connectionId',
+          studioDom.createConst(newConnectionId),
+        );
+      }
+    },
+    [apiNode, domApi],
+  );
 
   if (!dataSource) {
     return (
-      <NotFoundEditor
-        className={className}
-        message={`DataSource "${connection.attributes.dataSource.value}" not found`}
-      />
+      <NotFoundEditor className={className} message={`DataSource "${dataSourceName}" not found`} />
     );
   }
 
+  const previewIsInvalid: boolean = !connection && !previewQuery.isError;
+
   return (
-    <Box className={className} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', px: 3 }}>
-        <Toolbar disableGutters>
-          <Button
-            onClick={() => {
-              (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
-                if (typeof propName !== 'string' || !apiQuery[propName]) {
-                  return;
-                }
-                domApi.setNodeNamespacedProp(
-                  apiNode,
-                  'attributes',
-                  'query',
-                  studioDom.createConst(apiQuery),
-                );
-              });
-              savedQuery.current = apiQuery;
-            }}
-            disabled={savedQuery.current === apiQuery}
-          >
-            Update
-          </Button>
-        </Toolbar>
-        <Stack spacing={2}>
-          <NodeNameEditor node={apiNode} />
-          <dataSource.QueryEditor
-            api={queryEditorApi}
-            value={apiQuery}
-            onChange={(newApiQuery) => setApiQuery(newApiQuery)}
-          />
+    <Box sx={{ position: 'relative', flex: 1 }}>
+      <SplitPane
+        split="horizontal"
+        allowResize
+        defaultSize="60%"
+        paneStyle={{
+          width: '100%',
+          overflowY: 'auto',
+          display: 'block',
+        }}
+      >
+        <Stack sx={{ width: '100%', p: 3 }}>
+          <Stack direction="row" gap={2}>
+            <NodeNameEditor node={apiNode} />
+            <ConnectionSelect
+              dataSource={dataSourceName}
+              value={connection?.id ?? null}
+              onChange={handleConnectionChange}
+            />
+          </Stack>
+          <Toolbar disableGutters>
+            <Button
+              onClick={() => {
+                (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
+                  if (typeof propName !== 'string' || !apiQuery[propName]) {
+                    return;
+                  }
+                  domApi.setNodeNamespacedProp(
+                    apiNode,
+                    'attributes',
+                    'query',
+                    studioDom.createConst(apiQuery),
+                  );
+                });
+                savedQuery.current = apiQuery;
+              }}
+              disabled={savedQuery.current === apiQuery}
+            >
+              Update
+            </Button>
+          </Toolbar>
+          <Stack spacing={2}>
+            <dataSource.QueryEditor
+              api={queryEditorApi}
+              // TODO: Add disabled mode to QueryEditor
+              // disabled={!connection}
+              value={apiQuery}
+              onChange={(newApiQuery) => setApiQuery(newApiQuery)}
+            />
+          </Stack>
         </Stack>
-      </Box>
-      <Box sx={{ flex: 1, overflow: 'auto', borderTop: 1, borderColor: 'divider' }}>
-        <pre>{JSON.stringify(previewData, null, 2)}</pre>
-      </Box>
+        {previewQuery.isLoading || (previewIsInvalid && previewQuery.isFetching) ? (
+          <LinearProgress />
+        ) : null}
+        <Box sx={{ p: 2 }}>
+          {previewQuery.isError ? (
+            <Alert severity="error">{(previewQuery.error as Error).message}</Alert>
+          ) : null}
+          {!previewIsInvalid && previewQuery.isSuccess ? (
+            <JsonView src={previewQuery.data} />
+          ) : null}
+        </Box>
+      </SplitPane>
     </Box>
   );
 }

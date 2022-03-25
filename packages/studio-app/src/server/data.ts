@@ -28,6 +28,12 @@ export async function createApp(name: string) {
   });
 }
 
+export async function deleteApp(id: string) {
+  return prisma.app.delete({
+    where: { id },
+  });
+}
+
 function serializeValue(value: unknown, type: DomNodeAttributeType): string {
   const serialized = value === undefined ? '' : JSON.stringify(value);
   return type === 'secret' ? encryptSecret(serialized) : serialized;
@@ -312,13 +318,16 @@ export async function execApi<Q>(
   api: studioDom.StudioApiNode<Q>,
   params: Q,
 ): Promise<StudioApiResult<any>> {
-  const connection = await getConnection(appId, api.attributes.connectionId.value);
   const dataSource: StudioDataSourceServer<any, Q, any> | undefined =
-    studioDataSources[connection.type];
-
+    studioDataSources[api.attributes.dataSource.value];
   if (!dataSource) {
+    throw new Error(`Unknown datasource "${api.attributes.dataSource.value}" for api "${api.id}"`);
+  }
+
+  const connection = await getConnection(appId, api.attributes.connectionId.value);
+  if (!connection) {
     throw new Error(
-      `Unknown connection type "${connection.type}" for connection "${connection.id}"`,
+      `Unknown connection "${api.attributes.connectionId.value}" for api "${api.id}"`,
     );
   }
 

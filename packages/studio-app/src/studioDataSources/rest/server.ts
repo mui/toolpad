@@ -6,11 +6,12 @@ import {
 } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';
+import evalExpression from '../../server/evalExpression';
 
-function resolveBindableString(
+async function resolveBindableString(
   bindable: StudioBindable<string>,
   boundValues: Record<string, string>,
-): string {
+): Promise<string> {
   if (bindable.type === 'const') {
     return bindable.value;
   }
@@ -21,6 +22,11 @@ function resolveBindableString(
     const parsed = bindings.parse(bindable.value);
     const resolved = bindings.resolve(parsed, (interpolation) => boundValues[interpolation] || '');
     return bindings.formatStringValue(resolved);
+  }
+  if (bindable.type === 'jsExpression') {
+    return evalExpression(bindable.value, {
+      query: boundValues,
+    });
   }
   throw new Error(`Can't resolve bindable of type "${(bindable as StudioBindable<unknown>).type}"`);
 }
@@ -36,7 +42,7 @@ async function exec(
   params: Record<string, string>,
 ): Promise<StudioApiResult<any>> {
   const boundValues = { ...fetchQuery.params, ...params };
-  const resolvedUrl = resolveBindableString(fetchQuery.url, boundValues);
+  const resolvedUrl = await resolveBindableString(fetchQuery.url, boundValues);
   const res = await fetch(resolvedUrl);
   const data = await res.json();
   return { data };

@@ -28,7 +28,7 @@ async function main() {
       'react-query',
       '@mui/toolpad-core',
       '@mui/toolpad-core/runtime',
-      '@mui/stutoolpaddio-components',
+      '@mui/toolpad-components',
       '@mui/x-data-grid-pro',
       '@mui/material',
       '@mui/material/utils',

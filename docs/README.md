@@ -1,4 +1,4 @@
-# MUI Studio
+# MUI Toolpad
 
 Low code tool, for developrs, powered by MUI.
 

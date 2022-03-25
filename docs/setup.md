@@ -2,7 +2,7 @@
 
 ## docker-compose
 
-The easiest way to run MUI Studio locally is through docker-compose.
+The easiest way to run MUI Toolpad locally is through docker-compose.
 
 ### prerequisits
 
@@ -17,8 +17,8 @@ Make sure you have the following tools installed:
 1.  Check out the repository
 
 ```sh
-git clone https://github.com/mui/mui-studio.git
-cd mui-studio
+git clone https://github.com/mui/mui-toolpad.git
+cd mui-toolpad
 ```
 
 1. Start the docker compose services
@@ -27,7 +27,7 @@ cd mui-studio
 docker-compose -f docker/compose/docker-compose.yml up -d
 ```
 
-MUI Studio will be accessible under `http://localhost:3000/`.
+MUI Toolpad will be accessible under `http://localhost:3000/`.
 
 ## Heroku
 

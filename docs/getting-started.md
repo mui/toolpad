@@ -1,18 +1,18 @@
 # Getting started
 
-This page will guide you into creating your very first MUI Studio application. We will create a "hello world" type of application that will ask for a name and print a greeting.
+This page will guide you into creating your very first MUI Toolpad application. We will create a "hello world" type of application that will ask for a name and print a greeting.
 
 ## Prerequisites
 
-Make sure you have a running MUI Studio instance. If you don't know how to do that, please follow the [setup instructions](./setup.md).
+Make sure you have a running MUI Toolpad instance. If you don't know how to do that, please follow the [setup instructions](./setup.md).
 
 ## building your first application
 
-1. Open MUI Studio by navigating to [http://localhost:3000/](http://localhost:3000/) if you went through the docker setup, or otherwise the url MUI Studio is hosted under. You'll be presented with an overview screen with all the applications available. If you've started from a fresh instance, there should be none present.
+1. Open MUI Toolpad by navigating to [http://localhost:3000/](http://localhost:3000/) if you went through the docker setup, or otherwise the url MUI Toolpad is hosted under. You'll be presented with an overview screen with all the applications available. If you've started from a fresh instance, there should be none present.
 
    ![Apps overview](./images/apps-overview.png)
 
-1. Click "create new" and choose a name for your application in the popup, then click "create". This will create a new MUI Studio application and the page will navigate to the application editor.
+1. Click "create new" and choose a name for your application in the popup, then click "create". This will create a new MUI Toolpad application and the page will navigate to the application editor.
 
    ![Editor overview](./images/editor-overview.png)
 
@@ -44,6 +44,6 @@ Now that we have our first simple application, let's make sure we can use it out
 
    ![Release](./images/release.png)
 
-1. You just created a versioned release of your application. Click the "deploy" button to host this version under the production url of your page. Navigate to the MUI Studio home to get an overview of your application and click the "open" button on the application you just deployed. You'll be presented with an overview of the pages available in this application. Click on a page to see the production version of the application.
+1. You just created a versioned release of your application. Click the "deploy" button to host this version under the production url of your page. Navigate to the MUI Toolpad home to get an overview of your application and click the "open" button on the application you just deployed. You'll be presented with an overview of the pages available in this application. Click on a page to see the production version of the application.
 
    Now, go back to editing your application and change the binding of the Typography component to `` `Goodbye ${state.nameInput.value}!` ``. Create another release. After you've verified that the pages in this release are working correctly, click "deploy" to make this release the prodiction version of your application.

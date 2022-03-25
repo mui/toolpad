@@ -737,9 +737,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       const newSelectedNodeId = findNodeAt(pageNodes, nodesInfo, cursorPos.x, cursorPos.y);
-      api.select(newSelectedNodeId);
+      const newSelectedNode = newSelectedNodeId && studioDom.getMaybeNode(dom, newSelectedNodeId);
+      if (newSelectedNode && studioDom.isElement(newSelectedNode)) {
+        api.select(newSelectedNodeId);
+      } else {
+        api.select(null);
+      }
     },
-    [api, pageNodes, nodesInfo, getViewCoordinates],
+    [getViewCoordinates, pageNodes, nodesInfo, dom, api],
   );
 
   const handleDelete = React.useCallback(

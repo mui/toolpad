@@ -1,5 +1,4 @@
 .next
-.studio-data
 /packages/*/dist
 /packages/*/.next
 /packages/*/public

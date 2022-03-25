@@ -18,8 +18,8 @@ RUN npm init --yes
 FROM base as builder-base
 
 # When we're on alpine: RUN apk add --no-cache python3 make g++ git
-RUN npm i -S @mui/studio@$VERSION
-RUN prisma generate --schema node_modules/@mui/studio-app/prisma/schema.prisma
+RUN npm i -S @mui/toolpad@$VERSION
+RUN prisma generate --schema node_modules/@mui/toolpad-app/prisma/schema.prisma
 
 
 FROM base as prod
@@ -28,4 +28,4 @@ COPY --from=builder-base /app/ /app/
 USER node
 EXPOSE 3000
 
-CMD ["node_modules/@mui/studio/cli.js"]
+CMD ["node_modules/@mui/toolpad/cli.js"]

@@ -107,32 +107,28 @@ async function exec(
     version: 'v4',
     auth: client,
   });
-  try {
-    if (query.spreadsheet) {
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId: query.spreadsheet.id,
-        range: query.ranges,
-      });
-      if (response.statusText === 'OK') {
-        const { values } = response.data;
-        if (values && values.length > 0) {
-          const headerRow = values.shift() ?? [];
-          const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
+  if (query.spreadsheet) {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: query.spreadsheet.id,
+      range: query.ranges,
+    });
+    if (response.statusText === 'OK') {
+      const { values } = response.data;
+      if (values && values.length > 0) {
+        const headerRow = values.shift() ?? [];
+        const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
 
-          const data = values.map((row, rowIndex) => {
-            const rowObject: any = { id: rowIndex };
-            row.forEach((elem, cellIndex) => {
-              rowObject[headerRow[cellIndex]] = elem;
-            });
-            return rowObject;
+        const data = values.map((row, rowIndex) => {
+          const rowObject: any = { id: rowIndex };
+          row.forEach((elem, cellIndex) => {
+            rowObject[headerRow[cellIndex]] = elem;
           });
+          return rowObject;
+        });
 
-          return { fields, data };
-        }
+        return { fields, data };
       }
     }
-  } catch (error) {
-    throw new Error(`Unable to fetch spreadsheetId ${query.spreadsheet?.id}`);
   }
   throw new Error(`Invariant: Unrecognized googleSheets query type "${query.type}"`);
 }

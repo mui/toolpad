@@ -26,7 +26,7 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
       <head>
         <meta charset="utf-8" />
         <meta name="x-data-grid-pro-license" content="${MUI_X_PRO_LICENSE}" />
-        <title>Studio Sandbox</title>
+        <title>Toolpad Sandbox</title>
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"

@@ -1,10 +1,10 @@
 import { IncomingMessage } from 'http';
 
-// Represents what a session is able to do within Studio
+// Represents what a session is able to do within Toolpad
 export interface Capabilities {
-  // View and use Studio Applications
+  // View and use Toolpad Applications
   view: boolean;
-  // Create and edit Studio Applications
+  // Create and edit Toolpad Applications
   edit: boolean;
 }
 

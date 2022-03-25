@@ -2,8 +2,8 @@
   "name": "@mui/toolpad-components",
   "version": "0.0.5-alpha.3",
   "description": "Build MUI apps quickly",
-  "author": "MUI Studio team",
-  "homepage": "https://github.com/mui/mui-studio#readme",
+  "author": "MUI Toolpad team",
+  "homepage": "https://github.com/mui/mui-toolpad#readme",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui/mui-studio.git"
+    "url": "git+https://github.com/mui/mui-toolpad.git"
   },
   "scripts": {
     "prebuild": "rimraf dist",
@@ -26,7 +26,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
-    "url": "https://github.com/mui/mui-studio/issues"
+    "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
     "@mui/material": "^5.3.1",

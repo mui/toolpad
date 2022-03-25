@@ -4,11 +4,13 @@ import postgres from './postgres/client';
 import rest from './rest/client';
 import { NodeId, StudioDataSourceClient } from '../types';
 import * as studioDom from '../studioDom';
+import googleSheets from './googleSheets/client';
 
 const studioConnections: { [key: string]: StudioDataSourceClient<any, any> | undefined } = {
   movies,
   postgres,
   rest,
+  googleSheets,
 };
 
 export function getQueryNodeArgTypes(

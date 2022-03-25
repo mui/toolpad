@@ -1,4 +1,5 @@
 import type * as React from 'react';
+import { NextApiRequest, NextApiResponse } from 'next';
 import {
   ArgTypeDefinition,
   ArgTypeDefinitions,
@@ -78,6 +79,8 @@ export type NodeId = Branded<string, 'NodeId'>;
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
+export type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
+
 export interface SlotLocation {
   parentId: NodeId;
   parentProp: string;
@@ -123,13 +126,20 @@ export type StudioApiResultFields<D = any> = {
 
 export interface StudioApiResult<D = any> {
   data: D;
+  fields?: StudioApiResultFields;
 }
 
-export interface StudioConnectionParamsEditorProps<P> extends WithControlledProp<P> {
-  connectionName: string;
+export interface CreateHandlerApi {
+  updateConnection: (appId: string, props: Updates<StudioConnection>) => Promise<StudioConnection>;
+  getConnection: (appId: string, connectionId: string) => Promise<StudioConnection>;
 }
 
-export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionParamsEditorProps<P>>;
+export interface StudioConnectionEditorProps<P> extends WithControlledProp<P> {
+  handlerBasePath: string;
+  appId: string;
+  connectionId: NodeId;
+}
+export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionEditorProps<P>>;
 export interface StudioQueryEditorApi {
   fetchPrivate: (query: any) => Promise<any>;
 }
@@ -159,6 +169,7 @@ export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
   execPrivate?: (connection: StudioConnection<P>, query: any) => Promise<any>;
   // Execute a query on this connection, intended for viewers
   exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
+  createHandler?: () => (api: CreateHandlerApi, req: NextApiRequest, res: NextApiResponse) => void;
 }
 
 export interface StudioConnectionSummary {

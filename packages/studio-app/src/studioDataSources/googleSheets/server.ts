@@ -10,7 +10,12 @@ import {
 } from '../../types';
 import config from '../../server/config';
 import { asArray } from '../../utils/collections';
-import { GoogleSheetsActionType, GoogleSheetsConnectionParams, GoogleSheetsQuery } from './types';
+import {
+  GoogleSheetsConnectionParams,
+  GoogleSheetsPrivateQueryType,
+  GoogleSheetsPrivateQuery,
+  GoogleSheetsApiQuery,
+} from './types';
 
 async function test(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
@@ -47,43 +52,45 @@ function createOAuthClient() {
 
 async function execPrivate(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
-  query: GoogleSheetsQuery,
+  query: GoogleSheetsPrivateQuery,
 ): Promise<any> {
   const client = createOAuthClient();
   if (connection.params) {
     client.setCredentials(connection.params);
   }
-  if (query.type === GoogleSheetsActionType.FETCH_SHEET) {
+  if (query.type === GoogleSheetsPrivateQueryType.FETCH_SPREADSHEETS) {
+    const driveClient = google.drive({
+      version: 'v3',
+      auth: client,
+    });
+
+    const response = await driveClient.files.list({
+      q: "mimeType='application/vnd.google-apps.spreadsheet'",
+    });
+    if (response.statusText === 'OK') {
+      return response.data;
+    }
+    // TODO: Handle statusText not ok
+  }
+  if (query.type === GoogleSheetsPrivateQueryType.FETCH_SHEET) {
     const sheetsClient = google.sheets({
       version: 'v4',
       auth: client,
     });
-    const spreadsheetId = query.spreadsheet?.id;
-    try {
+    const { spreadsheetId } = query;
+    if (spreadsheetId) {
       const response = await sheetsClient.spreadsheets.get({
         spreadsheetId,
         includeGridData: false,
       });
       if (response.statusText === 'OK') {
         const { sheets } = response.data;
-        return { sheets: sheets?.map((sheet) => sheet.properties) };
+        return {
+          sheets: sheets?.map((sheet) => sheet.properties),
+        };
       }
-    } catch (error) {
-      throw new Error(`Unable to fetch spreadsheetId ${query.spreadsheet?.id}`);
     }
-  } else if (query.type === GoogleSheetsActionType.FETCH_SPREADSHEETS) {
-    const driveClient = google.drive({
-      version: 'v3',
-      auth: client,
-    });
-    try {
-      const response = await driveClient.files.list({
-        q: "mimeType='application/vnd.google-apps.spreadsheet'",
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(`Unable to fetch spreadsheets`);
-    }
+    // TODO: Handle statusText not ok
   }
   throw new Error(`Invariant: Unrecognized googleSheets private query type "${query.type}"`);
 }
@@ -97,7 +104,7 @@ async function execPrivate(
 
 async function exec(
   connection: StudioConnection<GoogleSheetsConnectionParams>,
-  query: GoogleSheetsQuery,
+  query: GoogleSheetsApiQuery,
 ): Promise<StudioApiResult<any>> {
   const client = createOAuthClient();
   if (connection.params) {
@@ -107,34 +114,29 @@ async function exec(
     version: 'v4',
     auth: client,
   });
-  try {
-    if (query.spreadsheet) {
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId: query.spreadsheet.id,
-        range: query.ranges,
-      });
-      if (response.statusText === 'OK') {
-        const { values } = response.data;
-        if (values && values.length > 0) {
-          const headerRow = values.shift() ?? [];
-          const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
-
-          const data = values.map((row, rowIndex) => {
-            const rowObject: any = { id: rowIndex };
-            row.forEach((elem, cellIndex) => {
-              rowObject[headerRow[cellIndex]] = elem;
-            });
-            return rowObject;
+  const { spreadsheetId, sheetName, ranges } = query;
+  if (spreadsheetId && ranges && sheetName) {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!${ranges}`,
+    });
+    if (response.statusText === 'OK') {
+      const { values } = response.data;
+      if (values && values.length > 0) {
+        const headerRow = values.shift() ?? [];
+        const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
+        const data = values.map((row, rowIndex) => {
+          const rowObject: any = { id: rowIndex };
+          row.forEach((elem, cellIndex) => {
+            rowObject[headerRow[cellIndex]] = elem;
           });
-
-          return { fields, data };
-        }
+          return rowObject;
+        });
+        return { fields, data };
       }
-    }
-  } catch (error) {
-    throw new Error(`Unable to fetch spreadsheetId ${query.spreadsheet?.id}`);
-  }
-  throw new Error(`Invariant: Unrecognized googleSheets query type "${query.type}"`);
+    } // TODO: Handle statusText not ok
+  } // TODO: Handle query params not defined
+  throw new Error(`Invariant: Unable to fetch spreadsheet "${query.spreadsheetId}"`);
 }
 
 /**

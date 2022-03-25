@@ -1,4 +1,4 @@
-import { Stack, Button, TextField, Autocomplete } from '@mui/material';
+import { Stack, Button, TextField, Autocomplete, Typography } from '@mui/material';
 import * as React from 'react';
 import { useQuery } from 'react-query';
 import {
@@ -8,11 +8,11 @@ import {
 } from '../../types';
 import {
   GoogleSheetsConnectionParams,
-  GoogleSheetsQuery,
+  GoogleSheetsApiQuery,
+  GoogleSheetsPrivateQueryType,
+  GoogleSheetsPrivateQuery,
   GoogleSpreadsheet,
   GoogleSheet,
-  GoogleSheetsQueryAction,
-  GoogleSheetsActionType,
 } from './types';
 
 function getInitialQueryValue(): any {
@@ -28,127 +28,148 @@ function isConnectionValid(connection: GoogleSheetsConnectionParams | null): boo
   return false;
 }
 
-const queryReducer = (
-  state: GoogleSheetsQuery,
-  action: GoogleSheetsQueryAction,
-): GoogleSheetsQuery => {
-  const { type } = action;
-  switch (type) {
-    case GoogleSheetsActionType.FETCH_SHEET:
+enum QueryEditorActionType {
+  UPDATE_SPREADSHEET = 'UPDATE_SPREADSHEET',
+  UPDATE_SHEET = 'UPDATE_SHEET',
+  UPDATE_RANGE = 'UPDATE_RANGE',
+}
+
+type QueryEditorAction =
+  | {
+      type: QueryEditorActionType.UPDATE_SPREADSHEET;
+      spreadsheetId: GoogleSheetsApiQuery['spreadsheetId'];
+    }
+  | {
+      type: QueryEditorActionType.UPDATE_SHEET;
+      sheetName: GoogleSheetsApiQuery['sheetName'];
+    }
+  | {
+      type: QueryEditorActionType.UPDATE_RANGE;
+      ranges: GoogleSheetsApiQuery['ranges'];
+    };
+
+function queryEditorReducer(
+  state: GoogleSheetsApiQuery,
+  action: QueryEditorAction,
+): GoogleSheetsApiQuery {
+  switch (action.type) {
+    case QueryEditorActionType.UPDATE_SPREADSHEET:
       return {
         ...state,
-        sheet: null,
-        type,
-        spreadsheet: action.spreadsheet,
+        spreadsheetId: action.spreadsheetId,
       };
-    case GoogleSheetsActionType.UPDATE_SHEET:
+    case QueryEditorActionType.UPDATE_SHEET:
       return {
         ...state,
-        type,
-        sheet: action.sheet,
+        sheetName: action.sheetName,
       };
-    case GoogleSheetsActionType.UPDATE_RANGE:
+    case QueryEditorActionType.UPDATE_RANGE:
       return {
         ...state,
-        type,
         ranges: action.ranges,
       };
-    default:
       return state;
+    default:
+      throw new Error();
   }
-};
+}
 
-function QueryEditor({ value, onChange, api }: StudioQueryEditorProps<GoogleSheetsQuery>) {
-  const [query, dispatch] = React.useReducer(
-    queryReducer,
-    value ?? {
-      type: GoogleSheetsActionType.FETCH_SPREADSHEETS,
-      spreadsheet: null,
-      sheet: null,
-      ranges: 'A1:Z100',
-    },
-  );
+function QueryEditor({
+  api,
+  value,
+  onChange,
+}: StudioQueryEditorProps<GoogleSheetsApiQuery, GoogleSheetsPrivateQuery>) {
+  const [apiQuery, dispatch] = React.useReducer(queryEditorReducer, value);
 
   const {
     isIdle: isListPending,
     isLoading: isListLoading,
     data: listData,
   } = useQuery('fetchSpreadsheets', () => {
-    return api.fetchPrivate({ type: GoogleSheetsActionType.FETCH_SPREADSHEETS });
+    return api.fetchPrivate({ type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEETS });
   });
 
   const {
     isIdle: isSpreadsheetPending,
     isLoading: isSpreadsheetLoading,
     data: spreadsheetData,
-  } = useQuery(
-    ['fetchSheet', query.spreadsheet?.id],
-    () => {
-      return api.fetchPrivate(query);
-    },
-    {
-      enabled: Boolean(query.spreadsheet) && query.type === GoogleSheetsActionType.FETCH_SHEET,
-    },
-  );
-
-  const { isLoading: isApiDataLoading } = useQuery(
-    ['execApi', query.ranges],
-    () => {
-      return onChange(query);
-    },
-    {
-      enabled: Boolean(query.spreadsheet) && query.type === GoogleSheetsActionType.UPDATE_RANGE,
-    },
-  );
+  } = useQuery(['fetchSheet', apiQuery.spreadsheetId], () => {
+    return api.fetchPrivate({
+      type: GoogleSheetsPrivateQueryType.FETCH_SHEET,
+      spreadsheetId: apiQuery.spreadsheetId,
+    });
+  });
 
   return (
     <Stack direction="column" gap={2}>
       <Autocomplete
         size="small"
-        value={query.spreadsheet}
         fullWidth
+        value={
+          !isListLoading &&
+          listData.files.find(
+            (spreadsheet: GoogleSpreadsheet) => spreadsheet.id === apiQuery.spreadsheetId,
+          )
+        }
         loading={isListLoading}
         loadingText={'Loading...'}
         options={isListLoading || isListPending ? [] : listData.files ?? []}
-        getOptionLabel={(option: GoogleSpreadsheet) => option?.name ?? ''}
-        isOptionEqualToValue={(option: GoogleSpreadsheet, val: GoogleSpreadsheet) =>
-          option?.id === val?.id
-        }
+        getOptionLabel={(option: GoogleSpreadsheet) => option.name}
         onChange={(event: any, newValue: GoogleSpreadsheet | null) =>
-          dispatch({ type: GoogleSheetsActionType.FETCH_SHEET, spreadsheet: newValue })
+          dispatch({
+            type: QueryEditorActionType.UPDATE_SPREADSHEET,
+            spreadsheetId: newValue?.id ?? null,
+          })
         }
         renderInput={(params) => <TextField {...params} size="small" label="Select spreadsheet" />}
       />
       <Autocomplete
         size="small"
-        disabled={Boolean(!query.spreadsheet)}
-        value={query.sheet}
+        value={
+          !isSpreadsheetLoading &&
+          spreadsheetData.sheets.find((sheet: GoogleSheet) => sheet.title === apiQuery.sheetName)
+        }
         fullWidth
         loading={isSpreadsheetLoading}
         loadingText={'Loading...'}
         options={isSpreadsheetLoading || isSpreadsheetPending ? [] : spreadsheetData.sheets}
-        getOptionLabel={(option: GoogleSheet) => option?.title ?? ''}
-        isOptionEqualToValue={(option: GoogleSheet, val: GoogleSheet) =>
-          option?.sheetId === val?.sheetId
+        getOptionLabel={(option: GoogleSheet) => option.title}
+        isOptionEqualToValue={(option: GoogleSheet, newValue: GoogleSheet | null) =>
+          option.sheetId === newValue?.sheetId
         }
-        onChange={(event: any, newValue: GoogleSheet | null) =>
-          dispatch({ type: GoogleSheetsActionType.UPDATE_SHEET, sheet: newValue })
-        }
+        onChange={(event: any, newValue: GoogleSheet | null) => {
+          const { spreadsheetId, ranges } = apiQuery;
+          dispatch({
+            type: QueryEditorActionType.UPDATE_SHEET,
+            sheetName: newValue?.title ?? null,
+          });
+          onChange({
+            spreadsheetId,
+            sheetName: newValue?.title ?? null,
+            ranges,
+          });
+        }}
         renderInput={(params) => <TextField {...params} size="small" label="Select sheet" />}
       />
       <TextField
         size="small"
         label="Range"
-        disabled={Boolean(!query.sheet) || isApiDataLoading}
         helperText={`In the form of A1:Z999`}
-        defaultValue={query.ranges}
+        defaultValue={value?.ranges ?? 'A1:Z100'}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          const { spreadsheetId, sheetName } = apiQuery;
           dispatch({
-            type: GoogleSheetsActionType.UPDATE_RANGE,
+            type: QueryEditorActionType.UPDATE_RANGE,
+            ranges: event.target?.value,
+          });
+          onChange({
+            spreadsheetId,
+            sheetName,
             ranges: event.target?.value,
           });
         }}
       />
+      <Typography>{JSON.stringify(apiQuery.sheetName)}</Typography>
     </Stack>
   );
 }
@@ -176,7 +197,7 @@ function ConnectionParamsInput({
   );
 }
 
-const dataSource: StudioDataSourceClient<GoogleSheetsConnectionParams, GoogleSheetsQuery> = {
+const dataSource: StudioDataSourceClient<GoogleSheetsConnectionParams, GoogleSheetsApiQuery> = {
   displayName: 'Google Sheets',
   ConnectionParamsInput,
   getInitialConnectionValue: getInitialQueryValue,

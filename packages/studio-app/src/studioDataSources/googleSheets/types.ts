@@ -74,16 +74,7 @@ export type GoogleSheet = {
   title: string;
 };
 
-export type GoogleSheetsQuery = {
-  /**
-   * Determining the type of query submitted by the client
-   */
-  type: GoogleSheetsActionType;
-  /**
-   * True if grid data should be returned. This parameter is ignored if a
-   * field mask was set in the request.
-   */
-  includeGridData: boolean;
+export type GoogleSheetsApiQuery = {
   /**
    * The ranges to retrieve from the spreadsheet.
    */
@@ -91,34 +82,23 @@ export type GoogleSheetsQuery = {
   /**
    * The spreadsheet to request.
    */
-  spreadsheet: GoogleSpreadsheet | null;
+  spreadsheetId: GoogleSpreadsheet['id'] | null;
   /**
    * The sheet to request.
    */
-  sheet: GoogleSheet | null;
+  sheetName: GoogleSheet['title'] | null;
 };
 
-export enum GoogleSheetsActionType {
-  UPDATE_SPREADSHEET = 'UPDATE_SPREADSHEET',
+export enum GoogleSheetsPrivateQueryType {
   FETCH_SHEET = 'FETCH_SHEET',
-  FETCH_SPREADSHEETS = 'FETCH_SPREADHSHEETS',
-  UPDATE_SHEET = 'UPDATE_SHEET',
-  UPDATE_RANGE = 'UPDATE_RANGE',
+  FETCH_SPREADSHEETS = 'FETCH_SPREADSHEETS',
 }
 
-export type GoogleSheetsQueryAction =
+export type GoogleSheetsPrivateQuery =
   | {
-      type: GoogleSheetsActionType.FETCH_SPREADSHEETS;
+      type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEETS;
     }
   | {
-      type: GoogleSheetsActionType.FETCH_SHEET;
-      spreadsheet: GoogleSpreadsheet | null;
-    }
-  | {
-      type: GoogleSheetsActionType.UPDATE_SHEET;
-      sheet: GoogleSheet | null;
-    }
-  | {
-      type: GoogleSheetsActionType.UPDATE_RANGE;
-      ranges: string;
+      type: GoogleSheetsPrivateQueryType.FETCH_SHEET;
+      spreadsheetId: GoogleSheetsApiQuery['spreadsheetId'];
     };

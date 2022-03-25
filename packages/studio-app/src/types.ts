@@ -140,11 +140,11 @@ export interface StudioConnectionEditorProps<P> extends WithControlledProp<P> {
   connectionId: NodeId;
 }
 export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionEditorProps<P>>;
-export interface StudioQueryEditorApi {
-  fetchPrivate: (query: any) => Promise<any>;
+export interface StudioQueryEditorApi<P> {
+  fetchPrivate: (query: P) => Promise<any>;
 }
-export interface StudioQueryEditorProps<Q> extends WithControlledProp<Q> {
-  api: StudioQueryEditorApi;
+export interface StudioQueryEditorProps<Q, P = {}> extends WithControlledProp<Q> {
+  api: StudioQueryEditorApi<P>;
 }
 export type StudioQueryEditor<Q = {}> = React.FC<StudioQueryEditorProps<Q>>;
 

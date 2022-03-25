@@ -36,6 +36,7 @@ export default function CreateStudioConnectionDialog({
   return (
     <Dialog {...props} onClose={onClose}>
       <DialogForm
+        autoComplete="off"
         onSubmit={(e) => {
           e.preventDefault();
           const dataSource = dataSources[dataSourceType];

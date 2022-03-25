@@ -83,6 +83,7 @@ export default function CreateStudioApiDialog({
   return (
     <Dialog {...props} onClose={onClose}>
       <DialogForm
+        autoComplete="off"
         onSubmit={(e) => {
           e.preventDefault();
           const connection =

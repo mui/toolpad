@@ -104,7 +104,7 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogForm onSubmit={doSubmit}>
+      <DialogForm autoComplete="off" onSubmit={doSubmit}>
         <DialogTitle>Create new release</DialogTitle>
         <DialogContent>
           {lastRelease.isSuccess ? (

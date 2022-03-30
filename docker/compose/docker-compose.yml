@@ -1,10 +1,10 @@
 version: '3.7'
 
 services:
-  studio:
-    image: muicom/studio:alpha
+  toolpad:
+    image: muicom/toolpad:alpha
     environment:
-      - STUDIO_DATABASE_URL=postgresql://studio-app:secretpw@postgres:5432/postgres?connect_timeout=10
+      - STUDIO_DATABASE_URL=postgresql://toolpad-app:secretpw@postgres:5432/postgres?connect_timeout=10
     ports:
       - '3000:3000'
 
@@ -12,7 +12,7 @@ services:
     image: postgres:14.2
     restart: always
     environment:
-      - POSTGRES_USER=studio-app
+      - POSTGRES_USER=toolpad-app
       - POSTGRES_PASSWORD=secretpw
     logging:
       options:

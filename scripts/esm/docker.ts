@@ -6,7 +6,7 @@ import * as path from 'path';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-const DOCKER_IMAGE_NAME = 'muicom/studio';
+const DOCKER_IMAGE_NAME = 'muicom/toolpad';
 const lernaJsonPath = path.resolve(fileURLToPath(import.meta.url), '../../../lerna.json');
 
 async function getVersion() {
@@ -29,7 +29,7 @@ async function build() {
       `${DOCKER_IMAGE_NAME}:${distTag}`,
       '--build-arg',
       `VERSION=${version}`,
-      './docker/images/studio',
+      './docker/images/toolpad',
     ],
     {
       stdio: 'inherit',
@@ -52,12 +52,12 @@ async function publish() {
 yargs(hideBin(process.argv))
   .command({
     command: 'build',
-    description: 'build studio docker image',
+    description: 'build Toolpad docker image',
     handler: build,
   })
   .command({
     command: 'publish',
-    description: 'publish studio docker image',
+    description: 'publish Toolpad docker image',
     handler: publish,
   })
   .help()

@@ -32,14 +32,14 @@ function createOAuthClient() {
   if (
     !config.googleSheetsClientId ||
     !config.googleSheetsClientSecret ||
-    !config.googleSheetsRedirectUri
+    !config.studioExternalUrl
   ) {
     throw new Error('Missing googleSheets datasource client configuration');
   }
   return new google.auth.OAuth2(
     config.googleSheetsClientId,
     config.googleSheetsClientSecret,
-    config.googleSheetsRedirectUri,
+    new URL('/api/dataSources/googleSheets/auth/callback', config.studioExternalUrl).href,
   );
 }
 

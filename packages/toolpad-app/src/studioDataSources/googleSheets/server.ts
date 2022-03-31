@@ -17,13 +17,6 @@ import {
   GoogleSheetsApiQuery,
 } from './types';
 
-async function test(
-  connection: StudioConnection<GoogleSheetsConnectionParams>,
-): Promise<ConnectionStatus> {
-  console.log(`Testing connection ${JSON.stringify(connection)}`);
-  return { timestamp: Date.now() };
-}
-
 /**
  * Create an OAuth2 client based on the configuration
  */
@@ -41,6 +34,19 @@ function createOAuthClient() {
     config.googleSheetsClientSecret,
     new URL('/api/dataSources/googleSheets/auth/callback', config.studioExternalUrl).href,
   );
+}
+
+/**
+ * Test function for this connection
+ * @param connection  The connection object
+ * @returns The connection status
+ */
+
+async function test(
+  connection: StudioConnection<GoogleSheetsConnectionParams>,
+): Promise<ConnectionStatus> {
+  console.log(`Testing connection ${JSON.stringify(connection)}`);
+  return { timestamp: Date.now() };
 }
 
 /**
@@ -74,7 +80,7 @@ async function execPrivate(
     if (response.statusText === 'OK') {
       return response.data;
     }
-    // TODO: Handle statusText not ok
+    throw new Error(`Failed to fetch query: "${JSON.stringify(query)}"`);
   }
   if (query.type === GoogleSheetsPrivateQueryType.FETCH_SHEET) {
     const sheetsClient = google.sheets({
@@ -82,19 +88,17 @@ async function execPrivate(
       auth: client,
     });
     const { spreadsheetId } = query;
-    if (spreadsheetId) {
-      const response = await sheetsClient.spreadsheets.get({
-        spreadsheetId,
-        includeGridData: false,
-      });
-      if (response.statusText === 'OK') {
-        const { sheets } = response.data;
-        return {
-          sheets: sheets?.map((sheet) => sheet.properties),
-        };
-      }
+    const response = await sheetsClient.spreadsheets.get({
+      spreadsheetId: spreadsheetId ?? undefined,
+      includeGridData: false,
+    });
+    if (response.statusText === 'OK') {
+      const { sheets } = response.data;
+      return {
+        sheets: sheets?.map((sheet) => sheet.properties),
+      };
     }
-    // TODO: Handle statusText not ok
+    throw new Error(`Failed to fetch query: "${JSON.stringify(query)}"`);
   }
   throw new Error(`Invariant: Unrecognized private query: "${JSON.stringify(query)}"`);
 }
@@ -144,7 +148,7 @@ async function exec(
       });
       return { fields, data };
     }
-  } // TODO: Handle statusText not ok
+  }
   throw new Error(`Invariant: Unable to execute query: "${JSON.stringify(query)}"`);
 }
 

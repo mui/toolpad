@@ -20,10 +20,8 @@ function getInitialQueryValue(): any {
 }
 
 function isConnectionValid(connection: GoogleSheetsConnectionParams | null): boolean {
-  if (connection?.access_token && connection?.expiry_date && connection?.refresh_token) {
-    if (connection.expiry_date >= Date.now()) {
-      return true;
-    }
+  if (connection?.access_token && connection?.refresh_token) {
+    return true;
   }
   return false;
 }
@@ -33,8 +31,6 @@ function QueryEditor({
   value,
   onChange,
 }: StudioQueryEditorProps<GoogleSheetsApiQuery, GoogleSheetsPrivateQuery>) {
-  // const [apiQuery, dispatch] = React.useReducer(queryEditorReducer, value);
-
   const {
     isIdle: isListPending,
     isLoading: isListLoading,

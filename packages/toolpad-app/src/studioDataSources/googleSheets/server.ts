@@ -58,6 +58,10 @@ async function execPrivate(
   if (connection.params) {
     client.setCredentials(connection.params);
   }
+  if (!query) {
+    return {};
+  }
+
   if (query.type === GoogleSheetsPrivateQueryType.FETCH_SPREADSHEETS) {
     const driveClient = google.drive({
       version: 'v3',
@@ -92,7 +96,7 @@ async function execPrivate(
     }
     // TODO: Handle statusText not ok
   }
-  throw new Error(`Invariant: Unrecognized googleSheets private query type "${query.type}"`);
+  throw new Error(`Invariant: Unrecognized private query: "${JSON.stringify(query)}"`);
 }
 
 /**
@@ -114,29 +118,34 @@ async function exec(
     version: 'v4',
     auth: client,
   });
-  const { spreadsheetId, sheetName, ranges } = query;
-  if (spreadsheetId && ranges && sheetName) {
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${sheetName}!${ranges}`,
-    });
-    if (response.statusText === 'OK') {
-      const { values } = response.data;
-      if (values && values.length > 0) {
-        const headerRow = values.shift() ?? [];
-        const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
-        const data = values.map((row, rowIndex) => {
-          const rowObject: any = { id: rowIndex };
-          row.forEach((elem, cellIndex) => {
-            rowObject[headerRow[cellIndex]] = elem;
-          });
-          return rowObject;
+  if (!query) {
+    return { fields: {}, data: {} };
+  }
+  const { spreadsheetId, sheetName, ranges = 'A1:Z100' } = query;
+  if (!spreadsheetId || !sheetName) {
+    return { fields: {}, data: {} };
+  }
+
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${sheetName}!${ranges}`,
+  });
+  if (response.statusText === 'OK') {
+    const { values } = response.data;
+    if (values && values.length > 0) {
+      const headerRow = values.shift() ?? [];
+      const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
+      const data = values.map((row, rowIndex) => {
+        const rowObject: any = { id: rowIndex };
+        row.forEach((elem, cellIndex) => {
+          rowObject[headerRow[cellIndex]] = elem;
         });
-        return { fields, data };
-      }
-    } // TODO: Handle statusText not ok
-  } // TODO: Handle query params not defined
-  throw new Error(`Invariant: Unable to fetch spreadsheet "${query.spreadsheetId}"`);
+        return rowObject;
+      });
+      return { fields, data };
+    }
+  } // TODO: Handle statusText not ok
+  throw new Error(`Invariant: Unable to execute query: "${JSON.stringify(query)}"`);
 }
 
 /**
@@ -172,14 +181,19 @@ async function handler(
         client.generateAuthUrl({
           access_type: 'offline',
           scope: [
-            'https://www.googleapis.com/auth/spreadsheets',
-            'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/spreadsheets.readonly',
+            'https://www.googleapis.com/auth/drive.readonly',
           ],
           state,
+          include_granted_scopes: true,
         }),
       );
     }
     if (matchAuthCallback(pathname)) {
+      const [oAuthError] = asArray(req.query.error);
+      if (oAuthError) {
+        throw new Error(oAuthError);
+      }
       const [code] = asArray(req.query.code);
       return client.getToken(code, async (error, token) => {
         if (error) {

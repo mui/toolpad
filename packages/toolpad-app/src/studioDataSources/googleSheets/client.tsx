@@ -31,11 +31,7 @@ function QueryEditor({
   value,
   onChange,
 }: StudioQueryEditorProps<GoogleSheetsApiQuery, GoogleSheetsPrivateQuery>) {
-  const {
-    isIdle: isListPending,
-    isLoading: isListLoading,
-    data: listData,
-  } = useQuery('fetchSpreadsheets', () => {
+  const { isLoading: isListLoading, data: listData } = useQuery('fetchSpreadsheets', () => {
     return api.fetchPrivate({ type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEETS });
   });
 
@@ -43,6 +39,7 @@ function QueryEditor({
     (event, newValue: GoogleSpreadsheet | null) => {
       onChange({
         ...value,
+        sheetName: null,
         spreadsheetId: newValue?.id ?? null,
       });
     },
@@ -100,7 +97,7 @@ function QueryEditor({
         }
         loading={isListLoading}
         loadingText={'Loading...'}
-        options={isListLoading || isListPending ? [] : listData.files ?? []}
+        options={isListLoading ? [] : listData.files ?? []}
         getOptionLabel={(option: GoogleSpreadsheet) => option.name}
         onChange={handleSpreadsheetChange}
         renderInput={(params) => <TextField {...params} size="small" label="Select spreadsheet" />}

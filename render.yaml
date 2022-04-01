@@ -9,7 +9,7 @@ services:
     buildCommand: yarn --frozen-lockfile --prod=false && yarn release:build
     startCommand: yarn start
     healthCheckPath: /health-check
-    plan: free
+    plan: starter plus
     # previewPlan: free
     pullRequestPreviewsEnabled: true
     envVars:
@@ -22,7 +22,7 @@ services:
 databases:
   - name: toolpad-db
     ipAllowList: []
-    plan: free
+    plan: starter
     # previewPlan: free
 
 envVarGroups:

@@ -92,7 +92,7 @@ function QueryEditor({
         size="small"
         fullWidth
         value={
-          !isListLoading && value?.spreadsheetId
+          listData && value?.spreadsheetId
             ? listData.files.find(
                 (spreadsheet: GoogleSpreadsheet) => spreadsheet.id === value.spreadsheetId,
               )
@@ -108,7 +108,7 @@ function QueryEditor({
       <Autocomplete
         size="small"
         value={
-          !isSpreadsheetLoading && value?.sheetName
+          spreadsheetData && value?.sheetName
             ? spreadsheetData.sheets.find((sheet: GoogleSheet) => sheet.title === value.sheetName)
             : null
         }

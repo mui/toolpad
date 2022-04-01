@@ -6,7 +6,7 @@ This page will guide you into creating your very first MUI Toolpad application. 
 
 Make sure you have a running MUI Toolpad instance. If you don't know how to do that, please follow the [setup instructions](./setup.md).
 
-## building your first application
+## Building your first application
 
 1. Open MUI Toolpad by navigating to [http://localhost:3000/](http://localhost:3000/) if you went through the docker setup, or otherwise the url MUI Toolpad is hosted under. You'll be presented with an overview screen with all the applications available. If you've started from a fresh instance, there should be none present.
 

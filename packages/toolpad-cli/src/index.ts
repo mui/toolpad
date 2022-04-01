@@ -37,8 +37,8 @@ const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   preferLocal: true,
   stdio: 'pipe',
   env: {
-    STUDIO_DATABASE_URL: process.env.STUDIO_DATABASE_URL,
-    FORCE_COLOR: process.env.FORCE_COLOR,
+    // See https://render.com/docs/environment-variables for more available variables
+    STUDIO_EXTERNAL_URL: process.env.STUDIO_EXTERNAL_URL || process.env.RENDER_EXTERNAL_URL,
     PRISMA_HIDE_UPDATE_MESSAGE: '1',
   },
 });

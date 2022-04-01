@@ -1,5 +1,5 @@
 # https://render.com/docs/preview-environments
-previewsEnabled: false
+previewsEnabled: true
 previewsExpireAfterDays: 3
 
 services:
@@ -10,7 +10,7 @@ services:
     startCommand: yarn start
     # healthCheckPath: /health-check
     plan: free
-    # previewPlan: free
+    previewPlan: free
     pullRequestPreviewsEnabled: true
     envVars:
       - key: STUDIO_DATABASE_URL
@@ -23,7 +23,7 @@ databases:
   - name: toolpad-db
     ipAllowList: []
     plan: free
-    # previewPlan: free
+    previewPlan: free
 
 envVarGroups:
   - name: toolpad-settings

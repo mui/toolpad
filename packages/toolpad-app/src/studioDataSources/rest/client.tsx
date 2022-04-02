@@ -9,7 +9,7 @@ import { FetchQuery } from './types';
 import * as studioDom from '../../studioDom';
 
 function ConnectionParamsInput() {
-  return <Typography>No input</Typography>;
+  return null;
 }
 
 function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {

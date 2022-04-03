@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { NodeId } from '../../types';
-import * as studioDom from '../../studioDom';
+import * as appDom from '../../appDom';
 import renderPageCode from '../../renderPageCode';
-import StudioSandbox from '../StudioSandbox';
+import AppSandbox from '../AppSandbox';
 import getImportMap from '../../getImportMap';
 import renderThemeCode from '../../renderThemeCode';
 import renderEntryPoint from '../../renderPageEntryCode';
@@ -12,7 +12,7 @@ export interface PageViewProps {
   editor?: boolean;
   onLoad?: (window: Window) => void;
   appId: string;
-  dom: studioDom.StudioDom;
+  dom: appDom.AppDom;
   pageNodeId: NodeId;
 }
 
@@ -45,8 +45,8 @@ export default function PageView({
   }, [pagePath, themePath, editor]);
 
   const codeComponentsFiles = React.useMemo(() => {
-    const app = studioDom.getApp(dom);
-    const { codeComponents = [] } = studioDom.getChildNodes(dom, app);
+    const app = appDom.getApp(dom);
+    const { codeComponents = [] } = appDom.getChildNodes(dom, app);
     // TODO: only render the components that were used on the page?
     return Object.fromEntries(
       codeComponents.map((component) => [
@@ -57,8 +57,8 @@ export default function PageView({
   }, [dom]);
 
   const derivedStateHookFiles = React.useMemo(() => {
-    const page = studioDom.getNode(dom, pageNodeId, 'page');
-    const { derivedStates = [] } = studioDom.getChildNodes(dom, page);
+    const page = appDom.getNode(dom, pageNodeId, 'page');
+    const { derivedStates = [] } = appDom.getChildNodes(dom, page);
     return Object.fromEntries(
       derivedStates.map((derivedState) => [
         `./derivedState/${derivedState.id}.ts`,
@@ -68,7 +68,7 @@ export default function PageView({
   }, [dom, pageNodeId]);
 
   return (
-    <StudioSandbox
+    <AppSandbox
       className={className}
       onLoad={onLoad}
       base={`/app/${appId}/${dom.root}/`}

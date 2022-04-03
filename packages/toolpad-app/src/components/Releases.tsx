@@ -12,7 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { useNavigate, useParams } from 'react-router-dom';
 import client from '../api';
-import StudioAppBar from './StudioAppBar';
+import AppHeader from './AppHeader';
 
 interface ReleaseRow {
   createdAt: Date;
@@ -96,7 +96,7 @@ export default function Releases() {
 
   return (
     <React.Fragment>
-      <StudioAppBar navigation={null} actions={null} />
+      <AppHeader navigation={null} actions={null} />
       <Container>
         <Typography variant="h2">Releases</Typography>
         <Box sx={{ my: 3, height: 350, width: '100%' }}>

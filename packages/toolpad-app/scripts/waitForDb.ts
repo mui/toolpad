@@ -3,8 +3,8 @@ import { PrismaClient } from '../prisma/generated/client';
 const INTERVAL = 1000;
 const MAX_RETRIES = 30;
 
-if (!process.env.STUDIO_DATABASE_URL) {
-  throw new Error(`App started without config env variable STUDIO_DATABASE_URL`);
+if (!process.env.TOOLPAD_DATABASE_URL) {
+  throw new Error(`App started without config env variable TOOLPAD_DATABASE_URL`);
 }
 
 const prisma = new PrismaClient();
@@ -13,7 +13,7 @@ async function main() {
   for (let i = 1; i <= MAX_RETRIES; i += 1) {
     try {
       console.log(
-        `(${i}/${MAX_RETRIES}) trying to connect db "${process.env.STUDIO_DATABASE_URL}"...`,
+        `(${i}/${MAX_RETRIES}) trying to connect db "${process.env.TOOLPAD_DATABASE_URL}"...`,
       );
       // eslint-disable-next-line no-await-in-loop
       await prisma.$connect();

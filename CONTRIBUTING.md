@@ -2,7 +2,7 @@
 
 ## Local development
 
-If you would like to hack on MUI Studio or want to run the latest version, you can follow these steps:
+If you would like to hack on MUI Toolpad or want to run the latest version, you can follow these steps:
 
 ### Prerequisites:
 
@@ -35,10 +35,10 @@ If you would like to hack on MUI Studio or want to run the latest version, you c
 1. Create a `.env` file in the root of the project
 
    ```sh
-   STUDIO_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
+   TOOLPAD_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
    ```
 
-1. Now you can run the MUI Studio cli to start the application
+1. Now you can run the MUI Toolpad cli to start the application
 
    ```sh
    yarn cli
@@ -122,4 +122,4 @@ For testing purposes, it is possible to try out publishing
    yarn release:publish:dry-run
    ```
 
-1. packages can be installed by appending `--registry=http://localhost:4873/` to `yarn`/`npm` commands, or by providing environment variable `npm_config_registry=http://localhost:4873/` (The latter seems to be needed for `npx`, as in `npm_config_registry=http://localhost:4873/ npx @mui/studio`)
+1. packages can be installed by appending `--registry=http://localhost:4873/` to `yarn`/`npm` commands, or by providing environment variable `npm_config_registry=http://localhost:4873/` (The latter seems to be needed for `npx`, as in `npm_config_registry=http://localhost:4873/ npx @mui/toolpad`)

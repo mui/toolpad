@@ -1,7 +1,7 @@
 import { NextApiHandler } from 'next';
 import { parseVersion } from '../../../../../src/server/data';
 import handleDataRequest from '../../../../../src/server/handleDataRequest';
-import { StudioApiResult } from '../../../../../src/types';
+import { ApiResult } from '../../../../../src/types';
 import { asArray } from '../../../../../src/utils/collections';
 
 export default (async (req, res) => {
@@ -12,4 +12,4 @@ export default (async (req, res) => {
     return;
   }
   await handleDataRequest(req, res, { appId, version });
-}) as NextApiHandler<StudioApiResult<any>>;
+}) as NextApiHandler<ApiResult<any>>;

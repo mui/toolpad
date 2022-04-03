@@ -25,7 +25,7 @@ import { inferColumns } from '@mui/toolpad-components';
 import type { EditorProps, PropControlDefinition } from '../../types';
 
 // TODO: this import suggests leaky abstraction
-import { usePageEditorState } from '../StudioEditor/PageEditor/PageEditorProvider';
+import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 import { generateUniqueString } from '../../utils/strings';
 
 const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean'];

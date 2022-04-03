@@ -1,24 +1,24 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
-import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_STUDIO_SLOTS } from './constants.js';
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type { SlotType, LiveBindings, ComponentConfig, RuntimeEvent } from './index';
 
 declare global {
   interface Window {
-    __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
-    __STUDIO_RUNTIME_BINDINGS_STATE__?: LiveBindings;
-    __STUDIO_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
+    __TOOLPAD_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
+    __TOOLPAD_RUNTIME_BINDINGS_STATE__?: LiveBindings;
+    __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
   }
 }
 
-export const StudioNodeContext = React.createContext<string | null>(null);
+export const NodeRuntimeContext = React.createContext<string | null>(null);
 
 // NOTE: These props aren't used, they are only there to transfer information from the
 // React elements to the fibers.
 interface SlotsWrapperProps {
   children?: React.ReactNode;
   // eslint-disable-next-line react/no-unused-prop-types
-  [RUNTIME_PROP_STUDIO_SLOTS]: string;
+  [RUNTIME_PROP_SLOTS]: string;
   // eslint-disable-next-line react/no-unused-prop-types
   slotType: SlotType;
   // eslint-disable-next-line react/no-unused-prop-types
@@ -31,7 +31,7 @@ function SlotsWrapper({ children }: SlotsWrapperProps) {
 
 interface PlaceholderWrapperProps {
   // eslint-disable-next-line react/no-unused-prop-types
-  [RUNTIME_PROP_STUDIO_SLOTS]: string;
+  [RUNTIME_PROP_SLOTS]: string;
   // eslint-disable-next-line react/no-unused-prop-types
   parentId: string;
 }
@@ -55,50 +55,50 @@ export interface RuntimeError {
   stack?: string;
 }
 
-export interface RuntimeStudioNodeProps {
+export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
   nodeId: string;
 }
 
-interface RuntimeStudioNodeState {
+interface NodeRuntimeWrapperState {
   error: RuntimeError | null;
 }
 
-interface RuntimeNodeWrapperProps {
+interface NodeFiberHostProps {
   children: React.ReactElement;
   [RUNTIME_PROP_NODE_ID]: string;
   nodeError?: RuntimeError;
 }
 
 // We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
-// represent StudioNodes. We use a wrapper to ensure only one element exists in the React tree
+// represent AppDomNodes. We use a wrapper to ensure only one element exists in the React tree
 // that has [RUNTIME_PROP_NODE_ID] property with this nodeId (We could clone the child and add
 // the prop, but the child may be spreading its props to other elements). We also don't want this
 // property to end up on DOM nodes.
-// IMPORTANT! This node must directly wrap the React Element for the studioNode
-function RuntimeNodeWrapper({ children }: RuntimeNodeWrapperProps) {
+// IMPORTANT! This node must directly wrap the React Element for the AppDomNode
+function NodeFiberHost({ children }: NodeFiberHostProps) {
   return children;
 }
 
-export class RuntimeStudioNode extends React.Component<
-  RuntimeStudioNodeProps,
-  RuntimeStudioNodeState
+export class NodeRuntimeWrapper extends React.Component<
+  NodeRuntimeWrapperProps,
+  NodeRuntimeWrapperState
 > {
-  state: RuntimeStudioNodeState;
+  state: NodeRuntimeWrapperState;
 
-  constructor(props: RuntimeStudioNodeProps) {
+  constructor(props: NodeRuntimeWrapperProps) {
     super(props);
     this.state = { error: null };
   }
 
-  static getDerivedStateFromError(error: Error): RuntimeStudioNodeState {
+  static getDerivedStateFromError(error: Error): NodeRuntimeWrapperState {
     return { error: { message: error.message, stack: error.stack } };
   }
 
   render() {
     if (this.state.error) {
       return (
-        <RuntimeNodeWrapper
+        <NodeFiberHost
           {...{
             [RUNTIME_PROP_NODE_ID]: this.props.nodeId,
             nodeError: this.state.error,
@@ -116,16 +116,16 @@ export class RuntimeStudioNode extends React.Component<
           >
             <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
           </span>
-        </RuntimeNodeWrapper>
+        </NodeFiberHost>
       );
     }
 
     return (
-      <StudioNodeContext.Provider value={this.props.nodeId}>
-        <RuntimeNodeWrapper {...{ [RUNTIME_PROP_NODE_ID]: this.props.nodeId }}>
+      <NodeRuntimeContext.Provider value={this.props.nodeId}>
+        <NodeFiberHost {...{ [RUNTIME_PROP_NODE_ID]: this.props.nodeId }}>
           {this.props.children}
-        </RuntimeNodeWrapper>
-      </StudioNodeContext.Provider>
+        </NodeFiberHost>
+      </NodeRuntimeContext.Provider>
     );
   }
 }
@@ -138,18 +138,18 @@ export function useDiagnostics(
   // to update its view state).
   React.useLayoutEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
-    window.__STUDIO_RUNTIME_PAGE_STATE__ = pageState;
+    window.__TOOLPAD_RUNTIME_PAGE_STATE__ = pageState;
     // eslint-disable-next-line no-underscore-dangle
-    window.__STUDIO_RUNTIME_BINDINGS_STATE__ = liveBindings;
+    window.__TOOLPAD_RUNTIME_BINDINGS_STATE__ = liveBindings;
   }, [pageState, liveBindings]);
 }
 
-export interface StudioRuntimeNode<P> {
+export interface NodeRuntime<P> {
   setProp: <K extends keyof P & string>(key: K, value: React.SetStateAction<P[K]>) => void;
 }
 
-export function useStudioNode<P = {}>(): StudioRuntimeNode<P> | null {
-  const nodeId = React.useContext(StudioNodeContext);
+export function useNode<P = {}>(): NodeRuntime<P> | null {
+  const nodeId = React.useContext(NodeRuntimeContext);
 
   return React.useMemo(() => {
     if (!nodeId) {
@@ -157,17 +157,17 @@ export function useStudioNode<P = {}>(): StudioRuntimeNode<P> | null {
     }
     const fireEvent = (event: RuntimeEvent) => {
       // eslint-disable-next-line no-underscore-dangle
-      if (!window.__STUDIO_RUNTIME_EVENT__) {
+      if (!window.__TOOLPAD_RUNTIME_EVENT__) {
         // eslint-disable-next-line no-underscore-dangle
-        window.__STUDIO_RUNTIME_EVENT__ = [] as RuntimeEvent[];
+        window.__TOOLPAD_RUNTIME_EVENT__ = [] as RuntimeEvent[];
       }
       // eslint-disable-next-line no-underscore-dangle
-      if (typeof window.__STUDIO_RUNTIME_EVENT__ === 'function') {
+      if (typeof window.__TOOLPAD_RUNTIME_EVENT__ === 'function') {
         // eslint-disable-next-line no-underscore-dangle
-        window.__STUDIO_RUNTIME_EVENT__(event);
+        window.__TOOLPAD_RUNTIME_EVENT__(event);
       } else {
         // eslint-disable-next-line no-underscore-dangle
-        window.__STUDIO_RUNTIME_EVENT__.push(event);
+        window.__TOOLPAD_RUNTIME_EVENT__.push(event);
       }
     };
     return {
@@ -189,7 +189,7 @@ export interface PlaceholderProps {
 }
 
 export function Placeholder({ prop, children }: PlaceholderProps) {
-  const nodeId = React.useContext(StudioNodeContext);
+  const nodeId = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
   }
@@ -200,7 +200,7 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
     <PlaceholderWrapper
       parentId={nodeId}
       {...{
-        [RUNTIME_PROP_STUDIO_SLOTS]: prop,
+        [RUNTIME_PROP_SLOTS]: prop,
         slotType: 'single',
       }}
     />
@@ -213,7 +213,7 @@ export interface SlotsProps {
 }
 
 export function Slots({ prop, children }: SlotsProps) {
-  const nodeId = React.useContext(StudioNodeContext);
+  const nodeId = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
   }
@@ -222,7 +222,7 @@ export function Slots({ prop, children }: SlotsProps) {
     <SlotsWrapper
       parentId={nodeId}
       {...{
-        [RUNTIME_PROP_STUDIO_SLOTS]: prop,
+        [RUNTIME_PROP_SLOTS]: prop,
         slotType: 'multiple',
       }}
     >

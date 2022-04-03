@@ -2,23 +2,23 @@
 
 <div align="center">
 
-Quickly build internal tools. MUI Studio is a low-code internal tools builder build on top of [MUI](https://mui.com/). Aimed at developers of all trade who want to save time building internal applications.
+Quickly build internal tools. MUI Toolpad is a low-code internal tools builder build on top of [MUI](https://mui.com/). Aimed at developers of all trade who want to save time building internal applications.
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
-[![npm latest package](https://img.shields.io/npm/v/@mui/studio/latest.svg)](https://www.npmjs.com/package/@mui/studio)
-[![npm next package](https://img.shields.io/npm/v/@mui/studio/next.svg)](https://www.npmjs.com/package/@mui/studio@alpha)
-[![npm downloads](https://img.shields.io/npm/dm/@mui/studio.svg)](https://www.npmjs.com/package/@mui/studio)
-[![CircleCI](https://circleci.com/gh/mui/mui-studio/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/mui/mui-studio?branch=master)
+[![npm latest package](https://img.shields.io/npm/v/@mui/toolpad/latest.svg)](https://www.npmjs.com/package/@mui/toolpad)
+[![npm next package](https://img.shields.io/npm/v/@mui/toolpad/next.svg)](https://www.npmjs.com/package/@mui/toolpad@alpha)
+[![npm downloads](https://img.shields.io/npm/dm/@mui/toolpad.svg)](https://www.npmjs.com/package/@mui/toolpad)
+[![CircleCI](https://circleci.com/gh/mui/mui-toolpad/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/MUI_hq.svg?label=follow+MUI)](https://twitter.com/MUI_hq)
-[![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-studio/issues/8)
-[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/studio.svg)](https://isitmaintained.com/project/mui/studio 'Average time to resolve an issue')
+[![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-toolpad/issues/8)
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/toolpad.svg)](https://isitmaintained.com/project/mui/toolpad 'Average time to resolve an issue')
 [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/mui)](https://opencollective.com/mui)
 
 </div>
 
 ## Notice
 
-MUI Studio is in its alpha stages of development. Feel free to run this application for testing purposes, but keep in mind, in no way is it ready or suitable to run it in production. It's both lacking in features and stability.
+MUI Toolpad is in its alpha stages of development. Feel free to run this application for testing purposes, but keep in mind, in no way is it ready or suitable to run it in production. It's both lacking in features and stability.
 
 ## Quick setup locally
 

@@ -1,11 +1,11 @@
 import { NextApiHandler } from 'next';
 import { asArray } from '../../../../src/utils/collections';
-import studioConnections from '../../../../src/studioDataSources/server';
+import serverDataSources from '../../../../src/toolpadDataSources/server';
 import { getConnection, updateConnection } from '../../../../src/server/data';
 
 const handlerMap = new Map<String, Function | null | undefined>();
-Object.keys(studioConnections).forEach((dataSource) => {
-  handlerMap.set(dataSource, studioConnections[dataSource]?.createHandler?.());
+Object.keys(serverDataSources).forEach((dataSource) => {
+  handlerMap.set(dataSource, serverDataSources[dataSource]?.createHandler?.());
 });
 
 export default (async (req, res) => {

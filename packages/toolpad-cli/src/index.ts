@@ -24,16 +24,16 @@ if (!process.env.TOOLPAD_DATABASE_URL) {
 }
 
 const connectionString = pgConnectionString.parse(process.env.TOOLPAD_DATABASE_URL);
-console.log(`Starting Studio with db "${connectionString.host}:${connectionString.port}"`);
+console.log(`Starting Toolpad with db "${connectionString.host}:${connectionString.port}"`);
 
-const studioDir = path.dirname(
+const toolpadDir = path.dirname(
   createRequire(import.meta.url).resolve('@mui/toolpad-app/package.json'),
 );
 
 const port = args['--port'] ?? 3000;
 
 const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
-  cwd: studioDir,
+  cwd: toolpadDir,
   preferLocal: true,
   stdio: 'pipe',
   env: {

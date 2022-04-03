@@ -2,14 +2,14 @@ import { DomNodeAttributeType, PrismaClient, Release } from '../../prisma/genera
 import {
   LegacyConnection,
   ConnectionStatus,
-  DataSourceServer,
+  ServerDataSource,
   ApiResult,
   NodeId,
   BindableAttrValue,
   Updates,
   VersionOrPreview,
 } from '../types';
-import studioDataSources from '../studioDataSources/server';
+import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
@@ -301,7 +301,7 @@ export async function updateConnection(
 }
 
 export async function testConnection(connection: appDom.ConnectionNode): Promise<ConnectionStatus> {
-  const dataSource = studioDataSources[connection.attributes.dataSource.value];
+  const dataSource = serverDataSources[connection.attributes.dataSource.value];
   if (!dataSource) {
     return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
   }
@@ -313,8 +313,8 @@ export async function execApi<Q>(
   api: appDom.ApiNode<Q>,
   params: Q,
 ): Promise<ApiResult<any>> {
-  const dataSource: DataSourceServer<any, Q, any> | undefined =
-    studioDataSources[api.attributes.dataSource.value];
+  const dataSource: ServerDataSource<any, Q, any> | undefined =
+    serverDataSources[api.attributes.dataSource.value];
   if (!dataSource) {
     throw new Error(`Unknown datasource "${api.attributes.dataSource.value}" for api "${api.id}"`);
   }
@@ -335,8 +335,8 @@ export async function dataSourceFetchPrivate(
   query: any,
 ): Promise<any> {
   const connection = await getConnection(appId, connectionId);
-  const dataSource: DataSourceServer<any, any, any> | undefined =
-    studioDataSources[connection.type];
+  const dataSource: ServerDataSource<any, any, any> | undefined =
+    serverDataSources[connection.type];
 
   if (!dataSource) {
     throw new Error(

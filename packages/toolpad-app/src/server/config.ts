@@ -4,7 +4,7 @@ export interface ServerConfig extends SharedConfig {
   databaseUrl: string;
   googleSheetsClientId?: string;
   googleSheetsClientSecret?: string;
-  studioExternalUrl?: string;
+  externalUrl?: string;
   encryptionKeys: string[];
 }
 
@@ -38,7 +38,7 @@ function readConfig(): ServerConfig {
     databaseUrl: process.env.TOOLPAD_DATABASE_URL,
     googleSheetsClientId: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
     googleSheetsClientSecret: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
-    studioExternalUrl: process.env.TOOLPAD_EXTERNAL_URL,
+    externalUrl: process.env.TOOLPAD_EXTERNAL_URL,
     // Whitespace separated, do not use spaces in your keys
     encryptionKeys,
   };

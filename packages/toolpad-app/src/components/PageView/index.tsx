@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NodeId } from '../../types';
 import * as appDom from '../../appDom';
 import renderPageCode from '../../renderPageCode';
-import StudioSandbox from '../StudioSandbox';
+import AppSandbox from '../AppSandbox';
 import getImportMap from '../../getImportMap';
 import renderThemeCode from '../../renderThemeCode';
 import renderEntryPoint from '../../renderPageEntryCode';
@@ -68,7 +68,7 @@ export default function PageView({
   }, [dom, pageNodeId]);
 
   return (
-    <StudioSandbox
+    <AppSandbox
       className={className}
       onLoad={onLoad}
       base={`/app/${appId}/${dom.root}/`}

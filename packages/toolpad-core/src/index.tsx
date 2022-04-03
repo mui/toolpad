@@ -126,8 +126,8 @@ export function evalCode(code: string, globalScope: Record<string, unknown>) {
   return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
 }
 
-export type { PlaceholderProps, SlotsProps, StudioRuntimeNode, RuntimeError } from './runtime';
-export { Placeholder, Slots, useStudioNode } from './runtime';
+export type { PlaceholderProps, SlotsProps, NodeRuntime, RuntimeError } from './runtime';
+export { Placeholder, Slots, useNode } from './runtime';
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 

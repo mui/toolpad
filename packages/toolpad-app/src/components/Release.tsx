@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 import client from '../api';
 import * as appDom from '../appDom';
 import { NodeId } from '../types';
-import StudioAppBar from './StudioAppBar';
+import AppHeader from './AppHeader';
 
 interface NavigateToReleaseActionProps {
   appId: string;
@@ -79,7 +79,7 @@ export default function Release() {
 
   return (
     <React.Fragment>
-      <StudioAppBar navigation={null} actions={null} />
+      <AppHeader navigation={null} actions={null} />
       <Container>
         <Typography variant="h2">Release &quot;{version}&quot;</Typography>
         <Box>{releaseQuery?.data?.description}</Box>

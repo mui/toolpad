@@ -145,7 +145,7 @@ export interface ConnectionStatus {
   error?: string;
 }
 
-export interface DataSourceClient<P = {}, Q = {}> {
+export interface ClientDataSource<P = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<P>;
   getInitialConnectionValue: () => P;
@@ -155,7 +155,7 @@ export interface DataSourceClient<P = {}, Q = {}> {
   getArgTypes?: (query: Q) => ArgTypeDefinitions;
 }
 
-export interface DataSourceServer<P = {}, Q = {}, D = {}> {
+export interface ServerDataSource<P = {}, Q = {}, D = {}> {
   test: (connection: LegacyConnection<P>) => Promise<ConnectionStatus>;
   // Execute a private query on this connection, intended for editors only
   execPrivate?: (connection: LegacyConnection<P>, query: any) => Promise<any>;

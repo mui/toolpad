@@ -1,7 +1,7 @@
 import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/toolpad-core';
 import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
-import { getStudioComponent } from './studioComponents';
+import { getToolpadComponent } from './toolpadComponents';
 import * as appDom from './appDom';
 import {
   NodeId,
@@ -14,9 +14,9 @@ import {
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
-import { getQueryNodeArgTypes } from './studioDataSources/client';
+import { getQueryNodeArgTypes } from './toolpadDataSources/client';
 import { tryFormat } from './utils/prettier';
-import { RenderContext } from './studioComponents/studioComponentDefinition';
+import { RenderContext } from './toolpadComponents/componentDefinition';
 
 function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes {
   return Object.fromEntries(
@@ -115,7 +115,7 @@ class Context implements RenderContext {
     this.reactAlias = this.addImport('react', '*', 'React');
 
     if (this.config.editor) {
-      this.runtimeAlias = this.addImport('@mui/toolpad-core/runtime', '*', '__studioRuntime');
+      this.runtimeAlias = this.addImport('@mui/toolpad-core/runtime', '*', '__editorRuntime');
     }
   }
 
@@ -181,8 +181,8 @@ class Context implements RenderContext {
     return stateHook;
   }
 
-  getStudioComponent(node: appDom.ElementNode) {
-    return getStudioComponent(this.dom, node.attributes.component.value);
+  getToolpadComponent(node: appDom.ElementNode) {
+    return getToolpadComponent(this.dom, node.attributes.component.value);
   }
 
   collectControlledStateProp(node: appDom.ElementNode, propName: string): ControlledStateHook {
@@ -192,7 +192,7 @@ class Context implements RenderContext {
 
     let stateHook = this.controlledStateHooks.get(stateId);
     if (!stateHook) {
-      const component = this.getStudioComponent(node);
+      const component = this.getToolpadComponent(node);
 
       const argType = component.argTypes[propName];
 
@@ -223,7 +223,7 @@ class Context implements RenderContext {
   }
 
   collectControlledStateProps(node: appDom.ElementNode): void {
-    const component = this.getStudioComponent(node);
+    const component = this.getToolpadComponent(node);
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [propName, argType] of Object.entries(component.argTypes)) {
@@ -321,7 +321,7 @@ class Context implements RenderContext {
   }
 
   /**
-   * Resolves StudioBindables to expressions we can render in the code.
+   * Resolves BindableAttrValues to expressions we can render in the code.
    */
   resolveBindables(
     id: string,
@@ -344,7 +344,7 @@ class Context implements RenderContext {
   }
 
   resolveElementProps(node: appDom.ElementNode): ResolvedProps {
-    const component = this.getStudioComponent(node);
+    const component = this.getToolpadComponent(node);
 
     const result: ResolvedProps = this.resolveBindables(
       `${node.id}.props`,
@@ -466,16 +466,16 @@ class Context implements RenderContext {
       type: 'jsxElement',
       value: this.config.editor
         ? `
-          <${this.runtimeAlias}.RuntimeStudioNode nodeId="${node.id}">
+          <${this.runtimeAlias}.NodeRuntimeWrapper nodeId="${node.id}">
             ${rendered}
-          </${this.runtimeAlias}.RuntimeStudioNode>
+          </${this.runtimeAlias}.NodeRuntimeWrapper>
         `
         : rendered,
     };
   }
 
   renderElement(node: appDom.ElementNode): PropExpression {
-    const component = this.getStudioComponent(node);
+    const component = this.getToolpadComponent(node);
 
     const resolvedProps = this.resolveElementProps(node);
     const resolvedChildren = this.resolveElementChildren(

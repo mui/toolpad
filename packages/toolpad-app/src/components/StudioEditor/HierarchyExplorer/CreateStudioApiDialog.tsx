@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { NodeId } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
 import DialogForm from '../../DialogForm';
@@ -27,8 +27,8 @@ export interface ConnectionSelectProps extends WithControlledProp<NodeId | null>
 export function ConnectionSelect({ dataSource, value, onChange }: ConnectionSelectProps) {
   const dom = useDom();
 
-  const app = studioDom.getApp(dom);
-  const { connections = [] } = studioDom.getChildNodes(dom, app);
+  const app = appDom.getApp(dom);
+  const { connections = [] } = appDom.getChildNodes(dom, app);
 
   const filtered = React.useMemo(() => {
     return dataSource
@@ -86,8 +86,7 @@ export default function CreateStudioApiDialog({
         autoComplete="off"
         onSubmit={(e) => {
           e.preventDefault();
-          const connection =
-            connectionId && studioDom.getMaybeNode(dom, connectionId, 'connection');
+          const connection = connectionId && appDom.getMaybeNode(dom, connectionId, 'connection');
 
           if (!connection) {
             throw new Error(`Invariant: Selected non-existing connection "${connectionId}"`);
@@ -100,14 +99,14 @@ export default function CreateStudioApiDialog({
             );
           }
 
-          const newApiNode = studioDom.createNode(dom, 'api', {
+          const newApiNode = appDom.createNode(dom, 'api', {
             attributes: {
-              query: studioDom.createConst(dataSource.getInitialQueryValue()),
-              connectionId: studioDom.createConst(connectionId),
+              query: appDom.createConst(dataSource.getInitialQueryValue()),
+              connectionId: appDom.createConst(connectionId),
               dataSource: connection.attributes.dataSource,
             },
           });
-          const appNode = studioDom.getApp(dom);
+          const appNode = appDom.getApp(dom);
           domApi.addNode(newApiNode, appNode, 'apis');
           onClose();
           navigate(`/app/${appId}/editor/apis/${newApiNode.id}`);

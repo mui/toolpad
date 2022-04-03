@@ -1,9 +1,9 @@
 import { ArgTypeDefinitions } from '@mui/toolpad-core';
-import { StudioDom, StudioElementNode } from '../studioDom';
+import * as appDom from '../appDom';
 import { PropExpression, ResolvedProps } from '../types';
 
 export interface RenderContext {
-  dom: StudioDom;
+  dom: appDom.AppDom;
   addImport(source: string, imported: string, local: string): string;
   addCodeComponentImport(source: string, local: string): string;
   renderProps(resolvedProps: ResolvedProps): string;
@@ -13,7 +13,7 @@ export interface RenderContext {
 
 export type RenderComponent = (
   ctx: RenderContext,
-  node: StudioElementNode,
+  node: appDom.ElementNode,
   resolvedProps: ResolvedProps,
 ) => string;
 

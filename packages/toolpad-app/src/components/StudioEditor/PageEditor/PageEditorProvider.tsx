@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { NodeId, SlotLocation, PageViewState } from '../../../types';
 import { update, updateOrCreate } from '../../../utils/immutability';
 
@@ -11,7 +11,7 @@ export interface PageEditorState {
   readonly nodeId: NodeId;
   readonly selection: NodeId | null;
   readonly componentPanelTab: ComponentPanelTab;
-  readonly newNode: studioDom.StudioElementNode | null;
+  readonly newNode: appDom.ElementNode | null;
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
   readonly viewState: PageViewState;
@@ -35,7 +35,7 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_NEW_NODE_DRAG_START';
-      newNode: studioDom.StudioElementNode;
+      newNode: appDom.ElementNode;
     }
   | {
       type: 'PAGE_NODE_DRAG_OVER';
@@ -125,7 +125,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     setComponentPanelTab(tab: ComponentPanelTab) {
       dispatch({ type: 'PAGE_SET_COMPONENT_PANEL_TAB', tab });
     },
-    newNodeDragStart(newNode: studioDom.StudioElementNode) {
+    newNodeDragStart(newNode: appDom.ElementNode) {
       dispatch({ type: 'PAGE_NEW_NODE_DRAG_START', newNode });
     },
     nodeDragEnd() {

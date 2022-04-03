@@ -10,7 +10,7 @@ import {
   VersionOrPreview,
 } from '../types';
 import studioDataSources from '../studioDataSources/server';
-import * as studioDom from '../studioDom';
+import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
@@ -43,11 +43,11 @@ function deserializeValue(dbValue: string, type: DomNodeAttributeType): unknown 
   return serialized.length <= 0 ? undefined : JSON.parse(serialized);
 }
 
-export async function saveDom(appId: string, app: studioDom.StudioDom): Promise<void> {
+export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> {
   await prisma.$transaction([
     prisma.domNode.deleteMany({ where: { appId } }),
     prisma.domNode.createMany({
-      data: Array.from(Object.values(app.nodes) as studioDom.StudioNode[], (node) => {
+      data: Array.from(Object.values(app.nodes) as appDom.AppDomNode[], (node) => {
         return {
           appId,
           id: node.id,
@@ -60,8 +60,8 @@ export async function saveDom(appId: string, app: studioDom.StudioDom): Promise<
       }),
     }),
     prisma.domNodeAttribute.createMany({
-      data: Object.values(app.nodes).flatMap((node: studioDom.StudioNode) => {
-        const namespaces = omit(node, ...studioDom.RESERVED_NODE_PROPERTIES);
+      data: Object.values(app.nodes).flatMap((node: appDom.AppDomNode) => {
+        const namespaces = omit(node, ...appDom.RESERVED_NODE_PROPERTIES);
         const attributesData = Object.entries(namespaces).flatMap(([namespace, attributes]) => {
           return Object.entries(attributes).map(([attributeName, attributeValue]) => {
             return {
@@ -79,19 +79,19 @@ export async function saveDom(appId: string, app: studioDom.StudioDom): Promise<
   ]);
 }
 
-export async function loadDom(appId: string): Promise<studioDom.StudioDom> {
+export async function loadDom(appId: string): Promise<appDom.AppDom> {
   const dbNodes = await prisma.domNode.findMany({
     where: { appId },
     include: { attributes: true },
   });
   if (dbNodes.length <= 0) {
-    const dom = studioDom.createDom();
+    const dom = appDom.createDom();
     await saveDom(appId, dom);
     return dom;
   }
   const root = dbNodes.find((node) => !node.parentId)?.id as NodeId;
   const nodes = Object.fromEntries(
-    dbNodes.map((node): [NodeId, studioDom.StudioNode] => {
+    dbNodes.map((node): [NodeId, appDom.AppDomNode] => {
       const nodeId = node.id as NodeId;
 
       return [
@@ -114,7 +114,7 @@ export async function loadDom(appId: string): Promise<studioDom.StudioDom> {
             } as StudioBindable<unknown>;
             return result;
           }, {} as Record<string, Record<string, StudioBindable<unknown>>>),
-        } as studioDom.StudioNode,
+        } as appDom.AppDomNode,
       ];
     }),
   );
@@ -213,19 +213,17 @@ export async function findActiveDeployment(appId: string) {
   });
 }
 
-export async function loadReleaseDom(appId: string, version: number): Promise<studioDom.StudioDom> {
+export async function loadReleaseDom(appId: string, version: number): Promise<appDom.AppDom> {
   const release = await prisma.release.findUnique({
     where: { release_app_constraint: { appId, version } },
   });
   if (!release) {
     throw new Error(`release doesn't exist`);
   }
-  return JSON.parse(release.snapshot.toString('utf-8')) as studioDom.StudioDom;
+  return JSON.parse(release.snapshot.toString('utf-8')) as appDom.AppDom;
 }
 
-function fromDomConnection<P>(
-  domConnection: studioDom.StudioConnectionNode<P>,
-): StudioConnection<P> {
+function fromDomConnection<P>(domConnection: appDom.ConnectionNode<P>): StudioConnection<P> {
   const { attributes, id, name } = domConnection;
   return {
     id,
@@ -241,17 +239,17 @@ export async function addConnection(
   { params, name, status, type }: StudioConnection,
 ): Promise<StudioConnection> {
   const dom = await loadDom(appId);
-  const app = studioDom.getApp(dom);
-  const newConnection = studioDom.createNode(dom, 'connection', {
+  const app = appDom.getApp(dom);
+  const newConnection = appDom.createNode(dom, 'connection', {
     name,
     attributes: {
-      dataSource: studioDom.createConst(type),
-      params: studioDom.createSecret(params),
-      status: studioDom.createConst(status),
+      dataSource: appDom.createConst(type),
+      params: appDom.createSecret(params),
+      status: appDom.createConst(status),
     },
   });
 
-  const newDom = studioDom.addNode(dom, newConnection, app, 'connections');
+  const newDom = appDom.addNode(dom, newConnection, app, 'connections');
   await saveDom(appId, newDom);
 
   return fromDomConnection(newConnection);
@@ -259,7 +257,7 @@ export async function addConnection(
 
 export async function getConnection(appId: string, id: string): Promise<StudioConnection> {
   const dom = await loadDom(appId);
-  return fromDomConnection(studioDom.getNode(dom, id as NodeId, 'connection'));
+  return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
 }
 
 export async function updateConnection(
@@ -267,44 +265,42 @@ export async function updateConnection(
   { id, params, name, status, type }: Updates<StudioConnection>,
 ): Promise<StudioConnection> {
   let dom = await loadDom(appId);
-  const existing = studioDom.getNode(dom, id as NodeId, 'connection');
+  const existing = appDom.getNode(dom, id as NodeId, 'connection');
   if (name !== undefined) {
-    dom = studioDom.setNodeName(dom, existing, name);
+    dom = appDom.setNodeName(dom, existing, name);
   }
   if (params !== undefined) {
-    dom = studioDom.setNodeNamespacedProp(
+    dom = appDom.setNodeNamespacedProp(
       dom,
       existing,
       'attributes',
       'params',
-      studioDom.createSecret(params),
+      appDom.createSecret(params),
     );
   }
   if (status !== undefined) {
-    dom = studioDom.setNodeNamespacedProp(
+    dom = appDom.setNodeNamespacedProp(
       dom,
       existing,
       'attributes',
       'status',
-      studioDom.createConst(status),
+      appDom.createConst(status),
     );
   }
   if (type !== undefined) {
-    dom = studioDom.setNodeNamespacedProp(
+    dom = appDom.setNodeNamespacedProp(
       dom,
       existing,
       'attributes',
       'dataSource',
-      studioDom.createConst(type),
+      appDom.createConst(type),
     );
   }
   await saveDom(appId, dom);
-  return fromDomConnection(studioDom.getNode(dom, id as NodeId, 'connection'));
+  return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
 }
 
-export async function testConnection(
-  connection: studioDom.StudioConnectionNode,
-): Promise<ConnectionStatus> {
+export async function testConnection(connection: appDom.ConnectionNode): Promise<ConnectionStatus> {
   const dataSource = studioDataSources[connection.attributes.dataSource.value];
   if (!dataSource) {
     return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
@@ -314,7 +310,7 @@ export async function testConnection(
 
 export async function execApi<Q>(
   appId: string,
-  api: studioDom.StudioApiNode<Q>,
+  api: appDom.ApiNode<Q>,
   params: Q,
 ): Promise<StudioApiResult<any>> {
   const dataSource: StudioDataSourceServer<any, Q, any> | undefined =

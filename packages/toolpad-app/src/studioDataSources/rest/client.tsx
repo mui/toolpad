@@ -6,7 +6,7 @@ import { BindingEditor } from '../../components/StudioEditor/BindingEditor';
 import { StudioDataSourceClient } from '../../types';
 import { WithControlledProp } from '../../utils/types';
 import { FetchQuery } from './types';
-import * as studioDom from '../../studioDom';
+import * as appDom from '../../appDom';
 
 function ConnectionParamsInput() {
   return <Typography>No input</Typography>;
@@ -46,7 +46,7 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
         />
         <BindingEditor
           value={value.url}
-          onChange={(url) => onChange({ ...value, url: url || studioDom.createConst('') })}
+          onChange={(url) => onChange({ ...value, url: url || appDom.createConst('') })}
           propType={{ type: 'string' }}
           globalScope={{ query: value.params }}
         />

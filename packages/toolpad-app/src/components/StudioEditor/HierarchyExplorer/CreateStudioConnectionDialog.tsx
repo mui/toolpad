@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import dataSources from '../../../studioDataSources/client';
 import { ExactEntriesOf } from '../../../utils/types';
@@ -43,14 +43,14 @@ export default function CreateStudioConnectionDialog({
           if (!dataSource) {
             throw new Error(`Can't find a datasource for "${dataSourceType}"`);
           }
-          const newNode = studioDom.createNode(dom, 'connection', {
+          const newNode = appDom.createNode(dom, 'connection', {
             attributes: {
-              dataSource: studioDom.createConst(dataSourceType),
-              params: studioDom.createSecret(dataSource.getInitialConnectionValue()),
-              status: studioDom.createConst(null),
+              dataSource: appDom.createConst(dataSourceType),
+              params: appDom.createSecret(dataSource.getInitialConnectionValue()),
+              status: appDom.createConst(null),
             },
           });
-          const appNode = studioDom.getApp(dom);
+          const appNode = appDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'connections');
           onClose();
           navigate(`/app/${appId}/editor/connections/${newNode.id}`);

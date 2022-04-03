@@ -6,7 +6,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { useParams } from 'react-router-dom';
 import client from '../api';
-import * as studioDom from '../studioDom';
+import * as appDom from '../appDom';
 import { NodeId } from '../types';
 import StudioAppBar from './StudioAppBar';
 
@@ -44,8 +44,8 @@ export default function Release() {
     isLoading,
     error,
   } = client.useQuery('loadReleaseDom', version ? [appId, version] : null);
-  const app = dom ? studioDom.getApp(dom) : null;
-  const { pages = [] } = dom && app ? studioDom.getChildNodes(dom, app) : {};
+  const app = dom ? appDom.getApp(dom) : null;
+  const { pages = [] } = dom && app ? appDom.getChildNodes(dom, app) : {};
 
   const deployReleaseMutation = client.useMutation('createDeployment');
   const activeDeploymentQuery = client.useQuery('findActiveDeployment', [appId]);

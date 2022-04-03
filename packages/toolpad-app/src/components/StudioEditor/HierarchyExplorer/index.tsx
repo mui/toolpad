@@ -17,7 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import { NodeId } from '../../../types';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import CreateStudioPageDialog from './CreateStudioPageDialog';
 import CreateStudioCodeComponentDialog from './CreateStudioCodeComponentDialog';
@@ -74,13 +74,13 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   const dom = useDom();
   const domApi = useDomApi();
 
-  const app = studioDom.getApp(dom);
+  const app = appDom.getApp(dom);
   const {
     apis = [],
     codeComponents = [],
     pages = [],
     connections = [],
-  } = studioDom.getChildNodes(dom, app);
+  } = appDom.getChildNodes(dom, app);
 
   const [expanded, setExpanded] = useLocalStorageState<string[]>(
     `editor/${app.id}/hierarchy-expansion`,
@@ -106,28 +106,28 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     }
 
     const studioNodeId: NodeId = rawNodeId as NodeId;
-    const node = studioDom.getNode(dom, studioNodeId);
-    if (studioDom.isElement(node)) {
+    const node = appDom.getNode(dom, studioNodeId);
+    if (appDom.isElement(node)) {
       // TODO: sort out in-page selection
-      const page = studioDom.getPageAncestor(dom, node);
+      const page = appDom.getPageAncestor(dom, node);
       if (page) {
         navigate(`/app/${appId}/editor/pages/${page.id}`);
       }
     }
 
-    if (studioDom.isPage(node)) {
+    if (appDom.isPage(node)) {
       navigate(`/app/${appId}/editor/pages/${node.id}`);
     }
 
-    if (studioDom.isApi(node)) {
+    if (appDom.isApi(node)) {
       navigate(`/app/${appId}/editor/apis/${node.id}`);
     }
 
-    if (studioDom.isCodeComponent(node)) {
+    if (appDom.isCodeComponent(node)) {
       navigate(`/app/${appId}/editor/codeComponents/${node.id}`);
     }
 
-    if (studioDom.isConnection(node)) {
+    if (appDom.isConnection(node)) {
       navigate(`/app/${appId}/editor/connections/${node.id}`);
     }
   };
@@ -184,7 +184,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     }
   }, [deletedNodeId, domApi, navigate, appId, handledeleteNodeDialogClose]);
 
-  const deletedNode = deletedNodeId && studioDom.getMaybeNode(dom, deletedNodeId);
+  const deletedNode = deletedNodeId && appDom.getMaybeNode(dom, deletedNodeId);
 
   return (
     <HierarchyExplorerRoot className={className}>

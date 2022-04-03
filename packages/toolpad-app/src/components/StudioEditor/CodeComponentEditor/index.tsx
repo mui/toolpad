@@ -5,7 +5,7 @@ import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import { ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
 import { NodeId } from '../../../types';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import StudioSandbox from '../../StudioSandbox';
 import getImportMap from '../../../getImportMap';
@@ -18,7 +18,7 @@ const ComponentSandbox = styled(StudioSandbox)({
 });
 
 interface CodeComponentEditorContentProps {
-  codeComponentNode: studioDom.StudioCodeComponentNode;
+  codeComponentNode: appDom.CodeComponentNode;
 }
 
 declare global {
@@ -44,13 +44,13 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         codeComponentNode,
         'attributes',
         'code',
-        studioDom.createConst(pretty),
+        appDom.createConst(pretty),
       );
       domApi.setNodeNamespacedProp(
         codeComponentNode,
         'attributes',
         'argTypes',
-        studioDom.createConst(argTypes),
+        appDom.createConst(argTypes),
       );
     };
   }, [domApi, codeComponentNode, input, argTypes]);
@@ -191,7 +191,7 @@ interface CodeComponentEditorProps {
 export default function CodeComponentEditor({ className }: CodeComponentEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
-  const codeComponentNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
+  const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
   return (
     <Box className={className}>
       {codeComponentNode ? (

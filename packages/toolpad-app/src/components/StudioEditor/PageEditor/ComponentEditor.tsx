@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ArgTypeDefinition, ArgTypeDefinitions } from '@mui/toolpad-core';
 import { getStudioComponent, useStudioComponent } from '../../../studioComponents';
 import { ExactEntriesOf } from '../../../utils/types';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
 import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
@@ -29,7 +29,7 @@ function shouldRenderControl(propTypeDef: ArgTypeDefinition) {
 }
 
 interface ComponentPropsEditorProps<P> {
-  node: studioDom.StudioElementNode<P>;
+  node: appDom.ElementNode<P>;
 }
 
 function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
@@ -56,7 +56,7 @@ function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
 }
 
 interface SelectedNodeEditorProps {
-  node: studioDom.StudioElementNode;
+  node: appDom.ElementNode;
 }
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
@@ -96,11 +96,11 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
 
   const { selection } = editor;
 
-  const selectedNode = selection ? studioDom.getNode(dom, selection) : null;
+  const selectedNode = selection ? appDom.getNode(dom, selection) : null;
 
   return (
     <div className={className}>
-      {selectedNode && studioDom.isElement(selectedNode) ? (
+      {selectedNode && appDom.isElement(selectedNode) ? (
         // Add key to make sure it mounts every time selected node changes
         <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
       ) : (

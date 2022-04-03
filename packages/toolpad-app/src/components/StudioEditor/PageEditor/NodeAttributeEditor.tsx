@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { ArgTypeDefinition } from '@mui/toolpad-core';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
 import { StudioBindable } from '../../../types';
 import BindableEditor from './BindableEditor';
 
 export interface NodeAttributeEditorProps {
-  node: studioDom.StudioNode;
+  node: appDom.AppDomNode;
   namespace?: string;
   name: string;
   argType: ArgTypeDefinition;

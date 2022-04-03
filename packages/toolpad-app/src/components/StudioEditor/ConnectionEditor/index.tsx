@@ -11,7 +11,7 @@ import {
   StudioDataSourceClient,
 } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import dataSources from '../../../studioDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
@@ -48,7 +48,7 @@ function ConnectionParamsEditor<P>({
 interface ConnectionEditorContentProps<P> {
   appId: string;
   className?: string;
-  connectionNode: studioDom.StudioConnectionNode<P>;
+  connectionNode: appDom.ConnectionNode<P>;
 }
 
 function ConnectionEditorContent<P>({
@@ -82,7 +82,7 @@ function ConnectionEditorContent<P>({
         ...connectionNode,
         attributes: {
           ...connectionNode.attributes,
-          params: studioDom.createSecret(connectionParams),
+          params: appDom.createSecret(connectionParams),
         },
       });
       if (status) {
@@ -114,7 +114,7 @@ function ConnectionEditorContent<P>({
                 connectionNode,
                 'attributes',
                 'params',
-                studioDom.createSecret(connectionParams),
+                appDom.createSecret(connectionParams),
               );
             });
             savedConnectionParams.current = connectionParams;
@@ -165,7 +165,7 @@ export interface ConnectionProps {
 export default function ConnectionEditor({ appId, className }: ConnectionProps) {
   const dom = useDom();
   const { nodeId } = useParams();
-  const connectionNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
+  const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
   return connectionNode ? (
     <ConnectionEditorContent
       appId={appId}

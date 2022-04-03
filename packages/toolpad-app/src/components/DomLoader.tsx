@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Alert, Snackbar } from '@mui/material';
 import * as appDom from '../appDom';
-import { NodeId, StudioBindable, StudioBindables } from '../types';
+import { NodeId, BindableAttrValue, BindableAttrValues } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
 import useDebounced from '../utils/useDebounced';
@@ -34,13 +34,13 @@ export type DomAction =
       node: appDom.AppDomNode;
       prop: string;
       namespace: string;
-      value: StudioBindable<unknown> | null;
+      value: BindableAttrValue<unknown> | null;
     }
   | {
       type: 'DOM_SET_NODE_NAMESPACE';
       node: appDom.AppDomNode;
       namespace: string;
-      value: StudioBindables<unknown> | null;
+      value: BindableAttrValues<unknown> | null;
     }
   | {
       type: 'DOM_ADD_NODE';
@@ -206,7 +206,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         namespace,
         node,
         prop,
-        value: value as StudioBindable<unknown> | null,
+        value: value as BindableAttrValue<unknown> | null,
       });
     },
     setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(
@@ -218,7 +218,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         type: 'DOM_SET_NODE_NAMESPACE',
         namespace,
         node,
-        value: value as StudioBindables<unknown> | null,
+        value: value as BindableAttrValues<unknown> | null,
       });
     },
   };

@@ -4,12 +4,7 @@ import { useParams } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import CheckIcon from '@mui/icons-material/Check';
 import CrossIcon from '@mui/icons-material/Clear';
-import {
-  ConnectionStatus,
-  NodeId,
-  StudioConnectionEditorProps,
-  StudioDataSourceClient,
-} from '../../../types';
+import { ConnectionStatus, NodeId, ConnectionEditorProps, DataSourceClient } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import dataSources from '../../../studioDataSources/client';
@@ -21,8 +16,8 @@ function getConnectionStatusIcon(status: ConnectionStatus) {
   return status.error ? <CrossIcon /> : <CheckIcon />;
 }
 
-interface ConnectionParamsEditorProps<P> extends StudioConnectionEditorProps<P> {
-  dataSource: StudioDataSourceClient<P, any>;
+interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps<P> {
+  dataSource: DataSourceClient<P, any>;
 }
 
 function ConnectionParamsEditor<P>({

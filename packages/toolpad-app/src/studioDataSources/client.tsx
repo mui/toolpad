@@ -2,11 +2,11 @@ import { ArgTypeDefinitions } from '@mui/toolpad-core';
 import movies from './movies/client';
 import postgres from './postgres/client';
 import rest from './rest/client';
-import { NodeId, StudioDataSourceClient } from '../types';
+import { NodeId, DataSourceClient } from '../types';
 import * as appDom from '../appDom';
 import googleSheets from './googleSheets/client';
 
-const studioConnections: { [key: string]: StudioDataSourceClient<any, any> | undefined } = {
+const studioConnections: { [key: string]: DataSourceClient<any, any> | undefined } = {
   movies,
   postgres,
   rest,

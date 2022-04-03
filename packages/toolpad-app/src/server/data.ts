@@ -1,11 +1,11 @@
 import { DomNodeAttributeType, PrismaClient, Release } from '../../prisma/generated/client';
 import {
-  StudioConnection,
+  LegacyConnection,
   ConnectionStatus,
-  StudioDataSourceServer,
-  StudioApiResult,
+  DataSourceServer,
+  ApiResult,
   NodeId,
-  StudioBindable,
+  BindableAttrValue,
   Updates,
   VersionOrPreview,
 } from '../types';
@@ -111,9 +111,9 @@ export async function loadDom(appId: string): Promise<appDom.AppDom> {
             result[attribute.namespace][attribute.name] = {
               type: attribute.type,
               value: deserializeValue(attribute.value, attribute.type),
-            } as StudioBindable<unknown>;
+            } as BindableAttrValue<unknown>;
             return result;
-          }, {} as Record<string, Record<string, StudioBindable<unknown>>>),
+          }, {} as Record<string, Record<string, BindableAttrValue<unknown>>>),
         } as appDom.AppDomNode,
       ];
     }),
@@ -223,7 +223,7 @@ export async function loadReleaseDom(appId: string, version: number): Promise<ap
   return JSON.parse(release.snapshot.toString('utf-8')) as appDom.AppDom;
 }
 
-function fromDomConnection<P>(domConnection: appDom.ConnectionNode<P>): StudioConnection<P> {
+function fromDomConnection<P>(domConnection: appDom.ConnectionNode<P>): LegacyConnection<P> {
   const { attributes, id, name } = domConnection;
   return {
     id,
@@ -236,8 +236,8 @@ function fromDomConnection<P>(domConnection: appDom.ConnectionNode<P>): StudioCo
 
 export async function addConnection(
   appId: string,
-  { params, name, status, type }: StudioConnection,
-): Promise<StudioConnection> {
+  { params, name, status, type }: LegacyConnection,
+): Promise<LegacyConnection> {
   const dom = await loadDom(appId);
   const app = appDom.getApp(dom);
   const newConnection = appDom.createNode(dom, 'connection', {
@@ -255,15 +255,15 @@ export async function addConnection(
   return fromDomConnection(newConnection);
 }
 
-export async function getConnection(appId: string, id: string): Promise<StudioConnection> {
+export async function getConnection(appId: string, id: string): Promise<LegacyConnection> {
   const dom = await loadDom(appId);
   return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
 }
 
 export async function updateConnection(
   appId: string,
-  { id, params, name, status, type }: Updates<StudioConnection>,
-): Promise<StudioConnection> {
+  { id, params, name, status, type }: Updates<LegacyConnection>,
+): Promise<LegacyConnection> {
   let dom = await loadDom(appId);
   const existing = appDom.getNode(dom, id as NodeId, 'connection');
   if (name !== undefined) {
@@ -312,8 +312,8 @@ export async function execApi<Q>(
   appId: string,
   api: appDom.ApiNode<Q>,
   params: Q,
-): Promise<StudioApiResult<any>> {
-  const dataSource: StudioDataSourceServer<any, Q, any> | undefined =
+): Promise<ApiResult<any>> {
+  const dataSource: DataSourceServer<any, Q, any> | undefined =
     studioDataSources[api.attributes.dataSource.value];
   if (!dataSource) {
     throw new Error(`Unknown datasource "${api.attributes.dataSource.value}" for api "${api.id}"`);
@@ -335,7 +335,7 @@ export async function dataSourceFetchPrivate(
   query: any,
 ): Promise<any> {
   const connection = await getConnection(appId, connectionId);
-  const dataSource: StudioDataSourceServer<any, any, any> | undefined =
+  const dataSource: DataSourceServer<any, any, any> | undefined =
     studioDataSources[connection.type];
 
   if (!dataSource) {

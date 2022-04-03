@@ -1,15 +1,10 @@
-import {
-  StudioBindable,
-  ConnectionStatus,
-  StudioDataSourceServer,
-  StudioApiResult,
-} from '../../types';
+import { BindableAttrValue, ConnectionStatus, DataSourceServer, ApiResult } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';
 import evalExpression from '../../server/evalExpression';
 
 async function resolveBindableString(
-  bindable: StudioBindable<string>,
+  bindable: BindableAttrValue<string>,
   boundValues: Record<string, string>,
 ): Promise<string> {
   if (bindable.type === 'const') {
@@ -28,7 +23,9 @@ async function resolveBindableString(
       query: boundValues,
     });
   }
-  throw new Error(`Can't resolve bindable of type "${(bindable as StudioBindable<unknown>).type}"`);
+  throw new Error(
+    `Can't resolve bindable of type "${(bindable as BindableAttrValue<unknown>).type}"`,
+  );
 }
 
 async function test(): Promise<ConnectionStatus> {
@@ -40,7 +37,7 @@ async function exec(
   connection: RestConnectionParams,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
-): Promise<StudioApiResult<any>> {
+): Promise<ApiResult<any>> {
   const boundValues = { ...fetchQuery.params, ...params };
   const resolvedUrl = await resolveBindableString(fetchQuery.url, boundValues);
   const res = await fetch(resolvedUrl);
@@ -48,7 +45,7 @@ async function exec(
   return { data };
 }
 
-const dataSource: StudioDataSourceServer<{}, FetchQuery, any> = {
+const dataSource: DataSourceServer<{}, FetchQuery, any> = {
   test,
   exec,
 };

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/toolpad-core';
 import StringRecordEditor from '../../components/StringRecordEditor';
 import { BindingEditor } from '../../components/StudioEditor/BindingEditor';
-import { StudioDataSourceClient } from '../../types';
+import { DataSourceClient } from '../../types';
 import { WithControlledProp } from '../../utils/types';
 import { FetchQuery } from './types';
 import * as appDom from '../../appDom';
@@ -78,7 +78,7 @@ function getArgTypes(query: FetchQuery): ArgTypeDefinitions {
   );
 }
 
-const dataSource: StudioDataSourceClient<{}, FetchQuery> = {
+const dataSource: DataSourceClient<{}, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   isConnectionValid: () => true,

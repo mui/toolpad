@@ -2,10 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { google } from 'googleapis';
 import { match } from 'path-to-regexp';
 import {
-  StudioApiResult,
-  StudioDataSourceServer,
+  ApiResult,
+  DataSourceServer,
   ConnectionStatus,
-  StudioConnection,
+  LegacyConnection,
   CreateHandlerApi,
 } from '../../types';
 import config from '../../server/config';
@@ -13,7 +13,7 @@ import { asArray } from '../../utils/collections';
 import { GoogleSheetsActionType, GoogleSheetsConnectionParams, GoogleSheetsQuery } from './types';
 
 async function test(
-  connection: StudioConnection<GoogleSheetsConnectionParams>,
+  connection: LegacyConnection<GoogleSheetsConnectionParams>,
 ): Promise<ConnectionStatus> {
   console.log(`Testing connection ${JSON.stringify(connection)}`);
   return { timestamp: Date.now() };
@@ -46,7 +46,7 @@ function createOAuthClient() {
  */
 
 async function execPrivate(
-  connection: StudioConnection<GoogleSheetsConnectionParams>,
+  connection: LegacyConnection<GoogleSheetsConnectionParams>,
   query: GoogleSheetsQuery,
 ): Promise<any> {
   const client = createOAuthClient();
@@ -96,9 +96,9 @@ async function execPrivate(
  */
 
 async function exec(
-  connection: StudioConnection<GoogleSheetsConnectionParams>,
+  connection: LegacyConnection<GoogleSheetsConnectionParams>,
   query: GoogleSheetsQuery,
-): Promise<StudioApiResult<any>> {
+): Promise<ApiResult<any>> {
   const client = createOAuthClient();
   if (connection.params) {
     client.setCredentials(connection.params);
@@ -203,7 +203,7 @@ async function handler(
   }
 }
 
-const dataSource: StudioDataSourceServer<GoogleSheetsConnectionParams, any> = {
+const dataSource: DataSourceServer<GoogleSheetsConnectionParams, any> = {
   test,
   exec,
   execPrivate,

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/toolpad-core';
 import studioPropControls from '../../propertyControls';
 import { BindingEditor } from '../BindingEditor';
-import { NodeId, StudioBindable } from '../../../types';
+import { NodeId, BindableAttrValue } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
 import { usePageEditorState } from './PageEditorProvider';
 
@@ -24,7 +24,7 @@ function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
   }
 }
 
-export interface BindableEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   propNamespace: string | null;
   propName: string;
   nodeId: NodeId;

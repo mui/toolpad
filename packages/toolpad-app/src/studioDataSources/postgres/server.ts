@@ -1,13 +1,8 @@
-import {
-  StudioApiResult,
-  StudioDataSourceServer,
-  ConnectionStatus,
-  StudioConnection,
-} from '../../types';
+import { ApiResult, DataSourceServer, ConnectionStatus, LegacyConnection } from '../../types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
 
 async function test(
-  connection: StudioConnection<PostgresConnectionParams>,
+  connection: LegacyConnection<PostgresConnectionParams>,
 ): Promise<ConnectionStatus> {
   console.log(`Testing connection ${JSON.stringify(connection)}`);
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -15,7 +10,7 @@ async function test(
 }
 
 async function execPrivate(
-  connection: StudioConnection<PostgresConnectionParams>,
+  connection: LegacyConnection<PostgresConnectionParams>,
   query: any,
 ): Promise<any> {
   console.log(`executing private query "${query}"`);
@@ -26,9 +21,9 @@ async function execPrivate(
 }
 
 async function exec(
-  connection: StudioConnection<PostgresConnectionParams>,
+  connection: LegacyConnection<PostgresConnectionParams>,
   postgresQuery: PostgresQuery,
-): Promise<StudioApiResult<any>> {
+): Promise<ApiResult<any>> {
   console.log(
     `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection.params.host}"`,
   );
@@ -37,7 +32,7 @@ async function exec(
   };
 }
 
-const dataSource: StudioDataSourceServer<PostgresConnectionParams, PostgresQuery, any> = {
+const dataSource: DataSourceServer<PostgresConnectionParams, PostgresQuery, any> = {
   test,
   execPrivate,
   exec,

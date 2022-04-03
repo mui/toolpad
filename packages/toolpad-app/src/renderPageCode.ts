@@ -7,8 +7,8 @@ import {
   NodeId,
   PropExpression,
   ResolvedProps,
-  StudioBindable,
-  StudioBindables,
+  BindableAttrValue,
+  BindableAttrValues,
   VersionOrPreview,
 } from './types';
 import { camelCase } from './utils/strings';
@@ -267,7 +267,7 @@ class Context implements RenderContext {
 
   resolveBindable<P extends appDom.BindableProps<P>>(
     id: string,
-    propValue: StudioBindable<any>,
+    propValue: BindableAttrValue<any>,
     argType: ArgTypeDefinition,
   ): PropExpression {
     if (propValue.type === 'const') {
@@ -325,7 +325,7 @@ class Context implements RenderContext {
    */
   resolveBindables(
     id: string,
-    bindables: StudioBindables<any>,
+    bindables: BindableAttrValues<any>,
     argTypes: ArgTypeDefinitions,
   ): ResolvedProps {
     const result: ResolvedProps = {};

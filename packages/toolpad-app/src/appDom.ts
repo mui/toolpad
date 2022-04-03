@@ -3,13 +3,13 @@ import cuid from 'cuid';
 import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/toolpad-core';
 import {
   NodeId,
-  StudioConstant,
-  StudioBindable,
-  StudioBindables,
+  ConstantAttrValue,
+  BindableAttrValue,
+  BindableAttrValues,
   ConnectionStatus,
-  StudioTheme,
-  StudioConstants,
-  StudioSecret,
+  AppTheme,
+  ConstantAttrValues,
+  SecretAttrValue,
 } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
@@ -65,67 +65,67 @@ export interface AppNode extends AppDomNodeBase {
 
 export interface ThemeNode extends AppDomNodeBase {
   readonly type: 'theme';
-  readonly theme: StudioBindables<StudioTheme>;
+  readonly theme: BindableAttrValues<AppTheme>;
 }
 
 export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   readonly type: 'connection';
   readonly attributes: {
-    readonly dataSource: StudioConstant<string>;
-    readonly params: StudioSecret<P>;
-    readonly status: StudioConstant<ConnectionStatus | null>;
+    readonly dataSource: ConstantAttrValue<string>;
+    readonly params: SecretAttrValue<P>;
+    readonly status: ConstantAttrValue<ConnectionStatus | null>;
   };
 }
 
 export interface ApiNode<Q = unknown> extends AppDomNodeBase {
   readonly type: 'api';
   readonly attributes: {
-    readonly connectionId: StudioConstant<string>;
-    readonly dataSource: StudioConstant<string>;
-    readonly query: StudioConstant<Q>;
+    readonly connectionId: ConstantAttrValue<string>;
+    readonly dataSource: ConstantAttrValue<string>;
+    readonly query: ConstantAttrValue<Q>;
   };
 }
 
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
-    readonly title: StudioConstant<string>;
-    readonly urlQuery: StudioConstant<Record<string, string>>;
+    readonly title: ConstantAttrValue<string>;
+    readonly urlQuery: ConstantAttrValue<Record<string, string>>;
   };
 }
 
 export interface ElementNode<P = any> extends AppDomNodeBase {
   readonly type: 'element';
   readonly attributes: {
-    readonly component: StudioConstant<string>;
+    readonly component: ConstantAttrValue<string>;
   };
-  readonly props?: StudioBindables<P>;
+  readonly props?: BindableAttrValues<P>;
 }
 
 export interface CodeComponentNode extends AppDomNodeBase {
   readonly type: 'codeComponent';
   readonly attributes: {
-    readonly code: StudioConstant<string>;
-    readonly argTypes: StudioConstant<ArgTypeDefinitions>;
+    readonly code: ConstantAttrValue<string>;
+    readonly argTypes: ConstantAttrValue<ArgTypeDefinitions>;
   };
 }
 
 export interface DerivedStateNode<P = any> extends AppDomNodeBase {
   readonly type: 'derivedState';
-  readonly params?: StudioBindables<P>;
+  readonly params?: BindableAttrValues<P>;
   readonly attributes: {
-    readonly code: StudioConstant<string>;
-    readonly argTypes: StudioConstant<PropValueTypes<keyof P & string>>;
-    readonly returnType: StudioConstant<PropValueType>;
+    readonly code: ConstantAttrValue<string>;
+    readonly argTypes: ConstantAttrValue<PropValueTypes<keyof P & string>>;
+    readonly returnType: ConstantAttrValue<PropValueType>;
   };
 }
 
 export interface QueryStateNode<P = any> extends AppDomNodeBase {
   readonly type: 'queryState';
   readonly attributes: {
-    readonly api: StudioConstant<NodeId | null>;
+    readonly api: ConstantAttrValue<NodeId | null>;
   };
-  readonly params?: StudioBindables<P>;
+  readonly params?: BindableAttrValues<P>;
 }
 
 type AppDomNodeOfType<K extends AppDomNodeType> = {
@@ -213,18 +213,18 @@ function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): 
   }
 }
 
-export function createConst<V>(value: V): StudioConstant<V> {
+export function createConst<V>(value: V): ConstantAttrValue<V> {
   return { type: 'const', value };
 }
 
-export function createSecret<V>(value: V): StudioSecret<V> {
+export function createSecret<V>(value: V): SecretAttrValue<V> {
   return { type: 'secret', value };
 }
 
-export function createConsts<P>(values: P): StudioConstants<P> {
+export function createConsts<P>(values: P): ConstantAttrValues<P> {
   return Object.fromEntries(
     Object.entries(values).map(([key, value]) => [key, createConst(value)]),
-  ) as StudioConstants<P>;
+  ) as ConstantAttrValues<P>;
 }
 
 export function getMaybeNode<T extends AppDomNodeType>(
@@ -479,7 +479,7 @@ export function createDom(): AppDom {
 export function createElement<P>(
   dom: AppDom,
   component: string,
-  props: Partial<StudioBindables<P>> = {},
+  props: Partial<BindableAttrValues<P>> = {},
   name?: string,
 ): ElementNode {
   return createNode(dom, 'element', {
@@ -547,11 +547,11 @@ export function setNodeName(dom: AppDom, node: AppDomNode, name: string): AppDom
 }
 
 export type PropNamespaces<N extends AppDomNode> = {
-  [K in keyof N]: N[K] extends StudioBindables<any> | undefined ? K : never;
+  [K in keyof N]: N[K] extends BindableAttrValues<any> | undefined ? K : never;
 }[keyof N & string];
 
 export type BindableProps<T> = {
-  [K in keyof T]: T[K] extends StudioBindable<any> ? K : never;
+  [K in keyof T]: T[K] extends BindableAttrValue<any> ? K : never;
 }[keyof T & string];
 
 export function setNodeProp<Node extends AppDomNode, Prop extends BindableProps<Node>>(
@@ -689,14 +689,14 @@ export function removeNode(dom: AppDom, nodeId: NodeId) {
   });
 }
 
-export function toConstPropValue<T = any>(value: T): StudioConstant<T> {
+export function toConstPropValue<T = any>(value: T): ConstantAttrValue<T> {
   return { type: 'const', value };
 }
 
 export function fromConstPropValue(prop: undefined): undefined;
-export function fromConstPropValue<T>(prop: StudioBindable<T>): T;
-export function fromConstPropValue<T>(prop?: StudioBindable<T | undefined>): T | undefined;
-export function fromConstPropValue<T>(prop?: StudioBindable<T | undefined>): T | undefined {
+export function fromConstPropValue<T>(prop: BindableAttrValue<T>): T;
+export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): T | undefined;
+export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): T | undefined {
   if (!prop) {
     return undefined;
   }
@@ -706,19 +706,19 @@ export function fromConstPropValue<T>(prop?: StudioBindable<T | undefined>): T |
   return prop.value;
 }
 
-export function toConstPropValues<P = any>(props: Partial<P>): Partial<StudioBindables<P>>;
-export function toConstPropValues<P = any>(props: P): StudioBindables<P>;
-export function toConstPropValues<P = any>(props: P): StudioBindables<P> {
+export function toConstPropValues<P = any>(props: Partial<P>): Partial<BindableAttrValues<P>>;
+export function toConstPropValues<P = any>(props: P): BindableAttrValues<P>;
+export function toConstPropValues<P = any>(props: P): BindableAttrValues<P> {
   return Object.fromEntries(
     Object.entries(props).flatMap(([propName, value]) =>
       value ? [[propName, toConstPropValue(value)]] : [],
     ),
-  ) as StudioBindables<P>;
+  ) as BindableAttrValues<P>;
 }
 
-export function fromConstPropValues<P>(props: StudioBindables<P>): Partial<P> {
+export function fromConstPropValues<P>(props: BindableAttrValues<P>): Partial<P> {
   const result: Partial<P> = {};
-  (Object.entries(props) as ExactEntriesOf<StudioBindables<P>>).forEach(([name, prop]) => {
+  (Object.entries(props) as ExactEntriesOf<BindableAttrValues<P>>).forEach(([name, prop]) => {
     if (prop) {
       result[name] = fromConstPropValue<P[typeof name]>(prop);
     }

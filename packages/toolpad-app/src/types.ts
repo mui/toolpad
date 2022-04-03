@@ -25,54 +25,46 @@ export interface PropControlDefinition<T = any> {
   Editor: React.FC<EditorProps<T>>;
 }
 
-export interface StudioNodeBindings {
-  [destProp: string]: string;
-}
+export type BindingAttrValueFormat = 'stringLiteral' | 'default';
 
-export interface StudioPageBindings {
-  [destNodeId: NodeId]: StudioNodeBindings | undefined;
-}
-
-export type StudioBindingFormat = 'stringLiteral' | 'default';
-
-// TODO: Get rid of StudioBoundExpressionProp? Its function can be fulfilled by derivedState as well
-export interface StudioBoundExpression {
+// TODO: Get rid of BoundExpressionAttrValue? Its function can be fulfilled by derivedState as well
+export interface BoundExpressionAttrValue {
   type: 'boundExpression';
   value: string;
-  format?: StudioBindingFormat;
+  format?: BindingAttrValueFormat;
 }
 
-export interface StudioJsExpressionBinding {
+export interface JsExpressionAttrValue {
   type: 'jsExpression';
   value: string;
 }
 
-export interface StudioBinding {
+export interface BindingAttrValue {
   type: 'binding';
   value: string;
 }
 
-export interface StudioConstant<V> {
+export interface ConstantAttrValue<V> {
   type: 'const';
   value: V;
 }
 
-export interface StudioSecret<V> {
+export interface SecretAttrValue<V> {
   type: 'secret';
   value: V;
 }
 
-export type StudioBindable<V> =
-  | StudioConstant<V>
-  | StudioBinding
-  | StudioSecret<V>
-  | StudioBoundExpression
-  | StudioJsExpressionBinding;
+export type BindableAttrValue<V> =
+  | ConstantAttrValue<V>
+  | BindingAttrValue
+  | SecretAttrValue<V>
+  | BoundExpressionAttrValue
+  | JsExpressionAttrValue;
 
-export type StudioConstants<P> = { [K in keyof P]: StudioConstant<P[K]> };
+export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
-export type StudioBindables<P> = {
-  readonly [K in keyof P]?: StudioBindable<P[K]>;
+export type BindableAttrValues<P> = {
+  readonly [K in keyof P]?: BindableAttrValue<P[K]>;
 };
 
 export type NodeId = Branded<string, 'NodeId'>;
@@ -118,67 +110,64 @@ export interface PageViewState {
   bindings: LiveBindings;
 }
 
-export type StudioApiResultFields<D = any> = {
+export type ApiResultFields<D = any> = {
   [K in keyof D]?: {
     type: string;
   };
 };
 
-export interface StudioApiResult<D = any> {
+export interface ApiResult<D = any> {
   data: D;
-  fields?: StudioApiResultFields;
+  fields?: ApiResultFields;
 }
 
 export interface CreateHandlerApi {
-  updateConnection: (appId: string, props: Updates<StudioConnection>) => Promise<StudioConnection>;
-  getConnection: (appId: string, connectionId: string) => Promise<StudioConnection>;
+  updateConnection: (appId: string, props: Updates<LegacyConnection>) => Promise<LegacyConnection>;
+  getConnection: (appId: string, connectionId: string) => Promise<LegacyConnection>;
 }
 
-export interface StudioConnectionEditorProps<P> extends WithControlledProp<P> {
+export interface ConnectionEditorProps<P> extends WithControlledProp<P> {
   handlerBasePath: string;
   appId: string;
   connectionId: NodeId;
 }
-export type StudioConnectionParamsEditor<P = {}> = React.FC<StudioConnectionEditorProps<P>>;
-export interface StudioQueryEditorApi {
+export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
+export interface QueryEditorApi {
   fetchPrivate: (query: any) => Promise<any>;
 }
-export interface StudioQueryEditorProps<Q> extends WithControlledProp<Q> {
-  api: StudioQueryEditorApi;
+export interface QueryEditorProps<Q> extends WithControlledProp<Q> {
+  api: QueryEditorApi;
 }
-export type StudioQueryEditor<Q = {}> = React.FC<StudioQueryEditorProps<Q>>;
+export type QueryEditor<Q = {}> = React.FC<QueryEditorProps<Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;
   error?: string;
 }
 
-export interface StudioDataSourceClient<P = {}, Q = {}> {
+export interface DataSourceClient<P = {}, Q = {}> {
   displayName: string;
-  ConnectionParamsInput: StudioConnectionParamsEditor<P>;
+  ConnectionParamsInput: ConnectionParamsEditor<P>;
   getInitialConnectionValue: () => P;
   isConnectionValid: (connection: P) => boolean;
-  QueryEditor: StudioQueryEditor<Q>;
+  QueryEditor: QueryEditor<Q>;
   getInitialQueryValue: () => Q;
   getArgTypes?: (query: Q) => ArgTypeDefinitions;
 }
 
-export interface StudioDataSourceServer<P = {}, Q = {}, D = {}> {
-  test: (connection: StudioConnection<P>) => Promise<ConnectionStatus>;
+export interface DataSourceServer<P = {}, Q = {}, D = {}> {
+  test: (connection: LegacyConnection<P>) => Promise<ConnectionStatus>;
   // Execute a private query on this connection, intended for editors only
-  execPrivate?: (connection: StudioConnection<P>, query: any) => Promise<any>;
+  execPrivate?: (connection: LegacyConnection<P>, query: any) => Promise<any>;
   // Execute a query on this connection, intended for viewers
-  exec: (connection: StudioConnection<P>, query: Q, params: any) => Promise<StudioApiResult<D>>;
+  exec: (connection: LegacyConnection<P>, query: Q, params: any) => Promise<ApiResult<D>>;
   createHandler?: () => (api: CreateHandlerApi, req: NextApiRequest, res: NextApiResponse) => void;
 }
-
-export interface StudioConnectionSummary {
+// TODO: replace LegacyConnection with ConnectionNode
+export interface LegacyConnection<P = unknown> {
   id: string;
   type: string;
   name: string;
-}
-
-export interface StudioConnection<P = unknown> extends StudioConnectionSummary {
   params: P;
   status: ConnectionStatus | null;
 }
@@ -211,7 +200,7 @@ export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
 
 export type ResolvedProps = Record<string, PropExpression | undefined>;
 
-export interface StudioTheme {
+export interface AppTheme {
   'palette.primary.main'?: string;
   'palette.secondary.main'?: string;
 }

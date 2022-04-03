@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import data from '../../../movies.json';
-import { StudioDataSourceClient } from '../../types';
+import { DataSourceClient } from '../../types';
 import { useInput } from '../../utils/forms';
 import { WithControlledProp } from '../../utils/types';
 import { MoviesQuery, MoviesConnectionParams } from './types';
@@ -67,7 +67,7 @@ function getInitialQueryValue(): MoviesQuery {
   return { genre: null };
 }
 
-const dataSource: StudioDataSourceClient<MoviesConnectionParams, MoviesQuery> = {
+const dataSource: DataSourceClient<MoviesConnectionParams, MoviesQuery> = {
   displayName: 'Fake Movies API',
   ConnectionParamsInput,
   getInitialConnectionValue: getInitialValue,

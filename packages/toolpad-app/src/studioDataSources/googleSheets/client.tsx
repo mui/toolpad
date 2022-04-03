@@ -1,11 +1,7 @@
 import { Stack, Button, TextField, Autocomplete } from '@mui/material';
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import {
-  StudioDataSourceClient,
-  StudioConnectionEditorProps,
-  StudioQueryEditorProps,
-} from '../../types';
+import { DataSourceClient, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   GoogleSheetsConnectionParams,
   GoogleSheetsQuery,
@@ -58,7 +54,7 @@ const queryReducer = (
   }
 };
 
-function QueryEditor({ value, onChange, api }: StudioQueryEditorProps<GoogleSheetsQuery>) {
+function QueryEditor({ value, onChange, api }: QueryEditorProps<GoogleSheetsQuery>) {
   const [query, dispatch] = React.useReducer(
     queryReducer,
     value ?? {
@@ -158,7 +154,7 @@ function ConnectionParamsInput({
   connectionId,
   handlerBasePath,
   value,
-}: StudioConnectionEditorProps<GoogleSheetsConnectionParams>) {
+}: ConnectionEditorProps<GoogleSheetsConnectionParams>) {
   return (
     <Stack direction="column" gap={1}>
       <Button
@@ -176,7 +172,7 @@ function ConnectionParamsInput({
   );
 }
 
-const dataSource: StudioDataSourceClient<GoogleSheetsConnectionParams, GoogleSheetsQuery> = {
+const dataSource: DataSourceClient<GoogleSheetsConnectionParams, GoogleSheetsQuery> = {
   displayName: 'Google Sheets',
   ConnectionParamsInput,
   getInitialConnectionValue: getInitialQueryValue,

@@ -26,7 +26,7 @@ import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';
 import * as appDom from '../../../appDom';
-import { NodeId, StudioBindable, StudioBindables } from '../../../types';
+import { NodeId, BindableAttrValue, BindableAttrValues } from '../../../types';
 import { BindingEditor } from '../BindingEditor';
 
 const DERIVED_STATE_PARAMS = 'StudioDerivedStateParams';
@@ -82,7 +82,7 @@ function PropValueTypeSelector({ value, onChange, disabled }: PropValueTypeSelec
 }
 
 interface StudioNodePropsEditorProps<P>
-  extends WithControlledProp<StudioBindables<P>>,
+  extends WithControlledProp<BindableAttrValues<P>>,
     WithControlledProp<PropValueTypes<keyof P & string>, 'argTypes'> {
   nodeId: NodeId;
 }
@@ -98,7 +98,7 @@ function StudioNodePropsEditor<P>({
   const globalScope = viewState.pageState;
 
   const handlePropValueChange = React.useCallback(
-    (param: keyof P & string) => (newValue: StudioBindable<any> | null) => {
+    (param: keyof P & string) => (newValue: BindableAttrValue<any> | null) => {
       if (newValue) {
         onChange({ ...value, [param]: newValue });
       }
@@ -119,7 +119,7 @@ function StudioNodePropsEditor<P>({
 
   const handlePropRemove = React.useCallback(
     (param: keyof P & string) => () => {
-      onChange(omit(value, param) as StudioBindables<P>);
+      onChange(omit(value, param) as BindableAttrValues<P>);
       onArgTypesChange(omit(argTypes, param) as PropValueTypes<keyof P & string>);
     },
     [onChange, value, onArgTypesChange, argTypes],
@@ -134,7 +134,7 @@ function StudioNodePropsEditor<P>({
           }
           const bindingId = `${nodeId}.props.${propName}`;
           const liveBinding = viewState.bindings[bindingId];
-          const propValue: StudioBindable<any> | null = value[propName] ?? null;
+          const propValue: BindableAttrValue<any> | null = value[propName] ?? null;
           const isBound = !!propValue;
           return (
             <Stack key={propName} direction="row" alignItems="center" gap={1}>
@@ -280,7 +280,7 @@ function DerivedStateNodeEditor<P>({ node }: DerivedStateNodeEditorProps<P>) {
   );
 
   const handleParamsChange = React.useCallback(
-    (params: StudioBindables<P>) => {
+    (params: BindableAttrValues<P>) => {
       domApi.setNodeNamespace(node, 'params', params);
     },
     [domApi, node],

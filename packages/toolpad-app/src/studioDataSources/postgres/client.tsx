@@ -1,7 +1,7 @@
 import { Stack, TextareaAutosize, TextField } from '@mui/material';
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { StudioDataSourceClient, StudioQueryEditorProps } from '../../types';
+import { DataSourceClient, QueryEditorProps } from '../../types';
 import { useInput } from '../../utils/forms';
 import { WithControlledProp } from '../../utils/types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
@@ -45,7 +45,7 @@ function ConnectionParamsInput({ value, onChange }: WithControlledProp<PostgresC
   );
 }
 
-function QueryEditor({ value, onChange, api }: StudioQueryEditorProps<PostgresQuery>) {
+function QueryEditor({ value, onChange, api }: QueryEditorProps<PostgresQuery>) {
   const result = useQuery('getAllTables', () => api.fetchPrivate('getAllTables'));
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -73,7 +73,7 @@ function getInitialQueryValue(): PostgresQuery {
   };
 }
 
-const dataSource: StudioDataSourceClient<PostgresConnectionParams, PostgresQuery> = {
+const dataSource: DataSourceClient<PostgresConnectionParams, PostgresQuery> = {
   displayName: 'Postgres',
   ConnectionParamsInput,
   getInitialConnectionValue: getInitialValue,

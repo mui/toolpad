@@ -8,7 +8,7 @@ export default {
   argTypes: {
     children: {
       typeDef: { type: 'string' },
-      name: 'value',
+      label: 'value',
       defaultValue: 'Text',
     },
     variant: {

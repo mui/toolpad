@@ -18,12 +18,12 @@ const args = arg({
 const DEV_MODE = args['--dev'];
 const NEXT_CMD = DEV_MODE ? 'dev' : 'start';
 
-if (!process.env.STUDIO_DATABASE_URL) {
-  console.error(`Missing environment variable STUDIO_DATABASE_URL`);
+if (!process.env.TOOLPAD_DATABASE_URL) {
+  console.error(`Missing environment variable TOOLPAD_DATABASE_URL`);
   process.exit(1);
 }
 
-const connectionString = pgConnectionString.parse(process.env.STUDIO_DATABASE_URL);
+const connectionString = pgConnectionString.parse(process.env.TOOLPAD_DATABASE_URL);
 console.log(`Starting Studio with db "${connectionString.host}:${connectionString.port}"`);
 
 const studioDir = path.dirname(
@@ -38,7 +38,7 @@ const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   stdio: 'pipe',
   env: {
     // See https://render.com/docs/environment-variables for more available variables
-    STUDIO_EXTERNAL_URL: process.env.STUDIO_EXTERNAL_URL || process.env.RENDER_EXTERNAL_URL,
+    TOOLPAD_EXTERNAL_URL: process.env.TOOLPAD_EXTERNAL_URL || process.env.RENDER_EXTERNAL_URL,
     PRISMA_HIDE_UPDATE_MESSAGE: '1',
   },
 });

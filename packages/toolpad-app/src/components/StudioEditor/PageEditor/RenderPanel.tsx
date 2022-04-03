@@ -14,7 +14,7 @@ import {
   NodeInfo,
   NodesInfo,
 } from '../../../types';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import PageView from '../../PageView';
 import {
   absolutePositionCss,
@@ -165,7 +165,7 @@ function insertSlotAbsolutePositionCss(slot: {
 }
 
 function findNodeAt(
-  nodes: readonly studioDom.StudioNode[],
+  nodes: readonly appDom.AppDomNode[],
   nodesInfo: NodesInfo,
   x: number,
   y: number,
@@ -241,7 +241,7 @@ function findClosestSlot(slots: RenderedSlot[], x: number, y: number): SlotLocat
 }
 
 function findActiveSlotAt(
-  nodes: readonly studioDom.StudioNode[],
+  nodes: readonly appDom.AppDomNode[],
   nodesInfo: NodesInfo,
   slots: ViewSlots,
   x: number,
@@ -316,7 +316,7 @@ function calculateSlots(
   parentId: NodeId,
   parentProp: string,
   slotState: SlotState,
-  children: studioDom.StudioNode[],
+  children: appDom.AppDomNode[],
   nodesInfo: NodesInfo,
 ): RenderedSlot[] {
   const rect = slotState.rect;
@@ -327,7 +327,7 @@ function calculateSlots(
         type: 'single',
         parentId,
         parentProp,
-        parentIndex: studioDom.createFractionalIndex(null, null),
+        parentIndex: appDom.createFractionalIndex(null, null),
         rect,
       },
     ];
@@ -392,7 +392,7 @@ function calculateSlots(
     const first = boundaries[0];
     offsets.push({
       offset: first.start,
-      parentIndex: studioDom.createFractionalIndex(null, first.parentIndex),
+      parentIndex: appDom.createFractionalIndex(null, first.parentIndex),
     });
     const lastIdx = boundaries.length - 1;
     for (let i = 0; i < lastIdx; i += 1) {
@@ -400,13 +400,13 @@ function calculateSlots(
       const current = boundaries[i + 1];
       offsets.push({
         offset: (prev.end + current.start) / 2,
-        parentIndex: studioDom.createFractionalIndex(prev.parentIndex, current.parentIndex),
+        parentIndex: appDom.createFractionalIndex(prev.parentIndex, current.parentIndex),
       });
     }
     const last = boundaries[lastIdx];
     offsets.push({
       offset: last.end,
-      parentIndex: studioDom.createFractionalIndex(last.parentIndex, null),
+      parentIndex: appDom.createFractionalIndex(last.parentIndex, null),
     });
   }
 
@@ -426,8 +426,8 @@ function calculateSlots(
 }
 
 function calculateNodeSlots(
-  parent: studioDom.StudioNode,
-  children: studioDom.NodeChildren,
+  parent: appDom.AppDomNode,
+  children: appDom.NodeChildren,
   nodesInfo: NodesInfo,
 ): NodeSlots {
   const parentState = nodesInfo[parent.id];
@@ -464,7 +464,7 @@ interface ViewSlots {
 }
 
 interface SelectionHudProps {
-  node: studioDom.StudioElementNode;
+  node: appDom.ElementNode;
   rect: Rectangle;
   selected?: boolean;
   allowInteraction?: boolean;
@@ -525,13 +525,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const { nodes: nodesInfo } = viewState;
 
-  const pageNode = studioDom.getNode(dom, pageNodeId, 'page');
+  const pageNode = appDom.getNode(dom, pageNodeId, 'page');
 
   const pageNodes = React.useMemo(() => {
-    return [pageNode, ...studioDom.getDescendants(dom, pageNode)];
+    return [pageNode, ...appDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
-  const selectedNode = selection && studioDom.getNode(dom, selection);
+  const selectedNode = selection && appDom.getNode(dom, selection);
 
   // We will use this key to remount the overlay after page load
   const [overlayKey, setOverlayKey] = React.useState(1);
@@ -555,7 +555,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const slots: ViewSlots = React.useMemo(() => {
     const result: ViewSlots = {};
     pageNodes.forEach((node) => {
-      result[node.id] = calculateNodeSlots(node, studioDom.getChildNodes(dom, node), nodesInfo);
+      result[node.id] = calculateNodeSlots(node, appDom.getChildNodes(dom, node), nodesInfo);
     });
     return result;
   }, [pageNodes, dom, nodesInfo]);
@@ -575,11 +575,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [api],
   );
 
-  const getCurrentlyDraggedNode = React.useCallback((): studioDom.StudioElementNode | null => {
-    return newNode || (selection && studioDom.getNode(dom, selection, 'element'));
+  const getCurrentlyDraggedNode = React.useCallback((): appDom.ElementNode | null => {
+    return newNode || (selection && appDom.getNode(dom, selection, 'element'));
   }, [dom, newNode, selection]);
 
-  const availableDropTargets = React.useMemo((): studioDom.StudioNode[] => {
+  const availableDropTargets = React.useMemo((): appDom.AppDomNode[] => {
     const draggedNode = getCurrentlyDraggedNode();
 
     if (!draggedNode) {
@@ -588,7 +588,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
     const component = draggedNode.attributes.component.value;
     if (component === ROW_COMPONENT) {
-      return [studioDom.getNode(dom, pageNodeId, 'page')];
+      return [appDom.getNode(dom, pageNodeId, 'page')];
     }
 
     /**
@@ -597,10 +597,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
      * them would create a cyclic structure.
      */
     const excludedNodes = selectedNode
-      ? new Set<studioDom.StudioNode>([
-          selectedNode,
-          ...studioDom.getDescendants(dom, selectedNode),
-        ])
+      ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
       : new Set();
     return pageNodes.filter((n) => !excludedNodes.has(n));
   }, [dom, getCurrentlyDraggedNode, pageNodeId, pageNodes, selectedNode]);
@@ -658,22 +655,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       );
 
       if (activeSlot) {
-        let parent = studioDom.getNode(dom, activeSlot.parentId);
+        let parent = appDom.getNode(dom, activeSlot.parentId);
 
-        if (!studioDom.isElement(parent) && !studioDom.isPage(parent)) {
+        if (!appDom.isElement(parent) && !appDom.isPage(parent)) {
           throw new Error(`Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`);
         }
 
-        if (studioDom.isPage(parent) && draggedNode.attributes.component.value !== ROW_COMPONENT) {
+        if (appDom.isPage(parent) && draggedNode.attributes.component.value !== ROW_COMPONENT) {
           // TODO: this logic should probably live in the DomReducer?
-          const container = studioDom.createElement(dom, ROW_COMPONENT, {});
+          const container = appDom.createElement(dom, ROW_COMPONENT, {});
           domApi.addNode(container, parent, 'children');
           parent = container;
           activeSlot = { parentId: parent.id, parentProp: 'children' };
         }
 
         if (newNode) {
-          if (studioDom.isElement(parent)) {
+          if (appDom.isElement(parent)) {
             domApi.addNode(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
           } else {
             domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
@@ -737,8 +734,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       const newSelectedNodeId = findNodeAt(pageNodes, nodesInfo, cursorPos.x, cursorPos.y);
-      const newSelectedNode = newSelectedNodeId && studioDom.getMaybeNode(dom, newSelectedNodeId);
-      if (newSelectedNode && studioDom.isElement(newSelectedNode)) {
+      const newSelectedNode = newSelectedNodeId && appDom.getMaybeNode(dom, newSelectedNodeId);
+      if (newSelectedNode && appDom.isElement(newSelectedNode)) {
         api.select(newSelectedNodeId);
       } else {
         api.select(null);
@@ -749,7 +746,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleDelete = React.useCallback(
     (nodeId: NodeId) => {
-      const toRemove = studioDom.getNode(dom, nodeId);
+      const toRemove = appDom.getNode(dom, nodeId);
       domApi.removeNode(toRemove.id);
       api.deselect();
     },
@@ -771,7 +768,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       return new Set();
     }
     return new Set(
-      [...studioDom.getPageAncestors(dom, selectedNode), selectedNode].map((node) => node.id),
+      [...appDom.getPageAncestors(dom, selectedNode), selectedNode].map((node) => node.id),
     );
   }, [dom, selectedNode]);
 
@@ -784,7 +781,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     (event: RuntimeEvent) => {
       switch (event.type) {
         case 'propUpdated': {
-          const node = studioDom.getNode(dom, event.nodeId as NodeId, 'element');
+          const node = appDom.getNode(dom, event.nodeId as NodeId, 'element');
           const actual = node.props?.[event.prop];
           if (actual && actual.type !== 'const') {
             console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);
@@ -936,7 +933,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             }
 
             return (
-              studioDom.isElement(node) && (
+              appDom.isElement(node) && (
                 <NodeHud
                   key={node.id}
                   node={node}

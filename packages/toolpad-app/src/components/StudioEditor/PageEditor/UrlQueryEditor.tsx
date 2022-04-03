@@ -2,7 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import StringRecordEditor from '../../StringRecordEditor';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { NodeId } from '../../../types';
 
@@ -14,7 +14,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   const dom = useDom();
   const domApi = useDomApi();
 
-  const page = studioDom.getNode(dom, pageNodeId, 'page');
+  const page = appDom.getNode(dom, pageNodeId, 'page');
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
@@ -25,7 +25,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   );
 
   const handleSave = React.useCallback(() => {
-    domApi.setNodeNamespacedProp(page, 'attributes', 'urlQuery', studioDom.createConst(input));
+    domApi.setNodeNamespacedProp(page, 'attributes', 'urlQuery', appDom.createConst(input));
   }, [domApi, page, input]);
 
   return (

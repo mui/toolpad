@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import DialogForm from '../../DialogForm';
 import { useDom, useDomApi } from '../../DomLoader';
 
@@ -34,14 +34,14 @@ export default function CreateStudioPageDialog({
         autoComplete="off"
         onSubmit={(e) => {
           e.preventDefault();
-          const newNode = studioDom.createNode(dom, 'page', {
+          const newNode = appDom.createNode(dom, 'page', {
             name,
             attributes: {
-              title: studioDom.createConst(name),
-              urlQuery: studioDom.createConst({}),
+              title: appDom.createConst(name),
+              urlQuery: appDom.createConst({}),
             },
           });
-          const appNode = studioDom.getApp(dom);
+          const appNode = appDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'pages');
 
           onClose();

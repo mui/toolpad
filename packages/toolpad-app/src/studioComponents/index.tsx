@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { capitalize } from 'lodash';
-import * as studioDom from '../studioDom';
+import * as appDom from '../appDom';
 
 import Button from './Button';
 import Container from './Container';
@@ -35,9 +35,7 @@ function codeComponentRenderer(moduleName: string, suggestedLocalName: string): 
   };
 }
 
-function createCodeComponent(
-  domNode: studioDom.StudioCodeComponentNode,
-): StudioComponentDefinition {
+function createCodeComponent(domNode: appDom.CodeComponentNode): StudioComponentDefinition {
   return {
     id: `codeComponent.${domNode.id}`,
     displayName: domNode.name,
@@ -46,9 +44,9 @@ function createCodeComponent(
   };
 }
 
-export function getStudioComponents(dom: studioDom.StudioDom): StudioComponentDefinition[] {
-  const app = studioDom.getApp(dom);
-  const { codeComponents = [] } = studioDom.getChildNodes(dom, app);
+export function getStudioComponents(dom: appDom.AppDom): StudioComponentDefinition[] {
+  const app = appDom.getApp(dom);
+  const { codeComponents = [] } = appDom.getChildNodes(dom, app);
   return [
     ...INTERNAL_COMPONENTS.values(),
     ...codeComponents.map((studioCodeComponent) => createCodeComponent(studioCodeComponent)),
@@ -56,7 +54,7 @@ export function getStudioComponents(dom: studioDom.StudioDom): StudioComponentDe
 }
 
 export function getStudioComponent(
-  dom: studioDom.StudioDom,
+  dom: appDom.AppDom,
   componentId: string,
 ): StudioComponentDefinition {
   const component = INTERNAL_COMPONENTS.get(componentId);
@@ -65,8 +63,8 @@ export function getStudioComponent(
     return component;
   }
 
-  const app = studioDom.getApp(dom);
-  const { codeComponents = [] } = studioDom.getChildNodes(dom, app);
+  const app = appDom.getApp(dom);
+  const { codeComponents = [] } = appDom.getChildNodes(dom, app);
   const nodeId = componentId.split('.')[1];
   const domNode = codeComponents.find((node) => node.id === nodeId);
 
@@ -77,13 +75,10 @@ export function getStudioComponent(
   throw new Error(`Invariant: Accessing unknown component "${componentId}"`);
 }
 
-export function useStudioComponents(dom: studioDom.StudioDom): StudioComponentDefinition[] {
+export function useStudioComponents(dom: appDom.AppDom): StudioComponentDefinition[] {
   return React.useMemo(() => getStudioComponents(dom), [dom]);
 }
 
-export function useStudioComponent(
-  dom: studioDom.StudioDom,
-  id: string,
-): StudioComponentDefinition {
+export function useStudioComponent(dom: appDom.AppDom, id: string): StudioComponentDefinition {
   return React.useMemo(() => getStudioComponent(dom, id), [dom, id]);
 }

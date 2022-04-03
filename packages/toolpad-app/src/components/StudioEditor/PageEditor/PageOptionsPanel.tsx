@@ -20,7 +20,7 @@ import QueryStateEditor from './QueryStateEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import { NodeId } from '../../../types';
 import NodeNameEditor from '../NodeNameEditor';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 
 // TODO: remove deprecated state
 const DEPRECATED = false;
@@ -47,7 +47,7 @@ export default function PageOptionsPanel() {
   const pageNodeId = state.nodeId;
   const dom = useDom();
 
-  const page = studioDom.getNode(dom, pageNodeId, 'page');
+  const page = appDom.getNode(dom, pageNodeId, 'page');
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [debugEditor, setDebugEditor] = React.useState(false);

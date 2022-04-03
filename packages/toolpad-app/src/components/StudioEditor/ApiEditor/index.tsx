@@ -6,7 +6,7 @@ import SplitPane from 'react-split-pane';
 import { NodeId } from '../../../types';
 import dataSources from '../../../studioDataSources/client';
 import client from '../../../api';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import useDebounced from '../../../utils/useDebounced';
 import NodeNameEditor from '../NodeNameEditor';
@@ -17,7 +17,7 @@ import JsonView from '../../JsonView';
 interface ApiEditorContentProps<Q> {
   appId: string;
   className?: string;
-  apiNode: studioDom.StudioApiNode<Q>;
+  apiNode: appDom.ApiNode<Q>;
 }
 
 function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProps<Q>) {
@@ -28,14 +28,14 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
   const savedQuery = React.useRef(apiNode.attributes.query.value);
 
   const conectionId = apiNode.attributes.connectionId.value as NodeId;
-  const connection = studioDom.getMaybeNode(dom, conectionId, 'connection');
+  const connection = appDom.getMaybeNode(dom, conectionId, 'connection');
   const dataSourceName = apiNode.attributes.dataSource.value;
   const dataSource = dataSources[dataSourceName] || null;
 
-  const previewApi: studioDom.StudioApiNode<Q> = React.useMemo(() => {
+  const previewApi: appDom.ApiNode<Q> = React.useMemo(() => {
     return {
       ...apiNode,
-      attributes: { ...apiNode.attributes, query: studioDom.createConst(apiQuery) },
+      attributes: { ...apiNode.attributes, query: appDom.createConst(apiQuery) },
     };
   }, [apiNode, apiQuery]);
 
@@ -59,7 +59,7 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
           apiNode,
           'attributes',
           'connectionId',
-          studioDom.createConst(newConnectionId),
+          appDom.createConst(newConnectionId),
         );
       }
     },
@@ -106,7 +106,7 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
                     apiNode,
                     'attributes',
                     'query',
-                    studioDom.createConst(apiQuery),
+                    appDom.createConst(apiQuery),
                   );
                 });
                 savedQuery.current = apiQuery;
@@ -150,7 +150,7 @@ interface ApiEditorProps {
 export default function ApiEditor({ appId, className }: ApiEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
-  const apiNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'api');
+  const apiNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'api');
   return apiNode ? (
     <ApiEditorContent className={className} key={nodeId} appId={appId} apiNode={apiNode} />
   ) : (

@@ -11,14 +11,15 @@ import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { LiveBinding, PropValueType } from '@mui/toolpad-core';
-import { StudioBindable } from '../../types';
+import { BindableAttrValue } from '../../types';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import RuntimeErrorAlert from './PageEditor/RuntimeErrorAlert';
 import JsonView from '../JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
 
-interface JsExpressionBindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+interface JsExpressionBindingEditorProps<V>
+  extends WithControlledProp<BindableAttrValue<V> | null> {
   globalScope: Record<string, unknown>;
   onCommit?: () => void;
 }
@@ -44,7 +45,7 @@ function JsExpressionBindingEditor<V>({
   );
 }
 
-export interface BindingEditorProps<V> extends WithControlledProp<StudioBindable<V> | null> {
+export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   globalScope: Record<string, unknown>;
   liveBinding?: LiveBinding;
   disabled?: boolean;

@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { ArgTypeDefinition } from '@mui/toolpad-core';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
-import { StudioBindable } from '../../../types';
+import { BindableAttrValue } from '../../../types';
 import BindableEditor from './BindableEditor';
 
 export interface NodeAttributeEditorProps {
-  node: studioDom.StudioNode;
+  node: appDom.AppDomNode;
   namespace?: string;
   name: string;
   argType: ArgTypeDefinition;
@@ -21,13 +21,13 @@ export default function NodeAttributeEditor({
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(
-    (newValue: StudioBindable<unknown> | null) => {
+    (newValue: BindableAttrValue<unknown> | null) => {
       domApi.setNodeNamespacedProp(node, namespace as any, name, newValue);
     },
     [domApi, node, namespace, name],
   );
 
-  const propValue: StudioBindable<unknown> | null = (node as any)[namespace]?.[name] ?? null;
+  const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   return (
     <BindableEditor

@@ -25,8 +25,8 @@ import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';
-import * as studioDom from '../../../studioDom';
-import { NodeId, StudioBindable, StudioBindables } from '../../../types';
+import * as appDom from '../../../appDom';
+import { NodeId, BindableAttrValue, BindableAttrValues } from '../../../types';
 import { BindingEditor } from '../BindingEditor';
 
 const DERIVED_STATE_PARAMS = 'StudioDerivedStateParams';
@@ -82,7 +82,7 @@ function PropValueTypeSelector({ value, onChange, disabled }: PropValueTypeSelec
 }
 
 interface StudioNodePropsEditorProps<P>
-  extends WithControlledProp<StudioBindables<P>>,
+  extends WithControlledProp<BindableAttrValues<P>>,
     WithControlledProp<PropValueTypes<keyof P & string>, 'argTypes'> {
   nodeId: NodeId;
 }
@@ -98,7 +98,7 @@ function StudioNodePropsEditor<P>({
   const globalScope = viewState.pageState;
 
   const handlePropValueChange = React.useCallback(
-    (param: keyof P & string) => (newValue: StudioBindable<any> | null) => {
+    (param: keyof P & string) => (newValue: BindableAttrValue<any> | null) => {
       if (newValue) {
         onChange({ ...value, [param]: newValue });
       }
@@ -119,7 +119,7 @@ function StudioNodePropsEditor<P>({
 
   const handlePropRemove = React.useCallback(
     (param: keyof P & string) => () => {
-      onChange(omit(value, param) as StudioBindables<P>);
+      onChange(omit(value, param) as BindableAttrValues<P>);
       onArgTypesChange(omit(argTypes, param) as PropValueTypes<keyof P & string>);
     },
     [onChange, value, onArgTypesChange, argTypes],
@@ -134,7 +134,7 @@ function StudioNodePropsEditor<P>({
           }
           const bindingId = `${nodeId}.props.${propName}`;
           const liveBinding = viewState.bindings[bindingId];
-          const propValue: StudioBindable<any> | null = value[propName] ?? null;
+          const propValue: BindableAttrValue<any> | null = value[propName] ?? null;
           const isBound = !!propValue;
           return (
             <Stack key={propName} direction="row" alignItems="center" gap={1}>
@@ -163,7 +163,7 @@ function StudioNodePropsEditor<P>({
 }
 
 interface DerivedStateNodeEditorProps<P> {
-  node: studioDom.StudioDerivedStateNode<P>;
+  node: appDom.DerivedStateNode<P>;
 }
 
 function DerivedStateNodeEditor<P>({ node }: DerivedStateNodeEditorProps<P>) {
@@ -242,7 +242,7 @@ function DerivedStateNodeEditor<P>({ node }: DerivedStateNodeEditorProps<P>) {
       node,
       'attributes',
       'argTypes',
-      studioDom.createConst(
+      appDom.createConst(
         update(node.attributes.argTypes.value, {
           [newPropName]: { type: 'string' },
         } as Partial<PropValueTypes<keyof P & string>>),
@@ -253,7 +253,7 @@ function DerivedStateNodeEditor<P>({ node }: DerivedStateNodeEditorProps<P>) {
 
   const handlePropTypesChange = React.useCallback(
     (argTypes: PropValueTypes<keyof P & string>) =>
-      domApi.setNodeNamespacedProp(node, 'attributes', 'argTypes', studioDom.createConst(argTypes)),
+      domApi.setNodeNamespacedProp(node, 'attributes', 'argTypes', appDom.createConst(argTypes)),
     [domApi, node],
   );
 
@@ -263,7 +263,7 @@ function DerivedStateNodeEditor<P>({ node }: DerivedStateNodeEditorProps<P>) {
         node,
         'attributes',
         'returnType',
-        studioDom.createConst(returnType),
+        appDom.createConst(returnType),
       ),
     [domApi, node],
   );
@@ -272,7 +272,7 @@ function DerivedStateNodeEditor<P>({ node }: DerivedStateNodeEditorProps<P>) {
     () =>
       debounce(
         (code: string = '') =>
-          domApi.setNodeNamespacedProp(node, 'attributes', 'code', studioDom.createConst(code)),
+          domApi.setNodeNamespacedProp(node, 'attributes', 'code', appDom.createConst(code)),
 
         240,
       ),
@@ -280,7 +280,7 @@ function DerivedStateNodeEditor<P>({ node }: DerivedStateNodeEditorProps<P>) {
   );
 
   const handleParamsChange = React.useCallback(
-    (params: StudioBindables<P>) => {
+    (params: BindableAttrValues<P>) => {
       domApi.setNodeNamespace(node, 'params', params);
     },
     [domApi, node],
@@ -336,23 +336,23 @@ export default function DerivedStateEditor() {
   const domApi = useDomApi();
 
   const [editedState, setEditedState] = React.useState<NodeId | null>(null);
-  const editedStateNode = editedState ? studioDom.getNode(dom, editedState, 'derivedState') : null;
+  const editedStateNode = editedState ? appDom.getNode(dom, editedState, 'derivedState') : null;
 
   const handleEditStateDialogClose = React.useCallback(() => setEditedState(null), []);
 
-  const page = studioDom.getNode(dom, state.nodeId, 'page');
+  const page = appDom.getNode(dom, state.nodeId, 'page');
 
-  const { derivedStates = [] } = studioDom.getChildNodes(dom, page);
+  const { derivedStates = [] } = appDom.getChildNodes(dom, page);
 
   const handleCreate = React.useCallback(() => {
-    const stateNode = studioDom.createNode(dom, 'derivedState', {
+    const stateNode = appDom.createNode(dom, 'derivedState', {
       params: {},
       attributes: {
-        argTypes: studioDom.createConst({}),
-        returnType: studioDom.createConst({
+        argTypes: appDom.createConst({}),
+        returnType: appDom.createConst({
           type: 'string',
         }),
-        code: studioDom.createConst(`/**
+        code: appDom.createConst(`/**
    * TODO: comment explaining how to derive state...
    */
   

@@ -3,13 +3,13 @@ import cuid from 'cuid';
 import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/toolpad-core';
 import {
   NodeId,
-  StudioConstant,
-  StudioBindable,
-  StudioBindables,
+  ConstantAttrValue,
+  BindableAttrValue,
+  BindableAttrValues,
   ConnectionStatus,
-  StudioTheme,
-  StudioConstants,
-  StudioSecret,
+  AppTheme,
+  ConstantAttrValues,
+  SecretAttrValue,
 } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
@@ -37,7 +37,7 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-export type StudioNodeType =
+type AppDomNodeType =
   | 'app'
   | 'connection'
   | 'api'
@@ -48,9 +48,9 @@ export type StudioNodeType =
   | 'derivedState'
   | 'queryState';
 
-export interface StudioNodeBase {
+interface AppDomNodeBase {
   readonly id: NodeId;
-  readonly type: StudioNodeType;
+  readonly type: AppDomNodeType;
   readonly name: string;
   readonly parentId: NodeId | null;
   readonly parentProp: string | null;
@@ -58,86 +58,86 @@ export interface StudioNodeBase {
   readonly attributes: {};
 }
 
-export interface StudioAppNode extends StudioNodeBase {
+export interface AppNode extends AppDomNodeBase {
   readonly type: 'app';
   readonly parentId: null;
 }
 
-export interface StudioThemeNode extends StudioNodeBase {
+export interface ThemeNode extends AppDomNodeBase {
   readonly type: 'theme';
-  readonly theme: StudioBindables<StudioTheme>;
+  readonly theme: BindableAttrValues<AppTheme>;
 }
 
-export interface StudioConnectionNode<P = unknown> extends StudioNodeBase {
+export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   readonly type: 'connection';
   readonly attributes: {
-    readonly dataSource: StudioConstant<string>;
-    readonly params: StudioSecret<P>;
-    readonly status: StudioConstant<ConnectionStatus | null>;
+    readonly dataSource: ConstantAttrValue<string>;
+    readonly params: SecretAttrValue<P>;
+    readonly status: ConstantAttrValue<ConnectionStatus | null>;
   };
 }
 
-export interface StudioApiNode<Q = unknown> extends StudioNodeBase {
+export interface ApiNode<Q = unknown> extends AppDomNodeBase {
   readonly type: 'api';
   readonly attributes: {
-    readonly connectionId: StudioConstant<string>;
-    readonly dataSource: StudioConstant<string>;
-    readonly query: StudioConstant<Q>;
+    readonly connectionId: ConstantAttrValue<string>;
+    readonly dataSource: ConstantAttrValue<string>;
+    readonly query: ConstantAttrValue<Q>;
   };
 }
 
-export interface StudioPageNode extends StudioNodeBase {
+export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
-    readonly title: StudioConstant<string>;
-    readonly urlQuery: StudioConstant<Record<string, string>>;
+    readonly title: ConstantAttrValue<string>;
+    readonly urlQuery: ConstantAttrValue<Record<string, string>>;
   };
 }
 
-export interface StudioElementNode<P = any> extends StudioNodeBase {
+export interface ElementNode<P = any> extends AppDomNodeBase {
   readonly type: 'element';
   readonly attributes: {
-    readonly component: StudioConstant<string>;
+    readonly component: ConstantAttrValue<string>;
   };
-  readonly props?: StudioBindables<P>;
+  readonly props?: BindableAttrValues<P>;
 }
 
-export interface StudioCodeComponentNode extends StudioNodeBase {
+export interface CodeComponentNode extends AppDomNodeBase {
   readonly type: 'codeComponent';
   readonly attributes: {
-    readonly code: StudioConstant<string>;
-    readonly argTypes: StudioConstant<ArgTypeDefinitions>;
+    readonly code: ConstantAttrValue<string>;
+    readonly argTypes: ConstantAttrValue<ArgTypeDefinitions>;
   };
 }
 
-export interface StudioDerivedStateNode<P = any> extends StudioNodeBase {
+export interface DerivedStateNode<P = any> extends AppDomNodeBase {
   readonly type: 'derivedState';
-  readonly params?: StudioBindables<P>;
+  readonly params?: BindableAttrValues<P>;
   readonly attributes: {
-    readonly code: StudioConstant<string>;
-    readonly argTypes: StudioConstant<PropValueTypes<keyof P & string>>;
-    readonly returnType: StudioConstant<PropValueType>;
+    readonly code: ConstantAttrValue<string>;
+    readonly argTypes: ConstantAttrValue<PropValueTypes<keyof P & string>>;
+    readonly returnType: ConstantAttrValue<PropValueType>;
   };
 }
 
-export interface StudioQueryStateNode<P = any> extends StudioNodeBase {
+export interface QueryStateNode<P = any> extends AppDomNodeBase {
   readonly type: 'queryState';
   readonly attributes: {
-    readonly api: StudioConstant<NodeId | null>;
+    readonly api: ConstantAttrValue<NodeId | null>;
   };
-  readonly params?: StudioBindables<P>;
+  readonly params?: BindableAttrValues<P>;
 }
 
-type StudioNodeOfType<K extends StudioNodeType> = {
-  app: StudioAppNode;
-  connection: StudioConnectionNode;
-  api: StudioApiNode;
-  theme: StudioThemeNode;
-  page: StudioPageNode;
-  element: StudioElementNode;
-  codeComponent: StudioCodeComponentNode;
-  derivedState: StudioDerivedStateNode;
-  queryState: StudioQueryStateNode;
+type AppDomNodeOfType<K extends AppDomNodeType> = {
+  app: AppNode;
+  connection: ConnectionNode;
+  api: ApiNode;
+  theme: ThemeNode;
+  page: PageNode;
+  element: ElementNode;
+  codeComponent: CodeComponentNode;
+  derivedState: DerivedStateNode;
+  queryState: QueryStateNode;
 }[K];
 
 type AllowedChildren = {
@@ -164,84 +164,84 @@ type AllowedChildren = {
   queryState: {};
 };
 
-export type StudioNode = StudioNodeOfType<StudioNodeType>;
+export type AppDomNode = AppDomNodeOfType<AppDomNodeType>;
 
-type TypeOf<N extends StudioNode> = N['type'];
-type AllowedChildTypesOfType<T extends StudioNodeType> = AllowedChildren[T];
-type AllowedChildTypesOf<N extends StudioNode> = AllowedChildTypesOfType<TypeOf<N>>;
+type TypeOf<N extends AppDomNode> = N['type'];
+type AllowedChildTypesOfType<T extends AppDomNodeType> = AllowedChildren[T];
+type AllowedChildTypesOf<N extends AppDomNode> = AllowedChildTypesOfType<TypeOf<N>>;
 
-export type ChildNodesOf<N extends StudioNode> = {
-  [K in keyof AllowedChildTypesOf<N>]: AllowedChildTypesOf<N>[K] extends StudioNodeType
-    ? StudioNodeOfType<AllowedChildTypesOf<N>[K]>[]
+export type ChildNodesOf<N extends AppDomNode> = {
+  [K in keyof AllowedChildTypesOf<N>]: AllowedChildTypesOf<N>[K] extends AppDomNodeType
+    ? AppDomNodeOfType<AllowedChildTypesOf<N>[K]>[]
     : never;
 };
 
-type CombinedChildrenOfType<T extends StudioNodeType> =
+type CombinedChildrenOfType<T extends AppDomNodeType> =
   AllowedChildren[T][keyof AllowedChildren[T]];
 
 type CombinedAllowedChildren = {
-  [K in StudioNodeType]: CombinedChildrenOfType<K>;
+  [K in AppDomNodeType]: CombinedChildrenOfType<K>;
 };
 
-type ParentTypeOfType<T extends StudioNodeType> = {
-  [K in StudioNodeType]: T extends CombinedAllowedChildren[K] ? K : never;
-}[StudioNodeType];
-export type ParentOf<N extends StudioNode> = StudioNodeOfType<ParentTypeOfType<TypeOf<N>>> | null;
+type ParentTypeOfType<T extends AppDomNodeType> = {
+  [K in AppDomNodeType]: T extends CombinedAllowedChildren[K] ? K : never;
+}[AppDomNodeType];
+export type ParentOf<N extends AppDomNode> = AppDomNodeOfType<ParentTypeOfType<TypeOf<N>>> | null;
 
-export type ParentPropOf<Child extends StudioNode, Parent extends StudioNode> = {
+export type ParentPropOf<Child extends AppDomNode, Parent extends AppDomNode> = {
   [K in keyof AllowedChildren[TypeOf<Parent>]]: TypeOf<Child> extends AllowedChildren[TypeOf<Parent>][K]
     ? K & string
     : never;
 }[keyof AllowedChildren[TypeOf<Parent>]];
 
-export interface StudioNodes {
-  [id: NodeId]: StudioNode;
+export interface AppDomNodes {
+  [id: NodeId]: AppDomNode;
 }
 
-export interface StudioDom {
-  nodes: StudioNodes;
+export interface AppDom {
+  nodes: AppDomNodes;
   root: NodeId;
 }
 
-function isType<T extends StudioNode>(node: StudioNode, type: T['type']): node is T {
+function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node is T {
   return node.type === type;
 }
 
-function assertIsType<T extends StudioNode>(node: StudioNode, type: T['type']): asserts node is T {
+function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): asserts node is T {
   if (!isType(node, type)) {
     throw new Error(`Invariant: expected node type "${type}" but got "${node.type}"`);
   }
 }
 
-export function createConst<V>(value: V): StudioConstant<V> {
+export function createConst<V>(value: V): ConstantAttrValue<V> {
   return { type: 'const', value };
 }
 
-export function createSecret<V>(value: V): StudioSecret<V> {
+export function createSecret<V>(value: V): SecretAttrValue<V> {
   return { type: 'secret', value };
 }
 
-export function createConsts<P>(values: P): StudioConstants<P> {
+export function createConsts<P>(values: P): ConstantAttrValues<P> {
   return Object.fromEntries(
     Object.entries(values).map(([key, value]) => [key, createConst(value)]),
-  ) as StudioConstants<P>;
+  ) as ConstantAttrValues<P>;
 }
 
-export function getMaybeNode<T extends StudioNodeType>(
-  dom: StudioDom,
+export function getMaybeNode<T extends AppDomNodeType>(
+  dom: AppDom,
   nodeId: NodeId,
   type: T,
-): StudioNodeOfType<T> | null;
-export function getMaybeNode<T extends StudioNodeType>(
-  dom: StudioDom,
+): AppDomNodeOfType<T> | null;
+export function getMaybeNode<T extends AppDomNodeType>(
+  dom: AppDom,
   nodeId: NodeId,
   type?: T,
-): StudioNode | null;
-export function getMaybeNode<T extends StudioNodeType>(
-  dom: StudioDom,
+): AppDomNode | null;
+export function getMaybeNode<T extends AppDomNodeType>(
+  dom: AppDom,
   nodeId: NodeId,
   type?: T,
-): StudioNode | null {
+): AppDomNode | null {
   const node = dom.nodes[nodeId];
   if (!node) {
     return null;
@@ -252,21 +252,21 @@ export function getMaybeNode<T extends StudioNodeType>(
   return node;
 }
 
-export function getNode<T extends StudioNodeType>(
-  dom: StudioDom,
+export function getNode<T extends AppDomNodeType>(
+  dom: AppDom,
   nodeId: NodeId,
   type: T,
-): StudioNodeOfType<T>;
-export function getNode<T extends StudioNodeType>(
-  dom: StudioDom,
+): AppDomNodeOfType<T>;
+export function getNode<T extends AppDomNodeType>(
+  dom: AppDom,
   nodeId: NodeId,
   type?: T,
-): StudioNode;
-export function getNode<T extends StudioNodeType>(
-  dom: StudioDom,
+): AppDomNode;
+export function getNode<T extends AppDomNodeType>(
+  dom: AppDom,
   nodeId: NodeId,
   type?: T,
-): StudioNode {
+): AppDomNode {
   const node = getMaybeNode(dom, nodeId, type);
   if (!node) {
     throw new Error(`Node "${nodeId}" not found`);
@@ -274,91 +274,89 @@ export function getNode<T extends StudioNodeType>(
   return node;
 }
 
-export function isApp(node: StudioNode): node is StudioAppNode {
-  return isType<StudioAppNode>(node, 'app');
+export function isApp(node: AppDomNode): node is AppNode {
+  return isType<AppNode>(node, 'app');
 }
 
-export function assertIsApp(node: StudioNode): asserts node is StudioAppNode {
-  assertIsType<StudioAppNode>(node, 'app');
+export function assertIsApp(node: AppDomNode): asserts node is AppNode {
+  assertIsType<AppNode>(node, 'app');
 }
 
-export function isPage(node: StudioNode): node is StudioPageNode {
-  return isType<StudioPageNode>(node, 'page');
+export function isPage(node: AppDomNode): node is PageNode {
+  return isType<PageNode>(node, 'page');
 }
 
-export function assertIsPage(node: StudioNode): asserts node is StudioPageNode {
-  assertIsType<StudioPageNode>(node, 'page');
+export function assertIsPage(node: AppDomNode): asserts node is PageNode {
+  assertIsType<PageNode>(node, 'page');
 }
 
-export function isApi<P>(node: StudioNode): node is StudioApiNode<P> {
-  return isType<StudioApiNode>(node, 'api');
+export function isApi<P>(node: AppDomNode): node is ApiNode<P> {
+  return isType<ApiNode>(node, 'api');
 }
 
-export function assertIsApi<P>(node: StudioNode): asserts node is StudioApiNode<P> {
-  assertIsType<StudioApiNode>(node, 'api');
+export function assertIsApi<P>(node: AppDomNode): asserts node is ApiNode<P> {
+  assertIsType<ApiNode>(node, 'api');
 }
 
-export function isConnection<P>(node: StudioNode): node is StudioConnectionNode<P> {
-  return isType<StudioConnectionNode>(node, 'connection');
+export function isConnection<P>(node: AppDomNode): node is ConnectionNode<P> {
+  return isType<ConnectionNode>(node, 'connection');
 }
 
-export function assertIsConnection<P>(node: StudioNode): asserts node is StudioConnectionNode<P> {
-  assertIsType<StudioConnectionNode>(node, 'connection');
+export function assertIsConnection<P>(node: AppDomNode): asserts node is ConnectionNode<P> {
+  assertIsType<ConnectionNode>(node, 'connection');
 }
 
-export function isCodeComponent(node: StudioNode): node is StudioCodeComponentNode {
-  return isType<StudioCodeComponentNode>(node, 'codeComponent');
+export function isCodeComponent(node: AppDomNode): node is CodeComponentNode {
+  return isType<CodeComponentNode>(node, 'codeComponent');
 }
 
-export function assertIsCodeComponent(node: StudioNode): asserts node is StudioCodeComponentNode {
-  assertIsType<StudioCodeComponentNode>(node, 'codeComponent');
+export function assertIsCodeComponent(node: AppDomNode): asserts node is CodeComponentNode {
+  assertIsType<CodeComponentNode>(node, 'codeComponent');
 }
 
-export function isTheme(node: StudioNode): node is StudioThemeNode {
-  return isType<StudioThemeNode>(node, 'theme');
+export function isTheme(node: AppDomNode): node is ThemeNode {
+  return isType<ThemeNode>(node, 'theme');
 }
 
-export function assertIsTheme(node: StudioNode): asserts node is StudioThemeNode {
-  assertIsType<StudioThemeNode>(node, 'theme');
+export function assertIsTheme(node: AppDomNode): asserts node is ThemeNode {
+  assertIsType<ThemeNode>(node, 'theme');
 }
 
-export function isElement<P>(node: StudioNode): node is StudioElementNode<P> {
-  return isType<StudioElementNode>(node, 'element');
+export function isElement<P>(node: AppDomNode): node is ElementNode<P> {
+  return isType<ElementNode>(node, 'element');
 }
 
-export function assertIsElement<P>(node: StudioNode): asserts node is StudioElementNode<P> {
-  assertIsType<StudioElementNode>(node, 'element');
+export function assertIsElement<P>(node: AppDomNode): asserts node is ElementNode<P> {
+  assertIsType<ElementNode>(node, 'element');
 }
 
-export function isDerivedState<P>(node: StudioNode): node is StudioDerivedStateNode<P> {
-  return isType<StudioDerivedStateNode>(node, 'derivedState');
+export function isDerivedState<P>(node: AppDomNode): node is DerivedStateNode<P> {
+  return isType<DerivedStateNode>(node, 'derivedState');
 }
 
-export function assertIsDerivedState<P>(
-  node: StudioNode,
-): asserts node is StudioDerivedStateNode<P> {
-  assertIsType<StudioDerivedStateNode>(node, 'derivedState');
+export function assertIsDerivedState<P>(node: AppDomNode): asserts node is DerivedStateNode<P> {
+  assertIsType<DerivedStateNode>(node, 'derivedState');
 }
 
-export function isQueryState<P>(node: StudioNode): node is StudioQueryStateNode<P> {
-  return isType<StudioQueryStateNode>(node, 'queryState');
+export function isQueryState<P>(node: AppDomNode): node is QueryStateNode<P> {
+  return isType<QueryStateNode>(node, 'queryState');
 }
 
-export function assertIsQueryState<P>(node: StudioNode): asserts node is StudioQueryStateNode<P> {
-  assertIsType<StudioQueryStateNode>(node, 'queryState');
+export function assertIsQueryState<P>(node: AppDomNode): asserts node is QueryStateNode<P> {
+  assertIsType<QueryStateNode>(node, 'queryState');
 }
 
-export function getApp(dom: StudioDom): StudioAppNode {
+export function getApp(dom: AppDom): AppNode {
   const rootNode = getNode(dom, dom.root);
   assertIsApp(rootNode);
   return rootNode;
 }
 
-export type NodeChildren<N extends StudioNode = any> = ChildNodesOf<N>;
+export type NodeChildren<N extends AppDomNode = any> = ChildNodesOf<N>;
 
 // TODO: memoize the result of this function per dom in a WeakMap
-const childrenMemo = new WeakMap<StudioDom, Map<NodeId, NodeChildren<any>>>();
-export function getChildNodes<N extends StudioNode>(dom: StudioDom, parent: N): NodeChildren<N> {
+const childrenMemo = new WeakMap<AppDom, Map<NodeId, NodeChildren<any>>>();
+export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): NodeChildren<N> {
   let domChildrenMemo = childrenMemo.get(dom);
   if (!domChildrenMemo) {
     domChildrenMemo = new Map();
@@ -370,8 +368,8 @@ export function getChildNodes<N extends StudioNode>(dom: StudioDom, parent: N): 
     result = {};
     domChildrenMemo.set(parent.id, result);
 
-    const allNodeChildren: StudioNode[] = Object.values(dom.nodes).filter(
-      (node: StudioNode) => node.parentId === parent.id,
+    const allNodeChildren: AppDomNode[] = Object.values(dom.nodes).filter(
+      (node: AppDomNode) => node.parentId === parent.id,
     );
 
     // eslint-disable-next-line no-restricted-syntax
@@ -387,7 +385,7 @@ export function getChildNodes<N extends StudioNode>(dom: StudioDom, parent: N): 
 
     // eslint-disable-next-line no-restricted-syntax
     for (const childArray of Object.values(result)) {
-      childArray?.sort((node1: StudioNode, node2: StudioNode) => {
+      childArray?.sort((node1: AppDomNode, node2: AppDomNode) => {
         if (!node1.parentIndex || !node2.parentIndex) {
           throw new Error(
             `Invariant: nodes inside the dom should have a parentIndex if they have a parent`,
@@ -401,7 +399,7 @@ export function getChildNodes<N extends StudioNode>(dom: StudioDom, parent: N): 
   return result;
 }
 
-export function getParent<N extends StudioNode>(dom: StudioDom, child: N): ParentOf<N> {
+export function getParent<N extends AppDomNode>(dom: AppDom, child: N): ParentOf<N> {
   if (child.parentId) {
     const parent = getNode(dom, child.parentId);
     return parent as ParentOf<N>;
@@ -409,20 +407,20 @@ export function getParent<N extends StudioNode>(dom: StudioDom, child: N): Paren
   return null;
 }
 
-function getNodeNames(dom: StudioDom): Set<string> {
+function getNodeNames(dom: AppDom): Set<string> {
   return new Set(Object.values(dom.nodes).map(({ name }) => name));
 }
 
-type StudioNodeInitOfType<T extends StudioNodeType> = Omit<
-  StudioNodeOfType<T>,
+type AppDomNodeInitOfType<T extends AppDomNodeType> = Omit<
+  AppDomNodeOfType<T>,
   ReservedNodeProperty
 > & { name?: string };
 
-function createNodeInternal<T extends StudioNodeType>(
+function createNodeInternal<T extends AppDomNodeType>(
   id: NodeId,
   type: T,
-  init: StudioNodeInitOfType<T> & { name: string },
-): StudioNodeOfType<T> {
+  init: AppDomNodeInitOfType<T> & { name: string },
+): AppDomNodeOfType<T> {
   return {
     ...init,
     id,
@@ -430,10 +428,10 @@ function createNodeInternal<T extends StudioNodeType>(
     parentId: null,
     parentProp: null,
     parentIndex: null,
-  } as StudioNodeOfType<T>;
+  } as AppDomNodeOfType<T>;
 }
 
-function slugifyNodeName(dom: StudioDom, nameCandidate: string, fallback: string): string {
+function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: string): string {
   // try to replace accents with relevant ascii
   let slug = removeDiacritics(nameCandidate);
   // replace spaces with camelcase
@@ -449,11 +447,11 @@ function slugifyNodeName(dom: StudioDom, nameCandidate: string, fallback: string
   return generateUniqueString(slug, existingNames);
 }
 
-export function createNode<T extends StudioNodeType>(
-  dom: StudioDom,
+export function createNode<T extends AppDomNodeType>(
+  dom: AppDom,
   type: T,
-  init: StudioNodeInitOfType<T>,
-): StudioNodeOfType<T> {
+  init: AppDomNodeInitOfType<T>,
+): AppDomNodeOfType<T> {
   const id = cuid() as NodeId;
   const name = slugifyNodeName(dom, init.name || type, type);
   return createNodeInternal(id, type, {
@@ -462,7 +460,7 @@ export function createNode<T extends StudioNodeType>(
   });
 }
 
-export function createDom(): StudioDom {
+export function createDom(): AppDom {
   const rootId = cuid() as NodeId;
   return {
     nodes: {
@@ -479,11 +477,11 @@ export function createDom(): StudioDom {
  * Creates a new DOM node representing aReact Element
  */
 export function createElement<P>(
-  dom: StudioDom,
+  dom: AppDom,
   component: string,
-  props: Partial<StudioBindables<P>> = {},
+  props: Partial<BindableAttrValues<P>> = {},
   name?: string,
-): StudioElementNode {
+): ElementNode {
   return createNode(dom, 'element', {
     name: name || component,
     props,
@@ -496,25 +494,25 @@ export function createElement<P>(
 /**
  * Get all descendants of a `node`, flattens childNodes objects into one single array
  */
-export function getDescendants(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
-  const children: readonly StudioNode[] = Object.values(getChildNodes(dom, node))
+export function getDescendants(dom: AppDom, node: AppDomNode): readonly AppDomNode[] {
+  const children: readonly AppDomNode[] = Object.values(getChildNodes(dom, node))
     .flat()
     .filter(Boolean);
   return [...children, ...children.flatMap((child) => getDescendants(dom, child))];
 }
 
-export function getAncestors(dom: StudioDom, node: StudioNode): readonly StudioNode[] {
+export function getAncestors(dom: AppDom, node: AppDomNode): readonly AppDomNode[] {
   const parent = getParent(dom, node);
   return parent ? [...getAncestors(dom, parent), parent] : [];
 }
 
 /**
- * Get all the ancestors of the `node` up until the first StudioPageNode node is encountered
+ * Get all the ancestors of the `node` up until the first PageNode node is encountered
  */
 export function getPageAncestors(
-  dom: StudioDom,
-  node: StudioNode,
-): readonly (StudioElementNode | StudioPageNode)[] {
+  dom: AppDom,
+  node: AppDomNode,
+): readonly (ElementNode | PageNode)[] {
   const parent = getParent(dom, node);
   return parent && (isElement(parent) || isPage(parent))
     ? [...getPageAncestors(dom, parent), parent]
@@ -522,9 +520,9 @@ export function getPageAncestors(
 }
 
 /**
- * Get the first StudioPageNode node up in the DOM tree starting from `node`
+ * Get the first PageNode node up in the DOM tree starting from `node`
  */
-export function getPageAncestor(dom: StudioDom, node: StudioNode): StudioPageNode | null {
+export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null {
   if (isPage(node)) {
     return node;
   }
@@ -534,7 +532,7 @@ export function getPageAncestor(dom: StudioDom, node: StudioNode): StudioPageNod
   }
   return null;
 }
-export function setNodeName(dom: StudioDom, node: StudioNode, name: string): StudioDom {
+export function setNodeName(dom: AppDom, node: AppDomNode, name: string): AppDom {
   if (dom.nodes[node.id].name === name) {
     return dom;
   }
@@ -548,48 +546,48 @@ export function setNodeName(dom: StudioDom, node: StudioNode, name: string): Stu
   });
 }
 
-export type PropNamespaces<N extends StudioNode> = {
-  [K in keyof N]: N[K] extends StudioBindables<any> | undefined ? K : never;
+export type PropNamespaces<N extends AppDomNode> = {
+  [K in keyof N]: N[K] extends BindableAttrValues<any> | undefined ? K : never;
 }[keyof N & string];
 
 export type BindableProps<T> = {
-  [K in keyof T]: T[K] extends StudioBindable<any> ? K : never;
+  [K in keyof T]: T[K] extends BindableAttrValue<any> ? K : never;
 }[keyof T & string];
 
-export function setNodeProp<Node extends StudioNode, Prop extends BindableProps<Node>>(
-  dom: StudioDom,
+export function setNodeProp<Node extends AppDomNode, Prop extends BindableProps<Node>>(
+  dom: AppDom,
   node: Node,
   prop: Prop,
   value: Node[Prop] | null,
-): StudioDom {
+): AppDom {
   if (value) {
     return update(dom, {
       nodes: update(dom.nodes, {
         [node.id]: update(node, {
           [prop]: value,
         } as any) as Partial<Node>,
-      } as Partial<StudioNodes>),
+      } as Partial<AppDomNodes>),
     });
   }
 
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: omit(node, prop) as Partial<Node>,
-    } as Partial<StudioNodes>),
+    } as Partial<AppDomNodes>),
   });
 }
 
 export function setNodeNamespacedProp<
-  Node extends StudioNode,
+  Node extends AppDomNode,
   Namespace extends PropNamespaces<Node>,
   Prop extends keyof Node[Namespace] & string,
 >(
-  dom: StudioDom,
+  dom: AppDom,
   node: Node,
   namespace: Namespace,
   prop: Prop,
   value: Node[Namespace][Prop] | null,
-): StudioDom {
+): AppDom {
   if (value) {
     return update(dom, {
       nodes: update(dom.nodes, {
@@ -610,12 +608,12 @@ export function setNodeNamespacedProp<
   });
 }
 
-export function setNodeNamespace<Node extends StudioNode, Namespace extends PropNamespaces<Node>>(
-  dom: StudioDom,
+export function setNodeNamespace<Node extends AppDomNode, Namespace extends PropNamespaces<Node>>(
+  dom: AppDom,
   node: Node,
   namespace: Namespace,
   value: Node[Namespace] | null,
-): StudioDom {
+): AppDom {
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: update(node, {
@@ -625,8 +623,8 @@ export function setNodeNamespace<Node extends StudioNode, Namespace extends Prop
   });
 }
 
-function setNodeParent<N extends StudioNode>(
-  dom: StudioDom,
+function setNodeParent<N extends AppDomNode>(
+  dom: AppDom,
   node: N,
   parentId: NodeId,
   parentProp: string,
@@ -635,14 +633,14 @@ function setNodeParent<N extends StudioNode>(
   const parent = getNode(dom, parentId);
 
   if (!parentIndex) {
-    const siblings: readonly StudioNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
+    const siblings: readonly AppDomNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
     const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
     parentIndex = createFractionalIndex(lastIndex, null);
   }
 
   return update(dom, {
     nodes: update(dom.nodes, {
-      [node.id]: update(node as StudioNode, {
+      [node.id]: update(node as AppDomNode, {
         parentId,
         parentProp,
         parentIndex,
@@ -651,13 +649,13 @@ function setNodeParent<N extends StudioNode>(
   });
 }
 
-export function addNode<Parent extends StudioNode, Child extends StudioNode>(
-  dom: StudioDom,
+export function addNode<Parent extends AppDomNode, Child extends AppDomNode>(
+  dom: AppDom,
   newNode: Child,
   parent: Parent,
   parentProp: ParentPropOf<Child, Parent>,
   parentIndex?: string,
-): StudioDom {
+): AppDom {
   if (newNode.parentId) {
     throw new Error(`Node "${newNode.id}" is already attached to a parent`);
   }
@@ -666,7 +664,7 @@ export function addNode<Parent extends StudioNode, Child extends StudioNode>(
 }
 
 export function moveNode(
-  dom: StudioDom,
+  dom: AppDom,
   nodeId: NodeId,
   parentId: NodeId,
   parentProp: string,
@@ -676,7 +674,7 @@ export function moveNode(
   return setNodeParent(dom, node, parentId, parentProp, parentIndex);
 }
 
-export function removeNode(dom: StudioDom, nodeId: NodeId) {
+export function removeNode(dom: AppDom, nodeId: NodeId) {
   const node = getNode(dom, nodeId);
   const parent = getParent(dom, node);
 
@@ -691,14 +689,14 @@ export function removeNode(dom: StudioDom, nodeId: NodeId) {
   });
 }
 
-export function toConstPropValue<T = any>(value: T): StudioConstant<T> {
+export function toConstPropValue<T = any>(value: T): ConstantAttrValue<T> {
   return { type: 'const', value };
 }
 
 export function fromConstPropValue(prop: undefined): undefined;
-export function fromConstPropValue<T>(prop: StudioBindable<T>): T;
-export function fromConstPropValue<T>(prop?: StudioBindable<T | undefined>): T | undefined;
-export function fromConstPropValue<T>(prop?: StudioBindable<T | undefined>): T | undefined {
+export function fromConstPropValue<T>(prop: BindableAttrValue<T>): T;
+export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): T | undefined;
+export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): T | undefined {
   if (!prop) {
     return undefined;
   }
@@ -708,19 +706,19 @@ export function fromConstPropValue<T>(prop?: StudioBindable<T | undefined>): T |
   return prop.value;
 }
 
-export function toConstPropValues<P = any>(props: Partial<P>): Partial<StudioBindables<P>>;
-export function toConstPropValues<P = any>(props: P): StudioBindables<P>;
-export function toConstPropValues<P = any>(props: P): StudioBindables<P> {
+export function toConstPropValues<P = any>(props: Partial<P>): Partial<BindableAttrValues<P>>;
+export function toConstPropValues<P = any>(props: P): BindableAttrValues<P>;
+export function toConstPropValues<P = any>(props: P): BindableAttrValues<P> {
   return Object.fromEntries(
     Object.entries(props).flatMap(([propName, value]) =>
       value ? [[propName, toConstPropValue(value)]] : [],
     ),
-  ) as StudioBindables<P>;
+  ) as BindableAttrValues<P>;
 }
 
-export function fromConstPropValues<P>(props: StudioBindables<P>): Partial<P> {
+export function fromConstPropValues<P>(props: BindableAttrValues<P>): Partial<P> {
   const result: Partial<P> = {};
-  (Object.entries(props) as ExactEntriesOf<StudioBindables<P>>).forEach(([name, prop]) => {
+  (Object.entries(props) as ExactEntriesOf<BindableAttrValues<P>>).forEach(([name, prop]) => {
     if (prop) {
       result[name] = fromConstPropValue<P[typeof name]>(prop);
     }
@@ -728,8 +726,8 @@ export function fromConstPropValues<P>(props: StudioBindables<P>): Partial<P> {
   return result;
 }
 
-const nodeByNameCache = new WeakMap<StudioDom, Map<string, NodeId>>();
-function getNodeIdByNameIndex(dom: StudioDom): Map<string, NodeId> {
+const nodeByNameCache = new WeakMap<AppDom, Map<string, NodeId>>();
+function getNodeIdByNameIndex(dom: AppDom): Map<string, NodeId> {
   let cached = nodeByNameCache.get(dom);
   if (!cached) {
     cached = new Map(Array.from(Object.values(dom.nodes), (node) => [node.name, node.id]));
@@ -738,7 +736,7 @@ function getNodeIdByNameIndex(dom: StudioDom): Map<string, NodeId> {
   return cached;
 }
 
-export function getNodeIdByName(dom: StudioDom, name: string): NodeId | null {
+export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
   const index = getNodeIdByNameIndex(dom);
   return index.get(name) ?? null;
 }

@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { format } from '../../../utils/prettier';
 import DialogForm from '../../DialogForm';
@@ -62,14 +62,14 @@ export default function CreateStudioCodeComponentDialog({
         autoComplete="off"
         onSubmit={(e) => {
           e.preventDefault();
-          const newNode = studioDom.createNode(dom, 'codeComponent', {
+          const newNode = appDom.createNode(dom, 'codeComponent', {
             name,
             attributes: {
-              code: studioDom.createConst(createDefaultCodeComponent(name)),
-              argTypes: studioDom.createConst({}),
+              code: appDom.createConst(createDefaultCodeComponent(name)),
+              argTypes: appDom.createConst({}),
             },
           });
-          const appNode = studioDom.getApp(dom);
+          const appNode = appDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'codeComponents');
           onClose();
           navigate(`/app/${appId}/editor/codeComponents/${newNode.id}`);

@@ -2,8 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
 import { execApi, loadVersionedDom } from './data';
 import initMiddleware from './initMiddleware';
-import { NodeId, StudioApiResult, VersionOrPreview } from '../types';
-import * as studioDom from '../studioDom';
+import { NodeId, ApiResult, VersionOrPreview } from '../types';
+import * as appDom from '../appDom';
 
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
@@ -22,13 +22,13 @@ export interface HandleDataRequestParams {
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse<StudioApiResult<any>>,
+  res: NextApiResponse<ApiResult<any>>,
   { appId, version }: HandleDataRequestParams,
 ) => {
   await cors(req, res);
   const apiNodeId = req.query.queryId as NodeId;
   const dom = await loadVersionedDom(appId, version);
-  const api = studioDom.getNode(dom, apiNodeId, 'api');
+  const api = appDom.getNode(dom, apiNodeId, 'api');
   res.json(
     await execApi(appId, api, req.query.params ? JSON.parse(req.query.params as string) : {}),
   );

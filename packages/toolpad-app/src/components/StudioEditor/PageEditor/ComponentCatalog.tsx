@@ -4,7 +4,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { useStudioComponents } from '../../../studioComponents';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { useDom } from '../../DomLoader';
 import { usePageEditorApi } from './PageEditorProvider';
 
@@ -60,7 +60,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
     event.dataTransfer.dropEffect = 'copy';
-    const newNode = studioDom.createElement(dom, componentType, {});
+    const newNode = appDom.createElement(dom, componentType, {});
     api.deselect();
     api.newNodeDragStart(newNode);
     closeDrawer(0);

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Alert, Snackbar } from '@mui/material';
-import * as studioDom from '../studioDom';
-import { NodeId, StudioBindable, StudioBindables } from '../types';
+import * as appDom from '../appDom';
+import { NodeId, BindableAttrValue, BindableAttrValues } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
 import useDebounced from '../utils/useDebounced';
@@ -12,7 +12,7 @@ export type DomAction =
     }
   | {
       type: 'DOM_LOADED';
-      dom: studioDom.StudioDom;
+      dom: appDom.AppDom;
     }
   | {
       type: 'DOM_SAVING';
@@ -31,21 +31,21 @@ export type DomAction =
     }
   | {
       type: 'DOM_SET_NODE_PROP';
-      node: studioDom.StudioNode;
+      node: appDom.AppDomNode;
       prop: string;
       namespace: string;
-      value: StudioBindable<unknown> | null;
+      value: BindableAttrValue<unknown> | null;
     }
   | {
       type: 'DOM_SET_NODE_NAMESPACE';
-      node: studioDom.StudioNode;
+      node: appDom.AppDomNode;
       namespace: string;
-      value: StudioBindables<unknown> | null;
+      value: BindableAttrValues<unknown> | null;
     }
   | {
       type: 'DOM_ADD_NODE';
-      node: studioDom.StudioNode;
-      parent: studioDom.StudioNode;
+      node: appDom.AppDomNode;
+      parent: appDom.AppDomNode;
       parentProp: string;
       parentIndex?: string;
     }
@@ -61,15 +61,15 @@ export type DomAction =
       nodeId: NodeId;
     };
 
-export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioDom.StudioDom {
+export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
   switch (action.type) {
     case 'DOM_SET_NODE_NAME': {
       // TODO: Also update all bindings on the page that use this name
-      const node = studioDom.getNode(dom, action.nodeId);
-      return studioDom.setNodeName(dom, node, action.name);
+      const node = appDom.getNode(dom, action.nodeId);
+      return appDom.setNodeName(dom, node, action.name);
     }
     case 'DOM_SET_NODE_PROP': {
-      return studioDom.setNodeNamespacedProp<any, any, any>(
+      return appDom.setNodeNamespacedProp<any, any, any>(
         dom,
         action.node,
         action.namespace,
@@ -78,10 +78,10 @@ export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioD
       );
     }
     case 'DOM_SET_NODE_NAMESPACE': {
-      return studioDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
+      return appDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
     }
     case 'DOM_ADD_NODE': {
-      return studioDom.addNode<any, any>(
+      return appDom.addNode<any, any>(
         dom,
         action.node,
         action.parent,
@@ -90,7 +90,7 @@ export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioD
       );
     }
     case 'DOM_MOVE_NODE': {
-      return studioDom.moveNode(
+      return appDom.moveNode(
         dom,
         action.nodeId,
         action.parentId,
@@ -99,7 +99,7 @@ export function domReducer(dom: studioDom.StudioDom, action: DomAction): studioD
       );
     }
     case 'DOM_REMOVE_NODE': {
-      return studioDom.removeNode(dom, action.nodeId);
+      return appDom.removeNode(dom, action.nodeId);
     }
     default:
       return dom;
@@ -162,10 +162,10 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
-    addNode<Parent extends studioDom.StudioNode, Child extends studioDom.StudioNode>(
+    addNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(
       node: Child,
       parent: Parent,
-      parentProp: studioDom.ParentPropOf<Child, Parent>,
+      parentProp: appDom.ParentPropOf<Child, Parent>,
       parentIndex?: string,
     ) {
       dispatch({
@@ -192,8 +192,8 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
       });
     },
     setNodeNamespacedProp<
-      Node extends studioDom.StudioNode,
-      Namespace extends studioDom.PropNamespaces<Node>,
+      Node extends appDom.AppDomNode,
+      Namespace extends appDom.PropNamespaces<Node>,
       Prop extends keyof NonNullable<Node[Namespace]> & string,
     >(
       node: Node,
@@ -206,25 +206,26 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         namespace,
         node,
         prop,
-        value: value as StudioBindable<unknown> | null,
+        value: value as BindableAttrValue<unknown> | null,
       });
     },
-    setNodeNamespace<
-      Node extends studioDom.StudioNode,
-      Namespace extends studioDom.PropNamespaces<Node>,
-    >(node: Node, namespace: Namespace, value: Node[Namespace] | null) {
+    setNodeNamespace<Node extends appDom.AppDomNode, Namespace extends appDom.PropNamespaces<Node>>(
+      node: Node,
+      namespace: Namespace,
+      value: Node[Namespace] | null,
+    ) {
       dispatch({
         type: 'DOM_SET_NODE_NAMESPACE',
         namespace,
         node,
-        value: value as StudioBindables<unknown> | null,
+        value: value as BindableAttrValues<unknown> | null,
       });
     },
   };
 }
 
 interface DomLoader {
-  dom: studioDom.StudioDom | null;
+  dom: appDom.AppDom | null;
   saving: boolean;
   unsavedChanges: number;
   loading: boolean;
@@ -247,7 +248,7 @@ export function useDomLoader(): DomLoader {
   return React.useContext(DomLoaderContext);
 }
 
-export function useDom(): studioDom.StudioDom {
+export function useDom(): appDom.AppDom {
   const { dom } = useDomLoader();
   if (!dom) {
     throw new Error("Trying to access the DOM before it's loaded");

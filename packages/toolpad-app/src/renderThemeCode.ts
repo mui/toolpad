@@ -1,4 +1,4 @@
-import * as studioDom from './studioDom';
+import * as appDom from './appDom';
 import { tryFormat } from './utils/prettier';
 
 export interface RenderThemeConfig {
@@ -9,7 +9,7 @@ export interface RenderThemeConfig {
 }
 
 export default function renderThemeCode(
-  dom: studioDom.StudioDom,
+  dom: appDom.AppDom,
   configInit: Partial<RenderThemeConfig> = {},
 ) {
   const config: RenderThemeConfig = {
@@ -22,21 +22,21 @@ export default function renderThemeCode(
   export default {};
   `;
 
-  const app = studioDom.getApp(dom);
-  const { themes = [] } = studioDom.getChildNodes(dom, app);
+  const app = appDom.getApp(dom);
+  const { themes = [] } = appDom.getChildNodes(dom, app);
 
   if (themes.length > 0) {
     const theme = themes[0];
     const importedColors = new Set();
     const paletteProps: [string, string][] = [];
 
-    const primary = studioDom.fromConstPropValue(theme.theme['palette.primary.main']);
+    const primary = appDom.fromConstPropValue(theme.theme['palette.primary.main']);
     if (primary) {
       importedColors.add(primary);
       paletteProps.push(['primary', `{ main: ${primary}[500] }`]);
     }
 
-    const secondary = studioDom.fromConstPropValue(theme.theme['palette.secondary.main']);
+    const secondary = appDom.fromConstPropValue(theme.theme['palette.secondary.main']);
     if (secondary) {
       importedColors.add(secondary);
       paletteProps.push(['secondary', `{ main: ${secondary}[500] }`]);

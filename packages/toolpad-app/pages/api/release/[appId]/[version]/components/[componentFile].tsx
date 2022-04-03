@@ -3,7 +3,7 @@ import { transform } from 'sucrase';
 import * as path from 'path';
 import { loadVersionedDom, parseVersion } from '../../../../../../src/server/data';
 import { NodeId } from '../../../../../../src/types';
-import * as studioDom from '../../../../../../src/studioDom';
+import * as appDom from '../../../../../../src/appDom';
 import { asArray } from '../../../../../../src/utils/collections';
 
 export default (async (req, res) => {
@@ -19,7 +19,7 @@ export default (async (req, res) => {
 
   const dom = await loadVersionedDom(appId, version);
 
-  const codeComponent = studioDom.getMaybeNode(dom, componentId as NodeId, 'codeComponent');
+  const codeComponent = appDom.getMaybeNode(dom, componentId as NodeId, 'codeComponent');
 
   if (!codeComponent) {
     res.status(404);

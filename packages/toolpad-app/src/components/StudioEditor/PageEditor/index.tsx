@@ -6,7 +6,7 @@ import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
 import { NodeId } from '../../../types';
 import { useDom } from '../../DomLoader';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 
@@ -36,7 +36,7 @@ interface PageEditorProps {
 export default function PageEditor({ appId, className }: PageEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
-  const pageNode = studioDom.getMaybeNode(dom, nodeId as NodeId, 'page');
+  const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
   return pageNode ? (
     <PageEditorProvider key={nodeId} appId={appId} nodeId={nodeId as NodeId}>
       <PageEditorRoot className={className}>

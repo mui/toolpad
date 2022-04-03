@@ -21,7 +21,7 @@ import { ArgTypeDefinitions, UseDataQuery } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
-import * as studioDom from '../../../studioDom';
+import * as appDom from '../../../appDom';
 import { NodeId } from '../../../types';
 import { ExactEntriesOf } from '../../../utils/types';
 import { getQueryNodeArgTypes } from '../../../studioDataSources/client';
@@ -30,7 +30,7 @@ import NodeNameEditor from '../NodeNameEditor';
 import JsonView from '../../JsonView';
 
 interface ParamsEditorProps<Q> {
-  node: studioDom.StudioNode;
+  node: appDom.AppDomNode;
   argTypes: ArgTypeDefinitions<Q>;
 }
 
@@ -55,7 +55,7 @@ function ParamsEditor<Q>({ node, argTypes }: ParamsEditorProps<Q>) {
 }
 
 interface PreviewQueryStateResultProps {
-  node: studioDom.StudioQueryStateNode;
+  node: appDom.QueryStateNode;
 }
 
 function PreviewQueryStateResult({ node }: PreviewQueryStateResultProps) {
@@ -73,19 +73,19 @@ function PreviewQueryStateResult({ node }: PreviewQueryStateResultProps) {
 }
 
 interface QueryStateNodeEditorProps<P> {
-  node: studioDom.StudioQueryStateNode<P>;
+  node: appDom.QueryStateNode<P>;
 }
 
 function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
   const dom = useDom();
   const domApi = useDomApi();
-  const app = studioDom.getApp(dom);
-  const { apis = [] } = studioDom.getChildNodes(dom, app);
+  const app = appDom.getApp(dom);
+  const { apis = [] } = appDom.getChildNodes(dom, app);
 
   const handleSelectionChange = React.useCallback(
     (event: SelectChangeEvent<'' | NodeId>) => {
       const apiNodeId = event.target.value ? (event.target.value as NodeId) : null;
-      domApi.setNodeNamespacedProp(node, 'attributes', 'api', studioDom.createConst(apiNodeId));
+      domApi.setNodeNamespacedProp(node, 'attributes', 'api', appDom.createConst(apiNodeId));
     },
     [domApi, node],
   );
@@ -126,16 +126,16 @@ export default function QueryStateEditor() {
   const domApi = useDomApi();
 
   const [editedState, setEditedState] = React.useState<NodeId | null>(null);
-  const editedStateNode = editedState ? studioDom.getNode(dom, editedState, 'queryState') : null;
+  const editedStateNode = editedState ? appDom.getNode(dom, editedState, 'queryState') : null;
   const handleEditStateDialogClose = React.useCallback(() => setEditedState(null), []);
 
-  const page = studioDom.getNode(dom, state.nodeId, 'page');
-  const { queryStates = [] } = studioDom.getChildNodes(dom, page) ?? [];
+  const page = appDom.getNode(dom, state.nodeId, 'page');
+  const { queryStates = [] } = appDom.getChildNodes(dom, page) ?? [];
 
   const handleCreate = React.useCallback(() => {
-    const stateNode = studioDom.createNode(dom, 'queryState', {
+    const stateNode = appDom.createNode(dom, 'queryState', {
       params: {},
-      attributes: { api: studioDom.createConst(null) },
+      attributes: { api: appDom.createConst(null) },
     });
     domApi.addNode(stateNode, page, 'queryStates');
     setEditedState(stateNode.id);

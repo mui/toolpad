@@ -13,7 +13,7 @@ services:
     # previewPlan: free
     pullRequestPreviewsEnabled: true
     envVars:
-      - key: STUDIO_DATABASE_URL
+      - key: TOOLPAD_DATABASE_URL
         fromDatabase:
           name: toolpad-db
           property: connectionString
@@ -28,7 +28,7 @@ databases:
 envVarGroups:
   - name: toolpad-settings
     envVars:
-      - key: STUDIO_BASIC_AUTH_USER
+      - key: TOOLPAD_BASIC_AUTH_USER
         sync: false
-      - key: STUDIO_BASIC_AUTH_PASSWORD
+      - key: TOOLPAD_BASIC_AUTH_PASSWORD
         sync: false

@@ -18,12 +18,12 @@ const args = arg({
 const DEV_MODE = args['--dev'];
 const NEXT_CMD = DEV_MODE ? 'dev' : 'start';
 
-if (!process.env.STUDIO_DATABASE_URL) {
-  console.error(`Missing environment variable STUDIO_DATABASE_URL`);
+if (!process.env.TOOLPAD_DATABASE_URL) {
+  console.error(`Missing environment variable TOOLPAD_DATABASE_URL`);
   process.exit(1);
 }
 
-const connectionString = pgConnectionString.parse(process.env.STUDIO_DATABASE_URL);
+const connectionString = pgConnectionString.parse(process.env.TOOLPAD_DATABASE_URL);
 console.log(`Starting Studio with db "${connectionString.host}:${connectionString.port}"`);
 
 const studioDir = path.dirname(
@@ -37,7 +37,7 @@ const cp = execa('yarn', [NEXT_CMD, '--', '--port', String(port)], {
   preferLocal: true,
   stdio: 'pipe',
   env: {
-    STUDIO_DATABASE_URL: process.env.STUDIO_DATABASE_URL,
+    TOOLPAD_DATABASE_URL: process.env.TOOLPAD_DATABASE_URL,
     FORCE_COLOR: process.env.FORCE_COLOR,
     PRISMA_HIDE_UPDATE_MESSAGE: '1',
   },

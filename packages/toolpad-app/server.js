@@ -10,8 +10,8 @@ const port = 3000;
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
 
-const BASIC_AUTH_USER = process.env.STUDIO_BASIC_AUTH_USER;
-const BASIC_AUTH_PASSWORD = process.env.STUDIO_BASIC_AUTH_PASSWORD;
+const BASIC_AUTH_USER = process.env.TOOLPAD_BASIC_AUTH_USER;
+const BASIC_AUTH_PASSWORD = process.env.TOOLPAD_BASIC_AUTH_PASSWORD;
 
 function sendStatus(res, statusCode) {
   res.statusCode = statusCode;
@@ -30,7 +30,7 @@ app.prepare().then(() => {
       if (BASIC_AUTH_USER) {
         if (!BASIC_AUTH_PASSWORD) {
           throw new Error(
-            `Basic Auth user configured without password. Please provide the STUDIO_BASIC_AUTH_PASSWORD environment variable.`,
+            `Basic Auth user configured without password. Please provide the TOOLPAD_BASIC_AUTH_PASSWORD environment variable.`,
           );
         }
 

@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("STUDIO_DATABASE_URL")
+  url      = env("TOOLPAD_DATABASE_URL")
 }
 
 enum DomNodeType {

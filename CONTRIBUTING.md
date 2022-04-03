@@ -35,7 +35,7 @@ If you would like to hack on MUI Studio or want to run the latest version, you c
 1. Create a `.env` file in the root of the project
 
    ```sh
-   STUDIO_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
+   TOOLPAD_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
    ```
 
 1. Now you can run the MUI Studio cli to start the application

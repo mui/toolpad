@@ -61,7 +61,7 @@
     "import-meta-resolve": "^1.1.1",
     "json-to-ts": "^1.7.0",
     "monaco-editor": "^0.32.1",
-    "next": "^12.0.8",
+    "next": "^12.1.4",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.5.1",
     "quickjs-emscripten": "^0.15.0",

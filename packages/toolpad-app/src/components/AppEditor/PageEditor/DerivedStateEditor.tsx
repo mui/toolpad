@@ -151,7 +151,7 @@ function NodePropsEditor<P>({
                 value={propValue}
                 onChange={handlePropValueChange(propName)}
               />
-              <IconButton onClick={handlePropRemove(propName)}>
+              <IconButton aria-label="Close editor" onClick={handlePropRemove(propName)}>
                 <CloseIcon />
               </IconButton>
             </Stack>
@@ -402,6 +402,9 @@ export default function DerivedStateEditor() {
             <DerivedStateNodeEditor node={lastEditedStateNode} />
           </DialogContent>
           <DialogActions>
+            <Button color="inherit" variant="text" onClick={handleEditStateDialogClose}>
+              Cancel
+            </Button>
             <Button onClick={handleRemove}>Remove</Button>
           </DialogActions>
         </Dialog>

@@ -24,6 +24,7 @@ import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateApiNodeDialog from './CreateApiNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
+import useLatest from '../../../utils/useLatest';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -49,12 +50,12 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
             {labelText}
           </Typography>
           {onCreate ? (
-            <IconButton size="small" onClick={onCreate}>
+            <IconButton aria-label={`Create ${labelText}`} size="small" onClick={onCreate}>
               <AddIcon fontSize="small" />
             </IconButton>
           ) : null}
           {onDelete ? (
-            <IconButton size="small" onClick={onDelete}>
+            <IconButton aria-label={`Delete ${labelText}`} size="small" onClick={onDelete}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           ) : null}
@@ -185,6 +186,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   }, [deletedNodeId, domApi, navigate, appId, handledeleteNodeDialogClose]);
 
   const deletedNode = deletedNodeId && appDom.getMaybeNode(dom, deletedNodeId);
+  const latestDeletedNode = useLatest(deletedNode);
 
   return (
     <HierarchyExplorerRoot className={className}>
@@ -274,10 +276,15 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       />
       <Dialog open={!!deletedNode} onClose={handledeleteNodeDialogClose}>
         <DialogTitle>
-          Delete {deletedNode?.type} &quot;{deletedNode?.name}&quot;?
+          Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
         </DialogTitle>
         <DialogActions>
-          <Button type="submit" onClick={handledeleteNodeDialogClose}>
+          <Button
+            type="submit"
+            color="inherit"
+            variant="text"
+            onClick={handledeleteNodeDialogClose}
+          >
             Cancel
           </Button>
           <Button type="submit" onClick={handleDeleteNode}>

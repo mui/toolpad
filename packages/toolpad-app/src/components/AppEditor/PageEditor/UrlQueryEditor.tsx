@@ -46,6 +46,9 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
           />
         </DialogContent>
         <DialogActions>
+          <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
+            Close
+          </Button>
           <Button disabled={page.attributes.urlQuery.value === input} onClick={handleSave}>
             Save
           </Button>

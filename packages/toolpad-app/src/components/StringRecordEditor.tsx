@@ -142,7 +142,7 @@ export default function StringRecordEditor({
             onChange={handleFieldValueChange(field)}
           />
 
-          <IconButton onClick={handleRemove(field)} size="small">
+          <IconButton aria-label="Delete property" onClick={handleRemove(field)} size="small">
             <DeleteIcon fontSize="small" />
           </IconButton>
         </React.Fragment>
@@ -164,7 +164,12 @@ export default function StringRecordEditor({
           value={newFieldValue}
           onChange={(event) => setNewFieldValue(event.target.value)}
         />
-        <IconButton size="small" disabled={!isValidNewFieldParams} type="submit">
+        <IconButton
+          aria-label="Add property"
+          size="small"
+          disabled={!isValidNewFieldParams}
+          type="submit"
+        >
           <AddIcon fontSize="small" />
         </IconButton>
       </form>

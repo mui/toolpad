@@ -1,6 +1,7 @@
 import {
   Button,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
@@ -111,7 +112,7 @@ function GridColumnsPropEditor({
         {editedColumn ? (
           <React.Fragment>
             <DialogTitle>
-              <IconButton onClick={() => setEditedIndex(null)}>
+              <IconButton aria-label="Back" onClick={() => setEditedIndex(null)}>
                 <ArrowBackIcon />
               </IconButton>
               Edit column {editedColumn.field}
@@ -185,7 +186,7 @@ function GridColumnsPropEditor({
           <React.Fragment>
             <DialogTitle>Edit columns</DialogTitle>
             <DialogContent>
-              <IconButton onClick={handleMenuClick} disabled={disabled}>
+              <IconButton aria-label="Add column" onClick={handleMenuClick} disabled={disabled}>
                 <AddIcon />
               </IconButton>
               <Menu
@@ -212,7 +213,11 @@ function GridColumnsPropEditor({
                       disableGutters
                       onClick={handleColumnItemClick(i)}
                       secondaryAction={
-                        <IconButton edge="end" aria-label="delete" onClick={handleColumnDelete(i)}>
+                        <IconButton
+                          aria-label="Remove column"
+                          edge="end"
+                          onClick={handleColumnDelete(i)}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       }
@@ -227,6 +232,11 @@ function GridColumnsPropEditor({
             </DialogContent>
           </React.Fragment>
         )}
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={() => setEditColumnsDialogOpen(false)}>
+            Close
+          </Button>
+        </DialogActions>
       </Dialog>
     </React.Fragment>
   );

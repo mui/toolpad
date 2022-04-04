@@ -174,6 +174,7 @@ function EditorContent({ appId }: EditorContentProps) {
             ) : null}
             <Typography>{domLoader.unsavedChanges} unsaved change(s).</Typography>
             <IconButton
+              aria-label="Create release"
               color="inherit"
               sx={{ ml: 1 }}
               onClick={() => setCreateReleaseDialogOpen(true)}

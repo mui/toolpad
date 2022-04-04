@@ -151,7 +151,7 @@ function NodePropsEditor<P>({
                 value={propValue}
                 onChange={handlePropValueChange(propName)}
               />
-              <IconButton onClick={handlePropRemove(propName)}>
+              <IconButton aria-label="Close editor" onClick={handlePropRemove(propName)}>
                 <CloseIcon />
               </IconButton>
             </Stack>

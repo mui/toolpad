@@ -85,6 +85,7 @@ export function BindingEditor<V>({
   return (
     <React.Fragment>
       <IconButton
+        aria-label="Add binding"
         disabled={disabled}
         size="small"
         onClick={handleOpen}

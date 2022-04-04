@@ -20,7 +20,7 @@ export default function AppHeader({ actions, navigation }: AppBarProps) {
         <IconButton
           edge="start"
           color="inherit"
-          aria-label="menu"
+          aria-label="Home"
           sx={{ mr: 2 }}
           component="a"
           href={`/`}

@@ -85,6 +85,7 @@ export function BindingEditor<V>({
   return (
     <React.Fragment>
       <IconButton
+        aria-label="Add binding"
         disabled={disabled}
         size="small"
         onClick={handleOpen}
@@ -116,8 +117,11 @@ export function BindingEditor<V>({
           ) : null}
         </DialogContent>
         <DialogActions>
-          <Button disabled={!value} onClick={() => onChange(null)}>
-            Remove
+          <Button color="inherit" variant="text" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button color="inherit" disabled={!value} onClick={() => onChange(null)}>
+            Remove binding
           </Button>
           <Button disabled={!input} color="primary" onClick={handleCommit}>
             Update binding

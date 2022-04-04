@@ -104,6 +104,7 @@ export default function Releases() {
             rows={releases}
             columns={columns}
             density="compact"
+            getRowId={(row) => row.version}
             loading={isLoading || deleteReleaseMutation.isLoading}
             error={(error as any)?.message}
             onRowClick={({ row }) => navigate(`/app/${appId}/releases/${row.version}`)}

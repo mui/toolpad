@@ -60,6 +60,9 @@ export default function CreateStudioPageDialog({
           />
         </DialogContent>
         <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
           <Button type="submit" disabled={!name}>
             Create
           </Button>

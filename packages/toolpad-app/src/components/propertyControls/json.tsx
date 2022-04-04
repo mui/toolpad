@@ -86,6 +86,9 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
           />
         </DialogContent>
         <DialogActions>
+          <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
+            Cancel
+          </Button>
           <Button disabled={valueAsString === input} onClick={handleSave}>
             Save
           </Button>

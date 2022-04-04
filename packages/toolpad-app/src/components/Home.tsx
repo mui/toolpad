@@ -21,6 +21,7 @@ import client from '../api';
 import DialogForm from './DialogForm';
 import { App } from '../../prisma/generated/client';
 import AppHeader from './AppHeader';
+import useLatest from '../utils/useLatest';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -53,6 +54,9 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           />
         </DialogContent>
         <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
           <LoadingButton type="submit" loading={createAppMutation.isLoading} disabled={!name}>
             Create
           </LoadingButton>
@@ -62,13 +66,13 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   );
 }
 
-interface AppCardProps {
-  app?: App;
+export interface AppDeleteDialogProps {
+  app: App | null;
+  onClose: () => void;
 }
 
-function AppCard({ app }: AppCardProps) {
-  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-
+function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
+  const latestApp = useLatest(app);
   const deleteAppMutation = client.useMutation('deleteApp');
 
   const handleDeleteClick = React.useCallback(async () => {
@@ -76,29 +80,42 @@ function AppCard({ app }: AppCardProps) {
       await deleteAppMutation.mutateAsync([app.id]);
     }
     await client.refetchQueries('getApps');
-    setDeleteDialogOpen(false);
-  }, [app, deleteAppMutation]);
+    onClose();
+  }, [app, deleteAppMutation, onClose]);
 
   return (
+    <Dialog open={!!app} onClose={onClose}>
+      <DialogForm>
+        <DialogTitle>Confirm delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete application &quot;{latestApp?.name}&quot;
+        </DialogContent>
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
+          <LoadingButton
+            type="submit"
+            loading={deleteAppMutation.isLoading}
+            onClick={handleDeleteClick}
+            color="error"
+          >
+            Delete
+          </LoadingButton>
+        </DialogActions>
+      </DialogForm>
+    </Dialog>
+  );
+}
+
+interface AppCardProps {
+  app?: App;
+  onDelete?: () => void;
+}
+
+function AppCard({ app, onDelete }: AppCardProps) {
+  return (
     <Card sx={{ gridColumn: 'span 1' }}>
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogForm>
-          <DialogTitle>Confirm delete</DialogTitle>
-          <DialogContent>
-            Are you sure you want to delete application &quot;{app?.name}&quot;
-          </DialogContent>
-          <DialogActions>
-            <LoadingButton
-              type="submit"
-              loading={deleteAppMutation.isLoading}
-              onClick={handleDeleteClick}
-              color="error"
-            >
-              Delete
-            </LoadingButton>
-          </DialogActions>
-        </DialogForm>
-      </Dialog>
       <CardActionArea component="a" href={app ? `/deploy/${app.id}` : ''} disabled={!app}>
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
@@ -118,7 +135,7 @@ function AppCard({ app }: AppCardProps) {
         >
           Edit
         </Button>
-        <Button size="small" disabled={!app} onClick={() => setDeleteDialogOpen(true)}>
+        <Button size="small" disabled={!app} onClick={onDelete}>
           delete
         </Button>
       </CardActions>
@@ -131,8 +148,11 @@ export default function Home() {
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
+  const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
+
   return (
     <React.Fragment>
+      <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
       <AppHeader navigation={null} actions={null} />
       <Container>
         <Typography variant="h2">Apps</Typography>
@@ -163,7 +183,9 @@ export default function Home() {
                 return (error as Error)?.message;
               case 'success':
                 return apps.length > 0
-                  ? apps.map((app) => <AppCard key={app.id} app={app} />)
+                  ? apps.map((app) => (
+                      <AppCard key={app.id} app={app} onDelete={() => setDeletedApp(app)} />
+                    ))
                   : 'No apps yet';
               default:
                 return '';

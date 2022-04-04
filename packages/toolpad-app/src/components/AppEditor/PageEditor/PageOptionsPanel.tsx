@@ -8,6 +8,7 @@ import {
   FormControlLabel,
   Typography,
   Divider,
+  DialogActions,
 } from '@mui/material';
 import * as React from 'react';
 import PageIcon from '@mui/icons-material/Web';
@@ -88,6 +89,11 @@ export default function PageOptionsPanel() {
           />
           <PageSource pageNodeId={pageNodeId} editor={debugEditor} appId={state.appId} />
         </DialogContent>
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
+            Close
+          </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );

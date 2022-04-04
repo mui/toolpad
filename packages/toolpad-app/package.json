@@ -40,7 +40,7 @@
     "@mui/toolpad-components": "^0.0.5-alpha.4",
     "@mui/toolpad-core": "^0.0.5-alpha.4",
     "@mui/x-data-grid-pro": "^5.4.0",
-    "@prisma/client": "^3.9.2",
+    "@prisma/client": "^3.11.1",
     "@swc/wasm": "^1.2.151",
     "@types/cors": "^2.8.12",
     "@types/prettier": "^2.4.3",
@@ -88,7 +88,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "glob": "^7.2.0",
-    "prisma": "^3.9.2"
+    "prisma": "^3.11.1"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

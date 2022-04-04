@@ -79,6 +79,9 @@ export default function CreateStudioConnectionDialog({
           </FormControl>
         </DialogContent>
         <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
           <Button type="submit" disabled={!dataSourceType}>
             Create
           </Button>

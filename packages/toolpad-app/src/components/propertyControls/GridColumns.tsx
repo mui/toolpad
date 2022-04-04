@@ -1,6 +1,7 @@
 import {
   Button,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
@@ -231,6 +232,11 @@ function GridColumnsPropEditor({
             </DialogContent>
           </React.Fragment>
         )}
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={() => setEditColumnsDialogOpen(false)}>
+            Close
+          </Button>
+        </DialogActions>
       </Dialog>
     </React.Fragment>
   );

@@ -117,8 +117,11 @@ export function BindingEditor<V>({
           ) : null}
         </DialogContent>
         <DialogActions>
-          <Button disabled={!value} onClick={() => onChange(null)}>
-            Remove
+          <Button color="inherit" variant="text" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button color="inherit" disabled={!value} onClick={() => onChange(null)}>
+            Remove binding
           </Button>
           <Button disabled={!input} color="primary" onClick={handleCommit}>
             Update binding

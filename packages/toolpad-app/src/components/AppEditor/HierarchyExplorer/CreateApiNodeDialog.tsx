@@ -118,6 +118,9 @@ export default function CreateApiNodeDialog({
           <ConnectionSelect value={connectionId} onChange={setConnectionID} />
         </DialogContent>
         <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
           <Button type="submit" disabled={!connectionId}>
             Create
           </Button>

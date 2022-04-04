@@ -178,6 +178,9 @@ export default function QueryStateEditor() {
             <QueryStateNodeEditor node={lastEditedStateNode} />
           </DialogContent>
           <DialogActions>
+            <Button color="inherit" variant="text" onClick={handleEditStateDialogClose}>
+              Cancel
+            </Button>
             <Button onClick={handleRemove}>Remove</Button>
           </DialogActions>
         </Dialog>

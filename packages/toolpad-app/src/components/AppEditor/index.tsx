@@ -130,6 +130,9 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
           ) : null}
         </DialogContent>
         <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
           <LoadingButton
             disabled={!lastRelease.isSuccess}
             loading={createReleaseMutation.isLoading}

@@ -1,22 +1,22 @@
 import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/toolpad-core';
 import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
-import { getStudioComponent } from './studioComponents';
-import * as studioDom from './studioDom';
+import { getToolpadComponent } from './toolpadComponents';
+import * as appDom from './appDom';
 import {
   NodeId,
   PropExpression,
   ResolvedProps,
-  StudioBindable,
-  StudioBindables,
+  BindableAttrValue,
+  BindableAttrValues,
   VersionOrPreview,
 } from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
-import { getQueryNodeArgTypes } from './studioDataSources/client';
+import { getQueryNodeArgTypes } from './toolpadDataSources/client';
 import { tryFormat } from './utils/prettier';
-import { RenderContext } from './studioComponents/studioComponentDefinition';
+import { RenderContext } from './toolpadComponents/componentDefinition';
 
 function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes {
   return Object.fromEntries(
@@ -74,11 +74,11 @@ interface MemoizedConst {
 class Context implements RenderContext {
   appId: string;
 
-  dom: studioDom.StudioDom;
+  dom: appDom.AppDom;
 
   private config: RenderPageConfig;
 
-  private page: studioDom.StudioPageNode;
+  private page: appDom.PageNode;
 
   private imports: Imports;
 
@@ -102,12 +102,7 @@ class Context implements RenderContext {
 
   private memoizedConsts: MemoizedConst[] = [];
 
-  constructor(
-    appId: string,
-    dom: studioDom.StudioDom,
-    page: studioDom.StudioPageNode,
-    config: RenderPageConfig,
-  ) {
+  constructor(appId: string, dom: appDom.AppDom, page: appDom.PageNode, config: RenderPageConfig) {
     this.appId = appId;
     this.dom = dom;
     this.page = page;
@@ -120,7 +115,7 @@ class Context implements RenderContext {
     this.reactAlias = this.addImport('react', '*', 'React');
 
     if (this.config.editor) {
-      this.runtimeAlias = this.addImport('@mui/toolpad-core/runtime', '*', '__studioRuntime');
+      this.runtimeAlias = this.addImport('@mui/toolpad-core/runtime', '*', '__editorRuntime');
     }
   }
 
@@ -133,11 +128,11 @@ class Context implements RenderContext {
   }
 
   collectAllState() {
-    const nodes = studioDom.getDescendants(this.dom, this.page);
+    const nodes = appDom.getDescendants(this.dom, this.page);
     nodes.forEach((node) => {
-      if (studioDom.isElement(node)) {
+      if (appDom.isElement(node)) {
         this.collectControlledStateProps(node);
-      } else if (studioDom.isDerivedState(node) || studioDom.isQueryState(node)) {
+      } else if (appDom.isDerivedState(node) || appDom.isQueryState(node)) {
         this.collectStateNode(node);
       }
     });
@@ -156,14 +151,12 @@ class Context implements RenderContext {
     );
   }
 
-  collectStateNode(
-    node: studioDom.StudioDerivedStateNode | studioDom.StudioQueryStateNode,
-  ): StateHook {
+  collectStateNode(node: appDom.DerivedStateNode | appDom.QueryStateNode): StateHook {
     let stateHook = this.stateHooks.get(node.id);
     if (!stateHook) {
       const stateVar = this.moduleScope.createUniqueBinding(node.name);
       const setStateVar = this.moduleScope.createUniqueBinding(camelCase('set', node.name));
-      if (studioDom.isDerivedState(node)) {
+      if (appDom.isDerivedState(node)) {
         stateHook = {
           type: 'derived',
           nodeId: node.id,
@@ -172,7 +165,7 @@ class Context implements RenderContext {
           setStateVar,
         };
         this.stateHooks.set(node.id, stateHook);
-      } else if (studioDom.isQueryState(node)) {
+      } else if (appDom.isQueryState(node)) {
         stateHook = {
           type: 'api',
           nodeId: node.id,
@@ -182,27 +175,24 @@ class Context implements RenderContext {
         };
         this.stateHooks.set(node.id, stateHook);
       } else {
-        throw new Error(`Invariant: Invalid node type "${(node as studioDom.StudioNode).type}"`);
+        throw new Error(`Invariant: Invalid node type "${(node as appDom.AppDomNode).type}"`);
       }
     }
     return stateHook;
   }
 
-  getStudioComponent(node: studioDom.StudioElementNode) {
-    return getStudioComponent(this.dom, node.attributes.component.value);
+  getToolpadComponent(node: appDom.ElementNode) {
+    return getToolpadComponent(this.dom, node.attributes.component.value);
   }
 
-  collectControlledStateProp(
-    node: studioDom.StudioElementNode,
-    propName: string,
-  ): ControlledStateHook {
+  collectControlledStateProp(node: appDom.ElementNode, propName: string): ControlledStateHook {
     const nodeId = node.id;
     const nodeName = node.name;
     const stateId = `${nodeId}.props.${propName}`;
 
     let stateHook = this.controlledStateHooks.get(stateId);
     if (!stateHook) {
-      const component = this.getStudioComponent(node);
+      const component = this.getToolpadComponent(node);
 
       const argType = component.argTypes[propName];
 
@@ -232,8 +222,8 @@ class Context implements RenderContext {
     return stateHook;
   }
 
-  collectControlledStateProps(node: studioDom.StudioElementNode): void {
-    const component = this.getStudioComponent(node);
+  collectControlledStateProps(node: appDom.ElementNode): void {
+    const component = this.getToolpadComponent(node);
 
     // eslint-disable-next-line no-restricted-syntax
     for (const [propName, argType] of Object.entries(component.argTypes)) {
@@ -275,9 +265,9 @@ class Context implements RenderContext {
       `;
   }
 
-  resolveBindable<P extends studioDom.BindableProps<P>>(
+  resolveBindable<P extends appDom.BindableProps<P>>(
     id: string,
-    propValue: StudioBindable<any>,
+    propValue: BindableAttrValue<any>,
     argType: ArgTypeDefinition,
   ): PropExpression {
     if (propValue.type === 'const') {
@@ -331,11 +321,11 @@ class Context implements RenderContext {
   }
 
   /**
-   * Resolves StudioBindables to expressions we can render in the code.
+   * Resolves BindableAttrValues to expressions we can render in the code.
    */
   resolveBindables(
     id: string,
-    bindables: StudioBindables<any>,
+    bindables: BindableAttrValues<any>,
     argTypes: ArgTypeDefinitions,
   ): ResolvedProps {
     const result: ResolvedProps = {};
@@ -353,8 +343,8 @@ class Context implements RenderContext {
     return result;
   }
 
-  resolveElementProps(node: studioDom.StudioElementNode): ResolvedProps {
-    const component = this.getStudioComponent(node);
+  resolveElementProps(node: appDom.ElementNode): ResolvedProps {
+    const component = this.getToolpadComponent(node);
 
     const result: ResolvedProps = this.resolveBindables(
       `${node.id}.props`,
@@ -416,7 +406,7 @@ class Context implements RenderContext {
   }
 
   resolveElementChildren(
-    renderableNodeChildren: { [key: string]: studioDom.StudioElementNode<any>[] },
+    renderableNodeChildren: { [key: string]: appDom.ElementNode<any>[] },
     argTypes?: ArgTypeDefinitions,
   ): ResolvedProps {
     const result: ResolvedProps = {};
@@ -471,28 +461,25 @@ class Context implements RenderContext {
     return result;
   }
 
-  wrapComponent(
-    node: studioDom.StudioElementNode | studioDom.StudioPageNode,
-    rendered: string,
-  ): PropExpression {
+  wrapComponent(node: appDom.ElementNode | appDom.PageNode, rendered: string): PropExpression {
     return {
       type: 'jsxElement',
       value: this.config.editor
         ? `
-          <${this.runtimeAlias}.RuntimeStudioNode nodeId="${node.id}">
+          <${this.runtimeAlias}.NodeRuntimeWrapper nodeId="${node.id}">
             ${rendered}
-          </${this.runtimeAlias}.RuntimeStudioNode>
+          </${this.runtimeAlias}.NodeRuntimeWrapper>
         `
         : rendered,
     };
   }
 
-  renderElement(node: studioDom.StudioElementNode): PropExpression {
-    const component = this.getStudioComponent(node);
+  renderElement(node: appDom.ElementNode): PropExpression {
+    const component = this.getToolpadComponent(node);
 
     const resolvedProps = this.resolveElementProps(node);
     const resolvedChildren = this.resolveElementChildren(
-      studioDom.getChildNodes(this.dom, node),
+      appDom.getChildNodes(this.dom, node),
       component.argTypes,
     );
 
@@ -511,8 +498,8 @@ class Context implements RenderContext {
    *   return ${RESULT};
    * }`
    */
-  renderRoot(node: studioDom.StudioPageNode): string {
-    const { children } = studioDom.getChildNodes(this.dom, node);
+  renderRoot(node: appDom.PageNode): string {
+    const { children } = appDom.getChildNodes(this.dom, node);
     const resolvedChildren = this.resolveElementChildren(
       { children },
       {
@@ -677,7 +664,7 @@ class Context implements RenderContext {
     return Array.from(this.stateHooks.values(), (stateHook) => {
       switch (stateHook.type) {
         case 'derived': {
-          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
+          const node = appDom.getNode(this.dom, stateHook.nodeId, 'derivedState');
           const resolvedParams = this.resolveBindables(
             `${node.id}.params`,
             node.params ?? {},
@@ -697,7 +684,7 @@ class Context implements RenderContext {
           }(${derivedStateGetter}(${paramsArg})), [${depsArray.join(', ')}])`;
         }
         case 'api': {
-          const node = studioDom.getNode(this.dom, stateHook.nodeId, 'queryState');
+          const node = appDom.getNode(this.dom, stateHook.nodeId, 'queryState');
           const propTypes = argTypesToPropValueTypes(getQueryNodeArgTypes(this.dom, node));
           const resolvedProps = this.resolveBindables(
             `${node.id}.params`,
@@ -824,7 +811,7 @@ class Context implements RenderContext {
 
 export default function renderPageCode(
   appId: string,
-  dom: studioDom.StudioDom,
+  dom: appDom.AppDom,
   pageNodeId: NodeId,
   configInit: Partial<RenderPageConfig> = {},
 ) {
@@ -835,7 +822,7 @@ export default function renderPageCode(
     ...configInit,
   };
 
-  const page = studioDom.getNode(dom, pageNodeId, 'page');
+  const page = appDom.getNode(dom, pageNodeId, 'page');
 
   const ctx = new Context(appId, dom, page, config);
   let code: string = ctx.render();

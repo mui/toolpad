@@ -9,7 +9,7 @@ import {
   GridColumnOrderChangeParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useStudioNode, UseDataQuery } from '@mui/toolpad-core';
+import { useNode, UseDataQuery } from '@mui/toolpad-core';
 import { debounce } from '@mui/material';
 
 function inferColumnType(value: unknown): string | undefined {
@@ -51,43 +51,43 @@ if (LICENSE) {
 const EMPTY_COLUMNS: GridColumns = [];
 const EMPTY_ROWS: GridRowsProp = [];
 
-interface StudioDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'> {
+interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'> {
   rows?: GridRowsProp;
   columns?: GridColumns;
   dataQuery?: UseDataQuery;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
-  { dataQuery, columns: columnsProp, rows: rowsProp, ...props }: StudioDataGridProps,
+  { dataQuery, columns: columnsProp, rows: rowsProp, ...props }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const studioNode = useStudioNode<StudioDataGridProps>();
+  const nodeRuntime = useNode<ToolpadDataGridProps>();
 
   const handleResize = React.useMemo(
     () =>
       debounce((params: GridColumnResizeParams) => {
-        if (!studioNode) {
+        if (!nodeRuntime) {
           return;
         }
 
-        studioNode.setProp('columns', (columns) =>
+        nodeRuntime.setProp('columns', (columns) =>
           columns?.map((column) =>
             column.field === params.colDef.field ? { ...column, width: params.width } : column,
           ),
         );
       }, 500),
-    [studioNode],
+    [nodeRuntime],
   );
   React.useEffect(() => handleResize.clear(), [handleResize]);
 
   const handleColumnOrderChange = React.useMemo(
     () =>
       debounce((params: GridColumnOrderChangeParams) => {
-        if (!studioNode) {
+        if (!nodeRuntime) {
           return;
         }
 
-        studioNode.setProp('columns', (columns) => {
+        nodeRuntime.setProp('columns', (columns) => {
           if (!columns) {
             return columns;
           }
@@ -103,7 +103,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           ];
         });
       }, 500),
-    [studioNode],
+    [nodeRuntime],
   );
   React.useEffect(() => handleColumnOrderChange.clear(), [handleColumnOrderChange]);
 
@@ -114,16 +114,16 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const columnsInitRef = React.useRef(false);
   const hasColumnsDefined = columnsProp && columnsProp.length > 0;
   React.useEffect(() => {
-    if (!studioNode || hasColumnsDefined || rows.length <= 0 || columnsInitRef.current) {
+    if (!nodeRuntime || hasColumnsDefined || rows.length <= 0 || columnsInitRef.current) {
       return;
     }
 
     const inferredColumns = inferColumns(rows);
 
-    studioNode.setProp('columns', inferredColumns);
+    nodeRuntime.setProp('columns', inferredColumns);
 
     columnsInitRef.current = true;
-  }, [hasColumnsDefined, rows, studioNode]);
+  }, [hasColumnsDefined, rows, nodeRuntime]);
 
   const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
 

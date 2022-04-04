@@ -1,7 +1,7 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
 import {
   RUNTIME_PROP_NODE_ID,
-  RUNTIME_PROP_STUDIO_SLOTS,
+  RUNTIME_PROP_SLOTS,
   SlotType,
   RuntimeError,
   LiveBindings,
@@ -15,9 +15,9 @@ import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry'
 declare global {
   interface Window {
     __REACT_DEVTOOLS_GLOBAL_HOOK__?: Hook;
-    __STUDIO_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
-    __STUDIO_RUNTIME_BINDINGS_STATE__?: LiveBindings;
-    __STUDIO_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
+    __TOOLPAD_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
+    __TOOLPAD_RUNTIME_BINDINGS_STATE__?: LiveBindings;
+    __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
   }
 }
 
@@ -83,10 +83,10 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
           return;
         }
 
-        const studioNodeId = fiber.memoizedProps[RUNTIME_PROP_NODE_ID] as string | undefined;
+        const nodeIdPropValue = fiber.memoizedProps[RUNTIME_PROP_NODE_ID] as string | undefined;
 
-        if (studioNodeId) {
-          const nodeId: NodeId = studioNodeId as NodeId;
+        if (nodeIdPropValue) {
+          const nodeId: NodeId = nodeIdPropValue as NodeId;
           if (nodes[nodeId]) {
             // We can get multiple fibers with the [RUNTIME_PROP_NODE_ID] if the component
             // spreads its props. Let's assume the first we encounter is the one wrapped by
@@ -107,8 +107,8 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
           }
         }
 
-        const studioSlotName = fiber.memoizedProps[RUNTIME_PROP_STUDIO_SLOTS] as string | undefined;
-        if (studioSlotName) {
+        const slotNamePropValue = fiber.memoizedProps[RUNTIME_PROP_SLOTS] as string | undefined;
+        if (slotNamePropValue) {
           const slotType = fiber.memoizedProps.slotType as SlotType;
           const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
           const nodeSlots = nodes[parentId]?.slots;
@@ -126,7 +126,7 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
                 : getRelativeBoundingRect(rootElm, childContainerElm);
             const direction = window.getComputedStyle(childContainerElm)
               .flexDirection as FlowDirection;
-            nodeSlots[studioSlotName] = {
+            nodeSlots[slotNamePropValue] = {
               type: slotType,
               rect,
               direction,
@@ -148,11 +148,11 @@ export function getPageViewState(rootElm: HTMLElement): PageViewState {
   return {
     nodes: nodesViewInfo.nodes,
     // eslint-disable-next-line no-underscore-dangle
-    pageState: contentWindow?.__STUDIO_RUNTIME_PAGE_STATE__ ?? {},
+    pageState: contentWindow?.__TOOLPAD_RUNTIME_PAGE_STATE__ ?? {},
     bindings: {
       ...nodesViewInfo.bindings,
       // eslint-disable-next-line no-underscore-dangle
-      ...(contentWindow?.__STUDIO_RUNTIME_BINDINGS_STATE__ ?? {}),
+      ...(contentWindow?.__TOOLPAD_RUNTIME_BINDINGS_STATE__ ?? {}),
     },
   };
 }

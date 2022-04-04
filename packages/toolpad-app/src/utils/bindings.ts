@@ -1,4 +1,4 @@
-import { StudioBindingFormat } from '../types';
+import { BindingAttrValueFormat } from '../types';
 
 type ParsedBinding = string[];
 
@@ -22,7 +22,7 @@ function toTemplateStringExpression(parts: ParsedBinding): string {
 
 export function formatExpression(
   expr: ParsedBinding,
-  bindingFormat: StudioBindingFormat = 'default',
+  bindingFormat: BindingAttrValueFormat = 'default',
 ): string {
   switch (bindingFormat) {
     case 'stringLiteral':

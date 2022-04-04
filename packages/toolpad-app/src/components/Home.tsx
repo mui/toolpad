@@ -20,7 +20,7 @@ import { Box } from '@mui/system';
 import client from '../api';
 import DialogForm from './DialogForm';
 import { App } from '../../prisma/generated/client';
-import StudioAppBar from './StudioAppBar';
+import AppHeader from './AppHeader';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -41,7 +41,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           window.location.href = `/_studio/app/${app.id}/editor`;
         }}
       >
-        <DialogTitle>Create a new MUI Studio App</DialogTitle>
+        <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
         <DialogContent>
           <TextField
             sx={{ my: 1 }}
@@ -133,7 +133,7 @@ export default function Home() {
 
   return (
     <React.Fragment>
-      <StudioAppBar navigation={null} actions={null} />
+      <AppHeader navigation={null} actions={null} />
       <Container>
         <Typography variant="h2">Apps</Typography>
         <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />

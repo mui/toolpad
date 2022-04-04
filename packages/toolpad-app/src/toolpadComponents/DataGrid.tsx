@@ -19,7 +19,7 @@ export default {
       typeDef: { type: 'object', schema: URI_DATAQUERY as string },
     },
     density: {
-      typeDef: { type: 'string', enum: ['comfortable', 'compact', 'standard'] },
+      typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },
     },
     sx: {
       typeDef: { type: 'object' },

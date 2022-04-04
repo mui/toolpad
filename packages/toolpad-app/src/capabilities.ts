@@ -18,6 +18,7 @@ export const CAP_EDITOR: Capabilities = {
   edit: true,
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getCapabilities(req: IncomingMessage): Promise<Capabilities | null> {
   return CAP_VIEWER;
 }

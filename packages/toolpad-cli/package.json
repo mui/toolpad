@@ -32,12 +32,12 @@
     "@mui/toolpad-core": "^0.0.5-alpha.4",
     "arg": "^5.0.1",
     "dotenv": "^16.0.0",
-    "execa": "^6.0.0",
+    "execa": "^6.1.0",
     "pg-connection-string": "^2.5.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15",
-    "ts-node": "^10.4.0"
+    "ts-node": "^10.7.0"
   },
   "publishConfig": {
     "access": "public"

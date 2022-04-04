@@ -29,18 +29,18 @@
   ],
   "dependencies": {
     "@emotion/cache": "^11.7.1",
-    "@emotion/react": "^11.7.1",
+    "@emotion/react": "^11.8.2",
     "@emotion/server": "^11.4.0",
-    "@emotion/styled": "^11.3.0",
+    "@emotion/styled": "^11.8.1",
     "@monaco-editor/react": "^4.3.1",
-    "@mui/icons-material": "^5.3.1",
-    "@mui/lab": "^5.0.0-alpha.66",
-    "@mui/material": "^5.3.1",
-    "@mui/styles": "^5.3.0",
+    "@mui/icons-material": "^5.5.1",
+    "@mui/lab": "^5.0.0-alpha.75",
+    "@mui/material": "^5.5.3",
+    "@mui/styles": "^5.5.3",
     "@mui/toolpad-components": "^0.0.5-alpha.4",
     "@mui/toolpad-core": "^0.0.5-alpha.4",
-    "@mui/x-data-grid-pro": "^5.4.0",
-    "@prisma/client": "^3.9.2",
+    "@mui/x-data-grid-pro": "^5.7.0",
+    "@prisma/client": "^3.11.1",
     "@swc/wasm": "^1.2.151",
     "@types/cors": "^2.8.12",
     "@types/prettier": "^2.4.3",
@@ -51,6 +51,7 @@
     "concurrently": "^7.0.0",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
+    "csstype": "^3.0.11",
     "cuid": "^2.1.8",
     "es-module-shims": "^1.4.3",
     "esbuild": "^0.14.14",
@@ -61,7 +62,7 @@
     "import-meta-resolve": "^1.1.1",
     "json-to-ts": "^1.7.0",
     "monaco-editor": "^0.32.1",
-    "next": "^12.0.8",
+    "next": "^12.1.4",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.5.1",
     "quickjs-emscripten": "^0.15.0",
@@ -75,7 +76,7 @@
     "react-split-pane": "^0.1.92",
     "sucrase": "^3.20.3",
     "ts-node": "^10.4.0",
-    "typescript": "^4.5.5"
+    "typescript": "^4.6.3"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
@@ -88,7 +89,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "glob": "^7.2.0",
-    "prisma": "^3.9.2"
+    "prisma": "^3.11.1"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

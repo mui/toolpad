@@ -108,13 +108,24 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
         <DialogTitle>Create new release</DialogTitle>
         <DialogContent>
           {lastRelease.isSuccess ? (
-            <Stack spacing={1} my={1}>
+            <Stack spacing={1}>
               <Typography>
-                New version: {lastRelease.data ? lastRelease.data.version + 1 : 1}
+                You are about to create a snapshot of your application under a unique url. You will
+                be able to verify whether everything is working correctly before deploying this
+                release to production.
+              </Typography>
+              <Typography>
+                The new version to be created is &quot;
+                {lastRelease.data ? lastRelease.data.version + 1 : 1}&quot;.
+              </Typography>
+              <Typography>
+                Please summarize the changes you have made to the application since the last
+                release:
               </Typography>
               <TextField
                 label="description"
                 size="small"
+                autoFocus
                 fullWidth
                 multiline
                 rows={5}

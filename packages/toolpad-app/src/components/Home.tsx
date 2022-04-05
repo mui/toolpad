@@ -164,7 +164,6 @@ export default function Home() {
 
         <Box
           sx={{
-            my: 5,
             display: 'grid',
             gridTemplateColumns: {
               lg: 'repeat(4, 1fr)',

@@ -65,7 +65,7 @@
     "next": "^12.1.4",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.6.2",
-    "quickjs-emscripten": "^0.15.0",
+    "quickjs-emscripten": "^0.20.0",
     "react": "^18.0.0",
     "react-devtools-inline": "^4.24.3",
     "react-dom": "^18.0.0",

@@ -1,32 +1,32 @@
-import { getQuickJS, QuickJSHandle, QuickJSVm } from 'quickjs-emscripten';
+import { getQuickJS, QuickJSHandle, QuickJSContext } from 'quickjs-emscripten';
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 
-function newJson(vm: QuickJSVm, json: Json): QuickJSHandle {
+function newJson(ctx: QuickJSContext, json: Json): QuickJSHandle {
   switch (typeof json) {
     case 'string':
-      return vm.newString(json);
+      return ctx.newString(json);
     case 'number':
-      return vm.newNumber(json);
+      return ctx.newNumber(json);
     case 'boolean':
-      return json ? vm.true : vm.false;
+      return json ? ctx.true : ctx.false;
     case 'object': {
       if (!json) {
-        return vm.null;
+        return ctx.null;
       }
       if (Array.isArray(json)) {
-        const result = vm.newArray();
+        const result = ctx.newArray();
         Object.values(json).forEach((value, i) => {
-          const valueHandle = newJson(vm, value);
-          vm.setProp(result, i, valueHandle);
+          const valueHandle = newJson(ctx, value);
+          ctx.setProp(result, i, valueHandle);
           valueHandle.dispose();
         });
         return result;
       }
-      const result = vm.newObject();
+      const result = ctx.newObject();
       Object.entries(json).forEach(([key, value]) => {
-        const valueHandle = newJson(vm, value);
-        vm.setProp(result, key, valueHandle);
+        const valueHandle = newJson(ctx, value);
+        ctx.setProp(result, key, valueHandle);
         valueHandle.dispose();
       });
       return result;
@@ -41,20 +41,20 @@ export default async function evalExpression(
   globalScope: Record<string, Json>,
 ) {
   const QuickJS = await getQuickJS();
-  const vm = QuickJS.createVm();
+  const ctx = QuickJS.newContext();
 
   try {
     Object.entries(globalScope).forEach(([key, value]) => {
-      const valueHandle = newJson(vm, value);
-      vm.setProp(vm.global, key, valueHandle);
+      const valueHandle = newJson(ctx, value);
+      ctx.setProp(ctx.global, key, valueHandle);
       valueHandle.dispose();
     });
 
-    const result = vm.unwrapResult(vm.evalCode(expression));
-    const resultValue = vm.dump(result);
+    const result = ctx.unwrapResult(ctx.evalCode(expression));
+    const resultValue = ctx.dump(result);
     result.dispose();
     return resultValue;
   } finally {
-    vm.dispose();
+    ctx.dispose();
   }
 }

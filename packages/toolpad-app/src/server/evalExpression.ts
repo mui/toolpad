@@ -38,7 +38,7 @@ function newJson(ctx: QuickJSContext, json: Json): QuickJSHandle {
 
 export default async function evalExpression(
   expression: string,
-  globalScope: Record<string, Json>,
+  globalScope: Record<string, Json> = {},
 ) {
   const QuickJS = await getQuickJS();
   const ctx = QuickJS.newContext();

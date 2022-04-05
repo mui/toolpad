@@ -3,9 +3,10 @@ orbs:
   aws-s3: circleci/aws-s3@3.0.0
 
 defaults: &defaults
-  working_directory: /tmp/mui-studio
+  working_directory: /tmp/mui-toolpad
+  resource_class: medium
   docker:
-    - image: circleci/node:14
+    - image: cimg/node:14.19
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.
@@ -76,7 +77,7 @@ jobs:
           command: yarn prettier check-changed
       - run:
           name: 'Build packages'
-          command: yarn build
+          command: yarn release:build
   test_unit:
     <<: *defaults
     steps:

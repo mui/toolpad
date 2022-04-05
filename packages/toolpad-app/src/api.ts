@@ -1,0 +1,117 @@
+import {
+  QueryClient,
+  useMutation,
+  UseMutationOptions,
+  UseMutationResult,
+  useQuery,
+  UseQueryOptions,
+  UseQueryResult,
+} from 'react-query';
+import type {
+  Definition,
+  MethodsGroup,
+  MethodsOf,
+  MethodsOfGroup,
+  RpcRequest,
+  RpcResponse,
+  ServerDefinition,
+} from '../pages/api/rpc';
+
+export const queryClient = new QueryClient();
+
+function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfGroup<any> {
+  return new Proxy(
+    {},
+    {
+      get(target, prop) {
+        return async (...params: any[]) => {
+          const body: RpcRequest = {
+            type,
+            name: prop as string,
+            params,
+          };
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify(body),
+          });
+
+          if (res.ok) {
+            const response = (await res.json()) as RpcResponse;
+            if (response.error) {
+              throw new Error(response.error.message);
+            }
+            return response.result;
+          }
+
+          throw new Error(`HTTP ${res.status}`);
+        };
+      },
+    },
+  );
+}
+
+interface UseQueryFn<M extends MethodsGroup> {
+  <K extends keyof M & string>(
+    name: K,
+    params: Parameters<M[K]> | null,
+    options?: Omit<
+      UseQueryOptions<
+        Awaited<ReturnType<M[K]>>,
+        unknown,
+        Awaited<ReturnType<M[K]>>,
+        [K, Parameters<M[K]> | null]
+      >,
+      'queryKey' | 'queryFn' | 'enabled'
+    >,
+  ): UseQueryResult<Awaited<ReturnType<M[K]>>>;
+}
+
+interface UseMutationFn<M extends MethodsGroup> {
+  <K extends keyof M & string>(
+    name: K,
+    options?: UseMutationOptions<any, unknown, Parameters<M[K]>>,
+  ): UseMutationResult<Awaited<ReturnType<M[K]>>, unknown, Parameters<M[K]>>;
+}
+
+interface ApiClient<D extends Definition> {
+  query: D['query'];
+  mutation: D['mutation'];
+  useQuery: UseQueryFn<D['query']>;
+  useMutation: UseMutationFn<D['mutation']>;
+  refetchQueries: <K extends keyof D['query']>(
+    key: K,
+    params?: Parameters<D['query'][K]>,
+  ) => Promise<void>;
+}
+
+function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> {
+  const query = createFetcher(endpoint, 'query');
+  const mutation = createFetcher(endpoint, 'mutation');
+
+  return {
+    query,
+    mutation,
+    useQuery: (key, params, options) => {
+      return useQuery({
+        ...options,
+        enabled: !!params,
+        queryKey: [key, params],
+        queryFn: () => {
+          if (!params) {
+            throw new Error(`Invariant: "enabled" prop of useQuery should prevent this call'`);
+          }
+          return query[key](...params);
+        },
+      });
+    },
+    useMutation: (key, options) => useMutation((params) => mutation[key](...params), options),
+    refetchQueries(key, params?) {
+      return queryClient.refetchQueries(params ? [key, params] : [key]);
+    },
+  };
+}
+
+export default createClient<ServerDefinition>('/api/rpc');

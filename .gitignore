@@ -9,8 +9,8 @@ node_modules
 /coverage
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
 /build
@@ -35,4 +35,12 @@ yarn-error.log*
 
 lerna-debug.log
 
-.studio-data
+.env
+
+dist/
+
+packages/toolpad-app/public/web_modules
+packages/toolpad-app/public/editorRuntime
+packages/toolpad-app/public/sandbox
+packages/toolpad-app/public/typings.json
+packages/toolpad-app/prisma/generated

@@ -1,6 +1,6 @@
 .next
-.studio-data
 /packages/*/dist
-/packages/*/.next
-/packages/*/public
+/packages/toolpad-app/.next
+/packages/toolpad-app/public
+/packages/toolpad-app/prisma/generated/*
 

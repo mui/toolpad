@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+  // TODO: we will need this when start building docker images
+  // binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("TOOLPAD_DATABASE_URL")
+}
+
+enum DomNodeType {
+  app
+  connection
+  api
+  theme
+  page
+  element
+  codeComponent
+  derivedState
+  queryState
+}
+
+model App {
+  id   String @id @default(cuid())
+  name String
+
+  nodes       DomNode[]    @relation("AppNodes")
+  releases    Release[]    @relation("AppReleases")
+  deployments Deployment[] @relation("AppDeployments")
+}
+
+model DomNode {
+  id          String      @id @default(cuid())
+  name        String
+  type        DomNodeType
+  children    DomNode[]   @relation("Children")
+  parent      DomNode?    @relation("Children", fields: [parentId], references: [id])
+  parentId    String?
+  parentIndex String?
+  parentProp  String?
+
+  app   App    @relation("AppNodes", fields: [appId], references: [id], onDelete: Cascade)
+  appId String
+
+  attributes DomNodeAttribute[] @relation("Attributes")
+
+  @@unique([appId, name], name: "node_name_app_constraint")
+}
+
+enum DomNodeAttributeType {
+  const
+  binding
+  boundExpression
+  jsExpression
+  secret
+}
+
+model DomNodeAttribute {
+  nodeId    String
+  namespace String
+  name      String
+  node      DomNode              @relation("Attributes", fields: [nodeId], references: [id], onDelete: Cascade)
+  type      DomNodeAttributeType
+  value     String
+
+  @@unique([nodeId, namespace, name])
+}
+
+model Release {
+  version     Int
+  description String
+  createdAt   DateTime     @default(now())
+  snapshot    Bytes
+  deployments Deployment[] @relation("DeploymentRelease")
+  app         App          @relation("AppReleases", fields: [appId], references: [id], onDelete: Cascade)
+  appId       String
+
+  @@id([version, appId], name: "release_app_constraint")
+}
+
+model Deployment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  release   Release  @relation("DeploymentRelease", fields: [appId, version], references: [appId, version], onDelete: Restrict)
+  version   Int
+  app       App      @relation("AppDeployments", fields: [appId], references: [id], onDelete: Cascade)
+  appId     String
+}

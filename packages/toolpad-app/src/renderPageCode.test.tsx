@@ -46,6 +46,7 @@ async function bundle(files: Record<string, string>, entry: string): Promise<str
 }
 
 describe('renderPageCode', () => {
+  // TODO: pick this back up when appDom stabalizes more
   // eslint-disable-next-line mocha/no-skipped-tests
   test.skip('Basic studio dom rendering Typography component', async () => {
     let dom = appDom.createDom();

@@ -24,5 +24,9 @@ export default {
     sx: {
       typeDef: { type: 'object' },
     },
+    selection: {
+      typeDef: { type: 'object' },
+      onChangeProp: 'onSelectionChange',
+    },
   },
 } as ToolpadComponentDefinition;

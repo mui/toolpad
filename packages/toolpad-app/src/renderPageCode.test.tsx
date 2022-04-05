@@ -8,8 +8,9 @@ import { render } from '@testing-library/react';
 import renderPageCode from './renderPageCode';
 import * as appDom from './appDom';
 
-const STUDIO_NS = 'studio';
+const TOOLPAD_NS = 'toolpad';
 
+// Bundles a Toolpad page into a single JS file
 async function bundle(files: Record<string, string>, entry: string): Promise<string> {
   const result = await esbuild.build({
     entryPoints: [entry],
@@ -25,17 +26,17 @@ async function bundle(files: Record<string, string>, entry: string): Promise<str
         setup(build) {
           build.onResolve({ filter: /.*/ }, async (args) => {
             if (args.kind === 'entry-point') {
-              return { namespace: STUDIO_NS, path: args.path };
+              return { namespace: TOOLPAD_NS, path: args.path };
             }
-            if (args.namespace === STUDIO_NS) {
+            if (args.namespace === TOOLPAD_NS) {
               if (args.path.startsWith('.') || args.path.startsWith('/')) {
-                return { namespace: STUDIO_NS, path: args.path };
+                return { namespace: TOOLPAD_NS, path: args.path };
               }
             }
             return {};
           });
 
-          build.onLoad({ filter: /.*/, namespace: STUDIO_NS }, (args) => {
+          build.onLoad({ filter: /.*/, namespace: TOOLPAD_NS }, (args) => {
             return { contents: files[args.path], loader: 'tsx', resolveDir: process.cwd() };
           });
         },
@@ -48,7 +49,7 @@ async function bundle(files: Record<string, string>, entry: string): Promise<str
 describe('renderPageCode', () => {
   // TODO: pick this back up when appDom stabalizes more
   // eslint-disable-next-line mocha/no-skipped-tests
-  test.skip('Basic studio dom rendering Typography component', async () => {
+  test.skip('Basic Toolpad dom rendering Typography component', async () => {
     let dom = appDom.createDom();
     const root = appDom.getNode(dom, dom.root, 'app');
     const page = appDom.createNode(dom, 'page', {

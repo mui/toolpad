@@ -55,10 +55,19 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   rows?: GridRowsProp;
   columns?: GridColumns;
   dataQuery?: UseDataQuery;
+  selection: any;
+  onSelectionChange: (newSelection: any) => void;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
-  { dataQuery, columns: columnsProp, rows: rowsProp, ...props }: ToolpadDataGridProps,
+  {
+    dataQuery,
+    columns: columnsProp,
+    rows: rowsProp,
+    selection,
+    onSelectionChange,
+    ...props
+  }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const nodeRuntime = useNode<ToolpadDataGridProps>();
@@ -135,6 +144,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
         columns={columns}
+        onSelectionModelChange={(ids) =>
+          onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null)
+        }
+        selectionModel={selection ? [selection.id] : []}
         {...dataQueryRest}
         {...props}
       />

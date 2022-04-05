@@ -874,7 +874,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         onLoad={handleLoad}
       />
       <EditorOverlay key={overlayKey} window={editorWindowRef.current}>
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <OverlayRoot
           className={clsx({
             [overlayClasses.componentDragging]: highlightLayout,

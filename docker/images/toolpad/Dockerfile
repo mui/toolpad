@@ -1,13 +1,17 @@
 FROM node:16 as base
 
-ARG VERSION
-LABEL version=$VERSION
+ARG GIT_SHA1
+ENV GIT_SHA1=$GIT_SHA1
+LABEL com.mui.toolpad.git-sha1=$GIT_SHA1
 
-RUN \
-# Check for mandatory build arguments
-    : "${VERSION:?Build argument needs to be set and non-empty.}" \
+ARG GITHUB_PR_NUMBER
+ENV GITHUB_PR_NUMBER=$GITHUB_PR_NUMBER
+LABEL com.mui.toolpad.github-pr-number=$GITHUB_PR_NUMBER
 
-RUN mkdir /app
+ARG CIRCLE_BUILD_NUM
+ENV CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM
+LABEL com.mui.toolpad.circle-build-number=$CIRCLE_BUILD_NUM
+
 WORKDIR /app
 
 

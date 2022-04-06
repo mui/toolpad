@@ -18,8 +18,6 @@ async function build(): Promise<void> {
       'build',
       '-t',
       `${DOCKER_IMAGE_NAME}:${version}`,
-      '--build-arg',
-      `VERSION=${version}`,
       '-f',
       './docker/images/toolpad/Dockerfile',
       '.',

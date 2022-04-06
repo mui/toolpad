@@ -105,7 +105,9 @@ jobs:
           docker build 
             -t muicom/toolpad:$CIRCLE_SHA1
             -t muicom/toolpad:pr-$CIRCLE_PR_NUMBER
-            --build-arg VERSION=$CIRCLE_SHA1
+            --build-arg GIT_SHA1=$CIRCLE_SHA1
+            --build-arg GITHUB_PR_NUMBER=$CIRCLE_PR_NUMBER
+            --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM
             -f ./docker/images/toolpad/Dockerfile
             .
 

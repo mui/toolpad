@@ -15,7 +15,21 @@ import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 
-const prisma = new PrismaClient();
+function getPrismaClient(): PrismaClient {
+  if (process.env.NODE_ENV === 'production') {
+    return new PrismaClient();
+  }
+
+  // avoid Next.js dev server from creating too many prisma clients
+  // See https://github.com/prisma/prisma/issues/1983
+  if (!(globalThis as any).prisma) {
+    (globalThis as any).prisma = new PrismaClient();
+  }
+
+  return (globalThis as any).prisma;
+}
+
+const prisma = getPrismaClient();
 
 export async function getApps() {
   return prisma.app.findMany();

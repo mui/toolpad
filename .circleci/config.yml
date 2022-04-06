@@ -104,14 +104,14 @@ jobs:
           echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
 
       # build the application image
-      - run: >-
-          docker build 
-            -t muicom/toolpad:$CIRCLE_SHA1
-            -t muicom/toolpad:pr-$CIRCLE_PR_NUMBER
-            --build-arg GIT_SHA1=$CIRCLE_SHA1
-            --build-arg GITHUB_PR_NUMBER=$CIRCLE_PR_NUMBER
-            --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM
-            -f ./docker/images/toolpad/Dockerfile
+      - run: |
+          docker build \
+            -t muicom/toolpad:$CIRCLE_SHA1 \
+            -t muicom/toolpad:pr-$CIRCLE_PR_NUMBER \
+            --build-arg GIT_SHA1=$CIRCLE_SHA1 \
+            --build-arg GITHUB_PR_NUMBER=$CIRCLE_PR_NUMBER \
+            --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
+            -f ./docker/images/toolpad/Dockerfile \
             .
 
       # deploy the image

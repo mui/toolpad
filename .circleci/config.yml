@@ -92,6 +92,8 @@ jobs:
   docker:
     docker:
       - image: cimg/go:1.17
+    environment:
+      - DOCKER_BUILDKIT: '1'
     steps:
       - checkout
 

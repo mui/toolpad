@@ -92,13 +92,13 @@ jobs:
     steps:
       - checkout
 
-      - setup_remote_docker
+      - setup_remote_docker:
           version: 20.10.12
           docker_layer_caching: true
 
       # login docker hub
       - run: |
-         echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+          echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
 
       # build the application image
       - run: >-

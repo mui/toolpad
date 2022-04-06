@@ -1,4 +1,4 @@
-import { DomNodeAttributeType, PrismaClient, Release } from '../../prisma/generated/client';
+import { App, DomNodeAttributeType, PrismaClient, Release } from '../../prisma/generated/client';
 import {
   LegacyConnection,
   ConnectionStatus,
@@ -30,27 +30,6 @@ function getPrismaClient(): PrismaClient {
 }
 
 const prisma = getPrismaClient();
-
-export async function getApps() {
-  return prisma.app.findMany();
-}
-
-export async function createApp(name: string) {
-  return prisma.$transaction(async () => {
-    const app = await prisma.app.create({
-      data: { name },
-    });
-
-    const dom = appDom.createDom();
-    await saveDom(app.id, dom);
-  });
-}
-
-export async function deleteApp(id: string) {
-  return prisma.app.delete({
-    where: { id },
-  });
-}
 
 function serializeValue(value: unknown, type: DomNodeAttributeType): string {
   const serialized = value === undefined ? '' : JSON.stringify(value);
@@ -138,6 +117,29 @@ export async function loadDom(appId: string): Promise<appDom.AppDom> {
     root,
     nodes,
   };
+}
+
+export async function getApps() {
+  return prisma.app.findMany();
+}
+
+export async function createApp(name: string): Promise<App> {
+  return prisma.$transaction(async () => {
+    const app = await prisma.app.create({
+      data: { name },
+    });
+
+    const dom = appDom.createDom();
+    await saveDom(app.id, dom);
+
+    return app;
+  });
+}
+
+export async function deleteApp(id: string) {
+  return prisma.app.delete({
+    where: { id },
+  });
 }
 
 interface CreateReleaseParams {

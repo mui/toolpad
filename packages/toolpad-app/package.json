@@ -14,7 +14,6 @@
     "build:next": "next build",
     "build:esbuild": "rimraf ./public/sandbox ./public/editorRuntime && esbuild ./sandbox/index.ts ./editorRuntime/index.ts --target=es6 --bundle --outdir=./public",
     "build:types": "ts-node ./scripts/typings.ts",
-    "build:prisma": "prisma generate",
     "dev:next": "node ./server.js",
     "dev:esbuild": "yarn build:esbuild --watch",
     "dev:types": "yarn build:types",

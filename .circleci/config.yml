@@ -90,6 +90,7 @@ jobs:
           command: yarn test
 
   docker:
+    # TODO: Caching https://testdriven.io/blog/faster-ci-builds-with-docker-cache/
     working_directory: /tmp/mui-toolpad
     resource_class: medium
     docker:
@@ -112,9 +113,7 @@ jobs:
           docker build \
             --progress plain \
             -t muicom/toolpad:$CIRCLE_SHA1 \
-            -t muicom/toolpad:pr-$CIRCLE_PR_NUMBER \
             --build-arg GIT_SHA1=$CIRCLE_SHA1 \
-            --build-arg GITHUB_PR_NUMBER=$CIRCLE_PR_NUMBER \
             --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
             -f ./docker/images/toolpad/Dockerfile \
             .
@@ -122,7 +121,6 @@ jobs:
       # deploy the image
       - run: |
           docker push muicom/toolpad:$CIRCLE_SHA1
-          docker push muicom/toolpad:pr-$CIRCLE_PR_NUMBER
 
 workflows:
   version: 2

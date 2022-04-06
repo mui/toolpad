@@ -43,7 +43,6 @@
     "@types/semver": "^7.3.9",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
-    "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-config-prettier": "^8.3.0",
@@ -71,5 +70,8 @@
   },
   "resolutions": {
     "eslint-plugin-react": "7.29.1"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3"
   }
 }

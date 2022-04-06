@@ -1,23 +1,16 @@
 import { execa } from 'execa';
-import semver from 'semver';
-import { readFile } from 'fs/promises';
-import { fileURLToPath } from 'url';
-import * as path from 'path';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 const DOCKER_IMAGE_NAME = 'muicom/toolpad';
-const lernaJsonPath = path.resolve(fileURLToPath(import.meta.url), '../../../lerna.json');
 
-async function getVersion() {
-  const { version } = JSON.parse(await readFile(lernaJsonPath, 'utf-8'));
-  const prerelease = semver.prerelease(version);
-  const distTag = prerelease ? 'alpha' : 'latest';
-  return { version, distTag };
+async function getVersion(): Promise<string> {
+  const result = await execa('git', ['rev-parse', 'HEAD']);
+  return result.stdout;
 }
 
-async function build() {
-  const { version, distTag } = await getVersion();
+async function build(): Promise<void> {
+  const version = await getVersion();
 
   await execa(
     'docker',
@@ -25,12 +18,10 @@ async function build() {
       'build',
       '-t',
       `${DOCKER_IMAGE_NAME}:${version}`,
-      '-t',
-      `${DOCKER_IMAGE_NAME}:${distTag}`,
       '--build-arg',
       `VERSION=${version}`,
       '-f',
-      './docker/images/toolpad2/Dockerfile',
+      './docker/images/toolpad/Dockerfile',
       '.',
     ],
     {
@@ -39,27 +30,26 @@ async function build() {
   );
 }
 
-async function push(tag: string) {
+async function push(tag: string): Promise<void> {
   await execa('docker', ['push', `${DOCKER_IMAGE_NAME}:${tag}`], {
     stdio: 'inherit',
   });
 }
 
 async function publish() {
-  const { version, distTag } = await getVersion();
+  const version = await getVersion();
   await push(version);
-  await push(distTag);
 }
 
 yargs(hideBin(process.argv))
   .command({
     command: 'build',
-    description: 'build Toolpad docker image',
+    describe: 'build Toolpad docker image',
     handler: build,
   })
   .command({
     command: 'publish',
-    description: 'publish Toolpad docker image',
+    describe: 'publish Toolpad docker image',
     handler: publish,
   })
   .help()

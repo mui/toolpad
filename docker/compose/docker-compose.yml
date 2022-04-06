@@ -2,9 +2,9 @@ version: '3.7'
 
 services:
   toolpad:
-    image: muicom/toolpad:alpha
+    image: muicom/toolpad:50cb14b030099d0bcdee0fb1c82d85fe72c99fe1
     environment:
-      - TOOLPAD_DATABASE_URL=postgresql://toolpad-app:secretpw@postgres:5432/postgres?connect_timeout=10
+      - TOOLPAD_DATABASE_URL=postgresql://postgres:secretpw@postgres:5432/postgres?connect_timeout=10
     ports:
       - '3000:3000'
 
@@ -12,7 +12,7 @@ services:
     image: postgres:14.2
     restart: always
     environment:
-      - POSTGRES_USER=toolpad-app
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=secretpw
     logging:
       options:

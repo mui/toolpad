@@ -65,6 +65,7 @@
     "next": "^12.1.4",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.6.2",
+    "prisma": "^3.12.0",
     "quickjs-emscripten": "^0.20.0",
     "react": "^18.0.0",
     "react-devtools-inline": "^4.24.3",
@@ -88,8 +89,7 @@
     "eslint-config-next": "^12.0.3",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
-    "glob": "^7.2.0",
-    "prisma": "^3.11.1"
+    "glob": "^7.2.0"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

@@ -122,7 +122,7 @@ jobs:
       # deploy the image
       - run: |
           docker push muicom/toolpad:$CIRCLE_SHA1
-          docker push muicom/toolpad:$CIRCLE_PR_NUMBER
+          docker push muicom/toolpad:pr-$CIRCLE_PR_NUMBER
 
 workflows:
   version: 2

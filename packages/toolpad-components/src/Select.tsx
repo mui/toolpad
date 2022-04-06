@@ -21,7 +21,7 @@ export interface SelectProps extends MuiSelectProps {
 export default function Select({ sx, label, options, ...props }: SelectProps) {
   const labelId = React.useId();
   return (
-    <FormControl size="small" sx={sx}>
+    <FormControl size="small" sx={{ minWidth: 120, ...sx }}>
       <InputLabel id={labelId}>{label}</InputLabel>
       <MuiSelect labelId={labelId} label={label} {...props}>
         {options.map((option) => (

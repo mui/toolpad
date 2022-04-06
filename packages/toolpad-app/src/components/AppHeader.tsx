@@ -1,39 +1,27 @@
 import * as React from 'react';
-import MenuIcon from '@mui/icons-material/Menu';
-import { AppBar, Toolbar, IconButton, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Button } from '@mui/material';
+import { Link } from 'react-router-dom';
+import Header from './Header';
 
-export interface AppBarProps {
-  navigation: React.ReactNode;
+export interface HeaderProps {
+  appId: string;
   actions: React.ReactNode;
 }
 
-export default function AppHeader({ actions, navigation }: AppBarProps) {
+export default function AppHeader({ appId, actions }: HeaderProps) {
   return (
-    <AppBar
-      position="static"
-      color="default"
-      elevation={0}
-      sx={{ zIndex: 2, borderBottom: 1, borderColor: 'divider' }}
-    >
-      <Toolbar variant="dense">
-        <IconButton
-          edge="start"
-          color="inherit"
-          aria-label="Home"
-          sx={{ mr: 2 }}
-          component="a"
-          href={`/`}
-        >
-          <MenuIcon />
-        </IconButton>
-        <Typography variant="h6" color="inherit" component="div" sx={{ mr: 2 }}>
-          MUI Toolpad
-        </Typography>
-        {navigation}
-        <Box flex={1} />
-        {actions}
-      </Toolbar>
-    </AppBar>
+    <Header
+      navigation={
+        <React.Fragment>
+          <Button component={Link} to={`/app/${appId}/editor`} color="inherit">
+            Editor
+          </Button>
+          <Button component={Link} to={`/app/${appId}/releases`} color="inherit">
+            Releases
+          </Button>
+        </React.Fragment>
+      }
+      actions={actions}
+    />
   );
 }

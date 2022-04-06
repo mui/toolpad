@@ -72,7 +72,8 @@ export default function Releases() {
         field: 'createdAt',
         headerName: 'Created',
         type: 'date',
-        valueGetter: (params: GridValueGetterParams<string, Date>) => new Date(params.value),
+        valueGetter: (params: GridValueGetterParams<string, Date>) =>
+          params.value ? new Date(params.value) : undefined,
       },
       {
         field: 'actions',

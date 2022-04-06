@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "Build MUI apps quickly",
-  "repository": "https://github.com/mui-org/mui-toolpad.git",
+  "repository": "https://github.com/mui/mui-toolpad.git",
   "private": true,
   "workspaces": {
     "packages": [
@@ -31,7 +31,7 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@mui/monorepo": "git+https://github.com/mui-org/material-ui.git#master",
+    "@mui/monorepo": "git+https://github.com/mui/material-ui.git#master",
     "@swc/core": "^1.2.163",
     "@swc/helpers": "^0.3.8",
     "@swc/jest": "^0.2.17",

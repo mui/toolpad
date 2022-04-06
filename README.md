@@ -1,130 +1,77 @@
-# MUI Toolpad
+<h1 align="center">MUI Toolpad</h1>
 
-## Running the docker container
+<div align="center">
+
+Quickly build internal tools. MUI Toolpad is a low-code internal tools builder build on top of [MUI](https://mui.com/). Aimed at developers of all trade who want to save time building internal applications.
+
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
+[![npm latest package](https://img.shields.io/npm/v/@mui/toolpad/latest.svg)](https://www.npmjs.com/package/@mui/toolpad)
+[![npm next package](https://img.shields.io/npm/v/@mui/toolpad/next.svg)](https://www.npmjs.com/package/@mui/toolpad@alpha)
+[![npm downloads](https://img.shields.io/npm/dm/@mui/toolpad.svg)](https://www.npmjs.com/package/@mui/toolpad)
+[![CircleCI](https://circleci.com/gh/mui/mui-toolpad/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/MUI_hq.svg?label=follow+MUI)](https://twitter.com/MUI_hq)
+[![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-toolpad/issues/8)
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/toolpad.svg)](https://isitmaintained.com/project/mui/mui-toolpad 'Average time to resolve an issue')
+[![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/mui)](https://opencollective.com/mui)
+
+</div>
+
+## Notice
+
+MUI Toolpad is in its alpha stages of development. Feel free to run this application for testing purposes, but keep in mind, in no way is it ready or suitable to run it in production. It's both lacking in features and stability.
+
+## Quick setup locally
+
+Check out the repository and run
 
 ```sh
 docker-compose -f docker/compose/docker-compose.yml up
 ```
 
-## Local development (TODO: let's move this to CONTRIBUTING.md)
+## documentation
 
-### Prerequisites:
+[The documentation](./docs)
 
-- git
-- yarn
-- node.js
-- docker
+## Contributing
 
-### Setting up your development environment:
+Read the [contributing guide](/CONTRIBUTING.md) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to MUI.
 
-1. Start a local database:
+Notice that contributions go far beyond pull requests and commits.
+Although we love giving you the opportunity to put your stamp on MUI, we also are thrilled to receive a variety of [other contributions](https://mui.com/getting-started/faq/#mui-is-awesome-how-can-i-support-the-project).
 
-   ```sh
-   docker-compose up -d
-   ```
+## Changelog
 
-   You can skip this step if you already have a development database available by other means. Use the following command to stop the running container:
+<!-- TODO -->
 
-   ```sh
-   docker-compose down
-   ```
+## Roadmap
 
-1. Install dependencies and start building the project in watch mode:
+<!-- TODO -->
 
-   ```sh
-   yarn install
-   yarn dev
-   ```
+## License
 
-1. Create a `.env` file in the root of the project
+This project is licensed under the terms of the
+[MIT license](/LICENSE).
 
-   ```sh
-   STUDIO_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
-   ```
+## Sponsoring services
 
-1. Now you can run the MUI Toolpad cli to start the application
+These great services sponsor MUI's core infrastructure:
 
-   ```sh
-   yarn cli
-   ```
+[<img loading="lazy" alt="GitHub" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" height="25">](https://github.com/)
 
-1. Open [`http://localhost:3000/`](http://localhost:3000/) in your browser.
+GitHub allows us to host the Git repository and coordinate contributions.
 
-### Notes:
+[<img loading="lazy" alt="Netlify" src="https://cdn.netlify.com/15ecf59b59c9d04b88097c6b5d2c7e8a7d1302d0/1b6d6/img/press/logos/full-logo-light.svg" height="30">](https://www.netlify.com/)
 
-- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn cli` command, or by running
+Netlify allows us to distribute the documentation.
 
-  ```sh
-  yarn prisma db push
-  ```
+[<img loading="lazy" alt="CrowdIn" src="https://support.crowdin.com/assets/logos/crowdin-logo1-small.png" height="30">](https://crowdin.com/)
 
-- In some cases, after the schema changes, the app may not start up and you may see the message:
+CrowdIn allows us to translate the documentation.
 
-  ```sh
-  ⚠️  There might be data loss when applying the changes:
-  ```
+[<img loading="lazy" alt="BrowserStack" src="https://www.browserstack.com/images/mail/browserstack-logo-footer.png" height="30">](https://www.browserstack.com/)
 
-  This means your database is out of sync with the prisma schema and can't be synchronized without data loss. You can synchronise the database manually using:
+BrowserStack allows us to test in real browsers.
 
-  ```sh
-  yarn prisma db push --accept-data-loss
-  ```
+[<img loading="lazy" alt="CodeCov" src="https://github.com/codecov.png?size=70" width="35" height="35">](https://codecov.io/)
 
-## Release process (TODO: move to separate internal doc)
-
-### release
-
-1. Build packages
-
-   ```sh
-   yarn release:build
-   ```
-
-1. Cut a new release
-
-   ```sh
-   yarn release:version <prerelease/patch/minor/major>
-   ```
-
-1. Publish release
-
-   ```sh
-   yarn release:publish
-   ```
-
-1. Build docker image
-
-   ```sh
-   yarn release:docker:build
-   ```
-
-1. Publish docker images. Make sure you are logged in to docker (`docker login`):
-
-   ```sh
-   yarn release:docker:publish
-   ```
-
-### Dryrun publish
-
-For testing purposes, it is possible to try out publishing
-
-1. Start local npm registry
-
-   ```sh
-   npx verdaccio
-   ```
-
-1. You may have to increase max allowed uploaded body size. To do so, locate your verdaccio config file and add:
-
-   ```yml
-   max_body_size: 100mb # Or whatever size is needed
-   ```
-
-1. Publish packages using the command
-
-   ```sh
-   yarn release:publish:dry-run
-   ```
-
-1. packages can be installed by appending `--registry=http://localhost:4873/` to `yarn`/`npm` commands, or by providing environment variable `npm_config_registry=http://localhost:4873/` (The latter seems to be needed for `npx`, as in `npm_config_registry=http://localhost:4873/ npx @mui/
-`)
+CodeCov allows us to monitor the test coverage.

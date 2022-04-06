@@ -12,7 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { useNavigate, useParams } from 'react-router-dom';
 import client from '../api';
-import StudioAppBar from './StudioAppBar';
+import AppHeader from './AppHeader';
 
 interface ReleaseRow {
   createdAt: Date;
@@ -72,7 +72,8 @@ export default function Releases() {
         field: 'createdAt',
         headerName: 'Created',
         type: 'date',
-        valueGetter: (params: GridValueGetterParams<string, Date>) => new Date(params.value),
+        valueGetter: (params: GridValueGetterParams<string, Date>) =>
+          params.value ? new Date(params.value) : undefined,
       },
       {
         field: 'actions',
@@ -96,7 +97,7 @@ export default function Releases() {
 
   return (
     <React.Fragment>
-      <StudioAppBar navigation={null} actions={null} />
+      <AppHeader appId={appId} actions={null} />
       <Container>
         <Typography variant="h2">Releases</Typography>
         <Box sx={{ my: 3, height: 350, width: '100%' }}>
@@ -104,6 +105,7 @@ export default function Releases() {
             rows={releases}
             columns={columns}
             density="compact"
+            getRowId={(row) => row.version}
             loading={isLoading || deleteReleaseMutation.isLoading}
             error={(error as any)?.message}
             onRowClick={({ row }) => navigate(`/app/${appId}/releases/${row.version}`)}

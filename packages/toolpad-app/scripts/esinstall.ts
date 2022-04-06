@@ -25,6 +25,7 @@ async function main() {
       'es-module-shims',
       'react',
       'react-dom',
+      'react-dom/client',
       'react-query',
       '@mui/toolpad-core',
       '@mui/toolpad-core/runtime',

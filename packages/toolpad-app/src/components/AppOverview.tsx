@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Box, Button, Card, CardActions, CardContent, Container, Typography } from '@mui/material';
-import * as studioDom from '../studioDom';
+import * as appDom from '../appDom';
 
 interface PageCardProps {
   appId: string;
-  page: studioDom.StudioPageNode;
+  page: appDom.PageNode;
 }
 
 function PageCard({ appId, page }: PageCardProps) {
@@ -29,12 +29,12 @@ function PageCard({ appId, page }: PageCardProps) {
 
 interface AppOverviewProps {
   appId: string;
-  dom: studioDom.StudioDom;
+  dom: appDom.AppDom;
 }
 
 export default function Deployment({ appId, dom }: AppOverviewProps) {
-  const app = dom ? studioDom.getApp(dom) : null;
-  const { pages = [] } = dom && app ? studioDom.getChildNodes(dom, app) : {};
+  const app = dom ? appDom.getApp(dom) : null;
+  const { pages = [] } = dom && app ? appDom.getChildNodes(dom, app) : {};
   return (
     <Container>
       <Typography variant="h2">Pages</Typography>

@@ -2,15 +2,14 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "./generated/client"
-  // TODO: we will need this when start building docker images
-  // binaryTargets = ["native", "linux-musl"]
+  provider        = "prisma-client-js"
+  output          = "./generated/client"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("STUDIO_DATABASE_URL")
+  url      = env("TOOLPAD_DATABASE_URL")
 }
 
 enum DomNodeType {

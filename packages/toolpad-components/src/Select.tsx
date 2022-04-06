@@ -1,3 +1,5 @@
+// TODO: Remove after https://github.com/DefinitelyTyped/DefinitelyTyped/pull/56210 lands
+/// <reference types="react/next" />
 import * as React from 'react';
 import {
   FormControl,
@@ -17,9 +19,7 @@ export interface SelectProps extends MuiSelectProps {
 }
 
 export default function Select({ sx, label, options, ...props }: SelectProps) {
-  // TODO: generate a unique id
-  //       https://github.com/reactwg/react-18/discussions/111
-  const labelId = 'my-select';
+  const labelId = React.useId();
   return (
     <FormControl size="small" sx={sx}>
       <InputLabel id={labelId}>{label}</InputLabel>

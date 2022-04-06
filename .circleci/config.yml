@@ -52,7 +52,7 @@ commands:
           key: v8-yarn-{{ checksum "yarn.lock" }}
           paths:
             # Keep path in sync with "Set yarn cache folder"
-            # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui-org/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
+            # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
             - /tmp/yarn-cache
 
 jobs:
@@ -78,11 +78,23 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
+  test_unit:
+    <<: *defaults
+    steps:
+      - checkout
+      - install_js
+      - run:
+          name: Tests fake browser
+          command: yarn test
+
 workflows:
   version: 2
   pipeline:
     jobs:
       - checkout
       - test_static:
+          requires:
+            - checkout
+      - test_unit:
           requires:
             - checkout

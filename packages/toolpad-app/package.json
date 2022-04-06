@@ -61,7 +61,6 @@
     "googleapis": "^97.0.0",
     "import-meta-resolve": "^1.1.1",
     "json-to-ts": "^1.7.0",
-    "monaco-editor": "^0.33.0",
     "next": "^12.1.4",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.6.2",
@@ -89,7 +88,8 @@
     "eslint-config-next": "^12.0.3",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
-    "glob": "^7.2.0"
+    "glob": "^7.2.0",
+    "monaco-editor": "^0.33.0"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

@@ -67,6 +67,7 @@ jobs:
       - run:
           name: Check for duplicated packages
           command: yarn deduplicate
+
   test_static:
     <<: *defaults
     steps:
@@ -78,6 +79,7 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
+
   test_unit:
     <<: *defaults
     steps:
@@ -86,6 +88,7 @@ jobs:
       - run:
           name: Tests fake browser
           command: yarn test
+
   docker:
     docker:
       - image: cimg/go:1.17
@@ -127,6 +130,4 @@ workflows:
       - test_unit:
           requires:
             - checkout
-      - docker:
-          requires:
-            - checkout
+      - docker

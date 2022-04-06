@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
 import AppHeader from '../AppHeader';
@@ -169,16 +169,7 @@ function EditorContent({ appId }: EditorContentProps) {
   return (
     <EditorRoot>
       <AppHeader
-        navigation={
-          <React.Fragment>
-            <Button component={Link} to={`/app/${appId}/editor`} color="inherit">
-              Editor
-            </Button>
-            <Button component={Link} to={`/app/${appId}/releases`} color="inherit">
-              Releases
-            </Button>
-          </React.Fragment>
-        }
+        appId={appId}
         actions={
           <React.Fragment>
             {domLoader.saving ? (

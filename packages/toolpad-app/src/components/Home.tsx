@@ -20,7 +20,7 @@ import { Box } from '@mui/system';
 import client from '../api';
 import DialogForm from './DialogForm';
 import { App } from '../../prisma/generated/client';
-import AppHeader from './AppHeader';
+import Header from './Header';
 import useLatest from '../utils/useLatest';
 
 export interface CreateAppDialogProps {
@@ -153,7 +153,7 @@ export default function Home() {
   return (
     <React.Fragment>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      <AppHeader navigation={null} actions={null} />
+      <Header navigation={null} actions={null} />
       <Container>
         <Typography variant="h2">Apps</Typography>
         <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />

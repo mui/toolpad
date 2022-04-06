@@ -97,7 +97,7 @@ export default function Releases() {
 
   return (
     <React.Fragment>
-      <AppHeader navigation={null} actions={null} />
+      <AppHeader appId={appId} actions={null} />
       <Container>
         <Typography variant="h2">Releases</Typography>
         <Box sx={{ my: 3, height: 350, width: '100%' }}>

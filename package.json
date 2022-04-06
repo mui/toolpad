@@ -31,7 +31,7 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@mui/monorepo": "git+https://github.com/mui-org/material-ui.git#master",
+    "@mui/monorepo": "git+https://github.com/mui/material-ui.git#master",
     "@swc/core": "^1.2.163",
     "@swc/helpers": "^0.3.8",
     "@swc/jest": "^0.2.17",

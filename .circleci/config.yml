@@ -86,6 +86,33 @@ jobs:
       - run:
           name: Tests fake browser
           command: yarn test
+  docker:
+    docker:
+      - image: cimg/go:1.17
+    steps:
+      - checkout
+
+      - setup_remote_docker
+          version: 20.10.12
+          docker_layer_caching: true
+
+      # login docker hub
+      - run: |
+         echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+
+      # build the application image
+      - run: >-
+          docker build 
+            -t muicom/toolpad:$CIRCLE_SHA1
+            -t muicom/toolpad:pr-$CIRCLE_PR_NUMBER
+            --build-arg VERSION=$CIRCLE_SHA1
+            -f ./docker/images/toolpad/Dockerfile
+            .
+
+      # deploy the image
+      - run: |
+          docker push muicom/toolpad:$CIRCLE_SHA1
+          docker push muicom/toolpad:$CIRCLE_PR_NUMBER
 
 workflows:
   version: 2
@@ -96,5 +123,8 @@ workflows:
           requires:
             - checkout
       - test_unit:
+          requires:
+            - checkout
+      - docker:
           requires:
             - checkout

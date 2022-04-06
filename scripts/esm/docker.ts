@@ -29,7 +29,9 @@ async function build() {
       `${DOCKER_IMAGE_NAME}:${distTag}`,
       '--build-arg',
       `VERSION=${version}`,
-      './docker/images/toolpad',
+      '-f',
+      './docker/images/toolpad2/Dockerfile',
+      '.',
     ],
     {
       stdio: 'inherit',

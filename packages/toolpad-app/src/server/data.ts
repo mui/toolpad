@@ -36,8 +36,13 @@ export async function getApps() {
 }
 
 export async function createApp(name: string) {
-  return prisma.app.create({
-    data: { name },
+  return prisma.$transaction(async () => {
+    const app = await prisma.app.create({
+      data: { name },
+    });
+
+    const dom = appDom.createDom();
+    await saveDom(app.id, dom);
   });
 }
 
@@ -98,11 +103,7 @@ export async function loadDom(appId: string): Promise<appDom.AppDom> {
     where: { appId },
     include: { attributes: true },
   });
-  if (dbNodes.length <= 0) {
-    const dom = appDom.createDom();
-    await saveDom(appId, dom);
-    return dom;
-  }
+
   const root = dbNodes.find((node) => !node.parentId)?.id as NodeId;
   const nodes = Object.fromEntries(
     dbNodes.map((node): [NodeId, appDom.AppDomNode] => {

@@ -13,10 +13,10 @@ import {
   TextField,
   Toolbar,
   Typography,
+  Box,
 } from '@mui/material';
 import * as React from 'react';
 import { LoadingButton } from '@mui/lab';
-import { Box } from '@mui/system';
 import client from '../api';
 import DialogForm from './DialogForm';
 import { App } from '../../prisma/generated/client';

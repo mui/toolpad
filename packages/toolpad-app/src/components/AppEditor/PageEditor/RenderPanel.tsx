@@ -1,10 +1,9 @@
-import { styled } from '@mui/system';
 import * as React from 'react';
 import clsx from 'clsx';
 import throttle from 'lodash/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { IconButton } from '@mui/material';
+import { IconButton, styled } from '@mui/material';
 import { RuntimeEvent, SlotType } from '@mui/toolpad-core';
 import {
   NodeId,

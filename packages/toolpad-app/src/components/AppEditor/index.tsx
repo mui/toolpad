@@ -1,6 +1,6 @@
-import { styled } from '@mui/system';
 import * as React from 'react';
 import {
+  styled,
   Alert,
   Box,
   Button,

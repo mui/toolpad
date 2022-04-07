@@ -1,5 +1,4 @@
-import { Container, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Container, Typography, Box } from '@mui/material';
 import {
   DataGridPro,
   GridActionsCellItem,

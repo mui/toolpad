@@ -152,10 +152,18 @@ const SELECT_RELEASE_META = {
   createdAt: true,
 } as const;
 
-export function findLastRelease(appId: string) {
+async function findLastReleaseInternal(appId: string) {
   return prisma.release.findFirst({
     where: { appId },
     orderBy: { version: 'desc' },
+  });
+}
+
+export async function findLastRelease(appId: string) {
+  return prisma.release.findFirst({
+    where: { appId },
+    orderBy: { version: 'desc' },
+    select: SELECT_RELEASE_META,
   });
 }
 
@@ -166,7 +174,7 @@ export async function createRelease(
   const currentDom = await loadDom(appId);
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
 
-  const lastRelease = await findLastRelease(appId);
+  const lastRelease = await findLastReleaseInternal(appId);
   const versionNumber = lastRelease ? lastRelease.version + 1 : 1;
 
   const release = await prisma.release.create({

@@ -88,17 +88,11 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
    yarn release:publish
    ```
 
-1. Build docker image
+### Releasing Docker images
 
-   ```sh
-   yarn release:docker:build
-   ```
+CI builds and pushes an image per commit. We can tag some of these images with a version number using the method of https://stackoverflow.com/a/70526615
 
-1. Publish docker images. Make sure you are logged in to docker (`docker login`):
-
-   ```sh
-   yarn release:docker:publish
-   ```
+<!-- TODO: create CLI for this workflow -->
 
 ### Dryrun publish
 

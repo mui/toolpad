@@ -18,7 +18,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import { useForm } from 'react-hook-form';
-import AppHeader from '../AppHeader';
+import ToolpadAppShell from '../ToolpadAppShell';
 import PageEditor from './PageEditor';
 import PagePanel from './PagePanel';
 import DomProvider, { useDomLoader } from '../DomLoader';
@@ -35,8 +35,7 @@ const classes = {
 };
 
 const EditorRoot = styled('div')(({ theme }) => ({
-  height: '100vh',
-  flex: 1,
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
@@ -167,48 +166,49 @@ function EditorContent({ appId }: EditorContentProps) {
   const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
 
   return (
-    <EditorRoot>
-      <AppHeader
-        appId={appId}
-        actions={
-          <React.Fragment>
-            {domLoader.saving ? (
-              <Box display="flex" flexDirection="row" alignItems="center">
-                <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
-              </Box>
-            ) : null}
-            <Typography>{domLoader.unsavedChanges} unsaved change(s).</Typography>
-            <IconButton
-              aria-label="Create release"
-              color="inherit"
-              sx={{ ml: 1 }}
-              onClick={() => setCreateReleaseDialogOpen(true)}
-            >
-              <RocketLaunchIcon />
-            </IconButton>
-          </React.Fragment>
-        }
-      />
-      {domLoader.dom ? (
-        <div className={classes.content}>
-          <PagePanel className={classes.hierarchyPanel} appId={appId} />
-          <FileEditor className={classes.editorPanel} appId={appId} />
-        </div>
-      ) : (
-        <Box flex={1} display="flex" alignItems="center" justifyContent="center">
-          {domLoader.error ? (
-            <Alert severity="error">{domLoader.error}</Alert>
-          ) : (
-            <CircularProgress />
-          )}
-        </Box>
-      )}
-      <CreateReleaseDialog
-        appId={appId}
-        open={createReleaseDialogOpen}
-        onClose={() => setCreateReleaseDialogOpen(false)}
-      />
-    </EditorRoot>
+    <ToolpadAppShell
+      appId={appId}
+      actions={
+        <React.Fragment>
+          {domLoader.saving ? (
+            <Box display="flex" flexDirection="row" alignItems="center">
+              <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
+            </Box>
+          ) : null}
+          <Typography>{domLoader.unsavedChanges} unsaved change(s).</Typography>
+          <IconButton
+            aria-label="Create release"
+            color="inherit"
+            sx={{ ml: 1 }}
+            onClick={() => setCreateReleaseDialogOpen(true)}
+          >
+            <RocketLaunchIcon />
+          </IconButton>
+        </React.Fragment>
+      }
+    >
+      <EditorRoot>
+        {domLoader.dom ? (
+          <div className={classes.content}>
+            <PagePanel className={classes.hierarchyPanel} appId={appId} />
+            <FileEditor className={classes.editorPanel} appId={appId} />
+          </div>
+        ) : (
+          <Box flex={1} display="flex" alignItems="center" justifyContent="center">
+            {domLoader.error ? (
+              <Alert severity="error">{domLoader.error}</Alert>
+            ) : (
+              <CircularProgress />
+            )}
+          </Box>
+        )}
+        <CreateReleaseDialog
+          appId={appId}
+          open={createReleaseDialogOpen}
+          onClose={() => setCreateReleaseDialogOpen(false)}
+        />
+      </EditorRoot>
+    </ToolpadAppShell>
   );
 }
 export default function Editor() {

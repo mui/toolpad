@@ -32,7 +32,7 @@ interface AppOverviewProps {
   dom: appDom.AppDom;
 }
 
-export default function Deployment({ appId, dom }: AppOverviewProps) {
+export default function AppOverview({ appId, dom }: AppOverviewProps) {
   const app = dom ? appDom.getApp(dom) : null;
   const { pages = [] } = dom && app ? appDom.getChildNodes(dom, app) : {};
   return (

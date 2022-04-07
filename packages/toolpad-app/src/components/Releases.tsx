@@ -12,7 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { useNavigate, useParams } from 'react-router-dom';
 import client from '../api';
-import AppHeader from './AppHeader';
+import ToolpadAppShell from './ToolpadAppShell';
 
 interface ReleaseRow {
   createdAt: Date;
@@ -96,8 +96,7 @@ export default function Releases() {
   );
 
   return (
-    <React.Fragment>
-      <AppHeader appId={appId} actions={null} />
+    <ToolpadAppShell appId={appId}>
       <Container>
         <Typography variant="h2">Releases</Typography>
         <Box sx={{ my: 3, height: 350, width: '100%' }}>
@@ -112,6 +111,6 @@ export default function Releases() {
           />
         </Box>
       </Container>
-    </React.Fragment>
+    </ToolpadAppShell>
   );
 }

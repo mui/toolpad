@@ -1,16 +1,17 @@
 import * as React from 'react';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import Header from './Header';
+import ToolpadShell from './ToolpadShell';
 
-export interface HeaderProps {
+export interface ToolpadAppShellProps {
   appId: string;
-  actions: React.ReactNode;
+  actions?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-export default function AppHeader({ appId, actions }: HeaderProps) {
+export default function ToolpadAppShell({ appId, ...props }: ToolpadAppShellProps) {
   return (
-    <Header
+    <ToolpadShell
       navigation={
         <React.Fragment>
           <Button component={Link} to={`/app/${appId}/editor`} color="inherit">
@@ -21,7 +22,7 @@ export default function AppHeader({ appId, actions }: HeaderProps) {
           </Button>
         </React.Fragment>
       }
-      actions={actions}
+      {...props}
     />
   );
 }

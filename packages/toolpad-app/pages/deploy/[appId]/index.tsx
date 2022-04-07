@@ -1,11 +1,11 @@
 import type { NextPage } from 'next';
 import * as React from 'react';
 import { useRouter } from 'next/router';
-import { CircularProgress, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { asArray } from '../../../src/utils/collections';
 import client from '../../../src/api';
 import AppOverview from '../../../src/components/AppOverview';
-import ToolpadAppViewport from '../../../src/ToolpadAppViewport';
+import ToolpadShell from '../../../src/components/ToolpadShell';
 
 interface PreviewProps {
   appId: string;
@@ -39,18 +39,24 @@ const Deploy: NextPage = () => {
 
   if (!appId || isLoading) {
     return (
-      <ToolpadAppViewport flex={1} display="flex" alignItems="center" justifyContent="center">
-        <CircularProgress />
-      </ToolpadAppViewport>
+      <ToolpadShell>
+        <Box flex={1} display="flex" alignItems="center" justifyContent="center" height="100%">
+          <CircularProgress />
+        </Box>
+      </ToolpadShell>
     );
   }
 
   return activeDeployment ? (
-    <Deployment appId={appId} version={activeDeployment.release.version} />
+    <ToolpadShell>
+      <Deployment appId={appId} version={activeDeployment.release.version} />
+    </ToolpadShell>
   ) : (
-    <ToolpadAppViewport flex={1} display="flex" alignItems="center" justifyContent="center">
-      <Typography>Not deployed yet (TODO: show instructions here)</Typography>
-    </ToolpadAppViewport>
+    <ToolpadShell>
+      <Box flex={1} display="flex" alignItems="center" justifyContent="center" height="100%">
+        <Typography>Not deployed yet (TODO: show instructions here)</Typography>
+      </Box>
+    </ToolpadShell>
   );
 };
 

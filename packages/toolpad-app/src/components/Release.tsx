@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 import client from '../api';
 import * as appDom from '../appDom';
 import { NodeId } from '../types';
-import AppHeader from './AppHeader';
+import ToolpadAppShell from './ToolpadAppShell';
 
 interface NavigateToReleaseActionProps {
   appId: string;
@@ -78,8 +78,7 @@ export default function Release() {
     deployReleaseMutation.isIdle && activeDeploymentQuery.isSuccess && !isActiveDeployment;
 
   return (
-    <React.Fragment>
-      <AppHeader appId={appId} actions={null} />
+    <ToolpadAppShell appId={appId}>
       <Container>
         <Typography variant="h2">Release &quot;{version}&quot;</Typography>
         <Box>{releaseQuery?.data?.description}</Box>
@@ -105,6 +104,6 @@ export default function Release() {
           />
         </Box>
       </Container>
-    </React.Fragment>
+    </ToolpadAppShell>
   );
 }

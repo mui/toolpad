@@ -67,6 +67,7 @@ jobs:
       - run:
           name: Check for duplicated packages
           command: yarn deduplicate
+
   test_static:
     <<: *defaults
     steps:
@@ -78,6 +79,7 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
+
   test_unit:
     <<: *defaults
     steps:
@@ -86,6 +88,46 @@ jobs:
       - run:
           name: Tests fake browser
           command: yarn test
+
+  docker:
+    working_directory: /tmp/mui-toolpad
+    resource_class: medium
+    docker:
+      - image: cimg/go:1.17
+    environment:
+      - DOCKER_BUILDKIT: '1'
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          version: 20.10.12
+          docker_layer_caching: true
+
+      # login docker hub
+      - run: |
+          echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+
+      # build the application image
+      - run: |
+          docker build \
+            --progress plain \
+            -t muicom/toolpad:$CIRCLE_SHA1 \
+            --build-arg GIT_SHA1=$CIRCLE_SHA1 \
+            --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
+            -f ./docker/images/toolpad/Dockerfile \
+            .
+
+      # deploy the image
+      - run: |
+          docker push muicom/toolpad:$CIRCLE_SHA1
+
+      - when:
+          condition:
+            equal: [master, << pipeline.git.branch >>]
+          steps:
+            - run: |
+                docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha
+                docker push muicom/toolpad:alpha
 
 workflows:
   version: 2
@@ -98,3 +140,4 @@ workflows:
       - test_unit:
           requires:
             - checkout
+      - docker

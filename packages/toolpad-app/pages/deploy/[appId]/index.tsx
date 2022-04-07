@@ -1,10 +1,11 @@
 import type { NextPage } from 'next';
 import * as React from 'react';
 import { useRouter } from 'next/router';
-import { Container, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { asArray } from '../../../src/utils/collections';
 import client from '../../../src/api';
 import AppOverview from '../../../src/components/AppOverview';
+import ToolpadShell from '../../../src/components/ToolpadShell';
 
 interface PreviewProps {
   appId: string;
@@ -36,14 +37,26 @@ const Deploy: NextPage = () => {
     appId ? [appId] : null,
   );
 
-  return appId && activeDeployment ? (
-    <Deployment appId={appId} version={activeDeployment.release.version} />
+  if (!appId || isLoading) {
+    return (
+      <ToolpadShell>
+        <Box flex={1} display="flex" alignItems="center" justifyContent="center" height="100%">
+          <CircularProgress />
+        </Box>
+      </ToolpadShell>
+    );
+  }
+
+  return activeDeployment ? (
+    <ToolpadShell>
+      <Deployment appId={appId} version={activeDeployment.release.version} />
+    </ToolpadShell>
   ) : (
-    <Container sx={{ my: 5 }}>
-      <Typography>
-        {isLoading ? 'Loading...' : 'Not deployed yet (TODO: show instructions here)'}
-      </Typography>
-    </Container>
+    <ToolpadShell>
+      <Box flex={1} display="flex" alignItems="center" justifyContent="center" height="100%">
+        <Typography>Not deployed yet (TODO: show instructions here)</Typography>
+      </Box>
+    </ToolpadShell>
   );
 };
 

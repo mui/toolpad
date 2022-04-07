@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled } from '@mui/system';
+import { styled } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';

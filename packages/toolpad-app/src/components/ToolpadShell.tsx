@@ -1,14 +1,31 @@
 import * as React from 'react';
+import { styled, AppBar, Toolbar, IconButton, Typography, Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { AppBar, Toolbar, IconButton, Typography } from '@mui/material';
-import { Box } from '@mui/system';
 
-export interface HeaderProps {
-  navigation: React.ReactNode;
-  actions: React.ReactNode;
+export interface ToolpadShellProps {
+  navigation?: React.ReactNode;
+  actions?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-export default function Header({ actions, navigation }: HeaderProps) {
+const ToolpadShellRoot = styled('div')({
+  width: '100vw',
+  height: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+const ViewPort = styled('div')({
+  flex: 1,
+  overflow: 'auto',
+});
+
+export interface HeaderProps {
+  navigation?: React.ReactNode;
+  actions?: React.ReactNode;
+}
+
+function Header({ actions, navigation }: HeaderProps) {
   return (
     <AppBar
       position="static"
@@ -35,5 +52,14 @@ export default function Header({ actions, navigation }: HeaderProps) {
         {actions}
       </Toolbar>
     </AppBar>
+  );
+}
+
+export default function ToolpadShell({ children, ...props }: ToolpadShellProps) {
+  return (
+    <ToolpadShellRoot>
+      <Header {...props} />
+      <ViewPort>{children}</ViewPort>
+    </ToolpadShellRoot>
   );
 }

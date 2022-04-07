@@ -183,7 +183,7 @@ async function handler(
           });
         }
         return res.redirect(
-          `/_studio/app/${encodeURIComponent(appId)}/editor/connections/${encodeURIComponent(
+          `/_toolpad/app/${encodeURIComponent(appId)}/editor/connections/${encodeURIComponent(
             connectionId,
           )}`,
         );

@@ -39,7 +39,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           event.preventDefault();
 
           const app = await createAppMutation.mutateAsync([name]);
-          window.location.href = `/_studio/app/${app.id}/editor`;
+          window.location.href = `/_toolpad/app/${app.id}/editor`;
         }}
       >
         <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
@@ -130,7 +130,7 @@ function AppCard({ app, onDelete }: AppCardProps) {
         <Button
           size="small"
           component="a"
-          href={app ? `/_studio/app/${app.id}/editor` : ''}
+          href={app ? `/_toolpad/app/${app.id}/editor` : ''}
           disabled={!app}
         >
           Edit

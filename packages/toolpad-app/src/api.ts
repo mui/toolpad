@@ -7,6 +7,7 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from 'react-query';
+import { parse as superjsonParse } from 'superjson';
 import type {
   Definition,
   MethodsGroup,
@@ -43,7 +44,7 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfG
             if (response.error) {
               throw new Error(response.error.message);
             }
-            return response.result;
+            return superjsonParse(response.result);
           }
 
           throw new Error(`HTTP ${res.status}`);

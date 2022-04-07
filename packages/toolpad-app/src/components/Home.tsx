@@ -122,7 +122,7 @@ function AppCard({ app, onDelete }: AppCardProps) {
             {app ? app.name : <Skeleton />}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {app ? `Some app description for "${app.name}" here` : <Skeleton />}
+            Created: {app ? app.createdAt.toLocaleDateString('short') : <Skeleton />}
           </Typography>
         </CardContent>
       </CardActionArea>

@@ -25,8 +25,9 @@ enum DomNodeType {
 }
 
 model App {
-  id   String @id @default(cuid())
-  name String
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
 
   nodes       DomNode[]    @relation("AppNodes")
   releases    Release[]    @relation("AppReleases")

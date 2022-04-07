@@ -58,7 +58,7 @@ export default function CreateStudioConnectionDialog({
       >
         <DialogTitle>Create a new MUI Studio Connection</DialogTitle>
         <DialogContent>
-          <FormControl size="small" fullWidth>
+          <FormControl sx={{ my: 1 }} size="small" fullWidth>
             <InputLabel id="select-connection-type">Type</InputLabel>
             <Select
               labelId="select-connection-type"

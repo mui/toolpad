@@ -1,4 +1,4 @@
-import { Stack, TextField, Typography } from '@mui/material';
+import { Stack, TextField } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinitions } from '@mui/toolpad-core';
 import StringRecordEditor from '../../components/StringRecordEditor';
@@ -9,7 +9,7 @@ import { FetchQuery } from './types';
 import * as appDom from '../../appDom';
 
 function ConnectionParamsInput() {
-  return <Typography>No input</Typography>;
+  return null;
 }
 
 function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {

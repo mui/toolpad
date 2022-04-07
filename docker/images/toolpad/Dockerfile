@@ -6,7 +6,7 @@ LABEL com.mui.toolpad.git-sha1=$GIT_SHA1
 
 ARG CIRCLE_BUILD_NUM
 ENV CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM
-LABEL com.mui.toolpad.circle-build-number=$CIRCLE_BUILD_NUM
+LABEL com.mui.toolpad.circle-build-num=$CIRCLE_BUILD_NUM
 
 WORKDIR /app
 

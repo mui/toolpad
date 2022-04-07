@@ -90,7 +90,6 @@ jobs:
           command: yarn test
 
   docker:
-    # TODO: Caching https://testdriven.io/blog/faster-ci-builds-with-docker-cache/
     working_directory: /tmp/mui-toolpad
     resource_class: medium
     docker:
@@ -121,6 +120,14 @@ jobs:
       # deploy the image
       - run: |
           docker push muicom/toolpad:$CIRCLE_SHA1
+
+      - when:
+          condition:
+            equal: [ master, << pipeline.git.branch >> ]
+        steps:
+          - run: |
+            docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha
+            docker push muicom/toolpad:alpha
 
 workflows:
   version: 2

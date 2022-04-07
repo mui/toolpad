@@ -1,5 +1,6 @@
 import { NextApiHandler } from 'next';
 import type { IncomingMessage } from 'http';
+import superjson from 'superjson';
 import {
   getApps,
   createApp,
@@ -57,7 +58,7 @@ export interface RpcRequest {
 
 export type RpcResponse =
   | {
-      result: any;
+      result: string;
       error?: undefined;
     }
   | {
@@ -80,9 +81,9 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
     const method: MethodResolver<any> = definition[type][name];
     const context = { req, res };
 
-    let result;
+    let rawResult;
     try {
-      result = await method(params, context);
+      rawResult = await method(params, context);
     } catch (error) {
       if (error instanceof Error) {
         res.json({ error: { message: error.message, stack: error.stack } });
@@ -92,7 +93,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
 
       return;
     }
-    const responseData: RpcResponse = { result };
+    const responseData: RpcResponse = { result: superjson.stringify(rawResult) };
     res.json(responseData);
   };
 }

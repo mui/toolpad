@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Card,
   CardActionArea,
@@ -122,7 +123,7 @@ function AppCard({ app, onDelete }: AppCardProps) {
             {app ? app.name : <Skeleton />}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {app ? `Some app description for "${app.name}" here` : <Skeleton />}
+            {app ? `Created: ${app.createdAt.toLocaleDateString('short')}` : <Skeleton />}
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -178,7 +179,7 @@ export default function Home() {
               case 'loading':
                 return <AppCard />;
               case 'error':
-                return (error as Error)?.message;
+                return <Alert severity="error">{(error as Error)?.message}</Alert>;
               case 'success':
                 return apps.length > 0
                   ? apps.map((app) => (

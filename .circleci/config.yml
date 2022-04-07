@@ -123,11 +123,11 @@ jobs:
 
       - when:
           condition:
-            equal: [ master, << pipeline.git.branch >> ]
+            equal: [master, << pipeline.git.branch >>]
         steps:
           - run: |
-            docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha
-            docker push muicom/toolpad:alpha
+              docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha
+              docker push muicom/toolpad:alpha
 
 workflows:
   version: 2

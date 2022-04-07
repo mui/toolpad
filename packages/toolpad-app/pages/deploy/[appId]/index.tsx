@@ -1,10 +1,11 @@
 import type { NextPage } from 'next';
 import * as React from 'react';
 import { useRouter } from 'next/router';
-import { Container, Typography } from '@mui/material';
+import { CircularProgress, Typography } from '@mui/material';
 import { asArray } from '../../../src/utils/collections';
 import client from '../../../src/api';
 import AppOverview from '../../../src/components/AppOverview';
+import ToolpadAppViewport from '../../../src/ToolpadAppViewport';
 
 interface PreviewProps {
   appId: string;
@@ -36,14 +37,20 @@ const Deploy: NextPage = () => {
     appId ? [appId] : null,
   );
 
-  return appId && activeDeployment ? (
+  if (!appId || isLoading) {
+    return (
+      <ToolpadAppViewport flex={1} display="flex" alignItems="center" justifyContent="center">
+        <CircularProgress />
+      </ToolpadAppViewport>
+    );
+  }
+
+  return activeDeployment ? (
     <Deployment appId={appId} version={activeDeployment.release.version} />
   ) : (
-    <Container sx={{ my: 5 }}>
-      <Typography>
-        {isLoading ? 'Loading...' : 'Not deployed yet (TODO: show instructions here)'}
-      </Typography>
-    </Container>
+    <ToolpadAppViewport flex={1} display="flex" alignItems="center" justifyContent="center">
+      <Typography>Not deployed yet (TODO: show instructions here)</Typography>
+    </ToolpadAppViewport>
   );
 };
 

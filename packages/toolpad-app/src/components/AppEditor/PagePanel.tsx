@@ -1,4 +1,4 @@
-import { styled } from '@mui/system';
+import { styled } from '@mui/material';
 import * as React from 'react';
 import HierarchyExplorer from './HierarchyExplorer';
 

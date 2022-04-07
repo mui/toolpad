@@ -6,6 +6,9 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  Stack,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
@@ -69,6 +72,7 @@ export function BindingEditor<V>({
 
   const hasBinding = value && value.type !== 'const';
 
+  const committedInput = React.useRef<BindableAttrValue<V> | null>(null);
   const handleCommit = React.useCallback(() => {
     let newValue = input;
 
@@ -79,42 +83,62 @@ export function BindingEditor<V>({
       };
     }
 
+    committedInput.current = newValue;
     onChange(newValue);
   }, [onChange, input]);
 
   return (
     <React.Fragment>
-      <IconButton
-        aria-label="Add binding"
-        disabled={disabled}
-        size="small"
-        onClick={handleOpen}
-        color={hasBinding ? 'primary' : 'inherit'}
-      >
-        {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
-      </IconButton>
-      <Dialog onClose={handleClose} open={open} fullWidth scroll="body">
+      <Tooltip title="Bind property dynamically">
+        <IconButton
+          aria-label="Bind property"
+          disabled={disabled}
+          size="small"
+          onClick={handleOpen}
+          color={hasBinding ? 'primary' : 'inherit'}
+        >
+          {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
+        </IconButton>
+      </Tooltip>
+      <Dialog onClose={handleClose} open={open} fullWidth scroll="body" maxWidth="lg">
         <DialogTitle>Bind a property</DialogTitle>
         <DialogContent>
-          <Box sx={{ mb: 2 }}>
-            Expected type: <code>{propType.type}</code>
-          </Box>
-          <JsExpressionBindingEditor<V>
-            globalScope={globalScope}
-            onCommit={handleCommit}
-            value={input}
-            onChange={(newValue) => setInput(newValue)}
-          />
-          {/* eslint-disable-next-line no-nested-ternary */}
-          {liveBinding ? (
-            liveBinding.error ? (
-              <RuntimeErrorAlert error={liveBinding.error} />
-            ) : (
-              <Box sx={{ maxHeight: 200, overflow: 'auto' }}>
-                <JsonView src={liveBinding.value} />
+          <Stack direction="row" sx={{ my: 2 }}>
+            <Box sx={{ width: 200 }}>
+              <Typography variant="subtitle2">Available variables</Typography>
+              <Box sx={{ overflow: 'auto' }}>
+                {Object.entries(globalScope).map(([key, scopeValue]) => (
+                  <pre key={key}>
+                    {key} ({typeof scopeValue})
+                  </pre>
+                ))}
               </Box>
-            )
-          ) : null}
+            </Box>
+
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={{ mb: 2 }}>
+                Make this property dynamic with a javascript expression. This property expects a
+                type: <code>{propType.type}</code>.
+              </Typography>
+              <JsExpressionBindingEditor<V>
+                globalScope={globalScope}
+                onCommit={handleCommit}
+                value={input}
+                onChange={(newValue) => setInput(newValue)}
+              />
+              {/* eslint-disable-next-line no-nested-ternary */}
+              {liveBinding ? (
+                liveBinding.error ? (
+                  <RuntimeErrorAlert error={liveBinding.error} />
+                ) : (
+                  <Box sx={{ maxHeight: 200, overflow: 'auto' }}>
+                    <Typography sx={{ mt: 1 }}>Actual value:</Typography>
+                    <JsonView src={liveBinding.value} />
+                  </Box>
+                )
+              ) : null}
+            </Box>
+          </Stack>
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={handleClose}>
@@ -123,7 +147,11 @@ export function BindingEditor<V>({
           <Button color="inherit" disabled={!value} onClick={() => onChange(null)}>
             Remove binding
           </Button>
-          <Button disabled={!input} color="primary" onClick={handleCommit}>
+          <Button
+            disabled={!input || input === committedInput.current}
+            color="primary"
+            onClick={handleCommit}
+          >
             Update binding
           </Button>
         </DialogActions>

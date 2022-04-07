@@ -14,15 +14,15 @@ import {
   TextField,
   Toolbar,
   Typography,
+  Box,
 } from '@mui/material';
 import * as React from 'react';
 import { LoadingButton } from '@mui/lab';
-import { Box } from '@mui/system';
 import client from '../api';
 import DialogForm from './DialogForm';
 import { App } from '../../prisma/generated/client';
-import Header from './Header';
 import useLatest from '../utils/useLatest';
+import ToolpadShell from './ToolpadShell';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -152,9 +152,8 @@ export default function Home() {
   const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
 
   return (
-    <React.Fragment>
+    <ToolpadShell>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      <Header navigation={null} actions={null} />
       <Container>
         <Typography variant="h2">Apps</Typography>
         <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
@@ -193,6 +192,6 @@ export default function Home() {
           })()}
         </Box>
       </Container>
-    </React.Fragment>
+    </ToolpadShell>
   );
 }

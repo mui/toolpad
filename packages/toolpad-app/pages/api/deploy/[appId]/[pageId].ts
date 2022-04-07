@@ -16,7 +16,7 @@ export default (async (req, res) => {
 
   const [pageId] = asArray(req.query.pageId);
   const { code: html } = renderPageHtml({
-    entry: `/api/release/${appId}/${activeDeployment.release.version}/${pageId}/entry`,
+    entry: `/release/${appId}/${activeDeployment.release.version}/${pageId}/entry`,
     importMap: getImportMap(),
   });
   res.setHeader('content-type', 'text/html');

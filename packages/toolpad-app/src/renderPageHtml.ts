@@ -1,6 +1,11 @@
 import { ImportMap } from 'esinstall';
+import { randomBytes } from 'crypto';
 import { MUI_X_PRO_LICENSE } from './constants';
 import { escapeHtml } from './utils/strings';
+
+function createNonce() {
+  return randomBytes(16).toString('base64');
+}
 
 export interface RenderHtmlConfig {
   importMap: ImportMap;
@@ -20,19 +25,23 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
     .map((url) => `<link rel="modulepreload" href="${escapeHtml(url)}" />`)
     .join('\n');
 
+  const nonce = createNonce();
+
   const code = `
     <!DOCTYPE html>
     <html style="position: relative">
       <head>
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'nonce-${nonce}'; style-src 'self' https://fonts.googleapis.com/ 'unsafe-inline'; font-src https://fonts.gstatic.com/">
         <meta charset="utf-8" />
         <meta name="x-data-grid-pro-license" content="${MUI_X_PRO_LICENSE}" />
         <title>Toolpad Sandbox</title>
         <link
+          nonce="${nonce}"
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <style>
+        <style nonce="${nonce}">
           #root {
             overflow: hidden; /* prevents margins from collapsing into root */
             min-height: 100vh;
@@ -42,7 +51,7 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
       <body>
         <div id="root"></div>
 
-        <script type="importmap">
+        <script type="importmap" nonce="${nonce}">
           ${serializedImportMap}
         </script>
 

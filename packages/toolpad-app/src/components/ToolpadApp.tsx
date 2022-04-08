@@ -2,6 +2,8 @@ import * as React from 'react';
 import { NoSsr, Stack } from '@mui/material';
 import { omit, pick, without } from 'lodash';
 import { evalCode } from '@mui/toolpad-core';
+import { ThemeProvider, createTheme, ThemeOptions, PaletteOptions } from '@mui/material/styles';
+import * as colors from '@mui/material/colors';
 import * as appDom from '../appDom';
 import { NodeId } from '../types';
 import { createProvidedContext } from '../utils/react';
@@ -189,20 +191,43 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 }
 
+function createThemeoptions(themeNode: appDom.ThemeNode): ThemeOptions {
+  const palette: PaletteOptions = {};
+  const primary = appDom.fromConstPropValue(themeNode.theme['palette.primary.main']);
+  if (primary) {
+    palette.primary = (colors as any)[primary];
+  }
+
+  const secondary = appDom.fromConstPropValue(themeNode.theme['palette.secondary.main']);
+  if (secondary) {
+    palette.secondary = (colors as any)[secondary];
+  }
+
+  return createTheme({ palette });
+}
+
 export interface ToolpadAppProps {
   dom: appDom.AppDom;
 }
 
 export default function ToolpadApp({ dom }: ToolpadAppProps) {
   const root = appDom.getApp(dom);
-  const { pages = [] } = appDom.getChildNodes(dom, root);
+  const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
+
+  const toolpadTheme = themes.length > 0 ? themes[0] : null;
+  const theme = React.useMemo(() => {
+    const options = toolpadTheme ? createThemeoptions(toolpadTheme) : {};
+    return createTheme(options);
+  }, [toolpadTheme]);
 
   return (
     // evaluation bindings run in an iframe so NoSsr for now
     <NoSsr>
-      <DomContextProvider value={dom}>
-        {pages.length > 0 ? <RenderedPage nodeId={pages[0].id} /> : null}
-      </DomContextProvider>
+      <ThemeProvider theme={createTheme(theme)}>
+        <DomContextProvider value={dom}>
+          {pages.length > 0 ? <RenderedPage nodeId={pages[0].id} /> : null}
+        </DomContextProvider>
+      </ThemeProvider>
     </NoSsr>
   );
 }

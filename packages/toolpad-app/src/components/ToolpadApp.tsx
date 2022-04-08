@@ -177,7 +177,9 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queryStates = [] } = appDom.getChildNodes(dom, page);
 
-  const [controlledState, setControlledState] = React.useState(getInitialPageState(dom, page));
+  const initialPageState = getInitialPageState(dom, page);
+  const [controlledState, setControlledState] = React.useState(initialPageState);
+  const prevPageState = React.useRef<PageState>(initialPageState);
 
   // Make sure to patch page state when dom nodes are added or removed
   React.useEffect(() => {
@@ -197,7 +199,9 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const reactQueries: UseQueryOptions[] = queryStates.map((node) => {
     const dataUrl = `/api/data/${appId}/${version}/`;
     const queryId = node.attributes.api.value;
-    const params = node.params ? resolveBindables(node.params, controlledState) : {};
+    // We update the last known pagestate with latest values
+    const lastPageState = { ...prevPageState.current, ...controlledState };
+    const params = node.params ? resolveBindables(node.params, lastPageState) : {};
     return {
       queryKey: [dataUrl, queryId, params],
       queryFn: () => queryId && fetchData(dataUrl, queryId, params),

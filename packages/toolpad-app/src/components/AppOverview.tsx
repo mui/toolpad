@@ -21,6 +21,10 @@ interface PageCardProps {
   openPageButtonProps?: OpenPageButtonProps;
 }
 
+/**
+ * Temporary render prop to have dual-mode code-generator/nextjs-page
+ * Remove this if/when we fully commit to nextjs rendering of the apps
+ */
 function defaultOpenPageButtonProps(appId: string, page: appDom.PageNode): ButtonProps {
   return { component: 'a', href: `/deploy/${appId}/${page.id}` } as ButtonProps;
 }

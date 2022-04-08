@@ -144,6 +144,8 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
     ...onChangeHandlers,
   };
 
+  console.log(props);
+
   return <Component {...props} />;
 }
 
@@ -161,7 +163,10 @@ function getInitialPageState(dom: appDom.AppDom, page: appDom.PageNode): PageSta
                 if (!argType || !argType.onChangeProp) {
                   return [];
                 }
-                const defaultValue = Component.defaultProps?.[key];
+                const defaultValue =
+                  elm.props?.[key]?.type === 'const'
+                    ? elm.props?.[key]?.value
+                    : Component.defaultProps?.[key];
                 return [[key, defaultValue]];
               }),
             ),

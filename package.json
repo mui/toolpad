@@ -28,7 +28,8 @@
     "release:publish:dry-run": "yarn release:publish --registry=\"http://localhost:4873/\"",
     "release:docker:build": "ts-node --esm ./scripts/esm/docker.ts build",
     "release:docker:publish": "ts-node --esm ./scripts/esm/docker.ts publish",
-    "test": "jest"
+    "test:build": "lerna run --scope @mui/toolpad-core --scope @mui/toolpad-components --stream build",
+    "test": "yarn test:build && jest"
   },
   "devDependencies": {
     "@mui/monorepo": "git+https://github.com/mui/material-ui.git#master",

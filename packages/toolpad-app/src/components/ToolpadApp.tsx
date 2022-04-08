@@ -6,7 +6,7 @@ import { ThemeProvider, createTheme, ThemeOptions, PaletteOptions } from '@mui/m
 import * as colors from '@mui/material/colors';
 import { useQueries, UseQueryOptions } from 'react-query';
 import * as appDom from '../appDom';
-import { NodeId, VersionOrPreview } from '../types';
+import { BindableAttrValues, NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import { getToolpadComponent } from '../toolpadComponents';
 import { ToolpadComponentDefinition } from '../toolpadComponents/componentDefinition';
@@ -43,6 +43,31 @@ function getElmToolpadComponent(
   return getToolpadComponent(dom, elm.attributes.component.value);
 }
 
+function resolveBindables(
+  bindables: BindableAttrValues<any>,
+  pageState: PageState,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(bindables).flatMap(([key, value]) => {
+      if (value?.type === 'jsExpression') {
+        try {
+          const result = evalCode(value?.value, pageState);
+          return [[key, result]];
+        } catch (err) {
+          console.error(`Oh no`, err);
+          return [];
+        }
+      }
+
+      if (value?.type === 'const') {
+        return [[key, value?.value]];
+      }
+
+      return [];
+    }),
+  );
+}
+
 interface RenderedNodeProps {
   nodeId: NodeId;
 }
@@ -56,35 +81,8 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   const { children = [] } = appDom.getChildNodes(dom, node);
   const { Component, argTypes } = getElmToolpadComponent(dom, node);
 
-  const constProps = React.useMemo(
-    () =>
-      node.props
-        ? Object.fromEntries(
-            Object.entries(node.props)
-              .filter(([, value]) => value?.type === 'const')
-              .map(([key, value]) => [key, value?.value]),
-          )
-        : {},
-    [node.props],
-  );
-
   const boundProps = React.useMemo(
-    () =>
-      node.props
-        ? Object.fromEntries(
-            Object.entries(node.props)
-              .filter(([, value]) => value?.type === 'jsExpression')
-              .flatMap(([key, value]) => {
-                try {
-                  const result = evalCode(value?.value, pageState);
-                  return [[key, result]];
-                } catch (err) {
-                  console.error(`Oh no`, err);
-                  return [];
-                }
-              }),
-          )
-        : {},
+    () => (node.props ? resolveBindables(node.props, pageState) : {}),
     [node.props, pageState],
   );
 
@@ -139,7 +137,6 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
 
   const props = {
     children: reactChildren,
-    ...constProps,
     ...boundProps,
     ...controlledProps,
     ...onChangeHandlers,
@@ -200,8 +197,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const reactQueries: UseQueryOptions[] = queryStates.map((node) => {
     const dataUrl = `/api/data/${appId}/${version}/`;
     const queryId = node.attributes.api.value;
-    // TODO: resolve bindables:
-    const params = {};
+    const params = node.params ? resolveBindables(node.params, controlledState) : {};
     return {
       queryKey: [dataUrl, queryId, params],
       queryFn: () => queryId && fetchData(dataUrl, queryId, params),

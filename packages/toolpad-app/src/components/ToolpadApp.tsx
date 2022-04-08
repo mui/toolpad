@@ -11,7 +11,6 @@ import { BindableAttrValues, NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import { getToolpadComponent } from '../toolpadComponents';
 import { ToolpadComponentDefinition } from '../toolpadComponents/componentDefinition';
-import type { App } from '../../prisma/generated/client';
 import AppOverview from './AppOverview';
 
 async function fetchData(dataUrl: string, queryId: string, params: any) {

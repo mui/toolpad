@@ -1,6 +1,7 @@
 import sharedConfig, { SharedConfig } from '../config';
 
 export interface ServerConfig extends SharedConfig {
+  databaseUrl: string;
   googleSheetsClientId?: string;
   googleSheetsClientSecret?: string;
   externalUrl?: string;
@@ -26,7 +27,7 @@ function readConfig(): ServerConfig {
   //  - ...?
 
   if (!process.env.TOOLPAD_DATABASE_URL) {
-    console.warn(`App started without config env variable TOOLPAD_DATABASE_URL`);
+    throw new Error(`App started without config env variable TOOLPAD_DATABASE_URL`);
   }
 
   const encryptionKeys: string[] =
@@ -34,6 +35,7 @@ function readConfig(): ServerConfig {
 
   return {
     ...sharedConfig,
+    databaseUrl: process.env.TOOLPAD_DATABASE_URL,
     googleSheetsClientId: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
     googleSheetsClientSecret: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
     externalUrl: process.env.TOOLPAD_EXTERNAL_URL,

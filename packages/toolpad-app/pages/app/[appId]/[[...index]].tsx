@@ -24,7 +24,14 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (context)
 };
 
 const Index: NextPage<PageProps> = (props) => {
-  return <ToolpadApp dom={props.dom} appId={props.appId} version="preview" />;
+  return (
+    <ToolpadApp
+      basename={`/app/${props.appId}`}
+      dom={props.dom}
+      appId={props.appId}
+      version="preview"
+    />
+  );
 };
 
 export default Index;

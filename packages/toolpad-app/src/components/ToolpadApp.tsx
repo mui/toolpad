@@ -1,15 +1,18 @@
 import * as React from 'react';
-import { NoSsr, Stack } from '@mui/material';
+import { ButtonProps, NoSsr, Stack } from '@mui/material';
 import { omit, pick, without } from 'lodash';
 import { evalCode, transformQueryResult, UseDataQuery } from '@mui/toolpad-core';
 import { ThemeProvider, createTheme, ThemeOptions, PaletteOptions } from '@mui/material/styles';
 import * as colors from '@mui/material/colors';
 import { useQueries, UseQueryOptions } from 'react-query';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { BindableAttrValues, NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import { getToolpadComponent } from '../toolpadComponents';
 import { ToolpadComponentDefinition } from '../toolpadComponents/componentDefinition';
+import type { App } from '../../prisma/generated/client';
+import AppOverview from './AppOverview';
 
 async function fetchData(dataUrl: string, queryId: string, params: any) {
   const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
@@ -250,13 +253,18 @@ function createThemeoptions(themeNode: appDom.ThemeNode): ThemeOptions {
   return createTheme({ palette });
 }
 
+function getPageNavButtonProps(appId: string, page: appDom.PageNode) {
+  return { component: Link, to: `/${page.id}` } as ButtonProps;
+}
+
 export interface ToolpadAppProps {
+  basename: string;
   appId: string;
   version: VersionOrPreview;
   dom: appDom.AppDom;
 }
 
-export default function ToolpadApp({ appId, version, dom }: ToolpadAppProps) {
+export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
   const root = appDom.getApp(dom);
   const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
 
@@ -274,7 +282,27 @@ export default function ToolpadApp({ appId, version, dom }: ToolpadAppProps) {
       <AppContextProvider value={appContext}>
         <ThemeProvider theme={createTheme(theme)}>
           <DomContextProvider value={dom}>
-            {pages.length > 0 ? <RenderedPage nodeId={pages[0].id} /> : null}
+            <BrowserRouter basename={basename}>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <AppOverview
+                      appId={appId}
+                      dom={dom}
+                      openPageButtonProps={getPageNavButtonProps}
+                    />
+                  }
+                />
+                {pages.map((page) => (
+                  <Route
+                    key={page.id}
+                    path={`/${page.id}`}
+                    element={<RenderedPage nodeId={pages[0].id} />}
+                  />
+                ))}
+              </Routes>
+            </BrowserRouter>
           </DomContextProvider>
         </ThemeProvider>
       </AppContextProvider>

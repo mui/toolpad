@@ -7,7 +7,7 @@ import * as colors from '@mui/material/colors';
 import { useQueries, UseQueryOptions } from 'react-query';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import * as appDom from '../appDom';
-import { BindableAttrValues, NodeId, VersionOrPreview } from '../types';
+import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import { getToolpadComponent } from '../toolpadComponents';
 import { ToolpadComponentDefinition } from '../toolpadComponents/componentDefinition';
@@ -45,27 +45,35 @@ function getElmToolpadComponent(
   return getToolpadComponent(dom, elm.attributes.component.value);
 }
 
+function resolveBindable<V>(bindable: BindableAttrValue<V>, pageState: PageState): V | undefined {
+  if (bindable?.type === 'jsExpression') {
+    try {
+      const result = evalCode(bindable?.value, pageState);
+      return result;
+    } catch (err) {
+      console.error(`Oh no`, err);
+      return undefined;
+    }
+  }
+
+  if (bindable?.type === 'const') {
+    return bindable?.value;
+  }
+
+  return undefined;
+}
+
 function resolveBindables(
   bindables: BindableAttrValues<any>,
   pageState: PageState,
 ): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(bindables).flatMap(([key, value]) => {
-      if (value?.type === 'jsExpression') {
-        try {
-          const result = evalCode(value?.value, pageState);
-          return [[key, result]];
-        } catch (err) {
-          console.error(`Oh no`, err);
-          return [];
-        }
+      if (!value) {
+        return [];
       }
-
-      if (value?.type === 'const') {
-        return [[key, value?.value]];
-      }
-
-      return [];
+      const result = resolveBindable(value, pageState);
+      return value === undefined ? [] : [[key, result]];
     }),
   );
 }
@@ -144,8 +152,6 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
     ...onChangeHandlers,
   };
 
-  console.log(props);
-
   return <Component {...props} />;
 }
 
@@ -163,10 +169,12 @@ function getInitialPageState(dom: appDom.AppDom, page: appDom.PageNode): PageSta
                 if (!argType || !argType.onChangeProp) {
                   return [];
                 }
+
                 const defaultValue =
                   elm.props?.[key]?.type === 'const'
                     ? elm.props?.[key]?.value
                     : Component.defaultProps?.[key];
+
                 return [[key, defaultValue]];
               }),
             ),

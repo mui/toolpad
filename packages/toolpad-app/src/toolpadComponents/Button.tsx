@@ -1,10 +1,18 @@
+import { Button } from '@mui/material';
+import React from 'react';
 import importedComponentRenderer from './importedComponentRenderer';
 import { ToolpadComponentDefinition } from './componentDefinition';
+import wrapWithDefaultProps from './WrapWithDefaultProps';
 
 export default {
   id: 'Button',
   displayName: 'Button',
   render: importedComponentRenderer('@mui/material', 'Button'),
+  Component: wrapWithDefaultProps(Button, {
+    children: <React.Fragment>Button Text</React.Fragment>,
+    variant: 'contained',
+    color: 'primary',
+  }),
   argTypes: {
     children: {
       name: 'content',

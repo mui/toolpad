@@ -1,10 +1,13 @@
+import { Typography } from '@mui/material';
 import { ToolpadComponentDefinition } from './componentDefinition';
 import importedComponentRenderer from './importedComponentRenderer';
+import wrapWithDefaultProps from './WrapWithDefaultProps';
 
 export default {
   id: 'Typography',
   displayName: 'Typography',
   render: importedComponentRenderer('@mui/material', 'Typography'),
+  Component: wrapWithDefaultProps(Typography, { children: 'Text' }),
   argTypes: {
     children: {
       typeDef: { type: 'string' },

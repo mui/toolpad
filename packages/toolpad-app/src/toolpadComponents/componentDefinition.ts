@@ -22,5 +22,6 @@ export interface ToolpadComponentDefinition {
   displayName: string;
   argTypes: ArgTypeDefinitions;
   render: RenderComponent;
+  Component: React.ComponentType<any>;
   extraControls?: Partial<Record<string, { type: string }>>;
 }

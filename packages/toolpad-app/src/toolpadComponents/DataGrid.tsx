@@ -1,11 +1,16 @@
+import { DataGrid } from '@mui/toolpad-components';
 import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../schemas';
 import { ToolpadComponentDefinition } from './componentDefinition';
 import importedComponentRenderer from './importedComponentRenderer';
+import wrapWithDefaultProps from './WrapWithDefaultProps';
 
 export default {
   id: 'DataGrid',
   displayName: 'DataGrid',
   render: importedComponentRenderer('@mui/toolpad-components', 'DataGrid'),
+  Component: wrapWithDefaultProps(DataGrid, {
+    selection: null,
+  }),
   argTypes: {
     rows: {
       typeDef: { type: 'array', schema: URI_DATAGRID_ROWS as string },
@@ -27,6 +32,7 @@ export default {
     selection: {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',
+      defaultValue: null,
     },
   },
 } as ToolpadComponentDefinition;

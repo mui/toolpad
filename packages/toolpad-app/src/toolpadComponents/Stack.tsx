@@ -1,10 +1,18 @@
+import { Stack } from '@mui/material';
 import { ToolpadComponentDefinition } from './componentDefinition';
 import importedComponentRenderer from './importedComponentRenderer';
+import wrapWithDefaultProps from './WrapWithDefaultProps';
 
 export default {
   id: 'Stack',
   displayName: 'Stack',
   render: importedComponentRenderer('@mui/material', 'Stack'),
+  Component: wrapWithDefaultProps(Stack, {
+    gap: 2,
+    direction: 'row',
+    alignItems: 'start',
+    justifyContent: 'start',
+  }),
   argTypes: {
     gap: {
       typeDef: { type: 'number' },

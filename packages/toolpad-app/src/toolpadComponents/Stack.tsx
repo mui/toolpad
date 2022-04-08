@@ -1,13 +1,13 @@
 import { Stack } from '@mui/material';
 import { ToolpadComponentDefinition } from './componentDefinition';
 import importedComponentRenderer from './importedComponentRenderer';
-import wrapWithDefaultProps from './WrapWithDefaultProps';
+import addDefaultProps from './addDefaultProps';
 
 export default {
   id: 'Stack',
   displayName: 'Stack',
   render: importedComponentRenderer('@mui/material', 'Stack'),
-  Component: wrapWithDefaultProps(Stack, {
+  Component: addDefaultProps(Stack, {
     gap: 2,
     direction: 'row',
     alignItems: 'start',

@@ -1,13 +1,13 @@
 import { PageRow } from '@mui/toolpad-components';
 import importedComponentRenderer from './importedComponentRenderer';
 import { ToolpadComponentDefinition } from './componentDefinition';
-import wrapWithDefaultProps from './WrapWithDefaultProps';
+import addDefaultProps from './addDefaultProps';
 
 export default {
   id: 'PageRow',
   displayName: 'PageRow',
   render: importedComponentRenderer('@mui/toolpad-components', 'PageRow'),
-  Component: wrapWithDefaultProps(PageRow, {
+  Component: addDefaultProps(PageRow, {
     spacing: 2,
     alignItems: 'start',
     justifyContent: 'start',

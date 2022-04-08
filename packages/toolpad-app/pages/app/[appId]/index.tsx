@@ -9,19 +9,21 @@ interface PageProps {
 }
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async (context) => {
-  const dom = await loadDom(context.query.appId as string);
+  const appId = context.query.appId as string;
+  const dom = await loadDom(appId);
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
   return {
     props: {
       pageNodeId: pages,
+      appId,
       dom,
     },
   };
 };
 
 const Index: NextPage<PageProps> = (props) => {
-  return <ToolpadApp dom={props.dom} />;
+  return <ToolpadApp dom={props.dom} appId={props.appId} version="preview" />;
 };
 
 export default Index;

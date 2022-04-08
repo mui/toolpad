@@ -2,13 +2,13 @@ import { Select } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
 import { URI_SELECT_OPTIONS } from '../schemas';
 import importedComponentRenderer from './importedComponentRenderer';
-import wrapWithDefaultProps from './WrapWithDefaultProps';
+import addDefaultProps from './addDefaultProps';
 
 export default {
   id: 'Select',
   displayName: 'Select',
   render: importedComponentRenderer('@mui/toolpad-components', 'Select'),
-  Component: wrapWithDefaultProps(Select, {
+  Component: addDefaultProps(Select, {
     label: '',
     variant: 'outlined',
     size: 'small',

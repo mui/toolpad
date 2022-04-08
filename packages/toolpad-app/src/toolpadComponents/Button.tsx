@@ -1,13 +1,13 @@
 import { Button } from '@mui/material';
 import importedComponentRenderer from './importedComponentRenderer';
 import { ToolpadComponentDefinition } from './componentDefinition';
-import wrapWithDefaultProps from './WrapWithDefaultProps';
+import addDefaultProps from './addDefaultProps';
 
 export default {
   id: 'Button',
   displayName: 'Button',
   render: importedComponentRenderer('@mui/material', 'Button'),
-  Component: wrapWithDefaultProps(Button, {
+  Component: addDefaultProps(Button, {
     children: 'Button Text',
     variant: 'contained',
     color: 'primary',

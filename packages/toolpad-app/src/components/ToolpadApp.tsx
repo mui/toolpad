@@ -1,23 +1,40 @@
 import * as React from 'react';
 import { NoSsr, Stack } from '@mui/material';
 import { omit, pick, without } from 'lodash';
-import { evalCode } from '@mui/toolpad-core';
+import { evalCode, transformQueryResult, UseDataQuery } from '@mui/toolpad-core';
 import { ThemeProvider, createTheme, ThemeOptions, PaletteOptions } from '@mui/material/styles';
 import * as colors from '@mui/material/colors';
+import { useQueries, UseQueryOptions } from 'react-query';
 import * as appDom from '../appDom';
-import { NodeId } from '../types';
+import { NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import { getToolpadComponent } from '../toolpadComponents';
 import { ToolpadComponentDefinition } from '../toolpadComponents/componentDefinition';
 
-type NodeState = Record<string, unknown>;
-type PageState = Record<string, NodeState | undefined>;
+async function fetchData(dataUrl: string, queryId: string, params: any) {
+  const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
+  url.searchParams.set('params', JSON.stringify(params));
+  const res = await fetch(String(url));
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status} while fetching "${url}"`);
+  }
+  return res.json();
+}
 
+type NodeState = Record<string, unknown>;
+type PageState = Record<string, NodeState | UseDataQuery | undefined>;
+
+interface AppContext {
+  appId: string;
+  version: VersionOrPreview;
+}
+
+const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
+const [useSetControlledStateContext, SetControlledStateContextProvider] =
+  createProvidedContext<React.Dispatch<React.SetStateAction<PageState>>>('SetControlledState');
 const [usePageStateContext, PageStateContextProvider] =
   createProvidedContext<PageState>('PagState');
-const [useSetPageStateContext, SetPageStateContextProvider] =
-  createProvidedContext<React.Dispatch<React.SetStateAction<PageState>>>('SetPagState');
 
 function getElmToolpadComponent(
   dom: appDom.AppDom,
@@ -33,7 +50,7 @@ interface RenderedNodeProps {
 function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const pageState = usePageStateContext();
-  const setPageState = useSetPageStateContext();
+  const setControlledState = useSetControlledStateContext();
 
   const node = appDom.getNode(dom, nodeId, 'element');
   const { children = [] } = appDom.getChildNodes(dom, node);
@@ -78,7 +95,7 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
           if (!argType || !argType.onChangeProp) {
             return [];
           }
-          const value = pageState[node.name]?.[key];
+          const value = (pageState[node.name] as NodeState)?.[key];
           return [[key, value]];
         }),
       ),
@@ -100,18 +117,18 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
             : (value: any) => value;
           const handler = (param: any) => {
             const value = valueGetter(param);
-            setPageState((oldPageState) => {
-              const nodeState = oldPageState[node.name];
+            setControlledState((oldState) => {
+              const nodeState = oldState[node.name];
               if (nodeState) {
-                return { ...oldPageState, [node.name]: { ...nodeState, [key]: value } };
+                return { ...oldState, [node.name]: { ...nodeState, [key]: value } };
               }
-              return oldPageState;
+              return oldState;
             });
           };
           return [[argType.onChangeProp, handler]];
         }),
       ),
-    [argTypes, node.name, setPageState],
+    [argTypes, node.name, setControlledState],
   );
 
   const reactChildren =
@@ -132,40 +149,42 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
 }
 
 function getInitialPageState(dom: appDom.AppDom, page: appDom.PageNode): PageState {
-  const elements = appDom.getDescendants(dom, page) as appDom.ElementNode[];
+  const elements = appDom.getDescendants(dom, page);
   return Object.fromEntries(
     elements.flatMap((elm) => {
-      if (!appDom.isElement(elm)) {
-        return [];
+      if (appDom.isElement(elm)) {
+        const { argTypes, Component } = getElmToolpadComponent(dom, elm);
+        return [
+          [
+            elm.name,
+            Object.fromEntries(
+              Object.entries(argTypes).flatMap(([key, argType]) => {
+                if (!argType || !argType.onChangeProp) {
+                  return [];
+                }
+                const defaultValue = Component.defaultProps?.[key];
+                return [[key, defaultValue]];
+              }),
+            ),
+          ],
+        ];
       }
-      const { argTypes, Component } = getElmToolpadComponent(dom, elm);
-      return [
-        [
-          elm.name,
-          Object.fromEntries(
-            Object.entries(argTypes).flatMap(([key, argType]) => {
-              if (!argType || !argType.onChangeProp) {
-                return [];
-              }
-              const defaultValue = Component.defaultProps?.[key];
-              return [[key, defaultValue]];
-            }),
-          ),
-        ],
-      ];
+      return [];
     }),
   );
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
+  const { appId, version } = useAppContext();
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queryStates = [] } = appDom.getChildNodes(dom, page);
 
-  const [pageState, setPageState] = React.useState(getInitialPageState(dom, page));
+  const [controlledState, setControlledState] = React.useState(getInitialPageState(dom, page));
+
   // Make sure to patch page state when dom nodes are added or removed
   React.useEffect(() => {
-    setPageState((existing) => {
+    setControlledState((existing) => {
       const initial = getInitialPageState(dom, page);
       const existingKeys = Object.keys(existing);
       const initialKeys = Object.keys(initial);
@@ -178,8 +197,33 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     });
   }, [dom, page]);
 
+  const reactQueries: UseQueryOptions[] = queryStates.map((node) => {
+    const dataUrl = `/api/data/${appId}/${version}/`;
+    const queryId = node.attributes.api.value;
+    // TODO: resolve bindables:
+    const params = {};
+    return {
+      queryKey: [dataUrl, queryId, params],
+      queryFn: () => queryId && fetchData(dataUrl, queryId, params),
+      enabled: !!queryId,
+    };
+  });
+
+  const queryResults = useQueries(reactQueries);
+
+  const pageState = React.useMemo(() => {
+    const queryResultState = Object.fromEntries(
+      queryStates.map((node, i) => {
+        const queryResult = queryResults[i];
+        return [node.name, transformQueryResult(queryResult)];
+      }),
+    );
+
+    return { ...queryResultState, ...controlledState };
+  }, [queryStates, controlledState, queryResults]);
+
   return (
-    <SetPageStateContextProvider value={setPageState}>
+    <SetControlledStateContextProvider value={setControlledState}>
       <PageStateContextProvider value={pageState}>
         <Stack direction="column" alignItems="stretch" sx={{ my: 2 }}>
           {children.map((child) => (
@@ -187,7 +231,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
           ))}
         </Stack>
       </PageStateContextProvider>
-    </SetPageStateContextProvider>
+    </SetControlledStateContextProvider>
   );
 }
 
@@ -207,10 +251,12 @@ function createThemeoptions(themeNode: appDom.ThemeNode): ThemeOptions {
 }
 
 export interface ToolpadAppProps {
+  appId: string;
+  version: VersionOrPreview;
   dom: appDom.AppDom;
 }
 
-export default function ToolpadApp({ dom }: ToolpadAppProps) {
+export default function ToolpadApp({ appId, version, dom }: ToolpadAppProps) {
   const root = appDom.getApp(dom);
   const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
 
@@ -220,14 +266,18 @@ export default function ToolpadApp({ dom }: ToolpadAppProps) {
     return createTheme(options);
   }, [toolpadTheme]);
 
+  const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
+
   return (
     // evaluation bindings run in an iframe so NoSsr for now
     <NoSsr>
-      <ThemeProvider theme={createTheme(theme)}>
-        <DomContextProvider value={dom}>
-          {pages.length > 0 ? <RenderedPage nodeId={pages[0].id} /> : null}
-        </DomContextProvider>
-      </ThemeProvider>
+      <AppContextProvider value={appContext}>
+        <ThemeProvider theme={createTheme(theme)}>
+          <DomContextProvider value={dom}>
+            {pages.length > 0 ? <RenderedPage nodeId={pages[0].id} /> : null}
+          </DomContextProvider>
+        </ThemeProvider>
+      </AppContextProvider>
     </NoSsr>
   );
 }

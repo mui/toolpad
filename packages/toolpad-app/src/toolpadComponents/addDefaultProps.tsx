@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export default function wrapWithDefaultProps<P = {}>(
+export default function addDefaultProps<P = {}>(
   Component: React.ComponentType<P>,
   defaultProps: Partial<React.PropsWithoutRef<P>>,
 ): React.ComponentType<P> {

@@ -1,13 +1,13 @@
 import { TextField } from '@mui/material';
 import { ToolpadComponentDefinition } from './componentDefinition';
 import importedComponentRenderer from './importedComponentRenderer';
-import wrapWithDefaultProps from './WrapWithDefaultProps';
+import addDefaultProps from './addDefaultProps';
 
 export default {
   id: 'TextField',
   displayName: 'TextField',
   render: importedComponentRenderer('@mui/material', 'TextField'),
-  Component: wrapWithDefaultProps(TextField, { variant: 'outlined', size: 'small', value: '' }),
+  Component: addDefaultProps(TextField, { variant: 'outlined', size: 'small', value: '' }),
   argTypes: {
     label: {
       typeDef: { type: 'string' },

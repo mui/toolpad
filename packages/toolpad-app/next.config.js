@@ -14,6 +14,23 @@ module.exports = {
     return config;
   },
 
+  async rewrites() {
+    return [
+      {
+        source: '/deploy/:appId',
+        destination: '/deploy/:appId',
+      },
+      {
+        source: '/deploy/:appId/:path*',
+        destination: '/api/deploy/:appId/:path*',
+      },
+      {
+        source: '/release/:appId/:path*',
+        destination: '/api/release/:appId/:path*',
+      },
+    ];
+  },
+
   async headers() {
     return [
       {

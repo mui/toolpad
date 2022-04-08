@@ -20,7 +20,7 @@ function NavigateToReleaseAction({ appId, version, pageNodeId }: NavigateToRelea
     <GridActionsCellItem
       icon={<OpenInNewIcon />}
       component="a"
-      href={`/api/release/${appId}/${version}/${pageNodeId}`}
+      href={`/release/${appId}/${version}/${pageNodeId}`}
       target="_blank"
       label="Open"
       disabled={!version}

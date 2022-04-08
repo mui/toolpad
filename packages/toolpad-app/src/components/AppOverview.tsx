@@ -19,7 +19,7 @@ function PageCard({ appId, page }: PageCardProps) {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" component="a" href={`/api/deploy/${appId}/${page.id}`}>
+        <Button size="small" component="a" href={`/deploy/${appId}/${page.id}`}>
           open
         </Button>
       </CardActions>

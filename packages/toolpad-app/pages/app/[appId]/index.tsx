@@ -5,6 +5,7 @@ import ToolpadApp from '../../../src/components/ToolpadApp';
 import { loadDom } from '../../../src/server/data';
 
 interface PageProps {
+  appId: string;
   dom: appDom.AppDom;
 }
 

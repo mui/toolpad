@@ -16,7 +16,11 @@ import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
 import { getQueryNodeArgTypes } from './toolpadDataSources/client';
 import { tryFormat } from './utils/prettier';
-import { RenderContext } from './toolpadComponents/componentDefinition';
+import { RenderContext, ToolpadComponentDefinition } from './toolpadComponents/componentDefinition';
+
+function componentDefaultValue(def: ToolpadComponentDefinition, prop: string): unknown {
+  return def.Component.defaultProps?.[prop];
+}
 
 function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes {
   return Object.fromEntries(
@@ -207,7 +211,8 @@ class Context implements RenderContext {
       const [stateVar, setStateVar] = this.generateControlledStateVars(nodeName, propName);
 
       const propValue = node.props?.[propName];
-      const defaultValue = propValue?.type === 'const' ? propValue.value : argType.defaultValue;
+      const defaultValue =
+        propValue?.type === 'const' ? propValue.value : componentDefaultValue(component, propName);
 
       stateHook = {
         nodeName,
@@ -392,11 +397,12 @@ class Context implements RenderContext {
     // Default values
     if (component) {
       Object.entries(component.argTypes).forEach(([propName, argType]) => {
-        if (argType && argType.defaultValue !== undefined && !result[propName]) {
+        const defaultValue = componentDefaultValue(component, propName);
+        if (argType && defaultValue !== undefined && !result[propName]) {
           const defaultPropName = argType.defaultValueProp ?? propName;
           result[defaultPropName] = {
             type: 'expression',
-            value: JSON.stringify(argType.defaultValue),
+            value: JSON.stringify(defaultValue),
           };
         }
       });

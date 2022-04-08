@@ -145,7 +145,7 @@ function getInitialPageState(dom: appDom.AppDom, page: appDom.PageNode): PageSta
               if (!argType || !argType.onChangeProp) {
                 return [];
               }
-              const defaultValue = Component.defaultProps?.[key] || argType.defaultValue;
+              const defaultValue = Component.defaultProps?.[key];
               return [[key, defaultValue]];
             }),
           ),

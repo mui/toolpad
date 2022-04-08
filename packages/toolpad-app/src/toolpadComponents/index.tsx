@@ -35,12 +35,17 @@ function codeComponentRenderer(moduleName: string, suggestedLocalName: string): 
   };
 }
 
+function Noop() {
+  return null;
+}
+
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
   return {
     id: `codeComponent.${domNode.id}`,
     displayName: domNode.name,
     argTypes: domNode.attributes.argTypes.value,
     render: codeComponentRenderer(`../components/${domNode.id}.tsx`, capitalize(domNode.name)),
+    Component: Noop,
   };
 }
 

@@ -1,10 +1,10 @@
-import importedComponentRenderer from './importedComponentRenderer';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
   id: 'CustomLayout',
   displayName: 'CustomLayout',
-  render: importedComponentRenderer('@mui/toolpad-components', 'CustomLayout'),
+  importedModule: '@mui/toolpad-components',
+  importedName: 'CustomLayout',
   argTypes: {
     child3: {
       typeDef: { type: 'element' },

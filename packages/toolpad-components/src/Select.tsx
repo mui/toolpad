@@ -33,3 +33,15 @@ export default function Select({ sx, label, options, ...props }: SelectProps) {
     </FormControl>
   );
 }
+
+Select.defaultProps = {
+  // eslint-disable-next-line react/default-props-match-prop-types
+  label: '',
+  // eslint-disable-next-line react/default-props-match-prop-types
+  variant: 'outlined',
+  // eslint-disable-next-line react/default-props-match-prop-types
+  size: 'small',
+  // eslint-disable-next-line react/default-props-match-prop-types
+  value: '',
+  options: [],
+};

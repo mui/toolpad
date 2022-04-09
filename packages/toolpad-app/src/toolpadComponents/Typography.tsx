@@ -1,15 +1,14 @@
 import { ToolpadComponentDefinition } from './componentDefinition';
-import importedComponentRenderer from './importedComponentRenderer';
 
 export default {
   id: 'Typography',
   displayName: 'Typography',
-  render: importedComponentRenderer('@mui/material', 'Typography'),
+  importedModule: '@mui/toolpad-components',
+  importedName: 'Typography',
   argTypes: {
     children: {
       typeDef: { type: 'string' },
       label: 'value',
-      defaultValue: 'Text',
     },
     variant: {
       typeDef: {

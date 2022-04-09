@@ -9,7 +9,7 @@ import Typography from './Typography';
 import TextField from './TextField';
 import Select from './Select';
 import PageRow from './PageRow';
-import { RenderComponent, ToolpadComponentDefinition } from './componentDefinition';
+import { ToolpadComponentDefinition } from './componentDefinition';
 import CustomLayout from './CustomLayout';
 import Paper from './Paper';
 import Stack from './Stack';
@@ -28,19 +28,14 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['CustomLayout', CustomLayout],
 ]);
 
-function codeComponentRenderer(moduleName: string, suggestedLocalName: string): RenderComponent {
-  return (ctx, node, resolvedProps) => {
-    const localName = ctx.addCodeComponentImport(moduleName, suggestedLocalName);
-    return `<${localName} ${ctx.renderProps(resolvedProps)} />`;
-  };
-}
-
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
   return {
     id: `codeComponent.${domNode.id}`,
     displayName: domNode.name,
     argTypes: domNode.attributes.argTypes.value,
-    render: codeComponentRenderer(`../components/${domNode.id}.tsx`, capitalize(domNode.name)),
+    importedModule: `../components/${domNode.id}.tsx`,
+    importedName: capitalize(domNode.name),
+    codeComponent: true,
   };
 }
 

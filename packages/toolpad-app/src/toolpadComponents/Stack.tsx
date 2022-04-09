@@ -1,22 +1,15 @@
-import { Stack } from '@mui/material';
+import { Stack } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
-import importedComponentRenderer from './importedComponentRenderer';
-import addDefaultProps from './addDefaultProps';
 
 export default {
   id: 'Stack',
   displayName: 'Stack',
-  render: importedComponentRenderer('@mui/material', 'Stack'),
-  Component: addDefaultProps(Stack, {
-    gap: 2,
-    direction: 'row',
-    alignItems: 'start',
-    justifyContent: 'start',
-  }),
+  Component: Stack,
+  importedModule: '@mui/toolpad-components',
+  importedName: 'Stack',
   argTypes: {
     gap: {
       typeDef: { type: 'number' },
-      defaultValue: 2,
     },
     margin: {
       typeDef: { type: 'number' },
@@ -26,21 +19,18 @@ export default {
         type: 'string',
         enum: ['row', 'row-reverse', 'column', 'column-reverse'],
       },
-      defaultValue: 'row',
     },
     alignItems: {
       typeDef: {
         type: 'string',
         enum: ['start', 'center', 'end', 'stretch', 'baseline'],
       },
-      defaultValue: 'start',
     },
     justifyContent: {
       typeDef: {
         type: 'string',
         enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
       },
-      defaultValue: 'start',
     },
     children: {
       typeDef: { type: 'element' },

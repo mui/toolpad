@@ -1,18 +1,16 @@
-import { Typography } from '@mui/material';
+import { Typography } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
-import importedComponentRenderer from './importedComponentRenderer';
-import addDefaultProps from './addDefaultProps';
 
 export default {
   id: 'Typography',
   displayName: 'Typography',
-  render: importedComponentRenderer('@mui/material', 'Typography'),
-  Component: addDefaultProps(Typography, { children: 'Text' }),
+  Component: Typography,
+  importedModule: '@mui/toolpad-components',
+  importedName: 'Typography',
   argTypes: {
     children: {
       typeDef: { type: 'string' },
       label: 'value',
-      defaultValue: 'Text',
     },
     variant: {
       typeDef: {

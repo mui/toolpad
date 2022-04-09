@@ -1,17 +1,15 @@
-import { Paper } from '@mui/material';
+import { Paper } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
-import importedComponentRenderer from './importedComponentRenderer';
-import addDefaultProps from './addDefaultProps';
 
 export default {
   id: 'Paper',
   displayName: 'Paper',
-  render: importedComponentRenderer('@mui/material', 'Paper'),
-  Component: addDefaultProps(Paper, { elevation: 1 }),
+  Component: Paper,
+  importedModule: '@mui/toolpad-components',
+  importedName: 'Paper',
   argTypes: {
     elevation: {
       typeDef: { type: 'number', minimum: 0 },
-      defaultValue: 1,
     },
     children: {
       typeDef: { type: 'element' },

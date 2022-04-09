@@ -63,6 +63,7 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
   nodes: NodesInfo;
   bindings: Record<string, LiveBinding>;
 } {
+  // /editorRuntime/index.js is conditionally loaded in _document.tsx
   // eslint-disable-next-line no-underscore-dangle
   const devtoolsHook = rootElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 

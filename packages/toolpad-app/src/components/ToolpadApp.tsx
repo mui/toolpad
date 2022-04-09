@@ -5,7 +5,7 @@ import { evalCode, transformQueryResult, UseDataQuery } from '@mui/toolpad-core'
 import { ThemeProvider, createTheme, ThemeOptions, PaletteOptions } from '@mui/material/styles';
 import * as colors from '@mui/material/colors';
 import { useQueries, UseQueryOptions } from 'react-query';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useParams, useLocation } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
@@ -155,7 +155,7 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   return <Component {...props} />;
 }
 
-function getInitialPageState(dom: appDom.AppDom, page: appDom.PageNode): PageState {
+function getInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): PageState {
   const elements = appDom.getDescendants(dom, page);
   return Object.fromEntries(
     elements.flatMap((elm) => {
@@ -189,17 +189,27 @@ function getInitialPageState(dom: appDom.AppDom, page: appDom.PageNode): PageSta
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const { appId, version } = useAppContext();
   const dom = useDomContext();
+  const location = useLocation();
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queryStates = [] } = appDom.getChildNodes(dom, page);
 
-  const initialPageState = getInitialPageState(dom, page);
-  const [controlledState, setControlledState] = React.useState(initialPageState);
-  const prevPageState = React.useRef<PageState>(initialPageState);
+  const initialControlledState = getInitialControlledState(dom, page);
+  const [controlledState, setControlledState] = React.useState(initialControlledState);
+  const prevPageState = React.useRef<PageState>(initialControlledState);
+
+  const urlQueryState = React.useMemo(() => {
+    const urlParams = new URLSearchParams(location.search);
+    return Object.fromEntries(
+      Object.entries(page.attributes.urlQuery.value).map(([key, defaultValue]) => {
+        return [key, urlParams.get(key) ?? defaultValue];
+      }),
+    );
+  }, [location.search, page.attributes.urlQuery.value]);
 
   // Make sure to patch page state when dom nodes are added or removed
   React.useEffect(() => {
     setControlledState((existing) => {
-      const initial = getInitialPageState(dom, page);
+      const initial = getInitialControlledState(dom, page);
       const existingKeys = Object.keys(existing);
       const initialKeys = Object.keys(initial);
       const newInitial = without(initialKeys, ...existingKeys);
@@ -234,8 +244,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       }),
     );
 
-    return { ...queryResultState, ...controlledState };
-  }, [queryStates, controlledState, queryResults]);
+    return { page: urlQueryState, ...queryResultState, ...controlledState };
+  }, [urlQueryState, queryStates, controlledState, queryResults]);
 
   return (
     <SetControlledStateContextProvider value={setControlledState}>

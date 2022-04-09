@@ -1,11 +1,16 @@
 import * as React from 'react';
 import { ButtonProps, NoSsr, Stack } from '@mui/material';
 import { omit, pick, without } from 'lodash';
-import { evalCode, transformQueryResult, UseDataQuery } from '@mui/toolpad-core';
+import {
+  evalCode,
+  INITIAL_DATA_QUERY,
+  transformQueryResult,
+  UseDataQuery,
+} from '@mui/toolpad-core';
 import { ThemeProvider, createTheme, ThemeOptions, PaletteOptions } from '@mui/material/styles';
 import * as colors from '@mui/material/colors';
 import { useQueries, UseQueryOptions } from 'react-query';
-import { BrowserRouter, Routes, Route, Link, useParams, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
@@ -24,7 +29,9 @@ async function fetchData(dataUrl: string, queryId: string, params: any) {
 }
 
 type NodeState = Record<string, unknown>;
-type PageState = Record<string, NodeState | UseDataQuery | undefined>;
+type ControlledState = Record<string, NodeState | undefined>;
+type DataQueryState = Record<string, UseDataQuery | undefined>;
+type PageState = Record<string, Record<string, string> | NodeState | UseDataQuery | undefined>;
 
 interface AppContext {
   appId: string;
@@ -34,7 +41,9 @@ interface AppContext {
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useSetControlledStateContext, SetControlledStateContextProvider] =
-  createProvidedContext<React.Dispatch<React.SetStateAction<PageState>>>('SetControlledState');
+  createProvidedContext<React.Dispatch<React.SetStateAction<ControlledState>>>(
+    'SetControlledState',
+  );
 const [usePageStateContext, PageStateContextProvider] =
   createProvidedContext<PageState>('PagState');
 
@@ -155,7 +164,7 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   return <Component {...props} />;
 }
 
-function getInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): PageState {
+function getInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): ControlledState {
   const elements = appDom.getDescendants(dom, page);
   return Object.fromEntries(
     elements.flatMap((elm) => {
@@ -186,16 +195,33 @@ function getInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): P
   );
 }
 
+function getInitialQueryState(dom: appDom.AppDom, page: appDom.PageNode): DataQueryState {
+  const elements = appDom.getDescendants(dom, page);
+  return Object.fromEntries(
+    elements.flatMap((elm) => {
+      return appDom.isQueryState(elm) ? [[elm.name, INITIAL_DATA_QUERY]] : [];
+    }),
+  );
+}
+
+function createPageState(
+  urlQueryState: Record<string, string>,
+  controlledState: ControlledState,
+  dataQueryState: DataQueryState,
+): PageState {
+  return {
+    page: urlQueryState,
+    ...controlledState,
+    ...dataQueryState,
+  };
+}
+
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const { appId, version } = useAppContext();
   const dom = useDomContext();
   const location = useLocation();
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queryStates = [] } = appDom.getChildNodes(dom, page);
-
-  const initialControlledState = getInitialControlledState(dom, page);
-  const [controlledState, setControlledState] = React.useState(initialControlledState);
-  const prevPageState = React.useRef<PageState>(initialControlledState);
 
   const urlQueryState = React.useMemo(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -205,6 +231,12 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       }),
     );
   }, [location.search, page.attributes.urlQuery.value]);
+
+  const initialControlledState = getInitialControlledState(dom, page);
+  const [controlledState, setControlledState] = React.useState(initialControlledState);
+  const prevPageState = React.useRef<PageState>(
+    createPageState(urlQueryState, initialControlledState, getInitialQueryState(dom, page)),
+  );
 
   // Make sure to patch page state when dom nodes are added or removed
   React.useEffect(() => {
@@ -244,8 +276,12 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       }),
     );
 
-    return { page: urlQueryState, ...queryResultState, ...controlledState };
+    return createPageState(urlQueryState, controlledState, queryResultState);
   }, [urlQueryState, queryStates, controlledState, queryResults]);
+
+  React.useEffect(() => {
+    prevPageState.current = pageState;
+  }, [pageState]);
 
   return (
     <SetControlledStateContextProvider value={setControlledState}>

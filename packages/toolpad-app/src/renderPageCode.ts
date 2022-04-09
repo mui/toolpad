@@ -16,7 +16,7 @@ import { ExactEntriesOf } from './utils/types';
 import * as bindings from './utils/bindings';
 import { getQueryNodeArgTypes } from './toolpadDataSources/client';
 import { tryFormat } from './utils/prettier';
-import { RenderContext } from './toolpadComponents/componentDefinition';
+import { RenderContext, ToolpadComponentDefinition } from './toolpadComponents/componentDefinition';
 
 function argTypesToPropValueTypes(argTypes: ArgTypeDefinitions): PropValueTypes {
   return Object.fromEntries(
@@ -47,7 +47,7 @@ interface UrlQueryStateHook {
   paramName: string;
   stateVar: string;
   setStateVar: string;
-  defaultValue?: unknown;
+  defaultValue?: PropExpression;
 }
 
 interface ControlledStateHook {
@@ -55,7 +55,7 @@ interface ControlledStateHook {
   propName: string;
   stateVar: string;
   setStateVar: string;
-  defaultValue?: unknown;
+  defaultValue?: PropExpression;
 }
 
 interface StateHook {
@@ -145,7 +145,7 @@ class Context implements RenderContext {
           paramName,
           stateVar,
           setStateVar,
-          defaultValue,
+          defaultValue: { type: 'expression', value: JSON.stringify(defaultValue) },
         });
       },
     );
@@ -206,8 +206,19 @@ class Context implements RenderContext {
 
       const [stateVar, setStateVar] = this.generateControlledStateVars(nodeName, propName);
 
+      const componentLocalName = this.importComponent(component);
+
       const propValue = node.props?.[propName];
-      const defaultValue = propValue?.type === 'const' ? propValue.value : argType.defaultValue;
+      const defaultValue: PropExpression =
+        propValue?.type === 'const'
+          ? {
+              type: 'expression',
+              value: JSON.stringify(propValue.value),
+            }
+          : {
+              type: 'expression',
+              value: `${componentLocalName}.defaultProps?.${propName}`,
+            };
 
       stateHook = {
         nodeName,
@@ -389,19 +400,6 @@ class Context implements RenderContext {
       });
     }
 
-    // Default values
-    if (component) {
-      Object.entries(component.argTypes).forEach(([propName, argType]) => {
-        if (argType && argType.defaultValue !== undefined && !result[propName]) {
-          const defaultPropName = argType.defaultValueProp ?? propName;
-          result[defaultPropName] = {
-            type: 'expression',
-            value: JSON.stringify(argType.defaultValue),
-          };
-        }
-      });
-    }
-
     return result;
   }
 
@@ -474,6 +472,13 @@ class Context implements RenderContext {
     };
   }
 
+  importComponent(component: ToolpadComponentDefinition): string {
+    const localName = component.codeComponent
+      ? this.addCodeComponentImport(component.importedModule, component.importedName)
+      : this.addImport(component.importedModule, component.importedName);
+    return localName;
+  }
+
   renderElement(node: appDom.ElementNode): PropExpression {
     const component = this.getToolpadComponent(node);
 
@@ -483,10 +488,13 @@ class Context implements RenderContext {
       component.argTypes,
     );
 
-    const rendered = component.render(this, node, {
+    const renderedProps = this.renderProps({
       ...resolvedProps,
       ...resolvedChildren,
     });
+
+    const localName = this.importComponent(component);
+    const rendered = `<${localName} ${renderedProps} />`;
 
     return this.wrapComponent(node, rendered);
   }
@@ -628,7 +636,7 @@ class Context implements RenderContext {
 
   renderControlledStateHooks(): string {
     return Array.from(this.controlledStateHooks.values(), (stateHook) => {
-      const defaultValue = JSON.stringify(stateHook.defaultValue);
+      const defaultValue = this.renderJsExpression(stateHook.defaultValue);
       return `const [${stateHook.stateVar}, ${stateHook.setStateVar}] = ${this.reactAlias}.useState(${defaultValue});`;
     }).join('\n');
   }
@@ -641,7 +649,7 @@ class Context implements RenderContext {
         'useUrlQueryState',
       );
       const paramName = JSON.stringify(stateHook.paramName);
-      const defaultValue = JSON.stringify(stateHook.defaultValue);
+      const defaultValue = this.renderJsExpression(stateHook.defaultValue);
       return `const [${stateHook.stateVar}, ${stateHook.setStateVar}] = ${useUrlQueryState}(${paramName}, ${defaultValue});`;
     }).join('\n');
   }

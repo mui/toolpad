@@ -22,3 +22,5 @@ export default function CustomLayout({ child1, child2, child3 }: CustomLayoutPro
     </Grid>
   );
 }
+
+CustomLayout.defaultProps = {};

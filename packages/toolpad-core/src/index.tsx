@@ -76,7 +76,6 @@ export interface ArgTypeDefinition {
   label?: string;
   typeDef: PropValueType;
   required?: boolean;
-  defaultValue?: any;
   description?: string;
   control?: ArgControlSpec;
   onChangeProp?: string;

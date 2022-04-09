@@ -21,6 +21,8 @@ export interface ToolpadComponentDefinition {
   id: string;
   displayName: string;
   argTypes: ArgTypeDefinitions;
-  render: RenderComponent;
+  importedModule: string;
+  importedName: string;
+  codeComponent?: boolean;
   extraControls?: Partial<Record<string, { type: string }>>;
 }

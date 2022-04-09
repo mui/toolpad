@@ -15,3 +15,9 @@ export default function PageRow({ spacing, children, alignItems, justifyContent 
     </Stack>
   );
 }
+
+PageRow.defaultProps = {
+  spacing: 2,
+  alignItems: 'start',
+  justifyContent: 'start',
+};

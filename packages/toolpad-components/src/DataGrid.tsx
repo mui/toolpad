@@ -156,3 +156,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 });
 
 export default DataGridComponent;
+
+DataGridComponent.defaultProps = {
+  selection: null,
+};

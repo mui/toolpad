@@ -17,14 +17,14 @@ import { createProvidedContext } from '../utils/react';
 import { ToolpadComponentDefinition } from '../toolpadComponents/componentDefinition';
 import AppOverview from './AppOverview';
 
-async function fetchData(dataUrl: string, queryId: string, params: any) {
-  const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
-  url.searchParams.set('params', JSON.stringify(params));
-  const res = await fetch(String(url));
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status} while fetching "${url}"`);
-  }
-  return res.json();
+interface RenderToolpadComponentParams {
+  Component: React.ComponentType;
+  props: any;
+  node: appDom.ElementNode;
+}
+
+function defaultRenderToolpadComponent({ Component, props }: RenderToolpadComponentParams) {
+  return <Component {...props} />;
 }
 
 type ComponentsContextValue = Record<string, ToolpadComponentDefinition | undefined>;
@@ -38,6 +38,7 @@ interface AppContext {
   version: VersionOrPreview;
 }
 
+const RenderToolpadComponentContext = React.createContext(defaultRenderToolpadComponent);
 const [useComponentsContext, ComponentsContextProvider] =
   createProvidedContext<ComponentsContextValue>('Components');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
@@ -48,6 +49,16 @@ const [useSetControlledStateContext, SetControlledStateContextProvider] =
   );
 const [usePageStateContext, PageStateContextProvider] =
   createProvidedContext<PageState>('PagState');
+
+async function fetchData(dataUrl: string, queryId: string, params: any) {
+  const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
+  url.searchParams.set('params', JSON.stringify(params));
+  const res = await fetch(String(url));
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status} while fetching "${url}"`);
+  }
+  return res.json();
+}
 
 function getElmComponent(
   components: ComponentsContextValue,
@@ -107,6 +118,7 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const pageState = usePageStateContext();
   const setControlledState = useSetControlledStateContext();
+  const renderToolpadComponent = React.useContext(RenderToolpadComponentContext);
 
   const node = appDom.getNode(dom, nodeId, 'element');
   const { children = [] } = appDom.getChildNodes(dom, node);
@@ -173,7 +185,11 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
     ...onChangeHandlers,
   };
 
-  return <Component {...props} />;
+  return renderToolpadComponent({
+    Component,
+    props,
+    node,
+  });
 }
 
 function useInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): ControlledState {
@@ -384,5 +400,7 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
     </NoSsr>
   );
 }
+
+export const RenderToolpadComponentProvider = RenderToolpadComponentContext.Provider;
 
 export { ComponentsContextProvider };

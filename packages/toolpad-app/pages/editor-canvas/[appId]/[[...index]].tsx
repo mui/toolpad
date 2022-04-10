@@ -2,6 +2,8 @@ import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
 import * as appDom from '../../../src/appDom';
 import EditorCanvas from '../../../src/components/EditorCanvas';
+import { ComponentsContextProvider } from '../../../src/components/ToolpadApp';
+import { useToolpadComponents } from '../../../src/toolpadComponents';
 
 interface PageProps {
   appId: string;
@@ -24,13 +26,16 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (context)
 };
 
 const Index: NextPage<PageProps> = (props) => {
+  const components = useToolpadComponents(props.dom);
   return (
-    <EditorCanvas
-      basename={`/editor-canvas/${props.appId}`}
-      dom={props.dom}
-      appId={props.appId}
-      version="preview"
-    />
+    <ComponentsContextProvider value={components}>
+      <EditorCanvas
+        basename={`/editor-canvas/${props.appId}`}
+        dom={props.dom}
+        appId={props.appId}
+        version="preview"
+      />
+    </ComponentsContextProvider>
   );
 };
 

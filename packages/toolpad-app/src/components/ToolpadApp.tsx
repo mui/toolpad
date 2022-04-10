@@ -14,7 +14,6 @@ import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-do
 import * as appDom from '../appDom';
 import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
-import { useToolpadComponent, useToolpadComponents } from '../toolpadComponents';
 import { ToolpadComponentDefinition } from '../toolpadComponents/componentDefinition';
 import AppOverview from './AppOverview';
 
@@ -28,6 +27,7 @@ async function fetchData(dataUrl: string, queryId: string, params: any) {
   return res.json();
 }
 
+type ComponentsContextValue = Record<string, ToolpadComponentDefinition | undefined>;
 type NodeState = Record<string, unknown>;
 type ControlledState = Record<string, NodeState | undefined>;
 type DataQueryState = Record<string, UseDataQuery | undefined>;
@@ -38,6 +38,8 @@ interface AppContext {
   version: VersionOrPreview;
 }
 
+const [useComponentsContext, ComponentsContextProvider] =
+  createProvidedContext<ComponentsContextValue>('Components');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useSetControlledStateContext, SetControlledStateContextProvider] =
@@ -47,11 +49,21 @@ const [useSetControlledStateContext, SetControlledStateContextProvider] =
 const [usePageStateContext, PageStateContextProvider] =
   createProvidedContext<PageState>('PagState');
 
-function useElmToolpadComponent(
-  dom: appDom.AppDom,
+function getElmComponent(
+  components: ComponentsContextValue,
   elm: appDom.ElementNode,
 ): ToolpadComponentDefinition {
-  return useToolpadComponent(dom, elm.attributes.component.value);
+  const componentId = elm.attributes.component.value;
+  const component = components[componentId];
+  if (!component) {
+    throw new Error(`Rendering unknown component "${componentId}"`);
+  }
+  return component;
+}
+
+function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponentDefinition {
+  const components = useComponentsContext();
+  return getElmComponent(components, elm);
 }
 
 function resolveBindable<V>(bindable: BindableAttrValue<V>, pageState: PageState): V | undefined {
@@ -98,7 +110,7 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
 
   const node = appDom.getNode(dom, nodeId, 'element');
   const { children = [] } = appDom.getChildNodes(dom, node);
-  const { Component, argTypes } = useElmToolpadComponent(dom, node);
+  const { Component, argTypes } = useElmToolpadComponent(node);
 
   const boundProps = React.useMemo(
     () => (node.props ? resolveBindables(node.props, pageState) : {}),
@@ -165,18 +177,13 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
 }
 
 function useInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): ControlledState {
-  const components = useToolpadComponents(dom);
+  const components = useComponentsContext();
   return React.useMemo(() => {
     const elements = appDom.getDescendants(dom, page);
     return Object.fromEntries(
       elements.flatMap((elm) => {
         if (appDom.isElement(elm)) {
-          const componentId = elm.attributes.component.value;
-          const component = components[componentId];
-          if (!component) {
-            throw new Error(`Rendering unknown component "${componentId}"`);
-          }
-          const { argTypes, Component } = component;
+          const { argTypes, Component } = getElmComponent(components, elm);
           return [
             [
               elm.name,
@@ -377,3 +384,5 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
     </NoSsr>
   );
 }
+
+export { ComponentsContextProvider };

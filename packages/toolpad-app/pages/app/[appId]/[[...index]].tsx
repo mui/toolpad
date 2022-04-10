@@ -1,7 +1,8 @@
 import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
 import * as appDom from '../../../src/appDom';
-import ToolpadApp from '../../../src/components/ToolpadApp';
+import ToolpadApp, { ComponentsContextProvider } from '../../../src/components/ToolpadApp';
+import { useToolpadComponents } from '../../../src/toolpadComponents';
 
 interface PageProps {
   appId: string;
@@ -24,13 +25,16 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (context)
 };
 
 const Index: NextPage<PageProps> = (props) => {
+  const components = useToolpadComponents(props.dom);
   return (
-    <ToolpadApp
-      basename={`/app/${props.appId}`}
-      dom={props.dom}
-      appId={props.appId}
-      version="preview"
-    />
+    <ComponentsContextProvider value={components}>
+      <ToolpadApp
+        basename={`/app/${props.appId}`}
+        dom={props.dom}
+        appId={props.appId}
+        version="preview"
+      />
+    </ComponentsContextProvider>
   );
 };
 

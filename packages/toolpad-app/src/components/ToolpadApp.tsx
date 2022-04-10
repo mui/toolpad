@@ -14,7 +14,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-do
 import * as appDom from '../appDom';
 import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
-import { getToolpadComponent } from '../toolpadComponents';
+import { useToolpadComponent, useToolpadComponents } from '../toolpadComponents';
 import { ToolpadComponentDefinition } from '../toolpadComponents/componentDefinition';
 import AppOverview from './AppOverview';
 
@@ -47,11 +47,11 @@ const [useSetControlledStateContext, SetControlledStateContextProvider] =
 const [usePageStateContext, PageStateContextProvider] =
   createProvidedContext<PageState>('PagState');
 
-function getElmToolpadComponent(
+function useElmToolpadComponent(
   dom: appDom.AppDom,
   elm: appDom.ElementNode,
 ): ToolpadComponentDefinition {
-  return getToolpadComponent(dom, elm.attributes.component.value);
+  return useToolpadComponent(dom, elm.attributes.component.value);
 }
 
 function resolveBindable<V>(bindable: BindableAttrValue<V>, pageState: PageState): V | undefined {
@@ -98,7 +98,7 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
 
   const node = appDom.getNode(dom, nodeId, 'element');
   const { children = [] } = appDom.getChildNodes(dom, node);
-  const { Component, argTypes } = getElmToolpadComponent(dom, node);
+  const { Component, argTypes } = useElmToolpadComponent(dom, node);
 
   const boundProps = React.useMemo(
     () => (node.props ? resolveBindables(node.props, pageState) : {}),
@@ -164,35 +164,43 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   return <Component {...props} />;
 }
 
-function getInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): ControlledState {
-  const elements = appDom.getDescendants(dom, page);
-  return Object.fromEntries(
-    elements.flatMap((elm) => {
-      if (appDom.isElement(elm)) {
-        const { argTypes, Component } = getElmToolpadComponent(dom, elm);
-        return [
-          [
-            elm.name,
-            Object.fromEntries(
-              Object.entries(argTypes).flatMap(([key, argType]) => {
-                if (!argType || !argType.onChangeProp) {
-                  return [];
-                }
+function useInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): ControlledState {
+  const components = useToolpadComponents(dom);
+  return React.useMemo(() => {
+    const elements = appDom.getDescendants(dom, page);
+    return Object.fromEntries(
+      elements.flatMap((elm) => {
+        if (appDom.isElement(elm)) {
+          const componentId = elm.attributes.component.value;
+          const component = components[componentId];
+          if (!component) {
+            throw new Error(`Rendering unknown component "${componentId}"`);
+          }
+          const { argTypes, Component } = component;
+          return [
+            [
+              elm.name,
+              Object.fromEntries(
+                Object.entries(argTypes).flatMap(([key, argType]) => {
+                  if (!argType || !argType.onChangeProp) {
+                    return [];
+                  }
 
-                const defaultValue =
-                  elm.props?.[key]?.type === 'const'
-                    ? elm.props?.[key]?.value
-                    : Component.defaultProps?.[key];
+                  const defaultValue =
+                    elm.props?.[key]?.type === 'const'
+                      ? elm.props?.[key]?.value
+                      : Component.defaultProps?.[key];
 
-                return [[key, defaultValue]];
-              }),
-            ),
-          ],
-        ];
-      }
-      return [];
-    }),
-  );
+                  return [[key, defaultValue]];
+                }),
+              ),
+            ],
+          ];
+        }
+        return [];
+      }),
+    );
+  }, [dom, page, components]);
 }
 
 function getInitialQueryState(dom: appDom.AppDom, page: appDom.PageNode): DataQueryState {
@@ -232,7 +240,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     );
   }, [location.search, page.attributes.urlQuery.value]);
 
-  const initialControlledState = getInitialControlledState(dom, page);
+  const initialControlledState = useInitialControlledState(dom, page);
   const [controlledState, setControlledState] = React.useState(initialControlledState);
   const prevPageState = React.useRef<PageState>(
     createPageState(urlQueryState, initialControlledState, getInitialQueryState(dom, page)),
@@ -241,17 +249,19 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   // Make sure to patch page state when dom nodes are added or removed
   React.useEffect(() => {
     setControlledState((existing) => {
-      const initial = getInitialControlledState(dom, page);
       const existingKeys = Object.keys(existing);
-      const initialKeys = Object.keys(initial);
+      const initialKeys = Object.keys(initialControlledState);
       const newInitial = without(initialKeys, ...existingKeys);
       const oldExisting = without(existingKeys, ...initialKeys);
       if (newInitial.length > 0 || oldExisting.length > 0) {
-        return { ...omit(existing, ...oldExisting), ...pick(initial, ...newInitial) };
+        return {
+          ...omit(existing, ...oldExisting),
+          ...pick(initialControlledState, ...newInitial),
+        };
       }
       return existing;
     });
-  }, [dom, page]);
+  }, [initialControlledState]);
 
   const reactQueries: UseQueryOptions[] = queryStates.map((node) => {
     const dataUrl = `/api/data/${appId}/${version}/`;

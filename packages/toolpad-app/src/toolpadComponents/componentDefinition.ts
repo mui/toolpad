@@ -18,7 +18,6 @@ export type RenderComponent = (
 ) => string;
 
 export interface ToolpadComponentDefinition {
-  id: string;
   displayName: string;
   argTypes: ArgTypeDefinitions;
   Component: React.ComponentType<any>;

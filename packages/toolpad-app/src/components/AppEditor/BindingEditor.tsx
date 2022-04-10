@@ -87,19 +87,25 @@ export function BindingEditor<V>({
     onChange(newValue);
   }, [onChange, input]);
 
+  const bindingButton = (
+    <IconButton
+      aria-label="Bind property"
+      disabled={disabled}
+      size="small"
+      onClick={handleOpen}
+      color={hasBinding ? 'primary' : 'inherit'}
+    >
+      {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
+    </IconButton>
+  );
+
   return (
     <React.Fragment>
-      <Tooltip title="Bind property dynamically">
-        <IconButton
-          aria-label="Bind property"
-          disabled={disabled}
-          size="small"
-          onClick={handleOpen}
-          color={hasBinding ? 'primary' : 'inherit'}
-        >
-          {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
-        </IconButton>
-      </Tooltip>
+      {disabled ? (
+        bindingButton
+      ) : (
+        <Tooltip title="Bind property dynamically">{bindingButton}</Tooltip>
+      )}
       <Dialog onClose={handleClose} open={open} fullWidth scroll="body" maxWidth="lg">
         <DialogTitle>Bind a property</DialogTitle>
         <DialogContent>

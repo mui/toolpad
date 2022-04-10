@@ -17,7 +17,7 @@ import { createProvidedContext } from '../utils/react';
 import { ToolpadComponentDefinition } from '../toolpadComponents/componentDefinition';
 import AppOverview from './AppOverview';
 
-interface RenderToolpadComponentParams {
+export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
   props: any;
   node: appDom.ElementNode;

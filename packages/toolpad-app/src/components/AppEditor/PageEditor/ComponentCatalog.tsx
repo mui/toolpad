@@ -91,12 +91,17 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
         <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
           <Box sx={{ width: 300, height: '100%', overflow: 'auto' }}>
             <Box display="grid" gridTemplateColumns="1fr" gap={1} padding={1}>
-              {toolpadComponents.map((componentType) => {
+              {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
+                if (!componentType) {
+                  throw new Error(
+                    `Invariant: Component definition for "${componentId}" is undefined`,
+                  );
+                }
                 return (
                   <ComponentCatalogItem
-                    key={componentType.id}
+                    key={componentId}
                     draggable
-                    onDragStart={handleDragStart(componentType.id)}
+                    onDragStart={handleDragStart(componentId)}
                   >
                     <DragIndicatorIcon color="inherit" />
                     {componentType.displayName}

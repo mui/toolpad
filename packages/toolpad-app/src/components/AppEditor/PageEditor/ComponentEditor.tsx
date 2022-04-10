@@ -1,7 +1,7 @@
 import { styled, Typography } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinition, ArgTypeDefinitions } from '@mui/toolpad-core';
-import { getToolpadComponent, useToolpadComponent } from '../../../toolpadComponents';
+import { useToolpadComponent } from '../../../toolpadComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
@@ -34,7 +34,7 @@ interface ComponentPropsEditorProps<P> {
 
 function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
   const dom = useDom();
-  const definition = getToolpadComponent(dom, node.attributes.component.value);
+  const definition = useToolpadComponent(dom, node.attributes.component.value);
 
   return (
     <ComponentPropsEditorRoot>

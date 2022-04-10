@@ -30,7 +30,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
 
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
   return {
-    id: `codeComponent.${domNode.id}`,
     displayName: domNode.name,
     argTypes: domNode.attributes.argTypes.value,
     importedModule: `../components/${domNode.id}.tsx`,

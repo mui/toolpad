@@ -209,6 +209,7 @@ class Context implements RenderContext {
       const componentLocalName = this.importComponent(component);
 
       const propValue = node.props?.[propName];
+
       const defaultValue: PropExpression =
         propValue?.type === 'const'
           ? {

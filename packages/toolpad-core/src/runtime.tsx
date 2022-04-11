@@ -148,6 +148,22 @@ export interface NodeRuntime<P> {
   setProp: <K extends keyof P & string>(key: K, value: React.SetStateAction<P[K]>) => void;
 }
 
+export function fireEvent(event: RuntimeEvent) {
+  // eslint-disable-next-line no-underscore-dangle
+  if (!window.__TOOLPAD_RUNTIME_EVENT__) {
+    // eslint-disable-next-line no-underscore-dangle
+    window.__TOOLPAD_RUNTIME_EVENT__ = [] as RuntimeEvent[];
+  }
+  // eslint-disable-next-line no-underscore-dangle
+  if (typeof window.__TOOLPAD_RUNTIME_EVENT__ === 'function') {
+    // eslint-disable-next-line no-underscore-dangle
+    window.__TOOLPAD_RUNTIME_EVENT__(event);
+  } else {
+    // eslint-disable-next-line no-underscore-dangle
+    window.__TOOLPAD_RUNTIME_EVENT__.push(event);
+  }
+}
+
 export function useNode<P = {}>(): NodeRuntime<P> | null {
   const nodeId = React.useContext(NodeRuntimeContext);
 
@@ -155,21 +171,6 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
     if (!nodeId) {
       return null;
     }
-    const fireEvent = (event: RuntimeEvent) => {
-      // eslint-disable-next-line no-underscore-dangle
-      if (!window.__TOOLPAD_RUNTIME_EVENT__) {
-        // eslint-disable-next-line no-underscore-dangle
-        window.__TOOLPAD_RUNTIME_EVENT__ = [] as RuntimeEvent[];
-      }
-      // eslint-disable-next-line no-underscore-dangle
-      if (typeof window.__TOOLPAD_RUNTIME_EVENT__ === 'function') {
-        // eslint-disable-next-line no-underscore-dangle
-        window.__TOOLPAD_RUNTIME_EVENT__(event);
-      } else {
-        // eslint-disable-next-line no-underscore-dangle
-        window.__TOOLPAD_RUNTIME_EVENT__.push(event);
-      }
-    };
     return {
       setProp: (prop, value) => {
         fireEvent({

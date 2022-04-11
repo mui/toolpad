@@ -6,8 +6,6 @@ export interface RenderEntryPointParams {
   themePath: string;
 }
 
-export const APP_ROOT_ID = 'root';
-
 export default function renderEntryPoint({ pagePath, themePath }: RenderEntryPointParams) {
   const pagePathString = JSON.stringify(pagePath);
   const themePathString = JSON.stringify(themePath);

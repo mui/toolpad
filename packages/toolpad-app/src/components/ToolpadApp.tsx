@@ -21,7 +21,7 @@ import AppOverview from './AppOverview';
 export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
   props: any;
-  node: appDom.ElementNode;
+  node: appDom.AppDomNode;
   argTypes: ArgTypeDefinitions;
 }
 
@@ -250,8 +250,21 @@ function createPageState(
   };
 }
 
+interface PageRootProps {
+  children?: React.ReactNode;
+}
+
+function PageRoot({ children }: PageRootProps) {
+  return (
+    <Stack direction="column" alignItems="stretch" sx={{ my: 2 }}>
+      {children}
+    </Stack>
+  );
+}
+
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const { appId, version } = useAppContext();
+  const renderToolpadComponent = React.useContext(RenderToolpadComponentContext);
   const dom = useDomContext();
   const location = useLocation();
   const page = appDom.getNode(dom, nodeId, 'page');
@@ -319,15 +332,21 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     prevPageState.current = pageState;
   }, [pageState]);
 
+  const renderedPageContent = renderToolpadComponent({
+    node: page,
+    Component: PageRoot,
+    props: { children: children.map((child) => <RenderedNode key={child.id} nodeId={child.id} />) },
+    argTypes: {
+      children: {
+        typeDef: { type: 'element' },
+        control: { type: 'slots' },
+      },
+    },
+  });
+
   return (
     <SetControlledStateContextProvider value={setControlledState}>
-      <PageStateContextProvider value={pageState}>
-        <Stack direction="column" alignItems="stretch" sx={{ my: 2 }}>
-          {children.map((child) => (
-            <RenderedNode key={child.id} nodeId={child.id} />
-          ))}
-        </Stack>
-      </PageStateContextProvider>
+      <PageStateContextProvider value={pageState}>{renderedPageContent}</PageStateContextProvider>
     </SetControlledStateContextProvider>
   );
 }
@@ -392,7 +411,7 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
                   <Route
                     key={page.id}
                     path={`/${page.id}`}
-                    element={<RenderedPage nodeId={pages[0].id} />}
+                    element={<RenderedPage nodeId={page.id} />}
                   />
                 ))}
               </Routes>

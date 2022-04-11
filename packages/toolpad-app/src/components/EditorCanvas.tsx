@@ -28,10 +28,24 @@ function renderToolpadComponent({
   Component,
   props,
   node,
+  argTypes,
 }: RenderToolpadComponentParams): React.ReactElement {
+  const wrappedProps = { ...props };
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [propName, argType] of Object.entries(argTypes)) {
+    if (argType?.typeDef.type === 'element') {
+      if (argType.control?.type === 'slots') {
+        const value = wrappedProps[propName];
+        wrappedProps[propName] = <runtime.Slots prop={propName}>{value}</runtime.Slots>;
+      } else if (argType.control?.type === 'slot') {
+        const value = wrappedProps[propName];
+        wrappedProps[propName] = <runtime.Placeholder prop={propName}>{value}</runtime.Placeholder>;
+      }
+    }
+  }
   return (
     <runtime.NodeRuntimeWrapper nodeId={node.id}>
-      <Component {...props} />
+      <Component {...wrappedProps} />
     </runtime.NodeRuntimeWrapper>
   );
 }

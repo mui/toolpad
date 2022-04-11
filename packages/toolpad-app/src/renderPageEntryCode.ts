@@ -1,3 +1,5 @@
+import { APP_ROOT_ID } from './constants';
+
 export interface RenderEntryPointParams {
   editor?: boolean;
   pagePath: string;

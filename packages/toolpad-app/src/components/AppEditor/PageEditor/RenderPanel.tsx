@@ -29,8 +29,8 @@ import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { useToolpadComponent } from '../../../toolpadComponents';
+import { APP_ROOT_ID } from '../../../constants';
 
-export const APP_ROOT_ID = 'root';
 const ROW_COMPONENT = 'PageRow';
 
 type SlotDirection = 'horizontal' | 'vertical';

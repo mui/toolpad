@@ -30,6 +30,7 @@ import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { useToolpadComponent } from '../../../toolpadComponents';
 
+export const APP_ROOT_ID = 'root';
 const ROW_COMPONENT = 'PageRow';
 
 type SlotDirection = 'horizontal' | 'vertical';
@@ -538,7 +539,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const getViewCoordinates = React.useCallback(
     (clientX: number, clientY: number): { x: number; y: number } | null => {
-      const rootElm = editorWindowRef.current?.document.getElementById('root');
+      const rootElm = editorWindowRef.current?.document.getElementById(APP_ROOT_ID);
       if (!rootElm) {
         return null;
       }
@@ -813,7 +814,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   React.useEffect(() => {
     if (editorWindowRef.current) {
       const editorWindow = editorWindowRef.current;
-      const rootElm = editorWindow.document.getElementById('root');
+      const rootElm = editorWindow.document.getElementById(APP_ROOT_ID);
 
       if (!rootElm) {
         console.warn(`Invariant: Unable to locate Toolpad App root element`);

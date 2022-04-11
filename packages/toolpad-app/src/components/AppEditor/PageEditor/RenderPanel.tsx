@@ -835,6 +835,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         attributes: true,
         childList: true,
         subtree: true,
+        characterData: true,
       });
 
       const resizeObserver = new ResizeObserver(handlePageUpdate);

@@ -97,6 +97,7 @@ export enum GoogleSheetsPrivateQueryType {
 export type GoogleSheetsPrivateQuery =
   | {
       type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEETS;
+      inputString?: string | null;
     }
   | {
       type: GoogleSheetsPrivateQueryType.FETCH_SHEET;

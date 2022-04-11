@@ -6,10 +6,10 @@ import {
   GoogleSheetsConnectionParams,
   GoogleSheetsApiQuery,
   GoogleSheetsPrivateQueryType,
-  GoogleSheetsPrivateQuery,
   GoogleSpreadsheet,
   GoogleSheet,
 } from './types';
+import useDebounced from '../../utils/useDebounced';
 
 function getInitialQueryValue(): any {
   return null;
@@ -22,51 +22,52 @@ function isConnectionValid(connection: GoogleSheetsConnectionParams | null): boo
   return false;
 }
 
-function QueryEditor({
-  api,
-  value,
-  onChange,
-}: QueryEditorProps<GoogleSheetsApiQuery, GoogleSheetsPrivateQuery>) {
-  const { isLoading: isListLoading, data: listData } = useQuery('fetchSpreadsheets', () => {
-    return api.fetchPrivate({ type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEETS });
-  });
+function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQuery>) {
+  const [spreadsheetQuery, setSpreadsheetQuery] = React.useState<string | null>(null);
+
+  const debouncedSpreadsheetQuery = useDebounced(spreadsheetQuery, 250);
+
+  const { isLoading: isListLoading, data: listData } = useQuery(
+    ['fetchSpreadsheets', debouncedSpreadsheetQuery],
+    () => {
+      return api.fetchPrivate({
+        type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEETS,
+        inputString: debouncedSpreadsheetQuery,
+      });
+    },
+    {
+      keepPreviousData: true,
+    },
+  );
 
   const handleSpreadsheetChange = React.useCallback(
-    (event, newValue: GoogleSpreadsheet | null) => {
+    (event, newValue: string | null) => {
       onChange({
         ...value,
         sheetName: null,
-        spreadsheetId: newValue?.id ?? null,
+        spreadsheetId: newValue ?? null,
       });
     },
     [onChange, value],
   );
 
-  const handleSheetChange = React.useCallback(
-    (event, newValue: GoogleSheet | null) => {
-      onChange({
-        ...value,
-        sheetName: newValue?.title ?? null,
-      });
+  const handleSpreadsheetInput = React.useCallback(
+    (event: React.SyntheticEvent, inputValue: string, reason: string) => {
+      if (reason === 'input') {
+        setSpreadsheetQuery(inputValue);
+      }
     },
-    [onChange, value],
+    [],
   );
 
-  const handleRangeChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({
-        ...value,
-        ranges: event.target?.value,
-      });
-    },
-    [onChange, value],
-  );
+  const getSpreadsheetName = (spreadsheetId: string) => {
+    return (
+      listData?.files?.find((spreadsheet: GoogleSpreadsheet) => spreadsheet.id === spreadsheetId)
+        ?.name ?? null
+    );
+  };
 
-  const {
-    isIdle: isSpreadsheetPending,
-    isLoading: isSpreadsheetLoading,
-    data: spreadsheetData,
-  } = useQuery(
+  const { isLoading: isSpreadsheetLoading, data: spreadsheetData } = useQuery(
     ['fetchSheet', value?.spreadsheetId],
     () => {
       return api.fetchPrivate({
@@ -79,48 +80,95 @@ function QueryEditor({
     },
   );
 
+  const getSheetTitle = React.useCallback(
+    (sheetId: number | null) => {
+      return (
+        spreadsheetData?.sheets?.find((sheet: GoogleSheet) => sheet.sheetId === sheetId)?.title ??
+        null
+      );
+    },
+    [spreadsheetData],
+  );
+
+  const getSheetId = (sheetName: string | null) => {
+    return (
+      spreadsheetData?.sheets?.find((sheet: GoogleSheet) => sheet.title === sheetName)?.sheetId ??
+      null
+    );
+  };
+
+  const handleSheetChange = React.useCallback(
+    (event, newValue: number | null) => {
+      onChange({
+        ...value,
+        sheetName: getSheetTitle(newValue) ?? null,
+      });
+    },
+    [getSheetTitle, onChange, value],
+  );
+
+  const handleRangeChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange({
+        ...value,
+        ranges: event.target?.value,
+      });
+    },
+    [onChange, value],
+  );
+
   return (
     <Stack direction="column" gap={2}>
       <Autocomplete
         size="small"
         fullWidth
-        value={
-          listData && value?.spreadsheetId
-            ? listData.files.find(
-                (spreadsheet: GoogleSpreadsheet) => spreadsheet.id === value.spreadsheetId,
-              )
-            : null
-        }
         loading={isListLoading}
+        defaultValue={value?.spreadsheetId}
         loadingText={'Loading...'}
-        options={isListLoading ? [] : listData.files ?? []}
-        getOptionLabel={(option: GoogleSpreadsheet) => option.name}
+        options={
+          isListLoading
+            ? []
+            : listData?.files?.map((spreadsheet: GoogleSpreadsheet) => spreadsheet.id) ?? []
+        }
+        onInputChange={handleSpreadsheetInput}
+        getOptionLabel={(option: string) => getSpreadsheetName(option) ?? ''}
         onChange={handleSpreadsheetChange}
+        renderOption={(props, option: string) => {
+          return (
+            <li {...props} key={option}>
+              {getSpreadsheetName(option)}
+            </li>
+          );
+        }}
         renderInput={(params) => <TextField {...params} size="small" label="Select spreadsheet" />}
       />
       <Autocomplete
         size="small"
-        value={
-          spreadsheetData && value?.sheetName
-            ? spreadsheetData.sheets.find((sheet: GoogleSheet) => sheet.title === value.sheetName)
-            : null
-        }
         fullWidth
         loading={isSpreadsheetLoading}
+        defaultValue={getSheetId(value?.sheetName)}
         loadingText={'Loading...'}
-        options={isSpreadsheetLoading || isSpreadsheetPending ? [] : spreadsheetData.sheets}
-        getOptionLabel={(option: GoogleSheet) => option.title}
-        isOptionEqualToValue={(option: GoogleSheet, newValue: GoogleSheet | null) =>
-          option.sheetId === newValue?.sheetId
+        options={
+          isSpreadsheetLoading
+            ? []
+            : spreadsheetData.sheets?.map((sheet: GoogleSheet) => sheet.sheetId)
         }
+        getOptionLabel={(option: number) => getSheetTitle(option)}
         onChange={handleSheetChange}
+        renderOption={(props, option: number) => {
+          return (
+            <li {...props} key={option}>
+              {getSheetTitle(option)}
+            </li>
+          );
+        }}
         renderInput={(params) => <TextField {...params} size="small" label="Select sheet" />}
       />
       <TextField
         size="small"
         label="Range"
         helperText={`In the form of A1:Z999`}
-        defaultValue={value?.ranges ?? 'A1:Z100'}
+        defaultValue={value?.ranges ?? 'A1:Z10'}
         disabled={!value?.sheetName}
         onChange={handleRangeChange}
       />

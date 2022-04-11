@@ -69,9 +69,13 @@ async function execPrivate(
       version: 'v3',
       auth: client,
     });
-
+    const { inputString } = query;
+    let queryString = "mimeType='application/vnd.google-apps.spreadsheet'";
+    if (inputString) {
+      queryString = `name contains '${inputString}' and ${queryString}`;
+    }
     const response = await driveClient.files.list({
-      q: "mimeType='application/vnd.google-apps.spreadsheet'",
+      q: queryString,
     });
     if (response.statusText === 'OK') {
       return response.data;
@@ -121,7 +125,7 @@ async function exec(
   if (!query) {
     return { fields: {}, data: {} };
   }
-  const { spreadsheetId, sheetName, ranges = 'A1:Z100' } = query;
+  const { spreadsheetId, sheetName, ranges = 'A1:Z10' } = query;
   if (!spreadsheetId || !sheetName) {
     return { fields: {}, data: {} };
   }

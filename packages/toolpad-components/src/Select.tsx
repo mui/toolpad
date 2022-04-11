@@ -11,11 +11,11 @@ import {
 
 export interface Selectoption {
   value: string;
-  label: string;
+  label?: string;
 }
 
 export interface SelectProps extends MuiSelectProps {
-  options: Selectoption[];
+  options: (string | Selectoption)[];
 }
 
 export default function Select({ sx, label, options, ...props }: SelectProps) {
@@ -24,11 +24,15 @@ export default function Select({ sx, label, options, ...props }: SelectProps) {
     <FormControl size="small" sx={{ minWidth: 120, ...sx }}>
       <InputLabel id={labelId}>{label}</InputLabel>
       <MuiSelect labelId={labelId} label={label} {...props}>
-        {options.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label ?? option.value}
-          </MenuItem>
-        )) ?? null}
+        {options.map((option) => {
+          const parsedOption: Selectoption =
+            typeof option === 'string' ? { value: option } : option;
+          return (
+            <MenuItem key={parsedOption.value} value={parsedOption.value}>
+              {parsedOption.label ?? parsedOption.value}
+            </MenuItem>
+          );
+        }) ?? null}
       </MuiSelect>
     </FormControl>
   );

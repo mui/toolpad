@@ -12,6 +12,7 @@ import PageRow from './PageRow';
 import { ToolpadComponentDefinition } from './componentDefinition';
 import CustomLayout from './CustomLayout';
 import Paper from './Paper';
+import Image from './Image';
 import Stack from './Stack';
 
 // TODO: bring these back to @mui/toolpad repo and make them import @mui/material
@@ -19,6 +20,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['PageRow', PageRow],
   ['Stack', Stack],
   ['Button', Button],
+  ['Image', Image],
   ['DataGrid', DataGrid],
   ['Container', Container],
   ['TextField', TextField],

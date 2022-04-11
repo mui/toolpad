@@ -10,7 +10,10 @@ export interface PageRowProps {
 
 export default function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps) {
   return (
-    <Stack direction="row" sx={{ gap: spacing, p: spacing, alignItems, justifyContent }}>
+    <Stack
+      direction="row"
+      sx={{ gap: spacing, p: spacing, alignItems, justifyContent, flexWrap: 'wrap' }}
+    >
       {children}
     </Stack>
   );

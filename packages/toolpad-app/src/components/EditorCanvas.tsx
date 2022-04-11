@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as runtime from '@mui/toolpad-core/runtime';
 import { styled } from '@mui/material';
+import { LiveBindings, RuntimeEvent } from '@mui/toolpad-core';
 import { VersionOrPreview } from '../types';
 import ToolpadApp, {
   ComponentsContextProvider,

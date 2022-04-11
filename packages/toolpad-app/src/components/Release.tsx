@@ -1,5 +1,4 @@
-import { Button, Container, Toolbar, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Button, Container, Toolbar, Typography, Box } from '@mui/material';
 import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -8,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import client from '../api';
 import * as appDom from '../appDom';
 import { NodeId } from '../types';
-import AppHeader from './AppHeader';
+import ToolpadAppShell from './ToolpadAppShell';
 
 interface NavigateToReleaseActionProps {
   appId: string;
@@ -21,7 +20,7 @@ function NavigateToReleaseAction({ appId, version, pageNodeId }: NavigateToRelea
     <GridActionsCellItem
       icon={<OpenInNewIcon />}
       component="a"
-      href={`/api/release/${appId}/${version}/${pageNodeId}`}
+      href={`/release/${appId}/${version}/${pageNodeId}`}
       target="_blank"
       label="Open"
       disabled={!version}
@@ -78,8 +77,7 @@ export default function Release() {
     deployReleaseMutation.isIdle && activeDeploymentQuery.isSuccess && !isActiveDeployment;
 
   return (
-    <React.Fragment>
-      <AppHeader appId={appId} actions={null} />
+    <ToolpadAppShell appId={appId}>
       <Container>
         <Typography variant="h2">Release &quot;{version}&quot;</Typography>
         <Box>{releaseQuery?.data?.description}</Box>
@@ -105,6 +103,6 @@ export default function Release() {
           />
         </Box>
       </Container>
-    </React.Fragment>
+    </ToolpadAppShell>
   );
 }

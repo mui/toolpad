@@ -2,7 +2,15 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import jsonToTs from 'json-to-ts';
+import { styled } from '@mui/material';
 import { WithControlledProp } from '../../../utils/types';
+
+const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
+  border: '1px solid black',
+  borderColor: theme.palette.divider,
+  borderRadius: theme.shape.borderRadius,
+  // overflow: 'hidden',
+}));
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
   globalScope: Record<string, unknown>;
@@ -55,6 +63,7 @@ export function JsExpressionEditor({
       editor.updateOptions({
         minimap: { enabled: false },
         accessibilitySupport: 'off',
+        fixedOverflowWidgets: true,
       });
 
       monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
@@ -85,7 +94,7 @@ export function JsExpressionEditor({
   );
 
   return (
-    <div>
+    <JsExpressionEditorRoot>
       <Editor
         height="150px"
         value={value}
@@ -94,6 +103,6 @@ export function JsExpressionEditor({
         language="typescript"
         onMount={HandleEditorMount}
       />
-    </div>
+    </JsExpressionEditorRoot>
   );
 }

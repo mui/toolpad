@@ -62,7 +62,7 @@ export default function PageOptionsPanel() {
           startIcon={<PageIcon />}
           color="inherit"
           component="a"
-          href={`/api/release/${state.appId}/preview/${pageNodeId}`}
+          href={`/release/${state.appId}/preview/${pageNodeId}`}
         >
           Preview
         </Button>

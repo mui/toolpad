@@ -1,10 +1,9 @@
-import { styled } from '@mui/system';
 import * as React from 'react';
 import clsx from 'clsx';
 import throttle from 'lodash/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { IconButton } from '@mui/material';
+import { IconButton, styled } from '@mui/material';
 import { RuntimeEvent, SlotType } from '@mui/toolpad-core';
 import {
   NodeId,
@@ -30,6 +29,7 @@ import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { useToolpadComponent } from '../../../toolpadComponents';
+import { APP_ROOT_ID } from '../../../constants';
 
 const ROW_COMPONENT = 'PageRow';
 
@@ -539,7 +539,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const getViewCoordinates = React.useCallback(
     (clientX: number, clientY: number): { x: number; y: number } | null => {
-      const rootElm = editorWindowRef.current?.document.getElementById('root');
+      const rootElm = editorWindowRef.current?.document.getElementById(APP_ROOT_ID);
       if (!rootElm) {
         return null;
       }
@@ -814,7 +814,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   React.useEffect(() => {
     if (editorWindowRef.current) {
       const editorWindow = editorWindowRef.current;
-      const rootElm = editorWindow.document.getElementById('root');
+      const rootElm = editorWindow.document.getElementById(APP_ROOT_ID);
 
       if (!rootElm) {
         console.warn(`Invariant: Unable to locate Toolpad App root element`);

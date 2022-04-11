@@ -20,14 +20,17 @@ COPY ./packages/toolpad-app/package.json ./packages/toolpad-app/
 COPY ./packages/toolpad-cli/package.json ./packages/toolpad-cli/
 COPY ./packages/toolpad-components/package.json ./packages/toolpad-components/
 COPY ./packages/toolpad-core/package.json ./packages/toolpad-core/
-RUN --mount=type=cache,target=/root/.yarn YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile
+RUN --mount=type=cache,target=/root/.yarn \
+  YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile
 
 
 
 FROM base as builder
 COPY --from=deps /app/ ./
 COPY . .
-RUN --mount=type=cache,target=/root/.yarn yarn release:build && YARN_CACHE_FOLDER=/root/.yarn yarn install --production --ignore-scripts --prefer-offline
+RUN --mount=type=cache,target=/root/.yarn \
+  yarn release:build && \
+  YARN_CACHE_FOLDER=/root/.yarn yarn install --production --ignore-scripts --prefer-offline
 
 
 

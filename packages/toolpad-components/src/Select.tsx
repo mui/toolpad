@@ -21,7 +21,7 @@ export interface SelectProps extends MuiSelectProps {
 export default function Select({ sx, label, options, ...props }: SelectProps) {
   const labelId = React.useId();
   return (
-    <FormControl size="small" sx={sx}>
+    <FormControl size="small" sx={{ minWidth: 120, ...sx }}>
       <InputLabel id={labelId}>{label}</InputLabel>
       <MuiSelect labelId={labelId} label={label} {...props}>
         {options.map((option) => (
@@ -33,3 +33,15 @@ export default function Select({ sx, label, options, ...props }: SelectProps) {
     </FormControl>
   );
 }
+
+Select.defaultProps = {
+  // eslint-disable-next-line react/default-props-match-prop-types
+  label: '',
+  // eslint-disable-next-line react/default-props-match-prop-types
+  variant: 'outlined',
+  // eslint-disable-next-line react/default-props-match-prop-types
+  size: 'small',
+  // eslint-disable-next-line react/default-props-match-prop-types
+  value: '',
+  options: [],
+};

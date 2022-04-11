@@ -1,10 +1,10 @@
-import importedComponentRenderer from './importedComponentRenderer';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
   id: 'Container',
   displayName: 'Container',
-  render: importedComponentRenderer('@mui/material', 'Container'),
+  importedModule: '@mui/toolpad-components',
+  importedName: 'Container',
   argTypes: {
     children: {
       typeDef: { type: 'element' },

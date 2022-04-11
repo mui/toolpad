@@ -47,3 +47,23 @@ Now that we have our first simple application, let's make sure we can use it out
 1. You just created a versioned release of your application. Click the "deploy" button to host this version under the production url of your page. Navigate to the MUI Toolpad home to get an overview of your application and click the "open" button on the application you just deployed. You'll be presented with an overview of the pages available in this application. Click on a page to see the production version of the application.
 
    Now, go back to editing your application and change the binding of the Typography component to `` `Goodbye ${state.nameInput.value}!` ``. Create another release. After you've verified that the pages in this release are working correctly, click "deploy" to make this release the prodiction version of your application.
+
+## Data fetching
+
+A Toolpad aaplication wouldn't be useful if you couldn't import your data into it.
+
+1. the first step is to make a connection to your data source. The connection holds the necessary credentials. In case of a databse this may be the connectiuon string, or in case of a REST API this may contain an API token. For demo purposes we will just create a dummy connection that we can use to make public HTTP requests with. To get started, click on the plus button next to "Connections" in the left menu. In the popup that opens, select the "Fetch" type and click "create". In the window that opens, give your connection a name "ourData".
+
+   ![Create Connection](./images/create-connection.png)
+
+1. Now that we can connect to our datasource, we can make an API endpoint for it on the Toolpad application. Click the plus button next to "Apis" in the left menu and select the "ourData" connection that we will make an API for. In the editor that opens, give it a name "ourDataApi" and in the url fill in "https://gist.githubusercontent.com/Janpot/c9d1f00be8472f2a510680b7e716a43b/raw/f001e0c3c501f5a0da35474ba4854cfc69acfd78/sample-data.json". This contains a sample dataset for us to use. If everything went well, you will see a preview in the bottom half of the page. CLick "update" to accept the parameters for this API.
+
+   ![Create Api](./images/create-api.png)
+
+1. Now we need to bring this data to our page. To do this, make a new page and click the "create query state" button in the page properties. In the popup that opens, give the state a name "ourDataState" and select the API we created before. We now have the data from this API available on the page in a variable `ourDataState` and we can bind it to components on the page.
+
+   ![Create State](./images/create-state.png)
+
+1. Now add a DataGrid on the page and in its properties click the link button next to "DataQuery". This will open our trusty binding editor in which you can type `ourDataState` and click "update binding". Close the binding editor to see the result.
+
+   ![Bind Query State](./images/bind-query-state.png)

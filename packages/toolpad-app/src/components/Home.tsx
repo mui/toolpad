@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Card,
   CardActionArea,
@@ -13,15 +14,15 @@ import {
   TextField,
   Toolbar,
   Typography,
+  Box,
 } from '@mui/material';
 import * as React from 'react';
 import { LoadingButton } from '@mui/lab';
-import { Box } from '@mui/system';
 import client from '../api';
 import DialogForm from './DialogForm';
 import { App } from '../../prisma/generated/client';
-import Header from './Header';
 import useLatest from '../utils/useLatest';
+import ToolpadShell from './ToolpadShell';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -39,7 +40,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           event.preventDefault();
 
           const app = await createAppMutation.mutateAsync([name]);
-          window.location.href = `/_studio/app/${app.id}/editor`;
+          window.location.href = `/_toolpad/app/${app.id}/editor`;
         }}
       >
         <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
@@ -122,7 +123,7 @@ function AppCard({ app, onDelete }: AppCardProps) {
             {app ? app.name : <Skeleton />}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {app ? `Some app description for "${app.name}" here` : <Skeleton />}
+            {app ? `Created: ${app.createdAt.toLocaleDateString('short')}` : <Skeleton />}
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -130,7 +131,7 @@ function AppCard({ app, onDelete }: AppCardProps) {
         <Button
           size="small"
           component="a"
-          href={app ? `/_studio/app/${app.id}/editor` : ''}
+          href={app ? `/_toolpad/app/${app.id}/editor` : ''}
           disabled={!app}
         >
           Edit
@@ -151,9 +152,8 @@ export default function Home() {
   const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
 
   return (
-    <React.Fragment>
+    <ToolpadShell>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      <Header navigation={null} actions={null} />
       <Container>
         <Typography variant="h2">Apps</Typography>
         <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
@@ -179,7 +179,7 @@ export default function Home() {
               case 'loading':
                 return <AppCard />;
               case 'error':
-                return (error as Error)?.message;
+                return <Alert severity="error">{(error as Error)?.message}</Alert>;
               case 'success':
                 return apps.length > 0
                   ? apps.map((app) => (
@@ -192,6 +192,6 @@ export default function Home() {
           })()}
         </Box>
       </Container>
-    </React.Fragment>
+    </ToolpadShell>
   );
 }

@@ -1,5 +1,5 @@
 import { ImportMap } from 'esinstall';
-import { MUI_X_PRO_LICENSE } from './constants';
+import { APP_ROOT_ID, MUI_X_PRO_LICENSE } from './constants';
 import { escapeHtml } from './utils/strings';
 
 export interface RenderHtmlConfig {
@@ -40,7 +40,7 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
         </style>
       </head>
       <body>
-        <div id="root"></div>
+        <div id="${APP_ROOT_ID}"></div>
 
         <script type="importmap">
           ${serializedImportMap}

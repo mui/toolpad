@@ -28,15 +28,10 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['CustomLayout', CustomLayout],
 ]);
 
-function Noop() {
-  return null;
-}
-
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
   return {
     displayName: domNode.name,
     argTypes: domNode.attributes.argTypes.value,
-    Component: Noop,
     importedModule: `../components/${domNode.id}.tsx`,
     importedName: capitalize(domNode.name),
     codeComponent: true,

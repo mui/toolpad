@@ -14,7 +14,8 @@ import {
   NodesInfo,
 } from '../../../types';
 import * as appDom from '../../../appDom';
-import PageView from '../../PageView';
+import PageView from './EditorCanvasHost';
+// import PageView from '../../PageView';
 import {
   absolutePositionCss,
   distanceToLine,

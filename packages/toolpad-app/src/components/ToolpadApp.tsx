@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ButtonProps, NoSsr, Stack } from '@mui/material';
 import { omit, pick, without } from 'lodash';
 import {
+  ArgTypeDefinitions,
   evalCode,
   INITIAL_DATA_QUERY,
   transformQueryResult,
@@ -21,6 +22,7 @@ export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
   props: any;
   node: appDom.ElementNode;
+  argTypes: ArgTypeDefinitions;
 }
 
 function defaultRenderToolpadComponent({ Component, props }: RenderToolpadComponentParams) {
@@ -189,6 +191,7 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
     Component,
     props,
     node,
+    argTypes,
   });
 }
 

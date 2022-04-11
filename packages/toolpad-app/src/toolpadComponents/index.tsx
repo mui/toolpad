@@ -38,38 +38,37 @@ function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponen
   };
 }
 
-export function getToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefinition[] {
+function getToolpadComponents(
+  dom: appDom.AppDom,
+): Record<string, ToolpadComponentDefinition | undefined> {
   const app = appDom.getApp(dom);
   const { codeComponents = [] } = appDom.getChildNodes(dom, app);
-  return [
-    ...INTERNAL_COMPONENTS.values(),
-    ...codeComponents.map((codeComponent) => createCodeComponent(codeComponent)),
-  ];
+  return Object.fromEntries([
+    ...INTERNAL_COMPONENTS.entries(),
+    ...codeComponents.map((codeComponent) => [
+      `codeComponent.${codeComponent.id}`,
+      createCodeComponent(codeComponent),
+    ]),
+  ]);
 }
 
 export function getToolpadComponent(
   dom: appDom.AppDom,
   componentId: string,
 ): ToolpadComponentDefinition {
-  const component = INTERNAL_COMPONENTS.get(componentId);
+  const components = getToolpadComponents(dom);
+  const component = components[componentId];
 
   if (component) {
     return component;
   }
 
-  const app = appDom.getApp(dom);
-  const { codeComponents = [] } = appDom.getChildNodes(dom, app);
-  const nodeId = componentId.split('.')[1];
-  const domNode = codeComponents.find((node) => node.id === nodeId);
-
-  if (domNode) {
-    return createCodeComponent(domNode);
-  }
-
   throw new Error(`Invariant: Accessing unknown component "${componentId}"`);
 }
 
-export function useToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefinition[] {
+export function useToolpadComponents(
+  dom: appDom.AppDom,
+): Record<string, ToolpadComponentDefinition | undefined> {
   return React.useMemo(() => getToolpadComponents(dom), [dom]);
 }
 

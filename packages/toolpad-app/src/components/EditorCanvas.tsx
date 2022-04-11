@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as runtime from '@mui/toolpad-core/runtime';
 import { styled } from '@mui/material';
-import { LiveBindings, RuntimeEvent } from '@mui/toolpad-core';
 import { VersionOrPreview } from '../types';
 import ToolpadApp, {
   ComponentsContextProvider,
@@ -18,9 +17,6 @@ export interface ToolpadBridge {
 declare global {
   interface Window {
     __TOOLPAD_BRIDGE__?: ToolpadBridge;
-    __TOOLPAD_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
-    __TOOLPAD_RUNTIME_BINDINGS_STATE__?: LiveBindings;
-    __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
   }
 }
 

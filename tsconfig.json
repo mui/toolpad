@@ -16,12 +16,11 @@
     "jsx": "react",
     "noImplicitAny": true,
     "types": ["node"],
-    "baseUrl": "./",
     "paths": {}
   },
   "ts-node": {
     "transpileOnly": true,
     "transpiler": "ts-node/transpilers/swc-experimental"
   },
-  "include": ["./jest-setup.ts"]
+  "include": ["./test"]
 }

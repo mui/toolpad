@@ -1,28 +1,51 @@
 import * as React from 'react';
-import { Box, Button, Card, CardActions, CardContent, Container, Typography } from '@mui/material';
+import {
+  Box,
+  ButtonProps,
+  Card,
+  CardActionArea,
+  CardContent,
+  Container,
+  Typography,
+} from '@mui/material';
 import * as appDom from '../appDom';
+
+type OpenPageButtonProps = (
+  appId: string,
+  page: appDom.PageNode,
+) => ButtonProps & { component?: string | React.ComponentType };
 
 interface PageCardProps {
   appId: string;
   page: appDom.PageNode;
+  openPageButtonProps?: OpenPageButtonProps;
 }
 
-function PageCard({ appId, page }: PageCardProps) {
+/**
+ * Temporary render prop to have dual-mode code-generator/nextjs-page
+ * Remove this if/when we fully commit to nextjs rendering of the apps
+ */
+function defaultOpenPageButtonProps(appId: string, page: appDom.PageNode): ButtonProps {
+  return { component: 'a', href: `/deploy/${appId}/${page.id}` } as ButtonProps;
+}
+
+function PageCard({
+  appId,
+  page,
+  openPageButtonProps = defaultOpenPageButtonProps,
+}: PageCardProps) {
   return (
     <Card sx={{ gridColumn: 'span 1' }}>
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {page.name}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {page.attributes.title.value}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button size="small" component="a" href={`/deploy/${appId}/${page.id}`}>
-          open
-        </Button>
-      </CardActions>
+      <CardActionArea {...openPageButtonProps(appId, page)}>
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            {page.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {page.attributes.title.value}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
     </Card>
   );
 }
@@ -30,9 +53,10 @@ function PageCard({ appId, page }: PageCardProps) {
 interface AppOverviewProps {
   appId: string;
   dom: appDom.AppDom;
+  openPageButtonProps?: OpenPageButtonProps;
 }
 
-export default function AppOverview({ appId, dom }: AppOverviewProps) {
+export default function AppOverview({ appId, dom, openPageButtonProps }: AppOverviewProps) {
   const app = dom ? appDom.getApp(dom) : null;
   const { pages = [] } = dom && app ? appDom.getChildNodes(dom, app) : {};
   return (
@@ -52,7 +76,12 @@ export default function AppOverview({ appId, dom }: AppOverviewProps) {
         }}
       >
         {pages.map((page) => (
-          <PageCard key={page.id} appId={appId} page={page} />
+          <PageCard
+            key={page.id}
+            appId={appId}
+            page={page}
+            openPageButtonProps={openPageButtonProps}
+          />
         ))}
       </Box>
     </Container>

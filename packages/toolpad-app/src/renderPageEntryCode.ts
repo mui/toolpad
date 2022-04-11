@@ -4,6 +4,8 @@ export interface RenderEntryPointParams {
   themePath: string;
 }
 
+export const APP_ROOT_ID = 'root';
+
 export default function renderEntryPoint({ pagePath, themePath }: RenderEntryPointParams) {
   const pagePathString = JSON.stringify(pagePath);
   const themePathString = JSON.stringify(themePath);
@@ -34,7 +36,9 @@ export default function renderEntryPoint({ pagePath, themePath }: RenderEntryPoi
     // TODO: react-refresh implementation, move to worker
     if (import.meta.hot) {
       // Make sure to reuse the root
-      const root = import.meta.hot.data.root || createRoot(document.getElementById('root'));
+      const root = import.meta.hot.data.root || createRoot(document.getElementById(${JSON.stringify(
+        APP_ROOT_ID,
+      )}));
       
       if (!import.meta.hot.data.isRefresh) {
         render(root, Page, theme);
@@ -50,7 +54,7 @@ export default function renderEntryPoint({ pagePath, themePath }: RenderEntryPoi
         import.meta.hot.data.root = root;
       });
     } else {
-      const root = createRoot(document.getElementById('root'));
+      const root = createRoot(document.getElementById(${JSON.stringify(APP_ROOT_ID)}));
       render(root, Page, theme);
     }
   `;

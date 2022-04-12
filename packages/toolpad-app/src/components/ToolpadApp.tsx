@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ButtonProps, NoSsr, Stack } from '@mui/material';
+import { ButtonProps, NoSsr, Stack, CssBaseline } from '@mui/material';
 import { omit, pick, without } from 'lodash';
 import {
   ArgTypeDefinitions,
@@ -10,7 +10,7 @@ import {
 } from '@mui/toolpad-core';
 import { ThemeProvider, createTheme, ThemeOptions, PaletteOptions } from '@mui/material/styles';
 import * as colors from '@mui/material/colors';
-import { useQueries, UseQueryOptions } from 'react-query';
+import { useQueries, UseQueryOptions, QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import * as appDom from '../appDom';
 import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../types';
@@ -389,35 +389,40 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
 
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
 
+  const queryClient = React.useMemo(() => new QueryClient(), []);
+
   return (
     // evaluation bindings run in an iframe so NoSsr for now
     <NoSsr>
       <AppContextProvider value={appContext}>
-        <ThemeProvider theme={createTheme(theme)}>
-          <DomContextProvider value={dom}>
-            <BrowserRouter basename={basename}>
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <AppOverview
-                      appId={appId}
-                      dom={dom}
-                      openPageButtonProps={getPageNavButtonProps}
-                    />
-                  }
-                />
-                {pages.map((page) => (
+        <QueryClientProvider client={queryClient}>
+          <CssBaseline />
+          <ThemeProvider theme={createTheme(theme)}>
+            <DomContextProvider value={dom}>
+              <BrowserRouter basename={basename}>
+                <Routes>
                   <Route
-                    key={page.id}
-                    path={`/${page.id}`}
-                    element={<RenderedPage nodeId={page.id} />}
+                    path="/"
+                    element={
+                      <AppOverview
+                        appId={appId}
+                        dom={dom}
+                        openPageButtonProps={getPageNavButtonProps}
+                      />
+                    }
                   />
-                ))}
-              </Routes>
-            </BrowserRouter>
-          </DomContextProvider>
-        </ThemeProvider>
+                  {pages.map((page) => (
+                    <Route
+                      key={page.id}
+                      path={`/${page.id}`}
+                      element={<RenderedPage nodeId={page.id} />}
+                    />
+                  ))}
+                </Routes>
+              </BrowserRouter>
+            </DomContextProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
       </AppContextProvider>
     </NoSsr>
   );

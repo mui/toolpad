@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as runtime from '@mui/toolpad-core/runtime';
 import { styled } from '@mui/material';
-import { VersionOrPreview } from '../types';
 import ToolpadApp, {
   ComponentsContextProvider,
   RenderToolpadComponentParams,
@@ -17,6 +16,7 @@ export interface ToolpadBridge {
 declare global {
   interface Window {
     __TOOLPAD_BRIDGE__?: ToolpadBridge;
+    __INITIAL_DOM__?: appDom.AppDom;
   }
 }
 
@@ -50,37 +50,46 @@ function renderToolpadComponent({
   );
 }
 
+export interface EditorContentProps {
+  dom: appDom.AppDom;
+  basename: string;
+  appId: string;
+}
+
+function EditorContent({ dom, appId, basename }: EditorContentProps) {
+  const components = useToolpadComponents(dom);
+  return (
+    <ComponentsContextProvider value={components}>
+      <RenderToolpadComponentProvider value={renderToolpadComponent}>
+        <ToolpadApp dom={dom} version="preview" appId={appId} basename={basename} />
+      </RenderToolpadComponentProvider>
+    </ComponentsContextProvider>
+  );
+}
+
 export interface EditorCanvasProps {
   basename: string;
   appId: string;
-  version: VersionOrPreview;
-  dom: appDom.AppDom;
 }
 
-export default function EditorCanvas({ dom: domProp, ...props }: EditorCanvasProps) {
-  const [dom, setDom] = React.useState(domProp);
-  React.useEffect(() => setDom(domProp), [domProp]);
-
-  const components = useToolpadComponents(dom);
+export default function EditorCanvas({ ...props }: EditorCanvasProps) {
+  const [dom, setDom] = React.useState<appDom.AppDom | null>(null);
 
   React.useEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
     window.__TOOLPAD_BRIDGE__ = {
       updateDom: (newDom) => setDom(newDom),
     };
+    // eslint-disable-next-line no-underscore-dangle
+    if (window.__INITIAL_DOM__) {
+      // eslint-disable-next-line no-underscore-dangle
+      setDom(window.__INITIAL_DOM__);
+    }
     return () => {
       // eslint-disable-next-line no-underscore-dangle
       delete window.__TOOLPAD_BRIDGE__;
     };
   }, []);
 
-  return (
-    <ComponentsContextProvider value={components}>
-      <RenderToolpadComponentProvider value={renderToolpadComponent}>
-        <EditorRoot id="root">
-          <ToolpadApp dom={dom} {...props} />
-        </EditorRoot>
-      </RenderToolpadComponentProvider>
-    </ComponentsContextProvider>
-  );
+  return <EditorRoot id="root">{dom ? <EditorContent dom={dom} {...props} /> : null}</EditorRoot>;
 }

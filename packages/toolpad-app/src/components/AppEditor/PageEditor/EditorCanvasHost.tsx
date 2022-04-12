@@ -35,10 +35,16 @@ export default function EditorCanvasHost({
   dom,
 }: EditorCanvasHostProps) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
+
   React.useEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
     frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__?.updateDom(dom);
+    if (frameRef.current?.contentWindow) {
+      // eslint-disable-next-line no-underscore-dangle
+      frameRef.current.contentWindow.__INITIAL_DOM__ = dom;
+    }
   }, [dom]);
+
   return (
     <CanvasRoot className={className}>
       <Box

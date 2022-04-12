@@ -106,12 +106,6 @@ const OverlayRoot = styled('div')({
     },
   },
 
-  /*   [`&.${overlayClasses.componentDragging}`]: {
-    [`& .${overlayClasses.insertSlotHud}`]: {
-      border: '1px dashed #DDD',
-    },
-  }, */
-
   [`& .${overlayClasses.insertSlotHud}`]: {
     position: 'absolute',
 

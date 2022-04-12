@@ -27,3 +27,6 @@ export * from './Paper.js';
 
 export { default as CustomLayout } from './CustomLayout.js';
 export * from './CustomLayout.js';
+
+export { default as Image } from './Image.js';
+export * from './Image.js';

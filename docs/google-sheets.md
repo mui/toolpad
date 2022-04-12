@@ -12,8 +12,14 @@ You'll need to enable Google Login to connect Google Sheets. If you’re an exis
 2. Now, you’ll have to generate OAuth 2.0 Client IDs; you can do this by navigating to the APIs and Services - Credentials section.
 3. Next, create a new app under the OAuth 2.0 Client ID section.
 4. You’ll now find two keys, Client ID and Client Secret; you’ll need these to authorize Toolpad to access your Google drive.
-5. Now add the following URIs under Authorised Redirect URIs**:** `https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback`
-6. Lastly, you’ll have to enable APIs to communicate with different services. For example, if you’re integrating google sheets, you’ll have to search for Google Sheets using the top search bar and enable API.
+5. Add a `.env.local` file inside `packages/toolpad_app` with the following values:
+   ```bash
+   TOOLPAD_EXTERNAL_URL=<YOUR_APP_URL>
+   TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID=<YOUR_CLIENT_ID>
+   TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET=<YOUR_CLIENT_SECRET>
+   ```
+6. Now add the following URIs under Authorised Redirect URIs**:** `https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback`
+7. Lastly, you’ll have to enable APIs to communicate with different services. For example, if you’re integrating google sheets, you’ll have to search for Google Sheets using the top search bar and enable API.
 
 ## Enable required APIs
 

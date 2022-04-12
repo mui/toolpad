@@ -1,6 +1,6 @@
 # MUI Toolpad
 
-Low code tool, for developrs, powered by MUI.
+Low code tool, for developers, powered by MUI.
 
 ## Table of contents
 

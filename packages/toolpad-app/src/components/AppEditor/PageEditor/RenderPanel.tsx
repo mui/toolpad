@@ -107,12 +107,6 @@ const OverlayRoot = styled('div')({
     },
   },
 
-  /*   [`&.${overlayClasses.componentDragging}`]: {
-    [`& .${overlayClasses.insertSlotHud}`]: {
-      border: '1px dashed #DDD',
-    },
-  }, */
-
   [`& .${overlayClasses.insertSlotHud}`]: {
     position: 'absolute',
 
@@ -836,6 +830,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         attributes: true,
         childList: true,
         subtree: true,
+        characterData: true,
       });
 
       const resizeObserver = new ResizeObserver(handlePageUpdate);

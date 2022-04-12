@@ -17,12 +17,11 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { ArgTypeDefinitions, UseDataQuery } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { NodeId } from '../../../types';
+import { NodeId, ArgTypeDefinitions, UseDataQuery } from '../../../types';
 import { ExactEntriesOf } from '../../../utils/types';
 import { getQueryNodeArgTypes } from '../../../toolpadDataSources/client';
 import NodeAttributeEditor from './NodeAttributeEditor';

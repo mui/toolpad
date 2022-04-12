@@ -40,7 +40,9 @@ lerna-debug.log
 dist/
 
 packages/toolpad-app/public/web_modules
-packages/toolpad-app/public/editorRuntime
+packages/toolpad-app/public/runtime
+packages/toolpad-app/public/reactDevtools
 packages/toolpad-app/public/sandbox
+packages/toolpad-app/public/runtime
 packages/toolpad-app/public/typings.json
 packages/toolpad-app/prisma/generated

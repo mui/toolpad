@@ -1,9 +1,8 @@
 import { Stack, TextField } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinitions } from '@mui/toolpad-core';
 import StringRecordEditor from '../../components/StringRecordEditor';
 import { BindingEditor } from '../../components/AppEditor/BindingEditor';
-import { ClientDataSource } from '../../types';
+import { ClientDataSource, ArgTypeDefinitions } from '../../types';
 import { WithControlledProp } from '../../utils/types';
 import { FetchQuery } from './types';
 import * as appDom from '../../appDom';

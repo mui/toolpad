@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Alert, AlertTitle } from '@mui/material';
-import { RuntimeError } from '@mui/toolpad-core';
+import { RuntimeError } from '../../../types';
 
 export interface RuntimeErrorAlertProps {
   error: RuntimeError;

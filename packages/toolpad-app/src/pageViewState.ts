@@ -1,15 +1,19 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
+// TODO: move to src/constants.ts
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from '../runtime/core';
 import {
-  RUNTIME_PROP_NODE_ID,
-  RUNTIME_PROP_SLOTS,
+  NodeId,
+  FlowDirection,
+  PageViewState,
+  NodesInfo,
+  NodeInfo,
   SlotType,
   RuntimeError,
   LiveBindings,
   RuntimeEvent,
   ComponentConfig,
   LiveBinding,
-} from '@mui/toolpad-core';
-import { NodeId, FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
+} from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
 
 declare global {

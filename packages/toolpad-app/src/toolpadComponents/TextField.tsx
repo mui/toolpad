@@ -3,7 +3,7 @@ import { ToolpadComponentDefinition } from './componentDefinition';
 export default {
   id: 'TextField',
   displayName: 'TextField',
-  importedModule: '@mui/toolpad-components',
+  importedModule: '/runtime/components.js',
   importedName: 'TextField',
   argTypes: {
     label: {

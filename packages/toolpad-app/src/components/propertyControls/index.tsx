@@ -1,5 +1,4 @@
-import { ArgControlSpec } from '@mui/toolpad-core';
-import { PropControlDefinition } from '../../types';
+import { PropControlDefinition, ArgControlSpec } from '../../types';
 import string from './string';
 import boolean from './boolean';
 import number from './number';

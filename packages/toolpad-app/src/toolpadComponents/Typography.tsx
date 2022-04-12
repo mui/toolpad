@@ -3,7 +3,7 @@ import { ToolpadComponentDefinition } from './componentDefinition';
 export default {
   id: 'Typography',
   displayName: 'Typography',
-  importedModule: '@mui/toolpad-components',
+  importedModule: '/runtime/components.js',
   importedName: 'Typography',
   argTypes: {
     children: {

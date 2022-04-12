@@ -3,7 +3,7 @@ import { ToolpadComponentDefinition } from './componentDefinition';
 export default {
   id: 'Paper',
   displayName: 'Paper',
-  importedModule: '@mui/toolpad-components',
+  importedModule: '/runtime/components.js',
   importedName: 'Paper',
   argTypes: {
     elevation: {

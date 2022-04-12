@@ -1,4 +1,3 @@
-import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/toolpad-core';
 import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getToolpadComponent } from './toolpadComponents';
@@ -10,6 +9,9 @@ import {
   BindableAttrValue,
   BindableAttrValues,
   VersionOrPreview,
+  ArgTypeDefinition,
+  ArgTypeDefinitions,
+  PropValueTypes,
 } from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
@@ -115,7 +117,7 @@ class Context implements RenderContext {
     this.reactAlias = this.addImport('react', '*', 'React');
 
     if (this.config.editor) {
-      this.runtimeAlias = this.addImport('@mui/toolpad-core/runtime', '*', '__editorRuntime');
+      this.runtimeAlias = this.addImport('/runtime/appRuntime.js', '*', '__editorRuntime');
     }
   }
 

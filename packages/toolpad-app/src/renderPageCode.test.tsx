@@ -5,6 +5,7 @@
 import * as React from 'react';
 import * as esbuild from 'esbuild';
 import { render } from '@testing-library/react';
+import path from 'path';
 import renderPageCode from './renderPageCode';
 import * as appDom from './appDom';
 
@@ -20,11 +21,15 @@ async function bundle(files: Record<string, string>, entry: string): Promise<str
     bundle: true,
     globalName: 'exports',
     external: ['react', 'react-dom'],
+    target: 'es6',
     plugins: [
       {
         name: 'resolver',
         setup(build) {
           build.onResolve({ filter: /.*/ }, async (args) => {
+            if (args.path === '/runtime/components.js') {
+              return { path: path.resolve(__dirname, '../runtime/components/index.tsx') };
+            }
             if (args.kind === 'entry-point') {
               return { namespace: TOOLPAD_NS, path: args.path };
             }

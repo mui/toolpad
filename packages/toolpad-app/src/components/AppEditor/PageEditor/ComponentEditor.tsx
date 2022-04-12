@@ -1,6 +1,6 @@
 import { styled, Typography } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinition, ArgTypeDefinitions } from '@mui/toolpad-core';
+import { ArgTypeDefinition, ArgTypeDefinitions } from '../../../types';
 import { useToolpadComponent } from '../../../toolpadComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';

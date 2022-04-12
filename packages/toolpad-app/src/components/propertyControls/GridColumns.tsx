@@ -22,7 +22,7 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { inferColumns } from '@mui/toolpad-components';
+import { inferColumns } from '../../../runtime/components';
 import type { EditorProps, PropControlDefinition } from '../../types';
 
 // TODO: this import suggests leaky abstraction

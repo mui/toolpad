@@ -18,7 +18,7 @@
     "prettier": "node scripts/prettier.js",
     "deduplicate": "node scripts/deduplicate.js",
     "start": "cross-env FORCE_COLOR=1 packages/toolpad-cli/cli.js",
-    "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/toolpad-core --scope @mui/toolpad-components --scope @mui/toolpad",
+    "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/toolpad",
     "cli": "cross-env FORCE_COLOR=1 packages/toolpad-cli/cli.js --dev",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "prisma": "yarn workspace @mui/toolpad-app run --cwd=\"./packages/toolpad-app\"  prisma",
@@ -28,8 +28,7 @@
     "release:publish:dry-run": "yarn release:publish --registry=\"http://localhost:4873/\"",
     "release:docker:build": "ts-node --esm ./scripts/esm/docker.ts build",
     "release:docker:publish": "ts-node --esm ./scripts/esm/docker.ts publish",
-    "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
-    "test": "yarn test:build && jest"
+    "test": "jest"
   },
   "devDependencies": {
     "@mui/monorepo": "git+https://github.com/mui/material-ui.git#master",

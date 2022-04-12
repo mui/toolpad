@@ -11,10 +11,13 @@ function rewriteImports(map: ImportMap): ImportMap {
           return [specifier, pathname];
         }),
       ),
+      '@mui/toolpad-core': '/runtime/core.js',
     },
   };
 }
 
 const IMPORT_MAP = rewriteImports(importMap);
 
-export default () => IMPORT_MAP;
+export default function getImportMap() {
+  return IMPORT_MAP;
+}

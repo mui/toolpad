@@ -55,7 +55,7 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
           config.editor
             ? `
               <script type="module" src="/sandbox/index.js"></script>
-              <script type="module" src="/editorRuntime/index.js"></script>
+              <script type="module" src="/reactDevtools/bootstrap.js"></script>
               `
             : ''
         }

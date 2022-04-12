@@ -4,7 +4,7 @@ import { URI_SELECT_OPTIONS } from '../schemas';
 export default {
   id: 'Select',
   displayName: 'Select',
-  importedModule: '@mui/toolpad-components',
+  importedModule: '/runtime/components.js',
   importedName: 'Select',
   argTypes: {
     label: {

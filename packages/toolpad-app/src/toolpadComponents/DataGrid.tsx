@@ -4,7 +4,7 @@ import { ToolpadComponentDefinition } from './componentDefinition';
 export default {
   id: 'DataGrid',
   displayName: 'DataGrid',
-  importedModule: '@mui/toolpad-components',
+  importedModule: '/runtime/components.js',
   importedName: 'DataGrid',
   argTypes: {
     rows: {

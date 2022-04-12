@@ -6,3 +6,5 @@ Low code tool, for developrs, powered by MUI.
 
 - [Setup instructions](./setup.md)
 - [Getting started](./getting-started.md)
+- Datasources
+  - [Google Sheets](./google-sheets.md)

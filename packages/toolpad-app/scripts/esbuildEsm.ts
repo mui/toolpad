@@ -71,7 +71,6 @@ build({
     'react',
     'react-dom',
     'react-query',
-    '@mui/toolpad-core',
     '@mui/x-data-grid-pro',
     '@mui/material',
     '@mui/material/utils',

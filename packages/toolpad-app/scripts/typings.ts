@@ -6,30 +6,30 @@ import { promisify } from 'util';
 const glob = promisify(globCb);
 
 const LIBS = [
-  'react',
-  'react-dom',
-  '@mui/material',
+  { name: 'react' },
+  { name: 'react-dom' },
+  { name: '@mui/material' },
   // TODO: we need to analyze imports of the definition files and include those libs automatically
-  'csstype',
-  'react-transition-group',
-  '@mui/base',
-  '@mui/styles',
-  '@mui/types',
-  '@mui/system',
-  '@mui/utils',
-  '@mui/toolpad-core',
+  { name: 'csstype' },
+  { name: 'react-transition-group' },
+  { name: '@mui/base' },
+  { name: '@mui/styles' },
+  { name: '@mui/types' },
+  { name: '@mui/system' },
+  { name: '@mui/utils' },
+  // { name: '@mui/toolpad-core', path: path.resolve(__dirname, '../runtime/core') },
 ];
 
 function getModuleId(fileName: string, pkgDir: string, pkgName: string) {
   return path.join(`node_modules/${pkgName}/`, path.relative(pkgDir, fileName));
 }
 
-async function getDefinitions() {
+async function main() {
   const allFiles: { filename: string; moduleId: string }[] = (
     await Promise.all(
-      LIBS.map(async (lib) => {
+      LIBS.map(async ({ name }) => {
         const files: { filename: string; moduleId: string }[] = [];
-        const resolvedPkg = require.resolve(`${lib}/package.json`);
+        const resolvedPkg = require.resolve(`${name}/package.json`);
         const pkgJson = await import(resolvedPkg);
         const pkgDir = path.dirname(resolvedPkg);
 
@@ -50,9 +50,9 @@ async function getDefinitions() {
         }
 
         try {
-          let typesLib = lib;
-          if (lib.startsWith('@')) {
-            const [part1, part2] = lib.slice(1).split('/');
+          let typesLib = name;
+          if (name.startsWith('@')) {
+            const [part1, part2] = name.slice(1).split('/');
             typesLib = `${part1}__${part2}`;
           }
           const resolvedTypesPkg = require.resolve(`@types/${typesLib}/package.json`);
@@ -95,4 +95,7 @@ async function getDefinitions() {
   });
 }
 
-getDefinitions();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -1,6 +1,5 @@
-import { ArgTypeDefinitions } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
-import { PropExpression, ResolvedProps } from '../types';
+import { PropExpression, ResolvedProps, ArgTypeDefinitions } from '../types';
 
 export interface RenderContext {
   dom: appDom.AppDom;

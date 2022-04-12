@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@mui/toolpad-app": "^0.0.5-alpha.4",
-    "@mui/toolpad-core": "^0.0.5-alpha.4",
     "arg": "^5.0.1",
     "dotenv": "^16.0.0",
     "execa": "^6.1.0",

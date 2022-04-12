@@ -21,3 +21,5 @@ export * from './useDataQuery';
 export { default as useUrlQueryState } from './useUrlQueryState';
 
 export * from './constants';
+
+export type { ComponentConfig } from '../../src/types';

@@ -5,7 +5,6 @@
 import * as React from 'react';
 import * as esbuild from 'esbuild';
 import { render } from '@testing-library/react';
-import path from 'path';
 import renderPageCode from './renderPageCode';
 import * as appDom from './appDom';
 
@@ -51,7 +50,7 @@ async function bundle(files: Record<string, string>, entry: string): Promise<str
 describe('renderPageCode', () => {
   // TODO: figure out imports
   // eslint-disable-next-line mocha/no-skipped-tests
-  test.skip('Basic Toolpad dom rendering Typography component', async () => {
+  test('Basic Toolpad dom rendering Typography component', async () => {
     let dom = appDom.createDom();
     const root = appDom.getNode(dom, dom.root, 'app');
     const page = appDom.createNode(dom, 'page', {

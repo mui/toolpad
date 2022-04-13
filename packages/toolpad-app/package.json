@@ -11,14 +11,17 @@
     "esinstall": "ts-node ./scripts/esinstall.ts",
     "esbuildEsm": "ts-node ./scripts/esbuildEsm.ts",
     "prisma": "prisma",
+    "build:runtime": "ts-node ./scripts/buildRuntime.ts",
     "build:next": "next build",
-    "build:esbuild": "rimraf ./public/sandbox ./public/editorRuntime && esbuild ./sandbox/index.ts ./editorRuntime/index.ts --target=es6 --bundle --outdir=./public",
-    "build:types": "ts-node ./scripts/typings.ts",
+    "build:esbuild": "rimraf ./public/sandbox ./public/reactDevtools && esbuild ./sandbox/index.ts ./reactDevtools/bootstrap.ts --target=es6 --bundle --outdir=./public",
+    "build:typings": "ts-node ./scripts/typings.ts",
+    "dev:runtime": "ts-node ./scripts/buildRuntime.ts --watch",
     "dev:next": "node ./server.js",
     "dev:esbuild": "yarn build:esbuild --watch",
-    "dev:types": "yarn build:types",
+    "dev:typings": "yarn build:typings",
     "dev:prisma": "prisma generate --watch",
-    "waitForDb": "ts-node ./scripts/waitForDb.ts"
+    "waitForDb": "ts-node ./scripts/waitForDb.ts",
+    "tmp": "tsc ./runtime/core --declaration --emitDeclarationOnly"
   },
   "files": [
     "prisma",

@@ -2,10 +2,7 @@
 import { install } from 'esinstall';
 import * as path from 'path';
 import arg from 'arg';
-import rimrafCb from 'rimraf';
-import { promisify } from 'util';
-
-const rimraf = promisify(rimrafCb);
+import rimraf from './rimraf';
 
 const args = arg({
   // Types
@@ -24,18 +21,18 @@ async function main() {
     [
       'es-module-shims',
       'react',
+      'react/jsx-runtime',
       'react-dom',
       'react-dom/client',
       'react-query',
-      '@mui/toolpad-core',
-      '@mui/toolpad-core/runtime',
-      '@mui/toolpad-components',
+      'react-router-dom',
       '@mui/x-data-grid-pro',
       '@mui/material',
       '@mui/material/utils',
       '@mui/material/styles',
       '@mui/material/colors',
       '@mui/lab',
+      '@mui/icons-material/Error',
     ],
     {
       cwd: PROJECT_ROOT,

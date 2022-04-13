@@ -5,7 +5,8 @@
     "alwaysStrict": true,
     "rootDir": "src",
     "outDir": "dist",
-    "declaration": true
+    "declaration": true,
+    "target": "ES2020"
   },
   "include": ["**/*.ts", "**/*.tsx"]
 }

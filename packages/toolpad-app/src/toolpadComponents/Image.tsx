@@ -3,7 +3,7 @@ import { ToolpadComponentDefinition } from './componentDefinition';
 export default {
   id: 'Image',
   displayName: 'Image',
-  importedModule: '/runtime/components.js',
+  importedModule: '@mui/toolpad-components',
   importedName: 'Image',
   argTypes: {
     src: {

@@ -3,7 +3,7 @@ import { ToolpadComponentDefinition } from './componentDefinition';
 export default {
   id: 'Stack',
   displayName: 'Stack',
-  importedModule: '/runtime/components.js',
+  importedModule: '@mui/toolpad-components',
   importedName: 'Stack',
   argTypes: {
     gap: {

@@ -3,7 +3,7 @@ import { ToolpadComponentDefinition } from './componentDefinition';
 export default {
   id: 'Container',
   displayName: 'Container',
-  importedModule: '/runtime/components.js',
+  importedModule: '@mui/toolpad-components',
   importedName: 'Container',
   argTypes: {
     children: {

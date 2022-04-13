@@ -3,7 +3,7 @@ import { ToolpadComponentDefinition } from './componentDefinition';
 export default {
   id: 'PageRow',
   displayName: 'PageRow',
-  importedModule: '/runtime/components.js',
+  importedModule: '@mui/toolpad-components',
   importedName: 'PageRow',
   argTypes: {
     spacing: {

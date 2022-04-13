@@ -3,7 +3,7 @@ import { ToolpadComponentDefinition } from './componentDefinition';
 export default {
   id: 'Button',
   displayName: 'Button',
-  importedModule: '/runtime/components.js',
+  importedModule: '@mui/toolpad-components',
   importedName: 'Button',
   argTypes: {
     children: {

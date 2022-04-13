@@ -27,7 +27,7 @@ async function bundle(files: Record<string, string>, entry: string): Promise<str
         name: 'resolver',
         setup(build) {
           build.onResolve({ filter: /.*/ }, async (args) => {
-            if (args.path === '/runtime/components.js') {
+            if (args.path === '@mui/toolpad-components') {
               return { path: path.resolve(__dirname, '../runtime/components/index.tsx') };
             }
             if (args.kind === 'entry-point') {

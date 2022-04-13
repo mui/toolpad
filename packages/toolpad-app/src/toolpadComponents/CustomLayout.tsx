@@ -3,7 +3,7 @@ import { ToolpadComponentDefinition } from './componentDefinition';
 export default {
   id: 'CustomLayout',
   displayName: 'CustomLayout',
-  importedModule: '/runtime/components.js',
+  importedModule: '@mui/toolpad-components',
   importedName: 'CustomLayout',
   argTypes: {
     child3: {

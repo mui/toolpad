@@ -36,7 +36,6 @@ async function main() {
       '@mui/x-data-grid-pro',
       '@mui/material',
       '@mui/icons-material',
-      // '@mui/toolpad-core',
     ],
     entryPoints: ['./runtime/components', './runtime/core', './runtime/appRuntime'],
     logLevel: 'info',

@@ -16,17 +16,15 @@ You'll need to enable Google Login to connect Google Sheets. If you’re an exis
    TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID=<YOUR_CLIENT_ID>
    TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET=<YOUR_CLIENT_SECRET>
    ```
-6. Now add the following URIs under Authorised Redirect URIs**:** `https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback`
-7. Lastly, you’ll have to enable APIs to communicate with different services. For example, if you’re integrating Google Sheets, you’ll have to search for Google Sheets using the top search bar and enable API.
+6. Now add the following URIs under Authorised Redirect URIs**:** 
+   ```bash
+   https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback
+   YOUR_APP_URL is the one that toolpad will be hosted under
+   ```
+8. Lastly, you’ll have to enable APIs to communicate with different services. You’ll have to search for Google Sheets and Google Drive APIs using the top search bar and enable them.
 
 Reference from Google: [https://developers.google.com/identity/sign-in/web/sign-in](https://developers.google.com/identity/sign-in/web/sign-in)
 
-## Enable required APIs
-
-From the console home screen, search and enable all of the 3 APIs mentioned below:
-
-- Google Drive API
-- Google Sheets API
 
 ## Adding Google Sheets as a datasource in Toolpad
 
@@ -38,11 +36,6 @@ From the App page;
 4. In the query editor, the spreadsheet input will show you the list of all available Google sheets (your and the ones shared with you).
 5. Choose the sheet, cell range → Click on “Update” to save the API
 
-## Querying data for a component
+You should now be able to use this API in any App page.
 
-1. Create a new Page or use an existing page from left sidebar
-2. Create a Query State so that the query created above can be used inside this page
-3. Add a component which you want to use with the Google sheet
-4. Bind the queryState with the properties of the components using JavaScript
-
-You should now be able to see Google sheet data in your Toolpad Application.
+Refer to the [Getting started](https://github.com/mui/mui-toolpad/blob/docs/sheets/docs/getting-started.md) section to learn more about building an application on Toolpad. 

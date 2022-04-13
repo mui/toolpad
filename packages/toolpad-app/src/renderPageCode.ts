@@ -115,7 +115,7 @@ class Context implements RenderContext {
     this.reactAlias = this.addImport('react', '*', 'React');
 
     if (this.config.editor) {
-      this.runtimeAlias = this.addImport('/runtime/appRuntime.js', '*', '__editorRuntime');
+      this.runtimeAlias = this.addImport('@mui/toolpad-core/runtime', '*', '__editorRuntime');
     }
   }
 

@@ -13,6 +13,7 @@ function rewriteImports(map: ImportMap): ImportMap {
       ),
       '@mui/toolpad-components': '/runtime/components.js',
       '@mui/toolpad-core': '/runtime/core.js',
+      '@mui/toolpad-core/runtime': '/runtime/coreRuntime.js',
     },
   };
 }

@@ -22,10 +22,13 @@ MUI Toolpad is in its alpha stages of development. Feel free to run this applica
 
 ## Quick setup locally
 
-Check out the repository and run
+**NOTE: MUI toolpad is in preview, do not run this in production.**
+
+Download the docker-compose file and run:
 
 ```sh
-docker-compose -f docker/compose/docker-compose.yml up
+curl -LO https://raw.githubusercontent.com/mui/mui-toolpad/master/docker/compose/docker-compose.yml
+docker-compose up -d
 ```
 
 ## documentation

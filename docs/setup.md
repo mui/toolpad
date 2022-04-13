@@ -4,7 +4,7 @@
 
 The easiest way to run MUI Toolpad locally is through docker-compose.
 
-NOTE: MUI toolpad is in preview, do not run this in production
+**NOTE: MUI toolpad is in preview, do not run this in production.**
 
 ### prerequisits
 

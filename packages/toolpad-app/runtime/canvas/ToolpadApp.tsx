@@ -11,7 +11,7 @@ import {
 import { ThemeProvider, createTheme, ThemeOptions, PaletteOptions } from '@mui/material/styles';
 import * as colors from '@mui/material/colors';
 import { useQueries, UseQueryOptions, QueryClient, QueryClientProvider } from 'react-query';
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import * as appDom from '../../src/appDom';
 import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../../src/types';
 import { createProvidedContext } from '../../src/utils/react';
@@ -367,7 +367,7 @@ function createThemeoptions(themeNode: appDom.ThemeNode): ThemeOptions {
 }
 
 function getPageNavButtonProps(appId: string, page: appDom.PageNode) {
-  return { component: Link, to: `/${page.id}` } as ButtonProps;
+  return { component: Link, to: `/pages/${page.id}` } as ButtonProps;
 }
 
 export interface ToolpadAppProps {
@@ -399,8 +399,9 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
           <DomContextProvider value={dom}>
             <BrowserRouter basename={basename}>
               <Routes>
+                <Route path="/" element={<Navigate replace to="/pages" />} />
                 <Route
-                  path="/"
+                  path="/pages"
                   element={
                     <AppOverview
                       appId={appId}
@@ -412,7 +413,7 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
                 {pages.map((page) => (
                   <Route
                     key={page.id}
-                    path={`/${page.id}`}
+                    path={`/pages/${page.id}`}
                     element={<RenderedPage nodeId={page.id} />}
                   />
                 ))}

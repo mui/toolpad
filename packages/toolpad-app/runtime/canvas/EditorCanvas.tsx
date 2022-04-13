@@ -18,6 +18,7 @@ declare global {
     __TOOLPAD_BRIDGE__?: ToolpadBridge;
   }
 }
+
 function renderToolpadComponent({
   Component,
   props,

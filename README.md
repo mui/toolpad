@@ -31,9 +31,9 @@ curl -LO https://raw.githubusercontent.com/mui/mui-toolpad/master/docker/compose
 docker-compose up -d
 ```
 
-## documentation
+## Documentation
 
-[The documentation](./docs)
+Check out our [documentation](./docs).
 
 ## Contributing
 
@@ -52,8 +52,7 @@ Although we love giving you the opportunity to put your stamp on MUI, we also ar
 
 ## License
 
-This project is licensed under the terms of the
-[MIT license](/LICENSE).
+This project is licensed under the terms of the [MIT license](/LICENSE).
 
 ## Sponsoring services
 

@@ -38,7 +38,7 @@ function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponen
   return {
     displayName: domNode.name,
     argTypes: domNode.attributes.argTypes.value,
-    Component: Noop,
+    Component: typeof window === 'undefined' ? Noop : Noop,
     importedModule: `../components/${domNode.id}.tsx`,
     importedName: capitalize(domNode.name),
     codeComponent: true,

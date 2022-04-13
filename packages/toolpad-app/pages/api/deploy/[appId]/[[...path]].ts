@@ -1,8 +1,7 @@
 import { NextApiHandler } from 'next';
-import getImportMap from '../../../../src/getImportMap';
-import renderPageHtml from '../../../../src/renderPageHtml';
 import { findActiveDeployment } from '../../../../src/server/data';
 import { asArray } from '../../../../src/utils/collections';
+import { renderAppHtml } from '../../app/[appId]/[version]/[[...path]]';
 
 export default (async (req, res) => {
   const [appId] = asArray(req.query.appId);
@@ -14,11 +13,11 @@ export default (async (req, res) => {
     return;
   }
 
-  const [pageId] = asArray(req.query.pageId);
-  const { code: html } = renderPageHtml({
-    entry: `/release/${appId}/${activeDeployment.release.version}/${pageId}/entry`,
-    importMap: getImportMap(),
-  });
   res.setHeader('content-type', 'text/html');
-  res.send(html);
+  res.send(
+    await renderAppHtml(appId, {
+      version: activeDeployment.version,
+      basename: `/deploy/${appId}`,
+    }),
+  );
 }) as NextApiHandler<string>;

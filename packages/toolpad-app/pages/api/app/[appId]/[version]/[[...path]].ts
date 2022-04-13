@@ -9,15 +9,17 @@ import {
 import getImportMap from '../../../../../src/getImportMap';
 import { escapeHtml } from '../../../../../src/utils/strings';
 import { loadVersionedDom, parseVersion } from '../../../../../src/server/data';
+import { VersionOrPreview } from '../../../../../src/types';
 
-export default (async (req, res) => {
-  const [appId] = asArray(req.query.appId);
-  const version = parseVersion(req.query.version);
-  if (!version) {
-    res.status(404).end();
-    return;
-  }
+export interface RenderAppHtmlOptions {
+  version: VersionOrPreview;
+  basename: string;
+}
 
+export async function renderAppHtml(
+  appId: string,
+  { version = 'preview', basename = `/app/${appId}/${version}` }: RenderAppHtmlOptions,
+) {
   const dom = await loadVersionedDom(appId, version);
 
   const importMap = getImportMap();
@@ -30,12 +32,11 @@ export default (async (req, res) => {
     editor: true,
     dom,
     appId,
-    basename: `/api/app/${appId}/${version}`,
+    basename,
     version,
   };
 
-  res.setHeader('content-type', 'text/html');
-  res.send(`
+  return `
     <!DOCTYPE html>
     <html style="position: relative">
       <head>
@@ -79,5 +80,22 @@ export default (async (req, res) => {
         <script type="module" src="/runtime/canvas.js"></script>
       </body>
     </html>
-  `);
+  `;
+}
+
+export default (async (req, res) => {
+  const [appId] = asArray(req.query.appId);
+  const version = parseVersion(req.query.version);
+  if (!version) {
+    res.status(404).end();
+    return;
+  }
+
+  res.setHeader('content-type', 'text/html');
+  res.send(
+    await renderAppHtml(appId, {
+      version,
+      basename: `/app/${appId}/${version}`,
+    }),
+  );
 }) as NextApiHandler<string>;

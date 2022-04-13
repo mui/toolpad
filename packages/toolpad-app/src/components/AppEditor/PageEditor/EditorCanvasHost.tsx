@@ -39,10 +39,6 @@ export default function EditorCanvasHost({
   React.useEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
     frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__?.updateDom(dom);
-    if (frameRef.current?.contentWindow) {
-      // eslint-disable-next-line no-underscore-dangle
-      frameRef.current.contentWindow.__INITIAL_DOM__ = dom;
-    }
   }, [dom]);
 
   return (
@@ -62,7 +58,8 @@ export default function EditorCanvasHost({
       <CanvasFrame
         ref={frameRef}
         onLoad={() => onLoad?.(frameRef.current?.contentWindow!)}
-        src={`/editor-canvas/${appId}/${pageNodeId}`}
+        src={`/api/app/${appId}/preview/${pageNodeId}`}
+        // src={`/editor-canvas/${appId}/${pageNodeId}`}
       />
     </CanvasRoot>
   );

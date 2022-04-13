@@ -1,4 +1,4 @@
-import { APP_ROOT_ID } from './constants';
+import { HTML_ID_APP_ROOT } from './constants';
 
 export interface RenderEntryPointParams {
   editor?: boolean;
@@ -37,7 +37,7 @@ export default function renderEntryPoint({ pagePath, themePath }: RenderEntryPoi
     if (import.meta.hot) {
       // Make sure to reuse the root
       const root = import.meta.hot.data.root || createRoot(document.getElementById(${JSON.stringify(
-        APP_ROOT_ID,
+        HTML_ID_APP_ROOT,
       )}));
       
       if (!import.meta.hot.data.isRefresh) {
@@ -54,7 +54,7 @@ export default function renderEntryPoint({ pagePath, themePath }: RenderEntryPoi
         import.meta.hot.data.root = root;
       });
     } else {
-      const root = createRoot(document.getElementById(${JSON.stringify(APP_ROOT_ID)}));
+      const root = createRoot(document.getElementById(${JSON.stringify(HTML_ID_APP_ROOT)}));
       render(root, Page, theme);
     }
   `;

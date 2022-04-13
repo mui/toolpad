@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ButtonProps, NoSsr, Stack, CssBaseline } from '@mui/material';
+import { ButtonProps, Stack, CssBaseline } from '@mui/material';
 import { omit, pick, without } from 'lodash';
 import {
   ArgTypeDefinitions,
@@ -12,11 +12,11 @@ import { ThemeProvider, createTheme, ThemeOptions, PaletteOptions } from '@mui/m
 import * as colors from '@mui/material/colors';
 import { useQueries, UseQueryOptions, QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
-import * as appDom from '../appDom';
-import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../types';
-import { createProvidedContext } from '../utils/react';
-import { ToolpadComponentDefinition } from '../toolpadComponents/componentDefinition';
-import AppOverview from './AppOverview';
+import * as appDom from '../../src/appDom';
+import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../../src/types';
+import { createProvidedContext } from '../../src/utils/react';
+import { ToolpadComponentDefinition } from '../../src/toolpadComponents/componentDefinition';
+import AppOverview from '../../src/components/AppOverview';
 
 export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
@@ -392,39 +392,36 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
   const queryClient = React.useMemo(() => new QueryClient(), []);
 
   return (
-    // evaluation bindings run in an iframe so NoSsr for now
-    <NoSsr>
-      <AppContextProvider value={appContext}>
-        <QueryClientProvider client={queryClient}>
-          <CssBaseline />
-          <ThemeProvider theme={createTheme(theme)}>
-            <DomContextProvider value={dom}>
-              <BrowserRouter basename={basename}>
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      <AppOverview
-                        appId={appId}
-                        dom={dom}
-                        openPageButtonProps={getPageNavButtonProps}
-                      />
-                    }
-                  />
-                  {pages.map((page) => (
-                    <Route
-                      key={page.id}
-                      path={`/${page.id}`}
-                      element={<RenderedPage nodeId={page.id} />}
+    <AppContextProvider value={appContext}>
+      <QueryClientProvider client={queryClient}>
+        <CssBaseline />
+        <ThemeProvider theme={createTheme(theme)}>
+          <DomContextProvider value={dom}>
+            <BrowserRouter basename={basename}>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <AppOverview
+                      appId={appId}
+                      dom={dom}
+                      openPageButtonProps={getPageNavButtonProps}
                     />
-                  ))}
-                </Routes>
-              </BrowserRouter>
-            </DomContextProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
-      </AppContextProvider>
-    </NoSsr>
+                  }
+                />
+                {pages.map((page) => (
+                  <Route
+                    key={page.id}
+                    path={`/${page.id}`}
+                    element={<RenderedPage nodeId={page.id} />}
+                  />
+                ))}
+              </Routes>
+            </BrowserRouter>
+          </DomContextProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </AppContextProvider>
   );
 }
 

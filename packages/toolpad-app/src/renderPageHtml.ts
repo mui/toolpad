@@ -1,5 +1,5 @@
 import { ImportMap } from 'esinstall';
-import { APP_ROOT_ID, MUI_X_PRO_LICENSE } from './constants';
+import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from './constants';
 import { escapeHtml } from './utils/strings';
 
 export interface RenderHtmlConfig {
@@ -15,7 +15,7 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
     ...configInit,
   };
 
-  const serializedImportMap = JSON.stringify(config.importMap);
+  const serializedImportMap = JSON.stringify(config.importMap, null, 2);
   const serializedPreload = Object.values(config.importMap.imports)
     .map((url) => `<link rel="modulepreload" href="${escapeHtml(url)}" />`)
     .join('\n');
@@ -40,7 +40,7 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
         </style>
       </head>
       <body>
-        <div id="${APP_ROOT_ID}"></div>
+        <div id="${HTML_ID_APP_ROOT}"></div>
 
         <script type="importmap">
           ${serializedImportMap}
@@ -54,13 +54,13 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
         ${
           config.editor
             ? `
-              <script type="module" src="/sandbox/index.js"></script>
               <script type="module" src="/reactDevtools/bootstrap.js"></script>
-              `
-            : ''
+              <script type="module" src="/runtime/canvas.js"></script>
+            `
+            : `<script type="module" src="${escapeHtml(config.entry)}"></script>`
         }
 
-        <script type="module" src="${escapeHtml(config.entry)}"></script>
+        
       </body>
     </html>
   `;

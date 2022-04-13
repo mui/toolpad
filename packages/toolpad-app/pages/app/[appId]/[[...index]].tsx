@@ -1,7 +1,7 @@
 import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
 import * as appDom from '../../../src/appDom';
-import ToolpadApp, { ComponentsContextProvider } from '../../../src/components/ToolpadApp';
+import ToolpadApp, { ComponentsContextProvider } from '../../../runtime/canvas/ToolpadApp';
 import { useToolpadComponents } from '../../../src/toolpadComponents';
 
 interface PageProps {

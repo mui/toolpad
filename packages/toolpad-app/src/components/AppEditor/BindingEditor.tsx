@@ -13,7 +13,8 @@ import {
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
-import { BindableAttrValue, LiveBinding, PropValueType } from '../../types';
+import { LiveBinding, PropValueType } from '@mui/toolpad-core';
+import { BindableAttrValue } from '../../types';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import RuntimeErrorAlert from './PageEditor/RuntimeErrorAlert';

@@ -17,7 +17,7 @@ const LIBS = [
   { name: '@mui/types' },
   { name: '@mui/system' },
   { name: '@mui/utils' },
-  // { name: '@mui/toolpad-core', path: path.resolve(__dirname, '../runtime/core') },
+  { name: '@mui/toolpad-core' },
 ];
 
 function getModuleId(fileName: string, pkgDir: string, pkgName: string) {

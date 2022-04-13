@@ -1,3 +1,4 @@
+import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/toolpad-core';
 import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
 import { getToolpadComponent } from './toolpadComponents';
@@ -9,9 +10,6 @@ import {
   BindableAttrValue,
   BindableAttrValues,
   VersionOrPreview,
-  ArgTypeDefinition,
-  ArgTypeDefinitions,
-  PropValueTypes,
 } from './types';
 import { camelCase } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';

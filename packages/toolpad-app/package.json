@@ -39,6 +39,7 @@
     "@mui/lab": "^5.0.0-alpha.75",
     "@mui/material": "^5.5.3",
     "@mui/styles": "^5.5.3",
+    "@mui/toolpad-core": "^0.0.5-alpha.4",
     "@mui/x-data-grid-pro": "^5.7.0",
     "@prisma/client": "^3.11.1",
     "@swc/wasm": "^1.2.163",

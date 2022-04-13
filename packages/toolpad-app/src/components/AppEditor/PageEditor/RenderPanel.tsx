@@ -4,6 +4,7 @@ import throttle from 'lodash/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
+import { RuntimeEvent, SlotType } from '@mui/toolpad-core';
 import {
   NodeId,
   FlowDirection,
@@ -11,8 +12,6 @@ import {
   SlotState,
   NodeInfo,
   NodesInfo,
-  RuntimeEvent,
-  SlotType,
 } from '../../../types';
 import * as appDom from '../../../appDom';
 import PageView from '../../PageView';

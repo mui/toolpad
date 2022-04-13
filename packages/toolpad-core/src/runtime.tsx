@@ -1,14 +1,7 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
-import {
-  RuntimeError,
-  SlotType,
-  LiveBindings,
-  ComponentConfig,
-  RuntimeEvent,
-  RUNTIME_PROP_NODE_ID,
-  RUNTIME_PROP_SLOTS,
-} from '@mui/toolpad-core';
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
+import type { SlotType, LiveBindings, ComponentConfig, RuntimeEvent } from './index';
 
 declare global {
   interface Window {
@@ -55,6 +48,11 @@ function PlaceholderWrapper(props: PlaceholderWrapperProps) {
       }}
     />
   );
+}
+
+export interface RuntimeError {
+  message: string;
+  stack?: string;
 }
 
 export interface NodeRuntimeWrapperProps {

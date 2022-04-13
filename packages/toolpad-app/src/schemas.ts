@@ -1,6 +1,6 @@
 import { JSONSchemaType } from 'ajv';
 import { GridEnrichedColDef } from '@mui/x-data-grid-pro';
-import { UseDataQuery } from './types';
+import { UseDataQuery } from '@mui/toolpad-core';
 
 type ToolpadColDef = Pick<GridEnrichedColDef, 'field' | 'align'>;
 type ToolpadGridColumns = ToolpadColDef[];

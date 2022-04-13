@@ -10,8 +10,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { debounce } from '@mui/material';
-import { useNode } from '../core';
-import { UseDataQuery } from '../../src/types';
+import { useNode, UseDataQuery } from '@mui/toolpad-core';
 
 function inferColumnType(value: unknown): string | undefined {
   if (value instanceof Date) {

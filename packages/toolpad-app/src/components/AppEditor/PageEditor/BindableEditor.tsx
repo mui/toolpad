@@ -1,14 +1,9 @@
 import { Alert, Stack } from '@mui/material';
 import * as React from 'react';
+import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/toolpad-core';
 import propertyControls from '../../propertyControls';
 import { BindingEditor } from '../BindingEditor';
-import {
-  NodeId,
-  BindableAttrValue,
-  ArgTypeDefinition,
-  ArgControlSpec,
-  PropValueType,
-} from '../../../types';
+import { NodeId, BindableAttrValue } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
 import { usePageEditorState } from './PageEditorProvider';
 

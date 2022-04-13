@@ -1,5 +1,6 @@
 import { generateKeyBetween } from 'fractional-indexing';
 import cuid from 'cuid';
+import { ArgTypeDefinitions, PropValueType, PropValueTypes } from '@mui/toolpad-core';
 import {
   NodeId,
   ConstantAttrValue,
@@ -9,9 +10,6 @@ import {
   AppTheme,
   ConstantAttrValues,
   SecretAttrValue,
-  ArgTypeDefinitions,
-  PropValueType,
-  PropValueTypes,
 } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';

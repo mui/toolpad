@@ -1,7 +1,8 @@
+import { ArgTypeDefinitions } from '@mui/toolpad-core';
 import movies from './movies/client';
 import postgres from './postgres/client';
 import rest from './rest/client';
-import { NodeId, ClientDataSource, ArgTypeDefinitions } from '../types';
+import { NodeId, ClientDataSource } from '../types';
 import * as appDom from '../appDom';
 import googleSheets from './googleSheets/client';
 

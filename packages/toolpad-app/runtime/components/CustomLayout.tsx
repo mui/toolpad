@@ -1,7 +1,7 @@
 // Just for demo purposes
 import * as React from 'react';
 import { Grid } from '@mui/material';
-import { Placeholder } from '../core';
+import { Placeholder } from '@mui/toolpad-core';
 
 export interface CustomLayoutProps {
   child1?: React.ReactNode;

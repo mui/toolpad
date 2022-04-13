@@ -19,19 +19,14 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import CloseIcon from '@mui/icons-material/Close';
+import { PropValueType, PropValueTypes } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';
 import * as appDom from '../../../appDom';
-import {
-  NodeId,
-  BindableAttrValue,
-  BindableAttrValues,
-  PropValueType,
-  PropValueTypes,
-} from '../../../types';
+import { NodeId, BindableAttrValue, BindableAttrValues } from '../../../types';
 import { BindingEditor } from '../BindingEditor';
 
 const DERIVED_STATE_PARAMS = 'DerivedStateParams';

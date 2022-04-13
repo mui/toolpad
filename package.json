@@ -18,7 +18,7 @@
     "prettier": "node scripts/prettier.js",
     "deduplicate": "node scripts/deduplicate.js",
     "start": "cross-env FORCE_COLOR=1 packages/toolpad-cli/cli.js",
-    "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/toolpad",
+    "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/toolpad --scope @mui/toolpad-core",
     "cli": "cross-env FORCE_COLOR=1 packages/toolpad-cli/cli.js --dev",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "prisma": "yarn workspace @mui/toolpad-app run --cwd=\"./packages/toolpad-app\"  prisma",

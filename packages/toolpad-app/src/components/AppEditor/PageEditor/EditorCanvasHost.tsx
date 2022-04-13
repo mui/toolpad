@@ -58,8 +58,7 @@ export default function EditorCanvasHost({
       <CanvasFrame
         ref={frameRef}
         onLoad={() => onLoad?.(frameRef.current?.contentWindow!)}
-        src={`/api/app/${appId}/preview/${pageNodeId}`}
-        // src={`/editor-canvas/${appId}/${pageNodeId}`}
+        src={`/api/app/${appId}/preview/pages/${pageNodeId}`}
       />
     </CanvasRoot>
   );

@@ -8,7 +8,7 @@ import {
   RuntimeEvent,
   RUNTIME_PROP_NODE_ID,
   RUNTIME_PROP_SLOTS,
-} from '@mui/toolpad-core';
+} from '../core';
 
 declare global {
   interface Window {

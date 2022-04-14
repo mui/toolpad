@@ -218,7 +218,7 @@ export default function Editor() {
     throw new Error(`Missing queryParam "appId"`);
   }
 
-  const appContextValue: AppEditorContext = { id: appId };
+  const appContextValue: AppEditorContext = React.useMemo(() => ({ id: appId }), [appId]);
 
   return (
     <AppEditorContextprovider value={appContextValue}>

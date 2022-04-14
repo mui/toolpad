@@ -3,10 +3,10 @@ import { Box, Collapse, styled, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { useToolpadComponents } from '../../../toolpadComponents';
 import * as appDom from '../../../appDom';
 import { useDom } from '../../DomLoader';
 import { usePageEditorApi } from './PageEditorProvider';
+import { useToolpadComponents } from '../toolpadComponents';
 
 const WIDTH_COLLAPSED = 50;
 

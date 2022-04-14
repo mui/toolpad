@@ -40,6 +40,7 @@ function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponen
 
 export function getToolpadComponents(
   appId: string,
+  version: string,
   dom: appDom.AppDom,
 ): ToolpadComponentDefinitions {
   const app = appDom.getApp(dom);

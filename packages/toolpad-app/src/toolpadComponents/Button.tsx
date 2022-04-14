@@ -1,10 +1,8 @@
-import { Button } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
   id: 'Button',
   displayName: 'Button',
-  Component: Button,
   importedModule: '@mui/toolpad-components',
   importedName: 'Button',
   argTypes: {

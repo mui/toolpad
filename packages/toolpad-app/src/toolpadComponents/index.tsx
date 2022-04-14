@@ -9,7 +9,7 @@ import Typography from './Typography';
 import TextField from './TextField';
 import Select from './Select';
 import PageRow from './PageRow';
-import { ToolpadComponentDefinition } from './componentDefinition';
+import { ToolpadComponentDefinition, ToolpadComponentDefinitions } from './componentDefinition';
 import CustomLayout from './CustomLayout';
 import Paper from './Paper';
 import Image from './Image';
@@ -30,24 +30,17 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['CustomLayout', CustomLayout],
 ]);
 
-function Noop() {
-  return null;
-}
-
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
   return {
     displayName: domNode.name,
     argTypes: domNode.attributes.argTypes.value,
-    Component: typeof window === 'undefined' ? Noop : Noop,
     importedModule: `../components/${domNode.id}.tsx`,
     importedName: capitalize(domNode.name),
     codeComponent: true,
   };
 }
 
-function getToolpadComponents(
-  dom: appDom.AppDom,
-): Record<string, ToolpadComponentDefinition | undefined> {
+export function getToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefinitions {
   const app = appDom.getApp(dom);
   const { codeComponents = [] } = appDom.getChildNodes(dom, app);
   return Object.fromEntries([
@@ -73,9 +66,7 @@ export function getToolpadComponent(
   throw new Error(`Invariant: Accessing unknown component "${componentId}"`);
 }
 
-export function useToolpadComponents(
-  dom: appDom.AppDom,
-): Record<string, ToolpadComponentDefinition | undefined> {
+export function useToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefinitions {
   return React.useMemo(() => getToolpadComponents(dom), [dom]);
 }
 

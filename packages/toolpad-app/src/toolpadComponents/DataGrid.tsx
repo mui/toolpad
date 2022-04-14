@@ -1,11 +1,9 @@
-import { DataGrid } from '@mui/toolpad-components';
 import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../schemas';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
   id: 'DataGrid',
   displayName: 'DataGrid',
-  Component: DataGrid,
   importedModule: '@mui/toolpad-components',
   importedName: 'DataGrid',
   argTypes: {

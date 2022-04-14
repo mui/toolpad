@@ -1,4 +1,3 @@
-import { Image } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
@@ -6,7 +5,6 @@ export default {
   displayName: 'Image',
   importedModule: '@mui/toolpad-components',
   importedName: 'Image',
-  Component: Image,
   argTypes: {
     src: {
       typeDef: { type: 'string' },

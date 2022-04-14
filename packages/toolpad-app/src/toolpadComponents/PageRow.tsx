@@ -1,10 +1,8 @@
-import { PageRow } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
   id: 'PageRow',
   displayName: 'PageRow',
-  Component: PageRow,
   importedModule: '@mui/toolpad-components',
   importedName: 'PageRow',
   argTypes: {

@@ -1,10 +1,8 @@
-import { Paper } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
   id: 'Paper',
   displayName: 'Paper',
-  Component: Paper,
   importedModule: '@mui/toolpad-components',
   importedName: 'Paper',
   argTypes: {

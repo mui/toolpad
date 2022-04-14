@@ -1,11 +1,9 @@
-import { Select } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
 import { URI_SELECT_OPTIONS } from '../schemas';
 
 export default {
   id: 'Select',
   displayName: 'Select',
-  Component: Select,
   importedModule: '@mui/toolpad-components',
   importedName: 'Select',
   argTypes: {

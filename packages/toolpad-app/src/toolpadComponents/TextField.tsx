@@ -1,10 +1,8 @@
-import { TextField } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
   id: 'TextField',
   displayName: 'TextField',
-  Component: TextField,
   importedModule: '@mui/toolpad-components',
   importedName: 'TextField',
   argTypes: {

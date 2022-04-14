@@ -20,9 +20,14 @@ export type RenderComponent = (
 export interface ToolpadComponentDefinition {
   displayName: string;
   argTypes: ArgTypeDefinitions;
-  Component: React.ComponentType<any>;
   importedModule: string;
   importedName: string;
   codeComponent?: boolean;
   extraControls?: Partial<Record<string, { type: string }>>;
 }
+
+export type ToolpadComponentDefinitions = Record<string, ToolpadComponentDefinition | undefined>;
+export interface InstantiatedComponent extends ToolpadComponentDefinition {
+  Component: React.ComponentType<any>;
+}
+export type InstantiatedComponents = Record<string, InstantiatedComponent | undefined>;

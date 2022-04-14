@@ -10,6 +10,8 @@ import getImportMap from '../../../../../src/getImportMap';
 import { escapeHtml } from '../../../../../src/utils/strings';
 import { loadVersionedDom, parseVersion } from '../../../../../src/server/data';
 import { VersionOrPreview } from '../../../../../src/types';
+import { RenderParams } from '../../../../../runtime/canvas/renderToolpadApp';
+import { getToolpadComponents } from '../../../../../src/toolpadComponents';
 
 export interface RenderAppHtmlOptions {
   version: VersionOrPreview;
@@ -28,12 +30,13 @@ export async function renderAppHtml(
     .map((url) => `<link rel="modulepreload" href="${escapeHtml(url)}" />`)
     .join('\n');
 
-  const renderParams = {
+  const renderParams: RenderParams = {
     editor: true,
     dom,
     appId,
     basename,
     version,
+    components: getToolpadComponents(dom),
   };
 
   return `
@@ -42,7 +45,7 @@ export async function renderAppHtml(
       <head>
         <meta charset="utf-8" />
         <meta name="x-data-grid-pro-license" content="${MUI_X_PRO_LICENSE}" />
-        <title>Toolpad Sandbox</title>
+        <title>Toolpad</title>
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"

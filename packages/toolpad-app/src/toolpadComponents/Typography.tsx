@@ -1,10 +1,8 @@
-import { Typography } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
   id: 'Typography',
   displayName: 'Typography',
-  Component: Typography,
   importedModule: '@mui/toolpad-components',
   importedName: 'Typography',
   argTypes: {

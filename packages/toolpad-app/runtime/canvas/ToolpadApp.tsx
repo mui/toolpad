@@ -15,8 +15,11 @@ import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react
 import * as appDom from '../../src/appDom';
 import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../../src/types';
 import { createProvidedContext } from '../../src/utils/react';
-import { ToolpadComponentDefinition } from '../../src/toolpadComponents/componentDefinition';
 import AppOverview from '../../src/components/AppOverview';
+import {
+  InstantiatedComponent,
+  InstantiatedComponents,
+} from '../../src/toolpadComponents/componentDefinition';
 
 export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
@@ -28,8 +31,6 @@ export interface RenderToolpadComponentParams {
 function defaultRenderToolpadComponent({ Component, props }: RenderToolpadComponentParams) {
   return <Component {...props} />;
 }
-
-type ComponentsContextValue = Record<string, ToolpadComponentDefinition | undefined>;
 type NodeState = Record<string, unknown>;
 type ControlledState = Record<string, NodeState | undefined>;
 type DataQueryState = Record<string, UseDataQuery | undefined>;
@@ -42,7 +43,7 @@ interface AppContext {
 
 const RenderToolpadComponentContext = React.createContext(defaultRenderToolpadComponent);
 const [useComponentsContext, ComponentsContextProvider] =
-  createProvidedContext<ComponentsContextValue>('Components');
+  createProvidedContext<InstantiatedComponents>('Components');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useSetControlledStateContext, SetControlledStateContextProvider] =
@@ -63,9 +64,9 @@ async function fetchData(dataUrl: string, queryId: string, params: any) {
 }
 
 function getElmComponent(
-  components: ComponentsContextValue,
+  components: InstantiatedComponents,
   elm: appDom.ElementNode,
-): ToolpadComponentDefinition {
+): InstantiatedComponent {
   const componentId = elm.attributes.component.value;
   const component = components[componentId];
   if (!component) {
@@ -74,7 +75,7 @@ function getElmComponent(
   return component;
 }
 
-function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponentDefinition {
+function useElmToolpadComponent(elm: appDom.ElementNode): InstantiatedComponent {
   const components = useComponentsContext();
   return getElmComponent(components, elm);
 }
@@ -375,9 +376,10 @@ export interface ToolpadAppProps {
   appId: string;
   version: VersionOrPreview;
   dom: appDom.AppDom;
+  components: InstantiatedComponents;
 }
 
-export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
+export default function ToolpadApp({ basename, appId, version, dom, components }: ToolpadAppProps) {
   const root = appDom.getApp(dom);
   const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
 
@@ -392,40 +394,40 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
   const queryClient = React.useMemo(() => new QueryClient(), []);
 
   return (
-    <AppContextProvider value={appContext}>
-      <QueryClientProvider client={queryClient}>
-        <CssBaseline />
-        <ThemeProvider theme={createTheme(theme)}>
-          <DomContextProvider value={dom}>
-            <BrowserRouter basename={basename}>
-              <Routes>
-                <Route path="/" element={<Navigate replace to="/pages" />} />
-                <Route
-                  path="/pages"
-                  element={
-                    <AppOverview
-                      appId={appId}
-                      dom={dom}
-                      openPageButtonProps={getPageNavButtonProps}
-                    />
-                  }
-                />
-                {pages.map((page) => (
+    <ComponentsContextProvider value={components}>
+      <AppContextProvider value={appContext}>
+        <QueryClientProvider client={queryClient}>
+          <CssBaseline />
+          <ThemeProvider theme={createTheme(theme)}>
+            <DomContextProvider value={dom}>
+              <BrowserRouter basename={basename}>
+                <Routes>
+                  <Route path="/" element={<Navigate replace to="/pages" />} />
                   <Route
-                    key={page.id}
-                    path={`/pages/${page.id}`}
-                    element={<RenderedPage nodeId={page.id} />}
+                    path="/pages"
+                    element={
+                      <AppOverview
+                        appId={appId}
+                        dom={dom}
+                        openPageButtonProps={getPageNavButtonProps}
+                      />
+                    }
                   />
-                ))}
-              </Routes>
-            </BrowserRouter>
-          </DomContextProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </AppContextProvider>
+                  {pages.map((page) => (
+                    <Route
+                      key={page.id}
+                      path={`/pages/${page.id}`}
+                      element={<RenderedPage nodeId={page.id} />}
+                    />
+                  ))}
+                </Routes>
+              </BrowserRouter>
+            </DomContextProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </AppContextProvider>
+    </ComponentsContextProvider>
   );
 }
 
 export const RenderToolpadComponentProvider = RenderToolpadComponentContext.Provider;
-
-export { ComponentsContextProvider };

@@ -1,13 +1,12 @@
 import * as React from 'react';
 import * as runtime from '@mui/toolpad-core/runtime';
 import ToolpadApp, {
-  ComponentsContextProvider,
   RenderToolpadComponentParams,
   RenderToolpadComponentProvider,
 } from './ToolpadApp';
 import * as appDom from '../../src/appDom';
-import { useToolpadComponents } from '../../src/toolpadComponents';
 import { VersionOrPreview } from '../../src/types';
+import { InstantiatedComponents } from '../../src/toolpadComponents/componentDefinition';
 
 export interface ToolpadBridge {
   updateDom(newDom: appDom.AppDom): void;
@@ -50,6 +49,7 @@ export interface EditorCanvasProps {
   basename: string;
   appId: string;
   version: VersionOrPreview;
+  components: InstantiatedComponents;
 }
 
 export default function EditorCanvas({ dom: initialDom, ...props }: EditorCanvasProps) {
@@ -66,13 +66,9 @@ export default function EditorCanvas({ dom: initialDom, ...props }: EditorCanvas
     };
   }, []);
 
-  const components = useToolpadComponents(dom);
-
   return (
-    <ComponentsContextProvider value={components}>
-      <RenderToolpadComponentProvider value={renderToolpadComponent}>
-        <ToolpadApp dom={dom} {...props} />
-      </RenderToolpadComponentProvider>
-    </ComponentsContextProvider>
+    <RenderToolpadComponentProvider value={renderToolpadComponent}>
+      <ToolpadApp dom={dom} {...props} />
+    </RenderToolpadComponentProvider>
   );
 }

@@ -1,10 +1,8 @@
-import { Stack } from '@mui/toolpad-components';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
   id: 'Stack',
   displayName: 'Stack',
-  Component: Stack,
   importedModule: '@mui/toolpad-components',
   importedName: 'Stack',
   argTypes: {

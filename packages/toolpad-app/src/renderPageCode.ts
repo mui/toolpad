@@ -1,7 +1,7 @@
 import { ArgTypeDefinition, ArgTypeDefinitions, PropValueTypes } from '@mui/toolpad-core';
 import Imports from './codeGen/Imports';
 import Scope from './codeGen/Scope';
-import { getToolpadComponent } from './toolpadComponents';
+import { getToolpadComponent, getToolpadComponents } from './toolpadComponents';
 import * as appDom from './appDom';
 import {
   NodeId,
@@ -182,7 +182,8 @@ class Context implements RenderContext {
   }
 
   getToolpadComponent(node: appDom.ElementNode) {
-    return getToolpadComponent(this.dom, node.attributes.component.value);
+    const components = getToolpadComponents(this.appId, this.dom);
+    return getToolpadComponent(components, node.attributes.component.value);
   }
 
   collectControlledStateProp(node: appDom.ElementNode, propName: string): ControlledStateHook {

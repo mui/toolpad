@@ -27,6 +27,7 @@ export default {
     selection: {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',
+      defaultValue: null,
     },
   },
 } as ToolpadComponentDefinition;

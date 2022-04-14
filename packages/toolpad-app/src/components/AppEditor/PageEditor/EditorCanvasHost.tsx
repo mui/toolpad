@@ -37,8 +37,9 @@ export default function EditorCanvasHost({
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
   React.useEffect(() => {
+    const renderDom = appDom.createRenderTree(dom);
     // eslint-disable-next-line no-underscore-dangle
-    frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__?.updateDom(dom);
+    frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__?.updateDom(renderDom);
   }, [dom]);
 
   return (

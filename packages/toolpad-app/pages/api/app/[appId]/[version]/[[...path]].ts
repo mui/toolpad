@@ -12,8 +12,7 @@ import { loadVersionedDom, parseVersion } from '../../../../../src/server/data';
 import { VersionOrPreview } from '../../../../../src/types';
 import { RenderParams } from '../../../../../runtime/canvas/renderToolpadApp';
 import { getToolpadComponents } from '../../../../../src/toolpadComponents';
-
-const FRONTEND_NODES = new Set(['app', 'page', 'element', 'queryState', 'derivedState', 'theme']);
+import * as appDom from '../../../../../src/appDom';
 
 export interface RenderAppHtmlOptions {
   version: VersionOrPreview;
@@ -32,16 +31,9 @@ export async function renderAppHtml(
     .map((url) => `<link rel="modulepreload" href="${escapeHtml(url)}" />`)
     .join('\n');
 
-  const frontendDom = {
-    ...dom,
-    nodes: Object.fromEntries(
-      Object.entries(dom.nodes).filter(([, node]) => FRONTEND_NODES.has(node.type)),
-    ),
-  };
-
   const renderParams: RenderParams = {
     editor: true,
-    dom: frontendDom,
+    dom: appDom.createRenderTree(dom),
     appId,
     basename,
     version,

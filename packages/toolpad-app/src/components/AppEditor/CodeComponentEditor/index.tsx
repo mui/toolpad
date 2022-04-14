@@ -13,6 +13,19 @@ import renderThemeCode from '../../../renderThemeCode';
 import renderEntryPoint from '../../../renderPageEntryCode';
 import { tryFormat } from '../../../utils/prettier';
 
+/* 
+TODO: we can rebuild the viewer using:
+async function importSrc(src: string) {
+  return import(
+    URL.createObjectURL(
+      new Blob([src], {
+        type: 'application/javascript',
+      }),
+    )
+  );
+}
+*/
+
 const ComponentSandbox = styled(AppSandbox)({
   height: '100%',
 });

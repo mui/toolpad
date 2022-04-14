@@ -1,4 +1,3 @@
-import { capitalize } from 'lodash';
 import * as appDom from '../appDom';
 import Button from './Button';
 import Container from './Container';

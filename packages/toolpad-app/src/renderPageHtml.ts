@@ -54,12 +54,13 @@ export default function renderPageHtml(configInit: RenderHtmlConfig) {
         ${
           config.editor
             ? `
+              <script type="module" src="/sandbox/index.js"></script>
               <script type="module" src="/reactDevtools/bootstrap.js"></script>
-              <script type="module" src="/runtime/canvas.js"></script>
             `
-            : `<script type="module" src="${escapeHtml(config.entry)}"></script>`
+            : ''
         }
 
+        <script type="module" src="${escapeHtml(config.entry)}"></script>
         
       </body>
     </html>

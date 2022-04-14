@@ -44,6 +44,7 @@ function instantiateComponent<P = {}>(def: ToolpadComponentDefinition): React.Co
 
   Component.displayName = def.importedName;
 
+  // @ts-expect-error This is an error in @types/react@^17
   return Component;
 }
 

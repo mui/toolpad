@@ -8,8 +8,7 @@ import {
   transformQueryResult,
   UseDataQuery,
 } from '@mui/toolpad-core';
-import { ThemeProvider, createTheme, ThemeOptions, PaletteOptions } from '@mui/material/styles';
-import * as colors from '@mui/material/colors';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useQueries, UseQueryOptions, QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import * as appDom from '../../src/appDom';
@@ -20,6 +19,7 @@ import {
   InstantiatedComponent,
   InstantiatedComponents,
 } from '../../src/toolpadComponents/componentDefinition';
+import { createToolpadTheme } from './theme';
 
 export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
@@ -352,21 +352,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 }
 
-function createThemeoptions(themeNode: appDom.ThemeNode): ThemeOptions {
-  const palette: PaletteOptions = {};
-  const primary = appDom.fromConstPropValue(themeNode.theme['palette.primary.main']);
-  if (primary) {
-    palette.primary = (colors as any)[primary];
-  }
-
-  const secondary = appDom.fromConstPropValue(themeNode.theme['palette.secondary.main']);
-  if (secondary) {
-    palette.secondary = (colors as any)[secondary];
-  }
-
-  return createTheme({ palette });
-}
-
 function getPageNavButtonProps(appId: string, page: appDom.PageNode) {
   return { component: Link, to: `/pages/${page.id}` } as ButtonProps;
 }
@@ -384,10 +369,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
 
   const toolpadTheme = themes.length > 0 ? themes[0] : null;
-  const theme = React.useMemo(() => {
-    const options = toolpadTheme ? createThemeoptions(toolpadTheme) : {};
-    return createTheme(options);
-  }, [toolpadTheme]);
+  const theme = React.useMemo(() => createToolpadTheme(toolpadTheme), [toolpadTheme]);
 
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
 

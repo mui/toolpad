@@ -57,11 +57,9 @@ export function getToolpadComponents(
 }
 
 export function getToolpadComponent(
-  appId: string,
-  dom: appDom.AppDom,
+  components: ToolpadComponentDefinitions,
   componentId: string,
 ): ToolpadComponentDefinition {
-  const components = getToolpadComponents(appId, dom);
   const component = components[componentId];
 
   if (component) {
@@ -77,6 +75,6 @@ export function useToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefini
 }
 
 export function useToolpadComponent(dom: appDom.AppDom, id: string): ToolpadComponentDefinition {
-  const { id: appId } = useAppEditorContext();
-  return React.useMemo(() => getToolpadComponent(appId, dom, id), [appId, dom, id]);
+  const components = useToolpadComponents(dom);
+  return React.useMemo(() => getToolpadComponent(components, id), [components, id]);
 }

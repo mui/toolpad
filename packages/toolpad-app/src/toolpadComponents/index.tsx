@@ -12,6 +12,7 @@ import CustomLayout from './CustomLayout';
 import Paper from './Paper';
 import Image from './Image';
 import Stack from './Stack';
+import { VersionOrPreview } from '../types';
 
 // TODO: bring these back to @mui/toolpad repo and make them import @mui/material
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
@@ -40,6 +41,7 @@ function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponen
 
 export function getToolpadComponents(
   appId: string,
+  version: VersionOrPreview,
   dom: appDom.AppDom,
 ): ToolpadComponentDefinitions {
   const app = appDom.getApp(dom);

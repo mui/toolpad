@@ -182,7 +182,7 @@ class Context implements RenderContext {
   }
 
   getToolpadComponent(node: appDom.ElementNode) {
-    const components = getToolpadComponents(this.appId, this.dom);
+    const components = getToolpadComponents(this.appId, this.config.version, this.dom);
     return getToolpadComponent(components, node.attributes.component.value);
   }
 

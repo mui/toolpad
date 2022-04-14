@@ -13,6 +13,8 @@ import { VersionOrPreview } from '../../../../../src/types';
 import { RenderParams } from '../../../../../runtime/canvas/renderToolpadApp';
 import { getToolpadComponents } from '../../../../../src/toolpadComponents';
 
+const FRONTEND_NODES = new Set(['app', 'page', 'element', 'queryState', 'derivedState', 'theme']);
+
 export interface RenderAppHtmlOptions {
   version: VersionOrPreview;
   basename: string;
@@ -30,9 +32,16 @@ export async function renderAppHtml(
     .map((url) => `<link rel="modulepreload" href="${escapeHtml(url)}" />`)
     .join('\n');
 
+  const frontendDom = {
+    ...dom,
+    nodes: Object.fromEntries(
+      Object.entries(dom.nodes).filter(([, node]) => FRONTEND_NODES.has(node.type)),
+    ),
+  };
+
   const renderParams: RenderParams = {
     editor: true,
-    dom,
+    dom: frontendDom,
     appId,
     basename,
     version,

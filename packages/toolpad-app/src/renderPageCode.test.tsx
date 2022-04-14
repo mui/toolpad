@@ -48,8 +48,6 @@ async function bundle(files: Record<string, string>, entry: string): Promise<str
 }
 
 describe('renderPageCode', () => {
-  // TODO: figure out imports
-  // eslint-disable-next-line mocha/no-skipped-tests
   test('Basic Toolpad dom rendering Typography component', async () => {
     let dom = appDom.createDom();
     const root = appDom.getNode(dom, dom.root, 'app');

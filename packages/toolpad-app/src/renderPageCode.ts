@@ -182,7 +182,7 @@ class Context implements RenderContext {
   }
 
   getToolpadComponent(node: appDom.ElementNode) {
-    return getToolpadComponent(this.dom, node.attributes.component.value);
+    return getToolpadComponent(this.appId, this.dom, node.attributes.component.value);
   }
 
   collectControlledStateProp(node: appDom.ElementNode, propName: string): ControlledStateHook {

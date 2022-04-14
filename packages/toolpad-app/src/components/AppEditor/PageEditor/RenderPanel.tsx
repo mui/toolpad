@@ -31,6 +31,7 @@ import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { useToolpadComponent } from '../../../toolpadComponents';
 import { HTML_ID_APP_ROOT } from '../../../constants';
+import { useAppEditorContext } from '../AppEditorContext';
 
 const ROW_COMPONENT = 'PageRow';
 

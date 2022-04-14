@@ -14,6 +14,7 @@ import CustomLayout from './CustomLayout';
 import Paper from './Paper';
 import Image from './Image';
 import Stack from './Stack';
+import { useAppEditorContext } from '../components/AppEditor/AppEditorContext';
 
 // TODO: bring these back to @mui/toolpad repo and make them import @mui/material
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
@@ -40,7 +41,10 @@ function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponen
   };
 }
 
-export function getToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefinitions {
+export function getToolpadComponents(
+  appId: string,
+  dom: appDom.AppDom,
+): ToolpadComponentDefinitions {
   const app = appDom.getApp(dom);
   const { codeComponents = [] } = appDom.getChildNodes(dom, app);
   return Object.fromEntries([
@@ -53,10 +57,11 @@ export function getToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefini
 }
 
 export function getToolpadComponent(
+  appId: string,
   dom: appDom.AppDom,
   componentId: string,
 ): ToolpadComponentDefinition {
-  const components = getToolpadComponents(dom);
+  const components = getToolpadComponents(appId, dom);
   const component = components[componentId];
 
   if (component) {
@@ -67,9 +72,11 @@ export function getToolpadComponent(
 }
 
 export function useToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefinitions {
-  return React.useMemo(() => getToolpadComponents(dom), [dom]);
+  const { id: appId } = useAppEditorContext();
+  return React.useMemo(() => getToolpadComponents(appId, dom), [appId, dom]);
 }
 
 export function useToolpadComponent(dom: appDom.AppDom, id: string): ToolpadComponentDefinition {
-  return React.useMemo(() => getToolpadComponent(dom, id), [dom, id]);
+  const { id: appId } = useAppEditorContext();
+  return React.useMemo(() => getToolpadComponent(appId, dom, id), [appId, dom, id]);
 }

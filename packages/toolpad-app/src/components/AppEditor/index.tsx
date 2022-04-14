@@ -27,6 +27,7 @@ import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
 import client from '../../api';
 import DialogForm from '../DialogForm';
+import { AppEditorContext, AppEditorContextprovider } from './AppEditorContext';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -155,7 +156,6 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
     </Dialog>
   );
 }
-
 export interface EditorContentProps {
   appId: string;
 }
@@ -218,9 +218,13 @@ export default function Editor() {
     throw new Error(`Missing queryParam "appId"`);
   }
 
+  const appContextValue: AppEditorContext = { id: appId };
+
   return (
-    <DomProvider appId={appId}>
-      <EditorContent appId={appId} />
-    </DomProvider>
+    <AppEditorContextprovider value={appContextValue}>
+      <DomProvider appId={appId}>
+        <EditorContent appId={appId} />
+      </DomProvider>
+    </AppEditorContextprovider>
   );
 }

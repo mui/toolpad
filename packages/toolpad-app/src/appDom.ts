@@ -744,6 +744,7 @@ export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
 /**
  * We need to make sure no secrets end up in the frontend html, so let's only send the
  * nodes that we need to build frontend, and that we know don't contain secrets.
+ * TODO: Would it make sense to create a separate datastructure that represents the render tree?
  */
 export function createRenderTree(dom: AppDom): AppDom {
   const frontendNodes = new Set(['app', 'page', 'element', 'queryState', 'derivedState', 'theme']);

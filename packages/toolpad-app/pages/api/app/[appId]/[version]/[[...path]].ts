@@ -37,7 +37,7 @@ export async function renderAppHtml(
     appId,
     basename,
     version,
-    components: getToolpadComponents(appId, dom),
+    components: getToolpadComponents(appId, version, dom),
   };
 
   return `

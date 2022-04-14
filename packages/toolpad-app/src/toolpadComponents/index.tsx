@@ -47,6 +47,7 @@ function createCodeComponent(
 
 export function getToolpadComponents(
   appId: string,
+  version: VersionOrPreview,
   dom: appDom.AppDom,
 ): ToolpadComponentDefinitions {
   const app = appDom.getApp(dom);
@@ -55,7 +56,7 @@ export function getToolpadComponents(
     ...INTERNAL_COMPONENTS.entries(),
     ...codeComponents.map((codeComponent) => [
       `codeComponent.${codeComponent.id}`,
-      createCodeComponent(appId, 'preview', codeComponent),
+      createCodeComponent(appId, version, codeComponent),
     ]),
   ]);
 }

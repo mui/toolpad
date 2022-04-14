@@ -1,7 +1,5 @@
-import * as React from 'react';
 import { capitalize } from 'lodash';
 import * as appDom from '../appDom';
-
 import Button from './Button';
 import Container from './Container';
 import DataGrid from './DataGrid';
@@ -14,7 +12,6 @@ import CustomLayout from './CustomLayout';
 import Paper from './Paper';
 import Image from './Image';
 import Stack from './Stack';
-import { useAppEditorContext } from '../components/AppEditor/AppEditorContext';
 
 // TODO: bring these back to @mui/toolpad repo and make them import @mui/material
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
@@ -67,14 +64,4 @@ export function getToolpadComponent(
   }
 
   throw new Error(`Invariant: Accessing unknown component "${componentId}"`);
-}
-
-export function useToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefinitions {
-  const { id: appId } = useAppEditorContext();
-  return React.useMemo(() => getToolpadComponents(appId, dom), [appId, dom]);
-}
-
-export function useToolpadComponent(dom: appDom.AppDom, id: string): ToolpadComponentDefinition {
-  const components = useToolpadComponents(dom);
-  return React.useMemo(() => getToolpadComponent(components, id), [components, id]);
 }

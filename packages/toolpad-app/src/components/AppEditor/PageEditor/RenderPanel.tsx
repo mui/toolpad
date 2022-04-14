@@ -29,9 +29,8 @@ import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
-import { useToolpadComponent } from '../../../toolpadComponents';
 import { HTML_ID_APP_ROOT } from '../../../constants';
-import { useAppEditorContext } from '../AppEditorContext';
+import { useToolpadComponent } from '../toolpadComponents';
 
 const ROW_COMPONENT = 'PageRow';
 

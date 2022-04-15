@@ -1,17 +1,19 @@
 import { NextApiHandler } from 'next';
 import { transform } from 'sucrase';
-import * as path from 'path';
-import { loadVersionedDom, parseVersion } from '../../../../../../src/server/data';
-import { NodeId } from '../../../../../../src/types';
-import * as appDom from '../../../../../../src/appDom';
-import { asArray } from '../../../../../../src/utils/collections';
+import { asArray } from '../../../../../src/utils/collections';
+import { loadVersionedDom, parseVersion } from '../../../../../src/server/data';
+import { NodeId, VersionOrPreview } from '../../../../../src/types';
+import * as appDom from '../../../../../src/appDom';
+
+export interface RenderAppHtmlOptions {
+  version: VersionOrPreview;
+  basename: string;
+}
 
 export default (async (req, res) => {
   const [appId] = asArray(req.query.appId);
-  const [componentFile] = asArray(req.query.componentFile);
-  const { name: componentId } = path.parse(componentFile);
-
   const version = parseVersion(req.query.version);
+  const [componentId] = asArray(req.query.componentId);
   if (!version) {
     res.status(404).end();
     return;
@@ -20,10 +22,8 @@ export default (async (req, res) => {
   const dom = await loadVersionedDom(appId, version);
 
   const codeComponent = appDom.getMaybeNode(dom, componentId as NodeId, 'codeComponent');
-
   if (!codeComponent) {
-    res.status(404);
-    res.end();
+    res.status(404).end();
     return;
   }
 

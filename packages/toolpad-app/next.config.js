@@ -17,16 +17,21 @@ module.exports = {
   async rewrites() {
     return [
       {
-        source: '/deploy/:appId',
-        destination: '/deploy/:appId',
-      },
-      {
         source: '/deploy/:appId/:path*',
         destination: '/api/deploy/:appId/:path*',
       },
       {
-        source: '/release/:appId/:path*',
-        destination: '/api/release/:appId/:path*',
+        source: '/app/:appId/:path*',
+        destination: '/api/app/:appId/:path*',
+      },
+    ];
+  },
+
+  async redirect() {
+    return [
+      {
+        source: '/release/:path*',
+        destination: '/app/:path*',
       },
     ];
   },

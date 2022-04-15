@@ -1,4 +1,3 @@
-import { capitalize } from 'lodash';
 import * as appDom from '../appDom';
 import Button from './Button';
 import Container from './Container';
@@ -29,12 +28,18 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['CustomLayout', CustomLayout],
 ]);
 
-function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
+function createCodeComponent(
+  appId: string,
+  version: VersionOrPreview,
+  domNode: appDom.CodeComponentNode,
+): ToolpadComponentDefinition {
   return {
     displayName: domNode.name,
     argTypes: domNode.attributes.argTypes.value,
-    importedModule: `../components/${domNode.id}.tsx`,
-    importedName: capitalize(domNode.name),
+    importedModule: `/api/components/${encodeURIComponent(appId)}/${encodeURIComponent(
+      version,
+    )}/${encodeURIComponent(domNode.id)}`,
+    importedName: 'default',
     codeComponent: true,
   };
 }
@@ -50,7 +55,7 @@ export function getToolpadComponents(
     ...INTERNAL_COMPONENTS.entries(),
     ...codeComponents.map((codeComponent) => [
       `codeComponent.${codeComponent.id}`,
-      createCodeComponent(codeComponent),
+      createCodeComponent(appId, version, codeComponent),
     ]),
   ]);
 }

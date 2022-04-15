@@ -37,7 +37,13 @@ async function main() {
       '@mui/material',
       '@mui/icons-material',
     ],
-    entryPoints: ['./runtime/components', './runtime/core', './runtime/coreRuntime'],
+    entryPoints: [
+      './runtime/pageEditor',
+      './runtime/codeComponentEditor',
+      './runtime/components',
+      './runtime/core',
+      './runtime/coreRuntime',
+    ],
     logLevel: 'info',
   });
 }

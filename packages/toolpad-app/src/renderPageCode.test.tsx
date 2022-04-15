@@ -5,7 +5,6 @@
 import * as React from 'react';
 import * as esbuild from 'esbuild';
 import { render } from '@testing-library/react';
-import path from 'path';
 import renderPageCode from './renderPageCode';
 import * as appDom from './appDom';
 

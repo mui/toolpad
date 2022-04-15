@@ -14,8 +14,7 @@ import {
   NodesInfo,
 } from '../../../types';
 import * as appDom from '../../../appDom';
-import PageView from './EditorCanvasHost';
-// import PageView from '../../PageView';
+import EditorCanvasHost from './EditorCanvasHost';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -861,7 +860,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   return (
     <RenderPanelRoot className={className}>
-      <PageView
+      <EditorCanvasHost
         appId={appId}
         editor
         className={classes.view}

@@ -1,6 +1,5 @@
-# test
 # https://render.com/docs/preview-environments
-previewsEnabled: false
+previewsEnabled: true
 previewsExpireAfterDays: 3
 
 services:

@@ -79,10 +79,11 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     >
       <Box
         sx={{
-          height: '100%',
           display: 'flex',
           flexDirection: 'row',
-          position: 'fixed',
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
           background: 'white',
           borderRight: 1,
           borderColor: 'divider',

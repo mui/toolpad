@@ -39,6 +39,7 @@ async function main() {
     ],
     entryPoints: [
       './runtime/pageEditor',
+      './runtime/codeComponentEditor',
       './runtime/components',
       './runtime/core',
       './runtime/coreRuntime',

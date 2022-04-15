@@ -8,7 +8,6 @@ import {
   transformQueryResult,
   UseDataQuery,
 } from '@mui/toolpad-core';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useQueries, UseQueryOptions, QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import * as appDom from '../../src/appDom';
@@ -19,7 +18,7 @@ import {
   InstantiatedComponent,
   InstantiatedComponents,
 } from '../../src/toolpadComponents/componentDefinition';
-import { createToolpadTheme } from './theme';
+import AppThemeProvider from './AppThemeProvider';
 
 export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
@@ -368,8 +367,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   const root = appDom.getApp(dom);
   const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
 
-  const toolpadTheme = themes.length > 0 ? themes[0] : null;
-  const theme = React.useMemo(() => createToolpadTheme(toolpadTheme), [toolpadTheme]);
+  const theme = themes.length > 0 ? themes[0] : null;
 
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
 
@@ -380,7 +378,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
       <AppContextProvider value={appContext}>
         <QueryClientProvider client={queryClient}>
           <CssBaseline />
-          <ThemeProvider theme={createTheme(theme)}>
+          <AppThemeProvider node={theme}>
             <DomContextProvider value={dom}>
               <BrowserRouter basename={basename}>
                 <Routes>
@@ -405,7 +403,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
                 </Routes>
               </BrowserRouter>
             </DomContextProvider>
-          </ThemeProvider>
+          </AppThemeProvider>
         </QueryClientProvider>
       </AppContextProvider>
     </ComponentsContextProvider>

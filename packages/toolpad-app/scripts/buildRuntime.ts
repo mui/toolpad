@@ -38,7 +38,7 @@ async function main() {
       '@mui/icons-material',
     ],
     entryPoints: [
-      './runtime/canvas',
+      './runtime/pageEditor',
       './runtime/components',
       './runtime/core',
       './runtime/coreRuntime',

@@ -10,7 +10,7 @@ import getImportMap from '../../../../../src/getImportMap';
 import { escapeHtml } from '../../../../../src/utils/strings';
 import { loadVersionedDom, parseVersion } from '../../../../../src/server/data';
 import { VersionOrPreview } from '../../../../../src/types';
-import { RenderParams } from '../../../../../runtime/canvas/renderToolpadApp';
+import { RenderParams } from '../../../../../runtime/pageEditor/renderToolpadApp';
 import { getToolpadComponents } from '../../../../../src/toolpadComponents';
 import * as appDom from '../../../../../src/appDom';
 
@@ -81,7 +81,7 @@ export async function renderAppHtml(
           ${serializeJavascript(renderParams)}
         </script>
 
-        <script type="module" src="/runtime/canvas.js"></script>
+        <script type="module" src="/runtime/pageEditor.js"></script>
       </body>
     </html>
   `;

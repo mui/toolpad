@@ -8,7 +8,7 @@ import {
   ToolpadComponentDefinitions,
 } from '../../src/toolpadComponents/componentDefinition';
 import { VersionOrPreview } from '../../src/types';
-import EditorCanvas from './EditorCanvas';
+import EditorCanvas from './EditorSandbox';
 import ToolpadApp from './ToolpadApp';
 
 export interface ComponentSpec {

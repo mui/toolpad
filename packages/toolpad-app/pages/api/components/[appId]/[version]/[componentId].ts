@@ -20,7 +20,6 @@ export default (async (req, res) => {
   }
 
   const dom = await loadVersionedDom(appId, version);
-  console.log(version, appId, dom, componentId);
 
   const codeComponent = appDom.getMaybeNode(dom, componentId as NodeId, 'codeComponent');
   if (!codeComponent) {

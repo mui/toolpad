@@ -72,7 +72,6 @@ export default function StringRecordEditor({
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      console.log(event.key);
       if (event.key === 'Enter') {
         const success = handleSaveEditedFieldName();
         if (success) {

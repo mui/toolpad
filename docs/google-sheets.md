@@ -7,7 +7,7 @@ Google Cloud Platform allows us to authorise third-party applications to access 
 You'll need to enable Google Login to connect Google Sheets. If you’re an existing user, you can sign in to [Google Console](https://cloud.google.com/) or create a new account.
 
 1. After signing in to Google Console, create a New Project from the top bar.
-2. Now, you’ll have to generate OAuth 2.0 Client IDs; you can do this by navigating to the APIs and Services - Credentials section.
+2. Now, you'll have to generate OAuth 2.0 Client IDs; you can do this by navigating to the APIs and Services - Credentials section.
 3. Next, create a new app under the OAuth 2.0 Client ID section.
 4. You’ll now find two keys, Client ID and Client Secret; you’ll need these to authorize Toolpad to access your Google Drive.
 5. You will need the following environment variables to setup the datasource:

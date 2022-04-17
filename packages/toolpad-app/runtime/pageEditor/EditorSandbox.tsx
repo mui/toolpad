@@ -14,6 +14,7 @@ export interface ToolpadBridge {
 
 declare global {
   interface Window {
+    __TOOLPAD_READY__?: boolean | (() => void);
     __TOOLPAD_BRIDGE__?: ToolpadBridge;
   }
 }
@@ -60,6 +61,14 @@ export default function EditorCanvas({ dom: initialDom, ...props }: EditorCanvas
     window.__TOOLPAD_BRIDGE__ = {
       updateDom: (newDom) => setDom(newDom),
     };
+    // eslint-disable-next-line no-underscore-dangle
+    if (typeof window.__TOOLPAD_READY__ === 'function') {
+      // eslint-disable-next-line no-underscore-dangle
+      window.__TOOLPAD_READY__();
+    } else {
+      // eslint-disable-next-line no-underscore-dangle
+      window.__TOOLPAD_READY__ = true;
+    }
     return () => {
       // eslint-disable-next-line no-underscore-dangle
       delete window.__TOOLPAD_BRIDGE__;

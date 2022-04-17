@@ -37,9 +37,25 @@ export default function EditorCanvasHost({
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
   React.useEffect(() => {
+    const frameWindow = frameRef.current?.contentWindow;
+    if (!frameWindow) {
+      return;
+    }
+
     const renderDom = appDom.createRenderTree(dom);
+
     // eslint-disable-next-line no-underscore-dangle
-    frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__?.updateDom(renderDom);
+    if (frameWindow.__TOOLPAD_READY__) {
+      // eslint-disable-next-line no-underscore-dangle
+      frameWindow.__TOOLPAD_BRIDGE__?.updateDom(renderDom);
+      // eslint-disable-next-line no-underscore-dangle
+    } else if (typeof frameWindow.__TOOLPAD_READY__ !== 'function') {
+      // eslint-disable-next-line no-underscore-dangle
+      frameWindow.__TOOLPAD_READY__ = () => {
+        // eslint-disable-next-line no-underscore-dangle
+        frameWindow.__TOOLPAD_BRIDGE__?.updateDom(renderDom);
+      };
+    }
   }, [dom]);
 
   return (

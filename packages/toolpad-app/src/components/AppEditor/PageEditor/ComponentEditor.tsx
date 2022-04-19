@@ -1,7 +1,6 @@
 import { styled, Typography } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinition, ArgTypeDefinitions } from '@mui/toolpad-core';
-import { useToolpadComponent } from '../../../toolpadComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
@@ -10,6 +9,7 @@ import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
 import RuntimeErrorAlert from './RuntimeErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
+import { useToolpadComponent } from '../toolpadComponents';
 
 const classes = {
   control: 'Toolpad_Control',

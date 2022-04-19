@@ -18,7 +18,7 @@ function createDefaultCodeComponent(name: string): string {
   const propTypeId = `${componentId}Props`;
   return format(`
     import * as React from 'react';
-    import type { ComponentConfig } from "@mui/toolpad-core";
+    import type { ComponentConfig } from '@mui/toolpad-core';
     
     export interface ${propTypeId} {
       msg: string;

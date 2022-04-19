@@ -4,18 +4,65 @@ import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import { ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
+import { transform } from 'sucrase';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
-import AppSandbox from '../../AppSandbox';
 import getImportMap from '../../../getImportMap';
-import renderThemeCode from '../../../renderThemeCode';
-import renderEntryPoint from '../../../renderPageEntryCode';
 import { tryFormat } from '../../../utils/prettier';
+import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from '../../../constants';
+import { escapeHtml } from '../../../utils/strings';
 
-const ComponentSandbox = styled(AppSandbox)({
+const CanvasFrame = styled('iframe')({
+  border: 'none',
+  position: 'absolute',
+  width: '100%',
   height: '100%',
 });
+
+function renderSandboxHtml() {
+  const importMap = getImportMap();
+  const serializedImportMap = JSON.stringify(importMap, null, 2);
+  const serializedPreload = Object.values(importMap.imports)
+    .map((url) => `<link rel="modulepreload" href="${escapeHtml(url)}" />`)
+    .join('\n');
+
+  return `
+    <!DOCTYPE html>
+    <html style="position: relative">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="x-data-grid-pro-license" content="${MUI_X_PRO_LICENSE}" />
+        <title>Toolpad</title>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+          #${HTML_ID_APP_ROOT} {
+            overflow: hidden; /* prevents margins from collapsing into root */
+            min-height: 100vh;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="${HTML_ID_APP_ROOT}"></div>
+
+        <script type="importmap">
+          ${serializedImportMap}
+        </script>
+
+        ${serializedPreload}
+
+        <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
+        <script async src="/web_modules/es-module-shims.js" type="module"></script>
+
+        <script type="module" src="/runtime/codeComponentEditor.js"></script>
+      </body>
+    </html>
+  `;
+}
 
 interface CodeComponentEditorContentProps {
   codeComponentNode: appDom.CodeComponentNode;
@@ -28,11 +75,12 @@ declare global {
 }
 
 function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
-  const dom = useDom();
   const domApi = useDomApi();
 
   const [input, setInput] = React.useState(codeComponentNode.attributes.code.value);
   const [argTypes, setArgTypes] = React.useState<ArgTypeDefinitions>({});
+
+  const frameRef = React.useRef<HTMLIFrameElement>(null);
 
   const updateDomActionRef = React.useRef(() => {});
 
@@ -56,7 +104,9 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   }, [domApi, codeComponentNode, input, argTypes]);
 
   const handleConfigUpdate = React.useCallback(
-    (newConfig: ComponentConfig<unknown> | undefined) => setArgTypes(newConfig?.argTypes || {}),
+    (newConfig: ComponentConfig<unknown> | undefined) => {
+      setArgTypes(newConfig?.argTypes || {});
+    },
     [],
   );
 
@@ -111,29 +161,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     [],
   );
 
-  const themePath = './lib/theme.ts';
-  const entryPath = `./entry.tsx`;
-  const componentWrapperPath = `./componentWrapper.ts`;
-  const componentPath = `./components/${codeComponentNode.id}.tsx`;
-
-  const renderedTheme = React.useMemo(() => renderThemeCode(dom, { editor: true }), [dom]);
-
-  const componentWrapper = `
-    const { default: Component, config } = await import(${JSON.stringify(componentPath)});
-    window.__TOOLPAD_EDITOR_UPDATE_COMPONENT_CONFIG__?.(config ?? {});
-    export default Component;
-  `;
-
-  const renderedEntrypoint = React.useMemo(() => {
-    return renderEntryPoint({
-      pagePath: componentWrapperPath,
-      themePath,
-      editor: true,
-    });
-  }, [componentWrapperPath, themePath]);
-
-  const frameRef = React.useRef<HTMLIFrameElement>(null);
-
   const setupFrameWindow = React.useCallback(() => {
     if (frameRef.current?.contentWindow) {
       // eslint-disable-next-line no-underscore-dangle
@@ -143,6 +170,40 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   }, [handleConfigUpdate]);
 
   React.useEffect(() => setupFrameWindow(), [setupFrameWindow]);
+
+  React.useEffect(() => {
+    const frameWindow = frameRef.current?.contentWindow;
+    if (!frameWindow) {
+      return;
+    }
+
+    let compiled: string;
+    try {
+      compiled = transform(input, {
+        transforms: ['jsx', 'typescript'],
+      }).code;
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+
+    // eslint-disable-next-line no-underscore-dangle
+    if (frameWindow.__CODE_COMPONENT_SANDBOX_READY__) {
+      // eslint-disable-next-line no-underscore-dangle
+      frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateCodeCompoent(
+        compiled,
+      );
+      // eslint-disable-next-line no-underscore-dangle
+    } else if (typeof frameWindow.__CODE_COMPONENT_SANDBOX_READY__ !== 'function') {
+      // eslint-disable-next-line no-underscore-dangle
+      frameWindow.__CODE_COMPONENT_SANDBOX_READY__ = () => {
+        // eslint-disable-next-line no-underscore-dangle
+        frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateCodeCompoent(
+          compiled,
+        );
+      };
+    }
+  }, [input]);
 
   return (
     <Stack sx={{ height: '100%' }}>
@@ -166,19 +227,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
           />
         </Box>
         <Box flex={1}>
-          <ComponentSandbox
-            base={`/components/${codeComponentNode.id}/`}
-            importMap={getImportMap()}
-            files={{
-              [componentWrapperPath]: { code: componentWrapper },
-              [componentPath]: { code: input },
-              [themePath]: { code: renderedTheme.code },
-              [entryPath]: { code: renderedEntrypoint.code },
-            }}
-            entry={entryPath}
-            frameRef={frameRef}
-            onLoad={setupFrameWindow}
-          />
+          <CanvasFrame ref={frameRef} srcDoc={renderSandboxHtml()} title="hello" />
         </Box>
       </Box>
     </Stack>

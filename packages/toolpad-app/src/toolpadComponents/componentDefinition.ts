@@ -25,3 +25,9 @@ export interface ToolpadComponentDefinition {
   codeComponent?: boolean;
   extraControls?: Partial<Record<string, { type: string }>>;
 }
+
+export type ToolpadComponentDefinitions = Record<string, ToolpadComponentDefinition | undefined>;
+export interface InstantiatedComponent extends ToolpadComponentDefinition {
+  Component: React.ComponentType<any>;
+}
+export type InstantiatedComponents = Record<string, InstantiatedComponent | undefined>;

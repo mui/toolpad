@@ -2,17 +2,19 @@
 
 <div align="center">
 
-Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal tools builder build on top of [MUI](https://mui.com/). Aimed at developers of all trade who want to save time building internal applications.
+Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal tools builder designed to extend the [MUI](https://mui.com/) React components. It's designed for developers of all trade who want to save time building internal applications.
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
+<!--
 [![npm latest package](https://img.shields.io/npm/v/@mui/toolpad/latest.svg)](https://www.npmjs.com/package/@mui/toolpad)
 [![npm next package](https://img.shields.io/npm/v/@mui/toolpad/next.svg)](https://www.npmjs.com/package/@mui/toolpad@alpha)
 [![npm downloads](https://img.shields.io/npm/dm/@mui/toolpad.svg)](https://www.npmjs.com/package/@mui/toolpad)
+-->
 [![CircleCI](https://circleci.com/gh/mui/mui-toolpad/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/MUI_hq.svg?label=follow+MUI)](https://twitter.com/MUI_hq)
 [![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-toolpad/issues/8)
-[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/toolpad.svg)](https://isitmaintained.com/project/mui/mui-toolpad 'Average time to resolve an issue')
-[![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/mui)](https://opencollective.com/mui)
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/mui/mui-toolpad.svg)](http://isitmaintained.com/project/mui/mui-toolpad "Average time to resolve an issue")
+  [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/mui)](https://opencollective.com/mui)
 
 </div>
 
@@ -22,15 +24,18 @@ MUI Toolpad is in its alpha stages of development. Feel free to run this applica
 
 ## Quick setup locally
 
-Check out the repository and run
+**NOTE: MUI toolpad is in preview, do not run this in production.**
+
+Download the docker-compose file and run:
 
 ```sh
-docker-compose -f docker/compose/docker-compose.yml up
+curl -LO https://raw.githubusercontent.com/mui/mui-toolpad/master/docker/compose/docker-compose.yml
+docker-compose up -d
 ```
 
-## documentation
+## Documentation
 
-[The documentation](./docs)
+Check out our [documentation](./docs).
 
 ## Contributing
 
@@ -49,8 +54,7 @@ Although we love giving you the opportunity to put your stamp on MUI, we also ar
 
 ## License
 
-This project is licensed under the terms of the
-[MIT license](/LICENSE).
+This project is licensed under the terms of the [MIT license](/LICENSE).
 
 ## Sponsoring services
 

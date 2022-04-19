@@ -14,7 +14,7 @@ import {
   NodesInfo,
 } from '../../../types';
 import * as appDom from '../../../appDom';
-import PageView from '../../PageView';
+import EditorCanvasHost from './EditorCanvasHost';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -28,8 +28,8 @@ import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
-import { useToolpadComponent } from '../../../toolpadComponents';
-import { APP_ROOT_ID } from '../../../constants';
+import { HTML_ID_APP_ROOT } from '../../../constants';
+import { useToolpadComponent } from '../toolpadComponents';
 
 const ROW_COMPONENT = 'PageRow';
 
@@ -533,7 +533,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const getViewCoordinates = React.useCallback(
     (clientX: number, clientY: number): { x: number; y: number } | null => {
-      const rootElm = editorWindowRef.current?.document.getElementById(APP_ROOT_ID);
+      const rootElm = editorWindowRef.current?.document.getElementById(HTML_ID_APP_ROOT);
       if (!rootElm) {
         return null;
       }
@@ -808,7 +808,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   React.useEffect(() => {
     if (editorWindowRef.current) {
       const editorWindow = editorWindowRef.current;
-      const rootElm = editorWindow.document.getElementById(APP_ROOT_ID);
+      const rootElm = editorWindow.document.getElementById(HTML_ID_APP_ROOT);
 
       if (!rootElm) {
         console.warn(`Invariant: Unable to locate Toolpad App root element`);
@@ -860,7 +860,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   return (
     <RenderPanelRoot className={className}>
-      <PageView
+      <EditorCanvasHost
         appId={appId}
         editor
         className={classes.view}

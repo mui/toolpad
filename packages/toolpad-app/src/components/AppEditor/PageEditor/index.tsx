@@ -56,7 +56,7 @@ export default function PageEditor({ appId, className }: PageEditorProps) {
           <SplitPane
             split="horizontal"
             allowResize
-            defaultSize="80%"
+            defaultSize="70%"
             onDragStarted={handleDragStart}
             onDragFinished={handleDragFinished}
             paneStyle={{

@@ -4,15 +4,12 @@ import AddIcon from '@mui/icons-material/Add';
 import StringRecordEditor from '../../StringRecordEditor';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
-import { NodeId } from '../../../types';
+import { usePageEditorState } from './PageEditorProvider';
 
-export interface UrlQueryEditorProps {
-  pageNodeId: NodeId;
-}
-
-export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
+export default function UrlQueryEditor() {
   const dom = useDom();
   const domApi = useDomApi();
+  const { nodeId: pageNodeId } = usePageEditorState();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 

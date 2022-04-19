@@ -10,6 +10,7 @@ import { useDom } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
+import NonRenderedPageContent from './NonRenderedPageContent';
 
 const classes = {
   componentPanel: 'Toolpad_ComponentPanel',
@@ -43,6 +44,11 @@ export default function PageEditor({ appId, className }: PageEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
+
+  const [dragActive, setDragActive] = React.useState(false);
+  const handleDragStart = React.useCallback(() => setDragActive(true), []);
+  const handleDragFinished = React.useCallback(() => setDragActive(false), []);
+
   return pageNode ? (
     <PageEditorProvider key={nodeId} appId={appId} nodeId={nodeId as NodeId}>
       <PageEditorRoot className={className}>
@@ -51,15 +57,27 @@ export default function PageEditor({ appId, className }: PageEditorProps) {
             split="horizontal"
             allowResize
             defaultSize="80%"
+            onDragStarted={handleDragStart}
+            onDragFinished={handleDragFinished}
             paneStyle={{
               width: '100%',
             }}
           >
-            <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', flex: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: '100%',
+                flex: 1,
+                position: 'relative',
+              }}
+            >
               <ComponentCatalog />
               <RenderPanel className={classes.renderPanel} />
+              {/* Workaround for https://github.com/tomkp/react-split-pane/issues/30 */}
+              {dragActive ? <Box sx={{ position: 'absolute', inset: '0 0 0 0' }} /> : null}
             </Box>
-            <Box />
+            <NonRenderedPageContent />
           </SplitPane>
         </Box>
         <ComponentPanel className={classes.componentPanel} />

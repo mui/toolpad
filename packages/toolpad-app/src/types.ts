@@ -132,12 +132,15 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P> {
   connectionId: NodeId;
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
-export interface QueryEditorApi {
-  fetchPrivate: (query: any) => Promise<any>;
+
+export interface QueryEditorApi<P> {
+  fetchPrivate: (query: P) => Promise<any>;
 }
-export interface QueryEditorProps<Q> extends WithControlledProp<Q> {
-  api: QueryEditorApi;
+
+export interface QueryEditorProps<Q, P = {}> extends WithControlledProp<Q> {
+  api: QueryEditorApi<P>;
 }
+
 export type QueryEditor<Q = {}> = React.FC<QueryEditorProps<Q>>;
 
 export interface ConnectionStatus {

@@ -328,7 +328,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     return createPageState(urlQueryState, controlledState, queryResultState);
   }, [urlQueryState, queryStates, controlledState, queryResults]);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
+    // Using a layout effect to make sure we update pageState on the window before the DOM is rendered
+    // because the state in the editor is updated when the dom mutates
+    // eslint-disable-next-line no-underscore-dangle
+    window.__TOOLPAD_RUNTIME_PAGE_STATE__ = pageState;
     prevPageState.current = pageState;
   }, [pageState]);
 

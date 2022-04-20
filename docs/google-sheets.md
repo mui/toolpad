@@ -32,9 +32,9 @@ Reference from Google: [https://developers.google.com/identity/sign-in/web/sign-
 
 From the App page;
 
-1. Click on Connections “+” → From the type dropdown choose Google Sheets as the data source → Click on “Create”
-2. Click on “Sign In To Google” → Authorise the application to fetch data from your Google Account
-3. Click on APIs “+” → Choose the connection you have recently made → Click on “Create”
+1. Click on Connections "+" → From the type dropdown choose Google Sheets as the data source → Click on "Create"
+2. Click on "Sign In To Google" → Authorise the application to fetch data from your Google Account
+3. Click on APIs "+" → Choose the connection you have recently made → Click on "Create"
 4. In the query editor, the spreadsheet input will show you the list of all available Google Sgitheets (your and the ones shared with you).
 5. Choose the sheet, cell range → Click on “Update” to save the API
 

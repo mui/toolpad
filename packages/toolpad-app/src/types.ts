@@ -121,6 +121,13 @@ export interface ApiResult<D = any> {
   fields?: ApiResultFields;
 }
 
+export interface PrivateApiResult<D = any> {
+  data?: D;
+  isLoading: boolean;
+  isIdle: boolean;
+  isSuccess: boolean;
+}
+
 export interface CreateHandlerApi {
   updateConnection: (appId: string, props: Updates<LegacyConnection>) => Promise<LegacyConnection>;
   getConnection: (appId: string, connectionId: string) => Promise<LegacyConnection>;
@@ -133,8 +140,8 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P> {
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorApi<P> {
-  fetchPrivate: (query: P) => Promise<any>;
+export interface QueryEditorApi<P, D = {}> {
+  fetchPrivate: (query: P) => Promise<PrivateApiResult<D>>;
 }
 
 export interface QueryEditorProps<Q, P = {}> extends WithControlledProp<Q> {

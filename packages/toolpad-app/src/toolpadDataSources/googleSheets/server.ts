@@ -63,26 +63,40 @@ async function execPrivate(
   if (!query) {
     return {};
   }
-
-  if (query.type === GoogleSheetsPrivateQueryType.FETCH_SPREADSHEETS) {
+  if (query.type === GoogleSheetsPrivateQueryType.FILE_GET) {
     const driveClient = google.drive({
       version: 'v3',
       auth: client,
     });
-    const { inputString } = query;
-    let queryString = "mimeType='application/vnd.google-apps.spreadsheet'";
-    if (inputString) {
-      queryString = `name contains '${inputString}' and ${queryString}`;
-    }
-    const response = await driveClient.files.list({
-      q: queryString,
+    const { spreadsheetId } = query;
+    const response = await driveClient.files.get({
+      fileId: spreadsheetId,
     });
     if (response.statusText === 'OK') {
       return response.data;
     }
     throw new Error(`Failed to fetch query: "${JSON.stringify(query)}"`);
   }
-  if (query.type === GoogleSheetsPrivateQueryType.FETCH_SHEET) {
+  if (query.type === GoogleSheetsPrivateQueryType.FILES_LIST) {
+    const driveClient = google.drive({
+      version: 'v3',
+      auth: client,
+    });
+    const { spreadsheetQuery, pageToken } = query;
+    let queryString = "mimeType='application/vnd.google-apps.spreadsheet'";
+    if (spreadsheetQuery) {
+      queryString = `name contains '${spreadsheetQuery}' and ${queryString}`;
+    }
+    const response = await driveClient.files.list({
+      q: queryString,
+      pageToken,
+    });
+    if (response.statusText === 'OK') {
+      return response.data;
+    }
+    throw new Error(`Failed to fetch query: "${JSON.stringify(query)}"`);
+  }
+  if (query.type === GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET) {
     const sheetsClient = google.sheets({
       version: 'v4',
       auth: client,
@@ -93,10 +107,7 @@ async function execPrivate(
       includeGridData: false,
     });
     if (response.statusText === 'OK') {
-      const { sheets } = response.data;
-      return {
-        sheets: sheets?.map((sheet) => sheet.properties),
-      };
+      return response.data;
     }
     throw new Error(`Failed to fetch query: "${JSON.stringify(query)}"`);
   }

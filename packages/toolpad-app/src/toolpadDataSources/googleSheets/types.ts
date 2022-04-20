@@ -6,7 +6,7 @@ export type GoogleSheetsConnectionParams = {
   id_token?: string | null;
 };
 
-export type GoogleSpreadsheet = {
+export type GoogleDriveFile = {
   /**
    * The ID of the file.
    */
@@ -55,7 +55,43 @@ export type GoogleSpreadsheet = {
   values: any[][];
 };
 
-export type GoogleSheet = {
+export type GoogleDriveFiles = {
+  kind: string;
+  nextPageToken: string;
+  incompleteSearch: boolean;
+  files: GoogleDriveFile[];
+};
+
+export type GoogleSpreadsheetProperties = {
+  /**
+   * The title of the spreadsheet
+   */
+  title: string;
+  /**
+   * The locale of the spreadsheet in one of the following formats:
+   * an ISO 639-1 language code such as en
+   * an ISO 639-2 language code such as fil, if no 639-1 code exists
+   * a combination of the ISO language code and country code, such as en_US
+   */
+  locale: string;
+};
+
+export type GoogleSpreadsheet = {
+  /**
+   * The ID of the spreadsheet
+   */
+  spreadsheetId: string;
+  /**
+   * Overall properties of the spreadsheet
+   */
+  properties: GoogleSpreadsheetProperties;
+  /**
+   * The sheets that are a part of the spreadsheet
+   */
+  sheets: GoogleSheet[];
+};
+
+export type GoogleSheetProperties = {
   /**
    * The index of the sheet within the spreadsheet.
    */
@@ -74,6 +110,13 @@ export type GoogleSheet = {
   title: string;
 };
 
+export type GoogleSheet = {
+  /**
+   * Metadata associated with the sheet
+   */
+  properties: GoogleSheetProperties;
+};
+
 export type GoogleSheetsApiQuery = {
   /**
    * The ranges to retrieve from the spreadsheet.
@@ -82,24 +125,30 @@ export type GoogleSheetsApiQuery = {
   /**
    * The spreadsheet to request.
    */
-  spreadsheetId: GoogleSpreadsheet['id'] | null;
+  spreadsheetId: GoogleDriveFile['id'] | null;
   /**
    * The sheet to request.
    */
-  sheetName: GoogleSheet['title'] | null;
+  sheetName: GoogleSheetProperties['title'] | null;
 };
 
 export enum GoogleSheetsPrivateQueryType {
-  FETCH_SHEET = 'FETCH_SHEET',
-  FETCH_SPREADSHEETS = 'FETCH_SPREADSHEETS',
+  FILE_GET = 'FILE_GET',
+  FILES_LIST = 'FILES_LIST',
+  FETCH_SPREADSHEET = 'FETCH_SPREADSHEET',
 }
 
 export type GoogleSheetsPrivateQuery =
   | {
-      type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEETS;
-      inputString?: string | null;
+      type: GoogleSheetsPrivateQueryType.FILE_GET;
+      spreadsheetId: string;
     }
   | {
-      type: GoogleSheetsPrivateQueryType.FETCH_SHEET;
+      type: GoogleSheetsPrivateQueryType.FILES_LIST;
+      spreadsheetQuery?: string | null;
+      pageToken?: string;
+    }
+  | {
+      type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET;
       spreadsheetId: GoogleSheetsApiQuery['spreadsheetId'];
     };

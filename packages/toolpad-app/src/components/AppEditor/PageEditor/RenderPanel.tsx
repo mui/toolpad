@@ -771,6 +771,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     setOverlayKey((key) => key + 1);
   }, []);
 
+  const handlePageUpdate = React.useCallback(() => {
+    const rootElm = editorWindowRef.current?.document.getElementById(HTML_ID_APP_ROOT);
+
+    if (!rootElm) {
+      return;
+    }
+
+    api.pageViewStateUpdate(getPageViewState(rootElm));
+  }, [api]);
+
   const handleRuntimeEvent = React.useCallback(
     (event: RuntimeEvent) => {
       switch (event.type) {
@@ -791,13 +801,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           });
           return;
         }
+        case 'pageStateUpdated': {
+          handlePageUpdate();
+          return;
+        }
         default:
           throw new Error(
             `received unrecognized event "${(event as RuntimeEvent).type}" from editor runtime`,
           );
       }
     },
-    [dom, domApi],
+    [dom, domApi, handlePageUpdate],
   );
 
   const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);
@@ -815,15 +829,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return () => {};
       }
 
-      api.pageViewStateUpdate(getPageViewState(rootElm));
+      handlePageUpdate();
+      const handlePageUpdateThrottled = throttle(handlePageUpdate, 250, { trailing: true });
 
-      const handlePageUpdate = throttle(
-        () => api.pageViewStateUpdate(getPageViewState(rootElm)),
-        250,
-        { trailing: true },
-      );
-
-      const mutationObserver = new MutationObserver(handlePageUpdate);
+      const mutationObserver = new MutationObserver(handlePageUpdateThrottled);
 
       mutationObserver.observe(rootElm, {
         attributes: true,
@@ -832,7 +841,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         characterData: true,
       });
 
-      const resizeObserver = new ResizeObserver(handlePageUpdate);
+      const resizeObserver = new ResizeObserver(handlePageUpdateThrottled);
 
       resizeObserver.observe(rootElm);
 
@@ -848,7 +857,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       editorWindow.__TOOLPAD_RUNTIME_EVENT__ = (event) => handleRuntimeEventRef.current(event);
 
       return () => {
-        handlePageUpdate.cancel();
+        handlePageUpdateThrottled.cancel();
         mutationObserver.disconnect();
         resizeObserver.disconnect();
         // eslint-disable-next-line no-underscore-dangle
@@ -856,7 +865,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       };
     }
     return () => {};
-  }, [overlayKey, api]);
+  }, [overlayKey, handlePageUpdate]);
 
   return (
     <RenderPanelRoot className={className}>

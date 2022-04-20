@@ -19,6 +19,7 @@ import {
   InstantiatedComponents,
 } from '../../src/toolpadComponents/componentDefinition';
 import AppThemeProvider from './AppThemeProvider';
+import { fireEvent } from '../coreRuntime';
 
 export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
@@ -331,6 +332,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   React.useLayoutEffect(() => {
     // Using a layout effect to make sure we update pageState on the window before the DOM is rendered
     // because the state in the editor is updated when the dom mutates
+    fireEvent({ type: 'pageStateUpdated', pageState });
     // eslint-disable-next-line no-underscore-dangle
     window.__TOOLPAD_RUNTIME_PAGE_STATE__ = pageState;
     prevPageState.current = pageState;

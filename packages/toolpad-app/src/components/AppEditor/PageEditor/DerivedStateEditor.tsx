@@ -94,7 +94,7 @@ function NodePropsEditor<P>({
   argTypes,
   onArgTypesChange,
 }: NodePropsEditorProps<P>) {
-  const { viewState, pageState } = usePageEditorState();
+  const { pageState, bindings } = usePageEditorState();
   const globalScope = pageState;
 
   const handlePropValueChange = React.useCallback(
@@ -133,7 +133,7 @@ function NodePropsEditor<P>({
             return null;
           }
           const bindingId = `${nodeId}.props.${propName}`;
-          const liveBinding = viewState.bindings[bindingId];
+          const liveBinding = bindings[bindingId];
           const propValue: BindableAttrValue<any> | null = value[propName] ?? null;
           const isBound = !!propValue;
           return (

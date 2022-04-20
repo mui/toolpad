@@ -52,8 +52,8 @@ export default function BindableEditor<V>({
   const control = controlSpec ? propertyControls[controlSpec.type] : null;
 
   const bindingId = `${nodeId}${propNamespace ? `.${propNamespace}` : ''}.${propName}`;
-  const { viewState, pageState } = usePageEditorState();
-  const liveBinding = viewState.bindings[bindingId];
+  const { bindings, pageState } = usePageEditorState();
+  const liveBinding = bindings[bindingId];
   const globalScope = pageState;
 
   const initConstValue = React.useCallback(() => {

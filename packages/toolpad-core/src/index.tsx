@@ -108,6 +108,10 @@ export type RuntimeEvent =
   | {
       type: 'pageStateUpdated';
       pageState: Record<string, unknown>;
+    }
+  | {
+      type: 'pageBindingsUpdated';
+      bindings: LiveBindings;
     };
 
 export interface ComponentConfig<P> {

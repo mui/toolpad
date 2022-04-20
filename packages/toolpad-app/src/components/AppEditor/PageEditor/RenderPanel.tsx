@@ -31,6 +31,12 @@ import EditorOverlay from './EditorOverlay';
 import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
 
+declare global {
+  interface Window {
+    __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
+  }
+}
+
 const ROW_COMPONENT = 'PageRow';
 
 type SlotDirection = 'horizontal' | 'vertical';
@@ -771,13 +777,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     setOverlayKey((key) => key + 1);
   }, []);
 
-  const handlePageStateUpdate = React.useCallback(
-    (pageState: Record<string, unknown>) => {
-      api.pageStateUpdate(pageState);
-    },
-    [api],
-  );
-
   const handlePageViewStateUpdate = React.useCallback(() => {
     const rootElm = editorWindowRef.current?.document.getElementById(HTML_ID_APP_ROOT);
 
@@ -809,7 +808,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'pageStateUpdated': {
-          handlePageStateUpdate(event.pageState);
+          api.pageStateUpdate(event.pageState);
+          return;
+        }
+        case 'pageBindingsUpdated': {
+          api.pageBindingsUpdate(event.bindings);
           return;
         }
         default:
@@ -818,7 +821,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           );
       }
     },
-    [dom, domApi, handlePageStateUpdate],
+    [dom, domApi, api],
   );
 
   const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);

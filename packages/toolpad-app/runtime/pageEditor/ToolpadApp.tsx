@@ -355,10 +355,12 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     const dataUrl = `/api/data/${appId}/${version}/`;
     const queryId = node.attributes.api.value;
     const params = node.params
-      ? Object.keys(node.params).map((propName) => [
-          propName,
-          tmpLiveBindings[`${node.id}.params.${propName}`]?.value,
-        ])
+      ? Object.fromEntries(
+          Object.keys(node.params).map((propName) => [
+            propName,
+            tmpLiveBindings[`${node.id}.params.${propName}`]?.value,
+          ]),
+        )
       : {};
     return {
       queryKey: [dataUrl, queryId, params],

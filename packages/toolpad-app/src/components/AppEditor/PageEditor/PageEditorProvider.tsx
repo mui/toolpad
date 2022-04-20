@@ -1,3 +1,4 @@
+import { LiveBindings } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { NodeId, SlotLocation, PageViewState } from '../../../types';
@@ -15,6 +16,8 @@ export interface PageEditorState {
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
   readonly viewState: PageViewState;
+  readonly pageState: Record<string, unknown>;
+  readonly bindings: LiveBindings;
 }
 
 export type PageEditorAction =
@@ -45,8 +48,16 @@ export type PageEditorAction =
       type: 'PAGE_NODE_DRAG_END';
     }
   | {
+      type: 'PAGE_STATE_UPDATE';
+      pageState: Record<string, unknown>;
+    }
+  | {
       type: 'PAGE_VIEW_STATE_UPDATE';
       viewState: PageViewState;
+    }
+  | {
+      type: 'PAGE_BINDINGS_UPDATE';
+      bindings: LiveBindings;
     };
 
 export function createPageEditorState(appId: string, nodeId: NodeId): PageEditorState {
@@ -59,7 +70,9 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     newNode: null,
     highlightLayout: false,
     highlightedSlot: null,
-    viewState: { nodes: {}, pageState: {}, bindings: {} },
+    viewState: { nodes: {} },
+    pageState: {},
+    bindings: {},
   };
 }
 
@@ -112,6 +125,18 @@ export function pageEditorReducer(
         viewState,
       });
     }
+    case 'PAGE_STATE_UPDATE': {
+      const { pageState } = action;
+      return update(state, {
+        pageState,
+      });
+    }
+    case 'PAGE_BINDINGS_UPDATE': {
+      const { bindings } = action;
+      return update(state, {
+        bindings,
+      });
+    }
     default:
       return state;
   }
@@ -141,6 +166,18 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
       dispatch({
         type: 'PAGE_VIEW_STATE_UPDATE',
         viewState,
+      });
+    },
+    pageStateUpdate(pageState: Record<string, unknown>) {
+      dispatch({
+        type: 'PAGE_STATE_UPDATE',
+        pageState,
+      });
+    },
+    pageBindingsUpdate(bindings: LiveBindings) {
+      dispatch({
+        type: 'PAGE_BINDINGS_UPDATE',
+        bindings,
       });
     },
   };

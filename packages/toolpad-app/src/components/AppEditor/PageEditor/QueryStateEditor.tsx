@@ -13,7 +13,8 @@ import {
   SelectChangeEvent,
   DialogActions,
   Box,
-  Typography,
+  LinearProgress,
+  Alert,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -59,15 +60,20 @@ interface PreviewQueryStateResultProps {
 }
 
 function PreviewQueryStateResult({ node }: PreviewQueryStateResultProps) {
-  const { viewState } = usePageEditorState();
-  const actualNodeState: UseDataQuery | undefined = viewState.pageState[node.name] as any;
+  const { pageState } = usePageEditorState();
+  const actualNodeState: UseDataQuery | undefined = pageState[node.name] as any;
+  if (!node.attributes.api.value) {
+    return null;
+  }
   return (
     <Box sx={{ maxHeight: 150, overflow: 'auto' }}>
-      {node.attributes.api.value ? (
-        <JsonView src={actualNodeState?.data} />
-      ) : (
-        <Typography>No data</Typography>
-      )}
+      {actualNodeState?.loading ? <LinearProgress /> : null}
+      {actualNodeState?.error ? (
+        <Alert severity="error">
+          {actualNodeState?.error.message || actualNodeState?.error || 'Something went wrong'}
+        </Alert>
+      ) : null}
+      {actualNodeState?.data ? <JsonView src={actualNodeState.data} /> : null}
     </Box>
   );
 }

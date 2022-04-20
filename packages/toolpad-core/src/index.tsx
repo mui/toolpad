@@ -98,12 +98,21 @@ export interface LiveBinding {
   error?: Error;
 }
 
-export type RuntimeEvent = {
-  type: 'propUpdated';
-  nodeId: string;
-  prop: string;
-  value: React.SetStateAction<unknown>;
-};
+export type RuntimeEvent =
+  | {
+      type: 'propUpdated';
+      nodeId: string;
+      prop: string;
+      value: React.SetStateAction<unknown>;
+    }
+  | {
+      type: 'pageStateUpdated';
+      pageState: Record<string, unknown>;
+    }
+  | {
+      type: 'pageBindingsUpdated';
+      bindings: LiveBindings;
+    };
 
 export interface ComponentConfig<P> {
   argTypes: ArgTypeDefinitions<P>;

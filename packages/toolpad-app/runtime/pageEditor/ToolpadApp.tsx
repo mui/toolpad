@@ -7,10 +7,10 @@ import {
   INITIAL_DATA_QUERY,
   LiveBinding,
   LiveBindings,
-  transformQueryResult,
+  useDataQuery,
   UseDataQuery,
 } from '@mui/toolpad-core';
-import { useQueries, UseQueryOptions, QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import * as appDom from '../../src/appDom';
 import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../../src/types';
@@ -35,7 +35,6 @@ function defaultRenderToolpadComponent({ Component, props }: RenderToolpadCompon
 }
 type NodeState = Record<string, unknown>;
 type ControlledState = Record<string, NodeState | undefined>;
-type DataQueryState = Record<string, UseDataQuery | undefined>;
 type PageState = Record<string, Record<string, string> | NodeState | UseDataQuery | undefined>;
 
 interface AppContext {
@@ -56,16 +55,6 @@ const [useSetControlledStateContext, SetControlledStateContextProvider] =
   );
 const [usePageStateContext, PageStateContextProvider] =
   createProvidedContext<PageState>('PagState');
-
-async function fetchData(dataUrl: string, queryId: string, params: any) {
-  const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
-  url.searchParams.set('params', JSON.stringify(params));
-  const res = await fetch(String(url));
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status} while fetching "${url}"`);
-  }
-  return res.json();
-}
 
 function getElmComponent(
   components: InstantiatedComponents,
@@ -238,30 +227,22 @@ function useInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): C
             ],
           ];
         }
+        if (appDom.isQueryState(elm)) {
+          return [[elm.name, INITIAL_DATA_QUERY]];
+        }
         return [];
       }),
     );
   }, [dom, page, components]);
 }
 
-function getInitialQueryState(dom: appDom.AppDom, page: appDom.PageNode): DataQueryState {
-  const elements = appDom.getDescendants(dom, page);
-  return Object.fromEntries(
-    elements.flatMap((elm) => {
-      return appDom.isQueryState(elm) ? [[elm.name, INITIAL_DATA_QUERY]] : [];
-    }),
-  );
-}
-
 function createPageState(
   urlQueryState: Record<string, string>,
   controlledState: ControlledState,
-  dataQueryState: DataQueryState,
 ): PageState {
   return {
     page: urlQueryState,
     ...controlledState,
-    ...dataQueryState,
   };
 }
 
@@ -275,6 +256,38 @@ function PageRoot({ children }: PageRootProps) {
       {children}
     </Stack>
   );
+}
+
+interface QueryStateNodeProps {
+  node: appDom.QueryStateNode;
+}
+
+function QueryStateNode({ node }: QueryStateNodeProps) {
+  const { appId, version } = useAppContext();
+  const bindings = useBindingsContext();
+  const setControlledState = useSetControlledStateContext();
+
+  const dataUrl = `/api/data/${appId}/${version}/`;
+  const queryId = node.attributes.api.value;
+  const params = node.params
+    ? Object.fromEntries(
+        Object.keys(node.params).map((propName) => [
+          propName,
+          bindings[`${node.id}.params.${propName}`]?.value,
+        ]),
+      )
+    : {};
+
+  const onResult = React.useCallback(
+    (result) => {
+      setControlledState((state) => ({ ...state, [node.name]: result }));
+    },
+    [node.name, setControlledState],
+  );
+
+  useDataQuery(onResult, dataUrl, queryId, params);
+
+  return null;
 }
 
 function useLiveBindings(
@@ -307,7 +320,6 @@ function useLiveBindings(
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
-  const { appId, version } = useAppContext();
   const renderToolpadComponent = React.useContext(RenderToolpadComponentContext);
   const dom = useDomContext();
   const location = useLocation();
@@ -325,11 +337,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const initialControlledState = useInitialControlledState(dom, page);
   const [controlledState, setControlledState] = React.useState(initialControlledState);
-  const prevPageState = React.useRef<PageState>(
-    createPageState(urlQueryState, initialControlledState, getInitialQueryState(dom, page)),
-  );
 
-  // Make sure to patch page state when dom nodes are added or removed
+  // Make sure to patch page state after dom nodes have been added or removed
   React.useEffect(() => {
     setControlledState((existing) => {
       const existingKeys = Object.keys(existing);
@@ -346,48 +355,15 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     });
   }, [initialControlledState]);
 
-  const tmpLiveBindings: LiveBindings = useLiveBindings(dom, page, {
-    ...prevPageState.current,
-    ...controlledState,
-  });
-
-  const reactQueries: UseQueryOptions[] = queryStates.map((node) => {
-    const dataUrl = `/api/data/${appId}/${version}/`;
-    const queryId = node.attributes.api.value;
-    const params = node.params
-      ? Object.fromEntries(
-          Object.keys(node.params).map((propName) => [
-            propName,
-            tmpLiveBindings[`${node.id}.params.${propName}`]?.value,
-          ]),
-        )
-      : {};
-    return {
-      queryKey: [dataUrl, queryId, params],
-      queryFn: () => queryId && fetchData(dataUrl, queryId, params),
-      enabled: !!queryId,
-    };
-  });
-
-  const queryResults = useQueries(reactQueries);
-
   const pageState = React.useMemo(() => {
-    const queryResultState = Object.fromEntries(
-      queryStates.map((node, i) => {
-        const queryResult = queryResults[i];
-        return [node.name, transformQueryResult(queryResult)];
-      }),
-    );
-
-    return createPageState(urlQueryState, controlledState, queryResultState);
-  }, [urlQueryState, queryStates, controlledState, queryResults]);
-
-  const liveBindings: LiveBindings = useLiveBindings(dom, page, pageState);
+    return createPageState(urlQueryState, controlledState);
+  }, [urlQueryState, controlledState]);
 
   React.useEffect(() => {
     fireEvent({ type: 'pageStateUpdated', pageState });
-    prevPageState.current = pageState;
   }, [pageState]);
+
+  const liveBindings: LiveBindings = useLiveBindings(dom, page, pageState);
 
   React.useEffect(() => {
     fireEvent({ type: 'pageBindingsUpdated', bindings: liveBindings });
@@ -408,7 +384,13 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   return (
     <BindingsContextProvider value={liveBindings}>
       <SetControlledStateContextProvider value={setControlledState}>
-        <PageStateContextProvider value={pageState}>{renderedPageContent}</PageStateContextProvider>
+        <PageStateContextProvider value={pageState}>
+          {renderedPageContent}
+
+          {queryStates.map((node) => (
+            <QueryStateNode key={node.id} node={node} />
+          ))}
+        </PageStateContextProvider>
       </SetControlledStateContextProvider>
     </BindingsContextProvider>
   );

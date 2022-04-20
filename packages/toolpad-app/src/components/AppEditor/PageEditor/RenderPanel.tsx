@@ -31,6 +31,12 @@ import EditorOverlay from './EditorOverlay';
 import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
 
+declare global {
+  interface Window {
+    __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
+  }
+}
+
 const ROW_COMPONENT = 'PageRow';
 
 type SlotDirection = 'horizontal' | 'vertical';
@@ -771,6 +777,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     setOverlayKey((key) => key + 1);
   }, []);
 
+  const handlePageViewStateUpdate = React.useCallback(() => {
+    const rootElm = editorWindowRef.current?.document.getElementById(HTML_ID_APP_ROOT);
+
+    if (!rootElm) {
+      return;
+    }
+
+    api.pageViewStateUpdate(getPageViewState(rootElm));
+  }, [api]);
+
   const handleRuntimeEvent = React.useCallback(
     (event: RuntimeEvent) => {
       switch (event.type) {
@@ -791,13 +807,21 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           });
           return;
         }
+        case 'pageStateUpdated': {
+          api.pageStateUpdate(event.pageState);
+          return;
+        }
+        case 'pageBindingsUpdated': {
+          api.pageBindingsUpdate(event.bindings);
+          return;
+        }
         default:
           throw new Error(
             `received unrecognized event "${(event as RuntimeEvent).type}" from editor runtime`,
           );
       }
     },
-    [dom, domApi],
+    [dom, domApi, api],
   );
 
   const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);
@@ -815,15 +839,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return () => {};
       }
 
-      api.pageViewStateUpdate(getPageViewState(rootElm));
+      handlePageViewStateUpdate();
+      const handlePageUpdateThrottled = throttle(handlePageViewStateUpdate, 250, {
+        trailing: true,
+      });
 
-      const handlePageUpdate = throttle(
-        () => api.pageViewStateUpdate(getPageViewState(rootElm)),
-        250,
-        { trailing: true },
-      );
-
-      const mutationObserver = new MutationObserver(handlePageUpdate);
+      const mutationObserver = new MutationObserver(handlePageUpdateThrottled);
 
       mutationObserver.observe(rootElm, {
         attributes: true,
@@ -832,7 +853,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         characterData: true,
       });
 
-      const resizeObserver = new ResizeObserver(handlePageUpdate);
+      const resizeObserver = new ResizeObserver(handlePageUpdateThrottled);
 
       resizeObserver.observe(rootElm);
 
@@ -848,7 +869,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       editorWindow.__TOOLPAD_RUNTIME_EVENT__ = (event) => handleRuntimeEventRef.current(event);
 
       return () => {
-        handlePageUpdate.cancel();
+        handlePageUpdateThrottled.cancel();
         mutationObserver.disconnect();
         resizeObserver.disconnect();
         // eslint-disable-next-line no-underscore-dangle
@@ -856,7 +877,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       };
     }
     return () => {};
-  }, [overlayKey, api]);
+  }, [overlayKey, handlePageViewStateUpdate]);
 
   return (
     <RenderPanelRoot className={className}>

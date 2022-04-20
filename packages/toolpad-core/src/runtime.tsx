@@ -1,12 +1,10 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
-import type { SlotType, LiveBindings, ComponentConfig, RuntimeEvent } from './index';
+import type { SlotType, ComponentConfig, RuntimeEvent } from './index';
 
 declare global {
   interface Window {
-    __TOOLPAD_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
-    __TOOLPAD_RUNTIME_BINDINGS_STATE__?: LiveBindings;
     __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
   }
 }
@@ -128,20 +126,6 @@ export class NodeRuntimeWrapper extends React.Component<
       </NodeRuntimeContext.Provider>
     );
   }
-}
-
-export function useDiagnostics(
-  pageState: Record<string, unknown>,
-  liveBindings: LiveBindings,
-): void {
-  // Layout effect to make sure it's updated before the DOM is updated (which triggers the editor
-  // to update its view state).
-  React.useLayoutEffect(() => {
-    // eslint-disable-next-line no-underscore-dangle
-    window.__TOOLPAD_RUNTIME_PAGE_STATE__ = pageState;
-    // eslint-disable-next-line no-underscore-dangle
-    window.__TOOLPAD_RUNTIME_BINDINGS_STATE__ = liveBindings;
-  }, [pageState, liveBindings]);
 }
 
 export interface NodeRuntime<P> {

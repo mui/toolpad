@@ -27,11 +27,12 @@ module.exports = {
     ];
   },
 
-  async redirect() {
+  async redirects() {
     return [
       {
         source: '/release/:path*',
         destination: '/app/:path*',
+        permanent: true,
       },
     ];
   },

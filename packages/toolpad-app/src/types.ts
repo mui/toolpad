@@ -5,7 +5,6 @@ import {
   ArgTypeDefinitions,
   SlotType,
   RuntimeError,
-  LiveBindings,
   ComponentConfig,
 } from '@mui/toolpad-core';
 import type { Branded, WithControlledProp } from './utils/types';
@@ -106,8 +105,6 @@ export interface NodesInfo {
 
 export interface PageViewState {
   nodes: NodesInfo;
-  pageState: Record<string, unknown>;
-  bindings: LiveBindings;
 }
 
 export type ApiResultFields<D = any> = {

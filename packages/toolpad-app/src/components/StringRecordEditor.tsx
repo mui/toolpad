@@ -28,10 +28,11 @@ export default function StringRecordEditor({
   const fieldInputRef = React.useRef<HTMLInputElement>(null);
 
   const [editedField, setEditedField] = React.useState<null | string>(null);
-  const [editedFieldName, setEditedFieldName] = React.useState<string>('');
+  const [editedFieldNewName, setEditedFieldNewName] = React.useState<string>('');
 
   const isValidEditedFieldName: boolean =
-    !!editedFieldName && editedFieldName !== editedField && !hasOwnProperty(value, editedFieldName);
+    !!editedFieldNewName &&
+    (!hasOwnProperty(value, editedFieldNewName) || editedFieldNewName === editedField);
 
   const isValidNewFieldName: boolean = !hasOwnProperty(value, newFieldName);
   const isValidNewFieldParams: boolean = !editedField && !!newFieldName && isValidNewFieldName;
@@ -55,9 +56,9 @@ export default function StringRecordEditor({
       return false;
     }
     const oldValue = value[editedField];
-    onChange({ ...omit(value, editedField), [editedFieldName]: oldValue });
+    onChange({ ...omit(value, editedField), [editedFieldNewName]: oldValue });
     return true;
-  }, [editedField, isValidEditedFieldName, value, onChange, editedFieldName]);
+  }, [editedField, isValidEditedFieldName, value, onChange, editedFieldNewName]);
 
   const handleSubmit = React.useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -95,7 +96,7 @@ export default function StringRecordEditor({
   const handleFocus = React.useCallback(
     (field: string) => () => {
       setEditedField(field);
-      setEditedFieldName(field);
+      setEditedFieldNewName(field);
     },
     [],
   );
@@ -109,9 +110,9 @@ export default function StringRecordEditor({
             <TextField
               label={valueLabel}
               size="small"
-              value={editedFieldName}
+              value={editedFieldNewName}
               autoFocus
-              onChange={(event) => setEditedFieldName(event.target.value)}
+              onChange={(event) => setEditedFieldNewName(event.target.value)}
               error={!isValidEditedFieldName}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}

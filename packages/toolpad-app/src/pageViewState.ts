@@ -4,8 +4,6 @@ import {
   RUNTIME_PROP_SLOTS,
   SlotType,
   RuntimeError,
-  LiveBindings,
-  RuntimeEvent,
   ComponentConfig,
   LiveBinding,
 } from '@mui/toolpad-core';
@@ -15,9 +13,6 @@ import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry'
 declare global {
   interface Window {
     __REACT_DEVTOOLS_GLOBAL_HOOK__?: Hook;
-    __TOOLPAD_RUNTIME_PAGE_STATE__?: Record<string, unknown>;
-    __TOOLPAD_RUNTIME_BINDINGS_STATE__?: LiveBindings;
-    __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
   }
 }
 
@@ -141,18 +136,9 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
 }
 
 export function getPageViewState(rootElm: HTMLElement): PageViewState {
-  const contentWindow = rootElm.ownerDocument.defaultView;
-
   const nodesViewInfo = getNodesViewInfo(rootElm);
 
   return {
     nodes: nodesViewInfo.nodes,
-    // eslint-disable-next-line no-underscore-dangle
-    pageState: contentWindow?.__TOOLPAD_RUNTIME_PAGE_STATE__ ?? {},
-    bindings: {
-      ...nodesViewInfo.bindings,
-      // eslint-disable-next-line no-underscore-dangle
-      ...(contentWindow?.__TOOLPAD_RUNTIME_BINDINGS_STATE__ ?? {}),
-    },
   };
 }

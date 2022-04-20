@@ -771,7 +771,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     setOverlayKey((key) => key + 1);
   }, []);
 
-  const handlePageUpdate = React.useCallback(() => {
+  const handlePageStateUpdate = React.useCallback(
+    (pageState: Record<string, unknown>) => {
+      api.pageStateUpdate(pageState);
+    },
+    [api],
+  );
+
+  const handlePageViewStateUpdate = React.useCallback(() => {
     const rootElm = editorWindowRef.current?.document.getElementById(HTML_ID_APP_ROOT);
 
     if (!rootElm) {
@@ -802,7 +809,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'pageStateUpdated': {
-          handlePageUpdate();
+          handlePageStateUpdate(event.pageState);
           return;
         }
         default:
@@ -811,7 +818,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           );
       }
     },
-    [dom, domApi, handlePageUpdate],
+    [dom, domApi, handlePageStateUpdate],
   );
 
   const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);
@@ -829,8 +836,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return () => {};
       }
 
-      handlePageUpdate();
-      const handlePageUpdateThrottled = throttle(handlePageUpdate, 250, { trailing: true });
+      handlePageViewStateUpdate();
+      const handlePageUpdateThrottled = throttle(handlePageViewStateUpdate, 250, {
+        trailing: true,
+      });
 
       const mutationObserver = new MutationObserver(handlePageUpdateThrottled);
 
@@ -865,7 +874,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       };
     }
     return () => {};
-  }, [overlayKey, handlePageUpdate]);
+  }, [overlayKey, handlePageViewStateUpdate]);
 
   return (
     <RenderPanelRoot className={className}>

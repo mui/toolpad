@@ -13,7 +13,6 @@ import {
   SelectChangeEvent,
   DialogActions,
   Box,
-  Typography,
   LinearProgress,
   Alert,
 } from '@mui/material';
@@ -61,8 +60,8 @@ interface PreviewQueryStateResultProps {
 }
 
 function PreviewQueryStateResult({ node }: PreviewQueryStateResultProps) {
-  const { viewState } = usePageEditorState();
-  const actualNodeState: UseDataQuery | undefined = viewState.pageState[node.name] as any;
+  const { pageState } = usePageEditorState();
+  const actualNodeState: UseDataQuery | undefined = pageState[node.name] as any;
   if (!node.attributes.api.value) {
     return null;
   }

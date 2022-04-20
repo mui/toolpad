@@ -106,7 +106,6 @@ export interface NodesInfo {
 
 export interface PageViewState {
   nodes: NodesInfo;
-  pageState: Record<string, unknown>;
   bindings: LiveBindings;
 }
 

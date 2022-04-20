@@ -94,8 +94,8 @@ function NodePropsEditor<P>({
   argTypes,
   onArgTypesChange,
 }: NodePropsEditorProps<P>) {
-  const { viewState } = usePageEditorState();
-  const globalScope = viewState.pageState;
+  const { viewState, pageState } = usePageEditorState();
+  const globalScope = pageState;
 
   const handlePropValueChange = React.useCallback(
     (param: keyof P & string) => (newValue: BindableAttrValue<any> | null) => {

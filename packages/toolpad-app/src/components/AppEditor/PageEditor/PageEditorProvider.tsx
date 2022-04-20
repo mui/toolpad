@@ -15,6 +15,7 @@ export interface PageEditorState {
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
   readonly viewState: PageViewState;
+  readonly pageState: Record<string, unknown>;
 }
 
 export type PageEditorAction =
@@ -45,6 +46,10 @@ export type PageEditorAction =
       type: 'PAGE_NODE_DRAG_END';
     }
   | {
+      type: 'PAGE_STATE_UPDATE';
+      pageState: Record<string, unknown>;
+    }
+  | {
       type: 'PAGE_VIEW_STATE_UPDATE';
       viewState: PageViewState;
     };
@@ -59,7 +64,8 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     newNode: null,
     highlightLayout: false,
     highlightedSlot: null,
-    viewState: { nodes: {}, pageState: {}, bindings: {} },
+    viewState: { nodes: {}, bindings: {} },
+    pageState: {},
   };
 }
 
@@ -112,6 +118,12 @@ export function pageEditorReducer(
         viewState,
       });
     }
+    case 'PAGE_STATE_UPDATE': {
+      const { pageState } = action;
+      return update(state, {
+        pageState,
+      });
+    }
     default:
       return state;
   }
@@ -141,6 +153,12 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
       dispatch({
         type: 'PAGE_VIEW_STATE_UPDATE',
         viewState,
+      });
+    },
+    pageStateUpdate(pageState: Record<string, unknown>) {
+      dispatch({
+        type: 'PAGE_STATE_UPDATE',
+        pageState,
       });
     },
   };

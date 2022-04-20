@@ -147,8 +147,6 @@ export function getPageViewState(rootElm: HTMLElement): PageViewState {
 
   return {
     nodes: nodesViewInfo.nodes,
-    // eslint-disable-next-line no-underscore-dangle
-    pageState: contentWindow?.__TOOLPAD_RUNTIME_PAGE_STATE__ ?? {},
     bindings: {
       ...nodesViewInfo.bindings,
       // eslint-disable-next-line no-underscore-dangle

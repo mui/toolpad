@@ -15,7 +15,8 @@
     "toolpad": "./dist/index.js"
   },
   "scripts": {
-    "prettier": "node scripts/prettier.js",
+    "prettier": "node ./scripts/prettier.js",
+    "prettier:all": "node ./scripts/prettier.js write",
     "deduplicate": "node scripts/deduplicate.js",
     "start": "cross-env FORCE_COLOR=1 packages/toolpad-cli/cli.js",
     "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/toolpad-core --scope @mui/toolpad-components --scope @mui/toolpad",

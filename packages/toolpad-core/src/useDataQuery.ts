@@ -17,6 +17,7 @@ export interface UseDataQuery {
   error: any;
   data: any;
   rows: GridRowsProp;
+  refetch: () => void;
 }
 
 export const INITIAL_DATA_QUERY: UseDataQuery = {
@@ -24,6 +25,7 @@ export const INITIAL_DATA_QUERY: UseDataQuery = {
   error: null,
   data: null,
   rows: [],
+  refetch: () => {},
 };
 
 const EMPTY_ARRAY: any[] = [];
@@ -39,6 +41,7 @@ export function useDataQuery(
     isLoading: loading,
     error,
     data: responseData = EMPTY_OBJECT,
+    refetch,
   } = useQuery([dataUrl, queryId, params], () => queryId && fetchData(dataUrl, queryId, params), {
     enabled: !!queryId,
   });
@@ -53,8 +56,9 @@ export function useDataQuery(
       error,
       data,
       rows,
+      refetch,
     }),
-    [loading, error, data, rows],
+    [loading, error, data, rows, refetch],
   );
 
   React.useEffect(() => {

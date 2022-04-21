@@ -60,7 +60,8 @@ export interface ArgControlSpec {
     | 'json' // JSON editor
     | 'GridColumns' // GridColumns specialized editor
     | 'HorizontalAlign'
-    | 'VerticalAlign';
+    | 'VerticalAlign'
+    | 'function';
 }
 
 type PrimitiveValueType =

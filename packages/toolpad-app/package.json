@@ -13,7 +13,7 @@
     "prisma": "prisma",
     "build:runtime": "ts-node ./scripts/buildRuntime.ts",
     "build:next": "next build",
-    "build:esbuild": "rimraf ./public/sandbox ./public/reactDevtools && esbuild ./sandbox/index.ts ./reactDevtools/bootstrap.ts --target=es6 --bundle --outdir=./public",
+    "build:esbuild": "rimraf ./public/reactDevtools && esbuild ./reactDevtools/bootstrap.ts --target=es6 --bundle --outdir=./public",
     "build:typings": "ts-node ./scripts/typings.ts",
     "dev:runtime": "ts-node ./scripts/buildRuntime.ts --watch",
     "dev:next": "node ./server.js",

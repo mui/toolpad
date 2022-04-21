@@ -11,7 +11,6 @@ export interface EditorCanvasHostProps {
   // TODO: Remove these when we get rid of PageView
   // eslint-disable-next-line react/no-unused-prop-types
   editor?: boolean;
-  // eslint-disable-next-line react/no-unused-prop-types
   dom: appDom.AppDom;
 }
 

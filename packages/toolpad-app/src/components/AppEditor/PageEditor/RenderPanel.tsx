@@ -188,7 +188,6 @@ function findClosestSlot(slots: RenderedSlot[], x: number, y: number): SlotLocat
   let closestDistance = Infinity;
   let closestSlot: RenderedSlot | null = null;
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const namedSlot of slots) {
     let distance: number;
     if (namedSlot.type === 'single') {
@@ -438,7 +437,6 @@ function calculateNodeSlots(
 
   const result: NodeSlots = {};
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const [parentProp, slotState] of Object.entries(parentState.slots)) {
     if (slotState) {
       const namedChildren = children[parentProp] ?? [];

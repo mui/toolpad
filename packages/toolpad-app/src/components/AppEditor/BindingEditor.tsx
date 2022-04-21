@@ -123,7 +123,7 @@ export function BindingEditor<V>({
 
             <Box sx={{ flex: 1 }}>
               <Typography sx={{ mb: 2 }}>
-                Make this property dynamic with a javascript expression. This property expects a
+                Make this property dynamic with a JavaScript expression. This property expects a
                 type: <code>{propType.type}</code>.
               </Typography>
               <JsExpressionBindingEditor<V>

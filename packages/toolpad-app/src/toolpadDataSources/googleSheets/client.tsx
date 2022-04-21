@@ -115,9 +115,6 @@ function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQ
 
   const handleSpreadsheetInput = React.useCallback(
     (event: React.SyntheticEvent, input: string, reason: string) => {
-      if (reason === 'reset' && input === '') {
-        console.log('got you mf');
-      }
       if (reason === 'input') {
         setSpreadsheetQuery(input);
       }

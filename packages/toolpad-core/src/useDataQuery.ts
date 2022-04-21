@@ -1,6 +1,6 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryOptions } from 'react-query';
 
 async function fetchData(dataUrl: string, queryId: string, params: any) {
   const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
@@ -36,6 +36,10 @@ export function useDataQuery(
   dataUrl: string,
   queryId: string | null,
   params: any,
+  options: Pick<
+    UseQueryOptions<any, unknown, unknown, any[]>,
+    'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
+  >,
 ): void {
   const {
     isLoading: loading,
@@ -43,6 +47,7 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery([dataUrl, queryId, params], () => queryId && fetchData(dataUrl, queryId, params), {
+    ...options,
     enabled: !!queryId,
   });
 

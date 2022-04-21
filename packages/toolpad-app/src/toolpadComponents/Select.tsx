@@ -10,6 +10,9 @@ export default {
     label: {
       typeDef: { type: 'string' },
     },
+    disabled: {
+      typeDef: { type: 'boolean' },
+    },
     variant: {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
     },

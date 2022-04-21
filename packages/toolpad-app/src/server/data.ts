@@ -1,4 +1,10 @@
-import { App, DomNodeAttributeType, PrismaClient, Release } from '../../prisma/generated/client';
+import {
+  App,
+  DomNodeAttributeType,
+  PrismaClient,
+  Release,
+  Prisma,
+} from '../../prisma/generated/client';
 import {
   LegacyConnection,
   ConnectionStatus,
@@ -14,6 +20,21 @@ import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
+
+// See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
+function excludeFields<T, K extends (keyof T)[]>(
+  fields: T,
+  excluded: K,
+): Record<Exclude<keyof T, K[number]>, boolean> {
+  const result = {} as Record<Exclude<keyof T, K[number]>, boolean>;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const key of Object.keys(fields)) {
+    if (!excluded.includes(key as any)) {
+      result[key as Exclude<keyof T, K[number]>] = true;
+    }
+  }
+  return result;
+}
 
 function getPrismaClient(): PrismaClient {
   if (process.env.NODE_ENV === 'production') {
@@ -146,11 +167,7 @@ interface CreateReleaseParams {
   description: string;
 }
 
-const SELECT_RELEASE_META = {
-  version: true,
-  description: true,
-  createdAt: true,
-} as const;
+const SELECT_RELEASE_META = excludeFields(Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 
 async function findLastReleaseInternal(appId: string) {
   return prisma.release.findFirst({

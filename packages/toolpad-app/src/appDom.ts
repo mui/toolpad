@@ -124,6 +124,9 @@ export interface QueryStateNode<P = any> extends AppDomNodeBase {
   readonly type: 'queryState';
   readonly attributes: {
     readonly api: ConstantAttrValue<NodeId | null>;
+    readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
+    readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
+    readonly refetchInterval?: ConstantAttrValue<number>;
   };
   readonly params?: BindableAttrValues<P>;
 }

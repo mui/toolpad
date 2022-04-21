@@ -6,7 +6,7 @@ export interface OnChangeHandler {
 }
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
 }
 
 export interface StringValueType extends ValueTypeBase {
@@ -38,6 +38,10 @@ export interface ElementValueType extends ValueTypeBase {
   type: 'element';
 }
 
+export interface EventValueType extends ValueTypeBase {
+  type: 'event';
+}
+
 export interface ArgControlSpec {
   type:
     | 'boolean' // checkbox
@@ -66,7 +70,7 @@ type PrimitiveValueType =
   | ObjectValueType
   | ArrayValueType;
 
-export type PropValueType = PrimitiveValueType | ElementValueType;
+export type PropValueType = PrimitiveValueType | ElementValueType | EventValueType;
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;

@@ -10,6 +10,9 @@ export default {
       name: 'content',
       typeDef: { type: 'string' },
     },
+    onClick: {
+      typeDef: { type: 'event' },
+    },
     disabled: {
       typeDef: { type: 'boolean' },
     },

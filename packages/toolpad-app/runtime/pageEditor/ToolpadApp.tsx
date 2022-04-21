@@ -296,7 +296,11 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
     [node.name, setControlledState],
   );
 
-  useDataQuery(onResult, dataUrl, queryId, params);
+  useDataQuery(onResult, dataUrl, queryId, params, {
+    refetchOnWindowFocus: node.attributes.refetchOnWindowFocus?.value,
+    refetchOnReconnect: node.attributes.refetchOnReconnect?.value,
+    refetchInterval: node.attributes.refetchInterval?.value,
+  });
 
   return null;
 }

@@ -6,7 +6,7 @@ export interface OnChangeHandler {
 }
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'function';
 }
 
 export interface StringValueType extends ValueTypeBase {
@@ -38,8 +38,8 @@ export interface ElementValueType extends ValueTypeBase {
   type: 'element';
 }
 
-export interface EventValueType extends ValueTypeBase {
-  type: 'event';
+export interface FunctionValueType extends ValueTypeBase {
+  type: 'function';
 }
 
 export interface ArgControlSpec {
@@ -70,7 +70,7 @@ type PrimitiveValueType =
   | ObjectValueType
   | ArrayValueType;
 
-export type PropValueType = PrimitiveValueType | ElementValueType | EventValueType;
+export type PropValueType = PrimitiveValueType | ElementValueType | FunctionValueType;
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;

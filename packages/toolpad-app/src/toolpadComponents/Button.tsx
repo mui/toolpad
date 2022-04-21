@@ -11,7 +11,7 @@ export default {
       typeDef: { type: 'string' },
     },
     onClick: {
-      typeDef: { type: 'event' },
+      typeDef: { type: 'function' },
     },
     disabled: {
       typeDef: { type: 'boolean' },

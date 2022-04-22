@@ -35,7 +35,12 @@ function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQ
   const debouncedSpreadsheetQuery = useDebounced(spreadsheetQuery, 300);
 
   const fetchedFiles: PrivateApiResult<GoogleDriveFiles> = useQuery(
-    ['filesList', value?.spreadsheetId, debouncedSpreadsheetQuery],
+    [
+      'sheets',
+      GoogleSheetsPrivateQueryType.FILES_LIST,
+      value?.spreadsheetId,
+      debouncedSpreadsheetQuery,
+    ],
     () => {
       return api.fetchPrivate({
         type: GoogleSheetsPrivateQueryType.FILES_LIST,
@@ -48,7 +53,7 @@ function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQ
   );
 
   const fetchedFile: PrivateApiResult<GoogleDriveFile> = useQuery(
-    ['fileGet', value?.spreadsheetId],
+    ['sheets', GoogleSheetsPrivateQueryType.FILE_GET, value?.spreadsheetId],
     () => {
       return api.fetchPrivate({
         type: GoogleSheetsPrivateQueryType.FILE_GET,
@@ -62,7 +67,7 @@ function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQ
   );
 
   const fetchedSpreadsheet: PrivateApiResult<GoogleSpreadsheet> = useQuery(
-    ['sheetGet', value?.spreadsheetId],
+    ['sheet', GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET, value?.spreadsheetId],
     () => {
       return api.fetchPrivate({
         type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET,
@@ -131,7 +136,7 @@ function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQ
         loading={fetchedFiles?.isLoading}
         loadingText={'Loading...'}
         options={fetchedFiles?.data?.files ?? []}
-        getOptionLabel={(option: GoogleDriveFile) => option?.name}
+        getOptionLabel={(option: GoogleDriveFile) => option?.name ?? ''}
         onInputChange={handleSpreadsheetInput}
         onChange={handleSpreadsheetChange}
         isOptionEqualToValue={(option: GoogleDriveFile, val: GoogleDriveFile) =>
@@ -153,7 +158,7 @@ function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQ
         value={selectedSheet}
         loadingText={'Loading...'}
         options={fetchedSpreadsheet?.data?.sheets ?? []}
-        getOptionLabel={(option: GoogleSheet) => option?.properties?.title}
+        getOptionLabel={(option: GoogleSheet) => option?.properties?.title ?? ''}
         onChange={handleSheetChange}
         renderInput={(params) => <TextField {...params} size="small" label="Select sheet" />}
         renderOption={(props, option) => {

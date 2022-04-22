@@ -21,7 +21,7 @@ export default function PageOptionsPanel() {
         startIcon={<PageIcon />}
         color="inherit"
         component="a"
-        href={`/release/${state.appId}/preview/${pageNodeId}`}
+        href={`/app/${state.appId}/preview/pages/${pageNodeId}`}
       >
         Preview
       </Button>

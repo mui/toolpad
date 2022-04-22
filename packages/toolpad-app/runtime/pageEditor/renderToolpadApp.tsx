@@ -51,7 +51,6 @@ function instantiateComponent<P = {}>(def: ToolpadComponentDefinition): React.Co
 function instantiateComponents(defs: ToolpadComponentDefinitions): InstantiatedComponents {
   const result: InstantiatedComponents = {};
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const [id, def] of Object.entries(defs)) {
     if (def) {
       result[id] = {

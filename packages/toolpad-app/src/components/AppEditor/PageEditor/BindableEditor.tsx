@@ -19,6 +19,8 @@ function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
       return { type: 'json' };
     case 'array':
       return { type: 'json' };
+    case 'function':
+      return { type: 'function' };
     default:
       return null;
   }
@@ -52,9 +54,9 @@ export default function BindableEditor<V>({
   const control = controlSpec ? propertyControls[controlSpec.type] : null;
 
   const bindingId = `${nodeId}${propNamespace ? `.${propNamespace}` : ''}.${propName}`;
-  const { viewState } = usePageEditorState();
-  const liveBinding = viewState.bindings[bindingId];
-  const globalScope = viewState.pageState;
+  const { bindings, pageState } = usePageEditorState();
+  const liveBinding = bindings[bindingId];
+  const globalScope = pageState;
 
   const initConstValue = React.useCallback(() => {
     if (value?.type === 'const') {

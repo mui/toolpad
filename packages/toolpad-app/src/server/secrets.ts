@@ -46,7 +46,6 @@ export function encryptSecret(value: string): string {
 }
 
 export function decryptSecret(value: string): string {
-  // eslint-disable-next-line no-restricted-syntax
   for (const decryptionMethod of decryptionMethods) {
     try {
       return unboxSecret(decryptionMethod(value));

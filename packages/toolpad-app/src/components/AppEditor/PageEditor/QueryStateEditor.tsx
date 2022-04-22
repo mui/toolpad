@@ -13,7 +13,12 @@ import {
   SelectChangeEvent,
   DialogActions,
   Box,
-  Typography,
+  LinearProgress,
+  Alert,
+  Checkbox,
+  FormControlLabel,
+  TextField,
+  InputAdornment,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -59,17 +64,30 @@ interface PreviewQueryStateResultProps {
 }
 
 function PreviewQueryStateResult({ node }: PreviewQueryStateResultProps) {
-  const { viewState } = usePageEditorState();
-  const actualNodeState: UseDataQuery | undefined = viewState.pageState[node.name] as any;
+  const { pageState } = usePageEditorState();
+  const actualNodeState: UseDataQuery | undefined = pageState[node.name] as any;
+  if (!node.attributes.api.value) {
+    return null;
+  }
   return (
     <Box sx={{ maxHeight: 150, overflow: 'auto' }}>
-      {node.attributes.api.value ? (
-        <JsonView src={actualNodeState?.data} />
-      ) : (
-        <Typography>No data</Typography>
-      )}
+      {actualNodeState?.loading ? <LinearProgress /> : null}
+      {actualNodeState?.error ? (
+        <Alert severity="error">
+          {actualNodeState?.error.message || actualNodeState?.error || 'Something went wrong'}
+        </Alert>
+      ) : null}
+      {actualNodeState?.data ? <JsonView src={actualNodeState.data} /> : null}
     </Box>
   );
+}
+
+function refetchIntervalInSeconds(maybeInterval?: number) {
+  if (typeof maybeInterval !== 'number') {
+    return undefined;
+  }
+  const seconds = Math.floor(maybeInterval / 1000);
+  return seconds > 0 ? seconds : undefined;
 }
 
 interface QueryStateNodeEditorProps<P> {
@@ -86,6 +104,48 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
     (event: SelectChangeEvent<'' | NodeId>) => {
       const apiNodeId = event.target.value ? (event.target.value as NodeId) : null;
       domApi.setNodeNamespacedProp(node, 'attributes', 'api', appDom.createConst(apiNodeId));
+    },
+    [domApi, node],
+  );
+
+  const handleRefetchOnWindowFocusChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      domApi.setNodeNamespacedProp(
+        node,
+        'attributes',
+        'refetchOnWindowFocus',
+        appDom.createConst(event.target.checked),
+      );
+    },
+    [domApi, node],
+  );
+
+  const handleRefetchOnReconnectChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      domApi.setNodeNamespacedProp(
+        node,
+        'attributes',
+        'refetchOnReconnect',
+        appDom.createConst(event.target.checked),
+      );
+    },
+    [domApi, node],
+  );
+
+  const handleRefetchIntervalChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const interval = Number(event.target.value);
+
+      if (Number.isNaN(interval) || interval <= 0) {
+        domApi.setNodeNamespacedProp(node, 'attributes', 'refetchInterval', undefined);
+      } else {
+        domApi.setNodeNamespacedProp(
+          node,
+          'attributes',
+          'refetchInterval',
+          appDom.createConst(interval * 1000),
+        );
+      }
     },
     [domApi, node],
   );
@@ -114,6 +174,37 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
           </Select>
         </FormControl>
         <ParamsEditor node={node} argTypes={argTypes} />
+        <FormControlLabel
+          control={
+            <Checkbox
+              size="small"
+              checked={node.attributes.refetchOnWindowFocus?.value ?? true}
+              onChange={handleRefetchOnWindowFocusChange}
+            />
+          }
+          label="Refetch on window focus"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              size="small"
+              checked={node.attributes.refetchOnReconnect?.value ?? true}
+              onChange={handleRefetchOnReconnectChange}
+            />
+          }
+          label="Refetch on network reconnect"
+        />
+        <TextField
+          InputProps={{
+            startAdornment: <InputAdornment position="start">s</InputAdornment>,
+          }}
+          sx={{ maxWidth: 300 }}
+          size="small"
+          type="number"
+          label="Refetch interval"
+          value={refetchIntervalInSeconds(node.attributes.refetchInterval?.value) ?? ''}
+          onChange={handleRefetchIntervalChange}
+        />
         <PreviewQueryStateResult node={node} />
       </Stack>
     </React.Fragment>
@@ -179,7 +270,7 @@ export default function QueryStateEditor() {
           </DialogContent>
           <DialogActions>
             <Button color="inherit" variant="text" onClick={handleEditStateDialogClose}>
-              Cancel
+              Close
             </Button>
             <Button onClick={handleRemove}>Remove</Button>
           </DialogActions>

@@ -4,7 +4,6 @@ packages/*/dist
 packages/toolpad-app/.next
 packages/toolpad-app/prisma/generated
 packages/toolpad-app/public/editorRuntime
-packages/toolpad-app/public/sandbox
 packages/toolpad-app/public/web_modules
 packages/toolpad-app/public/typings.json
 .git

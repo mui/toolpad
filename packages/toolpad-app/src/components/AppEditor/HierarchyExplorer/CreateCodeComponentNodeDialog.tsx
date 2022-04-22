@@ -56,6 +56,10 @@ export default function CreateStudioCodeComponentDialog({
   const [name, setName] = React.useState(`MyComponent`);
   const navigate = useNavigate();
 
+  const handleInputFocus = React.useCallback((event: React.FocusEvent<HTMLInputElement>) => {
+    event.target.select();
+  }, []);
+
   return (
     <Dialog {...props} onClose={onClose}>
       <DialogForm
@@ -79,6 +83,7 @@ export default function CreateStudioCodeComponentDialog({
         <DialogContent>
           <TextField
             sx={{ my: 1 }}
+            onFocus={handleInputFocus}
             autoFocus
             fullWidth
             label="name"

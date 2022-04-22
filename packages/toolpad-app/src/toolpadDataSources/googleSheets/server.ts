@@ -60,9 +60,6 @@ async function execPrivate(
   if (connection.params) {
     client.setCredentials(connection.params);
   }
-  if (!query) {
-    return {};
-  }
   if (query.type === GoogleSheetsPrivateQueryType.FILE_GET) {
     const driveClient = google.drive({
       version: 'v3',

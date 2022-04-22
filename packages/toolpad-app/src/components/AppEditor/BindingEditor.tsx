@@ -112,7 +112,7 @@ export function BindingEditor<V>({
           <Stack direction="row" sx={{ my: 2 }}>
             <Box sx={{ width: 200 }}>
               <Typography variant="subtitle2">Scope</Typography>
-              <Box sx={{ overflow: 'auto' }}>
+              <Box>
                 <JsonView src={globalScope} />
               </Box>
             </Box>

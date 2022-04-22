@@ -854,6 +854,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const resizeObserver = new ResizeObserver(handlePageUpdateThrottled);
 
       resizeObserver.observe(rootElm);
+      rootElm.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
 
       // eslint-disable-next-line no-underscore-dangle
       const queuedEvents = Array.isArray(editorWindow.__TOOLPAD_RUNTIME_EVENT__)

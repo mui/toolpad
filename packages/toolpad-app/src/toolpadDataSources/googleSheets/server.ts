@@ -72,7 +72,7 @@ async function execPrivate(
     if (response.statusText === 'OK') {
       return response.data;
     }
-    throw new Error(`Failed to fetch query: "${JSON.stringify(query)}"`);
+    throw new Error(`Error ${response?.status}: Failed to fetch "${JSON.stringify(query)}"`);
   }
   if (query.type === GoogleSheetsPrivateQueryType.FILES_LIST) {
     const driveClient = google.drive({
@@ -91,7 +91,7 @@ async function execPrivate(
     if (response.statusText === 'OK') {
       return response.data;
     }
-    throw new Error(`Failed to fetch query: "${JSON.stringify(query)}"`);
+    throw new Error(`Error ${response?.status}: Failed to fetch "${JSON.stringify(query)}"`);
   }
   if (query.type === GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET) {
     const sheetsClient = google.sheets({
@@ -106,7 +106,7 @@ async function execPrivate(
     if (response.statusText === 'OK') {
       return response.data;
     }
-    throw new Error(`Failed to fetch query: "${JSON.stringify(query)}"`);
+    throw new Error(`Error ${response?.status}: Failed to fetch "${JSON.stringify(query)}"`);
   }
   throw new Error(`Invariant: Unrecognized private query: "${JSON.stringify(query)}"`);
 }

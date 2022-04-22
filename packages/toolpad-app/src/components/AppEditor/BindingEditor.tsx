@@ -111,13 +111,9 @@ export function BindingEditor<V>({
         <DialogContent>
           <Stack direction="row" sx={{ my: 2 }}>
             <Box sx={{ width: 200 }}>
-              <Typography variant="subtitle2">Available variables</Typography>
+              <Typography variant="subtitle2">Scope</Typography>
               <Box sx={{ overflow: 'auto' }}>
-                {Object.entries(globalScope).map(([key, scopeValue]) => (
-                  <pre key={key}>
-                    {key} ({typeof scopeValue})
-                  </pre>
-                ))}
+                <JsonView src={globalScope} />
               </Box>
             </Box>
 

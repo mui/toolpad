@@ -188,7 +188,6 @@ function findClosestSlot(slots: RenderedSlot[], x: number, y: number): SlotLocat
   let closestDistance = Infinity;
   let closestSlot: RenderedSlot | null = null;
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const namedSlot of slots) {
     let distance: number;
     if (namedSlot.type === 'single') {
@@ -438,7 +437,6 @@ function calculateNodeSlots(
 
   const result: NodeSlots = {};
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const [parentProp, slotState] of Object.entries(parentState.slots)) {
     if (slotState) {
       const namedChildren = children[parentProp] ?? [];
@@ -856,6 +854,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const resizeObserver = new ResizeObserver(handlePageUpdateThrottled);
 
       resizeObserver.observe(rootElm);
+      rootElm.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
 
       // eslint-disable-next-line no-underscore-dangle
       const queuedEvents = Array.isArray(editorWindow.__TOOLPAD_RUNTIME_EVENT__)

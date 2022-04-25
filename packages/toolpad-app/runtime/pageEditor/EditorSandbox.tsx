@@ -26,7 +26,6 @@ function renderToolpadComponent({
   argTypes,
 }: RenderToolpadComponentParams): React.ReactElement {
   const wrappedProps = { ...props };
-  // eslint-disable-next-line no-restricted-syntax
   for (const [propName, argType] of Object.entries(argTypes)) {
     if (argType?.typeDef.type === 'element') {
       if (argType.control?.type === 'slots') {

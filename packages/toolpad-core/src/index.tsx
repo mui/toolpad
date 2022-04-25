@@ -6,7 +6,7 @@ export interface OnChangeHandler {
 }
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'function';
 }
 
 export interface StringValueType extends ValueTypeBase {
@@ -38,6 +38,10 @@ export interface ElementValueType extends ValueTypeBase {
   type: 'element';
 }
 
+export interface FunctionValueType extends ValueTypeBase {
+  type: 'function';
+}
+
 export interface ArgControlSpec {
   type:
     | 'boolean' // checkbox
@@ -56,7 +60,8 @@ export interface ArgControlSpec {
     | 'json' // JSON editor
     | 'GridColumns' // GridColumns specialized editor
     | 'HorizontalAlign'
-    | 'VerticalAlign';
+    | 'VerticalAlign'
+    | 'function';
 }
 
 type PrimitiveValueType =
@@ -66,7 +71,7 @@ type PrimitiveValueType =
   | ObjectValueType
   | ArrayValueType;
 
-export type PropValueType = PrimitiveValueType | ElementValueType;
+export type PropValueType = PrimitiveValueType | ElementValueType | FunctionValueType;
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;

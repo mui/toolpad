@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ButtonProps, Stack, CssBaseline } from '@mui/material';
 import { omit, pick, without } from 'lodash';
 import {
+  ArgTypeDefinition,
   ArgTypeDefinitions,
   evalCode,
   INITIAL_DATA_QUERY,
@@ -73,34 +74,44 @@ function useElmToolpadComponent(elm: appDom.ElementNode): InstantiatedComponent 
   return getElmComponent(components, elm);
 }
 
-function resolveBindable<V>(bindable: BindableAttrValue<V>, pageState: PageState): LiveBinding {
-  if (bindable?.type === 'jsExpression') {
-    try {
-      const value = evalCode(bindable?.value, pageState);
-      return { value };
-    } catch (err) {
-      console.error(`Oh no`, err);
-      return { error: err as Error };
+function resolveBindable<V>(
+  bindable: BindableAttrValue<V>,
+  pageState: PageState,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  argType?: ArgTypeDefinition,
+): LiveBinding {
+  const execExpression = () => {
+    if (bindable?.type === 'jsExpression') {
+      return evalCode(bindable?.value, pageState);
     }
-  }
 
-  if (bindable?.type === 'const') {
-    return { value: bindable?.value };
-  }
+    if (bindable?.type === 'const') {
+      return bindable?.value;
+    }
 
-  return { value: undefined };
+    return undefined;
+  };
+
+  try {
+    return { value: execExpression() };
+  } catch (err) {
+    console.error(`Oh no`, err);
+    return { error: err as Error };
+  }
 }
 
 function resolveBindables(
   bindables: BindableAttrValues<any>,
   pageState: PageState,
+  argTypes: ArgTypeDefinitions,
 ): Record<string, LiveBinding> {
   return Object.fromEntries(
     Object.entries(bindables).flatMap(([key, bindable]) => {
       if (!bindable) {
         return [];
       }
-      const liveBinding = resolveBindable(bindable, pageState);
+      const argType = argTypes[key];
+      const liveBinding = resolveBindable(bindable, pageState, argType);
       return bindable === undefined ? [] : [[key, liveBinding]];
     }),
   );
@@ -285,7 +296,11 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
     [node.name, setControlledState],
   );
 
-  useDataQuery(onResult, dataUrl, queryId, params);
+  useDataQuery(onResult, dataUrl, queryId, params, {
+    refetchOnWindowFocus: node.attributes.refetchOnWindowFocus?.value,
+    refetchOnReconnect: node.attributes.refetchOnReconnect?.value,
+    refetchInterval: node.attributes.refetchInterval?.value,
+  });
 
   return null;
 }
@@ -295,20 +310,22 @@ function useLiveBindings(
   page: appDom.PageNode,
   currentPageState: PageState,
 ): LiveBindings {
+  const components = useComponentsContext();
   return React.useMemo(() => {
     const descendants = appDom.getDescendants(dom, page);
     const bindings: LiveBindings = {};
     descendants.forEach((descendant) => {
       if (appDom.isElement(descendant)) {
         if (descendant.props) {
-          const elmBindables = resolveBindables(descendant.props, currentPageState);
+          const { argTypes } = getElmComponent(components, descendant);
+          const elmBindables = resolveBindables(descendant.props, currentPageState, argTypes);
           Object.entries(elmBindables).forEach(([propName, bindable]) => {
             bindings[`${descendant.id}.props.${propName}`] = bindable;
           });
         }
       } else if (appDom.isQueryState(descendant)) {
         if (descendant.params) {
-          const elmBindables = resolveBindables(descendant.params, currentPageState);
+          const elmBindables = resolveBindables(descendant.params, currentPageState, {});
           Object.entries(elmBindables).forEach(([propName, bindable]) => {
             bindings[`${descendant.id}.params.${propName}`] = bindable;
           });
@@ -316,7 +333,7 @@ function useLiveBindings(
       }
     });
     return bindings;
-  }, [currentPageState, dom, page]);
+  }, [currentPageState, dom, page, components]);
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {

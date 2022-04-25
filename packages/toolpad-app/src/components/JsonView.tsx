@@ -18,12 +18,23 @@ function shouldCollapse({ name }: CollapsedFieldProps) {
   return index > 5;
 }
 
+function stringifySrc(src: unknown): string {
+  const srcType = typeof src;
+  switch (srcType) {
+    case 'undefined':
+    case 'function':
+      return srcType;
+    default:
+      return JSON.stringify(src);
+  }
+}
+
 export default function JsonView({ src }: JsonViewProps) {
   return src && typeof src === 'object' ? (
     <React.Suspense fallback={<Box />}>
       <ReactJsonView name={false} src={src} shouldCollapse={shouldCollapse} />
     </React.Suspense>
   ) : (
-    <pre>{src === undefined ? 'undefined' : JSON.stringify(src)}</pre>
+    <pre>{stringifySrc(src)}</pre>
   );
 }

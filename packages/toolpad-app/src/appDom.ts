@@ -124,6 +124,9 @@ export interface QueryStateNode<P = any> extends AppDomNodeBase {
   readonly type: 'queryState';
   readonly attributes: {
     readonly api: ConstantAttrValue<NodeId | null>;
+    readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
+    readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
+    readonly refetchInterval?: ConstantAttrValue<number>;
   };
   readonly params?: BindableAttrValues<P>;
 }
@@ -372,7 +375,6 @@ export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): Nod
       (node: AppDomNode) => node.parentId === parent.id,
     );
 
-    // eslint-disable-next-line no-restricted-syntax
     for (const child of allNodeChildren) {
       const prop = child.parentProp || 'children';
       let existing = result[prop];
@@ -383,7 +385,6 @@ export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): Nod
       existing.push(child);
     }
 
-    // eslint-disable-next-line no-restricted-syntax
     for (const childArray of Object.values(result)) {
       childArray?.sort((node1: AppDomNode, node2: AppDomNode) => {
         if (!node1.parentIndex || !node2.parentIndex) {

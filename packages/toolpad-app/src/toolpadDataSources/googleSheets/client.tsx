@@ -22,7 +22,7 @@ import useDebounced from '../../utils/useDebounced';
 const dataSourceName = 'Google Sheets';
 
 function getInitialQueryValue(): GoogleSheetsApiQuery {
-  return { ranges: '', spreadsheetId: '', sheetName: '' };
+  return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '' };
 }
 
 function getInitialConnectionValue(): GoogleSheetsConnectionParams {
@@ -184,7 +184,7 @@ function QueryEditor({
         size="small"
         label="Range"
         helperText={`In the form of A1:Z999`}
-        defaultValue={value?.ranges ?? 'A1:Z10'}
+        value={value?.ranges}
         disabled={!value?.sheetName}
         onChange={handleRangeChange}
       />

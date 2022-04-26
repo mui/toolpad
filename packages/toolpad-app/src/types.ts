@@ -118,6 +118,13 @@ export interface ApiResult<D = any> {
   fields?: ApiResultFields;
 }
 
+export interface PrivateApiResult<D = any> {
+  data?: D;
+  isLoading: boolean;
+  isIdle: boolean;
+  isSuccess: boolean;
+}
+
 export interface CreateHandlerApi {
   updateConnection: (appId: string, props: Updates<LegacyConnection>) => Promise<LegacyConnection>;
   getConnection: (appId: string, connectionId: string) => Promise<LegacyConnection>;
@@ -129,33 +136,36 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P> {
   connectionId: NodeId;
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
-export interface QueryEditorApi {
-  fetchPrivate: (query: any) => Promise<any>;
+
+export interface QueryEditorApi<PQ> {
+  fetchPrivate: (query: PQ) => Promise<PrivateApiResult<any>>;
 }
-export interface QueryEditorProps<Q> extends WithControlledProp<Q> {
-  api: QueryEditorApi;
+
+export interface QueryEditorProps<Q, PQ = {}> extends WithControlledProp<Q> {
+  api: QueryEditorApi<PQ>;
 }
-export type QueryEditor<Q = {}> = React.FC<QueryEditorProps<Q>>;
+
+export type QueryEditor<Q = {}, PQ = {}> = React.FC<QueryEditorProps<Q, PQ>>;
 
 export interface ConnectionStatus {
   timestamp: number;
   error?: string;
 }
 
-export interface ClientDataSource<P = {}, Q = {}> {
+export interface ClientDataSource<P = {}, Q = {}, PQ = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<P>;
   getInitialConnectionValue: () => P;
   isConnectionValid: (connection: P) => boolean;
-  QueryEditor: QueryEditor<Q>;
+  QueryEditor: QueryEditor<Q, PQ>;
   getInitialQueryValue: () => Q;
   getArgTypes?: (query: Q) => ArgTypeDefinitions;
 }
 
-export interface ServerDataSource<P = {}, Q = {}, D = {}> {
+export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   test: (connection: LegacyConnection<P>) => Promise<ConnectionStatus>;
   // Execute a private query on this connection, intended for editors only
-  execPrivate?: (connection: LegacyConnection<P>, query: any) => Promise<any>;
+  execPrivate?: (connection: LegacyConnection<P>, query: PQ) => Promise<PrivateApiResult<any>>;
   // Execute a query on this connection, intended for viewers
   exec: (connection: LegacyConnection<P>, query: Q, params: any) => Promise<ApiResult<D>>;
   createHandler?: () => (api: CreateHandlerApi, req: NextApiRequest, res: NextApiResponse) => void;

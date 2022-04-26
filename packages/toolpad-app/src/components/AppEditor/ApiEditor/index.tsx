@@ -20,7 +20,7 @@ interface ApiEditorContentProps<Q> {
   apiNode: appDom.ApiNode<Q>;
 }
 
-function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProps<Q>) {
+function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContentProps<Q>) {
   const domApi = useDomApi();
   const dom = useDom();
 
@@ -47,7 +47,7 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
 
   const queryEditorApi = React.useMemo(() => {
     return {
-      fetchPrivate: async (query: any) =>
+      fetchPrivate: async (query: PQ | {}) =>
         client.query.dataSourceFetchPrivate(appId, conectionId, query),
     };
   }, [appId, conectionId]);

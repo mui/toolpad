@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { google } from 'googleapis';
+import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
 import {
   ApiResult,
@@ -10,28 +11,67 @@ import {
 } from '../../types';
 import config from '../../server/config';
 import { asArray } from '../../utils/collections';
-import { GoogleSheetsActionType, GoogleSheetsConnectionParams, GoogleSheetsQuery } from './types';
-
-async function test(
-  connection: LegacyConnection<GoogleSheetsConnectionParams>,
-): Promise<ConnectionStatus> {
-  console.log(`Testing connection ${JSON.stringify(connection)}`);
-  return { timestamp: Date.now() };
-}
+import {
+  GoogleSheetsConnectionParams,
+  GoogleSheetsPrivateQueryType,
+  GoogleSheetsPrivateQuery,
+  GoogleSheetsApiQuery,
+} from './types';
 
 /**
  * Create an OAuth2 client based on the configuration
  */
 
-function createOAuthClient() {
+function createOAuthClient(): OAuth2Client {
   if (!config.googleSheetsClientId || !config.googleSheetsClientSecret || !config.externalUrl) {
-    throw new Error('Missing googleSheets datasource client configuration');
+    throw new Error('Missing Google Sheets datasource client configuration');
   }
   return new google.auth.OAuth2(
     config.googleSheetsClientId,
     config.googleSheetsClientSecret,
     new URL('/api/dataSources/googleSheets/auth/callback', config.externalUrl).href,
   );
+}
+
+/**
+ * Create a Google Drive client based on the configuration
+ */
+
+function createDriveClient(client: OAuth2Client) {
+  if (!client) {
+    throw new Error('Malformed Google Sheets datasource client');
+  }
+  return google.drive({
+    version: 'v3',
+    auth: client,
+  });
+}
+
+/**
+ * Create a Google Sheets client based on the configuration
+ */
+
+function createSheetsClient(client: OAuth2Client) {
+  if (!client) {
+    throw new Error('Malformed Google Sheets datasource client');
+  }
+  return google.sheets({
+    version: 'v4',
+    auth: client,
+  });
+}
+
+/**
+ * Test function for this connection
+ * @param connection  The connection object
+ * @returns The connection status
+ */
+
+async function test(
+  connection: LegacyConnection<GoogleSheetsConnectionParams>,
+): Promise<ConnectionStatus> {
+  console.log(`Testing connection ${JSON.stringify(connection)}`);
+  return { timestamp: Date.now() };
 }
 
 /**
@@ -43,45 +83,70 @@ function createOAuthClient() {
 
 async function execPrivate(
   connection: LegacyConnection<GoogleSheetsConnectionParams>,
-  query: GoogleSheetsQuery,
+  query: GoogleSheetsPrivateQuery,
 ): Promise<any> {
   const client = createOAuthClient();
   if (connection.params) {
     client.setCredentials(connection.params);
   }
-  if (query.type === GoogleSheetsActionType.FETCH_SHEET) {
-    const sheetsClient = google.sheets({
-      version: 'v4',
-      auth: client,
+  if (query.type === GoogleSheetsPrivateQueryType.FILE_GET) {
+    const driveClient = createDriveClient(client);
+    const { spreadsheetId } = query;
+    if (spreadsheetId) {
+      const response = await driveClient.files.get({
+        fileId: spreadsheetId,
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+      throw new Error(
+        `${response?.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
+      );
+    }
+    throw new Error(`Invariant: Failed to fetch "${JSON.stringify(query)}"`);
+  }
+  if (query.type === GoogleSheetsPrivateQueryType.FILES_LIST) {
+    const driveClient = createDriveClient(client);
+    const { spreadsheetQuery, pageToken } = query;
+    let queryString = "mimeType='application/vnd.google-apps.spreadsheet'";
+    if (spreadsheetQuery) {
+      /** Escaping spreadsheetQuery
+       *  based on: https://developers.google.com/drive/api/guides/ref-search-terms#file_properties
+       */
+      const escapedSpreadsheetQuery = spreadsheetQuery.replace(/\\|'/g, '\\$&');
+      queryString = `name contains '${escapedSpreadsheetQuery}' and ${queryString}`;
+    }
+
+    const response = await driveClient.files.list({
+      q: queryString,
+      pageToken,
     });
-    const spreadsheetId = query.spreadsheet?.id;
-    try {
+
+    if (response.status === 200) {
+      return response.data;
+    }
+    throw new Error(
+      `${response?.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
+    );
+  }
+  if (query.type === GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET) {
+    const sheetsClient = createSheetsClient(client);
+    const { spreadsheetId } = query;
+    if (spreadsheetId) {
       const response = await sheetsClient.spreadsheets.get({
         spreadsheetId,
         includeGridData: false,
       });
-      if (response.statusText === 'OK') {
-        const { sheets } = response.data;
-        return { sheets: sheets?.map((sheet) => sheet.properties) };
+      if (response.status === 200) {
+        return response.data;
       }
-    } catch (error) {
-      throw new Error(`Unable to fetch spreadsheetId ${query.spreadsheet?.id}`);
+      throw new Error(
+        `${response?.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
+      );
     }
-  } else if (query.type === GoogleSheetsActionType.FETCH_SPREADSHEETS) {
-    const driveClient = google.drive({
-      version: 'v3',
-      auth: client,
-    });
-    try {
-      const response = await driveClient.files.list({
-        q: "mimeType='application/vnd.google-apps.spreadsheet'",
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(`Unable to fetch spreadsheets`);
-    }
+    throw new Error(`Invariant: Failed to fetch "${JSON.stringify(query)}"`);
   }
-  throw new Error(`Invariant: Unrecognized googleSheets private query type "${query.type}"`);
+  throw new Error(`Invariant: Unrecognized private query: "${JSON.stringify(query)}"`);
 }
 
 /**
@@ -93,27 +158,25 @@ async function execPrivate(
 
 async function exec(
   connection: LegacyConnection<GoogleSheetsConnectionParams>,
-  query: GoogleSheetsQuery,
+  query: GoogleSheetsApiQuery,
 ): Promise<ApiResult<any>> {
   const client = createOAuthClient();
   if (connection.params) {
     client.setCredentials(connection.params);
   }
-  const sheets = google.sheets({
-    version: 'v4',
-    auth: client,
-  });
-  if (query.spreadsheet) {
+  const sheets = createSheetsClient(client);
+
+  const { spreadsheetId, sheetName, ranges = 'A1:Z10' } = query;
+  if (spreadsheetId && sheetName) {
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: query.spreadsheet.id,
-      range: query.ranges,
+      spreadsheetId,
+      range: `${sheetName}!${ranges}`,
     });
-    if (response.statusText === 'OK') {
+    if (response.status === 200) {
       const { values } = response.data;
       if (values && values.length > 0) {
         const headerRow = values.shift() ?? [];
         const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
-
         const data = values.map((row, rowIndex) => {
           const rowObject: any = { id: rowIndex };
           row.forEach((elem, cellIndex) => {
@@ -121,12 +184,17 @@ async function exec(
           });
           return rowObject;
         });
-
         return { fields, data };
       }
     }
+    throw new Error(
+      `${response.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
+    );
   }
-  throw new Error(`Invariant: Unrecognized googleSheets query type "${query.type}"`);
+  return {
+    fields: {},
+    data: {},
+  };
 }
 
 /**
@@ -162,14 +230,19 @@ async function handler(
         client.generateAuthUrl({
           access_type: 'offline',
           scope: [
-            'https://www.googleapis.com/auth/spreadsheets',
-            'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/spreadsheets.readonly',
+            'https://www.googleapis.com/auth/drive.readonly',
           ],
           state,
+          include_granted_scopes: true,
         }),
       );
     }
     if (matchAuthCallback(pathname)) {
+      const [oAuthError] = asArray(req.query.error);
+      if (oAuthError) {
+        throw new Error(oAuthError);
+      }
       const [code] = asArray(req.query.code);
       return client.getToken(code, async (error, token) => {
         if (error) {
@@ -199,7 +272,11 @@ async function handler(
   }
 }
 
-const dataSource: ServerDataSource<GoogleSheetsConnectionParams, any> = {
+const dataSource: ServerDataSource<
+  GoogleSheetsConnectionParams,
+  GoogleSheetsApiQuery,
+  GoogleSheetsPrivateQuery
+> = {
   test,
   exec,
   execPrivate,

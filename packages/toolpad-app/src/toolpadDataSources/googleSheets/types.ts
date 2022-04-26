@@ -8,30 +8,15 @@ export type GoogleSheetsConnectionParams = {
   id_token?: string | null;
 };
 
-export type GoogleDriveFile = Pick<drive_v3.Schema$File, 'id' | 'kind' | 'name' | 'mimeType'>;
+export type GoogleDriveFile = drive_v3.Schema$File;
 
-export type GoogleSpreadsheetProperties = Pick<
-  sheets_v4.Schema$SpreadsheetProperties,
-  'title' | 'locale'
->;
+export type GoogleSpreadsheet = sheets_v4.Schema$Spreadsheet;
 
-export type GoogleSheetProperties = Pick<
-  sheets_v4.Schema$SheetProperties,
-  'sheetId' | 'title' | 'sheetType' | 'index'
->;
+export type GoogleSheet = sheets_v4.Schema$Sheet;
 
-export type GoogleSpreadsheet = Pick<sheets_v4.Schema$Spreadsheet, 'spreadsheetId'> & {
-  properties: GoogleSpreadsheetProperties;
-  sheets: GoogleSheet[];
-};
+type GoogleSheetProperties = sheets_v4.Schema$SheetProperties;
 
-export type GoogleSheet = {
-  properties: GoogleSheetProperties;
-};
-
-export type GoogleDriveFiles = {
-  files: GoogleDriveFile[];
-};
+export type GoogleDriveFiles = drive_v3.Schema$FileList;
 
 export type GoogleSheetsApiQuery = {
   /**
@@ -41,11 +26,11 @@ export type GoogleSheetsApiQuery = {
   /**
    * The spreadsheet to request.
    */
-  spreadsheetId: GoogleDriveFile['id'] | null;
+  spreadsheetId: GoogleDriveFile['id'];
   /**
    * The sheet to request.
    */
-  sheetName: GoogleSheetProperties['title'] | null;
+  sheetName: GoogleSheetProperties['title'];
 };
 
 export enum GoogleSheetsPrivateQueryType {
@@ -57,7 +42,7 @@ export enum GoogleSheetsPrivateQueryType {
 export type GoogleSheetsPrivateQuery =
   | {
       type: GoogleSheetsPrivateQueryType.FILE_GET;
-      spreadsheetId: string;
+      spreadsheetId: GoogleSheetsApiQuery['spreadsheetId'];
     }
   | {
       type: GoogleSheetsPrivateQueryType.FILES_LIST;

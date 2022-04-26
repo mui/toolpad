@@ -141,7 +141,7 @@ export interface QueryEditorApi<PQ> {
   fetchPrivate: (query: PQ) => Promise<PrivateApiResult<any>>;
 }
 
-export interface QueryEditorProps<Q, PQ> extends WithControlledProp<Q> {
+export interface QueryEditorProps<Q, PQ = {}> extends WithControlledProp<Q> {
   api: QueryEditorApi<PQ>;
 }
 

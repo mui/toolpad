@@ -7,6 +7,7 @@ import {
   DialogTitle,
   IconButton,
   Stack,
+  Toolbar,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -17,9 +18,10 @@ import { LiveBinding, PropValueType } from '@mui/toolpad-core';
 import { BindableAttrValue } from '../../types';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
-import RuntimeErrorAlert from './PageEditor/RuntimeErrorAlert';
 import JsonView from '../JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
+import { evaluateBindable } from '../../../runtime/pageEditor/ToolpadApp';
+import useLatest from '../../utils/useLatest';
 
 interface JsExpressionBindingEditorProps<V>
   extends WithControlledProp<BindableAttrValue<V> | null> {
@@ -50,23 +52,26 @@ function JsExpressionBindingEditor<V>({
 
 export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   globalScope: Record<string, unknown>;
-  liveBinding?: LiveBinding;
   disabled?: boolean;
   propType: PropValueType;
 }
 
 export function BindingEditor<V>({
   globalScope,
-  liveBinding,
   disabled,
   propType,
   value,
   onChange,
 }: BindingEditorProps<V>) {
   const [input, setInput] = React.useState(value);
-  React.useEffect(() => setInput(value), [value]);
-
   const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (open) {
+      setInput(value);
+    }
+  }, [open, value]);
+
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 
@@ -85,7 +90,8 @@ export function BindingEditor<V>({
 
     committedInput.current = newValue;
     onChange(newValue);
-  }, [onChange, input]);
+    handleClose();
+  }, [onChange, input, handleClose]);
 
   const bindingButton = (
     <IconButton
@@ -98,6 +104,13 @@ export function BindingEditor<V>({
       {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
     </IconButton>
   );
+
+  const previewValue: LiveBinding = React.useMemo(
+    () => evaluateBindable(input, globalScope),
+    [input, globalScope],
+  );
+
+  const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
 
   return (
     <React.Fragment>
@@ -124,25 +137,21 @@ export function BindingEditor<V>({
                 Make this property dynamic with a JavaScript expression. This property expects a
                 type: <code>{propType.type}</code>.
               </Typography>
+
               <JsExpressionBindingEditor<V>
                 globalScope={globalScope}
                 onCommit={handleCommit}
                 value={input}
                 onChange={(newValue) => setInput(newValue)}
               />
-              {/* eslint-disable-next-line no-nested-ternary */}
-              {liveBinding ? (
-                liveBinding.error ? (
-                  <RuntimeErrorAlert error={liveBinding.error} />
-                ) : (
-                  <React.Fragment>
-                    <Typography sx={{ my: 1 }}>Actual value:</Typography>
-                    <Box sx={{ flex: 1, overflow: 'auto' }}>
-                      <JsonView src={liveBinding.value} />
-                    </Box>
-                  </React.Fragment>
-                )
-              ) : null}
+
+              <Toolbar variant="dense" disableGutters>
+                <Typography color="error">{previewValue?.error?.message}</Typography>
+              </Toolbar>
+
+              <Box sx={{ flex: 1, overflow: 'auto' }}>
+                <JsonView src={lastGoodPreview?.value} />
+              </Box>
             </Box>
           </Stack>
         </DialogContent>

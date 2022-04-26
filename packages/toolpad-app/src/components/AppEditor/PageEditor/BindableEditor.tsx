@@ -85,7 +85,6 @@ export default function BindableEditor<V>({
           />
           <BindingEditor<V>
             globalScope={globalScope}
-            liveBinding={liveBinding}
             propType={argType.typeDef}
             value={value}
             onChange={onChange}

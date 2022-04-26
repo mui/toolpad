@@ -88,6 +88,8 @@ export function JsExpressionEditor({
       // eslint-disable-next-line no-bitwise
       editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => onCommit?.());
 
+      editor.focus();
+
       setLibSource();
     },
     [setLibSource, onCommit],

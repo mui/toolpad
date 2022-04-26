@@ -74,15 +74,15 @@ function useElmToolpadComponent(elm: appDom.ElementNode): InstantiatedComponent 
   return getElmComponent(components, elm);
 }
 
-function resolveBindable<V>(
-  bindable: BindableAttrValue<V>,
-  pageState: PageState,
+export function evaluateBindable<V>(
+  bindable: BindableAttrValue<V> | null,
+  globalScope: Record<string, unknown>,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   argType?: ArgTypeDefinition,
 ): LiveBinding {
   const execExpression = () => {
     if (bindable?.type === 'jsExpression') {
-      return evalCode(bindable?.value, pageState);
+      return evalCode(bindable?.value, globalScope);
     }
 
     if (bindable?.type === 'const') {
@@ -111,7 +111,7 @@ function resolveBindables(
         return [];
       }
       const argType = argTypes[key];
-      const liveBinding = resolveBindable(bindable, pageState, argType);
+      const liveBinding = evaluateBindable(bindable, pageState, argType);
       return bindable === undefined ? [] : [[key, liveBinding]];
     }),
   );

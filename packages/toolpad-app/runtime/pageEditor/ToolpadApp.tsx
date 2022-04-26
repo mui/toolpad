@@ -2,11 +2,8 @@ import * as React from 'react';
 import { ButtonProps, Stack, CssBaseline } from '@mui/material';
 import { omit, pick, without } from 'lodash';
 import {
-  BindableAttrValue,
   BindableAttrValues,
-  ArgTypeDefinition,
   ArgTypeDefinitions,
-  evalCode,
   INITIAL_DATA_QUERY,
   LiveBinding,
   LiveBindings,
@@ -24,7 +21,7 @@ import {
   InstantiatedComponents,
 } from '../../src/toolpadComponents/componentDefinition';
 import AppThemeProvider from './AppThemeProvider';
-import { fireEvent } from '../coreRuntime';
+import { evaluateBindable, fireEvent } from '../coreRuntime';
 
 export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
@@ -74,32 +71,6 @@ function getElmComponent(
 function useElmToolpadComponent(elm: appDom.ElementNode): InstantiatedComponent {
   const components = useComponentsContext();
   return getElmComponent(components, elm);
-}
-
-export function evaluateBindable<V>(
-  bindable: BindableAttrValue<V> | null,
-  globalScope: Record<string, unknown>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  argType?: ArgTypeDefinition,
-): LiveBinding {
-  const execExpression = () => {
-    if (bindable?.type === 'jsExpression') {
-      return evalCode(bindable?.value, globalScope);
-    }
-
-    if (bindable?.type === 'const') {
-      return bindable?.value;
-    }
-
-    return undefined;
-  };
-
-  try {
-    return { value: execExpression() };
-  } catch (err) {
-    console.error(`Oh no`, err);
-    return { error: err as Error };
-  }
 }
 
 function resolveBindables(

@@ -15,11 +15,11 @@ import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { LiveBinding, PropValueType, BindableAttrValue } from '@mui/toolpad-core';
+import { evaluateBindable } from '@mui/toolpad-core/runtime';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
-import { evaluateBindable } from '../../../runtime/pageEditor/ToolpadApp';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 

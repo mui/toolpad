@@ -14,6 +14,7 @@ import {
   BindableAttrValue,
   Updates,
   VersionOrPreview,
+  PrivateApiResult,
 } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
@@ -371,11 +372,11 @@ export async function execApi<Q>(
   return dataSource.exec(connection, api.attributes.query.value, params);
 }
 
-export async function dataSourceFetchPrivate(
+export async function dataSourceFetchPrivate<Q>(
   appId: string,
   connectionId: NodeId,
-  query: any,
-): Promise<any> {
+  query: Q,
+): Promise<PrivateApiResult<any>> {
   const connection = await getConnection(appId, connectionId);
   const dataSource: ServerDataSource<any, any, any> | undefined =
     serverDataSources[connection.type];

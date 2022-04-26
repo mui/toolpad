@@ -2,7 +2,7 @@ import * as React from 'react';
 
 export default function useThrottled<T>(value: T, throttle: number): T {
   const [throttledValue, setThrottledValue] = React.useState(value);
-  const lastUpdate = React.useRef(Date.now());
+  const lastUpdate = React.useRef(-Infinity);
 
   React.useEffect(() => {
     const now = Date.now();
@@ -19,5 +19,8 @@ export default function useThrottled<T>(value: T, throttle: number): T {
     return () => clearTimeout(timeoutId);
   }, [value, throttle]);
 
-  return throttledValue;
+  const now = Date.now();
+  const elapsed = now - lastUpdate.current;
+
+  return elapsed > throttle ? value : throttledValue;
 }

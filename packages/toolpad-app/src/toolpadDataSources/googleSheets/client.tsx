@@ -11,6 +11,7 @@ import {
   GoogleSheetsConnectionParams,
   GoogleSheetsApiQuery,
   GoogleSheetsPrivateQueryType,
+  GoogleSheetsPrivateQuery,
   GoogleDriveFile,
   GoogleSpreadsheet,
   GoogleSheet,
@@ -18,8 +19,14 @@ import {
 } from './types';
 import useDebounced from '../../utils/useDebounced';
 
-function getInitialQueryValue(): any {
-  return null;
+const dataSourceName = 'Google Sheets';
+
+function getInitialQueryValue(): GoogleSheetsApiQuery {
+  return { ranges: '', spreadsheetId: '', sheetName: '' };
+}
+
+function getInitialConnectionValue(): GoogleSheetsConnectionParams {
+  return {};
 }
 
 function isConnectionValid(connection: GoogleSheetsConnectionParams | null): boolean {
@@ -29,14 +36,18 @@ function isConnectionValid(connection: GoogleSheetsConnectionParams | null): boo
   return false;
 }
 
-function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQuery>) {
+function QueryEditor({
+  api,
+  value,
+  onChange,
+}: QueryEditorProps<GoogleSheetsApiQuery, GoogleSheetsPrivateQuery>) {
   const [spreadsheetQuery, setSpreadsheetQuery] = React.useState<string | null>(null);
 
   const debouncedSpreadsheetQuery = useDebounced(spreadsheetQuery, 300);
 
   const fetchedFiles: PrivateApiResult<GoogleDriveFiles> = useQuery(
     [
-      'sheets',
+      dataSourceName,
       GoogleSheetsPrivateQueryType.FILES_LIST,
       value?.spreadsheetId,
       debouncedSpreadsheetQuery,
@@ -53,7 +64,7 @@ function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQ
   );
 
   const fetchedFile: PrivateApiResult<GoogleDriveFile> = useQuery(
-    ['sheets', GoogleSheetsPrivateQueryType.FILE_GET, value?.spreadsheetId],
+    [dataSourceName, GoogleSheetsPrivateQueryType.FILE_GET, value?.spreadsheetId],
     () => {
       return api.fetchPrivate({
         type: GoogleSheetsPrivateQueryType.FILE_GET,
@@ -67,7 +78,7 @@ function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQ
   );
 
   const fetchedSpreadsheet: PrivateApiResult<GoogleSpreadsheet> = useQuery(
-    ['sheet', GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET, value?.spreadsheetId],
+    [dataSourceName, GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET, value?.spreadsheetId],
     () => {
       return api.fetchPrivate({
         type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET,
@@ -82,7 +93,7 @@ function QueryEditor({ api, value, onChange }: QueryEditorProps<GoogleSheetsApiQ
   const selectedSheet = React.useMemo(
     () =>
       fetchedSpreadsheet?.data?.sheets?.find(
-        (sheet) => sheet.properties.title === value?.sheetName,
+        (sheet) => sheet?.properties?.title === value?.sheetName,
       ) ?? null,
     [fetchedSpreadsheet, value],
   );
@@ -204,10 +215,14 @@ function ConnectionParamsInput({
   );
 }
 
-const dataSource: ClientDataSource<GoogleSheetsConnectionParams, GoogleSheetsApiQuery> = {
-  displayName: 'Google Sheets',
+const dataSource: ClientDataSource<
+  GoogleSheetsConnectionParams,
+  GoogleSheetsApiQuery,
+  GoogleSheetsPrivateQuery
+> = {
+  displayName: dataSourceName,
   ConnectionParamsInput,
-  getInitialConnectionValue: getInitialQueryValue,
+  getInitialConnectionValue,
   isConnectionValid,
   QueryEditor,
   getInitialQueryValue,

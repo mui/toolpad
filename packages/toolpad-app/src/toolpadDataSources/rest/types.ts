@@ -1,4 +1,4 @@
-import { BindableAttrValue } from '../../types';
+import { BindableAttrValue } from '@mui/toolpad-core';
 
 export interface RestConnectionParams {}
 

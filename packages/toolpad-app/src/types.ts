@@ -24,48 +24,6 @@ export interface PropControlDefinition<T = any> {
   Editor: React.FC<EditorProps<T>>;
 }
 
-export type BindingAttrValueFormat = 'stringLiteral' | 'default';
-
-// TODO: Get rid of BoundExpressionAttrValue? Its function can be fulfilled by derivedState as well
-export interface BoundExpressionAttrValue {
-  type: 'boundExpression';
-  value: string;
-  format?: BindingAttrValueFormat;
-}
-
-export interface JsExpressionAttrValue {
-  type: 'jsExpression';
-  value: string;
-}
-
-export interface BindingAttrValue {
-  type: 'binding';
-  value: string;
-}
-
-export interface ConstantAttrValue<V> {
-  type: 'const';
-  value: V;
-}
-
-export interface SecretAttrValue<V> {
-  type: 'secret';
-  value: V;
-}
-
-export type BindableAttrValue<V> =
-  | ConstantAttrValue<V>
-  | BindingAttrValue
-  | SecretAttrValue<V>
-  | BoundExpressionAttrValue
-  | JsExpressionAttrValue;
-
-export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
-
-export type BindableAttrValues<P> = {
-  readonly [K in keyof P]?: BindableAttrValue<P[K]>;
-};
-
 export type NodeId = Branded<string, 'NodeId'>;
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';

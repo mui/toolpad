@@ -1,4 +1,5 @@
-import { BindableAttrValue, ConnectionStatus, ServerDataSource, ApiResult } from '../../types';
+import { BindableAttrValue } from '@mui/toolpad-core';
+import { ConnectionStatus, ServerDataSource, ApiResult } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';
 import evalExpression from '../../server/evalExpression';

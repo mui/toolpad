@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { ArgTypeDefinition } from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
-import { BindableAttrValue } from '../../../types';
 import BindableEditor from './BindableEditor';
 
 export interface NodeAttributeEditorProps {

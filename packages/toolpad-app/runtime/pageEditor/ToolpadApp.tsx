@@ -2,6 +2,8 @@ import * as React from 'react';
 import { ButtonProps, Stack, CssBaseline } from '@mui/material';
 import { omit, pick, without } from 'lodash';
 import {
+  BindableAttrValue,
+  BindableAttrValues,
   ArgTypeDefinition,
   ArgTypeDefinitions,
   evalCode,
@@ -14,7 +16,7 @@ import {
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import * as appDom from '../../src/appDom';
-import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../../src/types';
+import { NodeId, VersionOrPreview } from '../../src/types';
 import { createProvidedContext } from '../../src/utils/react';
 import AppOverview from '../../src/components/AppOverview';
 import {
@@ -247,16 +249,6 @@ function useInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): C
   }, [dom, page, components]);
 }
 
-function createPageState(
-  urlQueryState: Record<string, string>,
-  controlledState: ControlledState,
-): PageState {
-  return {
-    page: urlQueryState,
-    ...controlledState,
-  };
-}
-
 interface PageRootProps {
   children?: React.ReactNode;
 }
@@ -372,8 +364,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     });
   }, [initialControlledState]);
 
-  const pageState = React.useMemo(() => {
-    return createPageState(urlQueryState, controlledState);
+  const pageState: PageState = React.useMemo(() => {
+    return {
+      page: urlQueryState,
+      ...controlledState,
+    };
   }, [urlQueryState, controlledState]);
 
   React.useEffect(() => {

@@ -14,14 +14,14 @@ import {
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
-import { LiveBinding, PropValueType } from '@mui/toolpad-core';
-import { BindableAttrValue } from '../../types';
+import { LiveBinding, PropValueType, BindableAttrValue } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
 import { evaluateBindable } from '../../../runtime/pageEditor/ToolpadApp';
 import useLatest from '../../utils/useLatest';
+import useDebounced from '../../utils/useDebounced';
 
 interface JsExpressionBindingEditorProps<V>
   extends WithControlledProp<BindableAttrValue<V> | null> {
@@ -111,6 +111,7 @@ export function BindingEditor<V>({
   );
 
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
+  const previewError = useDebounced(previewValue?.error, 500);
 
   return (
     <React.Fragment>
@@ -146,7 +147,7 @@ export function BindingEditor<V>({
               />
 
               <Toolbar variant="dense" disableGutters>
-                <Typography color="error">{previewValue?.error?.message}</Typography>
+                <Typography color="error">{previewError?.message}</Typography>
               </Toolbar>
 
               <Box sx={{ flex: 1, overflow: 'auto' }}>

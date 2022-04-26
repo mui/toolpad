@@ -1,3 +1,4 @@
+import { BindableAttrValue } from '@mui/toolpad-core';
 import {
   App,
   DomNodeAttributeType,
@@ -11,7 +12,6 @@ import {
   ServerDataSource,
   ApiResult,
   NodeId,
-  BindableAttrValue,
   Updates,
   VersionOrPreview,
 } from '../types';

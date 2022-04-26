@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { google } from 'googleapis';
+import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
 import {
   ApiResult,
@@ -21,15 +22,43 @@ import {
  * Create an OAuth2 client based on the configuration
  */
 
-function createOAuthClient() {
+function createOAuthClient(): OAuth2Client {
   if (!config.googleSheetsClientId || !config.googleSheetsClientSecret || !config.externalUrl) {
-    throw new Error('Missing googleSheets datasource client configuration');
+    throw new Error('Missing Google Sheets datasource client configuration');
   }
   return new google.auth.OAuth2(
     config.googleSheetsClientId,
     config.googleSheetsClientSecret,
     new URL('/api/dataSources/googleSheets/auth/callback', config.externalUrl).href,
   );
+}
+
+/**
+ * Create a Google Drive client based on the configuration
+ */
+
+function createDriveClient(client: OAuth2Client) {
+  if (!client) {
+    throw new Error('Malformed Google Sheets datasource client');
+  }
+  return google.drive({
+    version: 'v3',
+    auth: client,
+  });
+}
+
+/**
+ * Create a Google Sheets client based on the configuration
+ */
+
+function createSheetsClient(client: OAuth2Client) {
+  if (!client) {
+    throw new Error('Malformed Google Sheets datasource client');
+  }
+  return google.sheets({
+    version: 'v4',
+    auth: client,
+  });
 }
 
 /**
@@ -61,52 +90,61 @@ async function execPrivate(
     client.setCredentials(connection.params);
   }
   if (query.type === GoogleSheetsPrivateQueryType.FILE_GET) {
-    const driveClient = google.drive({
-      version: 'v3',
-      auth: client,
-    });
+    const driveClient = createDriveClient(client);
     const { spreadsheetId } = query;
-    const response = await driveClient.files.get({
-      fileId: spreadsheetId,
-    });
-    if (response.statusText === 'OK') {
-      return response.data;
+    if (spreadsheetId) {
+      const response = await driveClient.files.get({
+        fileId: spreadsheetId,
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+      throw new Error(
+        `${response?.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
+      );
     }
-    throw new Error(`Error ${response?.status}: Failed to fetch "${JSON.stringify(query)}"`);
+    throw new Error(`Invariant: Failed to fetch "${JSON.stringify(query)}"`);
   }
   if (query.type === GoogleSheetsPrivateQueryType.FILES_LIST) {
-    const driveClient = google.drive({
-      version: 'v3',
-      auth: client,
-    });
+    const driveClient = createDriveClient(client);
     const { spreadsheetQuery, pageToken } = query;
     let queryString = "mimeType='application/vnd.google-apps.spreadsheet'";
     if (spreadsheetQuery) {
-      queryString = `name contains '${spreadsheetQuery}' and ${queryString}`;
+      /** Escaping spreadsheetQuery
+       *  based on: https://developers.google.com/drive/api/guides/ref-search-terms#file_properties
+       */
+      const escapedSpreadsheetQuery = spreadsheetQuery.replace(/\\|'/g, '\\$&');
+      queryString = `name contains '${escapedSpreadsheetQuery}' and ${queryString}`;
     }
+
     const response = await driveClient.files.list({
       q: queryString,
       pageToken,
     });
-    if (response.statusText === 'OK') {
+
+    if (response.status === 200) {
       return response.data;
     }
-    throw new Error(`Error ${response?.status}: Failed to fetch "${JSON.stringify(query)}"`);
+    throw new Error(
+      `${response?.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
+    );
   }
   if (query.type === GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET) {
-    const sheetsClient = google.sheets({
-      version: 'v4',
-      auth: client,
-    });
+    const sheetsClient = createSheetsClient(client);
     const { spreadsheetId } = query;
-    const response = await sheetsClient.spreadsheets.get({
-      spreadsheetId: spreadsheetId ?? undefined,
-      includeGridData: false,
-    });
-    if (response.statusText === 'OK') {
-      return response.data;
+    if (spreadsheetId) {
+      const response = await sheetsClient.spreadsheets.get({
+        spreadsheetId,
+        includeGridData: false,
+      });
+      if (response.status === 200) {
+        return response.data;
+      }
+      throw new Error(
+        `${response?.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
+      );
     }
-    throw new Error(`Error ${response?.status}: Failed to fetch "${JSON.stringify(query)}"`);
+    throw new Error(`Invariant: Failed to fetch "${JSON.stringify(query)}"`);
   }
   throw new Error(`Invariant: Unrecognized private query: "${JSON.stringify(query)}"`);
 }
@@ -126,38 +164,37 @@ async function exec(
   if (connection.params) {
     client.setCredentials(connection.params);
   }
-  const sheets = google.sheets({
-    version: 'v4',
-    auth: client,
-  });
-  if (!query) {
-    return { fields: {}, data: {} };
-  }
-  const { spreadsheetId, sheetName, ranges = 'A1:Z10' } = query;
-  if (!spreadsheetId || !sheetName) {
-    return { fields: {}, data: {} };
-  }
+  const sheets = createSheetsClient(client);
 
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: `${sheetName}!${ranges}`,
-  });
-  if (response.statusText === 'OK') {
-    const { values } = response.data;
-    if (values && values.length > 0) {
-      const headerRow = values.shift() ?? [];
-      const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
-      const data = values.map((row, rowIndex) => {
-        const rowObject: any = { id: rowIndex };
-        row.forEach((elem, cellIndex) => {
-          rowObject[headerRow[cellIndex]] = elem;
+  const { spreadsheetId, sheetName, ranges = 'A1:Z10' } = query;
+  if (spreadsheetId && sheetName) {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!${ranges}`,
+    });
+    if (response.status === 200) {
+      const { values } = response.data;
+      if (values && values.length > 0) {
+        const headerRow = values.shift() ?? [];
+        const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
+        const data = values.map((row, rowIndex) => {
+          const rowObject: any = { id: rowIndex };
+          row.forEach((elem, cellIndex) => {
+            rowObject[headerRow[cellIndex]] = elem;
+          });
+          return rowObject;
         });
-        return rowObject;
-      });
-      return { fields, data };
+        return { fields, data };
+      }
     }
+    throw new Error(
+      `${response.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
+    );
   }
-  throw new Error(`Invariant: Unable to execute query: "${JSON.stringify(query)}"`);
+  return {
+    fields: {},
+    data: {},
+  };
 }
 
 /**
@@ -235,7 +272,11 @@ async function handler(
   }
 }
 
-const dataSource: ServerDataSource<GoogleSheetsConnectionParams, any> = {
+const dataSource: ServerDataSource<
+  GoogleSheetsConnectionParams,
+  GoogleSheetsApiQuery,
+  GoogleSheetsPrivateQuery
+> = {
   test,
   exec,
   execPrivate,

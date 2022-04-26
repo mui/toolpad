@@ -28,7 +28,6 @@ function excludeFields<T, K extends (keyof T)[]>(
   excluded: K,
 ): Record<Exclude<keyof T, K[number]>, boolean> {
   const result = {} as Record<Exclude<keyof T, K[number]>, boolean>;
-  // eslint-disable-next-line no-restricted-syntax
   for (const key of Object.keys(fields)) {
     if (!excluded.includes(key as any)) {
       result[key as Exclude<keyof T, K[number]>] = true;

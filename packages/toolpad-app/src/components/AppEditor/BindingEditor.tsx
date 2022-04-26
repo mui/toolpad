@@ -109,19 +109,17 @@ export function BindingEditor<V>({
       <Dialog onClose={handleClose} open={open} fullWidth scroll="body" maxWidth="lg">
         <DialogTitle>Bind a property</DialogTitle>
         <DialogContent>
-          <Stack direction="row" sx={{ my: 2 }}>
-            <Box sx={{ width: 200 }}>
-              <Typography variant="subtitle2">Available variables</Typography>
-              <Box sx={{ overflow: 'auto' }}>
-                {Object.entries(globalScope).map(([key, scopeValue]) => (
-                  <pre key={key}>
-                    {key} ({typeof scopeValue})
-                  </pre>
-                ))}
+          <Stack direction="row" sx={{ height: 400 }}>
+            <Box sx={{ width: 200, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <Typography sx={{ mb: 1 }} variant="subtitle2">
+                Scope
+              </Typography>
+              <Box sx={{ flex: 1, width: '100%', overflow: 'auto' }}>
+                <JsonView src={globalScope} />
               </Box>
             </Box>
 
-            <Box sx={{ flex: 1 }}>
+            <Box sx={{ height: '100%', display: 'flex', flex: 1, flexDirection: 'column' }}>
               <Typography sx={{ mb: 2 }}>
                 Make this property dynamic with a JavaScript expression. This property expects a
                 type: <code>{propType.type}</code>.
@@ -137,10 +135,12 @@ export function BindingEditor<V>({
                 liveBinding.error ? (
                   <RuntimeErrorAlert error={liveBinding.error} />
                 ) : (
-                  <Box sx={{ maxHeight: 200, overflow: 'auto' }}>
-                    <Typography sx={{ mt: 1 }}>Actual value:</Typography>
-                    <JsonView src={liveBinding.value} />
-                  </Box>
+                  <React.Fragment>
+                    <Typography sx={{ my: 1 }}>Actual value:</Typography>
+                    <Box sx={{ flex: 1, overflow: 'auto' }}>
+                      <JsonView src={liveBinding.value} />
+                    </Box>
+                  </React.Fragment>
                 )
               ) : null}
             </Box>

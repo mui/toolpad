@@ -1,40 +1,34 @@
-import { Box } from '@mui/material';
 import * as React from 'react';
-import { CollapsedFieldProps } from 'react-json-view';
+import { ObjectInspector, ObjectInspectorProps, ObjectValue, ObjectLabel } from 'react-inspector';
 
-// react-json-view uses `document` in the top-level scope, so can't be used in SSR context
-const ReactJsonView = React.lazy(() => import('react-json-view'));
+const nodeRenderer: ObjectInspectorProps['nodeRenderer'] = ({
+  depth,
+  name,
+  data,
+  isNonenumerable,
+}) => {
+  return depth === 0 ? (
+    <ObjectValue object={data} />
+  ) : (
+    <ObjectLabel name={name} data={data} isNonenumerable={isNonenumerable} />
+  );
+};
 
 export interface JsonViewProps {
   src: unknown;
 }
 
-function shouldCollapse({ name }: CollapsedFieldProps) {
-  // Assume the parent is an array when the property name is numerical and only expand first 5 items
-  const index = Number(name);
-  if (Number.isNaN(index)) {
-    return false;
-  }
-  return index > 5;
-}
-
-function stringifySrc(src: unknown): string {
-  const srcType = typeof src;
-  switch (srcType) {
-    case 'undefined':
-    case 'function':
-      return srcType;
-    default:
-      return JSON.stringify(src);
-  }
-}
-
 export default function JsonView({ src }: JsonViewProps) {
-  return src && typeof src === 'object' ? (
-    <React.Suspense fallback={<Box />}>
-      <ReactJsonView name={false} src={src} shouldCollapse={shouldCollapse} />
-    </React.Suspense>
-  ) : (
-    <pre>{stringifySrc(src)}</pre>
+  // TODO: elaborate on this to show a nice default, but avoid expanding massive amount of objects
+  const expandPaths = Array.isArray(src) ? ['$', '$.0', '$.1', '$.2', '$.3', '$.4'] : undefined;
+  return (
+    <div style={{ whiteSpace: 'nowrap' }}>
+      <ObjectInspector
+        nodeRenderer={nodeRenderer}
+        expandLevel={1}
+        expandPaths={expandPaths}
+        data={src}
+      />
+    </div>
   );
 }

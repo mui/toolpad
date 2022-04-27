@@ -64,7 +64,8 @@ function JsExpressionPreview({ input, globalScope }: JsExpressionPreviewProps) {
   );
 
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
-  const previewError = useDebounced(previewValue?.error, 500);
+  const previewErrorDebounced = useDebounced(previewValue?.error, 500);
+  const previewError = previewValue?.error && previewErrorDebounced;
 
   return (
     <React.Fragment>

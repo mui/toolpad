@@ -28,7 +28,17 @@ async function main() {
 
     watch: args['--watch'],
 
+    define: {
+      // For quickjs-emscripten
+      process: '{"env":{}}',
+    },
+
     external: [
+      // For quickjs-emscripten
+      'fs',
+      'path',
+
+      // Modules we want to load independently, to share with custom components
       'es-module-shims',
       'react',
       'react-dom',

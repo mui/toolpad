@@ -33,10 +33,12 @@ async function main() {
       '@mui/material/colors',
       '@mui/lab',
       '@mui/icons-material/Error',
+      'quickjs-emscripten',
     ],
     {
       cwd: PROJECT_ROOT,
       dest: DEST,
+      polyfillNode: true,
       // logger: console,
       packageLookupFields: ['module', 'main'],
       env: {

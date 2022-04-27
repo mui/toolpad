@@ -1,6 +1,6 @@
 import { getQuickJS, QuickJSHandle, QuickJSContext } from 'quickjs-emscripten';
 
-type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 
 function newJson(ctx: QuickJSContext, json: Json): QuickJSHandle {
   switch (typeof json) {
@@ -36,24 +36,31 @@ function newJson(ctx: QuickJSContext, json: Json): QuickJSHandle {
   }
 }
 
+export function evalExpressionInContext(
+  ctx: QuickJSContext,
+  expression: string,
+  globalScope: Record<string, Json> = {},
+) {
+  Object.entries(globalScope).forEach(([key, value]) => {
+    const valueHandle = newJson(ctx, value);
+    ctx.setProp(ctx.global, key, valueHandle);
+    valueHandle.dispose();
+  });
+
+  const result = ctx.unwrapResult(ctx.evalCode(expression));
+  const resultValue = ctx.dump(result);
+  result.dispose();
+  return resultValue;
+}
+
 export default async function evalExpression(
   expression: string,
   globalScope: Record<string, Json> = {},
 ) {
   const QuickJS = await getQuickJS();
   const ctx = QuickJS.newContext();
-
   try {
-    Object.entries(globalScope).forEach(([key, value]) => {
-      const valueHandle = newJson(ctx, value);
-      ctx.setProp(ctx.global, key, valueHandle);
-      valueHandle.dispose();
-    });
-
-    const result = ctx.unwrapResult(ctx.evalCode(expression));
-    const resultValue = ctx.dump(result);
-    result.dispose();
-    return resultValue;
+    return evalExpressionInContext(ctx, expression, globalScope);
   } finally {
     ctx.dispose();
   }

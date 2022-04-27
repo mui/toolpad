@@ -1,4 +1,4 @@
-import { BindingAttrValueFormat } from '../types';
+import { BindingAttrValueFormat } from '@mui/toolpad-core';
 
 type ParsedBinding = string[];
 

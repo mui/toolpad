@@ -19,14 +19,19 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import CloseIcon from '@mui/icons-material/Close';
-import { PropValueType, PropValueTypes } from '@mui/toolpad-core';
+import {
+  BindableAttrValue,
+  BindableAttrValues,
+  PropValueType,
+  PropValueTypes,
+} from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import { ExactEntriesOf, WithControlledProp } from '../../../utils/types';
 import { omit, update } from '../../../utils/immutability';
 import * as appDom from '../../../appDom';
-import { NodeId, BindableAttrValue, BindableAttrValues } from '../../../types';
+import { NodeId } from '../../../types';
 import { BindingEditor } from '../BindingEditor';
 
 const DERIVED_STATE_PARAMS = 'DerivedStateParams';
@@ -83,18 +88,15 @@ function PropValueTypeSelector({ value, onChange, disabled }: PropValueTypeSelec
 
 interface NodePropsEditorProps<P>
   extends WithControlledProp<BindableAttrValues<P>>,
-    WithControlledProp<PropValueTypes<keyof P & string>, 'argTypes'> {
-  nodeId: NodeId;
-}
+    WithControlledProp<PropValueTypes<keyof P & string>, 'argTypes'> {}
 
 function NodePropsEditor<P>({
-  nodeId,
   value,
   onChange,
   argTypes,
   onArgTypesChange,
 }: NodePropsEditorProps<P>) {
-  const { pageState, bindings } = usePageEditorState();
+  const { pageState } = usePageEditorState();
   const globalScope = pageState;
 
   const handlePropValueChange = React.useCallback(
@@ -132,8 +134,6 @@ function NodePropsEditor<P>({
           if (!propType) {
             return null;
           }
-          const bindingId = `${nodeId}.props.${propName}`;
-          const liveBinding = bindings[bindingId];
           const propValue: BindableAttrValue<any> | null = value[propName] ?? null;
           const isBound = !!propValue;
           return (
@@ -146,7 +146,6 @@ function NodePropsEditor<P>({
               />
               <BindingEditor
                 globalScope={globalScope}
-                liveBinding={liveBinding}
                 propType={propType}
                 value={propValue}
                 onChange={handlePropValueChange(propName)}
@@ -289,7 +288,6 @@ function DerivedStateNodeEditor<P>({ node }: DerivedStateNodeEditorProps<P>) {
   return (
     <Stack gap={1} my={1}>
       <NodePropsEditor
-        nodeId={node.id}
         value={node.params ?? {}}
         onChange={handleParamsChange}
         argTypes={node.attributes.argTypes.value}

@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Alert, Snackbar } from '@mui/material';
+import { BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
-import { NodeId, BindableAttrValue, BindableAttrValues } from '../types';
+import { NodeId } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
 import useDebounced from '../utils/useDebounced';

@@ -28,7 +28,7 @@ export default {
       },
     },
     options: {
-      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' as string },
+      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
       control: { type: 'json' },
     },
     sx: {

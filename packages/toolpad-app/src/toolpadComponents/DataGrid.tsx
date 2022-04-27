@@ -7,15 +7,15 @@ export default {
   importedName: 'DataGrid',
   argTypes: {
     rows: {
-      typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' as string },
+      typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' },
     },
     columns: {
-      typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' as string },
+      typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' },
       control: { type: 'GridColumns' },
       memoize: true,
     },
     dataQuery: {
-      typeDef: { type: 'object', schema: '/schemas/DataQuery.json' as string },
+      typeDef: { type: 'object', schema: '/schemas/DataQuery.json' },
     },
     density: {
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },
@@ -26,7 +26,6 @@ export default {
     selection: {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',
-      defaultValue: null,
     },
   },
 } as ToolpadComponentDefinition;

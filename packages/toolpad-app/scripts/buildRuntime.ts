@@ -29,7 +29,11 @@ async function main() {
     watch: args['--watch'],
 
     external: [
+      // Some runtime requirements
+      'quickjs-emscripten',
       'es-module-shims',
+
+      // Modules we want to load independently, to share with custom components
       'react',
       'react-dom',
       'react-query',

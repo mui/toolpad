@@ -30,7 +30,7 @@ import {
   InstantiatedComponents,
 } from '../../src/toolpadComponents/componentDefinition';
 import AppThemeProvider from './AppThemeProvider';
-import { evaluateBindable, fireEvent } from '../coreRuntime';
+import { evaluateBindable, fireEvent, JsRuntimeProvider } from '../coreRuntime';
 
 export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
@@ -440,39 +440,41 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   return (
     <ErrorBoundary FallbackComponent={AppError}>
       <React.Suspense fallback={<AppLoading />}>
-        <ComponentsContextProvider value={components}>
-          <AppContextProvider value={appContext}>
-            <QueryClientProvider client={queryClient}>
-              <CssBaseline />
-              <AppThemeProvider node={theme}>
-                <DomContextProvider value={dom}>
-                  <BrowserRouter basename={basename}>
-                    <Routes>
-                      <Route path="/" element={<Navigate replace to="/pages" />} />
-                      <Route
-                        path="/pages"
-                        element={
-                          <AppOverview
-                            appId={appId}
-                            dom={dom}
-                            openPageButtonProps={getPageNavButtonProps}
-                          />
-                        }
-                      />
-                      {pages.map((page) => (
+        <JsRuntimeProvider>
+          <ComponentsContextProvider value={components}>
+            <AppContextProvider value={appContext}>
+              <QueryClientProvider client={queryClient}>
+                <CssBaseline />
+                <AppThemeProvider node={theme}>
+                  <DomContextProvider value={dom}>
+                    <BrowserRouter basename={basename}>
+                      <Routes>
+                        <Route path="/" element={<Navigate replace to="/pages" />} />
                         <Route
-                          key={page.id}
-                          path={`/pages/${page.id}`}
-                          element={<RenderedPage nodeId={page.id} />}
+                          path="/pages"
+                          element={
+                            <AppOverview
+                              appId={appId}
+                              dom={dom}
+                              openPageButtonProps={getPageNavButtonProps}
+                            />
+                          }
                         />
-                      ))}
-                    </Routes>
-                  </BrowserRouter>
-                </DomContextProvider>
-              </AppThemeProvider>
-            </QueryClientProvider>
-          </AppContextProvider>
-        </ComponentsContextProvider>
+                        {pages.map((page) => (
+                          <Route
+                            key={page.id}
+                            path={`/pages/${page.id}`}
+                            element={<RenderedPage nodeId={page.id} />}
+                          />
+                        ))}
+                      </Routes>
+                    </BrowserRouter>
+                  </DomContextProvider>
+                </AppThemeProvider>
+              </QueryClientProvider>
+            </AppContextProvider>
+          </ComponentsContextProvider>
+        </JsRuntimeProvider>
       </React.Suspense>
     </ErrorBoundary>
   );

@@ -8,7 +8,7 @@ import {
   styled,
   AlertTitle,
 } from '@mui/material';
-import { omit, pick, without } from 'lodash';
+import { omit, pick, without } from 'lodash-es';
 import {
   BindableAttrValues,
   ArgTypeDefinitions,

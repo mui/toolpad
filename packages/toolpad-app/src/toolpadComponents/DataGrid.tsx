@@ -1,4 +1,3 @@
-import { URI_DATAGRID_COLUMNS, URI_DATAGRID_ROWS, URI_DATAQUERY } from '../schemas';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
@@ -8,15 +7,15 @@ export default {
   importedName: 'DataGrid',
   argTypes: {
     rows: {
-      typeDef: { type: 'array', schema: URI_DATAGRID_ROWS as string },
+      typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' as string },
     },
     columns: {
-      typeDef: { type: 'array', schema: URI_DATAGRID_COLUMNS as string },
+      typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' as string },
       control: { type: 'GridColumns' },
       memoize: true,
     },
     dataQuery: {
-      typeDef: { type: 'object', schema: URI_DATAQUERY as string },
+      typeDef: { type: 'object', schema: '/schemas/DataQuery.json' as string },
     },
     density: {
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },

@@ -1,5 +1,4 @@
 import { ToolpadComponentDefinition } from './componentDefinition';
-import { URI_SELECT_OPTIONS } from '../schemas';
 
 export default {
   id: 'Select',
@@ -29,8 +28,8 @@ export default {
       },
     },
     options: {
-      typeDef: { type: 'array' },
-      control: { type: 'json', schema: URI_SELECT_OPTIONS },
+      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' as string },
+      control: { type: 'json' },
     },
     sx: {
       typeDef: { type: 'object' },

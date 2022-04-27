@@ -96,7 +96,8 @@ function JsExpressionPreviewServerContent({ input, globalScope }: JsExpressionPr
   }, [jsRuntime, input, globalScope]);
 
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
-  const previewError = useDebounced(previewValue?.error, 500);
+  const previewErrorDebounced = useDebounced(previewValue?.error, 500);
+  const previewError = previewValue?.error && previewErrorDebounced;
 
   return (
     <React.Fragment>

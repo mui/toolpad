@@ -263,9 +263,9 @@ export function evaluateBindable<V>(
   };
 
   try {
-    return { value: execExpression() };
+    const value = execExpression();
+    return { value };
   } catch (err) {
-    console.error(`Oh no`, err);
     return { error: err as Error };
   }
 }

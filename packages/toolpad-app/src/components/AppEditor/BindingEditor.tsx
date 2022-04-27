@@ -23,7 +23,7 @@ import JsonView from '../JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
-import { Json } from '../../server/evalExpression';
+import { Serializable } from '../../server/evalExpression';
 
 interface JsExpressionBindingEditorProps<V>
   extends WithControlledProp<BindableAttrValue<V> | null> {
@@ -90,7 +90,7 @@ function JsExpressionPreviewServerContent({ input, globalScope }: JsExpressionPr
   const previewValue: LiveBinding = React.useMemo(() => {
     const ctx = jsRuntime.newContext();
     try {
-      return evaluateBindableServer(ctx, input, globalScope as Record<string, Json>);
+      return evaluateBindableServer(ctx, input, globalScope as Record<string, Serializable>);
     } finally {
       ctx.dispose();
     }

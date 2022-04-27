@@ -30,9 +30,7 @@ import {
   InstantiatedComponents,
 } from '../../src/toolpadComponents/componentDefinition';
 import AppThemeProvider from './AppThemeProvider';
-import { evaluateBindable, fireEvent } from '../coreRuntime';
-import { QuickJsProvider, useQuickJs } from './quickJs';
-import { evalExpressionInContext } from '../../src/server/evalExpression';
+import { evaluateBindable, fireEvent, JsRuntimeProvider } from '../coreRuntime';
 
 export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
@@ -311,13 +309,6 @@ function useLiveBindings(
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
-  const quickJs = useQuickJs();
-  const ctx = quickJs.newContext();
-  try {
-    console.log(evalExpressionInContext(ctx, '1 + 1'));
-  } finally {
-    ctx.dispose();
-  }
   const renderToolpadComponent = React.useContext(RenderToolpadComponentContext);
   const dom = useDomContext();
   const location = useLocation();
@@ -449,7 +440,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   return (
     <ErrorBoundary FallbackComponent={AppError}>
       <React.Suspense fallback={<AppLoading />}>
-        <QuickJsProvider>
+        <JsRuntimeProvider>
           <ComponentsContextProvider value={components}>
             <AppContextProvider value={appContext}>
               <QueryClientProvider client={queryClient}>
@@ -483,7 +474,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
               </QueryClientProvider>
             </AppContextProvider>
           </ComponentsContextProvider>
-        </QuickJsProvider>
+        </JsRuntimeProvider>
       </React.Suspense>
     </ErrorBoundary>
   );

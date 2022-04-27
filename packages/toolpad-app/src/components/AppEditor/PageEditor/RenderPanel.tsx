@@ -1,6 +1,6 @@
 import * as React from 'react';
 import clsx from 'clsx';
-import throttle from 'lodash/throttle';
+import throttle from 'lodash-es/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';

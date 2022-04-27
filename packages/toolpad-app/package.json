@@ -63,6 +63,7 @@
     "googleapis": "^97.0.0",
     "import-meta-resolve": "^1.1.1",
     "json-to-ts": "^1.7.0",
+    "lodash-es": "^4.17.21",
     "next": "^12.1.4",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.6.2",
@@ -86,7 +87,7 @@
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
     "@types/glob": "^7.2.0",
-    "@types/lodash": "^4.14.181",
+    "@types/lodash-es": "^4.17.6",
     "@types/react": "^17.0.43",
     "@types/react-inspector": "^4.0.2",
     "@types/serialize-javascript": "^5.0.2",

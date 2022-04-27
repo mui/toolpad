@@ -1,15 +1,17 @@
 import { ArgTypeDefinition, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
-import evalExpression, { Json } from './evalExpression';
+import { QuickJSContext } from 'quickjs-emscripten';
+import { evalExpressionInContext, Json } from './evalExpression';
 
-export default async function evaluateBindable<V>(
+export default function evaluateBindable<V>(
+  ctx: QuickJSContext,
   bindable: BindableAttrValue<V> | null,
   globalScope: Record<string, Json>,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   argType?: ArgTypeDefinition,
-): Promise<LiveBinding> {
-  const execExpression = async () => {
+): LiveBinding {
+  const execExpression = () => {
     if (bindable?.type === 'jsExpression') {
-      return evalExpression(bindable?.value, globalScope);
+      return evalExpressionInContext(ctx, bindable?.value, globalScope);
     }
 
     if (bindable?.type === 'const') {
@@ -20,7 +22,7 @@ export default async function evaluateBindable<V>(
   };
 
   try {
-    const value = await execExpression();
+    const value = execExpression();
     return { value };
   } catch (err) {
     return { error: err as Error };

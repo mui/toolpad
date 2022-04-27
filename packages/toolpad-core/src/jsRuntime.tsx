@@ -13,8 +13,14 @@ export const JsRuntimeProvider = React.lazy(async () => {
   const Context = (props: JsRuntimeProviderProps) => {
     const [runtime, setRuntime] = React.useState(() => quickJs.newRuntime(props.options));
 
-    // Make sure to clean dispose of runtime when it changes or unmounts
-    React.useEffect(() => () => runtime.dispose(), [runtime]);
+    // Make sure to dispose of runtime when it changes or unmounts
+    React.useEffect(() => {
+      return () => {
+        if (runtime.alive) {
+          runtime.dispose();
+        }
+      };
+    }, [runtime]);
 
     React.useEffect(() => setRuntime(quickJs.newRuntime(props.options)), [props.options]);
 

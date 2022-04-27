@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { ButtonProps, Stack, CssBaseline } from '@mui/material';
+import {
+  ButtonProps,
+  Stack,
+  CssBaseline,
+  CircularProgress,
+  Alert,
+  styled,
+  AlertTitle,
+} from '@mui/material';
 import { omit, pick, without } from 'lodash';
 import {
   ArgTypeDefinition,
@@ -13,6 +21,7 @@ import {
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import * as appDom from '../../src/appDom';
 import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../../src/types';
 import { createProvidedContext } from '../../src/utils/react';
@@ -417,6 +426,33 @@ function getPageNavButtonProps(appId: string, page: appDom.PageNode) {
   return { component: Link, to: `/pages/${page.id}` } as ButtonProps;
 }
 
+const FullPageCentered = styled('div')({
+  width: '100vw',
+  height: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
+function AppLoading() {
+  return (
+    <FullPageCentered>
+      <CircularProgress />
+    </FullPageCentered>
+  );
+}
+
+function AppError({ error }: FallbackProps) {
+  return (
+    <FullPageCentered>
+      <Alert severity="error">
+        <AlertTitle>Something went wrong</AlertTitle>
+        <pre>{error.stack}</pre>
+      </Alert>
+    </FullPageCentered>
+  );
+}
+
 export interface ToolpadAppProps {
   basename: string;
   appId: string;
@@ -436,39 +472,43 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   const queryClient = React.useMemo(() => new QueryClient(), []);
 
   return (
-    <ComponentsContextProvider value={components}>
-      <AppContextProvider value={appContext}>
-        <QueryClientProvider client={queryClient}>
-          <CssBaseline />
-          <AppThemeProvider node={theme}>
-            <DomContextProvider value={dom}>
-              <BrowserRouter basename={basename}>
-                <Routes>
-                  <Route path="/" element={<Navigate replace to="/pages" />} />
-                  <Route
-                    path="/pages"
-                    element={
-                      <AppOverview
-                        appId={appId}
-                        dom={dom}
-                        openPageButtonProps={getPageNavButtonProps}
+    <ErrorBoundary FallbackComponent={AppError}>
+      <React.Suspense fallback={<AppLoading />}>
+        <ComponentsContextProvider value={components}>
+          <AppContextProvider value={appContext}>
+            <QueryClientProvider client={queryClient}>
+              <CssBaseline />
+              <AppThemeProvider node={theme}>
+                <DomContextProvider value={dom}>
+                  <BrowserRouter basename={basename}>
+                    <Routes>
+                      <Route path="/" element={<Navigate replace to="/pages" />} />
+                      <Route
+                        path="/pages"
+                        element={
+                          <AppOverview
+                            appId={appId}
+                            dom={dom}
+                            openPageButtonProps={getPageNavButtonProps}
+                          />
+                        }
                       />
-                    }
-                  />
-                  {pages.map((page) => (
-                    <Route
-                      key={page.id}
-                      path={`/pages/${page.id}`}
-                      element={<RenderedPage nodeId={page.id} />}
-                    />
-                  ))}
-                </Routes>
-              </BrowserRouter>
-            </DomContextProvider>
-          </AppThemeProvider>
-        </QueryClientProvider>
-      </AppContextProvider>
-    </ComponentsContextProvider>
+                      {pages.map((page) => (
+                        <Route
+                          key={page.id}
+                          path={`/pages/${page.id}`}
+                          element={<RenderedPage nodeId={page.id} />}
+                        />
+                      ))}
+                    </Routes>
+                  </BrowserRouter>
+                </DomContextProvider>
+              </AppThemeProvider>
+            </QueryClientProvider>
+          </AppContextProvider>
+        </ComponentsContextProvider>
+      </React.Suspense>
+    </ErrorBoundary>
   );
 }
 

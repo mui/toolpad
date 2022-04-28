@@ -22,6 +22,7 @@ import { useDomLoader } from '../DomLoader';
 import ToolpadAppShell from '../ToolpadAppShell';
 import PagePanel from './PagePanel';
 import client from '../../api';
+import { NodeId } from '../../types';
 
 interface CreateReleaseDialogProps {
   appId: string;
@@ -104,11 +105,20 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
 
 export interface ToolpadAppShellProps {
   appId: string;
+  /**
+   * NodeId of the currently selected object. To be used to display active status in the hierarchy
+   */
+  activeNodeId?: NodeId;
   actions?: React.ReactNode;
   children?: React.ReactNode;
 }
 
-export default function AppEditorShell({ appId, children, ...props }: ToolpadAppShellProps) {
+export default function AppEditorShell({
+  appId,
+  children,
+  activeNodeId,
+  ...props
+}: ToolpadAppShellProps) {
   const domLoader = useDomLoader();
 
   const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
@@ -146,6 +156,7 @@ export default function AppEditorShell({ appId, children, ...props }: ToolpadApp
       >
         <PagePanel
           appId={appId}
+          activeNodeId={activeNodeId}
           sx={{
             width: 250,
             borderRight: `1px solid 'divider'`,

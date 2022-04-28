@@ -152,7 +152,7 @@ export default function ApiEditor({ appId }: ApiEditorProps) {
   const { nodeId } = useParams();
   const apiNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'api');
   return (
-    <AppEditorShell appId={appId}>
+    <AppEditorShell appId={appId} activeNodeId={apiNode?.id}>
       {apiNode ? (
         <ApiEditorContent key={nodeId} appId={appId} apiNode={apiNode} />
       ) : (

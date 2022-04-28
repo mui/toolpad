@@ -244,7 +244,7 @@ export default function CodeComponentEditor({ appId }: CodeComponentEditorProps)
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
   return (
-    <AppEditorShell appId={appId}>
+    <AppEditorShell appId={appId} activeNodeId={codeComponentNode?.id}>
       {codeComponentNode ? (
         <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
       ) : (

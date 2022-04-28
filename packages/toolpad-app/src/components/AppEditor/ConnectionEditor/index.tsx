@@ -162,7 +162,7 @@ export default function ConnectionEditor({ appId }: ConnectionProps) {
   const { nodeId } = useParams();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
   return (
-    <AppEditorShell appId={appId}>
+    <AppEditorShell appId={appId} activeNodeId={connectionNode?.id}>
       {connectionNode ? (
         <ConnectionEditorContent appId={appId} key={nodeId} connectionNode={connectionNode} />
       ) : (

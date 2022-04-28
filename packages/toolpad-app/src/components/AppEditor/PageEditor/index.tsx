@@ -40,7 +40,7 @@ export default function PageEditor({ appId }: PageEditorProps) {
   const { nodeId } = useParams();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
   return (
-    <AppEditorShell appId={appId}>
+    <AppEditorShell appId={appId} activeNodeId={pageNode?.id}>
       {pageNode ? (
         <PageEditorProvider key={nodeId} appId={appId} nodeId={nodeId as NodeId}>
           <PageEditorRoot>

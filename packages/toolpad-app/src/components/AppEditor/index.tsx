@@ -7,6 +7,7 @@ import ApiEditor from './ApiEditor';
 import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
 import { AppEditorContext, AppEditorContextprovider } from './AppEditorContext';
+import AppEditorShell from './AppEditorShell';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -46,6 +47,7 @@ function FileEditor({ appId }: FileEditorProps) {
       <Route path="apis/:nodeId" element={<ApiEditor appId={appId} />} />
       <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
       <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
+      <Route path="*" element={<AppEditorShell appId={appId} />} />
     </Routes>
   );
 }

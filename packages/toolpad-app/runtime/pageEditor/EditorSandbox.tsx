@@ -1,12 +1,13 @@
 import * as React from 'react';
 import * as runtime from '@mui/toolpad-core/runtime';
+import { TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import ToolpadApp, {
   RenderToolpadComponentParams,
   RenderToolpadComponentProvider,
 } from './ToolpadApp';
 import * as appDom from '../../src/appDom';
 import { VersionOrPreview } from '../../src/types';
-import { InstantiatedComponents } from '../../src/toolpadComponents/componentDefinition';
+import { InstantiatedComponents } from '../../src/toolpadComponents';
 
 export interface ToolpadBridge {
   updateDom(newDom: appDom.AppDom): void;
@@ -38,7 +39,7 @@ function renderToolpadComponent({
     }
   }
   return (
-    <runtime.NodeRuntimeWrapper nodeId={node.id}>
+    <runtime.NodeRuntimeWrapper nodeId={node.id} componentConfig={Component[TOOLPAD_COMPONENT]}>
       <Component {...wrappedProps} />
     </runtime.NodeRuntimeWrapper>
   );

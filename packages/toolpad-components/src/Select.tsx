@@ -8,6 +8,7 @@ import {
   SelectProps as MuiSelectProps,
   MenuItem,
 } from '@mui/material';
+import { createComponent } from '@mui/toolpad-core';
 
 export interface Selectoption {
   value: string;
@@ -18,7 +19,7 @@ export interface SelectProps extends MuiSelectProps {
   options: (string | Selectoption)[];
 }
 
-export default function Select({ sx, label, options, ...props }: SelectProps) {
+function Select({ sx, label, options, ...props }: SelectProps) {
   const labelId = React.useId();
   return (
     <FormControl size="small" sx={{ minWidth: 120, ...sx }}>
@@ -42,10 +43,43 @@ Select.defaultProps = {
   // eslint-disable-next-line react/default-props-match-prop-types
   label: '',
   // eslint-disable-next-line react/default-props-match-prop-types
-  variant: 'outlined',
+  variant: 'outlined' as const,
   // eslint-disable-next-line react/default-props-match-prop-types
-  size: 'small',
+  size: 'small' as const,
   // eslint-disable-next-line react/default-props-match-prop-types
   value: '',
   options: [],
 };
+
+export default createComponent(Select, {
+  argTypes: {
+    label: {
+      typeDef: { type: 'string' },
+    },
+    disabled: {
+      typeDef: { type: 'boolean' },
+    },
+    variant: {
+      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
+    },
+    size: {
+      typeDef: { type: 'string', enum: ['small', 'normal'] },
+    },
+    value: {
+      typeDef: { type: 'string' },
+      onChangeProp: 'onChange',
+      defaultValueProp: 'defaultValue',
+      onChangeHandler: {
+        params: ['event'],
+        valueGetter: 'event.target.value',
+      },
+    },
+    options: {
+      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
+      control: { type: 'json' },
+    },
+    sx: {
+      typeDef: { type: 'object' },
+    },
+  },
+});

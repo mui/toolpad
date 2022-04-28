@@ -1,3 +1,6 @@
+import React from 'react';
+import { TOOLPAD_COMPONENT } from './constants';
+
 export type BindingAttrValueFormat = 'stringLiteral' | 'default';
 
 // TODO: Get rid of BoundExpressionAttrValue? Its function can be fulfilled by derivedState as well
@@ -140,9 +143,14 @@ export interface ComponentDefinition<P> {
   argTypes: ArgTypeDefinitions<P>;
 }
 
+export interface LiveBindingError {
+  message: string;
+  stack?: string;
+}
+
 export interface LiveBinding {
   value?: any;
-  error?: Error;
+  error?: LiveBindingError;
 }
 
 export type RuntimeEvent =
@@ -164,6 +172,10 @@ export type RuntimeEvent =
 export interface ComponentConfig<P> {
   argTypes: ArgTypeDefinitions<P>;
 }
+
+export type ToolpadComponent<P = {}> = React.ComponentType<P> & {
+  [TOOLPAD_COMPONENT]: ComponentConfig<P>;
+};
 
 export type LiveBindings = Partial<Record<string, LiveBinding>>;
 

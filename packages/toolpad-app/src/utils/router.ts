@@ -34,7 +34,7 @@ export function useBlocker(blocker: Blocker, when = true) {
     if (!when) {
       refUnBlock.current?.();
       refUnBlock.current = undefined;
-      return () => {};
+      return;
     }
 
     if (!refUnBlock.current) {
@@ -50,15 +50,6 @@ export function useBlocker(blocker: Blocker, when = true) {
         blockerRef.current(autoUnblockingTx);
       });
     }
-
-    const onBeforeUnload = () => {
-      console.log('before unload');
-      refUnBlock.current?.();
-      refUnBlock.current = undefined;
-    };
-
-    window.addEventListener('beforeunload', onBeforeUnload);
-    return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [navigator, when]);
 }
 

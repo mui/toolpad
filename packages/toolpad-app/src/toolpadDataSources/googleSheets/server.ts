@@ -166,7 +166,7 @@ async function exec(
   }
   const sheets = createSheetsClient(client);
 
-  const { spreadsheetId, sheetName, ranges, transformResponse } = query;
+  const { spreadsheetId, sheetName, ranges, headerRow } = query;
   if (spreadsheetId && sheetName) {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
@@ -176,13 +176,13 @@ async function exec(
       const { values } = response.data;
       if (values && values.length > 0) {
         let data = values;
-        if (transformResponse) {
-          const headerRow = values.shift() ?? [];
+        if (headerRow) {
+          const firstRow = values.shift() ?? [];
           data = values.map((row) => {
             const rowObject: any = {};
             row.forEach((elem, cellIndex) => {
-              if (headerRow[cellIndex]) {
-                rowObject[headerRow[cellIndex]] = elem;
+              if (firstRow[cellIndex]) {
+                rowObject[firstRow[cellIndex]] = elem;
               }
             });
             return rowObject;

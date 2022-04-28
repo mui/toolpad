@@ -35,7 +35,7 @@ export type GoogleSheetsApiQuery = {
    * Whether to transform the response assuming
    * the first row to be column headers
    */
-  transformResponse: boolean;
+  headerRow: boolean;
 };
 
 export enum GoogleSheetsPrivateQueryType {

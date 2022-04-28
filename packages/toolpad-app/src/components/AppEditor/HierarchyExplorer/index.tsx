@@ -15,7 +15,15 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { useNavigate } from 'react-router-dom';
+import {
+  useNavigate,
+  UNSAFE_NavigationContext,
+  UNSAFE_RouteContext,
+  UNSAFE_LocationContext,
+  useLocation,
+  useRoutes,
+  matchRoutes,
+} from 'react-router-dom';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -88,7 +96,19 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [':connections', ':pages', ':apis', ':codeComponents'],
   );
 
-  const selected: NodeId[] = [];
+  const location = useLocation();
+  const match = matchRoutes(
+    [
+      { path: `/app/:appId/editor/pages/:activeNodeId` },
+      { path: `/app/:appId/editor/apis/:activeNodeId` },
+      { path: `/app/:appId/editor/codeComponents/:activeNodeId` },
+      { path: `/app/:appId/editor/connections/:activeNodeId` },
+    ],
+    location,
+  );
+  const activeNodeId = match && match.length > 0 ? (match[0].params.activeNodeId as NodeId) : null;
+
+  const selected: NodeId[] = activeNodeId ? [activeNodeId] : [];
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);

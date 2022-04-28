@@ -13,6 +13,7 @@ import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 import { ConnectionSelect } from '../HierarchyExplorer/CreateApiNodeDialog';
 import JsonView from '../../JsonView';
+import { usePrompt } from '../../../utils/router';
 
 interface ApiEditorContentProps<Q> {
   appId: string;
@@ -66,6 +67,13 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
     [apiNode, domApi],
   );
 
+  const allChangesAreCommitted = savedQuery.current === apiQuery;
+
+  usePrompt(
+    'Your API has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
+    !allChangesAreCommitted,
+  );
+
   if (!dataSource) {
     return (
       <NotFoundEditor className={className} message={`DataSource "${dataSourceName}" not found`} />
@@ -111,7 +119,7 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
                 });
                 savedQuery.current = apiQuery;
               }}
-              disabled={savedQuery.current === apiQuery}
+              disabled={allChangesAreCommitted}
             >
               Update
             </Button>

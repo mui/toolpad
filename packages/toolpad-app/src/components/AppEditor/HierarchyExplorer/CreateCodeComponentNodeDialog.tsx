@@ -18,17 +18,13 @@ function createDefaultCodeComponent(name: string): string {
   const propTypeId = `${componentId}Props`;
   return format(`
     import * as React from 'react';
-    import type { ComponentConfig } from '@mui/toolpad-core';
+    import { createComponent } from '@mui/toolpad-core';
     
     export interface ${propTypeId} {
       msg: string;
     }
     
-    export const config: ComponentConfig<${propTypeId}> = {
-      argTypes: {}
-    }
-    
-    export default function ${componentId}({ msg }: ${propTypeId}) {
+    function ${componentId}({ msg }: ${propTypeId}) {
       return (
         <div>{msg}</div>
       );
@@ -37,6 +33,12 @@ function createDefaultCodeComponent(name: string): string {
     ${componentId}.defaultProps = {
       msg: "Hello world!",
     };
+
+    export default createComponent(${componentId}, {
+      argTypes: {
+        msg: { typeDef: { type: "string" } }
+      }
+    });
   `);
 }
 
@@ -70,7 +72,6 @@ export default function CreateStudioCodeComponentDialog({
             name,
             attributes: {
               code: appDom.createConst(createDefaultCodeComponent(name)),
-              argTypes: appDom.createConst({}),
             },
           });
           const appNode = appDom.getApp(dom);

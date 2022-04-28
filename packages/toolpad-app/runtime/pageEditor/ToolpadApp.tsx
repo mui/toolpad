@@ -111,7 +111,8 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
 
   const node = appDom.getNode(dom, nodeId, 'element');
   const { children = [] } = appDom.getChildNodes(dom, node);
-  const { Component, argTypes } = useElmToolpadComponent(node);
+  const { Component } = useElmToolpadComponent(node);
+  const { argTypes } = Component[TOOLPAD_COMPONENT];
 
   const liveBindings = useBindingsContext();
 
@@ -199,7 +200,8 @@ function useInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): C
     return Object.fromEntries(
       elements.flatMap((elm) => {
         if (appDom.isElement(elm)) {
-          const { argTypes, Component } = getElmComponent(components, elm);
+          const { Component } = getElmComponent(components, elm);
+          const { argTypes } = Component[TOOLPAD_COMPONENT];
           return [
             [
               elm.name,
@@ -298,7 +300,8 @@ function useLiveBindings(
     descendants.forEach((descendant) => {
       if (appDom.isElement(descendant)) {
         if (descendant.props) {
-          const { argTypes } = getElmComponent(components, descendant);
+          const { Component } = getElmComponent(components, descendant);
+          const { argTypes } = Component[TOOLPAD_COMPONENT];
           const elmBindables = resolveBindables(descendant.props, currentPageState, argTypes);
           Object.entries(elmBindables).forEach(([propName, bindable]) => {
             bindings[`${descendant.id}.props.${propName}`] = bindable;

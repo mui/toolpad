@@ -30,29 +30,32 @@ export interface RenderParams {
   components: ToolpadComponentDefinitions;
 }
 
-function instantiateComponent<P = {}>(def: ToolpadComponentDefinition): ToolpadComponent {
+function instantiateComponent(def: ToolpadComponentDefinition): ToolpadComponent {
   let InstantiatedComponent: ToolpadComponent;
 
   const LazyComponent = React.lazy(async () => {
     const mod = await import(def.importedModule);
     const ImportedComponent = mod[def.importedName];
-    // We update the argTypes after the component is loaded
-    if (ImportedComponent[TOOLPAD_COMPONENT]) {
-      InstantiatedComponent[TOOLPAD_COMPONENT] = ImportedComponent[TOOLPAD_COMPONENT];
+
+    // TODO: remove this warning and the '|| mod.config' further down
+    if (mod.config) {
+      console.error(
+        `You're using a code component with config export. This is deprecated. Use "createComponent" instead`,
+      );
     }
+
+    const importedConfig = ImportedComponent[TOOLPAD_COMPONENT] || mod.config;
+
+    // We update the componentConfig after the component is loaded
+    if (importedConfig) {
+      InstantiatedComponent[TOOLPAD_COMPONENT] = importedConfig;
+    }
+
     return { default: ImportedComponent };
   });
 
   // We start with a lazy component with default argTypes
-  // @ts-expect-error This is an error in @types/react@^17
-  InstantiatedComponent = createComponent(
-    React.forwardRef<any, P>((props, ref) => (
-      // TODO: fallback?
-      <React.Suspense fallback={null}>
-        <LazyComponent ref={ref} {...props} />
-      </React.Suspense>
-    )),
-  );
+  InstantiatedComponent = createComponent(LazyComponent);
 
   InstantiatedComponent.displayName = def.importedName;
 

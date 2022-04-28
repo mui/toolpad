@@ -1,27 +1,11 @@
-import {
-  PageRow,
-  Stack,
-  Button,
-  Image,
-  DataGrid,
-  Container,
-  TextField,
-  Typography,
-  Select,
-  Paper,
-  CustomLayout,
-} from '@mui/toolpad-components';
-import { ArgTypeDefinitions, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
+import { ToolpadComponent } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 
 export interface ToolpadComponentDefinition {
   displayName: string;
-  argTypes: ArgTypeDefinitions;
   importedModule: string;
   importedName: string;
-  codeComponent?: boolean;
-  extraControls?: Partial<Record<string, { type: string }>>;
 }
 
 export type ToolpadComponentDefinitions = Record<string, ToolpadComponentDefinition | undefined>;
@@ -37,7 +21,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'PageRow',
       importedModule: '@mui/toolpad-components',
       importedName: 'PageRow',
-      ...PageRow[TOOLPAD_COMPONENT],
     },
   ],
   [
@@ -46,7 +29,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Stack',
       importedModule: '@mui/toolpad-components',
       importedName: 'Stack',
-      ...Stack[TOOLPAD_COMPONENT],
     },
   ],
   [
@@ -55,7 +37,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Button',
       importedModule: '@mui/toolpad-components',
       importedName: 'Button',
-      ...Button[TOOLPAD_COMPONENT],
     },
   ],
   [
@@ -64,7 +45,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Image',
       importedModule: '@mui/toolpad-components',
       importedName: 'Image',
-      ...Image[TOOLPAD_COMPONENT],
     },
   ],
   [
@@ -73,7 +53,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'DataGrid',
       importedModule: '@mui/toolpad-components',
       importedName: 'DataGrid',
-      ...DataGrid[TOOLPAD_COMPONENT],
     },
   ],
   [
@@ -82,7 +61,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Container',
       importedModule: '@mui/toolpad-components',
       importedName: 'Container',
-      ...Container[TOOLPAD_COMPONENT],
     },
   ],
   [
@@ -91,7 +69,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'TextField',
       importedModule: '@mui/toolpad-components',
       importedName: 'TextField',
-      ...TextField[TOOLPAD_COMPONENT],
     },
   ],
   [
@@ -100,7 +77,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Typography',
       importedModule: '@mui/toolpad-components',
       importedName: 'Typography',
-      ...Typography[TOOLPAD_COMPONENT],
     },
   ],
   [
@@ -109,7 +85,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Select',
       importedModule: '@mui/toolpad-components',
       importedName: 'Select',
-      ...Select[TOOLPAD_COMPONENT],
     },
   ],
   [
@@ -118,7 +93,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Paper',
       importedModule: '@mui/toolpad-components',
       importedName: 'Paper',
-      ...Paper[TOOLPAD_COMPONENT],
     },
   ],
   [
@@ -127,7 +101,6 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'CustomLayout',
       importedModule: '@mui/toolpad-components',
       importedName: 'CustomLayout',
-      ...CustomLayout[TOOLPAD_COMPONENT],
     },
   ],
 ]);
@@ -139,12 +112,10 @@ function createCodeComponent(
 ): ToolpadComponentDefinition {
   return {
     displayName: domNode.name,
-    argTypes: domNode.attributes.argTypes.value,
     importedModule: `/api/components/${encodeURIComponent(appId)}/${encodeURIComponent(
       version,
     )}/${encodeURIComponent(domNode.id)}`,
     importedName: 'default',
-    codeComponent: true,
   };
 }
 

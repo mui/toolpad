@@ -1,7 +1,7 @@
 // Just for demo purposes
 import * as React from 'react';
 import { Grid } from '@mui/material';
-import { Placeholder } from '@mui/toolpad-core';
+import { Placeholder, ComponentConfig } from '@mui/toolpad-core';
 
 export interface CustomLayoutProps {
   child1?: React.ReactNode;
@@ -24,3 +24,12 @@ export default function CustomLayout({ child1, child2, child3 }: CustomLayoutPro
 }
 
 CustomLayout.defaultProps = {};
+
+export const config: ComponentConfig<CustomLayoutProps> = {
+  argTypes: {
+    child3: {
+      typeDef: { type: 'element' },
+      control: { type: 'slot' },
+    },
+  },
+};

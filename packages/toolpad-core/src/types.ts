@@ -140,9 +140,14 @@ export interface ComponentDefinition<P> {
   argTypes: ArgTypeDefinitions<P>;
 }
 
+export interface LiveBindingError {
+  message: string;
+  stack?: string;
+}
+
 export interface LiveBinding {
   value?: any;
-  error?: Error;
+  error?: LiveBindingError;
 }
 
 export type RuntimeEvent =

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Stack, StackProps } from '@mui/material';
+import { ComponentConfig } from '@mui/toolpad-core';
 
 export interface PageRowProps {
   spacing?: number;
@@ -23,4 +24,32 @@ PageRow.defaultProps = {
   spacing: 2,
   alignItems: 'start',
   justifyContent: 'start',
+};
+
+export const config: ComponentConfig<PageRowProps> = {
+  argTypes: {
+    spacing: {
+      typeDef: { type: 'number' },
+    },
+    alignItems: {
+      typeDef: {
+        type: 'string',
+        enum: ['start', 'center', 'end', 'stretch', 'baseline'],
+      },
+      label: 'Vertical alignment',
+      control: { type: 'VerticalAlign' },
+    },
+    justifyContent: {
+      typeDef: {
+        type: 'string',
+        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+      },
+      label: 'Horizontal alignment',
+      control: { type: 'HorizontalAlign' },
+    },
+    children: {
+      typeDef: { type: 'element' },
+      control: { type: 'slots' },
+    },
+  },
 };

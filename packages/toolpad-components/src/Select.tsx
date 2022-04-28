@@ -8,6 +8,7 @@ import {
   SelectProps as MuiSelectProps,
   MenuItem,
 } from '@mui/material';
+import { ComponentConfig } from '@mui/toolpad-core';
 
 export interface Selectoption {
   value: string;
@@ -48,4 +49,37 @@ Select.defaultProps = {
   // eslint-disable-next-line react/default-props-match-prop-types
   value: '',
   options: [],
+};
+
+export const config: ComponentConfig<SelectProps> = {
+  argTypes: {
+    label: {
+      typeDef: { type: 'string' },
+    },
+    disabled: {
+      typeDef: { type: 'boolean' },
+    },
+    variant: {
+      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
+    },
+    size: {
+      typeDef: { type: 'string', enum: ['small', 'normal'] },
+    },
+    value: {
+      typeDef: { type: 'string' },
+      onChangeProp: 'onChange',
+      defaultValueProp: 'defaultValue',
+      onChangeHandler: {
+        params: ['event'],
+        valueGetter: 'event.target.value',
+      },
+    },
+    options: {
+      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
+      control: { type: 'json' },
+    },
+    sx: {
+      typeDef: { type: 'object' },
+    },
+  },
 };

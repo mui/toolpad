@@ -15,15 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import {
-  useNavigate,
-  UNSAFE_NavigationContext,
-  UNSAFE_RouteContext,
-  UNSAFE_LocationContext,
-  useLocation,
-  useRoutes,
-  matchRoutes,
-} from 'react-router-dom';
+import { useNavigate, useLocation, matchRoutes } from 'react-router-dom';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';

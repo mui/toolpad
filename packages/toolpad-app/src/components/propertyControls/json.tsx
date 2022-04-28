@@ -2,7 +2,6 @@ import type * as monacoEditor from 'monaco-editor';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import * as React from 'react';
 import Editor from '@monaco-editor/react';
-import schemas from '../../schemas';
 import type { EditorProps, PropControlDefinition } from '../../types';
 
 function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorProps<any>) {
@@ -26,8 +25,6 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
       ? argType.typeDef.schema
       : null;
 
-  const fileUri = `file:///x.json`;
-
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
       editor.updateOptions({
@@ -37,13 +34,16 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
 
       monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
         validate: true,
-        schemas: Object.entries(schemas).map(([uri, schema]) => {
-          return {
-            uri,
-            fileMatch: uri === schemaUri ? [fileUri] : [], // associate with our file
-            schema,
-          };
-        }),
+        schemaRequest: 'error',
+        enableSchemaRequest: true,
+        schemas: schemaUri
+          ? [
+              {
+                uri: new URL(schemaUri, window.location.href).href,
+                fileMatch: ['*'],
+              },
+            ]
+          : [],
       });
 
       monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
@@ -64,7 +64,7 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
         noSyntaxValidation: false,
       });
     },
-    [schemaUri, fileUri],
+    [schemaUri],
   );
 
   return (
@@ -79,7 +79,6 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
             height="200px"
             value={input}
             onChange={(newValue = '') => setInput(newValue)}
-            path={fileUri}
             language="json"
             options={{ readOnly: disabled }}
             onMount={HandleEditorMount}

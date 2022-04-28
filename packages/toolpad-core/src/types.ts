@@ -68,12 +68,12 @@ export interface BooleanValueType extends ValueTypeBase {
 
 export interface ObjectValueType extends ValueTypeBase {
   type: 'object';
-  schema?: 'string';
+  schema?: string;
 }
 
 export interface ArrayValueType extends ValueTypeBase {
   type: 'array';
-  schema?: 'string';
+  schema?: string;
 }
 
 export interface ElementValueType extends ValueTypeBase {

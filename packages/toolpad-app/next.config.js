@@ -11,6 +11,15 @@ module.exports = {
       // See https://github.com/prisma/prisma/issues/6564#issuecomment-853028373
       config.externals.push('_http_common');
     }
+
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      // We need these because quickjs-emscripten doesn't export pure browser compatible modules yet
+      // https://github.com/justjake/quickjs-emscripten/issues/33
+      fs: false,
+      path: false,
+    };
+
     return config;
   },
 

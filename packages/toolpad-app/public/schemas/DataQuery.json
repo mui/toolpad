@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "loading": { "type": "boolean" },
+    "rows": { "$ref": "./DataGridRows.json" },
+    "error": {}
+  }
+}

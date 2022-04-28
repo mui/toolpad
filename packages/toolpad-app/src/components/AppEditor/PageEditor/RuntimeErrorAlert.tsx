@@ -9,7 +9,7 @@ export interface RuntimeErrorAlertProps {
 export default function RuntimeErrorAlert({ error }: RuntimeErrorAlertProps) {
   return (
     <Alert severity="error" sx={{ overflow: 'auto' }}>
-      <AlertTitle>Error</AlertTitle>
+      <AlertTitle>{error.message}</AlertTitle>
       <pre>{error.stack}</pre>
     </Alert>
   );

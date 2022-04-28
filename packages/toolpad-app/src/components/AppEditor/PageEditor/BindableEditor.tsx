@@ -1,9 +1,14 @@
 import { Alert, Stack } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/toolpad-core';
+import {
+  BindableAttrValue,
+  ArgTypeDefinition,
+  ArgControlSpec,
+  PropValueType,
+} from '@mui/toolpad-core';
 import propertyControls from '../../propertyControls';
 import { BindingEditor } from '../BindingEditor';
-import { NodeId, BindableAttrValue } from '../../../types';
+import { NodeId } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
 import { usePageEditorState } from './PageEditorProvider';
 
@@ -85,7 +90,6 @@ export default function BindableEditor<V>({
           />
           <BindingEditor<V>
             globalScope={globalScope}
-            liveBinding={liveBinding}
             propType={argType.typeDef}
             value={value}
             onChange={onChange}

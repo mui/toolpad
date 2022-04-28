@@ -1,10 +1,17 @@
 import * as React from 'react';
-import { ButtonProps, Stack, CssBaseline } from '@mui/material';
-import { omit, pick, without } from 'lodash';
 import {
-  ArgTypeDefinition,
+  ButtonProps,
+  Stack,
+  CssBaseline,
+  CircularProgress,
+  Alert,
+  styled,
+  AlertTitle,
+} from '@mui/material';
+import { omit, pick, without } from 'lodash-es';
+import {
+  BindableAttrValues,
   ArgTypeDefinitions,
-  evalCode,
   INITIAL_DATA_QUERY,
   LiveBinding,
   LiveBindings,
@@ -13,8 +20,9 @@ import {
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import * as appDom from '../../src/appDom';
-import { BindableAttrValue, BindableAttrValues, NodeId, VersionOrPreview } from '../../src/types';
+import { NodeId, VersionOrPreview } from '../../src/types';
 import { createProvidedContext } from '../../src/utils/react';
 import AppOverview from '../../src/components/AppOverview';
 import {
@@ -22,7 +30,7 @@ import {
   InstantiatedComponents,
 } from '../../src/toolpadComponents/componentDefinition';
 import AppThemeProvider from './AppThemeProvider';
-import { fireEvent } from '../coreRuntime';
+import { evaluateBindable, fireEvent, JsRuntimeProvider } from '../coreRuntime';
 
 export interface RenderToolpadComponentParams {
   Component: React.ComponentType;
@@ -74,32 +82,6 @@ function useElmToolpadComponent(elm: appDom.ElementNode): InstantiatedComponent 
   return getElmComponent(components, elm);
 }
 
-function resolveBindable<V>(
-  bindable: BindableAttrValue<V>,
-  pageState: PageState,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  argType?: ArgTypeDefinition,
-): LiveBinding {
-  const execExpression = () => {
-    if (bindable?.type === 'jsExpression') {
-      return evalCode(bindable?.value, pageState);
-    }
-
-    if (bindable?.type === 'const') {
-      return bindable?.value;
-    }
-
-    return undefined;
-  };
-
-  try {
-    return { value: execExpression() };
-  } catch (err) {
-    console.error(`Oh no`, err);
-    return { error: err as Error };
-  }
-}
-
 function resolveBindables(
   bindables: BindableAttrValues<any>,
   pageState: PageState,
@@ -111,7 +93,7 @@ function resolveBindables(
         return [];
       }
       const argType = argTypes[key];
-      const liveBinding = resolveBindable(bindable, pageState, argType);
+      const liveBinding = evaluateBindable(bindable, pageState, argType);
       return bindable === undefined ? [] : [[key, liveBinding]];
     }),
   );
@@ -247,16 +229,6 @@ function useInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): C
   }, [dom, page, components]);
 }
 
-function createPageState(
-  urlQueryState: Record<string, string>,
-  controlledState: ControlledState,
-): PageState {
-  return {
-    page: urlQueryState,
-    ...controlledState,
-  };
-}
-
 interface PageRootProps {
   children?: React.ReactNode;
 }
@@ -372,8 +344,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     });
   }, [initialControlledState]);
 
-  const pageState = React.useMemo(() => {
-    return createPageState(urlQueryState, controlledState);
+  const pageState: PageState = React.useMemo(() => {
+    return {
+      page: urlQueryState,
+      ...controlledState,
+    };
   }, [urlQueryState, controlledState]);
 
   React.useEffect(() => {
@@ -417,6 +392,33 @@ function getPageNavButtonProps(appId: string, page: appDom.PageNode) {
   return { component: Link, to: `/pages/${page.id}` } as ButtonProps;
 }
 
+const FullPageCentered = styled('div')({
+  width: '100vw',
+  height: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
+function AppLoading() {
+  return (
+    <FullPageCentered>
+      <CircularProgress />
+    </FullPageCentered>
+  );
+}
+
+function AppError({ error }: FallbackProps) {
+  return (
+    <FullPageCentered>
+      <Alert severity="error">
+        <AlertTitle>Something went wrong</AlertTitle>
+        <pre>{error.stack}</pre>
+      </Alert>
+    </FullPageCentered>
+  );
+}
+
 export interface ToolpadAppProps {
   basename: string;
   appId: string;
@@ -436,39 +438,45 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   const queryClient = React.useMemo(() => new QueryClient(), []);
 
   return (
-    <ComponentsContextProvider value={components}>
-      <AppContextProvider value={appContext}>
-        <QueryClientProvider client={queryClient}>
-          <CssBaseline />
-          <AppThemeProvider node={theme}>
-            <DomContextProvider value={dom}>
-              <BrowserRouter basename={basename}>
-                <Routes>
-                  <Route path="/" element={<Navigate replace to="/pages" />} />
-                  <Route
-                    path="/pages"
-                    element={
-                      <AppOverview
-                        appId={appId}
-                        dom={dom}
-                        openPageButtonProps={getPageNavButtonProps}
-                      />
-                    }
-                  />
-                  {pages.map((page) => (
-                    <Route
-                      key={page.id}
-                      path={`/pages/${page.id}`}
-                      element={<RenderedPage nodeId={page.id} />}
-                    />
-                  ))}
-                </Routes>
-              </BrowserRouter>
-            </DomContextProvider>
-          </AppThemeProvider>
-        </QueryClientProvider>
-      </AppContextProvider>
-    </ComponentsContextProvider>
+    <ErrorBoundary FallbackComponent={AppError}>
+      <React.Suspense fallback={<AppLoading />}>
+        <JsRuntimeProvider>
+          <ComponentsContextProvider value={components}>
+            <AppContextProvider value={appContext}>
+              <QueryClientProvider client={queryClient}>
+                <CssBaseline />
+                <AppThemeProvider node={theme}>
+                  <DomContextProvider value={dom}>
+                    <BrowserRouter basename={basename}>
+                      <Routes>
+                        <Route path="/" element={<Navigate replace to="/pages" />} />
+                        <Route
+                          path="/pages"
+                          element={
+                            <AppOverview
+                              appId={appId}
+                              dom={dom}
+                              openPageButtonProps={getPageNavButtonProps}
+                            />
+                          }
+                        />
+                        {pages.map((page) => (
+                          <Route
+                            key={page.id}
+                            path={`/pages/${page.id}`}
+                            element={<RenderedPage nodeId={page.id} />}
+                          />
+                        ))}
+                      </Routes>
+                    </BrowserRouter>
+                  </DomContextProvider>
+                </AppThemeProvider>
+              </QueryClientProvider>
+            </AppContextProvider>
+          </ComponentsContextProvider>
+        </JsRuntimeProvider>
+      </React.Suspense>
+    </ErrorBoundary>
   );
 }
 

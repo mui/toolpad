@@ -48,7 +48,7 @@ function FileEditor({ appId }: FileEditorProps) {
         <Route path="apis/:nodeId" element={<ApiEditor appId={appId} />} />
         <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
         <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
-        <Route path="*" element={<AppEditorShell appId={appId} />} />
+        <Route path="*" element={null} />
       </Route>
     </Routes>
   );

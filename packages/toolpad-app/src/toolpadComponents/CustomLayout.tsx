@@ -1,3 +1,5 @@
+import { CustomLayout } from '@mui/toolpad-components';
+import { TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
@@ -5,10 +7,5 @@ export default {
   displayName: 'CustomLayout',
   importedModule: '@mui/toolpad-components',
   importedName: 'CustomLayout',
-  argTypes: {
-    child3: {
-      typeDef: { type: 'element' },
-      control: { type: 'slot' },
-    },
-  },
+  ...CustomLayout[TOOLPAD_COMPONENT],
 } as ToolpadComponentDefinition;

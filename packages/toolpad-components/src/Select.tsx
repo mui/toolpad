@@ -8,7 +8,7 @@ import {
   SelectProps as MuiSelectProps,
   MenuItem,
 } from '@mui/material';
-import { ComponentConfig } from '@mui/toolpad-core';
+import { createComponent } from '@mui/toolpad-core';
 
 export interface Selectoption {
   value: string;
@@ -19,7 +19,7 @@ export interface SelectProps extends MuiSelectProps {
   options: (string | Selectoption)[];
 }
 
-export default function Select({ sx, label, options, ...props }: SelectProps) {
+function Select({ sx, label, options, ...props }: SelectProps) {
   const labelId = React.useId();
   return (
     <FormControl size="small" sx={{ minWidth: 120, ...sx }}>
@@ -43,15 +43,15 @@ Select.defaultProps = {
   // eslint-disable-next-line react/default-props-match-prop-types
   label: '',
   // eslint-disable-next-line react/default-props-match-prop-types
-  variant: 'outlined',
+  variant: 'outlined' as const,
   // eslint-disable-next-line react/default-props-match-prop-types
-  size: 'small',
+  size: 'small' as const,
   // eslint-disable-next-line react/default-props-match-prop-types
   value: '',
   options: [],
 };
 
-export const config: ComponentConfig<SelectProps> = {
+export default createComponent(Select, {
   argTypes: {
     label: {
       typeDef: { type: 'string' },
@@ -82,4 +82,4 @@ export const config: ComponentConfig<SelectProps> = {
       typeDef: { type: 'object' },
     },
   },
-};
+});

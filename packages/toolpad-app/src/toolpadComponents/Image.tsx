@@ -1,3 +1,5 @@
+import { Image } from '@mui/toolpad-components';
+import { TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
@@ -5,15 +7,5 @@ export default {
   displayName: 'Image',
   importedModule: '@mui/toolpad-components',
   importedName: 'Image',
-  argTypes: {
-    src: {
-      typeDef: { type: 'string' },
-    },
-    alt: {
-      typeDef: { type: 'string' },
-    },
-    sx: {
-      typeDef: { type: 'object' },
-    },
-  },
+  ...Image[TOOLPAD_COMPONENT],
 } as ToolpadComponentDefinition;

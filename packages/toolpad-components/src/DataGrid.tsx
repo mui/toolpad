@@ -9,7 +9,7 @@ import {
   GridColumnOrderChangeParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useNode, UseDataQuery, ComponentConfig } from '@mui/toolpad-core';
+import { useNode, UseDataQuery, createComponent } from '@mui/toolpad-core';
 import { debounce } from '@mui/material';
 
 function inferColumnType(value: unknown): string | undefined {
@@ -155,13 +155,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 });
 
-export default DataGridComponent;
-
 DataGridComponent.defaultProps = {
   selection: null,
 };
 
-export const config: ComponentConfig<ToolpadDataGridProps> = {
+export default createComponent(DataGridComponent, {
   argTypes: {
     rows: {
       typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' },
@@ -185,4 +183,4 @@ export const config: ComponentConfig<ToolpadDataGridProps> = {
       onChangeProp: 'onSelectionChange',
     },
   },
-};
+});

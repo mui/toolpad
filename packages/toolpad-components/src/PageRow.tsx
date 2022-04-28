@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Stack, StackProps } from '@mui/material';
-import { ComponentConfig } from '@mui/toolpad-core';
+import { createComponent } from '@mui/toolpad-core';
 
 export interface PageRowProps {
   spacing?: number;
@@ -9,7 +9,7 @@ export interface PageRowProps {
   justifyContent?: StackProps['justifyContent'];
 }
 
-export default function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps) {
+function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps) {
   return (
     <Stack
       direction="row"
@@ -26,7 +26,7 @@ PageRow.defaultProps = {
   justifyContent: 'start',
 };
 
-export const config: ComponentConfig<PageRowProps> = {
+export default createComponent(PageRow, {
   argTypes: {
     spacing: {
       typeDef: { type: 'number' },
@@ -52,4 +52,4 @@ export const config: ComponentConfig<PageRowProps> = {
       control: { type: 'slots' },
     },
   },
-};
+});

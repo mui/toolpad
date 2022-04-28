@@ -1,3 +1,5 @@
+import { Button } from '@mui/toolpad-components';
+import { TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
@@ -5,25 +7,5 @@ export default {
   displayName: 'Button',
   importedModule: '@mui/toolpad-components',
   importedName: 'Button',
-  argTypes: {
-    children: {
-      name: 'content',
-      typeDef: { type: 'string' },
-    },
-    onClick: {
-      typeDef: { type: 'function' },
-    },
-    disabled: {
-      typeDef: { type: 'boolean' },
-    },
-    variant: {
-      typeDef: { type: 'string', enum: ['contained', 'outlined', 'text'] },
-    },
-    color: {
-      typeDef: { type: 'string', enum: ['primary', 'secondary'] },
-    },
-    sx: {
-      typeDef: { type: 'object' },
-    },
-  },
+  ...Button[TOOLPAD_COMPONENT],
 } as ToolpadComponentDefinition;

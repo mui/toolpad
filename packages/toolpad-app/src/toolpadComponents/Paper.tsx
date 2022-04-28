@@ -1,3 +1,5 @@
+import { Paper } from '@mui/toolpad-components';
+import { TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
@@ -5,16 +7,5 @@ export default {
   displayName: 'Paper',
   importedModule: '@mui/toolpad-components',
   importedName: 'Paper',
-  argTypes: {
-    elevation: {
-      typeDef: { type: 'number', minimum: 0 },
-    },
-    children: {
-      typeDef: { type: 'element' },
-      control: { type: 'slot' },
-    },
-    sx: {
-      typeDef: { type: 'object' },
-    },
-  },
+  ...Paper[TOOLPAD_COMPONENT],
 } as ToolpadComponentDefinition;

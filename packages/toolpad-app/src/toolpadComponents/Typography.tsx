@@ -1,3 +1,5 @@
+import { Typography } from '@mui/toolpad-components';
+import { TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
@@ -5,19 +7,5 @@ export default {
   displayName: 'Typography',
   importedModule: '@mui/toolpad-components',
   importedName: 'Typography',
-  argTypes: {
-    children: {
-      typeDef: { type: 'string' },
-      label: 'value',
-    },
-    variant: {
-      typeDef: {
-        type: 'string',
-        enum: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2'],
-      },
-    },
-    sx: {
-      typeDef: { type: 'object' },
-    },
-  },
+  ...Typography[TOOLPAD_COMPONENT],
 } as ToolpadComponentDefinition;

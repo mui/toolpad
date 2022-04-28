@@ -1,3 +1,5 @@
+import { Select } from '@mui/toolpad-components';
+import { TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
@@ -5,34 +7,5 @@ export default {
   displayName: 'Select',
   importedModule: '@mui/toolpad-components',
   importedName: 'Select',
-  argTypes: {
-    label: {
-      typeDef: { type: 'string' },
-    },
-    disabled: {
-      typeDef: { type: 'boolean' },
-    },
-    variant: {
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
-    },
-    size: {
-      typeDef: { type: 'string', enum: ['small', 'normal'] },
-    },
-    value: {
-      typeDef: { type: 'string' },
-      onChangeProp: 'onChange',
-      defaultValueProp: 'defaultValue',
-      onChangeHandler: {
-        params: ['event'],
-        valueGetter: 'event.target.value',
-      },
-    },
-    options: {
-      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
-      control: { type: 'json' },
-    },
-    sx: {
-      typeDef: { type: 'object' },
-    },
-  },
+  ...Select[TOOLPAD_COMPONENT],
 } as ToolpadComponentDefinition;

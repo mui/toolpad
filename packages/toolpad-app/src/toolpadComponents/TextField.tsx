@@ -1,3 +1,5 @@
+import { TextField } from '@mui/toolpad-components';
+import { TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { ToolpadComponentDefinition } from './componentDefinition';
 
 export default {
@@ -5,27 +7,5 @@ export default {
   displayName: 'TextField',
   importedModule: '@mui/toolpad-components',
   importedName: 'TextField',
-  argTypes: {
-    label: {
-      typeDef: { type: 'string' },
-    },
-    variant: {
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
-    },
-    size: {
-      typeDef: { type: 'string', enum: ['small', 'normal'] },
-    },
-    value: {
-      typeDef: { type: 'string' },
-      onChangeProp: 'onChange',
-      onChangeHandler: {
-        params: ['event'],
-        valueGetter: 'event.target.value',
-      },
-      defaultValueProp: 'defaultValue',
-    },
-    sx: {
-      typeDef: { type: 'object' },
-    },
-  },
+  ...TextField[TOOLPAD_COMPONENT],
 } as ToolpadComponentDefinition;

@@ -1,9 +1,8 @@
-import { Container, ContainerProps } from '@mui/material';
-import { ComponentConfig } from '@mui/toolpad-core';
+import { Container } from '@mui/material';
+import { createComponent } from '@mui/toolpad-core';
+import withDefaultProps from './utils/addDefaultProps';
 
-export default Container;
-
-export const config: ComponentConfig<ContainerProps> = {
+export default createComponent(withDefaultProps(Container, {}), {
   argTypes: {
     children: {
       typeDef: { type: 'element' },
@@ -13,4 +12,4 @@ export const config: ComponentConfig<ContainerProps> = {
       typeDef: { type: 'object' },
     },
   },
-};
+});

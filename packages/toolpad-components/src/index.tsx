@@ -19,3 +19,5 @@ export { default as Paper } from './Paper.js';
 export { default as CustomLayout } from './CustomLayout.js';
 
 export { default as Image } from './Image.js';
+
+export { inferColumns } from './DataGrid';

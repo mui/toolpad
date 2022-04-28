@@ -6,7 +6,7 @@ import {
   InstantiatedComponents,
   ToolpadComponentDefinition,
   ToolpadComponentDefinitions,
-} from '../../src/toolpadComponents/componentDefinition';
+} from '../../src/toolpadComponents';
 import { VersionOrPreview } from '../../src/types';
 import EditorCanvas from './EditorSandbox';
 import ToolpadApp from './ToolpadApp';

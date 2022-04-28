@@ -1,31 +1,135 @@
+import {
+  PageRow,
+  Stack,
+  Button,
+  Image,
+  DataGrid,
+  Container,
+  TextField,
+  Typography,
+  Select,
+  Paper,
+  CustomLayout,
+} from '@mui/toolpad-components';
+import { ArgTypeDefinitions, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
-import Button from './Button';
-import Container from './Container';
-import DataGrid from './DataGrid';
-import Typography from './Typography';
-import TextField from './TextField';
-import Select from './Select';
-import PageRow from './PageRow';
-import { ToolpadComponentDefinition, ToolpadComponentDefinitions } from './componentDefinition';
-import CustomLayout from './CustomLayout';
-import Paper from './Paper';
-import Image from './Image';
-import Stack from './Stack';
 import { VersionOrPreview } from '../types';
 
-// TODO: bring these back to @mui/toolpad repo and make them import @mui/material
+export interface ToolpadComponentDefinition {
+  displayName: string;
+  argTypes: ArgTypeDefinitions;
+  importedModule: string;
+  importedName: string;
+  codeComponent?: boolean;
+  extraControls?: Partial<Record<string, { type: string }>>;
+}
+
+export type ToolpadComponentDefinitions = Record<string, ToolpadComponentDefinition | undefined>;
+export interface InstantiatedComponent extends ToolpadComponentDefinition {
+  Component: React.ComponentType<any>;
+}
+export type InstantiatedComponents = Record<string, InstantiatedComponent | undefined>;
+
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
-  ['PageRow', PageRow],
-  ['Stack', Stack],
-  ['Button', Button],
-  ['Image', Image],
-  ['DataGrid', DataGrid],
-  ['Container', Container],
-  ['TextField', TextField],
-  ['Typography', Typography],
-  ['Select', Select],
-  ['Paper', Paper],
-  ['CustomLayout', CustomLayout],
+  [
+    'PageRow',
+    {
+      displayName: 'PageRow',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'PageRow',
+      ...PageRow[TOOLPAD_COMPONENT],
+    },
+  ],
+  [
+    'Stack',
+    {
+      displayName: 'Stack',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'Stack',
+      ...Stack[TOOLPAD_COMPONENT],
+    },
+  ],
+  [
+    'Button',
+    {
+      displayName: 'Button',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'Button',
+      ...Button[TOOLPAD_COMPONENT],
+    },
+  ],
+  [
+    'Image',
+    {
+      displayName: 'Image',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'Image',
+      ...Image[TOOLPAD_COMPONENT],
+    },
+  ],
+  [
+    'DataGrid',
+    {
+      displayName: 'DataGrid',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'DataGrid',
+      ...DataGrid[TOOLPAD_COMPONENT],
+    },
+  ],
+  [
+    'Container',
+    {
+      displayName: 'Container',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'Container',
+      ...Container[TOOLPAD_COMPONENT],
+    },
+  ],
+  [
+    'TextField',
+    {
+      displayName: 'TextField',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'TextField',
+      ...TextField[TOOLPAD_COMPONENT],
+    },
+  ],
+  [
+    'Typography',
+    {
+      displayName: 'Typography',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'Typography',
+      ...Typography[TOOLPAD_COMPONENT],
+    },
+  ],
+  [
+    'Select',
+    {
+      displayName: 'Select',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'Select',
+      ...Select[TOOLPAD_COMPONENT],
+    },
+  ],
+  [
+    'Paper',
+    {
+      displayName: 'Paper',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'Paper',
+      ...Paper[TOOLPAD_COMPONENT],
+    },
+  ],
+  [
+    'CustomLayout',
+    {
+      displayName: 'CustomLayout',
+      importedModule: '@mui/toolpad-components',
+      importedName: 'CustomLayout',
+      ...CustomLayout[TOOLPAD_COMPONENT],
+    },
+  ],
 ]);
 
 function createCodeComponent(

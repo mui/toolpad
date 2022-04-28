@@ -6,7 +6,7 @@ import ToolpadApp, {
 } from './ToolpadApp';
 import * as appDom from '../../src/appDom';
 import { VersionOrPreview } from '../../src/types';
-import { InstantiatedComponents } from '../../src/toolpadComponents/componentDefinition';
+import { InstantiatedComponents } from '../../src/toolpadComponents';
 
 export interface ToolpadBridge {
   updateDom(newDom: appDom.AppDom): void;

@@ -25,10 +25,7 @@ import * as appDom from '../../src/appDom';
 import { NodeId, VersionOrPreview } from '../../src/types';
 import { createProvidedContext } from '../../src/utils/react';
 import AppOverview from '../../src/components/AppOverview';
-import {
-  InstantiatedComponent,
-  InstantiatedComponents,
-} from '../../src/toolpadComponents/componentDefinition';
+import { InstantiatedComponent, InstantiatedComponents } from '../../src/toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import { evaluateBindable, fireEvent, JsRuntimeProvider } from '../coreRuntime';
 

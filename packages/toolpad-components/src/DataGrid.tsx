@@ -207,6 +207,9 @@ export default createComponent(DataGridComponent, {
     sx: {
       typeDef: { type: 'object' },
     },
+    rowIdField: {
+      typeDef: { type: 'string' },
+    },
     selection: {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',

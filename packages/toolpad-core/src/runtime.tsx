@@ -59,16 +59,18 @@ function PlaceholderWrapper(props: PlaceholderWrapperProps) {
 export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
   nodeId: string;
+  componentConfig: ComponentConfig<unknown>;
 }
 
 interface NodeRuntimeWrapperState {
   error: RuntimeError | null;
 }
 
-interface NodeFiberHostProps {
+export interface NodeFiberHostProps {
   children: React.ReactElement;
   [RUNTIME_PROP_NODE_ID]: string;
-  nodeError?: RuntimeError;
+  componentConfig: ComponentConfig<unknown>;
+  nodeError?: RuntimeError | null;
 }
 
 // We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
@@ -97,34 +99,31 @@ export class NodeRuntimeWrapper extends React.Component<
   }
 
   render() {
-    if (this.state.error) {
-      return (
+    return (
+      <NodeRuntimeContext.Provider value={this.props.nodeId}>
         <NodeFiberHost
           {...{
             [RUNTIME_PROP_NODE_ID]: this.props.nodeId,
             nodeError: this.state.error,
+            componentConfig: this.props.componentConfig,
           }}
         >
-          <span
-            style={{
-              display: 'inline-flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 8,
-              background: 'red',
-              color: 'white',
-            }}
-          >
-            <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
-          </span>
-        </NodeFiberHost>
-      );
-    }
-
-    return (
-      <NodeRuntimeContext.Provider value={this.props.nodeId}>
-        <NodeFiberHost {...{ [RUNTIME_PROP_NODE_ID]: this.props.nodeId }}>
-          {this.props.children}
+          {this.state.error ? (
+            <span
+              style={{
+                display: 'inline-flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                padding: 8,
+                background: 'red',
+                color: 'white',
+              }}
+            >
+              <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
+            </span>
+          ) : (
+            this.props.children
+          )}
         </NodeFiberHost>
       </NodeRuntimeContext.Provider>
     );

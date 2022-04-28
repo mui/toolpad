@@ -1,3 +1,4 @@
+import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import * as appDom from '../../src/appDom';
@@ -6,7 +7,7 @@ import {
   InstantiatedComponents,
   ToolpadComponentDefinition,
   ToolpadComponentDefinitions,
-} from '../../src/toolpadComponents/componentDefinition';
+} from '../../src/toolpadComponents';
 import { VersionOrPreview } from '../../src/types';
 import EditorCanvas from './EditorSandbox';
 import ToolpadApp from './ToolpadApp';
@@ -29,23 +30,33 @@ export interface RenderParams {
   components: ToolpadComponentDefinitions;
 }
 
-function instantiateComponent<P = {}>(def: ToolpadComponentDefinition): React.ComponentType {
+function instantiateComponent<P = {}>(def: ToolpadComponentDefinition): ToolpadComponent {
+  let InstantiatedComponent: ToolpadComponent;
+
   const LazyComponent = React.lazy(async () => {
     const mod = await import(def.importedModule);
-    return { default: mod[def.importedName] };
+    const ImportedComponent = mod[def.importedName];
+    // We update the argTypes after the component is loaded
+    if (ImportedComponent[TOOLPAD_COMPONENT]) {
+      InstantiatedComponent[TOOLPAD_COMPONENT] = ImportedComponent[TOOLPAD_COMPONENT];
+    }
+    return { default: ImportedComponent };
   });
 
-  const Component = React.forwardRef<any, P>((props, ref) => (
-    // TODO: fallback
-    <React.Suspense fallback={null}>
-      <LazyComponent ref={ref} {...props} />
-    </React.Suspense>
-  ));
-
-  Component.displayName = def.importedName;
-
+  // We start with a lazy component with default argTypes
   // @ts-expect-error This is an error in @types/react@^17
-  return Component;
+  InstantiatedComponent = createComponent(
+    React.forwardRef<any, P>((props, ref) => (
+      // TODO: fallback?
+      <React.Suspense fallback={null}>
+        <LazyComponent ref={ref} {...props} />
+      </React.Suspense>
+    )),
+  );
+
+  InstantiatedComponent.displayName = def.importedName;
+
+  return InstantiatedComponent;
 }
 
 function instantiateComponents(defs: ToolpadComponentDefinitions): InstantiatedComponents {

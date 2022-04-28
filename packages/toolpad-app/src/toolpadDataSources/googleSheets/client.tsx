@@ -22,7 +22,7 @@ import useDebounced from '../../utils/useDebounced';
 const dataSourceName = 'Google Sheets';
 
 function getInitialQueryValue(): GoogleSheetsApiQuery {
-  return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '', transformResponse: false };
+  return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '', headerRow: false };
 }
 
 function getInitialConnectionValue(): GoogleSheetsConnectionParams {
@@ -133,7 +133,7 @@ function QueryEditor({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange({
         ...value,
-        transformResponse: event.target?.checked,
+        headerRow: event.target?.checked,
       });
     },
     [onChange, value],
@@ -203,7 +203,7 @@ function QueryEditor({
         control={
           <Checkbox
             size="small"
-            checked={value?.transformResponse}
+            checked={value?.headerRow}
             onChange={handleTransformChange}
             inputProps={{ 'aria-label': 'controlled' }}
           />

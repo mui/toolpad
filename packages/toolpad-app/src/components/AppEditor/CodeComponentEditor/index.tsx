@@ -3,7 +3,6 @@ import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
-import { ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
 import { transform } from 'sucrase';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
@@ -68,17 +67,10 @@ interface CodeComponentEditorContentProps {
   codeComponentNode: appDom.CodeComponentNode;
 }
 
-declare global {
-  interface Window {
-    __TOOLPAD_EDITOR_UPDATE_COMPONENT_CONFIG__?: React.Dispatch<React.SetStateAction<any>>;
-  }
-}
-
 function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
 
   const [input, setInput] = React.useState(codeComponentNode.attributes.code.value);
-  const [argTypes, setArgTypes] = React.useState<ArgTypeDefinitions>({});
 
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
@@ -94,21 +86,8 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         'code',
         appDom.createConst(pretty),
       );
-      domApi.setNodeNamespacedProp(
-        codeComponentNode,
-        'attributes',
-        'argTypes',
-        appDom.createConst(argTypes),
-      );
     };
-  }, [domApi, codeComponentNode, input, argTypes]);
-
-  const handleConfigUpdate = React.useCallback(
-    (newConfig: ComponentConfig<unknown> | undefined) => {
-      setArgTypes(newConfig?.argTypes || {});
-    },
-    [],
-  );
+  }, [domApi, codeComponentNode, input]);
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const HandleEditorMount = React.useCallback(
@@ -160,16 +139,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     },
     [],
   );
-
-  const setupFrameWindow = React.useCallback(() => {
-    if (frameRef.current?.contentWindow) {
-      // eslint-disable-next-line no-underscore-dangle
-      frameRef.current.contentWindow.__TOOLPAD_EDITOR_UPDATE_COMPONENT_CONFIG__ =
-        handleConfigUpdate;
-    }
-  }, [handleConfigUpdate]);
-
-  React.useEffect(() => setupFrameWindow(), [setupFrameWindow]);
 
   React.useEffect(() => {
     const frameWindow = frameRef.current?.contentWindow;

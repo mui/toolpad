@@ -1,6 +1,6 @@
 import { styled, Typography } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinition, ArgTypeDefinitions } from '@mui/toolpad-core';
+import { ArgTypeDefinition, ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
@@ -30,15 +30,13 @@ function shouldRenderControl(propTypeDef: ArgTypeDefinition) {
 
 interface ComponentPropsEditorProps<P> {
   node: appDom.ElementNode<P>;
+  componentConfig: ComponentConfig<P>;
 }
 
-function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
-  const dom = useDom();
-  const definition = useToolpadComponent(dom, node.attributes.component.value);
-
+function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditorProps<P>) {
   return (
     <ComponentPropsEditorRoot>
-      {(Object.entries(definition.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
+      {(Object.entries(componentConfig.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
         ([propName, propTypeDef]) =>
           propTypeDef && shouldRenderControl(propTypeDef) ? (
             <div key={propName} className={classes.control}>
@@ -63,6 +61,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const dom = useDom();
   const { viewState } = usePageEditorState();
   const nodeError = viewState.nodes[node.id]?.error;
+  const componentConfig = viewState.nodes[node.id]?.componentConfig || { argTypes: {} };
 
   const component = useToolpadComponent(dom, node.attributes.component.value);
 
@@ -79,7 +78,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
           <Typography variant="subtitle1" sx={{ mt: 2 }}>
             Properties:
           </Typography>
-          <ComponentPropsEditor node={node} />
+          <ComponentPropsEditor componentConfig={componentConfig} node={node} />
         </React.Fragment>
       ) : null}
     </React.Fragment>

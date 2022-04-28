@@ -81,11 +81,6 @@ export default function CodeComponentSandbox() {
     );
 
     import(importUrl).then((mod) => {
-      // eslint-disable-next-line no-underscore-dangle
-      if (window.__TOOLPAD_EDITOR_UPDATE_COMPONENT_CONFIG__) {
-        // eslint-disable-next-line no-underscore-dangle
-        window.__TOOLPAD_EDITOR_UPDATE_COMPONENT_CONFIG__(mod.config);
-      }
       setComponent(() => mod.default);
       seterrorBoundaryKey((key) => key + 1);
     });

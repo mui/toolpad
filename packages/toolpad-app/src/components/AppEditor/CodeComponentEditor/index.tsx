@@ -235,20 +235,17 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 }
 
 interface CodeComponentEditorProps {
-  className?: string;
+  appId: string;
 }
 
-export default function CodeComponentEditor({ className }: CodeComponentEditorProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function CodeComponentEditor({ appId }: CodeComponentEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
-  return (
-    <Box className={className}>
-      {codeComponentNode ? (
-        <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
-      ) : (
-        <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
-      )}
-    </Box>
+  return codeComponentNode ? (
+    <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
+  ) : (
+    <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
   );
 }

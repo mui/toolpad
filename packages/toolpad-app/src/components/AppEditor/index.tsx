@@ -43,11 +43,13 @@ interface FileEditorProps {
 function FileEditor({ appId }: FileEditorProps) {
   return (
     <Routes>
-      <Route path="connections/:nodeId" element={<ConnectionEditor appId={appId} />} />
-      <Route path="apis/:nodeId" element={<ApiEditor appId={appId} />} />
-      <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
-      <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
-      <Route path="*" element={<AppEditorShell appId={appId} />} />
+      <Route element={<AppEditorShell appId={appId} />}>
+        <Route path="connections/:nodeId" element={<ConnectionEditor appId={appId} />} />
+        <Route path="apis/:nodeId" element={<ApiEditor appId={appId} />} />
+        <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
+        <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
+        <Route path="*" element={<AppEditorShell appId={appId} />} />
+      </Route>
     </Routes>
   );
 }

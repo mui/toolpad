@@ -15,14 +15,13 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import DialogForm from '../DialogForm';
 import { useDomLoader } from '../DomLoader';
 import ToolpadAppShell from '../ToolpadAppShell';
 import PagePanel from './PagePanel';
 import client from '../../api';
-import { NodeId } from '../../types';
 
 interface CreateReleaseDialogProps {
   appId: string;
@@ -105,20 +104,10 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
 
 export interface ToolpadAppShellProps {
   appId: string;
-  /**
-   * NodeId of the currently selected object. To be used to display active status in the hierarchy
-   */
-  activeNodeId?: NodeId;
   actions?: React.ReactNode;
-  children?: React.ReactNode;
 }
 
-export default function AppEditorShell({
-  appId,
-  children,
-  activeNodeId,
-  ...props
-}: ToolpadAppShellProps) {
+export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps) {
   const domLoader = useDomLoader();
 
   const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
@@ -156,7 +145,6 @@ export default function AppEditorShell({
       >
         <PagePanel
           appId={appId}
-          activeNodeId={activeNodeId}
           sx={{
             width: 250,
             borderRight: `1px solid 'divider'`,
@@ -169,7 +157,7 @@ export default function AppEditorShell({
             position: 'relative',
           }}
         >
-          {children}
+          <Outlet />
         </Box>
 
         <CreateReleaseDialog

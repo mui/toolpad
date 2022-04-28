@@ -13,7 +13,6 @@ import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 import { ConnectionSelect } from '../HierarchyExplorer/CreateApiNodeDialog';
 import JsonView from '../../JsonView';
-import AppEditorShell from '../AppEditorShell';
 
 interface ApiEditorContentProps<Q> {
   appId: string;
@@ -151,13 +150,9 @@ export default function ApiEditor({ appId }: ApiEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const apiNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'api');
-  return (
-    <AppEditorShell appId={appId} activeNodeId={apiNode?.id}>
-      {apiNode ? (
-        <ApiEditorContent key={nodeId} appId={appId} apiNode={apiNode} />
-      ) : (
-        <NotFoundEditor message={`Non-existing api "${nodeId}"`} />
-      )}
-    </AppEditorShell>
+  return apiNode ? (
+    <ApiEditorContent key={nodeId} appId={appId} apiNode={apiNode} />
+  ) : (
+    <NotFoundEditor message={`Non-existing api "${nodeId}"`} />
   );
 }

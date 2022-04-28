@@ -12,7 +12,6 @@ import getImportMap from '../../../getImportMap';
 import { tryFormat } from '../../../utils/prettier';
 import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from '../../../constants';
 import { escapeHtml } from '../../../utils/strings';
-import AppEditorShell from '../AppEditorShell';
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -239,17 +238,14 @@ interface CodeComponentEditorProps {
   appId: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function CodeComponentEditor({ appId }: CodeComponentEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
-  return (
-    <AppEditorShell appId={appId} activeNodeId={codeComponentNode?.id}>
-      {codeComponentNode ? (
-        <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
-      ) : (
-        <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
-      )}
-    </AppEditorShell>
+  return codeComponentNode ? (
+    <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
+  ) : (
+    <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
   );
 }

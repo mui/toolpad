@@ -11,7 +11,6 @@ import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 import client from '../../../api';
-import AppEditorShell from '../AppEditorShell';
 
 function getConnectionStatusIcon(status: ConnectionStatus) {
   return status.error ? <CrossIcon /> : <CheckIcon />;
@@ -161,13 +160,9 @@ export default function ConnectionEditor({ appId }: ConnectionProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
-  return (
-    <AppEditorShell appId={appId} activeNodeId={connectionNode?.id}>
-      {connectionNode ? (
-        <ConnectionEditorContent appId={appId} key={nodeId} connectionNode={connectionNode} />
-      ) : (
-        <NotFoundEditor message={`Non-existing Connection "${nodeId}"`} />
-      )}
-    </AppEditorShell>
+  return connectionNode ? (
+    <ConnectionEditorContent appId={appId} key={nodeId} connectionNode={connectionNode} />
+  ) : (
+    <NotFoundEditor message={`Non-existing Connection "${nodeId}"`} />
   );
 }

@@ -68,15 +68,10 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
 
 export interface HierarchyExplorerProps {
   appId: string;
-  activeNodeId?: NodeId;
   className?: string;
 }
 
-export default function HierarchyExplorer({
-  appId,
-  activeNodeId,
-  className,
-}: HierarchyExplorerProps) {
+export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
   const dom = useDom();
   const domApi = useDomApi();
 
@@ -93,7 +88,7 @@ export default function HierarchyExplorer({
     [':connections', ':pages', ':apis', ':codeComponents'],
   );
 
-  const selected: NodeId[] = activeNodeId ? [activeNodeId] : [];
+  const selected: NodeId[] = [];
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);

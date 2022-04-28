@@ -1,3 +1,4 @@
+import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import * as appDom from '../../src/appDom';
@@ -6,7 +7,7 @@ import {
   InstantiatedComponents,
   ToolpadComponentDefinition,
   ToolpadComponentDefinitions,
-} from '../../src/toolpadComponents/componentDefinition';
+} from '../../src/toolpadComponents';
 import { VersionOrPreview } from '../../src/types';
 import EditorCanvas from './EditorSandbox';
 import ToolpadApp from './ToolpadApp';
@@ -29,23 +30,36 @@ export interface RenderParams {
   components: ToolpadComponentDefinitions;
 }
 
-function instantiateComponent<P = {}>(def: ToolpadComponentDefinition): React.ComponentType {
+function instantiateComponent(def: ToolpadComponentDefinition): ToolpadComponent {
+  let InstantiatedComponent: ToolpadComponent;
+
   const LazyComponent = React.lazy(async () => {
     const mod = await import(def.importedModule);
-    return { default: mod[def.importedName] };
+    const ImportedComponent = mod[def.importedName];
+
+    // TODO: remove this warning and the '|| mod.config' further down
+    if (mod.config) {
+      console.error(
+        `You're using a code component with config export. This is deprecated. Use "createComponent" instead`,
+      );
+    }
+
+    const importedConfig = ImportedComponent[TOOLPAD_COMPONENT] || mod.config;
+
+    // We update the componentConfig after the component is loaded
+    if (importedConfig) {
+      InstantiatedComponent[TOOLPAD_COMPONENT] = importedConfig;
+    }
+
+    return { default: ImportedComponent };
   });
 
-  const Component = React.forwardRef<any, P>((props, ref) => (
-    // TODO: fallback
-    <React.Suspense fallback={null}>
-      <LazyComponent ref={ref} {...props} />
-    </React.Suspense>
-  ));
+  // We start with a lazy component with default argTypes
+  InstantiatedComponent = createComponent(LazyComponent);
 
-  Component.displayName = def.importedName;
+  InstantiatedComponent.displayName = def.importedName;
 
-  // @ts-expect-error This is an error in @types/react@^17
-  return Component;
+  return InstantiatedComponent;
 }
 
 function instantiateComponents(defs: ToolpadComponentDefinitions): InstantiatedComponents {

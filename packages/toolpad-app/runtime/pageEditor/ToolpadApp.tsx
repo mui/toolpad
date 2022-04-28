@@ -17,6 +17,9 @@ import {
   LiveBindings,
   useDataQuery,
   UseDataQuery,
+  ToolpadComponent,
+  createComponent,
+  TOOLPAD_COMPONENT,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
@@ -25,15 +28,12 @@ import * as appDom from '../../src/appDom';
 import { NodeId, VersionOrPreview } from '../../src/types';
 import { createProvidedContext } from '../../src/utils/react';
 import AppOverview from '../../src/components/AppOverview';
-import {
-  InstantiatedComponent,
-  InstantiatedComponents,
-} from '../../src/toolpadComponents/componentDefinition';
+import { InstantiatedComponent, InstantiatedComponents } from '../../src/toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import { evaluateBindable, fireEvent, JsRuntimeProvider } from '../coreRuntime';
 
 export interface RenderToolpadComponentParams {
-  Component: React.ComponentType;
+  Component: ToolpadComponent<any>;
   props: any;
   node: appDom.AppDomNode;
   argTypes: ArgTypeDefinitions;
@@ -111,7 +111,8 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
 
   const node = appDom.getNode(dom, nodeId, 'element');
   const { children = [] } = appDom.getChildNodes(dom, node);
-  const { Component, argTypes } = useElmToolpadComponent(node);
+  const { Component } = useElmToolpadComponent(node);
+  const { argTypes } = Component[TOOLPAD_COMPONENT];
 
   const liveBindings = useBindingsContext();
 
@@ -199,7 +200,8 @@ function useInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): C
     return Object.fromEntries(
       elements.flatMap((elm) => {
         if (appDom.isElement(elm)) {
-          const { argTypes, Component } = getElmComponent(components, elm);
+          const { Component } = getElmComponent(components, elm);
+          const { argTypes } = Component[TOOLPAD_COMPONENT];
           return [
             [
               elm.name,
@@ -240,6 +242,15 @@ function PageRoot({ children }: PageRootProps) {
     </Stack>
   );
 }
+
+const PageRootComponent = createComponent(PageRoot, {
+  argTypes: {
+    children: {
+      typeDef: { type: 'element' },
+      control: { type: 'slots' },
+    },
+  },
+});
 
 interface QueryStateNodeProps {
   node: appDom.QueryStateNode;
@@ -289,7 +300,8 @@ function useLiveBindings(
     descendants.forEach((descendant) => {
       if (appDom.isElement(descendant)) {
         if (descendant.props) {
-          const { argTypes } = getElmComponent(components, descendant);
+          const { Component } = getElmComponent(components, descendant);
+          const { argTypes } = Component[TOOLPAD_COMPONENT];
           const elmBindables = resolveBindables(descendant.props, currentPageState, argTypes);
           Object.entries(elmBindables).forEach(([propName, bindable]) => {
             bindings[`${descendant.id}.props.${propName}`] = bindable;
@@ -363,14 +375,9 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const renderedPageContent = renderToolpadComponent({
     node: page,
-    Component: PageRoot,
+    Component: PageRootComponent,
     props: { children: children.map((child) => <RenderedNode key={child.id} nodeId={child.id} />) },
-    argTypes: {
-      children: {
-        typeDef: { type: 'element' },
-        control: { type: 'slots' },
-      },
-    },
+    ...PageRootComponent[TOOLPAD_COMPONENT],
   });
 
   return (

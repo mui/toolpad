@@ -6,7 +6,6 @@ import {
   BindableAttrValues,
   ConstantAttrValues,
   SecretAttrValue,
-  ArgTypeDefinitions,
   PropValueType,
   PropValueTypes,
 } from '@mui/toolpad-core';
@@ -106,7 +105,6 @@ export interface CodeComponentNode extends AppDomNodeBase {
   readonly type: 'codeComponent';
   readonly attributes: {
     readonly code: ConstantAttrValue<string>;
-    readonly argTypes: ConstantAttrValue<ArgTypeDefinitions>;
   };
 }
 

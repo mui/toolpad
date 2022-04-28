@@ -50,10 +50,10 @@ export interface SlotsState {
 
 export interface NodeInfo {
   nodeId: NodeId;
-  error?: RuntimeError;
+  error?: RuntimeError | null;
   rect?: Rectangle;
   slots?: SlotsState;
-  component?: ComponentConfig<unknown>;
+  componentConfig?: ComponentConfig<unknown>;
   props: { [key: string]: unknown };
 }
 

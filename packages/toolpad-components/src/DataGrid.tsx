@@ -144,6 +144,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
         columns={columns}
+        getRowId={(row) => row.id ?? crypto.getRandomValues(new Uint16Array(1))[0]}
         onSelectionModelChange={(ids) =>
           onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null)
         }

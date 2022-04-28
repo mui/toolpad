@@ -97,7 +97,7 @@ function ConnectionEditorContent<P>({
   }, [connectionNode, connectionParams]);
 
   return (
-    <Box className={className} sx={{ px: 3 }}>
+    <Box className={className} sx={{ width: '100%', height: '100%', px: 3 }}>
       <Toolbar disableGutters>
         <Button
           onClick={() => {
@@ -154,21 +154,15 @@ function ConnectionEditorContent<P>({
 
 export interface ConnectionProps {
   appId: string;
-  className?: string;
 }
 
-export default function ConnectionEditor({ appId, className }: ConnectionProps) {
+export default function ConnectionEditor({ appId }: ConnectionProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
   return connectionNode ? (
-    <ConnectionEditorContent
-      appId={appId}
-      className={className}
-      key={nodeId}
-      connectionNode={connectionNode}
-    />
+    <ConnectionEditorContent appId={appId} key={nodeId} connectionNode={connectionNode} />
   ) : (
-    <NotFoundEditor className={className} message={`Non-existing Connection "${nodeId}"`} />
+    <NotFoundEditor message={`Non-existing Connection "${nodeId}"`} />
   );
 }

@@ -23,6 +23,9 @@ export default {
     sx: {
       typeDef: { type: 'object' },
     },
+    rowIdFieldProp: {
+      typeDef: { type: 'string' },
+    },
     selection: {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',

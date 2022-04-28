@@ -89,18 +89,18 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   );
 
   const location = useLocation();
-  const match = matchRoutes(
-    [
-      { path: `/app/:appId/editor/pages/:activeNodeId` },
-      { path: `/app/:appId/editor/apis/:activeNodeId` },
-      { path: `/app/:appId/editor/codeComponents/:activeNodeId` },
-      { path: `/app/:appId/editor/connections/:activeNodeId` },
-    ],
-    location,
-  );
-  const activeNodeId = match && match.length > 0 ? (match[0].params.activeNodeId as NodeId) : null;
+  const match =
+    matchRoutes(
+      [
+        { path: `/app/:appId/editor/pages/:activeNodeId` },
+        { path: `/app/:appId/editor/apis/:activeNodeId` },
+        { path: `/app/:appId/editor/codeComponents/:activeNodeId` },
+        { path: `/app/:appId/editor/connections/:activeNodeId` },
+      ],
+      location,
+    ) || [];
 
-  const selected: NodeId[] = activeNodeId ? [activeNodeId] : [];
+  const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);

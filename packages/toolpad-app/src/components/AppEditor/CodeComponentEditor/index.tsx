@@ -63,6 +63,25 @@ function renderSandboxHtml() {
   `;
 }
 
+interface ShortCut {
+  code: string;
+  metaKey?: boolean;
+}
+
+function useShortcut({ code, metaKey = false }: ShortCut, handler: () => void) {
+  React.useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.code === code && event.metaKey === metaKey) {
+        handler();
+        event.preventDefault();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeydown);
+    return () => document.removeEventListener('keydown', handleKeydown);
+  }, [code, metaKey, handler]);
+}
+
 interface CodeComponentEditorContentProps {
   codeComponentNode: appDom.CodeComponentNode;
 }
@@ -70,24 +89,28 @@ interface CodeComponentEditorContentProps {
 function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
 
-  const [input, setInput] = React.useState(codeComponentNode.attributes.code.value);
+  const [input, setInput] = React.useState<string>(codeComponentNode.attributes.code.value);
 
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
-  const updateDomActionRef = React.useRef(() => {});
+  const handleSave = React.useCallback(() => {
+    const pretty = tryFormat(input);
+    setInput(pretty);
+    domApi.setNodeNamespacedProp(
+      codeComponentNode,
+      'attributes',
+      'code',
+      appDom.createConst(pretty),
+    );
+  }, [codeComponentNode, domApi, input]);
 
-  React.useEffect(() => {
-    updateDomActionRef.current = () => {
-      const pretty = tryFormat(input);
-      setInput(pretty);
-      domApi.setNodeNamespacedProp(
-        codeComponentNode,
-        'attributes',
-        'code',
-        appDom.createConst(pretty),
-      );
-    };
-  }, [domApi, codeComponentNode, input]);
+  useShortcut(
+    {
+      code: 'KeyS',
+      metaKey: true,
+    },
+    handleSave,
+  );
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const HandleEditorMount = React.useCallback(
@@ -115,12 +138,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: false,
         noSyntaxValidation: false,
-      });
-
-      // The types for `monaco.KeyCode` seem to be messed up
-      // eslint-disable-next-line no-bitwise
-      editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => {
-        updateDomActionRef.current();
       });
 
       fetch('/typings.json')
@@ -177,10 +194,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   return (
     <Stack sx={{ height: '100%' }}>
       <Toolbar>
-        <Button
-          disabled={codeComponentNode.attributes.code.value === input}
-          onClick={() => updateDomActionRef.current()}
-        >
+        <Button disabled={codeComponentNode.attributes.code.value === input} onClick={handleSave}>
           Update
         </Button>
       </Toolbar>

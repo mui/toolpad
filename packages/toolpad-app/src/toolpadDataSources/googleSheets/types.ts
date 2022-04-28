@@ -31,6 +31,11 @@ export type GoogleSheetsApiQuery = {
    * The sheet to request.
    */
   sheetName: GoogleSheetProperties['title'];
+  /**
+   * Whether to transform the response assuming
+   * the first row to be column headers
+   */
+  transformResponse: boolean;
 };
 
 export enum GoogleSheetsPrivateQueryType {

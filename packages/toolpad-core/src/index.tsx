@@ -1,4 +1,5 @@
-export * from './types';
+import { TOOLPAD_COMPONENT } from './constants.js';
+import { ComponentConfig, ToolpadComponent } from './types';
 
 export type { PlaceholderProps, SlotsProps, NodeRuntime } from './runtime';
 export { Placeholder, Slots, useNode } from './runtime';
@@ -11,3 +12,14 @@ export * from './useDataQuery.js';
 export { default as useUrlQueryState } from './useUrlQueryState.js';
 
 export * from './constants.js';
+
+export function createComponent<P>(
+  Component: React.ComponentType<P>,
+  config?: ComponentConfig<P>,
+): ToolpadComponent<P> {
+  return Object.assign(Component, {
+    [TOOLPAD_COMPONENT]: config || { argTypes: {} },
+  });
+}
+
+export * from './types';

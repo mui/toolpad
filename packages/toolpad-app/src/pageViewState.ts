@@ -1,12 +1,6 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
-import {
-  RUNTIME_PROP_NODE_ID,
-  RUNTIME_PROP_SLOTS,
-  SlotType,
-  RuntimeError,
-  ComponentConfig,
-  LiveBinding,
-} from '@mui/toolpad-core';
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType, LiveBinding } from '@mui/toolpad-core';
+import { NodeFiberHostProps } from '@mui/toolpad-core/runtime';
 import { NodeId, FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
 
@@ -21,21 +15,16 @@ function getNodeViewInfo(
   viewElm: Element,
   elm: Element,
   nodeId: NodeId,
+  fiberHostProps: NodeFiberHostProps,
 ): NodeInfo | null {
   if (nodeId) {
     const rect = getRelativeOuterRect(viewElm, elm);
-    const error = fiber.memoizedProps?.nodeError as RuntimeError | undefined;
-    // We get the props from the child fiber because the current fiber is for the wrapper element
-    // eslint-disable-next-line no-underscore-dangle
-    const component: ComponentConfig<unknown> | undefined = (fiber.child?.elementType as any)
-      ?.__config;
-
     const props = fiber.child?.memoizedProps ?? {};
 
     return {
       nodeId,
-      error,
-      component,
+      error: fiberHostProps.nodeError,
+      componentConfig: fiberHostProps.componentConfig,
       rect,
       slots: {},
       props,
@@ -81,7 +70,9 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
         const nodeIdPropValue = fiber.memoizedProps[RUNTIME_PROP_NODE_ID] as string | undefined;
 
         if (nodeIdPropValue) {
-          const nodeId: NodeId = nodeIdPropValue as NodeId;
+          const fiberHostProps = fiber.memoizedProps as unknown as NodeFiberHostProps;
+
+          const nodeId = fiberHostProps[RUNTIME_PROP_NODE_ID] as NodeId;
           if (nodes[nodeId]) {
             // We can get multiple fibers with the [RUNTIME_PROP_NODE_ID] if the component
             // spreads its props. Let's assume the first we encounter is the one wrapped by
@@ -92,7 +83,7 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
           const elm = devtoolsHook.renderers.get(rendererId)?.findHostInstanceByFiber(fiber);
           if (elm) {
             nodeElms.set(nodeId, elm);
-            const info = getNodeViewInfo(fiber, rootElm, elm, nodeId);
+            const info = getNodeViewInfo(fiber, rootElm, elm, nodeId, fiberHostProps);
             if (info) {
               nodes[nodeId] = info;
               Object.entries(info.props).forEach(([key, value]) => {

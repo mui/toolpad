@@ -17,6 +17,9 @@ import {
   LiveBindings,
   useDataQuery,
   UseDataQuery,
+  ToolpadComponent,
+  createComponent,
+  TOOLPAD_COMPONENT,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
@@ -30,7 +33,7 @@ import AppThemeProvider from './AppThemeProvider';
 import { evaluateBindable, fireEvent, JsRuntimeProvider } from '../coreRuntime';
 
 export interface RenderToolpadComponentParams {
-  Component: React.ComponentType;
+  Component: ToolpadComponent<any>;
   props: any;
   node: appDom.AppDomNode;
   argTypes: ArgTypeDefinitions;
@@ -238,6 +241,15 @@ function PageRoot({ children }: PageRootProps) {
   );
 }
 
+const PageRootComponent = createComponent(PageRoot, {
+  argTypes: {
+    children: {
+      typeDef: { type: 'element' },
+      control: { type: 'slots' },
+    },
+  },
+});
+
 interface QueryStateNodeProps {
   node: appDom.QueryStateNode;
 }
@@ -360,14 +372,9 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const renderedPageContent = renderToolpadComponent({
     node: page,
-    Component: PageRoot,
+    Component: PageRootComponent,
     props: { children: children.map((child) => <RenderedNode key={child.id} nodeId={child.id} />) },
-    argTypes: {
-      children: {
-        typeDef: { type: 'element' },
-        control: { type: 'slots' },
-      },
-    },
+    ...PageRootComponent[TOOLPAD_COMPONENT],
   });
 
   return (

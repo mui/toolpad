@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as runtime from '@mui/toolpad-core/runtime';
+import { TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import ToolpadApp, {
   RenderToolpadComponentParams,
   RenderToolpadComponentProvider,
@@ -38,7 +39,7 @@ function renderToolpadComponent({
     }
   }
   return (
-    <runtime.NodeRuntimeWrapper nodeId={node.id}>
+    <runtime.NodeRuntimeWrapper nodeId={node.id} componentConfig={Component[TOOLPAD_COMPONENT]}>
       <Component {...wrappedProps} />
     </runtime.NodeRuntimeWrapper>
   );

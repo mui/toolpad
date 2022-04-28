@@ -11,7 +11,7 @@ import {
   Paper,
   CustomLayout,
 } from '@mui/toolpad-components';
-import { ArgTypeDefinitions, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
+import { ArgTypeDefinitions, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 
@@ -26,7 +26,7 @@ export interface ToolpadComponentDefinition {
 
 export type ToolpadComponentDefinitions = Record<string, ToolpadComponentDefinition | undefined>;
 export interface InstantiatedComponent extends ToolpadComponentDefinition {
-  Component: React.ComponentType<any>;
+  Component: ToolpadComponent<any>;
 }
 export type InstantiatedComponents = Record<string, InstantiatedComponent | undefined>;
 

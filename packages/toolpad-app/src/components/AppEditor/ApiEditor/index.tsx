@@ -13,6 +13,7 @@ import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 import { ConnectionSelect } from '../HierarchyExplorer/CreateApiNodeDialog';
 import JsonView from '../../JsonView';
+import AppEditorShell from '../AppEditorShell';
 
 interface ApiEditorContentProps<Q> {
   appId: string;
@@ -75,7 +76,7 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
   const previewIsInvalid: boolean = !connection && !previewQuery.isError;
 
   return (
-    <Box sx={{ position: 'relative', flex: 1 }}>
+    <Box sx={{ width: '100%', height: '100%' }}>
       <SplitPane
         split="horizontal"
         allowResize
@@ -144,16 +145,19 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
 
 interface ApiEditorProps {
   appId: string;
-  className?: string;
 }
 
-export default function ApiEditor({ appId, className }: ApiEditorProps) {
+export default function ApiEditor({ appId }: ApiEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const apiNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'api');
-  return apiNode ? (
-    <ApiEditorContent className={className} key={nodeId} appId={appId} apiNode={apiNode} />
-  ) : (
-    <NotFoundEditor className={className} message={`Non-existing api "${nodeId}"`} />
+  return (
+    <AppEditorShell appId={appId}>
+      {apiNode ? (
+        <ApiEditorContent key={nodeId} appId={appId} apiNode={apiNode} />
+      ) : (
+        <NotFoundEditor message={`Non-existing api "${nodeId}"`} />
+      )}
+    </AppEditorShell>
   );
 }

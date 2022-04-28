@@ -12,6 +12,7 @@ import getImportMap from '../../../getImportMap';
 import { tryFormat } from '../../../utils/prettier';
 import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from '../../../constants';
 import { escapeHtml } from '../../../utils/strings';
+import AppEditorShell from '../AppEditorShell';
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -235,20 +236,20 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 }
 
 interface CodeComponentEditorProps {
-  className?: string;
+  appId: string;
 }
 
-export default function CodeComponentEditor({ className }: CodeComponentEditorProps) {
+export default function CodeComponentEditor({ appId }: CodeComponentEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
   return (
-    <Box className={className}>
+    <AppEditorShell appId={appId}>
       {codeComponentNode ? (
         <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
       ) : (
         <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
       )}
-    </Box>
+    </AppEditorShell>
   );
 }

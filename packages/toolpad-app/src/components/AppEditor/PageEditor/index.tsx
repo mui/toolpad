@@ -9,6 +9,7 @@ import { useDom } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
+import AppEditorShell from '../AppEditorShell';
 
 const classes = {
   componentPanel: 'Toolpad_ComponentPanel',
@@ -16,6 +17,8 @@ const classes = {
 };
 
 const PageEditorRoot = styled('div')(({ theme }) => ({
+  width: '100%',
+  height: '100%',
   display: 'flex',
   flexDirection: 'row',
   overflow: 'hidden',
@@ -30,22 +33,25 @@ const PageEditorRoot = styled('div')(({ theme }) => ({
 
 interface PageEditorProps {
   appId: string;
-  className?: string;
 }
 
-export default function PageEditor({ appId, className }: PageEditorProps) {
+export default function PageEditor({ appId }: PageEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
-  return pageNode ? (
-    <PageEditorProvider key={nodeId} appId={appId} nodeId={nodeId as NodeId}>
-      <PageEditorRoot className={className}>
-        <ComponentCatalog />
-        <RenderPanel className={classes.renderPanel} />
-        <ComponentPanel className={classes.componentPanel} />
-      </PageEditorRoot>
-    </PageEditorProvider>
-  ) : (
-    <NotFoundEditor className={className} message={`Non-existing Page "${nodeId}"`} />
+  return (
+    <AppEditorShell appId={appId}>
+      {pageNode ? (
+        <PageEditorProvider key={nodeId} appId={appId} nodeId={nodeId as NodeId}>
+          <PageEditorRoot>
+            <ComponentCatalog />
+            <RenderPanel className={classes.renderPanel} />
+            <ComponentPanel className={classes.componentPanel} />
+          </PageEditorRoot>
+        </PageEditorProvider>
+      ) : (
+        <NotFoundEditor message={`Non-existing Page "${nodeId}"`} />
+      )}
+    </AppEditorShell>
   );
 }

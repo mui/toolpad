@@ -18,6 +18,7 @@ const ToolpadShellRoot = styled('div')({
 const ViewPort = styled('div')({
   flex: 1,
   overflow: 'auto',
+  position: 'relative',
 });
 
 export interface HeaderProps {

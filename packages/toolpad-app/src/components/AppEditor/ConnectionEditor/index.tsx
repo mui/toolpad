@@ -11,6 +11,7 @@ import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 import client from '../../../api';
+import AppEditorShell from '../AppEditorShell';
 
 function getConnectionStatusIcon(status: ConnectionStatus) {
   return status.error ? <CrossIcon /> : <CheckIcon />;
@@ -97,7 +98,7 @@ function ConnectionEditorContent<P>({
   }, [connectionNode, connectionParams]);
 
   return (
-    <Box className={className} sx={{ px: 3 }}>
+    <Box className={className} sx={{ width: '100%', height: '100%', px: 3 }}>
       <Toolbar disableGutters>
         <Button
           onClick={() => {
@@ -154,21 +155,19 @@ function ConnectionEditorContent<P>({
 
 export interface ConnectionProps {
   appId: string;
-  className?: string;
 }
 
-export default function ConnectionEditor({ appId, className }: ConnectionProps) {
+export default function ConnectionEditor({ appId }: ConnectionProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
-  return connectionNode ? (
-    <ConnectionEditorContent
-      appId={appId}
-      className={className}
-      key={nodeId}
-      connectionNode={connectionNode}
-    />
-  ) : (
-    <NotFoundEditor className={className} message={`Non-existing Connection "${nodeId}"`} />
+  return (
+    <AppEditorShell appId={appId}>
+      {connectionNode ? (
+        <ConnectionEditorContent appId={appId} key={nodeId} connectionNode={connectionNode} />
+      ) : (
+        <NotFoundEditor message={`Non-existing Connection "${nodeId}"`} />
+      )}
+    </AppEditorShell>
   );
 }

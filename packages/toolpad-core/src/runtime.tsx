@@ -220,15 +220,6 @@ export function Slots({ prop, children }: SlotsProps) {
   );
 }
 
-export async function importCodeComponent<P>(
-  module: Promise<{ default: React.FC<P> | React.Component<P>; config?: ComponentConfig<P> }>,
-): Promise<React.FC<P> | React.Component<P>> {
-  const { default: Component, config } = await module;
-  // eslint-disable-next-line no-underscore-dangle
-  (Component as any).__config = config;
-  return Component;
-}
-
 let iframe: HTMLIFrameElement;
 function evalCode(code: string, globalScope: Record<string, unknown>) {
   if (!iframe) {

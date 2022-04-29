@@ -19,6 +19,7 @@ function NavigateToReleaseAction({ appId, version, pageNodeId }: NavigateToRelea
   return (
     <GridActionsCellItem
       icon={<OpenInNewIcon />}
+      // @ts-expect-error https://github.com/mui/mui-x/issues/4654
       component="a"
       href={`/app/${appId}/${version}/pages/${pageNodeId}`}
       target="_blank"

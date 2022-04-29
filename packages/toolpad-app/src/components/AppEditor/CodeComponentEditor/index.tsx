@@ -11,6 +11,7 @@ import getImportMap from '../../../getImportMap';
 import { tryFormat } from '../../../utils/prettier';
 import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from '../../../constants';
 import { escapeHtml } from '../../../utils/strings';
+import useShortcut from '../../../utils/useShortcut';
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -61,25 +62,6 @@ function renderSandboxHtml() {
       </body>
     </html>
   `;
-}
-
-interface ShortCut {
-  code: string;
-  metaKey?: boolean;
-}
-
-function useShortcut({ code, metaKey = false }: ShortCut, handler: () => void) {
-  React.useEffect(() => {
-    const handleKeydown = (event: KeyboardEvent) => {
-      if (event.code === code && event.metaKey === metaKey) {
-        handler();
-        event.preventDefault();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeydown);
-    return () => document.removeEventListener('keydown', handleKeydown);
-  }, [code, metaKey, handler]);
 }
 
 interface CodeComponentEditorContentProps {

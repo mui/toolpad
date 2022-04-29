@@ -14,6 +14,7 @@ import NotFoundEditor from '../NotFoundEditor';
 import { ConnectionSelect } from '../HierarchyExplorer/CreateApiNodeDialog';
 import JsonView from '../../JsonView';
 import { usePrompt } from '../../../utils/router';
+import useShortcut from '../../../utils/useShortcut';
 
 interface ApiEditorContentProps<Q> {
   appId: string;
@@ -67,6 +68,24 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
     [apiNode, domApi],
   );
 
+  const handleSave = React.useCallback(() => {
+    (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
+      if (typeof propName !== 'string' || !apiQuery[propName]) {
+        return;
+      }
+      domApi.setNodeNamespacedProp(apiNode, 'attributes', 'query', appDom.createConst(apiQuery));
+    });
+    savedQuery.current = apiQuery;
+  }, [apiNode, apiQuery, domApi]);
+
+  useShortcut(
+    {
+      code: 'KeyS',
+      metaKey: true,
+    },
+    handleSave,
+  );
+
   const allChangesAreCommitted = savedQuery.current === apiQuery;
 
   usePrompt(
@@ -104,23 +123,7 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
             />
           </Stack>
           <Toolbar disableGutters>
-            <Button
-              onClick={() => {
-                (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
-                  if (typeof propName !== 'string' || !apiQuery[propName]) {
-                    return;
-                  }
-                  domApi.setNodeNamespacedProp(
-                    apiNode,
-                    'attributes',
-                    'query',
-                    appDom.createConst(apiQuery),
-                  );
-                });
-                savedQuery.current = apiQuery;
-              }}
-              disabled={allChangesAreCommitted}
-            >
+            <Button onClick={handleSave} disabled={allChangesAreCommitted}>
               Update
             </Button>
           </Toolbar>

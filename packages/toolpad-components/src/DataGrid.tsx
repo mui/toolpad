@@ -11,6 +11,7 @@ import {
 import * as React from 'react';
 import { useNode, UseDataQuery, createComponent } from '@mui/toolpad-core';
 import { debounce } from '@mui/material';
+import useDebounced from './utils/useDebounced';
 
 function inferColumnType(value: unknown): string | undefined {
   if (value instanceof Date) {
@@ -132,7 +133,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const hasColumnsDefined = columnsProp && columnsProp.length > 0;
 
   const idFieldInitRef = React.useRef(false);
-  const hasIdFieldDefined = Boolean(rowIdFieldProp);
 
   React.useEffect(() => {
     if (!nodeRuntime || hasColumnsDefined || rows.length <= 0 || columnsInitRef.current) {
@@ -151,7 +151,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
       return;
     }
 
-    if (hasIdFieldDefined || Boolean(rows?.[0]?.id)) {
+    if (rowIdFieldProp || Boolean(rows?.[0]?.id)) {
       idFieldInitRef.current = true;
       return;
     }
@@ -160,7 +160,18 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     nodeRuntime.setProp('rows', mappedRows);
 
     idFieldInitRef.current = true;
-  }, [hasIdFieldDefined, rows, nodeRuntime]);
+  }, [rowIdFieldProp, rows, nodeRuntime]);
+
+  const debouncedRowIdFieldProp = useDebounced(rowIdFieldProp, 300);
+
+  const getRowId = React.useCallback(
+    (row: any) => {
+      return debouncedRowIdFieldProp && row[debouncedRowIdFieldProp]
+        ? row[debouncedRowIdFieldProp]
+        : row.id;
+    },
+    [debouncedRowIdFieldProp],
+  );
 
   const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
 
@@ -172,7 +183,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onColumnOrderChange={handleColumnOrderChange}
         rows={idFieldInitRef.current ? rows : []}
         columns={columns}
-        getRowId={(row) => (hasIdFieldDefined ? row.rowIdFieldProp : row.id)}
+        key={debouncedRowIdFieldProp}
+        getRowId={(row) => getRowId(row)}
         onSelectionModelChange={(ids) =>
           onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null)
         }
@@ -198,9 +210,6 @@ export default createComponent(DataGridComponent, {
       control: { type: 'GridColumns' },
       memoize: true,
     },
-    rowIdField: {
-      typeDef: { type: 'string' },
-    },
     dataQuery: {
       typeDef: { type: 'object', schema: '/schemas/DataQuery.json' },
     },
@@ -213,6 +222,10 @@ export default createComponent(DataGridComponent, {
     selection: {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',
+    },
+    rowIdField: {
+      typeDef: { type: 'string' },
+      label: 'Id field',
     },
   },
 });

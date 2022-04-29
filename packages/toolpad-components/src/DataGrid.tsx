@@ -123,7 +123,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const columnsInitRef = React.useRef(false);
   const hasColumnsDefined = columnsProp && columnsProp.length > 0;
-
   React.useEffect(() => {
     if (!nodeRuntime || hasColumnsDefined || rows.length <= 0 || columnsInitRef.current) {
       return;

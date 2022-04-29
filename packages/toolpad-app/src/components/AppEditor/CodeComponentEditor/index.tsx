@@ -191,6 +191,18 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     }
   }, [input]);
 
+  React.useEffect(() => {
+    // Workaround for a problem in monaco editor
+    // See https://github.com/suren-atoyan/monaco-react/issues/365
+    // We'll just update the value programmatically for now, we can revert back to using value={input}
+    // when that issue is resolved
+    const state = editorRef.current?.saveViewState();
+    editorRef.current?.setValue(input);
+    if (state) {
+      editorRef.current?.restoreViewState(state);
+    }
+  }, [input]);
+
   return (
     <Stack sx={{ height: '100%' }}>
       <Toolbar>
@@ -202,7 +214,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         <Box flex={1}>
           <Editor
             height="100%"
-            value={input}
+            defaultValue={input}
             onChange={(newValue) => setInput(newValue || '')}
             path="./component.tsx"
             language="typescript"

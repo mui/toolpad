@@ -13,7 +13,6 @@ const LIBS = [
   { name: 'csstype' },
   { name: 'react-transition-group' },
   { name: '@mui/base' },
-  { name: '@mui/styles' },
   { name: '@mui/types' },
   { name: '@mui/system' },
   { name: '@mui/utils' },

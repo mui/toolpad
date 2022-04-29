@@ -31,7 +31,7 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/x-data-grid-pro": "^5.7.0",
+    "@mui/x-data-grid-pro": "^5.10.0",
     "quickjs-emscripten": "^0.20.0",
     "react": "^18.0.0",
     "react-query": "^3.34.19"

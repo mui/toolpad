@@ -78,13 +78,7 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
     savedQuery.current = apiQuery;
   }, [apiNode, apiQuery, domApi]);
 
-  useShortcut(
-    {
-      code: 'KeyS',
-      metaKey: true,
-    },
-    handleSave,
-  );
+  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
   const allChangesAreCommitted = savedQuery.current === apiQuery;
 

@@ -86,13 +86,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     );
   }, [codeComponentNode, domApi, input]);
 
-  useShortcut(
-    {
-      code: 'KeyS',
-      metaKey: true,
-    },
-    handleSave,
-  );
+  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const HandleEditorMount = React.useCallback(

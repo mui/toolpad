@@ -24,6 +24,7 @@ import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { Serializable } from '../../server/evalExpression';
+import useShortcut from '../../utils/useShortcut';
 
 interface JsExpressionBindingEditorProps<V>
   extends WithControlledProp<BindableAttrValue<V> | null> {
@@ -169,6 +170,8 @@ export function BindingEditor<V>({
     onChange(newValue);
     handleClose();
   }, [onChange, input, handleClose]);
+
+  useShortcut({ code: 'KeyS', metaKey: true }, handleCommit);
 
   const bindingButton = (
     <IconButton

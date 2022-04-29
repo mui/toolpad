@@ -54,7 +54,6 @@ const EMPTY_ROWS: GridRowsProp = [];
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'> {
   rows?: GridRowsProp;
   columns?: GridColumns;
-  rowIdField?: string;
   dataQuery?: UseDataQuery;
   selection: any;
   onSelectionChange: (newSelection: any) => void;

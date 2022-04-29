@@ -6,6 +6,7 @@ import { NodeId } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
 import useDebounced from '../utils/useDebounced';
+import useShortcut from '../utils/useShortcut';
 
 export type DomAction =
   | {
@@ -298,24 +299,33 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     };
   }, [appId]);
 
-  const debouncedDom = useDebounced(state.dom, 1000);
-
-  React.useEffect(() => {
-    if (!debouncedDom) {
+  const lastSavedDom = React.useRef<appDom.AppDom | null>(null);
+  const handleSave = React.useCallback(() => {
+    if (!state.dom || lastSavedDom.current === state.dom) {
       return;
     }
 
+    lastSavedDom.current = state.dom;
     dispatch({ type: 'DOM_SAVING' });
 
     client.mutation
-      .saveDom(appId, debouncedDom)
+      .saveDom(appId, state.dom)
       .then(() => {
         dispatch({ type: 'DOM_SAVED' });
       })
       .catch((err) => {
         dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
       });
-  }, [appId, debouncedDom]);
+  }, [appId, state.dom]);
+
+  const debouncedDom = useDebounced(state.dom, 1000);
+  const lastSavedDebouncedDom = React.useRef<appDom.AppDom | null>(null);
+  React.useEffect(() => {
+    if (debouncedDom !== lastSavedDebouncedDom.current) {
+      handleSave();
+      lastSavedDebouncedDom.current = debouncedDom;
+    }
+  }, [debouncedDom, handleSave]);
 
   React.useEffect(() => {
     if (state.unsavedChanges <= 0) {
@@ -330,6 +340,8 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [state.unsavedChanges]);
+
+  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
   return (
     <DomLoaderContext.Provider value={state}>

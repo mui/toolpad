@@ -11,6 +11,7 @@ import getImportMap from '../../../getImportMap';
 import { tryFormat } from '../../../utils/prettier';
 import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from '../../../constants';
 import { escapeHtml } from '../../../utils/strings';
+import useShortcut from '../../../utils/useShortcut';
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -70,24 +71,22 @@ interface CodeComponentEditorContentProps {
 function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
 
-  const [input, setInput] = React.useState(codeComponentNode.attributes.code.value);
+  const [input, setInput] = React.useState<string>(codeComponentNode.attributes.code.value);
 
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
-  const updateDomActionRef = React.useRef(() => {});
+  const handleSave = React.useCallback(() => {
+    const pretty = tryFormat(input);
+    setInput(pretty);
+    domApi.setNodeNamespacedProp(
+      codeComponentNode,
+      'attributes',
+      'code',
+      appDom.createConst(pretty),
+    );
+  }, [codeComponentNode, domApi, input]);
 
-  React.useEffect(() => {
-    updateDomActionRef.current = () => {
-      const pretty = tryFormat(input);
-      setInput(pretty);
-      domApi.setNodeNamespacedProp(
-        codeComponentNode,
-        'attributes',
-        'code',
-        appDom.createConst(pretty),
-      );
-    };
-  }, [domApi, codeComponentNode, input]);
+  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const HandleEditorMount = React.useCallback(
@@ -115,12 +114,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: false,
         noSyntaxValidation: false,
-      });
-
-      // The types for `monaco.KeyCode` seem to be messed up
-      // eslint-disable-next-line no-bitwise
-      editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => {
-        updateDomActionRef.current();
       });
 
       fetch('/typings.json')
@@ -174,13 +167,22 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     }
   }, [input]);
 
+  React.useEffect(() => {
+    // Workaround for a problem in monaco editor
+    // See https://github.com/suren-atoyan/monaco-react/issues/365
+    // We'll just update the value programmatically for now, we can revert back to using value={input}
+    // when that issue is resolved
+    const state = editorRef.current?.saveViewState();
+    editorRef.current?.setValue(input);
+    if (state) {
+      editorRef.current?.restoreViewState(state);
+    }
+  }, [input]);
+
   return (
     <Stack sx={{ height: '100%' }}>
       <Toolbar>
-        <Button
-          disabled={codeComponentNode.attributes.code.value === input}
-          onClick={() => updateDomActionRef.current()}
-        >
+        <Button disabled={codeComponentNode.attributes.code.value === input} onClick={handleSave}>
           Update
         </Button>
       </Toolbar>
@@ -188,7 +190,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         <Box flex={1}>
           <Editor
             height="100%"
-            value={input}
+            defaultValue={input}
             onChange={(newValue) => setInput(newValue || '')}
             path="./component.tsx"
             language="typescript"

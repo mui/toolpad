@@ -2,9 +2,9 @@
 
 ## Setup Google Cloud
 
-Google Cloud Platform allows us to authorise third-party applications to access files (docs, sheets, photos, etc.) in our Google Drive. Below are the steps to create a Toolpad application that can be given permission to access your Google Drive folder using OAuth.
+Google Cloud Platform allows us to authorize third-party applications to access files (docs, sheets, photos, etc.) in our Google Drive. Below are the steps to create a Toolpad application that can be given permission to access your Google Drive folder using OAuth.
 
-You'll need to enable Google Login to connect Google Sheets. If you're an existing user, you can sign in to [Google Console](https://cloud.google.com/) or create a new account.
+You need to enable Google Login to connect Google Sheets. If you're an existing user, you can sign in to [Google Console](https://cloud.google.com/) or create a new account.
 
 1. After signing in to Google Console, create a New Project from the top bar.
 2. Now, you'll have to generate OAuth 2.0 Client IDs; you can do this by navigating to the APIs and Services - Credentials section.
@@ -20,7 +20,7 @@ You'll need to enable Google Login to connect Google Sheets. If you're an existi
 
    where YOUR_APP_URL is the URL Toolpad is hosted on
 
-6. Now add the following URIs under Authorised Redirect URIs:
+6. Now add the following URIs under Authorized Redirect URIs:
    ```bash
    https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback
    ```
@@ -33,10 +33,10 @@ Reference from Google: [https://developers.google.com/identity/sign-in/web/sign-
 From the App page;
 
 1. Click on Connections "+" → From the type dropdown choose Google Sheets as the data source → Click on "Create"
-2. Click on "Sign In To Google" → Authorise the application to fetch data from your Google Account
+2. Click on "Sign In To Google" → Authorize the application to fetch data from your Google Account
 3. Click on APIs "+" → Choose the connection you have recently made → Click on "Create"
 4. In the query editor, the spreadsheet input will show you the list of all available Google Sgitheets (your and the ones shared with you).
-5. Choose the sheet, cell range → Click on “Update” to save the API
+5. Choose the sheet, cell range → Click on "Update" to save the API
 
 You should now be able to use this API in any App page.
 

@@ -29,7 +29,6 @@ async function main() {
       '@mui/x-data-grid-pro',
       '@mui/material',
       '@mui/material/utils',
-      '@mui/material/styles',
       '@mui/material/colors',
       '@mui/lab',
       '@mui/icons-material/Error',

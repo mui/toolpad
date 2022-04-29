@@ -6,12 +6,7 @@ module.exports = {
   reactStrictMode: true,
   publicRuntimeConfig: sharedConfig,
 
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      // See https://github.com/prisma/prisma/issues/6564#issuecomment-853028373
-      config.externals.push('_http_common');
-    }
-
+  webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
       // We need these because quickjs-emscripten doesn't export pure browser compatible modules yet

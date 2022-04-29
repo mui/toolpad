@@ -36,7 +36,7 @@ From the App page;
 2. Click on "Sign In To Google" → Authorize the application to fetch data from your Google Account
 3. Click on APIs "+" → Choose the connection you have recently made → Click on "Create"
 4. In the query editor, the spreadsheet input will show you the list of all available Google Sgitheets (your and the ones shared with you).
-5. Choose the sheet, cell range → Click on “Update” to save the API
+5. Choose the sheet, cell range → Click on "Update" to save the API
 
 You should now be able to use this API in any App page.
 

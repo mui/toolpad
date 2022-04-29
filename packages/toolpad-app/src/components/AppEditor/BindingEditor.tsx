@@ -192,7 +192,7 @@ export function BindingEditor<V>({
       <Dialog onClose={handleClose} open={open} fullWidth scroll="body" maxWidth="lg">
         <DialogTitle>Bind a property</DialogTitle>
         <DialogContent>
-          <Stack direction="row" sx={{ height: 400 }}>
+          <Stack direction="row" sx={{ height: 400, gap: 2 }}>
             <Box sx={{ width: 200, display: 'flex', flexDirection: 'column', height: '100%' }}>
               <Typography sx={{ mb: 1 }} variant="subtitle2">
                 Scope

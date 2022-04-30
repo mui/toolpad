@@ -5,8 +5,8 @@ import * as appDom from '../appDom';
 import { NodeId } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
-import useDebounced from '../utils/useDebounced';
 import useShortcut from '../utils/useShortcut';
+import useDebouncedHandler from '../utils/useDebouncedHandler';
 
 export type DomAction =
   | {
@@ -318,14 +318,11 @@ export default function DomProvider({ appId, children }: DomContextProps) {
       });
   }, [appId, state.dom]);
 
-  const debouncedDom = useDebounced(state.dom, 1000);
-  const lastSavedDebouncedDom = React.useRef<appDom.AppDom | null>(null);
+  const debouncedhandleSave = useDebouncedHandler(handleSave, 1000);
+
   React.useEffect(() => {
-    if (debouncedDom !== lastSavedDebouncedDom.current) {
-      handleSave();
-      lastSavedDebouncedDom.current = debouncedDom;
-    }
-  }, [debouncedDom, handleSave]);
+    debouncedhandleSave();
+  }, [state.dom, debouncedhandleSave]);
 
   React.useEffect(() => {
     if (state.unsavedChanges <= 0) {

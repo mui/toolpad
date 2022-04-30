@@ -45,7 +45,6 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
           disabled={value.url && value.url.type !== 'const'}
         />
         <BindingEditor
-          server
           value={value.url}
           onChange={(url) => onChange({ ...value, url: url || appDom.createConst('') })}
           propType={{ type: 'string' }}

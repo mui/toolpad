@@ -131,7 +131,10 @@ export class NodeRuntimeWrapper extends React.Component<
 }
 
 export interface NodeRuntime<P> {
-  setProp: <K extends keyof P & string>(key: K, value: React.SetStateAction<P[K]>) => void;
+  updateAppDomConstProp: <K extends keyof P & string>(
+    key: K,
+    value: React.SetStateAction<P[K]>,
+  ) => void;
 }
 
 export function fireEvent(event: RuntimeEvent) {
@@ -158,7 +161,7 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
       return null;
     }
     return {
-      setProp: (prop, value) => {
+      updateAppDomConstProp: (prop, value) => {
         fireEvent({
           type: 'propUpdated',
           nodeId,

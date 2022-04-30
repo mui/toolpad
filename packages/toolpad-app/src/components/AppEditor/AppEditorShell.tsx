@@ -147,7 +147,8 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
           appId={appId}
           sx={{
             width: 250,
-            borderRight: `1px solid 'divider'`,
+            borderRight: 1,
+            borderColor: 'divider',
           }}
         />
         <Box

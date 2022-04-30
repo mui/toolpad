@@ -79,7 +79,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           return;
         }
 
-        nodeRuntime.setProp('columns', (columns) =>
+        nodeRuntime.updateAppDomConstProp('columns', (columns) =>
           columns?.map((column) =>
             column.field === params.colDef.field ? { ...column, width: params.width } : column,
           ),
@@ -96,7 +96,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           return;
         }
 
-        nodeRuntime.setProp('columns', (columns) => {
+        nodeRuntime.updateAppDomConstProp('columns', (columns) => {
           if (!columns) {
             return columns;
           }
@@ -129,7 +129,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
     const inferredColumns = inferColumns(rows);
 
-    nodeRuntime.setProp('columns', inferredColumns);
+    nodeRuntime.updateAppDomConstProp('columns', inferredColumns);
 
     columnsInitRef.current = true;
   }, [hasColumnsDefined, rows, nodeRuntime]);

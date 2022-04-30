@@ -1,42 +1,68 @@
 import * as React from 'react';
 
+interface Handler<P extends any[]> {
+  (...params: P): void;
+}
+
+interface DelayedInvocation<P extends any[]> {
+  startTime: number;
+  timeout: NodeJS.Timeout;
+  params: P;
+}
+
+function clear<P extends any[]>(
+  delayedInvocation: React.MutableRefObject<DelayedInvocation<P> | null>,
+) {
+  if (delayedInvocation.current) {
+    clearTimeout(delayedInvocation.current.timeout);
+    delayedInvocation.current = null;
+  }
+}
+
+function defer<P extends any[]>(fn: React.MutableRefObject<Handler<P>>, params: P, delay: number) {
+  const timeout = setTimeout(() => {
+    fn.current(...params);
+  }, delay);
+
+  return { startTime: Date.now(), timeout, params };
+}
+
 /**
  * Creates a debounced version of the handler that is passed. The invocation of [fn] is
  * delayed for [delay] milliseconds from the last invocation of the debounced function.
  */
 export default function useDebouncedHandler<P extends any[]>(
-  fn: (...params: P) => void,
+  fn: Handler<P>,
   delay: number,
-): (...params: P) => void {
+): Handler<P> {
   const fnRef = React.useRef(fn);
   React.useEffect(() => {
     fnRef.current = fn;
   }, [fn]);
 
-  const timeout = React.useRef<NodeJS.Timeout | null>(null);
+  const delayedInvocation = React.useRef<DelayedInvocation<P> | null>(null);
 
-  React.useEffect(
-    () => () => {
-      if (timeout.current) {
-        // TODO: Should this be optional? Someone might want to run the function, even after unmount.
-        clearTimeout(timeout.current);
-        timeout.current = null;
-      }
-    },
-    [],
-  );
+  // TODO: Should this be optional? Someone might want to run the function, even after unmount.
+  React.useEffect(() => () => clear(delayedInvocation), []);
+
+  React.useEffect(() => {
+    if (!delayedInvocation.current) {
+      return;
+    }
+
+    const { startTime, params } = delayedInvocation.current;
+
+    const elapsed = Date.now() - startTime;
+    const newDelay = Math.max(delay - elapsed, 0);
+
+    clear(delayedInvocation);
+    delayedInvocation.current = defer(fnRef, params, newDelay);
+  }, [delay]);
 
   return React.useCallback(
     (...params: P) => {
-      if (timeout.current) {
-        clearTimeout(timeout.current);
-        timeout.current = null;
-      }
-
-      timeout.current = setTimeout(() => {
-        fnRef.current(...params);
-        timeout.current = null;
-      }, delay);
+      clear(delayedInvocation);
+      delayedInvocation.current = defer(fnRef, params, delay);
     },
     [delay],
   );

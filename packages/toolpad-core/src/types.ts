@@ -185,3 +185,13 @@ export interface RuntimeError {
 }
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
+
+export type Serializable =
+  | undefined
+  | string
+  | number
+  | boolean
+  | null
+  | Serializable[]
+  | { [key: string]: Serializable }
+  | ((...args: Serializable[]) => Serializable);

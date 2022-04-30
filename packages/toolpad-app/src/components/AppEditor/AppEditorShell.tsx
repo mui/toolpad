@@ -146,8 +146,9 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
         <PagePanel
           appId={appId}
           sx={{
-            width: 250,
-            borderRight: `1px solid 'divider'`,
+            width: 251,
+            borderRight: 1,
+            borderColor: 'divider',
           }}
         />
         <Box

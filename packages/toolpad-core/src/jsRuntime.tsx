@@ -1,5 +1,7 @@
 import { getQuickJS, RuntimeOptions, QuickJSRuntime } from 'quickjs-emscripten';
 import * as React from 'react';
+import { ArgTypeDefinition, BindableAttrValue, LiveBinding, Serializable } from './types';
+import evalExpression from './evalExpression';
 
 const JsRuntimeContext = React.createContext<QuickJSRuntime | null>(null);
 
@@ -39,3 +41,36 @@ export function useJsRuntime(): QuickJSRuntime {
 
   return runtime;
 }
+
+export function evaluateBindable<V>(
+  jsRuntime: QuickJSRuntime,
+  bindable: BindableAttrValue<V> | null,
+  globalScope: Record<string, Serializable>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  argType?: ArgTypeDefinition,
+): LiveBinding {
+  const getValue = () => {
+    if (bindable?.type === 'jsExpression') {
+      if (argType?.typeDef.type === 'function') {
+        const expression = `(${bindable?.value})()`;
+        return () => evalExpression(jsRuntime, expression, globalScope);
+      }
+      return evalExpression(jsRuntime, bindable?.value, globalScope);
+    }
+
+    if (bindable?.type === 'const') {
+      return bindable?.value;
+    }
+
+    return undefined;
+  };
+
+  try {
+    const value = getValue();
+    return { value };
+  } catch (err) {
+    return { error: err as Error };
+  }
+}
+
+export type JsRuntime = QuickJSRuntime;

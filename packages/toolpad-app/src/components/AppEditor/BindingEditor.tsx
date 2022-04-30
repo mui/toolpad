@@ -16,14 +16,12 @@ import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { LiveBinding, PropValueType, BindableAttrValue } from '@mui/toolpad-core';
 import { evaluateBindable, JsRuntimeProvider, useJsRuntime } from '@mui/toolpad-core/runtime';
-import evaluateBindableServer from '../../server/evaluateBindable';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
-import { Serializable } from '../../server/evalExpression';
 
 interface JsExpressionBindingEditorProps<V>
   extends WithControlledProp<BindableAttrValue<V> | null> {
@@ -57,44 +55,14 @@ interface JsExpressionPreviewProps {
   globalScope: Record<string, unknown>;
 }
 
-function JsExpressionPreview({ input, globalScope }: JsExpressionPreviewProps) {
-  const previewValue: LiveBinding = React.useMemo(
-    () => evaluateBindable(input, globalScope),
-    [input, globalScope],
-  );
-
-  const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
-  const previewErrorDebounced = useDebounced(previewValue?.error, 500);
-  const previewError = previewValue?.error && previewErrorDebounced;
-
-  return (
-    <React.Fragment>
-      <Toolbar variant="dense" disableGutters>
-        <Typography color="error">{previewError?.message}</Typography>
-      </Toolbar>
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <JsonView src={lastGoodPreview?.value} />
-      </Box>
-    </React.Fragment>
-  );
-}
-
-interface JsExpressionPreviewProps {
-  input: BindableAttrValue<unknown> | null;
-  globalScope: Record<string, unknown>;
-}
-
-function JsExpressionPreviewServerContent({ input, globalScope }: JsExpressionPreviewProps) {
+function JsExpressionPreviewContent({ input, globalScope }: JsExpressionPreviewProps) {
   const jsRuntime = useJsRuntime();
 
-  const previewValue: LiveBinding = React.useMemo(() => {
-    const ctx = jsRuntime.newContext();
-    try {
-      return evaluateBindableServer(ctx, input, globalScope as Record<string, Serializable>);
-    } finally {
-      ctx.dispose();
-    }
-  }, [jsRuntime, input, globalScope]);
+  const previewValue: LiveBinding = React.useMemo(
+    // @ts-expect-error TODO: fix
+    () => evaluateBindable(jsRuntime, input, globalScope),
+    [jsRuntime, input, globalScope],
+  );
 
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
   const previewErrorDebounced = useDebounced(previewValue?.error, 500);
@@ -112,11 +80,11 @@ function JsExpressionPreviewServerContent({ input, globalScope }: JsExpressionPr
   );
 }
 
-function JsExpressionPreviewServer(props: JsExpressionPreviewProps) {
+function JsExpressionPreview(props: JsExpressionPreviewProps) {
   return (
     <React.Suspense fallback="loading...">
       <JsRuntimeProvider>
-        <JsExpressionPreviewServerContent {...props} />
+        <JsExpressionPreviewContent {...props} />
       </JsRuntimeProvider>
     </React.Suspense>
   );
@@ -124,17 +92,12 @@ function JsExpressionPreviewServer(props: JsExpressionPreviewProps) {
 
 export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   globalScope: Record<string, unknown>;
-  /**
-   * Uses the QuickJs runtime to evaluate bindings, just like on the server
-   */
-  server?: boolean;
   disabled?: boolean;
   propType: PropValueType;
 }
 
 export function BindingEditor<V>({
   globalScope,
-  server,
   disabled,
   propType,
   value,
@@ -215,11 +178,7 @@ export function BindingEditor<V>({
                 onChange={(newValue) => setInput(newValue)}
               />
 
-              {server ? (
-                <JsExpressionPreviewServer input={input} globalScope={globalScope} />
-              ) : (
-                <JsExpressionPreview input={input} globalScope={globalScope} />
-              )}
+              <JsExpressionPreview input={input} globalScope={globalScope} />
             </Box>
           </Stack>
         </DialogContent>

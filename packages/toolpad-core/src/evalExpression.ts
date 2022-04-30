@@ -1,13 +1,5 @@
-import { getQuickJS, QuickJSHandle, QuickJSContext } from 'quickjs-emscripten';
-
-export type Serializable =
-  | string
-  | number
-  | boolean
-  | null
-  | Serializable[]
-  | { [key: string]: Serializable }
-  | ((...args: Serializable[]) => Serializable);
+import { QuickJSHandle, QuickJSContext, QuickJSRuntime } from 'quickjs-emscripten';
+import { Serializable } from './types';
 
 function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
   switch (typeof json) {
@@ -46,6 +38,9 @@ function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
       });
       return result;
     }
+    case 'undefined': {
+      return ctx.undefined;
+    }
     default:
       throw new Error(`Invariant: invalid value: ${json}`);
   }
@@ -68,12 +63,12 @@ export function evalExpressionInContext(
   return resultValue;
 }
 
-export default async function evalExpression(
+export default function evalExpressionInRuntime(
+  runtime: QuickJSRuntime,
   expression: string,
   globalScope: Record<string, Serializable> = {},
 ) {
-  const QuickJS = await getQuickJS();
-  const ctx = QuickJS.newContext();
+  const ctx = runtime.newContext();
   try {
     return evalExpressionInContext(ctx, expression, globalScope);
   } finally {

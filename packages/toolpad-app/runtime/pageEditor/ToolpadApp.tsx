@@ -30,7 +30,13 @@ import { createProvidedContext } from '../../src/utils/react';
 import AppOverview from '../../src/components/AppOverview';
 import { InstantiatedComponent, InstantiatedComponents } from '../../src/toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
-import { evaluateBindable, fireEvent, JsRuntimeProvider } from '../coreRuntime';
+import {
+  fireEvent,
+  JsRuntimeProvider,
+  useJsRuntime,
+  JsRuntime,
+  evaluateBindable,
+} from '../coreRuntime';
 
 export interface RenderToolpadComponentParams {
   Component: ToolpadComponent<any>;
@@ -83,6 +89,7 @@ function useElmToolpadComponent(elm: appDom.ElementNode): InstantiatedComponent 
 }
 
 function resolveBindables(
+  jsRuntime: JsRuntime,
   bindables: BindableAttrValues<any>,
   pageState: PageState,
   argTypes: ArgTypeDefinitions,
@@ -93,7 +100,9 @@ function resolveBindables(
         return [];
       }
       const argType = argTypes[key];
-      const liveBinding = evaluateBindable(bindable, pageState, argType);
+      // @ts-expect-error TODO: fix
+      const liveBinding = evaluateBindable(jsRuntime, bindable, pageState, argType);
+      console.log(liveBinding);
       return bindable === undefined ? [] : [[key, liveBinding]];
     }),
   );
@@ -294,6 +303,8 @@ function useLiveBindings(
   currentPageState: PageState,
 ): LiveBindings {
   const components = useComponentsContext();
+  const jsRuntime = useJsRuntime();
+
   return React.useMemo(() => {
     const descendants = appDom.getDescendants(dom, page);
     const bindings: LiveBindings = {};
@@ -302,14 +313,19 @@ function useLiveBindings(
         if (descendant.props) {
           const { Component } = getElmComponent(components, descendant);
           const { argTypes } = Component[TOOLPAD_COMPONENT];
-          const elmBindables = resolveBindables(descendant.props, currentPageState, argTypes);
+          const elmBindables = resolveBindables(
+            jsRuntime,
+            descendant.props,
+            currentPageState,
+            argTypes,
+          );
           Object.entries(elmBindables).forEach(([propName, bindable]) => {
             bindings[`${descendant.id}.props.${propName}`] = bindable;
           });
         }
       } else if (appDom.isQueryState(descendant)) {
         if (descendant.params) {
-          const elmBindables = resolveBindables(descendant.params, currentPageState, {});
+          const elmBindables = resolveBindables(jsRuntime, descendant.params, currentPageState, {});
           Object.entries(elmBindables).forEach(([propName, bindable]) => {
             bindings[`${descendant.id}.params.${propName}`] = bindable;
           });
@@ -317,7 +333,7 @@ function useLiveBindings(
       }
     });
     return bindings;
-  }, [currentPageState, dom, page, components]);
+  }, [dom, page, components, currentPageState, jsRuntime]);
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {

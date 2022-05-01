@@ -101,7 +101,6 @@ function resolveBindables(
       }
       const argType = argTypes[key];
       const liveBinding = evaluateBindable(jsRuntime, bindable, pageState, argType);
-      console.log(liveBinding);
       return bindable === undefined ? [] : [[key, liveBinding]];
     }),
   );

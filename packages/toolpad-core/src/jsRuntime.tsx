@@ -1,9 +1,16 @@
-import { getQuickJS, RuntimeOptions, QuickJSRuntime } from 'quickjs-emscripten';
+import {
+  getQuickJS,
+  RuntimeOptions,
+  QuickJSRuntime,
+  QuickJSContext,
+  QuickJSHandle,
+} from 'quickjs-emscripten';
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue, EvalScope, LiveBinding } from './types';
-import evalExpression from './evalExpression';
+import { EvalScope, Serializable } from './types';
 
-const JsRuntimeContext = React.createContext<QuickJSRuntime | null>(null);
+export type JsRuntime = QuickJSRuntime;
+
+const JsRuntimeContext = React.createContext<JsRuntime | null>(null);
 
 export interface JsRuntimeProviderProps {
   options?: RuntimeOptions;
@@ -32,44 +39,87 @@ export const JsRuntimeProvider = React.lazy(async () => {
   return { default: Context };
 });
 
-export function useJsRuntime(): QuickJSRuntime {
+export function useJsRuntime(): JsRuntime {
   const runtime = React.useContext(JsRuntimeContext);
 
   if (!runtime) {
-    throw new Error(`No JsRuntime contetx found`);
+    throw new Error(`No JsRuntime context found`);
   }
 
   return runtime;
 }
 
-export function evaluateBindable<V>(
-  jsRuntime: QuickJSRuntime,
-  bindable: BindableAttrValue<V> | null,
-  globalScope: EvalScope,
-  argType?: ArgTypeDefinition,
-): LiveBinding {
-  const getValue = () => {
-    if (bindable?.type === 'jsExpression') {
-      if (argType?.typeDef.type === 'function') {
-        const expression = `(${bindable?.value})()`;
-        return () => evalExpression(jsRuntime, expression, globalScope);
+function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
+  switch (typeof json) {
+    case 'string':
+      return ctx.newString(json);
+    case 'number':
+      return ctx.newNumber(json);
+    case 'boolean':
+      return json ? ctx.true : ctx.false;
+    case 'object': {
+      if (!json) {
+        return ctx.null;
       }
-      return evalExpression(jsRuntime, bindable?.value, globalScope);
+      if (Array.isArray(json)) {
+        const result = ctx.newArray();
+        Object.values(json).forEach((value, i) => {
+          const valueHandle = newJson(ctx, value);
+          ctx.setProp(result, i, valueHandle);
+          valueHandle.dispose();
+        });
+        return result;
+      }
+      const result = ctx.newObject();
+      Object.entries(json).forEach(([key, value]) => {
+        const valueHandle = newJson(ctx, value);
+        ctx.setProp(result, key, valueHandle);
+        valueHandle.dispose();
+      });
+      return result;
     }
-
-    if (bindable?.type === 'const') {
-      return bindable?.value;
+    case 'function': {
+      const result = ctx.newFunction('anonymous', (...args) => {
+        const dumpedArgs: Serializable[] = args.map((arg) => ctx.dump(arg));
+        const fnResult = json(...dumpedArgs);
+        return newJson(ctx, fnResult);
+      });
+      return result;
     }
-
-    return undefined;
-  };
-
-  try {
-    const value = getValue();
-    return { value };
-  } catch (err) {
-    return { error: err as Error };
+    case 'undefined': {
+      return ctx.undefined;
+    }
+    default:
+      throw new Error(`Invariant: invalid value: ${json}`);
   }
 }
 
-export type JsRuntime = QuickJSRuntime;
+function evalExpressionInContext(
+  ctx: QuickJSContext,
+  expression: string,
+  globalScope: EvalScope = {},
+) {
+  Object.entries(globalScope).forEach(([key, value]) => {
+    const valueHandle = newJson(ctx, value);
+    ctx.setProp(ctx.global, key, valueHandle);
+    valueHandle.dispose();
+  });
+
+  const result = ctx.unwrapResult(ctx.evalCode(expression));
+  const resultValue = ctx.dump(result);
+  result.dispose();
+  return resultValue;
+}
+
+export function evalExpression(
+  runtime: JsRuntime,
+  expression: string,
+  globalScope: EvalScope = {},
+) {
+  const ctx = runtime.newContext();
+  try {
+    return evalExpressionInContext(ctx, expression, globalScope);
+  } finally {
+    ctx.dispose();
+  }
+}

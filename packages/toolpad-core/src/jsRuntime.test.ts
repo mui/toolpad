@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { getQuickJS } from 'quickjs-emscripten';
-import evalExpression from './evalExpression';
+import { evalExpression } from './jsRuntime';
 import { EvalScope } from './types';
 
 async function evalExpressionInRuntime(expression: string, globalScope: EvalScope = {}) {

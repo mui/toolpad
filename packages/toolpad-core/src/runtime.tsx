@@ -1,7 +1,17 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
-import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
+import type {
+  SlotType,
+  ComponentConfig,
+  RuntimeEvent,
+  RuntimeError,
+  ArgTypeDefinition,
+  BindableAttrValue,
+  EvalScope,
+  LiveBinding,
+} from './types';
+import { evalExpression, JsRuntime } from './jsRuntime';
 
 declare global {
   interface Window {
@@ -216,3 +226,33 @@ export function Slots({ prop, children }: SlotsProps) {
 }
 
 export * from './jsRuntime';
+
+export function evaluateBindable<V>(
+  jsRuntime: JsRuntime,
+  bindable: BindableAttrValue<V> | null,
+  globalScope: EvalScope,
+  argType?: ArgTypeDefinition,
+): LiveBinding {
+  const getValue = () => {
+    if (bindable?.type === 'jsExpression') {
+      if (argType?.typeDef.type === 'function') {
+        const expression = `(${bindable?.value})()`;
+        return () => evalExpression(jsRuntime, expression, globalScope);
+      }
+      return evalExpression(jsRuntime, bindable?.value, globalScope);
+    }
+
+    if (bindable?.type === 'const') {
+      return bindable?.value;
+    }
+
+    return undefined;
+  };
+
+  try {
+    const value = getValue();
+    return { value };
+  } catch (err) {
+    return { error: err as Error };
+  }
+}

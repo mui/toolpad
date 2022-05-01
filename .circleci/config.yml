@@ -93,7 +93,7 @@ jobs:
     working_directory: /tmp/mui-toolpad
     resource_class: medium
     docker:
-      - image: cimg/go:1.17
+      - image: cimg/node:14.19
     environment:
       - DOCKER_BUILDKIT: '1'
     steps:

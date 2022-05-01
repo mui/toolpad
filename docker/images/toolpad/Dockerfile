@@ -21,7 +21,9 @@ COPY ./packages/toolpad-cli/package.json ./packages/toolpad-cli/
 COPY ./packages/toolpad-components/package.json ./packages/toolpad-components/
 COPY ./packages/toolpad-core/package.json ./packages/toolpad-core/
 RUN --mount=type=cache,target=/root/.yarn \
-  YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile
+  YARN_CACHE_FOLDER=/root/.yarn \
+  yarn cache clean && \
+  yarn install --frozen-lockfile
 
 
 

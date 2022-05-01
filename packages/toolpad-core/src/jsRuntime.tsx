@@ -14,7 +14,7 @@ export type JsRuntime = QuickJSRuntime;
 const LOADING_MARKER = '__TOOLPAD_DEFERRED_LOADING__';
 
 export interface DeferredValue {
-  error?: string;
+  error?: LiveBindingError;
   loading?: boolean;
 }
 
@@ -134,8 +134,8 @@ function evalExpressionInContext(
 
               const deferred = properties.get(prop);
               if (deferred) {
-                if (typeof deferred.error === 'string') {
-                  throw new Error(deferred.error);
+                if (typeof deferred.error !== 'undefined') {
+                  throw deferred.error;
                 }
 
                 if (deferred.loading) {

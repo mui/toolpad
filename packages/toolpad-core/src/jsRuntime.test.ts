@@ -59,7 +59,7 @@ describe('evalExpression', () => {
       },
       {
         x: {
-          y: { error: 'kaboom' },
+          y: { error: { message: 'kaboom' } },
         },
       },
     );

@@ -151,6 +151,7 @@ export interface LiveBindingError {
 export interface LiveBinding {
   value?: any;
   error?: LiveBindingError;
+  loading?: boolean;
 }
 
 export type EvalScope = Record<string, Serializable>;

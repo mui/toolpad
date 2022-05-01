@@ -233,26 +233,31 @@ export function evaluateBindable<V>(
   globalScope: EvalScope,
   argType?: ArgTypeDefinition,
 ): LiveBinding {
-  const getValue = () => {
-    if (bindable?.type === 'jsExpression') {
-      if (argType?.typeDef.type === 'function') {
-        const expression = `(${bindable?.value})()`;
-        return () => evalExpression(jsRuntime, expression, globalScope);
-      }
-      return evalExpression(jsRuntime, bindable?.value, globalScope);
+  if (bindable?.type === 'jsExpression') {
+    if (argType?.typeDef.type === 'function') {
+      const expression = `(${bindable?.value})()`;
+      return {
+        value: () => {
+          const result = evalExpression(jsRuntime, expression, globalScope);
+
+          if (result.error) {
+            throw new Error(result.error.message);
+          }
+
+          if (result.loading) {
+            throw new Error(`Value not available yet`);
+          }
+
+          return result.value;
+        },
+      };
     }
-
-    if (bindable?.type === 'const') {
-      return bindable?.value;
-    }
-
-    return undefined;
-  };
-
-  try {
-    const value = getValue();
-    return { value };
-  } catch (err) {
-    return { error: err as Error };
+    return evalExpression(jsRuntime, bindable?.value, globalScope);
   }
+
+  if (bindable?.type === 'const') {
+    return { value: bindable?.value };
+  }
+
+  return { value: undefined };
 }

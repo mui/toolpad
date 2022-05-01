@@ -5,10 +5,28 @@ import {
   QuickJSContext,
   QuickJSHandle,
 } from 'quickjs-emscripten';
+import { QuickJSUnwrapError } from 'quickjs-emscripten/dist/errors';
 import * as React from 'react';
-import { EvalScope, Serializable } from './types';
+import { EvalScope, LiveBinding, LiveBindingError, Serializable } from './types';
 
 export type JsRuntime = QuickJSRuntime;
+
+const LOADING_MARKER = '__TOOLPAD_DEFERRED_LOADING__';
+
+export interface DeferredValue {
+  error?: string;
+  loading?: boolean;
+}
+
+export interface DeferredValues {
+  [parentPath: string]: {
+    [property: string]: DeferredValue;
+  };
+}
+
+export interface GlobalScope {
+  values: Record<string, Serializable>;
+}
 
 const JsRuntimeContext = React.createContext<JsRuntime | null>(null);
 
@@ -49,7 +67,7 @@ export function useJsRuntime(): JsRuntime {
   return runtime;
 }
 
-function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
+function newJsValue(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
   switch (typeof json) {
     case 'string':
       return ctx.newString(json);
@@ -64,7 +82,7 @@ function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
       if (Array.isArray(json)) {
         const result = ctx.newArray();
         Object.values(json).forEach((value, i) => {
-          const valueHandle = newJson(ctx, value);
+          const valueHandle = newJsValue(ctx, value);
           ctx.setProp(result, i, valueHandle);
           valueHandle.dispose();
         });
@@ -72,7 +90,7 @@ function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
       }
       const result = ctx.newObject();
       Object.entries(json).forEach(([key, value]) => {
-        const valueHandle = newJson(ctx, value);
+        const valueHandle = newJsValue(ctx, value);
         ctx.setProp(result, key, valueHandle);
         valueHandle.dispose();
       });
@@ -82,7 +100,7 @@ function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
       const result = ctx.newFunction('anonymous', (...args) => {
         const dumpedArgs: Serializable[] = args.map((arg) => ctx.dump(arg));
         const fnResult = json(...dumpedArgs);
-        return newJson(ctx, fnResult);
+        return newJsValue(ctx, fnResult);
       });
       return result;
     }
@@ -98,27 +116,65 @@ function evalExpressionInContext(
   ctx: QuickJSContext,
   expression: string,
   globalScope: EvalScope = {},
-) {
-  Object.entries(globalScope).forEach(([key, value]) => {
-    const valueHandle = newJson(ctx, value);
-    ctx.setProp(ctx.global, key, valueHandle);
+  deferreds: DeferredValues = {},
+): LiveBinding {
+  Object.entries(globalScope).forEach(([globalVar, value]) => {
+    const valueHandle = newJsValue(ctx, value);
+    ctx.setProp(ctx.global, globalVar, valueHandle);
     valueHandle.dispose();
   });
 
-  const result = ctx.unwrapResult(ctx.evalCode(expression));
-  const resultValue = ctx.dump(result);
-  result.dispose();
-  return resultValue;
+  Object.entries(deferreds).forEach(([parentPath, properties]) => {
+    ctx
+      .unwrapResult(
+        ctx.evalCode(`
+          ${parentPath} = new Proxy(${parentPath}, {
+            get(target, prop, receiver) {
+              const properties = new Map(${JSON.stringify(Object.entries(properties))});
+
+              const deferred = properties.get(prop);
+              if (deferred) {
+                if (typeof deferred.error === 'string') {
+                  throw new Error(deferred.error);
+                }
+
+                if (deferred.loading) {
+                  throw ${JSON.stringify(LOADING_MARKER)};
+                }
+              }
+              
+              return Reflect.get(...arguments);
+            }
+          })
+        `),
+      )
+      .dispose();
+  });
+
+  const evalResult = ctx.evalCode(expression);
+  try {
+    const unwrapped = ctx.unwrapResult(evalResult);
+    const jsValue = ctx.dump(unwrapped);
+    unwrapped.dispose();
+    return { value: jsValue };
+  } catch (error: any) {
+    const cause = (error as QuickJSUnwrapError).cause;
+    if (cause === LOADING_MARKER) {
+      return { loading: true };
+    }
+    return { error: cause as LiveBindingError };
+  }
 }
 
 export function evalExpression(
   runtime: JsRuntime,
   expression: string,
   globalScope: EvalScope = {},
-) {
+  deferreds: DeferredValues = {},
+): LiveBinding {
   const ctx = runtime.newContext();
   try {
-    return evalExpressionInContext(ctx, expression, globalScope);
+    return evalExpressionInContext(ctx, expression, globalScope, deferreds);
   } finally {
     ctx.dispose();
   }

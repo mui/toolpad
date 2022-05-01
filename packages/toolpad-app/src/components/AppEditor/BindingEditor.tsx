@@ -59,7 +59,7 @@ function JsExpressionPreviewContent({ input, globalScope }: JsExpressionPreviewP
   const jsRuntime = useJsRuntime();
 
   const previewValue: LiveBinding = React.useMemo(
-    () => evaluateBindable(jsRuntime, input, globalScope, {}),
+    () => evaluateBindable(jsRuntime, input, globalScope),
     [jsRuntime, input, globalScope],
   );
 

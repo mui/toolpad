@@ -13,6 +13,7 @@ import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from '../../../constants';
 import { escapeHtml } from '../../../utils/strings';
 import useShortcut from '../../../utils/useShortcut';
 import { usePrompt } from '../../../utils/router';
+import NodeNameEditor from '../NodeNameEditor';
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -188,7 +189,10 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   return (
     <Stack sx={{ height: '100%' }}>
-      <Toolbar>
+      <Toolbar variant="dense" sx={{ mt: 2 }}>
+        <NodeNameEditor node={codeComponentNode} />
+      </Toolbar>
+      <Toolbar variant="dense">
         <Button disabled={allChangesAreCommitted} onClick={handleSave}>
           Update
         </Button>

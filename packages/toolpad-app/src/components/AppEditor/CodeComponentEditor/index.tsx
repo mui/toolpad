@@ -80,10 +80,26 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
 
   const updateInputExtern = React.useCallback((newInput) => {
-    // Workaround for a problem in monaco editor
-    // See https://github.com/suren-atoyan/monaco-react/issues/365
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+
+    const model = editor.getModel();
+    if (!model) {
+      return;
+    }
+
+    // Used to restore cursor position
     const state = editorRef.current?.saveViewState();
-    editorRef.current?.setValue(newInput);
+
+    editor.executeEdits(null, [
+      {
+        range: model.getFullModelRange(),
+        text: newInput,
+      },
+    ]);
+
     if (state) {
       editorRef.current?.restoreViewState(state);
     }
@@ -201,7 +217,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         <Box flex={1}>
           <Editor
             height="100%"
-            value={input}
+            defaultValue={input}
             onChange={(newValue) => setInput(newValue || '')}
             path="./component.tsx"
             language="typescript"

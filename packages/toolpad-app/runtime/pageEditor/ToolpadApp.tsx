@@ -13,7 +13,6 @@ import {
   BindableAttrValues,
   ArgTypeDefinitions,
   INITIAL_DATA_QUERY,
-  LiveBinding,
   LiveBindings,
   useDataQuery,
   ToolpadComponent,
@@ -93,7 +92,7 @@ function resolveBindables(
   bindables: BindableAttrValues<any>,
   pageState: PageState,
   argTypes: ArgTypeDefinitions,
-): Record<string, LiveBinding> {
+): LiveBindings {
   return Object.fromEntries(
     Object.entries(bindables).flatMap(([key, bindable]) => {
       if (!bindable) {

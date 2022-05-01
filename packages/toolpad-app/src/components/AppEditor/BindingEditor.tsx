@@ -14,7 +14,7 @@ import {
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
-import { LiveBinding, PropValueType, BindableAttrValue, PageState } from '@mui/toolpad-core';
+import { DeferredValue, PropValueType, BindableAttrValue, PageState } from '@mui/toolpad-core';
 import { evaluateBindable, JsRuntimeProvider, useJsRuntime } from '@mui/toolpad-core/runtime';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
@@ -58,7 +58,7 @@ interface JsExpressionPreviewProps {
 function JsExpressionPreviewContent({ input, globalScope }: JsExpressionPreviewProps) {
   const jsRuntime = useJsRuntime();
 
-  const previewValue: LiveBinding = React.useMemo(
+  const previewValue: DeferredValue = React.useMemo(
     () => evaluateBindable(jsRuntime, input, globalScope),
     [jsRuntime, input, globalScope],
   );

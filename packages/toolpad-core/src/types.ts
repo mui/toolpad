@@ -143,14 +143,17 @@ export interface ComponentDefinition<P> {
   argTypes: ArgTypeDefinitions<P>;
 }
 
-export interface LiveBindingError {
+export interface DeferredError {
   message: string;
   stack?: string;
 }
 
-export interface LiveBinding {
-  value?: any;
-  error?: LiveBindingError;
+/**
+ * Represents a three-state value in Toolpad that can be resolved, errorring, or still loading
+ */
+export interface DeferredValue<V = any> {
+  value?: V;
+  error?: DeferredError;
   loading?: boolean;
 }
 
@@ -181,7 +184,7 @@ export type ToolpadComponent<P = {}> = React.ComponentType<P> & {
   [TOOLPAD_COMPONENT]: ComponentConfig<P>;
 };
 
-export type LiveBindings = Partial<Record<string, LiveBinding>>;
+export type LiveBindings = Partial<Record<string, DeferredValue>>;
 
 export interface RuntimeError {
   message: string;

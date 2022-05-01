@@ -7,20 +7,20 @@ import {
 } from 'quickjs-emscripten';
 import { QuickJSUnwrapError } from 'quickjs-emscripten/dist/errors';
 import * as React from 'react';
-import { EvalScope, LiveBinding, LiveBindingError, Serializable } from './types';
+import { EvalScope, DeferredValue, DeferredError, Serializable } from './types';
 
 export type JsRuntime = QuickJSRuntime;
 
 const LOADING_MARKER = '__TOOLPAD_DEFERRED_LOADING__';
 
-export interface DeferredValue {
-  error?: LiveBindingError;
+export interface DeferredValueInput {
+  error?: DeferredError;
   loading?: boolean;
 }
 
-export interface DeferredValues {
+export interface DeferredValueInputs {
   [parentPath: string]: {
-    [property: string]: DeferredValue;
+    [property: string]: DeferredValueInput;
   };
 }
 
@@ -116,8 +116,8 @@ function evalExpressionInContext(
   ctx: QuickJSContext,
   expression: string,
   globalScope: EvalScope = {},
-  deferreds: DeferredValues = {},
-): LiveBinding {
+  deferreds: DeferredValueInputs = {},
+): DeferredValue {
   Object.entries(globalScope).forEach(([globalVar, value]) => {
     const valueHandle = newJsValue(ctx, value);
     ctx.setProp(ctx.global, globalVar, valueHandle);
@@ -162,7 +162,7 @@ function evalExpressionInContext(
     if (cause === LOADING_MARKER) {
       return { loading: true };
     }
-    return { error: cause as LiveBindingError };
+    return { error: cause as DeferredError };
   }
 }
 
@@ -170,8 +170,8 @@ export function evalExpression(
   runtime: JsRuntime,
   expression: string,
   globalScope: EvalScope = {},
-  deferreds: DeferredValues = {},
-): LiveBinding {
+  deferreds: DeferredValueInputs = {},
+): DeferredValue {
   const ctx = runtime.newContext();
   try {
     return evalExpressionInContext(ctx, expression, globalScope, deferreds);

@@ -9,7 +9,7 @@ import type {
   ArgTypeDefinition,
   BindableAttrValue,
   EvalScope,
-  LiveBinding,
+  DeferredValue,
 } from './types';
 import { evalExpression, JsRuntime } from './jsRuntime';
 
@@ -232,7 +232,7 @@ export function evaluateBindable<V>(
   bindable: BindableAttrValue<V> | null,
   globalScope: EvalScope,
   argType?: ArgTypeDefinition,
-): LiveBinding {
+): DeferredValue {
   if (bindable?.type === 'jsExpression') {
     if (argType?.typeDef.type === 'function') {
       const expression = `(${bindable?.value})()`;

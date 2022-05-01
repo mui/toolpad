@@ -1,5 +1,10 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
-import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType, LiveBinding } from '@mui/toolpad-core';
+import {
+  RUNTIME_PROP_NODE_ID,
+  RUNTIME_PROP_SLOTS,
+  SlotType,
+  LiveBindings,
+} from '@mui/toolpad-core';
 import { NodeFiberHostProps } from '@mui/toolpad-core/runtime';
 import { NodeId, FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
@@ -45,7 +50,7 @@ function walkFibers(node: FiberNode, visitor: (node: FiberNode) => void) {
 
 export function getNodesViewInfo(rootElm: HTMLElement): {
   nodes: NodesInfo;
-  bindings: Record<string, LiveBinding>;
+  bindings: LiveBindings;
 } {
   // eslint-disable-next-line no-underscore-dangle
   const devtoolsHook = rootElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
@@ -56,7 +61,7 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
   }
 
   const nodes: NodesInfo = {};
-  const bindings: Record<string, LiveBinding> = {};
+  const bindings: LiveBindings = {};
 
   const rendererId = 1;
   const nodeElms = new Map<NodeId, Element>();

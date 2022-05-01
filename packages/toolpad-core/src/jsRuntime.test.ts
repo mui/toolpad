@@ -1,13 +1,13 @@
 /// <reference types="jest" />
 
 import { getQuickJS } from 'quickjs-emscripten';
-import { evalExpression, DeferredValues } from './jsRuntime';
+import { evalExpression, DeferredValueInputs } from './jsRuntime';
 import { EvalScope } from './types';
 
 async function evalExpressionInRuntime(
   expression: string,
   globalScope: EvalScope = {},
-  deferreds: DeferredValues = {},
+  deferreds: DeferredValueInputs = {},
 ) {
   const QuickJS = await getQuickJS();
   const runtime = QuickJS.newRuntime();

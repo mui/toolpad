@@ -54,7 +54,7 @@ export async function renderAppHtml(
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <style>
           #${HTML_ID_APP_ROOT} {
-            overflow: hidden; /* prevents margins from collapsing into root */
+            overflow: auto; /* prevents margins from collapsing into root */
             min-height: 100vh;
           }
         </style>

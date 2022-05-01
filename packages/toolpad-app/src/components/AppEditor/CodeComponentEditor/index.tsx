@@ -12,6 +12,8 @@ import { tryFormat } from '../../../utils/prettier';
 import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from '../../../constants';
 import { escapeHtml } from '../../../utils/strings';
 import useShortcut from '../../../utils/useShortcut';
+import { usePrompt } from '../../../utils/router';
+import NodeNameEditor from '../NodeNameEditor';
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -41,7 +43,7 @@ function renderSandboxHtml() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <style>
           #${HTML_ID_APP_ROOT} {
-            overflow: hidden; /* prevents margins from collapsing into root */
+            overflow: auto; /* prevents margins from collapsing into root */
             min-height: 100vh;
           }
         </style>
@@ -75,20 +77,38 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
+  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
+
+  const updateInputExtern = React.useCallback((newInput) => {
+    // Workaround for a problem in monaco editor
+    // See https://github.com/suren-atoyan/monaco-react/issues/365
+    const state = editorRef.current?.saveViewState();
+    editorRef.current?.setValue(newInput);
+    if (state) {
+      editorRef.current?.restoreViewState(state);
+    }
+  }, []);
+
   const handleSave = React.useCallback(() => {
     const pretty = tryFormat(input);
-    setInput(pretty);
+    updateInputExtern(pretty);
     domApi.setNodeNamespacedProp(
       codeComponentNode,
       'attributes',
       'code',
       appDom.createConst(pretty),
     );
-  }, [codeComponentNode, domApi, input]);
+  }, [codeComponentNode, domApi, input, updateInputExtern]);
+
+  const allChangesAreCommitted = codeComponentNode.attributes.code.value === input;
+
+  usePrompt(
+    'Your code has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
+    !allChangesAreCommitted,
+  );
 
   useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
-  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
       editorRef.current = editor;
@@ -167,22 +187,13 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     }
   }, [input]);
 
-  React.useEffect(() => {
-    // Workaround for a problem in monaco editor
-    // See https://github.com/suren-atoyan/monaco-react/issues/365
-    // We'll just update the value programmatically for now, we can revert back to using value={input}
-    // when that issue is resolved
-    const state = editorRef.current?.saveViewState();
-    editorRef.current?.setValue(input);
-    if (state) {
-      editorRef.current?.restoreViewState(state);
-    }
-  }, [input]);
-
   return (
     <Stack sx={{ height: '100%' }}>
-      <Toolbar>
-        <Button disabled={codeComponentNode.attributes.code.value === input} onClick={handleSave}>
+      <Toolbar variant="dense" sx={{ mt: 2 }}>
+        <NodeNameEditor node={codeComponentNode} />
+      </Toolbar>
+      <Toolbar variant="dense">
+        <Button disabled={allChangesAreCommitted} onClick={handleSave}>
           Update
         </Button>
       </Toolbar>
@@ -190,14 +201,14 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         <Box flex={1}>
           <Editor
             height="100%"
-            defaultValue={input}
+            value={input}
             onChange={(newValue) => setInput(newValue || '')}
             path="./component.tsx"
             language="typescript"
             onMount={HandleEditorMount}
           />
         </Box>
-        <Box flex={1}>
+        <Box sx={{ flex: 1, position: 'relative' }}>
           <CanvasFrame ref={frameRef} srcDoc={renderSandboxHtml()} title="hello" />
         </Box>
       </Box>

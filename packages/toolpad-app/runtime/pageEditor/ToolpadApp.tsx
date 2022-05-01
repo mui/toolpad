@@ -16,10 +16,10 @@ import {
   LiveBinding,
   LiveBindings,
   useDataQuery,
-  UseDataQuery,
   ToolpadComponent,
   createComponent,
   TOOLPAD_COMPONENT,
+  Serializable,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
@@ -50,7 +50,7 @@ function defaultRenderToolpadComponent({ Component, props }: RenderToolpadCompon
 }
 type NodeState = Record<string, unknown>;
 type ControlledState = Record<string, NodeState | undefined>;
-type PageState = Record<string, Record<string, string> | NodeState | UseDataQuery | undefined>;
+type PageState = Record<string, Serializable>;
 
 interface AppContext {
   appId: string;
@@ -100,7 +100,6 @@ function resolveBindables(
         return [];
       }
       const argType = argTypes[key];
-      // @ts-expect-error TODO: fix
       const liveBinding = evaluateBindable(jsRuntime, bindable, pageState, argType);
       console.log(liveBinding);
       return bindable === undefined ? [] : [[key, liveBinding]];

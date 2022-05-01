@@ -153,6 +153,9 @@ export interface LiveBinding {
   error?: LiveBindingError;
 }
 
+export type EvalScope = Record<string, Serializable>;
+export type PageState = EvalScope;
+
 export type RuntimeEvent =
   | {
       type: 'propUpdated';
@@ -162,7 +165,7 @@ export type RuntimeEvent =
     }
   | {
       type: 'pageStateUpdated';
-      pageState: Record<string, unknown>;
+      pageState: PageState;
     }
   | {
       type: 'pageBindingsUpdated';

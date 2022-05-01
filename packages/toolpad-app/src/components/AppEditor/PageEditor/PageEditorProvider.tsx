@@ -1,4 +1,4 @@
-import { LiveBindings } from '@mui/toolpad-core';
+import { LiveBindings, PageState } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { NodeId, SlotLocation, PageViewState } from '../../../types';
@@ -16,7 +16,7 @@ export interface PageEditorState {
   readonly highlightLayout: boolean;
   readonly highlightedSlot: SlotLocation | null;
   readonly viewState: PageViewState;
-  readonly pageState: Record<string, unknown>;
+  readonly pageState: PageState;
   readonly bindings: LiveBindings;
 }
 
@@ -49,7 +49,7 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_STATE_UPDATE';
-      pageState: Record<string, unknown>;
+      pageState: PageState;
     }
   | {
       type: 'PAGE_VIEW_STATE_UPDATE';
@@ -168,7 +168,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         viewState,
       });
     },
-    pageStateUpdate(pageState: Record<string, unknown>) {
+    pageStateUpdate(pageState: PageState) {
       dispatch({
         type: 'PAGE_STATE_UPDATE',
         pageState,

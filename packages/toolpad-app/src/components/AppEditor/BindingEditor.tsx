@@ -14,7 +14,7 @@ import {
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
-import { LiveBinding, PropValueType, BindableAttrValue } from '@mui/toolpad-core';
+import { LiveBinding, PropValueType, BindableAttrValue, PageState } from '@mui/toolpad-core';
 import { evaluateBindable, JsRuntimeProvider, useJsRuntime } from '@mui/toolpad-core/runtime';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
@@ -52,14 +52,13 @@ function JsExpressionBindingEditor<V>({
 
 interface JsExpressionPreviewProps {
   input: BindableAttrValue<unknown> | null;
-  globalScope: Record<string, unknown>;
+  globalScope: PageState;
 }
 
 function JsExpressionPreviewContent({ input, globalScope }: JsExpressionPreviewProps) {
   const jsRuntime = useJsRuntime();
 
   const previewValue: LiveBinding = React.useMemo(
-    // @ts-expect-error TODO: fix
     () => evaluateBindable(jsRuntime, input, globalScope),
     [jsRuntime, input, globalScope],
   );
@@ -91,7 +90,7 @@ function JsExpressionPreview(props: JsExpressionPreviewProps) {
 }
 
 export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
-  globalScope: Record<string, unknown>;
+  globalScope: PageState;
   disabled?: boolean;
   propType: PropValueType;
 }

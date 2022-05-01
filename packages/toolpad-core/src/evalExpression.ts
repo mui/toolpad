@@ -1,5 +1,5 @@
 import { QuickJSHandle, QuickJSContext, QuickJSRuntime } from 'quickjs-emscripten';
-import { Serializable } from './types';
+import { EvalScope, Serializable } from './types';
 
 function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
   switch (typeof json) {
@@ -49,7 +49,7 @@ function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
 function evalExpressionInContext(
   ctx: QuickJSContext,
   expression: string,
-  globalScope: Record<string, Serializable> = {},
+  globalScope: EvalScope = {},
 ) {
   Object.entries(globalScope).forEach(([key, value]) => {
     const valueHandle = newJson(ctx, value);
@@ -66,7 +66,7 @@ function evalExpressionInContext(
 export default function evalExpression(
   runtime: QuickJSRuntime,
   expression: string,
-  globalScope: Record<string, Serializable> = {},
+  globalScope: EvalScope = {},
 ) {
   const ctx = runtime.newContext();
   try {

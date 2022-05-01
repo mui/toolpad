@@ -2,12 +2,9 @@
 
 import { getQuickJS } from 'quickjs-emscripten';
 import evalExpression from './evalExpression';
-import { Serializable } from './types';
+import { EvalScope } from './types';
 
-async function evalExpressionInRuntime(
-  expression: string,
-  globalScope: Record<string, Serializable> = {},
-) {
+async function evalExpressionInRuntime(expression: string, globalScope: EvalScope = {}) {
   const QuickJS = await getQuickJS();
   const runtime = QuickJS.newRuntime();
   try {

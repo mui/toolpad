@@ -1,6 +1,6 @@
 import { getQuickJS, RuntimeOptions, QuickJSRuntime } from 'quickjs-emscripten';
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue, LiveBinding, Serializable } from './types';
+import { ArgTypeDefinition, BindableAttrValue, EvalScope, LiveBinding } from './types';
 import evalExpression from './evalExpression';
 
 const JsRuntimeContext = React.createContext<QuickJSRuntime | null>(null);
@@ -45,8 +45,7 @@ export function useJsRuntime(): QuickJSRuntime {
 export function evaluateBindable<V>(
   jsRuntime: QuickJSRuntime,
   bindable: BindableAttrValue<V> | null,
-  globalScope: Record<string, Serializable>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  globalScope: EvalScope,
   argType?: ArgTypeDefinition,
 ): LiveBinding {
   const getValue = () => {

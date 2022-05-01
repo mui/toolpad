@@ -46,7 +46,7 @@ function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
   }
 }
 
-export function evalExpressionInContext(
+function evalExpressionInContext(
   ctx: QuickJSContext,
   expression: string,
   globalScope: Record<string, Serializable> = {},
@@ -63,7 +63,7 @@ export function evalExpressionInContext(
   return resultValue;
 }
 
-export default function evalExpressionInRuntime(
+export default function evalExpression(
   runtime: QuickJSRuntime,
   expression: string,
   globalScope: Record<string, Serializable> = {},

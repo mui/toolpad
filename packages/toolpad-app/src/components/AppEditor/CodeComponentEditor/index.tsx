@@ -76,16 +76,28 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
+  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
+
+  const updateInputExtern = React.useCallback((newInput) => {
+    // Workaround for a problem in monaco editor
+    // See https://github.com/suren-atoyan/monaco-react/issues/365
+    const state = editorRef.current?.saveViewState();
+    editorRef.current?.setValue(newInput);
+    if (state) {
+      editorRef.current?.restoreViewState(state);
+    }
+  }, []);
+
   const handleSave = React.useCallback(() => {
     const pretty = tryFormat(input);
-    setInput(pretty);
+    updateInputExtern(pretty);
     domApi.setNodeNamespacedProp(
       codeComponentNode,
       'attributes',
       'code',
       appDom.createConst(pretty),
     );
-  }, [codeComponentNode, domApi, input]);
+  }, [codeComponentNode, domApi, input, updateInputExtern]);
 
   const allChangesAreCommitted = codeComponentNode.attributes.code.value === input;
 
@@ -96,7 +108,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
-  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
       editorRef.current = editor;
@@ -175,18 +186,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     }
   }, [input]);
 
-  React.useEffect(() => {
-    // Workaround for a problem in monaco editor
-    // See https://github.com/suren-atoyan/monaco-react/issues/365
-    // We'll just update the value programmatically for now, we can revert back to using value={input}
-    // when that issue is resolved
-    const state = editorRef.current?.saveViewState();
-    editorRef.current?.setValue(input);
-    if (state) {
-      editorRef.current?.restoreViewState(state);
-    }
-  }, [input]);
-
   return (
     <Stack sx={{ height: '100%' }}>
       <Toolbar>
@@ -198,7 +197,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         <Box flex={1}>
           <Editor
             height="100%"
-            defaultValue={input}
+            value={input}
             onChange={(newValue) => setInput(newValue || '')}
             path="./component.tsx"
             language="typescript"

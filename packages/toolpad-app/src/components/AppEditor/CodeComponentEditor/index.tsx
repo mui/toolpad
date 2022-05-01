@@ -42,7 +42,6 @@ function renderSandboxHtml() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <style>
           #${HTML_ID_APP_ROOT} {
-            overflow: hidden; /* prevents margins from collapsing into root */
             min-height: 100vh;
           }
         </style>
@@ -205,7 +204,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             onMount={HandleEditorMount}
           />
         </Box>
-        <Box flex={1}>
+        <Box sx={{ flex: 1, position: 'relative' }}>
           <CanvasFrame ref={frameRef} srcDoc={renderSandboxHtml()} title="hello" />
         </Box>
       </Box>

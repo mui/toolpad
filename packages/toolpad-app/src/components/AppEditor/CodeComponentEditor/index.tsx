@@ -12,6 +12,7 @@ import { tryFormat } from '../../../utils/prettier';
 import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from '../../../constants';
 import { escapeHtml } from '../../../utils/strings';
 import useShortcut from '../../../utils/useShortcut';
+import { usePrompt } from '../../../utils/router';
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -85,6 +86,13 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
       appDom.createConst(pretty),
     );
   }, [codeComponentNode, domApi, input]);
+
+  const allChangesAreCommitted = codeComponentNode.attributes.code.value === input;
+
+  usePrompt(
+    'Your code has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
+    !allChangesAreCommitted,
+  );
 
   useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
@@ -182,7 +190,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   return (
     <Stack sx={{ height: '100%' }}>
       <Toolbar>
-        <Button disabled={codeComponentNode.attributes.code.value === input} onClick={handleSave}>
+        <Button disabled={allChangesAreCommitted} onClick={handleSave}>
           Update
         </Button>
       </Toolbar>

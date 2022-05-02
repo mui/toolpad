@@ -150,6 +150,13 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [rowIdFieldProp],
   );
 
+  const onSelectionModelChange = React.useCallback(
+    (ids) => {
+      onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null);
+    },
+    [rows, onSelectionChange],
+  );
+
   const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
 
   return (
@@ -160,10 +167,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
         columns={columns}
-        getRowId={(row) => getRowId(row)}
-        onSelectionModelChange={(ids) =>
-          onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null)
-        }
+        key={rowIdFieldProp}
+        getRowId={getRowId}
+        onSelectionModelChange={onSelectionModelChange}
         selectionModel={selection ? [selection.id] : []}
         {...dataQueryRest}
         {...props}

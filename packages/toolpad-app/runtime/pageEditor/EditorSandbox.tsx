@@ -59,7 +59,12 @@ export default function EditorCanvas({ dom: initialDom, ...props }: EditorCanvas
   React.useEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
     window.__TOOLPAD_BRIDGE__ = {
-      updateDom: (newDom) => setDom(newDom),
+      updateDom: (newDom) => {
+        // @ts-expect-error Need to upgrade @types/react
+        React.startTransition(() => {
+          setDom(newDom);
+        });
+      },
     };
     // eslint-disable-next-line no-underscore-dangle
     if (typeof window.__TOOLPAD_READY__ === 'function') {

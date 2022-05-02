@@ -39,12 +39,6 @@ export function inferColumns(rows: GridRowsProp): GridColumns {
   }));
 }
 
-export function addIdField(rows: GridRowsProp): GridRowsProp {
-  return rows.map((row, index) => {
-    return { id: index, ...row };
-  });
-}
-
 const LICENSE =
   typeof window !== 'undefined'
     ? window.document.querySelector('meta[name=x-data-grid-pro-license]')?.getAttribute('content')

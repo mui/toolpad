@@ -206,7 +206,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   return (
     <Stack sx={{ height: '100%' }}>
       <Toolbar variant="dense" sx={{ mt: 2 }}>
-        <NodeNameEditor node={codeComponentNode} />
+        <NodeNameEditor node={codeComponentNode} sx={{ maxWidth: 300 }} />
       </Toolbar>
       <Toolbar variant="dense">
         <Button disabled={allChangesAreCommitted} onClick={handleSave}>

@@ -8,18 +8,17 @@ import {
   styled,
   AlertTitle,
 } from '@mui/material';
-import { omit, pick, without } from 'lodash-es';
+import { merge, omit, pick, without } from 'lodash-es';
 import {
-  BindableAttrValues,
   ArgTypeDefinitions,
   INITIAL_DATA_QUERY,
-  LiveBinding,
   LiveBindings,
   useDataQuery,
   UseDataQuery,
   ToolpadComponent,
   createComponent,
   TOOLPAD_COMPONENT,
+  BindableAttrValue,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
@@ -30,7 +29,8 @@ import { createProvidedContext } from '../../src/utils/react';
 import AppOverview from '../../src/components/AppOverview';
 import { InstantiatedComponent, InstantiatedComponents } from '../../src/toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
-import { evaluateBindable, fireEvent, JsRuntimeProvider } from '../coreRuntime';
+import { fireEvent, JsRuntimeProvider } from '../coreRuntime';
+import evalExpressions from './evalExpressions';
 
 export interface RenderToolpadComponentParams {
   Component: ToolpadComponent<any>;
@@ -80,23 +80,6 @@ function getElmComponent(
 function useElmToolpadComponent(elm: appDom.ElementNode): InstantiatedComponent {
   const components = useComponentsContext();
   return getElmComponent(components, elm);
-}
-
-function resolveBindables(
-  bindables: BindableAttrValues<any>,
-  pageState: PageState,
-  argTypes: ArgTypeDefinitions,
-): Record<string, LiveBinding> {
-  return Object.fromEntries(
-    Object.entries(bindables).flatMap(([key, bindable]) => {
-      if (!bindable) {
-        return [];
-      }
-      const argType = argTypes[key];
-      const liveBinding = evaluateBindable(bindable, pageState, argType);
-      return bindable === undefined ? [] : [[key, liveBinding]];
-    }),
-  );
 }
 
 interface RenderedNodeProps {
@@ -231,6 +214,43 @@ function useInitialControlledState(dom: appDom.AppDom, page: appDom.PageNode): C
   }, [dom, page, components]);
 }
 
+function useConstState(dom: appDom.AppDom, page: appDom.PageNode): ControlledState {
+  const components = useComponentsContext();
+  return React.useMemo(() => {
+    const elements = appDom.getDescendants(dom, page);
+    return Object.fromEntries(
+      elements.flatMap((elm) => {
+        if (appDom.isElement(elm)) {
+          const { Component } = getElmComponent(components, elm);
+          const { argTypes } = Component[TOOLPAD_COMPONENT];
+          return [
+            [
+              elm.name,
+              Object.fromEntries(
+                Object.entries(argTypes).flatMap(([key, argType]) => {
+                  if (!argType || argType.onChangeProp) {
+                    return [];
+                  }
+
+                  if (elm.props?.[key]?.type === 'const') {
+                    return [[key, elm.props?.[key]?.value]];
+                  }
+
+                  return [];
+                }),
+              ),
+            ],
+          ];
+        }
+        if (appDom.isQueryState(elm)) {
+          return [[elm.name, INITIAL_DATA_QUERY]];
+        }
+        return [];
+      }),
+    );
+  }, [dom, page, components]);
+}
+
 interface PageRootProps {
   children?: React.ReactNode;
 }
@@ -288,36 +308,60 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
   return null;
 }
 
-function useLiveBindings(
-  dom: appDom.AppDom,
-  page: appDom.PageNode,
-  currentPageState: PageState,
-): LiveBindings {
-  const components = useComponentsContext();
+function getExpression(bindable?: BindableAttrValue<any>): string | undefined {
+  if (!bindable) {
+    return undefined;
+  }
+  switch (bindable.type) {
+    case 'jsExpression':
+      return bindable.value;
+    default:
+      return undefined;
+  }
+}
+
+function useLiveBindings(dom: appDom.AppDom, page: appDom.PageNode, currentPageState: PageState) {
   return React.useMemo(() => {
     const descendants = appDom.getDescendants(dom, page);
-    const bindings: LiveBindings = {};
+    const jsExpressions: Record<string, string> = {};
+    const bindings = new Map<string, string>();
+
     descendants.forEach((descendant) => {
       if (appDom.isElement(descendant)) {
         if (descendant.props) {
-          const { Component } = getElmComponent(components, descendant);
-          const { argTypes } = Component[TOOLPAD_COMPONENT];
-          const elmBindables = resolveBindables(descendant.props, currentPageState, argTypes);
-          Object.entries(elmBindables).forEach(([propName, bindable]) => {
-            bindings[`${descendant.id}.props.${propName}`] = bindable;
-          });
+          for (const [propName, bindable] of Object.entries(descendant.props)) {
+            const bindingLabel = `${descendant.name}.${propName}`;
+            const expression = getExpression(bindable);
+            bindings.set(`${descendant.id}.props.${propName}`, bindingLabel);
+            if (expression) {
+              jsExpressions[bindingLabel] = expression;
+            }
+          }
         }
       } else if (appDom.isQueryState(descendant)) {
         if (descendant.params) {
-          const elmBindables = resolveBindables(descendant.params, currentPageState, {});
-          Object.entries(elmBindables).forEach(([propName, bindable]) => {
-            bindings[`${descendant.id}.params.${propName}`] = bindable;
-          });
+          for (const [propName, bindable] of Object.entries(descendant.params)) {
+            const bindingLabel = `${descendant.name}.${propName}`;
+            const expression = getExpression(bindable);
+            bindings.set(`${descendant.id}.params.${propName}`, bindingLabel);
+            if (expression) {
+              jsExpressions[bindingLabel] = expression;
+            }
+          }
         }
       }
     });
-    return bindings;
-  }, [currentPageState, dom, page, components]);
+
+    const evaluations = evalExpressions(
+      Array.from(bindings.values()),
+      currentPageState,
+      jsExpressions,
+    );
+
+    return Object.fromEntries(
+      Array.from(bindings.keys(), (binding, i) => [binding, evaluations[i]]),
+    );
+  }, [dom, page, currentPageState]);
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
@@ -339,6 +383,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const initialControlledState = useInitialControlledState(dom, page);
   const [controlledState, setControlledState] = React.useState(initialControlledState);
 
+  const constState = useConstState(dom, page);
+
   // Make sure to patch page state after dom nodes have been added or removed
   React.useEffect(() => {
     setControlledState((existing) => {
@@ -357,17 +403,22 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   }, [initialControlledState]);
 
   const pageState: PageState = React.useMemo(() => {
-    return {
-      page: urlQueryState,
-      ...controlledState,
-    };
-  }, [urlQueryState, controlledState]);
+    return merge(
+      {
+        page: urlQueryState,
+      },
+      controlledState,
+      constState,
+    );
+  }, [urlQueryState, controlledState, constState]);
 
   React.useEffect(() => {
     fireEvent({ type: 'pageStateUpdated', pageState });
   }, [pageState]);
 
-  const liveBindings: LiveBindings = useLiveBindings(dom, page, pageState);
+  const liveBindings = useLiveBindings(dom, page, pageState);
+
+  console.log(pageState, liveBindings);
 
   React.useEffect(() => {
     fireEvent({ type: 'pageBindingsUpdated', bindings: liveBindings });

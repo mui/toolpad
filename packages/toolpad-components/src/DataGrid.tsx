@@ -11,7 +11,6 @@ import {
 import * as React from 'react';
 import { useNode, UseDataQuery, createComponent } from '@mui/toolpad-core';
 import { debounce } from '@mui/material';
-import useDebounced from './utils/useDebounced';
 
 function inferColumnType(value: unknown): string | undefined {
   if (value instanceof Date) {
@@ -127,12 +126,16 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const { rows: dataQueryRows, ...dataQueryRest } = dataQuery || {};
 
-  const rows: GridRowsProp = rowsProp || dataQueryRows || EMPTY_ROWS;
+  const rows: GridRowsProp = React.useMemo(() => {
+    const parsedRows = rowsProp || dataQueryRows || EMPTY_ROWS;
+    if (parsedRows.length === 0 || rowIdFieldProp || parsedRows[0].id) {
+      return parsedRows;
+    }
+    return parsedRows.map((row, id) => ({ ...row, id }));
+  }, [dataQueryRows, rowsProp, rowIdFieldProp]);
 
   const columnsInitRef = React.useRef(false);
   const hasColumnsDefined = columnsProp && columnsProp.length > 0;
-
-  const idFieldInitRef = React.useRef(false);
 
   React.useEffect(() => {
     if (!nodeRuntime || hasColumnsDefined || rows.length <= 0 || columnsInitRef.current) {
@@ -146,31 +149,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     columnsInitRef.current = true;
   }, [hasColumnsDefined, rows, nodeRuntime]);
 
-  React.useEffect(() => {
-    if (!nodeRuntime || rows.length <= 0 || idFieldInitRef.current) {
-      return;
-    }
-
-    if (rowIdFieldProp || Boolean(rows?.[0]?.id)) {
-      idFieldInitRef.current = true;
-      return;
-    }
-
-    const mappedRows = addIdField(rows);
-    nodeRuntime.setProp('rows', mappedRows);
-
-    idFieldInitRef.current = true;
-  }, [rowIdFieldProp, rows, nodeRuntime]);
-
-  const debouncedRowIdFieldProp = useDebounced(rowIdFieldProp, 300);
-
   const getRowId = React.useCallback(
     (row: any) => {
-      return debouncedRowIdFieldProp && row[debouncedRowIdFieldProp]
-        ? row[debouncedRowIdFieldProp]
-        : row.id;
+      return rowIdFieldProp && row[rowIdFieldProp] ? row[rowIdFieldProp] : row.id;
     },
-    [debouncedRowIdFieldProp],
+    [rowIdFieldProp],
   );
 
   const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
@@ -181,9 +164,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         components={{ Toolbar: GridToolbar }}
         onColumnResize={handleResize}
         onColumnOrderChange={handleColumnOrderChange}
-        rows={idFieldInitRef.current ? rows : []}
+        rows={rows}
         columns={columns}
-        key={debouncedRowIdFieldProp}
         getRowId={(row) => getRowId(row)}
         onSelectionModelChange={(ids) =>
           onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null)

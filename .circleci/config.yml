@@ -6,7 +6,7 @@ defaults: &defaults
   working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
-    - image: cimg/node:14.19
+    - image: cimg/node:16.14
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.
@@ -93,7 +93,7 @@ jobs:
     working_directory: /tmp/mui-toolpad
     resource_class: medium
     docker:
-      - image: cimg/node:14.19
+      - image: cimg/node:16.14
     environment:
       - DOCKER_BUILDKIT: '1'
     steps:

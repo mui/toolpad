@@ -27,20 +27,19 @@ test(`simple databinding`, async () => {
 
   const components = getToolpadComponents(appId, version, dom);
 
-  window.history.pushState({}, 'Test page', `/pages/${page.id}`);
+  window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
 
   render(
-    <ToolpadApp appId={appId} version={version} basename="/" dom={dom} components={components} />,
+    <ToolpadApp
+      appId={appId}
+      version={version}
+      basename="toolpad"
+      dom={dom}
+      components={components}
+    />,
   );
 
-  await waitFor(() => screen.getByText('Hello World'));
+  const typography = await waitFor(() => screen.getByText('Hello World'));
 
-  screen.getByText('Hello World');
-
-  // fireEvent.click(screen.getByText('Load Greeting'));
-  //
-  // await waitFor(() => screen.getByRole('heading'));
-  //
-  // expect(screen.getByRole('heading')).toHaveTextContent('hello there');
-  // expect(screen.getByRole('button')).toBeDisabled();
+  expect(typography).toHaveClass('MuiTypography-root');
 });

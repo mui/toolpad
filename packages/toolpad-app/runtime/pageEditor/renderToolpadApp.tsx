@@ -44,6 +44,8 @@ function instantiateComponent(def: ToolpadComponentDefinition): ToolpadComponent
       );
     }
 
+    InstantiatedComponent.defaultProps = ImportedComponent.defaultProps;
+
     const importedConfig = ImportedComponent[TOOLPAD_COMPONENT] || mod.config;
 
     // We update the componentConfig after the component is loaded
@@ -54,8 +56,10 @@ function instantiateComponent(def: ToolpadComponentDefinition): ToolpadComponent
     return { default: ImportedComponent };
   });
 
+  const LazyWrapper = React.forwardRef((props, ref) => <LazyComponent ref={ref} {...props} />);
+
   // We start with a lazy component with default argTypes
-  InstantiatedComponent = createComponent(LazyComponent);
+  InstantiatedComponent = createComponent(LazyWrapper);
 
   InstantiatedComponent.displayName = def.importedName;
 

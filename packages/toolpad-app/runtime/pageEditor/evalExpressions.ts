@@ -13,7 +13,7 @@ function evaluateCode(code: string, globalScope: Record<string, unknown>) {
   return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
 }
 
-type BindingEvaluationResult =
+export type BindingEvaluationResult =
   | {
       value: any;
       error?: undefined;

@@ -30,7 +30,7 @@ import AppOverview from '../../src/components/AppOverview';
 import { InstantiatedComponent, InstantiatedComponents } from '../../src/toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import { fireEvent, JsRuntimeProvider } from '../coreRuntime';
-import evalExpressions from './evalExpressions';
+import evalExpressions, { BindingEvaluationResult } from './evalExpressions';
 
 export interface RenderToolpadComponentParams {
   Component: ToolpadComponent<any>;
@@ -251,6 +251,40 @@ function useConstState(dom: appDom.AppDom, page: appDom.PageNode): ControlledSta
   }, [dom, page, components]);
 }
 
+function useConstBindings(
+  dom: appDom.AppDom,
+  page: appDom.PageNode,
+): Record<string, BindingEvaluationResult> {
+  const components = useComponentsContext();
+  return React.useMemo(() => {
+    const bindings: Record<string, BindingEvaluationResult> = {};
+    const elements = appDom.getDescendants(dom, page);
+
+    for (const elm of elements) {
+      if (appDom.isElement(elm)) {
+        const { Component } = getElmComponent(components, elm);
+        const { argTypes } = Component[TOOLPAD_COMPONENT];
+        for (const [key, argType] of Object.entries(argTypes)) {
+          if (argType && !argType.onChangeProp && elm.props?.[key]?.type === 'const') {
+            bindings[`${elm.id}.props.${key}`] = { value: elm.props?.[key]?.value };
+          }
+        }
+      }
+      if (appDom.isQueryState(elm)) {
+        if (elm.params) {
+          for (const [key, bindable] of Object.entries(elm.params)) {
+            if (bindable?.type === 'const') {
+              bindings[`${elm.id}.params.${key}`] = { value: bindable.value };
+            }
+          }
+        }
+      }
+    }
+
+    return bindings;
+  }, [dom, page, components]);
+}
+
 interface PageRootProps {
   children?: React.ReactNode;
 }
@@ -320,7 +354,11 @@ function getExpression(bindable?: BindableAttrValue<any>): string | undefined {
   }
 }
 
-function useLiveBindings(dom: appDom.AppDom, page: appDom.PageNode, currentPageState: PageState) {
+function useLiveBindings(
+  dom: appDom.AppDom,
+  page: appDom.PageNode,
+  currentPageState: PageState,
+): Record<string, BindingEvaluationResult> {
   return React.useMemo(() => {
     const descendants = appDom.getDescendants(dom, page);
     const jsExpressions: Record<string, string> = {};
@@ -332,8 +370,8 @@ function useLiveBindings(dom: appDom.AppDom, page: appDom.PageNode, currentPageS
           for (const [propName, bindable] of Object.entries(descendant.props)) {
             const bindingLabel = `${descendant.name}.${propName}`;
             const expression = getExpression(bindable);
-            bindings.set(`${descendant.id}.props.${propName}`, bindingLabel);
             if (expression) {
+              bindings.set(`${descendant.id}.props.${propName}`, bindingLabel);
               jsExpressions[bindingLabel] = expression;
             }
           }
@@ -343,8 +381,8 @@ function useLiveBindings(dom: appDom.AppDom, page: appDom.PageNode, currentPageS
           for (const [propName, bindable] of Object.entries(descendant.params)) {
             const bindingLabel = `${descendant.name}.${propName}`;
             const expression = getExpression(bindable);
-            bindings.set(`${descendant.id}.params.${propName}`, bindingLabel);
             if (expression) {
+              bindings.set(`${descendant.id}.params.${propName}`, bindingLabel);
               jsExpressions[bindingLabel] = expression;
             }
           }
@@ -416,9 +454,15 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     fireEvent({ type: 'pageStateUpdated', pageState });
   }, [pageState]);
 
-  const liveBindings = useLiveBindings(dom, page, pageState);
+  const constBindings = useConstBindings(dom, page);
+  const jsExpressionBindings = useLiveBindings(dom, page, pageState);
 
-  console.log(pageState, liveBindings);
+  const liveBindings = React.useMemo(
+    () => ({ ...constBindings, ...jsExpressionBindings }),
+    [constBindings, jsExpressionBindings],
+  );
+
+  console.log(liveBindings);
 
   React.useEffect(() => {
     fireEvent({ type: 'pageBindingsUpdated', bindings: liveBindings });

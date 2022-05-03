@@ -35,7 +35,7 @@ function evaluateExpression(
   }
 }
 
-export default function evalExpressions(
+export default function evalJsBindings(
   expressions: string[],
   scope: Record<string, unknown>,
   bindings: Record<string, string>,

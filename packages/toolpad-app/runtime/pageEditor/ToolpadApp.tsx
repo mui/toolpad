@@ -33,7 +33,7 @@ import {
 } from '../../src/toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import { fireEvent, JsRuntimeProvider } from '../coreRuntime';
-import evalExpressions, { BindingEvaluationResult } from './evalExpressions';
+import evalJsBindings, { BindingEvaluationResult } from './evalJsBindings';
 import instantiateComponents from './instantiateComponents';
 
 export interface RenderToolpadComponentParams {
@@ -406,7 +406,7 @@ function useLiveBindings(
       }
     });
 
-    const evaluations = evalExpressions(
+    const evaluations = evalJsBindings(
       Array.from(bindings.values()),
       currentPageState,
       jsExpressions,

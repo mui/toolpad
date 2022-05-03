@@ -178,7 +178,6 @@ test(`Databinding errors`, async () => {
       'message',
       'Cycle detected "cyclic1.value"',
     );
-    // console.log(bindings);
   } finally {
     cleanup();
   }

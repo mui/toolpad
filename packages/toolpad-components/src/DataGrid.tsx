@@ -54,6 +54,7 @@ const EMPTY_ROWS: GridRowsProp = [];
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'> {
   rows?: GridRowsProp;
   columns?: GridColumns;
+  rowIdField?: string;
   dataQuery?: UseDataQuery;
   selection: any;
   onSelectionChange: (newSelection: any) => void;
@@ -64,6 +65,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     dataQuery,
     columns: columnsProp,
     rows: rowsProp,
+    rowIdField: rowIdFieldProp,
     selection,
     onSelectionChange,
     ...props
@@ -118,10 +120,17 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const { rows: dataQueryRows, ...dataQueryRest } = dataQuery || {};
 
-  const rows: GridRowsProp = rowsProp || dataQueryRows || EMPTY_ROWS;
+  const rows: GridRowsProp = React.useMemo(() => {
+    const parsedRows = rowsProp || dataQueryRows || EMPTY_ROWS;
+    if (parsedRows.length === 0 || rowIdFieldProp || parsedRows[0].id) {
+      return parsedRows;
+    }
+    return parsedRows.map((row, id) => ({ ...row, id }));
+  }, [dataQueryRows, rowsProp, rowIdFieldProp]);
 
   const columnsInitRef = React.useRef(false);
   const hasColumnsDefined = columnsProp && columnsProp.length > 0;
+
   React.useEffect(() => {
     if (!nodeRuntime || hasColumnsDefined || rows.length <= 0 || columnsInitRef.current) {
       return;
@@ -134,6 +143,20 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     columnsInitRef.current = true;
   }, [hasColumnsDefined, rows, nodeRuntime]);
 
+  const getRowId = React.useCallback(
+    (row: any) => {
+      return rowIdFieldProp && row[rowIdFieldProp] ? row[rowIdFieldProp] : row.id;
+    },
+    [rowIdFieldProp],
+  );
+
+  const onSelectionModelChange = React.useCallback(
+    (ids) => {
+      onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null);
+    },
+    [rows, onSelectionChange],
+  );
+
   const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
 
   return (
@@ -144,9 +167,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
         columns={columns}
-        onSelectionModelChange={(ids) =>
-          onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null)
-        }
+        key={rowIdFieldProp}
+        getRowId={getRowId}
+        onSelectionModelChange={onSelectionModelChange}
         selectionModel={selection ? [selection.id] : []}
         {...dataQueryRest}
         {...props}
@@ -181,6 +204,10 @@ export default createComponent(DataGridComponent, {
     selection: {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',
+    },
+    rowIdField: {
+      typeDef: { type: 'string' },
+      label: 'Id field',
     },
   },
 });

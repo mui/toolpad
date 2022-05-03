@@ -1,4 +1,4 @@
-import { Stack, Button, TextField, Autocomplete } from '@mui/material';
+import { Stack, Button, Checkbox, TextField, Autocomplete, FormControlLabel } from '@mui/material';
 import * as React from 'react';
 import { useQuery } from 'react-query';
 import {
@@ -22,7 +22,7 @@ import useDebounced from '../../utils/useDebounced';
 const dataSourceName = 'Google Sheets';
 
 function getInitialQueryValue(): GoogleSheetsApiQuery {
-  return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '' };
+  return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '', headerRow: false };
 }
 
 function getInitialConnectionValue(): GoogleSheetsConnectionParams {
@@ -129,6 +129,16 @@ function QueryEditor({
     [onChange, value],
   );
 
+  const handleTransformChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange({
+        ...value,
+        headerRow: event.target?.checked,
+      });
+    },
+    [onChange, value],
+  );
+
   const handleSpreadsheetInput = React.useCallback(
     (event: React.SyntheticEvent, input: string, reason: string) => {
       if (reason === 'input') {
@@ -187,6 +197,17 @@ function QueryEditor({
         value={value?.ranges}
         disabled={!value?.sheetName}
         onChange={handleRangeChange}
+      />
+      <FormControlLabel
+        label="Interpret first row as columns"
+        control={
+          <Checkbox
+            size="small"
+            checked={value?.headerRow}
+            onChange={handleTransformChange}
+            inputProps={{ 'aria-label': 'controlled' }}
+          />
+        }
       />
     </Stack>
   );

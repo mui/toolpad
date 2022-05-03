@@ -1,5 +1,5 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
-import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType, LiveBinding } from '@mui/toolpad-core';
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType } from '@mui/toolpad-core';
 import { NodeFiberHostProps } from '@mui/toolpad-core/runtime';
 import { NodeId, FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
@@ -45,18 +45,16 @@ function walkFibers(node: FiberNode, visitor: (node: FiberNode) => void) {
 
 export function getNodesViewInfo(rootElm: HTMLElement): {
   nodes: NodesInfo;
-  bindings: Record<string, LiveBinding>;
 } {
   // eslint-disable-next-line no-underscore-dangle
   const devtoolsHook = rootElm.ownerDocument.defaultView?.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 
   if (!devtoolsHook) {
     console.warn(`Can't read page layout as react devtools are not installed`);
-    return { nodes: {}, bindings: {} };
+    return { nodes: {} };
   }
 
   const nodes: NodesInfo = {};
-  const bindings: Record<string, LiveBinding> = {};
 
   const rendererId = 1;
   const nodeElms = new Map<NodeId, Element>();
@@ -86,9 +84,6 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
             const info = getNodeViewInfo(fiber, rootElm, elm, nodeId, fiberHostProps);
             if (info) {
               nodes[nodeId] = info;
-              Object.entries(info.props).forEach(([key, value]) => {
-                bindings[`${info.nodeId}.props.${key}`] = { value };
-              });
             }
           }
         }
@@ -123,13 +118,9 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
     }
   });
 
-  return { nodes, bindings };
+  return { nodes };
 }
 
 export function getPageViewState(rootElm: HTMLElement): PageViewState {
-  const nodesViewInfo = getNodesViewInfo(rootElm);
-
-  return {
-    nodes: nodesViewInfo.nodes,
-  };
+  return getNodesViewInfo(rootElm);
 }

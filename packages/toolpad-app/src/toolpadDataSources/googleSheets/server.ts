@@ -166,7 +166,7 @@ async function exec(
   }
   const sheets = createSheetsClient(client);
 
-  const { spreadsheetId, sheetName, ranges = 'A1:Z10' } = query;
+  const { spreadsheetId, sheetName, ranges, headerRow } = query;
   if (spreadsheetId && sheetName) {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
@@ -175,17 +175,22 @@ async function exec(
     if (response.status === 200) {
       const { values } = response.data;
       if (values && values.length > 0) {
-        const headerRow = values.shift() ?? [];
-        const fields = headerRow.reduce((acc, currValue) => ({ ...acc, [currValue]: '' }), {});
-        const data = values.map((row, rowIndex) => {
-          const rowObject: any = { id: rowIndex };
-          row.forEach((elem, cellIndex) => {
-            rowObject[headerRow[cellIndex]] = elem;
+        let data = values;
+        if (headerRow) {
+          const firstRow = values.shift() ?? [];
+          data = values.map((row) => {
+            const rowObject: any = {};
+            row.forEach((elem, cellIndex) => {
+              if (firstRow[cellIndex]) {
+                rowObject[firstRow[cellIndex]] = elem;
+              }
+            });
+            return rowObject;
           });
-          return rowObject;
-        });
-        return { fields, data };
+        }
+        return { data };
       }
+      return { data: [] };
     }
     throw new Error(
       `${response.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,

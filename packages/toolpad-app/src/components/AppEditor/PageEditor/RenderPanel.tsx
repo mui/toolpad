@@ -5,6 +5,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
 import { RuntimeEvent, SlotType } from '@mui/toolpad-core';
+import { setEventHandler } from '@mui/toolpad-core/runtime';
 import {
   NodeId,
   FlowDirection,
@@ -30,12 +31,6 @@ import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
-
-declare global {
-  interface Window {
-    __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
-  }
-}
 
 const ROW_COMPONENT = 'PageRow';
 
@@ -856,23 +851,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       resizeObserver.observe(rootElm);
       rootElm.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
 
-      // eslint-disable-next-line no-underscore-dangle
-      const queuedEvents = Array.isArray(editorWindow.__TOOLPAD_RUNTIME_EVENT__)
-        ? // eslint-disable-next-line no-underscore-dangle
-          editorWindow.__TOOLPAD_RUNTIME_EVENT__
-        : [];
-
-      queuedEvents.forEach((event) => handleRuntimeEventRef.current(event));
-
-      // eslint-disable-next-line no-underscore-dangle
-      editorWindow.__TOOLPAD_RUNTIME_EVENT__ = (event) => handleRuntimeEventRef.current(event);
+      const cleanupHandler = setEventHandler(editorWindow, handleRuntimeEventRef.current);
 
       return () => {
         handlePageUpdateThrottled.cancel();
         mutationObserver.disconnect();
         resizeObserver.disconnect();
-        // eslint-disable-next-line no-underscore-dangle
-        delete editorWindow.__TOOLPAD_RUNTIME_EVENT__;
+        cleanupHandler();
       };
     }
     return () => {};

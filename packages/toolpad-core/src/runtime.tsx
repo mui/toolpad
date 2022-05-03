@@ -153,6 +153,30 @@ export function fireEvent(event: RuntimeEvent) {
   }
 }
 
+export function setEventHandler(window: Window, handleEvent: (event: RuntimeEvent) => void) {
+  // eslint-disable-next-line no-underscore-dangle
+  if (typeof window.__TOOLPAD_RUNTIME_EVENT__ === 'function') {
+    throw new Error(`Event handler already attached.`);
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  const queuedEvents = Array.isArray(window.__TOOLPAD_RUNTIME_EVENT__)
+    ? // eslint-disable-next-line no-underscore-dangle
+      window.__TOOLPAD_RUNTIME_EVENT__
+    : [];
+
+  queuedEvents.forEach((event) => handleEvent(event));
+
+  // eslint-disable-next-line no-underscore-dangle
+  window.__TOOLPAD_RUNTIME_EVENT__ = (event) => handleEvent(event);
+
+  return () => {
+    console.log('cleaning up');
+    // eslint-disable-next-line no-underscore-dangle
+    delete window.__TOOLPAD_RUNTIME_EVENT__;
+  };
+}
+
 export function useNode<P = {}>(): NodeRuntime<P> | null {
   const nodeId = React.useContext(NodeRuntimeContext);
 

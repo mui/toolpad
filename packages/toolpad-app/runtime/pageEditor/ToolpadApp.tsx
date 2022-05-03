@@ -535,7 +535,10 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
 
   const queryClient = React.useMemo(() => new QueryClient(), []);
 
-  const instantiatedComponents = instantiateComponents(components);
+  const instantiatedComponents = React.useMemo(
+    () => instantiateComponents(components),
+    [components],
+  );
 
   return (
     <ErrorBoundary FallbackComponent={AppError}>

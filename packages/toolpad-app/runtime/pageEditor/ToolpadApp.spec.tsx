@@ -89,7 +89,38 @@ test(`simple databinding`, async () => {
   });
 
   const text = await waitFor(() => screen.getByText('Default Text'));
+  const textField = screen.getByLabelText('The Input');
 
+  act(() => {
+    textField.focus();
+    fireEvent.change(textField, { target: { value: 'Hello Everybody' } });
+  });
+
+  expect(text).toHaveTextContent('Hello Everybody');
+});
+
+test(`simple databinding`, async () => {
+  renderPage((dom, page) => {
+    const textField = appDom.createNode(dom, 'element', {
+      name: 'theTextInput',
+      attributes: { component: appDom.createConst('TextField') },
+      props: {
+        label: appDom.createConst('The Input'),
+        value: appDom.createConst('Default Text'),
+      },
+    });
+    dom = appDom.addNode(dom, textField, page, 'children');
+
+    const text = appDom.createNode(dom, 'element', {
+      attributes: { component: appDom.createConst('Typography') },
+      props: { value: { type: 'jsExpression', value: 'theTextInput.value' } },
+    });
+    dom = appDom.addNode(dom, text, page, 'children');
+
+    return dom;
+  });
+
+  const text = await waitFor(() => screen.getByText('Default Text'));
   const textField = screen.getByLabelText('The Input');
 
   act(() => {

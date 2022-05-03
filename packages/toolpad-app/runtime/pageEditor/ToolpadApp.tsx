@@ -28,9 +28,14 @@ import * as appDom from '../../src/appDom';
 import { NodeId, VersionOrPreview } from '../../src/types';
 import { createProvidedContext } from '../../src/utils/react';
 import AppOverview from '../../src/components/AppOverview';
-import { InstantiatedComponent, InstantiatedComponents } from '../../src/toolpadComponents';
+import {
+  InstantiatedComponent,
+  InstantiatedComponents,
+  ToolpadComponentDefinitions,
+} from '../../src/toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import { evaluateBindable, fireEvent, JsRuntimeProvider } from '../coreRuntime';
+import instantiateComponents from './instantiateComponents';
 
 export interface RenderToolpadComponentParams {
   Component: ToolpadComponent<any>;
@@ -431,7 +436,7 @@ export interface ToolpadAppProps {
   appId: string;
   version: VersionOrPreview;
   dom: appDom.AppDom;
-  components: InstantiatedComponents;
+  components: ToolpadComponentDefinitions;
 }
 
 export default function ToolpadApp({ basename, appId, version, dom, components }: ToolpadAppProps) {
@@ -444,11 +449,13 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
 
   const queryClient = React.useMemo(() => new QueryClient(), []);
 
+  const instantiatedComponents = instantiateComponents(components);
+
   return (
     <ErrorBoundary FallbackComponent={AppError}>
       <React.Suspense fallback={<AppLoading />}>
         <JsRuntimeProvider>
-          <ComponentsContextProvider value={components}>
+          <ComponentsContextProvider value={instantiatedComponents}>
             <AppContextProvider value={appContext}>
               <QueryClientProvider client={queryClient}>
                 <CssBaseline />

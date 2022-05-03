@@ -21,7 +21,7 @@ test(`simple databinding`, async () => {
   dom = appDom.addNode(dom, page, root, 'pages');
   const text = appDom.createNode(dom, 'element', {
     attributes: { component: appDom.createConst('Typography') },
-    props: { children: { type: 'const', value: 'Hello World' } },
+    props: { value: { type: 'const', value: 'Hello World' } },
   });
   dom = appDom.addNode(dom, text, page, 'children');
 

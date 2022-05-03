@@ -9,7 +9,7 @@ import { setEventHandler } from '../coreRuntime';
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
-  waitForOrig(waiter, { timeout: 5000, ...options });
+  waitForOrig(waiter, { timeout: 4000, ...options });
 
 function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom) {
   const appId = '12345';
@@ -60,7 +60,9 @@ test(`Static Text`, async () => {
     return dom;
   });
 
-  const text = await waitFor(() => screen.getByText('Hello World'));
+  await waitFor(() => screen.getByTestId('page-root'));
+
+  const text = screen.getByText('Hello World');
   expect(text).toHaveClass('MuiTypography-root');
 });
 
@@ -75,7 +77,9 @@ test(`Default Text`, async () => {
     return dom;
   });
 
-  const text = await waitFor(() => screen.getByText('Text'));
+  await waitFor(() => screen.getByTestId('page-root'));
+
+  const text = screen.getByText('Text');
   expect(text).toHaveClass('MuiTypography-root');
 });
 
@@ -100,7 +104,9 @@ test(`simple databinding`, async () => {
     return dom;
   });
 
-  const text = await waitFor(() => screen.getByText('Default Text'));
+  await waitFor(() => screen.getByTestId('page-root'));
+
+  const text = screen.getByText('Default Text');
   const textField = screen.getByLabelText('The Input');
 
   act(() => {
@@ -126,16 +132,6 @@ test(`Databinding errors`, async () => {
     let cyclic1: appDom.ElementNode;
     let cyclic2: appDom.ElementNode;
     renderPage((dom, page) => {
-      dom = appDom.addNode(
-        dom,
-        appDom.createNode(dom, 'element', {
-          attributes: { component: appDom.createConst('Typography') },
-          props: { value: appDom.createConst('Marker') },
-        }),
-        page,
-        'children',
-      );
-
       nonExisting = appDom.createNode(dom, 'element', {
         attributes: { component: appDom.createConst('Typography') },
         props: { value: { type: 'jsExpression', value: 'nonExisting.foo' } },
@@ -166,7 +162,7 @@ test(`Databinding errors`, async () => {
       return dom;
     });
 
-    await waitFor(() => screen.getByText('Marker'));
+    await waitFor(() => screen.getByTestId('page-root'));
     await waitFor(() => bindings);
 
     expect(bindings![`${nonExisting!.id}.props.value`]).toHaveProperty(

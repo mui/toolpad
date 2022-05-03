@@ -162,6 +162,7 @@ test(`Databinding errors`, async () => {
 
     await waitFor(() => screen.getByText('Marker'));
     expect(bindings).toBeDefined();
+    console.log(bindings);
     expect(bindings![`${nonExisting!.id}.props.value`]?.error).toHaveProperty(
       'message',
       'nonExisting is not defined',

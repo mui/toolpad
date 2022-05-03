@@ -163,7 +163,7 @@ test(`Databinding errors`, async () => {
     });
 
     await waitFor(() => screen.getByTestId('page-root'));
-    await waitFor(() => bindings);
+    await waitFor(() => expect(bindings).toBeDefined());
 
     expect(bindings![`${nonExisting!.id}.props.value`]).toHaveProperty(
       'error',

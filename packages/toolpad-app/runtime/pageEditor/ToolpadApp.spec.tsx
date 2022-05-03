@@ -39,7 +39,10 @@ test(`simple databinding`, async () => {
     />,
   );
 
-  const typography = await waitFor(() => screen.getByText('Hello World'));
+  const typography = await waitFor(() => screen.getByText('Hello World'), {
+    interval: 1000,
+    timeout: 60000,
+  });
 
   expect(typography).toHaveClass('MuiTypography-root');
 });

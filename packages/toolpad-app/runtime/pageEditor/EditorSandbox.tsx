@@ -7,7 +7,7 @@ import ToolpadApp, {
 } from './ToolpadApp';
 import * as appDom from '../../src/appDom';
 import { VersionOrPreview } from '../../src/types';
-import { InstantiatedComponents } from '../../src/toolpadComponents';
+import { ToolpadComponentDefinitions } from '../../src/toolpadComponents';
 
 export interface ToolpadBridge {
   updateDom(newDom: appDom.AppDom): void;
@@ -50,7 +50,7 @@ export interface EditorCanvasProps {
   basename: string;
   appId: string;
   version: VersionOrPreview;
-  components: InstantiatedComponents;
+  components: ToolpadComponentDefinitions;
 }
 
 export default function EditorCanvas({ dom: initialDom, ...props }: EditorCanvasProps) {

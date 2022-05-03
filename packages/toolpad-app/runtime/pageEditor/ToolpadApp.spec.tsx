@@ -48,7 +48,7 @@ test(`Static Text`, async () => {
     return dom;
   });
 
-  const text = await waitFor(() => screen.getByText('Hello World'));
+  const text = await waitFor(() => screen.getByText('Hello World'), { timeout: 10000 });
   expect(text).toHaveClass('MuiTypography-root');
 });
 
@@ -63,7 +63,7 @@ test(`Default Text`, async () => {
     return dom;
   });
 
-  const text = await waitFor(() => screen.getByText('Text'));
+  const text = await waitFor(() => screen.getByText('Text'), { timeout: 10000 });
   expect(text).toHaveClass('MuiTypography-root');
 });
 
@@ -88,7 +88,7 @@ test(`simple databinding`, async () => {
     return dom;
   });
 
-  const text = await waitFor(() => screen.getByText('Default Text'));
+  const text = await waitFor(() => screen.getByText('Default Text'), { timeout: 10000 });
   const textField = screen.getByLabelText('The Input');
 
   act(() => {
@@ -120,7 +120,7 @@ test(`simple databinding`, async () => {
     return dom;
   });
 
-  const text = await waitFor(() => screen.getByText('Default Text'));
+  const text = await waitFor(() => screen.getByText('Default Text'), { timeout: 10000 });
   const textField = screen.getByLabelText('The Input');
 
   act(() => {

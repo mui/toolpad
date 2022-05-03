@@ -66,7 +66,10 @@ test(`simple databinding`, async () => {
     const textField = appDom.createNode(dom, 'element', {
       name: 'theTextInput',
       attributes: { component: appDom.createConst('TextField') },
-      props: { label: appDom.createConst('The Input') },
+      props: {
+        label: appDom.createConst('The Input'),
+        value: appDom.createConst('Default Text'),
+      },
     });
     dom = appDom.addNode(dom, textField, page, 'children');
     const text = appDom.createNode(dom, 'element', {
@@ -90,6 +93,8 @@ test(`simple databinding`, async () => {
     />,
   );
 
+  const text = await waitFor(() => screen.getByText('Default Text'));
+
   const textField = await waitFor(() => screen.getByLabelText('The Input'));
 
   act(() => {
@@ -97,7 +102,5 @@ test(`simple databinding`, async () => {
     fireEvent.change(textField, { target: { value: 'Hello Everybody' } });
   });
 
-  const text = await waitFor(() => screen.getByText('Hello Everybody'));
-
-  expect(text).toHaveClass('MuiTypography-root');
+  expect(text).toHaveTextContent('Hello Everybody');
 });

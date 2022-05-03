@@ -43,6 +43,12 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
   );
 }
 
+afterEach(() => {
+  // Make sure to clean up events after each test
+  const cleanup = setEventHandler(window, () => {});
+  cleanup();
+});
+
 test(`Static Text`, async () => {
   renderPage((dom, page) => {
     const text = appDom.createNode(dom, 'element', {
@@ -161,16 +167,8 @@ test(`Databinding errors`, async () => {
     });
 
     await waitFor(() => screen.getByText('Marker'));
-    expect(bindings).toBeDefined();
-    console.log(
-      {
-        nonExisting: nonExisting!.id,
-        selfReferencing: selfReferencing!.id,
-        cyclic1: cyclic1!.id,
-        cyclic2: cyclic2!.id,
-      },
-      bindings,
-    );
+    await waitFor(() => bindings);
+
     expect(bindings![`${nonExisting!.id}.props.value`]).toHaveProperty(
       'error',
       expect.objectContaining({

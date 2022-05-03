@@ -171,7 +171,6 @@ export function setEventHandler(window: Window, handleEvent: (event: RuntimeEven
   window.__TOOLPAD_RUNTIME_EVENT__ = (event) => handleEvent(event);
 
   return () => {
-    console.log('cleaning up');
     // eslint-disable-next-line no-underscore-dangle
     delete window.__TOOLPAD_RUNTIME_EVENT__;
   };

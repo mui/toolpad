@@ -162,22 +162,38 @@ test(`Databinding errors`, async () => {
 
     await waitFor(() => screen.getByText('Marker'));
     expect(bindings).toBeDefined();
-    console.log(bindings);
-    expect(bindings![`${nonExisting!.id}.props.value`]?.error).toHaveProperty(
-      'message',
-      'nonExisting is not defined',
+    console.log(
+      {
+        nonExisting: nonExisting!.id,
+        selfReferencing: selfReferencing!.id,
+        cyclic1: cyclic1!.id,
+        cyclic2: cyclic2!.id,
+      },
+      bindings,
     );
-    expect(bindings![`${selfReferencing!.id}.props.value`]?.error).toHaveProperty(
-      'message',
-      'Cycle detected "selfReferencing.value"',
+    expect(bindings![`${nonExisting!.id}.props.value`]).toHaveProperty(
+      'error',
+      expect.objectContaining({
+        message: 'nonExisting is not defined',
+      }),
     );
-    expect(bindings![`${cyclic1!.id}.props.value`]?.error).toHaveProperty(
-      'message',
-      'Cycle detected "cyclic1.value"',
+    expect(bindings![`${selfReferencing!.id}.props.value`]).toHaveProperty(
+      'error',
+      expect.objectContaining({
+        message: 'Cycle detected "selfReferencing.value"',
+      }),
     );
-    expect(bindings![`${cyclic2!.id}.props.value`]?.error).toHaveProperty(
-      'message',
-      'Cycle detected "cyclic1.value"',
+    expect(bindings![`${cyclic1!.id}.props.value`]).toHaveProperty(
+      'error',
+      expect.objectContaining({
+        message: 'Cycle detected "cyclic1.value"',
+      }),
+    );
+    expect(bindings![`${cyclic2!.id}.props.value`]).toHaveProperty(
+      'error',
+      expect.objectContaining({
+        message: 'Cycle detected "cyclic1.value"',
+      }),
     );
   } finally {
     cleanup();

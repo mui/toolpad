@@ -315,32 +315,30 @@ function parseBindings(
     if (appDom.isElement(elm)) {
       const { id, Component } = getElmComponent(components, elm);
 
-      if (id !== PAGE_ROW_COMPONENT_ID) {
-        const { argTypes } = Component[TOOLPAD_COMPONENT];
+      const { argTypes } = Component[TOOLPAD_COMPONENT];
 
-        for (const [propName, argType] of Object.entries(argTypes)) {
-          const binding = elm.props?.[propName];
-          const bindingId = `${elm.id}.props.${propName}`;
-          if (argType) {
-            if (argType.onChangeProp) {
-              const defaultValue =
-                binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
-              initialControlledValues[bindingId] = { value: defaultValue };
-            } else if (binding?.type === 'const') {
-              constValues[bindingId] = { value: binding?.value };
-            } else if (binding?.type === 'jsExpression') {
-              const variableExpression = `${elm.name}.${propName}`;
-              expressionBindings[bindingId] = variableExpression;
-              jsExpressions[variableExpression] = binding?.value;
-            }
+      for (const [propName, argType] of Object.entries(argTypes)) {
+        const binding = elm.props?.[propName];
+        const bindingId = `${elm.id}.props.${propName}`;
+        if (argType) {
+          if (argType.onChangeProp) {
+            const defaultValue =
+              binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
+            initialControlledValues[bindingId] = { value: defaultValue };
+          } else if (binding?.type === 'const') {
+            constValues[bindingId] = { value: binding?.value };
+          } else if (binding?.type === 'jsExpression') {
+            const variableExpression = `${elm.name}.${propName}`;
+            expressionBindings[bindingId] = variableExpression;
+            jsExpressions[variableExpression] = binding?.value;
           }
         }
+      }
 
-        for (const [propName, argType] of Object.entries(argTypes)) {
-          const bindingId = `${elm.id}.props.${propName}`;
-          if (argType) {
-            defaultValues[bindingId] = { value: Component.defaultProps?.[propName] };
-          }
+      for (const [propName, argType] of Object.entries(argTypes)) {
+        const bindingId = `${elm.id}.props.${propName}`;
+        if (argType) {
+          defaultValues[bindingId] = { value: Component.defaultProps?.[propName] };
         }
       }
     }

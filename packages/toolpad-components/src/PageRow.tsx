@@ -22,7 +22,7 @@ function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps
 
 PageRow.defaultProps = {
   spacing: 2,
-  alignItems: 'start',
+  alignItems: 'center',
   justifyContent: 'start',
 };
 

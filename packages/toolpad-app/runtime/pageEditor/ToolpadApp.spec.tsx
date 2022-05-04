@@ -180,13 +180,13 @@ test(`Databinding errors`, async () => {
     expect(bindings![`${cyclic1!.id}.props.value`]).toHaveProperty(
       'error',
       expect.objectContaining({
-        message: 'Cycle detected "cyclic1.value"',
+        message: 'Cycle detected "cyclic2.value"',
       }),
     );
     expect(bindings![`${cyclic2!.id}.props.value`]).toHaveProperty(
       'error',
       expect.objectContaining({
-        message: 'Cycle detected "cyclic1.value"',
+        message: 'Cycle detected "cyclic2.value"',
       }),
     );
   } finally {

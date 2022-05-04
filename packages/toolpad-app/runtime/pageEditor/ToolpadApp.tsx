@@ -402,7 +402,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     });
   }, [initialControlledValues]);
 
-  console.log(defaultValues);
   const inputBindings = React.useMemo(
     () => ({ ...defaultValues, ...constValues, ...controlledBindings }),
     [defaultValues, constValues, controlledBindings],

@@ -313,7 +313,7 @@ function parseBindings(
 
   for (const elm of elements) {
     if (appDom.isElement(elm)) {
-      const { id, Component } = getElmComponent(components, elm);
+      const { Component } = getElmComponent(components, elm);
 
       const { argTypes } = Component[TOOLPAD_COMPONENT];
 

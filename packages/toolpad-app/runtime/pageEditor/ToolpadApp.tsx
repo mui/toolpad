@@ -131,8 +131,6 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
     return hookResult;
   }, [argTypes, errorProp, liveBindings, loadingProp, node.id]);
 
-  // console.log(liveBindings, boundProps);
-
   const onChangeHandlers = React.useMemo(
     () =>
       Object.fromEntries(
@@ -454,8 +452,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
   const globalScope = useGlobalScope(dom, page, inputBindings);
   const jsExpressionValues = React.useMemo(
-    () => evalJsBindings(globalScope, jsExpressions, scopePathToBindingId),
-    [globalScope, jsExpressions, scopePathToBindingId],
+    () => evalJsBindings(globalScope, inputBindings, jsExpressions, scopePathToBindingId),
+    [globalScope, inputBindings, jsExpressions, scopePathToBindingId],
   );
 
   const liveBindings = React.useMemo(

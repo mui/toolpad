@@ -36,21 +36,28 @@ function evaluateExpression(
   }
 }
 
+function unwrapEvaluationResult(result: BindingEvaluationResult) {
+  if (result.loading) {
+    throw new Error(TOOLPAD_LOADING_MARKER);
+  } else if (result.error) {
+    throw result.error;
+  } else {
+    return result.value;
+  }
+}
+
 export default function evalJsBindings(
   scope: Record<string, unknown>,
+  boundValues: Record<string, BindingEvaluationResult>,
   boundExpressions: Record<string, string>,
   scopePathToBindingId: Record<string, string>,
 ) {
-  console.log(scopePathToBindingId);
   const bindingIdMap = new Map(Object.entries(scopePathToBindingId));
   const bindingsMap = new Map(Object.entries(boundExpressions));
 
   const computationStatuses = new Map<
     string,
-    | { status: 'computing' }
-    | { status: 'loading' }
-    | { status: 'resolved'; value: any }
-    | { status: 'error'; error: Error }
+    { status: 'computing' } | { status: 'computed'; result: BindingEvaluationResult }
   >();
 
   let proxiedScope: Record<string, unknown>;
@@ -65,37 +72,32 @@ export default function evalJsBindings(
         const scopePath = label ? `${label}.${prop}` : prop;
         const bindingId = bindingIdMap.get(scopePath);
 
-        if (!bindingId) {
-          return Reflect.get(target, prop, receiver);
-        }
+        if (bindingId) {
+          const expression = bindingsMap.get(bindingId);
 
-        const expression = bindingsMap.get(bindingId);
-
-        if (expression) {
-          const computed = computationStatuses.get(expression);
-          if (computed) {
-            if (computed.status === 'computing') {
-              throw new Error(`Cycle detected "${scopePath}"`);
-            } else if (computed.status === 'loading') {
-              throw new Error(TOOLPAD_LOADING_MARKER);
-            } else if (computed.status === 'error') {
-              throw computed.error;
-            } else {
-              return computed.value;
+          if (expression) {
+            const computed = computationStatuses.get(expression);
+            if (computed) {
+              if (computed.status === 'computing') {
+                throw new Error(`Cycle detected "${scopePath}"`);
+              } else {
+                // From cache
+                return unwrapEvaluationResult(computed.result);
+              }
             }
+
+            computationStatuses.set(expression, { status: 'computing' });
+            const result = evaluateExpression(expression, proxiedScope);
+            computationStatuses.set(expression, { status: 'computed', result });
+            // From freshly computed
+            return unwrapEvaluationResult(result);
           }
 
-          computationStatuses.set(expression, { status: 'computing' });
-          const result = evaluateExpression(expression, proxiedScope);
-          if (result.loading) {
-            computationStatuses.set(expression, { status: 'loading' });
-            throw new Error(TOOLPAD_LOADING_MARKER);
-          } else if (result.error) {
-            computationStatuses.set(expression, { status: 'error', error: result.error });
-            throw result.error;
-          } else {
-            computationStatuses.set(expression, { status: 'resolved', value: result.value });
-            return result.value;
+          const boundValue = boundValues[bindingId];
+
+          if (boundValue) {
+            // From input value on the page
+            return unwrapEvaluationResult(boundValue);
           }
         }
 

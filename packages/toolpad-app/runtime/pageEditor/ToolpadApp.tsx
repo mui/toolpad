@@ -299,7 +299,7 @@ function parseBindings(
   const initialControlledValues: Record<string, BindingEvaluationResult> = {};
   const constValues: Record<string, BindingEvaluationResult> = {};
   const jsExpressions: Record<string, string> = {};
-  const expressionBindings = new Map<string, string>();
+  const expressionBindings: Record<string, string> = {};
 
   const elements = appDom.getDescendants(dom, page);
 
@@ -310,33 +310,37 @@ function parseBindings(
 
       for (const [propName, argType] of Object.entries(argTypes)) {
         const binding = elm.props?.[propName];
+        const bindingId = `${elm.id}.props.${propName}`;
         if (argType) {
           if (argType.onChangeProp) {
             const defaultValue =
               binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
-            initialControlledValues[`${elm.id}.props.${propName}`] = { value: defaultValue };
+            initialControlledValues[bindingId] = { value: defaultValue };
           } else if (binding?.type === 'const') {
-            constValues[`${elm.id}.props.${propName}`] = { value: binding?.value };
+            constValues[bindingId] = { value: binding?.value };
           } else if (binding?.type === 'jsExpression') {
-            const bindingId = `${elm.name}.${propName}`;
-            expressionBindings.set(`${elm.id}.props.${propName}`, bindingId);
-            jsExpressions[bindingId] = binding?.value;
+            const variableExpression = `${elm.name}.${propName}`;
+            expressionBindings[bindingId] = variableExpression;
+            jsExpressions[variableExpression] = binding?.value;
           }
         }
       }
     }
+
     if (appDom.isQueryState(elm)) {
       if (elm.params) {
         for (const [paramName, bindable] of Object.entries(elm.params)) {
+          const bindingId = `${elm.id}.params.${paramName}`;
           if (bindable?.type === 'const') {
-            constValues[`${elm.id}.params.${paramName}`] = { value: bindable.value };
+            constValues[bindingId] = { value: bindable.value };
           } else if (bindable?.type === 'jsExpression') {
-            const bindingId = `${elm.name}.${paramName}`;
-            expressionBindings.set(`${elm.id}.params.${paramName}`, bindingId);
-            jsExpressions[bindingId] = bindable.value;
+            const variableExpression = `${elm.name}.${paramName}`;
+            expressionBindings[bindingId] = variableExpression;
+            jsExpressions[variableExpression] = bindable.value;
           }
         }
       }
+
       for (const [key, value] of Object.entries(INITIAL_DATA_QUERY)) {
         initialControlledValues[`${elm.id}.${key}`] = { value };
       }
@@ -393,14 +397,10 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
   const globalScope = useGlobalScope(dom, page, inputBindings);
   const jsExpressionValues = React.useMemo(() => {
-    const evaluations = evalJsBindings(
-      Array.from(expressionBindings.values()),
-      globalScope,
-      jsExpressions,
-    );
+    const evaluations = evalJsBindings(globalScope, jsExpressions);
 
     return Object.fromEntries(
-      Array.from(expressionBindings.keys(), (binding, i) => [binding, evaluations[i]]),
+      Object.keys(expressionBindings).map((binding, i) => [binding, evaluations[i]]),
     );
   }, [expressionBindings, globalScope, jsExpressions]);
 

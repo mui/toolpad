@@ -36,13 +36,12 @@ function evaluateExpression(
 }
 
 export default function evalJsBindings(
-  expressions: string[],
   scope: Record<string, unknown>,
-  bindings: Record<string, string>,
+  boundExpressions: Record<string, string>,
 ) {
-  const bindingsMap = new Map(Object.entries(bindings));
+  const bindingsMap = new Map(Object.entries(boundExpressions));
 
-  const bindingStatuses = new Map<
+  const computationStatuses = new Map<
     string,
     { status: 'computing' } | { status: 'resolved'; value: any } | { status: 'error'; error: Error }
   >();
@@ -58,27 +57,27 @@ export default function evalJsBindings(
 
         const thisLabel = label ? `${label}.${prop}` : prop;
 
-        const computed = bindingStatuses.get(thisLabel);
-        if (computed) {
-          if (computed.status === 'computing') {
-            throw new Error(`Cycle detected "${thisLabel}"`);
-          } else if (computed.status === 'error') {
-            throw computed.error;
-          } else {
-            return computed.value;
+        const expression = bindingsMap.get(thisLabel);
+
+        if (expression) {
+          const computed = computationStatuses.get(expression);
+          if (computed) {
+            if (computed.status === 'computing') {
+              throw new Error(`Cycle detected "${thisLabel}"`);
+            } else if (computed.status === 'error') {
+              throw computed.error;
+            } else {
+              return computed.value;
+            }
           }
-        }
 
-        const binding = bindingsMap.get(thisLabel);
-
-        if (binding) {
-          bindingStatuses.set(thisLabel, { status: 'computing' });
-          const result = evaluateExpression(binding, proxiedScope);
+          computationStatuses.set(expression, { status: 'computing' });
+          const result = evaluateExpression(expression, proxiedScope);
           if (result.error) {
-            bindingStatuses.set(thisLabel, { status: 'error', error: result.error });
+            computationStatuses.set(expression, { status: 'error', error: result.error });
             throw result.error;
           } else {
-            bindingStatuses.set(thisLabel, { status: 'resolved', value: result.value });
+            computationStatuses.set(expression, { status: 'resolved', value: result.value });
             return result.value;
           }
         }
@@ -95,5 +94,7 @@ export default function evalJsBindings(
 
   proxiedScope = proxify(scope);
 
-  return expressions.map((expression) => evaluateExpression(expression, proxiedScope));
+  return Object.values(boundExpressions).map((expression) =>
+    evaluateExpression(expression, proxiedScope),
+  );
 }

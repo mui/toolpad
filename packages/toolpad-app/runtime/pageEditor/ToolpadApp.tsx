@@ -12,11 +12,11 @@ import { omit, pick, without } from 'lodash-es';
 import {
   ArgTypeDefinitions,
   INITIAL_DATA_QUERY,
-  LiveBindings,
   useDataQuery,
   ToolpadComponent,
   createComponent,
   TOOLPAD_COMPONENT,
+  UseDataQuery,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import {
@@ -67,7 +67,7 @@ const [useComponentsContext, ComponentsContextProvider] =
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useBindingsContext, BindingsContextProvider] =
-  createProvidedContext<LiveBindings>('LiveBindings');
+  createProvidedContext<Record<string, BindingEvaluationResult>>('LiveBindings');
 const [useSetControlledBindingsContext, SetControlledBindingsContextProvider] =
   createProvidedContext<
     React.Dispatch<React.SetStateAction<Record<string, BindingEvaluationResult>>>
@@ -102,20 +102,36 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   const node = appDom.getNode(dom, nodeId, 'element');
   const { children = [] } = appDom.getChildNodes(dom, node);
   const { Component } = useElmToolpadComponent(node);
-  const { argTypes } = Component[TOOLPAD_COMPONENT];
+  const { argTypes, errorProp, loadingProp } = Component[TOOLPAD_COMPONENT];
 
   const liveBindings = useBindingsContext();
-  const boundProps = React.useMemo(
-    () =>
-      Object.fromEntries(
-        Object.keys(argTypes).flatMap((propName) => {
-          const bindingId = `${node.id}.props.${propName}`;
-          const binding = liveBindings[bindingId];
-          return binding ? [[propName, binding.value]] : [];
-        }),
-      ),
-    [argTypes, liveBindings, node.id],
-  );
+  const boundProps = React.useMemo(() => {
+    const hookResult: Record<string, any> = {};
+    let error: Error | undefined;
+    let loading: boolean = false;
+
+    for (const propName of Object.keys(argTypes)) {
+      const bindingId = `${node.id}.props.${propName}`;
+      const binding = liveBindings[bindingId];
+      if (binding) {
+        hookResult[propName] = binding.value;
+        error = error || binding.error;
+        loading = loading || binding.loading || false;
+      }
+    }
+
+    if (errorProp && error) {
+      hookResult[errorProp] = error;
+    }
+
+    if (loadingProp && loading) {
+      hookResult[loadingProp] = loading;
+    }
+
+    return hookResult;
+  }, [argTypes, errorProp, liveBindings, loadingProp, node.id]);
+
+  // console.log(liveBindings, boundProps);
 
   const onChangeHandlers = React.useMemo(
     () =>
@@ -124,12 +140,14 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
           if (!argType || !argType.onChangeProp) {
             return [];
           }
+
           const valueGetter = argType.onChangeHandler
             ? new Function(
                 ...argType.onChangeHandler.params,
                 `return ${argType.onChangeHandler.valueGetter}`,
               )
             : (value: any) => value;
+
           const handler = (param: any) => {
             const value = valueGetter(param);
             setControlledBindings((oldState) => {
@@ -149,11 +167,13 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
       : // `undefined` to ensure the defaultProps get picked up
         undefined;
 
-  const props = {
-    ...boundProps,
-    ...onChangeHandlers,
-    children: reactChildren,
-  };
+  const props = React.useMemo(() => {
+    return {
+      ...boundProps,
+      ...onChangeHandlers,
+      children: reactChildren,
+    };
+  }, [boundProps, onChangeHandlers, reactChildren]);
 
   return renderToolpadComponent({
     Component,
@@ -275,13 +295,23 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
     : {};
 
   const onResult = React.useCallback(
-    (result) => {
+    ({ loading, error, data, rows, ...result }: UseDataQuery) => {
       setControlledBindings((oldBindings) => {
         const newBindings = { ...oldBindings };
+
         for (const [key, value] of Object.entries(result)) {
           const bindingId = `${node.id}.${key}`;
           newBindings[bindingId] = { value };
         }
+
+        // Here we propagate the error and loading state to the data and rows prop prop
+        // TODO: is there a straightforward way fro us to generalize this behavior?
+        newBindings[`${node.id}.loading`] = { value: loading };
+        newBindings[`${node.id}.error`] = { value: error };
+        const deferredStatus = { loading, error };
+        newBindings[`${node.id}.data`] = { ...deferredStatus, value: data };
+        newBindings[`${node.id}.rows`] = { ...deferredStatus, value: rows };
+
         return newBindings;
       });
     },
@@ -307,7 +337,7 @@ function parseBindings(
   const constValues: Record<string, BindingEvaluationResult> = {};
   const initialControlledValues: Record<string, BindingEvaluationResult> = {};
   const jsExpressions: Record<string, string> = {};
-  const expressionBindings: Record<string, string> = {};
+  const scopePathToBindingId: Record<string, string> = {};
 
   const elements = appDom.getDescendants(dom, page);
 
@@ -320,6 +350,7 @@ function parseBindings(
       for (const [propName, argType] of Object.entries(argTypes)) {
         const binding = elm.props?.[propName];
         const bindingId = `${elm.id}.props.${propName}`;
+        scopePathToBindingId[`${elm.name}.${propName}`] = bindingId;
         if (argType) {
           if (argType.onChangeProp) {
             const defaultValue =
@@ -328,15 +359,14 @@ function parseBindings(
           } else if (binding?.type === 'const') {
             constValues[bindingId] = { value: binding?.value };
           } else if (binding?.type === 'jsExpression') {
-            const variableExpression = `${elm.name}.${propName}`;
-            expressionBindings[bindingId] = variableExpression;
-            jsExpressions[variableExpression] = binding?.value;
+            jsExpressions[bindingId] = binding?.value;
           }
         }
       }
 
       for (const [propName, argType] of Object.entries(argTypes)) {
         const bindingId = `${elm.id}.props.${propName}`;
+        scopePathToBindingId[`${elm.name}.${propName}`] = bindingId;
         if (argType) {
           defaultValues[bindingId] = { value: Component.defaultProps?.[propName] };
         }
@@ -347,25 +377,28 @@ function parseBindings(
       if (elm.params) {
         for (const [paramName, bindable] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
+          scopePathToBindingId[`${elm.name}.params.${paramName}`] = bindingId;
           if (bindable?.type === 'const') {
             constValues[bindingId] = { value: bindable.value };
           } else if (bindable?.type === 'jsExpression') {
-            const variableExpression = `${elm.name}.${paramName}`;
-            expressionBindings[bindingId] = variableExpression;
-            jsExpressions[variableExpression] = bindable.value;
+            jsExpressions[bindingId] = bindable.value;
           }
         }
       }
 
       for (const [key, value] of Object.entries(INITIAL_DATA_QUERY)) {
-        initialControlledValues[`${elm.id}.${key}`] = { value };
+        const bindingId = `${elm.id}.${key}`;
+        scopePathToBindingId[`${elm.name}.${key}`] = bindingId;
+        initialControlledValues[bindingId] = { value };
       }
     }
   }
 
   const urlParams = new URLSearchParams(location.search);
-  for (const [key, value] of urlParams.entries()) {
-    constValues[`${page.id}.query.${key}`] = { value };
+  for (const [paramName, paramValue] of urlParams.entries()) {
+    const bindingId = `${page.id}.query.${paramName}`;
+    scopePathToBindingId[`page.query.${paramName}`] = bindingId;
+    constValues[bindingId] = { value: paramValue };
   }
 
   return {
@@ -373,7 +406,7 @@ function parseBindings(
     constValues,
     initialControlledValues,
     jsExpressions,
-    expressionBindings,
+    scopePathToBindingId,
   };
 }
 
@@ -386,11 +419,16 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const location = useLocation();
   const components = useComponentsContext();
 
-  const { defaultValues, constValues, initialControlledValues, jsExpressions, expressionBindings } =
-    React.useMemo(
-      () => parseBindings(dom, page, components, location),
-      [components, dom, location, page],
-    );
+  const {
+    defaultValues,
+    constValues,
+    initialControlledValues,
+    jsExpressions,
+    scopePathToBindingId,
+  } = React.useMemo(
+    () => parseBindings(dom, page, components, location),
+    [components, dom, location, page],
+  );
 
   const [controlledBindings, setControlledBindings] = React.useState(initialControlledValues);
   // Make sure to patch page state after dom nodes have been added or removed
@@ -415,13 +453,10 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [defaultValues, constValues, controlledBindings],
   );
   const globalScope = useGlobalScope(dom, page, inputBindings);
-  const jsExpressionValues = React.useMemo(() => {
-    const evaluations = evalJsBindings(globalScope, jsExpressions);
-
-    return Object.fromEntries(
-      Object.keys(expressionBindings).map((binding, i) => [binding, evaluations[i]]),
-    );
-  }, [expressionBindings, globalScope, jsExpressions]);
+  const jsExpressionValues = React.useMemo(
+    () => evalJsBindings(globalScope, jsExpressions, scopePathToBindingId),
+    [globalScope, jsExpressions, scopePathToBindingId],
+  );
 
   const liveBindings = React.useMemo(
     () => ({ ...inputBindings, ...jsExpressionValues }),

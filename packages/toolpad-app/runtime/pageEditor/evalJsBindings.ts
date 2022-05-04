@@ -13,15 +13,13 @@ function evaluateCode(code: string, globalScope: Record<string, unknown>) {
   return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
 }
 
-export type BindingEvaluationResult =
-  | {
-      value: any;
-      error?: undefined;
-    }
-  | {
-      value?: undefined;
-      error: Error;
-    };
+export type BindingEvaluationResult<T = any> = {
+  value?: T;
+  error?: Error;
+  loading?: boolean;
+};
+
+const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
 
 function evaluateExpression(
   code: string,
@@ -30,7 +28,10 @@ function evaluateExpression(
   try {
     const value = evaluateCode(code, globalScope);
     return { value };
-  } catch (error: unknown) {
+  } catch (error: any) {
+    if (error?.message === TOOLPAD_LOADING_MARKER) {
+      return { loading: true };
+    }
     return { error: error as Error };
   }
 }
@@ -38,12 +39,18 @@ function evaluateExpression(
 export default function evalJsBindings(
   scope: Record<string, unknown>,
   boundExpressions: Record<string, string>,
+  scopePathToBindingId: Record<string, string>,
 ) {
+  console.log(scopePathToBindingId);
+  const bindingIdMap = new Map(Object.entries(scopePathToBindingId));
   const bindingsMap = new Map(Object.entries(boundExpressions));
 
   const computationStatuses = new Map<
     string,
-    { status: 'computing' } | { status: 'resolved'; value: any } | { status: 'error'; error: Error }
+    | { status: 'computing' }
+    | { status: 'loading' }
+    | { status: 'resolved'; value: any }
+    | { status: 'error'; error: Error }
   >();
 
   let proxiedScope: Record<string, unknown>;
@@ -55,15 +62,22 @@ export default function evalJsBindings(
           return Reflect.get(target, prop, receiver);
         }
 
-        const thisLabel = label ? `${label}.${prop}` : prop;
+        const scopePath = label ? `${label}.${prop}` : prop;
+        const bindingId = bindingIdMap.get(scopePath);
 
-        const expression = bindingsMap.get(thisLabel);
+        if (!bindingId) {
+          return Reflect.get(target, prop, receiver);
+        }
+
+        const expression = bindingsMap.get(bindingId);
 
         if (expression) {
           const computed = computationStatuses.get(expression);
           if (computed) {
             if (computed.status === 'computing') {
-              throw new Error(`Cycle detected "${thisLabel}"`);
+              throw new Error(`Cycle detected "${scopePath}"`);
+            } else if (computed.status === 'loading') {
+              throw new Error(TOOLPAD_LOADING_MARKER);
             } else if (computed.status === 'error') {
               throw computed.error;
             } else {
@@ -73,7 +87,10 @@ export default function evalJsBindings(
 
           computationStatuses.set(expression, { status: 'computing' });
           const result = evaluateExpression(expression, proxiedScope);
-          if (result.error) {
+          if (result.loading) {
+            computationStatuses.set(expression, { status: 'loading' });
+            throw new Error(TOOLPAD_LOADING_MARKER);
+          } else if (result.error) {
             computationStatuses.set(expression, { status: 'error', error: result.error });
             throw result.error;
           } else {
@@ -85,7 +102,7 @@ export default function evalJsBindings(
         const result = target[prop];
 
         if (result && typeof result === 'object') {
-          return proxify(result as Record<string, unknown>, thisLabel);
+          return proxify(result as Record<string, unknown>, scopePath);
         }
 
         return Reflect.get(target, prop, receiver);
@@ -94,7 +111,10 @@ export default function evalJsBindings(
 
   proxiedScope = proxify(scope);
 
-  return Object.values(boundExpressions).map((expression) =>
-    evaluateExpression(expression, proxiedScope),
+  return Object.fromEntries(
+    Object.entries(boundExpressions).map(([key, expression]) => [
+      key,
+      evaluateExpression(expression, proxiedScope),
+    ]),
   );
 }

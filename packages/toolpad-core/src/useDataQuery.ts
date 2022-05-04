@@ -32,7 +32,7 @@ const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
 
 export function useDataQuery(
-  setResult: React.Dispatch<React.SetStateAction<UseDataQuery>>,
+  setResult: (newResult: UseDataQuery) => void,
   dataUrl: string,
   queryId: string | null,
   params: any,

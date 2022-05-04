@@ -180,6 +180,8 @@ function useGlobalScope(
         const { id, Component } = getElmComponent(components, elm);
 
         if (id !== PAGE_ROW_COMPONENT_ID) {
+          // Hide page rows from the databinding system
+
           const { argTypes } = Component[TOOLPAD_COMPONENT];
           const elmScope: Record<string, unknown> = {};
           scope[elm.name] = elmScope;

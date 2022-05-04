@@ -43,6 +43,8 @@ import { fireEvent, JsRuntimeProvider } from '../coreRuntime';
 import evalJsBindings, { BindingEvaluationResult } from './evalJsBindings';
 import instantiateComponents from './instantiateComponents';
 
+const PAGE_ROW_COMPONENT_ID = 'PageRow';
+
 export interface RenderToolpadComponentParams {
   Component: ToolpadComponent<any>;
   props: any;
@@ -74,13 +76,13 @@ const [useSetControlledBindingsContext, SetControlledBindingsContextProvider] =
 function getElmComponent(
   components: InstantiatedComponents,
   elm: appDom.ElementNode,
-): InstantiatedComponent {
+): InstantiatedComponent & { id: string } {
   const componentId = elm.attributes.component.value;
   const component = components[componentId];
   if (!component) {
     throw new Error(`Rendering unknown component "${componentId}"`);
   }
-  return component;
+  return { ...component, id: componentId };
 }
 
 function useElmToolpadComponent(elm: appDom.ElementNode): InstantiatedComponent {
@@ -175,15 +177,18 @@ function useGlobalScope(
 
     for (const elm of elements) {
       if (appDom.isElement(elm)) {
-        const { Component } = getElmComponent(components, elm);
-        const { argTypes } = Component[TOOLPAD_COMPONENT];
-        const elmScope: Record<string, unknown> = {};
-        scope[elm.name] = elmScope;
-        for (const propName of Object.keys(argTypes)) {
-          const bindingId = `${elm.id}.props.${propName}`;
-          const binding = bindings[bindingId];
-          if (binding) {
-            elmScope[propName] = binding.value;
+        const { id, Component } = getElmComponent(components, elm);
+
+        if (id !== PAGE_ROW_COMPONENT_ID) {
+          const { argTypes } = Component[TOOLPAD_COMPONENT];
+          const elmScope: Record<string, unknown> = {};
+          scope[elm.name] = elmScope;
+          for (const propName of Object.keys(argTypes)) {
+            const bindingId = `${elm.id}.props.${propName}`;
+            const binding = bindings[bindingId];
+            if (binding) {
+              elmScope[propName] = binding.value;
+            }
           }
         }
       }
@@ -306,31 +311,34 @@ function parseBindings(
 
   for (const elm of elements) {
     if (appDom.isElement(elm)) {
-      const { Component } = getElmComponent(components, elm);
-      const { argTypes } = Component[TOOLPAD_COMPONENT];
+      const { id, Component } = getElmComponent(components, elm);
 
-      for (const [propName, argType] of Object.entries(argTypes)) {
-        const binding = elm.props?.[propName];
-        const bindingId = `${elm.id}.props.${propName}`;
-        if (argType) {
-          if (argType.onChangeProp) {
-            const defaultValue =
-              binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
-            initialControlledValues[bindingId] = { value: defaultValue };
-          } else if (binding?.type === 'const') {
-            constValues[bindingId] = { value: binding?.value };
-          } else if (binding?.type === 'jsExpression') {
-            const variableExpression = `${elm.name}.${propName}`;
-            expressionBindings[bindingId] = variableExpression;
-            jsExpressions[variableExpression] = binding?.value;
+      if (id !== PAGE_ROW_COMPONENT_ID) {
+        const { argTypes } = Component[TOOLPAD_COMPONENT];
+
+        for (const [propName, argType] of Object.entries(argTypes)) {
+          const binding = elm.props?.[propName];
+          const bindingId = `${elm.id}.props.${propName}`;
+          if (argType) {
+            if (argType.onChangeProp) {
+              const defaultValue =
+                binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
+              initialControlledValues[bindingId] = { value: defaultValue };
+            } else if (binding?.type === 'const') {
+              constValues[bindingId] = { value: binding?.value };
+            } else if (binding?.type === 'jsExpression') {
+              const variableExpression = `${elm.name}.${propName}`;
+              expressionBindings[bindingId] = variableExpression;
+              jsExpressions[variableExpression] = binding?.value;
+            }
           }
         }
-      }
 
-      for (const [propName, argType] of Object.entries(argTypes)) {
-        const bindingId = `${elm.id}.props.${propName}`;
-        if (argType) {
-          defaultValues[bindingId] = { value: Component.defaultProps?.[propName] };
+        for (const [propName, argType] of Object.entries(argTypes)) {
+          const bindingId = `${elm.id}.props.${propName}`;
+          if (argType) {
+            defaultValues[bindingId] = { value: Component.defaultProps?.[propName] };
+          }
         }
       }
     }

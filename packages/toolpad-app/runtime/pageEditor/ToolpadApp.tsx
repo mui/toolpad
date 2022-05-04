@@ -17,10 +17,17 @@ import {
   ToolpadComponent,
   createComponent,
   TOOLPAD_COMPONENT,
-  BindableAttrValue,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useLocation,
+  Navigate,
+  Location as RouterLocation,
+} from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import * as appDom from '../../src/appDom';
 import { NodeId, VersionOrPreview } from '../../src/types';
@@ -154,81 +161,6 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   });
 }
 
-function useInitialControlledBindings(
-  dom: appDom.AppDom,
-  page: appDom.PageNode,
-): Record<string, BindingEvaluationResult> {
-  const components = useComponentsContext();
-  return React.useMemo(() => {
-    const bindings: Record<string, BindingEvaluationResult> = {};
-    const elements = appDom.getDescendants(dom, page);
-
-    for (const elm of elements) {
-      if (appDom.isElement(elm)) {
-        const { Component } = getElmComponent(components, elm);
-        const { argTypes } = Component[TOOLPAD_COMPONENT];
-
-        for (const [key, argType] of Object.entries(argTypes)) {
-          if (argType?.onChangeProp) {
-            const defaultValue =
-              elm.props?.[key]?.type === 'const'
-                ? elm.props?.[key]?.value
-                : Component.defaultProps?.[key];
-            bindings[`${elm.id}.props.${key}`] = { value: defaultValue };
-          }
-        }
-      }
-      if (appDom.isQueryState(elm)) {
-        for (const [key, value] of Object.entries(INITIAL_DATA_QUERY)) {
-          bindings[`${elm.id}.${key}`] = { value };
-        }
-      }
-    }
-    return bindings;
-  }, [dom, page, components]);
-}
-
-function useConstBindings(
-  dom: appDom.AppDom,
-  page: appDom.PageNode,
-): Record<string, BindingEvaluationResult> {
-  const location = useLocation();
-
-  const components = useComponentsContext();
-  return React.useMemo(() => {
-    const bindings: Record<string, BindingEvaluationResult> = {};
-    const elements = appDom.getDescendants(dom, page);
-
-    for (const elm of elements) {
-      if (appDom.isElement(elm)) {
-        const { Component } = getElmComponent(components, elm);
-        const { argTypes } = Component[TOOLPAD_COMPONENT];
-        for (const [key, argType] of Object.entries(argTypes)) {
-          if (argType && !argType.onChangeProp && elm.props?.[key]?.type === 'const') {
-            bindings[`${elm.id}.props.${key}`] = { value: elm.props?.[key]?.value };
-          }
-        }
-      }
-      if (appDom.isQueryState(elm)) {
-        if (elm.params) {
-          for (const [key, bindable] of Object.entries(elm.params)) {
-            if (bindable?.type === 'const') {
-              bindings[`${elm.id}.params.${key}`] = { value: bindable.value };
-            }
-          }
-        }
-      }
-    }
-
-    const urlParams = new URLSearchParams(location.search);
-    for (const [key, value] of urlParams.entries()) {
-      bindings[`${page.id}.query.${key}`] = { value };
-    }
-
-    return bindings;
-  }, [dom, page, location.search, components]);
-}
-
 function useGlobalScope(
   dom: appDom.AppDom,
   page: appDom.PageNode,
@@ -358,64 +290,70 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
   return null;
 }
 
-function getExpression(bindable?: BindableAttrValue<any>): string | undefined {
-  if (!bindable) {
-    return undefined;
-  }
-  switch (bindable.type) {
-    case 'jsExpression':
-      return bindable.value;
-    default:
-      return undefined;
-  }
-}
-
-function useLiveBindings(
+function parseBindings(
   dom: appDom.AppDom,
   page: appDom.PageNode,
-  currentPageState: Record<string, unknown>,
-): Record<string, BindingEvaluationResult> {
-  return React.useMemo(() => {
-    const descendants = appDom.getDescendants(dom, page);
-    const jsExpressions: Record<string, string> = {};
-    const bindings = new Map<string, string>();
+  components: InstantiatedComponents,
+  location: RouterLocation,
+) {
+  const initialControlledValues: Record<string, BindingEvaluationResult> = {};
+  const constValues: Record<string, BindingEvaluationResult> = {};
+  const jsExpressions: Record<string, string> = {};
+  const expressionBindings = new Map<string, string>();
 
-    descendants.forEach((descendant) => {
-      if (appDom.isElement(descendant)) {
-        if (descendant.props) {
-          for (const [propName, bindable] of Object.entries(descendant.props)) {
-            const bindingLabel = `${descendant.name}.${propName}`;
-            const expression = getExpression(bindable);
-            if (expression) {
-              bindings.set(`${descendant.id}.props.${propName}`, bindingLabel);
-              jsExpressions[bindingLabel] = expression;
-            }
-          }
-        }
-      } else if (appDom.isQueryState(descendant)) {
-        if (descendant.params) {
-          for (const [propName, bindable] of Object.entries(descendant.params)) {
-            const bindingLabel = `${descendant.name}.${propName}`;
-            const expression = getExpression(bindable);
-            if (expression) {
-              bindings.set(`${descendant.id}.params.${propName}`, bindingLabel);
-              jsExpressions[bindingLabel] = expression;
-            }
+  const elements = appDom.getDescendants(dom, page);
+
+  for (const elm of elements) {
+    if (appDom.isElement(elm)) {
+      const { Component } = getElmComponent(components, elm);
+      const { argTypes } = Component[TOOLPAD_COMPONENT];
+
+      for (const [propName, argType] of Object.entries(argTypes)) {
+        const binding = elm.props?.[propName];
+        if (argType) {
+          if (argType.onChangeProp) {
+            const defaultValue =
+              binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
+            initialControlledValues[`${elm.id}.props.${propName}`] = { value: defaultValue };
+          } else if (binding?.type === 'const') {
+            constValues[`${elm.id}.props.${propName}`] = { value: binding?.value };
+          } else if (binding?.type === 'jsExpression') {
+            const bindingId = `${elm.name}.${propName}`;
+            expressionBindings.set(`${elm.id}.props.${propName}`, bindingId);
+            jsExpressions[bindingId] = binding?.value;
           }
         }
       }
-    });
+    }
+    if (appDom.isQueryState(elm)) {
+      if (elm.params) {
+        for (const [paramName, bindable] of Object.entries(elm.params)) {
+          if (bindable?.type === 'const') {
+            constValues[`${elm.id}.params.${paramName}`] = { value: bindable.value };
+          } else if (bindable?.type === 'jsExpression') {
+            const bindingId = `${elm.name}.${paramName}`;
+            expressionBindings.set(`${elm.id}.params.${paramName}`, bindingId);
+            jsExpressions[bindingId] = bindable.value;
+          }
+        }
+      }
+      for (const [key, value] of Object.entries(INITIAL_DATA_QUERY)) {
+        initialControlledValues[`${elm.id}.${key}`] = { value };
+      }
+    }
+  }
 
-    const evaluations = evalJsBindings(
-      Array.from(bindings.values()),
-      currentPageState,
-      jsExpressions,
-    );
+  const urlParams = new URLSearchParams(location.search);
+  for (const [key, value] of urlParams.entries()) {
+    constValues[`${page.id}.query.${key}`] = { value };
+  }
 
-    return Object.fromEntries(
-      Array.from(bindings.keys(), (binding, i) => [binding, evaluations[i]]),
-    );
-  }, [dom, page, currentPageState]);
+  return {
+    initialControlledValues,
+    constValues,
+    jsExpressions,
+    expressionBindings,
+  };
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
@@ -424,36 +362,51 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queryStates = [] } = appDom.getChildNodes(dom, page);
 
-  const initialControlledBindings = useInitialControlledBindings(dom, page);
-  const [controlledBindings, setControlledBindings] = React.useState(initialControlledBindings);
+  const location = useLocation();
+  const components = useComponentsContext();
+  const { initialControlledValues, constValues, jsExpressions, expressionBindings } = React.useMemo(
+    () => parseBindings(dom, page, components, location),
+    [components, dom, location, page],
+  );
+
+  const [controlledBindings, setControlledBindings] = React.useState(initialControlledValues);
   // Make sure to patch page state after dom nodes have been added or removed
   React.useEffect(() => {
     setControlledBindings((existing) => {
       const existingKeys = Object.keys(existing);
-      const initialKeys = Object.keys(initialControlledBindings);
+      const initialKeys = Object.keys(initialControlledValues);
       const newInitial = without(initialKeys, ...existingKeys);
       const oldExisting = without(existingKeys, ...initialKeys);
       if (newInitial.length > 0 || oldExisting.length > 0) {
         return {
           ...omit(existing, ...oldExisting),
-          ...pick(initialControlledBindings, ...newInitial),
+          ...pick(initialControlledValues, ...newInitial),
         };
       }
       return existing;
     });
-  }, [initialControlledBindings]);
+  }, [initialControlledValues]);
 
-  const constBindings = useConstBindings(dom, page);
   const inputBindings = React.useMemo(
-    () => ({ ...controlledBindings, ...constBindings }),
-    [controlledBindings, constBindings],
+    () => ({ ...controlledBindings, ...constValues }),
+    [controlledBindings, constValues],
   );
   const globalScope = useGlobalScope(dom, page, inputBindings);
-  const jsExpressionBindings = useLiveBindings(dom, page, globalScope);
+  const jsExpressionValues = React.useMemo(() => {
+    const evaluations = evalJsBindings(
+      Array.from(expressionBindings.values()),
+      globalScope,
+      jsExpressions,
+    );
+
+    return Object.fromEntries(
+      Array.from(expressionBindings.keys(), (binding, i) => [binding, evaluations[i]]),
+    );
+  }, [expressionBindings, globalScope, jsExpressions]);
 
   const liveBindings = React.useMemo(
-    () => ({ ...inputBindings, ...jsExpressionBindings }),
-    [inputBindings, jsExpressionBindings],
+    () => ({ ...inputBindings, ...jsExpressionValues }),
+    [inputBindings, jsExpressionValues],
   );
 
   const pageState = useGlobalScope(dom, page, liveBindings);

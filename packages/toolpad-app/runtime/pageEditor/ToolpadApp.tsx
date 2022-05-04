@@ -120,8 +120,12 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
       }
     }
 
-    if (errorProp && error) {
-      hookResult[errorProp] = error;
+    if (error) {
+      if (errorProp) {
+        hookResult[errorProp] = error;
+      } else {
+        throw error;
+      }
     }
 
     if (loadingProp && loading) {

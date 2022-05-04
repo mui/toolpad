@@ -148,9 +148,9 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
         undefined;
 
   const props = {
-    children: reactChildren,
     ...boundProps,
     ...onChangeHandlers,
+    children: reactChildren,
   };
 
   return renderToolpadComponent({
@@ -296,8 +296,9 @@ function parseBindings(
   components: InstantiatedComponents,
   location: RouterLocation,
 ) {
-  const initialControlledValues: Record<string, BindingEvaluationResult> = {};
+  const defaultValues: Record<string, BindingEvaluationResult> = {};
   const constValues: Record<string, BindingEvaluationResult> = {};
+  const initialControlledValues: Record<string, BindingEvaluationResult> = {};
   const jsExpressions: Record<string, string> = {};
   const expressionBindings: Record<string, string> = {};
 
@@ -323,6 +324,13 @@ function parseBindings(
             expressionBindings[bindingId] = variableExpression;
             jsExpressions[variableExpression] = binding?.value;
           }
+        }
+      }
+
+      for (const [propName, argType] of Object.entries(argTypes)) {
+        const bindingId = `${elm.id}.props.${propName}`;
+        if (argType) {
+          defaultValues[bindingId] = { value: Component.defaultProps?.[propName] };
         }
       }
     }
@@ -353,8 +361,9 @@ function parseBindings(
   }
 
   return {
-    initialControlledValues,
+    defaultValues,
     constValues,
+    initialControlledValues,
     jsExpressions,
     expressionBindings,
   };
@@ -368,10 +377,12 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const location = useLocation();
   const components = useComponentsContext();
-  const { initialControlledValues, constValues, jsExpressions, expressionBindings } = React.useMemo(
-    () => parseBindings(dom, page, components, location),
-    [components, dom, location, page],
-  );
+
+  const { defaultValues, constValues, initialControlledValues, jsExpressions, expressionBindings } =
+    React.useMemo(
+      () => parseBindings(dom, page, components, location),
+      [components, dom, location, page],
+    );
 
   const [controlledBindings, setControlledBindings] = React.useState(initialControlledValues);
   // Make sure to patch page state after dom nodes have been added or removed
@@ -391,9 +402,10 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     });
   }, [initialControlledValues]);
 
+  console.log(defaultValues);
   const inputBindings = React.useMemo(
-    () => ({ ...controlledBindings, ...constValues }),
-    [controlledBindings, constValues],
+    () => ({ ...defaultValues, ...constValues, ...controlledBindings }),
+    [defaultValues, constValues, controlledBindings],
   );
   const globalScope = useGlobalScope(dom, page, inputBindings);
   const jsExpressionValues = React.useMemo(() => {

@@ -45,7 +45,6 @@ async function exec(
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}`);
   }
-  await new Promise((r) => setTimeout(r, 2000));
   const data = await res.json();
   return { data };
 }

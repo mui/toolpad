@@ -42,6 +42,9 @@ async function exec(
   const boundValues = { ...fetchQuery.params, ...params };
   const resolvedUrl = await resolveBindableString(fetchQuery.url, boundValues);
   const res = await fetch(resolvedUrl);
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
   const data = await res.json();
   return { data };
 }

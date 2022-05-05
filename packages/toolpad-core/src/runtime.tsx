@@ -1,6 +1,7 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Tooltip } from '@mui/material';
+import { ErrorBoundary } from 'react-error-boundary';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type {
   SlotType,
@@ -11,6 +12,10 @@ import type {
   LiveBinding,
   RuntimeError,
 } from './types';
+
+const ResetNodeErrorsKeyContext = React.createContext(0);
+
+export const ResetNodeErrorsKeyProvider = ResetNodeErrorsKeyContext.Provider;
 
 declare global {
   interface Window {
@@ -63,15 +68,34 @@ export interface NodeRuntimeWrapperProps {
   componentConfig: ComponentConfig<unknown>;
 }
 
-interface NodeRuntimeWrapperState {
-  error: RuntimeError | null;
-}
-
 export interface NodeFiberHostProps {
   children: React.ReactElement;
   [RUNTIME_PROP_NODE_ID]: string;
   componentConfig: ComponentConfig<unknown>;
   nodeError?: RuntimeError | null;
+}
+
+interface NodeErrorProps {
+  error: RuntimeError;
+}
+
+function NodeError({ error }: NodeErrorProps) {
+  return (
+    <Tooltip title={error.message}>
+      <span
+        style={{
+          display: 'inline-flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 8,
+          background: 'red',
+          color: 'white',
+        }}
+      >
+        <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
+      </span>
+    </Tooltip>
+  );
 }
 
 // We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
@@ -84,53 +108,36 @@ function NodeFiberHost({ children }: NodeFiberHostProps) {
   return children;
 }
 
-export class NodeRuntimeWrapper extends React.Component<
-  NodeRuntimeWrapperProps,
-  NodeRuntimeWrapperState
-> {
-  state: NodeRuntimeWrapperState;
+export function NodeRuntimeWrapper({ nodeId, componentConfig, children }: NodeRuntimeWrapperProps) {
+  const resetNodeErrorsKey = React.useContext(ResetNodeErrorsKeyContext);
 
-  constructor(props: NodeRuntimeWrapperProps) {
-    super(props);
-    this.state = { error: null };
-  }
-
-  static getDerivedStateFromError(error: Error): NodeRuntimeWrapperState {
-    return { error: { message: error.message, stack: error.stack } };
-  }
-
-  render() {
-    return (
-      <NodeRuntimeContext.Provider value={this.props.nodeId}>
+  return (
+    <ErrorBoundary
+      resetKeys={[resetNodeErrorsKey]}
+      fallbackRender={({ error }) => (
         <NodeFiberHost
           {...{
-            [RUNTIME_PROP_NODE_ID]: this.props.nodeId,
-            nodeError: this.state.error,
-            componentConfig: this.props.componentConfig,
+            [RUNTIME_PROP_NODE_ID]: nodeId,
+            nodeError: error,
+            componentConfig,
           }}
         >
-          {this.state.error ? (
-            <Tooltip title={this.state.error.message}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  padding: 8,
-                  background: 'red',
-                  color: 'white',
-                }}
-              >
-                <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
-              </span>
-            </Tooltip>
-          ) : (
-            this.props.children
-          )}
+          <NodeError error={error} />
+        </NodeFiberHost>
+      )}
+    >
+      <NodeRuntimeContext.Provider value={nodeId}>
+        <NodeFiberHost
+          {...{
+            [RUNTIME_PROP_NODE_ID]: nodeId,
+            componentConfig,
+          }}
+        >
+          {children}
         </NodeFiberHost>
       </NodeRuntimeContext.Provider>
-    );
-  }
+    </ErrorBoundary>
+  );
 }
 
 export interface NodeRuntime<P> {

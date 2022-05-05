@@ -41,7 +41,12 @@ import {
   ToolpadComponentDefinitions,
 } from '../../src/toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
-import { fireEvent, JsRuntimeProvider, NodeRuntimeWrapper } from '../coreRuntime';
+import {
+  fireEvent,
+  JsRuntimeProvider,
+  NodeRuntimeWrapper,
+  ResetNodeErrorsKeyProvider,
+} from '../coreRuntime';
 import evalJsBindings, { BindingEvaluationResult } from './evalJsBindings';
 import instantiateComponents from './instantiateComponents';
 
@@ -585,45 +590,51 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
     [components],
   );
 
+  const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
+
+  React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
+
   return (
     <ErrorBoundary FallbackComponent={AppError}>
-      <React.Suspense fallback={<AppLoading />}>
-        <JsRuntimeProvider>
-          <ComponentsContextProvider value={instantiatedComponents}>
-            <AppContextProvider value={appContext}>
-              <QueryClientProvider client={queryClient}>
-                <CssBaseline />
-                <AppThemeProvider node={theme}>
-                  <DomContextProvider value={dom}>
-                    <BrowserRouter basename={basename}>
-                      <Routes>
-                        <Route path="/" element={<Navigate replace to="/pages" />} />
-                        <Route
-                          path="/pages"
-                          element={
-                            <AppOverview
-                              appId={appId}
-                              dom={dom}
-                              openPageButtonProps={getPageNavButtonProps}
-                            />
-                          }
-                        />
-                        {pages.map((page) => (
+      <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+        <React.Suspense fallback={<AppLoading />}>
+          <JsRuntimeProvider>
+            <ComponentsContextProvider value={instantiatedComponents}>
+              <AppContextProvider value={appContext}>
+                <QueryClientProvider client={queryClient}>
+                  <CssBaseline />
+                  <AppThemeProvider node={theme}>
+                    <DomContextProvider value={dom}>
+                      <BrowserRouter basename={basename}>
+                        <Routes>
+                          <Route path="/" element={<Navigate replace to="/pages" />} />
                           <Route
-                            key={page.id}
-                            path={`/pages/${page.id}`}
-                            element={<RenderedPage nodeId={page.id} />}
+                            path="/pages"
+                            element={
+                              <AppOverview
+                                appId={appId}
+                                dom={dom}
+                                openPageButtonProps={getPageNavButtonProps}
+                              />
+                            }
                           />
-                        ))}
-                      </Routes>
-                    </BrowserRouter>
-                  </DomContextProvider>
-                </AppThemeProvider>
-              </QueryClientProvider>
-            </AppContextProvider>
-          </ComponentsContextProvider>
-        </JsRuntimeProvider>
-      </React.Suspense>
+                          {pages.map((page) => (
+                            <Route
+                              key={page.id}
+                              path={`/pages/${page.id}`}
+                              element={<RenderedPage nodeId={page.id} />}
+                            />
+                          ))}
+                        </Routes>
+                      </BrowserRouter>
+                    </DomContextProvider>
+                  </AppThemeProvider>
+                </QueryClientProvider>
+              </AppContextProvider>
+            </ComponentsContextProvider>
+          </JsRuntimeProvider>
+        </React.Suspense>
+      </ResetNodeErrorsKeyProvider>
     </ErrorBoundary>
   );
 }

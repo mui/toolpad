@@ -181,7 +181,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
 DataGridComponent.defaultProps = {
   selection: null,
-};
+  density: 'compact',
+} as ToolpadDataGridProps;
 
 export default createComponent(DataGridComponent, {
   errorProp: 'error',

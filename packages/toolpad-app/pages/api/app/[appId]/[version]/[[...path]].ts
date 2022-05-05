@@ -78,7 +78,7 @@ export async function renderAppHtml(
         }
 
         <script type="application/json" id="${HTML_ID_TOOLPAD_APP_RENDER_PARAMS}">
-          ${serializeJavascript(renderParams)}
+          ${serializeJavascript(JSON.parse(JSON.stringify(renderParams)))}
         </script>
 
         <script type="module" src="/runtime/pageEditor.js"></script>

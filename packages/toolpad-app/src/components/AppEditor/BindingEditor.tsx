@@ -178,7 +178,7 @@ export function BindingEditor<V>({
       onClick={handleOpen}
       color={hasBinding ? 'primary' : 'inherit'}
     >
-      {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
+      {hasBinding ? <LinkOffIcon fontSize="inherit" /> : <LinkIcon fontSize="inherit" />}
     </IconButton>
   );
 

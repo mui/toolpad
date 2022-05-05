@@ -818,7 +818,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     handleRuntimeEventRef.current = handleRuntimeEvent;
   }, [handleRuntimeEvent]);
 
@@ -851,7 +851,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       resizeObserver.observe(rootElm);
       rootElm.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
 
-      const cleanupHandler = setEventHandler(editorWindow, handleRuntimeEventRef.current);
+      const cleanupHandler = setEventHandler(editorWindow, (event) =>
+        handleRuntimeEventRef.current(event),
+      );
 
       return () => {
         handlePageUpdateThrottled.cancel();

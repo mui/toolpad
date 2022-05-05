@@ -80,6 +80,7 @@ export async function renderAppHtml(
         <script type="application/javascript">
           window[${JSON.stringify(WINDOW_PROP_TOOLPAD_APP_RENDER_PARAMS)}] = ${serializeJavascript(
     renderParams,
+    { ignoreFunction: true },
   )};
         </script>
 

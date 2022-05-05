@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 import { omit, pick, without } from 'lodash-es';
 import {
-  ArgTypeDefinitions,
   INITIAL_DATA_QUERY,
   useDataQuery,
   ToolpadComponent,
@@ -51,42 +50,6 @@ import evalJsBindings, { BindingEvaluationResult } from './evalJsBindings';
 import instantiateComponents from './instantiateComponents';
 
 const PAGE_ROW_COMPONENT_ID = 'PageRow';
-
-export interface RenderToolpadComponentParams {
-  Component: ToolpadComponent<any>;
-  props: any;
-  node: appDom.AppDomNode;
-  argTypes: ArgTypeDefinitions;
-}
-
-export interface RenderToolpadComponent {
-  Component: ToolpadComponent<any>;
-  props: any;
-  node: appDom.AppDomNode;
-  argTypes: ArgTypeDefinitions;
-}
-
-function renderToolpadComponent({ node, Component, props }: RenderToolpadComponentParams) {
-  const wrapped = { ...props };
-  const { argTypes } = Component[TOOLPAD_COMPONENT];
-  for (const [propName, argType] of Object.entries(argTypes)) {
-    if (argType?.typeDef.type === 'element') {
-      if (argType.control?.type === 'slots') {
-        const value = wrapped[propName];
-        wrapped[propName] = <Slots prop={propName}>{value}</Slots>;
-      } else if (argType.control?.type === 'slot') {
-        const value = wrapped[propName];
-        wrapped[propName] = <Placeholder prop={propName}>{value}</Placeholder>;
-      }
-    }
-  }
-
-  return (
-    <NodeRuntimeWrapper nodeId={node.id} componentConfig={Component[TOOLPAD_COMPONENT]}>
-      <Component {...wrapped} />
-    </NodeRuntimeWrapper>
-  );
-}
 
 interface AppContext {
   appId: string;
@@ -129,20 +92,24 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const node = appDom.getNode(dom, nodeId, 'element');
   const { Component } = useElmToolpadComponent(node);
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  return <RenderedNodeContent node={node} Component={Component} />;
+  const { children = [] } = appDom.getChildNodes(dom, node);
+  return (
+    <NodeRuntimeWrapper nodeId={node.id} componentConfig={Component[TOOLPAD_COMPONENT]}>
+      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+      <RenderedNodeContent nodeId={node.id} childNodes={children} Component={Component} />
+    </NodeRuntimeWrapper>
+  );
 }
 
 interface RenderedNodeContentProps {
-  node: appDom.ElementNode;
+  nodeId: NodeId;
+  childNodes: appDom.ElementNode[];
   Component: ToolpadComponent<any>;
 }
 
-function RenderedNodeContent({ node, Component }: RenderedNodeContentProps) {
-  const dom = useDomContext();
+function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeContentProps) {
   const setControlledBindings = useSetControlledBindingsContext();
 
-  const { children = [] } = appDom.getChildNodes(dom, node);
   const { argTypes, errorProp, loadingProp } = Component[TOOLPAD_COMPONENT];
 
   const liveBindings = useBindingsContext();
@@ -152,7 +119,7 @@ function RenderedNodeContent({ node, Component }: RenderedNodeContentProps) {
     let loading: boolean = false;
 
     for (const propName of Object.keys(argTypes)) {
-      const bindingId = `${node.id}.props.${propName}`;
+      const bindingId = `${nodeId}.props.${propName}`;
       const binding = liveBindings[bindingId];
       if (binding) {
         hookResult[propName] = binding.value;
@@ -174,7 +141,7 @@ function RenderedNodeContent({ node, Component }: RenderedNodeContentProps) {
     }
 
     return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, node.id]);
+  }, [argTypes, errorProp, liveBindings, loadingProp, nodeId]);
 
   const onChangeHandlers = React.useMemo(
     () =>
@@ -194,19 +161,19 @@ function RenderedNodeContent({ node, Component }: RenderedNodeContentProps) {
           const handler = (param: any) => {
             const value = valueGetter(param);
             setControlledBindings((oldState) => {
-              const bindingId = `${node.id}.props.${key}`;
+              const bindingId = `${nodeId}.props.${key}`;
               return { ...oldState, [bindingId]: { value } };
             });
           };
           return [[argType.onChangeProp, handler]];
         }),
       ),
-    [argTypes, node.id, setControlledBindings],
+    [argTypes, nodeId, setControlledBindings],
   );
 
   const reactChildren =
-    children.length > 0
-      ? children.map((child) => <RenderedNode key={child.id} nodeId={child.id} />)
+    childNodes.length > 0
+      ? childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />)
       : // `undefined` to ensure the defaultProps get picked up
         undefined;
 
@@ -218,12 +185,20 @@ function RenderedNodeContent({ node, Component }: RenderedNodeContentProps) {
     };
   }, [boundProps, onChangeHandlers, reactChildren]);
 
-  return renderToolpadComponent({
-    Component,
-    props,
-    node,
-    argTypes,
-  });
+  // Wrap with slots
+  for (const [propName, argType] of Object.entries(argTypes)) {
+    if (argType?.typeDef.type === 'element') {
+      if (argType.control?.type === 'slots') {
+        const value = props[propName];
+        props[propName] = <Slots prop={propName}>{value}</Slots>;
+      } else if (argType.control?.type === 'slot') {
+        const value = props[propName];
+        props[propName] = <Placeholder prop={propName}>{value}</Placeholder>;
+      }
+    }
+  }
+
+  return <Component {...props} />;
 }
 
 function useGlobalScope(
@@ -515,17 +490,16 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     fireEvent({ type: 'pageBindingsUpdated', bindings: liveBindings });
   }, [liveBindings]);
 
-  const renderedPageContent = renderToolpadComponent({
-    node: page,
-    Component: PageRootComponent,
-    props: { children: children.map((child) => <RenderedNode key={child.id} nodeId={child.id} />) },
-    ...PageRootComponent[TOOLPAD_COMPONENT],
-  });
-
   return (
     <BindingsContextProvider value={liveBindings}>
       <SetControlledBindingsContextProvider value={setControlledBindings}>
-        {renderedPageContent}
+        <NodeRuntimeWrapper nodeId={page.id} componentConfig={PageRootComponent[TOOLPAD_COMPONENT]}>
+          <RenderedNodeContent
+            nodeId={page.id}
+            childNodes={children}
+            Component={PageRootComponent}
+          />
+        </NodeRuntimeWrapper>
 
         {queryStates.map((node) => (
           <QueryStateNode key={node.id} node={node} />

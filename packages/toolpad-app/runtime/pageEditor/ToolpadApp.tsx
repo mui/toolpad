@@ -137,7 +137,7 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     }
 
     if (loadingProp && loading) {
-      hookResult[loadingProp] = loading;
+      hookResult[loadingProp] = true;
     }
 
     return hookResult;
@@ -261,7 +261,7 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
     : {};
 
   const onResult = React.useCallback(
-    ({ loading, error, data, rows, ...result }: UseDataQuery) => {
+    ({ isLoading, error, data, rows, ...result }: UseDataQuery) => {
       setControlledBindings((oldBindings) => {
         const newBindings = { ...oldBindings };
 
@@ -272,9 +272,9 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
 
         // Here we propagate the error and loading state to the data and rows prop prop
         // TODO: is there a straightforward way fro us to generalize this behavior?
-        newBindings[`${node.id}.loading`] = { value: loading };
-        newBindings[`${node.id}.error`] = { value: error };
-        const deferredStatus = { loading, error };
+        newBindings[`${node.id}.isLoading`] = { value: isLoading };
+        const deferredStatus = { loading: isLoading, error };
+        newBindings[`${node.id}.error`] = { ...deferredStatus, value: error };
         newBindings[`${node.id}.data`] = { ...deferredStatus, value: data };
         newBindings[`${node.id}.rows`] = { ...deferredStatus, value: rows };
 

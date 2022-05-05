@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/material';
+import { LoadingButton as MuiButton, LoadingButtonProps as MuiButtonProps } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
 
 interface ButtonProps extends Omit<MuiButtonProps, 'children'> {
@@ -32,6 +32,9 @@ export default createComponent(Button, {
     },
     color: {
       typeDef: { type: 'string', enum: ['primary', 'secondary'] },
+    },
+    loading: {
+      typeDef: { type: 'boolean' },
     },
     sx: {
       typeDef: { type: 'object' },

@@ -204,6 +204,9 @@ export default createComponent(DataGridComponent, {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',
     },
+    loading: {
+      typeDef: { type: 'boolean' },
+    },
     rowIdField: {
       typeDef: { type: 'string' },
       label: 'Id field',

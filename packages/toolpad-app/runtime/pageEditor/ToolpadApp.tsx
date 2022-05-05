@@ -17,6 +17,8 @@ import {
   createComponent,
   TOOLPAD_COMPONENT,
   UseDataQuery,
+  Slots,
+  Placeholder,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import {
@@ -39,13 +41,20 @@ import {
   ToolpadComponentDefinitions,
 } from '../../src/toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
-import { fireEvent, JsRuntimeProvider } from '../coreRuntime';
+import { fireEvent, JsRuntimeProvider, NodeRuntimeWrapper } from '../coreRuntime';
 import evalJsBindings, { BindingEvaluationResult } from './evalJsBindings';
 import instantiateComponents from './instantiateComponents';
 
 const PAGE_ROW_COMPONENT_ID = 'PageRow';
 
 export interface RenderToolpadComponentParams {
+  Component: ToolpadComponent<any>;
+  props: any;
+  node: appDom.AppDomNode;
+  argTypes: ArgTypeDefinitions;
+}
+
+export interface RenderToolpadComponent {
   Component: ToolpadComponent<any>;
   props: any;
   node: appDom.AppDomNode;
@@ -96,12 +105,27 @@ interface RenderedNodeProps {
 
 function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
+  const node = appDom.getNode(dom, nodeId, 'element');
+  const { Component } = useElmToolpadComponent(node);
+  return (
+    <NodeRuntimeWrapper nodeId={nodeId} componentConfig={Component[TOOLPAD_COMPONENT]}>
+      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+      <RenderedNodeContent node={node} Component={Component} />
+    </NodeRuntimeWrapper>
+  );
+}
+
+interface RenderedNodeContentProps {
+  node: appDom.ElementNode;
+  Component: ToolpadComponent<any>;
+}
+
+function RenderedNodeContent({ node, Component }: RenderedNodeContentProps) {
+  const dom = useDomContext();
   const setControlledBindings = useSetControlledBindingsContext();
   const renderToolpadComponent = React.useContext(RenderToolpadComponentContext);
 
-  const node = appDom.getNode(dom, nodeId, 'element');
   const { children = [] } = appDom.getChildNodes(dom, node);
-  const { Component } = useElmToolpadComponent(node);
   const { argTypes, errorProp, loadingProp } = Component[TOOLPAD_COMPONENT];
 
   const liveBindings = useBindingsContext();
@@ -169,13 +193,25 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
       : // `undefined` to ensure the defaultProps get picked up
         undefined;
 
-  const props = React.useMemo(() => {
+  const props: Record<string, any> = React.useMemo(() => {
     return {
       ...boundProps,
       ...onChangeHandlers,
       children: reactChildren,
     };
   }, [boundProps, onChangeHandlers, reactChildren]);
+
+  for (const [propName, argType] of Object.entries(argTypes)) {
+    if (argType?.typeDef.type === 'element') {
+      if (argType.control?.type === 'slots') {
+        const value = props[propName];
+        props[propName] = <Slots prop={propName}>{value}</Slots>;
+      } else if (argType.control?.type === 'slot') {
+        const value = props[propName];
+        props[propName] = <Placeholder prop={propName}>{value}</Placeholder>;
+      }
+    }
+  }
 
   return renderToolpadComponent({
     Component,
@@ -391,7 +427,7 @@ function parseBindings(
       for (const [key, value] of Object.entries(INITIAL_DATA_QUERY)) {
         const bindingId = `${elm.id}.${key}`;
         scopePathToBindingId[`${elm.name}.${key}`] = bindingId;
-        initialControlledValues[bindingId] = { value };
+        initialControlledValues[bindingId] = { value, loading: true };
       }
     }
   }

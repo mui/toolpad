@@ -1,5 +1,6 @@
 import * as React from 'react';
 import ErrorIcon from '@mui/icons-material/Error';
+import { Tooltip } from '@mui/material';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type {
   SlotType,
@@ -109,18 +110,20 @@ export class NodeRuntimeWrapper extends React.Component<
           }}
         >
           {this.state.error ? (
-            <span
-              style={{
-                display: 'inline-flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                padding: 8,
-                background: 'red',
-                color: 'white',
-              }}
-            >
-              <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
-            </span>
+            <Tooltip title={this.state.error.message}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  padding: 8,
+                  background: 'red',
+                  color: 'white',
+                }}
+              >
+                <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
+              </span>
+            </Tooltip>
           ) : (
             this.props.children
           )}

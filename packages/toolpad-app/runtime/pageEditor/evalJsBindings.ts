@@ -87,6 +87,7 @@ export default function evalJsBindings(
             }
 
             computationStatuses.set(expression, { status: 'computing' });
+
             const result = evaluateExpression(expression, proxiedScope);
             computationStatuses.set(expression, { status: 'computed', result });
             // From freshly computed

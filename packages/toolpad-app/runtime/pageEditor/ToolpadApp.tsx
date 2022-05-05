@@ -66,8 +66,26 @@ export interface RenderToolpadComponent {
   argTypes: ArgTypeDefinitions;
 }
 
-function defaultRenderToolpadComponent({ Component, props }: RenderToolpadComponentParams) {
-  return <Component {...props} />;
+function renderToolpadComponent({ node, Component, props }: RenderToolpadComponentParams) {
+  const wrapped = { ...props };
+  const { argTypes } = Component[TOOLPAD_COMPONENT];
+  for (const [propName, argType] of Object.entries(argTypes)) {
+    if (argType?.typeDef.type === 'element') {
+      if (argType.control?.type === 'slots') {
+        const value = wrapped[propName];
+        wrapped[propName] = <Slots prop={propName}>{value}</Slots>;
+      } else if (argType.control?.type === 'slot') {
+        const value = wrapped[propName];
+        wrapped[propName] = <Placeholder prop={propName}>{value}</Placeholder>;
+      }
+    }
+  }
+
+  return (
+    <NodeRuntimeWrapper nodeId={node.id} componentConfig={Component[TOOLPAD_COMPONENT]}>
+      <Component {...wrapped} />
+    </NodeRuntimeWrapper>
+  );
 }
 
 interface AppContext {
@@ -75,7 +93,6 @@ interface AppContext {
   version: VersionOrPreview;
 }
 
-const RenderToolpadComponentContext = React.createContext(defaultRenderToolpadComponent);
 const [useComponentsContext, ComponentsContextProvider] =
   createProvidedContext<InstantiatedComponents>('Components');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
@@ -112,12 +129,8 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const node = appDom.getNode(dom, nodeId, 'element');
   const { Component } = useElmToolpadComponent(node);
-  return (
-    <NodeRuntimeWrapper nodeId={nodeId} componentConfig={Component[TOOLPAD_COMPONENT]}>
-      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
-      <RenderedNodeContent node={node} Component={Component} />
-    </NodeRuntimeWrapper>
-  );
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  return <RenderedNodeContent node={node} Component={Component} />;
 }
 
 interface RenderedNodeContentProps {
@@ -128,7 +141,6 @@ interface RenderedNodeContentProps {
 function RenderedNodeContent({ node, Component }: RenderedNodeContentProps) {
   const dom = useDomContext();
   const setControlledBindings = useSetControlledBindingsContext();
-  const renderToolpadComponent = React.useContext(RenderToolpadComponentContext);
 
   const { children = [] } = appDom.getChildNodes(dom, node);
   const { argTypes, errorProp, loadingProp } = Component[TOOLPAD_COMPONENT];
@@ -205,18 +217,6 @@ function RenderedNodeContent({ node, Component }: RenderedNodeContentProps) {
       children: reactChildren,
     };
   }, [boundProps, onChangeHandlers, reactChildren]);
-
-  for (const [propName, argType] of Object.entries(argTypes)) {
-    if (argType?.typeDef.type === 'element') {
-      if (argType.control?.type === 'slots') {
-        const value = props[propName];
-        props[propName] = <Slots prop={propName}>{value}</Slots>;
-      } else if (argType.control?.type === 'slot') {
-        const value = props[propName];
-        props[propName] = <Placeholder prop={propName}>{value}</Placeholder>;
-      }
-    }
-  }
 
   return renderToolpadComponent({
     Component,
@@ -454,7 +454,6 @@ function parseBindings(
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
-  const renderToolpadComponent = React.useContext(RenderToolpadComponentContext);
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queryStates = [] } = appDom.getChildNodes(dom, page);
@@ -638,5 +637,3 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
     </ErrorBoundary>
   );
 }
-
-export const RenderToolpadComponentProvider = RenderToolpadComponentContext.Provider;

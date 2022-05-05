@@ -4,7 +4,7 @@ import { asArray } from '../../../../../src/utils/collections';
 import {
   HTML_ID_APP_ROOT,
   MUI_X_PRO_LICENSE,
-  HTML_ID_TOOLPAD_APP_RENDER_PARAMS,
+  WINDOW_PROP_TOOLPAD_APP_RENDER_PARAMS,
 } from '../../../../../src/constants';
 import getImportMap from '../../../../../src/getImportMap';
 import { escapeHtml } from '../../../../../src/utils/strings';
@@ -77,8 +77,10 @@ export async function renderAppHtml(
             : ''
         }
 
-        <script type="application/json" id="${HTML_ID_TOOLPAD_APP_RENDER_PARAMS}">
-          ${serializeJavascript(JSON.parse(JSON.stringify(renderParams)))}
+        <script type="application/javascript">
+          window[${JSON.stringify(WINDOW_PROP_TOOLPAD_APP_RENDER_PARAMS)}] = ${serializeJavascript(
+    renderParams,
+  )};
         </script>
 
         <script type="module" src="/runtime/pageEditor.js"></script>

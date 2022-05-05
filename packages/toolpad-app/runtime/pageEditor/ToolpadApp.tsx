@@ -8,7 +8,7 @@ import {
   styled,
   AlertTitle,
 } from '@mui/material';
-import { omit, pick, without } from 'lodash-es';
+import { omit, pick, set, without } from 'lodash-es';
 import {
   INITIAL_DATA_QUERY,
   useDataQuery,
@@ -202,73 +202,21 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
 }
 
 function useGlobalScope(
-  dom: appDom.AppDom,
-  page: appDom.PageNode,
-  bindings: Record<string, BindingEvaluationResult>,
+  scopePathToBindingId: Record<string, string>,
+  inputBindings: Record<string, BindingEvaluationResult>,
+  scopePatshToHide: string[],
 ): Record<string, unknown> {
-  const location = useLocation();
-  const components = useComponentsContext();
-
   return React.useMemo(() => {
-    const scope: Record<string, unknown> = {};
-    const elements = appDom.getDescendants(dom, page);
-
-    for (const elm of elements) {
-      if (appDom.isElement(elm)) {
-        const { id, Component } = getElmComponent(components, elm);
-
-        if (id !== PAGE_ROW_COMPONENT_ID) {
-          // Hide page rows from the databinding system
-
-          const { argTypes } = Component[TOOLPAD_COMPONENT];
-          const elmScope: Record<string, unknown> = {};
-          scope[elm.name] = elmScope;
-          for (const propName of Object.keys(argTypes)) {
-            const bindingId = `${elm.id}.props.${propName}`;
-            const binding = bindings[bindingId];
-            if (binding) {
-              elmScope[propName] = binding.value;
-            }
-          }
-        }
-      }
-      if (appDom.isQueryState(elm)) {
-        const paramScope: Record<string, unknown> = {};
-        const elmScope: Record<string, unknown> = { params: paramScope, ...INITIAL_DATA_QUERY };
-        scope[elm.name] = elmScope;
-        if (elm.params) {
-          for (const paramName of Object.keys(elm.params)) {
-            const bindingId = `${elm.id}.params.${paramName}`;
-            const binding = bindings[bindingId];
-            if (binding) {
-              paramScope[paramName] = binding.value;
-            }
-          }
-        }
-
-        for (const propName of Object.keys(INITIAL_DATA_QUERY)) {
-          const bindingId = `${elm.id}.${propName}`;
-          const binding = bindings[bindingId];
-          if (binding) {
-            elmScope[propName] = binding.value;
-          }
-        }
+    const globalScope = {};
+    const scopePatshToHideSet = new Set(scopePatshToHide);
+    for (const [scopePath, bindingId] of Object.entries(scopePathToBindingId)) {
+      if (!scopePatshToHideSet.has(scopePath)) {
+        const value = inputBindings[bindingId]?.value;
+        set(globalScope, scopePath, value);
       }
     }
-
-    const urlParams = new URLSearchParams(location.search);
-    const pageScope = { query: {} as Record<string, string> };
-    scope.page = pageScope;
-    for (const key of urlParams.keys()) {
-      const bindingId = `${page.id}.query.${key}`;
-      const binding = bindings[bindingId];
-      if (binding) {
-        pageScope.query[key] = binding.value;
-      }
-    }
-
-    return scope;
-  }, [dom, page, bindings, components, location]);
+    return globalScope;
+  }, [scopePatshToHide, scopePathToBindingId, inputBindings]);
 }
 
 interface PageRootProps {
@@ -356,19 +304,25 @@ function parseBindings(
   const initialControlledValues: Record<string, BindingEvaluationResult> = {};
   const jsExpressions: Record<string, string> = {};
   const scopePathToBindingId: Record<string, string> = {};
+  // We may want to hide some things in the scope, but still have it visible in the databinding
+  const scopePatshToHide: string[] = [];
 
   const elements = appDom.getDescendants(dom, page);
 
   for (const elm of elements) {
     if (appDom.isElement(elm)) {
-      const { Component } = getElmComponent(components, elm);
+      const { id: componentId, Component } = getElmComponent(components, elm);
 
       const { argTypes } = Component[TOOLPAD_COMPONENT];
 
       for (const [propName, argType] of Object.entries(argTypes)) {
         const binding = elm.props?.[propName];
         const bindingId = `${elm.id}.props.${propName}`;
-        scopePathToBindingId[`${elm.name}.${propName}`] = bindingId;
+        const scopePath = `${elm.name}.${propName}`;
+        scopePathToBindingId[scopePath] = bindingId;
+        if (componentId === PAGE_ROW_COMPONENT_ID) {
+          scopePatshToHide.push(scopePath);
+        }
         if (argType) {
           if (argType.onChangeProp) {
             const defaultValue =
@@ -425,6 +379,7 @@ function parseBindings(
     initialControlledValues,
     jsExpressions,
     scopePathToBindingId,
+    scopePatshToHide,
   };
 }
 
@@ -442,6 +397,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     initialControlledValues,
     jsExpressions,
     scopePathToBindingId,
+    scopePatshToHide,
   } = React.useMemo(
     () => parseBindings(dom, page, components, location),
     [components, dom, location, page],
@@ -469,7 +425,9 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     () => ({ ...defaultValues, ...constValues, ...controlledBindings }),
     [defaultValues, constValues, controlledBindings],
   );
-  const globalScope = useGlobalScope(dom, page, inputBindings);
+
+  const globalScope = useGlobalScope(scopePathToBindingId, inputBindings, scopePatshToHide);
+
   const jsExpressionValues = React.useMemo(
     () => evalJsBindings(globalScope, inputBindings, jsExpressions, scopePathToBindingId),
     [globalScope, inputBindings, jsExpressions, scopePathToBindingId],
@@ -480,7 +438,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [inputBindings, jsExpressionValues],
   );
 
-  const pageState = useGlobalScope(dom, page, liveBindings);
+  const pageState = useGlobalScope(scopePathToBindingId, liveBindings, scopePatshToHide);
 
   React.useEffect(() => {
     fireEvent({ type: 'pageStateUpdated', pageState });

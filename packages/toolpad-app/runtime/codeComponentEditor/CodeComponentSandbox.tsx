@@ -1,6 +1,9 @@
 import { styled } from '@mui/material';
 import * as React from 'react';
 import AppThemeProvider from '../pageEditor/AppThemeProvider';
+import CodeComponentDev from './CodeComponentDev';
+
+const EXPERIMENTAL_COMMONJS_COMPONENTS = false;
 
 interface ErrorBoundaryProps {
   children?: React.ReactNode;
@@ -92,7 +95,11 @@ export default function CodeComponentSandbox() {
     <ErrorBoundary key={errorBoundaryKey}>
       <CodeComponentSandboxRoot>
         <AppThemeProvider node={null}>
-          <Component />
+          {EXPERIMENTAL_COMMONJS_COMPONENTS ? (
+            <CodeComponentDev code={codeComponentSrc || ''} props={{}} />
+          ) : (
+            <Component />
+          )}
         </AppThemeProvider>
       </CodeComponentSandboxRoot>
     </ErrorBoundary>

@@ -6,11 +6,12 @@ import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 import select from './select';
 
 function ColumnSelect({ nodeId, argType, ...props }: EditorProps<string>) {
-  const { viewState } = usePageEditorState();
-  const definedColumns = viewState.nodes[nodeId]?.props.columns as GridColDef[];
+  const { bindings } = usePageEditorState();
+  const columnsValue = bindings[`${nodeId}.props.columns`];
+  const definedColumns: GridColDef[] = columnsValue?.value;
 
   const newArgType: ArgTypeDefinition = React.useMemo(() => {
-    const columnNames = definedColumns.map((column) => column.field);
+    const columnNames = definedColumns?.map((column) => column.field);
     return {
       ...argType,
       typeDef: { type: 'string', enum: columnNames },

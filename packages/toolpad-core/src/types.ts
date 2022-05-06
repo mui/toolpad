@@ -124,15 +124,30 @@ export type PropValueTypes<K extends string = string> = Partial<{
 }>;
 
 export interface ArgTypeDefinition {
+  /**
+   * To be used instead of the property name for UI purposes in the editor.
+   */
   label?: string;
+  /**
+   * Describes the type of the values this property can accept.
+   */
   typeDef: PropValueType;
-  required?: boolean;
-  description?: string;
+  /**
+   * The control to be used to manipulate values for this property from the editor.
+   */
   control?: ArgControlSpec;
+  /**
+   * A description of the property, to be used to supply extra information to the user.
+   */
+  description?: string;
+  /**
+   * The property that is used to control this property.
+   */
   onChangeProp?: string;
+  /**
+   * Provides a way to manipulate the value from the onChange event before it is assigned to state.
+   */
   onChangeHandler?: OnChangeHandler;
-  memoize?: boolean;
-  defaultValueProp?: string;
 }
 
 export type ArgTypeDefinitions<P = any> = {
@@ -171,6 +186,19 @@ export type RuntimeEvent =
     };
 
 export interface ComponentConfig<P> {
+  /**
+   * Designates a property as "the error property". If Toolpad detects an error
+   * on any of the inputs, it will forward it to this property.
+   */
+  errorProp?: string;
+  /**
+   * Designates a property as "the loading property". If Toolpad detects any of the
+   * inputs is still loading it will set this property to true
+   */
+  loadingProp?: string;
+  /**
+   * Describes the individual properties for this component
+   */
   argTypes: ArgTypeDefinitions<P>;
 }
 

@@ -71,7 +71,7 @@ function PreviewQueryStateResult({ node }: PreviewQueryStateResultProps) {
   }
   return (
     <Box sx={{ maxHeight: 150, overflow: 'auto' }}>
-      {actualNodeState?.loading ? <LinearProgress /> : null}
+      {actualNodeState?.isLoading ? <LinearProgress /> : null}
       {actualNodeState?.error ? (
         <Alert severity="error">
           {actualNodeState?.error.message || actualNodeState?.error || 'Something went wrong'}

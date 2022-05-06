@@ -68,7 +68,6 @@ export default createComponent(Select, {
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
-      defaultValueProp: 'defaultValue',
       onChangeHandler: {
         params: ['event'],
         valueGetter: 'event.target.value',

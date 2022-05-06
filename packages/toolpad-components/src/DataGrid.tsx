@@ -9,7 +9,7 @@ import {
   GridColumnOrderChangeParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useNode, UseDataQuery, createComponent } from '@mui/toolpad-core';
+import { useNode, createComponent } from '@mui/toolpad-core';
 import { debounce } from '@mui/material';
 
 function inferColumnType(value: unknown): string | undefined {
@@ -51,21 +51,21 @@ if (LICENSE) {
 const EMPTY_COLUMNS: GridColumns = [];
 const EMPTY_ROWS: GridRowsProp = [];
 
-interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'> {
+interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
   columns?: GridColumns;
   rowIdField?: string;
-  dataQuery?: UseDataQuery;
   selection: any;
+  error?: Error | string;
   onSelectionChange: (newSelection: any) => void;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
   {
-    dataQuery,
     columns: columnsProp,
     rows: rowsProp,
     rowIdField: rowIdFieldProp,
+    error: errorProp,
     selection,
     onSelectionChange,
     ...props
@@ -118,15 +118,13 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
   React.useEffect(() => handleColumnOrderChange.clear(), [handleColumnOrderChange]);
 
-  const { rows: dataQueryRows, ...dataQueryRest } = dataQuery || {};
-
   const rows: GridRowsProp = React.useMemo(() => {
-    const parsedRows = rowsProp || dataQueryRows || EMPTY_ROWS;
+    const parsedRows = rowsProp || EMPTY_ROWS;
     if (parsedRows.length === 0 || rowIdFieldProp || parsedRows[0].id) {
       return parsedRows;
     }
     return parsedRows.map((row, id) => ({ ...row, id }));
-  }, [dataQueryRows, rowsProp, rowIdFieldProp]);
+  }, [rowsProp, rowIdFieldProp]);
 
   const columnsInitRef = React.useRef(false);
   const hasColumnsDefined = columnsProp && columnsProp.length > 0;
@@ -171,7 +169,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         getRowId={getRowId}
         onSelectionModelChange={onSelectionModelChange}
         selectionModel={selection ? [selection.id] : []}
-        {...dataQueryRest}
+        error={errorProp}
+        componentsProps={{
+          errorOverlay: { message: typeof errorProp === 'string' ? errorProp : errorProp?.message },
+        }}
         {...props}
       />
     </div>
@@ -183,6 +184,8 @@ DataGridComponent.defaultProps = {
 };
 
 export default createComponent(DataGridComponent, {
+  errorProp: 'error',
+  loadingProp: 'loading',
   argTypes: {
     rows: {
       typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' },
@@ -190,10 +193,6 @@ export default createComponent(DataGridComponent, {
     columns: {
       typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' },
       control: { type: 'GridColumns' },
-      memoize: true,
-    },
-    dataQuery: {
-      typeDef: { type: 'object', schema: '/schemas/DataQuery.json' },
     },
     density: {
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },
@@ -204,6 +203,9 @@ export default createComponent(DataGridComponent, {
     selection: {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',
+    },
+    loading: {
+      typeDef: { type: 'boolean' },
     },
     rowIdField: {
       typeDef: { type: 'string' },

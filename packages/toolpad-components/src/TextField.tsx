@@ -26,7 +26,6 @@ export default createComponent(
           params: ['event'],
           valueGetter: 'event.target.value',
         },
-        defaultValueProp: 'defaultValue',
       },
       sx: {
         typeDef: { type: 'object' },

@@ -106,7 +106,8 @@ export interface ArgControlSpec {
     | 'GridColumns' // GridColumns specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
-    | 'function';
+    | 'function'
+    | 'RowIdFieldSelect'; // Row id field specialized select
 }
 
 type PrimitiveValueType =

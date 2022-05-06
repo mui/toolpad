@@ -207,6 +207,7 @@ export default createComponent(DataGridComponent, {
     },
     rowIdField: {
       typeDef: { type: 'string' },
+      control: { type: 'RowIdFieldSelect' },
       label: 'Id field',
     },
   },

@@ -11,7 +11,7 @@ export interface ImageProps {
   loading?: boolean;
 }
 
-function Image({ sx: sxProp, src, width, height, alt, loading }: ImageProps) {
+function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp }: ImageProps) {
   const sx: SxProps = React.useMemo(
     () => ({
       ...sxProp,
@@ -24,18 +24,28 @@ function Image({ sx: sxProp, src, width, height, alt, loading }: ImageProps) {
     }),
     [sxProp, width, height],
   );
+
+  const [imgLoading, setImgLoading] = React.useState(true);
+  const handleLoad = React.useCallback(() => setImgLoading(false), []);
+
+  const loading = loadingProp || imgLoading;
+
   return (
     <Box sx={sx}>
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        <Box
-          component="img"
-          src={src}
-          alt={alt}
-          sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
-        />
-      )}
+      {loading ? <CircularProgress /> : null}
+      <Box
+        component="img"
+        src={src}
+        alt={alt}
+        sx={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+          position: 'absolute',
+          visibility: loading ? 'hidden' : 'visible',
+        }}
+        onLoad={handleLoad}
+      />
     </Box>
   );
 }
@@ -49,6 +59,7 @@ Image.defaultProps = {
 };
 
 export default createComponent(Image, {
+  loadingPropSource: ['src'],
   loadingProp: 'loading',
   argTypes: {
     src: {

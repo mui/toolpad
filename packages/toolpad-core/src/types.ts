@@ -191,6 +191,10 @@ export interface ComponentConfig<P> {
    */
   errorProp?: string;
   /**
+   * Configures which properties result in propagating loading state to `loadingProp`.
+   */
+  loadingPropSource?: string[];
+  /**
    * Designates a property as "the loading property". If Toolpad detects any of the
    * inputs is still loading it will set this property to true
    */

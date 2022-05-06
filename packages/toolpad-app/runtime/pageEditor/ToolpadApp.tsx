@@ -110,12 +110,16 @@ interface RenderedNodeContentProps {
 function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeContentProps) {
   const setControlledBindings = useSetControlledBindingsContext();
 
-  const { argTypes, errorProp, loadingProp } = Component[TOOLPAD_COMPONENT];
+  const { argTypes, errorProp, loadingProp, loadingPropSource } = Component[TOOLPAD_COMPONENT];
 
   const liveBindings = useBindingsContext();
   const boundProps = React.useMemo(() => {
+    const loadingPropSourceSet = new Set(loadingPropSource);
     const hookResult: Record<string, any> = {};
+
+    // error state we will propagate tot he component
     let error: Error | undefined;
+    // loading state we will propagate to the component
     let loading: boolean = false;
 
     for (const propName of Object.keys(argTypes)) {
@@ -124,7 +128,10 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
       if (binding) {
         hookResult[propName] = binding.value;
         error = error || binding.error;
-        loading = loading || binding.loading || false;
+
+        if (loading && loadingPropSourceSet.has(propName)) {
+          loading = true;
+        }
       }
     }
 
@@ -141,7 +148,7 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     }
 
     return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, nodeId]);
+  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
 
   const onChangeHandlers = React.useMemo(
     () =>

@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
-import LinkOffIcon from '@mui/icons-material/LinkOff';
+import AddLinkIcon from '@mui/icons-material/AddLink';
 import { LiveBinding, PropValueType, BindableAttrValue } from '@mui/toolpad-core';
 import { evaluateBindable, JsRuntimeProvider, useJsRuntime } from '@mui/toolpad-core/runtime';
 import evaluateBindableServer from '../../server/evaluateBindable';
@@ -123,6 +123,7 @@ function JsExpressionPreviewServer(props: JsExpressionPreviewProps) {
 }
 
 export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
+  label: string;
   globalScope: Record<string, unknown>;
   /**
    * Uses the QuickJs runtime to evaluate bindings, just like on the server
@@ -133,6 +134,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
 }
 
 export function BindingEditor<V>({
+  label,
   globalScope,
   server,
   disabled,
@@ -178,17 +180,25 @@ export function BindingEditor<V>({
       onClick={handleOpen}
       color={hasBinding ? 'primary' : 'inherit'}
     >
-      {hasBinding ? <LinkOffIcon fontSize="inherit" /> : <LinkIcon fontSize="inherit" />}
+      {hasBinding ? <LinkIcon fontSize="inherit" /> : <AddLinkIcon fontSize="inherit" />}
     </IconButton>
+  );
+
+  const bindingButtonWithTooltip = disabled ? (
+    bindingButton
+  ) : (
+    <Tooltip
+      placement="left"
+      arrow
+      title={hasBinding ? `Update "${label}" binding` : `Bind "${label}"`}
+    >
+      {bindingButton}
+    </Tooltip>
   );
 
   return (
     <React.Fragment>
-      {disabled ? (
-        bindingButton
-      ) : (
-        <Tooltip title="Bind property dynamically">{bindingButton}</Tooltip>
-      )}
+      {bindingButtonWithTooltip}
       <Dialog onClose={handleClose} open={open} fullWidth scroll="body" maxWidth="lg">
         <DialogTitle>Bind a property</DialogTitle>
         <DialogContent>
@@ -204,8 +214,8 @@ export function BindingEditor<V>({
 
             <Box sx={{ height: '100%', display: 'flex', flex: 1, flexDirection: 'column' }}>
               <Typography sx={{ mb: 2 }}>
-                Make this property dynamic with a JavaScript expression. This property expects a
-                type: <code>{propType.type}</code>.
+                Make the &quot;{label}&quot; property dynamic with a JavaScript expression. This
+                property expects a type: <code>{propType.type}</code>.
               </Typography>
 
               <JsExpressionBindingEditor<V>

@@ -145,6 +145,7 @@ function NodePropsEditor<P>({
                 disabled={isBound}
               />
               <BindingEditor
+                label={propName}
                 globalScope={globalScope}
                 propType={propType}
                 value={propValue}

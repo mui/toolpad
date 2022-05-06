@@ -75,6 +75,8 @@ export default function BindableEditor<V>({
 
   const hasBinding = value && value.type !== 'const';
 
+  const label = argType.label || propName;
+
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
       {control ? (
@@ -82,7 +84,7 @@ export default function BindableEditor<V>({
           <control.Editor
             nodeId={nodeId}
             propName={propName}
-            label={argType.label || propName}
+            label={label}
             argType={argType}
             disabled={!!hasBinding}
             value={constValue}
@@ -90,6 +92,7 @@ export default function BindableEditor<V>({
           />
           <BindingEditor<V>
             globalScope={globalScope}
+            label={label}
             propType={argType.typeDef}
             value={value}
             onChange={onChange}

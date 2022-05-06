@@ -39,7 +39,7 @@ function GridColumnsPropEditor({
   onChange,
   disabled,
 }: EditorProps<GridColumns>) {
-  const { viewState } = usePageEditorState();
+  const { bindings } = usePageEditorState();
   const [editColumnsDialogOpen, setEditColumnsDialogOpen] = React.useState(false);
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
 
@@ -59,7 +59,8 @@ function GridColumnsPropEditor({
     setMenuAnchorEl(null);
   };
 
-  const definedRows = viewState.nodes[nodeId]?.props.rows;
+  const rowsValue = bindings[`${nodeId}.props.rows`];
+  const definedRows: unknown = rowsValue?.value;
 
   const columnSuggestions = React.useMemo(() => {
     const inferred = inferColumns(Array.isArray(definedRows) ? definedRows : []);

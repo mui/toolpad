@@ -159,7 +159,6 @@ export async function createApp(name: string): Promise<App> {
         status: appDom.createConst(null),
       },
     });
-    console.log(newNode);
     const newDom = await appDom.addNode(dom, newNode, appNode, 'connections');
     await saveDom(app.id, newDom);
 

@@ -9,6 +9,7 @@ import functionType from './function';
 import GridColumns from './GridColumns';
 import HorizontalAlign from './HorizontalAlign';
 import VerticalAlign from './VerticalAlign';
+import RowIdFieldSelect from './RowIdFieldSelect';
 
 const propTypeControls: {
   [key in ArgControlSpec['type']]?: PropControlDefinition;
@@ -20,6 +21,7 @@ const propTypeControls: {
   json,
   function: functionType,
   GridColumns,
+  RowIdFieldSelect,
   HorizontalAlign,
   VerticalAlign,
 };

@@ -1,4 +1,4 @@
-import { Box, CircularProgress, SxProps } from '@mui/material';
+import { Box, Skeleton, SxProps } from '@mui/material';
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
 
@@ -9,9 +9,10 @@ export interface ImageProps {
   width: number;
   height: number;
   loading?: boolean;
+  fit: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
 }
 
-function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp }: ImageProps) {
+function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit }: ImageProps) {
   const sx: SxProps = React.useMemo(
     () => ({
       ...sxProp,
@@ -32,7 +33,7 @@ function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp }: Im
 
   return (
     <Box sx={sx}>
-      {loading ? <CircularProgress /> : null}
+      {loading ? <Skeleton variant="rectangular" width={width} height={height} /> : null}
       <Box
         component="img"
         src={src}
@@ -40,7 +41,7 @@ function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp }: Im
         sx={{
           width: '100%',
           height: '100%',
-          objectFit: 'contain',
+          objectFit: fit,
           position: 'absolute',
           visibility: loading ? 'hidden' : 'visible',
         }}
@@ -56,7 +57,8 @@ Image.defaultProps = {
   width: 400,
   height: 300,
   loading: false,
-};
+  fit: 'contain',
+} as ImageProps;
 
 export default createComponent(Image, {
   loadingPropSource: ['src'],
@@ -67,6 +69,9 @@ export default createComponent(Image, {
     },
     alt: {
       typeDef: { type: 'string' },
+    },
+    fit: {
+      typeDef: { type: 'string', enum: ['contain', 'cover', 'fill', 'none', 'scale-down'] },
     },
     width: {
       typeDef: { type: 'number' },

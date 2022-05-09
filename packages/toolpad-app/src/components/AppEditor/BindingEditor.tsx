@@ -10,6 +10,9 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  styled,
+  tooltipClasses,
+  TooltipProps,
 } from '@mui/material';
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
@@ -24,6 +27,14 @@ import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { Serializable } from '../../server/evalExpression';
+
+const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.error.dark,
+  },
+}));
 
 interface JsExpressionBindingEditorProps<V>
   extends WithControlledProp<BindableAttrValue<V> | null> {
@@ -131,6 +142,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
   server?: boolean;
   disabled?: boolean;
   propType: PropValueType;
+  liveBinding?: LiveBinding;
 }
 
 export function BindingEditor<V>({
@@ -141,6 +153,7 @@ export function BindingEditor<V>({
   propType,
   value,
   onChange,
+  liveBinding,
 }: BindingEditorProps<V>) {
   const [input, setInput] = React.useState(value);
   const [open, setOpen] = React.useState(false);
@@ -172,6 +185,8 @@ export function BindingEditor<V>({
     handleClose();
   }, [onChange, input, handleClose]);
 
+  const error: string | undefined = liveBinding?.error?.message;
+
   const bindingButton = (
     <Checkbox
       size="small"
@@ -181,15 +196,19 @@ export function BindingEditor<V>({
       icon={<AddLinkIcon />}
       checkedIcon={<LinkIcon />}
       onClick={handleOpen}
+      color={error ? 'error' : undefined}
     />
   );
 
+  const TooltipComponent = error ? ErrorTooltip : Tooltip;
+  const tooltipTitle: string =
+    error ?? (hasBinding ? `Update "${label}" binding` : `Bind "${label}"`);
   const bindingButtonWithTooltip = disabled ? (
     bindingButton
   ) : (
-    <Tooltip placement="left" title={hasBinding ? `Update "${label}" binding` : `Bind "${label}"`}>
+    <TooltipComponent placement="left" title={tooltipTitle}>
       {bindingButton}
-    </Tooltip>
+    </TooltipComponent>
   );
 
   return (

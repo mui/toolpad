@@ -97,6 +97,7 @@ export default function BindableEditor<V>({
             value={value}
             onChange={onChange}
             disabled={!isBindable}
+            liveBinding={liveBinding}
           />
         </React.Fragment>
       ) : (

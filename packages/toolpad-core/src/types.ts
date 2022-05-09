@@ -190,16 +190,16 @@ export interface ComponentConfig<P> {
    * Designates a property as "the error property". If Toolpad detects an error
    * on any of the inputs, it will forward it to this property.
    */
-  errorProp?: string;
+  errorProp?: keyof P & string;
   /**
    * Configures which properties result in propagating loading state to `loadingProp`.
    */
-  loadingPropSource?: string[];
+  loadingPropSource?: (keyof P & string)[];
   /**
    * Designates a property as "the loading property". If Toolpad detects any of the
    * inputs is still loading it will set this property to true
    */
-  loadingProp?: string;
+  loadingProp?: keyof P & string;
   /**
    * Describes the individual properties for this component
    */

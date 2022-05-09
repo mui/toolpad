@@ -117,7 +117,7 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     const loadingPropSourceSet = new Set(loadingPropSource);
     const hookResult: Record<string, any> = {};
 
-    // error state we will propagate tot he component
+    // error state we will propagate tot the component
     let error: Error | undefined;
     // loading state we will propagate to the component
     let loading: boolean = false;

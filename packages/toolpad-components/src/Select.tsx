@@ -52,6 +52,8 @@ Select.defaultProps = {
 };
 
 export default createComponent(Select, {
+  loadingPropSource: ['value', 'options'],
+  loadingProp: 'disabled',
   argTypes: {
     label: {
       typeDef: { type: 'string' },

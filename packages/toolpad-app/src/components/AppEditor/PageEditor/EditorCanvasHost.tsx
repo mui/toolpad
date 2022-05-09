@@ -34,6 +34,7 @@ export default function EditorCanvasHost({
   dom,
 }: EditorCanvasHostProps) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
+  const [showLoading, setShowLoading] = React.useState(true);
 
   React.useEffect(() => {
     const frameWindow = frameRef.current?.contentWindow;
@@ -57,6 +58,10 @@ export default function EditorCanvasHost({
     }
   }, [dom]);
 
+  const handleLoad = React.useCallback(() => {
+    onLoad?.(frameRef.current?.contentWindow!);
+  }, [onLoad]);
+
   return (
     <CanvasRoot className={className}>
       <Box
@@ -73,7 +78,7 @@ export default function EditorCanvasHost({
       </Box>
       <CanvasFrame
         ref={frameRef}
-        onLoad={() => onLoad?.(frameRef.current?.contentWindow!)}
+        onLoad={handleLoad}
         src={`/app/${appId}/preview/pages/${pageNodeId}`}
       />
     </CanvasRoot>

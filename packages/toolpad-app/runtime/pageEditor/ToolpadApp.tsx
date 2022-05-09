@@ -3,10 +3,10 @@ import {
   ButtonProps,
   Stack,
   CssBaseline,
-  CircularProgress,
   Alert,
   styled,
   AlertTitle,
+  LinearProgress,
 } from '@mui/material';
 import { omit, pick, set, without } from 'lodash-es';
 import {
@@ -487,11 +487,7 @@ const FullPageCentered = styled('div')({
 });
 
 function AppLoading() {
-  return (
-    <FullPageCentered>
-      <CircularProgress />
-    </FullPageCentered>
-  );
+  return <LinearProgress />;
 }
 
 function AppError({ error }: FallbackProps) {
@@ -533,46 +529,48 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
   return (
-    <ErrorBoundary FallbackComponent={AppError}>
-      <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-        <React.Suspense fallback={<AppLoading />}>
-          <JsRuntimeProvider>
-            <ComponentsContextProvider value={instantiatedComponents}>
-              <AppContextProvider value={appContext}>
-                <QueryClientProvider client={queryClient}>
-                  <CssBaseline />
-                  <AppThemeProvider node={theme}>
-                    <DomContextProvider value={dom}>
-                      <BrowserRouter basename={basename}>
-                        <Routes>
-                          <Route path="/" element={<Navigate replace to="/pages" />} />
-                          <Route
-                            path="/pages"
-                            element={
-                              <AppOverview
-                                appId={appId}
-                                dom={dom}
-                                openPageButtonProps={getPageNavButtonProps}
-                              />
-                            }
-                          />
-                          {pages.map((page) => (
+    <React.Fragment>
+      <CssBaseline />
+      <ErrorBoundary FallbackComponent={AppError}>
+        <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+          <React.Suspense fallback={<AppLoading />}>
+            <JsRuntimeProvider>
+              <ComponentsContextProvider value={instantiatedComponents}>
+                <AppContextProvider value={appContext}>
+                  <QueryClientProvider client={queryClient}>
+                    <AppThemeProvider node={theme}>
+                      <DomContextProvider value={dom}>
+                        <BrowserRouter basename={basename}>
+                          <Routes>
+                            <Route path="/" element={<Navigate replace to="/pages" />} />
                             <Route
-                              key={page.id}
-                              path={`/pages/${page.id}`}
-                              element={<RenderedPage nodeId={page.id} />}
+                              path="/pages"
+                              element={
+                                <AppOverview
+                                  appId={appId}
+                                  dom={dom}
+                                  openPageButtonProps={getPageNavButtonProps}
+                                />
+                              }
                             />
-                          ))}
-                        </Routes>
-                      </BrowserRouter>
-                    </DomContextProvider>
-                  </AppThemeProvider>
-                </QueryClientProvider>
-              </AppContextProvider>
-            </ComponentsContextProvider>
-          </JsRuntimeProvider>
-        </React.Suspense>
-      </ResetNodeErrorsKeyProvider>
-    </ErrorBoundary>
+                            {pages.map((page) => (
+                              <Route
+                                key={page.id}
+                                path={`/pages/${page.id}`}
+                                element={<RenderedPage nodeId={page.id} />}
+                              />
+                            ))}
+                          </Routes>
+                        </BrowserRouter>
+                      </DomContextProvider>
+                    </AppThemeProvider>
+                  </QueryClientProvider>
+                </AppContextProvider>
+              </ComponentsContextProvider>
+            </JsRuntimeProvider>
+          </React.Suspense>
+        </ResetNodeErrorsKeyProvider>
+      </ErrorBoundary>
+    </React.Fragment>
   );
 }

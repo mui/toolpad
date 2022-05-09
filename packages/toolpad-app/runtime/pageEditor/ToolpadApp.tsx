@@ -129,7 +129,7 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
         hookResult[propName] = binding.value;
         error = error || binding.error;
 
-        if (loading && loadingPropSourceSet.has(propName)) {
+        if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
         }
       }

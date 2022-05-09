@@ -1,38 +1,15 @@
 import { styled } from '@mui/material';
 import * as React from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { transform } from 'sucrase';
+import * as ReactIs from 'react-is';
 import AppThemeProvider from '../pageEditor/AppThemeProvider';
 import CodeComponentDev from './CodeComponentDev';
 
 const EXPERIMENTAL_COMMONJS_COMPONENTS = false;
 
-interface ErrorBoundaryProps {
-  children?: React.ReactNode;
-}
-
-interface ErrorBoundaryState {
-  error: Error | null;
-}
-
-class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
-  state: ErrorBoundaryState = {
-    error: null,
-  };
-
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
-
-  render() {
-    if (this.state.error) {
-      return <React.Fragment>{this.state.error.message}</React.Fragment>;
-    }
-
-    return this.props.children;
-  }
-}
-
 export interface CodeComponentSandboxBridge {
-  updateCodeCompoent: (newNode: string) => void;
+  updateCodeComponent: (newNode: string) => void;
 }
 
 declare global {
@@ -42,21 +19,78 @@ declare global {
   }
 }
 
-function Noop() {
-  return null;
+const CodeComponentSandboxRoot = styled('div')({});
+
+async function createCodeComponent(src: string): Promise<React.ComponentType> {
+  const { code } = transform(src, {
+    transforms: ['typescript', 'jsx'],
+  });
+
+  const importUrl = URL.createObjectURL(
+    new Blob([code], {
+      type: 'application/javascript',
+    }),
+  );
+
+  let mod;
+  try {
+    mod = await import(importUrl);
+  } finally {
+    URL.revokeObjectURL(importUrl);
+  }
+
+  const Component: unknown = mod.default;
+
+  if (!ReactIs.isValidElementType(Component) || typeof Component === 'string') {
+    throw new Error(`No React Component exported.`);
+  }
+
+  return Component;
 }
 
-const CodeComponentSandboxRoot = styled('div')({});
+interface CodeComponentProps<P> {
+  src: string;
+  props: P;
+}
+
+function useCodeComponent(src: string) {
+  const [Component, setComponent] = React.useState<React.ComponentType>();
+  const [error, setError] = React.useState<Error>();
+
+  React.useEffect(() => {
+    const startSrc = src;
+    createCodeComponent(startSrc)
+      .then((CreatedComponent) => {
+        if (startSrc === src) {
+          setComponent(() => CreatedComponent);
+        }
+      })
+      .catch((creationError: Error) => setError(creationError));
+  }, [src]);
+
+  return {
+    Component,
+    error,
+  };
+}
+
+function CodeComponent<P>({ src, props }: CodeComponentProps<P>) {
+  const { Component = () => null, error } = useCodeComponent(src);
+  if (error) {
+    throw error;
+  }
+  return <Component {...props} />;
+}
 
 export default function CodeComponentSandbox() {
   const [codeComponentSrc, setCodeComponentSrc] = React.useState<string | null>(null);
-  const [Component, setComponent] = React.useState<React.ComponentType>(() => Noop);
-  const [errorBoundaryKey, seterrorBoundaryKey] = React.useState(1);
 
   React.useEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
     window.__CODE_COMPONENT_SANDBOX_BRIDGE__ = {
-      updateCodeCompoent: (component) => setCodeComponentSrc(component),
+      updateCodeComponent: (component) => {
+        setCodeComponentSrc(component);
+      },
     };
     // eslint-disable-next-line no-underscore-dangle
     if (typeof window.__CODE_COMPONENT_SANDBOX_READY__ === 'function') {
@@ -72,36 +106,26 @@ export default function CodeComponentSandbox() {
     };
   }, []);
 
-  React.useEffect(() => {
-    if (!codeComponentSrc) {
-      return () => {};
-    }
-
-    const importUrl = URL.createObjectURL(
-      new Blob([codeComponentSrc], {
-        type: 'application/javascript',
-      }),
-    );
-
-    import(importUrl).then((mod) => {
-      setComponent(() => mod.default);
-      seterrorBoundaryKey((key) => key + 1);
-    });
-
-    return () => URL.revokeObjectURL(importUrl);
-  }, [codeComponentSrc]);
+  // @ts-expect-error
+  const deferredSrc: string | null = React.useDeferredValue(codeComponentSrc);
 
   return (
-    <ErrorBoundary key={errorBoundaryKey}>
-      <CodeComponentSandboxRoot>
-        <AppThemeProvider node={null}>
-          {EXPERIMENTAL_COMMONJS_COMPONENTS ? (
-            <CodeComponentDev code={codeComponentSrc || ''} props={{}} />
-          ) : (
-            <Component />
-          )}
-        </AppThemeProvider>
-      </CodeComponentSandboxRoot>
-    </ErrorBoundary>
+    <React.Suspense fallback={null}>
+      <ErrorBoundary
+        resetKeys={[deferredSrc]}
+        fallbackRender={({ error }) => <React.Fragment>{error.message}</React.Fragment>}
+      >
+        <CodeComponentSandboxRoot>
+          <AppThemeProvider node={null}>
+            {/* eslint-disable-next-line no-nested-ternary */}
+            {EXPERIMENTAL_COMMONJS_COMPONENTS ? (
+              <CodeComponentDev code={codeComponentSrc || ''} props={{}} />
+            ) : deferredSrc ? (
+              <CodeComponent src={deferredSrc} props={{}} />
+            ) : null}
+          </AppThemeProvider>
+        </CodeComponentSandboxRoot>
+      </ErrorBoundary>
+    </React.Suspense>
   );
 }

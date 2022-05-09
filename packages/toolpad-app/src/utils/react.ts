@@ -13,3 +13,31 @@ export function createProvidedContext<T>(name: string) {
 
   return [useContext, context.Provider] as const;
 }
+
+export function suspendPromise<T>(promise: Promise<T>): () => T {
+  let status = 'pending';
+  let error: Error;
+  let response: T;
+
+  const suspender = promise.then(
+    (res) => {
+      status = 'success';
+      response = res;
+    },
+    (err: Error) => {
+      status = 'error';
+      error = err;
+    },
+  );
+
+  return () => {
+    switch (status) {
+      case 'pending':
+        throw suspender;
+      case 'error':
+        throw error;
+      default:
+        return response;
+    }
+  };
+}

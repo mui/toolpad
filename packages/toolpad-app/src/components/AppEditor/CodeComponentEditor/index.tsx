@@ -3,7 +3,6 @@ import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
-import { transform } from 'sucrase';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -175,29 +174,19 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
       return;
     }
 
-    let compiled: string;
-    try {
-      compiled = transform(input, {
-        transforms: ['jsx', 'typescript'],
-      }).code;
-    } catch (err) {
-      console.error(err);
-      return;
-    }
-
     // eslint-disable-next-line no-underscore-dangle
     if (frameWindow.__CODE_COMPONENT_SANDBOX_READY__) {
       // eslint-disable-next-line no-underscore-dangle
-      frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateCodeCompoent(
-        compiled,
+      frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateCodeComponent(
+        input,
       );
       // eslint-disable-next-line no-underscore-dangle
     } else if (typeof frameWindow.__CODE_COMPONENT_SANDBOX_READY__ !== 'function') {
       // eslint-disable-next-line no-underscore-dangle
       frameWindow.__CODE_COMPONENT_SANDBOX_READY__ = () => {
         // eslint-disable-next-line no-underscore-dangle
-        frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateCodeCompoent(
-          compiled,
+        frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateCodeComponent(
+          input,
         );
       };
     }

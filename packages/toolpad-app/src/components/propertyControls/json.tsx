@@ -11,17 +11,20 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
   const [input, setInput] = React.useState(valueAsString);
   React.useEffect(() => setInput(valueAsString), [valueAsString]);
 
-  const isValid = React.useMemo(() => {
+  const normalizedInitial = React.useMemo(() => JSON.stringify(value), [value]);
+  const normalizedInput = React.useMemo(() => {
+    if (!input) {
+      return '';
+    }
     try {
-      JSON.parse(input);
-      return true;
+      return JSON.stringify(JSON.parse(input));
     } catch {
-      return false;
+      return null;
     }
   }, [input]);
 
   const handleSave = React.useCallback(() => {
-    const newValue = JSON.parse(input);
+    const newValue = input === '' ? undefined : JSON.parse(input);
     onChange(newValue);
   }, [onChange, input]);
 
@@ -93,7 +96,10 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
           <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
             Cancel
           </Button>
-          <Button disabled={valueAsString === input || !isValid} onClick={handleSave}>
+          <Button
+            disabled={normalizedInput === null || normalizedInitial === normalizedInput}
+            onClick={handleSave}
+          >
             Save
           </Button>
         </DialogActions>

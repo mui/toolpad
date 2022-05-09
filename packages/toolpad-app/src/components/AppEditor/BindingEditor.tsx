@@ -187,11 +187,7 @@ export function BindingEditor<V>({
   const bindingButtonWithTooltip = disabled ? (
     bindingButton
   ) : (
-    <Tooltip
-      placement="left"
-      arrow
-      title={hasBinding ? `Update "${label}" binding` : `Bind "${label}"`}
-    >
+    <Tooltip placement="left" title={hasBinding ? `Update "${label}" binding` : `Bind "${label}"`}>
       {bindingButton}
     </Tooltip>
   );

@@ -7,10 +7,30 @@ import {
   GridColumns,
   GridRowsProp,
   GridColumnOrderChangeParams,
+  useGridApiContext,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
-import { debounce } from '@mui/material';
+import { debounce, Skeleton } from '@mui/material';
+
+function SkeletonLoadingOverlay() {
+  const apiRef = useGridApiContext();
+
+  const viewportHeight = apiRef.current?.getRootDimensions()?.viewportInnerSize.height ?? 0;
+  // @ts-expect-error Function signature expects to be called with parameters, but the implementation suggests otherwise
+  const rowHeight = apiRef.current.unstable_getRowHeight();
+  const skeletonRowsCount = Math.ceil(viewportHeight / rowHeight);
+
+  const children = React.useMemo(() => {
+    const array = [];
+    for (let i = 0; i < skeletonRowsCount; i += 1) {
+      array.push(<Skeleton key={i} height={rowHeight} />);
+    }
+    return array;
+  }, [skeletonRowsCount, rowHeight]);
+
+  return <div style={{ marginLeft: 8, marginRight: 8 }}>{children}</div>;
+}
 
 function inferColumnType(value: unknown): string | undefined {
   if (value instanceof Date) {
@@ -169,7 +189,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   return (
     <div ref={ref} style={{ height: 350, width: '100%' }}>
       <DataGridPro
-        components={{ Toolbar: GridToolbar }}
+        components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
         onColumnResize={handleResize}
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}

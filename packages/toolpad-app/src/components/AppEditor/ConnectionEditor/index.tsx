@@ -86,10 +86,14 @@ function ConnectionEditorContent<P>({
           status,
         });
         if (status.error) {
+          // TODO: Proper UI fpr these errors
+          // eslint-disable-next-line no-alert
           alert(status.error);
         }
       }
     } catch (err: any) {
+      // TODO: Proper UI fpr these errors
+      // eslint-disable-next-line no-alert
       alert(err.message);
     } finally {
       setIsTesting(false);

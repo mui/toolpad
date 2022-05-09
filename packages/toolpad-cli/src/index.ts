@@ -24,6 +24,7 @@ if (!process.env.TOOLPAD_DATABASE_URL) {
 }
 
 const connectionString = pgConnectionString.parse(process.env.TOOLPAD_DATABASE_URL);
+// eslint-disable-next-line no-console
 console.log(`Starting Toolpad with db "${connectionString.host}:${connectionString.port}"`);
 
 const toolpadDir = path.dirname(

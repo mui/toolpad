@@ -137,7 +137,7 @@ function NodePropsEditor<P>({
           const propValue: BindableAttrValue<any> | null = value[propName] ?? null;
           const isBound = !!propValue;
           return (
-            <Stack key={propName} direction="row" alignItems="center" gap={1}>
+            <Stack key={propName} direction="row" alignItems="center">
               {propName}:
               <PropValueTypeSelector
                 value={propType}
@@ -145,6 +145,7 @@ function NodePropsEditor<P>({
                 disabled={isBound}
               />
               <BindingEditor
+                label={propName}
                 globalScope={globalScope}
                 propType={propType}
                 value={propValue}

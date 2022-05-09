@@ -1,4 +1,4 @@
-import { styled, Typography } from '@mui/material';
+import { Stack, styled, Typography } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinition, ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
 import { ExactEntriesOf } from '../../../utils/types';
@@ -66,7 +66,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const component = useToolpadComponent(dom, node.attributes.component.value);
 
   return (
-    <React.Fragment>
+    <Stack direction="column" gap={1}>
       <Typography variant="subtitle1">Component: {component.displayName}</Typography>
       <Typography variant="subtitle2" sx={{ mb: 2 }}>
         ID: {node.id}
@@ -81,7 +81,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
           <ComponentPropsEditor componentConfig={componentConfig} node={node} />
         </React.Fragment>
       ) : null}
-    </React.Fragment>
+    </Stack>
   );
 }
 

@@ -35,7 +35,7 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
 
   return (
     <div>
-      <Stack direction="row" gap={1}>
+      <Stack direction="row">
         <TextField
           label="url"
           size="small"
@@ -45,6 +45,7 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
           disabled={value.url && value.url.type !== 'const'}
         />
         <BindingEditor
+          label="url"
           server
           value={value.url}
           onChange={(url) => onChange({ ...value, url: url || appDom.createConst('') })}

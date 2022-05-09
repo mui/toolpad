@@ -79,12 +79,12 @@ const OverlayRoot = styled('div')({
     display: 'none',
     position: 'absolute',
     alignItems: 'center',
-    right: 0,
+    right: -1,
     background: 'red',
     color: 'white',
     fontSize: 11,
-    padding: `2px 0 2px 8px`,
-    // TODO: figure out positioning of this selectionhint, it should
+    padding: `0 0 0 8px`,
+    // TODO: figure out positioning of this selectionhint, perhaps it should
     //   - prefer top right, above the component
     //   - if that appears out of bound of the editor, show it bottom or left
     zIndex: 1,

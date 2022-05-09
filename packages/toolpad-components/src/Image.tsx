@@ -1,4 +1,4 @@
-import { Box, CircularProgress, SxProps } from '@mui/material';
+import { Box, Skeleton, SxProps } from '@mui/material';
 import * as React from 'react';
 import { createComponent } from '@mui/toolpad-core';
 
@@ -9,9 +9,10 @@ export interface ImageProps {
   width: number;
   height: number;
   loading?: boolean;
+  fit: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
 }
 
-function Image({ sx: sxProp, src, width, height, alt, loading }: ImageProps) {
+function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit }: ImageProps) {
   const sx: SxProps = React.useMemo(
     () => ({
       ...sxProp,
@@ -24,18 +25,28 @@ function Image({ sx: sxProp, src, width, height, alt, loading }: ImageProps) {
     }),
     [sxProp, width, height],
   );
+
+  const [imgLoading, setImgLoading] = React.useState(true);
+  const handleLoad = React.useCallback(() => setImgLoading(false), []);
+
+  const loading = loadingProp || imgLoading;
+
   return (
     <Box sx={sx}>
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        <Box
-          component="img"
-          src={src}
-          alt={alt}
-          sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
-        />
-      )}
+      {loading ? <Skeleton variant="rectangular" width={width} height={height} /> : null}
+      <Box
+        component="img"
+        src={src}
+        alt={alt}
+        sx={{
+          width: '100%',
+          height: '100%',
+          objectFit: fit,
+          position: 'absolute',
+          visibility: loading ? 'hidden' : 'visible',
+        }}
+        onLoad={handleLoad}
+      />
     </Box>
   );
 }
@@ -46,9 +57,11 @@ Image.defaultProps = {
   width: 400,
   height: 300,
   loading: false,
-};
+  fit: 'contain',
+} as ImageProps;
 
 export default createComponent(Image, {
+  loadingPropSource: ['src'],
   loadingProp: 'loading',
   argTypes: {
     src: {
@@ -56,6 +69,9 @@ export default createComponent(Image, {
     },
     alt: {
       typeDef: { type: 'string' },
+    },
+    fit: {
+      typeDef: { type: 'string', enum: ['contain', 'cover', 'fill', 'none', 'scale-down'] },
     },
     width: {
       typeDef: { type: 'number' },

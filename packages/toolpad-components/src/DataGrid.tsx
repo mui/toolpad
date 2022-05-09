@@ -194,6 +194,7 @@ DataGridComponent.defaultProps = {
 
 export default createComponent(DataGridComponent, {
   errorProp: 'error',
+  loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',
   argTypes: {
     rows: {

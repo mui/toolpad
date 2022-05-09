@@ -177,6 +177,7 @@ export function BindingEditor<V>({
       size="small"
       aria-label="Bind property"
       checked={hasBinding}
+      disabled={disabled}
       icon={<AddLinkIcon />}
       checkedIcon={<LinkIcon />}
       onClick={handleOpen}

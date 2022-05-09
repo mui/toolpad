@@ -118,13 +118,18 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
   React.useEffect(() => handleColumnOrderChange.clear(), [handleColumnOrderChange]);
 
-  const rows: GridRowsProp = React.useMemo(() => {
-    const parsedRows = rowsProp || EMPTY_ROWS;
-    if (parsedRows.length === 0 || rowIdFieldProp || parsedRows[0].id) {
-      return parsedRows;
-    }
-    return parsedRows.map((row, id) => ({ ...row, id }));
-  }, [rowsProp, rowIdFieldProp]);
+  const rowsInput = rowsProp || EMPTY_ROWS;
+
+  const hasExplicitRowId: boolean = React.useMemo(() => {
+    const hasRowIdField: boolean = !!(rowIdFieldProp && rowIdFieldProp !== 'id');
+    const parsedRows = rowsInput;
+    return parsedRows.length === 0 || hasRowIdField || !!parsedRows[0].id;
+  }, [rowIdFieldProp, rowsInput]);
+
+  const rows: GridRowsProp = React.useMemo(
+    () => (hasExplicitRowId ? rowsInput : rowsInput.map((row, id) => ({ ...row, id }))),
+    [hasExplicitRowId, rowsInput],
+  );
 
   const columnsInitRef = React.useRef(false);
   const hasColumnsDefined = columnsProp && columnsProp.length > 0;
@@ -134,12 +139,16 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
       return;
     }
 
-    const inferredColumns = inferColumns(rows);
+    let inferredColumns = inferColumns(rows);
+
+    if (!hasExplicitRowId) {
+      inferredColumns = inferredColumns.filter((column) => column.field !== 'id');
+    }
 
     nodeRuntime.updateAppDomConstProp('columns', inferredColumns);
 
     columnsInitRef.current = true;
-  }, [hasColumnsDefined, rows, nodeRuntime]);
+  }, [hasColumnsDefined, rows, nodeRuntime, hasExplicitRowId]);
 
   const getRowId = React.useCallback(
     (row: any) => {
@@ -209,6 +218,7 @@ export default createComponent(DataGridComponent, {
     },
     rowIdField: {
       typeDef: { type: 'string' },
+      control: { type: 'RowIdFieldSelect' },
       label: 'Id field',
     },
   },

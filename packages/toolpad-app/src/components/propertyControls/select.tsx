@@ -13,7 +13,7 @@ function SelectPropEditor({
   const items = argType.typeDef.type === 'string' ? argType.typeDef.enum ?? [] : [];
   const handleChange = React.useCallback(
     (event: SelectChangeEvent<string>) => {
-      onChange(event.target.value as string);
+      onChange(event.target.value);
     },
     [onChange],
   );
@@ -28,6 +28,7 @@ function SelectPropEditor({
         disabled={disabled}
         onChange={handleChange}
       >
+        <MenuItem value="">-</MenuItem>
         {items.map((item) => (
           <MenuItem key={item} value={item}>
             {item}

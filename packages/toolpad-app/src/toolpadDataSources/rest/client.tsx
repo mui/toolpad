@@ -35,7 +35,7 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
 
   return (
     <div>
-      <Stack direction="row" gap={1}>
+      <Stack direction="row">
         <TextField
           label="url"
           size="small"

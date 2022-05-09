@@ -78,7 +78,7 @@ export default function BindableEditor<V>({
   const label = argType.label || propName;
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+    <Stack direction="row" alignItems="center" justifyContent="space-between">
       {control ? (
         <React.Fragment>
           <control.Editor

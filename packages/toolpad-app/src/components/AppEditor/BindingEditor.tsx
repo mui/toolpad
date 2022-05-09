@@ -1,11 +1,11 @@
 import {
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
   Stack,
   Toolbar,
   Tooltip,
@@ -154,7 +154,7 @@ export function BindingEditor<V>({
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 
-  const hasBinding = value && value.type !== 'const';
+  const hasBinding: boolean = !!value && value.type !== 'const';
 
   const committedInput = React.useRef<BindableAttrValue<V> | null>(null);
   const handleCommit = React.useCallback(() => {
@@ -173,15 +173,14 @@ export function BindingEditor<V>({
   }, [onChange, input, handleClose]);
 
   const bindingButton = (
-    <IconButton
-      aria-label="Bind property"
-      disabled={disabled}
+    <Checkbox
       size="small"
+      aria-label="Bind property"
+      checked={hasBinding}
+      icon={<AddLinkIcon />}
+      checkedIcon={<LinkIcon />}
       onClick={handleOpen}
-      color={hasBinding ? 'primary' : 'inherit'}
-    >
-      {hasBinding ? <LinkIcon fontSize="inherit" /> : <AddLinkIcon fontSize="inherit" />}
-    </IconButton>
+    />
   );
 
   const bindingButtonWithTooltip = disabled ? (

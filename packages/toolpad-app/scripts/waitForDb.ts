@@ -12,11 +12,13 @@ const prisma = new PrismaClient();
 async function main() {
   for (let i = 1; i <= MAX_RETRIES; i += 1) {
     try {
+      // eslint-disable-next-line no-console
       console.log(
         `(${i}/${MAX_RETRIES}) trying to connect db "${process.env.TOOLPAD_DATABASE_URL}"...`,
       );
       // eslint-disable-next-line no-await-in-loop
       await prisma.$connect();
+      // eslint-disable-next-line no-console
       console.log(`connected!`);
       return;
     } catch (err) {

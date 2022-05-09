@@ -11,13 +11,18 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
   const [input, setInput] = React.useState(valueAsString);
   React.useEffect(() => setInput(valueAsString), [valueAsString]);
 
-  const handleSave = React.useCallback(() => {
+  const isValid = React.useMemo(() => {
     try {
-      const newValue = JSON.parse(input);
-      onChange(newValue);
-    } catch (err: any) {
-      alert(err.message);
+      JSON.parse(input);
+      return true;
+    } catch {
+      return false;
     }
+  }, [input]);
+
+  const handleSave = React.useCallback(() => {
+    const newValue = JSON.parse(input);
+    onChange(newValue);
   }, [onChange, input]);
 
   const schemaUri =
@@ -88,7 +93,7 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
           <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
             Cancel
           </Button>
-          <Button disabled={valueAsString === input} onClick={handleSave}>
+          <Button disabled={valueAsString === input || !isValid} onClick={handleSave}>
             Save
           </Button>
         </DialogActions>

@@ -66,9 +66,11 @@ export function usePrompt(
       if (typeof message === 'function') {
         response = message(tx.location, tx.action);
         if (typeof response === 'string') {
+          // eslint-disable-next-line no-alert
           response = window.confirm(response);
         }
       } else {
+        // eslint-disable-next-line no-alert
         response = window.confirm(message);
       }
       if (response) {

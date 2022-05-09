@@ -5,6 +5,7 @@ import { MoviesConnectionParams, MoviesQuery, Movie } from './types';
 async function test(
   connection: LegacyConnection<MoviesConnectionParams>,
 ): Promise<ConnectionStatus> {
+  // eslint-disable-next-line no-console
   console.log(`Testing connection ${JSON.stringify(connection)}`);
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return { timestamp: Date.now(), error: 'Failed to connect. (ERR-123)' };

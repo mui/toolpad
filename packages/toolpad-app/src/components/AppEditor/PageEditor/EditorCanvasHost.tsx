@@ -34,7 +34,6 @@ export default function EditorCanvasHost({
   dom,
 }: EditorCanvasHostProps) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
-  const [showLoading, setShowLoading] = React.useState(true);
 
   React.useEffect(() => {
     const frameWindow = frameRef.current?.contentWindow;

@@ -15,7 +15,6 @@ import {
   ToolpadComponent,
   createComponent,
   TOOLPAD_COMPONENT,
-  UseDataQuery,
   Slots,
   Placeholder,
 } from '@mui/toolpad-core';
@@ -267,35 +266,33 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
       )
     : {};
 
-  const onResult = React.useCallback(
-    ({ isLoading, error, data, rows, ...result }: UseDataQuery) => {
-      setControlledBindings((oldBindings) => {
-        const newBindings = { ...oldBindings };
-
-        for (const [key, value] of Object.entries(result)) {
-          const bindingId = `${node.id}.${key}`;
-          newBindings[bindingId] = { value };
-        }
-
-        // Here we propagate the error and loading state to the data and rows prop prop
-        // TODO: is there a straightforward way fro us to generalize this behavior?
-        newBindings[`${node.id}.isLoading`] = { value: isLoading };
-        const deferredStatus = { loading: isLoading, error };
-        newBindings[`${node.id}.error`] = { ...deferredStatus, value: error };
-        newBindings[`${node.id}.data`] = { ...deferredStatus, value: data };
-        newBindings[`${node.id}.rows`] = { ...deferredStatus, value: rows };
-
-        return newBindings;
-      });
-    },
-    [node.id, setControlledBindings],
-  );
-
-  useDataQuery(onResult, dataUrl, queryId, params, {
+  const queryResult = useDataQuery(dataUrl, queryId, params, {
     refetchOnWindowFocus: node.attributes.refetchOnWindowFocus?.value,
     refetchOnReconnect: node.attributes.refetchOnReconnect?.value,
     refetchInterval: node.attributes.refetchInterval?.value,
   });
+
+  React.useEffect(() => {
+    setControlledBindings((oldBindings) => {
+      const { isLoading, error, data, rows, ...result } = queryResult;
+      const newBindings = { ...oldBindings };
+
+      for (const [key, value] of Object.entries(result)) {
+        const bindingId = `${node.id}.${key}`;
+        newBindings[bindingId] = { value };
+      }
+
+      // Here we propagate the error and loading state to the data and rows prop prop
+      // TODO: is there a straightforward way fro us to generalize this behavior?
+      newBindings[`${node.id}.isLoading`] = { value: isLoading };
+      const deferredStatus = { loading: isLoading, error };
+      newBindings[`${node.id}.error`] = { ...deferredStatus, value: error };
+      newBindings[`${node.id}.data`] = { ...deferredStatus, value: data };
+      newBindings[`${node.id}.rows`] = { ...deferredStatus, value: rows };
+
+      return newBindings;
+    });
+  }, [node.id, queryResult, setControlledBindings]);
 
   return null;
 }

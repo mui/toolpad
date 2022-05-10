@@ -5,12 +5,12 @@ import {
   ArgTypeDefinition,
   ArgControlSpec,
   PropValueType,
+  LiveBinding,
 } from '@mui/toolpad-core';
 import propertyControls from '../../propertyControls';
 import { BindingEditor } from '../BindingEditor';
 import { NodeId } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
-import { usePageEditorState } from './PageEditorProvider';
 
 function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
   switch (typeDef.type) {
@@ -32,19 +32,21 @@ function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
 }
 
 export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
-  propNamespace: string | null;
-  propName: string;
+  label: string;
   nodeId: NodeId;
   argType: ArgTypeDefinition;
+  liveBinding?: LiveBinding;
+  globalScope?: Record<string, unknown>;
 }
 
 export default function BindableEditor<V>({
-  propNamespace,
-  propName,
+  label: labelProp,
   nodeId,
   argType,
   value,
   onChange,
+  liveBinding,
+  globalScope = {},
 }: BindableEditorProps<V>) {
   const handlePropConstChange = React.useCallback(
     (newValue: V) => onChange({ type: 'const', value: newValue }),
@@ -58,11 +60,6 @@ export default function BindableEditor<V>({
   const controlSpec = argType.control ?? getDefaultControl(argType.typeDef);
   const control = controlSpec ? propertyControls[controlSpec.type] : null;
 
-  const bindingId = `${nodeId}${propNamespace ? `.${propNamespace}` : ''}.${propName}`;
-  const { bindings, pageState } = usePageEditorState();
-  const liveBinding = bindings[bindingId];
-  const globalScope = pageState;
-
   const initConstValue = React.useCallback(() => {
     if (value?.type === 'const') {
       return value.value;
@@ -75,7 +72,7 @@ export default function BindableEditor<V>({
 
   const hasBinding = value && value.type !== 'const';
 
-  const label = argType.label || propName;
+  const label = argType.label || labelProp || '';
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -83,7 +80,6 @@ export default function BindableEditor<V>({
         <React.Fragment>
           <control.Editor
             nodeId={nodeId}
-            propName={propName}
             label={label}
             argType={argType}
             disabled={!!hasBinding}
@@ -102,7 +98,7 @@ export default function BindableEditor<V>({
         </React.Fragment>
       ) : (
         <Alert severity="warning">
-          {`No control for property '${propName}' (type '${argType.typeDef.type}' ${
+          {`No control for '${label}' (type '${argType.typeDef.type}' ${
             argType.control ? `, control: '${argType.control.type}'` : ''
           })`}
         </Alert>

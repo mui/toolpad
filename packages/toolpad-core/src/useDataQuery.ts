@@ -34,7 +34,6 @@ const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
 
 export function useDataQuery(
-  setResult: (newResult: UseDataQuery) => void,
   dataUrl: string,
   queryId: string | null,
   params: any,
@@ -42,7 +41,7 @@ export function useDataQuery(
     UseQueryOptions<any, unknown, unknown, any[]>,
     'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
   >,
-): void {
+): UseDataQuery {
   const {
     isLoading,
     isFetching,
@@ -70,7 +69,5 @@ export function useDataQuery(
     [isLoading, isFetching, error, data, rows, refetch],
   );
 
-  React.useEffect(() => {
-    setResult(result);
-  }, [setResult, result]);
+  return result;
 }

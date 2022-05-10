@@ -3,6 +3,7 @@ import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';
+import { usePageEditorState } from './PageEditorProvider';
 
 export interface NodeAttributeEditorProps {
   node: appDom.AppDomNode;
@@ -28,10 +29,16 @@ export default function NodeAttributeEditor({
 
   const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
+  const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
+  const { bindings, pageState } = usePageEditorState();
+  const liveBinding = bindings[bindingId];
+  const globalScope = pageState;
+
   return (
     <BindableEditor
-      propNamespace={namespace}
-      propName={name}
+      liveBinding={liveBinding}
+      globalScope={globalScope}
+      label={name}
       argType={argType}
       nodeId={node.id}
       value={propValue}

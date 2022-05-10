@@ -141,7 +141,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
    */
   server?: boolean;
   disabled?: boolean;
-  propType: PropValueType;
+  propType?: PropValueType;
   liveBinding?: LiveBinding;
 }
 
@@ -230,7 +230,7 @@ export function BindingEditor<V>({
             <Box sx={{ height: '100%', display: 'flex', flex: 1, flexDirection: 'column' }}>
               <Typography sx={{ mb: 2 }}>
                 Make the &quot;{label}&quot; property dynamic with a JavaScript expression. This
-                property expects a type: <code>{propType.type}</code>.
+                property expects a type: <code>{propType?.type || 'any'}</code>.
               </Typography>
 
               <JsExpressionBindingEditor<V>

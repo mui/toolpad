@@ -17,6 +17,7 @@ import {
   TOOLPAD_COMPONENT,
   Slots,
   Placeholder,
+  BindableAttrValues,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import {
@@ -247,7 +248,7 @@ const PageRootComponent = createComponent(PageRoot, {
 });
 
 function resolveBindables(
-  bindings: Partial<Record<string, LiveBinding>>,
+  bindings: Partial<Record<string, BindingEvaluationResult>>,
   bindingId: string,
   params?: BindableAttrValues<any>,
 ) {

@@ -8,28 +8,88 @@ import {
   GridRowsProp,
   GridColumnOrderChangeParams,
   useGridApiContext,
+  gridColumnsTotalWidthSelector,
+  gridColumnPositionsSelector,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
 import { debounce, Skeleton } from '@mui/material';
 
+// Pseudo random number. See https://stackoverflow.com/a/47593316
+function mulberry32(a: number): () => number {
+  return () => {
+    /* eslint-disable */
+    let t = (a += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    /* eslint-enable */
+  };
+}
+
+function randomBetween(seed: number, min: number, max: number): () => number {
+  const random = mulberry32(seed);
+  return () => min + (max - min) * random();
+}
+
 function SkeletonLoadingOverlay() {
   const apiRef = useGridApiContext();
 
-  const viewportHeight = apiRef.current?.getRootDimensions()?.viewportInnerSize.height ?? 0;
+  const dimensions = apiRef.current?.getRootDimensions();
+  const viewportHeight = dimensions?.viewportInnerSize.height ?? 0;
+
   // @ts-expect-error Function signature expects to be called with parameters, but the implementation suggests otherwise
   const rowHeight = apiRef.current.unstable_getRowHeight();
   const skeletonRowsCount = Math.ceil(viewportHeight / rowHeight);
 
+  const totalWidth = gridColumnsTotalWidthSelector(apiRef);
+  const positions = gridColumnPositionsSelector(apiRef);
+  const inViewportCount = React.useMemo(
+    () => positions.filter((value) => value <= totalWidth).length,
+    [totalWidth, positions],
+  );
+  const columns = apiRef.current.getVisibleColumns().slice(0, inViewportCount);
+
   const children = React.useMemo(() => {
-    const array = [];
+    // reseed random number generator to create stable lines betwen renders
+    const random = randomBetween(12345, 25, 75);
+    const array: React.ReactNode[] = [];
+
     for (let i = 0; i < skeletonRowsCount; i += 1) {
-      array.push(<Skeleton key={i} height={rowHeight} />);
+      for (const column of columns) {
+        const width = Math.round(random());
+        array.push(
+          <div
+            key={`${i}-${column.field}`}
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: column.align,
+              height: rowHeight,
+              alignItems: 'center',
+            }}
+          >
+            <Skeleton sx={{ mx: 1 }} width={`${width}%`} />
+          </div>,
+        );
+      }
     }
     return array;
-  }, [skeletonRowsCount, rowHeight]);
+  }, [skeletonRowsCount, columns, rowHeight]);
 
-  return <div style={{ marginLeft: 8, marginRight: 8 }}>{children}</div>;
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `${columns
+          .map(({ computedWidth }) => `${computedWidth}px`)
+          .join(' ')}`,
+        gridTemplateRows: `repeat(auto-fill, ${rowHeight}px)`,
+      }}
+    >
+      {children}
+    </div>
+  );
 }
 
 function inferColumnType(value: unknown): string | undefined {

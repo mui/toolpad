@@ -37,7 +37,6 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
   const dom = useDom();
 
   const [apiQuery, setApiQuery] = React.useState<Q>(apiNode.attributes.query.value);
-  const [transformFnString, setTransformFnString] = React.useState('(data) => { data }');
   const savedQuery = React.useRef(apiNode.attributes.query.value);
 
   const [transformEnabled, setTransformEnabled] = React.useState<boolean>(
@@ -72,14 +71,6 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
   const previewQuery = useQuery(['api', debouncedPreviewApi], async () =>
     client.query.execApi(appId, debouncedPreviewApi, {}),
   );
-
-  const transformFn = React.useMemo(() => {
-    return new Function(transformFnString);
-  }, [transformFnString]);
-
-  const transformedQuery = React.useMemo(() => {
-    return transformFn(previewQuery.data);
-  }, [previewQuery, transformFn]);
 
   const queryEditorApi = React.useMemo(() => {
     return {

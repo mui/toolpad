@@ -20,6 +20,7 @@ import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
+import evalExpression from './evalExpression';
 
 // See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
 function excludeFields<T, K extends (keyof T)[]>(
@@ -367,7 +368,14 @@ export async function execApi<Q>(
       `Unknown connection "${api.attributes.connectionId.value}" for api "${api.id}"`,
     );
   }
-
+  if (api.attributes.transform.value.flag) {
+    const apiResult = await dataSource.exec(connection, api.attributes.query.value, params);
+    return {
+      data: await evalExpression(
+        `${api.attributes.transform.value.fn}(${JSON.stringify(apiResult.data)})`,
+      ),
+    };
+  }
   return dataSource.exec(connection, api.attributes.query.value, params);
 }
 

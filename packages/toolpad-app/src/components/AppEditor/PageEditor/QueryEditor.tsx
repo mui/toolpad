@@ -324,7 +324,7 @@ type DialogState = {
   node?: appDom.QueryNode;
 };
 
-export default function QueryStateEditor() {
+export default function QueryEditor() {
   const dom = useDom();
   const state = usePageEditorState();
   const domApi = useDomApi();

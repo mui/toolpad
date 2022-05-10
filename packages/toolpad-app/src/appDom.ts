@@ -365,6 +365,14 @@ export function assertIsQueryState<P>(node: AppDomNode): asserts node is QuerySt
   assertIsType<QueryStateNode>(node, 'queryState');
 }
 
+export function isQuery<P>(node: AppDomNode): node is QueryNode<P> {
+  return isType<QueryNode>(node, 'query');
+}
+
+export function assertIsQuery<P>(node: AppDomNode): asserts node is QueryNode<P> {
+  assertIsType<QueryNode>(node, 'query');
+}
+
 export function getApp(dom: AppDom): AppNode {
   const rootNode = getNode(dom, dom.root);
   assertIsApp(rootNode);
@@ -772,7 +780,15 @@ export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
  * TODO: Would it make sense to create a separate datastructure that represents the render tree?
  */
 export function createRenderTree(dom: AppDom): AppDom {
-  const frontendNodes = new Set(['app', 'page', 'element', 'queryState', 'derivedState', 'theme']);
+  const frontendNodes = new Set([
+    'app',
+    'page',
+    'element',
+    'queryState',
+    'query',
+    'derivedState',
+    'theme',
+  ]);
   return {
     ...dom,
     nodes: Object.fromEntries(

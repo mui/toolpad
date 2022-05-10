@@ -45,6 +45,7 @@ type AppDomNodeType =
   | 'element'
   | 'codeComponent'
   | 'derivedState'
+  | 'query'
   | 'queryState';
 
 interface AppDomNodeBase {
@@ -129,6 +130,20 @@ export interface QueryStateNode<P = any> extends AppDomNodeBase {
   readonly params?: BindableAttrValues<P>;
 }
 
+export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
+  readonly type: 'query';
+  readonly params?: BindableAttrValues<P>;
+  readonly attributes: {
+    readonly dataSource?: ConstantAttrValue<string>;
+    readonly connectionId: ConstantAttrValue<NodeId>;
+    readonly query: ConstantAttrValue<Q>;
+
+    readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
+    readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
+    readonly refetchInterval?: ConstantAttrValue<number>;
+  };
+}
+
 type AppDomNodeOfType<K extends AppDomNodeType> = {
   app: AppNode;
   connection: ConnectionNode;
@@ -139,6 +154,7 @@ type AppDomNodeOfType<K extends AppDomNodeType> = {
   codeComponent: CodeComponentNode;
   derivedState: DerivedStateNode;
   queryState: QueryStateNode;
+  query: QueryNode;
 }[K];
 
 type AllowedChildren = {
@@ -156,6 +172,7 @@ type AllowedChildren = {
     children: 'element';
     derivedStates: 'derivedState';
     queryStates: 'queryState';
+    queries: 'query';
   };
   element: {
     [prop: string]: 'element';
@@ -163,6 +180,7 @@ type AllowedChildren = {
   codeComponent: {};
   derivedState: {};
   queryState: {};
+  query: {};
 };
 
 export type AppDomNode = AppDomNodeOfType<AppDomNodeType>;
@@ -671,6 +689,14 @@ export function moveNode(
 ) {
   const node = getNode(dom, nodeId);
   return setNodeParent(dom, node, parentId, parentProp, parentIndex);
+}
+
+export function saveNode(dom: AppDom, node: AppDomNode) {
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: node,
+    }),
+  });
 }
 
 export function removeNode(dom: AppDom, nodeId: NodeId) {

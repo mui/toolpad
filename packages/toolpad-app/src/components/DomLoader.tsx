@@ -61,6 +61,10 @@ export type DomAction =
   | {
       type: 'DOM_REMOVE_NODE';
       nodeId: NodeId;
+    }
+  | {
+      type: 'DOM_SAVE_NODE';
+      node: appDom.AppDomNode;
     };
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
@@ -99,6 +103,9 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
         action.parentProp,
         action.parentIndex,
       );
+    }
+    case 'DOM_SAVE_NODE': {
+      return appDom.saveNode(dom, action.node);
     }
     case 'DOM_REMOVE_NODE': {
       return appDom.removeNode(dom, action.nodeId);
@@ -191,6 +198,12 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
       dispatch({
         type: 'DOM_REMOVE_NODE',
         nodeId,
+      });
+    },
+    saveNode(node: appDom.AppDomNode) {
+      dispatch({
+        type: 'DOM_SAVE_NODE',
+        node,
       });
     },
     setNodeNamespacedProp<

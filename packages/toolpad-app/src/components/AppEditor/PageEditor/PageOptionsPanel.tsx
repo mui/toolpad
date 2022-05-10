@@ -5,6 +5,7 @@ import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import DerivedStateEditor from './DerivedStateEditor';
 import QueryStateEditor from './QueryStateEditor';
+import QueryEditor from './QueryEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
@@ -37,6 +38,7 @@ export default function PageOptionsPanel() {
         <UrlQueryEditor pageNodeId={pageNodeId} />
         {DEPRECATED && <DerivedStateEditor />}
         <QueryStateEditor />
+        <QueryEditor />
       </Stack>
     </div>
   );

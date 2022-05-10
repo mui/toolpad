@@ -6,6 +6,7 @@ import {
   createApp,
   testConnection,
   execApi,
+  execQuery,
   dataSourceFetchPrivate,
   loadDom,
   saveDom,
@@ -116,6 +117,9 @@ const rpcServer = {
     }),
     execApi: createMethod<typeof execApi>((args) => {
       return execApi(...args);
+    }),
+    execQuery: createMethod<typeof execQuery>((args) => {
+      return execQuery(...args);
     }),
     getReleases: createMethod<typeof getReleases>((params) => {
       return getReleases(...params);

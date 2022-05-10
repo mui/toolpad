@@ -104,6 +104,7 @@ export default function CreateApiNodeDialog({
               query: appDom.createConst(dataSource.getInitialQueryValue()),
               connectionId: appDom.createConst(connectionId),
               dataSource: connection.attributes.dataSource,
+              transform: appDom.createConst({ flag: false, fn: '(data) => { return data }' }),
             },
           });
           const appNode = appDom.getApp(dom);

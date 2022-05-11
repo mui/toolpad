@@ -42,7 +42,7 @@ function QueryEditor({ globalScope, value, onChange }: QueryEditorProps<FetchQue
 
   return (
     <div>
-      <BindableEditor
+      {/* <BindableEditor
         liveBinding={liveBinding}
         globalScope={globalScope}
         server
@@ -50,7 +50,7 @@ function QueryEditor({ globalScope, value, onChange }: QueryEditorProps<FetchQue
         argType={{ typeDef: { type: 'string' } }}
         value={value.url}
         onChange={handleUrlChange2}
-      />
+      /> */}
       <Stack direction="row">
         <TextField
           label="url"

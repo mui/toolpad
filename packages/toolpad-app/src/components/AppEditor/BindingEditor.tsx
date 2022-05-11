@@ -18,7 +18,7 @@ import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import AddLinkIcon from '@mui/icons-material/AddLink';
 import { LiveBinding, PropValueType, BindableAttrValue } from '@mui/toolpad-core';
-import { evaluateBindable, JsRuntimeProvider, useJsRuntime } from '@mui/toolpad-core/runtime';
+import { evaluateBindable, useJsRuntime } from '@mui/toolpad-core/runtime';
 import evaluateBindableServer from '../../server/evaluateBindable';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
@@ -65,11 +65,11 @@ function JsExpressionBindingEditor<V>({
 
 interface UseBindingPreviewProps {
   server?: boolean;
-  input: BindableAttrValue<any>;
+  input: BindableAttrValue<any> | null;
   globalScope: Record<string, unknown>;
 }
 
-function useBindingPreview<V>({ server, input, globalScope }: UseBindingPreviewProps) {
+function useBindingPreview({ server, input, globalScope }: UseBindingPreviewProps) {
   const jsRuntime = useJsRuntime();
 
   const previewValue: LiveBinding = React.useMemo(() => {
@@ -94,7 +94,7 @@ interface JsExpressionPreviewProps {
   globalScope: Record<string, unknown>;
 }
 
-function JsExpressionPreviewContent({ server, input, globalScope }: JsExpressionPreviewProps) {
+function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreviewProps) {
   const previewValue: LiveBinding = useBindingPreview({ server, input, globalScope });
 
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
@@ -110,16 +110,6 @@ function JsExpressionPreviewContent({ server, input, globalScope }: JsExpression
         <JsonView src={lastGoodPreview?.value} />
       </Box>
     </React.Fragment>
-  );
-}
-
-function JsExpressionPreview(props: JsExpressionPreviewProps) {
-  return (
-    <React.Suspense fallback="loading...">
-      <JsRuntimeProvider>
-        <JsExpressionPreviewContent {...props} />
-      </JsRuntimeProvider>
-    </React.Suspense>
   );
 }
 

@@ -7,7 +7,7 @@ import select from './select';
 
 function ColumnSelect({ nodeId, argType, ...props }: EditorProps<string>) {
   const { bindings } = usePageEditorState();
-  const columnsValue = bindings[`${nodeId}.props.columns`];
+  const columnsValue = nodeId && bindings[`${nodeId}.props.columns`];
   const definedColumns: GridColDef[] = columnsValue?.value;
 
   const newArgType: ArgTypeDefinition = React.useMemo(() => {

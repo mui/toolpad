@@ -13,7 +13,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
-import { debounce, Skeleton } from '@mui/material';
+import { debounce, LinearProgress, Skeleton } from '@mui/material';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -77,7 +77,11 @@ function SkeletonLoadingOverlay() {
     return array;
   }, [skeletonRowsCount, columns, rowHeight]);
 
-  return (
+  const rowsCount = apiRef.current.getRowsCount();
+
+  return rowsCount > 0 ? (
+    <LinearProgress />
+  ) : (
     <div
       style={{
         display: 'grid',

@@ -33,7 +33,8 @@ function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
 
 export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   label: string;
-  nodeId: NodeId;
+  nodeId?: NodeId;
+  server?: boolean;
   argType: ArgTypeDefinition;
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
@@ -44,6 +45,7 @@ export default function BindableEditor<V>({
   nodeId,
   argType,
   value,
+  server,
   onChange,
   liveBinding,
   globalScope = {},
@@ -89,6 +91,7 @@ export default function BindableEditor<V>({
           <BindingEditor<V>
             globalScope={globalScope}
             label={label}
+            server={server}
             propType={argType.typeDef}
             value={value}
             onChange={onChange}

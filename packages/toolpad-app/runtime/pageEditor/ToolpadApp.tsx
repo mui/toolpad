@@ -61,10 +61,10 @@ const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('A
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useBindingsContext, BindingsContextProvider] =
   createProvidedContext<Record<string, BindingEvaluationResult>>('LiveBindings');
-const [useSetControlledBindingsContext, SetControlledBindingsContextProvider] =
-  createProvidedContext<
-    React.Dispatch<React.SetStateAction<Record<string, BindingEvaluationResult>>>
-  >('SetControlledBindings');
+const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
+  createProvidedContext<(id: string, result: BindingEvaluationResult) => void>(
+    'SetControlledBinding',
+  );
 
 function getElmComponent(
   components: InstantiatedComponents,
@@ -107,7 +107,7 @@ interface RenderedNodeContentProps {
 }
 
 function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeContentProps) {
-  const setControlledBindings = useSetControlledBindingsContext();
+  const setControlledBinding = useSetControlledBindingContext();
 
   const { argTypes, errorProp, loadingProp, loadingPropSource } = Component[TOOLPAD_COMPONENT];
 
@@ -166,15 +166,13 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
 
           const handler = (param: any) => {
             const value = valueGetter(param);
-            setControlledBindings((oldState) => {
-              const bindingId = `${nodeId}.props.${key}`;
-              return { ...oldState, [bindingId]: { value } };
-            });
+            const bindingId = `${nodeId}.props.${key}`;
+            setControlledBinding(bindingId, { value });
           };
           return [[argType.onChangeProp, handler]];
         }),
       ),
-    [argTypes, nodeId, setControlledBindings],
+    [argTypes, nodeId, setControlledBinding],
   );
 
   const reactChildren =
@@ -249,7 +247,7 @@ interface QueryStateNodeProps {
 function QueryStateNode({ node }: QueryStateNodeProps) {
   const { appId, version } = useAppContext();
   const bindings = useBindingsContext();
-  const setControlledBindings = useSetControlledBindingsContext();
+  const setControlledBinding = useSetControlledBindingContext();
 
   const dataUrl = `/api/data/${appId}/${version}/`;
   const queryId = node.attributes.api.value;
@@ -269,26 +267,21 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
   });
 
   React.useEffect(() => {
-    setControlledBindings((oldBindings) => {
-      const { isLoading, error, data, rows, ...result } = queryResult;
-      const newBindings = { ...oldBindings };
+    const { isLoading, error, data, rows, ...result } = queryResult;
 
-      for (const [key, value] of Object.entries(result)) {
-        const bindingId = `${node.id}.${key}`;
-        newBindings[bindingId] = { value };
-      }
+    for (const [key, value] of Object.entries(result)) {
+      const bindingId = `${node.id}.${key}`;
+      setControlledBinding(bindingId, { value });
+    }
 
-      // Here we propagate the error and loading state to the data and rows prop prop
-      // TODO: is there a straightforward way fro us to generalize this behavior?
-      newBindings[`${node.id}.isLoading`] = { value: isLoading };
-      const deferredStatus = { loading: isLoading, error };
-      newBindings[`${node.id}.error`] = { ...deferredStatus, value: error };
-      newBindings[`${node.id}.data`] = { ...deferredStatus, value: data };
-      newBindings[`${node.id}.rows`] = { ...deferredStatus, value: rows };
-
-      return newBindings;
-    });
-  }, [node.id, queryResult, setControlledBindings]);
+    // Here we propagate the error and loading state to the data and rows prop prop
+    // TODO: is there a straightforward way for us to generalize this behavior?
+    setControlledBinding(`${node.id}.isLoading`, { value: isLoading });
+    const deferredStatus = { loading: isLoading, error };
+    setControlledBinding(`${node.id}.error`, { ...deferredStatus, value: error });
+    setControlledBinding(`${node.id}.data`, { ...deferredStatus, value: data });
+    setControlledBinding(`${node.id}.rows`, { ...deferredStatus, value: rows });
+  }, [node.id, queryResult, setControlledBinding]);
 
   return null;
 }
@@ -467,6 +460,10 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     });
   }, [initialControlledValues]);
 
+  const setControlledBinding = React.useCallback((id: string, result: BindingEvaluationResult) => {
+    setControlledBindings((existing) => ({ ...existing, [id]: result }));
+  }, []);
+
   const inputBindings = React.useMemo(
     () => ({ ...constValues, ...controlledBindings }),
     [constValues, controlledBindings],
@@ -496,7 +493,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   return (
     <BindingsContextProvider value={liveBindings}>
-      <SetControlledBindingsContextProvider value={setControlledBindings}>
+      <SetControlledBindingContextProvider value={setControlledBinding}>
         <NodeRuntimeWrapper nodeId={page.id} componentConfig={PageRootComponent[TOOLPAD_COMPONENT]}>
           <RenderedNodeContent
             nodeId={page.id}
@@ -508,7 +505,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
         {queryStates.map((node) => (
           <QueryStateNode key={node.id} node={node} />
         ))}
-      </SetControlledBindingsContextProvider>
+      </SetControlledBindingContextProvider>
     </BindingsContextProvider>
   );
 }

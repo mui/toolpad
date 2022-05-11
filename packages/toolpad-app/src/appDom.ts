@@ -702,7 +702,7 @@ export function moveNode(
 export function saveNode(dom: AppDom, node: AppDomNode) {
   return update(dom, {
     nodes: update(dom.nodes, {
-      [node.id]: node,
+      [node.id]: update(dom.nodes[node.id], omit(node, ...RESERVED_NODE_PROPERTIES)),
     }),
   });
 }

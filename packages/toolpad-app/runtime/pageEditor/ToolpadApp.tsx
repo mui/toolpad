@@ -160,16 +160,9 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
             return [];
           }
 
-          const valueGetter = argType.onChangeHandler
-            ? new Function(
-                ...argType.onChangeHandler.params,
-                `return ${argType.onChangeHandler.valueGetter}`,
-              )
-            : (value: any) => value;
-
           const handler = (param: any) => {
-            const value = valueGetter(param);
             const bindingId = `${nodeId}.props.${key}`;
+            const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
             setControlledBinding(bindingId, { value });
           };
           return [[argType.onChangeProp, handler]];

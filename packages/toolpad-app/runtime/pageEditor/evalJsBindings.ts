@@ -92,6 +92,9 @@ export function buildGlobalScope(bindings: Record<string, ParsedBinding>): Recor
   return globalScope;
 }
 
+/**
+ * Evaluates the expressions and replace with their result
+ */
 export default function evalJsBindings(
   bindings: Record<string, ParsedBinding>,
 ): Record<string, ParsedBinding> {

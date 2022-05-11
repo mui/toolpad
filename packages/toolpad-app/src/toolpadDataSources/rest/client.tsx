@@ -1,24 +1,31 @@
 import { Stack, TextField } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinitions } from '@mui/toolpad-core';
+import { ArgTypeDefinitions, BindableAttrValue } from '@mui/toolpad-core';
 import StringRecordEditor from '../../components/StringRecordEditor';
 import { BindingEditor } from '../../components/AppEditor/BindingEditor';
-import { ClientDataSource } from '../../types';
-import { WithControlledProp } from '../../utils/types';
+import { ClientDataSource, QueryEditorProps } from '../../types';
 import { FetchQuery } from './types';
 import * as appDom from '../../appDom';
+import BindableEditor from '../../components/AppEditor/PageEditor/BindableEditor';
 
 function ConnectionParamsInput() {
   return null;
 }
 
-function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
+function QueryEditor({ globalScope, value, onChange }: QueryEditorProps<FetchQuery>) {
   const handleUrlChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange({
         ...value,
         url: { type: 'const', value: event.target.value },
       });
+    },
+    [onChange, value],
+  );
+
+  const handleUrlChange2 = React.useCallback(
+    (newValue: BindableAttrValue<string> | null) => {
+      onChange({ ...value, url: newValue || { type: 'const', value: '' } });
     },
     [onChange, value],
   );
@@ -35,6 +42,15 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
 
   return (
     <div>
+      <BindableEditor
+        liveBinding={liveBinding}
+        globalScope={globalScope}
+        server
+        label="url"
+        argType={{ typeDef: { type: 'string' } }}
+        value={value.url}
+        onChange={handleUrlChange2}
+      />
       <Stack direction="row">
         <TextField
           label="url"
@@ -50,16 +66,19 @@ function QueryEditor({ value, onChange }: WithControlledProp<FetchQuery>) {
           value={value.url}
           onChange={(url) => onChange({ ...value, url: url || appDom.createConst('') })}
           propType={{ type: 'string' }}
-          globalScope={{ query: value.params }}
+          globalScope={globalScope.query ? globalScope : { query: value.params }}
         />
       </Stack>
-      <StringRecordEditor
-        label="api query"
-        fieldLabel="parameter"
-        valueLabel="default value"
-        value={value.params || {}}
-        onChange={handleApiQueryChange}
-      />
+      {/* TODO: remove this when QueryStateNode is removed */}
+      {globalScope.query ? null : (
+        <StringRecordEditor
+          label="api query"
+          fieldLabel="parameter"
+          valueLabel="default value"
+          value={value.params || {}}
+          onChange={handleApiQueryChange}
+        />
+      )}
     </div>
   );
 }

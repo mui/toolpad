@@ -59,7 +59,7 @@ function GridColumnsPropEditor({
     setMenuAnchorEl(null);
   };
 
-  const rowsValue = bindings[`${nodeId}.props.rows`];
+  const rowsValue = nodeId && bindings[`${nodeId}.props.rows`];
   const definedRows: unknown = rowsValue?.value;
 
   const columnSuggestions = React.useMemo(() => {

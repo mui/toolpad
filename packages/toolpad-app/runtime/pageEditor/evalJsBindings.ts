@@ -173,11 +173,4 @@ export default function evalJsBindings(
       ];
     }),
   );
-
-  return Object.fromEntries(
-    Object.entries(boundExpressions).map(([key, expression]) => [
-      key,
-      evaluateExpression(expression, proxiedScope),
-    ]),
-  );
 }

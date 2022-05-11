@@ -241,12 +241,14 @@ function QueryNodeEditor<Q, P, PQ>({
       <DialogTitle>Edit Query ({node.id})</DialogTitle>
       <DialogContent>
         <Stack spacing={1} py={1} gap={2}>
-          <NodeNameEditor node={node} />
-          <ConnectionSelect
-            dataSource={dataSourceId}
-            value={input.attributes.connectionId.value || null}
-            onChange={handleConnectionChange}
-          />
+          <Stack direction="row" gap={2}>
+            <NodeNameEditor node={node} />
+            <ConnectionSelect
+              dataSource={dataSourceId}
+              value={input.attributes.connectionId.value || null}
+              onChange={handleConnectionChange}
+            />
+          </Stack>
           <Divider />
           <Typography>Parameters</Typography>
           <ParametersEditor

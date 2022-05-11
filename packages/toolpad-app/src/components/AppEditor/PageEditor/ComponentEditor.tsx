@@ -7,7 +7,7 @@ import NodeAttributeEditor from './NodeAttributeEditor';
 import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
-import RuntimeErrorAlert from './RuntimeErrorAlert';
+import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
 
@@ -72,7 +72,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         ID: {node.id}
       </Typography>
       <NodeNameEditor node={node} />
-      {nodeError ? <RuntimeErrorAlert error={nodeError} /> : null}
+      {nodeError ? <ErrorAlert error={nodeError} /> : null}
       {node ? (
         <React.Fragment>
           <Typography variant="subtitle1" sx={{ mt: 2 }}>

@@ -13,6 +13,7 @@ import {
   InputAdornment,
   Divider,
   Typography,
+  Toolbar,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -31,6 +32,7 @@ import { ConnectionSelect } from '../HierarchyExplorer/CreateApiNodeDialog';
 import { omit, update } from '../../../utils/immutability';
 import client from '../../../api';
 import ParametersEditor from './ParametersEditor';
+import ErrorAlert from './ErrorAlert';
 
 function refetchIntervalInSeconds(maybeInterval?: number) {
   if (typeof maybeInterval !== 'number') {
@@ -299,14 +301,17 @@ function QueryNodeEditor<Q, P, PQ>({
             onChange={handleRefetchIntervalChange}
           />
           <Divider />
-          preview
-          <LoadingButton
-            disabled={previewParams === paramsObject && previewQuery === input}
-            loading={queryPreview.isLoading}
-            onClick={handleUpdatePreview}
-          >
-            Update
-          </LoadingButton>
+          <Toolbar disableGutters>
+            preview
+            <LoadingButton
+              disabled={previewParams === paramsObject && previewQuery === input}
+              loading={queryPreview.isLoading}
+              onClick={handleUpdatePreview}
+            >
+              Update
+            </LoadingButton>
+          </Toolbar>
+          {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
           <JsonView src={queryPreview.data} />
         </Stack>
       </DialogContent>

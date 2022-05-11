@@ -1,3 +1,5 @@
+import { set } from 'lodash-es';
+
 let iframe: HTMLIFrameElement;
 function evaluateCode(code: string, globalScope: Record<string, unknown>) {
   // TODO: investigate https://www.npmjs.com/package/ses
@@ -46,12 +48,55 @@ function unwrapEvaluationResult(result: BindingEvaluationResult) {
   }
 }
 
+export interface ParsedBinding {
+  controlled?: boolean;
+  /**
+   * How this binding presents itself to expressions in the global scope.
+   * Path in the form that is accepted by lodash.set
+   */
+  scopePath?: string;
+  /**
+   * javascript expression that evaluates to the value of this binding
+   */
+  expression?: string;
+  /**
+   * actual evaluated result of the binding
+   */
+  result?: BindingEvaluationResult;
+}
+
+export function buildGlobalScope(bindings: Record<string, ParsedBinding>): Record<string, unknown> {
+  const globalScope = {};
+  // eslint-disable-next-line no-restricted-syntax
+  for (const binding of Object.values(bindings)) {
+    if (binding.scopePath) {
+      const value = binding.result?.value;
+      set(globalScope, binding.scopePath, value);
+    }
+  }
+  return globalScope;
+}
+
 export default function evalJsBindings(
-  scope: Record<string, unknown>,
-  boundValues: Record<string, BindingEvaluationResult>,
-  boundExpressions: Record<string, string>,
-  scopePathToBindingId: Record<string, string>,
-) {
+  bindings: Record<string, ParsedBinding>,
+): Record<string, ParsedBinding> {
+  const boundValues: Record<string, BindingEvaluationResult> = {};
+  const boundExpressions: Record<string, string> = {};
+  const scopePathToBindingId: Record<string, string> = {};
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [key, binding] of Object.entries(bindings)) {
+    boundValues[key] = binding.result || { value: undefined };
+    if (binding.expression) {
+      boundExpressions[key] = binding.expression;
+    }
+    if (binding.scopePath) {
+      scopePathToBindingId[binding.scopePath] = key;
+    }
+  }
+
+  const scope = buildGlobalScope(bindings);
+
   const bindingIdMap = new Map(Object.entries(scopePathToBindingId));
   const bindingsMap = new Map(Object.entries(boundExpressions));
 
@@ -113,6 +158,21 @@ export default function evalJsBindings(
     });
 
   proxiedScope = proxify(scope);
+
+  return Object.fromEntries(
+    Object.entries(bindings).map(([bindingId, binding]) => {
+      const { expression, result, ...rest } = binding;
+      return [
+        bindingId,
+        {
+          ...rest,
+          result: expression
+            ? evaluateExpression(expression, proxiedScope)
+            : result || { value: undefined },
+        },
+      ];
+    }),
+  );
 
   return Object.fromEntries(
     Object.entries(boundExpressions).map(([key, expression]) => [

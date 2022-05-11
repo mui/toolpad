@@ -45,7 +45,11 @@ import {
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '../coreRuntime';
-import evalJsBindings, { BindingEvaluationResult } from './evalJsBindings';
+import evalJsBindings, {
+  BindingEvaluationResult,
+  buildGlobalScope,
+  ParsedBinding,
+} from './evalJsBindings';
 import instantiateComponents from './instantiateComponents';
 
 const PAGE_ROW_COMPONENT_ID = 'PageRow';
@@ -205,20 +209,6 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
   return <Component {...props} />;
 }
 
-function useGlobalScope(
-  scopePathToBindingId: Record<string, string>,
-  inputBindings: Record<string, BindingEvaluationResult>,
-): Record<string, unknown> {
-  return React.useMemo(() => {
-    const globalScope = {};
-    for (const [scopePath, bindingId] of Object.entries(scopePathToBindingId)) {
-      const value = inputBindings[bindingId]?.value;
-      set(globalScope, scopePath, value);
-    }
-    return globalScope;
-  }, [scopePathToBindingId, inputBindings]);
-}
-
 interface PageRootProps {
   children?: React.ReactNode;
 }
@@ -284,23 +274,6 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
   }, [node.id, queryResult, setControlledBinding]);
 
   return null;
-}
-
-interface ParsedBinding {
-  controlled?: boolean;
-  /**
-   * How this binding presents itself to expressions in the global scope.
-   * Path in the form that is accepted by lodash.set
-   */
-  scopePath?: string;
-  /**
-   * javascript expression that evaluates to the value of this binding
-   */
-  expression?: string;
-  /**
-   * actual evaluated result of the binding
-   */
-  result?: BindingEvaluationResult;
 }
 
 function parseBindings(
@@ -401,31 +374,7 @@ function parseBindings(
     });
   }
 
-  const constValues: Record<string, BindingEvaluationResult> = {};
-  const initialControlledValues: Record<string, BindingEvaluationResult> = {};
-  const jsExpressions: Record<string, string> = {};
-  const scopePathToBindingId: Record<string, string> = {};
-  for (const [key, binding] of parsedBindings.entries()) {
-    if (binding.controlled) {
-      initialControlledValues[key] = binding.result || { value: undefined };
-    } else {
-      constValues[key] = binding.result || { value: undefined };
-    }
-    if (binding.expression) {
-      jsExpressions[key] = binding.expression;
-    }
-    if (binding.scopePath) {
-      scopePathToBindingId[binding.scopePath] = key;
-    }
-  }
-
-  return {
-    constValues,
-    initialControlledValues,
-    jsExpressions,
-    scopePathToBindingId,
-    parsedBindings: Object.fromEntries(parsedBindings),
-  };
+  return Object.fromEntries(parsedBindings);
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
@@ -436,52 +385,40 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const location = useLocation();
   const components = useComponentsContext();
 
-  const { constValues, initialControlledValues, jsExpressions, scopePathToBindingId } =
-    React.useMemo(
-      () => parseBindings(dom, page, components, location),
-      [components, dom, location, page],
-    );
+  const parsedBindings = React.useMemo(
+    () => parseBindings(dom, page, components, location),
+    [components, dom, location, page],
+  );
 
-  const [controlledBindings, setControlledBindings] = React.useState(initialControlledValues);
-  // Make sure to patch page state after dom nodes have been added or removed
+  const [pageBindings, setPageBindings] = React.useState(parsedBindings);
   React.useEffect(() => {
-    setControlledBindings((existing) => {
-      const existingKeys = Object.keys(existing);
-      const initialKeys = Object.keys(initialControlledValues);
-      const newInitial = without(initialKeys, ...existingKeys);
-      const oldExisting = without(existingKeys, ...initialKeys);
-      if (newInitial.length > 0 || oldExisting.length > 0) {
-        return {
-          ...omit(existing, ...oldExisting),
-          ...pick(initialControlledValues, ...newInitial),
-        };
+    setPageBindings((existingBindings) => {
+      // Make sure to patch page bindings after dom nodes have been added or removed
+      const updated: Record<string, ParsedBinding> = {};
+      for (const [key, binding] of Object.entries(parsedBindings)) {
+        updated[key] = binding.controlled ? existingBindings[key] || binding : binding;
       }
-      return existing;
+      return updated;
     });
-  }, [initialControlledValues]);
+  }, [parsedBindings]);
 
   const setControlledBinding = React.useCallback((id: string, result: BindingEvaluationResult) => {
-    setControlledBindings((existing) => ({ ...existing, [id]: result }));
+    setPageBindings((existing) => ({ ...existing, [id]: { ...existing[id], result } }));
   }, []);
 
-  const inputBindings = React.useMemo(
-    () => ({ ...constValues, ...controlledBindings }),
-    [constValues, controlledBindings],
-  );
+  const evaluatedBindings = React.useMemo(() => evalJsBindings(pageBindings), [pageBindings]);
 
-  const globalScope = useGlobalScope(scopePathToBindingId, inputBindings);
-
-  const jsExpressionValues = React.useMemo(
-    () => evalJsBindings(globalScope, inputBindings, jsExpressions, scopePathToBindingId),
-    [globalScope, inputBindings, jsExpressions, scopePathToBindingId],
-  );
-
+  const pageState = React.useMemo(() => buildGlobalScope(evaluatedBindings), [evaluatedBindings]);
   const liveBindings = React.useMemo(
-    () => ({ ...inputBindings, ...jsExpressionValues }),
-    [inputBindings, jsExpressionValues],
+    () =>
+      Object.fromEntries(
+        Object.entries(evaluatedBindings).map(([bindingId, binding]) => [
+          bindingId,
+          binding.result || { value: undefined },
+        ]),
+      ),
+    [evaluatedBindings],
   );
-
-  const pageState = useGlobalScope(scopePathToBindingId, liveBindings);
 
   React.useEffect(() => {
     fireEvent({ type: 'pageStateUpdated', pageState });

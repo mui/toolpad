@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
 import { evaluateBindable } from '@mui/toolpad-core/runtime';
 import { LoadingButton } from '@mui/lab';
@@ -225,9 +226,12 @@ function QueryNodeEditor<Q, P, PQ>({
     return Object.fromEntries(liveParamValues);
   }, [liveParams]);
 
-  const [previewQuery, setPreviewQuery] = React.useState(input);
+  const [previewQuery, setPreviewQuery] = React.useState<appDom.QueryNode<Q, P> | null>(null);
   const [previewParams, setPreviewParams] = React.useState(paramsObject);
-  const queryPreview = client.useQuery('execQuery', [appId, previewQuery, previewParams]);
+  const queryPreview = client.useQuery(
+    'execQuery',
+    previewQuery ? [appId, previewQuery, previewParams] : null,
+  );
 
   const handleUpdatePreview = React.useCallback(() => {
     setPreviewQuery(input);
@@ -304,15 +308,18 @@ function QueryNodeEditor<Q, P, PQ>({
           <Toolbar disableGutters>
             preview
             <LoadingButton
+              sx={{ ml: 2 }}
               disabled={previewParams === paramsObject && previewQuery === input}
               loading={queryPreview.isLoading}
+              loadingPosition="start"
               onClick={handleUpdatePreview}
+              startIcon={<PlayArrowIcon />}
             >
-              Update
+              Run
             </LoadingButton>
           </Toolbar>
           {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
-          <JsonView src={queryPreview.data} />
+          {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
         </Stack>
       </DialogContent>
       <DialogActions>
@@ -329,7 +336,7 @@ function QueryNodeEditor<Q, P, PQ>({
 }
 
 type DialogState = {
-  node?: appDom.QueryNode;
+  nodeId?: NodeId;
 };
 
 export default function QueryEditor() {
@@ -351,7 +358,7 @@ export default function QueryEditor() {
   const handleCreated = React.useCallback(
     (node) => {
       domApi.addNode(node, page, 'queries');
-      setDialogState({ node });
+      setDialogState({ nodeId: node.id });
     },
     [domApi, page],
   );
@@ -359,7 +366,6 @@ export default function QueryEditor() {
   const handleSave = React.useCallback(
     (node: appDom.QueryNode) => {
       domApi.saveNode(node);
-      setDialogState({ node });
     },
     [domApi],
   );
@@ -371,8 +377,12 @@ export default function QueryEditor() {
     [domApi],
   );
 
+  const editedNode = dialogState?.nodeId
+    ? appDom.getMaybeNode(dom, dialogState.nodeId, 'query')
+    : null;
+
   // To keep it around during closing animation
-  const lastDialogState = useLatest(dialogState);
+  const lastEditednode = useLatest(editedNode);
 
   return (
     <Stack spacing={1} alignItems="start">
@@ -382,7 +392,11 @@ export default function QueryEditor() {
       <List>
         {queries.map((queryNode) => {
           return (
-            <ListItem key={queryNode.id} button onClick={() => setDialogState({ node: queryNode })}>
+            <ListItem
+              key={queryNode.id}
+              button
+              onClick={() => setDialogState({ nodeId: queryNode.id })}
+            >
               {queryNode.name}
             </ListItem>
           );
@@ -396,18 +410,16 @@ export default function QueryEditor() {
         scroll="body"
       >
         {/* eslint-disable-next-line no-nested-ternary */}
-        {dialogState && lastDialogState ? (
-          lastDialogState.node ? (
-            <QueryNodeEditor
-              node={lastDialogState.node}
-              onSave={handleSave}
-              onRemove={handleRemove}
-              onClose={handleEditStateDialogClose}
-            />
-          ) : (
-            <ConnectionSelector onCreated={handleCreated} onClose={handleEditStateDialogClose} />
-          )
-        ) : null}
+        {dialogState?.nodeId && lastEditednode ? (
+          <QueryNodeEditor
+            node={lastEditednode}
+            onSave={handleSave}
+            onRemove={handleRemove}
+            onClose={handleEditStateDialogClose}
+          />
+        ) : (
+          <ConnectionSelector onCreated={handleCreated} onClose={handleEditStateDialogClose} />
+        )}
       </Dialog>
     </Stack>
   );

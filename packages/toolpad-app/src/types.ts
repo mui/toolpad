@@ -11,7 +11,11 @@ import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
 export interface EditorProps<T> {
-  nodeId: NodeId;
+  /**
+   * @deprecated
+   * `nodeId` is only needed for very specific editors. Maybe this rather belongs in some context?
+   */
+  nodeId?: NodeId;
   label: string;
   argType: ArgTypeDefinition;
   disabled?: boolean;
@@ -100,6 +104,7 @@ export interface QueryEditorApi<PQ> {
 
 export interface QueryEditorProps<Q, PQ = {}> extends WithControlledProp<Q> {
   api: QueryEditorApi<PQ>;
+  globalScope: Record<string, any>;
 }
 
 export type QueryEditor<Q = {}, PQ = {}> = React.FC<QueryEditorProps<Q, PQ>>;

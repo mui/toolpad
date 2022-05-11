@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { styled, Alert, Box, CircularProgress } from '@mui/material';
 import { Route, Routes, useParams } from 'react-router-dom';
+import { JsRuntimeProvider } from '@mui/toolpad-core/runtime';
 import PageEditor from './PageEditor';
 import DomProvider, { useDomLoader } from '../DomLoader';
 import ApiEditor from './ApiEditor';
@@ -90,10 +91,14 @@ export default function Editor() {
   );
 
   return (
-    <AppEditorContextprovider value={appContextValue}>
-      <DomProvider appId={appId}>
-        <EditorContent appId={appId} />
-      </DomProvider>
-    </AppEditorContextprovider>
+    <React.Suspense fallback="kjdh">
+      <JsRuntimeProvider>
+        <AppEditorContextprovider value={appContextValue}>
+          <DomProvider appId={appId}>
+            <EditorContent appId={appId} />
+          </DomProvider>
+        </AppEditorContextprovider>
+      </JsRuntimeProvider>
+    </React.Suspense>
   );
 }

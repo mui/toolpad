@@ -18,15 +18,13 @@ import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import AddLinkIcon from '@mui/icons-material/AddLink';
 import { LiveBinding, PropValueType, BindableAttrValue } from '@mui/toolpad-core';
-import { evaluateBindable, JsRuntimeProvider, useJsRuntime } from '@mui/toolpad-core/runtime';
-import evaluateBindableServer from '../../server/evaluateBindable';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
-import { Serializable } from '../../server/evalExpression';
+import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 
 const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -64,15 +62,13 @@ function JsExpressionBindingEditor<V>({
 }
 
 interface JsExpressionPreviewProps {
-  input: BindableAttrValue<unknown> | null;
+  server?: boolean;
+  input: BindableAttrValue<any> | null;
   globalScope: Record<string, unknown>;
 }
 
-function JsExpressionPreview({ input, globalScope }: JsExpressionPreviewProps) {
-  const previewValue: LiveBinding = React.useMemo(
-    () => evaluateBindable(input, globalScope),
-    [input, globalScope],
-  );
+function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreviewProps) {
+  const previewValue: LiveBinding = useEvaluateLiveBinding({ server, input, globalScope });
 
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
   const previewErrorDebounced = useDebounced(previewValue?.error, 500);
@@ -87,49 +83,6 @@ function JsExpressionPreview({ input, globalScope }: JsExpressionPreviewProps) {
         <JsonView src={lastGoodPreview?.value} />
       </Box>
     </React.Fragment>
-  );
-}
-
-interface JsExpressionPreviewProps {
-  input: BindableAttrValue<unknown> | null;
-  globalScope: Record<string, unknown>;
-}
-
-function JsExpressionPreviewServerContent({ input, globalScope }: JsExpressionPreviewProps) {
-  const jsRuntime = useJsRuntime();
-
-  const previewValue: LiveBinding = React.useMemo(() => {
-    const ctx = jsRuntime.newContext();
-    try {
-      return evaluateBindableServer(ctx, input, globalScope as Record<string, Serializable>);
-    } finally {
-      ctx.dispose();
-    }
-  }, [jsRuntime, input, globalScope]);
-
-  const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
-  const previewErrorDebounced = useDebounced(previewValue?.error, 500);
-  const previewError = previewValue?.error && previewErrorDebounced;
-
-  return (
-    <React.Fragment>
-      <Toolbar variant="dense" disableGutters>
-        <Typography color="error">{previewError?.message}</Typography>
-      </Toolbar>
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <JsonView src={lastGoodPreview?.value} />
-      </Box>
-    </React.Fragment>
-  );
-}
-
-function JsExpressionPreviewServer(props: JsExpressionPreviewProps) {
-  return (
-    <React.Suspense fallback="loading...">
-      <JsRuntimeProvider>
-        <JsExpressionPreviewServerContent {...props} />
-      </JsRuntimeProvider>
-    </React.Suspense>
   );
 }
 
@@ -240,11 +193,7 @@ export function BindingEditor<V>({
                 onChange={(newValue) => setInput(newValue)}
               />
 
-              {server ? (
-                <JsExpressionPreviewServer input={input} globalScope={globalScope} />
-              ) : (
-                <JsExpressionPreview input={input} globalScope={globalScope} />
-              )}
+              <JsExpressionPreview server={server} input={input} globalScope={globalScope} />
             </Box>
           </Stack>
         </DialogContent>

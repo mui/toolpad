@@ -1,12 +1,10 @@
-import { Stack, TextField } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinitions, BindableAttrValue } from '@mui/toolpad-core';
+import { ArgTypeDefinitions, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import StringRecordEditor from '../../components/StringRecordEditor';
-import { BindingEditor } from '../../components/AppEditor/BindingEditor';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { FetchQuery } from './types';
-import * as appDom from '../../appDom';
 import BindableEditor from '../../components/AppEditor/PageEditor/BindableEditor';
+import { useEvaluateLiveBinding } from '../../components/AppEditor/useEvaluateLiveBinding';
 
 function ConnectionParamsInput() {
   return null;
@@ -14,16 +12,6 @@ function ConnectionParamsInput() {
 
 function QueryEditor({ globalScope, value, onChange }: QueryEditorProps<FetchQuery>) {
   const handleUrlChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({
-        ...value,
-        url: { type: 'const', value: event.target.value },
-      });
-    },
-    [onChange, value],
-  );
-
-  const handleUrlChange2 = React.useCallback(
     (newValue: BindableAttrValue<string> | null) => {
       onChange({ ...value, url: newValue || { type: 'const', value: '' } });
     },
@@ -40,35 +28,23 @@ function QueryEditor({ globalScope, value, onChange }: QueryEditorProps<FetchQue
     [onChange, value],
   );
 
+  const liveUrl: LiveBinding = useEvaluateLiveBinding({
+    server: true,
+    input: value.url,
+    globalScope: globalScope.query ? globalScope : { query: value.params },
+  });
+
   return (
     <div>
-      {/* <BindableEditor
-        liveBinding={liveBinding}
+      <BindableEditor
+        liveBinding={liveUrl}
         globalScope={globalScope}
         server
         label="url"
         argType={{ typeDef: { type: 'string' } }}
         value={value.url}
-        onChange={handleUrlChange2}
-      /> */}
-      <Stack direction="row">
-        <TextField
-          label="url"
-          size="small"
-          fullWidth
-          value={value.url?.value || ''}
-          onChange={handleUrlChange}
-          disabled={value.url && value.url.type !== 'const'}
-        />
-        <BindingEditor
-          label="url"
-          server
-          value={value.url}
-          onChange={(url) => onChange({ ...value, url: url || appDom.createConst('') })}
-          propType={{ type: 'string' }}
-          globalScope={globalScope.query ? globalScope : { query: value.params }}
-        />
-      </Stack>
+        onChange={handleUrlChange}
+      />
       {/* TODO: remove this when QueryStateNode is removed */}
       {globalScope.query ? null : (
         <StringRecordEditor

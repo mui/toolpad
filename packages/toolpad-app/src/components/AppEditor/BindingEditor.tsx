@@ -18,15 +18,13 @@ import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import AddLinkIcon from '@mui/icons-material/AddLink';
 import { LiveBinding, PropValueType, BindableAttrValue } from '@mui/toolpad-core';
-import { evaluateBindable, useJsRuntime } from '@mui/toolpad-core/runtime';
-import evaluateBindableServer from '../../server/evaluateBindable';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
-import { Serializable } from '../../server/evalExpression';
+import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 
 const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -63,31 +61,6 @@ function JsExpressionBindingEditor<V>({
   );
 }
 
-interface UseBindingPreviewProps {
-  server?: boolean;
-  input: BindableAttrValue<any> | null;
-  globalScope: Record<string, unknown>;
-}
-
-function useBindingPreview({ server, input, globalScope }: UseBindingPreviewProps) {
-  const jsRuntime = useJsRuntime();
-
-  const previewValue: LiveBinding = React.useMemo(() => {
-    if (server) {
-      const ctx = jsRuntime.newContext();
-      try {
-        return evaluateBindableServer(ctx, input, globalScope as Record<string, Serializable>);
-      } finally {
-        ctx.dispose();
-      }
-    } else {
-      return evaluateBindable(input, globalScope);
-    }
-  }, [server, jsRuntime, input, globalScope]);
-
-  return previewValue;
-}
-
 interface JsExpressionPreviewProps {
   server?: boolean;
   input: BindableAttrValue<any> | null;
@@ -95,7 +68,7 @@ interface JsExpressionPreviewProps {
 }
 
 function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreviewProps) {
-  const previewValue: LiveBinding = useBindingPreview({ server, input, globalScope });
+  const previewValue: LiveBinding = useEvaluateLiveBinding({ server, input, globalScope });
 
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
   const previewErrorDebounced = useDebounced(previewValue?.error, 500);

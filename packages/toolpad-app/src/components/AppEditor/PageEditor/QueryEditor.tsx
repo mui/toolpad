@@ -252,8 +252,8 @@ function QueryNodeEditor<Q, P, PQ>({
           <ParametersEditor
             value={params}
             onChange={handleParamsChange}
-            nodeId={node.id}
-            attributeNamespace={'params'}
+            globalScope={pageState}
+            liveValue={liveParams}
           />
           <Divider />
           <Typography>Build query:</Typography>
@@ -261,6 +261,7 @@ function QueryNodeEditor<Q, P, PQ>({
             api={queryEditorApi}
             value={input.attributes.query.value}
             onChange={handleQueryChange}
+            globalScope={{ query: paramsObject }}
           />
           <Divider />
           <Typography>Options:</Typography>

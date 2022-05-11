@@ -1,28 +1,26 @@
 import { Box, TextField, IconButton, SxProps } from '@mui/material';
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { BindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
-import { usePageEditorState } from './PageEditorProvider';
-import { BindingEditor } from '../BindingEditor';
-import { NodeId } from '../../../types';
+import BindableEditor from './BindableEditor';
 
 export interface StringRecordEntriesEditorProps
   extends WithControlledProp<[string, BindableAttrValue<any>][]> {
-  nodeId: NodeId;
-  attributeNamespace: string;
   label?: string;
+  liveValue: [string, LiveBinding][];
+  globalScope: Record<string, unknown>;
   fieldLabel?: string;
   valueLabel?: string;
   autoFocus?: boolean;
   sx?: SxProps;
 }
 
-export default function StringRecordEntriesEditor({
+export default function ParametersEditor({
   value,
   onChange,
-  nodeId,
-  attributeNamespace,
+  liveValue,
+  globalScope,
   label,
   fieldLabel = 'field',
   valueLabel = 'value',
@@ -46,14 +44,11 @@ export default function StringRecordEntriesEditor({
     return value.map(([field]) => !!field && counts[field] <= 1);
   }, [value]);
 
-  const { bindings, pageState } = usePageEditorState();
-
   return (
     <Box sx={sx} display="grid" gridTemplateColumns="1fr 2fr auto" alignItems="center" gap={1}>
       {label ? <Box gridColumn="span 3">{label}:</Box> : null}
       {value.map(([field, fieldValue], index) => {
-        const bindingId = `${nodeId}${attributeNamespace}.${field}`;
-        const liveBinding = bindings[bindingId];
+        const liveBinding = liveValue[index][1];
 
         return (
           <React.Fragment key={index}>
@@ -69,7 +64,23 @@ export default function StringRecordEntriesEditor({
               }
               error={!isValidFieldName[index]}
             />
-            <BindingEditor
+            <BindableEditor
+              liveBinding={liveBinding}
+              globalScope={globalScope}
+              label={field}
+              argType={{ typeDef: { type: 'string' } }}
+              value={fieldValue}
+              onChange={(newBinding) =>
+                onChange(
+                  value.map((entry, i) =>
+                    i === index
+                      ? [entry[0], newBinding || { type: 'const', value: undefined }]
+                      : entry,
+                  ),
+                )
+              }
+            />
+            {/* <BindingEditor
               globalScope={pageState}
               liveBinding={liveBinding}
               label={field}
@@ -83,7 +94,7 @@ export default function StringRecordEntriesEditor({
                   ),
                 )
               }
-            />
+            /> */}
 
             <IconButton aria-label="Delete property" onClick={handleRemove(index)} size="small">
               <DeleteIcon fontSize="small" />

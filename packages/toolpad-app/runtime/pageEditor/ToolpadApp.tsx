@@ -210,19 +210,15 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
 function useGlobalScope(
   scopePathToBindingId: Record<string, string>,
   inputBindings: Record<string, BindingEvaluationResult>,
-  scopePatshToHide: string[],
 ): Record<string, unknown> {
   return React.useMemo(() => {
     const globalScope = {};
-    const scopePatshToHideSet = new Set(scopePatshToHide);
     for (const [scopePath, bindingId] of Object.entries(scopePathToBindingId)) {
-      if (!scopePatshToHideSet.has(scopePath)) {
-        const value = inputBindings[bindingId]?.value;
-        set(globalScope, scopePath, value);
-      }
+      const value = inputBindings[bindingId]?.value;
+      set(globalScope, scopePath, value);
     }
     return globalScope;
-  }, [scopePatshToHide, scopePathToBindingId, inputBindings]);
+  }, [scopePathToBindingId, inputBindings]);
 }
 
 interface PageRootProps {
@@ -297,21 +293,32 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
   return null;
 }
 
+interface ParsedBinding {
+  controlled?: boolean;
+  /**
+   * How this binding presents itself to expressions in the global scope.
+   * Path in the form that is accepted by lodash.set
+   */
+  scopePath?: string;
+  /**
+   * javascript expression that evaluates to the value of this binding
+   */
+  expression?: string;
+  /**
+   * actual evaluated result of the binding
+   */
+  result?: BindingEvaluationResult;
+}
+
 function parseBindings(
   dom: appDom.AppDom,
   page: appDom.PageNode,
   components: InstantiatedComponents,
   location: RouterLocation,
 ) {
-  const defaultValues: Record<string, BindingEvaluationResult> = {};
-  const constValues: Record<string, BindingEvaluationResult> = {};
-  const initialControlledValues: Record<string, BindingEvaluationResult> = {};
-  const jsExpressions: Record<string, string> = {};
-  const scopePathToBindingId: Record<string, string> = {};
-  // We may want to hide some things in the scope, but still have it visible in the databinding
-  const scopePatshToHide: string[] = [];
-
   const elements = appDom.getDescendants(dom, page);
+
+  const parsedBindings = new Map<string, ParsedBinding>();
 
   for (const elm of elements) {
     if (appDom.isElement(elm)) {
@@ -320,31 +327,42 @@ function parseBindings(
       const { argTypes } = Component[TOOLPAD_COMPONENT];
 
       for (const [propName, argType] of Object.entries(argTypes)) {
-        const binding = elm.props?.[propName];
         const bindingId = `${elm.id}.props.${propName}`;
-        const scopePath = `${elm.name}.${propName}`;
-        scopePathToBindingId[scopePath] = bindingId;
-        if (componentId === PAGE_ROW_COMPONENT_ID) {
-          scopePatshToHide.push(scopePath);
-        }
+        const scopePath =
+          componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
         if (argType) {
-          if (argType.onChangeProp) {
-            const defaultValue =
-              binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
-            initialControlledValues[bindingId] = { value: defaultValue };
-          } else if (binding?.type === 'const') {
-            constValues[bindingId] = { value: binding?.value };
-          } else if (binding?.type === 'jsExpression') {
-            jsExpressions[bindingId] = binding?.value;
-          }
+          parsedBindings.set(bindingId, {
+            scopePath,
+            result: { value: Component.defaultProps?.[propName] },
+          });
         }
       }
 
       for (const [propName, argType] of Object.entries(argTypes)) {
+        const binding = elm.props?.[propName];
         const bindingId = `${elm.id}.props.${propName}`;
-        scopePathToBindingId[`${elm.name}.${propName}`] = bindingId;
+        const scopePath =
+          componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
         if (argType) {
-          defaultValues[bindingId] = { value: Component.defaultProps?.[propName] };
+          if (argType.onChangeProp) {
+            const defaultValue: unknown =
+              binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
+            parsedBindings.set(bindingId, {
+              scopePath,
+              controlled: true,
+              result: { value: defaultValue },
+            });
+          } else if (binding?.type === 'const') {
+            parsedBindings.set(bindingId, {
+              scopePath,
+              result: { value: binding?.value },
+            });
+          } else if (binding?.type === 'jsExpression') {
+            parsedBindings.set(bindingId, {
+              scopePath,
+              expression: binding?.value,
+            });
+          }
         }
       }
     }
@@ -353,19 +371,29 @@ function parseBindings(
       if (elm.params) {
         for (const [paramName, bindable] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
-          scopePathToBindingId[`${elm.name}.params.${paramName}`] = bindingId;
+          const scopePath = `${elm.name}.params.${paramName}`;
           if (bindable?.type === 'const') {
-            constValues[bindingId] = { value: bindable.value };
+            parsedBindings.set(bindingId, {
+              scopePath,
+              result: { value: bindable.value },
+            });
           } else if (bindable?.type === 'jsExpression') {
-            jsExpressions[bindingId] = bindable.value;
+            parsedBindings.set(bindingId, {
+              scopePath,
+              expression: bindable.value,
+            });
           }
         }
       }
 
       for (const [key, value] of Object.entries(INITIAL_DATA_QUERY)) {
         const bindingId = `${elm.id}.${key}`;
-        scopePathToBindingId[`${elm.name}.${key}`] = bindingId;
-        initialControlledValues[bindingId] = { value, loading: true };
+        const scopePath = `${elm.name}.${key}`;
+        parsedBindings.set(bindingId, {
+          controlled: true,
+          scopePath,
+          result: { value, loading: true },
+        });
       }
     }
   }
@@ -373,17 +401,37 @@ function parseBindings(
   const urlParams = new URLSearchParams(location.search);
   for (const [paramName, paramValue] of urlParams.entries()) {
     const bindingId = `${page.id}.query.${paramName}`;
-    scopePathToBindingId[`page.query.${paramName}`] = bindingId;
-    constValues[bindingId] = { value: paramValue };
+    const scopePath = `page.query.${paramName}`;
+    parsedBindings.set(bindingId, {
+      scopePath,
+      result: { value: paramValue },
+    });
+  }
+
+  const constValues: Record<string, BindingEvaluationResult> = {};
+  const initialControlledValues: Record<string, BindingEvaluationResult> = {};
+  const jsExpressions: Record<string, string> = {};
+  const scopePathToBindingId: Record<string, string> = {};
+  for (const [key, binding] of parsedBindings.entries()) {
+    if (binding.controlled) {
+      initialControlledValues[key] = binding.result || { value: undefined };
+    } else {
+      constValues[key] = binding.result || { value: undefined };
+    }
+    if (binding.expression) {
+      jsExpressions[key] = binding.expression;
+    }
+    if (binding.scopePath) {
+      scopePathToBindingId[binding.scopePath] = key;
+    }
   }
 
   return {
-    defaultValues,
     constValues,
     initialControlledValues,
     jsExpressions,
     scopePathToBindingId,
-    scopePatshToHide,
+    parsedBindings: Object.fromEntries(parsedBindings),
   };
 }
 
@@ -395,17 +443,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const location = useLocation();
   const components = useComponentsContext();
 
-  const {
-    defaultValues,
-    constValues,
-    initialControlledValues,
-    jsExpressions,
-    scopePathToBindingId,
-    scopePatshToHide,
-  } = React.useMemo(
-    () => parseBindings(dom, page, components, location),
-    [components, dom, location, page],
-  );
+  const { constValues, initialControlledValues, jsExpressions, scopePathToBindingId } =
+    React.useMemo(
+      () => parseBindings(dom, page, components, location),
+      [components, dom, location, page],
+    );
 
   const [controlledBindings, setControlledBindings] = React.useState(initialControlledValues);
   // Make sure to patch page state after dom nodes have been added or removed
@@ -426,11 +468,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   }, [initialControlledValues]);
 
   const inputBindings = React.useMemo(
-    () => ({ ...defaultValues, ...constValues, ...controlledBindings }),
-    [defaultValues, constValues, controlledBindings],
+    () => ({ ...constValues, ...controlledBindings }),
+    [constValues, controlledBindings],
   );
 
-  const globalScope = useGlobalScope(scopePathToBindingId, inputBindings, scopePatshToHide);
+  const globalScope = useGlobalScope(scopePathToBindingId, inputBindings);
 
   const jsExpressionValues = React.useMemo(
     () => evalJsBindings(globalScope, inputBindings, jsExpressions, scopePathToBindingId),
@@ -442,7 +484,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [inputBindings, jsExpressionValues],
   );
 
-  const pageState = useGlobalScope(scopePathToBindingId, liveBindings, scopePatshToHide);
+  const pageState = useGlobalScope(scopePathToBindingId, liveBindings);
 
   React.useEffect(() => {
     fireEvent({ type: 'pageStateUpdated', pageState });

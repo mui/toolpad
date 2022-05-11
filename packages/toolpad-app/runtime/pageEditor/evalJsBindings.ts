@@ -95,30 +95,17 @@ export function buildGlobalScope(bindings: Record<string, ParsedBinding>): Recor
 export default function evalJsBindings(
   bindings: Record<string, ParsedBinding>,
 ): Record<string, ParsedBinding> {
-  const boundValues: Record<string, BindingEvaluationResult> = {};
-  const boundExpressions: Record<string, string> = {};
-  const scopePathToBindingId: Record<string, string> = {};
+  const bindingsMap = new Map(Object.entries(bindings));
 
+  const bindingIdMap = new Map<string, string>();
   // eslint-disable-next-line no-restricted-syntax
-  for (const [key, binding] of Object.entries(bindings)) {
-    boundValues[key] = binding.result || { value: undefined };
-    if (binding.expression) {
-      boundExpressions[key] = binding.expression;
-    }
+  for (const [bindingId, binding] of bindingsMap) {
     if (binding.scopePath) {
-      scopePathToBindingId[binding.scopePath] = key;
+      bindingIdMap.set(binding.scopePath, bindingId);
     }
   }
 
-  const scope = buildGlobalScope(bindings);
-
-  const bindingIdMap = new Map(Object.entries(scopePathToBindingId));
-  const bindingsMap = new Map(Object.entries(boundExpressions));
-
-  const computationStatuses = new Map<
-    string,
-    { status: 'computing' } | { status: 'computed'; result: BindingEvaluationResult }
-  >();
+  const computationStatuses = new Map<string, { result: null | BindingEvaluationResult }>();
 
   let proxiedScope: Record<string, unknown>;
 
@@ -131,34 +118,33 @@ export default function evalJsBindings(
 
         const scopePath = label ? `${label}.${prop}` : prop;
         const bindingId = bindingIdMap.get(scopePath);
+        const binding = bindingId && bindingsMap.get(bindingId);
 
-        if (bindingId) {
-          const expression = bindingsMap.get(bindingId);
+        if (binding) {
+          const expression = binding.expression;
 
           if (expression) {
             const computed = computationStatuses.get(expression);
             if (computed) {
-              if (computed.status === 'computing') {
-                throw new Error(`Cycle detected "${scopePath}"`);
-              } else {
+              if (computed.result) {
                 // From cache
                 return unwrapEvaluationResult(computed.result);
               }
+
+              throw new Error(`Cycle detected "${scopePath}"`);
             }
 
-            computationStatuses.set(expression, { status: 'computing' });
-
+            // use null to mark as "computing"
+            computationStatuses.set(expression, { result: null });
             const result = evaluateExpression(expression, proxiedScope);
-            computationStatuses.set(expression, { status: 'computed', result });
+            computationStatuses.set(expression, { result });
             // From freshly computed
             return unwrapEvaluationResult(result);
           }
 
-          const boundValue = boundValues[bindingId];
-
-          if (boundValue) {
+          if (binding.result) {
             // From input value on the page
-            return unwrapEvaluationResult(boundValue);
+            return unwrapEvaluationResult(binding.result);
           }
         }
 
@@ -172,6 +158,7 @@ export default function evalJsBindings(
       },
     });
 
+  const scope = buildGlobalScope(bindings);
   proxiedScope = proxify(scope);
 
   return Object.fromEntries(

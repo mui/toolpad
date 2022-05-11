@@ -283,7 +283,8 @@ function parseBindings(
 ) {
   const elements = appDom.getDescendants(dom, page);
 
-  const parsedBindings = new Map<string, ParsedBinding>();
+  const parsedBindingsMap = new Map<string, ParsedBinding>();
+  const controlled = new Set<string>();
 
   for (const elm of elements) {
     if (appDom.isElement(elm)) {
@@ -296,7 +297,7 @@ function parseBindings(
         const scopePath =
           componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
         if (argType) {
-          parsedBindings.set(bindingId, {
+          parsedBindingsMap.set(bindingId, {
             scopePath,
             result: { value: Component.defaultProps?.[propName] },
           });
@@ -312,18 +313,18 @@ function parseBindings(
           if (argType.onChangeProp) {
             const defaultValue: unknown =
               binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
-            parsedBindings.set(bindingId, {
+            controlled.add(bindingId);
+            parsedBindingsMap.set(bindingId, {
               scopePath,
-              controlled: true,
               result: { value: defaultValue },
             });
           } else if (binding?.type === 'const') {
-            parsedBindings.set(bindingId, {
+            parsedBindingsMap.set(bindingId, {
               scopePath,
               result: { value: binding?.value },
             });
           } else if (binding?.type === 'jsExpression') {
-            parsedBindings.set(bindingId, {
+            parsedBindingsMap.set(bindingId, {
               scopePath,
               expression: binding?.value,
             });
@@ -338,12 +339,12 @@ function parseBindings(
           const bindingId = `${elm.id}.params.${paramName}`;
           const scopePath = `${elm.name}.params.${paramName}`;
           if (bindable?.type === 'const') {
-            parsedBindings.set(bindingId, {
+            parsedBindingsMap.set(bindingId, {
               scopePath,
               result: { value: bindable.value },
             });
           } else if (bindable?.type === 'jsExpression') {
-            parsedBindings.set(bindingId, {
+            parsedBindingsMap.set(bindingId, {
               scopePath,
               expression: bindable.value,
             });
@@ -354,8 +355,8 @@ function parseBindings(
       for (const [key, value] of Object.entries(INITIAL_DATA_QUERY)) {
         const bindingId = `${elm.id}.${key}`;
         const scopePath = `${elm.name}.${key}`;
-        parsedBindings.set(bindingId, {
-          controlled: true,
+        controlled.add(bindingId);
+        parsedBindingsMap.set(bindingId, {
           scopePath,
           result: { value, loading: true },
         });
@@ -367,13 +368,15 @@ function parseBindings(
   for (const [paramName, paramValue] of urlParams.entries()) {
     const bindingId = `${page.id}.query.${paramName}`;
     const scopePath = `page.query.${paramName}`;
-    parsedBindings.set(bindingId, {
+    parsedBindingsMap.set(bindingId, {
       scopePath,
       result: { value: paramValue },
     });
   }
 
-  return Object.fromEntries(parsedBindings);
+  const parsedBindings: Record<string, ParsedBinding> = Object.fromEntries(parsedBindingsMap);
+
+  return { parsedBindings, controlled };
 }
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
@@ -384,26 +387,39 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const location = useLocation();
   const components = useComponentsContext();
 
-  const parsedBindings = React.useMemo(
+  const { parsedBindings, controlled } = React.useMemo(
     () => parseBindings(dom, page, components, location),
     [components, dom, location, page],
   );
 
-  const [pageBindings, setPageBindings] = React.useState(parsedBindings);
+  const [pageBindings, setPageBindings] =
+    React.useState<Record<string, ParsedBinding>>(parsedBindings);
+
   React.useEffect(() => {
     setPageBindings((existingBindings) => {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
       for (const [key, binding] of Object.entries(parsedBindings)) {
-        updated[key] = binding.controlled ? existingBindings[key] || binding : binding;
+        updated[key] = controlled.has(key) ? existingBindings[key] || binding : binding;
       }
       return updated;
     });
-  }, [parsedBindings]);
+  }, [parsedBindings, controlled]);
 
-  const setControlledBinding = React.useCallback((id: string, result: BindingEvaluationResult) => {
-    setPageBindings((existing) => ({ ...existing, [id]: { ...existing[id], result } }));
-  }, []);
+  const setControlledBinding = React.useCallback(
+    (id: string, result: BindingEvaluationResult) => {
+      setPageBindings((existing) => {
+        if (!controlled.has(id)) {
+          throw new Error(`Not a controlled binding "${id}"`);
+        }
+        return {
+          ...existing,
+          [id]: { ...existing[id], result },
+        };
+      });
+    },
+    [controlled],
+  );
 
   const evaluatedBindings = React.useMemo(() => evalJsBindings(pageBindings), [pageBindings]);
 

@@ -15,12 +15,6 @@ function evaluateCode(code: string, globalScope: Record<string, unknown>) {
   return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
 }
 
-export type BindingEvaluationResult<T = any> = {
-  value?: T;
-  error?: Error;
-  loading?: boolean;
-};
-
 const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
 
 function evaluateExpression(
@@ -48,8 +42,29 @@ function unwrapEvaluationResult(result: BindingEvaluationResult) {
   }
 }
 
-export interface ParsedBinding {
-  controlled?: boolean;
+/**
+ * Represents the actual state of an evaluated binding.
+ */
+export type BindingEvaluationResult<T = unknown> = {
+  /**
+   * The actual value.
+   */
+  value?: T;
+  /**
+   * The evaluation of the value resulted in error.
+   */
+  error?: Error;
+  /**
+   * The parts that this value depends on are still loading.
+   */
+  loading?: boolean;
+};
+
+/**
+ * Represents the state of a binding. It both describes which place it takes in the gobal scope
+ * and how to obtain the result
+ */
+export interface ParsedBinding<T = unknown> {
   /**
    * How this binding presents itself to expressions in the global scope.
    * Path in the form that is accepted by lodash.set
@@ -62,7 +77,7 @@ export interface ParsedBinding {
   /**
    * actual evaluated result of the binding
    */
-  result?: BindingEvaluationResult;
+  result?: BindingEvaluationResult<T>;
 }
 
 export function buildGlobalScope(bindings: Record<string, ParsedBinding>): Record<string, unknown> {

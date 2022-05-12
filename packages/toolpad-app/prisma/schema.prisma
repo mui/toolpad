@@ -22,7 +22,6 @@ enum DomNodeType {
   codeComponent
   derivedState
   queryState
-  query
 }
 
 model App {

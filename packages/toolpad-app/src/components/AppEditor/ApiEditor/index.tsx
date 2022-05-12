@@ -43,7 +43,8 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
     apiNode.attributes.transformEnabled.value,
   );
   const [transform, setTransform] = React.useState<string>(apiNode.attributes.transform.value);
-  const savedTransform = React.useRef(apiNode.attributes.transform.value);
+
+  const responseDiffRef = React.useRef(false);
 
   const conectionId = apiNode.attributes.connectionId.value as NodeId;
   const connection = appDom.getMaybeNode(dom, conectionId, 'connection');
@@ -64,8 +65,15 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
 
   const debouncedPreviewApi = useDebounced(previewApi, 250);
 
-  const previewQuery = useQuery(['api', debouncedPreviewApi], async () =>
-    client.query.execApi(appId, debouncedPreviewApi, {}),
+  const previewQuery = useQuery(
+    ['api', debouncedPreviewApi],
+    async () => client.query.execApi(appId, debouncedPreviewApi, {}),
+    {
+      onSuccess: () => {
+        responseDiffRef.current = true;
+        return null;
+      },
+    },
   );
 
   const queryEditorApi = React.useMemo(() => {
@@ -111,13 +119,13 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
       );
     });
     savedQuery.current = apiQuery;
-    savedTransform.current = transform;
+    responseDiffRef.current = false;
   }, [apiNode, apiQuery, domApi, transform]);
 
   useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
   const allChangesAreCommitted =
-    savedQuery.current === apiQuery && savedTransform.current === transform;
+    savedQuery.current === apiQuery && responseDiffRef.current === false;
 
   usePrompt(
     'Your API has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
@@ -165,7 +173,6 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
               // disabled={!connection}
               value={apiQuery}
               onChange={(newApiQuery) => setApiQuery(newApiQuery)}
-              globalScope={{}}
             />
             <Stack>
               <FormControlLabel

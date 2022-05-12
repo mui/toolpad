@@ -498,11 +498,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
     (id: string): ToolpadComponent => {
       const def = components[id];
 
-      if (!def) {
-        throw new Error(`Unrecognized component "${id}"`);
-      }
-
-      if (def.builtin) {
+      if (def?.builtin) {
         const builtin = (builtins as any)[def.builtin];
 
         if (!ReactIs.isValidElementType(builtin) || typeof builtin === 'string') {
@@ -516,7 +512,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
         return builtin as ToolpadComponent;
       }
 
-      if (def.codeComponentId) {
+      if (def?.codeComponentId) {
         let ResolvedComponent: ToolpadComponent;
         const componentId = def.codeComponentId;
 

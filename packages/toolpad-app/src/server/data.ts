@@ -8,7 +8,6 @@ import {
 } from '../../prisma/generated/client';
 import {
   LegacyConnection,
-  ConnectionStatus,
   ServerDataSource,
   ApiResult,
   NodeId,
@@ -349,14 +348,6 @@ export async function updateConnection(
   }
   await saveDom(appId, dom);
   return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
-}
-
-export async function testConnection(connection: appDom.ConnectionNode): Promise<ConnectionStatus> {
-  const dataSource = serverDataSources[connection.attributes.dataSource.value];
-  if (!dataSource) {
-    return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
-  }
-  return dataSource.test(fromDomConnection(connection));
 }
 
 export async function execApi<Q>(

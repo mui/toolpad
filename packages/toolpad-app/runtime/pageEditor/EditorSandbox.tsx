@@ -30,7 +30,6 @@ export default function EditorCanvas({ dom: initialDom, ...props }: EditorCanvas
     // eslint-disable-next-line no-underscore-dangle
     window.__TOOLPAD_BRIDGE__ = {
       updateDom: (newDom) => {
-        // @ts-expect-error Need to upgrade @types/react
         React.startTransition(() => {
           setDom(newDom);
         });

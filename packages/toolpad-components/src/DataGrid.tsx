@@ -7,10 +7,94 @@ import {
   GridColumns,
   GridRowsProp,
   GridColumnOrderChangeParams,
+  useGridApiContext,
+  gridColumnsTotalWidthSelector,
+  gridColumnPositionsSelector,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
-import { debounce } from '@mui/material';
+import { debounce, LinearProgress, Skeleton } from '@mui/material';
+
+// Pseudo random number. See https://stackoverflow.com/a/47593316
+function mulberry32(a: number): () => number {
+  return () => {
+    /* eslint-disable */
+    let t = (a += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    /* eslint-enable */
+  };
+}
+
+function randomBetween(seed: number, min: number, max: number): () => number {
+  const random = mulberry32(seed);
+  return () => min + (max - min) * random();
+}
+
+function SkeletonLoadingOverlay() {
+  const apiRef = useGridApiContext();
+
+  const dimensions = apiRef.current?.getRootDimensions();
+  const viewportHeight = dimensions?.viewportInnerSize.height ?? 0;
+
+  // @ts-expect-error Function signature expects to be called with parameters, but the implementation suggests otherwise
+  const rowHeight = apiRef.current.unstable_getRowHeight();
+  const skeletonRowsCount = Math.ceil(viewportHeight / rowHeight);
+
+  const totalWidth = gridColumnsTotalWidthSelector(apiRef);
+  const positions = gridColumnPositionsSelector(apiRef);
+  const inViewportCount = React.useMemo(
+    () => positions.filter((value) => value <= totalWidth).length,
+    [totalWidth, positions],
+  );
+  const columns = apiRef.current.getVisibleColumns().slice(0, inViewportCount);
+
+  const children = React.useMemo(() => {
+    // reseed random number generator to create stable lines betwen renders
+    const random = randomBetween(12345, 25, 75);
+    const array: React.ReactNode[] = [];
+
+    for (let i = 0; i < skeletonRowsCount; i += 1) {
+      for (const column of columns) {
+        const width = Math.round(random());
+        array.push(
+          <div
+            key={`${i}-${column.field}`}
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: column.align,
+              height: rowHeight,
+              alignItems: 'center',
+            }}
+          >
+            <Skeleton sx={{ mx: 1 }} width={`${width}%`} />
+          </div>,
+        );
+      }
+    }
+    return array;
+  }, [skeletonRowsCount, columns, rowHeight]);
+
+  const rowsCount = apiRef.current.getRowsCount();
+
+  return rowsCount > 0 ? (
+    <LinearProgress />
+  ) : (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `${columns
+          .map(({ computedWidth }) => `${computedWidth}px`)
+          .join(' ')}`,
+        gridTemplateRows: `repeat(auto-fill, ${rowHeight}px)`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 function inferColumnType(value: unknown): string | undefined {
   if (value instanceof Date) {
@@ -118,13 +202,18 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
   React.useEffect(() => handleColumnOrderChange.clear(), [handleColumnOrderChange]);
 
-  const rows: GridRowsProp = React.useMemo(() => {
-    const parsedRows = rowsProp || EMPTY_ROWS;
-    if (parsedRows.length === 0 || rowIdFieldProp || parsedRows[0].id) {
-      return parsedRows;
-    }
-    return parsedRows.map((row, id) => ({ ...row, id }));
-  }, [rowsProp, rowIdFieldProp]);
+  const rowsInput = rowsProp || EMPTY_ROWS;
+
+  const hasExplicitRowId: boolean = React.useMemo(() => {
+    const hasRowIdField: boolean = !!(rowIdFieldProp && rowIdFieldProp !== 'id');
+    const parsedRows = rowsInput;
+    return parsedRows.length === 0 || hasRowIdField || !!parsedRows[0].id;
+  }, [rowIdFieldProp, rowsInput]);
+
+  const rows: GridRowsProp = React.useMemo(
+    () => (hasExplicitRowId ? rowsInput : rowsInput.map((row, id) => ({ ...row, id }))),
+    [hasExplicitRowId, rowsInput],
+  );
 
   const columnsInitRef = React.useRef(false);
   const hasColumnsDefined = columnsProp && columnsProp.length > 0;
@@ -134,12 +223,16 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
       return;
     }
 
-    const inferredColumns = inferColumns(rows);
+    let inferredColumns = inferColumns(rows);
+
+    if (!hasExplicitRowId) {
+      inferredColumns = inferredColumns.filter((column) => column.field !== 'id');
+    }
 
     nodeRuntime.updateAppDomConstProp('columns', inferredColumns);
 
     columnsInitRef.current = true;
-  }, [hasColumnsDefined, rows, nodeRuntime]);
+  }, [hasColumnsDefined, rows, nodeRuntime, hasExplicitRowId]);
 
   const getRowId = React.useCallback(
     (row: any) => {
@@ -160,7 +253,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   return (
     <div ref={ref} style={{ height: 350, width: '100%' }}>
       <DataGridPro
-        components={{ Toolbar: GridToolbar }}
+        components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
         onColumnResize={handleResize}
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
@@ -181,10 +274,12 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
 DataGridComponent.defaultProps = {
   selection: null,
-};
+  density: 'compact',
+} as ToolpadDataGridProps;
 
 export default createComponent(DataGridComponent, {
   errorProp: 'error',
+  loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',
   argTypes: {
     rows: {
@@ -209,6 +304,7 @@ export default createComponent(DataGridComponent, {
     },
     rowIdField: {
       typeDef: { type: 'string' },
+      control: { type: 'RowIdFieldSelect' },
       label: 'Id field',
     },
   },

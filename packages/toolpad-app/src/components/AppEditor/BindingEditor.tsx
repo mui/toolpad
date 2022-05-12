@@ -1,29 +1,38 @@
 import {
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
   Stack,
   Toolbar,
   Tooltip,
   Typography,
+  styled,
+  tooltipClasses,
+  TooltipProps,
 } from '@mui/material';
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
-import LinkOffIcon from '@mui/icons-material/LinkOff';
+import AddLinkIcon from '@mui/icons-material/AddLink';
 import { LiveBinding, PropValueType, BindableAttrValue } from '@mui/toolpad-core';
-import { evaluateBindable, JsRuntimeProvider, useJsRuntime } from '@mui/toolpad-core/runtime';
-import evaluateBindableServer from '../../server/evaluateBindable';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
-import { Serializable } from '../../server/evalExpression';
+import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
+
+const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.error.dark,
+  },
+}));
 
 interface JsExpressionBindingEditorProps<V>
   extends WithControlledProp<BindableAttrValue<V> | null> {
@@ -53,15 +62,13 @@ function JsExpressionBindingEditor<V>({
 }
 
 interface JsExpressionPreviewProps {
-  input: BindableAttrValue<unknown> | null;
+  server?: boolean;
+  input: BindableAttrValue<any> | null;
   globalScope: Record<string, unknown>;
 }
 
-function JsExpressionPreview({ input, globalScope }: JsExpressionPreviewProps) {
-  const previewValue: LiveBinding = React.useMemo(
-    () => evaluateBindable(input, globalScope),
-    [input, globalScope],
-  );
+function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreviewProps) {
+  const previewValue: LiveBinding = useEvaluateLiveBinding({ server, input, globalScope });
 
   const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
   const previewErrorDebounced = useDebounced(previewValue?.error, 500);
@@ -76,69 +83,30 @@ function JsExpressionPreview({ input, globalScope }: JsExpressionPreviewProps) {
         <JsonView src={lastGoodPreview?.value} />
       </Box>
     </React.Fragment>
-  );
-}
-
-interface JsExpressionPreviewProps {
-  input: BindableAttrValue<unknown> | null;
-  globalScope: Record<string, unknown>;
-}
-
-function JsExpressionPreviewServerContent({ input, globalScope }: JsExpressionPreviewProps) {
-  const jsRuntime = useJsRuntime();
-
-  const previewValue: LiveBinding = React.useMemo(() => {
-    const ctx = jsRuntime.newContext();
-    try {
-      return evaluateBindableServer(ctx, input, globalScope as Record<string, Serializable>);
-    } finally {
-      ctx.dispose();
-    }
-  }, [jsRuntime, input, globalScope]);
-
-  const lastGoodPreview = useLatest(previewValue?.error ? undefined : previewValue);
-  const previewErrorDebounced = useDebounced(previewValue?.error, 500);
-  const previewError = previewValue?.error && previewErrorDebounced;
-
-  return (
-    <React.Fragment>
-      <Toolbar variant="dense" disableGutters>
-        <Typography color="error">{previewError?.message}</Typography>
-      </Toolbar>
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <JsonView src={lastGoodPreview?.value} />
-      </Box>
-    </React.Fragment>
-  );
-}
-
-function JsExpressionPreviewServer(props: JsExpressionPreviewProps) {
-  return (
-    <React.Suspense fallback="loading...">
-      <JsRuntimeProvider>
-        <JsExpressionPreviewServerContent {...props} />
-      </JsRuntimeProvider>
-    </React.Suspense>
   );
 }
 
 export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
+  label: string;
   globalScope: Record<string, unknown>;
   /**
    * Uses the QuickJs runtime to evaluate bindings, just like on the server
    */
   server?: boolean;
   disabled?: boolean;
-  propType: PropValueType;
+  propType?: PropValueType;
+  liveBinding?: LiveBinding;
 }
 
 export function BindingEditor<V>({
+  label,
   globalScope,
   server,
   disabled,
   propType,
   value,
   onChange,
+  liveBinding,
 }: BindingEditorProps<V>) {
   const [input, setInput] = React.useState(value);
   const [open, setOpen] = React.useState(false);
@@ -152,7 +120,7 @@ export function BindingEditor<V>({
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 
-  const hasBinding = value && value.type !== 'const';
+  const hasBinding: boolean = !!value && value.type !== 'const';
 
   const committedInput = React.useRef<BindableAttrValue<V> | null>(null);
   const handleCommit = React.useCallback(() => {
@@ -170,25 +138,35 @@ export function BindingEditor<V>({
     handleClose();
   }, [onChange, input, handleClose]);
 
+  const error: string | undefined = liveBinding?.error?.message;
+
   const bindingButton = (
-    <IconButton
-      aria-label="Bind property"
-      disabled={disabled}
+    <Checkbox
       size="small"
+      aria-label="Bind property"
+      checked={hasBinding}
+      disabled={disabled}
+      icon={<AddLinkIcon />}
+      checkedIcon={<LinkIcon />}
       onClick={handleOpen}
-      color={hasBinding ? 'primary' : 'inherit'}
-    >
-      {hasBinding ? <LinkIcon fontSize="inherit" /> : <LinkOffIcon fontSize="inherit" />}
-    </IconButton>
+      color={error ? 'error' : undefined}
+    />
+  );
+
+  const TooltipComponent = error ? ErrorTooltip : Tooltip;
+  const tooltipTitle: string =
+    error ?? (hasBinding ? `Update "${label}" binding` : `Bind "${label}"`);
+  const bindingButtonWithTooltip = disabled ? (
+    bindingButton
+  ) : (
+    <TooltipComponent placement="left" title={tooltipTitle}>
+      {bindingButton}
+    </TooltipComponent>
   );
 
   return (
     <React.Fragment>
-      {disabled ? (
-        bindingButton
-      ) : (
-        <Tooltip title="Bind property dynamically">{bindingButton}</Tooltip>
-      )}
+      {bindingButtonWithTooltip}
       <Dialog onClose={handleClose} open={open} fullWidth scroll="body" maxWidth="lg">
         <DialogTitle>Bind a property</DialogTitle>
         <DialogContent>
@@ -204,8 +182,8 @@ export function BindingEditor<V>({
 
             <Box sx={{ height: '100%', display: 'flex', flex: 1, flexDirection: 'column' }}>
               <Typography sx={{ mb: 2 }}>
-                Make this property dynamic with a JavaScript expression. This property expects a
-                type: <code>{propType.type}</code>.
+                Make the &quot;{label}&quot; property dynamic with a JavaScript expression. This
+                property expects a type: <code>{propType?.type || 'any'}</code>.
               </Typography>
 
               <JsExpressionBindingEditor<V>
@@ -215,11 +193,7 @@ export function BindingEditor<V>({
                 onChange={(newValue) => setInput(newValue)}
               />
 
-              {server ? (
-                <JsExpressionPreviewServer input={input} globalScope={globalScope} />
-              ) : (
-                <JsExpressionPreview input={input} globalScope={globalScope} />
-              )}
+              <JsExpressionPreview server={server} input={input} globalScope={globalScope} />
             </Box>
           </Stack>
         </DialogContent>

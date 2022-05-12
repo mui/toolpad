@@ -52,6 +52,8 @@ Select.defaultProps = {
 };
 
 export default createComponent(Select, {
+  loadingPropSource: ['value', 'options'],
+  loadingProp: 'disabled',
   argTypes: {
     label: {
       typeDef: { type: 'string' },
@@ -68,10 +70,7 @@ export default createComponent(Select, {
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
-      onChangeHandler: {
-        params: ['event'],
-        valueGetter: 'event.target.value',
-      },
+      onChangeHandler: (event: React.ChangeEvent<HTMLSelectElement>) => event.target.value,
     },
     options: {
       typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },

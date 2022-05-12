@@ -79,5 +79,8 @@ build({
   ],
   plugins: [Resolver()],
 })
-  .then((x) => console.log(JSON.stringify(x, null, 2)))
+  .then((x) => {
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify(x, null, 2));
+  })
   .catch(console.error);

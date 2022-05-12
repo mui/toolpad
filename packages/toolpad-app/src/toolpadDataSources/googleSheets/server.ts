@@ -70,6 +70,7 @@ function createSheetsClient(client: OAuth2Client) {
 async function test(
   connection: LegacyConnection<GoogleSheetsConnectionParams>,
 ): Promise<ConnectionStatus> {
+  // eslint-disable-next-line no-console
   console.log(`Testing connection ${JSON.stringify(connection)}`);
   return { timestamp: Date.now() };
 }

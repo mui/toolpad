@@ -13,6 +13,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '..');
 const DEST = './public/web_modules/';
 
 async function main() {
+  // eslint-disable-next-line no-console
   console.log('installing /public/web_modules...');
 
   await rimraf(path.resolve(PROJECT_ROOT, DEST));
@@ -51,6 +52,7 @@ async function main() {
     },
   );
 
+  // eslint-disable-next-line no-console
   console.log(stats);
 }
 

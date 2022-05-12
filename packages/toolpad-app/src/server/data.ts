@@ -151,7 +151,16 @@ export async function createApp(name: string): Promise<App> {
     });
 
     const dom = appDom.createDom();
-    await saveDom(app.id, dom);
+    const appNode = appDom.getApp(dom);
+    const newNode = appDom.createNode(dom, 'connection', {
+      attributes: {
+        dataSource: appDom.createConst('rest'),
+        params: appDom.createSecret({ name: 'rest' }),
+        status: appDom.createConst(null),
+      },
+    });
+    const newDom = await appDom.addNode(dom, newNode, appNode, 'connections');
+    await saveDom(app.id, newDom);
 
     return app;
   });

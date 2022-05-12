@@ -128,6 +128,7 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
               // disabled={!connection}
               value={apiQuery}
               onChange={(newApiQuery) => setApiQuery(newApiQuery)}
+              globalScope={{}}
             />
           </Stack>
         </Stack>

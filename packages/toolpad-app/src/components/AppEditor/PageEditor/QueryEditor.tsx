@@ -44,11 +44,12 @@ function refetchIntervalInSeconds(maybeInterval?: number) {
 }
 
 interface DataSourceSelectorProps<Q> {
+  open: boolean;
   onClose: () => void;
   onCreated: (newNode: appDom.QueryNode<Q>) => void;
 }
 
-function ConnectionSelector<Q>({ onCreated, onClose }: DataSourceSelectorProps<Q>) {
+function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSelectorProps<Q>) {
   const dom = useDom();
 
   const [input, setInput] = React.useState<NodeId | null>(null);
@@ -79,7 +80,7 @@ function ConnectionSelector<Q>({ onCreated, onClose }: DataSourceSelectorProps<Q
   }, [dom, input, onCreated]);
 
   return (
-    <React.Fragment>
+    <Dialog open={open} onClose={onClose} scroll="body">
       <DialogTitle>Create Query</DialogTitle>
       <DialogContent>
         <ConnectionSelect value={input} onChange={setInput} />
@@ -92,18 +93,20 @@ function ConnectionSelector<Q>({ onCreated, onClose }: DataSourceSelectorProps<Q
           Create query
         </Button>
       </DialogActions>
-    </React.Fragment>
+    </Dialog>
   );
 }
 
 interface QueryNodeEditorProps<Q, P> {
+  open: boolean;
   onClose: () => void;
   onSave: (newNode: appDom.QueryNode) => void;
   onRemove: (newNode: appDom.QueryNode) => void;
   node: appDom.QueryNode<Q, P>;
 }
 
-function QueryNodeEditor<Q, P, PQ>({
+function QueryNodeEditorDialog<Q, P, PQ>({
+  open,
   node,
   onClose,
   onRemove,
@@ -238,12 +241,27 @@ function QueryNodeEditor<Q, P, PQ>({
     setPreviewParams(paramsObject);
   }, [input, paramsObject]);
 
+  const isInputSaved = node === input;
+
+  const handleClose = React.useCallback(() => {
+    const ok = isInputSaved
+      ? true
+      : // eslint-disable-next-line no-alert
+        window.confirm(
+          'Are you sure you want to close the editor. All unsaved progress will be lost.',
+        );
+
+    if (ok) {
+      onClose();
+    }
+  }, [onClose, isInputSaved]);
+
   if (!dataSourceId || !dataSource) {
     throw new Error(`DataSource "${dataSourceId}" not found`);
   }
 
   return (
-    <React.Fragment>
+    <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose} scroll="body">
       <DialogTitle>Edit Query ({node.id})</DialogTitle>
       <DialogContent>
         <Stack spacing={1} py={1} gap={2}>
@@ -323,15 +341,15 @@ function QueryNodeEditor<Q, P, PQ>({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
+        <Button color="inherit" variant="text" onClick={handleClose}>
           Cancel
         </Button>
         <Button onClick={handleRemove}>Remove</Button>
-        <Button disabled={node === input} onClick={handleSave}>
+        <Button disabled={isInputSaved} onClick={handleSave}>
           Save
         </Button>
       </DialogActions>
-    </React.Fragment>
+    </Dialog>
   );
 }
 
@@ -402,25 +420,22 @@ export default function QueryEditor() {
           );
         })}
       </List>
-      <Dialog
-        fullWidth
-        maxWidth="lg"
-        open={!!dialogState}
-        onClose={handleEditStateDialogClose}
-        scroll="body"
-      >
-        {/* eslint-disable-next-line no-nested-ternary */}
-        {dialogState?.nodeId && lastEditednode ? (
-          <QueryNodeEditor
-            node={lastEditednode}
-            onSave={handleSave}
-            onRemove={handleRemove}
-            onClose={handleEditStateDialogClose}
-          />
-        ) : (
-          <ConnectionSelector onCreated={handleCreated} onClose={handleEditStateDialogClose} />
-        )}
-      </Dialog>
+      {/* eslint-disable-next-line no-nested-ternary */}
+      {dialogState?.nodeId && lastEditednode ? (
+        <QueryNodeEditorDialog
+          open={!!dialogState}
+          node={lastEditednode}
+          onSave={handleSave}
+          onRemove={handleRemove}
+          onClose={handleEditStateDialogClose}
+        />
+      ) : (
+        <ConnectionSelectorDialog
+          open={!!dialogState}
+          onCreated={handleCreated}
+          onClose={handleEditStateDialogClose}
+        />
+      )}
     </Stack>
   );
 }

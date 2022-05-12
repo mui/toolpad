@@ -82,8 +82,8 @@ export interface ApiNode<Q = unknown> extends AppDomNodeBase {
     readonly connectionId: ConstantAttrValue<string>;
     readonly dataSource: ConstantAttrValue<string>;
     readonly query: ConstantAttrValue<Q>;
-    readonly transform: ConstantAttrValue<string>;
-    readonly transformEnabled: ConstantAttrValue<boolean>;
+    readonly transform?: ConstantAttrValue<string>;
+    readonly transformEnabled?: ConstantAttrValue<boolean>;
   };
 }
 

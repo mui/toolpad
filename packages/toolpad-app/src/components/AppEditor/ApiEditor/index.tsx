@@ -40,11 +40,14 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
   const savedQuery = React.useRef(apiNode.attributes.query.value);
 
   const [transformEnabled, setTransformEnabled] = React.useState<boolean>(
-    apiNode.attributes.transformEnabled.value,
+    apiNode.attributes.transformEnabled?.value ?? false,
   );
-  const [transform, setTransform] = React.useState<string>(apiNode.attributes.transform.value);
+  const savedTransformEnabled = React.useRef(apiNode.attributes.transformEnabled?.value);
 
-  const responseDiffRef = React.useRef(false);
+  const [transform, setTransform] = React.useState<string>(
+    apiNode.attributes.transform?.value ?? '(data) => { return data }',
+  );
+  const savedTransform = React.useRef(apiNode.attributes.transform?.value);
 
   const conectionId = apiNode.attributes.connectionId.value as NodeId;
   const connection = appDom.getMaybeNode(dom, conectionId, 'connection');
@@ -65,15 +68,8 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
 
   const debouncedPreviewApi = useDebounced(previewApi, 250);
 
-  const previewQuery = useQuery(
-    ['api', debouncedPreviewApi],
-    async () => client.query.execApi(appId, debouncedPreviewApi, {}),
-    {
-      onSuccess: () => {
-        responseDiffRef.current = true;
-        return null;
-      },
-    },
+  const previewQuery = useQuery(['api', debouncedPreviewApi], async () =>
+    client.query.execApi(appId, debouncedPreviewApi, {}),
   );
 
   const queryEditorApi = React.useMemo(() => {
@@ -117,15 +113,24 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
         'transform',
         appDom.createConst(transform),
       );
+      domApi.setNodeNamespacedProp(
+        apiNode,
+        'attributes',
+        'transformEnabled',
+        appDom.createConst(transformEnabled),
+      );
     });
     savedQuery.current = apiQuery;
-    responseDiffRef.current = false;
-  }, [apiNode, apiQuery, domApi, transform]);
+    savedTransform.current = transform;
+    savedTransformEnabled.current = transformEnabled;
+  }, [apiNode, apiQuery, domApi, transform, transformEnabled]);
 
   useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
   const allChangesAreCommitted =
-    savedQuery.current === apiQuery && responseDiffRef.current === false;
+    savedQuery.current === apiQuery &&
+    savedTransformEnabled.current === transformEnabled &&
+    savedTransform.current === transform;
 
   usePrompt(
     'Your API has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',

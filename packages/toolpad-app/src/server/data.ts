@@ -368,11 +368,11 @@ export async function execApi<Q>(
       `Unknown connection "${api.attributes.connectionId.value}" for api "${api.id}"`,
     );
   }
-  if (api.attributes.transform.value.flag) {
+  if (api.attributes.transformEnabled.value) {
     const apiResult = await dataSource.exec(connection, api.attributes.query.value, params);
     return {
       data: await evalExpression(
-        `${api.attributes.transform.value.fn}(${JSON.stringify(apiResult.data)})`,
+        `${api.attributes.transform.value}(${JSON.stringify(apiResult.data)})`,
       ),
     };
   }

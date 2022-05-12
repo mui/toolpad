@@ -39,9 +39,10 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
   const [apiQuery, setApiQuery] = React.useState<Q>(apiNode.attributes.query.value);
   const savedQuery = React.useRef(apiNode.attributes.query.value);
 
-  const [transform, setTransform] = React.useState<appDom.ApiTransform>(
-    apiNode.attributes.transform.value,
+  const [transformEnabled, setTransformEnabled] = React.useState<boolean>(
+    apiNode.attributes.transformEnabled.value,
   );
+  const [transform, setTransform] = React.useState<string>(apiNode.attributes.transform.value);
   const savedTransform = React.useRef(apiNode.attributes.transform.value);
 
   const conectionId = apiNode.attributes.connectionId.value as NodeId;
@@ -55,10 +56,11 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
       attributes: {
         ...apiNode.attributes,
         query: appDom.createConst(apiQuery),
+        transformEnabled: appDom.createConst(transformEnabled),
         transform: appDom.createConst(transform),
       },
     };
-  }, [apiNode, apiQuery, transform]);
+  }, [apiNode, apiQuery, transformEnabled, transform]);
 
   const debouncedPreviewApi = useDebounced(previewApi, 250);
 
@@ -88,21 +90,11 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
   );
 
   const handleTransformFnChange = (newValue: string) => {
-    setTransform((prevTransform) => {
-      return {
-        ...prevTransform,
-        fn: newValue,
-      };
-    });
+    setTransform(newValue);
   };
 
-  const handleTransformFlagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTransform((prevTransform) => {
-      return {
-        ...prevTransform,
-        flag: event.target.checked,
-      };
-    });
+  const handleTransformEnabledChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTransformEnabled(event.target.checked);
   };
 
   const handleSave = React.useCallback(() => {
@@ -181,17 +173,17 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
                 control={
                   <Checkbox
                     size="small"
-                    checked={transform.flag}
-                    onChange={handleTransformFlagChange}
+                    checked={transformEnabled}
+                    onChange={handleTransformEnabledChange}
                     inputProps={{ 'aria-label': 'controlled' }}
                   />
                 }
               />
             </Stack>
-            {transform.flag ? (
+            {transformEnabled ? (
               <JsExpressionEditor
                 globalScope={{}}
-                value={transform.fn}
+                value={transform}
                 onChange={handleTransformFnChange}
               />
             ) : null}

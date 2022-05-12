@@ -76,18 +76,14 @@ export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   };
 }
 
-export interface ApiTransform {
-  fn: string;
-  flag: boolean;
-}
-
 export interface ApiNode<Q = unknown> extends AppDomNodeBase {
   readonly type: 'api';
   readonly attributes: {
     readonly connectionId: ConstantAttrValue<string>;
     readonly dataSource: ConstantAttrValue<string>;
     readonly query: ConstantAttrValue<Q>;
-    readonly transform: ConstantAttrValue<ApiTransform>;
+    readonly transform: ConstantAttrValue<string>;
+    readonly transformEnabled: ConstantAttrValue<boolean>;
   };
 }
 

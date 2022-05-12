@@ -29,7 +29,7 @@ export default async (
   const apiNodeId = req.query.queryId as NodeId;
   const dom = await loadVersionedDom(appId, version);
   const api = appDom.getNode(dom, apiNodeId, 'api');
-  if (api.attributes.transform.value.flag) {
+  if (api.attributes.transformEnabled.value) {
     const apiResult = await execApi(
       appId,
       api,
@@ -37,7 +37,7 @@ export default async (
     );
     res.json({
       data: await evalExpression(
-        `${api.attributes.transform.value.fn}(${JSON.stringify(apiResult.data)})`,
+        `${api.attributes.transform.value}(${JSON.stringify(apiResult.data)})`,
       ),
     });
   }

@@ -93,16 +93,14 @@ export default function CodeComponentSandbox() {
     };
   }, []);
 
-  const deferredSrc: string | null = React.useDeferredValue(codeComponentSrc);
-
-  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(deferredSrc);
+  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(codeComponentSrc);
 
   const CodeComponent: React.ComponentType<any> = useLatest(GeneratedComponent) || Noop;
 
   return (
     <React.Suspense fallback={null}>
       <ErrorBoundary
-        resetKeys={[deferredSrc]}
+        resetKeys={[CodeComponent]}
         fallbackRender={({ error: runtimeError }) => (
           <React.Fragment>{runtimeError.message}</React.Fragment>
         )}

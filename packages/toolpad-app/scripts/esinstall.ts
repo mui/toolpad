@@ -33,6 +33,7 @@ async function main() {
       '@mui/material/utils',
       '@mui/material/styles',
       '@mui/material/Button',
+      '@mui/material/CheckBox',
       '@mui/material/CircularProgress',
       '@mui/lab',
       '@mui/icons-material/Error',

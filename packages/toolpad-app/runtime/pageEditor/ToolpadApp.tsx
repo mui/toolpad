@@ -517,8 +517,8 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   const queryClient = React.useMemo(() => new QueryClient(), []);
 
   const instantiatedComponents = React.useMemo(
-    () => instantiateComponents(components),
-    [components],
+    () => instantiateComponents(dom, components),
+    [dom, components],
   );
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);

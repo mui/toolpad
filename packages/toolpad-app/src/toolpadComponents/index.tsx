@@ -1,11 +1,13 @@
 import { ToolpadComponent } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
-import { VersionOrPreview } from '../types';
+import { NodeId, VersionOrPreview } from '../types';
 
 export interface ToolpadComponentDefinition {
   displayName: string;
-  importedModule: string;
-  importedName: string;
+  importedModule?: string;
+  importedName?: string;
+  builtin?: string;
+  codeComponentId?: NodeId;
 }
 
 export type ToolpadComponentDefinitions = Record<string, ToolpadComponentDefinition | undefined>;
@@ -21,6 +23,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'PageRow',
       importedModule: '@mui/toolpad-components',
       importedName: 'PageRow',
+      builtin: 'PageRow',
     },
   ],
   [
@@ -29,6 +32,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Stack',
       importedModule: '@mui/toolpad-components',
       importedName: 'Stack',
+      builtin: 'Stack',
     },
   ],
   [
@@ -37,6 +41,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Button',
       importedModule: '@mui/toolpad-components',
       importedName: 'Button',
+      builtin: 'Button',
     },
   ],
   [
@@ -45,6 +50,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Image',
       importedModule: '@mui/toolpad-components',
       importedName: 'Image',
+      builtin: 'Image',
     },
   ],
   [
@@ -53,6 +59,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'DataGrid',
       importedModule: '@mui/toolpad-components',
       importedName: 'DataGrid',
+      builtin: 'DataGrid',
     },
   ],
   [
@@ -61,6 +68,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Container',
       importedModule: '@mui/toolpad-components',
       importedName: 'Container',
+      builtin: 'Container',
     },
   ],
   [
@@ -69,6 +77,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'TextField',
       importedModule: '@mui/toolpad-components',
       importedName: 'TextField',
+      builtin: 'TextField',
     },
   ],
   [
@@ -77,6 +86,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Typography',
       importedModule: '@mui/toolpad-components',
       importedName: 'Typography',
+      builtin: 'Typography',
     },
   ],
   [
@@ -85,6 +95,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Select',
       importedModule: '@mui/toolpad-components',
       importedName: 'Select',
+      builtin: 'Select',
     },
   ],
   [
@@ -93,6 +104,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'Paper',
       importedModule: '@mui/toolpad-components',
       importedName: 'Paper',
+      builtin: 'Paper',
     },
   ],
   [
@@ -101,6 +113,7 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       displayName: 'CustomLayout',
       importedModule: '@mui/toolpad-components',
       importedName: 'CustomLayout',
+      builtin: 'CustomLayout',
     },
   ],
 ]);
@@ -116,6 +129,7 @@ function createCodeComponent(
       version,
     )}/${encodeURIComponent(domNode.id)}`,
     importedName: 'default',
+    codeComponentId: domNode.id,
   };
 }
 

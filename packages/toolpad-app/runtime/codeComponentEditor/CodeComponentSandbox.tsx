@@ -1,12 +1,8 @@
 import { styled } from '@mui/material';
 import * as React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { transform } from 'sucrase';
-import * as ReactIs from 'react-is';
 import AppThemeProvider from '../pageEditor/AppThemeProvider';
-import CodeComponentDev from './CodeComponentDev';
-
-const EXPERIMENTAL_COMMONJS_COMPONENTS = false;
+import createCodeComponent from './createCodeComponent';
 
 export interface CodeComponentSandboxBridge {
   updateCodeComponent: (newNode: string) => void;
@@ -20,33 +16,6 @@ declare global {
 }
 
 const CodeComponentSandboxRoot = styled('div')({});
-
-async function createCodeComponent(src: string): Promise<React.ComponentType> {
-  const { code } = transform(src, {
-    transforms: ['typescript', 'jsx'],
-  });
-
-  const importUrl = URL.createObjectURL(
-    new Blob([code], {
-      type: 'application/javascript',
-    }),
-  );
-
-  let mod;
-  try {
-    mod = await import(importUrl);
-  } finally {
-    URL.revokeObjectURL(importUrl);
-  }
-
-  const Component: unknown = mod.default;
-
-  if (!ReactIs.isValidElementType(Component) || typeof Component === 'string') {
-    throw new Error(`No React Component exported.`);
-  }
-
-  return Component;
-}
 
 interface CodeComponentProps<P> {
   src: string;
@@ -117,12 +86,7 @@ export default function CodeComponentSandbox() {
       >
         <CodeComponentSandboxRoot>
           <AppThemeProvider node={null}>
-            {/* eslint-disable-next-line no-nested-ternary */}
-            {EXPERIMENTAL_COMMONJS_COMPONENTS ? (
-              <CodeComponentDev code={codeComponentSrc || ''} props={{}} />
-            ) : deferredSrc ? (
-              <CodeComponent src={deferredSrc} props={{}} />
-            ) : null}
+            {deferredSrc ? <CodeComponent src={deferredSrc} props={{}} /> : null}
           </AppThemeProvider>
         </CodeComponentSandboxRoot>
       </ErrorBoundary>

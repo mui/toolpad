@@ -45,11 +45,6 @@ export type BindableAttrValues<P> = {
 
 export type SlotType = 'single' | 'multiple';
 
-export interface OnChangeHandler {
-  params: string[];
-  valueGetter: string;
-}
-
 export interface ValueTypeBase {
   type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'function';
 }
@@ -106,7 +101,8 @@ export interface ArgControlSpec {
     | 'GridColumns' // GridColumns specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
-    | 'function';
+    | 'function'
+    | 'RowIdFieldSelect'; // Row id field specialized select
 }
 
 type PrimitiveValueType =
@@ -145,8 +141,10 @@ export interface ArgTypeDefinition {
   onChangeProp?: string;
   /**
    * Provides a way to manipulate the value from the onChange event before it is assigned to state.
+   * @param {...any} params params for the function assigned to [onChangeProp]
+   * @returns {any} a value for the controlled prop
    */
-  onChangeHandler?: OnChangeHandler;
+  onChangeHandler?: (...params: any[]) => unknown;
 }
 
 export type ArgTypeDefinitions<P = any> = {
@@ -189,12 +187,16 @@ export interface ComponentConfig<P> {
    * Designates a property as "the error property". If Toolpad detects an error
    * on any of the inputs, it will forward it to this property.
    */
-  errorProp?: string;
+  errorProp?: keyof P & string;
+  /**
+   * Configures which properties result in propagating loading state to `loadingProp`.
+   */
+  loadingPropSource?: (keyof P & string)[];
   /**
    * Designates a property as "the loading property". If Toolpad detects any of the
    * inputs is still loading it will set this property to true
    */
-  loadingProp?: string;
+  loadingProp?: keyof P & string;
   /**
    * Describes the individual properties for this component
    */

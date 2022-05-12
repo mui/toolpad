@@ -75,7 +75,6 @@ export default function CodeComponentSandbox() {
     // eslint-disable-next-line no-underscore-dangle
     window.__CODE_COMPONENT_SANDBOX_BRIDGE__ = {
       updateSandbox: (updates) => {
-        console.log(updates);
         setCodeComponentSrc(updates.src);
         setThemeNode(updates.theme);
       },
@@ -99,8 +98,6 @@ export default function CodeComponentSandbox() {
   const { Component: GeneratedComponent, error: compileError } = useCodeComponent(deferredSrc);
 
   const CodeComponent: React.ComponentType<any> = useLatest(GeneratedComponent) || Noop;
-
-  console.log(themeNode);
 
   return (
     <React.Suspense fallback={null}>

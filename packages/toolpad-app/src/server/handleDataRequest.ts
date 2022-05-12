@@ -36,7 +36,7 @@ export default async (
     );
     res.json({
       data: await evalExpression(
-        `${api.attributes.transform.value}(${JSON.stringify(apiResult.data)})`,
+        `${api.attributes.transform?.value}(${JSON.stringify(apiResult.data)})`,
       ),
     });
   }

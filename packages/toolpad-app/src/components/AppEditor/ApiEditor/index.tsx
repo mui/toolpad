@@ -68,15 +68,8 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
 
   const debouncedPreviewApi = useDebounced(previewApi, 250);
 
-  const previewQuery = useQuery(
-    ['api', debouncedPreviewApi],
-    async () => client.query.execApi(appId, debouncedPreviewApi, {}),
-    {
-      onSuccess: () => {
-        responseDiffRef.current = true;
-        return null;
-      },
-    },
+  const previewQuery = useQuery(['api', debouncedPreviewApi], async () =>
+    client.query.execApi(appId, debouncedPreviewApi, {}),
   );
 
   const queryEditorApi = React.useMemo(() => {

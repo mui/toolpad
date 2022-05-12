@@ -35,7 +35,6 @@ async function main() {
       '@mui/material/styles',
       '@mui/material/Button',
       '@mui/material/CircularProgress',
-      '@mui/material/CheckBox',
       '@mui/lab',
       '@mui/icons-material/Error',
       'quickjs-emscripten',

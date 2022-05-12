@@ -16,7 +16,6 @@ async function createRequire() {
       ['@mui/toolpad-core', import(`@mui/toolpad-core`)],
       ['@mui/material', import('@mui/material')],
       ['@mui/material/Button', import('@mui/material/Button')],
-      ['@mui/material/CheckBox', import('@mui/material/CheckBox')],
       // ... (TODO)
     ]),
   );

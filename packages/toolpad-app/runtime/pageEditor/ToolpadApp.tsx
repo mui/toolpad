@@ -475,6 +475,38 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
+function instantiateCodeComponent(src: string): ToolpadComponent {
+  let ResolvedComponent: ToolpadComponent;
+
+  const LazyComponent = React.lazy(async () => {
+    let ImportedComponent: ToolpadComponent = createComponent(() => null);
+    ImportedComponent = await createCodeComponent(src);
+
+    ResolvedComponent.defaultProps = ImportedComponent.defaultProps;
+
+    const importedConfig = ImportedComponent[TOOLPAD_COMPONENT];
+
+    // We update the componentConfig after the component is loaded
+    if (importedConfig) {
+      ResolvedComponent[TOOLPAD_COMPONENT] = importedConfig;
+    }
+
+    return { default: ImportedComponent };
+  });
+
+  const LazyWrapper = React.forwardRef((props, ref) => (
+    // @ts-expect-error Need to update @types/react to > 18
+    <LazyComponent ref={ref} {...props} />
+  ));
+
+  // We start with a lazy component with default argTypes
+  ResolvedComponent = createComponent(LazyWrapper);
+
+  return ResolvedComponent;
+}
+
+const CODE_COMPONENTS_CACHE = new Map<string, ToolpadComponent>();
+
 export interface ToolpadAppProps {
   basename: string;
   appId: string;
@@ -485,7 +517,7 @@ export interface ToolpadAppProps {
 
 export default function ToolpadApp({ basename, appId, version, dom, components }: ToolpadAppProps) {
   const root = appDom.getApp(dom);
-  const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
+  const { pages = [], themes = [], codeComponents = [] } = appDom.getChildNodes(dom, root);
 
   const theme = themes.length > 0 ? themes[0] : null;
 
@@ -493,7 +525,6 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
 
   const queryClient = React.useMemo(() => new QueryClient(), []);
 
-  const codeComponentCache = React.useRef(new Map<string, ToolpadComponent>());
   const getComponent = React.useCallback(
     (id: string): ToolpadComponent => {
       const def = components[id];
@@ -513,45 +544,19 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
       }
 
       if (def?.codeComponentId) {
-        let ResolvedComponent: ToolpadComponent;
         const componentId = def.codeComponentId;
-
         const codeComponentNode = appDom.getNode(dom, componentId, 'codeComponent');
         const src = codeComponentNode.attributes.code.value;
 
-        const CachedComponent = codeComponentCache.current.get(src);
+        const CachedComponent = CODE_COMPONENTS_CACHE.get(src);
 
         if (CachedComponent) {
           return CachedComponent;
         }
 
-        const LazyComponent = React.lazy(async () => {
-          let ImportedComponent: ToolpadComponent = createComponent(() => null);
-          ImportedComponent = await createCodeComponent(codeComponentNode.attributes.code.value);
+        const ResolvedComponent = instantiateCodeComponent(src);
 
-          ResolvedComponent.defaultProps = ImportedComponent.defaultProps;
-
-          const importedConfig = ImportedComponent[TOOLPAD_COMPONENT];
-
-          // We update the componentConfig after the component is loaded
-          if (importedConfig) {
-            ResolvedComponent[TOOLPAD_COMPONENT] = importedConfig;
-          }
-
-          return { default: ImportedComponent };
-        });
-
-        const LazyWrapper = React.forwardRef((props, ref) => (
-          // @ts-expect-error Need to update @types/react to > 18
-          <LazyComponent ref={ref} {...props} />
-        ));
-
-        // We start with a lazy component with default argTypes
-        ResolvedComponent = createComponent(LazyWrapper);
-
-        ResolvedComponent.displayName = def.codeComponentId;
-
-        codeComponentCache.current.set(src, ResolvedComponent);
+        CODE_COMPONENTS_CACHE.set(src, ResolvedComponent);
 
         return ResolvedComponent;
       }
@@ -560,6 +565,19 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
     },
     [dom, components],
   );
+
+  React.useEffect(() => {
+    // Clean up code components cache
+    const currentCachedSrcs = new Set<string>(CODE_COMPONENTS_CACHE.keys());
+    for (const codeComponent of codeComponents) {
+      const src = codeComponent.attributes.code.value;
+      currentCachedSrcs.delete(src);
+    }
+
+    for (const src of currentCachedSrcs) {
+      CODE_COMPONENTS_CACHE.delete(src);
+    }
+  }, [codeComponents]);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 

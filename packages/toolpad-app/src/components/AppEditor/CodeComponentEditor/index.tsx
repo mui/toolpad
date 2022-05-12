@@ -66,10 +66,11 @@ function renderSandboxHtml() {
 }
 
 interface CodeComponentEditorContentProps {
+  theme?: appDom.ThemeNode;
   codeComponentNode: appDom.CodeComponentNode;
 }
 
-function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
+function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
 
   const [input, setInput] = React.useState<string>(codeComponentNode.attributes.code.value);
@@ -177,20 +178,22 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     // eslint-disable-next-line no-underscore-dangle
     if (frameWindow.__CODE_COMPONENT_SANDBOX_READY__) {
       // eslint-disable-next-line no-underscore-dangle
-      frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateCodeComponent(
-        input,
-      );
+      frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateSandbox({
+        src: input,
+        theme,
+      });
       // eslint-disable-next-line no-underscore-dangle
     } else if (typeof frameWindow.__CODE_COMPONENT_SANDBOX_READY__ !== 'function') {
       // eslint-disable-next-line no-underscore-dangle
       frameWindow.__CODE_COMPONENT_SANDBOX_READY__ = () => {
         // eslint-disable-next-line no-underscore-dangle
-        frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateCodeComponent(
-          input,
-        );
+        frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateSandbox({
+          src: input,
+          theme,
+        });
       };
     }
-  }, [input]);
+  }, [input, theme]);
 
   return (
     <Stack sx={{ height: '100%' }}>
@@ -230,8 +233,14 @@ export default function CodeComponentEditor({ appId }: CodeComponentEditorProps)
   const dom = useDom();
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
+  const root = appDom.getApp(dom);
+  const { themes = [] } = appDom.getChildNodes(dom, root);
   return codeComponentNode ? (
-    <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
+    <CodeComponentEditorContent
+      key={nodeId}
+      codeComponentNode={codeComponentNode}
+      theme={themes[0]}
+    />
   ) : (
     <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
   );

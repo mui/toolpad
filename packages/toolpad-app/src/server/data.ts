@@ -368,7 +368,7 @@ export async function execApi<Q>(
       `Unknown connection "${api.attributes.connectionId.value}" for api "${api.id}"`,
     );
   }
-  if (api.attributes.transformEnabled.value) {
+  if (api.attributes.transformEnabled?.value) {
     const apiResult = await dataSource.exec(connection, api.attributes.query.value, params);
     return {
       data: await evalExpression(

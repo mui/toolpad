@@ -1,6 +1,7 @@
 import { styled } from '@mui/material';
 import * as React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import useLatest from '../../src/utils/useLatest';
 import AppThemeProvider from '../pageEditor/AppThemeProvider';
 import createCodeComponent from './createCodeComponent';
 
@@ -17,38 +18,47 @@ declare global {
 
 const CodeComponentSandboxRoot = styled('div')({});
 
-interface CodeComponentProps<P> {
-  src: string;
-  props: P;
-}
+type UseCodeComponent =
+  | {
+      Component?: undefined;
+      error?: undefined;
+    }
+  | {
+      Component: React.ComponentType;
+      error?: undefined;
+    }
+  | {
+      Component?: undefined;
+      error: Error;
+    };
 
-function useCodeComponent(src: string) {
-  const [Component, setComponent] = React.useState<React.ComponentType>();
-  const [error, setError] = React.useState<Error>();
+function useCodeComponent(src: string | null): UseCodeComponent {
+  const [state, setState] = React.useState<UseCodeComponent>({});
 
   React.useEffect(() => {
+    if (!src) {
+      return;
+    }
+
     const startSrc = src;
     createCodeComponent(startSrc)
-      .then((CreatedComponent) => {
+      .then((Component) => {
         if (startSrc === src) {
-          setComponent(() => CreatedComponent);
+          setState({ Component });
         }
       })
-      .catch((creationError: Error) => setError(creationError));
+      .catch((error: Error) => {
+        if (startSrc === src) {
+          setState({ error });
+        }
+      });
   }, [src]);
 
-  return {
-    Component,
-    error,
-  };
+  return state;
 }
 
-function CodeComponent<P>({ src, props }: CodeComponentProps<P>) {
-  const { Component = () => null, error } = useCodeComponent(src);
-  if (error) {
-    throw error;
-  }
-  return <Component {...props} />;
+function Noop() {
+  return null;
 }
 
 export default function CodeComponentSandbox() {
@@ -75,21 +85,27 @@ export default function CodeComponentSandbox() {
     };
   }, []);
 
-  // @ts-expect-error
   const deferredSrc: string | null = React.useDeferredValue(codeComponentSrc);
+
+  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(deferredSrc);
+
+  const CodeComponent: React.ComponentType<any> = useLatest(GeneratedComponent) || Noop;
 
   return (
     <React.Suspense fallback={null}>
       <ErrorBoundary
         resetKeys={[deferredSrc]}
-        fallbackRender={({ error }) => <React.Fragment>{error.message}</React.Fragment>}
+        fallbackRender={({ error: runtimeError }) => (
+          <React.Fragment>{runtimeError.message}</React.Fragment>
+        )}
       >
         <CodeComponentSandboxRoot>
           <AppThemeProvider node={null}>
-            {deferredSrc ? <CodeComponent src={deferredSrc} props={{}} /> : null}
+            <CodeComponent />
           </AppThemeProvider>
         </CodeComponentSandboxRoot>
       </ErrorBoundary>
+      {compileError?.message}
     </React.Suspense>
   );
 }

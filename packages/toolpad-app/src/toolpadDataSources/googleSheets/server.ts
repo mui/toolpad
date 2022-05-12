@@ -23,8 +23,16 @@ import {
  */
 
 function createOAuthClient(): OAuth2Client {
-  if (!config.googleSheetsClientId || !config.googleSheetsClientSecret || !config.externalUrl) {
-    throw new Error('Missing Google Sheets datasource client configuration');
+  if (!config.googleSheetsClientId) {
+    throw new Error('Google Sheets: Missing client ID "TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID"');
+  }
+  if (!config.googleSheetsClientSecret) {
+    throw new Error(
+      'Google Sheets: Missing client secret "TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET"',
+    );
+  }
+  if (!config.externalUrl) {
+    throw new Error('Google Sheets: Missing redirect URL "TOOLPAD_EXTERNAL_URL"');
   }
   return new google.auth.OAuth2(
     config.googleSheetsClientId,

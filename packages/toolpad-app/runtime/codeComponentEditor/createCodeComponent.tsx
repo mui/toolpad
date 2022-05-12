@@ -1,3 +1,4 @@
+import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as ReactIs from 'react-is';
 import { transform } from 'sucrase';
@@ -20,8 +21,6 @@ async function createRequire() {
     ]),
   );
 
-  console.log(modules);
-
   const require = (moduleId: string): unknown => {
     const module = modules.get(moduleId);
     if (module && typeof module === 'object') {
@@ -34,7 +33,14 @@ async function createRequire() {
   return require;
 }
 
-export default async function createCodeComponent(src: string): Promise<React.ComponentType> {
+function ensureToolpadComponent<P>(Component: React.ComponentType<P>): ToolpadComponent<P> {
+  if ((Component as any)[TOOLPAD_COMPONENT]) {
+    return Component as ToolpadComponent<P>;
+  }
+  return createComponent(Component);
+}
+
+export default async function createCodeComponent(src: string): Promise<ToolpadComponent> {
   const compiled = transform(src, {
     transforms: ['jsx', 'typescript', 'imports'],
   });
@@ -66,5 +72,5 @@ export default async function createCodeComponent(src: string): Promise<React.Co
     throw new Error(`No React Component exported.`);
   }
 
-  return Component;
+  return ensureToolpadComponent(Component);
 }

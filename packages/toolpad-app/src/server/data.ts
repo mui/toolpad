@@ -362,17 +362,6 @@ async function applyTransform<Q>(
   };
 }
 
-async function applyTransform<Q>(
-  api: appDom.ApiNode<Q>,
-  result: ApiResult<{}>,
-): Promise<ApiResult<{}>> {
-  return {
-    data: await evalExpression(
-      `${api.attributes.transform?.value}(${JSON.stringify(result.data)})`,
-    ),
-  };
-}
-
 export async function execApi<Q>(
   appId: string,
   api: appDom.ApiNode<Q>,

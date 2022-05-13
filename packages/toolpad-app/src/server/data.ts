@@ -351,6 +351,17 @@ export async function updateConnection(
   return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
 }
 
+async function applyTransform<Q>(
+  api: appDom.ApiNode<Q>,
+  result: ApiResult<{}>,
+): Promise<ApiResult<{}>> {
+  return {
+    data: await evalExpression(
+      `${api.attributes.transform?.value}(${JSON.stringify(result.data)})`,
+    ),
+  };
+}
+
 export async function execApi<Q>(
   appId: string,
   api: appDom.ApiNode<Q>,
@@ -368,15 +379,12 @@ export async function execApi<Q>(
       `Unknown connection "${api.attributes.connectionId.value}" for api "${api.id}"`,
     );
   }
-  if (api.attributes.transformEnabled?.value) {
-    const apiResult = await dataSource.exec(connection, api.attributes.query.value, params);
-    return {
-      data: await evalExpression(
-        `${api.attributes.transform?.value}(${JSON.stringify(apiResult.data)})`,
-      ),
-    };
+  const transformEnabled = api.attributes.transformEnabled?.value;
+  let result = await dataSource.exec(connection, api.attributes.query.value, params);
+  if (transformEnabled) {
+    result = await applyTransform(api, result);
   }
-  return dataSource.exec(connection, api.attributes.query.value, params);
+  return result;
 }
 
 export async function dataSourceFetchPrivate<Q>(

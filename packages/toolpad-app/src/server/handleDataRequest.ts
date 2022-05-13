@@ -28,18 +28,6 @@ export default async (
   const apiNodeId = req.query.queryId as NodeId;
   const dom = await loadVersionedDom(appId, version);
   const api = appDom.getNode(dom, apiNodeId, 'api');
-  if (api.attributes.transformEnabled?.value) {
-    const apiResult = await execApi(
-      appId,
-      api,
-      req.query.params ? JSON.parse(req.query.params as string) : {},
-    );
-    res.json({
-      data: await evalExpression(
-        `${api.attributes.transform?.value}(${JSON.stringify(apiResult.data)})`,
-      ),
-    });
-  }
   res.json(
     await execApi(appId, api, req.query.params ? JSON.parse(req.query.params as string) : {}),
   );

@@ -23,8 +23,16 @@ import {
  */
 
 function createOAuthClient(): OAuth2Client {
-  if (!config.googleSheetsClientId || !config.googleSheetsClientSecret || !config.externalUrl) {
-    throw new Error('Missing Google Sheets datasource client configuration');
+  if (!config.googleSheetsClientId) {
+    throw new Error('Google Sheets: Missing client ID "TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID"');
+  }
+  if (!config.googleSheetsClientSecret) {
+    throw new Error(
+      'Google Sheets: Missing client secret "TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET"',
+    );
+  }
+  if (!config.externalUrl) {
+    throw new Error('Google Sheets: Missing redirect URL "TOOLPAD_EXTERNAL_URL"');
   }
   return new google.auth.OAuth2(
     config.googleSheetsClientId,
@@ -104,7 +112,7 @@ async function execPrivate(
         `${response?.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
       );
     }
-    throw new Error(`Invariant: Failed to fetch "${JSON.stringify(query)}"`);
+    throw new Error(`Google Sheets: Missing spreadsheetId in query`);
   }
   if (query.type === GoogleSheetsPrivateQueryType.FILES_LIST) {
     const driveClient = createDriveClient(client);
@@ -145,9 +153,9 @@ async function execPrivate(
         `${response?.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
       );
     }
-    throw new Error(`Invariant: Failed to fetch "${JSON.stringify(query)}"`);
+    throw new Error(`Google Sheets: Missing spreadsheetId in query`);
   }
-  throw new Error(`Invariant: Unrecognized private query: "${JSON.stringify(query)}"`);
+  throw new Error(`Google Sheets: Unrecognized private query "${JSON.stringify(query)}"`);
 }
 
 /**
@@ -241,6 +249,7 @@ async function handler(
           ],
           state,
           include_granted_scopes: true,
+          prompt: 'consent',
         }),
       );
     }
@@ -250,23 +259,22 @@ async function handler(
         throw new Error(oAuthError);
       }
       const [code] = asArray(req.query.code);
-      return client.getToken(code, async (error, token) => {
-        if (error) {
-          throw new Error(error.message);
-        }
-        if (token) {
-          client.setCredentials(token);
-          await api.updateConnection(appId, {
-            params: client.credentials,
-            id: connectionId,
-          });
-        }
-        return res.redirect(
-          `/_toolpad/app/${encodeURIComponent(appId)}/editor/connections/${encodeURIComponent(
-            connectionId,
-          )}`,
-        );
-      });
+      const { tokens, res: getTokenResponse } = await client.getToken(code);
+      if (!tokens) {
+        throw new Error(`${getTokenResponse?.status}: ${getTokenResponse?.statusText}`);
+      }
+      if (tokens) {
+        client.setCredentials(tokens);
+        await api.updateConnection(appId, {
+          params: client.credentials,
+          id: connectionId,
+        });
+      }
+      return res.redirect(
+        `/_toolpad/app/${encodeURIComponent(appId)}/editor/connections/${encodeURIComponent(
+          connectionId,
+        )}`,
+      );
     }
     return res.status(404).send('No handler exists for given path');
   } catch (e) {

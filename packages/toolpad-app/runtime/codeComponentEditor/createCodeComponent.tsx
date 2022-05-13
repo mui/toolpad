@@ -2,13 +2,14 @@ import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolp
 import * as React from 'react';
 import * as ReactIs from 'react-is';
 import { transform } from 'sucrase';
+import { findImports, isAbsoluteUrl } from '../../src/utils/strings';
 
 async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<string, unknown>> {
   const resolved = await Promise.all(input.values());
   return new Map(Array.from(input.keys(), (key, i) => [key, resolved[i]]));
 }
 
-async function createRequire() {
+async function createRequire(urlImports: string[]) {
   const modules = await resolveValues(
     new Map<string, any>([
       ['react', import('react')],
@@ -16,7 +17,8 @@ async function createRequire() {
       ['@mui/toolpad-core', import(`@mui/toolpad-core`)],
       ['@mui/material', import('@mui/material')],
       ['@mui/material/Button', import('@mui/material/Button')],
-      // ... (TODO)
+      // ... TODO: All @mui/material imports + custom solution for icons
+      ...urlImports.map((url) => [url, import(/* webpackIgnore: true */ url)] as const),
     ]),
   );
 
@@ -40,11 +42,13 @@ function ensureToolpadComponent<P>(Component: React.ComponentType<P>): ToolpadCo
 }
 
 export default async function createCodeComponent(src: string): Promise<ToolpadComponent> {
+  const imports = findImports(src).filter((maybeUrl) => isAbsoluteUrl(maybeUrl));
+
   const compiled = transform(src, {
     transforms: ['jsx', 'typescript', 'imports'],
   });
 
-  const require = await createRequire();
+  const require = await createRequire(imports);
 
   const exports: any = {};
 

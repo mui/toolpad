@@ -147,6 +147,15 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
         typeRoots: ['node_modules/@types'],
       });
 
+      monaco.languages.typescript.typescriptDefaults.addExtraLib(
+        `
+          declare module "https://*" {  
+            var x: any;
+            export = x;
+          }
+        `,
+      );
+
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: false,
         noSyntaxValidation: false,

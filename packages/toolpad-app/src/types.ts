@@ -23,10 +23,6 @@ export interface EditorProps<T> {
   onChange: (newValue: T) => void;
 }
 
-export interface PropControlDefinition<T = any> {
-  Editor: React.FC<EditorProps<T>>;
-}
-
 export type NodeId = Branded<string, 'NodeId'>;
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';

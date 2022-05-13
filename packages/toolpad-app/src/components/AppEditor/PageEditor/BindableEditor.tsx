@@ -60,7 +60,7 @@ export default function BindableEditor<V>({
   const isBindable = !argType.onChangeHandler;
 
   const controlSpec = argType.control ?? getDefaultControl(argType.typeDef);
-  const control = controlSpec ? propertyControls[controlSpec.type] : null;
+  const Control = controlSpec ? propertyControls[controlSpec.type] : null;
 
   const initConstValue = React.useCallback(() => {
     if (value?.type === 'const') {
@@ -78,9 +78,9 @@ export default function BindableEditor<V>({
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="space-between">
-      {control ? (
+      {Control ? (
         <React.Fragment>
-          <control.Editor
+          <Control
             nodeId={nodeId}
             label={label}
             argType={argType}

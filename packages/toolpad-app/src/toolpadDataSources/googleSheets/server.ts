@@ -2,13 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
-import {
-  ApiResult,
-  ServerDataSource,
-  ConnectionStatus,
-  LegacyConnection,
-  CreateHandlerApi,
-} from '../../types';
+import { ApiResult, ServerDataSource, LegacyConnection, CreateHandlerApi } from '../../types';
 import config from '../../server/config';
 import { asArray } from '../../utils/collections';
 import {
@@ -67,20 +61,6 @@ function createSheetsClient(client: OAuth2Client) {
     version: 'v4',
     auth: client,
   });
-}
-
-/**
- * Test function for this connection
- * @param connection  The connection object
- * @returns The connection status
- */
-
-async function test(
-  connection: LegacyConnection<GoogleSheetsConnectionParams>,
-): Promise<ConnectionStatus> {
-  // eslint-disable-next-line no-console
-  console.log(`Testing connection ${JSON.stringify(connection)}`);
-  return { timestamp: Date.now() };
 }
 
 /**
@@ -291,7 +271,6 @@ const dataSource: ServerDataSource<
   GoogleSheetsApiQuery,
   GoogleSheetsPrivateQuery
 > = {
-  test,
   exec,
   execPrivate,
   createHandler: () => handler,

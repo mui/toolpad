@@ -4,7 +4,6 @@ import superjson from 'superjson';
 import {
   getApps,
   createApp,
-  testConnection,
   execApi,
   dataSourceFetchPrivate,
   loadDom,
@@ -151,9 +150,6 @@ const rpcServer = {
     }),
     createDeployment: createMethod<typeof createDeployment>((params) => {
       return createDeployment(...params);
-    }),
-    testConnection: createMethod<typeof testConnection>((params) => {
-      return testConnection(...params);
     }),
     saveDom: createMethod<typeof saveDom>((params) => {
       return saveDom(...params);

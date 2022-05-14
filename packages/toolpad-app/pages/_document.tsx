@@ -19,7 +19,8 @@ export default class MyDocument extends Document {
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: `
-                if (window.location.pathname.startsWith('/app')){ 
+                // Add the data-toolpad-canvas attribute to the canvas iframe element
+                if (window.frameElement?.dataset.toolpadCanvas){ 
                   var script = document.createElement('script');
                   script.type = 'module';
                   script.src = '/reactDevtools/bootstrap.js';

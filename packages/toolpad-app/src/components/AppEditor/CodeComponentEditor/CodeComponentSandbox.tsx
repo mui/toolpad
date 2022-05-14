@@ -61,6 +61,9 @@ export default function CodeComponentSandbox({ themeNode, src }: CodeComponentSa
 
   const CodeComponent: React.ComponentType<any> = useLatest(GeneratedComponent) || Noop;
 
+  // Next.js in dev mode still shows their error overlay, even though there's an error boundary
+  // handling it. https://github.com/vercel/next.js/issues/36908
+
   return (
     <React.Suspense fallback={null}>
       <ErrorBoundary

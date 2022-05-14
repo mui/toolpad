@@ -28,15 +28,12 @@ import {
   Location as RouterLocation,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+import ReactIs from 'react-is';
 import * as appDom from '../../src/appDom';
 import { NodeId, VersionOrPreview } from '../../src/types';
 import { createProvidedContext } from '../../src/utils/react';
 import AppOverview from '../../src/components/AppOverview';
-import {
-  InstantiatedComponent,
-  InstantiatedComponents,
-  ToolpadComponentDefinitions,
-} from '../../src/toolpadComponents';
+import { ToolpadComponentDefinitions } from '../../src/toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import {
   fireEvent,
@@ -49,7 +46,8 @@ import evalJsBindings, {
   buildGlobalScope,
   ParsedBinding,
 } from './evalJsBindings';
-import instantiateComponents from './instantiateComponents';
+import * as builtins from '../components';
+import createCodeComponent from '../codeComponentEditor/createCodeComponent';
 
 const PAGE_ROW_COMPONENT_ID = 'PageRow';
 
@@ -59,7 +57,7 @@ interface AppContext {
 }
 
 const [useComponentsContext, ComponentsContextProvider] =
-  createProvidedContext<InstantiatedComponents>('Components');
+  createProvidedContext<(id: string) => ToolpadComponent>('Components');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useBindingsContext, BindingsContextProvider] =
@@ -69,21 +67,15 @@ const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
     'SetControlledBinding',
   );
 
-function getElmComponent(
-  components: InstantiatedComponents,
-  elm: appDom.ElementNode,
-): InstantiatedComponent & { id: string } {
+function getComponentId(elm: appDom.ElementNode): string {
   const componentId = elm.attributes.component.value;
-  const component = components[componentId];
-  if (!component) {
-    throw new Error(`Rendering unknown component "${componentId}"`);
-  }
-  return { ...component, id: componentId };
+  return componentId;
 }
 
-function useElmToolpadComponent(elm: appDom.ElementNode): InstantiatedComponent {
-  const components = useComponentsContext();
-  return getElmComponent(components, elm);
+function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
+  const getComponent = useComponentsContext();
+  const componentId = elm.attributes.component.value;
+  return getComponent(componentId);
 }
 
 interface RenderedNodeProps {
@@ -93,7 +85,7 @@ interface RenderedNodeProps {
 function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const node = appDom.getNode(dom, nodeId, 'element');
-  const { Component } = useElmToolpadComponent(node);
+  const Component = useElmToolpadComponent(node);
   const { children = [] } = appDom.getChildNodes(dom, node);
   return (
     <NodeRuntimeWrapper nodeId={node.id} componentConfig={Component[TOOLPAD_COMPONENT]}>
@@ -271,7 +263,7 @@ function QueryStateNode({ node }: QueryStateNodeProps) {
 function parseBindings(
   dom: appDom.AppDom,
   page: appDom.PageNode,
-  components: InstantiatedComponents,
+  getComponent: (id: string) => ToolpadComponent<any>,
   location: RouterLocation,
 ) {
   const elements = appDom.getDescendants(dom, page);
@@ -281,7 +273,8 @@ function parseBindings(
 
   for (const elm of elements) {
     if (appDom.isElement(elm)) {
-      const { id: componentId, Component } = getElmComponent(components, elm);
+      const componentId = getComponentId(elm);
+      const Component = getComponent(componentId);
 
       const { argTypes } = Component[TOOLPAD_COMPONENT];
 
@@ -378,11 +371,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const { children = [], queryStates = [] } = appDom.getChildNodes(dom, page);
 
   const location = useLocation();
-  const components = useComponentsContext();
+  const getComponent = useComponentsContext();
 
   const { parsedBindings, controlled } = React.useMemo(
-    () => parseBindings(dom, page, components, location),
-    [components, dom, location, page],
+    () => parseBindings(dom, page, getComponent, location),
+    [getComponent, dom, location, page],
   );
 
   const [pageBindings, setPageBindings] =
@@ -482,6 +475,38 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
+function instantiateCodeComponent(src: string): ToolpadComponent {
+  let ResolvedComponent: ToolpadComponent;
+
+  const LazyComponent = React.lazy(async () => {
+    let ImportedComponent: ToolpadComponent = createComponent(() => null);
+    ImportedComponent = await createCodeComponent(src);
+
+    ResolvedComponent.defaultProps = ImportedComponent.defaultProps;
+
+    const importedConfig = ImportedComponent[TOOLPAD_COMPONENT];
+
+    // We update the componentConfig after the component is loaded
+    if (importedConfig) {
+      ResolvedComponent[TOOLPAD_COMPONENT] = importedConfig;
+    }
+
+    return { default: ImportedComponent };
+  });
+
+  const LazyWrapper = React.forwardRef((props, ref) => (
+    // @ts-expect-error Need to update @types/react to > 18
+    <LazyComponent ref={ref} {...props} />
+  ));
+
+  // We start with a lazy component with default argTypes
+  ResolvedComponent = createComponent(LazyWrapper);
+
+  return ResolvedComponent;
+}
+
+const CODE_COMPONENTS_CACHE = new Map<string, ToolpadComponent>();
+
 export interface ToolpadAppProps {
   basename: string;
   appId: string;
@@ -492,7 +517,7 @@ export interface ToolpadAppProps {
 
 export default function ToolpadApp({ basename, appId, version, dom, components }: ToolpadAppProps) {
   const root = appDom.getApp(dom);
-  const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
+  const { pages = [], themes = [], codeComponents = [] } = appDom.getChildNodes(dom, root);
 
   const theme = themes.length > 0 ? themes[0] : null;
 
@@ -500,10 +525,59 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
 
   const queryClient = React.useMemo(() => new QueryClient(), []);
 
-  const instantiatedComponents = React.useMemo(
-    () => instantiateComponents(components),
-    [components],
+  const getComponent = React.useCallback(
+    (id: string): ToolpadComponent => {
+      const def = components[id];
+
+      if (def?.builtin) {
+        const builtin = (builtins as any)[def.builtin];
+
+        if (!ReactIs.isValidElementType(builtin) || typeof builtin === 'string') {
+          throw new Error(`Invalid builtin component imported "${def.builtin}"`);
+        }
+
+        if (!(builtin as any)[TOOLPAD_COMPONENT]) {
+          throw new Error(`Builtin component "${id}" is missing component config`);
+        }
+
+        return builtin as ToolpadComponent;
+      }
+
+      if (def?.codeComponentId) {
+        const componentId = def.codeComponentId;
+        const codeComponentNode = appDom.getNode(dom, componentId, 'codeComponent');
+        const src = codeComponentNode.attributes.code.value;
+
+        const CachedComponent = CODE_COMPONENTS_CACHE.get(src);
+
+        if (CachedComponent) {
+          return CachedComponent;
+        }
+
+        const ResolvedComponent = instantiateCodeComponent(src);
+
+        CODE_COMPONENTS_CACHE.set(src, ResolvedComponent);
+
+        return ResolvedComponent;
+      }
+
+      throw new Error(`Can't find component for "${id}"`);
+    },
+    [dom, components],
   );
+
+  React.useEffect(() => {
+    // Clean up code components cache
+    const currentCachedSrcs = new Set<string>(CODE_COMPONENTS_CACHE.keys());
+    for (const codeComponent of codeComponents) {
+      const src = codeComponent.attributes.code.value;
+      currentCachedSrcs.delete(src);
+    }
+
+    for (const src of currentCachedSrcs) {
+      CODE_COMPONENTS_CACHE.delete(src);
+    }
+  }, [codeComponents]);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -516,7 +590,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
         <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
           <React.Suspense fallback={<AppLoading />}>
             <JsRuntimeProvider>
-              <ComponentsContextProvider value={instantiatedComponents}>
+              <ComponentsContextProvider value={getComponent}>
                 <AppContextProvider value={appContext}>
                   <QueryClientProvider client={queryClient}>
                     <AppThemeProvider node={theme}>

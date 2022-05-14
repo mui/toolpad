@@ -1,35 +1,18 @@
 import { styled } from '@mui/material';
 import * as React from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import * as appDom from '../../src/appDom';
+import useLatest from '../../src/utils/useLatest';
 import AppThemeProvider from '../pageEditor/AppThemeProvider';
+import createCodeComponent from './createCodeComponent';
 
-interface ErrorBoundaryProps {
-  children?: React.ReactNode;
-}
-
-interface ErrorBoundaryState {
-  error: Error | null;
-}
-
-class ErrorBoundary extends React.Component<ErrorBoundaryProps> {
-  state: ErrorBoundaryState = {
-    error: null,
-  };
-
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
-
-  render() {
-    if (this.state.error) {
-      return <React.Fragment>{this.state.error.message}</React.Fragment>;
-    }
-
-    return this.props.children;
-  }
+interface SandboxUpdate {
+  src: string;
+  theme?: appDom.ThemeNode;
 }
 
 export interface CodeComponentSandboxBridge {
-  updateCodeCompoent: (newNode: string) => void;
+  updateSandbox: (updates: SandboxUpdate) => void;
 }
 
 declare global {
@@ -39,21 +22,62 @@ declare global {
   }
 }
 
+const CodeComponentSandboxRoot = styled('div')({});
+
+type UseCodeComponent =
+  | {
+      Component?: undefined;
+      error?: undefined;
+    }
+  | {
+      Component: React.ComponentType;
+      error?: undefined;
+    }
+  | {
+      Component?: undefined;
+      error: Error;
+    };
+
+function useCodeComponent(src: string | null): UseCodeComponent {
+  const [state, setState] = React.useState<UseCodeComponent>({});
+
+  React.useEffect(() => {
+    if (!src) {
+      return;
+    }
+
+    const startSrc = src;
+    createCodeComponent(startSrc)
+      .then((Component) => {
+        if (startSrc === src) {
+          setState({ Component });
+        }
+      })
+      .catch((error: Error) => {
+        if (startSrc === src) {
+          setState({ error });
+        }
+      });
+  }, [src]);
+
+  return state;
+}
+
 function Noop() {
   return null;
 }
 
-const CodeComponentSandboxRoot = styled('div')({});
-
 export default function CodeComponentSandbox() {
   const [codeComponentSrc, setCodeComponentSrc] = React.useState<string | null>(null);
-  const [Component, setComponent] = React.useState<React.ComponentType>(() => Noop);
-  const [errorBoundaryKey, seterrorBoundaryKey] = React.useState(1);
+  const [themeNode, setThemeNode] = React.useState<appDom.ThemeNode | undefined>();
 
   React.useEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
     window.__CODE_COMPONENT_SANDBOX_BRIDGE__ = {
-      updateCodeCompoent: (component) => setCodeComponentSrc(component),
+      updateSandbox: (updates) => {
+        setCodeComponentSrc(updates.src);
+        setThemeNode(updates.theme);
+      },
     };
     // eslint-disable-next-line no-underscore-dangle
     if (typeof window.__CODE_COMPONENT_SANDBOX_READY__ === 'function') {
@@ -69,32 +93,25 @@ export default function CodeComponentSandbox() {
     };
   }, []);
 
-  React.useEffect(() => {
-    if (!codeComponentSrc) {
-      return () => {};
-    }
+  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(codeComponentSrc);
 
-    const importUrl = URL.createObjectURL(
-      new Blob([codeComponentSrc], {
-        type: 'application/javascript',
-      }),
-    );
-
-    import(importUrl).then((mod) => {
-      setComponent(() => mod.default);
-      seterrorBoundaryKey((key) => key + 1);
-    });
-
-    return () => URL.revokeObjectURL(importUrl);
-  }, [codeComponentSrc]);
+  const CodeComponent: React.ComponentType<any> = useLatest(GeneratedComponent) || Noop;
 
   return (
-    <ErrorBoundary key={errorBoundaryKey}>
-      <CodeComponentSandboxRoot>
-        <AppThemeProvider node={null}>
-          <Component />
-        </AppThemeProvider>
-      </CodeComponentSandboxRoot>
-    </ErrorBoundary>
+    <React.Suspense fallback={null}>
+      <ErrorBoundary
+        resetKeys={[CodeComponent]}
+        fallbackRender={({ error: runtimeError }) => (
+          <React.Fragment>{runtimeError.message}</React.Fragment>
+        )}
+      >
+        <CodeComponentSandboxRoot>
+          <AppThemeProvider node={themeNode}>
+            <CodeComponent />
+          </AppThemeProvider>
+        </CodeComponentSandboxRoot>
+      </ErrorBoundary>
+      {compileError?.message}
+    </React.Suspense>
   );
 }

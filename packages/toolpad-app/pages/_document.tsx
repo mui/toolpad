@@ -15,6 +15,19 @@ export default class MyDocument extends Document {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           />
+          <script
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{
+              __html: `
+                if (window.location.pathname.startsWith('/app')){ 
+                  var script = document.createElement('script');
+                  script.type = 'module';
+                  script.src = '/reactDevtools/bootstrap.js';
+                  document.write(script.outerHTML);
+                }
+              `,
+            }}
+          />
         </Head>
         {/* https://github.com/facebook/react/issues/11538 */}
         <body className="notranslate">

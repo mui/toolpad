@@ -29,27 +29,33 @@ import {
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import ReactIs from 'react-is';
-import * as appDom from '../../src/appDom';
-import { NodeId, VersionOrPreview } from '../../src/types';
-import { createProvidedContext } from '../../src/utils/react';
-import AppOverview from '../../src/components/AppOverview';
-import { ToolpadComponentDefinitions } from '../../src/toolpadComponents';
-import AppThemeProvider from './AppThemeProvider';
 import {
   fireEvent,
   JsRuntimeProvider,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
-} from '../coreRuntime';
+} from '@mui/toolpad-core/runtime';
+import * as builtins from '@mui/toolpad-components';
+import * as appDom from '../appDom';
+import { NodeId, VersionOrPreview } from '../types';
+import { createProvidedContext } from '../utils/react';
+import AppOverview from '../components/AppOverview';
+import { ToolpadComponentDefinitions } from '../toolpadComponents';
+import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   BindingEvaluationResult,
   buildGlobalScope,
   ParsedBinding,
 } from './evalJsBindings';
-import * as builtins from '../components';
-import createCodeComponent from '../codeComponentEditor/createCodeComponent';
+import createCodeComponent from './createCodeComponent';
+import { HTML_ID_APP_ROOT } from '../constants';
 
 const PAGE_ROW_COMPONENT_ID = 'PageRow';
+
+const AppRoot = styled('div')({
+  overflow: 'auto' /* prevents margins from collapsing into root */,
+  minHeight: '100vh',
+});
 
 interface AppContext {
   appId: string;
@@ -584,7 +590,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
   return (
-    <React.Fragment>
+    <AppRoot id={HTML_ID_APP_ROOT}>
       <CssBaseline />
       <ErrorBoundary FallbackComponent={AppError}>
         <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
@@ -626,6 +632,6 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
           </React.Suspense>
         </ResetNodeErrorsKeyProvider>
       </ErrorBoundary>
-    </React.Fragment>
+    </AppRoot>
   );
 }

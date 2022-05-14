@@ -47,7 +47,7 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
       dom,
       version,
       components,
-      basename: `/app/${appId}/${version}`,
+      basename: `/deploy/${appId}`,
     },
   };
 };

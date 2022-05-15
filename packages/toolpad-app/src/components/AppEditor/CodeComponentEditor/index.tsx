@@ -3,16 +3,17 @@ import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
+import ReactDOM from 'react-dom';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
-import getImportMap from '../../../getImportMap';
 import { tryFormat } from '../../../utils/prettier';
-import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from '../../../constants';
-import { escapeHtml } from '../../../utils/strings';
 import useShortcut from '../../../utils/useShortcut';
 import { usePrompt } from '../../../utils/router';
 import NodeNameEditor from '../NodeNameEditor';
+import CodeComponentSandbox from './CodeComponentSandbox';
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -21,48 +22,25 @@ const CanvasFrame = styled('iframe')({
   height: '100%',
 });
 
-function renderSandboxHtml() {
-  const importMap = getImportMap();
-  const serializedImportMap = JSON.stringify(importMap, null, 2);
-  const serializedPreload = Object.values(importMap.imports)
-    .map((url) => `<link rel="modulepreload" href="${escapeHtml(url)}" />`)
-    .join('\n');
+interface FrameContentProps {
+  children: React.ReactElement;
+  document: Document;
+}
 
-  return `
-    <!DOCTYPE html>
-    <html style="position: relative">
-      <head>
-        <meta charset="utf-8" />
-        <meta name="x-data-grid-pro-license" content="${MUI_X_PRO_LICENSE}" />
-        <title>Toolpad</title>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <style>
-          #${HTML_ID_APP_ROOT} {
-            overflow: auto; /* prevents margins from collapsing into root */
-            min-height: 100vh;
-          }
-        </style>
-      </head>
-      <body>
-        <div id="${HTML_ID_APP_ROOT}"></div>
+function FrameContent(props: FrameContentProps) {
+  const { children, document } = props;
 
-        <script type="importmap">
-          ${serializedImportMap}
-        </script>
+  const cache = React.useMemo(
+    () =>
+      createCache({
+        key: `code-component-sandbox`,
+        prepend: true,
+        container: document.head,
+      }),
+    [document],
+  );
 
-        ${serializedPreload}
-
-        <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
-        <script async src="/web_modules/es-module-shims.js" type="module"></script>
-
-        <script type="module" src="/runtime/codeComponentEditor.js"></script>
-      </body>
-    </html>
-  `;
+  return <CacheProvider value={cache}>{children}</CacheProvider>;
 }
 
 interface CodeComponentEditorContentProps {
@@ -171,58 +149,60 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
     [],
   );
 
-  React.useEffect(() => {
-    const frameWindow = frameRef.current?.contentWindow;
-    if (!frameWindow) {
-      return;
-    }
+  const [iframeLoaded, onLoad] = React.useReducer(() => true, false);
 
-    // eslint-disable-next-line no-underscore-dangle
-    if (frameWindow.__CODE_COMPONENT_SANDBOX_READY__) {
-      // eslint-disable-next-line no-underscore-dangle
-      frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateSandbox({
-        src: input,
-        theme,
-      });
-      // eslint-disable-next-line no-underscore-dangle
-    } else if (typeof frameWindow.__CODE_COMPONENT_SANDBOX_READY__ !== 'function') {
-      // eslint-disable-next-line no-underscore-dangle
-      frameWindow.__CODE_COMPONENT_SANDBOX_READY__ = () => {
-        // eslint-disable-next-line no-underscore-dangle
-        frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateSandbox({
-          src: input,
-          theme,
-        });
-      };
+  React.useEffect(() => {
+    const document = frameRef.current?.contentDocument;
+    // When we hydrate the iframe then the load event is already dispatched
+    // once the iframe markup is parsed (maybe later but the important part is
+    // that it happens before React can attach event listeners).
+    // We need to check the readyState of the document once the iframe is mounted
+    // and "replay" the missed load event.
+    // See https://github.com/facebook/react/pull/13862 for ongoing effort in React
+    // (though not with iframes in mind).
+    if (document?.readyState === 'complete' && !iframeLoaded) {
+      onLoad();
     }
-  }, [input, theme]);
+  }, [iframeLoaded]);
+
+  const frameDocument = frameRef.current?.contentDocument;
 
   return (
-    <Stack sx={{ height: '100%' }}>
-      <Toolbar variant="dense" sx={{ mt: 2 }}>
-        <NodeNameEditor node={codeComponentNode} sx={{ maxWidth: 300 }} />
-      </Toolbar>
-      <Toolbar variant="dense">
-        <Button disabled={allChangesAreCommitted} onClick={handleSave}>
-          Update
-        </Button>
-      </Toolbar>
-      <Box flex={1} display="flex">
-        <Box flex={1}>
-          <Editor
-            height="100%"
-            defaultValue={input}
-            onChange={(newValue) => setInput(newValue || '')}
-            path="./component.tsx"
-            language="typescript"
-            onMount={HandleEditorMount}
-          />
+    <React.Fragment>
+      <Stack sx={{ height: '100%' }}>
+        <Toolbar variant="dense" sx={{ mt: 2 }}>
+          <NodeNameEditor node={codeComponentNode} sx={{ maxWidth: 300 }} />
+        </Toolbar>
+        <Toolbar variant="dense">
+          <Button disabled={allChangesAreCommitted} onClick={handleSave}>
+            Update
+          </Button>
+        </Toolbar>
+        <Box flex={1} display="flex">
+          <Box flex={1}>
+            <Editor
+              height="100%"
+              defaultValue={input}
+              onChange={(newValue) => setInput(newValue || '')}
+              path="./component.tsx"
+              language="typescript"
+              onMount={HandleEditorMount}
+            />
+          </Box>
+          <Box sx={{ flex: 1, position: 'relative' }}>
+            <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
+          </Box>
         </Box>
-        <Box sx={{ flex: 1, position: 'relative' }}>
-          <CanvasFrame ref={frameRef} srcDoc={renderSandboxHtml()} title="hello" />
-        </Box>
-      </Box>
-    </Stack>
+      </Stack>
+      {iframeLoaded && frameDocument
+        ? ReactDOM.createPortal(
+            <FrameContent document={frameDocument}>
+              <CodeComponentSandbox themeNode={theme} src={input} />
+            </FrameContent>,
+            frameDocument.body,
+          )
+        : null}
+    </React.Fragment>
   );
 }
 

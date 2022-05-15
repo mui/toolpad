@@ -2,7 +2,7 @@ import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolp
 import * as React from 'react';
 import * as ReactIs from 'react-is';
 import { transform } from 'sucrase';
-import { findImports, isAbsoluteUrl } from '../../src/utils/strings';
+import { findImports, isAbsoluteUrl } from '../utils/strings';
 
 async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<string, unknown>> {
   const resolved = await Promise.all(input.values());

@@ -79,6 +79,8 @@ export default function EditorCanvasHost({
         ref={frameRef}
         onLoad={handleLoad}
         src={`/app/${appId}/preview/pages/${pageNodeId}`}
+        // Used by the runtime to know when to load react devtools
+        data-toolpad-canvas
       />
     </CanvasRoot>
   );

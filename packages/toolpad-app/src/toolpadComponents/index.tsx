@@ -1,11 +1,11 @@
 import { ToolpadComponent } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
-import { VersionOrPreview } from '../types';
+import { NodeId, VersionOrPreview } from '../types';
 
 export interface ToolpadComponentDefinition {
   displayName: string;
-  importedModule: string;
-  importedName: string;
+  builtin?: string;
+  codeComponentId?: NodeId;
 }
 
 export type ToolpadComponentDefinitions = Record<string, ToolpadComponentDefinition | undefined>;
@@ -15,94 +15,17 @@ export interface InstantiatedComponent extends ToolpadComponentDefinition {
 export type InstantiatedComponents = Record<string, InstantiatedComponent | undefined>;
 
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
-  [
-    'PageRow',
-    {
-      displayName: 'PageRow',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'PageRow',
-    },
-  ],
-  [
-    'Stack',
-    {
-      displayName: 'Stack',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'Stack',
-    },
-  ],
-  [
-    'Button',
-    {
-      displayName: 'Button',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'Button',
-    },
-  ],
-  [
-    'Image',
-    {
-      displayName: 'Image',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'Image',
-    },
-  ],
-  [
-    'DataGrid',
-    {
-      displayName: 'DataGrid',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'DataGrid',
-    },
-  ],
-  [
-    'Container',
-    {
-      displayName: 'Container',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'Container',
-    },
-  ],
-  [
-    'TextField',
-    {
-      displayName: 'TextField',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'TextField',
-    },
-  ],
-  [
-    'Typography',
-    {
-      displayName: 'Typography',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'Typography',
-    },
-  ],
-  [
-    'Select',
-    {
-      displayName: 'Select',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'Select',
-    },
-  ],
-  [
-    'Paper',
-    {
-      displayName: 'Paper',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'Paper',
-    },
-  ],
-  [
-    'CustomLayout',
-    {
-      displayName: 'CustomLayout',
-      importedModule: '@mui/toolpad-components',
-      importedName: 'CustomLayout',
-    },
-  ],
+  ['PageRow', { displayName: 'PageRow', builtin: 'PageRow' }],
+  ['Stack', { displayName: 'Stack', builtin: 'Stack' }],
+  ['Button', { displayName: 'Button', builtin: 'Button' }],
+  ['Image', { displayName: 'Image', builtin: 'Image' }],
+  ['DataGrid', { displayName: 'DataGrid', builtin: 'DataGrid' }],
+  ['Container', { displayName: 'Container', builtin: 'Container' }],
+  ['TextField', { displayName: 'TextField', builtin: 'TextField' }],
+  ['Typography', { displayName: 'Typography', builtin: 'Typography' }],
+  ['Select', { displayName: 'Select', builtin: 'Select' }],
+  ['Paper', { displayName: 'Paper', builtin: 'Paper' }],
+  ['CustomLayout', { displayName: 'CustomLayout', builtin: 'CustomLayout' }],
 ]);
 
 function createCodeComponent(
@@ -112,10 +35,7 @@ function createCodeComponent(
 ): ToolpadComponentDefinition {
   return {
     displayName: domNode.name,
-    importedModule: `/api/components/${encodeURIComponent(appId)}/${encodeURIComponent(
-      version,
-    )}/${encodeURIComponent(domNode.id)}`,
-    importedName: 'default',
+    codeComponentId: domNode.id,
   };
 }
 

@@ -2,10 +2,10 @@ import React from 'react';
 import { render, waitFor as waitForOrig, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LiveBindings } from '@mui/toolpad-core';
+import { setEventHandler } from '@mui/toolpad-core/runtime';
 import ToolpadApp from './ToolpadApp';
-import * as appDom from '../../src/appDom';
-import { getToolpadComponents } from '../../src/toolpadComponents';
-import { setEventHandler } from '../coreRuntime';
+import * as appDom from '../appDom';
+import { getToolpadComponents } from '../toolpadComponents';
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>

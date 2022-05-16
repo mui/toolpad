@@ -14,6 +14,7 @@ import useShortcut from '../../../utils/useShortcut';
 import { usePrompt } from '../../../utils/router';
 import NodeNameEditor from '../NodeNameEditor';
 import CodeComponentSandbox from './CodeComponentSandbox';
+import usePageTitle from '../../../utils/usePageTitle';
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -56,6 +57,8 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
+
+  usePageTitle(`${codeComponentNode.name} | Toolpad editor`);
 
   const updateInputExtern = React.useCallback((newInput) => {
     const editor = editorRef.current;

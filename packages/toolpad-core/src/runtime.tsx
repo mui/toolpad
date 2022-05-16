@@ -1,5 +1,5 @@
 import * as React from 'react';
-import ErrorIcon from '@mui/icons-material/Error';
+import { Error as ErrorIcon } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
@@ -110,7 +110,6 @@ function NodeFiberHost({ children }: NodeFiberHostProps) {
 
 export function NodeRuntimeWrapper({ nodeId, componentConfig, children }: NodeRuntimeWrapperProps) {
   const resetNodeErrorsKey = React.useContext(ResetNodeErrorsKeyContext);
-
   return (
     <ErrorBoundary
       resetKeys={[resetNodeErrorsKey]}

@@ -486,7 +486,13 @@ function instantiateCodeComponent(src: string): ToolpadComponent {
 
   const LazyComponent = React.lazy(async () => {
     let ImportedComponent: ToolpadComponent = createComponent(() => null);
-    ImportedComponent = await createCodeComponent(src);
+    try {
+      ImportedComponent = await createCodeComponent(src);
+    } catch (error) {
+      ImportedComponent = createComponent(() => {
+        throw error;
+      });
+    }
 
     ResolvedComponent.defaultProps = ImportedComponent.defaultProps;
 

@@ -91,14 +91,12 @@ export default function Editor() {
   );
 
   return (
-    <React.Suspense fallback="kjdh">
-      <JsRuntimeProvider>
-        <AppEditorContextprovider value={appContextValue}>
-          <DomProvider appId={appId}>
-            <EditorContent appId={appId} />
-          </DomProvider>
-        </AppEditorContextprovider>
-      </JsRuntimeProvider>
-    </React.Suspense>
+    <JsRuntimeProvider>
+      <AppEditorContextprovider value={appContextValue}>
+        <DomProvider appId={appId}>
+          <EditorContent appId={appId} />
+        </DomProvider>
+      </AppEditorContextprovider>
+    </JsRuntimeProvider>
   );
 }

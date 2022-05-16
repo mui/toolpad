@@ -1,5 +1,5 @@
 import { BindableAttrValue } from '@mui/toolpad-core';
-import { ConnectionStatus, ServerDataSource, ApiResult } from '../../types';
+import { ServerDataSource, ApiResult } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';
 import evalExpression from '../../server/evalExpression';
@@ -29,11 +29,6 @@ async function resolveBindableString(
   );
 }
 
-async function test(): Promise<ConnectionStatus> {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return { timestamp: Date.now() };
-}
-
 async function exec(
   connection: RestConnectionParams,
   fetchQuery: FetchQuery,
@@ -50,7 +45,6 @@ async function exec(
 }
 
 const dataSource: ServerDataSource<{}, FetchQuery, any> = {
-  test,
   exec,
 };
 

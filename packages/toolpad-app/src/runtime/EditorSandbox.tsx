@@ -1,8 +1,8 @@
 import * as React from 'react';
 import ToolpadApp from './ToolpadApp';
-import * as appDom from '../../src/appDom';
-import { VersionOrPreview } from '../../src/types';
-import { ToolpadComponentDefinitions } from '../../src/toolpadComponents';
+import * as appDom from '../appDom';
+import { VersionOrPreview } from '../types';
+import { ToolpadComponentDefinitions } from '../toolpadComponents';
 
 export interface ToolpadBridge {
   updateDom(newDom: appDom.AppDom): void;

@@ -45,11 +45,6 @@ export type BindableAttrValues<P> = {
 
 export type SlotType = 'single' | 'multiple';
 
-export interface OnChangeHandler {
-  params: string[];
-  valueGetter: string;
-}
-
 export interface ValueTypeBase {
   type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'function';
 }
@@ -146,8 +141,10 @@ export interface ArgTypeDefinition {
   onChangeProp?: string;
   /**
    * Provides a way to manipulate the value from the onChange event before it is assigned to state.
+   * @param {...any} params params for the function assigned to [onChangeProp]
+   * @returns {any} a value for the controlled prop
    */
-  onChangeHandler?: OnChangeHandler;
+  onChangeHandler?: (...params: any[]) => unknown;
 }
 
 export type ArgTypeDefinitions<P = any> = {

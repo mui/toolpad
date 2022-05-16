@@ -22,10 +22,7 @@ export default createComponent(
       value: {
         typeDef: { type: 'string' },
         onChangeProp: 'onChange',
-        onChangeHandler: {
-          params: ['event'],
-          valueGetter: 'event.target.value',
-        },
+        onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
       },
       sx: {
         typeDef: { type: 'object' },

@@ -788,6 +788,7 @@ export function createRenderTree(dom: AppDom): AppDom {
     'query',
     'derivedState',
     'theme',
+    'codeComponent',
   ]);
   return {
     ...dom,

@@ -125,7 +125,6 @@ export interface ClientDataSource<P = {}, Q = {}, PQ = {}> {
 }
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
-  test: (connection: LegacyConnection<P>) => Promise<ConnectionStatus>;
   // Execute a private query on this connection, intended for editors only
   execPrivate?: (connection: LegacyConnection<P>, query: PQ) => Promise<PrivateApiResult<any>>;
   // Execute a query on this connection, intended for viewers

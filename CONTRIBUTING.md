@@ -16,13 +16,13 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 1. Start a local database:
 
    ```sh
-   docker-compose up -d
+   docker-compose -f ./docker-compose.dev.yml up -d
    ```
 
    You can skip this step if you already have a development database available by other means. Use the following command to stop the running container:
 
    ```sh
-   docker-compose down
+   docker-compose -f ./docker-compose.dev.yml down
    ```
 
 1. Install dependencies and start building the project in watch mode:

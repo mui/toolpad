@@ -4,7 +4,7 @@ previewsExpireAfterDays: 3
 
 services:
   - type: web
-    name: toolpad2
+    name: toolpad-app
     env: docker
     dockerfilePath: ./docker/images/toolpad/Dockerfile
     dockerContext: ./

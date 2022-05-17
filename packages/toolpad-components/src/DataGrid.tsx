@@ -10,6 +10,7 @@ import {
   useGridApiContext,
   gridColumnsTotalWidthSelector,
   gridColumnPositionsSelector,
+  gridDensityRowHeightSelector,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
@@ -38,8 +39,7 @@ function SkeletonLoadingOverlay() {
   const dimensions = apiRef.current?.getRootDimensions();
   const viewportHeight = dimensions?.viewportInnerSize.height ?? 0;
 
-  // @ts-expect-error Function signature expects to be called with parameters, but the implementation suggests otherwise
-  const rowHeight = apiRef.current.unstable_getRowHeight();
+  const rowHeight = gridDensityRowHeightSelector(apiRef);
   const skeletonRowsCount = Math.ceil(viewportHeight / rowHeight);
 
   const totalWidth = gridColumnsTotalWidthSelector(apiRef);

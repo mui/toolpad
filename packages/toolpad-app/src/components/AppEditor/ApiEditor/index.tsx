@@ -93,13 +93,16 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
     [apiNode, domApi],
   );
 
-  const handleTransformFnChange = (newValue: string) => {
+  const handleTransformFnChange = React.useCallback((newValue: string) => {
     setTransform(newValue);
-  };
+  }, []);
 
-  const handleTransformEnabledChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTransformEnabled(event.target.checked);
-  };
+  const handleTransformEnabledChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setTransformEnabled(event.target.checked);
+    },
+    [],
+  );
 
   const handleSave = React.useCallback(() => {
     (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {

@@ -61,7 +61,6 @@ export default function EditorCanvasHost({
 
     // eslint-disable-next-line no-underscore-dangle
     if (frameWindow.__TOOLPAD_READY__ === true) {
-      // eslint-disable-next-line no-underscore-dangle
       onReadyRef.current?.(frameWindow);
       // eslint-disable-next-line no-underscore-dangle
     } else if (typeof frameWindow.__TOOLPAD_READY__ !== 'function') {

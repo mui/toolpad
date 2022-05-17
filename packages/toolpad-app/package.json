@@ -58,7 +58,7 @@
     "import-meta-resolve": "^1.1.1",
     "json-to-ts": "^1.7.0",
     "lodash-es": "^4.17.21",
-    "next": "^12.1.4",
+    "next": "^12.1.6",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.6.2",
     "prisma": "^3.13.0",

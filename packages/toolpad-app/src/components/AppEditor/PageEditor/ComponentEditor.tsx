@@ -67,7 +67,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
 
   return (
     <Stack direction="column" gap={1}>
-      <Typography variant="subtitle1">Component: {component.displayName}</Typography>
+      <Typography variant="subtitle1">Component: {component?.displayName || '<unkown>'}</Typography>
       <Typography variant="subtitle2" sx={{ mb: 2 }}>
         ID: {node.id}
       </Typography>

@@ -488,7 +488,7 @@ function NodeHud({
       })}
     >
       <div draggable className={overlayClasses.selectionHint}>
-        {component?.displayName || '<unkown>'}
+        {component?.displayName || '<unknown>'}
         <DragIndicatorIcon color="inherit" fontSize="small" />
         <IconButton aria-label="Remove element" color="inherit" size="small" onClick={onDelete}>
           <DeleteIcon color="inherit" fontSize="small" />

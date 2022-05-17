@@ -58,12 +58,7 @@ export function getToolpadComponents(
 export function getToolpadComponent(
   components: ToolpadComponentDefinitions,
   componentId: string,
-): ToolpadComponentDefinition {
+): ToolpadComponentDefinition | null {
   const component = components[componentId];
-
-  if (component) {
-    return component;
-  }
-
-  throw new Error(`Invariant: Accessing unknown component "${componentId}"`);
+  return component || null;
 }

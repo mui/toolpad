@@ -9,7 +9,6 @@ import {
   loadDom,
   saveDom,
   createRelease,
-  deleteRelease,
   getReleases,
   getRelease,
   loadReleaseDom,
@@ -144,9 +143,6 @@ const rpcServer = {
     }),
     createRelease: createMethod<typeof createRelease>((params) => {
       return createRelease(...params);
-    }),
-    deleteRelease: createMethod<typeof deleteRelease>((params) => {
-      return deleteRelease(...params);
     }),
     createDeployment: createMethod<typeof createDeployment>((params) => {
       return createDeployment(...params);

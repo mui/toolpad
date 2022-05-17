@@ -1,6 +1,6 @@
 import { TextField } from '@mui/material';
 import * as React from 'react';
-import type { EditorProps, PropControlDefinition } from '../../types';
+import type { EditorProps } from '../../types';
 
 function NumberPropEditor({ label, value, onChange, disabled }: EditorProps<number>) {
   const handleChange = React.useCallback(
@@ -23,8 +23,4 @@ function NumberPropEditor({ label, value, onChange, disabled }: EditorProps<numb
   );
 }
 
-const numberType: PropControlDefinition<number> = {
-  Editor: NumberPropEditor,
-};
-
-export default numberType;
+export default NumberPropEditor;

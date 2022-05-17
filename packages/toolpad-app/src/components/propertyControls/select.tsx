@@ -1,6 +1,6 @@
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import * as React from 'react';
-import type { EditorProps, PropControlDefinition } from '../../types';
+import type { EditorProps } from '../../types';
 
 function SelectPropEditor({ label, argType, value, onChange, disabled }: EditorProps<string>) {
   const id = React.useId();
@@ -33,8 +33,4 @@ function SelectPropEditor({ label, argType, value, onChange, disabled }: EditorP
   );
 }
 
-const SelectType: PropControlDefinition<string> = {
-  Editor: SelectPropEditor,
-};
-
-export default SelectType;
+export default SelectPropEditor;

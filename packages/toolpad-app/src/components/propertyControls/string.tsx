@@ -1,6 +1,6 @@
 import { TextField } from '@mui/material';
 import * as React from 'react';
-import type { EditorProps, PropControlDefinition } from '../../types';
+import type { EditorProps } from '../../types';
 
 function StringPropEditor({ label, value, onChange, disabled }: EditorProps<string>) {
   const handleChange = React.useCallback(
@@ -21,8 +21,4 @@ function StringPropEditor({ label, value, onChange, disabled }: EditorProps<stri
   );
 }
 
-const stringType: PropControlDefinition<string> = {
-  Editor: StringPropEditor,
-};
-
-export default stringType;
+export default StringPropEditor;

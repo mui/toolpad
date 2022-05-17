@@ -6,6 +6,7 @@ import type * as monacoEditor from 'monaco-editor';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
+import { ErrorBoundary } from 'react-error-boundary';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -13,8 +14,14 @@ import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import { usePrompt } from '../../../utils/router';
 import NodeNameEditor from '../NodeNameEditor';
-import CodeComponentSandbox from './CodeComponentSandbox';
 import usePageTitle from '../../../utils/usePageTitle';
+import useLatest from '../../../utils/useLatest';
+import AppThemeProvider from '../../../runtime/AppThemeProvider';
+import useCodeComponent from './useCodeComponent';
+
+function Noop() {
+  return null;
+}
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -170,6 +177,10 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
 
   const frameDocument = frameRef.current?.contentDocument;
 
+  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(input);
+
+  const CodeComponent: React.ComponentType<any> = useLatest(GeneratedComponent) || Noop;
+
   return (
     <React.Fragment>
       <Stack sx={{ height: '100%' }}>
@@ -200,7 +211,19 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
       {iframeLoaded && frameDocument
         ? ReactDOM.createPortal(
             <FrameContent document={frameDocument}>
-              <CodeComponentSandbox themeNode={theme} src={input} />
+              <React.Suspense fallback={null}>
+                <ErrorBoundary
+                  resetKeys={[CodeComponent]}
+                  fallbackRender={({ error: runtimeError }) => (
+                    <React.Fragment>{runtimeError.message}</React.Fragment>
+                  )}
+                >
+                  <AppThemeProvider node={theme}>
+                    <CodeComponent />
+                  </AppThemeProvider>
+                </ErrorBoundary>
+                {compileError?.message}
+              </React.Suspense>
             </FrameContent>,
             frameDocument.body,
           )

@@ -20,21 +20,21 @@ export default async function createRequire(urlImports: string[]) {
   );
 
   const require = (moduleId: string): unknown => {
-    let module = modules.get(moduleId);
+    let esModule = modules.get(moduleId);
 
-    if (!module) {
+    if (!esModule) {
       // Custom solution for icons
       const iconMatch = /^@mui\/icons-material\/(.*)$/.exec(moduleId);
       if (iconMatch) {
         const iconName = iconMatch[1];
         const iconsModule = modules.get('@mui/icons-material');
-        module = { default: (iconsModule as any)[iconName] };
+        esModule = { default: (iconsModule as any)[iconName] };
       }
     }
 
-    if (module && typeof module === 'object') {
+    if (esModule && typeof esModule === 'object') {
       // ESM interop
-      return { ...module, __esModule: true };
+      return { ...esModule, __esModule: true };
     }
 
     throw new Error(`Can't resolve module "${moduleId}"`);

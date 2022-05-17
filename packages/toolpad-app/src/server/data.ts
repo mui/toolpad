@@ -233,12 +233,6 @@ export async function getRelease(appId: string, version: number) {
   });
 }
 
-export async function deleteRelease(appId: string, version: number) {
-  return prisma.release.delete({
-    where: { release_app_constraint: { appId, version } },
-  });
-}
-
 export async function createDeployment(appId: string, version: number) {
   return prisma.deployment.create({
     data: {

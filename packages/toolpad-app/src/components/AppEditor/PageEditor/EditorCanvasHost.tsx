@@ -35,27 +35,40 @@ export default function EditorCanvasHost({
 }: EditorCanvasHostProps) {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
+  const update = React.useCallback(() => {
+    const renderDom = appDom.createRenderTree(dom);
+    // eslint-disable-next-line no-underscore-dangle
+    frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__?.updateDom(renderDom);
+  }, [dom]);
+  React.useEffect(() => update(), [update]);
+
+  const onReadyRef = React.useRef((window: Window) => {
+    update();
+    onLoad?.(window);
+  });
+  React.useEffect(() => {
+    onReadyRef.current = (window: Window) => {
+      update();
+      onLoad?.(window);
+    };
+  }, [update, onLoad]);
+
   React.useEffect(() => {
     const frameWindow = frameRef.current?.contentWindow;
     if (!frameWindow) {
-      return;
+      throw new Error('Iframe ref not attached');
     }
 
-    const renderDom = appDom.createRenderTree(dom);
-
     // eslint-disable-next-line no-underscore-dangle
-    if (frameWindow.__TOOLPAD_READY__) {
+    if (frameWindow.__TOOLPAD_READY__ === true) {
       // eslint-disable-next-line no-underscore-dangle
-      frameWindow.__TOOLPAD_BRIDGE__?.updateDom(renderDom);
+      onReadyRef.current?.(frameWindow);
       // eslint-disable-next-line no-underscore-dangle
     } else if (typeof frameWindow.__TOOLPAD_READY__ !== 'function') {
       // eslint-disable-next-line no-underscore-dangle
-      frameWindow.__TOOLPAD_READY__ = () => {
-        // eslint-disable-next-line no-underscore-dangle
-        frameWindow.__TOOLPAD_BRIDGE__?.updateDom(renderDom);
-      };
+      frameWindow.__TOOLPAD_READY__ = () => onReadyRef.current?.(frameWindow);
     }
-  }, [dom]);
+  }, []);
 
   return (
     <CanvasRoot className={className}>
@@ -73,8 +86,9 @@ export default function EditorCanvasHost({
       </Box>
       <CanvasFrame
         ref={frameRef}
-        onLoad={() => onLoad?.(frameRef.current?.contentWindow!)}
         src={`/app/${appId}/preview/pages/${pageNodeId}`}
+        // Used by the runtime to know when to load react devtools
+        data-toolpad-canvas
       />
     </CanvasRoot>
   );

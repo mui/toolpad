@@ -45,11 +45,6 @@ export type BindableAttrValues<P> = {
 
 export type SlotType = 'single' | 'multiple';
 
-export interface OnChangeHandler {
-  params: string[];
-  valueGetter: string;
-}
-
 export interface ValueTypeBase {
   type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'function';
 }
@@ -106,7 +101,8 @@ export interface ArgControlSpec {
     | 'GridColumns' // GridColumns specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
-    | 'function';
+    | 'function'
+    | 'RowIdFieldSelect'; // Row id field specialized select
 }
 
 type PrimitiveValueType =
@@ -123,15 +119,32 @@ export type PropValueTypes<K extends string = string> = Partial<{
 }>;
 
 export interface ArgTypeDefinition {
+  /**
+   * To be used instead of the property name for UI purposes in the editor.
+   */
   label?: string;
+  /**
+   * Describes the type of the values this property can accept.
+   */
   typeDef: PropValueType;
-  required?: boolean;
-  description?: string;
+  /**
+   * The control to be used to manipulate values for this property from the editor.
+   */
   control?: ArgControlSpec;
+  /**
+   * A description of the property, to be used to supply extra information to the user.
+   */
+  description?: string;
+  /**
+   * The property that is used to control this property.
+   */
   onChangeProp?: string;
-  onChangeHandler?: OnChangeHandler;
-  memoize?: boolean;
-  defaultValueProp?: string;
+  /**
+   * Provides a way to manipulate the value from the onChange event before it is assigned to state.
+   * @param {...any} params params for the function assigned to [onChangeProp]
+   * @returns {any} a value for the controlled prop
+   */
+  onChangeHandler?: (...params: any[]) => unknown;
 }
 
 export type ArgTypeDefinitions<P = any> = {
@@ -170,6 +183,23 @@ export type RuntimeEvent =
     };
 
 export interface ComponentConfig<P> {
+  /**
+   * Designates a property as "the error property". If Toolpad detects an error
+   * on any of the inputs, it will forward it to this property.
+   */
+  errorProp?: keyof P & string;
+  /**
+   * Configures which properties result in propagating loading state to `loadingProp`.
+   */
+  loadingPropSource?: (keyof P & string)[];
+  /**
+   * Designates a property as "the loading property". If Toolpad detects any of the
+   * inputs is still loading it will set this property to true
+   */
+  loadingProp?: keyof P & string;
+  /**
+   * Describes the individual properties for this component
+   */
   argTypes: ArgTypeDefinitions<P>;
 }
 

@@ -13,7 +13,8 @@ async function fetchData(dataUrl: string, queryId: string, params: any) {
 }
 
 export interface UseDataQuery {
-  loading: boolean;
+  isLoading: boolean;
+  isFetching: boolean;
   error: any;
   data: any;
   rows: GridRowsProp;
@@ -21,7 +22,8 @@ export interface UseDataQuery {
 }
 
 export const INITIAL_DATA_QUERY: UseDataQuery = {
-  loading: false,
+  isLoading: false,
+  isFetching: false,
   error: null,
   data: null,
   rows: [],
@@ -32,7 +34,6 @@ const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
 
 export function useDataQuery(
-  setResult: React.Dispatch<React.SetStateAction<UseDataQuery>>,
   dataUrl: string,
   queryId: string | null,
   params: any,
@@ -40,9 +41,10 @@ export function useDataQuery(
     UseQueryOptions<any, unknown, unknown, any[]>,
     'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
   >,
-): void {
+): UseDataQuery {
   const {
-    isLoading: loading,
+    isLoading,
+    isFetching,
     error,
     data: responseData = EMPTY_OBJECT,
     refetch,
@@ -57,16 +59,15 @@ export function useDataQuery(
 
   const result: UseDataQuery = React.useMemo(
     () => ({
-      loading,
+      isLoading,
+      isFetching,
       error,
       data,
       rows,
       refetch,
     }),
-    [loading, error, data, rows, refetch],
+    [isLoading, isFetching, error, data, rows, refetch],
   );
 
-  React.useEffect(() => {
-    setResult(result);
-  }, [setResult, result]);
+  return result;
 }

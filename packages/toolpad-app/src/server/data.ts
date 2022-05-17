@@ -8,7 +8,6 @@ import {
 } from '../../prisma/generated/client';
 import {
   LegacyConnection,
-  ConnectionStatus,
   ServerDataSource,
   ApiResult,
   NodeId,
@@ -21,6 +20,7 @@ import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
+import evalExpression from './evalExpression';
 
 // See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
 function excludeFields<T, K extends (keyof T)[]>(
@@ -151,7 +151,16 @@ export async function createApp(name: string): Promise<App> {
     });
 
     const dom = appDom.createDom();
-    await saveDom(app.id, dom);
+    const appNode = appDom.getApp(dom);
+    const newNode = appDom.createNode(dom, 'connection', {
+      attributes: {
+        dataSource: appDom.createConst('rest'),
+        params: appDom.createSecret({ name: 'rest' }),
+        status: appDom.createConst(null),
+      },
+    });
+    const newDom = await appDom.addNode(dom, newNode, appNode, 'connections');
+    await saveDom(app.id, newDom);
 
     return app;
   });
@@ -342,12 +351,15 @@ export async function updateConnection(
   return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
 }
 
-export async function testConnection(connection: appDom.ConnectionNode): Promise<ConnectionStatus> {
-  const dataSource = serverDataSources[connection.attributes.dataSource.value];
-  if (!dataSource) {
-    return { timestamp: Date.now(), error: `Unknown datasource "${connection.type}"` };
-  }
-  return dataSource.test(fromDomConnection(connection));
+async function applyTransform<Q>(
+  api: appDom.ApiNode<Q>,
+  result: ApiResult<{}>,
+): Promise<ApiResult<{}>> {
+  return {
+    data: await evalExpression(
+      `${api.attributes.transform?.value}(${JSON.stringify(result.data)})`,
+    ),
+  };
 }
 
 export async function execApi<Q>(
@@ -367,8 +379,12 @@ export async function execApi<Q>(
       `Unknown connection "${api.attributes.connectionId.value}" for api "${api.id}"`,
     );
   }
-
-  return dataSource.exec(connection, api.attributes.query.value, params);
+  const transformEnabled = api.attributes.transformEnabled?.value;
+  let result = await dataSource.exec(connection, api.attributes.query.value, params);
+  if (transformEnabled) {
+    result = await applyTransform(api, result);
+  }
+  return result;
 }
 
 export async function dataSourceFetchPrivate<Q>(

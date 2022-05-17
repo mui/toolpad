@@ -1,14 +1,6 @@
 import moviesData from '../../../movies.json';
-import { LegacyConnection, ConnectionStatus, ApiResult, ServerDataSource } from '../../types';
+import { LegacyConnection, ApiResult, ServerDataSource } from '../../types';
 import { MoviesConnectionParams, MoviesQuery, Movie } from './types';
-
-async function test(
-  connection: LegacyConnection<MoviesConnectionParams>,
-): Promise<ConnectionStatus> {
-  console.log(`Testing connection ${JSON.stringify(connection)}`);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return { timestamp: Date.now(), error: 'Failed to connect. (ERR-123)' };
-}
 
 async function exec(
   connection: LegacyConnection<MoviesConnectionParams>,
@@ -23,7 +15,6 @@ async function exec(
 }
 
 const dataSource: ServerDataSource<MoviesConnectionParams, MoviesQuery, Movie[]> = {
-  test,
   exec,
 };
 

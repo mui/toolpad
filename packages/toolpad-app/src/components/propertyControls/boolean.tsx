@@ -1,6 +1,6 @@
 import { Checkbox, FormControlLabel } from '@mui/material';
 import * as React from 'react';
-import type { EditorProps, PropControlDefinition } from '../../types';
+import type { EditorProps } from '../../types';
 
 function BooleanPropEditor({ label, value, onChange, disabled }: EditorProps<boolean>) {
   const handleChange = React.useCallback(
@@ -18,8 +18,4 @@ function BooleanPropEditor({ label, value, onChange, disabled }: EditorProps<boo
   );
 }
 
-const booleanType: PropControlDefinition<boolean> = {
-  Editor: BooleanPropEditor,
-};
-
-export default booleanType;
+export default BooleanPropEditor;

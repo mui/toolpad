@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { createTheme, ThemeOptions, PaletteOptions, Theme, ThemeProvider } from '@mui/material';
 import * as colors from '@mui/material/colors';
-import * as appDom from '../../src/appDom';
-import { AppTheme } from '../../src/types';
+import * as appDom from '../appDom';
+import { AppTheme } from '../types';
 
 export function createThemeOptions(toolpadTheme: AppTheme): ThemeOptions {
   const palette: PaletteOptions = {};

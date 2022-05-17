@@ -11,17 +11,16 @@ import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
 export interface EditorProps<T> {
-  nodeId: NodeId;
-  propName: string;
+  /**
+   * @deprecated
+   * `nodeId` is only needed for very specific editors. Maybe this rather belongs in some context?
+   */
+  nodeId?: NodeId;
   label: string;
   argType: ArgTypeDefinition;
   disabled?: boolean;
   value: T | undefined;
   onChange: (newValue: T) => void;
-}
-
-export interface PropControlDefinition<T = any> {
-  Editor: React.FC<EditorProps<T>>;
 }
 
 export type NodeId = Branded<string, 'NodeId'>;
@@ -101,6 +100,7 @@ export interface QueryEditorApi<PQ> {
 
 export interface QueryEditorProps<Q, PQ = {}> extends WithControlledProp<Q> {
   api: QueryEditorApi<PQ>;
+  globalScope: Record<string, any>;
 }
 
 export type QueryEditor<Q = {}, PQ = {}> = React.FC<QueryEditorProps<Q, PQ>>;
@@ -121,7 +121,6 @@ export interface ClientDataSource<P = {}, Q = {}, PQ = {}> {
 }
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
-  test: (connection: LegacyConnection<P>) => Promise<ConnectionStatus>;
   // Execute a private query on this connection, intended for editors only
   execPrivate?: (connection: LegacyConnection<P>, query: PQ) => Promise<PrivateApiResult<any>>;
   // Execute a query on this connection, intended for viewers

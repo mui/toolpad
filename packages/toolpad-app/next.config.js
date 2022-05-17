@@ -18,39 +18,12 @@ module.exports = {
     return config;
   },
 
-  async rewrites() {
-    return [
-      {
-        source: '/deploy/:appId/:path*',
-        destination: '/api/deploy/:appId/:path*',
-      },
-      {
-        source: '/app/:appId/:path*',
-        destination: '/api/app/:appId/:path*',
-      },
-    ];
-  },
-
   async redirects() {
     return [
       {
         source: '/release/:path*',
         destination: '/app/:path*',
         permanent: true,
-      },
-    ];
-  },
-
-  async headers() {
-    return [
-      {
-        source: '/_next/static/chunks/:path*',
-        headers: [
-          {
-            key: 'service-worker-allowed',
-            value: '/',
-          },
-        ],
       },
     ];
   },

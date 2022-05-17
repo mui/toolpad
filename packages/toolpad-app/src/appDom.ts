@@ -82,6 +82,8 @@ export interface ApiNode<Q = unknown> extends AppDomNodeBase {
     readonly connectionId: ConstantAttrValue<string>;
     readonly dataSource: ConstantAttrValue<string>;
     readonly query: ConstantAttrValue<Q>;
+    readonly transform?: ConstantAttrValue<string>;
+    readonly transformEnabled?: ConstantAttrValue<boolean>;
   };
 }
 
@@ -746,7 +748,15 @@ export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
  * TODO: Would it make sense to create a separate datastructure that represents the render tree?
  */
 export function createRenderTree(dom: AppDom): AppDom {
-  const frontendNodes = new Set(['app', 'page', 'element', 'queryState', 'derivedState', 'theme']);
+  const frontendNodes = new Set([
+    'app',
+    'page',
+    'element',
+    'queryState',
+    'derivedState',
+    'theme',
+    'codeComponent',
+  ]);
   return {
     ...dom,
     nodes: Object.fromEntries(

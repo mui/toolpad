@@ -23,7 +23,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { inferColumns } from '@mui/toolpad-components';
-import type { EditorProps, PropControlDefinition } from '../../types';
+import type { EditorProps } from '../../types';
 
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
@@ -39,7 +39,7 @@ function GridColumnsPropEditor({
   onChange,
   disabled,
 }: EditorProps<GridColumns>) {
-  const { viewState } = usePageEditorState();
+  const { bindings } = usePageEditorState();
   const [editColumnsDialogOpen, setEditColumnsDialogOpen] = React.useState(false);
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
 
@@ -59,7 +59,8 @@ function GridColumnsPropEditor({
     setMenuAnchorEl(null);
   };
 
-  const definedRows = viewState.nodes[nodeId]?.props.rows;
+  const rowsValue = nodeId && bindings[`${nodeId}.props.rows`];
+  const definedRows: unknown = rowsValue?.value;
 
   const columnSuggestions = React.useMemo(() => {
     const inferred = inferColumns(Array.isArray(definedRows) ? definedRows : []);
@@ -242,8 +243,4 @@ function GridColumnsPropEditor({
   );
 }
 
-const jsonType: PropControlDefinition<GridColumns> = {
-  Editor: GridColumnsPropEditor,
-};
-
-export default jsonType;
+export default GridColumnsPropEditor;

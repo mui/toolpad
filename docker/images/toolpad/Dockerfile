@@ -10,10 +10,11 @@ LABEL com.mui.toolpad.circle-build-num=$CIRCLE_BUILD_NUM
 
 ENV YARN_CACHE_FOLDER=/root/caches/.yarn
 
+WORKDIR /app
+
 RUN --mount=type=cache,target=/root/caches \ 
   yarn cache clean
 
-WORKDIR /app
 
 
 
@@ -44,8 +45,9 @@ RUN --mount=type=cache,target=/root/caches \
 FROM base as prod
 
 ENV NODE_ENV production
-COPY --from=builder /app/ ./
+ENV YARN_CACHE_FOLDER=
 USER node
+COPY --from=builder --chown=node /app/ ./
 EXPOSE 3000
 ENV PORT 3000
 

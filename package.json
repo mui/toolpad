@@ -22,7 +22,7 @@
     "dev": "cross-env FORCE_COLOR=1 lerna run dev --stream --parallel --scope @mui/toolpad-core --scope @mui/toolpad-components --scope @mui/toolpad",
     "cli": "cross-env FORCE_COLOR=1 packages/toolpad-cli/cli.js --dev",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
-    "prisma": "yarn workspace @mui/toolpad-app run --cwd=\"./packages/toolpad-app\"  prisma",
+    "prisma": "dotenv yarn workspace @mui/toolpad-app run --cwd=\"./packages/toolpad-app\"  prisma",
     "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
     "release:build": "lerna run --stream build",
     "release:publish": "lerna publish from-package --pre-dist-tag alpha --dist-tag latest",
@@ -69,6 +69,7 @@
   },
   "dependencies": {
     "cross-env": "^7.0.3",
+    "dotenv-cli": "^5.1.0",
     "jest-environment-jsdom": "^28.0.0-alpha.8"
   }
 }

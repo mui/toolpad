@@ -1,20 +1,12 @@
 import * as React from 'react';
 import { Box, Button, Stack, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { LoadingButton } from '@mui/lab';
-import CheckIcon from '@mui/icons-material/Check';
-import CrossIcon from '@mui/icons-material/Clear';
-import { ConnectionStatus, NodeId, ConnectionEditorProps, ClientDataSource } from '../../../types';
+import { NodeId, ConnectionEditorProps, ClientDataSource } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
-import client from '../../../api';
-
-function getConnectionStatusIcon(status: ConnectionStatus) {
-  return status.error ? <CrossIcon /> : <CheckIcon />;
-}
 
 interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps<P> {
   dataSource: ClientDataSource<P, any>;
@@ -61,41 +53,6 @@ function ConnectionEditorContent<P>({
 
   const dataSource = dataSources[dataSourceType];
 
-  const [isTesting, setIsTesting] = React.useState(false);
-  const [testResult, setTestResult] = React.useState<{
-    connectionParams: P;
-    status: ConnectionStatus;
-  } | null>(null);
-
-  const handleConnectionTest = React.useCallback(async () => {
-    if (!savedConnectionParams) {
-      return;
-    }
-    try {
-      setIsTesting(true);
-      const status = await client.mutation.testConnection({
-        ...connectionNode,
-        attributes: {
-          ...connectionNode.attributes,
-          params: appDom.createSecret(connectionParams),
-        },
-      });
-      if (status) {
-        setTestResult({
-          connectionParams,
-          status,
-        });
-        if (status.error) {
-          alert(status.error);
-        }
-      }
-    } catch (err: any) {
-      alert(err.message);
-    } finally {
-      setIsTesting(false);
-    }
-  }, [connectionNode, connectionParams]);
-
   return (
     <Box className={className} sx={{ width: '100%', height: '100%', px: 3 }}>
       <Toolbar disableGutters>
@@ -118,18 +75,6 @@ function ConnectionEditorContent<P>({
         >
           Update
         </Button>
-        <LoadingButton
-          disabled={!connectionParams}
-          onClick={handleConnectionTest}
-          loading={isTesting}
-          endIcon={
-            connectionParams === testResult?.connectionParams
-              ? getConnectionStatusIcon(testResult.status)
-              : null
-          }
-        >
-          Test
-        </LoadingButton>
       </Toolbar>
       <Stack spacing={1}>
         <NodeNameEditor node={connectionNode} />

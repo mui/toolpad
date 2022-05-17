@@ -18,6 +18,7 @@ function createDefaultCodeComponent(name: string): string {
   const propTypeId = `${componentId}Props`;
   return format(`
     import * as React from 'react';
+    import { Typography } from '@mui/material';
     import { createComponent } from '@mui/toolpad-core';
     
     export interface ${propTypeId} {
@@ -26,7 +27,7 @@ function createDefaultCodeComponent(name: string): string {
     
     function ${componentId}({ msg }: ${propTypeId}) {
       return (
-        <div>{msg}</div>
+        <Typography>{msg}</Typography>
       );
     }
 

@@ -1,6 +1,15 @@
 import * as React from 'react';
 import { useQuery } from 'react-query';
-import { Alert, Box, Button, LinearProgress, Stack, Toolbar } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  LinearProgress,
+  Stack,
+  Toolbar,
+  FormControlLabel,
+  Checkbox,
+} from '@mui/material';
 import { useParams } from 'react-router-dom';
 import SplitPane from 'react-split-pane';
 import { NodeId } from '../../../types';
@@ -15,6 +24,7 @@ import { ConnectionSelect } from '../HierarchyExplorer/CreateApiNodeDialog';
 import JsonView from '../../JsonView';
 import { usePrompt } from '../../../utils/router';
 import useShortcut from '../../../utils/useShortcut';
+import { JsExpressionEditor } from '../PageEditor/JsExpressionEditor';
 
 interface ApiEditorContentProps<Q> {
   appId: string;
@@ -29,6 +39,16 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
   const [apiQuery, setApiQuery] = React.useState<Q>(apiNode.attributes.query.value);
   const savedQuery = React.useRef(apiNode.attributes.query.value);
 
+  const [transformEnabled, setTransformEnabled] = React.useState<boolean>(
+    apiNode.attributes.transformEnabled?.value ?? false,
+  );
+  const savedTransformEnabled = React.useRef(apiNode.attributes.transformEnabled?.value);
+
+  const [transform, setTransform] = React.useState<string>(
+    apiNode.attributes.transform?.value ?? '(data) => { return data }',
+  );
+  const savedTransform = React.useRef(apiNode.attributes.transform?.value);
+
   const conectionId = apiNode.attributes.connectionId.value as NodeId;
   const connection = appDom.getMaybeNode(dom, conectionId, 'connection');
   const dataSourceName = apiNode.attributes.dataSource.value;
@@ -37,9 +57,14 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
   const previewApi: appDom.ApiNode<Q> = React.useMemo(() => {
     return {
       ...apiNode,
-      attributes: { ...apiNode.attributes, query: appDom.createConst(apiQuery) },
+      attributes: {
+        ...apiNode.attributes,
+        query: appDom.createConst(apiQuery),
+        transformEnabled: appDom.createConst(transformEnabled),
+        transform: appDom.createConst(transform),
+      },
     };
-  }, [apiNode, apiQuery]);
+  }, [apiNode, apiQuery, transformEnabled, transform]);
 
   const debouncedPreviewApi = useDebounced(previewApi, 250);
 
@@ -68,19 +93,47 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
     [apiNode, domApi],
   );
 
+  const handleTransformFnChange = React.useCallback((newValue: string) => {
+    setTransform(newValue);
+  }, []);
+
+  const handleTransformEnabledChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setTransformEnabled(event.target.checked);
+    },
+    [],
+  );
+
   const handleSave = React.useCallback(() => {
     (Object.keys(apiQuery) as (keyof Q)[]).forEach((propName) => {
       if (typeof propName !== 'string' || !apiQuery[propName]) {
         return;
       }
       domApi.setNodeNamespacedProp(apiNode, 'attributes', 'query', appDom.createConst(apiQuery));
+      domApi.setNodeNamespacedProp(
+        apiNode,
+        'attributes',
+        'transform',
+        appDom.createConst(transform),
+      );
+      domApi.setNodeNamespacedProp(
+        apiNode,
+        'attributes',
+        'transformEnabled',
+        appDom.createConst(transformEnabled),
+      );
     });
     savedQuery.current = apiQuery;
-  }, [apiNode, apiQuery, domApi]);
+    savedTransform.current = transform;
+    savedTransformEnabled.current = transformEnabled;
+  }, [apiNode, apiQuery, domApi, transform, transformEnabled]);
 
   useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
-  const allChangesAreCommitted = savedQuery.current === apiQuery;
+  const allChangesAreCommitted =
+    savedQuery.current === apiQuery &&
+    savedTransformEnabled.current === transformEnabled &&
+    savedTransform.current === transform;
 
   usePrompt(
     'Your API has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
@@ -128,7 +181,28 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
               // disabled={!connection}
               value={apiQuery}
               onChange={(newApiQuery) => setApiQuery(newApiQuery)}
+              globalScope={{}}
             />
+            <Stack>
+              <FormControlLabel
+                label="Transform API response"
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={transformEnabled}
+                    onChange={handleTransformEnabledChange}
+                    inputProps={{ 'aria-label': 'controlled' }}
+                  />
+                }
+              />
+            </Stack>
+            {transformEnabled ? (
+              <JsExpressionEditor
+                globalScope={{}}
+                value={transform}
+                onChange={handleTransformFnChange}
+              />
+            ) : null}
           </Stack>
         </Stack>
         {previewQuery.isLoading || (previewIsInvalid && previewQuery.isFetching) ? (

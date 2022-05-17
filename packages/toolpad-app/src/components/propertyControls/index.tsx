@@ -12,7 +12,7 @@ import RowIdFieldSelect from './RowIdFieldSelect';
 import { EditorProps } from '../../types';
 
 const propTypeControls: {
-  [key in ArgControlSpec['type']]?: React.FC<EditorProps<any>>;
+  [key in ArgControlSpec['type']]?: (props: EditorProps<any>) => React.ReactNode;
 } = {
   string,
   boolean,

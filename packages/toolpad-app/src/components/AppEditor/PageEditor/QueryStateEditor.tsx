@@ -222,7 +222,7 @@ export default function QueryStateEditor() {
   const page = appDom.getNode(dom, state.nodeId, 'page');
   const { queryStates = [] } = appDom.getChildNodes(dom, page) ?? [];
 
-  // To keep it around during closing animation
+  // To keep dialog content around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);
 
   const handleRemove = React.useCallback(() => {

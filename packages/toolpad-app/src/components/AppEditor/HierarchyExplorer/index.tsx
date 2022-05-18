@@ -21,6 +21,7 @@ import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
+import CreateApiNodeDialog from './CreateApiNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import useLatest from '../../../utils/useLatest';
@@ -84,7 +85,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
   const [expanded, setExpanded] = useLocalStorageState<string[]>(
     `editor/${app.id}/hierarchy-expansion`,
-    [':connections', ':pages', ':codeComponents'],
+    [':connections', ':pages', ':apis', ':codeComponents'],
   );
 
   const location = useLocation();
@@ -154,6 +155,13 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [],
   );
 
+  const [createApiDialogOpen, setCreateApiDialogOpen] = React.useState(0);
+  const handleCreateApiDialogOpen = React.useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    setCreateApiDialogOpen(Math.random());
+  }, []);
+  const handleCreateApiDialogClose = React.useCallback(() => setCreateApiDialogOpen(0), []);
+
   const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
   const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
@@ -218,18 +226,16 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             />
           ))}
         </HierarchyTreeItem>
-        {apis.length > 0 ? (
-          <HierarchyTreeItem nodeId=":apis" labelText="Apis">
-            {apis.map((apiNode) => (
-              <HierarchyTreeItem
-                key={apiNode.id}
-                nodeId={apiNode.id}
-                labelText={apiNode.name}
-                onDelete={handleDeleteNodeDialogOpen(apiNode.id)}
-              />
-            ))}
-          </HierarchyTreeItem>
-        ) : null}
+        <HierarchyTreeItem nodeId=":apis" labelText="Apis" onCreate={handleCreateApiDialogOpen}>
+          {apis.map((apiNode) => (
+            <HierarchyTreeItem
+              key={apiNode.id}
+              nodeId={apiNode.id}
+              labelText={apiNode.name}
+              onDelete={handleDeleteNodeDialogOpen(apiNode.id)}
+            />
+          ))}
+        </HierarchyTreeItem>
         <HierarchyTreeItem
           nodeId=":codeComponents"
           labelText="Components"
@@ -261,6 +267,12 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         appId={appId}
         open={!!createConnectionDialogOpen}
         onClose={handleCreateConnectionDialogClose}
+      />
+      <CreateApiNodeDialog
+        key={createApiDialogOpen || undefined}
+        appId={appId}
+        open={!!createApiDialogOpen}
+        onClose={handleCreateApiDialogClose}
       />
       <CreatePageNodeDialog
         key={createPageDialogOpen || undefined}

@@ -495,12 +495,22 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
+function createToolpadComponentThatThrows(error: Error) {
+  return createComponent(() => {
+    throw error;
+  });
+}
+
 function instantiateCodeComponent(src: string): ToolpadComponent {
   let ResolvedComponent: ToolpadComponent;
 
   const LazyComponent = React.lazy(async () => {
     let ImportedComponent: ToolpadComponent = createComponent(() => null);
-    ImportedComponent = await createCodeComponent(src);
+    try {
+      ImportedComponent = await createCodeComponent(src);
+    } catch (error: any) {
+      ImportedComponent = createToolpadComponentThatThrows(error);
+    }
 
     ResolvedComponent.defaultProps = ImportedComponent.defaultProps;
 
@@ -581,7 +591,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
         return ResolvedComponent;
       }
 
-      throw new Error(`Can't find component for "${id}"`);
+      return createToolpadComponentThatThrows(new Error(`Can't find component for "${id}"`));
     },
     [dom, components],
   );

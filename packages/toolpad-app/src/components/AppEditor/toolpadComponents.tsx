@@ -14,7 +14,10 @@ export function useToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefini
   return React.useMemo(() => getToolpadComponents(appId, version, dom), [appId, version, dom]);
 }
 
-export function useToolpadComponent(dom: appDom.AppDom, id: string): ToolpadComponentDefinition {
+export function useToolpadComponent(
+  dom: appDom.AppDom,
+  id: string,
+): ToolpadComponentDefinition | null {
   const components = useToolpadComponents(dom);
   return React.useMemo(() => getToolpadComponent(components, id), [components, id]);
 }

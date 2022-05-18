@@ -20,6 +20,7 @@ import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
+import evalExpression from './evalExpression';
 
 // See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
 function excludeFields<T, K extends (keyof T)[]>(
@@ -232,12 +233,6 @@ export async function getRelease(appId: string, version: number) {
   });
 }
 
-export async function deleteRelease(appId: string, version: number) {
-  return prisma.release.delete({
-    where: { release_app_constraint: { appId, version } },
-  });
-}
-
 export async function createDeployment(appId: string, version: number) {
   return prisma.deployment.create({
     data: {
@@ -350,6 +345,17 @@ export async function updateConnection(
   return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
 }
 
+async function applyTransform<Q>(
+  api: appDom.ApiNode<Q>,
+  result: ApiResult<{}>,
+): Promise<ApiResult<{}>> {
+  return {
+    data: await evalExpression(
+      `${api.attributes.transform?.value}(${JSON.stringify(result.data)})`,
+    ),
+  };
+}
+
 export async function execApi<Q>(
   appId: string,
   api: appDom.ApiNode<Q>,
@@ -367,8 +373,12 @@ export async function execApi<Q>(
       `Unknown connection "${api.attributes.connectionId.value}" for api "${api.id}"`,
     );
   }
-
-  return dataSource.exec(connection, api.attributes.query.value, params);
+  const transformEnabled = api.attributes.transformEnabled?.value;
+  let result = await dataSource.exec(connection, api.attributes.query.value, params);
+  if (transformEnabled) {
+    result = await applyTransform(api, result);
+  }
+  return result;
 }
 
 export async function execQuery<Q>(

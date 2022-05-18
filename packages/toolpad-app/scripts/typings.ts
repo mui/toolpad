@@ -17,6 +17,8 @@ const LIBS = [
   { name: '@mui/system' },
   { name: '@mui/utils' },
   { name: '@mui/toolpad-core' },
+  { name: '@mui/x-date-pickers' },
+  { name: '@mui/x-data-grid-pro' },
 ];
 
 function getModuleId(fileName: string, pkgDir: string, pkgName: string) {

@@ -4,7 +4,6 @@ import { execApi, execQuery, loadVersionedDom } from './data';
 import initMiddleware from './initMiddleware';
 import { NodeId, ApiResult, VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
-
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
   // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options

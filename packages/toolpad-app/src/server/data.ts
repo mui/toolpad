@@ -381,6 +381,29 @@ export async function execApi<Q>(
   return result;
 }
 
+export async function execQuery<Q>(
+  appId: string,
+  query: appDom.QueryNode<Q>,
+  params: Q,
+): Promise<ApiResult<any>> {
+  const dataSource: ServerDataSource<any, Q, any> | undefined =
+    query.attributes.dataSource && serverDataSources[query.attributes.dataSource.value];
+  if (!dataSource) {
+    throw new Error(
+      `Unknown datasource "${query.attributes.dataSource?.value}" for query "${query.id}"`,
+    );
+  }
+
+  const connection = await getConnection(appId, query.attributes.connectionId.value);
+  if (!connection) {
+    throw new Error(
+      `Unknown connection "${query.attributes.connectionId.value}" for api "${query.id}"`,
+    );
+  }
+
+  return dataSource.exec(connection, query.attributes.query.value, params);
+}
+
 export async function dataSourceFetchPrivate<Q>(
   appId: string,
   connectionId: NodeId,

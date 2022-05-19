@@ -82,7 +82,6 @@ export interface ParsedBinding<T = unknown> {
 
 export function buildGlobalScope(bindings: Record<string, ParsedBinding>): Record<string, unknown> {
   const globalScope = {};
-  // eslint-disable-next-line no-restricted-syntax
   for (const binding of Object.values(bindings)) {
     if (binding.scopePath) {
       const value = binding.result?.value;
@@ -101,7 +100,6 @@ export default function evalJsBindings(
   const bindingsMap = new Map(Object.entries(bindings));
 
   const bindingIdMap = new Map<string, string>();
-  // eslint-disable-next-line no-restricted-syntax
   for (const [bindingId, binding] of bindingsMap) {
     if (binding.scopePath) {
       bindingIdMap.set(binding.scopePath, bindingId);

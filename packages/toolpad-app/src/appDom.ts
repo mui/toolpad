@@ -45,6 +45,7 @@ type AppDomNodeType =
   | 'element'
   | 'codeComponent'
   | 'derivedState'
+  | 'query'
   | 'queryState';
 
 interface AppDomNodeBase {
@@ -82,6 +83,8 @@ export interface ApiNode<Q = unknown> extends AppDomNodeBase {
     readonly connectionId: ConstantAttrValue<string>;
     readonly dataSource: ConstantAttrValue<string>;
     readonly query: ConstantAttrValue<Q>;
+    readonly transform?: ConstantAttrValue<string>;
+    readonly transformEnabled?: ConstantAttrValue<boolean>;
   };
 }
 
@@ -129,6 +132,20 @@ export interface QueryStateNode<P = any> extends AppDomNodeBase {
   readonly params?: BindableAttrValues<P>;
 }
 
+export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
+  readonly type: 'query';
+  readonly params?: BindableAttrValues<P>;
+  readonly attributes: {
+    readonly dataSource?: ConstantAttrValue<string>;
+    readonly connectionId: ConstantAttrValue<NodeId>;
+    readonly query: ConstantAttrValue<Q>;
+
+    readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
+    readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
+    readonly refetchInterval?: ConstantAttrValue<number>;
+  };
+}
+
 type AppDomNodeOfType<K extends AppDomNodeType> = {
   app: AppNode;
   connection: ConnectionNode;
@@ -139,6 +156,7 @@ type AppDomNodeOfType<K extends AppDomNodeType> = {
   codeComponent: CodeComponentNode;
   derivedState: DerivedStateNode;
   queryState: QueryStateNode;
+  query: QueryNode;
 }[K];
 
 type AllowedChildren = {
@@ -156,6 +174,7 @@ type AllowedChildren = {
     children: 'element';
     derivedStates: 'derivedState';
     queryStates: 'queryState';
+    queries: 'query';
   };
   element: {
     [prop: string]: 'element';
@@ -163,6 +182,7 @@ type AllowedChildren = {
   codeComponent: {};
   derivedState: {};
   queryState: {};
+  query: {};
 };
 
 export type AppDomNode = AppDomNodeOfType<AppDomNodeType>;
@@ -345,6 +365,14 @@ export function isQueryState<P>(node: AppDomNode): node is QueryStateNode<P> {
 
 export function assertIsQueryState<P>(node: AppDomNode): asserts node is QueryStateNode<P> {
   assertIsType<QueryStateNode>(node, 'queryState');
+}
+
+export function isQuery<P>(node: AppDomNode): node is QueryNode<P> {
+  return isType<QueryNode>(node, 'query');
+}
+
+export function assertIsQuery<P>(node: AppDomNode): asserts node is QueryNode<P> {
+  assertIsType<QueryNode>(node, 'query');
 }
 
 export function getApp(dom: AppDom): AppNode {
@@ -673,6 +701,14 @@ export function moveNode(
   return setNodeParent(dom, node, parentId, parentProp, parentIndex);
 }
 
+export function saveNode(dom: AppDom, node: AppDomNode) {
+  return update(dom, {
+    nodes: update(dom.nodes, {
+      [node.id]: update(dom.nodes[node.id], omit(node, ...RESERVED_NODE_PROPERTIES)),
+    }),
+  });
+}
+
 export function removeNode(dom: AppDom, nodeId: NodeId) {
   const node = getNode(dom, nodeId);
   const parent = getParent(dom, node);
@@ -751,6 +787,7 @@ export function createRenderTree(dom: AppDom): AppDom {
     'page',
     'element',
     'queryState',
+    'query',
     'derivedState',
     'theme',
     'codeComponent',

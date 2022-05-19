@@ -16,6 +16,7 @@ import {
   TOOLPAD_COMPONENT,
   Slots,
   Placeholder,
+  BindableAttrValues,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import {
@@ -220,25 +221,34 @@ const PageRootComponent = createComponent(PageRoot, {
   },
 });
 
-interface QueryStateNodeProps {
-  node: appDom.QueryStateNode;
+function resolveBindables(
+  bindings: Partial<Record<string, BindingEvaluationResult>>,
+  bindingId: string,
+  params?: BindableAttrValues<any>,
+) {
+  return params
+    ? Object.fromEntries(
+        Object.keys(params).map((propName) => [
+          propName,
+          bindings[`${bindingId}.${propName}`]?.value,
+        ]),
+      )
+    : {};
 }
 
-function QueryStateNode({ node }: QueryStateNodeProps) {
+interface QueryNodeProps {
+  // TODO: deprecate `QueryStateNode`
+  node: appDom.QueryNode | appDom.QueryStateNode;
+}
+
+function QueryNode({ node }: QueryNodeProps) {
   const { appId, version } = useAppContext();
   const bindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
   const dataUrl = `/api/data/${appId}/${version}/`;
-  const queryId = node.attributes.api.value;
-  const params = node.params
-    ? Object.fromEntries(
-        Object.keys(node.params).map((propName) => [
-          propName,
-          bindings[`${node.id}.params.${propName}`]?.value,
-        ]),
-      )
-    : {};
+  const queryId = appDom.isQueryState(node) ? node.attributes.api.value : node.id;
+  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
   const queryResult = useDataQuery(dataUrl, queryId, params, {
     refetchOnWindowFocus: node.attributes.refetchOnWindowFocus?.value,
@@ -325,7 +335,7 @@ function parseBindings(
       }
     }
 
-    if (appDom.isQueryState(elm)) {
+    if (appDom.isQueryState(elm) || appDom.isQuery(elm)) {
       if (elm.params) {
         for (const [paramName, bindable] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
@@ -374,7 +384,7 @@ function parseBindings(
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [], queryStates = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queryStates = [], queries = [] } = appDom.getChildNodes(dom, page);
 
   const location = useLocation();
   const getComponent = useComponentsContext();
@@ -447,7 +457,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
         </NodeRuntimeWrapper>
 
         {queryStates.map((node) => (
-          <QueryStateNode key={node.id} node={node} />
+          <QueryNode key={node.id} node={node} />
+        ))}
+
+        {queries.map((node) => (
+          <QueryNode key={node.id} node={node} />
         ))}
       </SetControlledBindingContextProvider>
     </BindingsContextProvider>
@@ -481,12 +495,22 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
+function createToolpadComponentThatThrows(error: Error) {
+  return createComponent(() => {
+    throw error;
+  });
+}
+
 function instantiateCodeComponent(src: string): ToolpadComponent {
   let ResolvedComponent: ToolpadComponent;
 
   const LazyComponent = React.lazy(async () => {
     let ImportedComponent: ToolpadComponent = createComponent(() => null);
-    ImportedComponent = await createCodeComponent(src);
+    try {
+      ImportedComponent = await createCodeComponent(src);
+    } catch (error: any) {
+      ImportedComponent = createToolpadComponentThatThrows(error);
+    }
 
     ResolvedComponent.defaultProps = ImportedComponent.defaultProps;
 
@@ -567,7 +591,7 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
         return ResolvedComponent;
       }
 
-      throw new Error(`Can't find component for "${id}"`);
+      return createToolpadComponentThatThrows(new Error(`Can't find component for "${id}"`));
     },
     [dom, components],
   );

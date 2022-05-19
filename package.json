@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@mui/monorepo": "https://github.com/mui/material-ui.git#master",
+    "@next/eslint-plugin-next": "^12.1.6",
     "@swc/core": "^1.2.163",
     "@swc/helpers": "^0.3.8",
     "@swc/jest": "^0.2.17",
@@ -69,6 +70,7 @@
   },
   "dependencies": {
     "cross-env": "^7.0.3",
+    "dotenv-cli": "^5.1.0",
     "jest-environment-jsdom": "^28.0.0-alpha.8"
   }
 }

@@ -5,6 +5,7 @@ import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import DerivedStateEditor from './DerivedStateEditor';
 import QueryStateEditor from './QueryStateEditor';
+import QueryEditor from './QueryEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
@@ -35,8 +36,9 @@ export default function PageOptionsPanel() {
         <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
         <Typography variant="subtitle1">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />
-        {DEPRECATED && <DerivedStateEditor />}
+        {DEPRECATED ? <DerivedStateEditor /> : null}
         <QueryStateEditor />
+        <QueryEditor />
       </Stack>
     </div>
   );

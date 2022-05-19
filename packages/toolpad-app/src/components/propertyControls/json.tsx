@@ -2,7 +2,7 @@ import type * as monacoEditor from 'monaco-editor';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import * as React from 'react';
 import Editor from '@monaco-editor/react';
-import type { EditorProps, PropControlDefinition } from '../../types';
+import type { EditorProps } from '../../types';
 
 function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorProps<any>) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -108,8 +108,4 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
   );
 }
 
-const jsonType: PropControlDefinition<string> = {
-  Editor: JsonPropEditor,
-};
-
-export default jsonType;
+export default JsonPropEditor;

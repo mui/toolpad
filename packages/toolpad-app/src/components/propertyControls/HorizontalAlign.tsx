@@ -3,7 +3,7 @@ import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import AlignHorizontalLeftIcon from '@mui/icons-material/AlignHorizontalLeft';
 import AlignHorizontalCenterIcon from '@mui/icons-material/AlignHorizontalCenter';
 import AlignHorizontalRightIcon from '@mui/icons-material/AlignHorizontalRight';
-import type { EditorProps, PropControlDefinition } from '../../types';
+import type { EditorProps } from '../../types';
 
 function HorizontalAlignPropEditor({
   label,
@@ -45,8 +45,4 @@ function HorizontalAlignPropEditor({
   );
 }
 
-const alignementType: PropControlDefinition<string> = {
-  Editor: HorizontalAlignPropEditor,
-};
-
-export default alignementType;
+export default HorizontalAlignPropEditor;

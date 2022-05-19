@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { styled, AppBar, Toolbar, IconButton, Typography, Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import config from '../config';
 
 export interface ToolpadShellProps {
   navigation?: React.ReactNode;
@@ -46,7 +47,7 @@ function Header({ actions, navigation }: HeaderProps) {
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" color="inherit" component="div" sx={{ mr: 2 }}>
-          MUI Toolpad
+          MUI Toolpad {config.target}
         </Typography>
         {navigation}
         <Box flex={1} />

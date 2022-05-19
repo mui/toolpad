@@ -1,7 +1,11 @@
-import getConfig from 'next/config';
+type ToolpadTargetType = 'CLOUD' | 'CE' | 'PRO';
 
-const { publicRuntimeConfig } = getConfig();
+export interface BuildEnvVars {
+  TARGET: ToolpadTargetType;
+}
 
-export interface SharedConfig {}
-
-export default publicRuntimeConfig as SharedConfig;
+export default {
+  // We may have to resort to using `if (process.env.TARGET == 'CE') ...` everywhere to
+  // get the relevant code tree shaken
+  target: process.env.TARGET,
+} as const;

@@ -30,11 +30,13 @@
     "release:docker:build": "ts-node --esm ./scripts/esm/docker.ts build",
     "release:docker:publish": "ts-node --esm ./scripts/esm/docker.ts publish",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
+    "test:smoke": "playwright test --config ./test/e2e-smoke/playwright.config.ts --headed",
     "test": "yarn test:build && jest"
   },
   "devDependencies": {
     "@mui/monorepo": "https://github.com/mui/material-ui.git#master",
     "@next/eslint-plugin-next": "^12.1.6",
+    "@playwright/test": "^1.22.1",
     "@swc/core": "^1.2.163",
     "@swc/helpers": "^0.3.8",
     "@swc/jest": "^0.2.17",

@@ -117,7 +117,25 @@ jobs:
             -f ./docker/images/toolpad/Dockerfile \
             .
 
-      # deploy the image
+      - install_js
+
+      - run:
+          command: |
+            docker-compose -f ./docker/compose/docker-compose.yml up -d
+          environment:
+            TAG: $CIRCLE_SHA1
+
+      - run:
+          command: |
+            yarn e2e:smoke
+
+      - run:
+          command: |
+            docker-compose -f ./docker/compose/docker-compose.yml down
+          environment:
+            TAG: $CIRCLE_SHA1
+
+      # push the image
       - run: |
           docker push muicom/toolpad:$CIRCLE_SHA1
 

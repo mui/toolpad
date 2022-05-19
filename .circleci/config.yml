@@ -121,9 +121,8 @@ jobs:
 
       - run:
           command: |
+            echo 'export TAG=$CIRCLE_SHA1' >> $BASH_ENV
             docker-compose -f ./docker/compose/docker-compose.yml up -d
-          environment:
-            TAG: $CIRCLE_SHA1
 
       - run:
           command: |
@@ -131,9 +130,8 @@ jobs:
 
       - run:
           command: |
+            echo 'export TAG=$CIRCLE_SHA1' >> $BASH_ENV
             docker-compose -f ./docker/compose/docker-compose.yml down
-          environment:
-            TAG: $CIRCLE_SHA1
 
       # push the image
       - run: |

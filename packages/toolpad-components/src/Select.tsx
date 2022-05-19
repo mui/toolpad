@@ -74,7 +74,7 @@ export default createComponent(Select, {
     },
     options: {
       typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
-      control: { type: 'json' },
+      control: { type: 'SelectOptions' },
     },
     sx: {
       typeDef: { type: 'object' },

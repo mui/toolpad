@@ -78,9 +78,9 @@ MyDocument.getInitialProps = async (ctx): Promise<DocumentInitialProps & Toolpad
   ));
 
   const nonce = generateNonce();
-  const csp = getCsp(nonce);
   const res = ctx?.res;
   if (res != null) {
+    const csp = getCsp(nonce);
     res.setHeader('Content-Security-Policy', csp);
   }
 

@@ -1,6 +1,6 @@
 /** @type {import('./src/config').BuildEnvVars} */
 const buildEnvVars = {
-  TARGET: 'CE',
+  TOOLPAD_TARGET: 'CE',
 };
 
 /** @type {import('next').NextConfig} */

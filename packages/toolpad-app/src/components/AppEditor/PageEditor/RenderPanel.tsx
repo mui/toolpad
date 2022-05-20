@@ -582,10 +582,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
     const component = draggedNode.attributes.component.value;
 
-    const dropTargetComponent = component === ROW_COMPONENT ? COLUMN_COMPONENT : ROW_COMPONENT;
-    const dropTargetNodes = pageNodes.filter(
-      (node) => (node as appDom.ElementNode).attributes.component?.value === dropTargetComponent,
-    );
+    const isRowComponent = component === ROW_COMPONENT;
+    const dropTargetComponent = isRowComponent ? COLUMN_COMPONENT : ROW_COMPONENT;
+    const dropTargetNodes = [
+      pageNode,
+      ...pageNodes.filter(
+        (node) => (node as appDom.ElementNode).attributes.component?.value === dropTargetComponent,
+      ),
+    ];
 
     /**
      * Return all nodes that are available for insertion.
@@ -596,7 +600,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
       : new Set();
     return dropTargetNodes.filter((n) => !excludedNodes.has(n));
-  }, [dom, getCurrentlyDraggedNode, pageNodes, selectedNode]);
+  }, [dom, getCurrentlyDraggedNode, pageNode, pageNodes, selectedNode]);
 
   const availableDropTargetIds = React.useMemo(
     () => new Set(availableDropTargets.map((n) => n.id)),

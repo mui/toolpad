@@ -3,17 +3,19 @@ import { Stack, StackProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageRowProps {
-  spacing?: number;
   children?: React.ReactNode;
   alignItems?: StackProps['alignItems'];
   justifyContent?: StackProps['justifyContent'];
 }
 
-function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps) {
+function PageRow({ children, alignItems, justifyContent }: PageRowProps) {
   return (
     <Stack
       direction="row"
-      sx={{ gap: spacing, p: spacing, alignItems, justifyContent, flexWrap: 'wrap' }}
+      sx={{
+        alignItems,
+        justifyContent,
+      }}
     >
       {children}
     </Stack>

@@ -3,17 +3,24 @@ import { Stack, StackProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageColumnProps {
+  span: number;
   spacing?: number;
   children?: React.ReactNode;
   alignItems?: StackProps['alignItems'];
   justifyContent?: StackProps['justifyContent'];
 }
 
-function PageColumn({ spacing, children, alignItems, justifyContent }: PageColumnProps) {
+function PageColumn({ span, spacing, children, alignItems, justifyContent }: PageColumnProps) {
   return (
     <Stack
       direction="column"
-      sx={{ gap: spacing, p: spacing, alignItems, justifyContent, flexWrap: 'wrap' }}
+      sx={{
+        gap: spacing,
+        p: spacing,
+        alignItems,
+        justifyContent,
+        width: `${(span / 12) * 100}vw`,
+      }}
     >
       {children}
     </Stack>
@@ -22,12 +29,16 @@ function PageColumn({ spacing, children, alignItems, justifyContent }: PageColum
 
 PageColumn.defaultProps = {
   spacing: 2,
+  span: 1,
   alignItems: 'center',
   justifyContent: 'start',
 };
 
 export default createComponent(PageColumn, {
   argTypes: {
+    span: {
+      typeDef: { type: 'number' },
+    },
     spacing: {
       typeDef: { type: 'number' },
     },

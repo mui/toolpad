@@ -31,12 +31,14 @@ function createDefaultCodeComponent(name: string): string {
       );
     }
 
-    export default createComponent(${componentId}, {
+    export default createComponent(MyComponent, {
       argTypes: {
-        msg: { typeDef: { type: "string" } },
-        defaultValue: "Hello world!"
-      }
-    });
+        msg: {
+          typeDef: { type: "string" },
+          defaultValue: "Hello world!",
+        },
+      },
+    });    
   `);
 }
 

@@ -7,6 +7,12 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
+import {
+  ArgTypeDefinitions,
+  createComponent,
+  ToolpadComponent,
+  TOOLPAD_COMPONENT,
+} from '@mui/toolpad-core';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -17,10 +23,9 @@ import NodeNameEditor from '../NodeNameEditor';
 import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
+import { ExactEntriesOf } from '../../../utils/types';
 
-function Noop() {
-  return null;
-}
+const Noop = createComponent(() => null);
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -176,7 +181,15 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
 
   const { Component: GeneratedComponent, error: compileError } = useCodeComponent(input);
 
-  const CodeComponent: React.ComponentType<any> = useLatest(GeneratedComponent) || Noop;
+  const CodeComponent: ToolpadComponent = useLatest(GeneratedComponent) || Noop;
+
+  const defaultProps = React.useMemo(() => {
+    const argTypeEntries = Object.entries(
+      CodeComponent[TOOLPAD_COMPONENT].argTypes,
+    ) as ExactEntriesOf<ArgTypeDefinitions>;
+
+    return Object.fromEntries(argTypeEntries.map(([key, argType]) => [key, argType.defaultValue]));
+  }, [CodeComponent]);
 
   return (
     <React.Fragment>
@@ -216,7 +229,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
                   )}
                 >
                   <AppThemeProvider node={theme}>
-                    <CodeComponent />
+                    <CodeComponent {...defaultProps} />
                   </AppThemeProvider>
                 </ErrorBoundary>
                 {compileError?.message}

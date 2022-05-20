@@ -136,7 +136,7 @@ export interface ArgTypeDefinition<V = unknown> {
    */
   description?: string;
   /**
-   * A description of the property, to be used to supply extra information to the user.
+   * A default value for the property.
    */
   defaultValue?: V;
   /**

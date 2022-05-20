@@ -272,11 +272,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 });
 
-DataGridComponent.defaultProps = {
-  selection: null,
-  density: 'compact',
-} as ToolpadDataGridProps;
-
 export default createComponent(DataGridComponent, {
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
@@ -291,6 +286,7 @@ export default createComponent(DataGridComponent, {
     },
     density: {
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },
+      defaultValue: 'compact',
     },
     sx: {
       typeDef: { type: 'object' },
@@ -298,6 +294,7 @@ export default createComponent(DataGridComponent, {
     selection: {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',
+      defaultValue: null,
     },
     loading: {
       typeDef: { type: 'boolean' },

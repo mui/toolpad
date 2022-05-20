@@ -16,7 +16,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate, useLocation, matchRoutes } from 'react-router-dom';
-import { NodeId } from '../../../types';
+import { NodeId, LocationState } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
@@ -192,7 +192,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   const handleDeleteNode = React.useCallback(() => {
     if (deletedNodeId) {
       domApi.removeNode(deletedNodeId);
-      navigate(`/app/${appId}/editor/`);
+      const state: LocationState = { deletedNode: true };
+      navigate(`/app/${appId}/editor/`, { state });
       handledeleteNodeDialogClose();
     }
   }, [deletedNodeId, domApi, navigate, appId, handledeleteNodeDialogClose]);

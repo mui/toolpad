@@ -21,7 +21,7 @@ commands:
     parameters:
       browsers:
         type: boolean
-        default: false
+        default: true
         description: 'Set to true if you intend to any browser (e.g. with playwright).'
 
     steps:
@@ -116,7 +116,7 @@ jobs:
     working_directory: /tmp/mui-toolpad
     resource_class: medium
     docker:
-      - image: cimg/node:16.14
+      - image: mcr.microsoft.com/playwright:v1.22.0-focal
     environment:
       - DOCKER_BUILDKIT: '1'
     steps:
@@ -151,7 +151,7 @@ jobs:
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
             echo 'export TAG=$CIRCLE_SHA1' >> $BASH_ENV
             docker-compose -f ./docker/compose/docker-compose.yml up -d
-            docker run -it --rm --ipc=host -v "$CIRCLE_WORKING_DIRECTORY:/tests" -w /tests mcr.microsoft.com/playwright:v1.22.0-focal yarn e2e:smoke
+            yarn e2e:smoke
             docker-compose -f ./docker/compose/docker-compose.yml down
 
       # push the image

@@ -1,10 +1,14 @@
-/** @type {import('./src/config').SharedConfig} */
-const sharedConfig = {};
+/** @type {import('./src/config').BuildEnvVars} */
+const buildEnvVars = {
+  TOOLPAD_TARGET: process.env.TOOLPAD_TARGET || 'CE',
+};
 
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
-  publicRuntimeConfig: sharedConfig,
+
+  // build-time env vars
+  env: buildEnvVars,
 
   webpack: (config) => {
     config.resolve.fallback = {

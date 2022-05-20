@@ -122,13 +122,15 @@ jobs:
     steps:
       - checkout
 
+      - run: |
+          docker run -it --rm --ipc=host -v "$CIRCLE_WORKING_DIRECTORY:/tests" -w /tests mcr.microsoft.com/playwright:v1.22.0-focal ls
+
       - setup_remote_docker:
           version: 20.10.12
           docker_layer_caching: true
 
       # login docker hub
       - run: |
-          ls $CIRCLE_WORKING_DIRECTORY
           echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
 
       # build the application image
@@ -149,7 +151,7 @@ jobs:
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
             echo 'export TAG=$CIRCLE_SHA1' >> $BASH_ENV
             docker-compose -f ./docker/compose/docker-compose.yml up -d
-            docker run -it --rm --ipc=host -v $CIRCLE_WORKING_DIRECTORY:/tests -w /tests mcr.microsoft.com/playwright:v1.22.0-focal yarn e2e:smoke
+            docker run -it --rm --ipc=host -v "$CIRCLE_WORKING_DIRECTORY:/tests" -w /tests mcr.microsoft.com/playwright:v1.22.0-focal yarn e2e:smoke
             docker-compose -f ./docker/compose/docker-compose.yml down
 
       # push the image

@@ -15,10 +15,12 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import DialogForm from '../DialogForm';
-import { useDomLoader } from '../DomLoader';
+import { useDomLoader, useDom } from '../DomLoader';
+import { LocationState } from '../../types';
+import * as appDom from '../../appDom';
 import ToolpadAppShell from '../ToolpadAppShell';
 import PagePanel from './PagePanel';
 import client from '../../api';
@@ -109,6 +111,28 @@ export interface ToolpadAppShellProps {
 
 export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps) {
   const domLoader = useDomLoader();
+  const dom = useDom();
+
+  const navigate = useNavigate();
+  const { state: locationState } = useLocation();
+
+  const redirectRef = React.useRef<boolean>(false);
+
+  /* Redirect to first page (if it exists) if (any of the following):
+   * 1. first visit to the Editor
+   * 2. if being redirected from a delete operation
+   */
+  React.useEffect(() => {
+    const app = appDom.getApp(dom);
+    const { pages = [] } = appDom.getChildNodes(dom, app);
+    if (
+      pages?.length &&
+      (!redirectRef.current || (locationState as LocationState)?.deletedNode === true)
+    ) {
+      navigate(`pages/${pages[0].id}/`);
+      redirectRef.current = true;
+    }
+  }, [dom, navigate, locationState]);
 
   const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
 

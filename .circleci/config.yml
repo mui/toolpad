@@ -115,8 +115,6 @@ jobs:
   docker:
     working_directory: /tmp/mui-toolpad
     resource_class: medium
-    docker:
-      - image: cimg/node:16.14
     environment:
       - DOCKER_BUILDKIT: '1'
     steps:
@@ -128,6 +126,7 @@ jobs:
 
       # login docker hub
       - run: |
+          ls $CIRCLE_WORKING_DIRECTORY
           echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
 
       # build the application image

@@ -170,3 +170,7 @@ export interface AppTheme {
 }
 
 export type VersionOrPreview = 'preview' | number;
+
+export type LocationState = {
+  deletedNode?: boolean;
+};

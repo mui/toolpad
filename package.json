@@ -30,7 +30,7 @@
     "release:docker:build": "ts-node --esm ./scripts/esm/docker.ts build",
     "release:docker:publish": "ts-node --esm ./scripts/esm/docker.ts publish",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
-    "e2e:smoke": "playwright test --config ./test/e2e-smoke/playwright.config.ts --headed",
+    "e2e:smoke": "playwright test --config ./test/e2e-smoke/playwright.config.ts",
     "test": "yarn test:build && jest"
   },
   "devDependencies": {

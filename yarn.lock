@@ -1962,10 +1962,10 @@
   resolved "https://registry.yarnpkg.com/@swc/helpers/-/helpers-0.3.8.tgz#5b9ecf4ee480ca00f1ffbc2d1a5d4eed0d1afe81"
   integrity sha512-aWItSZvJj4+GI6FWkjZR13xPNPctq2RRakzo+O6vN7bC2yjwdg5EFpgaSAUn95b7BGSgcflvzVDPoKmJv24IOg==
 
-"@swc/wasm@^1.2.163":
-  version "1.2.163"
-  resolved "https://registry.yarnpkg.com/@swc/wasm/-/wasm-1.2.163.tgz#fa9d69fd09c975a1d3ced4749c064d03ca0ad218"
-  integrity sha512-YZMIo5NM1UBP0pHWZwWdKSTw0zxtrqJbGv5Dc4AjE6jjTFZRF+rWk+UMPbaBjHh32pCVY1UntCmLvHGJ3aviPg==
+"@swc/wasm@^1.2.187":
+  version "1.2.187"
+  resolved "https://registry.yarnpkg.com/@swc/wasm/-/wasm-1.2.187.tgz#7fdd633d4b4a86b49d4aabea5164e15e0cec57fc"
+  integrity sha512-16kXef6RnMq6Hob9m2HdD32AD0y1y4dleH0DEUAxw3NQHyZCWFpYow5+pGEi8UWMpc9Gqcx2uIan2c+nB9QsNQ==
 
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"

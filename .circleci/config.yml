@@ -142,6 +142,7 @@ jobs:
           command: |
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
             echo 'export TAG=$CIRCLE_SHA1' >> $BASH_ENV
+            echo "TAG: $TAG"
             docker-compose -f ./docker/compose/docker-compose.yml up -d
             yarn workspace @mui/toolpad-app waitForApp
             docker-compose logs toolpad

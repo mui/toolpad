@@ -188,7 +188,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
       CodeComponent[TOOLPAD_COMPONENT].argTypes,
     ) as ExactEntriesOf<ArgTypeDefinitions>;
 
-    return Object.fromEntries(argTypeEntries.map(([key, argType]) => [key, argType.defaultValue]));
+    return Object.fromEntries(argTypeEntries.map(([key, argType]) => [key, argType?.defaultValue]));
   }, [CodeComponent]);
 
   return (

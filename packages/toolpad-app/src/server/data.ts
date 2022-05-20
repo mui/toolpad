@@ -144,6 +144,33 @@ export async function getApps() {
   return prisma.app.findMany();
 }
 
+async function setAppDefaults(
+  app: App,
+  dom: appDom.AppDom,
+  appNode: appDom.AppNode,
+): Promise<appDom.AppDom> {
+  // Create default REST connection node
+  const newConnectionNode = appDom.createNode(dom, 'connection', {
+    attributes: {
+      dataSource: appDom.createConst('rest'),
+      params: appDom.createSecret({ name: 'rest' }),
+      status: appDom.createConst(null),
+    },
+  });
+  const newDom = await appDom.addNode(dom, newConnectionNode, appNode, 'connections');
+
+  // Create default page
+  const newPageNode = appDom.createNode(dom, 'page', {
+    name: 'Page 1',
+    attributes: {
+      title: appDom.createConst('Page 1'),
+      urlQuery: appDom.createConst({}),
+    },
+  });
+
+  return appDom.addNode(newDom, newPageNode, appNode, 'pages');
+}
+
 export async function createApp(name: string): Promise<App> {
   return prisma.$transaction(async () => {
     const app = await prisma.app.create({
@@ -152,14 +179,8 @@ export async function createApp(name: string): Promise<App> {
 
     const dom = appDom.createDom();
     const appNode = appDom.getApp(dom);
-    const newNode = appDom.createNode(dom, 'connection', {
-      attributes: {
-        dataSource: appDom.createConst('rest'),
-        params: appDom.createSecret({ name: 'rest' }),
-        status: appDom.createConst(null),
-      },
-    });
-    const newDom = await appDom.addNode(dom, newNode, appNode, 'connections');
+
+    const newDom = await setAppDefaults(app, dom, appNode);
     await saveDom(app.id, newDom);
 
     return app;

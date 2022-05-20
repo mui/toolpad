@@ -122,9 +122,6 @@ jobs:
     steps:
       - checkout
 
-      - run: |
-          docker run -it --rm --ipc=host -v "$CIRCLE_WORKING_DIRECTORY:/tests" -w /tests mcr.microsoft.com/playwright:v1.22.0-focal ls
-
       - setup_remote_docker:
           version: 20.10.12
           docker_layer_caching: true

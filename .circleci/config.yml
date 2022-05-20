@@ -144,6 +144,7 @@ jobs:
             echo 'export TAG=$CIRCLE_SHA1' >> $BASH_ENV
             docker-compose -f ./docker/compose/docker-compose.yml up -d
             yarn workspace @mui/toolpad-app waitForApp
+            docker-compose logs toolpad
             docker run -it --rm \
               --ipc=host \
               -v "$CIRCLE_WORKING_DIRECTORY:/tests" \

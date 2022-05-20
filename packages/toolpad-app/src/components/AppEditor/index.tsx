@@ -9,6 +9,7 @@ import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
 import { AppEditorContext, AppEditorContextprovider } from './AppEditorContext';
 import AppEditorShell from './AppEditorShell';
+import NotFoundEditor from './NotFoundEditor';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -49,7 +50,15 @@ function FileEditor({ appId }: FileEditorProps) {
         <Route path="apis/:nodeId" element={<ApiEditor appId={appId} />} />
         <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
         <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
-        <Route path="*" element={null} />
+        <Route
+          index
+          element={
+            <NotFoundEditor
+              severity="info"
+              message="No pages in this app. Use '+' to create a new one"
+            />
+          }
+        />
       </Route>
     </Routes>
   );

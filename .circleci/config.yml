@@ -143,7 +143,14 @@ jobs:
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
             echo 'export TAG=$CIRCLE_SHA1' >> $BASH_ENV
             docker-compose -f ./docker/compose/docker-compose.yml up -d
-            docker run -it --rm --ipc=host -v "$CIRCLE_WORKING_DIRECTORY:/tests" -w /tests -e PLAYWRIGHT_TEST_BASE_URL=http://0.0.0.0:3000/ mcr.microsoft.com/playwright:v1.22.0-focal yarn e2e:smoke
+            yarn workspace @mui/toolpad-app waitForApp
+            docker run -it --rm \
+              --ipc=host \
+              -v "$CIRCLE_WORKING_DIRECTORY:/tests" \
+              -w /tests \
+              -e PLAYWRIGHT_TEST_BASE_URL=http://0.0.0.0:3000/ \
+              mcr.microsoft.com/playwright:v1.22.0-focal \
+              yarn e2e:smoke
             docker-compose -f ./docker/compose/docker-compose.yml down
 
       # push the image

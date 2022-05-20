@@ -33,6 +33,7 @@ import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
 
 const ROW_COMPONENT = 'PageRow';
+const COLUMN_COMPONENT = 'PageColumn';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -580,9 +581,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     }
 
     const component = draggedNode.attributes.component.value;
-    if (component === ROW_COMPONENT) {
-      return [appDom.getNode(dom, pageNodeId, 'page')];
-    }
+
+    const dropTargetComponent = component === ROW_COMPONENT ? COLUMN_COMPONENT : ROW_COMPONENT;
+    const dropTargetNodes = pageNodes.filter(
+      (node) => (node as appDom.ElementNode).attributes.component?.value === dropTargetComponent,
+    );
 
     /**
      * Return all nodes that are available for insertion.
@@ -592,8 +595,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     const excludedNodes = selectedNode
       ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
       : new Set();
-    return pageNodes.filter((n) => !excludedNodes.has(n));
-  }, [dom, getCurrentlyDraggedNode, pageNodeId, pageNodes, selectedNode]);
+    return dropTargetNodes.filter((n) => !excludedNodes.has(n));
+  }, [dom, getCurrentlyDraggedNode, pageNodes, selectedNode]);
 
   const availableDropTargetIds = React.useMemo(
     () => new Set(availableDropTargets.map((n) => n.id)),

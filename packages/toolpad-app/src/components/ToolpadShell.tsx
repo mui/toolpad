@@ -45,8 +45,14 @@ function Header({ actions, navigation }: HeaderProps) {
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" color="inherit" component="div" sx={{ mr: 2 }}>
-          MUI Toolpad
+        <Typography
+          data-test-id="brand"
+          variant="h6"
+          color="inherit"
+          component="div"
+          sx={{ mr: 2 }}
+        >
+          MUI Toolpad {process.env.TOOLPAD_TARGET}
         </Typography>
         {navigation}
         <Box flex={1} />

@@ -52,7 +52,7 @@ function Header({ actions, navigation }: HeaderProps) {
           component="div"
           sx={{ mr: 2 }}
         >
-          MUI Toolpad
+          MUI Toolpad {process.env.TOOLPAD_TARGET}
         </Typography>
         {navigation}
         <Box flex={1} />

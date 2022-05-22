@@ -118,6 +118,7 @@ test(`simple databinding`, async () => {
 });
 
 test(`Databinding errors`, async () => {
+  const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation();
   let bindings: LiveBindings | undefined;
 
   const cleanup = setEventHandler(window, (event) => {
@@ -189,7 +190,10 @@ test(`Databinding errors`, async () => {
         message: 'Cycle detected "cyclic2.value"',
       }),
     );
+
+    expect(consoleErrorMock).toHaveBeenCalled();
   } finally {
     cleanup();
+    consoleErrorMock.mockRestore();
   }
 });

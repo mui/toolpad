@@ -7,12 +7,7 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
-import {
-  ArgTypeDefinitions,
-  createComponent,
-  ToolpadComponent,
-  TOOLPAD_COMPONENT,
-} from '@mui/toolpad-core';
+import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -23,7 +18,7 @@ import NodeNameEditor from '../NodeNameEditor';
 import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
-import { ExactEntriesOf } from '../../../utils/types';
+import { mapValues } from '../../../utils/collections';
 
 const Noop = createComponent(() => null);
 
@@ -181,15 +176,13 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
 
   const { Component: GeneratedComponent, error: compileError } = useCodeComponent(input);
 
-  const CodeComponent: ToolpadComponent = useLatest(GeneratedComponent) || Noop;
+  const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
+  const { argTypes } = CodeComponent[TOOLPAD_COMPONENT];
 
-  const defaultProps = React.useMemo(() => {
-    const argTypeEntries = Object.entries(
-      CodeComponent[TOOLPAD_COMPONENT].argTypes,
-    ) as ExactEntriesOf<ArgTypeDefinitions>;
-
-    return Object.fromEntries(argTypeEntries.map(([key, argType]) => [key, argType?.defaultValue]));
-  }, [CodeComponent]);
+  const defaultProps = React.useMemo(
+    () => mapValues(argTypes, (argType) => argType?.defaultValue),
+    [argTypes],
+  );
 
   return (
     <React.Fragment>

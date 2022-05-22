@@ -1,11 +1,11 @@
 import { Paper } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import withDefaultProps from './utils/addDefaultProps';
 
-export default createComponent(withDefaultProps(Paper, { elevation: 1 }), {
+export default createComponent(Paper, {
   argTypes: {
     elevation: {
       typeDef: { type: 'number', minimum: 0 },
+      defaultValue: 1,
     },
     children: {
       typeDef: { type: 'element' },

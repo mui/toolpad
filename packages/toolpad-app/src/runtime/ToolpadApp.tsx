@@ -301,7 +301,7 @@ function parseBindings(
         if (argType) {
           parsedBindingsMap.set(bindingId, {
             scopePath,
-            result: { value: Component.defaultProps?.[propName] },
+            result: { value: argType.defaultValue },
           });
         }
       }
@@ -314,7 +314,7 @@ function parseBindings(
         if (argType) {
           if (argType.onChangeProp) {
             const defaultValue: unknown =
-              binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
+              binding?.type === 'const' ? binding?.value : argType.defaultValue;
             controlled.add(bindingId);
             parsedBindingsMap.set(bindingId, {
               scopePath,

@@ -23,8 +23,6 @@ function CustomLayout({ child1, child2, child3 }: CustomLayoutProps) {
   );
 }
 
-CustomLayout.defaultProps = {};
-
 export default createComponent(CustomLayout, {
   argTypes: {
     child3: {

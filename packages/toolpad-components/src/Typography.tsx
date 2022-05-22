@@ -19,17 +19,13 @@ function Typography({ value, loading, sx, ...props }: TypographyProps) {
   );
 }
 
-Typography.defaultProps = {
-  value: 'Text',
-  loading: false,
-} as TypographyProps;
-
 export default createComponent(Typography, {
   loadingPropSource: ['value'],
   loadingProp: 'loading',
   argTypes: {
     value: {
       typeDef: { type: 'string' },
+      defaultValue: 'Text',
     },
     variant: {
       typeDef: {
@@ -39,6 +35,7 @@ export default createComponent(Typography, {
     },
     loading: {
       typeDef: { type: 'boolean' },
+      defaultValue: false,
     },
     sx: {
       typeDef: { type: 'object' },

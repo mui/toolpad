@@ -126,7 +126,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
     const app = appDom.getApp(dom);
     const { pages = [] } = appDom.getChildNodes(dom, app);
     if (
-      pages?.length &&
+      pages.length > 0 &&
       (!redirectRef.current || (locationState as LocationState)?.deletedNode === true)
     ) {
       navigate(`pages/${pages[0].id}/`);

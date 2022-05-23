@@ -15,8 +15,8 @@ export interface InstantiatedComponent extends ToolpadComponentDefinition {
 export type InstantiatedComponents = Record<string, InstantiatedComponent | undefined>;
 
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
-  ['PageRow', { displayName: 'PageRow', builtin: 'PageRow' }],
-  ['PageColumn', { displayName: 'Container', builtin: 'PageColumn' }],
+  ['PageRow', { displayName: 'Row', builtin: 'PageRow' }],
+  ['PageColumn', { displayName: 'Column', builtin: 'PageColumn' }],
   ['Stack', { displayName: 'Stack', builtin: 'Stack' }],
   ['Button', { displayName: 'Button', builtin: 'Button' }],
   ['Image', { displayName: 'Image', builtin: 'Image' }],

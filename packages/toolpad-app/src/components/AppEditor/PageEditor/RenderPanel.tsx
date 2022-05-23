@@ -57,6 +57,7 @@ const overlayClasses = {
   insertSlotHud: 'Toolpad_InsertSlotHud',
   selected: 'Toolpad_Selected',
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
+  layout: 'Toolad_Layout',
   active: 'Toolpad_Active',
   available: 'Toolpad_Available',
   componentDragging: 'Toolpad_ComponentDragging',
@@ -93,7 +94,7 @@ const OverlayRoot = styled('div')({
   },
 
   [`& .${overlayClasses.nodeHud}`]: {
-    border: '1px dashed rgba(255,0,0,.2)',
+    border: '1px dashed rgba(255,0,0,.25)',
     // capture mouse events
     pointerEvents: 'initial',
     position: 'absolute',
@@ -106,6 +107,9 @@ const OverlayRoot = styled('div')({
     [`&.${overlayClasses.allowNodeInteraction}`]: {
       // block pointer-events so we can interact with the selection
       pointerEvents: 'none',
+    },
+    [`&.${overlayClasses.layout}`]: {
+      borderColor: 'rgba(255,0,0,.125)',
     },
   },
 
@@ -478,6 +482,8 @@ function NodeHud({
   const dom = useDom();
   const component = useToolpadComponent(dom, node.attributes.component.value);
 
+  const isLayoutComponent = component?.builtin === 'PageRow' || component?.builtin === 'PageColumn';
+
   return (
     <div
       draggable
@@ -487,6 +493,7 @@ function NodeHud({
       className={clsx(overlayClasses.nodeHud, {
         [overlayClasses.selected]: selected,
         [overlayClasses.allowNodeInteraction]: allowInteraction,
+        [overlayClasses.layout]: isLayoutComponent,
       })}
     >
       <div draggable className={overlayClasses.selectionHint}>
@@ -583,16 +590,20 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
     const component = draggedNode.attributes.component.value;
 
-    const dropTargetNodes =
-      component === ROW_COMPONENT
-        ? [
-            pageNode,
-            pageNodes.filter(
-              (node) =>
-                (node as appDom.ElementNode).attributes.component?.value === COLUMN_COMPONENT,
-            ),
-          ]
-        : pageNodes;
+    let dropTargetNodes = pageNodes;
+    if (component === ROW_COMPONENT) {
+      dropTargetNodes = [
+        pageNode,
+        ...pageNodes.filter(
+          (node) => (node as appDom.ElementNode).attributes.component?.value === COLUMN_COMPONENT,
+        ),
+      ];
+    }
+    if (component === COLUMN_COMPONENT) {
+      dropTargetNodes = pageNodes.filter(
+        (node) => (node as appDom.ElementNode).attributes.component?.value !== COLUMN_COMPONENT,
+      );
+    }
 
     /**
      * Return all nodes that are available for insertion.
@@ -750,7 +761,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleDelete = React.useCallback(
     (nodeId: NodeId) => {
       const toRemove = appDom.getNode(dom, nodeId);
+      const parent = appDom.getParent(dom, toRemove) as appDom.ElementNode;
+
       domApi.removeNode(toRemove.id);
+
+      if (
+        parent &&
+        (parent as appDom.ElementNode).attributes.component?.value === 'PageRow' &&
+        appDom.getChildNodes(dom, parent).children.length === 1
+      ) {
+        domApi.removeNode(parent.id);
+      }
+
       api.deselect();
     },
     [dom, domApi, api],

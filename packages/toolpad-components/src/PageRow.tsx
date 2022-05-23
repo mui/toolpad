@@ -1,24 +1,28 @@
 import * as React from 'react';
-import { Stack } from '@mui/material';
+import { Stack, StackProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageRowProps {
   children?: React.ReactNode;
+  alignItems?: StackProps['alignItems'];
 }
 
-function PageRow({ children }: PageRowProps) {
+function PageRow({ children, alignItems }: PageRowProps) {
   return (
     <Stack
       direction="row"
       sx={{
-        alignItems: 'start',
-        justifyContent: 'start',
+        alignItems,
       }}
     >
       {children}
     </Stack>
   );
 }
+
+PageRow.defaultProps = {
+  alignItems: 'start',
+};
 
 export default createComponent(PageRow, {
   argTypes: {

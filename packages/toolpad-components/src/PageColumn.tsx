@@ -7,10 +7,9 @@ export interface PageColumnProps {
   spacing?: number;
   children?: React.ReactNode;
   alignItems?: StackProps['alignItems'];
-  justifyContent?: StackProps['justifyContent'];
 }
 
-function PageColumn({ span, spacing, children, alignItems, justifyContent }: PageColumnProps) {
+function PageColumn({ span, spacing, children, alignItems }: PageColumnProps) {
   return (
     <Stack
       direction="column"
@@ -18,7 +17,6 @@ function PageColumn({ span, spacing, children, alignItems, justifyContent }: Pag
         gap: spacing,
         p: spacing,
         alignItems,
-        justifyContent,
         width: `${(span / 12) * 100}vw`,
       }}
     >
@@ -31,7 +29,6 @@ PageColumn.defaultProps = {
   spacing: 2,
   span: 1,
   alignItems: 'center',
-  justifyContent: 'start',
 };
 
 export default createComponent(PageColumn, {
@@ -49,14 +46,6 @@ export default createComponent(PageColumn, {
       },
       label: 'Horizontal alignment',
       control: { type: 'HorizontalAlign' },
-    },
-    justifyContent: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'stretch', 'baseline'],
-      },
-      label: 'Vertical alignment',
-      control: { type: 'VerticalAlign' },
     },
     children: {
       typeDef: { type: 'element' },

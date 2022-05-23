@@ -56,7 +56,8 @@ function PlaceholderWrapper(props: PlaceholderWrapperProps) {
       style={{
         display: 'block',
         minHeight: 40,
-        minWidth: '100%',
+        minWidth: `${(1 / 12) * 100}vw`,
+        width: '100%',
       }}
     />
   );

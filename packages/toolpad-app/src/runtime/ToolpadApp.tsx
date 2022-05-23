@@ -50,6 +50,7 @@ import evalJsBindings, {
 } from './evalJsBindings';
 import createCodeComponent from './createCodeComponent';
 import { HTML_ID_APP_ROOT } from '../constants';
+import { mapProperties, mapValues } from '../utils/collections';
 
 const PAGE_ROW_COMPONENT_ID = 'PageRow';
 
@@ -151,22 +152,20 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     return hookResult;
   }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
 
-  const onChangeHandlers = React.useMemo(
+  const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
     () =>
-      Object.fromEntries(
-        Object.entries(argTypes).flatMap(([key, argType]) => {
-          if (!argType || !argType.onChangeProp) {
-            return [];
-          }
+      mapProperties(argTypes, ([key, argType]) => {
+        if (!argType || !argType.onChangeProp) {
+          return null;
+        }
 
-          const handler = (param: any) => {
-            const bindingId = `${nodeId}.props.${key}`;
-            const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
-            setControlledBinding(bindingId, { value });
-          };
-          return [[argType.onChangeProp, handler]];
-        }),
-      ),
+        const handler = (param: any) => {
+          const bindingId = `${nodeId}.props.${key}`;
+          const value = argType.onChangeHandler ? argType.onChangeHandler(param) : param;
+          setControlledBinding(bindingId, { value });
+        };
+        return [argType.onChangeProp, handler];
+      }),
     [argTypes, nodeId, setControlledBinding],
   );
 
@@ -225,14 +224,9 @@ function resolveBindables(
   bindings: Partial<Record<string, BindingEvaluationResult>>,
   bindingId: string,
   params?: BindableAttrValues<any>,
-) {
+): Record<string, unknown> {
   return params
-    ? Object.fromEntries(
-        Object.keys(params).map((propName) => [
-          propName,
-          bindings[`${bindingId}.${propName}`]?.value,
-        ]),
-      )
+    ? mapProperties(params, ([propName]) => [propName, bindings[`${bindingId}.${propName}`]?.value])
     : {};
 }
 
@@ -426,14 +420,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const evaluatedBindings = React.useMemo(() => evalJsBindings(pageBindings), [pageBindings]);
 
   const pageState = React.useMemo(() => buildGlobalScope(evaluatedBindings), [evaluatedBindings]);
-  const liveBindings = React.useMemo(
-    () =>
-      Object.fromEntries(
-        Object.entries(evaluatedBindings).map(([bindingId, binding]) => [
-          bindingId,
-          binding.result || { value: undefined },
-        ]),
-      ),
+  const liveBindings: Record<string, BindingEvaluationResult> = React.useMemo(
+    () => mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined }),
     [evaluatedBindings],
   );
 

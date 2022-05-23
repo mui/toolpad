@@ -1,4 +1,5 @@
 import { set } from 'lodash-es';
+import { mapValues } from '../utils/collections';
 
 let iframe: HTMLIFrameElement;
 function evaluateCode(code: string, globalScope: Record<string, unknown>) {
@@ -162,18 +163,13 @@ export default function evalJsBindings(
   const scope = buildGlobalScope(bindings);
   proxiedScope = proxify(scope);
 
-  return Object.fromEntries(
-    Object.entries(bindings).map(([bindingId, binding]) => {
-      const { expression, result, ...rest } = binding;
-      return [
-        bindingId,
-        {
-          ...rest,
-          result: expression
-            ? evaluateExpression(expression, proxiedScope)
-            : result || { value: undefined },
-        },
-      ];
-    }),
-  );
+  return mapValues(bindings, (binding) => {
+    const { expression, result, ...rest } = binding;
+    return {
+      ...rest,
+      result: expression
+        ? evaluateExpression(expression, proxiedScope)
+        : result || { value: undefined },
+    };
+  });
 }

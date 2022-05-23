@@ -56,7 +56,7 @@ function PlaceholderWrapper(props: PlaceholderWrapperProps) {
       style={{
         display: 'block',
         minHeight: 40,
-        minWidth: 200,
+        minWidth: '100%',
       }}
     />
   );

@@ -93,6 +93,7 @@ const OverlayRoot = styled('div')({
   },
 
   [`& .${overlayClasses.nodeHud}`]: {
+    border: '1px dashed rgba(255,0,0,.2)',
     // capture mouse events
     pointerEvents: 'initial',
     position: 'absolute',
@@ -582,14 +583,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
     const component = draggedNode.attributes.component.value;
 
-    const isRowComponent = component === ROW_COMPONENT;
-    const dropTargetComponent = isRowComponent ? COLUMN_COMPONENT : ROW_COMPONENT;
-    const dropTargetNodes = [
-      pageNode,
-      ...pageNodes.filter(
-        (node) => (node as appDom.ElementNode).attributes.component?.value === dropTargetComponent,
-      ),
-    ];
+    const dropTargetNodes =
+      component === ROW_COMPONENT
+        ? [
+            pageNode,
+            pageNodes.filter(
+              (node) =>
+                (node as appDom.ElementNode).attributes.component?.value === COLUMN_COMPONENT,
+            ),
+          ]
+        : pageNodes;
 
     /**
      * Return all nodes that are available for insertion.

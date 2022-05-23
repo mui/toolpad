@@ -16,7 +16,7 @@ export type InstantiatedComponents = Record<string, InstantiatedComponent | unde
 
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['PageRow', { displayName: 'PageRow', builtin: 'PageRow' }],
-  ['PageColumn', { displayName: 'PageColumn', builtin: 'PageColumn' }],
+  ['PageColumn', { displayName: 'Container', builtin: 'PageColumn' }],
   ['Stack', { displayName: 'Stack', builtin: 'Stack' }],
   ['Button', { displayName: 'Button', builtin: 'Button' }],
   ['Image', { displayName: 'Image', builtin: 'Image' }],

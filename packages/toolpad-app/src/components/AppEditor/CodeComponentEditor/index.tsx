@@ -15,6 +15,7 @@ import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import { usePrompt } from '../../../utils/router';
 import NodeNameEditor from '../NodeNameEditor';
+import usePageTitle from '../../../utils/usePageTitle';
 import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
@@ -63,6 +64,8 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
+
+  usePageTitle(`${codeComponentNode.name} | Toolpad editor`);
 
   const updateInputExtern = React.useCallback((newInput) => {
     const editor = editorRef.current;

@@ -413,17 +413,18 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const setControlledBinding = React.useCallback(
     (id: string, result: BindingEvaluationResult) => {
+      const parsedBinding = parsedBindings[id];
       setPageBindings((existing) => {
         if (!controlled.has(id)) {
           throw new Error(`Not a controlled binding "${id}"`);
         }
         return {
           ...existing,
-          [id]: { ...existing[id], result },
+          [id]: { ...parsedBinding, result },
         };
       });
     },
-    [controlled],
+    [parsedBindings, controlled],
   );
 
   const evaluatedBindings = React.useMemo(() => evalJsBindings(pageBindings), [pageBindings]);

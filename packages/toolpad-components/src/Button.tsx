@@ -10,16 +10,11 @@ function Button({ content, ...props }: ButtonProps) {
   return <MuiButton {...props}>{content}</MuiButton>;
 }
 
-Button.defaultProps = {
-  content: 'Button Text',
-  variant: 'contained',
-  color: 'primary',
-} as ButtonProps;
-
 export default createComponent(Button, {
   argTypes: {
     content: {
       typeDef: { type: 'string' },
+      defaultValue: 'Button Text',
     },
     onClick: {
       typeDef: { type: 'function' },
@@ -29,9 +24,11 @@ export default createComponent(Button, {
     },
     variant: {
       typeDef: { type: 'string', enum: ['contained', 'outlined', 'text'] },
+      defaultValue: 'contained',
     },
     color: {
       typeDef: { type: 'string', enum: ['primary', 'secondary'] },
+      defaultValue: 'primary',
     },
     loading: {
       typeDef: { type: 'boolean' },

@@ -21,7 +21,7 @@ commands:
     parameters:
       browsers:
         type: boolean
-        default: false
+        default: true
         description: 'Set to true if you intend to any browser (e.g. with playwright).'
 
     steps:
@@ -42,6 +42,19 @@ commands:
             # Debug information
             yarn cache dir
             yarn cache list
+      - when:
+          condition: << parameters.browsers >>
+          steps:
+            - run:
+                name: Prepare playwright hash
+                command: yarn --json list --pattern playwright > /tmp/playwright_info.json
+            - store_artifacts:
+                name: Debug playwright hash
+                path: /tmp/playwright_info.json
+            - restore_cache:
+                name: Restore playwright cache
+                keys:
+                  - v5-playwright-{{ arch }}-{{ checksum "/tmp/playwright_info.json" }}
       - run:
           name: Install js dependencies
           command: yarn install --frozen-lockfile --verbose
@@ -54,6 +67,17 @@ commands:
             # Keep path in sync with "Set yarn cache folder"
             # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
             - /tmp/yarn-cache
+            - node_modules
+      - when:
+          condition: << parameters.browsers >>
+          steps:
+            - save_cache:
+                name: Save playwright cache
+                key: v5-playwright-{{ arch }}-{{ checksum "/tmp/playwright_info.json" }}
+                paths:
+                  # Keep path in sync with "PLAYWRIGHT_BROWSERS_PATH"
+                  # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
+                  - /tmp/pw-browsers
 
 jobs:
   checkout:
@@ -92,16 +116,11 @@ jobs:
   docker:
     working_directory: /tmp/mui-toolpad
     resource_class: medium
-    docker:
-      - image: cimg/node:16.14
+    machine: true
     environment:
       - DOCKER_BUILDKIT: '1'
     steps:
       - checkout
-
-      - setup_remote_docker:
-          version: 20.10.12
-          docker_layer_caching: true
 
       # login docker hub
       - run: |
@@ -117,15 +136,30 @@ jobs:
             -f ./docker/images/toolpad/Dockerfile \
             .
 
-      # deploy the image
-      - run: |
-          docker push muicom/toolpad:$CIRCLE_SHA1
+      - install_js
 
+      # test the image
+      - run:
+          command: |
+            # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
+            TAG=$CIRCLE_SHA1 docker-compose -f ./docker/compose/docker-compose.yml up -d
+            yarn workspace @mui/toolpad-app waitForApp
+            docker run -it --rm \
+              --ipc=host \
+              -v "$CIRCLE_WORKING_DIRECTORY:/tests" \
+              -w /tests \
+              -e PLAYWRIGHT_TEST_BASE_URL=http://172.17.0.1:3000/ \
+              mcr.microsoft.com/playwright:v1.22.0-focal \
+              yarn e2e:smoke
+            docker-compose -f ./docker/compose/docker-compose.yml down
+
+      # push the image
       - when:
           condition:
             equal: [master, << pipeline.git.branch >>]
           steps:
             - run: |
+                docker push muicom/toolpad:$CIRCLE_SHA1
                 docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha
                 docker push muicom/toolpad:alpha
 

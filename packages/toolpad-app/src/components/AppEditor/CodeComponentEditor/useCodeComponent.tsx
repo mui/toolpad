@@ -1,3 +1,4 @@
+import { ToolpadComponent } from '@mui/toolpad-core';
 import * as React from 'react';
 import createCodeComponent from '../../../runtime/createCodeComponent';
 
@@ -7,7 +8,7 @@ export type UseCodeComponent =
       error?: undefined;
     }
   | {
-      Component: React.ComponentType;
+      Component: ToolpadComponent;
       error?: undefined;
     }
   | {

@@ -124,7 +124,7 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     // loading state we will propagate to the component
     let loading: boolean = false;
 
-    for (const propName of Object.keys(argTypes)) {
+    for (const [propName, argType] of Object.entries(argTypes)) {
       const bindingId = `${nodeId}.props.${propName}`;
       const binding = liveBindings[bindingId];
       if (binding) {
@@ -134,6 +134,8 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
         if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
         }
+      } else if (argType) {
+        hookResult[propName] = argType.defaultValue;
       }
     }
 

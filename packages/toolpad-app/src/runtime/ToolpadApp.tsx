@@ -51,6 +51,7 @@ import evalJsBindings, {
 import createCodeComponent from './createCodeComponent';
 import { HTML_ID_APP_ROOT } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
+import usePageTitle from '../utils/usePageTitle';
 
 const PAGE_ROW_COMPONENT_ID = 'PageRow';
 
@@ -379,6 +380,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queryStates = [], queries = [] } = appDom.getChildNodes(dom, page);
+
+  usePageTitle(page.attributes.title.value);
 
   const location = useLocation();
   const getComponent = useComponentsContext();

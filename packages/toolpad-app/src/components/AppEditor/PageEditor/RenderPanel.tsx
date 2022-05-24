@@ -684,12 +684,23 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
           }
         } else if (selection) {
+          const dragParent = appDom.getParent(dom, draggedNode);
+
+          const isOnlyRowElement =
+            dragParent &&
+            getElementNodeComponentId(dragParent as appDom.ElementNode) === PAGE_ROW_COMPONENT_ID &&
+            appDom.getChildNodes(dom, dragParent).children.length === 1;
+
           domApi.moveNode(
             selection,
             activeSlot.parentId,
             activeSlot.parentProp,
             activeSlot.parentIndex,
           );
+
+          if (isOnlyRowElement) {
+            domApi.removeNode(dragParent.id);
+          }
         }
       }
 

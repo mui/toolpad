@@ -53,8 +53,7 @@ import createCodeComponent from './createCodeComponent';
 import { HTML_ID_APP_ROOT } from '../constants';
 import usePageTitle from '../utils/usePageTitle';
 import DomProvider, { useDomContext } from './DomProvider';
-
-const PAGE_ROW_COMPONENT_ID = 'PageRow';
+import { getElementNodeComponentId, PAGE_ROW_COMPONENT_ID } from '../utils/components';
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
@@ -77,13 +76,13 @@ const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
   );
 
 function getComponentId(elm: appDom.ElementNode): string {
-  const componentId = elm.attributes.component.value;
+  const componentId = getElementNodeComponentId(elm);
   return componentId;
 }
 
 function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
   const getComponent = useComponentsContext();
-  const componentId = elm.attributes.component.value;
+  const componentId = getElementNodeComponentId(elm);
   return getComponent(componentId);
 }
 

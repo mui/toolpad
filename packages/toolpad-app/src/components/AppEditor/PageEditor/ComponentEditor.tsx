@@ -10,6 +10,7 @@ import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
+import { getElementNodeComponentId } from '../../../utils/components';
 
 const classes = {
   control: 'Toolpad_Control',
@@ -63,7 +64,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const nodeError = viewState.nodes[node.id]?.error;
   const componentConfig = viewState.nodes[node.id]?.componentConfig || { argTypes: {} };
 
-  const component = useToolpadComponent(dom, node.attributes.component.value);
+  const component = useToolpadComponent(dom, getElementNodeComponentId(node));
 
   return (
     <Stack direction="column" gap={1}>

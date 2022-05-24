@@ -31,8 +31,11 @@ import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
-
-const ROW_COMPONENT = 'PageRow';
+import {
+  PAGE_COLUMN_COMPONENT_ID,
+  PAGE_ROW_COMPONENT_ID,
+  getElementNodeComponentId,
+} from '../../../utils/components';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -56,7 +59,7 @@ const overlayClasses = {
   insertSlotHud: 'Toolpad_InsertSlotHud',
   selected: 'Toolpad_Selected',
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
-  layout: 'Toolad_Layout',
+  layout: 'Toolpad_Layout',
   active: 'Toolpad_Active',
   available: 'Toolpad_Available',
   componentDragging: 'Toolpad_ComponentDragging',
@@ -479,9 +482,12 @@ function NodeHud({
   onDelete,
 }: SelectionHudProps) {
   const dom = useDom();
-  const component = useToolpadComponent(dom, node.attributes.component.value);
 
-  const isLayoutComponent = component?.builtin === 'PageRow' || component?.builtin === 'PageColumn';
+  const componentId = getElementNodeComponentId(node);
+  const component = useToolpadComponent(dom, componentId);
+
+  const isLayoutComponent =
+    componentId === PAGE_ROW_COMPONENT_ID || componentId === PAGE_COLUMN_COMPONENT_ID;
 
   return (
     <div
@@ -657,12 +663,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           throw new Error(`Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`);
         }
 
+        const isParentRowContainer =
+          appDom.isPage(parent) || getElementNodeComponentId(parent) === PAGE_COLUMN_COMPONENT_ID;
+
         if (
-          (appDom.isPage(parent) || parent.attributes.component.value === 'PageColumn') &&
-          draggedNode.attributes.component.value !== ROW_COMPONENT
+          isParentRowContainer &&
+          getElementNodeComponentId(draggedNode) !== PAGE_ROW_COMPONENT_ID
         ) {
           // TODO: this logic should probably live in the DomReducer?
-          const container = appDom.createElement(dom, ROW_COMPONENT, {});
+          const container = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
           domApi.addNode(container, parent, 'children');
           parent = container;
           activeSlot = { parentId: parent.id, parentProp: 'children' };
@@ -748,13 +757,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const toRemove = appDom.getNode(dom, nodeId);
       const parent = appDom.getParent(dom, toRemove) as appDom.ElementNode;
 
+      const isOnlyRowElement =
+        parent &&
+        getElementNodeComponentId(parent) === PAGE_ROW_COMPONENT_ID &&
+        appDom.getChildNodes(dom, parent).children.length === 1;
+
       domApi.removeNode(toRemove.id);
 
-      if (
-        parent &&
-        (parent as appDom.ElementNode).attributes.component?.value === 'PageRow' &&
-        appDom.getChildNodes(dom, parent).children.length === 1
-      ) {
+      if (isOnlyRowElement) {
         domApi.removeNode(parent.id);
       }
 

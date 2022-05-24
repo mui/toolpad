@@ -7,6 +7,7 @@ import * as appDom from '../../../appDom';
 import { useDom } from '../../DomLoader';
 import { usePageEditorApi } from './PageEditorProvider';
 import { useToolpadComponents } from '../toolpadComponents';
+import { PAGE_ROW_COMPONENT_ID } from '../../../utils/components';
 
 const WIDTH_COLLAPSED = 50;
 
@@ -93,7 +94,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           <Box sx={{ width: 300, height: '100%', overflow: 'auto' }}>
             <Box display="grid" gridTemplateColumns="1fr" gap={1} padding={1}>
               {Object.entries(toolpadComponents)
-                .filter(([componentId]) => componentId !== 'PageRow')
+                .filter(([componentId]) => componentId !== PAGE_ROW_COMPONENT_ID)
                 .map(([componentId, componentType]) => {
                   if (!componentType) {
                     throw new Error(

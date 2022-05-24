@@ -3,26 +3,26 @@ import { Stack, StackProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageRowProps {
+  spacing?: number;
   children?: React.ReactNode;
   alignItems?: StackProps['alignItems'];
 }
 
-function PageRow({ children, alignItems }: PageRowProps) {
+function PageRow({ spacing, children, alignItems }: PageRowProps) {
   return (
     <Stack
       direction="row"
       sx={{
+        gap: spacing,
+        p: spacing,
         alignItems,
+        width: '100%',
       }}
     >
       {children}
     </Stack>
   );
 }
-
-PageRow.defaultProps = {
-  alignItems: 'start',
-};
 
 export default createComponent(PageRow, {
   argTypes: {

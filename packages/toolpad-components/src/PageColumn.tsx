@@ -18,6 +18,7 @@ function PageColumn({ span, spacing, children, alignItems }: PageColumnProps) {
         p: spacing,
         alignItems,
         width: `${(span / 12) * 100}vw`,
+        maxWidth: '100%',
       }}
     >
       {children}
@@ -28,7 +29,7 @@ function PageColumn({ span, spacing, children, alignItems }: PageColumnProps) {
 PageColumn.defaultProps = {
   spacing: 2,
   span: 1,
-  alignItems: 'center',
+  alignItems: 'start',
 };
 
 export default createComponent(PageColumn, {

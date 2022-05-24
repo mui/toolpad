@@ -33,7 +33,6 @@ import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
 
 const ROW_COMPONENT = 'PageRow';
-const COLUMN_COMPONENT = 'PageColumn';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -98,6 +97,9 @@ const OverlayRoot = styled('div')({
     // capture mouse events
     pointerEvents: 'initial',
     position: 'absolute',
+    [`&.${overlayClasses.layout}`]: {
+      borderColor: 'rgba(255,0,0,.125)',
+    },
     [`&.${overlayClasses.selected}`]: {
       border: '1px solid red',
       [`& .${overlayClasses.selectionHint}`]: {
@@ -107,9 +109,6 @@ const OverlayRoot = styled('div')({
     [`&.${overlayClasses.allowNodeInteraction}`]: {
       // block pointer-events so we can interact with the selection
       pointerEvents: 'none',
-    },
-    [`&.${overlayClasses.layout}`]: {
-      borderColor: 'rgba(255,0,0,.125)',
     },
   },
 
@@ -130,7 +129,7 @@ const OverlayRoot = styled('div')({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 11,
+    fontSize: 18,
     color: 'green',
     border: '1px dashed green',
     opacity: 0.5,
@@ -491,9 +490,9 @@ function NodeHud({
       onDragStart={onDragStart}
       style={absolutePositionCss(rect)}
       className={clsx(overlayClasses.nodeHud, {
+        [overlayClasses.layout]: isLayoutComponent,
         [overlayClasses.selected]: selected,
         [overlayClasses.allowNodeInteraction]: allowInteraction,
-        [overlayClasses.layout]: isLayoutComponent,
       })}
     >
       <div draggable className={overlayClasses.selectionHint}>
@@ -588,23 +587,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       return [];
     }
 
-    const component = draggedNode.attributes.component.value;
-
-    let dropTargetNodes = pageNodes;
-    if (component === ROW_COMPONENT) {
-      dropTargetNodes = [
-        pageNode,
-        ...pageNodes.filter(
-          (node) => (node as appDom.ElementNode).attributes.component?.value === COLUMN_COMPONENT,
-        ),
-      ];
-    }
-    if (component === COLUMN_COMPONENT) {
-      dropTargetNodes = pageNodes.filter(
-        (node) => (node as appDom.ElementNode).attributes.component?.value !== COLUMN_COMPONENT,
-      );
-    }
-
     /**
      * Return all nodes that are available for insertion.
      * i.e. Exclude all descendants of the current selection since inserting in one of
@@ -613,8 +595,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     const excludedNodes = selectedNode
       ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
       : new Set();
-    return dropTargetNodes.filter((n) => !excludedNodes.has(n));
-  }, [dom, getCurrentlyDraggedNode, pageNode, pageNodes, selectedNode]);
+    return pageNodes.filter((n) => !excludedNodes.has(n));
+  }, [dom, getCurrentlyDraggedNode, pageNodes, selectedNode]);
 
   const availableDropTargetIds = React.useMemo(
     () => new Set(availableDropTargets.map((n) => n.id)),
@@ -675,7 +657,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           throw new Error(`Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`);
         }
 
-        if (appDom.isPage(parent) && draggedNode.attributes.component.value !== ROW_COMPONENT) {
+        if (
+          (appDom.isPage(parent) || parent.attributes.component.value === 'PageColumn') &&
+          draggedNode.attributes.component.value !== ROW_COMPONENT
+        ) {
           // TODO: this logic should probably live in the DomReducer?
           const container = appDom.createElement(dom, ROW_COMPONENT, {});
           domApi.addNode(container, parent, 'children');
@@ -952,7 +937,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                           highlightedSlot?.parentProp === parentProp,
                       })}
                     >
-                      Insert Here
+                      +
                     </div>
                   ),
                 );

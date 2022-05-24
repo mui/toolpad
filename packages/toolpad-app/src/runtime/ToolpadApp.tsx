@@ -42,7 +42,7 @@ import * as appDom from '../appDom';
 import { NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import AppOverview from '../components/AppOverview';
-import { ToolpadComponentDefinitions } from '../toolpadComponents';
+import { getToolpadComponents } from '../toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   BindingEvaluationResult,
@@ -549,10 +549,9 @@ export interface ToolpadAppProps {
   appId: string;
   version: VersionOrPreview;
   dom: appDom.AppDom;
-  components: ToolpadComponentDefinitions;
 }
 
-export default function ToolpadApp({ basename, appId, version, dom, components }: ToolpadAppProps) {
+export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
   const root = appDom.getApp(dom);
   const { pages = [], themes = [], codeComponents = [] } = appDom.getChildNodes(dom, root);
 
@@ -561,6 +560,11 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
 
   const queryClient = React.useMemo(() => new QueryClient(), []);
+
+  const components = React.useMemo(
+    () => getToolpadComponents(appId, version, dom),
+    [appId, version, dom],
+  );
 
   const getComponent = React.useCallback(
     (id: string): ToolpadComponent => {

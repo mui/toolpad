@@ -109,6 +109,7 @@ export interface ToolpadAppShellProps {
 
 export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps) {
   const domLoader = useDomLoader();
+
   const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
 
   return (

@@ -26,19 +26,15 @@ function PageColumn({ span, spacing, children, alignItems }: PageColumnProps) {
   );
 }
 
-PageColumn.defaultProps = {
-  spacing: 2,
-  span: 1,
-  alignItems: 'start',
-};
-
 export default createComponent(PageColumn, {
   argTypes: {
     span: {
       typeDef: { type: 'number' },
+      defaultValue: 1,
     },
     spacing: {
       typeDef: { type: 'number' },
+      defaultValue: 2,
     },
     alignItems: {
       typeDef: {
@@ -47,6 +43,7 @@ export default createComponent(PageColumn, {
       },
       label: 'Horizontal alignment',
       control: { type: 'HorizontalAlign' },
+      defaultValue: 'start',
     },
     children: {
       typeDef: { type: 'element' },

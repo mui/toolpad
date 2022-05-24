@@ -26,17 +26,11 @@ function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps
   );
 }
 
-PageRow.defaultProps = {
-  spacing: 0,
-  alignItems: 'start',
-  justifyContent: 'start',
-};
-
 export default createComponent(PageRow, {
   argTypes: {
     spacing: {
       typeDef: { type: 'number' },
-      defaultValue: 2,
+      defaultValue: 0,
     },
     alignItems: {
       typeDef: {

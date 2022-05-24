@@ -10,7 +10,7 @@ import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
 import { AppEditorContext, AppEditorContextprovider } from './AppEditorContext';
 import AppEditorShell from './AppEditorShell';
-import NotFoundEditor from './NotFoundEditor';
+import NoPageFound from './NoPageFound';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -47,14 +47,8 @@ function FileEditor({ appId }: FileEditorProps) {
   const dom = useDom();
   const app = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, app);
-  const firstPage = pages[0];
 
-  const hasPages = React.useMemo(() => {
-    if (firstPage?.id) {
-      return true;
-    }
-    return false;
-  }, [firstPage]);
+  const firstPage = pages.length > 0 ? pages[0] : null;
 
   return (
     <Routes>
@@ -67,13 +61,10 @@ function FileEditor({ appId }: FileEditorProps) {
         <Route
           index
           element={
-            hasPages ? (
+            firstPage ? (
               <Navigate to={`pages/${firstPage.id}`} />
             ) : (
-              <NotFoundEditor
-                severity="info"
-                message="No pages in this app. Use the '+' button to create a new one"
-              />
+              <NoPageFound appId={appId} alertSeverity="info" message="No pages in this app." />
             )
           }
         />

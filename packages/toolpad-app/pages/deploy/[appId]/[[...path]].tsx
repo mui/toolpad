@@ -1,11 +1,10 @@
 import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
-import { NoSsr } from '@mui/material';
 import { VersionOrPreview } from '../../../src/types';
 
 import { asArray } from '../../../src/utils/collections';
 import * as appDom from '../../../src/appDom';
-import EditorSandbox from '../../../src/runtime/EditorSandbox';
+import ToolpadApp from '../../../src/runtime/ToolpadApp';
 import { getToolpadComponents, ToolpadComponentDefinitions } from '../../../src/toolpadComponents';
 
 interface ToolpadAppProps {
@@ -52,12 +51,5 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
   };
 };
 
-const App: NextPage<ToolpadAppProps> = (props) => {
-  return (
-    <NoSsr>
-      <EditorSandbox {...props} />
-    </NoSsr>
-  );
-};
-
+const App: NextPage<ToolpadAppProps> = (props) => <ToolpadApp {...props} />;
 export default App;

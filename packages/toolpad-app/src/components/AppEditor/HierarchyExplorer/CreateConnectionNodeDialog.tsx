@@ -17,17 +17,17 @@ import dataSources from '../../../toolpadDataSources/client';
 import { ExactEntriesOf } from '../../../utils/types';
 import DialogForm from '../../DialogForm';
 
-export interface CreateStudioConnectionDialogProps {
+export interface CreateConnectionDialogProps {
   appId: string;
   open: boolean;
   onClose: () => void;
 }
 
-export default function CreateStudioConnectionDialog({
+export default function CreateConnectionDialog({
   appId,
   onClose,
   ...props
-}: CreateStudioConnectionDialogProps) {
+}: CreateConnectionDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const [dataSourceType, setDataSourceType] = React.useState('');
@@ -56,7 +56,7 @@ export default function CreateStudioConnectionDialog({
           navigate(`/app/${appId}/editor/connections/${newNode.id}`);
         }}
       >
-        <DialogTitle>Create a new MUI Studio Connection</DialogTitle>
+        <DialogTitle>Create a new MUI Toolpad Connection</DialogTitle>
         <DialogContent>
           <FormControl sx={{ my: 1 }} size="small" fullWidth>
             <InputLabel id="select-connection-type">Type</InputLabel>

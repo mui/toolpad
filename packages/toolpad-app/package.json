@@ -3,9 +3,9 @@
   "version": "0.0.5-alpha.4",
   "license": "MIT",
   "scripts": {
-    "dev": "yarn prisma generate && yarn waitForDb && yarn prisma db push --skip-generate && concurrently \"yarn:dev:*\"",
     "build": "yarn prisma generate && concurrently \"yarn:build:*\" && rimraf ./.next/cache",
     "start": "yarn waitForDb && yarn prisma migrate deploy && NODE_ENV=production node ./server.js",
+    "dev": "yarn prisma generate && yarn waitForDb && yarn prisma db push --skip-generate && concurrently \"yarn:dev:*\"",
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",
     "prisma": "prisma",

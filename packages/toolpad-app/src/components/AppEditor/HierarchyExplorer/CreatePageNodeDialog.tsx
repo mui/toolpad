@@ -12,17 +12,13 @@ import * as appDom from '../../../appDom';
 import DialogForm from '../../DialogForm';
 import { useDom, useDomApi } from '../../DomLoader';
 
-export interface CreateStudioPageDialogProps {
+export interface CreatePageDialogProps {
   appId: string;
   open: boolean;
   onClose: () => void;
 }
 
-export default function CreateStudioPageDialog({
-  appId,
-  onClose,
-  ...props
-}: CreateStudioPageDialogProps) {
+export default function CreatePageDialog({ appId, onClose, ...props }: CreatePageDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const [name, setName] = React.useState('');
@@ -48,7 +44,7 @@ export default function CreateStudioPageDialog({
           navigate(`/app/${appId}/editor/pages/${newNode.id}`);
         }}
       >
-        <DialogTitle>Create a new MUI Studio Page</DialogTitle>
+        <DialogTitle>Create a new MUI Toolpad Page</DialogTitle>
         <DialogContent>
           <TextField
             sx={{ my: 1 }}

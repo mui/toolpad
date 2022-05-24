@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import config from '../src/server/config';
 
+const BASIC_AUTH_WHITELIST = new Set(['/health-check']);
+
 export function middleware(req: NextRequest) {
   const { pathname } = new URL(req.url);
 
-  if (pathname === '/health-check' || !config.basicAuthUser) {
+  if (!config.basicAuthUser || BASIC_AUTH_WHITELIST.has(pathname)) {
     return NextResponse.next();
   }
 

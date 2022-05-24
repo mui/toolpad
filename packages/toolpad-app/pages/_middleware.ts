@@ -17,7 +17,7 @@ export function middleware(req: NextRequest) {
     }
   }
 
-  return new Response('Auth required', {
+  return new Response(null, {
     status: 401,
     headers: {
       'WWW-Authenticate': 'Basic realm="Secure Area"',

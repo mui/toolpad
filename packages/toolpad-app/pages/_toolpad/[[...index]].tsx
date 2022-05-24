@@ -1,14 +1,6 @@
-import { NoSsr } from '@mui/material';
 import type { NextPage } from 'next';
 import * as React from 'react';
-import Studio from '../../src/components/Studio';
+import Toolpad from '../../src/components/Toolpad';
 
-const Home: NextPage = () => {
-  return (
-    <NoSsr>
-      <Studio basename="/_toolpad" />
-    </NoSsr>
-  );
-};
-
+const Home: NextPage = () => <Toolpad basename="/_toolpad" />;
 export default Home;

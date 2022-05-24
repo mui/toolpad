@@ -22,6 +22,15 @@ module.exports = {
     return config;
   },
 
+  async rewrites() {
+    return [
+      {
+        source: '/health-check',
+        destination: '/api/health-check',
+      },
+    ];
+  },
+
   async redirects() {
     return [
       {

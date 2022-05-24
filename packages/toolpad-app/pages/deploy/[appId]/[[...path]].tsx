@@ -1,20 +1,7 @@
 import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
-import { NoSsr } from '@mui/material';
-import { VersionOrPreview } from '../../../src/types';
-
 import { asArray } from '../../../src/utils/collections';
-import * as appDom from '../../../src/appDom';
-import EditorSandbox from '../../../src/runtime/EditorSandbox';
-import { getToolpadComponents, ToolpadComponentDefinitions } from '../../../src/toolpadComponents';
-
-interface ToolpadAppProps {
-  appId: string;
-  dom: appDom.AppDom;
-  version: VersionOrPreview;
-  components: ToolpadComponentDefinitions;
-  basename: string;
-}
+import ToolpadApp, { ToolpadAppProps } from '../../../src/runtime/ToolpadApp';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
   const { loadVersionedDom, findActiveDeployment } = await import('../../../src/server/data');
@@ -39,25 +26,15 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
 
   const dom = await loadVersionedDom(appId, version);
 
-  const components = getToolpadComponents(appId, version, dom);
-
   return {
     props: {
       appId,
       dom,
       version,
-      components,
       basename: `/deploy/${appId}`,
     },
   };
 };
 
-const App: NextPage<ToolpadAppProps> = (props) => {
-  return (
-    <NoSsr>
-      <EditorSandbox {...props} />
-    </NoSsr>
-  );
-};
-
+const App: NextPage<ToolpadAppProps> = (props) => <ToolpadApp {...props} />;
 export default App;

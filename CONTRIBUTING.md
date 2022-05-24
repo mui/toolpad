@@ -29,7 +29,6 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
    ```sh
    yarn install
-   yarn dev
    ```
 
 1. Create a `.env` file in the root of the project
@@ -38,17 +37,17 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
    TOOLPAD_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
    ```
 
-1. Now you can run the MUI Toolpad cli to start the application
+1. Now you can run the MUI Toolpad dev command to start the application
 
    ```sh
-   yarn cli
+   yarn dev
    ```
 
 1. Open [`http://localhost:3000/`](http://localhost:3000/) in your browser.
 
 ### Notes for contributors:
 
-- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn cli` command, or by running
+- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn dev` command, or by running
 
   ```sh
   yarn prisma db push

@@ -23,7 +23,6 @@ FROM base AS deps
 COPY ./package.json ./yarn.lock ./
 COPY ./packages/eslint-plugin-material-ui/package.json ./packages/eslint-plugin-material-ui/
 COPY ./packages/toolpad-app/package.json ./packages/toolpad-app/
-COPY ./packages/toolpad-cli/package.json ./packages/toolpad-cli/
 COPY ./packages/toolpad-components/package.json ./packages/toolpad-components/
 COPY ./packages/toolpad-core/package.json ./packages/toolpad-core/
 RUN --mount=type=cache,target=/root/caches \

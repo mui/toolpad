@@ -6,9 +6,10 @@ export interface PageRowProps {
   spacing?: number;
   children?: React.ReactNode;
   alignItems?: StackProps['alignItems'];
+  justifyContent?: StackProps['justifyContent'];
 }
 
-function PageRow({ spacing, children, alignItems }: PageRowProps) {
+function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps) {
   return (
     <Stack
       direction="row"
@@ -16,6 +17,7 @@ function PageRow({ spacing, children, alignItems }: PageRowProps) {
         gap: spacing,
         p: spacing,
         alignItems,
+        justifyContent,
         width: '100%',
       }}
     >
@@ -23,6 +25,12 @@ function PageRow({ spacing, children, alignItems }: PageRowProps) {
     </Stack>
   );
 }
+
+PageRow.defaultProps = {
+  spacing: 0,
+  alignItems: 'start',
+  justifyContent: 'start',
+};
 
 export default createComponent(PageRow, {
   argTypes: {
@@ -37,7 +45,7 @@ export default createComponent(PageRow, {
       },
       label: 'Vertical alignment',
       control: { type: 'VerticalAlign' },
-      defaultValue: 'center',
+      defaultValue: 'start',
     },
     justifyContent: {
       typeDef: {

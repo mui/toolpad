@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { styled, Alert, Box, CircularProgress } from '@mui/material';
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes, useParams, Navigate } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/runtime';
 import PageEditor from './PageEditor';
-import DomProvider, { useDomLoader } from '../DomLoader';
+import DomProvider, { useDom, useDomLoader } from '../DomLoader';
 import ApiEditor from './ApiEditor';
+import * as appDom from '../../appDom';
 import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
 import { AppEditorContext, AppEditorContextprovider } from './AppEditorContext';
@@ -43,6 +44,18 @@ interface FileEditorProps {
 }
 
 function FileEditor({ appId }: FileEditorProps) {
+  const dom = useDom();
+  const app = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
+  const firstPage = pages[0];
+
+  const hasPages = React.useMemo(() => {
+    if (firstPage?.id) {
+      return true;
+    }
+    return false;
+  }, [firstPage]);
+
   return (
     <Routes>
       <Route element={<AppEditorShell appId={appId} />}>
@@ -50,13 +63,18 @@ function FileEditor({ appId }: FileEditorProps) {
         <Route path="apis/:nodeId" element={<ApiEditor appId={appId} />} />
         <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
         <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
+        <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
         <Route
           index
           element={
-            <NotFoundEditor
-              severity="info"
-              message="No pages in this app. Use '+' to create a new one"
-            />
+            hasPages ? (
+              <Navigate to={`pages/${firstPage.id}`} />
+            ) : (
+              <NotFoundEditor
+                severity="info"
+                message="No pages in this app. Use the '+' button to create a new one"
+              />
+            )
           }
         />
       </Route>

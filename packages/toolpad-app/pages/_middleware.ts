@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import config from '../src/server/config';
 
 export function middleware(req: NextRequest) {
-  if (!config.basicAuthUser) {
+  const { pathname } = new URL(req.url);
+
+  if (pathname === '/health-check' || !config.basicAuthUser) {
     return NextResponse.next();
   }
 

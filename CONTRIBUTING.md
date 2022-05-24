@@ -25,7 +25,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
    docker-compose -f ./docker-compose.dev.yml down
    ```
 
-1. Install dependencies and start building the project in watch mode:
+1. Install dependencies:
 
    ```sh
    yarn install

@@ -50,6 +50,7 @@ import evalJsBindings, {
 } from './evalJsBindings';
 import createCodeComponent from './createCodeComponent';
 import { HTML_ID_APP_ROOT } from '../constants';
+import usePageTitle from '../utils/usePageTitle';
 
 const PAGE_ROW_COMPONENT_ID = 'PageRow';
 
@@ -123,7 +124,7 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     // loading state we will propagate to the component
     let loading: boolean = false;
 
-    for (const propName of Object.keys(argTypes)) {
+    for (const [propName, argType] of Object.entries(argTypes)) {
       const bindingId = `${nodeId}.props.${propName}`;
       const binding = liveBindings[bindingId];
       if (binding) {
@@ -133,6 +134,8 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
         if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
         }
+      } else if (argType) {
+        hookResult[propName] = argType.defaultValue;
       }
     }
 
@@ -301,7 +304,7 @@ function parseBindings(
         if (argType) {
           parsedBindingsMap.set(bindingId, {
             scopePath,
-            result: { value: Component.defaultProps?.[propName] },
+            result: { value: argType.defaultValue },
           });
         }
       }
@@ -314,7 +317,7 @@ function parseBindings(
         if (argType) {
           if (argType.onChangeProp) {
             const defaultValue: unknown =
-              binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
+              binding?.type === 'const' ? binding?.value : argType.defaultValue;
             controlled.add(bindingId);
             parsedBindingsMap.set(bindingId, {
               scopePath,
@@ -386,6 +389,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queryStates = [], queries = [] } = appDom.getChildNodes(dom, page);
 
+  usePageTitle(page.attributes.title.value);
+
   const location = useLocation();
   const getComponent = useComponentsContext();
 
@@ -410,17 +415,18 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const setControlledBinding = React.useCallback(
     (id: string, result: BindingEvaluationResult) => {
+      const parsedBinding = parsedBindings[id];
       setPageBindings((existing) => {
         if (!controlled.has(id)) {
           throw new Error(`Not a controlled binding "${id}"`);
         }
         return {
           ...existing,
-          [id]: { ...existing[id], result },
+          [id]: { ...parsedBinding, result },
         };
       });
     },
-    [controlled],
+    [parsedBindings, controlled],
   );
 
   const evaluatedBindings = React.useMemo(() => evalJsBindings(pageBindings), [pageBindings]);

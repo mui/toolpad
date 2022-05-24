@@ -16,7 +16,8 @@
     "dev:react-devtools": "yarn build:react-devtools --watch",
     "dev:typings": "yarn build:typings",
     "dev:prisma": "prisma generate --watch",
-    "waitForDb": "ts-node ./scripts/waitForDb.ts"
+    "waitForDb": "ts-node ./scripts/waitForDb.ts",
+    "waitForApp": "ts-node ./scripts/waitForApp.ts"
   },
   "files": [
     "prisma",

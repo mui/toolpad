@@ -9,11 +9,18 @@
     "type": "git",
     "url": "git+https://github.com/mui/mui-toolpad.git"
   },
-  "scripts": {},
+  "scripts": {
+    "dev": "next dev",
+    "dev2": "node ./server.js"
+  },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/toolpad-app": "^0.0.5-alpha.4"
+    "@mui/toolpad-app": "^0.0.5-alpha.4",
+    "next": "^12.1.4"
+  },
+  "devDependencies": {
+    "next-transpile-modules": "^9.0.0"
   }
 }

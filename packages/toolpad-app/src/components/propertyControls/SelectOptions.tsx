@@ -4,15 +4,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
   IconButton,
-  InputLabel,
-  OutlinedInput,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
-  FormHelperText,
   Stack,
   TextField,
 } from '@mui/material';
@@ -49,13 +45,9 @@ function SelectOptionsPropEditor({
     return null;
   }, [editingIndex, value]);
 
-  const handleOptionTextTnput = React.useCallback(
-    (
-      event:
-        | React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
-        | React.ChangeEvent<HTMLInputElement>,
-    ) => {
-      if ('key' in event && event.key === 'Enter') {
+  const handleOptionTextInput = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Enter') {
         onChange([...value, (event.target as HTMLInputElement).value]);
 
         if (optionInputRef.current) {
@@ -198,18 +190,16 @@ function SelectOptionsPropEditor({
                   })}
                 </List>
               ) : null}
-              <FormControl fullWidth sx={{ m: 1 }} size="small" variant="outlined">
-                <InputLabel htmlFor="add-options">Add option</InputLabel>
-                <OutlinedInput
-                  inputRef={optionInputRef}
-                  id="add-options"
-                  onKeyUp={handleOptionTextTnput}
-                  label="Add option"
-                />
-                <FormHelperText id="add-options-helperText">
-                  Press &ldquo;Enter&rdquo; / &ldquo;Return&rdquo; to add
-                </FormHelperText>
-              </FormControl>
+              <TextField
+                fullWidth
+                sx={{ m: 1 }}
+                size="small"
+                variant="outlined"
+                inputRef={optionInputRef}
+                onKeyUp={handleOptionTextInput}
+                label="Add option"
+                helperText="Press &ldquo;Enter&rdquo; / &ldquo;Return&rdquo; to add"
+              />
             </DialogContent>
           </React.Fragment>
         )}

@@ -8,33 +8,63 @@ import {
   IconButton,
   InputLabel,
   OutlinedInput,
-  InputAdornment,
   List,
   ListItem,
   ListItemButton,
-  ListSubheader,
   ListItemText,
   FormHelperText,
+  Stack,
+  TextField,
 } from '@mui/material';
 import * as React from 'react';
-import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import type { EditorProps } from '../../types';
 
-function SelectOptionsPropEditor({ label, value = [], onChange }: EditorProps<string[]>) {
-  const [editOptionsDialogOpen, setEditOptionsDialogOpen] = React.useState(false);
-  const [optionsText, setOptionsText] = React.useState<string | null>('');
+interface SelectOption {
+  label?: string;
+  value: string;
+}
 
-  const handleOptionsAdd = React.useCallback(() => {
-    const newOptions = optionsText?.split(',');
-    if (newOptions?.length) {
-      if (value?.length) {
-        onChange([...value, ...newOptions]);
-      } else {
-        onChange([...newOptions]);
+function SelectOptionsPropEditor({
+  label,
+  value = [],
+  onChange,
+}: EditorProps<(string | SelectOption)[]>) {
+  const [editOptionsDialogOpen, setEditOptionsDialogOpen] = React.useState(false);
+  const optionInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
+
+  const editingOption: SelectOption | null = React.useMemo(() => {
+    if (typeof editingIndex === 'number') {
+      const option: SelectOption | string = value[editingIndex];
+      if (typeof option === 'string') {
+        return {
+          value: option,
+          label: '',
+        };
       }
+      return option;
     }
-  }, [onChange, value, optionsText]);
+    return null;
+  }, [editingIndex, value]);
+
+  const handleOptionTextTnput = React.useCallback(
+    (
+      event:
+        | React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
+        | React.ChangeEvent<HTMLInputElement>,
+    ) => {
+      if ('key' in event && event.key === 'Enter') {
+        onChange([...value, (event.target as HTMLInputElement).value]);
+
+        if (optionInputRef.current) {
+          optionInputRef.current.value = '';
+        }
+      }
+    },
+    [onChange, value],
+  );
 
   const handleOptionDelete = React.useCallback(
     (deletedIndex: number) => (event: React.MouseEvent) => {
@@ -42,6 +72,24 @@ function SelectOptionsPropEditor({ label, value = [], onChange }: EditorProps<st
       onChange(value.filter((column, i) => i !== deletedIndex));
     },
     [onChange, value],
+  );
+
+  const handleDeleteAll = React.useCallback(() => {
+    onChange([]);
+  }, [onChange]);
+
+  const handleOptionItemClick = React.useCallback(
+    (index: number) => () => {
+      setEditingIndex(index);
+    },
+    [],
+  );
+
+  const handleOptionChange = React.useCallback(
+    (newValue: SelectOption) => {
+      onChange(value.map((option, i) => (i === editingIndex ? newValue : option)));
+    },
+    [editingIndex, onChange, value],
   );
 
   return (
@@ -59,36 +107,86 @@ function SelectOptionsPropEditor({ label, value = [], onChange }: EditorProps<st
         open={editOptionsDialogOpen}
         onClose={() => setEditOptionsDialogOpen(false)}
       >
-        {
+        {editingOption ? (
           <React.Fragment>
-            <DialogTitle>Edit options</DialogTitle>
+            <DialogTitle>
+              <IconButton aria-label="Back" onClick={() => setEditingIndex(null)}>
+                <ArrowBackIcon />
+              </IconButton>
+              Edit option &ldquo;{editingOption.value}&rdquo;
+            </DialogTitle>
             <DialogContent>
-              {value?.length ? (
-                <List
-                  dense
-                  subheader={
-                    <ListSubheader component="div" id="options-list">
-                      Options
-                    </ListSubheader>
-                  }
+              <Stack gap={1} py={1}>
+                <TextField
+                  label="Value"
+                  size="small"
+                  value={editingOption.value}
+                  onChange={(event) => {
+                    handleOptionChange({ ...editingOption, value: event.target.value });
+                  }}
+                />
+                <TextField
+                  label="Label"
+                  size="small"
+                  value={editingOption.label}
+                  onChange={(event) => {
+                    handleOptionChange({ ...editingOption, label: event.target.value });
+                  }}
+                />
+              </Stack>
+            </DialogContent>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <DialogTitle>
+              Edit options
+              {value.length > 0 ? (
+                <Button
+                  aria-label="Delete all options"
+                  variant="text"
+                  size="small"
+                  color="inherit"
+                  onClick={handleDeleteAll}
+                  sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 16,
+                  }}
                 >
+                  Delete All
+                </Button>
+              ) : null}
+            </DialogTitle>
+            <DialogContent>
+              {value.length > 0 ? (
+                <List dense>
                   {value.map((option, i) => {
                     return (
                       <ListItem
                         key={i}
                         disableGutters
+                        onClick={handleOptionItemClick(i)}
                         secondaryAction={
                           <IconButton
-                            aria-label="Remove option"
+                            aria-label="Delete option"
                             edge="end"
                             onClick={handleOptionDelete(i)}
                           >
-                            <DeleteIcon />
+                            <DeleteIcon fontSize="small" />
                           </IconButton>
                         }
                       >
                         <ListItemButton>
-                          <ListItemText primary={option} />
+                          <ListItemText
+                            primary={
+                              typeof option === 'string' ? option : (option as SelectOption).value
+                            }
+                            secondary={
+                              typeof option === 'object'
+                                ? `Label: "${(option as SelectOption).label}"`
+                                : null
+                            }
+                          />
                         </ListItemButton>
                       </ListItem>
                     );
@@ -96,34 +194,20 @@ function SelectOptionsPropEditor({ label, value = [], onChange }: EditorProps<st
                 </List>
               ) : null}
               <FormControl fullWidth sx={{ m: 1 }} size="small" variant="outlined">
-                <InputLabel htmlFor="add-options">
-                  Add {value?.length ? 'More' : 'Options'}
-                </InputLabel>
+                <InputLabel htmlFor="add-options">Add option</InputLabel>
                 <OutlinedInput
+                  inputRef={optionInputRef}
                   id="add-options"
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setOptionsText(event.target.value);
-                  }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleOptionsAdd}
-                        edge="end"
-                      >
-                        {<CheckIcon />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  label="Options"
+                  onKeyUp={handleOptionTextTnput}
+                  label="Add option"
                 />
                 <FormHelperText id="add-options-helperText">
-                  Enter a comma ( , ) separated list
+                  Press &ldquo;Enter&rdquo; / &ldquo;Return&rdquo; to add
                 </FormHelperText>
               </FormControl>
             </DialogContent>
           </React.Fragment>
-        }
+        )}
         <DialogActions>
           <Button color="inherit" variant="text" onClick={() => setEditOptionsDialogOpen(false)}>
             Close

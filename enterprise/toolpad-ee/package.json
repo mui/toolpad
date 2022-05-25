@@ -10,8 +10,12 @@
     "url": "git+https://github.com/mui/mui-toolpad.git"
   },
   "scripts": {
-    "dev": "next dev",
-    "dev2": "node ./server.js"
+    "build": "yarn workspace @mui/toolpad-app build:prisma && concurrently \"yarn:build:*\" && rimraf ./.next/cache",
+    "dev": "concurrently \"yarn:dev:*\"",
+    "build:public": "PUBLIC_FOLDER=\"$PWD/public\" yarn workspace @mui/toolpad-app build:public",
+    "build:next": "next build",
+    "dev:next": "next dev",
+    "dev:public": "PUBLIC_FOLDER=\"$PWD/public\" yarn workspace @mui/toolpad-app dev:public"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
@@ -21,6 +25,7 @@
     "next": "^12.1.4"
   },
   "devDependencies": {
+    "concurrently": "^7.2.1",
     "next-transpile-modules": "^9.0.0"
   }
 }

@@ -7,6 +7,7 @@ import * as appDom from '../../../appDom';
 import { useDom } from '../../DomLoader';
 import { usePageEditorApi } from './PageEditorProvider';
 import { useToolpadComponents } from '../toolpadComponents';
+import { PAGE_ROW_COMPONENT_ID } from '../../../toolpadComponents';
 
 const WIDTH_COLLAPSED = 50;
 
@@ -92,23 +93,25 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
         <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
           <Box sx={{ width: 300, height: '100%', overflow: 'auto' }}>
             <Box display="grid" gridTemplateColumns="1fr" gap={1} padding={1}>
-              {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
-                if (!componentType) {
-                  throw new Error(
-                    `Invariant: Component definition for "${componentId}" is undefined`,
+              {Object.entries(toolpadComponents)
+                .filter(([componentId]) => componentId !== PAGE_ROW_COMPONENT_ID)
+                .map(([componentId, componentType]) => {
+                  if (!componentType) {
+                    throw new Error(
+                      `Invariant: Component definition for "${componentId}" is undefined`,
+                    );
+                  }
+                  return (
+                    <ComponentCatalogItem
+                      key={componentId}
+                      draggable
+                      onDragStart={handleDragStart(componentId)}
+                    >
+                      <DragIndicatorIcon color="inherit" />
+                      {componentType.displayName}
+                    </ComponentCatalogItem>
                   );
-                }
-                return (
-                  <ComponentCatalogItem
-                    key={componentId}
-                    draggable
-                    onDragStart={handleDragStart(componentId)}
-                  >
-                    <DragIndicatorIcon color="inherit" />
-                    {componentType.displayName}
-                  </ComponentCatalogItem>
-                );
-              })}
+                })}
             </Box>
           </Box>
         </Collapse>

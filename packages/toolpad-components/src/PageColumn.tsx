@@ -2,23 +2,23 @@ import * as React from 'react';
 import { Stack, StackProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
-export interface PageRowProps {
+export interface PageColumnProps {
+  span: number;
   spacing?: number;
   children?: React.ReactNode;
   alignItems?: StackProps['alignItems'];
-  justifyContent?: StackProps['justifyContent'];
 }
 
-function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps) {
+function PageColumn({ span, spacing, children, alignItems }: PageColumnProps) {
   return (
     <Stack
-      direction="row"
+      direction="column"
       sx={{
         gap: spacing,
         p: spacing,
         alignItems,
-        justifyContent,
-        width: '100%',
+        width: `${(span / 12) * 100}vw`,
+        maxWidth: '100%',
       }}
     >
       {children}
@@ -26,22 +26,17 @@ function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps
   );
 }
 
-export default createComponent(PageRow, {
+export default createComponent(PageColumn, {
   argTypes: {
+    span: {
+      typeDef: { type: 'number' },
+      defaultValue: 1,
+    },
     spacing: {
       typeDef: { type: 'number' },
-      defaultValue: 0,
+      defaultValue: 2,
     },
     alignItems: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'stretch', 'baseline'],
-      },
-      label: 'Vertical alignment',
-      control: { type: 'VerticalAlign' },
-      defaultValue: 'start',
-    },
-    justifyContent: {
       typeDef: {
         type: 'string',
         enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],

@@ -31,8 +31,13 @@ import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
-
-const ROW_COMPONENT = 'PageRow';
+import {
+  getElementNodeComponentId,
+  isPageColumn,
+  isPageRow,
+  PAGE_COLUMN_COMPONENT_ID,
+  PAGE_ROW_COMPONENT_ID,
+} from '../../../toolpadComponents';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -56,6 +61,7 @@ const overlayClasses = {
   insertSlotHud: 'Toolpad_InsertSlotHud',
   selected: 'Toolpad_Selected',
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
+  layout: 'Toolpad_Layout',
   active: 'Toolpad_Active',
   available: 'Toolpad_Available',
   componentDragging: 'Toolpad_ComponentDragging',
@@ -92,9 +98,13 @@ const OverlayRoot = styled('div')({
   },
 
   [`& .${overlayClasses.nodeHud}`]: {
+    border: '1px dashed rgba(255,0,0,.25)',
     // capture mouse events
     pointerEvents: 'initial',
     position: 'absolute',
+    [`&.${overlayClasses.layout}`]: {
+      borderColor: 'rgba(255,0,0,.125)',
+    },
     [`&.${overlayClasses.selected}`]: {
       border: '1px solid red',
       [`& .${overlayClasses.selectionHint}`]: {
@@ -124,7 +134,7 @@ const OverlayRoot = styled('div')({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 11,
+    fontSize: 18,
     color: 'green',
     border: '1px dashed green',
     opacity: 0.5,
@@ -474,7 +484,12 @@ function NodeHud({
   onDelete,
 }: SelectionHudProps) {
   const dom = useDom();
-  const component = useToolpadComponent(dom, node.attributes.component.value);
+
+  const componentId = getElementNodeComponentId(node);
+  const component = useToolpadComponent(dom, componentId);
+
+  const isLayoutComponent =
+    componentId === PAGE_ROW_COMPONENT_ID || componentId === PAGE_COLUMN_COMPONENT_ID;
 
   return (
     <div
@@ -483,6 +498,7 @@ function NodeHud({
       onDragStart={onDragStart}
       style={absolutePositionCss(rect)}
       className={clsx(overlayClasses.nodeHud, {
+        [overlayClasses.layout]: isLayoutComponent,
         [overlayClasses.selected]: selected,
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
@@ -579,11 +595,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       return [];
     }
 
-    const component = draggedNode.attributes.component.value;
-    if (component === ROW_COMPONENT) {
-      return [appDom.getNode(dom, pageNodeId, 'page')];
-    }
-
     /**
      * Return all nodes that are available for insertion.
      * i.e. Exclude all descendants of the current selection since inserting in one of
@@ -593,7 +604,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
       : new Set();
     return pageNodes.filter((n) => !excludedNodes.has(n));
-  }, [dom, getCurrentlyDraggedNode, pageNodeId, pageNodes, selectedNode]);
+  }, [dom, getCurrentlyDraggedNode, pageNodes, selectedNode]);
 
   const availableDropTargetIds = React.useMemo(
     () => new Set(availableDropTargets.map((n) => n.id)),
@@ -654,9 +665,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           throw new Error(`Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`);
         }
 
-        if (appDom.isPage(parent) && draggedNode.attributes.component.value !== ROW_COMPONENT) {
+        const isParentRowContainer = appDom.isPage(parent) || isPageColumn(parent);
+
+        if (isParentRowContainer && !isPageRow(draggedNode)) {
           // TODO: this logic should probably live in the DomReducer?
-          const container = appDom.createElement(dom, ROW_COMPONENT, {});
+          const container = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
           domApi.addNode(container, parent, 'children');
           parent = container;
           activeSlot = { parentId: parent.id, parentProp: 'children' };
@@ -669,12 +682,24 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
           }
         } else if (selection) {
+          const dragParent = appDom.getParent(dom, draggedNode);
+
+          const isOnlyRowElement =
+            dragParent &&
+            appDom.isElement(dragParent) &&
+            isPageRow(dragParent) &&
+            appDom.getChildNodes(dom, dragParent).children.length === 1;
+
           domApi.moveNode(
             selection,
             activeSlot.parentId,
             activeSlot.parentProp,
             activeSlot.parentIndex,
           );
+
+          if (isOnlyRowElement) {
+            domApi.removeNode(dragParent.id);
+          }
         }
       }
 
@@ -740,7 +765,20 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleDelete = React.useCallback(
     (nodeId: NodeId) => {
       const toRemove = appDom.getNode(dom, nodeId);
+      const parent = appDom.getParent(dom, toRemove);
+
+      const isOnlyRowElement =
+        parent &&
+        appDom.isElement(parent) &&
+        isPageRow(parent) &&
+        appDom.getChildNodes(dom, parent).children.length === 1;
+
       domApi.removeNode(toRemove.id);
+
+      if (isOnlyRowElement) {
+        domApi.removeNode(parent.id);
+      }
+
       api.deselect();
     },
     [dom, domApi, api],
@@ -920,7 +958,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                           highlightedSlot?.parentProp === parentProp,
                       })}
                     >
-                      Insert Here
+                      +
                     </div>
                   ),
                 );

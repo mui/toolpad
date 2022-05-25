@@ -14,8 +14,12 @@ export interface InstantiatedComponent extends ToolpadComponentDefinition {
 }
 export type InstantiatedComponents = Record<string, InstantiatedComponent | undefined>;
 
+export const PAGE_ROW_COMPONENT_ID = 'PageRow';
+export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
+
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
-  ['PageRow', { displayName: 'PageRow', builtin: 'PageRow' }],
+  [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtin: 'PageRow' }],
+  [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtin: 'PageColumn' }],
   ['Stack', { displayName: 'Stack', builtin: 'Stack' }],
   ['Button', { displayName: 'Button', builtin: 'Button' }],
   ['Image', { displayName: 'Image', builtin: 'Image' }],
@@ -61,4 +65,16 @@ export function getToolpadComponent(
 ): ToolpadComponentDefinition | null {
   const component = components[componentId];
   return component || null;
+}
+
+export function getElementNodeComponentId(elementNode: appDom.ElementNode): string {
+  return elementNode.attributes.component.value;
+}
+
+export function isPageRow(elementNode: appDom.ElementNode): boolean {
+  return getElementNodeComponentId(elementNode) === PAGE_ROW_COMPONENT_ID;
+}
+
+export function isPageColumn(elementNode: appDom.ElementNode): boolean {
+  return getElementNodeComponentId(elementNode) === PAGE_COLUMN_COMPONENT_ID;
 }

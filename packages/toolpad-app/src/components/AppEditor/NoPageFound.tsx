@@ -1,13 +1,11 @@
-import { Box, Alert, AlertColor, Button } from '@mui/material';
+import { Grid, Typography, Button } from '@mui/material';
 import * as React from 'react';
 import CreatePageNodeDialog from './HierarchyExplorer/CreatePageNodeDialog';
 
 export interface NoPageFoundProps {
   appId: string;
-  message: string;
-  alertSeverity?: AlertColor;
 }
-export default function NotFoundEditor({ appId, message, alertSeverity }: NoPageFoundProps) {
+export default function NoPageFound({ appId }: NoPageFoundProps) {
   const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
   const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
@@ -15,29 +13,33 @@ export default function NotFoundEditor({ appId, message, alertSeverity }: NoPage
   }, []);
   const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
   return (
-    <Box
-      sx={{
-        p: 3,
-        display: 'flex',
-        flexDirection: 'row',
-      }}
+    <Grid
+      container
+      sx={{ minHeight: '100%', m: 1 }}
+      spacing={1}
+      justifyContent="center"
+      alignItems="center"
+      direction="column"
     >
-      <Alert
-        severity={alertSeverity ?? 'warning'}
-        action={
-          <Button color="inherit" size="small" onClick={handleCreatePageDialogOpen}>
-            Create new
-          </Button>
-        }
-      >
-        {message}
-      </Alert>
+      <Grid item>
+        <Typography variant="h6">No pages in this app.</Typography>
+      </Grid>
+      <Grid item>
+        <Button
+          variant="outlined"
+          color="inherit"
+          size="small"
+          onClick={handleCreatePageDialogOpen}
+        >
+          Create new
+        </Button>
+      </Grid>
       <CreatePageNodeDialog
         key={createPageDialogOpen || undefined}
         appId={appId}
         open={!!createPageDialogOpen}
         onClose={handleCreatepageDialogClose}
       />
-    </Box>
+    </Grid>
   );
 }

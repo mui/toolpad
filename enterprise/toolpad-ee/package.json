@@ -1,0 +1,19 @@
+{
+  "name": "@mui/toolpad-ee",
+  "version": "0.0.5-alpha.4",
+  "description": "Build MUI apps quickly",
+  "author": "MUI Toolpad team",
+  "homepage": "https://github.com/mui/mui-toolpad#readme",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mui/mui-toolpad.git"
+  },
+  "scripts": {},
+  "bugs": {
+    "url": "https://github.com/mui/mui-toolpad/issues"
+  },
+  "dependencies": {
+    "@mui/toolpad-app": "^0.0.5-alpha.4"
+  }
+}

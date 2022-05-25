@@ -51,15 +51,6 @@ function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit 
   );
 }
 
-Image.defaultProps = {
-  alt: '',
-  sx: { maxWidth: '100%' },
-  width: 400,
-  height: 300,
-  loading: false,
-  fit: 'contain',
-} as ImageProps;
-
 export default createComponent(Image, {
   loadingPropSource: ['src'],
   loadingProp: 'loading',
@@ -69,21 +60,27 @@ export default createComponent(Image, {
     },
     alt: {
       typeDef: { type: 'string' },
+      defaultValue: '',
     },
     fit: {
       typeDef: { type: 'string', enum: ['contain', 'cover', 'fill', 'none', 'scale-down'] },
+      defaultValue: 'contain',
     },
     width: {
       typeDef: { type: 'number' },
+      defaultValue: 400,
     },
     height: {
       typeDef: { type: 'number' },
+      defaultValue: 300,
     },
     loading: {
       typeDef: { type: 'boolean' },
+      defaultValue: false,
     },
     sx: {
       typeDef: { type: 'object' },
+      defaultValue: { maxWidth: '100%' },
     },
   },
 });

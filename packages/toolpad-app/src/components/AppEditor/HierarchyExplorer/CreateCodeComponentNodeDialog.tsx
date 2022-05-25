@@ -31,29 +31,28 @@ function createDefaultCodeComponent(name: string): string {
       );
     }
 
-    ${componentId}.defaultProps = {
-      msg: "Hello world!",
-    };
-
-    export default createComponent(${componentId}, {
+    export default createComponent(MyComponent, {
       argTypes: {
-        msg: { typeDef: { type: "string" } }
-      }
-    });
+        msg: {
+          typeDef: { type: "string" },
+          defaultValue: "Hello world!",
+        },
+      },
+    });    
   `);
 }
 
-export interface CreateStudioCodeComponentDialogProps {
+export interface CreateCodeComponentDialogProps {
   appId: string;
   open: boolean;
   onClose: () => void;
 }
 
-export default function CreateStudioCodeComponentDialog({
+export default function CreateCodeComponentDialog({
   appId,
   onClose,
   ...props
-}: CreateStudioCodeComponentDialogProps) {
+}: CreateCodeComponentDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const [name, setName] = React.useState(`MyComponent`);
@@ -81,7 +80,7 @@ export default function CreateStudioCodeComponentDialog({
           navigate(`/app/${appId}/editor/codeComponents/${newNode.id}`);
         }}
       >
-        <DialogTitle>Create a new MUI Studio Code Component</DialogTitle>
+        <DialogTitle>Create a new MUI Toolpad Code Component</DialogTitle>
         <DialogContent>
           <TextField
             sx={{ my: 1 }}

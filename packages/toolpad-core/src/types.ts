@@ -119,7 +119,7 @@ export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
 }>;
 
-export interface ArgTypeDefinition {
+export interface ArgTypeDefinition<V = unknown> {
   /**
    * To be used instead of the property name for UI purposes in the editor.
    */
@@ -137,6 +137,10 @@ export interface ArgTypeDefinition {
    */
   description?: string;
   /**
+   * A default value for the property.
+   */
+  defaultValue?: V;
+  /**
    * The property that is used to control this property.
    */
   onChangeProp?: string;
@@ -145,11 +149,11 @@ export interface ArgTypeDefinition {
    * @param {...any} params params for the function assigned to [onChangeProp]
    * @returns {any} a value for the controlled prop
    */
-  onChangeHandler?: (...params: any[]) => unknown;
+  onChangeHandler?: (...params: any[]) => V;
 }
 
 export type ArgTypeDefinitions<P = any> = {
-  [K in keyof P & string]?: ArgTypeDefinition;
+  [K in keyof P & string]?: ArgTypeDefinition<P[K]>;
 };
 
 export interface ComponentDefinition<P> {

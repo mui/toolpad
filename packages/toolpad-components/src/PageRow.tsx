@@ -20,16 +20,11 @@ function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps
   );
 }
 
-PageRow.defaultProps = {
-  spacing: 2,
-  alignItems: 'center',
-  justifyContent: 'start',
-};
-
 export default createComponent(PageRow, {
   argTypes: {
     spacing: {
       typeDef: { type: 'number' },
+      defaultValue: 2,
     },
     alignItems: {
       typeDef: {
@@ -38,6 +33,7 @@ export default createComponent(PageRow, {
       },
       label: 'Vertical alignment',
       control: { type: 'VerticalAlign' },
+      defaultValue: 'center',
     },
     justifyContent: {
       typeDef: {
@@ -46,6 +42,7 @@ export default createComponent(PageRow, {
       },
       label: 'Horizontal alignment',
       control: { type: 'HorizontalAlign' },
+      defaultValue: 'start',
     },
     children: {
       typeDef: { type: 'element' },

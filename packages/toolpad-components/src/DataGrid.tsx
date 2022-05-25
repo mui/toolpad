@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
-import { debounce, LinearProgress, Skeleton } from '@mui/material';
+import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -32,6 +32,13 @@ function randomBetween(seed: number, min: number, max: number): () => number {
   const random = mulberry32(seed);
   return () => min + (max - min) * random();
 }
+
+const SkeletonCell = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  borderBottom: `1px solid ${theme.palette.divider}`,
+}));
 
 function SkeletonLoadingOverlay() {
   const apiRef = useGridApiContext();
@@ -59,23 +66,15 @@ function SkeletonLoadingOverlay() {
       for (const column of columns) {
         const width = Math.round(random());
         array.push(
-          <div
-            key={`${i}-${column.field}`}
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: column.align,
-              height: rowHeight,
-              alignItems: 'center',
-            }}
-          >
+          <SkeletonCell key={`${i}-${column.field}`} sx={{ justifyContent: column.align }}>
             <Skeleton sx={{ mx: 1 }} width={`${width}%`} />
-          </div>,
+          </SkeletonCell>,
         );
       }
+      array.push(<SkeletonCell />);
     }
     return array;
-  }, [skeletonRowsCount, columns, rowHeight]);
+  }, [skeletonRowsCount, columns]);
 
   const rowsCount = apiRef.current.getRowsCount();
 
@@ -87,8 +86,8 @@ function SkeletonLoadingOverlay() {
         display: 'grid',
         gridTemplateColumns: `${columns
           .map(({ computedWidth }) => `${computedWidth}px`)
-          .join(' ')}`,
-        gridTemplateRows: `repeat(auto-fill, ${rowHeight}px)`,
+          .join(' ')} 1fr`,
+        gridAutoRows: `${rowHeight}px`,
       }}
     >
       {children}
@@ -272,11 +271,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 });
 
-DataGridComponent.defaultProps = {
-  selection: null,
-  density: 'compact',
-} as ToolpadDataGridProps;
-
 export default createComponent(DataGridComponent, {
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
@@ -291,6 +285,7 @@ export default createComponent(DataGridComponent, {
     },
     density: {
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },
+      defaultValue: 'compact',
     },
     sx: {
       typeDef: { type: 'object' },
@@ -298,6 +293,7 @@ export default createComponent(DataGridComponent, {
     selection: {
       typeDef: { type: 'object' },
       onChangeProp: 'onSelectionChange',
+      defaultValue: null,
     },
     loading: {
       typeDef: { type: 'boolean' },

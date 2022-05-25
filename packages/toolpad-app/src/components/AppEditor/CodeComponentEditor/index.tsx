@@ -7,6 +7,7 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
+import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -14,13 +15,13 @@ import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import { usePrompt } from '../../../utils/router';
 import NodeNameEditor from '../NodeNameEditor';
+import usePageTitle from '../../../utils/usePageTitle';
 import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
+import { mapValues } from '../../../utils/collections';
 
-function Noop() {
-  return null;
-}
+const Noop = createComponent(() => null);
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -63,6 +64,8 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
+
+  usePageTitle(`${codeComponentNode.name} | Toolpad editor`);
 
   const updateInputExtern = React.useCallback((newInput) => {
     const editor = editorRef.current;
@@ -176,7 +179,13 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
 
   const { Component: GeneratedComponent, error: compileError } = useCodeComponent(input);
 
-  const CodeComponent: React.ComponentType<any> = useLatest(GeneratedComponent) || Noop;
+  const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
+  const { argTypes } = CodeComponent[TOOLPAD_COMPONENT];
+
+  const defaultProps = React.useMemo(
+    () => mapValues(argTypes, (argType) => argType?.defaultValue),
+    [argTypes],
+  );
 
   return (
     <React.Fragment>
@@ -216,7 +225,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
                   )}
                 >
                   <AppThemeProvider node={theme}>
-                    <CodeComponent />
+                    <CodeComponent {...defaultProps} />
                   </AppThemeProvider>
                 </ErrorBoundary>
                 {compileError?.message}

@@ -39,42 +39,35 @@ function Select({ sx, label, options, ...props }: SelectProps) {
   );
 }
 
-Select.defaultProps = {
-  // eslint-disable-next-line react/default-props-match-prop-types
-  label: '',
-  // eslint-disable-next-line react/default-props-match-prop-types
-  variant: 'outlined' as const,
-  // eslint-disable-next-line react/default-props-match-prop-types
-  size: 'small' as const,
-  // eslint-disable-next-line react/default-props-match-prop-types
-  value: '',
-  options: [],
-};
-
 export default createComponent(Select, {
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',
   argTypes: {
     label: {
       typeDef: { type: 'string' },
+      defaultValue: '',
     },
     disabled: {
       typeDef: { type: 'boolean' },
     },
     variant: {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
+      defaultValue: 'outlined',
     },
     size: {
       typeDef: { type: 'string', enum: ['small', 'normal'] },
+      defaultValue: 'small',
     },
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       onChangeHandler: (event: React.ChangeEvent<HTMLSelectElement>) => event.target.value,
+      defaultValue: '',
     },
     options: {
       typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
       control: { type: 'SelectOptions' },
+      defaultValue: [],
     },
     sx: {
       typeDef: { type: 'object' },

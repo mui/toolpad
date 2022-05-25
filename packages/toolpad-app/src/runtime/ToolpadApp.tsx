@@ -7,6 +7,7 @@ import {
   styled,
   AlertTitle,
   LinearProgress,
+  NoSsr,
 } from '@mui/material';
 import {
   INITIAL_DATA_QUERY,
@@ -16,6 +17,7 @@ import {
   TOOLPAD_COMPONENT,
   Slots,
   Placeholder,
+  BindableAttrValues,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import {
@@ -40,7 +42,7 @@ import * as appDom from '../appDom';
 import { NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import AppOverview from '../components/AppOverview';
-import { ToolpadComponentDefinitions } from '../toolpadComponents';
+import { getToolpadComponents } from '../toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   BindingEvaluationResult,
@@ -49,6 +51,8 @@ import evalJsBindings, {
 } from './evalJsBindings';
 import createCodeComponent from './createCodeComponent';
 import { HTML_ID_APP_ROOT } from '../constants';
+import usePageTitle from '../utils/usePageTitle';
+import DomProvider, { useDomContext } from './DomProvider';
 
 const PAGE_ROW_COMPONENT_ID = 'PageRow';
 
@@ -65,7 +69,6 @@ interface AppContext {
 const [useComponentsContext, ComponentsContextProvider] =
   createProvidedContext<(id: string) => ToolpadComponent>('Components');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
-const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useBindingsContext, BindingsContextProvider] =
   createProvidedContext<Record<string, BindingEvaluationResult>>('LiveBindings');
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
@@ -122,7 +125,7 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     // loading state we will propagate to the component
     let loading: boolean = false;
 
-    for (const propName of Object.keys(argTypes)) {
+    for (const [propName, argType] of Object.entries(argTypes)) {
       const bindingId = `${nodeId}.props.${propName}`;
       const binding = liveBindings[bindingId];
       if (binding) {
@@ -132,6 +135,8 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
         if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
         }
+      } else if (argType) {
+        hookResult[propName] = argType.defaultValue;
       }
     }
 
@@ -220,25 +225,34 @@ const PageRootComponent = createComponent(PageRoot, {
   },
 });
 
-interface QueryStateNodeProps {
-  node: appDom.QueryStateNode;
+function resolveBindables(
+  bindings: Partial<Record<string, BindingEvaluationResult>>,
+  bindingId: string,
+  params?: BindableAttrValues<any>,
+) {
+  return params
+    ? Object.fromEntries(
+        Object.keys(params).map((propName) => [
+          propName,
+          bindings[`${bindingId}.${propName}`]?.value,
+        ]),
+      )
+    : {};
 }
 
-function QueryStateNode({ node }: QueryStateNodeProps) {
+interface QueryNodeProps {
+  // TODO: deprecate `QueryStateNode`
+  node: appDom.QueryNode | appDom.QueryStateNode;
+}
+
+function QueryNode({ node }: QueryNodeProps) {
   const { appId, version } = useAppContext();
   const bindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
   const dataUrl = `/api/data/${appId}/${version}/`;
-  const queryId = node.attributes.api.value;
-  const params = node.params
-    ? Object.fromEntries(
-        Object.keys(node.params).map((propName) => [
-          propName,
-          bindings[`${node.id}.params.${propName}`]?.value,
-        ]),
-      )
-    : {};
+  const queryId = appDom.isQueryState(node) ? node.attributes.api.value : node.id;
+  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
   const queryResult = useDataQuery(dataUrl, queryId, params, {
     refetchOnWindowFocus: node.attributes.refetchOnWindowFocus?.value,
@@ -291,7 +305,7 @@ function parseBindings(
         if (argType) {
           parsedBindingsMap.set(bindingId, {
             scopePath,
-            result: { value: Component.defaultProps?.[propName] },
+            result: { value: argType.defaultValue },
           });
         }
       }
@@ -304,7 +318,7 @@ function parseBindings(
         if (argType) {
           if (argType.onChangeProp) {
             const defaultValue: unknown =
-              binding?.type === 'const' ? binding?.value : Component.defaultProps?.[propName];
+              binding?.type === 'const' ? binding?.value : argType.defaultValue;
             controlled.add(bindingId);
             parsedBindingsMap.set(bindingId, {
               scopePath,
@@ -325,7 +339,7 @@ function parseBindings(
       }
     }
 
-    if (appDom.isQueryState(elm)) {
+    if (appDom.isQueryState(elm) || appDom.isQuery(elm)) {
       if (elm.params) {
         for (const [paramName, bindable] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
@@ -374,7 +388,9 @@ function parseBindings(
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [], queryStates = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queryStates = [], queries = [] } = appDom.getChildNodes(dom, page);
+
+  usePageTitle(page.attributes.title.value);
 
   const location = useLocation();
   const getComponent = useComponentsContext();
@@ -400,17 +416,18 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const setControlledBinding = React.useCallback(
     (id: string, result: BindingEvaluationResult) => {
+      const parsedBinding = parsedBindings[id];
       setPageBindings((existing) => {
         if (!controlled.has(id)) {
           throw new Error(`Not a controlled binding "${id}"`);
         }
         return {
           ...existing,
-          [id]: { ...existing[id], result },
+          [id]: { ...parsedBinding, result },
         };
       });
     },
-    [controlled],
+    [parsedBindings, controlled],
   );
 
   const evaluatedBindings = React.useMemo(() => evalJsBindings(pageBindings), [pageBindings]);
@@ -447,7 +464,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
         </NodeRuntimeWrapper>
 
         {queryStates.map((node) => (
-          <QueryStateNode key={node.id} node={node} />
+          <QueryNode key={node.id} node={node} />
+        ))}
+
+        {queries.map((node) => (
+          <QueryNode key={node.id} node={node} />
         ))}
       </SetControlledBindingContextProvider>
     </BindingsContextProvider>
@@ -528,10 +549,9 @@ export interface ToolpadAppProps {
   appId: string;
   version: VersionOrPreview;
   dom: appDom.AppDom;
-  components: ToolpadComponentDefinitions;
 }
 
-export default function ToolpadApp({ basename, appId, version, dom, components }: ToolpadAppProps) {
+export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
   const root = appDom.getApp(dom);
   const { pages = [], themes = [], codeComponents = [] } = appDom.getChildNodes(dom, root);
 
@@ -540,6 +560,11 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
 
   const queryClient = React.useMemo(() => new QueryClient(), []);
+
+  const components = React.useMemo(
+    () => getToolpadComponents(appId, version, dom),
+    [appId, version, dom],
+  );
 
   const getComponent = React.useCallback(
     (id: string): ToolpadComponent => {
@@ -600,48 +625,50 @@ export default function ToolpadApp({ basename, appId, version, dom, components }
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
   return (
-    <AppRoot id={HTML_ID_APP_ROOT}>
-      <CssBaseline />
-      <ErrorBoundary FallbackComponent={AppError}>
-        <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-          <React.Suspense fallback={<AppLoading />}>
-            <JsRuntimeProvider>
-              <ComponentsContextProvider value={getComponent}>
-                <AppContextProvider value={appContext}>
-                  <QueryClientProvider client={queryClient}>
-                    <AppThemeProvider node={theme}>
-                      <DomContextProvider value={dom}>
-                        <BrowserRouter basename={basename}>
-                          <Routes>
-                            <Route path="/" element={<Navigate replace to="/pages" />} />
-                            <Route
-                              path="/pages"
-                              element={
-                                <AppOverview
-                                  appId={appId}
-                                  dom={dom}
-                                  openPageButtonProps={getPageNavButtonProps}
-                                />
-                              }
-                            />
-                            {pages.map((page) => (
+    <NoSsr>
+      <DomProvider dom={dom}>
+        <AppRoot id={HTML_ID_APP_ROOT}>
+          <CssBaseline />
+          <ErrorBoundary FallbackComponent={AppError}>
+            <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+              <React.Suspense fallback={<AppLoading />}>
+                <JsRuntimeProvider>
+                  <ComponentsContextProvider value={getComponent}>
+                    <AppContextProvider value={appContext}>
+                      <QueryClientProvider client={queryClient}>
+                        <AppThemeProvider node={theme}>
+                          <BrowserRouter basename={basename}>
+                            <Routes>
+                              <Route path="/" element={<Navigate replace to="/pages" />} />
                               <Route
-                                key={page.id}
-                                path={`/pages/${page.id}`}
-                                element={<RenderedPage nodeId={page.id} />}
+                                path="/pages"
+                                element={
+                                  <AppOverview
+                                    appId={appId}
+                                    dom={dom}
+                                    openPageButtonProps={getPageNavButtonProps}
+                                  />
+                                }
                               />
-                            ))}
-                          </Routes>
-                        </BrowserRouter>
-                      </DomContextProvider>
-                    </AppThemeProvider>
-                  </QueryClientProvider>
-                </AppContextProvider>
-              </ComponentsContextProvider>
-            </JsRuntimeProvider>
-          </React.Suspense>
-        </ResetNodeErrorsKeyProvider>
-      </ErrorBoundary>
-    </AppRoot>
+                              {pages.map((page) => (
+                                <Route
+                                  key={page.id}
+                                  path={`/pages/${page.id}`}
+                                  element={<RenderedPage nodeId={page.id} />}
+                                />
+                              ))}
+                            </Routes>
+                          </BrowserRouter>
+                        </AppThemeProvider>
+                      </QueryClientProvider>
+                    </AppContextProvider>
+                  </ComponentsContextProvider>
+                </JsRuntimeProvider>
+              </React.Suspense>
+            </ResetNodeErrorsKeyProvider>
+          </ErrorBoundary>
+        </AppRoot>
+      </DomProvider>
+    </NoSsr>
   );
 }

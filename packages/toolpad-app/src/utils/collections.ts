@@ -12,3 +12,21 @@ export function hasOwnProperty<X extends {}, Y extends PropertyKey>(
 ): obj is Ensure<X, Y> {
   return obj.hasOwnProperty(prop);
 }
+
+export function mapProperties<U, V>(
+  obj: Record<string, U>,
+  mapper: (old: [string, U]) => [string, V],
+): Record<string, V> {
+  return Object.fromEntries(Object.entries(obj).map(mapper));
+}
+
+export function mapKeys<U>(
+  obj: Record<string, U>,
+  mapper: (old: string) => string,
+): Record<string, U> {
+  return mapProperties(obj, ([key, value]) => [mapper(key), value]);
+}
+
+export function mapValues<U, V>(obj: Record<string, U>, mapper: (old: U) => V): Record<string, V> {
+  return mapProperties(obj, ([key, value]) => [key, mapper(value)]);
+}

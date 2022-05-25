@@ -1,47 +1,42 @@
 import { Stack } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
-import withDefaultProps from './utils/addDefaultProps';
 
-export default createComponent(
-  withDefaultProps(Stack, {
-    gap: 2,
-    direction: 'row',
-    alignItems: 'start',
-    justifyContent: 'start',
-  }),
-  {
-    argTypes: {
-      gap: {
-        typeDef: { type: 'number' },
+export default createComponent(Stack, {
+  argTypes: {
+    gap: {
+      typeDef: { type: 'number' },
+      defaultValue: 2,
+    },
+    margin: {
+      typeDef: { type: 'number' },
+    },
+    direction: {
+      typeDef: {
+        type: 'string',
+        enum: ['row', 'row-reverse', 'column', 'column-reverse'],
       },
-      margin: {
-        typeDef: { type: 'number' },
+      defaultValue: 'row',
+    },
+    alignItems: {
+      typeDef: {
+        type: 'string',
+        enum: ['start', 'center', 'end', 'stretch', 'baseline'],
       },
-      direction: {
-        typeDef: {
-          type: 'string',
-          enum: ['row', 'row-reverse', 'column', 'column-reverse'],
-        },
+      defaultValue: 'start',
+    },
+    justifyContent: {
+      typeDef: {
+        type: 'string',
+        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
       },
-      alignItems: {
-        typeDef: {
-          type: 'string',
-          enum: ['start', 'center', 'end', 'stretch', 'baseline'],
-        },
-      },
-      justifyContent: {
-        typeDef: {
-          type: 'string',
-          enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-        },
-      },
-      children: {
-        typeDef: { type: 'element' },
-        control: { type: 'slots' },
-      },
-      sx: {
-        typeDef: { type: 'object' },
-      },
+      defaultValue: 'start',
+    },
+    children: {
+      typeDef: { type: 'element' },
+      control: { type: 'slots' },
+    },
+    sx: {
+      typeDef: { type: 'object' },
     },
   },
-);
+});

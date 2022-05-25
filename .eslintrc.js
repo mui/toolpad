@@ -60,6 +60,13 @@ module.exports = {
               message:
                 '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
             },
+            // See https://github.com/jsx-eslint/eslint-plugin-react/issues/2073
+            {
+              selector:
+                ":matches(JSXElement, JSXFragment) > JSXExpressionContainer > LogicalExpression[operator='&&']",
+              message:
+                "Please use `condition ? <Jsx /> : null`. Otherwise, there is a chance of rendering '0' instead of '' in some cases. Context: https://stackoverflow.com/q/53048037",
+            },
           ],
         },
       };

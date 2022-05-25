@@ -92,6 +92,11 @@ function SelectOptionsPropEditor({
     [editingIndex, onChange, value],
   );
 
+  const handleEditOptionsDialogClose = React.useCallback(() => {
+    setEditingIndex(null);
+    setEditOptionsDialogOpen(false);
+  }, []);
+
   return (
     <React.Fragment>
       <Button
@@ -209,7 +214,7 @@ function SelectOptionsPropEditor({
           </React.Fragment>
         )}
         <DialogActions>
-          <Button color="inherit" variant="text" onClick={() => setEditOptionsDialogOpen(false)}>
+          <Button color="inherit" variant="text" onClick={handleEditOptionsDialogClose}>
             Close
           </Button>
         </DialogActions>

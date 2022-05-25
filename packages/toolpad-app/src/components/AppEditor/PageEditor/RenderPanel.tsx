@@ -688,8 +688,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
           const isOnlyRowElement =
             dragParent &&
-            (dragParent as appDom.ElementNode).attributes.component?.value ===
-              PAGE_ROW_COMPONENT_ID &&
+            appDom.isElement(dragParent) &&
+            dragParent.attributes.component.value === PAGE_ROW_COMPONENT_ID &&
             appDom.getChildNodes(dom, dragParent).children.length === 1;
 
           domApi.moveNode(
@@ -771,8 +771,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const isOnlyRowElement =
         parent &&
-        (parent as appDom.ElementNode).attributes.component?.value === PAGE_ROW_COMPONENT_ID &&
-        appDom.getChildNodes(dom, parent as appDom.ElementNode).children.length === 1;
+        appDom.isElement(parent) &&
+        parent.attributes.component.value === PAGE_ROW_COMPONENT_ID &&
+        appDom.getChildNodes(dom, parent).children.length === 1;
 
       domApi.removeNode(toRemove.id);
 

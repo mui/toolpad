@@ -7,7 +7,7 @@ import * as appDom from '../../../appDom';
 import { useDom } from '../../DomLoader';
 import { usePageEditorApi } from './PageEditorProvider';
 import { useToolpadComponents } from '../toolpadComponents';
-import { PAGE_ROW_COMPONENT_ID } from '../../../utils/components';
+import { PAGE_ROW_COMPONENT_ID } from '../../../toolpadComponents';
 
 const WIDTH_COLLAPSED = 50;
 

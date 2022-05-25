@@ -10,7 +10,7 @@ import PageOptionsPanel from './PageOptionsPanel';
 import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
-import { getElementNodeComponentId } from '../../../utils/components';
+import { getElementNodeComponentId } from '../../../toolpadComponents';
 
 const classes = {
   control: 'Toolpad_Control',

@@ -32,10 +32,12 @@ import EditorOverlay from './EditorOverlay';
 import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
 import {
+  getElementNodeComponentId,
+  isPageColumn,
+  isPageRow,
   PAGE_COLUMN_COMPONENT_ID,
   PAGE_ROW_COMPONENT_ID,
-  getElementNodeComponentId,
-} from '../../../utils/components';
+} from '../../../toolpadComponents';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -663,13 +665,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           throw new Error(`Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`);
         }
 
-        const isParentRowContainer =
-          appDom.isPage(parent) || getElementNodeComponentId(parent) === PAGE_COLUMN_COMPONENT_ID;
+        const isParentRowContainer = appDom.isPage(parent) || isPageColumn(parent);
 
-        if (
-          isParentRowContainer &&
-          getElementNodeComponentId(draggedNode) !== PAGE_ROW_COMPONENT_ID
-        ) {
+        if (isParentRowContainer && !isPageRow(draggedNode)) {
           // TODO: this logic should probably live in the DomReducer?
           const container = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
           domApi.addNode(container, parent, 'children');
@@ -689,7 +687,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           const isOnlyRowElement =
             dragParent &&
             appDom.isElement(dragParent) &&
-            dragParent.attributes.component.value === PAGE_ROW_COMPONENT_ID &&
+            isPageRow(dragParent) &&
             appDom.getChildNodes(dom, dragParent).children.length === 1;
 
           domApi.moveNode(
@@ -772,7 +770,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const isOnlyRowElement =
         parent &&
         appDom.isElement(parent) &&
-        parent.attributes.component.value === PAGE_ROW_COMPONENT_ID &&
+        isPageRow(parent) &&
         appDom.getChildNodes(dom, parent).children.length === 1;
 
       domApi.removeNode(toRemove.id);

@@ -42,7 +42,11 @@ import * as appDom from '../appDom';
 import { NodeId, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import AppOverview from '../components/AppOverview';
-import { getToolpadComponents } from '../toolpadComponents';
+import {
+  getElementNodeComponentId,
+  getToolpadComponents,
+  PAGE_ROW_COMPONENT_ID,
+} from '../toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   BindingEvaluationResult,
@@ -53,7 +57,6 @@ import createCodeComponent from './createCodeComponent';
 import { HTML_ID_APP_ROOT } from '../constants';
 import usePageTitle from '../utils/usePageTitle';
 import DomProvider, { useDomContext } from './DomProvider';
-import { getElementNodeComponentId, PAGE_ROW_COMPONENT_ID } from '../utils/components';
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,

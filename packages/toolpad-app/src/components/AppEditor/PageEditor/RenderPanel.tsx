@@ -259,7 +259,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return pageNodes.filter((n) => !excludedNodes.has(n));
   }, [dom, getCurrentlyDraggedNode, pageNodes, selectedNode]);
 
-  const [dropPreviewNodeId, setDropPreviewNodeId] = React.useState<string | null>(null);
+  const [dropPreviewNodeId, setDropPreviewNodeId] = React.useState<NodeId | null>(null);
+
+  const availableDropTargetIds = React.useMemo(
+    () => new Set(availableDropTargets.map((n) => n.id)),
+    [availableDropTargets],
+  );
 
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
@@ -275,16 +280,34 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         cursorPos.x,
         cursorPos.y,
       );
-      if (newActiveDropNodeId !== dropPreviewNodeId) {
+
+      if (
+        newActiveDropNodeId &&
+        newActiveDropNodeId !== dropPreviewNodeId &&
+        availableDropTargetIds.has(newActiveDropNodeId)
+      ) {
         setDropPreviewNodeId(newActiveDropNodeId);
       }
 
       event.preventDefault();
+
+      if (newActiveDropNodeId) {
+        api.nodeDragOver(newActiveDropNodeId);
+      } else {
+        api.nodeDragOver(null);
+      }
     },
-    [availableDropTargets, dropPreviewNodeId, getViewCoordinates, nodesInfo],
+    [
+      api,
+      availableDropTargetIds,
+      availableDropTargets,
+      dropPreviewNodeId,
+      getViewCoordinates,
+      nodesInfo,
+    ],
   );
 
-  const handleDragLeave = React.useCallback(() => api.nodeDragOver(), [api]);
+  const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
 
   const handleDrop = React.useCallback(() => {}, []);
 

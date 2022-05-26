@@ -41,6 +41,7 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_NODE_DRAG_OVER';
+      nodeId: NodeId | null;
     }
   | {
       type: 'PAGE_NODE_DRAG_END';
@@ -151,9 +152,10 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     nodeDragEnd() {
       dispatch({ type: 'PAGE_NODE_DRAG_END' });
     },
-    nodeDragOver() {
+    nodeDragOver(nodeId: NodeId | null) {
       dispatch({
         type: 'PAGE_NODE_DRAG_OVER',
+        nodeId,
       });
     },
     pageViewStateUpdate(viewState: PageViewState) {

@@ -40,7 +40,7 @@ const RenderPanelRoot = styled('div')({
 const overlayClasses = {
   hud: 'Toolpad_Hud',
   nodeHud: 'Toolpad_NodeHud',
-  dropPreview: 'Toolpad_DropPreview',
+  highlighted: 'Toolpad_Highlighted',
   selected: 'Toolpad_Selected',
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
   layout: 'Toolpad_Layout',
@@ -87,7 +87,7 @@ const OverlayRoot = styled('div')({
     [`&.${overlayClasses.layout}`]: {
       borderColor: 'rgba(255,0,0,.125)',
     },
-    [`&.${overlayClasses.dropPreview}`]: {
+    [`&.${overlayClasses.highlighted}`]: {
       border: '2px solid green',
     },
     [`&.${overlayClasses.selected}`]: {
@@ -128,7 +128,7 @@ function findNodeAt(
 interface SelectionHudProps {
   node: appDom.ElementNode;
   rect: Rectangle;
-  hasDropPreview?: boolean;
+  isHighlighted?: boolean;
   selected?: boolean;
   allowInteraction?: boolean;
   onDragStart?: React.DragEventHandler<HTMLElement>;
@@ -137,7 +137,7 @@ interface SelectionHudProps {
 
 function NodeHud({
   node,
-  hasDropPreview,
+  isHighlighted,
   selected,
   allowInteraction,
   rect,
@@ -160,7 +160,7 @@ function NodeHud({
       style={absolutePositionCss(rect)}
       className={clsx(overlayClasses.nodeHud, {
         [overlayClasses.layout]: isLayoutComponent,
-        [overlayClasses.dropPreview]: hasDropPreview,
+        [overlayClasses.highlighted]: isHighlighted,
         [overlayClasses.selected]: selected,
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
@@ -191,6 +191,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     viewState,
     nodeId: pageNodeId,
     highlightLayout,
+    highlightedNodeId,
   } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;
@@ -259,8 +260,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return pageNodes.filter((n) => !excludedNodes.has(n));
   }, [dom, getCurrentlyDraggedNode, pageNodes, selectedNode]);
 
-  const [dropPreviewNodeId, setDropPreviewNodeId] = React.useState<NodeId | null>(null);
-
   const availableDropTargetIds = React.useMemo(
     () => new Set(availableDropTargets.map((n) => n.id)),
     [availableDropTargets],
@@ -281,19 +280,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         cursorPos.y,
       );
 
-      if (
-        newActiveDropNodeId &&
-        newActiveDropNodeId !== dropPreviewNodeId &&
-        availableDropTargetIds.has(newActiveDropNodeId)
-      ) {
-        setDropPreviewNodeId(newActiveDropNodeId);
-      }
-
       event.preventDefault();
 
-      if (newActiveDropNodeId) {
+      if (
+        newActiveDropNodeId &&
+        newActiveDropNodeId !== highlightedNodeId &&
+        availableDropTargetIds.has(newActiveDropNodeId)
+      ) {
         api.nodeDragOver(newActiveDropNodeId);
-      } else {
+      } else if (!newActiveDropNodeId && highlightedNodeId) {
         api.nodeDragOver(null);
       }
     },
@@ -301,8 +296,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       api,
       availableDropTargetIds,
       availableDropTargets,
-      dropPreviewNodeId,
       getViewCoordinates,
+      highlightedNodeId,
       nodesInfo,
     ],
   );
@@ -532,7 +527,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               return null;
             }
 
-            const hasDropPreview = node.id === dropPreviewNodeId;
+            const isHighlighted = node.id === highlightedNodeId;
 
             return (
               appDom.isElement(node) && (
@@ -540,7 +535,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                   key={node.id}
                   node={node}
                   rect={nodeLayout.rect}
-                  hasDropPreview={hasDropPreview}
+                  isHighlighted={isHighlighted}
                   selected={selectedNode?.id === node.id}
                   allowInteraction={nodesWithInteraction.has(node.id)}
                   onDragStart={handleDragStart}

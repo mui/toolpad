@@ -14,6 +14,7 @@ export interface PageEditorState {
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: appDom.ElementNode | null;
   readonly highlightLayout: boolean;
+  readonly highlightedNodeId: NodeId | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
   readonly bindings: LiveBindings;
@@ -68,6 +69,7 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     componentPanelTab: 'component',
     newNode: null,
     highlightLayout: false,
+    highlightedNodeId: null,
     viewState: { nodes: {} },
     pageState: {},
     bindings: {},
@@ -109,10 +111,12 @@ export function pageEditorReducer(
       return update(state, {
         newNode: null,
         highlightLayout: false,
+        highlightedNodeId: null,
       });
     case 'PAGE_NODE_DRAG_OVER': {
       return update(state, {
         highlightLayout: true,
+        highlightedNodeId: action.nodeId,
       });
     }
     case 'PAGE_VIEW_STATE_UPDATE': {

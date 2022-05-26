@@ -15,6 +15,8 @@ import {
   ToolpadComponent,
   createComponent,
   TOOLPAD_COMPONENT,
+  Slots,
+  Placeholder,
   BindableAttrValues,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -31,9 +33,7 @@ import {
   fireEvent,
   JsRuntimeProvider,
   NodeRuntimeWrapper,
-  Placeholder,
   ResetNodeErrorsKeyProvider,
-  Slots,
 } from '@mui/toolpad-core/runtime';
 import * as appDom from '../appDom';
 import { NodeId, VersionOrPreview } from '../types';

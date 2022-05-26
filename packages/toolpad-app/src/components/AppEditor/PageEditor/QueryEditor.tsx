@@ -492,7 +492,6 @@ export default function QueryEditor() {
           );
         })}
       </List>
-      {/* eslint-disable-next-line no-nested-ternary */}
       {dialogState?.nodeId && lastEditednode ? (
         <QueryNodeEditorDialog
           open={!!dialogState}

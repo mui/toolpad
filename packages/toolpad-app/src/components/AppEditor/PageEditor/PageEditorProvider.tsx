@@ -1,8 +1,8 @@
 import { LiveBindings } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
-import { NodeId, SlotLocation, PageViewState } from '../../../types';
-import { update, updateOrCreate } from '../../../utils/immutability';
+import { NodeId, PageViewState } from '../../../types';
+import { update } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'component' | 'theme';
 
@@ -14,7 +14,6 @@ export interface PageEditorState {
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: appDom.ElementNode | null;
   readonly highlightLayout: boolean;
-  readonly highlightedSlot: SlotLocation | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
   readonly bindings: LiveBindings;
@@ -42,7 +41,6 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_NODE_DRAG_OVER';
-      slot: SlotLocation | null;
     }
   | {
       type: 'PAGE_NODE_DRAG_END';
@@ -69,7 +67,6 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     componentPanelTab: 'component',
     newNode: null,
     highlightLayout: false,
-    highlightedSlot: null,
     viewState: { nodes: {} },
     pageState: {},
     bindings: {},
@@ -111,12 +108,10 @@ export function pageEditorReducer(
       return update(state, {
         newNode: null,
         highlightLayout: false,
-        highlightedSlot: null,
       });
     case 'PAGE_NODE_DRAG_OVER': {
       return update(state, {
         highlightLayout: true,
-        highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,
       });
     }
     case 'PAGE_VIEW_STATE_UPDATE': {
@@ -156,10 +151,9 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     nodeDragEnd() {
       dispatch({ type: 'PAGE_NODE_DRAG_END' });
     },
-    nodeDragOver(slot: SlotLocation | null) {
+    nodeDragOver() {
       dispatch({
         type: 'PAGE_NODE_DRAG_OVER',
-        slot,
       });
     },
     pageViewStateUpdate(viewState: PageViewState) {

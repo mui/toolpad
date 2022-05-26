@@ -4,28 +4,14 @@ import throttle from 'lodash-es/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
-import { RuntimeEvent, SlotType } from '@mui/toolpad-core';
+import { RuntimeEvent } from '@mui/toolpad-core';
 import { setEventHandler } from '@mui/toolpad-core/runtime';
-import {
-  NodeId,
-  FlowDirection,
-  SlotLocation,
-  SlotState,
-  NodeInfo,
-  NodesInfo,
-} from '../../../types';
+import { NodeId, NodesInfo } from '../../../types';
 import * as appDom from '../../../appDom';
 import EditorCanvasHost from './EditorCanvasHost';
-import {
-  absolutePositionCss,
-  distanceToLine,
-  distanceToRect,
-  Rectangle,
-  rectContainsPoint,
-} from '../../../utils/geometry';
+import { absolutePositionCss, Rectangle, rectContainsPoint } from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
 import { getPageViewState } from '../../../pageViewState';
-import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
@@ -33,13 +19,10 @@ import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
 import {
   getElementNodeComponentId,
-  isPageColumn,
   isPageRow,
   PAGE_COLUMN_COMPONENT_ID,
   PAGE_ROW_COMPONENT_ID,
 } from '../../../toolpadComponents';
-
-type SlotDirection = 'horizontal' | 'vertical';
 
 const classes = {
   view: 'Toolpad_View',
@@ -57,8 +40,6 @@ const RenderPanelRoot = styled('div')({
 const overlayClasses = {
   hud: 'Toolpad_Hud',
   nodeHud: 'Toolpad_NodeHud',
-  slotHud: 'Toolpad_SlotHud',
-  insertSlotHud: 'Toolpad_InsertSlotHud',
   selected: 'Toolpad_Selected',
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
   layout: 'Toolpad_Layout',
@@ -117,57 +98,11 @@ const OverlayRoot = styled('div')({
     },
   },
 
-  [`& .${overlayClasses.insertSlotHud}`]: {
-    position: 'absolute',
-
-    [`&.${overlayClasses.available}`]: {
-      border: '1px dashed #DDD',
-    },
-
-    [`&.${overlayClasses.active}`]: {
-      border: '1px solid green',
-    },
-  },
-
-  [`& .${overlayClasses.slotHud}`]: {
-    position: 'absolute',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 18,
-    color: 'green',
-    border: '1px dashed green',
-    opacity: 0.5,
-    [`&.${overlayClasses.active}`]: {
-      border: '1px solid green',
-      opacity: 1,
-    },
-  },
-
   [`& .${overlayClasses.hudOverlay}`]: {
     position: 'absolute',
     inset: '0 0 0 0',
   },
 });
-
-function insertSlotAbsolutePositionCss(slot: {
-  direction: SlotDirection;
-  x: number;
-  y: number;
-  size: number;
-}): React.CSSProperties {
-  return slot.direction === 'horizontal'
-    ? {
-        left: slot.x,
-        top: slot.y,
-        height: slot.size,
-      }
-    : {
-        left: slot.x,
-        top: slot.y,
-        width: slot.size,
-      };
-}
 
 function findNodeAt(
   nodes: readonly appDom.AppDomNode[],
@@ -184,286 +119,6 @@ function findNodeAt(
     }
   }
   return null;
-}
-
-/**
- * From a collection of slots, returns the location of the closest one to a certain point
- */
-function findClosestSlot(slots: RenderedSlot[], x: number, y: number): SlotLocation | null {
-  let closestDistance = Infinity;
-  let closestSlot: RenderedSlot | null = null;
-
-  for (const namedSlot of slots) {
-    let distance: number;
-    if (namedSlot.type === 'single') {
-      distance = distanceToRect(namedSlot.rect, x, y);
-    } else {
-      distance =
-        namedSlot.direction === 'horizontal'
-          ? distanceToLine(
-              namedSlot.x,
-              namedSlot.y,
-              namedSlot.x,
-              namedSlot.y + namedSlot.size,
-              x,
-              y,
-            )
-          : distanceToLine(
-              namedSlot.x,
-              namedSlot.y,
-              namedSlot.x + namedSlot.size,
-              namedSlot.y,
-              x,
-              y,
-            );
-    }
-
-    if (distance <= 0) {
-      // We can bail out early here
-      return {
-        parentId: namedSlot.parentId,
-        parentIndex: namedSlot.parentIndex,
-        parentProp: namedSlot.parentProp,
-      };
-    }
-
-    if (distance < closestDistance) {
-      closestDistance = distance;
-      closestSlot = namedSlot;
-    }
-  }
-
-  if (closestSlot) {
-    return {
-      parentId: closestSlot.parentId,
-      parentProp: closestSlot.parentProp,
-      parentIndex: closestSlot.parentIndex,
-    };
-  }
-
-  return null;
-}
-
-function findActiveSlotAt(
-  nodes: readonly appDom.AppDomNode[],
-  nodesInfo: NodesInfo,
-  slots: ViewSlots,
-  x: number,
-  y: number,
-): SlotLocation | null {
-  // Search deepest nested first
-  let nodeInfo: NodeInfo | undefined;
-  for (let i = nodes.length - 1; i >= 0; i -= 1) {
-    const node = nodes[i];
-    nodeInfo = nodesInfo[node.id];
-    if (nodeInfo?.rect && rectContainsPoint(nodeInfo.rect, x, y)) {
-      // Initially only consider slots of the node we're hovering
-      const nodeSlots = Object.values(slots[node.id] || {})
-        .flat()
-        .filter(Boolean);
-      const slotIndex = findClosestSlot(nodeSlots, x, y);
-      if (slotIndex) {
-        return slotIndex;
-      }
-    }
-  }
-
-  // One last attempt, as a fallback, we find the closest possible slot
-  if (nodeInfo) {
-    const allSlots: RenderedSlot[] = Object.values(slots)
-      .flatMap((slotState: NodeSlots = {}) => {
-        return Object.values(slotState).flat();
-      })
-      .filter(Boolean);
-    return findClosestSlot(allSlots, x, y);
-  }
-
-  return null;
-}
-
-function getSlotDirection(flow: FlowDirection): SlotDirection {
-  switch (flow) {
-    case 'row':
-    case 'row-reverse':
-      return 'horizontal';
-    case 'column':
-    case 'column-reverse':
-      return 'vertical';
-    default:
-      throw new Error(`Invariant: Unrecognized direction "${flow}"`);
-  }
-}
-
-interface RenderedSlotBase {
-  readonly type: SlotType;
-  readonly parentId: NodeId;
-  readonly parentProp: string;
-  readonly parentIndex: string;
-}
-
-interface RenderedSingleSlot extends RenderedSlotBase {
-  readonly type: 'single';
-  readonly rect: Rectangle;
-}
-
-interface RenderedInsertSlot extends RenderedSlotBase {
-  readonly type: 'multiple';
-  readonly direction: SlotDirection;
-  readonly x: number;
-  readonly y: number;
-  readonly size: number;
-}
-
-type RenderedSlot = RenderedInsertSlot | RenderedSingleSlot;
-
-function calculateSlots(
-  parentId: NodeId,
-  parentProp: string,
-  slotState: SlotState,
-  children: appDom.AppDomNode[],
-  nodesInfo: NodesInfo,
-): RenderedSlot[] {
-  const rect = slotState.rect;
-
-  if (slotState.type === 'single') {
-    return [
-      {
-        type: 'single',
-        parentId,
-        parentProp,
-        parentIndex: appDom.createFractionalIndex(null, null),
-        rect,
-      },
-    ];
-  }
-
-  const slotDirection = getSlotDirection(slotState.direction);
-
-  const size = slotDirection === 'horizontal' ? rect.height : rect.width;
-
-  const boundaries: { start: number; end: number; parentIndex: string }[] = [];
-
-  for (let i = 0; i < children.length; i += 1) {
-    const child = children[i];
-    const childState = nodesInfo[child.id];
-
-    if (!child.parentIndex) {
-      throw new Error(`Invariant: Node "${child.id}" has no parent`);
-    }
-
-    if (!childState?.rect) {
-      return [];
-    }
-
-    const childRect = childState.rect;
-
-    switch (slotState.direction) {
-      case 'row':
-        boundaries.push({
-          start: childRect.x,
-          end: childRect.x + childRect.width,
-          parentIndex: child.parentIndex,
-        });
-        break;
-      case 'column':
-        boundaries.push({
-          start: childRect.y,
-          end: childRect.y + childRect.height,
-          parentIndex: child.parentIndex,
-        });
-        break;
-      case 'row-reverse':
-        boundaries.push({
-          start: childRect.x + childRect.width,
-          end: childRect.x,
-          parentIndex: child.parentIndex,
-        });
-        break;
-      case 'column-reverse':
-        boundaries.push({
-          start: childRect.y + childRect.height,
-          end: childRect.y,
-          parentIndex: child.parentIndex,
-        });
-        break;
-      default:
-        throw new Error(`Invariant: Unrecognized direction "${slotState.direction}"`);
-    }
-  }
-
-  const offsets: { offset: number; parentIndex: string }[] = [];
-  if (boundaries.length > 0) {
-    const first = boundaries[0];
-    offsets.push({
-      offset: first.start,
-      parentIndex: appDom.createFractionalIndex(null, first.parentIndex),
-    });
-    const lastIdx = boundaries.length - 1;
-    for (let i = 0; i < lastIdx; i += 1) {
-      const prev = boundaries[i];
-      const current = boundaries[i + 1];
-      offsets.push({
-        offset: (prev.end + current.start) / 2,
-        parentIndex: appDom.createFractionalIndex(prev.parentIndex, current.parentIndex),
-      });
-    }
-    const last = boundaries[lastIdx];
-    offsets.push({
-      offset: last.end,
-      parentIndex: appDom.createFractionalIndex(last.parentIndex, null),
-    });
-  }
-
-  return offsets.map(
-    ({ offset, parentIndex }) =>
-      ({
-        type: 'multiple',
-        parentId,
-        parentProp,
-        parentIndex,
-        direction: slotDirection,
-        x: slotDirection === 'horizontal' ? offset : rect.x,
-        y: slotDirection === 'horizontal' ? rect.y : offset,
-        size,
-      } as const),
-  );
-}
-
-function calculateNodeSlots(
-  parent: appDom.AppDomNode,
-  children: appDom.NodeChildren,
-  nodesInfo: NodesInfo,
-): NodeSlots {
-  const parentState = nodesInfo[parent.id];
-
-  if (!parentState?.slots) {
-    return {};
-  }
-
-  const result: NodeSlots = {};
-
-  for (const [parentProp, slotState] of Object.entries(parentState.slots)) {
-    if (slotState) {
-      const namedChildren = children[parentProp] ?? [];
-      result[parentProp] = calculateSlots(
-        parentState.nodeId,
-        parentProp,
-        slotState,
-        namedChildren,
-        nodesInfo,
-      );
-    }
-  }
-
-  return result;
-}
-
-interface NodeSlots {
-  [key: string]: RenderedSlot[] | undefined;
-}
-
-interface ViewSlots {
-  [node: NodeId]: NodeSlots | undefined;
 }
 
 interface SelectionHudProps {
@@ -529,7 +184,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     viewState,
     nodeId: pageNodeId,
     highlightLayout,
-    highlightedSlot,
   } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;
@@ -560,14 +214,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     },
     [],
   );
-
-  const slots: ViewSlots = React.useMemo(() => {
-    const result: ViewSlots = {};
-    pageNodes.forEach((node) => {
-      result[node.id] = calculateNodeSlots(node, appDom.getChildNodes(dom, node), nodesInfo);
-    });
-    return result;
-  }, [pageNodes, dom, nodesInfo]);
 
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
@@ -619,108 +265,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const slotIndex = findActiveSlotAt(
-        availableDropTargets,
-        nodesInfo,
-        slots,
-        cursorPos.x,
-        cursorPos.y,
-      );
-
-      const activeSlot = slotIndex;
-
       event.preventDefault();
-      if (activeSlot) {
-        api.nodeDragOver(activeSlot);
-      } else {
-        api.nodeDragOver(null);
-      }
     },
-    [getViewCoordinates, availableDropTargets, nodesInfo, slots, api],
+    [getViewCoordinates],
   );
 
-  const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
+  const handleDragLeave = React.useCallback(() => api.nodeDragOver(), [api]);
 
-  const handleDrop = React.useCallback(
-    (event: React.DragEvent<Element>) => {
-      const draggedNode = getCurrentlyDraggedNode();
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
-
-      if (!draggedNode || !cursorPos) {
-        return;
-      }
-
-      let activeSlot = findActiveSlotAt(
-        availableDropTargets,
-        nodesInfo,
-        slots,
-        cursorPos.x,
-        cursorPos.y,
-      );
-
-      if (activeSlot) {
-        let parent = appDom.getNode(dom, activeSlot.parentId);
-
-        if (!appDom.isElement(parent) && !appDom.isPage(parent)) {
-          throw new Error(`Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`);
-        }
-
-        const isParentRowContainer = appDom.isPage(parent) || isPageColumn(parent);
-
-        if (isParentRowContainer && !isPageRow(draggedNode)) {
-          // TODO: this logic should probably live in the DomReducer?
-          const container = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
-          domApi.addNode(container, parent, 'children');
-          parent = container;
-          activeSlot = { parentId: parent.id, parentProp: 'children' };
-        }
-
-        if (newNode) {
-          if (appDom.isElement(parent)) {
-            domApi.addNode(newNode, parent, activeSlot.parentProp, activeSlot.parentIndex);
-          } else {
-            domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
-          }
-        } else if (selection) {
-          const dragParent = appDom.getParent(dom, draggedNode);
-
-          const isOnlyRowElement =
-            dragParent &&
-            appDom.isElement(dragParent) &&
-            isPageRow(dragParent) &&
-            appDom.getChildNodes(dom, dragParent).children.length === 1;
-
-          domApi.moveNode(
-            selection,
-            activeSlot.parentId,
-            activeSlot.parentProp,
-            activeSlot.parentIndex,
-          );
-
-          if (isOnlyRowElement) {
-            domApi.removeNode(dragParent.id);
-          }
-        }
-      }
-
-      api.nodeDragEnd();
-      if (activeSlot && newNode) {
-        api.select(newNode.id);
-      }
-    },
-    [
-      dom,
-      nodesInfo,
-      domApi,
-      api,
-      slots,
-      newNode,
-      selection,
-      getViewCoordinates,
-      getCurrentlyDraggedNode,
-      availableDropTargets,
-    ],
-  );
+  const handleDrop = React.useCallback(() => {}, []);
 
   const handleDragEnd = React.useCallback(
     (event: DragEvent | React.DragEvent) => {
@@ -937,42 +489,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           onKeyDown={handleKeyDown}
           onDragEnd={handleDragEnd}
         >
-          {(Object.entries(slots) as ExactEntriesOf<ViewSlots>).map(([nodeId, nodeSlots = {}]) => {
-            return (Object.entries(nodeSlots) as ExactEntriesOf<NodeSlots>).map(
-              ([parentProp, namedSlots = []]) => {
-                return namedSlots.map((slot: RenderedSlot) =>
-                  slot.type === 'multiple' ? (
-                    <div
-                      key={`${nodeId}:${slot.parentIndex}`}
-                      style={insertSlotAbsolutePositionCss(slot)}
-                      className={clsx(overlayClasses.insertSlotHud, {
-                        [overlayClasses.available]:
-                          highlightLayout && availableDropTargetIds.has(nodeId),
-                        [overlayClasses.active]:
-                          highlightedSlot?.parentId === nodeId &&
-                          highlightedSlot?.parentProp === parentProp &&
-                          highlightedSlot?.parentIndex === slot.parentIndex,
-                      })}
-                    />
-                  ) : (
-                    <div
-                      key={`${nodeId}:${slot.parentIndex}`}
-                      style={absolutePositionCss(slot.rect)}
-                      className={clsx(overlayClasses.slotHud, {
-                        [overlayClasses.available]:
-                          highlightLayout && availableDropTargetIds.has(nodeId),
-                        [overlayClasses.active]:
-                          highlightedSlot?.parentId === nodeId &&
-                          highlightedSlot?.parentProp === parentProp,
-                      })}
-                    >
-                      +
-                    </div>
-                  ),
-                );
-              },
-            );
-          })}
           {pageNodes.map((node) => {
             const nodeLayout = nodesInfo[node.id];
             if (!nodeLayout?.rect) {

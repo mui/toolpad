@@ -1,8 +1,8 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
-import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType } from '@mui/toolpad-core';
+import { RUNTIME_PROP_NODE_ID } from '@mui/toolpad-core';
 import { NodeFiberHostProps } from '@mui/toolpad-core/runtime';
-import { NodeId, FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
-import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
+import { NodeId, PageViewState, NodesInfo, NodeInfo } from './types';
+import { getRelativeOuterRect } from './utils/geometry';
 
 declare global {
   interface Window {
@@ -26,7 +26,6 @@ function getNodeViewInfo(
       error: fiberHostProps.nodeError,
       componentConfig: fiberHostProps.componentConfig,
       rect,
-      slots: {},
       props,
     };
   }
@@ -85,33 +84,6 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
             if (info) {
               nodes[nodeId] = info;
             }
-          }
-        }
-
-        const slotNamePropValue = fiber.memoizedProps[RUNTIME_PROP_SLOTS] as string | undefined;
-        if (slotNamePropValue) {
-          const slotType = fiber.memoizedProps.slotType as SlotType;
-          const parentId: NodeId = fiber.memoizedProps.parentId as NodeId;
-          const nodeSlots = nodes[parentId]?.slots;
-
-          const firstChildElm = devtoolsHook.renderers
-            .get(rendererId)
-            ?.findHostInstanceByFiber(fiber);
-
-          const childContainerElm = firstChildElm?.parentElement;
-
-          if (childContainerElm && nodeSlots) {
-            const rect =
-              slotType === 'single'
-                ? getRelativeBoundingRect(rootElm, firstChildElm)
-                : getRelativeBoundingRect(rootElm, childContainerElm);
-            const direction = window.getComputedStyle(childContainerElm)
-              .flexDirection as FlowDirection;
-            nodeSlots[slotNamePropValue] = {
-              type: slotType,
-              rect,
-              direction,
-            };
           }
         }
       });

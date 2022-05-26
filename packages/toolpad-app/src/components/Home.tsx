@@ -156,7 +156,6 @@ function AppCard({ app, onDelete, onUpdate }: AppCardProps) {
     async (name: string) => {
       if (app?.id && onUpdate) {
         onUpdate(await client.mutation.updateApp(app.id, name));
-        // await client.refetchQueries('getApps');
       }
     },
     [app?.id, onUpdate],
@@ -277,20 +276,21 @@ function AppCard({ app, onDelete, onUpdate }: AppCardProps) {
 }
 
 export default function Home() {
-  const { data: apps = [], status, error } = client.useQuery('getApps', []);
+  const [apps, setApps] = React.useState<App[]>([]);
+
+  const { status, error } = client.useQuery('getApps', [], {
+    onSuccess: (data: App[]) => setApps(data),
+  });
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
   const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
 
-  const [updatedApp, setUpdatedApp] = React.useState<null | App>(null);
-
-  const fetchedApps = React.useMemo(() => {
-    if (updatedApp) {
-      return apps.map((app) => (app.id === updatedApp.id ? updatedApp : app));
-    }
-    return apps;
-  }, [updatedApp, apps]);
+  const onUpdate = React.useCallback((updatedApp: App) => {
+    setApps((previousApps) => {
+      return previousApps.map((prevApp) => (prevApp.id === updatedApp.id ? updatedApp : prevApp));
+    });
+  }, []);
 
   return (
     <ToolpadShell>
@@ -322,12 +322,12 @@ export default function Home() {
               case 'error':
                 return <Alert severity="error">{(error as Error)?.message}</Alert>;
               case 'success':
-                return fetchedApps.length > 0
-                  ? fetchedApps.map((app) => (
+                return apps.length > 0
+                  ? apps.map((app) => (
                       <AppCard
                         key={app.id}
                         app={app}
-                        onUpdate={setUpdatedApp}
+                        onUpdate={onUpdate}
                         onDelete={() => setDeletedApp(app)}
                       />
                     ))

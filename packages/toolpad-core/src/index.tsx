@@ -1,8 +1,8 @@
 import { TOOLPAD_COMPONENT } from './constants.js';
 import { ComponentConfig, ToolpadComponent } from './types';
 
-export type { NodeRuntime } from './runtime';
-export { useNode } from './runtime';
+export type { PlaceholderProps, SlotsProps, NodeRuntime } from './runtime';
+export { Placeholder, Slots, useNode } from './runtime';
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 

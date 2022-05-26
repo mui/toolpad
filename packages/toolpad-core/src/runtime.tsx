@@ -2,8 +2,9 @@ import * as React from 'react';
 import { Error as ErrorIcon } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { ErrorBoundary } from 'react-error-boundary';
-import { RUNTIME_PROP_NODE_ID } from './constants.js';
+import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type {
+  SlotType,
   ComponentConfig,
   RuntimeEvent,
   ArgTypeDefinition,
@@ -23,6 +24,43 @@ declare global {
 }
 
 export const NodeRuntimeContext = React.createContext<string | null>(null);
+
+// NOTE: These props aren't used, they are only there to transfer information from the
+// React elements to the fibers.
+interface SlotsWrapperProps {
+  children?: React.ReactNode;
+  // eslint-disable-next-line react/no-unused-prop-types
+  [RUNTIME_PROP_SLOTS]: string;
+  // eslint-disable-next-line react/no-unused-prop-types
+  slotType: SlotType;
+  // eslint-disable-next-line react/no-unused-prop-types
+  parentId: string;
+}
+
+function SlotsWrapper({ children }: SlotsWrapperProps) {
+  return <React.Fragment>{children}</React.Fragment>;
+}
+
+interface PlaceholderWrapperProps {
+  // eslint-disable-next-line react/no-unused-prop-types
+  [RUNTIME_PROP_SLOTS]: string;
+  // eslint-disable-next-line react/no-unused-prop-types
+  parentId: string;
+}
+
+// We want typescript to enforce these props, even when they're not used
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function PlaceholderWrapper(props: PlaceholderWrapperProps) {
+  return (
+    <div
+      style={{
+        display: 'block',
+        minHeight: 40,
+        width: '100%',
+      }}
+    />
+  );
+}
 
 export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
@@ -165,6 +203,56 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
       },
     };
   }, [nodeId]);
+}
+
+export interface PlaceholderProps {
+  prop: string;
+  children?: React.ReactNode;
+}
+
+export function Placeholder({ prop, children }: PlaceholderProps) {
+  const nodeId = React.useContext(NodeRuntimeContext);
+  if (!nodeId) {
+    return <React.Fragment>{children}</React.Fragment>;
+  }
+  const count = React.Children.count(children);
+  return count > 0 ? (
+    <React.Fragment>{children}</React.Fragment>
+  ) : (
+    <PlaceholderWrapper
+      parentId={nodeId}
+      {...{
+        [RUNTIME_PROP_SLOTS]: prop,
+        slotType: 'single',
+      }}
+    />
+  );
+}
+
+export interface SlotsProps {
+  prop: string;
+  children?: React.ReactNode;
+}
+
+export function Slots({ prop, children }: SlotsProps) {
+  const nodeId = React.useContext(NodeRuntimeContext);
+  if (!nodeId) {
+    return <React.Fragment>{children}</React.Fragment>;
+  }
+  const count = React.Children.count(children);
+  return count > 0 ? (
+    <SlotsWrapper
+      parentId={nodeId}
+      {...{
+        [RUNTIME_PROP_SLOTS]: prop,
+        slotType: 'multiple',
+      }}
+    >
+      {children}
+    </SlotsWrapper>
+  ) : (
+    <Placeholder prop={prop} />
+  );
 }
 
 let iframe: HTMLIFrameElement;

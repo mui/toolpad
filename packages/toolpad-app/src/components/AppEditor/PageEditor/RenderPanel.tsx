@@ -40,6 +40,7 @@ const RenderPanelRoot = styled('div')({
 const overlayClasses = {
   hud: 'Toolpad_Hud',
   nodeHud: 'Toolpad_NodeHud',
+  dropPreview: 'Toolpad_DropPreview',
   selected: 'Toolpad_Selected',
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
   layout: 'Toolpad_Layout',
@@ -86,6 +87,9 @@ const OverlayRoot = styled('div')({
     [`&.${overlayClasses.layout}`]: {
       borderColor: 'rgba(255,0,0,.125)',
     },
+    [`&.${overlayClasses.dropPreview}`]: {
+      border: '2px solid green',
+    },
     [`&.${overlayClasses.selected}`]: {
       border: '1px solid red',
       [`& .${overlayClasses.selectionHint}`]: {
@@ -124,6 +128,7 @@ function findNodeAt(
 interface SelectionHudProps {
   node: appDom.ElementNode;
   rect: Rectangle;
+  hasDropPreview?: boolean;
   selected?: boolean;
   allowInteraction?: boolean;
   onDragStart?: React.DragEventHandler<HTMLElement>;
@@ -132,6 +137,7 @@ interface SelectionHudProps {
 
 function NodeHud({
   node,
+  hasDropPreview,
   selected,
   allowInteraction,
   rect,
@@ -154,6 +160,7 @@ function NodeHud({
       style={absolutePositionCss(rect)}
       className={clsx(overlayClasses.nodeHud, {
         [overlayClasses.layout]: isLayoutComponent,
+        [overlayClasses.dropPreview]: hasDropPreview,
         [overlayClasses.selected]: selected,
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
@@ -252,10 +259,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return pageNodes.filter((n) => !excludedNodes.has(n));
   }, [dom, getCurrentlyDraggedNode, pageNodes, selectedNode]);
 
-  const availableDropTargetIds = React.useMemo(
-    () => new Set(availableDropTargets.map((n) => n.id)),
-    [availableDropTargets],
-  );
+  const [dropPreviewNodeId, setDropPreviewNodeId] = React.useState<string | null>(null);
 
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
@@ -265,9 +269,19 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
+      const newActiveDropNodeId = findNodeAt(
+        availableDropTargets,
+        nodesInfo,
+        cursorPos.x,
+        cursorPos.y,
+      );
+      if (newActiveDropNodeId !== dropPreviewNodeId) {
+        setDropPreviewNodeId(newActiveDropNodeId);
+      }
+
       event.preventDefault();
     },
-    [getViewCoordinates],
+    [availableDropTargets, dropPreviewNodeId, getViewCoordinates, nodesInfo],
   );
 
   const handleDragLeave = React.useCallback(() => api.nodeDragOver(), [api]);
@@ -495,12 +509,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               return null;
             }
 
+            const hasDropPreview = node.id === dropPreviewNodeId;
+
             return (
               appDom.isElement(node) && (
                 <NodeHud
                   key={node.id}
                   node={node}
                   rect={nodeLayout.rect}
+                  hasDropPreview={hasDropPreview}
                   selected={selectedNode?.id === node.id}
                   allowInteraction={nodesWithInteraction.has(node.id)}
                   onDragStart={handleDragStart}

@@ -31,7 +31,9 @@ import {
   fireEvent,
   JsRuntimeProvider,
   NodeRuntimeWrapper,
+  Placeholder,
   ResetNodeErrorsKeyProvider,
+  Slots,
 } from '@mui/toolpad-core/runtime';
 import * as appDom from '../appDom';
 import { NodeId, VersionOrPreview } from '../types';

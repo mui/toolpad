@@ -9,6 +9,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  ListItemIcon,
+  ListItemText,
   Menu,
   MenuItem,
   Skeleton,
@@ -34,8 +36,6 @@ export interface CreateAppDialogProps {
   open: boolean;
   onClose: () => void;
 }
-
-const AppCardMenuIconStyles = { fontSize: '1rem', mr: '0.5rem', color: 'grey.700' };
 
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
@@ -260,15 +260,22 @@ function AppCard({ app, onDelete, onUpdate }: AppCardProps) {
         }}
       >
         <MenuItem onClick={handleRenameClick}>
-          <DriveFileRenameOutlineIcon sx={AppCardMenuIconStyles} />
-          Rename
+          <ListItemIcon>
+            <DriveFileRenameOutlineIcon />
+          </ListItemIcon>
+          <ListItemText>Rename</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleMenuClose}>
-          <FileCopyIcon sx={AppCardMenuIconStyles} /> Duplicate
+          <ListItemIcon>
+            <FileCopyIcon />
+          </ListItemIcon>
+          <ListItemText>Duplicate</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleDeleteClick}>
-          <DeleteIcon sx={AppCardMenuIconStyles} />
-          Delete
+          <ListItemIcon>
+            <DeleteIcon />
+          </ListItemIcon>
+          <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
     </React.Fragment>

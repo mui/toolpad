@@ -5,7 +5,6 @@ import { LiveBindings } from '@mui/toolpad-core';
 import { setEventHandler } from '@mui/toolpad-core/runtime';
 import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
-import { getToolpadComponents } from '../toolpadComponents';
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
@@ -28,19 +27,9 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
 
   dom = initPage(dom, page);
 
-  const components = getToolpadComponents(appId, version, dom);
-
   window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
 
-  return render(
-    <ToolpadApp
-      appId={appId}
-      version={version}
-      basename="toolpad"
-      dom={dom}
-      components={components}
-    />,
-  );
+  return render(<ToolpadApp appId={appId} version={version} basename="toolpad" dom={dom} />);
 }
 
 afterEach(() => {

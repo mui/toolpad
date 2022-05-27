@@ -3,7 +3,6 @@ import { TOOLPAD_COMPONENT } from './constants';
 
 export type BindingAttrValueFormat = 'stringLiteral' | 'default';
 
-// TODO: Get rid of BoundExpressionAttrValue? Its function can be fulfilled by derivedState as well
 export interface BoundExpressionAttrValue {
   type: 'boundExpression';
   value: string;

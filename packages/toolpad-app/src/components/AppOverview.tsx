@@ -1,42 +1,16 @@
 import * as React from 'react';
-import {
-  Box,
-  ButtonProps,
-  Card,
-  CardActionArea,
-  CardContent,
-  Container,
-  Typography,
-} from '@mui/material';
+import { Box, Card, CardActionArea, CardContent, Container, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
 import * as appDom from '../appDom';
 
-type OpenPageButtonProps = (
-  appId: string,
-  page: appDom.PageNode,
-) => ButtonProps & { component?: string | React.ComponentType };
-
 interface PageCardProps {
-  appId: string;
   page: appDom.PageNode;
-  openPageButtonProps?: OpenPageButtonProps;
 }
 
-/**
- * Temporary render prop to have dual-mode code-generator/nextjs-page
- * Remove this if/when we fully commit to nextjs rendering of the apps
- */
-function defaultOpenPageButtonProps(appId: string, page: appDom.PageNode): ButtonProps {
-  return { component: 'a', href: `/deploy/${appId}/${page.id}` } as ButtonProps;
-}
-
-function PageCard({
-  appId,
-  page,
-  openPageButtonProps = defaultOpenPageButtonProps,
-}: PageCardProps) {
+function PageCard({ page }: PageCardProps) {
   return (
     <Card sx={{ gridColumn: 'span 1' }}>
-      <CardActionArea {...openPageButtonProps(appId, page)}>
+      <CardActionArea component={Link} to={`/pages/${page.id}`}>
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
             {page.name}
@@ -51,12 +25,10 @@ function PageCard({
 }
 
 interface AppOverviewProps {
-  appId: string;
   dom: appDom.AppDom;
-  openPageButtonProps?: OpenPageButtonProps;
 }
 
-export default function AppOverview({ appId, dom, openPageButtonProps }: AppOverviewProps) {
+export default function AppOverview({ dom }: AppOverviewProps) {
   const app = dom ? appDom.getApp(dom) : null;
   const { pages = [] } = dom && app ? appDom.getChildNodes(dom, app) : {};
   return (
@@ -76,12 +48,7 @@ export default function AppOverview({ appId, dom, openPageButtonProps }: AppOver
         }}
       >
         {pages.map((page) => (
-          <PageCard
-            key={page.id}
-            appId={appId}
-            page={page}
-            openPageButtonProps={openPageButtonProps}
-          />
+          <PageCard key={page.id} page={page} />
         ))}
       </Box>
     </Container>

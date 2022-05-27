@@ -65,9 +65,11 @@ interface AppContext {
   version: VersionOrPreview;
 }
 
+type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
+
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useComponentsContext, ComponentsContextProvider] =
-  createProvidedContext<(id: string) => ToolpadComponent>('Components');
+  createProvidedContext<ToolpadComponents>('Components');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useBindingsContext, BindingsContextProvider] =
   createProvidedContext<Record<string, BindingEvaluationResult>>('LiveBindings');
@@ -76,15 +78,33 @@ const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
     'SetControlledBinding',
   );
 
+function createToolpadComponentThatThrows(error: Error) {
+  return createComponent(() => {
+    throw error;
+  });
+}
+
+function createToolpadComponentThatSuspends() {
+  return createComponent(() => {
+    throw new Promise(() => {});
+  });
+}
+
 function getComponentId(elm: appDom.ElementNode): string {
   const componentId = getElementNodeComponentId(elm);
   return componentId;
 }
 
 function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
-  const getComponent = useComponentsContext();
+  const components = useComponentsContext();
   const componentId = getElementNodeComponentId(elm);
-  return getComponent(componentId);
+
+  return React.useMemo(() => {
+    return (
+      components?.[componentId] ??
+      createToolpadComponentThatThrows(new Error(`Can't find component for "${componentId}"`))
+    );
+  }, [components, componentId]);
 }
 
 interface RenderedNodeProps {
@@ -285,7 +305,7 @@ function QueryNode({ node }: QueryNodeProps) {
 function parseBindings(
   dom: appDom.AppDom,
   page: appDom.PageNode,
-  getComponent: (id: string) => ToolpadComponent<any>,
+  components: ToolpadComponents,
   location: RouterLocation,
 ) {
   const elements = appDom.getDescendants(dom, page);
@@ -296,9 +316,9 @@ function parseBindings(
   for (const elm of elements) {
     if (appDom.isElement(elm)) {
       const componentId = getComponentId(elm);
-      const Component = getComponent(componentId);
+      const Component = components[componentId];
 
-      const { argTypes } = Component[TOOLPAD_COMPONENT];
+      const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
         const bindingId = `${elm.id}.props.${propName}`;
@@ -395,11 +415,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   usePageTitle(page.attributes.title.value);
 
   const location = useLocation();
-  const getComponent = useComponentsContext();
+  const components = useComponentsContext();
 
   const { parsedBindings, controlled } = React.useMemo(
-    () => parseBindings(dom, page, getComponent, location),
-    [getComponent, dom, location, page],
+    () => parseBindings(dom, page, components, location),
+    [components, dom, location, page],
   );
 
   const [pageBindings, setPageBindings] =
@@ -500,46 +520,6 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
-function createToolpadComponentThatThrows(error: Error) {
-  return createComponent(() => {
-    throw error;
-  });
-}
-
-function instantiateCodeComponent(src: string): ToolpadComponent {
-  let ResolvedComponent: ToolpadComponent;
-
-  const LazyComponent = React.lazy(async () => {
-    let ImportedComponent: ToolpadComponent = createComponent(() => null);
-    try {
-      ImportedComponent = await createCodeComponent(src);
-    } catch (error: any) {
-      ImportedComponent = createToolpadComponentThatThrows(error);
-    }
-
-    ResolvedComponent.defaultProps = ImportedComponent.defaultProps;
-
-    const importedConfig = ImportedComponent[TOOLPAD_COMPONENT];
-
-    // We update the componentConfig after the component is loaded
-    if (importedConfig) {
-      ResolvedComponent[TOOLPAD_COMPONENT] = importedConfig;
-    }
-
-    return { default: ImportedComponent };
-  });
-
-  const LazyWrapper = React.forwardRef((props, ref) => (
-    // @ts-expect-error Need to update @types/react to > 18
-    <LazyComponent ref={ref} {...props} />
-  ));
-
-  // We start with a lazy component with default argTypes
-  ResolvedComponent = createComponent(LazyWrapper);
-
-  return ResolvedComponent;
-}
-
 const CODE_COMPONENTS_CACHE = new Map<string, ToolpadComponent>();
 
 export interface ToolpadAppProps {
@@ -569,48 +549,57 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
     [],
   );
 
-  const components = React.useMemo(() => getToolpadComponents(dom), [dom]);
+  const [components, setComponents] = React.useState(() => {
+    const componentDefs = getToolpadComponents(dom);
+    const result: ToolpadComponents = {};
 
-  const getComponent = React.useCallback(
-    (id: string): ToolpadComponent => {
-      const def = components[id];
+    for (const [id, componentDef] of Object.entries(componentDefs)) {
+      if (componentDef) {
+        if (componentDef.builtin) {
+          const builtin = (builtins as any)[componentDef.builtin];
 
-      if (def?.builtin) {
-        const builtin = (builtins as any)[def.builtin];
+          if (!ReactIs.isValidElementType(builtin) || typeof builtin === 'string') {
+            throw new Error(`Invalid builtin component imported "${componentDef.builtin}"`);
+          }
 
-        if (!ReactIs.isValidElementType(builtin) || typeof builtin === 'string') {
-          throw new Error(`Invalid builtin component imported "${def.builtin}"`);
+          if (!(builtin as any)[TOOLPAD_COMPONENT]) {
+            throw new Error(`Builtin component "${id}" is missing component config`);
+          }
+
+          result[id] = builtin as ToolpadComponent;
         }
 
-        if (!(builtin as any)[TOOLPAD_COMPONENT]) {
-          throw new Error(`Builtin component "${id}" is missing component config`);
+        if (componentDef.codeComponentId) {
+          result[id] = createToolpadComponentThatSuspends();
         }
-
-        return builtin as ToolpadComponent;
       }
+    }
 
-      if (def?.codeComponentId) {
-        const componentId = def.codeComponentId;
+    return result;
+  });
+
+  React.useEffect(() => {
+    const componentDefs = getToolpadComponents(dom);
+
+    for (const [id, componentDef] of Object.entries(componentDefs)) {
+      if (componentDef?.codeComponentId) {
+        const componentId = componentDef.codeComponentId;
         const codeComponentNode = appDom.getNode(dom, componentId, 'codeComponent');
         const src = codeComponentNode.attributes.code.value;
 
-        const CachedComponent = CODE_COMPONENTS_CACHE.get(src);
-
-        if (CachedComponent) {
-          return CachedComponent;
-        }
-
-        const ResolvedComponent = instantiateCodeComponent(src);
-
-        CODE_COMPONENTS_CACHE.set(src, ResolvedComponent);
-
-        return ResolvedComponent;
+        createCodeComponent(src)
+          .then((Component) => {
+            setComponents((existing) => ({ ...existing, [id]: Component }));
+          })
+          .catch((error) => {
+            setComponents((existing) => ({
+              ...existing,
+              [id]: createToolpadComponentThatThrows(error),
+            }));
+          });
       }
-
-      return createToolpadComponentThatThrows(new Error(`Can't find component for "${id}"`));
-    },
-    [dom, components],
-  );
+    }
+  }, [dom]);
 
   React.useEffect(() => {
     // Clean up code components cache
@@ -638,7 +627,7 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
             <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
               <React.Suspense fallback={<AppLoading />}>
                 <JsRuntimeProvider>
-                  <ComponentsContextProvider value={getComponent}>
+                  <ComponentsContextProvider value={components}>
                     <AppContextProvider value={appContext}>
                       <QueryClientProvider client={queryClient}>
                         <AppThemeProvider node={theme}>

@@ -135,7 +135,9 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
         if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
         }
-      } else if (argType) {
+      }
+
+      if (typeof hookResult[propName] === 'undefined' && argType) {
         hookResult[propName] = argType.defaultValue;
       }
     }
@@ -555,7 +557,17 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
 
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
 
-  const queryClient = React.useMemo(() => new QueryClient(), []);
+  const queryClient = React.useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+          },
+        },
+      }),
+    [],
+  );
 
   const components = React.useMemo(() => getToolpadComponents(dom), [dom]);
 

@@ -333,8 +333,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             cursorPos.x - activeDropNodeRect.x,
             cursorPos.y - activeDropNodeRect.y,
             {
-              ignoreCenterAreaXFraction: 0.25,
-              ignoreCenterAreaYFraction: 0.25,
+              centerAreaXFraction: 0.5,
+              centerAreaYFraction: 0.5,
             },
           );
         }

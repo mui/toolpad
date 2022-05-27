@@ -135,16 +135,17 @@ export enum RectBoundary {
   RIGHT = 'RIGHT',
   BOTTOM = 'BOTTOM',
   LEFT = 'LEFT',
+  CENTER = 'CENTER'
 }
 
 interface GetRectPointBoundaryOptions {
-  ignoreCenterAreaXFraction?: number // 0-1
-  ignoreCenterAreaYFraction?: number // 0-1
+  centerAreaXFraction?: number // 0-1
+  centerAreaYFraction?: number // 0-1
 }
 
 export function getRectPointBoundary(rect: Rectangle, x: number, y: number, options: GetRectPointBoundaryOptions = {}): RectBoundary | null {
   const { height: rectHeight, width: rectWidth } = rect
-  const { ignoreCenterAreaXFraction = 0, ignoreCenterAreaYFraction = 0 } = options
+  const { centerAreaXFraction = 0, centerAreaYFraction = 0 } = options
 
   // Out of bounds
   if (x < 0 || x > rectWidth || y < 0 || y > rectHeight) {
@@ -154,15 +155,15 @@ export function getRectPointBoundary(rect: Rectangle, x: number, y: number, opti
   // Ignored center area fractions
   const fractionalX = x / rectWidth
   const fractionalY = y / rectHeight
-  const includedCenterAreaXFractionHalf = (1 - ignoreCenterAreaXFraction) / 2
-  const includedCenterAreaYFractionHalf = (1 - ignoreCenterAreaYFraction) / 2
+  const centerAreaXFractionHalf = centerAreaXFraction / 2
+  const centerAreaYFractionHalf = centerAreaYFraction / 2
   if (
-    fractionalX > includedCenterAreaXFractionHalf &&
-    fractionalX < 1 - includedCenterAreaXFractionHalf &&
-    fractionalY > includedCenterAreaYFractionHalf &&
-    fractionalY < 1 - includedCenterAreaYFractionHalf
+    fractionalX > centerAreaXFractionHalf &&
+    fractionalX < 1 - centerAreaXFractionHalf &&
+    fractionalY > centerAreaYFractionHalf &&
+    fractionalY < 1 - centerAreaYFractionHalf
   ) {
-    return null
+    return RectBoundary.CENTER;
   }
 
   const isOverFirstDiagonal = y < (rectHeight / rectWidth) * x;

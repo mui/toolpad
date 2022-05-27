@@ -54,7 +54,6 @@ import evalJsBindings, {
 import createCodeComponent from './createCodeComponent';
 import { HTML_ID_APP_ROOT } from '../constants';
 import usePageTitle from '../utils/usePageTitle';
-import DomProvider, { useDomContext } from './DomProvider';
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
@@ -66,6 +65,7 @@ interface AppContext {
   version: VersionOrPreview;
 }
 
+const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useComponentsContext, ComponentsContextProvider] =
   createProvidedContext<(id: string) => ToolpadComponent>('Components');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
@@ -542,15 +542,14 @@ function instantiateCodeComponent(src: string): ToolpadComponent {
 
 const CODE_COMPONENTS_CACHE = new Map<string, ToolpadComponent>();
 
-export interface ToolpadAppContentProps {
+export interface ToolpadAppProps {
   basename: string;
   appId: string;
   version: VersionOrPreview;
+  dom: appDom.AppDom;
 }
 
-function ToolpadAppContent({ basename, appId, version }: ToolpadAppContentProps) {
-  const dom = useDomContext();
-
+export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
   const root = appDom.getApp(dom);
   const { pages = [], themes = [], codeComponents = [] } = appDom.getChildNodes(dom, root);
 
@@ -632,53 +631,40 @@ function ToolpadAppContent({ basename, appId, version }: ToolpadAppContentProps)
 
   return (
     <AppRoot id={HTML_ID_APP_ROOT}>
-      <CssBaseline />
-      <ErrorBoundary FallbackComponent={AppError}>
-        <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-          <React.Suspense fallback={<AppLoading />}>
-            <JsRuntimeProvider>
-              <ComponentsContextProvider value={getComponent}>
-                <AppContextProvider value={appContext}>
-                  <QueryClientProvider client={queryClient}>
-                    <AppThemeProvider node={theme}>
-                      <BrowserRouter basename={basename}>
-                        <Routes>
-                          <Route path="/" element={<Navigate replace to="/pages" />} />
-                          <Route path="/pages" element={<AppOverview dom={dom} />} />
-                          {pages.map((page) => (
-                            <Route
-                              key={page.id}
-                              path={`/pages/${page.id}`}
-                              element={<RenderedPage nodeId={page.id} />}
-                            />
-                          ))}
-                        </Routes>
-                      </BrowserRouter>
-                    </AppThemeProvider>
-                  </QueryClientProvider>
-                </AppContextProvider>
-              </ComponentsContextProvider>
-            </JsRuntimeProvider>
-          </React.Suspense>
-        </ResetNodeErrorsKeyProvider>
-      </ErrorBoundary>
+      <NoSsr>
+        <DomContextProvider value={dom}>
+          <CssBaseline />
+          <ErrorBoundary FallbackComponent={AppError}>
+            <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+              <React.Suspense fallback={<AppLoading />}>
+                <JsRuntimeProvider>
+                  <ComponentsContextProvider value={getComponent}>
+                    <AppContextProvider value={appContext}>
+                      <QueryClientProvider client={queryClient}>
+                        <AppThemeProvider node={theme}>
+                          <BrowserRouter basename={basename}>
+                            <Routes>
+                              <Route path="/" element={<Navigate replace to="/pages" />} />
+                              <Route path="/pages" element={<AppOverview dom={dom} />} />
+                              {pages.map((page) => (
+                                <Route
+                                  key={page.id}
+                                  path={`/pages/${page.id}`}
+                                  element={<RenderedPage nodeId={page.id} />}
+                                />
+                              ))}
+                            </Routes>
+                          </BrowserRouter>
+                        </AppThemeProvider>
+                      </QueryClientProvider>
+                    </AppContextProvider>
+                  </ComponentsContextProvider>
+                </JsRuntimeProvider>
+              </React.Suspense>
+            </ResetNodeErrorsKeyProvider>
+          </ErrorBoundary>
+        </DomContextProvider>
+      </NoSsr>
     </AppRoot>
-  );
-}
-
-export interface ToolpadAppProps {
-  basename: string;
-  appId: string;
-  version: VersionOrPreview;
-  dom: appDom.AppDom;
-}
-
-export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
-  return (
-    <NoSsr>
-      <DomProvider dom={dom}>
-        <ToolpadAppContent basename={basename} appId={appId} version={version} />
-      </DomProvider>
-    </NoSsr>
   );
 }

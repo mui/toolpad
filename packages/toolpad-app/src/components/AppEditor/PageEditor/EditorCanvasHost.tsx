@@ -85,7 +85,7 @@ export default function EditorCanvasHost({
       </Box>
       <CanvasFrame
         ref={frameRef}
-        src={`/app/${appId}/preview/pages/${pageNodeId}`}
+        src={`/app-canvas/${appId}/pages/${pageNodeId}`}
         // Used by the runtime to know when to load react devtools
         data-toolpad-canvas
       />

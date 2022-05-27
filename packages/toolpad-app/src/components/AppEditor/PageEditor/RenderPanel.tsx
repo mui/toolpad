@@ -818,6 +818,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     api.pageViewStateUpdate(getPageViewState(rootElm));
   }, [api]);
 
+  const [rootElm, setRootElm] = React.useState<HTMLElement | null>();
+
   const handleRuntimeEvent = React.useCallback(
     (event: RuntimeEvent) => {
       switch (event.type) {
@@ -846,6 +848,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           api.pageBindingsUpdate(event.bindings);
           return;
         }
+        case 'afterRender': {
+          const editorWindow = editorWindowRef.current ?? null;
+          setRootElm(editorWindow?.document.getElementById(HTML_ID_APP_ROOT));
+          return;
+        }
         default:
           throw new Error(
             `received unrecognized event "${(event as RuntimeEvent).type}" from editor runtime`,
@@ -863,45 +870,46 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   React.useEffect(() => {
     if (editorWindowRef.current) {
       const editorWindow = editorWindowRef.current;
-      const rootElm = editorWindow.document.getElementById(HTML_ID_APP_ROOT);
-
-      if (!rootElm) {
-        console.warn(`Invariant: Unable to locate Toolpad App root element`);
-        return () => {};
-      }
-
-      handlePageViewStateUpdate();
-      const handlePageUpdateThrottled = throttle(handlePageViewStateUpdate, 250, {
-        trailing: true,
-      });
-
-      const mutationObserver = new MutationObserver(handlePageUpdateThrottled);
-
-      mutationObserver.observe(rootElm, {
-        attributes: true,
-        childList: true,
-        subtree: true,
-        characterData: true,
-      });
-
-      const resizeObserver = new ResizeObserver(handlePageUpdateThrottled);
-
-      resizeObserver.observe(rootElm);
-      rootElm.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
 
       const cleanupHandler = setEventHandler(editorWindow, (event) =>
         handleRuntimeEventRef.current(event),
       );
 
-      return () => {
-        handlePageUpdateThrottled.cancel();
-        mutationObserver.disconnect();
-        resizeObserver.disconnect();
-        cleanupHandler();
-      };
+      return cleanupHandler;
     }
     return () => {};
-  }, [overlayKey, handlePageViewStateUpdate]);
+  }, [overlayKey]);
+
+  React.useEffect(() => {
+    if (!rootElm) {
+      return () => {};
+    }
+
+    handlePageViewStateUpdate();
+    const handlePageUpdateThrottled = throttle(handlePageViewStateUpdate, 250, {
+      trailing: true,
+    });
+
+    const mutationObserver = new MutationObserver(handlePageUpdateThrottled);
+
+    mutationObserver.observe(rootElm, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    const resizeObserver = new ResizeObserver(handlePageUpdateThrottled);
+
+    resizeObserver.observe(rootElm);
+    rootElm.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
+
+    return () => {
+      handlePageUpdateThrottled.cancel();
+      mutationObserver.disconnect();
+      resizeObserver.disconnect();
+    };
+  }, [overlayKey, handlePageViewStateUpdate, rootElm]);
 
   return (
     <RenderPanelRoot className={className}>

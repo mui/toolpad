@@ -7,7 +7,6 @@ import DomProvider, { useDomLoader } from '../DomLoader';
 import ApiEditor from './ApiEditor';
 import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
-import { AppEditorContext, AppEditorContextprovider } from './AppEditorContext';
 import AppEditorShell from './AppEditorShell';
 
 const classes = {
@@ -85,18 +84,11 @@ export default function Editor() {
     throw new Error(`Missing queryParam "appId"`);
   }
 
-  const appContextValue: AppEditorContext = React.useMemo(
-    () => ({ id: appId, version: 'preview' }),
-    [appId],
-  );
-
   return (
     <JsRuntimeProvider>
-      <AppEditorContextprovider value={appContextValue}>
-        <DomProvider appId={appId}>
-          <EditorContent appId={appId} />
-        </DomProvider>
-      </AppEditorContextprovider>
+      <DomProvider appId={appId}>
+        <EditorContent appId={appId} />
+      </DomProvider>
     </JsRuntimeProvider>
   );
 }

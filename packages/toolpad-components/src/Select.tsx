@@ -1,5 +1,3 @@
-// TODO: Remove after https://github.com/DefinitelyTyped/DefinitelyTyped/pull/56210 lands
-/// <reference types="react/next" />
 import * as React from 'react';
 import {
   FormControl,

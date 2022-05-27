@@ -54,7 +54,6 @@ import evalJsBindings, {
 import createCodeComponent from './createCodeComponent';
 import { HTML_ID_APP_ROOT } from '../constants';
 import usePageTitle from '../utils/usePageTitle';
-import DomProvider, { useDomContext } from './DomProvider';
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
@@ -66,6 +65,7 @@ interface AppContext {
   version: VersionOrPreview;
 }
 
+const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useComponentsContext, ComponentsContextProvider] =
   createProvidedContext<(id: string) => ToolpadComponent>('Components');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
@@ -618,9 +618,9 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
   return (
-    <NoSsr>
-      <DomProvider dom={dom}>
-        <AppRoot id={HTML_ID_APP_ROOT}>
+    <AppRoot id={HTML_ID_APP_ROOT}>
+      <NoSsr>
+        <DomContextProvider value={dom}>
           <CssBaseline />
           <ErrorBoundary FallbackComponent={AppError}>
             <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
@@ -651,8 +651,8 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
               </React.Suspense>
             </ResetNodeErrorsKeyProvider>
           </ErrorBoundary>
-        </AppRoot>
-      </DomProvider>
-    </NoSsr>
+        </DomContextProvider>
+      </NoSsr>
+    </AppRoot>
   );
 }

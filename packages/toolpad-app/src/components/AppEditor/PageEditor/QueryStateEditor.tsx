@@ -21,7 +21,6 @@ import {
   InputAdornment,
 } from '@mui/material';
 import * as React from 'react';
-import AddIcon from '@mui/icons-material/Add';
 import { ArgTypeDefinitions, UseDataQuery } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -223,16 +222,7 @@ export default function QueryStateEditor() {
   const page = appDom.getNode(dom, state.nodeId, 'page');
   const { queryStates = [] } = appDom.getChildNodes(dom, page) ?? [];
 
-  const handleCreate = React.useCallback(() => {
-    const stateNode = appDom.createNode(dom, 'queryState', {
-      params: {},
-      attributes: { api: appDom.createConst(null) },
-    });
-    domApi.addNode(stateNode, page, 'queryStates');
-    setEditedState(stateNode.id);
-  }, [dom, domApi, page]);
-
-  // To keep it around during closing animation
+  // To keep dialog content around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);
 
   const handleRemove = React.useCallback(() => {
@@ -242,11 +232,8 @@ export default function QueryStateEditor() {
     handleEditStateDialogClose();
   }, [editedStateNode, handleEditStateDialogClose, domApi]);
 
-  return (
+  return queryStates.length > 0 ? (
     <Stack spacing={1} alignItems="start">
-      <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
-        create query state
-      </Button>
       <List>
         {queryStates.map((stateNode) => {
           return (
@@ -277,5 +264,5 @@ export default function QueryStateEditor() {
         </Dialog>
       ) : null}
     </Stack>
-  );
+  ) : null;
 }

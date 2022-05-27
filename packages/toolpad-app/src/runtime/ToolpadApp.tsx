@@ -542,14 +542,15 @@ function instantiateCodeComponent(src: string): ToolpadComponent {
 
 const CODE_COMPONENTS_CACHE = new Map<string, ToolpadComponent>();
 
-export interface ToolpadAppProps {
+export interface ToolpadAppContentProps {
   basename: string;
   appId: string;
   version: VersionOrPreview;
-  dom: appDom.AppDom;
 }
 
-export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
+function ToolpadAppContent({ basename, appId, version }: ToolpadAppContentProps) {
+  const dom = useDomContext();
+
   const root = appDom.getApp(dom);
   const { pages = [], themes = [], codeComponents = [] } = appDom.getChildNodes(dom, root);
 
@@ -630,40 +631,53 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
   return (
+    <AppRoot id={HTML_ID_APP_ROOT}>
+      <CssBaseline />
+      <ErrorBoundary FallbackComponent={AppError}>
+        <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+          <React.Suspense fallback={<AppLoading />}>
+            <JsRuntimeProvider>
+              <ComponentsContextProvider value={getComponent}>
+                <AppContextProvider value={appContext}>
+                  <QueryClientProvider client={queryClient}>
+                    <AppThemeProvider node={theme}>
+                      <BrowserRouter basename={basename}>
+                        <Routes>
+                          <Route path="/" element={<Navigate replace to="/pages" />} />
+                          <Route path="/pages" element={<AppOverview dom={dom} />} />
+                          {pages.map((page) => (
+                            <Route
+                              key={page.id}
+                              path={`/pages/${page.id}`}
+                              element={<RenderedPage nodeId={page.id} />}
+                            />
+                          ))}
+                        </Routes>
+                      </BrowserRouter>
+                    </AppThemeProvider>
+                  </QueryClientProvider>
+                </AppContextProvider>
+              </ComponentsContextProvider>
+            </JsRuntimeProvider>
+          </React.Suspense>
+        </ResetNodeErrorsKeyProvider>
+      </ErrorBoundary>
+    </AppRoot>
+  );
+}
+
+export interface ToolpadAppProps {
+  basename: string;
+  appId: string;
+  version: VersionOrPreview;
+  dom: appDom.AppDom;
+}
+
+export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
+  return (
     <NoSsr>
       <DomProvider dom={dom}>
-        <AppRoot id={HTML_ID_APP_ROOT}>
-          <CssBaseline />
-          <ErrorBoundary FallbackComponent={AppError}>
-            <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-              <React.Suspense fallback={<AppLoading />}>
-                <JsRuntimeProvider>
-                  <ComponentsContextProvider value={getComponent}>
-                    <AppContextProvider value={appContext}>
-                      <QueryClientProvider client={queryClient}>
-                        <AppThemeProvider node={theme}>
-                          <BrowserRouter basename={basename}>
-                            <Routes>
-                              <Route path="/" element={<Navigate replace to="/pages" />} />
-                              <Route path="/pages" element={<AppOverview dom={dom} />} />
-                              {pages.map((page) => (
-                                <Route
-                                  key={page.id}
-                                  path={`/pages/${page.id}`}
-                                  element={<RenderedPage nodeId={page.id} />}
-                                />
-                              ))}
-                            </Routes>
-                          </BrowserRouter>
-                        </AppThemeProvider>
-                      </QueryClientProvider>
-                    </AppContextProvider>
-                  </ComponentsContextProvider>
-                </JsRuntimeProvider>
-              </React.Suspense>
-            </ResetNodeErrorsKeyProvider>
-          </ErrorBoundary>
-        </AppRoot>
+        <ToolpadAppContent basename={basename} appId={appId} version={version} />
       </DomProvider>
     </NoSsr>
   );

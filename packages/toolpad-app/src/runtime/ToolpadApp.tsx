@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  ButtonProps,
   Stack,
   CssBaseline,
   Alert,
@@ -24,7 +23,6 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Link,
   useLocation,
   Navigate,
   Location as RouterLocation,
@@ -477,10 +475,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 }
 
-function getPageNavButtonProps(appId: string, page: appDom.PageNode) {
-  return { component: Link, to: `/pages/${page.id}` } as ButtonProps;
-}
-
 const FullPageCentered = styled('div')({
   width: '100vw',
   height: '100vh',
@@ -642,16 +636,7 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
                           <BrowserRouter basename={basename}>
                             <Routes>
                               <Route path="/" element={<Navigate replace to="/pages" />} />
-                              <Route
-                                path="/pages"
-                                element={
-                                  <AppOverview
-                                    appId={appId}
-                                    dom={dom}
-                                    openPageButtonProps={getPageNavButtonProps}
-                                  />
-                                }
-                              />
+                              <Route path="/pages" element={<AppOverview dom={dom} />} />
                               {pages.map((page) => (
                                 <Route
                                   key={page.id}

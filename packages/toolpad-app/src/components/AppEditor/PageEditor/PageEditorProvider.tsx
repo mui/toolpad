@@ -2,6 +2,7 @@ import { LiveBindings } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { NodeId, PageViewState } from '../../../types';
+import { RectBoundary } from '../../../utils/geometry';
 import { update } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'component' | 'theme';
@@ -15,6 +16,7 @@ export interface PageEditorState {
   readonly newNode: appDom.ElementNode | null;
   readonly highlightLayout: boolean;
   readonly highlightedNodeId: NodeId | null;
+  readonly highlightedNodeBoundary: RectBoundary | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
   readonly bindings: LiveBindings;
@@ -42,7 +44,10 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_NODE_DRAG_OVER';
-      nodeId: NodeId | null;
+      highlightState: {
+        nodeId: NodeId | null;
+        boundary: RectBoundary | null;
+      };
     }
   | {
       type: 'PAGE_NODE_DRAG_END';
@@ -70,6 +75,7 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     newNode: null,
     highlightLayout: false,
     highlightedNodeId: null,
+    highlightedNodeBoundary: null,
     viewState: { nodes: {} },
     pageState: {},
     bindings: {},
@@ -114,9 +120,12 @@ export function pageEditorReducer(
         highlightedNodeId: null,
       });
     case 'PAGE_NODE_DRAG_OVER': {
+      const { nodeId, boundary } = action.highlightState;
+
       return update(state, {
         highlightLayout: true,
-        highlightedNodeId: action.nodeId,
+        highlightedNodeId: nodeId,
+        highlightedNodeBoundary: boundary,
       });
     }
     case 'PAGE_VIEW_STATE_UPDATE': {
@@ -156,10 +165,10 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     nodeDragEnd() {
       dispatch({ type: 'PAGE_NODE_DRAG_END' });
     },
-    nodeDragOver(nodeId: NodeId | null) {
+    nodeDragOver({ nodeId, boundary }: { nodeId: NodeId | null; boundary: RectBoundary | null }) {
       dispatch({
         type: 'PAGE_NODE_DRAG_OVER',
-        nodeId,
+        highlightState: { nodeId, boundary },
       });
     },
     pageViewStateUpdate(viewState: PageViewState) {

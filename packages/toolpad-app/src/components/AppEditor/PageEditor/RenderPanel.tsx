@@ -9,7 +9,13 @@ import { setEventHandler } from '@mui/toolpad-core/runtime';
 import { NodeId, NodesInfo } from '../../../types';
 import * as appDom from '../../../appDom';
 import EditorCanvasHost from './EditorCanvasHost';
-import { absolutePositionCss, Rectangle, rectContainsPoint } from '../../../utils/geometry';
+import {
+  absolutePositionCss,
+  getRectPointBoundary,
+  Rectangle,
+  RectBoundary,
+  rectContainsPoint,
+} from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
 import { getPageViewState } from '../../../pageViewState';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -40,7 +46,10 @@ const RenderPanelRoot = styled('div')({
 const overlayClasses = {
   hud: 'Toolpad_Hud',
   nodeHud: 'Toolpad_NodeHud',
-  highlighted: 'Toolpad_Highlighted',
+  highlightedTop: 'Toolpad_HighlightedTop',
+  highlightedRight: 'Toolpad_HighlightedRight',
+  highlightedBottom: 'Toolpad_HighlightedBottom',
+  highlightedLeft: 'Toolpad_HighlightedLeft',
   selected: 'Toolpad_Selected',
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
   layout: 'Toolpad_Layout',
@@ -49,6 +58,23 @@ const overlayClasses = {
   componentDragging: 'Toolpad_ComponentDragging',
   selectionHint: 'Toolpad_SelectionHint',
   hudOverlay: 'Toolpad_HudOverlay',
+};
+
+export const getHighlightedBoundaryOverlayClass = (
+  highlightedBoundary: RectBoundary,
+): typeof overlayClasses[keyof typeof overlayClasses] | null => {
+  switch (highlightedBoundary) {
+    case RectBoundary.TOP:
+      return overlayClasses.highlightedTop;
+    case RectBoundary.RIGHT:
+      return overlayClasses.highlightedRight;
+    case RectBoundary.BOTTOM:
+      return overlayClasses.highlightedBottom;
+    case RectBoundary.LEFT:
+      return overlayClasses.highlightedLeft;
+    default:
+      return null;
+  }
 };
 
 const OverlayRoot = styled('div')({
@@ -87,8 +113,17 @@ const OverlayRoot = styled('div')({
     [`&.${overlayClasses.layout}`]: {
       borderColor: 'rgba(255,0,0,.125)',
     },
-    [`&.${overlayClasses.highlighted}`]: {
-      border: '2px solid green',
+    [`&.${overlayClasses.highlightedTop}`]: {
+      borderTop: '2px solid green',
+    },
+    [`&.${overlayClasses.highlightedRight}`]: {
+      borderRight: '2px solid green',
+    },
+    [`&.${overlayClasses.highlightedBottom}`]: {
+      borderBottom: '2px solid green',
+    },
+    [`&.${overlayClasses.highlightedLeft}`]: {
+      borderLeft: '2px solid green',
     },
     [`&.${overlayClasses.selected}`]: {
       border: '1px solid red',
@@ -128,7 +163,7 @@ function findNodeAt(
 interface SelectionHudProps {
   node: appDom.ElementNode;
   rect: Rectangle;
-  isHighlighted?: boolean;
+  highlightedBoundary?: RectBoundary | null;
   selected?: boolean;
   allowInteraction?: boolean;
   onDragStart?: React.DragEventHandler<HTMLElement>;
@@ -137,7 +172,7 @@ interface SelectionHudProps {
 
 function NodeHud({
   node,
-  isHighlighted,
+  highlightedBoundary,
   selected,
   allowInteraction,
   rect,
@@ -152,6 +187,9 @@ function NodeHud({
   const isLayoutComponent =
     componentId === PAGE_ROW_COMPONENT_ID || componentId === PAGE_COLUMN_COMPONENT_ID;
 
+  const highlightedBoundaryOverlayClass =
+    highlightedBoundary && getHighlightedBoundaryOverlayClass(highlightedBoundary);
+
   return (
     <div
       draggable
@@ -160,7 +198,7 @@ function NodeHud({
       style={absolutePositionCss(rect)}
       className={clsx(overlayClasses.nodeHud, {
         [overlayClasses.layout]: isLayoutComponent,
-        [overlayClasses.highlighted]: isHighlighted,
+        ...(highlightedBoundaryOverlayClass ? { [highlightedBoundaryOverlayClass]: true } : {}),
         [overlayClasses.selected]: selected,
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
@@ -192,6 +230,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     nodeId: pageNodeId,
     highlightLayout,
     highlightedNodeId,
+    highlightedNodeBoundary,
   } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;
@@ -273,7 +312,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const newActiveDropNodeId = findNodeAt(
+      const activeDropNodeId = findNodeAt(
         availableDropTargets,
         nodesInfo,
         cursorPos.x,
@@ -282,14 +321,37 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       event.preventDefault();
 
+      const activeDropNodeInfo = activeDropNodeId && nodesInfo[activeDropNodeId];
+
+      let activeDropBoundary = null;
+      if (activeDropNodeInfo) {
+        const activeDropNodeRect = activeDropNodeInfo.rect;
+
+        if (activeDropNodeRect) {
+          activeDropBoundary = getRectPointBoundary(
+            activeDropNodeRect,
+            cursorPos.x - activeDropNodeRect.x,
+            cursorPos.y - activeDropNodeRect.y,
+            {
+              ignoreCenterAreaXFraction: 0.25,
+              ignoreCenterAreaYFraction: 0.25,
+            },
+          );
+        }
+      }
+
+      const hasChangedHighlightedArea =
+        activeDropNodeId !== highlightedNodeId || activeDropBoundary !== highlightedNodeBoundary;
+
       if (
-        newActiveDropNodeId &&
-        newActiveDropNodeId !== highlightedNodeId &&
-        availableDropTargetIds.has(newActiveDropNodeId)
+        activeDropNodeId &&
+        activeDropBoundary &&
+        hasChangedHighlightedArea &&
+        availableDropTargetIds.has(activeDropNodeId)
       ) {
-        api.nodeDragOver(newActiveDropNodeId);
-      } else if (!newActiveDropNodeId && highlightedNodeId) {
-        api.nodeDragOver(null);
+        api.nodeDragOver({ nodeId: activeDropNodeId, boundary: activeDropBoundary });
+      } else if (highlightedNodeId && (!activeDropNodeId || !activeDropBoundary)) {
+        api.nodeDragOver({ nodeId: null, boundary: null });
       }
     },
     [
@@ -297,12 +359,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       availableDropTargetIds,
       availableDropTargets,
       getViewCoordinates,
+      highlightedNodeBoundary,
       highlightedNodeId,
       nodesInfo,
     ],
   );
 
-  const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
+  const handleDragLeave = React.useCallback(
+    () => api.nodeDragOver({ nodeId: null, boundary: null }),
+    [api],
+  );
 
   const handleDrop = React.useCallback(() => {}, []);
 
@@ -535,7 +601,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                   key={node.id}
                   node={node}
                   rect={nodeLayout.rect}
-                  isHighlighted={isHighlighted}
+                  highlightedBoundary={isHighlighted ? highlightedNodeBoundary : null}
                   selected={selectedNode?.id === node.id}
                   allowInteraction={nodesWithInteraction.has(node.id)}
                   onDragStart={handleDragStart}

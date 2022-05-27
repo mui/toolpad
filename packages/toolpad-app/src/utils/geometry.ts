@@ -129,3 +129,53 @@ export function getRelativeOuterRect(containerElm: Element, childElm: Element): 
 export function rectContainsPoint(rect: Rectangle, x: number, y: number): boolean {
   return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
 }
+
+export enum RectBoundary {
+  TOP = 'TOP',
+  RIGHT = 'RIGHT',
+  BOTTOM = 'BOTTOM',
+  LEFT = 'LEFT',
+}
+
+interface GetRectPointBoundaryOptions {
+  ignoreCenterAreaXFraction?: number // 0-1
+  ignoreCenterAreaYFraction?: number // 0-1
+}
+
+export function getRectPointBoundary(rect: Rectangle, x: number, y: number, options: GetRectPointBoundaryOptions = {}): RectBoundary | null {
+  const { height: rectHeight, width: rectWidth } = rect
+  const { ignoreCenterAreaXFraction = 0, ignoreCenterAreaYFraction = 0 } = options
+
+  // Out of bounds
+  if (x < 0 || x > rectWidth || y < 0 || y > rectHeight) {
+    return null;
+  }
+
+  // Ignored center area fractions
+  const fractionalX = x / rectWidth
+  const fractionalY = y / rectHeight
+  const includedCenterAreaXFractionHalf = (1 - ignoreCenterAreaXFraction) / 2
+  const includedCenterAreaYFractionHalf = (1 - ignoreCenterAreaYFraction) / 2
+  if (
+    fractionalX > includedCenterAreaXFractionHalf &&
+    fractionalX < 1 - includedCenterAreaXFractionHalf &&
+    fractionalY > includedCenterAreaYFractionHalf &&
+    fractionalY < 1 - includedCenterAreaYFractionHalf
+  ) {
+    return null
+  }
+
+  const isOverFirstDiagonal = y < (rectHeight / rectWidth) * x;
+  const isOverSecondDiagonal = y < -1 * (rectHeight / rectWidth) * x + rectHeight;
+
+  if (isOverFirstDiagonal && isOverSecondDiagonal) {
+    return RectBoundary.TOP;
+  }
+  if (isOverFirstDiagonal) {
+    return RectBoundary.RIGHT;
+  }
+  if (isOverSecondDiagonal) {
+    return RectBoundary.LEFT;
+  }
+  return RectBoundary.BOTTOM;
+}

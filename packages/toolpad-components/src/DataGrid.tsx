@@ -11,6 +11,7 @@ import {
   gridColumnsTotalWidthSelector,
   gridColumnPositionsSelector,
   gridDensityRowHeightSelector,
+  GridSelectionModel,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
@@ -241,7 +242,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const onSelectionModelChange = React.useCallback(
-    (ids) => {
+    (ids: GridSelectionModel) => {
       onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null);
     },
     [rows, onSelectionChange],

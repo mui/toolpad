@@ -80,13 +80,13 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
   }, [appId, conectionId]);
 
   const handleConnectionChange = React.useCallback(
-    (newConnectionId) => {
+    (newConnectionId: NodeId | null) => {
       if (apiNode) {
         domApi.setNodeNamespacedProp(
           apiNode,
           'attributes',
           'connectionId',
-          appDom.createConst(newConnectionId),
+          newConnectionId ? appDom.createConst(newConnectionId) : null,
         );
       }
     },
@@ -150,6 +150,7 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
 
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
+      {/* @ts-expect-error React 18 types */}
       <SplitPane
         split="horizontal"
         allowResize

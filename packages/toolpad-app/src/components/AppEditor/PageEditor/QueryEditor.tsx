@@ -121,11 +121,11 @@ function QueryNodeEditorDialog<Q, P, PQ>({
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const handleConnectionChange = React.useCallback((newConnectionId) => {
+  const handleConnectionChange = React.useCallback((newConnectionId: NodeId | null) => {
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          connectionId: appDom.createConst(newConnectionId),
+          connectionId: newConnectionId ? appDom.createConst(newConnectionId) : undefined,
         }),
       }),
     );
@@ -375,7 +375,7 @@ export default function QueryEditor() {
   }, []);
 
   const handleCreated = React.useCallback(
-    (node) => {
+    (node: appDom.QueryNode) => {
       domApi.addNode(node, page, 'queries');
       setDialogState({ nodeId: node.id });
     },

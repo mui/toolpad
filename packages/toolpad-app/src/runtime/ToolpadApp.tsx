@@ -557,7 +557,17 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
 
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
 
-  const queryClient = React.useMemo(() => new QueryClient(), []);
+  const queryClient = React.useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+          },
+        },
+      }),
+    [],
+  );
 
   const components = React.useMemo(() => getToolpadComponents(dom), [dom]);
 

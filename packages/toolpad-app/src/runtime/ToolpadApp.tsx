@@ -135,7 +135,9 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
         if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
         }
-      } else if (argType) {
+      }
+
+      if (typeof hookResult[propName] === 'undefined' && argType) {
         hookResult[propName] = argType.defaultValue;
       }
     }

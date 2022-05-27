@@ -144,6 +144,10 @@ export async function getApps() {
   return prisma.app.findMany();
 }
 
+export async function getApp(id: string) {
+  return prisma.app.findUnique({ where: { id } });
+}
+
 export async function createApp(name: string): Promise<App> {
   return prisma.$transaction(async () => {
     const app = await prisma.app.create({

@@ -167,16 +167,14 @@ export async function createApp(name: string): Promise<App> {
 }
 
 export async function updateApp(appId: string, name: string): Promise<App> {
-  return prisma.$transaction(async () => {
-    const app = await prisma.app.update({
-      where: {
-        id: appId,
-      },
-      data: { name },
-    });
-    return app;
+  return prisma.app.update({
+    where: {
+      id: appId,
+    },
+    data: { name },
   });
 }
+
 export async function deleteApp(id: string) {
   return prisma.app.delete({
     where: { id },

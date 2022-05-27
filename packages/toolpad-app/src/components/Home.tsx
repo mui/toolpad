@@ -120,10 +120,9 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
 interface AppCardProps {
   app?: App;
   onDelete?: () => void;
-  onUpdate?: (app: App) => void;
 }
 
-function AppCard({ app, onDelete, onUpdate }: AppCardProps) {
+function AppCard({ app, onDelete }: AppCardProps) {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
@@ -154,11 +153,12 @@ function AppCard({ app, onDelete, onUpdate }: AppCardProps) {
 
   const handleAppRename = React.useCallback(
     async (name: string) => {
-      if (app?.id && onUpdate) {
-        onUpdate(await client.mutation.updateApp(app.id, name));
+      if (app?.id) {
+        await client.mutation.updateApp(app.id, name);
+        await client.refetchQueries('getApps');
       }
     },
-    [app?.id, onUpdate],
+    [app?.id],
   );
 
   const handleAppTitleBlur = React.useCallback(
@@ -283,21 +283,11 @@ function AppCard({ app, onDelete, onUpdate }: AppCardProps) {
 }
 
 export default function Home() {
-  const [apps, setApps] = React.useState<App[]>([]);
-
-  const { status, error } = client.useQuery('getApps', [], {
-    onSuccess: (data: App[]) => setApps(data),
-  });
+  const { data: apps = [], status, error } = client.useQuery('getApps', []);
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
   const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
-
-  const onUpdate = React.useCallback((updatedApp: App) => {
-    setApps((previousApps) => {
-      return previousApps.map((prevApp) => (prevApp.id === updatedApp.id ? updatedApp : prevApp));
-    });
-  }, []);
 
   return (
     <ToolpadShell>
@@ -331,12 +321,7 @@ export default function Home() {
               case 'success':
                 return apps.length > 0
                   ? apps.map((app) => (
-                      <AppCard
-                        key={app.id}
-                        app={app}
-                        onUpdate={onUpdate}
-                        onDelete={() => setDeletedApp(app)}
-                      />
+                      <AppCard key={app.id} app={app} onDelete={() => setDeletedApp(app)} />
                     ))
                   : 'No apps yet';
               default:

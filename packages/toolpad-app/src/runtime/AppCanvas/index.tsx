@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { fireEvent } from '@mui/toolpad-core/runtime';
-import ToolpadApp from './ToolpadApp';
-import * as appDom from '../appDom';
+import ToolpadApp from '../ToolpadApp';
+import * as appDom from '../../appDom';
 
 export interface AppCanvasProps {
   appId: string;

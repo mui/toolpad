@@ -106,6 +106,25 @@ test(`simple databinding`, async () => {
   expect(text).toHaveTextContent('Hello Everybody');
 });
 
+test(`default Value for binding`, async () => {
+  renderPage((dom, page) => {
+    const select = appDom.createNode(dom, 'element', {
+      name: 'theTextInput',
+      attributes: { component: appDom.createConst('Select') },
+      props: {
+        label: appDom.createConst('The select'),
+        options: { type: 'jsExpression', value: 'undefined' },
+      },
+    });
+    dom = appDom.addNode(dom, select, page, 'children');
+    return dom;
+  });
+
+  await waitFor(() => screen.getByTestId('page-root'));
+
+  screen.getByLabelText('The select');
+});
+
 test(`Databinding errors`, async () => {
   const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation();
   let bindings: LiveBindings | undefined;

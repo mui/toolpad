@@ -118,6 +118,7 @@ export default function ComponentsContext({ dom, page, children }: ComponentsCon
   const { components, pending } = React.useMemo(() => getComponentsForPage(dom, page), [dom, page]);
 
   if (pending.length > 0) {
+    // We can suspend rendering here to avoid layout shifting
     throw Promise.all(pending);
   }
 

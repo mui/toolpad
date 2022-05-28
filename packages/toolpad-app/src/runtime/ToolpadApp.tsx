@@ -144,6 +144,8 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     if (error) {
       if (errorProp) {
         hookResult[errorProp] = error;
+      } else {
+        console.error(error);
       }
     }
 

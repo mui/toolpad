@@ -183,7 +183,8 @@ export type RuntimeEvent =
   | {
       type: 'pageBindingsUpdated';
       bindings: LiveBindings;
-    };
+    }
+  | { type: 'afterRender' };
 
 export interface ComponentConfig<P> {
   /**

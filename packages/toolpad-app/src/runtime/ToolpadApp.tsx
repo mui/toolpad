@@ -458,13 +458,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   return (
     <BindingsContextProvider value={liveBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
-        <NodeRuntimeWrapper nodeId={page.id} componentConfig={PageRootComponent[TOOLPAD_COMPONENT]}>
-          <RenderedNodeContent
-            nodeId={page.id}
-            childNodes={children}
-            Component={PageRootComponent}
-          />
-        </NodeRuntimeWrapper>
+        <RenderedNodeContent nodeId={page.id} childNodes={children} Component={PageRootComponent} />
 
         {queryStates.map((node) => (
           <QueryNode key={node.id} node={node} />

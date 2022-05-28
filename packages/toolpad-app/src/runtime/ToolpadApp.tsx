@@ -94,13 +94,12 @@ interface RenderedNodeProps {
 function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const node = appDom.getNode(dom, nodeId, 'element');
-  const Component = useElmToolpadComponent(node);
-  const { children = [] } = appDom.getChildNodes(dom, node);
+  const Component: ToolpadComponent<any> = useElmToolpadComponent(node);
+  const { children: childNodes = [] } = appDom.getChildNodes(dom, node);
+
   return (
-    <NodeRuntimeWrapper nodeId={node.id} componentConfig={Component[TOOLPAD_COMPONENT]}>
-      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
-      <RenderedNodeContent nodeId={node.id} childNodes={children} Component={Component} />
-    </NodeRuntimeWrapper>
+    /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
+    <RenderedNodeContent nodeId={node.id} childNodes={childNodes} Component={Component} />
   );
 }
 
@@ -145,8 +144,6 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     if (error) {
       if (errorProp) {
         hookResult[errorProp] = error;
-      } else {
-        throw error;
       }
     }
 
@@ -203,7 +200,11 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     }
   }
 
-  return <Component {...props} />;
+  return (
+    <NodeRuntimeWrapper nodeId={nodeId} componentConfig={Component[TOOLPAD_COMPONENT]}>
+      <Component {...props} />
+    </NodeRuntimeWrapper>
+  );
 }
 
 interface PageRootProps {

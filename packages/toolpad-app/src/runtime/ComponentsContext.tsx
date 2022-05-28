@@ -11,6 +11,7 @@ import * as appDom from '../appDom';
 import { getToolpadComponents } from '../toolpadComponents';
 import createCodeComponent from './createCodeComponent';
 import { createProvidedContext } from '../utils/react';
+import { hasOwnProperty } from '../utils/collections';
 
 const [useComponents, ComponentsContextProvider] =
   createProvidedContext<ToolpadComponents>('Components');
@@ -34,9 +35,21 @@ type ComponentsCache = Partial<
 
 const globalCache: ComponentsCache = {};
 
+function isToolpadComponent(maybeComponent: unknown): maybeComponent is ToolpadComponent<any> {
+  if (
+    !ReactIs.isValidElementType(maybeComponent) ||
+    typeof maybeComponent === 'string' ||
+    !hasOwnProperty(maybeComponent, TOOLPAD_COMPONENT)
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
 /**
  * This function will instantiate all components used on a page. CodeComponents that haven't been
- * loaded yet will return null components. Additionally, an array with promises is returned,
+ * loaded yet will return null. Additionally, an array with promises is returned,
  * one for each code component that is still loading. This can be used to suspend rendering.
  */
 function getComponentsForPage(dom: appDom.AppDom, page: appDom.PageNode) {
@@ -62,15 +75,11 @@ function getComponentsForPage(dom: appDom.AppDom, page: appDom.PageNode) {
       if (componentDef.builtin) {
         const builtin = (builtins as any)[componentDef.builtin];
 
-        if (!ReactIs.isValidElementType(builtin) || typeof builtin === 'string') {
-          throw new Error(`Invalid builtin component imported "${componentDef.builtin}"`);
+        if (!isToolpadComponent(builtin)) {
+          throw new Error(`Imported builtin "${componentDef.builtin}" is not a ToolpadComponent`);
         }
 
-        if (!(builtin as any)[TOOLPAD_COMPONENT]) {
-          throw new Error(`Builtin component "${id}" is missing component config`);
-        }
-
-        components[id] = builtin as ToolpadComponent;
+        components[id] = builtin;
       }
 
       if (componentDef?.codeComponentId) {

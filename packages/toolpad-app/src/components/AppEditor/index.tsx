@@ -1,13 +1,15 @@
 import * as React from 'react';
 import { styled, Alert, Box, CircularProgress } from '@mui/material';
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes, useParams, Navigate } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/runtime';
 import PageEditor from './PageEditor';
-import DomProvider, { useDomLoader } from '../DomLoader';
+import DomProvider, { useDom, useDomLoader } from '../DomLoader';
 import ApiEditor from './ApiEditor';
+import * as appDom from '../../appDom';
 import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
 import AppEditorShell from './AppEditorShell';
+import NoPageFound from './NoPageFound';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -41,6 +43,12 @@ interface FileEditorProps {
 }
 
 function FileEditor({ appId }: FileEditorProps) {
+  const dom = useDom();
+  const app = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
+
+  const firstPage = pages.length > 0 ? pages[0] : null;
+
   return (
     <Routes>
       <Route element={<AppEditorShell appId={appId} />}>
@@ -48,7 +56,13 @@ function FileEditor({ appId }: FileEditorProps) {
         <Route path="apis/:nodeId" element={<ApiEditor appId={appId} />} />
         <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
         <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
-        <Route path="*" element={null} />
+        <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
+        <Route
+          index
+          element={
+            firstPage ? <Navigate to={`pages/${firstPage.id}`} /> : <NoPageFound appId={appId} />
+          }
+        />
       </Route>
     </Routes>
   );

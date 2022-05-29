@@ -1,14 +1,15 @@
-import { Box, Alert } from '@mui/material';
+import { Box, Alert, AlertColor } from '@mui/material';
 import * as React from 'react';
 
 export interface NotFoundEditorProps {
   className?: string;
   message: string;
+  severity?: AlertColor;
 }
-export default function NotFoundEditor({ className, message }: NotFoundEditorProps) {
+export default function NotFoundEditor({ className, message, severity }: NotFoundEditorProps) {
   return (
     <Box className={className} sx={{ p: 3 }}>
-      <Alert severity="warning">{message}</Alert>
+      <Alert severity={severity ?? 'warning'}>{message}</Alert>
     </Box>
   );
 }

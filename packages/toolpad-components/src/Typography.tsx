@@ -13,7 +13,16 @@ interface TypographyProps extends Omit<MuiTypographyProps, 'children'> {
 
 function Typography({ value, loading, sx, ...props }: TypographyProps) {
   return (
-    <MuiTypography sx={{ minWidth: loading ? 150 : undefined, ...sx }} {...props}>
+    <MuiTypography
+      sx={{
+        minWidth: loading || !value ? 150 : undefined,
+        // This will give it height, even when empty.
+        // REMARK: Does it make sense to put it in core?
+        [`&:empty::before`]: { content: '""', display: 'inline-block' },
+        ...sx,
+      }}
+      {...props}
+    >
       {loading ? <Skeleton /> : value}
     </MuiTypography>
   );

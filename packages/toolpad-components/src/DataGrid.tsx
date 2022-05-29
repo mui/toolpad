@@ -66,12 +66,12 @@ function SkeletonLoadingOverlay() {
       for (const column of columns) {
         const width = Math.round(random());
         array.push(
-          <SkeletonCell key={`${i}-${column.field}`} sx={{ justifyContent: column.align }}>
+          <SkeletonCell key={`col-${column.field}-${i}`} sx={{ justifyContent: column.align }}>
             <Skeleton sx={{ mx: 1 }} width={`${width}%`} />
           </SkeletonCell>,
         );
       }
-      array.push(<SkeletonCell />);
+      array.push(<SkeletonCell key={`fill-${i}`} />);
     }
     return array;
   }, [skeletonRowsCount, columns]);

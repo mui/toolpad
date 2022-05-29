@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  ButtonProps,
   Stack,
   CssBaseline,
   Alert,
@@ -24,7 +23,6 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Link,
   useLocation,
   Navigate,
   Location as RouterLocation,
@@ -56,7 +54,6 @@ import evalJsBindings, {
 import createCodeComponent from './createCodeComponent';
 import { HTML_ID_APP_ROOT } from '../constants';
 import usePageTitle from '../utils/usePageTitle';
-import DomProvider, { useDomContext } from './DomProvider';
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
@@ -68,6 +65,7 @@ interface AppContext {
   version: VersionOrPreview;
 }
 
+const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useComponentsContext, ComponentsContextProvider] =
   createProvidedContext<(id: string) => ToolpadComponent>('Components');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
@@ -137,7 +135,9 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
         if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
         }
-      } else if (argType) {
+      }
+
+      if (typeof hookResult[propName] === 'undefined' && argType) {
         hookResult[propName] = argType.defaultValue;
       }
     }
@@ -477,10 +477,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 }
 
-function getPageNavButtonProps(appId: string, page: appDom.PageNode) {
-  return { component: Link, to: `/pages/${page.id}` } as ButtonProps;
-}
-
 const FullPageCentered = styled('div')({
   width: '100vw',
   height: '100vh',
@@ -561,7 +557,17 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
 
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
 
-  const queryClient = React.useMemo(() => new QueryClient(), []);
+  const queryClient = React.useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+          },
+        },
+      }),
+    [],
+  );
 
   const components = React.useMemo(() => getToolpadComponents(dom), [dom]);
 
@@ -624,9 +630,9 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
   return (
-    <NoSsr>
-      <DomProvider dom={dom}>
-        <AppRoot id={HTML_ID_APP_ROOT}>
+    <AppRoot id={HTML_ID_APP_ROOT}>
+      <NoSsr>
+        <DomContextProvider value={dom}>
           <CssBaseline />
           <ErrorBoundary FallbackComponent={AppError}>
             <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
@@ -639,16 +645,7 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
                           <BrowserRouter basename={basename}>
                             <Routes>
                               <Route path="/" element={<Navigate replace to="/pages" />} />
-                              <Route
-                                path="/pages"
-                                element={
-                                  <AppOverview
-                                    appId={appId}
-                                    dom={dom}
-                                    openPageButtonProps={getPageNavButtonProps}
-                                  />
-                                }
-                              />
+                              <Route path="/pages" element={<AppOverview dom={dom} />} />
                               {pages.map((page) => (
                                 <Route
                                   key={page.id}
@@ -666,8 +663,8 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
               </React.Suspense>
             </ResetNodeErrorsKeyProvider>
           </ErrorBoundary>
-        </AppRoot>
-      </DomProvider>
-    </NoSsr>
+        </DomContextProvider>
+      </NoSsr>
+    </AppRoot>
   );
 }

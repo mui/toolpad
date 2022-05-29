@@ -3,7 +3,6 @@ import { TOOLPAD_COMPONENT } from './constants';
 
 export type BindingAttrValueFormat = 'stringLiteral' | 'default';
 
-// TODO: Get rid of BoundExpressionAttrValue? Its function can be fulfilled by derivedState as well
 export interface BoundExpressionAttrValue {
   type: 'boundExpression';
   value: string;
@@ -99,6 +98,7 @@ export interface ArgControlSpec {
     | 'date' // date picker
     | 'json' // JSON editor
     | 'GridColumns' // GridColumns specialized editor
+    | 'SelectOptions' // SelectOptions specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
     | 'function'
@@ -184,7 +184,8 @@ export type RuntimeEvent =
   | {
       type: 'pageBindingsUpdated';
       bindings: LiveBindings;
-    };
+    }
+  | { type: 'afterRender' };
 
 export interface ComponentConfig<P> {
   /**

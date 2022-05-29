@@ -1,6 +1,7 @@
 import {
   Stack,
   Button,
+  Grid,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -34,6 +35,7 @@ import { omit, update } from '../../../utils/immutability';
 import client from '../../../api';
 import ParametersEditor from './ParametersEditor';
 import ErrorAlert from './ErrorAlert';
+import { JsExpressionEditor } from './JsExpressionEditor';
 
 function refetchIntervalInSeconds(maybeInterval?: number) {
   if (typeof maybeInterval !== 'number') {
@@ -140,6 +142,29 @@ function QueryNodeEditorDialog<Q, P, PQ>({
       }),
     );
   }, []);
+
+  const handleTransformFnChange = React.useCallback((newValue: string) => {
+    setInput((existing) =>
+      update(existing, {
+        attributes: update(existing.attributes, {
+          transform: appDom.createConst(newValue),
+        }),
+      }),
+    );
+  }, []);
+
+  const handleTransformEnabledChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) =>
+        update(existing, {
+          attributes: update(existing.attributes, {
+            transformEnabled: appDom.createConst(event.target.checked),
+          }),
+        }),
+      );
+    },
+    [],
+  );
 
   const handleRefetchOnWindowFocusChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -273,6 +298,7 @@ function QueryNodeEditorDialog<Q, P, PQ>({
               onChange={handleConnectionChange}
             />
           </Stack>
+
           <Divider />
           <Typography>Parameters</Typography>
           <ParametersEditor
@@ -291,37 +317,65 @@ function QueryNodeEditorDialog<Q, P, PQ>({
           />
           <Divider />
           <Typography>Options:</Typography>
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={input.attributes.refetchOnWindowFocus?.value ?? true}
-                onChange={handleRefetchOnWindowFocusChange}
-              />
-            }
-            label="Refetch on window focus"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={input.attributes.refetchOnReconnect?.value ?? true}
-                onChange={handleRefetchOnReconnectChange}
-              />
-            }
-            label="Refetch on network reconnect"
-          />
-          <TextField
-            InputProps={{
-              startAdornment: <InputAdornment position="start">s</InputAdornment>,
-            }}
-            sx={{ maxWidth: 300 }}
-            size="small"
-            type="number"
-            label="Refetch interval"
-            value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
-            onChange={handleRefetchIntervalChange}
-          />
+          <Grid container direction="row" spacing={1}>
+            <Grid item xs={4}>
+              <Stack direction="column">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={input.attributes.refetchOnWindowFocus?.value ?? true}
+                      onChange={handleRefetchOnWindowFocusChange}
+                    />
+                  }
+                  label="Refetch on window focus"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={input.attributes.refetchOnReconnect?.value ?? true}
+                      onChange={handleRefetchOnReconnectChange}
+                    />
+                  }
+                  label="Refetch on network reconnect"
+                />
+                <TextField
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">s</InputAdornment>,
+                  }}
+                  sx={{ maxWidth: 300 }}
+                  size="small"
+                  type="number"
+                  label="Refetch interval"
+                  value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
+                  onChange={handleRefetchIntervalChange}
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack>
+                <FormControlLabel
+                  label="Transform API response"
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={input.attributes.transformEnabled?.value ?? false}
+                      onChange={handleTransformEnabledChange}
+                      inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                  }
+                />
+                {input.attributes.transformEnabled?.value ? (
+                  <JsExpressionEditor
+                    globalScope={{}}
+                    value={input.attributes.transform?.value ?? '(data) => { return data }'}
+                    onChange={handleTransformFnChange}
+                  />
+                ) : null}
+              </Stack>
+            </Grid>
+          </Grid>
           <Divider />
           <Toolbar disableGutters>
             preview

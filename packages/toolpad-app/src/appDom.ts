@@ -126,7 +126,8 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeId>;
     readonly query: ConstantAttrValue<Q>;
-
+    readonly transform?: ConstantAttrValue<string>;
+    readonly transformEnabled?: ConstantAttrValue<boolean>;
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;

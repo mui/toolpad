@@ -144,11 +144,10 @@ export async function getApps() {
   return prisma.app.findMany();
 }
 
-async function setAppDefaults(
-  app: App,
-  dom: appDom.AppDom,
-  appNode: appDom.AppNode,
-): Promise<appDom.AppDom> {
+function createDefaultDom(): appDom.AppDom {
+  let dom = appDom.createDom();
+  const appNode = appDom.getApp(dom);
+
   // Create default REST connection node
   const newConnectionNode = appDom.createNode(dom, 'connection', {
     attributes: {
@@ -157,7 +156,7 @@ async function setAppDefaults(
       status: appDom.createConst(null),
     },
   });
-  const newDom = await appDom.addNode(dom, newConnectionNode, appNode, 'connections');
+  dom = appDom.addNode(dom, newConnectionNode, appNode, 'connections');
 
   // Create default page
   const newPageNode = appDom.createNode(dom, 'page', {
@@ -168,7 +167,9 @@ async function setAppDefaults(
     },
   });
 
-  return appDom.addNode(newDom, newPageNode, appNode, 'pages');
+  dom = appDom.addNode(dom, newPageNode, appNode, 'pages');
+
+  return dom;
 }
 
 export async function createApp(name: string): Promise<App> {
@@ -177,11 +178,9 @@ export async function createApp(name: string): Promise<App> {
       data: { name },
     });
 
-    const dom = appDom.createDom();
-    const appNode = appDom.getApp(dom);
+    const dom = createDefaultDom();
 
-    const newDom = await setAppDefaults(app, dom, appNode);
-    await saveDom(app.id, newDom);
+    await saveDom(app.id, dom);
 
     return app;
   });

@@ -234,6 +234,7 @@ function QueryNodeEditorDialog<Q, P, PQ>({
   const queryPreview = client.useQuery(
     'execQuery',
     previewQuery ? [appId, previewQuery, previewParams] : null,
+    { retry: false },
   );
 
   const handleUpdatePreview = React.useCallback(() => {

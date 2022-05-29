@@ -98,6 +98,7 @@ export interface ArgControlSpec {
     | 'date' // date picker
     | 'json' // JSON editor
     | 'GridColumns' // GridColumns specialized editor
+    | 'SelectOptions' // SelectOptions specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
     | 'function'
@@ -183,7 +184,8 @@ export type RuntimeEvent =
   | {
       type: 'pageBindingsUpdated';
       bindings: LiveBindings;
-    };
+    }
+  | { type: 'afterRender' };
 
 export interface ComponentConfig<P> {
   /**

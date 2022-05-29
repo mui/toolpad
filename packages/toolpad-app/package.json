@@ -57,6 +57,7 @@
     "fractional-indexing": "^3.0.1",
     "googleapis": "^100.0.0",
     "json-to-ts": "^1.7.0",
+    "json5": "^2.2.1",
     "lodash-es": "^4.17.21",
     "next": "^12.1.4",
     "path-to-regexp": "^6.2.0",

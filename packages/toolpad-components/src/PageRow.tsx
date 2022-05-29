@@ -30,7 +30,7 @@ export default createComponent(PageRow, {
   argTypes: {
     spacing: {
       typeDef: { type: 'number' },
-      defaultValue: 2,
+      defaultValue: 1,
     },
     alignItems: {
       typeDef: {

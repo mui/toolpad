@@ -138,6 +138,11 @@ export function BindingEditor<V>({
     handleClose();
   }, [onChange, input, handleClose]);
 
+  const handleRemove = React.useCallback(() => {
+    onChange(null);
+    handleClose();
+  }, [onChange, handleClose]);
+
   const error: string | undefined = liveBinding?.error?.message;
 
   const bindingButton = (
@@ -155,11 +160,11 @@ export function BindingEditor<V>({
 
   const TooltipComponent = error ? ErrorTooltip : Tooltip;
   const tooltipTitle: string =
-    error ?? (hasBinding ? `Update "${label}" binding` : `Bind "${label}"`);
+    error ?? (hasBinding ? `Update "${label}" binding...` : `Bind "${label}"...`);
   const bindingButtonWithTooltip = disabled ? (
     bindingButton
   ) : (
-    <TooltipComponent placement="left" title={tooltipTitle}>
+    <TooltipComponent disableInteractive placement="top" title={tooltipTitle}>
       {bindingButton}
     </TooltipComponent>
   );
@@ -201,7 +206,7 @@ export function BindingEditor<V>({
           <Button color="inherit" variant="text" onClick={handleClose}>
             Cancel
           </Button>
-          <Button color="inherit" disabled={!value} onClick={() => onChange(null)}>
+          <Button color="inherit" disabled={!value} onClick={handleRemove}>
             Remove binding
           </Button>
           <Button

@@ -367,13 +367,13 @@ function QueryNodeEditorDialog<Q, P, PQ>({
                     />
                   }
                 />
-                {input.attributes.transformEnabled?.value ? (
-                  <JsExpressionEditor
-                    globalScope={{}}
-                    value={input.attributes.transform?.value ?? '(data) => { return data }'}
-                    onChange={handleTransformFnChange}
-                  />
-                ) : null}
+
+                <JsExpressionEditor
+                  globalScope={{}}
+                  value={input.attributes.transform?.value ?? '(data) => {\n  return data;\n}'}
+                  onChange={handleTransformFnChange}
+                  disabled={!input.attributes.transformEnabled?.value}
+                />
               </Stack>
             </Grid>
           </Grid>

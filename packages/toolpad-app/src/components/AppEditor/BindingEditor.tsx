@@ -57,6 +57,7 @@ function JsExpressionBindingEditor<V>({
       value={value?.type === 'jsExpression' ? value.value : ''}
       onChange={handleChange}
       onCommit={onCommit}
+      autoFocus
     />
   );
 }

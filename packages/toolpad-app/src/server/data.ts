@@ -148,11 +148,10 @@ export async function getApp(id: string) {
   return prisma.app.findUnique({ where: { id } });
 }
 
-async function setAppDefaults(
-  app: App,
-  dom: appDom.AppDom,
-  appNode: appDom.AppNode,
-): Promise<appDom.AppDom> {
+function createDefaultDom(): appDom.AppDom {
+  let dom = appDom.createDom();
+  const appNode = appDom.getApp(dom);
+
   // Create default REST connection node
   const newConnectionNode = appDom.createNode(dom, 'connection', {
     attributes: {
@@ -161,7 +160,7 @@ async function setAppDefaults(
       status: appDom.createConst(null),
     },
   });
-  const newDom = await appDom.addNode(dom, newConnectionNode, appNode, 'connections');
+  dom = appDom.addNode(dom, newConnectionNode, appNode, 'connections');
 
   // Create default page
   const newPageNode = appDom.createNode(dom, 'page', {
@@ -172,7 +171,9 @@ async function setAppDefaults(
     },
   });
 
-  return appDom.addNode(newDom, newPageNode, appNode, 'pages');
+  dom = appDom.addNode(dom, newPageNode, appNode, 'pages');
+
+  return dom;
 }
 
 export async function createApp(name: string): Promise<App> {
@@ -181,11 +182,9 @@ export async function createApp(name: string): Promise<App> {
       data: { name },
     });
 
-    const dom = appDom.createDom();
-    const appNode = appDom.getApp(dom);
+    const dom = createDefaultDom();
 
-    const newDom = await setAppDefaults(app, dom, appNode);
-    await saveDom(app.id, newDom);
+    await saveDom(app.id, dom);
 
     return app;
   });
@@ -371,12 +370,12 @@ export async function updateConnection(
 }
 
 async function applyTransform<Q>(
-  api: appDom.ApiNode<Q>,
+  node: appDom.ApiNode<Q> | appDom.QueryNode<Q>,
   result: ApiResult<{}>,
 ): Promise<ApiResult<{}>> {
   return {
     data: await evalExpression(
-      `${api.attributes.transform?.value}(${JSON.stringify(result.data)})`,
+      `${node.attributes.transform?.value}(${JSON.stringify(result.data)})`,
     ),
   };
 }
@@ -425,8 +424,12 @@ export async function execQuery<Q>(
       `Unknown connection "${query.attributes.connectionId.value}" for api "${query.id}"`,
     );
   }
-
-  return dataSource.exec(connection, query.attributes.query.value, params);
+  const transformEnabled = query.attributes.transformEnabled?.value;
+  let result = await dataSource.exec(connection, query.attributes.query.value, params);
+  if (transformEnabled) {
+    result = await applyTransform(query, result);
+  }
+  return result;
 }
 
 export async function dataSourceFetchPrivate<Q>(

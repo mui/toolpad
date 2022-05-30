@@ -6,22 +6,30 @@ import Releases from './Releases';
 import AppEditor from './AppEditor';
 import Home from './Home';
 
+function AppWorkspace() {
+  return (
+    <Routes>
+      <Route>
+        <Route path="editor/*" element={<AppEditor />} />
+        <Route path="releases" element={<Releases />} />
+        <Route path="releases/:version" element={<Release />} />
+      </Route>
+    </Routes>
+  );
+}
+
 export interface EditorProps {
   basename: string;
 }
 
-export default function Editor({ basename }: EditorProps) {
+export default function Toolpad({ basename }: EditorProps) {
   return (
     <NoSsr>
       <React.Suspense fallback="loading...">
         <BrowserRouter basename={basename}>
           <Routes>
-            <Route>
-              <Route path="/" element={<Home />} />
-              <Route path="/app/:appId/editor/*" element={<AppEditor />} />
-              <Route path="/app/:appId/releases" element={<Releases />} />
-              <Route path="/app/:appId/releases/:version" element={<Release />} />
-            </Route>
+            <Route path="/" element={<Home />} />
+            <Route path="/app/:appId/*" element={<AppWorkspace />} />
           </Routes>
         </BrowserRouter>
       </React.Suspense>

@@ -144,6 +144,10 @@ export async function getApps() {
   return prisma.app.findMany();
 }
 
+export async function getApp(id: string) {
+  return prisma.app.findUnique({ where: { id } });
+}
+
 function createDefaultDom(): appDom.AppDom {
   let dom = appDom.createDom();
   const appNode = appDom.getApp(dom);

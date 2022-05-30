@@ -15,7 +15,6 @@ function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps
       direction="row"
       sx={{
         gap: spacing,
-        p: spacing,
         alignItems,
         justifyContent,
         width: '100%',

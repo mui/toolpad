@@ -7,6 +7,7 @@ import {
   AlertTitle,
   LinearProgress,
   NoSsr,
+  Container,
 } from '@mui/material';
 import {
   INITIAL_DATA_QUERY,
@@ -212,9 +213,11 @@ interface PageRootProps {
 
 function PageRoot({ children }: PageRootProps) {
   return (
-    <Stack data-testid="page-root" direction="column" alignItems="stretch" sx={{ my: 2 }}>
-      {children}
-    </Stack>
+    <Container>
+      <Stack data-testid="page-root" direction="column" alignItems="stretch" sx={{ my: 2, gap: 1 }}>
+        {children}
+      </Stack>
+    </Container>
   );
 }
 

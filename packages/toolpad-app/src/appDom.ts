@@ -1,6 +1,7 @@
 import { generateKeyBetween } from 'fractional-indexing';
 import cuid from 'cuid';
 import {
+  RefAttrValue,
   ConstantAttrValue,
   BindableAttrValue,
   BindableAttrValues,
@@ -77,7 +78,7 @@ export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
 export interface ApiNode<Q = unknown> extends AppDomNodeBase {
   readonly type: 'api';
   readonly attributes: {
-    readonly connectionId: ConstantAttrValue<string>;
+    readonly connectionId: RefAttrValue;
     readonly dataSource: ConstantAttrValue<string>;
     readonly query: ConstantAttrValue<Q>;
     readonly transform?: ConstantAttrValue<string>;

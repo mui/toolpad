@@ -29,6 +29,15 @@ export interface SecretAttrValue<V> {
   value: V;
 }
 
+/**
+ * References another node
+ */
+export interface RefAttrValue {
+  type: 'ref';
+  // NodeId
+  value: string;
+}
+
 export type BindableAttrValue<V> =
   | ConstantAttrValue<V>
   | BindingAttrValue

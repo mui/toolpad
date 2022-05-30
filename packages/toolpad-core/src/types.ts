@@ -212,6 +212,8 @@ export type ToolpadComponent<P = {}> = React.ComponentType<P> & {
   [TOOLPAD_COMPONENT]: ComponentConfig<P>;
 };
 
+export type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
+
 export type LiveBindings = Partial<Record<string, LiveBinding>>;
 
 export interface RuntimeError {

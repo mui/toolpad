@@ -4,13 +4,13 @@ import {
   ConstantAttrValue,
   BindableAttrValue,
   BindableAttrValues,
-  ConstantAttrValues,
   SecretAttrValue,
 } from '@mui/toolpad-core';
 import { NodeId, ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
+import { filterValues, mapProperties } from './utils/collections';
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -200,9 +200,7 @@ export type ParentPropOf<Child extends AppDomNode, Parent extends AppDomNode> = 
     : never;
 }[keyof AllowedChildren[TypeOf<Parent>]];
 
-export interface AppDomNodes {
-  [id: NodeId]: AppDomNode;
-}
+export type AppDomNodes = Record<NodeId, AppDomNode>;
 
 export interface AppDom {
   nodes: AppDomNodes;
@@ -225,12 +223,6 @@ export function createConst<V>(value: V): ConstantAttrValue<V> {
 
 export function createSecret<V>(value: V): SecretAttrValue<V> {
   return { type: 'secret', value };
-}
-
-export function createConsts<P>(values: P): ConstantAttrValues<P> {
-  return Object.fromEntries(
-    Object.entries(values).map(([key, value]) => [key, createConst(value)]),
-  ) as ConstantAttrValues<P>;
 }
 
 export function getMaybeNode<T extends AppDomNodeType>(
@@ -721,10 +713,8 @@ export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): 
 export function toConstPropValues<P = any>(props: Partial<P>): Partial<BindableAttrValues<P>>;
 export function toConstPropValues<P = any>(props: P): BindableAttrValues<P>;
 export function toConstPropValues<P = any>(props: P): BindableAttrValues<P> {
-  return Object.fromEntries(
-    Object.entries(props).flatMap(([propName, value]) =>
-      value ? [[propName, toConstPropValue(value)]] : [],
-    ),
+  return mapProperties(props, ([propName, value]) =>
+    value ? [propName, toConstPropValue(value)] : null,
   ) as BindableAttrValues<P>;
 }
 
@@ -770,8 +760,6 @@ export function createRenderTree(dom: AppDom): AppDom {
   ]);
   return {
     ...dom,
-    nodes: Object.fromEntries(
-      Object.entries(dom.nodes).filter(([, node]) => frontendNodes.has(node.type)),
-    ),
+    nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as AppDomNodes,
   };
 }

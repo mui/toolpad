@@ -83,26 +83,26 @@ export interface FunctionValueType extends ValueTypeBase {
 
 export interface ArgControlSpec {
   type:
-  | 'boolean' // checkbox
-  | 'number' // number input
-  | 'range' // slider
-  | 'object' // json editor
-  | 'radio' // radio buttons
-  | 'buttons' // button group
-  | 'select' // select control
-  | 'string' // text input
-  | 'color' // color picker
-  | 'slot' // slot in canvas
-  | 'slots' // slots in canvas
-  | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
-  | 'date' // date picker
-  | 'json' // JSON editor
-  | 'GridColumns' // GridColumns specialized editor
-  | 'SelectOptions' // SelectOptions specialized editor
-  | 'HorizontalAlign'
-  | 'VerticalAlign'
-  | 'function'
-  | 'RowIdFieldSelect'; // Row id field specialized select
+    | 'boolean' // checkbox
+    | 'number' // number input
+    | 'range' // slider
+    | 'object' // json editor
+    | 'radio' // radio buttons
+    | 'buttons' // button group
+    | 'select' // select control
+    | 'string' // text input
+    | 'color' // color picker
+    | 'slot' // slot in canvas
+    | 'slots' // slots in canvas
+    | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
+    | 'date' // date picker
+    | 'json' // JSON editor
+    | 'GridColumns' // GridColumns specialized editor
+    | 'SelectOptions' // SelectOptions specialized editor
+    | 'HorizontalAlign'
+    | 'VerticalAlign'
+    | 'function'
+    | 'RowIdFieldSelect'; // Row id field specialized select
 }
 
 type PrimitiveValueType =
@@ -172,19 +172,19 @@ export interface LiveBinding {
 
 export type RuntimeEvent =
   | {
-    type: 'propUpdated';
-    nodeId: string;
-    prop: string;
-    value: React.SetStateAction<unknown>;
-  }
+      type: 'propUpdated';
+      nodeId: string;
+      prop: string;
+      value: React.SetStateAction<unknown>;
+    }
   | {
-    type: 'pageStateUpdated';
-    pageState: Record<string, unknown>;
-  }
+      type: 'pageStateUpdated';
+      pageState: Record<string, unknown>;
+    }
   | {
-    type: 'pageBindingsUpdated';
-    bindings: LiveBindings;
-  }
+      type: 'pageBindingsUpdated';
+      bindings: LiveBindings;
+    }
   | { type: 'afterRender' };
 
 export interface ComponentConfig<P> {

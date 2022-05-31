@@ -142,7 +142,7 @@ export function getRectPointZone(
   rect: Rectangle,
   x: number,
   y: number,
-  centerAreaFraction = 0 // 0-1
+  centerAreaFraction = 0, // 0-1
 ): RectZone | null {
   const { height: rectHeight, width: rectWidth } = rect;
 

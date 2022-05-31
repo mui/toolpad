@@ -18,9 +18,7 @@ import { MoviesQuery, MoviesConnectionParams } from './types';
 
 function ConnectionParamsInput({ value, onChange }: WithControlledProp<MoviesConnectionParams>) {
   const { handleSubmit, register, formState, reset } = useForm({
-    defaultValues: {
-      ...value,
-    },
+    defaultValues: value,
   });
 
   const doSubmit = handleSubmit((connectionParams) => {

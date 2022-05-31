@@ -29,9 +29,7 @@ function isValid(connection: PostgresConnectionParams): boolean {
 
 function ConnectionParamsInput({ value, onChange }: WithControlledProp<PostgresConnectionParams>) {
   const { handleSubmit, register, formState, reset } = useForm({
-    defaultValues: {
-      ...value,
-    },
+    defaultValues: value,
   });
 
   const doSubmit = handleSubmit((connectionParams) => {

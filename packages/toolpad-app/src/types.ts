@@ -36,6 +36,7 @@ export interface NodeInfo {
   error?: RuntimeError | null;
   rect?: Rectangle;
   componentConfig?: ComponentConfig<unknown>;
+  direction: FlowDirection;
   props: { [key: string]: unknown };
 }
 

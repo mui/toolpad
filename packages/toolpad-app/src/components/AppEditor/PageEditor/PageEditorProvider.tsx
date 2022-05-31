@@ -2,7 +2,7 @@ import { LiveBindings } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { NodeId, PageViewState } from '../../../types';
-import { RectBoundary } from '../../../utils/geometry';
+import { RectZone } from '../../../utils/geometry';
 import { update } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'component' | 'theme';
@@ -15,8 +15,8 @@ export interface PageEditorState {
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: appDom.ElementNode | null;
   readonly highlightLayout: boolean;
-  readonly highlightedNodeId: NodeId | null;
-  readonly highlightedNodeBoundary: RectBoundary | null;
+  readonly dragOverNodeId: NodeId | null;
+  readonly dragOverNodeZone: RectZone | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
   readonly bindings: LiveBindings;
@@ -44,9 +44,9 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_NODE_DRAG_OVER';
-      highlightState: {
+      dragOverState: {
         nodeId: NodeId | null;
-        boundary: RectBoundary | null;
+        zone: RectZone | null;
       };
     }
   | {
@@ -74,8 +74,8 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     componentPanelTab: 'component',
     newNode: null,
     highlightLayout: false,
-    highlightedNodeId: null,
-    highlightedNodeBoundary: null,
+    dragOverNodeId: null,
+    dragOverNodeZone: null,
     viewState: { nodes: {} },
     pageState: {},
     bindings: {},
@@ -117,15 +117,15 @@ export function pageEditorReducer(
       return update(state, {
         newNode: null,
         highlightLayout: false,
-        highlightedNodeId: null,
+        dragOverNodeId: null,
       });
     case 'PAGE_NODE_DRAG_OVER': {
-      const { nodeId, boundary } = action.highlightState;
+      const { nodeId, zone } = action.dragOverState;
 
       return update(state, {
         highlightLayout: true,
-        highlightedNodeId: nodeId,
-        highlightedNodeBoundary: boundary,
+        dragOverNodeId: nodeId,
+        dragOverNodeZone: zone,
       });
     }
     case 'PAGE_VIEW_STATE_UPDATE': {
@@ -165,10 +165,10 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     nodeDragEnd() {
       dispatch({ type: 'PAGE_NODE_DRAG_END' });
     },
-    nodeDragOver({ nodeId, boundary }: { nodeId: NodeId | null; boundary: RectBoundary | null }) {
+    nodeDragOver({ nodeId, zone }: { nodeId: NodeId | null; zone: RectZone | null }) {
       dispatch({
         type: 'PAGE_NODE_DRAG_OVER',
-        highlightState: { nodeId, boundary },
+        dragOverState: { nodeId, zone },
       });
     },
     pageViewStateUpdate(viewState: PageViewState) {

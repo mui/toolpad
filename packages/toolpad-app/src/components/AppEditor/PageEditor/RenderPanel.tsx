@@ -6,14 +6,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
 import { RuntimeEvent } from '@mui/toolpad-core';
 import { setEventHandler } from '@mui/toolpad-core/runtime';
-import { NodeId, NodesInfo } from '../../../types';
+import { FlowDirection, NodeId, NodesInfo } from '../../../types';
 import * as appDom from '../../../appDom';
 import EditorCanvasHost from './EditorCanvasHost';
 import {
   absolutePositionCss,
-  getRectPointBoundary,
+  getRectPointZone,
   Rectangle,
-  RectBoundary,
+  RectZone,
   rectContainsPoint,
 } from '../../../utils/geometry';
 import { PinholeOverlay } from '../../../PinholeOverlay';
@@ -60,22 +60,37 @@ const overlayClasses = {
   hudOverlay: 'Toolpad_HudOverlay',
 };
 
-export const getHighlightedBoundaryOverlayClass = (
-  highlightedBoundary: RectBoundary,
-): typeof overlayClasses[keyof typeof overlayClasses] | null => {
-  switch (highlightedBoundary) {
-    case RectBoundary.TOP:
+export function getHighlightedZoneOverlayClass(
+  highlightedZone: RectZone,
+): typeof overlayClasses[keyof typeof overlayClasses] | null {
+  switch (highlightedZone) {
+    case RectZone.TOP:
       return overlayClasses.highlightedTop;
-    case RectBoundary.RIGHT:
+    case RectZone.RIGHT:
       return overlayClasses.highlightedRight;
-    case RectBoundary.BOTTOM:
+    case RectZone.BOTTOM:
       return overlayClasses.highlightedBottom;
-    case RectBoundary.LEFT:
+    case RectZone.LEFT:
       return overlayClasses.highlightedLeft;
     default:
       return null;
   }
-};
+}
+
+export function getChildNodeHighlightedZone(direction: FlowDirection): RectZone | null {
+  switch (direction) {
+    case 'row':
+      return RectZone.RIGHT;
+    case 'column':
+      return RectZone.BOTTOM;
+    case 'row-reverse':
+      return RectZone.LEFT;
+    case 'column-reverse':
+      return RectZone.TOP;
+    default:
+      return null;
+  }
+}
 
 const OverlayRoot = styled('div')({
   pointerEvents: 'none',
@@ -114,16 +129,16 @@ const OverlayRoot = styled('div')({
       borderColor: 'rgba(255,0,0,.125)',
     },
     [`&.${overlayClasses.highlightedTop}`]: {
-      borderTop: '2px solid green',
+      borderTop: '3px solid #44EB2D',
     },
     [`&.${overlayClasses.highlightedRight}`]: {
-      borderRight: '2px solid green',
+      borderRight: '3px solid #44EB2D',
     },
     [`&.${overlayClasses.highlightedBottom}`]: {
-      borderBottom: '2px solid green',
+      borderBottom: '3px solid #44EB2D',
     },
     [`&.${overlayClasses.highlightedLeft}`]: {
-      borderLeft: '2px solid green',
+      borderLeft: '3px solid #44EB2D',
     },
     [`&.${overlayClasses.selected}`]: {
       border: '1px solid red',
@@ -163,7 +178,7 @@ function findNodeAt(
 interface SelectionHudProps {
   node: appDom.ElementNode;
   rect: Rectangle;
-  highlightedBoundary?: RectBoundary | null;
+  highlightedZone?: RectZone | null;
   selected?: boolean;
   allowInteraction?: boolean;
   onDragStart?: React.DragEventHandler<HTMLElement>;
@@ -172,7 +187,7 @@ interface SelectionHudProps {
 
 function NodeHud({
   node,
-  highlightedBoundary,
+  highlightedZone,
   selected,
   allowInteraction,
   rect,
@@ -187,8 +202,8 @@ function NodeHud({
   const isLayoutComponent =
     componentId === PAGE_ROW_COMPONENT_ID || componentId === PAGE_COLUMN_COMPONENT_ID;
 
-  const highlightedBoundaryOverlayClass =
-    highlightedBoundary && getHighlightedBoundaryOverlayClass(highlightedBoundary);
+  const highlightedZoneOverlayClass =
+    highlightedZone && getHighlightedZoneOverlayClass(highlightedZone);
 
   return (
     <div
@@ -198,7 +213,7 @@ function NodeHud({
       style={absolutePositionCss(rect)}
       className={clsx(overlayClasses.nodeHud, {
         [overlayClasses.layout]: isLayoutComponent,
-        ...(highlightedBoundaryOverlayClass ? { [highlightedBoundaryOverlayClass]: true } : {}),
+        ...(highlightedZoneOverlayClass ? { [highlightedZoneOverlayClass]: true } : {}),
         [overlayClasses.selected]: selected,
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
@@ -229,8 +244,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     viewState,
     nodeId: pageNodeId,
     highlightLayout,
-    highlightedNodeId,
-    highlightedNodeBoundary,
+    dragOverNodeId,
+    dragOverNodeZone,
   } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;
@@ -323,50 +338,73 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const activeDropNodeInfo = activeDropNodeId && nodesInfo[activeDropNodeId];
 
-      let activeDropBoundary = null;
+      let activeDropZone = null;
       if (activeDropNodeInfo) {
         const activeDropNodeRect = activeDropNodeInfo.rect;
 
         if (activeDropNodeRect) {
-          activeDropBoundary = getRectPointBoundary(
+          activeDropZone = getRectPointZone(
             activeDropNodeRect,
             cursorPos.x - activeDropNodeRect.x,
             cursorPos.y - activeDropNodeRect.y,
-            {
-              centerAreaXFraction: 0.5,
-              centerAreaYFraction: 0.5,
-            },
+            0.5,
           );
         }
       }
 
       const hasChangedHighlightedArea =
-        activeDropNodeId !== highlightedNodeId || activeDropBoundary !== highlightedNodeBoundary;
+        activeDropNodeId !== dragOverNodeId || activeDropZone !== dragOverNodeZone;
 
       if (
         activeDropNodeId &&
-        activeDropBoundary &&
+        activeDropZone &&
         hasChangedHighlightedArea &&
         availableDropTargetIds.has(activeDropNodeId)
       ) {
-        api.nodeDragOver({ nodeId: activeDropNodeId, boundary: activeDropBoundary });
-      } else if (highlightedNodeId && (!activeDropNodeId || !activeDropBoundary)) {
-        api.nodeDragOver({ nodeId: null, boundary: null });
+        api.nodeDragOver({ nodeId: activeDropNodeId, zone: activeDropZone });
+      } else if (dragOverNodeId && (!activeDropNodeId || !activeDropZone)) {
+        api.nodeDragOver({ nodeId: null, zone: null });
       }
     },
     [
-      api,
-      availableDropTargetIds,
-      availableDropTargets,
       getViewCoordinates,
-      highlightedNodeBoundary,
-      highlightedNodeId,
+      availableDropTargets,
       nodesInfo,
+      dragOverNodeId,
+      dragOverNodeZone,
+      availableDropTargetIds,
+      api,
     ],
   );
 
+  const getNodeHighlightedZone = React.useCallback(
+    (node: appDom.AppDomNode): RectZone | null => {
+      if (dragOverNodeZone === RectZone.CENTER) {
+        const parent = appDom.getParent(dom, node);
+
+        if (!parent) {
+          return null;
+        }
+
+        const parentChildren = appDom.isElement(parent)
+          ? appDom.getChildNodes(dom, parent).children
+          : [];
+        const isParentLastChild =
+          parentChildren.length > 0 && node.id === parentChildren[parentChildren.length - 1].id;
+
+        const nodeInfo = nodesInfo[node.id];
+
+        return nodeInfo && parent.id === dragOverNodeId && isParentLastChild
+          ? getChildNodeHighlightedZone(nodeInfo.direction)
+          : null;
+      }
+      return node.id === dragOverNodeId ? dragOverNodeZone : null;
+    },
+    [dom, dragOverNodeId, dragOverNodeZone, nodesInfo],
+  );
+
   const handleDragLeave = React.useCallback(
-    () => api.nodeDragOver({ nodeId: null, boundary: null }),
+    () => api.nodeDragOver({ nodeId: null, zone: null }),
     [api],
   );
 
@@ -593,15 +631,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               return null;
             }
 
-            const isHighlighted = node.id === highlightedNodeId;
-
             return (
               appDom.isElement(node) && (
                 <NodeHud
                   key={node.id}
                   node={node}
                   rect={nodeLayout.rect}
-                  highlightedBoundary={isHighlighted ? highlightedNodeBoundary : null}
+                  highlightedZone={getNodeHighlightedZone(node)}
                   selected={selectedNode?.id === node.id}
                   allowInteraction={nodesWithInteraction.has(node.id)}
                   onDragStart={handleDragStart}

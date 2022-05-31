@@ -130,53 +130,51 @@ export function rectContainsPoint(rect: Rectangle, x: number, y: number): boolea
   return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
 }
 
-export enum RectBoundary {
+export enum RectZone {
   TOP = 'TOP',
   RIGHT = 'RIGHT',
   BOTTOM = 'BOTTOM',
   LEFT = 'LEFT',
-  CENTER = 'CENTER'
+  CENTER = 'CENTER',
 }
 
-interface GetRectPointBoundaryOptions {
-  centerAreaXFraction?: number // 0-1
-  centerAreaYFraction?: number // 0-1
-}
-
-export function getRectPointBoundary(rect: Rectangle, x: number, y: number, options: GetRectPointBoundaryOptions = {}): RectBoundary | null {
-  const { height: rectHeight, width: rectWidth } = rect
-  const { centerAreaXFraction = 0, centerAreaYFraction = 0 } = options
+export function getRectPointZone(
+  rect: Rectangle,
+  x: number,
+  y: number,
+  centerAreaFraction = 0 // 0-1
+): RectZone | null {
+  const { height: rectHeight, width: rectWidth } = rect;
 
   // Out of bounds
   if (x < 0 || x > rectWidth || y < 0 || y > rectHeight) {
     return null;
   }
 
-  // Ignored center area fractions
-  const fractionalX = x / rectWidth
-  const fractionalY = y / rectHeight
-  const centerAreaXFractionHalf = centerAreaXFraction / 2
-  const centerAreaYFractionHalf = centerAreaYFraction / 2
+  // Center area
+  const fractionalX = x / rectWidth;
+  const fractionalY = y / rectHeight;
+  const centerAreaFractionHalf = centerAreaFraction / 2;
   if (
-    fractionalX > centerAreaXFractionHalf &&
-    fractionalX < 1 - centerAreaXFractionHalf &&
-    fractionalY > centerAreaYFractionHalf &&
-    fractionalY < 1 - centerAreaYFractionHalf
+    fractionalX > centerAreaFractionHalf &&
+    fractionalX < 1 - centerAreaFractionHalf &&
+    fractionalY > centerAreaFractionHalf &&
+    fractionalY < 1 - centerAreaFractionHalf
   ) {
-    return RectBoundary.CENTER;
+    return RectZone.CENTER;
   }
 
   const isOverFirstDiagonal = y < (rectHeight / rectWidth) * x;
   const isOverSecondDiagonal = y < -1 * (rectHeight / rectWidth) * x + rectHeight;
 
   if (isOverFirstDiagonal && isOverSecondDiagonal) {
-    return RectBoundary.TOP;
+    return RectZone.TOP;
   }
   if (isOverFirstDiagonal) {
-    return RectBoundary.RIGHT;
+    return RectZone.RIGHT;
   }
   if (isOverSecondDiagonal) {
-    return RectBoundary.LEFT;
+    return RectZone.LEFT;
   }
-  return RectBoundary.BOTTOM;
+  return RectZone.BOTTOM;
 }

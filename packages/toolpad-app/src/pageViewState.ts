@@ -1,7 +1,7 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { RUNTIME_PROP_NODE_ID } from '@mui/toolpad-core';
 import { NodeFiberHostProps } from '@mui/toolpad-core/runtime';
-import { NodeId, PageViewState, NodesInfo, NodeInfo } from './types';
+import { NodeId, PageViewState, NodesInfo, NodeInfo, FlowDirection } from './types';
 import { getRelativeOuterRect } from './utils/geometry';
 
 declare global {
@@ -26,6 +26,7 @@ function getNodeViewInfo(
       error: fiberHostProps.nodeError,
       componentConfig: fiberHostProps.componentConfig,
       rect,
+      direction: window.getComputedStyle(elm).flexDirection as FlowDirection,
       props,
     };
   }

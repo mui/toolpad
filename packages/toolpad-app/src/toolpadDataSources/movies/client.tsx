@@ -1,4 +1,5 @@
 import {
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -6,20 +7,35 @@ import {
   SelectChangeEvent,
   Stack,
   TextField,
+  Toolbar,
 } from '@mui/material';
 import * as React from 'react';
+import { useForm } from 'react-hook-form';
 import data from '../../../movies.json';
 import { ClientDataSource } from '../../types';
-import { useInput } from '../../utils/forms';
 import { WithControlledProp } from '../../utils/types';
 import { MoviesQuery, MoviesConnectionParams } from './types';
 
 function ConnectionParamsInput({ value, onChange }: WithControlledProp<MoviesConnectionParams>) {
-  const apiKeyInputProps = useInput(value, onChange, 'apiKey');
+  const { handleSubmit, register, formState, reset } = useForm({
+    defaultValues: {
+      ...value,
+    },
+  });
+
+  const doSubmit = handleSubmit((connectionParams) => {
+    onChange(connectionParams);
+    reset(connectionParams);
+  });
 
   return (
     <Stack direction="column" gap={1}>
-      <TextField size="small" label="API key" {...apiKeyInputProps} />
+      <Toolbar disableGutters>
+        <Button onClick={doSubmit} disabled={!formState.isDirty}>
+          Save
+        </Button>
+      </Toolbar>
+      <TextField size="small" label="API key" {...register('apiKey')} />
     </Stack>
   );
 }

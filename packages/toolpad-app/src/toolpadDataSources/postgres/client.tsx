@@ -1,8 +1,8 @@
-import { Stack, TextareaAutosize, TextField } from '@mui/material';
+import { Button, Stack, TextareaAutosize, TextField, Toolbar } from '@mui/material';
 import * as React from 'react';
+import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { ClientDataSource, QueryEditorProps } from '../../types';
-import { useInput } from '../../utils/forms';
 import { WithControlledProp } from '../../utils/types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
 
@@ -28,19 +28,29 @@ function isValid(connection: PostgresConnectionParams): boolean {
 }
 
 function ConnectionParamsInput({ value, onChange }: WithControlledProp<PostgresConnectionParams>) {
-  const hostInputProps = useInput(value, onChange, 'host');
-  const portInputProps = useInput(value, onChange, 'port');
-  const userInputProps = useInput(value, onChange, 'user');
-  const passwordInputProps = useInput(value, onChange, 'password');
-  const databaseInputProps = useInput(value, onChange, 'database');
+  const { handleSubmit, register, formState, reset } = useForm({
+    defaultValues: {
+      ...value,
+    },
+  });
+
+  const doSubmit = handleSubmit((connectionParams) => {
+    onChange(connectionParams);
+    reset(connectionParams);
+  });
 
   return (
     <Stack direction="column" gap={1}>
-      <TextField size="small" label="host" {...hostInputProps} />
-      <TextField size="small" label="port" {...portInputProps} />
-      <TextField size="small" label="user" {...userInputProps} />
-      <TextField size="small" label="password" type="password" {...passwordInputProps} />
-      <TextField size="small" label="database" {...databaseInputProps} />
+      <Toolbar disableGutters>
+        <Button onClick={doSubmit} disabled={!formState.isDirty}>
+          Save
+        </Button>
+      </Toolbar>
+      <TextField size="small" label="host" {...register('host')} />
+      <TextField size="small" label="port" {...register('port')} />
+      <TextField size="small" label="user" {...register('user')} />
+      <TextField size="small" label="password" type="password" {...register('password')} />
+      <TextField size="small" label="database" {...register('database')} />
     </Stack>
   );
 }

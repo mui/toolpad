@@ -17,6 +17,9 @@ async function exec(
   connection: LegacyConnection<PostgresConnectionParams>,
   postgresQuery: PostgresQuery,
 ): Promise<ApiResult<any>> {
+  if (!connection.params) {
+    throw new Error(`Connection not initialized`);
+  }
   // eslint-disable-next-line no-console
   console.log(
     `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection.params.host}"`,

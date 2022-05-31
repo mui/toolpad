@@ -25,10 +25,6 @@ function getInitialQueryValue(): GoogleSheetsApiQuery {
   return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '', headerRow: false };
 }
 
-function getInitialConnectionValue(): GoogleSheetsConnectionParams {
-  return {};
-}
-
 function isConnectionValid(connection: GoogleSheetsConnectionParams | null): boolean {
   if (connection?.access_token && connection?.refresh_token) {
     return true;
@@ -243,7 +239,6 @@ const dataSource: ClientDataSource<
 > = {
   displayName: dataSourceName,
   ConnectionParamsInput,
-  getInitialConnectionValue,
   isConnectionValid,
   QueryEditor,
   getInitialQueryValue,

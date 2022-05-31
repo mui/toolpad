@@ -76,3 +76,5 @@ export type CapitalizeTail<T extends string[]> = T extends []
  * type T2 = CapitalizeAll<''>;  // ''
  */
 export type SnakeToCamel<T extends string> = Join<CapitalizeTail<Split<T, '-'>>, ''>;
+
+export type Maybe<T> = T | undefined | null;

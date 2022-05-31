@@ -87,7 +87,7 @@ export interface CreateHandlerApi {
   getConnection: (appId: string, connectionId: string) => Promise<LegacyConnection>;
 }
 
-export interface ConnectionEditorProps<P> extends WithControlledProp<P> {
+export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
   handlerBasePath: string;
   appId: string;
   connectionId: NodeId;
@@ -113,7 +113,6 @@ export interface ConnectionStatus {
 export interface ClientDataSource<P = {}, Q = {}, PQ = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<P>;
-  getInitialConnectionValue: () => P;
   isConnectionValid: (connection: P) => boolean;
   QueryEditor: QueryEditor<Q, PQ>;
   getInitialQueryValue: () => Q;
@@ -132,7 +131,7 @@ export interface LegacyConnection<P = unknown> {
   id: string;
   type: string;
   name: string;
-  params: P;
+  params: P | null;
   status: ConnectionStatus | null;
 }
 

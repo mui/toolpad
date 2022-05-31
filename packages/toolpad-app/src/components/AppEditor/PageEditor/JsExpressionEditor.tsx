@@ -26,6 +26,8 @@ export function JsExpressionEditor({
   disabled,
   autoFocus,
 }: JsExpressionEditorProps) {
+  const id = React.useId();
+
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const monacoRef = React.useRef<typeof monacoEditor>();
 
@@ -108,7 +110,7 @@ export function JsExpressionEditor({
         height="150px"
         value={value}
         onChange={(code = '') => onChange(code)}
-        path="./component.tsx"
+        path={`./expression/${id}.tsx`}
         language="typescript"
         onMount={HandleEditorMount}
         options={{

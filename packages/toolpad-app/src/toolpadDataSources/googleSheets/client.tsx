@@ -151,7 +151,6 @@ function QueryEditor({
   return (
     <Stack direction="column" gap={2}>
       <Autocomplete
-        size="small"
         fullWidth
         value={fetchedFile?.data ?? null}
         loading={fetchedFiles?.isLoading}
@@ -163,7 +162,7 @@ function QueryEditor({
         isOptionEqualToValue={(option: GoogleDriveFile, val: GoogleDriveFile) =>
           option.id === val.id
         }
-        renderInput={(params) => <TextField {...params} size="small" label="Select spreadsheet" />}
+        renderInput={(params) => <TextField {...params} label="Select spreadsheet" />}
         renderOption={(props, option) => {
           return (
             <li {...props} key={option?.id}>
@@ -173,7 +172,6 @@ function QueryEditor({
         }}
       />
       <Autocomplete
-        size="small"
         fullWidth
         loading={fetchedSpreadsheet?.isLoading}
         value={selectedSheet}
@@ -181,7 +179,7 @@ function QueryEditor({
         options={fetchedSpreadsheet?.data?.sheets ?? []}
         getOptionLabel={(option: GoogleSheet) => option?.properties?.title ?? ''}
         onChange={handleSheetChange}
-        renderInput={(params) => <TextField {...params} size="small" label="Select sheet" />}
+        renderInput={(params) => <TextField {...params} label="Select sheet" />}
         renderOption={(props, option) => {
           return (
             <li {...props} key={option?.properties?.sheetId}>
@@ -191,7 +189,6 @@ function QueryEditor({
         }}
       />
       <TextField
-        size="small"
         label="Range"
         helperText={`In the form of A1:Z999`}
         value={value?.ranges}
@@ -202,7 +199,6 @@ function QueryEditor({
         label="Interpret first row as columns"
         control={
           <Checkbox
-            size="small"
             checked={value?.headerRow}
             onChange={handleTransformChange}
             inputProps={{ 'aria-label': 'controlled' }}

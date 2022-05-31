@@ -24,7 +24,6 @@ function HorizontalAlignPropEditor({
     <Box>
       <Typography>{label}:</Typography>
       <ToggleButtonGroup
-        size="small"
         exclusive
         disabled={disabled}
         value={value}

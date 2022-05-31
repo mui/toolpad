@@ -188,7 +188,6 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
                 label="Transform API response"
                 control={
                   <Checkbox
-                    size="small"
                     checked={transformEnabled}
                     onChange={handleTransformEnabledChange}
                     inputProps={{ 'aria-label': 'controlled' }}

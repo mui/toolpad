@@ -190,10 +190,10 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
   return (
     <React.Fragment>
       <Stack sx={{ height: '100%' }}>
-        <Toolbar variant="dense" sx={{ mt: 2 }}>
+        <Toolbar sx={{ mt: 2 }}>
           <NodeNameEditor node={codeComponentNode} sx={{ maxWidth: 300 }} />
         </Toolbar>
-        <Toolbar variant="dense">
+        <Toolbar>
           <Button disabled={allChangesAreCommitted} onClick={handleSave}>
             Update
           </Button>

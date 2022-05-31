@@ -77,7 +77,7 @@ function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreview
 
   return (
     <React.Fragment>
-      <Toolbar variant="dense" disableGutters>
+      <Toolbar disableGutters>
         <Typography color="error">{previewError?.message}</Typography>
       </Toolbar>
       <Box sx={{ flex: 1, overflow: 'auto' }}>
@@ -148,7 +148,6 @@ export function BindingEditor<V>({
 
   const bindingButton = (
     <Checkbox
-      size="small"
       aria-label="Bind property"
       checked={hasBinding}
       disabled={disabled}

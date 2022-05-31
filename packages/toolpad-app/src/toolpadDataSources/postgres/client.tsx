@@ -36,11 +36,11 @@ function ConnectionParamsInput({ value, onChange }: WithControlledProp<PostgresC
 
   return (
     <Stack direction="column" gap={1}>
-      <TextField size="small" label="host" {...hostInputProps} />
-      <TextField size="small" label="port" {...portInputProps} />
-      <TextField size="small" label="user" {...userInputProps} />
-      <TextField size="small" label="password" type="password" {...passwordInputProps} />
-      <TextField size="small" label="database" {...databaseInputProps} />
+      <TextField label="host" {...hostInputProps} />
+      <TextField label="port" {...portInputProps} />
+      <TextField label="user" {...userInputProps} />
+      <TextField label="password" type="password" {...passwordInputProps} />
+      <TextField label="database" {...databaseInputProps} />
     </Stack>
   );
 }

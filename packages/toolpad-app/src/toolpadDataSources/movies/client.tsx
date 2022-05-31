@@ -19,7 +19,7 @@ function ConnectionParamsInput({ value, onChange }: WithControlledProp<MoviesCon
 
   return (
     <Stack direction="column" gap={1}>
-      <TextField size="small" label="API key" {...apiKeyInputProps} />
+      <TextField label="API key" {...apiKeyInputProps} />
     </Stack>
   );
 }
@@ -43,7 +43,7 @@ export function QueryEditor({ value, onChange }: WithControlledProp<MoviesQuery>
   );
   return (
     <Stack>
-      <FormControl size="small" fullWidth>
+      <FormControl fullWidth>
         <InputLabel id="select-movie-genre">Genre</InputLabel>
         <Select
           labelId="select-movie-genre"

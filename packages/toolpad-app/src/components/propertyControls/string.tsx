@@ -16,7 +16,6 @@ function StringPropEditor({ label, value, onChange, disabled }: EditorProps<stri
       disabled={disabled}
       onChange={handleChange}
       label={label}
-      size="small"
     />
   );
 }

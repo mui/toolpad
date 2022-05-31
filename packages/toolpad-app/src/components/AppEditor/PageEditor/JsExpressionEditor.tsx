@@ -9,12 +9,13 @@ const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
   border: '1px solid black',
   borderColor: theme.palette.divider,
   borderRadius: theme.shape.borderRadius,
-  // overflow: 'hidden',
 }));
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
   globalScope: Record<string, unknown>;
   onCommit?: () => void;
+  disabled?: boolean;
+  autoFocus?: boolean;
 }
 
 export function JsExpressionEditor({
@@ -22,6 +23,8 @@ export function JsExpressionEditor({
   value,
   onChange,
   globalScope,
+  disabled,
+  autoFocus,
 }: JsExpressionEditorProps) {
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const monacoRef = React.useRef<typeof monacoEditor>();
@@ -55,6 +58,7 @@ export function JsExpressionEditor({
 
   React.useEffect(() => setLibSource(), [setLibSource]);
 
+  const isMount = React.useRef(true);
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
       monacoRef.current = monaco;
@@ -88,15 +92,18 @@ export function JsExpressionEditor({
       // eslint-disable-next-line no-bitwise
       editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => onCommit?.());
 
-      editor.focus();
+      if (isMount && autoFocus && !disabled) {
+        editor.focus();
+        isMount.current = false;
+      }
 
       setLibSource();
     },
-    [setLibSource, onCommit],
+    [setLibSource, onCommit, autoFocus, disabled],
   );
 
   return (
-    <JsExpressionEditorRoot>
+    <JsExpressionEditorRoot sx={disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}}>
       <Editor
         height="150px"
         value={value}
@@ -104,6 +111,9 @@ export function JsExpressionEditor({
         path="./component.tsx"
         language="typescript"
         onMount={HandleEditorMount}
+        options={{
+          readOnly: disabled,
+        }}
       />
     </JsExpressionEditorRoot>
   );

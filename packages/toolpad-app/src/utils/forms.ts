@@ -1,18 +1,25 @@
-import * as React from 'react';
+import { FieldError, FormState } from 'react-hook-form';
 
-export function useInput<O, K extends keyof O>(
-  object: O,
-  setObject: (newValue: O) => void,
-  key: K,
-) {
-  const handleChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setObject({ ...object, [key]: event.target.value });
-    },
-    [setObject, key, object],
-  );
+function errorMessage(error: FieldError) {
+  if (error.message) {
+    return error.message;
+  }
+  switch (error.type) {
+    case 'required':
+      return 'required';
+    default:
+      return 'invalid';
+  }
+}
+
+export function validation<T>(
+  formState: FormState<T>,
+  field: keyof T,
+): { error?: boolean; helperText?: string } {
+  const error: FieldError = (formState.errors as any)[field];
+
   return {
-    value: object[key],
-    onChange: handleChange,
+    error: !!error,
+    helperText: error ? errorMessage(error) : undefined,
   };
 }

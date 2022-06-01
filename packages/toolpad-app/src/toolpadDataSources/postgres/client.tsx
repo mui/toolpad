@@ -1,20 +1,11 @@
-import { Stack, TextareaAutosize, TextField } from '@mui/material';
+import { Button, Stack, TextareaAutosize, TextField, Toolbar } from '@mui/material';
 import * as React from 'react';
+import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
-import { ClientDataSource, QueryEditorProps } from '../../types';
-import { useInput } from '../../utils/forms';
-import { WithControlledProp } from '../../utils/types';
+import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import { validation } from '../../utils/forms';
+import { Maybe } from '../../utils/types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
-
-function getInitialValue(): PostgresConnectionParams {
-  return {
-    host: '',
-    port: 5432,
-    user: '',
-    password: '',
-    database: '',
-  };
-}
 
 function isValid(connection: PostgresConnectionParams): boolean {
   return !!(
@@ -27,20 +18,63 @@ function isValid(connection: PostgresConnectionParams): boolean {
   );
 }
 
-function ConnectionParamsInput({ value, onChange }: WithControlledProp<PostgresConnectionParams>) {
-  const hostInputProps = useInput(value, onChange, 'host');
-  const portInputProps = useInput(value, onChange, 'port');
-  const userInputProps = useInput(value, onChange, 'user');
-  const passwordInputProps = useInput(value, onChange, 'password');
-  const databaseInputProps = useInput(value, onChange, 'database');
+function withDefaults(value: Maybe<PostgresConnectionParams>): PostgresConnectionParams {
+  return {
+    host: '',
+    port: 5432,
+    user: '',
+    password: '',
+    database: '',
+    ...value,
+  };
+}
+
+function ConnectionParamsInput({
+  value,
+  onChange,
+}: ConnectionEditorProps<PostgresConnectionParams>) {
+  const { handleSubmit, register, formState, reset } = useForm({
+    defaultValues: withDefaults(value),
+    reValidateMode: 'onChange',
+    mode: 'all',
+  });
+  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
 
   return (
     <Stack direction="column" gap={1}>
-      <TextField label="host" {...hostInputProps} />
-      <TextField label="port" {...portInputProps} />
-      <TextField label="user" {...userInputProps} />
-      <TextField label="password" type="password" {...passwordInputProps} />
-      <TextField label="database" {...databaseInputProps} />
+      <Toolbar disableGutters>
+        <Button onClick={doSubmit} disabled={!formState.isDirty || !formState.isValid}>
+          Save
+        </Button>
+      </Toolbar>
+      <TextField
+        label="host"
+        {...register('host', { required: true })}
+        {...validation(formState, 'host')}
+      />
+      <TextField
+        label="port"
+        {...register('port', { required: true })}
+        {...validation(formState, 'port')}
+      />
+      <TextField
+        label="user"
+        {...register('user', { required: true })}
+        {...validation(formState, 'user')}
+      />
+      <TextField
+        label="password"
+        type="password"
+        {...register('password', { required: true })}
+        {...validation(formState, 'password')}
+      />
+      <TextField
+        label="database"
+        {...register('database', { required: true })}
+        {...validation(formState, 'database')}
+      />
     </Stack>
   );
 }
@@ -76,7 +110,6 @@ function getInitialQueryValue(): PostgresQuery {
 const dataSource: ClientDataSource<PostgresConnectionParams, PostgresQuery> = {
   displayName: 'Postgres',
   ConnectionParamsInput,
-  getInitialConnectionValue: getInitialValue,
   isConnectionValid: isValid,
   QueryEditor,
   getInitialQueryValue,

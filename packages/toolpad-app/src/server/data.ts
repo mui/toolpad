@@ -6,15 +6,7 @@ import {
   Release,
   Prisma,
 } from '../../prisma/generated/client';
-import {
-  LegacyConnection,
-  ServerDataSource,
-  ApiResult,
-  NodeId,
-  Updates,
-  VersionOrPreview,
-  PrivateApiResult,
-} from '../types';
+import { ServerDataSource, ApiResult, NodeId, VersionOrPreview, PrivateApiResult } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -292,81 +284,40 @@ export async function loadReleaseDom(appId: string, version: number): Promise<ap
   return JSON.parse(release.snapshot.toString('utf-8')) as appDom.AppDom;
 }
 
-function fromDomConnection<P>(domConnection: appDom.ConnectionNode<P>): LegacyConnection<P> {
-  const { attributes, id, name } = domConnection;
-  return {
-    id,
-    name,
-    type: attributes.dataSource.value,
-    params: attributes.params.value,
-    status: attributes.status.value,
-  };
-}
-
-export async function addConnection(
+export async function getConnection<P = unknown>(
   appId: string,
-  { params, name, status, type }: LegacyConnection,
-): Promise<LegacyConnection> {
+  id: string,
+): Promise<appDom.ConnectionNode<P>> {
   const dom = await loadDom(appId);
-  const app = appDom.getApp(dom);
-  const newConnection = appDom.createNode(dom, 'connection', {
-    name,
-    attributes: {
-      dataSource: appDom.createConst(type),
-      params: appDom.createSecret(params),
-      status: appDom.createConst(status),
-    },
-  });
-
-  const newDom = appDom.addNode(dom, newConnection, app, 'connections');
-  await saveDom(appId, newDom);
-
-  return fromDomConnection(newConnection);
+  return appDom.getNode(dom, id as NodeId, 'connection') as appDom.ConnectionNode<P>;
 }
 
-export async function getConnection(appId: string, id: string): Promise<LegacyConnection> {
-  const dom = await loadDom(appId);
-  return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
-}
-
-export async function updateConnection(
+export async function getConnectionParams<P = unknown>(
   appId: string,
-  { id, params, name, status, type }: Updates<LegacyConnection>,
-): Promise<LegacyConnection> {
+  id: string,
+): Promise<P | null> {
+  const dom = await loadDom(appId);
+  const node = appDom.getNode(dom, id as NodeId, 'connection') as appDom.ConnectionNode<P>;
+  return node.attributes.params.value;
+}
+
+export async function setConnectionParams<P>(
+  appId: string,
+  connectionId: NodeId,
+  params: P,
+): Promise<void> {
   let dom = await loadDom(appId);
-  const existing = appDom.getNode(dom, id as NodeId, 'connection');
-  if (name !== undefined) {
-    dom = appDom.setNodeName(dom, existing, name);
-  }
-  if (params !== undefined) {
-    dom = appDom.setNodeNamespacedProp(
-      dom,
-      existing,
-      'attributes',
-      'params',
-      appDom.createSecret(params),
-    );
-  }
-  if (status !== undefined) {
-    dom = appDom.setNodeNamespacedProp(
-      dom,
-      existing,
-      'attributes',
-      'status',
-      appDom.createConst(status),
-    );
-  }
-  if (type !== undefined) {
-    dom = appDom.setNodeNamespacedProp(
-      dom,
-      existing,
-      'attributes',
-      'dataSource',
-      appDom.createConst(type),
-    );
-  }
+  const existing = appDom.getNode(dom, connectionId, 'connection');
+
+  dom = appDom.setNodeNamespacedProp(
+    dom,
+    existing,
+    'attributes',
+    'params',
+    appDom.createSecret(params),
+  );
+
   await saveDom(appId, dom);
-  return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
 }
 
 async function applyTransform<Q>(
@@ -391,14 +342,14 @@ export async function execApi<Q>(
     throw new Error(`Unknown datasource "${api.attributes.dataSource.value}" for api "${api.id}"`);
   }
 
-  const connection = await getConnection(appId, api.attributes.connectionId.value);
-  if (!connection) {
-    throw new Error(
-      `Unknown connection "${api.attributes.connectionId.value}" for api "${api.id}"`,
-    );
+  const connectionParams = await getConnectionParams(appId, api.attributes.connectionId.value);
+
+  if (!connectionParams) {
+    throw new Error(`Connection "${api.attributes.connectionId.value}" is not configured"`);
   }
+
   const transformEnabled = api.attributes.transformEnabled?.value;
-  let result = await dataSource.exec(connection, api.attributes.query.value, params);
+  let result = await dataSource.exec(connectionParams, api.attributes.query.value, params);
   if (transformEnabled) {
     result = await applyTransform(api, result);
   }
@@ -418,40 +369,43 @@ export async function execQuery<Q>(
     );
   }
 
-  const connection = await getConnection(appId, query.attributes.connectionId.value);
-  if (!connection) {
-    throw new Error(
-      `Unknown connection "${query.attributes.connectionId.value}" for api "${query.id}"`,
-    );
+  const connectionParams = await getConnectionParams(appId, query.attributes.connectionId.value);
+
+  if (!connectionParams) {
+    throw new Error(`Connection "${query.attributes.connectionId.value}" is not configured"`);
   }
+
   const transformEnabled = query.attributes.transformEnabled?.value;
-  let result = await dataSource.exec(connection, query.attributes.query.value, params);
+  let result = await dataSource.exec(connectionParams, query.attributes.query.value, params);
   if (transformEnabled) {
     result = await applyTransform(query, result);
   }
   return result;
 }
 
-export async function dataSourceFetchPrivate<Q>(
+export async function dataSourceFetchPrivate<P, Q>(
   appId: string,
   connectionId: NodeId,
   query: Q,
 ): Promise<PrivateApiResult<any>> {
-  const connection = await getConnection(appId, connectionId);
-  const dataSource: ServerDataSource<any, any, any> | undefined =
-    serverDataSources[connection.type];
+  const connection: appDom.ConnectionNode<P> = await getConnection<P>(appId, connectionId);
+  const dataSourceId = connection.attributes.dataSource.value;
+  const dataSource: ServerDataSource<P, Q, any> | undefined = serverDataSources[dataSourceId];
 
   if (!dataSource) {
-    throw new Error(
-      `Unknown connection type "${connection.type}" for connection "${connection.id}"`,
-    );
+    throw new Error(`Unknown dataSource "${dataSourceId}" for connection "${connection.id}"`);
   }
 
   if (!dataSource.execPrivate) {
-    throw new Error(`No execPrivate available on datasource "${connection.type}"`);
+    throw new Error(`No execPrivate available on datasource "${dataSourceId}"`);
   }
 
-  return dataSource.execPrivate(connection, query);
+  const connectionParams = connection.attributes.params.value;
+  if (!connectionParams) {
+    throw new Error(`Connection "${connection.id}" is not configured"`);
+  }
+
+  return dataSource.execPrivate(connectionParams, query);
 }
 
 export function parseVersion(param?: string | string[]): VersionOrPreview | null {

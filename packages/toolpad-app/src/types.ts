@@ -82,12 +82,12 @@ export interface PrivateApiResult<D = any> {
   isSuccess: boolean;
 }
 
-export interface CreateHandlerApi {
-  updateConnection: (appId: string, props: Updates<LegacyConnection>) => Promise<LegacyConnection>;
-  getConnection: (appId: string, connectionId: string) => Promise<LegacyConnection>;
+export interface CreateHandlerApi<P = unknown> {
+  setConnectionParams: (appId: string, connectionId: string, props: P) => Promise<void>;
+  getConnectionParams: (appId: string, connectionId: string) => Promise<P>;
 }
 
-export interface ConnectionEditorProps<P> extends WithControlledProp<P> {
+export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
   handlerBasePath: string;
   appId: string;
   connectionId: NodeId;
@@ -113,7 +113,6 @@ export interface ConnectionStatus {
 export interface ClientDataSource<P = {}, Q = {}, PQ = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<P>;
-  getInitialConnectionValue: () => P;
   isConnectionValid: (connection: P) => boolean;
   QueryEditor: QueryEditor<Q, PQ>;
   getInitialQueryValue: () => Q;
@@ -122,18 +121,14 @@ export interface ClientDataSource<P = {}, Q = {}, PQ = {}> {
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
-  execPrivate?: (connection: LegacyConnection<P>, query: PQ) => Promise<PrivateApiResult<any>>;
+  execPrivate?: (connection: P, query: PQ) => Promise<PrivateApiResult<any>>;
   // Execute a query on this connection, intended for viewers
-  exec: (connection: LegacyConnection<P>, query: Q, params: any) => Promise<ApiResult<D>>;
-  createHandler?: () => (api: CreateHandlerApi, req: NextApiRequest, res: NextApiResponse) => void;
-}
-// TODO: replace LegacyConnection with ConnectionNode
-export interface LegacyConnection<P = unknown> {
-  id: string;
-  type: string;
-  name: string;
-  params: P;
-  status: ConnectionStatus | null;
+  exec: (connection: P, query: Q, params: any) => Promise<ApiResult<D>>;
+  createHandler?: () => (
+    api: CreateHandlerApi<P>,
+    req: NextApiRequest,
+    res: NextApiResponse,
+  ) => void;
 }
 
 /**

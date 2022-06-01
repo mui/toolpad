@@ -69,7 +69,7 @@ export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   readonly type: 'connection';
   readonly attributes: {
     readonly dataSource: ConstantAttrValue<string>;
-    readonly params: SecretAttrValue<P>;
+    readonly params: SecretAttrValue<P | null>;
     readonly status: ConstantAttrValue<ConnectionStatus | null>;
   };
 }

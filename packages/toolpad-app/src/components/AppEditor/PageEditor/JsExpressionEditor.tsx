@@ -16,6 +16,9 @@ export interface JsExpressionEditorProps extends WithControlledProp<string> {
   onCommit?: () => void;
   disabled?: boolean;
   autoFocus?: boolean;
+  functionBody?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 export function JsExpressionEditor({
@@ -25,6 +28,9 @@ export function JsExpressionEditor({
   globalScope,
   disabled,
   autoFocus,
+  functionBody,
+  onFocus,
+  onBlur,
 }: JsExpressionEditorProps) {
   const id = React.useId();
 
@@ -60,6 +66,22 @@ export function JsExpressionEditor({
 
   React.useEffect(() => setLibSource(), [setLibSource]);
 
+  React.useEffect(() => {
+    if (editorRef.current && onFocus) {
+      const { dispose } = editorRef.current.onDidFocusEditorText(onFocus);
+      return () => dispose();
+    }
+    return () => {};
+  }, [onFocus]);
+
+  React.useEffect(() => {
+    if (editorRef.current && onBlur) {
+      const { dispose } = editorRef.current.onDidBlurEditorText(onBlur);
+      return () => dispose();
+    }
+    return () => {};
+  }, [onBlur]);
+
   const isMount = React.useRef(true);
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
@@ -88,6 +110,7 @@ export function JsExpressionEditor({
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: false,
         noSyntaxValidation: false,
+        diagnosticCodesToIgnore: functionBody ? [1108] : [],
       });
 
       // The types for `monaco.KeyCode` seem to be messed up
@@ -101,7 +124,7 @@ export function JsExpressionEditor({
 
       setLibSource();
     },
-    [setLibSource, onCommit, autoFocus, disabled],
+    [setLibSource, onCommit, autoFocus, disabled, functionBody],
   );
 
   return (

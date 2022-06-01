@@ -6,7 +6,7 @@ import {
   Release,
   Prisma,
 } from '../../prisma/generated/client';
-import { ServerDataSource, ApiResult, NodeId, VersionOrPreview, PrivateApiResult } from '../types';
+import { ServerDataSource, ApiResult, NodeId, VersionOrPreview } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -387,7 +387,7 @@ export async function dataSourceFetchPrivate<P, Q>(
   appId: string,
   connectionId: NodeId,
   query: Q,
-): Promise<PrivateApiResult<any>> {
+): Promise<any> {
   const connection: appDom.ConnectionNode<P> = await getConnection<P>(appId, connectionId);
   const dataSourceId = connection.attributes.dataSource.value;
   const dataSource: ServerDataSource<P, Q, any> | undefined = serverDataSources[dataSourceId];

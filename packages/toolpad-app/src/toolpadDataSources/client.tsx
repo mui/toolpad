@@ -6,7 +6,7 @@ import { NodeId, ClientDataSource } from '../types';
 import * as appDom from '../appDom';
 import googleSheets from './googleSheets/client';
 
-const clientDataSources: { [key: string]: ClientDataSource<any, any, any> | undefined } = {
+const clientDataSources: { [key: string]: ClientDataSource<any, any> | undefined } = {
   movies,
   postgres,
   rest,

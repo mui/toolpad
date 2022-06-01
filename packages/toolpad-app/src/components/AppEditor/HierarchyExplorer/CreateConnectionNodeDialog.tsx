@@ -46,7 +46,7 @@ export default function CreateConnectionDialog({
           const newNode = appDom.createNode(dom, 'connection', {
             attributes: {
               dataSource: appDom.createConst(dataSourceType),
-              params: appDom.createSecret(dataSource.getInitialConnectionValue()),
+              params: appDom.createSecret(null),
               status: appDom.createConst(null),
             },
           });

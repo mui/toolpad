@@ -1,4 +1,5 @@
 import {
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -6,28 +7,46 @@ import {
   SelectChangeEvent,
   Stack,
   TextField,
+  Toolbar,
 } from '@mui/material';
 import * as React from 'react';
+import { useForm } from 'react-hook-form';
 import data from '../../../movies.json';
-import { ClientDataSource } from '../../types';
-import { useInput } from '../../utils/forms';
-import { WithControlledProp } from '../../utils/types';
+import { ClientDataSource, ConnectionEditorProps } from '../../types';
+import { validation } from '../../utils/forms';
+import { Maybe, WithControlledProp } from '../../utils/types';
 import { MoviesQuery, MoviesConnectionParams } from './types';
 
-function ConnectionParamsInput({ value, onChange }: WithControlledProp<MoviesConnectionParams>) {
-  const apiKeyInputProps = useInput(value, onChange, 'apiKey');
+function withDefaults(value: Maybe<MoviesConnectionParams>): MoviesConnectionParams {
+  return {
+    apiKey: '',
+    ...value,
+  };
+}
+
+function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<MoviesConnectionParams>) {
+  const { handleSubmit, register, formState, reset } = useForm({
+    defaultValues: withDefaults(value),
+  });
+  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
 
   return (
     <Stack direction="column" gap={1}>
-      <TextField size="small" label="API key" {...apiKeyInputProps} />
+      <Toolbar disableGutters>
+        <Button onClick={doSubmit} disabled={!formState.isDirty || !formState.isValid}>
+          Save
+        </Button>
+      </Toolbar>
+      <TextField
+        size="small"
+        label="API key"
+        {...register('apiKey', { required: true })}
+        {...validation(formState, 'apiKey')}
+      />
     </Stack>
   );
-}
-
-function getInitialValue(): MoviesConnectionParams {
-  return {
-    apiKey: '',
-  };
 }
 
 function isValid(connection: MoviesConnectionParams): boolean {
@@ -70,7 +89,6 @@ function getInitialQueryValue(): MoviesQuery {
 const dataSource: ClientDataSource<MoviesConnectionParams, MoviesQuery> = {
   displayName: 'Fake Movies API',
   ConnectionParamsInput,
-  getInitialConnectionValue: getInitialValue,
   isConnectionValid: isValid,
   QueryEditor,
   getInitialQueryValue,

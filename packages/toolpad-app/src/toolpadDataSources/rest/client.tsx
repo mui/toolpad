@@ -79,7 +79,6 @@ const dataSource: ClientDataSource<{}, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   isConnectionValid: () => true,
-  getInitialConnectionValue: () => ({}),
   QueryEditor,
   getInitialQueryValue,
   getArgTypes,

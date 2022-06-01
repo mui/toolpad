@@ -1,13 +1,41 @@
 import * as React from 'react';
 import { ArgTypeDefinitions, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
+import { Button, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import StringRecordEditor from '../../components/StringRecordEditor';
-import { ClientDataSource, QueryEditorProps } from '../../types';
-import { FetchQuery } from './types';
+import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import { FetchQuery, RestConnectionParams } from './types';
 import BindableEditor from '../../components/AppEditor/PageEditor/BindableEditor';
 import { useEvaluateLiveBinding } from '../../components/AppEditor/useEvaluateLiveBinding';
+import MapEntriesEditor from '../../components/MapEntriesEditor';
 
-function ConnectionParamsInput() {
-  return null;
+const EMPTY_ARRAY: [string, string][] = [];
+
+function ConnectionParamsInput({
+  value: valueProp,
+  onChange,
+}: ConnectionEditorProps<RestConnectionParams>) {
+  const [input, setInput] = React.useState(valueProp || { url: '', headers: [] });
+  React.useEffect(() => setInput((existing) => valueProp ?? existing), [valueProp]);
+
+  return (
+    <Stack direction="column" gap={1}>
+      <Toolbar disableGutters>
+        <Button onClick={() => onChange(input)}>Save</Button>
+      </Toolbar>
+      <TextField
+        label="url"
+        size="small"
+        value={input.url}
+        onChange={(newUrl) => setInput((existing) => ({ ...existing, url: newUrl.target.value }))}
+      />
+      <Typography>headers:</Typography>
+      <MapEntriesEditor
+        value={input.headers || EMPTY_ARRAY}
+        onChange={(newHeaders) => setInput((existing) => ({ ...existing, headers: newHeaders }))}
+        disabled={!input.url}
+      />
+    </Stack>
+  );
 }
 
 function QueryEditor({ globalScope, value, onChange }: QueryEditorProps<FetchQuery>) {

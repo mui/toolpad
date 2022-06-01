@@ -1,6 +1,9 @@
 import { BindableAttrValue } from '@mui/toolpad-core';
 
-export interface RestConnectionParams {}
+export interface RestConnectionParams {
+  url?: string;
+  headers?: [string, string][];
+}
 
 export interface FetchQuery {
   /**

@@ -195,7 +195,7 @@ function QueryEditor({
         onChange={handleRangeChange}
       />
       <FormControlLabel
-        label="First row contains headers"
+        label="First row contains column headers"
         control={
           <Checkbox
             size="small"

@@ -1,7 +1,6 @@
 import { Button, Stack, TextareaAutosize, TextField, Toolbar } from '@mui/material';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { useQuery } from 'react-query';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { validation } from '../../utils/forms';
 import { Maybe } from '../../utils/types';
@@ -84,8 +83,7 @@ function ConnectionParamsInput({
   );
 }
 
-function QueryEditor({ value, onChange, api }: QueryEditorProps<PostgresQuery>) {
-  const result = useQuery('getAllTables', () => api.fetchPrivate('getAllTables'));
+function QueryEditor({ value, onChange }: QueryEditorProps<PostgresQuery>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange({ ...value, text: event.target.value });
@@ -94,7 +92,6 @@ function QueryEditor({ value, onChange, api }: QueryEditorProps<PostgresQuery>) 
   );
   return (
     <div>
-      <div>{JSON.stringify(result.data, null, 2)}</div>
       <TextareaAutosize
         maxRows={4}
         value={value.text}

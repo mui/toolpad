@@ -32,7 +32,7 @@ interface ApiEditorContentProps<Q> {
   apiNode: appDom.ApiNode<Q>;
 }
 
-function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContentProps<Q>) {
+function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProps<Q>) {
   const domApi = useDomApi();
   const dom = useDom();
 
@@ -71,13 +71,6 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
   const previewQuery = useQuery(['api', debouncedPreviewApi], async () =>
     client.query.execApi(appId, debouncedPreviewApi, {}),
   );
-
-  const queryEditorApi = React.useMemo(() => {
-    return {
-      fetchPrivate: async (query: PQ | {}) =>
-        client.query.dataSourceFetchPrivate(appId, conectionId, query),
-    };
-  }, [appId, conectionId]);
 
   const handleConnectionChange = React.useCallback(
     (newConnectionId) => {
@@ -175,14 +168,17 @@ function ApiEditorContent<Q, PQ>({ appId, className, apiNode }: ApiEditorContent
             </Button>
           </Toolbar>
           <Stack spacing={2}>
-            <dataSource.QueryEditor
-              api={queryEditorApi}
-              // TODO: Add disabled mode to QueryEditor
-              // disabled={!connection}
-              value={apiQuery}
-              onChange={(newApiQuery) => setApiQuery(newApiQuery)}
-              globalScope={{}}
-            />
+            {connection ? (
+              <dataSource.QueryEditor
+                appId={appId}
+                connectionId={connection.id}
+                // TODO: Add disabled mode to QueryEditor
+                // disabled={!connection}
+                value={apiQuery}
+                onChange={(newApiQuery) => setApiQuery(newApiQuery)}
+                globalScope={{}}
+              />
+            ) : null}
             <Stack>
               <FormControlLabel
                 label="Transform API response"

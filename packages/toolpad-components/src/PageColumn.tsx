@@ -29,7 +29,7 @@ export default createComponent(PageColumn, {
   argTypes: {
     span: {
       typeDef: { type: 'number' },
-      defaultValue: 1,
+      defaultValue: 4,
     },
     spacing: {
       typeDef: { type: 'number' },

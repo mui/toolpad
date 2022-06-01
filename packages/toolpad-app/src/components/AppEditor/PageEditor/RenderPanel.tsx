@@ -26,6 +26,7 @@ import { useToolpadComponent } from '../toolpadComponents';
 import {
   getElementNodeComponentId,
   isPageRow,
+  isPageColumn,
   PAGE_COLUMN_COMPONENT_ID,
   PAGE_ROW_COMPONENT_ID,
 } from '../../../toolpadComponents';
@@ -408,7 +409,110 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [api],
   );
 
-  const handleDrop = React.useCallback(() => {}, []);
+  const handleDrop = React.useCallback(
+    (event: React.DragEvent<Element>) => {
+      const draggedNode = getCurrentlyDraggedNode();
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+
+      if (!draggedNode || !cursorPos || !dragOverNodeId || !dragOverNodeZone) {
+        return;
+      }
+
+      const dragOverNode = appDom.getNode(dom, dragOverNodeId);
+      let parent = appDom.getParent(dom, dragOverNode);
+
+      if (parent) {
+        if (!appDom.isElement(parent) && !appDom.isPage(parent)) {
+          throw new Error(`Invalid drop target "${parent.id}" of type "${parent.type}"`);
+        }
+
+        if (appDom.isPage(parent)) {
+          const container = appDom.createElement(
+            dom,
+            [RectZone.TOP, RectZone.BOTTOM, RectZone.CENTER].includes(dragOverNodeZone)
+              ? PAGE_ROW_COMPONENT_ID
+              : PAGE_COLUMN_COMPONENT_ID,
+            {},
+          );
+          domApi.addNode(container, parent, 'children');
+          parent = container;
+        }
+
+        if (appDom.isElement(parent) && isPageColumn(parent) && !isPageRow(draggedNode)) {
+          // TODO: this logic should probably live in the DomReducer?
+          const container = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
+          domApi.addNode(container, parent, 'children');
+          parent = container;
+        }
+
+        if (dragOverNodeZone === RectZone.CENTER) {
+          domApi.addNode(draggedNode, dragOverNode, 'children', dragOverNode.parentIndex);
+          return;
+        }
+
+        // const parentChildren = appDom.isElement(parent)
+        //   ? appDom.getChildNodes(dom, parent).children
+        //   : [];
+        // const parentChildPosition =
+        //   parentChildren.length > 0
+        //     ? parentChildren.findIndex((node) => node.id === dragOverNode.id)
+        //     : null;
+
+        if (dragOverNodeZone === RectZone.TOP) {
+          domApi.addNode(draggedNode, parent, 'children', dragOverNode.parentIndex);
+        }
+        if (dragOverNodeZone === RectZone.RIGHT) {
+          domApi.addNode(draggedNode, parent, 'children', dragOverNode.parentIndex);
+        }
+        if (dragOverNodeZone === RectZone.BOTTOM) {
+          domApi.addNode(draggedNode, parent, 'children', dragOverNode.parentIndex);
+        }
+        if (dragOverNodeZone === RectZone.LEFT) {
+          domApi.addNode(draggedNode, parent, 'children', dragOverNode.parentIndex);
+        }
+
+        if (selection) {
+          const dragParent = appDom.getParent(dom, draggedNode);
+          const isOnlyRowElement =
+            dragParent &&
+            appDom.isElement(dragParent) &&
+            isPageRow(dragParent) &&
+            appDom.getChildNodes(dom, dragParent).children.length === 1;
+
+          const dragParentParent = appDom.getParent(dom, draggedNode);
+          const isParentOnlyColumnRow =
+            dragParentParent &&
+            appDom.isElement(dragParentParent) &&
+            isPageColumn(dragParentParent) &&
+            appDom.getChildNodes(dom, dragParentParent).children.length === 1;
+
+          if (isOnlyRowElement) {
+            domApi.removeNode(dragParent.id);
+          }
+
+          if (isParentOnlyColumnRow) {
+            domApi.removeNode(dragParentParent.id);
+          }
+        }
+
+        api.nodeDragEnd();
+        if (newNode) {
+          api.select(newNode.id);
+        }
+      }
+    },
+    [
+      api,
+      dom,
+      domApi,
+      dragOverNodeId,
+      dragOverNodeZone,
+      getCurrentlyDraggedNode,
+      getViewCoordinates,
+      newNode,
+      selection,
+    ],
+  );
 
   const handleDragEnd = React.useCallback(
     (event: DragEvent | React.DragEvent) => {

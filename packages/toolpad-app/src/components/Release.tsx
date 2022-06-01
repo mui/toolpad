@@ -98,7 +98,6 @@ export default function Release() {
           <DataGridPro
             rows={pages}
             columns={columns}
-            density="compact"
             loading={isLoading}
             error={(error as any)?.message}
           />

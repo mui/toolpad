@@ -56,7 +56,6 @@ export default function ParametersEditor({
           <React.Fragment key={index}>
             <TextField
               label={valueLabel}
-              size="small"
               value={field}
               autoFocus
               onChange={(event) =>
@@ -84,8 +83,8 @@ export default function ParametersEditor({
               }
             />
 
-            <IconButton aria-label="Delete property" onClick={handleRemove(index)} size="small">
-              <DeleteIcon fontSize="small" />
+            <IconButton aria-label="Delete property" onClick={handleRemove(index)}>
+              <DeleteIcon />
             </IconButton>
           </React.Fragment>
         );
@@ -94,7 +93,6 @@ export default function ParametersEditor({
       <form autoComplete="off" style={{ display: 'contents' }}>
         <TextField
           inputRef={fieldInputRef}
-          size="small"
           label={fieldLabel}
           value=""
           onChange={(event) => {

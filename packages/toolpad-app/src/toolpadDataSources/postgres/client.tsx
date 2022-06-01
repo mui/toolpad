@@ -49,32 +49,27 @@ function ConnectionParamsInput({
         </Button>
       </Toolbar>
       <TextField
-        size="small"
         label="host"
         {...register('host', { required: true })}
         {...validation(formState, 'host')}
       />
       <TextField
-        size="small"
         label="port"
         {...register('port', { required: true })}
         {...validation(formState, 'port')}
       />
       <TextField
-        size="small"
         label="user"
         {...register('user', { required: true })}
         {...validation(formState, 'user')}
       />
       <TextField
-        size="small"
         label="password"
         type="password"
         {...register('password', { required: true })}
         {...validation(formState, 'password')}
       />
       <TextField
-        size="small"
         label="database"
         {...register('database', { required: true })}
         {...validation(formState, 'database')}

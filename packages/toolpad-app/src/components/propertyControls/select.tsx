@@ -12,11 +12,10 @@ function SelectPropEditor({ label, argType, value, onChange, disabled }: EditorP
     [onChange],
   );
   return (
-    <FormControl fullWidth size="small">
+    <FormControl fullWidth>
       <InputLabel id={id}>{label}</InputLabel>
       <Select
         labelId={id}
-        size="small"
         label={label}
         value={value ?? ''}
         disabled={disabled}

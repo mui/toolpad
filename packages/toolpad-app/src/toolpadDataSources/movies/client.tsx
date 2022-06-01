@@ -40,7 +40,6 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<Movies
         </Button>
       </Toolbar>
       <TextField
-        size="small"
         label="API key"
         {...register('apiKey', { required: true })}
         {...validation(formState, 'apiKey')}
@@ -62,7 +61,7 @@ export function QueryEditor({ value, onChange }: WithControlledProp<MoviesQuery>
   );
   return (
     <Stack>
-      <FormControl size="small" fullWidth>
+      <FormControl fullWidth>
         <InputLabel id="select-movie-genre">Genre</InputLabel>
         <Select
           labelId="select-movie-genre"

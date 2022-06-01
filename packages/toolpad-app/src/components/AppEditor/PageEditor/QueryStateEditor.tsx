@@ -155,14 +155,13 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
     <React.Fragment>
       <Stack spacing={1} py={1}>
         <NodeNameEditor node={node} />
-        <FormControl fullWidth size="small">
+        <FormControl fullWidth>
           <InputLabel id={`select-data-query`}>Query</InputLabel>
           <Select
             value={node.attributes.api.value || ''}
             labelId="select-data-query"
             label="Query"
             onChange={handleSelectionChange}
-            size="small"
           >
             <MenuItem value="">---</MenuItem>
             {apis.map(({ id, name }) => (
@@ -176,7 +175,6 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
         <FormControlLabel
           control={
             <Checkbox
-              size="small"
               checked={node.attributes.refetchOnWindowFocus?.value ?? true}
               onChange={handleRefetchOnWindowFocusChange}
             />
@@ -186,7 +184,6 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
         <FormControlLabel
           control={
             <Checkbox
-              size="small"
               checked={node.attributes.refetchOnReconnect?.value ?? true}
               onChange={handleRefetchOnReconnectChange}
             />
@@ -198,7 +195,6 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
             startAdornment: <InputAdornment position="start">s</InputAdornment>,
           }}
           sx={{ maxWidth: 300 }}
-          size="small"
           type="number"
           label="Refetch interval"
           value={refetchIntervalInSeconds(node.attributes.refetchInterval?.value) ?? ''}

@@ -19,10 +19,10 @@ export interface SelectProps extends MuiSelectProps {
   options: (string | Selectoption)[];
 }
 
-function Select({ sx, label, options, ...props }: SelectProps) {
+function Select({ sx, label, options, size, ...props }: SelectProps) {
   const labelId = React.useId();
   return (
-    <FormControl size="small" sx={{ minWidth: 120, ...sx }}>
+    <FormControl size={size} sx={{ minWidth: 120, ...sx }}>
       <InputLabel id={labelId}>{label}</InputLabel>
       <MuiSelect labelId={labelId} label={label} {...props}>
         {options.map((option) => {
@@ -55,7 +55,7 @@ export default createComponent(Select, {
       defaultValue: 'outlined',
     },
     size: {
-      typeDef: { type: 'string', enum: ['small', 'normal'] },
+      typeDef: { type: 'string', enum: ['small', 'medium'] },
       defaultValue: 'small',
     },
     value: {

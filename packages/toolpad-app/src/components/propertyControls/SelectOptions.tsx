@@ -116,7 +116,6 @@ function SelectOptionsPropEditor({
               <Stack gap={1} py={1}>
                 <TextField
                   label="Value"
-                  size="small"
                   value={editingOption.value}
                   onChange={(event) => {
                     handleOptionChange({ ...editingOption, value: event.target.value });
@@ -124,7 +123,6 @@ function SelectOptionsPropEditor({
                 />
                 <TextField
                   label="Label"
-                  size="small"
                   value={editingOption.label}
                   onChange={(event) => {
                     handleOptionChange({ ...editingOption, label: event.target.value });
@@ -141,7 +139,6 @@ function SelectOptionsPropEditor({
                 <Button
                   aria-label="Delete all options"
                   variant="text"
-                  size="small"
                   color="inherit"
                   onClick={handleDeleteAll}
                   sx={{
@@ -156,7 +153,7 @@ function SelectOptionsPropEditor({
             </DialogTitle>
             <DialogContent>
               {value.length > 0 ? (
-                <List dense>
+                <List>
                   {value.map((option, i) => {
                     return (
                       <ListItem
@@ -169,7 +166,7 @@ function SelectOptionsPropEditor({
                             edge="end"
                             onClick={handleOptionDelete(i)}
                           >
-                            <DeleteIcon fontSize="small" />
+                            <DeleteIcon />
                           </IconButton>
                         }
                       >
@@ -193,7 +190,6 @@ function SelectOptionsPropEditor({
               <TextField
                 fullWidth
                 sx={{ m: 1 }}
-                size="small"
                 variant="outlined"
                 inputRef={optionInputRef}
                 onKeyUp={handleOptionTextInput}

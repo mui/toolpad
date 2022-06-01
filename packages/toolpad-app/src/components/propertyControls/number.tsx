@@ -18,7 +18,6 @@ function NumberPropEditor({ label, value, onChange, disabled }: EditorProps<numb
       type="number"
       onChange={handleChange}
       label={label}
-      size="small"
     />
   );
 }

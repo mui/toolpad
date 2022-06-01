@@ -122,18 +122,16 @@ function GridColumnsPropEditor({
               <Stack gap={1} py={1}>
                 <TextField
                   label="field"
-                  size="small"
                   value={editedColumn.field}
                   disabled={disabled}
                   onChange={(event) =>
                     handleColumnChange({ ...editedColumn, field: event.target.value })
                   }
                 />
-                <FormControl fullWidth size="small">
+                <FormControl fullWidth>
                   <InputLabel id={`select-type`}>type</InputLabel>
                   <Select
                     labelId={`select-type`}
-                    size="small"
                     label="type"
                     value={editedColumn.type ?? ''}
                     disabled={disabled}
@@ -148,11 +146,10 @@ function GridColumnsPropEditor({
                     ))}
                   </Select>
                 </FormControl>
-                <FormControl fullWidth size="small">
+                <FormControl fullWidth>
                   <InputLabel id={`select-align`}>align</InputLabel>
                   <Select
                     labelId={`select-align`}
-                    size="small"
                     label="align"
                     value={editedColumn.align ?? ''}
                     disabled={disabled}
@@ -172,7 +169,6 @@ function GridColumnsPropEditor({
                 </FormControl>
                 <TextField
                   label="width"
-                  size="small"
                   type="number"
                   value={editedColumn.width}
                   disabled={disabled}
@@ -206,7 +202,7 @@ function GridColumnsPropEditor({
                 ))}
                 <MenuItem onClick={handleCreateColumn({ field: 'new' })}>new column</MenuItem>
               </Menu>
-              <List dense>
+              <List>
                 {value.map((colDef, i) => {
                   return (
                     <ListItem

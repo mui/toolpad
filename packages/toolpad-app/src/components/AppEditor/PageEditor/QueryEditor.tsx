@@ -107,7 +107,7 @@ interface QueryNodeEditorProps<Q, P> {
   node: appDom.QueryNode<Q, P>;
 }
 
-function QueryNodeEditorDialog<Q, P, PQ>({
+function QueryNodeEditorDialog<Q, P>({
   open,
   node,
   onClose,
@@ -239,19 +239,6 @@ function QueryNodeEditorDialog<Q, P, PQ>({
     onClose();
   }, [onRemove, node, onClose]);
 
-  const fetchPrivate = React.useCallback(
-    (query: PQ | {}) => {
-      return client.query.dataSourceFetchPrivate(appId, connectionId, query);
-    },
-    [appId, connectionId],
-  );
-
-  const queryEditorApi = React.useMemo(() => {
-    return {
-      fetchPrivate,
-    };
-  }, [fetchPrivate]);
-
   const paramsObject: Record<string, any> = React.useMemo(() => {
     const liveParamValues: [string, any][] = liveParams.map(([name, result]) => [
       name,
@@ -317,7 +304,8 @@ function QueryNodeEditorDialog<Q, P, PQ>({
           <Divider />
           <Typography>Build query:</Typography>
           <dataSource.QueryEditor
-            api={queryEditorApi}
+            appId={appId}
+            connectionId={connectionId}
             value={input.attributes.query.value}
             onChange={handleQueryChange}
             globalScope={{ query: paramsObject }}

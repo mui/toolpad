@@ -1,10 +1,7 @@
-import { ApiResult, ServerDataSource, LegacyConnection } from '../../types';
+import { ApiResult, ServerDataSource } from '../../types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
 
-async function execPrivate(
-  connection: LegacyConnection<PostgresConnectionParams>,
-  query: any,
-): Promise<any> {
+async function execPrivate(connection: PostgresConnectionParams, query: any): Promise<any> {
   // eslint-disable-next-line no-console
   console.log(`executing private query "${query}"`);
   if (query === 'getAllTables') {
@@ -14,15 +11,12 @@ async function execPrivate(
 }
 
 async function exec(
-  connection: LegacyConnection<PostgresConnectionParams>,
+  connection: PostgresConnectionParams,
   postgresQuery: PostgresQuery,
 ): Promise<ApiResult<any>> {
-  if (!connection.params) {
-    throw new Error(`Connection not initialized`);
-  }
   // eslint-disable-next-line no-console
   console.log(
-    `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection.params.host}"`,
+    `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection.host}"`,
   );
   return {
     data: [],

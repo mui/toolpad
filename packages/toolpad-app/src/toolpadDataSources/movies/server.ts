@@ -1,9 +1,9 @@
 import moviesData from '../../../movies.json';
-import { LegacyConnection, ApiResult, ServerDataSource } from '../../types';
+import { ApiResult, ServerDataSource } from '../../types';
 import { MoviesConnectionParams, MoviesQuery, Movie } from './types';
 
 async function exec(
-  connection: LegacyConnection<MoviesConnectionParams>,
+  connection: MoviesConnectionParams,
   moviesQuery: MoviesQuery,
 ): Promise<ApiResult<Movie[]>> {
   const data = moviesData.movies.filter((movie) =>

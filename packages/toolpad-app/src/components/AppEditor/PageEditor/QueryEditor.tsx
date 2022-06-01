@@ -119,7 +119,7 @@ function QueryNodeEditorDialog<Q, P, PQ>({
   const [input, setInput] = React.useState(node);
   React.useEffect(() => setInput(node), [node]);
 
-  const conectionId = node.attributes.connectionId.value;
+  const connectionId = input.attributes.connectionId.value;
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
@@ -239,12 +239,18 @@ function QueryNodeEditorDialog<Q, P, PQ>({
     onClose();
   }, [onRemove, node, onClose]);
 
+  const fetchPrivate = React.useCallback(
+    (query: PQ | {}) => {
+      return client.query.dataSourceFetchPrivate(appId, connectionId, query);
+    },
+    [appId, connectionId],
+  );
+
   const queryEditorApi = React.useMemo(() => {
     return {
-      fetchPrivate: async (query: PQ | {}) =>
-        client.query.dataSourceFetchPrivate(appId, conectionId, query),
+      fetchPrivate,
     };
-  }, [appId, conectionId]);
+  }, [fetchPrivate]);
 
   const paramsObject: Record<string, any> = React.useMemo(() => {
     const liveParamValues: [string, any][] = liveParams.map(([name, result]) => [

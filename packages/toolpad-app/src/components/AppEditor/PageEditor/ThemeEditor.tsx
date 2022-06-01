@@ -8,12 +8,22 @@ import {
   Button,
   ToggleButtonGroup,
   ToggleButton,
+  styled,
 } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import * as appDom from '../../../appDom';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
+
+const IconToggleButton = styled(ToggleButton)({
+  display: 'flex',
+  justifyContent: 'center',
+  width: '100%',
+  '& > *': {
+    marginRight: '8px',
+  },
+});
 
 const THEME_COLORS = [
   'red',
@@ -96,12 +106,14 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
             }}
             aria-label="Mode"
           >
-            <ToggleButton value="light" aria-label="light">
+            <IconToggleButton value="light" aria-label="light">
               <LightModeIcon />
-            </ToggleButton>
-            <ToggleButton value="dark" aria-label="dark">
+              Light
+            </IconToggleButton>
+            <IconToggleButton value="dark" aria-label="dark">
               <DarkModeIcon />
-            </ToggleButton>
+              Dark
+            </IconToggleButton>
           </ToggleButtonGroup>
           <PaletteColorPicker
             name="primary"

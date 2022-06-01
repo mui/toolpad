@@ -85,9 +85,10 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           position: 'absolute',
           top: 0,
           bottom: 0,
-          background: 'white',
+          backgroundColor: 'background.default',
           borderRight: 1,
           borderColor: 'divider',
+          zIndex: 1,
         }}
       >
         <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>

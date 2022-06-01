@@ -1,5 +1,16 @@
 import * as React from 'react';
-import { FormControl, InputLabel, Select, MenuItem, Stack, Button } from '@mui/material';
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Stack,
+  Button,
+  ToggleButtonGroup,
+  ToggleButton,
+} from '@mui/material';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 import * as appDom from '../../../appDom';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -73,6 +84,25 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
     <div className={className}>
       {theme ? (
         <Stack spacing={2}>
+          <ToggleButtonGroup
+            size="small"
+            exclusive
+            value={appDom.fromConstPropValue(theme.theme['palette.mode']) || 'light'}
+            onChange={(event, newValue) => {
+              domApi.setNodeNamespacedProp(theme, 'theme', 'palette.mode', {
+                type: 'const',
+                value: newValue,
+              });
+            }}
+            aria-label="Mode"
+          >
+            <ToggleButton value="light" aria-label="light">
+              <LightModeIcon />
+            </ToggleButton>
+            <ToggleButton value="dark" aria-label="dark">
+              <DarkModeIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
           <PaletteColorPicker
             name="primary"
             value={appDom.fromConstPropValue(theme.theme['palette.primary.main']) || ''}

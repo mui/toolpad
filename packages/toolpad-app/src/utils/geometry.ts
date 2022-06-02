@@ -156,10 +156,10 @@ export function getRectPointZone(
   const fractionalY = y / rectHeight;
   const centerAreaFractionHalf = centerAreaFraction / 2;
   if (
-    fractionalX > centerAreaFractionHalf &&
-    fractionalX < 1 - centerAreaFractionHalf &&
-    fractionalY > centerAreaFractionHalf &&
-    fractionalY < 1 - centerAreaFractionHalf
+    fractionalX >= 0.5 - centerAreaFractionHalf &&
+    fractionalX <= 0.5 + centerAreaFractionHalf &&
+    fractionalY >= 0.5 - centerAreaFractionHalf &&
+    fractionalY <= 0.5 + centerAreaFractionHalf
   ) {
     return RectZone.CENTER;
   }

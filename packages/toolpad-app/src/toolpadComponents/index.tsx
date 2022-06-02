@@ -70,3 +70,7 @@ export function isPageRow(elementNode: appDom.ElementNode): boolean {
 export function isPageColumn(elementNode: appDom.ElementNode): boolean {
   return getElementNodeComponentId(elementNode) === PAGE_COLUMN_COMPONENT_ID;
 }
+
+export function isPageLayoutComponent(elementNode: appDom.ElementNode): boolean {
+  return isPageRow(elementNode) || isPageColumn(elementNode);
+}

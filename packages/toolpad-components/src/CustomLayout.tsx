@@ -13,10 +13,10 @@ function CustomLayout({ child1, child2, child3 }: CustomLayoutProps) {
   return (
     <Grid container>
       <Grid item>
-        <Placeholder prop="child1">{child1}</Placeholder>
+        <Placeholder>{child1}</Placeholder>
       </Grid>
       <Grid item>
-        <Placeholder prop="child2">{child2}</Placeholder>
+        <Placeholder>{child2}</Placeholder>
       </Grid>
       <Grid item>{child3}</Grid>
     </Grid>

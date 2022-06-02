@@ -187,10 +187,10 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     if (argType?.typeDef.type === 'element') {
       if (argType.control?.type === 'slots') {
         const value = props[propName];
-        props[propName] = <Slots prop={propName}>{value}</Slots>;
+        props[propName] = <Slots>{value}</Slots>;
       } else if (argType.control?.type === 'slot') {
         const value = props[propName];
-        props[propName] = <Placeholder prop={propName}>{value}</Placeholder>;
+        props[propName] = <Placeholder>{value}</Placeholder>;
       }
     }
   }

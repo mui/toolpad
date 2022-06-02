@@ -29,7 +29,6 @@ import {
   isPageColumn,
   PAGE_COLUMN_COMPONENT_ID,
   PAGE_ROW_COMPONENT_ID,
-  isPageLayoutComponent,
 } from '../../../toolpadComponents';
 
 const classes = {
@@ -62,6 +61,7 @@ const overlayClasses = {
   selectionHint: 'Toolpad_SelectionHint',
   hudOverlay: 'Toolpad_HudOverlay',
 };
+
 export function getHighlightedZoneOverlayClass(
   highlightedZone: RectZone,
 ): typeof overlayClasses[keyof typeof overlayClasses] | null {
@@ -165,6 +165,16 @@ const OverlayRoot = styled('div')({
   },
 });
 
+const EmptyDropZone = styled('div')({
+  alignItems: 'center',
+  border: '1px solid green',
+  color: 'green',
+  display: 'flex',
+  fontSize: 20,
+  justifyContent: 'center',
+  position: 'absolute',
+});
+
 function findNodeAt(
   nodes: readonly appDom.AppDomNode[],
   nodesInfo: NodesInfo,
@@ -190,6 +200,7 @@ interface SelectionHudProps {
   allowInteraction?: boolean;
   onDragStart?: React.DragEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLButtonElement>;
+  hasEmptyContainer: boolean;
 }
 
 function NodeHud({
@@ -200,6 +211,7 @@ function NodeHud({
   rect,
   onDragStart,
   onDelete,
+  hasEmptyContainer,
 }: SelectionHudProps) {
   const dom = useDom();
 
@@ -213,26 +225,31 @@ function NodeHud({
     highlightedZone && getHighlightedZoneOverlayClass(highlightedZone);
 
   return (
-    <div
-      draggable
-      data-node-id={node.id}
-      onDragStart={onDragStart}
-      style={absolutePositionCss(rect)}
-      className={clsx(overlayClasses.nodeHud, {
-        [overlayClasses.layout]: isLayoutComponent,
-        ...(highlightedZoneOverlayClass ? { [highlightedZoneOverlayClass]: true } : {}),
-        [overlayClasses.selected]: selected,
-        [overlayClasses.allowNodeInteraction]: allowInteraction,
-      })}
-    >
-      <div draggable className={overlayClasses.selectionHint}>
-        {component?.displayName || '<unknown>'}
-        <DragIndicatorIcon color="inherit" />
-        <IconButton aria-label="Remove element" color="inherit" onClick={onDelete}>
-          <DeleteIcon color="inherit" />
-        </IconButton>
+    <React.Fragment>
+      {hasEmptyContainer ? (
+        <EmptyDropZone style={absolutePositionCss(rect)}>+</EmptyDropZone>
+      ) : null}
+      <div
+        draggable
+        data-node-id={node.id}
+        onDragStart={onDragStart}
+        style={absolutePositionCss(rect)}
+        className={clsx(overlayClasses.nodeHud, {
+          [overlayClasses.layout]: isLayoutComponent,
+          ...(highlightedZoneOverlayClass ? { [highlightedZoneOverlayClass]: true } : {}),
+          [overlayClasses.selected]: selected,
+          [overlayClasses.allowNodeInteraction]: allowInteraction,
+        })}
+      >
+        <div draggable className={overlayClasses.selectionHint}>
+          {component?.displayName || '<unknown>'}
+          <DragIndicatorIcon color="inherit" />
+          <IconButton aria-label="Remove element" color="inherit" onClick={onDelete}>
+            <DeleteIcon color="inherit" />
+          </IconButton>
+        </div>
       </div>
-    </div>
+    </React.Fragment>
   );
 }
 
@@ -282,6 +299,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       return null;
     },
     [],
+  );
+
+  const hasContainerComponent = React.useCallback(
+    (node: appDom.AppDomNode) => {
+      const nodeInfo = nodesInfo[node.id];
+
+      if (nodeInfo) {
+        const componentArgTypes: ArgTypeDefinitions<any> | undefined =
+          nodeInfo.componentConfig?.argTypes;
+        const childrenControlType = componentArgTypes?.children?.control?.type;
+
+        return childrenControlType === 'slot' || childrenControlType === 'slots';
+      }
+      return false;
+    },
+    [nodesInfo],
   );
 
   const handleDragStart = React.useCallback(
@@ -352,11 +385,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         const isDraggingOverPage = appDom.isPage(activeDropNode);
 
-        const componentArgTypes: ArgTypeDefinitions<any> | undefined =
-          activeDropNodeInfo.componentConfig?.argTypes;
-        const childrenControlType = componentArgTypes?.children?.control?.type;
-        const isDraggingOverContainer =
-          childrenControlType === 'slot' || childrenControlType === 'slots';
+        const isDraggingOverContainer = hasContainerComponent(activeDropNode);
 
         let centerAreaFraction = 0;
         if (isDraggingOverContainer) {
@@ -398,6 +427,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       dragOverNodeId,
       dragOverNodeZone,
       availableDropTargetIds,
+      hasContainerComponent,
       api,
     ],
   );
@@ -427,9 +457,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
         // Is dragging over own element center
         if (node.id === dragOverNodeId) {
-          const nodeChildren = appDom.isElement(node)
-            ? appDom.getChildNodes(dom, node).children
-            : [];
+          const nodeChildren =
+            (appDom.isElement(node) && appDom.getChildNodes(dom, node).children) || [];
 
           return nodeChildren && nodeChildren.length === 0 ? RectZone.CENTER : null;
         }
@@ -777,19 +806,29 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               return null;
             }
 
-            const hasPageNodeHub = pageNodes.length === 1 && appDom.isPage(node);
+            const isPageNodeHub = pageNodes.length === 1;
+
+            const hasContainerElement = hasContainerComponent(node);
+
+            let isEmptyContainerElement = false;
+            if (hasContainerElement) {
+              const childNodes =
+                (appDom.isElement(node) && appDom.getChildNodes(dom, node).children) || [];
+              isEmptyContainerElement = childNodes.length === 0;
+            }
 
             return (
               <React.Fragment key={node.id}>
-                {hasPageNodeHub || appDom.isElement(node) ? (
+                {isPageNodeHub || appDom.isElement(node) ? (
                   <NodeHud
                     node={node}
                     rect={nodeLayout.rect}
                     highlightedZone={getNodeHighlightedZone(node)}
                     selected={selectedNode?.id === node.id}
-                    allowInteraction={hasPageNodeHub ? false : nodesWithInteraction.has(node.id)}
+                    allowInteraction={isPageNodeHub ? false : nodesWithInteraction.has(node.id)}
                     onDragStart={handleDragStart}
                     onDelete={() => handleDelete(node.id)}
+                    hasEmptyContainer={isEmptyContainerElement}
                   />
                 ) : null}
               </React.Fragment>

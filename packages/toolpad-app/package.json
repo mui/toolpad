@@ -63,6 +63,7 @@
     "next": "^12.1.4",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.6.2",
+    "pretty-bytes": "^6.0.0",
     "prisma": "^3.13.0",
     "quickjs-emscripten": "^0.20.0",
     "react": "^18.1.0",

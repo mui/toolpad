@@ -160,7 +160,7 @@ export function BindingEditor<V>({
 
   const TooltipComponent = error ? ErrorTooltip : Tooltip;
   const tooltipTitle: string =
-    error ?? (hasBinding ? `Update "${label}" binding...` : `Bind "${label}"...`);
+    error ?? (hasBinding ? `Update "${label}" binding…` : `Bind "${label}"…`);
   const bindingButtonWithTooltip = disabled ? (
     bindingButton
   ) : (

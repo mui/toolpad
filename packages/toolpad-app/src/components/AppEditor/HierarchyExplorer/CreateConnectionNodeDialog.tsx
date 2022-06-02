@@ -58,11 +58,10 @@ export default function CreateConnectionDialog({
       >
         <DialogTitle>Create a new MUI Toolpad Connection</DialogTitle>
         <DialogContent>
-          <FormControl sx={{ my: 1 }} size="small" fullWidth>
+          <FormControl sx={{ my: 1 }} fullWidth>
             <InputLabel id="select-connection-type">Type</InputLabel>
             <Select
               labelId="select-connection-type"
-              size="small"
               value={dataSourceType}
               label="Type"
               onChange={(event) => setDataSourceType(event.target.value)}

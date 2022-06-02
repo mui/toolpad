@@ -31,4 +31,13 @@ module.exports = {
       },
     ];
   },
+
+  async rewrites() {
+    return [
+      {
+        source: '/health-check',
+        destination: '/api/health-check',
+      },
+    ];
+  },
 };

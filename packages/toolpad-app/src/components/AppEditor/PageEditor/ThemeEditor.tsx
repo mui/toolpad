@@ -50,11 +50,10 @@ interface PaletteColorPickerProps extends WithControlledProp<string> {
 
 function PaletteColorPicker({ name, value, onChange }: PaletteColorPickerProps) {
   return (
-    <FormControl size="small" fullWidth>
+    <FormControl fullWidth>
       <InputLabel id="select-color">{name}</InputLabel>
       <Select
         labelId="select-color"
-        size="small"
         value={value}
         label={name}
         onChange={(event) => onChange(event.target.value)}

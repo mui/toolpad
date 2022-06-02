@@ -37,7 +37,6 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
     <TextField
       sx={sx}
       fullWidth
-      size="small"
       label="name"
       value={nameInput}
       onChange={handleNameInputChange}

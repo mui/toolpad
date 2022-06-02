@@ -44,10 +44,9 @@ export function ConnectionSelect({ dataSource, value, onChange }: ConnectionSele
   );
 
   return (
-    <FormControl size="small" fullWidth>
+    <FormControl fullWidth>
       <InputLabel id="select-connection-type">Connection</InputLabel>
       <Select
-        size="small"
         fullWidth
         value={value || ''}
         labelId="select-connection-type"

@@ -109,7 +109,6 @@ export default function StringRecordEditor({
           {editedField === field ? (
             <TextField
               label={valueLabel}
-              size="small"
               value={editedFieldNewName}
               autoFocus
               onChange={(event) => setEditedFieldNewName(event.target.value)}
@@ -137,13 +136,12 @@ export default function StringRecordEditor({
           )}
           <TextField
             label={valueLabel}
-            size="small"
             value={fieldValue}
             onChange={handleFieldValueChange(field)}
           />
 
-          <IconButton aria-label="Delete property" onClick={handleRemove(field)} size="small">
-            <DeleteIcon fontSize="small" />
+          <IconButton aria-label="Delete property" onClick={handleRemove(field)}>
+            <DeleteIcon />
           </IconButton>
         </React.Fragment>
       ))}
@@ -151,7 +149,6 @@ export default function StringRecordEditor({
       <form autoComplete="off" style={{ display: 'contents' }} onSubmit={handleSubmit}>
         <TextField
           inputRef={fieldInputRef}
-          size="small"
           label={fieldLabel}
           value={newFieldName}
           onChange={(event) => setNewFieldName(event.target.value)}
@@ -159,18 +156,12 @@ export default function StringRecordEditor({
           error={!isValidNewFieldName}
         />
         <TextField
-          size="small"
           label={valueLabel}
           value={newFieldValue}
           onChange={(event) => setNewFieldValue(event.target.value)}
         />
-        <IconButton
-          aria-label="Add property"
-          size="small"
-          disabled={!isValidNewFieldParams}
-          type="submit"
-        >
-          <AddIcon fontSize="small" />
+        <IconButton aria-label="Add property" disabled={!isValidNewFieldParams} type="submit">
+          <AddIcon />
         </IconButton>
       </form>
     </Box>

@@ -49,13 +49,13 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
             {labelText}
           </Typography>
           {onCreate ? (
-            <IconButton aria-label={`Create ${labelText}`} size="small" onClick={onCreate}>
-              <AddIcon fontSize="small" />
+            <IconButton aria-label={`Create ${labelText}`} onClick={onCreate}>
+              <AddIcon />
             </IconButton>
           ) : null}
           {onDelete ? (
-            <IconButton aria-label={`Delete ${labelText}`} size="small" onClick={onDelete}>
-              <DeleteIcon fontSize="small" />
+            <IconButton aria-label={`Delete ${labelText}`} onClick={onDelete}>
+              <DeleteIcon />
             </IconButton>
           ) : null}
         </Box>

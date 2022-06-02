@@ -128,15 +128,10 @@ function AppCard({ app, onDelete }: AppCardProps) {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button
-          size="small"
-          component="a"
-          href={app ? `/_toolpad/app/${app.id}/editor` : ''}
-          disabled={!app}
-        >
+        <Button component="a" href={app ? `/_toolpad/app/${app.id}/editor` : ''} disabled={!app}>
           Edit
         </Button>
-        <Button size="small" disabled={!app} onClick={onDelete}>
+        <Button disabled={!app} onClick={onDelete}>
           delete
         </Button>
       </CardActions>

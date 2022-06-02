@@ -318,7 +318,6 @@ function QueryNodeEditorDialog<Q, P>({
                 <FormControlLabel
                   control={
                     <Checkbox
-                      size="small"
                       checked={input.attributes.refetchOnWindowFocus?.value ?? true}
                       onChange={handleRefetchOnWindowFocusChange}
                     />
@@ -328,7 +327,6 @@ function QueryNodeEditorDialog<Q, P>({
                 <FormControlLabel
                   control={
                     <Checkbox
-                      size="small"
                       checked={input.attributes.refetchOnReconnect?.value ?? true}
                       onChange={handleRefetchOnReconnectChange}
                     />
@@ -340,7 +338,6 @@ function QueryNodeEditorDialog<Q, P>({
                     startAdornment: <InputAdornment position="start">s</InputAdornment>,
                   }}
                   sx={{ maxWidth: 300 }}
-                  size="small"
                   type="number"
                   label="Refetch interval"
                   value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
@@ -354,7 +351,6 @@ function QueryNodeEditorDialog<Q, P>({
                   label="Transform API response"
                   control={
                     <Checkbox
-                      size="small"
                       checked={input.attributes.transformEnabled?.value ?? false}
                       onChange={handleTransformEnabledChange}
                       inputProps={{ 'aria-label': 'controlled' }}

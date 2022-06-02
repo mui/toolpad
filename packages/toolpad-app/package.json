@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "yarn prisma generate && concurrently \"yarn:build:*\" && rimraf ./.next/cache",
-    "start": "yarn waitForDb && NODE_ENV=production node ./server.js",
+    "start": "yarn waitForDb && yarn prisma migrate deploy && NODE_ENV=production node ./server.js",
     "dev": "yarn prisma generate && yarn waitForDb && yarn prisma db push --skip-generate && concurrently \"yarn:dev:*\"",
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",

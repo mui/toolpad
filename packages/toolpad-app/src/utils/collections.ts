@@ -36,9 +36,7 @@ export function mapKeys<U>(
   return mapProperties(obj, ([key, value]) => [mapper(key), value]);
 }
 
-export function mapValues(obj: any, mapper: (old: any) => any): any;
-export function mapValues<U, V>(obj: Record<string, U>, mapper: (old: U) => V): Record<string, V>;
-export function mapValues<U, V>(obj: Record<string, U>, mapper: (old: U) => V): Record<string, V> {
+export function mapValues<P, V>(obj: P, mapper: (old: P[keyof P]) => V): Record<keyof P, V> {
   return mapProperties(obj, ([key, value]) => [key, mapper(value)]);
 }
 

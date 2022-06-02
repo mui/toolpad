@@ -70,6 +70,7 @@ export default function ParametersEditor({
               server={server}
               globalScope={globalScope}
               label={field}
+              propType={{ type: 'string' }}
               value={fieldValue}
               onChange={(newBinding) =>
                 onChange(

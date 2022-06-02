@@ -36,7 +36,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   label: string;
   disabled?: boolean;
   server?: boolean;
-  propType?: PropValueType;
+  propType: PropValueType;
   renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
@@ -86,7 +86,7 @@ export default function BindableEditor<V>({
           propType={propType}
           value={value}
           onChange={onChange}
-          disabled={!disabled}
+          disabled={disabled}
           liveBinding={liveBinding}
         />
       </React.Fragment>

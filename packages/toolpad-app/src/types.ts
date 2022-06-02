@@ -7,6 +7,7 @@ import {
   RuntimeError,
   ComponentConfig,
 } from '@mui/toolpad-core';
+import { PaletteMode } from '@mui/material';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
@@ -150,6 +151,7 @@ export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
 export type ResolvedProps = Record<string, PropExpression | undefined>;
 
 export interface AppTheme {
+  'palette.mode'?: PaletteMode;
   'palette.primary.main'?: string;
   'palette.secondary.main'?: string;
 }

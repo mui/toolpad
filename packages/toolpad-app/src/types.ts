@@ -7,7 +7,7 @@ import {
   RuntimeError,
   ComponentConfig,
 } from '@mui/toolpad-core';
-import type { Branded, WithControlledProp } from './utils/types';
+import type { Branded, Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
 export interface EditorProps<T> {
@@ -87,13 +87,14 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorProps<Q> extends WithControlledProp<Q> {
+export interface QueryEditorProps<P, Q> extends WithControlledProp<Q> {
   appId: string;
   connectionId: NodeId;
+  connectionParams: Maybe<P>;
   globalScope: Record<string, any>;
 }
 
-export type QueryEditor<Q = {}> = React.FC<QueryEditorProps<Q>>;
+export type QueryEditor<P, Q = {}> = React.FC<QueryEditorProps<P, Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;
@@ -104,7 +105,7 @@ export interface ClientDataSource<P = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<P>;
   isConnectionValid: (connection: P) => boolean;
-  QueryEditor: QueryEditor<Q>;
+  QueryEditor: QueryEditor<P, Q>;
   getInitialQueryValue: () => Q;
   getArgTypes?: (query: Q) => ArgTypeDefinitions;
 }

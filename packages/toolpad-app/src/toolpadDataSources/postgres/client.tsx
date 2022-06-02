@@ -78,7 +78,10 @@ function ConnectionParamsInput({
   );
 }
 
-function QueryEditor({ value, onChange }: QueryEditorProps<PostgresQuery>) {
+function QueryEditor({
+  value,
+  onChange,
+}: QueryEditorProps<PostgresConnectionParams, PostgresQuery>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange({ ...value, text: event.target.value });

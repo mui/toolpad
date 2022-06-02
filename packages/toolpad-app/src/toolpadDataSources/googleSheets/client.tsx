@@ -30,7 +30,7 @@ function QueryEditor({
   connectionId,
   value,
   onChange,
-}: QueryEditorProps<GoogleSheetsApiQuery>) {
+}: QueryEditorProps<GoogleSheetsConnectionParams, GoogleSheetsApiQuery>) {
   const [spreadsheetQuery, setSpreadsheetQuery] = React.useState<string | null>(null);
 
   const debouncedSpreadsheetQuery = useDebounced(spreadsheetQuery, 300);

@@ -12,9 +12,9 @@ import {
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import data from '../../../movies.json';
-import { ClientDataSource, ConnectionEditorProps } from '../../types';
+import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { validation } from '../../utils/forms';
-import { Maybe, WithControlledProp } from '../../utils/types';
+import { Maybe } from '../../utils/types';
 import { MoviesQuery, MoviesConnectionParams } from './types';
 
 function withDefaults(value: Maybe<MoviesConnectionParams>): MoviesConnectionParams {
@@ -52,7 +52,10 @@ function isValid(connection: MoviesConnectionParams): boolean {
   return !!connection.apiKey;
 }
 
-export function QueryEditor({ value, onChange }: WithControlledProp<MoviesQuery>) {
+export function QueryEditor({
+  value,
+  onChange,
+}: QueryEditorProps<MoviesConnectionParams, MoviesQuery>) {
   const handleChange = React.useCallback(
     (event: SelectChangeEvent<string>) => {
       onChange({ ...value, genre: event.target.value || null });

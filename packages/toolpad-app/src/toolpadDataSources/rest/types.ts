@@ -1,7 +1,7 @@
 import { BindableAttrValue } from '@mui/toolpad-core';
 
 export interface RestConnectionParams {
-  url?: string;
+  baseUrl?: string;
   headers?: [string, string][];
 }
 

@@ -14,7 +14,7 @@ function ConnectionParamsInput({
   value: valueProp,
   onChange,
 }: ConnectionEditorProps<RestConnectionParams>) {
-  const [input, setInput] = React.useState(valueProp || { url: '', headers: [] });
+  const [input, setInput] = React.useState(valueProp || { baseUrl: '', headers: [] });
   React.useEffect(() => setInput((existing) => valueProp ?? existing), [valueProp]);
 
   return (
@@ -23,22 +23,30 @@ function ConnectionParamsInput({
         <Button onClick={() => onChange(input)}>Save</Button>
       </Toolbar>
       <TextField
-        label="url"
-        size="small"
-        value={input.url}
-        onChange={(newUrl) => setInput((existing) => ({ ...existing, url: newUrl.target.value }))}
+        label="base url"
+        value={input.baseUrl}
+        onChange={(newUrl) =>
+          setInput((existing) => ({ ...existing, baseUrl: newUrl.target.value }))
+        }
       />
       <Typography>headers:</Typography>
       <MapEntriesEditor
         value={input.headers || EMPTY_ARRAY}
         onChange={(newHeaders) => setInput((existing) => ({ ...existing, headers: newHeaders }))}
-        disabled={!input.url}
+        disabled={!input.baseUrl}
       />
     </Stack>
   );
 }
 
-function QueryEditor({ globalScope, value, onChange }: QueryEditorProps<FetchQuery>) {
+function QueryEditor({
+  globalScope,
+  connectionParams,
+  value,
+  onChange,
+}: QueryEditorProps<RestConnectionParams, FetchQuery>) {
+  const baseUrl = connectionParams?.baseUrl;
+
   const handleUrlChange = React.useCallback(
     (newValue: BindableAttrValue<string> | null) => {
       onChange({ ...value, url: newValue || { type: 'const', value: '' } });

@@ -1,12 +1,44 @@
 import * as React from 'react';
 import { ArgTypeDefinitions, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
-import { Button, Stack, TextField, Toolbar, Typography } from '@mui/material';
+import { Button, InputAdornment, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import StringRecordEditor from '../../components/StringRecordEditor';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
-import BindableEditor from '../../components/AppEditor/PageEditor/BindableEditor';
+import BindableEditor, {
+  RenderControlParams,
+} from '../../components/AppEditor/PageEditor/BindableEditor';
 import { useEvaluateLiveBinding } from '../../components/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
+
+interface UrlControlProps extends RenderControlParams<string> {
+  baseUrl?: string;
+}
+
+function UrlControl({ label, disabled, baseUrl, value, onChange }: UrlControlProps) {
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(event.target.value);
+    },
+    [onChange],
+  );
+
+  return (
+    <TextField
+      fullWidth
+      value={value ?? ''}
+      disabled={disabled}
+      onChange={handleChange}
+      label={label}
+      InputProps={
+        baseUrl
+          ? {
+              startAdornment: <InputAdornment position="start">{baseUrl}</InputAdornment>,
+            }
+          : undefined
+      }
+    />
+  );
+}
 
 const EMPTY_ARRAY: [string, string][] = [];
 
@@ -78,6 +110,9 @@ function QueryEditor({
         server
         label="url"
         propType={{ type: 'string' }}
+        renderControl={(params) => {
+          return <UrlControl baseUrl={baseUrl} {...params} />;
+        }}
         value={value.url}
         onChange={handleUrlChange}
       />

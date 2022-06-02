@@ -77,7 +77,7 @@ function QueryEditor({
         globalScope={globalScope}
         server
         label="url"
-        argType={{ typeDef: { type: 'string' } }}
+        propType={{ type: 'string' }}
         value={value.url}
         onChange={handleUrlChange}
       />

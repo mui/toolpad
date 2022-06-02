@@ -41,7 +41,6 @@ function QueryEditor({ globalScope, value, onChange }: QueryEditorProps<FetchQue
         globalScope={globalScope}
         server
         label="url"
-        argType={{ typeDef: { type: 'string' } }}
         value={value.url}
         onChange={handleUrlChange}
       />

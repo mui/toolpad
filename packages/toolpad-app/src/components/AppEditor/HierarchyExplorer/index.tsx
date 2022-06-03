@@ -87,10 +87,6 @@ function findFirstSibling(dom: appDom.AppDom, node: appDom.AppDomNode) {
   );
 }
 
-function findFirstOfType(dom: appDom.AppDom, type: appDom.AppDomNode['type']) {
-  return Object.values(dom.nodes).find((node) => node.type === type);
-}
-
 function getLinkToNodeEditor(appId: string, node: appDom.AppDomNode): string | undefined {
   switch (node.type) {
     case 'page':
@@ -220,14 +216,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         const sibling = findFirstSibling(dom, deletedNode);
         if (sibling) {
           redirectAfterDelete = getLinkToNodeEditor(appId, sibling);
-        } else if (deletedNode.type !== 'page') {
-          const firstPage = findFirstOfType(dom, 'page');
-          if (firstPage) {
-            redirectAfterDelete = getLinkToNodeEditor(appId, firstPage);
-          }
-        }
-
-        if (!redirectAfterDelete) {
+        } else {
           redirectAfterDelete = `/app/${appId}/editor`;
         }
       }

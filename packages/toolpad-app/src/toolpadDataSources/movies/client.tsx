@@ -1,14 +1,4 @@
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Stack,
-  TextField,
-  Toolbar,
-} from '@mui/material';
+import { Button, MenuItem, Stack, TextField, Toolbar } from '@mui/material';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import data from '../../../movies.json';
@@ -54,29 +44,21 @@ function isValid(connection: MoviesConnectionParams): boolean {
 
 export function QueryEditor({ value, onChange }: WithControlledProp<MoviesQuery>) {
   const handleChange = React.useCallback(
-    (event: SelectChangeEvent<string>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange({ ...value, genre: event.target.value || null });
     },
     [value, onChange],
   );
   return (
     <Stack>
-      <FormControl fullWidth>
-        <InputLabel id="select-movie-genre">Genre</InputLabel>
-        <Select
-          labelId="select-movie-genre"
-          value={value.genre || ''}
-          label="Genre"
-          onChange={handleChange}
-        >
-          <MenuItem value={''}>Any</MenuItem>
-          {data.genres.map((genre) => (
-            <MenuItem key={genre} value={genre}>
-              {genre}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <TextField select fullWidth value={value.genre || ''} label="Genre" onChange={handleChange}>
+        <MenuItem value={''}>Any</MenuItem>
+        {data.genres.map((genre) => (
+          <MenuItem key={genre} value={genre}>
+            {genre}
+          </MenuItem>
+        ))}
+      </TextField>
     </Stack>
   );
 }

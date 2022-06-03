@@ -172,8 +172,7 @@ function ApiEditorContent<Q>({ appId, className, apiNode }: ApiEditorContentProp
               <dataSource.QueryEditor
                 appId={appId}
                 connectionId={connection.id}
-                // TODO: Add disabled mode to QueryEditor
-                // disabled={!connection}
+                connectionParams={connection.attributes.params.value}
                 value={apiQuery}
                 onChange={(newApiQuery) => setApiQuery(newApiQuery)}
                 globalScope={{}}

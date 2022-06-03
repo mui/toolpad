@@ -3,17 +3,21 @@ import { Grid, MenuItem, Stack, TextField } from '@mui/material';
 import { ApiKeyAuth, Authentication, BasicAuth, BearerTokenAuth } from './types';
 import { Maybe, WithControlledProp } from '../../utils/types';
 
-interface ApiKeyAuthEditorProps extends WithControlledProp<ApiKeyAuth> {}
+interface AuthMethodEditorProps<T> extends WithControlledProp<T> {
+  disabled?: boolean;
+}
 
-function ApiKeyAuthEditor({ value, onChange }: ApiKeyAuthEditorProps) {
+function ApiKeyAuthEditor({ disabled, value, onChange }: AuthMethodEditorProps<ApiKeyAuth>) {
   return (
     <Stack gap={1}>
       <TextField
+        disabled={disabled}
         label="header"
         value={value.header}
         onChange={(event) => onChange({ ...value, header: event.target.value })}
       />
       <TextField
+        disabled={disabled}
         label="key"
         value={value.key}
         onChange={(event) => onChange({ ...value, key: event.target.value })}
@@ -21,13 +25,15 @@ function ApiKeyAuthEditor({ value, onChange }: ApiKeyAuthEditorProps) {
     </Stack>
   );
 }
-
-interface BearerTokenAuthEditorProps extends WithControlledProp<BearerTokenAuth> {}
-
-function BearerTokenAuthEditor({ value, onChange }: BearerTokenAuthEditorProps) {
+function BearerTokenAuthEditor({
+  disabled,
+  value,
+  onChange,
+}: AuthMethodEditorProps<BearerTokenAuth>) {
   return (
     <Stack gap={1}>
       <TextField
+        disabled={disabled}
         label="token"
         value={value.token}
         onChange={(event) => onChange({ ...value, token: event.target.value })}
@@ -36,17 +42,17 @@ function BearerTokenAuthEditor({ value, onChange }: BearerTokenAuthEditorProps) 
   );
 }
 
-interface BasicAuthEditorProps extends WithControlledProp<BasicAuth> {}
-
-function BasicAuthEditor({ value, onChange }: BasicAuthEditorProps) {
+function BasicAuthEditor({ disabled, value, onChange }: AuthMethodEditorProps<BasicAuth>) {
   return (
     <Stack gap={1}>
       <TextField
+        disabled={disabled}
         label="user"
         value={value.user}
         onChange={(event) => onChange({ ...value, user: event.target.value })}
       />
       <TextField
+        disabled={disabled}
         label="password"
         value={value.password}
         onChange={(event) => onChange({ ...value, password: event.target.value })}
@@ -55,9 +61,7 @@ function BasicAuthEditor({ value, onChange }: BasicAuthEditorProps) {
   );
 }
 
-interface AuthenticationDetailsEditorProps extends WithControlledProp<Authentication> {}
-
-function AuthenticationDetailsEditor({ value, ...props }: AuthenticationDetailsEditorProps) {
+function AuthenticationDetailsEditor({ value, ...props }: AuthMethodEditorProps<Authentication>) {
   switch (value.type) {
     case 'basic':
       return <BasicAuthEditor value={value} {...props} />;
@@ -86,9 +90,15 @@ function getInitialAuthenticationValue(type: string): Maybe<Authentication> {
   }
 }
 
-export interface AuthenticationEditorProps extends WithControlledProp<Maybe<Authentication>> {}
+export interface AuthenticationEditorProps extends WithControlledProp<Maybe<Authentication>> {
+  disabled?: boolean;
+}
 
-export default function AuthenticationEditor({ value, onChange }: AuthenticationEditorProps) {
+export default function AuthenticationEditor({
+  disabled,
+  value,
+  onChange,
+}: AuthenticationEditorProps) {
   const handleTypeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       onChange(getInitialAuthenticationValue(event.target.value));
@@ -100,6 +110,7 @@ export default function AuthenticationEditor({ value, onChange }: Authentication
     <Grid container spacing={1}>
       <Grid item xs={4}>
         <TextField
+          disabled={disabled}
           select
           label="authentication"
           value={value?.type || ''}
@@ -113,7 +124,9 @@ export default function AuthenticationEditor({ value, onChange }: Authentication
         </TextField>
       </Grid>
       <Grid item xs={4}>
-        {value ? <AuthenticationDetailsEditor value={value} onChange={onChange} /> : null}
+        {value ? (
+          <AuthenticationDetailsEditor disabled={disabled} value={value} onChange={onChange} />
+        ) : null}
       </Grid>
     </Grid>
   );

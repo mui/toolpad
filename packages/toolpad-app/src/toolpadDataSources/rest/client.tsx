@@ -69,12 +69,15 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
     }),
   );
 
+  const baseUrlValue = watch('baseUrl');
   const headersValue = watch('headers');
   const authenticationValue = watch('authentication');
   const authenticationHeaders = getAuthenticationHeaders(authenticationValue);
 
   const mustHaveBaseUrl: boolean =
     (headersValue && headersValue.length > 0) || !!authenticationValue;
+
+  const headersAllowed = !!baseUrlValue;
 
   return (
     <Stack direction="column" gap={1}>
@@ -113,8 +116,9 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
             const allHeaders = [...authenticationHeaders, ...fieldValue];
             return (
               <MapEntriesEditor
-                fieldLabel="header"
                 {...field}
+                disabled={!headersAllowed}
+                fieldLabel="header"
                 value={allHeaders}
                 onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
                 isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
@@ -127,7 +131,11 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
           name="authentication"
           control={control}
           render={({ field: { value: fieldValue, ref, ...field } }) => (
-            <AuthenticationEditor {...field} value={fieldValue ?? null} />
+            <AuthenticationEditor
+              {...field}
+              disabled={!headersAllowed}
+              value={fieldValue ?? null}
+            />
           )}
         />
       </Stack>

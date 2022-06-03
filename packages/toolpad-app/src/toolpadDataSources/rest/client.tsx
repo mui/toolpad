@@ -80,13 +80,16 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         <Controller
           name="headers"
           control={control}
-          render={({ field: { value: fieldValue = [], ref, ...field } }) => {
+          render={({
+            field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field },
+          }) => {
             const allHeaders = [...authenticationHeaders, ...fieldValue];
             return (
               <MapEntriesEditor
                 fieldLabel="header"
                 {...field}
                 value={allHeaders}
+                onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
                 isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
               />
             );

@@ -516,14 +516,14 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
     <AppRoot id={HTML_ID_APP_ROOT}>
       <NoSsr>
         <DomContextProvider value={dom}>
-          <CssBaseline />
-          <ErrorBoundary FallbackComponent={AppError}>
-            <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-              <React.Suspense fallback={<AppLoading />}>
-                <JsRuntimeProvider>
-                  <AppContextProvider value={appContext}>
-                    <QueryClientProvider client={queryClient}>
-                      <AppThemeProvider node={theme}>
+          <AppThemeProvider node={theme}>
+            <CssBaseline />
+            <ErrorBoundary FallbackComponent={AppError}>
+              <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                <React.Suspense fallback={<AppLoading />}>
+                  <JsRuntimeProvider>
+                    <AppContextProvider value={appContext}>
+                      <QueryClientProvider client={queryClient}>
                         <BrowserRouter basename={basename}>
                           <Routes>
                             <Route path="/" element={<Navigate replace to="/pages" />} />
@@ -541,13 +541,13 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
                             ))}
                           </Routes>
                         </BrowserRouter>
-                      </AppThemeProvider>
-                    </QueryClientProvider>
-                  </AppContextProvider>
-                </JsRuntimeProvider>
-              </React.Suspense>
-            </ResetNodeErrorsKeyProvider>
-          </ErrorBoundary>
+                      </QueryClientProvider>
+                    </AppContextProvider>
+                  </JsRuntimeProvider>
+                </React.Suspense>
+              </ResetNodeErrorsKeyProvider>
+            </ErrorBoundary>
+          </AppThemeProvider>
         </DomContextProvider>
       </NoSsr>
     </AppRoot>

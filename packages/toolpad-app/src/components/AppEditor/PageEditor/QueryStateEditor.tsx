@@ -4,13 +4,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
   List,
   ListItem,
-  SelectChangeEvent,
   DialogActions,
   Box,
   LinearProgress,
@@ -100,7 +96,7 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
   const { apis = [] } = appDom.getChildNodes(dom, app);
 
   const handleSelectionChange = React.useCallback(
-    (event: SelectChangeEvent<'' | NodeId>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       const apiNodeId = event.target.value ? (event.target.value as NodeId) : null;
       domApi.setNodeNamespacedProp(node, 'attributes', 'api', appDom.createConst(apiNodeId));
     },
@@ -155,22 +151,20 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
     <React.Fragment>
       <Stack spacing={1} py={1}>
         <NodeNameEditor node={node} />
-        <FormControl fullWidth>
-          <InputLabel id={`select-data-query`}>Query</InputLabel>
-          <Select
-            value={node.attributes.api.value || ''}
-            labelId="select-data-query"
-            label="Query"
-            onChange={handleSelectionChange}
-          >
-            <MenuItem value="">---</MenuItem>
-            {apis.map(({ id, name }) => (
-              <MenuItem key={id} value={id}>
-                {name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <TextField
+          select
+          fullWidth
+          value={node.attributes.api.value || ''}
+          label="Query"
+          onChange={handleSelectionChange}
+        >
+          <MenuItem value="">---</MenuItem>
+          {apis.map(({ id, name }) => (
+            <MenuItem key={id} value={id}>
+              {name}
+            </MenuItem>
+          ))}
+        </TextField>
         <ParamsEditor node={node} argTypes={argTypes} />
         <FormControlLabel
           control={

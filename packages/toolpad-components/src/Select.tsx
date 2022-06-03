@@ -1,13 +1,5 @@
-// TODO: Remove after https://github.com/DefinitelyTyped/DefinitelyTyped/pull/56210 lands
-/// <reference types="react/next" />
 import * as React from 'react';
-import {
-  FormControl,
-  InputLabel,
-  Select as MuiSelect,
-  SelectProps as MuiSelectProps,
-  MenuItem,
-} from '@mui/material';
+import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface Selectoption {
@@ -15,27 +7,22 @@ export interface Selectoption {
   label?: string;
 }
 
-export interface SelectProps extends MuiSelectProps {
+export type SelectProps = TextFieldProps & {
   options: (string | Selectoption)[];
-}
+};
 
-function Select({ sx, label, options, size, ...props }: SelectProps) {
-  const labelId = React.useId();
+function Select({ sx, options, ...props }: SelectProps) {
   return (
-    <FormControl size={size} sx={{ minWidth: 120, ...sx }}>
-      <InputLabel id={labelId}>{label}</InputLabel>
-      <MuiSelect labelId={labelId} label={label} {...props}>
-        {options.map((option) => {
-          const parsedOption: Selectoption =
-            typeof option === 'string' ? { value: option } : option;
-          return (
-            <MenuItem key={parsedOption.value} value={parsedOption.value}>
-              {parsedOption.label ?? parsedOption.value}
-            </MenuItem>
-          );
-        }) ?? null}
-      </MuiSelect>
-    </FormControl>
+    <TextField select sx={{ minWidth: 120, ...sx }} {...props}>
+      {options.map((option) => {
+        const parsedOption: Selectoption = typeof option === 'string' ? { value: option } : option;
+        return (
+          <MenuItem key={parsedOption.value} value={parsedOption.value}>
+            {parsedOption.label ?? parsedOption.value}
+          </MenuItem>
+        );
+      }) ?? null}
+    </TextField>
   );
 }
 

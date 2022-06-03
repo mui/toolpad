@@ -52,6 +52,7 @@ function BasicAuthEditor({ disabled, value, onChange }: AuthMethodEditorProps<Ba
         onChange={(event) => onChange({ ...value, user: event.target.value })}
       />
       <TextField
+        type="password"
         disabled={disabled}
         label="password"
         value={value.password}

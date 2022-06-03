@@ -36,6 +36,7 @@ function Header({ actions, navigation }: HeaderProps) {
     >
       <Toolbar>
         <IconButton
+          size="medium"
           edge="start"
           color="inherit"
           aria-label="Home"
@@ -43,7 +44,7 @@ function Header({ actions, navigation }: HeaderProps) {
           component="a"
           href={`/`}
         >
-          <MenuIcon />
+          <MenuIcon fontSize="medium" />
         </IconButton>
         <Typography
           data-test-id="brand"

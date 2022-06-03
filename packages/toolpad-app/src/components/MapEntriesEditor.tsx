@@ -120,7 +120,12 @@ export default function MapEntriesEditor<V = string>({
               disabled: entryDisabled,
             })}
 
-            <IconButton aria-label="Delete property" onClick={handleRemove(index)} size="small">
+            <IconButton
+              aria-label="Delete property"
+              onClick={handleRemove(index)}
+              size="small"
+              disabled={entryDisabled}
+            >
               <DeleteIcon fontSize="small" />
             </IconButton>
           </React.Fragment>

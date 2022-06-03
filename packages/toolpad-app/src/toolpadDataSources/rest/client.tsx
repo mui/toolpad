@@ -74,31 +74,33 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
           Save
         </Button>
       </Toolbar>
-      <TextField label="base url" {...register('baseUrl')} />
-      <Typography>Headers:</Typography>
-      <Controller
-        name="headers"
-        control={control}
-        render={({ field: { value: fieldValue = [], ref, ...field } }) => {
-          const allHeaders = [...authenticationHeaders, ...fieldValue];
-          return (
-            <MapEntriesEditor
-              fieldLabel="header"
-              {...field}
-              value={allHeaders}
-              isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
-            />
-          );
-        }}
-      />
-      <Typography>Authentication:</Typography>
-      <Controller
-        name="authentication"
-        control={control}
-        render={({ field: { value: fieldValue, ref, ...field } }) => (
-          <AuthenticationEditor {...field} value={fieldValue ?? null} />
-        )}
-      />
+      <Stack gap={3}>
+        <TextField label="base url" {...register('baseUrl')} />
+        <Typography>Headers:</Typography>
+        <Controller
+          name="headers"
+          control={control}
+          render={({ field: { value: fieldValue = [], ref, ...field } }) => {
+            const allHeaders = [...authenticationHeaders, ...fieldValue];
+            return (
+              <MapEntriesEditor
+                fieldLabel="header"
+                {...field}
+                value={allHeaders}
+                isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
+              />
+            );
+          }}
+        />
+        <Typography>Authentication:</Typography>
+        <Controller
+          name="authentication"
+          control={control}
+          render={({ field: { value: fieldValue, ref, ...field } }) => (
+            <AuthenticationEditor {...field} value={fieldValue ?? null} />
+          )}
+        />
+      </Stack>
     </Stack>
   );
 }

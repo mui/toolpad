@@ -64,40 +64,6 @@ const overlayClasses = {
   hudOverlay: 'Toolpad_HudOverlay',
 };
 
-export function getHighlightedZoneOverlayClass(
-  highlightedZone: RectZone,
-): typeof overlayClasses[keyof typeof overlayClasses] | null {
-  switch (highlightedZone) {
-    case RectZone.TOP:
-      return overlayClasses.highlightedTop;
-    case RectZone.RIGHT:
-      return overlayClasses.highlightedRight;
-    case RectZone.BOTTOM:
-      return overlayClasses.highlightedBottom;
-    case RectZone.LEFT:
-      return overlayClasses.highlightedLeft;
-    case RectZone.CENTER:
-      return overlayClasses.highlightedCenter;
-    default:
-      return null;
-  }
-}
-
-export function getChildNodeHighlightedZone(direction: FlowDirection): RectZone | null {
-  switch (direction) {
-    case 'row':
-      return RectZone.RIGHT;
-    case 'column':
-      return RectZone.BOTTOM;
-    case 'row-reverse':
-      return RectZone.LEFT;
-    case 'column-reverse':
-      return RectZone.TOP;
-    default:
-      return null;
-  }
-}
-
 const OverlayRoot = styled('div')({
   pointerEvents: 'none',
   width: '100%',
@@ -194,11 +160,53 @@ function findNodeAt(
   return null;
 }
 
+function getHighlightedZoneOverlayClass(
+  highlightedZone: RectZone,
+): typeof overlayClasses[keyof typeof overlayClasses] | null {
+  switch (highlightedZone) {
+    case RectZone.TOP:
+      return overlayClasses.highlightedTop;
+    case RectZone.RIGHT:
+      return overlayClasses.highlightedRight;
+    case RectZone.BOTTOM:
+      return overlayClasses.highlightedBottom;
+    case RectZone.LEFT:
+      return overlayClasses.highlightedLeft;
+    case RectZone.CENTER:
+      return overlayClasses.highlightedCenter;
+    default:
+      return null;
+  }
+}
+
+function getChildNodeHighlightedZone(direction: FlowDirection): RectZone | null {
+  switch (direction) {
+    case 'row':
+      return RectZone.RIGHT;
+    case 'column':
+      return RectZone.BOTTOM;
+    case 'row-reverse':
+      return RectZone.LEFT;
+    case 'column-reverse':
+      return RectZone.TOP;
+    default:
+      return null;
+  }
+}
+
 function hasContainerComponent(nodeInfo: NodeInfo): boolean {
   const componentArgTypes: ArgTypeDefinitions<any> | undefined = nodeInfo.componentConfig?.argTypes;
   const childrenControlType = componentArgTypes?.children?.control?.type;
 
   return childrenControlType === 'slot' || childrenControlType === 'slots';
+}
+
+function hasHorizontalContainer(nodeInfo: NodeInfo): boolean {
+  return nodeInfo.direction === 'row' || nodeInfo.direction === 'row-reverse';
+}
+
+function hasVerticalContainer(nodeInfo: NodeInfo): boolean {
+  return nodeInfo.direction === 'column' || nodeInfo.direction === 'column-reverse';
 }
 
 interface SelectionHudProps {
@@ -469,14 +477,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         !isPageColumn(parent)
       ) {
         if (
-          (parentNodeInfo.direction === 'row' || parentNodeInfo.direction === 'row-reverse') &&
+          hasHorizontalContainer(parentNodeInfo) &&
           (dragOverNodeZone === RectZone.TOP || dragOverNodeZone === RectZone.BOTTOM)
         ) {
           return null;
         }
         if (
-          (parentNodeInfo.direction === 'column' ||
-            parentNodeInfo.direction === 'column-reverse') &&
+          hasVerticalContainer(parentNodeInfo) &&
           (dragOverNodeZone === RectZone.RIGHT || dragOverNodeZone === RectZone.LEFT)
         ) {
           return null;
@@ -505,6 +512,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const dragOverNode = appDom.getNode(dom, dragOverNodeId);
 
       let parent = appDom.getParent(dom, dragOverNode);
+      const parentInfo = nodesInfo[parent.id];
       const originalParent = parent;
 
       const isDraggingOverPage = (dragOverNode && appDom.isPage(dragOverNode)) || false;
@@ -542,8 +550,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           domApi.addNode(draggedNode, dragOverNode, 'children', dragOverNode.parentIndex);
         }
 
+        const isOriginalParentRow = appDom.isElement(originalParent) && isPageRow(originalParent);
+        const isOriginalParentColumn =
+          appDom.isElement(originalParent) && isPageColumn(originalParent);
+
         if ([RectZone.TOP, RectZone.BOTTOM].includes(dragOverNodeZone)) {
-          const isOriginalParentRow = appDom.isElement(originalParent) && isPageRow(originalParent);
+          if (
+            !isOriginalParentRow &&
+            !isOriginalParentColumn &&
+            !hasVerticalContainer(parentInfo)
+          ) {
+            return;
+          }
 
           if (isOriginalParentRow && !isDraggingOverColumn) {
             const columnContainer = appDom.createElement(dom, PAGE_COLUMN_COMPONENT_ID, {});
@@ -566,8 +584,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
 
         if ([RectZone.RIGHT, RectZone.LEFT].includes(dragOverNodeZone)) {
-          const isOriginalParentColumn =
-            appDom.isElement(originalParent) && isPageColumn(originalParent);
+          if (
+            !isOriginalParentRow &&
+            !isOriginalParentColumn &&
+            !hasHorizontalContainer(parentInfo)
+          ) {
+            return;
+          }
 
           if (isOriginalParentColumn) {
             const stackContainer = appDom.createElement(dom, STACK_COMPONENT_ID, {});

@@ -3,10 +3,16 @@ import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { WithControlledProp } from '../utils/types';
 
-function renderStringValueEditor({ label, value, onChange }: RenderValueEditorParams<string>) {
+function renderStringValueEditor({
+  label,
+  disabled,
+  value,
+  onChange,
+}: RenderValueEditorParams<string>) {
   return (
     <TextField
       label={label}
+      disabled={disabled}
       size="small"
       value={value}
       onChange={(event) => onChange(event.target.value)}
@@ -39,6 +45,7 @@ export type MapEntriesEditorProps<V> = WithControlledProp<[string, V][]> & {
   autoFocus?: boolean;
   sx?: SxProps;
   disabled?: boolean;
+  isEntryDisabled?: (entry: [string, V], i: number) => boolean;
 } & MapEntriesEditorTypedProps<V>;
 
 export default function MapEntriesEditor<V = string>({
@@ -52,6 +59,7 @@ export default function MapEntriesEditor<V = string>({
   sx,
   renderValueEditor: renderValueEditorProp,
   disabled,
+  isEntryDisabled,
 }: MapEntriesEditorProps<V>) {
   const fieldInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -78,30 +86,38 @@ export default function MapEntriesEditor<V = string>({
   return (
     <Box sx={sx} display="grid" gridTemplateColumns="1fr 2fr auto" alignItems="center" gap={1}>
       {label ? <Box gridColumn="span 3">{label}:</Box> : null}
-      {value.map(([field, fieldValue], index) => {
+      {value.map((entry, index) => {
+        const [field, fieldValue] = entry;
+        const entryDisabled = disabled || isEntryDisabled?.(entry, index);
         return (
           <React.Fragment key={index}>
             <TextField
-              disabled={disabled}
-              label={valueLabel}
+              disabled={entryDisabled}
+              label={fieldLabel}
               size="small"
               value={field}
               autoFocus
               onChange={(event) =>
                 onChange(
-                  value.map((entry, i) => (i === index ? [event.target.value, entry[1]] : entry)),
+                  value.map((existingEntry, i) =>
+                    i === index ? [event.target.value, existingEntry[1]] : existingEntry,
+                  ),
                 )
               }
               error={!isValidFieldName[index]}
             />
 
             {renderValueEditor({
-              label: field,
+              label: valueLabel,
               value: fieldValue,
               onChange(newValue) {
-                onChange(value.map((entry, i) => (i === index ? [entry[0], newValue] : entry)));
+                onChange(
+                  value.map((existingEntry, i) =>
+                    i === index ? [existingEntry[0], newValue] : existingEntry,
+                  ),
+                );
               },
-              disabled,
+              disabled: entryDisabled,
             })}
 
             <IconButton aria-label="Delete property" onClick={handleRemove(index)} size="small">

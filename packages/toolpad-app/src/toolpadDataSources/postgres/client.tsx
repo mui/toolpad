@@ -2,7 +2,7 @@ import { Button, Stack, TextareaAutosize, TextField, Toolbar } from '@mui/materi
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
-import { validation } from '../../utils/forms';
+import { isSaveDisabled, validation } from '../../utils/forms';
 import { Maybe } from '../../utils/types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
 
@@ -44,7 +44,7 @@ function ConnectionParamsInput({
   return (
     <Stack direction="column" gap={1}>
       <Toolbar disableGutters>
-        <Button onClick={doSubmit} disabled={!formState.isDirty || !formState.isValid}>
+        <Button onClick={doSubmit} disabled={isSaveDisabled(formState)}>
           Save
         </Button>
       </Toolbar>

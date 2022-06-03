@@ -13,7 +13,7 @@ import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import data from '../../../movies.json';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
-import { validation } from '../../utils/forms';
+import { isSaveDisabled, validation } from '../../utils/forms';
 import { Maybe } from '../../utils/types';
 import { MoviesQuery, MoviesConnectionParams } from './types';
 
@@ -35,7 +35,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<Movies
   return (
     <Stack direction="column" gap={1}>
       <Toolbar disableGutters>
-        <Button onClick={doSubmit} disabled={!formState.isDirty || !formState.isValid}>
+        <Button onClick={doSubmit} disabled={isSaveDisabled(formState)}>
           Save
         </Button>
       </Toolbar>

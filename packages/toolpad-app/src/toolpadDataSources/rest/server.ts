@@ -5,7 +5,7 @@ import * as bindings from '../../utils/bindings';
 import evalExpression from '../../server/evalExpression';
 import { removeLeading } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
-import { parseBaseUrl } from './shared';
+import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 
 async function resolveBindableString(
   bindable: BindableAttrValue<string>,
@@ -52,7 +52,10 @@ async function exec(
   const queryUrl = parseQueryUrl(resolvedUrl, connection.baseUrl);
 
   const res = await fetch(queryUrl.href, {
-    headers: connection.headers,
+    headers: [
+      ...getAuthenticationHeaders(connection.authentication),
+      ...(connection.headers || []),
+    ],
   });
 
   if (!res.ok) {

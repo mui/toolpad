@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import StringRecordEditor from '../../components/StringRecordEditor';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
-import { getAuthenticationHeaders } from './shared';
+import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../components/AppEditor/PageEditor/BindableEditor';
@@ -13,7 +13,7 @@ import { useEvaluateLiveBinding } from '../../components/AppEditor/useEvaluateLi
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
-import { isSaveDisabled } from '../../utils/forms';
+import { isSaveDisabled, validation } from '../../utils/forms';
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -62,10 +62,19 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   });
   React.useEffect(() => reset(withDefaults(value)), [reset, value]);
 
-  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
+  const doSubmit = handleSubmit((connectionParams) =>
+    onChange({
+      ...connectionParams,
+      baseUrl: connectionParams.baseUrl && parseBaseUrl(connectionParams.baseUrl).href,
+    }),
+  );
 
-  const authentication = watch('authentication');
-  const authenticationHeaders = getAuthenticationHeaders(authentication);
+  const headersValue = watch('headers');
+  const authenticationValue = watch('authentication');
+  const authenticationHeaders = getAuthenticationHeaders(authenticationValue);
+
+  const mustHaveBaseUrl: boolean =
+    (headersValue && headersValue.length > 0) || !!authenticationValue;
 
   return (
     <Stack direction="column" gap={1}>
@@ -75,7 +84,25 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         </Button>
       </Toolbar>
       <Stack gap={3}>
-        <TextField label="base url" {...register('baseUrl')} />
+        <TextField
+          label="base url"
+          {...register('baseUrl', {
+            validate(input?: string) {
+              if (!input) {
+                if (mustHaveBaseUrl) {
+                  return 'Must have a baseUrl when using headers';
+                }
+                return true;
+              }
+              try {
+                return !!parseBaseUrl(input);
+              } catch (error) {
+                return 'Must be an absolute url';
+              }
+            },
+          })}
+          {...validation(formState, 'baseUrl')}
+        />
         <Typography>Headers:</Typography>
         <Controller
           name="headers"

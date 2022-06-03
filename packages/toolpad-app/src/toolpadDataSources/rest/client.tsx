@@ -90,7 +90,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
             validate(input?: string) {
               if (!input) {
                 if (mustHaveBaseUrl) {
-                  return 'Must have a baseUrl when using headers';
+                  return 'A base url is required when headers are used';
                 }
                 return true;
               }

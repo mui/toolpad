@@ -556,6 +556,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         if ([RectZone.TOP, RectZone.BOTTOM].includes(dragOverNodeZone)) {
           if (
+            !isOriginalParentPage &&
             !isOriginalParentRow &&
             !isOriginalParentColumn &&
             !hasVerticalContainer(parentInfo)
@@ -585,6 +586,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         if ([RectZone.RIGHT, RectZone.LEFT].includes(dragOverNodeZone)) {
           if (
+            !isOriginalParentPage &&
             !isOriginalParentRow &&
             !isOriginalParentColumn &&
             !hasHorizontalContainer(parentInfo)

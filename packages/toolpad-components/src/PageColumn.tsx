@@ -33,7 +33,7 @@ export default createComponent(PageColumn, {
     },
     spacing: {
       typeDef: { type: 'number' },
-      defaultValue: 2,
+      defaultValue: 1,
     },
     alignItems: {
       typeDef: {
@@ -42,7 +42,7 @@ export default createComponent(PageColumn, {
       },
       label: 'Horizontal alignment',
       control: { type: 'HorizontalAlign' },
-      defaultValue: 'start',
+      defaultValue: 'center',
     },
     children: {
       typeDef: { type: 'element' },

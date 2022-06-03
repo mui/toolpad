@@ -38,7 +38,7 @@ export default createComponent(PageRow, {
       },
       label: 'Vertical alignment',
       control: { type: 'VerticalAlign' },
-      defaultValue: 'start',
+      defaultValue: 'center',
     },
     justifyContent: {
       typeDef: {

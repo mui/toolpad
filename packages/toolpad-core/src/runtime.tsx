@@ -40,7 +40,7 @@ function PlaceholderWrapper() {
       style={{
         display: 'block',
         minHeight: 40,
-        width: '100%',
+        minWidth: 200,
       }}
     />
   );

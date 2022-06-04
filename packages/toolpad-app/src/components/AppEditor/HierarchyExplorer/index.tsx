@@ -81,12 +81,6 @@ function getActiveNodeId(location: Location): NodeId | null {
   return selected.length > 0 ? selected[0] : null;
 }
 
-function findFirstSibling(dom: appDom.AppDom, node: appDom.AppDomNode) {
-  return Object.values(dom.nodes).find(
-    (sibling) => sibling.type === node.type && sibling.id !== node.id,
-  );
-}
-
 function getLinkToNodeEditor(appId: string, node: appDom.AppDomNode): string | undefined {
   switch (node.type) {
     case 'page':
@@ -213,9 +207,10 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       let redirectAfterDelete: string | undefined;
       if (deletedNodeId === activeNode) {
         const deletedNode = appDom.getNode(dom, deletedNodeId);
-        const sibling = findFirstSibling(dom, deletedNode);
-        if (sibling) {
-          redirectAfterDelete = getLinkToNodeEditor(appId, sibling);
+        const siblings = appDom.getSiblings(dom, deletedNode);
+        const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
+        if (firstSiblingOfType) {
+          redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
         } else {
           redirectAfterDelete = `/app/${appId}/editor`;
         }

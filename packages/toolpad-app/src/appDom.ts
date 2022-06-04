@@ -497,6 +497,18 @@ export function getDescendants(dom: AppDom, node: AppDomNode): readonly AppDomNo
   return [...children, ...children.flatMap((child) => getDescendants(dom, child))];
 }
 
+/**
+ * Get all siblings of a `node`
+ */
+export function getSiblings(dom: AppDom, node: AppDomNode): readonly AppDomNode[] {
+  return Object.values(dom.nodes).filter(
+    (sibling) =>
+      sibling.parentId === node.parentId &&
+      sibling.parentProp === node.parentProp &&
+      sibling.id !== node.id,
+  );
+}
+
 export function getAncestors(dom: AppDom, node: AppDomNode): readonly AppDomNode[] {
   const parent = getParent(dom, node);
   return parent ? [...getAncestors(dom, parent), parent] : [];

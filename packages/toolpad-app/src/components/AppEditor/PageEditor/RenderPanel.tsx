@@ -568,11 +568,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         if (isOriginalParentPage && dragOverNodeZone && dragOverNodeZone !== RectZone.CENTER) {
           if ([RectZone.TOP, RectZone.BOTTOM].includes(dragOverNodeZone)) {
             const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
-            domApi.addNode(rowContainer, parent, 'children');
+
+            const newParentIndex =
+              dragOverNodeZone === RectZone.TOP
+                ? appDom.getNewParentIndexBeforeNode(dom, dragOverNode, 'children')
+                : appDom.getNewParentIndexAfterNode(dom, dragOverNode, 'children');
+
+            domApi.addNode(rowContainer, parent, 'children', newParentIndex);
             parent = rowContainer;
           } else {
+            const newParentIndex =
+              dragOverNodeZone === RectZone.RIGHT
+                ? appDom.getNewLastParentIndexInParentNode(dom, dragOverNode, 'children')
+                : appDom.getNewFirstParentIndexInParentNode(dom, dragOverNode, 'children');
+
             const columnContainer = appDom.createElement(dom, PAGE_COLUMN_COMPONENT_ID, {});
-            domApi.addNode(columnContainer, dragOverNode, 'children');
+            domApi.addNode(columnContainer, dragOverNode, 'children', newParentIndex);
             parent = columnContainer;
           }
         }
@@ -580,7 +591,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         const isDraggingOverColumn = isPageColumn(dragOverNode);
 
         if (dragOverNodeZone === RectZone.CENTER) {
-          addOrMoveNode(draggedNode, dragOverNode, 'children', dragOverNode.parentIndex);
+          addOrMoveNode(draggedNode, dragOverNode, 'children');
         }
 
         const isOriginalParentRow = appDom.isElement(originalParent) && isPageRow(originalParent);
@@ -588,6 +599,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           appDom.isElement(originalParent) && isPageColumn(originalParent);
 
         if ([RectZone.TOP, RectZone.BOTTOM].includes(dragOverNodeZone)) {
+          // Ignore invalid drop zones
           if (
             !isOriginalParentPage &&
             !isOriginalParentRow &&
@@ -599,25 +611,40 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
           if (isOriginalParentRow && !isDraggingOverColumn) {
             const columnContainer = appDom.createElement(dom, PAGE_COLUMN_COMPONENT_ID, {});
-            domApi.addNode(columnContainer, parent, 'children');
+            domApi.addNode(
+              columnContainer,
+              parent,
+              'children',
+              appDom.getNewParentIndexAfterNode(dom, dragOverNode, 'children'),
+            );
             parent = columnContainer;
 
-            if (dragOverNodeZone === RectZone.TOP) {
-              domApi.moveNode(dragOverNode, parent, 'children');
-            }
+            // Move existing element inside column right away if drag over zone is bottom
             if (dragOverNodeZone === RectZone.BOTTOM) {
               domApi.moveNode(dragOverNode, parent, 'children');
             }
           }
+
+          const newParentIndex =
+            dragOverNodeZone === RectZone.TOP
+              ? appDom.getNewParentIndexBeforeNode(dom, dragOverNode, 'children')
+              : appDom.getNewParentIndexAfterNode(dom, dragOverNode, 'children');
+
           addOrMoveNode(
             draggedNode,
             isDraggingOverColumn ? dragOverNode : parent,
             'children',
-            dragOverNode.parentIndex,
+            newParentIndex,
           );
+
+          // Only move existing element inside column in the end if drag over zone is top
+          if (isOriginalParentRow && !isDraggingOverColumn && dragOverNodeZone === RectZone.TOP) {
+            domApi.moveNode(dragOverNode, parent, 'children');
+          }
         }
 
         if ([RectZone.RIGHT, RectZone.LEFT].includes(dragOverNodeZone)) {
+          // Ignore invalid drop zones
           if (
             !isOriginalParentPage &&
             !isOriginalParentRow &&
@@ -629,16 +656,30 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
           if (isOriginalParentColumn) {
             const stackContainer = appDom.createElement(dom, STACK_COMPONENT_ID, {});
-            domApi.addNode(stackContainer, parent, 'children', dragOverNode.parentIndex);
-            domApi.moveNode(dragOverNode, stackContainer, 'children', dragOverNode.parentIndex);
+            domApi.addNode(
+              stackContainer,
+              parent,
+              'children',
+              appDom.getNewParentIndexAfterNode(dom, dragOverNode, 'children'),
+            );
             parent = stackContainer;
+
+            // Move existing element inside stack right away if drag over zone is right
+            if (dragOverNodeZone === RectZone.RIGHT) {
+              domApi.moveNode(dragOverNode, parent, 'children');
+            }
           }
 
-          if (dragOverNodeZone === RectZone.RIGHT) {
-            addOrMoveNode(draggedNode, parent, 'children', dragOverNode.parentIndex);
-          }
-          if (dragOverNodeZone === RectZone.LEFT) {
-            addOrMoveNode(draggedNode, parent, 'children', dragOverNode.parentIndex);
+          const newParentIndex =
+            dragOverNodeZone === RectZone.RIGHT
+              ? appDom.getNewParentIndexAfterNode(dom, dragOverNode, 'children')
+              : appDom.getNewParentIndexBeforeNode(dom, dragOverNode, 'children');
+
+          addOrMoveNode(draggedNode, parent, 'children', newParentIndex);
+
+          // Only move existing element inside column in the end if drag over zone is left
+          if (isOriginalParentColumn && dragOverNodeZone === RectZone.LEFT) {
+            domApi.moveNode(dragOverNode, parent, 'children');
           }
         }
       }

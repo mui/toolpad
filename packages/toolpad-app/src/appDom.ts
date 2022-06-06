@@ -625,15 +625,14 @@ export function addNode<Parent extends AppDomNode, Child extends AppDomNode>(
   return setNodeParent(dom, newNode, parent.id, parentProp, parentIndex);
 }
 
-export function moveNode(
+export function moveNode<Parent extends AppDomNode, Child extends AppDomNode>(
   dom: AppDom,
-  nodeId: NodeId,
-  parentId: NodeId,
-  parentProp: string,
+  node: Child,
+  parent: Parent,
+  parentProp: ParentPropOf<Child, Parent>,
   parentIndex?: string,
 ) {
-  const node = getNode(dom, nodeId);
-  return setNodeParent(dom, node, parentId, parentProp, parentIndex);
+  return setNodeParent(dom, node, parent.id, parentProp, parentIndex);
 }
 
 export function saveNode(dom: AppDom, node: AppDomNode) {

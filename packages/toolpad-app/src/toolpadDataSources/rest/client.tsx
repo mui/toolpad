@@ -41,7 +41,7 @@ function QueryEditor({ globalScope, value, onChange }: QueryEditorProps<FetchQue
         globalScope={globalScope}
         server
         label="url"
-        argType={{ typeDef: { type: 'string' } }}
+        propType={{ type: 'string' }}
         value={value.url}
         onChange={handleUrlChange}
       />
@@ -79,7 +79,6 @@ const dataSource: ClientDataSource<{}, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   isConnectionValid: () => true,
-  getInitialConnectionValue: () => ({}),
   QueryEditor,
   getInitialQueryValue,
   getArgTypes,

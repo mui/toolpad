@@ -15,7 +15,6 @@ function PageColumn({ span, spacing, children, alignItems }: PageColumnProps) {
       direction="column"
       sx={{
         gap: spacing,
-        p: spacing,
         alignItems,
         width: `${(span / 12) * 100}vw`,
         maxWidth: '100%',

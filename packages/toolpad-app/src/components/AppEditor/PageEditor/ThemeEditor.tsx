@@ -1,8 +1,27 @@
 import * as React from 'react';
-import { FormControl, InputLabel, Select, MenuItem, Stack, Button } from '@mui/material';
+import {
+  MenuItem,
+  Stack,
+  Button,
+  ToggleButtonGroup,
+  ToggleButton,
+  styled,
+  TextField,
+} from '@mui/material';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 import * as appDom from '../../../appDom';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
+
+const IconToggleButton = styled(ToggleButton)({
+  display: 'flex',
+  justifyContent: 'center',
+  width: '100%',
+  '& > *': {
+    marginRight: '8px',
+  },
+});
 
 const THEME_COLORS = [
   'red',
@@ -29,22 +48,19 @@ interface PaletteColorPickerProps extends WithControlledProp<string> {
 
 function PaletteColorPicker({ name, value, onChange }: PaletteColorPickerProps) {
   return (
-    <FormControl size="small" fullWidth>
-      <InputLabel id="select-color">{name}</InputLabel>
-      <Select
-        labelId="select-color"
-        size="small"
-        value={value}
-        label={name}
-        onChange={(event) => onChange(event.target.value)}
-      >
-        {THEME_COLORS.map((color) => (
-          <MenuItem key={color} value={color}>
-            {color}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <TextField
+      select
+      fullWidth
+      value={value}
+      label={name}
+      onChange={(event) => onChange(event.target.value)}
+    >
+      {THEME_COLORS.map((color) => (
+        <MenuItem key={color} value={color}>
+          {color}
+        </MenuItem>
+      ))}
+    </TextField>
   );
 }
 
@@ -73,6 +89,27 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
     <div className={className}>
       {theme ? (
         <Stack spacing={2}>
+          <ToggleButtonGroup
+            size="small"
+            exclusive
+            value={appDom.fromConstPropValue(theme.theme['palette.mode']) || 'light'}
+            onChange={(event, newValue) => {
+              domApi.setNodeNamespacedProp(theme, 'theme', 'palette.mode', {
+                type: 'const',
+                value: newValue,
+              });
+            }}
+            aria-label="Mode"
+          >
+            <IconToggleButton value="light" aria-label="light">
+              <LightModeIcon />
+              Light
+            </IconToggleButton>
+            <IconToggleButton value="dark" aria-label="dark">
+              <DarkModeIcon />
+              Dark
+            </IconToggleButton>
+          </ToggleButtonGroup>
           <PaletteColorPicker
             name="primary"
             value={appDom.fromConstPropValue(theme.theme['palette.primary.main']) || ''}

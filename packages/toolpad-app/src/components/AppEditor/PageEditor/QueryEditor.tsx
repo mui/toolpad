@@ -1,6 +1,7 @@
 import {
   Stack,
   Button,
+  Grid,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -34,6 +35,7 @@ import { omit, update } from '../../../utils/immutability';
 import client from '../../../api';
 import ParametersEditor from './ParametersEditor';
 import ErrorAlert from './ErrorAlert';
+import { JsExpressionEditor } from './JsExpressionEditor';
 
 function refetchIntervalInSeconds(maybeInterval?: number) {
   if (typeof maybeInterval !== 'number') {
@@ -105,7 +107,7 @@ interface QueryNodeEditorProps<Q, P> {
   node: appDom.QueryNode<Q, P>;
 }
 
-function QueryNodeEditorDialog<Q, P, PQ>({
+function QueryNodeEditorDialog<Q, P>({
   open,
   node,
   onClose,
@@ -117,7 +119,7 @@ function QueryNodeEditorDialog<Q, P, PQ>({
   const [input, setInput] = React.useState(node);
   React.useEffect(() => setInput(node), [node]);
 
-  const conectionId = node.attributes.connectionId.value;
+  const connectionId = input.attributes.connectionId.value;
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
@@ -140,6 +142,29 @@ function QueryNodeEditorDialog<Q, P, PQ>({
       }),
     );
   }, []);
+
+  const handleTransformFnChange = React.useCallback((newValue: string) => {
+    setInput((existing) =>
+      update(existing, {
+        attributes: update(existing.attributes, {
+          transform: appDom.createConst(newValue),
+        }),
+      }),
+    );
+  }, []);
+
+  const handleTransformEnabledChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) =>
+        update(existing, {
+          attributes: update(existing.attributes, {
+            transformEnabled: appDom.createConst(event.target.checked),
+          }),
+        }),
+      );
+    },
+    [],
+  );
 
   const handleRefetchOnWindowFocusChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -214,13 +239,6 @@ function QueryNodeEditorDialog<Q, P, PQ>({
     onClose();
   }, [onRemove, node, onClose]);
 
-  const queryEditorApi = React.useMemo(() => {
-    return {
-      fetchPrivate: async (query: PQ | {}) =>
-        client.query.dataSourceFetchPrivate(appId, conectionId, query),
-    };
-  }, [appId, conectionId]);
-
   const paramsObject: Record<string, any> = React.useMemo(() => {
     const liveParamValues: [string, any][] = liveParams.map(([name, result]) => [
       name,
@@ -234,6 +252,7 @@ function QueryNodeEditorDialog<Q, P, PQ>({
   const queryPreview = client.useQuery(
     'execQuery',
     previewQuery ? [appId, previewQuery, previewParams] : null,
+    { retry: false },
   );
 
   const handleUpdatePreview = React.useCallback(() => {
@@ -273,6 +292,7 @@ function QueryNodeEditorDialog<Q, P, PQ>({
               onChange={handleConnectionChange}
             />
           </Stack>
+
           <Divider />
           <Typography>Parameters</Typography>
           <ParametersEditor
@@ -284,44 +304,69 @@ function QueryNodeEditorDialog<Q, P, PQ>({
           <Divider />
           <Typography>Build query:</Typography>
           <dataSource.QueryEditor
-            api={queryEditorApi}
+            appId={appId}
+            connectionId={connectionId}
             value={input.attributes.query.value}
             onChange={handleQueryChange}
             globalScope={{ query: paramsObject }}
           />
           <Divider />
           <Typography>Options:</Typography>
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={input.attributes.refetchOnWindowFocus?.value ?? true}
-                onChange={handleRefetchOnWindowFocusChange}
-              />
-            }
-            label="Refetch on window focus"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={input.attributes.refetchOnReconnect?.value ?? true}
-                onChange={handleRefetchOnReconnectChange}
-              />
-            }
-            label="Refetch on network reconnect"
-          />
-          <TextField
-            InputProps={{
-              startAdornment: <InputAdornment position="start">s</InputAdornment>,
-            }}
-            sx={{ maxWidth: 300 }}
-            size="small"
-            type="number"
-            label="Refetch interval"
-            value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
-            onChange={handleRefetchIntervalChange}
-          />
+          <Grid container direction="row" spacing={1}>
+            <Grid item xs={4}>
+              <Stack direction="column">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={input.attributes.refetchOnWindowFocus?.value ?? true}
+                      onChange={handleRefetchOnWindowFocusChange}
+                    />
+                  }
+                  label="Refetch on window focus"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={input.attributes.refetchOnReconnect?.value ?? true}
+                      onChange={handleRefetchOnReconnectChange}
+                    />
+                  }
+                  label="Refetch on network reconnect"
+                />
+                <TextField
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">s</InputAdornment>,
+                  }}
+                  sx={{ maxWidth: 300 }}
+                  type="number"
+                  label="Refetch interval"
+                  value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
+                  onChange={handleRefetchIntervalChange}
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack>
+                <FormControlLabel
+                  label="Transform API response"
+                  control={
+                    <Checkbox
+                      checked={input.attributes.transformEnabled?.value ?? false}
+                      onChange={handleTransformEnabledChange}
+                      inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                  }
+                />
+
+                <JsExpressionEditor
+                  globalScope={{}}
+                  value={input.attributes.transform?.value ?? '(data) => {\n  return data;\n}'}
+                  onChange={handleTransformFnChange}
+                  disabled={!input.attributes.transformEnabled?.value}
+                />
+              </Stack>
+            </Grid>
+          </Grid>
           <Divider />
           <Toolbar disableGutters>
             preview

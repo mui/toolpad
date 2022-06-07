@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Button, Stack, Toolbar, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { NodeId, ConnectionEditorProps, ClientDataSource } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -45,44 +45,35 @@ function ConnectionEditorContent<P>({
 }: ConnectionEditorContentProps<P>) {
   const domApi = useDomApi();
 
-  const [connectionParams, setConnectionParams] = React.useState<P>(
-    connectionNode.attributes.params.value,
+  const handleConnectionChange = React.useCallback(
+    (connectionParams) => {
+      (Object.keys(connectionParams) as (keyof P)[]).forEach((propName) => {
+        if (typeof propName !== 'string' || !connectionParams[propName]) {
+          return;
+        }
+        domApi.setNodeNamespacedProp(
+          connectionNode,
+          'attributes',
+          'params',
+          appDom.createSecret(connectionParams),
+        );
+      });
+    },
+    [connectionNode, domApi],
   );
-  const savedConnectionParams = React.useRef<P | null>(connectionNode.attributes.params.value);
-  const dataSourceType = connectionNode.attributes.dataSource.value;
 
+  const dataSourceType = connectionNode.attributes.dataSource.value;
   const dataSource = dataSources[dataSourceType];
 
   return (
-    <Box className={className} sx={{ width: '100%', height: '100%', px: 3 }}>
-      <Toolbar disableGutters>
-        <Button
-          onClick={() => {
-            (Object.keys(connectionParams) as (keyof P)[]).forEach((propName) => {
-              if (typeof propName !== 'string' || !connectionParams[propName]) {
-                return;
-              }
-              domApi.setNodeNamespacedProp(
-                connectionNode,
-                'attributes',
-                'params',
-                appDom.createSecret(connectionParams),
-              );
-            });
-            savedConnectionParams.current = connectionParams;
-          }}
-          disabled={connectionParams === savedConnectionParams.current}
-        >
-          Update
-        </Button>
-      </Toolbar>
+    <Box className={className} sx={{ width: '100%', height: '100%', p: 3 }}>
       <Stack spacing={1}>
         <NodeNameEditor node={connectionNode} />
         {dataSource ? (
           <ConnectionParamsEditor
             dataSource={dataSource}
-            value={connectionParams}
-            onChange={setConnectionParams}
+            value={connectionNode.attributes.params.value}
+            onChange={handleConnectionChange}
             handlerBasePath={`/api/dataSources/${dataSourceType}`}
             appId={appId}
             connectionId={connectionNode.id}

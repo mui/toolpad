@@ -16,6 +16,11 @@ export function createThemeOptions(toolpadTheme: AppTheme): ThemeOptions {
     palette.secondary = (colors as any)[secondary];
   }
 
+  const mode = toolpadTheme['palette.mode'];
+  if (mode) {
+    palette.mode = mode;
+  }
+
   return { palette };
 }
 

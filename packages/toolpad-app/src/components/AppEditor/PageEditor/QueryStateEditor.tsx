@@ -4,13 +4,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
   List,
   ListItem,
-  SelectChangeEvent,
   DialogActions,
   Box,
   LinearProgress,
@@ -21,7 +17,6 @@ import {
   InputAdornment,
 } from '@mui/material';
 import * as React from 'react';
-import AddIcon from '@mui/icons-material/Add';
 import { ArgTypeDefinitions, UseDataQuery } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -101,7 +96,7 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
   const { apis = [] } = appDom.getChildNodes(dom, app);
 
   const handleSelectionChange = React.useCallback(
-    (event: SelectChangeEvent<'' | NodeId>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       const apiNodeId = event.target.value ? (event.target.value as NodeId) : null;
       domApi.setNodeNamespacedProp(node, 'attributes', 'api', appDom.createConst(apiNodeId));
     },
@@ -156,28 +151,24 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
     <React.Fragment>
       <Stack spacing={1} py={1}>
         <NodeNameEditor node={node} />
-        <FormControl fullWidth size="small">
-          <InputLabel id={`select-data-query`}>Query</InputLabel>
-          <Select
-            value={node.attributes.api.value || ''}
-            labelId="select-data-query"
-            label="Query"
-            onChange={handleSelectionChange}
-            size="small"
-          >
-            <MenuItem value="">---</MenuItem>
-            {apis.map(({ id, name }) => (
-              <MenuItem key={id} value={id}>
-                {name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <TextField
+          select
+          fullWidth
+          value={node.attributes.api.value || ''}
+          label="Query"
+          onChange={handleSelectionChange}
+        >
+          <MenuItem value="">---</MenuItem>
+          {apis.map(({ id, name }) => (
+            <MenuItem key={id} value={id}>
+              {name}
+            </MenuItem>
+          ))}
+        </TextField>
         <ParamsEditor node={node} argTypes={argTypes} />
         <FormControlLabel
           control={
             <Checkbox
-              size="small"
               checked={node.attributes.refetchOnWindowFocus?.value ?? true}
               onChange={handleRefetchOnWindowFocusChange}
             />
@@ -187,7 +178,6 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
         <FormControlLabel
           control={
             <Checkbox
-              size="small"
               checked={node.attributes.refetchOnReconnect?.value ?? true}
               onChange={handleRefetchOnReconnectChange}
             />
@@ -199,7 +189,6 @@ function QueryStateNodeEditor<P>({ node }: QueryStateNodeEditorProps<P>) {
             startAdornment: <InputAdornment position="start">s</InputAdornment>,
           }}
           sx={{ maxWidth: 300 }}
-          size="small"
           type="number"
           label="Refetch interval"
           value={refetchIntervalInSeconds(node.attributes.refetchInterval?.value) ?? ''}
@@ -223,16 +212,7 @@ export default function QueryStateEditor() {
   const page = appDom.getNode(dom, state.nodeId, 'page');
   const { queryStates = [] } = appDom.getChildNodes(dom, page) ?? [];
 
-  const handleCreate = React.useCallback(() => {
-    const stateNode = appDom.createNode(dom, 'queryState', {
-      params: {},
-      attributes: { api: appDom.createConst(null) },
-    });
-    domApi.addNode(stateNode, page, 'queryStates');
-    setEditedState(stateNode.id);
-  }, [dom, domApi, page]);
-
-  // To keep it around during closing animation
+  // To keep dialog content around during closing animation
   const lastEditedStateNode = useLatest(editedStateNode);
 
   const handleRemove = React.useCallback(() => {
@@ -242,11 +222,8 @@ export default function QueryStateEditor() {
     handleEditStateDialogClose();
   }, [editedStateNode, handleEditStateDialogClose, domApi]);
 
-  return (
+  return queryStates.length > 0 ? (
     <Stack spacing={1} alignItems="start">
-      <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
-        create query state
-      </Button>
       <List>
         {queryStates.map((stateNode) => {
           return (
@@ -277,5 +254,5 @@ export default function QueryStateEditor() {
         </Dialog>
       ) : null}
     </Stack>
-  );
+  ) : null;
 }

@@ -1,7 +1,5 @@
 import * as React from 'react';
 import * as appDom from '../../appDom';
-
-import { useAppEditorContext } from './AppEditorContext';
 import {
   getToolpadComponent,
   getToolpadComponents,
@@ -10,8 +8,7 @@ import {
 } from '../../toolpadComponents';
 
 export function useToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefinitions {
-  const { id: appId, version } = useAppEditorContext();
-  return React.useMemo(() => getToolpadComponents(appId, version, dom), [appId, version, dom]);
+  return React.useMemo(() => getToolpadComponents(dom), [dom]);
 }
 
 export function useToolpadComponent(

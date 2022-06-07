@@ -1,20 +1,10 @@
-import { Stack, TextareaAutosize, TextField } from '@mui/material';
+import { Button, Stack, TextareaAutosize, TextField, Toolbar } from '@mui/material';
 import * as React from 'react';
-import { useQuery } from 'react-query';
-import { ClientDataSource, QueryEditorProps } from '../../types';
-import { useInput } from '../../utils/forms';
-import { WithControlledProp } from '../../utils/types';
+import { useForm } from 'react-hook-form';
+import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import { validation } from '../../utils/forms';
+import { Maybe } from '../../utils/types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
-
-function getInitialValue(): PostgresConnectionParams {
-  return {
-    host: '',
-    port: 5432,
-    user: '',
-    password: '',
-    database: '',
-  };
-}
 
 function isValid(connection: PostgresConnectionParams): boolean {
   return !!(
@@ -27,26 +17,68 @@ function isValid(connection: PostgresConnectionParams): boolean {
   );
 }
 
-function ConnectionParamsInput({ value, onChange }: WithControlledProp<PostgresConnectionParams>) {
-  const hostInputProps = useInput(value, onChange, 'host');
-  const portInputProps = useInput(value, onChange, 'port');
-  const userInputProps = useInput(value, onChange, 'user');
-  const passwordInputProps = useInput(value, onChange, 'password');
-  const databaseInputProps = useInput(value, onChange, 'database');
+function withDefaults(value: Maybe<PostgresConnectionParams>): PostgresConnectionParams {
+  return {
+    host: '',
+    port: 5432,
+    user: '',
+    password: '',
+    database: '',
+    ...value,
+  };
+}
+
+function ConnectionParamsInput({
+  value,
+  onChange,
+}: ConnectionEditorProps<PostgresConnectionParams>) {
+  const { handleSubmit, register, formState, reset } = useForm({
+    defaultValues: withDefaults(value),
+    reValidateMode: 'onChange',
+    mode: 'all',
+  });
+  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
 
   return (
     <Stack direction="column" gap={1}>
-      <TextField size="small" label="host" {...hostInputProps} />
-      <TextField size="small" label="port" {...portInputProps} />
-      <TextField size="small" label="user" {...userInputProps} />
-      <TextField size="small" label="password" type="password" {...passwordInputProps} />
-      <TextField size="small" label="database" {...databaseInputProps} />
+      <Toolbar disableGutters>
+        <Button onClick={doSubmit} disabled={!formState.isDirty || !formState.isValid}>
+          Save
+        </Button>
+      </Toolbar>
+      <TextField
+        label="host"
+        {...register('host', { required: true })}
+        {...validation(formState, 'host')}
+      />
+      <TextField
+        label="port"
+        {...register('port', { required: true })}
+        {...validation(formState, 'port')}
+      />
+      <TextField
+        label="user"
+        {...register('user', { required: true })}
+        {...validation(formState, 'user')}
+      />
+      <TextField
+        label="password"
+        type="password"
+        {...register('password', { required: true })}
+        {...validation(formState, 'password')}
+      />
+      <TextField
+        label="database"
+        {...register('database', { required: true })}
+        {...validation(formState, 'database')}
+      />
     </Stack>
   );
 }
 
-function QueryEditor({ value, onChange, api }: QueryEditorProps<PostgresQuery>) {
-  const result = useQuery('getAllTables', () => api.fetchPrivate('getAllTables'));
+function QueryEditor({ value, onChange }: QueryEditorProps<PostgresQuery>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange({ ...value, text: event.target.value });
@@ -55,7 +87,6 @@ function QueryEditor({ value, onChange, api }: QueryEditorProps<PostgresQuery>) 
   );
   return (
     <div>
-      <div>{JSON.stringify(result.data, null, 2)}</div>
       <TextareaAutosize
         maxRows={4}
         value={value.text}
@@ -76,7 +107,6 @@ function getInitialQueryValue(): PostgresQuery {
 const dataSource: ClientDataSource<PostgresConnectionParams, PostgresQuery> = {
   displayName: 'Postgres',
   ConnectionParamsInput,
-  getInitialConnectionValue: getInitialValue,
   isConnectionValid: isValid,
   QueryEditor,
   getInitialQueryValue,

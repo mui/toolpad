@@ -25,7 +25,7 @@ export default function ErrorAlert({ error }: ErrorAlertProps) {
       }}
       action={
         stack ? (
-          <IconButton color="inherit" size="small" onClick={toggleExpanded}>
+          <IconButton color="inherit" onClick={toggleExpanded}>
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         ) : null

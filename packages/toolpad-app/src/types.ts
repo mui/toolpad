@@ -7,6 +7,7 @@ import {
   RuntimeError,
   ComponentConfig,
 } from '@mui/toolpad-core';
+import { PaletteMode } from '@mui/material';
 import type { Branded, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
@@ -75,65 +76,50 @@ export interface ApiResult<D = any> {
   fields?: ApiResultFields;
 }
 
-export interface PrivateApiResult<D = any> {
-  data?: D;
-  isLoading: boolean;
-  isIdle: boolean;
-  isSuccess: boolean;
+export interface CreateHandlerApi<P = unknown> {
+  setConnectionParams: (appId: string, connectionId: string, props: P) => Promise<void>;
+  getConnectionParams: (appId: string, connectionId: string) => Promise<P>;
 }
 
-export interface CreateHandlerApi {
-  updateConnection: (appId: string, props: Updates<LegacyConnection>) => Promise<LegacyConnection>;
-  getConnection: (appId: string, connectionId: string) => Promise<LegacyConnection>;
-}
-
-export interface ConnectionEditorProps<P> extends WithControlledProp<P> {
+export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
   handlerBasePath: string;
   appId: string;
   connectionId: NodeId;
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorApi<PQ> {
-  fetchPrivate: (query: PQ) => Promise<PrivateApiResult<any>>;
-}
-
-export interface QueryEditorProps<Q, PQ = {}> extends WithControlledProp<Q> {
-  api: QueryEditorApi<PQ>;
+export interface QueryEditorProps<Q> extends WithControlledProp<Q> {
+  appId: string;
+  connectionId: NodeId;
   globalScope: Record<string, any>;
 }
 
-export type QueryEditor<Q = {}, PQ = {}> = React.FC<QueryEditorProps<Q, PQ>>;
+export type QueryEditor<Q = {}> = React.FC<QueryEditorProps<Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;
   error?: string;
 }
 
-export interface ClientDataSource<P = {}, Q = {}, PQ = {}> {
+export interface ClientDataSource<P = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<P>;
-  getInitialConnectionValue: () => P;
   isConnectionValid: (connection: P) => boolean;
-  QueryEditor: QueryEditor<Q, PQ>;
+  QueryEditor: QueryEditor<Q>;
   getInitialQueryValue: () => Q;
   getArgTypes?: (query: Q) => ArgTypeDefinitions;
 }
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
-  execPrivate?: (connection: LegacyConnection<P>, query: PQ) => Promise<PrivateApiResult<any>>;
+  execPrivate?: (connection: P, query: PQ) => Promise<any>;
   // Execute a query on this connection, intended for viewers
-  exec: (connection: LegacyConnection<P>, query: Q, params: any) => Promise<ApiResult<D>>;
-  createHandler?: () => (api: CreateHandlerApi, req: NextApiRequest, res: NextApiResponse) => void;
-}
-// TODO: replace LegacyConnection with ConnectionNode
-export interface LegacyConnection<P = unknown> {
-  id: string;
-  type: string;
-  name: string;
-  params: P;
-  status: ConnectionStatus | null;
+  exec: (connection: P, query: Q, params: any) => Promise<ApiResult<D>>;
+  createHandler?: () => (
+    api: CreateHandlerApi<P>,
+    req: NextApiRequest,
+    res: NextApiResponse,
+  ) => void;
 }
 
 /**
@@ -165,6 +151,7 @@ export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
 export type ResolvedProps = Record<string, PropExpression | undefined>;
 
 export interface AppTheme {
+  'palette.mode'?: PaletteMode;
   'palette.primary.main'?: string;
   'palette.secondary.main'?: string;
 }

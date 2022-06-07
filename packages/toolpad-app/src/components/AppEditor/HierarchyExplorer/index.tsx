@@ -15,13 +15,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { useNavigate, useLocation, matchRoutes } from 'react-router-dom';
+import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
-import CreateApiNodeDialog from './CreateApiNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import useLatest from '../../../utils/useLatest';
@@ -50,13 +49,13 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
             {labelText}
           </Typography>
           {onCreate ? (
-            <IconButton aria-label={`Create ${labelText}`} size="small" onClick={onCreate}>
-              <AddIcon fontSize="small" />
+            <IconButton aria-label={`Create ${labelText}`} onClick={onCreate}>
+              <AddIcon />
             </IconButton>
           ) : null}
           {onDelete ? (
-            <IconButton aria-label={`Delete ${labelText}`} size="small" onClick={onDelete}>
-              <DeleteIcon fontSize="small" />
+            <IconButton aria-label={`Delete ${labelText}`} onClick={onDelete}>
+              <DeleteIcon />
             </IconButton>
           ) : null}
         </Box>
@@ -64,6 +63,37 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
       {...other}
     />
   );
+}
+
+function getActiveNodeId(location: Location): NodeId | null {
+  const match =
+    matchRoutes(
+      [
+        { path: `/app/:appId/editor/pages/:activeNodeId` },
+        { path: `/app/:appId/editor/apis/:activeNodeId` },
+        { path: `/app/:appId/editor/codeComponents/:activeNodeId` },
+        { path: `/app/:appId/editor/connections/:activeNodeId` },
+      ],
+      location,
+    ) || [];
+
+  const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
+  return selected.length > 0 ? selected[0] : null;
+}
+
+function getLinkToNodeEditor(appId: string, node: appDom.AppDomNode): string | undefined {
+  switch (node.type) {
+    case 'page':
+      return `/app/${appId}/editor/pages/${node.id}`;
+    case 'connection':
+      return `/app/${appId}/editor/connections/${node.id}`;
+    case 'codeComponent':
+      return `/app/${appId}/editor/codeComponents/${node.id}`;
+    case 'api':
+      return `/app/${appId}/editor/apis/${node.id}`;
+    default:
+      return undefined;
+  }
 }
 
 export interface HierarchyExplorerProps {
@@ -85,22 +115,12 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
   const [expanded, setExpanded] = useLocalStorageState<string[]>(
     `editor/${app.id}/hierarchy-expansion`,
-    [':connections', ':pages', ':apis', ':codeComponents'],
+    [':connections', ':pages', ':codeComponents'],
   );
 
   const location = useLocation();
-  const match =
-    matchRoutes(
-      [
-        { path: `/app/:appId/editor/pages/:activeNodeId` },
-        { path: `/app/:appId/editor/apis/:activeNodeId` },
-        { path: `/app/:appId/editor/codeComponents/:activeNodeId` },
-        { path: `/app/:appId/editor/connections/:activeNodeId` },
-      ],
-      location,
-    ) || [];
 
-  const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
+  const activeNode = getActiveNodeId(location);
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);
@@ -155,13 +175,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [],
   );
 
-  const [createApiDialogOpen, setCreateApiDialogOpen] = React.useState(0);
-  const handleCreateApiDialogOpen = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreateApiDialogOpen(Math.random());
-  }, []);
-  const handleCreateApiDialogClose = React.useCallback(() => setCreateApiDialogOpen(0), []);
-
   const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
   const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
@@ -191,11 +204,27 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
   const handleDeleteNode = React.useCallback(() => {
     if (deletedNodeId) {
+      let redirectAfterDelete: string | undefined;
+      if (deletedNodeId === activeNode) {
+        const deletedNode = appDom.getNode(dom, deletedNodeId);
+        const siblings = appDom.getSiblings(dom, deletedNode);
+        const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
+        if (firstSiblingOfType) {
+          redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
+        } else {
+          redirectAfterDelete = `/app/${appId}/editor`;
+        }
+      }
+
       domApi.removeNode(deletedNodeId);
-      navigate(`/app/${appId}/editor/`);
+
+      if (redirectAfterDelete) {
+        navigate(redirectAfterDelete);
+      }
+
       handledeleteNodeDialogClose();
     }
-  }, [deletedNodeId, domApi, navigate, appId, handledeleteNodeDialogClose]);
+  }, [deletedNodeId, activeNode, domApi, handledeleteNodeDialogClose, dom, appId, navigate]);
 
   const deletedNode = deletedNodeId && appDom.getMaybeNode(dom, deletedNodeId);
   const latestDeletedNode = useLatest(deletedNode);
@@ -204,7 +233,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     <HierarchyExplorerRoot className={className}>
       <TreeView
         aria-label="hierarchy explorer"
-        selected={selected}
+        selected={activeNode ? [activeNode] : []}
         onNodeSelect={handleSelect}
         expanded={expanded}
         onNodeToggle={handleToggle}
@@ -226,16 +255,18 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             />
           ))}
         </HierarchyTreeItem>
-        <HierarchyTreeItem nodeId=":apis" labelText="Apis" onCreate={handleCreateApiDialogOpen}>
-          {apis.map((apiNode) => (
-            <HierarchyTreeItem
-              key={apiNode.id}
-              nodeId={apiNode.id}
-              labelText={apiNode.name}
-              onDelete={handleDeleteNodeDialogOpen(apiNode.id)}
-            />
-          ))}
-        </HierarchyTreeItem>
+        {apis.length > 0 ? (
+          <HierarchyTreeItem nodeId=":apis" labelText="Apis">
+            {apis.map((apiNode) => (
+              <HierarchyTreeItem
+                key={apiNode.id}
+                nodeId={apiNode.id}
+                labelText={apiNode.name}
+                onDelete={handleDeleteNodeDialogOpen(apiNode.id)}
+              />
+            ))}
+          </HierarchyTreeItem>
+        ) : null}
         <HierarchyTreeItem
           nodeId=":codeComponents"
           labelText="Components"
@@ -267,12 +298,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         appId={appId}
         open={!!createConnectionDialogOpen}
         onClose={handleCreateConnectionDialogClose}
-      />
-      <CreateApiNodeDialog
-        key={createApiDialogOpen || undefined}
-        appId={appId}
-        open={!!createApiDialogOpen}
-        onClose={handleCreateApiDialogClose}
       />
       <CreatePageNodeDialog
         key={createPageDialogOpen || undefined}

@@ -4,11 +4,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
-  SelectChangeEvent,
+  TextField,
   Typography,
 } from '@mui/material';
 import * as React from 'react';
@@ -37,30 +34,26 @@ export function ConnectionSelect({ dataSource, value, onChange }: ConnectionSele
   }, [connections, dataSource]);
 
   const handleSelectionChange = React.useCallback(
-    (event: SelectChangeEvent<string>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange((event.target.value as NodeId) || null);
     },
     [onChange],
   );
 
   return (
-    <FormControl size="small" fullWidth>
-      <InputLabel id="select-connection-type">Connection</InputLabel>
-      <Select
-        size="small"
-        fullWidth
-        value={value || ''}
-        labelId="select-connection-type"
-        label="Connection"
-        onChange={handleSelectionChange}
-      >
-        {filtered.map((connection) => (
-          <MenuItem key={connection.id} value={connection.id}>
-            {connection.name} | {connection.attributes.dataSource.value}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <TextField
+      select
+      fullWidth
+      value={value || ''}
+      label="Connection"
+      onChange={handleSelectionChange}
+    >
+      {filtered.map((connection) => (
+        <MenuItem key={connection.id} value={connection.id}>
+          {connection.name} | {connection.attributes.dataSource.value}
+        </MenuItem>
+      ))}
+    </TextField>
   );
 }
 

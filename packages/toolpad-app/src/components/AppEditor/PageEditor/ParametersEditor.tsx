@@ -14,6 +14,7 @@ export interface StringRecordEntriesEditorProps
   valueLabel?: string;
   autoFocus?: boolean;
   sx?: SxProps;
+  server?: boolean;
 }
 
 export default function ParametersEditor({
@@ -26,6 +27,7 @@ export default function ParametersEditor({
   valueLabel = 'value',
   autoFocus = false,
   sx,
+  server,
 }: StringRecordEntriesEditorProps) {
   const fieldInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -48,13 +50,12 @@ export default function ParametersEditor({
     <Box sx={sx} display="grid" gridTemplateColumns="1fr 2fr auto" alignItems="center" gap={1}>
       {label ? <Box gridColumn="span 3">{label}:</Box> : null}
       {value.map(([field, fieldValue], index) => {
-        const liveBinding = liveValue[index][1];
+        const liveBinding: LiveBinding | undefined = liveValue[index]?.[1];
 
         return (
           <React.Fragment key={index}>
             <TextField
               label={valueLabel}
-              size="small"
               value={field}
               autoFocus
               onChange={(event) =>
@@ -66,9 +67,10 @@ export default function ParametersEditor({
             />
             <BindableEditor
               liveBinding={liveBinding}
+              server={server}
               globalScope={globalScope}
               label={field}
-              argType={{ typeDef: { type: 'string' } }}
+              propType={{ type: 'string' }}
               value={fieldValue}
               onChange={(newBinding) =>
                 onChange(
@@ -80,24 +82,9 @@ export default function ParametersEditor({
                 )
               }
             />
-            {/* <BindingEditor
-              globalScope={pageState}
-              liveBinding={liveBinding}
-              label={field}
-              value={fieldValue}
-              onChange={(newBinding) =>
-                onChange(
-                  value.map((entry, i) =>
-                    i === index
-                      ? [entry[0], newBinding || { type: 'const', value: undefined }]
-                      : entry,
-                  ),
-                )
-              }
-            /> */}
 
-            <IconButton aria-label="Delete property" onClick={handleRemove(index)} size="small">
-              <DeleteIcon fontSize="small" />
+            <IconButton aria-label="Delete property" onClick={handleRemove(index)}>
+              <DeleteIcon />
             </IconButton>
           </React.Fragment>
         );
@@ -106,7 +93,6 @@ export default function ParametersEditor({
       <form autoComplete="off" style={{ display: 'contents' }}>
         <TextField
           inputRef={fieldInputRef}
-          size="small"
           label={fieldLabel}
           value=""
           onChange={(event) => {

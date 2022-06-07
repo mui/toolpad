@@ -4,10 +4,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
+  TextField,
 } from '@mui/material';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -46,7 +44,7 @@ export default function CreateConnectionDialog({
           const newNode = appDom.createNode(dom, 'connection', {
             attributes: {
               dataSource: appDom.createConst(dataSourceType),
-              params: appDom.createSecret(dataSource.getInitialConnectionValue()),
+              params: appDom.createSecret(null),
               status: appDom.createConst(null),
             },
           });
@@ -58,25 +56,23 @@ export default function CreateConnectionDialog({
       >
         <DialogTitle>Create a new MUI Toolpad Connection</DialogTitle>
         <DialogContent>
-          <FormControl sx={{ my: 1 }} size="small" fullWidth>
-            <InputLabel id="select-connection-type">Type</InputLabel>
-            <Select
-              labelId="select-connection-type"
-              size="small"
-              value={dataSourceType}
-              label="Type"
-              onChange={(event) => setDataSourceType(event.target.value)}
-            >
-              {(Object.entries(dataSources) as ExactEntriesOf<typeof dataSources>).map(
-                ([type, dataSourceDef]) =>
-                  dataSourceDef && (
-                    <MenuItem key={type} value={type}>
-                      {dataSourceDef.displayName}
-                    </MenuItem>
-                  ),
-              )}
-            </Select>
-          </FormControl>
+          <TextField
+            select
+            sx={{ my: 1 }}
+            fullWidth
+            value={dataSourceType}
+            label="Type"
+            onChange={(event) => setDataSourceType(event.target.value)}
+          >
+            {(Object.entries(dataSources) as ExactEntriesOf<typeof dataSources>).map(
+              ([type, dataSourceDef]) =>
+                dataSourceDef && (
+                  <MenuItem key={type} value={type}>
+                    {dataSourceDef.displayName}
+                  </MenuItem>
+                ),
+            )}
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={onClose}>

@@ -69,7 +69,6 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
               </Typography>
               <TextField
                 label="description"
-                size="small"
                 autoFocus
                 fullWidth
                 multiline

@@ -3,6 +3,7 @@ import type { IncomingMessage } from 'http';
 import superjson from 'superjson';
 import {
   getApps,
+  getApp,
   createApp,
   updateApp,
   execApi,
@@ -113,6 +114,9 @@ const rpcServer = {
     }),
     getApps: createMethod<typeof getApps>((params) => {
       return getApps(...params);
+    }),
+    getApp: createMethod<typeof getApp>((params) => {
+      return getApp(...params);
     }),
     execApi: createMethod<typeof execApi>((args) => {
       return execApi(...args);

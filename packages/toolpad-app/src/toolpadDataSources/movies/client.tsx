@@ -1,33 +1,41 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Stack,
-  TextField,
-} from '@mui/material';
+import { Button, MenuItem, Stack, TextField, Toolbar } from '@mui/material';
 import * as React from 'react';
+import { useForm } from 'react-hook-form';
 import data from '../../../movies.json';
-import { ClientDataSource } from '../../types';
-import { useInput } from '../../utils/forms';
-import { WithControlledProp } from '../../utils/types';
+import { ClientDataSource, ConnectionEditorProps } from '../../types';
+import { validation } from '../../utils/forms';
+import { Maybe, WithControlledProp } from '../../utils/types';
 import { MoviesQuery, MoviesConnectionParams } from './types';
 
-function ConnectionParamsInput({ value, onChange }: WithControlledProp<MoviesConnectionParams>) {
-  const apiKeyInputProps = useInput(value, onChange, 'apiKey');
+function withDefaults(value: Maybe<MoviesConnectionParams>): MoviesConnectionParams {
+  return {
+    apiKey: '',
+    ...value,
+  };
+}
+
+function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<MoviesConnectionParams>) {
+  const { handleSubmit, register, formState, reset } = useForm({
+    defaultValues: withDefaults(value),
+  });
+  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
 
   return (
     <Stack direction="column" gap={1}>
-      <TextField size="small" label="API key" {...apiKeyInputProps} />
+      <Toolbar disableGutters>
+        <Button onClick={doSubmit} disabled={!formState.isDirty || !formState.isValid}>
+          Save
+        </Button>
+      </Toolbar>
+      <TextField
+        label="API key"
+        {...register('apiKey', { required: true })}
+        {...validation(formState, 'apiKey')}
+      />
     </Stack>
   );
-}
-
-function getInitialValue(): MoviesConnectionParams {
-  return {
-    apiKey: '',
-  };
 }
 
 function isValid(connection: MoviesConnectionParams): boolean {
@@ -36,29 +44,21 @@ function isValid(connection: MoviesConnectionParams): boolean {
 
 export function QueryEditor({ value, onChange }: WithControlledProp<MoviesQuery>) {
   const handleChange = React.useCallback(
-    (event: SelectChangeEvent<string>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange({ ...value, genre: event.target.value || null });
     },
     [value, onChange],
   );
   return (
     <Stack>
-      <FormControl size="small" fullWidth>
-        <InputLabel id="select-movie-genre">Genre</InputLabel>
-        <Select
-          labelId="select-movie-genre"
-          value={value.genre || ''}
-          label="Genre"
-          onChange={handleChange}
-        >
-          <MenuItem value={''}>Any</MenuItem>
-          {data.genres.map((genre) => (
-            <MenuItem key={genre} value={genre}>
-              {genre}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <TextField select fullWidth value={value.genre || ''} label="Genre" onChange={handleChange}>
+        <MenuItem value={''}>Any</MenuItem>
+        {data.genres.map((genre) => (
+          <MenuItem key={genre} value={genre}>
+            {genre}
+          </MenuItem>
+        ))}
+      </TextField>
     </Stack>
   );
 }
@@ -70,7 +70,6 @@ function getInitialQueryValue(): MoviesQuery {
 const dataSource: ClientDataSource<MoviesConnectionParams, MoviesQuery> = {
   displayName: 'Fake Movies API',
   ConnectionParamsInput,
-  getInitialConnectionValue: getInitialValue,
   isConnectionValid: isValid,
   QueryEditor,
   getInitialQueryValue,

@@ -1,7 +1,7 @@
 import { NextApiHandler } from 'next';
 import { asArray } from '../../../../src/utils/collections';
 import serverDataSources from '../../../../src/toolpadDataSources/server';
-import { getConnection, updateConnection } from '../../../../src/server/data';
+import { getConnectionParams, setConnectionParams } from '../../../../src/server/data';
 
 const handlerMap = new Map<String, Function | null | undefined>();
 Object.keys(serverDataSources).forEach((dataSource) => {
@@ -13,7 +13,14 @@ export default (async (req, res) => {
     const [dataSource] = asArray(req.query.dataSource);
     const handler = handlerMap.get(dataSource);
     if (handler) {
-      return handler({ getConnection, updateConnection }, req, res);
+      return handler(
+        {
+          getConnectionParams,
+          setConnectionParams,
+        },
+        req,
+        res,
+      );
     }
     return res.status(404).json({ message: 'No handler found' });
   }

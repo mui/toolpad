@@ -38,8 +38,11 @@ export default function EditorCanvasHost({
   const update = React.useCallback(() => {
     const renderDom = appDom.createRenderTree(dom);
     // eslint-disable-next-line no-underscore-dangle
-    frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__?.updateDom(renderDom);
-  }, [dom]);
+    frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__?.update({
+      appId,
+      dom: renderDom,
+    });
+  }, [appId, dom]);
   React.useEffect(() => update(), [update]);
 
   const onReadyRef = React.useRef((window: Window) => {
@@ -85,7 +88,7 @@ export default function EditorCanvasHost({
       </Box>
       <CanvasFrame
         ref={frameRef}
-        src={`/app/${appId}/preview/pages/${pageNodeId}`}
+        src={`/app-canvas/${appId}/pages/${pageNodeId}`}
         // Used by the runtime to know when to load react devtools
         data-toolpad-canvas
       />

@@ -1,11 +1,15 @@
 import * as React from 'react';
-import * as appDom from '../appDom';
-import { createProvidedContext } from '../utils/react';
+import { fireEvent } from '@mui/toolpad-core/runtime';
+import ToolpadApp from '../ToolpadApp';
+import * as appDom from '../../appDom';
 
-const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
+export interface AppCanvasState {
+  appId: string;
+  dom: appDom.AppDom;
+}
 
 export interface ToolpadBridge {
-  updateDom(newDom: appDom.AppDom): void;
+  update(updates: AppCanvasState): void;
 }
 
 declare global {
@@ -15,21 +19,19 @@ declare global {
   }
 }
 
-export interface EditorCanvasProps {
-  dom: appDom.AppDom;
-  children?: React.ReactNode;
+export interface AppCanvasProps {
+  basename: string;
 }
 
-export default function DomProvider({ dom: domProp, children }: EditorCanvasProps) {
-  const [dom, setDom] = React.useState<appDom.AppDom>(domProp);
-  React.useEffect(() => setDom(domProp), [domProp]);
+export default function AppCanvas({ basename }: AppCanvasProps) {
+  const [state, setState] = React.useState<AppCanvasState | null>(null);
 
   React.useEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
     window.__TOOLPAD_BRIDGE__ = {
-      updateDom: (newDom) => {
+      update: (newState) => {
         React.startTransition(() => {
-          setDom(newDom);
+          setState(newState);
         });
       },
     };
@@ -47,7 +49,19 @@ export default function DomProvider({ dom: domProp, children }: EditorCanvasProp
     };
   }, []);
 
-  return <DomContextProvider value={dom}>{children}</DomContextProvider>;
-}
+  React.useEffect(() => {
+    // Run after every render
+    fireEvent({ type: 'afterRender' });
+  });
 
-export { useDomContext };
+  return state ? (
+    <ToolpadApp
+      dom={state.dom}
+      version="preview"
+      appId={state.appId}
+      basename={`${basename}/${state.appId}`}
+    />
+  ) : (
+    <div>loading...</div>
+  );
+}

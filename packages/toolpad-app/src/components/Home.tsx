@@ -24,7 +24,6 @@ import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import client from '../api';
 import DialogForm from './DialogForm';
@@ -264,12 +263,6 @@ function AppCard({ app, onDelete }: AppCardProps) {
             <DriveFileRenameOutlineIcon />
           </ListItemIcon>
           <ListItemText>Rename</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleMenuClose}>
-          <ListItemIcon>
-            <FileCopyIcon />
-          </ListItemIcon>
-          <ListItemText>Duplicate</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleDeleteClick}>
           <ListItemIcon>

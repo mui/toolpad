@@ -496,15 +496,31 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   const deleteOrphanedLayoutComponents = React.useCallback(
-    (movedOrDeletedNode: appDom.ElementNode) => {
+    (movedOrDeletedNode: appDom.ElementNode, moveTargetNodeId: NodeId | null = null) => {
       const parent = appDom.getParent(dom, movedOrDeletedNode);
       const parentParent = parent && appDom.getParent(dom, parent);
+
+      const parentChildren = parent ? appDom.getChildNodes(dom, parent).children : [];
+
+      const isSecondLastColumnChild =
+        parent && appDom.isElement(parent) && isPageColumn(parent) && parentChildren.length === 2;
+
+      if (isSecondLastColumnChild) {
+        const lastColumnChild = parentChildren.filter(
+          (child) => child.id !== movedOrDeletedNode.id,
+        )[0];
+
+        if (parent.parentIndex && parentParent && appDom.isElement(parentParent)) {
+          domApi.moveNode(lastColumnChild, parentParent, 'children', parent.parentIndex);
+          domApi.removeNode(parent.id);
+        }
+      }
 
       const isOnlyLayoutContainerChild =
         parent &&
         appDom.isElement(parent) &&
         isPageLayoutComponent(parent) &&
-        appDom.getChildNodes(dom, parent).children.length === 1;
+        parentChildren.length === 1;
 
       if (isOnlyLayoutContainerChild) {
         const isParentOnlyRowColumn =
@@ -515,7 +531,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         domApi.removeNode(parent.id);
 
-        if (isParentOnlyRowColumn) {
+        if (isParentOnlyRowColumn && moveTargetNodeId !== parentParent.id) {
           domApi.removeNode(parentParent.id);
         }
       }
@@ -671,7 +687,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       api.nodeDragEnd();
 
       if (selection) {
-        deleteOrphanedLayoutComponents(draggedNode);
+        deleteOrphanedLayoutComponents(draggedNode, dragOverNode.id);
       }
 
       if (newNode) {

@@ -4,10 +4,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
+  TextField,
 } from '@mui/material';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -58,24 +56,23 @@ export default function CreateConnectionDialog({
       >
         <DialogTitle>Create a new MUI Toolpad Connection</DialogTitle>
         <DialogContent>
-          <FormControl sx={{ my: 1 }} fullWidth>
-            <InputLabel id="select-connection-type">Type</InputLabel>
-            <Select
-              labelId="select-connection-type"
-              value={dataSourceType}
-              label="Type"
-              onChange={(event) => setDataSourceType(event.target.value)}
-            >
-              {(Object.entries(dataSources) as ExactEntriesOf<typeof dataSources>).map(
-                ([type, dataSourceDef]) =>
-                  dataSourceDef && (
-                    <MenuItem key={type} value={type}>
-                      {dataSourceDef.displayName}
-                    </MenuItem>
-                  ),
-              )}
-            </Select>
-          </FormControl>
+          <TextField
+            select
+            sx={{ my: 1 }}
+            fullWidth
+            value={dataSourceType}
+            label="Type"
+            onChange={(event) => setDataSourceType(event.target.value)}
+          >
+            {(Object.entries(dataSources) as ExactEntriesOf<typeof dataSources>).map(
+              ([type, dataSourceDef]) =>
+                dataSourceDef && (
+                  <MenuItem key={type} value={type}>
+                    {dataSourceDef.displayName}
+                  </MenuItem>
+                ),
+            )}
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={onClose}>

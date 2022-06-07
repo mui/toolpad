@@ -4,16 +4,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
   IconButton,
-  InputLabel,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
   Menu,
   MenuItem,
-  Select,
   Stack,
   TextField,
 } from '@mui/material';
@@ -128,45 +125,41 @@ function GridColumnsPropEditor({
                     handleColumnChange({ ...editedColumn, field: event.target.value })
                   }
                 />
-                <FormControl fullWidth>
-                  <InputLabel id={`select-type`}>type</InputLabel>
-                  <Select
-                    labelId={`select-type`}
-                    label="type"
-                    value={editedColumn.type ?? ''}
-                    disabled={disabled}
-                    onChange={(event) =>
-                      handleColumnChange({ ...editedColumn, type: event.target.value })
-                    }
-                  >
-                    {COLUMN_TYPES.map((type) => (
-                      <MenuItem key={type} value={type}>
-                        {type}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl fullWidth>
-                  <InputLabel id={`select-align`}>align</InputLabel>
-                  <Select
-                    labelId={`select-align`}
-                    label="align"
-                    value={editedColumn.align ?? ''}
-                    disabled={disabled}
-                    onChange={(event) =>
-                      handleColumnChange({
-                        ...editedColumn,
-                        align: (event.target.value as GridAlignment) || undefined,
-                      })
-                    }
-                  >
-                    {ALIGNMENTS.map((alignment) => (
-                      <MenuItem key={alignment} value={alignment}>
-                        {alignment}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <TextField
+                  select
+                  fullWidth
+                  label="type"
+                  value={editedColumn.type ?? ''}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({ ...editedColumn, type: event.target.value })
+                  }
+                >
+                  {COLUMN_TYPES.map((type) => (
+                    <MenuItem key={type} value={type}>
+                      {type}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  select
+                  fullWidth
+                  label="align"
+                  value={editedColumn.align ?? ''}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({
+                      ...editedColumn,
+                      align: (event.target.value as GridAlignment) || undefined,
+                    })
+                  }
+                >
+                  {ALIGNMENTS.map((alignment) => (
+                    <MenuItem key={alignment} value={alignment}>
+                      {alignment}
+                    </MenuItem>
+                  ))}
+                </TextField>
                 <TextField
                   label="width"
                   type="number"

@@ -60,7 +60,11 @@ function FileEditor({ appId }: FileEditorProps) {
         <Route
           index
           element={
-            firstPage ? <Navigate to={`pages/${firstPage.id}`} /> : <NoPageFound appId={appId} />
+            firstPage ? (
+              <Navigate to={`pages/${firstPage.id}`} replace />
+            ) : (
+              <NoPageFound appId={appId} />
+            )
           }
         />
       </Route>

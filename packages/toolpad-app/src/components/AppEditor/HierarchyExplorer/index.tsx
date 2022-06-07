@@ -15,7 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { useNavigate, useLocation, matchRoutes } from 'react-router-dom';
+import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -65,6 +65,37 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   );
 }
 
+function getActiveNodeId(location: Location): NodeId | null {
+  const match =
+    matchRoutes(
+      [
+        { path: `/app/:appId/editor/pages/:activeNodeId` },
+        { path: `/app/:appId/editor/apis/:activeNodeId` },
+        { path: `/app/:appId/editor/codeComponents/:activeNodeId` },
+        { path: `/app/:appId/editor/connections/:activeNodeId` },
+      ],
+      location,
+    ) || [];
+
+  const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
+  return selected.length > 0 ? selected[0] : null;
+}
+
+function getLinkToNodeEditor(appId: string, node: appDom.AppDomNode): string | undefined {
+  switch (node.type) {
+    case 'page':
+      return `/app/${appId}/editor/pages/${node.id}`;
+    case 'connection':
+      return `/app/${appId}/editor/connections/${node.id}`;
+    case 'codeComponent':
+      return `/app/${appId}/editor/codeComponents/${node.id}`;
+    case 'api':
+      return `/app/${appId}/editor/apis/${node.id}`;
+    default:
+      return undefined;
+  }
+}
+
 export interface HierarchyExplorerProps {
   appId: string;
   className?: string;
@@ -88,18 +119,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   );
 
   const location = useLocation();
-  const match =
-    matchRoutes(
-      [
-        { path: `/app/:appId/editor/pages/:activeNodeId` },
-        { path: `/app/:appId/editor/apis/:activeNodeId` },
-        { path: `/app/:appId/editor/codeComponents/:activeNodeId` },
-        { path: `/app/:appId/editor/connections/:activeNodeId` },
-      ],
-      location,
-    ) || [];
 
-  const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
+  const activeNode = getActiveNodeId(location);
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);
@@ -183,11 +204,27 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
   const handleDeleteNode = React.useCallback(() => {
     if (deletedNodeId) {
+      let redirectAfterDelete: string | undefined;
+      if (deletedNodeId === activeNode) {
+        const deletedNode = appDom.getNode(dom, deletedNodeId);
+        const siblings = appDom.getSiblings(dom, deletedNode);
+        const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
+        if (firstSiblingOfType) {
+          redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
+        } else {
+          redirectAfterDelete = `/app/${appId}/editor`;
+        }
+      }
+
       domApi.removeNode(deletedNodeId);
-      navigate(`/app/${appId}/editor/`);
+
+      if (redirectAfterDelete) {
+        navigate(redirectAfterDelete);
+      }
+
       handledeleteNodeDialogClose();
     }
-  }, [deletedNodeId, domApi, navigate, appId, handledeleteNodeDialogClose]);
+  }, [deletedNodeId, activeNode, domApi, handledeleteNodeDialogClose, dom, appId, navigate]);
 
   const deletedNode = deletedNodeId && appDom.getMaybeNode(dom, deletedNodeId);
   const latestDeletedNode = useLatest(deletedNode);
@@ -196,7 +233,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     <HierarchyExplorerRoot className={className}>
       <TreeView
         aria-label="hierarchy explorer"
-        selected={selected}
+        selected={activeNode ? [activeNode] : []}
         onNodeSelect={handleSelect}
         expanded={expanded}
         onNodeToggle={handleToggle}

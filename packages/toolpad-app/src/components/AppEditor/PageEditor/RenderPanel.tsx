@@ -547,10 +547,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const parentInfo = parent && nodesInfo[parent.id];
       const originalParent = parent;
 
-      if (parent && !appDom.isElement(parent) && !appDom.isPage(parent)) {
-        return;
-      }
-
       let addOrMoveNode = domApi.addNode;
       if (selection) {
         addOrMoveNode = domApi.moveNode;
@@ -563,6 +559,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         const container = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
         domApi.addNode(container, dragOverNode, 'children');
         addOrMoveNode(draggedNode, container, 'children');
+      }
+
+      if (parent && !appDom.isElement(parent) && !appDom.isPage(parent)) {
+        return;
       }
 
       if (!isDraggingOverPage && parent) {
@@ -938,7 +938,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
             const nodeInfo = nodesInfo[node.id];
 
-            const isPageNodeHub = appDom.isPage(node);
+            const isPageNodeHub = appDom.isPage(node) && pageNodes.length === 1;
 
             const hasContainer = nodeInfo ? hasContainerComponent(nodeInfo) : false;
 

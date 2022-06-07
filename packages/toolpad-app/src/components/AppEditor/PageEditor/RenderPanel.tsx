@@ -389,10 +389,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         const isDraggingOverContainer = hasContainerComponent(activeDropNodeInfo);
 
         let centerAreaFraction = 0;
-        if (isDraggingOverContainer) {
-          centerAreaFraction = 0.5;
-        }
-        if (isDraggingOverPage) {
+        if (isDraggingOverContainer || isDraggingOverPage) {
           centerAreaFraction = 1;
         }
 
@@ -433,7 +430,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   const getNodeLastChild = React.useCallback(
-    (node: appDom.ElementNode): appDom.ElementNode | null => {
+    (node: appDom.PageNode | appDom.ElementNode): appDom.ElementNode | null => {
       const nodeChildren = appDom.getChildNodes(dom, node).children || [];
       return nodeChildren.length > 0 ? nodeChildren[nodeChildren.length - 1] : null;
     },
@@ -448,8 +445,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       if (dragOverNodeZone === RectZone.CENTER) {
         if (node.id !== dragOverNodeId) {
           // Is dragging over parent element center
-          if (parent && !appDom.isPage(parent) && parent.id === dragOverNodeId) {
-            const parentLastChild = appDom.isElement(parent) ? getNodeLastChild(parent) : null;
+          if (parent && parent.id === dragOverNodeId) {
+            const parentLastChild =
+              appDom.isPage(parent) || appDom.isElement(parent) ? getNodeLastChild(parent) : null;
 
             const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
 
@@ -460,13 +458,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return null;
         }
         // Is dragging over own element center
-        if (node.id === dragOverNodeId) {
-          const nodeChildren =
-            (appDom.isElement(node) && appDom.getChildNodes(dom, node).children) || [];
+        const nodeChildren =
+          (appDom.isElement(node) && appDom.getChildNodes(dom, node).children) || [];
 
-          return nodeChildren && nodeChildren.length === 0 ? RectZone.CENTER : null;
-        }
-        return null;
+        return nodeChildren && nodeChildren.length === 0 ? RectZone.CENTER : null;
       }
 
       // For non-page layout containers, only highlight in the container direction
@@ -570,30 +565,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         if (!isOriginalParentPage && !appDom.isElement(parent)) {
           throw new Error(`Invalid drop target "${parent.id}" of type "${parent.type}"`);
-        }
-
-        // Drop on page rows (except page row center)
-        if (isOriginalParentPage && dragOverNodeZone && dragOverNodeZone !== RectZone.CENTER) {
-          if ([RectZone.TOP, RectZone.BOTTOM].includes(dragOverNodeZone)) {
-            const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
-
-            const newParentIndex =
-              dragOverNodeZone === RectZone.TOP
-                ? appDom.getNewParentIndexBeforeNode(dom, dragOverNode, 'children')
-                : appDom.getNewParentIndexAfterNode(dom, dragOverNode, 'children');
-
-            domApi.addNode(rowContainer, parent, 'children', newParentIndex);
-            parent = rowContainer;
-          } else {
-            const newParentIndex =
-              dragOverNodeZone === RectZone.RIGHT
-                ? appDom.getNewLastParentIndexInParentNode(dom, dragOverNode, 'children')
-                : appDom.getNewFirstParentIndexInParentNode(dom, dragOverNode, 'children');
-
-            const columnContainer = appDom.createElement(dom, PAGE_COLUMN_COMPONENT_ID, {});
-            domApi.addNode(columnContainer, dragOverNode, 'children', newParentIndex);
-            parent = columnContainer;
-          }
         }
 
         const isDraggingOverColumn = appDom.isElement(dragOverNode) && isPageColumn(dragOverNode);

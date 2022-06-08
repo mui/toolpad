@@ -237,7 +237,7 @@ function resolveBindables(
 
 interface QueryNodeProps {
   // TODO: deprecate `QueryStateNode`
-  node: appDom.QueryNode | appDom.QueryStateNode;
+  node: appDom.QueryNode;
 }
 
 function QueryNode({ node }: QueryNodeProps) {
@@ -246,7 +246,7 @@ function QueryNode({ node }: QueryNodeProps) {
   const setControlledBinding = useSetControlledBindingContext();
 
   const dataUrl = `/api/data/${appId}/${version}/`;
-  const queryId = appDom.isQueryState(node) ? node.attributes.api.value : node.id;
+  const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
   const queryResult = useDataQuery(dataUrl, queryId, params, {
@@ -334,7 +334,7 @@ function parseBindings(
       }
     }
 
-    if (appDom.isQueryState(elm) || appDom.isQuery(elm)) {
+    if (appDom.isQuery(elm)) {
       if (elm.params) {
         for (const [paramName, bindable] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
@@ -383,7 +383,7 @@ function parseBindings(
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [], queryStates = [], queries = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
   usePageTitle(page.attributes.title.value);
 
@@ -445,10 +445,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     <BindingsContextProvider value={liveBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <RenderedNodeContent nodeId={page.id} childNodes={children} Component={PageRootComponent} />
-
-        {queryStates.map((node) => (
-          <QueryNode key={node.id} node={node} />
-        ))}
 
         {queries.map((node) => (
           <QueryNode key={node.id} node={node} />

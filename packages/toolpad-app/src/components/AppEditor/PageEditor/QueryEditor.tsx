@@ -15,6 +15,7 @@ import {
   Divider,
   Typography,
   Toolbar,
+  MenuItem,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -23,19 +24,59 @@ import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad
 import { evaluateBindable } from '@mui/toolpad-core/runtime';
 import { LoadingButton } from '@mui/lab';
 import useLatest from '../../../utils/useLatest';
-import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
 import { NodeId } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import JsonView from '../../JsonView';
-import { ConnectionSelect } from '../HierarchyExplorer/CreateApiNodeDialog';
 import { omit, update } from '../../../utils/immutability';
 import client from '../../../api';
 import ParametersEditor from './ParametersEditor';
 import ErrorAlert from './ErrorAlert';
 import { JsExpressionEditor } from './JsExpressionEditor';
+import { WithControlledProp } from '../../../utils/types';
+import { useDom, useDomApi } from '../../DomLoader';
+
+export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
+  dataSource?: string;
+}
+
+export function ConnectionSelect({ dataSource, value, onChange }: ConnectionSelectProps) {
+  const dom = useDom();
+
+  const app = appDom.getApp(dom);
+  const { connections = [] } = appDom.getChildNodes(dom, app);
+
+  const filtered = React.useMemo(() => {
+    return dataSource
+      ? connections.filter((connection) => connection.attributes.dataSource.value === dataSource)
+      : connections;
+  }, [connections, dataSource]);
+
+  const handleSelectionChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange((event.target.value as NodeId) || null);
+    },
+    [onChange],
+  );
+
+  return (
+    <TextField
+      select
+      fullWidth
+      value={value || ''}
+      label="Connection"
+      onChange={handleSelectionChange}
+    >
+      {filtered.map((connection) => (
+        <MenuItem key={connection.id} value={connection.id}>
+          {connection.name} | {connection.attributes.dataSource.value}
+        </MenuItem>
+      ))}
+    </TextField>
+  );
+}
 
 function refetchIntervalInSeconds(maybeInterval?: number) {
   if (typeof maybeInterval !== 'number') {

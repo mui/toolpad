@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { ArgTypeDefinitions, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
+import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import { Button, InputAdornment, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-import StringRecordEditor from '../../components/StringRecordEditor';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
@@ -158,20 +157,10 @@ function QueryEditor({
     [onChange, value],
   );
 
-  const handleApiQueryChange = React.useCallback(
-    (newValue: Record<string, string>) => {
-      onChange({
-        ...value,
-        params: newValue,
-      });
-    },
-    [onChange, value],
-  );
-
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
     input: value.url,
-    globalScope: globalScope.query ? globalScope : { query: value.params },
+    globalScope,
   });
 
   return (
@@ -188,34 +177,12 @@ function QueryEditor({
         value={value.url}
         onChange={handleUrlChange}
       />
-      {/* TODO: remove this when QueryStateNode is removed */}
-      {globalScope.query ? null : (
-        <StringRecordEditor
-          label="api query"
-          fieldLabel="parameter"
-          valueLabel="default value"
-          value={value.params || {}}
-          onChange={handleApiQueryChange}
-        />
-      )}
     </div>
   );
 }
 
 function getInitialQueryValue(): FetchQuery {
-  return { url: { type: 'const', value: '' }, method: '', headers: [], params: {} };
-}
-
-function getArgTypes(query: FetchQuery): ArgTypeDefinitions {
-  return Object.fromEntries(
-    Object.entries(query.params).map(([propName, defaultValue]) => [
-      propName,
-      {
-        typeDef: { type: 'string' },
-        defaultValue,
-      },
-    ]),
-  );
+  return { url: { type: 'const', value: '' }, method: '', headers: [] };
 }
 
 const dataSource: ClientDataSource<{}, FetchQuery> = {
@@ -224,7 +191,6 @@ const dataSource: ClientDataSource<{}, FetchQuery> = {
   isConnectionValid: () => true,
   QueryEditor,
   getInitialQueryValue,
-  getArgTypes,
 };
 
 export default dataSource;

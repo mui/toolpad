@@ -3,7 +3,6 @@ import * as React from 'react';
 import PageIcon from '@mui/icons-material/Web';
 import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
-import QueryStateEditor from './QueryStateEditor';
 import QueryEditor from './QueryEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
@@ -32,7 +31,6 @@ export default function PageOptionsPanel() {
         <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
         <Typography variant="subtitle1">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />
-        <QueryStateEditor />
         <QueryEditor />
       </Stack>
     </div>

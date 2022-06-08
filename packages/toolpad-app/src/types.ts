@@ -1,12 +1,6 @@
 import type * as React from 'react';
 import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  ArgTypeDefinition,
-  ArgTypeDefinitions,
-  SlotType,
-  RuntimeError,
-  ComponentConfig,
-} from '@mui/toolpad-core';
+import { ArgTypeDefinition, SlotType, RuntimeError, ComponentConfig } from '@mui/toolpad-core';
 
 import { PaletteMode } from '@mui/material';
 import type { Branded, Maybe, WithControlledProp } from './utils/types';
@@ -109,7 +103,6 @@ export interface ClientDataSource<P = {}, Q = {}> {
   isConnectionValid: (connection: P) => boolean;
   QueryEditor: QueryEditor<P, Q>;
   getInitialQueryValue: () => Q;
-  getArgTypes?: (query: Q) => ArgTypeDefinitions;
 }
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {

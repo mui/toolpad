@@ -46,8 +46,7 @@ async function exec(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
 ): Promise<ApiResult<any>> {
-  const boundValues = { ...fetchQuery.params, ...params };
-  const resolvedUrl = await resolveBindableString(fetchQuery.url, boundValues);
+  const resolvedUrl = await resolveBindableString(fetchQuery.url, params);
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
 

@@ -87,6 +87,12 @@ export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> 
         return attributesData;
       }),
     }),
+    prisma.app.update({
+      where: {
+        id: appId,
+      },
+      data: { editedAt: new Date() },
+    }),
   ]);
 }
 
@@ -133,7 +139,11 @@ export async function loadDom(appId: string): Promise<appDom.AppDom> {
 }
 
 export async function getApps() {
-  return prisma.app.findMany();
+  return prisma.app.findMany({
+    orderBy: {
+      editedAt: 'desc',
+    },
+  });
 }
 
 export async function getApp(id: string) {
@@ -179,6 +189,15 @@ export async function createApp(name: string): Promise<App> {
     await saveDom(app.id, dom);
 
     return app;
+  });
+}
+
+export async function updateApp(appId: string, name: string): Promise<App> {
+  return prisma.app.update({
+    where: {
+      id: appId,
+    },
+    data: { name },
   });
 }
 

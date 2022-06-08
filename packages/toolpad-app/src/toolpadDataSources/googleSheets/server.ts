@@ -11,6 +11,7 @@ import {
   GoogleSheetsPrivateQuery,
   GoogleSheetsApiQuery,
 } from './types';
+import { Maybe } from '../../utils/types';
 
 /**
  * Create an OAuth2 client based on the configuration
@@ -71,7 +72,7 @@ function createSheetsClient(client: OAuth2Client) {
  */
 
 async function execPrivate(
-  connection: GoogleSheetsConnectionParams,
+  connection: Maybe<GoogleSheetsConnectionParams>,
   query: GoogleSheetsPrivateQuery,
 ): Promise<any> {
   const client = createOAuthClient();
@@ -146,7 +147,7 @@ async function execPrivate(
  */
 
 async function exec(
-  connection: GoogleSheetsConnectionParams,
+  connection: Maybe<GoogleSheetsConnectionParams>,
   query: GoogleSheetsApiQuery,
 ): Promise<ApiResult<any>> {
   const client = createOAuthClient();

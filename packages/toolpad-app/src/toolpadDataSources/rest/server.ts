@@ -3,6 +3,7 @@ import { ServerDataSource, ApiResult } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';
 import evalExpression from '../../server/evalExpression';
+import { Maybe } from '../../utils/types';
 
 async function resolveBindableString(
   bindable: BindableAttrValue<string>,
@@ -30,7 +31,7 @@ async function resolveBindableString(
 }
 
 async function exec(
-  connection: RestConnectionParams,
+  connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
 ): Promise<ApiResult<any>> {

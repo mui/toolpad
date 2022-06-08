@@ -429,11 +429,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         const activeDropNodeRect = activeDropNodeInfo.rect;
 
         const isDraggingOverPage = appDom.isPage(activeDropNode);
-
-        const isDraggingOverContainer = hasContainerComponent(activeDropNodeInfo);
+        const isDraggingOverRow = appDom.isElement(activeDropNode) && isPageRow(activeDropNode);
 
         let centerAreaFraction = 0;
-        if (isDraggingOverContainer || isDraggingOverPage) {
+        if (isDraggingOverPage || isDraggingOverRow) {
           centerAreaFraction = 1;
         }
 

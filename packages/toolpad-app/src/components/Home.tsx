@@ -130,11 +130,11 @@ function AppRenameErrorDialog({ open, name, onContinue, onDiscard }: AppRenameEr
         <DialogTitle>Error renaming</DialogTitle>
         <DialogContent>An app with the name &quot;{name}&quot; already exists.</DialogContent>
         <DialogActions>
+          <Button onClick={onDiscard} color={'error'}>
+            Discard
+          </Button>
           <Button color="inherit" variant="text" onClick={onContinue}>
             Keep editing
-          </Button>
-          <Button onClick={onDiscard} color="error">
-            Discard
           </Button>
         </DialogActions>
       </DialogForm>

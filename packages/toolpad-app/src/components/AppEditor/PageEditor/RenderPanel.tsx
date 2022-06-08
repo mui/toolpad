@@ -344,6 +344,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       return [];
     }
 
+    // If dragging row, can place only inside page
+    if (isPageRow(draggedNode)) {
+      return [pageNode];
+    }
+
     /**
      * Return all nodes that are available for insertion.
      * i.e. Exclude all descendants of the current selection since inserting in one of
@@ -352,8 +357,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     const excludedNodes = selectedNode
       ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
       : new Set();
+
     return pageNodes.filter((n) => !excludedNodes.has(n));
-  }, [dom, getCurrentlyDraggedNode, pageNodes, selectedNode]);
+  }, [dom, getCurrentlyDraggedNode, pageNode, pageNodes, selectedNode]);
 
   const availableDropTargetIds = React.useMemo(
     () => new Set(availableDropTargets.map((n) => n.id)),
@@ -558,18 +564,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const parentInfo = parent && nodesInfo[parent.id];
       const originalParent = parent;
 
-      let addOrMoveNode = domApi.addNode;
-      if (selection) {
-        addOrMoveNode = domApi.moveNode;
-      }
-
       const isDraggingOverPage = (dragOverNode && appDom.isPage(dragOverNode)) || false;
 
       // Drop on page
       if (isDraggingOverPage) {
-        const container = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
-        domApi.addNode(container, dragOverNode, 'children');
-        addOrMoveNode(draggedNode, container, 'children');
+        if (!selection) {
+          const container = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
+          domApi.addNode(container, dragOverNode, 'children');
+          domApi.addNode(draggedNode, container, 'children');
+        } else {
+          domApi.moveNode(draggedNode, dragOverNode, 'children');
+        }
+      }
+
+      let addOrMoveNode = domApi.addNode;
+      if (selection) {
+        addOrMoveNode = domApi.moveNode;
       }
 
       if (parent && !appDom.isElement(parent) && !appDom.isPage(parent)) {

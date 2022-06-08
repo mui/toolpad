@@ -48,13 +48,23 @@ export function QueryEditor({
 }: QueryEditorProps<MoviesConnectionParams, MoviesQuery>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ ...value, genre: event.target.value || null });
+      const query: MoviesQuery = {
+        ...value.query,
+        genre: event.target.value || null,
+      };
+      onChange({ ...value, query });
     },
     [value, onChange],
   );
   return (
     <Stack>
-      <TextField select fullWidth value={value.genre || ''} label="Genre" onChange={handleChange}>
+      <TextField
+        select
+        fullWidth
+        value={value.query.genre || ''}
+        label="Genre"
+        onChange={handleChange}
+      >
         <MenuItem value={''}>Any</MenuItem>
         {data.genres.map((genre) => (
           <MenuItem key={genre} value={genre}>

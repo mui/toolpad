@@ -46,13 +46,13 @@ function QueryEditor({
 
   const fetchedFile: UseQueryResult<GoogleDriveFile> = client.useQuery(
     'dataSourceFetchPrivate',
-    value.spreadsheetId
+    value.query.spreadsheetId
       ? [
           appId,
           connectionId,
           {
             type: GoogleSheetsPrivateQueryType.FILE_GET,
-            spreadsheetId: value.spreadsheetId,
+            spreadsheetId: value.query.spreadsheetId,
           },
         ]
       : null,
@@ -60,13 +60,13 @@ function QueryEditor({
 
   const fetchedSpreadsheet: UseQueryResult<GoogleSpreadsheet> = client.useQuery(
     'dataSourceFetchPrivate',
-    value.spreadsheetId
+    value.query.spreadsheetId
       ? [
           appId,
           connectionId,
           {
             type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET,
-            spreadsheetId: value.spreadsheetId,
+            spreadsheetId: value.query.spreadsheetId,
           },
         ]
       : null,
@@ -75,48 +75,52 @@ function QueryEditor({
   const selectedSheet = React.useMemo(
     () =>
       fetchedSpreadsheet.data?.sheets?.find(
-        (sheet) => sheet.properties?.title === value.sheetName,
+        (sheet) => sheet.properties?.title === value.query.sheetName,
       ) ?? null,
     [fetchedSpreadsheet, value],
   );
 
   const handleSpreadsheetChange = React.useCallback(
     (event, newValue: GoogleDriveFile | null) => {
-      onChange({
-        ...value,
+      const query: GoogleSheetsApiQuery = {
+        ...value.query,
         sheetName: null,
         spreadsheetId: newValue?.id ?? null,
-      });
+      };
+      onChange({ ...value, query });
     },
     [onChange, value],
   );
 
   const handleSheetChange = React.useCallback(
     (event, newValue: GoogleSheet | null) => {
-      onChange({
-        ...value,
+      const query: GoogleSheetsApiQuery = {
+        ...value.query,
         sheetName: newValue?.properties?.title ?? null,
-      });
+      };
+      onChange({ ...value, query });
     },
     [onChange, value],
   );
 
   const handleRangeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({
-        ...value,
+      const query: GoogleSheetsApiQuery = {
+        ...value.query,
         ranges: event.target.value,
-      });
+      };
+      onChange({ ...value, query });
     },
     [onChange, value],
   );
 
   const handleTransformChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({
-        ...value,
+      const query: GoogleSheetsApiQuery = {
+        ...value.query,
         headerRow: event.target.checked,
-      });
+      };
+      onChange({ ...value, query });
     },
     [onChange, value],
   );
@@ -173,15 +177,15 @@ function QueryEditor({
       <TextField
         label="Range"
         helperText={`In the form of A1:Z999`}
-        value={value.ranges}
-        disabled={!value.sheetName}
+        value={value.query.ranges}
+        disabled={!value.query.sheetName}
         onChange={handleRangeChange}
       />
       <FormControlLabel
         label="First row contains column headers"
         control={
           <Checkbox
-            checked={value.headerRow}
+            checked={value.query.headerRow}
             onChange={handleTransformChange}
             inputProps={{ 'aria-label': 'controlled' }}
           />

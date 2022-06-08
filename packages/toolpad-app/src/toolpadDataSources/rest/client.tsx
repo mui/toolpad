@@ -14,6 +14,7 @@ import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
+import * as appDom from '../../appDom';
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -152,25 +153,30 @@ function QueryEditor({
   const baseUrl = connectionParams?.baseUrl;
 
   const handleUrlChange = React.useCallback(
-    (newValue: BindableAttrValue<string> | null) => {
-      onChange({ ...value, url: newValue || { type: 'const', value: '' } });
+    (newUrl: BindableAttrValue<string> | null) => {
+      const query: FetchQuery = {
+        ...value.query,
+        url: newUrl || appDom.createConst(''),
+      };
+      onChange({ ...value, query });
     },
     [onChange, value],
   );
 
   const handleApiQueryChange = React.useCallback(
     (newValue: Record<string, string>) => {
-      onChange({
-        ...value,
+      const query: FetchQuery = {
+        ...value.query,
         params: newValue,
-      });
+      };
+      onChange({ ...value, query });
     },
     [onChange, value],
   );
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
-    input: value.url,
+    input: value.query.url,
     globalScope: globalScope.query ? globalScope : { query: value.params },
   });
 
@@ -185,7 +191,7 @@ function QueryEditor({
         renderControl={(params) => {
           return <UrlControl baseUrl={baseUrl} {...params} />;
         }}
-        value={value.url}
+        value={value.query.url}
         onChange={handleUrlChange}
       />
       {/* TODO: remove this when QueryStateNode is removed */}
@@ -194,7 +200,7 @@ function QueryEditor({
           label="api query"
           fieldLabel="parameter"
           valueLabel="default value"
-          value={value.params || {}}
+          value={value.query.params || {}}
           onChange={handleApiQueryChange}
         />
       )}

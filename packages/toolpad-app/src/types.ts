@@ -6,6 +6,7 @@ import {
   SlotType,
   RuntimeError,
   ComponentConfig,
+  BindableAttrValues,
 } from '@mui/toolpad-core';
 
 import { PaletteMode } from '@mui/material';
@@ -89,7 +90,12 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorProps<P, Q> extends WithControlledProp<Q> {
+export interface QueryEditorModel<Q> {
+  query: Q;
+  params?: BindableAttrValues<any>;
+}
+
+export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
   appId: string;
   connectionId: NodeId;
   connectionParams: Maybe<P>;

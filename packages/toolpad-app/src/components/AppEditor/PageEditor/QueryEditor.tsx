@@ -26,7 +26,7 @@ import useLatest from '../../../utils/useLatest';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { NodeId } from '../../../types';
+import { NodeId, QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import JsonView from '../../JsonView';
@@ -135,12 +135,13 @@ function QueryNodeEditorDialog<Q, P>({
     );
   }, []);
 
-  const handleQueryChange = React.useCallback((newQuery: Q) => {
+  const handleQueryChange = React.useCallback((model: QueryEditorModel<Q>) => {
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          query: appDom.createConst(newQuery),
+          query: appDom.createConst(model.query),
         }),
+        params: model.params,
       }),
     );
   }, []);
@@ -309,7 +310,10 @@ function QueryNodeEditorDialog<Q, P>({
             appId={appId}
             connectionId={connectionId}
             connectionParams={connection?.attributes.params.value}
-            value={input.attributes.query.value}
+            value={{
+              query: input.attributes.query.value,
+              params: input.params,
+            }}
             onChange={handleQueryChange}
             globalScope={{ query: paramsObject }}
           />

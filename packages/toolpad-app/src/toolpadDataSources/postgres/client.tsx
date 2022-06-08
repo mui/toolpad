@@ -84,7 +84,11 @@ function QueryEditor({
 }: QueryEditorProps<PostgresConnectionParams, PostgresQuery>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      onChange({ ...value, text: event.target.value });
+      const query: PostgresQuery = {
+        ...value.query,
+        text: event.target.value,
+      };
+      onChange({ ...value, query });
     },
     [value, onChange],
   );
@@ -92,7 +96,7 @@ function QueryEditor({
     <div>
       <TextareaAutosize
         maxRows={4}
-        value={value.text}
+        value={value.query.text}
         onChange={handleChange}
         style={{ width: 200 }}
       />

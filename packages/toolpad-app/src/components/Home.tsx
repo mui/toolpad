@@ -18,6 +18,7 @@ import {
   Toolbar,
   Typography,
   Box,
+  Snackbar,
 } from '@mui/material';
 import * as React from 'react';
 import { LoadingButton } from '@mui/lab';
@@ -123,7 +124,7 @@ interface AppCardProps {
 
 function AppCard({ app, onDelete }: AppCardProps) {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-
+  const [showAppRenameErrorAlert, setShowAppRenameErrorAlert] = React.useState<boolean>(false);
   const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
   const [appTitle, setAppTitle] = React.useState<string | undefined>(app?.name);
   const appTitleInput = React.useRef<HTMLInputElement | null>(null);
@@ -153,12 +154,26 @@ function AppCard({ app, onDelete }: AppCardProps) {
   const handleAppRename = React.useCallback(
     async (name: string) => {
       if (app?.id) {
-        await client.mutation.updateApp(app.id, name);
-        await client.refetchQueries('getApps');
+        try {
+          await client.mutation.updateApp(app.id, name);
+          await client.refetchQueries('getApps');
+        } catch (err) {
+          setShowAppRenameErrorAlert(true);
+          setAppTitle(app.name);
+        }
       }
     },
-    [app?.id],
+    [app?.id, app?.name],
   );
+  const handleAppRenameErrorAlertClose = (
+    event: Event | React.SyntheticEvent<any, Event>,
+    reason: string,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setShowAppRenameErrorAlert(false);
+  };
 
   const handleAppTitleBlur = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
@@ -229,7 +244,7 @@ function AppCard({ app, onDelete }: AppCardProps) {
           }
           subheader={
             <Typography variant="body2" color="text.secondary">
-              {app ? `Created: ${app.createdAt.toLocaleDateString('short')}` : <Skeleton />}
+              {app ? `Edited: ${app.editedAt.toLocaleString('short')}` : <Skeleton />}
             </Typography>
           }
         />
@@ -271,6 +286,15 @@ function AppCard({ app, onDelete }: AppCardProps) {
           <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
+      <Snackbar
+        open={showAppRenameErrorAlert}
+        autoHideDuration={3000}
+        onClose={handleAppRenameErrorAlertClose}
+      >
+        <Alert severity="error" sx={{ width: '100%' }}>
+          An app with that name already exists.
+        </Alert>
+      </Snackbar>
     </React.Fragment>
   );
 }

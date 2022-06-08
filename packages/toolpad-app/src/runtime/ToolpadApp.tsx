@@ -236,7 +236,6 @@ function resolveBindables(
 }
 
 interface QueryNodeProps {
-  // TODO: deprecate `QueryStateNode`
   node: appDom.QueryNode;
 }
 

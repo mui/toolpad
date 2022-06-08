@@ -82,6 +82,13 @@ commands:
 jobs:
   checkout:
     <<: *defaults
+    docker:
+      - image: cimg/node:16.14
+        environment:
+          TOOLPAD_SHADOW_DATABASE_URL: postgresql://postgres@localhost/circle_test
+      - image: cimg/postgres:14.0
+        environment:
+          POSTGRES_USER: postgres
     steps:
       - checkout
       - install_js

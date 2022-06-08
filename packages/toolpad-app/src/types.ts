@@ -114,9 +114,9 @@ export interface ClientDataSource<P = {}, Q = {}> {
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
-  execPrivate?: (connection: P, query: PQ) => Promise<any>;
+  execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<any>;
   // Execute a query on this connection, intended for viewers
-  exec: (connection: P, query: Q, params: any) => Promise<ApiResult<D>>;
+  exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ApiResult<D>>;
   createHandler?: () => (
     api: CreateHandlerApi<P>,
     req: NextApiRequest,

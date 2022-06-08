@@ -1,7 +1,8 @@
 import { ApiResult, ServerDataSource } from '../../types';
+import { Maybe } from '../../utils/types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
 
-async function execPrivate(connection: PostgresConnectionParams, query: any): Promise<any> {
+async function execPrivate(connection: Maybe<PostgresConnectionParams>, query: any): Promise<any> {
   // eslint-disable-next-line no-console
   console.log(`executing private query "${query}"`);
   if (query === 'getAllTables') {
@@ -11,12 +12,12 @@ async function execPrivate(connection: PostgresConnectionParams, query: any): Pr
 }
 
 async function exec(
-  connection: PostgresConnectionParams,
+  connection: Maybe<PostgresConnectionParams>,
   postgresQuery: PostgresQuery,
 ): Promise<ApiResult<any>> {
   // eslint-disable-next-line no-console
   console.log(
-    `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection.host}"`,
+    `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection?.host}"`,
   );
   return {
     data: [],

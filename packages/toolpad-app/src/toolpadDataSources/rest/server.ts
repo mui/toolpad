@@ -42,21 +42,21 @@ function parseQueryUrl(queryUrl: string, baseUrl: Maybe<string>): URL {
 }
 
 async function exec(
-  connection: RestConnectionParams,
+  connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
 ): Promise<ApiResult<any>> {
   const boundValues = { ...fetchQuery.params, ...params };
   const resolvedUrl = await resolveBindableString(fetchQuery.url, boundValues);
 
-  const queryUrl = parseQueryUrl(resolvedUrl, connection.baseUrl);
+  const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
 
-  const res = await fetch(queryUrl.href, {
-    headers: [
-      ...getAuthenticationHeaders(connection.authentication),
-      ...(connection.headers || []),
-    ],
-  });
+  const headers = [
+    ...(connection ? getAuthenticationHeaders(connection.authentication) : []),
+    ...(connection?.headers || []),
+  ];
+
+  const res = await fetch(queryUrl.href, { headers });
 
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}`);

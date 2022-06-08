@@ -331,22 +331,18 @@ async function applyTransform<Q>(
   };
 }
 
-export async function execApi<Q>(
+export async function execApi<P, Q>(
   appId: string,
   api: appDom.ApiNode<Q>,
   params: Q,
 ): Promise<ApiResult<any>> {
-  const dataSource: ServerDataSource<any, Q, any> | undefined =
+  const dataSource: ServerDataSource<P, Q, any> | undefined =
     serverDataSources[api.attributes.dataSource.value];
   if (!dataSource) {
     throw new Error(`Unknown datasource "${api.attributes.dataSource.value}" for api "${api.id}"`);
   }
 
-  const connectionParams = await getConnectionParams(appId, api.attributes.connectionId.value);
-
-  if (!connectionParams) {
-    throw new Error(`Connection "${api.attributes.connectionId.value}" is not configured"`);
-  }
+  const connectionParams = await getConnectionParams<P>(appId, api.attributes.connectionId.value);
 
   const transformEnabled = api.attributes.transformEnabled?.value;
   let result = await dataSource.exec(connectionParams, api.attributes.query.value, params);
@@ -356,12 +352,12 @@ export async function execApi<Q>(
   return result;
 }
 
-export async function execQuery<Q>(
+export async function execQuery<P, Q>(
   appId: string,
   query: appDom.QueryNode<Q>,
   params: Q,
 ): Promise<ApiResult<any>> {
-  const dataSource: ServerDataSource<any, Q, any> | undefined =
+  const dataSource: ServerDataSource<P, Q, any> | undefined =
     query.attributes.dataSource && serverDataSources[query.attributes.dataSource.value];
   if (!dataSource) {
     throw new Error(
@@ -369,11 +365,7 @@ export async function execQuery<Q>(
     );
   }
 
-  const connectionParams = await getConnectionParams(appId, query.attributes.connectionId.value);
-
-  if (!connectionParams) {
-    throw new Error(`Connection "${query.attributes.connectionId.value}" is not configured"`);
-  }
+  const connectionParams = await getConnectionParams<P>(appId, query.attributes.connectionId.value);
 
   const transformEnabled = query.attributes.transformEnabled?.value;
   let result = await dataSource.exec(connectionParams, query.attributes.query.value, params);
@@ -401,9 +393,6 @@ export async function dataSourceFetchPrivate<P, Q>(
   }
 
   const connectionParams = connection.attributes.params.value;
-  if (!connectionParams) {
-    throw new Error(`Connection "${connection.id}" is not configured"`);
-  }
 
   return dataSource.execPrivate(connectionParams, query);
 }

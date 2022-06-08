@@ -25,7 +25,9 @@ export function createThemeOptions(toolpadTheme: AppTheme): ThemeOptions {
 }
 
 export function createToolpadTheme(themeNode?: appDom.ThemeNode | null): Theme {
-  const options = themeNode ? createThemeOptions(appDom.fromConstPropValues(themeNode.theme)) : {};
+  const options = themeNode?.theme
+    ? createThemeOptions(appDom.fromConstPropValues(themeNode.theme))
+    : {};
   return createTheme(options);
 }
 

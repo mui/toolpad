@@ -92,7 +92,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
           <ToggleButtonGroup
             size="small"
             exclusive
-            value={appDom.fromConstPropValue(theme.theme['palette.mode']) || 'light'}
+            value={appDom.fromConstPropValue(theme.theme?.['palette.mode']) || 'light'}
             onChange={(event, newValue) => {
               domApi.setNodeNamespacedProp(theme, 'theme', 'palette.mode', {
                 type: 'const',
@@ -112,7 +112,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
           </ToggleButtonGroup>
           <PaletteColorPicker
             name="primary"
-            value={appDom.fromConstPropValue(theme.theme['palette.primary.main']) || ''}
+            value={appDom.fromConstPropValue(theme.theme?.['palette.primary.main']) || ''}
             onChange={(newValue) => {
               domApi.setNodeNamespacedProp(theme, 'theme', 'palette.primary.main', {
                 type: 'const',
@@ -122,7 +122,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
           />
           <PaletteColorPicker
             name="secondary"
-            value={appDom.fromConstPropValue(theme.theme['palette.secondary.main']) || ''}
+            value={appDom.fromConstPropValue(theme.theme?.['palette.secondary.main']) || ''}
             onChange={(newValue) =>
               domApi.setNodeNamespacedProp(theme, 'theme', 'palette.secondary.main', {
                 type: 'const',

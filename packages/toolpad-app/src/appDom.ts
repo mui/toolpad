@@ -10,7 +10,7 @@ import { NodeId, ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
-import { filterValues, mapProperties } from './utils/collections';
+import { filterValues } from './utils/collections';
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -62,7 +62,7 @@ export interface AppNode extends AppDomNodeBase {
 
 export interface ThemeNode extends AppDomNodeBase {
   readonly type: 'theme';
-  readonly theme: BindableAttrValues<AppTheme>;
+  readonly theme?: BindableAttrValues<AppTheme>;
 }
 
 export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
@@ -720,14 +720,6 @@ export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): 
     throw new Error(`trying to unbox a non-constant prop value`);
   }
   return prop.value;
-}
-
-export function toConstPropValues<P = any>(props: Partial<P>): Partial<BindableAttrValues<P>>;
-export function toConstPropValues<P = any>(props: P): BindableAttrValues<P>;
-export function toConstPropValues<P = any>(props: P): BindableAttrValues<P> {
-  return mapProperties(props, ([propName, value]) =>
-    value ? [propName, toConstPropValue(value)] : null,
-  ) as BindableAttrValues<P>;
 }
 
 export function fromConstPropValues<P>(props: BindableAttrValues<P>): Partial<P> {

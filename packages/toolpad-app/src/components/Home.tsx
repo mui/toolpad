@@ -118,17 +118,24 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
 
 export interface AppRenameErrorDialogProps {
   open: boolean;
-  name: string | undefined;
+  currentName: string | undefined;
+  newName: string | undefined;
   onContinue: () => void;
   onDiscard: () => void;
 }
 
-function AppRenameErrorDialog({ open, name, onContinue, onDiscard }: AppRenameErrorDialogProps) {
+function AppRenameErrorDialog({
+  open,
+  currentName,
+  newName,
+  onContinue,
+  onDiscard,
+}: AppRenameErrorDialogProps) {
   return (
     <Dialog open={open} onClose={onDiscard}>
       <DialogForm>
-        <DialogTitle>Error renaming</DialogTitle>
-        <DialogContent>An app with the name &quot;{name}&quot; already exists.</DialogContent>
+        <DialogTitle>Can&apos;t rename app &quot;{currentName}&quot; </DialogTitle>
+        <DialogContent>An app with the name &quot;{newName}&quot; already exists.</DialogContent>
         <DialogActions>
           <Button onClick={onDiscard} color={'error'}>
             Discard
@@ -303,7 +310,8 @@ function AppCard({ app, onDelete }: AppCardProps) {
       </Menu>
       <AppRenameErrorDialog
         open={showAppRenameErrorDialog}
-        name={appTitle}
+        currentName={app?.name}
+        newName={appTitle}
         onDiscard={() => {
           setEditingTitle(false);
           setAppTitle(app?.name);

@@ -23,6 +23,7 @@ import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';
 import ParametersEditor from '../../components/AppEditor/PageEditor/ParametersEditor';
+import { mapValues } from '../../utils/collections';
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -172,12 +173,6 @@ function QueryEditor({
     [onChange, value],
   );
 
-  const liveUrl: LiveBinding = useEvaluateLiveBinding({
-    server: true,
-    input: value.query.url,
-    globalScope,
-  });
-
   const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
     Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>)),
   );
@@ -200,20 +195,30 @@ function QueryEditor({
     liveParams[key],
   ]);
 
+  const queryScope = {
+    query: mapValues(liveParams, (bindingResult) => bindingResult.value),
+  };
+
+  const liveUrl: LiveBinding = useEvaluateLiveBinding({
+    server: true,
+    input: value.query.url,
+    globalScope: queryScope,
+  });
+
   return (
     <Stack gap={2}>
       <Typography>Parameters</Typography>
       <ParametersEditor
         value={params}
         onChange={handleParamsChange}
-        globalScope={pageState}
+        globalScope={globalScope}
         liveValue={paramsEditorLiveValue}
       />
       <Divider />
       <Typography>Query</Typography>
       <BindableEditor
         liveBinding={liveUrl}
-        globalScope={globalScope}
+        globalScope={queryScope}
         server
         label="url"
         propType={{ type: 'string' }}

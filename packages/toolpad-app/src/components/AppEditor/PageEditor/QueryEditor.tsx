@@ -20,8 +20,6 @@ import {
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
-import { evaluateBindable } from '@mui/toolpad-core/runtime';
 import { LoadingButton } from '@mui/lab';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -37,6 +35,7 @@ import { JsExpressionEditor } from './JsExpressionEditor';
 import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
+import { mapValues } from '../../../utils/collections';
 
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
@@ -254,29 +253,12 @@ function QueryNodeEditorDialog<Q, P>({
     [],
   );
 
-  const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
-    Object.entries(input.params || {}),
-  );
-  React.useEffect(() => setParams(Object.entries(input.params || {})), [input.params]);
-
   const { pageState } = usePageEditorState();
-  const liveParams: [string, LiveBinding][] = React.useMemo(() => {
-    return params.map(([name, bindable]) => [name, evaluateBindable(bindable, pageState)]);
-  }, [params, pageState]);
-  const liveParams2 = useEvaluateLiveBindings({
+
+  const liveParams = useEvaluateLiveBindings({
     input: input.params || {},
     globalScope: pageState,
   });
-
-  const handleParamsChange = React.useCallback((newParams: [string, BindableAttrValue<any>][]) => {
-    setParams(newParams);
-    const paramsObj: BindableAttrValues<any> = Object.fromEntries(newParams);
-    setInput((existing) =>
-      update(existing, {
-        params: paramsObj,
-      }),
-    );
-  }, []);
 
   const handleSave = React.useCallback(() => {
     onSave(input);
@@ -287,13 +269,10 @@ function QueryNodeEditorDialog<Q, P>({
     onClose();
   }, [onRemove, node, onClose]);
 
-  const paramsObject: Record<string, any> = React.useMemo(() => {
-    const liveParamValues: [string, any][] = liveParams.map(([name, result]) => [
-      name,
-      result?.value,
-    ]);
-    return Object.fromEntries(liveParamValues);
-  }, [liveParams]);
+  const paramsObject: Record<string, any> = mapValues(
+    liveParams,
+    (bindingResult) => bindingResult.value,
+  );
 
   const [previewQuery, setPreviewQuery] = React.useState<appDom.QueryNode<Q, P> | null>(null);
   const [previewParams, setPreviewParams] = React.useState(paramsObject);
@@ -351,9 +330,9 @@ function QueryNodeEditorDialog<Q, P>({
               query: input.attributes.query.value,
               params: input.params,
             }}
-            liveParams={liveParams2}
+            liveParams={liveParams}
             onChange={handleQueryChange}
-            globalScope={{ query: paramsObject }}
+            globalScope={pageState}
           />
           <Divider />
           <Typography>Options:</Typography>

@@ -5,7 +5,7 @@ import {
   getApps,
   getApp,
   createApp,
-  execApi,
+  updateApp,
   execQuery,
   dataSourceFetchPrivate,
   loadDom,
@@ -117,9 +117,6 @@ const rpcServer = {
     getApp: createMethod<typeof getApp>((params) => {
       return getApp(...params);
     }),
-    execApi: createMethod<typeof execApi>((args) => {
-      return execApi(...args);
-    }),
     execQuery: createMethod<typeof execQuery>((args) => {
       return execQuery(...args);
     }),
@@ -145,6 +142,9 @@ const rpcServer = {
   mutation: {
     createApp: createMethod<typeof createApp>((params) => {
       return createApp(...params);
+    }),
+    updateApp: createMethod<typeof updateApp>((params) => {
+      return updateApp(...params);
     }),
     deleteApp: createMethod<typeof deleteApp>((params) => {
       return deleteApp(...params);

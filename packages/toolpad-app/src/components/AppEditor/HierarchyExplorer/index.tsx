@@ -89,8 +89,6 @@ function getLinkToNodeEditor(appId: string, node: appDom.AppDomNode): string | u
       return `/app/${appId}/editor/connections/${node.id}`;
     case 'codeComponent':
       return `/app/${appId}/editor/codeComponents/${node.id}`;
-    case 'api':
-      return `/app/${appId}/editor/apis/${node.id}`;
     default:
       return undefined;
   }
@@ -106,12 +104,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   const domApi = useDomApi();
 
   const app = appDom.getApp(dom);
-  const {
-    apis = [],
-    codeComponents = [],
-    pages = [],
-    connections = [],
-  } = appDom.getChildNodes(dom, app);
+  const { codeComponents = [], pages = [], connections = [] } = appDom.getChildNodes(dom, app);
 
   const [expanded, setExpanded] = useLocalStorageState<string[]>(
     `editor/${app.id}/hierarchy-expansion`,
@@ -150,10 +143,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
     if (appDom.isPage(node)) {
       navigate(`/app/${appId}/editor/pages/${node.id}`);
-    }
-
-    if (appDom.isApi(node)) {
-      navigate(`/app/${appId}/editor/apis/${node.id}`);
     }
 
     if (appDom.isCodeComponent(node)) {
@@ -255,18 +244,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             />
           ))}
         </HierarchyTreeItem>
-        {apis.length > 0 ? (
-          <HierarchyTreeItem nodeId=":apis" labelText="Apis">
-            {apis.map((apiNode) => (
-              <HierarchyTreeItem
-                key={apiNode.id}
-                nodeId={apiNode.id}
-                labelText={apiNode.name}
-                onDelete={handleDeleteNodeDialogOpen(apiNode.id)}
-              />
-            ))}
-          </HierarchyTreeItem>
-        ) : null}
         <HierarchyTreeItem
           nodeId=":codeComponents"
           labelText="Components"

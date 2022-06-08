@@ -1,10 +1,5 @@
 import * as React from 'react';
-import {
-  ArgTypeDefinitions,
-  BindableAttrValue,
-  BindableAttrValues,
-  LiveBinding,
-} from '@mui/toolpad-core';
+import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
 import {
   Button,
   Divider,
@@ -15,25 +10,19 @@ import {
   Typography,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-import { evaluateBindable } from '@mui/toolpad-core/runtime';
-import StringRecordEditor from '../../components/StringRecordEditor';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../components/AppEditor/PageEditor/BindableEditor';
-import {
-  useEvaluateLiveBinding,
-  useEvaluateLiveBindings,
-} from '../../components/AppEditor/useEvaluateLiveBinding';
+import { useEvaluateLiveBinding } from '../../components/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';
 import ParametersEditor from '../../components/AppEditor/PageEditor/ParametersEditor';
-import { usePageEditorState } from '../../components/AppEditor/PageEditor/PageEditorProvider';
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -183,21 +172,10 @@ function QueryEditor({
     [onChange, value],
   );
 
-  const handleApiQueryChange = React.useCallback(
-    (newValue: Record<string, string>) => {
-      const query: FetchQuery = {
-        ...value.query,
-        params: newValue,
-      };
-      onChange({ ...value, query });
-    },
-    [onChange, value],
-  );
-
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
     input: value.query.url,
-    globalScope: globalScope.query ? globalScope : { query: liveParams },
+    globalScope,
   });
 
   const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
@@ -243,34 +221,12 @@ function QueryEditor({
         value={value.query.url}
         onChange={handleUrlChange}
       />
-      {/* TODO: remove this when QueryStateNode is removed */}
-      {globalScope.query ? null : (
-        <StringRecordEditor
-          label="api query"
-          fieldLabel="parameter"
-          valueLabel="default value"
-          value={value.query.params || {}}
-          onChange={handleApiQueryChange}
-        />
-      )}
     </Stack>
   );
 }
 
 function getInitialQueryValue(): FetchQuery {
-  return { url: { type: 'const', value: '' }, method: '', headers: [], params: {} };
-}
-
-function getArgTypes(query: FetchQuery): ArgTypeDefinitions {
-  return Object.fromEntries(
-    Object.entries(query.params).map(([propName, defaultValue]) => [
-      propName,
-      {
-        typeDef: { type: 'string' },
-        defaultValue,
-      },
-    ]),
-  );
+  return { url: { type: 'const', value: '' }, method: '', headers: [] };
 }
 
 const dataSource: ClientDataSource<{}, FetchQuery> = {
@@ -279,7 +235,6 @@ const dataSource: ClientDataSource<{}, FetchQuery> = {
   isConnectionValid: () => true,
   QueryEditor,
   getInitialQueryValue,
-  getArgTypes,
 };
 
 export default dataSource;

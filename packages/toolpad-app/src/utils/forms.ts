@@ -23,3 +23,9 @@ export function validation<T>(
     helperText: error ? errorMessage(error) : undefined,
   };
 }
+
+export function isSaveDisabled(formState: FormState<any>): boolean {
+  // Always destructure formState to trigger underlying react-hook-form Proxy object
+  const { isValid, isDirty } = formState;
+  return !isValid || !isDirty;
+}

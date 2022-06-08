@@ -108,7 +108,7 @@ export default function StringRecordEditor({
         <React.Fragment key={field}>
           {editedField === field ? (
             <TextField
-              label={valueLabel}
+              label={fieldLabel}
               value={editedFieldNewName}
               autoFocus
               onChange={(event) => setEditedFieldNewName(event.target.value)}

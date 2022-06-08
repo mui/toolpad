@@ -27,7 +27,7 @@ function renderDefaultControl(params: RenderControlParams<any>) {
   return <DefaultControl {...params} />;
 }
 
-interface RenderControlParams<V> extends WithControlledProp<V> {
+export interface RenderControlParams<V> extends WithControlledProp<V> {
   label: string;
   disabled: boolean;
 }

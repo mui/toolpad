@@ -3,7 +3,9 @@ import { ServerDataSource, ApiResult } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';
 import evalExpression from '../../server/evalExpression';
+import { removeLeading } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
+import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 
 async function resolveBindableString(
   bindable: BindableAttrValue<string>,
@@ -30,6 +32,15 @@ async function resolveBindableString(
   );
 }
 
+function parseQueryUrl(queryUrl: string, baseUrl: Maybe<string>): URL {
+  if (baseUrl) {
+    const parsedBase = parseBaseUrl(baseUrl);
+    return new URL(parsedBase.href + removeLeading(queryUrl, '/'));
+  }
+
+  return new URL(queryUrl);
+}
+
 async function exec(
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
@@ -37,7 +48,16 @@ async function exec(
 ): Promise<ApiResult<any>> {
   const boundValues = { ...fetchQuery.params, ...params };
   const resolvedUrl = await resolveBindableString(fetchQuery.url, boundValues);
-  const res = await fetch(resolvedUrl);
+
+  const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
+
+  const headers = [
+    ...(connection ? getAuthenticationHeaders(connection.authentication) : []),
+    ...(connection?.headers || []),
+  ];
+
+  const res = await fetch(queryUrl.href, { headers });
+
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}`);
   }

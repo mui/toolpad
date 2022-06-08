@@ -115,11 +115,13 @@ function QueryNodeEditorDialog<Q, P>({
   onSave,
 }: QueryNodeEditorProps<Q, P>) {
   const { appId } = usePageEditorState();
+  const dom = useDom();
 
   const [input, setInput] = React.useState(node);
   React.useEffect(() => setInput(node), [node]);
 
   const connectionId = input.attributes.connectionId.value;
+  const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
@@ -306,6 +308,7 @@ function QueryNodeEditorDialog<Q, P>({
           <dataSource.QueryEditor
             appId={appId}
             connectionId={connectionId}
+            connectionParams={connection?.attributes.params.value}
             value={input.attributes.query.value}
             onChange={handleQueryChange}
             globalScope={{ query: paramsObject }}
@@ -314,7 +317,7 @@ function QueryNodeEditorDialog<Q, P>({
           <Typography>Options:</Typography>
           <Grid container direction="row" spacing={1}>
             <Grid item xs={4}>
-              <Stack direction="column">
+              <Stack direction="column" gap={1}>
                 <FormControlLabel
                   control={
                     <Checkbox

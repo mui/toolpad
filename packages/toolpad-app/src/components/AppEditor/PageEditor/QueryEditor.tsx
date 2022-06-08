@@ -351,7 +351,7 @@ function QueryNodeEditorDialog<Q, P>({
             <Grid item xs={6}>
               <Stack>
                 <FormControlLabel
-                  label="Transform API response"
+                  label="Transform response"
                   control={
                     <Checkbox
                       checked={input.attributes.transformEnabled?.value ?? false}

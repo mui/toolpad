@@ -366,6 +366,30 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [availableDropTargets],
   );
 
+  const availableDropZones = React.useMemo((): RectZone[] => {
+    const dragOverNode = dragOverNodeId && appDom.getNode(dom, dragOverNodeId);
+
+    const dragOverNodeParent = dragOverNode && appDom.getParent(dom, dragOverNode);
+    const dragOverNodeParentInfo = dragOverNodeParent && nodesInfo[dragOverNodeParent.id];
+
+    // For non-page layout containers, only highlight in the container direction
+    if (
+      dragOverNodeParentInfo &&
+      appDom.isElement(dragOverNodeParent) &&
+      !isPageRow(dragOverNodeParent) &&
+      !isPageColumn(dragOverNodeParent)
+    ) {
+      if (hasHorizontalContainer(dragOverNodeParentInfo)) {
+        return [RectZone.RIGHT, RectZone.LEFT];
+      }
+      if (hasVerticalContainer(dragOverNodeParentInfo)) {
+        return [RectZone.TOP, RectZone.BOTTOM];
+      }
+    }
+
+    return [RectZone.TOP, RectZone.RIGHT, RectZone.BOTTOM, RectZone.LEFT, RectZone.CENTER];
+  }, [dom, dragOverNodeId, nodesInfo]);
+
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
@@ -471,29 +495,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       // For non-page layout containers, only highlight in the container direction
-      if (
-        parentNodeInfo &&
-        appDom.isElement(parent) &&
-        !isPageRow(parent) &&
-        !isPageColumn(parent)
-      ) {
-        if (
-          hasHorizontalContainer(parentNodeInfo) &&
-          (dragOverNodeZone === RectZone.TOP || dragOverNodeZone === RectZone.BOTTOM)
-        ) {
-          return null;
-        }
-        if (
-          hasVerticalContainer(parentNodeInfo) &&
-          (dragOverNodeZone === RectZone.RIGHT || dragOverNodeZone === RectZone.LEFT)
-        ) {
-          return null;
-        }
+      if (dragOverNodeZone && !availableDropZones.includes(dragOverNodeZone)) {
+        return null;
       }
 
       return node.id === dragOverNodeId ? dragOverNodeZone : null;
     },
-    [dom, dragOverNodeId, dragOverNodeZone, getNodeLastChild, nodesInfo],
+    [availableDropZones, dom, dragOverNodeId, dragOverNodeZone, getNodeLastChild, nodesInfo],
   );
 
   const handleDragLeave = React.useCallback(
@@ -561,7 +569,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       let parent = appDom.getParent(dom, dragOverNode);
-      const parentInfo = parent && nodesInfo[parent.id];
       const originalParent = parent;
 
       const isDraggingOverPage = (dragOverNode && appDom.isPage(dragOverNode)) || false;
@@ -608,13 +615,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         if ([RectZone.TOP, RectZone.BOTTOM].includes(dragOverNodeZone)) {
           // Ignore invalid drop zones
-          if (
-            !isOriginalParentPage &&
-            !isOriginalParentRow &&
-            !isOriginalParentColumn &&
-            parentInfo &&
-            !hasVerticalContainer(parentInfo)
-          ) {
+          if (!availableDropZones.includes(dragOverNodeZone)) {
             return;
           }
 
@@ -654,13 +655,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         if ([RectZone.RIGHT, RectZone.LEFT].includes(dragOverNodeZone)) {
           // Ignore invalid drop zones
-          if (
-            !isOriginalParentPage &&
-            !isOriginalParentRow &&
-            !isOriginalParentColumn &&
-            parentInfo &&
-            !hasHorizontalContainer(parentInfo)
-          ) {
+          if (!availableDropZones.includes(dragOverNodeZone)) {
             return;
           }
 
@@ -706,6 +701,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     },
     [
       api,
+      availableDropZones,
       deleteOrphanedLayoutComponents,
       dom,
       domApi,
@@ -714,7 +710,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       getCurrentlyDraggedNode,
       getViewCoordinates,
       newNode,
-      nodesInfo,
       selection,
     ],
   );

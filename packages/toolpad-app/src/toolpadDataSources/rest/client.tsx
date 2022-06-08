@@ -1,7 +1,21 @@
 import * as React from 'react';
-import { ArgTypeDefinitions, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
-import { Button, InputAdornment, Stack, TextField, Toolbar, Typography } from '@mui/material';
+import {
+  ArgTypeDefinitions,
+  BindableAttrValue,
+  BindableAttrValues,
+  LiveBinding,
+} from '@mui/toolpad-core';
+import {
+  Button,
+  Divider,
+  InputAdornment,
+  Stack,
+  TextField,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
+import { evaluateBindable } from '@mui/toolpad-core/runtime';
 import StringRecordEditor from '../../components/StringRecordEditor';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
@@ -9,12 +23,17 @@ import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../components/AppEditor/PageEditor/BindableEditor';
-import { useEvaluateLiveBinding } from '../../components/AppEditor/useEvaluateLiveBinding';
+import {
+  useEvaluateLiveBinding,
+  useEvaluateLiveBindings,
+} from '../../components/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';
+import ParametersEditor from '../../components/AppEditor/PageEditor/ParametersEditor';
+import { usePageEditorState } from '../../components/AppEditor/PageEditor/PageEditorProvider';
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -147,6 +166,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
 function QueryEditor({
   globalScope,
   connectionParams,
+  liveParams,
   value,
   onChange,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
@@ -177,20 +197,49 @@ function QueryEditor({
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
     input: value.query.url,
-    globalScope: globalScope.query ? globalScope : { query: value.params },
+    globalScope: globalScope.query ? globalScope : { query: liveParams },
   });
 
+  const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
+    Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>)),
+  );
+  React.useEffect(
+    () => setParams(Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>))),
+    [value.params],
+  );
+
+  const handleParamsChange = React.useCallback(
+    (newParams: [string, BindableAttrValue<any>][]) => {
+      setParams(newParams);
+      const paramsObj: BindableAttrValues<any> = Object.fromEntries(newParams);
+      onChange({ ...value, params: paramsObj });
+    },
+    [onChange, value],
+  );
+
+  const paramsEditorLiveValue: [string, LiveBinding][] = params.map(([key]) => [
+    key,
+    liveParams[key],
+  ]);
+
   return (
-    <div>
+    <Stack gap={2}>
+      <Typography>Parameters</Typography>
+      <ParametersEditor
+        value={params}
+        onChange={handleParamsChange}
+        globalScope={pageState}
+        liveValue={paramsEditorLiveValue}
+      />
+      <Divider />
+      <Typography>Query</Typography>
       <BindableEditor
         liveBinding={liveUrl}
         globalScope={globalScope}
         server
         label="url"
         propType={{ type: 'string' }}
-        renderControl={(params) => {
-          return <UrlControl baseUrl={baseUrl} {...params} />;
-        }}
+        renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
         value={value.query.url}
         onChange={handleUrlChange}
       />
@@ -204,7 +253,7 @@ function QueryEditor({
           onChange={handleApiQueryChange}
         />
       )}
-    </div>
+    </Stack>
   );
 }
 

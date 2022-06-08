@@ -7,6 +7,7 @@ import {
   RuntimeError,
   ComponentConfig,
   BindableAttrValues,
+  LiveBinding,
 } from '@mui/toolpad-core';
 
 import { PaletteMode } from '@mui/material';
@@ -100,6 +101,11 @@ export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorMo
   connectionId: NodeId;
   connectionParams: Maybe<P>;
   globalScope: Record<string, any>;
+  /**
+   * @deprecated
+   */
+  queryScope?: Record<string, any>;
+  liveParams: Record<string, LiveBinding>;
 }
 
 export type QueryEditor<P, Q = {}> = React.FC<QueryEditorProps<P, Q>>;

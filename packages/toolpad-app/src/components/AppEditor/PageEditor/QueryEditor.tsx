@@ -36,6 +36,7 @@ import client from '../../../api';
 import ParametersEditor from './ParametersEditor';
 import ErrorAlert from './ErrorAlert';
 import { JsExpressionEditor } from './JsExpressionEditor';
+import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 
 function refetchIntervalInSeconds(maybeInterval?: number) {
   if (typeof maybeInterval !== 'number') {
@@ -222,6 +223,10 @@ function QueryNodeEditorDialog<Q, P>({
   const liveParams: [string, LiveBinding][] = React.useMemo(() => {
     return params.map(([name, bindable]) => [name, evaluateBindable(bindable, pageState)]);
   }, [params, pageState]);
+  const liveParams2 = useEvaluateLiveBindings({
+    input: input.params || {},
+    globalScope: pageState,
+  });
 
   const handleParamsChange = React.useCallback((newParams: [string, BindableAttrValue<any>][]) => {
     setParams(newParams);
@@ -297,14 +302,6 @@ function QueryNodeEditorDialog<Q, P>({
           </Stack>
 
           <Divider />
-          <Typography>Parameters</Typography>
-          <ParametersEditor
-            value={params}
-            onChange={handleParamsChange}
-            globalScope={pageState}
-            liveValue={liveParams}
-          />
-          <Divider />
           <Typography>Build query:</Typography>
           <dataSource.QueryEditor
             appId={appId}
@@ -314,6 +311,7 @@ function QueryNodeEditorDialog<Q, P>({
               query: input.attributes.query.value,
               params: input.params,
             }}
+            liveParams={liveParams2}
             onChange={handleQueryChange}
             globalScope={{ query: paramsObject }}
           />

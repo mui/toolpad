@@ -18,7 +18,6 @@ import {
   Toolbar,
   Typography,
   Box,
-  Snackbar,
 } from '@mui/material';
 import * as React from 'react';
 import { LoadingButton } from '@mui/lab';
@@ -117,6 +116,32 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
   );
 }
 
+export interface AppRenameErrorDialogProps {
+  open: boolean;
+  name: string | undefined;
+  onContinue: () => void;
+  onDiscard: () => void;
+}
+
+function AppRenameErrorDialog({ open, name, onContinue, onDiscard }: AppRenameErrorDialogProps) {
+  return (
+    <Dialog open={open} onClose={onDiscard}>
+      <DialogForm>
+        <DialogTitle>Error renaming</DialogTitle>
+        <DialogContent>An app with the name &quot;{name}&quot; already exists.</DialogContent>
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={onContinue}>
+            Keep editing
+          </Button>
+          <Button onClick={onDiscard} color="error">
+            Discard
+          </Button>
+        </DialogActions>
+      </DialogForm>
+    </Dialog>
+  );
+}
+
 interface AppCardProps {
   app?: App;
   onDelete?: () => void;
@@ -124,7 +149,7 @@ interface AppCardProps {
 
 function AppCard({ app, onDelete }: AppCardProps) {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [showAppRenameErrorAlert, setShowAppRenameErrorAlert] = React.useState<boolean>(false);
+  const [showAppRenameErrorDialog, setShowAppRenameErrorDialog] = React.useState<boolean>(false);
   const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
   const [appTitle, setAppTitle] = React.useState<string | undefined>(app?.name);
   const appTitleInput = React.useRef<HTMLInputElement | null>(null);
@@ -158,22 +183,12 @@ function AppCard({ app, onDelete }: AppCardProps) {
           await client.mutation.updateApp(app.id, name);
           await client.refetchQueries('getApps');
         } catch (err) {
-          setShowAppRenameErrorAlert(true);
-          setAppTitle(app.name);
+          setShowAppRenameErrorDialog(true);
         }
       }
     },
-    [app?.id, app?.name],
+    [app?.id],
   );
-  const handleAppRenameErrorAlertClose = (
-    event: Event | React.SyntheticEvent<any, Event>,
-    reason: string,
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setShowAppRenameErrorAlert(false);
-  };
 
   const handleAppTitleBlur = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
@@ -286,15 +301,19 @@ function AppCard({ app, onDelete }: AppCardProps) {
           <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
-      <Snackbar
-        open={showAppRenameErrorAlert}
-        autoHideDuration={3000}
-        onClose={handleAppRenameErrorAlertClose}
-      >
-        <Alert severity="error" sx={{ width: '100%' }}>
-          An app with that name already exists.
-        </Alert>
-      </Snackbar>
+      <AppRenameErrorDialog
+        open={showAppRenameErrorDialog}
+        name={appTitle}
+        onDiscard={() => {
+          setEditingTitle(false);
+          setAppTitle(app?.name);
+          setShowAppRenameErrorDialog(false);
+        }}
+        onContinue={() => {
+          setEditingTitle(true);
+          setShowAppRenameErrorDialog(false);
+        }}
+      />
     </React.Fragment>
   );
 }

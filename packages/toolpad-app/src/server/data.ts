@@ -70,13 +70,6 @@ export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> 
         };
       }),
     }),
-    prisma.app.update({
-      where: {
-        id: appId,
-      },
-      data: { editedAt: new Date() },
-    }),
-
     prisma.domNodeAttribute.createMany({
       data: Object.values(app.nodes).flatMap((node: appDom.AppDomNode) => {
         const namespaces = omit(node, ...appDom.RESERVED_NODE_PROPERTIES);
@@ -93,6 +86,12 @@ export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> 
         });
         return attributesData;
       }),
+    }),
+    prisma.app.update({
+      where: {
+        id: appId,
+      },
+      data: { editedAt: new Date() },
     }),
   ]);
 }

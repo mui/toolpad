@@ -47,7 +47,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
 ### Notes for contributors:
 
-- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn dev` command, or by running
+- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually:
 
   ```sh
   yarn prisma db push

@@ -5,7 +5,7 @@
   "scripts": {
     "build": "yarn prisma generate && concurrently \"yarn:build:*\" && rimraf ./.next/cache",
     "start": "yarn waitForDb && yarn prisma migrate deploy && NODE_ENV=production node ./server.js",
-    "dev": "yarn prisma generate && yarn waitForDb && yarn prisma db push --skip-generate && concurrently \"yarn:dev:*\"",
+    "dev": "yarn prisma generate && yarn waitForDb && yarn prisma migrate deploy && concurrently \"yarn:dev:*\"",
     "lint": "next lint && prettier --check .",
     "fix": "next lint --fix && prettier --write .",
     "prisma": "prisma",
@@ -15,7 +15,7 @@
     "dev:next": "node ./server.js",
     "dev:react-devtools": "yarn build:react-devtools --watch",
     "dev:typings": "yarn build:typings",
-    "dev:prisma": "prisma generate --watch",
+    "dev:prisma-client": "prisma generate --watch",
     "waitForDb": "ts-node ./scripts/waitForDb.ts",
     "waitForApp": "ts-node ./scripts/waitForApp.ts"
   },

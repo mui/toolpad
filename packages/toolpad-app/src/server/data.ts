@@ -340,7 +340,7 @@ export async function setConnectionParams<P>(
 }
 
 async function applyTransform<Q>(
-  node: appDom.ApiNode<Q> | appDom.QueryNode<Q>,
+  node: appDom.QueryNode<Q>,
   result: ApiResult<{}>,
 ): Promise<ApiResult<{}>> {
   return {
@@ -348,27 +348,6 @@ async function applyTransform<Q>(
       `${node.attributes.transform?.value}(${JSON.stringify(result.data)})`,
     ),
   };
-}
-
-export async function execApi<P, Q>(
-  appId: string,
-  api: appDom.ApiNode<Q>,
-  params: Q,
-): Promise<ApiResult<any>> {
-  const dataSource: ServerDataSource<P, Q, any> | undefined =
-    serverDataSources[api.attributes.dataSource.value];
-  if (!dataSource) {
-    throw new Error(`Unknown datasource "${api.attributes.dataSource.value}" for api "${api.id}"`);
-  }
-
-  const connectionParams = await getConnectionParams<P>(appId, api.attributes.connectionId.value);
-
-  const transformEnabled = api.attributes.transformEnabled?.value;
-  let result = await dataSource.exec(connectionParams, api.attributes.query.value, params);
-  if (transformEnabled) {
-    result = await applyTransform(api, result);
-  }
-  return result;
 }
 
 export async function execQuery<P, Q>(

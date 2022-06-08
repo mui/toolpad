@@ -4,7 +4,6 @@ import { Route, Routes, useParams, Navigate } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/runtime';
 import PageEditor from './PageEditor';
 import DomProvider, { useDom, useDomLoader } from '../DomLoader';
-import ApiEditor from './ApiEditor';
 import * as appDom from '../../appDom';
 import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
@@ -53,7 +52,6 @@ function FileEditor({ appId }: FileEditorProps) {
     <Routes>
       <Route element={<AppEditorShell appId={appId} />}>
         <Route path="connections/:nodeId" element={<ConnectionEditor appId={appId} />} />
-        <Route path="apis/:nodeId" element={<ApiEditor appId={appId} />} />
         <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
         <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
         <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />

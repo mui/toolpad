@@ -6,7 +6,6 @@ import {
   getApp,
   createApp,
   updateApp,
-  execApi,
   execQuery,
   dataSourceFetchPrivate,
   loadDom,
@@ -117,9 +116,6 @@ const rpcServer = {
     }),
     getApp: createMethod<typeof getApp>((params) => {
       return getApp(...params);
-    }),
-    execApi: createMethod<typeof execApi>((args) => {
-      return execApi(...args);
     }),
     execQuery: createMethod<typeof execQuery>((args) => {
       return execQuery(...args);

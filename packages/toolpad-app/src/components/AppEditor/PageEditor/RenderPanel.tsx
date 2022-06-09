@@ -93,27 +93,58 @@ const OverlayRoot = styled('div')({
   },
 
   [`& .${overlayClasses.nodeHud}`]: {
-    border: '1px dashed rgba(255,0,0,.25)',
     // capture mouse events
     pointerEvents: 'initial',
     position: 'absolute',
     [`&.${overlayClasses.layout}`]: {
-      borderColor: 'rgba(255,0,0,.125)',
+      border: '1px dotted rgba(255,0,0,.125)',
     },
     [`&.${overlayClasses.highlightedTop}`]: {
-      borderTop: '3px solid #44EB2D',
+      '&:after': {
+        backgroundColor: '#44EB2D',
+        content: "''",
+        height: 4,
+        position: 'absolute',
+        left: 0,
+        top: -2,
+        width: '100%',
+      },
     },
     [`&.${overlayClasses.highlightedRight}`]: {
-      borderRight: '3px solid #44EB2D',
+      '&:after': {
+        backgroundColor: '#44EB2D',
+        content: "''",
+        height: '100%',
+        position: 'absolute',
+        right: -2,
+        top: 0,
+        width: 4,
+      },
     },
     [`&.${overlayClasses.highlightedBottom}`]: {
-      borderBottom: '3px solid #44EB2D',
+      '&:after': {
+        backgroundColor: '#44EB2D',
+        content: "''",
+        height: 4,
+        position: 'absolute',
+        left: 0,
+        bottom: -2,
+        width: '100%',
+      },
     },
     [`&.${overlayClasses.highlightedLeft}`]: {
-      borderLeft: '3px solid #44EB2D',
+      '&:after': {
+        backgroundColor: '#44EB2D',
+        content: "''",
+        height: '100%',
+        position: 'absolute',
+        left: -2,
+        top: 0,
+        width: 4,
+      },
     },
     [`&.${overlayClasses.highlightedCenter}`]: {
-      border: '3px solid #44EB2D',
+      border: '4px solid #44EB2D',
     },
     [`&.${overlayClasses.selected}`]: {
       border: '1px solid red',
@@ -217,7 +248,7 @@ interface SelectionHudProps {
   allowInteraction?: boolean;
   onDragStart?: React.DragEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLButtonElement>;
-  hasEmptyContainer: boolean;
+  hasContainer: boolean;
 }
 
 function NodeHud({
@@ -228,18 +259,21 @@ function NodeHud({
   rect,
   onDragStart,
   onDelete,
-  hasEmptyContainer,
+  hasContainer,
 }: SelectionHudProps) {
   const dom = useDom();
 
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
   const component = useToolpadComponent(dom, componentId);
 
-  const isLayoutComponent =
-    componentId === PAGE_ROW_COMPONENT_ID || componentId === PAGE_COLUMN_COMPONENT_ID;
-
   const highlightedZoneOverlayClass =
     highlightedZone && getHighlightedZoneOverlayClass(highlightedZone);
+
+  let hasEmptyContainer = false;
+  if (hasContainer) {
+    const childNodes = (appDom.isElement(node) && appDom.getChildNodes(dom, node).children) || [];
+    hasEmptyContainer = childNodes.length === 0;
+  }
 
   return (
     <React.Fragment>
@@ -252,7 +286,7 @@ function NodeHud({
         onDragStart={onDragStart}
         style={absolutePositionCss(rect)}
         className={clsx(overlayClasses.nodeHud, {
-          [overlayClasses.layout]: isLayoutComponent,
+          [overlayClasses.layout]: hasContainer,
           ...(highlightedZoneOverlayClass ? { [highlightedZoneOverlayClass]: true } : {}),
           [overlayClasses.selected]: selected,
           [overlayClasses.allowNodeInteraction]: allowInteraction,
@@ -482,12 +516,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       let activeDropZone = null;
       if (activeDropNode) {
         const activeDropNodeRect = dropAreaRects[activeDropNodeId];
+        const activeNodeDropInfo = nodesInfo[activeDropNodeId];
 
         const isDraggingOverPage = appDom.isPage(activeDropNode);
-        const isDraggingOverRow = appDom.isElement(activeDropNode) && isPageRow(activeDropNode);
+        const isDraggingOverContainer = activeNodeDropInfo
+          ? hasContainerComponent(activeNodeDropInfo)
+          : false;
 
         let centerAreaFraction = 0;
-        if (isDraggingOverPage || isDraggingOverRow) {
+        if (isDraggingOverPage || isDraggingOverContainer) {
           centerAreaFraction = 1;
         }
 
@@ -523,6 +560,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       dragOverNodeId,
       dragOverNodeZone,
       availableDropTargetIds,
+      nodesInfo,
       api,
     ],
   );
@@ -1011,13 +1049,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
             const hasContainer = nodeInfo ? hasContainerComponent(nodeInfo) : false;
 
-            let hasEmptyContainer = false;
-            if (hasContainer) {
-              const childNodes =
-                (appDom.isElement(node) && appDom.getChildNodes(dom, node).children) || [];
-              hasEmptyContainer = childNodes.length === 0;
-            }
-
             const rect = dropAreaRects[node.id];
 
             if (!rect) {
@@ -1035,7 +1066,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     allowInteraction={isPageNodeHub ? false : nodesWithInteraction.has(node.id)}
                     onDragStart={handleDragStart}
                     onDelete={() => handleDelete(node.id)}
-                    hasEmptyContainer={hasEmptyContainer}
+                    hasContainer={hasContainer}
                   />
                 ) : null}
               </React.Fragment>

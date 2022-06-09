@@ -18,39 +18,41 @@ function createDefaultCodeComponent(name: string): string {
   const propTypeId = `${componentId}Props`;
   return format(`
     import * as React from 'react';
-    import type { ComponentConfig } from '@mui/toolpad-core';
+    import { Typography } from '@mui/material';
+    import { createComponent } from '@mui/toolpad-core';
     
     export interface ${propTypeId} {
       msg: string;
     }
     
-    export const config: ComponentConfig<${propTypeId}> = {
-      argTypes: {}
-    }
-    
-    export default function ${componentId}({ msg }: ${propTypeId}) {
+    function ${componentId}({ msg }: ${propTypeId}) {
       return (
-        <div>{msg}</div>
+        <Typography>{msg}</Typography>
       );
     }
 
-    ${componentId}.defaultProps = {
-      msg: "Hello world!",
-    };
+    export default createComponent(${componentId}, {
+      argTypes: {
+        msg: {
+          typeDef: { type: "string" },
+          defaultValue: "Hello world!",
+        },
+      },
+    });    
   `);
 }
 
-export interface CreateStudioCodeComponentDialogProps {
+export interface CreateCodeComponentDialogProps {
   appId: string;
   open: boolean;
   onClose: () => void;
 }
 
-export default function CreateStudioCodeComponentDialog({
+export default function CreateCodeComponentDialog({
   appId,
   onClose,
   ...props
-}: CreateStudioCodeComponentDialogProps) {
+}: CreateCodeComponentDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const [name, setName] = React.useState(`MyComponent`);
@@ -70,7 +72,6 @@ export default function CreateStudioCodeComponentDialog({
             name,
             attributes: {
               code: appDom.createConst(createDefaultCodeComponent(name)),
-              argTypes: appDom.createConst({}),
             },
           });
           const appNode = appDom.getApp(dom);
@@ -79,7 +80,7 @@ export default function CreateStudioCodeComponentDialog({
           navigate(`/app/${appId}/editor/codeComponents/${newNode.id}`);
         }}
       >
-        <DialogTitle>Create a new MUI Studio Code Component</DialogTitle>
+        <DialogTitle>Create a new MUI Toolpad Code Component</DialogTitle>
         <DialogContent>
           <TextField
             sx={{ my: 1 }}

@@ -2,69 +2,28 @@ import type * as React from 'react';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   ArgTypeDefinition,
-  ArgTypeDefinitions,
   SlotType,
   RuntimeError,
   ComponentConfig,
+  BindableAttrValues,
+  LiveBinding,
 } from '@mui/toolpad-core';
-import type { Branded, WithControlledProp } from './utils/types';
+import { PaletteMode } from '@mui/material';
+import type { Branded, Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
 export interface EditorProps<T> {
-  nodeId: NodeId;
-  propName: string;
+  /**
+   * @deprecated
+   * `nodeId` is only needed for very specific editors. Maybe this rather belongs in some context?
+   */
+  nodeId?: NodeId;
   label: string;
   argType: ArgTypeDefinition;
   disabled?: boolean;
   value: T | undefined;
   onChange: (newValue: T) => void;
 }
-
-export interface PropControlDefinition<T = any> {
-  Editor: React.FC<EditorProps<T>>;
-}
-
-export type BindingAttrValueFormat = 'stringLiteral' | 'default';
-
-// TODO: Get rid of BoundExpressionAttrValue? Its function can be fulfilled by derivedState as well
-export interface BoundExpressionAttrValue {
-  type: 'boundExpression';
-  value: string;
-  format?: BindingAttrValueFormat;
-}
-
-export interface JsExpressionAttrValue {
-  type: 'jsExpression';
-  value: string;
-}
-
-export interface BindingAttrValue {
-  type: 'binding';
-  value: string;
-}
-
-export interface ConstantAttrValue<V> {
-  type: 'const';
-  value: V;
-}
-
-export interface SecretAttrValue<V> {
-  type: 'secret';
-  value: V;
-}
-
-export type BindableAttrValue<V> =
-  | ConstantAttrValue<V>
-  | BindingAttrValue
-  | SecretAttrValue<V>
-  | BoundExpressionAttrValue
-  | JsExpressionAttrValue;
-
-export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
-
-export type BindableAttrValues<P> = {
-  readonly [K in keyof P]?: BindableAttrValue<P[K]>;
-};
 
 export type NodeId = Branded<string, 'NodeId'>;
 
@@ -92,10 +51,10 @@ export interface SlotsState {
 
 export interface NodeInfo {
   nodeId: NodeId;
-  error?: RuntimeError;
+  error?: RuntimeError | null;
   rect?: Rectangle;
   slots?: SlotsState;
-  component?: ComponentConfig<unknown>;
+  componentConfig?: ComponentConfig<unknown>;
   props: { [key: string]: unknown };
 }
 
@@ -118,24 +77,36 @@ export interface ApiResult<D = any> {
   fields?: ApiResultFields;
 }
 
-export interface CreateHandlerApi {
-  updateConnection: (appId: string, props: Updates<LegacyConnection>) => Promise<LegacyConnection>;
-  getConnection: (appId: string, connectionId: string) => Promise<LegacyConnection>;
+export interface CreateHandlerApi<P = unknown> {
+  setConnectionParams: (appId: string, connectionId: string, props: P) => Promise<void>;
+  getConnectionParams: (appId: string, connectionId: string) => Promise<P>;
 }
 
-export interface ConnectionEditorProps<P> extends WithControlledProp<P> {
+export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
   handlerBasePath: string;
   appId: string;
   connectionId: NodeId;
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
-export interface QueryEditorApi {
-  fetchPrivate: (query: any) => Promise<any>;
+
+export interface QueryEditorModel<Q> {
+  query: Q;
+  params?: BindableAttrValues<any>;
 }
-export interface QueryEditorProps<Q> extends WithControlledProp<Q> {
-  api: QueryEditorApi;
+
+export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
+  appId: string;
+  connectionId: NodeId;
+  connectionParams: Maybe<P>;
+  globalScope: Record<string, any>;
+  /**
+   * @deprecated
+   */
+  queryScope?: Record<string, any>;
+  liveParams: Record<string, LiveBinding>;
 }
-export type QueryEditor<Q = {}> = React.FC<QueryEditorProps<Q>>;
+
+export type QueryEditor<P, Q = {}> = React.FC<QueryEditorProps<P, Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;
@@ -145,28 +116,21 @@ export interface ConnectionStatus {
 export interface ClientDataSource<P = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<P>;
-  getInitialConnectionValue: () => P;
   isConnectionValid: (connection: P) => boolean;
-  QueryEditor: QueryEditor<Q>;
+  QueryEditor: QueryEditor<P, Q>;
   getInitialQueryValue: () => Q;
-  getArgTypes?: (query: Q) => ArgTypeDefinitions;
 }
 
-export interface ServerDataSource<P = {}, Q = {}, D = {}> {
-  test: (connection: LegacyConnection<P>) => Promise<ConnectionStatus>;
+export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
-  execPrivate?: (connection: LegacyConnection<P>, query: any) => Promise<any>;
+  execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<any>;
   // Execute a query on this connection, intended for viewers
-  exec: (connection: LegacyConnection<P>, query: Q, params: any) => Promise<ApiResult<D>>;
-  createHandler?: () => (api: CreateHandlerApi, req: NextApiRequest, res: NextApiResponse) => void;
-}
-// TODO: replace LegacyConnection with ConnectionNode
-export interface LegacyConnection<P = unknown> {
-  id: string;
-  type: string;
-  name: string;
-  params: P;
-  status: ConnectionStatus | null;
+  exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ApiResult<D>>;
+  createHandler?: () => (
+    api: CreateHandlerApi<P>,
+    req: NextApiRequest,
+    res: NextApiResponse,
+  ) => void;
 }
 
 /**
@@ -198,6 +162,7 @@ export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
 export type ResolvedProps = Record<string, PropExpression | undefined>;
 
 export interface AppTheme {
+  'palette.mode'?: PaletteMode;
   'palette.primary.main'?: string;
   'palette.secondary.main'?: string;
 }

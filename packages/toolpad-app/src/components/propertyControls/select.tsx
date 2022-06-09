@@ -1,45 +1,33 @@
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { MenuItem, TextField } from '@mui/material';
 import * as React from 'react';
-import type { EditorProps, PropControlDefinition } from '../../types';
+import type { EditorProps } from '../../types';
 
-function SelectPropEditor({
-  propName,
-  label,
-  argType,
-  value,
-  onChange,
-  disabled,
-}: EditorProps<string>) {
+function SelectPropEditor({ label, argType, value, onChange, disabled }: EditorProps<string>) {
   const items = argType.typeDef.type === 'string' ? argType.typeDef.enum ?? [] : [];
   const handleChange = React.useCallback(
-    (event: SelectChangeEvent<string>) => {
-      onChange(event.target.value as string);
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(event.target.value);
     },
     [onChange],
   );
+
   return (
-    <FormControl fullWidth size="small">
-      <InputLabel id={`select-${propName}`}>{label}</InputLabel>
-      <Select
-        labelId={`select-${propName}`}
-        size="small"
-        label={label}
-        value={value ?? ''}
-        disabled={disabled}
-        onChange={handleChange}
-      >
-        {items.map((item) => (
-          <MenuItem key={item} value={item}>
-            {item}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <TextField
+      select
+      fullWidth
+      label={label}
+      value={value ?? ''}
+      disabled={disabled}
+      onChange={handleChange}
+    >
+      <MenuItem value="">-</MenuItem>
+      {items.map((item) => (
+        <MenuItem key={item} value={item}>
+          {item}
+        </MenuItem>
+      ))}
+    </TextField>
   );
 }
 
-const SelectType: PropControlDefinition<string> = {
-  Editor: SelectPropEditor,
-};
-
-export default SelectType;
+export default SelectPropEditor;

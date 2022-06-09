@@ -2,8 +2,9 @@ import type * as monacoEditor from 'monaco-editor';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import * as React from 'react';
 import Editor from '@monaco-editor/react';
-import schemas from '../../schemas';
-import type { EditorProps, PropControlDefinition } from '../../types';
+import * as JSON5 from 'json5';
+import type { EditorProps } from '../../types';
+import useShortcut from '../../utils/useShortcut';
 
 function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorProps<any>) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -12,21 +13,27 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
   const [input, setInput] = React.useState(valueAsString);
   React.useEffect(() => setInput(valueAsString), [valueAsString]);
 
-  const handleSave = React.useCallback(() => {
-    try {
-      const newValue = JSON.parse(input);
-      onChange(newValue);
-    } catch (err: any) {
-      alert(err.message);
+  const normalizedInitial = React.useMemo(() => JSON.stringify(value), [value]);
+  const normalizedInput = React.useMemo(() => {
+    if (!input) {
+      return '';
     }
+    try {
+      return JSON.stringify(JSON5.parse(input));
+    } catch {
+      return null;
+    }
+  }, [input]);
+
+  const handleSave = React.useCallback(() => {
+    const newValue = input === '' ? undefined : JSON5.parse(input);
+    onChange(newValue);
   }, [onChange, input]);
 
   const schemaUri =
     argType.typeDef.type === 'object' || argType.typeDef.type === 'array'
       ? argType.typeDef.schema
       : null;
-
-  const fileUri = `file:///x.json`;
 
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
@@ -37,13 +44,16 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
 
       monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
         validate: true,
-        schemas: Object.entries(schemas).map(([uri, schema]) => {
-          return {
-            uri,
-            fileMatch: uri === schemaUri ? [fileUri] : [], // associate with our file
-            schema,
-          };
-        }),
+        schemaRequest: 'error',
+        enableSchemaRequest: true,
+        schemas: schemaUri
+          ? [
+              {
+                uri: new URL(schemaUri, window.location.href).href,
+                fileMatch: ['*'],
+              },
+            ]
+          : [],
       });
 
       monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
@@ -64,8 +74,10 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
         noSyntaxValidation: false,
       });
     },
-    [schemaUri, fileUri],
+    [schemaUri],
   );
+
+  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
   return (
     <React.Fragment>
@@ -79,7 +91,6 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
             height="200px"
             value={input}
             onChange={(newValue = '') => setInput(newValue)}
-            path={fileUri}
             language="json"
             options={{ readOnly: disabled }}
             onMount={HandleEditorMount}
@@ -89,7 +100,10 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
           <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
             Cancel
           </Button>
-          <Button disabled={valueAsString === input} onClick={handleSave}>
+          <Button
+            disabled={normalizedInput === null || normalizedInitial === normalizedInput}
+            onClick={handleSave}
+          >
             Save
           </Button>
         </DialogActions>
@@ -98,8 +112,4 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
   );
 }
 
-const jsonType: PropControlDefinition<string> = {
-  Editor: JsonPropEditor,
-};
-
-export default jsonType;
+export default JsonPropEditor;

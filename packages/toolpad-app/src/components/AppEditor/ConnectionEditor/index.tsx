@@ -1,20 +1,12 @@
 import * as React from 'react';
-import { Box, Button, Stack, Toolbar, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { LoadingButton } from '@mui/lab';
-import CheckIcon from '@mui/icons-material/Check';
-import CrossIcon from '@mui/icons-material/Clear';
-import { ConnectionStatus, NodeId, ConnectionEditorProps, ClientDataSource } from '../../../types';
+import { NodeId, ConnectionEditorProps, ClientDataSource } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
-import client from '../../../api';
-
-function getConnectionStatusIcon(status: ConnectionStatus) {
-  return status.error ? <CrossIcon /> : <CheckIcon />;
-}
 
 interface ConnectionParamsEditorProps<P> extends ConnectionEditorProps<P> {
   dataSource: ClientDataSource<P, any>;
@@ -53,91 +45,35 @@ function ConnectionEditorContent<P>({
 }: ConnectionEditorContentProps<P>) {
   const domApi = useDomApi();
 
-  const [connectionParams, setConnectionParams] = React.useState<P>(
-    connectionNode.attributes.params.value,
+  const handleConnectionChange = React.useCallback(
+    (connectionParams) => {
+      (Object.keys(connectionParams) as (keyof P)[]).forEach((propName) => {
+        if (typeof propName !== 'string' || !connectionParams[propName]) {
+          return;
+        }
+        domApi.setNodeNamespacedProp(
+          connectionNode,
+          'attributes',
+          'params',
+          appDom.createSecret(connectionParams),
+        );
+      });
+    },
+    [connectionNode, domApi],
   );
-  const savedConnectionParams = React.useRef<P | null>(connectionNode.attributes.params.value);
-  const dataSourceType = connectionNode.attributes.dataSource.value;
 
+  const dataSourceType = connectionNode.attributes.dataSource.value;
   const dataSource = dataSources[dataSourceType];
 
-  const [isTesting, setIsTesting] = React.useState(false);
-  const [testResult, setTestResult] = React.useState<{
-    connectionParams: P;
-    status: ConnectionStatus;
-  } | null>(null);
-
-  const handleConnectionTest = React.useCallback(async () => {
-    if (!savedConnectionParams) {
-      return;
-    }
-    try {
-      setIsTesting(true);
-      const status = await client.mutation.testConnection({
-        ...connectionNode,
-        attributes: {
-          ...connectionNode.attributes,
-          params: appDom.createSecret(connectionParams),
-        },
-      });
-      if (status) {
-        setTestResult({
-          connectionParams,
-          status,
-        });
-        if (status.error) {
-          alert(status.error);
-        }
-      }
-    } catch (err: any) {
-      alert(err.message);
-    } finally {
-      setIsTesting(false);
-    }
-  }, [connectionNode, connectionParams]);
-
   return (
-    <Box className={className} sx={{ px: 3 }}>
-      <Toolbar disableGutters>
-        <Button
-          onClick={() => {
-            (Object.keys(connectionParams) as (keyof P)[]).forEach((propName) => {
-              if (typeof propName !== 'string' || !connectionParams[propName]) {
-                return;
-              }
-              domApi.setNodeNamespacedProp(
-                connectionNode,
-                'attributes',
-                'params',
-                appDom.createSecret(connectionParams),
-              );
-            });
-            savedConnectionParams.current = connectionParams;
-          }}
-          disabled={connectionParams === savedConnectionParams.current}
-        >
-          Update
-        </Button>
-        <LoadingButton
-          disabled={!connectionParams}
-          onClick={handleConnectionTest}
-          loading={isTesting}
-          endIcon={
-            connectionParams === testResult?.connectionParams
-              ? getConnectionStatusIcon(testResult.status)
-              : null
-          }
-        >
-          Test
-        </LoadingButton>
-      </Toolbar>
+    <Box className={className} sx={{ width: '100%', height: '100%', p: 3 }}>
       <Stack spacing={1}>
         <NodeNameEditor node={connectionNode} />
         {dataSource ? (
           <ConnectionParamsEditor
             dataSource={dataSource}
-            value={connectionParams}
-            onChange={setConnectionParams}
+            value={connectionNode.attributes.params.value}
+            onChange={handleConnectionChange}
             handlerBasePath={`/api/dataSources/${dataSourceType}`}
             appId={appId}
             connectionId={connectionNode.id}
@@ -154,21 +90,15 @@ function ConnectionEditorContent<P>({
 
 export interface ConnectionProps {
   appId: string;
-  className?: string;
 }
 
-export default function ConnectionEditor({ appId, className }: ConnectionProps) {
+export default function ConnectionEditor({ appId }: ConnectionProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
   return connectionNode ? (
-    <ConnectionEditorContent
-      appId={appId}
-      className={className}
-      key={nodeId}
-      connectionNode={connectionNode}
-    />
+    <ConnectionEditorContent appId={appId} key={nodeId} connectionNode={connectionNode} />
   ) : (
-    <NotFoundEditor className={className} message={`Non-existing Connection "${nodeId}"`} />
+    <NotFoundEditor message={`Non-existing Connection "${nodeId}"`} />
   );
 }

@@ -9,12 +9,16 @@ const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
   border: '1px solid black',
   borderColor: theme.palette.divider,
   borderRadius: theme.shape.borderRadius,
-  // overflow: 'hidden',
 }));
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
   globalScope: Record<string, unknown>;
   onCommit?: () => void;
+  disabled?: boolean;
+  autoFocus?: boolean;
+  functionBody?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 export function JsExpressionEditor({
@@ -22,7 +26,14 @@ export function JsExpressionEditor({
   value,
   onChange,
   globalScope,
+  disabled,
+  autoFocus,
+  functionBody,
+  onFocus,
+  onBlur,
 }: JsExpressionEditorProps) {
+  const id = React.useId();
+
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
   const monacoRef = React.useRef<typeof monacoEditor>();
 
@@ -55,6 +66,23 @@ export function JsExpressionEditor({
 
   React.useEffect(() => setLibSource(), [setLibSource]);
 
+  React.useEffect(() => {
+    if (editorRef.current && onFocus) {
+      const { dispose } = editorRef.current.onDidFocusEditorText(onFocus);
+      return () => dispose();
+    }
+    return () => {};
+  }, [onFocus]);
+
+  React.useEffect(() => {
+    if (editorRef.current && onBlur) {
+      const { dispose } = editorRef.current.onDidBlurEditorText(onBlur);
+      return () => dispose();
+    }
+    return () => {};
+  }, [onBlur]);
+
+  const isMount = React.useRef(true);
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
       monacoRef.current = monaco;
@@ -82,26 +110,35 @@ export function JsExpressionEditor({
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: false,
         noSyntaxValidation: false,
+        diagnosticCodesToIgnore: functionBody ? [1108] : [],
       });
 
       // The types for `monaco.KeyCode` seem to be messed up
       // eslint-disable-next-line no-bitwise
       editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => onCommit?.());
 
+      if (isMount && autoFocus && !disabled) {
+        editor.focus();
+        isMount.current = false;
+      }
+
       setLibSource();
     },
-    [setLibSource, onCommit],
+    [setLibSource, onCommit, autoFocus, disabled, functionBody],
   );
 
   return (
-    <JsExpressionEditorRoot>
+    <JsExpressionEditorRoot sx={disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}}>
       <Editor
         height="150px"
         value={value}
         onChange={(code = '') => onChange(code)}
-        path="./component.tsx"
+        path={`./expression/${id}.tsx`}
         language="typescript"
         onMount={HandleEditorMount}
+        options={{
+          readOnly: disabled,
+        }}
       />
     </JsExpressionEditorRoot>
   );

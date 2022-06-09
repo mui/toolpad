@@ -18,6 +18,7 @@ const ToolpadShellRoot = styled('div')({
 const ViewPort = styled('div')({
   flex: 1,
   overflow: 'auto',
+  position: 'relative',
 });
 
 export interface HeaderProps {
@@ -33,8 +34,9 @@ function Header({ actions, navigation }: HeaderProps) {
       elevation={0}
       sx={{ zIndex: 2, borderBottom: 1, borderColor: 'divider' }}
     >
-      <Toolbar variant="dense">
+      <Toolbar>
         <IconButton
+          size="medium"
           edge="start"
           color="inherit"
           aria-label="Home"
@@ -42,10 +44,16 @@ function Header({ actions, navigation }: HeaderProps) {
           component="a"
           href={`/`}
         >
-          <MenuIcon />
+          <MenuIcon fontSize="medium" />
         </IconButton>
-        <Typography variant="h6" color="inherit" component="div" sx={{ mr: 2 }}>
-          MUI Toolpad
+        <Typography
+          data-test-id="brand"
+          variant="h6"
+          color="inherit"
+          component="div"
+          sx={{ mr: 2 }}
+        >
+          MUI Toolpad {process.env.TOOLPAD_TARGET}
         </Typography>
         {navigation}
         <Box flex={1} />

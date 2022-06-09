@@ -3,7 +3,7 @@ import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import AlignverticalTopIcon from '@mui/icons-material/AlignVerticalTop';
 import AlignVerticalCenterIcon from '@mui/icons-material/AlignVerticalCenter';
 import AlignVerticalBottomIcon from '@mui/icons-material/AlignVerticalBottom';
-import type { EditorProps, PropControlDefinition } from '../../types';
+import type { EditorProps } from '../../types';
 
 function VerticalAlignPropEditor({
   label,
@@ -21,7 +21,6 @@ function VerticalAlignPropEditor({
     <Box>
       <Typography>{label}:</Typography>
       <ToggleButtonGroup
-        size="small"
         exclusive
         disabled={disabled}
         value={value}
@@ -42,8 +41,4 @@ function VerticalAlignPropEditor({
   );
 }
 
-const alignementType: PropControlDefinition<string> = {
-  Editor: VerticalAlignPropEditor,
-};
-
-export default alignementType;
+export default VerticalAlignPropEditor;

@@ -3,15 +3,25 @@ import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
-import { ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
-import { transform } from 'sucrase';
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
+import ReactDOM from 'react-dom';
+import { ErrorBoundary } from 'react-error-boundary';
+import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
-import getImportMap from '../../../getImportMap';
 import { tryFormat } from '../../../utils/prettier';
-import { HTML_ID_APP_ROOT, MUI_X_PRO_LICENSE } from '../../../constants';
-import { escapeHtml } from '../../../utils/strings';
+import useShortcut from '../../../utils/useShortcut';
+import { usePrompt } from '../../../utils/router';
+import NodeNameEditor from '../NodeNameEditor';
+import usePageTitle from '../../../utils/usePageTitle';
+import useLatest from '../../../utils/useLatest';
+import AppThemeProvider from '../../../runtime/AppThemeProvider';
+import useCodeComponent from './useCodeComponent';
+import { mapValues } from '../../../utils/collections';
+
+const Noop = createComponent(() => null);
 
 const CanvasFrame = styled('iframe')({
   border: 'none',
@@ -20,97 +30,89 @@ const CanvasFrame = styled('iframe')({
   height: '100%',
 });
 
-function renderSandboxHtml() {
-  const importMap = getImportMap();
-  const serializedImportMap = JSON.stringify(importMap, null, 2);
-  const serializedPreload = Object.values(importMap.imports)
-    .map((url) => `<link rel="modulepreload" href="${escapeHtml(url)}" />`)
-    .join('\n');
+interface FrameContentProps {
+  children: React.ReactElement;
+  document: Document;
+}
 
-  return `
-    <!DOCTYPE html>
-    <html style="position: relative">
-      <head>
-        <meta charset="utf-8" />
-        <meta name="x-data-grid-pro-license" content="${MUI_X_PRO_LICENSE}" />
-        <title>Toolpad</title>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <style>
-          #${HTML_ID_APP_ROOT} {
-            overflow: hidden; /* prevents margins from collapsing into root */
-            min-height: 100vh;
-          }
-        </style>
-      </head>
-      <body>
-        <div id="${HTML_ID_APP_ROOT}"></div>
+function FrameContent(props: FrameContentProps) {
+  const { children, document } = props;
 
-        <script type="importmap">
-          ${serializedImportMap}
-        </script>
+  const cache = React.useMemo(
+    () =>
+      createCache({
+        key: `code-component-sandbox`,
+        prepend: true,
+        container: document.head,
+      }),
+    [document],
+  );
 
-        ${serializedPreload}
-
-        <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
-        <script async src="/web_modules/es-module-shims.js" type="module"></script>
-
-        <script type="module" src="/runtime/codeComponentEditor.js"></script>
-      </body>
-    </html>
-  `;
+  return <CacheProvider value={cache}>{children}</CacheProvider>;
 }
 
 interface CodeComponentEditorContentProps {
+  theme?: appDom.ThemeNode;
   codeComponentNode: appDom.CodeComponentNode;
 }
 
-declare global {
-  interface Window {
-    __TOOLPAD_EDITOR_UPDATE_COMPONENT_CONFIG__?: React.Dispatch<React.SetStateAction<any>>;
-  }
-}
-
-function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
+function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
 
-  const [input, setInput] = React.useState(codeComponentNode.attributes.code.value);
-  const [argTypes, setArgTypes] = React.useState<ArgTypeDefinitions>({});
+  const [input, setInput] = React.useState<string>(codeComponentNode.attributes.code.value);
 
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
-  const updateDomActionRef = React.useRef(() => {});
+  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
 
-  React.useEffect(() => {
-    updateDomActionRef.current = () => {
-      const pretty = tryFormat(input);
-      setInput(pretty);
-      domApi.setNodeNamespacedProp(
-        codeComponentNode,
-        'attributes',
-        'code',
-        appDom.createConst(pretty),
-      );
-      domApi.setNodeNamespacedProp(
-        codeComponentNode,
-        'attributes',
-        'argTypes',
-        appDom.createConst(argTypes),
-      );
-    };
-  }, [domApi, codeComponentNode, input, argTypes]);
+  usePageTitle(`${codeComponentNode.name} | Toolpad editor`);
 
-  const handleConfigUpdate = React.useCallback(
-    (newConfig: ComponentConfig<unknown> | undefined) => {
-      setArgTypes(newConfig?.argTypes || {});
-    },
-    [],
+  const updateInputExtern = React.useCallback((newInput) => {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+
+    const model = editor.getModel();
+    if (!model) {
+      return;
+    }
+
+    // Used to restore cursor position
+    const state = editorRef.current?.saveViewState();
+
+    editor.executeEdits(null, [
+      {
+        range: model.getFullModelRange(),
+        text: newInput,
+      },
+    ]);
+
+    if (state) {
+      editorRef.current?.restoreViewState(state);
+    }
+  }, []);
+
+  const handleSave = React.useCallback(() => {
+    const pretty = tryFormat(input);
+    updateInputExtern(pretty);
+    domApi.setNodeNamespacedProp(
+      codeComponentNode,
+      'attributes',
+      'code',
+      appDom.createConst(pretty),
+    );
+  }, [codeComponentNode, domApi, input, updateInputExtern]);
+
+  const allChangesAreCommitted = codeComponentNode.attributes.code.value === input;
+
+  usePrompt(
+    'Your code has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
+    !allChangesAreCommitted,
   );
 
-  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
+  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
+
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
       editorRef.current = editor;
@@ -133,15 +135,11 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         typeRoots: ['node_modules/@types'],
       });
 
+      monaco.languages.typescript.typescriptDefaults.addExtraLib(`declare module "https://*";`);
+
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: false,
         noSyntaxValidation: false,
-      });
-
-      // The types for `monaco.KeyCode` seem to be messed up
-      // eslint-disable-next-line no-bitwise
-      editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => {
-        updateDomActionRef.current();
       });
 
       fetch('/typings.json')
@@ -161,94 +159,103 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     [],
   );
 
-  const setupFrameWindow = React.useCallback(() => {
-    if (frameRef.current?.contentWindow) {
-      // eslint-disable-next-line no-underscore-dangle
-      frameRef.current.contentWindow.__TOOLPAD_EDITOR_UPDATE_COMPONENT_CONFIG__ =
-        handleConfigUpdate;
-    }
-  }, [handleConfigUpdate]);
-
-  React.useEffect(() => setupFrameWindow(), [setupFrameWindow]);
+  const [iframeLoaded, onLoad] = React.useReducer(() => true, false);
 
   React.useEffect(() => {
-    const frameWindow = frameRef.current?.contentWindow;
-    if (!frameWindow) {
-      return;
+    const document = frameRef.current?.contentDocument;
+    // When we hydrate the iframe then the load event is already dispatched
+    // once the iframe markup is parsed (maybe later but the important part is
+    // that it happens before React can attach event listeners).
+    // We need to check the readyState of the document once the iframe is mounted
+    // and "replay" the missed load event.
+    // See https://github.com/facebook/react/pull/13862 for ongoing effort in React
+    // (though not with iframes in mind).
+    if (document?.readyState === 'complete' && !iframeLoaded) {
+      onLoad();
     }
+  }, [iframeLoaded]);
 
-    let compiled: string;
-    try {
-      compiled = transform(input, {
-        transforms: ['jsx', 'typescript'],
-      }).code;
-    } catch (err) {
-      console.error(err);
-      return;
-    }
+  const frameDocument = frameRef.current?.contentDocument;
 
-    // eslint-disable-next-line no-underscore-dangle
-    if (frameWindow.__CODE_COMPONENT_SANDBOX_READY__) {
-      // eslint-disable-next-line no-underscore-dangle
-      frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateCodeCompoent(
-        compiled,
-      );
-      // eslint-disable-next-line no-underscore-dangle
-    } else if (typeof frameWindow.__CODE_COMPONENT_SANDBOX_READY__ !== 'function') {
-      // eslint-disable-next-line no-underscore-dangle
-      frameWindow.__CODE_COMPONENT_SANDBOX_READY__ = () => {
-        // eslint-disable-next-line no-underscore-dangle
-        frameRef.current?.contentWindow?.__CODE_COMPONENT_SANDBOX_BRIDGE__?.updateCodeCompoent(
-          compiled,
-        );
-      };
-    }
-  }, [input]);
+  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(input);
+
+  const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
+  const { argTypes } = CodeComponent[TOOLPAD_COMPONENT];
+
+  const defaultProps = React.useMemo(
+    () => mapValues(argTypes, (argType) => argType?.defaultValue),
+    [argTypes],
+  );
 
   return (
-    <Stack sx={{ height: '100%' }}>
-      <Toolbar>
-        <Button
-          disabled={codeComponentNode.attributes.code.value === input}
-          onClick={() => updateDomActionRef.current()}
-        >
-          Update
-        </Button>
-      </Toolbar>
-      <Box flex={1} display="flex">
-        <Box flex={1}>
-          <Editor
-            height="100%"
-            value={input}
-            onChange={(newValue) => setInput(newValue || '')}
-            path="./component.tsx"
-            language="typescript"
-            onMount={HandleEditorMount}
-          />
+    <React.Fragment>
+      <Stack sx={{ height: '100%' }}>
+        <Toolbar sx={{ mt: 2 }}>
+          <NodeNameEditor node={codeComponentNode} sx={{ maxWidth: 300 }} />
+        </Toolbar>
+        <Toolbar>
+          <Button disabled={allChangesAreCommitted} onClick={handleSave}>
+            Update
+          </Button>
+        </Toolbar>
+        <Box flex={1} display="flex">
+          <Box flex={1}>
+            <Editor
+              height="100%"
+              defaultValue={input}
+              onChange={(newValue) => setInput(newValue || '')}
+              path="./component.tsx"
+              language="typescript"
+              onMount={HandleEditorMount}
+            />
+          </Box>
+          <Box sx={{ flex: 1, position: 'relative' }}>
+            <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
+          </Box>
         </Box>
-        <Box flex={1}>
-          <CanvasFrame ref={frameRef} srcDoc={renderSandboxHtml()} title="hello" />
-        </Box>
-      </Box>
-    </Stack>
+      </Stack>
+      {iframeLoaded && frameDocument
+        ? ReactDOM.createPortal(
+            <FrameContent document={frameDocument}>
+              <React.Suspense fallback={null}>
+                <ErrorBoundary
+                  resetKeys={[CodeComponent]}
+                  fallbackRender={({ error: runtimeError }) => (
+                    <React.Fragment>{runtimeError.message}</React.Fragment>
+                  )}
+                >
+                  <AppThemeProvider node={theme}>
+                    <CodeComponent {...defaultProps} />
+                  </AppThemeProvider>
+                </ErrorBoundary>
+                {compileError?.message}
+              </React.Suspense>
+            </FrameContent>,
+            frameDocument.body,
+          )
+        : null}
+    </React.Fragment>
   );
 }
 
 interface CodeComponentEditorProps {
-  className?: string;
+  appId: string;
 }
 
-export default function CodeComponentEditor({ className }: CodeComponentEditorProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function CodeComponentEditor({ appId }: CodeComponentEditorProps) {
   const dom = useDom();
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
-  return (
-    <Box className={className}>
-      {codeComponentNode ? (
-        <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
-      ) : (
-        <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
-      )}
-    </Box>
+  const root = appDom.getApp(dom);
+  const { themes = [] } = appDom.getChildNodes(dom, root);
+  return codeComponentNode ? (
+    <CodeComponentEditorContent
+      key={nodeId}
+      codeComponentNode={codeComponentNode}
+      theme={themes[0]}
+    />
+  ) : (
+    <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
   );
 }

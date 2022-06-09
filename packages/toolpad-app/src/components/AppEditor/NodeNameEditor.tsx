@@ -1,13 +1,14 @@
-import { TextField } from '@mui/material';
+import { SxProps, TextField } from '@mui/material';
 import * as React from 'react';
 import * as appDom from '../../appDom';
 import { useDomApi } from '../DomLoader';
 
 interface NodeNameEditorProps {
   node: appDom.AppDomNode;
+  sx?: SxProps;
 }
 
-export default function NodeNameEditor({ node }: NodeNameEditorProps) {
+export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
   const domApi = useDomApi();
 
   const [nameInput, setNameInput] = React.useState(node.name);
@@ -34,8 +35,8 @@ export default function NodeNameEditor({ node }: NodeNameEditorProps) {
 
   return (
     <TextField
+      sx={sx}
       fullWidth
-      size="small"
       label="name"
       value={nameInput}
       onChange={handleNameInputChange}

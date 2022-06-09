@@ -19,6 +19,7 @@ function NavigateToReleaseAction({ appId, version, pageNodeId }: NavigateToRelea
   return (
     <GridActionsCellItem
       icon={<OpenInNewIcon />}
+      // @ts-expect-error https://github.com/mui/mui-x/issues/4654
       component="a"
       href={`/app/${appId}/${version}/pages/${pageNodeId}`}
       target="_blank"
@@ -97,7 +98,6 @@ export default function Release() {
           <DataGridPro
             rows={pages}
             columns={columns}
-            density="compact"
             loading={isLoading}
             error={(error as any)?.message}
           />

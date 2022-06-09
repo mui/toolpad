@@ -11,6 +11,7 @@ import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import NonRenderedPageContent from './NonRenderedPageContent';
+import usePageTitle from '../../../utils/usePageTitle';
 
 const classes = {
   componentPanel: 'Toolpad_ComponentPanel',
@@ -20,6 +21,8 @@ const classes = {
 
 const PageEditorRoot = styled('div')(({ theme }) => ({
   position: 'relative',
+  width: '100%',
+  height: '100%',
   display: 'flex',
   flexDirection: 'row',
   overflow: 'hidden',
@@ -35,23 +38,21 @@ const PageEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-interface PageEditorProps {
+interface PageEditorContentProps {
   appId: string;
-  className?: string;
+  node: appDom.PageNode;
 }
 
-export default function PageEditor({ appId, className }: PageEditorProps) {
-  const dom = useDom();
-  const { nodeId } = useParams();
-  const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
+function PageEditorContent({ appId, node }: PageEditorContentProps) {
+  usePageTitle(`${node.attributes.title.value} | Toolpad editor`);
 
   const [dragActive, setDragActive] = React.useState(false);
   const handleDragStart = React.useCallback(() => setDragActive(true), []);
   const handleDragFinished = React.useCallback(() => setDragActive(false), []);
 
-  return pageNode ? (
-    <PageEditorProvider key={nodeId} appId={appId} nodeId={nodeId as NodeId}>
-      <PageEditorRoot className={className}>
+  return (
+    <PageEditorProvider key={node.id} appId={appId} nodeId={node.id}>
+      <PageEditorRoot>
         <Box sx={{ flex: 1, position: 'relative' }}>
           <SplitPane
             split="horizontal"
@@ -83,7 +84,21 @@ export default function PageEditor({ appId, className }: PageEditorProps) {
         <ComponentPanel className={classes.componentPanel} />
       </PageEditorRoot>
     </PageEditorProvider>
+  );
+}
+
+interface PageEditorProps {
+  appId: string;
+}
+
+export default function PageEditor({ appId }: PageEditorProps) {
+  const dom = useDom();
+  const { nodeId } = useParams();
+  const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
+
+  return pageNode ? (
+    <PageEditorContent appId={appId} node={pageNode} />
   ) : (
-    <NotFoundEditor className={className} message={`Non-existing Page "${nodeId}"`} />
+    <NotFoundEditor message={`Non-existing Page "${nodeId}"`} />
   );
 }

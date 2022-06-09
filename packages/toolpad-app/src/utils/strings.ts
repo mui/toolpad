@@ -52,3 +52,53 @@ export function removeDiacritics(input: string): string {
   // See https://stackoverflow.com/a/37511463
   return input.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
+
+export function isAbsoluteUrl(maybeUrl: string) {
+  try {
+    return !!new URL(maybeUrl);
+  } catch {
+    return false;
+  }
+}
+
+export function removeLeading(input: string, prefix: string): string {
+  return input.startsWith(prefix) ? input.slice(prefix.length) : input;
+}
+
+export function removeTrailing(input: string, suffix: string): string {
+  return input.endsWith(suffix) ? input.slice(0, input.length - suffix.length) : input;
+}
+
+export function ensureStartsWith(input: string, prefix: string): string {
+  return input.startsWith(prefix) ? input : prefix + input;
+}
+
+export function ensureEndsWith(input: string, suffix: string): string {
+  return input.endsWith(suffix) ? input : input + suffix;
+}
+
+/**
+ * Regex to statically find all static import statements
+ *
+ * Tested against:
+ *   import {
+ *     Component
+ *   } from '@angular2/core';
+ *   import defaultMember from "module-name";
+ *   import   *    as name from "module-name  ";
+ *   import   {  member }   from "  module-name";
+ *   import { member as alias } from "module-name";
+ *   import { member1 ,
+ *   member2 } from "module-name";
+ *   import { member1 , member2 as alias2 , member3 as alias3 } from "module-name";
+ *   import defaultMember, { member, member } from "module-name";
+ *   import defaultMember, * as name from "module-name";
+ *   import "module-name";
+ *   import * from './smdn';
+ */
+const IMPORT_STATEMENT_REGEX =
+  /^\s*import(?:["'\s]*([\w*{}\n, ]+)from\s*)?["'\s]*([^"']+)["'\s].*/gm;
+
+export function findImports(src: string): string[] {
+  return Array.from(src.matchAll(IMPORT_STATEMENT_REGEX), (match) => match[2]);
+}

@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { Alert, Snackbar } from '@mui/material';
+import { BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
-import { NodeId, BindableAttrValue, BindableAttrValues } from '../types';
+import { NodeId } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
-import useDebounced from '../utils/useDebounced';
+import useShortcut from '../utils/useShortcut';
+import useDebouncedHandler from '../utils/useDebouncedHandler';
 
 export type DomAction =
   | {
@@ -59,6 +61,10 @@ export type DomAction =
   | {
       type: 'DOM_REMOVE_NODE';
       nodeId: NodeId;
+    }
+  | {
+      type: 'DOM_SAVE_NODE';
+      node: appDom.AppDomNode;
     };
 
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
@@ -97,6 +103,9 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
         action.parentProp,
         action.parentIndex,
       );
+    }
+    case 'DOM_SAVE_NODE': {
+      return appDom.saveNode(dom, action.node);
     }
     case 'DOM_REMOVE_NODE': {
       return appDom.removeNode(dom, action.nodeId);
@@ -189,6 +198,12 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
       dispatch({
         type: 'DOM_REMOVE_NODE',
         nodeId,
+      });
+    },
+    saveNode(node: appDom.AppDomNode) {
+      dispatch({
+        type: 'DOM_SAVE_NODE',
+        node,
       });
     },
     setNodeNamespacedProp<
@@ -297,24 +312,30 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     };
   }, [appId]);
 
-  const debouncedDom = useDebounced(state.dom, 1000);
-
-  React.useEffect(() => {
-    if (!debouncedDom) {
+  const lastSavedDom = React.useRef<appDom.AppDom | null>(null);
+  const handleSave = React.useCallback(() => {
+    if (!state.dom || lastSavedDom.current === state.dom) {
       return;
     }
 
+    lastSavedDom.current = state.dom;
     dispatch({ type: 'DOM_SAVING' });
 
     client.mutation
-      .saveDom(appId, debouncedDom)
+      .saveDom(appId, state.dom)
       .then(() => {
         dispatch({ type: 'DOM_SAVED' });
       })
       .catch((err) => {
         dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
       });
-  }, [appId, debouncedDom]);
+  }, [appId, state.dom]);
+
+  const debouncedhandleSave = useDebouncedHandler(handleSave, 1000);
+
+  React.useEffect(() => {
+    debouncedhandleSave();
+  }, [state.dom, debouncedhandleSave]);
 
   React.useEffect(() => {
     if (state.unsavedChanges <= 0) {
@@ -329,6 +350,8 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [state.unsavedChanges]);
+
+  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
   return (
     <DomLoaderContext.Provider value={state}>

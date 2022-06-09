@@ -7,3 +7,7 @@ packages/toolpad-app/public/editorRuntime
 packages/toolpad-app/public/web_modules
 packages/toolpad-app/public/typings.json
 .git
+.env
+docker
+.circleci
+.github

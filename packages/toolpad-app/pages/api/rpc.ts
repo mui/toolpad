@@ -3,14 +3,14 @@ import type { IncomingMessage } from 'http';
 import superjson from 'superjson';
 import {
   getApps,
+  getApp,
   createApp,
-  testConnection,
-  execApi,
+  updateApp,
+  execQuery,
   dataSourceFetchPrivate,
   loadDom,
   saveDom,
   createRelease,
-  deleteRelease,
   getReleases,
   getRelease,
   loadReleaseDom,
@@ -114,8 +114,11 @@ const rpcServer = {
     getApps: createMethod<typeof getApps>((params) => {
       return getApps(...params);
     }),
-    execApi: createMethod<typeof execApi>((args) => {
-      return execApi(...args);
+    getApp: createMethod<typeof getApp>((params) => {
+      return getApp(...params);
+    }),
+    execQuery: createMethod<typeof execQuery>((args) => {
+      return execQuery(...args);
     }),
     getReleases: createMethod<typeof getReleases>((params) => {
       return getReleases(...params);
@@ -140,20 +143,17 @@ const rpcServer = {
     createApp: createMethod<typeof createApp>((params) => {
       return createApp(...params);
     }),
+    updateApp: createMethod<typeof updateApp>((params) => {
+      return updateApp(...params);
+    }),
     deleteApp: createMethod<typeof deleteApp>((params) => {
       return deleteApp(...params);
     }),
     createRelease: createMethod<typeof createRelease>((params) => {
       return createRelease(...params);
     }),
-    deleteRelease: createMethod<typeof deleteRelease>((params) => {
-      return deleteRelease(...params);
-    }),
     createDeployment: createMethod<typeof createDeployment>((params) => {
       return createDeployment(...params);
-    }),
-    testConnection: createMethod<typeof testConnection>((params) => {
-      return testConnection(...params);
     }),
     saveDom: createMethod<typeof saveDom>((params) => {
       return saveDom(...params);

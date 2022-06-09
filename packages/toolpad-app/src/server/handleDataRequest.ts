@@ -1,10 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
-import { execApi, loadVersionedDom } from './data';
+import { execQuery, loadVersionedDom } from './data';
 import initMiddleware from './initMiddleware';
 import { NodeId, ApiResult, VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
-
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
   // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -26,10 +25,15 @@ export default async (
   { appId, version }: HandleDataRequestParams,
 ) => {
   await cors(req, res);
-  const apiNodeId = req.query.queryId as NodeId;
+  const queryNodeId = req.query.queryId as NodeId;
   const dom = await loadVersionedDom(appId, version);
-  const api = appDom.getNode(dom, apiNodeId, 'api');
-  res.json(
-    await execApi(appId, api, req.query.params ? JSON.parse(req.query.params as string) : {}),
+  const query = appDom.getNode(dom, queryNodeId, 'query');
+
+  const result = await execQuery(
+    appId,
+    query,
+    req.query.params ? JSON.parse(req.query.params as string) : {},
   );
+
+  res.json(result);
 };

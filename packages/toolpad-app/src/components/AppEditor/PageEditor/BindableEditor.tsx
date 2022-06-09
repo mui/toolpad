@@ -1,62 +1,62 @@
-import { Alert, Stack } from '@mui/material';
+import { Stack, TextField } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/toolpad-core';
-import propertyControls from '../../propertyControls';
+import { BindableAttrValue, PropValueType, LiveBinding } from '@mui/toolpad-core';
 import { BindingEditor } from '../BindingEditor';
-import { NodeId, BindableAttrValue } from '../../../types';
 import { WithControlledProp } from '../../../utils/types';
-import { usePageEditorState } from './PageEditorProvider';
 
-function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
-  switch (typeDef.type) {
-    case 'string':
-      return typeDef.enum ? { type: 'select' } : { type: 'string' };
-    case 'number':
-      return { type: 'number' };
-    case 'boolean':
-      return { type: 'boolean' };
-    case 'object':
-      return { type: 'json' };
-    case 'array':
-      return { type: 'json' };
-    case 'function':
-      return { type: 'function' };
-    default:
-      return null;
-  }
+function DefaultControl({ label, disabled, value, onChange }: RenderControlParams<any>) {
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(event.target.value);
+    },
+    [onChange],
+  );
+
+  return (
+    <TextField
+      fullWidth
+      value={value ?? ''}
+      disabled={disabled}
+      onChange={handleChange}
+      label={label}
+    />
+  );
+}
+
+function renderDefaultControl(params: RenderControlParams<any>) {
+  return <DefaultControl {...params} />;
+}
+
+export interface RenderControlParams<V> extends WithControlledProp<V> {
+  label: string;
+  disabled: boolean;
 }
 
 export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
-  propNamespace: string | null;
-  propName: string;
-  nodeId: NodeId;
-  argType: ArgTypeDefinition;
+  label: string;
+  disabled?: boolean;
+  server?: boolean;
+  propType: PropValueType;
+  renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
+  liveBinding?: LiveBinding;
+  globalScope?: Record<string, unknown>;
 }
 
 export default function BindableEditor<V>({
-  propNamespace,
-  propName,
-  nodeId,
-  argType,
+  label,
+  disabled,
+  propType,
+  renderControl = renderDefaultControl,
   value,
+  server,
   onChange,
+  liveBinding,
+  globalScope = {},
 }: BindableEditorProps<V>) {
   const handlePropConstChange = React.useCallback(
     (newValue: V) => onChange({ type: 'const', value: newValue }),
     [onChange],
   );
-
-  // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
-  // to make them bindable to other controlled props only
-  const isBindable = !argType.onChangeHandler;
-
-  const controlSpec = argType.control ?? getDefaultControl(argType.typeDef);
-  const control = controlSpec ? propertyControls[controlSpec.type] : null;
-
-  const bindingId = `${nodeId}${propNamespace ? `.${propNamespace}` : ''}.${propName}`;
-  const { bindings, pageState } = usePageEditorState();
-  const liveBinding = bindings[bindingId];
-  const globalScope = pageState;
 
   const initConstValue = React.useCallback(() => {
     if (value?.type === 'const') {
@@ -71,34 +71,25 @@ export default function BindableEditor<V>({
   const hasBinding = value && value.type !== 'const';
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
-      {control ? (
-        <React.Fragment>
-          <control.Editor
-            nodeId={nodeId}
-            propName={propName}
-            label={argType.label || propName}
-            argType={argType}
-            disabled={!!hasBinding}
-            value={constValue}
-            onChange={handlePropConstChange}
-          />
-          <BindingEditor<V>
-            globalScope={globalScope}
-            liveBinding={liveBinding}
-            propType={argType.typeDef}
-            value={value}
-            onChange={onChange}
-            disabled={!isBindable}
-          />
-        </React.Fragment>
-      ) : (
-        <Alert severity="warning">
-          {`No control for property '${propName}' (type '${argType.typeDef.type}' ${
-            argType.control ? `, control: '${argType.control.type}'` : ''
-          })`}
-        </Alert>
-      )}
+    <Stack direction="row" alignItems="center" justifyContent="space-between">
+      <React.Fragment>
+        {renderControl({
+          label,
+          disabled: !!hasBinding,
+          value: constValue,
+          onChange: handlePropConstChange,
+        })}
+        <BindingEditor<V>
+          globalScope={globalScope}
+          label={label}
+          server={server}
+          propType={propType}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          liveBinding={liveBinding}
+        />
+      </React.Fragment>
     </Stack>
   );
 }

@@ -1,10 +1,11 @@
 import * as React from 'react';
 import clsx from 'clsx';
-import throttle from 'lodash/throttle';
+import throttle from 'lodash-es/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
 import { RuntimeEvent, SlotType } from '@mui/toolpad-core';
+import { setEventHandler } from '@mui/toolpad-core/runtime';
 import {
   NodeId,
   FlowDirection,
@@ -30,14 +31,13 @@ import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
 import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
-
-declare global {
-  interface Window {
-    __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
-  }
-}
-
-const ROW_COMPONENT = 'PageRow';
+import {
+  getElementNodeComponentId,
+  isPageColumn,
+  isPageRow,
+  PAGE_COLUMN_COMPONENT_ID,
+  PAGE_ROW_COMPONENT_ID,
+} from '../../../toolpadComponents';
 
 type SlotDirection = 'horizontal' | 'vertical';
 
@@ -61,6 +61,7 @@ const overlayClasses = {
   insertSlotHud: 'Toolpad_InsertSlotHud',
   selected: 'Toolpad_Selected',
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
+  layout: 'Toolpad_Layout',
   active: 'Toolpad_Active',
   available: 'Toolpad_Available',
   componentDragging: 'Toolpad_ComponentDragging',
@@ -84,12 +85,12 @@ const OverlayRoot = styled('div')({
     display: 'none',
     position: 'absolute',
     alignItems: 'center',
-    right: 0,
+    right: -1,
     background: 'red',
     color: 'white',
     fontSize: 11,
-    padding: `2px 0 2px 8px`,
-    // TODO: figure out positioning of this selectionhint, it should
+    padding: `0 0 0 8px`,
+    // TODO: figure out positioning of this selectionhint, perhaps it should
     //   - prefer top right, above the component
     //   - if that appears out of bound of the editor, show it bottom or left
     zIndex: 1,
@@ -97,9 +98,13 @@ const OverlayRoot = styled('div')({
   },
 
   [`& .${overlayClasses.nodeHud}`]: {
+    border: '1px dashed rgba(255,0,0,.25)',
     // capture mouse events
     pointerEvents: 'initial',
     position: 'absolute',
+    [`&.${overlayClasses.layout}`]: {
+      borderColor: 'rgba(255,0,0,.125)',
+    },
     [`&.${overlayClasses.selected}`]: {
       border: '1px solid red',
       [`& .${overlayClasses.selectionHint}`]: {
@@ -129,7 +134,7 @@ const OverlayRoot = styled('div')({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 11,
+    fontSize: 18,
     color: 'green',
     border: '1px dashed green',
     opacity: 0.5,
@@ -479,7 +484,12 @@ function NodeHud({
   onDelete,
 }: SelectionHudProps) {
   const dom = useDom();
-  const component = useToolpadComponent(dom, node.attributes.component.value);
+
+  const componentId = getElementNodeComponentId(node);
+  const component = useToolpadComponent(dom, componentId);
+
+  const isLayoutComponent =
+    componentId === PAGE_ROW_COMPONENT_ID || componentId === PAGE_COLUMN_COMPONENT_ID;
 
   return (
     <div
@@ -488,15 +498,16 @@ function NodeHud({
       onDragStart={onDragStart}
       style={absolutePositionCss(rect)}
       className={clsx(overlayClasses.nodeHud, {
+        [overlayClasses.layout]: isLayoutComponent,
         [overlayClasses.selected]: selected,
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
     >
       <div draggable className={overlayClasses.selectionHint}>
-        {component.displayName}
-        <DragIndicatorIcon color="inherit" fontSize="small" />
-        <IconButton aria-label="Remove element" color="inherit" size="small" onClick={onDelete}>
-          <DeleteIcon color="inherit" fontSize="small" />
+        {component?.displayName || '<unknown>'}
+        <DragIndicatorIcon color="inherit" />
+        <IconButton aria-label="Remove element" color="inherit" onClick={onDelete}>
+          <DeleteIcon color="inherit" />
         </IconButton>
       </div>
     </div>
@@ -584,11 +595,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       return [];
     }
 
-    const component = draggedNode.attributes.component.value;
-    if (component === ROW_COMPONENT) {
-      return [appDom.getNode(dom, pageNodeId, 'page')];
-    }
-
     /**
      * Return all nodes that are available for insertion.
      * i.e. Exclude all descendants of the current selection since inserting in one of
@@ -598,7 +604,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       ? new Set<appDom.AppDomNode>([selectedNode, ...appDom.getDescendants(dom, selectedNode)])
       : new Set();
     return pageNodes.filter((n) => !excludedNodes.has(n));
-  }, [dom, getCurrentlyDraggedNode, pageNodeId, pageNodes, selectedNode]);
+  }, [dom, getCurrentlyDraggedNode, pageNodes, selectedNode]);
 
   const availableDropTargetIds = React.useMemo(
     () => new Set(availableDropTargets.map((n) => n.id)),
@@ -659,9 +665,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           throw new Error(`Invalid drop target "${activeSlot.parentId}" of type "${parent.type}"`);
         }
 
-        if (appDom.isPage(parent) && draggedNode.attributes.component.value !== ROW_COMPONENT) {
+        const isParentRowContainer = appDom.isPage(parent) || isPageColumn(parent);
+
+        if (isParentRowContainer && !isPageRow(draggedNode)) {
           // TODO: this logic should probably live in the DomReducer?
-          const container = appDom.createElement(dom, ROW_COMPONENT, {});
+          const container = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
           domApi.addNode(container, parent, 'children');
           parent = container;
           activeSlot = { parentId: parent.id, parentProp: 'children' };
@@ -674,12 +682,24 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             domApi.addNode(newNode, parent, 'children', activeSlot.parentIndex);
           }
         } else if (selection) {
+          const dragParent = appDom.getParent(dom, draggedNode);
+
+          const isOnlyRowElement =
+            dragParent &&
+            appDom.isElement(dragParent) &&
+            isPageRow(dragParent) &&
+            appDom.getChildNodes(dom, dragParent).children.length === 1;
+
           domApi.moveNode(
             selection,
             activeSlot.parentId,
             activeSlot.parentProp,
             activeSlot.parentIndex,
           );
+
+          if (isOnlyRowElement) {
+            domApi.removeNode(dragParent.id);
+          }
         }
       }
 
@@ -745,7 +765,20 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleDelete = React.useCallback(
     (nodeId: NodeId) => {
       const toRemove = appDom.getNode(dom, nodeId);
+      const parent = appDom.getParent(dom, toRemove);
+
+      const isOnlyRowElement =
+        parent &&
+        appDom.isElement(parent) &&
+        isPageRow(parent) &&
+        appDom.getChildNodes(dom, parent).children.length === 1;
+
       domApi.removeNode(toRemove.id);
+
+      if (isOnlyRowElement) {
+        domApi.removeNode(parent.id);
+      }
+
       api.deselect();
     },
     [dom, domApi, api],
@@ -785,6 +818,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     api.pageViewStateUpdate(getPageViewState(rootElm));
   }, [api]);
 
+  const [rootElm, setRootElm] = React.useState<HTMLElement | null>();
+
   const handleRuntimeEvent = React.useCallback(
     (event: RuntimeEvent) => {
       switch (event.type) {
@@ -813,6 +848,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           api.pageBindingsUpdate(event.bindings);
           return;
         }
+        case 'afterRender': {
+          const editorWindow = editorWindowRef.current ?? null;
+          setRootElm(editorWindow?.document.getElementById(HTML_ID_APP_ROOT));
+          return;
+        }
         default:
           throw new Error(
             `received unrecognized event "${(event as RuntimeEvent).type}" from editor runtime`,
@@ -823,59 +863,53 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     handleRuntimeEventRef.current = handleRuntimeEvent;
   }, [handleRuntimeEvent]);
 
   React.useEffect(() => {
     if (editorWindowRef.current) {
       const editorWindow = editorWindowRef.current;
-      const rootElm = editorWindow.document.getElementById(HTML_ID_APP_ROOT);
 
-      if (!rootElm) {
-        console.warn(`Invariant: Unable to locate Toolpad App root element`);
-        return () => {};
-      }
+      const cleanupHandler = setEventHandler(editorWindow, (event) =>
+        handleRuntimeEventRef.current(event),
+      );
 
-      handlePageViewStateUpdate();
-      const handlePageUpdateThrottled = throttle(handlePageViewStateUpdate, 250, {
-        trailing: true,
-      });
-
-      const mutationObserver = new MutationObserver(handlePageUpdateThrottled);
-
-      mutationObserver.observe(rootElm, {
-        attributes: true,
-        childList: true,
-        subtree: true,
-        characterData: true,
-      });
-
-      const resizeObserver = new ResizeObserver(handlePageUpdateThrottled);
-
-      resizeObserver.observe(rootElm);
-
-      // eslint-disable-next-line no-underscore-dangle
-      const queuedEvents = Array.isArray(editorWindow.__TOOLPAD_RUNTIME_EVENT__)
-        ? // eslint-disable-next-line no-underscore-dangle
-          editorWindow.__TOOLPAD_RUNTIME_EVENT__
-        : [];
-
-      queuedEvents.forEach((event) => handleRuntimeEventRef.current(event));
-
-      // eslint-disable-next-line no-underscore-dangle
-      editorWindow.__TOOLPAD_RUNTIME_EVENT__ = (event) => handleRuntimeEventRef.current(event);
-
-      return () => {
-        handlePageUpdateThrottled.cancel();
-        mutationObserver.disconnect();
-        resizeObserver.disconnect();
-        // eslint-disable-next-line no-underscore-dangle
-        delete editorWindow.__TOOLPAD_RUNTIME_EVENT__;
-      };
+      return cleanupHandler;
     }
     return () => {};
-  }, [overlayKey, handlePageViewStateUpdate]);
+  }, [overlayKey]);
+
+  React.useEffect(() => {
+    if (!rootElm) {
+      return () => {};
+    }
+
+    handlePageViewStateUpdate();
+    const handlePageUpdateThrottled = throttle(handlePageViewStateUpdate, 250, {
+      trailing: true,
+    });
+
+    const mutationObserver = new MutationObserver(handlePageUpdateThrottled);
+
+    mutationObserver.observe(rootElm, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    const resizeObserver = new ResizeObserver(handlePageUpdateThrottled);
+
+    resizeObserver.observe(rootElm);
+    rootElm.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
+
+    return () => {
+      handlePageUpdateThrottled.cancel();
+      mutationObserver.disconnect();
+      resizeObserver.disconnect();
+    };
+  }, [overlayKey, handlePageViewStateUpdate, rootElm]);
 
   return (
     <RenderPanelRoot className={className}>
@@ -932,7 +966,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                           highlightedSlot?.parentProp === parentProp,
                       })}
                     >
-                      Insert Here
+                      +
                     </div>
                   ),
                 );

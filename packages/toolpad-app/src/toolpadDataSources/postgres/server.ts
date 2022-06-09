@@ -1,18 +1,9 @@
-import { ApiResult, ServerDataSource, ConnectionStatus, LegacyConnection } from '../../types';
+import { ApiResult, ServerDataSource } from '../../types';
+import { Maybe } from '../../utils/types';
 import { PostgresConnectionParams, PostgresQuery } from './types';
 
-async function test(
-  connection: LegacyConnection<PostgresConnectionParams>,
-): Promise<ConnectionStatus> {
-  console.log(`Testing connection ${JSON.stringify(connection)}`);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return { timestamp: Date.now() };
-}
-
-async function execPrivate(
-  connection: LegacyConnection<PostgresConnectionParams>,
-  query: any,
-): Promise<any> {
+async function execPrivate(connection: Maybe<PostgresConnectionParams>, query: any): Promise<any> {
+  // eslint-disable-next-line no-console
   console.log(`executing private query "${query}"`);
   if (query === 'getAllTables') {
     return ['table1', 'table2'];
@@ -21,11 +12,12 @@ async function execPrivate(
 }
 
 async function exec(
-  connection: LegacyConnection<PostgresConnectionParams>,
+  connection: Maybe<PostgresConnectionParams>,
   postgresQuery: PostgresQuery,
 ): Promise<ApiResult<any>> {
+  // eslint-disable-next-line no-console
   console.log(
-    `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection.params.host}"`,
+    `executing "${postgresQuery.text}" with "${postgresQuery.params}" on "${connection?.host}"`,
   );
   return {
     data: [],
@@ -33,7 +25,6 @@ async function exec(
 }
 
 const dataSource: ServerDataSource<PostgresConnectionParams, PostgresQuery, any> = {
-  test,
   execPrivate,
   exec,
 };

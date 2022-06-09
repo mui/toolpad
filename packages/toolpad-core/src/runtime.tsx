@@ -1,7 +1,21 @@
 import * as React from 'react';
-import ErrorIcon from '@mui/icons-material/Error';
+import { Error as ErrorIcon } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
+import { ErrorBoundary } from 'react-error-boundary';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
-import type { SlotType, ComponentConfig, RuntimeEvent } from './index';
+import type {
+  SlotType,
+  ComponentConfig,
+  RuntimeEvent,
+  ArgTypeDefinition,
+  BindableAttrValue,
+  LiveBinding,
+  RuntimeError,
+} from './types';
+
+const ResetNodeErrorsKeyContext = React.createContext(0);
+
+export const ResetNodeErrorsKeyProvider = ResetNodeErrorsKeyContext.Provider;
 
 declare global {
   interface Window {
@@ -42,30 +56,46 @@ function PlaceholderWrapper(props: PlaceholderWrapperProps) {
       style={{
         display: 'block',
         minHeight: 40,
-        minWidth: 200,
+        width: '100%',
       }}
     />
   );
 }
 
-export interface RuntimeError {
-  message: string;
-  stack?: string;
-}
-
 export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
   nodeId: string;
+  componentConfig: ComponentConfig<unknown>;
 }
 
-interface NodeRuntimeWrapperState {
-  error: RuntimeError | null;
-}
-
-interface NodeFiberHostProps {
+export interface NodeFiberHostProps {
   children: React.ReactElement;
   [RUNTIME_PROP_NODE_ID]: string;
-  nodeError?: RuntimeError;
+  componentConfig: ComponentConfig<unknown>;
+  nodeError?: RuntimeError | null;
+}
+
+interface NodeErrorProps {
+  error: RuntimeError;
+}
+
+function NodeError({ error }: NodeErrorProps) {
+  return (
+    <Tooltip title={error.message}>
+      <span
+        style={{
+          display: 'inline-flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 8,
+          background: 'red',
+          color: 'white',
+        }}
+      >
+        <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
+      </span>
+    </Tooltip>
+  );
 }
 
 // We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
@@ -78,58 +108,42 @@ function NodeFiberHost({ children }: NodeFiberHostProps) {
   return children;
 }
 
-export class NodeRuntimeWrapper extends React.Component<
-  NodeRuntimeWrapperProps,
-  NodeRuntimeWrapperState
-> {
-  state: NodeRuntimeWrapperState;
-
-  constructor(props: NodeRuntimeWrapperProps) {
-    super(props);
-    this.state = { error: null };
-  }
-
-  static getDerivedStateFromError(error: Error): NodeRuntimeWrapperState {
-    return { error: { message: error.message, stack: error.stack } };
-  }
-
-  render() {
-    if (this.state.error) {
-      return (
+export function NodeRuntimeWrapper({ nodeId, componentConfig, children }: NodeRuntimeWrapperProps) {
+  const resetNodeErrorsKey = React.useContext(ResetNodeErrorsKeyContext);
+  return (
+    <ErrorBoundary
+      resetKeys={[resetNodeErrorsKey]}
+      fallbackRender={({ error }) => (
         <NodeFiberHost
           {...{
-            [RUNTIME_PROP_NODE_ID]: this.props.nodeId,
-            nodeError: this.state.error,
+            [RUNTIME_PROP_NODE_ID]: nodeId,
+            nodeError: error,
+            componentConfig,
           }}
         >
-          <span
-            style={{
-              display: 'inline-flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: 8,
-              background: 'red',
-              color: 'white',
-            }}
-          >
-            <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
-          </span>
+          <NodeError error={error} />
         </NodeFiberHost>
-      );
-    }
-
-    return (
-      <NodeRuntimeContext.Provider value={this.props.nodeId}>
-        <NodeFiberHost {...{ [RUNTIME_PROP_NODE_ID]: this.props.nodeId }}>
-          {this.props.children}
+      )}
+    >
+      <NodeRuntimeContext.Provider value={nodeId}>
+        <NodeFiberHost
+          {...{
+            [RUNTIME_PROP_NODE_ID]: nodeId,
+            componentConfig,
+          }}
+        >
+          {children}
         </NodeFiberHost>
       </NodeRuntimeContext.Provider>
-    );
-  }
+    </ErrorBoundary>
+  );
 }
 
 export interface NodeRuntime<P> {
-  setProp: <K extends keyof P & string>(key: K, value: React.SetStateAction<P[K]>) => void;
+  updateAppDomConstProp: <K extends keyof P & string>(
+    key: K,
+    value: React.SetStateAction<P[K]>,
+  ) => void;
 }
 
 export function fireEvent(event: RuntimeEvent) {
@@ -148,6 +162,29 @@ export function fireEvent(event: RuntimeEvent) {
   }
 }
 
+export function setEventHandler(window: Window, handleEvent: (event: RuntimeEvent) => void) {
+  // eslint-disable-next-line no-underscore-dangle
+  if (typeof window.__TOOLPAD_RUNTIME_EVENT__ === 'function') {
+    throw new Error(`Event handler already attached.`);
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  const queuedEvents = Array.isArray(window.__TOOLPAD_RUNTIME_EVENT__)
+    ? // eslint-disable-next-line no-underscore-dangle
+      window.__TOOLPAD_RUNTIME_EVENT__
+    : [];
+
+  queuedEvents.forEach((event) => handleEvent(event));
+
+  // eslint-disable-next-line no-underscore-dangle
+  window.__TOOLPAD_RUNTIME_EVENT__ = (event) => handleEvent(event);
+
+  return () => {
+    // eslint-disable-next-line no-underscore-dangle
+    delete window.__TOOLPAD_RUNTIME_EVENT__;
+  };
+}
+
 export function useNode<P = {}>(): NodeRuntime<P> | null {
   const nodeId = React.useContext(NodeRuntimeContext);
 
@@ -156,7 +193,7 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
       return null;
     }
     return {
-      setProp: (prop, value) => {
+      updateAppDomConstProp: (prop, value) => {
         fireEvent({
           type: 'propUpdated',
           nodeId,
@@ -218,11 +255,44 @@ export function Slots({ prop, children }: SlotsProps) {
   );
 }
 
-export async function importCodeComponent<P>(
-  module: Promise<{ default: React.FC<P> | React.Component<P>; config?: ComponentConfig<P> }>,
-): Promise<React.FC<P> | React.Component<P>> {
-  const { default: Component, config } = await module;
+let iframe: HTMLIFrameElement;
+function evalCode(code: string, globalScope: Record<string, unknown>) {
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+    iframe.style.display = 'none';
+    document.documentElement.appendChild(iframe);
+  }
+
   // eslint-disable-next-line no-underscore-dangle
-  (Component as any).__config = config;
-  return Component;
+  (iframe.contentWindow as any).__SCOPE = globalScope;
+  return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
 }
+
+export function evaluateBindable<V>(
+  bindable: BindableAttrValue<V> | null,
+  globalScope: Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  argType?: ArgTypeDefinition,
+): LiveBinding {
+  const execExpression = () => {
+    if (bindable?.type === 'jsExpression') {
+      return evalCode(bindable?.value, globalScope);
+    }
+
+    if (bindable?.type === 'const') {
+      return bindable?.value;
+    }
+
+    return undefined;
+  };
+
+  try {
+    const value = execExpression();
+    return { value };
+  } catch (err) {
+    return { error: err as Error };
+  }
+}
+
+export * from './jsRuntime';

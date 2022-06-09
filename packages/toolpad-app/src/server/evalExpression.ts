@@ -1,8 +1,15 @@
 import { getQuickJS, QuickJSHandle, QuickJSContext } from 'quickjs-emscripten';
 
-type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+export type Serializable =
+  | string
+  | number
+  | boolean
+  | null
+  | Serializable[]
+  | { [key: string]: Serializable }
+  | ((...args: Serializable[]) => Serializable);
 
-function newJson(ctx: QuickJSContext, json: Json): QuickJSHandle {
+function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
   switch (typeof json) {
     case 'string':
       return ctx.newString(json);
@@ -31,29 +38,44 @@ function newJson(ctx: QuickJSContext, json: Json): QuickJSHandle {
       });
       return result;
     }
+    case 'function': {
+      const result = ctx.newFunction('anonymous', (...args) => {
+        const dumpedArgs: Serializable[] = args.map((arg) => ctx.dump(arg));
+        const fnResult = json(...dumpedArgs);
+        return newJson(ctx, fnResult);
+      });
+      return result;
+    }
     default:
       throw new Error(`Invariant: invalid value: ${json}`);
   }
 }
 
+export function evalExpressionInContext(
+  ctx: QuickJSContext,
+  expression: string,
+  globalScope: Record<string, Serializable> = {},
+) {
+  Object.entries(globalScope).forEach(([key, value]) => {
+    const valueHandle = newJson(ctx, value);
+    ctx.setProp(ctx.global, key, valueHandle);
+    valueHandle.dispose();
+  });
+
+  const result = ctx.unwrapResult(ctx.evalCode(expression));
+  const resultValue = ctx.dump(result);
+  result.dispose();
+  return resultValue;
+}
+
 export default async function evalExpression(
   expression: string,
-  globalScope: Record<string, Json> = {},
+  globalScope: Record<string, Serializable> = {},
 ) {
   const QuickJS = await getQuickJS();
   const ctx = QuickJS.newContext();
-
   try {
-    Object.entries(globalScope).forEach(([key, value]) => {
-      const valueHandle = newJson(ctx, value);
-      ctx.setProp(ctx.global, key, valueHandle);
-      valueHandle.dispose();
-    });
-
-    const result = ctx.unwrapResult(ctx.evalCode(expression));
-    const resultValue = ctx.dump(result);
-    result.dispose();
-    return resultValue;
+    return evalExpressionInContext(ctx, expression, globalScope);
   } finally {
     ctx.dispose();
   }

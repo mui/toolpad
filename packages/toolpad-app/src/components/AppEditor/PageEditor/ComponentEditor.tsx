@@ -1,15 +1,16 @@
-import { styled, Typography } from '@mui/material';
+import { Stack, styled, Typography } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinition, ArgTypeDefinitions } from '@mui/toolpad-core';
+import { ArgTypeDefinition, ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
 import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import PageOptionsPanel from './PageOptionsPanel';
-import RuntimeErrorAlert from './RuntimeErrorAlert';
+import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
+import { getElementNodeComponentId } from '../../../toolpadComponents';
 
 const classes = {
   control: 'Toolpad_Control',
@@ -30,15 +31,13 @@ function shouldRenderControl(propTypeDef: ArgTypeDefinition) {
 
 interface ComponentPropsEditorProps<P> {
   node: appDom.ElementNode<P>;
+  componentConfig: ComponentConfig<P>;
 }
 
-function ComponentPropsEditor<P>({ node }: ComponentPropsEditorProps<P>) {
-  const dom = useDom();
-  const definition = useToolpadComponent(dom, node.attributes.component.value);
-
+function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditorProps<P>) {
   return (
     <ComponentPropsEditorRoot>
-      {(Object.entries(definition.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
+      {(Object.entries(componentConfig.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
         ([propName, propTypeDef]) =>
           propTypeDef && shouldRenderControl(propTypeDef) ? (
             <div key={propName} className={classes.control}>
@@ -63,26 +62,29 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const dom = useDom();
   const { viewState } = usePageEditorState();
   const nodeError = viewState.nodes[node.id]?.error;
+  const componentConfig = viewState.nodes[node.id]?.componentConfig || { argTypes: {} };
 
-  const component = useToolpadComponent(dom, node.attributes.component.value);
+  const component = useToolpadComponent(dom, getElementNodeComponentId(node));
 
   return (
-    <React.Fragment>
-      <Typography variant="subtitle1">Component: {component.displayName}</Typography>
+    <Stack direction="column" gap={1}>
+      <Typography variant="subtitle1">
+        Component: {component?.displayName || '<unknown>'}
+      </Typography>
       <Typography variant="subtitle2" sx={{ mb: 2 }}>
         ID: {node.id}
       </Typography>
       <NodeNameEditor node={node} />
-      {nodeError ? <RuntimeErrorAlert error={nodeError} /> : null}
+      {nodeError ? <ErrorAlert error={nodeError} /> : null}
       {node ? (
         <React.Fragment>
           <Typography variant="subtitle1" sx={{ mt: 2 }}>
             Properties:
           </Typography>
-          <ComponentPropsEditor node={node} />
+          <ComponentPropsEditor componentConfig={componentConfig} node={node} />
         </React.Fragment>
       ) : null}
-    </React.Fragment>
+    </Stack>
   );
 }
 

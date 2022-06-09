@@ -1,33 +1,14 @@
 import * as React from 'react';
-import {
-  styled,
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import { LoadingButton } from '@mui/lab';
-import { useForm } from 'react-hook-form';
-import ToolpadAppShell from '../ToolpadAppShell';
+import { styled, Alert, Box, CircularProgress } from '@mui/material';
+import { Route, Routes, useParams, Navigate } from 'react-router-dom';
+import { JsRuntimeProvider } from '@mui/toolpad-core/runtime';
 import PageEditor from './PageEditor';
-import PagePanel from './PagePanel';
-import DomProvider, { useDomLoader } from '../DomLoader';
-import ApiEditor from './ApiEditor';
+import DomProvider, { useDom, useDomLoader } from '../DomLoader';
+import * as appDom from '../../appDom';
 import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
-import client from '../../api';
-import DialogForm from '../DialogForm';
-import { AppEditorContext, AppEditorContextprovider } from './AppEditorContext';
+import AppEditorShell from './AppEditorShell';
+import NoPageFound from './NoPageFound';
 
 const classes = {
   content: 'Toolpad_Content',
@@ -36,7 +17,7 @@ const classes = {
 };
 
 const EditorRoot = styled('div')(({ theme }) => ({
-  height: '100%',
+  height: '100vh',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
@@ -58,104 +39,37 @@ const EditorRoot = styled('div')(({ theme }) => ({
 
 interface FileEditorProps {
   appId: string;
-  className?: string;
 }
 
-function FileEditor({ appId, className }: FileEditorProps) {
+function FileEditor({ appId }: FileEditorProps) {
+  const dom = useDom();
+  const app = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, app);
+
+  const firstPage = pages.length > 0 ? pages[0] : null;
+
   return (
     <Routes>
-      <Route
-        path="connections/:nodeId"
-        element={<ConnectionEditor appId={appId} className={className} />}
-      />
-      <Route path="apis/:nodeId" element={<ApiEditor appId={appId} className={className} />} />
-      <Route path="pages/:nodeId" element={<PageEditor appId={appId} className={className} />} />
-      <Route
-        path="codeComponents/:nodeId"
-        element={<CodeComponentEditor className={className} />}
-      />
+      <Route element={<AppEditorShell appId={appId} />}>
+        <Route path="connections/:nodeId" element={<ConnectionEditor appId={appId} />} />
+        <Route path="pages/:nodeId" element={<PageEditor appId={appId} />} />
+        <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
+        <Route path="codeComponents/:nodeId" element={<CodeComponentEditor appId={appId} />} />
+        <Route
+          index
+          element={
+            firstPage ? (
+              <Navigate to={`pages/${firstPage.id}`} replace />
+            ) : (
+              <NoPageFound appId={appId} />
+            )
+          }
+        />
+      </Route>
     </Routes>
   );
 }
 
-interface CreateReleaseDialogProps {
-  appId: string;
-  open: boolean;
-  onClose: () => void;
-}
-
-function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps) {
-  const navigate = useNavigate();
-
-  const lastRelease = client.useQuery('findLastRelease', [appId]);
-
-  const { handleSubmit, register, formState, reset } = useForm({
-    defaultValues: {
-      description: '',
-    },
-  });
-
-  const createReleaseMutation = client.useMutation('createRelease');
-  const doSubmit = handleSubmit(async (releaseParams) => {
-    const newRelease = await createReleaseMutation.mutateAsync([appId, releaseParams]);
-    reset();
-    navigate(`/app/${appId}/releases/${newRelease.version}`);
-  });
-
-  return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogForm autoComplete="off" onSubmit={doSubmit}>
-        <DialogTitle>Create new release</DialogTitle>
-        <DialogContent>
-          {lastRelease.isSuccess ? (
-            <Stack spacing={1}>
-              <Typography>
-                You are about to create a snapshot of your application under a unique url. You will
-                be able to verify whether everything is working correctly before deploying this
-                release to production.
-              </Typography>
-              <Typography>
-                The new version to be created is &quot;
-                {lastRelease.data ? lastRelease.data.version + 1 : 1}&quot;.
-              </Typography>
-              <Typography>
-                Please summarize the changes you have made to the application since the last
-                release:
-              </Typography>
-              <TextField
-                label="description"
-                size="small"
-                autoFocus
-                fullWidth
-                multiline
-                rows={5}
-                {...register('description')}
-                error={Boolean(formState.errors.description)}
-                helperText={formState.errors.description?.message}
-              />
-            </Stack>
-          ) : null}
-
-          {createReleaseMutation.isError ? (
-            <Alert severity="error">{(createReleaseMutation.error as Error).message}</Alert>
-          ) : null}
-        </DialogContent>
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={onClose}>
-            Cancel
-          </Button>
-          <LoadingButton
-            disabled={!lastRelease.isSuccess}
-            loading={createReleaseMutation.isLoading}
-            type="submit"
-          >
-            Create
-          </LoadingButton>
-        </DialogActions>
-      </DialogForm>
-    </Dialog>
-  );
-}
 export interface EditorContentProps {
   appId: string;
 }
@@ -163,52 +77,20 @@ export interface EditorContentProps {
 function EditorContent({ appId }: EditorContentProps) {
   const domLoader = useDomLoader();
 
-  const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
-
   return (
-    <ToolpadAppShell
-      appId={appId}
-      actions={
-        <React.Fragment>
-          {domLoader.saving ? (
-            <Box display="flex" flexDirection="row" alignItems="center">
-              <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
-            </Box>
-          ) : null}
-          <Typography>{domLoader.unsavedChanges} unsaved change(s).</Typography>
-          <IconButton
-            aria-label="Create release"
-            color="inherit"
-            sx={{ ml: 1 }}
-            onClick={() => setCreateReleaseDialogOpen(true)}
-          >
-            <RocketLaunchIcon />
-          </IconButton>
-        </React.Fragment>
-      }
-    >
-      <EditorRoot>
-        {domLoader.dom ? (
-          <div className={classes.content}>
-            <PagePanel className={classes.hierarchyPanel} appId={appId} />
-            <FileEditor className={classes.editorPanel} appId={appId} />
-          </div>
-        ) : (
-          <Box flex={1} display="flex" alignItems="center" justifyContent="center">
-            {domLoader.error ? (
-              <Alert severity="error">{domLoader.error}</Alert>
-            ) : (
-              <CircularProgress />
-            )}
-          </Box>
-        )}
-        <CreateReleaseDialog
-          appId={appId}
-          open={createReleaseDialogOpen}
-          onClose={() => setCreateReleaseDialogOpen(false)}
-        />
-      </EditorRoot>
-    </ToolpadAppShell>
+    <EditorRoot>
+      {domLoader.dom ? (
+        <FileEditor appId={appId} />
+      ) : (
+        <Box flex={1} display="flex" alignItems="center" justifyContent="center">
+          {domLoader.error ? (
+            <Alert severity="error">{domLoader.error}</Alert>
+          ) : (
+            <CircularProgress />
+          )}
+        </Box>
+      )}
+    </EditorRoot>
   );
 }
 export default function Editor() {
@@ -218,16 +100,11 @@ export default function Editor() {
     throw new Error(`Missing queryParam "appId"`);
   }
 
-  const appContextValue: AppEditorContext = React.useMemo(
-    () => ({ id: appId, version: 'preview' }),
-    [appId],
-  );
-
   return (
-    <AppEditorContextprovider value={appContextValue}>
+    <JsRuntimeProvider>
       <DomProvider appId={appId}>
         <EditorContent appId={appId} />
       </DomProvider>
-    </AppEditorContextprovider>
+    </JsRuntimeProvider>
   );
 }

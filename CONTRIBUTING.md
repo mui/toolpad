@@ -16,20 +16,19 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 1. Start a local database:
 
    ```sh
-   docker-compose up -d
+   docker-compose -f ./docker-compose.dev.yml up -d
    ```
 
    You can skip this step if you already have a development database available by other means. Use the following command to stop the running container:
 
    ```sh
-   docker-compose down
+   docker-compose -f ./docker-compose.dev.yml down
    ```
 
-1. Install dependencies and start building the project in watch mode:
+1. Install dependencies:
 
    ```sh
    yarn install
-   yarn dev
    ```
 
 1. Create a `.env` file in the root of the project
@@ -38,17 +37,17 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
    TOOLPAD_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
    ```
 
-1. Now you can run the MUI Toolpad cli to start the application
+1. Now you can run the MUI Toolpad dev command to start the application
 
    ```sh
-   yarn cli
+   yarn dev
    ```
 
 1. Open [`http://localhost:3000/`](http://localhost:3000/) in your browser.
 
 ### Notes for contributors:
 
-- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn cli` command, or by running
+- Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn dev` command, or by running
 
   ```sh
   yarn prisma db push

@@ -303,7 +303,7 @@ export async function loadReleaseDom(appId: string, version: number): Promise<ap
   return JSON.parse(release.snapshot.toString('utf-8')) as appDom.AppDom;
 }
 
-export async function getConnection<P = unknown>(
+async function getConnection<P = unknown>(
   appId: string,
   id: string,
 ): Promise<appDom.ConnectionNode<P>> {

@@ -53,7 +53,7 @@ import ComponentsContext, { useComponents, useComponent } from './ComponentsCont
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* Prevents margins from collapsing into root */,
-  // position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
+  position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
   minHeight: '100vh',
 });
 

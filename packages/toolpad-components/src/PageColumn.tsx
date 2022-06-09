@@ -4,17 +4,17 @@ import { createComponent } from '@mui/toolpad-core';
 
 export interface PageColumnProps {
   span: number;
-  spacing?: number;
+  gap?: number;
   children?: React.ReactNode;
   alignItems?: StackProps['alignItems'];
 }
 
-function PageColumn({ span, spacing, children, alignItems }: PageColumnProps) {
+function PageColumn({ span, gap, children, alignItems }: PageColumnProps) {
   return (
     <Stack
       direction="column"
       sx={{
-        gap: spacing,
+        gap,
         alignItems,
         width: `${(span / 12) * 100}vw`,
         maxWidth: '100%',
@@ -31,7 +31,7 @@ export default createComponent(PageColumn, {
       typeDef: { type: 'number' },
       defaultValue: 4,
     },
-    spacing: {
+    gap: {
       typeDef: { type: 'number' },
       defaultValue: 1,
     },

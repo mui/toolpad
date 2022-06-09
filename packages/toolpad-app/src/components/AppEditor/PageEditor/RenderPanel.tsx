@@ -6,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
 import { ArgTypeDefinitions, RuntimeEvent } from '@mui/toolpad-core';
 import { setEventHandler } from '@mui/toolpad-core/runtime';
-import { FlowDirection, NodeId, NodeInfo, NodesInfo } from '../../../types';
+import { FlowDirection, NodeId, NodeInfo } from '../../../types';
 import * as appDom from '../../../appDom';
 import EditorCanvasHost from './EditorCanvasHost';
 import {
@@ -145,15 +145,15 @@ const EmptyDropZone = styled('div')({
 
 function findNodeAt(
   nodes: readonly appDom.AppDomNode[],
-  nodesInfo: NodesInfo,
+  rects: Record<NodeId, Rectangle | null>,
   x: number,
   y: number,
 ): NodeId | null {
   // Search deepest nested first
   for (let i = nodes.length - 1; i >= 0; i -= 1) {
     const node = nodes[i];
-    const nodeInfo = nodesInfo[node.id];
-    if (nodeInfo?.rect && rectContainsPoint(nodeInfo.rect, x, y)) {
+    const rect = rects[node.id];
+    if (rect && rectContainsPoint(rect, x, y)) {
       return node.id;
     }
   }
@@ -344,7 +344,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       return [];
     }
 
-    // If dragging row, can place only inside page
+    // If dragging row, can place only based on page or other page rows
     if (isPageRow(draggedNode)) {
       return [pageNode, ...pageNodes.filter((node) => appDom.isElement(node) && isPageRow(node))];
     }
@@ -404,6 +404,62 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return [RectZone.TOP, RectZone.RIGHT, RectZone.BOTTOM, RectZone.LEFT, RectZone.CENTER];
   }, [dom, dragOverNodeId, getCurrentlyDraggedNode, nodesInfo]);
 
+  const dropAreaRects = React.useMemo(() => {
+    const rects: Record<NodeId, Rectangle | null> = {};
+
+    pageNodes.forEach((node) => {
+      const nodeInfo = nodesInfo[node.id];
+
+      const parent = appDom.getParent(dom, node);
+      const parentInfo = parent && nodesInfo[parent.id];
+
+      let parentAwareNodeRect = null;
+
+      if (nodeInfo && parentInfo && hasContainerComponent(parentInfo) && !appDom.isPage(parent)) {
+        const parentChildren =
+          (appDom.isElement(parent) && appDom.getChildNodes(dom, parent).children) || [];
+
+        const isFirstChild = parentChildren.length > 0 ? parentChildren[0].id === node.id : true;
+        const isLastChild =
+          parentChildren.length > 0
+            ? parentChildren[parentChildren.length - 1].id === node.id
+            : true;
+
+        const gapInPx = 4;
+        const parentGapInPx: number = (parentInfo.props.gap as number) * gapInPx || 0;
+
+        let gapCount = 2;
+        if (isFirstChild || isLastChild) {
+          gapCount = 1;
+        }
+        if (isFirstChild && isLastChild) {
+          gapCount = 0;
+        }
+
+        if (nodeInfo.rect && hasVerticalContainer(parentInfo)) {
+          parentAwareNodeRect = {
+            ...nodeInfo.rect,
+            y: isFirstChild ? nodeInfo.rect.y : nodeInfo.rect.y - parentGapInPx,
+            height: nodeInfo.rect.height + gapCount * parentGapInPx,
+          };
+        }
+        if (nodeInfo.rect && hasHorizontalContainer(parentInfo)) {
+          parentAwareNodeRect = {
+            ...nodeInfo.rect,
+            x: isFirstChild ? nodeInfo.rect.x : nodeInfo.rect.x - parentGapInPx,
+            width: nodeInfo.rect.width + gapCount * parentGapInPx,
+          };
+        }
+
+        rects[node.id] = parentAwareNodeRect;
+      } else {
+        rects[node.id] = nodeInfo?.rect || null;
+      }
+    });
+
+    return rects;
+  }, [dom, nodesInfo, pageNodes]);
+
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
@@ -414,7 +470,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const activeDropNodeId = findNodeAt(
         availableDropTargets,
-        nodesInfo,
+        dropAreaRects,
         cursorPos.x,
         cursorPos.y,
       );
@@ -422,11 +478,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       event.preventDefault();
 
       const activeDropNode = activeDropNodeId && appDom.getNode(dom, activeDropNodeId);
-      const activeDropNodeInfo = activeDropNodeId && nodesInfo[activeDropNodeId];
 
       let activeDropZone = null;
-      if (activeDropNode && activeDropNodeInfo) {
-        const activeDropNodeRect = activeDropNodeInfo.rect;
+      if (activeDropNode) {
+        const activeDropNodeRect = dropAreaRects[activeDropNodeId];
 
         const isDraggingOverPage = appDom.isPage(activeDropNode);
         const isDraggingOverRow = appDom.isElement(activeDropNode) && isPageRow(activeDropNode);
@@ -463,7 +518,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [
       getViewCoordinates,
       availableDropTargets,
-      nodesInfo,
+      dropAreaRects,
       dom,
       dragOverNodeId,
       dragOverNodeZone,
@@ -765,7 +820,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return;
       }
 
-      const newSelectedNodeId = findNodeAt(pageNodes, nodesInfo, cursorPos.x, cursorPos.y);
+      const newSelectedNodeId = findNodeAt(pageNodes, dropAreaRects, cursorPos.x, cursorPos.y);
       const newSelectedNode = newSelectedNodeId && appDom.getMaybeNode(dom, newSelectedNodeId);
       if (newSelectedNode && appDom.isElement(newSelectedNode)) {
         api.select(newSelectedNodeId);
@@ -773,7 +828,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.select(null);
       }
     },
-    [getViewCoordinates, pageNodes, nodesInfo, dom, api],
+    [getViewCoordinates, pageNodes, dropAreaRects, dom, api],
   );
 
   const handleDelete = React.useCallback(
@@ -963,12 +1018,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               hasEmptyContainer = childNodes.length === 0;
             }
 
+            const rect = dropAreaRects[node.id];
+
+            if (!rect) {
+              return null;
+            }
+
             return (
               <React.Fragment key={node.id}>
                 {isPageNodeHub || appDom.isElement(node) ? (
                   <NodeHud
                     node={node}
-                    rect={nodeLayout.rect}
+                    rect={rect}
                     highlightedZone={getNodeHighlightedZone(node)}
                     selected={selectedNode?.id === node.id}
                     allowInteraction={isPageNodeHub ? false : nodesWithInteraction.has(node.id)}

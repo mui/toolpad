@@ -519,12 +519,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         const activeNodeDropInfo = nodesInfo[activeDropNodeId];
 
         const isDraggingOverPage = appDom.isPage(activeDropNode);
+        const isDraggingOverRow = appDom.isElement(activeDropNode) && isPageRow(activeDropNode);
         const isDraggingOverContainer = activeNodeDropInfo
           ? hasContainerComponent(activeNodeDropInfo)
           : false;
 
         let centerAreaFraction = 0;
-        if (isDraggingOverPage || isDraggingOverContainer) {
+        if (isDraggingOverContainer) {
+          centerAreaFraction = 0.625;
+        }
+        if (isDraggingOverPage || isDraggingOverRow) {
           centerAreaFraction = 1;
         }
 
@@ -1050,7 +1054,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             const hasContainer = nodeInfo ? hasContainerComponent(nodeInfo) : false;
 
             const rect = dropAreaRects[node.id];
-
             if (!rect) {
               return null;
             }

@@ -68,11 +68,9 @@ const OverlayRoot = styled('div')({
   pointerEvents: 'none',
   width: '100%',
   height: '100%',
-
   '&:focus': {
     outline: 'none',
   },
-
   [`& .${overlayClasses.selectionHint}`]: {
     // capture mouse events
     pointerEvents: 'initial',
@@ -91,56 +89,67 @@ const OverlayRoot = styled('div')({
     zIndex: 1,
     transform: `translate(0, -100%)`,
   },
+  [`& .${overlayClasses.hudOverlay}`]: {
+    position: 'absolute',
+    inset: '0 0 0 0',
+  },
+});
 
-  [`& .${overlayClasses.nodeHud}`]: {
+const NodeHudWrapper = styled('div')<{
+  highlightHeight?: number | string;
+  highlightWidth?: number | string;
+  highlightTop?: number;
+  highlightLeft?: number;
+}>(
+  ({ highlightHeight = '100%', highlightWidth = '100%', highlightTop = 0, highlightLeft = 0 }) => ({
     // capture mouse events
     pointerEvents: 'initial',
     position: 'absolute',
     [`&.${overlayClasses.layout}`]: {
-      border: '1px dotted rgba(255,0,0,.125)',
+      outline: '1px dotted rgba(255,0,0,.125)',
     },
     [`&.${overlayClasses.highlightedTop}`]: {
       '&:after': {
         backgroundColor: '#44EB2D',
         content: "''",
-        height: 4,
         position: 'absolute',
-        left: 0,
+        height: 4,
+        width: highlightWidth,
         top: -2,
-        width: '100%',
+        left: highlightLeft,
       },
     },
     [`&.${overlayClasses.highlightedRight}`]: {
       '&:after': {
         backgroundColor: '#44EB2D',
         content: "''",
-        height: '100%',
         position: 'absolute',
-        right: -2,
-        top: 0,
+        height: highlightHeight,
         width: 4,
+        top: highlightTop,
+        right: -2,
       },
     },
     [`&.${overlayClasses.highlightedBottom}`]: {
       '&:after': {
         backgroundColor: '#44EB2D',
         content: "''",
-        height: 4,
         position: 'absolute',
-        left: 0,
+        height: 4,
+        width: highlightWidth,
         bottom: -2,
-        width: '100%',
+        left: highlightLeft,
       },
     },
     [`&.${overlayClasses.highlightedLeft}`]: {
       '&:after': {
         backgroundColor: '#44EB2D',
         content: "''",
-        height: '100%',
         position: 'absolute',
-        left: -2,
-        top: 0,
+        height: highlightHeight,
         width: 4,
+        left: -2,
+        top: highlightTop,
       },
     },
     [`&.${overlayClasses.highlightedCenter}`]: {
@@ -156,13 +165,8 @@ const OverlayRoot = styled('div')({
       // block pointer-events so we can interact with the selection
       pointerEvents: 'none',
     },
-  },
-
-  [`& .${overlayClasses.hudOverlay}`]: {
-    position: 'absolute',
-    inset: '0 0 0 0',
-  },
-});
+  }),
+);
 
 const EmptyDropZone = styled('div')({
   alignItems: 'center',
@@ -242,6 +246,7 @@ function hasVerticalContainer(nodeInfo: NodeInfo): boolean {
 
 interface SelectionHudProps {
   node: appDom.ElementNode | appDom.PageNode;
+  parentInfo: NodeInfo | null;
   rect: Rectangle;
   highlightedZone?: RectZone | null;
   selected?: boolean;
@@ -253,6 +258,7 @@ interface SelectionHudProps {
 
 function NodeHud({
   node,
+  parentInfo,
   highlightedZone,
   selected,
   allowInteraction,
@@ -275,22 +281,42 @@ function NodeHud({
     hasEmptyContainer = childNodes.length === 0;
   }
 
+  const isContainerChild = parentInfo ? hasContainerComponent(parentInfo) : false;
+  const isHorizontalContainerChild = parentInfo
+    ? isContainerChild && hasHorizontalContainer(parentInfo)
+    : false;
+  const isVerticalContainerChild = parentInfo
+    ? isContainerChild && hasVerticalContainer(parentInfo)
+    : false;
+
+  const highlightHeight =
+    isHorizontalContainerChild && parentInfo?.rect ? parentInfo.rect.height : undefined;
+  const highlightWidth =
+    isVerticalContainerChild && parentInfo?.rect ? parentInfo.rect.width : undefined;
+
+  const highlightTop = highlightHeight && parentInfo?.rect ? parentInfo.rect.y - rect.y : undefined;
+  const highlightLeft = highlightWidth && parentInfo?.rect ? parentInfo.rect.x - rect.x : undefined;
+
   return (
     <React.Fragment>
       {hasEmptyContainer ? (
         <EmptyDropZone style={absolutePositionCss(rect)}>+</EmptyDropZone>
       ) : null}
-      <div
+      <NodeHudWrapper
         draggable
         data-node-id={node.id}
         onDragStart={onDragStart}
         style={absolutePositionCss(rect)}
-        className={clsx(overlayClasses.nodeHud, {
+        className={clsx({
           [overlayClasses.layout]: hasContainer,
           ...(highlightedZoneOverlayClass ? { [highlightedZoneOverlayClass]: true } : {}),
           [overlayClasses.selected]: selected,
           [overlayClasses.allowNodeInteraction]: allowInteraction,
         })}
+        highlightHeight={highlightHeight}
+        highlightWidth={highlightWidth}
+        highlightTop={highlightTop}
+        highlightLeft={highlightLeft}
       >
         <div draggable className={overlayClasses.selectionHint}>
           {component?.displayName || '<unknown>'}
@@ -299,7 +325,7 @@ function NodeHud({
             <DeleteIcon color="inherit" />
           </IconButton>
         </div>
-      </div>
+      </NodeHudWrapper>
     </React.Fragment>
   );
 }
@@ -438,6 +464,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return [RectZone.TOP, RectZone.RIGHT, RectZone.BOTTOM, RectZone.LEFT, RectZone.CENTER];
   }, [dom, dragOverNodeId, getCurrentlyDraggedNode, nodesInfo]);
 
+  const CONTAINER_GAP_IN_PX = 4;
+
   const dropAreaRects = React.useMemo(() => {
     const rects: Record<NodeId, Rectangle | null> = {};
 
@@ -459,8 +487,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             ? parentChildren[parentChildren.length - 1].id === node.id
             : true;
 
-        const gapInPx = 4;
-        const parentGapInPx: number = (parentInfo.props.gap as number) * gapInPx || 0;
+        const parentGapInPx: number = (parentInfo.props.gap as number) * CONTAINER_GAP_IN_PX || 0;
 
         let gapCount = 2;
         if (isFirstChild || isLastChild) {
@@ -1042,12 +1069,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           onDragEnd={handleDragEnd}
         >
           {pageNodes.map((node) => {
-            const nodeLayout = nodesInfo[node.id];
-            if (!nodeLayout?.rect) {
-              return null;
-            }
-
             const nodeInfo = nodesInfo[node.id];
+
+            const parent = appDom.getParent(dom, node);
+            const parentInfo = (parent && nodesInfo[parent.id]) || null;
 
             const isPageNodeHub = appDom.isPage(node) && pageNodes.length === 1;
 
@@ -1063,6 +1088,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                 {isPageNodeHub || appDom.isElement(node) ? (
                   <NodeHud
                     node={node}
+                    parentInfo={parentInfo}
                     rect={rect}
                     highlightedZone={getNodeHighlightedZone(node)}
                     selected={selectedNode?.id === node.id}

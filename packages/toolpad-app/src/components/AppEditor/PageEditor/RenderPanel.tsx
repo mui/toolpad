@@ -15,7 +15,7 @@ import {
   NodesInfo,
 } from '../../../types';
 import * as appDom from '../../../appDom';
-import EditorCanvasHost from './EditorCanvasHost';
+import EditorCanvasHost, { EditorCanvasHostHandle } from './EditorCanvasHost';
 import {
   absolutePositionCss,
   distanceToLine,
@@ -29,7 +29,6 @@ import { ExactEntriesOf } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from './PageEditorProvider';
 import EditorOverlay from './EditorOverlay';
-import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
 import {
   getElementNodeComponentId,
@@ -534,6 +533,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const { nodes: nodesInfo } = viewState;
 
+  const canvasHostRef = React.useRef<EditorCanvasHostHandle>(null);
+
   const pageNode = appDom.getNode(dom, pageNodeId, 'page');
 
   const pageNodes = React.useMemo(() => {
@@ -545,21 +546,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   // We will use this key to remount the overlay after page load
   const [overlayKey, setOverlayKey] = React.useState(1);
   const editorWindowRef = React.useRef<Window>();
-
-  const getViewCoordinates = React.useCallback(
-    (clientX: number, clientY: number): { x: number; y: number } | null => {
-      const rootElm = editorWindowRef.current?.document.getElementById(HTML_ID_APP_ROOT);
-      if (!rootElm) {
-        return null;
-      }
-      const rect = rootElm.getBoundingClientRect();
-      if (rectContainsPoint(rect, clientX, clientY)) {
-        return { x: clientX - rect.x, y: clientY - rect.y };
-      }
-      return null;
-    },
-    [],
-  );
 
   const slots: ViewSlots = React.useMemo(() => {
     const result: ViewSlots = {};
@@ -613,7 +599,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -636,7 +622,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.nodeDragOver(null);
       }
     },
-    [getViewCoordinates, availableDropTargets, nodesInfo, slots, api],
+    [availableDropTargets, nodesInfo, slots, api],
   );
 
   const handleDragLeave = React.useCallback(() => api.nodeDragOver(null), [api]);
@@ -644,7 +630,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
       const draggedNode = getCurrentlyDraggedNode();
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
 
       if (!draggedNode || !cursorPos) {
         return;
@@ -716,7 +702,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       slots,
       newNode,
       selection,
-      getViewCoordinates,
+
       getCurrentlyDraggedNode,
       availableDropTargets,
     ],
@@ -745,7 +731,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -759,7 +745,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.select(null);
       }
     },
-    [getViewCoordinates, pageNodes, nodesInfo, dom, api],
+    [pageNodes, nodesInfo, dom, api],
   );
 
   const handleDelete = React.useCallback(
@@ -809,7 +795,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   }, []);
 
   const handlePageViewStateUpdate = React.useCallback(() => {
-    const rootElm = editorWindowRef.current?.document.getElementById(HTML_ID_APP_ROOT);
+    const rootElm = canvasHostRef.current?.getRootElm();
 
     if (!rootElm) {
       return;
@@ -849,8 +835,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'afterRender': {
-          const editorWindow = editorWindowRef.current ?? null;
-          setRootElm(editorWindow?.document.getElementById(HTML_ID_APP_ROOT));
+          setRootElm(canvasHostRef.current?.getRootElm());
           return;
         }
         default:
@@ -914,6 +899,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
+        ref={canvasHostRef}
         appId={appId}
         editor
         className={classes.view}
@@ -921,7 +907,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         pageNodeId={pageNodeId}
         onLoad={handleLoad}
       />
-      <EditorOverlay key={overlayKey} window={editorWindowRef.current}>
+      <EditorOverlay key={overlayKey} rootElm={rootElm}>
         <OverlayRoot
           className={clsx({
             [overlayClasses.componentDragging]: highlightLayout,

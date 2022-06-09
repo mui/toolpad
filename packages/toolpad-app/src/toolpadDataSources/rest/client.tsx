@@ -1,6 +1,14 @@
 import * as React from 'react';
-import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
-import { Button, InputAdornment, Stack, TextField, Toolbar, Typography } from '@mui/material';
+import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
+import {
+  Button,
+  Divider,
+  InputAdornment,
+  Stack,
+  TextField,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { FetchQuery, RestConnectionParams } from './types';
@@ -13,6 +21,9 @@ import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
+import * as appDom from '../../appDom';
+import ParametersEditor from '../../components/AppEditor/PageEditor/ParametersEditor';
+import { mapValues } from '../../utils/collections';
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -145,39 +156,77 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
 function QueryEditor({
   globalScope,
   connectionParams,
+  liveParams,
   value,
   onChange,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const baseUrl = connectionParams?.baseUrl;
 
   const handleUrlChange = React.useCallback(
-    (newValue: BindableAttrValue<string> | null) => {
-      onChange({ ...value, url: newValue || { type: 'const', value: '' } });
+    (newUrl: BindableAttrValue<string> | null) => {
+      const query: FetchQuery = {
+        ...value.query,
+        url: newUrl || appDom.createConst(''),
+      };
+      onChange({ ...value, query });
     },
     [onChange, value],
   );
 
+  const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
+    Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>)),
+  );
+  React.useEffect(
+    () => setParams(Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>))),
+    [value.params],
+  );
+
+  const handleParamsChange = React.useCallback(
+    (newParams: [string, BindableAttrValue<any>][]) => {
+      setParams(newParams);
+      const paramsObj: BindableAttrValues<any> = Object.fromEntries(newParams);
+      onChange({ ...value, params: paramsObj });
+    },
+    [onChange, value],
+  );
+
+  const paramsEditorLiveValue: [string, LiveBinding][] = params.map(([key]) => [
+    key,
+    liveParams[key],
+  ]);
+
+  const queryScope = {
+    query: mapValues(liveParams, (bindingResult) => bindingResult.value),
+  };
+
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
-    input: value.url,
-    globalScope,
+    input: value.query.url,
+    globalScope: queryScope,
   });
 
   return (
-    <div>
+    <Stack gap={2}>
+      <Typography>Parameters</Typography>
+      <ParametersEditor
+        value={params}
+        onChange={handleParamsChange}
+        globalScope={globalScope}
+        liveValue={paramsEditorLiveValue}
+      />
+      <Divider />
+      <Typography>Query</Typography>
       <BindableEditor
         liveBinding={liveUrl}
-        globalScope={globalScope}
+        globalScope={queryScope}
         server
         label="url"
         propType={{ type: 'string' }}
-        renderControl={(params) => {
-          return <UrlControl baseUrl={baseUrl} {...params} />;
-        }}
-        value={value.url}
+        renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
+        value={value.query.url}
         onChange={handleUrlChange}
       />
-    </div>
+    </Stack>
   );
 }
 

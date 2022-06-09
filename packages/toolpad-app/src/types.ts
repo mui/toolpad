@@ -1,7 +1,13 @@
 import type * as React from 'react';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ArgTypeDefinition, SlotType, RuntimeError, ComponentConfig } from '@mui/toolpad-core';
-
+import {
+  ArgTypeDefinition,
+  SlotType,
+  RuntimeError,
+  ComponentConfig,
+  BindableAttrValues,
+  LiveBinding,
+} from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
 import type { Branded, Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
@@ -83,11 +89,21 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorProps<P, Q> extends WithControlledProp<Q> {
+export interface QueryEditorModel<Q> {
+  query: Q;
+  params?: BindableAttrValues<any>;
+}
+
+export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
   appId: string;
   connectionId: NodeId;
   connectionParams: Maybe<P>;
   globalScope: Record<string, any>;
+  /**
+   * @deprecated
+   */
+  queryScope?: Record<string, any>;
+  liveParams: Record<string, LiveBinding>;
 }
 
 export type QueryEditor<P, Q = {}> = React.FC<QueryEditorProps<P, Q>>;

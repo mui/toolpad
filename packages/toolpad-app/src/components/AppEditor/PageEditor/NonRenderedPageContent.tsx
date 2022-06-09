@@ -5,7 +5,7 @@ import UrlQueryEditor from './UrlQueryEditor';
 
 export default function NonRenderedPageContent() {
   return (
-    <Box>
+    <Box sx={{ m: 3 }}>
       <Typography variant="subtitle1">Page State:</Typography>
       <UrlQueryEditor />
       <QueryEditor />

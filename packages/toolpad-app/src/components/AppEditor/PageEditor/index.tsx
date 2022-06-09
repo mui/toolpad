@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { styled, Box } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import SplitPane from 'react-split-pane';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
@@ -10,8 +9,9 @@ import { useDom } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
-import NonRenderedPageContent from './NonRenderedPageContent';
 import usePageTitle from '../../../utils/usePageTitle';
+import SplitPane from '../../SplitPane';
+import NonRenderedPageContent from './NonRenderedPageContent';
 
 const classes = {
   componentPanel: 'Toolpad_ComponentPanel',
@@ -46,10 +46,6 @@ interface PageEditorContentProps {
 function PageEditorContent({ appId, node }: PageEditorContentProps) {
   usePageTitle(`${node.attributes.title.value} | Toolpad editor`);
 
-  const [dragActive, setDragActive] = React.useState(false);
-  const handleDragStart = React.useCallback(() => setDragActive(true), []);
-  const handleDragFinished = React.useCallback(() => setDragActive(false), []);
-
   return (
     <PageEditorProvider key={node.id} appId={appId} nodeId={node.id}>
       <PageEditorRoot>
@@ -58,25 +54,18 @@ function PageEditorContent({ appId, node }: PageEditorContentProps) {
             split="horizontal"
             allowResize
             defaultSize="70%"
-            onDragStarted={handleDragStart}
-            onDragFinished={handleDragFinished}
-            paneStyle={{
-              width: '100%',
-            }}
+            pane2Style={{ overflow: 'auto' }}
           >
             <Box
               sx={{
+                width: '100%',
+                height: '100%',
                 display: 'flex',
                 flexDirection: 'row',
-                width: '100%',
-                flex: 1,
-                position: 'relative',
               }}
             >
               <ComponentCatalog />
               <RenderPanel className={classes.renderPanel} />
-              {/* Workaround for https://github.com/tomkp/react-split-pane/issues/30 */}
-              {dragActive ? <Box sx={{ position: 'absolute', inset: '0 0 0 0' }} /> : null}
             </Box>
             <NonRenderedPageContent />
           </SplitPane>

@@ -136,6 +136,17 @@ async function execPrivate(
     }
     throw new Error(`Google Sheets: Missing spreadsheetId in query`);
   }
+  if (query.type === GoogleSheetsPrivateQueryType.CONNECTION_STATUS) {
+    const driveClient = createDriveClient(client);
+    try {
+      const response = await driveClient.about.get({ fields: 'user' });
+      if (response.status === 200) {
+        return response.data.user;
+      }
+    } catch (error) {
+      return null;
+    }
+  }
   throw new Error(`Google Sheets: Unrecognized private query "${JSON.stringify(query)}"`);
 }
 

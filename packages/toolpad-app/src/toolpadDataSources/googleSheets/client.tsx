@@ -1,4 +1,13 @@
-import { Stack, Button, Checkbox, TextField, Autocomplete, FormControlLabel } from '@mui/material';
+import {
+  Stack,
+  Button,
+  Checkbox,
+  TextField,
+  Autocomplete,
+  FormControlLabel,
+  Typography,
+  Skeleton,
+} from '@mui/material';
 import * as React from 'react';
 import { UseQueryResult } from 'react-query';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
@@ -10,6 +19,7 @@ import {
   GoogleSpreadsheet,
   GoogleSheet,
   GoogleDriveFiles,
+  GoogleDriveUser,
 } from './types';
 import useDebounced from '../../utils/useDebounced';
 import { usePrivateQuery } from '../context';
@@ -183,20 +193,28 @@ function ConnectionParamsInput({
   appId,
   connectionId,
   handlerBasePath,
-  value,
 }: ConnectionEditorProps<GoogleSheetsConnectionParams>) {
+  const validatedUser: UseQueryResult<GoogleDriveUser> = usePrivateQuery({
+    type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS,
+  });
   return (
     <Stack direction="column" gap={1}>
       <Button
         component="a"
-        disabled={isConnectionValid(value)}
+        disabled={Boolean(validatedUser.data)}
         href={`${handlerBasePath}/auth/login?state=${encodeURIComponent(
           JSON.stringify({ appId, connectionId }),
         )}
         `}
         variant="outlined"
       >
-        {isConnectionValid(value) ? 'Signed In' : 'Sign In to Google '}
+        <Typography variant="button">
+          {validatedUser.isLoading ? (
+            <Skeleton width={100} />
+          ) : (
+            `Connect${validatedUser.data ? `ed: ${validatedUser.data.emailAddress}` : ''}`
+          )}
+        </Typography>
       </Button>
     </Stack>
   );

@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Debug
         run: |
-          echo "commit: ${{ env.GITHUB_SHA }}"
+          echo "commit: ${{ github.sha }}"
           echo "docker tag: ${{ github.event.release.tag_name }}"
           echo "prerelease:  ${{ github.event.release.prerelease }}"
 
@@ -24,7 +24,7 @@ jobs:
       - name: Publish release tag
         uses: akhilerm/tag-push-action@v2.0.0
         with:
-          src: docker.io/muicom/toolpad:${{ env.GITHUB_SHA }}
+          src: docker.io/muicom/toolpad:${{ github.sha }}
           dst: |
             docker.io/muicom/toolpad:${{ github.event.release.tag_name }}
 
@@ -32,6 +32,6 @@ jobs:
         uses: akhilerm/tag-push-action@v2.0.0
         if: ${{ !github.event.release.prerelease }}
         with:
-          src: docker.io/muicom/toolpad:${{ env.GITHUB_SHA }}
+          src: docker.io/muicom/toolpad:${{ github.sha }}
           dst: |
             docker.io/muicom/toolpad:latest

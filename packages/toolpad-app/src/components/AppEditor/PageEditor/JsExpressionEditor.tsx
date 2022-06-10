@@ -118,14 +118,14 @@ export function JsExpressionEditor({
       // eslint-disable-next-line no-bitwise
       editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => onCommit?.());
 
-      if (isMount && autoFocus) {
+      if (isMount && autoFocus && !disabled) {
         editor.focus();
         isMount.current = false;
       }
 
       setLibSource();
     },
-    [setLibSource, onCommit, autoFocus, functionBody],
+    [setLibSource, onCommit, autoFocus, disabled, functionBody],
   );
 
   return (

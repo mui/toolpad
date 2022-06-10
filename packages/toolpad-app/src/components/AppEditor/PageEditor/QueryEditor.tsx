@@ -16,6 +16,7 @@ import {
   Typography,
   Toolbar,
   MenuItem,
+  Skeleton,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -283,10 +284,35 @@ function QueryNodeEditorDialog<Q, P>({
     { retry: false },
   );
 
+  const untransformedQueryPreview = client.useQuery(
+    'execQuery',
+    input
+      ? [
+          appId,
+          {
+            ...input,
+            attributes: {
+              ...input.attributes,
+              transform: { value: '', type: 'const' },
+              transformEnabled: { value: false, type: 'const' },
+            },
+          },
+          paramsObject,
+        ]
+      : null,
+    { retry: false },
+  );
+
   const handleUpdatePreview = React.useCallback(() => {
     setPreviewQuery(input);
     setPreviewParams(paramsObject);
   }, [input, paramsObject]);
+
+  const handleTransformEditorFocus = React.useCallback(() => {
+    if (input) {
+      untransformedQueryPreview.refetch();
+    }
+  }, [input, untransformedQueryPreview]);
 
   const isInputSaved = node === input;
 
@@ -384,13 +410,26 @@ function QueryNodeEditorDialog<Q, P>({
                     />
                   }
                 />
-
-                <JsExpressionEditor
-                  globalScope={{}}
-                  value={input.attributes.transform?.value ?? '(data) => {\n  return data;\n}'}
-                  onChange={handleTransformFnChange}
-                  disabled={!input.attributes.transformEnabled?.value}
-                />
+                <Stack direction={'row'} spacing={2}>
+                  {untransformedQueryPreview.isLoading ? (
+                    <Skeleton width={'150px'} height={'10px'} />
+                  ) : (
+                    <JsonView
+                      src={untransformedQueryPreview.data}
+                      disabled={!input.attributes.transformEnabled?.value}
+                    />
+                  )}
+                  <JsExpressionEditor
+                    globalScope={{ data: untransformedQueryPreview.data?.data }}
+                    autoFocus
+                    onFocus={handleTransformEditorFocus}
+                    fullWidth
+                    value={input.attributes.transform?.value ?? 'return data;'}
+                    functionBody
+                    onChange={handleTransformFnChange}
+                    disabled={!input.attributes.transformEnabled?.value}
+                  />
+                </Stack>
               </Stack>
             </Grid>
           </Grid>

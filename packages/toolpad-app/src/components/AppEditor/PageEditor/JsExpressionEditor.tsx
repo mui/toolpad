@@ -16,6 +16,7 @@ export interface JsExpressionEditorProps extends WithControlledProp<string> {
   onCommit?: () => void;
   disabled?: boolean;
   autoFocus?: boolean;
+  fullWidth?: boolean;
   functionBody?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -28,6 +29,7 @@ export function JsExpressionEditor({
   globalScope,
   disabled,
   autoFocus,
+  fullWidth,
   functionBody,
   onFocus,
   onBlur,
@@ -87,7 +89,6 @@ export function JsExpressionEditor({
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
       monacoRef.current = monaco;
       editorRef.current = editor;
-
       editor.updateOptions({
         minimap: { enabled: false },
         accessibilitySupport: 'off',
@@ -117,18 +118,24 @@ export function JsExpressionEditor({
       // eslint-disable-next-line no-bitwise
       editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => onCommit?.());
 
-      if (isMount && autoFocus && !disabled) {
+      if (isMount && autoFocus) {
         editor.focus();
         isMount.current = false;
       }
 
       setLibSource();
     },
-    [setLibSource, onCommit, autoFocus, disabled, functionBody],
+    [setLibSource, onCommit, autoFocus, functionBody],
   );
 
   return (
-    <JsExpressionEditorRoot sx={disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}}>
+    <JsExpressionEditorRoot
+      sx={{
+        opacity: disabled ? 0.5 : 'default',
+        pointerEvents: disabled ? 'none' : 'default',
+        width: fullWidth ? '100%' : 'unset',
+      }}
+    >
       <Editor
         height="150px"
         value={value}

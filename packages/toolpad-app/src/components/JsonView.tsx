@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Box from '@mui/material/Box';
 import { ObjectInspector, ObjectInspectorProps, ObjectValue, ObjectLabel } from 'react-inspector';
 
 const nodeRenderer: ObjectInspectorProps['nodeRenderer'] = ({
@@ -16,19 +17,25 @@ const nodeRenderer: ObjectInspectorProps['nodeRenderer'] = ({
 
 export interface JsonViewProps {
   src: unknown;
+  disabled?: boolean;
 }
 
-export default function JsonView({ src }: JsonViewProps) {
+export default function JsonView({ src, disabled }: JsonViewProps) {
   // TODO: elaborate on this to show a nice default, but avoid expanding massive amount of objects
   const expandPaths = Array.isArray(src) ? ['$', '$.0', '$.1', '$.2', '$.3', '$.4'] : undefined;
   return (
-    <div style={{ whiteSpace: 'nowrap' }}>
+    <Box
+      sx={{
+        whiteSpace: 'nowrap',
+        opacity: disabled ? 0.5 : 'default',
+      }}
+    >
       <ObjectInspector
         nodeRenderer={nodeRenderer}
         expandLevel={1}
         expandPaths={expandPaths}
         data={src}
       />
-    </div>
+    </Box>
   );
 }

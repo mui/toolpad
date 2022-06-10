@@ -4,17 +4,15 @@ on:
   release:
     types: [published]
 
-env:
-  DOCKER_TAG: ${{ github.event.release.tag_name }}
-
 jobs:
   docker-release:
     name: 'retag and push'
+    runs-on: ubuntu-latest
     steps:
       - name: Debug
         run: |
           echo "commit: ${GITHUB_SHA}"
-          echo "docker tag: ${DOCKER_TAG}"
+          echo "docker tag: ${{ github.event.release.tag_name }}"
           echo "prerelease:  ${{ github.event.release.prerelease }}"
 
       - name: Login to Docker Hub
@@ -23,19 +21,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Publish prerelease tag
+      - name: Publish release tag
         uses: akhilerm/tag-push-action@v2.0.0
-        if: ${{ github.event.release.prerelease }}
         with:
           src: docker.io/muicom/toolpad:${GITHUB_SHA}
           dst: |
-            docker.io/muicom/toolpad:${DOCKER_TAG}-rc
+            docker.io/muicom/toolpad:${{ github.event.release.tag_name }}
 
-      - name: Publish release tag
+      - name: Publish latest tag
         uses: akhilerm/tag-push-action@v2.0.0
         if: ${{ !github.event.release.prerelease }}
         with:
           src: docker.io/muicom/toolpad:${GITHUB_SHA}
           dst: |
-            docker.io/muicom/toolpad:${DOCKER_TAG}
             docker.io/muicom/toolpad:latest

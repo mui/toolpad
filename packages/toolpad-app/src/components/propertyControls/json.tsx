@@ -77,7 +77,7 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
     [schemaUri],
   );
 
-  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
+  useShortcut({ code: 'KeyS', metaKey: true, disabled: !dialogOpen }, handleSave);
 
   return (
     <React.Fragment>

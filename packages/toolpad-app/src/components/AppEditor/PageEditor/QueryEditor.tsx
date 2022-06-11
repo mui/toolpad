@@ -284,35 +284,35 @@ function QueryNodeEditorDialog<Q, P>({
     { retry: false },
   );
 
-  const untransformedQueryPreview = client.useQuery(
-    'execQuery',
-    input
-      ? [
-          appId,
-          {
-            ...input,
-            attributes: {
-              ...input.attributes,
-              transform: { value: '', type: 'const' },
-              transformEnabled: { value: false, type: 'const' },
-            },
-          },
-          paramsObject,
-        ]
-      : null,
-    { retry: false },
-  );
-
   const handleUpdatePreview = React.useCallback(() => {
     setPreviewQuery(input);
     setPreviewParams(paramsObject);
   }, [input, paramsObject]);
 
+  const withTransformDisabled = React.useCallback(
+    (inp: appDom.QueryNode<Q, P>): appDom.QueryNode<Q, P> => {
+      return {
+        ...inp,
+        attributes: {
+          ...inp.attributes,
+          transform: { value: '', type: 'const' },
+          transformEnabled: { value: false, type: 'const' },
+        },
+      };
+    },
+    [],
+  );
+
+  const [rawPreviewQuery, setRawPreviewQuery] = React.useState(withTransformDisabled(input));
+
+  const untransformedQueryPreview = client.useQuery(
+    'execQuery',
+    rawPreviewQuery ? [appId, rawPreviewQuery, paramsObject] : null,
+  );
+
   const handleTransformEditorFocus = React.useCallback(() => {
-    if (input) {
-      untransformedQueryPreview.refetch();
-    }
-  }, [input, untransformedQueryPreview]);
+    setRawPreviewQuery(withTransformDisabled(input));
+  }, [withTransformDisabled, input]);
 
   const isInputSaved = node === input;
 

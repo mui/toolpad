@@ -289,30 +289,21 @@ function QueryNodeEditorDialog<Q, P>({
     setPreviewParams(paramsObject);
   }, [input, paramsObject]);
 
-  const withTransformDisabled = React.useCallback(
-    (inp: appDom.QueryNode<Q, P>): appDom.QueryNode<Q, P> => {
-      return {
-        ...inp,
-        attributes: {
-          ...inp.attributes,
-          transform: { value: '', type: 'const' },
-          transformEnabled: { value: false, type: 'const' },
-        },
-      };
-    },
-    [],
-  );
-
-  const [rawPreviewQuery, setRawPreviewQuery] = React.useState(withTransformDisabled(input));
+  const inputWithTransformDisabled: appDom.QueryNode<Q, P> = React.useMemo(() => {
+    return {
+      ...input,
+      attributes: {
+        ...input.attributes,
+        transform: { value: '', type: 'const' },
+        transformEnabled: { value: false, type: 'const' },
+      },
+    };
+  }, [input]);
 
   const untransformedQueryPreview = client.useQuery(
     'execQuery',
-    rawPreviewQuery ? [appId, rawPreviewQuery, paramsObject] : null,
+    inputWithTransformDisabled ? [appId, inputWithTransformDisabled, paramsObject] : null,
   );
-
-  const handleTransformEditorFocus = React.useCallback(() => {
-    setRawPreviewQuery(withTransformDisabled(input));
-  }, [withTransformDisabled, input]);
 
   const isInputSaved = node === input;
 
@@ -422,7 +413,6 @@ function QueryNodeEditorDialog<Q, P>({
                   <JsExpressionEditor
                     globalScope={{ data: untransformedQueryPreview.data?.data }}
                     autoFocus
-                    onFocus={handleTransformEditorFocus}
                     fullWidth
                     value={input.attributes.transform?.value ?? 'return data;'}
                     functionBody

@@ -206,6 +206,8 @@ interface PageRootProps {
   children?: React.ReactNode;
 }
 
+export const PAGE_GAP = 1;
+
 function PageRoot({ children }: PageRootProps) {
   return (
     <Container
@@ -219,7 +221,7 @@ function PageRoot({ children }: PageRootProps) {
         alignItems="stretch"
         sx={{
           my: 2,
-          gap: 0,
+          gap: PAGE_GAP,
           minHeight: `calc(100vh - ${2 * 16}px)`,
         }}
       >

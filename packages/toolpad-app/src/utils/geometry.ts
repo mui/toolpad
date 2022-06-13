@@ -130,20 +130,14 @@ export function rectContainsPoint(rect: Rectangle, x: number, y: number): boolea
   return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
 }
 
-export enum RectZone {
+export enum RectangleEdge {
   TOP = 'TOP',
   RIGHT = 'RIGHT',
   BOTTOM = 'BOTTOM',
   LEFT = 'LEFT',
-  CENTER = 'CENTER',
 }
 
-export function getRectPointZone(
-  rect: Rectangle,
-  x: number,
-  y: number,
-  centerAreaFraction = 0, // 0-1
-): RectZone | null {
+export function getRectanglePointEdge(rect: Rectangle, x: number, y: number): RectangleEdge | null {
   const { height: rectHeight, width: rectWidth } = rect;
 
   // Out of bounds
@@ -151,30 +145,17 @@ export function getRectPointZone(
     return null;
   }
 
-  // Center area
-  const fractionalX = x / rectWidth;
-  const fractionalY = y / rectHeight;
-  const centerAreaFractionHalf = centerAreaFraction / 2;
-  if (
-    fractionalX >= 0.5 - centerAreaFractionHalf &&
-    fractionalX <= 0.5 + centerAreaFractionHalf &&
-    fractionalY >= 0.5 - centerAreaFractionHalf &&
-    fractionalY <= 0.5 + centerAreaFractionHalf
-  ) {
-    return RectZone.CENTER;
-  }
-
   const isOverFirstDiagonal = y < (rectHeight / rectWidth) * x;
   const isOverSecondDiagonal = y < -1 * (rectHeight / rectWidth) * x + rectHeight;
 
   if (isOverFirstDiagonal && isOverSecondDiagonal) {
-    return RectZone.TOP;
+    return RectangleEdge.TOP;
   }
   if (isOverFirstDiagonal) {
-    return RectZone.RIGHT;
+    return RectangleEdge.RIGHT;
   }
   if (isOverSecondDiagonal) {
-    return RectZone.LEFT;
+    return RectangleEdge.LEFT;
   }
-  return RectZone.BOTTOM;
+  return RectangleEdge.BOTTOM;
 }

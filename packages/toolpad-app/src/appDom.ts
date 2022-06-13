@@ -700,28 +700,6 @@ export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
   return index.get(name) ?? null;
 }
 
-export function getNewFirstParentIndexInParentNode(
-  dom: AppDom,
-  parent: AppDomNode,
-  parentProp: string,
-) {
-  const siblings: readonly AppDomNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
-  const firstSibling = siblings.length > 0 ? siblings[0] : null;
-
-  return createFractionalIndex(null, firstSibling?.parentIndex || null);
-}
-
-export function getNewLastParentIndexInParentNode(
-  dom: AppDom,
-  parent: AppDomNode,
-  parentProp: string,
-) {
-  const siblings: readonly AppDomNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
-  const lastSibling = siblings.length > 0 ? siblings[siblings.length - 1] : null;
-
-  return createFractionalIndex(lastSibling?.parentIndex || null, null);
-}
-
 export function getNewParentIndexBeforeNode(dom: AppDom, node: AppDomNode, parentProp: string) {
   const parent = getParent(dom, node);
 
@@ -729,10 +707,11 @@ export function getNewParentIndexBeforeNode(dom: AppDom, node: AppDomNode, paren
     throw new Error(`Invariant: Node: "${node.id}" has no parent`);
   }
 
-  const siblings: readonly AppDomNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
+  const parentChildren: readonly AppDomNode[] =
+    (isElement(parent) && getChildNodes<ElementNode>(dom, parent)[parentProp]) || [];
 
-  const nodeIndex = siblings.findIndex((sibling) => sibling.id === node.id);
-  const nodeBefore = nodeIndex > 0 ? siblings[nodeIndex - 1] : null;
+  const nodeIndex = parentChildren.findIndex((child) => child.id === node.id);
+  const nodeBefore = nodeIndex > 0 ? parentChildren[nodeIndex - 1] : null;
 
   return createFractionalIndex(nodeBefore?.parentIndex || null, node.parentIndex);
 }
@@ -744,10 +723,11 @@ export function getNewParentIndexAfterNode(dom: AppDom, node: AppDomNode, parent
     throw new Error(`Invariant: Node: "${node.id}" has no parent`);
   }
 
-  const siblings: readonly AppDomNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
+  const parentChildren: readonly AppDomNode[] =
+    (isElement(parent) && getChildNodes<ElementNode>(dom, parent)[parentProp]) || [];
 
-  const nodeIndex = siblings.findIndex((sibling) => sibling.id === node.id);
-  const nodeAfter = nodeIndex < siblings.length - 1 ? siblings[nodeIndex + 1] : null;
+  const nodeIndex = parentChildren.findIndex((child) => child.id === node.id);
+  const nodeAfter = nodeIndex < parentChildren.length - 1 ? parentChildren[nodeIndex + 1] : null;
 
   return createFractionalIndex(node.parentIndex, nodeAfter?.parentIndex || null);
 }

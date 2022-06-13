@@ -18,6 +18,7 @@ import {
   Toolbar,
   Typography,
   Box,
+  Snackbar,
 } from '@mui/material';
 import * as React from 'react';
 import { LoadingButton } from '@mui/lab';
@@ -39,38 +40,55 @@ export interface CreateAppDialogProps {
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const createAppMutation = client.useMutation('createApp');
+  const [showAppNameErrorSnackbar, setShowNameErrorSnackbar] = React.useState<boolean>(false);
+
+  const handleSnackbarClose = React.useCallback(() => setShowNameErrorSnackbar(false), []);
 
   return (
-    <Dialog {...props} onClose={onClose}>
-      <DialogForm
-        onSubmit={async (event) => {
-          event.preventDefault();
-
-          const app = await createAppMutation.mutateAsync([name]);
-          window.location.href = `/_toolpad/app/${app.id}/editor`;
-        }}
+    <React.Fragment>
+      <Dialog {...props} onClose={onClose}>
+        <DialogForm
+          onSubmit={async (event) => {
+            event.preventDefault();
+            try {
+              const app = await createAppMutation.mutateAsync([name]);
+              window.location.href = `/_toolpad/app/${app.id}/editor`;
+            } catch (err) {
+              setShowNameErrorSnackbar(true);
+            }
+          }}
+        >
+          <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
+          <DialogContent>
+            <TextField
+              sx={{ my: 1 }}
+              autoFocus
+              fullWidth
+              label="name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button color="inherit" variant="text" onClick={onClose}>
+              Cancel
+            </Button>
+            <LoadingButton type="submit" loading={createAppMutation.isLoading} disabled={!name}>
+              Create
+            </LoadingButton>
+          </DialogActions>
+        </DialogForm>
+      </Dialog>
+      <Snackbar
+        open={showAppNameErrorSnackbar}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
       >
-        <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
-        <DialogContent>
-          <TextField
-            sx={{ my: 1 }}
-            autoFocus
-            fullWidth
-            label="name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={onClose}>
-            Cancel
-          </Button>
-          <LoadingButton type="submit" loading={createAppMutation.isLoading} disabled={!name}>
-            Create
-          </LoadingButton>
-        </DialogActions>
-      </DialogForm>
-    </Dialog>
+        <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: '100%' }}>
+          An app with the name &quot;{name}&quot; already exists
+        </Alert>
+      </Snackbar>
+    </React.Fragment>
   );
 }
 
@@ -116,26 +134,26 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
   );
 }
 
-export interface AppRenameErrorDialogProps {
+export interface AppNameErrorDialogProps {
   open: boolean;
-  currentName: string | undefined;
-  newName: string | undefined;
+  title: string | undefined;
+  content: string | undefined;
   onContinue: () => void;
   onDiscard: () => void;
 }
 
-function AppRenameErrorDialog({
+function AppNameErrorDialog({
   open,
-  currentName,
-  newName,
+  title,
+  content,
   onContinue,
   onDiscard,
-}: AppRenameErrorDialogProps) {
+}: AppNameErrorDialogProps) {
   return (
     <Dialog open={open} onClose={onDiscard}>
       <DialogForm>
-        <DialogTitle>Can&apos;t rename app &quot;{currentName}&quot; </DialogTitle>
-        <DialogContent>An app with the name &quot;{newName}&quot; already exists.</DialogContent>
+        <DialogTitle>{title}</DialogTitle>
+        <DialogContent>{content}</DialogContent>
         <DialogActions>
           <Button onClick={onDiscard} color={'error'}>
             Discard
@@ -232,7 +250,14 @@ function AppCard({ app, onDelete }: AppCardProps) {
 
   return (
     <React.Fragment>
-      <Card sx={{ gridColumn: 'span 1' }}>
+      <Card
+        sx={{
+          gridColumn: 'span 1',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
         <CardHeader
           action={
             <IconButton
@@ -308,10 +333,10 @@ function AppCard({ app, onDelete }: AppCardProps) {
           <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
-      <AppRenameErrorDialog
+      <AppNameErrorDialog
         open={showAppRenameErrorDialog}
-        currentName={app?.name}
-        newName={appTitle}
+        title={`Can't rename app "${app?.name}"`}
+        content={`An app with the name "${appTitle}" already exists`}
         onDiscard={() => {
           setEditingTitle(false);
           setAppTitle(app?.name);

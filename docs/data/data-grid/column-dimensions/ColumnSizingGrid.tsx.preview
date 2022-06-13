@@ -1,8 +1,0 @@
-<DataGridPro
-  columns={[
-    { field: 'id' },
-    { field: 'username', width: 125, minWidth: 150, maxWidth: 200 },
-    { field: 'age', resizable: false },
-  ]}
-  rows={rows}
-/>

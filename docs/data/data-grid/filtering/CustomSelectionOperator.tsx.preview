@@ -1,6 +1,0 @@
-<DataGrid
-  {...data}
-  columns={columns}
-  onSelectionModelChange={handleSelectionModelChange}
-  onFilterModelChange={handleFilterModelChange}
-/>

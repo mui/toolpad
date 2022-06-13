@@ -6,7 +6,6 @@
 
 import 'docs/src/modules/components/bootstrap';
 // --- Post bootstrap -----
-import pages from 'docsx/data/pages'; // DO NOT REMOVE
 import * as React from 'react';
 import { loadCSS } from 'fg-loadcss/src/loadCSS';
 import NextHead from 'next/head';
@@ -29,6 +28,8 @@ import {
 import DocsStyledEngineProvider from 'docs/src/modules/utils/StyledEngineProvider';
 import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
+
+const pages = [];
 
 function getMuiPackageVersion(packageName, commitRef) {
   if (commitRef === undefined) {

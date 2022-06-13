@@ -1,8 +1,0 @@
-<DataGrid
-  {...data}
-  components={{
-    Toolbar: GridToolbar,
-  }}
-  filterModel={filterModel}
-  onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
-/>

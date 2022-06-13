@@ -1,7 +1,0 @@
-<DataGrid
-  components={{
-    LoadingOverlay: LinearProgress,
-  }}
-  loading
-  {...data}
-/>

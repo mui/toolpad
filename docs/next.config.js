@@ -1,11 +1,15 @@
 const path = require('path');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-// const withTM = require('next-transpile-modules')(['@mui/monorepo']);
+const withTM = require('next-transpile-modules')([
+  '@mui/monorepo',
+  '@mui/styles',
+  '@mui/utils',
+  '@emotion/react',
+  '@mui/private-theming',
+  '@mui/material',
+]);
 const pkg = require('../package.json');
 const { findPages } = require('./src/modules/utils/find');
 const { LANGUAGES, LANGUAGES_SSR } = require('./src/modules/constants');
-
-const workspaceRoot = path.join(__dirname, '../');
 
 /**
  * https://github.com/zeit/next.js/blob/287961ed9142a53f8e9a23bafb2f31257339ea98/packages/next/next-server/server/config.ts#L10
@@ -22,7 +26,7 @@ if (reactStrictMode) {
   console.log(`Using React.StrictMode.`);
 }
 
-module.exports = {
+module.exports = withTM({
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -47,27 +51,27 @@ module.exports = {
     SOURCE_CODE_REPO: 'https://github.com/mui/mui-x',
   },
   webpack5: true,
-  webpack: (config, options) => {
-    const plugins = config.plugins.slice();
-
-    if (process.env.DOCS_STATS_ENABLED) {
-      plugins.push(
-        // For all options see https://github.com/th0r/webpack-bundle-analyzer#as-plugin
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'server',
-          generateStatsFile: true,
-          analyzerPort: options.isServer ? 8888 : 8889,
-          // Will be available at `.next/stats.json`
-          statsFilename: 'stats.json',
-        }),
-      );
-    }
-
-    const includesMonorepo = [/(@mui[\\/]monorepo)$/, /(@mui[\\/]monorepo)[\\/](?!.*node_modules)/];
-
+  webpack: (config) => {
     return {
       ...config,
-      plugins,
+      resolve: {
+        ...config.resolve,
+        alias: {
+          ...config.resolve.alias,
+          docs: path.resolve(__dirname, './node_modules/@mui/monorepo/docs'),
+          'styled-components': path.resolve(__dirname, './node_modules/styled-components'),
+          '@mui/joy': path.resolve(__dirname, './node_modules/@mui/monorepo/packages/mui-joy/src'),
+          '@mui/styles': path.resolve(
+            __dirname,
+            './node_modules/@mui/monorepo/packages/mui-styles',
+          ),
+          '@mui/utils': path.resolve(__dirname, './node_modules/@mui/monorepo/packages/mui-utils'),
+          [path.resolve(
+            __dirname,
+            './node_modules/@mui/monorepo/packages/mui-utils/macros/MuiError.macro',
+          )]: 'react',
+        },
+      },
       module: {
         ...config.module,
         rules: config.module.rules.concat([
@@ -80,17 +84,6 @@ module.exports = {
                 use: require.resolve('../node_modules/@mui/monorepo/docs/packages/markdown/loader'),
               },
             ],
-          },
-          {
-            test: /\.+(js|jsx|mjs|ts|tsx)$/,
-            include: includesMonorepo,
-            use: options.defaultLoaders.babel,
-          },
-          {
-            test: /\.(js|mjs|ts|tsx)$/,
-            include: [workspaceRoot],
-            exclude: /node_modules/,
-            use: options.defaultLoaders.babel,
           },
         ]),
       },
@@ -143,22 +136,4 @@ module.exports = {
       { source: '/api/:rest*', destination: '/api-docs/:rest*' },
     ];
   },
-  // redirects only take effect in the development, not production (because of `next export`).
-  redirects: async () => [
-    {
-      source: '/',
-      destination: '/x/react-data-grid/',
-      permanent: false,
-    },
-    {
-      source: '/components/data-grid/:path*',
-      destination: '/x/react-data-grid/:path*',
-      permanent: false,
-    },
-    {
-      source: '/api/data-grid/:path*',
-      destination: '/x/api/data-grid/:path*',
-      permanent: false,
-    },
-  ],
-};
+});

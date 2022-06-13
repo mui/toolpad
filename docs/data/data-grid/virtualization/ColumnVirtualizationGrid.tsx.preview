@@ -1,1 +1,0 @@
-<DataGrid {...data} columnBuffer={2} columnThreshold={2} />

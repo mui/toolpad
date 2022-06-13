@@ -1,7 +1,0 @@
-<DataGrid
-  {...data}
-  density="compact"
-  components={{
-    Toolbar: CustomToolbar,
-  }}
-/>

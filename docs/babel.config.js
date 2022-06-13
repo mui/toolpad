@@ -10,22 +10,6 @@ function resolvePath(sourcePath, currentFile, opts) {
   return bpmr.resolvePath(sourcePath, currentFile, opts);
 }
 
-const alias = {
-  '@mui/x-data-grid': '../packages/grid/x-data-grid/src',
-  '@mui/x-data-grid-generator': '../packages/grid/x-data-grid-generator/src',
-  '@mui/x-data-grid-pro': '../packages/grid/x-data-grid-pro/src',
-  '@mui/x-data-grid-premium': '../packages/grid/x-data-grid-premium/src',
-  '@mui/x-date-pickers': '../packages/x-date-pickers/src',
-  '@mui/x-date-pickers-pro': '../packages/x-date-pickers-pro/src',
-  '@mui/x-license-pro': '../packages/x-license-pro/src',
-  '@mui/docs': '../node_modules/@mui/monorepo/packages/mui-docs/src',
-  '@mui/markdown': '../node_modules/@mui/monorepo/docs/packages/markdown',
-  '@mui/monorepo': '../node_modules/@mui/monorepo',
-  '@mui/joy': '../node_modules/@mui/monorepo/packages/mui-joy/src',
-  docs: '../node_modules/@mui/monorepo/docs', // TODO remove
-  docsx: './',
-};
-
 const { version: transformRuntimeVersion } = fse.readJSONSync(
   require.resolve('@babel/runtime-corejs2/package.json'),
 );
@@ -49,7 +33,7 @@ module.exports = {
     [
       'babel-plugin-module-resolver',
       {
-        alias,
+        alias: {},
         transformFunctions: ['require', 'require.context'],
         resolvePath,
       },

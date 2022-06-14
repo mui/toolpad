@@ -17,7 +17,8 @@
     "dev:typings": "yarn build:typings",
     "dev:prisma": "prisma generate --watch",
     "waitForDb": "ts-node ./scripts/waitForDb.ts",
-    "waitForApp": "ts-node ./scripts/waitForApp.ts"
+    "waitForApp": "ts-node ./scripts/waitForApp.ts",
+    "prisma-detect-drift": "prisma migrate diff --exit-code --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url \"$TOOLPAD_SHADOW_DATABASE_URL\""
   },
   "files": [
     "prisma",
@@ -39,7 +40,7 @@
     "@mui/toolpad-core": "^0.0.5-alpha.4",
     "@mui/x-data-grid-pro": "^5.11.0",
     "@prisma/client": "^3.13.0",
-    "@swc/wasm": "^1.2.163",
+    "@swc/wasm": "^1.2.189",
     "@types/cors": "^2.8.12",
     "@types/prettier": "^2.4.3",
     "@types/react-dom": "^18.0.5",
@@ -62,6 +63,7 @@
     "next": "^12.1.4",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.6.2",
+    "pretty-bytes": "^6.0.0",
     "prisma": "^3.13.0",
     "quickjs-emscripten": "^0.20.0",
     "react": "^18.1.0",

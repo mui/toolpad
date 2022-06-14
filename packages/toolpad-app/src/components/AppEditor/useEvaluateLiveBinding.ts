@@ -7,6 +7,7 @@ import {
 import { QuickJSRuntime } from 'quickjs-emscripten';
 import { Serializable } from '../../server/evalExpression';
 import evaluateBindableServer from '../../server/evaluateBindable';
+import { mapValues } from '../../utils/collections';
 
 interface EvaluateBindableAttrValueConfig {
   jsRuntime?: QuickJSRuntime;
@@ -33,11 +34,9 @@ function evaluateBindableAttrValues(
   input: BindableAttrValues<any>,
   globalScope: Record<string, unknown>,
   config: EvaluateBindableAttrValueConfig = {},
-) {
-  return Object.fromEntries(
-    Object.entries(input).map(([key, bindable]) => {
-      return [key, evaluateBindableAttrValue(bindable || null, globalScope, config)];
-    }),
+): Record<string, LiveBinding> {
+  return mapValues(input, (bindable) =>
+    evaluateBindableAttrValue(bindable || null, globalScope, config),
   );
 }
 

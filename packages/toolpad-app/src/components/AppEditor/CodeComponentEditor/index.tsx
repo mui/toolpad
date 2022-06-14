@@ -20,6 +20,7 @@ import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
 import { mapValues } from '../../../utils/collections';
+import ErrorAlert from '../PageEditor/ErrorAlert';
 
 const Noop = createComponent(() => null);
 
@@ -190,10 +191,10 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
   return (
     <React.Fragment>
       <Stack sx={{ height: '100%' }}>
-        <Toolbar variant="dense" sx={{ mt: 2 }}>
+        <Toolbar sx={{ mt: 2 }}>
           <NodeNameEditor node={codeComponentNode} sx={{ maxWidth: 300 }} />
         </Toolbar>
-        <Toolbar variant="dense">
+        <Toolbar>
           <Button disabled={allChangesAreCommitted} onClick={handleSave}>
             Update
           </Button>
@@ -220,15 +221,13 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
               <React.Suspense fallback={null}>
                 <ErrorBoundary
                   resetKeys={[CodeComponent]}
-                  fallbackRender={({ error: runtimeError }) => (
-                    <React.Fragment>{runtimeError.message}</React.Fragment>
-                  )}
+                  fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
                   <AppThemeProvider node={theme}>
                     <CodeComponent {...defaultProps} />
                   </AppThemeProvider>
                 </ErrorBoundary>
-                {compileError?.message}
+                {compileError ? <ErrorAlert error={compileError} /> : null}
               </React.Suspense>
             </FrameContent>,
             frameDocument.body,

@@ -19,15 +19,12 @@ function sendStatus(res, statusCode) {
   res.end();
 }
 
+const BASIC_AUTH_WHITELIST = new Set(['/health-check']);
+
 app.prepare().then(() => {
   createServer(async (req, res) => {
     try {
-      if (req.url === '/health-check') {
-        sendStatus(res, 200);
-        return;
-      }
-
-      if (BASIC_AUTH_USER) {
+      if (BASIC_AUTH_USER && !BASIC_AUTH_WHITELIST.has(req.url)) {
         if (!BASIC_AUTH_PASSWORD) {
           throw new Error(
             `Basic Auth user configured without password. Please provide the TOOLPAD_BASIC_AUTH_PASSWORD environment variable.`,

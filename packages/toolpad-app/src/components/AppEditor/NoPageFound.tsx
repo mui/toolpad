@@ -25,12 +25,7 @@ export default function NoPageFound({ appId }: NoPageFoundProps) {
         <Typography variant="h6">No pages in this app.</Typography>
       </Grid>
       <Grid item>
-        <Button
-          variant="outlined"
-          color="inherit"
-          size="small"
-          onClick={handleCreatePageDialogOpen}
-        >
+        <Button variant="outlined" color="inherit" onClick={handleCreatePageDialogOpen}>
           Create new
         </Button>
       </Grid>

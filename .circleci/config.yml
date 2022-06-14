@@ -82,12 +82,22 @@ commands:
 jobs:
   checkout:
     <<: *defaults
+    docker:
+      - image: cimg/node:16.14
+        environment:
+          TOOLPAD_SHADOW_DATABASE_URL: postgresql://postgres@localhost/circle_test
+      - image: cimg/postgres:14.0
+        environment:
+          POSTGRES_USER: postgres
     steps:
       - checkout
       - install_js
       - run:
           name: Should not have any git not staged
           command: git diff --exit-code
+      - run:
+          name: should not have any prisma schema drift
+          command: yarn workspace @mui/toolpad-app prisma-detect-drift
       - run:
           name: Check for duplicated packages
           command: yarn deduplicate

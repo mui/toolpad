@@ -34,8 +34,9 @@ function Header({ actions, navigation }: HeaderProps) {
       elevation={0}
       sx={{ zIndex: 2, borderBottom: 1, borderColor: 'divider' }}
     >
-      <Toolbar variant="dense">
+      <Toolbar>
         <IconButton
+          size="medium"
           edge="start"
           color="inherit"
           aria-label="Home"
@@ -43,7 +44,7 @@ function Header({ actions, navigation }: HeaderProps) {
           component="a"
           href={`/`}
         >
-          <MenuIcon />
+          <MenuIcon fontSize="medium" />
         </IconButton>
         <Typography
           data-test-id="brand"

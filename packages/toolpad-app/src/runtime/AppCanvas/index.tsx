@@ -3,20 +3,35 @@ import { fireEvent } from '@mui/toolpad-core/runtime';
 import ToolpadApp from '../ToolpadApp';
 import * as appDom from '../../appDom';
 
-export interface AppCanvasProps {
+export interface AppCanvasState {
   appId: string;
+  dom: appDom.AppDom;
+}
+
+export interface ToolpadBridge {
+  update(updates: AppCanvasState): void;
+}
+
+declare global {
+  interface Window {
+    __TOOLPAD_READY__?: boolean | (() => void);
+    __TOOLPAD_BRIDGE__?: ToolpadBridge;
+  }
+}
+
+export interface AppCanvasProps {
   basename: string;
 }
 
-export default function AppCanvas({ appId, basename }: AppCanvasProps) {
-  const [dom, setDom] = React.useState<appDom.AppDom | null>(null);
+export default function AppCanvas({ basename }: AppCanvasProps) {
+  const [state, setState] = React.useState<AppCanvasState | null>(null);
 
   React.useEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
     window.__TOOLPAD_BRIDGE__ = {
-      updateDom: (newDom) => {
+      update: (newState) => {
         React.startTransition(() => {
-          setDom(newDom);
+          setState(newState);
         });
       },
     };
@@ -39,8 +54,13 @@ export default function AppCanvas({ appId, basename }: AppCanvasProps) {
     fireEvent({ type: 'afterRender' });
   });
 
-  return dom ? (
-    <ToolpadApp dom={dom} version="preview" appId={appId} basename={basename} />
+  return state ? (
+    <ToolpadApp
+      dom={state.dom}
+      version="preview"
+      appId={state.appId}
+      basename={`${basename}/${state.appId}`}
+    />
   ) : (
     <div>loading...</div>
   );

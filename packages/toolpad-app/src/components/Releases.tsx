@@ -58,7 +58,6 @@ export default function Releases() {
           <DataGridPro
             rows={releases}
             columns={columns}
-            density="compact"
             getRowId={(row) => row.version}
             loading={isLoading}
             error={(error as any)?.message}

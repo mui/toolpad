@@ -15,7 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { useNavigate, useLocation, matchRoutes } from 'react-router-dom';
+import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
 import { NodeId } from '../../../types';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -49,13 +49,13 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
             {labelText}
           </Typography>
           {onCreate ? (
-            <IconButton aria-label={`Create ${labelText}`} size="small" onClick={onCreate}>
-              <AddIcon fontSize="small" />
+            <IconButton aria-label={`Create ${labelText}`} onClick={onCreate}>
+              <AddIcon />
             </IconButton>
           ) : null}
           {onDelete ? (
-            <IconButton aria-label={`Delete ${labelText}`} size="small" onClick={onDelete}>
-              <DeleteIcon fontSize="small" />
+            <IconButton aria-label={`Delete ${labelText}`} onClick={onDelete}>
+              <DeleteIcon />
             </IconButton>
           ) : null}
         </Box>
@@ -65,29 +65,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
   );
 }
 
-export interface HierarchyExplorerProps {
-  appId: string;
-  className?: string;
-}
-
-export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
-  const dom = useDom();
-  const domApi = useDomApi();
-
-  const app = appDom.getApp(dom);
-  const {
-    apis = [],
-    codeComponents = [],
-    pages = [],
-    connections = [],
-  } = appDom.getChildNodes(dom, app);
-
-  const [expanded, setExpanded] = useLocalStorageState<string[]>(
-    `editor/${app.id}/hierarchy-expansion`,
-    [':connections', ':pages', ':codeComponents'],
-  );
-
-  const location = useLocation();
+function getActiveNodeId(location: Location): NodeId | null {
   const match =
     matchRoutes(
       [
@@ -100,6 +78,42 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     ) || [];
 
   const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
+  return selected.length > 0 ? selected[0] : null;
+}
+
+function getLinkToNodeEditor(appId: string, node: appDom.AppDomNode): string | undefined {
+  switch (node.type) {
+    case 'page':
+      return `/app/${appId}/editor/pages/${node.id}`;
+    case 'connection':
+      return `/app/${appId}/editor/connections/${node.id}`;
+    case 'codeComponent':
+      return `/app/${appId}/editor/codeComponents/${node.id}`;
+    default:
+      return undefined;
+  }
+}
+
+export interface HierarchyExplorerProps {
+  appId: string;
+  className?: string;
+}
+
+export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
+  const dom = useDom();
+  const domApi = useDomApi();
+
+  const app = appDom.getApp(dom);
+  const { codeComponents = [], pages = [], connections = [] } = appDom.getChildNodes(dom, app);
+
+  const [expanded, setExpanded] = useLocalStorageState<string[]>(
+    `editor/${app.id}/hierarchy-expansion`,
+    [':connections', ':pages', ':codeComponents'],
+  );
+
+  const location = useLocation();
+
+  const activeNode = getActiveNodeId(location);
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);
@@ -129,10 +143,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
     if (appDom.isPage(node)) {
       navigate(`/app/${appId}/editor/pages/${node.id}`);
-    }
-
-    if (appDom.isApi(node)) {
-      navigate(`/app/${appId}/editor/apis/${node.id}`);
     }
 
     if (appDom.isCodeComponent(node)) {
@@ -183,11 +193,27 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
 
   const handleDeleteNode = React.useCallback(() => {
     if (deletedNodeId) {
+      let redirectAfterDelete: string | undefined;
+      if (deletedNodeId === activeNode) {
+        const deletedNode = appDom.getNode(dom, deletedNodeId);
+        const siblings = appDom.getSiblings(dom, deletedNode);
+        const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
+        if (firstSiblingOfType) {
+          redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
+        } else {
+          redirectAfterDelete = `/app/${appId}/editor`;
+        }
+      }
+
       domApi.removeNode(deletedNodeId);
-      navigate(`/app/${appId}/editor/`);
+
+      if (redirectAfterDelete) {
+        navigate(redirectAfterDelete);
+      }
+
       handledeleteNodeDialogClose();
     }
-  }, [deletedNodeId, domApi, navigate, appId, handledeleteNodeDialogClose]);
+  }, [deletedNodeId, activeNode, domApi, handledeleteNodeDialogClose, dom, appId, navigate]);
 
   const deletedNode = deletedNodeId && appDom.getMaybeNode(dom, deletedNodeId);
   const latestDeletedNode = useLatest(deletedNode);
@@ -196,7 +222,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     <HierarchyExplorerRoot className={className}>
       <TreeView
         aria-label="hierarchy explorer"
-        selected={selected}
+        selected={activeNode ? [activeNode] : []}
         onNodeSelect={handleSelect}
         expanded={expanded}
         onNodeToggle={handleToggle}
@@ -218,18 +244,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             />
           ))}
         </HierarchyTreeItem>
-        {apis.length > 0 ? (
-          <HierarchyTreeItem nodeId=":apis" labelText="Apis">
-            {apis.map((apiNode) => (
-              <HierarchyTreeItem
-                key={apiNode.id}
-                nodeId={apiNode.id}
-                labelText={apiNode.name}
-                onDelete={handleDeleteNodeDialogOpen(apiNode.id)}
-              />
-            ))}
-          </HierarchyTreeItem>
-        ) : null}
         <HierarchyTreeItem
           nodeId=":codeComponents"
           labelText="Components"

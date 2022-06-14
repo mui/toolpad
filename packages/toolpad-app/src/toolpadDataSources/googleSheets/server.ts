@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
-import { ApiResult, ServerDataSource, LegacyConnection, CreateHandlerApi } from '../../types';
+import { ApiResult, ServerDataSource, CreateHandlerApi } from '../../types';
 import config from '../../server/config';
 import { asArray } from '../../utils/collections';
 import {
@@ -11,6 +11,7 @@ import {
   GoogleSheetsPrivateQuery,
   GoogleSheetsApiQuery,
 } from './types';
+import { Maybe } from '../../utils/types';
 
 /**
  * Create an OAuth2 client based on the configuration
@@ -71,12 +72,12 @@ function createSheetsClient(client: OAuth2Client) {
  */
 
 async function execPrivate(
-  connection: LegacyConnection<GoogleSheetsConnectionParams>,
+  connection: Maybe<GoogleSheetsConnectionParams>,
   query: GoogleSheetsPrivateQuery,
 ): Promise<any> {
   const client = createOAuthClient();
-  if (connection.params) {
-    client.setCredentials(connection.params);
+  if (connection) {
+    client.setCredentials(connection);
   }
   if (query.type === GoogleSheetsPrivateQueryType.FILE_GET) {
     const driveClient = createDriveClient(client);
@@ -146,12 +147,12 @@ async function execPrivate(
  */
 
 async function exec(
-  connection: LegacyConnection<GoogleSheetsConnectionParams>,
+  connection: Maybe<GoogleSheetsConnectionParams>,
   query: GoogleSheetsApiQuery,
 ): Promise<ApiResult<any>> {
   const client = createOAuthClient();
-  if (connection.params) {
-    client.setCredentials(connection.params);
+  if (connection) {
+    client.setCredentials(connection);
   }
   const sheets = createSheetsClient(client);
 
@@ -199,7 +200,7 @@ async function exec(
  */
 
 async function handler(
-  api: CreateHandlerApi,
+  api: CreateHandlerApi<GoogleSheetsConnectionParams>,
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<NextApiResponse | void> {
@@ -215,9 +216,9 @@ async function handler(
     const { connectionId, appId } = JSON.parse(decodeURIComponent(state));
 
     // Check if connection with connectionId exists, if so: merge
-    const savedConnection = await api.getConnection(appId, connectionId);
-    if (savedConnection.params) {
-      client.setCredentials(savedConnection.params as GoogleSheetsConnectionParams);
+    const savedConnection = await api.getConnectionParams(appId, connectionId);
+    if (savedConnection) {
+      client.setCredentials(savedConnection);
     }
     if (matchAuthLogin(pathname)) {
       return res.redirect(
@@ -245,10 +246,7 @@ async function handler(
       }
       if (tokens) {
         client.setCredentials(tokens);
-        await api.updateConnection(appId, {
-          params: client.credentials,
-          id: connectionId,
-        });
+        await api.setConnectionParams(appId, connectionId, client.credentials);
       }
       return res.redirect(
         `/_toolpad/app/${encodeURIComponent(appId)}/editor/connections/${encodeURIComponent(

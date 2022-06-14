@@ -6,15 +6,7 @@ import {
   Release,
   Prisma,
 } from '../../prisma/generated/client';
-import {
-  LegacyConnection,
-  ServerDataSource,
-  ApiResult,
-  NodeId,
-  Updates,
-  VersionOrPreview,
-  PrivateApiResult,
-} from '../types';
+import { ServerDataSource, ApiResult, NodeId, VersionOrPreview } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -95,6 +87,12 @@ export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> 
         return attributesData;
       }),
     }),
+    prisma.app.update({
+      where: {
+        id: appId,
+      },
+      data: { editedAt: new Date() },
+    }),
   ]);
 }
 
@@ -141,14 +139,21 @@ export async function loadDom(appId: string): Promise<appDom.AppDom> {
 }
 
 export async function getApps() {
-  return prisma.app.findMany();
+  return prisma.app.findMany({
+    orderBy: {
+      editedAt: 'desc',
+    },
+  });
 }
 
-async function setAppDefaults(
-  app: App,
-  dom: appDom.AppDom,
-  appNode: appDom.AppNode,
-): Promise<appDom.AppDom> {
+export async function getApp(id: string) {
+  return prisma.app.findUnique({ where: { id } });
+}
+
+function createDefaultDom(): appDom.AppDom {
+  let dom = appDom.createDom();
+  const appNode = appDom.getApp(dom);
+
   // Create default REST connection node
   const newConnectionNode = appDom.createNode(dom, 'connection', {
     attributes: {
@@ -157,7 +162,7 @@ async function setAppDefaults(
       status: appDom.createConst(null),
     },
   });
-  const newDom = await appDom.addNode(dom, newConnectionNode, appNode, 'connections');
+  dom = appDom.addNode(dom, newConnectionNode, appNode, 'connections');
 
   // Create default page
   const newPageNode = appDom.createNode(dom, 'page', {
@@ -168,7 +173,9 @@ async function setAppDefaults(
     },
   });
 
-  return appDom.addNode(newDom, newPageNode, appNode, 'pages');
+  dom = appDom.addNode(dom, newPageNode, appNode, 'pages');
+
+  return dom;
 }
 
 export async function createApp(name: string): Promise<App> {
@@ -177,13 +184,20 @@ export async function createApp(name: string): Promise<App> {
       data: { name },
     });
 
-    const dom = appDom.createDom();
-    const appNode = appDom.getApp(dom);
+    const dom = createDefaultDom();
 
-    const newDom = await setAppDefaults(app, dom, appNode);
-    await saveDom(app.id, newDom);
+    await saveDom(app.id, dom);
 
     return app;
+  });
+}
+
+export async function updateApp(appId: string, name: string): Promise<App> {
+  return prisma.app.update({
+    where: {
+      id: appId,
+    },
+    data: { name },
   });
 }
 
@@ -289,125 +303,59 @@ export async function loadReleaseDom(appId: string, version: number): Promise<ap
   return JSON.parse(release.snapshot.toString('utf-8')) as appDom.AppDom;
 }
 
-function fromDomConnection<P>(domConnection: appDom.ConnectionNode<P>): LegacyConnection<P> {
-  const { attributes, id, name } = domConnection;
-  return {
-    id,
-    name,
-    type: attributes.dataSource.value,
-    params: attributes.params.value,
-    status: attributes.status.value,
-  };
-}
-
-export async function addConnection(
+async function getConnection<P = unknown>(
   appId: string,
-  { params, name, status, type }: LegacyConnection,
-): Promise<LegacyConnection> {
+  id: string,
+): Promise<appDom.ConnectionNode<P>> {
   const dom = await loadDom(appId);
-  const app = appDom.getApp(dom);
-  const newConnection = appDom.createNode(dom, 'connection', {
-    name,
-    attributes: {
-      dataSource: appDom.createConst(type),
-      params: appDom.createSecret(params),
-      status: appDom.createConst(status),
-    },
-  });
-
-  const newDom = appDom.addNode(dom, newConnection, app, 'connections');
-  await saveDom(appId, newDom);
-
-  return fromDomConnection(newConnection);
+  return appDom.getNode(dom, id as NodeId, 'connection') as appDom.ConnectionNode<P>;
 }
 
-export async function getConnection(appId: string, id: string): Promise<LegacyConnection> {
-  const dom = await loadDom(appId);
-  return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
-}
-
-export async function updateConnection(
+export async function getConnectionParams<P = unknown>(
   appId: string,
-  { id, params, name, status, type }: Updates<LegacyConnection>,
-): Promise<LegacyConnection> {
+  id: string,
+): Promise<P | null> {
+  const dom = await loadDom(appId);
+  const node = appDom.getNode(dom, id as NodeId, 'connection') as appDom.ConnectionNode<P>;
+  return node.attributes.params.value;
+}
+
+export async function setConnectionParams<P>(
+  appId: string,
+  connectionId: NodeId,
+  params: P,
+): Promise<void> {
   let dom = await loadDom(appId);
-  const existing = appDom.getNode(dom, id as NodeId, 'connection');
-  if (name !== undefined) {
-    dom = appDom.setNodeName(dom, existing, name);
-  }
-  if (params !== undefined) {
-    dom = appDom.setNodeNamespacedProp(
-      dom,
-      existing,
-      'attributes',
-      'params',
-      appDom.createSecret(params),
-    );
-  }
-  if (status !== undefined) {
-    dom = appDom.setNodeNamespacedProp(
-      dom,
-      existing,
-      'attributes',
-      'status',
-      appDom.createConst(status),
-    );
-  }
-  if (type !== undefined) {
-    dom = appDom.setNodeNamespacedProp(
-      dom,
-      existing,
-      'attributes',
-      'dataSource',
-      appDom.createConst(type),
-    );
-  }
+  const existing = appDom.getNode(dom, connectionId, 'connection');
+
+  dom = appDom.setNodeNamespacedProp(
+    dom,
+    existing,
+    'attributes',
+    'params',
+    appDom.createSecret(params),
+  );
+
   await saveDom(appId, dom);
-  return fromDomConnection(appDom.getNode(dom, id as NodeId, 'connection'));
 }
 
 async function applyTransform<Q>(
-  api: appDom.ApiNode<Q>,
+  node: appDom.QueryNode<Q>,
   result: ApiResult<{}>,
 ): Promise<ApiResult<{}>> {
   return {
     data: await evalExpression(
-      `${api.attributes.transform?.value}(${JSON.stringify(result.data)})`,
+      `${node.attributes.transform?.value}(${JSON.stringify(result.data)})`,
     ),
   };
 }
 
-export async function execApi<Q>(
-  appId: string,
-  api: appDom.ApiNode<Q>,
-  params: Q,
-): Promise<ApiResult<any>> {
-  const dataSource: ServerDataSource<any, Q, any> | undefined =
-    serverDataSources[api.attributes.dataSource.value];
-  if (!dataSource) {
-    throw new Error(`Unknown datasource "${api.attributes.dataSource.value}" for api "${api.id}"`);
-  }
-
-  const connection = await getConnection(appId, api.attributes.connectionId.value);
-  if (!connection) {
-    throw new Error(
-      `Unknown connection "${api.attributes.connectionId.value}" for api "${api.id}"`,
-    );
-  }
-  const transformEnabled = api.attributes.transformEnabled?.value;
-  let result = await dataSource.exec(connection, api.attributes.query.value, params);
-  if (transformEnabled) {
-    result = await applyTransform(api, result);
-  }
-  return result;
-}
-
-export async function execQuery<Q>(
+export async function execQuery<P, Q>(
   appId: string,
   query: appDom.QueryNode<Q>,
   params: Q,
 ): Promise<ApiResult<any>> {
-  const dataSource: ServerDataSource<any, Q, any> | undefined =
+  const dataSource: ServerDataSource<P, Q, any> | undefined =
     query.attributes.dataSource && serverDataSources[query.attributes.dataSource.value];
   if (!dataSource) {
     throw new Error(
@@ -415,36 +363,36 @@ export async function execQuery<Q>(
     );
   }
 
-  const connection = await getConnection(appId, query.attributes.connectionId.value);
-  if (!connection) {
-    throw new Error(
-      `Unknown connection "${query.attributes.connectionId.value}" for api "${query.id}"`,
-    );
-  }
+  const connectionParams = await getConnectionParams<P>(appId, query.attributes.connectionId.value);
 
-  return dataSource.exec(connection, query.attributes.query.value, params);
+  const transformEnabled = query.attributes.transformEnabled?.value;
+  let result = await dataSource.exec(connectionParams, query.attributes.query.value, params);
+  if (transformEnabled) {
+    result = await applyTransform(query, result);
+  }
+  return result;
 }
 
-export async function dataSourceFetchPrivate<Q>(
+export async function dataSourceFetchPrivate<P, Q>(
   appId: string,
   connectionId: NodeId,
   query: Q,
-): Promise<PrivateApiResult<any>> {
-  const connection = await getConnection(appId, connectionId);
-  const dataSource: ServerDataSource<any, any, any> | undefined =
-    serverDataSources[connection.type];
+): Promise<any> {
+  const connection: appDom.ConnectionNode<P> = await getConnection<P>(appId, connectionId);
+  const dataSourceId = connection.attributes.dataSource.value;
+  const dataSource: ServerDataSource<P, Q, any> | undefined = serverDataSources[dataSourceId];
 
   if (!dataSource) {
-    throw new Error(
-      `Unknown connection type "${connection.type}" for connection "${connection.id}"`,
-    );
+    throw new Error(`Unknown dataSource "${dataSourceId}" for connection "${connection.id}"`);
   }
 
   if (!dataSource.execPrivate) {
-    throw new Error(`No execPrivate available on datasource "${connection.type}"`);
+    throw new Error(`No execPrivate available on datasource "${dataSourceId}"`);
   }
 
-  return dataSource.execPrivate(connection, query);
+  const connectionParams = connection.attributes.params.value;
+
+  return dataSource.execPrivate(connectionParams, query);
 }
 
 export function parseVersion(param?: string | string[]): VersionOrPreview | null {

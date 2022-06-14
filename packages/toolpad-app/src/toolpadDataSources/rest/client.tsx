@@ -1,88 +1,240 @@
 import * as React from 'react';
-import { ArgTypeDefinitions, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
-import StringRecordEditor from '../../components/StringRecordEditor';
-import { ClientDataSource, QueryEditorProps } from '../../types';
-import { FetchQuery } from './types';
-import BindableEditor from '../../components/AppEditor/PageEditor/BindableEditor';
+import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
+import {
+  Box,
+  Button,
+  Divider,
+  InputAdornment,
+  Stack,
+  TextField,
+  Toolbar,
+  Typography,
+} from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
+import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import { FetchQuery, RestConnectionParams } from './types';
+import { getAuthenticationHeaders, parseBaseUrl } from './shared';
+import BindableEditor, {
+  RenderControlParams,
+} from '../../components/AppEditor/PageEditor/BindableEditor';
 import { useEvaluateLiveBinding } from '../../components/AppEditor/useEvaluateLiveBinding';
+import MapEntriesEditor from '../../components/MapEntriesEditor';
+import { Maybe } from '../../utils/types';
+import AuthenticationEditor from './AuthenticationEditor';
+import { isSaveDisabled, validation } from '../../utils/forms';
+import * as appDom from '../../appDom';
+import ParametersEditor from '../../components/AppEditor/PageEditor/ParametersEditor';
+import { mapValues } from '../../utils/collections';
 
-function ConnectionParamsInput() {
-  return null;
+interface UrlControlProps extends RenderControlParams<string> {
+  baseUrl?: string;
 }
 
-function QueryEditor({ globalScope, value, onChange }: QueryEditorProps<FetchQuery>) {
+function UrlControl({ label, disabled, baseUrl, value, onChange }: UrlControlProps) {
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(event.target.value);
+    },
+    [onChange],
+  );
+
+  return (
+    <TextField
+      fullWidth
+      value={value ?? ''}
+      disabled={disabled}
+      onChange={handleChange}
+      label={label}
+      InputProps={
+        baseUrl
+          ? {
+              startAdornment: <InputAdornment position="start">{baseUrl}</InputAdornment>,
+            }
+          : undefined
+      }
+    />
+  );
+}
+
+function withDefaults(value: Maybe<RestConnectionParams>): RestConnectionParams {
+  return {
+    baseUrl: '',
+    headers: [],
+    authentication: null,
+    ...value,
+  };
+}
+
+function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestConnectionParams>) {
+  const { handleSubmit, register, formState, reset, control, watch } = useForm({
+    defaultValues: withDefaults(value),
+    reValidateMode: 'onChange',
+    mode: 'all',
+  });
+  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) =>
+    onChange({
+      ...connectionParams,
+      baseUrl: connectionParams.baseUrl && parseBaseUrl(connectionParams.baseUrl).href,
+    }),
+  );
+
+  const baseUrlValue = watch('baseUrl');
+  const headersValue = watch('headers');
+  const authenticationValue = watch('authentication');
+  const authenticationHeaders = getAuthenticationHeaders(authenticationValue);
+
+  const mustHaveBaseUrl: boolean =
+    (headersValue && headersValue.length > 0) || !!authenticationValue;
+
+  const headersAllowed = !!baseUrlValue;
+
+  return (
+    <Stack direction="column" gap={3} sx={{ py: 3 }}>
+      <TextField
+        label="base url"
+        {...register('baseUrl', {
+          validate(input?: string) {
+            if (!input) {
+              if (mustHaveBaseUrl) {
+                return 'A base url is required when headers are used';
+              }
+              return true;
+            }
+            try {
+              return !!parseBaseUrl(input);
+            } catch (error) {
+              return 'Must be an absolute url';
+            }
+          },
+        })}
+        {...validation(formState, 'baseUrl')}
+      />
+      <Typography>Headers:</Typography>
+      <Controller
+        name="headers"
+        control={control}
+        render={({ field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field } }) => {
+          const allHeaders = [...authenticationHeaders, ...fieldValue];
+          return (
+            <MapEntriesEditor
+              {...field}
+              disabled={!headersAllowed}
+              fieldLabel="header"
+              value={allHeaders}
+              onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
+              isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
+            />
+          );
+        }}
+      />
+      <Typography>Authentication:</Typography>
+      <Controller
+        name="authentication"
+        control={control}
+        render={({ field: { value: fieldValue, ref, ...field } }) => (
+          <AuthenticationEditor {...field} disabled={!headersAllowed} value={fieldValue ?? null} />
+        )}
+      />
+
+      <Toolbar disableGutters>
+        <Box sx={{ flex: 1 }} />
+        <Button variant="contained" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+          Save
+        </Button>
+      </Toolbar>
+    </Stack>
+  );
+}
+
+function QueryEditor({
+  globalScope,
+  connectionParams,
+  liveParams,
+  value,
+  onChange,
+}: QueryEditorProps<RestConnectionParams, FetchQuery>) {
+  const baseUrl = connectionParams?.baseUrl;
+
   const handleUrlChange = React.useCallback(
-    (newValue: BindableAttrValue<string> | null) => {
-      onChange({ ...value, url: newValue || { type: 'const', value: '' } });
+    (newUrl: BindableAttrValue<string> | null) => {
+      const query: FetchQuery = {
+        ...value.query,
+        url: newUrl || appDom.createConst(''),
+      };
+      onChange({ ...value, query });
     },
     [onChange, value],
   );
 
-  const handleApiQueryChange = React.useCallback(
-    (newValue: Record<string, string>) => {
-      onChange({
-        ...value,
-        params: newValue,
-      });
+  const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
+    Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>)),
+  );
+  React.useEffect(
+    () => setParams(Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>))),
+    [value.params],
+  );
+
+  const handleParamsChange = React.useCallback(
+    (newParams: [string, BindableAttrValue<any>][]) => {
+      setParams(newParams);
+      const paramsObj: BindableAttrValues<any> = Object.fromEntries(newParams);
+      onChange({ ...value, params: paramsObj });
     },
     [onChange, value],
   );
+
+  const paramsEditorLiveValue: [string, LiveBinding][] = params.map(([key]) => [
+    key,
+    liveParams[key],
+  ]);
+
+  const queryScope = {
+    query: mapValues(liveParams, (bindingResult) => bindingResult.value),
+  };
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
-    input: value.url,
-    globalScope: globalScope.query ? globalScope : { query: value.params },
+    input: value.query.url,
+    globalScope: queryScope,
   });
 
   return (
-    <div>
+    <Stack gap={2}>
+      <Typography>Parameters</Typography>
+      <ParametersEditor
+        value={params}
+        onChange={handleParamsChange}
+        globalScope={globalScope}
+        liveValue={paramsEditorLiveValue}
+      />
+      <Divider />
+      <Typography>Query</Typography>
       <BindableEditor
         liveBinding={liveUrl}
-        globalScope={globalScope}
+        globalScope={queryScope}
         server
         label="url"
-        argType={{ typeDef: { type: 'string' } }}
-        value={value.url}
+        propType={{ type: 'string' }}
+        renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
+        value={value.query.url}
         onChange={handleUrlChange}
       />
-      {/* TODO: remove this when QueryStateNode is removed */}
-      {globalScope.query ? null : (
-        <StringRecordEditor
-          label="api query"
-          fieldLabel="parameter"
-          valueLabel="default value"
-          value={value.params || {}}
-          onChange={handleApiQueryChange}
-        />
-      )}
-    </div>
+    </Stack>
   );
 }
 
 function getInitialQueryValue(): FetchQuery {
-  return { url: { type: 'const', value: '' }, method: '', headers: [], params: {} };
-}
-
-function getArgTypes(query: FetchQuery): ArgTypeDefinitions {
-  return Object.fromEntries(
-    Object.entries(query.params).map(([propName, defaultValue]) => [
-      propName,
-      {
-        typeDef: { type: 'string' },
-        defaultValue,
-      },
-    ]),
-  );
+  return { url: { type: 'const', value: '' }, method: '', headers: [] };
 }
 
 const dataSource: ClientDataSource<{}, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   isConnectionValid: () => true,
-  getInitialConnectionValue: () => ({}),
   QueryEditor,
   getInitialQueryValue,
-  getArgTypes,
 };
 
 export default dataSource;

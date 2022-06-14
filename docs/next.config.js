@@ -1,18 +1,29 @@
 const path = require('path');
-const withTM = require('next-transpile-modules')([
-  '@mui/monorepo',
-  '@mui/styles',
-  '@mui/utils',
-  '@mui/system',
-  '@mui/base',
-  '@mui/styled-engine',
-  '@emotion/react',
-  '@mui/private-theming',
-  '@mui/material',
-]);
+
+const withTM = require('next-transpile-modules')(['@mui/monorepo'], {
+  __unstable_matcher: (matchedPath) => {
+    return /(@mui[\\/]monorepo)[\\/](?!.*node_modules)/.test(matchedPath);
+  },
+});
+
 const pkg = require('../package.json');
 const { findPages } = require('./src/modules/utils/find');
 const { LANGUAGES, LANGUAGES_SSR } = require('./src/modules/constants');
+
+const MONORPO_PATH = path.resolve(__dirname, './node_modules/@mui/monorepo');
+const MONOREPO_PACKAGES = {
+  '@mui/docs': path.resolve(MONORPO_PATH, './packages/mui-docs/src'),
+  '@mui/joy': path.resolve(MONORPO_PATH, './packages/mui-joy/src'),
+  '@mui/styled-engine': path.resolve(MONORPO_PATH, './packages/mui-styled-engine/src'),
+  '@mui/system': path.resolve(MONORPO_PATH, './packages/mui-system/src'),
+  '@mui/base': path.resolve(MONORPO_PATH, './packages/mui-base/src'),
+  '@mui/markdown': path.resolve(MONORPO_PATH, './docs/packages/markdown'),
+  '@mui/material': path.resolve(MONORPO_PATH, './packages/mui-material/src'),
+  '@mui/icons-material': path.resolve(MONORPO_PATH, './packages/mui-icons-material/lib'),
+  '@mui/styles': path.resolve(MONORPO_PATH, './packages/mui-styles'),
+  '@mui/utils': path.resolve(MONORPO_PATH, './packages/mui-utils'),
+  '@mui/private-theming': path.resolve(MONORPO_PATH, './packages/mui-private-theming/src'),
+};
 
 /**
  * https://github.com/zeit/next.js/blob/287961ed9142a53f8e9a23bafb2f31257339ea98/packages/next/next-server/server/config.ts#L10
@@ -61,39 +72,9 @@ module.exports = withTM({
         ...config.resolve,
         alias: {
           ...config.resolve.alias,
-          '@mui/monorepo': path.resolve(__dirname, './node_modules/@mui/monorepo'),
-          docs: path.resolve(__dirname, './node_modules/@mui/monorepo/docs'),
-          'styled-components': path.resolve(__dirname, './node_modules/styled-components'),
-          '@mui/docs': path.resolve(
-            __dirname,
-            './node_modules/@mui/monorepo/packages/mui-docs/src',
-          ),
-          '@mui/joy': path.resolve(__dirname, './node_modules/@mui/monorepo/packages/mui-joy/src'),
-          '@mui/styled-engine': path.resolve(
-            __dirname,
-            './node_modules/@mui/monorepo/packages/mui-styled-engine/src',
-          ),
-          '@mui/system': path.resolve(
-            __dirname,
-            './node_modules/@mui/monorepo/packages/mui-system/src',
-          ),
-          '@mui/base': path.resolve(
-            __dirname,
-            './node_modules/@mui/monorepo/packages/mui-base/src',
-          ),
-          '@mui/markdown': path.resolve(
-            __dirname,
-            './node_modules/@mui/monorepo/docs/packages/markdown',
-          ),
-          '@mui/styles': path.resolve(
-            __dirname,
-            './node_modules/@mui/monorepo/packages/mui-styles',
-          ),
-          '@mui/utils': path.resolve(__dirname, './node_modules/@mui/monorepo/packages/mui-utils'),
-          [path.resolve(
-            __dirname,
-            './node_modules/@mui/monorepo/packages/mui-utils/macros/MuiError.macro',
-          )]: 'react',
+          docs: path.resolve(MONORPO_PATH, './docs'),
+          [path.resolve(MONORPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
+          ...MONOREPO_PACKAGES,
         },
       },
       module: {

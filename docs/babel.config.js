@@ -1,14 +1,4 @@
-const bpmr = require('babel-plugin-module-resolver');
 const fse = require('fs-extra');
-
-function resolvePath(sourcePath, currentFile, opts) {
-  if (sourcePath === 'markdown') {
-    const base = currentFile.substring(__dirname.length).slice(0, -3);
-    return `${__dirname}/docs/src/${base}/`;
-  }
-
-  return bpmr.resolvePath(sourcePath, currentFile, opts);
-}
 
 const { version: transformRuntimeVersion } = fse.readJSONSync(
   require.resolve('@babel/runtime-corejs2/package.json'),
@@ -30,14 +20,6 @@ module.exports = {
     // for IE 11 support
     '@babel/plugin-transform-object-assign',
     'babel-plugin-preval',
-    [
-      'babel-plugin-module-resolver',
-      {
-        alias: {},
-        transformFunctions: ['require', 'require.context'],
-        resolvePath,
-      },
-    ],
   ],
   ignore: [
     // Fix a Windows issue.

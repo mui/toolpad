@@ -68,6 +68,7 @@
   "dependencies": {
     "cross-env": "^7.0.3",
     "dotenv-cli": "^5.1.0",
+    "inquirer": "^8.2.4",
     "jest-environment-jsdom": "^28.0.0-alpha.8",
     "yargs": "^17.5.1"
   }

@@ -1,4 +1,5 @@
 const yargs = require('yargs');
+const inquirer = require('inquirer');
 
 const IMAGE_NAME = 'muicom/toolpad';
 
@@ -26,7 +27,6 @@ async function dockerCreateTag(image, srcTag, destTags) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function commitLog(count = 100) {
   const { execa } = await import('execa');
   const { exitCode, stderr, stdout } = await execa('git', ['log', `-${count}`, `--pretty=oneline`]);
@@ -42,12 +42,73 @@ async function commitLog(count = 100) {
   });
 }
 
-async function main({ commit, releaseTag, prerelease }) {
+async function showFile(commit, file) {
+  const { execa } = await import('execa');
+  const { exitCode, stderr, stdout } = await execa('git', ['show', `${commit}:${file}`]);
+  if (exitCode !== 0) {
+    throw new Error(stderr);
+  }
+  return stdout;
+}
+
+async function main({ yes, force, commit, releaseTag, prerelease }) {
   // TODO: if no --commit provided, assume last commit and ask for confirmation
   // TODO: if no --releaseTag provided, read it from the --commit and ask for confirmation
 
-  if (await checkTagExists(IMAGE_NAME, releaseTag)) {
-    throw new Error(`Tag "${IMAGE_NAME}:${releaseTag}" already exists`);
+  if (!commit) {
+    const log = await commitLog();
+    const answers = await inquirer.prompt([
+      {
+        name: 'commit',
+        message: 'Which commit contains the release?',
+        type: 'list',
+        choices: log.map((entry) => ({
+          value: entry.commit,
+          name: `${entry.commit} ${entry.subject}`,
+        })),
+        pageSize: 20,
+      },
+    ]);
+
+    commit = answers.commit;
+  }
+
+  if (!releaseTag) {
+    const lernaJson = JSON.parse(await showFile(commit, 'lerna.json'));
+
+    const answers = await inquirer.prompt([
+      {
+        name: 'releaseTag',
+        message: 'Which tag will this be release under?',
+        type: 'input',
+        default: lernaJson.version,
+      },
+    ]);
+
+    releaseTag = answers.releaseTag;
+  }
+
+  if (!yes) {
+    const answers = await inquirer.prompt([
+      {
+        name: 'confirmed',
+        message: `Release commit ${commit} as ${IMAGE_NAME}:${releaseTag}?`,
+        type: 'confirm',
+      },
+    ]);
+
+    if (!answers.confirmed) {
+      // eslint-disable-next-line no-console
+      console.log(`Canceled`);
+      return;
+    }
+  }
+
+  const exists = await checkTagExists(IMAGE_NAME, releaseTag);
+  if (exists && !force) {
+    console.error(`Tag "${IMAGE_NAME}:${releaseTag}" already exists`);
+    yargs.exit(1, `Tag "${IMAGE_NAME}:${releaseTag}" already exists`);
+    return;
   }
 
   const tags = [releaseTag];
@@ -68,12 +129,10 @@ yargs
         .option('commit', {
           describe: 'The git commit hash e.g. ff5a591140cce65833d536009c64d1147c3aba44',
           type: 'string',
-          demandOption: true,
         })
         .option('releaseTag', {
           describe: 'The tag under which to release this image e.g. v1.2.3',
           type: 'string',
-          demandOption: true,
         })
         .option('prerelease', {
           describe: 'Mark as a prerelease (omits the "latest" tag)',

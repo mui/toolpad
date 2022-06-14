@@ -28,7 +28,6 @@ import {
   isPageRow,
   PAGE_COLUMN_COMPONENT_ID,
   PAGE_ROW_COMPONENT_ID,
-  STACK_COMPONENT_ID,
   isPageLayoutComponent,
   isPageColumn,
 } from '../../../toolpadComponents';
@@ -757,11 +756,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       // Drop on page
       if (isDraggingOverPage) {
         if (!selection || !isPageRow(draggedNode)) {
-          const container = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
-          domApi.addNode(container, dragOverNode, 'children');
-          parent = container;
+          const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
+          domApi.addNode(rowContainer, dragOverNode, 'children');
+          parent = rowContainer;
 
-          addOrMoveNode(draggedNode, container, 'children');
+          addOrMoveNode(draggedNode, rowContainer, 'children');
         } else {
           addOrMoveNode(draggedNode, dragOverNode, 'children');
         }
@@ -773,7 +772,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       if (!isDraggingOverPage && parent) {
         const isOriginalParentPage = originalParent ? appDom.isPage(originalParent) : false;
-
         if (!isOriginalParentPage && !appDom.isElement(parent)) {
           throw new Error(`Invalid drop target "${parent.id}" of type "${parent.type}"`);
         }
@@ -784,7 +782,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
 
         // Drop on page rows (except page row center)
-        if (isOriginalParentPage && dragOverNodeZone && dragOverNodeZone !== DropZone.CENTER) {
+        if (isPageRow(dragOverNode) && dragOverNodeZone && dragOverNodeZone !== DropZone.CENTER) {
           const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
 
           const newParentIndex =
@@ -850,14 +848,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         if ([DropZone.RIGHT, DropZone.LEFT].includes(dragOverNodeZone)) {
           if (isOriginalParentColumn) {
-            const stackContainer = appDom.createElement(dom, STACK_COMPONENT_ID, {});
+            const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
             domApi.addNode(
-              stackContainer,
+              rowContainer,
               parent,
               'children',
               appDom.getNewParentIndexAfterNode(dom, dragOverNode, 'children'),
             );
-            parent = stackContainer;
+            parent = rowContainer;
 
             // Move existing element inside stack right away if drag over zone is right
             if (dragOverNodeZone === DropZone.RIGHT) {

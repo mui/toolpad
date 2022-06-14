@@ -12,17 +12,23 @@ const { LANGUAGES, LANGUAGES_SSR } = require('./src/modules/constants');
 
 const MONORPO_PATH = path.resolve(__dirname, './node_modules/@mui/monorepo');
 const MONOREPO_PACKAGES = {
-  '@mui/docs': path.resolve(MONORPO_PATH, './packages/mui-docs/src'),
-  '@mui/joy': path.resolve(MONORPO_PATH, './packages/mui-joy/src'),
-  '@mui/styled-engine': path.resolve(MONORPO_PATH, './packages/mui-styled-engine/src'),
-  '@mui/system': path.resolve(MONORPO_PATH, './packages/mui-system/src'),
   '@mui/base': path.resolve(MONORPO_PATH, './packages/mui-base/src'),
-  '@mui/markdown': path.resolve(MONORPO_PATH, './docs/packages/markdown'),
-  '@mui/material': path.resolve(MONORPO_PATH, './packages/mui-material/src'),
+  '@mui/codemod': path.resolve(MONORPO_PATH, './packages/mui-codemod/src'),
+  '@mui/docs': path.resolve(MONORPO_PATH, './packages/mui-docs/src'),
+  '@mui/envinfo': path.resolve(MONORPO_PATH, './packages/mui-envinfo'),
   '@mui/icons-material': path.resolve(MONORPO_PATH, './packages/mui-icons-material/lib'),
-  '@mui/styles': path.resolve(MONORPO_PATH, './packages/mui-styles'),
-  '@mui/utils': path.resolve(MONORPO_PATH, './packages/mui-utils'),
+  '@mui/joy': path.resolve(MONORPO_PATH, './packages/mui-joy/src'),
+  '@mui/lab': path.resolve(MONORPO_PATH, './packages/mui-lab/src'),
+  '@mui/material': path.resolve(MONORPO_PATH, './packages/mui-material/src'),
+  '@mui/material-next': path.resolve(MONORPO_PATH, './packages/mui-material-next/src'),
   '@mui/private-theming': path.resolve(MONORPO_PATH, './packages/mui-private-theming/src'),
+  '@mui/styled-engine': path.resolve(MONORPO_PATH, './packages/mui-styled-engine/src'),
+  '@mui/styled-engine-sc': path.resolve(MONORPO_PATH, './packages/mui-styled-engine-sc/src'),
+  '@mui/styles': path.resolve(MONORPO_PATH, './packages/mui-styles'),
+  '@mui/system': path.resolve(MONORPO_PATH, './packages/mui-system/src'),
+  '@mui/types': path.resolve(MONORPO_PATH, './packages/mui-types'),
+  '@mui/markdown': path.resolve(MONORPO_PATH, './docs/packages/markdown'),
+  '@mui/utils': path.resolve(MONORPO_PATH, './packages/mui-utils'),
 };
 
 /**

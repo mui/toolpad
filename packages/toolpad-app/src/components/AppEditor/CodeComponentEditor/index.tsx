@@ -20,6 +20,7 @@ import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
 import { mapValues } from '../../../utils/collections';
+import ErrorAlert from '../PageEditor/ErrorAlert';
 
 const Noop = createComponent(() => null);
 
@@ -67,7 +68,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
 
   usePageTitle(`${codeComponentNode.name} | Toolpad editor`);
 
-  const updateInputExtern = React.useCallback((newInput) => {
+  const updateInputExtern = React.useCallback((newInput: string) => {
     const editor = editorRef.current;
     if (!editor) {
       return;
@@ -220,15 +221,13 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
               <React.Suspense fallback={null}>
                 <ErrorBoundary
                   resetKeys={[CodeComponent]}
-                  fallbackRender={({ error: runtimeError }) => (
-                    <React.Fragment>{runtimeError.message}</React.Fragment>
-                  )}
+                  fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
                   <AppThemeProvider node={theme}>
                     <CodeComponent {...defaultProps} />
                   </AppThemeProvider>
                 </ErrorBoundary>
-                {compileError?.message}
+                {compileError ? <ErrorAlert error={compileError} /> : null}
               </React.Suspense>
             </FrameContent>,
             frameDocument.body,

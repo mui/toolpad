@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Container, Stack, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { NodeId, ConnectionEditorProps, ClientDataSource } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -46,18 +46,13 @@ function ConnectionEditorContent<P>({
   const domApi = useDomApi();
 
   const handleConnectionChange = React.useCallback(
-    (connectionParams) => {
-      (Object.keys(connectionParams) as (keyof P)[]).forEach((propName) => {
-        if (typeof propName !== 'string' || !connectionParams[propName]) {
-          return;
-        }
-        domApi.setNodeNamespacedProp(
-          connectionNode,
-          'attributes',
-          'params',
-          appDom.createSecret(connectionParams),
-        );
-      });
+    (connectionParams: P | null) => {
+      domApi.setNodeNamespacedProp(
+        connectionNode,
+        'attributes',
+        'params',
+        appDom.createSecret(connectionParams),
+      );
     },
     [connectionNode, domApi],
   );
@@ -66,24 +61,26 @@ function ConnectionEditorContent<P>({
   const dataSource = dataSources[dataSourceType];
 
   return (
-    <Box className={className} sx={{ width: '100%', height: '100%', p: 3 }}>
-      <Stack spacing={1}>
-        <NodeNameEditor node={connectionNode} />
-        {dataSource ? (
-          <ConnectionParamsEditor
-            dataSource={dataSource}
-            value={connectionNode.attributes.params.value}
-            onChange={handleConnectionChange}
-            handlerBasePath={`/api/dataSources/${dataSourceType}`}
-            appId={appId}
-            connectionId={connectionNode.id}
-          />
-        ) : (
-          <Typography>
-            Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
-          </Typography>
-        )}
-      </Stack>
+    <Box className={className} sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
+      <Container sx={{ my: 2 }}>
+        <Stack spacing={1}>
+          <NodeNameEditor node={connectionNode} />
+          {dataSource ? (
+            <ConnectionParamsEditor
+              dataSource={dataSource}
+              value={connectionNode.attributes.params.value}
+              onChange={handleConnectionChange}
+              handlerBasePath={`/api/dataSources/${dataSourceType}`}
+              appId={appId}
+              connectionId={connectionNode.id}
+            />
+          ) : (
+            <Typography>
+              Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
+            </Typography>
+          )}
+        </Stack>
+      </Container>
     </Box>
   );
 }

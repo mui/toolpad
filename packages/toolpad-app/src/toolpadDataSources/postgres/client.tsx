@@ -43,11 +43,6 @@ function ConnectionParamsInput({
 
   return (
     <Stack direction="column" gap={1}>
-      <Toolbar disableGutters>
-        <Button onClick={doSubmit} disabled={isSaveDisabled(formState)}>
-          Save
-        </Button>
-      </Toolbar>
       <TextField
         label="host"
         {...register('host', { required: true })}
@@ -74,6 +69,11 @@ function ConnectionParamsInput({
         {...register('database', { required: true })}
         {...validation(formState, 'database')}
       />
+      <Toolbar disableGutters>
+        <Button variant="contained" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+          Save
+        </Button>
+      </Toolbar>
     </Stack>
   );
 }

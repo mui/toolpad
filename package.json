@@ -25,7 +25,7 @@
     "release:build": "lerna run --stream build",
     "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
     "release:docker": "node ./scripts/releaseDocker.js",
-    "release:changelog": "dotenv -- node ./scripts/releaseChangelog.js",
+    "release:changelog": "dotenv -- node ./scripts/releaseChangelog.js --repo mui-toolpad",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "e2e:smoke": "playwright test --config ./test/e2e-smoke/playwright.config.ts",
     "test": "yarn test:build && jest"

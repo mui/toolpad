@@ -67,14 +67,33 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
 ## Release process
 
+1. Generate a new version using
+
+   ```sh
+   yarn release:version
+   ```
+
 1. Generate changelog using
 
    ```sh
    yarn release:changelog
    ```
 
-1. Clean the generated changelog
+1. Clean the generated changelog, add highlights, use the new version number as title
 
 1. prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md)
 
-1.
+1. Open a PR with the proposed changes
+
+1. Review/merge PR
+
+1. Wait for the docker build to finish.
+
+1. Release the docker image using:
+
+   ```sh
+   # add --prerelease if necessary
+   yarn release:docker --commit <commit of merged PR> --releaseTag <version number>
+   ```
+
+1. Create a new github release, use `<version number>` as the tag and `<commit of merged PR>` as the target. Use the cleaned changelog as the body and the `<version number>` as the title. Mark as prerelease if necessary.

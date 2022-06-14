@@ -43,7 +43,8 @@ async function commitLog(count = 100) {
 }
 
 async function main({ commit, releaseTag, prerelease }) {
-  const { execa } = await import('execa');
+  // TODO: if no --commit provided, assume last commit and ask for confirmation
+  // TODO: if no --releaseTag provided, read it from the --commit and ask for confirmation
 
   if (await checkTagExists(IMAGE_NAME, releaseTag)) {
     throw new Error(`Tag "${IMAGE_NAME}:${releaseTag}" already exists`);
@@ -56,8 +57,6 @@ async function main({ commit, releaseTag, prerelease }) {
   }
 
   await dockerCreateTag(IMAGE_NAME, commit, tags);
-
-  await execa('echo', ['hello world!'], { stdio: 'inherit' });
 }
 
 yargs

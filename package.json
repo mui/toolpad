@@ -28,7 +28,7 @@
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "prisma": "dotenv yarn workspace @mui/toolpad-app run --cwd=\"./packages/toolpad-app\"  prisma",
     "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
-    "release:build": "lerna run --stream build",
+    "release:build": "lerna run --ignore docs --stream build",
     "release:publish": "lerna publish from-package --pre-dist-tag alpha --dist-tag latest",
     "release:publish:dry-run": "yarn release:publish --registry=\"http://localhost:4873/\"",
     "release:docker:build": "ts-node --esm ./scripts/esm/docker.ts build",
@@ -77,5 +77,8 @@
     "cross-env": "^7.0.3",
     "dotenv-cli": "^5.1.0",
     "jest-environment-jsdom": "^28.0.0-alpha.8"
+  },
+  "resolutions": {
+    "@types/react": "18.0.12"
   }
 }

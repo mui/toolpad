@@ -141,4 +141,12 @@ module.exports = withTM({
       { source: '/api/:rest*', destination: '/api-docs/:rest*' },
     ];
   },
+  // redirects only take effect in the development, not production (because of `next export`).
+  redirects: async () => [
+    {
+      source: '/',
+      destination: '/toolpad',
+      permanent: false,
+    },
+  ],
 });

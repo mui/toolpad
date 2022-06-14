@@ -257,18 +257,18 @@ function getChildNodeHighlightedZone(direction: FlowDirection): DropZone | null 
   }
 }
 
-function hasContainerComponent(nodeInfo: NodeInfo): boolean {
+function isContainerComponent(nodeInfo: NodeInfo): boolean {
   const componentArgTypes: ArgTypeDefinitions<any> | undefined = nodeInfo.componentConfig?.argTypes;
   const childrenControlType = componentArgTypes?.children?.control?.type;
 
   return childrenControlType === 'slot' || childrenControlType === 'slots';
 }
 
-function hasHorizontalContainer(nodeInfo: NodeInfo): boolean {
+function isHorizontalContainer(nodeInfo: NodeInfo): boolean {
   return nodeInfo.direction === 'row' || nodeInfo.direction === 'row-reverse';
 }
 
-function hasVerticalContainer(nodeInfo: NodeInfo): boolean {
+function isVerticalContainer(nodeInfo: NodeInfo): boolean {
   return nodeInfo.direction === 'column' || nodeInfo.direction === 'column-reverse';
 }
 
@@ -309,12 +309,12 @@ function NodeHud({
     hasEmptyContainer = childNodes.length === 0;
   }
 
-  const isContainerChild = parentInfo ? hasContainerComponent(parentInfo) : false;
+  const isContainerChild = parentInfo ? isContainerComponent(parentInfo) : false;
   const isHorizontalContainerChild = parentInfo
-    ? isContainerChild && hasHorizontalContainer(parentInfo)
+    ? isContainerChild && isHorizontalContainer(parentInfo)
     : false;
   const isVerticalContainerChild = parentInfo
-    ? isContainerChild && hasVerticalContainer(parentInfo)
+    ? isContainerChild && isVerticalContainer(parentInfo)
     : false;
 
   const highlightHeight =
@@ -462,6 +462,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       if (appDom.isPage(dragOverNode)) {
         return [DropZone.CENTER];
       }
+
       if (appDom.isElement(dragOverNode)) {
         if (isPageRow(dragOverNode)) {
           return [
@@ -493,7 +494,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         nodeInfo &&
         parentInfo &&
         (appDom.isPage(parent) || appDom.isElement(parent)) &&
-        hasContainerComponent(parentInfo)
+        isContainerComponent(parentInfo)
       ) {
         const parentChildren = appDom.getChildNodes(dom, parent).children || [];
 
@@ -515,14 +516,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           gapCount = 0;
         }
 
-        if (nodeInfo.rect && hasVerticalContainer(parentInfo)) {
+        if (nodeInfo.rect && isVerticalContainer(parentInfo)) {
           parentAwareNodeRect = {
             ...nodeInfo.rect,
             y: isFirstChild ? nodeInfo.rect.y : nodeInfo.rect.y - parentGapInPx,
             height: nodeInfo.rect.height + gapCount * parentGapInPx,
           };
         }
-        if (nodeInfo.rect && hasHorizontalContainer(parentInfo)) {
+        if (nodeInfo.rect && isHorizontalContainer(parentInfo)) {
           parentAwareNodeRect = {
             ...nodeInfo.rect,
             x: isFirstChild ? nodeInfo.rect.x : nodeInfo.rect.x - parentGapInPx,
@@ -573,7 +574,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           [];
 
         const isDraggingOverEmptyContainer = activeDropNodeInfo
-          ? hasContainerComponent(activeDropNodeInfo) && activeDropNodeChildren.length === 0
+          ? isContainerComponent(activeDropNodeInfo) && activeDropNodeChildren.length === 0
           : false;
 
         if (activeDropNodeRect) {
@@ -591,12 +592,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           if (
             isDraggingOverElement &&
             activeDropNodeInfo &&
-            hasContainerComponent(activeDropNodeInfo) &&
-            hasHorizontalContainer(activeDropNodeInfo)
+            isContainerComponent(activeDropNodeInfo) &&
+            isHorizontalContainer(activeDropNodeInfo)
           ) {
             const fractionalY = relativeY / activeDropNodeRect.height;
 
-            if (fractionalY > 0.25 && fractionalY < 0.75) {
+            if (fractionalY > 0.2 && fractionalY < 0.8) {
               activeDropZone = DropZone.CENTER;
             }
           }
@@ -744,6 +745,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       let parent = appDom.getParent(dom, dragOverNode);
       const originalParent = parent;
+      const originalParentInfo = parent && nodesInfo[parent.id];
 
       const isDraggingOverPage = (dragOverNode && appDom.isPage(dragOverNode)) || false;
 
@@ -800,15 +802,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           addOrMoveNode(draggedNode, dragOverNode, 'children');
         }
 
-        const isOriginalParentRow = originalParent
-          ? appDom.isElement(originalParent) && isPageRow(originalParent)
+        const isOriginalParentHorizontalContainer = originalParentInfo
+          ? isHorizontalContainer(originalParentInfo)
           : false;
         const isOriginalParentColumn = originalParent
           ? appDom.isElement(originalParent) && isPageColumn(originalParent)
           : false;
 
         if ([DropZone.TOP, DropZone.BOTTOM].includes(dragOverNodeZone)) {
-          if (isOriginalParentRow && !isDraggingOverColumn) {
+          if (isOriginalParentHorizontalContainer && !isDraggingOverColumn) {
             const columnContainer = appDom.createElement(dom, PAGE_COLUMN_COMPONENT_ID, {});
             domApi.addNode(
               columnContainer,
@@ -837,7 +839,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           );
 
           // Only move existing element inside column in the end if drag over zone is top
-          if (isOriginalParentRow && !isDraggingOverColumn && dragOverNodeZone === DropZone.TOP) {
+          if (
+            isOriginalParentHorizontalContainer &&
+            !isDraggingOverColumn &&
+            dragOverNodeZone === DropZone.TOP
+          ) {
             domApi.moveNode(dragOverNode, parent, 'children');
           }
         }
@@ -894,6 +900,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       getCurrentlyDraggedNode,
       getViewCoordinates,
       newNode,
+      nodesInfo,
       selection,
     ],
   );
@@ -1081,9 +1088,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   }, [overlayKey, handlePageViewStateUpdate, rootElm]);
 
   const isDraggedComponentDroppable =
-    Boolean(dragOverNodeId) &&
-    availableDropTargetIds.has(dragOverNodeId) &&
-    availableDropZones.includes(dragOverNodeZone);
+    (dragOverNodeId &&
+      availableDropTargetIds.has(dragOverNodeId) &&
+      availableDropZones.includes(dragOverNodeZone)) ||
+    false;
 
   return (
     <RenderPanelRoot className={className}>
@@ -1120,7 +1128,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
             const isPageNodeHub = appDom.isPage(node) && pageNodes.length === 1;
 
-            const hasContainer = nodeInfo ? hasContainerComponent(nodeInfo) : false;
+            const hasContainer = nodeInfo ? isContainerComponent(nodeInfo) : false;
 
             const rect = dropAreaRects[node.id];
             if (!rect) {

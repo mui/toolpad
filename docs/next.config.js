@@ -58,9 +58,18 @@ module.exports = withTM({
         ...config.resolve,
         alias: {
           ...config.resolve.alias,
+          '@mui/monorepo': path.resolve(__dirname, './node_modules/@mui/monorepo'),
           docs: path.resolve(__dirname, './node_modules/@mui/monorepo/docs'),
           'styled-components': path.resolve(__dirname, './node_modules/styled-components'),
+          '@mui/docs': path.resolve(
+            __dirname,
+            './node_modules/@mui/monorepo/packages/mui-docs/src',
+          ),
           '@mui/joy': path.resolve(__dirname, './node_modules/@mui/monorepo/packages/mui-joy/src'),
+          '@mui/markdown': path.resolve(
+            __dirname,
+            './node_modules/@mui/monorepo/docs/packages/markdown',
+          ),
           '@mui/styles': path.resolve(
             __dirname,
             './node_modules/@mui/monorepo/packages/mui-styles',
@@ -81,7 +90,7 @@ module.exports = withTM({
             oneOf: [
               {
                 resourceQuery: /@mui\/markdown/,
-                use: require.resolve('../node_modules/@mui/monorepo/docs/packages/markdown/loader'),
+                use: require.resolve('@mui/monorepo/docs/packages/markdown/loader'),
               },
             ],
           },

@@ -36,6 +36,7 @@ import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { mapValues } from '../../../utils/collections';
+import { QueryEditorContextProvider } from '../../../toolpadDataSources/context';
 
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
@@ -306,6 +307,8 @@ function QueryNodeEditorDialog<Q, P>({
     throw new Error(`DataSource "${dataSourceId}" not found`);
   }
 
+  const queryEditorContext = React.useMemo(() => ({ appId, connectionId }), [appId, connectionId]);
+
   return (
     <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose} scroll="body">
       <DialogTitle>Edit Query ({node.id})</DialogTitle>
@@ -322,18 +325,18 @@ function QueryNodeEditorDialog<Q, P>({
 
           <Divider />
           <Typography>Build query:</Typography>
-          <dataSource.QueryEditor
-            appId={appId}
-            connectionId={connectionId}
-            connectionParams={connection?.attributes.params.value}
-            value={{
-              query: input.attributes.query.value,
-              params: input.params,
-            }}
-            liveParams={liveParams}
-            onChange={handleQueryChange}
-            globalScope={pageState}
-          />
+          <QueryEditorContextProvider value={queryEditorContext}>
+            <dataSource.QueryEditor
+              connectionParams={connection?.attributes.params.value}
+              value={{
+                query: input.attributes.query.value,
+                params: input.params,
+              }}
+              liveParams={liveParams}
+              onChange={handleQueryChange}
+              globalScope={pageState}
+            />
+          </QueryEditorContextProvider>
           <Divider />
           <Typography>Options:</Typography>
           <Grid container direction="row" spacing={1}>
@@ -372,7 +375,7 @@ function QueryNodeEditorDialog<Q, P>({
             <Grid item xs={6}>
               <Stack>
                 <FormControlLabel
-                  label="Transform API response"
+                  label="Transform response"
                   control={
                     <Checkbox
                       checked={input.attributes.transformEnabled?.value ?? false}

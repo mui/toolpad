@@ -95,14 +95,8 @@ export interface QueryEditorModel<Q> {
 }
 
 export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
-  appId: string;
-  connectionId: NodeId;
   connectionParams: Maybe<P>;
   globalScope: Record<string, any>;
-  /**
-   * @deprecated
-   */
-  queryScope?: Record<string, any>;
   liveParams: Record<string, LiveBinding>;
 }
 

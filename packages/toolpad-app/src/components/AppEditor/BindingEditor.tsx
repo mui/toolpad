@@ -25,6 +25,7 @@ import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
+import useShortcut from '../../utils/useShortcut';
 
 const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -124,7 +125,8 @@ export function BindingEditor<V>({
   const hasBinding: boolean = !!value && value.type !== 'const';
 
   const committedInput = React.useRef<BindableAttrValue<V> | null>(null);
-  const handleCommit = React.useCallback(() => {
+
+  const handleSave = React.useCallback(() => {
     let newValue = input;
 
     if (input?.type === 'jsExpression') {
@@ -136,8 +138,12 @@ export function BindingEditor<V>({
 
     committedInput.current = newValue;
     onChange(newValue);
+  }, [onChange, input]);
+
+  const handleCommit = React.useCallback(() => {
+    handleSave();
     handleClose();
-  }, [onChange, input, handleClose]);
+  }, [handleSave, handleClose]);
 
   const handleRemove = React.useCallback(() => {
     onChange(null);
@@ -168,6 +174,10 @@ export function BindingEditor<V>({
       {bindingButton}
     </TooltipComponent>
   );
+
+  useShortcut({ code: 'KeyS', metaKey: true, disabled: !open }, handleSave);
+
+  const hasUnsavedChanges = input && input !== committedInput.current;
 
   return (
     <React.Fragment>
@@ -204,16 +214,12 @@ export function BindingEditor<V>({
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={handleClose}>
-            Cancel
+            {hasUnsavedChanges ? 'Cancel' : 'Close'}
           </Button>
           <Button color="inherit" disabled={!value} onClick={handleRemove}>
             Remove binding
           </Button>
-          <Button
-            disabled={!input || input === committedInput.current}
-            color="primary"
-            onClick={handleCommit}
-          >
+          <Button disabled={!hasUnsavedChanges} color="primary" onClick={handleCommit}>
             Update binding
           </Button>
         </DialogActions>

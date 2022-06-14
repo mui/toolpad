@@ -65,13 +65,13 @@ function PlaceholderWrapper(props: PlaceholderWrapperProps) {
 export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
   nodeId: string;
-  componentConfig: ComponentConfig<unknown>;
+  componentConfig: ComponentConfig<any>;
 }
 
 export interface NodeFiberHostProps {
   children: React.ReactElement;
   [RUNTIME_PROP_NODE_ID]: string;
-  componentConfig: ComponentConfig<unknown>;
+  componentConfig: ComponentConfig<any>;
   nodeError?: RuntimeError | null;
 }
 

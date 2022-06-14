@@ -68,7 +68,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
 
   usePageTitle(`${codeComponentNode.name} | Toolpad editor`);
 
-  const updateInputExtern = React.useCallback((newInput) => {
+  const updateInputExtern = React.useCallback((newInput: string) => {
     const editor = editorRef.current;
     if (!editor) {
       return;

@@ -46,18 +46,13 @@ function ConnectionEditorContent<P>({
   const domApi = useDomApi();
 
   const handleConnectionChange = React.useCallback(
-    (connectionParams) => {
-      (Object.keys(connectionParams) as (keyof P)[]).forEach((propName) => {
-        if (typeof propName !== 'string' || !connectionParams[propName]) {
-          return;
-        }
-        domApi.setNodeNamespacedProp(
-          connectionNode,
-          'attributes',
-          'params',
-          appDom.createSecret(connectionParams),
-        );
-      });
+    (connectionParams: P | null) => {
+      domApi.setNodeNamespacedProp(
+        connectionNode,
+        'attributes',
+        'params',
+        appDom.createSecret(connectionParams),
+      );
     },
     [connectionNode, domApi],
   );

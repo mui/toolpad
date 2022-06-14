@@ -65,7 +65,7 @@ function QueryEditor({
   );
 
   const handleSpreadsheetChange = React.useCallback(
-    (event, newValue: GoogleDriveFile | null) => {
+    (event: React.SyntheticEvent<Element, Event>, newValue: GoogleDriveFile | null) => {
       const query: GoogleSheetsApiQuery = {
         ...value.query,
         sheetName: null,
@@ -77,7 +77,7 @@ function QueryEditor({
   );
 
   const handleSheetChange = React.useCallback(
-    (event, newValue: GoogleSheet | null) => {
+    (event: React.SyntheticEvent<Element, Event>, newValue: GoogleSheet | null) => {
       const query: GoogleSheetsApiQuery = {
         ...value.query,
         sheetName: newValue?.properties?.title ?? null,

@@ -3,6 +3,9 @@ const withTM = require('next-transpile-modules')([
   '@mui/monorepo',
   '@mui/styles',
   '@mui/utils',
+  '@mui/system',
+  '@mui/base',
+  '@mui/styled-engine',
   '@emotion/react',
   '@mui/private-theming',
   '@mui/material',
@@ -66,6 +69,18 @@ module.exports = withTM({
             './node_modules/@mui/monorepo/packages/mui-docs/src',
           ),
           '@mui/joy': path.resolve(__dirname, './node_modules/@mui/monorepo/packages/mui-joy/src'),
+          '@mui/styled-engine': path.resolve(
+            __dirname,
+            './node_modules/@mui/monorepo/packages/mui-styled-engine/src',
+          ),
+          '@mui/system': path.resolve(
+            __dirname,
+            './node_modules/@mui/monorepo/packages/mui-system/src',
+          ),
+          '@mui/base': path.resolve(
+            __dirname,
+            './node_modules/@mui/monorepo/packages/mui-base/src',
+          ),
           '@mui/markdown': path.resolve(
             __dirname,
             './node_modules/@mui/monorepo/docs/packages/markdown',

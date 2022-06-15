@@ -21,6 +21,7 @@ import {
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import Autorenew from '@mui/icons-material/Autorenew';
 import { LoadingButton } from '@mui/lab';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -198,19 +199,6 @@ function QueryNodeEditorDialog<Q, P>({
     );
   }, []);
 
-  const handleTransformEnabledChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) =>
-        update(existing, {
-          attributes: update(existing.attributes, {
-            transformEnabled: appDom.createConst(event.target.checked),
-          }),
-        }),
-      );
-    },
-    [],
-  );
-
   const handleRefetchOnWindowFocusChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setInput((existing) =>
@@ -289,20 +277,46 @@ function QueryNodeEditorDialog<Q, P>({
     setPreviewParams(paramsObject);
   }, [input, paramsObject]);
 
-  const inputWithTransformDisabled: appDom.QueryNode<Q, P> = React.useMemo(() => {
-    return {
-      ...input,
-      attributes: {
-        ...input.attributes,
-        transform: { value: '', type: 'const' },
-        transformEnabled: { value: false, type: 'const' },
-      },
-    };
-  }, [input]);
+  const withTransformDisabled = React.useCallback(
+    (query: appDom.QueryNode<Q, P>): appDom.QueryNode<Q, P> => {
+      return {
+        ...query,
+        attributes: {
+          ...query.attributes,
+          transform: { type: 'const', value: '' },
+          transformEnabled: { type: 'const', value: false },
+        },
+      };
+    },
+    [],
+  );
+
+  const [rawPreviewQuery, setRawPreviewQuery] = React.useState<appDom.QueryNode<Q, P> | null>(null);
 
   const untransformedQueryPreview = client.useQuery(
     'execQuery',
-    inputWithTransformDisabled ? [appId, inputWithTransformDisabled, paramsObject] : null,
+    rawPreviewQuery ? [appId, rawPreviewQuery, paramsObject] : null,
+    { retry: false },
+  );
+
+  const handleRawPreviewQueryRefresh = React.useCallback(() => {
+    setRawPreviewQuery(withTransformDisabled(input));
+  }, [withTransformDisabled, input]);
+
+  const handleTransformEnabledChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) =>
+        update(existing, {
+          attributes: update(existing.attributes, {
+            transformEnabled: appDom.createConst(event.target.checked),
+          }),
+        }),
+      );
+      if (event.target.checked) {
+        handleRawPreviewQueryRefresh();
+      }
+    },
+    [handleRawPreviewQueryRefresh],
   );
 
   const isInputSaved = node === input;
@@ -402,14 +416,31 @@ function QueryNodeEditorDialog<Q, P>({
                   }
                 />
                 <Stack direction={'row'} spacing={2}>
-                  {untransformedQueryPreview.isLoading ? (
-                    <Skeleton width={'150px'} height={'10px'} />
-                  ) : (
-                    <JsonView
-                      src={untransformedQueryPreview.data}
-                      disabled={!input.attributes.transformEnabled?.value}
-                    />
-                  )}
+                  <Stack
+                    direction={'column'}
+                    sx={{ minWidth: '300px', overflowX: 'scroll' }}
+                    spacing={2}
+                  >
+                    {untransformedQueryPreview.isLoading ? (
+                      <Skeleton width={'300px'} height={'30px'} />
+                    ) : (
+                      <JsonView
+                        src={untransformedQueryPreview.data ?? { data: '' }}
+                        disabled={!input.attributes.transformEnabled?.value}
+                      />
+                    )}
+                    <LoadingButton
+                      disabled={
+                        rawPreviewQuery === input || !input.attributes.transformEnabled?.value
+                      }
+                      loading={untransformedQueryPreview.isLoading}
+                      loadingPosition="center"
+                      onClick={handleRawPreviewQueryRefresh}
+                      startIcon={<Autorenew />}
+                    >
+                      Refresh
+                    </LoadingButton>
+                  </Stack>
                   <JsExpressionEditor
                     globalScope={{ data: untransformedQueryPreview.data?.data }}
                     autoFocus

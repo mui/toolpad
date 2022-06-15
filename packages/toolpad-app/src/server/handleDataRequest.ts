@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
+import { NodeId } from '@mui/toolpad-core';
 import { execQuery, loadVersionedDom } from './data';
 import initMiddleware from './initMiddleware';
-import { NodeId, ApiResult, VersionOrPreview } from '../types';
+import { ApiResult, VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
 // Initialize the cors middleware
 const cors = initMiddleware<any>(

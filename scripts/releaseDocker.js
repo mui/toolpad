@@ -99,20 +99,23 @@ async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest, ...
   }
 
   if (!yes) {
+    const baseImage = `${IMAGE_NAME}:${commit}`;
     const imagesToBePublished = tags.map((tag) => `${IMAGE_NAME}:${tag}`);
+    const message = [
+      `Docker image ${chalk.blue(baseImage)} will be published as:`,
+      ...imagesToBePublished.map((image) => `    - ${chalk.blue(image)}`),
+      `  Does this look right?`,
+    ].join('\n');
+
     const answers = await inquirer.prompt([
       {
-        name: 'confirmed',
-        message: `Docker image ${chalk.blue(
-          `${IMAGE_NAME}:${commit}`,
-        )} will be published as \n${imagesToBePublished
-          .map((image) => `    - ${chalk.blue(image)}`)
-          .join('\n')}\n  Does this look right?`,
+        name: 'publishConfirmed',
         type: 'confirm',
+        message,
       },
     ]);
 
-    if (!answers.confirmed) {
+    if (!answers.publishConfirmed) {
       // eslint-disable-next-line no-console
       console.log(`Canceled`);
       return;

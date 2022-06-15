@@ -29,12 +29,23 @@ export interface SecretAttrValue<V> {
   value: V;
 }
 
+export interface RefAttrValue {
+  type: 'secret';
+  value: NodeId;
+}
+
 export type BindableAttrValue<V> =
   | ConstantAttrValue<V>
   | BindingAttrValue
   | SecretAttrValue<V>
   | BoundExpressionAttrValue
   | JsExpressionAttrValue;
+
+export interface NavigationAction<P> {
+  type: 'navigation';
+  to: NodeId;
+  parameters?: BindableAttrValues<P>;
+}
 
 export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 

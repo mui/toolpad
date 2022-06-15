@@ -102,6 +102,18 @@ jobs:
           name: Check for duplicated packages
           command: yarn deduplicate
 
+  test_lint:
+    <<: *defaults
+    steps:
+      - checkout
+      - install_js
+      - run:
+          name: Eslint
+          command: yarn eslint
+      - run:
+          name: Lint JSON
+          command: yarn jsonlint
+
   test_static:
     <<: *defaults
     steps:
@@ -178,6 +190,9 @@ workflows:
   pipeline:
     jobs:
       - checkout
+      - test_lint:
+          requires:
+            - checkout
       - test_static:
           requires:
             - checkout

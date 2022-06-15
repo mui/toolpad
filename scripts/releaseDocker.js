@@ -61,7 +61,7 @@ async function showFile(commit, file) {
   return stdout;
 }
 
-async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest, ...rest }) {
+async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest }) {
   const { default: chalk } = await import('chalk');
 
   if (!commit) {

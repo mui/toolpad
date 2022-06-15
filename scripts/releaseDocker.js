@@ -1,7 +1,9 @@
 const yargs = require('yargs');
 const inquirer = require('inquirer');
+const semver = require('semver');
 
 const IMAGE_NAME = 'muicom/toolpad';
+const LATEST_TAG = 'latest';
 
 async function checkTagExists(image, tag) {
   const { execa } = await import('execa');
@@ -51,9 +53,8 @@ async function showFile(commit, file) {
   return stdout;
 }
 
-async function main({ yes, force, commit, releaseTag, prerelease }) {
-  // TODO: if no --commit provided, assume last commit and ask for confirmation
-  // TODO: if no --releaseTag provided, read it from the --commit and ask for confirmation
+async function main({ yes, force, commit, releaseTag }) {
+  const { default: chalk } = await import('chalk');
 
   if (!commit) {
     const log = await commitLog();
@@ -64,7 +65,7 @@ async function main({ yes, force, commit, releaseTag, prerelease }) {
         type: 'list',
         choices: log.map((entry) => ({
           value: entry.commit,
-          name: `${entry.commit} ${entry.subject}`,
+          name: `${chalk.blue(entry.commit)} ${entry.subject}`,
         })),
         pageSize: 20,
       },
@@ -88,11 +89,25 @@ async function main({ yes, force, commit, releaseTag, prerelease }) {
     releaseTag = answers.releaseTag;
   }
 
+  const parsedVersion = semver.parse(releaseTag);
+  const isPrerelease = parsedVersion.prerelease.length > 0;
+
+  const tags = [releaseTag];
+
+  if (!isPrerelease) {
+    tags.push(LATEST_TAG);
+  }
+
   if (!yes) {
+    const imagesToBePublished = tags.map((tag) => `${IMAGE_NAME}:${tag}`);
     const answers = await inquirer.prompt([
       {
         name: 'confirmed',
-        message: `Release commit ${commit} as ${IMAGE_NAME}:${releaseTag}?`,
+        message: `Docker image ${chalk.blue(
+          `${IMAGE_NAME}:${commit}`,
+        )} will be published as \n${imagesToBePublished
+          .map((image) => `  - ${chalk.blue(image)}`)
+          .join('\n')}`,
         type: 'confirm',
       },
     ]);
@@ -111,12 +126,6 @@ async function main({ yes, force, commit, releaseTag, prerelease }) {
     return;
   }
 
-  const tags = [releaseTag];
-
-  if (!prerelease) {
-    tags.push('latest-test');
-  }
-
   await dockerCreateTag(IMAGE_NAME, commit, tags);
 }
 
@@ -133,11 +142,6 @@ yargs
         .option('releaseTag', {
           describe: 'The tag under which to release this image e.g. v1.2.3',
           type: 'string',
-        })
-        .option('prerelease', {
-          describe: 'Mark as a prerelease (omits the "latest" tag)',
-          type: 'boolean',
-          default: false,
         })
         .option('force', {
           describe: 'Create tag, even if it already exists',

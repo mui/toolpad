@@ -107,6 +107,8 @@ jobs:
     steps:
       - checkout
       - install_js
+      - run: echo pwd
+      - run: cat ./.eslintignore
       - run:
           name: Eslint
           command: yarn eslint

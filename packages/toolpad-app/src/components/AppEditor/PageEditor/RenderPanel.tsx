@@ -110,7 +110,7 @@ const NodeHudWrapper = styled('div')<{
     pointerEvents: 'initial',
     position: 'absolute',
     [`&.${overlayClasses.layout}`]: {
-      outline: '1px dotted rgba(255,0,0,.15)',
+      outline: '1px dotted rgba(255,0,0,.2)',
     },
     [`&.${overlayClasses.highlightedTop}`]: {
       '&:after': {
@@ -690,16 +690,19 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const parentChildren = parent ? appDom.getChildNodes(dom, parent).children : [];
 
-      const isSecondLastColumnChild =
-        parent && appDom.isElement(parent) && isPageColumn(parent) && parentChildren.length === 2;
+      const isSecondLastLayoutContainerChild =
+        parent &&
+        appDom.isElement(parent) &&
+        (isPageRow(parent) || isPageColumn(parent)) &&
+        parentChildren.length === 2;
 
-      if (isSecondLastColumnChild) {
-        const lastColumnChild = parentChildren.filter(
-          (child) => child.id !== movedOrDeletedNode.id,
-        )[0];
-
+      if (isSecondLastLayoutContainerChild) {
         if (parent.parentIndex && parentParent && appDom.isElement(parentParent)) {
-          domApi.moveNode(lastColumnChild, parentParent, 'children', parent.parentIndex);
+          const lastContainerChild = parentChildren.filter(
+            (child) => child.id !== movedOrDeletedNode.id,
+          )[0];
+
+          domApi.moveNode(lastContainerChild, parentParent, 'children', parent.parentIndex);
           domApi.removeNode(parent.id);
         }
       }
@@ -756,7 +759,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       // Drop on page
       if (isDraggingOverPage) {
-        if (!selection || !isPageRow(draggedNode)) {
+        if (!isPageRow(draggedNode)) {
           const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
           domApi.addNode(rowContainer, dragOverNode, 'children');
           parent = rowContainer;
@@ -827,7 +830,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               }
             }
 
-            if (!isDraggingOverRow) {
+            if (!isDraggingOverRow || isPageRow(draggedNode)) {
               addOrMoveNode(draggedNode, parent, 'children', newParentIndex);
             }
 
@@ -842,10 +845,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           }
 
           if (isDraggingOverVerticalContainer) {
-            const newParentIndex =
-              dragOverNodeZone === DropZone.TOP
-                ? appDom.getNewFirstParentIndexInNode(dom, dragOverNode)
-                : appDom.getNewLastParentIndexInNode(dom, dragOverNode);
+            const isDraggingOverDirectionStart =
+              dragOverNodeZone ===
+              (dragOverNodeInfo?.direction === 'column' ? DropZone.TOP : DropZone.BOTTOM);
+
+            const newParentIndex = isDraggingOverDirectionStart
+              ? appDom.getNewFirstParentIndexInNode(dom, dragOverNode)
+              : appDom.getNewLastParentIndexInNode(dom, dragOverNode);
 
             addOrMoveNode(draggedNode, dragOverNode, 'children', newParentIndex);
           }
@@ -858,7 +864,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         if ([DropZone.RIGHT, DropZone.LEFT].includes(dragOverNodeZone)) {
           if (isOriginalParentNonPageVerticalContainer) {
-            const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
+            const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {
+              justifyContent: appDom.createConst(originalParentInfo?.props.alignItems || 'start'),
+            });
             domApi.addNode(
               rowContainer,
               parent,
@@ -1095,11 +1103,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     };
   }, [overlayKey, handlePageViewStateUpdate, rootElm]);
 
-  const isDraggedComponentDroppable =
-    (dragOverNodeId &&
-      availableDropTargetIds.has(dragOverNodeId) &&
-      availableDropZones.includes(dragOverNodeZone)) ||
-    false;
+  const isDraggedComponentDroppable = React.useMemo(
+    () =>
+      (dragOverNodeId &&
+        availableDropTargetIds.has(dragOverNodeId) &&
+        availableDropZones.includes(dragOverNodeZone)) ||
+      false,
+    [availableDropTargetIds, availableDropZones, dragOverNodeId, dragOverNodeZone],
+  );
 
   return (
     <RenderPanelRoot className={className}>

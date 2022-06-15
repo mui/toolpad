@@ -60,7 +60,6 @@ const overlayClasses = {
   active: 'Toolpad_Active',
   available: 'Toolpad_Available',
   componentDragging: 'Toolpad_ComponentDragging',
-  componentDroppable: 'Toolpad_ComponentDroppable',
   selectionHint: 'Toolpad_SelectionHint',
   hudOverlay: 'Toolpad_HudOverlay',
 };
@@ -72,7 +71,7 @@ const OverlayRoot = styled('div')({
   '&:focus': {
     outline: 'none',
   },
-  [`&.${overlayClasses.componentDroppable}`]: {
+  [`&.${overlayClasses.componentDragging}`]: {
     cursor: 'copy',
   },
   [`& .${overlayClasses.selectionHint}`]: {
@@ -99,17 +98,24 @@ const OverlayRoot = styled('div')({
   },
 });
 
-const NodeHudWrapper = styled('div')<{
-  highlightHeight?: number | string;
-  highlightWidth?: number | string;
-  highlightTop?: number;
-  highlightLeft?: number;
-}>(
-  ({ highlightHeight = '100%', highlightWidth = '100%', highlightTop = 0, highlightLeft = 0 }) => ({
+const NodeHudWrapper = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'highlightRelativeRect',
+})<{
+  highlightRelativeRect?: Partial<Rectangle>;
+}>(({ highlightRelativeRect = {} }) => {
+  const {
+    x: highlightRelativeX = 0,
+    y: highlightRelativeY = 0,
+    width: highlightWidth = '100%',
+    height: highlightHeight = '100%',
+  } = highlightRelativeRect;
+
+  return {
     // capture mouse events
     pointerEvents: 'initial',
     position: 'absolute',
-    [`&.${overlayClasses.layout}`]: {
+    [`.${overlayClasses.layout}`]: {
+      position: 'absolute',
       outline: '1px dotted rgba(255,0,0,.2)',
     },
     [`&.${overlayClasses.highlightedTop}`]: {
@@ -120,7 +126,7 @@ const NodeHudWrapper = styled('div')<{
         height: 4,
         width: highlightWidth,
         top: -2,
-        left: highlightLeft,
+        left: highlightRelativeX,
       },
     },
     [`&.${overlayClasses.highlightedRight}`]: {
@@ -130,7 +136,7 @@ const NodeHudWrapper = styled('div')<{
         position: 'absolute',
         height: highlightHeight,
         width: 4,
-        top: highlightTop,
+        top: highlightRelativeY,
         right: -2,
       },
     },
@@ -142,7 +148,7 @@ const NodeHudWrapper = styled('div')<{
         height: 4,
         width: highlightWidth,
         bottom: -2,
-        left: highlightLeft,
+        left: highlightRelativeX,
       },
     },
     [`&.${overlayClasses.highlightedLeft}`]: {
@@ -153,24 +159,25 @@ const NodeHudWrapper = styled('div')<{
         height: highlightHeight,
         width: 4,
         left: -2,
-        top: highlightTop,
+        top: highlightRelativeY,
       },
     },
     [`&.${overlayClasses.highlightedCenter}`]: {
       border: '4px solid #44EB2D',
     },
-    [`&.${overlayClasses.selected}`]: {
-      border: '1px solid red',
-      [`& .${overlayClasses.selectionHint}`]: {
-        display: 'flex',
-      },
+    [`.${overlayClasses.selected}`]: {
+      position: 'absolute',
+      outline: '1px solid red',
+    },
+    [`& .${overlayClasses.selectionHint}`]: {
+      display: 'flex',
     },
     [`&.${overlayClasses.allowNodeInteraction}`]: {
       // block pointer-events so we can interact with the selection
       pointerEvents: 'none',
     },
-  }),
-);
+  };
+});
 
 const EmptyDropZone = styled('div')({
   alignItems: 'center',
@@ -280,7 +287,8 @@ function isVerticalContainer(nodeInfo: NodeInfo): boolean {
 interface SelectionHudProps {
   node: appDom.ElementNode | appDom.PageNode;
   parentInfo: NodeInfo | null;
-  rect: Rectangle;
+  nodeRect: Rectangle;
+  dropAreaRect: Rectangle;
   highlightedZone?: DropZone | null;
   selected?: boolean;
   allowInteraction?: boolean;
@@ -295,7 +303,8 @@ function NodeHud({
   highlightedZone,
   selected,
   allowInteraction,
-  rect,
+  nodeRect,
+  dropAreaRect,
   onDragStart,
   onDelete,
   hasContainer,
@@ -317,42 +326,61 @@ function NodeHud({
   const isHorizontalContainerChild = parentInfo ? isHorizontalContainer(parentInfo) : false;
   const isVerticalContainerChild = parentInfo ? isVerticalContainer(parentInfo) : false;
 
+  const nodeRelativeRect = {
+    ...nodeRect,
+    x: nodeRect.x - dropAreaRect.x,
+    y: nodeRect.y - dropAreaRect.y,
+  };
+
   const highlightHeight =
     isHorizontalContainerChild && parentInfo?.rect ? parentInfo.rect.height : undefined;
   const highlightWidth =
     isVerticalContainerChild && parentInfo?.rect ? parentInfo.rect.width : undefined;
 
-  const highlightTop = highlightHeight && parentInfo?.rect ? parentInfo.rect.y - rect.y : undefined;
-  const highlightLeft = highlightWidth && parentInfo?.rect ? parentInfo.rect.x - rect.x : undefined;
+  const highlightRelativeX =
+    highlightWidth && parentInfo?.rect ? parentInfo.rect.x - dropAreaRect.x : undefined;
+  const highlightRelativeY =
+    highlightHeight && parentInfo?.rect ? parentInfo.rect.y - dropAreaRect.y : undefined;
 
   return (
     <React.Fragment>
       {hasEmptyContainer ? (
-        <EmptyDropZone style={absolutePositionCss(rect)}>+</EmptyDropZone>
+        <EmptyDropZone style={absolutePositionCss(nodeRect)}>+</EmptyDropZone>
       ) : null}
       <NodeHudWrapper
         draggable
         data-node-id={node.id}
         onDragStart={onDragStart}
-        style={absolutePositionCss(rect)}
+        style={absolutePositionCss(dropAreaRect)}
         className={clsx({
-          [overlayClasses.layout]: hasContainer,
           ...(highlightedZoneOverlayClass ? { [highlightedZoneOverlayClass]: true } : {}),
-          [overlayClasses.selected]: selected,
           [overlayClasses.allowNodeInteraction]: allowInteraction,
         })}
-        highlightHeight={highlightHeight}
-        highlightWidth={highlightWidth}
-        highlightTop={highlightTop}
-        highlightLeft={highlightLeft}
+        highlightRelativeRect={{
+          x: highlightRelativeX,
+          y: highlightRelativeY,
+          width: highlightWidth,
+          height: highlightHeight,
+        }}
       >
-        <div draggable className={overlayClasses.selectionHint}>
-          {component?.displayName || '<unknown>'}
-          <DragIndicatorIcon color="inherit" />
-          <IconButton aria-label="Remove element" color="inherit" onClick={onDelete}>
-            <DeleteIcon color="inherit" />
-          </IconButton>
-        </div>
+        {hasContainer ? (
+          <span className={overlayClasses.layout} style={absolutePositionCss(nodeRelativeRect)} />
+        ) : null}
+        {selected ? (
+          <React.Fragment>
+            <span
+              className={overlayClasses.selected}
+              style={absolutePositionCss(nodeRelativeRect)}
+            />
+            <div draggable className={overlayClasses.selectionHint}>
+              {component?.displayName || '<unknown>'}
+              <DragIndicatorIcon color="inherit" />
+              <IconButton aria-label="Remove element" color="inherit" onClick={onDelete}>
+                <DeleteIcon color="inherit" />
+              </IconButton>
+            </div>
+          </React.Fragment>
+        ) : null}
       </NodeHudWrapper>
     </React.Fragment>
   );
@@ -1103,15 +1131,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     };
   }, [overlayKey, handlePageViewStateUpdate, rootElm]);
 
-  const isDraggedComponentDroppable = React.useMemo(
-    () =>
-      (dragOverNodeId &&
-        availableDropTargetIds.has(dragOverNodeId) &&
-        availableDropZones.includes(dragOverNodeZone)) ||
-      false,
-    [availableDropTargetIds, availableDropZones, dragOverNodeId, dragOverNodeZone],
-  );
-
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
@@ -1126,7 +1145,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         <OverlayRoot
           className={clsx({
             [overlayClasses.componentDragging]: highlightLayout,
-            [overlayClasses.componentDroppable]: isDraggedComponentDroppable,
           })}
           // Need this to be able to capture key events
           tabIndex={0}
@@ -1149,8 +1167,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
             const hasContainer = nodeInfo ? isContainerComponent(nodeInfo) : false;
 
-            const rect = dropAreaRects[node.id];
-            if (!rect) {
+            const nodeRect = nodeInfo?.rect;
+            const dropAreaRect = dropAreaRects[node.id];
+            if (!nodeRect || !dropAreaRect) {
               return null;
             }
 
@@ -1160,7 +1179,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                   <NodeHud
                     node={node}
                     parentInfo={parentInfo}
-                    rect={rect}
+                    nodeRect={nodeRect}
+                    dropAreaRect={dropAreaRect}
                     highlightedZone={getNodeHighlightedZone(node)}
                     selected={selectedNode?.id === node.id}
                     allowInteraction={isPageNodeHub ? false : nodesWithInteraction.has(node.id)}

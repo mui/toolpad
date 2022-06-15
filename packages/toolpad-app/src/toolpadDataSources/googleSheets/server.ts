@@ -138,14 +138,11 @@ async function execPrivate(
   }
   if (query.type === GoogleSheetsPrivateQueryType.CONNECTION_STATUS) {
     const driveClient = createDriveClient(client);
-    try {
-      const response = await driveClient.about.get({ fields: 'user' });
-      if (response.status === 200) {
-        return response.data.user;
-      }
-    } catch (error) {
-      return null;
+    const response = await driveClient.about.get({ fields: 'user' });
+    if (response.status === 200) {
+      return response.data.user;
     }
+    return null;
   }
   throw new Error(`Google Sheets: Unrecognized private query "${JSON.stringify(query)}"`);
 }

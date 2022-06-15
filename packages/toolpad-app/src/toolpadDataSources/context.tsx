@@ -13,10 +13,14 @@ const [useConnectionContext, ConnectionContextProvider] =
 
 export { useConnectionContext, ConnectionContextProvider };
 
-export function usePrivateQuery<Q = unknown, R = unknown>(query: Q | null): UseQueryResult<R> {
+export function usePrivateQuery<Q = unknown, R = unknown>(
+  query: Q | null,
+  retry?: boolean | number,
+): UseQueryResult<R> {
   const { appId, connectionId } = useConnectionContext();
   return client.useQuery(
     'dataSourceFetchPrivate',
     query == null ? null : [appId, connectionId, query],
+    { retry: retry ?? 3 },
   );
 }

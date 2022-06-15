@@ -194,9 +194,12 @@ function ConnectionParamsInput({
   connectionId,
   handlerBasePath,
 }: ConnectionEditorProps<GoogleSheetsConnectionParams>) {
-  const validatedUser: UseQueryResult<GoogleDriveUser> = usePrivateQuery({
-    type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS,
-  });
+  const validatedUser: UseQueryResult<GoogleDriveUser> = usePrivateQuery(
+    {
+      type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS,
+    },
+    false,
+  );
   return (
     <Stack direction="column" gap={1}>
       <Button

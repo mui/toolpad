@@ -16,7 +16,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
-import { NodeId } from '../../../types';
+import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';

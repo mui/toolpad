@@ -8,9 +8,9 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
+import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
-import { NodeId } from '../../../types';
 import MapEntriesEditor from '../../MapEntriesEditor';
 
 export interface UrlQueryEditorProps {

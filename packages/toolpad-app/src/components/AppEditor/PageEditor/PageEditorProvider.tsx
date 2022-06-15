@@ -1,7 +1,7 @@
-import { LiveBindings } from '@mui/toolpad-core';
+import { NodeId, LiveBindings } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
-import { NodeId, SlotLocation, PageViewState } from '../../../types';
+import { SlotLocation, PageViewState } from '../../../types';
 import { update, updateOrCreate } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'component' | 'theme';

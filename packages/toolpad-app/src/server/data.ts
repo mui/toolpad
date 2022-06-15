@@ -1,4 +1,4 @@
-import { BindableAttrValue } from '@mui/toolpad-core';
+import { NodeId, BindableAttrValue } from '@mui/toolpad-core';
 import {
   App,
   DomNodeAttributeType,
@@ -6,7 +6,7 @@ import {
   Release,
   Prisma,
 } from '../../prisma/generated/client';
-import { ServerDataSource, ApiResult, NodeId, VersionOrPreview } from '../types';
+import { ServerDataSource, ApiResult, VersionOrPreview } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';

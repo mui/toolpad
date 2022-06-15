@@ -76,7 +76,7 @@ export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
     readonly title: ConstantAttrValue<string>;
-    readonly urlQuery: ConstantAttrValue<Record<string, string>>;
+    readonly parameters?: ConstantAttrValue<[string, string][]>;
   };
 }
 

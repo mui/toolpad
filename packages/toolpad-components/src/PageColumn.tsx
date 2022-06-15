@@ -42,7 +42,7 @@ export default createComponent(PageColumn, {
       },
       label: 'Horizontal alignment',
       control: { type: 'HorizontalAlign' },
-      defaultValue: 'center',
+      defaultValue: 'start',
     },
     children: {
       typeDef: { type: 'element' },

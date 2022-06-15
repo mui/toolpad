@@ -7,8 +7,16 @@ const LATEST_TAG = 'latest';
 
 async function checkTagExists(image, tag) {
   const { execa } = await import('execa');
-  const { exitCode } = await execa('docker', ['manifest', 'inspect', `${image}:${tag}`]);
-  return exitCode === 0;
+  try {
+    const { exitCode } = await execa('docker', ['manifest', 'inspect', `${image}:${tag}`]);
+    return exitCode === 0;
+  } catch (err) {
+    const { stderr } = err;
+    if (stderr === `no such manifest: docker.io/${image}:${tag}`) {
+      return false;
+    }
+    throw err;
+  }
 }
 
 async function dockerCreateTag(image, srcTag, destTags) {
@@ -53,7 +61,7 @@ async function showFile(commit, file) {
   return stdout;
 }
 
-async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest, ...rest }) {
+async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest }) {
   const { default: chalk } = await import('chalk');
 
   if (!commit) {
@@ -84,7 +92,7 @@ async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest, ...
         type: 'input',
         async default() {
           const lernaJson = JSON.parse(await showFile(commit, 'lerna.json'));
-          return lernaJson.version;
+          return `v${lernaJson.version}`;
         },
       },
     ]);

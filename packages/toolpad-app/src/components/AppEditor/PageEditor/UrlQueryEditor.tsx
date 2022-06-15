@@ -33,10 +33,10 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   return (
     <React.Fragment>
       <Button color="inherit" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
-        URL query
+        Add page parameters
       </Button>
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>Edit URL query</DialogTitle>
+        <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
           <MapEntriesEditor
             sx={{ my: 1 }}

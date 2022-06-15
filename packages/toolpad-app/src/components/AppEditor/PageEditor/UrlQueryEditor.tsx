@@ -1,14 +1,16 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import StringRecordEditor from '../../StringRecordEditor';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { NodeId } from '../../../types';
+import MapEntriesEditor from '../../MapEntriesEditor';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
 }
+
+const EMPTY_OBJECT = {};
 
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   const dom = useDom();
@@ -18,14 +20,14 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
-  const [input, setInput] = React.useState(page.attributes.urlQuery.value || {});
-  React.useEffect(
-    () => setInput(page.attributes.urlQuery.value || {}),
-    [page.attributes.urlQuery.value],
-  );
+  const rawValue: Record<string, string> = page.attributes.urlQuery.value || EMPTY_OBJECT;
+  const valueAsEntries = React.useMemo(() => Object.entries(rawValue), [rawValue]);
+  const [input, setInput] = React.useState(valueAsEntries);
+  React.useEffect(() => setInput(valueAsEntries), [valueAsEntries]);
 
   const handleSave = React.useCallback(() => {
-    domApi.setNodeNamespacedProp(page, 'attributes', 'urlQuery', appDom.createConst(input));
+    const newRawValue = Object.fromEntries(input);
+    domApi.setNodeNamespacedProp(page, 'attributes', 'urlQuery', appDom.createConst(newRawValue));
   }, [domApi, page, input]);
 
   return (
@@ -36,20 +38,19 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit URL query</DialogTitle>
         <DialogContent>
-          <StringRecordEditor
+          <MapEntriesEditor
             sx={{ my: 1 }}
             fieldLabel="Parameter"
             valueLabel="Default value"
             value={input}
             onChange={setInput}
-            autoFocus
           />
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
             Close
           </Button>
-          <Button disabled={page.attributes.urlQuery.value === input} onClick={handleSave}>
+          <Button disabled={valueAsEntries === input} onClick={handleSave}>
             Save
           </Button>
         </DialogActions>

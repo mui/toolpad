@@ -169,7 +169,6 @@ function createDefaultDom(): appDom.AppDom {
     name: 'Page 1',
     attributes: {
       title: appDom.createConst('Page 1'),
-      urlQuery: appDom.createConst({}),
     },
   });
 

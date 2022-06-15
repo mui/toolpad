@@ -365,12 +365,13 @@ function parseBindings(
   }
 
   const urlParams = new URLSearchParams(location.search);
-  for (const [paramName, paramValue] of urlParams.entries()) {
-    const bindingId = `${page.id}.query.${paramName}`;
-    const scopePath = `page.query.${paramName}`;
+  const pageParameters = page.attributes.parameters?.value || [];
+  for (const [paramName, paramDefault] of pageParameters) {
+    const bindingId = `${page.id}.parameters.${paramName}`;
+    const scopePath = `page.parameters.${paramName}`;
     parsedBindingsMap.set(bindingId, {
       scopePath,
-      result: { value: paramValue },
+      result: { value: urlParams.get(paramName) || paramDefault },
     });
   }
 

@@ -1,10 +1,17 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import StringRecordEditor from '../../StringRecordEditor';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { NodeId } from '../../../types';
+import MapEntriesEditor from '../../MapEntriesEditor';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
@@ -18,38 +25,40 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
-  const [input, setInput] = React.useState(page.attributes.urlQuery.value || {});
-  React.useEffect(
-    () => setInput(page.attributes.urlQuery.value || {}),
-    [page.attributes.urlQuery.value],
-  );
+  const value = page.attributes.parameters?.value;
+  const [input, setInput] = React.useState(value);
+  React.useEffect(() => setInput(value), [value]);
 
   const handleSave = React.useCallback(() => {
-    domApi.setNodeNamespacedProp(page, 'attributes', 'urlQuery', appDom.createConst(input));
+    domApi.setNodeNamespacedProp(page, 'attributes', 'parameters', appDom.createConst(input || []));
   }, [domApi, page, input]);
 
   return (
     <React.Fragment>
       <Button color="inherit" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
-        URL query
+        Add page parameters
       </Button>
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>Edit URL query</DialogTitle>
+        <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
-          <StringRecordEditor
-            sx={{ my: 1 }}
+          <Typography>
+            The parameters you define below will be made available in bindings under the{' '}
+            <code>page.parameters</code> global variable. You can set these parameters in the url
+            with query variables (<code>?param=value</code>).
+          </Typography>
+          <MapEntriesEditor
+            sx={{ my: 3 }}
             fieldLabel="Parameter"
             valueLabel="Default value"
-            value={input}
+            value={input || []}
             onChange={setInput}
-            autoFocus
           />
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
             Close
           </Button>
-          <Button disabled={page.attributes.urlQuery.value === input} onClick={handleSave}>
+          <Button disabled={value === input} onClick={handleSave}>
             Save
           </Button>
         </DialogActions>

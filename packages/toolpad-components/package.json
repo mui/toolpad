@@ -31,10 +31,15 @@
   "dependencies": {
     "@mui/material": "^5.8.0",
     "@mui/toolpad-core": "^0.0.5",
-    "@mui/x-data-grid-pro": "^5.11.0",
-    "react": "^18.1.0"
+    "@mui/x-data-grid-pro": "^5.11.0"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "react": "^18.2.0"
   }
 }

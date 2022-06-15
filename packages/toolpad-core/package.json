@@ -33,11 +33,16 @@
   "dependencies": {
     "@mui/x-data-grid-pro": "^5.11.0",
     "quickjs-emscripten": "^0.20.0",
-    "react": "^18.1.0",
     "react-error-boundary": "^3.1.4",
     "react-query": "^3.34.19"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "react": "^18.2.0"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
   }
 }

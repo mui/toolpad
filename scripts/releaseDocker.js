@@ -53,7 +53,7 @@ async function showFile(commit, file) {
   return stdout;
 }
 
-async function main({ yes, force, commit, releaseTag }) {
+async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest, ...rest }) {
   const { default: chalk } = await import('chalk');
 
   if (!commit) {
@@ -94,7 +94,7 @@ async function main({ yes, force, commit, releaseTag }) {
 
   const tags = [releaseTag];
 
-  if (!isPrerelease) {
+  if (!noLatest && !isPrerelease) {
     tags.push(LATEST_TAG);
   }
 
@@ -106,8 +106,8 @@ async function main({ yes, force, commit, releaseTag }) {
         message: `Docker image ${chalk.blue(
           `${IMAGE_NAME}:${commit}`,
         )} will be published as \n${imagesToBePublished
-          .map((image) => `  - ${chalk.blue(image)}`)
-          .join('\n')}`,
+          .map((image) => `    - ${chalk.blue(image)}`)
+          .join('\n')}\n  Does this look right?`,
         type: 'confirm',
       },
     ]);
@@ -145,6 +145,11 @@ yargs
         })
         .option('force', {
           describe: 'Create tag, even if it already exists',
+          type: 'boolean',
+          default: false,
+        })
+        .option('no-latest', {
+          describe: 'Don\'t create the "latest" tag.',
           type: 'boolean',
           default: false,
         });

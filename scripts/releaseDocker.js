@@ -1,7 +1,9 @@
 const yargs = require('yargs');
 const inquirer = require('inquirer');
+const semver = require('semver');
 
 const IMAGE_NAME = 'muicom/toolpad';
+const LATEST_TAG = 'latest';
 
 async function checkTagExists(image, tag) {
   const { execa } = await import('execa');
@@ -51,21 +53,22 @@ async function showFile(commit, file) {
   return stdout;
 }
 
-async function main({ yes, force, commit, releaseTag, prerelease }) {
-  // TODO: if no --commit provided, assume last commit and ask for confirmation
-  // TODO: if no --releaseTag provided, read it from the --commit and ask for confirmation
+async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest, ...rest }) {
+  const { default: chalk } = await import('chalk');
 
   if (!commit) {
-    const log = await commitLog();
     const answers = await inquirer.prompt([
       {
         name: 'commit',
         message: 'Which commit contains the release?',
         type: 'list',
-        choices: log.map((entry) => ({
-          value: entry.commit,
-          name: `${entry.commit} ${entry.subject}`,
-        })),
+        async choices() {
+          const log = await commitLog();
+          return log.map((entry) => ({
+            value: entry.commit,
+            name: `${chalk.blue(entry.commit)} ${entry.subject}`,
+          }));
+        },
         pageSize: 20,
       },
     ]);
@@ -74,30 +77,48 @@ async function main({ yes, force, commit, releaseTag, prerelease }) {
   }
 
   if (!releaseTag) {
-    const lernaJson = JSON.parse(await showFile(commit, 'lerna.json'));
-
     const answers = await inquirer.prompt([
       {
         name: 'releaseTag',
         message: 'Which tag will this be release under?',
         type: 'input',
-        default: lernaJson.version,
+        async default() {
+          const lernaJson = JSON.parse(await showFile(commit, 'lerna.json'));
+          return lernaJson.version;
+        },
       },
     ]);
 
     releaseTag = answers.releaseTag;
   }
 
+  const parsedVersion = semver.parse(releaseTag);
+  const isPrerelease = parsedVersion.prerelease.length > 0;
+
+  const tags = [releaseTag];
+
+  if (!noLatest && !isPrerelease) {
+    tags.push(LATEST_TAG);
+  }
+
   if (!yes) {
+    const baseImage = `${IMAGE_NAME}:${commit}`;
+    const imagesToBePublished = tags.map((tag) => `${IMAGE_NAME}:${tag}`);
+    const message = [
+      `Docker image ${chalk.blue(baseImage)} will be published as:`,
+      ...imagesToBePublished.map((image) => `    - ${chalk.blue(image)}`),
+      `  Does this look right?`,
+    ].join('\n');
+
     const answers = await inquirer.prompt([
       {
-        name: 'confirmed',
-        message: `Release commit ${commit} as ${IMAGE_NAME}:${releaseTag}?`,
+        name: 'publishConfirmed',
         type: 'confirm',
+        message,
       },
     ]);
 
-    if (!answers.confirmed) {
+    if (!answers.publishConfirmed) {
       // eslint-disable-next-line no-console
       console.log(`Canceled`);
       return;
@@ -109,12 +130,6 @@ async function main({ yes, force, commit, releaseTag, prerelease }) {
     console.error(`Tag "${IMAGE_NAME}:${releaseTag}" already exists`);
     yargs.exit(1, `Tag "${IMAGE_NAME}:${releaseTag}" already exists`);
     return;
-  }
-
-  const tags = [releaseTag];
-
-  if (!prerelease) {
-    tags.push('latest-test');
   }
 
   await dockerCreateTag(IMAGE_NAME, commit, tags);
@@ -134,13 +149,13 @@ yargs
           describe: 'The tag under which to release this image e.g. v1.2.3',
           type: 'string',
         })
-        .option('prerelease', {
-          describe: 'Mark as a prerelease (omits the "latest" tag)',
+        .option('force', {
+          describe: 'Create tag, even if it already exists',
           type: 'boolean',
           default: false,
         })
-        .option('force', {
-          describe: 'Create tag, even if it already exists',
+        .option('no-latest', {
+          describe: 'Don\'t create the "latest" tag.',
           type: 'boolean',
           default: false,
         });

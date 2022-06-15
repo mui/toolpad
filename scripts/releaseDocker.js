@@ -61,10 +61,31 @@ async function showFile(commit, file) {
   return stdout;
 }
 
+async function currentBranch() {
+  const { execa } = await import('execa');
+  const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD']);
+  return stdout;
+}
+
 async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest }) {
   const { default: chalk } = await import('chalk');
 
   if (!commit) {
+    const branch = await currentBranch();
+    if (branch !== 'master') {
+      const { branchConfirmed } = await inquirer.prompt([
+        {
+          name: 'branchConfirmed',
+          type: 'confirm',
+          message: `Current branch is ${chalk.blue(branch)}. Are you sure you want to proceed?`,
+          default: false,
+        },
+      ]);
+
+      if (!branchConfirmed) {
+        yargs.exit();
+      }
+    }
     const answers = await inquirer.prompt([
       {
         name: 'commit',

@@ -57,16 +57,18 @@ async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest, ...
   const { default: chalk } = await import('chalk');
 
   if (!commit) {
-    const log = await commitLog();
     const answers = await inquirer.prompt([
       {
         name: 'commit',
         message: 'Which commit contains the release?',
         type: 'list',
-        choices: log.map((entry) => ({
-          value: entry.commit,
-          name: `${chalk.blue(entry.commit)} ${entry.subject}`,
-        })),
+        async choices() {
+          const log = await commitLog();
+          return log.map((entry) => ({
+            value: entry.commit,
+            name: `${chalk.blue(entry.commit)} ${entry.subject}`,
+          }));
+        },
         pageSize: 20,
       },
     ]);
@@ -75,14 +77,15 @@ async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest, ...
   }
 
   if (!releaseTag) {
-    const lernaJson = JSON.parse(await showFile(commit, 'lerna.json'));
-
     const answers = await inquirer.prompt([
       {
         name: 'releaseTag',
         message: 'Which tag will this be release under?',
         type: 'input',
-        default: lernaJson.version,
+        async default() {
+          const lernaJson = JSON.parse(await showFile(commit, 'lerna.json'));
+          return lernaJson.version;
+        },
       },
     ]);
 

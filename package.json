@@ -21,6 +21,7 @@
     "start": "dotenv cross-env FORCE_COLOR=1 yarn workspace @mui/toolpad-app start",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --scope @mui/toolpad-core --scope @mui/toolpad-components --scope @mui/toolpad-app",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
+    "jsonlint": "node ./scripts/jsonlint.js",
     "prisma": "dotenv yarn workspace @mui/toolpad-app run --cwd=\"./packages/toolpad-app\" prisma",
     "release:build": "lerna run --stream build",
     "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
@@ -42,6 +43,7 @@
     "@types/rimraf": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.21.0",
     "@typescript-eslint/parser": "^5.21.0",
+    "chalk": "^4.1.2",
     "eslint": "^8.14.0",
     "eslint-config-airbnb-typescript": "12",
     "eslint-config-prettier": "^8.3.0",
@@ -66,7 +68,6 @@
     "yarn-deduplicate": "^4.0.0"
   },
   "dependencies": {
-    "chalk": "^5.0.1",
     "cross-env": "^7.0.3",
     "dotenv-cli": "^5.1.0",
     "inquirer": "^8.2.4",

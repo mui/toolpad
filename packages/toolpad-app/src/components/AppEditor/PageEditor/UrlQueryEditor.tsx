@@ -43,8 +43,8 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
         <DialogContent>
           <Typography>
             The parameters you define below will be made available in bindings under the{' '}
-            <code>page</code> global variable. You can set these parameters in the url with query
-            variables (<code>?param=value</code>).
+            <code>page.parameters</code> global variable. You can set these parameters in the url
+            with query variables (<code>?param=value</code>).
           </Typography>
           <MapEntriesEditor
             sx={{ my: 3 }}

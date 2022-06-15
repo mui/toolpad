@@ -7,8 +7,7 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
-import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
-import { NodeId } from '../../../types';
+import { NodeId, createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { tryFormat } from '../../../utils/prettier';
@@ -20,6 +19,7 @@ import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
 import { mapValues } from '../../../utils/collections';
+import ErrorAlert from '../PageEditor/ErrorAlert';
 
 const Noop = createComponent(() => null);
 
@@ -67,7 +67,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
 
   usePageTitle(`${codeComponentNode.name} | Toolpad editor`);
 
-  const updateInputExtern = React.useCallback((newInput) => {
+  const updateInputExtern = React.useCallback((newInput: string) => {
     const editor = editorRef.current;
     if (!editor) {
       return;
@@ -220,15 +220,13 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
               <React.Suspense fallback={null}>
                 <ErrorBoundary
                   resetKeys={[CodeComponent]}
-                  fallbackRender={({ error: runtimeError }) => (
-                    <React.Fragment>{runtimeError.message}</React.Fragment>
-                  )}
+                  fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
                   <AppThemeProvider node={theme}>
                     <CodeComponent {...defaultProps} />
                   </AppThemeProvider>
                 </ErrorBoundary>
-                {compileError?.message}
+                {compileError ? <ErrorAlert error={compileError} /> : null}
               </React.Suspense>
             </FrameContent>,
             frameDocument.body,

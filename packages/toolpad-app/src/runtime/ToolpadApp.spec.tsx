@@ -20,7 +20,6 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
     name: 'Page',
     attributes: {
       title: appDom.createConst(''),
-      urlQuery: appDom.createConst({}),
     },
   });
   dom = appDom.addNode(dom, page, root, 'pages');

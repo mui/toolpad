@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { Alert, Snackbar } from '@mui/material';
-import { BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
+import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
-import { NodeId } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';

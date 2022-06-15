@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Container, Stack, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { NodeId, ConnectionEditorProps, ClientDataSource } from '../../../types';
+import { NodeId } from '@mui/toolpad-core';
+import { ConnectionEditorProps, ClientDataSource } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import dataSources from '../../../toolpadDataSources/client';
-import { QueryEditorContextProvider } from '../../../toolpadDataSources/context';
+import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 
@@ -47,18 +48,13 @@ function ConnectionEditorContent<P>({
   const domApi = useDomApi();
 
   const handleConnectionChange = React.useCallback(
-    (connectionParams) => {
-      (Object.keys(connectionParams) as (keyof P)[]).forEach((propName) => {
-        if (typeof propName !== 'string' || !connectionParams[propName]) {
-          return;
-        }
-        domApi.setNodeNamespacedProp(
-          connectionNode,
-          'attributes',
-          'params',
-          appDom.createSecret(connectionParams),
-        );
-      });
+    (connectionParams: P | null) => {
+      domApi.setNodeNamespacedProp(
+        connectionNode,
+        'attributes',
+        'params',
+        appDom.createSecret(connectionParams),
+      );
     },
     [connectionNode, domApi],
   );
@@ -71,26 +67,28 @@ function ConnectionEditorContent<P>({
   );
 
   return (
-    <Box className={className} sx={{ width: '100%', height: '100%', p: 3 }}>
-      <Stack spacing={1}>
-        <NodeNameEditor node={connectionNode} />
-        {dataSource ? (
-          <QueryEditorContextProvider value={connectionEditorContext}>
-            <ConnectionParamsEditor
-              dataSource={dataSource}
-              value={connectionNode.attributes.params.value}
-              onChange={handleConnectionChange}
-              handlerBasePath={`/api/dataSources/${dataSourceType}`}
-              appId={appId}
-              connectionId={connectionNode.id}
-            />
-          </QueryEditorContextProvider>
-        ) : (
-          <Typography>
-            Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
-          </Typography>
-        )}
-      </Stack>
+    <Box className={className} sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
+      <Container sx={{ my: 2 }}>
+        <Stack spacing={1}>
+          <NodeNameEditor node={connectionNode} />
+          {dataSource ? (
+            <ConnectionContextProvider value={connectionEditorContext}>
+              <ConnectionParamsEditor
+                dataSource={dataSource}
+                value={connectionNode.attributes.params.value}
+                onChange={handleConnectionChange}
+                handlerBasePath={`/api/dataSources/${dataSourceType}`}
+                appId={appId}
+                connectionId={connectionNode.id}
+              />
+            </ConnectionContextProvider>
+          ) : (
+            <Typography>
+              Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
+            </Typography>
+          )}
+        </Stack>
+      </Container>
     </Box>
   );
 }

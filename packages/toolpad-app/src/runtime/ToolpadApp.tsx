@@ -115,7 +115,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
   const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
   const liveBindings = useBindingsContext();
-  const boundProps = React.useMemo(() => {
+  const boundProps: Record<string, any> = React.useMemo(() => {
     const loadingPropSourceSet = new Set(loadingPropSource);
     const hookResult: Record<string, any> = {};
 

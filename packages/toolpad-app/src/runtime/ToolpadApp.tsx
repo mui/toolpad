@@ -53,6 +53,29 @@ import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 
+export interface NavigateToPage {
+  (pageNodeId: NodeId): void;
+}
+
+export interface EditorHooks {
+  navigateToPage?: NavigateToPage;
+}
+
+export const EditorHooksContext = React.createContext<EditorHooks>({});
+
+function usePageNavigator(): NavigateToPage {
+  const navigate = useNavigate();
+  const navigateToPage: NavigateToPage = React.useCallback(
+    (pageNodeId: NodeId) => {
+      navigate(`/pages/${pageNodeId}`);
+    },
+    [navigate],
+  );
+
+  const editorHooks = React.useContext(EditorHooksContext);
+  return editorHooks.navigateToPage || navigateToPage;
+}
+
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
   minHeight: '100vh',
@@ -173,7 +196,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
     [argTypes, nodeId, setControlledBinding],
   );
 
-  const navigate = useNavigate();
+  const navigateToPage = usePageNavigator();
 
   const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
     return mapProperties(argTypes, ([key, argType]) => {
@@ -187,7 +210,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
         const handler = () => {
           const { page } = action.value;
           if (page) {
-            navigate(`/pages/${page}`);
+            navigateToPage(page);
           }
         };
 
@@ -196,7 +219,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
 
       return null;
     });
-  }, [argTypes, node, navigate]);
+  }, [argTypes, node, navigateToPage]);
 
   const reactChildren =
     childNodes.length > 0

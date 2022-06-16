@@ -204,7 +204,8 @@ export type RuntimeEvent =
       type: 'pageBindingsUpdated';
       bindings: LiveBindings;
     }
-  | { type: 'afterRender' };
+  | { type: 'afterRender' }
+  | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
 
 export interface ComponentConfig<P> {
   /**

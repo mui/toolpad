@@ -22,7 +22,7 @@ commands:
       browsers:
         type: boolean
         default: true
-        description: 'Set to true if you intend to any browser (e.g. with playwright).'
+        description: 'Set to true if you intend to use any browser (e.g. with playwright).'
 
     steps:
       - run:
@@ -60,6 +60,10 @@ commands:
           command: yarn install --frozen-lockfile --verbose
           environment:
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: <<# parameters.browsers >>0<</ parameters.browsers >><<^ parameters.browsers >>1<</ parameters.browsers >>
+
+      - run:
+          name: Generate prisma client
+          command: yarn prisma generate
       - save_cache:
           name: Save yarn cache
           key: v8-yarn-{{ checksum "yarn.lock" }}
@@ -101,6 +105,18 @@ jobs:
       - run:
           name: Check for duplicated packages
           command: yarn deduplicate
+
+  test_lint:
+    <<: *defaults
+    steps:
+      - checkout
+      - install_js
+      - run:
+          name: Eslint
+          command: yarn eslint
+      - run:
+          name: Lint JSON
+          command: yarn jsonlint
 
   test_static:
     <<: *defaults
@@ -178,6 +194,9 @@ workflows:
   pipeline:
     jobs:
       - checkout
+      - test_lint:
+          requires:
+            - checkout
       - test_static:
           requires:
             - checkout

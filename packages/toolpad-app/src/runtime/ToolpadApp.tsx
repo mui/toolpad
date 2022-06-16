@@ -18,6 +18,7 @@ import {
   Slots,
   Placeholder,
   BindableAttrValues,
+  NodeId,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import {
@@ -36,7 +37,7 @@ import {
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
 import * as appDom from '../appDom';
-import { NodeId, VersionOrPreview } from '../types';
+import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import AppOverview from '../components/AppOverview';
 import { getElementNodeComponentId, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';

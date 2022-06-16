@@ -1,7 +1,7 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
-import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType } from '@mui/toolpad-core';
+import { NodeId, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType } from '@mui/toolpad-core';
 import { NodeFiberHostProps } from '@mui/toolpad-core/runtime';
-import { NodeId, FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
+import { FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
 
 declare global {

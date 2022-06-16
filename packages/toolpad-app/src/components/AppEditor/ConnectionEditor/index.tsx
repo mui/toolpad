@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Box, Container, Stack, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { NodeId, ConnectionEditorProps, ClientDataSource } from '../../../types';
+import { NodeId } from '@mui/toolpad-core';
+import { ConnectionEditorProps, ClientDataSource } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import dataSources from '../../../toolpadDataSources/client';

@@ -26,6 +26,22 @@ import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
+import { createProvidedContext } from '../../utils/react';
+
+interface BindingEditorContext {
+  label: string;
+  globalScope: Record<string, unknown>;
+  /**
+   * Serverside binding, use the QuickJs runtime to evaluate bindings
+   */
+  server?: boolean;
+  disabled?: boolean;
+  propType?: PropValueType;
+  liveBinding?: LiveBinding;
+}
+
+const [useBindingEditorContext, BindingEditorContextProvider] =
+  createProvidedContext<BindingEditorContext>('BindingEditor');
 
 const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -88,6 +104,101 @@ function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreview
   );
 }
 
+export interface JsBindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {}
+
+export function JsBindingEditor<V>({ value, onChange }: JsBindingEditorProps<V>) {
+  const { label, globalScope, server, propType } = useBindingEditorContext();
+  return (
+    <Stack direction="row" sx={{ height: 400, gap: 2 }}>
+      <Box sx={{ width: 200, display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Typography sx={{ mb: 1 }} variant="subtitle2">
+          Scope
+        </Typography>
+        <Box sx={{ flex: 1, width: '100%', overflow: 'auto' }}>
+          <JsonView src={globalScope} />
+        </Box>
+      </Box>
+
+      <Box sx={{ height: '100%', display: 'flex', flex: 1, flexDirection: 'column' }}>
+        <Typography sx={{ mb: 2 }}>
+          Make the &quot;{label}&quot; property dynamic with a JavaScript expression. This property
+          expects a type: <code>{propType?.type || 'any'}</code>.
+        </Typography>
+
+        <JsExpressionBindingEditor<V> globalScope={globalScope} value={value} onChange={onChange} />
+
+        <JsExpressionPreview server={server} input={value} globalScope={globalScope} />
+      </Box>
+    </Stack>
+  );
+}
+
+export interface BindingEditorDialogProps<V>
+  extends WithControlledProp<BindableAttrValue<V> | null> {
+  open: boolean;
+  onClose: () => void;
+}
+
+export function BindingEditorDialog<V>({
+  value,
+  onChange,
+  open,
+  onClose,
+}: BindingEditorDialogProps<V>) {
+  const [input, setInput] = React.useState(value);
+  React.useEffect(() => setInput(value), [value]);
+
+  const committedInput = React.useRef<BindableAttrValue<V> | null>(null);
+
+  const handleSave = React.useCallback(() => {
+    let newValue = input;
+
+    if (input?.type === 'jsExpression') {
+      newValue = {
+        ...input,
+        value: tryFormatExpression(input.value),
+      };
+    }
+
+    committedInput.current = newValue;
+    onChange(newValue);
+  }, [onChange, input]);
+
+  const handleCommit = React.useCallback(() => {
+    handleSave();
+    onClose();
+  }, [handleSave, onClose]);
+
+  const handleRemove = React.useCallback(() => {
+    onChange(null);
+    onClose();
+  }, [onChange, onClose]);
+
+  useShortcut({ code: 'KeyS', metaKey: true, disabled: !open }, handleSave);
+
+  const hasUnsavedChanges = input && input !== committedInput.current;
+
+  return (
+    <Dialog onClose={onClose} open={open} fullWidth scroll="body" maxWidth="lg">
+      <DialogTitle>Bind a property</DialogTitle>
+      <DialogContent>
+        <JsBindingEditor value={input} onChange={(newValue) => setInput(newValue)} />
+      </DialogContent>
+      <DialogActions>
+        <Button color="inherit" variant="text" onClick={onClose}>
+          {hasUnsavedChanges ? 'Cancel' : 'Close'}
+        </Button>
+        <Button color="inherit" disabled={!value} onClick={handleRemove}>
+          Remove binding
+        </Button>
+        <Button disabled={!hasUnsavedChanges} color="primary" onClick={handleCommit}>
+          Update binding
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   label: string;
   globalScope: Record<string, unknown>;
@@ -110,45 +221,12 @@ export function BindingEditor<V>({
   onChange,
   liveBinding,
 }: BindingEditorProps<V>) {
-  const [input, setInput] = React.useState(value);
   const [open, setOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    if (open) {
-      setInput(value);
-    }
-  }, [open, value]);
 
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 
   const hasBinding: boolean = !!value && value.type !== 'const';
-
-  const committedInput = React.useRef<BindableAttrValue<V> | null>(null);
-
-  const handleSave = React.useCallback(() => {
-    let newValue = input;
-
-    if (input?.type === 'jsExpression') {
-      newValue = {
-        ...input,
-        value: tryFormatExpression(input.value),
-      };
-    }
-
-    committedInput.current = newValue;
-    onChange(newValue);
-  }, [onChange, input]);
-
-  const handleCommit = React.useCallback(() => {
-    handleSave();
-    handleClose();
-  }, [handleSave, handleClose]);
-
-  const handleRemove = React.useCallback(() => {
-    onChange(null);
-    handleClose();
-  }, [onChange, handleClose]);
 
   const error: string | undefined = liveBinding?.error?.message;
 
@@ -175,55 +253,19 @@ export function BindingEditor<V>({
     </TooltipComponent>
   );
 
-  useShortcut({ code: 'KeyS', metaKey: true, disabled: !open }, handleSave);
-
-  const hasUnsavedChanges = input && input !== committedInput.current;
+  const bindingEditorContext: BindingEditorContext = {
+    label,
+    globalScope,
+    server,
+    disabled,
+    propType,
+    liveBinding,
+  };
 
   return (
-    <React.Fragment>
+    <BindingEditorContextProvider value={bindingEditorContext}>
       {bindingButtonWithTooltip}
-      <Dialog onClose={handleClose} open={open} fullWidth scroll="body" maxWidth="lg">
-        <DialogTitle>Bind a property</DialogTitle>
-        <DialogContent>
-          <Stack direction="row" sx={{ height: 400, gap: 2 }}>
-            <Box sx={{ width: 200, display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <Typography sx={{ mb: 1 }} variant="subtitle2">
-                Scope
-              </Typography>
-              <Box sx={{ flex: 1, width: '100%', overflow: 'auto' }}>
-                <JsonView src={globalScope} />
-              </Box>
-            </Box>
-
-            <Box sx={{ height: '100%', display: 'flex', flex: 1, flexDirection: 'column' }}>
-              <Typography sx={{ mb: 2 }}>
-                Make the &quot;{label}&quot; property dynamic with a JavaScript expression. This
-                property expects a type: <code>{propType?.type || 'any'}</code>.
-              </Typography>
-
-              <JsExpressionBindingEditor<V>
-                globalScope={globalScope}
-                onCommit={handleCommit}
-                value={input}
-                onChange={(newValue) => setInput(newValue)}
-              />
-
-              <JsExpressionPreview server={server} input={input} globalScope={globalScope} />
-            </Box>
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={handleClose}>
-            {hasUnsavedChanges ? 'Cancel' : 'Close'}
-          </Button>
-          <Button color="inherit" disabled={!value} onClick={handleRemove}>
-            Remove binding
-          </Button>
-          <Button disabled={!hasUnsavedChanges} color="primary" onClick={handleCommit}>
-            Update binding
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
+      <BindingEditorDialog open={open} onClose={handleClose} value={value} onChange={onChange} />
+    </BindingEditorContextProvider>
   );
 }

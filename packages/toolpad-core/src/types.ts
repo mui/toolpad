@@ -32,10 +32,18 @@ export interface SecretAttrValue<V> {
   value: V;
 }
 
-export interface RefAttrValue {
-  type: 'secret';
-  value: NodeId;
+export interface JsExpressionAction {
+  type: 'jsExpressionAction';
+  value: string;
 }
+
+export interface NavigationAction<P = any> {
+  type: 'navigationAction';
+  page: NodeId;
+  parameters?: BindableAttrValues<P>;
+}
+
+export type BindableAction = JsExpressionAction | NavigationAction;
 
 export type BindableAttrValue<V> =
   | ConstantAttrValue<V>
@@ -43,12 +51,6 @@ export type BindableAttrValue<V> =
   | SecretAttrValue<V>
   | BoundExpressionAttrValue
   | JsExpressionAttrValue;
-
-export interface NavigationAction<P> {
-  type: 'navigation';
-  to: NodeId;
-  parameters?: BindableAttrValues<P>;
-}
 
 export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
@@ -59,7 +61,7 @@ export type BindableAttrValues<P> = {
 export type SlotType = 'single' | 'multiple';
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'function';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
 }
 
 export interface StringValueType extends ValueTypeBase {
@@ -91,8 +93,8 @@ export interface ElementValueType extends ValueTypeBase {
   type: 'element';
 }
 
-export interface FunctionValueType extends ValueTypeBase {
-  type: 'function';
+export interface EventValueType extends ValueTypeBase {
+  type: 'event';
 }
 
 export interface ArgControlSpec {
@@ -115,7 +117,7 @@ export interface ArgControlSpec {
     | 'SelectOptions' // SelectOptions specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
-    | 'function'
+    | 'event'
     | 'RowIdFieldSelect'; // Row id field specialized select
 }
 
@@ -126,7 +128,7 @@ type PrimitiveValueType =
   | ObjectValueType
   | ArrayValueType;
 
-export type PropValueType = PrimitiveValueType | ElementValueType | FunctionValueType;
+export type PropValueType = PrimitiveValueType | ElementValueType | EventValueType;
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;

@@ -21,7 +21,7 @@ function Select({ sx, options, ...props }: SelectProps) {
             {parsedOption.label ?? parsedOption.value}
           </MenuItem>
         );
-      }) ?? null}
+      })}
     </TextField>
   );
 }

@@ -39,8 +39,10 @@ export interface JsExpressionAction {
 
 export interface NavigationAction<P = any> {
   type: 'navigationAction';
-  page: NodeId;
-  parameters?: BindableAttrValues<P>;
+  value: {
+    page: NodeId;
+    parameters?: BindableAttrValues<P>;
+  };
 }
 
 export type BindableAction = JsExpressionAction | NavigationAction;
@@ -50,7 +52,8 @@ export type BindableAttrValue<V> =
   | BindingAttrValue
   | SecretAttrValue<V>
   | BoundExpressionAttrValue
-  | JsExpressionAttrValue;
+  | JsExpressionAttrValue
+  | BindableAction;
 
 export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 

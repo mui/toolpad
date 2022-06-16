@@ -28,6 +28,7 @@ import {
   useLocation,
   Navigate,
   Location as RouterLocation,
+  useNavigate,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -95,20 +96,23 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
 
   return (
     /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-    <RenderedNodeContent nodeId={node.id} childNodes={childNodes} Component={Component} />
+    <RenderedNodeContent node={node} childNodes={childNodes} Component={Component} />
   );
 }
 
 interface RenderedNodeContentProps {
-  nodeId: NodeId;
+  node: appDom.PageNode | appDom.ElementNode;
   childNodes: appDom.ElementNode[];
   Component: ToolpadComponent<any>;
 }
 
-function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeContentProps) {
+function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeContentProps) {
   const setControlledBinding = useSetControlledBindingContext();
 
-  const { argTypes, errorProp, loadingProp, loadingPropSource } = Component[TOOLPAD_COMPONENT];
+  const nodeId = node.id;
+
+  const componentConfig = Component[TOOLPAD_COMPONENT];
+  const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
   const liveBindings = useBindingsContext();
   const boundProps = React.useMemo(() => {
@@ -169,6 +173,31 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     [argTypes, nodeId, setControlledBinding],
   );
 
+  const navigate = useNavigate();
+
+  const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
+    return mapProperties(argTypes, ([key, argType]) => {
+      if (!argType || argType.typeDef.type !== 'event' || !appDom.isElement(node)) {
+        return null;
+      }
+
+      const action = node.props?.[key];
+
+      if (action?.type === 'navigationAction') {
+        const handler = () => {
+          const { page } = action.value;
+          if (page) {
+            navigate(`/pages/${page}`);
+          }
+        };
+
+        return [key, handler];
+      }
+
+      return null;
+    });
+  }, [argTypes, node, navigate]);
+
   const reactChildren =
     childNodes.length > 0
       ? childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />)
@@ -179,9 +208,10 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     return {
       ...boundProps,
       ...onChangeHandlers,
+      ...eventHandlers,
       children: reactChildren,
     };
-  }, [boundProps, onChangeHandlers, reactChildren]);
+  }, [boundProps, eventHandlers, onChangeHandlers, reactChildren]);
 
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {
@@ -445,7 +475,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   return (
     <BindingsContextProvider value={liveBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
-        <RenderedNodeContent nodeId={page.id} childNodes={children} Component={PageRootComponent} />
+        <RenderedNodeContent node={page} childNodes={children} Component={PageRootComponent} />
 
         {queries.map((node) => (
           <QueryNode key={node.id} node={node} />

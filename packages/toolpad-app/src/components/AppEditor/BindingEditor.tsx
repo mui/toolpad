@@ -13,11 +13,20 @@ import {
   styled,
   tooltipClasses,
   TooltipProps,
+  TextField,
+  MenuItem,
 } from '@mui/material';
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
 import AddLinkIcon from '@mui/icons-material/AddLink';
-import { LiveBinding, PropValueType, BindableAttrValue } from '@mui/toolpad-core';
+import {
+  LiveBinding,
+  PropValueType,
+  BindableAttrValue,
+  JsExpressionAttrValue,
+  NavigationAction,
+  NodeId,
+} from '@mui/toolpad-core';
 import { WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../JsonView';
@@ -27,6 +36,8 @@ import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
 import { createProvidedContext } from '../../utils/react';
+import { useDom } from '../DomLoader';
+import * as appDom from '../../appDom';
 
 interface BindingEditorContext {
   label: string;
@@ -51,18 +62,17 @@ const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
   },
 }));
 
-interface JsExpressionBindingEditorProps<V>
-  extends WithControlledProp<BindableAttrValue<V> | null> {
+interface JsExpressionBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {
   globalScope: Record<string, unknown>;
   onCommit?: () => void;
 }
 
-function JsExpressionBindingEditor<V>({
+function JsExpressionBindingEditor({
   globalScope,
   value,
   onChange,
   onCommit,
-}: JsExpressionBindingEditorProps<V>) {
+}: JsExpressionBindingEditorProps) {
   const handleChange = React.useCallback(
     (newValue: string) => onChange({ type: 'jsExpression', value: newValue }),
     [onChange],
@@ -104,9 +114,9 @@ function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreview
   );
 }
 
-export interface JsBindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {}
+export interface JsBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {}
 
-export function JsBindingEditor<V>({ value, onChange }: JsBindingEditorProps<V>) {
+export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
   const { label, globalScope, server, propType } = useBindingEditorContext();
   return (
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
@@ -125,11 +135,45 @@ export function JsBindingEditor<V>({ value, onChange }: JsBindingEditorProps<V>)
           expects a type: <code>{propType?.type || 'any'}</code>.
         </Typography>
 
-        <JsExpressionBindingEditor<V> globalScope={globalScope} value={value} onChange={onChange} />
+        <JsExpressionBindingEditor globalScope={globalScope} value={value} onChange={onChange} />
 
         <JsExpressionPreview server={server} input={value} globalScope={globalScope} />
       </Box>
     </Stack>
+  );
+}
+
+export interface NavigationActionEditorProps extends WithControlledProp<NavigationAction | null> {}
+
+function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps) {
+  const dom = useDom();
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  const handlePageChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange({ type: 'navigationAction', value: { page: event.target.value as NodeId } });
+    },
+    [onChange],
+  );
+
+  return (
+    <Box sx={{ my: 1 }}>
+      <Typography>Navigate to a page on this event</Typography>
+      <TextField
+        fullWidth
+        label="page"
+        select
+        value={value?.value?.page || ''}
+        onChange={handlePageChange}
+      >
+        {pages.map((page) => (
+          <MenuItem key={page.id} value={page.id}>
+            {page.name}
+          </MenuItem>
+        ))}
+      </TextField>
+    </Box>
   );
 }
 
@@ -145,6 +189,8 @@ export function BindingEditorDialog<V>({
   open,
   onClose,
 }: BindingEditorDialogProps<V>) {
+  const { propType } = useBindingEditorContext();
+
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
 
@@ -182,7 +228,17 @@ export function BindingEditorDialog<V>({
     <Dialog onClose={onClose} open={open} fullWidth scroll="body" maxWidth="lg">
       <DialogTitle>Bind a property</DialogTitle>
       <DialogContent>
-        <JsBindingEditor value={input} onChange={(newValue) => setInput(newValue)} />
+        {propType?.type === 'event' ? (
+          <NavigationActionEditor
+            value={input?.type === 'navigationAction' ? input : null}
+            onChange={(newValue) => setInput(newValue)}
+          />
+        ) : (
+          <JsBindingEditor
+            value={input?.type === 'jsExpression' ? input : null}
+            onChange={(newValue) => setInput(newValue)}
+          />
+        )}
       </DialogContent>
       <DialogActions>
         <Button color="inherit" variant="text" onClick={onClose}>

@@ -41,8 +41,8 @@ export type BindableAttrValue<V> =
 
 export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
-export type BindableAttrValues<P> = {
-  readonly [K in keyof P & string]?: BindableAttrValue<P[K]>;
+export type BindableAttrValues<P = Record<string, unknown>> = {
+  readonly [K in keyof P]?: BindableAttrValue<P[K]>;
 };
 
 export type SlotType = 'single' | 'multiple';

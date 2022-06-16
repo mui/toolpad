@@ -41,7 +41,7 @@ export type DomAction =
       type: 'DOM_SET_NODE_NAMESPACE';
       node: appDom.AppDomNode;
       namespace: string;
-      value: BindableAttrValues<unknown> | null;
+      value: BindableAttrValues | null;
     }
   | {
       type: 'DOM_ADD_NODE';
@@ -232,7 +232,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         type: 'DOM_SET_NODE_NAMESPACE',
         namespace,
         node,
-        value: value as BindableAttrValues<unknown> | null,
+        value: value as BindableAttrValues | null,
       });
     },
   };

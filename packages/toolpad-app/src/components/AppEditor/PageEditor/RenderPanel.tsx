@@ -599,48 +599,45 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       event.preventDefault();
 
-      const activeDropNode = activeDropNodeId && appDom.getNode(dom, activeDropNodeId);
+      const activeDropNode = appDom.getNode(dom, activeDropNodeId);
 
       let activeDropZone = null;
-      if (activeDropNode) {
-        const activeDropNodeRect = dropAreaRects[activeDropNodeId];
-        const activeDropNodeInfo = nodesInfo[activeDropNodeId];
+      const activeDropNodeRect = dropAreaRects[activeDropNodeId];
+      const activeDropNodeInfo = nodesInfo[activeDropNodeId];
 
-        const isDraggingOverPage = appDom.isPage(activeDropNode);
-        const isDraggingOverElement = appDom.isElement(activeDropNode);
+      const isDraggingOverPage = appDom.isPage(activeDropNode);
+      const isDraggingOverElement = appDom.isElement(activeDropNode);
 
-        const activeDropNodeChildren =
-          (activeDropNode &&
-            (isDraggingOverPage || appDom.isElement(activeDropNode)) &&
-            appDom.getChildNodes(dom, activeDropNode).children) ||
-          [];
+      const activeDropNodeChildren =
+        ((isDraggingOverPage || appDom.isElement(activeDropNode)) &&
+          appDom.getChildNodes(dom, activeDropNode).children) ||
+        [];
 
-        const isDraggingOverEmptyContainer = activeDropNodeInfo
-          ? isContainerComponent(activeDropNodeInfo) && activeDropNodeChildren.length === 0
-          : false;
+      const isDraggingOverEmptyContainer = activeDropNodeInfo
+        ? isContainerComponent(activeDropNodeInfo) && activeDropNodeChildren.length === 0
+        : false;
 
-        if (activeDropNodeRect) {
-          const relativeX = cursorPos.x - activeDropNodeRect.x;
-          const relativeY = cursorPos.y - activeDropNodeRect.y;
+      if (activeDropNodeRect) {
+        const relativeX = cursorPos.x - activeDropNodeRect.x;
+        const relativeY = cursorPos.y - activeDropNodeRect.y;
 
-          activeDropZone =
-            isDraggingOverPage || isDraggingOverEmptyContainer
-              ? NodeDropZone.CENTER
-              : getRectangleEdgeDropZone(
-                  getRectanglePointEdge(activeDropNodeRect, relativeX, relativeY),
-                );
+        activeDropZone =
+          isDraggingOverPage || isDraggingOverEmptyContainer
+            ? NodeDropZone.CENTER
+            : getRectangleEdgeDropZone(
+                getRectanglePointEdge(activeDropNodeRect, relativeX, relativeY),
+              );
 
-          // Detect center in horizontal containers
-          if (
-            isDraggingOverElement &&
-            activeDropNodeInfo &&
-            isHorizontalContainer(activeDropNodeInfo)
-          ) {
-            const fractionalY = relativeY / activeDropNodeRect.height;
+        // Detect center in horizontal containers
+        if (
+          isDraggingOverElement &&
+          activeDropNodeInfo &&
+          isHorizontalContainer(activeDropNodeInfo)
+        ) {
+          const fractionalY = relativeY / activeDropNodeRect.height;
 
-            if (fractionalY > 0.2 && fractionalY < 0.8) {
-              activeDropZone = NodeDropZone.CENTER;
-            }
+          if (fractionalY > 0.2 && fractionalY < 0.8) {
+            activeDropZone = NodeDropZone.CENTER;
           }
         }
       }
@@ -649,13 +646,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         activeDropNodeId !== dragOverNodeId || activeDropZone !== dragOverNodeZone;
 
       if (
-        activeDropNodeId &&
         activeDropZone &&
         hasChangedHighlightedArea &&
         availableDropTargetIds.has(activeDropNodeId)
       ) {
         api.nodeDragOver({ nodeId: activeDropNodeId, zone: activeDropZone });
-      } else if (dragOverNodeId && (!activeDropNodeId || !activeDropZone)) {
+      } else if (dragOverNodeId && !activeDropZone) {
         api.nodeDragOver({ nodeId: null, zone: null });
       }
     },
@@ -663,6 +659,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       getViewCoordinates,
       availableDropTargets,
       dropAreaRects,
+      pageNode.id,
       dom,
       dragOverNodeId,
       dragOverNodeZone,

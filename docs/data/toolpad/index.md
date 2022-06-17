@@ -6,4 +6,4 @@ title: Toolpad docs - Home
 
 <p class="description">Toolpad docs</p>
 
-Hello world!
+Low code tool, for developers, powered by MUI.

@@ -12,7 +12,6 @@ import NextHead from 'next/head';
 import PropTypes from 'prop-types';
 import acceptLanguage from 'accept-language';
 import { useRouter } from 'next/router';
-import { ponyfillGlobal } from '@mui/utils';
 import PageContext from 'docs/src/modules/components/PageContext';
 import GoogleAnalytics from 'docs/src/modules/components/GoogleAnalytics';
 import { ThemeProvider } from 'docs/src/modules/components/ThemeContext';
@@ -28,75 +27,8 @@ import {
 import DocsStyledEngineProvider from 'docs/src/modules/utils/StyledEngineProvider';
 import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
+import pages from '../data/pages';
 
-const pages = [];
-
-function getMuiPackageVersion(packageName, commitRef) {
-  if (commitRef === undefined) {
-    return 'latest';
-  }
-  const shortSha = commitRef.slice(0, 8);
-  return `https://pkg.csb.dev/mui/mui-x/commit/${shortSha}/@mui/${packageName}`;
-}
-
-ponyfillGlobal.muiDocConfig = {
-  csbIncludePeerDependencies: (deps, { versions }) => {
-    const newDeps = { ...deps };
-
-    if (newDeps['@mui/x-data-grid']) {
-      newDeps['@mui/material'] = versions['@mui/material'];
-    }
-
-    if (newDeps['@mui/x-data-grid-pro']) {
-      newDeps['@mui/material'] = versions['@mui/material'];
-      newDeps['@mui/x-data-grid'] = versions['@mui/x-data-grid'];
-    }
-
-    if (newDeps['@mui/x-data-grid-premium']) {
-      newDeps['@mui/material'] = versions['@mui/material'];
-      newDeps['@mui/x-data-grid'] = versions['@mui/x-data-grid'];
-      newDeps['@mui/x-data-grid-pro'] = versions['@mui/x-data-grid-pro'];
-      // TODO: remove when https://github.com/mui/material-ui/pull/32492 is released
-      // use `import 'exceljs'` in demonstrations instead
-      newDeps.exceljs = versions.exceljs;
-    }
-
-    if (newDeps['@mui/x-data-grid-generator']) {
-      newDeps['@mui/material'] = versions['@mui/material'];
-      newDeps['@mui/icons-material'] = versions['@mui/icons-material'];
-      newDeps['@mui/x-data-grid'] = versions['@mui/x-data-grid']; // TS types are imported from @mui/x-data-grid
-      newDeps['@mui/x-data-grid-pro'] = versions['@mui/x-data-grid-pro']; // Some TS types are imported from @mui/x-data-grid-pro
-    }
-
-    if (newDeps['@mui/x-date-pickers']) {
-      newDeps['@mui/material'] = versions['@mui/material'];
-      newDeps['date-fns'] = versions['date-fns'];
-    }
-
-    if (newDeps['@mui/x-date-pickers-pro']) {
-      newDeps['@mui/material'] = versions['@mui/material'];
-      newDeps['@mui/x-date-pickers'] = versions['@mui/x-date-pickers'];
-    }
-
-    return newDeps;
-  },
-  csbGetVersions: (versions, { muiCommitRef }) => {
-    const output = {
-      ...versions,
-      '@mui/x-data-grid': getMuiPackageVersion('x-data-grid', muiCommitRef),
-      '@mui/x-data-grid-pro': getMuiPackageVersion('x-data-grid-pro', muiCommitRef),
-      '@mui/x-data-grid-premium': getMuiPackageVersion('x-data-grid-premium', muiCommitRef),
-      '@mui/x-data-grid-generator': getMuiPackageVersion('x-data-grid-generator', muiCommitRef),
-      '@mui/x-date-pickers': getMuiPackageVersion('x-date-pickers', muiCommitRef),
-      '@mui/x-date-pickers-pro': getMuiPackageVersion('x-date-pickers-pro', muiCommitRef),
-      'date-fns': 'latest',
-      exceljs: 'latest',
-    };
-    return output;
-  },
-};
-
-// Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 
 // Set the locales that the documentation automatically redirects to.

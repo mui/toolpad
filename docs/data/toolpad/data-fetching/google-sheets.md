@@ -1,4 +1,10 @@
+---
+title: Toolpad docs - Data Fetching
+---
+
 # Google Sheets
+
+<p class="description">Google Sheets data source</p>
 
 ## Setup Google Cloud
 
@@ -22,7 +28,7 @@ You need to enable Google Login to connect Google Sheets. If you're an existing 
    where YOUR_APP_URL is the URL Toolpad is hosted on
 
 4. Now add the following URIs under Authorized Redirect URIs:
-   ```bash
+   ```
    https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback
    ```
 5. Lastly, you'll have to enable the Google Sheets and Google Drive APIs for the project using the instructions [here](https://developers.google.com/identity/protocols/oauth2/web-server#enable-apis).

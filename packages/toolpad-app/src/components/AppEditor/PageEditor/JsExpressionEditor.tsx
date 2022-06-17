@@ -111,10 +111,6 @@ export function JsExpressionEditor({
         diagnosticCodesToIgnore: functionBody ? [1108] : [],
       });
 
-      // The types for `monaco.KeyCode` seem to be messed up
-      // eslint-disable-next-line no-bitwise
-      editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => onCommit?.());
-
       if (isMount && autoFocus && !disabled) {
         editor.focus();
         isMount.current = false;
@@ -122,7 +118,7 @@ export function JsExpressionEditor({
 
       setLibSource();
     },
-    [setLibSource, onCommit, autoFocus, disabled, functionBody],
+    [setLibSource, autoFocus, disabled, functionBody],
   );
 
   return (

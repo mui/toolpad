@@ -1,5 +1,5 @@
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Tab, Box, styled, SxProps } from '@mui/material';
+import { Tab, Box, styled } from '@mui/material';
 import * as React from 'react';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
@@ -21,10 +21,9 @@ const ComponentPanelRoot = styled('div')(({ theme }) => ({
 
 export interface ComponentPanelProps {
   className?: string;
-  sx?: SxProps;
 }
 
-export default function ComponentPanel({ className, sx }: ComponentPanelProps) {
+export default function ComponentPanel({ className }: ComponentPanelProps) {
   const state = usePageEditorState();
   const api = usePageEditorApi();
 
@@ -32,7 +31,7 @@ export default function ComponentPanel({ className, sx }: ComponentPanelProps) {
     api.setComponentPanelTab(newValue);
 
   return (
-    <ComponentPanelRoot sx={sx} className={className}>
+    <ComponentPanelRoot className={className}>
       <TabContext value={state.componentPanelTab}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <TabList onChange={handleChange} aria-label="lab API tabs example">

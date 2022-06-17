@@ -12,7 +12,7 @@ const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
 }));
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
-  globalScope: Record<string, unknown>;
+  globalScope?: Record<string, unknown>;
   onCommit?: () => void;
   disabled?: boolean;
   autoFocus?: boolean;
@@ -25,7 +25,7 @@ export function JsExpressionEditor({
   onCommit,
   value,
   onChange,
-  globalScope,
+  globalScope = {},
   disabled,
   autoFocus,
   functionBody,

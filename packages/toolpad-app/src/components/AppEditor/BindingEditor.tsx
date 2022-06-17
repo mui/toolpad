@@ -15,6 +15,7 @@ import {
   TooltipProps,
   TextField,
   MenuItem,
+  Tab,
 } from '@mui/material';
 import * as React from 'react';
 import LinkIcon from '@mui/icons-material/Link';
@@ -26,8 +27,10 @@ import {
   JsExpressionAttrValue,
   NavigationAction,
   NodeId,
+  JsExpressionAction,
 } from '@mui/toolpad-core';
-import { WithControlledProp } from '../../utils/types';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { Maybe, WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
@@ -143,6 +146,27 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
   );
 }
 
+export interface JsExpressionActionEditorProps
+  extends WithControlledProp<JsExpressionAction | null> {}
+
+function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorProps) {
+  const { globalScope } = useBindingEditorContext();
+  const handleCodeChange = React.useCallback(
+    (newValue: string) => onChange({ type: 'jsExpressionAction', value: newValue }),
+    [onChange],
+  );
+  return (
+    <Box sx={{ my: 1 }}>
+      <Typography>Run code when this event fires</Typography>
+      <JsExpressionEditor
+        globalScope={globalScope}
+        value={value?.value || ''}
+        onChange={handleCodeChange}
+      />
+    </Box>
+  );
+}
+
 export interface NavigationActionEditorProps extends WithControlledProp<NavigationAction | null> {}
 
 function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps) {
@@ -173,6 +197,48 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
           </MenuItem>
         ))}
       </TextField>
+    </Box>
+  );
+}
+
+type BindableType = BindableAttrValue<any>['type'];
+
+function getActionTab(value: Maybe<BindableAttrValue<any>>) {
+  return value?.type || 'jsExpressionAction';
+}
+
+export interface ActionEditorProps extends WithControlledProp<BindableAttrValue<any> | null> {}
+
+function ActionEditor({ value, onChange }: ActionEditorProps) {
+  const [activeTab, setActiveTab] = React.useState<BindableType>(getActionTab(value));
+  React.useEffect(() => setActiveTab(getActionTab(value)), [value]);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: BindableType) => {
+    setActiveTab(newValue);
+  };
+
+  return (
+    <Box>
+      <TabContext value={activeTab}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <TabList onChange={handleTabChange} aria-label="lab API tabs example">
+            <Tab label="JS expression" value="jsExpressionAction" />
+            <Tab label="Navigation" value="navigationAction" />
+          </TabList>
+        </Box>
+        <TabPanel value="jsExpressionAction">
+          <JsExpressionActionEditor
+            value={value?.type === 'jsExpressionAction' ? value : null}
+            onChange={onChange}
+          />
+        </TabPanel>
+        <TabPanel value="navigationAction">
+          <NavigationActionEditor
+            value={value?.type === 'navigationAction' ? value : null}
+            onChange={onChange}
+          />
+        </TabPanel>
+      </TabContext>
     </Box>
   );
 }
@@ -229,10 +295,7 @@ export function BindingEditorDialog<V>({
       <DialogTitle>Bind a property</DialogTitle>
       <DialogContent>
         {propType?.type === 'event' ? (
-          <NavigationActionEditor
-            value={input?.type === 'navigationAction' ? input : null}
-            onChange={(newValue) => setInput(newValue)}
-          />
+          <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />
         ) : (
           <JsBindingEditor
             value={input?.type === 'jsExpression' ? input : null}

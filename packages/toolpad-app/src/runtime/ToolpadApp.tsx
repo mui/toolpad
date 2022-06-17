@@ -46,6 +46,7 @@ import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   BindingEvaluationResult,
   buildGlobalScope,
+  evaluateExpression,
   ParsedBinding,
 } from './evalJsBindings';
 import { HTML_ID_APP_ROOT } from '../constants';
@@ -90,6 +91,8 @@ type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
+const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
+  createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
 const [useBindingsContext, BindingsContextProvider] =
   createProvidedContext<Record<string, BindingEvaluationResult>>('LiveBindings');
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
@@ -197,6 +200,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
   );
 
   const navigateToPage = usePageNavigator();
+  const evaluatePageExpression = useEvaluatePageExpression();
 
   const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
     return mapProperties(argTypes, ([key, argType]) => {
@@ -217,9 +221,19 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
         return [key, handler];
       }
 
+      if (action?.type === 'jsExpressionAction') {
+        const handler = () => {
+          const code = action.value;
+          const exprToEvaluate = `(() => {${code}})()`;
+          evaluatePageExpression(exprToEvaluate);
+        };
+
+        return [key, handler];
+      }
+
       return null;
     });
-  }, [argTypes, node, navigateToPage]);
+  }, [argTypes, node, navigateToPage, evaluatePageExpression]);
 
   const reactChildren =
     childNodes.length > 0
@@ -487,6 +501,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [evaluatedBindings],
   );
 
+  const evaluatePageExpression = React.useCallback(
+    (expression: string) => evaluateExpression(expression, pageState),
+    [pageState],
+  );
+
   React.useEffect(() => {
     fireEvent({ type: 'pageStateUpdated', pageState });
   }, [pageState]);
@@ -498,11 +517,13 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   return (
     <BindingsContextProvider value={liveBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
-        <RenderedNodeContent node={page} childNodes={children} Component={PageRootComponent} />
+        <EvaluatePageExpressionProvider value={evaluatePageExpression}>
+          <RenderedNodeContent node={page} childNodes={children} Component={PageRootComponent} />
 
-        {queries.map((node) => (
-          <QueryNode key={node.id} node={node} />
-        ))}
+          {queries.map((node) => (
+            <QueryNode key={node.id} node={node} />
+          ))}
+        </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>
     </BindingsContextProvider>
   );

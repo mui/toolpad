@@ -132,6 +132,10 @@ export async function loadDom(appId: string): Promise<appDom.AppDom> {
     }),
   );
 
+  if (!root) {
+    throw new Error(`App "${appId}" not found`);
+  }
+
   return {
     root,
     nodes,

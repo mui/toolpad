@@ -210,11 +210,7 @@ export const PAGE_GAP = 1;
 
 function PageRoot({ children }: PageRootProps) {
   return (
-    <Container
-      sx={{
-        flexDirection: 'column',
-      }}
-    >
+    <Container>
       <Stack
         data-testid="page-root"
         direction="column"
@@ -222,7 +218,6 @@ function PageRoot({ children }: PageRootProps) {
         sx={{
           my: 2,
           gap: PAGE_GAP,
-          minHeight: `calc(100vh - ${2 * 16}px)`,
         }}
       >
         {children}

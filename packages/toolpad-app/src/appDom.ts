@@ -424,7 +424,7 @@ export function createDom(): AppDom {
 }
 
 /**
- * Creates a new DOM node representing aReact Element
+ * Creates a new DOM node representing a React Element
  */
 export function createElement<P>(
   dom: AppDom,

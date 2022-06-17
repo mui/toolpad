@@ -2,10 +2,17 @@ import { LiveBindings } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
 import { NodeId, PageViewState } from '../../../types';
-import { RectZone } from '../../../utils/geometry';
 import { update } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'component' | 'theme';
+
+export enum NodeDropZone {
+  TOP = 'TOP',
+  RIGHT = 'RIGHT',
+  BOTTOM = 'BOTTOM',
+  LEFT = 'LEFT',
+  CENTER = 'CENTER',
+}
 
 export interface PageEditorState {
   readonly appId: string;
@@ -16,7 +23,7 @@ export interface PageEditorState {
   readonly newNode: appDom.ElementNode | null;
   readonly highlightLayout: boolean;
   readonly dragOverNodeId: NodeId | null;
-  readonly dragOverNodeZone: RectZone | null;
+  readonly dragOverNodeZone: NodeDropZone | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
   readonly bindings: LiveBindings;
@@ -46,7 +53,7 @@ export type PageEditorAction =
       type: 'PAGE_NODE_DRAG_OVER';
       dragOverState: {
         nodeId: NodeId | null;
-        zone: RectZone | null;
+        zone: NodeDropZone | null;
       };
     }
   | {
@@ -165,7 +172,7 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     nodeDragEnd() {
       dispatch({ type: 'PAGE_NODE_DRAG_END' });
     },
-    nodeDragOver({ nodeId, zone }: { nodeId: NodeId | null; zone: RectZone | null }) {
+    nodeDragOver({ nodeId, zone }: { nodeId: NodeId | null; zone: NodeDropZone | null }) {
       dispatch({
         type: 'PAGE_NODE_DRAG_OVER',
         dragOverState: { nodeId, zone },

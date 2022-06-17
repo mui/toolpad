@@ -67,14 +67,12 @@ const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
 
 interface JsExpressionBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {
   globalScope: Record<string, unknown>;
-  onCommit?: () => void;
 }
 
 function JsExpressionBindingEditor({
   globalScope,
   value,
   onChange,
-  onCommit,
 }: JsExpressionBindingEditorProps) {
   const handleChange = React.useCallback(
     (newValue: string) => onChange({ type: 'jsExpression', value: newValue }),
@@ -86,7 +84,6 @@ function JsExpressionBindingEditor({
       globalScope={globalScope}
       value={value?.type === 'jsExpression' ? value.value : ''}
       onChange={handleChange}
-      onCommit={onCommit}
       autoFocus
     />
   );

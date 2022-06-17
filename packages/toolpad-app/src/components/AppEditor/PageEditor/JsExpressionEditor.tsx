@@ -2,7 +2,7 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import jsonToTs from 'json-to-ts';
-import { styled } from '@mui/material';
+import { styled, SxProps } from '@mui/material';
 import { WithControlledProp } from '../../../utils/types';
 
 const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
@@ -18,6 +18,7 @@ export interface JsExpressionEditorProps extends WithControlledProp<string> {
   functionBody?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
+  sx?: SxProps;
 }
 
 export function JsExpressionEditor({
@@ -29,6 +30,7 @@ export function JsExpressionEditor({
   functionBody,
   onFocus,
   onBlur,
+  sx,
 }: JsExpressionEditorProps) {
   const id = React.useId();
 
@@ -122,7 +124,9 @@ export function JsExpressionEditor({
   );
 
   return (
-    <JsExpressionEditorRoot sx={disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}}>
+    <JsExpressionEditorRoot
+      sx={{ ...sx, ...(disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}) }}
+    >
       <Editor
         height="150px"
         value={value}

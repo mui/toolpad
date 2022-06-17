@@ -41,6 +41,7 @@ import useShortcut from '../../utils/useShortcut';
 import { createProvidedContext } from '../../utils/react';
 import { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
+import { usePageEditorState } from './PageEditor/PageEditorProvider';
 
 interface BindingEditorContext {
   label: string;
@@ -156,6 +157,7 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
     <Box sx={{ my: 1 }}>
       <Typography>Run code when this event fires</Typography>
       <JsExpressionEditor
+        sx={{ my: 3 }}
         globalScope={globalScope}
         value={value?.value || ''}
         onChange={handleCodeChange}
@@ -170,6 +172,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
   const dom = useDom();
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
+  const { nodeId: currentPageNodeId } = usePageEditorState();
 
   const handlePageChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,17 +181,27 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
     [onChange],
   );
 
+  const availablePages = React.useMemo(
+    () => pages.filter((page) => page.id !== currentPageNodeId),
+    [pages, currentPageNodeId],
+  );
+
+  const hasPagesAvailable = availablePages.length > 0;
+
   return (
     <Box sx={{ my: 1 }}>
       <Typography>Navigate to a page on this event</Typography>
       <TextField
         fullWidth
+        sx={{ my: 3 }}
         label="page"
         select
         value={value?.value?.page || ''}
         onChange={handlePageChange}
+        disabled={!hasPagesAvailable}
+        helperText={hasPagesAvailable ? null : 'No other pages available'}
       >
-        {pages.map((page) => (
+        {availablePages.map((page) => (
           <MenuItem key={page.id} value={page.id}>
             {page.name}
           </MenuItem>

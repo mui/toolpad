@@ -7,9 +7,10 @@ import {
   ComponentConfig,
   BindableAttrValues,
   LiveBinding,
+  NodeId,
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
-import type { Branded, Maybe, WithControlledProp } from './utils/types';
+import type { Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
 export interface EditorProps<T> {
@@ -24,8 +25,6 @@ export interface EditorProps<T> {
   value: T | undefined;
   onChange: (newValue: T) => void;
 }
-
-export type NodeId = Branded<string, 'NodeId'>;
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
@@ -95,14 +94,8 @@ export interface QueryEditorModel<Q> {
 }
 
 export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
-  appId: string;
-  connectionId: NodeId;
   connectionParams: Maybe<P>;
   globalScope: Record<string, any>;
-  /**
-   * @deprecated
-   */
-  queryScope?: Record<string, any>;
   liveParams: Record<string, LiveBinding>;
 }
 

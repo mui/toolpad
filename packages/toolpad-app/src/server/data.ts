@@ -1,4 +1,4 @@
-import { BindableAttrValue } from '@mui/toolpad-core';
+import { NodeId, BindableAttrValue } from '@mui/toolpad-core';
 import {
   App,
   DomNodeAttributeType,
@@ -6,7 +6,7 @@ import {
   Release,
   Prisma,
 } from '../../prisma/generated/client';
-import { ServerDataSource, ApiResult, NodeId, VersionOrPreview } from '../types';
+import { ServerDataSource, ApiResult, VersionOrPreview } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -169,7 +169,6 @@ function createDefaultDom(): appDom.AppDom {
     name: 'Page 1',
     attributes: {
       title: appDom.createConst('Page 1'),
-      urlQuery: appDom.createConst({}),
     },
   });
 
@@ -303,7 +302,7 @@ export async function loadReleaseDom(appId: string, version: number): Promise<ap
   return JSON.parse(release.snapshot.toString('utf-8')) as appDom.AppDom;
 }
 
-export async function getConnection<P = unknown>(
+async function getConnection<P = unknown>(
   appId: string,
   id: string,
 ): Promise<appDom.ConnectionNode<P>> {

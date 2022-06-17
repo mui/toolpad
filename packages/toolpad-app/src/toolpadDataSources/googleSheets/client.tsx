@@ -12,7 +12,7 @@ import {
   GoogleDriveFiles,
 } from './types';
 import useDebounced from '../../utils/useDebounced';
-import client from '../../api';
+import { usePrivateQuery } from '../context';
 
 function getInitialQueryValue(): GoogleSheetsApiQuery {
   return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '', headerRow: false };
@@ -26,8 +26,6 @@ function isConnectionValid(connection: GoogleSheetsConnectionParams | null): boo
 }
 
 function QueryEditor({
-  appId,
-  connectionId,
   value,
   onChange,
 }: QueryEditorProps<GoogleSheetsConnectionParams, GoogleSheetsApiQuery>) {
@@ -35,40 +33,26 @@ function QueryEditor({
 
   const debouncedSpreadsheetQuery = useDebounced(spreadsheetQuery, 300);
 
-  const fetchedFiles: UseQueryResult<GoogleDriveFiles> = client.useQuery('dataSourceFetchPrivate', [
-    appId,
-    connectionId,
-    {
-      type: GoogleSheetsPrivateQueryType.FILES_LIST,
-      spreadsheetQuery: debouncedSpreadsheetQuery,
-    },
-  ]);
+  const fetchedFiles: UseQueryResult<GoogleDriveFiles> = usePrivateQuery({
+    type: GoogleSheetsPrivateQueryType.FILES_LIST,
+    spreadsheetQuery: debouncedSpreadsheetQuery,
+  });
 
-  const fetchedFile: UseQueryResult<GoogleDriveFile> = client.useQuery(
-    'dataSourceFetchPrivate',
+  const fetchedFile: UseQueryResult<GoogleDriveFile> = usePrivateQuery(
     value.query.spreadsheetId
-      ? [
-          appId,
-          connectionId,
-          {
-            type: GoogleSheetsPrivateQueryType.FILE_GET,
-            spreadsheetId: value.query.spreadsheetId,
-          },
-        ]
+      ? {
+          type: GoogleSheetsPrivateQueryType.FILE_GET,
+          spreadsheetId: value.query.spreadsheetId,
+        }
       : null,
   );
 
-  const fetchedSpreadsheet: UseQueryResult<GoogleSpreadsheet> = client.useQuery(
-    'dataSourceFetchPrivate',
+  const fetchedSpreadsheet: UseQueryResult<GoogleSpreadsheet> = usePrivateQuery(
     value.query.spreadsheetId
-      ? [
-          appId,
-          connectionId,
-          {
-            type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET,
-            spreadsheetId: value.query.spreadsheetId,
-          },
-        ]
+      ? {
+          type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET,
+          spreadsheetId: value.query.spreadsheetId,
+        }
       : null,
   );
 
@@ -81,7 +65,7 @@ function QueryEditor({
   );
 
   const handleSpreadsheetChange = React.useCallback(
-    (event, newValue: GoogleDriveFile | null) => {
+    (event: React.SyntheticEvent<Element, Event>, newValue: GoogleDriveFile | null) => {
       const query: GoogleSheetsApiQuery = {
         ...value.query,
         sheetName: null,
@@ -93,7 +77,7 @@ function QueryEditor({
   );
 
   const handleSheetChange = React.useCallback(
-    (event, newValue: GoogleSheet | null) => {
+    (event: React.SyntheticEvent<Element, Event>, newValue: GoogleSheet | null) => {
       const query: GoogleSheetsApiQuery = {
         ...value.query,
         sheetName: newValue?.properties?.title ?? null,

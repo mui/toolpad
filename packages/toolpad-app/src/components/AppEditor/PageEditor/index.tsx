@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { styled, Box } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import { NodeId } from '@mui/toolpad-core';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';
-import { NodeId } from '../../../types';
 import { useDom } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';

@@ -21,10 +21,11 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { LoadingButton } from '@mui/lab';
+import { NodeId } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { NodeId, QueryEditorModel } from '../../../types';
+import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import JsonView from '../../JsonView';
@@ -36,6 +37,7 @@ import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { mapValues } from '../../../utils/collections';
+import { QueryEditorContextProvider } from '../../../toolpadDataSources/context';
 
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
@@ -165,11 +167,11 @@ function QueryNodeEditorDialog<Q, P>({
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const handleConnectionChange = React.useCallback((newConnectionId) => {
+  const handleConnectionChange = React.useCallback((newConnectionId: NodeId | null) => {
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          connectionId: appDom.createConst(newConnectionId),
+          connectionId: newConnectionId ? appDom.createConst(newConnectionId) : undefined,
         }),
       }),
     );
@@ -306,6 +308,8 @@ function QueryNodeEditorDialog<Q, P>({
     throw new Error(`DataSource "${dataSourceId}" not found`);
   }
 
+  const queryEditorContext = React.useMemo(() => ({ appId, connectionId }), [appId, connectionId]);
+
   return (
     <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose} scroll="body">
       <DialogTitle>Edit Query ({node.id})</DialogTitle>
@@ -322,18 +326,18 @@ function QueryNodeEditorDialog<Q, P>({
 
           <Divider />
           <Typography>Build query:</Typography>
-          <dataSource.QueryEditor
-            appId={appId}
-            connectionId={connectionId}
-            connectionParams={connection?.attributes.params.value}
-            value={{
-              query: input.attributes.query.value,
-              params: input.params,
-            }}
-            liveParams={liveParams}
-            onChange={handleQueryChange}
-            globalScope={pageState}
-          />
+          <QueryEditorContextProvider value={queryEditorContext}>
+            <dataSource.QueryEditor
+              connectionParams={connection?.attributes.params.value}
+              value={{
+                query: input.attributes.query.value,
+                params: input.params,
+              }}
+              liveParams={liveParams}
+              onChange={handleQueryChange}
+              globalScope={pageState}
+            />
+          </QueryEditorContextProvider>
           <Divider />
           <Typography>Options:</Typography>
           <Grid container direction="row" spacing={1}>
@@ -372,7 +376,7 @@ function QueryNodeEditorDialog<Q, P>({
             <Grid item xs={6}>
               <Stack>
                 <FormControlLabel
-                  label="Transform API response"
+                  label="Transform response"
                   control={
                     <Checkbox
                       checked={input.attributes.transformEnabled?.value ?? false}
@@ -443,7 +447,7 @@ export default function QueryEditor() {
   }, []);
 
   const handleCreated = React.useCallback(
-    (node) => {
+    (node: appDom.QueryNode) => {
       domApi.addNode(node, page, 'queries');
       setDialogState({ nodeId: node.id });
     },
@@ -489,7 +493,6 @@ export default function QueryEditor() {
           );
         })}
       </List>
-      {/* eslint-disable-next-line no-nested-ternary */}
       {dialogState?.nodeId && lastEditednode ? (
         <QueryNodeEditorDialog
           open={!!dialogState}

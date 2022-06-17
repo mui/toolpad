@@ -4,16 +4,9 @@ import throttle from 'lodash-es/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
-import { RuntimeEvent, SlotType } from '@mui/toolpad-core';
+import { NodeId, RuntimeEvent, SlotType } from '@mui/toolpad-core';
 import { setEventHandler } from '@mui/toolpad-core/runtime';
-import {
-  NodeId,
-  FlowDirection,
-  SlotLocation,
-  SlotState,
-  NodeInfo,
-  NodesInfo,
-} from '../../../types';
+import { FlowDirection, SlotLocation, SlotState, NodeInfo, NodesInfo } from '../../../types';
 import * as appDom from '../../../appDom';
 import EditorCanvasHost from './EditorCanvasHost';
 import {

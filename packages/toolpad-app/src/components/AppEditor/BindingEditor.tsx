@@ -42,6 +42,7 @@ import { createProvidedContext } from '../../utils/react';
 import { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
+import GlobalScopeExplorer from './GlobalScopeExplorer';
 
 interface BindingEditorContext {
   label: string;
@@ -121,14 +122,7 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
   const { label, globalScope, server, propType } = useBindingEditorContext();
   return (
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
-      <Box sx={{ width: 200, display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <Typography sx={{ mb: 1 }} variant="subtitle2">
-          Scope
-        </Typography>
-        <Box sx={{ flex: 1, width: '100%', overflow: 'auto' }}>
-          <JsonView src={globalScope} />
-        </Box>
-      </Box>
+      <GlobalScopeExplorer value={globalScope} />
 
       <Box sx={{ height: '100%', display: 'flex', flex: 1, flexDirection: 'column' }}>
         <Typography sx={{ mb: 2 }}>
@@ -156,12 +150,18 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
   return (
     <Box sx={{ my: 1 }}>
       <Typography>Run code when this event fires</Typography>
-      <JsExpressionEditor
-        sx={{ my: 3 }}
-        globalScope={globalScope}
-        value={value?.value || ''}
-        onChange={handleCodeChange}
-      />
+      <Box
+        sx={{ my: 3, display: 'flex', flexDirection: 'row', maxHeight: 250, alignItems: 'stretch' }}
+      >
+        <GlobalScopeExplorer value={globalScope} />
+
+        <JsExpressionEditor
+          sx={{ flex: 1 }}
+          globalScope={globalScope}
+          value={value?.value || ''}
+          onChange={handleCodeChange}
+        />
+      </Box>
     </Box>
   );
 }

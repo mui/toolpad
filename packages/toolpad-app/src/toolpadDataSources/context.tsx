@@ -1,5 +1,5 @@
 import { UseQueryResult } from 'react-query';
-import { NodeId } from '../types';
+import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '../utils/react';
 import client from '../api';
 

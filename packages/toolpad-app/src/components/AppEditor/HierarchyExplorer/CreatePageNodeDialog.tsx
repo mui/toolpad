@@ -34,7 +34,6 @@ export default function CreatePageDialog({ appId, onClose, ...props }: CreatePag
             name,
             attributes: {
               title: appDom.createConst(name),
-              urlQuery: appDom.createConst({}),
             },
           });
           const appNode = appDom.getApp(dom);

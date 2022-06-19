@@ -21,10 +21,11 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { LoadingButton } from '@mui/lab';
+import { NodeId } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { NodeId, QueryEditorModel } from '../../../types';
+import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import JsonView from '../../JsonView';
@@ -166,11 +167,11 @@ function QueryNodeEditorDialog<Q, P>({
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const handleConnectionChange = React.useCallback((newConnectionId) => {
+  const handleConnectionChange = React.useCallback((newConnectionId: NodeId | null) => {
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          connectionId: appDom.createConst(newConnectionId),
+          connectionId: newConnectionId ? appDom.createConst(newConnectionId) : undefined,
         }),
       }),
     );
@@ -446,7 +447,7 @@ export default function QueryEditor() {
   }, []);
 
   const handleCreated = React.useCallback(
-    (node) => {
+    (node: appDom.QueryNode) => {
       domApi.addNode(node, page, 'queries');
       setDialogState({ nodeId: node.id });
     },
@@ -492,7 +493,6 @@ export default function QueryEditor() {
           );
         })}
       </List>
-      {/* eslint-disable-next-line no-nested-ternary */}
       {dialogState?.nodeId && lastEditednode ? (
         <QueryNodeEditorDialog
           open={!!dialogState}

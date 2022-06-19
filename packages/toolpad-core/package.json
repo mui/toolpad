@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-core",
-  "version": "0.0.5-alpha.4",
+  "version": "0.0.6",
   "description": "Build MUI apps quickly",
   "author": "MUI Soolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -12,7 +12,8 @@
     "./package.json": "./package.json",
     ".": "./dist/index.js",
     "./constants": "./dist/constants.js",
-    "./runtime": "./dist/runtime.js"
+    "./runtime": "./dist/runtime.js",
+    "./utils": "./dist/utils.js"
   },
   "files": [
     "dist"
@@ -33,9 +34,14 @@
   "dependencies": {
     "@mui/x-data-grid-pro": "^5.11.0",
     "quickjs-emscripten": "^0.20.0",
-    "react": "^18.1.0",
     "react-error-boundary": "^3.1.4",
     "react-query": "^3.34.19"
+  },
+  "devDependencies": {
+    "react": "^18.1.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
   },
   "publishConfig": {
     "access": "public"

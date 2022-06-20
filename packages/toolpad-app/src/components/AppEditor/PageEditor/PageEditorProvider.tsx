@@ -6,7 +6,7 @@ import { update } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'component' | 'theme';
 
-export enum NodeDropZone {
+export enum DropZone {
   TOP = 'TOP',
   RIGHT = 'RIGHT',
   BOTTOM = 'BOTTOM',
@@ -23,7 +23,8 @@ export interface PageEditorState {
   readonly newNode: appDom.ElementNode | null;
   readonly highlightLayout: boolean;
   readonly dragOverNodeId: NodeId | null;
-  readonly dragOverNodeZone: NodeDropZone | null;
+  readonly dragOverSlotParentProp: string | null;
+  readonly dragOverZone: DropZone | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
   readonly bindings: LiveBindings;
@@ -53,7 +54,8 @@ export type PageEditorAction =
       type: 'PAGE_NODE_DRAG_OVER';
       dragOverState: {
         nodeId: NodeId | null;
-        zone: NodeDropZone | null;
+        parentProp: string | null;
+        zone: DropZone | null;
       };
     }
   | {
@@ -82,7 +84,8 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     newNode: null,
     highlightLayout: false,
     dragOverNodeId: null,
-    dragOverNodeZone: null,
+    dragOverSlotParentProp: null,
+    dragOverZone: null,
     viewState: { nodes: {} },
     pageState: {},
     bindings: {},
@@ -127,12 +130,13 @@ export function pageEditorReducer(
         dragOverNodeId: null,
       });
     case 'PAGE_NODE_DRAG_OVER': {
-      const { nodeId, zone } = action.dragOverState;
+      const { nodeId, parentProp, zone } = action.dragOverState;
 
       return update(state, {
         highlightLayout: true,
         dragOverNodeId: nodeId,
-        dragOverNodeZone: zone,
+        dragOverSlotParentProp: parentProp,
+        dragOverZone: zone,
       });
     }
     case 'PAGE_VIEW_STATE_UPDATE': {
@@ -172,10 +176,18 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     nodeDragEnd() {
       dispatch({ type: 'PAGE_NODE_DRAG_END' });
     },
-    nodeDragOver({ nodeId, zone }: { nodeId: NodeId | null; zone: NodeDropZone | null }) {
+    nodeDragOver({
+      nodeId,
+      parentProp,
+      zone,
+    }: {
+      nodeId: NodeId | null;
+      parentProp: string | null;
+      zone: DropZone | null;
+    }) {
       dispatch({
         type: 'PAGE_NODE_DRAG_OVER',
-        dragOverState: { nodeId, zone },
+        dragOverState: { nodeId, parentProp, zone },
       });
     },
     pageViewStateUpdate(viewState: PageViewState) {

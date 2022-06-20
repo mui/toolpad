@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-components",
-  "version": "0.0.5-alpha.4",
+  "version": "0.0.6",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -30,9 +30,14 @@
   },
   "dependencies": {
     "@mui/material": "^5.8.0",
-    "@mui/toolpad-core": "^0.0.5-alpha.4",
-    "@mui/x-data-grid-pro": "^5.11.0",
+    "@mui/toolpad-core": "^0.0.6",
+    "@mui/x-data-grid-pro": "^5.11.0"
+  },
+  "devDependencies": {
     "react": "^18.1.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
   },
   "publishConfig": {
     "access": "public"

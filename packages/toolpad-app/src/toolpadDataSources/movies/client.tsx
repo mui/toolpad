@@ -24,16 +24,16 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<Movies
 
   return (
     <Stack direction="column" gap={1}>
-      <Toolbar disableGutters>
-        <Button onClick={doSubmit} disabled={isSaveDisabled(formState)}>
-          Save
-        </Button>
-      </Toolbar>
       <TextField
         label="API key"
         {...register('apiKey', { required: true })}
         {...validation(formState, 'apiKey')}
       />
+      <Toolbar disableGutters>
+        <Button variant="contained" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+          Save
+        </Button>
+      </Toolbar>
     </Stack>
   );
 }

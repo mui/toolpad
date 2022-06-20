@@ -67,52 +67,33 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
 ## Release process
 
-### release
-
-1. Build packages
+1. Generate a new version using
 
    ```sh
-   yarn release:build
+   yarn release:version
    ```
 
-1. Cut a new release
+1. Generate changelog using
 
    ```sh
-   yarn release:version <prerelease/patch/minor/major>
+   yarn release:changelog
    ```
 
-1. Publish release
+1. Clean the generated changelog, add highlights, use the new version number as title
+
+1. prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md)
+
+1. Open a PR with the proposed changes
+
+1. Review/merge PR
+
+1. Wait for the docker build to finish.
+
+1. Release the docker image using:
 
    ```sh
-   yarn release:publish
+   # add --prerelease if necessary
+   yarn release:docker --commit <commit of merged PR> --releaseTag <version number>
    ```
 
-### Releasing Docker images
-
-CI builds and pushes an image per commit. We can tag some of these images with a version number using the method of https://stackoverflow.com/a/70526615
-
-<!-- TODO: create CLI for this workflow -->
-
-### Dryrun publish
-
-For testing purposes, it is possible to try out publishing
-
-1. Start local npm registry
-
-   ```sh
-   npx verdaccio
-   ```
-
-1. You may have to increase max allowed uploaded body size. To do so, locate your verdaccio config file and add:
-
-   ```yml
-   max_body_size: 100mb # Or whatever size is needed
-   ```
-
-1. Publish packages using the command
-
-   ```sh
-   yarn release:publish:dry-run
-   ```
-
-1. packages can be installed by appending `--registry=http://localhost:4873/` to `yarn`/`npm` commands, or by providing environment variable `npm_config_registry=http://localhost:4873/` (The latter seems to be needed for `npx`, as in `npm_config_registry=http://localhost:4873/ npx @mui/toolpad`)
+1. Create a new github release, use `<version number>` as the tag and `<commit of merged PR>` as the target. Use the cleaned changelog as the body and the `<version number>` as the title. Mark as prerelease if necessary.

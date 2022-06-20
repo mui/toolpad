@@ -1,5 +1,8 @@
-import React from 'react';
-import { TOOLPAD_COMPONENT } from './constants';
+import type * as React from 'react';
+import type { TOOLPAD_COMPONENT } from './constants';
+import type { Branded } from './utils';
+
+export type NodeId = Branded<string, 'NodeId'>;
 
 export type BindingAttrValueFormat = 'stringLiteral' | 'default';
 
@@ -38,7 +41,7 @@ export type BindableAttrValue<V> =
 
 export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
-export type BindableAttrValues<P> = {
+export type BindableAttrValues<P = Record<string, unknown>> = {
   readonly [K in keyof P]?: BindableAttrValue<P[K]>;
 };
 

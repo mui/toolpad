@@ -83,8 +83,8 @@ function EditorContent({ appId }: EditorContentProps) {
         <FileEditor appId={appId} />
       ) : (
         <Box flex={1} display="flex" alignItems="center" justifyContent="center">
-          {domLoader.error ? (
-            <Alert severity="error">{domLoader.error}</Alert>
+          {domLoader.loadError ? (
+            <Alert severity="error">{domLoader.loadError}</Alert>
           ) : (
             <CircularProgress />
           )}

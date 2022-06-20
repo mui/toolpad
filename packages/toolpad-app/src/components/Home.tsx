@@ -18,6 +18,7 @@ import {
   Toolbar,
   Typography,
   Box,
+  Tooltip,
 } from '@mui/material';
 import * as React from 'react';
 import { LoadingButton } from '@mui/lab';
@@ -229,6 +230,26 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
     }
   }, [appTitleInput, editingTitle]);
 
+  const openDisabled = !app || !activeDeployment;
+  let openButton = (
+    <Button
+      disabled={!app || !activeDeployment}
+      size="small"
+      component="a"
+      href={app ? `deploy/${app.id}` : ''}
+    >
+      Open
+    </Button>
+  );
+
+  if (openDisabled) {
+    openButton = (
+      <Tooltip title="The app hasn't been deployed yet">
+        <span>{openButton}</span>
+      </Tooltip>
+    );
+  }
+
   return (
     <React.Fragment>
       <Card sx={{ gridColumn: 'span 1' }}>
@@ -279,14 +300,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           >
             Edit
           </Button>
-          <Button
-            disabled={!app || !activeDeployment}
-            size="small"
-            component="a"
-            href={app ? `deploy/${app.id}` : ''}
-          >
-            View
-          </Button>
+          {openButton}
         </CardActions>
       </Card>
       <Menu

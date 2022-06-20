@@ -1,6 +1,7 @@
 import {
   Stack,
   Button,
+  Box,
   Grid,
   Dialog,
   DialogTitle,
@@ -17,6 +18,7 @@ import {
   Toolbar,
   MenuItem,
   Skeleton,
+  IconButton,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -417,37 +419,40 @@ function QueryNodeEditorDialog<Q, P>({
                   }
                 />
                 <Stack direction={'row'} spacing={2}>
-                  <Stack
-                    direction={'column'}
-                    sx={{ minWidth: '300px', overflowX: 'scroll' }}
-                    spacing={2}
-                  >
-                    {untransformedQueryPreview.isLoading ? (
-                      <Skeleton width={'300px'} height={'30px'} />
-                    ) : (
+                  {untransformedQueryPreview.isLoading ? (
+                    <Skeleton width={'300px'} height={'30px'} />
+                  ) : (
+                    <Box
+                      sx={{
+                        width: '600px',
+                        maxWidth: '600px',
+                        maxHeight: '150px',
+                        overflow: 'scroll',
+                      }}
+                    >
                       <JsonView
                         src={untransformedQueryPreview.data ?? { data: '' }}
                         disabled={!input.attributes.transformEnabled?.value}
                       />
-                    )}
-                    <LoadingButton
-                      disabled={
-                        rawPreviewQuery === input || !input.attributes.transformEnabled?.value
-                      }
-                      loading={untransformedQueryPreview.isLoading}
-                      loadingPosition="center"
-                      onClick={handleRawPreviewQueryRefresh}
-                      startIcon={<Autorenew />}
-                    >
-                      Refresh
-                    </LoadingButton>
-                  </Stack>
+                    </Box>
+                  )}
+                  <IconButton
+                    disabled={
+                      rawPreviewQuery === input || !input.attributes.transformEnabled?.value
+                    }
+                    size="small"
+                    onClick={handleRawPreviewQueryRefresh}
+                    sx={{ alignSelf: 'self-start' }}
+                  >
+                    <Autorenew fontSize="inherit" />
+                  </IconButton>
                   <JsExpressionEditor
                     globalScope={{ data: untransformedQueryPreview.data?.data }}
                     autoFocus
                     fullWidth
                     value={input.attributes.transform?.value ?? 'return data;'}
                     functionBody
+                    onFocus={handleRawPreviewQueryRefresh}
                     onChange={handleTransformFnChange}
                     disabled={!input.attributes.transformEnabled?.value}
                   />

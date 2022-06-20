@@ -294,17 +294,25 @@ function QueryNodeEditorDialog<Q, P>({
     [],
   );
 
-  const [rawPreviewQuery, setRawPreviewQuery] = React.useState<appDom.QueryNode<Q, P> | null>(null);
-
-  const untransformedQueryPreview = client.useQuery(
-    'execQuery',
-    rawPreviewQuery ? [appId, rawPreviewQuery, paramsObject] : null,
-    { retry: false },
+  const rawQueryPreviewKey: [string, appDom.QueryNode<Q, P>, Record<string, any>] = React.useMemo(
+    () => [appId, withTransformDisabled(input), previewParams],
+    [appId, input, previewParams, withTransformDisabled],
   );
 
-  const handleRawPreviewQueryRefresh = React.useCallback(() => {
-    setRawPreviewQuery(withTransformDisabled(input));
-  }, [withTransformDisabled, input]);
+  const rawQueryPreviewKeyRef = React.useRef(rawQueryPreviewKey);
+
+  const rawQueryPreview = client.useQuery('execQuery', rawQueryPreviewKey, {
+    enabled: false,
+    retry: false,
+    keepPreviousData: true,
+  });
+
+  const handleRawQueryPreviewRefresh = React.useCallback(() => {
+    rawQueryPreviewKeyRef.current = rawQueryPreviewKey;
+    rawQueryPreview.refetch();
+  }, [rawQueryPreviewKey, rawQueryPreviewKeyRef, rawQueryPreview]);
+
+  const rawQueryPreviewRefreshDisabled = rawQueryPreviewKeyRef.current === rawQueryPreviewKey;
 
   const handleTransformEnabledChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -316,10 +324,10 @@ function QueryNodeEditorDialog<Q, P>({
         }),
       );
       if (event.target.checked) {
-        handleRawPreviewQueryRefresh();
+        handleRawQueryPreviewRefresh();
       }
     },
-    [handleRawPreviewQueryRefresh],
+    [handleRawQueryPreviewRefresh],
   );
 
   const isInputSaved = node === input;
@@ -419,7 +427,7 @@ function QueryNodeEditorDialog<Q, P>({
                   }
                 />
                 <Stack direction={'row'} spacing={2}>
-                  {untransformedQueryPreview.isLoading ? (
+                  {rawQueryPreview.isLoading ? (
                     <Skeleton width={'300px'} height={'30px'} />
                   ) : (
                     <Box
@@ -431,28 +439,28 @@ function QueryNodeEditorDialog<Q, P>({
                       }}
                     >
                       <JsonView
-                        src={untransformedQueryPreview.data ?? { data: '' }}
+                        src={rawQueryPreview.data ?? { data: '' }}
                         disabled={!input.attributes.transformEnabled?.value}
                       />
                     </Box>
                   )}
                   <IconButton
                     disabled={
-                      rawPreviewQuery === input || !input.attributes.transformEnabled?.value
+                      rawQueryPreviewRefreshDisabled || !input.attributes.transformEnabled?.value
                     }
                     size="small"
-                    onClick={handleRawPreviewQueryRefresh}
+                    onClick={handleRawQueryPreviewRefresh}
                     sx={{ alignSelf: 'self-start' }}
                   >
                     <Autorenew fontSize="inherit" />
                   </IconButton>
                   <JsExpressionEditor
-                    globalScope={{ data: untransformedQueryPreview.data?.data }}
+                    globalScope={{ data: rawQueryPreview.data?.data }}
                     autoFocus
                     fullWidth
                     value={input.attributes.transform?.value ?? 'return data;'}
                     functionBody
-                    onFocus={handleRawPreviewQueryRefresh}
+                    onFocus={handleRawQueryPreviewRefresh}
                     onChange={handleTransformFnChange}
                     disabled={!input.attributes.transformEnabled?.value}
                   />

@@ -65,7 +65,7 @@ interface UseQueryFn<M extends MethodsGroup> {
         Awaited<ReturnType<M[K]>>,
         [K, Parameters<M[K]> | null]
       >,
-      'queryKey' | 'queryFn' | 'enabled'
+      'queryKey' | 'queryFn'
     >,
   ): UseQueryResult<Awaited<ReturnType<M[K]>>>;
 }
@@ -98,7 +98,7 @@ function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> 
     useQuery: (key, params, options) => {
       return useQuery({
         ...options,
-        enabled: !!params,
+        enabled: !!params && options?.enabled !== false,
         queryKey: [key, params],
         queryFn: () => {
           if (!params) {

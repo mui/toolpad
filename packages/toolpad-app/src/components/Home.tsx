@@ -215,9 +215,10 @@ function AppCard({ app, onDelete }: AppCardProps) {
       }
       if (event.key === 'Enter') {
         setEditingTitle(false);
+        handleAppRename((event.target as HTMLInputElement).value);
       }
     },
-    [app?.name],
+    [app?.name, handleAppRename],
   );
 
   React.useEffect(() => {

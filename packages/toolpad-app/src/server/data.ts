@@ -132,6 +132,10 @@ export async function loadDom(appId: string): Promise<appDom.AppDom> {
     }),
   );
 
+  if (!root) {
+    throw new Error(`App "${appId}" not found`);
+  }
+
   return {
     root,
     nodes,
@@ -143,6 +147,13 @@ export async function getApps() {
     orderBy: {
       editedAt: 'desc',
     },
+  });
+}
+
+export async function getActiveDeployments() {
+  return prisma.deployment.findMany({
+    distinct: ['appId'],
+    orderBy: { createdAt: 'desc' },
   });
 }
 

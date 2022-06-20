@@ -26,6 +26,10 @@ export type DomAction =
       error: string;
     }
   | {
+      type: 'DOM_SAVING_ERROR';
+      error: string;
+    }
+  | {
       type: 'DOM_SET_NODE_NAME';
       nodeId: NodeId;
       name: string;
@@ -41,7 +45,7 @@ export type DomAction =
       type: 'DOM_SET_NODE_NAMESPACE';
       node: appDom.AppDomNode;
       namespace: string;
-      value: BindableAttrValues<unknown> | null;
+      value: BindableAttrValues | null;
     }
   | {
       type: 'DOM_ADD_NODE';
@@ -129,35 +133,41 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     case 'DOM_LOADING': {
       return update(state, {
         loading: true,
-        error: null,
+        loadError: null,
       });
     }
     case 'DOM_LOADED': {
       return update(state, {
         loading: false,
-        error: null,
+        loadError: null,
         dom: action.dom,
-        unsavedChanges: 0,
-      });
-    }
-    case 'DOM_SAVING': {
-      return update(state, {
-        saving: true,
-        error: null,
-      });
-    }
-    case 'DOM_SAVED': {
-      return update(state, {
-        saving: false,
-        error: null,
         unsavedChanges: 0,
       });
     }
     case 'DOM_LOADING_ERROR': {
       return update(state, {
         loading: false,
+        loadError: action.error,
+      });
+    }
+    case 'DOM_SAVING': {
+      return update(state, {
+        saving: true,
+        saveError: null,
+      });
+    }
+    case 'DOM_SAVED': {
+      return update(state, {
         saving: false,
-        error: action.error,
+        saveError: null,
+        unsavedChanges: 0,
+      });
+    }
+    case 'DOM_SAVING_ERROR': {
+      return update(state, {
+        loading: false,
+        saving: false,
+        saveError: action.error,
       });
     }
     default:
@@ -232,7 +242,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         type: 'DOM_SET_NODE_NAMESPACE',
         namespace,
         node,
-        value: value as BindableAttrValues<unknown> | null,
+        value: value as BindableAttrValues | null,
       });
     },
   };
@@ -243,14 +253,16 @@ interface DomLoader {
   saving: boolean;
   unsavedChanges: number;
   loading: boolean;
-  error: string | null;
+  loadError: string | null;
+  saveError: string | null;
 }
 
 const DomLoaderContext = React.createContext<DomLoader>({
   saving: false,
   unsavedChanges: 0,
   loading: false,
-  error: null,
+  loadError: null,
+  saveError: null,
   dom: null,
 });
 
@@ -284,7 +296,8 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     loading: false,
     saving: false,
     unsavedChanges: 0,
-    error: null,
+    loadError: null,
+    saveError: null,
     dom: null,
   });
   const api = React.useMemo(() => createDomApi(dispatch), []);
@@ -326,7 +339,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
         dispatch({ type: 'DOM_SAVED' });
       })
       .catch((err) => {
-        dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
+        dispatch({ type: 'DOM_SAVING_ERROR', error: err.message });
       });
   }, [appId, state.dom]);
 
@@ -355,9 +368,9 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   return (
     <DomLoaderContext.Provider value={state}>
       <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
-      <Snackbar open={!!state.error}>
+      <Snackbar open={!!state.saveError}>
         <Alert severity="error" sx={{ width: '100%' }}>
-          Failed to save: {state.error}
+          Failed to save: {state.saveError}
         </Alert>
       </Snackbar>
     </DomLoaderContext.Provider>

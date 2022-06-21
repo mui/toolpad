@@ -12,6 +12,7 @@ import {
 import { DataGridPro, GridColumns } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import type { Deployment } from '../../prisma/generated/client';
 import client from '../api';
@@ -52,7 +53,14 @@ function ActiveDeployment({ value }: ActiveDeploymentProps) {
       </DefinitionList>
 
       <DeploymentActions>
-        <Button variant="contained" component="a" href={url || '#'} disabled={!url}>
+        <Button
+          variant="contained"
+          component="a"
+          href={url || '#'}
+          target="_blank"
+          disabled={!url}
+          endIcon={<OpenInNewIcon />}
+        >
           Open
         </Button>
       </DeploymentActions>

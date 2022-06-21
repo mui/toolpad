@@ -3,7 +3,6 @@ import {
   Container,
   Toolbar,
   Typography,
-  Box,
   Paper,
   Breadcrumbs,
   Link as MuiLink,
@@ -73,7 +72,8 @@ function DeploymentStatus({ appId, activeVersion, version }: ActiveReleaseMessag
           onClick={handleDeployClick}
           startIcon={<RocketLaunchIcon />}
         >
-          Deploy version &quot;{version}&quot;
+          {version >= (activeVersion ?? -Infinity) ? 'Deploy' : 'Rollback to'} version &quot;
+          {version}&quot;
         </Button>
       </Toolbar>
     </React.Fragment>

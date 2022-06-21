@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
+import { Box, Button, CssBaseline, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
@@ -207,6 +207,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
               path="./component.tsx"
               language="typescript"
               onMount={HandleEditorMount}
+              theme="vs-dark"
             />
           </Box>
           <Box sx={{ flex: 1, position: 'relative' }}>
@@ -223,6 +224,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
                   fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
                   <AppThemeProvider node={theme}>
+                    <CssBaseline />
                     <CodeComponent {...defaultProps} />
                   </AppThemeProvider>
                 </ErrorBoundary>

@@ -7,8 +7,6 @@ import {
   chromeDark,
 } from 'react-inspector';
 
-console.log(chromeDark);
-
 const nodeRenderer: ObjectInspectorProps['nodeRenderer'] = ({
   depth,
   name,

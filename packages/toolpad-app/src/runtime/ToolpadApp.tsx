@@ -32,7 +32,6 @@ import {
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
   fireEvent,
-  JsRuntimeProvider,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
@@ -51,6 +50,7 @@ import { HTML_ID_APP_ROOT } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
+import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
@@ -381,6 +381,8 @@ function parseBindings(
   return { parsedBindings, controlled };
 }
 
+const EMPTY_OBJECT = {};
+
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
@@ -426,9 +428,19 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [parsedBindings, controlled],
   );
 
-  const evaluatedBindings = React.useMemo(() => evalJsBindings(pageBindings), [pageBindings]);
+  const modules = useAppModules();
+  const moduleEntry = modules[`pages/${nodeId}`];
+  const globalScope = (moduleEntry?.module as any)?.globalScope || EMPTY_OBJECT;
 
-  const pageState = React.useMemo(() => buildGlobalScope(evaluatedBindings), [evaluatedBindings]);
+  const evaluatedBindings = React.useMemo(
+    () => evalJsBindings(pageBindings, globalScope),
+    [globalScope, pageBindings],
+  );
+
+  const pageState = React.useMemo(
+    () => buildGlobalScope(globalScope, evaluatedBindings),
+    [evaluatedBindings, globalScope],
+  );
   const liveBindings: Record<string, BindingEvaluationResult> = React.useMemo(
     () => mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined }),
     [evaluatedBindings],
@@ -518,29 +530,27 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
-                  <JsRuntimeProvider>
-                    <AppContextProvider value={appContext}>
-                      <QueryClientProvider client={queryClient}>
-                        <BrowserRouter basename={basename}>
-                          <Routes>
-                            <Route path="/" element={<Navigate replace to="/pages" />} />
-                            <Route path="/pages" element={<AppOverview dom={dom} />} />
-                            {pages.map((page) => (
-                              <Route
-                                key={page.id}
-                                path={`/pages/${page.id}`}
-                                element={
-                                  <ComponentsContext dom={dom} page={page}>
-                                    <RenderedPage nodeId={page.id} />
-                                  </ComponentsContext>
-                                }
-                              />
-                            ))}
-                          </Routes>
-                        </BrowserRouter>
-                      </QueryClientProvider>
-                    </AppContextProvider>
-                  </JsRuntimeProvider>
+                  <AppModulesProvider dom={dom}>
+                    <ComponentsContext dom={dom}>
+                      <AppContextProvider value={appContext}>
+                        <QueryClientProvider client={queryClient}>
+                          <BrowserRouter basename={basename}>
+                            <Routes>
+                              <Route path="/" element={<Navigate replace to="/pages" />} />
+                              <Route path="/pages" element={<AppOverview dom={dom} />} />
+                              {pages.map((page) => (
+                                <Route
+                                  key={page.id}
+                                  path={`/pages/${page.id}`}
+                                  element={<RenderedPage nodeId={page.id} />}
+                                />
+                              ))}
+                            </Routes>
+                          </BrowserRouter>
+                        </QueryClientProvider>
+                      </AppContextProvider>
+                    </ComponentsContext>
+                  </AppModulesProvider>
                 </React.Suspense>
               </ResetNodeErrorsKeyProvider>
             </ErrorBoundary>

@@ -19,6 +19,7 @@ import {
   Typography,
   Box,
   Snackbar,
+  Tooltip,
 } from '@mui/material';
 import * as React from 'react';
 import { LoadingButton } from '@mui/lab';
@@ -28,7 +29,7 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import DeleteIcon from '@mui/icons-material/Delete';
 import client from '../api';
 import DialogForm from './DialogForm';
-import { App } from '../../prisma/generated/client';
+import type { App, Deployment } from '../../prisma/generated/client';
 import useLatest from '../utils/useLatest';
 import ToolpadShell from './ToolpadShell';
 
@@ -111,25 +112,22 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
 
   return (
     <Dialog open={!!app} onClose={onClose}>
-      <DialogForm>
-        <DialogTitle>Confirm delete</DialogTitle>
-        <DialogContent>
-          Are you sure you want to delete application &quot;{latestApp?.name}&quot;
-        </DialogContent>
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={onClose}>
-            Cancel
-          </Button>
-          <LoadingButton
-            type="submit"
-            loading={deleteAppMutation.isLoading}
-            onClick={handleDeleteClick}
-            color="error"
-          >
-            Delete
-          </LoadingButton>
-        </DialogActions>
-      </DialogForm>
+      <DialogTitle>Confirm delete</DialogTitle>
+      <DialogContent>
+        Are you sure you want to delete application &quot;{latestApp?.name}&quot;
+      </DialogContent>
+      <DialogActions>
+        <Button color="inherit" variant="text" onClick={onClose}>
+          Cancel
+        </Button>
+        <LoadingButton
+          loading={deleteAppMutation.isLoading}
+          onClick={handleDeleteClick}
+          color="error"
+        >
+          Delete
+        </LoadingButton>
+      </DialogActions>
     </Dialog>
   );
 }
@@ -169,10 +167,11 @@ function AppNameErrorDialog({
 
 interface AppCardProps {
   app?: App;
+  activeDeployment?: Deployment;
   onDelete?: () => void;
 }
 
-function AppCard({ app, onDelete }: AppCardProps) {
+function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
   const [showAppRenameErrorDialog, setShowAppRenameErrorDialog] = React.useState<boolean>(false);
   const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
@@ -236,9 +235,10 @@ function AppCard({ app, onDelete }: AppCardProps) {
       }
       if (event.key === 'Enter') {
         setEditingTitle(false);
+        handleAppRename((event.target as HTMLInputElement).value);
       }
     },
-    [app?.name],
+    [app?.name, handleAppRename],
   );
 
   React.useEffect(() => {
@@ -247,6 +247,26 @@ function AppCard({ app, onDelete }: AppCardProps) {
       appTitleInput.current.select();
     }
   }, [appTitleInput, editingTitle]);
+
+  const openDisabled = !app || !activeDeployment;
+  let openButton = (
+    <Button
+      disabled={!app || !activeDeployment}
+      size="small"
+      component="a"
+      href={app ? `deploy/${app.id}` : ''}
+    >
+      Open
+    </Button>
+  );
+
+  if (openDisabled) {
+    openButton = (
+      <Tooltip title="The app hasn't been deployed yet">
+        <span>{openButton}</span>
+      </Tooltip>
+    );
+  }
 
   return (
     <React.Fragment>
@@ -305,9 +325,7 @@ function AppCard({ app, onDelete }: AppCardProps) {
           >
             Edit
           </Button>
-          <Button size="small" component="a" href={app ? `deploy/${app.id}` : ''} disabled={!app}>
-            View
-          </Button>
+          {openButton}
         </CardActions>
       </Card>
       <Menu
@@ -353,6 +371,16 @@ function AppCard({ app, onDelete }: AppCardProps) {
 
 export default function Home() {
   const { data: apps = [], status, error } = client.useQuery('getApps', []);
+  const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);
+
+  const activeDeploymentsByApp = React.useMemo(() => {
+    if (!activeDeployments) {
+      return null;
+    }
+    return Object.fromEntries(
+      activeDeployments.map((deployment) => [deployment.appId, deployment]),
+    );
+  }, [activeDeployments]);
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
@@ -389,9 +417,17 @@ export default function Home() {
                 return <Alert severity="error">{(error as Error)?.message}</Alert>;
               case 'success':
                 return apps.length > 0
-                  ? apps.map((app) => (
-                      <AppCard key={app.id} app={app} onDelete={() => setDeletedApp(app)} />
-                    ))
+                  ? apps.map((app) => {
+                      const activeDeployment = activeDeploymentsByApp?.[app.id];
+                      return (
+                        <AppCard
+                          key={app.id}
+                          app={app}
+                          activeDeployment={activeDeployment}
+                          onDelete={() => setDeletedApp(app)}
+                        />
+                      );
+                    })
                   : 'No apps yet';
               default:
                 return '';

@@ -12,6 +12,7 @@ const classes = {
 const ComponentPanelRoot = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
+  height: '100%',
   [`& .${classes.panel}`]: {
     flex: 1,
     padding: theme.spacing(2),

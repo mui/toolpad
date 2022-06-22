@@ -24,6 +24,7 @@ export default function TsModuleEditor({ path, extraLibs, value, onChange }: TsM
       editor.updateOptions({
         minimap: { enabled: false },
         accessibilitySupport: 'off',
+        tabSize: 2,
       });
 
       monaco.languages.typescript.typescriptDefaults.setCompilerOptions({

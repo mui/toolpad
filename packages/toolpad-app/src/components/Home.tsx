@@ -300,7 +300,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
             </Typography>
           }
         />
-        <CardContent>
+        <CardContent sx={{ flexGrow: 1 }}>
           <EditableText
             onBlur={handleAppTitleBlur}
             onKeyUp={handleAppTitleInput}

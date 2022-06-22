@@ -1,6 +1,6 @@
 import { ToolpadComponent } from '@mui/toolpad-core';
 import * as React from 'react';
-import createCodeComponent from '../../../runtime/createCodeComponent';
+import loadCodeComponent from '../../../runtime/loadCodeComponent';
 
 export type UseCodeComponent =
   | {
@@ -25,7 +25,7 @@ export default function useCodeComponent(src: string | null): UseCodeComponent {
     }
 
     const startSrc = src;
-    createCodeComponent(startSrc)
+    loadCodeComponent(startSrc)
       .then((Component) => {
         if (startSrc === src) {
           setState({ Component });

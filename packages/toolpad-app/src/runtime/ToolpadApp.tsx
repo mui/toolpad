@@ -32,7 +32,6 @@ import {
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
   fireEvent,
-  JsRuntimeProvider,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
@@ -51,6 +50,7 @@ import { HTML_ID_APP_ROOT } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
+import { AppModulesProvider } from './AppModulesProvider';
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
@@ -518,29 +518,27 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
-                  <JsRuntimeProvider>
-                    <AppContextProvider value={appContext}>
-                      <QueryClientProvider client={queryClient}>
-                        <BrowserRouter basename={basename}>
-                          <Routes>
-                            <Route path="/" element={<Navigate replace to="/pages" />} />
-                            <Route path="/pages" element={<AppOverview dom={dom} />} />
-                            {pages.map((page) => (
-                              <Route
-                                key={page.id}
-                                path={`/pages/${page.id}`}
-                                element={
-                                  <ComponentsContext dom={dom} page={page}>
-                                    <RenderedPage nodeId={page.id} />
-                                  </ComponentsContext>
-                                }
-                              />
-                            ))}
-                          </Routes>
-                        </BrowserRouter>
-                      </QueryClientProvider>
-                    </AppContextProvider>
-                  </JsRuntimeProvider>
+                  <AppModulesProvider dom={dom}>
+                    <ComponentsContext dom={dom}>
+                      <AppContextProvider value={appContext}>
+                        <QueryClientProvider client={queryClient}>
+                          <BrowserRouter basename={basename}>
+                            <Routes>
+                              <Route path="/" element={<Navigate replace to="/pages" />} />
+                              <Route path="/pages" element={<AppOverview dom={dom} />} />
+                              {pages.map((page) => (
+                                <Route
+                                  key={page.id}
+                                  path={`/pages/${page.id}`}
+                                  element={<RenderedPage nodeId={page.id} />}
+                                />
+                              ))}
+                            </Routes>
+                          </BrowserRouter>
+                        </QueryClientProvider>
+                      </AppContextProvider>
+                    </ComponentsContext>
+                  </AppModulesProvider>
                 </React.Suspense>
               </ResetNodeErrorsKeyProvider>
             </ErrorBoundary>

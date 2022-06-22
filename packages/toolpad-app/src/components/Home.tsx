@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardHeader,
+  CardContent,
   CardActions,
   Container,
   Dialog,
@@ -32,6 +33,8 @@ import DialogForm from './DialogForm';
 import type { App, Deployment } from '../../prisma/generated/client';
 import useLatest from '../utils/useLatest';
 import ToolpadShell from './ToolpadShell';
+import getReadableDuration from '../utils/readableDuration';
+import EditableText from './EditableText';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -291,31 +294,23 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
             </IconButton>
           }
           disableTypography
-          title={
-            editingTitle ? (
-              <TextField
-                variant="standard"
-                size="small"
-                inputRef={appTitleInput}
-                sx={{ paddingBottom: '4px' }}
-                InputProps={{ sx: { fontSize: '1.5rem', height: '1.5em' } }}
-                onKeyUp={handleAppTitleInput}
-                onBlur={handleAppTitleBlur}
-                defaultValue={appTitle}
-              />
-            ) : (
-              <Typography gutterBottom variant="h5" component="div">
-                {app ? appTitle : <Skeleton />}
-              </Typography>
-            )
-          }
           subheader={
             <Typography variant="body2" color="text.secondary">
-              {app ? `Edited: ${app.editedAt.toLocaleString('short')}` : <Skeleton />}
+              {app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
             </Typography>
           }
         />
-
+        <CardContent>
+          <EditableText
+            onBlur={handleAppTitleBlur}
+            onKeyUp={handleAppTitleInput}
+            editing={editingTitle}
+            loading={Boolean(!app)}
+            defaultValue={appTitle}
+            variant={'h5'}
+            ref={appTitleInput}
+          />
+        </CardContent>
         <CardActions>
           <Button
             size="small"

@@ -50,7 +50,7 @@ import { HTML_ID_APP_ROOT } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
-import { AppModulesProvider } from './AppModulesProvider';
+import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
@@ -381,6 +381,8 @@ function parseBindings(
   return { parsedBindings, controlled };
 }
 
+const EMPTY_OBJECT = {};
+
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
@@ -426,9 +428,19 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [parsedBindings, controlled],
   );
 
-  const evaluatedBindings = React.useMemo(() => evalJsBindings(pageBindings), [pageBindings]);
+  const modules = useAppModules();
+  const moduleEntry = modules[`pages/${nodeId}`];
+  const globalScope = (moduleEntry?.module as any)?.globalScope || EMPTY_OBJECT;
 
-  const pageState = React.useMemo(() => buildGlobalScope(evaluatedBindings), [evaluatedBindings]);
+  const evaluatedBindings = React.useMemo(
+    () => evalJsBindings(pageBindings, globalScope),
+    [globalScope, pageBindings],
+  );
+
+  const pageState = React.useMemo(
+    () => buildGlobalScope(globalScope, evaluatedBindings),
+    [evaluatedBindings, globalScope],
+  );
   const liveBindings: Record<string, BindingEvaluationResult> = React.useMemo(
     () => mapValues(evaluatedBindings, (binding) => binding.result || { value: undefined }),
     [evaluatedBindings],

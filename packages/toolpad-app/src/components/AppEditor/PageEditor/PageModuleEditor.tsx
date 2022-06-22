@@ -11,6 +11,12 @@ const DEFAULT_CONTENT = `// All properties of this object will be available on t
 export const globalScope = {};
 `;
 
+const EXTRA_LIBS_HTTP_MODULES = [
+  {
+    content: `declare module "https://*";`,
+  },
+];
+
 interface PageModuleEditorDialogProps {
   pageNodeId: NodeId;
   open: boolean;
@@ -44,6 +50,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
           path={`./pages/${page.id}.ts`}
           value={input}
           onChange={(newValue) => setInput(newValue)}
+          extraLibs={EXTRA_LIBS_HTTP_MODULES}
         />
       </Box>
       <DialogActions>

@@ -51,6 +51,12 @@ function FrameContent(props: FrameContentProps) {
   return <CacheProvider value={cache}>{children}</CacheProvider>;
 }
 
+const EXTRA_LIBS_HTTP_MODULES = [
+  {
+    content: `declare module "https://*";`,
+  },
+];
+
 interface CodeComponentEditorContentProps {
   theme?: appDom.ThemeNode;
   codeComponentNode: appDom.CodeComponentNode;
@@ -64,17 +70,17 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
   });
 
   const extraLibs = React.useMemo(() => {
-    return [
-      ...(typings
-        ? Object.entries(typings).map(([path, content]) => ({
-            content,
-            filePath: `file:///${path}`,
-          }))
-        : []),
-      {
-        content: `declare module "https://*";`,
-      },
-    ];
+    if (typings) {
+      return [
+        ...Object.entries(typings).map(([path, content]) => ({
+          content,
+          filePath: `file:///${path}`,
+        })),
+        ...EXTRA_LIBS_HTTP_MODULES,
+      ];
+    }
+
+    return EXTRA_LIBS_HTTP_MODULES;
   }, [typings]);
 
   const [input, setInput] = React.useState<string>(codeComponentNode.attributes.code.value);

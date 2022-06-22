@@ -1,3 +1,4 @@
+import CodeIcon from '@mui/icons-material/Code';
 import { Box, Button, Dialog, DialogActions, DialogTitle } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import * as React from 'react';
@@ -72,7 +73,9 @@ export default function PageModuleEditor({ pageNodeId }: PageModuleEditorProps) 
 
   return (
     <React.Fragment>
-      <Button onClick={() => setDialogOpen(true)}>Edit page module</Button>
+      <Button color="inherit" onClick={() => setDialogOpen(true)} startIcon={<CodeIcon />}>
+        Edit page module
+      </Button>
       <PageModuleEditorDialog
         pageNodeId={pageNodeId}
         open={dialogOpen}

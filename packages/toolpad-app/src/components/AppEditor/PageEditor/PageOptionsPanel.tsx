@@ -29,8 +29,8 @@ export default function PageOptionsPanel() {
         >
           Preview
         </Button>
-        <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
         <PageModuleEditor pageNodeId={pageNodeId} />
+        <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
         <Typography variant="subtitle1">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />
         <QueryEditor />

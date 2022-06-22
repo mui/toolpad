@@ -23,7 +23,7 @@ export interface AppModulesProviderProps {
 export function AppModulesProvider({ dom, children }: AppModulesProviderProps) {
   const moduleSpecs: [string, string | null][] = React.useMemo(() => {
     const root = appDom.getApp(dom);
-    const { codeComponents = [], pages = [] } = appDom.getChildNodes(dom, root);
+    const { codeComponents = [] } = appDom.getChildNodes(dom, root);
     return [
       ...codeComponents.map((component): [string, string | null] => [
         `codeComponents/${component.id}`,

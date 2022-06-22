@@ -37,7 +37,7 @@ import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { mapValues } from '../../../utils/collections';
-import { QueryEditorContextProvider } from '../../../toolpadDataSources/context';
+import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
@@ -326,7 +326,7 @@ function QueryNodeEditorDialog<Q, P>({
 
           <Divider />
           <Typography>Build query:</Typography>
-          <QueryEditorContextProvider value={queryEditorContext}>
+          <ConnectionContextProvider value={queryEditorContext}>
             <dataSource.QueryEditor
               connectionParams={connection?.attributes.params.value}
               value={{
@@ -337,7 +337,7 @@ function QueryNodeEditorDialog<Q, P>({
               onChange={handleQueryChange}
               globalScope={pageState}
             />
-          </QueryEditorContextProvider>
+          </ConnectionContextProvider>
           <Divider />
           <Typography>Options:</Typography>
           <Grid container direction="row" spacing={1}>

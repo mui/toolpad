@@ -429,8 +429,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const modules = useAppModules();
-  const pageModule = modules[`pages/${nodeId}`];
-  const globalScope = (pageModule.module as any)?.globalScope || EMPTY_OBJECT;
+  const moduleEntry = modules[`pages/${nodeId}`];
+  const globalScope = (moduleEntry?.module as any)?.globalScope || EMPTY_OBJECT;
 
   const evaluatedBindings = React.useMemo(
     () => evalJsBindings(pageBindings, globalScope),

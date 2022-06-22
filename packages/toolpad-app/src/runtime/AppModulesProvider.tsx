@@ -8,7 +8,7 @@ type SuspenseCacheEntry =
   | { state: 'loaded'; module: unknown; error?: Error };
 
 const [useAppModules, AppModulesContextProvider] =
-  createProvidedContext<Record<string, { module: unknown; error?: Error }>>('AppModules');
+  createProvidedContext<Partial<Record<string, { module: unknown; error?: Error }>>>('AppModules');
 
 const ModulesCacheContext = React.createContext(new Map<string, SuspenseCacheEntry>());
 
@@ -43,7 +43,6 @@ export function AppModulesProvider({ dom, children }: AppModulesProviderProps) {
   for (const [id, content] of moduleSpecs) {
     const cacheId = `// ${id}\n${content}`;
     const fromCache = cache.get(cacheId);
-    modules[id] = null;
 
     if (content) {
       if (!fromCache) {

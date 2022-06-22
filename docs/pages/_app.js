@@ -1,9 +1,3 @@
-/* eslint-disable import/first */
-// import { LicenseInfo } from '@mui/x-data-grid-pro';
-
-// Remove the license warning from demonstration purposes
-// LicenseInfo.setLicenseKey(process.env.NEXT_PUBLIC_MUI_LICENSE);
-
 import 'docs/src/modules/components/bootstrap';
 // --- Post bootstrap -----
 import * as React from 'react';
@@ -155,7 +149,6 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
 ██║ ╚═╝ ██║ ╚██████╔╝ ██████╗
 ╚═╝     ╚═╝  ╚═════╝  ╚═════╝
 
-Tip: you can access the documentation \`theme\` object directly in the console.
 `,
     'font-family:monospace;color:#1976d2;font-size:12px;',
   );

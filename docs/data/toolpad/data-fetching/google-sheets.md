@@ -19,7 +19,7 @@ You need to enable Google Login to connect Google Sheets. If you're an existing 
 
 3. You will need the following environment variables to setup the datasource:
 
-   ```
+   ```sh
    TOOLPAD_EXTERNAL_URL=<YOUR_APP_URL>
    TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID=
    TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET=
@@ -29,7 +29,7 @@ You need to enable Google Login to connect Google Sheets. If you're an existing 
 
 4. Now add the following URIs under Authorized Redirect URIs:
    ```
-   https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback
+   https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback</YOUR_APP_URL>
    ```
 5. Lastly, you'll have to enable the Google Sheets and Google Drive APIs for the project using the instructions [here](https://developers.google.com/identity/protocols/oauth2/web-server#enable-apis).
 

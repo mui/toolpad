@@ -61,7 +61,7 @@
     "lz-string": "^1.4.4",
     "markdown-to-jsx": "^7.1.7",
     "marked": "^4.0.17",
-    "next": "12.1.7-canary.4",
+    "next": "12.1.7-canary.44",
     "next-transpile-modules": "^9.0.0",
     "nprogress": "^0.2.0",
     "postcss": "^8.4.14",

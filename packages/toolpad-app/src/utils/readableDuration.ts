@@ -10,11 +10,11 @@ const getReadableDuration = (editedAt: Date) => {
   let readableDuration = '';
 
   if (delta < 30) {
-    readableDuration = 'Just now';
+    readableDuration = 'just now';
   } else if (delta < minute) {
     readableDuration = `${delta} seconds ago`;
   } else if (delta < 2 * minute) {
-    readableDuration = 'A minute ago';
+    readableDuration = 'a minute ago';
   } else if (delta < hour) {
     readableDuration = `${Math.floor(delta / minute)} minutes ago`;
   } else if (Math.floor(delta / hour) === 1) {
@@ -22,7 +22,7 @@ const getReadableDuration = (editedAt: Date) => {
   } else if (delta < day) {
     readableDuration = `${Math.floor(delta / hour)}  hours ago`;
   } else if (delta < day * 2) {
-    readableDuration = 'Yesterday';
+    readableDuration = 'yesterday';
   } else if (delta < week) {
     readableDuration = `${Math.floor(delta / day)}  days ago`;
   } else {

@@ -63,8 +63,10 @@ export default function ComponentsContext({ dom, children }: ComponentsContextPr
 
         if (componentDef?.codeComponentId) {
           const componentId = componentDef.codeComponentId;
-          const mod = modules[`codeComponents/${componentId}`];
-          result[id] = ensureToolpadComponent((mod as any).default);
+          const { module: mod, error } = modules[`codeComponents/${componentId}`];
+          result[id] = error
+            ? createToolpadComponentThatThrows(error)
+            : ensureToolpadComponent((mod as any)?.default);
         }
       }
 

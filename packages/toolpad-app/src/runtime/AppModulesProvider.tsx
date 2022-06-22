@@ -3,14 +3,14 @@ import * as appDom from '../appDom';
 import { createProvidedContext } from '../utils/react';
 import loadModule from './loadModule';
 
-type SuspenseCacheEntry<V> =
+type SuspenseCacheEntry =
   | { state: 'pending'; promise: Promise<any> }
-  | { state: 'loaded'; value: V };
+  | { state: 'loaded'; module: unknown; error?: Error };
 
 const [useAppModules, AppModulesContextProvider] =
-  createProvidedContext<Record<string, unknown>>('AppModules');
+  createProvidedContext<Record<string, { module: unknown; error?: Error }>>('AppModules');
 
-const ModulesCacheContext = React.createContext(new Map<string, SuspenseCacheEntry<any>>());
+const ModulesCacheContext = React.createContext(new Map<string, SuspenseCacheEntry>());
 
 export interface AppModulesProviderProps {
   dom: appDom.AppDom;
@@ -42,12 +42,21 @@ export function AppModulesProvider({ dom, children }: AppModulesProviderProps) {
 
     if (content) {
       if (!fromCache) {
-        const createPromise = loadModule(content).then((value) => {
-          cache.set(id, {
-            state: 'loaded',
-            value,
-          });
-        });
+        const createPromise = loadModule(content).then(
+          (module: unknown) => {
+            cache.set(id, {
+              state: 'loaded',
+              module,
+            });
+          },
+          (error) => {
+            cache.set(id, {
+              state: 'loaded',
+              module: undefined,
+              error,
+            });
+          },
+        );
         cache.set(id, {
           state: 'pending',
           promise: createPromise,
@@ -56,7 +65,7 @@ export function AppModulesProvider({ dom, children }: AppModulesProviderProps) {
       } else if (fromCache.state === 'pending') {
         pending.push(fromCache.promise);
       } else {
-        modules[id] = fromCache.value;
+        modules[id] = fromCache;
       }
     }
   }

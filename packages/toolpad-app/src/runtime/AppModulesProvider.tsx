@@ -37,27 +37,28 @@ export function AppModulesProvider({ dom, children }: AppModulesProviderProps) {
   const pending: Promise<void>[] = [];
 
   for (const [id, content] of moduleSpecs) {
-    const fromCache = cache.get(id);
+    const cacheId = `// ${id}\n${content}`;
+    const fromCache = cache.get(cacheId);
     modules[id] = null;
 
     if (content) {
       if (!fromCache) {
         const createPromise = loadModule(content).then(
           (module: unknown) => {
-            cache.set(id, {
+            cache.set(cacheId, {
               state: 'loaded',
               module,
             });
           },
           (error) => {
-            cache.set(id, {
+            cache.set(cacheId, {
               state: 'loaded',
               module: undefined,
               error,
             });
           },
         );
-        cache.set(id, {
+        cache.set(cacheId, {
           state: 'pending',
           promise: createPromise,
         });

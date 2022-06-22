@@ -1,12 +1,13 @@
 import { generateKeyBetween } from 'fractional-indexing';
 import cuid from 'cuid';
 import {
+  NodeId,
   ConstantAttrValue,
   BindableAttrValue,
   BindableAttrValues,
   SecretAttrValue,
 } from '@mui/toolpad-core';
-import { NodeId, ConnectionStatus, AppTheme } from './types';
+import { ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
@@ -76,7 +77,8 @@ export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
     readonly title: ConstantAttrValue<string>;
-    readonly urlQuery: ConstantAttrValue<Record<string, string>>;
+    readonly parameters?: ConstantAttrValue<[string, string][]>;
+    readonly module?: ConstantAttrValue<string>;
   };
 }
 

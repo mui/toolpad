@@ -1,12 +1,3 @@
-declare const brand: unique symbol;
-
-export interface Brand<B> {
-  readonly [brand]: B;
-}
-
-// https://stackoverflow.com/a/56749647
-export type Branded<A, B> = A & Brand<B>;
-
 export type WithControlledProp<V, K extends string = 'value'> = Record<K, V> &
   Record<K extends 'value' ? 'onChange' : `on${Capitalize<K>}Change`, (newValue: V) => void>;
 

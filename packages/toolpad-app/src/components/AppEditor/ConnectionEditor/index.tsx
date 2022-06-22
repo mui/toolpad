@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { Box, Container, Stack, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { NodeId, ConnectionEditorProps, ClientDataSource } from '../../../types';
+import { NodeId } from '@mui/toolpad-core';
+import { ConnectionEditorProps, ClientDataSource } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import dataSources from '../../../toolpadDataSources/client';
+import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 
@@ -59,6 +61,10 @@ function ConnectionEditorContent<P>({
 
   const dataSourceType = connectionNode.attributes.dataSource.value;
   const dataSource = dataSources[dataSourceType];
+  const connectionEditorContext = React.useMemo(
+    () => ({ appId, connectionId: connectionNode.id }),
+    [appId, connectionNode.id],
+  );
 
   return (
     <Box className={className} sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
@@ -66,14 +72,16 @@ function ConnectionEditorContent<P>({
         <Stack spacing={1}>
           <NodeNameEditor node={connectionNode} />
           {dataSource ? (
-            <ConnectionParamsEditor
-              dataSource={dataSource}
-              value={connectionNode.attributes.params.value}
-              onChange={handleConnectionChange}
-              handlerBasePath={`/api/dataSources/${dataSourceType}`}
-              appId={appId}
-              connectionId={connectionNode.id}
-            />
+            <ConnectionContextProvider value={connectionEditorContext}>
+              <ConnectionParamsEditor
+                dataSource={dataSource}
+                value={connectionNode.attributes.params.value}
+                onChange={handleConnectionChange}
+                handlerBasePath={`/api/dataSources/${dataSourceType}`}
+                appId={appId}
+                connectionId={connectionNode.id}
+              />
+            </ConnectionContextProvider>
           ) : (
             <Typography>
               Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;

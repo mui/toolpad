@@ -1,6 +1,5 @@
-import { ToolpadComponent } from '@mui/toolpad-core';
+import { NodeId, ToolpadComponent } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
-import { NodeId } from '../types';
 
 export interface ToolpadComponentDefinition {
   displayName: string;

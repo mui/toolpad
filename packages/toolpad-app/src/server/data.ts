@@ -1,4 +1,4 @@
-import { BindableAttrValue } from '@mui/toolpad-core';
+import { NodeId, BindableAttrValue } from '@mui/toolpad-core';
 import {
   App,
   DomNodeAttributeType,
@@ -6,7 +6,7 @@ import {
   Release,
   Prisma,
 } from '../../prisma/generated/client';
-import { ServerDataSource, ApiResult, NodeId, VersionOrPreview } from '../types';
+import { ServerDataSource, ApiResult, VersionOrPreview } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -132,6 +132,10 @@ export async function loadDom(appId: string): Promise<appDom.AppDom> {
     }),
   );
 
+  if (!root) {
+    throw new Error(`App "${appId}" not found`);
+  }
+
   return {
     root,
     nodes,
@@ -143,6 +147,13 @@ export async function getApps() {
     orderBy: {
       editedAt: 'desc',
     },
+  });
+}
+
+export async function getActiveDeployments() {
+  return prisma.deployment.findMany({
+    distinct: ['appId'],
+    orderBy: { createdAt: 'desc' },
   });
 }
 
@@ -169,7 +180,6 @@ function createDefaultDom(): appDom.AppDom {
     name: 'Page 1',
     attributes: {
       title: appDom.createConst('Page 1'),
-      urlQuery: appDom.createConst({}),
     },
   });
 

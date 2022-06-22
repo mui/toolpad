@@ -1,22 +1,26 @@
 import { UseQueryResult } from 'react-query';
-import { NodeId } from '../types';
+import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '../utils/react';
 import client from '../api';
 
-export interface QueryEditorContext {
+export interface ConnectionContext {
   appId: string;
   connectionId: NodeId;
 }
 
-const [useQueryEditorContext, QueryEditorContextProvider] =
-  createProvidedContext<QueryEditorContext>('QueryEditor');
+const [useConnectionContext, ConnectionContextProvider] =
+  createProvidedContext<ConnectionContext>('QueryEditor');
 
-export { useQueryEditorContext, QueryEditorContextProvider };
+export { useConnectionContext, ConnectionContextProvider };
 
-export function usePrivateQuery<Q = unknown, R = unknown>(query: Q | null): UseQueryResult<R> {
-  const { appId, connectionId } = useQueryEditorContext();
+export function usePrivateQuery<Q = unknown, R = unknown>(
+  query: Q | null,
+  retry?: boolean | number,
+): UseQueryResult<R> {
+  const { appId, connectionId } = useConnectionContext();
   return client.useQuery(
     'dataSourceFetchPrivate',
     query == null ? null : [appId, connectionId, query],
+    { retry: retry ?? 3 },
   );
 }

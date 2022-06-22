@@ -21,10 +21,11 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { LoadingButton } from '@mui/lab';
+import { NodeId } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { NodeId, QueryEditorModel } from '../../../types';
+import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import JsonView from '../../JsonView';
@@ -36,7 +37,7 @@ import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { mapValues } from '../../../utils/collections';
-import { QueryEditorContextProvider } from '../../../toolpadDataSources/context';
+import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
@@ -325,7 +326,7 @@ function QueryNodeEditorDialog<Q, P>({
 
           <Divider />
           <Typography>Build query:</Typography>
-          <QueryEditorContextProvider value={queryEditorContext}>
+          <ConnectionContextProvider value={queryEditorContext}>
             <dataSource.QueryEditor
               connectionParams={connection?.attributes.params.value}
               value={{
@@ -336,7 +337,7 @@ function QueryNodeEditorDialog<Q, P>({
               onChange={handleQueryChange}
               globalScope={pageState}
             />
-          </QueryEditorContextProvider>
+          </ConnectionContextProvider>
           <Divider />
           <Typography>Options:</Typography>
           <Grid container direction="row" spacing={1}>

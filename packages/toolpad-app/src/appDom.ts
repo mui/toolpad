@@ -705,7 +705,7 @@ export function getNewFirstParentIndexInNode(
   node: ElementNode | PageNode,
   parentProp: string,
 ) {
-  const children: readonly AppDomNode[] = getChildNodes(dom, node)[parentProp] || [];
+  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
   const firstChild = children.length > 0 ? children[0] : null;
 
   return createFractionalIndex(null, firstChild?.parentIndex || null);
@@ -716,7 +716,7 @@ export function getNewLastParentIndexInNode(
   node: ElementNode | PageNode,
   parentProp: string,
 ) {
-  const children: readonly AppDomNode[] = getChildNodes(dom, node)[parentProp] || [];
+  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
   const lastChild = children.length > 0 ? children[children.length - 1] : null;
 
   return createFractionalIndex(lastChild?.parentIndex || null, null);
@@ -733,8 +733,10 @@ export function getNewParentIndexBeforeNode(
     throw new Error(`Invariant: Node: "${node.id}" has no parent`);
   }
 
-  const parentChildren: readonly AppDomNode[] =
-    ((isPage(parent) || isElement(parent)) && getChildNodes(dom, parent)[parentProp]) || [];
+  const parentChildren =
+    ((isPage(parent) || isElement(parent)) &&
+      (getChildNodes(dom, parent) as NodeChildren<ElementNode>)[parentProp]) ||
+    [];
 
   const nodeIndex = parentChildren.findIndex((child) => child.id === node.id);
   const nodeBefore = nodeIndex > 0 ? parentChildren[nodeIndex - 1] : null;
@@ -753,8 +755,10 @@ export function getNewParentIndexAfterNode(
     throw new Error(`Invariant: Node: "${node.id}" has no parent`);
   }
 
-  const parentChildren: readonly AppDomNode[] =
-    ((isPage(parent) || isElement(parent)) && getChildNodes(dom, parent)[parentProp]) || [];
+  const parentChildren =
+    ((isPage(parent) || isElement(parent)) &&
+      (getChildNodes(dom, parent) as NodeChildren<ElementNode>)[parentProp]) ||
+    [];
 
   const nodeIndex = parentChildren.findIndex((child) => child.id === node.id);
   const nodeAfter = nodeIndex < parentChildren.length - 1 ? parentChildren[nodeIndex + 1] : null;

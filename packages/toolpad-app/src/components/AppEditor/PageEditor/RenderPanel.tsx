@@ -31,7 +31,6 @@ import {
   isPageLayoutComponent,
   isPageColumn,
 } from '../../../toolpadComponents';
-import { PAGE_GAP } from '../../../runtime/ToolpadApp';
 import { ExactEntriesOf } from '../../../utils/types';
 
 const classes = {
@@ -437,8 +436,6 @@ function NodeDropArea({
   );
 }
 
-const GAP_UNIT_IN_PX = 4;
-
 export interface RenderPanelProps {
   className?: string;
 }
@@ -612,10 +609,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               ? parentChildren[parentChildrenCount - 1].id === node.id
               : true;
 
-          const parentGapInPx: number = isPageChild
-            ? PAGE_GAP * GAP_UNIT_IN_PX
-            : (parentInfo.props.gap as number) * GAP_UNIT_IN_PX || 0;
-
           let gapCount = 2;
           if (isFirstChild || isLastChild) {
             gapCount = 1;
@@ -627,18 +620,39 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           const parentSlots = parentInfo?.slots;
           const parentSlot = (parentSlots && nodeParentProp && parentSlots[nodeParentProp]) || null;
 
-          if (parentSlot && isVerticalSlot(parentSlot)) {
+          const isParentVerticalContainer = parentSlot ? isVerticalSlot(parentSlot) : false;
+          const isParentHorizontalContainer = parentSlot ? isHorizontalSlot(parentSlot) : false;
+
+          let parentGap = 0;
+          if (nodesInfo && gapCount > 0) {
+            const firstChildInfo = nodesInfo[parentChildren[0].id];
+            const secondChildInfo = nodesInfo[parentChildren[1].id];
+
+            const firstChildRect = firstChildInfo?.rect;
+            const secondChildRect = secondChildInfo?.rect;
+
+            if (firstChildRect && secondChildRect) {
+              if (isParentHorizontalContainer) {
+                parentGap = (secondChildRect.x - firstChildRect.x - firstChildRect.width) / 2;
+              }
+              if (isParentVerticalContainer) {
+                parentGap = (secondChildRect.y - firstChildRect.y - firstChildRect.height) / 2;
+              }
+            }
+          }
+
+          if (isParentVerticalContainer) {
             parentAwareNodeRect = {
               ...baseRect,
-              y: isFirstChild ? baseRect.y : baseRect.y - parentGapInPx,
-              height: baseRect.height + gapCount * parentGapInPx,
+              y: isFirstChild ? baseRect.y : baseRect.y - parentGap,
+              height: baseRect.height + gapCount * parentGap,
             };
           }
-          if (parentSlot && isHorizontalSlot(parentSlot)) {
+          if (isParentHorizontalContainer) {
             parentAwareNodeRect = {
               ...baseRect,
-              x: isFirstChild ? baseRect.x : baseRect.x - parentGapInPx,
-              width: baseRect.width + gapCount * parentGapInPx,
+              x: isFirstChild ? baseRect.x : baseRect.x - parentGap,
+              width: baseRect.width + gapCount * parentGap,
             };
           }
 

@@ -27,6 +27,7 @@
     ".next"
   ],
   "dependencies": {
+    "@babel/code-frame": "^7.16.7",
     "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.8.2",
     "@emotion/server": "^11.4.0",

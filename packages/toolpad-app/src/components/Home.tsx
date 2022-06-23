@@ -42,20 +42,19 @@ export interface CreateAppDialogProps {
 
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
-  const createAppMutation = client.useMutation('createApp');
+  const createAppMutation = client.useMutation('createApp', {
+    onSuccess: (app) => {
+      window.location.href = `/_toolpad/app/${app.id}/editor`;
+    },
+  });
 
   return (
     <React.Fragment>
       <Dialog {...props} onClose={onClose}>
         <DialogForm
-          onSubmit={async (event) => {
+          onSubmit={(event) => {
             event.preventDefault();
-            try {
-              const app = await createAppMutation.mutateAsync([name]);
-              window.location.href = `/_toolpad/app/${app.id}/editor`;
-            } catch (error) {
-              // Silently catch
-            }
+            createAppMutation.mutate([name]);
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
@@ -69,13 +68,25 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               error={createAppMutation.isError}
               helperText={createAppMutation.isError ? `An app named "${name}" already exists` : ''}
               onChange={(event) => {
-                createAppMutation.reset();
+                if (createAppMutation.isError) {
+                  createAppMutation.reset();
+                }
                 setName(event.target.value);
               }}
             />
           </DialogContent>
           <DialogActions>
-            <Button color="inherit" variant="text" onClick={onClose}>
+            <Button
+              color="inherit"
+              variant="text"
+              onClick={() => {
+                setName('');
+                if (createAppMutation.isError) {
+                  createAppMutation.reset();
+                }
+                onClose();
+              }}
+            >
               Cancel
             </Button>
             <LoadingButton type="submit" loading={createAppMutation.isLoading} disabled={!name}>
@@ -188,6 +199,9 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
   const handleAppTitleInput = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       setAppTitle((event.target as HTMLInputElement).value);
+      if (showAppRenameError) {
+        setShowAppRenameError(false);
+      }
       if (event.key === 'Escape') {
         if (appTitleInput.current?.value && app?.name) {
           setAppTitle(app.name);
@@ -201,7 +215,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         handleAppRename((event.target as HTMLInputElement).value);
       }
     },
-    [app?.name, handleAppRename],
+    [app?.name, handleAppRename, showAppRenameError],
   );
 
   React.useEffect(() => {

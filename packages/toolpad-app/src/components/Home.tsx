@@ -68,9 +68,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               error={createAppMutation.isError}
               helperText={createAppMutation.isError ? `An app named "${name}" already exists` : ''}
               onChange={(event) => {
-                if (createAppMutation.isError) {
-                  createAppMutation.reset();
-                }
+                createAppMutation.reset();
                 setName(event.target.value);
               }}
             />
@@ -81,9 +79,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               variant="text"
               onClick={() => {
                 setName('');
-                if (createAppMutation.isError) {
-                  createAppMutation.reset();
-                }
+                createAppMutation.reset();
                 onClose();
               }}
             >
@@ -199,9 +195,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
   const handleAppTitleInput = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       setAppTitle((event.target as HTMLInputElement).value);
-      if (showAppRenameError) {
-        setShowAppRenameError(false);
-      }
+      setShowAppRenameError(false);
       if (event.key === 'Escape') {
         if (appTitleInput.current?.value && app?.name) {
           setAppTitle(app.name);
@@ -215,7 +209,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         handleAppRename((event.target as HTMLInputElement).value);
       }
     },
-    [app?.name, handleAppRename, showAppRenameError],
+    [app?.name, handleAppRename],
   );
 
   React.useEffect(() => {

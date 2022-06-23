@@ -5,6 +5,8 @@ interface EditableTextProps {
   defaultValue?: string;
   loading: boolean;
   editing: boolean;
+  isError: boolean;
+  errorText?: string;
   onKeyUp: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
   variant?: TypographyVariant;
@@ -12,7 +14,7 @@ interface EditableTextProps {
 }
 
 const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
-  ({ defaultValue, onKeyUp, onBlur, variant, size, editing, loading }, ref) => {
+  ({ defaultValue, onKeyUp, onBlur, variant, size, editing, loading, isError, errorText }, ref) => {
     return editing ? (
       <TextField
         variant={'standard'}
@@ -23,6 +25,8 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         onKeyUp={onKeyUp ?? (() => {})}
         onBlur={onBlur ?? (() => {})}
         defaultValue={defaultValue}
+        error={isError}
+        helperText={isError ? errorText : ''}
       />
     ) : (
       <Typography gutterBottom variant={variant ?? 'body1'} component="div">

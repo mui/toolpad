@@ -43,7 +43,6 @@ export interface CreateAppDialogProps {
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const createAppMutation = client.useMutation('createApp');
-  const [showAppNameErrorAlert, setShowNameErrorAlert] = React.useState<boolean>(false);
 
   return (
     <React.Fragment>
@@ -54,8 +53,8 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             try {
               const app = await createAppMutation.mutateAsync([name]);
               window.location.href = `/_toolpad/app/${app.id}/editor`;
-            } catch (err) {
-              setShowNameErrorAlert(true);
+            } catch (error) {
+              // Silently catch
             }
           }}
         >
@@ -67,18 +66,13 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               fullWidth
               label="name"
               value={name}
+              error={createAppMutation.isError}
+              helperText={createAppMutation.isError ? `An app named "${name}" already exists` : ''}
               onChange={(event) => {
-                if (showAppNameErrorAlert) {
-                  setShowNameErrorAlert(false);
-                }
+                createAppMutation.reset();
                 setName(event.target.value);
               }}
             />
-            {showAppNameErrorAlert ? (
-              <Alert action={<React.Fragment />} severity="error">
-                An app named &quot;{name}&quot; already exists
-              </Alert>
-            ) : null}
           </DialogContent>
           <DialogActions>
             <Button color="inherit" variant="text" onClick={onClose}>
@@ -133,39 +127,6 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
   );
 }
 
-export interface AppRenameErrorDialogProps {
-  open: boolean;
-  title: string | undefined;
-  content: string | undefined;
-  onContinue: () => void;
-  onDiscard: () => void;
-}
-
-function AppRenameErrorDialog({
-  open,
-  title,
-  content,
-  onContinue,
-  onDiscard,
-}: AppRenameErrorDialogProps) {
-  return (
-    <Dialog open={open} onClose={onDiscard}>
-      <DialogForm>
-        <DialogTitle>{title}</DialogTitle>
-        <DialogContent>{content}</DialogContent>
-        <DialogActions>
-          <Button onClick={onDiscard} color={'error'}>
-            Discard
-          </Button>
-          <Button color="inherit" variant="text" onClick={onContinue}>
-            Keep editing
-          </Button>
-        </DialogActions>
-      </DialogForm>
-    </Dialog>
-  );
-}
-
 interface AppCardProps {
   app?: App;
   activeDeployment?: Deployment;
@@ -174,7 +135,7 @@ interface AppCardProps {
 
 function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [showAppRenameErrorDialog, setShowAppRenameErrorDialog] = React.useState<boolean>(false);
+  const [showAppRenameError, setShowAppRenameError] = React.useState<boolean>(false);
   const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
   const [appTitle, setAppTitle] = React.useState<string | undefined>(app?.name);
   const appTitleInput = React.useRef<HTMLInputElement | null>(null);
@@ -208,7 +169,8 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           await client.mutation.updateApp(app.id, name);
           await client.refetchQueries('getApps');
         } catch (err) {
-          setShowAppRenameErrorDialog(true);
+          setShowAppRenameError(true);
+          setEditingTitle(true);
         }
       }
     },
@@ -309,6 +271,8 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
             onBlur={handleAppTitleBlur}
             onKeyUp={handleAppTitleInput}
             editing={editingTitle}
+            isError={showAppRenameError}
+            errorText={`An app named "${appTitle}" already exists`}
             loading={Boolean(!app)}
             defaultValue={appTitle}
             variant={'h5'}
@@ -350,20 +314,6 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
-      <AppRenameErrorDialog
-        open={showAppRenameErrorDialog}
-        title={`Can't rename app "${app?.name}"`}
-        content={`An app with the name "${appTitle}" already exists`}
-        onDiscard={() => {
-          setEditingTitle(false);
-          setAppTitle(app?.name);
-          setShowAppRenameErrorDialog(false);
-        }}
-        onContinue={() => {
-          setEditingTitle(true);
-          setShowAppRenameErrorDialog(false);
-        }}
-      />
     </React.Fragment>
   );
 }

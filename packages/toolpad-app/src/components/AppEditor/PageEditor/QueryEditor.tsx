@@ -17,7 +17,6 @@ import {
   Typography,
   Toolbar,
   MenuItem,
-  Skeleton,
   IconButton,
 } from '@mui/material';
 import * as React from 'react';
@@ -427,9 +426,7 @@ function QueryNodeEditorDialog<Q, P>({
                   }
                 />
                 <Stack direction={'row'} spacing={2}>
-                  {rawQueryPreview.isLoading ? (
-                    <Skeleton width={'300px'} height={'30px'} />
-                  ) : (
+                  {
                     <Box
                       sx={{
                         width: '600px',
@@ -439,11 +436,15 @@ function QueryNodeEditorDialog<Q, P>({
                       }}
                     >
                       <JsonView
-                        src={rawQueryPreview.data ?? { data: '' }}
-                        disabled={!input.attributes.transformEnabled?.value}
+                        src={rawQueryPreview.data ?? { data: {} }}
+                        disabled={
+                          rawQueryPreview.isLoading ||
+                          rawQueryPreview.isRefetching ||
+                          !input.attributes.transformEnabled?.value
+                        }
                       />
                     </Box>
-                  )}
+                  }
                   <IconButton
                     disabled={
                       rawQueryPreviewRefreshDisabled || !input.attributes.transformEnabled?.value
@@ -452,7 +453,24 @@ function QueryNodeEditorDialog<Q, P>({
                     onClick={handleRawQueryPreviewRefresh}
                     sx={{ alignSelf: 'self-start' }}
                   >
-                    <Autorenew fontSize="inherit" />
+                    <Autorenew
+                      sx={{
+                        animation: 'spin 1500ms linear infinite',
+                        animationPlayState:
+                          rawQueryPreview.isLoading || rawQueryPreview.isRefetching
+                            ? 'running'
+                            : 'paused',
+                        '@keyframes spin': {
+                          '0%': {
+                            transform: 'rotate(0deg)',
+                          },
+                          '100%': {
+                            transform: 'rotate(360deg)',
+                          },
+                        },
+                      }}
+                      fontSize="inherit"
+                    />
                   </IconButton>
                   <JsExpressionEditor
                     globalScope={{ data: rawQueryPreview.data?.data }}

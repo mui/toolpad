@@ -215,6 +215,7 @@ function findDropAreaAt(
   dropAreaRects: DropAreaRects,
   x: number,
   y: number,
+  isSlotAware = true,
 ): {
   nodeId: NodeId;
   slotParentProp?: string;
@@ -224,7 +225,7 @@ function findDropAreaAt(
     const node = nodes[i];
     const nodeInfo = nodesInfo[node.id];
 
-    if (nodeInfo && hasEmptyNodeSlots(nodeInfo)) {
+    if (isSlotAware && nodeInfo && hasEmptyNodeSlots(nodeInfo)) {
       const rectEntries = Object.entries(dropAreaRects[node.id]);
 
       for (let j = 0; j < rectEntries.length; j += 1) {
@@ -658,6 +659,21 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
     return rects;
   }, [dom, nodesInfo, pageNodes]);
+
+  const selectionRects = React.useMemo(() => {
+    const rects: DropAreaRects = {};
+
+    pageNodes.forEach((node) => {
+      const nodeInfo = nodesInfo[node.id];
+      const nodeRect = nodeInfo?.rect || null;
+
+      if (nodeRect) {
+        (rects[node.id] as Rectangle) = nodeRect;
+      }
+    });
+
+    return rects;
+  }, [nodesInfo, pageNodes]);
 
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
@@ -1189,8 +1205,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       const newSelectedNodeId =
-        findDropAreaAt(pageNodes, nodesInfo, dropAreaRects, cursorPos.x, cursorPos.y)?.nodeId ||
-        null;
+        findDropAreaAt(pageNodes, nodesInfo, selectionRects, cursorPos.x, cursorPos.y, false)
+          ?.nodeId || null;
       const newSelectedNode = newSelectedNodeId && appDom.getMaybeNode(dom, newSelectedNodeId);
       if (newSelectedNode && appDom.isElement(newSelectedNode)) {
         api.select(newSelectedNodeId);
@@ -1198,7 +1214,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.select(null);
       }
     },
-    [getViewCoordinates, pageNodes, nodesInfo, dropAreaRects, dom, api],
+    [getViewCoordinates, pageNodes, nodesInfo, selectionRects, dom, api],
   );
 
   const handleDelete = React.useCallback(

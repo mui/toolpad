@@ -1,4 +1,5 @@
-import { transform } from 'sucrase';
+import { transform, TransformResult } from 'sucrase';
+import { codeFrameColumns } from '@babel/code-frame';
 import { findImports, isAbsoluteUrl } from '../utils/strings';
 
 async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<string, unknown>> {
@@ -49,9 +50,18 @@ async function createRequire(urlImports: string[]) {
 export default async function loadModule(src: string): Promise<any> {
   const imports = findImports(src).filter((maybeUrl) => isAbsoluteUrl(maybeUrl));
 
-  const compiled = transform(src, {
-    transforms: ['jsx', 'typescript', 'imports'],
-  });
+  let compiled: TransformResult;
+
+  try {
+    compiled = transform(src, {
+      transforms: ['jsx', 'typescript', 'imports'],
+    });
+  } catch (err: any) {
+    if (err.loc) {
+      err.message = [err.message, codeFrameColumns(src, { start: err.loc })].join('\n\n');
+    }
+    throw err;
+  }
 
   const require = await createRequire(imports);
 

@@ -51,6 +51,7 @@ import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
+import Pre from '../components/Pre';
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
@@ -492,7 +493,7 @@ function AppError({ error }: FallbackProps) {
     <FullPageCentered>
       <Alert severity="error">
         <AlertTitle>Something went wrong</AlertTitle>
-        <pre>{error.stack}</pre>
+        <Pre>{error.stack}</Pre>
       </Alert>
     </FullPageCentered>
   );

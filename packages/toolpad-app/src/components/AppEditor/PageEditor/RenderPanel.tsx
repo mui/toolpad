@@ -205,7 +205,7 @@ const EmptySlot = styled('div')({
 
 type DropAreaRects = Record<NodeId, Rectangle | Record<string, Rectangle>>;
 
-function isContainerNode(nodeInfo: NodeInfo): boolean {
+function hasEmptyNodeSlots(nodeInfo: NodeInfo): boolean {
   return Object.keys(nodeInfo.slots || []).length > 0;
 }
 
@@ -224,9 +224,7 @@ function findDropAreaAt(
     const node = nodes[i];
     const nodeInfo = nodesInfo[node.id];
 
-    const isContainer = nodeInfo ? isContainerNode(nodeInfo) : false;
-
-    if (isContainer) {
+    if (nodeInfo && hasEmptyNodeSlots(nodeInfo)) {
       const rectEntries = Object.entries(dropAreaRects[node.id]);
 
       for (let j = 0; j < rectEntries.length; j += 1) {
@@ -576,17 +574,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const nodeSlots = nodeInfo?.slots || [];
       const nodeSlotValues = Object.values(nodeSlots);
 
-      const isContainer = nodeSlotValues.length > 0;
+      const hasEmptySlots = nodeSlotValues.length > 0;
 
       rects[nodeId] = {};
 
-      const baseRects = isContainer ? nodeSlotValues.map((slot) => slot?.rect) : [nodeInfo?.rect];
+      const baseRects = hasEmptySlots ? nodeSlotValues.map((slot) => slot?.rect) : [nodeInfo?.rect];
 
       baseRects.forEach((baseRect, baseRectIndex) => {
         const parent = appDom.getParent(dom, node);
         const parentInfo = parent && nodesInfo[parent.id];
 
-        const parentProp = isContainer ? Object.keys(nodeSlots)[baseRectIndex] : null;
+        const parentProp = hasEmptySlots ? Object.keys(nodeSlots)[baseRectIndex] : null;
 
         let parentAwareNodeRect = null;
 
@@ -597,7 +595,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           parentInfo &&
           baseRect &&
           (isPageChild || appDom.isElement(parent)) &&
-          isContainerNode(parentInfo)
+          hasEmptyNodeSlots(parentInfo)
         ) {
           const parentChildren = nodeParentProp
             ? (appDom.getChildNodes(dom, parent) as appDom.NodeChildren<appDom.ElementNode>)[
@@ -684,7 +682,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const activeDropNodeInfo = nodesInfo[activeDropNodeId];
 
       const isActiveDropNodeContainer = activeDropNodeInfo
-        ? isContainerNode(activeDropNodeInfo)
+        ? hasEmptyNodeSlots(activeDropNodeInfo)
         : false;
 
       const activeDropNode = appDom.getNode(dom, activeDropNodeId);
@@ -1377,13 +1375,19 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             const parent = appDom.getParent(dom, node);
             const parentInfo = (parent && nodesInfo[parent.id]) || null;
 
-            const slots = nodeInfo?.slots || {};
-            const slotEntries = Object.entries(slots) as ExactEntriesOf<SlotsState>;
+            const emptySlots = nodeInfo?.slots || {};
+            const emptySlotEntries = Object.entries(emptySlots) as ExactEntriesOf<SlotsState>;
+            const hasEmptySlots = emptySlotEntries.length > 0;
 
             const isPageNode = appDom.isPage(node);
             const isPageChild = parent ? appDom.isPage(parent) : false;
 
-            const isContainer = nodeInfo ? isContainerNode(nodeInfo) : false;
+            const childNodes = appDom.getChildNodes(
+              dom,
+              node,
+            ) as appDom.NodeChildren<appDom.ElementNode>;
+
+            const isContainer = Object.keys(childNodes).length > 0;
 
             const nodeRect = nodeInfo?.rect || null;
             const hasNodeOverlay = isPageNode || appDom.isElement(node);
@@ -1405,19 +1409,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     onDelete={() => handleDelete(node.id)}
                   />
                 ) : null}
-                {isContainer ? (
-                  slotEntries.map(([parentProp, slot]) => {
+                {hasEmptySlots ? (
+                  emptySlotEntries.map(([parentProp, emptySlot]) => {
                     const dropAreaRect = (dropAreaRects[node.id] as Record<string, Rectangle>)[
                       parentProp
                     ];
 
-                    const childNodes =
-                      (appDom.getChildNodes(dom, node) as appDom.NodeChildren<appDom.ElementNode>)[
-                        parentProp
-                      ] || [];
-                    const isEmptyContainer = isContainer && childNodes.length === 0;
+                    const slotChildNodes = childNodes[parentProp] || [];
+                    const isEmptyContainer = slotChildNodes.length === 0;
 
-                    if (!slot) {
+                    if (!emptySlot) {
                       return null;
                     }
 
@@ -1433,7 +1434,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                           isPageChild={isPageChild}
                         />
                         {isEmptyContainer ? (
-                          <EmptySlot style={absolutePositionCss(slot.rect)}>+</EmptySlot>
+                          <EmptySlot style={absolutePositionCss(emptySlot.rect)}>+</EmptySlot>
                         ) : null}
                       </React.Fragment>
                     );

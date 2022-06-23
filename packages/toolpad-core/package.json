@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-core",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Build MUI apps quickly",
   "author": "MUI Soolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -35,7 +35,7 @@
     "@mui/x-data-grid-pro": "^5.11.0",
     "quickjs-emscripten": "^0.20.0",
     "react-error-boundary": "^3.1.4",
-    "react-query": "^3.34.19"
+    "react-query": "^3.39.1"
   },
   "devDependencies": {
     "react": "^18.1.0"

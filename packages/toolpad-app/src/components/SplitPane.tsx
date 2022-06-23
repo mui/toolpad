@@ -7,40 +7,41 @@ const classes = {
   dragging: 'MuiToolpadSplitPaneDragging',
 };
 
-const WrappedSplitPane = React.forwardRef<SplitPane, SplitPaneProps>(
-  ({ className, onDragStarted, onDragFinished, ...props }, ref) => {
-    const [dragActive, setDragActive] = React.useState(false);
+const WrappedSplitPane = React.forwardRef<
+  SplitPane,
+  SplitPaneProps & { children?: React.ReactNode }
+>(({ className, onDragStarted, onDragFinished, ...props }, ref) => {
+  const [dragActive, setDragActive] = React.useState(false);
 
-    const handleDragStarted = React.useCallback(
-      (...args: Parameters<NonNullable<typeof onDragStarted>>) => {
-        setDragActive(true);
-        onDragStarted?.(...args);
-      },
-      [onDragStarted],
-    );
+  const handleDragStarted = React.useCallback(
+    (...args: Parameters<NonNullable<typeof onDragStarted>>) => {
+      setDragActive(true);
+      onDragStarted?.(...args);
+    },
+    [onDragStarted],
+  );
 
-    const handleDragFinished = React.useCallback(
-      (...args: Parameters<NonNullable<typeof onDragFinished>>) => {
-        setDragActive(false);
-        onDragFinished?.(...args);
-      },
-      [onDragFinished],
-    );
+  const handleDragFinished = React.useCallback(
+    (...args: Parameters<NonNullable<typeof onDragFinished>>) => {
+      setDragActive(false);
+      onDragFinished?.(...args);
+    },
+    [onDragFinished],
+  );
 
-    return (
-      <SplitPane
-        ref={ref}
-        className={clsx({ [classes.dragging]: dragActive }, className)}
-        onDragStarted={handleDragStarted}
-        onDragFinished={handleDragFinished}
-        // Some sensible defaults
-        minSize={20}
-        maxSize={-20}
-        {...props}
-      />
-    );
-  },
-);
+  return (
+    <SplitPane
+      ref={ref}
+      className={clsx({ [classes.dragging]: dragActive }, className)}
+      onDragStarted={handleDragStarted}
+      onDragFinished={handleDragFinished}
+      // Some sensible defaults
+      minSize={20}
+      maxSize={-20}
+      {...props}
+    />
+  );
+});
 
 const StyledSplitPane = styled(WrappedSplitPane)(({ theme }) => ({
   [`&.${classes.dragging} *`]: {

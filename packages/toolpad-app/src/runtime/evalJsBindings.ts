@@ -81,8 +81,11 @@ export interface ParsedBinding<T = unknown> {
   result?: BindingEvaluationResult<T>;
 }
 
-export function buildGlobalScope(bindings: Record<string, ParsedBinding>): Record<string, unknown> {
-  const globalScope = {};
+export function buildGlobalScope(
+  base: Record<string, unknown>,
+  bindings: Record<string, ParsedBinding>,
+): Record<string, unknown> {
+  const globalScope = { ...base };
   for (const binding of Object.values(bindings)) {
     if (binding.scopePath) {
       const value = binding.result?.value;
@@ -97,6 +100,7 @@ export function buildGlobalScope(bindings: Record<string, ParsedBinding>): Recor
  */
 export default function evalJsBindings(
   bindings: Record<string, ParsedBinding>,
+  globalScope: Record<string, unknown>,
 ): Record<string, ParsedBinding> {
   const bindingsMap = new Map(Object.entries(bindings));
 
@@ -160,7 +164,7 @@ export default function evalJsBindings(
       },
     });
 
-  const scope = buildGlobalScope(bindings);
+  const scope = buildGlobalScope(globalScope, bindings);
   proxiedScope = proxify(scope);
 
   return mapValues(bindings, (binding) => {

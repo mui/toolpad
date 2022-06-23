@@ -27,21 +27,21 @@ module.exports = {
     return config;
   },
 
-  async rewrites() {
-    return [
-      {
-        source: '/health-check',
-        destination: '/api/health-check',
-      },
-    ];
-  },
-
   async redirects() {
     return [
       {
         source: '/release/:path*',
         destination: '/app/:path*',
         permanent: true,
+      },
+    ];
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: '/health-check',
+        destination: '/api/health-check',
       },
     ];
   },

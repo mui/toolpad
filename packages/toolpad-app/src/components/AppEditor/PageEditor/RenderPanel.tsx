@@ -530,19 +530,35 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       const isDraggingPageRow = isPageRow(draggedNode);
-
-      if (isDraggingPageRow) {
-        return [DropZone.TOP, DropZone.BOTTOM];
-      }
+      const isDraggingPageColumn = isPageColumn(draggedNode);
 
       const dragOverNodeSlots = dragOverNodeInfo?.slots;
       const dragOverSlot =
         dragOverNodeSlots && dragOverSlotParentProp && dragOverNodeSlots[dragOverSlotParentProp];
 
-      if (dragOverSlot && isHorizontalSlot(dragOverSlot)) {
+      const isDraggingOverHorizontalContainer = dragOverSlot && isHorizontalSlot(dragOverSlot);
+      const isDraggingOverVerticalContainer = dragOverSlot && isVerticalSlot(dragOverSlot);
+
+      if (isDraggingPageRow) {
+        return [
+          DropZone.TOP,
+          DropZone.BOTTOM,
+          ...(isDraggingOverVerticalContainer ? [DropZone.CENTER] : []),
+        ];
+      }
+
+      if (isDraggingPageColumn) {
+        return [
+          DropZone.RIGHT,
+          DropZone.LEFT,
+          ...(isDraggingOverHorizontalContainer ? [DropZone.CENTER] : []),
+        ];
+      }
+
+      if (isDraggingOverHorizontalContainer) {
         return [DropZone.TOP, DropZone.BOTTOM, DropZone.CENTER];
       }
-      if (dragOverSlot && isVerticalSlot(dragOverSlot)) {
+      if (isDraggingOverVerticalContainer) {
         return [DropZone.RIGHT, DropZone.LEFT, DropZone.CENTER];
       }
     }
@@ -1448,6 +1464,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
                       const slotChildNodes = childNodes[parentProp] || [];
                       const isEmptySlot = slotChildNodes.length === 0;
+
+                      if (isPageNode && !isEmptySlot) {
+                        return null;
+                      }
 
                       return (
                         <NodeDropArea

@@ -280,6 +280,10 @@ function isVerticalSlot(slot: SlotState): boolean {
   return slot.flowDirection === 'column' || slot.flowDirection === 'column-reverse';
 }
 
+function isReverseSlot(slot: SlotState): boolean {
+  return slot.flowDirection === 'row-reverse' || slot.flowDirection === 'column-reverse';
+}
+
 function getDropAreaId(nodeId: string, parentProp: string): string {
   return `${nodeId}:${parentProp}`;
 }
@@ -648,6 +652,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           const isParentVerticalContainer = parentSlot ? isVerticalSlot(parentSlot) : false;
           const isParentHorizontalContainer = parentSlot ? isHorizontalSlot(parentSlot) : false;
 
+          const isParentReverseContainer = parentSlot ? isReverseSlot(parentSlot) : false;
+
           let parentGap = 0;
           if (nodesInfo && gapCount > 0) {
             const firstChildInfo = nodesInfo[parentChildren[0].id];
@@ -658,25 +664,32 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
             if (firstChildRect && secondChildRect) {
               if (isParentHorizontalContainer) {
-                parentGap = (secondChildRect.x - firstChildRect.x - firstChildRect.width) / 2;
+                parentGap =
+                  (isParentReverseContainer
+                    ? firstChildRect.x - secondChildRect.x - secondChildRect.width
+                    : secondChildRect.x - firstChildRect.x - firstChildRect.width) / 2;
               }
               if (isParentVerticalContainer) {
-                parentGap = (secondChildRect.y - firstChildRect.y - firstChildRect.height) / 2;
+                parentGap =
+                  (isParentReverseContainer
+                    ? firstChildRect.y - secondChildRect.y - secondChildRect.height
+                    : secondChildRect.y - firstChildRect.y - firstChildRect.height) / 2;
               }
             }
           }
 
+          const hasPositionGap = isParentReverseContainer ? isLastChild : isFirstChild;
           if (isParentVerticalContainer) {
             parentAwareNodeRect = {
               ...baseRect,
-              y: isFirstChild ? baseRect.y : baseRect.y - parentGap,
+              y: hasPositionGap ? baseRect.y : baseRect.y - parentGap,
               height: baseRect.height + gapCount * parentGap,
             };
           }
           if (isParentHorizontalContainer) {
             parentAwareNodeRect = {
               ...baseRect,
-              x: isFirstChild ? baseRect.x : baseRect.x - parentGap,
+              x: hasPositionGap ? baseRect.x : baseRect.x - parentGap,
               width: baseRect.width + gapCount * parentGap,
             };
           }

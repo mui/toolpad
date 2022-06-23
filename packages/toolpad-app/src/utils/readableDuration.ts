@@ -5,7 +5,6 @@ const getReadableDuration = (editedAt: Date) => {
   const minute = 60;
   const hour = minute * 60;
   const day = hour * 24;
-  const week = day * 7;
 
   let readableDuration = '';
 
@@ -21,12 +20,8 @@ const getReadableDuration = (editedAt: Date) => {
     readableDuration = '1 hour ago';
   } else if (delta < day) {
     readableDuration = `${Math.floor(delta / hour)}  hours ago`;
-  } else if (delta < day * 2) {
-    readableDuration = 'yesterday';
-  } else if (delta < week) {
-    readableDuration = `${Math.floor(delta / day)}  days ago`;
   } else {
-    readableDuration = `${Math.floor(delta / week)} weeks ago`;
+    readableDuration = editedAt.toLocaleDateString('short');
   }
   return readableDuration;
 };

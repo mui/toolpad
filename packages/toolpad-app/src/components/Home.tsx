@@ -19,7 +19,6 @@ import {
   Toolbar,
   Typography,
   Box,
-  Snackbar,
   Tooltip,
 } from '@mui/material';
 import * as React from 'react';
@@ -44,9 +43,7 @@ export interface CreateAppDialogProps {
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const createAppMutation = client.useMutation('createApp');
-  const [showAppNameErrorSnackbar, setShowNameErrorSnackbar] = React.useState<boolean>(false);
-
-  const handleSnackbarClose = React.useCallback(() => setShowNameErrorSnackbar(false), []);
+  const [showAppNameErrorAlert, setShowNameErrorAlert] = React.useState<boolean>(false);
 
   return (
     <React.Fragment>
@@ -58,7 +55,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               const app = await createAppMutation.mutateAsync([name]);
               window.location.href = `/_toolpad/app/${app.id}/editor`;
             } catch (err) {
-              setShowNameErrorSnackbar(true);
+              setShowNameErrorAlert(true);
             }
           }}
         >
@@ -70,8 +67,18 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               fullWidth
               label="name"
               value={name}
-              onChange={(event) => setName(event.target.value)}
+              onChange={(event) => {
+                if (showAppNameErrorAlert) {
+                  setShowNameErrorAlert(false);
+                }
+                setName(event.target.value);
+              }}
             />
+            {showAppNameErrorAlert ? (
+              <Alert action={<React.Fragment />} severity="error">
+                An app named &quot;{name}&quot; already exists
+              </Alert>
+            ) : null}
           </DialogContent>
           <DialogActions>
             <Button color="inherit" variant="text" onClick={onClose}>
@@ -83,15 +90,6 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           </DialogActions>
         </DialogForm>
       </Dialog>
-      <Snackbar
-        open={showAppNameErrorSnackbar}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: '100%' }}>
-          An app with the name &quot;{name}&quot; already exists
-        </Alert>
-      </Snackbar>
     </React.Fragment>
   );
 }
@@ -135,7 +133,7 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
   );
 }
 
-export interface AppNameErrorDialogProps {
+export interface AppRenameErrorDialogProps {
   open: boolean;
   title: string | undefined;
   content: string | undefined;
@@ -143,13 +141,13 @@ export interface AppNameErrorDialogProps {
   onDiscard: () => void;
 }
 
-function AppNameErrorDialog({
+function AppRenameErrorDialog({
   open,
   title,
   content,
   onContinue,
   onDiscard,
-}: AppNameErrorDialogProps) {
+}: AppRenameErrorDialogProps) {
   return (
     <Dialog open={open} onClose={onDiscard}>
       <DialogForm>
@@ -296,7 +294,13 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           disableTypography
           subheader={
             <Typography variant="body2" color="text.secondary">
-              {app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
+              {app ? (
+                <Tooltip title={app.editedAt.toLocaleString('short')}>
+                  <span>Edited {getReadableDuration(app.editedAt)}</span>
+                </Tooltip>
+              ) : (
+                <Skeleton />
+              )}
             </Typography>
           }
         />
@@ -346,7 +350,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
-      <AppNameErrorDialog
+      <AppRenameErrorDialog
         open={showAppRenameErrorDialog}
         title={`Can't rename app "${app?.name}"`}
         content={`An app with the name "${appTitle}" already exists`}

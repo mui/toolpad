@@ -7,6 +7,10 @@ import {
   Breadcrumbs,
   Link as MuiLink,
   Stack,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
 } from '@mui/material';
 import * as React from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -15,6 +19,8 @@ import { Link, useParams } from 'react-router-dom';
 import client from '../api';
 import ToolpadAppShell from './ToolpadAppShell';
 import DefinitionList from './DefinitionList';
+import useLatest from '../utils/useLatest';
+import useDialog from '../utils/useDialog';
 
 function getDeploymentStatusMessage(version: number, activeVersion?: number): React.ReactNode {
   if (typeof activeVersion === 'undefined') {
@@ -33,25 +39,69 @@ function getDeploymentStatusMessage(version: number, activeVersion?: number): Re
   );
 }
 
+interface ConfirmDeployDialogProps {
+  data?: {
+    version: number;
+  };
+  open: boolean;
+  onClose: (confirm: boolean) => void;
+}
+
+function ConfirmDeployDialog({ open, onClose, data: dataProp }: ConfirmDeployDialogProps) {
+  const cancel = () => onClose(false);
+
+  const data = useLatest(dataProp);
+
+  if (!data) {
+    return null;
+  }
+
+  return (
+    <Dialog open={open} onClose={cancel}>
+      <DialogTitle>Confirm deploy</DialogTitle>
+      <DialogContent>
+        Press &quot;Deploy&quot; to change the canonical url of your application to
+        version&nbsp;&quot;{data.version}&quot;.
+      </DialogContent>
+      <DialogActions>
+        <Button color="inherit" variant="text" onClick={cancel}>
+          Cancel
+        </Button>
+        <Button onClick={() => onClose(true)}>Deploy</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 interface ActiveReleaseMessageProps {
   appId: string;
   version: number;
   activeVersion?: number;
 }
+
 function DeploymentStatus({ appId, activeVersion, version }: ActiveReleaseMessageProps) {
   const msg: React.ReactNode = getDeploymentStatusMessage(version, activeVersion);
   const isActiveDeployment = activeVersion === version;
 
   const deployReleaseMutation = client.useMutation('createDeployment');
 
+  const { element, show: showConfirmDialog } = useDialog(ConfirmDeployDialog);
+
   const handleDeployClick = React.useCallback(async () => {
+    const ok = await showConfirmDialog({ version });
+
+    if (!ok) {
+      return;
+    }
+
     if (version) {
       await deployReleaseMutation.mutateAsync([appId, version]);
       client.invalidateQueries('findActiveDeployment', [appId]);
     }
-  }, [appId, deployReleaseMutation, version]);
+  }, [appId, deployReleaseMutation, showConfirmDialog, version]);
 
   const canDeploy = deployReleaseMutation.isIdle && !isActiveDeployment;
+  const isNewerVersion = version >= (activeVersion ?? -Infinity);
 
   return (
     <React.Fragment>
@@ -68,14 +118,16 @@ function DeploymentStatus({ appId, activeVersion, version }: ActiveReleaseMessag
         </Button>
         <Button
           variant={canDeploy ? 'contained' : 'outlined'}
+          color={isNewerVersion ? 'primary' : 'error'}
           disabled={!canDeploy}
           onClick={handleDeployClick}
           startIcon={<RocketLaunchIcon />}
         >
-          {version >= (activeVersion ?? -Infinity) ? 'Deploy' : 'Rollback to'} version &quot;
+          {isNewerVersion ? 'Deploy' : 'Rollback to'} version &quot;
           {version}&quot;
         </Button>
       </Toolbar>
+      {element}
     </React.Fragment>
   );
 }

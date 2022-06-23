@@ -30,6 +30,12 @@ module.exports = {
         '@next/next/no-html-link-for-pages': ['error', 'packages/toolpad-app/pages/'],
       },
     },
+    {
+      files: ['./docs/**/*'],
+      rules: {
+        'import/no-unresolved': ['error', { ignore: ['\\.md\\?@mui/markdown$'] }],
+      },
+    },
     ...baseline.overrides.map((override) => {
       return {
         ...override,

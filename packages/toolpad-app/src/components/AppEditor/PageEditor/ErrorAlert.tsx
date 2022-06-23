@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Alert, AlertTitle, IconButton, Collapse, Box, styled } from '@mui/material';
+import { Alert, AlertTitle, IconButton, Collapse, Box } from '@mui/material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Pre from '../../Pre';
 
 /**
  * Remove the error message from the stack trace
@@ -9,11 +10,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 function stackTraceOnly(stack: string, message: string): string {
   return stack.split(message)[1]?.trim() || '';
 }
-
-const Pre = styled('pre')({
-  margin: 0,
-  fontFamily: 'Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
-});
 
 export interface ErrorAlertProps {
   error: unknown;

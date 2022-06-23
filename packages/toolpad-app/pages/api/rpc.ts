@@ -3,8 +3,10 @@ import type { IncomingMessage } from 'http';
 import superjson from 'superjson';
 import {
   getApps,
+  getApp,
+  getActiveDeployments,
   createApp,
-  execApi,
+  updateApp,
   execQuery,
   dataSourceFetchPrivate,
   loadDom,
@@ -113,8 +115,11 @@ const rpcServer = {
     getApps: createMethod<typeof getApps>((params) => {
       return getApps(...params);
     }),
-    execApi: createMethod<typeof execApi>((args) => {
-      return execApi(...args);
+    getActiveDeployments: createMethod<typeof getActiveDeployments>((params) => {
+      return getActiveDeployments(...params);
+    }),
+    getApp: createMethod<typeof getApp>((params) => {
+      return getApp(...params);
     }),
     execQuery: createMethod<typeof execQuery>((args) => {
       return execQuery(...args);
@@ -141,6 +146,9 @@ const rpcServer = {
   mutation: {
     createApp: createMethod<typeof createApp>((params) => {
       return createApp(...params);
+    }),
+    updateApp: createMethod<typeof updateApp>((params) => {
+      return updateApp(...params);
     }),
     deleteApp: createMethod<typeof deleteApp>((params) => {
       return deleteApp(...params);

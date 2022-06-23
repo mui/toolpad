@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
-import { execApi, execQuery, loadVersionedDom } from './data';
+import { NodeId } from '@mui/toolpad-core';
+import { execQuery, loadVersionedDom } from './data';
 import initMiddleware from './initMiddleware';
-import { NodeId, ApiResult, VersionOrPreview } from '../types';
+import { ApiResult, VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
@@ -27,24 +28,13 @@ export default async (
   await cors(req, res);
   const queryNodeId = req.query.queryId as NodeId;
   const dom = await loadVersionedDom(appId, version);
-  const query = appDom.getNode(dom, queryNodeId);
+  const query = appDom.getNode(dom, queryNodeId, 'query');
 
-  let result;
-  if (appDom.isApi(query)) {
-    result = await execApi(
-      appId,
-      query,
-      req.query.params ? JSON.parse(req.query.params as string) : {},
-    );
-  } else if (appDom.isQuery(query)) {
-    result = await execQuery(
-      appId,
-      query,
-      req.query.params ? JSON.parse(req.query.params as string) : {},
-    );
-  } else {
-    throw new Error(`Unrecognized query "${queryNodeId}"`);
-  }
+  const result = await execQuery(
+    appId,
+    query,
+    req.query.params ? JSON.parse(req.query.params as string) : {},
+  );
 
   res.json(result);
 };

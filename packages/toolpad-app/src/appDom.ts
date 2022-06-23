@@ -1,18 +1,17 @@
 import { generateKeyBetween } from 'fractional-indexing';
 import cuid from 'cuid';
 import {
+  NodeId,
   ConstantAttrValue,
   BindableAttrValue,
   BindableAttrValues,
-  ConstantAttrValues,
   SecretAttrValue,
-  PropValueType,
-  PropValueTypes,
 } from '@mui/toolpad-core';
-import { NodeId, ConnectionStatus, AppTheme } from './types';
+import { ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
 import { ExactEntriesOf } from './utils/types';
+import { filterValues } from './utils/collections';
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -39,14 +38,11 @@ export function compareFractionalIndex(index1: string, index2: string): number {
 type AppDomNodeType =
   | 'app'
   | 'connection'
-  | 'api'
   | 'theme'
   | 'page'
   | 'element'
   | 'codeComponent'
-  | 'derivedState'
-  | 'query'
-  | 'queryState';
+  | 'query';
 
 interface AppDomNodeBase {
   readonly id: NodeId;
@@ -65,26 +61,15 @@ export interface AppNode extends AppDomNodeBase {
 
 export interface ThemeNode extends AppDomNodeBase {
   readonly type: 'theme';
-  readonly theme: BindableAttrValues<AppTheme>;
+  readonly theme?: BindableAttrValues<AppTheme>;
 }
 
 export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
   readonly type: 'connection';
   readonly attributes: {
     readonly dataSource: ConstantAttrValue<string>;
-    readonly params: SecretAttrValue<P>;
+    readonly params: SecretAttrValue<P | null>;
     readonly status: ConstantAttrValue<ConnectionStatus | null>;
-  };
-}
-
-export interface ApiNode<Q = unknown> extends AppDomNodeBase {
-  readonly type: 'api';
-  readonly attributes: {
-    readonly connectionId: ConstantAttrValue<string>;
-    readonly dataSource: ConstantAttrValue<string>;
-    readonly query: ConstantAttrValue<Q>;
-    readonly transform?: ConstantAttrValue<string>;
-    readonly transformEnabled?: ConstantAttrValue<boolean>;
   };
 }
 
@@ -92,7 +77,8 @@ export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
     readonly title: ConstantAttrValue<string>;
-    readonly urlQuery: ConstantAttrValue<Record<string, string>>;
+    readonly parameters?: ConstantAttrValue<[string, string][]>;
+    readonly module?: ConstantAttrValue<string>;
   };
 }
 
@@ -111,27 +97,6 @@ export interface CodeComponentNode extends AppDomNodeBase {
   };
 }
 
-export interface DerivedStateNode<P = any> extends AppDomNodeBase {
-  readonly type: 'derivedState';
-  readonly params?: BindableAttrValues<P>;
-  readonly attributes: {
-    readonly code: ConstantAttrValue<string>;
-    readonly argTypes: ConstantAttrValue<PropValueTypes<keyof P & string>>;
-    readonly returnType: ConstantAttrValue<PropValueType>;
-  };
-}
-
-export interface QueryStateNode<P = any> extends AppDomNodeBase {
-  readonly type: 'queryState';
-  readonly attributes: {
-    readonly api: ConstantAttrValue<NodeId | null>;
-    readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
-    readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
-    readonly refetchInterval?: ConstantAttrValue<number>;
-  };
-  readonly params?: BindableAttrValues<P>;
-}
-
 export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
   readonly type: 'query';
   readonly params?: BindableAttrValues<P>;
@@ -139,7 +104,8 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeId>;
     readonly query: ConstantAttrValue<Q>;
-
+    readonly transform?: ConstantAttrValue<string>;
+    readonly transformEnabled?: ConstantAttrValue<boolean>;
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
@@ -149,13 +115,10 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
 type AppDomNodeOfType<K extends AppDomNodeType> = {
   app: AppNode;
   connection: ConnectionNode;
-  api: ApiNode;
   theme: ThemeNode;
   page: PageNode;
   element: ElementNode;
   codeComponent: CodeComponentNode;
-  derivedState: DerivedStateNode;
-  queryState: QueryStateNode;
   query: QueryNode;
 }[K];
 
@@ -163,25 +126,19 @@ type AllowedChildren = {
   app: {
     pages: 'page';
     connections: 'connection';
-    apis: 'api';
     themes: 'theme';
     codeComponents: 'codeComponent';
   };
   theme: {};
-  api: {};
   connection: {};
   page: {
     children: 'element';
-    derivedStates: 'derivedState';
-    queryStates: 'queryState';
     queries: 'query';
   };
   element: {
     [prop: string]: 'element';
   };
   codeComponent: {};
-  derivedState: {};
-  queryState: {};
   query: {};
 };
 
@@ -215,9 +172,7 @@ export type ParentPropOf<Child extends AppDomNode, Parent extends AppDomNode> = 
     : never;
 }[keyof AllowedChildren[TypeOf<Parent>]];
 
-export interface AppDomNodes {
-  [id: NodeId]: AppDomNode;
-}
+export type AppDomNodes = Record<NodeId, AppDomNode>;
 
 export interface AppDom {
   nodes: AppDomNodes;
@@ -240,12 +195,6 @@ export function createConst<V>(value: V): ConstantAttrValue<V> {
 
 export function createSecret<V>(value: V): SecretAttrValue<V> {
   return { type: 'secret', value };
-}
-
-export function createConsts<P>(values: P): ConstantAttrValues<P> {
-  return Object.fromEntries(
-    Object.entries(values).map(([key, value]) => [key, createConst(value)]),
-  ) as ConstantAttrValues<P>;
 }
 
 export function getMaybeNode<T extends AppDomNodeType>(
@@ -311,14 +260,6 @@ export function assertIsPage(node: AppDomNode): asserts node is PageNode {
   assertIsType<PageNode>(node, 'page');
 }
 
-export function isApi<P>(node: AppDomNode): node is ApiNode<P> {
-  return isType<ApiNode>(node, 'api');
-}
-
-export function assertIsApi<P>(node: AppDomNode): asserts node is ApiNode<P> {
-  assertIsType<ApiNode>(node, 'api');
-}
-
 export function isConnection<P>(node: AppDomNode): node is ConnectionNode<P> {
   return isType<ConnectionNode>(node, 'connection');
 }
@@ -349,22 +290,6 @@ export function isElement<P>(node: AppDomNode): node is ElementNode<P> {
 
 export function assertIsElement<P>(node: AppDomNode): asserts node is ElementNode<P> {
   assertIsType<ElementNode>(node, 'element');
-}
-
-export function isDerivedState<P>(node: AppDomNode): node is DerivedStateNode<P> {
-  return isType<DerivedStateNode>(node, 'derivedState');
-}
-
-export function assertIsDerivedState<P>(node: AppDomNode): asserts node is DerivedStateNode<P> {
-  assertIsType<DerivedStateNode>(node, 'derivedState');
-}
-
-export function isQueryState<P>(node: AppDomNode): node is QueryStateNode<P> {
-  return isType<QueryStateNode>(node, 'queryState');
-}
-
-export function assertIsQueryState<P>(node: AppDomNode): asserts node is QueryStateNode<P> {
-  assertIsType<QueryStateNode>(node, 'queryState');
 }
 
 export function isQuery<P>(node: AppDomNode): node is QueryNode<P> {
@@ -526,6 +451,18 @@ export function getDescendants(dom: AppDom, node: AppDomNode): readonly AppDomNo
     .flat()
     .filter(Boolean);
   return [...children, ...children.flatMap((child) => getDescendants(dom, child))];
+}
+
+/**
+ * Get all siblings of a `node`
+ */
+export function getSiblings(dom: AppDom, node: AppDomNode): readonly AppDomNode[] {
+  return Object.values(dom.nodes).filter(
+    (sibling) =>
+      sibling.parentId === node.parentId &&
+      sibling.parentProp === node.parentProp &&
+      sibling.id !== node.id,
+  );
 }
 
 export function getAncestors(dom: AppDom, node: AppDomNode): readonly AppDomNode[] {
@@ -741,16 +678,6 @@ export function fromConstPropValue<T>(prop?: BindableAttrValue<T | undefined>): 
   return prop.value;
 }
 
-export function toConstPropValues<P = any>(props: Partial<P>): Partial<BindableAttrValues<P>>;
-export function toConstPropValues<P = any>(props: P): BindableAttrValues<P>;
-export function toConstPropValues<P = any>(props: P): BindableAttrValues<P> {
-  return Object.fromEntries(
-    Object.entries(props).flatMap(([propName, value]) =>
-      value ? [[propName, toConstPropValue(value)]] : [],
-    ),
-  ) as BindableAttrValues<P>;
-}
-
 export function fromConstPropValues<P>(props: BindableAttrValues<P>): Partial<P> {
   const result: Partial<P> = {};
   (Object.entries(props) as ExactEntriesOf<BindableAttrValues<P>>).forEach(([name, prop]) => {
@@ -782,20 +709,9 @@ export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
  * TODO: Would it make sense to create a separate datastructure that represents the render tree?
  */
 export function createRenderTree(dom: AppDom): AppDom {
-  const frontendNodes = new Set([
-    'app',
-    'page',
-    'element',
-    'queryState',
-    'query',
-    'derivedState',
-    'theme',
-    'codeComponent',
-  ]);
+  const frontendNodes = new Set(['app', 'page', 'element', 'query', 'theme', 'codeComponent']);
   return {
     ...dom,
-    nodes: Object.fromEntries(
-      Object.entries(dom.nodes).filter(([, node]) => frontendNodes.has(node.type)),
-    ),
+    nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as AppDomNodes,
   };
 }

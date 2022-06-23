@@ -2,12 +2,15 @@ import type * as React from 'react';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   ArgTypeDefinition,
-  ArgTypeDefinitions,
   SlotType,
   RuntimeError,
   ComponentConfig,
+  BindableAttrValues,
+  LiveBinding,
+  NodeId,
 } from '@mui/toolpad-core';
-import type { Branded, WithControlledProp } from './utils/types';
+import { PaletteMode } from '@mui/material';
+import type { Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
 export interface EditorProps<T> {
@@ -22,8 +25,6 @@ export interface EditorProps<T> {
   value: T | undefined;
   onChange: (newValue: T) => void;
 }
-
-export type NodeId = Branded<string, 'NodeId'>;
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
@@ -75,65 +76,54 @@ export interface ApiResult<D = any> {
   fields?: ApiResultFields;
 }
 
-export interface PrivateApiResult<D = any> {
-  data?: D;
-  isLoading: boolean;
-  isIdle: boolean;
-  isSuccess: boolean;
+export interface CreateHandlerApi<P = unknown> {
+  setConnectionParams: (appId: string, connectionId: string, props: P) => Promise<void>;
+  getConnectionParams: (appId: string, connectionId: string) => Promise<P>;
 }
 
-export interface CreateHandlerApi {
-  updateConnection: (appId: string, props: Updates<LegacyConnection>) => Promise<LegacyConnection>;
-  getConnection: (appId: string, connectionId: string) => Promise<LegacyConnection>;
-}
-
-export interface ConnectionEditorProps<P> extends WithControlledProp<P> {
+export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
   handlerBasePath: string;
   appId: string;
   connectionId: NodeId;
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorApi<PQ> {
-  fetchPrivate: (query: PQ) => Promise<PrivateApiResult<any>>;
+export interface QueryEditorModel<Q> {
+  query: Q;
+  params?: BindableAttrValues<any>;
 }
 
-export interface QueryEditorProps<Q, PQ = {}> extends WithControlledProp<Q> {
-  api: QueryEditorApi<PQ>;
+export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
+  connectionParams: Maybe<P>;
   globalScope: Record<string, any>;
+  liveParams: Record<string, LiveBinding>;
 }
 
-export type QueryEditor<Q = {}, PQ = {}> = React.FC<QueryEditorProps<Q, PQ>>;
+export type QueryEditor<P, Q = {}> = React.FC<QueryEditorProps<P, Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;
   error?: string;
 }
 
-export interface ClientDataSource<P = {}, Q = {}, PQ = {}> {
+export interface ClientDataSource<P = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<P>;
-  getInitialConnectionValue: () => P;
   isConnectionValid: (connection: P) => boolean;
-  QueryEditor: QueryEditor<Q, PQ>;
+  QueryEditor: QueryEditor<P, Q>;
   getInitialQueryValue: () => Q;
-  getArgTypes?: (query: Q) => ArgTypeDefinitions;
 }
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
-  execPrivate?: (connection: LegacyConnection<P>, query: PQ) => Promise<PrivateApiResult<any>>;
+  execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<any>;
   // Execute a query on this connection, intended for viewers
-  exec: (connection: LegacyConnection<P>, query: Q, params: any) => Promise<ApiResult<D>>;
-  createHandler?: () => (api: CreateHandlerApi, req: NextApiRequest, res: NextApiResponse) => void;
-}
-// TODO: replace LegacyConnection with ConnectionNode
-export interface LegacyConnection<P = unknown> {
-  id: string;
-  type: string;
-  name: string;
-  params: P;
-  status: ConnectionStatus | null;
+  exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ApiResult<D>>;
+  createHandler?: () => (
+    api: CreateHandlerApi<P>,
+    req: NextApiRequest,
+    res: NextApiResponse,
+  ) => void;
 }
 
 /**
@@ -165,6 +155,7 @@ export type PropExpression = JsxFragmentExpression | JsExpression | JsxElement;
 export type ResolvedProps = Record<string, PropExpression | undefined>;
 
 export interface AppTheme {
+  'palette.mode'?: PaletteMode;
   'palette.primary.main'?: string;
   'palette.secondary.main'?: string;
 }

@@ -22,7 +22,7 @@ commands:
       browsers:
         type: boolean
         default: true
-        description: 'Set to true if you intend to any browser (e.g. with playwright).'
+        description: 'Set to true if you intend to use any browser (e.g. with playwright).'
 
     steps:
       - run:
@@ -60,6 +60,10 @@ commands:
           command: yarn install --frozen-lockfile --verbose
           environment:
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: <<# parameters.browsers >>0<</ parameters.browsers >><<^ parameters.browsers >>1<</ parameters.browsers >>
+
+      - run:
+          name: Generate prisma client
+          command: yarn prisma generate
       - save_cache:
           name: Save yarn cache
           key: v8-yarn-{{ checksum "yarn.lock" }}
@@ -82,6 +86,13 @@ commands:
 jobs:
   checkout:
     <<: *defaults
+    docker:
+      - image: cimg/node:16.14
+        environment:
+          TOOLPAD_SHADOW_DATABASE_URL: postgresql://postgres@localhost/circle_test
+      - image: cimg/postgres:14.0
+        environment:
+          POSTGRES_USER: postgres
     steps:
       - checkout
       - install_js
@@ -89,8 +100,23 @@ jobs:
           name: Should not have any git not staged
           command: git diff --exit-code
       - run:
+          name: should not have any prisma schema drift
+          command: yarn workspace @mui/toolpad-app prisma-detect-drift
+      - run:
           name: Check for duplicated packages
           command: yarn deduplicate
+
+  test_lint:
+    <<: *defaults
+    steps:
+      - checkout
+      - install_js
+      - run:
+          name: Eslint
+          command: yarn eslint
+      - run:
+          name: Lint JSON
+          command: yarn jsonlint
 
   test_static:
     <<: *defaults
@@ -168,6 +194,9 @@ workflows:
   pipeline:
     jobs:
       - checkout
+      - test_lint:
+          requires:
+            - checkout
       - test_static:
           requires:
             - checkout

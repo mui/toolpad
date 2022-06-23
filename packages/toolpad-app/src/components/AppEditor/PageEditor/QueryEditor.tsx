@@ -1,6 +1,7 @@
 import {
   Stack,
   Button,
+  Grid,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -14,26 +15,69 @@ import {
   Divider,
   Typography,
   Toolbar,
+  MenuItem,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
-import { evaluateBindable } from '@mui/toolpad-core/runtime';
 import { LoadingButton } from '@mui/lab';
+import { NodeId } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
-import { useDom, useDomApi } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { NodeId } from '../../../types';
+import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import JsonView from '../../JsonView';
-import { ConnectionSelect } from '../HierarchyExplorer/CreateApiNodeDialog';
 import { omit, update } from '../../../utils/immutability';
 import client from '../../../api';
-import ParametersEditor from './ParametersEditor';
 import ErrorAlert from './ErrorAlert';
+import { JsExpressionEditor } from './JsExpressionEditor';
+import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
+import { WithControlledProp } from '../../../utils/types';
+import { useDom, useDomApi } from '../../DomLoader';
+import { mapValues } from '../../../utils/collections';
+import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
+
+export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
+  dataSource?: string;
+}
+
+export function ConnectionSelect({ dataSource, value, onChange }: ConnectionSelectProps) {
+  const dom = useDom();
+
+  const app = appDom.getApp(dom);
+  const { connections = [] } = appDom.getChildNodes(dom, app);
+
+  const filtered = React.useMemo(() => {
+    return dataSource
+      ? connections.filter((connection) => connection.attributes.dataSource.value === dataSource)
+      : connections;
+  }, [connections, dataSource]);
+
+  const handleSelectionChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange((event.target.value as NodeId) || null);
+    },
+    [onChange],
+  );
+
+  return (
+    <TextField
+      select
+      fullWidth
+      value={value || ''}
+      label="Connection"
+      onChange={handleSelectionChange}
+    >
+      {filtered.map((connection) => (
+        <MenuItem key={connection.id} value={connection.id}>
+          {connection.name} | {connection.attributes.dataSource.value}
+        </MenuItem>
+      ))}
+    </TextField>
+  );
+}
 
 function refetchIntervalInSeconds(maybeInterval?: number) {
   if (typeof maybeInterval !== 'number') {
@@ -105,7 +149,7 @@ interface QueryNodeEditorProps<Q, P> {
   node: appDom.QueryNode<Q, P>;
 }
 
-function QueryNodeEditorDialog<Q, P, PQ>({
+function QueryNodeEditorDialog<Q, P>({
   open,
   node,
   onClose,
@@ -113,33 +157,59 @@ function QueryNodeEditorDialog<Q, P, PQ>({
   onSave,
 }: QueryNodeEditorProps<Q, P>) {
   const { appId } = usePageEditorState();
+  const dom = useDom();
 
   const [input, setInput] = React.useState(node);
   React.useEffect(() => setInput(node), [node]);
 
-  const conectionId = node.attributes.connectionId.value;
+  const connectionId = input.attributes.connectionId.value;
+  const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const handleConnectionChange = React.useCallback((newConnectionId) => {
+  const handleConnectionChange = React.useCallback((newConnectionId: NodeId | null) => {
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          connectionId: appDom.createConst(newConnectionId),
+          connectionId: newConnectionId ? appDom.createConst(newConnectionId) : undefined,
         }),
       }),
     );
   }, []);
 
-  const handleQueryChange = React.useCallback((newQuery: Q) => {
+  const handleQueryChange = React.useCallback((model: QueryEditorModel<Q>) => {
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          query: appDom.createConst(newQuery),
+          query: appDom.createConst(model.query),
+        }),
+        params: model.params,
+      }),
+    );
+  }, []);
+
+  const handleTransformFnChange = React.useCallback((newValue: string) => {
+    setInput((existing) =>
+      update(existing, {
+        attributes: update(existing.attributes, {
+          transform: appDom.createConst(newValue),
         }),
       }),
     );
   }, []);
+
+  const handleTransformEnabledChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) =>
+        update(existing, {
+          attributes: update(existing.attributes, {
+            transformEnabled: appDom.createConst(event.target.checked),
+          }),
+        }),
+      );
+    },
+    [],
+  );
 
   const handleRefetchOnWindowFocusChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,25 +255,12 @@ function QueryNodeEditorDialog<Q, P, PQ>({
     [],
   );
 
-  const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
-    Object.entries(input.params || {}),
-  );
-  React.useEffect(() => setParams(Object.entries(input.params || {})), [input.params]);
-
   const { pageState } = usePageEditorState();
-  const liveParams: [string, LiveBinding][] = React.useMemo(() => {
-    return params.map(([name, bindable]) => [name, evaluateBindable(bindable, pageState)]);
-  }, [params, pageState]);
 
-  const handleParamsChange = React.useCallback((newParams: [string, BindableAttrValue<any>][]) => {
-    setParams(newParams);
-    const paramsObj: BindableAttrValues<any> = Object.fromEntries(newParams);
-    setInput((existing) =>
-      update(existing, {
-        params: paramsObj,
-      }),
-    );
-  }, []);
+  const liveParams = useEvaluateLiveBindings({
+    input: input.params || {},
+    globalScope: pageState,
+  });
 
   const handleSave = React.useCallback(() => {
     onSave(input);
@@ -214,26 +271,17 @@ function QueryNodeEditorDialog<Q, P, PQ>({
     onClose();
   }, [onRemove, node, onClose]);
 
-  const queryEditorApi = React.useMemo(() => {
-    return {
-      fetchPrivate: async (query: PQ | {}) =>
-        client.query.dataSourceFetchPrivate(appId, conectionId, query),
-    };
-  }, [appId, conectionId]);
-
-  const paramsObject: Record<string, any> = React.useMemo(() => {
-    const liveParamValues: [string, any][] = liveParams.map(([name, result]) => [
-      name,
-      result?.value,
-    ]);
-    return Object.fromEntries(liveParamValues);
-  }, [liveParams]);
+  const paramsObject: Record<string, any> = mapValues(
+    liveParams,
+    (bindingResult) => bindingResult.value,
+  );
 
   const [previewQuery, setPreviewQuery] = React.useState<appDom.QueryNode<Q, P> | null>(null);
   const [previewParams, setPreviewParams] = React.useState(paramsObject);
   const queryPreview = client.useQuery(
     'execQuery',
     previewQuery ? [appId, previewQuery, previewParams] : null,
+    { retry: false },
   );
 
   const handleUpdatePreview = React.useCallback(() => {
@@ -260,6 +308,8 @@ function QueryNodeEditorDialog<Q, P, PQ>({
     throw new Error(`DataSource "${dataSourceId}" not found`);
   }
 
+  const queryEditorContext = React.useMemo(() => ({ appId, connectionId }), [appId, connectionId]);
+
   return (
     <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose} scroll="body">
       <DialogTitle>Edit Query ({node.id})</DialogTitle>
@@ -273,55 +323,78 @@ function QueryNodeEditorDialog<Q, P, PQ>({
               onChange={handleConnectionChange}
             />
           </Stack>
-          <Divider />
-          <Typography>Parameters</Typography>
-          <ParametersEditor
-            value={params}
-            onChange={handleParamsChange}
-            globalScope={pageState}
-            liveValue={liveParams}
-          />
+
           <Divider />
           <Typography>Build query:</Typography>
-          <dataSource.QueryEditor
-            api={queryEditorApi}
-            value={input.attributes.query.value}
-            onChange={handleQueryChange}
-            globalScope={{ query: paramsObject }}
-          />
+          <ConnectionContextProvider value={queryEditorContext}>
+            <dataSource.QueryEditor
+              connectionParams={connection?.attributes.params.value}
+              value={{
+                query: input.attributes.query.value,
+                params: input.params,
+              }}
+              liveParams={liveParams}
+              onChange={handleQueryChange}
+              globalScope={pageState}
+            />
+          </ConnectionContextProvider>
           <Divider />
           <Typography>Options:</Typography>
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={input.attributes.refetchOnWindowFocus?.value ?? true}
-                onChange={handleRefetchOnWindowFocusChange}
-              />
-            }
-            label="Refetch on window focus"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={input.attributes.refetchOnReconnect?.value ?? true}
-                onChange={handleRefetchOnReconnectChange}
-              />
-            }
-            label="Refetch on network reconnect"
-          />
-          <TextField
-            InputProps={{
-              startAdornment: <InputAdornment position="start">s</InputAdornment>,
-            }}
-            sx={{ maxWidth: 300 }}
-            size="small"
-            type="number"
-            label="Refetch interval"
-            value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
-            onChange={handleRefetchIntervalChange}
-          />
+          <Grid container direction="row" spacing={1}>
+            <Grid item xs={4}>
+              <Stack direction="column" gap={1}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={input.attributes.refetchOnWindowFocus?.value ?? true}
+                      onChange={handleRefetchOnWindowFocusChange}
+                    />
+                  }
+                  label="Refetch on window focus"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={input.attributes.refetchOnReconnect?.value ?? true}
+                      onChange={handleRefetchOnReconnectChange}
+                    />
+                  }
+                  label="Refetch on network reconnect"
+                />
+                <TextField
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">s</InputAdornment>,
+                  }}
+                  sx={{ maxWidth: 300 }}
+                  type="number"
+                  label="Refetch interval"
+                  value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
+                  onChange={handleRefetchIntervalChange}
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack>
+                <FormControlLabel
+                  label="Transform response"
+                  control={
+                    <Checkbox
+                      checked={input.attributes.transformEnabled?.value ?? false}
+                      onChange={handleTransformEnabledChange}
+                      inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                  }
+                />
+
+                <JsExpressionEditor
+                  globalScope={{}}
+                  value={input.attributes.transform?.value ?? '(data) => {\n  return data;\n}'}
+                  onChange={handleTransformFnChange}
+                  disabled={!input.attributes.transformEnabled?.value}
+                />
+              </Stack>
+            </Grid>
+          </Grid>
           <Divider />
           <Toolbar disableGutters>
             preview
@@ -374,7 +447,7 @@ export default function QueryEditor() {
   }, []);
 
   const handleCreated = React.useCallback(
-    (node) => {
+    (node: appDom.QueryNode) => {
       domApi.addNode(node, page, 'queries');
       setDialogState({ nodeId: node.id });
     },
@@ -420,7 +493,6 @@ export default function QueryEditor() {
           );
         })}
       </List>
-      {/* eslint-disable-next-line no-nested-ternary */}
       {dialogState?.nodeId && lastEditednode ? (
         <QueryNodeEditorDialog
           open={!!dialogState}

@@ -25,6 +25,7 @@ import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
+import useShortcut from '../../utils/useShortcut';
 
 const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -57,6 +58,7 @@ function JsExpressionBindingEditor<V>({
       value={value?.type === 'jsExpression' ? value.value : ''}
       onChange={handleChange}
       onCommit={onCommit}
+      autoFocus
     />
   );
 }
@@ -76,7 +78,7 @@ function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreview
 
   return (
     <React.Fragment>
-      <Toolbar variant="dense" disableGutters>
+      <Toolbar disableGutters>
         <Typography color="error">{previewError?.message}</Typography>
       </Toolbar>
       <Box sx={{ flex: 1, overflow: 'auto' }}>
@@ -123,7 +125,8 @@ export function BindingEditor<V>({
   const hasBinding: boolean = !!value && value.type !== 'const';
 
   const committedInput = React.useRef<BindableAttrValue<V> | null>(null);
-  const handleCommit = React.useCallback(() => {
+
+  const handleSave = React.useCallback(() => {
     let newValue = input;
 
     if (input?.type === 'jsExpression') {
@@ -135,14 +138,22 @@ export function BindingEditor<V>({
 
     committedInput.current = newValue;
     onChange(newValue);
+  }, [onChange, input]);
+
+  const handleCommit = React.useCallback(() => {
+    handleSave();
     handleClose();
-  }, [onChange, input, handleClose]);
+  }, [handleSave, handleClose]);
+
+  const handleRemove = React.useCallback(() => {
+    onChange(null);
+    handleClose();
+  }, [onChange, handleClose]);
 
   const error: string | undefined = liveBinding?.error?.message;
 
   const bindingButton = (
     <Checkbox
-      size="small"
       aria-label="Bind property"
       checked={hasBinding}
       disabled={disabled}
@@ -155,14 +166,18 @@ export function BindingEditor<V>({
 
   const TooltipComponent = error ? ErrorTooltip : Tooltip;
   const tooltipTitle: string =
-    error ?? (hasBinding ? `Update "${label}" binding` : `Bind "${label}"`);
+    error ?? (hasBinding ? `Update "${label}" binding…` : `Bind "${label}"…`);
   const bindingButtonWithTooltip = disabled ? (
     bindingButton
   ) : (
-    <TooltipComponent placement="left" title={tooltipTitle}>
+    <TooltipComponent disableInteractive placement="top" title={tooltipTitle}>
       {bindingButton}
     </TooltipComponent>
   );
+
+  useShortcut({ code: 'KeyS', metaKey: true, disabled: !open }, handleSave);
+
+  const hasUnsavedChanges = input && input !== committedInput.current;
 
   return (
     <React.Fragment>
@@ -199,16 +214,12 @@ export function BindingEditor<V>({
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={handleClose}>
-            Cancel
+            {hasUnsavedChanges ? 'Cancel' : 'Close'}
           </Button>
-          <Button color="inherit" disabled={!value} onClick={() => onChange(null)}>
+          <Button color="inherit" disabled={!value} onClick={handleRemove}>
             Remove binding
           </Button>
-          <Button
-            disabled={!input || input === committedInput.current}
-            color="primary"
-            onClick={handleCommit}
-          >
+          <Button disabled={!hasUnsavedChanges} color="primary" onClick={handleCommit}>
             Update binding
           </Button>
         </DialogActions>

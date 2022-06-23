@@ -1,4 +1,3 @@
-// TODO: maybe we should create/publish a @mui/scripts package?
 const baseline = require('@mui/monorepo/prettier.config');
 
 module.exports = {

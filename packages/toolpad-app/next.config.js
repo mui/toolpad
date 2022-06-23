@@ -7,6 +7,11 @@ const buildEnvVars = {
 module.exports = {
   reactStrictMode: true,
 
+  eslint: {
+    // We're running this as part of the monorepo eslint
+    ignoreDuringBuilds: true,
+  },
+
   // build-time env vars
   env: buildEnvVars,
 
@@ -37,6 +42,15 @@ module.exports = {
         source: '/release/:path*',
         destination: '/app/:path*',
         permanent: true,
+      },
+    ];
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: '/health-check',
+        destination: '/api/health-check',
       },
     ];
   },

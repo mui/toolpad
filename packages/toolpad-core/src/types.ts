@@ -1,9 +1,11 @@
-import React from 'react';
-import { TOOLPAD_COMPONENT } from './constants';
+import type * as React from 'react';
+import type { TOOLPAD_COMPONENT } from './constants';
+import type { Branded } from './utils';
+
+export type NodeId = Branded<string, 'NodeId'>;
 
 export type BindingAttrValueFormat = 'stringLiteral' | 'default';
 
-// TODO: Get rid of BoundExpressionAttrValue? Its function can be fulfilled by derivedState as well
 export interface BoundExpressionAttrValue {
   type: 'boundExpression';
   value: string;
@@ -39,7 +41,7 @@ export type BindableAttrValue<V> =
 
 export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
-export type BindableAttrValues<P> = {
+export type BindableAttrValues<P = Record<string, unknown>> = {
   readonly [K in keyof P]?: BindableAttrValue<P[K]>;
 };
 
@@ -99,6 +101,7 @@ export interface ArgControlSpec {
     | 'date' // date picker
     | 'json' // JSON editor
     | 'GridColumns' // GridColumns specialized editor
+    | 'SelectOptions' // SelectOptions specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
     | 'function'
@@ -184,7 +187,8 @@ export type RuntimeEvent =
   | {
       type: 'pageBindingsUpdated';
       bindings: LiveBindings;
-    };
+    }
+  | { type: 'afterRender' };
 
 export interface ComponentConfig<P> {
   /**
@@ -210,6 +214,8 @@ export interface ComponentConfig<P> {
 export type ToolpadComponent<P = {}> = React.ComponentType<P> & {
   [TOOLPAD_COMPONENT]: ComponentConfig<P>;
 };
+
+export type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
 export type LiveBindings = Partial<Record<string, LiveBinding>>;
 

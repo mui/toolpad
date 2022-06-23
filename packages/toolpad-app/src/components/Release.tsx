@@ -4,9 +4,9 @@ import * as React from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { useParams } from 'react-router-dom';
+import { NodeId } from '@mui/toolpad-core';
 import client from '../api';
 import * as appDom from '../appDom';
-import { NodeId } from '../types';
 import ToolpadAppShell from './ToolpadAppShell';
 
 interface NavigateToReleaseActionProps {
@@ -98,7 +98,6 @@ export default function Release() {
           <DataGridPro
             rows={pages}
             columns={columns}
-            density="compact"
             loading={isLoading}
             error={(error as any)?.message}
           />

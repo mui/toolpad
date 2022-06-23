@@ -21,13 +21,12 @@
     "start": "dotenv cross-env FORCE_COLOR=1 yarn workspace @mui/toolpad-app start",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --scope @mui/toolpad-core --scope @mui/toolpad-components --scope @mui/toolpad-app",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
-    "prisma": "dotenv yarn workspace @mui/toolpad-app run --cwd=\"./packages/toolpad-app\"  prisma",
-    "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
+    "jsonlint": "node ./scripts/jsonlint.js",
+    "prisma": "dotenv yarn workspace @mui/toolpad-app run --cwd=\"./packages/toolpad-app\" prisma",
     "release:build": "lerna run --stream build",
-    "release:publish": "lerna publish from-package --pre-dist-tag alpha --dist-tag latest",
-    "release:publish:dry-run": "yarn release:publish --registry=\"http://localhost:4873/\"",
-    "release:docker:build": "ts-node --esm ./scripts/esm/docker.ts build",
-    "release:docker:publish": "ts-node --esm ./scripts/esm/docker.ts publish",
+    "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
+    "release:docker": "node ./scripts/releaseDocker.js",
+    "release:changelog": "dotenv -- node ./scripts/releaseChangelog.js --repo mui-toolpad",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "e2e:smoke": "playwright test --config ./test/e2e-smoke/playwright.config.ts",
     "test": "yarn test:build && jest"
@@ -36,9 +35,7 @@
     "@mui/monorepo": "https://github.com/mui/material-ui.git#master",
     "@next/eslint-plugin-next": "^12.1.6",
     "@playwright/test": "^1.22.1",
-    "@swc/core": "^1.2.163",
     "@swc/helpers": "^0.3.8",
-    "@swc/jest": "^0.2.17",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^13.0.0",
     "@types/jest": "^27.4.0",
@@ -46,6 +43,7 @@
     "@types/rimraf": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.21.0",
     "@typescript-eslint/parser": "^5.21.0",
+    "chalk": "^4.1.2",
     "eslint": "^8.14.0",
     "eslint-config-airbnb-typescript": "12",
     "eslint-config-prettier": "^8.3.0",
@@ -72,6 +70,9 @@
   "dependencies": {
     "cross-env": "^7.0.3",
     "dotenv-cli": "^5.1.0",
-    "jest-environment-jsdom": "^28.0.0-alpha.8"
+    "inquirer": "^8.2.4",
+    "jest-environment-jsdom": "^28.0.0-alpha.8",
+    "semver": "^7.3.7",
+    "yargs": "^17.5.1"
   }
 }

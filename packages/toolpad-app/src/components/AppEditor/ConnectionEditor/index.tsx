@@ -1,10 +1,12 @@
 import * as React from 'react';
-import { Box, Button, Stack, Toolbar, Typography } from '@mui/material';
+import { Box, Container, Stack, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { NodeId, ConnectionEditorProps, ClientDataSource } from '../../../types';
+import { NodeId } from '@mui/toolpad-core';
+import { ConnectionEditorProps, ClientDataSource } from '../../../types';
 import { useDom, useDomApi } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import dataSources from '../../../toolpadDataSources/client';
+import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import NodeNameEditor from '../NodeNameEditor';
 import NotFoundEditor from '../NotFoundEditor';
 
@@ -45,54 +47,48 @@ function ConnectionEditorContent<P>({
 }: ConnectionEditorContentProps<P>) {
   const domApi = useDomApi();
 
-  const [connectionParams, setConnectionParams] = React.useState<P>(
-    connectionNode.attributes.params.value,
+  const handleConnectionChange = React.useCallback(
+    (connectionParams: P | null) => {
+      domApi.setNodeNamespacedProp(
+        connectionNode,
+        'attributes',
+        'params',
+        appDom.createSecret(connectionParams),
+      );
+    },
+    [connectionNode, domApi],
   );
-  const savedConnectionParams = React.useRef<P | null>(connectionNode.attributes.params.value);
-  const dataSourceType = connectionNode.attributes.dataSource.value;
 
+  const dataSourceType = connectionNode.attributes.dataSource.value;
   const dataSource = dataSources[dataSourceType];
+  const connectionEditorContext = React.useMemo(
+    () => ({ appId, connectionId: connectionNode.id }),
+    [appId, connectionNode.id],
+  );
 
   return (
-    <Box className={className} sx={{ width: '100%', height: '100%', px: 3 }}>
-      <Toolbar disableGutters>
-        <Button
-          onClick={() => {
-            (Object.keys(connectionParams) as (keyof P)[]).forEach((propName) => {
-              if (typeof propName !== 'string' || !connectionParams[propName]) {
-                return;
-              }
-              domApi.setNodeNamespacedProp(
-                connectionNode,
-                'attributes',
-                'params',
-                appDom.createSecret(connectionParams),
-              );
-            });
-            savedConnectionParams.current = connectionParams;
-          }}
-          disabled={connectionParams === savedConnectionParams.current}
-        >
-          Update
-        </Button>
-      </Toolbar>
-      <Stack spacing={1}>
-        <NodeNameEditor node={connectionNode} />
-        {dataSource ? (
-          <ConnectionParamsEditor
-            dataSource={dataSource}
-            value={connectionParams}
-            onChange={setConnectionParams}
-            handlerBasePath={`/api/dataSources/${dataSourceType}`}
-            appId={appId}
-            connectionId={connectionNode.id}
-          />
-        ) : (
-          <Typography>
-            Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
-          </Typography>
-        )}
-      </Stack>
+    <Box className={className} sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
+      <Container sx={{ my: 2 }}>
+        <Stack spacing={1}>
+          <NodeNameEditor node={connectionNode} />
+          {dataSource ? (
+            <ConnectionContextProvider value={connectionEditorContext}>
+              <ConnectionParamsEditor
+                dataSource={dataSource}
+                value={connectionNode.attributes.params.value}
+                onChange={handleConnectionChange}
+                handlerBasePath={`/api/dataSources/${dataSourceType}`}
+                appId={appId}
+                connectionId={connectionNode.id}
+              />
+            </ConnectionContextProvider>
+          ) : (
+            <Typography>
+              Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
+            </Typography>
+          )}
+        </Stack>
+      </Container>
     </Box>
   );
 }

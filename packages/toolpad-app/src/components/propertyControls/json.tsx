@@ -2,7 +2,9 @@ import type * as monacoEditor from 'monaco-editor';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import * as React from 'react';
 import Editor from '@monaco-editor/react';
+import * as JSON5 from 'json5';
 import type { EditorProps } from '../../types';
+import useShortcut from '../../utils/useShortcut';
 
 function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorProps<any>) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -17,14 +19,14 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
       return '';
     }
     try {
-      return JSON.stringify(JSON.parse(input));
+      return JSON.stringify(JSON5.parse(input));
     } catch {
       return null;
     }
   }, [input]);
 
   const handleSave = React.useCallback(() => {
-    const newValue = input === '' ? undefined : JSON.parse(input);
+    const newValue = input === '' ? undefined : JSON5.parse(input);
     onChange(newValue);
   }, [onChange, input]);
 
@@ -74,6 +76,8 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
     },
     [schemaUri],
   );
+
+  useShortcut({ code: 'KeyS', metaKey: true, disabled: !dialogOpen }, handleSave);
 
   return (
     <React.Fragment>

@@ -1,6 +1,5 @@
-import { ToolpadComponent } from '@mui/toolpad-core';
+import { NodeId, ToolpadComponent } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
-import { NodeId, VersionOrPreview } from '../types';
 
 export interface ToolpadComponentDefinition {
   displayName: string;
@@ -14,8 +13,12 @@ export interface InstantiatedComponent extends ToolpadComponentDefinition {
 }
 export type InstantiatedComponents = Record<string, InstantiatedComponent | undefined>;
 
+export const PAGE_ROW_COMPONENT_ID = 'PageRow';
+export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
+
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
-  ['PageRow', { displayName: 'PageRow', builtin: 'PageRow' }],
+  [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtin: 'PageRow' }],
+  [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtin: 'PageColumn' }],
   ['Stack', { displayName: 'Stack', builtin: 'Stack' }],
   ['Button', { displayName: 'Button', builtin: 'Button' }],
   ['Image', { displayName: 'Image', builtin: 'Image' }],
@@ -28,29 +31,21 @@ const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['CustomLayout', { displayName: 'CustomLayout', builtin: 'CustomLayout' }],
 ]);
 
-function createCodeComponent(
-  appId: string,
-  version: VersionOrPreview,
-  domNode: appDom.CodeComponentNode,
-): ToolpadComponentDefinition {
+function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
   return {
     displayName: domNode.name,
     codeComponentId: domNode.id,
   };
 }
 
-export function getToolpadComponents(
-  appId: string,
-  version: VersionOrPreview,
-  dom: appDom.AppDom,
-): ToolpadComponentDefinitions {
+export function getToolpadComponents(dom: appDom.AppDom): ToolpadComponentDefinitions {
   const app = appDom.getApp(dom);
   const { codeComponents = [] } = appDom.getChildNodes(dom, app);
   return Object.fromEntries([
     ...INTERNAL_COMPONENTS.entries(),
     ...codeComponents.map((codeComponent) => [
       `codeComponent.${codeComponent.id}`,
-      createCodeComponent(appId, version, codeComponent),
+      createCodeComponent(codeComponent),
     ]),
   ]);
 }
@@ -61,4 +56,16 @@ export function getToolpadComponent(
 ): ToolpadComponentDefinition | null {
   const component = components[componentId];
   return component || null;
+}
+
+export function getElementNodeComponentId(elementNode: appDom.ElementNode): string {
+  return elementNode.attributes.component.value;
+}
+
+export function isPageRow(elementNode: appDom.ElementNode): boolean {
+  return getElementNodeComponentId(elementNode) === PAGE_ROW_COMPONENT_ID;
+}
+
+export function isPageColumn(elementNode: appDom.ElementNode): boolean {
+  return getElementNodeComponentId(elementNode) === PAGE_COLUMN_COMPONENT_ID;
 }

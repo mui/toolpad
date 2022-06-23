@@ -10,7 +10,6 @@ services:
     startCommand: yarn start
     healthCheckPath: /health-check
     plan: starter plus
-    previewPlan: starter
     pullRequestPreviewsEnabled: true
     envVars:
       - key: TOOLPAD_DATABASE_URL
@@ -23,7 +22,6 @@ databases:
   - name: toolpad-db
     ipAllowList: []
     plan: starter
-    previewPlan: starter
 
 envVarGroups:
   - name: toolpad-settings

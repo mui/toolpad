@@ -19,8 +19,7 @@
     "paths": {}
   },
   "ts-node": {
-    "transpileOnly": true,
-    "transpiler": "ts-node/transpilers/swc-experimental"
+    "swc": true
   },
   "include": ["./test"]
 }

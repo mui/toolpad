@@ -13,7 +13,12 @@ function PageRow({ spacing, children, alignItems, justifyContent }: PageRowProps
   return (
     <Stack
       direction="row"
-      sx={{ gap: spacing, p: spacing, alignItems, justifyContent, flexWrap: 'wrap' }}
+      sx={{
+        gap: spacing,
+        alignItems,
+        justifyContent,
+        width: '100%',
+      }}
     >
       {children}
     </Stack>
@@ -24,7 +29,7 @@ export default createComponent(PageRow, {
   argTypes: {
     spacing: {
       typeDef: { type: 'number' },
-      defaultValue: 2,
+      defaultValue: 1,
     },
     alignItems: {
       typeDef: {
@@ -33,7 +38,7 @@ export default createComponent(PageRow, {
       },
       label: 'Vertical alignment',
       control: { type: 'VerticalAlign' },
-      defaultValue: 'center',
+      defaultValue: 'start',
     },
     justifyContent: {
       typeDef: {

@@ -1,5 +1,7 @@
 export { default as PageRow } from './PageRow.js';
 
+export { default as PageColumn } from './PageColumn.js';
+
 export { default as Stack } from './Stack.js';
 
 export { default as Button } from './Button.js';

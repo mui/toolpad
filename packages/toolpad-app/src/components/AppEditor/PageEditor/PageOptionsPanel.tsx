@@ -3,15 +3,11 @@ import * as React from 'react';
 import PageIcon from '@mui/icons-material/Web';
 import { useDom } from '../../DomLoader';
 import { usePageEditorState } from './PageEditorProvider';
-import DerivedStateEditor from './DerivedStateEditor';
-import QueryStateEditor from './QueryStateEditor';
 import QueryEditor from './QueryEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
-
-// TODO: remove deprecated state
-const DEPRECATED = false;
+import PageModuleEditor from './PageModuleEditor';
 
 export default function PageOptionsPanel() {
   const state = usePageEditorState();
@@ -33,11 +29,10 @@ export default function PageOptionsPanel() {
         >
           Preview
         </Button>
+        <PageModuleEditor pageNodeId={pageNodeId} />
         <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
         <Typography variant="subtitle1">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />
-        {DEPRECATED ? <DerivedStateEditor /> : null}
-        <QueryStateEditor />
         <QueryEditor />
       </Stack>
     </div>

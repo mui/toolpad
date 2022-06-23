@@ -16,11 +16,18 @@ export function createThemeOptions(toolpadTheme: AppTheme): ThemeOptions {
     palette.secondary = (colors as any)[secondary];
   }
 
+  const mode = toolpadTheme['palette.mode'];
+  if (mode) {
+    palette.mode = mode;
+  }
+
   return { palette };
 }
 
 export function createToolpadTheme(themeNode?: appDom.ThemeNode | null): Theme {
-  const options = themeNode ? createThemeOptions(appDom.fromConstPropValues(themeNode.theme)) : {};
+  const options = themeNode?.theme
+    ? createThemeOptions(appDom.fromConstPropValues(themeNode.theme))
+    : {};
   return createTheme(options);
 }
 

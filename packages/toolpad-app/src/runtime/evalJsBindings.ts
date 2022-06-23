@@ -1,4 +1,5 @@
 import { set } from 'lodash-es';
+import { mapValues } from '../utils/collections';
 
 let iframe: HTMLIFrameElement;
 function evaluateCode(code: string, globalScope: Record<string, unknown>) {
@@ -80,8 +81,11 @@ export interface ParsedBinding<T = unknown> {
   result?: BindingEvaluationResult<T>;
 }
 
-export function buildGlobalScope(bindings: Record<string, ParsedBinding>): Record<string, unknown> {
-  const globalScope = {};
+export function buildGlobalScope(
+  base: Record<string, unknown>,
+  bindings: Record<string, ParsedBinding>,
+): Record<string, unknown> {
+  const globalScope = { ...base };
   for (const binding of Object.values(bindings)) {
     if (binding.scopePath) {
       const value = binding.result?.value;
@@ -96,6 +100,7 @@ export function buildGlobalScope(bindings: Record<string, ParsedBinding>): Recor
  */
 export default function evalJsBindings(
   bindings: Record<string, ParsedBinding>,
+  globalScope: Record<string, unknown>,
 ): Record<string, ParsedBinding> {
   const bindingsMap = new Map(Object.entries(bindings));
 
@@ -159,21 +164,16 @@ export default function evalJsBindings(
       },
     });
 
-  const scope = buildGlobalScope(bindings);
+  const scope = buildGlobalScope(globalScope, bindings);
   proxiedScope = proxify(scope);
 
-  return Object.fromEntries(
-    Object.entries(bindings).map(([bindingId, binding]) => {
-      const { expression, result, ...rest } = binding;
-      return [
-        bindingId,
-        {
-          ...rest,
-          result: expression
-            ? evaluateExpression(expression, proxiedScope)
-            : result || { value: undefined },
-        },
-      ];
-    }),
-  );
+  return mapValues(bindings, (binding) => {
+    const { expression, result, ...rest } = binding;
+    return {
+      ...rest,
+      result: expression
+        ? evaluateExpression(expression, proxiedScope)
+        : result || { value: undefined },
+    };
+  });
 }

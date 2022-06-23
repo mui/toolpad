@@ -11,6 +11,7 @@ import {
   gridColumnsTotalWidthSelector,
   gridColumnPositionsSelector,
   gridDensityRowHeightSelector,
+  GridSelectionModel,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
@@ -66,12 +67,12 @@ function SkeletonLoadingOverlay() {
       for (const column of columns) {
         const width = Math.round(random());
         array.push(
-          <SkeletonCell key={`${i}-${column.field}`} sx={{ justifyContent: column.align }}>
+          <SkeletonCell key={`col-${column.field}-${i}`} sx={{ justifyContent: column.align }}>
             <Skeleton sx={{ mx: 1 }} width={`${width}%`} />
           </SkeletonCell>,
         );
       }
-      array.push(<SkeletonCell />);
+      array.push(<SkeletonCell key={`fill-${i}`} />);
     }
     return array;
   }, [skeletonRowsCount, columns]);
@@ -241,7 +242,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const onSelectionModelChange = React.useCallback(
-    (ids) => {
+    (ids: GridSelectionModel) => {
       onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null);
     },
     [rows, onSelectionChange],

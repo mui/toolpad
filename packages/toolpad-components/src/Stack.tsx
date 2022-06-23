@@ -37,6 +37,9 @@ export default createComponent(Stack, {
     },
     sx: {
       typeDef: { type: 'object' },
+      defaultValue: {
+        minWidth: `${(1 / 12) * 100}vw`,
+      },
     },
   },
 });

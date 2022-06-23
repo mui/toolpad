@@ -4,16 +4,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
   IconButton,
-  InputLabel,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
   Menu,
   MenuItem,
-  Select,
   Stack,
   TextField,
 } from '@mui/material';
@@ -122,57 +119,49 @@ function GridColumnsPropEditor({
               <Stack gap={1} py={1}>
                 <TextField
                   label="field"
-                  size="small"
                   value={editedColumn.field}
                   disabled={disabled}
                   onChange={(event) =>
                     handleColumnChange({ ...editedColumn, field: event.target.value })
                   }
                 />
-                <FormControl fullWidth size="small">
-                  <InputLabel id={`select-type`}>type</InputLabel>
-                  <Select
-                    labelId={`select-type`}
-                    size="small"
-                    label="type"
-                    value={editedColumn.type ?? ''}
-                    disabled={disabled}
-                    onChange={(event) =>
-                      handleColumnChange({ ...editedColumn, type: event.target.value })
-                    }
-                  >
-                    {COLUMN_TYPES.map((type) => (
-                      <MenuItem key={type} value={type}>
-                        {type}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl fullWidth size="small">
-                  <InputLabel id={`select-align`}>align</InputLabel>
-                  <Select
-                    labelId={`select-align`}
-                    size="small"
-                    label="align"
-                    value={editedColumn.align ?? ''}
-                    disabled={disabled}
-                    onChange={(event) =>
-                      handleColumnChange({
-                        ...editedColumn,
-                        align: (event.target.value as GridAlignment) || undefined,
-                      })
-                    }
-                  >
-                    {ALIGNMENTS.map((alignment) => (
-                      <MenuItem key={alignment} value={alignment}>
-                        {alignment}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <TextField
+                  select
+                  fullWidth
+                  label="type"
+                  value={editedColumn.type ?? ''}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({ ...editedColumn, type: event.target.value })
+                  }
+                >
+                  {COLUMN_TYPES.map((type) => (
+                    <MenuItem key={type} value={type}>
+                      {type}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  select
+                  fullWidth
+                  label="align"
+                  value={editedColumn.align ?? ''}
+                  disabled={disabled}
+                  onChange={(event) =>
+                    handleColumnChange({
+                      ...editedColumn,
+                      align: (event.target.value as GridAlignment) || undefined,
+                    })
+                  }
+                >
+                  {ALIGNMENTS.map((alignment) => (
+                    <MenuItem key={alignment} value={alignment}>
+                      {alignment}
+                    </MenuItem>
+                  ))}
+                </TextField>
                 <TextField
                   label="width"
-                  size="small"
                   type="number"
                   value={editedColumn.width}
                   disabled={disabled}
@@ -206,7 +195,7 @@ function GridColumnsPropEditor({
                 ))}
                 <MenuItem onClick={handleCreateColumn({ field: 'new' })}>new column</MenuItem>
               </Menu>
-              <List dense>
+              <List>
                 {value.map((colDef, i) => {
                   return (
                     <ListItem

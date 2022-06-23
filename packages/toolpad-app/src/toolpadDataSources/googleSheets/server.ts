@@ -195,7 +195,6 @@ async function exec(
     );
   }
   return {
-    fields: {},
     data: {},
   };
 }

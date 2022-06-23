@@ -150,6 +150,13 @@ export async function getApps() {
   });
 }
 
+export async function getActiveDeployments() {
+  return prisma.deployment.findMany({
+    distinct: ['appId'],
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
 export async function getApp(id: string) {
   return prisma.app.findUnique({ where: { id } });
 }

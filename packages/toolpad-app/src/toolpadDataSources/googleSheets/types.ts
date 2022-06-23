@@ -18,6 +18,8 @@ type GoogleSheetProperties = sheets_v4.Schema$SheetProperties;
 
 export type GoogleDriveFiles = drive_v3.Schema$FileList;
 
+export type GoogleDriveUser = drive_v3.Schema$User;
+
 export type GoogleSheetsApiQuery = {
   /**
    * The ranges to retrieve from the spreadsheet.
@@ -42,6 +44,7 @@ export enum GoogleSheetsPrivateQueryType {
   FILE_GET = 'FILE_GET',
   FILES_LIST = 'FILES_LIST',
   FETCH_SPREADSHEET = 'FETCH_SPREADSHEET',
+  CONNECTION_STATUS = 'CONNECTION_STATUS',
 }
 
 export type GoogleSheetsPrivateQuery =
@@ -57,4 +60,7 @@ export type GoogleSheetsPrivateQuery =
   | {
       type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET;
       spreadsheetId: GoogleSheetsApiQuery['spreadsheetId'];
+    }
+  | {
+      type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS;
     };

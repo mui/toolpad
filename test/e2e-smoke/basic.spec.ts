@@ -41,5 +41,6 @@ test('basic app creation flow', async ({ page }) => {
 
   await page.off('request', handleRequest);
 
+  // https://github.com/mui/mui-toolpad/issues/573
   expect(hasNavigated).toBeFalsy();
 });

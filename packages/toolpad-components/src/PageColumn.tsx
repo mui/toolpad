@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Stack, StackProps } from '@mui/material';
+import { Box, StackProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageColumnProps {
@@ -11,17 +11,17 @@ export interface PageColumnProps {
 
 function PageColumn({ span, gap, children, alignItems }: PageColumnProps) {
   return (
-    <Stack
-      direction="column"
+    <Box
       sx={{
         gap,
         alignItems,
-        width: `${(span / 12) * 100}vw`,
-        maxWidth: '100%',
+        display: 'grid',
+        gridAutoFlow: 'row',
+        gridAutoRows: 'minmax(0, 1fr)',
       }}
     >
       {children}
-    </Stack>
+    </Box>
   );
 }
 

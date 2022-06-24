@@ -32,12 +32,28 @@ export interface SecretAttrValue<V> {
   value: V;
 }
 
+export interface JsExpressionAction {
+  type: 'jsExpressionAction';
+  value: string;
+}
+
+export interface NavigationAction<P = any> {
+  type: 'navigationAction';
+  value: {
+    page: NodeId;
+    parameters?: BindableAttrValues<P>;
+  };
+}
+
+export type BindableAction = JsExpressionAction | NavigationAction;
+
 export type BindableAttrValue<V> =
   | ConstantAttrValue<V>
   | BindingAttrValue
   | SecretAttrValue<V>
   | BoundExpressionAttrValue
-  | JsExpressionAttrValue;
+  | JsExpressionAttrValue
+  | BindableAction;
 
 export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
@@ -48,7 +64,7 @@ export type BindableAttrValues<P = Record<string, unknown>> = {
 export type SlotType = 'single' | 'multiple';
 
 export interface ValueTypeBase {
-  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'function';
+  type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
 }
 
 export interface StringValueType extends ValueTypeBase {
@@ -80,8 +96,8 @@ export interface ElementValueType extends ValueTypeBase {
   type: 'element';
 }
 
-export interface FunctionValueType extends ValueTypeBase {
-  type: 'function';
+export interface EventValueType extends ValueTypeBase {
+  type: 'event';
 }
 
 export interface ArgControlSpec {
@@ -104,7 +120,7 @@ export interface ArgControlSpec {
     | 'SelectOptions' // SelectOptions specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
-    | 'function'
+    | 'event'
     | 'RowIdFieldSelect'; // Row id field specialized select
 }
 
@@ -115,7 +131,7 @@ type PrimitiveValueType =
   | ObjectValueType
   | ArrayValueType;
 
-export type PropValueType = PrimitiveValueType | ElementValueType | FunctionValueType;
+export type PropValueType = PrimitiveValueType | ElementValueType | EventValueType;
 
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
@@ -188,7 +204,8 @@ export type RuntimeEvent =
       type: 'pageBindingsUpdated';
       bindings: LiveBindings;
     }
-  | { type: 'afterRender' };
+  | { type: 'afterRender' }
+  | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
 
 export interface ComponentConfig<P> {
   /**

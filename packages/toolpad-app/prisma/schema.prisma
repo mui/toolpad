@@ -59,6 +59,8 @@ enum DomNodeAttributeType {
   boundExpression
   jsExpression
   secret
+  jsExpressionAction
+  navigationAction
 }
 
 model DomNodeAttribute {

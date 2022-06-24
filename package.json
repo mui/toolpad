@@ -78,5 +78,9 @@
   "resolutions": {
     "@types/react": "18.0.14",
     "@types/react-dom": "18.0.5"
+  },
+  "engines": {
+    "npm": "please-use-yarn",
+    "yarn": ">= 1.22.18"
   }
 }

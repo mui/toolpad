@@ -94,22 +94,25 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
 
   return (
     <Dialog open={!!app} onClose={onClose}>
-      <DialogTitle>Confirm delete</DialogTitle>
-      <DialogContent>
-        Are you sure you want to delete application &quot;{latestApp?.name}&quot;
-      </DialogContent>
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
-          Cancel
-        </Button>
-        <LoadingButton
-          loading={deleteAppMutation.isLoading}
-          onClick={handleDeleteClick}
-          color="error"
-        >
-          Delete
-        </LoadingButton>
-      </DialogActions>
+      <DialogForm>
+        <DialogTitle>Confirm delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete application &quot;{latestApp?.name}&quot;
+        </DialogContent>
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
+          <LoadingButton
+            type="submit"
+            loading={deleteAppMutation.isLoading}
+            onClick={handleDeleteClick}
+            color="error"
+          >
+            Delete
+          </LoadingButton>
+        </DialogActions>
+      </DialogForm>
     </Dialog>
   );
 }
@@ -252,7 +255,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
 
   return (
     <React.Fragment>
-      <Card sx={{ gridColumn: 'span 1' }}>
+      <Card sx={{ gridColumn: 'span 1' }} role="article">
         <CardHeader
           action={
             <IconButton

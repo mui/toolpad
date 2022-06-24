@@ -1,12 +1,14 @@
-const yargs = require('yargs');
-const inquirer = require('inquirer');
-const semver = require('semver');
+import inquirer from 'inquirer';
+import { execa } from 'execa';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import chalk from 'chalk';
+import semver from 'semver';
 
 const IMAGE_NAME = 'muicom/toolpad';
 const LATEST_TAG = 'latest';
 
 async function checkTagExists(image, tag) {
-  const { execa } = await import('execa');
   try {
     const { exitCode } = await execa('docker', ['manifest', 'inspect', `${image}:${tag}`]);
     return exitCode === 0;
@@ -20,7 +22,6 @@ async function checkTagExists(image, tag) {
 }
 
 async function dockerCreateTag(image, srcTag, destTags) {
-  const { execa } = await import('execa');
   const { exitCode, stderr } = await execa(
     'docker',
     [
@@ -38,7 +39,6 @@ async function dockerCreateTag(image, srcTag, destTags) {
 }
 
 async function commitLog(count = 100) {
-  const { execa } = await import('execa');
   const { exitCode, stderr, stdout } = await execa('git', ['log', `-${count}`, `--pretty=oneline`]);
   if (exitCode !== 0) {
     throw new Error(stderr);
@@ -53,7 +53,6 @@ async function commitLog(count = 100) {
 }
 
 async function showFile(commit, file) {
-  const { execa } = await import('execa');
   const { exitCode, stderr, stdout } = await execa('git', ['show', `${commit}:${file}`]);
   if (exitCode !== 0) {
     throw new Error(stderr);
@@ -62,14 +61,11 @@ async function showFile(commit, file) {
 }
 
 async function currentBranch() {
-  const { execa } = await import('execa');
   const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD']);
   return stdout;
 }
 
 async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest }) {
-  const { default: chalk } = await import('chalk');
-
   if (!commit) {
     const branch = await currentBranch();
     if (branch !== 'master') {
@@ -164,7 +160,7 @@ async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest }) {
   await dockerCreateTag(IMAGE_NAME, commit, tags);
 }
 
-yargs
+yargs(hideBin(process.argv))
   .command({
     command: '$0',
     description: 'Creates a Docker release',

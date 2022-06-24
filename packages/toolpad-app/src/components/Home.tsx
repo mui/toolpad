@@ -252,7 +252,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
 
   return (
     <React.Fragment>
-      <Card sx={{ gridColumn: 'span 1' }}>
+      <Card sx={{ gridColumn: 'span 1' }} role="article">
         <CardHeader
           action={
             <IconButton

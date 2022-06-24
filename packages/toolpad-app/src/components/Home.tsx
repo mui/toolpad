@@ -108,7 +108,7 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
     if (app) {
       await deleteAppMutation.mutateAsync([app.id]);
     }
-    await client.refetchQueries('getApps');
+    await client.invalidateQueries('getApps');
     onClose();
   }, [app, deleteAppMutation, onClose]);
 
@@ -174,7 +174,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
       if (app?.id) {
         try {
           await client.mutation.updateApp(app.id, name);
-          await client.refetchQueries('getApps');
+          await client.invalidateQueries('getApps');
         } catch (err) {
           setShowAppRenameError(true);
           setEditingTitle(true);
@@ -242,6 +242,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
   return (
     <React.Fragment>
       <Card
+        role="article"
         sx={{
           gridColumn: 'span 1',
           display: 'flex',

@@ -61,6 +61,7 @@ export interface NavigateToPage {
 
 export interface EditorHooks {
   navigateToPage?: NavigateToPage;
+  hidePreviewBanner?: boolean;
 }
 
 export const EditorHooksContext = React.createContext<EditorHooks>({});
@@ -576,6 +577,8 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
   const root = appDom.getApp(dom);
   const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
 
+  const { hidePreviewBanner } = React.useContext(EditorHooksContext);
+
   const theme = themes.length > 0 ? themes[0] : null;
 
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
@@ -602,6 +605,9 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
         <DomContextProvider value={dom}>
           <AppThemeProvider node={theme}>
             <CssBaseline />
+            {hidePreviewBanner ? null : (
+              <Alert severity="info">This is a preview version of the application.</Alert>
+            )}
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>

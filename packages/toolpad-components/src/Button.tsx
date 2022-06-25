@@ -1,13 +1,18 @@
 import * as React from 'react';
 import { LoadingButton as MuiButton, LoadingButtonProps as MuiButtonProps } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
+import { Box } from '@mui/material';
 
 interface ButtonProps extends Omit<MuiButtonProps, 'children'> {
   content: string;
 }
 
 function Button({ content, ...props }: ButtonProps) {
-  return <MuiButton {...props}>{content}</MuiButton>;
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <MuiButton {...props}>{content}</MuiButton>
+    </Box>
+  );
 }
 
 export default createComponent(Button, {
@@ -19,12 +24,15 @@ export default createComponent(Button, {
     onClick: {
       typeDef: { type: 'function' },
     },
-    disabled: {
-      typeDef: { type: 'boolean' },
-    },
     variant: {
       typeDef: { type: 'string', enum: ['contained', 'outlined', 'text'] },
       defaultValue: 'contained',
+    },
+    disabled: {
+      typeDef: { type: 'boolean' },
+    },
+    fullWidth: {
+      typeDef: { type: 'boolean' },
     },
     color: {
       typeDef: { type: 'string', enum: ['primary', 'secondary'] },

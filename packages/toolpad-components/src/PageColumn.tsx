@@ -3,13 +3,12 @@ import { Box, StackProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageColumnProps {
-  span: number;
   gap?: number;
   children?: React.ReactNode;
   alignItems?: StackProps['alignItems'];
 }
 
-function PageColumn({ span, gap, children, alignItems }: PageColumnProps) {
+function PageColumn({ gap, children, alignItems }: PageColumnProps) {
   return (
     <Box
       sx={{
@@ -27,10 +26,6 @@ function PageColumn({ span, gap, children, alignItems }: PageColumnProps) {
 
 export default createComponent(PageColumn, {
   argTypes: {
-    span: {
-      typeDef: { type: 'number' },
-      defaultValue: 4,
-    },
     gap: {
       typeDef: { type: 'number' },
       defaultValue: 1,

@@ -1,6 +1,6 @@
 import { ServerDataSource } from '../types';
 import movies from './movies/server';
-import postgres from './postgres/server';
+// import postgres from './postgres/server';
 import rest from './rest/server';
 import googleSheets from './googleSheets/server';
 
@@ -11,7 +11,7 @@ const serverDataSources: ServerDataSources = process.env.TOOLPAD_DEMO
       movies,
     }
   : {
-      postgres,
+      // postgres,
       rest,
       googleSheets,
     };

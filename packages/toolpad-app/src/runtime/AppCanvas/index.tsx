@@ -56,6 +56,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
 
   const editorHooks: EditorHooks = React.useMemo(() => {
     return {
+      hidePreviewBanner: true,
       navigateToPage(pageNodeId) {
         fireEvent({ type: 'pageNavigationRequest', pageNodeId });
       },

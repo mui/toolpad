@@ -4,6 +4,7 @@ import type * as monacoEditor from 'monaco-editor';
 import jsonToTs from 'json-to-ts';
 import { styled, SxProps } from '@mui/material';
 import { WithControlledProp } from '../../../utils/types';
+import TsModuleEditorTmp from '../../TsModuleEditorTmp';
 
 const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
   border: '1px solid black',
@@ -32,6 +33,8 @@ export function JsExpressionEditor({
   onBlur,
   sx,
 }: JsExpressionEditorProps) {
+  return <TsModuleEditorTmp value={value} onChange={onChange} />;
+
   const id = React.useId();
 
   const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();

@@ -2,6 +2,7 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import { WithControlledProp } from '../utils/types';
+import TsModuleEditorTmp from './TsModuleEditorTmp';
 
 interface TsModuleEditorProps extends WithControlledProp<string> {
   path: string;
@@ -18,6 +19,7 @@ export default function TsModuleEditor({ path, extraLibs, value, onChange }: TsM
 
   const HandleEditorMount = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
+      return <TsModuleEditorTmp value={value} onChange={onChange} />;
       editorRef.current = editor;
       monacoRef.current = monaco;
 

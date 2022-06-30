@@ -1,5 +1,5 @@
 import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
-import React from 'react';
+import * as React from 'react';
 import {
   evaluateBindable as evaluateBindableBrowser,
   useJsRuntime,

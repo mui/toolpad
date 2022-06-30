@@ -1,10 +1,13 @@
+const withTM = require('next-transpile-modules')(['monaco-editor']);
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+
 /** @type {import('./src/config').BuildEnvVars} */
 const buildEnvVars = {
   TOOLPAD_TARGET: process.env.TOOLPAD_TARGET || 'CE',
 };
 
 /** @type {import('next').NextConfig} */
-module.exports = {
+module.exports = withTM({
   reactStrictMode: true,
 
   eslint: {
@@ -23,6 +26,14 @@ module.exports = {
       fs: false,
       path: false,
     };
+
+    config.plugins = [
+      ...config.plugins,
+      new MonacoWebpackPlugin({
+        languages: ['typescript', 'javascript'],
+        filename: 'static/[name].worker.js',
+      }),
+    ];
 
     return config;
   },
@@ -45,4 +56,4 @@ module.exports = {
       },
     ];
   },
-};
+});

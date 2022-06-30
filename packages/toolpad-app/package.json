@@ -41,7 +41,7 @@
     "@mui/toolpad-core": "^0.0.7",
     "@mui/x-data-grid-pro": "^5.12.3",
     "@prisma/client": "^3.13.0",
-    "@swc/wasm": "^1.2.204",
+    "@swc/wasm": "^1.2.207",
     "@types/cors": "^2.8.12",
     "@types/prettier": "^2.4.3",
     "@types/react-dom": "^18.0.5",
@@ -61,7 +61,7 @@
     "json-to-ts": "^1.7.0",
     "json5": "^2.2.1",
     "lodash-es": "^4.17.21",
-    "next": "12.1.6",
+    "next": "12.2.0",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.6.2",
     "pretty-bytes": "^6.0.0",
@@ -97,7 +97,9 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "glob": "^8.0.3",
-    "monaco-editor": "^0.33.0"
+    "monaco-editor": "^0.33.0",
+    "monaco-editor-webpack-plugin": "^7.0.1",
+    "next-transpile-modules": "^9.0.0"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

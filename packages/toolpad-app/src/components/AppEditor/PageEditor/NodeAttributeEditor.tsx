@@ -24,8 +24,8 @@ function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
       return { type: 'json' };
     case 'array':
       return { type: 'json' };
-    case 'function':
-      return { type: 'function' };
+    case 'event':
+      return { type: 'event' };
     default:
       return null;
   }

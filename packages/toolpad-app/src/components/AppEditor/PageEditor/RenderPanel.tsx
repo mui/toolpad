@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
 import { setEventHandler } from '@mui/toolpad-core/runtime';
 import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
+import { useNavigate } from 'react-router-dom';
 import { FlowDirection, NodeInfo, SlotsState, SlotState } from '../../../types';
 import * as appDom from '../../../appDom';
 import EditorCanvasHost from './EditorCanvasHost';
@@ -1309,6 +1310,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const [rootElm, setRootElm] = React.useState<HTMLElement | null>();
 
+  const navigate = useNavigate();
+
   const handleRuntimeEvent = React.useCallback(
     (event: RuntimeEvent) => {
       switch (event.type) {
@@ -1342,13 +1345,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           setRootElm(editorWindow?.document.getElementById(HTML_ID_APP_ROOT));
           return;
         }
+        case 'pageNavigationRequest': {
+          navigate(`../pages/${event.pageNodeId}`);
+          return;
+        }
         default:
           throw new Error(
             `received unrecognized event "${(event as RuntimeEvent).type}" from editor runtime`,
           );
       }
     },
-    [dom, domApi, api],
+    [dom, domApi, api, navigate],
   );
 
   const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);

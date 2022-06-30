@@ -304,7 +304,7 @@ interface NodeHudProps {
   selected?: boolean;
   allowInteraction?: boolean;
   onDragStart?: React.DragEventHandler<HTMLElement>;
-  onDelete?: React.MouseEventHandler<HTMLButtonElement>;
+  onDelete?: React.MouseEventHandler<HTMLElement>;
 }
 
 function NodeHud({
@@ -322,7 +322,7 @@ function NodeHud({
   const component = useToolpadComponent(dom, componentId);
 
   const handleDelete = React.useCallback(
-    (event) => {
+    (event: React.MouseEvent<HTMLElement>) => {
       event.stopPropagation();
 
       if (onDelete) {

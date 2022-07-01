@@ -154,12 +154,11 @@ jobs:
 
       # build the application image
       - run: |
-          docker buildx build \
+          docker build \
             --progress plain \
             -t muicom/toolpad:$CIRCLE_SHA1 \
             --build-arg GIT_SHA1=$CIRCLE_SHA1 \
             --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
-            --platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
             -f ./docker/images/toolpad/Dockerfile \
             .
 
@@ -186,9 +185,16 @@ jobs:
             equal: [master, << pipeline.git.branch >>]
           steps:
             - run: |
-                docker push muicom/toolpad:$CIRCLE_SHA1
-                docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha
-                docker push muicom/toolpad:alpha
+                docker buildx build \
+                  --progress plain \
+                  -t muicom/toolpad:$CIRCLE_SHA1 \
+                  -t muicom/toolpad:alpha \
+                  --build-arg GIT_SHA1=$CIRCLE_SHA1 \
+                  --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
+                  --platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
+                  -f ./docker/images/toolpad/Dockerfile \
+                  --push \
+                  .
 
 workflows:
   version: 2

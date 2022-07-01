@@ -1,12 +1,14 @@
 import CodeIcon from '@mui/icons-material/Code';
-import { Box, Button, Dialog, DialogActions, DialogTitle } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogTitle, Skeleton } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import * as React from 'react';
 import { useDom, useDomApi } from '../../DomLoader';
-import TsModuleEditor from '../../TsModuleEditor';
 import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
+import reactLazyNoSsr from '../../../utils/reactLazyNoSsr';
+
+const TypescriptEditor = reactLazyNoSsr(() => import('../../TypescriptEditor'));
 
 const DEFAULT_CONTENT = `// All properties of this object will be available on the global scope in bindings
 export const globalScope = {};
@@ -47,12 +49,14 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">
       <DialogTitle>Edit page module</DialogTitle>
       <Box sx={{ height: 500 }}>
-        <TsModuleEditor
-          path={`./pages/${page.id}.ts`}
-          value={input}
-          onChange={(newValue) => setInput(newValue)}
-          extraLibs={EXTRA_LIBS_HTTP_MODULES}
-        />
+        <React.Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
+          <TypescriptEditor
+            path={`./pages/${page.id}.ts`}
+            value={input}
+            onChange={(newValue) => setInput(newValue)}
+            extraLibs={EXTRA_LIBS_HTTP_MODULES}
+          />
+        </React.Suspense>
       </Box>
       <DialogActions>
         <Button color="inherit" variant="text" onClick={onClose}>

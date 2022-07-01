@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import * as monaco from 'monaco-editor';
-import { styled } from '@mui/material';
+import { styled, SxProps } from '@mui/material';
 
 (globalThis as any).MonacoEnvironment = {
   getWorkerUrl(_, label) {
@@ -45,7 +45,7 @@ monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
   noSyntaxValidation: false,
 });
 
-const EditorRoot = styled('div')({});
+const EditorRoot = styled('div')({ height: '100%' });
 
 export interface MonacoEditorHandle {
   editor: monaco.editor.IStandaloneCodeEditor;
@@ -55,6 +55,7 @@ export interface MonacoEditorHandle {
 type EditorOptions = monaco.editor.IEditorOptions & monaco.editor.IGlobalEditorOptions;
 
 export interface MonacoEditorProps {
+  sx?: SxProps;
   value?: string;
   onChange?: (newValue: string) => void;
   disabled?: boolean;
@@ -66,7 +67,7 @@ export interface MonacoEditorProps {
 }
 
 export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function MonacoEditor(
-  { value, onChange, language = 'typescript', onFocus, onBlur, disabled, options, autoFocus },
+  { sx, value, onChange, language = 'typescript', onFocus, onBlur, disabled, options, autoFocus },
   ref,
 ) {
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -183,5 +184,10 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
     [],
   );
 
-  return <EditorRoot style={{ height: '100%' }} ref={rootRef} />;
+  return (
+    <EditorRoot
+      sx={{ ...sx, ...(disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}) }}
+      ref={rootRef}
+    />
+  );
 });

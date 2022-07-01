@@ -2,10 +2,12 @@
  * NOTE: This file can't SSR (use reactLazyNoSsr to load it)
  */
 
+import { SxProps } from '@mui/system';
 import * as React from 'react';
 import MonacoEditor, { MonacoEditorHandle } from './MonacoEditor';
 
 export interface TypescriptEditorProps {
+  sx?: SxProps;
   value: string;
   onChange: (newValue: string) => void;
   extraLibs?: { content: string; filePath?: string }[];

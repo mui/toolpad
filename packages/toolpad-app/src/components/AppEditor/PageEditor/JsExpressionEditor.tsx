@@ -51,11 +51,10 @@ export function JsExpressionEditor({
   }, [globalScope]);
 
   return (
-    <JsExpressionEditorRoot
-      sx={{ ...sx, ...(disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}) }}
-    >
+    <JsExpressionEditorRoot>
       <React.Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
         <TypescriptEditor
+          sx={sx}
           value={value}
           onChange={(code = '') => onChange(code)}
           disabled={disabled}

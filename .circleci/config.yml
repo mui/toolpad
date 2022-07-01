@@ -139,7 +139,7 @@ jobs:
           name: Tests fake browser
           command: yarn test
 
-  docker:
+  test_docker:
     working_directory: /tmp/mui-toolpad
     resource_class: medium
     machine: true
@@ -147,10 +147,6 @@ jobs:
       - DOCKER_BUILDKIT: '1'
     steps:
       - checkout
-
-      # login docker hub
-      - run: |
-          echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
 
       # build the application image
       - run: |
@@ -179,22 +175,31 @@ jobs:
               yarn e2e:smoke
             docker-compose -f ./docker/compose/docker-compose.yml down
 
-      # push the image
-      - when:
-          condition:
-            equal: [master, << pipeline.git.branch >>]
-          steps:
-            - run: |
-                docker buildx build \
-                  --progress plain \
-                  -t muicom/toolpad:$CIRCLE_SHA1 \
-                  -t muicom/toolpad:alpha \
-                  --build-arg GIT_SHA1=$CIRCLE_SHA1 \
-                  --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
-                  --platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
-                  -f ./docker/images/toolpad/Dockerfile \
-                  --push \
-                  .
+publish_docker:
+  working_directory: /tmp/mui-toolpad
+  resource_class: medium
+  machine: true
+  environment:
+    - DOCKER_BUILDKIT: '1'
+  steps:
+    - checkout
+
+    # login docker hub
+    - run: |
+        echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+
+    - run:
+        command: |
+          docker buildx build \
+            --progress plain \
+            -t muicom/toolpad:$CIRCLE_SHA1 \
+            -t muicom/toolpad:alpha \
+            --build-arg GIT_SHA1=$CIRCLE_SHA1 \
+            --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
+            --platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
+            -f ./docker/images/toolpad/Dockerfile \
+            --push \
+            .
 
 workflows:
   version: 2
@@ -210,4 +215,12 @@ workflows:
       - test_unit:
           requires:
             - checkout
-      - docker
+      - test_docker
+      - publish_docker:
+          requires:
+            - test_docker
+          filters:
+            branches:
+              only:
+                - master
+                - multi-arch-docker

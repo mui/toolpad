@@ -154,11 +154,12 @@ jobs:
 
       # build the application image
       - run: |
-          docker build \
+          docker buildx build \
             --progress plain \
             -t muicom/toolpad:$CIRCLE_SHA1 \
             --build-arg GIT_SHA1=$CIRCLE_SHA1 \
             --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
+            --platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
             -f ./docker/images/toolpad/Dockerfile \
             .
 

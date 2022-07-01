@@ -78,7 +78,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
     }
 
     const combinedOptions: EditorOptions = {
-      ...(disabled ? { readOnly: disabled } : {}),
+      readOnly: disabled,
       ...options,
     };
 

@@ -2,10 +2,14 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import jsonToTs from 'json-to-ts';
-import { styled, SxProps } from '@mui/material';
+import { Skeleton, styled, SxProps } from '@mui/material';
 import { WithControlledProp } from '../../../utils/types';
+import reactLazyNoSsr from '../../../utils/reactLazyNoSsr';
+
+const TypescriptEditor = reactLazyNoSsr(() => import('../../MonacoEditor'));
 
 const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
+  height: 150,
   border: '1px solid black',
   borderColor: theme.palette.divider,
   borderRadius: theme.shape.borderRadius,
@@ -127,8 +131,18 @@ export function JsExpressionEditor({
     <JsExpressionEditorRoot
       sx={{ ...sx, ...(disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}) }}
     >
-      <Editor
-        height="150px"
+      <React.Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
+        <TypescriptEditor
+          value={value}
+          onChange={(code = '') => onChange(code)}
+          language="typescript"
+          options={{
+            readOnly: disabled,
+          }}
+        />
+      </React.Suspense>
+      {/*       <Editor
+        height="100%"
         value={value}
         onChange={(code = '') => onChange(code)}
         path={`./expression/${id}.tsx`}
@@ -137,7 +151,7 @@ export function JsExpressionEditor({
         options={{
           readOnly: disabled,
         }}
-      />
+      /> */}
     </JsExpressionEditorRoot>
   );
 }

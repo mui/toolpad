@@ -78,7 +78,7 @@ module.exports = {
     config.plugins = [
       ...config.plugins,
       new MonacoWebpackPlugin({
-        languages: ['typescript', 'javascript', 'json'],
+        languages: ['typescript', 'json', 'css', 'html'],
         filename: 'static/[name].worker.js',
       }),
     ];

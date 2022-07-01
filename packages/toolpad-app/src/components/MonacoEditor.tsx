@@ -6,13 +6,19 @@ import * as React from 'react';
 import * as monaco from 'monaco-editor';
 import { styled } from '@mui/material';
 
-// These are configured by MonacoWebpackPlugin in next.config.js
-const MONACO_LANGUAGES = new Set(['json', 'javascript', 'typescript']);
-
 (globalThis as any).MonacoEnvironment = {
   getWorkerUrl(_, label) {
-    if (MONACO_LANGUAGES.has(label)) {
-      return `/_next/static/${label}.worker.js`;
+    if (label === 'typescript') {
+      return `/_next/static/ts.worker.js`;
+    }
+    if (label === 'json') {
+      return `/_next/static/json.worker.js`;
+    }
+    if (label === 'html') {
+      return `/_next/static/html.worker.js`;
+    }
+    if (label === 'css') {
+      return `/_next/static/css.worker.js`;
     }
     if (label === 'editorWorkerService') {
       return '/_next/static/editor.worker.js';

@@ -1,5 +1,8 @@
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const path = require('path');
+import { createRequire } from 'module';
+import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
+import * as path from 'path';
+
+const require = createRequire(import.meta.url);
 
 /** @type {import('./src/config').BuildEnvVars} */
 const buildEnvVars = {
@@ -26,7 +29,7 @@ const regexEqual = (x, y) => {
 };
 
 /** @type {import('next').NextConfig} */
-module.exports = {
+export default {
   reactStrictMode: true,
 
   eslint: {

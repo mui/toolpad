@@ -2,25 +2,17 @@
  * NOTE: This file can't SSR (use reactLazyNoSsr to load it)
  */
 
-import { SxProps } from '@mui/system';
 import * as React from 'react';
-import MonacoEditor, { MonacoEditorHandle } from './MonacoEditor';
+import MonacoEditor, { MonacoEditorHandle, MonacoEditorProps } from './MonacoEditor';
 
-export interface TypescriptEditorProps {
-  sx?: SxProps;
+export interface TypescriptEditorProps extends Omit<MonacoEditorProps, 'language'> {
   value: string;
   onChange: (newValue: string) => void;
   extraLibs?: { content: string; filePath?: string }[];
-  onFocus?: () => void;
-  onBlur?: () => void;
   functionBody?: boolean;
-  disabled?: boolean;
-  autoFocus?: boolean;
 }
 
 export default function TypescriptEditor({
-  value,
-  onChange,
   extraLibs,
   functionBody,
   ...props
@@ -37,13 +29,5 @@ export default function TypescriptEditor({
     });
   }, [functionBody]);
 
-  return (
-    <MonacoEditor
-      ref={editorRef}
-      value={value}
-      onChange={onChange}
-      language="typescript"
-      {...props}
-    />
-  );
+  return <MonacoEditor ref={editorRef} language="typescript" {...props} />;
 }

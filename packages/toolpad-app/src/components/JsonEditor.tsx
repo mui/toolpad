@@ -3,16 +3,13 @@
  */
 
 import * as React from 'react';
-import MonacoEditor, { MonacoEditorHandle } from './MonacoEditor';
+import MonacoEditor, { MonacoEditorHandle, MonacoEditorProps } from './MonacoEditor';
 
-export interface JsonEditorProps {
-  value: string;
-  onChange: (newValue: string) => void;
+export interface JsonEditorProps extends Omit<MonacoEditorProps, 'language'> {
   schemaUri?: string;
-  disabled?: boolean;
 }
 
-export default function JsonEditor({ value, onChange, schemaUri, disabled }: JsonEditorProps) {
+export default function JsonEditor({ schemaUri, ...props }: JsonEditorProps) {
   const editorRef = React.useRef<MonacoEditorHandle>(null);
 
   React.useEffect(() => {
@@ -31,13 +28,5 @@ export default function JsonEditor({ value, onChange, schemaUri, disabled }: Jso
     });
   }, [schemaUri]);
 
-  return (
-    <MonacoEditor
-      ref={editorRef}
-      value={value}
-      onChange={onChange}
-      language="json"
-      disabled={disabled}
-    />
-  );
+  return <MonacoEditor ref={editorRef} language="json" {...props} />;
 }

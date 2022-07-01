@@ -16,7 +16,6 @@ export default function JsonEditor({ value, onChange, schemaUri, disabled }: Jso
   const editorRef = React.useRef<MonacoEditorHandle>(null);
 
   React.useEffect(() => {
-    console.log(schemaUri);
     editorRef.current?.monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
       validate: true,
       schemaRequest: 'error',

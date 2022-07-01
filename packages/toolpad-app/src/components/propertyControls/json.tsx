@@ -1,4 +1,12 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Skeleton,
+} from '@mui/material';
 import * as React from 'react';
 import * as JSON5 from 'json5';
 import type { EditorProps } from '../../types';
@@ -47,12 +55,14 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
         <DialogTitle>Edit JSON</DialogTitle>
         <DialogContent>
           <Box sx={{ height: 200 }}>
-            <JsonEditor
-              value={input}
-              onChange={(newValue = '') => setInput(newValue)}
-              schemaUri={schemaUri}
-              disabled={disabled}
-            />
+            <React.Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
+              <JsonEditor
+                value={input}
+                onChange={(newValue = '') => setInput(newValue)}
+                schemaUri={schemaUri}
+                disabled={disabled}
+              />
+            </React.Suspense>
           </Box>
         </DialogContent>
         <DialogActions>

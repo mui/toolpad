@@ -19,7 +19,9 @@ import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
 import { mapValues } from '../../../utils/collections';
 import ErrorAlert from '../PageEditor/ErrorAlert';
-import TsModuleEditor from '../../TsModuleEditor';
+import reactLazyNoSsr from '../../../utils/reactLazyNoSsr';
+
+const TypescriptEditor = reactLazyNoSsr(() => import('../../TypescriptEditor'));
 
 const Noop = createComponent(() => null);
 
@@ -154,7 +156,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
         </Toolbar>
         <Box flex={1} display="flex">
           <Box flex={1}>
-            <TsModuleEditor
+            <TypescriptEditor
               path={`./codeComponents/${codeComponentNode.id}.tsx`}
               value={input}
               onChange={(newValue) => setInput(newValue || '')}

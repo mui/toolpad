@@ -34,6 +34,8 @@ export function JsExpressionEditor({
   onBlur,
   sx,
 }: JsExpressionEditorProps) {
+  const id = React.useId();
+
   const extraLibs = React.useMemo(() => {
     const type = jsonToTs(globalScope);
 
@@ -54,9 +56,10 @@ export function JsExpressionEditor({
     <JsExpressionEditorRoot>
       <React.Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
         <TypescriptEditor
-          sx={sx}
+          path={`./expressions/${id}.tsx`}
           value={value}
           onChange={(code = '') => onChange(code)}
+          sx={sx}
           disabled={disabled}
           extraLibs={extraLibs}
           functionBody={functionBody}

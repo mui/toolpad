@@ -55,10 +55,11 @@ export interface MonacoEditorHandle {
 type EditorOptions = monaco.editor.IEditorOptions & monaco.editor.IGlobalEditorOptions;
 
 export interface MonacoEditorProps {
-  sx?: SxProps;
+  path: string;
   value?: string;
   onChange?: (newValue: string) => void;
   disabled?: boolean;
+  sx?: SxProps;
   autoFocus?: boolean;
   language?: string;
   onFocus?: () => void;
@@ -67,7 +68,18 @@ export interface MonacoEditorProps {
 }
 
 export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function MonacoEditor(
-  { sx, value, onChange, language = 'typescript', onFocus, onBlur, disabled, options, autoFocus },
+  {
+    path,
+    value,
+    onChange,
+    sx,
+    language = 'typescript',
+    onFocus,
+    onBlur,
+    disabled,
+    options,
+    autoFocus,
+  },
   ref,
 ) {
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -78,14 +90,14 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
       return;
     }
 
-    const combinedOptions: EditorOptions = {
+    const extraOptions: EditorOptions = {
       readOnly: disabled,
       ...options,
     };
 
     if (instanceRef.current) {
-      if (combinedOptions) {
-        instanceRef.current.updateOptions(combinedOptions);
+      if (extraOptions) {
+        instanceRef.current.updateOptions(extraOptions);
       }
 
       const model = instanceRef.current.getModel();
@@ -109,20 +121,25 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         }
       }
     } else {
+      const pathUri = monaco.Uri.parse(path);
+      const model =
+        monaco.editor.getModel(pathUri) ||
+        monaco.editor.createModel(value || '', language, pathUri);
+
       instanceRef.current = monaco.editor.create(rootRef.current, {
-        value,
+        model,
         language,
         minimap: { enabled: false },
         accessibilitySupport: 'off',
         tabSize: 2,
-        ...combinedOptions,
+        ...extraOptions,
       });
 
       if (autoFocus && !disabled) {
         instanceRef.current.focus();
       }
     }
-  }, [language, value, options, disabled, autoFocus]);
+  }, [language, value, options, disabled, autoFocus, path]);
 
   React.useEffect(() => {
     const editor = instanceRef.current;

@@ -57,6 +57,7 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
           <Box sx={{ height: 200 }}>
             <React.Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
               <JsonEditor
+                path={`./propertyControls/${schemaUri ? window.btoa(schemaUri) : 'default'}.json`}
                 value={input}
                 onChange={(newValue = '') => setInput(newValue)}
                 schemaUri={schemaUri}

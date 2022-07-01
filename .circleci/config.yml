@@ -178,10 +178,12 @@ jobs:
   publish_docker:
     working_directory: /tmp/mui-toolpad
     resource_class: medium
-    machine: true
-    environment:
-      - DOCKER_BUILDKIT: '1'
+    docker:
+      - image: cimg/base:stable
     steps:
+      - setup_remote_docker:
+          version: 20.10.11
+
       - checkout
 
       # login docker hub

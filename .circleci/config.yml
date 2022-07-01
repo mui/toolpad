@@ -175,31 +175,32 @@ jobs:
               yarn e2e:smoke
             docker-compose -f ./docker/compose/docker-compose.yml down
 
-publish_docker:
-  working_directory: /tmp/mui-toolpad
-  resource_class: medium
-  machine: true
-  environment:
-    - DOCKER_BUILDKIT: '1'
-  steps:
-    - checkout
+  publish_docker:
+    working_directory: /tmp/mui-toolpad
+    resource_class: medium
+    machine: true
+    environment:
+      - DOCKER_BUILDKIT: '1'
+    steps:
+      - checkout
 
-    # login docker hub
-    - run: |
-        echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      # login docker hub
+      - run: |
+          echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
 
-    - run:
-        command: |
-          docker buildx build \
-            --progress plain \
-            -t muicom/toolpad:$CIRCLE_SHA1 \
-            -t muicom/toolpad:alpha \
-            --build-arg GIT_SHA1=$CIRCLE_SHA1 \
-            --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
-            --platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
-            -f ./docker/images/toolpad/Dockerfile \
-            --push \
-            .
+      # build and push multi-arch image
+      - run:
+          command: |
+            docker buildx build \
+              --progress plain \
+              -t muicom/toolpad:$CIRCLE_SHA1 \
+              -t muicom/toolpad:alpha \
+              --build-arg GIT_SHA1=$CIRCLE_SHA1 \
+              --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
+              --platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
+              -f ./docker/images/toolpad/Dockerfile \
+              --push \
+              .
 
 workflows:
   version: 2

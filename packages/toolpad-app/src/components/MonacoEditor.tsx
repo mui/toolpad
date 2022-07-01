@@ -1,3 +1,153 @@
-import * as React from 'react';
+/**
+ * NOTE: This file can't SSR (use reactLazyNoSsr to load it)
+ */
 
-export default React.lazy(async () => import('./MonacoEditorBase'));
+import * as React from 'react';
+import * as monaco from 'monaco-editor';
+import { styled } from '@mui/material';
+
+// These are configured by MonacoWebpackPlugin in next.config.js
+const MONACO_LANGUAGES = new Set(['json', 'javascript', 'typescript']);
+
+(globalThis as any).MonacoEnvironment = {
+  getWorkerUrl(_, label) {
+    if (MONACO_LANGUAGES.has(label)) {
+      return `/_next/static/${label}.worker.js`;
+    }
+    if (label === 'editorWorkerService') {
+      return '/_next/static/editor.worker.js';
+    }
+    throw new Error(`Failed to provide a worker URL for label "${label}"`);
+  },
+} as monaco.Environment;
+
+monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+  target: monaco.languages.typescript.ScriptTarget.Latest,
+  allowNonTsExtensions: true,
+  moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+  module: monaco.languages.typescript.ModuleKind.CommonJS,
+  noEmit: true,
+  esModuleInterop: true,
+  jsx: monaco.languages.typescript.JsxEmit.React,
+  reactNamespace: 'React',
+  allowJs: true,
+  typeRoots: ['node_modules/@types'],
+});
+
+monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+  noSemanticValidation: false,
+  noSyntaxValidation: false,
+});
+
+const EditorRoot = styled('div')({});
+
+export interface MonacoEditorHandle {
+  editor: monaco.editor.IStandaloneCodeEditor;
+  monaco: typeof monaco;
+}
+
+export interface MonacoEditorProps {
+  value?: string;
+  onChange?: (newValue: string) => void;
+  language?: string;
+  options?: monaco.editor.IEditorOptions & monaco.editor.IGlobalEditorOptions;
+}
+
+export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function MonacoEditor(
+  { value, onChange, language = 'typescript', options },
+  ref,
+) {
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const instanceRef = React.useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+
+  React.useEffect(() => {
+    if (!rootRef.current) {
+      return;
+    }
+
+    if (instanceRef.current) {
+      if (options) {
+        instanceRef.current.updateOptions(options);
+      }
+
+      const model = instanceRef.current.getModel();
+      if (typeof value === 'string' && model) {
+        const actualValue = model.getValue();
+
+        if (value !== actualValue) {
+          // Used to restore cursor position
+          const state = instanceRef.current.saveViewState();
+
+          instanceRef.current.executeEdits(null, [
+            {
+              range: model.getFullModelRange(),
+              text: value,
+            },
+          ]);
+
+          if (state) {
+            instanceRef.current.restoreViewState(state);
+          }
+        }
+      }
+    } else {
+      instanceRef.current = monaco.editor.create(rootRef.current, {
+        value,
+        language,
+        minimap: { enabled: false },
+        accessibilitySupport: 'off',
+        tabSize: 2,
+        ...options,
+      });
+    }
+  }, [language, value, options]);
+
+  React.useEffect(() => {
+    const editor = instanceRef.current;
+
+    if (!editor) {
+      return () => {};
+    }
+
+    const onDidChangeSubscription = editor.onDidChangeModelContent(() => {
+      const editorValue = editor.getValue();
+
+      if (onChange && value !== editorValue) {
+        onChange(editorValue);
+      }
+    });
+
+    return () => {
+      onDidChangeSubscription.dispose();
+    };
+  }, [onChange, value]);
+
+  React.useEffect(() => {
+    return () => {
+      instanceRef.current?.getModel()?.dispose();
+      instanceRef.current?.dispose();
+      instanceRef.current = null;
+    };
+  }, []);
+
+  React.useImperativeHandle(
+    ref,
+    () => {
+      return {
+        get editor() {
+          const editor = instanceRef.current;
+          if (!editor) {
+            throw new Error('Editor not created yet');
+          }
+          return editor;
+        },
+        get monaco() {
+          return monaco;
+        },
+      };
+    },
+    [],
+  );
+
+  return <EditorRoot style={{ height: '100%' }} ref={rootRef} />;
+});

@@ -30,7 +30,7 @@ module.exports = withTM({
     config.plugins = [
       ...config.plugins,
       new MonacoWebpackPlugin({
-        languages: ['typescript', 'javascript'],
+        languages: ['typescript', 'javascript', 'json'],
         filename: 'static/[name].worker.js',
       }),
     ];

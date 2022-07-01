@@ -52,15 +52,21 @@ export interface MonacoEditorHandle {
   monaco: typeof monaco;
 }
 
+type EditorOptions = monaco.editor.IEditorOptions & monaco.editor.IGlobalEditorOptions;
+
 export interface MonacoEditorProps {
   value?: string;
   onChange?: (newValue: string) => void;
+  disabled?: boolean;
+  autoFocus?: boolean;
   language?: string;
-  options?: monaco.editor.IEditorOptions & monaco.editor.IGlobalEditorOptions;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  options?: EditorOptions;
 }
 
 export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function MonacoEditor(
-  { value, onChange, language = 'typescript', options },
+  { value, onChange, language = 'typescript', onFocus, onBlur, disabled, options, autoFocus },
   ref,
 ) {
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -71,9 +77,14 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
       return;
     }
 
+    const combinedOptions: EditorOptions = {
+      ...(disabled ? { readOnly: disabled } : {}),
+      ...options,
+    };
+
     if (instanceRef.current) {
-      if (options) {
-        instanceRef.current.updateOptions(options);
+      if (combinedOptions) {
+        instanceRef.current.updateOptions(combinedOptions);
       }
 
       const model = instanceRef.current.getModel();
@@ -103,19 +114,19 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         minimap: { enabled: false },
         accessibilitySupport: 'off',
         tabSize: 2,
-        ...options,
+        ...combinedOptions,
       });
+
+      if (autoFocus && !disabled) {
+        instanceRef.current.focus();
+      }
     }
-  }, [language, value, options]);
+  }, [language, value, options, disabled, autoFocus]);
 
   React.useEffect(() => {
     const editor = instanceRef.current;
 
-    if (!editor) {
-      return () => {};
-    }
-
-    const onDidChangeSubscription = editor.onDidChangeModelContent(() => {
+    const onDidChangeModelContentSub = editor?.onDidChangeModelContent(() => {
       const editorValue = editor.getValue();
 
       if (onChange && value !== editorValue) {
@@ -123,10 +134,27 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
       }
     });
 
-    return () => {
-      onDidChangeSubscription.dispose();
-    };
+    return () => onDidChangeModelContentSub?.dispose();
   }, [onChange, value]);
+
+  React.useEffect(() => {
+    const editor = instanceRef.current;
+
+    if (onFocus) {
+      const onDidFocusEditorTextSub = editor?.onDidFocusEditorText(onFocus);
+      return () => onDidFocusEditorTextSub?.dispose();
+    }
+    return () => {};
+  }, [onFocus]);
+
+  React.useEffect(() => {
+    const editor = instanceRef.current;
+    if (onBlur) {
+      const onDidBlurEditorTextSub = editor?.onDidBlurEditorText(onBlur);
+      return () => onDidBlurEditorTextSub?.dispose();
+    }
+    return () => {};
+  }, [onBlur]);
 
   React.useEffect(() => {
     return () => {

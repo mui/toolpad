@@ -31,20 +31,13 @@ export default function JsonEditor({ value, onChange, schemaUri, disabled }: Jso
     });
   }, [schemaUri]);
 
-  const editorOptions = React.useMemo(
-    () => ({
-      readOnly: disabled,
-    }),
-    [disabled],
-  );
-
   return (
     <MonacoEditor
       ref={editorRef}
       value={value}
       onChange={onChange}
       language="json"
-      options={editorOptions}
+      disabled={disabled}
     />
   );
 }

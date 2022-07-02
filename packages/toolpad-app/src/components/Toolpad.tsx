@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { NoSsr } from '@mui/material';
+import { ErrorBoundary } from 'react-error-boundary';
 import Release from './Release';
 import Releases from './Releases';
 import AppEditor from './AppEditor';
@@ -25,14 +26,16 @@ export interface EditorProps {
 export default function Toolpad({ basename }: EditorProps) {
   return (
     <NoSsr>
-      <React.Suspense fallback="loading...">
-        <BrowserRouter basename={basename}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/app/:appId/*" element={<AppWorkspace />} />
-          </Routes>
-        </BrowserRouter>
-      </React.Suspense>
+      <ErrorBoundary fallback={<React.Fragment>error</React.Fragment>}>
+        <React.Suspense fallback="loading...">
+          <BrowserRouter basename={basename}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/app/:appId/*" element={<AppWorkspace />} />
+            </Routes>
+          </BrowserRouter>
+        </React.Suspense>
+      </ErrorBoundary>
     </NoSsr>
   );
 }

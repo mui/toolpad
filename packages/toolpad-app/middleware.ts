@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import config from '../src/server/config';
+import config from './src/server/config';
 
 const BASIC_AUTH_WHITELIST = new Set(['/health-check']);
 

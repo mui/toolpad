@@ -67,8 +67,8 @@ module.exports = withTM({
     // Set by Netlify
     GRID_EXPERIMENTAL_ENABLED: process.env.PULL_REQUEST === 'false' ? 'false' : 'true',
     // #default-branch-switch
-    SOURCE_CODE_ROOT_URL: 'https://github.com/mui/mui-x/blob/master',
-    SOURCE_CODE_REPO: 'https://github.com/mui/mui-x',
+    SOURCE_CODE_ROOT_URL: 'https://github.com/mui/mui-toolpad/blob/master',
+    SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',
   },
   webpack5: true,
   webpack: (config) => {

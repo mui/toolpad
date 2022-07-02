@@ -23,7 +23,7 @@
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "jsonlint": "node ./scripts/jsonlint.js",
     "prisma": "dotenv yarn workspace @mui/toolpad-app run --cwd=\"./packages/toolpad-app\" prisma",
-    "release:build": "lerna run --stream build",
+    "release:build": "NODE_OPTIONS=--max_old_space_size=4096 lerna run --stream build",
     "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
     "release:docker": "node ./scripts/releaseDocker.mjs",
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.js --repo mui-toolpad",

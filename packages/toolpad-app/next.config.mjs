@@ -78,13 +78,15 @@ export default {
       }
     }
 
-    config.plugins = [
-      ...config.plugins,
-      new MonacoWebpackPlugin({
-        languages: ['typescript', 'json', 'css', 'html'],
-        filename: 'static/[name].worker.js',
-      }),
-    ];
+    if (!options.isServer) {
+      config.plugins = [
+        ...config.plugins,
+        new MonacoWebpackPlugin({
+          languages: ['typescript', 'json', 'css', 'html'],
+          filename: 'static/[name].worker.js',
+        }),
+      ];
+    }
 
     return config;
   },

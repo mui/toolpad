@@ -193,6 +193,7 @@ jobs:
       # build and push multi-arch image
       - run:
           command: |
+            docker buildx create --use
             docker buildx build \
               --progress plain \
               -t muicom/toolpad:$CIRCLE_SHA1 \

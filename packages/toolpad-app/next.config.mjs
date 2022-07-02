@@ -53,7 +53,7 @@ export default {
       // Adapted from next-transpile-modules.
       // Extracts the css imports in monaco-editor.
       // next-transpile-modules also compiles javascript and results in buggy output.
-      const extraCssIssuer = /\/node_modules\/monaco-editor\/esm\//;
+      const extraCssIssuer = /\/node_modules\/monaco-editor\/esm\/.*\/browser\//;
       const modulesPaths = [path.dirname(require.resolve('monaco-editor/package.json'))];
 
       // Support CSS modules + global in node_modules
@@ -67,7 +67,6 @@ export default {
         );
 
         if (nextGlobalCssLoader) {
-          console.log(nextGlobalCssLoader);
           nextGlobalCssLoader.issuer = { or: [extraCssIssuer, nextGlobalCssLoader.issuer] };
           nextGlobalCssLoader.include = { or: [...modulesPaths, nextGlobalCssLoader.include] };
         } else if (!options.isServer) {

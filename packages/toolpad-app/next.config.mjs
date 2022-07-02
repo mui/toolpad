@@ -1,5 +1,4 @@
 import { createRequire } from 'module';
-import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 import * as path from 'path';
 
 const require = createRequire(import.meta.url);
@@ -74,16 +73,6 @@ export default {
           console.warn('could not find default CSS rule, global CSS imports may not work');
         }
       }
-    }
-
-    if (!options.isServer) {
-      config.plugins = [
-        ...config.plugins,
-        new MonacoWebpackPlugin({
-          languages: ['typescript', 'json', 'css', 'html'],
-          filename: 'static/[name].worker.js',
-        }),
-      ];
     }
 
     return config;

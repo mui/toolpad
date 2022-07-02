@@ -7,23 +7,25 @@ import * as monaco from 'monaco-editor';
 import { styled, SxProps } from '@mui/material';
 
 (globalThis as any).MonacoEnvironment = {
-  getWorkerUrl(_, label) {
+  async getWorker(_, label) {
     if (label === 'typescript') {
-      return `/_next/static/ts.worker.js`;
+      return new Worker(
+        new URL(`monaco-editor/esm/vs/language/typescript/ts.worker`, import.meta.url),
+      );
     }
     if (label === 'json') {
-      return `/_next/static/json.worker.js`;
+      return new Worker(new URL(`monaco-editor/esm/vs/language/json/json.worker`, import.meta.url));
     }
     if (label === 'html') {
-      return `/_next/static/html.worker.js`;
+      return new Worker(new URL(`monaco-editor/esm/vs/language/html/html.worker`, import.meta.url));
     }
     if (label === 'css') {
-      return `/_next/static/css.worker.js`;
+      return new Worker(new URL(`monaco-editor/esm/vs/language/css/css.worker`, import.meta.url));
     }
     if (label === 'editorWorkerService') {
-      return '/_next/static/editor.worker.js';
+      return new Worker(new URL('monaco-editor/esm/vs/editor/editor.worker', import.meta.url));
     }
-    throw new Error(`Failed to provide a worker URL for label "${label}"`);
+    throw new Error(`Failed to resolve worker with label "${label}"`);
   },
 } as monaco.Environment;
 
@@ -176,7 +178,6 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 
   React.useEffect(() => {
     return () => {
-      instanceRef.current?.getModel()?.dispose();
       instanceRef.current?.dispose();
       instanceRef.current = null;
     };

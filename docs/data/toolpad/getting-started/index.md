@@ -1,7 +1,3 @@
----
-title: Toolpad docs - Getting started
----
-
 # Getting started
 
 <p class="description">Get started building a Toolpad app!</p>

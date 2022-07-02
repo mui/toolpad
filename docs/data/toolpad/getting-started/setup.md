@@ -1,10 +1,6 @@
----
-title: Toolpad docs - Getting started
----
-
 # Setup
 
-<p class="description">Set Toolpad up locally!</p>
+<p class="description">Set Toolpad up locally.</p>
 
 ## docker-compose
 
@@ -12,7 +8,7 @@ The easiest way to run Toolpad locally is through docker-compose.
 
 **NOTE: Toolpad is in preview, do not run this in production.**
 
-### Pre-Requisites
+### Prerequisites
 
 Make sure you have the following tools installed:
 

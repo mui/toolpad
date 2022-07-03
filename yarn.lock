@@ -2034,7 +2034,7 @@
   dependencies:
     "@octokit/openapi-types" "^12.4.0"
 
-"@playwright/test@^1.23.1":
+"@playwright/test@^1.22.1":
   version "1.23.1"
   resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.23.1.tgz#209cceb81c579d1cd2835f15c2bb3a8345103d60"
   integrity sha512-dKplLPSYPZgnsBk1xxOophhpx3ZVg8DveoNJgLPe096lDCfmaIIreLsYF+4hqzy3PG61IP+aEnG5VAOjC3bhbA==

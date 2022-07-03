@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import config from '../src/server/config';
+import config from './src/server/config';
 
 const BASIC_AUTH_WHITELIST = new Set(['/health-check']);
 
@@ -14,7 +14,7 @@ export function middleware(req: NextRequest) {
 
   if (basicAuth) {
     const auth = basicAuth.split(' ')[1];
-    const [user, pwd] = Buffer.from(auth, 'base64').toString().split(':');
+    const [user, pwd] = atob(auth).toString().split(':');
 
     if (user === config.basicAuthUser && pwd === config.basicAuthPassword) {
       return NextResponse.next();

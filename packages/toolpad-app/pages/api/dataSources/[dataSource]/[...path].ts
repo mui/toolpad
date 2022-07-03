@@ -11,6 +11,9 @@ Object.keys(serverDataSources).forEach((dataSource) => {
 export default (async (req, res) => {
   if (req.method === 'GET') {
     const [dataSource] = asArray(req.query.dataSource);
+    if (!dataSource) {
+      throw new Error(`Missing path parameter "dataSource"`);
+    }
     const handler = handlerMap.get(dataSource);
     if (handler) {
       return handler(

@@ -195,13 +195,14 @@ jobs:
           command: |
             docker context create buildx-ci
             docker buildx create --use buildx-ci
+            docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
             docker buildx build \
               --progress plain \
               -t muicom/toolpad:$CIRCLE_SHA1 \
               -t muicom/toolpad:alpha \
               --build-arg GIT_SHA1=$CIRCLE_SHA1 \
               --build-arg CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM \
-              --platform linux/arm64/v8,linux/amd64 \
+              --platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
               -f ./docker/images/toolpad/Dockerfile \
               --push \
               .

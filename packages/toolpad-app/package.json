@@ -74,7 +74,7 @@
     "react-hook-form": "^7.29.0",
     "react-inspector": "^5.1.1",
     "react-is": "^18.1.0",
-    "react-query": "^3.39.1",
+    "react-query": "^4.0.0-beta.23",
     "react-router-dom": "^6.3.0",
     "react-split-pane": "^0.1.92",
     "serialize-javascript": "^6.0.0",

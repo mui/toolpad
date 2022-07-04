@@ -1,5 +1,5 @@
 /**
- * NOTE: This file can't SSR (use reactLazyNoSsr to load it)
+ * NOTE: This file can't SSR (use lazyComponent to load it)
  */
 
 import * as React from 'react';

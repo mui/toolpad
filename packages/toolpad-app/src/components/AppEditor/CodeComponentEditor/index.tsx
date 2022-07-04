@@ -19,10 +19,13 @@ import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
 import { mapValues } from '../../../utils/collections';
 import ErrorAlert from '../PageEditor/ErrorAlert';
-import reactLazyNoSsr from '../../../utils/reactLazyNoSsr';
+import lazyComponent from '../../../utils/lazyComponent';
 import CenteredSpinner from '../../CenteredSpinner';
 
-const TypescriptEditor = reactLazyNoSsr(() => import('../../TypescriptEditor'));
+const TypescriptEditor = lazyComponent(() => import('../../TypescriptEditor'), {
+  noSsr: true,
+  fallback: <CenteredSpinner />,
+});
 
 const Noop = createComponent(() => null);
 
@@ -157,14 +160,12 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
         </Toolbar>
         <Box flex={1} display="flex">
           <Box flex={1}>
-            <React.Suspense fallback={<CenteredSpinner />}>
-              <TypescriptEditor
-                path={`./codeComponents/${codeComponentNode.id}.tsx`}
-                value={input}
-                onChange={(newValue) => setInput(newValue || '')}
-                extraLibs={extraLibs}
-              />
-            </React.Suspense>
+            <TypescriptEditor
+              path={`./codeComponents/${codeComponentNode.id}.tsx`}
+              value={input}
+              onChange={(newValue) => setInput(newValue || '')}
+              extraLibs={extraLibs}
+            />
           </Box>
           <Box sx={{ flex: 1, position: 'relative' }}>
             <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />

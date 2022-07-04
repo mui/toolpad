@@ -2,9 +2,12 @@ import * as React from 'react';
 import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
 import { WithControlledProp } from '../../../utils/types';
-import reactLazyNoSsr from '../../../utils/reactLazyNoSsr';
+import lazyComponent from '../../../utils/lazyComponent';
 
-const TypescriptEditor = reactLazyNoSsr(() => import('../../TypescriptEditor'));
+const TypescriptEditor = lazyComponent(() => import('../../TypescriptEditor'), {
+  noSsr: true,
+  fallback: <Skeleton variant="rectangular" height="100%" />,
+});
 
 const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
   height: 150,
@@ -54,20 +57,18 @@ export function JsExpressionEditor({
 
   return (
     <JsExpressionEditorRoot>
-      <React.Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
-        <TypescriptEditor
-          path={`./expressions/${id}.tsx`}
-          value={value}
-          onChange={(code = '') => onChange(code)}
-          sx={sx}
-          disabled={disabled}
-          extraLibs={extraLibs}
-          functionBody={functionBody}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          autoFocus={autoFocus}
-        />
-      </React.Suspense>
+      <TypescriptEditor
+        path={`./expressions/${id}.tsx`}
+        value={value}
+        onChange={(code = '') => onChange(code)}
+        sx={sx}
+        disabled={disabled}
+        extraLibs={extraLibs}
+        functionBody={functionBody}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        autoFocus={autoFocus}
+      />
     </JsExpressionEditorRoot>
   );
 }

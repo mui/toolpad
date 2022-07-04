@@ -11,9 +11,12 @@ import * as React from 'react';
 import * as JSON5 from 'json5';
 import type { EditorProps } from '../../types';
 import useShortcut from '../../utils/useShortcut';
-import reactLazyNoSsr from '../../utils/reactLazyNoSsr';
+import lazyComponent from '../../utils/lazyComponent';
 
-const JsonEditor = reactLazyNoSsr(() => import('../JsonEditor'));
+const JsonEditor = lazyComponent(() => import('../JsonEditor'), {
+  noSsr: true,
+  fallback: <Skeleton variant="rectangular" height="100%" />,
+});
 
 function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorProps<any>) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -55,15 +58,13 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
         <DialogTitle>Edit JSON</DialogTitle>
         <DialogContent>
           <Box sx={{ height: 200 }}>
-            <React.Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
-              <JsonEditor
-                path={`./propertyControls/${schemaUri ? window.btoa(schemaUri) : 'default'}.json`}
-                value={input}
-                onChange={(newValue = '') => setInput(newValue)}
-                schemaUri={schemaUri}
-                disabled={disabled}
-              />
-            </React.Suspense>
+            <JsonEditor
+              path={`./propertyControls/${schemaUri ? window.btoa(schemaUri) : 'default'}.json`}
+              value={input}
+              onChange={(newValue = '') => setInput(newValue)}
+              schemaUri={schemaUri}
+              disabled={disabled}
+            />
           </Box>
         </DialogContent>
         <DialogActions>

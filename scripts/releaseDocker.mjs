@@ -22,19 +22,18 @@ async function checkTagExists(image, tag) {
 }
 
 async function dockerCreateTag(image, srcTag, destTags) {
-  const { exitCode, stderr } = await execa(
-    'docker',
-    [
-      'buildx',
-      'imagetools',
-      'create',
-      `${image}:${srcTag}`,
-      ...destTags.flatMap((tag) => ['--tag', `${image}:${tag}`]),
-    ],
-    { stdio: 'inherit' },
-  );
-  if (exitCode !== 0) {
-    throw new Error(stderr);
+  const srImage = `${image}:${srcTag}`;
+  try {
+    await execa('docker', ['pull', srImage], { stdio: 'inherit' });
+    await Promise.all(
+      destTags.map(async (destTag) => {
+        const destImage = `${image}:${destTag}`;
+        await execa('docker', ['tag', srImage, destImage], { stdio: 'inherit' });
+        await execa('docker', ['push', destImage], { stdio: 'inherit' });
+      }),
+    );
+  } finally {
+    await execa('docker', ['rmi', srImage], { stdio: 'inherit' });
   }
 }
 
@@ -118,7 +117,7 @@ async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest }) {
   }
 
   const parsedVersion = semver.parse(releaseTag);
-  const isPrerelease = parsedVersion.prerelease.length > 0;
+  const isPrerelease = parsedVersion ? parsedVersion.prerelease.length > 0 : true;
 
   const tags = [releaseTag];
 

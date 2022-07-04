@@ -21,11 +21,12 @@ import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
  *      - Use by importing the module `./src/server.config`
  */
 
-type ToolpadTargetType = 'CLOUD' | 'CE' | 'PRO';
+export type ToolpadTargetType = 'CLOUD' | 'CE' | 'PRO';
 
 // These are inlined at build time
 export interface BuildEnvVars {
   TOOLPAD_TARGET: ToolpadTargetType;
+  TOOLPAD_DEMO: boolean;
 }
 
 // These are set at runtime and passed to the browser.

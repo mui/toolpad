@@ -21,7 +21,6 @@ import { mapValues } from '../../../utils/collections';
 import ErrorAlert from '../PageEditor/ErrorAlert';
 import lazyComponent from '../../../utils/lazyComponent';
 import CenteredSpinner from '../../CenteredSpinner';
-import '../../TypescriptEditor';
 
 const TypescriptEditor = lazyComponent(() => import('../../TypescriptEditor'), {
   noSsr: true,

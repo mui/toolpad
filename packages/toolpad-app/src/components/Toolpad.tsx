@@ -54,6 +54,7 @@ export interface EditorProps {
 export default function Toolpad({ basename }: EditorProps) {
   return (
     <NoSsr>
+      {/* Container that allows children to size to it with height: 100% */}
       <Box sx={{ height: '1px', minHeight: '100vh' }}>
         <ErrorBoundary fallbackRender={({ error }) => <FullPageError error={error} />}>
           <React.Suspense fallback={<FullPageLoader />}>

@@ -8,11 +8,15 @@ ARG CIRCLE_BUILD_NUM
 ENV CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM
 LABEL com.mui.toolpad.circle-build-num=$CIRCLE_BUILD_NUM
 
-ENV YARN_CACHE_FOLDER=/root/caches/.yarn
+ARG TARGETARCH
+ARG CACHES_FOLDER=/root/caches/$TARGETARCH
+
+ENV YARN_CACHE_FOLDER=$CACHES_FOLDER/.yarn
+
 
 WORKDIR /app
 
-RUN --mount=type=cache,target=/root/caches \ 
+RUN --mount=type=cache,target=$CACHES_FOLDER \ 
   yarn cache clean
 
 
@@ -25,7 +29,7 @@ COPY ./packages/eslint-plugin-material-ui/package.json ./packages/eslint-plugin-
 COPY ./packages/toolpad-app/package.json ./packages/toolpad-app/
 COPY ./packages/toolpad-components/package.json ./packages/toolpad-components/
 COPY ./packages/toolpad-core/package.json ./packages/toolpad-core/
-RUN --mount=type=cache,target=/root/caches \
+RUN --mount=type=cache,target=$CACHES_FOLDER \
   yarn install --frozen-lockfile
 
 
@@ -33,7 +37,7 @@ RUN --mount=type=cache,target=/root/caches \
 FROM base as builder
 COPY --from=deps /app/ ./
 COPY . .
-RUN --mount=type=cache,target=/root/caches \
+RUN --mount=type=cache,target=$CACHES_FOLDER \
   yarn release:build && \
   yarn install --production --ignore-scripts --prefer-offline
 

@@ -5,6 +5,7 @@
 import * as React from 'react';
 import * as monaco from 'monaco-editor';
 import { styled, SxProps } from '@mui/material';
+import clsx from 'clsx';
 
 (globalThis as any).MonacoEnvironment = {
   async getWorker(_, label) {
@@ -47,7 +48,37 @@ monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
   noSyntaxValidation: false,
 });
 
-const EditorRoot = styled('div')({ height: '100%' });
+const classes = {
+  monacoHost: 'Toolpad_MonacoEditorMonacoHost',
+  overlay: 'Toolpad_MonacoEditorOverlay',
+  disabled: 'Toolpad_MonacoEditorDisabled',
+};
+
+const EditorRoot = styled('div')(({ theme }) => ({
+  height: '100%',
+  position: 'relative',
+
+  [`& .${classes.monacoHost}`]: {
+    position: 'absolute',
+    inset: '0 0 0 0',
+  },
+
+  [`& .${classes.overlay}`]: {
+    position: 'absolute',
+    inset: '0 0 0 0',
+    background: theme.palette.background.default,
+    opacity: 0.5,
+    display: 'none',
+  },
+
+  [`&.${classes.disabled}`]: {
+    pointerEvents: 'none',
+  },
+
+  [`&.${classes.disabled} .${classes.overlay}`]: {
+    display: 'block',
+  },
+}));
 
 export interface MonacoEditorHandle {
   editor: monaco.editor.IStandaloneCodeEditor;
@@ -203,9 +234,9 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
   );
 
   return (
-    <EditorRoot
-      sx={{ ...sx, ...(disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}) }}
-      ref={rootRef}
-    />
+    <EditorRoot className={clsx({ [classes.disabled]: disabled })} sx={sx}>
+      <div className={classes.monacoHost} ref={rootRef} />
+      <div className={classes.overlay} />
+    </EditorRoot>
   );
 });

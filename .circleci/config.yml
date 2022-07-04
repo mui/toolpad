@@ -193,9 +193,11 @@ jobs:
       # build and push multi-arch image
       - run:
           command: |
-            docker context create buildx-ci
-            docker buildx create --use buildx-ci
             docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+            docker context create multiarch
+            docker buildx create --name multiarch --driver docker-container --use
+            docker buildx inspect --bootstrap
+
             docker buildx build \
               --progress plain \
               -t muicom/toolpad:$CIRCLE_SHA1 \

@@ -135,13 +135,17 @@ if (LICENSE) {
 const EMPTY_COLUMNS: GridColumns = [];
 const EMPTY_ROWS: GridRowsProp = [];
 
+interface Selection {
+  id?: any;
+}
+
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
   columns?: GridColumns;
   rowIdField?: string;
-  selection: any;
   error?: Error | string;
-  onSelectionChange: (newSelection: any) => void;
+  selection?: Selection | null;
+  onSelectionChange?: (newSelection?: Selection | null) => void;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
@@ -243,9 +247,14 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const onSelectionModelChange = React.useCallback(
     (ids: GridSelectionModel) => {
-      onSelectionChange(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null);
+      onSelectionChange?.(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null);
     },
     [rows, onSelectionChange],
+  );
+
+  const selectionModel = React.useMemo(
+    () => (selection?.id ? [selection.id] : []),
+    [selection?.id],
   );
 
   const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
@@ -261,7 +270,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         key={rowIdFieldProp}
         getRowId={getRowId}
         onSelectionModelChange={onSelectionModelChange}
-        selectionModel={selection ? [selection.id] : []}
+        selectionModel={selectionModel}
         error={errorProp}
         componentsProps={{
           errorOverlay: { message: typeof errorProp === 'string' ? errorProp : errorProp?.message },

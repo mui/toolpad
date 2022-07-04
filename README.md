@@ -20,6 +20,8 @@ Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal too
 
 </div>
 
+![Editor screenshot](./docs/images/hero-screenshot.png)
+
 ## Notice
 
 MUI Toolpad is in its alpha stages of development. Feel free to run this application for testing purposes, but keep in mind, in no way is it ready or suitable to run it in production. It's both lacking in features and stability.

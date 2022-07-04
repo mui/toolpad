@@ -1,7 +1,28 @@
-/** @type {import('./src/config').BuildEnvVars} */
-const buildEnvVars = {
-  TOOLPAD_TARGET: process.env.TOOLPAD_TARGET || 'CE',
-};
+/**
+ * @param {string} input
+ * @returns {input is import('./src/config').ToolpadTargetType}
+ */
+function isValidTarget(input) {
+  return input === 'CLOUD' || input === 'CE' || input === 'PRO';
+}
+
+/** @type {(env: Partial<Record<string, string>>) => import('./src/config').BuildEnvVars} */
+function parseBuidEnvVars(env) {
+  /** @type {import('./src/config').ToolpadTargetType} */
+  let target = 'CE';
+  if (env.TOOLPAD_TARGET && !isValidTarget(env.TOOLPAD_TARGET)) {
+    if (isValidTarget(env.TOOLPAD_TARGET)) {
+      target = env.TOOLPAD_TARGET;
+    } else {
+      throw new Error(`Invalid "TOOLPAD_TARGET", got ${env.TOOLPAD_TARGET}`);
+    }
+  }
+
+  return {
+    TOOLPAD_TARGET: target,
+    TOOLPAD_DEMO: env.TOOLPAD_DEMO === 'true',
+  };
+}
 
 /** @type {import('next').NextConfig} */
 module.exports = {
@@ -13,7 +34,7 @@ module.exports = {
   },
 
   // build-time env vars
-  env: buildEnvVars,
+  env: parseBuidEnvVars(process.env),
 
   webpack: (config) => {
     config.resolve.fallback = {

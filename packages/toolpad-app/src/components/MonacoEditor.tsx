@@ -1,13 +1,20 @@
 /**
  * NOTE: This file can't SSR (use lazyComponent to load it)
  */
+import '../utils/browserOnly';
 
 import * as React from 'react';
 import * as monaco from 'monaco-editor';
 import { styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
 
-(globalThis as any).MonacoEnvironment = {
+declare global {
+  interface Window {
+    MonacoEnvironment: monaco.Environment;
+  }
+}
+
+window.MonacoEnvironment = {
   async getWorker(_, label) {
     if (label === 'typescript') {
       return new Worker(

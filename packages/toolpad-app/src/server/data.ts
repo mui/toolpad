@@ -161,19 +161,41 @@ export async function getApp(id: string) {
   return prisma.app.findUnique({ where: { id } });
 }
 
+function createDefaultConnections(dom: appDom.AppDom): appDom.ConnectionNode[] {
+  if (process.env.TOOLPAD_DEMO) {
+    return [
+      appDom.createNode(dom, 'connection', {
+        name: 'movies',
+        attributes: {
+          dataSource: appDom.createConst('movies'),
+          params: appDom.createSecret({ apiKey: '12345' }),
+          status: appDom.createConst(null),
+        },
+      }),
+    ];
+  }
+
+  return [
+    appDom.createNode(dom, 'connection', {
+      name: 'rest',
+      attributes: {
+        dataSource: appDom.createConst('rest'),
+        params: appDom.createSecret({}),
+        status: appDom.createConst(null),
+      },
+    }),
+  ];
+}
+
 function createDefaultDom(): appDom.AppDom {
   let dom = appDom.createDom();
   const appNode = appDom.getApp(dom);
 
-  // Create default REST connection node
-  const newConnectionNode = appDom.createNode(dom, 'connection', {
-    attributes: {
-      dataSource: appDom.createConst('rest'),
-      params: appDom.createSecret({ name: 'rest' }),
-      status: appDom.createConst(null),
-    },
-  });
-  dom = appDom.addNode(dom, newConnectionNode, appNode, 'connections');
+  // Create default connections
+  const defaultConnections = createDefaultConnections(dom);
+  for (const connection of defaultConnections) {
+    dom = appDom.addNode(dom, connection, appNode, 'connections');
+  }
 
   // Create default page
   const newPageNode = appDom.createNode(dom, 'page', {

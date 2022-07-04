@@ -34,7 +34,7 @@
   "devDependencies": {
     "@mui/monorepo": "https://github.com/mui/material-ui.git#master",
     "@next/eslint-plugin-next": "12.2.0",
-    "@playwright/test": "^1.23.1",
+    "@playwright/test": "^1.22.1",
     "@swc/helpers": "^0.4.3",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^13.0.0",
@@ -63,7 +63,7 @@
     "prettier-plugin-prisma": "^3.11.0",
     "regenerator-runtime": "^0.13.9",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.8.2",
+    "ts-node": "^10.7.0",
     "typescript": "^4.7.4",
     "yarn-deduplicate": "^5.0.0"
   },
@@ -71,7 +71,7 @@
     "cross-env": "^7.0.3",
     "dotenv-cli": "^5.1.0",
     "inquirer": "^9.0.0",
-    "jest-environment-jsdom": "^28.1.2",
+    "jest-environment-jsdom": "^28.0.0-alpha.8",
     "semver": "^7.3.7",
     "yargs": "^17.5.1"
   },

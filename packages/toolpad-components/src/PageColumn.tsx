@@ -3,20 +3,22 @@ import { Stack, StackProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageColumnProps {
-  span: number;
   gap?: number;
   children?: React.ReactNode;
   alignItems?: StackProps['alignItems'];
+  justifyContent?: StackProps['justifyContent'];
 }
 
-function PageColumn({ span, gap, children, alignItems }: PageColumnProps) {
+function PageColumn({ gap, children, alignItems, justifyContent }: PageColumnProps) {
   return (
     <Stack
       direction="column"
       sx={{
         gap,
         alignItems,
-        width: `${(span / 12) * 100}vw`,
+        justifyContent,
+        alignSelf: 'stretch',
+        flex: 1,
         maxWidth: '100%',
       }}
     >
@@ -27,10 +29,6 @@ function PageColumn({ span, gap, children, alignItems }: PageColumnProps) {
 
 export default createComponent(PageColumn, {
   argTypes: {
-    span: {
-      typeDef: { type: 'number' },
-      defaultValue: 4,
-    },
     gap: {
       typeDef: { type: 'number' },
       defaultValue: 1,
@@ -42,6 +40,15 @@ export default createComponent(PageColumn, {
       },
       label: 'Horizontal alignment',
       control: { type: 'HorizontalAlign' },
+      defaultValue: 'center',
+    },
+    justifyContent: {
+      typeDef: {
+        type: 'string',
+        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+      },
+      label: 'Vertical alignment',
+      control: { type: 'VerticalAlign' },
       defaultValue: 'center',
     },
     children: {

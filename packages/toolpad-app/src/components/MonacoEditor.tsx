@@ -98,6 +98,7 @@ export interface MonacoEditorProps {
   onFocus?: () => void;
   onBlur?: () => void;
   options?: EditorOptions;
+  className?: string;
 }
 
 export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function MonacoEditor(
@@ -109,6 +110,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
     language = 'typescript',
     onFocus,
     onBlur,
+    className,
     disabled,
     options,
     autoFocus,
@@ -234,7 +236,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
   );
 
   return (
-    <EditorRoot className={clsx({ [classes.disabled]: disabled })} sx={sx}>
+    <EditorRoot className={clsx({ [classes.disabled]: disabled }, className)} sx={sx}>
       <div className={classes.monacoHost} ref={rootRef} />
       <div className={classes.overlay} />
     </EditorRoot>

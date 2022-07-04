@@ -1,11 +1,39 @@
 import * as React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { NoSsr } from '@mui/material';
+import { Box, CircularProgress, NoSsr, styled } from '@mui/material';
 import { ErrorBoundary } from 'react-error-boundary';
 import Release from './Release';
 import Releases from './Releases';
 import AppEditor from './AppEditor';
 import Home from './Home';
+import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+
+const Centered = styled('div')({
+  height: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+});
+
+function FullPageLoader() {
+  return (
+    <Centered>
+      <CircularProgress />
+    </Centered>
+  );
+}
+
+interface FullPageErrorProps {
+  error: Error;
+}
+
+function FullPageError({ error }: FullPageErrorProps) {
+  return (
+    <Centered>
+      <ErrorAlert error={error} />
+    </Centered>
+  );
+}
 
 function AppWorkspace() {
   return (
@@ -26,16 +54,18 @@ export interface EditorProps {
 export default function Toolpad({ basename }: EditorProps) {
   return (
     <NoSsr>
-      <ErrorBoundary fallback={<React.Fragment>error</React.Fragment>}>
-        <React.Suspense fallback="loading...">
-          <BrowserRouter basename={basename}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/app/:appId/*" element={<AppWorkspace />} />
-            </Routes>
-          </BrowserRouter>
-        </React.Suspense>
-      </ErrorBoundary>
+      <Box sx={{ height: '1px', minHeight: '100vh' }}>
+        <ErrorBoundary fallbackRender={({ error }) => <FullPageError error={error} />}>
+          <React.Suspense fallback={<FullPageLoader />}>
+            <BrowserRouter basename={basename}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/app/:appId/*" element={<AppWorkspace />} />
+              </Routes>
+            </BrowserRouter>
+          </React.Suspense>
+        </ErrorBoundary>
+      </Box>
     </NoSsr>
   );
 }

@@ -1198,9 +1198,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                 const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
                 domApi.addNode(rowContainer, parent, dragOverNodeParentProp, newParentIndex);
                 parent = rowContainer;
-              }
 
-              addOrMoveNode(draggedNode, parent, dragOverNodeParentProp);
+                addOrMoveNode(draggedNode, parent, dragOverNodeParentProp);
+              } else {
+                addOrMoveNode(draggedNode, parent, dragOverNodeParentProp, newParentIndex);
+              }
             }
 
             if (isOriginalParentHorizontalContainer) {

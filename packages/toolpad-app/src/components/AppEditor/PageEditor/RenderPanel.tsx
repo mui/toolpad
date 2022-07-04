@@ -531,7 +531,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
     if (draggedNode && dragOverNode) {
       if (appDom.isPage(dragOverNode)) {
-        return [DropZone.CENTER];
+        return [DropZone.TOP, DropZone.CENTER];
       }
 
       const isDraggingPageRow = isPageRow(draggedNode);
@@ -543,6 +543,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const isDraggingOverHorizontalContainer = dragOverSlot && isHorizontalSlot(dragOverSlot);
       const isDraggingOverVerticalContainer = dragOverSlot && isVerticalSlot(dragOverSlot);
+
+      const isDraggingOverPageRow = appDom.isElement(dragOverNode) && isPageRow(dragOverNode);
 
       if (isDraggingPageRow) {
         return [
@@ -556,12 +558,23 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         return [
           DropZone.RIGHT,
           DropZone.LEFT,
+          ...(isDraggingOverPageRow ? [DropZone.TOP, DropZone.BOTTOM] : []),
           ...(isDraggingOverHorizontalContainer ? [DropZone.CENTER] : []),
         ];
       }
 
       if (isDraggingOverHorizontalContainer) {
-        return [DropZone.TOP, DropZone.BOTTOM, DropZone.CENTER];
+        const dragOverNodeParent = appDom.getParent(dom, dragOverNode);
+        const isDraggingOverPageChild = dragOverNodeParent
+          ? appDom.isPage(dragOverNodeParent)
+          : false;
+
+        return [
+          DropZone.TOP,
+          DropZone.BOTTOM,
+          DropZone.CENTER,
+          ...(isDraggingOverPageChild ? [DropZone.LEFT] : []),
+        ];
       }
       if (isDraggingOverVerticalContainer) {
         return [DropZone.RIGHT, DropZone.LEFT, DropZone.CENTER];
@@ -590,18 +603,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const nodeSlots = nodeInfo?.slots || [];
       const nodeSlotEntries = Object.entries(nodeSlots);
 
-      const hasMultipleSlots = nodeSlotEntries.length > 1;
-
       const hasFreeSlots = nodeSlotEntries.length > 0;
+      const hasMultipleFreeSlots = nodeSlotEntries.length > 1;
 
       const baseRects = hasFreeSlots
         ? [
-            ...(hasMultipleSlots ? [nodeRect] : []),
+            ...(hasMultipleFreeSlots ? [nodeRect] : []),
             ...nodeSlotEntries.map(([slotParentProp, slot]) => {
               const slotChildNodes = nodeChildNodes[slotParentProp] || [];
               const isEmptySlot = slotChildNodes.length === 0;
 
-              return slot && (isEmptySlot || hasMultipleSlots) ? slot.rect : nodeRect;
+              return slot && (isEmptySlot || hasMultipleFreeSlots) ? slot.rect : nodeRect;
             }),
           ]
         : [nodeRect];
@@ -610,8 +622,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         const parent = appDom.getParent(dom, node);
         const parentInfo = parent && nodesInfo[parent.id];
 
+        const parentRect = parentInfo?.rect;
+
         const parentProp = hasFreeSlots
-          ? Object.keys(nodeSlots)[hasMultipleSlots ? baseRectIndex - 1 : baseRectIndex]
+          ? Object.keys(nodeSlots)[hasMultipleFreeSlots ? baseRectIndex - 1 : baseRectIndex]
           : null;
 
         let parentAwareNodeRect = null;
@@ -682,8 +696,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           const hasPositionGap = isParentReverseContainer ? isLastChild : isFirstChild;
           if (isParentVerticalContainer) {
             parentAwareNodeRect = {
-              ...baseRect,
+              x: isPageChild ? 0 : baseRect.x,
               y: hasPositionGap ? baseRect.y : baseRect.y - parentGap,
+              width: isPageChild && parentRect ? parentRect.width : baseRect.width,
               height: baseRect.height + gapCount * parentGap,
             };
           }
@@ -743,26 +758,24 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const activeDropNodeId: NodeId =
         (activeDropAreaId && getDropAreaNodeId(activeDropAreaId)) || pageNode.id;
 
+      const activeDropNode = appDom.getNode(dom, activeDropNodeId);
+
       const activeDropNodeInfo = nodesInfo[activeDropNodeId];
 
-      const isActiveDropNodeContainer = activeDropNodeInfo
-        ? hasFreeNodeSlots(activeDropNodeInfo)
-        : false;
-
-      const activeDropNode = appDom.getNode(dom, activeDropNodeId);
+      const activeDropNodeRect = activeDropNodeInfo?.rect;
 
       const isDraggingOverPage = appDom.isPage(activeDropNode);
       const isDraggingOverElement = appDom.isElement(activeDropNode);
+
+      const isDraggingOverContainer = activeDropNodeInfo
+        ? hasFreeNodeSlots(activeDropNodeInfo)
+        : false;
 
       const activeDropSlotParentProp = isDraggingOverPage
         ? 'children'
         : activeDropAreaId && getDropAreaParentProp(activeDropAreaId);
 
       let activeDropZone = null;
-      const activeDropNodeRect =
-        isActiveDropNodeContainer && activeDropSlotParentProp
-          ? dropAreaRects[getDropAreaId(activeDropNodeId, activeDropSlotParentProp)]
-          : dropAreaRects[activeDropNodeId];
 
       const activeDropNodeSlots = activeDropNodeInfo?.slots || null;
       const activeDropSlot =
@@ -779,39 +792,60 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         [];
 
       const isDraggingOverEmptyContainer = activeDropNodeInfo
-        ? isActiveDropNodeContainer && activeDropNodeChildren.length === 0
+        ? isDraggingOverContainer && activeDropNodeChildren.length === 0
         : false;
 
-      if (activeDropNodeRect) {
-        const relativeX = cursorPos.x - activeDropNodeRect.x;
-        const relativeY = cursorPos.y - activeDropNodeRect.y;
+      const activeDropAreaRect =
+        isDraggingOverContainer && activeDropSlotParentProp
+          ? dropAreaRects[getDropAreaId(activeDropNodeId, activeDropSlotParentProp)]
+          : dropAreaRects[activeDropNodeId];
 
-        activeDropZone =
-          isDraggingOverPage || isDraggingOverEmptyContainer
-            ? DropZone.CENTER
-            : getRectangleEdgeDropZone(
-                getRectanglePointEdge(activeDropNodeRect, relativeX, relativeY),
-              );
+      if (activeDropAreaRect) {
+        const relativeX = cursorPos.x - activeDropAreaRect.x;
+        const relativeY = cursorPos.y - activeDropAreaRect.y;
+
+        activeDropZone = isDraggingOverEmptyContainer
+          ? DropZone.CENTER
+          : getRectangleEdgeDropZone(
+              getRectanglePointEdge(activeDropAreaRect, relativeX, relativeY),
+            );
+
+        if (isDraggingOverPage) {
+          if (activeDropNodeRect && relativeY < 0) {
+            activeDropZone = DropZone.TOP;
+          } else {
+            activeDropZone = DropZone.CENTER;
+          }
+        }
+
+        const edgeDetectionMargin = 10; // px
 
         // Detect center in layout containers
         if (isDraggingOverElement && activeDropNodeInfo && activeDropSlot) {
-          if (isHorizontalSlot(activeDropSlot)) {
-            const fractionalY = relativeY / activeDropNodeRect.height;
+          const activeDropNodeParent = appDom.getParent(dom, activeDropNode);
+          const isDraggingOverPageChild = activeDropNodeParent
+            ? appDom.isPage(activeDropNodeParent)
+            : false;
 
-            if (fractionalY < 0.15) {
+          if (isHorizontalSlot(activeDropSlot)) {
+            if (
+              isDraggingOverPageChild &&
+              activeDropNodeRect &&
+              relativeX <= activeDropNodeRect.x
+            ) {
+              activeDropZone = DropZone.LEFT;
+            } else if (relativeY <= edgeDetectionMargin) {
               activeDropZone = DropZone.TOP;
-            } else if (fractionalY > 0.85) {
+            } else if (activeDropAreaRect.height - relativeY <= edgeDetectionMargin) {
               activeDropZone = DropZone.BOTTOM;
             } else {
               activeDropZone = DropZone.CENTER;
             }
           }
           if (isVerticalSlot(activeDropSlot)) {
-            const fractionalX = relativeX / activeDropNodeRect.width;
-
-            if (fractionalX < 0.15) {
+            if (relativeX <= edgeDetectionMargin) {
               activeDropZone = DropZone.LEFT;
-            } else if (fractionalX > 0.85) {
+            } else if (activeDropAreaRect.width - relativeX <= edgeDetectionMargin) {
               activeDropZone = DropZone.RIGHT;
             } else {
               activeDropZone = DropZone.CENTER;
@@ -847,6 +881,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     ],
   );
 
+  const getNodeSlotFirstChild = React.useCallback(
+    (node: appDom.PageNode | appDom.ElementNode, parentProp: string): appDom.ElementNode | null => {
+      const nodeChildren =
+        (appDom.getChildNodes(dom, node) as appDom.NodeChildren<appDom.ElementNode>)[parentProp] ||
+        [];
+      return nodeChildren.length > 0 ? nodeChildren[0] : null;
+    },
+    [dom],
+  );
+
   const getNodeSlotLastChild = React.useCallback(
     (node: appDom.PageNode | appDom.ElementNode, parentProp: string): appDom.ElementNode | null => {
       const nodeChildren =
@@ -864,36 +908,46 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const parent = appDom.getParent(dom, node);
       const parentNodeInfo = parent && nodesInfo[parent.id];
 
+      const parentParent = parent && appDom.getParent(dom, parent);
+
       if (dragOverZone && !availableDropZones.includes(dragOverZone)) {
         return null;
       }
 
+      if (dragOverZone === DropZone.TOP) {
+        // Is dragging over page top
+        if (parent && parent.id === dragOverNodeId && appDom.isPage(parent)) {
+          const pageFirstChild = getNodeSlotFirstChild(parent, 'children');
+
+          const isPageFirstChild = pageFirstChild ? node.id === pageFirstChild.id : false;
+
+          return isPageFirstChild ? DropZone.TOP : null;
+        }
+      }
+
       if (dragOverZone === DropZone.CENTER) {
-        if (node.id !== dragOverNodeId) {
-          // Is dragging over parent element center
-          if (parent && parent.id === dragOverNodeId) {
-            const nodeParentProp = node.parentProp;
+        // Is dragging over parent element center
+        if (parent && parent.id === dragOverNodeId) {
+          const nodeParentProp = node.parentProp;
 
-            const parentLastChild =
-              nodeParentProp && (appDom.isPage(parent) || appDom.isElement(parent))
-                ? getNodeSlotLastChild(parent, nodeParentProp)
-                : null;
-
-            const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
-
-            const nodeSlots = nodeInfo?.slots || null;
-            const hasMultipleSlots = nodeSlots && Object.keys(nodeSlots).length > 1;
-
-            const parentSlots = parentNodeInfo?.slots || null;
-
-            const parentFlowDirection =
-              parentSlots && nodeParentProp && parentSlots[nodeParentProp]?.flowDirection;
-
-            return parentFlowDirection && isParentLastChild && (!hasMultipleSlots || !parentProp)
-              ? getChildNodeHighlightedZone(parentFlowDirection)
+          const parentLastChild =
+            nodeParentProp && (appDom.isPage(parent) || appDom.isElement(parent))
+              ? getNodeSlotLastChild(parent, nodeParentProp)
               : null;
-          }
-          return null;
+
+          const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
+
+          const nodeSlots = nodeInfo?.slots || null;
+          const hasMultipleSlots = nodeSlots && Object.keys(nodeSlots).length > 1;
+
+          const parentSlots = parentNodeInfo?.slots || null;
+
+          const parentFlowDirection =
+            parentSlots && nodeParentProp && parentSlots[nodeParentProp]?.flowDirection;
+
+          return parentFlowDirection && isParentLastChild && (!hasMultipleSlots || !parentProp)
+            ? getChildNodeHighlightedZone(parentFlowDirection)
+            : null;
         }
         // Is dragging over slot center
 
@@ -909,6 +963,34 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
       }
 
+      if (dragOverZone === DropZone.LEFT) {
+        // Is dragging over parent page row left, and parent page row is a child of the page
+        if (
+          parent &&
+          parentParent &&
+          parent.id === dragOverNodeId &&
+          appDom.isElement(parent) &&
+          isPageRow(parent) &&
+          appDom.isPage(parentParent)
+        ) {
+          const nodeParentProp = node.parentProp;
+
+          const parentFirstChild =
+            nodeParentProp && (appDom.isPage(parent) || appDom.isElement(parent))
+              ? getNodeSlotFirstChild(parent, nodeParentProp)
+              : null;
+
+          const isParentFirstChild = parentFirstChild ? node.id === parentFirstChild.id : false;
+
+          return isParentFirstChild ? DropZone.LEFT : null;
+        }
+
+        // Is dragging over page row, and is a child of the page
+        if (parent && appDom.isElement(node) && isPageRow(node) && appDom.isPage(parent)) {
+          return null;
+        }
+      }
+
       return node.id === dragOverNodeId && parentProp === dragOverSlotParentProp
         ? dragOverZone
         : null;
@@ -919,6 +1001,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       dragOverNodeId,
       dragOverSlotParentProp,
       dragOverZone,
+      getNodeSlotFirstChild,
       getNodeSlotLastChild,
       nodesInfo,
     ],
@@ -1064,27 +1147,35 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         addOrMoveNode = domApi.moveNode;
       }
 
+      if (!availableDropZones.includes(dragOverZone)) {
+        return;
+      }
+
       // Drop on page
       if (isDraggingOverPage) {
+        const newParentIndex =
+          dragOverZone === DropZone.TOP
+            ? appDom.getNewFirstParentIndexInNode(dom, dragOverNode, 'children')
+            : appDom.getNewLastParentIndexInNode(dom, dragOverNode, 'children');
+
         if (!isPageRow(draggedNode)) {
           const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
-          domApi.addNode(rowContainer, dragOverNode, 'children');
+          domApi.addNode(rowContainer, dragOverNode, 'children', newParentIndex);
           parent = rowContainer;
 
           addOrMoveNode(draggedNode, rowContainer, 'children');
         } else {
-          addOrMoveNode(draggedNode, dragOverNode, 'children');
+          addOrMoveNode(draggedNode, dragOverNode, 'children', newParentIndex);
         }
       }
 
       if (isDraggingOverElement && parent && (appDom.isPage(parent) || appDom.isElement(parent))) {
-        if (!availableDropZones.includes(dragOverZone)) {
-          return;
-        }
-
         const isOriginalParentPage = originalParent ? appDom.isPage(originalParent) : false;
 
         const isDraggingOverRow = isDraggingOverElement && isPageRow(dragOverNode);
+        const isDraggingOverHorizontalContainer = dragOverSlot
+          ? isHorizontalSlot(dragOverSlot)
+          : false;
         const isDraggingOverVerticalContainer = dragOverSlot ? isVerticalSlot(dragOverSlot) : false;
 
         if (dragOverZone === DropZone.CENTER && dragOverSlotParentProp) {
@@ -1159,34 +1250,48 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           !isOriginalParentPage && originalParentSlot ? isVerticalSlot(originalParentSlot) : false;
 
         if ([DropZone.RIGHT, DropZone.LEFT].includes(dragOverZone)) {
-          if (isOriginalParentNonPageVerticalContainer) {
-            const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {
-              justifyContent: appDom.createConst(originalParentInfo?.props.alignItems || 'start'),
-            });
-            domApi.addNode(
-              rowContainer,
-              parent,
-              dragOverNodeParentProp,
-              appDom.getNewParentIndexAfterNode(dom, dragOverNode, dragOverNodeParentProp),
-            );
-            parent = rowContainer;
+          if (!isDraggingOverHorizontalContainer) {
+            if (isOriginalParentNonPageVerticalContainer) {
+              const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {
+                justifyContent: appDom.createConst(originalParentInfo?.props.alignItems || 'start'),
+              });
+              domApi.addNode(
+                rowContainer,
+                parent,
+                dragOverNodeParentProp,
+                appDom.getNewParentIndexAfterNode(dom, dragOverNode, dragOverNodeParentProp),
+              );
+              parent = rowContainer;
 
-            // Move existing element inside stack right away if drag over zone is right
-            if (dragOverZone === DropZone.RIGHT) {
+              // Move existing element inside stack right away if drag over zone is right
+              if (dragOverZone === DropZone.RIGHT) {
+                domApi.moveNode(dragOverNode, parent, dragOverNodeParentProp);
+              }
+            }
+
+            const newParentIndex =
+              dragOverZone === DropZone.RIGHT
+                ? appDom.getNewParentIndexAfterNode(dom, dragOverNode, dragOverNodeParentProp)
+                : appDom.getNewParentIndexBeforeNode(dom, dragOverNode, dragOverNodeParentProp);
+
+            addOrMoveNode(draggedNode, parent, dragOverNodeParentProp, newParentIndex);
+
+            // Only move existing element inside column in the end if drag over zone is left
+            if (isOriginalParentNonPageVerticalContainer && dragOverZone === DropZone.LEFT) {
               domApi.moveNode(dragOverNode, parent, dragOverNodeParentProp);
             }
           }
 
-          const newParentIndex =
-            dragOverZone === DropZone.RIGHT
-              ? appDom.getNewParentIndexAfterNode(dom, dragOverNode, dragOverNodeParentProp)
-              : appDom.getNewParentIndexBeforeNode(dom, dragOverNode, dragOverNodeParentProp);
+          if (dragOverSlotParentProp && isDraggingOverHorizontalContainer) {
+            const isDraggingOverDirectionStart =
+              dragOverZone ===
+              (dragOverSlot?.flowDirection === 'row' ? DropZone.LEFT : DropZone.RIGHT);
 
-          addOrMoveNode(draggedNode, parent, dragOverNodeParentProp, newParentIndex);
+            const newParentIndex = isDraggingOverDirectionStart
+              ? appDom.getNewFirstParentIndexInNode(dom, dragOverNode, dragOverSlotParentProp)
+              : appDom.getNewLastParentIndexInNode(dom, dragOverNode, dragOverSlotParentProp);
 
-          // Only move existing element inside column in the end if drag over zone is left
-          if (isOriginalParentNonPageVerticalContainer && dragOverZone === DropZone.LEFT) {
-            domApi.moveNode(dragOverNode, parent, dragOverNodeParentProp);
+            addOrMoveNode(draggedNode, dragOverNode, dragOverSlotParentProp, newParentIndex);
           }
         }
       }
@@ -1441,8 +1546,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
             const freeSlots = nodeInfo?.slots || {};
             const freeSlotEntries = Object.entries(freeSlots) as ExactEntriesOf<SlotsState>;
+
             const hasFreeSlots = freeSlotEntries.length > 0;
-            const hasMultipleSlots = freeSlotEntries.length > 1;
+            const hasMultipleFreeSlots = freeSlotEntries.length > 1;
 
             const isPageNode = appDom.isPage(node);
             const isPageChild = parent ? appDom.isPage(parent) : false;
@@ -1504,7 +1610,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                       );
                     })
                   : null}
-                {!hasFreeSlots || hasMultipleSlots ? (
+                {!hasFreeSlots || hasMultipleFreeSlots ? (
                   <NodeDropArea
                     node={node}
                     parentInfo={parentInfo}

@@ -2,7 +2,7 @@ import * as React from 'react';
 import Editor from '@monaco-editor/react';
 import type * as monacoEditor from 'monaco-editor';
 import jsonToTs from 'json-to-ts';
-import { styled } from '@mui/material';
+import { styled, SxProps } from '@mui/material';
 import { WithControlledProp } from '../../../utils/types';
 
 const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
@@ -12,25 +12,25 @@ const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
 }));
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
-  globalScope: Record<string, unknown>;
-  onCommit?: () => void;
+  globalScope?: Record<string, unknown>;
   disabled?: boolean;
   autoFocus?: boolean;
   functionBody?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
+  sx?: SxProps;
 }
 
 export function JsExpressionEditor({
-  onCommit,
   value,
   onChange,
-  globalScope,
+  globalScope = {},
   disabled,
   autoFocus,
   functionBody,
   onFocus,
   onBlur,
+  sx,
 }: JsExpressionEditorProps) {
   const id = React.useId();
 
@@ -113,10 +113,6 @@ export function JsExpressionEditor({
         diagnosticCodesToIgnore: functionBody ? [1108] : [],
       });
 
-      // The types for `monaco.KeyCode` seem to be messed up
-      // eslint-disable-next-line no-bitwise
-      editor.addCommand(monaco.KeyMod.CtrlCmd | (monaco.KeyCode as any).KEY_S, () => onCommit?.());
-
       if (isMount && autoFocus && !disabled) {
         editor.focus();
         isMount.current = false;
@@ -124,11 +120,13 @@ export function JsExpressionEditor({
 
       setLibSource();
     },
-    [setLibSource, onCommit, autoFocus, disabled, functionBody],
+    [setLibSource, autoFocus, disabled, functionBody],
   );
 
   return (
-    <JsExpressionEditorRoot sx={disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}}>
+    <JsExpressionEditorRoot
+      sx={{ ...sx, ...(disabled ? { opacity: 0.5, pointerEvents: 'none' } : {}) }}
+    >
       <Editor
         height="150px"
         value={value}

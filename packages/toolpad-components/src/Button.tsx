@@ -17,7 +17,7 @@ export default createComponent(Button, {
       defaultValue: 'Button Text',
     },
     onClick: {
-      typeDef: { type: 'function' },
+      typeDef: { type: 'event' },
     },
     disabled: {
       typeDef: { type: 'boolean' },

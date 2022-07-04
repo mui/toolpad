@@ -6,6 +6,9 @@ import { asArray } from '../../../../../src/utils/collections';
 
 export default (async (req, res) => {
   const [appId] = asArray(req.query.appId);
+  if (!appId) {
+    throw new Error(`Missing path parameter "appId"`);
+  }
   const version = parseVersion(req.query.version);
   if (!version) {
     res.status(404).end();

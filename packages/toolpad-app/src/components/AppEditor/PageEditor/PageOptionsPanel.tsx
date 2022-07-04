@@ -7,6 +7,7 @@ import QueryEditor from './QueryEditor';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
+import PageModuleEditor from './PageModuleEditor';
 
 export default function PageOptionsPanel() {
   const state = usePageEditorState();
@@ -28,6 +29,7 @@ export default function PageOptionsPanel() {
         >
           Preview
         </Button>
+        <PageModuleEditor pageNodeId={pageNodeId} />
         <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
         <Typography variant="subtitle1">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />

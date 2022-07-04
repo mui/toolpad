@@ -139,8 +139,7 @@ const StyledNodeDropArea = styled('div', {
   } = highlightRelativeRect;
 
   return {
-    // capture mouse events
-    pointerEvents: 'initial',
+    pointerEvents: 'none',
     position: 'absolute',
     [`&.${overlayClasses.highlightedTop}`]: {
       '&:after': {
@@ -1173,6 +1172,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         const isOriginalParentPage = originalParent ? appDom.isPage(originalParent) : false;
 
         const isDraggingOverRow = isDraggingOverElement && isPageRow(dragOverNode);
+
         const isDraggingOverHorizontalContainer = dragOverSlot
           ? isHorizontalSlot(dragOverSlot)
           : false;

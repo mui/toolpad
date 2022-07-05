@@ -17,6 +17,7 @@ function Button({ content, alignItems, justifyContent, ...props }: ButtonProps) 
         alignSelf: 'stretch',
         alignItems,
         justifyContent,
+        width: '100%',
       }}
     >
       <MuiButton {...props}>{content}</MuiButton>

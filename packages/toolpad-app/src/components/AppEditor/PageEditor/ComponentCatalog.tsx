@@ -7,7 +7,11 @@ import * as appDom from '../../../appDom';
 import { useDom } from '../../DomLoader';
 import { usePageEditorApi } from './PageEditorProvider';
 import { useToolpadComponents } from '../toolpadComponents';
-import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../../../toolpadComponents';
+import {
+  PAGE_COLUMN_COMPONENT_ID,
+  PAGE_ROW_COMPONENT_ID,
+  STACK_COMPONENT_ID,
+} from '../../../toolpadComponents';
 
 const WIDTH_COLLAPSED = 50;
 
@@ -96,8 +100,9 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               {Object.entries(toolpadComponents)
                 .filter(
                   ([componentId]) =>
-                    componentId !== PAGE_ROW_COMPONENT_ID &&
-                    componentId !== PAGE_COLUMN_COMPONENT_ID,
+                    ![PAGE_ROW_COMPONENT_ID, PAGE_COLUMN_COMPONENT_ID, STACK_COMPONENT_ID].includes(
+                      componentId,
+                    ),
                 )
                 .map(([componentId, componentType]) => {
                   if (!componentType) {

@@ -17,9 +17,7 @@ function PageColumn({ gap, children, alignItems, justifyContent }: PageColumnPro
         alignItems,
         justifyContent,
         alignSelf: 'stretch',
-        display: 'grid',
-        gridAutoFlow: 'row',
-        gridAutoRows: 'minmax(0, 1fr)',
+        display: 'flex',
         flexDirection: 'column',
       }}
     >

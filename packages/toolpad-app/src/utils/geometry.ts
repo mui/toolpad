@@ -130,12 +130,15 @@ export function rectContainsPoint(rect: Rectangle, x: number, y: number): boolea
   return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
 }
 
-export enum RectangleEdge {
-  TOP = 'TOP',
-  RIGHT = 'RIGHT',
-  BOTTOM = 'BOTTOM',
-  LEFT = 'LEFT',
-}
+export const RECTANGLE_EDGE_TOP = 'top';
+export const RECTANGLE_EDGE_BOTTOM = 'bottom';
+export const RECTANGLE_EDGE_LEFT = 'left';
+export const RECTANGLE_EDGE_RIGHT = 'right';
+export type RectangleEdge =
+  | typeof RECTANGLE_EDGE_TOP
+  | typeof RECTANGLE_EDGE_BOTTOM
+  | typeof RECTANGLE_EDGE_LEFT
+  | typeof RECTANGLE_EDGE_RIGHT;
 
 export function getRectanglePointEdge(rect: Rectangle, x: number, y: number): RectangleEdge | null {
   const { height: rectHeight, width: rectWidth } = rect;
@@ -149,13 +152,13 @@ export function getRectanglePointEdge(rect: Rectangle, x: number, y: number): Re
   const isOverSecondDiagonal = y < -1 * (rectHeight / rectWidth) * x + rectHeight;
 
   if (isOverFirstDiagonal && isOverSecondDiagonal) {
-    return RectangleEdge.TOP;
+    return RECTANGLE_EDGE_TOP;
   }
   if (isOverFirstDiagonal) {
-    return RectangleEdge.RIGHT;
+    return RECTANGLE_EDGE_RIGHT;
   }
   if (isOverSecondDiagonal) {
-    return RectangleEdge.LEFT;
+    return RECTANGLE_EDGE_LEFT;
   }
-  return RectangleEdge.BOTTOM;
+  return RECTANGLE_EDGE_BOTTOM;
 }

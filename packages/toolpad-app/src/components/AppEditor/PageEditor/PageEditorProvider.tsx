@@ -6,13 +6,17 @@ import { update } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'component' | 'theme';
 
-export enum DropZone {
-  TOP = 'TOP',
-  RIGHT = 'RIGHT',
-  BOTTOM = 'BOTTOM',
-  LEFT = 'LEFT',
-  CENTER = 'CENTER',
-}
+export const DROP_ZONE_TOP = 'top';
+export const DROP_ZONE_BOTTOM = 'bottom';
+export const DROP_ZONE_LEFT = 'left';
+export const DROP_ZONE_RIGHT = 'right';
+export const DROP_ZONE_CENTER = 'center';
+export type DropZone =
+  | typeof DROP_ZONE_TOP
+  | typeof DROP_ZONE_BOTTOM
+  | typeof DROP_ZONE_LEFT
+  | typeof DROP_ZONE_RIGHT
+  | typeof DROP_ZONE_CENTER;
 
 export interface PageEditorState {
   readonly appId: string;

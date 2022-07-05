@@ -13,4 +13,4 @@
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1"
 
 [[plugins]]
-  package = "./packages/netlify-plugin-cache-docs"
+  package = "./node_modules/@mui/monorepo/packages/netlify-plugin-cache-docs"

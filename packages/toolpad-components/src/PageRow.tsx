@@ -1,27 +1,30 @@
 import * as React from 'react';
-import { Stack, StackProps } from '@mui/material';
+import { Box, BoxProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageRowProps {
   gap?: number;
   children?: React.ReactNode;
-  alignItems?: StackProps['alignItems'];
-  justifyContent?: StackProps['justifyContent'];
+  alignItems?: BoxProps['alignItems'];
+  justifyContent?: BoxProps['justifyContent'];
 }
 
 function PageRow({ gap, children, alignItems, justifyContent }: PageRowProps) {
   return (
-    <Stack
-      direction="row"
+    <Box
       sx={{
         gap,
         alignItems,
         justifyContent,
         width: '100%',
+        display: 'grid',
+        gridAutoFlow: 'column',
+        gridAutoColumns: 'minmax(0, 1fr)',
+        overflow: 'hidden',
       }}
     >
       {children}
-    </Stack>
+    </Box>
   );
 }
 

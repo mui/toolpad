@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextFieldProps, MenuItem, TextField } from '@mui/material';
+import { TextFieldProps, MenuItem, TextField, Box } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface Selectoption {
@@ -13,16 +13,19 @@ export type SelectProps = TextFieldProps & {
 
 function Select({ sx, options, ...props }: SelectProps) {
   return (
-    <TextField select sx={{ minWidth: 120, ...sx }} {...props}>
-      {options.map((option) => {
-        const parsedOption: Selectoption = typeof option === 'string' ? { value: option } : option;
-        return (
-          <MenuItem key={parsedOption.value} value={parsedOption.value}>
-            {parsedOption.label ?? parsedOption.value}
-          </MenuItem>
-        );
-      })}
-    </TextField>
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <TextField select sx={{ minWidth: 120, ...sx }} {...props}>
+        {options.map((option) => {
+          const parsedOption: Selectoption =
+            typeof option === 'string' ? { value: option } : option;
+          return (
+            <MenuItem key={parsedOption.value} value={parsedOption.value}>
+              {parsedOption.label ?? parsedOption.value}
+            </MenuItem>
+          );
+        })}
+      </TextField>
+    </Box>
   );
 }
 
@@ -40,6 +43,9 @@ export default createComponent(Select, {
     variant: {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
       defaultValue: 'outlined',
+    },
+    fullWidth: {
+      typeDef: { type: 'boolean' },
     },
     size: {
       typeDef: { type: 'string', enum: ['small', 'medium'] },

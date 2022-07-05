@@ -1,29 +1,29 @@
 import * as React from 'react';
-import { Stack, StackProps } from '@mui/material';
+import { Box, BoxProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageColumnProps {
   gap?: number;
   children?: React.ReactNode;
-  alignItems?: StackProps['alignItems'];
-  justifyContent?: StackProps['justifyContent'];
+  alignItems?: BoxProps['alignItems'];
+  justifyContent?: BoxProps['justifyContent'];
 }
 
 function PageColumn({ gap, children, alignItems, justifyContent }: PageColumnProps) {
   return (
-    <Stack
-      direction="column"
+    <Box
       sx={{
         gap,
         alignItems,
         justifyContent,
         alignSelf: 'stretch',
-        flex: 1,
-        maxWidth: '100%',
+        display: 'grid',
+        gridAutoFlow: 'row',
+        gridAutoRows: 'minmax(0, 1fr)',
       }}
     >
       {children}
-    </Stack>
+    </Box>
   );
 }
 

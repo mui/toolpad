@@ -3,7 +3,7 @@ import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
-import ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { NodeId, createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { useQuery } from 'react-query';
@@ -65,7 +65,7 @@ interface CodeComponentEditorContentProps {
 function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
 
-  const { data: typings } = useQuery<Record<string, string>>('/typings.json', async () => {
+  const { data: typings } = useQuery<Record<string, string>>(['/typings.json'], async () => {
     return fetch('/typings.json').then((res) => res.json());
   });
 

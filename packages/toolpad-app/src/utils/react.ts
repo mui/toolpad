@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 
 export function createProvidedContext<T>(name: string) {
   const context = React.createContext<T | undefined>(undefined);

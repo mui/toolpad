@@ -4,7 +4,7 @@ import boolean from './boolean';
 import number from './number';
 import select from './select';
 import json from './json';
-import functionType from './function';
+import event from './event';
 import GridColumns from './GridColumns';
 import SelectOptions from './SelectOptions';
 import HorizontalAlign from './HorizontalAlign';
@@ -20,7 +20,7 @@ const propTypeControls: {
   number,
   select,
   json,
-  function: functionType,
+  event,
   GridColumns,
   SelectOptions,
   RowIdFieldSelect,

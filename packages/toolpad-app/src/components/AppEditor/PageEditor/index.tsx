@@ -11,6 +11,7 @@ import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import usePageTitle from '../../../utils/usePageTitle';
+import useLocalStorageState from '../../../utils/useLocalStorageState';
 
 const classes = {
   renderPanel: 'Toolpad_RenderPanel',
@@ -34,9 +35,21 @@ interface PageEditorContentProps {
 
 function PageEditorContent({ appId, node }: PageEditorContentProps) {
   usePageTitle(`${node.attributes.title.value} | Toolpad editor`);
+
+  const [splitDefaultSize, setSplitDefaultSize] = useLocalStorageState<number>(
+    `editor/${appId}/component-panel-split`,
+    300,
+  );
+
   return (
     <PageEditorProvider key={node.id} appId={appId} nodeId={node.id}>
-      <SplitPane allowResize split="vertical" defaultSize={300} primary="second">
+      <SplitPane
+        allowResize
+        split="vertical"
+        defaultSize={splitDefaultSize}
+        onChange={(newSize) => setSplitDefaultSize(newSize)}
+        primary="second"
+      >
         <PageEditorRoot>
           <ComponentCatalog />
           <RenderPanel className={classes.renderPanel} />

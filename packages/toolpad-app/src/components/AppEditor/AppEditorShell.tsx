@@ -16,6 +16,7 @@ import {
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { Outlet, useNavigate } from 'react-router-dom';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import DialogForm from '../DialogForm';
 import { useDomLoader } from '../DomLoader';
@@ -115,7 +116,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
     <ToolpadAppShell
       appId={appId}
       actions={
-        <React.Fragment>
+        <Stack direction="row" gap={1} alignItems="center">
           {domLoader.saving ? (
             <Box display="flex" flexDirection="row" alignItems="center">
               <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
@@ -125,12 +126,20 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
           <IconButton
             aria-label="Create release"
             color="inherit"
-            sx={{ ml: 1 }}
             onClick={() => setCreateReleaseDialogOpen(true)}
           >
             <RocketLaunchIcon />
           </IconButton>
-        </React.Fragment>
+          <Button
+            variant="outlined"
+            component="a"
+            href={`/app/${appId}/preview`}
+            target="_blank"
+            endIcon={<OpenInNewIcon />}
+          >
+            Preview
+          </Button>
+        </Stack>
       }
       {...props}
     >

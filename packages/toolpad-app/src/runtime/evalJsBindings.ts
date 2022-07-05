@@ -18,7 +18,7 @@ function evaluateCode(code: string, globalScope: Record<string, unknown>) {
 
 const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
 
-function evaluateExpression(
+export function evaluateExpression(
   code: string,
   globalScope: Record<string, unknown>,
 ): BindingEvaluationResult {

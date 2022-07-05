@@ -35,6 +35,9 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
    ```sh
    TOOLPAD_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
+   # For a custom port:
+   # PORT=3004
+   # EXTERNAL_URL=http://localhost:3004/
    ```
 
 1. Now you can run the MUI Toolpad dev command to start the application

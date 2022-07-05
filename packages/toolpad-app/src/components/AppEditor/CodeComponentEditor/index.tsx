@@ -65,7 +65,7 @@ interface CodeComponentEditorContentProps {
 function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
 
-  const { data: typings } = useQuery<Record<string, string>>('/typings.json', async () => {
+  const { data: typings } = useQuery<Record<string, string>>(['/typings.json'], async () => {
     return fetch('/typings.json').then((res) => res.json());
   });
 

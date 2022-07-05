@@ -101,14 +101,7 @@ const NodeHudWrapper = styled('div')({
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
-  [`.${overlayClasses.container}`]: {
-    position: 'absolute',
-    outline: '1px dotted rgba(255,0,0,.2)',
-    top: 0,
-    left: 0,
-    height: '100%',
-    width: '100%',
-  },
+  outline: '1px dotted rgba(255,0,0,.2)',
   [`.${overlayClasses.selected}`]: {
     position: 'absolute',
     top: 0,
@@ -299,22 +292,13 @@ function getDropAreaParentProp(dropAreaId: string): string | null {
 interface NodeHudProps {
   node: appDom.ElementNode | appDom.PageNode;
   rect: Rectangle;
-  isContainer: boolean;
   selected?: boolean;
   allowInteraction?: boolean;
   onDragStart?: React.DragEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLElement>;
 }
 
-function NodeHud({
-  node,
-  selected,
-  allowInteraction,
-  rect,
-  isContainer,
-  onDragStart,
-  onDelete,
-}: NodeHudProps) {
+function NodeHud({ node, selected, allowInteraction, rect, onDragStart, onDelete }: NodeHudProps) {
   const dom = useDom();
 
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
@@ -341,7 +325,6 @@ function NodeHud({
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
     >
-      {isContainer ? <span className={overlayClasses.container} /> : null}
       {selected ? (
         <React.Fragment>
           <span className={overlayClasses.selected} />
@@ -1560,8 +1543,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               node,
             ) as appDom.NodeChildren<appDom.ElementNode>;
 
-            const isContainer = Object.keys(childNodes).length > 0;
-
             const nodeRect = nodeInfo?.rect || null;
             const hasNodeOverlay = isPageNode || appDom.isElement(node);
 
@@ -1575,7 +1556,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                   <NodeHud
                     node={node}
                     rect={nodeRect}
-                    isContainer={isContainer}
                     selected={selectedNode?.id === node.id}
                     allowInteraction={nodesWithInteraction.has(node.id)}
                     onDragStart={handleDragStart}

@@ -1,10 +1,20 @@
 import * as React from 'react';
-import { Box, TextField as MuiTextField, TextFieldProps } from '@mui/material';
+import {
+  Box,
+  TextField as MuiTextField,
+  TextFieldProps as MuiTextFieldProps,
+  BoxProps,
+} from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
-function TextField({ ...props }: TextFieldProps) {
+export type TextFieldProps = MuiTextFieldProps & {
+  alignItems?: BoxProps['alignItems'];
+  justifyContent?: BoxProps['justifyContent'];
+};
+
+function TextField({ alignItems, justifyContent, ...props }: TextFieldProps) {
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+    <Box sx={{ display: 'flex', alignSelf: 'stretch', alignItems, justifyContent }}>
       <MuiTextField {...props} />
     </Box>
   );
@@ -21,6 +31,24 @@ export default createComponent(TextField, {
     },
     disabled: {
       typeDef: { type: 'boolean' },
+    },
+    alignItems: {
+      typeDef: {
+        type: 'string',
+        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+      },
+      label: 'Vertical alignment',
+      control: { type: 'VerticalAlign' },
+      defaultValue: 'center',
+    },
+    justifyContent: {
+      typeDef: {
+        type: 'string',
+        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+      },
+      label: 'Horizontal alignment',
+      control: { type: 'HorizontalAlign' },
+      defaultValue: 'center',
     },
     fullWidth: {
       typeDef: { type: 'boolean' },

@@ -20,6 +20,7 @@ function PageColumn({ gap, children, alignItems, justifyContent }: PageColumnPro
         display: 'grid',
         gridAutoFlow: 'row',
         gridAutoRows: 'minmax(0, 1fr)',
+        flexDirection: 'column',
       }}
     >
       {children}

@@ -21,6 +21,7 @@ function PageRow({ gap, children, alignItems, justifyContent }: PageRowProps) {
         gridAutoFlow: 'column',
         gridAutoColumns: 'minmax(0, 1fr)',
         overflow: 'hidden',
+        flexDirection: 'row',
       }}
     >
       {children}

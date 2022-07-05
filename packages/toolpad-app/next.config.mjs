@@ -46,7 +46,9 @@ const regexEqual = (x, y) => {
   );
 };
 
-export default /** @type {import('next').NextConfig} */({
+const NEVER = () => false;
+
+export default /** @type {import('next').NextConfig} */ ({
   reactStrictMode: true,
 
   eslint: {
@@ -57,7 +59,11 @@ export default /** @type {import('next').NextConfig} */({
   // build-time env vars
   env: parseBuidEnvVars(process.env),
 
+  /**
+   * @param {import('webpack').Configuration} config
+   */
   webpack: (config, options) => {
+    config.resolve = config.resolve ?? {};
     config.resolve.fallback = {
       ...config.resolve.fallback,
       // We need these because quickjs-emscripten doesn't export pure browser compatible modules yet
@@ -67,28 +73,40 @@ export default /** @type {import('next').NextConfig} */({
     };
 
     {
+      // Support global CSS in monaco-editor
       // Adapted from next-transpile-modules.
-      // Extracts the css imports in monaco-editor.
-      // next-transpile-modules also compiles javascript and results in buggy output.
       const extraCssIssuer = /\/node_modules\/monaco-editor\//;
       const modulesPaths = [path.dirname(require.resolve('monaco-editor/package.json'))];
 
-      // Support CSS modules + global in node_modules
-      // TODO ask Next.js maintainer to expose the css-loader via defaultLoaders
-      const nextCssLoaders = config.module.rules.find((rule) => typeof rule.oneOf === 'object');
+      config.module = config.module ?? {};
+      config.module.rules = config.module.rules ?? [];
+      const nextCssLoaders = /** @type {import('webpack').RuleSetRule} */ (
+        config.module.rules.find(
+          (rule) => typeof rule === 'object' && typeof rule.oneOf === 'object',
+        )
+      );
 
       // Add support for Global CSS imports in transpiled modules
       if (nextCssLoaders) {
-        const nextGlobalCssLoader = nextCssLoaders.oneOf.find(
-          (rule) => rule.sideEffects === true && regexEqual(rule.test, /(?<!\.module)\.css$/),
+        const nextGlobalCssLoader = nextCssLoaders.oneOf?.find(
+          (rule) =>
+            rule.sideEffects === true &&
+            rule.test instanceof RegExp &&
+            regexEqual(rule.test, /(?<!\.module)\.css$/),
         );
 
         if (nextGlobalCssLoader) {
-          nextGlobalCssLoader.issuer = { or: [extraCssIssuer, nextGlobalCssLoader.issuer] };
-          nextGlobalCssLoader.include = { or: [...modulesPaths, nextGlobalCssLoader.include] };
+          nextGlobalCssLoader.issuer = {
+            or: [extraCssIssuer, nextGlobalCssLoader.issuer ?? NEVER],
+          };
+          nextGlobalCssLoader.include = {
+            or: [...modulesPaths, nextGlobalCssLoader.include ?? NEVER],
+          };
         } else if (!options.isServer) {
           // Note that Next.js ignores global CSS imports on the server
-          console.warn('could not find default CSS rule, global CSS imports may not work');
+          console.warn(
+            'could not find default CSS rule, global CSS imports may not work correctly',
+          );
         }
       }
     }

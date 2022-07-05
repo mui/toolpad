@@ -17,7 +17,7 @@
     "dev:typings": "yarn build:typings",
     "dev:prisma": "prisma generate --watch",
     "waitForDb": "ts-node ./scripts/waitForDb.ts",
-    "waitForApp": "ts-node ./scripts/waitForApp.ts",
+    "waitForApp": "ts-node --esm ./scripts/waitForApp.mts",
     "prisma-detect-drift": "prisma migrate diff --exit-code --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url \"$TOOLPAD_SHADOW_DATABASE_URL\""
   },
   "files": [
@@ -32,7 +32,6 @@
     "@emotion/react": "^11.9.3",
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.9.3",
-    "@monaco-editor/react": "^4.4.4",
     "@mui/icons-material": "^5.8.4",
     "@mui/lab": "^5.0.0-alpha.88",
     "@mui/material": "^5.8.6",
@@ -62,6 +61,7 @@
     "json5": "^2.2.1",
     "lodash-es": "^4.17.21",
     "next": "12.2.0",
+    "node-fetch": "^3.2.6",
     "path-to-regexp": "^6.2.0",
     "prettier": "^2.6.2",
     "pretty-bytes": "^6.0.0",
@@ -74,7 +74,7 @@
     "react-hook-form": "^7.33.1",
     "react-inspector": "^5.1.1",
     "react-is": "^18.1.0",
-    "react-query": "^3.39.1",
+    "react-query": "^4.0.0-beta.23",
     "react-router-dom": "^6.3.0",
     "react-split-pane": "^0.1.92",
     "serialize-javascript": "^6.0.0",
@@ -88,6 +88,7 @@
     "@types/crypto-js": "^4.1.1",
     "@types/glob": "^7.2.0",
     "@types/lodash-es": "^4.17.6",
+    "@types/node-fetch": "^2.6.2",
     "@types/react": "^18.0.14",
     "@types/react-inspector": "^4.0.2",
     "@types/serialize-javascript": "^5.0.2",
@@ -97,7 +98,8 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "glob": "^8.0.3",
-    "monaco-editor": "^0.33.0"
+    "monaco-editor": "^0.33.0",
+    "webpack": "^5.73.0"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

@@ -6,24 +6,14 @@ import { update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
+import { createProvidedContext } from '../utils/react';
 
 export type DomAction =
-  | {
-      type: 'DOM_LOADING';
-    }
-  | {
-      type: 'DOM_LOADED';
-      dom: appDom.AppDom;
-    }
   | {
       type: 'DOM_SAVING';
     }
   | {
       type: 'DOM_SAVED';
-    }
-  | {
-      type: 'DOM_LOADING_ERROR';
-      error: string;
     }
   | {
       type: 'DOM_SAVING_ERROR';
@@ -130,26 +120,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
   }
 
   switch (action.type) {
-    case 'DOM_LOADING': {
-      return update(state, {
-        loading: true,
-        loadError: null,
-      });
-    }
-    case 'DOM_LOADED': {
-      return update(state, {
-        loading: false,
-        loadError: null,
-        dom: action.dom,
-        unsavedChanges: 0,
-      });
-    }
-    case 'DOM_LOADING_ERROR': {
-      return update(state, {
-        loading: false,
-        loadError: action.error,
-      });
-    }
     case 'DOM_SAVING': {
       return update(state, {
         saving: true,
@@ -165,7 +135,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     }
     case 'DOM_SAVING_ERROR': {
       return update(state, {
-        loading: false,
         saving: false,
         saveError: action.error,
       });
@@ -254,30 +223,19 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
 }
 
 interface DomLoader {
-  dom: appDom.AppDom | null;
+  dom: appDom.AppDom;
   saving: boolean;
   unsavedChanges: number;
-  loading: boolean;
-  loadError: string | null;
   saveError: string | null;
 }
 
-const DomLoaderContext = React.createContext<DomLoader>({
-  saving: false,
-  unsavedChanges: 0,
-  loading: false,
-  loadError: null,
-  saveError: null,
-  dom: null,
-});
+const [useDomLoader, DomLoaderProvider] = createProvidedContext<DomLoader>('DomLoader');
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
 
 export type DomApi = ReturnType<typeof createDomApi>;
 
-export function useDomLoader(): DomLoader {
-  return React.useContext(DomLoaderContext);
-}
+export { useDomLoader };
 
 export function useDom(): appDom.AppDom {
   const { dom } = useDomLoader();
@@ -297,37 +255,19 @@ export interface DomContextProps {
 }
 
 export default function DomProvider({ appId, children }: DomContextProps) {
+  const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
+
+  if (!dom) {
+    throw new Error(`Invariant: suspense should load the dom`);
+  }
+
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
-    loading: false,
     saving: false,
     unsavedChanges: 0,
-    loadError: null,
     saveError: null,
-    dom: null,
+    dom,
   });
   const api = React.useMemo(() => createDomApi(dispatch), []);
-
-  React.useEffect(() => {
-    let canceled = false;
-
-    dispatch({ type: 'DOM_LOADING' });
-    client.query
-      .loadDom(appId)
-      .then((dom) => {
-        if (!canceled) {
-          dispatch({ type: 'DOM_LOADED', dom });
-        }
-      })
-      .catch((err) => {
-        if (!canceled) {
-          dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
-        }
-      });
-
-    return () => {
-      canceled = true;
-    };
-  }, [appId]);
 
   const lastSavedDom = React.useRef<appDom.AppDom | null>(null);
   const handleSave = React.useCallback(() => {
@@ -371,13 +311,13 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
   return (
-    <DomLoaderContext.Provider value={state}>
+    <DomLoaderProvider value={state}>
       <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
       <Snackbar open={!!state.saveError}>
         <Alert severity="error" sx={{ width: '100%' }}>
           Failed to save: {state.saveError}
         </Alert>
       </Snackbar>
-    </DomLoaderContext.Provider>
+    </DomLoaderProvider>
   );
 }

@@ -105,12 +105,21 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
               slotType === 'single'
                 ? getRelativeBoundingRect(rootElm, firstChildElm)
                 : getRelativeBoundingRect(rootElm, childContainerElm);
-            const flowDirection = window.getComputedStyle(childContainerElm)
-              .flexDirection as FlowDirection;
+
+            const gridAutoFlow = window.getComputedStyle(childContainerElm).gridAutoFlow;
+            const flexDirection = window.getComputedStyle(childContainerElm).flexDirection;
+
+            let flowDirection;
+            if (gridAutoFlow) {
+              flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
+            } else {
+              flowDirection = flexDirection;
+            }
+
             nodeSlots[slotNamePropValue] = {
               type: slotType,
               rect,
-              flowDirection,
+              flowDirection: flowDirection as FlowDirection,
             };
           }
         }

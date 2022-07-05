@@ -16,7 +16,6 @@ function PageRow({ gap, children }: PageRowProps) {
         gridAutoFlow: 'column',
         gridAutoColumns: 'minmax(0, 1fr)',
         overflow: 'hidden',
-        flexDirection: 'row',
       }}
     >
       {children}

@@ -5,7 +5,6 @@ const require = createRequire(import.meta.url);
 
 /**
  * @param {string} input
- * @returns {input is import('./src/config').ToolpadTargetType}
  */
 function isValidTarget(input) {
   return input === 'CLOUD' || input === 'CE' || input === 'PRO';
@@ -13,7 +12,6 @@ function isValidTarget(input) {
 
 /** @type {(env: Partial<Record<string, string>>) => import('./src/config').BuildEnvVars} */
 function parseBuidEnvVars(env) {
-  /** @type {import('./src/config').ToolpadTargetType} */
   let target = 'CE';
   if (env.TOOLPAD_TARGET && !isValidTarget(env.TOOLPAD_TARGET)) {
     if (isValidTarget(env.TOOLPAD_TARGET)) {
@@ -25,7 +23,7 @@ function parseBuidEnvVars(env) {
 
   return {
     TOOLPAD_TARGET: target,
-    TOOLPAD_DEMO: env.TOOLPAD_DEMO === 'true',
+    TOOLPAD_DEMO: env.TOOLPAD_DEMO,
   };
 }
 
@@ -48,8 +46,7 @@ const regexEqual = (x, y) => {
   );
 };
 
-/** @type {import('next').NextConfig} */
-export default {
+export default /** @type {import('next').NextConfig} */({
   reactStrictMode: true,
 
   eslint: {
@@ -117,4 +114,4 @@ export default {
       },
     ];
   },
-};
+});

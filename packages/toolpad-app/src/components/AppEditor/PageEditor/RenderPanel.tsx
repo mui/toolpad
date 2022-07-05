@@ -388,10 +388,12 @@ function NodeDropArea({
 
   const isHighlightingCenter = highlightedZone === DropZone.CENTER;
 
+  const highlightRect = isHighlightingCenter && isEmptySlot && slotRect ? slotRect : dropAreaRect;
+
   return (
     <React.Fragment>
       <StyledNodeDropArea
-        style={absolutePositionCss(dropAreaRect)}
+        style={absolutePositionCss(highlightRect)}
         className={clsx(
           highlightedZoneOverlayClass
             ? {
@@ -932,8 +934,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             : null;
         }
         // Is dragging over slot center
-
-        if (parentProp && parentProp === dragOverSlotParentProp) {
+        if (node.id === dragOverNodeId && parentProp && parentProp === dragOverSlotParentProp) {
           if (appDom.isPage(node)) {
             return DropZone.CENTER;
           }

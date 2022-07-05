@@ -56,7 +56,6 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
 
   const editorHooks: EditorHooks = React.useMemo(() => {
     return {
-      hidePreviewBanner: true,
       navigateToPage(pageNodeId) {
         fireEvent({ type: 'pageNavigationRequest', pageNodeId });
       },
@@ -66,6 +65,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
   return state ? (
     <EditorHooksContext.Provider value={editorHooks}>
       <ToolpadApp
+        hidePreviewBanner
         dom={state.dom}
         version="preview"
         appId={state.appId}

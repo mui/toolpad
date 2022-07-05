@@ -5,7 +5,6 @@ import GradientText from 'docs/src/components/typography/GradientText';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 import HeroContainer from 'docs/src/layouts/HeroContainer';
 import IconImage from 'docs/src/components/icon/IconImage';
-import ROUTES from 'docs/src/route';
 
 export default function ToolpadHero() {
   return (
@@ -36,7 +35,7 @@ export default function ToolpadHero() {
           </Typography>
           <GetStartedButtons
             installation="install intructions here"
-            to={ROUTES.dataGridDocs}
+            to={'/toolpad/getting-started'}
             sx={{ justifyContent: { xs: 'center', md: 'flex-start' } }}
           />
         </Box>

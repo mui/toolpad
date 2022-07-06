@@ -15,7 +15,7 @@ export type SelectProps = TextFieldProps & {
 
 function Select({ sx, options, alignItems, justifyContent, ...props }: SelectProps) {
   return (
-    <Box sx={{ display: 'flex', alignSelf: 'stretch', alignItems, justifyContent }}>
+    <Box sx={{ display: 'flex', alignItems, justifyContent }}>
       <TextField select sx={{ minWidth: 120, ...sx }} {...props}>
         {options.map((option) => {
           const parsedOption: SelectOption =

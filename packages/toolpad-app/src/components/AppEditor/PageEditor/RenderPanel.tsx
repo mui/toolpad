@@ -528,7 +528,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
     if (draggedNode && dragOverNode) {
       if (appDom.isPage(dragOverNode)) {
-        return [DROP_ZONE_TOP, DROP_ZONE_CENTER];
+        const isEmptyPage = pageNodes.length <= 1;
+        return [...(isEmptyPage ? [] : [DROP_ZONE_TOP]), DROP_ZONE_CENTER] as DropZone[];
       }
 
       const isDraggingPageRow = isPageRow(draggedNode);
@@ -579,7 +580,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     }
 
     return [DROP_ZONE_TOP, DROP_ZONE_RIGHT, DROP_ZONE_BOTTOM, DROP_ZONE_LEFT];
-  }, [dom, dragOverNodeId, dragOverSlotParentProp, getCurrentlyDraggedNode, nodesInfo]);
+  }, [
+    dom,
+    dragOverNodeId,
+    dragOverSlotParentProp,
+    getCurrentlyDraggedNode,
+    nodesInfo,
+    pageNodes.length,
+  ]);
 
   const dropAreaRects = React.useMemo(() => {
     const rects: Record<string, Rectangle> = {};
@@ -808,7 +816,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             );
 
         if (isDraggingOverPage) {
-          if (activeDropNodeRect && relativeY < 0) {
+          const isEmptyPage = pageNodes.length <= 1;
+          if (activeDropNodeRect && relativeY < 0 && !isEmptyPage) {
             activeDropZone = DROP_ZONE_TOP;
           } else {
             activeDropZone = DROP_ZONE_CENTER;
@@ -866,14 +875,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     },
     [
       getViewCoordinates,
-      nodesInfo,
       dropAreaRects,
       pageNode.id,
       dom,
+      nodesInfo,
       dragOverNodeId,
       dragOverSlotParentProp,
       dragOverZone,
       availableDropTargetIds,
+      pageNodes.length,
       api,
     ],
   );

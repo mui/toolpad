@@ -14,7 +14,7 @@ export type TextFieldProps = MuiTextFieldProps & {
 
 function TextField({ alignItems, justifyContent, ...props }: TextFieldProps) {
   return (
-    <Box sx={{ display: 'flex', alignSelf: 'stretch', alignItems, justifyContent }}>
+    <Box sx={{ display: 'flex', alignItems, justifyContent }}>
       <MuiTextField {...props} />
     </Box>
   );

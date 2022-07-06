@@ -17,7 +17,8 @@ const classes = {
 };
 
 const EditorRoot = styled('div')(({ theme }) => ({
-  height: '100vh',
+  height: 1,
+  minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',

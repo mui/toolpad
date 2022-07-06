@@ -279,7 +279,15 @@ interface PageRootProps {
 function PageRoot({ children }: PageRootProps) {
   return (
     <Container>
-      <Stack data-testid="page-root" direction="column" alignItems="stretch" sx={{ my: 2, gap: 1 }}>
+      <Stack
+        data-testid="page-root"
+        direction="column"
+        alignItems="stretch"
+        sx={{
+          my: 2,
+          gap: 1,
+        }}
+      >
         {children}
       </Stack>
     </Container>

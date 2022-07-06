@@ -90,7 +90,7 @@ interface AppContext {
 
 type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
-const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
+const [useDomContext, DomContextProvider] = createProvidedContext<appDom.RenderTree>('Dom');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
   createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
@@ -344,7 +344,7 @@ function QueryNode({ node }: QueryNodeProps) {
 }
 
 function parseBindings(
-  dom: appDom.AppDom,
+  dom: appDom.RenderTree,
   page: appDom.PageNode,
   components: ToolpadComponents,
   location: RouterLocation,
@@ -570,7 +570,7 @@ export interface ToolpadAppProps {
   basename: string;
   appId: string;
   version: VersionOrPreview;
-  dom: appDom.AppDom;
+  dom: appDom.RenderTree;
 }
 
 export default function ToolpadApp({

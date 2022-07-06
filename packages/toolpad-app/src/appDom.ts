@@ -703,15 +703,26 @@ export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
   return index.get(name) ?? null;
 }
 
+const RENDERTREE_NODES = ['app', 'page', 'element', 'query', 'theme', 'codeComponent'] as const;
+
+export type RenderTreeNodeType = typeof RENDERTREE_NODES[number];
+export type RenderTreeNode = { [K in RenderTreeNodeType]: AppDomNodeOfType<K> }[RenderTreeNodeType];
+export type RenderTreeNodes = Record<NodeId, RenderTreeNode>;
+
+export interface RenderTree {
+  root: NodeId;
+  nodes: RenderTreeNodes;
+}
+
 /**
  * We need to make sure no secrets end up in the frontend html, so let's only send the
  * nodes that we need to build frontend, and that we know don't contain secrets.
  * TODO: Would it make sense to create a separate datastructure that represents the render tree?
  */
-export function createRenderTree(dom: AppDom): AppDom {
-  const frontendNodes = new Set(['app', 'page', 'element', 'query', 'theme', 'codeComponent']);
+export function createRenderTree(dom: AppDom): RenderTree {
+  const frontendNodes = new Set<string>(RENDERTREE_NODES);
   return {
     ...dom,
-    nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as AppDomNodes,
+    nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as RenderTreeNodes,
   };
 }

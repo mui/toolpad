@@ -13,7 +13,6 @@ const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
   height: 150,
   border: '1px solid black',
   borderColor: theme.palette.divider,
-  borderRadius: theme.shape.borderRadius,
 }));
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
@@ -56,12 +55,11 @@ export function JsExpressionEditor({
   }, [globalScope]);
 
   return (
-    <JsExpressionEditorRoot>
+    <JsExpressionEditorRoot sx={sx}>
       <TypescriptEditor
         path={`./expressions/${id}.tsx`}
         value={value}
         onChange={(code = '') => onChange(code)}
-        sx={sx}
         disabled={disabled}
         extraLibs={extraLibs}
         functionBody={functionBody}

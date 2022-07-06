@@ -61,7 +61,6 @@ export interface NavigateToPage {
 
 export interface EditorHooks {
   navigateToPage?: NavigateToPage;
-  dom?: appDom.RenderTree;
 }
 
 export const EditorHooksContext = React.createContext<EditorHooks>({});

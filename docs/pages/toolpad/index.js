@@ -5,12 +5,16 @@ import BrandingProvider from 'docs/src/BrandingProvider';
 import AppHeader from 'docs/src/layouts/AppHeader';
 import AppFooter from 'docs/src/layouts/AppFooter';
 import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
-import ToolpadHero from '../../src/components/productToolpad/ToolpadHero';
+import ToolpadHero from '../../src/components/landing/ToolpadHero';
 
 export default function Home() {
   return (
     <BrandingProvider>
-      <Head title="Title" description="Description" card="/static/social-previews/x-preview.jpg" />
+      <Head
+        title="Title"
+        description="Description"
+        card="/static/social-previews/toolpad-preview.jpg"
+      />
       <CssBaseline />
       <AppHeaderBanner />
       <AppHeader />

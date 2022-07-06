@@ -46,8 +46,8 @@ export type DomAction =
     }
   | {
       type: 'DOM_MOVE_NODE';
-      nodeId: NodeId;
-      parentId: NodeId;
+      node: appDom.AppDomNode;
+      parent: appDom.AppDomNode;
       parentProp: string;
       parentIndex?: string;
     }
@@ -89,10 +89,10 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
       );
     }
     case 'DOM_MOVE_NODE': {
-      return appDom.moveNode(
+      return appDom.moveNode<any, any>(
         dom,
-        action.nodeId,
-        action.parentId,
+        action.node,
+        action.parent,
         action.parentProp,
         action.parentIndex,
       );
@@ -163,11 +163,16 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parentIndex,
       });
     },
-    moveNode(nodeId: NodeId, parentId: NodeId, parentProp: string, parentIndex?: string) {
+    moveNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(
+      node: Child,
+      parent: Parent,
+      parentProp: appDom.ParentPropOf<Child, Parent>,
+      parentIndex?: string,
+    ) {
       dispatch({
         type: 'DOM_MOVE_NODE',
-        nodeId,
-        parentId,
+        node,
+        parent,
         parentProp,
         parentIndex,
       });

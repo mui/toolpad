@@ -426,7 +426,7 @@ export function createDom(): AppDom {
 }
 
 /**
- * Creates a new DOM node representing aReact Element
+ * Creates a new DOM node representing a React Element
  */
 export function createElement<P>(
   dom: AppDom,
@@ -627,15 +627,14 @@ export function addNode<Parent extends AppDomNode, Child extends AppDomNode>(
   return setNodeParent(dom, newNode, parent.id, parentProp, parentIndex);
 }
 
-export function moveNode(
+export function moveNode<Parent extends AppDomNode, Child extends AppDomNode>(
   dom: AppDom,
-  nodeId: NodeId,
-  parentId: NodeId,
-  parentProp: string,
+  node: Child,
+  parent: Parent,
+  parentProp: ParentPropOf<Child, Parent>,
   parentIndex?: string,
 ) {
-  const node = getNode(dom, nodeId);
-  return setNodeParent(dom, node, parentId, parentProp, parentIndex);
+  return setNodeParent(dom, node, parent.id, parentProp, parentIndex);
 }
 
 export function saveNode(dom: AppDom, node: AppDomNode) {
@@ -701,6 +700,72 @@ function getNodeIdByNameIndex(dom: AppDom): Map<string, NodeId> {
 export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
   const index = getNodeIdByNameIndex(dom);
   return index.get(name) ?? null;
+}
+
+export function getNewFirstParentIndexInNode(
+  dom: AppDom,
+  node: ElementNode | PageNode,
+  parentProp: string,
+) {
+  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
+  const firstChild = children.length > 0 ? children[0] : null;
+
+  return createFractionalIndex(null, firstChild?.parentIndex || null);
+}
+
+export function getNewLastParentIndexInNode(
+  dom: AppDom,
+  node: ElementNode | PageNode,
+  parentProp: string,
+) {
+  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
+  const lastChild = children.length > 0 ? children[children.length - 1] : null;
+
+  return createFractionalIndex(lastChild?.parentIndex || null, null);
+}
+
+export function getNewParentIndexBeforeNode(
+  dom: AppDom,
+  node: ElementNode | PageNode,
+  parentProp: string,
+) {
+  const parent = getParent(dom, node);
+
+  if (!parent) {
+    throw new Error(`Invariant: Node: "${node.id}" has no parent`);
+  }
+
+  const parentChildren =
+    ((isPage(parent) || isElement(parent)) &&
+      (getChildNodes(dom, parent) as NodeChildren<ElementNode>)[parentProp]) ||
+    [];
+
+  const nodeIndex = parentChildren.findIndex((child) => child.id === node.id);
+  const nodeBefore = nodeIndex > 0 ? parentChildren[nodeIndex - 1] : null;
+
+  return createFractionalIndex(nodeBefore?.parentIndex || null, node.parentIndex);
+}
+
+export function getNewParentIndexAfterNode(
+  dom: AppDom,
+  node: ElementNode | PageNode,
+  parentProp: string,
+) {
+  const parent = getParent(dom, node);
+
+  if (!parent) {
+    throw new Error(`Invariant: Node: "${node.id}" has no parent`);
+  }
+
+  const parentChildren =
+    ((isPage(parent) || isElement(parent)) &&
+      (getChildNodes(dom, parent) as NodeChildren<ElementNode>)[parentProp]) ||
+    [];
+
+  const nodeIndex = parentChildren.findIndex((child) => child.id === node.id);
+  const nodeAfter = nodeIndex < parentChildren.length - 1 ? parentChildren[nodeIndex + 1] : null;
+
+  return createFractionalIndex(node.parentIndex, nodeAfter?.parentIndex || null);
 }
 
 const RENDERTREE_NODES = ['app', 'page', 'element', 'query', 'theme', 'codeComponent'] as const;

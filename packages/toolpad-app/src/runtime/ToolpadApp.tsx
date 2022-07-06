@@ -80,6 +80,7 @@ function usePageNavigator(): NavigateToPage {
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
+  height: 1,
   minHeight: '100vh',
 });
 
@@ -278,7 +279,15 @@ interface PageRootProps {
 function PageRoot({ children }: PageRootProps) {
   return (
     <Container>
-      <Stack data-testid="page-root" direction="column" alignItems="stretch" sx={{ my: 2, gap: 1 }}>
+      <Stack
+        data-testid="page-root"
+        direction="column"
+        alignItems="stretch"
+        sx={{
+          my: 2,
+          gap: 1,
+        }}
+      >
         {children}
       </Stack>
     </Container>
@@ -566,8 +575,8 @@ function RenderedPages({ dom }: RenderedPagesProps) {
 }
 
 const FullPageCentered = styled('div')({
-  width: '100vw',
-  height: '100vh',
+  width: '100%',
+  height: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

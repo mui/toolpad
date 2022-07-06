@@ -535,16 +535,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     const dragOverParent = dragOverNode && appDom.getParent(dom, dragOverNode);
     const dragOverParentInfo = dragOverParent && nodesInfo[dragOverParent.id];
 
-    const dragOverParentSlots = dragOverParentInfo?.slots;
-    const dragOverParentSlot =
-      dragOverParentSlots && dragOverParentSlots[dragOverSlotParentProp || 'children'];
+    const dragOverParentFreeSlots = dragOverParentInfo?.slots;
+    const dragOverParentFreeSlot =
+      dragOverParentFreeSlots && dragOverParentFreeSlots[dragOverSlotParentProp || 'children'];
 
     if (draggedNode && dragOverNode) {
       if (appDom.isPage(dragOverNode)) {
         return [...(isEmptyPage ? [] : [DROP_ZONE_TOP]), DROP_ZONE_CENTER] as DropZone[];
       }
 
-      if (!dragOverParentSlot) {
+      if (dragOverNodeInfo && !hasFreeNodeSlots(dragOverNodeInfo) && !dragOverParentFreeSlot) {
         return [];
       }
 

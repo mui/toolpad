@@ -2,9 +2,10 @@ import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
 import { asArray } from '../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../src/runtime/ToolpadApp';
+import { createRenderTree } from '../../../src/appDom';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
-  const { loadVersionedDom, findActiveDeployment } = await import('../../../src/server/data');
+  const { loadDom, findActiveDeployment } = await import('../../../src/server/data');
 
   const [appId] = asArray(context.query.appId);
 
@@ -24,12 +25,12 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
 
   const { version } = activeDeployment;
 
-  const dom = await loadVersionedDom(appId, version);
+  const dom = await loadDom(appId, version);
 
   return {
     props: {
       appId,
-      dom,
+      dom: createRenderTree(dom),
       version,
       basename: `/deploy/${appId}`,
     },

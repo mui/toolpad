@@ -32,11 +32,17 @@ export function createToolpadTheme(themeNode?: appDom.ThemeNode | null): Theme {
 }
 
 export interface ThemeProviderProps {
-  node?: appDom.ThemeNode | null;
+  dom: appDom.AppDom;
   children?: React.ReactNode;
 }
 
-export default function AppThemeProvider({ node, children }: ThemeProviderProps) {
-  const theme = React.useMemo(() => createToolpadTheme(node), [node]);
+export default function AppThemeProvider({ dom, children }: ThemeProviderProps) {
+  const theme = React.useMemo(() => {
+    const root = appDom.getApp(dom);
+    const { themes = [] } = appDom.getChildNodes(dom, root);
+    const themeNode = themes.length > 0 ? themes[0] : null;
+    return createToolpadTheme(themeNode);
+  }, [dom]);
+
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }

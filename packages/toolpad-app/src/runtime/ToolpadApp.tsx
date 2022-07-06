@@ -61,6 +61,7 @@ export interface NavigateToPage {
 
 export interface EditorHooks {
   navigateToPage?: NavigateToPage;
+  dom?: appDom.RenderTree;
 }
 
 export const EditorHooksContext = React.createContext<EditorHooks>({});
@@ -90,7 +91,7 @@ interface AppContext {
 
 type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
-const [useDomContext, DomContextProvider] = createProvidedContext<appDom.RenderTree>('Dom');
+const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
   createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
@@ -344,7 +345,7 @@ function QueryNode({ node }: QueryNodeProps) {
 }
 
 function parseBindings(
-  dom: appDom.RenderTree,
+  dom: appDom.AppDom,
   page: appDom.PageNode,
   components: ToolpadComponents,
   location: RouterLocation,
@@ -542,6 +543,29 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 }
 
+interface RenderedPagesProps {
+  dom: appDom.AppDom;
+}
+
+function RenderedPages({ dom }: RenderedPagesProps) {
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate replace to="/pages" />} />
+      <Route path="/pages" element={<AppOverview dom={dom} />} />
+      {pages.map((page) => (
+        <Route
+          key={page.id}
+          path={`/pages/${page.id}`}
+          element={<RenderedPage nodeId={page.id} />}
+        />
+      ))}
+    </Routes>
+  );
+}
+
 const FullPageCentered = styled('div')({
   width: '100vw',
   height: '100vh',
@@ -565,12 +589,20 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
 export interface ToolpadAppProps {
   hidePreviewBanner?: boolean;
   basename: string;
   appId: string;
   version: VersionOrPreview;
-  dom: appDom.RenderTree;
+  dom: appDom.AppDom;
 }
 
 export default function ToolpadApp({
@@ -580,24 +612,7 @@ export default function ToolpadApp({
   dom,
   hidePreviewBanner,
 }: ToolpadAppProps) {
-  const root = appDom.getApp(dom);
-  const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
-
-  const theme = themes.length > 0 ? themes[0] : null;
-
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
-
-  const queryClient = React.useMemo(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            retry: false,
-          },
-        },
-      }),
-    [],
-  );
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -607,7 +622,7 @@ export default function ToolpadApp({
     <AppRoot id={HTML_ID_APP_ROOT}>
       <NoSsr>
         <DomContextProvider value={dom}>
-          <AppThemeProvider node={theme}>
+          <AppThemeProvider dom={dom}>
             <CssBaseline />
             {version === 'preview' && !hidePreviewBanner ? (
               <Alert severity="info">This is a preview version of the application.</Alert>
@@ -620,17 +635,7 @@ export default function ToolpadApp({
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>
-                            <Routes>
-                              <Route path="/" element={<Navigate replace to="/pages" />} />
-                              <Route path="/pages" element={<AppOverview dom={dom} />} />
-                              {pages.map((page) => (
-                                <Route
-                                  key={page.id}
-                                  path={`/pages/${page.id}`}
-                                  element={<RenderedPage nodeId={page.id} />}
-                                />
-                              ))}
-                            </Routes>
+                            <RenderedPages dom={dom} />
                           </BrowserRouter>
                         </QueryClientProvider>
                       </AppContextProvider>

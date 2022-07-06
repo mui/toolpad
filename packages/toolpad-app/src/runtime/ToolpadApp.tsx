@@ -61,7 +61,6 @@ export interface NavigateToPage {
 
 export interface EditorHooks {
   navigateToPage?: NavigateToPage;
-  hidePreviewBanner?: boolean;
 }
 
 export const EditorHooksContext = React.createContext<EditorHooks>({});
@@ -567,17 +566,22 @@ function AppError({ error }: FallbackProps) {
 }
 
 export interface ToolpadAppProps {
+  hidePreviewBanner?: boolean;
   basename: string;
   appId: string;
   version: VersionOrPreview;
   dom: appDom.AppDom;
 }
 
-export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
+export default function ToolpadApp({
+  basename,
+  appId,
+  version,
+  dom,
+  hidePreviewBanner,
+}: ToolpadAppProps) {
   const root = appDom.getApp(dom);
   const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
-
-  const { hidePreviewBanner } = React.useContext(EditorHooksContext);
 
   const theme = themes.length > 0 ? themes[0] : null;
 
@@ -605,9 +609,9 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
         <DomContextProvider value={dom}>
           <AppThemeProvider node={theme}>
             <CssBaseline />
-            {hidePreviewBanner ? null : (
+            {version === 'preview' && !hidePreviewBanner ? (
               <Alert severity="info">This is a preview version of the application.</Alert>
-            )}
+            ) : null}
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>

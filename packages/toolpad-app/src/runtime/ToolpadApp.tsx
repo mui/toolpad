@@ -80,6 +80,7 @@ function usePageNavigator(): NavigateToPage {
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
+  height: 1,
   minHeight: '100vh',
 });
 
@@ -543,8 +544,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 }
 
 const FullPageCentered = styled('div')({
-  width: '100vw',
-  height: '100vh',
+  width: '100%',
+  height: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

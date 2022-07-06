@@ -456,6 +456,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return [pageNode, ...appDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
+  const isEmptyPage = pageNodes.length <= 1;
+
   const selectedNode = selection && appDom.getNode(dom, selection);
 
   // We will use this key to remount the overlay after page load
@@ -526,18 +528,28 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     const dragOverNode = dragOverNodeId && appDom.getNode(dom, dragOverNodeId);
     const dragOverNodeInfo = dragOverNodeId && nodesInfo[dragOverNodeId];
 
+    const dragOverNodeSlots = dragOverNodeInfo?.slots;
+    const dragOverSlot =
+      dragOverNodeSlots && dragOverSlotParentProp && dragOverNodeSlots[dragOverSlotParentProp];
+
+    const dragOverParent = dragOverNode && appDom.getParent(dom, dragOverNode);
+    const dragOverParentInfo = dragOverParent && nodesInfo[dragOverParent.id];
+
+    const dragOverParentSlots = dragOverParentInfo?.slots;
+    const dragOverParentSlot =
+      dragOverParentSlots && dragOverParentSlots[dragOverSlotParentProp || 'children'];
+
     if (draggedNode && dragOverNode) {
       if (appDom.isPage(dragOverNode)) {
-        const isEmptyPage = pageNodes.length <= 1;
         return [...(isEmptyPage ? [] : [DROP_ZONE_TOP]), DROP_ZONE_CENTER] as DropZone[];
+      }
+
+      if (!dragOverParentSlot) {
+        return [];
       }
 
       const isDraggingPageRow = isPageRow(draggedNode);
       const isDraggingPageColumn = isPageColumn(draggedNode);
-
-      const dragOverNodeSlots = dragOverNodeInfo?.slots;
-      const dragOverSlot =
-        dragOverNodeSlots && dragOverSlotParentProp && dragOverNodeSlots[dragOverSlotParentProp];
 
       const isDraggingOverHorizontalContainer = dragOverSlot && isHorizontalSlot(dragOverSlot);
       const isDraggingOverVerticalContainer = dragOverSlot && isVerticalSlot(dragOverSlot);
@@ -562,10 +574,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       if (isDraggingOverHorizontalContainer) {
-        const dragOverNodeParent = appDom.getParent(dom, dragOverNode);
-        const isDraggingOverPageChild = dragOverNodeParent
-          ? appDom.isPage(dragOverNodeParent)
-          : false;
+        const isDraggingOverPageChild = dragOverParent ? appDom.isPage(dragOverParent) : false;
 
         return [
           DROP_ZONE_TOP,
@@ -585,8 +594,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     dragOverNodeId,
     dragOverSlotParentProp,
     getCurrentlyDraggedNode,
+    isEmptyPage,
     nodesInfo,
-    pageNodes.length,
   ]);
 
   const dropAreaRects = React.useMemo(() => {
@@ -816,7 +825,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             );
 
         if (isDraggingOverPage) {
-          const isEmptyPage = pageNodes.length <= 1;
           if (activeDropNodeRect && relativeY < 0 && !isEmptyPage) {
             activeDropZone = DROP_ZONE_TOP;
           } else {
@@ -883,7 +891,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       dragOverSlotParentProp,
       dragOverZone,
       availableDropTargetIds,
-      pageNodes.length,
+      isEmptyPage,
       api,
     ],
   );
@@ -1272,7 +1280,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               );
               parent = rowContainer;
 
-              // Move existing element inside stack right away if drag over zone is right
+              // Move existing element inside right away if drag over zone is right
               if (dragOverZone === DROP_ZONE_RIGHT) {
                 domApi.moveNode(dragOverNode, parent, dragOverNodeParentProp);
               }

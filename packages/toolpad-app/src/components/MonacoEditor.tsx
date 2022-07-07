@@ -7,6 +7,24 @@ import * as React from 'react';
 import * as monaco from 'monaco-editor';
 import { styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
+import cuid from 'cuid';
+
+function getExtension(language: string): string {
+  switch (language) {
+    case 'typescript':
+      return '.tsx';
+    case 'json':
+      return '.json';
+    case 'javascript':
+      return '.jsx';
+    case 'css':
+      return '.css';
+    case 'html':
+      return '.html';
+    default:
+      return '.jsx';
+  }
+}
 
 declare global {
   interface Window {
@@ -95,7 +113,6 @@ export interface MonacoEditorHandle {
 type EditorOptions = monaco.editor.IEditorOptions & monaco.editor.IGlobalEditorOptions;
 
 export interface MonacoEditorProps {
-  path: string;
   value?: string;
   onChange?: (newValue: string) => void;
   disabled?: boolean;
@@ -110,7 +127,6 @@ export interface MonacoEditorProps {
 
 export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function MonacoEditor(
   {
-    path,
     value,
     onChange,
     sx,
@@ -163,10 +179,8 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         }
       }
     } else {
-      const pathUri = monaco.Uri.parse(path);
-      const model =
-        monaco.editor.getModel(pathUri) ||
-        monaco.editor.createModel(value || '', language, pathUri);
+      const pathUri = monaco.Uri.parse(`./scripts/${cuid()}${getExtension(language)}`);
+      const model = monaco.editor.createModel(value || '', language, pathUri);
 
       instanceRef.current = monaco.editor.create(rootRef.current, {
         model,
@@ -181,7 +195,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         instanceRef.current.focus();
       }
     }
-  }, [language, value, options, disabled, autoFocus, path]);
+  }, [language, value, options, disabled, autoFocus]);
 
   React.useEffect(() => {
     const editor = instanceRef.current;
@@ -218,6 +232,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 
   React.useEffect(() => {
     return () => {
+      instanceRef.current?.getModel()?.dispose();
       instanceRef.current?.dispose();
       instanceRef.current = null;
     };

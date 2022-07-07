@@ -14,7 +14,7 @@ function PageColumn({ gap, children }: PageColumnProps) {
         gap,
         display: 'grid',
         gridAutoFlow: 'row',
-        gridAutoRows: 'minmax(0, 1fr)',
+        gridAutoRows: 'min-content',
       }}
     >
       {children}

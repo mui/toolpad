@@ -276,7 +276,11 @@ export function BindingEditorDialog<V>({
   const { propType } = useBindingEditorContext();
 
   const [input, setInput] = React.useState(value);
-  React.useEffect(() => setInput(value), [value]);
+  React.useEffect(() => {
+    if (open) {
+      setInput(value);
+    }
+  }, [open, value]);
 
   const committedInput = React.useRef<BindableAttrValue<V> | null>(null);
 

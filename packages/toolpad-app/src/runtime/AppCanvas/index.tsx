@@ -5,7 +5,7 @@ import * as appDom from '../../appDom';
 
 export interface AppCanvasState {
   appId: string;
-  dom: appDom.AppDom;
+  dom: appDom.RenderTree;
 }
 
 export interface ToolpadBridge {
@@ -65,6 +65,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
   return state ? (
     <EditorHooksContext.Provider value={editorHooks}>
       <ToolpadApp
+        hidePreviewBanner
         dom={state.dom}
         version="preview"
         appId={state.appId}

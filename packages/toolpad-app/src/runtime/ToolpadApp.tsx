@@ -6,7 +6,6 @@ import {
   styled,
   AlertTitle,
   LinearProgress,
-  NoSsr,
   Container,
 } from '@mui/material';
 import {
@@ -54,6 +53,8 @@ import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
+import { StaticRouter } from 'react-router-dom/server';
+import { useRouter } from 'next/router';
 
 export interface NavigateToPage {
   (pageNodeId: NodeId): void;
@@ -604,6 +605,23 @@ const queryClient = new QueryClient({
   },
 });
 
+interface ToolpadRouterProps {
+  children?: React.ReactNode;
+  basename?: string;
+}
+
+function ToolpadRouter({ children, basename }: ToolpadRouterProps) {
+  const { asPath } = useRouter();
+
+  return typeof window === 'undefined' ? (
+    <StaticRouter basename={basename} location={asPath}>
+      {children}
+    </StaticRouter>
+  ) : (
+    <BrowserRouter basename={basename}>{children}</BrowserRouter>
+  );
+}
+
 export interface ToolpadAppProps {
   hidePreviewBanner?: boolean;
   basename: string;
@@ -627,33 +645,31 @@ export default function ToolpadApp({
 
   return (
     <AppRoot id={HTML_ID_APP_ROOT}>
-      <NoSsr>
-        <DomContextProvider value={dom}>
-          <AppThemeProvider dom={dom}>
-            <CssBaseline />
-            {version === 'preview' && !hidePreviewBanner ? (
-              <Alert severity="info">This is a preview version of the application.</Alert>
-            ) : null}
-            <ErrorBoundary FallbackComponent={AppError}>
-              <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                <React.Suspense fallback={<AppLoading />}>
-                  <AppModulesProvider dom={dom}>
-                    <ComponentsContext dom={dom}>
-                      <AppContextProvider value={appContext}>
-                        <QueryClientProvider client={queryClient}>
-                          <BrowserRouter basename={basename}>
-                            <RenderedPages dom={dom} />
-                          </BrowserRouter>
-                        </QueryClientProvider>
-                      </AppContextProvider>
-                    </ComponentsContext>
-                  </AppModulesProvider>
-                </React.Suspense>
-              </ResetNodeErrorsKeyProvider>
-            </ErrorBoundary>
-          </AppThemeProvider>
-        </DomContextProvider>
-      </NoSsr>
+      <DomContextProvider value={dom}>
+        <AppThemeProvider dom={dom}>
+          <CssBaseline />
+          {version === 'preview' && !hidePreviewBanner ? (
+            <Alert severity="info">This is a preview version of the application.</Alert>
+          ) : null}
+          <ErrorBoundary FallbackComponent={AppError}>
+            <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+              <React.Suspense fallback={<AppLoading />}>
+                <AppModulesProvider dom={dom}>
+                  <ComponentsContext dom={dom}>
+                    <AppContextProvider value={appContext}>
+                      <QueryClientProvider client={queryClient}>
+                        <ToolpadRouter basename={basename}>
+                          <RenderedPages dom={dom} />
+                        </ToolpadRouter>
+                      </QueryClientProvider>
+                    </AppContextProvider>
+                  </ComponentsContext>
+                </AppModulesProvider>
+              </React.Suspense>
+            </ResetNodeErrorsKeyProvider>
+          </ErrorBoundary>
+        </AppThemeProvider>
+      </DomContextProvider>
     </AppRoot>
   );
 }

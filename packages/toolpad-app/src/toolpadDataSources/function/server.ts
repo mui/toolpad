@@ -1,10 +1,11 @@
 import { getQuickJS } from 'quickjs-emscripten';
+import ivm from 'isolated-vm';
 import { ServerDataSource, ApiResult } from '../../types';
 import { FunctionQuery, FunctionConnectionParams } from './types';
 import { Maybe } from '../../utils/types';
 import { newJson } from '../../server/evalExpression';
 
-async function exec(
+async function execQuickjs(
   connection: Maybe<FunctionConnectionParams>,
   functionQuery: FunctionQuery,
   params: Record<string, string>,
@@ -87,8 +88,74 @@ globalThis.result = (async () => fn())();
   return apiResult;
 }
 
+const isolate = new ivm.Isolate({ memoryLimit: 128 });
+
+export async function execIsolatedVm(
+  connection: Maybe<FunctionConnectionParams>,
+  functionQuery: FunctionQuery,
+  params: Record<string, string>,
+): Promise<ApiResult<any>> {
+  const context = isolate.createContextSync();
+  const jail = context.global;
+  jail.setSync('global', jail.derefInto());
+
+  await context.evalClosure(
+    `
+      const INTERNALS = Symbol('Fetch internals');
+
+      global.Response = class Response {
+        constructor() {}
+        get ok () {
+          return this[INTERNALS].getSync(ok);
+        }
+        get status () {
+          return this[INTERNALS].getSync(status);
+        }
+        json () {
+          return this[INTERNALS].getSync('json').apply(null, args, { result: { copy: true, promise: true }});
+        }
+        text () {
+          return this[INTERNALS].getSync('text').apply(null, args, { result: { copy: true, promise: true }});
+        }
+      }
+
+      global.fetch = async (...args) => {
+        const responseRef = await $0.apply(null, args, { result: { promise: true }});
+        const response = new Response();
+        respons[INTERNALS] = responseRef;
+        return response;
+      }
+    `,
+    [
+      (...args) => {
+        return fetch(...args).then((res) => ({
+          ok: res.ok,
+          status: res.status,
+          json: new ivm.Reference(() => res.json()),
+          text: new ivm.Reference(() => res.text()),
+        }));
+      },
+    ],
+    { arguments: { reference: true } },
+  );
+
+  const userModule = await isolate.compileModule(functionQuery.module);
+
+  await userModule.instantiate(context, (specifier) => {
+    throw new Error(`Not found "${specifier}"`);
+  });
+
+  userModule.evaluateSync();
+
+  const defaultExport = await userModule.namespace.get('default', { reference: true });
+
+  const result = await defaultExport.apply(null, [2, 4], { result: { copy: true, promise: true } });
+
+  return result;
+}
+
 const dataSource: ServerDataSource<{}, FunctionQuery, any> = {
-  exec,
+  exec: execIsolatedVm,
 };
 
 export default dataSource;

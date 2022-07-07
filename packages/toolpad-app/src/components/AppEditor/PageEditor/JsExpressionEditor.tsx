@@ -36,8 +36,6 @@ export function JsExpressionEditor({
   onBlur,
   sx,
 }: JsExpressionEditorProps) {
-  const id = React.useId();
-
   const extraLibs = React.useMemo(() => {
     const type = jsonToTs(globalScope);
 

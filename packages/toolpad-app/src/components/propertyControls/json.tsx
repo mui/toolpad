@@ -59,7 +59,6 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
         <DialogContent>
           <Box sx={{ height: 200 }}>
             <JsonEditor
-              path={`./propertyControls/${schemaUri ? window.btoa(schemaUri) : 'default'}.json`}
               value={input}
               onChange={(newValue = '') => setInput(newValue)}
               schemaUri={schemaUri}

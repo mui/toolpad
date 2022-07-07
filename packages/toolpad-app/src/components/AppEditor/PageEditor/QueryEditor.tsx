@@ -163,7 +163,11 @@ function QueryNodeEditorDialog<Q, P>({
   const dom = useDom();
 
   const [input, setInput] = React.useState(node);
-  React.useEffect(() => setInput(node), [node]);
+  React.useEffect(() => {
+    if (open) {
+      setInput(node);
+    }
+  }, [open, node]);
 
   const connectionId = input.attributes.connectionId.value;
   const connection = appDom.getMaybeNode(dom, connectionId, 'connection');

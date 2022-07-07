@@ -161,7 +161,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         <Box flex={1} display="flex">
           <Box flex={1}>
             <TypescriptEditor
-              path={`./codeComponents/${codeComponentNode.id}.tsx`}
               value={input}
               onChange={(newValue) => setInput(newValue || '')}
               extraLibs={extraLibs}

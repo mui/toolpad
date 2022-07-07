@@ -159,12 +159,12 @@ export async function execIsolatedVm(
 
   const defaultExport = await userModule.namespace.get('default', { reference: true });
 
-  const result: any = await defaultExport.apply(null, [params], {
+  const data: any = await defaultExport.apply(null, [params], {
     arguments: { copy: true },
     result: { copy: true, promise: true },
   });
 
-  return result;
+  return { data };
 }
 
 const dataSource: ServerDataSource<{}, FunctionQuery, any> = {

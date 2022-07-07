@@ -18,11 +18,7 @@ function ConnectionParamsInput() {
 }
 
 const DEFAULT_MODULE = `export default async function () {
-  return {
-    data: [
-      { id: 1, foo: 'bar' }
-    ]
-  }
+  throw new Error('No implemenetation');
 }`;
 
 function QueryEditor({
@@ -65,7 +61,6 @@ function QueryEditor({
       />
       <Box sx={{ height: 250 }}>
         <TypescriptEditor
-          path={`./dataSources/function`}
           value={value.query.module}
           onChange={(newValue) => onChange({ ...value, query: { module: newValue } })}
         />

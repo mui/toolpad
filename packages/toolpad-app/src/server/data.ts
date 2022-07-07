@@ -442,3 +442,10 @@ export function parseVersion(param?: string | string[]): VersionOrPreview | null
 export async function loadDom(appId: string, version: VersionOrPreview = 'preview') {
   return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
 }
+
+/**
+ * Version of loadDom that returns a subset of the dom that doesn't contain sensitive information
+ */
+export async function loadRenderTree(appId: string, version: VersionOrPreview = 'preview') {
+  return appDom.createRenderTree(await loadDom(appId, version));
+}

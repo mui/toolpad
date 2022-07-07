@@ -1,6 +1,8 @@
 import * as React from 'react';
 
-export function createProvidedContext<T>(name: string) {
+export function createProvidedContext<T>(
+  name: string,
+): [() => T, React.ComponentType<React.ProviderProps<T>>] {
   const context = React.createContext<T | undefined>(undefined);
 
   const useContext = () => {
@@ -11,7 +13,11 @@ export function createProvidedContext<T>(name: string) {
     return maybeContext;
   };
 
-  return [useContext, context.Provider] as const;
+  const Provider = ({ value, ...props }: React.ProviderProps<T>) => {
+    return <context.Provider value={value} {...props} />;
+  };
+
+  return [useContext, Provider];
 }
 
 export function suspendPromise<T>(promise: Promise<T>): () => T {

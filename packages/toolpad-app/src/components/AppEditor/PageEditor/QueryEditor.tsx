@@ -287,6 +287,8 @@ function QueryNodeEditorDialog<Q, P>({
     { retry: false },
   );
 
+  const isPreviewLoading: boolean = !!previewQuery && queryPreview.isLoading;
+
   const handleUpdatePreview = React.useCallback(() => {
     setPreviewQuery(input);
     setPreviewParams(paramsObject);
@@ -404,7 +406,7 @@ function QueryNodeEditorDialog<Q, P>({
             <LoadingButton
               sx={{ ml: 2 }}
               disabled={previewParams === paramsObject && previewQuery === input}
-              loading={queryPreview.isLoading}
+              loading={isPreviewLoading}
               loadingPosition="start"
               onClick={handleUpdatePreview}
               startIcon={<PlayArrowIcon />}

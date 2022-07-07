@@ -18,7 +18,7 @@ function ConnectionParamsInput() {
 }
 
 const DEFAULT_MODULE = `export default async function () {
-  throw new Error('No implemenetation');
+  throw new Error('Not implemented');
 }`;
 
 function QueryEditor({

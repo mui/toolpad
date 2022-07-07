@@ -53,7 +53,6 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
       <DialogTitle>Edit page module</DialogTitle>
       <Box sx={{ height: 500 }}>
         <TypescriptEditor
-          path={`./pages/${page.id}.ts`}
           value={input}
           onChange={(newValue) => setInput(newValue)}
           extraLibs={EXTRA_LIBS_HTTP_MODULES}

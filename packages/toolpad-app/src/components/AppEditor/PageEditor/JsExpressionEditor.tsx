@@ -57,7 +57,6 @@ export function JsExpressionEditor({
   return (
     <JsExpressionEditorRoot sx={sx}>
       <TypescriptEditor
-        path={`./expressions/${id}.tsx`}
         value={value}
         onChange={(code = '') => onChange(code)}
         disabled={disabled}

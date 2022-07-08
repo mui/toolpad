@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { styled, Alert, Box, CircularProgress } from '@mui/material';
+import { styled } from '@mui/material';
 import { Route, Routes, useParams, Navigate } from 'react-router-dom';
 import { JsRuntimeProvider } from '@mui/toolpad-core/runtime';
 import PageEditor from './PageEditor';
-import DomProvider, { useDom, useDomLoader } from '../DomLoader';
+import DomProvider, { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
 import CodeComponentEditor from './CodeComponentEditor';
 import ConnectionEditor from './ConnectionEditor';
@@ -17,7 +17,8 @@ const classes = {
 };
 
 const EditorRoot = styled('div')(({ theme }) => ({
-  height: '100vh',
+  height: 1,
+  minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
@@ -75,21 +76,9 @@ export interface EditorContentProps {
 }
 
 function EditorContent({ appId }: EditorContentProps) {
-  const domLoader = useDomLoader();
-
   return (
     <EditorRoot>
-      {domLoader.dom ? (
-        <FileEditor appId={appId} />
-      ) : (
-        <Box flex={1} display="flex" alignItems="center" justifyContent="center">
-          {domLoader.loadError ? (
-            <Alert severity="error">{domLoader.loadError}</Alert>
-          ) : (
-            <CircularProgress />
-          )}
-        </Box>
-      )}
+      <FileEditor appId={appId} />
     </EditorRoot>
   );
 }

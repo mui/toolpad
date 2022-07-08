@@ -214,12 +214,15 @@ async function handler(
   const client = createOAuthClient();
   try {
     const pathname = `/${asArray(req.query.path)
-      .map((segment) => encodeURIComponent(segment))
+      .map((segment = '') => encodeURIComponent(segment))
       .join('/')}`;
     const matchAuthLogin = match('/auth/login', { decode: decodeURIComponent });
     const matchAuthCallback = match('/auth/callback', { decode: decodeURIComponent });
 
     const [state] = asArray(req.query.state);
+    if (!state) {
+      return res.status(400).send(`Missing query parameter "state"`);
+    }
     const { connectionId, appId } = JSON.parse(decodeURIComponent(state));
 
     // Check if connection with connectionId exists, if so: merge
@@ -247,6 +250,9 @@ async function handler(
         throw new Error(oAuthError);
       }
       const [code] = asArray(req.query.code);
+      if (!code) {
+        return res.status(400).send(`Missing query parameter "code"`);
+      }
       const { tokens, res: getTokenResponse } = await client.getToken(code);
       if (!tokens) {
         throw new Error(`${getTokenResponse?.status}: ${getTokenResponse?.statusText}`);

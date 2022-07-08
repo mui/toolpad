@@ -15,20 +15,19 @@ export type InstantiatedComponents = Record<string, InstantiatedComponent | unde
 
 export const PAGE_ROW_COMPONENT_ID = 'PageRow';
 export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
+export const STACK_COMPONENT_ID = 'Stack';
 
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtin: 'PageRow' }],
   [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtin: 'PageColumn' }],
-  ['Stack', { displayName: 'Stack', builtin: 'Stack' }],
+  [STACK_COMPONENT_ID, { displayName: 'Stack', builtin: 'Stack' }],
   ['Button', { displayName: 'Button', builtin: 'Button' }],
   ['Image', { displayName: 'Image', builtin: 'Image' }],
   ['DataGrid', { displayName: 'DataGrid', builtin: 'DataGrid' }],
-  ['Container', { displayName: 'Container', builtin: 'Container' }],
   ['TextField', { displayName: 'TextField', builtin: 'TextField' }],
   ['Typography', { displayName: 'Typography', builtin: 'Typography' }],
   ['Select', { displayName: 'Select', builtin: 'Select' }],
   ['Paper', { displayName: 'Paper', builtin: 'Paper' }],
-  ['CustomLayout', { displayName: 'CustomLayout', builtin: 'CustomLayout' }],
 ]);
 
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
@@ -68,4 +67,8 @@ export function isPageRow(elementNode: appDom.ElementNode): boolean {
 
 export function isPageColumn(elementNode: appDom.ElementNode): boolean {
   return getElementNodeComponentId(elementNode) === PAGE_COLUMN_COMPONENT_ID;
+}
+
+export function isPageLayoutComponent(elementNode: appDom.ElementNode): boolean {
+  return isPageRow(elementNode) || isPageColumn(elementNode);
 }

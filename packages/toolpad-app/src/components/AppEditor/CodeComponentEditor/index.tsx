@@ -3,7 +3,7 @@ import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
-import ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { NodeId, createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import { useQuery } from 'react-query';
@@ -19,7 +19,13 @@ import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
 import { mapValues } from '../../../utils/collections';
 import ErrorAlert from '../PageEditor/ErrorAlert';
-import TsModuleEditor from '../../TsModuleEditor';
+import lazyComponent from '../../../utils/lazyComponent';
+import CenteredSpinner from '../../CenteredSpinner';
+
+const TypescriptEditor = lazyComponent(() => import('../../TypescriptEditor'), {
+  noSsr: true,
+  fallback: <CenteredSpinner />,
+});
 
 const Noop = createComponent(() => null);
 
@@ -58,14 +64,14 @@ const EXTRA_LIBS_HTTP_MODULES = [
 ];
 
 interface CodeComponentEditorContentProps {
-  theme?: appDom.ThemeNode;
   codeComponentNode: appDom.CodeComponentNode;
 }
 
-function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentEditorContentProps) {
+function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
+  const dom = useDom();
 
-  const { data: typings } = useQuery<Record<string, string>>('/typings.json', async () => {
+  const { data: typings } = useQuery<Record<string, string>>(['/typings.json'], async () => {
     return fetch('/typings.json').then((res) => res.json());
   });
 
@@ -154,8 +160,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
         </Toolbar>
         <Box flex={1} display="flex">
           <Box flex={1}>
-            <TsModuleEditor
-              path={`./codeComponents/${codeComponentNode.id}.tsx`}
+            <TypescriptEditor
               value={input}
               onChange={(newValue) => setInput(newValue || '')}
               extraLibs={extraLibs}
@@ -174,7 +179,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
                   resetKeys={[CodeComponent]}
                   fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
-                  <AppThemeProvider node={theme}>
+                  <AppThemeProvider dom={dom}>
                     <CodeComponent {...defaultProps} />
                   </AppThemeProvider>
                 </ErrorBoundary>
@@ -197,14 +202,8 @@ export default function CodeComponentEditor({ appId }: CodeComponentEditorProps)
   const dom = useDom();
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
-  const root = appDom.getApp(dom);
-  const { themes = [] } = appDom.getChildNodes(dom, root);
   return codeComponentNode ? (
-    <CodeComponentEditorContent
-      key={nodeId}
-      codeComponentNode={codeComponentNode}
-      theme={themes[0]}
-    />
+    <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
   ) : (
     <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
   );

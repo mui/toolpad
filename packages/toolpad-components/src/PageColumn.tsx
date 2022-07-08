@@ -1,48 +1,32 @@
 import * as React from 'react';
-import { Stack, StackProps } from '@mui/material';
+import { Box } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageColumnProps {
-  span: number;
-  spacing?: number;
+  gap?: number;
   children?: React.ReactNode;
-  alignItems?: StackProps['alignItems'];
 }
 
-function PageColumn({ span, spacing, children, alignItems }: PageColumnProps) {
+function PageColumn({ gap, children }: PageColumnProps) {
   return (
-    <Stack
-      direction="column"
+    <Box
       sx={{
-        gap: spacing,
-        alignItems,
-        width: `${(span / 12) * 100}vw`,
-        maxWidth: '100%',
+        gap,
+        display: 'grid',
+        gridAutoFlow: 'row',
+        gridAutoRows: 'min-content',
       }}
     >
       {children}
-    </Stack>
+    </Box>
   );
 }
 
 export default createComponent(PageColumn, {
   argTypes: {
-    span: {
+    gap: {
       typeDef: { type: 'number' },
       defaultValue: 1,
-    },
-    spacing: {
-      typeDef: { type: 'number' },
-      defaultValue: 2,
-    },
-    alignItems: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      },
-      label: 'Horizontal alignment',
-      control: { type: 'HorizontalAlign' },
-      defaultValue: 'start',
     },
     children: {
       typeDef: { type: 'element' },

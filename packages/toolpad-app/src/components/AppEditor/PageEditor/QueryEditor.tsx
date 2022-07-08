@@ -163,7 +163,11 @@ function QueryNodeEditorDialog<Q, P>({
   const dom = useDom();
 
   const [input, setInput] = React.useState(node);
-  React.useEffect(() => setInput(node), [node]);
+  React.useEffect(() => {
+    if (open) {
+      setInput(node);
+    }
+  }, [open, node]);
 
   const connectionId = input.attributes.connectionId.value;
   const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
@@ -287,6 +291,8 @@ function QueryNodeEditorDialog<Q, P>({
     { retry: false },
   );
 
+  const isPreviewLoading: boolean = !!previewQuery && queryPreview.isLoading;
+
   const handleUpdatePreview = React.useCallback(() => {
     setPreviewQuery(input);
     setPreviewParams(paramsObject);
@@ -404,7 +410,7 @@ function QueryNodeEditorDialog<Q, P>({
             <LoadingButton
               sx={{ ml: 2 }}
               disabled={previewParams === paramsObject && previewQuery === input}
-              loading={queryPreview.isLoading}
+              loading={isPreviewLoading}
               loadingPosition="start"
               onClick={handleUpdatePreview}
               startIcon={<PlayArrowIcon />}

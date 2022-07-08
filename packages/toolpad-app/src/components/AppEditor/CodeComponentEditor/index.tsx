@@ -64,12 +64,12 @@ const EXTRA_LIBS_HTTP_MODULES = [
 ];
 
 interface CodeComponentEditorContentProps {
-  theme?: appDom.ThemeNode;
   codeComponentNode: appDom.CodeComponentNode;
 }
 
-function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentEditorContentProps) {
+function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
+  const dom = useDom();
 
   const { data: typings } = useQuery<Record<string, string>>(['/typings.json'], async () => {
     return fetch('/typings.json').then((res) => res.json());
@@ -161,7 +161,6 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
         <Box flex={1} display="flex">
           <Box flex={1}>
             <TypescriptEditor
-              path={`./codeComponents/${codeComponentNode.id}.tsx`}
               value={input}
               onChange={(newValue) => setInput(newValue || '')}
               extraLibs={extraLibs}
@@ -180,7 +179,7 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
                   resetKeys={[CodeComponent]}
                   fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
-                  <AppThemeProvider node={theme}>
+                  <AppThemeProvider dom={dom}>
                     <CodeComponent {...defaultProps} />
                   </AppThemeProvider>
                 </ErrorBoundary>
@@ -203,14 +202,8 @@ export default function CodeComponentEditor({ appId }: CodeComponentEditorProps)
   const dom = useDom();
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
-  const root = appDom.getApp(dom);
-  const { themes = [] } = appDom.getChildNodes(dom, root);
   return codeComponentNode ? (
-    <CodeComponentEditorContent
-      key={nodeId}
-      codeComponentNode={codeComponentNode}
-      theme={themes[0]}
-    />
+    <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
   ) : (
     <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
   );

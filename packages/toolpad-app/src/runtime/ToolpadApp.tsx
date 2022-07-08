@@ -80,6 +80,7 @@ function usePageNavigator(): NavigateToPage {
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
+  height: 1,
   minHeight: '100vh',
 });
 
@@ -278,7 +279,14 @@ interface PageRootProps {
 function PageRoot({ children }: PageRootProps) {
   return (
     <Container>
-      <Stack data-testid="page-root" direction="column" alignItems="stretch" sx={{ my: 2, gap: 1 }}>
+      <Stack
+        data-testid="page-root"
+        direction="column"
+        sx={{
+          my: 2,
+          gap: 1,
+        }}
+      >
         {children}
       </Stack>
     </Container>
@@ -542,9 +550,32 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 }
 
+interface RenderedPagesProps {
+  dom: appDom.AppDom;
+}
+
+function RenderedPages({ dom }: RenderedPagesProps) {
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate replace to="/pages" />} />
+      <Route path="/pages" element={<AppOverview dom={dom} />} />
+      {pages.map((page) => (
+        <Route
+          key={page.id}
+          path={`/pages/${page.id}`}
+          element={<RenderedPage nodeId={page.id} />}
+        />
+      ))}
+    </Routes>
+  );
+}
+
 const FullPageCentered = styled('div')({
-  width: '100vw',
-  height: '100vh',
+  width: '100%',
+  height: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -565,6 +596,14 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
 export interface ToolpadAppProps {
   hidePreviewBanner?: boolean;
   basename: string;
@@ -580,24 +619,7 @@ export default function ToolpadApp({
   dom,
   hidePreviewBanner,
 }: ToolpadAppProps) {
-  const root = appDom.getApp(dom);
-  const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
-
-  const theme = themes.length > 0 ? themes[0] : null;
-
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
-
-  const queryClient = React.useMemo(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            retry: false,
-          },
-        },
-      }),
-    [],
-  );
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -607,7 +629,7 @@ export default function ToolpadApp({
     <AppRoot id={HTML_ID_APP_ROOT}>
       <NoSsr>
         <DomContextProvider value={dom}>
-          <AppThemeProvider node={theme}>
+          <AppThemeProvider dom={dom}>
             <CssBaseline />
             {version === 'preview' && !hidePreviewBanner ? (
               <Alert severity="info">This is a preview version of the application.</Alert>
@@ -620,17 +642,7 @@ export default function ToolpadApp({
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>
-                            <Routes>
-                              <Route path="/" element={<Navigate replace to="/pages" />} />
-                              <Route path="/pages" element={<AppOverview dom={dom} />} />
-                              {pages.map((page) => (
-                                <Route
-                                  key={page.id}
-                                  path={`/pages/${page.id}`}
-                                  element={<RenderedPage nodeId={page.id} />}
-                                />
-                              ))}
-                            </Routes>
+                            <RenderedPages dom={dom} />
                           </BrowserRouter>
                         </QueryClientProvider>
                       </AppContextProvider>

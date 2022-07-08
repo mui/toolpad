@@ -29,6 +29,8 @@ import {
   Location as RouterLocation,
   useNavigate,
 } from 'react-router-dom';
+import { StaticRouter } from 'react-router-dom/server';
+import { useRouter } from 'next/router';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
   fireEvent,
@@ -53,8 +55,6 @@ import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
-import { StaticRouter } from 'react-router-dom/server';
-import { useRouter } from 'next/router';
 
 export interface NavigateToPage {
   (pageNodeId: NodeId): void;

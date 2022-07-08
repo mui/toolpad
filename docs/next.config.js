@@ -155,7 +155,7 @@ module.exports = withTM({
   redirects: async () => [
     {
       source: '/',
-      destination: '/toolpad',
+      destination: '/toolpad/',
       permanent: false,
     },
   ],

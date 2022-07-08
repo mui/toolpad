@@ -132,6 +132,8 @@ export function pageEditorReducer(
         newNode: null,
         highlightLayout: false,
         dragOverNodeId: null,
+        dragOverSlotParentProp: null,
+        dragOverZone: null,
       });
     case 'PAGE_NODE_DRAG_OVER': {
       const { nodeId, parentProp, zone } = action.dragOverState;

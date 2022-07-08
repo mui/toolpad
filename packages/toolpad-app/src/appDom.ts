@@ -594,11 +594,11 @@ function setNodeParent<N extends AppDomNode>(
   parentProp: string,
   parentIndex?: string,
 ) {
-  const parent = getNode(dom, parentId);
-
   if (!parentIndex) {
-    const siblings: readonly AppDomNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
-    const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
+    const parent = getNode(dom, parentId);
+
+    const children: readonly AppDomNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
+    const lastIndex = children.length > 0 ? children[children.length - 1].parentIndex : null;
     parentIndex = createFractionalIndex(lastIndex, null);
   }
 

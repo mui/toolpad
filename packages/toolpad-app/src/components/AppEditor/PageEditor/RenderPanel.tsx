@@ -39,10 +39,10 @@ import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
 import {
   getElementNodeComponentId,
-  isPageRow,
   PAGE_COLUMN_COMPONENT_ID,
   PAGE_ROW_COMPONENT_ID,
   isPageLayoutComponent,
+  isPageRow,
   isPageColumn,
 } from '../../../toolpadComponents';
 import { ExactEntriesOf } from '../../../utils/types';
@@ -72,6 +72,7 @@ const overlayClasses = {
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
   container: 'Toolpad_Container',
   componentDragging: 'Toolpad_ComponentDragging',
+  horizontalEdgeDragging: 'Toolpad_HorizontalEdgeDragging',
   selectionHint: 'Toolpad_SelectionHint',
   hudOverlay: 'Toolpad_HudOverlay',
 };
@@ -85,6 +86,9 @@ const OverlayRoot = styled('div')({
   },
   [`&.${overlayClasses.componentDragging}`]: {
     cursor: 'copy',
+  },
+  [`&.${overlayClasses.horizontalEdgeDragging}`]: {
+    cursor: 'ew-resize',
   },
   [`.${overlayClasses.selectionHint}`]: {
     // capture mouse events
@@ -208,6 +212,41 @@ const EmptySlot = styled('div')({
   opacity: 0.75,
 });
 
+const DRAGGABLE_EDGE_MARGIN = 16; // px
+
+const DraggableEdge = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'edge',
+})<{
+  edge: RectangleEdge;
+}>(({ edge }) => {
+  let dynamicStyles = {};
+  if (edge === RECTANGLE_EDGE_RIGHT) {
+    dynamicStyles = {
+      cursor: 'ew-resize',
+      top: -1,
+      right: -DRAGGABLE_EDGE_MARGIN / 2,
+      height: 'calc(100% + 2px)',
+      width: DRAGGABLE_EDGE_MARGIN,
+    };
+  }
+  if (edge === RECTANGLE_EDGE_LEFT) {
+    dynamicStyles = {
+      cursor: 'ew-resize',
+      top: -1,
+      left: -DRAGGABLE_EDGE_MARGIN / 2,
+      height: 'calc(100% + 2px)',
+      width: DRAGGABLE_EDGE_MARGIN,
+    };
+  }
+
+  return {
+    ...dynamicStyles,
+    position: 'absolute',
+    pointerEvents: 'initial',
+    zIndex: 1,
+  };
+});
+
 function hasFreeNodeSlots(nodeInfo: NodeInfo): boolean {
   return Object.keys(nodeInfo.slots || []).length > 0;
 }
@@ -307,11 +346,25 @@ interface NodeHudProps {
   rect: Rectangle;
   selected?: boolean;
   allowInteraction?: boolean;
-  onDragStart?: React.DragEventHandler<HTMLElement>;
+  onNodeDragStart?: React.DragEventHandler<HTMLElement>;
+  draggableEdges?: RectangleEdge[];
+  onEdgeDragStart: (
+    node: appDom.ElementNode | appDom.PageNode,
+    edge: RectangleEdge,
+  ) => React.DragEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLElement>;
 }
 
-function NodeHud({ node, selected, allowInteraction, rect, onDragStart, onDelete }: NodeHudProps) {
+function NodeHud({
+  node,
+  selected,
+  allowInteraction,
+  rect,
+  onNodeDragStart,
+  draggableEdges = [],
+  onEdgeDragStart,
+  onDelete,
+}: NodeHudProps) {
   const dom = useDom();
 
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
@@ -330,9 +383,7 @@ function NodeHud({ node, selected, allowInteraction, rect, onDragStart, onDelete
 
   return (
     <NodeHudWrapper
-      draggable
       data-node-id={node.id}
-      onDragStart={onDragStart}
       style={absolutePositionCss(rect)}
       className={clsx({
         [overlayClasses.allowNodeInteraction]: allowInteraction,
@@ -341,7 +392,7 @@ function NodeHud({ node, selected, allowInteraction, rect, onDragStart, onDelete
       {selected ? (
         <React.Fragment>
           <span className={overlayClasses.selected} />
-          <div draggable className={overlayClasses.selectionHint}>
+          <div draggable className={overlayClasses.selectionHint} onDragStart={onNodeDragStart}>
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
             <IconButton aria-label="Remove element" color="inherit" onClick={handleDelete}>
@@ -350,6 +401,14 @@ function NodeHud({ node, selected, allowInteraction, rect, onDragStart, onDelete
           </div>
         </React.Fragment>
       ) : null}
+      {draggableEdges.map((edge) => (
+        <DraggableEdge
+          key={`${node.id}-edge-${edge}`}
+          draggable
+          edge={edge}
+          onDragStart={onEdgeDragStart(node, edge)}
+        />
+      ))}
     </NodeHudWrapper>
   );
 }
@@ -479,24 +538,23 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [],
   );
 
-  const handleDragStart = React.useCallback(
-    (event: React.DragEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-      const nodeId = event.currentTarget.dataset.nodeId as NodeId | undefined;
+  const [draggedNodeId, setDraggedNodeId] = React.useState<NodeId | null>(null);
+  const [draggedEdge, setDraggedEdge] = React.useState<RectangleEdge | null>(null);
 
-      if (!nodeId) {
-        return;
-      }
+  const handleNodeDragStart = React.useCallback(
+    (node: appDom.ElementNode) => (event: React.DragEvent<HTMLDivElement>) => {
+      event.stopPropagation();
 
       event.dataTransfer.dropEffect = 'move';
-      api.select(nodeId);
+      api.select(node.id);
+      setDraggedNodeId(node.id);
     },
     [api],
   );
 
   const getCurrentlyDraggedNode = React.useCallback((): appDom.ElementNode | null => {
-    return newNode || (selection && appDom.getNode(dom, selection, 'element'));
-  }, [dom, newNode, selection]);
+    return newNode || (draggedNodeId && appDom.getNode(dom, draggedNodeId, 'element'));
+  }, [dom, draggedNodeId, newNode]);
 
   const availableDropTargets = React.useMemo((): appDom.AppDomNode[] => {
     const draggedNode = getCurrentlyDraggedNode();
@@ -761,7 +819,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     (event: React.DragEvent<Element>) => {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
-      if (!cursorPos) {
+      const draggedNode = getCurrentlyDraggedNode();
+
+      if (!cursorPos || !draggedNode) {
         return;
       }
 
@@ -883,6 +943,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     },
     [
       getViewCoordinates,
+      getCurrentlyDraggedNode,
       dropAreaRects,
       pageNode.id,
       dom,
@@ -1019,11 +1080,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       getNodeSlotLastChild,
       nodesInfo,
     ],
-  );
-
-  const handleDragLeave = React.useCallback(
-    () => api.nodeDragOver({ nodeId: null, parentProp: null, zone: null }),
-    [api],
   );
 
   const deleteOrphanedLayoutComponents = React.useCallback(
@@ -1343,7 +1399,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleDragEnd = React.useCallback(
     (event: DragEvent | React.DragEvent) => {
       event.preventDefault();
+
       api.nodeDragEnd();
+
+      setDraggedNodeId(null);
+      setDraggedEdge(null);
     },
     [api],
   );
@@ -1404,6 +1464,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     },
     [selection, handleDelete],
   );
+
+  const handleEdgeDragStart =
+    (node: appDom.ElementNode | appDom.PageNode, edge: RectangleEdge) =>
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+
+      api.select(node.id);
+
+      setDraggedEdge(edge);
+    };
+
   const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
 
   const nodesWithInteraction = React.useMemo<Set<NodeId>>(() => {
@@ -1529,6 +1600,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     };
   }, [overlayKey, handlePageViewStateUpdate, rootElm]);
 
+  const pinholeRect = selectedRect && {
+    ...selectedRect,
+    x: selectedRect.x - DRAGGABLE_EDGE_MARGIN / 2,
+    width: selectedRect.width + DRAGGABLE_EDGE_MARGIN,
+  };
+
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
@@ -1543,6 +1620,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         <OverlayRoot
           className={clsx({
             [overlayClasses.componentDragging]: highlightLayout,
+            [overlayClasses.horizontalEdgeDragging]:
+              draggedEdge === RECTANGLE_EDGE_RIGHT || draggedEdge === RECTANGLE_EDGE_LEFT,
           })}
           // Need this to be able to capture key events
           tabIndex={0}
@@ -1550,7 +1629,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           // for its children. We can still capture the click gobally
           onClick={handleClick}
           onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onKeyDown={handleKeyDown}
           onDragEnd={handleDragEnd}
@@ -1568,7 +1646,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             const hasMultipleFreeSlots = freeSlotEntries.length > 1;
 
             const isPageNode = appDom.isPage(node);
+
             const isPageChild = parent ? appDom.isPage(parent) : false;
+            const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
 
             const childNodes = appDom.getChildNodes(
               dom,
@@ -1590,7 +1670,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     rect={nodeRect}
                     selected={selectedNode?.id === node.id}
                     allowInteraction={nodesWithInteraction.has(node.id)}
-                    onDragStart={handleDragStart}
+                    onNodeDragStart={handleNodeDragStart(node)}
+                    draggableEdges={
+                      isPageRowChild ? [RECTANGLE_EDGE_LEFT, RECTANGLE_EDGE_RIGHT] : []
+                    }
+                    onEdgeDragStart={handleEdgeDragStart}
                     onDelete={() => handleDelete(node.id)}
                   />
                 ) : null}
@@ -1643,7 +1727,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             This allows interactivity on the selected element only, while maintaining
             a reliable click target for the rest of the page
           */}
-          <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
+          {pinholeRect ? (
+            <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={pinholeRect} />
+          ) : null}
         </OverlayRoot>
       </EditorOverlay>
     </RenderPanelRoot>

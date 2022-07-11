@@ -404,25 +404,26 @@ function QueryNodeEditorDialog<Q, P>({
             </Grid>
             <Divider />
             <Toolbar disableGutters>
-              preview
               <LoadingButton
                 sx={{ ml: 2 }}
+                size="medium"
                 disabled={previewParams === paramsObject && previewQuery === input}
                 loading={isPreviewLoading}
                 loadingPosition="start"
+                variant="contained"
                 onClick={handleUpdatePreview}
                 startIcon={<PlayArrowIcon />}
               >
-                Run
+                Preview
               </LoadingButton>
             </Toolbar>
             {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
-            {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
+            {queryPreview.isSuccess ? <JsonView sx={{ ml: 2 }} src={queryPreview.data} /> : null}
           </Stack>
         </DialogContent>
       ) : (
         <DialogContent>
-          <Alert severity="error">DataSource &quot;{dataSourceId}&quot; not found</Alert>
+          <Alert severity="error">DaPtaSource &quot;{dataSourceId}&quot; not found</Alert>
         </DialogContent>
       )}
       <DialogActions>

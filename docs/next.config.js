@@ -29,10 +29,6 @@ const MONOREPO_PACKAGES = {
   '@mui/types': path.resolve(MONORPO_PATH, './packages/mui-types'),
   '@mui/markdown': path.resolve(MONORPO_PATH, './docs/packages/markdown'),
   '@mui/utils': path.resolve(MONORPO_PATH, './packages/mui-utils'),
-  'packages/mui-material': path.resolve(MONORPO_PATH, './packages/mui-material'),
-  'packages/mui-joy': path.resolve(MONORPO_PATH, './packages/mui-joy'),
-  'packages/mui-base': path.resolve(MONORPO_PATH, './packages/mui-base'),
-  'packages/mui-system': path.resolve(MONORPO_PATH, './packages/mui-system'),
 };
 
 /**

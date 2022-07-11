@@ -282,6 +282,7 @@ function PageRoot({ children }: PageRootProps) {
       <Stack
         data-testid="page-root"
         direction="column"
+        alignItems="stretch"
         sx={{
           my: 2,
           gap: 1,

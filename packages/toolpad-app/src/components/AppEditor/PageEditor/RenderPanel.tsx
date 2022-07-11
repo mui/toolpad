@@ -394,7 +394,7 @@ function NodeHud({
       {selected ? (
         <React.Fragment>
           <span className={overlayClasses.selected} />
-          <div className={overlayClasses.selectionHint}>
+          <div className={overlayClasses.selectionHint} draggable>
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
             <IconButton aria-label="Remove element" color="inherit" onClick={handleDelete}>
@@ -550,11 +550,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [api],
   );
 
-  const getCurrentlyDraggedNode = React.useCallback(
-    (): appDom.ElementNode | null =>
-      newNode || (draggedNodeId && appDom.getNode(dom, draggedNodeId, 'element')),
-    [dom, draggedNodeId, newNode],
-  );
+  const getCurrentlyDraggedNode = React.useCallback((): appDom.ElementNode | null => {
+    return newNode || (selection && appDom.getNode(dom, selection, 'element'));
+  }, [dom, newNode, selection]);
 
   const availableDropTargets = React.useMemo((): appDom.AppDomNode[] => {
     const draggedNode = getCurrentlyDraggedNode();

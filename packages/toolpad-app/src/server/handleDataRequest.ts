@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
 import { NodeId } from '@mui/toolpad-core';
-import { execQuery, loadVersionedDom } from './data';
+import { execQuery, loadDom } from './data';
 import initMiddleware from './initMiddleware';
 import { ApiResult, VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
@@ -27,7 +27,7 @@ export default async (
 ) => {
   await cors(req, res);
   const queryNodeId = req.query.queryId as NodeId;
-  const dom = await loadVersionedDom(appId, version);
+  const dom = await loadDom(appId, version);
   const query = appDom.getNode(dom, queryNodeId, 'query');
 
   const result = await execQuery(

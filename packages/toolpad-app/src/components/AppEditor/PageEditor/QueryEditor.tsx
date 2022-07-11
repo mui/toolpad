@@ -445,7 +445,6 @@ function QueryNodeEditorDialog<Q, P>({
                         <JsonView
                           src={rawQueryPreview.data ?? { data: {} }}
                           disabled={
-                            rawQueryPreview.isLoading ||
                             rawQueryPreview.isRefetching ||
                             !input.attributes.transformEnabled?.value
                           }
@@ -463,10 +462,7 @@ function QueryNodeEditorDialog<Q, P>({
                       <Autorenew
                         sx={{
                           animation: 'spin 1500ms linear infinite',
-                          animationPlayState:
-                            rawQueryPreview.isLoading || rawQueryPreview.isRefetching
-                              ? 'running'
-                              : 'paused',
+                          animationPlayState: rawQueryPreview.isRefetching ? 'running' : 'paused',
                           '@keyframes spin': {
                             '0%': {
                               transform: 'rotate(0deg)',

@@ -10,7 +10,7 @@ export interface PageRowProps {
 
 function PageRow({ layoutColumnSizes = [], gap, children }: PageRowProps) {
   const gridAutoColumns = layoutColumnSizes.reduce(
-    (acc, layoutColumnSize) => `${acc}${`${acc && ' '}{minmax(0, ${layoutColumnSize || 1}fr)`}`,
+    (acc, layoutColumnSize) => `${acc}${`${acc && ' '}minmax(0, ${layoutColumnSize || 1}fr)`}`,
     '',
   );
 
@@ -31,6 +31,10 @@ function PageRow({ layoutColumnSizes = [], gap, children }: PageRowProps) {
 
 export default createComponent(PageRow, {
   argTypes: {
+    layoutColumnSizes: {
+      typeDef: { type: 'array' },
+      defaultValue: [],
+    },
     gap: {
       typeDef: { type: 'number' },
       defaultValue: 1,

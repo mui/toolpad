@@ -820,8 +820,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         .map((child) => child.layout?.columnSize || appDom.createConst(0))
         .map((constAttribute) => constAttribute.value);
 
-      console.log(layoutColumnSizes);
-
       domApi.setNodeNamespacedProp(pageRowNode, 'props', 'layoutColumnSizes', {
         type: 'const',
         value: layoutColumnSizes,

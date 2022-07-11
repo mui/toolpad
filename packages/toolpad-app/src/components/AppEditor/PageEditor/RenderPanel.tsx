@@ -222,7 +222,6 @@ const DraggableEdge = styled('div', {
   let dynamicStyles = {};
   if (edge === RECTANGLE_EDGE_RIGHT) {
     dynamicStyles = {
-      cursor: 'ew-resize',
       top: -1,
       right: -DRAGGABLE_EDGE_MARGIN / 2,
       height: 'calc(100% + 2px)',
@@ -231,7 +230,6 @@ const DraggableEdge = styled('div', {
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
-      cursor: 'ew-resize',
       top: -1,
       left: -DRAGGABLE_EDGE_MARGIN / 2,
       height: 'calc(100% + 2px)',
@@ -241,6 +239,7 @@ const DraggableEdge = styled('div', {
 
   return {
     ...dynamicStyles,
+    cursor: 'ew-resize',
     position: 'absolute',
     pointerEvents: 'initial',
     zIndex: 1,
@@ -501,10 +500,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     newNode,
     viewState,
     nodeId: pageNodeId,
-    highlightLayout,
+    draggedNodeId,
+    isDraggingOver,
     dragOverNodeId,
     dragOverSlotParentProp,
     dragOverZone,
+    draggedEdge,
   } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;
@@ -538,16 +539,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [],
   );
 
-  const [draggedNodeId, setDraggedNodeId] = React.useState<NodeId | null>(null);
-  const [draggedEdge, setDraggedEdge] = React.useState<RectangleEdge | null>(null);
-
   const handleNodeDragStart = React.useCallback(
     (node: appDom.ElementNode) => (event: React.DragEvent<HTMLDivElement>) => {
       event.stopPropagation();
 
       event.dataTransfer.dropEffect = 'move';
       api.select(node.id);
-      setDraggedNodeId(node.id);
+      api.existingNodeDragStart(node);
     },
     [api],
   );
@@ -1371,7 +1369,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
       }
 
-      api.nodeDragEnd();
+      api.dragEnd();
 
       if (selection) {
         deleteOrphanedLayoutComponents(draggedNode, dragOverNodeId);
@@ -1402,10 +1400,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     (event: DragEvent | React.DragEvent) => {
       event.preventDefault();
 
-      api.nodeDragEnd();
-
-      setDraggedNodeId(null);
-      setDraggedEdge(null);
+      api.dragEnd();
     },
     [api],
   );
@@ -1473,8 +1468,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       event.stopPropagation();
 
       api.select(node.id);
-
-      setDraggedEdge(edge);
+      api.edgeDragStart(edge);
     };
 
   const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
@@ -1608,6 +1602,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     width: selectedRect.width + DRAGGABLE_EDGE_MARGIN,
   };
 
+  const isDraggingHorizontalEdge =
+    draggedEdge === RECTANGLE_EDGE_RIGHT || draggedEdge === RECTANGLE_EDGE_LEFT;
+
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
@@ -1621,9 +1618,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       <EditorOverlay key={overlayKey} window={editorWindowRef.current}>
         <OverlayRoot
           className={clsx({
-            [overlayClasses.componentDragging]: highlightLayout,
-            [overlayClasses.horizontalEdgeDragging]:
-              draggedEdge === RECTANGLE_EDGE_RIGHT || draggedEdge === RECTANGLE_EDGE_LEFT,
+            [overlayClasses.componentDragging]: isDraggingOver,
+            [overlayClasses.horizontalEdgeDragging]: isDraggingHorizontalEdge,
           })}
           // Need this to be able to capture key events
           tabIndex={0}
@@ -1729,9 +1725,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             This allows interactivity on the selected element only, while maintaining
             a reliable click target for the rest of the page
           */}
-          {pinholeRect ? (
-            <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={pinholeRect} />
-          ) : null}
+          <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={pinholeRect} />
         </OverlayRoot>
       </EditorOverlay>
     </RenderPanelRoot>

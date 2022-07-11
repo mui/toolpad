@@ -1429,7 +1429,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       <EditorCanvasHost
         ref={canvasHostRef}
         appId={appId}
-        editor
         className={classes.view}
         dom={dom}
         pageNodeId={pageNodeId}

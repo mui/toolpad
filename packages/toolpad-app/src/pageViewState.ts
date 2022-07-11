@@ -1,7 +1,7 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType } from '@mui/toolpad-core';
 import { NodeFiberHostProps } from '@mui/toolpad-core/runtime';
-import { FlowDirection, PageViewState, NodesInfo, NodeInfo } from './types';
+import { PageViewState, NodesInfo, NodeInfo, FlowDirection } from './types';
 import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
 
 declare global {
@@ -105,12 +105,21 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
               slotType === 'single'
                 ? getRelativeBoundingRect(rootElm, firstChildElm)
                 : getRelativeBoundingRect(rootElm, childContainerElm);
-            const direction = window.getComputedStyle(childContainerElm)
-              .flexDirection as FlowDirection;
+
+            const gridAutoFlow = window.getComputedStyle(childContainerElm).gridAutoFlow;
+            const flexDirection = window.getComputedStyle(childContainerElm).flexDirection;
+
+            let flowDirection;
+            if (gridAutoFlow) {
+              flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
+            } else {
+              flowDirection = flexDirection;
+            }
+
             nodeSlots[slotNamePropValue] = {
               type: slotType,
               rect,
-              direction,
+              flowDirection: flowDirection as FlowDirection,
             };
           }
         }

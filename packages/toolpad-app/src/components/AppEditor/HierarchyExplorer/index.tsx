@@ -293,17 +293,10 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
           Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
         </DialogTitle>
         <DialogActions>
-          <Button
-            type="submit"
-            color="inherit"
-            variant="text"
-            onClick={handledeleteNodeDialogClose}
-          >
+          <Button color="inherit" variant="text" onClick={handledeleteNodeDialogClose}>
             Cancel
           </Button>
-          <Button type="submit" onClick={handleDeleteNode}>
-            Delete
-          </Button>
+          <Button onClick={handleDeleteNode}>Delete</Button>
         </DialogActions>
       </Dialog>
     </HierarchyExplorerRoot>

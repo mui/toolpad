@@ -24,7 +24,7 @@ export function validation<T>(
   };
 }
 
-export function isSaveDisabled(formState: FormState<any>): boolean {
+export function isSaveDisabled<S>(formState: FormState<S>): boolean {
   // Always destructure formState to trigger underlying react-hook-form Proxy object
   const { isValid, isDirty } = formState;
   return !isValid || !isDirty;

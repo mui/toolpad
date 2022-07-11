@@ -48,7 +48,7 @@ import evalJsBindings, {
   evaluateExpression,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_APP_ROOT } from '../constants';
+import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
@@ -79,9 +79,15 @@ function usePageNavigator(): NavigateToPage {
 }
 
 const AppRoot = styled('div')({
-  overflow: 'auto' /* prevents margins from collapsing into root */,
-  height: 1,
+  overflow: 'auto' /* Prevents margins from collapsing into root */,
+  position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
   minHeight: '100vh',
+});
+
+const EditorOverlay = styled('div')({
+  position: 'absolute',
+  inset: '0 0 0 0',
+  pointerEvents: 'none',
 });
 
 interface AppContext {
@@ -654,6 +660,7 @@ export default function ToolpadApp({
           </AppThemeProvider>
         </DomContextProvider>
       </NoSsr>
+      <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
     </AppRoot>
   );
 }

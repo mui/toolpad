@@ -1,9 +1,33 @@
 import * as React from 'react';
 import { Box, CircularProgress, styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
+import ReactDOM from 'react-dom';
 import * as appDom from '../../../appDom';
-import { HTML_ID_APP_ROOT } from '../../../constants';
+import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../../../constants';
 import { rectContainsPoint } from '../../../utils/geometry';
+
+interface OverlayProps {
+  children?: React.ReactNode;
+  container: HTMLElement;
+}
+
+function Overlay(props: OverlayProps) {
+  const { children, container } = props;
+
+  const cache = React.useMemo(
+    () =>
+      createCache({
+        key: `toolpad-editor-overlay`,
+        prepend: true,
+        container,
+      }),
+    [container],
+  );
+
+  return <CacheProvider value={cache}>{children}</CacheProvider>;
+}
 
 export interface EditorCanvasHostHandle {
   getRootElm(): HTMLElement | null;
@@ -19,6 +43,7 @@ export interface EditorCanvasHostProps {
   // eslint-disable-next-line react/no-unused-prop-types
   editor?: boolean;
   dom: appDom.AppDom;
+  overlay?: React.ReactNode;
 }
 
 const CanvasRoot = styled('div')({
@@ -34,7 +59,7 @@ const CanvasFrame = styled('iframe')({
 });
 
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
-  function EditorCanvasHost({ appId, className, pageNodeId, onLoad, dom }, forwardedRef) {
+  function EditorCanvasHost({ appId, className, pageNodeId, onLoad, dom, overlay }, forwardedRef) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
 
     const update = React.useCallback(() => {
@@ -74,20 +99,22 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       }
     }, []);
 
+    const [contentWindow, setContentWindow] = React.useState<Window | null>(null);
+    const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
+    const [appRoot, setAppRoot] = React.useState<HTMLElement | null>(null);
+
     React.useImperativeHandle(
       forwardedRef,
       () => {
-        const getRootElm = () => {
-          return frameRef.current?.contentDocument?.getElementById(HTML_ID_APP_ROOT) || null;
-        };
         return {
-          getRootElm,
+          getRootElm() {
+            return appRoot;
+          },
           getViewCoordinates(clientX, clientY) {
-            const rootElm = getRootElm();
-            if (!rootElm) {
+            if (!appRoot) {
               return null;
             }
-            const rect = rootElm.getBoundingClientRect();
+            const rect = appRoot.getBoundingClientRect();
             if (rectContainsPoint(rect, clientX, clientY)) {
               return { x: clientX - rect.x, y: clientY - rect.y };
             }
@@ -95,8 +122,27 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
           },
         };
       },
-      [],
+      [appRoot],
     );
+
+    const handleFrameLoad = React.useCallback(() => {
+      setContentWindow(frameRef.current?.contentWindow || null);
+    }, []);
+
+    React.useEffect(() => {
+      if (!contentWindow) {
+        return () => {};
+      }
+      const observer = new MutationObserver(() => {
+        setAppRoot(contentWindow.document.getElementById(HTML_ID_APP_ROOT));
+        setEditorOverlayRoot(contentWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
+      });
+      observer.observe(contentWindow.document.body, {
+        subtree: true,
+        childList: true,
+      });
+      return () => observer.disconnect();
+    }, [contentWindow]);
 
     return (
       <CanvasRoot className={className}>
@@ -114,10 +160,17 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         </Box>
         <CanvasFrame
           ref={frameRef}
+          onLoad={handleFrameLoad}
           src={`/app-canvas/${appId}/pages/${pageNodeId}`}
           // Used by the runtime to know when to load react devtools
           data-toolpad-canvas
         />
+        {editorOverlayRoot
+          ? ReactDOM.createPortal(
+              <Overlay container={editorOverlayRoot}>{overlay}</Overlay>,
+              editorOverlayRoot,
+            )
+          : null}
       </CanvasRoot>
     );
   },

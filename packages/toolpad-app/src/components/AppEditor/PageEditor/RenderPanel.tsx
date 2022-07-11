@@ -34,7 +34,6 @@ import {
   usePageEditorApi,
   usePageEditorState,
 } from './PageEditorProvider';
-import EditorOverlay from './EditorOverlay';
 import { useToolpadComponent } from '../toolpadComponents';
 import {
   getElementNodeComponentId,
@@ -1498,114 +1497,114 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         dom={dom}
         pageNodeId={pageNodeId}
         onLoad={handleLoad}
+        overlay={
+          <OverlayRoot
+            className={clsx({
+              [overlayClasses.componentDragging]: highlightLayout,
+            })}
+            // Need this to be able to capture key events
+            tabIndex={0}
+            // This component has `pointer-events: none`, but we will selectively enable pointer-events
+            // for its children. We can still capture the click gobally
+            onClick={handleClick}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onKeyDown={handleKeyDown}
+            onDragEnd={handleDragEnd}
+          >
+            {pageNodes.map((node) => {
+              const nodeInfo = nodesInfo[node.id];
+
+              const parent = appDom.getParent(dom, node);
+              const parentInfo = (parent && nodesInfo[parent.id]) || null;
+
+              const freeSlots = nodeInfo?.slots || {};
+              const freeSlotEntries = Object.entries(freeSlots) as ExactEntriesOf<SlotsState>;
+
+              const hasFreeSlots = freeSlotEntries.length > 0;
+              const hasMultipleFreeSlots = freeSlotEntries.length > 1;
+
+              const isPageNode = appDom.isPage(node);
+              const isPageChild = parent ? appDom.isPage(parent) : false;
+
+              const childNodes = appDom.getChildNodes(
+                dom,
+                node,
+              ) as appDom.NodeChildren<appDom.ElementNode>;
+
+              const nodeRect = nodeInfo?.rect || null;
+              const hasNodeOverlay = isPageNode || appDom.isElement(node);
+
+              if (!nodeRect || !hasNodeOverlay) {
+                return null;
+              }
+
+              return (
+                <React.Fragment key={node.id}>
+                  {!isPageNode ? (
+                    <NodeHud
+                      node={node}
+                      rect={nodeRect}
+                      selected={selectedNode?.id === node.id}
+                      allowInteraction={nodesWithInteraction.has(node.id)}
+                      onDragStart={handleDragStart}
+                      onDelete={() => handleDelete(node.id)}
+                    />
+                  ) : null}
+                  {hasFreeSlots
+                    ? freeSlotEntries.map(([parentProp, freeSlot]) => {
+                        if (!freeSlot) {
+                          return null;
+                        }
+
+                        const dropAreaRect = dropAreaRects[getDropAreaId(node.id, parentProp)];
+
+                        const slotChildNodes = childNodes[parentProp] || [];
+                        const isEmptySlot = slotChildNodes.length === 0;
+
+                        if (isPageNode && !isEmptySlot) {
+                          return null;
+                        }
+
+                        return (
+                          <NodeDropArea
+                            key={`${node.id}:${parentProp}`}
+                            node={node}
+                            parentInfo={parentInfo}
+                            layoutRect={nodeRect}
+                            dropAreaRect={dropAreaRect}
+                            slotRect={freeSlot.rect}
+                            highlightedZone={getNodeDropAreaHighlightedZone(node, parentProp)}
+                            isEmptySlot={isEmptySlot}
+                            isPageChild={isPageChild}
+                          />
+                        );
+                      })
+                    : null}
+                  {!hasFreeSlots || hasMultipleFreeSlots ? (
+                    <NodeDropArea
+                      node={node}
+                      parentInfo={parentInfo}
+                      layoutRect={nodeRect}
+                      dropAreaRect={dropAreaRects[node.id]}
+                      highlightedZone={getNodeDropAreaHighlightedZone(node)}
+                      isEmptySlot={false}
+                      isPageChild={isPageChild}
+                    />
+                  ) : null}
+                </React.Fragment>
+              );
+            })}
+            {/* 
+              This overlay allows passing through pointer-events through a pinhole
+              This allows interactivity on the selected element only, while maintaining
+              a reliable click target for the rest of the page
+            */}
+            <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
+          </OverlayRoot>
+        }
       />
-      <EditorOverlay key={overlayKey} rootElm={rootElm}>
-        <OverlayRoot
-          className={clsx({
-            [overlayClasses.componentDragging]: highlightLayout,
-          })}
-          // Need this to be able to capture key events
-          tabIndex={0}
-          // This component has `pointer-events: none`, but we will selectively enable pointer-events
-          // for its children. We can still capture the click gobally
-          onClick={handleClick}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onKeyDown={handleKeyDown}
-          onDragEnd={handleDragEnd}
-        >
-          {pageNodes.map((node) => {
-            const nodeInfo = nodesInfo[node.id];
-
-            const parent = appDom.getParent(dom, node);
-            const parentInfo = (parent && nodesInfo[parent.id]) || null;
-
-            const freeSlots = nodeInfo?.slots || {};
-            const freeSlotEntries = Object.entries(freeSlots) as ExactEntriesOf<SlotsState>;
-
-            const hasFreeSlots = freeSlotEntries.length > 0;
-            const hasMultipleFreeSlots = freeSlotEntries.length > 1;
-
-            const isPageNode = appDom.isPage(node);
-            const isPageChild = parent ? appDom.isPage(parent) : false;
-
-            const childNodes = appDom.getChildNodes(
-              dom,
-              node,
-            ) as appDom.NodeChildren<appDom.ElementNode>;
-
-            const nodeRect = nodeInfo?.rect || null;
-            const hasNodeOverlay = isPageNode || appDom.isElement(node);
-
-            if (!nodeRect || !hasNodeOverlay) {
-              return null;
-            }
-
-            return (
-              <React.Fragment key={node.id}>
-                {!isPageNode ? (
-                  <NodeHud
-                    node={node}
-                    rect={nodeRect}
-                    selected={selectedNode?.id === node.id}
-                    allowInteraction={nodesWithInteraction.has(node.id)}
-                    onDragStart={handleDragStart}
-                    onDelete={() => handleDelete(node.id)}
-                  />
-                ) : null}
-                {hasFreeSlots
-                  ? freeSlotEntries.map(([parentProp, freeSlot]) => {
-                      if (!freeSlot) {
-                        return null;
-                      }
-
-                      const dropAreaRect = dropAreaRects[getDropAreaId(node.id, parentProp)];
-
-                      const slotChildNodes = childNodes[parentProp] || [];
-                      const isEmptySlot = slotChildNodes.length === 0;
-
-                      if (isPageNode && !isEmptySlot) {
-                        return null;
-                      }
-
-                      return (
-                        <NodeDropArea
-                          key={`${node.id}:${parentProp}`}
-                          node={node}
-                          parentInfo={parentInfo}
-                          layoutRect={nodeRect}
-                          dropAreaRect={dropAreaRect}
-                          slotRect={freeSlot.rect}
-                          highlightedZone={getNodeDropAreaHighlightedZone(node, parentProp)}
-                          isEmptySlot={isEmptySlot}
-                          isPageChild={isPageChild}
-                        />
-                      );
-                    })
-                  : null}
-                {!hasFreeSlots || hasMultipleFreeSlots ? (
-                  <NodeDropArea
-                    node={node}
-                    parentInfo={parentInfo}
-                    layoutRect={nodeRect}
-                    dropAreaRect={dropAreaRects[node.id]}
-                    highlightedZone={getNodeDropAreaHighlightedZone(node)}
-                    isEmptySlot={false}
-                    isPageChild={isPageChild}
-                  />
-                ) : null}
-              </React.Fragment>
-            );
-          })}
-          {/* 
-            This overlay allows passing through pointer-events through a pinhole
-            This allows interactivity on the selected element only, while maintaining
-            a reliable click target for the rest of the page
-          */}
-          <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
-        </OverlayRoot>
-      </EditorOverlay>
     </RenderPanelRoot>
   );
 }

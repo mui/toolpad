@@ -820,9 +820,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         .map((child) => child.layout?.columnSize || appDom.createConst(0))
         .map((constAttribute) => constAttribute.value);
 
+      const totalLayoutColumnsSize = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
+
       domApi.setNodeNamespacedProp(pageRowNode, 'props', 'layoutColumnSizes', {
         type: 'const',
-        value: layoutColumnSizes,
+        value: layoutColumnSizes.map((size) => size / totalLayoutColumnsSize),
       });
     },
     [dom, domApi],

@@ -840,8 +840,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleEdgeDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      event.stopPropagation();
-
       const draggedNode = getCurrentlyDraggedNode();
 
       if (!draggedNode) {

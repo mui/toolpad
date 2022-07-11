@@ -820,6 +820,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         .map((child) => child.layout?.columnSize || appDom.createConst(0))
         .map((constAttribute) => constAttribute.value);
 
+      console.log(layoutColumnSizes);
+
       domApi.setNodeNamespacedProp(pageRowNode, 'props', 'layoutColumnSizes', {
         type: 'const',
         value: layoutColumnSizes,
@@ -867,6 +869,28 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               domApi.setNodeNamespacedProp(previousSibling, 'layout', 'columnSize', {
                 type: 'const',
                 value: Math.max(0, previousSiblingRect.width + (cursorPos.x - draggedNodeRect.x)),
+              });
+            }
+          }
+        }
+        if (draggedEdge === RECTANGLE_EDGE_RIGHT) {
+          const nextSibling = appDom.getSiblingAfterNode(dom, draggedNode, 'children');
+
+          if (nextSibling) {
+            const nextSiblingInfo = nodesInfo[nextSibling.id];
+            const nextSiblingRect = nextSiblingInfo?.rect;
+
+            if (nextSiblingRect) {
+              domApi.setNodeNamespacedProp(draggedNode, 'layout', 'columnSize', {
+                type: 'const',
+                value: Math.max(0, cursorPos.x - draggedNodeRect.x),
+              });
+              domApi.setNodeNamespacedProp(nextSibling, 'layout', 'columnSize', {
+                type: 'const',
+                value: Math.max(
+                  0,
+                  nextSiblingRect.width - (cursorPos.x - draggedNodeRect.x - draggedNodeRect.width),
+                ),
               });
             }
           }

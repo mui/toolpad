@@ -5,7 +5,7 @@ import * as appDom from '../../appDom';
 
 export interface AppCanvasState {
   appId: string;
-  dom: appDom.AppDom;
+  dom: appDom.RenderTree;
 }
 
 export interface ToolpadBridge {

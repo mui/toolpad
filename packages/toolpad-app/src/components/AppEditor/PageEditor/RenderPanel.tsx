@@ -72,7 +72,6 @@ const overlayClasses = {
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
   container: 'Toolpad_Container',
   componentDragging: 'Toolpad_ComponentDragging',
-  horizontalEdgeDragging: 'Toolpad_HorizontalEdgeDragging',
   selectionHint: 'Toolpad_SelectionHint',
   hudOverlay: 'Toolpad_HudOverlay',
 };
@@ -86,9 +85,6 @@ const OverlayRoot = styled('div')({
   },
   [`&.${overlayClasses.componentDragging}`]: {
     cursor: 'copy',
-  },
-  [`&.${overlayClasses.horizontalEdgeDragging}`]: {
-    cursor: 'ew-resize',
   },
   [`.${overlayClasses.selectionHint}`]: {
     // capture mouse events
@@ -347,8 +343,8 @@ interface NodeHudProps {
   allowInteraction?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
   draggableEdges?: RectangleEdge[];
-  onEdgeDragStart: (
-    node: appDom.ElementNode | appDom.PageNode,
+  onEdgeDragStart?: (
+    node: appDom.ElementNode,
     edge: RectangleEdge,
   ) => React.DragEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLElement>;
@@ -400,14 +396,16 @@ function NodeHud({
           </div>
         </React.Fragment>
       ) : null}
-      {draggableEdges.map((edge) => (
-        <DraggableEdge
-          key={`${node.id}-edge-${edge}`}
-          draggable
-          edge={edge}
-          onDragStart={onEdgeDragStart(node, edge)}
-        />
-      ))}
+      {onEdgeDragStart
+        ? draggableEdges.map((edge) => (
+            <DraggableEdge
+              key={`${node.id}-edge-${edge}`}
+              draggable
+              edge={edge}
+              onDragStart={onEdgeDragStart(node as appDom.ElementNode, edge)}
+            />
+          ))
+        : null}
     </NodeHudWrapper>
   );
 }
@@ -815,8 +813,90 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return rects;
   }, [nodesInfo, pageNodes]);
 
+  const updatePageRowLayout = React.useCallback(
+    (pageRowNode: appDom.ElementNode) => {
+      const children = appDom.getChildNodes(dom, pageRowNode).children;
+      const layoutColumnSizes = children
+        .map((child) => child.layout?.columnSize || appDom.createConst(0))
+        .map((constAttribute) => constAttribute.value);
+
+      domApi.setNodeNamespacedProp(pageRowNode, 'props', 'layoutColumnSizes', {
+        type: 'const',
+        value: layoutColumnSizes,
+      });
+    },
+    [dom, domApi],
+  );
+
+  const handleEdgeDragStart = React.useCallback(
+    (node: appDom.ElementNode, edge: RectangleEdge) => () => {
+      api.select(node.id);
+      api.edgeDragStart({ nodeId: node.id, edge });
+    },
+    [api],
+  );
+
+  const handleEdgeDragOver = React.useCallback(
+    (event: React.DragEvent<Element>) => {
+      event.stopPropagation();
+
+      const draggedNode = getCurrentlyDraggedNode();
+
+      if (!draggedNode) {
+        return;
+      }
+
+      const draggedNodeInfo = nodesInfo[draggedNode.id];
+      const draggedNodeRect = draggedNodeInfo?.rect;
+
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+
+      if (draggedNodeRect && cursorPos) {
+        if (draggedEdge === RECTANGLE_EDGE_LEFT) {
+          const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
+
+          if (previousSibling) {
+            const previousSiblingInfo = nodesInfo[previousSibling.id];
+            const previousSiblingRect = previousSiblingInfo?.rect;
+
+            if (previousSiblingRect) {
+              domApi.setNodeNamespacedProp(draggedNode, 'layout', 'columnSize', {
+                type: 'const',
+                value: Math.max(0, draggedNodeRect.width - (cursorPos.x - draggedNodeRect.x)),
+              });
+              domApi.setNodeNamespacedProp(previousSibling, 'layout', 'columnSize', {
+                type: 'const',
+                value: Math.max(0, previousSiblingRect.width + (cursorPos.x - draggedNodeRect.x)),
+              });
+            }
+          }
+        }
+
+        const parent = appDom.getParent(dom, draggedNode);
+
+        if (parent) {
+          updatePageRowLayout(parent as appDom.ElementNode);
+        }
+      }
+    },
+    [
+      dom,
+      domApi,
+      draggedEdge,
+      getCurrentlyDraggedNode,
+      getViewCoordinates,
+      nodesInfo,
+      updatePageRowLayout,
+    ],
+  );
+
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
+      if (draggedEdge) {
+        handleEdgeDragOver(event);
+        return;
+      }
+
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
       const draggedNode = getCurrentlyDraggedNode();
@@ -942,6 +1022,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
     },
     [
+      draggedEdge,
       getViewCoordinates,
       getCurrentlyDraggedNode,
       dropAreaRects,
@@ -952,6 +1033,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       dragOverSlotParentProp,
       dragOverZone,
       availableDropTargetIds,
+      handleEdgeDragOver,
       isEmptyPage,
       api,
     ],
@@ -1462,15 +1544,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [selection, handleDelete],
   );
 
-  const handleEdgeDragStart =
-    (node: appDom.ElementNode | appDom.PageNode, edge: RectangleEdge) =>
-    (event: React.DragEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-
-      api.select(node.id);
-      api.edgeDragStart(edge);
-    };
-
   const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
 
   const nodesWithInteraction = React.useMemo<Set<NodeId>>(() => {
@@ -1602,9 +1675,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     width: selectedRect.width + DRAGGABLE_EDGE_MARGIN,
   };
 
-  const isDraggingHorizontalEdge =
-    draggedEdge === RECTANGLE_EDGE_RIGHT || draggedEdge === RECTANGLE_EDGE_LEFT;
-
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
@@ -1619,7 +1689,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         <OverlayRoot
           className={clsx({
             [overlayClasses.componentDragging]: isDraggingOver,
-            [overlayClasses.horizontalEdgeDragging]: isDraggingHorizontalEdge,
           })}
           // Need this to be able to capture key events
           tabIndex={0}
@@ -1672,7 +1741,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     draggableEdges={
                       isPageRowChild ? [RECTANGLE_EDGE_LEFT, RECTANGLE_EDGE_RIGHT] : []
                     }
-                    onEdgeDragStart={handleEdgeDragStart}
+                    onEdgeDragStart={isPageRowChild ? handleEdgeDragStart : undefined}
                     onDelete={() => handleDelete(node.id)}
                   />
                 ) : null}

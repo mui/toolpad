@@ -63,7 +63,10 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_EDGE_DRAG_START';
-      edge: RectangleEdge;
+      edgeDragState: {
+        nodeId: NodeId | null;
+        edge: RectangleEdge;
+      };
     }
   | {
       type: 'PAGE_NODE_DRAG_OVER';
@@ -146,8 +149,11 @@ export function pageEditorReducer(
       });
     }
     case 'PAGE_EDGE_DRAG_START': {
+      const { nodeId, edge } = action.edgeDragState;
+
       return update(state, {
-        draggedEdge: action.edge,
+        draggedNodeId: nodeId,
+        draggedEdge: edge,
       });
     }
     case 'PAGE_DRAG_END':
@@ -207,8 +213,11 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     existingNodeDragStart(node: appDom.ElementNode) {
       dispatch({ type: 'PAGE_EXISTING_NODE_DRAG_START', node });
     },
-    edgeDragStart(edge: RectangleEdge) {
-      dispatch({ type: 'PAGE_EDGE_DRAG_START', edge });
+    edgeDragStart({ nodeId, edge }: { nodeId: NodeId | null; edge: RectangleEdge }) {
+      dispatch({
+        type: 'PAGE_EDGE_DRAG_START',
+        edgeDragState: { nodeId, edge },
+      });
     },
     dragEnd() {
       dispatch({ type: 'PAGE_DRAG_END' });

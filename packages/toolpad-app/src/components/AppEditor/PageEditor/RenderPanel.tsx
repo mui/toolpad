@@ -388,11 +388,13 @@ function NodeHud({
       className={clsx({
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
+      draggable
+      onDragStart={onNodeDragStart}
     >
       {selected ? (
         <React.Fragment>
           <span className={overlayClasses.selected} />
-          <div draggable className={overlayClasses.selectionHint} onDragStart={onNodeDragStart}>
+          <div className={overlayClasses.selectionHint}>
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
             <IconButton aria-label="Remove element" color="inherit" onClick={handleDelete}>
@@ -401,14 +403,6 @@ function NodeHud({
           </div>
         </React.Fragment>
       ) : null}
-      {draggableEdges.map((edge) => (
-        <DraggableEdge
-          key={`${node.id}-edge-${edge}`}
-          draggable
-          edge={edge}
-          onDragStart={onEdgeDragStart(node, edge)}
-        />
-      ))}
     </NodeHudWrapper>
   );
 }
@@ -542,12 +536,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const [draggedEdge, setDraggedEdge] = React.useState<RectangleEdge | null>(null);
 
   const handleNodeDragStart = React.useCallback(
-    (node: appDom.ElementNode) => (event: React.DragEvent<HTMLDivElement>) => {
+    (event: React.DragEvent<HTMLDivElement>) => {
       event.stopPropagation();
+      const nodeId = event.currentTarget.dataset.nodeId as NodeId | undefined;
+
+      if (!nodeId) {
+        return;
+      }
 
       event.dataTransfer.dropEffect = 'move';
-      api.select(node.id);
-      setDraggedNodeId(node.id);
+      api.select(nodeId);
     },
     [api],
   );
@@ -821,9 +819,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     (event: React.DragEvent<Element>) => {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
-      const draggedNode = getCurrentlyDraggedNode();
-
-      if (!cursorPos || !draggedNode) {
+      if (!cursorPos) {
         return;
       }
 
@@ -1082,6 +1078,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       getNodeSlotLastChild,
       nodesInfo,
     ],
+  );
+
+  const handleDragLeave = React.useCallback(
+    () => api.nodeDragOver({ nodeId: null, parentProp: null, zone: null }),
+    [api],
   );
 
   const deleteOrphanedLayoutComponents = React.useCallback(
@@ -1403,9 +1404,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       event.preventDefault();
 
       api.nodeDragEnd();
-
-      setDraggedNodeId(null);
-      setDraggedEdge(null);
     },
     [api],
   );
@@ -1602,11 +1600,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     };
   }, [overlayKey, handlePageViewStateUpdate, rootElm]);
 
-  const pinholeRect = selectedRect && {
-    ...selectedRect,
-    x: selectedRect.x - DRAGGABLE_EDGE_MARGIN / 2,
-    width: selectedRect.width + DRAGGABLE_EDGE_MARGIN,
-  };
+  const pinholeRect = selectedRect;
 
   return (
     <RenderPanelRoot className={className}>
@@ -1631,6 +1625,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           // for its children. We can still capture the click gobally
           onClick={handleClick}
           onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onKeyDown={handleKeyDown}
           onDragEnd={handleDragEnd}
@@ -1672,7 +1667,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     rect={nodeRect}
                     selected={selectedNode?.id === node.id}
                     allowInteraction={nodesWithInteraction.has(node.id)}
-                    onNodeDragStart={handleNodeDragStart(node)}
+                    onNodeDragStart={handleNodeDragStart}
                     draggableEdges={
                       isPageRowChild ? [RECTANGLE_EDGE_LEFT, RECTANGLE_EDGE_RIGHT] : []
                     }

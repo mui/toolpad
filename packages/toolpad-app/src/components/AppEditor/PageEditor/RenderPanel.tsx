@@ -552,9 +552,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [api],
   );
 
-  const getCurrentlyDraggedNode = React.useCallback((): appDom.ElementNode | null => {
-    return newNode || (draggedNodeId && appDom.getNode(dom, draggedNodeId, 'element'));
-  }, [dom, draggedNodeId, newNode]);
+  const getCurrentlyDraggedNode = React.useCallback(
+    (): appDom.ElementNode | null =>
+      newNode || (draggedNodeId && appDom.getNode(dom, draggedNodeId, 'element')),
+    [dom, draggedNodeId, newNode],
+  );
 
   const availableDropTargets = React.useMemo((): appDom.AppDomNode[] => {
     const draggedNode = getCurrentlyDraggedNode();

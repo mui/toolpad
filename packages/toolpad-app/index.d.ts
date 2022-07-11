@@ -1,3 +1,1 @@
-import 'react/next';
-
 export {};

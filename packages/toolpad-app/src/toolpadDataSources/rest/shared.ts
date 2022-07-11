@@ -1,4 +1,4 @@
-import { ensureEndsWith } from '../../utils/strings';
+import { ensureSuffix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import { Authentication } from './types';
 
@@ -26,7 +26,7 @@ export function getAuthenticationHeaders(auth: Maybe<Authentication>): [string, 
 
 export function parseBaseUrl(baseUrl: string): URL {
   const parsedBase = new URL(baseUrl);
-  parsedBase.pathname = ensureEndsWith(parsedBase.pathname, '/');
+  parsedBase.pathname = ensureSuffix(parsedBase.pathname, '/');
   parsedBase.search = '';
   parsedBase.hash = '';
   return parsedBase;

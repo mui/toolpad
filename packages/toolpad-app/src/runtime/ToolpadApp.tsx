@@ -28,6 +28,7 @@ import {
   useLocation,
   Navigate,
   Location as RouterLocation,
+  useNavigate,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -44,6 +45,7 @@ import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   BindingEvaluationResult,
   buildGlobalScope,
+  evaluateExpression,
   ParsedBinding,
 } from './evalJsBindings';
 import { HTML_ID_APP_ROOT } from '../constants';
@@ -51,9 +53,34 @@ import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
+import Pre from '../components/Pre';
+
+export interface NavigateToPage {
+  (pageNodeId: NodeId): void;
+}
+
+export interface EditorHooks {
+  navigateToPage?: NavigateToPage;
+}
+
+export const EditorHooksContext = React.createContext<EditorHooks>({});
+
+function usePageNavigator(): NavigateToPage {
+  const navigate = useNavigate();
+  const navigateToPage: NavigateToPage = React.useCallback(
+    (pageNodeId: NodeId) => {
+      navigate(`/pages/${pageNodeId}`);
+    },
+    [navigate],
+  );
+
+  const editorHooks = React.useContext(EditorHooksContext);
+  return editorHooks.navigateToPage || navigateToPage;
+}
 
 const AppRoot = styled('div')({
   overflow: 'auto' /* prevents margins from collapsing into root */,
+  height: 1,
   minHeight: '100vh',
 });
 
@@ -66,6 +93,8 @@ type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
+const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
+  createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
 const [useBindingsContext, BindingsContextProvider] =
   createProvidedContext<Record<string, BindingEvaluationResult>>('LiveBindings');
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
@@ -95,23 +124,26 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
 
   return (
     /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-    <RenderedNodeContent nodeId={node.id} childNodes={childNodes} Component={Component} />
+    <RenderedNodeContent node={node} childNodes={childNodes} Component={Component} />
   );
 }
 
 interface RenderedNodeContentProps {
-  nodeId: NodeId;
+  node: appDom.PageNode | appDom.ElementNode;
   childNodes: appDom.ElementNode[];
   Component: ToolpadComponent<any>;
 }
 
-function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeContentProps) {
+function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeContentProps) {
   const setControlledBinding = useSetControlledBindingContext();
 
-  const { argTypes, errorProp, loadingProp, loadingPropSource } = Component[TOOLPAD_COMPONENT];
+  const nodeId = node.id;
+
+  const componentConfig = Component[TOOLPAD_COMPONENT];
+  const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
   const liveBindings = useBindingsContext();
-  const boundProps = React.useMemo(() => {
+  const boundProps: Record<string, any> = React.useMemo(() => {
     const loadingPropSourceSet = new Set(loadingPropSource);
     const hookResult: Record<string, any> = {};
 
@@ -169,6 +201,42 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     [argTypes, nodeId, setControlledBinding],
   );
 
+  const navigateToPage = usePageNavigator();
+  const evaluatePageExpression = useEvaluatePageExpression();
+
+  const eventHandlers: Record<string, (param: any) => void> = React.useMemo(() => {
+    return mapProperties(argTypes, ([key, argType]) => {
+      if (!argType || argType.typeDef.type !== 'event' || !appDom.isElement(node)) {
+        return null;
+      }
+
+      const action = node.props?.[key];
+
+      if (action?.type === 'navigationAction') {
+        const handler = () => {
+          const { page } = action.value;
+          if (page) {
+            navigateToPage(page);
+          }
+        };
+
+        return [key, handler];
+      }
+
+      if (action?.type === 'jsExpressionAction') {
+        const handler = () => {
+          const code = action.value;
+          const exprToEvaluate = `(() => {${code}})()`;
+          evaluatePageExpression(exprToEvaluate);
+        };
+
+        return [key, handler];
+      }
+
+      return null;
+    });
+  }, [argTypes, node, navigateToPage, evaluatePageExpression]);
+
   const reactChildren =
     childNodes.length > 0
       ? childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />)
@@ -179,9 +247,10 @@ function RenderedNodeContent({ nodeId, childNodes, Component }: RenderedNodeCont
     return {
       ...boundProps,
       ...onChangeHandlers,
+      ...eventHandlers,
       children: reactChildren,
     };
-  }, [boundProps, onChangeHandlers, reactChildren]);
+  }, [boundProps, eventHandlers, onChangeHandlers, reactChildren]);
 
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {
@@ -210,7 +279,14 @@ interface PageRootProps {
 function PageRoot({ children }: PageRootProps) {
   return (
     <Container>
-      <Stack data-testid="page-root" direction="column" alignItems="stretch" sx={{ my: 2, gap: 1 }}>
+      <Stack
+        data-testid="page-root"
+        direction="column"
+        sx={{
+          my: 2,
+          gap: 1,
+        }}
+      >
         {children}
       </Stack>
     </Container>
@@ -446,6 +522,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     [evaluatedBindings],
   );
 
+  const evaluatePageExpression = React.useCallback(
+    (expression: string) => evaluateExpression(expression, pageState),
+    [pageState],
+  );
+
   React.useEffect(() => {
     fireEvent({ type: 'pageStateUpdated', pageState });
   }, [pageState]);
@@ -457,19 +538,44 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   return (
     <BindingsContextProvider value={liveBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
-        <RenderedNodeContent nodeId={page.id} childNodes={children} Component={PageRootComponent} />
+        <EvaluatePageExpressionProvider value={evaluatePageExpression}>
+          <RenderedNodeContent node={page} childNodes={children} Component={PageRootComponent} />
 
-        {queries.map((node) => (
-          <QueryNode key={node.id} node={node} />
-        ))}
+          {queries.map((node) => (
+            <QueryNode key={node.id} node={node} />
+          ))}
+        </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>
     </BindingsContextProvider>
   );
 }
 
+interface RenderedPagesProps {
+  dom: appDom.AppDom;
+}
+
+function RenderedPages({ dom }: RenderedPagesProps) {
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate replace to="/pages" />} />
+      <Route path="/pages" element={<AppOverview dom={dom} />} />
+      {pages.map((page) => (
+        <Route
+          key={page.id}
+          path={`/pages/${page.id}`}
+          element={<RenderedPage nodeId={page.id} />}
+        />
+      ))}
+    </Routes>
+  );
+}
+
 const FullPageCentered = styled('div')({
-  width: '100vw',
-  height: '100vh',
+  width: '100%',
+  height: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -484,38 +590,36 @@ function AppError({ error }: FallbackProps) {
     <FullPageCentered>
       <Alert severity="error">
         <AlertTitle>Something went wrong</AlertTitle>
-        <pre>{error.stack}</pre>
+        <Pre>{error.stack}</Pre>
       </Alert>
     </FullPageCentered>
   );
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
 export interface ToolpadAppProps {
+  hidePreviewBanner?: boolean;
   basename: string;
   appId: string;
   version: VersionOrPreview;
   dom: appDom.AppDom;
 }
 
-export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
-  const root = appDom.getApp(dom);
-  const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
-
-  const theme = themes.length > 0 ? themes[0] : null;
-
+export default function ToolpadApp({
+  basename,
+  appId,
+  version,
+  dom,
+  hidePreviewBanner,
+}: ToolpadAppProps) {
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
-
-  const queryClient = React.useMemo(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            retry: false,
-          },
-        },
-      }),
-    [],
-  );
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -525,8 +629,11 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
     <AppRoot id={HTML_ID_APP_ROOT}>
       <NoSsr>
         <DomContextProvider value={dom}>
-          <AppThemeProvider node={theme}>
+          <AppThemeProvider dom={dom}>
             <CssBaseline />
+            {version === 'preview' && !hidePreviewBanner ? (
+              <Alert severity="info">This is a preview version of the application.</Alert>
+            ) : null}
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
@@ -535,17 +642,7 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>
-                            <Routes>
-                              <Route path="/" element={<Navigate replace to="/pages" />} />
-                              <Route path="/pages" element={<AppOverview dom={dom} />} />
-                              {pages.map((page) => (
-                                <Route
-                                  key={page.id}
-                                  path={`/pages/${page.id}`}
-                                  element={<RenderedPage nodeId={page.id} />}
-                                />
-                              ))}
-                            </Routes>
+                            <RenderedPages dom={dom} />
                           </BrowserRouter>
                         </QueryClientProvider>
                       </AppContextProvider>

@@ -96,7 +96,7 @@ export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> 
   ]);
 }
 
-export async function loadDom(appId: string): Promise<appDom.AppDom> {
+async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
   const dbNodes = await prisma.domNode.findMany({
     where: { appId },
     include: { attributes: true },
@@ -161,19 +161,41 @@ export async function getApp(id: string) {
   return prisma.app.findUnique({ where: { id } });
 }
 
+function createDefaultConnections(dom: appDom.AppDom): appDom.ConnectionNode[] {
+  if (process.env.TOOLPAD_DEMO) {
+    return [
+      appDom.createNode(dom, 'connection', {
+        name: 'movies',
+        attributes: {
+          dataSource: appDom.createConst('movies'),
+          params: appDom.createSecret({ apiKey: '12345' }),
+          status: appDom.createConst(null),
+        },
+      }),
+    ];
+  }
+
+  return [
+    appDom.createNode(dom, 'connection', {
+      name: 'rest',
+      attributes: {
+        dataSource: appDom.createConst('rest'),
+        params: appDom.createSecret({}),
+        status: appDom.createConst(null),
+      },
+    }),
+  ];
+}
+
 function createDefaultDom(): appDom.AppDom {
   let dom = appDom.createDom();
   const appNode = appDom.getApp(dom);
 
-  // Create default REST connection node
-  const newConnectionNode = appDom.createNode(dom, 'connection', {
-    attributes: {
-      dataSource: appDom.createConst('rest'),
-      params: appDom.createSecret({ name: 'rest' }),
-      status: appDom.createConst(null),
-    },
-  });
-  dom = appDom.addNode(dom, newConnectionNode, appNode, 'connections');
+  // Create default connections
+  const defaultConnections = createDefaultConnections(dom);
+  for (const connection of defaultConnections) {
+    dom = appDom.addNode(dom, connection, appNode, 'connections');
+  }
 
   // Create default page
   const newPageNode = appDom.createNode(dom, 'page', {
@@ -242,7 +264,7 @@ export async function createRelease(
   appId: string,
   { description }: CreateReleaseParams,
 ): Promise<Pick<Release, keyof typeof SELECT_RELEASE_META>> {
-  const currentDom = await loadDom(appId);
+  const currentDom = await loadPreviewDom(appId);
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
 
   const lastRelease = await findLastReleaseInternal(appId);
@@ -317,7 +339,7 @@ async function getConnection<P = unknown>(
   appId: string,
   id: string,
 ): Promise<appDom.ConnectionNode<P>> {
-  const dom = await loadDom(appId);
+  const dom = await loadPreviewDom(appId);
   return appDom.getNode(dom, id as NodeId, 'connection') as appDom.ConnectionNode<P>;
 }
 
@@ -325,7 +347,7 @@ export async function getConnectionParams<P = unknown>(
   appId: string,
   id: string,
 ): Promise<P | null> {
-  const dom = await loadDom(appId);
+  const dom = await loadPreviewDom(appId);
   const node = appDom.getNode(dom, id as NodeId, 'connection') as appDom.ConnectionNode<P>;
   return node.attributes.params.value;
 }
@@ -335,7 +357,7 @@ export async function setConnectionParams<P>(
   connectionId: NodeId,
   params: P,
 ): Promise<void> {
-  let dom = await loadDom(appId);
+  let dom = await loadPreviewDom(appId);
   const existing = appDom.getNode(dom, connectionId, 'connection');
 
   dom = appDom.setNodeNamespacedProp(
@@ -414,6 +436,13 @@ export function parseVersion(param?: string | string[]): VersionOrPreview | null
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-export async function loadVersionedDom(appId: string, version: VersionOrPreview) {
-  return version === 'preview' ? loadDom(appId) : loadReleaseDom(appId, version);
+export async function loadDom(appId: string, version: VersionOrPreview = 'preview') {
+  return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
+}
+
+/**
+ * Version of loadDom that returns a subset of the dom that doesn't contain sensitive information
+ */
+export async function loadRenderTree(appId: string, version: VersionOrPreview = 'preview') {
+  return appDom.createRenderTree(await loadDom(appId, version));
 }

@@ -148,6 +148,23 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
   );
 }
 
+function withTransformDisabled<Q, P>(query: appDom.QueryNode<Q, P>): appDom.QueryNode<Q, P> {
+  if (query.attributes.transformEnabled?.value) {
+    return {
+      ...query,
+      attributes: {
+        ...query.attributes,
+        transform: { type: 'const', value: '' },
+        transformEnabled: { type: 'const', value: false },
+      },
+    };
+  }
+
+  return query;
+}
+
+type RawQueryPreviewKey<Q, P> = [string, appDom.QueryNode<Q, P>, Record<string, any>];
+
 interface QueryNodeEditorProps<Q, P> {
   open: boolean;
   onClose: () => void;
@@ -289,26 +306,10 @@ function QueryNodeEditorDialog<Q, P>({
     setPreviewParams(paramsObject);
   }, [input, paramsObject]);
 
-  const withTransformDisabled = React.useCallback(
-    (query: appDom.QueryNode<Q, P>): appDom.QueryNode<Q, P> => {
-      return {
-        ...query,
-        attributes: {
-          ...query.attributes,
-          transform: { type: 'const', value: '' },
-          transformEnabled: { type: 'const', value: false },
-        },
-      };
-    },
-    [],
-  );
-
-  const rawQueryPreviewKey: [string, appDom.QueryNode<Q, P>, Record<string, any>] = React.useMemo(
+  const rawQueryPreviewKey = React.useMemo<RawQueryPreviewKey<Q, P>>(
     () => [appId, withTransformDisabled(input), previewParams],
-    [appId, input, previewParams, withTransformDisabled],
+    [appId, input, previewParams],
   );
-
-  const rawQueryPreviewKeyRef = React.useRef(rawQueryPreviewKey);
 
   const rawQueryPreview = client.useQuery('execQuery', rawQueryPreviewKey, {
     enabled: false,
@@ -317,11 +318,10 @@ function QueryNodeEditorDialog<Q, P>({
   });
 
   const handleRawQueryPreviewRefresh = React.useCallback(() => {
-    rawQueryPreviewKeyRef.current = rawQueryPreviewKey;
     rawQueryPreview.refetch();
-  }, [rawQueryPreviewKey, rawQueryPreviewKeyRef, rawQueryPreview]);
+  }, [rawQueryPreview]);
 
-  const rawQueryPreviewRefreshDisabled = rawQueryPreviewKeyRef.current === rawQueryPreviewKey;
+  const rawQueryPreviewRefreshDisabled = rawQueryPreview.isFetched;
 
   const handleTransformEnabledChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -332,11 +332,8 @@ function QueryNodeEditorDialog<Q, P>({
           }),
         }),
       );
-      if (event.target.checked) {
-        handleRawQueryPreviewRefresh();
-      }
     },
-    [handleRawQueryPreviewRefresh],
+    [],
   );
 
   const isInputSaved = node === input;

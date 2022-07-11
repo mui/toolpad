@@ -1,10 +1,22 @@
-import { LiveBindings } from '@mui/toolpad-core';
+import { NodeId, LiveBindings } from '@mui/toolpad-core';
 import * as React from 'react';
 import * as appDom from '../../../appDom';
-import { NodeId, SlotLocation, PageViewState } from '../../../types';
-import { update, updateOrCreate } from '../../../utils/immutability';
+import { PageViewState } from '../../../types';
+import { update } from '../../../utils/immutability';
 
 export type ComponentPanelTab = 'component' | 'theme';
+
+export const DROP_ZONE_TOP = 'top';
+export const DROP_ZONE_BOTTOM = 'bottom';
+export const DROP_ZONE_LEFT = 'left';
+export const DROP_ZONE_RIGHT = 'right';
+export const DROP_ZONE_CENTER = 'center';
+export type DropZone =
+  | typeof DROP_ZONE_TOP
+  | typeof DROP_ZONE_BOTTOM
+  | typeof DROP_ZONE_LEFT
+  | typeof DROP_ZONE_RIGHT
+  | typeof DROP_ZONE_CENTER;
 
 export interface PageEditorState {
   readonly appId: string;
@@ -14,7 +26,9 @@ export interface PageEditorState {
   readonly componentPanelTab: ComponentPanelTab;
   readonly newNode: appDom.ElementNode | null;
   readonly highlightLayout: boolean;
-  readonly highlightedSlot: SlotLocation | null;
+  readonly dragOverNodeId: NodeId | null;
+  readonly dragOverSlotParentProp: string | null;
+  readonly dragOverZone: DropZone | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
   readonly bindings: LiveBindings;
@@ -42,7 +56,11 @@ export type PageEditorAction =
     }
   | {
       type: 'PAGE_NODE_DRAG_OVER';
-      slot: SlotLocation | null;
+      dragOverState: {
+        nodeId: NodeId | null;
+        parentProp: string | null;
+        zone: DropZone | null;
+      };
     }
   | {
       type: 'PAGE_NODE_DRAG_END';
@@ -69,7 +87,9 @@ export function createPageEditorState(appId: string, nodeId: NodeId): PageEditor
     componentPanelTab: 'component',
     newNode: null,
     highlightLayout: false,
-    highlightedSlot: null,
+    dragOverNodeId: null,
+    dragOverSlotParentProp: null,
+    dragOverZone: null,
     viewState: { nodes: {} },
     pageState: {},
     bindings: {},
@@ -111,12 +131,16 @@ export function pageEditorReducer(
       return update(state, {
         newNode: null,
         highlightLayout: false,
-        highlightedSlot: null,
+        dragOverNodeId: null,
       });
     case 'PAGE_NODE_DRAG_OVER': {
+      const { nodeId, parentProp, zone } = action.dragOverState;
+
       return update(state, {
         highlightLayout: true,
-        highlightedSlot: action.slot ? updateOrCreate(state.highlightedSlot, action.slot) : null,
+        dragOverNodeId: nodeId,
+        dragOverSlotParentProp: parentProp,
+        dragOverZone: zone,
       });
     }
     case 'PAGE_VIEW_STATE_UPDATE': {
@@ -156,10 +180,18 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
     nodeDragEnd() {
       dispatch({ type: 'PAGE_NODE_DRAG_END' });
     },
-    nodeDragOver(slot: SlotLocation | null) {
+    nodeDragOver({
+      nodeId,
+      parentProp,
+      zone,
+    }: {
+      nodeId: NodeId | null;
+      parentProp: string | null;
+      zone: DropZone | null;
+    }) {
       dispatch({
         type: 'PAGE_NODE_DRAG_OVER',
-        slot,
+        dragOverState: { nodeId, parentProp, zone },
       });
     },
     pageViewStateUpdate(viewState: PageViewState) {

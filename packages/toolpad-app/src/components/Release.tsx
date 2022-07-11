@@ -1,31 +1,134 @@
-import { Button, Container, Toolbar, Typography, Box } from '@mui/material';
-import { DataGridPro, GridActionsCellItem, GridColumns, GridRowParams } from '@mui/x-data-grid-pro';
+import {
+  Button,
+  Container,
+  Toolbar,
+  Typography,
+  Paper,
+  Breadcrumbs,
+  Link as MuiLink,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+} from '@mui/material';
 import * as React from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import client from '../api';
-import * as appDom from '../appDom';
-import { NodeId } from '../types';
 import ToolpadAppShell from './ToolpadAppShell';
+import DefinitionList from './DefinitionList';
+import useLatest from '../utils/useLatest';
+import useDialog from '../utils/useDialog';
 
-interface NavigateToReleaseActionProps {
-  appId: string;
-  version?: number;
-  pageNodeId: NodeId;
+function getDeploymentStatusMessage(version: number, activeVersion?: number): React.ReactNode {
+  if (typeof activeVersion === 'undefined') {
+    return <Typography>App is not deployed</Typography>;
+  }
+
+  return version === activeVersion ? (
+    <Typography>This is the deployed release</Typography>
+  ) : (
+    <Typography>
+      <MuiLink component={Link} to={`../releases/${activeVersion}`}>
+        Version &quot;{activeVersion}&quot;
+      </MuiLink>{' '}
+      is currently deployed
+    </Typography>
+  );
 }
 
-function NavigateToReleaseAction({ appId, version, pageNodeId }: NavigateToReleaseActionProps) {
+interface ConfirmDeployDialogProps {
+  data?: {
+    version: number;
+  };
+  open: boolean;
+  onClose: (confirm: boolean) => void;
+}
+
+function ConfirmDeployDialog({ open, onClose, data: dataProp }: ConfirmDeployDialogProps) {
+  const cancel = () => onClose(false);
+
+  const data = useLatest(dataProp);
+
+  if (!data) {
+    return null;
+  }
+
   return (
-    <GridActionsCellItem
-      icon={<OpenInNewIcon />}
-      // @ts-expect-error https://github.com/mui/mui-x/issues/4654
-      component="a"
-      href={`/app/${appId}/${version}/pages/${pageNodeId}`}
-      target="_blank"
-      label="Open"
-      disabled={!version}
-    />
+    <Dialog open={open} onClose={cancel}>
+      <DialogTitle>Confirm deploy</DialogTitle>
+      <DialogContent>
+        Press &quot;Deploy&quot; to change the canonical url of your application to
+        version&nbsp;&quot;{data.version}&quot;.
+      </DialogContent>
+      <DialogActions>
+        <Button color="inherit" variant="text" onClick={cancel}>
+          Cancel
+        </Button>
+        <Button onClick={() => onClose(true)}>Deploy</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+interface ActiveReleaseMessageProps {
+  appId: string;
+  version: number;
+  activeVersion?: number;
+}
+
+function DeploymentStatus({ appId, activeVersion, version }: ActiveReleaseMessageProps) {
+  const msg: React.ReactNode = getDeploymentStatusMessage(version, activeVersion);
+  const isActiveDeployment = activeVersion === version;
+
+  const deployReleaseMutation = client.useMutation('createDeployment');
+
+  const { element, show: showConfirmDialog } = useDialog(ConfirmDeployDialog);
+
+  const handleDeployClick = React.useCallback(async () => {
+    const ok = await showConfirmDialog({ version });
+
+    if (!ok) {
+      return;
+    }
+
+    if (version) {
+      await deployReleaseMutation.mutateAsync([appId, version]);
+      client.invalidateQueries('findActiveDeployment', [appId]);
+    }
+  }, [appId, deployReleaseMutation, showConfirmDialog, version]);
+
+  const canDeploy = deployReleaseMutation.isIdle && !isActiveDeployment;
+  const isNewerVersion = version >= (activeVersion ?? -Infinity);
+
+  return (
+    <React.Fragment>
+      {msg}
+      <Toolbar disableGutters sx={{ gap: 1 }}>
+        <Button
+          variant={isActiveDeployment ? 'contained' : 'outlined'}
+          component="a"
+          href={`/deploy/${appId}`}
+          target="_blank"
+          endIcon={<OpenInNewIcon />}
+        >
+          Open
+        </Button>
+        <Button
+          variant={canDeploy ? 'contained' : 'outlined'}
+          color={isNewerVersion ? 'primary' : 'error'}
+          disabled={!canDeploy}
+          onClick={handleDeployClick}
+          startIcon={<RocketLaunchIcon />}
+        >
+          {isNewerVersion ? 'Deploy' : 'Rollback to'} version &quot;
+          {version}&quot;
+        </Button>
+      </Toolbar>
+      {element}
+    </React.Fragment>
   );
 }
 
@@ -39,69 +142,40 @@ export default function Release() {
 
   const releaseQuery = client.useQuery('getRelease', [appId, version]);
 
-  const {
-    data: dom,
-    isLoading,
-    error,
-  } = client.useQuery('loadReleaseDom', version ? [appId, version] : null);
-  const app = dom ? appDom.getApp(dom) : null;
-  const { pages = [] } = dom && app ? appDom.getChildNodes(dom, app) : {};
-
-  const deployReleaseMutation = client.useMutation('createDeployment');
   const activeDeploymentQuery = client.useQuery('findActiveDeployment', [appId]);
 
-  const columns: GridColumns = React.useMemo(
-    () => [
-      { field: 'name' },
-      { field: 'title', flex: 1 },
-      {
-        field: 'actions',
-        type: 'actions',
-        getActions: (params: GridRowParams) => [
-          <NavigateToReleaseAction appId={appId} version={version} pageNodeId={params.row.id} />,
-        ],
-      },
-    ],
-    [appId, version],
-  );
-
-  const handleDeployClick = React.useCallback(async () => {
-    if (version) {
-      await deployReleaseMutation.mutateAsync([appId, version]);
-      activeDeploymentQuery.refetch();
-    }
-  }, [appId, activeDeploymentQuery, deployReleaseMutation, version]);
-
-  const isActiveDeployment = activeDeploymentQuery.data?.release.version === version;
-
-  const canDeploy =
-    deployReleaseMutation.isIdle && activeDeploymentQuery.isSuccess && !isActiveDeployment;
+  const permaLink = String(new URL(`/app/${appId}/${version}`, window.location.href));
 
   return (
     <ToolpadAppShell appId={appId}>
-      <Container>
-        <Typography variant="h2">Release &quot;{version}&quot;</Typography>
-        <Box>{releaseQuery?.data?.description}</Box>
-        <Toolbar disableGutters>
-          <Button
-            disabled={!canDeploy}
-            onClick={handleDeployClick}
-            startIcon={<RocketLaunchIcon />}
-          >
-            Deploy
-          </Button>
-        </Toolbar>
-        <Typography>
-          {isActiveDeployment ? `Release "${version}" is currently deployed` : null}
-        </Typography>
-        <Box sx={{ my: 3, height: 350, width: '100%' }}>
-          <DataGridPro
-            rows={pages}
-            columns={columns}
-            loading={isLoading}
-            error={(error as any)?.message}
-          />
-        </Box>
+      <Container sx={{ my: 3 }}>
+        <Stack gap={3}>
+          <Breadcrumbs aria-label="breadcrumb">
+            <MuiLink component={Link} underline="hover" color="inherit" to="../releases">
+              Releases
+            </MuiLink>
+            <Typography color="text.primary">Version &quot;{version}&quot;</Typography>
+          </Breadcrumbs>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h5">Version &quot;{version}&quot;</Typography>
+
+            <DefinitionList>
+              <dt>Created:</dt>
+              <dd>{releaseQuery?.data?.createdAt.toLocaleString('short')}</dd>
+              <dt>Description:</dt>
+              <dd>{releaseQuery?.data?.description}</dd>
+              <dt>Permalink:</dt>
+              <dd>
+                <MuiLink href={permaLink}>{permaLink}</MuiLink>
+              </dd>
+            </DefinitionList>
+            <DeploymentStatus
+              appId={appId}
+              version={version}
+              activeVersion={activeDeploymentQuery.data?.release.version}
+            />
+          </Paper>
+        </Stack>
       </Container>
     </ToolpadAppShell>
   );

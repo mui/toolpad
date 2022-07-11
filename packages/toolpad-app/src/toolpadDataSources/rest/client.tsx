@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
 import {
+  Box,
   Button,
   Divider,
   InputAdornment,
@@ -90,65 +91,59 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   const headersAllowed = !!baseUrlValue;
 
   return (
-    <Stack direction="column" gap={1}>
+    <Stack direction="column" gap={3} sx={{ py: 3 }}>
+      <TextField
+        label="base url"
+        {...register('baseUrl', {
+          validate(input?: string) {
+            if (!input) {
+              if (mustHaveBaseUrl) {
+                return 'A base url is required when headers are used';
+              }
+              return true;
+            }
+            try {
+              return !!parseBaseUrl(input);
+            } catch (error) {
+              return 'Must be an absolute url';
+            }
+          },
+        })}
+        {...validation(formState, 'baseUrl')}
+      />
+      <Typography>Headers:</Typography>
+      <Controller
+        name="headers"
+        control={control}
+        render={({ field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field } }) => {
+          const allHeaders = [...authenticationHeaders, ...fieldValue];
+          return (
+            <MapEntriesEditor
+              {...field}
+              disabled={!headersAllowed}
+              fieldLabel="header"
+              value={allHeaders}
+              onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
+              isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
+            />
+          );
+        }}
+      />
+      <Typography>Authentication:</Typography>
+      <Controller
+        name="authentication"
+        control={control}
+        render={({ field: { value: fieldValue, ref, ...field } }) => (
+          <AuthenticationEditor {...field} disabled={!headersAllowed} value={fieldValue ?? null} />
+        )}
+      />
+
       <Toolbar disableGutters>
-        <Button onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+        <Box sx={{ flex: 1 }} />
+        <Button variant="contained" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
           Save
         </Button>
       </Toolbar>
-      <Stack gap={3}>
-        <TextField
-          label="base url"
-          {...register('baseUrl', {
-            validate(input?: string) {
-              if (!input) {
-                if (mustHaveBaseUrl) {
-                  return 'A base url is required when headers are used';
-                }
-                return true;
-              }
-              try {
-                return !!parseBaseUrl(input);
-              } catch (error) {
-                return 'Must be an absolute url';
-              }
-            },
-          })}
-          {...validation(formState, 'baseUrl')}
-        />
-        <Typography>Headers:</Typography>
-        <Controller
-          name="headers"
-          control={control}
-          render={({
-            field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field },
-          }) => {
-            const allHeaders = [...authenticationHeaders, ...fieldValue];
-            return (
-              <MapEntriesEditor
-                {...field}
-                disabled={!headersAllowed}
-                fieldLabel="header"
-                value={allHeaders}
-                onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
-                isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
-              />
-            );
-          }}
-        />
-        <Typography>Authentication:</Typography>
-        <Controller
-          name="authentication"
-          control={control}
-          render={({ field: { value: fieldValue, ref, ...field } }) => (
-            <AuthenticationEditor
-              {...field}
-              disabled={!headersAllowed}
-              value={fieldValue ?? null}
-            />
-          )}
-        />
-      </Stack>
     </Stack>
   );
 }

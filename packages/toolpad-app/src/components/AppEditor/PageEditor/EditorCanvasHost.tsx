@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box, CircularProgress, styled } from '@mui/material';
-import { NodeId } from '../../../types';
+import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
 import { HTML_ID_APP_ROOT } from '../../../constants';
 import { rectContainsPoint } from '../../../utils/geometry';

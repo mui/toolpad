@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { render, waitFor as waitForOrig, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LiveBindings } from '@mui/toolpad-core';
@@ -20,7 +20,6 @@ function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => app
     name: 'Page',
     attributes: {
       title: appDom.createConst(''),
-      urlQuery: appDom.createConst({}),
     },
   });
   dom = appDom.addNode(dom, page, root, 'pages');

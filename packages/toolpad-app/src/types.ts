@@ -7,9 +7,11 @@ import {
   ComponentConfig,
   BindableAttrValues,
   LiveBinding,
+  NodeId,
 } from '@mui/toolpad-core';
+
 import { PaletteMode } from '@mui/material';
-import type { Branded, Maybe, WithControlledProp } from './utils/types';
+import type { Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
 export interface EditorProps<T> {
@@ -25,8 +27,6 @@ export interface EditorProps<T> {
   onChange: (newValue: T) => void;
 }
 
-export type NodeId = Branded<string, 'NodeId'>;
-
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 
 export type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
@@ -37,12 +37,10 @@ export interface SlotLocation {
   parentIndex?: string;
 }
 
-export type SlotDirection = 'horizontal' | 'vertical';
-
 export interface SlotState {
   type: SlotType;
   rect: Rectangle;
-  direction: FlowDirection;
+  flowDirection: FlowDirection;
 }
 
 export interface SlotsState {

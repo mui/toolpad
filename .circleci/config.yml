@@ -22,7 +22,7 @@ commands:
       browsers:
         type: boolean
         default: true
-        description: 'Set to true if you intend to any browser (e.g. with playwright).'
+        description: 'Set to true if you intend to use any browser (e.g. with playwright).'
 
     steps:
       - run:
@@ -60,6 +60,10 @@ commands:
           command: yarn install --frozen-lockfile --verbose
           environment:
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: <<# parameters.browsers >>0<</ parameters.browsers >><<^ parameters.browsers >>1<</ parameters.browsers >>
+
+      - run:
+          name: Generate prisma client
+          command: yarn prisma generate
       - save_cache:
           name: Save yarn cache
           key: v8-yarn-{{ checksum "yarn.lock" }}
@@ -101,6 +105,18 @@ jobs:
       - run:
           name: Check for duplicated packages
           command: yarn deduplicate
+
+  test_lint:
+    <<: *defaults
+    steps:
+      - checkout
+      - install_js
+      - run:
+          name: Eslint
+          command: yarn eslint
+      - run:
+          name: Lint JSON
+          command: yarn jsonlint
 
   test_static:
     <<: *defaults
@@ -153,13 +169,13 @@ jobs:
           command: |
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
             TAG=$CIRCLE_SHA1 docker-compose -f ./docker/compose/docker-compose.yml up -d
-            yarn workspace @mui/toolpad-app waitForApp
+            yarn workspace @mui/toolpad-app waitForApp --url=http://172.17.0.1:3000/
             docker run -it --rm \
               --ipc=host \
               -v "$CIRCLE_WORKING_DIRECTORY:/tests" \
               -w /tests \
               -e PLAYWRIGHT_TEST_BASE_URL=http://172.17.0.1:3000/ \
-              mcr.microsoft.com/playwright:v1.22.0-focal \
+              mcr.microsoft.com/playwright:v1.23.1-focal \
               yarn e2e:smoke
             docker-compose -f ./docker/compose/docker-compose.yml down
 
@@ -178,6 +194,9 @@ workflows:
   pipeline:
     jobs:
       - checkout
+      - test_lint:
+          requires:
+            - checkout
       - test_static:
           requires:
             - checkout

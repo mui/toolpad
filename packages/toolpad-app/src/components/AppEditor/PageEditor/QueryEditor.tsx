@@ -16,15 +16,17 @@ import {
   Typography,
   Toolbar,
   MenuItem,
+  SxProps,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { LoadingButton } from '@mui/lab';
+import { NodeId } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { NodeId, QueryEditorModel } from '../../../types';
+import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import JsonView from '../../JsonView';
@@ -36,13 +38,14 @@ import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { mapValues } from '../../../utils/collections';
-import { QueryEditorContextProvider } from '../../../toolpadDataSources/context';
+import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
+  sx?: SxProps;
 }
 
-export function ConnectionSelect({ dataSource, value, onChange }: ConnectionSelectProps) {
+export function ConnectionSelect({ sx, dataSource, value, onChange }: ConnectionSelectProps) {
   const dom = useDom();
 
   const app = appDom.getApp(dom);
@@ -63,6 +66,7 @@ export function ConnectionSelect({ dataSource, value, onChange }: ConnectionSele
 
   return (
     <TextField
+      sx={sx}
       select
       fullWidth
       value={value || ''}
@@ -126,7 +130,7 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
     <Dialog open={open} onClose={onClose} scroll="body">
       <DialogTitle>Create Query</DialogTitle>
       <DialogContent>
-        <ConnectionSelect value={input} onChange={setInput} />
+        <ConnectionSelect sx={{ my: 1 }} value={input} onChange={setInput} />
       </DialogContent>
       <DialogActions>
         <Button color="inherit" variant="text" onClick={onClose}>
@@ -159,18 +163,22 @@ function QueryNodeEditorDialog<Q, P>({
   const dom = useDom();
 
   const [input, setInput] = React.useState(node);
-  React.useEffect(() => setInput(node), [node]);
+  React.useEffect(() => {
+    if (open) {
+      setInput(node);
+    }
+  }, [open, node]);
 
   const connectionId = input.attributes.connectionId.value;
   const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const handleConnectionChange = React.useCallback((newConnectionId) => {
+  const handleConnectionChange = React.useCallback((newConnectionId: NodeId | null) => {
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          connectionId: appDom.createConst(newConnectionId),
+          connectionId: newConnectionId ? appDom.createConst(newConnectionId) : undefined,
         }),
       }),
     );
@@ -283,6 +291,8 @@ function QueryNodeEditorDialog<Q, P>({
     { retry: false },
   );
 
+  const isPreviewLoading: boolean = !!previewQuery && queryPreview.isLoading;
+
   const handleUpdatePreview = React.useCallback(() => {
     setPreviewQuery(input);
     setPreviewParams(paramsObject);
@@ -325,7 +335,7 @@ function QueryNodeEditorDialog<Q, P>({
 
           <Divider />
           <Typography>Build query:</Typography>
-          <QueryEditorContextProvider value={queryEditorContext}>
+          <ConnectionContextProvider value={queryEditorContext}>
             <dataSource.QueryEditor
               connectionParams={connection?.attributes.params.value}
               value={{
@@ -336,7 +346,7 @@ function QueryNodeEditorDialog<Q, P>({
               onChange={handleQueryChange}
               globalScope={pageState}
             />
-          </QueryEditorContextProvider>
+          </ConnectionContextProvider>
           <Divider />
           <Typography>Options:</Typography>
           <Grid container direction="row" spacing={1}>
@@ -400,7 +410,7 @@ function QueryNodeEditorDialog<Q, P>({
             <LoadingButton
               sx={{ ml: 2 }}
               disabled={previewParams === paramsObject && previewQuery === input}
-              loading={queryPreview.isLoading}
+              loading={isPreviewLoading}
               loadingPosition="start"
               onClick={handleUpdatePreview}
               startIcon={<PlayArrowIcon />}
@@ -446,7 +456,7 @@ export default function QueryEditor() {
   }, []);
 
   const handleCreated = React.useCallback(
-    (node) => {
+    (node: appDom.QueryNode) => {
       domApi.addNode(node, page, 'queries');
       setDialogState({ nodeId: node.id });
     },
@@ -492,7 +502,6 @@ export default function QueryEditor() {
           );
         })}
       </List>
-      {/* eslint-disable-next-line no-nested-ternary */}
       {dialogState?.nodeId && lastEditednode ? (
         <QueryNodeEditorDialog
           open={!!dialogState}

@@ -1,21 +1,14 @@
 import * as React from 'react';
 import { Alert, Snackbar } from '@mui/material';
-import { BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
+import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import * as appDom from '../appDom';
-import { NodeId } from '../types';
 import { update } from '../utils/immutability';
 import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
+import { createProvidedContext } from '../utils/react';
 
 export type DomAction =
-  | {
-      type: 'DOM_LOADING';
-    }
-  | {
-      type: 'DOM_LOADED';
-      dom: appDom.AppDom;
-    }
   | {
       type: 'DOM_SAVING';
     }
@@ -23,7 +16,7 @@ export type DomAction =
       type: 'DOM_SAVED';
     }
   | {
-      type: 'DOM_LOADING_ERROR';
+      type: 'DOM_SAVING_ERROR';
       error: string;
     }
   | {
@@ -42,7 +35,7 @@ export type DomAction =
       type: 'DOM_SET_NODE_NAMESPACE';
       node: appDom.AppDomNode;
       namespace: string;
-      value: BindableAttrValues<unknown> | null;
+      value: BindableAttrValues | null;
     }
   | {
       type: 'DOM_ADD_NODE';
@@ -53,8 +46,8 @@ export type DomAction =
     }
   | {
       type: 'DOM_MOVE_NODE';
-      nodeId: NodeId;
-      parentId: NodeId;
+      node: appDom.AppDomNode;
+      parent: appDom.AppDomNode;
       parentProp: string;
       parentIndex?: string;
     }
@@ -96,10 +89,10 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
       );
     }
     case 'DOM_MOVE_NODE': {
-      return appDom.moveNode(
+      return appDom.moveNode<any, any>(
         dom,
-        action.nodeId,
-        action.parentId,
+        action.node,
+        action.parent,
         action.parentProp,
         action.parentIndex,
       );
@@ -127,38 +120,23 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
   }
 
   switch (action.type) {
-    case 'DOM_LOADING': {
-      return update(state, {
-        loading: true,
-        error: null,
-      });
-    }
-    case 'DOM_LOADED': {
-      return update(state, {
-        loading: false,
-        error: null,
-        dom: action.dom,
-        unsavedChanges: 0,
-      });
-    }
     case 'DOM_SAVING': {
       return update(state, {
         saving: true,
-        error: null,
+        saveError: null,
       });
     }
     case 'DOM_SAVED': {
       return update(state, {
         saving: false,
-        error: null,
+        saveError: null,
         unsavedChanges: 0,
       });
     }
-    case 'DOM_LOADING_ERROR': {
+    case 'DOM_SAVING_ERROR': {
       return update(state, {
-        loading: false,
         saving: false,
-        error: action.error,
+        saveError: action.error,
       });
     }
     default:
@@ -185,11 +163,16 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parentIndex,
       });
     },
-    moveNode(nodeId: NodeId, parentId: NodeId, parentProp: string, parentIndex?: string) {
+    moveNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(
+      node: Child,
+      parent: Parent,
+      parentProp: appDom.ParentPropOf<Child, Parent>,
+      parentIndex?: string,
+    ) {
       dispatch({
         type: 'DOM_MOVE_NODE',
-        nodeId,
-        parentId,
+        node,
+        parent,
         parentProp,
         parentIndex,
       });
@@ -233,35 +216,26 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         type: 'DOM_SET_NODE_NAMESPACE',
         namespace,
         node,
-        value: value as BindableAttrValues<unknown> | null,
+        value: value as BindableAttrValues | null,
       });
     },
   };
 }
 
 interface DomLoader {
-  dom: appDom.AppDom | null;
+  dom: appDom.AppDom;
   saving: boolean;
   unsavedChanges: number;
-  loading: boolean;
-  error: string | null;
+  saveError: string | null;
 }
 
-const DomLoaderContext = React.createContext<DomLoader>({
-  saving: false,
-  unsavedChanges: 0,
-  loading: false,
-  error: null,
-  dom: null,
-});
+const [useDomLoader, DomLoaderProvider] = createProvidedContext<DomLoader>('DomLoader');
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
 
 export type DomApi = ReturnType<typeof createDomApi>;
 
-export function useDomLoader(): DomLoader {
-  return React.useContext(DomLoaderContext);
-}
+export { useDomLoader };
 
 export function useDom(): appDom.AppDom {
   const { dom } = useDomLoader();
@@ -281,36 +255,19 @@ export interface DomContextProps {
 }
 
 export default function DomProvider({ appId, children }: DomContextProps) {
+  const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
+
+  if (!dom) {
+    throw new Error(`Invariant: suspense should load the dom`);
+  }
+
   const [state, dispatch] = React.useReducer(domLoaderReducer, {
-    loading: false,
     saving: false,
     unsavedChanges: 0,
-    error: null,
-    dom: null,
+    saveError: null,
+    dom,
   });
   const api = React.useMemo(() => createDomApi(dispatch), []);
-
-  React.useEffect(() => {
-    let canceled = false;
-
-    dispatch({ type: 'DOM_LOADING' });
-    client.query
-      .loadDom(appId)
-      .then((dom) => {
-        if (!canceled) {
-          dispatch({ type: 'DOM_LOADED', dom });
-        }
-      })
-      .catch((err) => {
-        if (!canceled) {
-          dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
-        }
-      });
-
-    return () => {
-      canceled = true;
-    };
-  }, [appId]);
 
   const lastSavedDom = React.useRef<appDom.AppDom | null>(null);
   const handleSave = React.useCallback(() => {
@@ -327,7 +284,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
         dispatch({ type: 'DOM_SAVED' });
       })
       .catch((err) => {
-        dispatch({ type: 'DOM_LOADING_ERROR', error: err.message });
+        dispatch({ type: 'DOM_SAVING_ERROR', error: err.message });
       });
   }, [appId, state.dom]);
 
@@ -354,13 +311,13 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
 
   return (
-    <DomLoaderContext.Provider value={state}>
+    <DomLoaderProvider value={state}>
       <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
-      <Snackbar open={!!state.error}>
+      <Snackbar open={!!state.saveError}>
         <Alert severity="error" sx={{ width: '100%' }}>
-          Failed to save: {state.error}
+          Failed to save: {state.saveError}
         </Alert>
       </Snackbar>
-    </DomLoaderContext.Provider>
+    </DomLoaderProvider>
   );
 }

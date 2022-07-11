@@ -16,7 +16,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
-import { NodeId } from '../../../types';
+import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
@@ -293,17 +293,10 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
           Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
         </DialogTitle>
         <DialogActions>
-          <Button
-            type="submit"
-            color="inherit"
-            variant="text"
-            onClick={handledeleteNodeDialogClose}
-          >
+          <Button color="inherit" variant="text" onClick={handledeleteNodeDialogClose}>
             Cancel
           </Button>
-          <Button type="submit" onClick={handleDeleteNode}>
-            Delete
-          </Button>
+          <Button onClick={handleDeleteNode}>Delete</Button>
         </DialogActions>
       </Dialog>
     </HierarchyExplorerRoot>

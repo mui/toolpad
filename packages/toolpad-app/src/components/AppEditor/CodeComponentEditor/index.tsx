@@ -1,14 +1,12 @@
 import * as React from 'react';
 import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import Editor from '@monaco-editor/react';
-import type * as monacoEditor from 'monaco-editor';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
-import ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
-import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
-import { NodeId } from '../../../types';
+import { NodeId, createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
+import { useQuery } from 'react-query';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { tryFormat } from '../../../utils/prettier';
@@ -20,6 +18,14 @@ import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
 import { mapValues } from '../../../utils/collections';
+import ErrorAlert from '../PageEditor/ErrorAlert';
+import lazyComponent from '../../../utils/lazyComponent';
+import CenteredSpinner from '../../CenteredSpinner';
+
+const TypescriptEditor = lazyComponent(() => import('../../TypescriptEditor'), {
+  noSsr: true,
+  fallback: <CenteredSpinner />,
+});
 
 const Noop = createComponent(() => null);
 
@@ -51,58 +57,58 @@ function FrameContent(props: FrameContentProps) {
   return <CacheProvider value={cache}>{children}</CacheProvider>;
 }
 
+const EXTRA_LIBS_HTTP_MODULES = [
+  {
+    content: `declare module "https://*";`,
+  },
+];
+
 interface CodeComponentEditorContentProps {
-  theme?: appDom.ThemeNode;
   codeComponentNode: appDom.CodeComponentNode;
 }
 
-function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentEditorContentProps) {
+function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorContentProps) {
   const domApi = useDomApi();
+  const dom = useDom();
+
+  const { data: typings } = useQuery<Record<string, string>>(['/typings.json'], async () => {
+    return fetch('/typings.json').then((res) => res.json());
+  });
+
+  const extraLibs = React.useMemo(() => {
+    if (typings) {
+      return [
+        ...Object.entries(typings).map(([path, content]) => ({
+          content,
+          filePath: `file:///${path}`,
+        })),
+        ...EXTRA_LIBS_HTTP_MODULES,
+      ];
+    }
+
+    return EXTRA_LIBS_HTTP_MODULES;
+  }, [typings]);
 
   const [input, setInput] = React.useState<string>(codeComponentNode.attributes.code.value);
+  React.useEffect(
+    () => setInput(codeComponentNode.attributes.code.value),
+    [codeComponentNode.attributes.code.value],
+  );
 
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
-  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor>();
-
   usePageTitle(`${codeComponentNode.name} | Toolpad editor`);
-
-  const updateInputExtern = React.useCallback((newInput) => {
-    const editor = editorRef.current;
-    if (!editor) {
-      return;
-    }
-
-    const model = editor.getModel();
-    if (!model) {
-      return;
-    }
-
-    // Used to restore cursor position
-    const state = editorRef.current?.saveViewState();
-
-    editor.executeEdits(null, [
-      {
-        range: model.getFullModelRange(),
-        text: newInput,
-      },
-    ]);
-
-    if (state) {
-      editorRef.current?.restoreViewState(state);
-    }
-  }, []);
 
   const handleSave = React.useCallback(() => {
     const pretty = tryFormat(input);
-    updateInputExtern(pretty);
+    setInput(pretty);
     domApi.setNodeNamespacedProp(
       codeComponentNode,
       'attributes',
       'code',
       appDom.createConst(pretty),
     );
-  }, [codeComponentNode, domApi, input, updateInputExtern]);
+  }, [codeComponentNode, domApi, input]);
 
   const allChangesAreCommitted = codeComponentNode.attributes.code.value === input;
 
@@ -112,52 +118,6 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
   );
 
   useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
-
-  const HandleEditorMount = React.useCallback(
-    (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
-      editorRef.current = editor;
-
-      editor.updateOptions({
-        minimap: { enabled: false },
-        accessibilitySupport: 'off',
-      });
-
-      monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-        target: monaco.languages.typescript.ScriptTarget.Latest,
-        allowNonTsExtensions: true,
-        moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-        module: monaco.languages.typescript.ModuleKind.CommonJS,
-        noEmit: true,
-        esModuleInterop: true,
-        jsx: monaco.languages.typescript.JsxEmit.React,
-        reactNamespace: 'React',
-        allowJs: true,
-        typeRoots: ['node_modules/@types'],
-      });
-
-      monaco.languages.typescript.typescriptDefaults.addExtraLib(`declare module "https://*";`);
-
-      monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-        noSemanticValidation: false,
-        noSyntaxValidation: false,
-      });
-
-      fetch('/typings.json')
-        .then((res) => res.json())
-        .then((typings) => {
-          Array.from(Object.entries(typings)).forEach(([path, content]) => {
-            monaco.languages.typescript.typescriptDefaults.addExtraLib(
-              content as string,
-              `file:///${path}`,
-            );
-          });
-        })
-        .catch((err) =>
-          console.error(`Failed to initialize typescript types on editor: ${err.message}`),
-        );
-    },
-    [],
-  );
 
   const [iframeLoaded, onLoad] = React.useReducer(() => true, false);
 
@@ -200,13 +160,10 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
         </Toolbar>
         <Box flex={1} display="flex">
           <Box flex={1}>
-            <Editor
-              height="100%"
-              defaultValue={input}
+            <TypescriptEditor
+              value={input}
               onChange={(newValue) => setInput(newValue || '')}
-              path="./component.tsx"
-              language="typescript"
-              onMount={HandleEditorMount}
+              extraLibs={extraLibs}
             />
           </Box>
           <Box sx={{ flex: 1, position: 'relative' }}>
@@ -220,15 +177,13 @@ function CodeComponentEditorContent({ theme, codeComponentNode }: CodeComponentE
               <React.Suspense fallback={null}>
                 <ErrorBoundary
                   resetKeys={[CodeComponent]}
-                  fallbackRender={({ error: runtimeError }) => (
-                    <React.Fragment>{runtimeError.message}</React.Fragment>
-                  )}
+                  fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
-                  <AppThemeProvider node={theme}>
+                  <AppThemeProvider dom={dom}>
                     <CodeComponent {...defaultProps} />
                   </AppThemeProvider>
                 </ErrorBoundary>
-                {compileError?.message}
+                {compileError ? <ErrorAlert error={compileError} /> : null}
               </React.Suspense>
             </FrameContent>,
             frameDocument.body,
@@ -247,14 +202,8 @@ export default function CodeComponentEditor({ appId }: CodeComponentEditorProps)
   const dom = useDom();
   const { nodeId } = useParams();
   const codeComponentNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'codeComponent');
-  const root = appDom.getApp(dom);
-  const { themes = [] } = appDom.getChildNodes(dom, root);
   return codeComponentNode ? (
-    <CodeComponentEditorContent
-      key={nodeId}
-      codeComponentNode={codeComponentNode}
-      theme={themes[0]}
-    />
+    <CodeComponentEditorContent key={nodeId} codeComponentNode={codeComponentNode} />
   ) : (
     <Typography sx={{ p: 4 }}>Non-existing Code Component &quot;{nodeId}&quot;</Typography>
   );

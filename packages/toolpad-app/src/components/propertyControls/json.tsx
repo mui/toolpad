@@ -1,10 +1,22 @@
-import type * as monacoEditor from 'monaco-editor';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Skeleton,
+} from '@mui/material';
 import * as React from 'react';
-import Editor from '@monaco-editor/react';
 import * as JSON5 from 'json5';
 import type { EditorProps } from '../../types';
 import useShortcut from '../../utils/useShortcut';
+import lazyComponent from '../../utils/lazyComponent';
+
+const JsonEditor = lazyComponent(() => import('../JsonEditor'), {
+  noSsr: true,
+  fallback: <Skeleton variant="rectangular" height="100%" />,
+});
 
 function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorProps<any>) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -33,51 +45,9 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
   const schemaUri =
     argType.typeDef.type === 'object' || argType.typeDef.type === 'array'
       ? argType.typeDef.schema
-      : null;
+      : undefined;
 
-  const HandleEditorMount = React.useCallback(
-    (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
-      editor.updateOptions({
-        minimap: { enabled: false },
-        accessibilitySupport: 'off',
-      });
-
-      monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
-        validate: true,
-        schemaRequest: 'error',
-        enableSchemaRequest: true,
-        schemas: schemaUri
-          ? [
-              {
-                uri: new URL(schemaUri, window.location.href).href,
-                fileMatch: ['*'],
-              },
-            ]
-          : [],
-      });
-
-      monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-        target: monaco.languages.typescript.ScriptTarget.Latest,
-        allowNonTsExtensions: true,
-        moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-        module: monaco.languages.typescript.ModuleKind.CommonJS,
-        noEmit: true,
-        esModuleInterop: true,
-        jsx: monaco.languages.typescript.JsxEmit.React,
-        reactNamespace: 'React',
-        allowJs: true,
-        typeRoots: ['node_modules/@types'],
-      });
-
-      monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-        noSemanticValidation: false,
-        noSyntaxValidation: false,
-      });
-    },
-    [schemaUri],
-  );
-
-  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
+  useShortcut({ code: 'KeyS', metaKey: true, disabled: !dialogOpen }, handleSave);
 
   return (
     <React.Fragment>
@@ -87,14 +57,14 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
       <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit JSON</DialogTitle>
         <DialogContent>
-          <Editor
-            height="200px"
-            value={input}
-            onChange={(newValue = '') => setInput(newValue)}
-            language="json"
-            options={{ readOnly: disabled }}
-            onMount={HandleEditorMount}
-          />
+          <Box sx={{ height: 200 }}>
+            <JsonEditor
+              value={input}
+              onChange={(newValue = '') => setInput(newValue)}
+              schemaUri={schemaUri}
+              disabled={disabled}
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>

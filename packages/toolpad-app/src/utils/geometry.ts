@@ -129,3 +129,36 @@ export function getRelativeOuterRect(containerElm: Element, childElm: Element): 
 export function rectContainsPoint(rect: Rectangle, x: number, y: number): boolean {
   return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
 }
+
+export const RECTANGLE_EDGE_TOP = 'top';
+export const RECTANGLE_EDGE_BOTTOM = 'bottom';
+export const RECTANGLE_EDGE_LEFT = 'left';
+export const RECTANGLE_EDGE_RIGHT = 'right';
+export type RectangleEdge =
+  | typeof RECTANGLE_EDGE_TOP
+  | typeof RECTANGLE_EDGE_BOTTOM
+  | typeof RECTANGLE_EDGE_LEFT
+  | typeof RECTANGLE_EDGE_RIGHT;
+
+export function getRectanglePointEdge(rect: Rectangle, x: number, y: number): RectangleEdge | null {
+  const { height: rectHeight, width: rectWidth } = rect;
+
+  // Out of bounds
+  if (x < 0 || x > rectWidth || y < 0 || y > rectHeight) {
+    return null;
+  }
+
+  const isOverFirstDiagonal = y < (rectHeight / rectWidth) * x;
+  const isOverSecondDiagonal = y < -1 * (rectHeight / rectWidth) * x + rectHeight;
+
+  if (isOverFirstDiagonal && isOverSecondDiagonal) {
+    return RECTANGLE_EDGE_TOP;
+  }
+  if (isOverFirstDiagonal) {
+    return RECTANGLE_EDGE_RIGHT;
+  }
+  if (isOverSecondDiagonal) {
+    return RECTANGLE_EDGE_LEFT;
+  }
+  return RECTANGLE_EDGE_BOTTOM;
+}

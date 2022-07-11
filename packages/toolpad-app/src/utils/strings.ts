@@ -61,19 +61,19 @@ export function isAbsoluteUrl(maybeUrl: string) {
   }
 }
 
-export function removeLeading(input: string, prefix: string): string {
+export function removePrefix(input: string, prefix: string): string {
   return input.startsWith(prefix) ? input.slice(prefix.length) : input;
 }
 
-export function removeTrailing(input: string, suffix: string): string {
+export function removeSuffix(input: string, suffix: string): string {
   return input.endsWith(suffix) ? input.slice(0, input.length - suffix.length) : input;
 }
 
-export function ensureStartsWith(input: string, prefix: string): string {
+export function ensurePrefix(input: string, prefix: string): string {
   return input.startsWith(prefix) ? input : prefix + input;
 }
 
-export function ensureEndsWith(input: string, suffix: string): string {
+export function ensureSuffix(input: string, suffix: string): string {
   return input.endsWith(suffix) ? input : input + suffix;
 }
 

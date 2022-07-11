@@ -4,6 +4,7 @@ import superjson from 'superjson';
 import {
   getApps,
   getApp,
+  getActiveDeployments,
   createApp,
   updateApp,
   execQuery,
@@ -13,7 +14,6 @@ import {
   createRelease,
   getReleases,
   getRelease,
-  loadReleaseDom,
   createDeployment,
   findActiveDeployment,
   findLastRelease,
@@ -114,6 +114,9 @@ const rpcServer = {
     getApps: createMethod<typeof getApps>((params) => {
       return getApps(...params);
     }),
+    getActiveDeployments: createMethod<typeof getActiveDeployments>((params) => {
+      return getActiveDeployments(...params);
+    }),
     getApp: createMethod<typeof getApp>((params) => {
       return getApp(...params);
     }),
@@ -128,9 +131,6 @@ const rpcServer = {
     }),
     findActiveDeployment: createMethod<typeof findActiveDeployment>((params) => {
       return findActiveDeployment(...params);
-    }),
-    loadReleaseDom: createMethod<typeof loadReleaseDom>((params) => {
-      return loadReleaseDom(...params);
     }),
     loadDom: createMethod<typeof loadDom>((params) => {
       return loadDom(...params);

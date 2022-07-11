@@ -28,15 +28,13 @@ export default function JsonView({ src, sx }: JsonViewProps) {
   // TODO: elaborate on this to show a nice default, but avoid expanding massive amount of objects
   const expandPaths = Array.isArray(src) ? ['$', '$.0', '$.1', '$.2', '$.3', '$.4'] : undefined;
   return (
-    <div>
-      <JsonViewRoot sx={sx}>
-        <ObjectInspector
-          nodeRenderer={nodeRenderer}
-          expandLevel={1}
-          expandPaths={expandPaths}
-          data={src}
-        />
-      </JsonViewRoot>
-    </div>
+    <JsonViewRoot sx={sx}>
+      <ObjectInspector
+        nodeRenderer={nodeRenderer}
+        expandLevel={1}
+        expandPaths={expandPaths}
+        data={src}
+      />
+    </JsonViewRoot>
   );
 }

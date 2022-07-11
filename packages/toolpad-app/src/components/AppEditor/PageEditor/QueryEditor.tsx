@@ -321,7 +321,7 @@ function QueryNodeEditorDialog<Q, P>({
       <DialogTitle>Edit Query ({node.id})</DialogTitle>
       {dataSourceId && dataSource ? (
         <DialogContent>
-          <Stack spacing={1} py={1} gap={2}>
+          <Stack spacing={2} py={1}>
             <Stack direction="row" gap={2}>
               <NodeNameEditor node={node} />
               <ConnectionSelect
@@ -405,7 +405,6 @@ function QueryNodeEditorDialog<Q, P>({
             <Divider />
             <Toolbar disableGutters>
               <LoadingButton
-                sx={{ ml: 2 }}
                 size="medium"
                 disabled={previewParams === paramsObject && previewQuery === input}
                 loading={isPreviewLoading}

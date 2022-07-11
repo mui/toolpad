@@ -417,7 +417,7 @@ function QueryNodeEditorDialog<Q, P>({
               </LoadingButton>
             </Toolbar>
             {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
-            {queryPreview.isSuccess ? <JsonView sx={{ ml: 2 }} src={queryPreview.data} /> : null}
+            {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
           </Stack>
         </DialogContent>
       ) : (

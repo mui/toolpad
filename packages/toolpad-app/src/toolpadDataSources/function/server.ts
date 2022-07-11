@@ -14,6 +14,27 @@ export async function execIsolatedVm(
   const jail = context.global;
   jail.setSync('global', jail.derefInto());
 
+  const logs: { level: string; args: any[] }[] = [];
+
+  await context.evalClosure(
+    `
+      global.console = {
+        log: (...args) => {
+          $0.apply(null, ['log', JSON.stringify(args)], { arguments: { copy: true }});
+        }
+      }
+    `,
+    [
+      (level: string, serializedArgs: string) => {
+        logs.push({
+          level,
+          args: JSON.parse(serializedArgs),
+        });
+      },
+    ],
+    { arguments: { reference: true } },
+  );
+
   await context.evalClosure(
     `
       const INTERNALS = Symbol('Fetch internals');
@@ -78,6 +99,7 @@ export async function execIsolatedVm(
     result: { copy: true, promise: true },
   });
 
+  console.log(logs);
   return { data };
 }
 

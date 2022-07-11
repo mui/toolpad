@@ -212,41 +212,6 @@ const EmptySlot = styled('div')({
   opacity: 0.75,
 });
 
-const DRAGGABLE_EDGE_MARGIN = 16; // px
-
-const DraggableEdge = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'edge',
-})<{
-  edge: RectangleEdge;
-}>(({ edge }) => {
-  let dynamicStyles = {};
-  if (edge === RECTANGLE_EDGE_RIGHT) {
-    dynamicStyles = {
-      cursor: 'ew-resize',
-      top: -1,
-      right: -DRAGGABLE_EDGE_MARGIN / 2,
-      height: 'calc(100% + 2px)',
-      width: DRAGGABLE_EDGE_MARGIN,
-    };
-  }
-  if (edge === RECTANGLE_EDGE_LEFT) {
-    dynamicStyles = {
-      cursor: 'ew-resize',
-      top: -1,
-      left: -DRAGGABLE_EDGE_MARGIN / 2,
-      height: 'calc(100% + 2px)',
-      width: DRAGGABLE_EDGE_MARGIN,
-    };
-  }
-
-  return {
-    ...dynamicStyles,
-    position: 'absolute',
-    pointerEvents: 'initial',
-    zIndex: 1,
-  };
-});
-
 function hasFreeNodeSlots(nodeInfo: NodeInfo): boolean {
   return Object.keys(nodeInfo.slots || []).length > 0;
 }
@@ -346,25 +311,11 @@ interface NodeHudProps {
   rect: Rectangle;
   selected?: boolean;
   allowInteraction?: boolean;
-  onNodeDragStart?: React.DragEventHandler<HTMLElement>;
-  draggableEdges?: RectangleEdge[];
-  onEdgeDragStart: (
-    node: appDom.ElementNode | appDom.PageNode,
-    edge: RectangleEdge,
-  ) => React.DragEventHandler<HTMLElement>;
+  onDragStart?: React.DragEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLElement>;
 }
 
-function NodeHud({
-  node,
-  selected,
-  allowInteraction,
-  rect,
-  onNodeDragStart,
-  draggableEdges = [],
-  onEdgeDragStart,
-  onDelete,
-}: NodeHudProps) {
+function NodeHud({ node, selected, allowInteraction, rect, onDragStart, onDelete }: NodeHudProps) {
   const dom = useDom();
 
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
@@ -389,7 +340,7 @@ function NodeHud({
         [overlayClasses.allowNodeInteraction]: allowInteraction,
       })}
       draggable
-      onDragStart={onNodeDragStart}
+      onDragStart={onDragStart}
     >
       {selected ? (
         <React.Fragment>
@@ -532,7 +483,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [],
   );
 
-  const [draggedNodeId, setDraggedNodeId] = React.useState<NodeId | null>(null);
   const [draggedEdge, setDraggedEdge] = React.useState<RectangleEdge | null>(null);
 
   const handleNodeDragStart = React.useCallback(
@@ -939,7 +889,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     },
     [
       getViewCoordinates,
-      getCurrentlyDraggedNode,
       dropAreaRects,
       pageNode.id,
       dom,
@@ -1665,7 +1614,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     rect={nodeRect}
                     selected={selectedNode?.id === node.id}
                     allowInteraction={nodesWithInteraction.has(node.id)}
-                    onNodeDragStart={handleNodeDragStart}
+                    onDragStart={handleNodeDragStart}
                     draggableEdges={
                       isPageRowChild ? [RECTANGLE_EDGE_LEFT, RECTANGLE_EDGE_RIGHT] : []
                     }

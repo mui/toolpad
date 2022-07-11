@@ -17,6 +17,7 @@ import {
   Toolbar,
   MenuItem,
   SxProps,
+  Alert,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -313,115 +314,117 @@ function QueryNodeEditorDialog<Q, P>({
     }
   }, [onClose, isInputSaved]);
 
-  if (!dataSourceId || !dataSource) {
-    throw new Error(`DataSource "${dataSourceId}" not found`);
-  }
-
   const queryEditorContext = React.useMemo(() => ({ appId, connectionId }), [appId, connectionId]);
 
   return (
     <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose} scroll="body">
       <DialogTitle>Edit Query ({node.id})</DialogTitle>
-      <DialogContent>
-        <Stack spacing={1} py={1} gap={2}>
-          <Stack direction="row" gap={2}>
-            <NodeNameEditor node={node} />
-            <ConnectionSelect
-              dataSource={dataSourceId}
-              value={input.attributes.connectionId.value || null}
-              onChange={handleConnectionChange}
-            />
+      {dataSourceId && dataSource ? (
+        <DialogContent>
+          <Stack spacing={1} py={1} gap={2}>
+            <Stack direction="row" gap={2}>
+              <NodeNameEditor node={node} />
+              <ConnectionSelect
+                dataSource={dataSourceId}
+                value={input.attributes.connectionId.value || null}
+                onChange={handleConnectionChange}
+              />
+            </Stack>
+
+            <Divider />
+            <Typography>Build query:</Typography>
+            <ConnectionContextProvider value={queryEditorContext}>
+              <dataSource.QueryEditor
+                connectionParams={connection?.attributes.params.value}
+                value={{
+                  query: input.attributes.query.value,
+                  params: input.params,
+                }}
+                liveParams={liveParams}
+                onChange={handleQueryChange}
+                globalScope={pageState}
+              />
+            </ConnectionContextProvider>
+            <Divider />
+            <Typography>Options:</Typography>
+            <Grid container direction="row" spacing={1}>
+              <Grid item xs={4}>
+                <Stack direction="column" gap={1}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={input.attributes.refetchOnWindowFocus?.value ?? true}
+                        onChange={handleRefetchOnWindowFocusChange}
+                      />
+                    }
+                    label="Refetch on window focus"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={input.attributes.refetchOnReconnect?.value ?? true}
+                        onChange={handleRefetchOnReconnectChange}
+                      />
+                    }
+                    label="Refetch on network reconnect"
+                  />
+                  <TextField
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">s</InputAdornment>,
+                    }}
+                    sx={{ maxWidth: 300 }}
+                    type="number"
+                    label="Refetch interval"
+                    value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
+                    onChange={handleRefetchIntervalChange}
+                  />
+                </Stack>
+              </Grid>
+              <Grid item xs={6}>
+                <Stack>
+                  <FormControlLabel
+                    label="Transform response"
+                    control={
+                      <Checkbox
+                        checked={input.attributes.transformEnabled?.value ?? false}
+                        onChange={handleTransformEnabledChange}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                      />
+                    }
+                  />
+
+                  <JsExpressionEditor
+                    globalScope={{}}
+                    value={input.attributes.transform?.value ?? '(data) => {\n  return data;\n}'}
+                    onChange={handleTransformFnChange}
+                    disabled={!input.attributes.transformEnabled?.value}
+                  />
+                </Stack>
+              </Grid>
+            </Grid>
+            <Divider />
+            <Toolbar disableGutters>
+              preview
+              <LoadingButton
+                sx={{ ml: 2 }}
+                disabled={previewParams === paramsObject && previewQuery === input}
+                loading={isPreviewLoading}
+                loadingPosition="start"
+                onClick={handleUpdatePreview}
+                startIcon={<PlayArrowIcon />}
+              >
+                Run
+              </LoadingButton>
+            </Toolbar>
+            {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
+            {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
           </Stack>
-
-          <Divider />
-          <Typography>Build query:</Typography>
-          <ConnectionContextProvider value={queryEditorContext}>
-            <dataSource.QueryEditor
-              connectionParams={connection?.attributes.params.value}
-              value={{
-                query: input.attributes.query.value,
-                params: input.params,
-              }}
-              liveParams={liveParams}
-              onChange={handleQueryChange}
-              globalScope={pageState}
-            />
-          </ConnectionContextProvider>
-          <Divider />
-          <Typography>Options:</Typography>
-          <Grid container direction="row" spacing={1}>
-            <Grid item xs={4}>
-              <Stack direction="column" gap={1}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={input.attributes.refetchOnWindowFocus?.value ?? true}
-                      onChange={handleRefetchOnWindowFocusChange}
-                    />
-                  }
-                  label="Refetch on window focus"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={input.attributes.refetchOnReconnect?.value ?? true}
-                      onChange={handleRefetchOnReconnectChange}
-                    />
-                  }
-                  label="Refetch on network reconnect"
-                />
-                <TextField
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">s</InputAdornment>,
-                  }}
-                  sx={{ maxWidth: 300 }}
-                  type="number"
-                  label="Refetch interval"
-                  value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
-                  onChange={handleRefetchIntervalChange}
-                />
-              </Stack>
-            </Grid>
-            <Grid item xs={6}>
-              <Stack>
-                <FormControlLabel
-                  label="Transform response"
-                  control={
-                    <Checkbox
-                      checked={input.attributes.transformEnabled?.value ?? false}
-                      onChange={handleTransformEnabledChange}
-                      inputProps={{ 'aria-label': 'controlled' }}
-                    />
-                  }
-                />
-
-                <JsExpressionEditor
-                  globalScope={{}}
-                  value={input.attributes.transform?.value ?? '(data) => {\n  return data;\n}'}
-                  onChange={handleTransformFnChange}
-                  disabled={!input.attributes.transformEnabled?.value}
-                />
-              </Stack>
-            </Grid>
-          </Grid>
-          <Divider />
-          <Toolbar disableGutters>
-            preview
-            <LoadingButton
-              sx={{ ml: 2 }}
-              disabled={previewParams === paramsObject && previewQuery === input}
-              loading={isPreviewLoading}
-              loadingPosition="start"
-              onClick={handleUpdatePreview}
-              startIcon={<PlayArrowIcon />}
-            >
-              Run
-            </LoadingButton>
-          </Toolbar>
-          {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
-          {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
-        </Stack>
-      </DialogContent>
+        </DialogContent>
+      ) : (
+        <DialogContent>
+          <Alert severity="error">DataSource &quot;{dataSourceId}&quot; not found</Alert>
+        </DialogContent>
+      )}
       <DialogActions>
         <Button color="inherit" variant="text" onClick={handleClose}>
           Cancel

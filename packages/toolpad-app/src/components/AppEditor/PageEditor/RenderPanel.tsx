@@ -860,7 +860,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         });
       }
     },
-    [availableDropTargets, nodesInfo, api],
+    [availableDropTargetIds, nodesInfo, api],
   );
 
   const getNodeSlotFirstChild = React.useCallback(
@@ -1290,7 +1290,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.select(newNode.id);
       }
     },
-    [api, newNode, selection, getCurrentlyDraggedNode, newNode, nodesInfo, selection],
+    [
+      api,
+      newNode,
+      selection,
+      getCurrentlyDraggedNode,
+      availableDropZones,
+      newNode,
+      nodesInfo,
+      selection,
+    ],
   );
 
   const handleDragEnd = React.useCallback(
@@ -1331,7 +1340,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.select(null);
       }
     },
-    [pageNodes, nodesInfo, dom, api],
+    [pageNodes, selectionRects, nodesInfo, dom, api],
   );
 
   const handleDelete = React.useCallback(

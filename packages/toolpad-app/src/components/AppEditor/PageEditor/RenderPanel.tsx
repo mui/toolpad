@@ -1,10 +1,8 @@
 import * as React from 'react';
 import clsx from 'clsx';
-import throttle from 'lodash-es/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
-import { setEventHandler } from '@mui/toolpad-core/runtime';
 import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
 import { useNavigate } from 'react-router-dom';
 import { FlowDirection, NodeInfo, SlotsState, SlotState } from '../../../types';
@@ -459,10 +457,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const isEmptyPage = pageNodes.length <= 1;
 
   const selectedNode = selection && appDom.getNode(dom, selection);
-
-  // We will use this key to remount the overlay after page load
-  const [overlayKey, setOverlayKey] = React.useState(1);
-  const editorWindowRef = React.useRef<Window>();
 
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
@@ -1374,11 +1368,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     );
   }, [dom, selectedNode]);
 
-  const handleLoad = React.useCallback((frameWindow: Window) => {
-    editorWindowRef.current = frameWindow;
-    setOverlayKey((key) => key + 1);
-  }, []);
-
   const handlePageViewStateUpdate = React.useCallback(() => {
     const rootElm = canvasHostRef.current?.getRootElm();
 
@@ -1388,8 +1377,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
     api.pageViewStateUpdate(getPageViewState(rootElm));
   }, [api]);
-
-  const [rootElm, setRootElm] = React.useState<HTMLElement | null>();
 
   const navigate = useNavigate();
 
@@ -1422,7 +1409,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'afterRender': {
-          setRootElm(canvasHostRef.current?.getRootElm());
           return;
         }
         case 'pageNavigationRequest': {
@@ -1438,55 +1424,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [dom, domApi, api, navigate],
   );
 
-  const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);
-  React.useLayoutEffect(() => {
-    handleRuntimeEventRef.current = handleRuntimeEvent;
-  }, [handleRuntimeEvent]);
-
-  React.useEffect(() => {
-    if (editorWindowRef.current) {
-      const editorWindow = editorWindowRef.current;
-
-      const cleanupHandler = setEventHandler(editorWindow, (event) =>
-        handleRuntimeEventRef.current(event),
-      );
-
-      return cleanupHandler;
-    }
-    return () => {};
-  }, [overlayKey]);
-
-  React.useEffect(() => {
-    if (!rootElm) {
-      return () => {};
-    }
-
-    handlePageViewStateUpdate();
-    const handlePageUpdateThrottled = throttle(handlePageViewStateUpdate, 250, {
-      trailing: true,
-    });
-
-    const mutationObserver = new MutationObserver(handlePageUpdateThrottled);
-
-    mutationObserver.observe(rootElm, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
-
-    const resizeObserver = new ResizeObserver(handlePageUpdateThrottled);
-
-    resizeObserver.observe(rootElm);
-    rootElm.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
-
-    return () => {
-      handlePageUpdateThrottled.cancel();
-      mutationObserver.disconnect();
-      resizeObserver.disconnect();
-    };
-  }, [overlayKey, handlePageViewStateUpdate, rootElm]);
-
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
@@ -1496,7 +1433,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         className={classes.view}
         dom={dom}
         pageNodeId={pageNodeId}
-        onLoad={handleLoad}
+        onRuntimeEvent={handleRuntimeEvent}
+        onScreenUpdate={handlePageViewStateUpdate}
         overlay={
           <OverlayRoot
             className={clsx({

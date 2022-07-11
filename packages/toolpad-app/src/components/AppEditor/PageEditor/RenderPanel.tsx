@@ -860,7 +860,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         });
       }
     },
-    [availableDropTargetIds, nodesInfo, api],
+    [
+      dropAreaRects,
+      pageNode.id,
+      dom,
+      nodesInfo,
+      dragOverNodeId,
+      dragOverSlotParentProp,
+      dragOverZone,
+      availableDropTargetIds,
+      isEmptyPage,
+      api,
+    ],
   );
 
   const getNodeSlotFirstChild = React.useCallback(
@@ -1292,10 +1303,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     },
     [
       api,
-      newNode,
-      selection,
-      getCurrentlyDraggedNode,
       availableDropZones,
+      deleteOrphanedLayoutComponents,
+      dom,
+      domApi,
+      dragOverNodeId,
+      dragOverSlotParentProp,
+      dragOverZone,
+      getCurrentlyDraggedNode,
       newNode,
       nodesInfo,
       selection,
@@ -1340,7 +1355,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.select(null);
       }
     },
-    [pageNodes, selectionRects, nodesInfo, dom, api],
+    [selectionRects, dom, api],
   );
 
   const handleDelete = React.useCallback(

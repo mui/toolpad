@@ -24,7 +24,7 @@ import {
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import Autorenew from '@mui/icons-material/Autorenew';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { LoadingButton } from '@mui/lab';
 import { NodeId } from '@mui/toolpad-core';
 import useLatest from '../../../utils/useLatest';
@@ -459,7 +459,7 @@ function QueryNodeEditorDialog<Q, P>({
                       onClick={handleRawQueryPreviewRefresh}
                       sx={{ alignSelf: 'self-start' }}
                     >
-                      <Autorenew
+                      <AutorenewIcon
                         sx={{
                           animation: 'spin 1500ms linear infinite',
                           animationPlayState: rawQueryPreview.isRefetching ? 'running' : 'paused',

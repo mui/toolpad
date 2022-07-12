@@ -21,7 +21,6 @@ function PageRow({ layoutColumnSizes = [], gap, children }: PageRowProps) {
         display: 'grid',
         gridAutoFlow: 'column',
         gridAutoColumns,
-        overflow: 'hidden',
       }}
     >
       {children}

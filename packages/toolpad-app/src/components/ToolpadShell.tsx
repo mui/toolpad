@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled, AppBar, Toolbar, IconButton, Typography, Box } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import HomeIcon from '@mui/icons-material/Home';
 
 export interface ToolpadShellProps {
   navigation?: React.ReactNode;
@@ -44,7 +44,7 @@ function Header({ actions, navigation }: HeaderProps) {
           component="a"
           href={`/`}
         >
-          <MenuIcon fontSize="medium" />
+          <HomeIcon fontSize="medium" />
         </IconButton>
         <Typography
           data-test-id="brand"

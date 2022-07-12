@@ -59,11 +59,14 @@ export interface NavigateToPage {
   (pageNodeId: NodeId): void;
 }
 
-export interface EditorHooks {
+/**
+ * Context created by the app canvas to override behavior for the app editor
+ */
+export interface CanvasHooks {
   navigateToPage?: NavigateToPage;
 }
 
-export const EditorHooksContext = React.createContext<EditorHooks>({});
+export const CanvasHooksContext = React.createContext<CanvasHooks>({});
 
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
@@ -74,8 +77,8 @@ function usePageNavigator(): NavigateToPage {
     [navigate],
   );
 
-  const editorHooks = React.useContext(EditorHooksContext);
-  return editorHooks.navigateToPage || navigateToPage;
+  const canvasHooks = React.useContext(CanvasHooksContext);
+  return canvasHooks.navigateToPage || navigateToPage;
 }
 
 const AppRoot = styled('div')({

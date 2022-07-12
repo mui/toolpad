@@ -359,7 +359,7 @@ function QueryNodeEditorDialog<Q, P>({
       <DialogTitle>Edit Query ({node.id})</DialogTitle>
       {dataSourceId && dataSource ? (
         <DialogContent>
-          <Stack spacing={1} py={1} gap={2}>
+          <Stack spacing={2} py={1}>
             <Stack direction="row" gap={2}>
               <NodeNameEditor node={node} />
               <ConnectionSelect
@@ -488,16 +488,16 @@ function QueryNodeEditorDialog<Q, P>({
             </Grid>
             <Divider />
             <Toolbar disableGutters>
-              preview
               <LoadingButton
-                sx={{ ml: 2 }}
+                size="medium"
                 disabled={previewParams === paramsObject && previewQuery === input}
                 loading={isPreviewLoading}
                 loadingPosition="start"
+                variant="contained"
                 onClick={handleUpdatePreview}
                 startIcon={<PlayArrowIcon />}
               >
-                Run
+                Preview
               </LoadingButton>
             </Toolbar>
             {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
@@ -506,7 +506,7 @@ function QueryNodeEditorDialog<Q, P>({
         </DialogContent>
       ) : (
         <DialogContent>
-          <Alert severity="error">DataSource &quot;{dataSourceId}&quot; not found</Alert>
+          <Alert severity="error">DaPtaSource &quot;{dataSourceId}&quot; not found</Alert>
         </DialogContent>
       )}
       <DialogActions>

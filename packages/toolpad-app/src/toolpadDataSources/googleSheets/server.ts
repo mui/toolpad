@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { google } from 'googleapis';
+import { drive_v3 } from '@googleapis/drive';
+import { sheets_v4 } from '@googleapis/sheets';
 import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
 import { ApiResult, ServerDataSource, CreateHandlerApi } from '../../types';
@@ -29,7 +30,7 @@ function createOAuthClient(): OAuth2Client {
   if (!config.externalUrl) {
     throw new Error('Google Sheets: Missing redirect URL "TOOLPAD_EXTERNAL_URL"');
   }
-  return new google.auth.OAuth2(
+  return new OAuth2Client(
     config.googleSheetsClientId,
     config.googleSheetsClientSecret,
     new URL('/api/dataSources/googleSheets/auth/callback', config.externalUrl).href,
@@ -44,8 +45,7 @@ function createDriveClient(client: OAuth2Client) {
   if (!client) {
     throw new Error('Malformed Google Sheets datasource client');
   }
-  return google.drive({
-    version: 'v3',
+  return new drive_v3.Drive({
     auth: client,
   });
 }
@@ -58,8 +58,7 @@ function createSheetsClient(client: OAuth2Client) {
   if (!client) {
     throw new Error('Malformed Google Sheets datasource client');
   }
-  return google.sheets({
-    version: 'v4',
+  return new sheets_v4.Sheets({
     auth: client,
   });
 }

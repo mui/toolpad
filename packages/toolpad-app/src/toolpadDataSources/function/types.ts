@@ -9,8 +9,19 @@ export interface PrivateQuery<I, R> {
   result: R;
 }
 
-export interface FunctionResult {}
-
 export interface PrivateQueries {
   debug: PrivateQuery<FunctionQuery, {}>;
+}
+
+export interface LogEntry {
+  timestamp: number;
+  level: string;
+  kind: 'console' | 'fetch';
+  args: any[];
+}
+
+export interface FunctionResult {
+  data: any;
+  error?: Error;
+  logs: LogEntry[];
 }

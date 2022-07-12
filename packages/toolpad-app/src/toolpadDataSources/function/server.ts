@@ -1,20 +1,20 @@
 import ivm from 'isolated-vm';
-import { ServerDataSource, ApiResult } from '../../types';
-import { FunctionQuery, FunctionConnectionParams } from './types';
+import { ServerDataSource } from '../../types';
+import { FunctionQuery, FunctionConnectionParams, FunctionResult, LogEntry } from './types';
 import { Maybe } from '../../utils/types';
 
 const isolate = new ivm.Isolate({ memoryLimit: 128 });
 
-export async function execQuery(
+async function execBase(
   connection: Maybe<FunctionConnectionParams>,
   functionQuery: FunctionQuery,
   params: Record<string, string>,
-): Promise<ApiResult<any>> {
+): Promise<FunctionResult> {
   const context = isolate.createContextSync();
   const jail = context.global;
   jail.setSync('global', jail.derefInto());
 
-  const logs: { timestamp: number; level: string; kind: 'console' | 'fetch'; args: any[] }[] = [];
+  const logs: LogEntry[] = [];
 
   await context.evalClosure(
     `
@@ -76,26 +76,41 @@ export async function execQuery(
 
       global.fetch = async (...args) => {
         const response = new Response();
-        response[INTERNALS] = await $0.apply(null, args, { result: { promise: true }});
+        response[INTERNALS] = await $0.apply(null, args, { arguments: { copy: true }, result: { promise: true }});
         return response;
       }
     `,
     [
       new ivm.Reference((...args: Parameters<typeof fetch>) => {
+        const req = new Request(...args);
+
+        const serializedReq = {
+          method: req.method,
+          url: req.url,
+          headers: Array.from(req.headers.entries()),
+        };
+
         logs.push({
           timestamp: Date.now(),
           level: 'log',
           kind: 'fetch',
-          args: [`Request "${args[0]}"`],
+          args: [`request "${serializedReq.url}"`, serializedReq],
         });
 
-        return fetch(...args).then(
+        return fetch(req).then(
           (res) => {
+            const serializedRes = {
+              status: res.status,
+              statusText: res.statusText,
+              ok: res.ok,
+              headers: Array.from(res.headers.entries()),
+            };
+
             logs.push({
               timestamp: Date.now(),
               level: 'log',
               kind: 'fetch',
-              args: [`Response ${res.status}: ${res.statusText}`],
+              args: [`response`, serializedRes],
             });
 
             return {
@@ -122,31 +137,47 @@ export async function execQuery(
     {},
   );
 
-  const userModule = await isolate.compileModule(functionQuery.module);
+  let data;
+  let error: Error | undefined;
 
-  await userModule.instantiate(context, (specifier) => {
-    throw new Error(`Not found "${specifier}"`);
-  });
+  try {
+    const userModule = await isolate.compileModule(functionQuery.module);
 
-  userModule.evaluateSync();
+    await userModule.instantiate(context, (specifier) => {
+      throw new Error(`Not found "${specifier}"`);
+    });
 
-  const defaultExport = await userModule.namespace.get('default', { reference: true });
+    userModule.evaluateSync();
 
-  const data: any = await defaultExport.apply(null, [params], {
-    arguments: { copy: true },
-    result: { copy: true, promise: true },
-  });
+    const defaultExport = await userModule.namespace.get('default', { reference: true });
 
-  console.log(logs);
-  return { data, logs };
+    data = await defaultExport.apply(null, [params], {
+      arguments: { copy: true },
+      result: { copy: true, promise: true },
+    });
+  } catch (userError) {
+    error = userError instanceof Error ? userError : new Error(String(userError));
+  }
+
+  return { data, logs, error };
 }
 
-async function execPrivate(connection, query) {
-  return execBase(connection, query.query, query.parameters);
+async function execPrivate(
+  connection: Maybe<FunctionConnectionParams>,
+  query: { query: FunctionQuery; params: Record<string, any> },
+) {
+  return execBase(connection, query.query, query.params);
 }
 
-async function exec(...args) {
-  const { data } = await execBase(...args);
+async function exec(
+  connection: Maybe<FunctionConnectionParams>,
+  functionQuery: FunctionQuery,
+  params: Record<string, string>,
+) {
+  const { data, error } = await execBase(connection, functionQuery, params);
+  if (error) {
+    throw error;
+  }
   return { data };
 }
 

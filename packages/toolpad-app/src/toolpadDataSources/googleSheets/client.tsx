@@ -198,7 +198,7 @@ function ConnectionParamsInput({
     {
       type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS,
     },
-    false,
+    { retry: false },
   );
   return (
     <Stack direction="column" gap={1}>

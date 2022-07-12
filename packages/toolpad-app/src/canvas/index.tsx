@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { fireEvent } from '@mui/toolpad-core/runtime';
-import ToolpadApp, { EditorHooks, EditorHooksContext } from '../ToolpadApp';
-import * as appDom from '../../appDom';
+import ToolpadApp, { CanvasHooks, CanvasHooksContext } from '../runtime';
+import * as appDom from '../appDom';
 
 export interface AppCanvasState {
   appId: string;
@@ -54,7 +54,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
     fireEvent({ type: 'afterRender' });
   });
 
-  const editorHooks: EditorHooks = React.useMemo(() => {
+  const editorHooks: CanvasHooks = React.useMemo(() => {
     return {
       navigateToPage(pageNodeId) {
         fireEvent({ type: 'pageNavigationRequest', pageNodeId });
@@ -63,7 +63,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
   }, []);
 
   return state ? (
-    <EditorHooksContext.Provider value={editorHooks}>
+    <CanvasHooksContext.Provider value={editorHooks}>
       <ToolpadApp
         hidePreviewBanner
         dom={state.dom}
@@ -71,7 +71,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
         appId={state.appId}
         basename={`${basename}/${state.appId}`}
       />
-    </EditorHooksContext.Provider>
+    </CanvasHooksContext.Provider>
   ) : (
     <div>loading...</div>
   );

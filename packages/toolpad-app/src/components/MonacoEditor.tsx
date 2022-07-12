@@ -188,6 +188,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         minimap: { enabled: false },
         accessibilitySupport: 'off',
         tabSize: 2,
+        automaticLayout: true,
         ...extraOptions,
       });
 

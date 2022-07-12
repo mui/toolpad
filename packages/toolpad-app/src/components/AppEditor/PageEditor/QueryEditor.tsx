@@ -148,21 +148,6 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
   );
 }
 
-function withTransformDisabled<Q, P>(query: appDom.QueryNode<Q, P>): appDom.QueryNode<Q, P> {
-  if (query.attributes.transformEnabled?.value) {
-    return {
-      ...query,
-      attributes: {
-        ...query.attributes,
-        transform: { type: 'const', value: '' },
-        transformEnabled: { type: 'const', value: false },
-      },
-    };
-  }
-
-  return query;
-}
-
 type RawQueryPreviewKey<Q, P> = [string, appDom.QueryNode<Q, P>, Record<string, any>];
 
 interface QueryNodeEditorProps<Q, P> {
@@ -306,9 +291,27 @@ function QueryNodeEditorDialog<Q, P>({
     setPreviewParams(paramsObject);
   }, [input, paramsObject]);
 
+  const inputWithTransformDisabled = React.useMemo<appDom.QueryNode<Q, P>>(() => {
+    if (input.attributes.transformEnabled?.value) {
+      return {
+        ...input,
+        attributes: {
+          ...input.attributes,
+          transform: { type: 'const', value: '' },
+          refetchOnReconnect: { type: 'const', value: false },
+          refetchOnWindowFocus: { type: 'const', value: false },
+          refetchInterval: undefined,
+          transformEnabled: { type: 'const', value: false },
+        },
+      };
+    }
+
+    return input;
+  }, [input]);
+
   const rawQueryPreviewKey = React.useMemo<RawQueryPreviewKey<Q, P>>(
-    () => [appId, withTransformDisabled(input), previewParams],
-    [appId, input, previewParams],
+    () => [appId, inputWithTransformDisabled, previewParams],
+    [appId, inputWithTransformDisabled, previewParams],
   );
 
   const rawQueryPreview = client.useQuery('execQuery', rawQueryPreviewKey, {
@@ -320,8 +323,6 @@ function QueryNodeEditorDialog<Q, P>({
   const handleRawQueryPreviewRefresh = React.useCallback(() => {
     rawQueryPreview.refetch();
   }, [rawQueryPreview]);
-
-  const rawQueryPreviewRefreshDisabled = rawQueryPreview.isFetched;
 
   const handleTransformEnabledChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -423,7 +424,7 @@ function QueryNodeEditorDialog<Q, P>({
                     label="Transform response"
                     control={
                       <Checkbox
-                        checked={input.attributes.transformEnabled?.value ?? false}
+                        checked={Boolean(input.attributes.transformEnabled?.value)}
                         onChange={handleTransformEnabledChange}
                         inputProps={{ 'aria-label': 'controlled' }}
                       />
@@ -450,7 +451,7 @@ function QueryNodeEditorDialog<Q, P>({
                     }
                     <IconButton
                       disabled={
-                        rawQueryPreviewRefreshDisabled || !input.attributes.transformEnabled?.value
+                        rawQueryPreview.isFetched || !input.attributes.transformEnabled?.value
                       }
                       size="small"
                       onClick={handleRawQueryPreviewRefresh}
@@ -476,9 +477,8 @@ function QueryNodeEditorDialog<Q, P>({
                       globalScope={{ data: rawQueryPreview.data?.data }}
                       autoFocus
                       value={input.attributes.transform?.value ?? 'return data;'}
-                      sx={{ width: '100%', opacity: rawQueryPreview.isLoading ? 0.5 : 1 }}
+                      sx={{ width: '100%', opacity: rawQueryPreview.isRefetching ? 0.5 : 1 }}
                       functionBody
-                      onFocus={handleRawQueryPreviewRefresh}
                       onChange={handleTransformFnChange}
                       disabled={!input.attributes.transformEnabled?.value}
                     />

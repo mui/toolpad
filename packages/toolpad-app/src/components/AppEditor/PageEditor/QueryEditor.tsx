@@ -442,10 +442,13 @@ function QueryNodeEditorDialog<Q, P>({
                       >
                         <JsonView
                           src={rawQueryPreview.data ?? { data: {} }}
-                          disabled={
-                            rawQueryPreview.isRefetching ||
-                            !input.attributes.transformEnabled?.value
-                          }
+                          sx={{
+                            opacity:
+                              rawQueryPreview.isRefetching ||
+                              !input.attributes.transformEnabled?.value
+                                ? 0.5
+                                : 1,
+                          }}
                         />
                       </Box>
                     }

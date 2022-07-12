@@ -1,4 +1,5 @@
-import { drive_v3, sheets_v4 } from 'googleapis';
+import { sheets_v4 } from '@googleapis/sheets';
+import { drive_v3 } from '@googleapis/drive';
 
 export type GoogleSheetsConnectionParams = {
   refresh_token?: string | null;

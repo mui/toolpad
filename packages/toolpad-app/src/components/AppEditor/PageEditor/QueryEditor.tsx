@@ -509,7 +509,7 @@ function QueryNodeEditorDialog<Q, P>({
         </DialogContent>
       ) : (
         <DialogContent>
-          <Alert severity="error">DaPtaSource &quot;{dataSourceId}&quot; not found</Alert>
+          <Alert severity="error">DataSource &quot;{dataSourceId}&quot; not found</Alert>
         </DialogContent>
       )}
       <DialogActions>

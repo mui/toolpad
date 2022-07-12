@@ -317,7 +317,7 @@ function QueryNodeEditorDialog<Q, P>({
   const queryEditorContext = React.useMemo(() => ({ appId, connectionId }), [appId, connectionId]);
 
   return (
-    <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose} scroll="body">
+    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose} scroll="body">
       <DialogTitle>Edit Query ({node.id})</DialogTitle>
       {dataSourceId && dataSource ? (
         <DialogContent>

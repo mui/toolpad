@@ -5,7 +5,7 @@ import { Maybe } from '../../utils/types';
 
 const isolate = new ivm.Isolate({ memoryLimit: 128 });
 
-export async function execIsolatedVm(
+export async function execQuery(
   connection: Maybe<FunctionConnectionParams>,
   functionQuery: FunctionQuery,
   params: Record<string, string>,
@@ -14,20 +14,30 @@ export async function execIsolatedVm(
   const jail = context.global;
   jail.setSync('global', jail.derefInto());
 
-  const logs: { level: string; args: any[] }[] = [];
+  const logs: { timestamp: number; level: string; kind: 'console' | 'fetch'; args: any[] }[] = [];
 
   await context.evalClosure(
     `
-      global.console = {
-        log: (...args) => {
-          $0.apply(null, ['log', JSON.stringify(args)], { arguments: { copy: true }});
+      function consoleMethod (level) {
+        return (...args) => {
+          $0.apply(null, [level, JSON.stringify(args)], { arguments: { copy: true }});
         }
+      }
+
+      global.console = {
+        log: consoleMethod('log'),
+        debug: consoleMethod('debug'),
+        info: consoleMethod('info'),
+        warn: consoleMethod('warn'),
+        error: consoleMethod('error'),
       }
     `,
     [
       (level: string, serializedArgs: string) => {
         logs.push({
+          timestamp: Date.now(),
           level,
+          kind: 'console',
           args: JSON.parse(serializedArgs),
         });
       },
@@ -72,13 +82,41 @@ export async function execIsolatedVm(
     `,
     [
       new ivm.Reference((...args: Parameters<typeof fetch>) => {
-        return fetch(...args).then((res) => ({
-          ok: res.ok,
-          status: res.status,
-          statusText: res.statusText,
-          json: new ivm.Reference(() => res.json()),
-          text: new ivm.Reference(() => res.text()),
-        }));
+        logs.push({
+          timestamp: Date.now(),
+          level: 'log',
+          kind: 'fetch',
+          args: [`Request "${args[0]}"`],
+        });
+
+        return fetch(...args).then(
+          (res) => {
+            logs.push({
+              timestamp: Date.now(),
+              level: 'log',
+              kind: 'fetch',
+              args: [`Response ${res.status}: ${res.statusText}`],
+            });
+
+            return {
+              ok: res.ok,
+              status: res.status,
+              statusText: res.statusText,
+              json: new ivm.Reference(() => res.json()),
+              text: new ivm.Reference(() => res.text()),
+            };
+          },
+          (err) => {
+            logs.push({
+              timestamp: Date.now(),
+              level: 'error',
+              kind: 'fetch',
+              args: [{ name: err.name, message: err.message }],
+            });
+
+            throw err;
+          },
+        );
       }),
     ],
     {},
@@ -100,11 +138,21 @@ export async function execIsolatedVm(
   });
 
   console.log(logs);
+  return { data, logs };
+}
+
+async function execPrivate(connection, query) {
+  return execBase(connection, query.query, query.parameters);
+}
+
+async function exec(...args) {
+  const { data } = await execBase(...args);
   return { data };
 }
 
 const dataSource: ServerDataSource<{}, FunctionQuery, any> = {
-  exec: execIsolatedVm,
+  exec,
+  execPrivate,
 };
 
 export default dataSource;

@@ -1,15 +1,13 @@
 import * as React from 'react';
 import clsx from 'clsx';
-import throttle from 'lodash-es/throttle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
-import { setEventHandler } from '@mui/toolpad-core/runtime';
 import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
 import { useNavigate } from 'react-router-dom';
 import { FlowDirection, NodeInfo, SlotsState, SlotState } from '../../../types';
 import * as appDom from '../../../appDom';
-import EditorCanvasHost from './EditorCanvasHost';
+import EditorCanvasHost, { EditorCanvasHostHandle } from './EditorCanvasHost';
 import {
   absolutePositionCss,
   getRectanglePointEdge,
@@ -34,8 +32,6 @@ import {
   usePageEditorApi,
   usePageEditorState,
 } from './PageEditorProvider';
-import EditorOverlay from './EditorOverlay';
-import { HTML_ID_APP_ROOT } from '../../../constants';
 import { useToolpadComponent } from '../toolpadComponents';
 import {
   getElementNodeComponentId,
@@ -450,6 +446,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const { nodes: nodesInfo } = viewState;
 
+  const canvasHostRef = React.useRef<EditorCanvasHostHandle>(null);
+
   const pageNode = appDom.getNode(dom, pageNodeId, 'page');
 
   const pageNodes = React.useMemo(() => {
@@ -459,25 +457,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const isEmptyPage = pageNodes.length <= 1;
 
   const selectedNode = selection && appDom.getNode(dom, selection);
-
-  // We will use this key to remount the overlay after page load
-  const [overlayKey, setOverlayKey] = React.useState(1);
-  const editorWindowRef = React.useRef<Window>();
-
-  const getViewCoordinates = React.useCallback(
-    (clientX: number, clientY: number): { x: number; y: number } | null => {
-      const rootElm = editorWindowRef.current?.document.getElementById(HTML_ID_APP_ROOT);
-      if (!rootElm) {
-        return null;
-      }
-      const rect = rootElm.getBoundingClientRect();
-      if (rectContainsPoint(rect, clientX, clientY)) {
-        return { x: clientX - rect.x, y: clientY - rect.y };
-      }
-      return null;
-    },
-    [],
-  );
 
   const handleDragStart = React.useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
@@ -759,7 +738,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -882,7 +861,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
     },
     [
-      getViewCoordinates,
       dropAreaRects,
       pageNode.id,
       dom,
@@ -1114,7 +1092,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
       const draggedNode = getCurrentlyDraggedNode();
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
 
       if (!draggedNode || !cursorPos || !dragOverNodeId || !dragOverZone) {
         return;
@@ -1333,7 +1311,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       dragOverSlotParentProp,
       dragOverZone,
       getCurrentlyDraggedNode,
-      getViewCoordinates,
       newNode,
       nodesInfo,
       selection,
@@ -1363,7 +1340,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
 
       if (!cursorPos) {
         return;
@@ -1378,7 +1355,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.select(null);
       }
     },
-    [getViewCoordinates, selectionRects, dom, api],
+    [selectionRects, dom, api],
   );
 
   const handleDelete = React.useCallback(
@@ -1415,13 +1392,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     );
   }, [dom, selectedNode]);
 
-  const handleLoad = React.useCallback((frameWindow: Window) => {
-    editorWindowRef.current = frameWindow;
-    setOverlayKey((key) => key + 1);
-  }, []);
-
   const handlePageViewStateUpdate = React.useCallback(() => {
-    const rootElm = editorWindowRef.current?.document.getElementById(HTML_ID_APP_ROOT);
+    const rootElm = canvasHostRef.current?.getRootElm();
 
     if (!rootElm) {
       return;
@@ -1429,8 +1401,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
     api.pageViewStateUpdate(getPageViewState(rootElm));
   }, [api]);
-
-  const [rootElm, setRootElm] = React.useState<HTMLElement | null>();
 
   const navigate = useNavigate();
 
@@ -1463,8 +1433,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           return;
         }
         case 'afterRender': {
-          const editorWindow = editorWindowRef.current ?? null;
-          setRootElm(editorWindow?.document.getElementById(HTML_ID_APP_ROOT));
           return;
         }
         case 'pageNavigationRequest': {
@@ -1480,172 +1448,124 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [dom, domApi, api, navigate],
   );
 
-  const handleRuntimeEventRef = React.useRef(handleRuntimeEvent);
-  React.useLayoutEffect(() => {
-    handleRuntimeEventRef.current = handleRuntimeEvent;
-  }, [handleRuntimeEvent]);
-
-  React.useEffect(() => {
-    if (editorWindowRef.current) {
-      const editorWindow = editorWindowRef.current;
-
-      const cleanupHandler = setEventHandler(editorWindow, (event) =>
-        handleRuntimeEventRef.current(event),
-      );
-
-      return cleanupHandler;
-    }
-    return () => {};
-  }, [overlayKey]);
-
-  React.useEffect(() => {
-    if (!rootElm) {
-      return () => {};
-    }
-
-    handlePageViewStateUpdate();
-    const handlePageUpdateThrottled = throttle(handlePageViewStateUpdate, 250, {
-      trailing: true,
-    });
-
-    const mutationObserver = new MutationObserver(handlePageUpdateThrottled);
-
-    mutationObserver.observe(rootElm, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
-
-    const resizeObserver = new ResizeObserver(handlePageUpdateThrottled);
-
-    resizeObserver.observe(rootElm);
-    rootElm.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
-
-    return () => {
-      handlePageUpdateThrottled.cancel();
-      mutationObserver.disconnect();
-      resizeObserver.disconnect();
-    };
-  }, [overlayKey, handlePageViewStateUpdate, rootElm]);
-
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
+        ref={canvasHostRef}
         appId={appId}
-        editor
         className={classes.view}
         dom={dom}
         pageNodeId={pageNodeId}
-        onLoad={handleLoad}
+        onRuntimeEvent={handleRuntimeEvent}
+        onScreenUpdate={handlePageViewStateUpdate}
+        overlay={
+          <OverlayRoot
+            className={clsx({
+              [overlayClasses.componentDragging]: highlightLayout,
+            })}
+            // Need this to be able to capture key events
+            tabIndex={0}
+            // This component has `pointer-events: none`, but we will selectively enable pointer-events
+            // for its children. We can still capture the click gobally
+            onClick={handleClick}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onKeyDown={handleKeyDown}
+            onDragEnd={handleDragEnd}
+          >
+            {pageNodes.map((node) => {
+              const nodeInfo = nodesInfo[node.id];
+
+              const parent = appDom.getParent(dom, node);
+              const parentInfo = (parent && nodesInfo[parent.id]) || null;
+
+              const freeSlots = nodeInfo?.slots || {};
+              const freeSlotEntries = Object.entries(freeSlots) as ExactEntriesOf<SlotsState>;
+
+              const hasFreeSlots = freeSlotEntries.length > 0;
+              const hasMultipleFreeSlots = freeSlotEntries.length > 1;
+
+              const isPageNode = appDom.isPage(node);
+              const isPageChild = parent ? appDom.isPage(parent) : false;
+
+              const childNodes = appDom.getChildNodes(
+                dom,
+                node,
+              ) as appDom.NodeChildren<appDom.ElementNode>;
+
+              const nodeRect = nodeInfo?.rect || null;
+              const hasNodeOverlay = isPageNode || appDom.isElement(node);
+
+              if (!nodeRect || !hasNodeOverlay) {
+                return null;
+              }
+
+              return (
+                <React.Fragment key={node.id}>
+                  {!isPageNode ? (
+                    <NodeHud
+                      node={node}
+                      rect={nodeRect}
+                      selected={selectedNode?.id === node.id}
+                      allowInteraction={nodesWithInteraction.has(node.id)}
+                      onDragStart={handleDragStart}
+                      onDelete={() => handleDelete(node.id)}
+                    />
+                  ) : null}
+                  {hasFreeSlots
+                    ? freeSlotEntries.map(([parentProp, freeSlot]) => {
+                        if (!freeSlot) {
+                          return null;
+                        }
+
+                        const dropAreaRect = dropAreaRects[getDropAreaId(node.id, parentProp)];
+
+                        const slotChildNodes = childNodes[parentProp] || [];
+                        const isEmptySlot = slotChildNodes.length === 0;
+
+                        if (isPageNode && !isEmptySlot) {
+                          return null;
+                        }
+
+                        return (
+                          <NodeDropArea
+                            key={`${node.id}:${parentProp}`}
+                            node={node}
+                            parentInfo={parentInfo}
+                            layoutRect={nodeRect}
+                            dropAreaRect={dropAreaRect}
+                            slotRect={freeSlot.rect}
+                            highlightedZone={getNodeDropAreaHighlightedZone(node, parentProp)}
+                            isEmptySlot={isEmptySlot}
+                            isPageChild={isPageChild}
+                          />
+                        );
+                      })
+                    : null}
+                  {!hasFreeSlots || hasMultipleFreeSlots ? (
+                    <NodeDropArea
+                      node={node}
+                      parentInfo={parentInfo}
+                      layoutRect={nodeRect}
+                      dropAreaRect={dropAreaRects[node.id]}
+                      highlightedZone={getNodeDropAreaHighlightedZone(node)}
+                      isEmptySlot={false}
+                      isPageChild={isPageChild}
+                    />
+                  ) : null}
+                </React.Fragment>
+              );
+            })}
+            {/* 
+              This overlay allows passing through pointer-events through a pinhole
+              This allows interactivity on the selected element only, while maintaining
+              a reliable click target for the rest of the page
+            */}
+            <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
+          </OverlayRoot>
+        }
       />
-      <EditorOverlay key={overlayKey} window={editorWindowRef.current}>
-        <OverlayRoot
-          className={clsx({
-            [overlayClasses.componentDragging]: highlightLayout,
-          })}
-          // Need this to be able to capture key events
-          tabIndex={0}
-          // This component has `pointer-events: none`, but we will selectively enable pointer-events
-          // for its children. We can still capture the click gobally
-          onClick={handleClick}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onKeyDown={handleKeyDown}
-          onDragEnd={handleDragEnd}
-        >
-          {pageNodes.map((node) => {
-            const nodeInfo = nodesInfo[node.id];
-
-            const parent = appDom.getParent(dom, node);
-            const parentInfo = (parent && nodesInfo[parent.id]) || null;
-
-            const freeSlots = nodeInfo?.slots || {};
-            const freeSlotEntries = Object.entries(freeSlots) as ExactEntriesOf<SlotsState>;
-
-            const hasFreeSlots = freeSlotEntries.length > 0;
-            const hasMultipleFreeSlots = freeSlotEntries.length > 1;
-
-            const isPageNode = appDom.isPage(node);
-            const isPageChild = parent ? appDom.isPage(parent) : false;
-
-            const childNodes = appDom.getChildNodes(
-              dom,
-              node,
-            ) as appDom.NodeChildren<appDom.ElementNode>;
-
-            const nodeRect = nodeInfo?.rect || null;
-            const hasNodeOverlay = isPageNode || appDom.isElement(node);
-
-            if (!nodeRect || !hasNodeOverlay) {
-              return null;
-            }
-
-            return (
-              <React.Fragment key={node.id}>
-                {!isPageNode ? (
-                  <NodeHud
-                    node={node}
-                    rect={nodeRect}
-                    selected={selectedNode?.id === node.id}
-                    allowInteraction={nodesWithInteraction.has(node.id)}
-                    onDragStart={handleDragStart}
-                    onDelete={() => handleDelete(node.id)}
-                  />
-                ) : null}
-                {hasFreeSlots
-                  ? freeSlotEntries.map(([parentProp, freeSlot]) => {
-                      if (!freeSlot) {
-                        return null;
-                      }
-
-                      const dropAreaRect = dropAreaRects[getDropAreaId(node.id, parentProp)];
-
-                      const slotChildNodes = childNodes[parentProp] || [];
-                      const isEmptySlot = slotChildNodes.length === 0;
-
-                      if (isPageNode && !isEmptySlot) {
-                        return null;
-                      }
-
-                      return (
-                        <NodeDropArea
-                          key={`${node.id}:${parentProp}`}
-                          node={node}
-                          parentInfo={parentInfo}
-                          layoutRect={nodeRect}
-                          dropAreaRect={dropAreaRect}
-                          slotRect={freeSlot.rect}
-                          highlightedZone={getNodeDropAreaHighlightedZone(node, parentProp)}
-                          isEmptySlot={isEmptySlot}
-                          isPageChild={isPageChild}
-                        />
-                      );
-                    })
-                  : null}
-                {!hasFreeSlots || hasMultipleFreeSlots ? (
-                  <NodeDropArea
-                    node={node}
-                    parentInfo={parentInfo}
-                    layoutRect={nodeRect}
-                    dropAreaRect={dropAreaRects[node.id]}
-                    highlightedZone={getNodeDropAreaHighlightedZone(node)}
-                    isEmptySlot={false}
-                    isPageChild={isPageChild}
-                  />
-                ) : null}
-              </React.Fragment>
-            );
-          })}
-          {/* 
-            This overlay allows passing through pointer-events through a pinhole
-            This allows interactivity on the selected element only, while maintaining
-            a reliable click target for the rest of the page
-          */}
-          <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
-        </OverlayRoot>
-      </EditorOverlay>
     </RenderPanelRoot>
   );
 }

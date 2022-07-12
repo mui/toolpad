@@ -242,6 +242,10 @@ const DraggableEdge = styled('div', {
   };
 });
 
+const ResizePreview = styled('div')({
+  outline: '2px solid red',
+});
+
 function hasFreeNodeSlots(nodeInfo: NodeInfo): boolean {
   return Object.keys(nodeInfo.slots || []).length > 0;
 }
@@ -336,6 +340,8 @@ function getDropAreaParentProp(dropAreaId: string): string | null {
   return dropAreaId.split(':')[1] || null;
 }
 
+const RESIZE_PREVIEW_ID = 'resize-preview';
+
 interface NodeHudProps {
   node: appDom.ElementNode | appDom.PageNode;
   rect: Rectangle;
@@ -348,6 +354,7 @@ interface NodeHudProps {
     edge: RectangleEdge,
   ) => React.DragEventHandler<HTMLElement>;
   onDelete?: React.MouseEventHandler<HTMLElement>;
+  isResizing?: boolean;
 }
 
 function NodeHud({
@@ -359,6 +366,7 @@ function NodeHud({
   draggableEdges = [],
   onEdgeDragStart,
   onDelete,
+  isResizing = false,
 }: NodeHudProps) {
   const dom = useDom();
 
@@ -406,6 +414,9 @@ function NodeHud({
             />
           ))
         : null}
+      {isResizing ? (
+        <ResizePreview id={RESIZE_PREVIEW_ID} style={absolutePositionCss(rect)} />
+      ) : null}
     </NodeHudWrapper>
   );
 }
@@ -813,26 +824,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return rects;
   }, [nodesInfo, pageNodes]);
 
-  const updatePageRowLayout = React.useCallback(
-    (pageRowNode: appDom.ElementNode) => {
-      const children = appDom.getChildNodes(dom, pageRowNode).children;
-      const layoutColumnSizes = children
-        .map((child) => child.layout?.columnSize || appDom.createConst(0))
-        .map((constAttribute) => constAttribute.value);
-
-      const totalLayoutColumnsSize = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
-
-      domApi.setNodeNamespacedProp(pageRowNode, 'props', 'layoutColumnSizes', {
-        type: 'const',
-        value: layoutColumnSizes.map((size) => size / totalLayoutColumnsSize),
-      });
-    },
-    [dom, domApi],
-  );
-
   const handleEdgeDragStart = React.useCallback(
     (node: appDom.ElementNode, edge: RectangleEdge) => () => {
-      api.select(node.id);
       api.edgeDragStart({ nodeId: node.id, edge });
     },
     [api],
@@ -840,76 +833,47 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleEdgeDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const draggedNode = getCurrentlyDraggedNode();
-
-      if (!draggedNode) {
-        return;
-      }
-
-      const draggedNodeInfo = nodesInfo[draggedNode.id];
-      const draggedNodeRect = draggedNodeInfo?.rect;
+      const resizePreviewElement =
+        editorWindowRef.current?.document.getElementById(RESIZE_PREVIEW_ID);
 
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
-      if (draggedNodeRect && cursorPos) {
-        if (draggedEdge === RECTANGLE_EDGE_LEFT) {
-          const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
+      if (resizePreviewElement && cursorPos) {
+        const resizePreviewRect = resizePreviewElement?.getBoundingClientRect();
 
-          if (previousSibling) {
-            const previousSiblingInfo = nodesInfo[previousSibling.id];
-            const previousSiblingRect = previousSiblingInfo?.rect;
+        if (
+          draggedEdge === RECTANGLE_EDGE_LEFT &&
+          cursorPos.x > 0 &&
+          cursorPos.x < resizePreviewRect.x + resizePreviewRect.width
+        ) {
+          const resizePreviewElementLeftPos = Number(
+            resizePreviewElement.style.left.replace('px', ''),
+          );
 
-            if (previousSiblingRect) {
-              domApi.setNodeNamespacedProp(draggedNode, 'layout', 'columnSize', {
-                type: 'const',
-                value: Math.max(0, draggedNodeRect.width - (cursorPos.x - draggedNodeRect.x)),
-              });
-              domApi.setNodeNamespacedProp(previousSibling, 'layout', 'columnSize', {
-                type: 'const',
-                value: Math.max(0, previousSiblingRect.width + (cursorPos.x - draggedNodeRect.x)),
-              });
-            }
-          }
+          const updatedTransformScale =
+            1 + (resizePreviewElementLeftPos - cursorPos.x) / resizePreviewElement.offsetWidth;
+
+          resizePreviewElement.style.transformOrigin = '100% 50%';
+          resizePreviewElement.style.transform = `scale(${updatedTransformScale}, 1)`;
         }
-        if (draggedEdge === RECTANGLE_EDGE_RIGHT) {
-          const nextSibling = appDom.getSiblingAfterNode(dom, draggedNode, 'children');
+        if (
+          draggedEdge === RECTANGLE_EDGE_RIGHT &&
+          cursorPos.x > resizePreviewRect.x &&
+          cursorPos.x < 1200
+        ) {
+          const resizePreviewElementRightPos = Number(
+            resizePreviewElement.style.right.replace('px', ''),
+          );
 
-          if (nextSibling) {
-            const nextSiblingInfo = nodesInfo[nextSibling.id];
-            const nextSiblingRect = nextSiblingInfo?.rect;
+          const updatedTransformScale =
+            (cursorPos.x - resizePreviewElementRightPos) / resizePreviewElement.offsetWidth;
 
-            if (nextSiblingRect) {
-              domApi.setNodeNamespacedProp(draggedNode, 'layout', 'columnSize', {
-                type: 'const',
-                value: Math.max(0, cursorPos.x - draggedNodeRect.x),
-              });
-              domApi.setNodeNamespacedProp(nextSibling, 'layout', 'columnSize', {
-                type: 'const',
-                value: Math.max(
-                  0,
-                  nextSiblingRect.width - (cursorPos.x - draggedNodeRect.x - draggedNodeRect.width),
-                ),
-              });
-            }
-          }
-        }
-
-        const parent = appDom.getParent(dom, draggedNode);
-
-        if (parent) {
-          updatePageRowLayout(parent as appDom.ElementNode);
+          resizePreviewElement.style.transformOrigin = '0 50%';
+          resizePreviewElement.style.transform = `scale(${updatedTransformScale}, 1)`;
         }
       }
     },
-    [
-      dom,
-      domApi,
-      draggedEdge,
-      getCurrentlyDraggedNode,
-      getViewCoordinates,
-      nodesInfo,
-      updatePageRowLayout,
-    ],
+    [draggedEdge, getViewCoordinates],
   );
 
   const handleDragOver = React.useCallback(
@@ -1500,13 +1464,159 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     ],
   );
 
+  const updatePageRowLayout = React.useCallback(
+    (pageRowNode: appDom.ElementNode, layoutColumnSizes?: number[]) => {
+      if (!layoutColumnSizes) {
+        const children = appDom.getChildNodes(dom, pageRowNode).children;
+
+        layoutColumnSizes = children
+          .map((child) => child.layout?.columnSize || appDom.createConst(0))
+          .map((constAttribute) => constAttribute.value);
+      }
+
+      const totalLayoutColumnsSize = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
+
+      domApi.setNodeNamespacedProp(pageRowNode, 'props', 'layoutColumnSizes', {
+        type: 'const',
+        value: layoutColumnSizes.map((size) => size / totalLayoutColumnsSize),
+      });
+    },
+    [dom, domApi],
+  );
+
+  const handleEdgeDragEnd = React.useCallback(
+    (event: DragEvent | React.DragEvent) => {
+      const draggedNode = getCurrentlyDraggedNode();
+
+      if (!draggedNode) {
+        return;
+      }
+
+      const draggedNodeInfo = nodesInfo[draggedNode.id];
+      const draggedNodeRect = draggedNodeInfo?.rect;
+
+      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+
+      let updatedColumnSizes: Record<NodeId, number> = {};
+
+      if (draggedNodeRect && cursorPos) {
+        if (draggedEdge === RECTANGLE_EDGE_LEFT) {
+          const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
+
+          if (previousSibling) {
+            const previousSiblingInfo = nodesInfo[previousSibling.id];
+            const previousSiblingRect = previousSiblingInfo?.rect;
+
+            if (previousSiblingRect) {
+              const updatedDraggedNodeColumnSize = Math.max(
+                0,
+                draggedNodeRect.width - (cursorPos.x - draggedNodeRect.x),
+              );
+              const updatedPreviousSiblingColumnSize = Math.max(
+                0,
+                previousSiblingRect.width + (cursorPos.x - draggedNodeRect.x),
+              );
+
+              domApi.setNodeNamespacedProp(
+                draggedNode,
+                'layout',
+                'columnSize',
+                appDom.createConst(updatedDraggedNodeColumnSize),
+              );
+              domApi.setNodeNamespacedProp(
+                previousSibling,
+                'layout',
+                'columnSize',
+                appDom.createConst(updatedPreviousSiblingColumnSize),
+              );
+
+              updatedColumnSizes = {
+                [draggedNode.id]: updatedDraggedNodeColumnSize,
+                [previousSibling.id]: updatedPreviousSiblingColumnSize,
+              };
+            }
+          }
+        }
+        if (draggedEdge === RECTANGLE_EDGE_RIGHT) {
+          const nextSibling = appDom.getSiblingAfterNode(dom, draggedNode, 'children');
+
+          if (nextSibling) {
+            const nextSiblingInfo = nodesInfo[nextSibling.id];
+            const nextSiblingRect = nextSiblingInfo?.rect;
+
+            if (nextSiblingRect) {
+              const updatedDraggedNodeColumnSize = Math.max(
+                0,
+                Math.max(0, cursorPos.x - draggedNodeRect.x),
+              );
+              const updatedNextSiblingColumnSize = Math.max(
+                0,
+                Math.max(
+                  0,
+                  nextSiblingRect.width - (cursorPos.x - draggedNodeRect.x - draggedNodeRect.width),
+                ),
+              );
+
+              domApi.setNodeNamespacedProp(
+                draggedNode,
+                'layout',
+                'columnSize',
+                appDom.createConst(updatedDraggedNodeColumnSize),
+              );
+              domApi.setNodeNamespacedProp(
+                nextSibling,
+                'layout',
+                'columnSize',
+                appDom.createConst(updatedNextSiblingColumnSize),
+              );
+
+              updatedColumnSizes = {
+                [draggedNode.id]: updatedDraggedNodeColumnSize,
+                [nextSibling.id]: updatedNextSiblingColumnSize,
+              };
+            }
+          }
+        }
+
+        const parent = appDom.getParent(dom, draggedNode);
+
+        if (parent) {
+          const rowChildren = appDom.getChildNodes(dom, parent).children;
+
+          const updatedLayoutColumnSizes = rowChildren
+            .map((child) =>
+              Object.keys(updatedColumnSizes).includes(child.id)
+                ? appDom.createConst(updatedColumnSizes[child.id])
+                : child.layout?.columnSize || appDom.createConst(0),
+            )
+            .map((constAttribute) => constAttribute.value);
+
+          updatePageRowLayout(parent as appDom.ElementNode, updatedLayoutColumnSizes);
+        }
+      }
+    },
+    [
+      dom,
+      domApi,
+      draggedEdge,
+      getCurrentlyDraggedNode,
+      getViewCoordinates,
+      nodesInfo,
+      updatePageRowLayout,
+    ],
+  );
+
   const handleDragEnd = React.useCallback(
     (event: DragEvent | React.DragEvent) => {
       event.preventDefault();
 
+      if (draggedEdge) {
+        handleEdgeDragEnd(event);
+      }
+
       api.dragEnd();
     },
-    [api],
+    [api, draggedEdge, handleEdgeDragEnd],
   );
 
   React.useEffect(() => {
@@ -1758,13 +1868,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     node={node}
                     rect={nodeRect}
                     selected={selectedNode?.id === node.id}
-                    allowInteraction={nodesWithInteraction.has(node.id)}
+                    allowInteraction={nodesWithInteraction.has(node.id) && !draggedEdge}
                     onNodeDragStart={handleNodeDragStart(node)}
                     draggableEdges={
                       isPageRowChild ? [RECTANGLE_EDGE_LEFT, RECTANGLE_EDGE_RIGHT] : []
                     }
                     onEdgeDragStart={isPageRowChild ? handleEdgeDragStart : undefined}
                     onDelete={() => handleDelete(node.id)}
+                    isResizing={Boolean(draggedEdge) && node.id === draggedNodeId}
                   />
                 ) : null}
                 {hasFreeSlots

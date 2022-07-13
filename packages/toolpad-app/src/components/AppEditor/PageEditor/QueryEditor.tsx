@@ -345,7 +345,7 @@ function QueryNodeEditorDialog<Q, P>({
             <Grid container direction="row" spacing={1}>
               {/* TODO: move transform inside of the dataSource.QueryEditor and remove the conditional */}
               {dataSourceId === 'function' ? null : (
-                <>
+                <React.Fragment>
                   <Divider />
                   <Grid item xs={6}>
                     <Stack>
@@ -370,12 +370,12 @@ function QueryNodeEditorDialog<Q, P>({
                       />
                     </Stack>
                   </Grid>
-                </>
+                </React.Fragment>
               )}
             </Grid>
             {/* TODO: move preview inside of the dataSource.QueryEditor and remove the conditional */}
             {dataSourceId === 'function' ? null : (
-              <>
+              <React.Fragment>
                 <Divider />
                 <Toolbar disableGutters>
                   <LoadingButton
@@ -392,7 +392,7 @@ function QueryNodeEditorDialog<Q, P>({
                 </Toolbar>
                 {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
                 {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
-              </>
+              </React.Fragment>
             )}
 
             <Divider />

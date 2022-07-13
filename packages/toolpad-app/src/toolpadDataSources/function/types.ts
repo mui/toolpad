@@ -13,12 +13,39 @@ export interface PrivateQueries {
   debug: PrivateQuery<FunctionQuery, {}>;
 }
 
-export interface LogEntry {
+export interface LogRequest {
+  method: string;
+  url: string;
+  headers: [string, string][];
+}
+
+export interface LogResponse {
+  status: number;
+  statusText: string;
+  ok: boolean;
+  headers: [string, string][];
+}
+
+export interface LogConsoleEntry {
   timestamp: number;
   level: string;
-  kind: 'console' | 'fetch';
+  kind: 'console';
   args: any[];
 }
+
+export interface LogRequestEntry {
+  timestamp: number;
+  kind: 'request';
+  request: LogRequest;
+}
+
+export interface LogResponseEntry {
+  timestamp: number;
+  kind: 'response';
+  response: LogResponse;
+}
+
+export type LogEntry = LogConsoleEntry | LogRequestEntry | LogResponseEntry;
 
 export interface FunctionResult {
   data: any;

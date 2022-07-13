@@ -15,6 +15,7 @@ import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import client from '../../api';
 import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../components/AppEditor/PageEditor/ErrorAlert';
+import Console from './Console';
 
 const TypescriptEditor = lazyComponent(() => import('../../components/TypescriptEditor'), {
   noSsr: true,
@@ -109,13 +110,8 @@ function QueryEditor({
                 Clear
               </Button>
             </Toolbar>
-            <Box sx={{ flex: 1, overflow: 'auto', mx: 1 }}>
-              {previewLogs.map((log) => (
-                <div>
-                  {new Date(log.timestamp).toLocaleTimeString()}: {JSON.stringify(log.args)}
-                </div>
-              ))}
-            </Box>
+
+            <Console sx={{ flex: 1, overflow: 'auto', mx: 1 }} entries={previewLogs} />
           </Box>
         </SplitPane>
       </SplitPane>

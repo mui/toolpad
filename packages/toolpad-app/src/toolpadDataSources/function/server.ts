@@ -84,33 +84,27 @@ async function execBase(
       new ivm.Reference((...args: Parameters<typeof fetch>) => {
         const req = new Request(...args);
 
-        const serializedReq = {
-          method: req.method,
-          url: req.url,
-          headers: Array.from(req.headers.entries()),
-        };
-
         logs.push({
           timestamp: Date.now(),
-          level: 'log',
-          kind: 'fetch',
-          args: [`request "${serializedReq.url}"`, serializedReq],
+          kind: 'request',
+          request: {
+            method: req.method,
+            url: req.url,
+            headers: Array.from(req.headers.entries()),
+          },
         });
 
         return fetch(req).then(
           (res) => {
-            const serializedRes = {
-              status: res.status,
-              statusText: res.statusText,
-              ok: res.ok,
-              headers: Array.from(res.headers.entries()),
-            };
-
             logs.push({
               timestamp: Date.now(),
-              level: 'log',
-              kind: 'fetch',
-              args: [`response`, serializedRes],
+              kind: 'response',
+              response: {
+                status: res.status,
+                statusText: res.statusText,
+                ok: res.ok,
+                headers: Array.from(res.headers.entries()),
+              },
             });
 
             return {
@@ -125,7 +119,7 @@ async function execBase(
             logs.push({
               timestamp: Date.now(),
               level: 'error',
-              kind: 'fetch',
+              kind: 'console',
               args: [{ name: err.name, message: err.message }],
             });
 

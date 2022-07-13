@@ -46,6 +46,7 @@ import {
   isPageColumn,
 } from '../../../toolpadComponents';
 import { ExactEntriesOf } from '../../../utils/types';
+import { OverlayGrid } from './OverlayGrid';
 
 const classes = {
   view: 'Toolpad_View',
@@ -208,8 +209,6 @@ const EmptySlot = styled('div')({
   opacity: 0.75,
 });
 
-const DRAGGABLE_EDGE_MARGIN = 16; // px
-
 const DraggableEdge = styled('div', {
   shouldForwardProp: (prop) => prop !== 'edge',
 })<{
@@ -218,18 +217,18 @@ const DraggableEdge = styled('div', {
   let dynamicStyles = {};
   if (edge === RECTANGLE_EDGE_RIGHT) {
     dynamicStyles = {
-      top: -1,
-      right: -DRAGGABLE_EDGE_MARGIN / 2,
-      height: 'calc(100% + 2px)',
-      width: DRAGGABLE_EDGE_MARGIN,
+      top: 0,
+      right: 0,
+      height: '100%',
+      width: 8,
     };
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
-      top: -1,
-      left: -DRAGGABLE_EDGE_MARGIN / 2,
-      height: 'calc(100% + 2px)',
-      width: DRAGGABLE_EDGE_MARGIN,
+      top: 0,
+      left: 0,
+      height: '100%',
+      width: 8,
     };
   }
 
@@ -243,7 +242,8 @@ const DraggableEdge = styled('div', {
 });
 
 const ResizePreview = styled('div')({
-  outline: '2px solid red',
+  backgroundColor: '#44EB2D',
+  opacity: 0.5,
 });
 
 function hasFreeNodeSlots(nodeInfo: NodeInfo): boolean {
@@ -827,29 +827,37 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleEdgeDragStart = React.useCallback(
     (node: appDom.ElementNode, edge: RectangleEdge) => () => {
       api.edgeDragStart({ nodeId: node.id, edge });
+
+      api.select(node.id);
     },
     [api],
   );
 
   const handleEdgeDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
+      const draggedNode = getCurrentlyDraggedNode();
+      const parent = draggedNode && appDom.getParent(dom, draggedNode);
+
+      const parentInfo = parent ? nodesInfo[parent.id] : null;
+      const parentRect = parentInfo?.rect;
+
       const resizePreviewElement =
         editorWindowRef.current?.document.getElementById(RESIZE_PREVIEW_ID);
 
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
-      if (resizePreviewElement && cursorPos) {
+      if (parentRect && resizePreviewElement && cursorPos) {
         const resizePreviewRect = resizePreviewElement?.getBoundingClientRect();
+
+        const resizePreviewElementLeftPos = Number(
+          resizePreviewElement.style.left.replace('px', ''),
+        );
 
         if (
           draggedEdge === RECTANGLE_EDGE_LEFT &&
-          cursorPos.x > 0 &&
+          cursorPos.x > parentRect.x &&
           cursorPos.x < resizePreviewRect.x + resizePreviewRect.width
         ) {
-          const resizePreviewElementLeftPos = Number(
-            resizePreviewElement.style.left.replace('px', ''),
-          );
-
           const updatedTransformScale =
             1 + (resizePreviewElementLeftPos - cursorPos.x) / resizePreviewElement.offsetWidth;
 
@@ -859,21 +867,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         if (
           draggedEdge === RECTANGLE_EDGE_RIGHT &&
           cursorPos.x > resizePreviewRect.x &&
-          cursorPos.x < 1200
+          cursorPos.x < parentRect.x + parentRect.width
         ) {
-          const resizePreviewElementRightPos = Number(
-            resizePreviewElement.style.right.replace('px', ''),
-          );
-
           const updatedTransformScale =
-            (cursorPos.x - resizePreviewElementRightPos) / resizePreviewElement.offsetWidth;
+            (cursorPos.x - resizePreviewElementLeftPos) / resizePreviewElement.offsetWidth;
 
           resizePreviewElement.style.transformOrigin = '0 50%';
           resizePreviewElement.style.transform = `scale(${updatedTransformScale}, 1)`;
         }
       }
     },
-    [draggedEdge, getViewCoordinates],
+    [dom, draggedEdge, getCurrentlyDraggedNode, getViewCoordinates, nodesInfo],
   );
 
   const handleDragOver = React.useCallback(
@@ -1469,9 +1473,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       if (!layoutColumnSizes) {
         const children = appDom.getChildNodes(dom, pageRowNode).children;
 
-        layoutColumnSizes = children
-          .map((child) => child.layout?.columnSize || appDom.createConst(0))
-          .map((constAttribute) => constAttribute.value);
+        layoutColumnSizes = children.map((child) => child.layout?.columnSize?.value || 0);
       }
 
       const totalLayoutColumnsSize = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
@@ -1801,12 +1803,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     };
   }, [overlayKey, handlePageViewStateUpdate, rootElm]);
 
-  const pinholeRect = selectedRect && {
-    ...selectedRect,
-    x: selectedRect.x - DRAGGABLE_EDGE_MARGIN / 2,
-    width: selectedRect.width + DRAGGABLE_EDGE_MARGIN,
-  };
-
   return (
     <RenderPanelRoot className={className}>
       <EditorCanvasHost
@@ -1927,7 +1923,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             This allows interactivity on the selected element only, while maintaining
             a reliable click target for the rest of the page
           */}
-          <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={pinholeRect} />
+          <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
+          {draggedEdge ? <OverlayGrid /> : null}
         </OverlayRoot>
       </EditorOverlay>
     </RenderPanelRoot>

@@ -29,8 +29,9 @@ function ConnectionParamsInput() {
 }
 
 const DEFAULT_MODULE = `export default async function ({ params }: ${EVENT_INTERFACE_IDENTIFIER}) {
+  console.info('Executing function', params);
   const url = new URL('https://gist.githubusercontent.com/saniyusuf/406b843afdfb9c6a86e25753fe2761f4/raw/523c324c7fcc36efab8224f9ebb7556c09b69a14/Film.JSON');
-  url.searchParams.set('foo', params.foo);
+  url.searchParams.set('timestamp', Date.now());
   const response = await fetch(String(url));
   if (!response.ok) {
     throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);

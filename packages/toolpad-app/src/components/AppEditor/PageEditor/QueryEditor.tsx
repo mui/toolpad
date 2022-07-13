@@ -337,9 +337,6 @@ function QueryNodeEditorDialog<Q, P>({
                 flex: 1,
                 minWidth: 0,
                 overflow: 'auto',
-                gap: 2,
-                px: 3,
-                py: 1,
               }}
             >
               <ConnectionContextProvider value={queryEditorContext}>
@@ -355,9 +352,9 @@ function QueryNodeEditorDialog<Q, P>({
                 />
               </ConnectionContextProvider>
 
-              <Grid container direction="row" spacing={1}>
-                {/* TODO: move transform inside of the dataSource.QueryEditor and remove the conditional */}
-                {dataSourceId === 'function' ? null : (
+              {/* TODO: move transform inside of the dataSource.QueryEditor and remove the conditional */}
+              {dataSourceId === 'function' ? null : (
+                <Grid container direction="row" spacing={1} sx={{ px: 3, pb: 1, mt: 2 }}>
                   <React.Fragment>
                     <Divider />
                     <Grid item xs={6}>
@@ -384,9 +381,10 @@ function QueryNodeEditorDialog<Q, P>({
                       </Stack>
                     </Grid>
                   </React.Fragment>
-                )}
-              </Grid>
+                </Grid>
+              )}
             </Stack>
+
             {/* TODO: move preview inside of the dataSource.QueryEditor and remove the conditional */}
             {dataSourceId === 'function' ? null : (
               <Box

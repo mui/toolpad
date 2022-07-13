@@ -69,6 +69,20 @@ function QueryEditor({
     });
   }, [appId, connectionId, value]);
 
+  const extraLibs = React.useMemo(() => {
+    const paramsMembers = params.map(([key]) => `${key}: string`).join('\n');
+
+    const content = `
+      interface ToolpadFunctionEvent {
+        params: {
+          ${paramsMembers}
+        }
+      }
+    `;
+
+    return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
+  }, [params]);
+
   return (
     <Box sx={{ height: 500, position: 'relative' }}>
       <SplitPane split="vertical" size="50%" allowResize>
@@ -76,6 +90,7 @@ function QueryEditor({
           <TypescriptEditor
             value={value.query.module}
             onChange={(newValue) => onChange({ ...value, query: { module: newValue } })}
+            extraLibs={extraLibs}
           />
 
           <Box>

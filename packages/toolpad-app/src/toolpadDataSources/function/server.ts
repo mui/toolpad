@@ -1,4 +1,5 @@
 import ivm from 'isolated-vm';
+import { transform } from 'esbuild';
 import { ServerDataSource } from '../../types';
 import { FunctionQuery, FunctionConnectionParams, FunctionResult, LogEntry } from './types';
 import { Maybe } from '../../utils/types';
@@ -135,7 +136,11 @@ async function execBase(
   let error: Error | undefined;
 
   try {
-    const userModule = await isolate.compileModule(functionQuery.module);
+    const { code: userModuleJs } = await transform(functionQuery.module, {
+      loader: 'ts',
+    });
+
+    const userModule = await isolate.compileModule(userModuleJs);
 
     await userModule.instantiate(context, (specifier) => {
       throw new Error(`Not found "${specifier}"`);
@@ -145,7 +150,7 @@ async function execBase(
 
     const defaultExport = await userModule.namespace.get('default', { reference: true });
 
-    data = await defaultExport.apply(null, [params], {
+    data = await defaultExport.apply(null, [{ params }], {
       arguments: { copy: true },
       result: { copy: true, promise: true },
     });

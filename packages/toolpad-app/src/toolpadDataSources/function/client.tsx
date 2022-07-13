@@ -3,15 +3,15 @@ import * as React from 'react';
 import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
 import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
 
+import { LoadingButton } from '@mui/lab';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { FunctionConnectionParams, FunctionQuery, FunctionResult, LogEntry } from './types';
 import lazyComponent from '../../utils/lazyComponent';
 import ParametersEditor from '../../components/AppEditor/PageEditor/ParametersEditor';
 import SplitPane from '../../components/SplitPane';
-import { LoadingButton } from '@mui/lab';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useConnectionContext } from '../context';
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import client from '../../api';
 import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../components/AppEditor/PageEditor/ErrorAlert';
@@ -100,7 +100,7 @@ function QueryEditor({
               {preview?.error ? (
                 <ErrorAlert error={preview?.error} />
               ) : (
-                <JsonView src={preview?.data}></JsonView>
+                <JsonView src={preview?.data} />
               )}
             </Box>
           </Box>

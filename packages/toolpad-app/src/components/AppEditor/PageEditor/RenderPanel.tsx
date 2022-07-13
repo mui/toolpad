@@ -1850,6 +1850,19 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               node,
             ) as appDom.NodeChildren<appDom.ElementNode>;
 
+            const parentChildNodes =
+              parent &&
+              (appDom.getChildNodes(dom, parent) as appDom.NodeChildren<appDom.ElementNode>);
+            const parentSlotChildNodes =
+              parentChildNodes && node.parentProp && parentChildNodes[node.parentProp];
+
+            const isFirstChild = parentSlotChildNodes
+              ? parentSlotChildNodes[0].id === node.id
+              : false;
+            const isLastChild = parentSlotChildNodes
+              ? parentSlotChildNodes[parentSlotChildNodes.length - 1].id === node.id
+              : false;
+
             const nodeRect = nodeInfo?.rect || null;
             const hasNodeOverlay = isPageNode || appDom.isElement(node);
 
@@ -1867,7 +1880,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                     allowInteraction={nodesWithInteraction.has(node.id) && !draggedEdge}
                     onNodeDragStart={handleNodeDragStart(node)}
                     draggableEdges={
-                      isPageRowChild ? [RECTANGLE_EDGE_LEFT, RECTANGLE_EDGE_RIGHT] : []
+                      isPageRowChild
+                        ? [
+                            ...(isFirstChild ? [] : [RECTANGLE_EDGE_LEFT as RectangleEdge]),
+                            ...(isLastChild ? [] : [RECTANGLE_EDGE_RIGHT as RectangleEdge]),
+                          ]
+                        : []
                     }
                     onEdgeDragStart={isPageRowChild ? handleEdgeDragStart : undefined}
                     onDelete={() => handleDelete(node.id)}

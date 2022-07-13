@@ -525,6 +525,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return [pageNode, ...appDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
+  const overlayGridRef = React.useRef<{
+    getMinColumnWidth: () => number;
+    getLeftColumnEdges: () => number[];
+    getRightColumnEdges: () => number[];
+  }>({
+    getMinColumnWidth: () => 0,
+    getLeftColumnEdges: () => [],
+    getRightColumnEdges: () => [],
+  });
+
   const isEmptyPage = pageNodes.length <= 1;
 
   const selectedNode = selection && appDom.getNode(dom, selection);
@@ -853,24 +863,45 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           resizePreviewElement.style.left.replace('px', ''),
         );
 
+        const resizeSnapUnits = 4; // px
+        const snapToGridMargin = 12; // px
+
+        let snappedToGridCursorPosX = Math.round(cursorPos.x / resizeSnapUnits) * resizeSnapUnits;
+
+        const activeSnapGridColumnEdges =
+          draggedEdge === RECTANGLE_EDGE_LEFT
+            ? overlayGridRef.current.getLeftColumnEdges()
+            : overlayGridRef.current.getRightColumnEdges();
+
+        for (const gridColumnEdge of activeSnapGridColumnEdges) {
+          if (Math.abs(gridColumnEdge - cursorPos.x) <= snapToGridMargin) {
+            snappedToGridCursorPosX = gridColumnEdge;
+          }
+        }
+
+        const minGridColumnWidth = overlayGridRef.current.getMinColumnWidth();
+
         if (
           draggedEdge === RECTANGLE_EDGE_LEFT &&
-          cursorPos.x > parentRect.x &&
-          cursorPos.x < resizePreviewRect.x + resizePreviewRect.width
+          snappedToGridCursorPosX > parentRect.x + minGridColumnWidth &&
+          snappedToGridCursorPosX < resizePreviewRect.x + resizePreviewRect.width
         ) {
           const updatedTransformScale =
-            1 + (resizePreviewElementLeftPos - cursorPos.x) / resizePreviewElement.offsetWidth;
+            1 +
+            (resizePreviewElementLeftPos - snappedToGridCursorPosX) /
+              resizePreviewElement.offsetWidth;
 
           resizePreviewElement.style.transformOrigin = '100% 50%';
           resizePreviewElement.style.transform = `scale(${updatedTransformScale}, 1)`;
         }
         if (
           draggedEdge === RECTANGLE_EDGE_RIGHT &&
-          cursorPos.x > resizePreviewRect.x &&
-          cursorPos.x < parentRect.x + parentRect.width
+          snappedToGridCursorPosX > resizePreviewRect.x &&
+          snappedToGridCursorPosX < parentRect.x + parentRect.width - minGridColumnWidth
         ) {
           const updatedTransformScale =
-            (cursorPos.x - resizePreviewElementLeftPos) / resizePreviewElement.offsetWidth;
+            (snappedToGridCursorPosX - resizePreviewElementLeftPos) /
+            resizePreviewElement.offsetWidth;
 
           resizePreviewElement.style.transformOrigin = '0 50%';
           resizePreviewElement.style.transform = `scale(${updatedTransformScale}, 1)`;
@@ -1942,7 +1973,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             a reliable click target for the rest of the page
           */}
           <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
-          {draggedEdge ? <OverlayGrid /> : null}
+          {draggedEdge ? <OverlayGrid ref={overlayGridRef} /> : null}
         </OverlayRoot>
       </EditorOverlay>
     </RenderPanelRoot>

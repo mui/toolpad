@@ -111,7 +111,7 @@ function QueryEditor({
               </Button>
             </Toolbar>
 
-            <Console sx={{ flex: 1, overflow: 'auto', mx: 1 }} entries={previewLogs} />
+            <Console sx={{ flex: 1, overflow: 'auto' }} entries={previewLogs} />
           </Box>
         </SplitPane>
       </SplitPane>

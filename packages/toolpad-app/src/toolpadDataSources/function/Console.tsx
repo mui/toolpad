@@ -5,6 +5,7 @@ import { interleave } from '../../utils/react';
 import { LogEntry } from './types';
 
 const classes = {
+  logEntries: 'Toolpad_ConsoleLogEntries',
   logEntry: 'Toolpad_ConsoleLogEntry',
   logEntryText: 'Toolpad_ConsoleLogEntryTExt',
 };
@@ -16,11 +17,18 @@ const ConsoleRoot = styled('div')(({ theme }) => ({
   lineHeight: 1.2,
   fontFamily: 'Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
 
+  // This container has only a single item, but the column-reverse has the effect that it
+  // keeps the scroll position at the bottom when the content grows
+  display: 'flex',
+  flexDirection: 'column-reverse',
+
   [`& .${classes.logEntry}`]: {
     '&:first-child': {
       borderTop: `1px solid ${theme.palette.divider}`,
     },
     borderBottom: `1px solid ${theme.palette.divider}`,
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
     paddingTop: 3,
     paddingBottom: 1,
   },
@@ -98,9 +106,11 @@ interface ConsoleProps {
 export default function Console({ entries, sx }: ConsoleProps) {
   return (
     <ConsoleRoot sx={sx}>
-      {entries.map((entry) => (
-        <ConsoleEntry entry={entry} />
-      ))}
+      <div className={classes.logEntries}>
+        {entries.map((entry) => (
+          <ConsoleEntry entry={entry} />
+        ))}
+      </div>
     </ConsoleRoot>
   );
 }

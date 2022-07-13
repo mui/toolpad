@@ -1,8 +1,37 @@
 import ivm from 'isolated-vm';
-import { transform } from 'esbuild';
+import * as esbuild from 'esbuild';
 import { ServerDataSource } from '../../types';
 import { FunctionQuery, FunctionConnectionParams, FunctionResult, LogEntry } from './types';
 import { Maybe } from '../../utils/types';
+
+async function createPolyfillModule() {
+  const { outputFiles } = await esbuild.build({
+    entryPoints: [],
+    bundle: true,
+    format: 'esm',
+    write: false,
+    stdin: {
+      resolveDir: __dirname,
+      contents: `
+        import 'fastestsmallesttextencoderdecoder';
+        import { URL, URLSearchParams } from 'whatwg-url';
+
+        global.URL = URL;
+        global.URLSearchParams = URLSearchParams;
+      `,
+    },
+  });
+  const code = outputFiles?.[0].text || '';
+  return code;
+}
+
+let cachedPolyfills: Promise<string> | undefined;
+async function getPolyfills() {
+  if (!cachedPolyfills) {
+    cachedPolyfills = createPolyfillModule();
+  }
+  return cachedPolyfills;
+}
 
 const isolate = new ivm.Isolate({ memoryLimit: 128 });
 
@@ -45,6 +74,9 @@ async function execBase(
     ],
     { arguments: { reference: true } },
   );
+
+  const polyfills = await getPolyfills();
+  await context.eval(polyfills);
 
   await context.evalClosure(
     `
@@ -121,7 +153,7 @@ async function execBase(
               timestamp: Date.now(),
               level: 'error',
               kind: 'console',
-              args: [{ name: err.name, message: err.message }],
+              args: [{ name: err.name, message: err.message, stack: err.stack }],
             });
 
             throw err;
@@ -136,7 +168,7 @@ async function execBase(
   let error: Error | undefined;
 
   try {
-    const { code: userModuleJs } = await transform(functionQuery.module, {
+    const { code: userModuleJs } = await esbuild.transform(functionQuery.module, {
       loader: 'ts',
     });
 
@@ -149,7 +181,6 @@ async function execBase(
     userModule.evaluateSync();
 
     const defaultExport = await userModule.namespace.get('default', { reference: true });
-
     data = await defaultExport.apply(null, [{ params }], {
       arguments: { copy: true },
       result: { copy: true, promise: true },

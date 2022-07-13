@@ -17,6 +17,8 @@ import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../components/AppEditor/PageEditor/ErrorAlert';
 import Console from './Console';
 
+const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
+
 const TypescriptEditor = lazyComponent(() => import('../../components/TypescriptEditor'), {
   noSsr: true,
   fallback: <Skeleton variant="rectangular" height="100%" />,
@@ -26,8 +28,14 @@ function ConnectionParamsInput() {
   return <Stack direction="column" gap={3} sx={{ py: 3 }} />;
 }
 
-const DEFAULT_MODULE = `export default async function () {
-  throw new Error('Not implemented');
+const DEFAULT_MODULE = `export default async function ({ params }: ${EVENT_INTERFACE_IDENTIFIER}) {
+  const url = new URL('https://gist.githubusercontent.com/saniyusuf/406b843afdfb9c6a86e25753fe2761f4/raw/523c324c7fcc36efab8224f9ebb7556c09b69a14/Film.JSON');
+  url.searchParams.set('foo', params.foo);
+  const response = await fetch(String(url));
+  if (!response.ok) {
+    throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
+  }
+  return response.json();
 }`;
 
 function QueryEditor({
@@ -63,17 +71,25 @@ function QueryEditor({
   const [preview, setPreview] = React.useState<FunctionResult | null>(null);
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
   const runPreview = React.useCallback(() => {
-    client.query.dataSourceFetchPrivate(appId, connectionId, value).then((result) => {
-      setPreview(result);
-      setPreviewLogs((existing) => [...existing, ...result.logs]);
-    });
-  }, [appId, connectionId, value]);
+    const currentParams = Object.fromEntries(
+      paramsEditorLiveValue.map(([key, binding]) => [key, binding.value]),
+    );
+    client.query
+      .dataSourceFetchPrivate(appId, connectionId, {
+        query: value.query,
+        params: currentParams,
+      })
+      .then((result) => {
+        setPreview(result);
+        setPreviewLogs((existing) => [...existing, ...result.logs]);
+      });
+  }, [appId, connectionId, paramsEditorLiveValue, value.query]);
 
   const extraLibs = React.useMemo(() => {
     const paramsMembers = params.map(([key]) => `${key}: string`).join('\n');
 
     const content = `
-      interface ToolpadFunctionEvent {
+      interface ${EVENT_INTERFACE_IDENTIFIER} {
         params: {
           ${paramsMembers}
         }

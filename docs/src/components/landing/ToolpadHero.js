@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import GradientText from 'docs/src/components/typography/GradientText';
 import IconImage from 'docs/src/components/icon/IconImage';
-import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer.tsx';
+import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
 
 export default function ToolpadHero() {
   return (

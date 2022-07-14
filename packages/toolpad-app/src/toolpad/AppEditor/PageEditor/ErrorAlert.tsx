@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Alert, AlertTitle, IconButton, Collapse, Box } from '@mui/material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Pre from '../../Pre';
+import Pre from '../../../components/Pre';
 
 /**
  * Remove the error message from the stack trace

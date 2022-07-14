@@ -18,7 +18,7 @@ import type { Deployment } from '../../prisma/generated/client';
 import client from '../api';
 import { Maybe } from '../utils/types';
 import ToolpadAppShell from './ToolpadAppShell';
-import DefinitionList from './DefinitionList';
+import DefinitionList from '../components/DefinitionList';
 
 interface ReleaseRow {
   createdAt: Date;

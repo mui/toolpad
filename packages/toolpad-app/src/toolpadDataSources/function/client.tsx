@@ -182,11 +182,20 @@ function QueryEditor({
     <Box sx={{ height: 500, position: 'relative' }}>
       <SplitPane split="vertical" size="50%" allowResize>
         <SplitPane split="horizontal" size={85} primary="second" allowResize>
-          <TypescriptEditor
-            value={value.query.module}
-            onChange={(newValue) => onChange({ ...value, query: { module: newValue } })}
-            extraLibs={extraLibs}
-          />
+          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Toolbar>
+              <LoadingButton startIcon={<PlayArrowIcon />} onClick={() => runPreview()}>
+                Preview
+              </LoadingButton>
+            </Toolbar>
+            <Box sx={{ flex: 1, minHeight: 0 }}>
+              <TypescriptEditor
+                value={value.query.module}
+                onChange={(newValue) => onChange({ ...value, query: { module: newValue } })}
+                extraLibs={extraLibs}
+              />
+            </Box>
+          </Box>
 
           <Box sx={{ p: 2 }}>
             <Typography>Parameters</Typography>
@@ -200,20 +209,14 @@ function QueryEditor({
         </SplitPane>
 
         <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
-          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Toolbar>
-              <LoadingButton startIcon={<PlayArrowIcon />} onClick={() => runPreview()}>
-                Preview
-              </LoadingButton>
-            </Toolbar>
-            <Box sx={{ flex: 1, overflow: 'auto', mx: 1 }}>
-              {preview?.error ? (
-                <ErrorAlert error={preview?.error} />
-              ) : (
-                <JsonView src={preview?.data} />
-              )}
-            </Box>
+          <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
+            {preview?.error ? (
+              <ErrorAlert error={preview?.error} />
+            ) : (
+              <JsonView src={preview?.data} />
+            )}
           </Box>
+
           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Toolbar>
               <Button startIcon={<DoDisturbIcon />} onClick={() => setPreviewLogs([])}>

@@ -219,12 +219,16 @@ function QueryEditor({
 
           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Toolbar>
-              <Button startIcon={<DoDisturbIcon />} onClick={() => setPreviewLogs([])}>
+              <Button
+                startIcon={<DoDisturbIcon />}
+                onClick={() => setPreviewLogs([])}
+                disabled={previewLogs.length <= 0}
+              >
                 Clear
               </Button>
             </Toolbar>
 
-            <Console sx={{ flex: 1, overflow: 'auto' }} entries={previewLogs} />
+            <Console sx={{ flex: 1 }} entries={previewLogs} />
           </Box>
         </SplitPane>
       </SplitPane>

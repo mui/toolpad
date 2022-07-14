@@ -13,12 +13,12 @@ import {
   FunctionResult,
 } from './types';
 import lazyComponent from '../../utils/lazyComponent';
-import ParametersEditor from '../../components/AppEditor/PageEditor/ParametersEditor';
+import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import SplitPane from '../../components/SplitPane';
 import { useConnectionContext, usePrivateQuery } from '../context';
 import client from '../../api';
 import JsonView from '../../components/JsonView';
-import ErrorAlert from '../../components/AppEditor/PageEditor/ErrorAlert';
+import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import Console, { LogEntry } from '../../components/Console';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';

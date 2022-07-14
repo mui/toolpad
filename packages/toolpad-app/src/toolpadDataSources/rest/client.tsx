@@ -201,7 +201,7 @@ function QueryEditor({
   });
 
   return (
-    <Stack gap={2}>
+    <Stack gap={2} sx={{ px: 3, pt: 1 }}>
       <Typography>Parameters</Typography>
       <ParametersEditor
         value={params}

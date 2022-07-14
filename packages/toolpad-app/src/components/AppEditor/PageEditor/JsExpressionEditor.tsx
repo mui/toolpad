@@ -11,8 +11,7 @@ const TypescriptEditor = lazyComponent(() => import('../../TypescriptEditor'), {
 
 const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
   height: 150,
-  border: '1px solid black',
-  borderColor: theme.palette.divider,
+  border: `1px solid ${theme.palette.divider}`,
 }));
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {

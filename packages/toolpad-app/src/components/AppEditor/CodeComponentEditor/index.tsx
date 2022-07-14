@@ -21,6 +21,7 @@ import { mapValues } from '../../../utils/collections';
 import ErrorAlert from '../PageEditor/ErrorAlert';
 import lazyComponent from '../../../utils/lazyComponent';
 import CenteredSpinner from '../../CenteredSpinner';
+import SplitPane from '../../SplitPane';
 
 const TypescriptEditor = lazyComponent(() => import('../../TypescriptEditor'), {
   noSsr: true,
@@ -158,17 +159,16 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             Update
           </Button>
         </Toolbar>
-        <Box flex={1} display="flex">
-          <Box flex={1}>
+        <Box flex={1}>
+          <SplitPane split="vertical" allowResize size="50%">
             <TypescriptEditor
               value={input}
               onChange={(newValue) => setInput(newValue || '')}
               extraLibs={extraLibs}
             />
-          </Box>
-          <Box sx={{ flex: 1, position: 'relative' }}>
+
             <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
-          </Box>
+          </SplitPane>
         </Box>
       </Stack>
       {iframeLoaded && frameDocument

@@ -59,6 +59,7 @@
     "fastestsmallesttextencoderdecoder": "^1.0.22",
     "find-up": "^6.2.0",
     "fractional-indexing": "^3.0.1",
+    "headers-polyfill": "^3.0.10",
     "isolated-vm": "^4.4.1",
     "json-to-ts": "^1.7.0",
     "json5": "^2.2.1",

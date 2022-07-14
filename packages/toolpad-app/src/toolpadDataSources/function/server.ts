@@ -20,8 +20,10 @@ async function createPolyfillModule() {
       resolveDir: __dirname,
       contents: `
         import 'fastestsmallesttextencoderdecoder';
+        import { Headers } from 'headers-polyfill';
         import { URL, URLSearchParams } from 'whatwg-url';
 
+        global.Headers = Headers;
         global.URL = URL;
         global.URLSearchParams = URLSearchParams;
       `,
@@ -99,6 +101,9 @@ async function execBase(
         get statusText () {
           return this[INTERNALS].getSync('statusText');
         }
+        get headers () {
+          return new Headers(this[INTERNALS].getSync('headers').copy())
+        }
         json (...args) {
           return this[INTERNALS].getSync('json').apply(null, args, { 
             arguments: { copy: true },
@@ -122,10 +127,12 @@ async function execBase(
     [
       new ivm.Reference((...args: Parameters<typeof fetch>) => {
         const req = new Request(...args);
+        const id = '';
 
         logs.push({
           timestamp: Date.now(),
           kind: 'request',
+          id,
           request: {
             method: req.method,
             url: req.url,
@@ -135,14 +142,21 @@ async function execBase(
 
         return fetch(req).then(
           (res) => {
+            const resHeadersInit = Array.from(res.headers.entries());
+
             logs.push({
               timestamp: Date.now(),
               kind: 'response',
+              id,
               response: {
                 status: res.status,
                 statusText: res.statusText,
                 ok: res.ok,
-                headers: Array.from(res.headers.entries()),
+                headers: resHeadersInit,
+                bodyUsed: res.bodyUsed,
+                redirected: res.redirected,
+                type: res.type,
+                url: res.url,
               },
             });
 
@@ -150,6 +164,7 @@ async function execBase(
               ok: res.ok,
               status: res.status,
               statusText: res.statusText,
+              headers: new ivm.ExternalCopy(resHeadersInit),
               json: new ivm.Reference(() => res.json()),
               text: new ivm.Reference(() => res.text()),
             };

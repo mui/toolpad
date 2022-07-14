@@ -26,6 +26,10 @@ export interface LogResponse {
   statusText: string;
   ok: boolean;
   headers: [string, string][];
+  bodyUsed: boolean;
+  redirected: boolean;
+  type: Response['type'];
+  url: string;
 }
 
 export interface LogConsoleEntry {
@@ -38,12 +42,14 @@ export interface LogConsoleEntry {
 export interface LogRequestEntry {
   timestamp: number;
   kind: 'request';
+  id: string;
   request: LogRequest;
 }
 
 export interface LogResponseEntry {
   timestamp: number;
   kind: 'response';
+  id: string;
   response: LogResponse;
 }
 

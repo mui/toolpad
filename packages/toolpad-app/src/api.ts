@@ -54,19 +54,17 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfG
   );
 }
 
+export interface UseQueryFnOptions<F extends (...args: any[]) => any>
+  extends Omit<
+    UseQueryOptions<Awaited<ReturnType<F>>, unknown, Awaited<ReturnType<F>>, any[]>,
+    'queryKey' | 'queryFn' | 'enabled'
+  > {}
+
 interface UseQueryFn<M extends MethodsGroup> {
   <K extends keyof M & string>(
     name: K,
     params: Parameters<M[K]> | null,
-    options?: Omit<
-      UseQueryOptions<
-        Awaited<ReturnType<M[K]>>,
-        unknown,
-        Awaited<ReturnType<M[K]>>,
-        [K, Parameters<M[K]> | null]
-      >,
-      'queryKey' | 'queryFn'
-    >,
+    options?: UseQueryFnOptions<M[K]>,
   ): UseQueryResult<Awaited<ReturnType<M[K]>>>;
 }
 

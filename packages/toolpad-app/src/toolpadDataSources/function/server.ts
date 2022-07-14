@@ -217,7 +217,7 @@ async function execBase(
         );
       }),
     ],
-    {},
+    { timeout: 30000 },
   );
 
   let data;

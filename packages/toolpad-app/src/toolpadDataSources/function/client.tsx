@@ -126,7 +126,15 @@ function QueryEditor({
   const [preview, setPreview] = React.useState<FunctionResult | null>(null);
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
 
+  const cancelRunPreview = React.useRef<(() => void) | null>(null);
   const runPreview = React.useCallback(() => {
+    let canceled = false;
+
+    cancelRunPreview.current?.();
+    cancelRunPreview.current = () => {
+      canceled = true;
+    };
+
     const currentParams = Object.fromEntries(
       paramsEditorLiveValue.map(([key, binding]) => [key, binding.value]),
     );
@@ -138,8 +146,13 @@ function QueryEditor({
         params: currentParams,
       } as FunctionPrivateQuery)
       .then((result) => {
-        setPreview(result);
-        setPreviewLogs((existing) => [...existing, ...result.logs]);
+        if (!canceled) {
+          setPreview(result);
+          setPreviewLogs((existing) => [...existing, ...result.logs]);
+        }
+      })
+      .finally(() => {
+        cancelRunPreview.current = null;
       });
   }, [appId, connectionId, paramsEditorLiveValue, value.query]);
 

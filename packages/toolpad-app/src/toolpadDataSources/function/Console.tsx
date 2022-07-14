@@ -23,7 +23,7 @@ const ConsoleRoot = styled('div')(({ theme }) => ({
   flexDirection: 'column-reverse',
 
   [`& .${classes.logEntry}`]: {
-    '&:first-child': {
+    '&:first-of-type': {
       borderTop: `1px solid ${theme.palette.divider}`,
     },
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -61,7 +61,9 @@ function ConsoleLogEntry({ entry }: ConsoleEntryProps<'console'>) {
     <div className={classes.logEntry}>
       <div className={classes.logEntryText}>
         {interleave(
-          entry.args.map((arg) => (typeof arg === 'string' ? arg : <ConsoleInpector data={arg} />)),
+          entry.args.map((arg, i) =>
+            typeof arg === 'string' ? arg : <ConsoleInpector key={i} data={arg} />,
+          ),
           ' ',
         )}
       </div>
@@ -107,8 +109,8 @@ export default function Console({ entries, sx }: ConsoleProps) {
   return (
     <ConsoleRoot sx={sx}>
       <div className={classes.logEntries}>
-        {entries.map((entry) => (
-          <ConsoleEntry entry={entry} />
+        {entries.map((entry, i) => (
+          <ConsoleEntry key={i} entry={entry} />
         ))}
       </div>
     </ConsoleRoot>

@@ -83,6 +83,41 @@ async function execBase(
     { arguments: { reference: true } },
   );
 
+  let nextTimeoutId = 1;
+  const timeouts = new Map<number, NodeJS.Timeout>();
+  await context.evalClosure(
+    `      
+      global.setTimeout = (cb, ms) => {
+        return $0.applySync(null, [cb, ms], { arguments: { reference: true }, result: { copy: true }});
+      }
+
+      global.clearTimeout = (timeout) => {
+        return $1.applyIgnored(null, [timeout], { arguments: { copy: true }});
+      }
+    `,
+    [
+      (cb: ivm.Reference, ms: ivm.Reference) => {
+        const id = nextTimeoutId;
+        nextTimeoutId += 1;
+
+        const timeout = setTimeout(() => {
+          timeouts.delete(id);
+          cb.applyIgnored(null, []);
+        }, ms.copySync());
+
+        timeouts.set(id, timeout);
+
+        return id;
+      },
+      (id: number) => {
+        const timeout = timeouts.get(id);
+        timeouts.delete(id);
+        clearTimeout(timeout);
+      },
+    ],
+    { arguments: { reference: true } },
+  );
+
   const polyfills = await getPolyfills();
   await context.eval(polyfills);
 

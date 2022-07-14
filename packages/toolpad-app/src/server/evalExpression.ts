@@ -9,7 +9,7 @@ export type Serializable =
   | { [key: string]: Serializable }
   | ((...args: Serializable[]) => Serializable);
 
-function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
+export function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
   switch (typeof json) {
     case 'string':
       return ctx.newString(json);

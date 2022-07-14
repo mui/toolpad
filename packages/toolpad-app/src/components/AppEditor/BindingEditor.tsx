@@ -124,7 +124,15 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
       <GlobalScopeExplorer value={globalScope} />
 
-      <Box sx={{ height: '100%', display: 'flex', flex: 1, flexDirection: 'column' }}>
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flex: 1,
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
         <Typography sx={{ mb: 2 }}>
           Make the &quot;{label}&quot; property dynamic with a JavaScript expression. This property
           expects a type: <code>{propType?.type || 'any'}</code>.

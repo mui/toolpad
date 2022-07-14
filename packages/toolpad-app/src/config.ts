@@ -22,7 +22,7 @@ import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
  */
 
 // These are inlined at build time
-export type BuildEnvVars = Partial<Record<'TOOLPAD_TARGET' | 'TOOLPAD_DEMO', string>>;
+export type BuildEnvVars = Record<'TOOLPAD_TARGET' | 'TOOLPAD_DEMO' | 'TOOLPAD_VERSION', string>;
 
 // These are set at runtime and passed to the browser.
 // Do not add secrets

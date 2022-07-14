@@ -329,6 +329,7 @@ function QueryNodeEditorDialog<Q, P>({
         </Stack>
       </DialogTitle>
       <Divider />
+
       {dataSourceId && dataSource ? (
         <DialogContent sx={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', p: 0 }}>
           <Box sx={{ display: 'flex', flexDirection: 'row', minHeight: 0 }}>

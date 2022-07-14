@@ -181,7 +181,7 @@ function QueryEditor({
   return (
     <Box sx={{ height: 500, position: 'relative' }}>
       <SplitPane split="vertical" size="50%" allowResize>
-        <SplitPane split="horizontal" size={20} primary="second" allowResize>
+        <SplitPane split="horizontal" size={85} primary="second" allowResize>
           <TypescriptEditor
             value={value.query.module}
             onChange={(newValue) => onChange({ ...value, query: { module: newValue } })}

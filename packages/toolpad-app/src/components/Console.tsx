@@ -1,6 +1,8 @@
-import { styled, SxProps } from '@mui/material';
+import { darken, lighten, styled, SxProps } from '@mui/material';
+import clsx from 'clsx';
 import * as React from 'react';
-import Inspector, { chromeLight, InspectorProps, InspectorTheme } from 'react-inspector';
+import Inspector, { InspectorProps } from 'react-inspector';
+import inspectorTheme from '../inspectorTheme';
 import { interleave } from '../utils/react';
 
 export interface LogRequest {
@@ -49,46 +51,64 @@ const classes = {
   logEntryText: 'Toolpad_ConsoleLogEntryTExt',
 };
 
-const ConsoleRoot = styled('div')(({ theme }) => ({
-  overflow: 'auto',
+const ConsoleRoot = styled('div')(({ theme }) => {
+  const getColor = (color: string) => {
+    const modify = theme.palette.mode === 'light' ? darken : lighten;
+    return modify(color, 0.6);
+  };
 
-  fontSize: 12,
-  lineHeight: 1.2,
-  fontFamily: 'Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+  const getBackgroundColor = (color: string) => {
+    const modify = theme.palette.mode === 'light' ? lighten : darken;
+    return modify(color, 0.9);
+  };
 
-  // This container has only a single item, but the column-reverse has the effect that it
-  // keeps the scroll position at the bottom when the content grows
-  display: 'flex',
-  flexDirection: 'column-reverse',
+  return {
+    overflow: 'auto',
 
-  [`& .${classes.logEntry}`]: {
-    '&:first-of-type': {
-      borderTop: `1px solid ${theme.palette.divider}`,
+    fontSize: 12,
+    lineHeight: 1.2,
+    fontFamily: 'Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+
+    // This container has only a single item, but the column-reverse has the effect that it
+    // keeps the scroll position at the bottom when the content grows
+    display: 'flex',
+    flexDirection: 'column-reverse',
+
+    [`& .${classes.logEntry}`]: {
+      '&:first-of-type': {
+        borderTop: `1px solid ${theme.palette.divider}`,
+      },
+      borderBottom: `1px solid ${theme.palette.divider}`,
+      paddingLeft: theme.spacing(1),
+      paddingRight: theme.spacing(1),
+      paddingTop: 3,
+      paddingBottom: 1,
     },
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
-    paddingTop: 3,
-    paddingBottom: 1,
-  },
 
-  [`& .${classes.logEntryText} > *`]: {
-    display: 'inline-block',
-    verticalAlign: 'top',
-  },
-}));
+    [`& .${classes.logEntry}.error`]: {
+      color: getColor(theme.palette.error.light),
+      background: getBackgroundColor(theme.palette.error.light),
+    },
 
-const INSPECTOR_THEME: InspectorTheme = {
-  ...chromeLight,
+    [`& .${classes.logEntry}.warn`]: {
+      color: getColor(theme.palette.warning.light),
+      background: getBackgroundColor(theme.palette.warning.light),
+    },
 
-  TREENODE_FONT_FAMILY: 'inherit',
-  TREENODE_FONT_SIZE: 'inherit',
-  ARROW_FONT_SIZE: 'inherit',
-  TREENODE_LINE_HEIGHT: 'inherit',
-};
+    [`& .${classes.logEntry}.info`]: {
+      color: getColor(theme.palette.info.light),
+      background: getBackgroundColor(theme.palette.info.light),
+    },
+
+    [`& .${classes.logEntryText} > *`]: {
+      display: 'inline-block',
+      verticalAlign: 'top',
+    },
+  };
+});
 
 function ConsoleInpector(props: InspectorProps) {
-  return <Inspector {...props} theme={INSPECTOR_THEME} />;
+  return <Inspector {...props} theme={inspectorTheme} />;
 }
 
 interface ConsoleEntryProps<K = LogEntry['kind']> {
@@ -97,7 +117,7 @@ interface ConsoleEntryProps<K = LogEntry['kind']> {
 
 function ConsoleLogEntry({ entry }: ConsoleEntryProps<'console'>) {
   return (
-    <div className={classes.logEntry}>
+    <div className={clsx(classes.logEntry, entry.level)}>
       <div className={classes.logEntryText}>
         {interleave(
           entry.args.map((arg, i) =>

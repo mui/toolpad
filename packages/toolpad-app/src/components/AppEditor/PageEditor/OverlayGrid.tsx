@@ -7,10 +7,10 @@ const StyledGrid = styled(Grid)({
   height: '100vh',
   pointerEvents: 'none',
   position: 'absolute',
-  width: 'calc(100vw - 2px)',
+  width: 'calc(100vw - 6px)',
   zIndex: 1,
   margin: '0 auto',
-  left: -4,
+  left: -1,
 });
 
 const StyledGridColumn = styled('div')({

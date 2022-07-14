@@ -120,6 +120,7 @@ const NodeHudWrapper = styled('div')({
   pointerEvents: 'initial',
   position: 'absolute',
   outline: '1px dotted rgba(255,0,0,.2)',
+  userSelect: 'none',
   [`.${overlayClasses.selected}`]: {
     position: 'absolute',
     top: 0,
@@ -357,13 +358,13 @@ interface NodeHudProps {
   rect: Rectangle;
   selected?: boolean;
   allowInteraction?: boolean;
-  onNodeDragStart?: React.DragEventHandler<HTMLDivElement>;
+  onNodeDragStart?: React.DragEventHandler<HTMLElement>;
   draggableEdges?: RectangleEdge[];
   onEdgeDragStart?: (
     node: appDom.ElementNode,
     edge: RectangleEdge,
-  ) => React.MouseEventHandler<HTMLDivElement>;
-  onDelete?: React.MouseEventHandler<Element>;
+  ) => React.MouseEventHandler<HTMLElement>;
+  onDelete?: React.MouseEventHandler<HTMLElement>;
   isResizing?: boolean;
 }
 
@@ -384,7 +385,7 @@ function NodeHud({
   const component = useToolpadComponent(dom, componentId);
 
   const handleDelete = React.useCallback(
-    (event: React.MouseEvent<Element>) => {
+    (event: React.MouseEvent<HTMLElement>) => {
       event.stopPropagation();
 
       if (onDelete) {
@@ -569,7 +570,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   const handleNodeDragStart = React.useCallback(
-    (node: appDom.ElementNode) => (event: React.DragEvent<HTMLDivElement>) => {
+    (node: appDom.ElementNode) => (event: React.DragEvent<HTMLElement>) => {
       event.stopPropagation();
 
       event.dataTransfer.dropEffect = 'move';
@@ -845,7 +846,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   }, [nodesInfo, pageNodes]);
 
   const handleEdgeDragStart = React.useCallback(
-    (node: appDom.ElementNode, edge: RectangleEdge) => (event: React.MouseEvent<HTMLDivElement>) => {
+    (node: appDom.ElementNode, edge: RectangleEdge) => (event: React.MouseEvent<HTMLElement>) => {
       event.stopPropagation();
 
       api.edgeDragStart({ nodeId: node.id, edge });
@@ -878,7 +879,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       if (draggedNodeRect && parentRect && resizePreviewElement && cursorPos) {
         const resizeSnapUnits = 4; // px
-        const snapToGridMargin = 12; // px
+        const snapToGridMargin = 10; // px
 
         let snappedToGridCursorPosX = Math.round(cursorPos.x / resizeSnapUnits) * resizeSnapUnits;
 
@@ -922,7 +923,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [dom, draggedEdge, getCurrentlyDraggedNode, getViewCoordinates, nodesInfo],
   );
 
-  const handleDragOver = React.useCallback(
+  const handleNodeDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
       event.preventDefault();
 
@@ -1638,7 +1639,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [api, dom, domApi, draggedEdge, getCurrentlyDraggedNode, nodesInfo, updatePageRowLayout],
   );
 
-  const handleDragEnd = React.useCallback(
+  const handleNodeDragEnd = React.useCallback(
     (event: DragEvent | React.DragEvent) => {
       event.preventDefault();
       api.dragEnd();
@@ -1647,17 +1648,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   React.useEffect(() => {
-    const handleDragOverDefault = (event: DragEvent) => {
+    const handleNodeDragOverDefault = (event: DragEvent) => {
       // Make the whole window a drop target to prevent the return animation happening on dragend
       event.preventDefault();
     };
-    window.addEventListener('dragover', handleDragOverDefault);
-    window.addEventListener('dragend', handleDragEnd);
+    window.addEventListener('dragover', handleNodeDragOverDefault);
+    window.addEventListener('dragend', handleNodeDragEnd);
     return () => {
-      window.removeEventListener('dragover', handleDragOverDefault);
-      window.removeEventListener('dragend', handleDragEnd);
+      window.removeEventListener('dragover', handleNodeDragOverDefault);
+      window.removeEventListener('dragend', handleNodeDragEnd);
     };
-  }, [handleDragEnd]);
+  }, [handleNodeDragEnd]);
 
   const handleClick = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -1856,9 +1857,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                 onMouseUp: handleEdgeDragEnd,
               }
             : {
-                onDragOver: handleDragOver,
+                onDragOver: handleNodeDragOver,
                 onDrop: handleDrop,
-                onDragEnd: handleDragEnd,
+                onDragEnd: handleNodeDragEnd,
               })}
         >
           {pageNodes.map((node) => {

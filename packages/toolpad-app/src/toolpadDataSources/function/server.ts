@@ -1,5 +1,7 @@
 import ivm from 'isolated-vm';
 import * as esbuild from 'esbuild';
+import type * as harFormat from 'har-format';
+import { withHar, createHarLog } from 'node-fetch-har';
 import { ServerDataSource } from '../../types';
 import {
   FunctionQuery,
@@ -53,6 +55,8 @@ async function execBase(
   jail.setSync('global', jail.derefInto());
 
   const logs: LogEntry[] = [];
+  const har: harFormat.Har = createHarLog();
+  const instrumentedFetch: typeof fetch = withHar(fetch, { har });
 
   await context.evalClosure(
     `
@@ -162,38 +166,10 @@ async function execBase(
     [
       new ivm.Reference((...args: Parameters<typeof fetch>) => {
         const req = new Request(...args);
-        const id = '';
 
-        logs.push({
-          timestamp: Date.now(),
-          kind: 'request',
-          id,
-          request: {
-            method: req.method,
-            url: req.url,
-            headers: Array.from(req.headers.entries()),
-          },
-        });
-
-        return fetch(req).then(
+        return instrumentedFetch(req).then(
           (res) => {
             const resHeadersInit = Array.from(res.headers.entries());
-
-            logs.push({
-              timestamp: Date.now(),
-              kind: 'response',
-              id,
-              response: {
-                status: res.status,
-                statusText: res.statusText,
-                ok: res.ok,
-                headers: resHeadersInit,
-                bodyUsed: res.bodyUsed,
-                redirected: res.redirected,
-                type: res.type,
-                url: res.url,
-              },
-            });
 
             return {
               ok: res.ok,
@@ -247,7 +223,7 @@ async function execBase(
     error = userError instanceof Error ? userError : new Error(String(userError));
   }
 
-  return { data, logs, error };
+  return { data, logs, error, har };
 }
 
 async function execPrivate(

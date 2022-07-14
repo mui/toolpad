@@ -1,3 +1,4 @@
+import { Har } from 'har-format';
 import { LogEntry } from '../../components/Console';
 
 export interface FunctionConnectionParams {
@@ -21,6 +22,7 @@ export interface FunctionResult {
   data: any;
   error?: Error;
   logs: LogEntry[];
+  har: Har;
 }
 
 export type FunctionPrivateQuery =

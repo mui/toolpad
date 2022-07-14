@@ -1,9 +1,8 @@
 import * as React from 'react';
-
-import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Skeleton, Stack, styled, Tab, Toolbar, Typography } from '@mui/material';
 import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
 
-import { LoadingButton } from '@mui/lab';
+import { LoadingButton, TabContext, TabList, TabPanel } from '@mui/lab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Controller, useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
@@ -24,6 +23,14 @@ import Console, { LogEntry } from '../../components/Console';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import { isSaveDisabled } from '../../utils/forms';
+
+const HarViewer = lazyComponent(() => import('../../components/HarViewer'), {});
+
+const DebuggerTabs = styled(TabList)({
+  minHeight: 0,
+  '& .MuiTab-root ': { padding: 8, minHeight: 0 },
+});
+const DebuggerTabPanel = styled(TabPanel)({ padding: 0, flex: 1, minHeight: 0 });
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -81,7 +88,7 @@ function ConnectionParamsInput({
 }
 
 const DEFAULT_MODULE = `export default async function ({ params }: ${EVENT_INTERFACE_IDENTIFIER}) {
-  console.info('Executing function', params);
+  console.info('Executing function with params:', params);
   const url = new URL('https://gist.githubusercontent.com/saniyusuf/406b843afdfb9c6a86e25753fe2761f4/raw/523c324c7fcc36efab8224f9ebb7556c09b69a14/Film.JSON');
   url.searchParams.set('timestamp', String(Date.now()));
   const response = await fetch(String(url));
@@ -177,6 +184,11 @@ function QueryEditor({
     return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
   }, [params, secretsKeys]);
 
+  const [debuggerTab, setDebuggerTab] = React.useState('console');
+  const handleDebuggerTabChange = (event: React.SyntheticEvent, newValue: string) => {
+    setDebuggerTab(newValue);
+  };
+
   return (
     <Box sx={{ height: 500, position: 'relative' }}>
       <SplitPane split="vertical" size="50%" allowResize>
@@ -216,9 +228,26 @@ function QueryEditor({
             )}
           </Box>
 
-          <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Console sx={{ flex: 1 }} value={previewLogs} onChange={setPreviewLogs} />
-          </Box>
+          <TabContext value={debuggerTab}>
+            <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <DebuggerTabs onChange={handleDebuggerTabChange} aria-label="Debugger">
+                  <Tab label="Console" value="console" />
+                  <Tab label="Network" value="network" />
+                </DebuggerTabs>
+              </Box>
+              <DebuggerTabPanel value="console">
+                <Console sx={{ flex: 1 }} value={previewLogs} onChange={setPreviewLogs} />
+              </DebuggerTabPanel>
+              <DebuggerTabPanel value="network">
+                <HarViewer har={preview?.har} />
+              </DebuggerTabPanel>
+            </Box>
+          </TabContext>
+
+          {/*       <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+ <Console sx={{ flex: 1 }} value={previewLogs} onChange={setPreviewLogs} /> 
+          </Box> */}
         </SplitPane>
       </SplitPane>
     </Box>

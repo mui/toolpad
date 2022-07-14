@@ -2,7 +2,46 @@ import { styled, SxProps } from '@mui/material';
 import * as React from 'react';
 import Inspector, { chromeLight, InspectorProps, InspectorTheme } from 'react-inspector';
 import { interleave } from '../../utils/react';
-import { LogEntry } from './types';
+
+export interface LogRequest {
+  method: string;
+  url: string;
+  headers: [string, string][];
+}
+
+export interface LogResponse {
+  status: number;
+  statusText: string;
+  ok: boolean;
+  headers: [string, string][];
+  bodyUsed: boolean;
+  redirected: boolean;
+  type: Response['type'];
+  url: string;
+}
+
+export interface LogConsoleEntry {
+  timestamp: number;
+  level: string;
+  kind: 'console';
+  args: any[];
+}
+
+export interface LogRequestEntry {
+  timestamp: number;
+  kind: 'request';
+  id: string;
+  request: LogRequest;
+}
+
+export interface LogResponseEntry {
+  timestamp: number;
+  kind: 'response';
+  id: string;
+  response: LogResponse;
+}
+
+export type LogEntry = LogConsoleEntry | LogRequestEntry | LogResponseEntry;
 
 const classes = {
   logEntries: 'Toolpad_ConsoleLogEntries',

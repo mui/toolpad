@@ -13,7 +13,6 @@ import {
   FunctionPrivateQuery,
   FunctionQuery,
   FunctionResult,
-  LogEntry,
 } from './types';
 import lazyComponent from '../../utils/lazyComponent';
 import ParametersEditor from '../../components/AppEditor/PageEditor/ParametersEditor';
@@ -22,7 +21,7 @@ import { useConnectionContext, usePrivateQuery } from '../context';
 import client from '../../api';
 import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../components/AppEditor/PageEditor/ErrorAlert';
-import Console from './Console';
+import Console, { LogEntry } from './Console';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import { isSaveDisabled } from '../../utils/forms';

@@ -5,10 +5,10 @@ import {
   FunctionQuery,
   FunctionConnectionParams,
   FunctionResult,
-  LogEntry,
   FunctionPrivateQuery,
 } from './types';
 import { Maybe } from '../../utils/types';
+import { LogEntry } from './Console';
 
 async function createPolyfillModule() {
   const { outputFiles } = await esbuild.build({

@@ -1,8 +1,8 @@
 import { createRequire } from 'module';
 import * as path from 'path';
-import pkgJson from './package.json' assert { type: 'json' };
 
 const require = createRequire(import.meta.url);
+const pkgJson = require('./package.json');
 
 /**
  * @param {string} input

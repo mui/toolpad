@@ -2,6 +2,7 @@ import { createRequire } from 'module';
 import * as path from 'path';
 
 const require = createRequire(import.meta.url);
+const pkgJson = require('./package.json');
 
 /**
  * @param {string} input
@@ -23,7 +24,8 @@ function parseBuidEnvVars(env) {
 
   return {
     TOOLPAD_TARGET: target,
-    TOOLPAD_DEMO: env.TOOLPAD_DEMO,
+    TOOLPAD_DEMO: env.TOOLPAD_DEMO || '',
+    TOOLPAD_VERSION: pkgJson.version,
   };
 }
 

@@ -8,6 +8,7 @@ import * as monaco from 'monaco-editor';
 import { styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
 import cuid from 'cuid';
+import monacoEditorTheme from '../monacoEditorTheme';
 
 function getExtension(language: string): string {
   switch (language) {
@@ -189,6 +190,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         accessibilitySupport: 'off',
         tabSize: 2,
         automaticLayout: true,
+        theme: monacoEditorTheme,
         ...extraOptions,
       });
 

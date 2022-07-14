@@ -26,10 +26,6 @@ import { isSaveDisabled } from '../../utils/forms';
 
 const HarViewer = lazyComponent(() => import('../../components/HarViewer'), {});
 
-const DebuggerTabs = styled(TabList)(({ theme }) => ({
-  minHeight: 0,
-  '& .MuiTab-root ': { padding: theme.spacing(1), minHeight: 0 },
-}));
 const DebuggerTabPanel = styled(TabPanel)({ padding: 0, flex: 1, minHeight: 0 });
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
@@ -231,10 +227,10 @@ function QueryEditor({
           <TabContext value={debuggerTab}>
             <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <DebuggerTabs onChange={handleDebuggerTabChange} aria-label="Debugger">
+                <TabList onChange={handleDebuggerTabChange} aria-label="Debugger">
                   <Tab label="Console" value="console" />
                   <Tab label="Network" value="network" />
-                </DebuggerTabs>
+                </TabList>
               </Box>
               <DebuggerTabPanel value="console">
                 <Console sx={{ flex: 1 }} value={previewLogs} onChange={setPreviewLogs} />

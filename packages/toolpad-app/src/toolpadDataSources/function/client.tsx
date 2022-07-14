@@ -26,10 +26,10 @@ import { isSaveDisabled } from '../../utils/forms';
 
 const HarViewer = lazyComponent(() => import('../../components/HarViewer'), {});
 
-const DebuggerTabs = styled(TabList)({
+const DebuggerTabs = styled(TabList)(({ theme }) => ({
   minHeight: 0,
-  '& .MuiTab-root ': { padding: 8, minHeight: 0 },
-});
+  '& .MuiTab-root ': { padding: theme.spacing(1), minHeight: 0 },
+}));
 const DebuggerTabPanel = styled(TabPanel)({ padding: 0, flex: 1, minHeight: 0 });
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';

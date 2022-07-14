@@ -1,6 +1,7 @@
-import { darken, lighten, styled, SxProps } from '@mui/material';
+import { darken, IconButton, lighten, styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
 import * as React from 'react';
+import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import Inspector, { InspectorProps } from 'react-inspector';
 import inspectorTheme from '../inspectorTheme';
 import { interleave } from '../utils/react';
@@ -46,6 +47,8 @@ export interface LogResponseEntry {
 export type LogEntry = LogConsoleEntry | LogRequestEntry | LogResponseEntry;
 
 const classes = {
+  header: 'Toolpad_ConsoleHeader',
+  logEntriesContainer: 'Toolpad_ConsoleLogEntriesContainer',
   logEntries: 'Toolpad_ConsoleLogEntries',
   logEntry: 'Toolpad_ConsoleLogEntry',
   logEntryText: 'Toolpad_ConsoleLogEntryTExt',
@@ -63,16 +66,30 @@ const ConsoleRoot = styled('div')(({ theme }) => {
   };
 
   return {
-    overflow: 'auto',
-
-    fontSize: 12,
-    lineHeight: 1.2,
-    fontFamily: 'Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
-
-    // This container has only a single item, but the column-reverse has the effect that it
-    // keeps the scroll position at the bottom when the content grows
+    width: '100%',
+    height: '100%',
     display: 'flex',
-    flexDirection: 'column-reverse',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+
+    [`& .${classes.header}`]: {
+      padding: theme.spacing('2px', 1),
+      borderBottom: `1px solid ${theme.palette.divider}`,
+    },
+
+    [`& .${classes.logEntriesContainer}`]: {
+      flex: 1,
+
+      // This container has only a single item, but the column-reverse has the effect that it
+      // keeps the scroll position at the bottom when the content grows
+      display: 'flex',
+      flexDirection: 'column-reverse',
+      overflow: 'auto',
+
+      fontSize: 12,
+      lineHeight: 1.2,
+      fontFamily: 'Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+    },
 
     [`& .${classes.logEntry}`]: {
       '&:first-of-type': {
@@ -161,16 +178,26 @@ function ConsoleEntry({ entry }: ConsoleEntryProps) {
 
 interface ConsoleProps {
   sx?: SxProps;
-  entries: LogEntry[];
+  value?: LogEntry[];
+  onChange?: (logEntries: LogEntry[]) => void;
 }
 
-export default function Console({ entries, sx }: ConsoleProps) {
+export default function Console({ value = [], onChange, sx }: ConsoleProps) {
   return (
     <ConsoleRoot sx={sx}>
-      <div className={classes.logEntries}>
-        {entries.map((entry, i) => (
-          <ConsoleEntry key={i} entry={entry} />
-        ))}
+      <div className={classes.header}>
+        {onChange ? (
+          <IconButton disabled={value.length <= 0} onClick={() => onChange([])}>
+            <DoDisturbIcon />
+          </IconButton>
+        ) : null}
+      </div>
+      <div className={classes.logEntriesContainer}>
+        <div className={classes.logEntries}>
+          {value.map((entry, i) => (
+            <ConsoleEntry key={i} entry={entry} />
+          ))}
+        </div>
       </div>
     </ConsoleRoot>
   );

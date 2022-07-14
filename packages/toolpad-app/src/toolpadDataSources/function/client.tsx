@@ -5,7 +5,6 @@ import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad
 
 import { LoadingButton } from '@mui/lab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import { Controller, useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -217,18 +216,8 @@ function QueryEditor({
             )}
           </Box>
 
-          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Toolbar>
-              <Button
-                startIcon={<DoDisturbIcon />}
-                onClick={() => setPreviewLogs([])}
-                disabled={previewLogs.length <= 0}
-              >
-                Clear
-              </Button>
-            </Toolbar>
-
-            <Console sx={{ flex: 1 }} entries={previewLogs} />
+          <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Console sx={{ flex: 1 }} value={previewLogs} onChange={setPreviewLogs} />
           </Box>
         </SplitPane>
       </SplitPane>

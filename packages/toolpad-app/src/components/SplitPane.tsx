@@ -39,8 +39,9 @@ const WrappedSplitPane = React.forwardRef<
       minSize={20}
       maxSize={-20}
       paneStyle={{
-        // display: 'block',
+        display: 'block',
         // Prevent the content from stretching the Panel out
+        minWidth: 0,
         minHeight: 0,
         ...props.paneStyle,
       }}

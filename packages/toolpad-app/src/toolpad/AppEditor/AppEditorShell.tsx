@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 import { Outlet, useNavigate } from 'react-router-dom';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import DialogForm from '../DialogForm';
+import DialogForm from '../../components/DialogForm';
 import { useDomLoader } from '../DomLoader';
 import ToolpadAppShell from '../ToolpadAppShell';
 import PagePanel from './PagePanel';

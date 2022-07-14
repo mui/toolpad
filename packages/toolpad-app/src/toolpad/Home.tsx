@@ -28,12 +28,12 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import client from '../api';
-import DialogForm from './DialogForm';
+import DialogForm from '../components/DialogForm';
 import type { App, Deployment } from '../../prisma/generated/client';
 import useLatest from '../utils/useLatest';
 import ToolpadShell from './ToolpadShell';
 import getReadableDuration from '../utils/readableDuration';
-import EditableText from './EditableText';
+import EditableText from '../components/EditableText';
 
 export interface CreateAppDialogProps {
   open: boolean;

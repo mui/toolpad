@@ -30,7 +30,7 @@ import * as appDom from '../../../appDom';
 import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
-import JsonView from '../../JsonView';
+import JsonView from '../../../components/JsonView';
 import { omit, update } from '../../../utils/immutability';
 import client from '../../../api';
 import ErrorAlert from './ErrorAlert';

@@ -32,7 +32,7 @@ import {
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
-import JsonView from '../JsonView';
+import JsonView from '../../components/JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';

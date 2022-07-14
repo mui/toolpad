@@ -2,7 +2,7 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
-import SplitPane from '../../SplitPane';
+import SplitPane from '../../../components/SplitPane';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
 import { PageEditorProvider } from './PageEditorProvider';

@@ -6,45 +6,11 @@ import Inspector, { InspectorProps } from 'react-inspector';
 import inspectorTheme from '../inspectorTheme';
 import { interleave } from '../utils/react';
 
-export interface LogRequest {
-  method: string;
-  url: string;
-  headers: [string, string][];
-}
-
-export interface LogResponse {
-  status: number;
-  statusText: string;
-  ok: boolean;
-  headers: [string, string][];
-  bodyUsed: boolean;
-  redirected: boolean;
-  type: Response['type'];
-  url: string;
-}
-
-export interface LogConsoleEntry {
+export interface LogEntry {
   timestamp: number;
   level: string;
-  kind: 'console';
   args: any[];
 }
-
-export interface LogRequestEntry {
-  timestamp: number;
-  kind: 'request';
-  id: string;
-  request: LogRequest;
-}
-
-export interface LogResponseEntry {
-  timestamp: number;
-  kind: 'response';
-  id: string;
-  response: LogResponse;
-}
-
-export type LogEntry = LogConsoleEntry | LogRequestEntry | LogResponseEntry;
 
 const classes = {
   header: 'Toolpad_ConsoleHeader',
@@ -128,11 +94,11 @@ function ConsoleInpector(props: InspectorProps) {
   return <Inspector {...props} theme={inspectorTheme} />;
 }
 
-interface ConsoleEntryProps<K = LogEntry['kind']> {
-  entry: Extract<LogEntry, { kind: K }>;
+interface ConsoleEntryProps {
+  entry: LogEntry;
 }
 
-function ConsoleLogEntry({ entry }: ConsoleEntryProps<'console'>) {
+function ConsoleEntry({ entry }: ConsoleEntryProps) {
   return (
     <div className={clsx(classes.logEntry, entry.level)}>
       <div className={classes.logEntryText}>
@@ -145,35 +111,6 @@ function ConsoleLogEntry({ entry }: ConsoleEntryProps<'console'>) {
       </div>
     </div>
   );
-}
-
-function ConsoleRequestEntry({ entry }: ConsoleEntryProps<'request'>) {
-  return (
-    <div className={classes.logEntry}>
-      Request {entry.request.url} <ConsoleInpector data={entry.request} />
-    </div>
-  );
-}
-
-function ConsoleResponseEntry({ entry }: ConsoleEntryProps<'response'>) {
-  return (
-    <div className={classes.logEntry}>
-      Response {entry.response.status} <ConsoleInpector data={entry.response} />
-    </div>
-  );
-}
-
-function ConsoleEntry({ entry }: ConsoleEntryProps) {
-  switch (entry.kind) {
-    case 'console':
-      return <ConsoleLogEntry entry={entry} />;
-    case 'request':
-      return <ConsoleRequestEntry entry={entry} />;
-    case 'response':
-      return <ConsoleResponseEntry entry={entry} />;
-    default:
-      throw new Error(`Unknown console entry`);
-  }
 }
 
 interface ConsoleProps {

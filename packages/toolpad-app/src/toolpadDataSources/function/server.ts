@@ -79,7 +79,6 @@ async function execBase(
         logs.push({
           timestamp: Date.now(),
           level,
-          kind: 'console',
           args: JSON.parse(serializedArgs),
         });
       },
@@ -184,7 +183,6 @@ async function execBase(
             logs.push({
               timestamp: Date.now(),
               level: 'error',
-              kind: 'console',
               args: [{ name: err.name, message: err.message, stack: err.stack }],
             });
 

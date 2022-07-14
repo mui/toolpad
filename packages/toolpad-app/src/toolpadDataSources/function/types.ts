@@ -1,4 +1,6 @@
-export interface FunctionConnectionParams {}
+export interface FunctionConnectionParams {
+  secrets?: [string, string][];
+}
 
 export interface FunctionQuery {
   readonly module: string;
@@ -52,3 +54,7 @@ export interface FunctionResult {
   error?: Error;
   logs: LogEntry[];
 }
+
+export type FunctionPrivateQuery =
+  | { kind: 'debugExec'; query: FunctionQuery; params: Record<string, any> }
+  | { kind: 'secretsKeys' };

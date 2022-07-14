@@ -1,7 +1,13 @@
 import ivm from 'isolated-vm';
 import * as esbuild from 'esbuild';
 import { ServerDataSource } from '../../types';
-import { FunctionQuery, FunctionConnectionParams, FunctionResult, LogEntry } from './types';
+import {
+  FunctionQuery,
+  FunctionConnectionParams,
+  FunctionResult,
+  LogEntry,
+  FunctionPrivateQuery,
+} from './types';
 import { Maybe } from '../../utils/types';
 
 async function createPolyfillModule() {
@@ -180,8 +186,10 @@ async function execBase(
 
     userModule.evaluateSync();
 
+    const secrets = Object.fromEntries(connection?.secrets ?? []);
+
     const defaultExport = await userModule.namespace.get('default', { reference: true });
-    data = await defaultExport.apply(null, [{ params }], {
+    data = await defaultExport.apply(null, [{ params, secrets }], {
       arguments: { copy: true },
       result: { copy: true, promise: true },
     });
@@ -194,9 +202,16 @@ async function execBase(
 
 async function execPrivate(
   connection: Maybe<FunctionConnectionParams>,
-  query: { query: FunctionQuery; params: Record<string, any> },
+  query: FunctionPrivateQuery,
 ) {
-  return execBase(connection, query.query, query.params);
+  switch (query.kind) {
+    case 'secretsKeys':
+      return (connection?.secrets ?? []).map(([key]) => key);
+    case 'debugExec':
+      return execBase(connection, query.query, query.params);
+    default:
+      throw new Error(`Unknown private query "${(query as FunctionPrivateQuery).kind}"`);
+  }
 }
 
 async function exec(
@@ -211,7 +226,7 @@ async function exec(
   return { data };
 }
 
-const dataSource: ServerDataSource<{}, FunctionQuery, any> = {
+const dataSource: ServerDataSource<FunctionConnectionParams, FunctionQuery, any> = {
   exec,
   execPrivate,
 };

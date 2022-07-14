@@ -6,16 +6,26 @@ import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad
 import { LoadingButton } from '@mui/lab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
-import { ClientDataSource, QueryEditorProps } from '../../types';
-import { FunctionConnectionParams, FunctionQuery, FunctionResult, LogEntry } from './types';
+import { Controller, useForm } from 'react-hook-form';
+import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import {
+  FunctionConnectionParams,
+  FunctionPrivateQuery,
+  FunctionQuery,
+  FunctionResult,
+  LogEntry,
+} from './types';
 import lazyComponent from '../../utils/lazyComponent';
 import ParametersEditor from '../../components/AppEditor/PageEditor/ParametersEditor';
 import SplitPane from '../../components/SplitPane';
-import { useConnectionContext } from '../context';
+import { useConnectionContext, usePrivateQuery } from '../context';
 import client from '../../api';
 import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../components/AppEditor/PageEditor/ErrorAlert';
 import Console from './Console';
+import MapEntriesEditor from '../../components/MapEntriesEditor';
+import { Maybe } from '../../utils/types';
+import { isSaveDisabled } from '../../utils/forms';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -24,14 +34,58 @@ const TypescriptEditor = lazyComponent(() => import('../../components/Typescript
   fallback: <Skeleton variant="rectangular" height="100%" />,
 });
 
-function ConnectionParamsInput() {
-  return <Stack direction="column" gap={3} sx={{ py: 3 }} />;
+function withDefaults(value: Maybe<FunctionConnectionParams>): FunctionConnectionParams {
+  return {
+    secrets: [],
+    ...value,
+  };
+}
+
+function ConnectionParamsInput({
+  value,
+  onChange,
+}: ConnectionEditorProps<FunctionConnectionParams>) {
+  const { handleSubmit, formState, reset, control } = useForm({
+    defaultValues: withDefaults(value),
+    reValidateMode: 'onChange',
+    mode: 'all',
+  });
+  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
+
+  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
+
+  return (
+    <Stack direction="column" gap={3} sx={{ py: 3 }}>
+      <Typography>Secrets:</Typography>
+      <Controller
+        name="secrets"
+        control={control}
+        render={({ field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field } }) => {
+          return (
+            <MapEntriesEditor
+              {...field}
+              fieldLabel="key"
+              value={fieldValue}
+              onChange={onFieldChange}
+            />
+          );
+        }}
+      />
+
+      <Toolbar disableGutters>
+        <Box sx={{ flex: 1 }} />
+        <Button variant="contained" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+          Save
+        </Button>
+      </Toolbar>
+    </Stack>
+  );
 }
 
 const DEFAULT_MODULE = `export default async function ({ params }: ${EVENT_INTERFACE_IDENTIFIER}) {
   console.info('Executing function', params);
   const url = new URL('https://gist.githubusercontent.com/saniyusuf/406b843afdfb9c6a86e25753fe2761f4/raw/523c324c7fcc36efab8224f9ebb7556c09b69a14/Film.JSON');
-  url.searchParams.set('timestamp', Date.now());
+  url.searchParams.set('timestamp', String(Date.now()));
   const response = await fetch(String(url));
   if (!response.ok) {
     throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
@@ -71,34 +125,46 @@ function QueryEditor({
   const { appId, connectionId } = useConnectionContext();
   const [preview, setPreview] = React.useState<FunctionResult | null>(null);
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
+
   const runPreview = React.useCallback(() => {
     const currentParams = Object.fromEntries(
       paramsEditorLiveValue.map(([key, binding]) => [key, binding.value]),
     );
+
     client.query
       .dataSourceFetchPrivate(appId, connectionId, {
+        kind: 'debugExec',
         query: value.query,
         params: currentParams,
-      })
+      } as FunctionPrivateQuery)
       .then((result) => {
         setPreview(result);
         setPreviewLogs((existing) => [...existing, ...result.logs]);
       });
   }, [appId, connectionId, paramsEditorLiveValue, value.query]);
 
+  const { data: secretsKeys = [] } = usePrivateQuery<FunctionPrivateQuery, string[]>({
+    kind: 'secretsKeys',
+  });
+
   const extraLibs = React.useMemo(() => {
-    const paramsMembers = params.map(([key]) => `${key}: string`).join('\n');
+    const paramsKeys = params.map(([key]) => key);
+    const paramsMembers = paramsKeys.map((key) => `${key}: string`).join('\n');
+    const secretsMembers = secretsKeys.map((key) => `${key}: string`).join('\n');
 
     const content = `
-      interface ${EVENT_INTERFACE_IDENTIFIER} {
+      interface ${EVENT_INTERFACE_IDENTIFIER} {       
         params: {
           ${paramsMembers}
+        }
+        secrets: {
+          ${secretsMembers}
         }
       }
     `;
 
     return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
-  }, [params]);
+  }, [params, secretsKeys]);
 
   return (
     <Box sx={{ height: 500, position: 'relative' }}>
@@ -110,7 +176,7 @@ function QueryEditor({
             extraLibs={extraLibs}
           />
 
-          <Box>
+          <Box sx={{ p: 2 }}>
             <Typography>Parameters</Typography>
             <ParametersEditor
               value={params}

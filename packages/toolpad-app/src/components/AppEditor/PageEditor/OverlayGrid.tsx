@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Grid, styled } from '@mui/material';
 
-const GRID_NUMBER_OF_COLUMNS = 12;
+export const GRID_NUMBER_OF_COLUMNS = 12;
 
 const StyledGrid = styled(Grid)({
   height: '100vh',
   pointerEvents: 'none',
   position: 'absolute',
-  width: '100vw',
+  width: 'calc(100vw - 2px)',
   zIndex: 1,
   margin: '0 auto',
   left: -4,

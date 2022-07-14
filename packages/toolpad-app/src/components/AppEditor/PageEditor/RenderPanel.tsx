@@ -46,7 +46,7 @@ import {
   isPageColumn,
 } from '../../../toolpadComponents';
 import { ExactEntriesOf } from '../../../utils/types';
-import { OverlayGrid } from './OverlayGrid';
+import { GRID_NUMBER_OF_COLUMNS, OverlayGrid } from './OverlayGrid';
 
 const classes = {
   view: 'Toolpad_View',
@@ -73,6 +73,7 @@ const overlayClasses = {
   allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
   container: 'Toolpad_Container',
   componentDragging: 'Toolpad_ComponentDragging',
+  resize: 'Toolpad_Resize',
   selectionHint: 'Toolpad_SelectionHint',
   hudOverlay: 'Toolpad_HudOverlay',
 };
@@ -86,6 +87,9 @@ const OverlayRoot = styled('div')({
   },
   [`&.${overlayClasses.componentDragging}`]: {
     cursor: 'copy',
+  },
+  [`&.${overlayClasses.resize}`]: {
+    cursor: 'ew-resize',
   },
   [`.${overlayClasses.selectionHint}`]: {
     // capture mouse events
@@ -210,17 +214,18 @@ const EmptySlot = styled('div')({
 });
 
 const DraggableEdge = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'edge',
+  shouldForwardProp: (prop) => prop !== 'edge' && prop !== 'isResizing',
 })<{
   edge: RectangleEdge;
-}>(({ edge }) => {
+  isResizing: boolean;
+}>(({ edge, isResizing }) => {
   let dynamicStyles = {};
   if (edge === RECTANGLE_EDGE_RIGHT) {
     dynamicStyles = {
       top: 0,
       right: 0,
       height: '100%',
-      width: 8,
+      width: 10,
     };
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
@@ -228,7 +233,7 @@ const DraggableEdge = styled('div', {
       top: 0,
       left: 0,
       height: '100%',
-      width: 8,
+      width: 10,
     };
   }
 
@@ -238,6 +243,11 @@ const DraggableEdge = styled('div', {
     position: 'absolute',
     pointerEvents: 'initial',
     zIndex: 1,
+
+    '&:hover': {
+      backgroundColor: '#44EB2D',
+      opacity: `${isResizing ? 0 : 0.5}`,
+    },
   };
 });
 
@@ -347,13 +357,13 @@ interface NodeHudProps {
   rect: Rectangle;
   selected?: boolean;
   allowInteraction?: boolean;
-  onNodeDragStart?: React.DragEventHandler<HTMLElement>;
+  onNodeDragStart?: React.DragEventHandler<HTMLDivElement>;
   draggableEdges?: RectangleEdge[];
   onEdgeDragStart?: (
     node: appDom.ElementNode,
     edge: RectangleEdge,
-  ) => React.DragEventHandler<HTMLElement>;
-  onDelete?: React.MouseEventHandler<HTMLElement>;
+  ) => React.MouseEventHandler<HTMLDivElement>;
+  onDelete?: React.MouseEventHandler<Element>;
   isResizing?: boolean;
 }
 
@@ -374,7 +384,7 @@ function NodeHud({
   const component = useToolpadComponent(dom, componentId);
 
   const handleDelete = React.useCallback(
-    (event: React.MouseEvent<HTMLElement>) => {
+    (event: React.MouseEvent<Element>) => {
       event.stopPropagation();
 
       if (onDelete) {
@@ -408,9 +418,9 @@ function NodeHud({
         ? draggableEdges.map((edge) => (
             <DraggableEdge
               key={`${node.id}-edge-${edge}`}
-              draggable
               edge={edge}
-              onDragStart={onEdgeDragStart(node as appDom.ElementNode, edge)}
+              onMouseDown={onEdgeDragStart(node as appDom.ElementNode, edge)}
+              isResizing={isResizing}
             />
           ))
         : null}
@@ -835,7 +845,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   }, [nodesInfo, pageNodes]);
 
   const handleEdgeDragStart = React.useCallback(
-    (node: appDom.ElementNode, edge: RectangleEdge) => () => {
+    (node: appDom.ElementNode, edge: RectangleEdge) => (event: React.MouseEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+
       api.edgeDragStart({ nodeId: node.id, edge });
 
       api.select(node.id);
@@ -844,8 +856,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   const handleEdgeDragOver = React.useCallback(
-    (event: React.DragEvent<Element>) => {
+    (event: React.MouseEvent<Element>) => {
       const draggedNode = getCurrentlyDraggedNode();
+
+      if (!draggedNode) {
+        return;
+      }
+
+      const draggedNodeInfo = nodesInfo[draggedNode.id];
+      const draggedNodeRect = draggedNodeInfo?.rect;
+
       const parent = draggedNode && appDom.getParent(dom, draggedNode);
 
       const parentInfo = parent ? nodesInfo[parent.id] : null;
@@ -856,13 +876,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
-      if (parentRect && resizePreviewElement && cursorPos) {
-        const resizePreviewRect = resizePreviewElement?.getBoundingClientRect();
-
-        const resizePreviewElementLeftPos = Number(
-          resizePreviewElement.style.left.replace('px', ''),
-        );
-
+      if (draggedNodeRect && parentRect && resizePreviewElement && cursorPos) {
         const resizeSnapUnits = 4; // px
         const snapToGridMargin = 12; // px
 
@@ -883,25 +897,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         if (
           draggedEdge === RECTANGLE_EDGE_LEFT &&
-          snappedToGridCursorPosX > parentRect.x + minGridColumnWidth &&
-          snappedToGridCursorPosX < resizePreviewRect.x + resizePreviewRect.width
+          cursorPos.x > parentRect.x + minGridColumnWidth &&
+          cursorPos.x < draggedNodeRect.x + draggedNodeRect.width - minGridColumnWidth
         ) {
           const updatedTransformScale =
-            1 +
-            (resizePreviewElementLeftPos - snappedToGridCursorPosX) /
-              resizePreviewElement.offsetWidth;
+            1 + (draggedNodeRect.x - snappedToGridCursorPosX) / draggedNodeRect.width;
 
           resizePreviewElement.style.transformOrigin = '100% 50%';
           resizePreviewElement.style.transform = `scale(${updatedTransformScale}, 1)`;
         }
         if (
           draggedEdge === RECTANGLE_EDGE_RIGHT &&
-          snappedToGridCursorPosX > resizePreviewRect.x &&
-          snappedToGridCursorPosX < parentRect.x + parentRect.width - minGridColumnWidth
+          cursorPos.x > draggedNodeRect.x + minGridColumnWidth &&
+          cursorPos.x < parentRect.x + parentRect.width - minGridColumnWidth
         ) {
           const updatedTransformScale =
-            (snappedToGridCursorPosX - resizePreviewElementLeftPos) /
-            resizePreviewElement.offsetWidth;
+            (snappedToGridCursorPosX - draggedNodeRect.x) / draggedNodeRect.width;
 
           resizePreviewElement.style.transformOrigin = '0 50%';
           resizePreviewElement.style.transform = `scale(${updatedTransformScale}, 1)`;
@@ -913,10 +924,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      if (draggedEdge) {
-        handleEdgeDragOver(event);
-        return;
-      }
+      event.preventDefault();
 
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
@@ -925,8 +933,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       if (!cursorPos || !draggedNode) {
         return;
       }
-
-      event.preventDefault();
 
       const activeDropAreaId = findAreaAt(dropAreaRects, cursorPos.x, cursorPos.y);
 
@@ -1043,7 +1049,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
     },
     [
-      draggedEdge,
       getViewCoordinates,
       getCurrentlyDraggedNode,
       dropAreaRects,
@@ -1054,7 +1059,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       dragOverSlotParentProp,
       dragOverZone,
       availableDropTargetIds,
-      handleEdgeDragOver,
       isEmptyPage,
       api,
     ],
@@ -1511,14 +1515,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       domApi.setNodeNamespacedProp(pageRowNode, 'props', 'layoutColumnSizes', {
         type: 'const',
-        value: layoutColumnSizes.map((size) => size / totalLayoutColumnsSize),
+        value: layoutColumnSizes.map(
+          (size) => (size * GRID_NUMBER_OF_COLUMNS) / totalLayoutColumnsSize,
+        ),
       });
     },
     [dom, domApi],
   );
 
   const handleEdgeDragEnd = React.useCallback(
-    (event: DragEvent | React.DragEvent) => {
+    (event: React.MouseEvent<Element>) => {
+      event.preventDefault();
+
       const draggedNode = getCurrentlyDraggedNode();
 
       if (!draggedNode) {
@@ -1528,11 +1536,13 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const draggedNodeInfo = nodesInfo[draggedNode.id];
       const draggedNodeRect = draggedNodeInfo?.rect;
 
-      const cursorPos = getViewCoordinates(event.clientX, event.clientY);
+      const resizePreviewElement =
+        editorWindowRef.current?.document.getElementById(RESIZE_PREVIEW_ID);
+      const resizePreviewRect = resizePreviewElement?.getBoundingClientRect();
 
       let updatedColumnSizes: Record<NodeId, number> = {};
 
-      if (draggedNodeRect && cursorPos) {
+      if (draggedNodeRect && resizePreviewRect) {
         if (draggedEdge === RECTANGLE_EDGE_LEFT) {
           const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
 
@@ -1541,13 +1551,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             const previousSiblingRect = previousSiblingInfo?.rect;
 
             if (previousSiblingRect) {
-              const updatedDraggedNodeColumnSize = Math.max(
-                0,
-                draggedNodeRect.width - (cursorPos.x - draggedNodeRect.x),
-              );
+              const updatedDraggedNodeColumnSize = Math.max(0, Math.round(resizePreviewRect.width));
               const updatedPreviousSiblingColumnSize = Math.max(
                 0,
-                previousSiblingRect.width + (cursorPos.x - draggedNodeRect.x),
+                Math.round(
+                  previousSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
+                ),
               );
 
               domApi.setNodeNamespacedProp(
@@ -1578,15 +1587,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             const nextSiblingRect = nextSiblingInfo?.rect;
 
             if (nextSiblingRect) {
-              const updatedDraggedNodeColumnSize = Math.max(
-                0,
-                Math.max(0, cursorPos.x - draggedNodeRect.x),
-              );
+              const updatedDraggedNodeColumnSize = Math.max(0, Math.round(resizePreviewRect.width));
               const updatedNextSiblingColumnSize = Math.max(
                 0,
-                Math.max(
-                  0,
-                  nextSiblingRect.width - (cursorPos.x - draggedNodeRect.x - draggedNodeRect.width),
+                Math.round(
+                  nextSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
                 ),
               );
 
@@ -1627,29 +1632,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           updatePageRowLayout(parent as appDom.ElementNode, updatedLayoutColumnSizes);
         }
       }
+
+      api.dragEnd();
     },
-    [
-      dom,
-      domApi,
-      draggedEdge,
-      getCurrentlyDraggedNode,
-      getViewCoordinates,
-      nodesInfo,
-      updatePageRowLayout,
-    ],
+    [api, dom, domApi, draggedEdge, getCurrentlyDraggedNode, nodesInfo, updatePageRowLayout],
   );
 
   const handleDragEnd = React.useCallback(
     (event: DragEvent | React.DragEvent) => {
       event.preventDefault();
-
-      if (draggedEdge) {
-        handleEdgeDragEnd(event);
-      }
-
       api.dragEnd();
     },
-    [api, draggedEdge, handleEdgeDragEnd],
+    [api],
   );
 
   React.useEffect(() => {
@@ -1848,16 +1842,24 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         <OverlayRoot
           className={clsx({
             [overlayClasses.componentDragging]: isDraggingOver,
+            [overlayClasses.resize]: draggedEdge,
           })}
           // Need this to be able to capture key events
           tabIndex={0}
           // This component has `pointer-events: none`, but we will selectively enable pointer-events
           // for its children. We can still capture the click gobally
           onClick={handleClick}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
           onKeyDown={handleKeyDown}
-          onDragEnd={handleDragEnd}
+          {...(draggedEdge
+            ? {
+                onMouseMove: handleEdgeDragOver,
+                onMouseUp: handleEdgeDragEnd,
+              }
+            : {
+                onDragOver: handleDragOver,
+                onDrop: handleDrop,
+                onDragEnd: handleDragEnd,
+              })}
         >
           {pageNodes.map((node) => {
             const nodeInfo = nodesInfo[node.id];

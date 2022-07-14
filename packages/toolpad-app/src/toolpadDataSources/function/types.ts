@@ -1,4 +1,4 @@
-import { LogEntry } from './Console';
+import { LogEntry } from '../../components/Console';
 
 export interface FunctionConnectionParams {
   secrets?: [string, string][];

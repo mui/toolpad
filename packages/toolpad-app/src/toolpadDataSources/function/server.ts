@@ -8,7 +8,7 @@ import {
   FunctionPrivateQuery,
 } from './types';
 import { Maybe } from '../../utils/types';
-import { LogEntry } from './Console';
+import { LogEntry } from '../../components/Console';
 
 async function createPolyfillModule() {
   const { outputFiles } = await esbuild.build({

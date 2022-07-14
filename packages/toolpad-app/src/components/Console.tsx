@@ -1,7 +1,7 @@
 import { styled, SxProps } from '@mui/material';
 import * as React from 'react';
 import Inspector, { chromeLight, InspectorProps, InspectorTheme } from 'react-inspector';
-import { interleave } from '../../utils/react';
+import { interleave } from '../utils/react';
 
 export interface LogRequest {
   method: string;

@@ -21,7 +21,7 @@ import { useConnectionContext, usePrivateQuery } from '../context';
 import client from '../../api';
 import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../components/AppEditor/PageEditor/ErrorAlert';
-import Console, { LogEntry } from './Console';
+import Console, { LogEntry } from '../../components/Console';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import { isSaveDisabled } from '../../utils/forms';

@@ -1275,7 +1275,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [dom, domApi],
   );
 
-  const handleDrop = React.useCallback(
+  const handleNodeDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
       const draggedNode = getCurrentlyDraggedNode();
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
@@ -1660,11 +1660,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     };
   }, [handleNodeDragEnd]);
 
-  const handleClick = React.useCallback(
+  const handleNodeMouseUp = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       const cursorPos = getViewCoordinates(event.clientX, event.clientY);
 
-      if (!cursorPos) {
+      if (!cursorPos || draggedNodeId) {
         return;
       }
 
@@ -1677,7 +1677,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         api.select(null);
       }
     },
-    [getViewCoordinates, selectionRects, dom, api],
+    [getViewCoordinates, draggedNodeId, selectionRects, dom, api],
   );
 
   const handleDelete = React.useCallback(
@@ -1847,9 +1847,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           })}
           // Need this to be able to capture key events
           tabIndex={0}
-          // This component has `pointer-events: none`, but we will selectively enable pointer-events
-          // for its children. We can still capture the click gobally
-          onClick={handleClick}
           onKeyDown={handleKeyDown}
           {...(draggedEdge
             ? {
@@ -1858,8 +1855,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               }
             : {
                 onDragOver: handleNodeDragOver,
-                onDrop: handleDrop,
+                onDrop: handleNodeDrop,
                 onDragEnd: handleNodeDragEnd,
+                // This component has `pointer-events: none`, but we will selectively enable pointer-events
+                // for its children. We can still capture the click gobally
+                onMouseUp: handleNodeMouseUp,
               })}
         >
           {pageNodes.map((node) => {

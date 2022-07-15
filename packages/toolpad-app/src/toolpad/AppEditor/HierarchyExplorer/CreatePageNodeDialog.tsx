@@ -9,7 +9,7 @@ import {
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as appDom from '../../../appDom';
-import DialogForm from '../../DialogForm';
+import DialogForm from '../../../components/DialogForm';
 import { useDom, useDomApi } from '../../DomLoader';
 
 export interface CreatePageDialogProps {

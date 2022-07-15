@@ -13,7 +13,7 @@ import type { EditorProps } from '../../types';
 import useShortcut from '../../utils/useShortcut';
 import lazyComponent from '../../utils/lazyComponent';
 
-const JsonEditor = lazyComponent(() => import('../JsonEditor'), {
+const JsonEditor = lazyComponent(() => import('../../components/JsonEditor'), {
   noSsr: true,
   fallback: <Skeleton variant="rectangular" height="100%" />,
 });

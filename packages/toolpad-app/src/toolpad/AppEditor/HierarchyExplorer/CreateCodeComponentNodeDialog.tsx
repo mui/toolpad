@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { format } from '../../../utils/prettier';
-import DialogForm from '../../DialogForm';
+import DialogForm from '../../../components/DialogForm';
 
 function createDefaultCodeComponent(name: string): string {
   const componentId = name.replace(/\s/g, '');

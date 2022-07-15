@@ -1,4 +1,5 @@
 import movies from './movies/client';
+import functionSrc from './function/client';
 // import postgres from './postgres/client';
 import rest from './rest/client';
 import { ClientDataSource } from '../types';
@@ -12,6 +13,7 @@ const clientDataSources: ClientDataSources = process.env.TOOLPAD_DEMO
     }
   : {
       // postgres,
+      function: functionSrc,
       rest,
       googleSheets,
     };

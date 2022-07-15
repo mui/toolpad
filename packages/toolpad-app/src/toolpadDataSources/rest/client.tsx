@@ -16,14 +16,14 @@ import { FetchQuery, RestConnectionParams } from './types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
-} from '../../components/AppEditor/PageEditor/BindableEditor';
-import { useEvaluateLiveBinding } from '../../components/AppEditor/useEvaluateLiveBinding';
+} from '../../toolpad/AppEditor/PageEditor/BindableEditor';
+import { useEvaluateLiveBinding } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';
-import ParametersEditor from '../../components/AppEditor/PageEditor/ParametersEditor';
+import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { mapValues } from '../../utils/collections';
 
 interface UrlControlProps extends RenderControlParams<string> {

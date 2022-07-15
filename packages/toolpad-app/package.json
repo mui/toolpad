@@ -12,11 +12,13 @@
     "build:next": "next build",
     "build:react-devtools": "rimraf ./public/reactDevtools && esbuild ./reactDevtools/bootstrap.ts --target=es6 --bundle --outdir=./public/reactDevtools",
     "build:typings": "ts-node ./scripts/typings.ts",
+    "build:function-runtime": "esbuild ./src/toolpadDatasources/function/runtime/index.ts --target=es2020 --bundle --outdir=./src/toolpadDatasources/function/dist",
     "dev:next": "next dev",
     "dev:react-devtools": "yarn build:react-devtools --watch",
     "dev:typings": "yarn build:typings",
     "dev:prisma": "prisma generate --watch",
     "waitForDb": "ts-node ./scripts/waitForDb.ts",
+    "dev:function-runtime": "yarn build:function-runtime --watch",
     "waitForApp": "ts-node --esm ./scripts/waitForApp.mts",
     "prisma-detect-drift": "prisma migrate diff --exit-code --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url \"$TOOLPAD_SHADOW_DATABASE_URL\""
   },
@@ -47,6 +49,7 @@
     "@types/cors": "^2.8.12",
     "@types/prettier": "^2.4.3",
     "@types/react-dom": "^18.0.5",
+    "@types/whatwg-url": "^8.2.2",
     "arg": "^5.0.1",
     "basic-auth": "^2.0.1",
     "clsx": "^1.2.0",
@@ -90,6 +93,7 @@
     "superjson": "^1.8.1",
     "ts-node": "^10.8.2",
     "typescript": "^4.7.4",
+    "whatwg-fetch": "^3.6.2",
     "whatwg-url": "^11.0.0"
   },
   "devDependencies": {

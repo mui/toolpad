@@ -2,6 +2,7 @@ import ivm from 'isolated-vm';
 import * as esbuild from 'esbuild';
 import type * as harFormat from 'har-format';
 import { withHar, createHarLog } from 'node-fetch-har';
+import * as fs from 'fs/promises';
 import { ServerDataSource } from '../../types';
 import {
   FunctionQuery,
@@ -12,98 +13,18 @@ import {
 import { Maybe } from '../../utils/types';
 import { LogEntry } from '../../components/Console';
 
-async function createPolyfillModule() {
-  const { outputFiles } = await esbuild.build({
-    entryPoints: [],
-    bundle: true,
-    format: 'esm',
-    write: false,
-    stdin: {
-      resolveDir: __dirname,
-      contents: `
-        import 'fastestsmallesttextencoderdecoder';
-        import { Headers } from 'headers-polyfill';
-        import { URL, URLSearchParams } from 'whatwg-url';
-
-        global.Headers = Headers;
-        global.URL = URL;
-        global.URLSearchParams = URLSearchParams;
-
-        const __TOOLPAD_BRIDGE__ = global.__TOOLPAD_BRIDGE__
-
-
-        function consoleMethod (level) {
-          return (...args) => {
-            __TOOLPAD_BRIDGE__.console.apply(null, [level, JSON.stringify(args)], { arguments: { copy: true }});
-          }
-        }
-  
-        global.console = {
-          log: consoleMethod('log'),
-          debug: consoleMethod('debug'),
-          info: consoleMethod('info'),
-          warn: consoleMethod('warn'),
-          error: consoleMethod('error'),
-        }
-
-
-        global.setTimeout = (cb, ms) => {
-          return __TOOLPAD_BRIDGE__.setTimeout.applySync(null, [cb, ms], { arguments: { reference: true }, result: { copy: true }});
-        }
-  
-        global.clearTimeout = (timeout) => {
-          return __TOOLPAD_BRIDGE__.clearTimeout.applyIgnored(null, [timeout], { arguments: { copy: true }});
-        }
-
-
-        const INTERNALS = Symbol('Fetch internals');
-
-        global.Response = class Response {
-          constructor() {}
-          get ok () {
-            return this[INTERNALS].getSync('ok');
-          }
-          get status () {
-            return this[INTERNALS].getSync('status');
-          }
-          get statusText () {
-            return this[INTERNALS].getSync('statusText');
-          }
-          get headers () {
-            return new Headers(this[INTERNALS].getSync('headers').copy())
-          }
-          json (...args) {
-            return this[INTERNALS].getSync('json').apply(null, args, { 
-              arguments: { copy: true },
-              result: { copy: true, promise: true }
-            });
-          }
-          text (...args) {
-            return this[INTERNALS].getSync('text').apply(null, args, { 
-              arguments: { copy: true },
-              result: { copy: true, promise: true }
-            });
-          }
-        }
-
-        global.fetch = async (...args) => {
-          const response = new Response();
-          response[INTERNALS] = await __TOOLPAD_BRIDGE__.fetch.apply(null, args, { arguments: { copy: true }, result: { promise: true }});
-          return response;
-        }
-      `,
-    },
+async function fetchRuntimeModule() {
+  return fs.readFile('./src/toolpadDatasources/function/dist/index.js', {
+    encoding: 'utf-8',
   });
-  const code = outputFiles?.[0].text || '';
-  return code;
 }
 
-let cachedPolyfills: Promise<string> | undefined;
-async function getRuntime() {
-  if (!cachedPolyfills) {
-    cachedPolyfills = createPolyfillModule();
+let cachedRuntimeModule: Promise<string> | undefined;
+async function getRuntimeModule() {
+  if (!cachedRuntimeModule) {
+    cachedRuntimeModule = fetchRuntimeModule();
   }
-  return cachedPolyfills;
+  return cachedRuntimeModule;
 }
 
 const isolate = new ivm.Isolate({ memoryLimit: 128 });
@@ -187,7 +108,7 @@ async function execBase(
   await bridge.set('setTimeout', setTimeoutStub);
   await bridge.set('clearTimeout', clearTimeoutStub);
 
-  const runtime = await getRuntime();
+  const runtime = await getRuntimeModule();
   await context.evalClosure(runtime, []);
 
   await jail.delete('__TOOLPAD_BRIDGE__');

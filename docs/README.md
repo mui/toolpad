@@ -1,6 +1,6 @@
-# MUI X docs
+# MUI Toolpad docs
 
-This is the documentation website of MUI X.
+This is the documentation website of MUI Toolpad.
 
 To start the docs site in development mode, from the project root, run:
 

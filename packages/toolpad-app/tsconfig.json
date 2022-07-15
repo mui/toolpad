@@ -23,5 +23,5 @@
     "noUnusedLocals": true
   },
   "include": ["next.config.mjs", "next-env.d.ts", "**/*.ts", "**/*.tsx", "typings/**/*.d.ts"],
-  "exclude": ["node_modules", "./scripts", "./public"]
+  "exclude": ["node_modules", "./scripts", "./public", "./src/toolpadDatasources/runtime"]
 }

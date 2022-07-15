@@ -101,8 +101,8 @@ async function execBase(
     });
   };
 
-  await jail.set('__TOOLPAD_BRIDGE__', new ivm.ExternalCopy({}).copyInto());
-  const bridge = await jail.get('__TOOLPAD_BRIDGE__');
+  await jail.set('TOOLPAD_BRIDGE', new ivm.ExternalCopy({}).copyInto());
+  const bridge = await jail.get('TOOLPAD_BRIDGE');
   await bridge.set('fetch', fetchStub);
   await bridge.set('console', consoleStub);
   await bridge.set('setTimeout', setTimeoutStub);
@@ -111,7 +111,7 @@ async function execBase(
   const runtime = await getRuntimeModule();
   await context.evalClosure(runtime, []);
 
-  await jail.delete('__TOOLPAD_BRIDGE__');
+  await jail.delete('TOOLPAD_BRIDGE');
 
   let data;
   let error: Error | undefined;

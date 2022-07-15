@@ -409,7 +409,7 @@ function NodeHud({
           <div draggable className={overlayClasses.selectionHint} onDragStart={onNodeDragStart}>
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
-            <IconButton aria-label="Remove element" color="inherit" onClick={handleDelete}>
+            <IconButton aria-label="Remove element" color="inherit" onMouseUp={handleDelete}>
               <DeleteIcon color="inherit" />
             </IconButton>
           </div>
@@ -537,10 +537,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   }, [dom, pageNode]);
 
   const overlayGridRef = React.useRef<{
+    gridElement: HTMLDivElement | null;
     getMinColumnWidth: () => number;
     getLeftColumnEdges: () => number[];
     getRightColumnEdges: () => number[];
   }>({
+    gridElement: null,
     getMinColumnWidth: () => 0,
     getLeftColumnEdges: () => [],
     getRightColumnEdges: () => [],
@@ -1681,7 +1683,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   const handleDelete = React.useCallback(
-    (nodeId: NodeId) => {
+    (nodeId: NodeId) => (event: React.MouseEvent<HTMLElement>) => {
+      event.stopPropagation();
+
       const toRemove = appDom.getNode(dom, nodeId);
 
       domApi.removeNode(toRemove.id);
@@ -1922,7 +1926,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                         : []
                     }
                     onEdgeDragStart={isPageRowChild ? handleEdgeDragStart : undefined}
-                    onDelete={() => handleDelete(node.id)}
+                    onDelete={handleDelete(node.id)}
                     isResizing={Boolean(draggedEdge) && node.id === draggedNodeId}
                   />
                 ) : null}

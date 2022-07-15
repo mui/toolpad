@@ -21,6 +21,7 @@ const StyledGridColumn = styled('div')({
 });
 
 export const OverlayGrid = React.forwardRef<{
+  gridElement: HTMLDivElement | null;
   getMinColumnWidth: () => number;
   getLeftColumnEdges: () => number[];
   getRightColumnEdges: () => number[];
@@ -43,6 +44,7 @@ export const OverlayGrid = React.forwardRef<{
       }
 
       return {
+        gridElement: gridRef.current,
         getMinColumnWidth() {
           return columnEdges[1] - columnEdges[0];
         },

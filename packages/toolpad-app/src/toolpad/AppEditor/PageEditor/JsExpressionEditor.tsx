@@ -4,7 +4,7 @@ import { Skeleton, styled, SxProps } from '@mui/material';
 import { WithControlledProp } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
 
-const TypescriptEditor = lazyComponent(() => import('../../TypescriptEditor'), {
+const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
   fallback: <Skeleton variant="rectangular" height="100%" />,
 });

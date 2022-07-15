@@ -13,7 +13,7 @@ import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import dataSources from '../../../toolpadDataSources/client';
 import { ExactEntriesOf } from '../../../utils/types';
-import DialogForm from '../../DialogForm';
+import DialogForm from '../../../components/DialogForm';
 
 export interface CreateConnectionDialogProps {
   appId: string;

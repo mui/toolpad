@@ -39,7 +39,7 @@ import {
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
-import AppOverview from '../components/AppOverview';
+import AppOverview from './AppOverview';
 import { getElementNodeComponentId, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {

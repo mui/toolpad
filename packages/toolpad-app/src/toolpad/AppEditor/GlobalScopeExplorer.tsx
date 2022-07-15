@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import { Box, SxProps } from '@mui/system';
 import * as React from 'react';
-import JsonView from '../JsonView';
+import JsonView from '../../components/JsonView';
 
 export interface GlobalScopeExplorerProps {
   value?: Record<string, unknown>;

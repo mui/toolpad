@@ -1,5 +1,6 @@
 import { ServerDataSource } from '../types';
 import movies from './movies/server';
+import functionSrc from './function/server';
 // import postgres from './postgres/server';
 import rest from './rest/server';
 import googleSheets from './googleSheets/server';
@@ -12,6 +13,7 @@ const serverDataSources: ServerDataSources = process.env.TOOLPAD_DEMO
     }
   : {
       // postgres,
+      function: functionSrc,
       rest,
       googleSheets,
     };

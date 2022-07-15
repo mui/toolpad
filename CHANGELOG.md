@@ -1,5 +1,34 @@
 # Changelog
 
+## v0.0.9
+
+<!-- generated comparing v0.0.8..master -->
+
+_Jul 14, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Refine the drag & drop UX, optimize usage of `googleapis`, add new serverless function datasource.
+
+- &#8203;<!-- 16 -->Move the toolpad app out of the components folder (#657) @Janpot
+- &#8203;<!-- 15 -->Support serverless Function datasource (#641) @Janpot
+- &#8203;<!-- 14 -->Move control of spacing into the datasource QueryEditor (#656) @Janpot
+- &#8203;<!-- 13 -->Rework query editor layout (#655) @Janpot
+- &#8203;<!-- 12 -->Update usePrivateQuery options to follow useQuery options (#654) @Janpot
+- &#8203;<!-- 11 -->Fix Overlay sizing (#543) @Janpot
+- &#8203;<!-- 10 -->Make sure Monaco resizes with its container (#653) @Janpot
+- &#8203;<!-- 09 -->Fix sizing inside columns (#650) @apedroferreira
+- &#8203;<!-- 08 -->Preview query button (#647) @bharatkashyap
+- &#8203;<!-- 07 -->Extract canvas logic in top level layout (#644) @Janpot
+- &#8203;<!-- 06 -->Replace `googleapis` with individual pacakges (#648) @bharatkashyap
+- &#8203;<!-- 05 -->Avoid crash when a query is edited for a non-existing datasource (#640) @Janpot
+- &#8203;<!-- 04 -->Fix the list in setup docs (#643) @Janpot
+- &#8203;<!-- 03 -->Remove MonacoEditor path property (#639) @Janpot
+- &#8203;<!-- 02 -->Bag of tweaks (#637) @Janpot
+- &#8203;<!-- 01 -->Fixes and remove unneeded stylings in recent visual editor update (#638) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
 ## v0.0.8
 
 <!-- generated comparing v0.0.7..master -->

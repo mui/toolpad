@@ -30,7 +30,7 @@ import * as appDom from '../../../appDom';
 import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
-import JsonView from '../../JsonView';
+import JsonView from '../../../components/JsonView';
 import { omit, update } from '../../../utils/immutability';
 import client from '../../../api';
 import ErrorAlert from './ErrorAlert';
@@ -329,6 +329,7 @@ function QueryNodeEditorDialog<Q, P>({
         </Stack>
       </DialogTitle>
       <Divider />
+
       {dataSourceId && dataSource ? (
         <DialogContent sx={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', p: 0 }}>
           <Box sx={{ display: 'flex', flexDirection: 'row', minHeight: 0 }}>

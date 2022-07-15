@@ -20,10 +20,10 @@ import useCodeComponent from './useCodeComponent';
 import { mapValues } from '../../../utils/collections';
 import ErrorAlert from '../PageEditor/ErrorAlert';
 import lazyComponent from '../../../utils/lazyComponent';
-import CenteredSpinner from '../../CenteredSpinner';
-import SplitPane from '../../SplitPane';
+import CenteredSpinner from '../../../components/CenteredSpinner';
+import SplitPane from '../../../components/SplitPane';
 
-const TypescriptEditor = lazyComponent(() => import('../../TypescriptEditor'), {
+const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
   fallback: <CenteredSpinner />,
 });

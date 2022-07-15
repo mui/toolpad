@@ -18,7 +18,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { Link, useParams } from 'react-router-dom';
 import client from '../api';
 import ToolpadAppShell from './ToolpadAppShell';
-import DefinitionList from './DefinitionList';
+import DefinitionList from '../components/DefinitionList';
 import useLatest from '../utils/useLatest';
 import useDialog from '../utils/useDialog';
 

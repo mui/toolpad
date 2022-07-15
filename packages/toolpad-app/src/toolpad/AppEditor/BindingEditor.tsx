@@ -32,7 +32,7 @@ import {
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
-import JsonView from '../JsonView';
+import JsonView from '../../components/JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
@@ -124,7 +124,15 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
       <GlobalScopeExplorer value={globalScope} />
 
-      <Box sx={{ height: '100%', display: 'flex', flex: 1, flexDirection: 'column' }}>
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flex: 1,
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
         <Typography sx={{ mb: 2 }}>
           Make the &quot;{label}&quot; property dynamic with a JavaScript expression. This property
           expects a type: <code>{propType?.type || 'any'}</code>.

@@ -11,7 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
-import MapEntriesEditor from '../../MapEntriesEditor';
+import MapEntriesEditor from '../../../components/MapEntriesEditor';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;

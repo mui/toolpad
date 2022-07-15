@@ -1,12 +1,14 @@
 # Setup
 
+<p class="description">Set Toolpad up locally.</p>
+
 ## docker-compose
 
-The easiest way to run MUI Toolpad locally is through docker-compose.
+The easiest way to run Toolpad locally is through docker-compose.
 
-**NOTE: MUI toolpad is in preview, do not run this in production.**
+**NOTE: Toolpad is in preview, do not run this in production.**
 
-### prerequisits
+### Prerequisites
 
 Make sure you have the following tools installed:
 
@@ -28,7 +30,7 @@ Make sure you have the following tools installed:
     docker-compose -f docker/compose/docker-compose.yml up -d
     ```
 
-MUI Toolpad will be accessible under `http://localhost:3000/`.
+Toolpad will be accessible under `http://localhost:3000/`.
 
 ## Heroku
 

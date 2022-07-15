@@ -9,6 +9,10 @@
     "packages": [
       "packages/*",
       "docs"
+    ],
+    "nohoist": [
+      "docs",
+      "docs/**"
     ]
   },
   "bin": {
@@ -20,10 +24,13 @@
     "deduplicate": "node scripts/deduplicate.js",
     "start": "dotenv cross-env FORCE_COLOR=1 yarn workspace @mui/toolpad-app start",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --scope @mui/toolpad-core --scope @mui/toolpad-components --scope @mui/toolpad-app",
+    "docs:dev": "yarn workspace docs dev",
+    "docs:build": "yarn workspace docs build",
+    "docs:export": "yarn workspace docs export",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "jsonlint": "node ./scripts/jsonlint.js",
     "prisma": "dotenv yarn workspace @mui/toolpad-app run --cwd=\"./packages/toolpad-app\" prisma",
-    "release:build": "lerna run --stream build",
+    "release:build": "lerna run --ignore docs --stream build",
     "release:version": "lerna version --no-changelog --no-push --no-git-tag-version",
     "release:docker": "node ./scripts/releaseDocker.mjs",
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.js --repo mui-toolpad",
@@ -32,7 +39,7 @@
     "test": "yarn test:build && jest"
   },
   "devDependencies": {
-    "@mui/monorepo": "https://github.com/mui/material-ui.git#master",
+    "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "12.2.0",
     "@playwright/test": "^1.23.1",
     "@swc/helpers": "^0.4.3",
@@ -43,6 +50,7 @@
     "@types/rimraf": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.30.3",
     "@typescript-eslint/parser": "^5.30.3",
+    "babel-plugin-transform-rename-import": "^2.3.0",
     "chalk": "^4.1.2",
     "eslint": "^8.19.0",
     "eslint-config-airbnb-typescript": "12",

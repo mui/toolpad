@@ -1760,8 +1760,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   const handleDelete = React.useCallback(
-    (nodeId: NodeId) => (event: React.MouseEvent<HTMLElement>) => {
-      event.stopPropagation();
+    (nodeId: NodeId) => (event?: React.MouseEvent<HTMLElement>) => {
+      if (event) {
+        event.stopPropagation();
+      }
 
       const toRemove = appDom.getNode(dom, nodeId);
 
@@ -1779,7 +1781,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (selection && event.key === 'Backspace') {
-        handleDelete(selection);
+        handleDelete(selection)();
       }
     },
     [selection, handleDelete],

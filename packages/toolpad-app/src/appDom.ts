@@ -435,6 +435,7 @@ export function createElement<P>(
   dom: AppDom,
   component: string,
   props: Partial<BindableAttrValues<P>> = {},
+  layout: Partial<BindableAttrValues<P>> = {},
   name?: string,
 ): ElementNode {
   return createNode(dom, 'element', {
@@ -443,6 +444,7 @@ export function createElement<P>(
     attributes: {
       component: createConst(component),
     },
+    layout,
   });
 }
 

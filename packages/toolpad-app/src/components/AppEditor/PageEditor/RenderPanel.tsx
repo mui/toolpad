@@ -46,7 +46,7 @@ import {
   isPageColumn,
 } from '../../../toolpadComponents';
 import { ExactEntriesOf } from '../../../utils/types';
-import { GRID_NUMBER_OF_COLUMNS, OverlayGrid } from './OverlayGrid';
+import { OverlayGrid } from './OverlayGrid';
 
 const classes = {
   view: 'Toolpad_View',
@@ -1246,6 +1246,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                 lastContainerChild.parentProp,
                 parent.parentIndex,
               );
+
+              if (isPageColumn(parent)) {
+                domApi.setNodeNamespacedProp(
+                  lastContainerChild,
+                  'layout',
+                  'columnSize',
+                  parent.layout?.columnSize || appDom.createConst(1),
+                );
+              }
+
               domApi.removeNode(parent.id);
             }
 
@@ -1260,6 +1270,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                 parentParentParent,
                 lastContainerChild.parentProp,
               );
+
+              if (isPageColumn(parentParent)) {
+                domApi.setNodeNamespacedProp(
+                  lastContainerChild,
+                  'layout',
+                  'columnSize',
+                  parentParent.layout?.columnSize || appDom.createConst(1),
+                );
+              }
+
               domApi.removeNode(parentParent.id);
             }
           }
@@ -1387,7 +1407,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             }
 
             if (isOriginalParentHorizontalContainer) {
-              const columnContainer = appDom.createElement(dom, PAGE_COLUMN_COMPONENT_ID, {});
+              const columnContainer = appDom.createElement(
+                dom,
+                PAGE_COLUMN_COMPONENT_ID,
+                {},
+                {
+                  columnSize: dragOverNode.layout?.columnSize || appDom.createConst(1),
+                },
+              );
+
+              domApi.setNodeNamespacedProp(
+                dragOverNode,
+                'layout',
+                'columnSize',
+                appDom.createConst(1),
+              );
+
               domApi.addNode(
                 columnContainer,
                 parent,
@@ -1477,6 +1512,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             addOrMoveNode(draggedNode, dragOverNode, dragOverSlotParentProp, newParentIndex);
           }
         }
+
+        const draggedNodeParent = appDom.getParent(dom, draggedNode);
+        if (
+          draggedNode.layout?.columnSize &&
+          draggedNodeParent &&
+          draggedNodeParent.id !== parent.id
+        ) {
+          domApi.setNodeNamespacedProp(draggedNode, 'layout', 'columnSize', appDom.createConst(1));
+        }
       }
 
       api.dragEnd();
@@ -1506,25 +1550,72 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     ],
   );
 
-  const updatePageRowLayout = React.useCallback(
-    (pageRowNode: appDom.ElementNode, layoutColumnSizes?: number[]) => {
-      if (!layoutColumnSizes) {
-        const children = appDom.getChildNodes(dom, pageRowNode).children;
+  const normalizePageRowColumnSizes = React.useCallback(
+    (pageRowNode: appDom.ElementNode): number[] => {
+      const children = appDom.getChildNodes(dom, pageRowNode).children;
 
-        layoutColumnSizes = children.map((child) => child.layout?.columnSize?.value || 0);
-      }
+      const layoutColumnSizes = children.map((child) => child.layout?.columnSize?.value || 1);
+      const totalLayoutColumnSizes = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
 
-      const totalLayoutColumnsSize = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
+      const normalizedLayoutColumnSizes = layoutColumnSizes.map(
+        (size) => (size * children.length) / totalLayoutColumnSizes,
+      );
 
-      domApi.setNodeNamespacedProp(pageRowNode, 'props', 'layoutColumnSizes', {
-        type: 'const',
-        value: layoutColumnSizes.map(
-          (size) => (size * GRID_NUMBER_OF_COLUMNS) / totalLayoutColumnsSize,
-        ),
+      children.forEach((child, childIndex) => {
+        if (child.layout?.columnSize) {
+          domApi.setNodeNamespacedProp(
+            child,
+            'layout',
+            'columnSize',
+            appDom.createConst(normalizedLayoutColumnSizes[childIndex]),
+          );
+        }
       });
+
+      return normalizedLayoutColumnSizes;
     },
     [dom, domApi],
   );
+
+  const previousRowColumnCountsRef = React.useRef<Record<NodeId, number>>({});
+
+  const updatePageRowLayout = React.useCallback(
+    (pageRowNode: appDom.ElementNode) => {
+      const children = appDom.getChildNodes(dom, pageRowNode).children;
+      const childrenCount = children.length;
+
+      let layoutColumnSizes: number[] = [];
+
+      if (childrenCount < previousRowColumnCountsRef.current[pageRowNode.id]) {
+        layoutColumnSizes = normalizePageRowColumnSizes(pageRowNode);
+      } else {
+        layoutColumnSizes = children.map((child) => child.layout?.columnSize?.value || 1);
+      }
+
+      if (
+        JSON.stringify(pageRowNode.props?.layoutColumnSizes?.value) !==
+        JSON.stringify(layoutColumnSizes)
+      ) {
+        domApi.setNodeNamespacedProp(
+          pageRowNode,
+          'props',
+          'layoutColumnSizes',
+          appDom.createConst(layoutColumnSizes),
+        );
+      }
+
+      previousRowColumnCountsRef.current[pageRowNode.id] = childrenCount;
+    },
+    [dom, domApi, normalizePageRowColumnSizes],
+  );
+
+  React.useEffect(() => {
+    pageNodes.forEach((node: appDom.AppDomNode) => {
+      if (appDom.isElement(node) && isPageRow(node)) {
+        updatePageRowLayout(node);
+      }
+    });
+  }, [pageNodes, updatePageRowLayout]);
 
   const handleEdgeDragEnd = React.useCallback(
     (event: React.MouseEvent<Element>) => {
@@ -1539,11 +1630,17 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const draggedNodeInfo = nodesInfo[draggedNode.id];
       const draggedNodeRect = draggedNodeInfo?.rect;
 
+      const parent = appDom.getParent(dom, draggedNode);
+
+      const parentChildren = parent ? appDom.getChildNodes(dom, parent).children : [];
+      const totalLayoutColumnSizes = parentChildren.reduce(
+        (acc, child) => acc + (nodesInfo[child.id]?.rect?.width || 0),
+        0,
+      );
+
       const resizePreviewElement =
         editorWindowRef.current?.document.getElementById(RESIZE_PREVIEW_ID);
       const resizePreviewRect = resizePreviewElement?.getBoundingClientRect();
-
-      let updatedColumnSizes: Record<NodeId, number> = {};
 
       if (draggedNodeRect && resizePreviewRect) {
         if (draggedEdge === RECTANGLE_EDGE_LEFT) {
@@ -1554,12 +1651,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             const previousSiblingRect = previousSiblingInfo?.rect;
 
             if (previousSiblingRect) {
-              const updatedDraggedNodeColumnSize = Math.max(0, Math.round(resizePreviewRect.width));
+              const updatedDraggedNodeColumnSize = Math.max(
+                0,
+                (resizePreviewRect.width * parentChildren.length) / totalLayoutColumnSizes,
+              );
               const updatedPreviousSiblingColumnSize = Math.max(
                 0,
-                Math.round(
-                  previousSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
-                ),
+                ((previousSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width)) *
+                  parentChildren.length) /
+                  totalLayoutColumnSizes,
               );
 
               domApi.setNodeNamespacedProp(
@@ -1574,11 +1674,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                 'columnSize',
                 appDom.createConst(updatedPreviousSiblingColumnSize),
               );
-
-              updatedColumnSizes = {
-                [draggedNode.id]: updatedDraggedNodeColumnSize,
-                [previousSibling.id]: updatedPreviousSiblingColumnSize,
-              };
             }
           }
         }
@@ -1590,12 +1685,15 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             const nextSiblingRect = nextSiblingInfo?.rect;
 
             if (nextSiblingRect) {
-              const updatedDraggedNodeColumnSize = Math.max(0, Math.round(resizePreviewRect.width));
+              const updatedDraggedNodeColumnSize = Math.max(
+                0,
+                (resizePreviewRect.width * parentChildren.length) / totalLayoutColumnSizes,
+              );
               const updatedNextSiblingColumnSize = Math.max(
                 0,
-                Math.round(
-                  nextSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
-                ),
+                ((nextSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width)) *
+                  parentChildren.length) /
+                  totalLayoutColumnSizes,
               );
 
               domApi.setNodeNamespacedProp(
@@ -1610,35 +1708,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                 'columnSize',
                 appDom.createConst(updatedNextSiblingColumnSize),
               );
-
-              updatedColumnSizes = {
-                [draggedNode.id]: updatedDraggedNodeColumnSize,
-                [nextSibling.id]: updatedNextSiblingColumnSize,
-              };
             }
           }
-        }
-
-        const parent = appDom.getParent(dom, draggedNode);
-
-        if (parent) {
-          const rowChildren = appDom.getChildNodes(dom, parent).children;
-
-          const updatedLayoutColumnSizes = rowChildren
-            .map((child) =>
-              Object.keys(updatedColumnSizes).includes(child.id)
-                ? appDom.createConst(updatedColumnSizes[child.id])
-                : child.layout?.columnSize || appDom.createConst(0),
-            )
-            .map((constAttribute) => constAttribute.value);
-
-          updatePageRowLayout(parent as appDom.ElementNode, updatedLayoutColumnSizes);
         }
       }
 
       api.dragEnd();
     },
-    [api, dom, domApi, draggedEdge, getCurrentlyDraggedNode, nodesInfo, updatePageRowLayout],
+    [api, dom, domApi, draggedEdge, getCurrentlyDraggedNode, nodesInfo],
   );
 
   const handleNodeDragEnd = React.useCallback(
@@ -1696,7 +1773,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.deselect();
     },
-    [dom, domApi, deleteOrphanedLayoutComponents, api],
+    [dom, domApi, api, deleteOrphanedLayoutComponents],
   );
 
   const handleKeyDown = React.useCallback(

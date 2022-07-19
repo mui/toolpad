@@ -47,3 +47,16 @@ export function suspendPromise<T>(promise: Promise<T>): () => T {
     }
   };
 }
+
+export function interleave(items: React.ReactNode[], separator: React.ReactNode): React.ReactNode {
+  const result: React.ReactNode[] = [];
+
+  for (let i = 0; i < items.length; i += 1) {
+    if (i > 0) {
+      result.push(separator);
+    }
+    result.push(items[i]);
+  }
+
+  return result;
+}

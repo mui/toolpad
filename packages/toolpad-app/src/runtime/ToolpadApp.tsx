@@ -39,8 +39,8 @@ import {
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
-import AppOverview from '../components/AppOverview';
 import { getElementNodeComponentId, isPageRow, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';
+import AppOverview from './AppOverview';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   BindingEvaluationResult,
@@ -48,7 +48,7 @@ import evalJsBindings, {
   evaluateExpression,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_APP_ROOT } from '../constants';
+import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
@@ -59,11 +59,14 @@ export interface NavigateToPage {
   (pageNodeId: NodeId): void;
 }
 
-export interface EditorHooks {
+/**
+ * Context created by the app canvas to override behavior for the app editor
+ */
+export interface CanvasHooks {
   navigateToPage?: NavigateToPage;
 }
 
-export const EditorHooksContext = React.createContext<EditorHooks>({});
+export const CanvasHooksContext = React.createContext<CanvasHooks>({});
 
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
@@ -74,14 +77,20 @@ function usePageNavigator(): NavigateToPage {
     [navigate],
   );
 
-  const editorHooks = React.useContext(EditorHooksContext);
-  return editorHooks.navigateToPage || navigateToPage;
+  const canvasHooks = React.useContext(CanvasHooksContext);
+  return canvasHooks.navigateToPage || navigateToPage;
 }
 
 const AppRoot = styled('div')({
-  overflow: 'auto' /* prevents margins from collapsing into root */,
-  height: 1,
+  overflow: 'auto' /* Prevents margins from collapsing into root */,
+  position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
   minHeight: '100vh',
+});
+
+const EditorOverlay = styled('div')({
+  position: 'absolute',
+  inset: '0 0 0 0',
+  pointerEvents: 'none',
 });
 
 interface AppContext {
@@ -664,6 +673,7 @@ export default function ToolpadApp({
           </AppThemeProvider>
         </DomContextProvider>
       </NoSsr>
+      <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
     </AppRoot>
   );
 }

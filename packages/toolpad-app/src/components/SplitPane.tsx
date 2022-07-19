@@ -1,14 +1,14 @@
 import { styled } from '@mui/material';
 import clsx from 'clsx';
 import * as React from 'react';
-import SplitPane, { SplitPaneProps } from 'react-split-pane';
+import ReactSplitPane, { SplitPaneProps } from 'react-split-pane';
 
 const classes = {
   dragging: 'MuiToolpadSplitPaneDragging',
 };
 
 const WrappedSplitPane = React.forwardRef<
-  SplitPane,
+  ReactSplitPane,
   SplitPaneProps & { children?: React.ReactNode }
 >(({ className, onDragStarted, onDragFinished, ...props }, ref) => {
   const [dragActive, setDragActive] = React.useState(false);
@@ -30,7 +30,7 @@ const WrappedSplitPane = React.forwardRef<
   );
 
   return (
-    <SplitPane
+    <ReactSplitPane
       ref={ref}
       className={clsx({ [classes.dragging]: dragActive }, className)}
       onDragStarted={handleDragStarted}
@@ -38,12 +38,19 @@ const WrappedSplitPane = React.forwardRef<
       // Some sensible defaults
       minSize={20}
       maxSize={-20}
+      paneStyle={{
+        display: 'block',
+        // Prevent the content from stretching the Panel out
+        minWidth: 0,
+        minHeight: 0,
+        ...props.paneStyle,
+      }}
       {...props}
     />
   );
 });
 
-const StyledSplitPane = styled(WrappedSplitPane)(({ theme }) => ({
+const SplitPane = styled(WrappedSplitPane)(({ theme }) => ({
   [`&.${classes.dragging} *`]: {
     // Workaround for https://github.com/tomkp/react-split-pane/issues/30
     pointerEvents: 'none',
@@ -51,14 +58,6 @@ const StyledSplitPane = styled(WrappedSplitPane)(({ theme }) => ({
 
   '& .Pane': {
     background: theme.palette.background.default,
-  },
-
-  '& .Pane.Vertical': {
-    height: '100%',
-  },
-
-  '& .Pane.Horizontal': {
-    width: '100%',
   },
 
   '& .Pane2': {
@@ -113,4 +112,4 @@ const StyledSplitPane = styled(WrappedSplitPane)(({ theme }) => ({
   },
 }));
 
-export default StyledSplitPane;
+export default SplitPane;

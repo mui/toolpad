@@ -21,7 +21,7 @@ async function fetchRuntimeModule() {
 
 let cachedRuntimeModule: Promise<string> | undefined;
 async function getRuntimeModule() {
-  if (!cachedRuntimeModule) {
+  if (!cachedRuntimeModule || process.env.NODE_ENV !== 'production') {
     cachedRuntimeModule = fetchRuntimeModule();
   }
   return cachedRuntimeModule;
@@ -73,33 +73,35 @@ async function execBase(
   let nextTimeoutId = 1;
   const timeouts = new Map<number, NodeJS.Timeout>();
 
-  const setTimeoutStub = (cb: ivm.Reference, ms: ivm.Reference) => {
-    const id = nextTimeoutId;
-    nextTimeoutId += 1;
+  const setTimeoutStub = new ivm.Reference(
+    (cb: ivm.Reference<() => void>, ms: ivm.Reference<number>) => {
+      const id = nextTimeoutId;
+      nextTimeoutId += 1;
 
-    const timeout = setTimeout(() => {
-      timeouts.delete(id);
-      cb.applyIgnored(null, []);
-    }, ms.copySync());
+      const timeout = setTimeout(() => {
+        timeouts.delete(id);
+        cb.applyIgnored(null, []);
+      }, ms.copySync());
 
-    timeouts.set(id, timeout);
+      timeouts.set(id, timeout);
 
-    return id;
-  };
+      return id;
+    },
+  );
 
-  const clearTimeoutStub = (id: number) => {
+  const clearTimeoutStub = new ivm.Reference((id: number) => {
     const timeout = timeouts.get(id);
     timeouts.delete(id);
     clearTimeout(timeout);
-  };
+  });
 
-  const consoleStub = (level: string, serializedArgs: string) => {
+  const consoleStub = new ivm.Reference((level: string, serializedArgs: string) => {
     logs.push({
       timestamp: Date.now(),
       level,
       args: JSON.parse(serializedArgs),
     });
-  };
+  });
 
   await jail.set('TOOLPAD_BRIDGE', new ivm.ExternalCopy({}).copyInto());
   const bridge = await jail.get('TOOLPAD_BRIDGE');

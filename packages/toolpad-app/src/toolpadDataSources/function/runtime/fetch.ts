@@ -1,52 +1,52 @@
-import type * as ivm from 'isolated-vm';
 import { Headers } from 'headers-polyfill';
+import { ResponseStub, ToolpadFunctionRuntimeBridge } from './types';
 
-const TOOLPAD_BRIDGE = global.TOOLPAD_BRIDGE;
+const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = global.TOOLPAD_BRIDGE;
 
 const INTERNALS = Symbol('Fetch internals');
 
 class Response {
-  [INTERNALS]: ivm.Reference;
+  [INTERNALS]: ResponseStub;
 
-  x = null;
-
-  get ok() {
-    return this[INTERNALS].getSync('ok');
+  get ok(): boolean {
+    return this[INTERNALS].ok;
   }
 
-  get status() {
-    return this[INTERNALS].getSync('status');
+  get status(): number {
+    return this[INTERNALS].status;
   }
 
-  get statusText() {
-    return this[INTERNALS].getSync('statusText');
+  get statusText(): string {
+    return this[INTERNALS].statusText;
   }
 
-  get headers() {
-    return new Headers(this[INTERNALS].getSync('headers').copy());
+  get headers(): Headers {
+    return new Headers(this[INTERNALS].headers.copy());
   }
 
-  json() {
-    return this[INTERNALS].getSync('json').apply(null, [], {
+  async json(): Promise<any> {
+    return this[INTERNALS].json.apply(null, [], {
       arguments: { copy: true },
       result: { copy: true, promise: true },
     });
   }
 
-  text() {
-    return this[INTERNALS].getSync('text').apply(null, [], {
+  async text(): Promise<string> {
+    return this[INTERNALS].text.apply(null, [], {
       arguments: { copy: true },
       result: { copy: true, promise: true },
     });
   }
 }
 
-async function fetch(...args) {
+async function fetch(input: RequestInfo | URL, init?: RequestInit) {
   const response = new Response();
-  response[INTERNALS] = await TOOLPAD_BRIDGE.fetch.apply(null, args, {
+
+  response[INTERNALS] = await TOOLPAD_BRIDGE.fetch.apply(null, [input, init], {
     arguments: { copy: true },
-    result: { promise: true },
+    result: { promise: true, copy: true },
   });
+
   return response;
 }
 

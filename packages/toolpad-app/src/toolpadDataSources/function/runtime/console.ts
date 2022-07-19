@@ -1,4 +1,6 @@
-const TOOLPAD_BRIDGE = global.TOOLPAD_BRIDGE;
+import { ToolpadFunctionRuntimeBridge } from './types';
+
+const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = global.TOOLPAD_BRIDGE;
 
 function consoleMethod(level: string) {
   return (...args: any[]) => {
@@ -8,6 +10,8 @@ function consoleMethod(level: string) {
   };
 }
 
+// @ts-expect-error Can't turn of @types/node which gets pulled in automatically
+// https://github.com/microsoft/TypeScript/issues/37053
 global.console = {
   log: consoleMethod('log'),
   debug: consoleMethod('debug'),

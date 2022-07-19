@@ -1579,43 +1579,20 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const previousRowColumnCountsRef = React.useRef<Record<NodeId, number>>({});
 
-  const updatePageRowLayout = React.useCallback(
-    (pageRowNode: appDom.ElementNode) => {
-      const children = appDom.getChildNodes(dom, pageRowNode).children;
-      const childrenCount = children.length;
-
-      let layoutColumnSizes: number[] = [];
-
-      if (childrenCount < previousRowColumnCountsRef.current[pageRowNode.id]) {
-        layoutColumnSizes = normalizePageRowColumnSizes(pageRowNode);
-      } else {
-        layoutColumnSizes = children.map((child) => child.layout?.columnSize?.value || 1);
-      }
-
-      if (
-        JSON.stringify(pageRowNode.props?.layoutColumnSizes?.value) !==
-        JSON.stringify(layoutColumnSizes)
-      ) {
-        domApi.setNodeNamespacedProp(
-          pageRowNode,
-          'props',
-          'layoutColumnSizes',
-          appDom.createConst(layoutColumnSizes),
-        );
-      }
-
-      previousRowColumnCountsRef.current[pageRowNode.id] = childrenCount;
-    },
-    [dom, domApi, normalizePageRowColumnSizes],
-  );
-
   React.useEffect(() => {
     pageNodes.forEach((node: appDom.AppDomNode) => {
       if (appDom.isElement(node) && isPageRow(node)) {
-        updatePageRowLayout(node);
+        const children = appDom.getChildNodes(dom, node).children;
+        const childrenCount = children.length;
+
+        if (childrenCount < previousRowColumnCountsRef.current[node.id]) {
+          normalizePageRowColumnSizes(node);
+        }
+
+        previousRowColumnCountsRef.current[node.id] = childrenCount;
       }
     });
-  }, [pageNodes, updatePageRowLayout]);
+  }, [dom, normalizePageRowColumnSizes, pageNodes]);
 
   const handleEdgeDragEnd = React.useCallback(
     (event: React.MouseEvent<Element>) => {

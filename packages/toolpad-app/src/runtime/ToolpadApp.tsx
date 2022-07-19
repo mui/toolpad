@@ -255,7 +255,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
   const layoutProps = React.useMemo(() => {
     if (appDom.isElement(node) && isPageRow(node)) {
       return {
-        layoutColumnSizes: childNodes.map((childNode) => childNode.layout?.columnSize?.value || 1),
+        layoutColumnSizes: childNodes.map((childNode) => childNode.layout?.columnSize?.value),
       };
     }
     return {};

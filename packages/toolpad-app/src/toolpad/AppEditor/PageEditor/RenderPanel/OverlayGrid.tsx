@@ -1,7 +1,15 @@
 import * as React from 'react';
 import { Grid, styled } from '@mui/material';
 
+export interface OverlayGridHandle {
+  gridElement: HTMLDivElement | null;
+  getMinColumnWidth: () => number;
+  getLeftColumnEdges: () => number[];
+  getRightColumnEdges: () => number[];
+}
+
 export const GRID_NUMBER_OF_COLUMNS = 12;
+export const GRID_COLUMN_GAP = 1;
 
 const StyledGrid = styled(Grid)({
   height: '100vh',
@@ -20,12 +28,10 @@ const StyledGridColumn = styled('div')({
   width: '100%',
 });
 
-export const OverlayGrid = React.forwardRef<{
-  gridElement: HTMLDivElement | null;
-  getMinColumnWidth: () => number;
-  getLeftColumnEdges: () => number[];
-  getRightColumnEdges: () => number[];
-}>(function OverlayGrid(props, forwardedRef) {
+export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayGrid(
+  props,
+  forwardedRef,
+) {
   const gridRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useImperativeHandle(
@@ -60,7 +66,7 @@ export const OverlayGrid = React.forwardRef<{
   );
 
   return (
-    <StyledGrid ref={gridRef} container columnSpacing={1} px={2}>
+    <StyledGrid ref={gridRef} container columnSpacing={GRID_COLUMN_GAP} px={2}>
       {[...Array(GRID_NUMBER_OF_COLUMNS)].map((column, index) => (
         <Grid key={index} item xs={1}>
           <StyledGridColumn />

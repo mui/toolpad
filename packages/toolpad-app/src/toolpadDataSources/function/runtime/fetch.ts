@@ -7,7 +7,7 @@ import './web-streams';
 import './domException';
 import { ToolpadFunctionRuntimeBridge } from './types';
 
-const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = global.TOOLPAD_BRIDGE;
+const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = (global as any).TOOLPAD_BRIDGE;
 
 /*
   'FileReader' in global &&
@@ -37,7 +37,7 @@ function isDataView(obj: unknown): obj is DataView {
   return !!obj && obj instanceof DataView;
 }
 
-function consumeBody(body): void {
+function consumeBody(body: Body): void {
   if (body.bodyUsed) {
     throw new TypeError('Already read');
   }
@@ -71,7 +71,7 @@ async function readBlobAsText(blob: Blob): Promise<string> {
   return reader.result as string;
 }
 
-function readArrayBufferAsText(buf) {
+function readArrayBufferAsText(buf: ArrayBuffer) {
   const view = new Uint8Array(buf);
   const chars = new Array(view.length);
 
@@ -87,35 +87,32 @@ function bufferClone(buf: ArrayBuffer | ArrayBufferView): ArrayBuffer {
     : buf.slice(0);
 }
 
-function decode(body) {
+function decode(body: string) {
   const form = new FormData();
-  body
-    .trim()
-    .split('&')
-    .forEach((bytes) => {
-      if (bytes) {
-        const split = bytes.split('=');
-        const name = split.shift().replace(/\+/g, ' ');
-        const value = split.join('=').replace(/\+/g, ' ');
-        form.append(decodeURIComponent(name), decodeURIComponent(value));
-      }
-    });
+  for (const [name, value] of new URLSearchParams(body)) {
+    form.append(name, value);
+  }
   return form;
 }
 
 class Body {
   bodyUsed = false;
 
+  // @ts-expect-error set in initBody
   headers: Headers;
 
   protected bodyInit: any;
 
+  // @ts-expect-error set in initBody
   private bodyText: string;
 
+  // @ts-expect-error set in initBody
   private bodyBlob: Blob;
 
+  // @ts-expect-error set in initBody
   private bodyFormData: FormData;
 
+  // @ts-expect-error set in initBody
   private bodyArrayBuffer: ArrayBuffer;
 
   blob = SUPPORTS_BLOB
@@ -236,15 +233,15 @@ function normalizeMethod(method: string): string {
 class Request extends Body {
   url: string;
 
-  credentials: RequestCredentials;
+  credentials: RequestCredentials = 'same-origin';
 
-  method: string;
+  method: string = 'GET';
 
-  mode: RequestMode;
+  mode: RequestMode | null = null;
 
-  signal: AbortSignal | null;
+  signal: AbortSignal | null = null;
 
-  referrer: string | null;
+  referrer: string | null = null;
 
   constructor(input: Request | string | URL, options?: RequestInit) {
     super();
@@ -272,11 +269,11 @@ class Request extends Body {
       this.url = String(input);
     }
 
-    this.credentials = options.credentials || this.credentials || 'same-origin';
+    this.credentials = options.credentials || this.credentials;
     if (options.headers || !this.headers) {
       this.headers = new Headers(options.headers);
     }
-    this.method = normalizeMethod(options.method || this.method || 'GET');
+    this.method = normalizeMethod(options.method || this.method);
     this.mode = options.mode || this.mode || null;
     this.signal =
       options.signal ||
@@ -323,7 +320,7 @@ class Response extends Body {
 
   readonly ok: boolean;
 
-  readonly redirected: boolean;
+  readonly redirected: boolean = false;
 
   readonly status: number;
 
@@ -331,7 +328,7 @@ class Response extends Body {
 
   readonly type: ResponseType;
 
-  readonly url: string;
+  readonly url: string = '';
 
   static error() {
     const response = new Response(null, { status: 0, statusText: '' });
@@ -340,7 +337,7 @@ class Response extends Body {
     return response;
   }
 
-  static redirect(url, status) {
+  static redirect(url: string, status: number) {
     if (!redirectStatuses.has(status)) {
       throw new RangeError('Invalid status code');
     }
@@ -348,7 +345,7 @@ class Response extends Body {
     return new Response(null, { status, headers: { location: url } });
   }
 
-  constructor(bodyInit, options) {
+  constructor(bodyInit: any, options: ResponseInit & { url?: string }) {
     super();
     if (!options) {
       options = {};
@@ -381,7 +378,7 @@ async function serializeRequest(request: Request): Promise<[string, RequestInit]
     {
       headers: Array.from(request.headers.entries()),
       method: request.method,
-      mode: request.mode,
+      mode: request.mode || undefined,
       body: nonBodyMethod.has(normalizeMethod(request.method)) ? undefined : await request.text(),
     },
   ];

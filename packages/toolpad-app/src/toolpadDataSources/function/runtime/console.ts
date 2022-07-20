@@ -1,6 +1,6 @@
 import { ToolpadFunctionRuntimeBridge } from './types';
 
-const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = global.TOOLPAD_BRIDGE;
+const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = (global as any).TOOLPAD_BRIDGE;
 
 function consoleMethod(level: string) {
   return (...args: any[]) => {

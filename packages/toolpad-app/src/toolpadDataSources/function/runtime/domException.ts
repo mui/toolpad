@@ -4,9 +4,11 @@ try {
 } catch (err) {
   // @ts-expect-error This is a best effort
   global.DOMException = class DOMException extends Error {
-    constructor(message, name) {
+    constructor(message: string, name: string) {
       super(message);
       this.name = name;
     }
   };
 }
+
+export {};

@@ -1,4 +1,4 @@
-# Getting started
+# Tutorial
 
 <p class="description">Get started building a Toolpad app!</p>
 

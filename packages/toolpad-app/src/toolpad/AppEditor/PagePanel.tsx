@@ -1,4 +1,4 @@
-import { styled, SxProps, Typography, Skeleton, Box, Divider } from '@mui/material';
+import { styled, SxProps, Typography, Tooltip, Skeleton, Box, Divider } from '@mui/material';
 import * as React from 'react';
 import HierarchyExplorer from './HierarchyExplorer';
 import client from '../../api';
@@ -20,7 +20,11 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
   return (
     <PagePanelRoot className={className} sx={sx}>
       <Box sx={{ px: 2, py: 1 }}>
-        {isLoading ? <Skeleton variant="text" /> : <Typography>{app?.name}</Typography>}
+        {isLoading ? <Skeleton variant="text" /> : (
+          <Tooltip title={app?.name || ''} enterDelay={500}>
+            <Typography noWrap>{app?.name}</Typography>
+          </Tooltip>
+        )}
       </Box>
       <Divider />
       <HierarchyExplorer appId={appId} />

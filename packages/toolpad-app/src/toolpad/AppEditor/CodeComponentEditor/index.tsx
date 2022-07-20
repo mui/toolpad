@@ -154,11 +154,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         <Toolbar sx={{ mt: 2 }}>
           <NodeNameEditor node={codeComponentNode} sx={{ maxWidth: 300 }} />
         </Toolbar>
-        <Toolbar>
-          <Button disabled={allChangesAreCommitted} onClick={handleSave}>
-            Update
-          </Button>
-        </Toolbar>
+
         <Box flex={1}>
           <SplitPane split="vertical" allowResize size="50%">
             <TypescriptEditor
@@ -189,6 +185,21 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             frameDocument.body,
           )
         : null}
+      <Toolbar
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          width: '100%',
+          zIndex: 1,
+          background: '#f2f2f2',
+          justifyContent: 'end',
+        }}
+      >
+        <Button disabled={allChangesAreCommitted} onClick={handleSave} variant="contained">
+          Update
+        </Button>
+      </Toolbar>
     </React.Fragment>
   );
 }

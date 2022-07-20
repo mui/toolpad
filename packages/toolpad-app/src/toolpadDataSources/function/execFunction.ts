@@ -44,7 +44,7 @@ export default async function execFunction(
   const fetchStub = new ivm.Reference((...args: Parameters<typeof fetch>) => {
     const req = new Request(...args);
 
-    return instrumentedFetch(req).then(
+    return fetch(req).then(
       (res) => {
         const resHeadersInit = Array.from(res.headers.entries());
 

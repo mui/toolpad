@@ -1,10 +1,12 @@
 /**
  * Implementation adapted from https://github.com/github/fetch/blob/master/fetch.js
  */
-import './url';
-import './headers';
-import './web-streams';
 import './domException';
+import './formData';
+import './headers';
+import './url';
+import './web-streams';
+import { formDataToBlob } from 'formdata-polyfill/esm.min';
 import { ToolpadFunctionRuntimeBridge } from './types';
 
 const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = (global as any).TOOLPAD_BRIDGE;
@@ -24,11 +26,6 @@ const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = (global as any).TOOLPAD_BRI
 const SUPPORTS_BLOB = false;
 
 /*
-  formData: 'FormData' in global
-*/
-const SUPPORTS_FORMDATA = false;
-
-/*
   abortController: 'AbortController' in global
 */
 const SUPPORTS_ABORTCONTROLLER = false;
@@ -44,31 +41,13 @@ function consumeBody(body: Body): void {
   body.bodyUsed = true;
 }
 
-function fileReaderReady(reader: FileReader): Promise<void> {
-  return new Promise((resolve, reject) => {
-    reader.onload = () => {
-      resolve();
-    };
-    reader.onerror = () => {
-      reject(reader.error);
-    };
-  });
-}
-
 async function readBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
-  const reader = new FileReader();
-  const readerReady = fileReaderReady(reader);
-  reader.readAsArrayBuffer(blob);
-  await readerReady;
-  return reader.result as ArrayBuffer;
+  return blob.arrayBuffer();
 }
 
 async function readBlobAsText(blob: Blob): Promise<string> {
-  const reader = new FileReader();
-  const readerReady = fileReaderReady(reader);
-  reader.readAsText(blob);
-  await readerReady;
-  return reader.result as string;
+  const utf8decoder = new TextDecoder();
+  return utf8decoder.decode(await readBlobAsArrayBuffer(blob));
 }
 
 function readArrayBufferAsText(buf: ArrayBuffer) {
@@ -110,7 +89,7 @@ class Body {
   private bodyBlob: Blob;
 
   // @ts-expect-error set in initBody
-  private bodyFormData: FormData;
+  private bodyFormData: Blob;
 
   // @ts-expect-error set in initBody
   private bodyArrayBuffer: ArrayBuffer;
@@ -150,11 +129,9 @@ class Body {
       }
     : undefined;
 
-  formData = SUPPORTS_FORMDATA
-    ? async () => {
-        return this.text().then(decode);
-      }
-    : undefined;
+  async formData() {
+    return this.text().then(decode);
+  }
 
   protected initBody(body: unknown) {
     this.bodyInit = body;
@@ -164,8 +141,8 @@ class Body {
       this.bodyText = body;
     } else if (SUPPORTS_BLOB && body instanceof Blob) {
       this.bodyBlob = body;
-    } else if (SUPPORTS_FORMDATA && body instanceof FormData) {
-      this.bodyFormData = body;
+    } else if (body instanceof FormData) {
+      this.bodyFormData = formDataToBlob(body);
     } else if (body instanceof URLSearchParams) {
       this.bodyText = body.toString();
     } else if (SUPPORTS_BLOB && isDataView(body)) {
@@ -187,6 +164,9 @@ class Body {
         this.headers.set('content-type', this.bodyBlob.type);
       } else if (body instanceof URLSearchParams) {
         this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+      } else if (this.bodyFormData) {
+        this.headers.set('content-type', this.bodyFormData.type);
+        this.headers.set('content-length', String(this.bodyFormData.size));
       }
     }
   }
@@ -201,10 +181,9 @@ class Body {
       return readArrayBufferAsText(this.bodyArrayBuffer);
     }
     if (this.bodyFormData) {
-      throw new Error('could not read FormData body as text');
-    } else {
-      return this.bodyText;
+      return readBlobAsText(this.bodyFormData);
     }
+    return this.bodyText;
   }
 
   async json() {

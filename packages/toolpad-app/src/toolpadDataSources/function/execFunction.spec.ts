@@ -1,6 +1,7 @@
 import * as http from 'http';
 import getPort from 'get-port';
 import { Readable } from 'stream';
+import formidable from 'formidable';
 import execFunction from './execFunction';
 
 function streamToString(stream: Readable) {
@@ -168,7 +169,7 @@ describe('execFunction', () => {
     }
   });
 
-  test('fetch bad status', async () => {
+  test('fetch POST requests', async () => {
     const { port, stopServer } = await startServer(async (req, res) => {
       res.write(
         JSON.stringify({
@@ -203,7 +204,58 @@ describe('execFunction', () => {
     }
   });
 
-  test('fetch POST requests', async () => {
+  test('fetch POST requests with Formdata', async () => {
+    const { port, stopServer } = await startServer(async (req, res) => {
+      const form = formidable({ multiples: true });
+      console.log(req.headers);
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          console.log(err);
+          res.statusCode = 500;
+          res.end();
+          return;
+        }
+
+        res.write(
+          JSON.stringify({
+            method: req.method,
+            body: JSON.stringify({ fields, files }),
+          }),
+        );
+        res.end();
+      });
+    });
+
+    try {
+      const { data, error, logs } = await execFunction(`
+      export default async function () {
+        const body = new FormData();
+        body.append('foo', 'bar');
+        body.append('baz', 'quux');
+        const res = await fetch('http://localhost:${port}', {
+          method: 'POST',
+          body
+        });
+        if (!res.ok) {
+          throw new Error(\`HTTP \${res.status}: \${res.statusText}: \${await res.text()}\`)
+        }
+        return res.json();
+      }
+    `);
+
+      console.log(JSON.stringify(logs, null, 2));
+
+      expect(error).toBeUndefined();
+      expect(data).toEqual({
+        method: 'POST',
+        body: 'Foo body',
+      });
+    } finally {
+      await stopServer();
+    }
+  });
+
+  test('fetch bad status', async () => {
     const { port, stopServer } = await startServer((req, res) => {
       res.statusCode = 500;
       res.write('BOOM!');

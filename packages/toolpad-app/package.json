@@ -111,6 +111,7 @@
     "eslint-config-next": "^12.2.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
+    "get-port": "^6.1.2",
     "glob": "^8.0.3",
     "monaco-editor": "^0.33.0",
     "webpack": "^5.73.0"

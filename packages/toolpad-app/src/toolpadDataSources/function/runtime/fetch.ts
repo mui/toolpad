@@ -8,6 +8,10 @@ const INTERNALS = Symbol('Fetch internals');
 class Response {
   [INTERNALS]: ResponseStub;
 
+  static error(): Response {}
+
+  static redirect(url: string | URL, status?: number): Response {}
+
   get ok(): boolean {
     return this[INTERNALS].ok;
   }

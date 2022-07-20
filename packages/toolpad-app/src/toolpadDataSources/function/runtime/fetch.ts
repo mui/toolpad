@@ -1,5 +1,4 @@
 import './url';
-import './blob';
 import './headers';
 import './web-streams';
 import './domException';

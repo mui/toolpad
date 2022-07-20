@@ -6,14 +6,14 @@ if (!global.TextDecoder) {
   global.TextDecoder = TextDecoder;
 } else {
   // eslint-disable-next-line no-console
-  console.info('TextDecoder not polyfilled: trunning on a platform that supports TextDecoder');
+  console.info('TextDecoder not polyfilled: running on a platform that supports TextDecoder');
 }
 
 if (!global.TextEncoder) {
   global.TextEncoder = TextEncoder;
 } else {
   // eslint-disable-next-line no-console
-  console.info('TextEncoder not polyfilled: trunning on a platform that supports TextEncoder');
+  console.info('TextEncoder not polyfilled: running on a platform that supports TextEncoder');
 }
 
 if (!global.fetch) {
@@ -26,5 +26,5 @@ if (!global.fetch) {
   global.Response = Response;
 } else {
   // eslint-disable-next-line no-console
-  console.info('Fetch API not polyfilled: trunning on a platform that supports fetch');
+  console.info('Fetch API not polyfilled: running on a platform that supports fetch');
 }

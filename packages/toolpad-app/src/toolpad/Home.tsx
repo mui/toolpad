@@ -284,7 +284,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
             errorText={`An app named "${appTitle}" already exists`}
             loading={Boolean(!app)}
             defaultValue={appTitle}
-            variant={'h5'}
+            variant={'subtitle1'}
             ref={appTitleInput}
           />
         </CardContent>
@@ -376,16 +376,16 @@ export default function Home() {
               case 'success':
                 return apps.length > 0
                   ? apps.map((app) => {
-                      const activeDeployment = activeDeploymentsByApp?.[app.id];
-                      return (
-                        <AppCard
-                          key={app.id}
-                          app={app}
-                          activeDeployment={activeDeployment}
-                          onDelete={() => setDeletedApp(app)}
-                        />
-                      );
-                    })
+                    const activeDeployment = activeDeploymentsByApp?.[app.id];
+                    return (
+                      <AppCard
+                        key={app.id}
+                        app={app}
+                        activeDeployment={activeDeployment}
+                        onDelete={() => setDeletedApp(app)}
+                      />
+                    );
+                  })
                   : 'No apps yet';
               default:
                 return '';

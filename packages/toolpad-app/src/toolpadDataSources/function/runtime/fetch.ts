@@ -1,3 +1,6 @@
+/**
+ * Implementation adapted from https://github.com/github/fetch/blob/master/fetch.js
+ */
 import './url';
 import './headers';
 import './web-streams';

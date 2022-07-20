@@ -376,16 +376,16 @@ export default function Home() {
               case 'success':
                 return apps.length > 0
                   ? apps.map((app) => {
-                    const activeDeployment = activeDeploymentsByApp?.[app.id];
-                    return (
-                      <AppCard
-                        key={app.id}
-                        app={app}
-                        activeDeployment={activeDeployment}
-                        onDelete={() => setDeletedApp(app)}
-                      />
-                    );
-                  })
+                      const activeDeployment = activeDeploymentsByApp?.[app.id];
+                      return (
+                        <AppCard
+                          key={app.id}
+                          app={app}
+                          activeDeployment={activeDeployment}
+                          onDelete={() => setDeletedApp(app)}
+                        />
+                      );
+                    })
                   : 'No apps yet';
               default:
                 return '';

@@ -19,6 +19,7 @@
     "toolpad": "./dist/index.js"
   },
   "scripts": {
+    "markdownlint": "markdownlint \"**/*.md\" --config .markdownlint.jsonc",
     "prettier": "node ./scripts/prettier.js",
     "prettier:all": "node ./scripts/prettier.js write",
     "deduplicate": "node scripts/deduplicate.js",
@@ -67,6 +68,7 @@
     "format-util": "^1.0.5",
     "jest": "^28.1.2",
     "lerna": "^5.1.6",
+    "markdownlint-cli": "^0.31.1",
     "prettier": "^2.6.2",
     "prettier-plugin-prisma": "^3.11.0",
     "regenerator-runtime": "^0.13.9",

@@ -52,6 +52,7 @@
     "@types/whatwg-url": "^8.2.2",
     "arg": "^5.0.1",
     "basic-auth": "^2.0.1",
+    "blob-polyfill": "^7.0.20220408",
     "clsx": "^1.2.0",
     "concurrently": "^7.1.0",
     "cors": "^2.8.5",
@@ -93,7 +94,7 @@
     "superjson": "^1.8.1",
     "ts-node": "^10.8.2",
     "typescript": "^4.7.4",
-    "whatwg-fetch": "^3.6.2",
+    "web-streams-polyfill": "^3.2.1",
     "whatwg-url": "^11.0.0"
   },
   "devDependencies": {

@@ -5,6 +5,7 @@ export interface FetchStub {
 }
 
 export interface ResponseStub {
+  url: string;
   ok: boolean;
   status: number;
   statusText: string;
@@ -18,7 +19,7 @@ export interface ConsoleStub {
 }
 
 export interface SetTimeoutStub {
-  (cb: ivm.Reference<() => void>, ms: ivm.Reference<number>): number;
+  (cb: () => void, ms: number): number;
 }
 
 export interface ClearTimeoutStub {

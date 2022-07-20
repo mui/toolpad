@@ -49,6 +49,7 @@ export default async function execFunction(
         const resHeadersInit = Array.from(res.headers.entries());
 
         return {
+          url: res.url,
           ok: res.ok,
           status: res.status,
           statusText: res.statusText,

@@ -1,6 +1,16 @@
 import * as http from 'http';
 import getPort from 'get-port';
+import { Readable } from 'stream';
 import execFunction from './execFunction';
+
+function streamToString(stream: Readable) {
+  const chunks: Buffer[] = [];
+  return new Promise((resolve, reject) => {
+    stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+    stream.on('error', (err) => reject(err));
+    stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+  });
+}
 
 async function startServer(handler?: http.RequestListener) {
   const server = http.createServer(handler);
@@ -159,6 +169,41 @@ describe('execFunction', () => {
   });
 
   test('fetch bad status', async () => {
+    const { port, stopServer } = await startServer(async (req, res) => {
+      res.write(
+        JSON.stringify({
+          method: req.method,
+          body: await streamToString(req),
+        }),
+      );
+      res.end();
+    });
+
+    try {
+      const { data, error } = await execFunction(`
+      export default async function () {
+        const res = await fetch('http://localhost:${port}', {
+          method: 'POST',
+          body: 'Foo body'
+        });
+        if (!res.ok) {
+          throw new Error(\`HTTP \${res.status}: \${res.statusText}: \${await res.text()}\`)
+        }
+        return res.json();
+      }
+    `);
+
+      expect(error).toBeUndefined();
+      expect(data).toEqual({
+        method: 'POST',
+        body: 'Foo body',
+      });
+    } finally {
+      await stopServer();
+    }
+  });
+
+  test('fetch POST requests', async () => {
     const { port, stopServer } = await startServer((req, res) => {
       res.statusCode = 500;
       res.write('BOOM!');

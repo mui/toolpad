@@ -2,6 +2,7 @@ import { TextDecoder, TextEncoder } from 'util';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 
 if (!global.TextDecoder) {
+  // @ts-expect-error
   global.TextDecoder = TextDecoder;
 } else {
   // eslint-disable-next-line no-console

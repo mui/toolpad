@@ -1,5 +1,6 @@
 import './console';
 import './fetch';
-import './text-encoding';
+import './textEncoding';
 import './timers';
 import './url';
+import './blob';

@@ -1,3 +1,5 @@
+// whatwg-url depends on TextEndoder/TextDecoder
+import './textEncoding';
 import { URL, URLSearchParams } from 'whatwg-url';
 
 // @ts-expect-error Can't turn of @types/node which gets pulled in automatically

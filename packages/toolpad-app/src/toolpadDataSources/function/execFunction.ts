@@ -10,7 +10,7 @@ import { LogEntry } from '../../components/Console';
 import { FetchOptions } from './runtime/types';
 
 async function fetchRuntimeModule() {
-  const filePath = fileURLToPath(new URL('./dist/index.js', import.meta.url).href);
+  const filePath = fileURLToPath(new URL('./function/dist/index.js', import.meta.url).href);
   return fs.readFile(filePath, {
     encoding: 'utf-8',
   });

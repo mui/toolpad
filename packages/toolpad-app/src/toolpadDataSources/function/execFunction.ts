@@ -4,8 +4,10 @@ import type * as harFormat from 'har-format';
 import { withHar, createHarLog } from 'node-fetch-har';
 import * as fs from 'fs/promises';
 import { fileURLToPath } from 'url';
+import fetch from 'node-fetch';
 import { FunctionResult } from './types';
 import { LogEntry } from '../../components/Console';
+import { FetchOptions } from './runtime/types';
 
 async function fetchRuntimeModule() {
   const filePath = fileURLToPath(new URL('./dist/index.js', import.meta.url).href);
@@ -41,10 +43,14 @@ export default async function execFunction(
 
   const instrumentedFetch: typeof fetch = withHar(fetch, { har });
 
-  const fetchStub = new ivm.Reference((...args: Parameters<typeof fetch>) => {
-    const req = new Request(...args);
+  const fetchStub = new ivm.Reference((url: string, rawOptions: FetchOptions) => {
+    const options = {
+      ...rawOptions,
+      // node-fetch-har doesn't deal well with arrays here
+      headers: Object.fromEntries(rawOptions.headers || []),
+    };
 
-    return fetch(req).then(
+    return instrumentedFetch(url, options).then(
       (res) => {
         const resHeadersInit = Array.from(res.headers.entries());
 

@@ -1,7 +1,14 @@
 import type * as ivm from 'isolated-vm';
 
+export interface FetchOptions {
+  headers: [string, string][];
+  method: string;
+  mode?: string;
+  body?: string;
+}
+
 export interface FetchStub {
-  (input: RequestInfo | URL, init?: RequestInit): Promise<ResponseStub>;
+  (input: string, options: FetchOptions): Promise<ResponseStub>;
 }
 
 export interface ResponseStub {

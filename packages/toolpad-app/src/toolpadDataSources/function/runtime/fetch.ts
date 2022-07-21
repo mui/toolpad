@@ -7,7 +7,7 @@ import './headers';
 import './url';
 import './web-streams';
 import { formDataToBlob } from 'formdata-polyfill/esm.min';
-import { ToolpadFunctionRuntimeBridge } from './types';
+import { ToolpadFunctionRuntimeBridge, FetchOptions } from './types';
 
 const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = (global as any).TOOLPAD_BRIDGE;
 
@@ -351,7 +351,7 @@ class Response extends Body {
 
 const nonBodyMethod = new Set(['GET', 'HEAD']);
 
-async function serializeRequest(request: Request): Promise<[string, RequestInit]> {
+async function serializeRequest(request: Request): Promise<[string, FetchOptions]> {
   return [
     request.url,
     {

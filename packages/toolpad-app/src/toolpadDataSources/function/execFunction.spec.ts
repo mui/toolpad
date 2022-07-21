@@ -207,10 +207,8 @@ describe('execFunction', () => {
   test('fetch POST requests with Formdata', async () => {
     const { port, stopServer } = await startServer(async (req, res) => {
       const form = formidable({ multiples: true });
-      console.log(req.headers);
-      form.parse(req, (err, fields, files) => {
+      form.parse(req, (err, fields) => {
         if (err) {
-          console.log(err);
           res.statusCode = 500;
           res.end();
           return;
@@ -219,7 +217,7 @@ describe('execFunction', () => {
         res.write(
           JSON.stringify({
             method: req.method,
-            body: JSON.stringify({ fields, files }),
+            body: fields,
           }),
         );
         res.end();
@@ -227,7 +225,7 @@ describe('execFunction', () => {
     });
 
     try {
-      const { data, error, logs } = await execFunction(`
+      const { data, error } = await execFunction(`
       export default async function () {
         const body = new FormData();
         body.append('foo', 'bar');
@@ -243,12 +241,13 @@ describe('execFunction', () => {
       }
     `);
 
-      console.log(JSON.stringify(logs, null, 2));
-
       expect(error).toBeUndefined();
       expect(data).toEqual({
         method: 'POST',
-        body: 'Foo body',
+        body: {
+          baz: 'quux',
+          foo: 'bar',
+        },
       });
     } finally {
       await stopServer();

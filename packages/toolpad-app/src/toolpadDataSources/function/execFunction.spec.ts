@@ -2,7 +2,10 @@ import * as http from 'http';
 import getPort from 'get-port';
 import { Readable } from 'stream';
 import formidable from 'formidable';
+import { execa } from 'execa';
+import path from 'path';
 import execFunction from './execFunction';
+import projectRoot from '../../server/projectRoot';
 
 function streamToString(stream: Readable) {
   const chunks: Buffer[] = [];
@@ -41,6 +44,16 @@ async function startServer(handler?: http.RequestListener) {
     },
   };
 }
+
+async function buildRuntime() {
+  await execa('yarn', ['run', 'build:function-runtime'], {
+    cwd: path.resolve(__dirname, '../../..'),
+  });
+}
+
+beforeAll(async () => {
+  return buildRuntime();
+});
 
 describe('execFunction', () => {
   test('basic', async () => {

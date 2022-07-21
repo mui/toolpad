@@ -46,10 +46,13 @@ if (reactStrictMode) {
   console.log(`Using React.StrictMode.`);
 }
 
+const isProd = process.env.CONTEXT === 'production';
+
 module.exports = withTM({
   eslint: {
     ignoreDuringBuilds: true,
   },
+  assetPrefix: isProd ? '/toolpad' : '',
   typescript: {
     // Motivated by https://github.com/zeit/next.js/issues/7687
     ignoreDevErrors: true,

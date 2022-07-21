@@ -3,14 +3,15 @@ import * as esbuild from 'esbuild';
 import type * as harFormat from 'har-format';
 import { withHar, createHarLog } from 'node-fetch-har';
 import * as fs from 'fs/promises';
-import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
+import * as path from 'path';
 import { FunctionResult } from './types';
 import { LogEntry } from '../../components/Console';
 import { FetchOptions } from './runtime/types';
+import projectRoot from '../../server/projectRoot';
 
 async function fetchRuntimeModule() {
-  const filePath = fileURLToPath(new URL('./dist/index.js', import.meta.url).href);
+  const filePath = path.resolve(projectRoot, './src/toolpadDataSources/function/dist/index.js');
   return fs.readFile(filePath, {
     encoding: 'utf-8',
   });

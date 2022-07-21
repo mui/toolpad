@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Skeleton, TextField, Typography, TypographyVariant } from '@mui/material';
+import { Skeleton, TextField, Typography, TypographyVariant, Tooltip } from '@mui/material';
 
 interface EditableTextProps {
   defaultValue?: string;
@@ -29,9 +29,11 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         helperText={isError ? errorText : ''}
       />
     ) : (
-      <Typography gutterBottom variant={variant ?? 'body1'} component="div">
-        {loading ? <Skeleton /> : defaultValue}
-      </Typography>
+      <Tooltip title={defaultValue || ''} enterDelay={500}>
+        <Typography gutterBottom variant={variant ?? 'body1'} component="div" noWrap>
+          {loading ? <Skeleton /> : defaultValue}
+        </Typography>
+      </Tooltip>
     );
   },
 );

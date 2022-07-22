@@ -52,6 +52,7 @@ module.exports = withTM({
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: isDeployment ? '/toolpad' : '',
   typescript: {
     // Motivated by https://github.com/zeit/next.js/issues/7687

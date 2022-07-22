@@ -1,8 +1,11 @@
 # Google Sheets
 
+<p class="description">Google Sheets data source.</p>
+
 ## Setup Google Cloud
 
-Google Cloud Platform allows us to authorize third-party applications to access files (docs, sheets, photos, etc.) in our Google Drive. Below are the steps to create a Toolpad application that can be given permission to access your Google Drive folder using OAuth.
+Google Cloud Platform allows us to authorize third-party applications to access files (docs, sheets, photos, etc.) in our Google Drive.
+Below are the steps to create a Toolpad application that can be given permission to access your Google Drive folder using OAuth.
 
 You need to enable Google Login to connect Google Sheets. If you're an existing user, you can sign in to [Google Console](https://cloud.google.com/) or create a new account.
 
@@ -13,7 +16,7 @@ You need to enable Google Login to connect Google Sheets. If you're an existing 
 
 3. You will need the following environment variables to setup the datasource:
 
-   ```
+   ```sh
    TOOLPAD_EXTERNAL_URL=<YOUR_APP_URL>
    TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID=
    TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET=
@@ -22,8 +25,8 @@ You need to enable Google Login to connect Google Sheets. If you're an existing 
    where YOUR_APP_URL is the URL Toolpad is hosted on
 
 4. Now add the following URIs under Authorized Redirect URIs:
-   ```bash
-   https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback
+   ```sh
+   https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback</YOUR_APP_URL>
    ```
 5. Lastly, you'll have to enable the Google Sheets and Google Drive APIs for the project using the instructions [here](https://developers.google.com/identity/protocols/oauth2/web-server#enable-apis).
 
@@ -38,5 +41,3 @@ From the App page;
 5. Choose the sheet, cell range → Click on "Update" to save the API
 
 You should now be able to use this API in any App page.
-
-Refer to the [Getting started](https://github.com/mui/mui-toolpad/blob/docs/sheets/docs/getting-started.md) section to learn more about building an application on Toolpad.

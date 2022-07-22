@@ -33,6 +33,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# docs
+
+/docs/export
+
 lerna-debug.log
 
 .env

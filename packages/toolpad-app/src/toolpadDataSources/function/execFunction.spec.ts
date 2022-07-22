@@ -5,7 +5,6 @@ import formidable from 'formidable';
 import { execa } from 'execa';
 import path from 'path';
 import execFunction from './execFunction';
-import projectRoot from '../../server/projectRoot';
 
 function streamToString(stream: Readable) {
   const chunks: Buffer[] = [];
@@ -46,16 +45,24 @@ async function startServer(handler?: http.RequestListener) {
 }
 
 async function buildRuntime() {
-  await execa('yarn', ['run', 'build:function-runtime'], {
+  const proc = execa('yarn', ['run', 'build:function-runtime'], {
     cwd: path.resolve(__dirname, '../../..'),
+    stdio: 'pipe',
   });
+  const chunks: Buffer[] = [];
+  proc.stdout?.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+  proc.stderr?.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+
+  await proc;
+
+  console.log(Buffer.concat(chunks).toString('utf-8'));
 }
 
-beforeAll(async () => {
-  return buildRuntime();
-});
-
 describe('execFunction', () => {
+  beforeAll(async () => {
+    await buildRuntime();
+  });
+
   test('basic', async () => {
     const { data, error } = await execFunction(`
       export default async function () {

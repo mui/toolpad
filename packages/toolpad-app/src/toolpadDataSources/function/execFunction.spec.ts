@@ -2,9 +2,22 @@ import * as http from 'http';
 import getPort from 'get-port';
 import { Readable } from 'stream';
 import formidable from 'formidable';
-import { execa } from 'execa';
+import { execa, ExecaChildProcess } from 'execa';
 import path from 'path';
 import execFunction from './execFunction';
+
+function redirectOutput(cp: ExecaChildProcess): ExecaChildProcess {
+  if (cp.stdin) {
+    process.stdin.pipe(cp.stdin);
+  }
+  if (cp.stdout) {
+    cp.stdout.pipe(process.stdout);
+  }
+  if (cp.stderr) {
+    cp.stderr.pipe(process.stderr);
+  }
+  return cp;
+}
 
 function streamToString(stream: Readable) {
   const chunks: Buffer[] = [];
@@ -45,17 +58,12 @@ async function startServer(handler?: http.RequestListener) {
 }
 
 async function buildRuntime() {
-  const proc = execa('yarn', ['run', 'build:function-runtime'], {
-    cwd: path.resolve(__dirname, '../../..'),
-    stdio: 'pipe',
-  });
-  const chunks: Buffer[] = [];
-  proc.stdout?.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
-  proc.stderr?.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
-
-  await proc;
-
-  console.log(Buffer.concat(chunks).toString('utf-8'));
+  await redirectOutput(
+    execa('yarn', ['run', 'build:function-runtime'], {
+      cwd: path.resolve(__dirname, '../../..'),
+      stdio: 'pipe',
+    }),
+  );
 }
 
 describe('execFunction', () => {

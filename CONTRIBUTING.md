@@ -96,7 +96,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
    ```sh
    # add --prerelease if necessary
-   yarn release:docker --commit <commit of merged PR> --releaseTag <version number>
+   yarn release:docker
    ```
 
 1. Create a new github release, use `<version number>` as the tag and `<commit of merged PR>` as the target. Use the cleaned changelog as the body and the `<version number>` as the title. Mark as prerelease if necessary.

@@ -144,7 +144,6 @@ module.exports = withTM({
     return map;
   },
   reactStrictMode,
-  distDir: 'dist',
   async rewrites() {
     return [
       { source: `/:lang(${LANGUAGES.join('|')})?/:rest*`, destination: '/:rest*' },

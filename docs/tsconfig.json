@@ -13,5 +13,5 @@
     "jsx": "preserve"
   },
   "include": ["src/pages/**/*", "data/**/*"],
-  "exclude": ["docs/dist", "docs/export"]
+  "exclude": ["docs/.next", "docs/export"]
 }

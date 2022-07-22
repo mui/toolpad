@@ -117,7 +117,9 @@ jobs:
       - run:
           name: Lint JSON
           command: yarn jsonlint
-
+      - run:
+          name: Lint Markdown
+          command: yarn markdownlint
   test_static:
     <<: *defaults
     steps:

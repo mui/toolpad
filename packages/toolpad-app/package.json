@@ -40,6 +40,7 @@
     "@mui/system": "^5.8.6",
     "@mui/toolpad-components": "^0.0.9",
     "@mui/toolpad-core": "^0.0.9",
+    "@mui/utils": "^5.8.6",
     "@mui/x-data-grid-pro": "^5.12.3",
     "@prisma/client": "^4.0.0",
     "@swc/wasm": "^1.2.208",

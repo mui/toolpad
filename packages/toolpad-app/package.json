@@ -111,7 +111,6 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "glob": "^8.0.3",
-    "monaco-editor": "^0.34.0-dev.20220722",
     "webpack": "^5.73.0"
   },
   "typings": "./index.d.ts",

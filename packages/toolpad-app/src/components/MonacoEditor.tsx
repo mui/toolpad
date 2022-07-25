@@ -10,6 +10,7 @@ import clsx from 'clsx';
 import cuid from 'cuid';
 import invariant from 'invariant';
 import monacoEditorTheme from '../monacoEditorTheme';
+import muiTheme from '../theme';
 
 function getExtension(language: string): string {
   switch (language) {
@@ -107,6 +108,19 @@ const EditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
+let overflowWidgetsDomNode: HTMLDivElement | null = null;
+function getOverflowWidgetsDomNode(): HTMLDivElement {
+  if (!overflowWidgetsDomNode) {
+    overflowWidgetsDomNode = document.createElement('div');
+    // See https://github.com/microsoft/monaco-editor/issues/2233#issuecomment-913170212
+    overflowWidgetsDomNode.classList.add('monaco-editor');
+    overflowWidgetsDomNode.style.zIndex = String(muiTheme.zIndex.tooltip + 1);
+    document.body.append(overflowWidgetsDomNode);
+  }
+
+  return overflowWidgetsDomNode;
+}
+
 export interface MonacoEditorHandle {
   editor: monaco.editor.IStandaloneCodeEditor;
   monaco: typeof monaco;
@@ -190,6 +204,9 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         tabSize: 2,
         automaticLayout: true,
         theme: monacoEditorTheme,
+        fixedOverflowWidgets: true,
+        // See https://github.com/microsoft/monaco-editor/issues/181
+        overflowWidgetsDomNode: getOverflowWidgetsDomNode(),
         ...extraOptions,
       });
 

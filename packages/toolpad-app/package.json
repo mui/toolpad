@@ -66,6 +66,7 @@
     "json-to-ts": "^1.7.0",
     "json5": "^2.2.1",
     "lodash-es": "^4.17.21",
+    "monaco-editor": "0.34.0-dev.20220725",
     "next": "12.2.0",
     "node-fetch": "^3.2.6",
     "node-fetch-har": "^1.0.1",
@@ -110,7 +111,6 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "glob": "^8.0.3",
-    "monaco-editor": "^0.34.0-dev.20220722",
     "webpack": "^5.73.0"
   },
   "typings": "./index.d.ts",

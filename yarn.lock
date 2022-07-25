@@ -8942,10 +8942,10 @@ modify-values@^1.0.0:
   resolved "https://registry.yarnpkg.com/modify-values/-/modify-values-1.0.1.tgz#b3939fa605546474e3e3e3c63d64bd43b4ee6022"
   integrity sha512-xV2bxeN6F7oYjZWTe/YPAy6MN2M+sL4u/Rlm2AHCIVGfo2p1yGmBHQ6vHehl4bRTZBdHu3TSkWdYgkwpYzAGSw==
 
-monaco-editor@^0.33.0:
-  version "0.33.0"
-  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.33.0.tgz#842e244f3750a2482f8a29c676b5684e75ff34af"
-  integrity sha512-VcRWPSLIUEgQJQIE0pVT8FcGBIgFoxz7jtqctE+IiCxWugD0DwgyQBcZBhdSrdMC84eumoqMZsGl2GTreOzwqw==
+monaco-editor@0.34.0-dev.20220725:
+  version "0.34.0-dev.20220725"
+  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.34.0-dev.20220725.tgz#79e6bdef9dd3e1e5a66ebbbef549604064695b22"
+  integrity sha512-MiuJINwVQyqEEieWQ2NEcapjmi2MiAibthhpK2Tj2pd5tMHtZMO2PpoAKQla1cwxfhTlkb7e+cv0a+CN7Cl67A==
 
 mrmime@^1.0.0:
   version "1.0.1"

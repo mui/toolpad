@@ -9,7 +9,7 @@ services:
     buildCommand: yarn --frozen-lockfile --prod=false && yarn release:build
     startCommand: yarn start
     healthCheckPath: /health-check
-    plan: starter plus
+    plan: standard
     pullRequestPreviewsEnabled: true
     envVars:
       - key: TOOLPAD_DATABASE_URL

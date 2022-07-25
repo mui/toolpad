@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.0.10
+
+<!-- generated comparing v0.0.9..master -->
+
+_Jul 22, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Getting a first version of the docs app working. Fixes to the UI on the application overview, thanks to our new team member @bytasv!
+
+- &#8203;<!-- 5 -->Fix app name overflow (#672) @bytasv
+- &#8203;<!-- 4 -->Add fetch polyfills to jest (#669) @Janpot
+- &#8203;<!-- 3 -->[docs] Fix Next.js hosting on mui.com (#661) @bharatkashyap
+- &#8203;<!-- 2 -->[docs] Lint markdown (#675) @oliviertassinari
+- &#8203;<!-- 1 -->[docs] Bootstrap docs/landing page site (#542) @bharatkashyap
+
+All contributors of this release in alphabetical order: @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## v0.0.9
 
 <!-- generated comparing v0.0.8..master -->

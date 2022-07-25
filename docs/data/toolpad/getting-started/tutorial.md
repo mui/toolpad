@@ -1,4 +1,4 @@
-# Getting started
+# Tutorial
 
 <p class="description">Get started building a Toolpad app!</p>
 
@@ -58,7 +58,7 @@ A Toolpad aaplication wouldn't be useful if you couldn't import your data into i
 
    ![Create Connection](/static/toolpad/create-connection.png)
 
-1. Now that we can connect to our datasource, we can make an API endpoint for it on the Toolpad application. Click the plus button next to "Apis" in the left menu and select the "ourData" connection that we will make an API for. In the editor that opens, give it a name "ourDataApi" and in the url fill in "https://gist.githubusercontent.com/Janpot/c9d1f00be8472f2a510680b7e716a43b/raw/f001e0c3c501f5a0da35474ba4854cfc69acfd78/sample-data.json". This contains a sample dataset for us to use. If everything went well, you will see a preview in the bottom half of the page. CLick "update" to accept the parameters for this API.
+1. Now that we can connect to our datasource, we can make an API endpoint for it on the Toolpad application. Click the plus button next to "Apis" in the left menu and select the "ourData" connection that we will make an API for. In the editor that opens, give it a name "ourDataApi" and in the url fill in `https://gist.githubusercontent.com/Janpot/c9d1f00be8472f2a510680b7e716a43b/raw/f001e0c3c501f5a0da35474ba4854cfc69acfd78/sample-data.json`. This contains a sample dataset for us to use. If everything went well, you will see a preview in the bottom half of the page. CLick "update" to accept the parameters for this API.
 
    ![Create Api](/static/toolpad/create-api.png)
 

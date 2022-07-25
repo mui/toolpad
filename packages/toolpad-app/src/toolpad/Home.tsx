@@ -284,7 +284,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
             errorText={`An app named "${appTitle}" already exists`}
             loading={Boolean(!app)}
             defaultValue={appTitle}
-            variant={'h5'}
+            variant="subtitle1"
             ref={appTitleInput}
           />
         </CardContent>

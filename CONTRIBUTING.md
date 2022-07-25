@@ -4,14 +4,14 @@
 
 If you would like to hack on MUI Toolpad or want to run the latest version, you can follow these steps:
 
-### Prerequisites:
+### Prerequisites
 
 - git
 - node.js
 - Docker
 - docker-compose
 
-### Steps:
+### Steps
 
 1. Start a local database:
 
@@ -48,7 +48,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
 1. Open [`http://localhost:3000/`](http://localhost:3000/) in your browser.
 
-### Notes for contributors:
+### Notes for contributors
 
 - Changes that you make to the prisma model will be automatically compiled, but you'll have to push them to the db manually, either by restarting the `yarn dev` command, or by running
 
@@ -96,7 +96,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
    ```sh
    # add --prerelease if necessary
-   yarn release:docker --commit <commit of merged PR> --releaseTag <version number>
+   yarn release:docker
    ```
 
 1. Create a new github release, use `<version number>` as the tag and `<commit of merged PR>` as the target. Use the cleaned changelog as the body and the `<version number>` as the title. Mark as prerelease if necessary.

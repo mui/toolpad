@@ -41,5 +41,3 @@ From the App page;
 5. Choose the sheet, cell range → Click on "Update" to save the API
 
 You should now be able to use this API in any App page.
-
-Refer to the [Getting started](https://github.com/mui/mui-toolpad/blob/docs/sheets/docs/getting-started.md) section to learn more about building an application on Toolpad.

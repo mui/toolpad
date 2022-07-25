@@ -7,6 +7,7 @@ import {
   BindableAttrValues,
   SecretAttrValue,
 } from '@mui/toolpad-core';
+import invariant from 'invariant';
 import { ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
@@ -187,9 +188,7 @@ function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node i
 }
 
 function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): asserts node is T {
-  if (!isType(node, type)) {
-    throw new Error(`Invariant: expected node type "${type}" but got "${node.type}"`);
-  }
+  invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {
@@ -341,11 +340,10 @@ export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): Nod
 
     for (const childArray of Object.values(result)) {
       childArray?.sort((node1: AppDomNode, node2: AppDomNode) => {
-        if (!node1.parentIndex || !node2.parentIndex) {
-          throw new Error(
-            `Invariant: nodes inside the dom should have a parentIndex if they have a parent`,
-          );
-        }
+        invariant(
+          node1.parentIndex && node2.parentIndex,
+          `Nodes inside the dom should have a parentIndex if they have a parent`,
+        );
         return compareFractionalIndex(node1.parentIndex, node2.parentIndex);
       });
     }
@@ -654,9 +652,7 @@ export function removeNode(dom: AppDom, nodeId: NodeId) {
   const node = getNode(dom, nodeId);
   const parent = getParent(dom, node);
 
-  if (!parent) {
-    throw new Error(`Invariant: Node: "${node.id}" can't be removed`);
-  }
+  invariant(parent, `Node: "${node.id}" can't be removed`);
 
   const descendantIds = getDescendants(dom, node).map(({ id }) => id);
 
@@ -714,9 +710,7 @@ export function getSiblingBeforeNode(
 ) {
   const parent = getParent(dom, node);
 
-  if (!parent) {
-    throw new Error(`Invariant: Node: "${node.id}" has no parent`);
-  }
+  invariant(parent, `Node: "${node.id}" has no parent`);
 
   const parentChildren =
     ((isPage(parent) || isElement(parent)) &&
@@ -732,9 +726,7 @@ export function getSiblingBeforeNode(
 export function getSiblingAfterNode(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {
   const parent = getParent(dom, node);
 
-  if (!parent) {
-    throw new Error(`Invariant: Node: "${node.id}" has no parent`);
-  }
+  invariant(parent, `Node: "${node.id}" has no parent`);
 
   const parentChildren =
     ((isPage(parent) || isElement(parent)) &&

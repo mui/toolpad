@@ -1,5 +1,5 @@
 import * as React from 'react';
-
+import * as builtins from '@mui/toolpad-components';
 import {
   ToolpadComponent,
   ToolpadComponents,
@@ -7,7 +7,6 @@ import {
   createComponent,
 } from '@mui/toolpad-core';
 import * as ReactIs from 'react-is';
-import * as builtins from '../../../toolpad-components/dist/index';
 import * as appDom from '../appDom';
 import { getToolpadComponents } from '../toolpadComponents';
 import { ensureToolpadComponent } from './loadCodeComponent';

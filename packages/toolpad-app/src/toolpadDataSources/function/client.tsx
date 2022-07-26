@@ -123,7 +123,7 @@ function QueryEditor({
     liveParams[key],
   ]);
 
-  const { appId, connectionId } = useConnectionContext();
+  const { appId, dataSourceId, connectionId } = useConnectionContext();
   const [preview, setPreview] = React.useState<FunctionResult | null>(null);
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
 
@@ -141,7 +141,7 @@ function QueryEditor({
     );
 
     client.query
-      .dataSourceFetchPrivate(appId, connectionId, {
+      .dataSourceFetchPrivate(appId, dataSourceId, connectionId, {
         kind: 'debugExec',
         query: value.query,
         params: currentParams,
@@ -155,7 +155,7 @@ function QueryEditor({
       .finally(() => {
         cancelRunPreview.current = null;
       });
-  }, [appId, connectionId, paramsEditorLiveValue, value.query]);
+  }, [appId, dataSourceId, connectionId, paramsEditorLiveValue, value.query]);
 
   const { data: secretsKeys = [] } = usePrivateQuery<FunctionPrivateQuery, string[]>({
     kind: 'secretsKeys',
@@ -260,6 +260,7 @@ const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {
   isConnectionValid: () => true,
   QueryEditor,
   getInitialQueryValue,
+  hasDefault: true,
 };
 
 export default dataSource;

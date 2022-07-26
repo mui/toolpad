@@ -43,7 +43,12 @@ import { mapValues } from '../../../utils/collections';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
 
-export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
+export type ConnectionOption = {
+  connectionId: NodeId | null;
+  dataSourceId: string;
+};
+
+export interface ConnectionSelectProps extends WithControlledProp<ConnectionOption | null> {
   dataSource?: string;
   sx?: SxProps;
 }
@@ -54,33 +59,80 @@ export function ConnectionSelect({ sx, dataSource, value, onChange }: Connection
   const app = appDom.getApp(dom);
   const { connections = [] } = appDom.getChildNodes(dom, app);
 
-  const filtered = React.useMemo(() => {
-    return dataSource
-      ? connections.filter((connection) => connection.attributes.dataSource.value === dataSource)
-      : connections;
+  const options: ConnectionOption[] = React.useMemo(() => {
+    const result: ConnectionOption[] = [];
+
+    for (const [dataSourceId, config] of Object.entries(dataSources)) {
+      if (config?.hasDefault) {
+        if (!dataSource || dataSource === dataSourceId) {
+          result.push({
+            dataSourceId,
+            connectionId: null,
+          });
+        }
+      }
+    }
+
+    for (const connection of connections) {
+      const connectionDataSourceId = connection.attributes.dataSource.value;
+      if (!dataSource || dataSource === connectionDataSourceId) {
+        const connectionDataSource = dataSources[connectionDataSourceId];
+        if (connectionDataSource) {
+          result.push({
+            connectionId: connection.id,
+            dataSourceId: connectionDataSourceId,
+          });
+        }
+      }
+    }
+
+    return result;
   }, [connections, dataSource]);
 
   const handleSelectionChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange((event.target.value as NodeId) || null);
+      const index = Number(event.target.value);
+      onChange(options[index] || null);
     },
-    [onChange],
+    [onChange, options],
   );
+
+  const selection = React.useMemo(() => {
+    if (!value) {
+      return '';
+    }
+    return String(
+      options.findIndex(
+        (option) =>
+          option.connectionId === value.connectionId && option.dataSourceId === value.dataSourceId,
+      ),
+    );
+  }, [options, value]);
 
   return (
     <TextField
       sx={sx}
       select
       fullWidth
-      value={value || ''}
+      value={selection}
       label="Connection"
       onChange={handleSelectionChange}
     >
-      {filtered.map((connection) => (
-        <MenuItem key={connection.id} value={connection.id}>
-          {connection.name} | {connection.attributes.dataSource.value}
-        </MenuItem>
-      ))}
+      {options.map((option, index) => {
+        const config = dataSources[option.dataSourceId];
+        const dataSourceLabel = config
+          ? config.displayName
+          : `<unknown datasource "${option.dataSourceId}">`;
+
+        const connectionLabel = option.connectionId
+          ? appDom.getMaybeNode(dom, option.connectionId)?.name
+          : '<default>';
+        return (
+          <MenuItem key={index} value={index}>
+            {dataSourceLabel} | {connectionLabel}
+          </MenuItem>
+        );
+      })}
     </TextField>
   );
 }
@@ -102,15 +154,18 @@ interface DataSourceSelectorProps<Q> {
 function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSelectorProps<Q>) {
   const dom = useDom();
 
-  const [input, setInput] = React.useState<NodeId | null>(null);
+  const [input, setInput] = React.useState<ConnectionOption | null>(null);
 
-  const handleClick = React.useCallback(() => {
-    const connectionId = input;
-    const connection = connectionId && appDom.getMaybeNode(dom, connectionId, 'connection');
+  const handleCreateClick = React.useCallback(() => {
+    invariant(input, `Create button should be disabled when there's no input`);
 
-    invariant(connection, `Selected non-existing connection "${connectionId}"`);
+    const { connectionId = null, dataSourceId } = input;
 
-    const dataSourceId = connection.attributes.dataSource.value;
+    if (connectionId) {
+      const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
+      invariant(connection, `Selected non-existing connection "${connectionId}"`);
+    }
+
     const dataSource = dataSources[dataSourceId];
     invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
 
@@ -126,7 +181,7 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
   }, [dom, input, onCreated]);
 
   return (
-    <Dialog open={open} onClose={onClose} scroll="body">
+    <Dialog fullWidth open={open} onClose={onClose} scroll="body">
       <DialogTitle>Create Query</DialogTitle>
       <DialogContent>
         <ConnectionSelect sx={{ my: 1 }} value={input} onChange={setInput} />
@@ -135,7 +190,7 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
         <Button color="inherit" variant="text" onClick={onClose}>
           Cancel
         </Button>
-        <Button disabled={!input} onClick={handleClick}>
+        <Button disabled={!input} onClick={handleCreateClick}>
           Create query
         </Button>
       </DialogActions>
@@ -159,6 +214,7 @@ function ConnectionWrapper({ children, dataSourceId }: ConnectionWrapperProps) {
     </SplitPane>
   );
 }
+
 interface QueryNodeEditorProps<Q, P> {
   open: boolean;
   onClose: () => void;
@@ -185,19 +241,34 @@ function QueryNodeEditorDialog<Q, P>({
   }, [open, node]);
 
   const connectionId = input.attributes.connectionId.value;
-  const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
+  const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const handleConnectionChange = React.useCallback((newConnectionId: NodeId | null) => {
-    setInput((existing) =>
-      update(existing, {
-        attributes: update(existing.attributes, {
-          connectionId: newConnectionId ? appDom.createConst(newConnectionId) : undefined,
-        }),
-      }),
-    );
-  }, []);
+  const handleConnectionChange = React.useCallback(
+    (newConnectionOption: ConnectionOption | null) => {
+      if (newConnectionOption) {
+        setInput((existing) =>
+          update(existing, {
+            attributes: update(existing.attributes, {
+              connectionId: appDom.createConst(newConnectionOption.connectionId),
+              dataSource: appDom.createConst(newConnectionOption.dataSourceId),
+            }),
+          }),
+        );
+      } else {
+        setInput((existing) =>
+          update(existing, {
+            attributes: update(existing.attributes, {
+              connectionId: undefined,
+              dataSource: undefined,
+            }),
+          }),
+        );
+      }
+    },
+    [],
+  );
 
   const handleQueryChange = React.useCallback((model: QueryEditorModel<Q>) => {
     setInput((existing) =>
@@ -328,7 +399,10 @@ function QueryNodeEditorDialog<Q, P>({
     }
   }, [onClose, isInputSaved]);
 
-  const queryEditorContext = React.useMemo(() => ({ appId, connectionId }), [appId, connectionId]);
+  const queryEditorContext = React.useMemo(
+    () => (dataSourceId ? { appId, dataSourceId, connectionId } : null),
+    [appId, dataSourceId, connectionId],
+  );
 
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
@@ -337,14 +411,21 @@ function QueryNodeEditorDialog<Q, P>({
           <NodeNameEditor node={node} />
           <ConnectionSelect
             dataSource={dataSourceId}
-            value={input.attributes.connectionId.value || null}
+            value={
+              input.attributes.dataSource
+                ? {
+                    connectionId: input.attributes.connectionId.value || null,
+                    dataSourceId: input.attributes.dataSource.value,
+                  }
+                : null
+            }
             onChange={handleConnectionChange}
           />
         </Stack>
       </DialogTitle>
       <Divider />
 
-      {dataSourceId && dataSource ? (
+      {dataSourceId && dataSource && queryEditorContext ? (
         <DialogContent
           sx={{
             overflow: 'hidden',

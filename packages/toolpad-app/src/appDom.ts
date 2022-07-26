@@ -103,7 +103,7 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
   readonly params?: BindableAttrValues<P>;
   readonly attributes: {
     readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeId>;
+    readonly connectionId: ConstantAttrValue<NodeId | null>;
     readonly query: ConstantAttrValue<Q>;
     readonly transform?: ConstantAttrValue<string>;
     readonly transformEnabled?: ConstantAttrValue<boolean>;

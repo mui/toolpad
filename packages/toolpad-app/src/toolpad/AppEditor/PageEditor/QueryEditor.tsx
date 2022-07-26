@@ -43,6 +43,13 @@ import { mapValues } from '../../../utils/collections';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
 
+const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
+  'rest',
+  'googleSheets',
+  'postgres',
+  'movies',
+]);
+
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
   sx?: SxProps;
@@ -149,17 +156,15 @@ interface ConnectionWrapperProps {
 }
 
 function ConnectionWrapper({ children, dataSourceId }: ConnectionWrapperProps) {
-  if (dataSourceId === 'function') {
-    return <Box flex={1}>{children}</Box>;
-  }
-
-  return (
-    <div style={{ flexGrow: 1, width: '100%' }}>
+  if (LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT.has(dataSourceId)) {
+    return (
       <SplitPane split="vertical" allowResize size="50%">
         {children}
       </SplitPane>
-    </div>
-  );
+    );
+  }
+
+  return <React.Fragment>{children}</React.Fragment>;
 }
 interface QueryNodeEditorProps<Q, P> {
   open: boolean;
@@ -363,90 +368,93 @@ function QueryNodeEditorDialog<Q, P>({
               display: 'flex',
             }}
           >
-            <ConnectionWrapper dataSourceId={dataSourceId}>
-              <Stack
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                  overflow: 'auto',
-                }}
-              >
-                <ConnectionContextProvider value={queryEditorContext}>
-                  <dataSource.QueryEditor
-                    connectionParams={connection?.attributes.params.value}
-                    value={{
-                      query: input.attributes.query.value,
-                      params: input.params,
-                    }}
-                    liveParams={liveParams}
-                    onChange={handleQueryChange}
-                    globalScope={pageState}
-                  />
-                </ConnectionContextProvider>
-
-                {/* TODO: move transform inside of the dataSource.QueryEditor and remove the conditional */}
-                {dataSourceId === 'function' ? null : (
-                  <Grid container direction="row" spacing={1} sx={{ px: 3, pb: 1, mt: 2 }}>
-                    <React.Fragment>
-                      <Divider />
-                      <Grid item xs={6}>
-                        <Stack>
-                          <FormControlLabel
-                            label="Transform response"
-                            control={
-                              <Checkbox
-                                checked={input.attributes.transformEnabled?.value ?? false}
-                                onChange={handleTransformEnabledChange}
-                                inputProps={{ 'aria-label': 'controlled' }}
-                              />
-                            }
-                          />
-
-                          <JsExpressionEditor
-                            globalScope={{}}
-                            value={
-                              input.attributes.transform?.value ?? '(data) => {\n  return data;\n}'
-                            }
-                            onChange={handleTransformFnChange}
-                            disabled={!input.attributes.transformEnabled?.value}
-                          />
-                        </Stack>
-                      </Grid>
-                    </React.Fragment>
-                  </Grid>
-                )}
-              </Stack>
-
-              {/* TODO: move preview inside of the dataSource.QueryEditor and remove the conditional */}
-              {dataSourceId === 'function' ? null : (
-                <Box
+            <div style={{ flexGrow: 1, width: '100%' }}>
+              <ConnectionWrapper dataSourceId={dataSourceId}>
+                <Stack
                   sx={{
                     width: '100%',
                     height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
+                    overflow: 'auto',
                   }}
                 >
-                  <Toolbar>
-                    <LoadingButton
-                      size="medium"
-                      disabled={previewParams === paramsObject && previewQuery === input}
-                      loading={isPreviewLoading}
-                      loadingPosition="start"
-                      variant="contained"
-                      onClick={handleUpdatePreview}
-                      startIcon={<PlayArrowIcon />}
-                    >
-                      Preview
-                    </LoadingButton>
-                  </Toolbar>
-                  <Box sx={{ flex: 1, minHeight: 0, px: 3, py: 1, overflow: 'auto' }}>
-                    {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
-                    {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
+                  <ConnectionContextProvider value={queryEditorContext}>
+                    <dataSource.QueryEditor
+                      connectionParams={connection?.attributes.params.value}
+                      value={{
+                        query: input.attributes.query.value,
+                        params: input.params,
+                      }}
+                      liveParams={liveParams}
+                      onChange={handleQueryChange}
+                      globalScope={pageState}
+                    />
+                  </ConnectionContextProvider>
+
+                  {/* TODO: move transform inside of the dataSource.QueryEditor and remove the conditional */}
+                  {LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT.has(dataSourceId) ? (
+                    <Grid container direction="row" spacing={1} sx={{ px: 3, pb: 1, mt: 2 }}>
+                      <React.Fragment>
+                        <Divider />
+                        <Grid item xs={6}>
+                          <Stack>
+                            <FormControlLabel
+                              label="Transform response"
+                              control={
+                                <Checkbox
+                                  checked={input.attributes.transformEnabled?.value ?? false}
+                                  onChange={handleTransformEnabledChange}
+                                  inputProps={{ 'aria-label': 'controlled' }}
+                                />
+                              }
+                            />
+
+                            <JsExpressionEditor
+                              globalScope={{}}
+                              value={
+                                input.attributes.transform?.value ??
+                                '(data) => {\n  return data;\n}'
+                              }
+                              onChange={handleTransformFnChange}
+                              disabled={!input.attributes.transformEnabled?.value}
+                            />
+                          </Stack>
+                        </Grid>
+                      </React.Fragment>
+                    </Grid>
+                  ) : null}
+                </Stack>
+
+                {/* TODO: move preview inside of the dataSource.QueryEditor and remove the conditional */}
+                {LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT.has(dataSourceId) ? (
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <Toolbar>
+                      <LoadingButton
+                        size="medium"
+                        disabled={previewParams === paramsObject && previewQuery === input}
+                        loading={isPreviewLoading}
+                        loadingPosition="start"
+                        variant="contained"
+                        onClick={handleUpdatePreview}
+                        startIcon={<PlayArrowIcon />}
+                      >
+                        Preview
+                      </LoadingButton>
+                    </Toolbar>
+                    <Box sx={{ flex: 1, minHeight: 0, px: 3, py: 1, overflow: 'auto' }}>
+                      {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
+                      {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
+                    </Box>
                   </Box>
-                </Box>
-              )}
-            </ConnectionWrapper>
+                ) : null}
+              </ConnectionWrapper>
+            </div>
           </Box>
 
           <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>

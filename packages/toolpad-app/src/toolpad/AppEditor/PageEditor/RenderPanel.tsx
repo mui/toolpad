@@ -214,26 +214,25 @@ const EmptySlot = styled('div')({
 });
 
 const DraggableEdge = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'edge' && prop !== 'isResizing',
+  shouldForwardProp: (prop) => prop !== 'edge',
 })<{
   edge: RectangleEdge;
-  isResizing: boolean;
-}>(({ edge, isResizing }) => {
+}>(({ edge }) => {
   let dynamicStyles = {};
   if (edge === RECTANGLE_EDGE_RIGHT) {
     dynamicStyles = {
       top: 0,
-      right: 0,
+      right: -2,
       height: '100%',
-      width: 10,
+      width: 12,
     };
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
       top: 0,
-      left: 0,
+      left: -2,
       height: '100%',
-      width: 10,
+      width: 12,
     };
   }
 
@@ -243,11 +242,6 @@ const DraggableEdge = styled('div', {
     position: 'absolute',
     pointerEvents: 'initial',
     zIndex: 1,
-
-    '&:hover': {
-      backgroundColor: '#44EB2D',
-      opacity: `${isResizing ? 0 : 0.5}`,
-    },
   };
 });
 
@@ -420,7 +414,6 @@ function NodeHud({
               key={`${node.id}-edge-${edge}`}
               edge={edge}
               onMouseDown={onEdgeDragStart(node as appDom.ElementNode, edge)}
-              isResizing={isResizing}
             />
           ))
         : null}

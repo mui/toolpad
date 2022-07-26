@@ -1,15 +1,12 @@
 import * as React from 'react';
 import clsx from 'clsx';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { IconButton, styled } from '@mui/material';
+import { styled } from '@mui/material';
 import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
 import { useNavigate } from 'react-router-dom';
-import { FlowDirection, NodeInfo, SlotsState, SlotState } from '../../../types';
+import { FlowDirection, NodeInfo, SlotsState } from '../../../types';
 import * as appDom from '../../../appDom';
 import EditorCanvasHost, { EditorCanvasHostHandle } from './EditorCanvasHost';
 import {
-  absolutePositionCss,
   getRectanglePointEdge,
   Rectangle,
   RectangleEdge,
@@ -32,9 +29,7 @@ import {
   usePageEditorApi,
   usePageEditorState,
 } from './PageEditorProvider';
-import { useToolpadComponent } from '../toolpadComponents';
 import {
-  getElementNodeComponentId,
   PAGE_COLUMN_COMPONENT_ID,
   PAGE_ROW_COMPONENT_ID,
   isPageLayoutComponent,
@@ -43,6 +38,9 @@ import {
 } from '../../../toolpadComponents';
 import { ExactEntriesOf } from '../../../utils/types';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
+import NodeHud from './NodeHud';
+import NodeDropArea from './NodeDropArea';
+import { isHorizontalSlot, isReverseSlot, isVerticalSlot } from '../../../utils/pageView';
 
 const RESIZE_SNAP_UNITS = 4; // px
 const SNAP_TO_GRID_COLUMN_MARGIN = 10; // px
@@ -63,17 +61,9 @@ const RenderPanelRoot = styled('div')({
 const overlayClasses = {
   hud: 'Toolpad_Hud',
   nodeHud: 'Toolpad_NodeHud',
-  highlightedTop: 'Toolpad_HighlightedTop',
-  highlightedRight: 'Toolpad_HighlightedRight',
-  highlightedBottom: 'Toolpad_HighlightedBottom',
-  highlightedLeft: 'Toolpad_HighlightedLeft',
-  highlightedCenter: 'Toolpad_HighlightedCenter',
-  selected: 'Toolpad_Selected',
-  allowNodeInteraction: 'Toolpad_AllowNodeInteraction',
   container: 'Toolpad_Container',
   componentDragging: 'Toolpad_ComponentDragging',
   resize: 'Toolpad_Resize',
-  selectionHint: 'Toolpad_SelectionHint',
   hudOverlay: 'Toolpad_HudOverlay',
 };
 
@@ -90,164 +80,10 @@ const OverlayRoot = styled('div')({
   [`&.${overlayClasses.resize}`]: {
     cursor: 'ew-resize',
   },
-  [`.${overlayClasses.selectionHint}`]: {
-    // capture mouse events
-    pointerEvents: 'initial',
-    cursor: 'grab',
-    display: 'none',
-    position: 'absolute',
-    alignItems: 'center',
-    right: -1,
-    background: 'red',
-    color: 'white',
-    fontSize: 11,
-    padding: `0 0 0 8px`,
-    // TODO: figure out positioning of this selectionhint, perhaps it should
-    //   - prefer top right, above the component
-    //   - if that appears out of bound of the editor, show it bottom or left
-    zIndex: 1,
-    transform: `translate(0, -100%)`,
-  },
   [`.${overlayClasses.hudOverlay}`]: {
     position: 'absolute',
     inset: '0 0 0 0',
   },
-});
-
-const NodeHudWrapper = styled('div')({
-  // capture mouse events
-  pointerEvents: 'initial',
-  position: 'absolute',
-  outline: '1px dotted rgba(255,0,0,.2)',
-  userSelect: 'none',
-  [`.${overlayClasses.selected}`]: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    height: '100%',
-    width: '100%',
-    outline: '1px solid red',
-  },
-  [`.${overlayClasses.selectionHint}`]: {
-    display: 'flex',
-  },
-  [`&.${overlayClasses.allowNodeInteraction}`]: {
-    // block pointer-events so we can interact with the selection
-    pointerEvents: 'none',
-  },
-});
-
-const StyledNodeDropArea = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'highlightRelativeRect',
-})<{
-  highlightRelativeRect?: Partial<Rectangle>;
-}>(({ highlightRelativeRect = {} }) => {
-  const {
-    x: highlightRelativeX = 0,
-    y: highlightRelativeY = 0,
-    width: highlightWidth = '100%',
-    height: highlightHeight = '100%',
-  } = highlightRelativeRect;
-
-  return {
-    pointerEvents: 'none',
-    position: 'absolute',
-    [`&.${overlayClasses.highlightedTop}`]: {
-      '&:after': {
-        backgroundColor: '#44EB2D',
-        content: "''",
-        position: 'absolute',
-        height: 4,
-        width: highlightWidth,
-        top: -2,
-        left: highlightRelativeX,
-      },
-    },
-    [`&.${overlayClasses.highlightedRight}`]: {
-      '&:after': {
-        backgroundColor: '#44EB2D',
-        content: "''",
-        position: 'absolute',
-        height: highlightHeight,
-        width: 4,
-        top: highlightRelativeY,
-        right: -2,
-      },
-    },
-    [`&.${overlayClasses.highlightedBottom}`]: {
-      '&:after': {
-        backgroundColor: '#44EB2D',
-        content: "''",
-        position: 'absolute',
-        height: 4,
-        width: highlightWidth,
-        bottom: -2,
-        left: highlightRelativeX,
-      },
-    },
-    [`&.${overlayClasses.highlightedLeft}`]: {
-      '&:after': {
-        backgroundColor: '#44EB2D',
-        content: "''",
-        position: 'absolute',
-        height: highlightHeight,
-        width: 4,
-        left: -2,
-        top: highlightRelativeY,
-      },
-    },
-    [`&.${overlayClasses.highlightedCenter}`]: {
-      border: '4px solid #44EB2D',
-    },
-  };
-});
-
-const EmptySlot = styled('div')({
-  alignItems: 'center',
-  border: '1px dashed green',
-  color: 'green',
-  display: 'flex',
-  fontSize: 20,
-  justifyContent: 'center',
-  position: 'absolute',
-  opacity: 0.75,
-});
-
-const DraggableEdge = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'edge',
-})<{
-  edge: RectangleEdge;
-}>(({ edge }) => {
-  let dynamicStyles = {};
-  if (edge === RECTANGLE_EDGE_RIGHT) {
-    dynamicStyles = {
-      top: 0,
-      right: -2,
-      height: '100%',
-      width: 12,
-    };
-  }
-  if (edge === RECTANGLE_EDGE_LEFT) {
-    dynamicStyles = {
-      top: 0,
-      left: -2,
-      height: '100%',
-      width: 12,
-    };
-  }
-
-  return {
-    ...dynamicStyles,
-    cursor: 'ew-resize',
-    position: 'absolute',
-    pointerEvents: 'initial',
-    zIndex: 1,
-  };
-});
-
-const ResizePreview = styled('div')({
-  backgroundColor: '#44EB2D',
-  opacity: 0.5,
 });
 
 function hasFreeNodeSlots(nodeInfo: NodeInfo): boolean {
@@ -286,25 +122,6 @@ function getRectangleEdgeDropZone(edge: RectangleEdge | null): DropZone | null {
   }
 }
 
-function getHighlightedZoneOverlayClass(
-  highlightedZone: DropZone,
-): typeof overlayClasses[keyof typeof overlayClasses] | null {
-  switch (highlightedZone) {
-    case DROP_ZONE_TOP:
-      return overlayClasses.highlightedTop;
-    case DROP_ZONE_RIGHT:
-      return overlayClasses.highlightedRight;
-    case DROP_ZONE_BOTTOM:
-      return overlayClasses.highlightedBottom;
-    case DROP_ZONE_LEFT:
-      return overlayClasses.highlightedLeft;
-    case DROP_ZONE_CENTER:
-      return overlayClasses.highlightedCenter;
-    default:
-      return null;
-  }
-}
-
 function getChildNodeHighlightedZone(parentFlowDirection: FlowDirection): DropZone | null {
   switch (parentFlowDirection) {
     case 'row':
@@ -320,18 +137,6 @@ function getChildNodeHighlightedZone(parentFlowDirection: FlowDirection): DropZo
   }
 }
 
-function isHorizontalSlot(slot: SlotState): boolean {
-  return slot.flowDirection === 'row' || slot.flowDirection === 'row-reverse';
-}
-
-function isVerticalSlot(slot: SlotState): boolean {
-  return slot.flowDirection === 'column' || slot.flowDirection === 'column-reverse';
-}
-
-function isReverseSlot(slot: SlotState): boolean {
-  return slot.flowDirection === 'row-reverse' || slot.flowDirection === 'column-reverse';
-}
-
 function getDropAreaId(nodeId: string, parentProp: string): string {
   return `${nodeId}:${parentProp}`;
 }
@@ -342,160 +147,6 @@ function getDropAreaNodeId(dropAreaId: string): NodeId {
 
 function getDropAreaParentProp(dropAreaId: string): string | null {
   return dropAreaId.split(':')[1] || null;
-}
-
-interface NodeHudProps {
-  node: appDom.ElementNode | appDom.PageNode;
-  rect: Rectangle;
-  selected?: boolean;
-  allowInteraction?: boolean;
-  onNodeDragStart?: React.DragEventHandler<HTMLElement>;
-  draggableEdges?: RectangleEdge[];
-  onEdgeDragStart?: (
-    node: appDom.ElementNode,
-    edge: RectangleEdge,
-  ) => React.MouseEventHandler<HTMLElement>;
-  onDelete?: React.MouseEventHandler<HTMLElement>;
-  isResizing?: boolean;
-  resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
-}
-
-function NodeHud({
-  node,
-  selected,
-  allowInteraction,
-  rect,
-  onNodeDragStart,
-  draggableEdges = [],
-  onEdgeDragStart,
-  onDelete,
-  isResizing = false,
-  resizePreviewElementRef,
-}: NodeHudProps) {
-  const dom = useDom();
-
-  const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
-  const component = useToolpadComponent(dom, componentId);
-
-  const handleDelete = React.useCallback(
-    (event: React.MouseEvent<HTMLElement>) => {
-      event.stopPropagation();
-
-      if (onDelete) {
-        onDelete(event);
-      }
-    },
-    [onDelete],
-  );
-
-  return (
-    <NodeHudWrapper
-      data-node-id={node.id}
-      style={absolutePositionCss(rect)}
-      className={clsx({
-        [overlayClasses.allowNodeInteraction]: allowInteraction,
-      })}
-    >
-      {selected ? (
-        <React.Fragment>
-          <span className={overlayClasses.selected} />
-          <div draggable className={overlayClasses.selectionHint} onDragStart={onNodeDragStart}>
-            {component?.displayName || '<unknown>'}
-            <DragIndicatorIcon color="inherit" />
-            <IconButton aria-label="Remove element" color="inherit" onMouseUp={handleDelete}>
-              <DeleteIcon color="inherit" />
-            </IconButton>
-          </div>
-        </React.Fragment>
-      ) : null}
-      {onEdgeDragStart
-        ? draggableEdges.map((edge) => (
-            <DraggableEdge
-              key={`${node.id}-edge-${edge}`}
-              edge={edge}
-              onMouseDown={onEdgeDragStart(node as appDom.ElementNode, edge)}
-            />
-          ))
-        : null}
-      {isResizing ? (
-        <ResizePreview ref={resizePreviewElementRef} style={absolutePositionCss(rect)} />
-      ) : null}
-    </NodeHudWrapper>
-  );
-}
-
-interface NodeSlotProps {
-  node: appDom.ElementNode | appDom.PageNode;
-  parentInfo: NodeInfo | null;
-  layoutRect: Rectangle;
-  dropAreaRect: Rectangle;
-  slotRect?: Rectangle;
-  highlightedZone?: DropZone | null;
-  isEmptySlot: boolean;
-  isPageChild: boolean;
-}
-
-function NodeDropArea({
-  node,
-  highlightedZone,
-  parentInfo,
-  layoutRect,
-  slotRect,
-  dropAreaRect,
-  isEmptySlot,
-  isPageChild,
-}: NodeSlotProps) {
-  const highlightedZoneOverlayClass =
-    highlightedZone && getHighlightedZoneOverlayClass(highlightedZone);
-
-  const nodeParentProp = node.parentProp;
-
-  const parentSlots = parentInfo?.slots;
-  const parentSlot = parentSlots && nodeParentProp && parentSlots[nodeParentProp];
-
-  const parentRect = parentInfo?.rect;
-
-  const isHorizontalContainerChild = parentSlot ? isHorizontalSlot(parentSlot) : false;
-  const isVerticalContainerChild = parentSlot ? isVerticalSlot(parentSlot) : false;
-
-  const highlightHeight =
-    isHorizontalContainerChild && parentRect ? parentRect.height : layoutRect.height;
-  const highlightWidth =
-    !isPageChild && isVerticalContainerChild && parentRect ? parentRect.width : layoutRect.width;
-
-  const highlightRelativeX =
-    (!isPageChild && isVerticalContainerChild && parentRect ? parentRect.x : layoutRect.x) -
-    dropAreaRect.x;
-  const highlightRelativeY =
-    (isHorizontalContainerChild && parentRect ? parentRect.y : layoutRect.y) - dropAreaRect.y;
-
-  const isHighlightingCenter = highlightedZone === DROP_ZONE_CENTER;
-
-  const highlightRect = isHighlightingCenter && isEmptySlot && slotRect ? slotRect : dropAreaRect;
-
-  return (
-    <React.Fragment>
-      <StyledNodeDropArea
-        style={absolutePositionCss(highlightRect)}
-        className={clsx(
-          highlightedZoneOverlayClass
-            ? {
-                [highlightedZoneOverlayClass]: !isHighlightingCenter || isEmptySlot,
-              }
-            : {},
-        )}
-        highlightRelativeRect={{
-          x: highlightRelativeX,
-          y: highlightRelativeY,
-          width: highlightWidth,
-          height: highlightHeight,
-        }}
-      />
-      {isEmptySlot && slotRect ? (
-        <EmptySlot style={absolutePositionCss(slotRect)}>+</EmptySlot>
-      ) : null}
-    </React.Fragment>
-  );
 }
 
 export interface RenderPanelProps {

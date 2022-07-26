@@ -18,7 +18,7 @@ const MapComponent = ({ latitude, longitude, zoom, sx, style }: MapComponentProp
       initialViewState={{ latitude, longitude, zoom }}
       style={sx as React.CSSProperties}
       mapStyle={style}
-      mapboxAccessToken={process.env.MAPBOX_ACCESS_TOKEN}
+      mapboxAccessToken={process.env.TOOLPAD_MAPBOX_ACCESS_TOKEN}
     />
   );
 };

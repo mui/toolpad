@@ -154,9 +154,11 @@ function ConnectionWrapper({ children, dataSourceId }: ConnectionWrapperProps) {
   }
 
   return (
-    <SplitPane split="vertical" allowResize size="50%">
-      {children}
-    </SplitPane>
+    <div style={{ flexGrow: 1, width: '100%' }}>
+      <SplitPane split="vertical" allowResize size="50%">
+        {children}
+      </SplitPane>
+    </div>
   );
 }
 interface QueryNodeEditorProps<Q, P> {
@@ -354,13 +356,18 @@ function QueryNodeEditorDialog<Q, P>({
           }}
         >
           <Box
-            sx={{ display: 'flex', flexDirection: 'row', minHeight: '500px', position: 'relative' }}
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              position: 'relative',
+              display: 'flex',
+            }}
           >
             <ConnectionWrapper dataSourceId={dataSourceId}>
               <Stack
                 sx={{
-                  flex: 1,
-                  minWidth: 0,
+                  width: '100%',
+                  height: '100%',
                   overflow: 'auto',
                 }}
               >
@@ -414,10 +421,8 @@ function QueryNodeEditorDialog<Q, P>({
               {dataSourceId === 'function' ? null : (
                 <Box
                   sx={{
-                    flex: 1,
-                    minWidth: 0,
-                    borderLeft: 1,
-                    borderColor: 'divider',
+                    width: '100%',
+                    height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                   }}

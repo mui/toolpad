@@ -150,22 +150,6 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
   );
 }
 
-interface ConnectionWrapperProps {
-  dataSourceId: string;
-  children: React.ReactNode;
-}
-
-function ConnectionWrapper({ children, dataSourceId }: ConnectionWrapperProps) {
-  if (LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT.has(dataSourceId)) {
-    return (
-      <SplitPane split="vertical" allowResize size="50%">
-        {children}
-      </SplitPane>
-    );
-  }
-
-  return <React.Fragment>{children}</React.Fragment>;
-}
 interface QueryNodeEditorProps<Q, P> {
   open: boolean;
   onClose: () => void;
@@ -354,10 +338,11 @@ function QueryNodeEditorDialog<Q, P>({
       {dataSourceId && dataSource ? (
         <DialogContent
           sx={{
-            overflow: 'hidden',
+            // height will be clipped by max-height
+            height: '100vh',
+            p: 0,
             display: 'flex',
             flexDirection: 'column',
-            p: 0,
           }}
         >
           <Box
@@ -368,16 +353,18 @@ function QueryNodeEditorDialog<Q, P>({
               display: 'flex',
             }}
           >
-            <div style={{ flexGrow: 1, width: '100%' }}>
-              <ConnectionWrapper dataSourceId={dataSourceId}>
-                <Stack
-                  sx={{
-                    width: '100%',
-                    height: '100%',
-                    overflow: 'auto',
-                  }}
-                >
-                  <ConnectionContextProvider value={queryEditorContext}>
+            <ConnectionContextProvider value={queryEditorContext}>
+              {/* TODO: move transform/preview inside of the dataSource.QueryEditor and remove the legacy conditional */}
+              {LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT.has(dataSourceId) ? (
+                <SplitPane split="vertical" allowResize size="50%">
+                  <Stack
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      overflow: 'auto',
+                    }}
+                  >
+                    {/* This is the exact same element as below */}
                     <dataSource.QueryEditor
                       connectionParams={connection?.attributes.params.value}
                       value={{
@@ -388,10 +375,7 @@ function QueryNodeEditorDialog<Q, P>({
                       onChange={handleQueryChange}
                       globalScope={pageState}
                     />
-                  </ConnectionContextProvider>
 
-                  {/* TODO: move transform inside of the dataSource.QueryEditor and remove the conditional */}
-                  {LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT.has(dataSourceId) ? (
                     <Grid container direction="row" spacing={1} sx={{ px: 3, pb: 1, mt: 2 }}>
                       <React.Fragment>
                         <Divider />
@@ -421,11 +405,8 @@ function QueryNodeEditorDialog<Q, P>({
                         </Grid>
                       </React.Fragment>
                     </Grid>
-                  ) : null}
-                </Stack>
+                  </Stack>
 
-                {/* TODO: move preview inside of the dataSource.QueryEditor and remove the conditional */}
-                {LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT.has(dataSourceId) ? (
                   <Box
                     sx={{
                       width: '100%',
@@ -452,9 +433,20 @@ function QueryNodeEditorDialog<Q, P>({
                       {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
                     </Box>
                   </Box>
-                ) : null}
-              </ConnectionWrapper>
-            </div>
+                </SplitPane>
+              ) : (
+                <dataSource.QueryEditor
+                  connectionParams={connection?.attributes.params.value}
+                  value={{
+                    query: input.attributes.query.value,
+                    params: input.params,
+                  }}
+                  liveParams={liveParams}
+                  onChange={handleQueryChange}
+                  globalScope={pageState}
+                />
+              )}
+            </ConnectionContextProvider>
           </Box>
 
           <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>

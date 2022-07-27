@@ -1,7 +1,6 @@
 import type * as React from 'react';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
-  ArgTypeDefinition,
   SlotType,
   RuntimeError,
   ComponentConfig,

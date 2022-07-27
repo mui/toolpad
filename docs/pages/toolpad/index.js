@@ -6,6 +6,19 @@ import AppHeader from 'docs/src/layouts/AppHeader';
 import AppFooter from 'docs/src/layouts/AppFooter';
 import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
 import ToolpadHero from '../../src/components/landing/ToolpadHero';
+import CardGrid from '../../src/components/landing/CardGrid';
+import Banner from '../../src/components/landing/Banner';
+import Pricing from '../../src/components/landing/PricingTable';
+import features from '../../src/content/features';
+import upvote from '../../src/content/upvote';
+import useCases from '../../src/content/useCases';
+import {
+  plans,
+  planInfo,
+  rowHeaders,
+  communityData,
+  commercialData,
+} from '../../src/content/pricing';
 
 export default function Home() {
   return (
@@ -20,6 +33,16 @@ export default function Home() {
       <AppHeader />
       <main>
         <ToolpadHero />
+        <CardGrid content={features} span={4} />
+        <Banner content={upvote} />
+        <CardGrid content={useCases} span={4} />
+        <Pricing
+          plans={plans}
+          planInfo={planInfo}
+          rowHeaders={rowHeaders}
+          commercialData={commercialData}
+          communityData={communityData}
+        />
       </main>
       <AppFooter />
     </BrandingProvider>

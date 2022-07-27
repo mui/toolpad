@@ -56,9 +56,16 @@ import ComponentsContext, { useComponents, useComponent } from './ComponentsCont
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 
-const INITIAL_MUTATION = {
+interface UseMutation {
+  call: () => Promise<void>;
+  isLoading: boolean;
+  error: unknown;
+}
+
+const INITIAL_MUTATION: UseMutation = {
   call: async () => {},
   isLoading: false,
+  error: null,
 };
 
 export interface NavigateToPage {
@@ -379,21 +386,22 @@ function MutationNode({ node }: MutationNodeProps) {
   const mutationId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
-  const mutation = useMutation(
-    async (overrides: any) => {
-      return execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides });
-    },
-    {
-      mutationKey: [dataUrl, mutationId, params],
-    },
-  );
+  const {
+    isLoading,
+    error,
+    mutateAsync: call,
+  } = useMutation(async () => execDataSourceQuery(dataUrl, mutationId, params), {
+    mutationKey: [dataUrl, mutationId, params],
+  });
 
-  const mutationResult = React.useMemo(
+  // Stabilize the mutation and prepare for inclusion in global scope
+  const mutationResult: UseMutation = React.useMemo(
     () => ({
-      isLoading: mutation.isLoading,
-      call: mutation.mutateAsync,
+      isLoading,
+      error,
+      call,
     }),
-    [mutation.isLoading, mutation.mutateAsync],
+    [isLoading, error, call],
   );
 
   React.useEffect(() => {

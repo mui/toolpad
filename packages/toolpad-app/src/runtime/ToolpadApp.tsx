@@ -57,7 +57,7 @@ import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 
 interface UseMutation {
-  call: () => Promise<void>;
+  call: (overrides: any) => Promise<void>;
   isLoading: boolean;
   error: unknown;
 }
@@ -390,9 +390,13 @@ function MutationNode({ node }: MutationNodeProps) {
     isLoading,
     error,
     mutateAsync: call,
-  } = useMutation(async () => execDataSourceQuery(dataUrl, mutationId, params), {
-    mutationKey: [dataUrl, mutationId, params],
-  });
+  } = useMutation(
+    async (overrides: any = {}) =>
+      execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides }),
+    {
+      mutationKey: [dataUrl, mutationId, params],
+    },
+  );
 
   // Stabilize the mutation and prepare for inclusion in global scope
   const mutationResult: UseMutation = React.useMemo(

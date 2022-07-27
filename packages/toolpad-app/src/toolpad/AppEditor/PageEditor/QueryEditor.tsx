@@ -43,6 +43,13 @@ import { mapValues } from '../../../utils/collections';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
 
+const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
+  'rest',
+  'googleSheets',
+  'postgres',
+  'movies',
+]);
+
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
   sx?: SxProps;
@@ -143,22 +150,6 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
   );
 }
 
-interface ConnectionWrapperProps {
-  dataSourceId: string;
-  children: React.ReactNode;
-}
-
-function ConnectionWrapper({ children, dataSourceId }: ConnectionWrapperProps) {
-  if (dataSourceId === 'function') {
-    return <Box flex={1}>{children}</Box>;
-  }
-
-  return (
-    <SplitPane split="vertical" allowResize size="50%">
-      {children}
-    </SplitPane>
-  );
-}
 interface QueryNodeEditorProps<Q, P> {
   open: boolean;
   onClose: () => void;
@@ -347,101 +338,115 @@ function QueryNodeEditorDialog<Q, P>({
       {dataSourceId && dataSource ? (
         <DialogContent
           sx={{
-            overflow: 'hidden',
+            // height will be clipped by max-height
+            height: '100vh',
+            p: 0,
             display: 'flex',
             flexDirection: 'column',
-            p: 0,
           }}
         >
           <Box
-            sx={{ display: 'flex', flexDirection: 'row', minHeight: '500px', position: 'relative' }}
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              position: 'relative',
+              display: 'flex',
+            }}
           >
-            <ConnectionWrapper dataSourceId={dataSourceId}>
-              <Stack
-                sx={{
-                  flex: 1,
-                  minWidth: 0,
-                  overflow: 'auto',
-                }}
-              >
-                <ConnectionContextProvider value={queryEditorContext}>
-                  <dataSource.QueryEditor
-                    connectionParams={connection?.attributes.params.value}
-                    value={{
-                      query: input.attributes.query.value,
-                      params: input.params,
+            <ConnectionContextProvider value={queryEditorContext}>
+              {/* TODO: move transform/preview inside of the dataSource.QueryEditor and remove the legacy conditional */}
+              {LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT.has(dataSourceId) ? (
+                <SplitPane split="vertical" allowResize size="50%">
+                  <Stack
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      overflow: 'auto',
                     }}
-                    liveParams={liveParams}
-                    onChange={handleQueryChange}
-                    globalScope={pageState}
-                  />
-                </ConnectionContextProvider>
+                  >
+                    {/* This is the exact same element as below */}
+                    <dataSource.QueryEditor
+                      connectionParams={connection?.attributes.params.value}
+                      value={{
+                        query: input.attributes.query.value,
+                        params: input.params,
+                      }}
+                      liveParams={liveParams}
+                      onChange={handleQueryChange}
+                      globalScope={pageState}
+                    />
 
-                {/* TODO: move transform inside of the dataSource.QueryEditor and remove the conditional */}
-                {dataSourceId === 'function' ? null : (
-                  <Grid container direction="row" spacing={1} sx={{ px: 3, pb: 1, mt: 2 }}>
-                    <React.Fragment>
-                      <Divider />
-                      <Grid item xs={6}>
-                        <Stack>
-                          <FormControlLabel
-                            label="Transform response"
-                            control={
-                              <Checkbox
-                                checked={input.attributes.transformEnabled?.value ?? false}
-                                onChange={handleTransformEnabledChange}
-                                inputProps={{ 'aria-label': 'controlled' }}
-                              />
-                            }
-                          />
+                    <Grid container direction="row" spacing={1} sx={{ px: 3, pb: 1, mt: 2 }}>
+                      <React.Fragment>
+                        <Divider />
+                        <Grid item xs={6}>
+                          <Stack>
+                            <FormControlLabel
+                              label="Transform response"
+                              control={
+                                <Checkbox
+                                  checked={input.attributes.transformEnabled?.value ?? false}
+                                  onChange={handleTransformEnabledChange}
+                                  inputProps={{ 'aria-label': 'controlled' }}
+                                />
+                              }
+                            />
 
-                          <JsExpressionEditor
-                            globalScope={{}}
-                            value={
-                              input.attributes.transform?.value ?? '(data) => {\n  return data;\n}'
-                            }
-                            onChange={handleTransformFnChange}
-                            disabled={!input.attributes.transformEnabled?.value}
-                          />
-                        </Stack>
-                      </Grid>
-                    </React.Fragment>
-                  </Grid>
-                )}
-              </Stack>
+                            <JsExpressionEditor
+                              globalScope={{}}
+                              value={
+                                input.attributes.transform?.value ??
+                                '(data) => {\n  return data;\n}'
+                              }
+                              onChange={handleTransformFnChange}
+                              disabled={!input.attributes.transformEnabled?.value}
+                            />
+                          </Stack>
+                        </Grid>
+                      </React.Fragment>
+                    </Grid>
+                  </Stack>
 
-              {/* TODO: move preview inside of the dataSource.QueryEditor and remove the conditional */}
-              {dataSourceId === 'function' ? null : (
-                <Box
-                  sx={{
-                    flex: 1,
-                    minWidth: 0,
-                    borderLeft: 1,
-                    borderColor: 'divider',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <Toolbar>
-                    <LoadingButton
-                      size="medium"
-                      disabled={previewParams === paramsObject && previewQuery === input}
-                      loading={isPreviewLoading}
-                      loadingPosition="start"
-                      variant="contained"
-                      onClick={handleUpdatePreview}
-                      startIcon={<PlayArrowIcon />}
-                    >
-                      Preview
-                    </LoadingButton>
-                  </Toolbar>
-                  <Box sx={{ flex: 1, minHeight: 0, px: 3, py: 1, overflow: 'auto' }}>
-                    {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
-                    {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <Toolbar>
+                      <LoadingButton
+                        size="medium"
+                        disabled={previewParams === paramsObject && previewQuery === input}
+                        loading={isPreviewLoading}
+                        loadingPosition="start"
+                        variant="contained"
+                        onClick={handleUpdatePreview}
+                        startIcon={<PlayArrowIcon />}
+                      >
+                        Preview
+                      </LoadingButton>
+                    </Toolbar>
+                    <Box sx={{ flex: 1, minHeight: 0, px: 3, py: 1, overflow: 'auto' }}>
+                      {queryPreview.error ? <ErrorAlert error={queryPreview.error} /> : null}
+                      {queryPreview.isSuccess ? <JsonView src={queryPreview.data} /> : null}
+                    </Box>
                   </Box>
-                </Box>
+                </SplitPane>
+              ) : (
+                <dataSource.QueryEditor
+                  connectionParams={connection?.attributes.params.value}
+                  value={{
+                    query: input.attributes.query.value,
+                    params: input.params,
+                  }}
+                  liveParams={liveParams}
+                  onChange={handleQueryChange}
+                  globalScope={pageState}
+                />
               )}
-            </ConnectionWrapper>
+            </ConnectionContextProvider>
           </Box>
 
           <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>

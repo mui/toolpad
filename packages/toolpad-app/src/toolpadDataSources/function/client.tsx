@@ -186,67 +186,61 @@ function QueryEditor({
   };
 
   return (
-    <Box sx={{ height: 500, position: 'relative' }}>
-      <SplitPane split="vertical" size="50%" allowResize>
-        <SplitPane split="horizontal" size={85} primary="second" allowResize>
-          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Toolbar>
-              <LoadingButton startIcon={<PlayArrowIcon />} onClick={() => runPreview()}>
-                Preview
-              </LoadingButton>
-            </Toolbar>
-            <Box sx={{ flex: 1, minHeight: 0 }}>
-              <TypescriptEditor
-                value={value.query.module}
-                onChange={(newValue) => onChange({ ...value, query: { module: newValue } })}
-                extraLibs={extraLibs}
-              />
-            </Box>
-          </Box>
-
-          <Box sx={{ p: 2 }}>
-            <Typography>Parameters</Typography>
-            <ParametersEditor
-              value={params}
-              onChange={handleParamsChange}
-              globalScope={globalScope}
-              liveValue={paramsEditorLiveValue}
+    <SplitPane split="vertical" size="50%" allowResize>
+      <SplitPane split="horizontal" size={85} primary="second" allowResize>
+        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Toolbar>
+            <LoadingButton startIcon={<PlayArrowIcon />} onClick={() => runPreview()}>
+              Preview
+            </LoadingButton>
+          </Toolbar>
+          <Box sx={{ flex: 1, minHeight: 0 }}>
+            <TypescriptEditor
+              value={value.query.module}
+              onChange={(newValue) => onChange({ ...value, query: { module: newValue } })}
+              extraLibs={extraLibs}
             />
           </Box>
-        </SplitPane>
+        </Box>
 
-        <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
-          <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
-            {preview?.error ? (
-              <ErrorAlert error={preview?.error} />
-            ) : (
-              <JsonView src={preview?.data} />
-            )}
-          </Box>
-
-          <TabContext value={debuggerTab}>
-            <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <TabList onChange={handleDebuggerTabChange} aria-label="Debugger">
-                  <Tab label="Console" value="console" />
-                  <Tab label="Network" value="network" />
-                </TabList>
-              </Box>
-              <DebuggerTabPanel value="console">
-                <Console sx={{ flex: 1 }} value={previewLogs} onChange={setPreviewLogs} />
-              </DebuggerTabPanel>
-              <DebuggerTabPanel value="network">
-                <HarViewer har={preview?.har} />
-              </DebuggerTabPanel>
-            </Box>
-          </TabContext>
-
-          {/*       <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
- <Console sx={{ flex: 1 }} value={previewLogs} onChange={setPreviewLogs} /> 
-          </Box> */}
-        </SplitPane>
+        <Box sx={{ p: 2 }}>
+          <Typography>Parameters</Typography>
+          <ParametersEditor
+            value={params}
+            onChange={handleParamsChange}
+            globalScope={globalScope}
+            liveValue={paramsEditorLiveValue}
+          />
+        </Box>
       </SplitPane>
-    </Box>
+
+      <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
+        <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
+          {preview?.error ? (
+            <ErrorAlert error={preview?.error} />
+          ) : (
+            <JsonView src={preview?.data} />
+          )}
+        </Box>
+
+        <TabContext value={debuggerTab}>
+          <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <TabList onChange={handleDebuggerTabChange} aria-label="Debugger">
+                <Tab label="Console" value="console" />
+                <Tab label="Network" value="network" />
+              </TabList>
+            </Box>
+            <DebuggerTabPanel value="console">
+              <Console sx={{ flex: 1 }} value={previewLogs} onChange={setPreviewLogs} />
+            </DebuggerTabPanel>
+            <DebuggerTabPanel value="network">
+              <HarViewer har={preview?.har} />
+            </DebuggerTabPanel>
+          </Box>
+        </TabContext>
+      </SplitPane>
+    </SplitPane>
   );
 }
 

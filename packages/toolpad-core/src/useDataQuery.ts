@@ -12,6 +12,11 @@ async function fetchData(dataUrl: string, queryId: string, params: any) {
   return res.json();
 }
 
+export type UseDataQueryConfig = Pick<
+  UseQueryOptions<any, unknown, unknown, any[]>,
+  'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
+>;
+
 export interface UseDataQuery {
   isLoading: boolean;
   isFetching: boolean;
@@ -37,13 +42,7 @@ export function useDataQuery(
   dataUrl: string,
   queryId: string | null,
   params: any,
-  {
-    enabled = true,
-    ...options
-  }: Pick<
-    UseQueryOptions<any, unknown, unknown, any[]>,
-    'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
-  >,
+  { enabled = true, ...options }: UseDataQueryConfig,
 ): UseDataQuery {
   const {
     isLoading,

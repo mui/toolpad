@@ -8,6 +8,7 @@ import {
   BindableAttrValues,
   LiveBinding,
   NodeId,
+  PropValueType,
 } from '@mui/toolpad-core';
 
 import { PaletteMode } from '@mui/material';
@@ -21,7 +22,7 @@ export interface EditorProps<T> {
    */
   nodeId?: NodeId;
   label: string;
-  argType: ArgTypeDefinition;
+  propType: PropValueType;
   disabled?: boolean;
   value: T | undefined;
   onChange: (newValue: T) => void;

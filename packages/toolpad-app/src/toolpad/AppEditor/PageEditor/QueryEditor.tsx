@@ -51,13 +51,6 @@ const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
   'movies',
 ]);
 
-const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
-  'rest',
-  'googleSheets',
-  'postgres',
-  'movies',
-]);
-
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
   sx?: SxProps;

@@ -44,8 +44,12 @@ import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import NodeHud from './NodeHud';
 import NodeDropArea from './NodeDropArea';
 
-const RESIZE_SNAP_UNITS = 4; // px
+const HORIZONTAL_RESIZE_SNAP_UNITS = 4; // px
 const SNAP_TO_GRID_COLUMN_MARGIN = 10; // px
+
+const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
+
+const MIN_RESIZABLE_ELEMENT_HEIGHT = 100; // px
 
 const classes = {
   view: 'Toolpad_View',
@@ -1318,43 +1322,59 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
 
       if (draggedNodeRect && parentRect && resizePreviewElement && cursorPos) {
-        let snappedToGridCursorPosX =
-          Math.round(cursorPos.x / RESIZE_SNAP_UNITS) * RESIZE_SNAP_UNITS;
+        if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
+          let snappedToGridCursorRelativePosX =
+            Math.ceil((cursorPos.x - draggedNodeRect.x) / HORIZONTAL_RESIZE_SNAP_UNITS) *
+            HORIZONTAL_RESIZE_SNAP_UNITS;
 
-        const activeSnapGridColumnEdges =
-          draggedEdge === RECTANGLE_EDGE_LEFT
-            ? overlayGridRef.current.getLeftColumnEdges()
-            : overlayGridRef.current.getRightColumnEdges();
+          const activeSnapGridColumnEdges =
+            draggedEdge === RECTANGLE_EDGE_LEFT
+              ? overlayGridRef.current.getLeftColumnEdges()
+              : overlayGridRef.current.getRightColumnEdges();
 
-        for (const gridColumnEdge of activeSnapGridColumnEdges) {
-          if (Math.abs(gridColumnEdge - cursorPos.x) <= SNAP_TO_GRID_COLUMN_MARGIN) {
-            snappedToGridCursorPosX = gridColumnEdge;
+          for (const gridColumnEdge of activeSnapGridColumnEdges) {
+            if (Math.abs(gridColumnEdge - cursorPos.x) <= SNAP_TO_GRID_COLUMN_MARGIN) {
+              snappedToGridCursorRelativePosX = gridColumnEdge - draggedNodeRect.x;
+            }
+          }
+
+          const minGridColumnWidth = overlayGridRef.current.getMinColumnWidth();
+
+          if (
+            draggedEdge === RECTANGLE_EDGE_LEFT &&
+            cursorPos.x > parentRect.x + minGridColumnWidth &&
+            cursorPos.x < draggedNodeRect.x + draggedNodeRect.width - minGridColumnWidth
+          ) {
+            const updatedTransformScale =
+              1 - snappedToGridCursorRelativePosX / draggedNodeRect.width;
+
+            resizePreviewElement.style.transformOrigin = '100% 50%';
+            resizePreviewElement.style.transform = `scaleX(${updatedTransformScale})`;
+          }
+          if (
+            draggedEdge === RECTANGLE_EDGE_RIGHT &&
+            cursorPos.x > draggedNodeRect.x + minGridColumnWidth &&
+            cursorPos.x < parentRect.x + parentRect.width - minGridColumnWidth
+          ) {
+            const updatedTransformScale = snappedToGridCursorRelativePosX / draggedNodeRect.width;
+
+            resizePreviewElement.style.transformOrigin = '0 50%';
+            resizePreviewElement.style.transform = `scaleX(${updatedTransformScale})`;
           }
         }
 
-        const minGridColumnWidth = overlayGridRef.current.getMinColumnWidth();
-
         if (
-          draggedEdge === RECTANGLE_EDGE_LEFT &&
-          cursorPos.x > parentRect.x + minGridColumnWidth &&
-          cursorPos.x < draggedNodeRect.x + draggedNodeRect.width - minGridColumnWidth
+          draggedEdge === RECTANGLE_EDGE_BOTTOM &&
+          cursorPos.y > draggedNodeRect.y + MIN_RESIZABLE_ELEMENT_HEIGHT
         ) {
-          const updatedTransformScale =
-            1 + (draggedNodeRect.x - snappedToGridCursorPosX) / draggedNodeRect.width;
+          const snappedToGridCursorRelativePosY =
+            Math.ceil((cursorPos.y - draggedNodeRect.y) / VERTICAL_RESIZE_SNAP_UNITS) *
+            VERTICAL_RESIZE_SNAP_UNITS;
 
-          resizePreviewElement.style.transformOrigin = '100% 50%';
-          resizePreviewElement.style.transform = `scale(${updatedTransformScale}, 1)`;
-        }
-        if (
-          draggedEdge === RECTANGLE_EDGE_RIGHT &&
-          cursorPos.x > draggedNodeRect.x + minGridColumnWidth &&
-          cursorPos.x < parentRect.x + parentRect.width - minGridColumnWidth
-        ) {
-          const updatedTransformScale =
-            (snappedToGridCursorPosX - draggedNodeRect.x) / draggedNodeRect.width;
+          const updatedTransformScale = snappedToGridCursorRelativePosY / draggedNodeRect.height;
 
-          resizePreviewElement.style.transformOrigin = '0 50%';
-          resizePreviewElement.style.transform = `scale(${updatedTransformScale}, 1)`;
+          resizePreviewElement.style.transformOrigin = '50% 0';
+          resizePreviewElement.style.transform = `scaleY(${updatedTransformScale})`;
         }
       }
     },
@@ -1384,72 +1404,87 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const parent = appDom.getParent(dom, draggedNode);
 
-      const parentChildren = parent ? appDom.getChildNodes(dom, parent).children : [];
-      const totalLayoutColumnSizes = parentChildren.reduce(
-        (acc, child) => acc + (nodesInfo[child.id]?.rect?.width || 0),
-        0,
-      );
-
       const resizePreviewRect = resizePreviewElement?.getBoundingClientRect();
 
       if (draggedNodeRect && resizePreviewRect) {
-        const normalizeColumnSize = (size: number) =>
-          Math.max(0, size * parentChildren.length) / totalLayoutColumnSizes;
+        if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
+          const parentChildren = parent ? appDom.getChildNodes(dom, parent).children : [];
+          const totalLayoutColumnSizes = parentChildren.reduce(
+            (acc, child) => acc + (nodesInfo[child.id]?.rect?.width || 0),
+            0,
+          );
 
-        if (draggedEdge === RECTANGLE_EDGE_LEFT) {
-          const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
+          const normalizeColumnSize = (size: number) =>
+            Math.max(0, size * parentChildren.length) / totalLayoutColumnSizes;
 
-          if (previousSibling) {
-            const previousSiblingInfo = nodesInfo[previousSibling.id];
-            const previousSiblingRect = previousSiblingInfo?.rect;
+          if (draggedEdge === RECTANGLE_EDGE_LEFT) {
+            const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
 
-            if (previousSiblingRect) {
-              const updatedDraggedNodeColumnSize = normalizeColumnSize(resizePreviewRect.width);
-              const updatedPreviousSiblingColumnSize = normalizeColumnSize(
-                previousSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
-              );
+            if (previousSibling) {
+              const previousSiblingInfo = nodesInfo[previousSibling.id];
+              const previousSiblingRect = previousSiblingInfo?.rect;
 
-              domApi.setNodeNamespacedProp(
-                draggedNode,
-                'layout',
-                'columnSize',
-                appDom.createConst(updatedDraggedNodeColumnSize),
-              );
-              domApi.setNodeNamespacedProp(
-                previousSibling,
-                'layout',
-                'columnSize',
-                appDom.createConst(updatedPreviousSiblingColumnSize),
-              );
+              if (previousSiblingRect) {
+                const updatedDraggedNodeColumnSize = normalizeColumnSize(resizePreviewRect.width);
+                const updatedPreviousSiblingColumnSize = normalizeColumnSize(
+                  previousSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
+                );
+
+                domApi.setNodeNamespacedProp(
+                  draggedNode,
+                  'layout',
+                  'columnSize',
+                  appDom.createConst(updatedDraggedNodeColumnSize),
+                );
+                domApi.setNodeNamespacedProp(
+                  previousSibling,
+                  'layout',
+                  'columnSize',
+                  appDom.createConst(updatedPreviousSiblingColumnSize),
+                );
+              }
+            }
+          }
+          if (draggedEdge === RECTANGLE_EDGE_RIGHT) {
+            const nextSibling = appDom.getSiblingAfterNode(dom, draggedNode, 'children');
+
+            if (nextSibling) {
+              const nextSiblingInfo = nodesInfo[nextSibling.id];
+              const nextSiblingRect = nextSiblingInfo?.rect;
+
+              if (nextSiblingRect) {
+                const updatedDraggedNodeColumnSize = normalizeColumnSize(resizePreviewRect.width);
+                const updatedNextSiblingColumnSize = normalizeColumnSize(
+                  nextSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
+                );
+
+                domApi.setNodeNamespacedProp(
+                  draggedNode,
+                  'layout',
+                  'columnSize',
+                  appDom.createConst(updatedDraggedNodeColumnSize),
+                );
+                domApi.setNodeNamespacedProp(
+                  nextSibling,
+                  'layout',
+                  'columnSize',
+                  appDom.createConst(updatedNextSiblingColumnSize),
+                );
+              }
             }
           }
         }
-        if (draggedEdge === RECTANGLE_EDGE_RIGHT) {
-          const nextSibling = appDom.getSiblingAfterNode(dom, draggedNode, 'children');
 
-          if (nextSibling) {
-            const nextSiblingInfo = nodesInfo[nextSibling.id];
-            const nextSiblingRect = nextSiblingInfo?.rect;
+        if (draggedEdge === RECTANGLE_EDGE_BOTTOM) {
+          const resizableHeightProp = draggedNodeInfo?.componentConfig?.resizableHeightProp;
 
-            if (nextSiblingRect) {
-              const updatedDraggedNodeColumnSize = normalizeColumnSize(resizePreviewRect.width);
-              const updatedNextSiblingColumnSize = normalizeColumnSize(
-                nextSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
-              );
-
-              domApi.setNodeNamespacedProp(
-                draggedNode,
-                'layout',
-                'columnSize',
-                appDom.createConst(updatedDraggedNodeColumnSize),
-              );
-              domApi.setNodeNamespacedProp(
-                nextSibling,
-                'layout',
-                'columnSize',
-                appDom.createConst(updatedNextSiblingColumnSize),
-              );
-            }
+          if (resizableHeightProp) {
+            domApi.setNodeNamespacedProp(
+              draggedNode,
+              'props',
+              resizableHeightProp,
+              appDom.createConst(resizePreviewRect.height),
+            );
           }
         }
       }
@@ -1527,6 +1562,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                 ? parentSlotChildNodes[parentSlotChildNodes.length - 1].id === node.id
                 : false;
 
+              const isVerticallyResizable = Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
+
               const nodeRect = nodeInfo?.rect || null;
               const hasNodeOverlay = isPageNode || appDom.isElement(node);
 
@@ -1543,15 +1580,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                       selected={selectedNode?.id === node.id}
                       allowInteraction={nodesWithInteraction.has(node.id) && !draggedEdge}
                       onNodeDragStart={handleNodeDragStart(node)}
-                      draggableEdges={
-                        isPageRowChild
+                      draggableEdges={[
+                        ...(isPageRowChild
                           ? [
                               ...(isFirstChild ? [] : [RECTANGLE_EDGE_LEFT as RectangleEdge]),
                               ...(isLastChild ? [] : [RECTANGLE_EDGE_RIGHT as RectangleEdge]),
                             ]
-                          : []
+                          : []),
+                        ...(isVerticallyResizable ? [RECTANGLE_EDGE_BOTTOM as RectangleEdge] : []),
+                      ]}
+                      onEdgeDragStart={
+                        isPageRowChild || isVerticallyResizable ? handleEdgeDragStart : undefined
                       }
-                      onEdgeDragStart={isPageRowChild ? handleEdgeDragStart : undefined}
                       onDelete={handleDelete(node.id)}
                       isResizing={Boolean(draggedEdge) && node.id === draggedNodeId}
                       resizePreviewElementRef={resizePreviewElementRef}

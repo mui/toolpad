@@ -237,6 +237,16 @@ function QueryNodeEditorDialog<Q, P>({
     [],
   );
 
+  const handleEnabledChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setInput((existing) =>
+      update(existing, {
+        attributes: update(existing.attributes, {
+          enabled: appDom.createConst(event.target.checked),
+        }),
+      }),
+    );
+  }, []);
+
   const handleRefetchOnReconnectChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setInput((existing) =>
@@ -450,6 +460,15 @@ function QueryNodeEditorDialog<Q, P>({
           </Box>
 
           <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={input.attributes.enabled?.value ?? true}
+                  onChange={handleEnabledChange}
+                />
+              }
+              label="Enabled"
+            />
             <FormControlLabel
               control={
                 <Checkbox

@@ -335,6 +335,7 @@ function QueryNode({ node }: QueryNodeProps) {
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
   const queryResult = useDataQuery(dataUrl, queryId, params, {
+    enabled: node.attributes.enabled?.value ?? true,
     refetchOnWindowFocus: node.attributes.refetchOnWindowFocus?.value,
     refetchOnReconnect: node.attributes.refetchOnReconnect?.value,
     refetchInterval: node.attributes.refetchInterval?.value,

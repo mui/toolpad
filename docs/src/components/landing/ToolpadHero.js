@@ -1,5 +1,9 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
+import Link from 'docs/src/modules/components/Link';
 import Typography from '@mui/material/Typography';
 import GradientText from 'docs/src/components/typography/GradientText';
 import IconImage from 'docs/src/components/icon/IconImage';
@@ -31,6 +35,18 @@ export default function ToolpadHero() {
           Drag and drop pre-built components, connect to data sources, APIs and build your internal
           tools 10x faster. Open-source and powered by MUI.
         </Typography>
+        <TextField variant="outlined" placeholder="example@email.com" sx={{ mr: 2 }} />
+        <Button
+          component={Link}
+          href={'/'}
+          noLinkStyle
+          size="large"
+          variant="contained"
+          endIcon={<KeyboardArrowRightRounded />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Sign up
+        </Button>
       </Box>
     </ToolpadHeroContainer>
   );

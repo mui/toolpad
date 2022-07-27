@@ -14,8 +14,6 @@ import {
   InputAdornment,
   Divider,
   Toolbar,
-  MenuItem,
-  SxProps,
   Alert,
   Box,
 } from '@mui/material';
@@ -37,11 +35,11 @@ import client from '../../../api';
 import ErrorAlert from './ErrorAlert';
 import { JsExpressionEditor } from './JsExpressionEditor';
 import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
-import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { mapValues } from '../../../utils/collections';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
+import ConnectionSelect from './ConnectionSelect';
 
 const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
   'rest',
@@ -49,48 +47,6 @@ const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
   'postgres',
   'movies',
 ]);
-
-export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
-  dataSource?: string;
-  sx?: SxProps;
-}
-
-export function ConnectionSelect({ sx, dataSource, value, onChange }: ConnectionSelectProps) {
-  const dom = useDom();
-
-  const app = appDom.getApp(dom);
-  const { connections = [] } = appDom.getChildNodes(dom, app);
-
-  const filtered = React.useMemo(() => {
-    return dataSource
-      ? connections.filter((connection) => connection.attributes.dataSource.value === dataSource)
-      : connections;
-  }, [connections, dataSource]);
-
-  const handleSelectionChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange((event.target.value as NodeId) || null);
-    },
-    [onChange],
-  );
-
-  return (
-    <TextField
-      sx={sx}
-      select
-      fullWidth
-      value={value || ''}
-      label="Connection"
-      onChange={handleSelectionChange}
-    >
-      {filtered.map((connection) => (
-        <MenuItem key={connection.id} value={connection.id}>
-          {connection.name} | {connection.attributes.dataSource.value}
-        </MenuItem>
-      ))}
-    </TextField>
-  );
-}
 
 function refetchIntervalInSeconds(maybeInterval?: number) {
   if (typeof maybeInterval !== 'number') {

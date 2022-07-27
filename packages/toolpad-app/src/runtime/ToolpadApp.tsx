@@ -19,8 +19,9 @@ import {
   Placeholder,
   BindableAttrValues,
   NodeId,
+  execDataSourceQuery,
 } from '@mui/toolpad-core';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider, useMutation } from 'react-query';
 import {
   BrowserRouter,
   Routes,
@@ -54,6 +55,11 @@ import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
+
+const INITIAL_MUTATION = {
+  call: async () => {},
+  isLoading: false,
+};
 
 export interface NavigateToPage {
   (pageNodeId: NodeId): void;
@@ -360,6 +366,46 @@ function QueryNode({ node }: QueryNodeProps) {
   return null;
 }
 
+interface MutationNodeProps {
+  node: appDom.MutationNode;
+}
+
+function MutationNode({ node }: MutationNodeProps) {
+  const { appId, version } = useAppContext();
+  const bindings = useBindingsContext();
+  const setControlledBinding = useSetControlledBindingContext();
+
+  const dataUrl = `/api/data/${appId}/${version}/`;
+  const mutationId = node.id;
+  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
+
+  const mutation = useMutation(
+    async (overrides: any) => {
+      return execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides });
+    },
+    {
+      mutationKey: [dataUrl, mutationId, params],
+    },
+  );
+
+  const mutationResult = React.useMemo(
+    () => ({
+      isLoading: mutation.isLoading,
+      call: mutation.mutateAsync,
+    }),
+    [mutation.isLoading, mutation.mutateAsync],
+  );
+
+  React.useEffect(() => {
+    for (const [key, value] of Object.entries(mutationResult)) {
+      const bindingId = `${node.id}.${key}`;
+      setControlledBinding(bindingId, { value });
+    }
+  }, [node.id, mutationResult, setControlledBinding]);
+
+  return null;
+}
+
 function parseBindings(
   dom: appDom.AppDom,
   page: appDom.PageNode,
@@ -448,6 +494,36 @@ function parseBindings(
         });
       }
     }
+
+    if (appDom.isMutation(elm)) {
+      if (elm.params) {
+        for (const [paramName, bindable] of Object.entries(elm.params)) {
+          const bindingId = `${elm.id}.params.${paramName}`;
+          const scopePath = `${elm.name}.params.${paramName}`;
+          if (bindable?.type === 'const') {
+            parsedBindingsMap.set(bindingId, {
+              scopePath,
+              result: { value: bindable.value },
+            });
+          } else if (bindable?.type === 'jsExpression') {
+            parsedBindingsMap.set(bindingId, {
+              scopePath,
+              expression: bindable.value,
+            });
+          }
+        }
+      }
+
+      for (const [key, value] of Object.entries(INITIAL_MUTATION)) {
+        const bindingId = `${elm.id}.${key}`;
+        const scopePath = `${elm.name}.${key}`;
+        controlled.add(bindingId);
+        parsedBindingsMap.set(bindingId, {
+          scopePath,
+          result: { value, loading: true },
+        });
+      }
+    }
   }
 
   const urlParams = new URLSearchParams(location.search);
@@ -471,7 +547,7 @@ const EMPTY_OBJECT = {};
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queries = [], mutations = [] } = appDom.getChildNodes(dom, page);
 
   usePageTitle(page.attributes.title.value);
 
@@ -552,6 +628,10 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
           {queries.map((node) => (
             <QueryNode key={node.id} node={node} />
+          ))}
+
+          {mutations.map((node) => (
+            <MutationNode key={node.id} node={node} />
           ))}
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>

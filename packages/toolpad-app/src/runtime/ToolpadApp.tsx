@@ -57,7 +57,7 @@ import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 
 interface UseMutation {
-  call: (overrides: any) => Promise<void>;
+  call: (overrides?: any) => Promise<void>;
   isLoading: boolean;
   error: unknown;
 }

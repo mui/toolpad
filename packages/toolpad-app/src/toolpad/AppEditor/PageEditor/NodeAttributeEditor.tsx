@@ -1,35 +1,11 @@
 import * as React from 'react';
-import {
-  ArgControlSpec,
-  ArgTypeDefinition,
-  BindableAttrValue,
-  PropValueType,
-} from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import { Alert } from '@mui/material';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
-import propertyControls from '../../propertyControls';
-
-function getDefaultControl(typeDef: PropValueType): ArgControlSpec | null {
-  switch (typeDef.type) {
-    case 'string':
-      return typeDef.enum ? { type: 'select' } : { type: 'string' };
-    case 'number':
-      return { type: 'number' };
-    case 'boolean':
-      return { type: 'boolean' };
-    case 'object':
-      return { type: 'json' };
-    case 'array':
-      return { type: 'json' };
-    case 'event':
-      return { type: 'event' };
-    default:
-      return null;
-  }
-}
+import { getDefaultControl } from '../../propertyControls';
 
 export interface NodeAttributeEditorProps {
   node: appDom.AppDomNode;
@@ -59,9 +35,8 @@ export default function NodeAttributeEditor({
   const { bindings, pageState } = usePageEditorState();
   const liveBinding = bindings[bindingId];
   const globalScope = pageState;
-
-  const controlSpec = argType.control ?? getDefaultControl(argType.typeDef);
-  const Control = controlSpec ? propertyControls[controlSpec.type] : null;
+  const propType = argType.typeDef;
+  const Control = getDefaultControl(argType);
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
   // to make them bindable to other controlled props only
@@ -73,14 +48,14 @@ export default function NodeAttributeEditor({
       globalScope={globalScope}
       label={argType.label || name}
       disabled={!isBindable}
-      propType={argType.typeDef}
-      renderControl={(params) => <Control nodeId={node.id} argType={argType} {...params} />}
+      propType={propType}
+      renderControl={(params) => <Control nodeId={node.id} {...params} propType={propType} />}
       value={propValue}
       onChange={handlePropChange}
     />
   ) : (
     <Alert severity="warning">
-      {`No control for '${name}' (type '${argType.typeDef.type}' ${
+      {`No control for '${name}' (type '${propType.type}' ${
         argType.control ? `, control: '${argType.control.type}'` : ''
       })`}
     </Alert>

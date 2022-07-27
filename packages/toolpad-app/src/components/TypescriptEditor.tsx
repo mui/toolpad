@@ -25,7 +25,7 @@ export default function TypescriptEditor({
 
   React.useEffect(() => {
     editorRef.current?.monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-      diagnosticCodesToIgnore: functionBody ? [1108] : [],
+      diagnosticCodesToIgnore: functionBody ? [1108, 1375] : [],
     });
   }, [functionBody]);
 

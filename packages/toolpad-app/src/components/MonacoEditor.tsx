@@ -62,7 +62,7 @@ monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   target: monaco.languages.typescript.ScriptTarget.Latest,
   allowNonTsExtensions: true,
   moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-  module: monaco.languages.typescript.ModuleKind.CommonJS,
+  module: monaco.languages.typescript.ModuleKind.ESNext,
   noEmit: true,
   esModuleInterop: true,
   jsx: monaco.languages.typescript.JsxEmit.React,

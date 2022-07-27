@@ -235,7 +235,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
       if (action?.type === 'jsExpressionAction') {
         const handler = () => {
           const code = action.value;
-          const exprToEvaluate = `(() => {${code}})()`;
+          const exprToEvaluate = `(async () => {${code}})()`;
           evaluatePageExpression(exprToEvaluate);
         };
 

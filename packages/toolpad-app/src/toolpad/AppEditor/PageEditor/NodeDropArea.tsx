@@ -3,7 +3,12 @@ import clsx from 'clsx';
 import { styled } from '@mui/material';
 import { NodeInfo } from '../../../types';
 import * as appDom from '../../../appDom';
-import { absolutePositionCss, Rectangle } from '../../../utils/geometry';
+import {
+  absolutePositionCss,
+  isHorizontalFlow,
+  isVerticalFlow,
+  Rectangle,
+} from '../../../utils/geometry';
 import {
   DropZone,
   DROP_ZONE_BOTTOM,
@@ -12,7 +17,6 @@ import {
   DROP_ZONE_RIGHT,
   DROP_ZONE_TOP,
 } from './PageEditorProvider';
-import { isHorizontalSlot, isVerticalSlot } from '../../../utils/pageView';
 
 const dropAreaHighlightClasses = {
   highlightedTop: 'DropArea_HighlightedTop',
@@ -148,8 +152,10 @@ export default function NodeDropArea({
 
   const parentRect = parentInfo?.rect;
 
-  const isHorizontalContainerChild = parentSlot ? isHorizontalSlot(parentSlot) : false;
-  const isVerticalContainerChild = parentSlot ? isVerticalSlot(parentSlot) : false;
+  const isHorizontalContainerChild = parentSlot
+    ? isHorizontalFlow(parentSlot.flowDirection)
+    : false;
+  const isVerticalContainerChild = parentSlot ? isVerticalFlow(parentSlot.flowDirection) : false;
 
   const highlightHeight =
     isHorizontalContainerChild && parentRect ? parentRect.height : layoutRect.height;

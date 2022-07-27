@@ -7,7 +7,10 @@ import { FlowDirection, NodeInfo, SlotsState } from '../../../types';
 import * as appDom from '../../../appDom';
 import EditorCanvasHost, { EditorCanvasHostHandle } from './EditorCanvasHost';
 import {
-  getRectanglePointEdge,
+  getRectanglePointActiveEdge,
+  isHorizontalFlow,
+  isReverseFlow,
+  isVerticalFlow,
   Rectangle,
   RectangleEdge,
   RECTANGLE_EDGE_BOTTOM,
@@ -40,7 +43,6 @@ import { ExactEntriesOf } from '../../../utils/types';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import NodeHud from './NodeHud';
 import NodeDropArea from './NodeDropArea';
-import { isHorizontalSlot, isReverseSlot, isVerticalSlot } from '../../../utils/pageView';
 
 const RESIZE_SNAP_UNITS = 4; // px
 const SNAP_TO_GRID_COLUMN_MARGIN = 10; // px
@@ -262,8 +264,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const isDraggingPageRow = isPageRow(draggedNode);
       const isDraggingPageColumn = isPageColumn(draggedNode);
 
-      const isDraggingOverHorizontalContainer = dragOverSlot && isHorizontalSlot(dragOverSlot);
-      const isDraggingOverVerticalContainer = dragOverSlot && isVerticalSlot(dragOverSlot);
+      const isDraggingOverHorizontalContainer =
+        dragOverSlot && isHorizontalFlow(dragOverSlot.flowDirection);
+      const isDraggingOverVerticalContainer =
+        dragOverSlot && isVerticalFlow(dragOverSlot.flowDirection);
 
       const isDraggingOverPageRow = appDom.isElement(dragOverNode) && isPageRow(dragOverNode);
 
@@ -389,10 +393,16 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           const parentSlots = parentInfo?.slots;
           const parentSlot = (parentSlots && nodeParentProp && parentSlots[nodeParentProp]) || null;
 
-          const isParentVerticalContainer = parentSlot ? isVerticalSlot(parentSlot) : false;
-          const isParentHorizontalContainer = parentSlot ? isHorizontalSlot(parentSlot) : false;
+          const isParentVerticalContainer = parentSlot
+            ? isVerticalFlow(parentSlot.flowDirection)
+            : false;
+          const isParentHorizontalContainer = parentSlot
+            ? isHorizontalFlow(parentSlot.flowDirection)
+            : false;
 
-          const isParentReverseContainer = parentSlot ? isReverseSlot(parentSlot) : false;
+          const isParentReverseContainer = parentSlot
+            ? isReverseFlow(parentSlot.flowDirection)
+            : false;
 
           let parentGap = 0;
           if (nodesInfo && gapCount > 0) {
@@ -534,7 +544,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         activeDropZone = isDraggingOverEmptyContainer
           ? DROP_ZONE_CENTER
           : getRectangleEdgeDropZone(
-              getRectanglePointEdge(activeDropAreaRect, relativeX, relativeY),
+              getRectanglePointActiveEdge(activeDropAreaRect, relativeX, relativeY),
             );
 
         if (isDraggingOverPage) {
@@ -554,7 +564,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             ? appDom.isPage(activeDropNodeParent)
             : false;
 
-          if (isHorizontalSlot(activeDropSlot)) {
+          if (isHorizontalFlow(activeDropSlot.flowDirection)) {
             if (
               isDraggingOverPageChild &&
               activeDropNodeRect &&
@@ -569,7 +579,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
               activeDropZone = DROP_ZONE_CENTER;
             }
           }
-          if (isVerticalSlot(activeDropSlot)) {
+          if (isVerticalFlow(activeDropSlot.flowDirection)) {
             if (relativeX <= edgeDetectionMargin) {
               activeDropZone = DROP_ZONE_LEFT;
             } else if (activeDropAreaRect.width - relativeX <= edgeDetectionMargin) {
@@ -917,16 +927,18 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         const isDraggingOverRow = isDraggingOverElement && isPageRow(dragOverNode);
 
         const isDraggingOverHorizontalContainer = dragOverSlot
-          ? isHorizontalSlot(dragOverSlot)
+          ? isHorizontalFlow(dragOverSlot.flowDirection)
           : false;
-        const isDraggingOverVerticalContainer = dragOverSlot ? isVerticalSlot(dragOverSlot) : false;
+        const isDraggingOverVerticalContainer = dragOverSlot
+          ? isVerticalFlow(dragOverSlot.flowDirection)
+          : false;
 
         if (dragOverZone === DROP_ZONE_CENTER && dragOverSlotParentProp) {
           addOrMoveNode(draggedNode, dragOverNode, dragOverSlotParentProp);
         }
 
         const isOriginalParentHorizontalContainer = originalParentSlot
-          ? isHorizontalSlot(originalParentSlot)
+          ? isHorizontalFlow(originalParentSlot.flowDirection)
           : false;
 
         if ([DROP_ZONE_TOP, DROP_ZONE_BOTTOM].includes(dragOverZone)) {
@@ -1007,7 +1019,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
 
         const isOriginalParentNonPageVerticalContainer =
-          !isOriginalParentPage && originalParentSlot ? isVerticalSlot(originalParentSlot) : false;
+          !isOriginalParentPage && originalParentSlot
+            ? isVerticalFlow(originalParentSlot.flowDirection)
+            : false;
 
         if ([DROP_ZONE_RIGHT, DROP_ZONE_LEFT].includes(dragOverZone)) {
           if (!isDraggingOverHorizontalContainer) {

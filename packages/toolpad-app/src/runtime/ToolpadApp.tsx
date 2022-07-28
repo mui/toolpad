@@ -19,6 +19,8 @@ import {
   Placeholder,
   BindableAttrValues,
   NodeId,
+  BindableAttrValue,
+  UseDataQueryConfig,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import {
@@ -36,11 +38,12 @@ import {
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
+import { pick } from 'lodash-es';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
+import { getElementNodeComponentId, isPageRow, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';
 import AppOverview from './AppOverview';
-import { getElementNodeComponentId, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   BindingEvaluationResult,
@@ -54,6 +57,13 @@ import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
+
+const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
+  'enabled',
+  'refetchInterval',
+  'refetchOnReconnect',
+  'refetchOnWindowFocus',
+];
 
 export interface NavigateToPage {
   (pageNodeId: NodeId): void;
@@ -252,14 +262,24 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
       : // `undefined` to ensure the defaultProps get picked up
         undefined;
 
+  const layoutProps = React.useMemo(() => {
+    if (appDom.isElement(node) && isPageRow(node)) {
+      return {
+        layoutColumnSizes: childNodes.map((childNode) => childNode.layout?.columnSize?.value),
+      };
+    }
+    return {};
+  }, [childNodes, node]);
+
   const props: Record<string, any> = React.useMemo(() => {
     return {
       ...boundProps,
       ...onChangeHandlers,
       ...eventHandlers,
+      ...layoutProps,
       children: reactChildren,
     };
-  }, [boundProps, eventHandlers, onChangeHandlers, reactChildren]);
+  }, [boundProps, eventHandlers, layoutProps, onChangeHandlers, reactChildren]);
 
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {
@@ -334,11 +354,9 @@ function QueryNode({ node }: QueryNodeProps) {
   const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
-  const queryResult = useDataQuery(dataUrl, queryId, params, {
-    refetchOnWindowFocus: node.attributes.refetchOnWindowFocus?.value,
-    refetchOnReconnect: node.attributes.refetchOnReconnect?.value,
-    refetchInterval: node.attributes.refetchInterval?.value,
-  });
+  const configBindings = pick(node.attributes, ...USE_DATA_QUERY_CONFIG_KEYS);
+  const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
+  const queryResult = useDataQuery(dataUrl, queryId, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;
@@ -358,6 +376,25 @@ function QueryNode({ node }: QueryNodeProps) {
   }, [node.id, queryResult, setControlledBinding]);
 
   return null;
+}
+
+function parseBinding(bindable: BindableAttrValue<any> | undefined, scopePath: string | undefined) {
+  if (bindable?.type === 'const') {
+    return {
+      scopePath,
+      result: { value: bindable.value },
+    };
+  }
+  if (bindable?.type === 'jsExpression') {
+    return {
+      scopePath,
+      expression: bindable.value,
+    };
+  }
+  return {
+    scopePath,
+    result: { value: undefined },
+  };
 }
 
 function parseBindings(
@@ -404,16 +441,8 @@ function parseBindings(
               scopePath,
               result: { value: defaultValue },
             });
-          } else if (binding?.type === 'const') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              result: { value: binding?.value },
-            });
-          } else if (binding?.type === 'jsExpression') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              expression: binding?.value,
-            });
+          } else {
+            parsedBindingsMap.set(bindingId, parseBinding(binding, scopePath));
           }
         }
       }
@@ -424,17 +453,7 @@ function parseBindings(
         for (const [paramName, bindable] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
           const scopePath = `${elm.name}.params.${paramName}`;
-          if (bindable?.type === 'const') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              result: { value: bindable.value },
-            });
-          } else if (bindable?.type === 'jsExpression') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              expression: bindable.value,
-            });
-          }
+          parsedBindingsMap.set(bindingId, parseBinding(bindable, scopePath));
         }
       }
 
@@ -446,6 +465,13 @@ function parseBindings(
           scopePath,
           result: { value, loading: true },
         });
+      }
+
+      for (const configName of USE_DATA_QUERY_CONFIG_KEYS) {
+        const bindingId = `${elm.id}.config.${configName}`;
+        const scopePath = `${elm.name}.config.${configName}`;
+        const bindable = elm.attributes[configName];
+        parsedBindingsMap.set(bindingId, parseBinding(bindable, scopePath));
       }
     }
   }

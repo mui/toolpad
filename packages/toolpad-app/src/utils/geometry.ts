@@ -1,3 +1,5 @@
+import { FlowDirection } from '@mui/toolpad-core';
+
 export interface Rectangle {
   x: number;
   y: number;
@@ -87,6 +89,18 @@ export function absolutePositionCss({ x, y, width, height }: Rectangle): React.C
   return { left: x, top: y, width, height };
 }
 
+export function isHorizontalFlow(flowDirection: FlowDirection): boolean {
+  return flowDirection === 'row' || flowDirection === 'row-reverse';
+}
+
+export function isVerticalFlow(flowDirection: FlowDirection): boolean {
+  return flowDirection === 'column' || flowDirection === 'column-reverse';
+}
+
+export function isReverseFlow(flowDirection: FlowDirection): boolean {
+  return flowDirection === 'row-reverse' || flowDirection === 'column-reverse';
+}
+
 // Returns the bounding client rect of an element against another element.
 export function getRelativeBoundingRect(containerElm: Element, childElm: Element): Rectangle {
   const containerRect = containerElm.getBoundingClientRect();
@@ -140,7 +154,11 @@ export type RectangleEdge =
   | typeof RECTANGLE_EDGE_LEFT
   | typeof RECTANGLE_EDGE_RIGHT;
 
-export function getRectanglePointEdge(rect: Rectangle, x: number, y: number): RectangleEdge | null {
+export function getRectanglePointActiveEdge(
+  rect: Rectangle,
+  x: number,
+  y: number,
+): RectangleEdge | null {
   const { height: rectHeight, width: rectWidth } = rect;
 
   // Out of bounds

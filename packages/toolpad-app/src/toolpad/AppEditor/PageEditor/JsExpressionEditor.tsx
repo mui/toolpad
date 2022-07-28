@@ -19,7 +19,6 @@ export interface JsExpressionEditorProps extends WithControlledProp<string> {
   disabled?: boolean;
   autoFocus?: boolean;
   functionBody?: boolean;
-  topLevelAwait?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
   sx?: SxProps;
@@ -32,7 +31,6 @@ export function JsExpressionEditor({
   disabled,
   autoFocus,
   functionBody,
-  topLevelAwait,
   onFocus,
   onBlur,
   sx,
@@ -61,7 +59,6 @@ export function JsExpressionEditor({
         disabled={disabled}
         extraLibs={extraLibs}
         functionBody={functionBody}
-        topLevelAwait={topLevelAwait}
         onFocus={onFocus}
         onBlur={onBlur}
         autoFocus={autoFocus}

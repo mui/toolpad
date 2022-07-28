@@ -14,8 +14,6 @@ import {
   InputAdornment,
   Divider,
   Toolbar,
-  MenuItem,
-  SxProps,
   Alert,
   Box,
 } from '@mui/material';
@@ -23,7 +21,7 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { LoadingButton } from '@mui/lab';
-import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import { NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -36,13 +34,12 @@ import { omit, update } from '../../../utils/immutability';
 import client from '../../../api';
 import ErrorAlert from './ErrorAlert';
 import { JsExpressionEditor } from './JsExpressionEditor';
-import { useEvaluateLiveBinding, useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
-import { WithControlledProp } from '../../../utils/types';
+import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 import { useDom, useDomApi } from '../../DomLoader';
 import { mapValues } from '../../../utils/collections';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
-import BindableEditor from './BindableEditor';
+import ConnectionSelect from './ConnectionSelect';
 
 const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
   'rest',
@@ -50,48 +47,6 @@ const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
   'postgres',
   'movies',
 ]);
-
-export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
-  dataSource?: string;
-  sx?: SxProps;
-}
-
-export function ConnectionSelect({ sx, dataSource, value, onChange }: ConnectionSelectProps) {
-  const dom = useDom();
-
-  const app = appDom.getApp(dom);
-  const { connections = [] } = appDom.getChildNodes(dom, app);
-
-  const filtered = React.useMemo(() => {
-    return dataSource
-      ? connections.filter((connection) => connection.attributes.dataSource.value === dataSource)
-      : connections;
-  }, [connections, dataSource]);
-
-  const handleSelectionChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange((event.target.value as NodeId) || null);
-    },
-    [onChange],
-  );
-
-  return (
-    <TextField
-      sx={sx}
-      select
-      fullWidth
-      value={value || ''}
-      label="Connection"
-      onChange={handleSelectionChange}
-    >
-      {filtered.map((connection) => (
-        <MenuItem key={connection.id} value={connection.id}>
-          {connection.name} | {connection.attributes.dataSource.value}
-        </MenuItem>
-      ))}
-    </TextField>
-  );
-}
 
 function refetchIntervalInSeconds(maybeInterval?: number) {
   if (typeof maybeInterval !== 'number') {
@@ -238,16 +193,6 @@ function QueryNodeEditorDialog<Q, P>({
     [],
   );
 
-  const handleEnabledChange = React.useCallback((newValue: BindableAttrValue<boolean> | null) => {
-    setInput((existing) =>
-      update(existing, {
-        attributes: update(existing.attributes, {
-          enabled: newValue || undefined,
-        }),
-      }),
-    );
-  }, []);
-
   const handleRefetchOnReconnectChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setInput((existing) =>
@@ -331,11 +276,6 @@ function QueryNodeEditorDialog<Q, P>({
   }, [onClose, isInputSaved]);
 
   const queryEditorContext = React.useMemo(() => ({ appId, connectionId }), [appId, connectionId]);
-
-  const liveEnabled = useEvaluateLiveBinding({
-    input: input.attributes.enabled || null,
-    globalScope: pageState,
-  });
 
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
@@ -466,15 +406,6 @@ function QueryNodeEditorDialog<Q, P>({
           </Box>
 
           <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
-            <BindableEditor
-              liveBinding={liveEnabled}
-              globalScope={pageState}
-              server
-              label="Enabled"
-              propType={{ type: 'boolean' }}
-              value={input.attributes.enabled ?? null}
-              onChange={handleEnabledChange}
-            />
             <FormControlLabel
               control={
                 <Checkbox

@@ -169,7 +169,6 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
           value={value?.value || ''}
           onChange={handleCodeChange}
           functionBody
-          topLevelAwait
         />
       </Box>
     </Box>

@@ -43,7 +43,8 @@ type AppDomNodeType =
   | 'page'
   | 'element'
   | 'codeComponent'
-  | 'query';
+  | 'query'
+  | 'mutation';
 
 interface AppDomNodeBase {
   readonly id: NodeId;
@@ -113,7 +114,16 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
-    readonly enabled?: BindableAttrValue<boolean>;
+  };
+}
+
+export interface MutationNode<Q = any, P = any> extends AppDomNodeBase {
+  readonly type: 'mutation';
+  readonly params?: BindableAttrValues<P>;
+  readonly attributes: {
+    readonly dataSource?: ConstantAttrValue<string>;
+    readonly connectionId: ConstantAttrValue<NodeId>;
+    readonly query: ConstantAttrValue<Q>;
   };
 }
 
@@ -125,6 +135,7 @@ type AppDomNodeOfType<K extends AppDomNodeType> = {
   element: ElementNode;
   codeComponent: CodeComponentNode;
   query: QueryNode;
+  mutation: MutationNode;
 }[K];
 
 type AllowedChildren = {
@@ -139,12 +150,14 @@ type AllowedChildren = {
   page: {
     children: 'element';
     queries: 'query';
+    mutations: 'mutation';
   };
   element: {
     [prop: string]: 'element';
   };
   codeComponent: {};
   query: {};
+  mutation: {};
 };
 
 export type AppDomNode = AppDomNodeOfType<AppDomNodeType>;
@@ -301,6 +314,14 @@ export function isQuery<P>(node: AppDomNode): node is QueryNode<P> {
 
 export function assertIsQuery<P>(node: AppDomNode): asserts node is QueryNode<P> {
   assertIsType<QueryNode>(node, 'query');
+}
+
+export function isMutation<P>(node: AppDomNode): node is MutationNode<P> {
+  return isType<MutationNode>(node, 'mutation');
+}
+
+export function assertIsMutation<P>(node: AppDomNode): asserts node is MutationNode<P> {
+  assertIsType<MutationNode>(node, 'mutation');
 }
 
 export function getApp(dom: AppDom): AppNode {
@@ -780,7 +801,15 @@ export function getNewParentIndexAfterNode(
   return createFractionalIndex(node.parentIndex, nodeAfter?.parentIndex || null);
 }
 
-const RENDERTREE_NODES = ['app', 'page', 'element', 'query', 'theme', 'codeComponent'] as const;
+const RENDERTREE_NODES = [
+  'app',
+  'page',
+  'element',
+  'query',
+  'mutation',
+  'theme',
+  'codeComponent',
+] as const;
 
 export type RenderTreeNodeType = typeof RENDERTREE_NODES[number];
 export type RenderTreeNode = { [K in RenderTreeNodeType]: AppDomNodeOfType<K> }[RenderTreeNodeType];

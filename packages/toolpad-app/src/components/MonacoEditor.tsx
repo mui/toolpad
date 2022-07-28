@@ -9,8 +9,21 @@ import { styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
 import cuid from 'cuid';
 import invariant from 'invariant';
+import {
+  conf as jsonBasicConf,
+  language as jsonBasicLanguage,
+} from 'monaco-editor/esm/vs/basic-languages/javascript/javascript';
+import {
+  conf as typescriptBasicConf,
+  language as typescriptBasicLanguage,
+} from 'monaco-editor/esm/vs/basic-languages/typescript/typescript';
 import monacoEditorTheme from '../monacoEditorTheme';
 import muiTheme from '../theme';
+
+export interface ExtraLib {
+  content: string;
+  filePath?: string;
+}
 
 function getExtension(language: string): string {
   switch (language) {
@@ -58,6 +71,29 @@ window.MonacoEnvironment = {
   },
 } as monaco.Environment;
 
+function registerLanguage(
+  langId: string,
+  language: monaco.languages.IMonarchLanguage,
+  conf: monaco.languages.LanguageConfiguration,
+) {
+  monaco.languages.register({ id: langId });
+  monaco.languages.registerTokensProviderFactory(langId, {
+    create: async (): Promise<monaco.languages.IMonarchLanguage> => language,
+  });
+  monaco.languages.onLanguage(langId, async () => {
+    monaco.languages.setLanguageConfiguration(langId, conf);
+  });
+}
+
+/**
+ * Monaco language services are singletons, we can't set language options per editor instance.
+ * We're working around this limitiation by only considering diagnostics for the focused editor.
+ * Unfocused editors will be configured with a syntax-coloring-only language which are registered below.
+ * See https://github.com/microsoft/monaco-editor/issues/1105
+ */
+registerLanguage('jsonBasic', jsonBasicLanguage, jsonBasicConf);
+registerLanguage('typescriptBasic', typescriptBasicLanguage, typescriptBasicConf);
+
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   target: monaco.languages.typescript.ScriptTarget.Latest,
   allowNonTsExtensions: true,
@@ -71,10 +107,35 @@ monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   typeRoots: ['node_modules/@types'],
 });
 
-monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+const JSON_DEFAULT_DIAGNOSTICS_OPTIONS: monaco.languages.json.DiagnosticsOptions = {};
+
+monaco.languages.json.jsonDefaults.setDiagnosticsOptions(JSON_DEFAULT_DIAGNOSTICS_OPTIONS);
+
+const TYPESCRIPT_DEFAULT_DIAGNOSTICS_OPTIONS: monaco.languages.typescript.DiagnosticsOptions = {
   noSemanticValidation: false,
   noSyntaxValidation: false,
-});
+};
+
+monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions(
+  TYPESCRIPT_DEFAULT_DIAGNOSTICS_OPTIONS,
+);
+
+const TYPESCRIPT_DEFAULT_COMPILER_OPTIONS: monaco.languages.typescript.CompilerOptions = {
+  target: monaco.languages.typescript.ScriptTarget.Latest,
+  allowNonTsExtensions: true,
+  moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+  module: monaco.languages.typescript.ModuleKind.CommonJS,
+  noEmit: true,
+  esModuleInterop: true,
+  jsx: monaco.languages.typescript.JsxEmit.React,
+  reactNamespace: 'React',
+  allowJs: true,
+  typeRoots: ['node_modules/@types'],
+};
+
+monaco.languages.typescript.typescriptDefaults.setCompilerOptions(
+  TYPESCRIPT_DEFAULT_COMPILER_OPTIONS,
+);
 
 const classes = {
   monacoHost: 'Toolpad_MonacoEditorMonacoHost',
@@ -128,18 +189,39 @@ export interface MonacoEditorHandle {
 
 type EditorOptions = monaco.editor.IEditorOptions & monaco.editor.IGlobalEditorOptions;
 
-export interface MonacoEditorProps {
+interface MonacoEditorBaseProps {
   value?: string;
   onChange?: (newValue: string) => void;
   disabled?: boolean;
   sx?: SxProps;
   autoFocus?: boolean;
-  language?: string;
   onFocus?: () => void;
   onBlur?: () => void;
   options?: EditorOptions;
   className?: string;
 }
+
+export type MonacoEditorProps = MonacoEditorBaseProps &
+  (
+    | {
+        language?: 'typescript' | undefined;
+        diagnostics?: monaco.languages.typescript.DiagnosticsOptions;
+        compilerOptions?: monaco.languages.typescript.CompilerOptions | undefined;
+        extraLibs?: ExtraLib[];
+      }
+    | {
+        language: 'json';
+        diagnostics?: monaco.languages.json.DiagnosticsOptions;
+        compilerOptions?: undefined;
+        extraLibs?: undefined;
+      }
+    | {
+        language: 'css';
+        diagnostics?: undefined;
+        compilerOptions?: undefined;
+        extraLibs?: undefined;
+      }
+  );
 
 export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function MonacoEditor(
   {
@@ -147,6 +229,9 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
     onChange,
     sx,
     language = 'typescript',
+    diagnostics,
+    compilerOptions,
+    extraLibs,
     onFocus,
     onBlur,
     className,
@@ -159,6 +244,50 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
   const rootRef = React.useRef<HTMLDivElement>(null);
   const instanceRef = React.useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
+  const [isFocused, setIsFocused] = React.useState(false);
+
+  React.useEffect(() => {
+    /**
+     * Update the language and diagnostics of the currently focused editor. Non-focused editors
+     * will get a syntax-coloring-only version of the language.
+     * This is our workaround for having different diagnostics options per editor instance.
+     * See https://github.com/microsoft/monaco-editor/issues/1105
+     */
+    const model = instanceRef.current?.getModel();
+    if (!model) {
+      return;
+    }
+
+    if (language === 'json') {
+      if (isFocused) {
+        monaco.editor.setModelLanguage(model, 'json');
+        monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+          ...JSON_DEFAULT_DIAGNOSTICS_OPTIONS,
+          ...(diagnostics as monaco.languages.json.DiagnosticsOptions),
+        });
+      } else {
+        monaco.editor.setModelLanguage(model, 'jsonBasic');
+      }
+    } else if (language === 'typescript') {
+      if (isFocused) {
+        monaco.editor.setModelLanguage(model, 'typescript');
+        monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+          ...TYPESCRIPT_DEFAULT_DIAGNOSTICS_OPTIONS,
+          ...(diagnostics as monaco.languages.typescript.DiagnosticsOptions),
+        });
+        monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+          ...TYPESCRIPT_DEFAULT_COMPILER_OPTIONS,
+          ...compilerOptions,
+        });
+        monaco.languages.typescript.typescriptDefaults.setExtraLibs(extraLibs || []);
+      } else {
+        monaco.editor.setModelLanguage(model, 'typescriptBasic');
+      }
+    } else {
+      monaco.editor.setModelLanguage(model, language);
+    }
+  }, [isFocused, language, diagnostics, extraLibs, compilerOptions]);
+
   React.useEffect(() => {
     invariant(rootRef.current, 'Ref not attached');
 
@@ -167,20 +296,22 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
       ...options,
     };
 
-    if (instanceRef.current) {
+    let instance = instanceRef.current;
+
+    if (instance) {
       if (extraOptions) {
-        instanceRef.current.updateOptions(extraOptions);
+        instance.updateOptions(extraOptions);
       }
 
-      const model = instanceRef.current.getModel();
+      const model = instance.getModel();
       if (typeof value === 'string' && model) {
         const actualValue = model.getValue();
 
         if (value !== actualValue) {
           // Used to restore cursor position
-          const state = instanceRef.current.saveViewState();
+          const state = instance.saveViewState();
 
-          instanceRef.current.executeEdits(null, [
+          instance.executeEdits(null, [
             {
               range: model.getFullModelRange(),
               text: value,
@@ -188,7 +319,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
           ]);
 
           if (state) {
-            instanceRef.current.restoreViewState(state);
+            instance.restoreViewState(state);
           }
         }
       }
@@ -196,7 +327,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
       const pathUri = monaco.Uri.parse(`./scripts/${cuid()}${getExtension(language)}`);
       const model = monaco.editor.createModel(value || '', language, pathUri);
 
-      instanceRef.current = monaco.editor.create(rootRef.current, {
+      instance = monaco.editor.create(rootRef.current, {
         model,
         language,
         minimap: { enabled: false },
@@ -210,8 +341,13 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         ...extraOptions,
       });
 
+      instanceRef.current = instance;
+
+      instance.onDidFocusEditorWidget(() => setIsFocused(true));
+      instance.onDidBlurEditorWidget(() => setIsFocused(false));
+
       if (autoFocus && !disabled) {
-        instanceRef.current.focus();
+        instance.focus();
       }
     }
   }, [language, value, options, disabled, autoFocus]);

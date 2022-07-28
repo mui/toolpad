@@ -12,6 +12,11 @@ async function fetchData(dataUrl: string, queryId: string, params: any) {
   return res.json();
 }
 
+export type UseDataQueryConfig = Pick<
+  UseQueryOptions<any, unknown, unknown, any[]>,
+  'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
+>;
+
 export interface UseDataQuery {
   isLoading: boolean;
   isFetching: boolean;
@@ -37,10 +42,7 @@ export function useDataQuery(
   dataUrl: string,
   queryId: string | null,
   params: any,
-  options: Pick<
-    UseQueryOptions<any, unknown, unknown, any[]>,
-    'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
-  >,
+  { enabled = true, ...options }: UseDataQueryConfig,
 ): UseDataQuery {
   const {
     isLoading,
@@ -50,7 +52,7 @@ export function useDataQuery(
     refetch,
   } = useQuery([dataUrl, queryId, params], () => queryId && fetchData(dataUrl, queryId, params), {
     ...options,
-    enabled: !!queryId,
+    enabled: !!queryId && enabled,
   });
 
   const { data } = responseData;
@@ -59,14 +61,14 @@ export function useDataQuery(
 
   const result: UseDataQuery = React.useMemo(
     () => ({
-      isLoading,
+      isLoading: isLoading && enabled,
       isFetching,
       error,
       data,
       rows,
       refetch,
     }),
-    [isLoading, isFetching, error, data, rows, refetch],
+    [isLoading, enabled, isFetching, error, data, rows, refetch],
   );
 
   return result;

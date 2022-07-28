@@ -69,7 +69,8 @@ const overlayClasses = {
   nodeHud: 'Toolpad_NodeHud',
   container: 'Toolpad_Container',
   componentDragging: 'Toolpad_ComponentDragging',
-  resize: 'Toolpad_Resize',
+  resizeHorizontal: 'Toolpad_ResizeHorizontal',
+  resizeVertical: 'Toolpad_ResizeVertical',
   hudOverlay: 'Toolpad_HudOverlay',
 };
 
@@ -83,8 +84,11 @@ const OverlayRoot = styled('div')({
   [`&.${overlayClasses.componentDragging}`]: {
     cursor: 'copy',
   },
-  [`&.${overlayClasses.resize}`]: {
+  [`&.${overlayClasses.resizeHorizontal}`]: {
     cursor: 'ew-resize',
+  },
+  [`&.${overlayClasses.resizeVertical}`]: {
+    cursor: 'ns-resize',
   },
   [`.${overlayClasses.hudOverlay}`]: {
     position: 'absolute',
@@ -1508,7 +1512,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           <OverlayRoot
             className={clsx({
               [overlayClasses.componentDragging]: isDraggingOver,
-              [overlayClasses.resize]: draggedEdge,
+              [overlayClasses.resizeHorizontal]:
+                draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT,
+              [overlayClasses.resizeVertical]:
+                draggedEdge === RECTANGLE_EDGE_TOP || draggedEdge === RECTANGLE_EDGE_BOTTOM,
             })}
             // Need this to be able to capture key events
             tabIndex={0}

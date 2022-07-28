@@ -71,27 +71,28 @@ window.MonacoEnvironment = {
   },
 } as monaco.Environment;
 
+function registerLanguage(
+  langId: string,
+  language: monaco.languages.IMonarchLanguage,
+  conf: monaco.languages.LanguageConfiguration,
+) {
+  monaco.languages.register({ id: langId });
+  monaco.languages.registerTokensProviderFactory(langId, {
+    create: async (): Promise<monaco.languages.IMonarchLanguage> => language,
+  });
+  monaco.languages.onLanguage(langId, async () => {
+    monaco.languages.setLanguageConfiguration(langId, conf);
+  });
+}
+
 /**
  * Monaco language services are singletons, we can't set language options per editor instance.
  * We're working around this limitiation by only considering diagnostics for the focused editor.
  * Unfocused editors will be configured with a syntax-coloring-only language which are registered below.
  * See https://github.com/microsoft/monaco-editor/issues/1105
  */
-monaco.languages.register({ id: 'jsonBasic' });
-monaco.languages.registerTokensProviderFactory('jsonBasic', {
-  create: async (): Promise<monaco.languages.IMonarchLanguage> => jsonBasicLanguage,
-});
-monaco.languages.onLanguage('jsonBasic', async () => {
-  monaco.languages.setLanguageConfiguration('jsonBasic', jsonBasicConf);
-});
-
-monaco.languages.register({ id: 'typescriptBasic' });
-monaco.languages.registerTokensProviderFactory('typescriptBasic', {
-  create: async (): Promise<monaco.languages.IMonarchLanguage> => typescriptBasicLanguage,
-});
-monaco.languages.onLanguage('typescriptBasic', async () => {
-  monaco.languages.setLanguageConfiguration('typescriptBasic', typescriptBasicConf);
-});
+registerLanguage('jsonBasic', jsonBasicLanguage, jsonBasicConf);
+registerLanguage('typescriptBasic', typescriptBasicLanguage, typescriptBasicConf);
 
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   target: monaco.languages.typescript.ScriptTarget.Latest,

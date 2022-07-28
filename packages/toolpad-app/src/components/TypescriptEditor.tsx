@@ -3,12 +3,12 @@
  */
 
 import * as React from 'react';
-import MonacoEditor, { MonacoEditorHandle, MonacoEditorProps } from './MonacoEditor';
+import type * as monaco from 'monaco-editor';
+import MonacoEditor, { MonacoEditorProps } from './MonacoEditor';
 
-export interface TypescriptEditorProps extends Omit<MonacoEditorProps, 'language'> {
+export interface TypescriptEditorProps extends Omit<MonacoEditorProps, 'language' | 'diagnostics'> {
   value: string;
   onChange: (newValue: string) => void;
-  extraLibs?: { content: string; filePath?: string }[];
   functionBody?: boolean;
   topLevelAwait?: boolean;
 }
@@ -32,15 +32,5 @@ export default function TypescriptEditor({
     return { diagnosticCodesToIgnore };
   }, [functionBody, topLevelAwait]);
 
-  React.useEffect(() => {
-    editorRef.current?.monaco.languages.typescript.typescriptDefaults.setExtraLibs(extraLibs || []);
-  }, [extraLibs]);
-
-  React.useEffect(() => {
-    editorRef.current?.monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-      diagnosticCodesToIgnore: functionBody ? [1108, 1375] : [],
-    });
-  }, [functionBody]);
-
-  return <MonacoEditor ref={editorRef} language="typescript" {...props} />;
+  return <MonacoEditor language="typescript" diagnostics={diagnostics} {...props} />;
 }

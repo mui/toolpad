@@ -9,9 +9,11 @@ import ToolpadHero from '../../src/components/landing/ToolpadHero';
 import CardGrid from '../../src/components/landing/CardGrid';
 import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
+import Marquee from '../../src/components/landing/Marquee';
 import features from '../../src/content/features';
 import upvote from '../../src/content/upvote';
 import useCases from '../../src/content/useCases';
+import marquee from '../../src/content/marquee';
 import {
   plans,
   planInfo,
@@ -43,6 +45,7 @@ export default function Home() {
           commercialData={commercialData}
           communityData={communityData}
         />
+        <Marquee content={marquee} />
       </main>
       <AppFooter />
     </BrandingProvider>

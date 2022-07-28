@@ -94,19 +94,6 @@ function registerLanguage(
 registerLanguage('jsonBasic', jsonBasicLanguage, jsonBasicConf);
 registerLanguage('typescriptBasic', typescriptBasicLanguage, typescriptBasicConf);
 
-monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-  target: monaco.languages.typescript.ScriptTarget.Latest,
-  allowNonTsExtensions: true,
-  moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-  module: monaco.languages.typescript.ModuleKind.CommonJS,
-  noEmit: true,
-  esModuleInterop: true,
-  jsx: monaco.languages.typescript.JsxEmit.React,
-  reactNamespace: 'React',
-  allowJs: true,
-  typeRoots: ['node_modules/@types'],
-});
-
 const JSON_DEFAULT_DIAGNOSTICS_OPTIONS: monaco.languages.json.DiagnosticsOptions = {};
 
 monaco.languages.json.jsonDefaults.setDiagnosticsOptions(JSON_DEFAULT_DIAGNOSTICS_OPTIONS);
@@ -124,7 +111,7 @@ const TYPESCRIPT_DEFAULT_COMPILER_OPTIONS: monaco.languages.typescript.CompilerO
   target: monaco.languages.typescript.ScriptTarget.Latest,
   allowNonTsExtensions: true,
   moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-  module: monaco.languages.typescript.ModuleKind.CommonJS,
+  module: monaco.languages.typescript.ModuleKind.ESNext,
   noEmit: true,
   esModuleInterop: true,
   jsx: monaco.languages.typescript.JsxEmit.React,

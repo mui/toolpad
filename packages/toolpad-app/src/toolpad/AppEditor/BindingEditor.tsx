@@ -168,6 +168,8 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
           globalScope={globalScope}
           value={value?.value || ''}
           onChange={handleCodeChange}
+          functionBody
+          topLevelAwait
         />
       </Box>
     </Box>

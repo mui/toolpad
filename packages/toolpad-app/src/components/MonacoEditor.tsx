@@ -58,7 +58,43 @@ window.MonacoEnvironment = {
   },
 } as monaco.Environment;
 
-monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+function registerLanguage(
+  langId: string,
+  language: monaco.languages.IMonarchLanguage,
+  conf: monaco.languages.LanguageConfiguration,
+) {
+  monaco.languages.register({ id: langId });
+  monaco.languages.registerTokensProviderFactory(langId, {
+    create: async (): Promise<monaco.languages.IMonarchLanguage> => language,
+  });
+  monaco.languages.onLanguage(langId, async () => {
+    monaco.languages.setLanguageConfiguration(langId, conf);
+  });
+}
+
+/**
+ * Monaco language services are singletons, we can't set language options per editor instance.
+ * We're working around this limitiation by only considering diagnostics for the focused editor.
+ * Unfocused editors will be configured with a syntax-coloring-only language which are registered below.
+ * See https://github.com/microsoft/monaco-editor/issues/1105
+ */
+registerLanguage('jsonBasic', jsonBasicLanguage, jsonBasicConf);
+registerLanguage('typescriptBasic', typescriptBasicLanguage, typescriptBasicConf);
+
+const JSON_DEFAULT_DIAGNOSTICS_OPTIONS: monaco.languages.json.DiagnosticsOptions = {};
+
+monaco.languages.json.jsonDefaults.setDiagnosticsOptions(JSON_DEFAULT_DIAGNOSTICS_OPTIONS);
+
+const TYPESCRIPT_DEFAULT_DIAGNOSTICS_OPTIONS: monaco.languages.typescript.DiagnosticsOptions = {
+  noSemanticValidation: false,
+  noSyntaxValidation: false,
+};
+
+monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions(
+  TYPESCRIPT_DEFAULT_DIAGNOSTICS_OPTIONS,
+);
+
+const TYPESCRIPT_DEFAULT_COMPILER_OPTIONS: monaco.languages.typescript.CompilerOptions = {
   target: monaco.languages.typescript.ScriptTarget.Latest,
   allowNonTsExtensions: true,
   moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
@@ -69,12 +105,11 @@ monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   reactNamespace: 'React',
   allowJs: true,
   typeRoots: ['node_modules/@types'],
-});
+};
 
-monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-  noSemanticValidation: false,
-  noSyntaxValidation: false,
-});
+monaco.languages.typescript.typescriptDefaults.setCompilerOptions(
+  TYPESCRIPT_DEFAULT_COMPILER_OPTIONS,
+);
 
 const classes = {
   monacoHost: 'Toolpad_MonacoEditorMonacoHost',

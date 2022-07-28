@@ -7,7 +7,7 @@ import type * as monaco from 'monaco-editor';
 import MonacoEditor, { MonacoEditorProps } from './MonacoEditor';
 
 export interface JsonEditorProps
-  extends Omit<MonacoEditorProps, 'language' | 'diagnostics' | 'extraLibs'> {
+  extends Omit<MonacoEditorProps, 'language' | 'diagnostics' | 'extraLibs' | 'compilerOptions'> {
   schemaUri?: string;
 }
 

@@ -1,3 +1,5 @@
+import { FlowDirection } from '@mui/toolpad-core';
+
 export interface Rectangle {
   x: number;
   y: number;
@@ -87,6 +89,18 @@ export function absolutePositionCss({ x, y, width, height }: Rectangle): React.C
   return { left: x, top: y, width, height };
 }
 
+export function isHorizontalFlow(flowDirection: FlowDirection): boolean {
+  return flowDirection === 'row' || flowDirection === 'row-reverse';
+}
+
+export function isVerticalFlow(flowDirection: FlowDirection): boolean {
+  return flowDirection === 'column' || flowDirection === 'column-reverse';
+}
+
+export function isReverseFlow(flowDirection: FlowDirection): boolean {
+  return flowDirection === 'row-reverse' || flowDirection === 'column-reverse';
+}
+
 // Returns the bounding client rect of an element against another element.
 export function getRelativeBoundingRect(containerElm: Element, childElm: Element): Rectangle {
   const containerRect = containerElm.getBoundingClientRect();
@@ -128,4 +142,41 @@ export function getRelativeOuterRect(containerElm: Element, childElm: Element): 
 
 export function rectContainsPoint(rect: Rectangle, x: number, y: number): boolean {
   return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
+}
+
+export const RECTANGLE_EDGE_TOP = 'top';
+export const RECTANGLE_EDGE_BOTTOM = 'bottom';
+export const RECTANGLE_EDGE_LEFT = 'left';
+export const RECTANGLE_EDGE_RIGHT = 'right';
+export type RectangleEdge =
+  | typeof RECTANGLE_EDGE_TOP
+  | typeof RECTANGLE_EDGE_BOTTOM
+  | typeof RECTANGLE_EDGE_LEFT
+  | typeof RECTANGLE_EDGE_RIGHT;
+
+export function getRectanglePointActiveEdge(
+  rect: Rectangle,
+  x: number,
+  y: number,
+): RectangleEdge | null {
+  const { height: rectHeight, width: rectWidth } = rect;
+
+  // Out of bounds
+  if (x < 0 || x > rectWidth || y < 0 || y > rectHeight) {
+    return null;
+  }
+
+  const isOverFirstDiagonal = y < (rectHeight / rectWidth) * x;
+  const isOverSecondDiagonal = y < -1 * (rectHeight / rectWidth) * x + rectHeight;
+
+  if (isOverFirstDiagonal && isOverSecondDiagonal) {
+    return RECTANGLE_EDGE_TOP;
+  }
+  if (isOverFirstDiagonal) {
+    return RECTANGLE_EDGE_RIGHT;
+  }
+  if (isOverSecondDiagonal) {
+    return RECTANGLE_EDGE_LEFT;
+  }
+  return RECTANGLE_EDGE_BOTTOM;
 }

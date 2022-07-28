@@ -1,3 +1,5 @@
+# Notes
+
 ## As a developer, what do I dislike about low-code tools?
 
 What I usually don't like about low-code tools **as a developer**:
@@ -55,7 +57,7 @@ Take aways:
 
 - having to always keep performance in the back of the head?
 
-## Random:
+## Random
 
 - What if a low-code tool compiles down to a Next.js app?
 - empowering low-tech users or automating high-tech user's work?

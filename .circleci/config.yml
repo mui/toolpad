@@ -117,7 +117,9 @@ jobs:
       - run:
           name: Lint JSON
           command: yarn jsonlint
-
+      - run:
+          name: Lint Markdown
+          command: yarn markdownlint
   test_static:
     <<: *defaults
     steps:
@@ -169,7 +171,7 @@ jobs:
           command: |
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
             TAG=$CIRCLE_SHA1 docker-compose -f ./docker/compose/docker-compose.yml up -d
-            yarn workspace @mui/toolpad-app waitForApp
+            yarn workspace @mui/toolpad-app waitForApp --url=http://172.17.0.1:3000/
             docker run -it --rm \
               --ipc=host \
               -v "$CIRCLE_WORKING_DIRECTORY:/tests" \

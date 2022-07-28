@@ -1,3 +1,4 @@
+import invariant from 'invariant';
 import {
   QueryClient,
   useMutation,
@@ -54,19 +55,17 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfG
   );
 }
 
+export interface UseQueryFnOptions<F extends (...args: any[]) => any>
+  extends Omit<
+    UseQueryOptions<Awaited<ReturnType<F>>, unknown, Awaited<ReturnType<F>>, any[]>,
+    'queryKey' | 'queryFn' | 'enabled'
+  > {}
+
 interface UseQueryFn<M extends MethodsGroup> {
   <K extends keyof M & string>(
     name: K,
     params: Parameters<M[K]> | null,
-    options?: Omit<
-      UseQueryOptions<
-        Awaited<ReturnType<M[K]>>,
-        unknown,
-        Awaited<ReturnType<M[K]>>,
-        [K, Parameters<M[K]> | null]
-      >,
-      'queryKey' | 'queryFn' | 'enabled'
-    >,
+    options?: UseQueryFnOptions<M[K]>,
   ): UseQueryResult<Awaited<ReturnType<M[K]>>>;
 }
 
@@ -105,9 +104,7 @@ function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> 
         enabled: !!params,
         queryKey: [key, params],
         queryFn: () => {
-          if (!params) {
-            throw new Error(`Invariant: "enabled" prop of useQuery should prevent this call'`);
-          }
+          invariant(params, `"enabled" prop of useQuery should prevent this call'`);
           return query[key](...params);
         },
       });

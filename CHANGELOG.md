@@ -1,5 +1,98 @@
 # Changelog
 
+## v0.0.10
+
+<!-- generated comparing v0.0.9..master -->
+
+_Jul 22, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Getting a first version of the docs app working. Fixes to the UI on the application overview, thanks to our new team member @bytasv!
+
+- &#8203;<!-- 5 -->Fix app name overflow (#672) @bytasv
+- &#8203;<!-- 4 -->Add fetch polyfills to jest (#669) @Janpot
+- &#8203;<!-- 3 -->[docs] Fix Next.js hosting on mui.com (#661) @bharatkashyap
+- &#8203;<!-- 2 -->[docs] Lint markdown (#675) @oliviertassinari
+- &#8203;<!-- 1 -->[docs] Bootstrap docs/landing page site (#542) @bharatkashyap
+
+All contributors of this release in alphabetical order: @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
+## v0.0.9
+
+<!-- generated comparing v0.0.8..master -->
+
+_Jul 14, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Refine the drag & drop UX, optimize usage of `googleapis`, add new serverless function datasource.
+
+- &#8203;<!-- 16 -->Move the toolpad app out of the components folder (#657) @Janpot
+- &#8203;<!-- 15 -->Support serverless Function datasource (#641) @Janpot
+- &#8203;<!-- 14 -->Move control of spacing into the datasource QueryEditor (#656) @Janpot
+- &#8203;<!-- 13 -->Rework query editor layout (#655) @Janpot
+- &#8203;<!-- 12 -->Update usePrivateQuery options to follow useQuery options (#654) @Janpot
+- &#8203;<!-- 11 -->Fix Overlay sizing (#543) @Janpot
+- &#8203;<!-- 10 -->Make sure Monaco resizes with its container (#653) @Janpot
+- &#8203;<!-- 09 -->Fix sizing inside columns (#650) @apedroferreira
+- &#8203;<!-- 08 -->Preview query button (#647) @bharatkashyap
+- &#8203;<!-- 07 -->Extract canvas logic in top level layout (#644) @Janpot
+- &#8203;<!-- 06 -->Replace `googleapis` with individual pacakges (#648) @bharatkashyap
+- &#8203;<!-- 05 -->Avoid crash when a query is edited for a non-existing datasource (#640) @Janpot
+- &#8203;<!-- 04 -->Fix the list in setup docs (#643) @Janpot
+- &#8203;<!-- 03 -->Remove MonacoEditor path property (#639) @Janpot
+- &#8203;<!-- 02 -->Bag of tweaks (#637) @Janpot
+- &#8203;<!-- 01 -->Fixes and remove unneeded stylings in recent visual editor update (#638) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot
+
+## v0.0.8
+
+<!-- generated comparing v0.0.7..master -->
+
+_Jul 6, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Improve the drag&drop UX of the visual editor. Add more functionality to the Application overview page. Make the release process more intuitive.
+
+- &#8203;<!-- 33 -->Make sure to only send frontend dom nodes to the browser (#635) @Janpot
+- &#8203;<!-- 32 -->Improve visual editor UX (#466) @apedroferreira
+- &#8203;<!-- 31 -->Add instructions on configuring a different port in dev mode (#629) @Janpot
+- &#8203;<!-- 30 -->Fix expression editor for code actions (#633) @Janpot
+- &#8203;<!-- 29 -->Fix height issues with application root element (#634) @Janpot
+- &#8203;<!-- 28 -->Hide preview banner on deployed pages (#630) @Janpot
+- &#8203;<!-- 27 -->Fix no-restricted-syntax not applying to some files (#632) @Janpot
+- &#8203;<!-- 26 -->Make monaco editor work offline (#619) @Janpot
+- &#8203;<!-- 25 -->Add missing node-fetch dependency (#627) @Janpot
+- &#8203;<!-- 24 -->Dom loader suspense (#625) @Janpot
+- &#8203;<!-- 23 -->Use next.config.mjs (#626) @Janpot
+- &#8203;<!-- 22 -->Add demo mode (#607) @Janpot
+- &#8203;<!-- 21 -->Memoize selectionModel in DataGrid (#616) @Janpot
+- &#8203;<!-- 20 -->Use pull tag push strategy to fix released docker images (#623) @Janpot
+- &#8203;<!-- 19 -->Migrate to prisma v4 (#622) @Janpot
+- &#8203;<!-- 18 -->Upgrade to latest Next.js (#620) @Janpot
+- &#8203;<!-- 17 -->reset binding dialog on open (#621) @Janpot
+- &#8203;<!-- 16 -->Add banner to the app when running in preview mode (#608) @Janpot
+- &#8203;<!-- 15 -->Persist component panel size (#604) @Janpot
+- &#8203;<!-- 14 -->Remove some obsolete components (#605) @Janpot
+- &#8203;<!-- 13 -->Add screenshot to README (#601) @Janpot
+- &#8203;<!-- 12 -->Introduce running actions on events (#565) @Janpot
+- &#8203;<!-- 11 -->Enforce yarn for usage with the monorepo (#599) @Janpot
+- &#8203;<!-- 10 -->Upgrade dependencies (#600) @Janpot
+- &#8203;<!-- 09 -->App card enhancements (#591) @bharatkashyap
+- &#8203;<!-- 08 -->Enhance release flow (#583) @Janpot
+- &#8203;<!-- 07 -->Expand e2e test to create/delete an app (#597) @Janpot
+- &#8203;<!-- 06 -->Remove submit from buttons (#596) @Janpot
+- &#8203;<!-- 05 -->Upgrade next.js (#595) @Janpot
+- &#8203;<!-- 04 -->Add codeFrame to compiler errors (#593) @Janpot
+- &#8203;<!-- 03 -->Get rid of next.js custom server (#452) @Janpot
+- &#8203;<!-- 02 -->Fix some type issues coming up with React 18 (#594) @Janpot
+- &#8203;<!-- 01 -->[docs] Fix Netlify deploy with a dummy index.html (#606) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
 ## v0.0.7
 
 <!-- generated comparing v0.0.6..master -->

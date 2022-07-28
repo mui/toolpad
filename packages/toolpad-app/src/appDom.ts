@@ -7,6 +7,7 @@ import {
   BindableAttrValues,
   SecretAttrValue,
 } from '@mui/toolpad-core';
+import invariant from 'invariant';
 import { ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
@@ -88,6 +89,9 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
     readonly component: ConstantAttrValue<string>;
   };
   readonly props?: BindableAttrValues<P>;
+  readonly layout?: {
+    readonly columnSize?: ConstantAttrValue<number>;
+  };
 }
 
 export interface CodeComponentNode extends AppDomNodeBase {
@@ -109,6 +113,7 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
+    readonly enabled?: BindableAttrValue<boolean>;
   };
 }
 
@@ -184,9 +189,7 @@ function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node i
 }
 
 function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): asserts node is T {
-  if (!isType(node, type)) {
-    throw new Error(`Invariant: expected node type "${type}" but got "${node.type}"`);
-  }
+  invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {
@@ -338,11 +341,10 @@ export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): Nod
 
     for (const childArray of Object.values(result)) {
       childArray?.sort((node1: AppDomNode, node2: AppDomNode) => {
-        if (!node1.parentIndex || !node2.parentIndex) {
-          throw new Error(
-            `Invariant: nodes inside the dom should have a parentIndex if they have a parent`,
-          );
-        }
+        invariant(
+          node1.parentIndex && node2.parentIndex,
+          `Nodes inside the dom should have a parentIndex if they have a parent`,
+        );
         return compareFractionalIndex(node1.parentIndex, node2.parentIndex);
       });
     }
@@ -426,12 +428,13 @@ export function createDom(): AppDom {
 }
 
 /**
- * Creates a new DOM node representing aReact Element
+ * Creates a new DOM node representing a React Element
  */
 export function createElement<P>(
   dom: AppDom,
   component: string,
   props: Partial<BindableAttrValues<P>> = {},
+  layout: Partial<BindableAttrValues<P>> = {},
   name?: string,
 ): ElementNode {
   return createNode(dom, 'element', {
@@ -440,6 +443,7 @@ export function createElement<P>(
     attributes: {
       component: createConst(component),
     },
+    layout,
   });
 }
 
@@ -594,11 +598,11 @@ function setNodeParent<N extends AppDomNode>(
   parentProp: string,
   parentIndex?: string,
 ) {
-  const parent = getNode(dom, parentId);
-
   if (!parentIndex) {
-    const siblings: readonly AppDomNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
-    const lastIndex = siblings.length > 0 ? siblings[siblings.length - 1].parentIndex : null;
+    const parent = getNode(dom, parentId);
+
+    const children: readonly AppDomNode[] = (getChildNodes(dom, parent) as any)[parentProp] ?? [];
+    const lastIndex = children.length > 0 ? children[children.length - 1].parentIndex : null;
     parentIndex = createFractionalIndex(lastIndex, null);
   }
 
@@ -627,15 +631,14 @@ export function addNode<Parent extends AppDomNode, Child extends AppDomNode>(
   return setNodeParent(dom, newNode, parent.id, parentProp, parentIndex);
 }
 
-export function moveNode(
+export function moveNode<Parent extends AppDomNode, Child extends AppDomNode>(
   dom: AppDom,
-  nodeId: NodeId,
-  parentId: NodeId,
-  parentProp: string,
+  node: Child,
+  parent: Parent,
+  parentProp: ParentPropOf<Child, Parent>,
   parentIndex?: string,
 ) {
-  const node = getNode(dom, nodeId);
-  return setNodeParent(dom, node, parentId, parentProp, parentIndex);
+  return setNodeParent(dom, node, parent.id, parentProp, parentIndex);
 }
 
 export function saveNode(dom: AppDom, node: AppDomNode) {
@@ -650,9 +653,7 @@ export function removeNode(dom: AppDom, nodeId: NodeId) {
   const node = getNode(dom, nodeId);
   const parent = getParent(dom, node);
 
-  if (!parent) {
-    throw new Error(`Invariant: Node: "${node.id}" can't be removed`);
-  }
+  invariant(parent, `Node: "${node.id}" can't be removed`);
 
   const descendantIds = getDescendants(dom, node).map(({ id }) => id);
 
@@ -703,15 +704,102 @@ export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
   return index.get(name) ?? null;
 }
 
+export function getSiblingBeforeNode(
+  dom: AppDom,
+  node: ElementNode | PageNode,
+  parentProp: string,
+) {
+  const parent = getParent(dom, node);
+
+  invariant(parent, `Node: "${node.id}" has no parent`);
+
+  const parentChildren =
+    ((isPage(parent) || isElement(parent)) &&
+      (getChildNodes(dom, parent) as NodeChildren<ElementNode>)[parentProp]) ||
+    [];
+
+  const nodeIndex = parentChildren.findIndex((child) => child.id === node.id);
+  const nodeBefore = nodeIndex > 0 ? parentChildren[nodeIndex - 1] : null;
+
+  return nodeBefore;
+}
+
+export function getSiblingAfterNode(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {
+  const parent = getParent(dom, node);
+
+  invariant(parent, `Node: "${node.id}" has no parent`);
+
+  const parentChildren =
+    ((isPage(parent) || isElement(parent)) &&
+      (getChildNodes(dom, parent) as NodeChildren<ElementNode>)[parentProp]) ||
+    [];
+
+  const nodeIndex = parentChildren.findIndex((child) => child.id === node.id);
+  const nodeAfter = nodeIndex < parentChildren.length - 1 ? parentChildren[nodeIndex + 1] : null;
+
+  return nodeAfter;
+}
+
+export function getNewFirstParentIndexInNode(
+  dom: AppDom,
+  node: ElementNode | PageNode,
+  parentProp: string,
+) {
+  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
+  const firstChild = children.length > 0 ? children[0] : null;
+
+  return createFractionalIndex(null, firstChild?.parentIndex || null);
+}
+
+export function getNewLastParentIndexInNode(
+  dom: AppDom,
+  node: ElementNode | PageNode,
+  parentProp: string,
+) {
+  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
+  const lastChild = children.length > 0 ? children[children.length - 1] : null;
+
+  return createFractionalIndex(lastChild?.parentIndex || null, null);
+}
+
+export function getNewParentIndexBeforeNode(
+  dom: AppDom,
+  node: ElementNode | PageNode,
+  parentProp: string,
+) {
+  const nodeBefore = getSiblingBeforeNode(dom, node, parentProp);
+  return createFractionalIndex(nodeBefore?.parentIndex || null, node.parentIndex);
+}
+
+export function getNewParentIndexAfterNode(
+  dom: AppDom,
+  node: ElementNode | PageNode,
+  parentProp: string,
+) {
+  const nodeAfter = getSiblingAfterNode(dom, node, parentProp);
+  return createFractionalIndex(node.parentIndex, nodeAfter?.parentIndex || null);
+}
+
+const RENDERTREE_NODES = ['app', 'page', 'element', 'query', 'theme', 'codeComponent'] as const;
+
+export type RenderTreeNodeType = typeof RENDERTREE_NODES[number];
+export type RenderTreeNode = { [K in RenderTreeNodeType]: AppDomNodeOfType<K> }[RenderTreeNodeType];
+export type RenderTreeNodes = Record<NodeId, RenderTreeNode>;
+
+export interface RenderTree {
+  root: NodeId;
+  nodes: RenderTreeNodes;
+}
+
 /**
  * We need to make sure no secrets end up in the frontend html, so let's only send the
  * nodes that we need to build frontend, and that we know don't contain secrets.
  * TODO: Would it make sense to create a separate datastructure that represents the render tree?
  */
-export function createRenderTree(dom: AppDom): AppDom {
-  const frontendNodes = new Set(['app', 'page', 'element', 'query', 'theme', 'codeComponent']);
+export function createRenderTree(dom: AppDom): RenderTree {
+  const frontendNodes = new Set<string>(RENDERTREE_NODES);
   return {
     ...dom,
-    nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as AppDomNodes,
+    nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as RenderTreeNodes,
   };
 }

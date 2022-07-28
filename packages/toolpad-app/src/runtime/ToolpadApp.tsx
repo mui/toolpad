@@ -19,6 +19,8 @@ import {
   Placeholder,
   BindableAttrValues,
   NodeId,
+  BindableAttrValue,
+  UseDataQueryConfig,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import {
@@ -36,11 +38,12 @@ import {
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
+import { pick } from 'lodash-es';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
-import AppOverview from '../components/AppOverview';
-import { getElementNodeComponentId, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';
+import { getElementNodeComponentId, isPageRow, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';
+import AppOverview from './AppOverview';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   BindingEvaluationResult,
@@ -48,23 +51,32 @@ import evalJsBindings, {
   evaluateExpression,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_APP_ROOT } from '../constants';
+import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 
+const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
+  'enabled',
+  'refetchInterval',
+  'refetchOnReconnect',
+  'refetchOnWindowFocus',
+];
+
 export interface NavigateToPage {
   (pageNodeId: NodeId): void;
 }
 
-export interface EditorHooks {
+/**
+ * Context created by the app canvas to override behavior for the app editor
+ */
+export interface CanvasHooks {
   navigateToPage?: NavigateToPage;
-  hidePreviewBanner?: boolean;
 }
 
-export const EditorHooksContext = React.createContext<EditorHooks>({});
+export const CanvasHooksContext = React.createContext<CanvasHooks>({});
 
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
@@ -75,13 +87,20 @@ function usePageNavigator(): NavigateToPage {
     [navigate],
   );
 
-  const editorHooks = React.useContext(EditorHooksContext);
-  return editorHooks.navigateToPage || navigateToPage;
+  const canvasHooks = React.useContext(CanvasHooksContext);
+  return canvasHooks.navigateToPage || navigateToPage;
 }
 
 const AppRoot = styled('div')({
-  overflow: 'auto' /* prevents margins from collapsing into root */,
+  overflow: 'auto' /* Prevents margins from collapsing into root */,
+  position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
   minHeight: '100vh',
+});
+
+const EditorOverlay = styled('div')({
+  position: 'absolute',
+  inset: '0 0 0 0',
+  pointerEvents: 'none',
 });
 
 interface AppContext {
@@ -226,7 +245,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
       if (action?.type === 'jsExpressionAction') {
         const handler = () => {
           const code = action.value;
-          const exprToEvaluate = `(() => {${code}})()`;
+          const exprToEvaluate = `(async () => {${code}})()`;
           evaluatePageExpression(exprToEvaluate);
         };
 
@@ -243,14 +262,24 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
       : // `undefined` to ensure the defaultProps get picked up
         undefined;
 
+  const layoutProps = React.useMemo(() => {
+    if (appDom.isElement(node) && isPageRow(node)) {
+      return {
+        layoutColumnSizes: childNodes.map((childNode) => childNode.layout?.columnSize?.value),
+      };
+    }
+    return {};
+  }, [childNodes, node]);
+
   const props: Record<string, any> = React.useMemo(() => {
     return {
       ...boundProps,
       ...onChangeHandlers,
       ...eventHandlers,
+      ...layoutProps,
       children: reactChildren,
     };
-  }, [boundProps, eventHandlers, onChangeHandlers, reactChildren]);
+  }, [boundProps, eventHandlers, layoutProps, onChangeHandlers, reactChildren]);
 
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {
@@ -279,7 +308,14 @@ interface PageRootProps {
 function PageRoot({ children }: PageRootProps) {
   return (
     <Container>
-      <Stack data-testid="page-root" direction="column" alignItems="stretch" sx={{ my: 2, gap: 1 }}>
+      <Stack
+        data-testid="page-root"
+        direction="column"
+        sx={{
+          my: 2,
+          gap: 1,
+        }}
+      >
         {children}
       </Stack>
     </Container>
@@ -318,11 +354,9 @@ function QueryNode({ node }: QueryNodeProps) {
   const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
-  const queryResult = useDataQuery(dataUrl, queryId, params, {
-    refetchOnWindowFocus: node.attributes.refetchOnWindowFocus?.value,
-    refetchOnReconnect: node.attributes.refetchOnReconnect?.value,
-    refetchInterval: node.attributes.refetchInterval?.value,
-  });
+  const configBindings = pick(node.attributes, ...USE_DATA_QUERY_CONFIG_KEYS);
+  const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
+  const queryResult = useDataQuery(dataUrl, queryId, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;
@@ -342,6 +376,25 @@ function QueryNode({ node }: QueryNodeProps) {
   }, [node.id, queryResult, setControlledBinding]);
 
   return null;
+}
+
+function parseBinding(bindable: BindableAttrValue<any> | undefined, scopePath: string | undefined) {
+  if (bindable?.type === 'const') {
+    return {
+      scopePath,
+      result: { value: bindable.value },
+    };
+  }
+  if (bindable?.type === 'jsExpression') {
+    return {
+      scopePath,
+      expression: bindable.value,
+    };
+  }
+  return {
+    scopePath,
+    result: { value: undefined },
+  };
 }
 
 function parseBindings(
@@ -388,16 +441,8 @@ function parseBindings(
               scopePath,
               result: { value: defaultValue },
             });
-          } else if (binding?.type === 'const') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              result: { value: binding?.value },
-            });
-          } else if (binding?.type === 'jsExpression') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              expression: binding?.value,
-            });
+          } else {
+            parsedBindingsMap.set(bindingId, parseBinding(binding, scopePath));
           }
         }
       }
@@ -408,17 +453,7 @@ function parseBindings(
         for (const [paramName, bindable] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
           const scopePath = `${elm.name}.params.${paramName}`;
-          if (bindable?.type === 'const') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              result: { value: bindable.value },
-            });
-          } else if (bindable?.type === 'jsExpression') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              expression: bindable.value,
-            });
-          }
+          parsedBindingsMap.set(bindingId, parseBinding(bindable, scopePath));
         }
       }
 
@@ -430,6 +465,13 @@ function parseBindings(
           scopePath,
           result: { value, loading: true },
         });
+      }
+
+      for (const configName of USE_DATA_QUERY_CONFIG_KEYS) {
+        const bindingId = `${elm.id}.config.${configName}`;
+        const scopePath = `${elm.name}.config.${configName}`;
+        const bindable = elm.attributes[configName];
+        parsedBindingsMap.set(bindingId, parseBinding(bindable, scopePath));
       }
     }
   }
@@ -543,9 +585,32 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 }
 
+interface RenderedPagesProps {
+  dom: appDom.AppDom;
+}
+
+function RenderedPages({ dom }: RenderedPagesProps) {
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate replace to="/pages" />} />
+      <Route path="/pages" element={<AppOverview dom={dom} />} />
+      {pages.map((page) => (
+        <Route
+          key={page.id}
+          path={`/pages/${page.id}`}
+          element={<RenderedPage nodeId={page.id} />}
+        />
+      ))}
+    </Routes>
+  );
+}
+
 const FullPageCentered = styled('div')({
-  width: '100vw',
-  height: '100vh',
+  width: '100%',
+  height: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -566,34 +631,30 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
 export interface ToolpadAppProps {
+  hidePreviewBanner?: boolean;
   basename: string;
   appId: string;
   version: VersionOrPreview;
   dom: appDom.AppDom;
 }
 
-export default function ToolpadApp({ basename, appId, version, dom }: ToolpadAppProps) {
-  const root = appDom.getApp(dom);
-  const { pages = [], themes = [] } = appDom.getChildNodes(dom, root);
-
-  const { hidePreviewBanner } = React.useContext(EditorHooksContext);
-
-  const theme = themes.length > 0 ? themes[0] : null;
-
+export default function ToolpadApp({
+  basename,
+  appId,
+  version,
+  dom,
+  hidePreviewBanner,
+}: ToolpadAppProps) {
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
-
-  const queryClient = React.useMemo(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            retry: false,
-          },
-        },
-      }),
-    [],
-  );
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -603,11 +664,11 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
     <AppRoot id={HTML_ID_APP_ROOT}>
       <NoSsr>
         <DomContextProvider value={dom}>
-          <AppThemeProvider node={theme}>
+          <AppThemeProvider dom={dom}>
             <CssBaseline />
-            {hidePreviewBanner ? null : (
+            {version === 'preview' && !hidePreviewBanner ? (
               <Alert severity="info">This is a preview version of the application.</Alert>
-            )}
+            ) : null}
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
@@ -616,17 +677,7 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>
                           <BrowserRouter basename={basename}>
-                            <Routes>
-                              <Route path="/" element={<Navigate replace to="/pages" />} />
-                              <Route path="/pages" element={<AppOverview dom={dom} />} />
-                              {pages.map((page) => (
-                                <Route
-                                  key={page.id}
-                                  path={`/pages/${page.id}`}
-                                  element={<RenderedPage nodeId={page.id} />}
-                                />
-                              ))}
-                            </Routes>
+                            <RenderedPages dom={dom} />
                           </BrowserRouter>
                         </QueryClientProvider>
                       </AppContextProvider>
@@ -638,6 +689,7 @@ export default function ToolpadApp({ basename, appId, version, dom }: ToolpadApp
           </AppThemeProvider>
         </DomContextProvider>
       </NoSsr>
+      <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
     </AppRoot>
   );
 }

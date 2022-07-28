@@ -1,6 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 import { red } from '@mui/material/colors';
 import type {} from '@mui/x-data-grid-pro/themeAugmentation';
+import type {} from '@mui/lab/themeAugmentation';
 
 // Create a theme instance.
 const theme = createTheme({
@@ -63,6 +64,21 @@ const theme = createTheme({
     MuiSvgIcon: {
       defaultProps: {
         fontSize: 'small',
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        root: {
+          minHeight: 0,
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          padding: 8,
+          minHeight: 0,
+        },
       },
     },
   },

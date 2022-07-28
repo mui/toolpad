@@ -1,14 +1,15 @@
 import type * as React from 'react';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
-  ArgTypeDefinition,
   SlotType,
   RuntimeError,
   ComponentConfig,
   BindableAttrValues,
   LiveBinding,
   NodeId,
+  PropValueType,
 } from '@mui/toolpad-core';
+
 import { PaletteMode } from '@mui/material';
 import type { Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
@@ -20,7 +21,7 @@ export interface EditorProps<T> {
    */
   nodeId?: NodeId;
   label: string;
-  argType: ArgTypeDefinition;
+  propType: PropValueType;
   disabled?: boolean;
   value: T | undefined;
   onChange: (newValue: T) => void;
@@ -36,12 +37,10 @@ export interface SlotLocation {
   parentIndex?: string;
 }
 
-export type SlotDirection = 'horizontal' | 'vertical';
-
 export interface SlotState {
   type: SlotType;
   rect: Rectangle;
-  direction: FlowDirection;
+  flowDirection: FlowDirection;
 }
 
 export interface SlotsState {

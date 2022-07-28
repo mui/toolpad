@@ -129,7 +129,7 @@ function QueryEditor({
   );
 
   return (
-    <Stack direction="column" gap={2}>
+    <Stack direction="column" gap={2} sx={{ px: 3, pt: 1 }}>
       <Autocomplete
         fullWidth
         value={fetchedFile.data ?? null}
@@ -198,7 +198,7 @@ function ConnectionParamsInput({
     {
       type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS,
     },
-    false,
+    { retry: false },
   );
   return (
     <Stack direction="column" gap={1}>

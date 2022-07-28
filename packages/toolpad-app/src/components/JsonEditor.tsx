@@ -3,17 +3,17 @@
  */
 
 import * as React from 'react';
-import MonacoEditor, { MonacoEditorHandle, MonacoEditorProps } from './MonacoEditor';
+import type * as monaco from 'monaco-editor';
+import MonacoEditor, { MonacoEditorProps } from './MonacoEditor';
 
-export interface JsonEditorProps extends Omit<MonacoEditorProps, 'language'> {
+export interface JsonEditorProps
+  extends Omit<MonacoEditorProps, 'language' | 'diagnostics' | 'extraLibs'> {
   schemaUri?: string;
 }
 
 export default function JsonEditor({ schemaUri, ...props }: JsonEditorProps) {
-  const editorRef = React.useRef<MonacoEditorHandle>(null);
-
-  React.useEffect(() => {
-    editorRef.current?.monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+  const diagnostics = React.useMemo<monaco.languages.json.DiagnosticsOptions>(
+    () => ({
       validate: true,
       schemaRequest: 'error',
       enableSchemaRequest: true,
@@ -25,8 +25,9 @@ export default function JsonEditor({ schemaUri, ...props }: JsonEditorProps) {
             },
           ]
         : [],
-    });
-  }, [schemaUri]);
+    }),
+    [schemaUri],
+  );
 
-  return <MonacoEditor ref={editorRef} language="json" {...props} />;
+  return <MonacoEditor language="json" diagnostics={diagnostics} {...props} />;
 }

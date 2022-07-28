@@ -2,7 +2,7 @@ import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from 'react-query';
 
-export async function execDataSourceQuery(dataUrl: string, queryId: string, params: any) {
+async function fetchData(dataUrl: string, queryId: string, params: any) {
   const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
   url.searchParams.set('params', JSON.stringify(params));
   const res = await fetch(String(url));
@@ -11,6 +11,11 @@ export async function execDataSourceQuery(dataUrl: string, queryId: string, para
   }
   return res.json();
 }
+
+export type UseDataQueryConfig = Pick<
+  UseQueryOptions<any, unknown, unknown, any[]>,
+  'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
+>;
 
 export interface UseDataQuery {
   isLoading: boolean;
@@ -37,10 +42,7 @@ export function useDataQuery(
   dataUrl: string,
   queryId: string | null,
   params: any,
-  options: Pick<
-    UseQueryOptions<any, unknown, unknown, any[]>,
-    'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
-  >,
+  { enabled = true, ...options }: UseDataQueryConfig,
 ): UseDataQuery {
   const {
     isLoading,
@@ -48,14 +50,10 @@ export function useDataQuery(
     error,
     data: responseData = EMPTY_OBJECT,
     refetch,
-  } = useQuery(
-    [dataUrl, queryId, params],
-    () => queryId && execDataSourceQuery(dataUrl, queryId, params),
-    {
-      ...options,
-      enabled: !!queryId,
-    },
-  );
+  } = useQuery([dataUrl, queryId, params], () => queryId && fetchData(dataUrl, queryId, params), {
+    ...options,
+    enabled: !!queryId && enabled,
+  });
 
   const { data } = responseData;
 
@@ -63,14 +61,14 @@ export function useDataQuery(
 
   const result: UseDataQuery = React.useMemo(
     () => ({
-      isLoading,
+      isLoading: isLoading && enabled,
       isFetching,
       error,
       data,
       rows,
       refetch,
     }),
-    [isLoading, isFetching, error, data, rows, refetch],
+    [isLoading, enabled, isFetching, error, data, rows, refetch],
   );
 
   return result;

@@ -19,9 +19,10 @@ import {
   Placeholder,
   BindableAttrValues,
   NodeId,
-  execDataSourceQuery,
+  BindableAttrValue,
+  UseDataQueryConfig,
 } from '@mui/toolpad-core';
-import { QueryClient, QueryClientProvider, useMutation } from 'react-query';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import {
   BrowserRouter,
   Routes,
@@ -37,6 +38,7 @@ import {
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
+import { pick } from 'lodash-es';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
@@ -56,17 +58,12 @@ import ComponentsContext, { useComponents, useComponent } from './ComponentsCont
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 
-interface UseMutation {
-  call: (overrides?: any) => Promise<void>;
-  isLoading: boolean;
-  error: unknown;
-}
-
-const INITIAL_MUTATION: UseMutation = {
-  call: async () => {},
-  isLoading: false,
-  error: null,
-};
+const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
+  'enabled',
+  'refetchInterval',
+  'refetchOnReconnect',
+  'refetchOnWindowFocus',
+];
 
 export interface NavigateToPage {
   (pageNodeId: NodeId): void;
@@ -357,11 +354,9 @@ function QueryNode({ node }: QueryNodeProps) {
   const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
-  const queryResult = useDataQuery(dataUrl, queryId, params, {
-    refetchOnWindowFocus: node.attributes.refetchOnWindowFocus?.value,
-    refetchOnReconnect: node.attributes.refetchOnReconnect?.value,
-    refetchInterval: node.attributes.refetchInterval?.value,
-  });
+  const configBindings = pick(node.attributes, ...USE_DATA_QUERY_CONFIG_KEYS);
+  const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
+  const queryResult = useDataQuery(dataUrl, queryId, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;
@@ -383,49 +378,23 @@ function QueryNode({ node }: QueryNodeProps) {
   return null;
 }
 
-interface MutationNodeProps {
-  node: appDom.MutationNode;
-}
-
-function MutationNode({ node }: MutationNodeProps) {
-  const { appId, version } = useAppContext();
-  const bindings = useBindingsContext();
-  const setControlledBinding = useSetControlledBindingContext();
-
-  const dataUrl = `/api/data/${appId}/${version}/`;
-  const mutationId = node.id;
-  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
-
-  const {
-    isLoading,
-    error,
-    mutateAsync: call,
-  } = useMutation(
-    async (overrides: any = {}) =>
-      execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides }),
-    {
-      mutationKey: [dataUrl, mutationId, params],
-    },
-  );
-
-  // Stabilize the mutation and prepare for inclusion in global scope
-  const mutationResult: UseMutation = React.useMemo(
-    () => ({
-      isLoading,
-      error,
-      call,
-    }),
-    [isLoading, error, call],
-  );
-
-  React.useEffect(() => {
-    for (const [key, value] of Object.entries(mutationResult)) {
-      const bindingId = `${node.id}.${key}`;
-      setControlledBinding(bindingId, { value });
-    }
-  }, [node.id, mutationResult, setControlledBinding]);
-
-  return null;
+function parseBinding(bindable: BindableAttrValue<any> | undefined, scopePath: string | undefined) {
+  if (bindable?.type === 'const') {
+    return {
+      scopePath,
+      result: { value: bindable.value },
+    };
+  }
+  if (bindable?.type === 'jsExpression') {
+    return {
+      scopePath,
+      expression: bindable.value,
+    };
+  }
+  return {
+    scopePath,
+    result: { value: undefined },
+  };
 }
 
 function parseBindings(
@@ -472,16 +441,8 @@ function parseBindings(
               scopePath,
               result: { value: defaultValue },
             });
-          } else if (binding?.type === 'const') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              result: { value: binding?.value },
-            });
-          } else if (binding?.type === 'jsExpression') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              expression: binding?.value,
-            });
+          } else {
+            parsedBindingsMap.set(bindingId, parseBinding(binding, scopePath));
           }
         }
       }
@@ -492,17 +453,7 @@ function parseBindings(
         for (const [paramName, bindable] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
           const scopePath = `${elm.name}.params.${paramName}`;
-          if (bindable?.type === 'const') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              result: { value: bindable.value },
-            });
-          } else if (bindable?.type === 'jsExpression') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              expression: bindable.value,
-            });
-          }
+          parsedBindingsMap.set(bindingId, parseBinding(bindable, scopePath));
         }
       }
 
@@ -515,35 +466,12 @@ function parseBindings(
           result: { value, loading: true },
         });
       }
-    }
 
-    if (appDom.isMutation(elm)) {
-      if (elm.params) {
-        for (const [paramName, bindable] of Object.entries(elm.params)) {
-          const bindingId = `${elm.id}.params.${paramName}`;
-          const scopePath = `${elm.name}.params.${paramName}`;
-          if (bindable?.type === 'const') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              result: { value: bindable.value },
-            });
-          } else if (bindable?.type === 'jsExpression') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              expression: bindable.value,
-            });
-          }
-        }
-      }
-
-      for (const [key, value] of Object.entries(INITIAL_MUTATION)) {
-        const bindingId = `${elm.id}.${key}`;
-        const scopePath = `${elm.name}.${key}`;
-        controlled.add(bindingId);
-        parsedBindingsMap.set(bindingId, {
-          scopePath,
-          result: { value, loading: true },
-        });
+      for (const configName of USE_DATA_QUERY_CONFIG_KEYS) {
+        const bindingId = `${elm.id}.config.${configName}`;
+        const scopePath = `${elm.name}.config.${configName}`;
+        const bindable = elm.attributes[configName];
+        parsedBindingsMap.set(bindingId, parseBinding(bindable, scopePath));
       }
     }
   }
@@ -569,7 +497,7 @@ const EMPTY_OBJECT = {};
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [], queries = [], mutations = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
   usePageTitle(page.attributes.title.value);
 
@@ -650,10 +578,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
           {queries.map((node) => (
             <QueryNode key={node.id} node={node} />
-          ))}
-
-          {mutations.map((node) => (
-            <MutationNode key={node.id} node={node} />
           ))}
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>

@@ -40,8 +40,8 @@ import {
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
+import { getElementNodeComponentId, isPageRow, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';
 import AppOverview from './AppOverview';
-import { getElementNodeComponentId, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
   BindingEvaluationResult,
@@ -265,14 +265,24 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
       : // `undefined` to ensure the defaultProps get picked up
         undefined;
 
+  const layoutProps = React.useMemo(() => {
+    if (appDom.isElement(node) && isPageRow(node)) {
+      return {
+        layoutColumnSizes: childNodes.map((childNode) => childNode.layout?.columnSize?.value),
+      };
+    }
+    return {};
+  }, [childNodes, node]);
+
   const props: Record<string, any> = React.useMemo(() => {
     return {
       ...boundProps,
       ...onChangeHandlers,
       ...eventHandlers,
+      ...layoutProps,
       children: reactChildren,
     };
-  }, [boundProps, eventHandlers, onChangeHandlers, reactChildren]);
+  }, [boundProps, eventHandlers, layoutProps, onChangeHandlers, reactChildren]);
 
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {

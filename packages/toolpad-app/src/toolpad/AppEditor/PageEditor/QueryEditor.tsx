@@ -469,7 +469,6 @@ function QueryNodeEditorDialog<Q, P>({
                                   rawQueryPreview.isFetched ||
                                   !input.attributes.transformEnabled?.value
                                 }
-                                size="small"
                                 onClick={handleRawQueryPreviewRefresh}
                                 sx={{ alignSelf: 'self-start' }}
                               >
@@ -520,7 +519,6 @@ function QueryNodeEditorDialog<Q, P>({
                   >
                     <Toolbar>
                       <LoadingButton
-                        size="medium"
                         disabled={previewParams === paramsObject && previewQuery === input}
                         loading={isPreviewLoading}
                         loadingPosition="start"

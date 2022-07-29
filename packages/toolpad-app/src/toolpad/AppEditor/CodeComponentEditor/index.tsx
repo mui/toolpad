@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Stack, styled, Toolbar, Typography, Tab } from '@mui/material';
+import { TabList } from '@mui/lab';
 import { useParams } from 'react-router-dom';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
@@ -22,6 +23,7 @@ import ErrorAlert from '../PageEditor/ErrorAlert';
 import lazyComponent from '../../../utils/lazyComponent';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 import SplitPane from '../../../components/SplitPane';
+import Console, { LogEntry } from '../../../components/Console';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -148,6 +150,21 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     [argTypes],
   );
 
+  if (compileError?.stack) {
+    console.log('error', compileError.stack);
+  }
+
+  const consoleLogs = compileError
+    ? [
+        {
+          timestamp: new Date().getTime(),
+          level: 'error',
+          // TODO: how to format this part?
+          args: [compileError.stack],
+        },
+      ]
+    : [];
+
   return (
     <React.Fragment>
       <Stack sx={{ height: '100%' }}>
@@ -162,7 +179,22 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
               extraLibs={extraLibs}
             />
 
-            <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
+            <SplitPane split="horizontal" allowResize size="70%">
+              <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
+
+              <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <Tab label="Console" value="console" disabled />
+                </Box>
+                <Console
+                  sx={{ flex: 1 }}
+                  value={consoleLogs}
+                  onChange={() => {
+                    debugger;
+                  }}
+                />
+              </Box>
+            </SplitPane>
           </SplitPane>
         </Box>
         <Toolbar

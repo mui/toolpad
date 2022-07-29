@@ -418,10 +418,18 @@ export default function Home() {
               onChange={handleViewModeChange}
               aria-label="view mode"
             >
-              <ToggleButton value="list" aria-label="list view" color="primary">
+              <ToggleButton
+                value="list"
+                aria-label="list view"
+                color={viewMode === 'list' ? 'primary' : undefined}
+              >
                 <ViewListIcon />
               </ToggleButton>
-              <ToggleButton value="grid" aria-label="grid view">
+              <ToggleButton
+                value="grid"
+                aria-label="grid view"
+                color={viewMode === 'grid' ? 'primary' : undefined}
+              >
                 <GridViewIcon />
               </ToggleButton>
             </ToggleButtonGroup>

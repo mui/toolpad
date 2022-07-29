@@ -223,13 +223,6 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
     [app?.name, handleAppRename],
   );
 
-  React.useEffect(() => {
-    if (appTitleInput.current && editingTitle) {
-      appTitleInput.current.focus();
-      appTitleInput.current.select();
-    }
-  }, [appTitleInput, editingTitle]);
-
   const openDisabled = !app || !activeDeployment;
   let openButton = (
     <Button
@@ -321,6 +314,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           dense: true,
         }}
       >
+        {/* Using an onClick on a MenuItem causes accessibility issues, see: https://github.com/mui/material-ui/pull/30145 */}
         <MenuItem onClick={handleRenameClick}>
           <ListItemIcon>
             <DriveFileRenameOutlineIcon />

@@ -1,5 +1,34 @@
 # Changelog
 
+## v0.0.11
+
+<!-- generated comparing v0.0.10..master -->
+
+_Jul 29, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Split pane layout for queries, resize components in the visual editor, improve post-request transformation UX.
+
+- &#8203;<!-- 16 -->Satisfy dependabot (#706) @Janpot
+- &#8203;<!-- 15 -->Add autocomplete to post-request transform editor (#546) @bharatkashyap
+- &#8203;<!-- 14 -->Support async code in event handlers (#697) @Janpot
+- &#8203;<!-- 13 -->Fix interferring monaco editor instances (#702) @Janpot
+- &#8203;<!-- 12 -->Add bindable enabled property to queries (#696) @Janpot
+- &#8203;<!-- 11 -->Fix column sizing when there's not enough space (#699) @apedroferreira
+- &#8203;<!-- 10 -->Editor - Resizing elements inside page rows (#645) @apedroferreira
+- &#8203;<!-- 09 -->Add default control to BindableEditor (#695) @Janpot
+- &#8203;<!-- 08 -->Fixes to query editor layout (#693) @Janpot
+- &#8203;<!-- 07 -->Make function runtime fetch implementation more spec-compliant (#668) @Janpot
+- &#8203;<!-- 06 -->Fix overflow widgets for monaco (#682) @Janpot
+- &#8203;<!-- 05 -->Increase yarn network timeout (#688) @Janpot
+- &#8203;<!-- 04 -->Standardize on React invariant library (#683) @Janpot
+- &#8203;<!-- 03 -->Tweak update button position and visibility in component editor (#673) @bytasv
+- &#8203;<!-- 02 -->Add split panes to connections dialog (#676) @bytasv
+- &#8203;<!-- 01 -->Remove obsolete DataGrid license code (#679) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot
+
 ## v0.0.10
 
 <!-- generated comparing v0.0.9..master -->

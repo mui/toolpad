@@ -799,7 +799,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                 parent.parentIndex,
               );
 
-              if (isPageColumn(parent)) {
+              if (isPageColumn(parent) && moveTargetNodeId !== parent.id) {
                 domApi.setNodeNamespacedProp(
                   lastContainerChild,
                   'layout',
@@ -823,7 +823,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
                 lastContainerChild.parentProp,
               );
 
-              if (isPageColumn(parentParent)) {
+              if (isPageColumn(parentParent) && moveTargetNodeId !== parentParent.id) {
                 domApi.setNodeNamespacedProp(
                   lastContainerChild,
                   'layout',

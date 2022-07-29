@@ -1,12 +1,5 @@
 import * as React from 'react';
-import {
-  Skeleton,
-  TextField,
-  Typography,
-  TypographyVariant,
-  Tooltip,
-  SxProps,
-} from '@mui/material';
+import { Skeleton, TextField, Theme, TypographyVariant, Tooltip, SxProps } from '@mui/material';
 
 interface EditableTextProps {
   defaultValue?: string;
@@ -18,7 +11,6 @@ interface EditableTextProps {
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
   variant?: TypographyVariant;
   size?: 'small' | 'medium';
-  inputProps?: SxProps;
   sx?: SxProps;
 }
 
@@ -28,10 +20,9 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
       defaultValue,
       onKeyUp,
       onBlur,
-      variant,
+      variant: typographyVariant = 'body1',
       size,
       sx,
-      inputProps,
       editing,
       loading,
       isError,
@@ -39,24 +30,58 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
     },
     ref,
   ) => {
-    return editing ? (
-      <TextField
-        variant={'standard'}
-        size={size ?? 'small'}
-        inputRef={ref}
-        sx={sx}
-        InputProps={{ sx: inputProps }}
-        onKeyUp={onKeyUp ?? (() => {})}
-        onBlur={onBlur ?? (() => {})}
-        defaultValue={defaultValue}
-        error={isError}
-        helperText={isError ? errorText : ''}
-      />
-    ) : (
-      <Tooltip title={defaultValue || ''} enterDelay={500} placement={'left'}>
-        <Typography gutterBottom variant={variant ?? 'body1'} component="div" noWrap>
-          {loading ? <Skeleton /> : defaultValue}
-        </Typography>
+    const appTitleInput = React.useRef<HTMLInputElement | null>(null);
+
+    React.useEffect(() => {
+      let inputElement: HTMLInputElement | null = appTitleInput.current;
+      if (ref) {
+        inputElement = (ref as React.MutableRefObject<HTMLInputElement>).current;
+      }
+
+      if (inputElement) {
+        if (editing) {
+          inputElement.focus();
+          inputElement.select();
+        } else {
+          inputElement.blur();
+        }
+      }
+    }, [ref, editing]);
+
+    return (
+      <Tooltip title={editing ? '' : defaultValue || ''} enterDelay={500} placement={'left'}>
+        {loading ? (
+          <Skeleton />
+        ) : (
+          <TextField
+            variant={'standard'}
+            size={size ?? 'small'}
+            inputRef={ref ?? appTitleInput}
+            sx={{
+              ...sx,
+              '& .MuiInputBase-root.MuiInput-root:before, .MuiInput-root.MuiInputBase-root:not(.Mui-disabled):hover::before':
+                {
+                  borderBottom: editing ? `initial` : 'none',
+                },
+            }}
+            inputProps={{
+              tabIndex: editing ? 0 : -1,
+              sx: (theme: Theme) => ({
+                // Handle overflow
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                fontSize: theme.typography[typographyVariant].fontSize,
+                height: theme.typography[typographyVariant].fontSize,
+              }),
+            }}
+            onKeyUp={onKeyUp ?? (() => {})}
+            onBlur={onBlur ?? (() => {})}
+            defaultValue={defaultValue}
+            error={isError}
+            helperText={isError ? errorText : ''}
+          />
+        )}
       </Tooltip>
     );
   },

@@ -15,9 +15,13 @@ import {
   Menu,
   MenuItem,
   Skeleton,
+  Tabs,
+  Tab,
   TextField,
   Toolbar,
   Typography,
+  ToggleButton,
+  ToggleButtonGroup,
   Box,
   Tooltip,
 } from '@mui/material';
@@ -26,6 +30,8 @@ import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import GridViewIcon from '@mui/icons-material/GridView';
 import DeleteIcon from '@mui/icons-material/Delete';
 import client from '../api';
 import DialogForm from '../components/DialogForm';
@@ -327,6 +333,47 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
   );
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
+      {...other}
+    >
+      {value === index ? <Box>{children}</Box> : null}
+    </div>
+  );
+}
+
+interface TabListProps {
+  value: number;
+  handleTabChange: (event: React.SyntheticEvent, newValue: number) => void;
+}
+
+function TabList({ value, handleTabChange }: TabListProps) {
+  return (
+    <Tabs
+      value={value}
+      onChange={handleTabChange}
+      sx={{ minHeight: 'inherit', '& > div.MuiTabs-scroller': { display: 'inline-flex' } }}
+      aria-label="tabs list"
+    >
+      <Tab label="Apps" />
+      <Tab label="Data" />
+    </Tabs>
+  );
+}
+
 export default function Home() {
   const { data: apps = [], status, error } = client.useQuery('getApps', []);
   const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);
@@ -344,55 +391,81 @@ export default function Home() {
 
   const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
 
+  const [tabIndex, setTabIndex] = React.useState(0);
+
+  const handleTabChange = React.useCallback((event: React.SyntheticEvent, newIndex: number) => {
+    setTabIndex(newIndex);
+  }, []);
+
+  const [viewMode, setViewMode] = React.useState<string>('list');
+
+  const handleViewModeChange = React.useCallback((event: React.MouseEvent, value: string) => {
+    setViewMode(value);
+  }, []);
+
   return (
-    <ToolpadShell>
+    <ToolpadShell navigation={<TabList value={tabIndex} handleTabChange={handleTabChange} />}>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      <Container>
-        <Typography variant="h2">Apps</Typography>
-        <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
+      <TabPanel index={0} value={tabIndex}>
+        <Container>
+          <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
 
-        <Toolbar disableGutters>
-          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-        </Toolbar>
+          <Toolbar variant={'regular'} disableGutters sx={{ justifyContent: 'space-between' }}>
+            <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={handleViewModeChange}
+              aria-label="view mode"
+            >
+              <ToggleButton value="list" aria-label="list view" color="primary">
+                <ViewListIcon />
+              </ToggleButton>
+              <ToggleButton value="grid" aria-label="grid view">
+                <GridViewIcon />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Toolbar>
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              lg: 'repeat(4, 1fr)',
-              md: 'repeat(3, 1fr)',
-              sm: 'repeat(2, fr)',
-              xs: 'repeat(1, fr)',
-            },
-            gap: 2,
-          }}
-        >
-          {(() => {
-            switch (status) {
-              case 'loading':
-                return <AppCard />;
-              case 'error':
-                return <Alert severity="error">{(error as Error)?.message}</Alert>;
-              case 'success':
-                return apps.length > 0
-                  ? apps.map((app) => {
-                      const activeDeployment = activeDeploymentsByApp?.[app.id];
-                      return (
-                        <AppCard
-                          key={app.id}
-                          app={app}
-                          activeDeployment={activeDeployment}
-                          onDelete={() => setDeletedApp(app)}
-                        />
-                      );
-                    })
-                  : 'No apps yet';
-              default:
-                return '';
-            }
-          })()}
-        </Box>
-      </Container>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                lg: 'repeat(4, 1fr)',
+                md: 'repeat(3, 1fr)',
+                sm: 'repeat(2, fr)',
+                xs: 'repeat(1, fr)',
+              },
+              gap: 2,
+            }}
+          >
+            {(() => {
+              switch (status) {
+                case 'loading':
+                  return <AppCard />;
+                case 'error':
+                  return <Alert severity="error">{(error as Error)?.message}</Alert>;
+                case 'success':
+                  return apps.length > 0
+                    ? apps.map((app) => {
+                        const activeDeployment = activeDeploymentsByApp?.[app.id];
+                        return (
+                          <AppCard
+                            key={app.id}
+                            app={app}
+                            activeDeployment={activeDeployment}
+                            onDelete={() => setDeletedApp(app)}
+                          />
+                        );
+                      })
+                    : 'No apps yet';
+                default:
+                  return '';
+              }
+            })()}
+          </Box>
+        </Container>
+      </TabPanel>
     </ToolpadShell>
   );
 }

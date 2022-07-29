@@ -67,7 +67,7 @@
     "execa": "^6.1.0",
     "format-util": "^1.0.5",
     "jest": "^28.1.2",
-    "lerna": "^5.1.6",
+    "lerna": "^5.3.0",
     "markdownlint-cli": "^0.31.1",
     "prettier": "^2.6.2",
     "prettier-plugin-prisma": "^3.11.0",

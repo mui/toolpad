@@ -20,7 +20,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableRow,
   TextField,
   Toolbar,
@@ -474,11 +473,6 @@ export default function Home() {
           ) : null}
           {viewMode === 'list' ? (
             <Table sx={{ minWidth: 650 }} aria-label="apps list" size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                </TableRow>
-              </TableHead>
               <TableBody>
                 {apps.map((app) => (
                   <TableRow
@@ -489,6 +483,7 @@ export default function Home() {
                     <TableCell component="th" scope="row">
                       <EditableText
                         defaultValue={app.name}
+                        disableTooltip
                         helperText={`Edited at ${getReadableDuration(app.editedAt)}`}
                       />
                     </TableCell>

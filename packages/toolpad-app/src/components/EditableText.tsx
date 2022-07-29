@@ -3,15 +3,17 @@ import { Skeleton, TextField, Theme, TypographyVariant, Tooltip, SxProps } from 
 
 interface EditableTextProps {
   defaultValue?: string;
-  loading: boolean;
-  editing: boolean;
-  isError: boolean;
+  loading?: boolean;
+  editing?: boolean;
+  isError?: boolean;
   errorText?: string;
-  onKeyUp: (event: React.KeyboardEvent<HTMLInputElement>) => void;
-  onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
+  onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
   variant?: TypographyVariant;
   size?: 'small' | 'medium';
   sx?: SxProps;
+  helperText?: string;
+  disableTooltip?: boolean;
 }
 
 const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
@@ -27,6 +29,9 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
       loading,
       isError,
       errorText,
+      helperText,
+      disableTooltip,
+      ...rest
     },
     ref,
   ) => {
@@ -49,7 +54,11 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
     }, [ref, editing]);
 
     return (
-      <Tooltip title={editing ? '' : defaultValue || ''} enterDelay={500} placement={'left'}>
+      <Tooltip
+        title={editing || disableTooltip ? '' : defaultValue || ''}
+        enterDelay={500}
+        placement={'left'}
+      >
         {loading ? (
           <Skeleton />
         ) : (
@@ -79,7 +88,8 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
             onBlur={onBlur ?? (() => {})}
             defaultValue={defaultValue}
             error={isError}
-            helperText={isError ? errorText : ''}
+            helperText={isError ? errorText : helperText}
+            {...rest}
           />
         )}
       </Tooltip>

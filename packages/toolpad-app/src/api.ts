@@ -58,7 +58,7 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfG
 export interface UseQueryFnOptions<F extends (...args: any[]) => any>
   extends Omit<
     UseQueryOptions<Awaited<ReturnType<F>>, unknown, Awaited<ReturnType<F>>, any[]>,
-    'queryKey' | 'queryFn' | 'enabled'
+    'queryKey' | 'queryFn'
   > {}
 
 interface UseQueryFn<M extends MethodsGroup> {
@@ -101,7 +101,7 @@ function createClient<D extends MethodsOf<any>>(endpoint: string): ApiClient<D> 
     useQuery: (key, params, options) => {
       return useQuery({
         ...options,
-        enabled: !!params,
+        enabled: !!params && options?.enabled !== false,
         queryKey: [key, params],
         queryFn: () => {
           invariant(params, `"enabled" prop of useQuery should prevent this call'`);

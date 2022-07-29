@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  Box,
   Card,
   CardHeader,
   CardContent,
@@ -14,15 +15,19 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Skeleton,
   Tabs,
   Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
   Toolbar,
   Typography,
   ToggleButton,
   ToggleButtonGroup,
-  Box,
+  Skeleton,
   Tooltip,
 } from '@mui/material';
 import * as React from 'react';
@@ -434,44 +439,71 @@ export default function Home() {
               </ToggleButton>
             </ToggleButtonGroup>
           </Toolbar>
-
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                lg: 'repeat(4, 1fr)',
-                md: 'repeat(3, 1fr)',
-                sm: 'repeat(2, fr)',
-                xs: 'repeat(1, fr)',
-              },
-              gap: 2,
-            }}
-          >
-            {(() => {
-              switch (status) {
-                case 'loading':
-                  return <AppCard />;
-                case 'error':
-                  return <Alert severity="error">{(error as Error)?.message}</Alert>;
-                case 'success':
-                  return apps.length > 0
-                    ? apps.map((app) => {
-                        const activeDeployment = activeDeploymentsByApp?.[app.id];
-                        return (
-                          <AppCard
-                            key={app.id}
-                            app={app}
-                            activeDeployment={activeDeployment}
-                            onDelete={() => setDeletedApp(app)}
-                          />
-                        );
-                      })
-                    : 'No apps yet';
-                default:
-                  return '';
-              }
-            })()}
-          </Box>
+          {viewMode === 'grid' ? (
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  lg: 'repeat(4, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                  sm: 'repeat(2, fr)',
+                  xs: 'repeat(1, fr)',
+                },
+                gap: 2,
+              }}
+            >
+              {(() => {
+                switch (status) {
+                  case 'loading':
+                    return <AppCard />;
+                  case 'error':
+                    return <Alert severity="error">{(error as Error)?.message}</Alert>;
+                  case 'success':
+                    return apps.length > 0
+                      ? apps.map((app) => {
+                          const activeDeployment = activeDeploymentsByApp?.[app.id];
+                          return (
+                            <AppCard
+                              key={app.id}
+                              app={app}
+                              activeDeployment={activeDeployment}
+                              onDelete={() => setDeletedApp(app)}
+                            />
+                          );
+                        })
+                      : 'No apps yet';
+                  default:
+                    return '';
+                }
+              })()}
+            </Box>
+          ) : null}
+          {viewMode === 'list' ? (
+            <Table sx={{ minWidth: 650 }} aria-label="apps list" size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {apps.map((app) => (
+                  <TableRow
+                    key={app.id}
+                    hover
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      <EditableText
+                        defaultValue={app.name}
+                        helperText={`Edited at ${getReadableDuration(app.editedAt)}`}
+                      />
+                    </TableCell>
+                    <TableCell align="right">{}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : null}
         </Container>
       </TabPanel>
     </ToolpadShell>

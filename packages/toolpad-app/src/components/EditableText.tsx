@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Skeleton, TextField, Theme, TypographyVariant, Tooltip, SxProps } from '@mui/material';
+import { TextField, Theme, TypographyVariant, SxProps } from '@mui/material';
 
 interface EditableTextProps {
   defaultValue?: string;
@@ -12,8 +12,7 @@ interface EditableTextProps {
   variant?: TypographyVariant;
   size?: 'small' | 'medium';
   sx?: SxProps;
-  helperText?: string;
-  disableTooltip?: boolean;
+  helperText?: React.ReactNode;
 }
 
 const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
@@ -30,8 +29,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
       isError,
       errorText,
       helperText,
-      disableTooltip,
-      ...rest
+      ...inputProps
     },
     ref,
   ) => {
@@ -42,7 +40,6 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
       if (ref) {
         inputElement = (ref as React.MutableRefObject<HTMLInputElement>).current;
       }
-
       if (inputElement) {
         if (editing) {
           inputElement.focus();
@@ -54,45 +51,35 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
     }, [ref, editing]);
 
     return (
-      <Tooltip
-        title={editing || disableTooltip ? '' : defaultValue || ''}
-        enterDelay={500}
-        placement={'left'}
-      >
-        {loading ? (
-          <Skeleton />
-        ) : (
-          <TextField
-            variant={'standard'}
-            size={size ?? 'small'}
-            inputRef={ref ?? appTitleInput}
-            sx={{
-              ...sx,
-              '& .MuiInputBase-root.MuiInput-root:before, .MuiInput-root.MuiInputBase-root:not(.Mui-disabled):hover::before':
-                {
-                  borderBottom: editing ? `initial` : 'none',
-                },
-            }}
-            inputProps={{
-              tabIndex: editing ? 0 : -1,
-              sx: (theme: Theme) => ({
-                // Handle overflow
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                fontSize: theme.typography[typographyVariant].fontSize,
-                height: theme.typography[typographyVariant].fontSize,
-              }),
-            }}
-            onKeyUp={onKeyUp ?? (() => {})}
-            onBlur={onBlur ?? (() => {})}
-            defaultValue={defaultValue}
-            error={isError}
-            helperText={isError ? errorText : helperText}
-            {...rest}
-          />
-        )}
-      </Tooltip>
+      <TextField
+        variant={'standard'}
+        size={size ?? 'small'}
+        inputRef={ref ?? appTitleInput}
+        sx={{
+          ...sx,
+          '& .MuiInputBase-root.MuiInput-root:before, .MuiInput-root.MuiInputBase-root:not(.Mui-disabled):hover::before':
+            {
+              borderBottom: editing ? `initial` : 'none',
+            },
+        }}
+        inputProps={{
+          tabIndex: editing ? 0 : -1,
+          sx: (theme: Theme) => ({
+            // Handle overflow
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            fontSize: theme.typography[typographyVariant].fontSize,
+            height: theme.typography[typographyVariant].fontSize,
+          }),
+          ...inputProps,
+        }}
+        onKeyUp={onKeyUp ?? (() => {})}
+        onBlur={onBlur ?? (() => {})}
+        defaultValue={defaultValue}
+        error={isError}
+        helperText={isError ? errorText : helperText}
+      />
     );
   },
 );

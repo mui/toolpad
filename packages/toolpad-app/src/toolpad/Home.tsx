@@ -15,6 +15,8 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Skeleton,
+  Stack,
   Tabs,
   Tab,
   Table,
@@ -26,7 +28,6 @@ import {
   Typography,
   ToggleButton,
   ToggleButtonGroup,
-  Skeleton,
   Tooltip,
 } from '@mui/material';
 import * as React from 'react';
@@ -144,40 +145,24 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
   );
 }
 
-interface AppCardProps {
+interface AppNameEditableProps {
   app?: App;
-  activeDeployment?: Deployment;
-  onDelete?: () => void;
+  editingTitle?: boolean;
+  setEditingTitle: (editingTitle: boolean) => void;
+  loading?: boolean;
+  description?: React.ReactNode;
 }
 
-function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
-  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+function AppNameEditable({
+  app,
+  editingTitle,
+  setEditingTitle,
+  loading,
+  description,
+}: AppNameEditableProps) {
   const [showAppRenameError, setShowAppRenameError] = React.useState<boolean>(false);
-  const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
   const [appTitle, setAppTitle] = React.useState<string | undefined>(app?.name);
   const appTitleInput = React.useRef<HTMLInputElement | null>(null);
-
-  const menuOpen = Boolean(menuAnchorEl);
-
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = React.useCallback(() => {
-    setMenuAnchorEl(null);
-  }, []);
-
-  const handleRenameClick = React.useCallback(() => {
-    setMenuAnchorEl(null);
-    setEditingTitle(true);
-  }, []);
-
-  const handleDeleteClick = React.useCallback(() => {
-    setMenuAnchorEl(null);
-    if (onDelete) {
-      onDelete();
-    }
-  }, [onDelete]);
 
   const handleAppRename = React.useCallback(
     async (name: string) => {
@@ -191,7 +176,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         }
       }
     },
-    [app?.id],
+    [app?.id, setEditingTitle],
   );
 
   const handleAppTitleBlur = React.useCallback(
@@ -199,7 +184,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
       setEditingTitle(false);
       handleAppRename(event.target.value);
     },
-    [handleAppRename],
+    [handleAppRename, setEditingTitle],
   );
 
   const handleAppTitleInput = React.useCallback(
@@ -219,9 +204,51 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         handleAppRename((event.target as HTMLInputElement).value);
       }
     },
-    [app?.name, handleAppRename],
+    [app?.name, handleAppRename, setEditingTitle],
   );
 
+  return loading ? (
+    <Skeleton />
+  ) : (
+    <EditableText
+      onBlur={handleAppTitleBlur}
+      onKeyUp={handleAppTitleInput}
+      editing={editingTitle}
+      isError={showAppRenameError}
+      errorText={`An app named "${appTitle}" already exists`}
+      loading={loading}
+      defaultValue={appTitle}
+      helperText={description}
+      variant="subtitle1"
+      sx={{ width: '100%' }}
+      ref={appTitleInput}
+    />
+  );
+}
+
+interface AppEditButtonProps {
+  app?: App;
+}
+
+function AppEditButton({ app }: AppEditButtonProps) {
+  return (
+    <Button
+      size="small"
+      component="a"
+      href={app ? `/_toolpad/app/${app.id}/editor` : ''}
+      disabled={!app}
+    >
+      Edit
+    </Button>
+  );
+}
+
+interface AppOpenButtonProps {
+  app?: App;
+  activeDeployment?: Deployment;
+}
+
+function AppOpenButton({ app, activeDeployment }: AppOpenButtonProps) {
   const openDisabled = !app || !activeDeployment;
   let openButton = (
     <Button
@@ -241,6 +268,102 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
       </Tooltip>
     );
   }
+  return openButton;
+}
+
+interface AppOptionsProps {
+  menuOpen: boolean;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+function AppOptions({ menuOpen, onClick }: AppOptionsProps) {
+  return (
+    <IconButton
+      aria-label="settings"
+      aria-controls={menuOpen ? 'basic-menu' : undefined}
+      aria-haspopup="true"
+      aria-expanded={menuOpen ? 'true' : undefined}
+      onClick={onClick}
+    >
+      <MoreVertIcon />
+    </IconButton>
+  );
+}
+
+interface AppMenuProps {
+  menuAnchorEl: HTMLElement | null;
+  menuOpen: boolean;
+  handleMenuClose: () => void;
+  handleRenameClick: () => void;
+  handleDeleteClick: () => void;
+}
+
+function AppMenu({
+  menuAnchorEl,
+  menuOpen,
+  handleMenuClose,
+  handleRenameClick,
+  handleDeleteClick,
+}: AppMenuProps) {
+  return (
+    <Menu
+      id="basic-menu"
+      anchorEl={menuAnchorEl}
+      open={menuOpen}
+      onClose={handleMenuClose}
+      MenuListProps={{
+        'aria-labelledby': 'basic-button',
+        dense: true,
+      }}
+    >
+      {/* Using an onClick on a MenuItem causes accessibility issues, see: https://github.com/mui/material-ui/pull/30145 */}
+      <MenuItem onClick={handleRenameClick}>
+        <ListItemIcon>
+          <DriveFileRenameOutlineIcon />
+        </ListItemIcon>
+        <ListItemText>Rename</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={handleDeleteClick}>
+        <ListItemIcon>
+          <DeleteIcon />
+        </ListItemIcon>
+        <ListItemText>Delete</ListItemText>
+      </MenuItem>
+    </Menu>
+  );
+}
+
+interface AppCardProps {
+  app?: App;
+  activeDeployment?: Deployment;
+  onDelete?: () => void;
+}
+
+function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
+
+  const menuOpen = Boolean(menuAnchorEl);
+
+  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = React.useCallback(() => {
+    setMenuAnchorEl(null);
+  }, []);
+
+  const handleRenameClick = React.useCallback(() => {
+    setMenuAnchorEl(null);
+    setEditingTitle(true);
+  }, []);
+
+  const handleDeleteClick = React.useCallback(() => {
+    setMenuAnchorEl(null);
+    if (onDelete) {
+      onDelete();
+    }
+  }, [onDelete]);
 
   return (
     <React.Fragment>
@@ -254,17 +377,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         }}
       >
         <CardHeader
-          action={
-            <IconButton
-              aria-label="settings"
-              aria-controls={menuOpen ? 'basic-menu' : undefined}
-              aria-haspopup="true"
-              aria-expanded={menuOpen ? 'true' : undefined}
-              onClick={handleMenuClick}
-            >
-              <MoreVertIcon />
-            </IconButton>
-          }
+          action={<AppOptions menuOpen={menuOpen} onClick={handleOptionsClick} />}
           disableTypography
           subheader={
             <Typography variant="body2" color="text.secondary">
@@ -279,58 +392,105 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           }
         />
         <CardContent sx={{ flexGrow: 1 }}>
-          <EditableText
-            onBlur={handleAppTitleBlur}
-            onKeyUp={handleAppTitleInput}
-            editing={editingTitle}
-            isError={showAppRenameError}
-            errorText={`An app named "${appTitle}" already exists`}
+          <AppNameEditable
+            app={app}
+            editingTitle={editingTitle}
+            setEditingTitle={setEditingTitle}
             loading={Boolean(!app)}
-            defaultValue={appTitle}
-            variant="subtitle1"
-            ref={appTitleInput}
           />
         </CardContent>
         <CardActions>
-          <Button
-            size="small"
-            component="a"
-            href={app ? `/_toolpad/app/${app.id}/editor` : ''}
-            disabled={!app}
-          >
-            Edit
-          </Button>
-          {openButton}
+          <AppEditButton app={app} />
+          <AppOpenButton app={app} activeDeployment={activeDeployment} />
         </CardActions>
       </Card>
-      <Menu
-        id="basic-menu"
-        anchorEl={menuAnchorEl}
-        open={menuOpen}
-        onClose={handleMenuClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-          dense: true,
-        }}
-      >
-        {/* Using an onClick on a MenuItem causes accessibility issues, see: https://github.com/mui/material-ui/pull/30145 */}
-        <MenuItem onClick={handleRenameClick}>
-          <ListItemIcon>
-            <DriveFileRenameOutlineIcon />
-          </ListItemIcon>
-          <ListItemText>Rename</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleDeleteClick}>
-          <ListItemIcon>
-            <DeleteIcon />
-          </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
-        </MenuItem>
-      </Menu>
+      <AppMenu
+        menuAnchorEl={menuAnchorEl}
+        menuOpen={menuOpen}
+        handleMenuClose={handleMenuClose}
+        handleRenameClick={handleRenameClick}
+        handleDeleteClick={handleDeleteClick}
+      />
     </React.Fragment>
   );
 }
 
+interface AppRowProps {
+  app?: App;
+  activeDeployment?: Deployment;
+  onDelete?: () => void;
+}
+
+function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [viewRowActions, setViewRowActions] = React.useState<string | null>(null);
+  const menuOpen = Boolean(menuAnchorEl);
+
+  const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
+
+  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = React.useCallback(() => {
+    setMenuAnchorEl(null);
+  }, []);
+
+  const handleRenameClick = React.useCallback(() => {
+    setMenuAnchorEl(null);
+    setEditingTitle(true);
+  }, []);
+
+  const handleDeleteClick = React.useCallback(() => {
+    setMenuAnchorEl(null);
+    if (onDelete) {
+      onDelete();
+    }
+  }, [onDelete]);
+
+  return (
+    <React.Fragment>
+      <TableRow
+        key={app?.id}
+        hover
+        onMouseEnter={() => {
+          setViewRowActions(app?.id ?? null);
+        }}
+        onMouseLeave={() => {
+          setViewRowActions(null);
+        }}
+      >
+        <TableCell component="th" scope="row">
+          <AppNameEditable
+            loading={Boolean(!app)}
+            app={app}
+            editingTitle={editingTitle}
+            setEditingTitle={setEditingTitle}
+            description={app ? `Edited at ${getReadableDuration(app.editedAt)}` : <Skeleton />}
+          />
+        </TableCell>
+        {app ? (
+          <TableCell hidden={viewRowActions !== app.id} align="right">
+            <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
+              <AppEditButton app={app} />
+              <AppOpenButton app={app} activeDeployment={activeDeployment} />
+              <AppOptions menuOpen={menuOpen} onClick={handleOptionsClick} />
+            </Stack>
+          </TableCell>
+        ) : (
+          <Skeleton />
+        )}
+      </TableRow>
+      <AppMenu
+        menuAnchorEl={menuAnchorEl}
+        menuOpen={menuOpen}
+        handleMenuClose={handleMenuClose}
+        handleRenameClick={handleRenameClick}
+        handleDeleteClick={handleDeleteClick}
+      />
+    </React.Fragment>
+  );
+}
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -367,7 +527,6 @@ function TabList({ value, handleTabChange }: TabListProps) {
       aria-label="tabs list"
     >
       <Tab label="Apps" />
-      <Tab label="Data" />
     </Tabs>
   );
 }
@@ -407,7 +566,6 @@ export default function Home() {
       <TabPanel index={0} value={tabIndex}>
         <Container>
           <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
-
           <Toolbar variant={'regular'} disableGutters sx={{ justifyContent: 'space-between' }}>
             <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
             <ToggleButtonGroup
@@ -472,24 +630,32 @@ export default function Home() {
             </Box>
           ) : null}
           {viewMode === 'list' ? (
-            <Table sx={{ minWidth: 650 }} aria-label="apps list" size="small">
+            <Table aria-label="apps list" size="medium">
               <TableBody>
-                {apps.map((app) => (
-                  <TableRow
-                    key={app.id}
-                    hover
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">
-                      <EditableText
-                        defaultValue={app.name}
-                        disableTooltip
-                        helperText={`Edited at ${getReadableDuration(app.editedAt)}`}
-                      />
-                    </TableCell>
-                    <TableCell align="right">{}</TableCell>
-                  </TableRow>
-                ))}
+                {(() => {
+                  switch (status) {
+                    case 'loading':
+                      return <AppRow />;
+                    case 'error':
+                      return <Alert severity="error">{(error as Error)?.message}</Alert>;
+                    case 'success':
+                      return apps.length > 0
+                        ? apps.map((app) => {
+                            const activeDeployment = activeDeploymentsByApp?.[app.id];
+                            return (
+                              <AppRow
+                                key={app.id}
+                                app={app}
+                                activeDeployment={activeDeployment}
+                                onDelete={() => setDeletedApp(app)}
+                              />
+                            );
+                          })
+                        : 'No apps yet';
+                    default:
+                      return '';
+                  }
+                })()}
               </TableBody>
             </Table>
           ) : null}

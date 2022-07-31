@@ -60,7 +60,7 @@ function ConfirmDeployDialog({ open, onClose, data: dataProp }: ConfirmDeployDia
     <Dialog open={open} onClose={cancel}>
       <DialogTitle>Confirm deploy</DialogTitle>
       <DialogContent>
-        Press &quot;Deploy&quot; to change the canonical url of your application to
+        Press &quot;Deploy&quot; to change the canonical URL of your application to
         version&nbsp;&quot;{data.version}&quot;.
       </DialogContent>
       <DialogActions>

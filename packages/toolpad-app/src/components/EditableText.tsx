@@ -1,9 +1,14 @@
 import * as React from 'react';
-import { TextField, Theme, TypographyVariant, SxProps } from '@mui/material';
+import {
+  TextField,
+  Theme,
+  TypographyVariant,
+  SxProps,
+  InputBaseComponentProps,
+} from '@mui/material';
 
 interface EditableTextProps {
   defaultValue?: string;
-  loading?: boolean;
   editing?: boolean;
   isError?: boolean;
   errorText?: string;
@@ -13,6 +18,8 @@ interface EditableTextProps {
   size?: 'small' | 'medium';
   sx?: SxProps;
   helperText?: React.ReactNode;
+  disabled?: boolean;
+  inputProps?: InputBaseComponentProps;
 }
 
 const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
@@ -25,11 +32,11 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
       size,
       sx,
       editing,
-      loading,
       isError,
       errorText,
       helperText,
-      ...inputProps
+      disabled,
+      inputProps = {},
     },
     ref,
   ) => {
@@ -65,6 +72,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         inputProps={{
           tabIndex: editing ? 0 : -1,
           sx: (theme: Theme) => ({
+            ...inputProps.sx,
             // Handle overflow
             textOverflow: 'ellipsis',
             overflow: 'hidden',
@@ -78,6 +86,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         onBlur={onBlur ?? (() => {})}
         defaultValue={defaultValue}
         error={isError}
+        disabled={disabled}
         helperText={isError ? errorText : helperText}
       />
     );

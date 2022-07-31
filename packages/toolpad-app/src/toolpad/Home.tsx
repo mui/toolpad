@@ -25,10 +25,10 @@ import {
   TableRow,
   TextField,
   Toolbar,
-  Typography,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import * as React from 'react';
 import { LoadingButton } from '@mui/lab';
@@ -216,11 +216,19 @@ function AppNameEditable({
       editing={editingTitle}
       isError={showAppRenameError}
       errorText={`An app named "${appTitle}" already exists`}
-      loading={loading}
       defaultValue={appTitle}
       helperText={description}
       variant="subtitle1"
-      sx={{ width: '100%' }}
+      sx={{
+        width: '100%',
+        // TextField must be disabled by default
+        '& .MuiInput-root.MuiInputBase-root.Mui-disabled, .MuiInput-input.MuiInputBase-input.Mui-disabled, .MuiInput-root.MuiFormHelperText-root.Mui-disabled':
+          {
+            WebkitTextFillColor: 'unset',
+            color: 'unset',
+          },
+      }}
+      disabled={!editingTitle}
       ref={appTitleInput}
     />
   );

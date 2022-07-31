@@ -55,7 +55,9 @@ async function exec(
     ...(connection?.headers || []),
   ];
 
-  const res = await fetch(queryUrl.href, { headers });
+  const method = fetchQuery.method;
+
+  const res = await fetch(queryUrl.href, { method, headers });
 
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}`);

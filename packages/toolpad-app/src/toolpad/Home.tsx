@@ -445,14 +445,14 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
 
   return (
     <React.Fragment>
-      <TableRow hover>
+      <TableRow hover role="row">
         <TableCell component="th" scope="row">
           <AppNameEditable
             loading={Boolean(!app)}
             app={app}
             editingTitle={editingTitle}
             setEditingTitle={setEditingTitle}
-            description={app ? `Edited at ${getReadableDuration(app.editedAt)}` : <Skeleton />}
+            description={app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
           />
         </TableCell>
         <TableCell align="right">

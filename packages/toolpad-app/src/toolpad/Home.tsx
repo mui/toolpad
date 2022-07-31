@@ -423,7 +423,7 @@ interface AppRowProps {
 
 function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [viewRowActions, setViewRowActions] = React.useState<string | null>(null);
+
   const menuOpen = Boolean(menuAnchorEl);
 
   const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
@@ -450,16 +450,7 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
 
   return (
     <React.Fragment>
-      <TableRow
-        key={app?.id}
-        hover
-        onMouseEnter={() => {
-          setViewRowActions(app?.id ?? null);
-        }}
-        onMouseLeave={() => {
-          setViewRowActions(null);
-        }}
-      >
+      <TableRow hover>
         <TableCell component="th" scope="row">
           <AppNameEditable
             loading={Boolean(!app)}
@@ -469,17 +460,13 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
             description={app ? `Edited at ${getReadableDuration(app.editedAt)}` : <Skeleton />}
           />
         </TableCell>
-        {app ? (
-          <TableCell hidden={viewRowActions !== app.id} align="right">
-            <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
-              <AppEditButton app={app} />
-              <AppOpenButton app={app} activeDeployment={activeDeployment} />
-              <AppOptions menuOpen={menuOpen} onClick={handleOptionsClick} />
-            </Stack>
-          </TableCell>
-        ) : (
-          <Skeleton />
-        )}
+        <TableCell align="right">
+          <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
+            <AppEditButton app={app} />
+            <AppOpenButton app={app} activeDeployment={activeDeployment} />
+            <AppOptions menuOpen={menuOpen} onClick={handleOptionsClick} />
+          </Stack>
+        </TableCell>
       </TableRow>
       <AppMenu
         menuAnchorEl={menuAnchorEl}
@@ -624,13 +611,13 @@ export default function Home() {
                         })
                       : 'No apps yet';
                   default:
-                    return '';
+                    return <AppCard />;
                 }
               })()}
             </Box>
           ) : null}
-          {viewMode === 'list' ? (
-            <Table aria-label="apps list" size="medium">
+          <Table aria-label="apps list" size="medium">
+            {viewMode === 'list' ? (
               <TableBody>
                 {(() => {
                   switch (status) {
@@ -657,8 +644,8 @@ export default function Home() {
                   }
                 })()}
               </TableBody>
-            </Table>
-          ) : null}
+            ) : null}
+          </Table>
         </Container>
       </TabPanel>
     </ToolpadShell>

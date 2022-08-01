@@ -114,6 +114,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         inputRef={ref ?? appTitleInput}
         inputProps={{
           tabIndex: editing ? 0 : -1,
+          'aria-readonly': !editing,
           sx: (theme: Theme) => ({
             // Handle overflow
             textOverflow: 'ellipsis',

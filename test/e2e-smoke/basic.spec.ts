@@ -19,13 +19,9 @@ test('basic app creation flow', async ({ page }) => {
 
   await page.click('[aria-label="Home"]');
 
-  const appRow = await page.locator(`[role="row"]`, {
-    has: await page.locator(`input[value="${appName}"]`),
-  });
+  const appRowSelector = `[role="row"] >> has="input[value='${appName}']"`;
 
-  const appOptions = await appRow.locator('[aria-label="settings"]');
-
-  await appOptions.click();
+  await page.click(`${appRowSelector} >> [aria-label="settings"]`);
 
   await page.click('[role="menuitem"]:has-text("Delete"):visible');
 
@@ -41,8 +37,7 @@ test('basic app creation flow', async ({ page }) => {
     `[role="dialog"]:has-text('Are you sure you want to delete application "${appName}"') >> button:has-text("delete")`,
   );
 
-  const appRowElement = await appRow.elementHandle();
-  await appRowElement?.waitForElementState('hidden');
+  await page.waitForSelector(appRowSelector, { state: 'detached' });
 
   await page.off('request', handleRequest);
 

@@ -221,7 +221,7 @@ function AppNameEditable({
       variant="subtitle1"
       sx={{
         width: '100%',
-        // TextField must be disabled by default
+        // TextField must be disabled by default, but not appear so
         '& .MuiInput-root.MuiInputBase-root.Mui-disabled, .MuiInput-input.MuiInputBase-input.Mui-disabled, .MuiInput-root.MuiFormHelperText-root.Mui-disabled':
           {
             WebkitTextFillColor: 'unset',

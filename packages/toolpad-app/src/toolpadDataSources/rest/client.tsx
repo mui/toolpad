@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
-import { FetchQuery, RestConnectionParams } from './types';
+import { FetchQuery, RestConnectionParams, Body } from './types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
@@ -26,6 +26,7 @@ import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { mapValues } from '../../utils/collections';
+import BodyEditor from './BodyEditor';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -183,8 +184,12 @@ function QueryEditor({
   );
 
   const handleBodyChange = React.useCallback(
-    (newUrl: BindableAttrValue<string> | null) => {
-      // TODO
+    (newBody: Maybe<Body>) => {
+      const query: FetchQuery = {
+        ...value.query,
+        body: newBody,
+      };
+      onChange({ ...value, query });
     },
     [onChange, value],
   );
@@ -252,15 +257,7 @@ function QueryEditor({
           onChange={handleUrlChange}
         />
       </Box>
-      <BindableEditor
-        liveBinding={liveUrl}
-        globalScope={queryScope}
-        server
-        label="body"
-        propType={{ type: 'string' }}
-        value={value.query.body ?? appDom.createConst('')}
-        onChange={handleBodyChange}
-      />
+      <BodyEditor value={value.query.body} onChange={handleBodyChange} />
     </Stack>
   );
 }

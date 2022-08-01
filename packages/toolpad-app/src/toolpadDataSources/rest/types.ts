@@ -30,23 +30,26 @@ export interface RestConnectionParams {
   authentication?: Maybe<Authentication>;
 }
 
-export type Body =
-  | {
-      kind: 'raw';
-      value: BindableAttrValue<string>;
-    }
-  | {
-      kind: 'urlEncoded';
-      value: [string, BindableAttrValue<string>][];
-    }
-  | {
-      kind: 'json';
-      value: BindableAttrValue<any>;
-    };
+export interface RawBody {
+  kind: 'raw';
+  content: BindableAttrValue<string>;
+}
+
+export interface UrlEncodedBody {
+  kind: 'urlEncoded';
+  content: [string, BindableAttrValue<string>][];
+}
+
+export interface JsonBody {
+  kind: 'json';
+  content: BindableAttrValue<any>;
+}
+
+export type Body = RawBody | UrlEncodedBody | JsonBody;
 
 export interface FetchQuery {
   readonly url: BindableAttrValue<string>;
   readonly method: string;
   readonly headers: [string, BindableAttrValue<string>][];
-  readonly body?: Body;
+  readonly body?: Maybe<Body>;
 }

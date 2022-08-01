@@ -182,6 +182,13 @@ function QueryEditor({
     [onChange, value],
   );
 
+  const handleBodyChange = React.useCallback(
+    (newUrl: BindableAttrValue<string> | null) => {
+      // TODO
+    },
+    [onChange, value],
+  );
+
   const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
     Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>)),
   );
@@ -245,6 +252,15 @@ function QueryEditor({
           onChange={handleUrlChange}
         />
       </Box>
+      <BindableEditor
+        liveBinding={liveUrl}
+        globalScope={queryScope}
+        server
+        label="body"
+        propType={{ type: 'string' }}
+        value={value.query.body ?? appDom.createConst('')}
+        onChange={handleBodyChange}
+      />
     </Stack>
   );
 }

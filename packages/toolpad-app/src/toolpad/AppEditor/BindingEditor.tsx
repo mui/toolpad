@@ -27,6 +27,7 @@ import {
   JsExpressionAttrValue,
   NavigationAction,
   NodeId,
+  NodeReference,
   JsExpressionAction,
 } from '@mui/toolpad-core';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
@@ -186,7 +187,10 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
 
   const handlePageChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ type: 'navigationAction', value: { page: event.target.value as NodeId } });
+      const newPageNode: NodeReference = {
+        $$ref: event.target.value as NodeId,
+      };
+      onChange({ type: 'navigationAction', value: { page: newPageNode } });
     },
     [onChange],
   );
@@ -206,7 +210,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
         sx={{ my: 3 }}
         label="page"
         select
-        value={value?.value?.page || ''}
+        value={value?.value?.page.$$ref || ''}
         onChange={handlePageChange}
         disabled={!hasPagesAvailable}
         helperText={hasPagesAvailable ? null : 'No other pages available'}

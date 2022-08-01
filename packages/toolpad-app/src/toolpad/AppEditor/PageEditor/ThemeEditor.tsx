@@ -90,7 +90,6 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
       {theme ? (
         <Stack spacing={2}>
           <ToggleButtonGroup
-            size="small"
             exclusive
             value={appDom.fromConstPropValue(theme.theme?.['palette.mode']) || 'light'}
             onChange={(event, newValue) => {

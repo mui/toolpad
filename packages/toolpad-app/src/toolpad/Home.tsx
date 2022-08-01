@@ -147,24 +147,37 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
 
 interface AppNameEditableProps {
   app?: App;
-  editingTitle?: boolean;
-  setEditingTitle: (editingTitle: boolean) => void;
+  editingName?: boolean;
+  setEditingName: (editingTitle: boolean) => void;
   loading?: boolean;
   description?: React.ReactNode;
 }
 
 function AppNameEditable({
   app,
-  editingTitle,
-  setEditingTitle,
+  editingName,
+  setEditingName,
   loading,
   description,
 }: AppNameEditableProps) {
   const [showAppRenameError, setShowAppRenameError] = React.useState<boolean>(false);
-  const [appTitle, setAppTitle] = React.useState<string | undefined>(app?.name);
-  const appTitleInput = React.useRef<HTMLInputElement | null>(null);
+  const appNameInput = React.useRef<HTMLInputElement | null>(null);
+  const [appName, setAppName] = React.useState<string>(app?.name || '');
 
-  const handleAppRename = React.useCallback(
+  const handleAppNameChange = React.useCallback(
+    (newValue: string) => {
+      setShowAppRenameError(false);
+      setAppName(newValue);
+    },
+    [setAppName],
+  );
+
+  const handleAppRenameClose = React.useCallback(() => {
+    setEditingName(false);
+    setShowAppRenameError(false);
+  }, [setEditingName]);
+
+  const handleAppRenameSave = React.useCallback(
     async (name: string) => {
       if (app?.id) {
         try {
@@ -172,53 +185,27 @@ function AppNameEditable({
           await client.invalidateQueries('getApps');
         } catch (err) {
           setShowAppRenameError(true);
-          setEditingTitle(true);
+          setEditingName(true);
         }
       }
     },
-    [app?.id, setEditingTitle],
-  );
-
-  const handleAppTitleBlur = React.useCallback(
-    (event: React.FocusEvent<HTMLInputElement>) => {
-      setEditingTitle(false);
-      handleAppRename(event.target.value);
-    },
-    [handleAppRename, setEditingTitle],
-  );
-
-  const handleAppTitleInput = React.useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
-      setAppTitle((event.target as HTMLInputElement).value);
-      setShowAppRenameError(false);
-      if (event.key === 'Escape') {
-        if (appTitleInput.current?.value && app?.name) {
-          setAppTitle(app.name);
-          appTitleInput.current.value = app.name;
-        }
-        setEditingTitle(false);
-        return;
-      }
-      if (event.key === 'Enter') {
-        setEditingTitle(false);
-        handleAppRename((event.target as HTMLInputElement).value);
-      }
-    },
-    [app?.name, handleAppRename, setEditingTitle],
+    [app?.id, setEditingName],
   );
 
   return loading ? (
     <Skeleton />
   ) : (
     <EditableText
-      onBlur={handleAppTitleBlur}
-      onKeyUp={handleAppTitleInput}
-      editing={editingTitle}
-      isError={showAppRenameError}
-      errorText={`An app named "${appTitle}" already exists`}
-      defaultValue={appTitle}
+      defaultValue={app?.name}
+      disabled={!editingName}
+      editing={editingName}
+      errorText={`An app named "${appName}" already exists`}
       helperText={description}
-      variant="subtitle1"
+      isError={showAppRenameError}
+      onChange={handleAppNameChange}
+      onClose={handleAppRenameClose}
+      onSave={handleAppRenameSave}
+      ref={appNameInput}
       sx={{
         width: '100%',
         // TextField must be disabled by default, but not appear so
@@ -228,8 +215,8 @@ function AppNameEditable({
             color: 'unset',
           },
       }}
-      disabled={!editingTitle}
-      ref={appTitleInput}
+      value={appName}
+      variant="subtitle1"
     />
   );
 }
@@ -344,7 +331,7 @@ interface AppCardProps {
 
 function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
+  const [editingName, setEditingName] = React.useState<boolean>(false);
 
   const menuOpen = Boolean(menuAnchorEl);
 
@@ -358,7 +345,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
 
   const handleRenameClick = React.useCallback(() => {
     setMenuAnchorEl(null);
-    setEditingTitle(true);
+    setEditingName(true);
   }, []);
 
   const handleDeleteClick = React.useCallback(() => {
@@ -397,8 +384,8 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         <CardContent sx={{ flexGrow: 1 }}>
           <AppNameEditable
             app={app}
-            editingTitle={editingTitle}
-            setEditingTitle={setEditingTitle}
+            editingName={editingName}
+            setEditingName={setEditingName}
             loading={Boolean(!app)}
           />
         </CardContent>
@@ -429,7 +416,7 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
 
   const menuOpen = Boolean(menuAnchorEl);
 
-  const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
+  const [editingName, setEditingName] = React.useState<boolean>(false);
 
   const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenuAnchorEl(event.currentTarget);
@@ -441,7 +428,7 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
 
   const handleRenameClick = React.useCallback(() => {
     setMenuAnchorEl(null);
-    setEditingTitle(true);
+    setEditingName(true);
   }, []);
 
   const handleDeleteClick = React.useCallback(() => {
@@ -458,8 +445,8 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
           <AppNameEditable
             loading={Boolean(!app)}
             app={app}
-            editingTitle={editingTitle}
-            setEditingTitle={setEditingTitle}
+            editingName={editingName}
+            setEditingName={setEditingName}
             description={app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
           />
         </TableCell>

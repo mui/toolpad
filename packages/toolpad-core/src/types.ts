@@ -6,6 +6,10 @@ export type NodeId = Branded<string, 'NodeId'>;
 
 export type BindingAttrValueFormat = 'stringLiteral' | 'default';
 
+export interface NodeReference {
+  $$ref: NodeId;
+}
+
 export interface BoundExpressionAttrValue {
   type: 'boundExpression';
   value: string;
@@ -40,7 +44,7 @@ export interface JsExpressionAction {
 export interface NavigationAction<P = any> {
   type: 'navigationAction';
   value: {
-    page: NodeId;
+    page: NodeReference;
     parameters?: BindableAttrValues<P>;
   };
 }

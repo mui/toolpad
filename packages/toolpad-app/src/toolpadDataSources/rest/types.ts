@@ -33,6 +33,7 @@ export interface RestConnectionParams {
 export interface RawBody {
   kind: 'raw';
   content: BindableAttrValue<string>;
+  contentType: string;
 }
 
 export interface UrlEncodedBody {

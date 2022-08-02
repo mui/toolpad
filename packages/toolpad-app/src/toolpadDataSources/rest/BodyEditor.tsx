@@ -1,34 +1,72 @@
 import * as React from 'react';
-import { Box, MenuItem, Skeleton, TextField, Toolbar } from '@mui/material';
-import { TabContext, TabPanel } from '@mui/lab';
+import { Box, MenuItem, Skeleton, styled, TextField, Toolbar, ToolbarProps } from '@mui/material';
+import { TabContext } from '@mui/lab';
 import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
-import { Body, JsonBody, RawBody, UrlEncodedBody } from './types';
+import { Body, RawBody, UrlEncodedBody } from './types';
 import { Maybe, WithControlledProp } from '../../utils/types';
 import { useEvaluateLiveBinding } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import lazyComponent from '../../utils/lazyComponent';
+import * as appDom from '../../appDom';
+import TabPanel from '../../components/TabPanel';
 
-const JsonEditor = lazyComponent(() => import('../../components/JsonEditor'), {
+interface ContentTypeSpec {
+  alias: string;
+  language: string;
+}
+
+const RAW_CONTENT_TYPES = new Map<string, ContentTypeSpec>([
+  ['text/plain', { alias: 'text', language: 'plaintext' }],
+  ['application/json', { alias: 'json', language: 'json' }],
+  ['text/javascript', { alias: 'javascript', language: 'typescript' }],
+  ['text/csv', { alias: 'csv', language: 'plaintext' }],
+  ['text/html', { alias: 'html', language: 'html' }],
+  ['text/css', { alias: 'css', language: 'css' }],
+  ['application/xml', { alias: 'xml', language: 'plaintext' }],
+]);
+
+const BodyEditorToolbar = styled((props: ToolbarProps) => <Toolbar disableGutters {...props} />)(
+  ({ theme }) => ({
+    gap: theme.spacing(1),
+  }),
+);
+
+const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor'), {
   noSsr: true,
   fallback: <Skeleton variant="rectangular" height="100%" />,
 });
 
-interface BodyEditorProps<B = Body> extends WithControlledProp<Maybe<B>> {
+interface BodyTypeEditorProps<B = Body> extends WithControlledProp<Maybe<B>> {
   globalScope: Record<string, any>;
+  toolbarActions?: React.ReactNode;
 }
 
-function RawBodyEditor({ value, onChange, globalScope }: BodyEditorProps<RawBody>) {
-  return null;
-}
+function RawBodyEditor({
+  toolbarActions,
+  value: valueProp,
+  onChange,
+  globalScope,
+}: BodyTypeEditorProps<RawBody>) {
+  const value: RawBody = React.useMemo(
+    () => ({
+      kind: 'raw',
+      contentType: 'text/plain',
+      content: appDom.createConst(''),
+      ...valueProp,
+    }),
+    [valueProp],
+  );
 
-function UrlEncodedBodyEditor({ value, onChange, globalScope }: BodyEditorProps<UrlEncodedBody>) {
-  return null;
-}
+  const handleContentTypeChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange({ ...value, contentType: event.target.value });
+    },
+    [onChange, value],
+  );
 
-function JsonBodyEditor({ value, onChange, globalScope }: BodyEditorProps<JsonBody>) {
   const handleValueChange = React.useCallback(
-    (newContent: BindableAttrValue<any> | null) => {
-      onChange(newContent ? { ...value, kind: 'json', content: newContent } : null);
+    (newContent: BindableAttrValue<string> | null) => {
+      onChange({ ...value, content: newContent || appDom.createConst('') });
     },
     [onChange, value],
   );
@@ -40,14 +78,31 @@ function JsonBodyEditor({ value, onChange, globalScope }: BodyEditorProps<JsonBo
     globalScope,
   });
 
+  const { language = 'plaintext' } = RAW_CONTENT_TYPES.get(value.contentType) ?? {};
+
   return (
-    <Box sx={{ height: 500 }}>
+    <Box>
+      <BodyEditorToolbar disableGutters>
+        {toolbarActions}
+        <TextField select value={value?.contentType} onChange={handleContentTypeChange}>
+          {Array.from(RAW_CONTENT_TYPES.entries(), ([contentType, { alias }]) => (
+            <MenuItem key={contentType} value={contentType}>
+              {alias}
+            </MenuItem>
+          ))}
+        </TextField>
+      </BodyEditorToolbar>
       <BindableEditor
         liveBinding={liveContent}
         globalScope={globalScope}
         propType={{ type: 'string' }}
         renderControl={(props) => (
-          <JsonEditor sx={{ flex: 1, height: 250 }} value={props.value} onChange={props.onChange} />
+          <MonacoEditor
+            sx={{ flex: 1, height: 250 }}
+            language={language}
+            value={props.value}
+            onChange={props.onChange}
+          />
         )}
         value={value?.content || null}
         onChange={handleValueChange}
@@ -57,7 +112,25 @@ function JsonBodyEditor({ value, onChange, globalScope }: BodyEditorProps<JsonBo
   );
 }
 
+function UrlEncodedBodyEditor({
+  toolbarActions,
+  value,
+  onChange,
+  globalScope,
+}: BodyTypeEditorProps<UrlEncodedBody>) {
+  return (
+    <Box>
+      <BodyEditorToolbar disableGutters>{toolbarActions}</BodyEditorToolbar>
+      🚧 under construction
+    </Box>
+  );
+}
+
 type BodyKind = Body['kind'];
+
+export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
+  globalScope: Record<string, any>;
+}
 
 export default function BodyEditor({ globalScope, value, onChange }: BodyEditorProps) {
   const [activeTab, setActiveTab] = React.useState<BodyKind>(value?.kind || 'raw');
@@ -67,34 +140,31 @@ export default function BodyEditor({ globalScope, value, onChange }: BodyEditorP
     setActiveTab(event.target.value as BodyKind);
   };
 
+  const toolbarActions = (
+    <React.Fragment>
+      <TextField select value={activeTab} onChange={handleTabChange}>
+        <MenuItem value="raw">raw</MenuItem>
+        <MenuItem value="urlEncoded">x-www-form-urlencoded</MenuItem>
+      </TextField>
+    </React.Fragment>
+  );
+
   return (
     <Box>
       <TabContext value={activeTab}>
-        <Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TextField select value={activeTab} onChange={handleTabChange}>
-            <MenuItem value="raw">raw</MenuItem>
-            <MenuItem value="urlEncoded">x-www-form-urlencoded</MenuItem>
-            <MenuItem value="json">json</MenuItem>
-          </TextField>
-        </Toolbar>
-        <TabPanel value="raw">
+        <TabPanel disableGutters value="raw">
           <RawBodyEditor
+            toolbarActions={toolbarActions}
             globalScope={globalScope}
             value={value?.kind === 'raw' ? value : null}
             onChange={onChange}
           />
         </TabPanel>
-        <TabPanel value="urlEncoded">
+        <TabPanel disableGutters value="urlEncoded">
           <UrlEncodedBodyEditor
+            toolbarActions={toolbarActions}
             globalScope={globalScope}
             value={value?.kind === 'urlEncoded' ? value : null}
-            onChange={onChange}
-          />
-        </TabPanel>
-        <TabPanel value="json">
-          <JsonBodyEditor
-            globalScope={globalScope}
-            value={value?.kind === 'json' ? value : null}
             onChange={onChange}
           />
         </TabPanel>

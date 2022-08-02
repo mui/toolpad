@@ -7,11 +7,13 @@ import {
   InputAdornment,
   MenuItem,
   Stack,
+  Tab,
   TextField,
   Toolbar,
   Typography,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
+import { TabContext, TabList } from '@mui/lab';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { FetchQuery, RestConnectionParams, Body } from './types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
@@ -27,6 +29,7 @@ import * as appDom from '../../appDom';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { mapValues } from '../../utils/collections';
 import BodyEditor from './BodyEditor';
+import TabPanel from '../../components/TabPanel';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -226,6 +229,13 @@ function QueryEditor({
     globalScope: queryScope,
   });
 
+  const [activeTab, setActiveTab] = React.useState('body');
+
+  const handleActiveTabChange = React.useCallback(
+    (event: React.SyntheticEvent, newValue: string) => setActiveTab(newValue),
+    [],
+  );
+
   return (
     <Stack gap={2} sx={{ px: 3, pt: 1 }}>
       <Typography>Parameters</Typography>
@@ -257,7 +267,28 @@ function QueryEditor({
           onChange={handleUrlChange}
         />
       </Box>
-      <BodyEditor value={value.query.body} onChange={handleBodyChange} />
+      <TabContext value={activeTab}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
+            <Tab label="Parameters" value="parameters" />
+            <Tab label="Body" value="body" />
+            <Tab label="Headers" value="headers" />
+          </TabList>
+        </Box>
+        <TabPanel disableGutters value="parameters">
+          🚧 Under construction
+        </TabPanel>
+        <TabPanel disableGutters value="body">
+          <BodyEditor
+            globalScope={globalScope}
+            value={value.query.body}
+            onChange={handleBodyChange}
+          />
+        </TabPanel>
+        <TabPanel disableGutters value="headers">
+          🚧 Under construction
+        </TabPanel>
+      </TabContext>
     </Stack>
   );
 }

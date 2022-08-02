@@ -127,7 +127,7 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
     const queryNode = appDom.createNode(dom, 'query', {
       attributes: {
         query: appDom.createConst(dataSource.getInitialQueryValue()),
-        connectionId: appDom.createConst(connectionId),
+        connectionId: appDom.createConst(appDom.ref(connectionId)),
         dataSource: appDom.createConst(dataSourceId),
       },
     });
@@ -180,7 +180,7 @@ function QueryNodeEditorDialog<Q, P>({
     }
   }, [open, node]);
 
-  const connectionId = input.attributes.connectionId.value;
+  const connectionId = appDom.deref(input.attributes.connectionId.value);
   const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
@@ -189,7 +189,9 @@ function QueryNodeEditorDialog<Q, P>({
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
-          connectionId: newConnectionId ? appDom.createConst(newConnectionId) : undefined,
+          connectionId: newConnectionId
+            ? appDom.createConst(appDom.ref(newConnectionId))
+            : undefined,
         }),
       }),
     );
@@ -380,7 +382,7 @@ function QueryNodeEditorDialog<Q, P>({
           <NodeNameEditor node={node} />
           <ConnectionSelect
             dataSource={dataSourceId}
-            value={input.attributes.connectionId.value || null}
+            value={appDom.deref(input.attributes.connectionId.value) || null}
             onChange={handleConnectionChange}
           />
         </Stack>

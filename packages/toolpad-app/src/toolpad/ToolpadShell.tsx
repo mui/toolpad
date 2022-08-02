@@ -42,7 +42,7 @@ function Header({ actions, navigation }: HeaderProps) {
       elevation={0}
       sx={{ zIndex: 2, borderBottom: 1, borderColor: 'divider' }}
     >
-      <Toolbar sx={{ gap: 2 }}>
+      <Toolbar sx={{ gap: 1 }}>
         <IconButton
           size="medium"
           edge="start"

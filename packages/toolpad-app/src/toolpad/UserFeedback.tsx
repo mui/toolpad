@@ -32,9 +32,9 @@ function getDialogContent(params: DialogParams) {
       return (
         <React.Fragment>
           Looking for a <code>{params.futureComponent.displayName}</code> component? We&quot;re
-          working on it. You can upvote{' '}
+          working on it. You can upvote the{' '}
           <a href={params.futureComponent.githubLink} target="_blank" rel="noreferrer">
-            the feature request
+            feature request
           </a>{' '}
           on our repository.
         </React.Fragment>

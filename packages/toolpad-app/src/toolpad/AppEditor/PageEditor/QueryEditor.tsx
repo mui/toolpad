@@ -25,7 +25,7 @@ import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { LoadingButton } from '@mui/lab';
-import { BindableAttrValue, NodeId, NodeReference } from '@mui/toolpad-core';
+import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -127,7 +127,7 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
     const queryNode = appDom.createNode(dom, 'query', {
       attributes: {
         query: appDom.createConst(dataSource.getInitialQueryValue()),
-        connectionId: appDom.createConst({ $$ref: connectionId } as NodeReference),
+        connectionId: appDom.createConst(appDom.ref(connectionId)),
         dataSource: appDom.createConst(dataSourceId),
       },
     });
@@ -180,7 +180,7 @@ function QueryNodeEditorDialog<Q, P>({
     }
   }, [open, node]);
 
-  const connectionId = input.attributes.connectionId.value.$$ref;
+  const connectionId = appDom.deref(input.attributes.connectionId.value);
   const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
@@ -190,7 +190,7 @@ function QueryNodeEditorDialog<Q, P>({
       update(existing, {
         attributes: update(existing.attributes, {
           connectionId: newConnectionId
-            ? appDom.createConst({ $$ref: newConnectionId } as NodeReference)
+            ? appDom.createConst(appDom.ref(newConnectionId))
             : undefined,
         }),
       }),
@@ -382,7 +382,7 @@ function QueryNodeEditorDialog<Q, P>({
           <NodeNameEditor node={node} />
           <ConnectionSelect
             dataSource={dataSourceId}
-            value={input.attributes.connectionId.value.$$ref || null}
+            value={appDom.deref(input.attributes.connectionId.value) || null}
             onChange={handleConnectionChange}
           />
         </Stack>

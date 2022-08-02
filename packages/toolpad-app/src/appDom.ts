@@ -804,3 +804,10 @@ export function createRenderTree(dom: AppDom): RenderTree {
     nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as RenderTreeNodes,
   };
 }
+
+export function ref(nodeId: NodeId): NodeReference {
+  return { $$ref: nodeId };
+}
+export function deref(nodeRef: NodeReference): NodeId {
+  return nodeRef.$$ref;
+}

@@ -197,23 +197,15 @@ function AppNameEditable({
   ) : (
     <EditableText
       defaultValue={app?.name}
-      disabled={!editingName}
       editing={editingName}
-      errorText={`An app named "${appName}" already exists`}
-      helperText={description}
-      isError={showAppRenameError}
+      helperText={showAppRenameError ? `An app named "${appName}" already exists` : description}
+      error={showAppRenameError}
       onChange={handleAppNameChange}
       onClose={handleAppRenameClose}
       onSave={handleAppRenameSave}
       ref={appNameInput}
       sx={{
         width: '100%',
-        // TextField must be disabled by default, but not appear so
-        '& .MuiInput-root.MuiInputBase-root.Mui-disabled, .MuiInput-input.MuiInputBase-input.Mui-disabled, .MuiInput-root.MuiFormHelperText-root.Mui-disabled':
-          {
-            WebkitTextFillColor: 'unset',
-            color: 'unset',
-          },
       }}
       value={appName}
       variant="subtitle1"

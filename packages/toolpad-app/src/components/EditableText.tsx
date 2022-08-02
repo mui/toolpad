@@ -5,9 +5,8 @@ interface EditableTextProps {
   defaultValue?: string;
   disabled?: boolean;
   editing?: boolean;
-  errorText?: string;
   helperText?: React.ReactNode;
-  isError?: boolean;
+  error?: boolean;
   onChange?: (newValue: string) => void;
   onSave?: (newValue: string) => void;
   onClose?: () => void;
@@ -23,9 +22,8 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
       defaultValue,
       disabled,
       editing,
-      errorText,
       helperText,
-      isError,
+      error,
       onChange,
       onClose,
       onSave,
@@ -108,9 +106,10 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
 
     return (
       <TextField
-        disabled={disabled}
-        error={isError}
-        helperText={isError ? errorText : helperText}
+        // `disabled` prop overrides `editing` prop
+        disabled={disabled || !editing}
+        error={error}
+        helperText={helperText}
         inputRef={ref ?? appTitleInput}
         inputProps={{
           tabIndex: editing ? 0 : -1,
@@ -134,6 +133,14 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
             {
               borderBottom: editing ? `initial` : 'none',
             },
+          // TextField must not appear disabled if disabled state is controlled by `editing` prop
+          '& .MuiInput-root.MuiInputBase-root.Mui-disabled, .MuiInput-input.MuiInputBase-input.Mui-disabled, .MuiInput-root.MuiFormHelperText-root.Mui-disabled':
+            disabled
+              ? null
+              : {
+                  WebkitTextFillColor: 'unset',
+                  color: 'unset',
+                },
         }}
         value={value}
         variant={'standard'}

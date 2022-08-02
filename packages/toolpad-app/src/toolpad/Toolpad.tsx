@@ -7,6 +7,7 @@ import Releases from './Releases';
 import AppEditor from './AppEditor';
 import Home from './Home';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import UserFeedback from './UserFeedback';
 
 const Centered = styled('div')({
   height: '100%',
@@ -58,12 +59,14 @@ export default function Toolpad({ basename }: EditorProps) {
       <Box sx={{ height: '1px', minHeight: '100vh' }}>
         <ErrorBoundary fallbackRender={({ error }) => <FullPageError error={error} />}>
           <React.Suspense fallback={<FullPageLoader />}>
-            <BrowserRouter basename={basename}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/app/:appId/*" element={<AppWorkspace />} />
-              </Routes>
-            </BrowserRouter>
+            <UserFeedback>
+              <BrowserRouter basename={basename}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/app/:appId/*" element={<AppWorkspace />} />
+                </Routes>
+              </BrowserRouter>
+            </UserFeedback>
           </React.Suspense>
         </ErrorBoundary>
       </Box>

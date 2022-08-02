@@ -13,6 +13,14 @@ import {
   PAGE_ROW_COMPONENT_ID,
   STACK_COMPONENT_ID,
 } from '../../../toolpadComponents';
+import { FutureComponentSpec, useUserFeedback } from '../../UserFeedback';
+
+const FUTURE_COMPONENTS: FutureComponentSpec[] = [
+  {
+    displayName: 'Tabs',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/78',
+  },
+];
 
 const WIDTH_COLLAPSED = 50;
 
@@ -24,17 +32,19 @@ const ComponentCatalogRoot = styled('div')({
   overflow: 'visible',
 });
 
-const ComponentCatalogItem = styled('div')(({ theme }) => ({
+const ComponentCatalogItem = styled('div')(({ theme, draggable, onClick }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: theme.spacing(1, 0),
+  padding: theme.spacing(1, 1, 1, 0),
   borderRadius: theme.shape.borderRadius,
   border: `1px solid ${theme.palette.divider}`,
   color: theme.palette.text.secondary,
-  cursor: 'grab',
+
   '&:hover': {
     background: theme.palette.action.hover,
   },
+  ...(draggable ? { cursor: 'grab' } : {}),
+  ...(onClick ? { cursor: 'pointer' } : {}),
 }));
 
 export interface ComponentCatalogProps {
@@ -76,6 +86,11 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
+
+  const { showDialog } = useUserFeedback();
+
+  const handleFutureComponentClick = (futureComponent: FutureComponentSpec) => () =>
+    showDialog({ kind: 'futureComponent', futureComponent });
 
   return (
     <ComponentCatalogRoot
@@ -119,6 +134,19 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     </ComponentCatalogItem>
                   );
                 })}
+              {FUTURE_COMPONENTS.map((futureComponent, i) => {
+                return (
+                  <ComponentCatalogItem
+                    key={`futureComponent[${i}]`}
+                    onClick={handleFutureComponentClick(futureComponent)}
+                  >
+                    <DragIndicatorIcon color="disabled" />
+                    {futureComponent.displayName}
+                    <Box sx={{ flex: 1 }} />
+                    🚧
+                  </ComponentCatalogItem>
+                );
+              })}
             </Box>
           </Box>
         </Collapse>

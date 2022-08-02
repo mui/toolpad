@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { styled, AppBar, Toolbar, IconButton, Typography, Box } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import { useUserFeedback } from './UserFeedback';
 
 export interface ToolpadShellProps {
   navigation?: React.ReactNode;
@@ -27,6 +29,12 @@ export interface HeaderProps {
 }
 
 function Header({ actions, navigation }: HeaderProps) {
+  const { showDialog } = useUserFeedback();
+
+  const handleFeedbackClick = React.useCallback(() => {
+    showDialog();
+  }, [showDialog]);
+
   return (
     <AppBar
       position="static"
@@ -34,30 +42,26 @@ function Header({ actions, navigation }: HeaderProps) {
       elevation={0}
       sx={{ zIndex: 2, borderBottom: 1, borderColor: 'divider' }}
     >
-      <Toolbar>
+      <Toolbar sx={{ gap: 2 }}>
         <IconButton
           size="medium"
           edge="start"
           color="inherit"
           aria-label="Home"
-          sx={{ mr: 2 }}
           component="a"
           href={`/`}
         >
           <HomeIcon fontSize="medium" />
         </IconButton>
-        <Typography
-          data-test-id="brand"
-          variant="h6"
-          color="inherit"
-          component="div"
-          sx={{ mr: 2 }}
-        >
+        <Typography data-test-id="brand" variant="h6" color="inherit" component="div">
           MUI Toolpad {process.env.TOOLPAD_TARGET}
         </Typography>
         {navigation}
         <Box flex={1} />
         {actions}
+        <IconButton onClick={handleFeedbackClick} color="inherit">
+          <FeedbackIcon />
+        </IconButton>
       </Toolbar>
     </AppBar>
   );

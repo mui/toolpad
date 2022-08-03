@@ -21,7 +21,7 @@ jobs:
         run: |
           echo "commit: ${{ github.event.inputs.commit }}"
           echo "docker tag: ${{ github.event.inputs.version }}"
-          echo "latest:  ${{ github.event.release.latest }}"
+          echo "latest:  ${{ toJSON(github.event.release.latest) }}"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2

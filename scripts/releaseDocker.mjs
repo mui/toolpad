@@ -32,7 +32,7 @@ async function createDockerTag(octokit, commit, version, latest) {
   await octokit.actions.createWorkflowDispatch({
     owner: 'mui',
     repo: 'mui-toolpad',
-    ref: 'aa-release-workflow',
+    ref: 'master',
     workflow_id: RELEASE_DOCKER_WORKFLOW_ID,
     inputs: {
       commit,

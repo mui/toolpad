@@ -147,19 +147,13 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
 
 interface AppNameEditableProps {
   app?: App;
-  editingName?: boolean;
-  setEditingName: (editingTitle: boolean) => void;
+  editing?: boolean;
+  setEditing: (editing: boolean) => void;
   loading?: boolean;
   description?: React.ReactNode;
 }
 
-function AppNameEditable({
-  app,
-  editingName,
-  setEditingName,
-  loading,
-  description,
-}: AppNameEditableProps) {
+function AppNameEditable({ app, editing, setEditing, loading, description }: AppNameEditableProps) {
   const [showAppRenameError, setShowAppRenameError] = React.useState<boolean>(false);
   const appNameInput = React.useRef<HTMLInputElement | null>(null);
   const [appName, setAppName] = React.useState<string>(app?.name || '');
@@ -173,9 +167,9 @@ function AppNameEditable({
   );
 
   const handleAppRenameClose = React.useCallback(() => {
-    setEditingName(false);
+    setEditing(false);
     setShowAppRenameError(false);
-  }, [setEditingName]);
+  }, [setEditing]);
 
   const handleAppRenameSave = React.useCallback(
     async (name: string) => {
@@ -185,11 +179,11 @@ function AppNameEditable({
           await client.invalidateQueries('getApps');
         } catch (err) {
           setShowAppRenameError(true);
-          setEditingName(true);
+          setEditing(true);
         }
       }
     },
-    [app?.id, setEditingName],
+    [app?.id, setEditing],
   );
 
   return loading ? (
@@ -197,7 +191,7 @@ function AppNameEditable({
   ) : (
     <EditableText
       defaultValue={app?.name}
-      editing={editingName}
+      editable={editing}
       helperText={showAppRenameError ? `An app named "${appName}" already exists` : description}
       error={showAppRenameError}
       onChange={handleAppNameChange}
@@ -376,8 +370,8 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         <CardContent sx={{ flexGrow: 1 }}>
           <AppNameEditable
             app={app}
-            editingName={editingName}
-            setEditingName={setEditingName}
+            editing={editingName}
+            setEditing={setEditingName}
             loading={Boolean(!app)}
           />
         </CardContent>
@@ -437,8 +431,8 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
           <AppNameEditable
             loading={Boolean(!app)}
             app={app}
-            editingName={editingName}
-            setEditingName={setEditingName}
+            editing={editingName}
+            setEditing={setEditingName}
             description={app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
           />
         </TableCell>

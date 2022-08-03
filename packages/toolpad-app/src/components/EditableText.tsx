@@ -4,7 +4,7 @@ import { TextField, Theme, TypographyVariant, SxProps } from '@mui/material';
 interface EditableTextProps {
   defaultValue?: string;
   disabled?: boolean;
-  editing?: boolean;
+  editable?: boolean;
   helperText?: React.ReactNode;
   error?: boolean;
   onChange?: (newValue: string) => void;
@@ -21,7 +21,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
     {
       defaultValue,
       disabled,
-      editing,
+      editable,
       helperText,
       error,
       onChange,
@@ -42,14 +42,14 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         inputElement = (ref as React.MutableRefObject<HTMLInputElement>).current;
       }
       if (inputElement) {
-        if (editing) {
+        if (editable) {
           inputElement.focus();
           inputElement.select();
         } else {
           inputElement.blur();
         }
       }
-    }, [ref, editing]);
+    }, [ref, editable]);
 
     const handleBlur = React.useCallback(
       (event: React.FocusEvent<HTMLInputElement>) => {
@@ -106,14 +106,14 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
 
     return (
       <TextField
-        // `disabled` prop overrides `editing` prop
-        disabled={disabled || !editing}
+        // `disabled` prop overrides `editable` prop
+        disabled={disabled || !editable}
         error={error}
         helperText={helperText}
         inputRef={ref ?? appTitleInput}
         inputProps={{
-          tabIndex: editing ? 0 : -1,
-          'aria-readonly': !editing,
+          tabIndex: editable ? 0 : -1,
+          'aria-readonly': !editable,
           sx: (theme: Theme) => ({
             // Handle overflow
             textOverflow: 'ellipsis',
@@ -131,9 +131,9 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
           ...sx,
           '& .MuiInputBase-root.MuiInput-root:before, .MuiInput-root.MuiInputBase-root:not(.Mui-disabled):hover::before':
             {
-              borderBottom: editing ? `initial` : 'none',
+              borderBottom: editable ? `initial` : 'none',
             },
-          // TextField must not appear disabled if disabled state is controlled by `editing` prop
+          // TextField must not appear disabled if disabled state is controlled by `editable` prop
           '& .MuiInput-root.MuiInputBase-root.Mui-disabled, .MuiInput-input.MuiInputBase-input.Mui-disabled, .MuiInput-root.MuiFormHelperText-root.Mui-disabled':
             disabled
               ? null

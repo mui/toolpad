@@ -649,8 +649,10 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       const activeDropNode = appDom.getNode(dom, activeDropNodeId);
 
       const activeDropNodeInfo = nodesInfo[activeDropNodeId];
-
       const activeDropNodeRect = activeDropNodeInfo?.rect;
+
+      const activeDropNodeParent = appDom.getParent(dom, activeDropNode);
+      const activeDropNodeSiblings = appDom.getSiblings(dom, activeDropNode);
 
       const isDraggingOverPage = appDom.isPage(activeDropNode);
       const isDraggingOverElement = appDom.isElement(activeDropNode);
@@ -658,6 +660,12 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       const isDraggingOverContainer = activeDropNodeInfo
         ? hasFreeNodeSlots(activeDropNodeInfo)
         : false;
+
+      const isDraggingOverOnlyPageRowChild =
+        activeDropNodeParent &&
+        appDom.isElement(activeDropNodeParent) &&
+        isPageRow(activeDropNodeParent) &&
+        activeDropNodeSiblings.length === 0;
 
       const activeDropSlotParentProp = isDraggingOverPage
         ? 'children'
@@ -710,7 +718,6 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
         // Detect center in layout containers
         if (isDraggingOverElement && activeDropNodeInfo && activeDropSlot) {
-          const activeDropNodeParent = appDom.getParent(dom, activeDropNode);
           const isDraggingOverPageChild = activeDropNodeParent
             ? appDom.isPage(activeDropNodeParent)
             : false;
@@ -748,8 +755,14 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         activeDropZone !== dragOverZone;
 
       if (activeDropZone && hasChangedDropArea && availableDropTargetIds.has(activeDropNodeId)) {
+        const newDragOverNodeId =
+          isDraggingOverOnlyPageRowChild &&
+          (activeDropZone === DROP_ZONE_TOP || activeDropZone === DROP_ZONE_BOTTOM)
+            ? activeDropNodeParent.id
+            : activeDropNodeId;
+
         api.nodeDragOver({
-          nodeId: activeDropNodeId,
+          nodeId: newDragOverNodeId,
           parentProp: activeDropSlotParentProp || null,
           zone: activeDropZone as DropZone,
         });
@@ -1340,10 +1353,9 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         const isResizing = Boolean(draggedEdge) && node.id === draggedNodeId;
 
         return (
-          <React.Fragment>
+          <React.Fragment key={node.id}>
             {!isPageNode ? (
               <NodeHud
-                key={node.id}
                 node={node}
                 rect={nodeRect}
                 isSelected={isSelected}

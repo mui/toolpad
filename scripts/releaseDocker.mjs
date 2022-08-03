@@ -4,7 +4,9 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import semver from 'semver';
+import { Octokit } from '@octokit/rest';
 
+const RELEASE_DOCKER_WORKFLOW_ID = 31597666;
 const IMAGE_NAME = 'muicom/toolpad';
 const LATEST_TAG = 'latest';
 
@@ -21,20 +23,21 @@ async function checkTagExists(image, tag) {
   }
 }
 
-async function dockerCreateTag(image, srcTag, destTags) {
-  const srImage = `${image}:${srcTag}`;
-  try {
-    await execa('docker', ['pull', srImage], { stdio: 'inherit' });
-    await Promise.all(
-      destTags.map(async (destTag) => {
-        const destImage = `${image}:${destTag}`;
-        await execa('docker', ['tag', srImage, destImage], { stdio: 'inherit' });
-        await execa('docker', ['push', destImage], { stdio: 'inherit' });
-      }),
-    );
-  } finally {
-    await execa('docker', ['rmi', srImage], { stdio: 'inherit' });
-  }
+async function createDockerTag(octokit, commit, dockerTag) {
+  await octokit.actions.createWorkflowDispatch({
+    owner: 'mui',
+    repo: 'mui-toolpad',
+    ref: 'aa-release-workflow',
+    workflow_id: RELEASE_DOCKER_WORKFLOW_ID,
+    inputs: {
+      commit,
+      docker_tag: dockerTag,
+    },
+  });
+}
+
+async function dockerCreateTags(octokit, commit, dockerTags) {
+  await Promise.all(dockerTags.map((dockerTag) => createDockerTag(octokit, commit, dockerTag)));
 }
 
 async function commitLog(count = 100) {
@@ -64,7 +67,19 @@ async function currentBranch() {
   return stdout;
 }
 
-async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest }) {
+async function main({ yes, force, commit, releaseTag, noLatest, githubToken }) {
+  if (!githubToken) {
+    throw new TypeError(
+      'Unable to authenticate. Make sure you either call the script with `--githubToken $token` or set `process.env.GITHUB_TOKEN`. The token needs `public_repo` permissions.',
+    );
+  }
+
+  const octokit = new Octokit({
+    auth: githubToken,
+  });
+
+  await dockerCreateTags(octokit, commit, ['test', 'test2']);
+
   if (!commit) {
     const branch = await currentBranch();
     if (branch !== 'master') {
@@ -153,10 +168,9 @@ async function main({ yes, force, commit, releaseTag, 'no-latest': noLatest }) {
   if (exists && !force) {
     console.error(`Tag "${IMAGE_NAME}:${releaseTag}" already exists`);
     yargs.exit(1, `Tag "${IMAGE_NAME}:${releaseTag}" already exists`);
-    return;
   }
 
-  await dockerCreateTag(IMAGE_NAME, commit, tags);
+  // await dockerCreateTags(IMAGE_NAME, commit, tags);
 }
 
 yargs(hideBin(process.argv))
@@ -178,10 +192,16 @@ yargs(hideBin(process.argv))
           type: 'boolean',
           default: false,
         })
-        .option('no-latest', {
+        .option('noLatest', {
           describe: 'Don\'t create the "latest" tag.',
           type: 'boolean',
           default: false,
+        })
+        .option('githubToken', {
+          default: process.env.GITHUB_TOKEN,
+          describe:
+            'The personal access token to use for authenticating with GitHub. Needs public_repo permissions.',
+          type: 'string',
         });
     },
     handler: main,

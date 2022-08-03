@@ -391,7 +391,10 @@ export async function execQuery<P, Q>(
     );
   }
 
-  const connectionParams = await getConnectionParams<P>(appId, query.attributes.connectionId.value);
+  const connectionParams = await getConnectionParams<P>(
+    appId,
+    appDom.deref(query.attributes.connectionId.value),
+  );
 
   const transformEnabled = query.attributes.transformEnabled?.value;
   const transform = query.attributes.transform?.value;

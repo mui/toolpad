@@ -1,0 +1,34 @@
+name: 'Release Docker images'
+
+on:
+  workflow_dispatch:
+    input:
+      commit:
+        type: string
+        required: true
+      docker_tag:
+        type: string
+        required: true
+
+jobs:
+  docker-release:
+    name: 'retag and push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug
+        run: |
+          echo "commit: ${{ github.event.inputs.commit }}"
+          echo "docker tag: ${{ github.event.inputs.docker_tag }}"
+          echo "prerelease:  ${{ github.event.release.prerelease }}"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Publish release tag
+        uses: akhilerm/tag-push-action@v2.0.0
+        with:
+          src: docker.io/muicom/toolpad:${{ github.event.inputs.commit }}
+          dst: docker.io/muicom/toolpad:${{ github.event.inputs.docker_tag }}

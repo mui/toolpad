@@ -8,6 +8,7 @@ import {
   absolutePositionCss,
   Rectangle,
   RectangleEdge,
+  RECTANGLE_EDGE_BOTTOM,
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
 } from '../../../../utils/geometry';
@@ -67,6 +68,7 @@ const DraggableEdge = styled('div', {
   let dynamicStyles = {};
   if (edge === RECTANGLE_EDGE_RIGHT) {
     dynamicStyles = {
+      cursor: 'ew-resize',
       top: 0,
       right: -2,
       height: '100%',
@@ -75,16 +77,25 @@ const DraggableEdge = styled('div', {
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
+      cursor: 'ew-resize',
       top: 0,
       left: -2,
       height: '100%',
       width: 12,
     };
   }
+  if (edge === RECTANGLE_EDGE_BOTTOM) {
+    dynamicStyles = {
+      cursor: 'ns-resize',
+      bottom: -2,
+      height: 12,
+      left: 0,
+      width: '100%',
+    };
+  }
 
   return {
     ...dynamicStyles,
-    cursor: 'ew-resize',
     position: 'absolute',
     pointerEvents: 'initial',
     zIndex: 1,

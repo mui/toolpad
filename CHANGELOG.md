@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.0.12
+
+<!-- generated comparing v0.0.11..master -->
+
+_Aug 3, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Allow vertically resizing components, add configuration options to Fetch datasource.
+
+- &#8203;<!-- 8 -->Allow scrolling the page when over the monaco editor (#719) @Janpot
+- &#8203;<!-- 7 -->Make DataTable vertically resizeable (#700) @apedroferreira
+- &#8203;<!-- 6 -->Fix typo (#715) @oliviertassinari
+- &#8203;<!-- 5 -->Make fetch method configurable (#708) @Janpot
+- &#8203;<!-- 4 -->Remove some unnecessary component sizing (#710) @Janpot
+- &#8203;<!-- 3 -->[core] `NodeReference` type for references to nodes (#720) @bharatkashyap
+- &#8203;<!-- 2 -->[core] Remove duplicated file (#714) @oliviertassinari
+- &#8203;<!-- 1 -->[core] Prepare automation for support (#612) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
 ## v0.0.11
 
 <!-- generated comparing v0.0.10..master -->

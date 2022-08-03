@@ -41,12 +41,7 @@ export interface UrlEncodedBody {
   content: [string, BindableAttrValue<string>][];
 }
 
-export interface JsonBody {
-  kind: 'json';
-  content: BindableAttrValue<any>;
-}
-
-export type Body = RawBody | UrlEncodedBody | JsonBody;
+export type Body = RawBody | UrlEncodedBody;
 
 export interface FetchQuery {
   readonly url: BindableAttrValue<string>;

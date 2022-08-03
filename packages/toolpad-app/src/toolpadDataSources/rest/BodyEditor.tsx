@@ -9,6 +9,7 @@ import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import lazyComponent from '../../utils/lazyComponent';
 import * as appDom from '../../appDom';
 import TabPanel from '../../components/TabPanel';
+import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 
 interface ContentTypeSpec {
   alias: string;
@@ -114,14 +115,36 @@ function RawBodyEditor({
 
 function UrlEncodedBodyEditor({
   toolbarActions,
-  value,
+  value: valueProp,
   onChange,
   globalScope,
 }: BodyTypeEditorProps<UrlEncodedBody>) {
+  const value: UrlEncodedBody = React.useMemo(
+    () => ({
+      kind: 'urlEncoded',
+      contentType: 'text/plain',
+      content: [],
+      ...valueProp,
+    }),
+    [valueProp],
+  );
+
+  const handleParamsChange = React.useCallback(
+    (newContent: [string, BindableAttrValue<any>][]) => {
+      onChange({ ...value, content: newContent });
+    },
+    [onChange, value],
+  );
+
   return (
     <Box>
       <BodyEditorToolbar disableGutters>{toolbarActions}</BodyEditorToolbar>
-      🚧 under construction
+      <ParametersEditor
+        value={value.content}
+        onChange={handleParamsChange}
+        globalScope={globalScope}
+        liveValue={paramsEditorLiveValue}
+      />
     </Box>
   );
 }

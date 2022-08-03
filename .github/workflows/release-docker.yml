@@ -37,7 +37,7 @@ jobs:
 
       - name: Publish latest tag
         uses: akhilerm/tag-push-action@v2.0.0
-        if: ${{ github.event.inputs.latest }}
+        if: ${{ github.event.inputs.latest == 'true' }}
         with:
           src: docker.io/muicom/toolpad:${{ github.event.inputs.commit }}
           dst: docker.io/muicom/toolpad:latest-test

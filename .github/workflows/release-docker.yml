@@ -29,13 +29,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Publish release tag
+      - name: Publish version tag
         uses: akhilerm/tag-push-action@v2.0.0
         with:
           src: docker.io/muicom/toolpad:${{ github.event.inputs.commit }}
           dst: docker.io/muicom/toolpad:${{ github.event.inputs.version }}
 
-      - name: Publish release tag
+      - name: Publish latest tag
         uses: akhilerm/tag-push-action@v2.0.0
         if: ${{ github.event.inputs.latest }}
         with:

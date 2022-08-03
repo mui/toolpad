@@ -661,12 +661,6 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         ? hasFreeNodeSlots(activeDropNodeInfo)
         : false;
 
-      const isDraggingOverOnlyPageRowChild =
-        activeDropNodeParent &&
-        appDom.isElement(activeDropNodeParent) &&
-        isPageRow(activeDropNodeParent) &&
-        activeDropNodeSiblings.length === 0;
-
       const activeDropSlotParentProp = isDraggingOverPage
         ? 'children'
         : activeDropAreaId && getDropAreaParentProp(activeDropAreaId);
@@ -755,15 +749,20 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         activeDropZone !== dragOverZone;
 
       if (activeDropZone && hasChangedDropArea && availableDropTargetIds.has(activeDropNodeId)) {
-        const newDragOverNodeId =
-          isDraggingOverOnlyPageRowChild &&
-          (activeDropZone === DROP_ZONE_TOP || activeDropZone === DROP_ZONE_BOTTOM)
-            ? activeDropNodeParent.id
-            : activeDropNodeId;
+        const isDraggingOverOnlyPageRowChildVerticalZones =
+          activeDropNodeParent &&
+          appDom.isElement(activeDropNodeParent) &&
+          isPageRow(activeDropNodeParent) &&
+          activeDropNodeSiblings.length === 0 &&
+          (activeDropZone === DROP_ZONE_TOP || activeDropZone === DROP_ZONE_BOTTOM);
 
         api.nodeDragOver({
-          nodeId: newDragOverNodeId,
-          parentProp: activeDropSlotParentProp || null,
+          nodeId: isDraggingOverOnlyPageRowChildVerticalZones
+            ? activeDropNodeParent.id
+            : activeDropNodeId,
+          parentProp: isDraggingOverOnlyPageRowChildVerticalZones
+            ? 'children'
+            : activeDropSlotParentProp || null,
           zone: activeDropZone as DropZone,
         });
       }

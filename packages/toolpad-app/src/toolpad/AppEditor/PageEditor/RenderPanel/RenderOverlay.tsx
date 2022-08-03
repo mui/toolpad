@@ -1292,8 +1292,6 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       })}
       // Need this to be able to capture key events
       tabIndex={0}
-      // This component has `pointer-events: none`, but we will selectively enable pointer-events
-      // for its children. We can still capture the click gobally
       onKeyDown={handleKeyDown}
       {...(draggedEdge
         ? {

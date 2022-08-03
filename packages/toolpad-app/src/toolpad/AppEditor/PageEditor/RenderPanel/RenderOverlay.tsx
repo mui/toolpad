@@ -252,7 +252,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 parent.parentIndex,
               );
 
-              if (isPageColumn(parent) && moveTargetNodeId !== parent.id) {
+              if (isPageColumn(parent)) {
                 domApi.setNodeNamespacedProp(
                   lastContainerChild,
                   'layout',
@@ -265,6 +265,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
             }
 
             if (
+              parentParent.parentIndex &&
               parentParentParent &&
               appDom.isElement(parentParentParent) &&
               isParentOnlyLayoutContainerChild &&
@@ -274,9 +275,10 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 lastContainerChild,
                 parentParentParent,
                 lastContainerChild.parentProp,
+                parentParent.parentIndex,
               );
 
-              if (isPageColumn(parentParent) && moveTargetNodeId !== parentParent.id) {
+              if (isPageColumn(parentParent)) {
                 domApi.setNodeNamespacedProp(
                   lastContainerChild,
                   'layout',

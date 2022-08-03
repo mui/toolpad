@@ -2,7 +2,7 @@ name: 'Release Docker images'
 
 on:
   workflow_dispatch:
-    input:
+    inputs:
       commit:
         type: string
         required: true

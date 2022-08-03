@@ -40,4 +40,4 @@ jobs:
         if: ${{ github.event.inputs.latest == 'true' }}
         with:
           src: docker.io/muicom/toolpad:${{ github.event.inputs.commit }}
-          dst: docker.io/muicom/toolpad:latest-test
+          dst: docker.io/muicom/toolpad:latest

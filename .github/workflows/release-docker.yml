@@ -6,9 +6,11 @@ on:
       commit:
         type: string
         required: true
-      docker_tag:
+      version:
         type: string
         required: true
+      latest:
+        type: boolean
 
 jobs:
   docker-release:
@@ -18,8 +20,8 @@ jobs:
       - name: Debug
         run: |
           echo "commit: ${{ github.event.inputs.commit }}"
-          echo "docker tag: ${{ github.event.inputs.docker_tag }}"
-          echo "prerelease:  ${{ github.event.release.prerelease }}"
+          echo "docker tag: ${{ github.event.inputs.version }}"
+          echo "latest:  ${{ github.event.release.latest }}"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -31,4 +33,11 @@ jobs:
         uses: akhilerm/tag-push-action@v2.0.0
         with:
           src: docker.io/muicom/toolpad:${{ github.event.inputs.commit }}
-          dst: docker.io/muicom/toolpad:${{ github.event.inputs.docker_tag }}
+          dst: docker.io/muicom/toolpad:${{ github.event.inputs.version }}
+
+      - name: Publish release tag
+        uses: akhilerm/tag-push-action@v2.0.0
+        if: ${{ github.event.inputs.latest }}
+        with:
+          src: docker.io/muicom/toolpad:${{ github.event.inputs.commit }}
+          dst: docker.io/muicom/toolpad:latest-test

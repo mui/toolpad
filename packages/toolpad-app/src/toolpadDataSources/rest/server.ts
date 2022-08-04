@@ -1,11 +1,13 @@
 import { BindableAttrValue } from '@mui/toolpad-core';
+import { createHarLog } from 'node-fetch-har';
 import { ServerDataSource, ApiResult } from '../../types';
-import { FetchQuery, RestConnectionParams } from './types';
+import { FetchPrivateQuery, FetchQuery, FetchResult, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';
 import evalExpression from '../../server/evalExpression';
 import { removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
+import applyTransform from '../../server/applyTransform';
 
 async function resolveBindableString(
   bindable: BindableAttrValue<string>,
@@ -41,11 +43,11 @@ function parseQueryUrl(queryUrl: string, baseUrl: Maybe<string>): URL {
   return new URL(queryUrl);
 }
 
-async function exec(
+async function execBase(
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
-): Promise<ApiResult<any>> {
+): Promise<FetchResult> {
   const resolvedUrl = await resolveBindableString(fetchQuery.url, params);
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
@@ -57,17 +59,57 @@ async function exec(
 
   const method = fetchQuery.method;
 
-  const res = await fetch(queryUrl.href, { method, headers });
+  let error: Error | undefined;
+  let untransformedData;
+  let data;
+  const har = createHarLog(); // TODO generate actual har
 
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status}`);
+  try {
+    const res = await fetch(queryUrl.href, { method, headers });
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    untransformedData = await res.json();
+    data = untransformedData;
+
+    if (fetchQuery.transformEnabled && fetchQuery.transform) {
+      data = applyTransform(fetchQuery.transform, untransformedData);
+    }
+  } catch (err: any) {
+    error = err;
   }
-  const data = await res.json();
-  return { data };
+
+  return { data, untransformedData, error, har };
+}
+
+async function execPrivate(connection: Maybe<RestConnectionParams>, query: FetchPrivateQuery) {
+  switch (query.kind) {
+    case 'debugExec':
+      return execBase(connection, query.query, query.params);
+    default:
+      throw new Error(`Unknown private query "${(query as FetchPrivateQuery).kind}"`);
+  }
+}
+
+async function exec(
+  connection: Maybe<RestConnectionParams>,
+  fetchQuery: FetchQuery,
+  params: Record<string, string>,
+): Promise<ApiResult<any>> {
+  const { data, error } = await execBase(connection, fetchQuery, params);
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }
 
 const dataSource: ServerDataSource<{}, FetchQuery, any> = {
   exec,
+  execPrivate,
 };
 
 export default dataSource;

@@ -45,25 +45,6 @@ import { mapValues } from '../../../utils/collections';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
 import BindableEditor from './BindableEditor';
-import { createProvidedContext } from '../../../utils/react';
-
-interface EditorHostContextValue {
-  open;
-  onClose;
-  node;
-  dataSourceId;
-  dataSource;
-  input;
-  onConnectionIdChange;
-  queryEditorContext;
-}
-
-const [useEditorHostContext, EditorHostContextProvider] =
-  createProvidedContext<EditorHostContextValue>('EditorHost');
-
-function QueryEditorHost({ isDirty, onCommit, children }) {
-  return null;
-}
 
 const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
   'rest',

@@ -46,14 +46,104 @@ import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
 import BindableEditor from './BindableEditor';
 
-const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
-  'rest',
-  'googleSheets',
-  'postgres',
-  'movies',
-]);
+const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set(['googleSheets', 'postgres', 'movies']);
 
 const EMPTY_OBJECT = {};
+
+interface TransformInputProps {
+  value: string;
+  onChange: (newValue: string) => void;
+  enabled: boolean;
+  onEnabledChange: (newValue: boolean) => void;
+  globalScope: Record<string, any>;
+  loading: boolean;
+  onUpdatePreview: () => void;
+}
+
+function TransformInput({
+  value,
+  onChange,
+  enabled,
+  onEnabledChange,
+  globalScope,
+  loading,
+  onUpdatePreview,
+}: TransformInputProps) {
+  const handleTransformEnabledChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => onEnabledChange(event.target.checked),
+    [onEnabledChange],
+  );
+
+  return (
+    <Grid container direction="row" spacing={1} sx={{ px: 3, pb: 1, mt: 2 }}>
+      <Grid item xs={6} md={12}>
+        <Stack>
+          <FormControlLabel
+            label="Transform response"
+            control={
+              <Checkbox
+                checked={enabled}
+                onChange={handleTransformEnabledChange}
+                inputProps={{ 'aria-label': 'controlled' }}
+              />
+            }
+          />
+
+          <Stack direction={'row'} spacing={2} width={'100%'}>
+            <Box
+              sx={{
+                width: '300px',
+                maxWidth: '600px',
+                maxHeight: '150px',
+                overflow: 'scroll',
+              }}
+            >
+              <JsonView
+                src={globalScope}
+                sx={{
+                  opacity: loading || !enabled ? 0.5 : 1,
+                }}
+              />
+            </Box>
+            <IconButton
+              disabled={!enabled}
+              onClick={onUpdatePreview}
+              sx={{ alignSelf: 'self-start' }}
+            >
+              <AutorenewIcon
+                sx={{
+                  animation: 'spin 1500ms linear infinite',
+                  animationPlayState: loading ? 'running' : 'paused',
+                  '@keyframes spin': {
+                    '0%': {
+                      transform: 'rotate(0deg)',
+                    },
+                    '100%': {
+                      transform: 'rotate(360deg)',
+                    },
+                  },
+                }}
+                fontSize="inherit"
+              />
+            </IconButton>
+            <JsExpressionEditor
+              globalScope={globalScope}
+              autoFocus
+              value={value}
+              sx={{
+                minWidth: '300px',
+                opacity: loading ? 0.5 : 1,
+              }}
+              functionBody
+              onChange={onChange}
+              disabled={!enabled}
+            />
+          </Stack>
+        </Stack>
+      </Grid>
+    </Grid>
+  );
+}
 
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
@@ -353,18 +443,15 @@ function QueryNodeEditorDialog<Q, P>({
     rawQueryPreview.refetch();
   }, [rawQueryPreview]);
 
-  const handleTransformEnabledChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) =>
-        update(existing, {
-          attributes: update(existing.attributes, {
-            transformEnabled: appDom.createConst(event.target.checked),
-          }),
+  const handleTransformEnabledChange = React.useCallback((enabled: boolean) => {
+    setInput((existing) =>
+      update(existing, {
+        attributes: update(existing.attributes, {
+          transformEnabled: appDom.createConst(enabled),
         }),
-      );
-    },
-    [],
-  );
+      }),
+    );
+  }, []);
 
   const isInputSaved = node === input;
 
@@ -387,6 +474,11 @@ function QueryNodeEditorDialog<Q, P>({
     input: input.attributes.enabled || null,
     globalScope: pageState,
   });
+
+  const transformerScope = React.useMemo(
+    () => ({ data: rawQueryPreview.data ?? {} }),
+    [rawQueryPreview.data],
+  );
 
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
@@ -440,85 +532,15 @@ function QueryNodeEditorDialog<Q, P>({
                       globalScope={pageState}
                     />
 
-                    <Grid container direction="row" spacing={1} sx={{ px: 3, pb: 1, mt: 2 }}>
-                      <React.Fragment>
-                        <Divider />
-                        <Grid item xs={6} md={12}>
-                          <Stack>
-                            <FormControlLabel
-                              label="Transform response"
-                              control={
-                                <Checkbox
-                                  checked={input.attributes.transformEnabled?.value ?? false}
-                                  onChange={handleTransformEnabledChange}
-                                  inputProps={{ 'aria-label': 'controlled' }}
-                                />
-                              }
-                            />
-
-                            <Stack direction={'row'} spacing={2} width={'100%'}>
-                              <Box
-                                sx={{
-                                  width: '300px',
-                                  maxWidth: '600px',
-                                  maxHeight: '150px',
-                                  overflow: 'scroll',
-                                }}
-                              >
-                                <JsonView
-                                  src={rawQueryPreview.data ?? { data: {} }}
-                                  sx={{
-                                    opacity:
-                                      rawQueryPreview.isRefetching ||
-                                      !input.attributes.transformEnabled?.value
-                                        ? 0.5
-                                        : 1,
-                                  }}
-                                />
-                              </Box>
-                              <IconButton
-                                disabled={
-                                  rawQueryPreview.isFetched ||
-                                  !input.attributes.transformEnabled?.value
-                                }
-                                onClick={handleRawQueryPreviewRefresh}
-                                sx={{ alignSelf: 'self-start' }}
-                              >
-                                <AutorenewIcon
-                                  sx={{
-                                    animation: 'spin 1500ms linear infinite',
-                                    animationPlayState: rawQueryPreview.isRefetching
-                                      ? 'running'
-                                      : 'paused',
-                                    '@keyframes spin': {
-                                      '0%': {
-                                        transform: 'rotate(0deg)',
-                                      },
-                                      '100%': {
-                                        transform: 'rotate(360deg)',
-                                      },
-                                    },
-                                  }}
-                                  fontSize="inherit"
-                                />
-                              </IconButton>
-                              <JsExpressionEditor
-                                globalScope={{ data: rawQueryPreview.data?.data }}
-                                autoFocus
-                                value={input.attributes.transform?.value ?? 'return data;'}
-                                sx={{
-                                  minWidth: '300px',
-                                  opacity: rawQueryPreview.isRefetching ? 0.5 : 1,
-                                }}
-                                functionBody
-                                onChange={handleTransformFnChange}
-                                disabled={!input.attributes.transformEnabled?.value}
-                              />
-                            </Stack>
-                          </Stack>
-                        </Grid>
-                      </React.Fragment>
-                    </Grid>
+                    <TransformInput
+                      value={input.attributes.transform?.value ?? 'return data;'}
+                      onChange={handleTransformFnChange}
+                      enabled={input.attributes.transformEnabled?.value ?? false}
+                      onEnabledChange={handleTransformEnabledChange}
+                      globalScope={transformerScope}
+                      loading={rawQueryPreview.isRefetching}
+                      onUpdatePreview={handleRawQueryPreviewRefresh}
+                    />
                   </Stack>
 
                   <Box

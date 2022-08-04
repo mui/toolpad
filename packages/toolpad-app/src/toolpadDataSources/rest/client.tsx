@@ -32,6 +32,7 @@ import SplitPane from '../../components/SplitPane';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import JsonView from '../../components/JsonView';
 import useQueryPreview from '../useQueryPreview';
+import TransformInput from '../TranformInput';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -188,6 +189,28 @@ function QueryEditor({
     [onChange, value],
   );
 
+  const handleTransformEnabledChange = React.useCallback(
+    (transformEnabled: boolean) => {
+      const query: FetchQuery = {
+        ...value.query,
+        transformEnabled,
+      };
+      onChange({ ...value, query });
+    },
+    [onChange, value],
+  );
+
+  const handleTransformChange = React.useCallback(
+    (transform: string) => {
+      const query: FetchQuery = {
+        ...value.query,
+        transform,
+      };
+      onChange({ ...value, query });
+    },
+    [onChange, value],
+  );
+
   const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
     Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>)),
   );
@@ -235,7 +258,7 @@ function QueryEditor({
     <SplitPane split="vertical" size="50%" allowResize>
       <Box sx={{ height: '100%', overflow: 'auto' }}>
         <Toolbar>
-          <LoadingButton startIcon={<PlayArrowIcon />} onClick={() => runPreview()}>
+          <LoadingButton startIcon={<PlayArrowIcon />} onClick={runPreview}>
             Preview
           </LoadingButton>
         </Toolbar>
@@ -269,6 +292,15 @@ function QueryEditor({
               onChange={handleUrlChange}
             />
           </Box>
+          <TransformInput
+            value={value.query.transform ?? 'return data;'}
+            onChange={handleTransformChange}
+            enabled={value.query.transformEnabled ?? false}
+            onEnabledChange={handleTransformEnabledChange}
+            globalScope={{ data: preview?.untransformedData }}
+            loading={false}
+            onUpdatePreview={runPreview}
+          />
         </Stack>
       </Box>
       <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>

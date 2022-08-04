@@ -75,7 +75,7 @@ async function execBase(
     data = untransformedData;
 
     if (fetchQuery.transformEnabled && fetchQuery.transform) {
-      data = applyTransform(fetchQuery.transform, untransformedData);
+      data = await applyTransform(fetchQuery.transform, untransformedData);
     }
   } catch (err: any) {
     error = err;

@@ -27,6 +27,8 @@ import { useDom, useDomApi } from '../../DomLoader';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import ConnectionSelect from './ConnectionSelect';
 
+const DATASOURCES_WHITELIST = ['function'];
+
 interface DataSourceSelectorProps<Q> {
   open: boolean;
   onClose: () => void;
@@ -63,7 +65,12 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
     <Dialog open={open} onClose={onClose} scroll="body">
       <DialogTitle>Create Mutation</DialogTitle>
       <DialogContent>
-        <ConnectionSelect sx={{ my: 1 }} value={input} onChange={setInput} />
+        <ConnectionSelect
+          dataSource={DATASOURCES_WHITELIST}
+          sx={{ my: 1 }}
+          value={input}
+          onChange={setInput}
+        />
       </DialogContent>
       <DialogActions>
         <Button color="inherit" variant="text" onClick={onClose}>

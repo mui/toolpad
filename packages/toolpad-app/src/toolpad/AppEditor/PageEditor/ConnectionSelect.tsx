@@ -4,9 +4,10 @@ import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom } from '../../DomLoader';
+import { asArray } from '../../../utils/collections';
 
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
-  dataSource?: string;
+  dataSource?: string | string[];
   sx?: SxProps;
 }
 
@@ -22,8 +23,11 @@ export default function ConnectionSelect({
   const { connections = [] } = appDom.getChildNodes(dom, app);
 
   const filtered = React.useMemo(() => {
+    const filteredSources = new Set(asArray(dataSource));
     return dataSource
-      ? connections.filter((connection) => connection.attributes.dataSource.value === dataSource)
+      ? connections.filter((connection) =>
+          filteredSources.has(connection.attributes.dataSource.value),
+        )
       : connections;
   }, [connections, dataSource]);
 

@@ -380,28 +380,32 @@ async function applyTransform(transform: string, result: ApiResult<{}>): Promise
 
 export async function execQuery<P, Q>(
   appId: string,
-  query: appDom.QueryNode<Q>,
+  dataNode: appDom.QueryNode<Q> | appDom.MutationNode<Q>,
   params: Q,
 ): Promise<ApiResult<any>> {
   const dataSource: ServerDataSource<P, Q, any> | undefined =
-    query.attributes.dataSource && serverDataSources[query.attributes.dataSource.value];
+    dataNode.attributes.dataSource && serverDataSources[dataNode.attributes.dataSource.value];
   if (!dataSource) {
     throw new Error(
-      `Unknown datasource "${query.attributes.dataSource?.value}" for query "${query.id}"`,
+      `Unknown datasource "${dataNode.attributes.dataSource?.value}" for query "${dataNode.id}"`,
     );
   }
 
   const connectionParams = await getConnectionParams<P>(
     appId,
-    appDom.deref(query.attributes.connectionId.value),
+    appDom.deref(dataNode.attributes.connectionId.value),
   );
 
-  const transformEnabled = query.attributes.transformEnabled?.value;
-  const transform = query.attributes.transform?.value;
-  let result = await dataSource.exec(connectionParams, query.attributes.query.value, params);
-  if (transformEnabled && transform) {
-    result = await applyTransform(transform, result);
+  let result = await dataSource.exec(connectionParams, dataNode.attributes.query.value, params);
+
+  if (appDom.isQuery(dataNode)) {
+    const transformEnabled = dataNode.attributes.transformEnabled?.value;
+    const transform = dataNode.attributes.transform?.value;
+    if (transformEnabled && transform) {
+      result = await applyTransform(transform, result);
+    }
   }
+
   return result;
 }
 

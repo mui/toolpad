@@ -4,8 +4,11 @@ import { useQuery, UseQueryOptions } from 'react-query';
 
 export async function execDataSourceQuery(dataUrl: string, queryId: string, params: any) {
   const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
-  url.searchParams.set('params', JSON.stringify(params));
-  const res = await fetch(String(url));
+  const res = await fetch(String(url), {
+    method: 'POST',
+    body: JSON.stringify(params),
+    headers: [['content-type', 'application/json']],
+  });
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} while fetching "${url}"`);
   }

@@ -749,20 +749,19 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         activeDropZone !== dragOverZone;
 
       if (activeDropZone && hasChangedDropArea && availableDropTargetIds.has(activeDropNodeId)) {
-        const isDraggingOverPageRowOnlyChildVerticalZones =
+        const isDragOverParentPageRow =
           activeDropNodeParent &&
           appDom.isElement(activeDropNodeParent) &&
-          isPageRow(activeDropNodeParent) &&
+          isPageRow(activeDropNodeParent);
+
+        const hasDragOverParentRowOverride =
+          isDragOverParentPageRow &&
           activeDropNodeSiblings.length === 0 &&
           (activeDropZone === DROP_ZONE_TOP || activeDropZone === DROP_ZONE_BOTTOM);
 
         api.nodeDragOver({
-          nodeId: isDraggingOverPageRowOnlyChildVerticalZones
-            ? activeDropNodeParent.id
-            : activeDropNodeId,
-          parentProp: isDraggingOverPageRowOnlyChildVerticalZones
-            ? 'children'
-            : activeDropSlotParentProp || null,
+          nodeId: hasDragOverParentRowOverride ? activeDropNodeParent.id : activeDropNodeId,
+          parentProp: hasDragOverParentRowOverride ? 'children' : activeDropSlotParentProp || null,
           zone: activeDropZone as DropZone,
         });
       }

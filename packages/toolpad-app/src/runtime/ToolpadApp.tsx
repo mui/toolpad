@@ -238,7 +238,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
         const handler = () => {
           const { page } = action.value;
           if (page) {
-            navigateToPage(page);
+            navigateToPage(appDom.deref(page));
           }
         };
 

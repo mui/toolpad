@@ -1137,9 +1137,14 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
           const minGridColumnWidth = overlayGridRef.current.getMinColumnWidth();
 
+          const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
+          const previousSiblingInfo = previousSibling && nodesInfo[previousSibling.id];
+          const previousSiblingRect = previousSiblingInfo?.rect;
+
           if (
             draggedEdge === RECTANGLE_EDGE_LEFT &&
-            cursorPos.x > parentRect.x + minGridColumnWidth &&
+            cursorPos.x >
+              Math.max(parentRect.x, previousSiblingRect?.x || 0) + minGridColumnWidth &&
             cursorPos.x < draggedNodeRect.x + draggedNodeRect.width - minGridColumnWidth
           ) {
             const updatedTransformScale =
@@ -1148,10 +1153,20 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
             resizePreviewElement.style.transformOrigin = '100% 50%';
             resizePreviewElement.style.transform = `scaleX(${updatedTransformScale})`;
           }
+
+          const nextSibling = appDom.getSiblingAfterNode(dom, draggedNode, 'children');
+          const nextSiblingInfo = nextSibling && nodesInfo[nextSibling.id];
+          const nextSiblingRect = nextSiblingInfo?.rect;
+
           if (
             draggedEdge === RECTANGLE_EDGE_RIGHT &&
             cursorPos.x > draggedNodeRect.x + minGridColumnWidth &&
-            cursorPos.x < parentRect.x + parentRect.width - minGridColumnWidth
+            cursorPos.x <
+              Math.min(
+                parentRect.x + parentRect.width,
+                nextSiblingRect ? nextSiblingRect?.x + nextSiblingRect?.width : 0,
+              ) -
+                minGridColumnWidth
           ) {
             const updatedTransformScale = snappedToGridCursorRelativePosX / draggedNodeRect.width;
 

@@ -168,6 +168,8 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
           globalScope={globalScope}
           value={value?.value || ''}
           onChange={handleCodeChange}
+          functionBody
+          topLevelAwait
         />
       </Box>
     </Box>
@@ -184,7 +186,10 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
 
   const handlePageChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ type: 'navigationAction', value: { page: event.target.value as NodeId } });
+      onChange({
+        type: 'navigationAction',
+        value: { page: appDom.ref(event.target.value as NodeId) },
+      });
     },
     [onChange],
   );
@@ -204,7 +209,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
         sx={{ my: 3 }}
         label="page"
         select
-        value={value?.value?.page || ''}
+        value={value?.value?.page ? appDom.deref(value.value.page) : ''}
         onChange={handlePageChange}
         disabled={!hasPagesAvailable}
         helperText={hasPagesAvailable ? null : 'No other pages available'}

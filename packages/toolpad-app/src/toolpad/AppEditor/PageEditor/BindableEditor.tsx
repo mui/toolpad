@@ -1,34 +1,18 @@
-import { Stack, TextField } from '@mui/material';
+import { Stack, SxProps } from '@mui/material';
 import * as React from 'react';
 import { BindableAttrValue, PropValueType, LiveBinding } from '@mui/toolpad-core';
 import { BindingEditor } from '../BindingEditor';
 import { WithControlledProp } from '../../../utils/types';
-
-function DefaultControl({ label, disabled, value, onChange }: RenderControlParams<any>) {
-  const handleChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(event.target.value);
-    },
-    [onChange],
-  );
-
-  return (
-    <TextField
-      fullWidth
-      value={value ?? ''}
-      disabled={disabled}
-      onChange={handleChange}
-      label={label}
-    />
-  );
-}
+import { getDefaultControl } from '../../propertyControls';
 
 function renderDefaultControl(params: RenderControlParams<any>) {
-  return <DefaultControl {...params} />;
+  const Control = getDefaultControl({ typeDef: params.propType });
+  return Control ? <Control {...params} /> : null;
 }
 
 export interface RenderControlParams<V> extends WithControlledProp<V> {
   label: string;
+  propType: PropValueType;
   disabled: boolean;
 }
 
@@ -40,6 +24,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
+  sx?: SxProps;
 }
 
 export default function BindableEditor<V>({
@@ -52,6 +37,7 @@ export default function BindableEditor<V>({
   onChange,
   liveBinding,
   globalScope = {},
+  sx,
 }: BindableEditorProps<V>) {
   const handlePropConstChange = React.useCallback(
     (newValue: V) => onChange({ type: 'const', value: newValue }),
@@ -71,10 +57,11 @@ export default function BindableEditor<V>({
   const hasBinding = value && value.type !== 'const';
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between">
+    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={sx}>
       <React.Fragment>
         {renderControl({
           label,
+          propType,
           disabled: !!hasBinding,
           value: constValue,
           onChange: handlePropConstChange,

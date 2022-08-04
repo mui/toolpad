@@ -2,8 +2,8 @@ import { MenuItem, TextField } from '@mui/material';
 import * as React from 'react';
 import type { EditorProps } from '../../types';
 
-function SelectPropEditor({ label, argType, value, onChange, disabled }: EditorProps<string>) {
-  const items = argType.typeDef.type === 'string' ? argType.typeDef.enum ?? [] : [];
+function SelectPropEditor({ label, propType, value, onChange, disabled }: EditorProps<string>) {
+  const items = propType.type === 'string' ? propType.enum ?? [] : [];
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChange(event.target.value);

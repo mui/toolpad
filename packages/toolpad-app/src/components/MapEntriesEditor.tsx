@@ -13,7 +13,6 @@ function renderStringValueEditor({
     <TextField
       label={label}
       disabled={disabled}
-      size="small"
       value={value}
       onChange={(event) => onChange(event.target.value)}
     />
@@ -94,7 +93,6 @@ export default function MapEntriesEditor<V = string>({
             <TextField
               disabled={entryDisabled}
               label={fieldLabel}
-              size="small"
               value={field}
               autoFocus
               onChange={(event) =>
@@ -123,10 +121,9 @@ export default function MapEntriesEditor<V = string>({
             <IconButton
               aria-label="Delete property"
               onClick={handleRemove(index)}
-              size="small"
               disabled={entryDisabled}
             >
-              <DeleteIcon fontSize="small" />
+              <DeleteIcon />
             </IconButton>
           </React.Fragment>
         );
@@ -135,7 +132,6 @@ export default function MapEntriesEditor<V = string>({
       <form autoComplete="off" style={{ display: 'contents' }}>
         <TextField
           inputRef={fieldInputRef}
-          size="small"
           label={fieldLabel}
           value=""
           onChange={(event) => {

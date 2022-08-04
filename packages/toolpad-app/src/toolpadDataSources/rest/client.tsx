@@ -5,6 +5,7 @@ import {
   Button,
   Divider,
   InputAdornment,
+  MenuItem,
   Stack,
   TextField,
   Toolbar,
@@ -25,6 +26,8 @@ import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { mapValues } from '../../utils/collections';
+
+const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -168,6 +171,17 @@ function QueryEditor({
     [onChange, value],
   );
 
+  const handleMethodChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const query: FetchQuery = {
+        ...value.query,
+        method: event.target.value,
+      };
+      onChange({ ...value, query });
+    },
+    [onChange, value],
+  );
+
   const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
     Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>)),
   );
@@ -211,16 +225,26 @@ function QueryEditor({
       />
       <Divider />
       <Typography>Query</Typography>
-      <BindableEditor
-        liveBinding={liveUrl}
-        globalScope={queryScope}
-        server
-        label="url"
-        propType={{ type: 'string' }}
-        renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-        value={value.query.url}
-        onChange={handleUrlChange}
-      />
+      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+        <TextField select value={value.query.method || 'GET'} onChange={handleMethodChange}>
+          {HTTP_METHODS.map((method) => (
+            <MenuItem key={method} value={method}>
+              {method}
+            </MenuItem>
+          ))}
+        </TextField>
+        <BindableEditor
+          liveBinding={liveUrl}
+          globalScope={queryScope}
+          sx={{ flex: 1 }}
+          server
+          label="url"
+          propType={{ type: 'string' }}
+          renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
+          value={value.query.url}
+          onChange={handleUrlChange}
+        />
+      </Box>
     </Stack>
   );
 }

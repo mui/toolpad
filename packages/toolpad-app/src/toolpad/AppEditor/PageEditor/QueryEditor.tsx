@@ -15,6 +15,7 @@ import {
   Divider,
   Toolbar,
   MenuItem,
+  IconButton,
   SxProps,
   Alert,
   Box,
@@ -22,8 +23,9 @@ import {
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { LoadingButton } from '@mui/lab';
-import { NodeId } from '@mui/toolpad-core';
+import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -36,12 +38,13 @@ import { omit, update } from '../../../utils/immutability';
 import client from '../../../api';
 import ErrorAlert from './ErrorAlert';
 import { JsExpressionEditor } from './JsExpressionEditor';
-import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
+import { useEvaluateLiveBinding, useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 import { WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { mapValues } from '../../../utils/collections';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
+import BindableEditor from './BindableEditor';
 
 export type ConnectionOption = {
   connectionId: NodeId | null;
@@ -179,7 +182,7 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
     const queryNode = appDom.createNode(dom, 'query', {
       attributes: {
         query: appDom.createConst(dataSource.getInitialQueryValue()),
-        connectionId: appDom.createConst(connectionId),
+        connectionId: appDom.createConst(appDom.ref(connectionId)),
         dataSource: appDom.createConst(dataSourceId),
       },
     });
@@ -204,6 +207,8 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
     </Dialog>
   );
 }
+
+type RawQueryPreviewKey<Q, P> = [string, appDom.QueryNode<Q, P>, Record<string, any>];
 
 interface QueryNodeEditorProps<Q, P> {
   open: boolean;
@@ -230,7 +235,9 @@ function QueryNodeEditorDialog<Q, P>({
     }
   }, [open, node]);
 
-  const connectionId = input.attributes.connectionId.value;
+  const connectionId = input.attributes.connectionId.value
+    ? appDom.deref(input.attributes.connectionId.value)
+    : null;
   const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
@@ -241,7 +248,7 @@ function QueryNodeEditorDialog<Q, P>({
         setInput((existing) =>
           update(existing, {
             attributes: update(existing.attributes, {
-              connectionId: appDom.createConst(newConnectionOption.connectionId),
+              connectionId: appDom.createConst(appDom.ref(newConnectionOption.connectionId)),
               dataSource: appDom.createConst(newConnectionOption.dataSourceId),
             }),
           }),
@@ -281,19 +288,6 @@ function QueryNodeEditorDialog<Q, P>({
     );
   }, []);
 
-  const handleTransformEnabledChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) =>
-        update(existing, {
-          attributes: update(existing.attributes, {
-            transformEnabled: appDom.createConst(event.target.checked),
-          }),
-        }),
-      );
-    },
-    [],
-  );
-
   const handleRefetchOnWindowFocusChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setInput((existing) =>
@@ -306,6 +300,16 @@ function QueryNodeEditorDialog<Q, P>({
     },
     [],
   );
+
+  const handleEnabledChange = React.useCallback((newValue: BindableAttrValue<boolean> | null) => {
+    setInput((existing) =>
+      update(existing, {
+        attributes: update(existing.attributes, {
+          enabled: newValue || undefined,
+        }),
+      }),
+    );
+  }, []);
 
   const handleRefetchOnReconnectChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -374,6 +378,51 @@ function QueryNodeEditorDialog<Q, P>({
     setPreviewParams(paramsObject);
   }, [input, paramsObject]);
 
+  const inputWithTransformDisabled = React.useMemo<appDom.QueryNode<Q, P>>(() => {
+    if (input.attributes.transformEnabled?.value) {
+      return {
+        ...input,
+        attributes: {
+          ...input.attributes,
+          transform: { type: 'const', value: '' },
+          refetchOnReconnect: { type: 'const', value: false },
+          refetchOnWindowFocus: { type: 'const', value: false },
+          refetchInterval: undefined,
+          transformEnabled: { type: 'const', value: false },
+        },
+      };
+    }
+
+    return input;
+  }, [input]);
+
+  const rawQueryPreviewKey = React.useMemo<RawQueryPreviewKey<Q, P>>(
+    () => [appId, inputWithTransformDisabled, previewParams],
+    [appId, inputWithTransformDisabled, previewParams],
+  );
+
+  const rawQueryPreview = client.useQuery('execQuery', rawQueryPreviewKey, {
+    retry: false,
+    keepPreviousData: true,
+  });
+
+  const handleRawQueryPreviewRefresh = React.useCallback(() => {
+    rawQueryPreview.refetch();
+  }, [rawQueryPreview]);
+
+  const handleTransformEnabledChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) =>
+        update(existing, {
+          attributes: update(existing.attributes, {
+            transformEnabled: appDom.createConst(event.target.checked),
+          }),
+        }),
+      );
+    },
+    [],
+  );
+
   const isInputSaved = node === input;
 
   const handleClose = React.useCallback(() => {
@@ -394,6 +443,11 @@ function QueryNodeEditorDialog<Q, P>({
     [appId, dataSourceId, connectionId],
   );
 
+  const liveEnabled = useEvaluateLiveBinding({
+    input: input.attributes.enabled || null,
+    globalScope: pageState,
+  });
+
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
       <DialogTitle>
@@ -404,7 +458,7 @@ function QueryNodeEditorDialog<Q, P>({
             value={
               input.attributes.dataSource
                 ? {
-                    connectionId: input.attributes.connectionId.value || null,
+                    connectionId: appDom.deref(input.attributes.connectionId.value) || null,
                     dataSourceId: input.attributes.dataSource.value,
                   }
                 : null
@@ -459,7 +513,7 @@ function QueryNodeEditorDialog<Q, P>({
                     <Grid container direction="row" spacing={1} sx={{ px: 3, pb: 1, mt: 2 }}>
                       <React.Fragment>
                         <Divider />
-                        <Grid item xs={6}>
+                        <Grid item xs={6} md={12}>
                           <Stack>
                             <FormControlLabel
                               label="Transform response"
@@ -472,15 +526,65 @@ function QueryNodeEditorDialog<Q, P>({
                               }
                             />
 
-                            <JsExpressionEditor
-                              globalScope={{}}
-                              value={
-                                input.attributes.transform?.value ??
-                                '(data) => {\n  return data;\n}'
-                              }
-                              onChange={handleTransformFnChange}
-                              disabled={!input.attributes.transformEnabled?.value}
-                            />
+                            <Stack direction={'row'} spacing={2} width={'100%'}>
+                              <Box
+                                sx={{
+                                  width: '300px',
+                                  maxWidth: '600px',
+                                  maxHeight: '150px',
+                                  overflow: 'scroll',
+                                }}
+                              >
+                                <JsonView
+                                  src={rawQueryPreview.data ?? { data: {} }}
+                                  sx={{
+                                    opacity:
+                                      rawQueryPreview.isRefetching ||
+                                      !input.attributes.transformEnabled?.value
+                                        ? 0.5
+                                        : 1,
+                                  }}
+                                />
+                              </Box>
+                              <IconButton
+                                disabled={
+                                  rawQueryPreview.isFetched ||
+                                  !input.attributes.transformEnabled?.value
+                                }
+                                onClick={handleRawQueryPreviewRefresh}
+                                sx={{ alignSelf: 'self-start' }}
+                              >
+                                <AutorenewIcon
+                                  sx={{
+                                    animation: 'spin 1500ms linear infinite',
+                                    animationPlayState: rawQueryPreview.isRefetching
+                                      ? 'running'
+                                      : 'paused',
+                                    '@keyframes spin': {
+                                      '0%': {
+                                        transform: 'rotate(0deg)',
+                                      },
+                                      '100%': {
+                                        transform: 'rotate(360deg)',
+                                      },
+                                    },
+                                  }}
+                                  fontSize="inherit"
+                                />
+                              </IconButton>
+                              <JsExpressionEditor
+                                globalScope={{ data: rawQueryPreview.data?.data }}
+                                autoFocus
+                                value={input.attributes.transform?.value ?? 'return data;'}
+                                sx={{
+                                  minWidth: '300px',
+                                  opacity: rawQueryPreview.isRefetching ? 0.5 : 1,
+                                }}
+                                functionBody
+                                onChange={handleTransformFnChange}
+                                disabled={!input.attributes.transformEnabled?.value}
+                              />
+                            </Stack>
                           </Stack>
                         </Grid>
                       </React.Fragment>
@@ -497,7 +601,6 @@ function QueryNodeEditorDialog<Q, P>({
                   >
                     <Toolbar>
                       <LoadingButton
-                        size="medium"
                         disabled={previewParams === paramsObject && previewQuery === input}
                         loading={isPreviewLoading}
                         loadingPosition="start"
@@ -530,6 +633,15 @@ function QueryNodeEditorDialog<Q, P>({
           </Box>
 
           <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
+            <BindableEditor
+              liveBinding={liveEnabled}
+              globalScope={pageState}
+              server
+              label="Enabled"
+              propType={{ type: 'boolean' }}
+              value={input.attributes.enabled ?? null}
+              onChange={handleEnabledChange}
+            />
             <FormControlLabel
               control={
                 <Checkbox

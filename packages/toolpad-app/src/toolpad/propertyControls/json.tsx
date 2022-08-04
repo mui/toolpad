@@ -18,7 +18,7 @@ const JsonEditor = lazyComponent(() => import('../../components/JsonEditor'), {
   fallback: <Skeleton variant="rectangular" height="100%" />,
 });
 
-function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorProps<any>) {
+function JsonPropEditor({ label, propType, value, onChange, disabled }: EditorProps<any>) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const valueAsString = React.useMemo(() => JSON.stringify(value, null, 2), [value]);
@@ -43,9 +43,7 @@ function JsonPropEditor({ label, argType, value, onChange, disabled }: EditorPro
   }, [onChange, input]);
 
   const schemaUri =
-    argType.typeDef.type === 'object' || argType.typeDef.type === 'array'
-      ? argType.typeDef.schema
-      : undefined;
+    propType.type === 'object' || propType.type === 'array' ? propType.schema : undefined;
 
   useShortcut({ code: 'KeyS', metaKey: true, disabled: !dialogOpen }, handleSave);
 

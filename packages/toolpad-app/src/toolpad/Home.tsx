@@ -221,12 +221,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
 
   const openDisabled = !app || !activeDeployment;
   let openButton = (
-    <Button
-      disabled={!app || !activeDeployment}
-      size="small"
-      component="a"
-      href={app ? `deploy/${app.id}` : ''}
-    >
+    <Button disabled={!app || !activeDeployment} component="a" href={app ? `deploy/${app.id}` : ''}>
       Open
     </Button>
   );
@@ -289,12 +284,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           />
         </CardContent>
         <CardActions>
-          <Button
-            size="small"
-            component="a"
-            href={app ? `/_toolpad/app/${app.id}/editor` : ''}
-            disabled={!app}
-          >
+          <Button component="a" href={app ? `/_toolpad/app/${app.id}/editor` : ''} disabled={!app}>
             Edit
           </Button>
           {openButton}

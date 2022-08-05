@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Box, Button, Skeleton, Stack, styled, Tab, Toolbar, Typography } from '@mui/material';
 import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
+
 import { LoadingButton, TabContext, TabList, TabPanel } from '@mui/lab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Controller, useForm } from 'react-hook-form';
@@ -14,14 +15,14 @@ import {
 import lazyComponent from '../../utils/lazyComponent';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import SplitPane from '../../components/SplitPane';
-import { usePrivateQuery } from '../context';
+import { useConnectionContext, usePrivateQuery } from '../context';
+import client from '../../api';
 import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import Console, { LogEntry } from '../../components/Console';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import { isSaveDisabled } from '../../utils/forms';
-import useQueryPreview from '../useQueryPreview';
 
 const HarViewer = lazyComponent(() => import('../../components/HarViewer'), {});
 
@@ -122,24 +123,39 @@ function QueryEditor({
     liveParams[key],
   ]);
 
-  const previewParams = React.useMemo(
-    () => Object.fromEntries(paramsEditorLiveValue.map(([key, binding]) => [key, binding.value])),
-    [paramsEditorLiveValue],
-  );
-
+  const { appId, connectionId } = useConnectionContext();
+  const [preview, setPreview] = React.useState<FunctionResult | null>(null);
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
-  const { preview, runPreview } = useQueryPreview<FunctionPrivateQuery, FunctionResult>(
-    {
-      kind: 'debugExec',
-      query: value.query,
-      params: previewParams,
-    },
-    {
-      onPreview(result) {
-        setPreviewLogs((existing) => [...existing, ...result.logs]);
-      },
-    },
-  );
+
+  const cancelRunPreview = React.useRef<(() => void) | null>(null);
+  const runPreview = React.useCallback(() => {
+    let canceled = false;
+
+    cancelRunPreview.current?.();
+    cancelRunPreview.current = () => {
+      canceled = true;
+    };
+
+    const currentParams = Object.fromEntries(
+      paramsEditorLiveValue.map(([key, binding]) => [key, binding.value]),
+    );
+
+    client.query
+      .dataSourceFetchPrivate(appId, connectionId, {
+        kind: 'debugExec',
+        query: value.query,
+        params: currentParams,
+      } as FunctionPrivateQuery)
+      .then((result) => {
+        if (!canceled) {
+          setPreview(result);
+          setPreviewLogs((existing) => [...existing, ...result.logs]);
+        }
+      })
+      .finally(() => {
+        cancelRunPreview.current = null;
+      });
+  }, [appId, connectionId, paramsEditorLiveValue, value.query]);
 
   const { data: secretsKeys = [] } = usePrivateQuery<FunctionPrivateQuery, string[]>({
     kind: 'secretsKeys',

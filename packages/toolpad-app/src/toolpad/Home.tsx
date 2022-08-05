@@ -454,7 +454,7 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
   );
 }
 
-interface AppViewProps {
+interface AppsViewProps {
   apps: App[];
   status: string;
   activeDeploymentsByApp: { [appId: string]: Deployment } | null;
@@ -462,7 +462,13 @@ interface AppViewProps {
   setDeletedApp: (app: App) => void;
 }
 
-function AppGrid({ status, apps, activeDeploymentsByApp, error, setDeletedApp }: AppViewProps) {
+function AppsGridView({
+  status,
+  apps,
+  activeDeploymentsByApp,
+  error,
+  setDeletedApp,
+}: AppsViewProps) {
   return (
     <Box
       sx={{
@@ -504,7 +510,13 @@ function AppGrid({ status, apps, activeDeploymentsByApp, error, setDeletedApp }:
   );
 }
 
-function AppList({ status, apps, activeDeploymentsByApp, error, setDeletedApp }: AppViewProps) {
+function AppsListView({
+  status,
+  apps,
+  activeDeploymentsByApp,
+  error,
+  setDeletedApp,
+}: AppsViewProps) {
   return (
     <Table aria-label="apps list" size="medium">
       <TableBody>
@@ -583,7 +595,7 @@ export default function Home() {
     setViewMode(value);
   }, []);
 
-  const AppsView = viewMode === 'list' ? AppList : AppGrid;
+  const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
 
   return (
     <TabContext value={activeTab}>

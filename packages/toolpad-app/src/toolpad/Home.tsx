@@ -34,7 +34,6 @@ import useLatest from '../utils/useLatest';
 import ToolpadShell from './ToolpadShell';
 import getReadableDuration from '../utils/readableDuration';
 import EditableText from '../components/EditableText';
-import UserFeedback from './UserFeedback';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -336,56 +335,54 @@ export default function Home() {
   const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
 
   return (
-    <UserFeedback>
-      <ToolpadShell>
-        <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-        <Container>
-          <Typography variant="h2">Apps</Typography>
-          <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
+    <ToolpadShell>
+      <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
+      <Container>
+        <Typography variant="h2">Apps</Typography>
+        <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
 
-          <Toolbar disableGutters>
-            <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-          </Toolbar>
+        <Toolbar disableGutters>
+          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+        </Toolbar>
 
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                lg: 'repeat(4, 1fr)',
-                md: 'repeat(3, 1fr)',
-                sm: 'repeat(2, fr)',
-                xs: 'repeat(1, fr)',
-              },
-              gap: 2,
-            }}
-          >
-            {(() => {
-              switch (status) {
-                case 'loading':
-                  return <AppCard />;
-                case 'error':
-                  return <Alert severity="error">{(error as Error)?.message}</Alert>;
-                case 'success':
-                  return apps.length > 0
-                    ? apps.map((app) => {
-                        const activeDeployment = activeDeploymentsByApp?.[app.id];
-                        return (
-                          <AppCard
-                            key={app.id}
-                            app={app}
-                            activeDeployment={activeDeployment}
-                            onDelete={() => setDeletedApp(app)}
-                          />
-                        );
-                      })
-                    : 'No apps yet';
-                default:
-                  return '';
-              }
-            })()}
-          </Box>
-        </Container>
-      </ToolpadShell>
-    </UserFeedback>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              lg: 'repeat(4, 1fr)',
+              md: 'repeat(3, 1fr)',
+              sm: 'repeat(2, fr)',
+              xs: 'repeat(1, fr)',
+            },
+            gap: 2,
+          }}
+        >
+          {(() => {
+            switch (status) {
+              case 'loading':
+                return <AppCard />;
+              case 'error':
+                return <Alert severity="error">{(error as Error)?.message}</Alert>;
+              case 'success':
+                return apps.length > 0
+                  ? apps.map((app) => {
+                      const activeDeployment = activeDeploymentsByApp?.[app.id];
+                      return (
+                        <AppCard
+                          key={app.id}
+                          app={app}
+                          activeDeployment={activeDeployment}
+                          onDelete={() => setDeletedApp(app)}
+                        />
+                      );
+                    })
+                  : 'No apps yet';
+              default:
+                return '';
+            }
+          })()}
+        </Box>
+      </Container>
+    </ToolpadShell>
   );
 }

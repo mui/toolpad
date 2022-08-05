@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Collapse, styled, Typography } from '@mui/material';
+import { Box, Collapse, Link, styled, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -13,7 +13,11 @@ import {
   PAGE_ROW_COMPONENT_ID,
   STACK_COMPONENT_ID,
 } from '../../../toolpadComponents';
-import { FutureComponentSpec, useUserFeedback } from '../../UserFeedback';
+
+interface FutureComponentSpec {
+  displayName: string;
+  githubLink: string;
+}
 
 const FUTURE_COMPONENTS: FutureComponentSpec[] = [
   {
@@ -87,11 +91,6 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const handleMouseEnter = React.useCallback(() => openDrawer(), [openDrawer]);
   const handleMouseLeave = React.useCallback(() => closeDrawer(), [closeDrawer]);
 
-  const { showDialog } = useUserFeedback();
-
-  const handleFutureComponentClick = (futureComponent: FutureComponentSpec) => () =>
-    showDialog({ kind: 'futureComponent', futureComponent });
-
   return (
     <ComponentCatalogRoot
       className={className}
@@ -136,15 +135,14 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                 })}
               {FUTURE_COMPONENTS.map((futureComponent, i) => {
                 return (
-                  <ComponentCatalogItem
-                    key={`futureComponent[${i}]`}
-                    onClick={handleFutureComponentClick(futureComponent)}
-                  >
-                    <DragIndicatorIcon color="disabled" />
-                    {futureComponent.displayName}
-                    <Box sx={{ flex: 1 }} />
-                    🚧
-                  </ComponentCatalogItem>
+                  <Link href={futureComponent.githubLink} underline="none" target="_blank">
+                    <ComponentCatalogItem key={`futureComponent[${i}]`}>
+                      <DragIndicatorIcon color="disabled" />
+                      {futureComponent.displayName}
+                      <Box sx={{ flex: 1 }} />
+                      🚧
+                    </ComponentCatalogItem>
+                  </Link>
                 );
               })}
             </Box>

@@ -4,3 +4,4 @@ export const HTML_ID_APP_ROOT = 'root';
 export const HTML_ID_EDITOR_OVERLAY = 'editor-overlay';
 export const WINDOW_PROP_TOOLPAD_APP_RENDER_PARAMS = '__TOOLPAD_APP_RENDER_PARAMS__';
 export const RUNTIME_CONFIG_WINDOW_PROPERTY = '__TOOLPAD_RUNTIME_CONFIG__';
+export const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';

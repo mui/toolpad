@@ -46,7 +46,7 @@ function getDialogContent(params: DialogParams) {
           <a href={FEATURE_REQUEST_LINK} target="_blank" rel="noreferrer">
             feature request
           </a>{' '}
-          over at our github repository.
+          over at our GitHub repo or upvote an existing request.
         </React.Fragment>
       );
 

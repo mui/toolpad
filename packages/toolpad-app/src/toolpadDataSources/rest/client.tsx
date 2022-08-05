@@ -299,7 +299,6 @@ function QueryEditor({
             onEnabledChange={handleTransformEnabledChange}
             globalScope={{ data: preview?.untransformedData }}
             loading={false}
-            onUpdatePreview={runPreview}
           />
         </Stack>
       </Box>

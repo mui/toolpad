@@ -60,6 +60,29 @@ export default function TransformInput({
                 }}
               />
             </Box>
+            {onUpdatePreview ? (
+              <IconButton
+                disabled={!enabled}
+                onClick={onUpdatePreview}
+                sx={{ alignSelf: 'self-start' }}
+              >
+                <AutorenewIcon
+                  sx={{
+                    animation: 'spin 1500ms linear infinite',
+                    animationPlayState: loading ? 'running' : 'paused',
+                    '@keyframes spin': {
+                      '0%': {
+                        transform: 'rotate(0deg)',
+                      },
+                      '100%': {
+                        transform: 'rotate(360deg)',
+                      },
+                    },
+                  }}
+                  fontSize="inherit"
+                />
+              </IconButton>
+            ) : null}
             <JsExpressionEditor
               globalScope={globalScope}
               autoFocus

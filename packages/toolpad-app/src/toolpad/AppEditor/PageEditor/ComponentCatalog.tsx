@@ -21,8 +21,36 @@ interface FutureComponentSpec {
 
 const FUTURE_COMPONENTS: FutureComponentSpec[] = [
   {
+    displayName: 'Form',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/749',
+  },
+  {
+    displayName: 'Card',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/748',
+  },
+  {
     displayName: 'Tabs',
     githubLink: 'https://github.com/mui/mui-toolpad/issues/747',
+  },
+  {
+    displayName: 'Slider',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/746',
+  },
+  {
+    displayName: 'Switch',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/745',
+  },
+  {
+    displayName: 'RadioButton',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/744',
+  },
+  {
+    displayName: 'DatePicker',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/743',
+  },
+  {
+    displayName: 'Checkbox',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/742',
   },
 ];
 

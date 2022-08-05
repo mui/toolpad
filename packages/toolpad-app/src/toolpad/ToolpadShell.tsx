@@ -10,6 +10,7 @@ import {
   MenuItem,
   Divider,
   ListItemText,
+  Tooltip,
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
@@ -66,16 +67,18 @@ function UserFeedback() {
 
   return (
     <React.Fragment>
-      <IconButton
-        id={menuId}
-        aria-controls={open ? menuId : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
-        color="inherit"
-      >
-        <HelpOutlinedIcon />
-      </IconButton>
+      <Tooltip title="Help and resources">
+        <IconButton
+          id={menuId}
+          aria-controls={open ? menuId : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}
+          color="inherit"
+        >
+          <HelpOutlinedIcon />
+        </IconButton>
+      </Tooltip>
       <Menu
         id={menuId}
         anchorEl={anchorEl}

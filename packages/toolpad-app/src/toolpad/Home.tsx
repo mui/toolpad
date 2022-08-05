@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
   Alert,
   Button,
@@ -17,7 +18,6 @@ import {
   MenuItem,
   Skeleton,
   Stack,
-  Tabs,
   Tab,
   Table,
   TableBody,
@@ -30,8 +30,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import * as React from 'react';
-import { LoadingButton } from '@mui/lab';
+import { LoadingButton, TabContext, TabList, TabPanel } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
@@ -454,43 +453,104 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
     </React.Fragment>
   );
 }
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
+
+interface AppViewProps {
+  apps: App[];
+  status: string;
+  activeDeploymentsByApp: { [appId: string]: Deployment } | null;
+  error: unknown;
+  setDeletedApp: (app: App) => void;
 }
 
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
+function AppGrid({ status, apps, activeDeploymentsByApp, error, setDeletedApp }: AppViewProps) {
   return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`tabpanel-${index}`}
-      aria-labelledby={`tab-${index}`}
-      {...other}
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          lg: 'repeat(4, 1fr)',
+          md: 'repeat(3, 1fr)',
+          sm: 'repeat(2, fr)',
+          xs: 'repeat(1, fr)',
+        },
+        gap: 2,
+      }}
     >
-      {value === index ? <Box>{children}</Box> : null}
-    </div>
+      {(() => {
+        switch (status) {
+          case 'loading':
+            return <AppCard />;
+          case 'error':
+            return <Alert severity="error">{(error as Error)?.message}</Alert>;
+          case 'success':
+            return apps.length > 0
+              ? apps.map((app) => {
+                  const activeDeployment = activeDeploymentsByApp?.[app.id];
+                  return (
+                    <AppCard
+                      key={app.id}
+                      app={app}
+                      activeDeployment={activeDeployment}
+                      onDelete={() => setDeletedApp(app)}
+                    />
+                  );
+                })
+              : 'No apps yet';
+          default:
+            return <AppCard />;
+        }
+      })()}
+    </Box>
   );
 }
 
-interface TabListProps {
-  value: number;
-  handleTabChange: (event: React.SyntheticEvent, newValue: number) => void;
+function AppList({ status, apps, activeDeploymentsByApp, error, setDeletedApp }: AppViewProps) {
+  return (
+    <Table aria-label="apps list" size="medium">
+      <TableBody>
+        {(() => {
+          switch (status) {
+            case 'loading':
+              return <AppRow />;
+            case 'error':
+              return <Alert severity="error">{(error as Error)?.message}</Alert>;
+            case 'success':
+              return apps.length > 0
+                ? apps.map((app) => {
+                    const activeDeployment = activeDeploymentsByApp?.[app.id];
+                    return (
+                      <AppRow
+                        key={app.id}
+                        app={app}
+                        activeDeployment={activeDeployment}
+                        onDelete={() => setDeletedApp(app)}
+                      />
+                    );
+                  })
+                : 'No apps yet';
+            default:
+              return '';
+          }
+        })()}
+      </TableBody>
+    </Table>
+  );
 }
 
-function TabList({ value, handleTabChange }: TabListProps) {
+interface NavTabListProps {
+  activeTab: string;
+  handleTabChange: (event: React.SyntheticEvent, value: string) => void;
+}
+
+function NavTabList({ activeTab, handleTabChange }: NavTabListProps) {
   return (
-    <Tabs
-      value={value}
+    <TabList
+      value={activeTab}
       onChange={handleTabChange}
       sx={{ minHeight: 'inherit', '& > div.MuiTabs-scroller': { display: 'inline-flex' } }}
-      aria-label="tabs list"
     >
-      <Tab label="Apps" />
-    </Tabs>
+      <Tab label="Apps" value="apps" />
+    </TabList>
   );
 }
 
@@ -511,10 +571,10 @@ export default function Home() {
 
   const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
 
-  const [tabIndex, setTabIndex] = React.useState(0);
+  const [activeTab, setActiveTab] = React.useState('apps');
 
-  const handleTabChange = React.useCallback((event: React.SyntheticEvent, newIndex: number) => {
-    setTabIndex(newIndex);
+  const handleTabChange = React.useCallback((event: React.SyntheticEvent, newValue: string) => {
+    setActiveTab(newValue);
   }, []);
 
   const [viewMode, setViewMode] = React.useState<string>('list');
@@ -523,107 +583,51 @@ export default function Home() {
     setViewMode(value);
   }, []);
 
+  const AppsView = viewMode === 'list' ? AppList : AppGrid;
+
   return (
-    <ToolpadShell navigation={<TabList value={tabIndex} handleTabChange={handleTabChange} />}>
-      <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      <TabPanel index={0} value={tabIndex}>
-        <Container>
-          <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
-          <Toolbar variant={'regular'} disableGutters sx={{ justifyContent: 'space-between' }}>
-            <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-            <ToggleButtonGroup
-              value={viewMode}
-              exclusive
-              onChange={handleViewModeChange}
-              aria-label="view mode"
-            >
-              <ToggleButton
-                value="list"
-                aria-label="list view"
-                color={viewMode === 'list' ? 'primary' : undefined}
+    <TabContext value={activeTab}>
+      <ToolpadShell
+        navigation={<NavTabList activeTab={activeTab} handleTabChange={handleTabChange} />}
+      >
+        <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
+        <TabPanel value={activeTab}>
+          <Container>
+            <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
+            <Toolbar variant={'regular'} disableGutters sx={{ justifyContent: 'space-between' }}>
+              <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={handleViewModeChange}
+                aria-label="view mode"
               >
-                <ViewListIcon />
-              </ToggleButton>
-              <ToggleButton
-                value="grid"
-                aria-label="grid view"
-                color={viewMode === 'grid' ? 'primary' : undefined}
-              >
-                <GridViewIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Toolbar>
-          {viewMode === 'grid' ? (
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: {
-                  lg: 'repeat(4, 1fr)',
-                  md: 'repeat(3, 1fr)',
-                  sm: 'repeat(2, fr)',
-                  xs: 'repeat(1, fr)',
-                },
-                gap: 2,
-              }}
-            >
-              {(() => {
-                switch (status) {
-                  case 'loading':
-                    return <AppCard />;
-                  case 'error':
-                    return <Alert severity="error">{(error as Error)?.message}</Alert>;
-                  case 'success':
-                    return apps.length > 0
-                      ? apps.map((app) => {
-                          const activeDeployment = activeDeploymentsByApp?.[app.id];
-                          return (
-                            <AppCard
-                              key={app.id}
-                              app={app}
-                              activeDeployment={activeDeployment}
-                              onDelete={() => setDeletedApp(app)}
-                            />
-                          );
-                        })
-                      : 'No apps yet';
-                  default:
-                    return <AppCard />;
-                }
-              })()}
-            </Box>
-          ) : null}
-          <Table aria-label="apps list" size="medium">
-            {viewMode === 'list' ? (
-              <TableBody>
-                {(() => {
-                  switch (status) {
-                    case 'loading':
-                      return <AppRow />;
-                    case 'error':
-                      return <Alert severity="error">{(error as Error)?.message}</Alert>;
-                    case 'success':
-                      return apps.length > 0
-                        ? apps.map((app) => {
-                            const activeDeployment = activeDeploymentsByApp?.[app.id];
-                            return (
-                              <AppRow
-                                key={app.id}
-                                app={app}
-                                activeDeployment={activeDeployment}
-                                onDelete={() => setDeletedApp(app)}
-                              />
-                            );
-                          })
-                        : 'No apps yet';
-                    default:
-                      return '';
-                  }
-                })()}
-              </TableBody>
-            ) : null}
-          </Table>
-        </Container>
-      </TabPanel>
-    </ToolpadShell>
+                <ToggleButton
+                  value="list"
+                  aria-label="list view"
+                  color={viewMode === 'list' ? 'primary' : undefined}
+                >
+                  <ViewListIcon />
+                </ToggleButton>
+                <ToggleButton
+                  value="grid"
+                  aria-label="grid view"
+                  color={viewMode === 'grid' ? 'primary' : undefined}
+                >
+                  <GridViewIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Toolbar>
+            <AppsView
+              apps={apps}
+              status={status}
+              error={error}
+              activeDeploymentsByApp={activeDeploymentsByApp}
+              setDeletedApp={setDeletedApp}
+            />
+          </Container>
+        </TabPanel>
+      </ToolpadShell>
+    </TabContext>
   );
 }

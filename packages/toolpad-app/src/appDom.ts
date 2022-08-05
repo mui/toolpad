@@ -808,6 +808,7 @@ export function createRenderTree(dom: AppDom): RenderTree {
 export function ref(nodeId: NodeId): NodeReference {
   return { $$ref: nodeId };
 }
+
 export function deref(nodeRef: NodeReference): NodeId {
   return nodeRef.$$ref;
 }

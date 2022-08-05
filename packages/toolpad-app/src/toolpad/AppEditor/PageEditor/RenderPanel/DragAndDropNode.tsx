@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { NodeId } from '@mui/toolpad-core';
 
-import { SlotsState, FlowDirection } from '../../../../types';
+import { FlowDirection } from '../../../../types';
 import * as appDom from '../../../../appDom';
 import { Rectangle } from '../../../../utils/geometry';
-import { ExactEntriesOf } from '../../../../utils/types';
 
 import { useDom } from '../../../DomLoader';
 
@@ -37,13 +35,15 @@ function getChildNodeHighlightedZone(parentFlowDirection: FlowDirection): DropZo
 
 interface DragAndDropNodeProps {
   node: appDom.AppDomNode;
-  getDropAreaRect: (nodeId: NodeId, parentProp?: string) => Rectangle;
+  parentProp: string | null;
+  dropAreaRect: Rectangle;
   availableDropZones: DropZone[];
 }
 
 export default function DragAndDropNode({
   node,
-  getDropAreaRect,
+  parentProp,
+  dropAreaRect,
   availableDropZones,
 }: DragAndDropNodeProps) {
   const dom = useDom();
@@ -51,176 +51,147 @@ export default function DragAndDropNode({
 
   const { nodes: nodesInfo } = viewState;
 
-  const nodeInfo = nodesInfo[node.id];
-  const nodeParentProp = node.parentProp;
+  const dropAreaNodeInfo = nodesInfo[node.id];
 
-  const parent = appDom.getParent(dom, node) as appDom.PageNode | appDom.ElementNode;
-  const parentInfo = (parent && nodesInfo[parent.id]) || null;
+  const dropAreaNodeRect = dropAreaNodeInfo?.rect || null;
+  const dropAreaNodeSlots = dropAreaNodeInfo?.slots;
+
+  const hasMultipleFreeSlots = dropAreaNodeSlots
+    ? Object.keys(dropAreaNodeSlots).length > 1
+    : false;
+
+  const dropAreaNodeParent = appDom.getParent(dom, node);
+  const dropAreaNodeParentInfo = dropAreaNodeParent && nodesInfo[dropAreaNodeParent.id];
 
   const isPageNode = appDom.isPage(node);
-  const isPageChild = parent ? appDom.isPage(parent) : false;
+  const isPageChild = dropAreaNodeParent ? appDom.isPage(dropAreaNodeParent) : false;
+  const isPageRowChild = dropAreaNodeParent
+    ? appDom.isElement(dropAreaNodeParent) && isPageRow(dropAreaNodeParent)
+    : false;
 
-  const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
-
-  const childNodes = appDom.getChildNodes(dom, node) as appDom.NodeChildren<appDom.ElementNode>;
-
-  const freeSlots = nodeInfo?.slots || {};
-  const freeSlotEntries = Object.entries(freeSlots) as ExactEntriesOf<SlotsState>;
-
-  const hasFreeSlots = freeSlotEntries.length > 0;
-  const hasMultipleFreeSlots = freeSlotEntries.length > 1;
-
-  const getNodeDropAreaHighlightedZone = React.useCallback(
-    (parentProp: string | null = null): DropZone | null => {
-      const parentParent = parent && appDom.getParent(dom, parent);
-
-      if (dragOverZone && !availableDropZones.includes(dragOverZone)) {
-        return null;
-      }
-
-      if (dragOverZone === DROP_ZONE_TOP) {
-        // Is dragging over page top
-        if (parent && parent.id === dragOverNodeId && appDom.isPage(parent)) {
-          const pageFirstChild = appDom.getNodeFirstChild(dom, parent, 'children');
-
-          const isPageFirstChild = pageFirstChild ? node.id === pageFirstChild.id : false;
-
-          return isPageFirstChild ? DROP_ZONE_TOP : null;
-        }
-      }
-
-      if (dragOverZone === DROP_ZONE_LEFT) {
-        // Is dragging over parent page row left, and parent page row is a child of the page
-        if (
-          parent &&
-          parentParent &&
-          parent.id === dragOverNodeId &&
-          appDom.isElement(parent) &&
-          isPageRowChild &&
-          appDom.isPage(parentParent)
-        ) {
-          const parentFirstChild = nodeParentProp
-            ? appDom.getNodeFirstChild(dom, parent, nodeParentProp)
-            : null;
-
-          const isParentFirstChild = parentFirstChild ? node.id === parentFirstChild.id : false;
-
-          return isParentFirstChild ? DROP_ZONE_LEFT : null;
-        }
-
-        // Is dragging over left, is page row and child of the page
-        if (parent && appDom.isElement(node) && isPageRow(node) && isPageChild) {
-          return null;
-        }
-      }
-
-      if (dragOverZone === DROP_ZONE_CENTER) {
-        // Is dragging over parent element center
-        if (parent && parent.id === dragOverNodeId) {
-          const parentLastChild =
-            nodeParentProp && (appDom.isPage(parent) || appDom.isElement(parent))
-              ? appDom.getNodeLastChild(dom, parent, nodeParentProp)
-              : null;
-
-          const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
-
-          const parentSlots = parentInfo?.slots || null;
-
-          const parentFlowDirection =
-            parentSlots && nodeParentProp && parentSlots[nodeParentProp]?.flowDirection;
-
-          return parentFlowDirection && isParentLastChild && (!hasMultipleFreeSlots || !parentProp)
-            ? getChildNodeHighlightedZone(parentFlowDirection)
-            : null;
-        }
-        // Is dragging over slot center
-        if (node.id === dragOverNodeId && parentProp && parentProp === dragOverSlotParentProp) {
-          if (isPageNode) {
-            return DROP_ZONE_CENTER;
-          }
-
-          const nodeChildren =
-            (parentProp && appDom.isElement(node) && childNodes[parentProp]) || [];
-          return nodeChildren.length === 0 ? DROP_ZONE_CENTER : null;
-        }
-      }
-
-      // Common cases
-      return node.id === dragOverNodeId && parentProp === dragOverSlotParentProp
-        ? dragOverZone
-        : null;
-    },
-    [
-      availableDropZones,
-      childNodes,
-      dom,
-      dragOverNodeId,
-      dragOverSlotParentProp,
-      dragOverZone,
-      hasMultipleFreeSlots,
-      isPageChild,
-      isPageNode,
-      isPageRowChild,
-      node,
-      nodeParentProp,
-      parent,
-      parentInfo?.slots,
-    ],
+  const dropAreaNodeChildNodes = React.useMemo(
+    () => appDom.getChildNodes(dom, node) as appDom.NodeChildren<appDom.ElementNode>,
+    [dom, node],
   );
 
-  const nodeRect = nodeInfo?.rect || null;
-  const hasNodeOverlay = isPageNode || appDom.isElement(node);
+  const getNodeDropAreaHighlightedZone = React.useCallback((): DropZone | null => {
+    const dropAreaParentParent = dropAreaNodeParent && appDom.getParent(dom, dropAreaNodeParent);
 
-  if (!nodeRect || !hasNodeOverlay) {
+    if (dragOverZone && !availableDropZones.includes(dragOverZone)) {
+      return null;
+    }
+
+    if (dragOverZone === DROP_ZONE_TOP) {
+      // Is dragging over page top
+      if (
+        dropAreaNodeParent &&
+        dropAreaNodeParent.id === dragOverNodeId &&
+        appDom.isPage(dropAreaNodeParent)
+      ) {
+        const pageFirstChild = appDom.getNodeFirstChild(dom, dropAreaNodeParent, 'children');
+
+        const isPageFirstChild = pageFirstChild ? node.id === pageFirstChild.id : false;
+
+        return isPageFirstChild ? DROP_ZONE_TOP : null;
+      }
+    }
+
+    if (dragOverZone === DROP_ZONE_LEFT) {
+      // Is dragging over parent page row left, and parent page row is a child of the page
+      if (
+        dropAreaNodeParent &&
+        dropAreaParentParent &&
+        dropAreaNodeParent.id === dragOverNodeId &&
+        appDom.isElement(dropAreaNodeParent) &&
+        isPageRowChild &&
+        appDom.isPage(dropAreaParentParent)
+      ) {
+        const parentFirstChild = parentProp
+          ? appDom.getNodeFirstChild(dom, dropAreaNodeParent, parentProp)
+          : null;
+
+        const isParentFirstChild = parentFirstChild ? node.id === parentFirstChild.id : false;
+
+        return isParentFirstChild ? DROP_ZONE_LEFT : null;
+      }
+
+      // Is dragging over left, is page row and child of the page
+      if (dropAreaNodeParent && appDom.isElement(node) && isPageRow(node) && isPageChild) {
+        return null;
+      }
+    }
+
+    if (dragOverZone === DROP_ZONE_CENTER) {
+      // Is dragging over parent element center
+      if (dropAreaNodeParent && dropAreaNodeParent.id === dragOverNodeId) {
+        const parentLastChild =
+          parentProp && (appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent))
+            ? appDom.getNodeLastChild(dom, dropAreaNodeParent, parentProp)
+            : null;
+
+        const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
+
+        const parentSlots = dropAreaNodeParentInfo?.slots || null;
+
+        const parentFlowDirection =
+          parentSlots && parentProp && parentSlots[parentProp]?.flowDirection;
+
+        return parentFlowDirection && isParentLastChild && (!hasMultipleFreeSlots || !parentProp)
+          ? getChildNodeHighlightedZone(parentFlowDirection)
+          : null;
+      }
+      // Is dragging over slot center
+      if (node.id === dragOverNodeId && parentProp && parentProp === dragOverSlotParentProp) {
+        if (isPageNode) {
+          return DROP_ZONE_CENTER;
+        }
+
+        const nodeChildren =
+          (parentProp && appDom.isElement(node) && dropAreaNodeChildNodes[parentProp]) || [];
+        return nodeChildren.length === 0 ? DROP_ZONE_CENTER : null;
+      }
+    }
+
+    // Common cases
+    return node.id === dragOverNodeId && parentProp === dragOverSlotParentProp
+      ? dragOverZone
+      : null;
+  }, [
+    dropAreaNodeParent,
+    dom,
+    dragOverZone,
+    availableDropZones,
+    node,
+    dragOverNodeId,
+    parentProp,
+    dragOverSlotParentProp,
+    isPageRowChild,
+    isPageChild,
+    dropAreaNodeParentInfo?.slots,
+    hasMultipleFreeSlots,
+    isPageNode,
+    dropAreaNodeChildNodes,
+  ]);
+
+  const slotRect = (dropAreaNodeSlots && parentProp && dropAreaNodeSlots[parentProp]?.rect) || null;
+
+  const dropAreaSlotChildNodes = parentProp ? dropAreaNodeChildNodes[parentProp] || [] : [];
+  const isEmptySlot = dropAreaSlotChildNodes.length === 0;
+
+  if (!node || !dropAreaNodeParentInfo || !dropAreaNodeRect) {
     return null;
   }
 
-  const hasOwnDropArea = !hasFreeSlots || hasMultipleFreeSlots;
-  const hasSlotDropAreas = hasFreeSlots;
-
   return (
-    <React.Fragment>
-      {hasSlotDropAreas
-        ? freeSlotEntries.map(([parentProp, freeSlot]) => {
-            if (!freeSlot) {
-              return null;
-            }
-
-            const dropAreaRect = getDropAreaRect(node.id, parentProp);
-
-            const slotChildNodes = childNodes[parentProp] || [];
-            const isEmptySlot = slotChildNodes.length === 0;
-
-            if (isPageNode && !isEmptySlot) {
-              return null;
-            }
-
-            return (
-              <NodeDropArea
-                key={`${node.id}:${parentProp}`}
-                node={node}
-                parentInfo={parentInfo}
-                layoutRect={nodeRect}
-                dropAreaRect={dropAreaRect}
-                slotRect={freeSlot.rect}
-                highlightedZone={getNodeDropAreaHighlightedZone(parentProp)}
-                isEmptySlot={isEmptySlot}
-                isPageChild={isPageChild}
-              />
-            );
-          })
-        : null}
-      {hasOwnDropArea ? (
-        <NodeDropArea
-          node={node}
-          parentInfo={parentInfo}
-          layoutRect={nodeRect}
-          dropAreaRect={getDropAreaRect(node.id)}
-          highlightedZone={getNodeDropAreaHighlightedZone()}
-          isEmptySlot={false}
-          isPageChild={isPageChild}
-        />
-      ) : null}
-    </React.Fragment>
+    <NodeDropArea
+      node={node}
+      parentInfo={dropAreaNodeParentInfo}
+      layoutRect={dropAreaNodeRect}
+      dropAreaRect={dropAreaRect}
+      slotRect={slotRect}
+      highlightedZone={getNodeDropAreaHighlightedZone()}
+      isEmptySlot={isEmptySlot}
+      isPageChild={isPageChild}
+    />
   );
 }

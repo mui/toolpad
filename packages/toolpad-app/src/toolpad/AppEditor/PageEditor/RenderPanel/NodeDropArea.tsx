@@ -122,11 +122,11 @@ const EmptySlot = styled('div')({
 });
 
 interface NodeDropAreaProps {
-  node: appDom.ElementNode | appDom.PageNode;
+  node: appDom.AppDomNode;
   parentInfo: NodeInfo | null;
   layoutRect: Rectangle;
   dropAreaRect: Rectangle;
-  slotRect?: Rectangle;
+  slotRect: Rectangle | null;
   highlightedZone?: DropZone | null;
   isEmptySlot: boolean;
   isPageChild: boolean;

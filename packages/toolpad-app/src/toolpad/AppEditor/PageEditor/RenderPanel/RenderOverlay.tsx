@@ -1391,12 +1391,22 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 resizePreviewElementRef={resizePreviewElementRef}
               />
             ) : null}
-            <DragAndDropNode
-              node={node}
-              getDropAreaRect={getDropAreaRect}
-              availableDropZones={availableDropZones}
-            />
           </React.Fragment>
+        );
+      })}
+      {Object.entries(dropAreaRects).map(([dropAreaId, dropAreaRect]) => {
+        const dropAreaNodeId = getDropAreaNodeId(dropAreaId);
+        const dropAreaParentProp = getDropAreaParentProp(dropAreaId);
+
+        const dropAreaNode = appDom.getNode(dom, dropAreaNodeId);
+
+        return (
+          <DragAndDropNode
+            node={dropAreaNode}
+            parentProp={dropAreaParentProp}
+            dropAreaRect={dropAreaRect}
+            availableDropZones={availableDropZones}
+          />
         );
       })}
       {/* 

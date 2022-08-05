@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Box, Button, Skeleton, Stack, styled, Tab, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
 import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
 
-import { LoadingButton, TabContext, TabList, TabPanel } from '@mui/lab';
+import { LoadingButton } from '@mui/lab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Controller, useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
@@ -19,14 +19,11 @@ import { useConnectionContext, usePrivateQuery } from '../context';
 import client from '../../api';
 import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
-import Console, { LogEntry } from '../../components/Console';
+import { LogEntry } from '../../components/Console';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import { isSaveDisabled } from '../../utils/forms';
-
-const HarViewer = lazyComponent(() => import('../../components/HarViewer'), {});
-
-const DebuggerTabPanel = styled(TabPanel)({ padding: 0, flex: 1, minHeight: 0 });
+import Devtools from '../../components/Devtools';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -180,11 +177,6 @@ function QueryEditor({
     return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
   }, [params, secretsKeys]);
 
-  const [debuggerTab, setDebuggerTab] = React.useState('console');
-  const handleDebuggerTabChange = (event: React.SyntheticEvent, newValue: string) => {
-    setDebuggerTab(newValue);
-  };
-
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
@@ -223,22 +215,12 @@ function QueryEditor({
           )}
         </Box>
 
-        <TabContext value={debuggerTab}>
-          <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <TabList onChange={handleDebuggerTabChange} aria-label="Debugger">
-                <Tab label="Console" value="console" />
-                <Tab label="Network" value="network" />
-              </TabList>
-            </Box>
-            <DebuggerTabPanel value="console">
-              <Console sx={{ flex: 1 }} value={previewLogs} onChange={setPreviewLogs} />
-            </DebuggerTabPanel>
-            <DebuggerTabPanel value="network">
-              <HarViewer har={preview?.har} />
-            </DebuggerTabPanel>
-          </Box>
-        </TabContext>
+        <Devtools
+          sx={{ width: '100%', height: '100%' }}
+          log={previewLogs}
+          onLogChange={setPreviewLogs}
+          har={preview?.har}
+        />
       </SplitPane>
     </SplitPane>
   );

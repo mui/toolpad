@@ -2,6 +2,7 @@ import { generateKeyBetween } from 'fractional-indexing';
 import cuid from 'cuid';
 import {
   NodeId,
+  NodeReference,
   ConstantAttrValue,
   BindableAttrValue,
   BindableAttrValues,
@@ -106,7 +107,7 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
   readonly params?: BindableAttrValues<P>;
   readonly attributes: {
     readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeId>;
+    readonly connectionId: ConstantAttrValue<NodeReference>;
     readonly query: ConstantAttrValue<Q>;
     readonly transform?: ConstantAttrValue<string>;
     readonly transformEnabled?: ConstantAttrValue<boolean>;
@@ -802,4 +803,11 @@ export function createRenderTree(dom: AppDom): RenderTree {
     ...dom,
     nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as RenderTreeNodes,
   };
+}
+
+export function ref(nodeId: NodeId): NodeReference {
+  return { $$ref: nodeId };
+}
+export function deref(nodeRef: NodeReference): NodeId {
+  return nodeRef.$$ref;
 }

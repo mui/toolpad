@@ -3,7 +3,7 @@ import type * as ivm from 'isolated-vm';
 export interface FetchOptions {
   headers: [string, string][];
   method: string;
-  mode?: string;
+  mode?: RequestMode;
   body?: string;
 }
 

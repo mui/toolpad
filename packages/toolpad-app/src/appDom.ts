@@ -811,3 +811,41 @@ export function ref(nodeId: NodeId): NodeReference {
 export function deref(nodeRef: NodeReference): NodeId {
   return nodeRef.$$ref;
 }
+
+export function fromLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
+  // Migrate old rest nodes with transforms on the fly
+  // TODO: Build migration flow for https://github.com/mui/mui-toolpad/issues/741
+  //       to make this obsolete
+
+  if (node.attributes.dataSource?.value !== 'rest') {
+    return node;
+  }
+
+  if (
+    typeof node.attributes.query.value?.transformEnabled !== 'undefined' &&
+    (node.attributes.transformEnabled || node.attributes.transform)
+  ) {
+    return update(node, {
+      attributes: update(node.attributes, {
+        transformEnabled: undefined,
+        transform: undefined,
+      }),
+    });
+  }
+
+  if (node.attributes.transformEnabled || node.attributes.transform) {
+    return update(node, {
+      attributes: update(node.attributes, {
+        transformEnabled: undefined,
+        transform: undefined,
+        query: createConst({
+          ...node.attributes.query.value,
+          transformEnabled: node.attributes.transformEnabled?.value,
+          transform: node.attributes.transform?.value,
+        }),
+      }),
+    });
+  }
+
+  return node;
+}

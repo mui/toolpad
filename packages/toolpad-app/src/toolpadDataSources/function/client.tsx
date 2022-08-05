@@ -222,7 +222,7 @@ function QueryEditor({
           sx={{ width: '100%', height: '100%' }}
           log={previewLogs}
           onLogChange={setPreviewLogs}
-          har={preview?.har}
+          har={preview?.har || DEFAULT_HAR}
         />
       </SplitPane>
     </SplitPane>

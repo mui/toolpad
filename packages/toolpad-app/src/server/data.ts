@@ -376,6 +376,8 @@ export async function execQuery<P, Q>(
   query: appDom.QueryNode<Q>,
   params: Q,
 ): Promise<ApiResult<any>> {
+  query = appDom.fromLegacyQueryNode(query);
+
   const dataSource: ServerDataSource<P, Q, any> | undefined =
     query.attributes.dataSource && serverDataSources[query.attributes.dataSource.value];
   if (!dataSource) {
@@ -393,11 +395,7 @@ export async function execQuery<P, Q>(
   const transform = query.attributes.transform?.value;
   let result = await dataSource.exec(connectionParams, query.attributes.query.value, params);
 
-  // TODO: come up with migration scheme: https://github.com/mui/mui-toolpad/issues/741
-  const suppressLegacyTransform: boolean =
-    appDom.isQuery(query) && !!query.attributes.transformEnabled;
-
-  if (transformEnabled && transform && !suppressLegacyTransform) {
+  if (transformEnabled && transform) {
     result = {
       data: await applyTransform(transform, result.data),
     };

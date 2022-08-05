@@ -50,8 +50,6 @@ const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set(['googleSheets', 'postgres
 
 const EMPTY_OBJECT = {};
 
-const EMPTY_OBJECT = {};
-
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
   sx?: SxProps;

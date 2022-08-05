@@ -106,7 +106,7 @@ async function exec(
     throw error;
   }
 
-  return data;
+  return { data };
 }
 
 const dataSource: ServerDataSource<{}, FetchQuery, any> = {

@@ -1,5 +1,6 @@
 import { BindableAttrValue } from '@mui/toolpad-core';
-import { createHarLog } from 'node-fetch-har';
+import fetch from 'node-fetch';
+import { withHarInstrumentation, createHarLog } from '../../utils/har';
 import { ServerDataSource, ApiResult } from '../../types';
 import { FetchPrivateQuery, FetchQuery, FetchResult, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';
@@ -62,10 +63,11 @@ async function execBase(
   let error: Error | undefined;
   let untransformedData;
   let data;
-  const har = createHarLog(); // TODO generate actual har
+  const har = createHarLog();
 
   try {
-    const res = await fetch(queryUrl.href, { method, headers });
+    const instrumentedFetch = withHarInstrumentation(fetch, { har });
+    const res = await instrumentedFetch(queryUrl.href, { method, headers });
 
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`);

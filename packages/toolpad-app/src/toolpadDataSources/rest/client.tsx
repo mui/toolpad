@@ -33,6 +33,7 @@ import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import JsonView from '../../components/JsonView';
 import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
+import Devtools from '../../components/Devtools';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -302,9 +303,17 @@ function QueryEditor({
           />
         </Stack>
       </Box>
-      <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
-        {preview?.error ? <ErrorAlert error={preview?.error} /> : <JsonView src={preview?.data} />}
-      </Box>
+
+      <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
+        <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
+          {preview?.error ? (
+            <ErrorAlert error={preview?.error} />
+          ) : (
+            <JsonView src={preview?.data} />
+          )}
+        </Box>
+        <Devtools sx={{ width: '100%', height: '100%' }} har={preview?.har} />
+      </SplitPane>
     </SplitPane>
   );
 }

@@ -38,9 +38,9 @@ import {
 } from '../../../../utils/geometry';
 import { EditorCanvasHostHandle } from '../EditorCanvasHost';
 import NodeHud from './NodeHud';
-import DragAndDropNode from './DragAndDropNode';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
+import NodeDropArea from './NodeDropArea';
 
 const HORIZONTAL_RESIZE_SNAP_UNITS = 4; // px
 const SNAP_TO_GRID_COLUMN_MARGIN = 10; // px
@@ -1401,7 +1401,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         const dropAreaNode = appDom.getNode(dom, dropAreaNodeId);
 
         return (
-          <DragAndDropNode
+          <NodeDropArea
             node={dropAreaNode}
             parentProp={dropAreaParentProp}
             dropAreaRect={dropAreaRect}

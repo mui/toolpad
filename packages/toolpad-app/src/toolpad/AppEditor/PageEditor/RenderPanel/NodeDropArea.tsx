@@ -1,7 +1,8 @@
 import * as React from 'react';
 import clsx from 'clsx';
 import { styled } from '@mui/material';
-import { NodeInfo } from '../../../../types';
+
+import { FlowDirection } from '../../../../types';
 import * as appDom from '../../../../appDom';
 import {
   absolutePositionCss,
@@ -9,14 +10,19 @@ import {
   isVerticalFlow,
   Rectangle,
 } from '../../../../utils/geometry';
+
+import { useDom } from '../../../DomLoader';
+
 import {
-  DropZone,
-  DROP_ZONE_BOTTOM,
   DROP_ZONE_CENTER,
+  DROP_ZONE_BOTTOM,
   DROP_ZONE_LEFT,
   DROP_ZONE_RIGHT,
   DROP_ZONE_TOP,
+  DropZone,
+  usePageEditorState,
 } from '../PageEditorProvider';
+import { isPageRow } from '../../../../toolpadComponents';
 
 const dropAreaHighlightClasses = {
   highlightedTop: 'DropArea_HighlightedTop',
@@ -25,25 +31,6 @@ const dropAreaHighlightClasses = {
   highlightedLeft: 'DropArea_HighlightedLeft',
   highlightedCenter: 'DropArea_HighlightedCenter',
 };
-
-function getHighlightedZoneOverlayClass(
-  highlightedZone: DropZone,
-): typeof dropAreaHighlightClasses[keyof typeof dropAreaHighlightClasses] | null {
-  switch (highlightedZone) {
-    case DROP_ZONE_TOP:
-      return dropAreaHighlightClasses.highlightedTop;
-    case DROP_ZONE_RIGHT:
-      return dropAreaHighlightClasses.highlightedRight;
-    case DROP_ZONE_BOTTOM:
-      return dropAreaHighlightClasses.highlightedBottom;
-    case DROP_ZONE_LEFT:
-      return dropAreaHighlightClasses.highlightedLeft;
-    case DROP_ZONE_CENTER:
-      return dropAreaHighlightClasses.highlightedCenter;
-    default:
-      return null;
-  }
-}
 
 const StyledNodeDropArea = styled('div', {
   shouldForwardProp: (prop) => prop !== 'highlightRelativeRect',
@@ -121,52 +108,219 @@ const EmptySlot = styled('div')({
   opacity: 0.75,
 });
 
+function getChildNodeHighlightedZone(parentFlowDirection: FlowDirection): DropZone | null {
+  switch (parentFlowDirection) {
+    case 'row':
+      return DROP_ZONE_RIGHT;
+    case 'column':
+      return DROP_ZONE_BOTTOM;
+    case 'row-reverse':
+      return DROP_ZONE_LEFT;
+    case 'column-reverse':
+      return DROP_ZONE_TOP;
+    default:
+      return null;
+  }
+}
+
+function getHighlightedZoneOverlayClass(
+  highlightedZone: DropZone,
+): typeof dropAreaHighlightClasses[keyof typeof dropAreaHighlightClasses] | null {
+  switch (highlightedZone) {
+    case DROP_ZONE_TOP:
+      return dropAreaHighlightClasses.highlightedTop;
+    case DROP_ZONE_RIGHT:
+      return dropAreaHighlightClasses.highlightedRight;
+    case DROP_ZONE_BOTTOM:
+      return dropAreaHighlightClasses.highlightedBottom;
+    case DROP_ZONE_LEFT:
+      return dropAreaHighlightClasses.highlightedLeft;
+    case DROP_ZONE_CENTER:
+      return dropAreaHighlightClasses.highlightedCenter;
+    default:
+      return null;
+  }
+}
+
 interface NodeDropAreaProps {
   node: appDom.AppDomNode;
-  parentInfo: NodeInfo | null;
-  layoutRect: Rectangle;
+  parentProp: string | null;
   dropAreaRect: Rectangle;
-  slotRect: Rectangle | null;
-  highlightedZone?: DropZone | null;
-  isEmptySlot: boolean;
-  isPageChild: boolean;
+  availableDropZones: DropZone[];
 }
 
 export default function NodeDropArea({
   node,
-  parentInfo,
-  layoutRect,
+  parentProp,
   dropAreaRect,
-  slotRect,
-  highlightedZone,
-  isEmptySlot,
-  isPageChild,
+  availableDropZones,
 }: NodeDropAreaProps) {
+  const dom = useDom();
+  const { dragOverNodeId, dragOverSlotParentProp, dragOverZone, viewState } = usePageEditorState();
+
+  const { nodes: nodesInfo } = viewState;
+
+  const dropAreaNodeInfo = nodesInfo[node.id];
+  const dropAreaNodeRect = dropAreaNodeInfo?.rect || null;
+  const dropAreaNodeSlots = dropAreaNodeInfo?.slots;
+
+  const hasMultipleFreeSlots = dropAreaNodeSlots
+    ? Object.keys(dropAreaNodeSlots).length > 1
+    : false;
+
+  const dropAreaNodeParent = appDom.getParent(dom, node);
+  const dropAreaNodeParentInfo = dropAreaNodeParent && nodesInfo[dropAreaNodeParent.id];
+  const dropAreaNodeParentRect = dropAreaNodeParentInfo?.rect || null;
+  const dropAreaNodeParentSlots = dropAreaNodeParentInfo?.slots;
+  const dropAreaNodeParentSlot =
+    dropAreaNodeParentSlots && parentProp && dropAreaNodeParentSlots[parentProp];
+
+  const isPageNode = appDom.isPage(node);
+  const isPageChild = dropAreaNodeParent ? appDom.isPage(dropAreaNodeParent) : false;
+  const isPageRowChild = dropAreaNodeParent
+    ? appDom.isElement(dropAreaNodeParent) && isPageRow(dropAreaNodeParent)
+    : false;
+
+  const dropAreaNodeChildNodes = React.useMemo(
+    () => appDom.getChildNodes(dom, node) as appDom.NodeChildren<appDom.ElementNode>,
+    [dom, node],
+  );
+
+  const highlightedZone = React.useMemo((): DropZone | null => {
+    const dropAreaParentParent = dropAreaNodeParent && appDom.getParent(dom, dropAreaNodeParent);
+
+    if (dragOverZone && !availableDropZones.includes(dragOverZone)) {
+      return null;
+    }
+
+    if (dragOverZone === DROP_ZONE_TOP) {
+      // Is dragging over page top
+      if (
+        dropAreaNodeParent &&
+        dropAreaNodeParent.id === dragOverNodeId &&
+        appDom.isPage(dropAreaNodeParent)
+      ) {
+        const pageFirstChild = appDom.getNodeFirstChild(dom, dropAreaNodeParent, 'children');
+
+        const isPageFirstChild = pageFirstChild ? node.id === pageFirstChild.id : false;
+
+        return isPageFirstChild ? DROP_ZONE_TOP : null;
+      }
+    }
+
+    if (dragOverZone === DROP_ZONE_LEFT) {
+      // Is dragging over parent page row left, and parent page row is a child of the page
+      if (
+        dropAreaNodeParent &&
+        dropAreaParentParent &&
+        dropAreaNodeParent.id === dragOverNodeId &&
+        appDom.isElement(dropAreaNodeParent) &&
+        isPageRowChild &&
+        appDom.isPage(dropAreaParentParent)
+      ) {
+        const parentFirstChild = parentProp
+          ? appDom.getNodeFirstChild(dom, dropAreaNodeParent, parentProp)
+          : null;
+
+        const isParentFirstChild = parentFirstChild ? node.id === parentFirstChild.id : false;
+
+        return isParentFirstChild ? DROP_ZONE_LEFT : null;
+      }
+
+      // Is dragging over left, is page row and child of the page
+      if (dropAreaNodeParent && appDom.isElement(node) && isPageRow(node) && isPageChild) {
+        return null;
+      }
+    }
+
+    if (dragOverZone === DROP_ZONE_CENTER) {
+      // Is dragging over parent element center
+      if (dropAreaNodeParent && dropAreaNodeParent.id === dragOverNodeId) {
+        const parentLastChild =
+          parentProp && (appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent))
+            ? appDom.getNodeLastChild(dom, dropAreaNodeParent, parentProp)
+            : null;
+
+        const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
+
+        const parentSlots = dropAreaNodeParentInfo?.slots || null;
+
+        const parentFlowDirection =
+          parentSlots && parentProp && parentSlots[parentProp]?.flowDirection;
+
+        return parentFlowDirection && isParentLastChild && (!hasMultipleFreeSlots || !parentProp)
+          ? getChildNodeHighlightedZone(parentFlowDirection)
+          : null;
+      }
+      // Is dragging over slot center
+      if (node.id === dragOverNodeId && parentProp && parentProp === dragOverSlotParentProp) {
+        if (isPageNode) {
+          return DROP_ZONE_CENTER;
+        }
+
+        const nodeChildren =
+          (parentProp && appDom.isElement(node) && dropAreaNodeChildNodes[parentProp]) || [];
+        return nodeChildren.length === 0 ? DROP_ZONE_CENTER : null;
+      }
+    }
+
+    // Common cases
+    return node.id === dragOverNodeId && parentProp === dragOverSlotParentProp
+      ? dragOverZone
+      : null;
+  }, [
+    dropAreaNodeParent,
+    dom,
+    dragOverZone,
+    availableDropZones,
+    node,
+    dragOverNodeId,
+    parentProp,
+    dragOverSlotParentProp,
+    isPageRowChild,
+    isPageChild,
+    dropAreaNodeParentInfo?.slots,
+    hasMultipleFreeSlots,
+    isPageNode,
+    dropAreaNodeChildNodes,
+  ]);
+
+  const slotRect = (dropAreaNodeSlots && parentProp && dropAreaNodeSlots[parentProp]?.rect) || null;
+
+  const dropAreaSlotChildNodes = parentProp ? dropAreaNodeChildNodes[parentProp] || [] : [];
+  const isEmptySlot = dropAreaSlotChildNodes.length === 0;
+
+  if (!node || !dropAreaNodeParentInfo || !dropAreaNodeRect) {
+    return null;
+  }
+
   const highlightedZoneOverlayClass =
     highlightedZone && getHighlightedZoneOverlayClass(highlightedZone);
 
-  const nodeParentProp = node.parentProp;
-
-  const parentSlots = parentInfo?.slots;
-  const parentSlot = parentSlots && nodeParentProp && parentSlots[nodeParentProp];
-
-  const parentRect = parentInfo?.rect;
-
-  const isHorizontalContainerChild = parentSlot
-    ? isHorizontalFlow(parentSlot.flowDirection)
+  const isHorizontalContainerChild = dropAreaNodeParentSlot
+    ? isHorizontalFlow(dropAreaNodeParentSlot.flowDirection)
     : false;
-  const isVerticalContainerChild = parentSlot ? isVerticalFlow(parentSlot.flowDirection) : false;
+  const isVerticalContainerChild = dropAreaNodeParentSlot
+    ? isVerticalFlow(dropAreaNodeParentSlot.flowDirection)
+    : false;
 
   const highlightHeight =
-    isHorizontalContainerChild && parentRect ? parentRect.height : layoutRect.height;
+    isHorizontalContainerChild && dropAreaNodeParentRect
+      ? dropAreaNodeParentRect.height
+      : dropAreaNodeRect.height;
   const highlightWidth =
-    !isPageChild && isVerticalContainerChild && parentRect ? parentRect.width : layoutRect.width;
+    !isPageChild && isVerticalContainerChild && dropAreaNodeParentRect
+      ? dropAreaNodeParentRect.width
+      : dropAreaNodeRect.width;
 
   const highlightRelativeX =
-    (!isPageChild && isVerticalContainerChild && parentRect ? parentRect.x : layoutRect.x) -
-    dropAreaRect.x;
+    (!isPageChild && isVerticalContainerChild && dropAreaNodeParentRect
+      ? dropAreaNodeParentRect.x
+      : dropAreaNodeRect.x) - dropAreaRect.x;
   const highlightRelativeY =
-    (isHorizontalContainerChild && parentRect ? parentRect.y : layoutRect.y) - dropAreaRect.y;
+    (isHorizontalContainerChild && dropAreaNodeParentRect
+      ? dropAreaNodeParentRect.y
+      : dropAreaNodeRect.y) - dropAreaRect.y;
 
   const isHighlightingCenter = highlightedZone === DROP_ZONE_CENTER;
 

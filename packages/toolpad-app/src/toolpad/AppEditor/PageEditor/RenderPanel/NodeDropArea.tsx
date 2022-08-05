@@ -235,7 +235,11 @@ export default function NodeDropArea({
 
     if (dragOverZone === DROP_ZONE_CENTER) {
       // Is dragging over parent element center
-      if (dropAreaNodeParent && dropAreaNodeParent.id === dragOverNodeId) {
+      if (
+        dropAreaNodeParent &&
+        dropAreaNodeParent.id === dragOverNodeId &&
+        parentProp === dragOverSlotParentProp
+      ) {
         const parentLastChild =
           parentProp && (appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent))
             ? appDom.getNodeLastChild(dom, dropAreaNodeParent, parentProp)
@@ -304,22 +308,24 @@ export default function NodeDropArea({
     ? isVerticalFlow(dropAreaNodeParentSlot.flowDirection)
     : false;
 
+  const highlightParentRect = slotRect || dropAreaNodeParentRect;
+
   const highlightHeight =
-    isHorizontalContainerChild && dropAreaNodeParentRect
-      ? dropAreaNodeParentRect.height
+    isHorizontalContainerChild && highlightParentRect && dropAreaNodeParentRect
+      ? highlightParentRect.height
       : dropAreaNodeRect.height;
   const highlightWidth =
-    !isPageChild && isVerticalContainerChild && dropAreaNodeParentRect
-      ? dropAreaNodeParentRect.width
+    !isPageChild && isVerticalContainerChild && highlightParentRect && dropAreaNodeParentRect
+      ? highlightParentRect.width
       : dropAreaNodeRect.width;
 
   const highlightRelativeX =
-    (!isPageChild && isVerticalContainerChild && dropAreaNodeParentRect
-      ? dropAreaNodeParentRect.x
+    (!isPageChild && isVerticalContainerChild && highlightParentRect && dropAreaNodeParentRect
+      ? highlightParentRect.x
       : dropAreaNodeRect.x) - dropAreaRect.x;
   const highlightRelativeY =
-    (isHorizontalContainerChild && dropAreaNodeParentRect
-      ? dropAreaNodeParentRect.y
+    (isHorizontalContainerChild && highlightParentRect && dropAreaNodeParentRect
+      ? highlightParentRect.y
       : dropAreaNodeRect.y) - dropAreaRect.y;
 
   const isHighlightingCenter = highlightedZone === DROP_ZONE_CENTER;

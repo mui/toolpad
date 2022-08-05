@@ -1,7 +1,7 @@
 import ivm from 'isolated-vm';
 import * as esbuild from 'esbuild';
 import type * as harFormat from 'har-format';
-import { withHar, createHarLog } from 'node-fetch-har';
+import { createHarLog } from 'node-fetch-har';
 import * as fs from 'fs/promises';
 import fetch from 'node-fetch';
 import * as path from 'path';
@@ -9,6 +9,7 @@ import { FunctionResult } from './types';
 import { LogEntry } from '../../components/Console';
 import { FetchOptions } from './runtime/types';
 import projectRoot from '../../server/projectRoot';
+import { withHarInstrumentation } from '../../utils/har';
 
 async function fetchRuntimeModule() {
   const filePath = path.resolve(projectRoot, './src/toolpadDataSources/function/dist/index.js');
@@ -42,16 +43,10 @@ export default async function execFunction(
   const logs: LogEntry[] = [];
   const har: harFormat.Har = createHarLog();
 
-  const instrumentedFetch: typeof fetch = withHar(fetch, { har });
+  const instrumentedFetch = withHarInstrumentation(fetch, { har });
 
   const fetchStub = new ivm.Reference((url: string, rawOptions: FetchOptions) => {
-    const options = {
-      ...rawOptions,
-      // node-fetch-har doesn't deal well with arrays here
-      headers: Object.fromEntries(rawOptions.headers || []),
-    };
-
-    return instrumentedFetch(url, options).then(
+    return instrumentedFetch(url, rawOptions).then(
       (res) => {
         const resHeadersInit = Array.from(res.headers.entries());
 

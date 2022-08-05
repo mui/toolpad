@@ -1,10 +1,11 @@
 declare module 'node-fetch-har' {
   import { Har } from 'har-format';
+  import fetch from 'node-fetch';
 
   export interface WithHarOptions {
     har?: Har;
   }
 
-  export function withHar(fetch: typeof fetch, options?: WithHarOptions): typeof fetch;
+  export function withHar(fetchFn: typeof fetch, options?: WithHarOptions): typeof fetch;
   export function createHarLog(): Har;
 }

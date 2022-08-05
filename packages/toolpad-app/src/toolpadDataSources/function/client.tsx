@@ -24,6 +24,9 @@ import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import { isSaveDisabled } from '../../utils/forms';
 import Devtools from '../../components/Devtools';
+import createHarLog from '../../utils/createHarLog';
+
+const DEFAULT_HAR = createHarLog();
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 

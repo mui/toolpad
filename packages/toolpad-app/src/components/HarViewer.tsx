@@ -20,7 +20,7 @@ export default function HarViewer({ har, sx }: HarViewerProps) {
 
   React.useEffect(() => {
     const root = rootRef.current;
-    if (har && root) {
+    if (har && har.log.entries.length > 0 && root) {
       const svg = fromHar(har);
       fixLinks(svg);
 

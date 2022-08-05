@@ -34,6 +34,9 @@ import JsonView from '../../components/JsonView';
 import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
+import createHarLog from '../../utils/createHarLog';
+
+const DEFAULT_HAR = createHarLog();
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -312,7 +315,7 @@ function QueryEditor({
             <JsonView src={preview?.data} />
           )}
         </Box>
-        <Devtools sx={{ width: '100%', height: '100%' }} har={preview?.har} />
+        <Devtools sx={{ width: '100%', height: '100%' }} har={preview?.har || DEFAULT_HAR} />
       </SplitPane>
     </SplitPane>
   );

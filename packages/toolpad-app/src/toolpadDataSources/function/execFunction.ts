@@ -1,7 +1,6 @@
 import ivm from 'isolated-vm';
 import * as esbuild from 'esbuild';
 import type * as harFormat from 'har-format';
-import { createHarLog } from 'node-fetch-har';
 import * as fs from 'fs/promises';
 import fetch from 'node-fetch';
 import * as path from 'path';
@@ -9,7 +8,7 @@ import { FunctionResult } from './types';
 import { LogEntry } from '../../components/Console';
 import { FetchOptions } from './runtime/types';
 import projectRoot from '../../server/projectRoot';
-import { withHarInstrumentation } from '../../utils/har';
+import { withHarInstrumentation, createHarLog } from '../../utils/har';
 
 async function fetchRuntimeModule() {
   const filePath = path.resolve(projectRoot, './src/toolpadDataSources/function/dist/index.js');

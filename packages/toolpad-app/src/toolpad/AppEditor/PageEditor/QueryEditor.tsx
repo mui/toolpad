@@ -150,6 +150,43 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
   );
 }
 
+function fromLegacy(node: appDom.QueryNode): appDom.QueryNode {
+  if (node.attributes.dataSource?.value !== 'rest') {
+    return node;
+  }
+
+  // Migrate old rest nodes with transforms on the fly
+  // TODO: Build migration flow for https://github.com/mui/mui-toolpad/issues/741
+
+  if (
+    typeof node.attributes.query.value?.transformEnabled !== 'undefined' &&
+    (node.attributes.transformEnabled || node.attributes.transform)
+  ) {
+    return update(node, {
+      attributes: update(node.attributes, {
+        transformEnabled: undefined,
+        transform: undefined,
+      }),
+    });
+  }
+
+  if (node.attributes.transformEnabled || node.attributes.transform) {
+    return update(node, {
+      attributes: update(node.attributes, {
+        transformEnabled: undefined,
+        transform: undefined,
+        query: appDom.createConst({
+          ...node.attributes.query.value,
+          transformEnabled: node.attributes.transformEnabled?.value,
+          transform: node.attributes.transform?.value,
+        }),
+      }),
+    });
+  }
+
+  return node;
+}
+
 type RawQueryPreviewKey<Q, P> = [string, appDom.QueryNode<Q, P>, Record<string, any>];
 
 interface QueryNodeEditorProps<Q, P> {
@@ -170,10 +207,10 @@ function QueryNodeEditorDialog<Q, P>({
   const { appId } = usePageEditorState();
   const dom = useDom();
 
-  const [input, setInput] = React.useState(node);
+  const [input, setInput] = React.useState(fromLegacy(node));
   React.useEffect(() => {
     if (open) {
-      setInput(node);
+      setInput(fromLegacy(node));
     }
   }, [open, node]);
 

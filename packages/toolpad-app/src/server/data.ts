@@ -12,7 +12,7 @@ import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
-import evalExpression from './evalExpression';
+import applyTransform from './applyTransform';
 
 // See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
 function excludeFields<T, K extends (keyof T)[]>(
@@ -371,13 +371,6 @@ export async function setConnectionParams<P>(
   await saveDom(appId, dom);
 }
 
-async function applyTransform(transform: string, result: ApiResult<{}>): Promise<ApiResult<{}>> {
-  const transformFn = `(data) => {${transform}}`;
-  return {
-    data: await evalExpression(`${transformFn}(${JSON.stringify(result.data)})`),
-  };
-}
-
 export async function execQuery<P, Q>(
   appId: string,
   query: appDom.QueryNode<Q>,
@@ -399,9 +392,17 @@ export async function execQuery<P, Q>(
   const transformEnabled = query.attributes.transformEnabled?.value;
   const transform = query.attributes.transform?.value;
   let result = await dataSource.exec(connectionParams, query.attributes.query.value, params);
-  if (transformEnabled && transform) {
-    result = await applyTransform(transform, result);
+
+  // TODO: come up with migration scheme: https://github.com/mui/mui-toolpad/issues/741
+  const suppressLegacyTransform: boolean =
+    appDom.isQuery(query) && !!query.attributes.transformEnabled;
+
+  if (transformEnabled && transform && !suppressLegacyTransform) {
+    result = {
+      data: await applyTransform(transform, result.data),
+    };
   }
+
   return result;
 }
 

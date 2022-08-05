@@ -1,5 +1,6 @@
 import { withHar as withHarOriginal } from 'node-fetch-har';
 import fetch, { Request } from 'node-fetch';
+import { Har } from 'har-format';
 
 const withHarInstrumentation: typeof withHarOriginal = function withHar(fetchFn, options) {
   const withHarFetch = withHarOriginal(fetchFn, options);
@@ -25,6 +26,18 @@ const withHarInstrumentation: typeof withHarOriginal = function withHar(fetchFn,
   return patchedfetch;
 };
 
-export { createHarLog } from 'node-fetch-har';
+export function createHarLog(): Har {
+  return {
+    log: {
+      version: '0.0',
+      creator: {
+        name: 'Toolpad',
+        version: process.env.TOOLPAD_VERSION,
+      },
+      entries: [],
+    },
+  };
+}
+
 export type { WithHarOptions } from 'node-fetch-har';
 export { withHarInstrumentation };

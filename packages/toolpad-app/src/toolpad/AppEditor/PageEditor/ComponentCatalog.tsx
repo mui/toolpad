@@ -22,7 +22,7 @@ interface FutureComponentSpec {
 const FUTURE_COMPONENTS: FutureComponentSpec[] = [
   {
     displayName: 'Tabs',
-    githubLink: 'https://github.com/mui/mui-toolpad/issues/78',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/747',
   },
 ];
 

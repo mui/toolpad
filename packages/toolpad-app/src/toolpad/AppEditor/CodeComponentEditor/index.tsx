@@ -140,6 +140,8 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const frameDocument = frameRef.current?.contentDocument;
 
+  
+
   const { Component: GeneratedComponent, error: compileError } = useCodeComponent(input);
 
   const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
@@ -163,7 +165,18 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
           args: [compileError.stack],
         },
       ]
-    : [];
+    : [
+      {
+        timestamp: new Date().getTime(),
+          level: 'info',
+          // TODO: how to format this part?
+          args: ['testing'],
+      }
+    ];
+
+  const handleEditorChange = (newValue: string) => {
+    if (newValue) {setInput(newValue || '')}
+  }
 
   return (
     <React.Fragment>
@@ -175,7 +188,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
           <SplitPane split="vertical" allowResize size="50%">
             <TypescriptEditor
               value={input}
-              onChange={(newValue) => setInput(newValue || '')}
+              onChange={handleEditorChange}
               extraLibs={extraLibs}
             />
 

@@ -94,6 +94,9 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         // eslint-disable-next-line no-underscore-dangle
         frameWindow.__TOOLPAD_READY__ = () => onReadyRef.current?.();
       }
+
+      console.log('regular from app')
+      frameRef.current.contentWindow.console.log = (value) => {console.warn('nope', value)}
     }, []);
 
     const [contentWindow, setContentWindow] = React.useState<Window | null>(null);

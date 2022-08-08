@@ -37,5 +37,5 @@ body:
   
   - type: textarea
     attributes:
-      label: Relevant resources 🔗
+      label: Relevant resources/benchmarks 🔗
       description: Attach any issues, PRs, links, documents, etc… that might be relevant to the RFC

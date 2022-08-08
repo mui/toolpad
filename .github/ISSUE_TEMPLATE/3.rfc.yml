@@ -32,9 +32,9 @@ body:
 
   - type: textarea
     attributes:
-      label: Proposed solution🟢
+      label: Proposed solution 🟢
       description: |
-        This is the core of RFC, and its purpose is to help you think through the problem because [writing is thinking](https://medium.learningbyshipping.com/writing-is-thinking-an-annotated-twitter-thread-2a75fe07fade).*
+        This is the core of RFC, and its purpose is to clearly explain reasoning for the proposed solution, why it's better compared to the other options or why should it be chosen instead.
         
         Consider:
         - using diagrams to help illustrate your ideas

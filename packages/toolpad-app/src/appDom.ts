@@ -705,6 +705,16 @@ export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
   return index.get(name) ?? null;
 }
 
+export function getNodeFirstChild(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {
+  const nodeChildren = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
+  return nodeChildren.length > 0 ? nodeChildren[0] : null;
+}
+
+export function getNodeLastChild(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {
+  const nodeChildren = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
+  return nodeChildren.length > 0 ? nodeChildren[nodeChildren.length - 1] : null;
+}
+
 export function getSiblingBeforeNode(
   dom: AppDom,
   node: ElementNode | PageNode,
@@ -746,9 +756,7 @@ export function getNewFirstParentIndexInNode(
   node: ElementNode | PageNode,
   parentProp: string,
 ) {
-  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
-  const firstChild = children.length > 0 ? children[0] : null;
-
+  const firstChild = getNodeFirstChild(dom, node, parentProp);
   return createFractionalIndex(null, firstChild?.parentIndex || null);
 }
 
@@ -757,9 +765,7 @@ export function getNewLastParentIndexInNode(
   node: ElementNode | PageNode,
   parentProp: string,
 ) {
-  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
-  const lastChild = children.length > 0 ? children[children.length - 1] : null;
-
+  const lastChild = getNodeLastChild(dom, node, parentProp);
   return createFractionalIndex(lastChild?.parentIndex || null, null);
 }
 

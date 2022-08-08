@@ -165,6 +165,9 @@ function QueryEditor({
     return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
   }, [params, secretsKeys]);
 
+  const handleLogClear = React.useCallback(() => setPreviewLogs([]), []);
+  const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
+
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
@@ -206,8 +209,9 @@ function QueryEditor({
         <Devtools
           sx={{ width: '100%', height: '100%' }}
           log={previewLogs}
-          onLogChange={setPreviewLogs}
+          onLogClear={handleLogClear}
           har={previewHar}
+          onHarClear={handleHarClear}
         />
       </SplitPane>
     </SplitPane>

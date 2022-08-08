@@ -264,6 +264,8 @@ function QueryEditor({
     },
   );
 
+  const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
+
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <Box sx={{ height: '100%', overflow: 'auto' }}>
@@ -321,7 +323,11 @@ function QueryEditor({
             <JsonView src={preview?.data} />
           )}
         </Box>
-        <Devtools sx={{ width: '100%', height: '100%' }} har={previewHar} />
+        <Devtools
+          sx={{ width: '100%', height: '100%' }}
+          har={previewHar}
+          onHarClear={handleHarClear}
+        />
       </SplitPane>
     </SplitPane>
   );

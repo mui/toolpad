@@ -164,10 +164,6 @@ export default function NodeDropArea({
   const dropAreaNodeRect = dropAreaNodeInfo?.rect || null;
   const dropAreaNodeSlots = dropAreaNodeInfo?.slots;
 
-  const hasMultipleFreeSlots = dropAreaNodeSlots
-    ? Object.keys(dropAreaNodeSlots).length > 1
-    : false;
-
   const dropAreaNodeParent = appDom.getParent(dom, node);
   const dropAreaNodeParentInfo = dropAreaNodeParent && nodesInfo[dropAreaNodeParent.id];
   const dropAreaNodeParentRect = dropAreaNodeParentInfo?.rect || null;
@@ -193,12 +189,17 @@ export default function NodeDropArea({
       return null;
     }
 
+    if (isPageNode && parentProp) {
+      return null;
+    }
+
     if (dragOverZone === DROP_ZONE_TOP) {
-      // Is dragging over page top
+      // Is dragging over page top and is slot
       if (
         dropAreaNodeParent &&
         dropAreaNodeParent.id === dragOverNodeId &&
-        appDom.isPage(dropAreaNodeParent)
+        appDom.isPage(dropAreaNodeParent) &&
+        parentProp
       ) {
         const pageFirstChild = appDom.getNodeFirstChild(dom, dropAreaNodeParent, 'children');
 
@@ -209,22 +210,27 @@ export default function NodeDropArea({
     }
 
     if (dragOverZone === DROP_ZONE_LEFT) {
-      // Is dragging over parent page row left, and parent page row is a child of the page
+      // Is dragging beyond the left of parent page row slot, and parent page row is a child of the page
       if (
         dropAreaNodeParent &&
         dropAreaParentParent &&
         dropAreaNodeParent.id === dragOverNodeId &&
         appDom.isElement(dropAreaNodeParent) &&
         isPageRowChild &&
-        appDom.isPage(dropAreaParentParent)
+        appDom.isPage(dropAreaParentParent) &&
+        !parentProp
       ) {
-        const parentFirstChild = parentProp
-          ? appDom.getNodeFirstChild(dom, dropAreaNodeParent, parentProp)
-          : null;
+        const parentHighlightedChild = appDom.getNodeFirstChild(
+          dom,
+          dropAreaNodeParent,
+          'children',
+        );
 
-        const isParentFirstChild = parentFirstChild ? node.id === parentFirstChild.id : false;
+        const isParentHighlightedChild = parentHighlightedChild
+          ? node.id === parentHighlightedChild.id
+          : false;
 
-        return isParentFirstChild ? DROP_ZONE_LEFT : null;
+        return isParentHighlightedChild ? dragOverZone : null;
       }
 
       // Is dragging over left, is page row and child of the page
@@ -234,15 +240,21 @@ export default function NodeDropArea({
     }
 
     if (dragOverZone === DROP_ZONE_CENTER) {
+      let rowAwareParentProp = parentProp;
+      if (isPageRowChild) {
+        rowAwareParentProp = 'children';
+      }
+
       // Is dragging over parent element center
       if (
         dropAreaNodeParent &&
         dropAreaNodeParent.id === dragOverNodeId &&
-        parentProp === dragOverSlotParentProp
+        rowAwareParentProp === dragOverSlotParentProp
       ) {
         const parentLastChild =
-          parentProp && (appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent))
-            ? appDom.getNodeLastChild(dom, dropAreaNodeParent, parentProp)
+          rowAwareParentProp &&
+          (appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent))
+            ? appDom.getNodeLastChild(dom, dropAreaNodeParent, rowAwareParentProp)
             : null;
 
         const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
@@ -250,9 +262,9 @@ export default function NodeDropArea({
         const parentSlots = dropAreaNodeParentInfo?.slots || null;
 
         const parentFlowDirection =
-          parentSlots && parentProp && parentSlots[parentProp]?.flowDirection;
+          parentSlots && rowAwareParentProp && parentSlots[rowAwareParentProp]?.flowDirection;
 
-        return parentFlowDirection && isParentLastChild && (!hasMultipleFreeSlots || !parentProp)
+        return parentFlowDirection && isParentLastChild
           ? getChildNodeHighlightedZone(parentFlowDirection)
           : null;
       }
@@ -284,7 +296,6 @@ export default function NodeDropArea({
     isPageRowChild,
     isPageChild,
     dropAreaNodeParentInfo?.slots,
-    hasMultipleFreeSlots,
     isPageNode,
     dropAreaNodeChildNodes,
   ]);
@@ -293,10 +304,6 @@ export default function NodeDropArea({
 
   const dropAreaSlotChildNodes = parentProp ? dropAreaNodeChildNodes[parentProp] || [] : [];
   const isEmptySlot = dropAreaSlotChildNodes.length === 0;
-
-  if (!node || !dropAreaNodeParentInfo || !dropAreaNodeRect) {
-    return null;
-  }
 
   const highlightedZoneOverlayClass =
     highlightedZone && getHighlightedZoneOverlayClass(highlightedZone);
@@ -309,6 +316,10 @@ export default function NodeDropArea({
     : false;
 
   const highlightParentRect = slotRect || dropAreaNodeParentRect;
+
+  if (!dropAreaNodeRect) {
+    return null;
+  }
 
   const highlightHeight =
     isHorizontalContainerChild && highlightParentRect && dropAreaNodeParentRect

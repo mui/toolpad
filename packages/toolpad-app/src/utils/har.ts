@@ -1,30 +1,42 @@
-import { withHar as withHarOriginal } from 'node-fetch-har';
-import fetch, { Request } from 'node-fetch';
+import { Har } from 'har-format';
 
-const withHarInstrumentation: typeof withHarOriginal = function withHar(fetchFn, options) {
-  const withHarFetch = withHarOriginal(fetchFn, options);
-
-  const patchedfetch = (...args: Parameters<typeof fetch>): ReturnType<typeof fetch> => {
-    // node-fetch-har doesn't deal well with certain ways of passing parameters e.g. passing headers as [string, string][]
-    // We're normalizing them here to a format that we know it can handle correctly:
-    const req = new Request(...args);
-    const input = req.url;
-    return withHarFetch(input, {
-      agent: req.agent,
-      body: req.body,
-      compress: req.compress,
-      follow: req.follow,
-      headers: req.headers,
-      method: req.method,
-      redirect: req.redirect,
-    });
+export function createHarLog(): Har {
+  return {
+    log: {
+      version: '0.0',
+      creator: {
+        name: 'Toolpad',
+        version: process.env.TOOLPAD_VERSION,
+      },
+      entries: [],
+    },
   };
+}
 
-  patchedfetch.isRedirect = fetch.isRedirect;
+interface WithStartedDateTime {
+  startedDateTime: string;
+}
 
-  return patchedfetch;
-};
+function oldestFirst(a: WithStartedDateTime, b: WithStartedDateTime): number {
+  return new Date(a.startedDateTime).valueOf() - new Date(b.startedDateTime).valueOf();
+}
 
-export { createHarLog } from 'node-fetch-har';
-export type { WithHarOptions } from 'node-fetch-har';
-export { withHarInstrumentation };
+export function mergeHar(target: Har, ...src: Har[]): Har {
+  for (const har of src) {
+    if (har.log.pages) {
+      if (!target.log.pages) {
+        target.log.pages = [];
+      }
+      target.log.pages.push(...har.log.pages);
+    }
+    target.log.entries.push(...har.log.entries);
+  }
+
+  target.log.entries.sort(oldestFirst);
+
+  if (target.log.pages) {
+    target.log.pages.sort(oldestFirst);
+  }
+
+  return target;
+}

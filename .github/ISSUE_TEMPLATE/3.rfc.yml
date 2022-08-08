@@ -26,7 +26,7 @@ body:
 
   - type: textarea
     attributes:
-      label: Proposed option 🟢
+      label: Proposed solution🟢
       description: |
         This is the core of RFC, and its purpose is to help you think through the problem because [writing is thinking](https://medium.learningbyshipping.com/writing-is-thinking-an-annotated-twitter-thread-2a75fe07fade).*
         

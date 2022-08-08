@@ -53,10 +53,6 @@ function Header({ actions, navigation }: HeaderProps) {
           component="div"
           sx={{
             mr: 2,
-            // Handle minHeight overflow on smaller screens
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
           }}
         >
           MUI Toolpad {process.env.TOOLPAD_TARGET}

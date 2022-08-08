@@ -405,6 +405,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     const dragOverNode = dragOverNodeId && appDom.getNode(dom, dragOverNodeId);
     const dragOverNodeInfo = dragOverNodeId && nodesInfo[dragOverNodeId];
 
+    const dragOverNodeParentProp = dragOverNode?.parentProp;
+
     const dragOverNodeSlots = dragOverNodeInfo?.slots;
     const dragOverSlot =
       dragOverNodeSlots && dragOverSlotParentProp && dragOverNodeSlots[dragOverSlotParentProp];
@@ -414,7 +416,9 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
     const dragOverParentFreeSlots = dragOverParentInfo?.slots;
     const dragOverParentFreeSlot =
-      dragOverParentFreeSlots && dragOverParentFreeSlots[dragOverSlotParentProp || 'children'];
+      dragOverParentFreeSlots &&
+      dragOverNodeParentProp &&
+      dragOverParentFreeSlots[dragOverNodeParentProp];
 
     if (draggedNode && dragOverNode) {
       if (appDom.isPage(dragOverNode)) {
@@ -459,7 +463,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           DROP_ZONE_TOP,
           DROP_ZONE_BOTTOM,
           DROP_ZONE_CENTER,
-          ...((isDraggingOverPageChild ? [DROP_ZONE_LEFT] : []) as DropZone[]),
+          ...((isDraggingOverPageChild ? [DROP_ZONE_LEFT, DROP_ZONE_RIGHT] : []) as DropZone[]),
         ];
       }
       if (isDraggingOverVerticalContainer) {
@@ -708,6 +712,12 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
               relativeX <= activeDropNodeRect.x
             ) {
               activeDropZone = DROP_ZONE_LEFT;
+            } else if (
+              isDraggingOverPageChild &&
+              activeDropNodeRect &&
+              relativeX >= activeDropNodeRect.x + activeDropNodeRect.width
+            ) {
+              activeDropZone = DROP_ZONE_RIGHT;
             } else if (relativeY <= edgeDetectionMargin) {
               activeDropZone = DROP_ZONE_TOP;
             } else if (activeDropAreaRect.height - relativeY <= edgeDetectionMargin) {
@@ -816,18 +826,10 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       const originalParentInfo = parent && nodesInfo[parent.id];
 
       const isOriginalParentPage = originalParent ? appDom.isPage(originalParent) : false;
-
-      const originalParentSlots = originalParentInfo?.slots || null;
-      const originalParentSlot =
-        (originalParentSlots && originalParentSlots[dragOverNodeParentProp]) || null;
-
-      const isOriginalParentHorizontalContainer = originalParentSlot
-        ? isHorizontalFlow(originalParentSlot.flowDirection)
-        : false;
-      const isOriginalParentNonPageVerticalContainer =
-        !isOriginalParentPage && originalParentSlot
-          ? isVerticalFlow(originalParentSlot.flowDirection)
-          : false;
+      const isOriginalParentRow =
+        originalParent && appDom.isElement(originalParent) ? isPageRow(originalParent) : false;
+      const isOriginalParentColumn =
+        originalParent && appDom.isElement(originalParent) ? isPageColumn(originalParent) : false;
 
       let addOrMoveNode = domApi.addNode;
       if (selection) {
@@ -885,7 +887,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
               }
             }
 
-            if (isOriginalParentHorizontalContainer) {
+            if (isOriginalParentRow) {
               const columnContainer = appDom.createElement(
                 dom,
                 PAGE_COLUMN_COMPONENT_ID,
@@ -922,7 +924,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
             // Only move existing element inside column in the end if drag over zone is top
             if (
-              isOriginalParentHorizontalContainer &&
+              isOriginalParentRow &&
               !isDraggingOverVerticalContainer &&
               dragOverZone === DROP_ZONE_TOP
             ) {
@@ -945,7 +947,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
         if ([DROP_ZONE_RIGHT, DROP_ZONE_LEFT].includes(dragOverZone)) {
           if (!isDraggingOverHorizontalContainer) {
-            if (isOriginalParentNonPageVerticalContainer) {
+            if (isOriginalParentColumn) {
               const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {
                 justifyContent: appDom.createConst(originalParentInfo?.props.alignItems || 'start'),
               });
@@ -971,7 +973,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
             addOrMoveNode(draggedNode, parent, dragOverNodeParentProp, newParentIndex);
 
             // Only move existing element inside column in the end if drag over zone is left
-            if (isOriginalParentNonPageVerticalContainer && dragOverZone === DROP_ZONE_LEFT) {
+            if (isOriginalParentColumn && dragOverZone === DROP_ZONE_LEFT) {
               domApi.moveNode(dragOverNode, parent, dragOverNodeParentProp);
             }
           }

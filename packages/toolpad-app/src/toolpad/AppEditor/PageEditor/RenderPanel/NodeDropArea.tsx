@@ -209,7 +209,7 @@ export default function NodeDropArea({
       }
     }
 
-    if (dragOverZone === DROP_ZONE_LEFT) {
+    if (dragOverZone === DROP_ZONE_LEFT || dragOverZone === DROP_ZONE_RIGHT) {
       // Is dragging beyond the left of parent page row slot, and parent page row is a child of the page
       if (
         dropAreaNodeParent &&
@@ -220,11 +220,10 @@ export default function NodeDropArea({
         appDom.isPage(dropAreaParentParent) &&
         !parentProp
       ) {
-        const parentHighlightedChild = appDom.getNodeFirstChild(
-          dom,
-          dropAreaNodeParent,
-          'children',
-        );
+        const parentHighlightedChild =
+          dragOverZone === DROP_ZONE_LEFT
+            ? appDom.getNodeFirstChild(dom, dropAreaNodeParent, 'children')
+            : appDom.getNodeLastChild(dom, dropAreaNodeParent, 'children');
 
         const isParentHighlightedChild = parentHighlightedChild
           ? node.id === parentHighlightedChild.id
@@ -240,21 +239,15 @@ export default function NodeDropArea({
     }
 
     if (dragOverZone === DROP_ZONE_CENTER) {
-      let rowAwareParentProp = parentProp;
-      if (isPageRowChild) {
-        rowAwareParentProp = 'children';
-      }
-
       // Is dragging over parent element center
       if (
         dropAreaNodeParent &&
         dropAreaNodeParent.id === dragOverNodeId &&
-        rowAwareParentProp === dragOverSlotParentProp
+        parentProp === dragOverSlotParentProp
       ) {
         const parentLastChild =
-          rowAwareParentProp &&
-          (appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent))
-            ? appDom.getNodeLastChild(dom, dropAreaNodeParent, rowAwareParentProp)
+          parentProp && (appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent))
+            ? appDom.getNodeLastChild(dom, dropAreaNodeParent, parentProp)
             : null;
 
         const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
@@ -262,7 +255,7 @@ export default function NodeDropArea({
         const parentSlots = dropAreaNodeParentInfo?.slots || null;
 
         const parentFlowDirection =
-          parentSlots && rowAwareParentProp && parentSlots[rowAwareParentProp]?.flowDirection;
+          parentSlots && parentProp && parentSlots[parentProp]?.flowDirection;
 
         return parentFlowDirection && isParentLastChild
           ? getChildNodeHighlightedZone(parentFlowDirection)

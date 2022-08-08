@@ -128,9 +128,9 @@ function Header({ actions, navigation }: HeaderProps) {
           MUI Toolpad {process.env.TOOLPAD_TARGET}
         </Typography>
         {navigation}
-        <UserFeedback />
         <Box flex={1} />
         {actions}
+        <UserFeedback />
       </Toolbar>
     </AppBar>
   );

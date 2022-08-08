@@ -1,6 +1,6 @@
 import { BindableAttrValue } from '@mui/toolpad-core';
 import fetch from 'node-fetch';
-import { withHarInstrumentation, createHarLog } from '../../utils/har';
+import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource, ApiResult } from '../../types';
 import { FetchPrivateQuery, FetchQuery, FetchResult, RestConnectionParams } from './types';
 import * as bindings from '../../utils/bindings';

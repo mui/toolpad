@@ -34,9 +34,7 @@ import JsonView from '../../components/JsonView';
 import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
-import createHarLog from '../../utils/createHarLog';
-
-const DEFAULT_HAR = createHarLog();
+import { createHarLog, mergeHar } from '../../utils/har';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -252,11 +250,19 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
-  const { preview, runPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>({
-    kind: 'debugExec',
-    query: value.query,
-    params: previewParams,
-  });
+  const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
+  const { preview, runPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(
+    {
+      kind: 'debugExec',
+      query: value.query,
+      params: previewParams,
+    },
+    {
+      onPreview(result) {
+        setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+      },
+    },
+  );
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>
@@ -315,7 +321,7 @@ function QueryEditor({
             <JsonView src={preview?.data} />
           )}
         </Box>
-        <Devtools sx={{ width: '100%', height: '100%' }} har={preview?.har || DEFAULT_HAR} />
+        <Devtools sx={{ width: '100%', height: '100%' }} har={previewHar} />
       </SplitPane>
     </SplitPane>
   );

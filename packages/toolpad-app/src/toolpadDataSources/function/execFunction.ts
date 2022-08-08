@@ -8,7 +8,7 @@ import { FunctionResult } from './types';
 import { LogEntry } from '../../components/Console';
 import { FetchOptions } from './runtime/types';
 import projectRoot from '../../server/projectRoot';
-import { withHarInstrumentation, createHarLog } from '../../utils/har';
+import { withHarInstrumentation, createHarLog } from '../../server/har';
 
 async function fetchRuntimeModule() {
   const filePath = path.resolve(projectRoot, './src/toolpadDataSources/function/dist/index.js');

@@ -419,6 +419,7 @@ function parseBindings(
         const bindingId = `${elm.id}.props.${propName}`;
         const scopePath =
           componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
+
         if (argType) {
           parsedBindingsMap.set(bindingId, {
             scopePath,
@@ -441,7 +442,7 @@ function parseBindings(
               scopePath,
               result: { value: defaultValue },
             });
-          } else {
+          } else if (binding) {
             parsedBindingsMap.set(bindingId, parseBinding(binding, scopePath));
           }
         }

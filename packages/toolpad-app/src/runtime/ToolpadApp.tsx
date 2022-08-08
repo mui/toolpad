@@ -378,7 +378,11 @@ function QueryNode({ node }: QueryNodeProps) {
   return null;
 }
 
-function parseBinding(bindable: BindableAttrValue<any> | undefined, scopePath: string | undefined) {
+interface ParseBindingOptions {
+  scopePath?: string;
+}
+
+function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions) {
   if (bindable?.type === 'const') {
     return {
       scopePath,
@@ -416,20 +420,8 @@ function parseBindings(
       const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
-        const bindingId = `${elm.id}.props.${propName}`;
-        const scopePath =
-          componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
-
-        if (argType) {
-          parsedBindingsMap.set(bindingId, {
-            scopePath,
-            result: { value: argType.defaultValue },
-          });
-        }
-      }
-
-      for (const [propName, argType] of Object.entries(argTypes)) {
-        const binding = elm.props?.[propName];
+        const binding =
+          elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
         const bindingId = `${elm.id}.props.${propName}`;
         const scopePath =
           componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
@@ -442,8 +434,8 @@ function parseBindings(
               scopePath,
               result: { value: defaultValue },
             });
-          } else if (binding) {
-            parsedBindingsMap.set(bindingId, parseBinding(binding, scopePath));
+          } else {
+            parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
           }
         }
       }
@@ -451,10 +443,11 @@ function parseBindings(
 
     if (appDom.isQuery(elm)) {
       if (elm.params) {
-        for (const [paramName, bindable] of Object.entries(elm.params)) {
+        for (const [paramName, paramValue] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
           const scopePath = `${elm.name}.params.${paramName}`;
-          parsedBindingsMap.set(bindingId, parseBinding(bindable, scopePath));
+          const bindable = paramValue || appDom.createConst(undefined);
+          parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
         }
       }
 
@@ -471,8 +464,8 @@ function parseBindings(
       for (const configName of USE_DATA_QUERY_CONFIG_KEYS) {
         const bindingId = `${elm.id}.config.${configName}`;
         const scopePath = `${elm.name}.config.${configName}`;
-        const bindable = elm.attributes[configName];
-        parsedBindingsMap.set(bindingId, parseBinding(bindable, scopePath));
+        const bindable = elm.attributes[configName] || appDom.createConst(undefined);
+        parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
       }
     }
   }

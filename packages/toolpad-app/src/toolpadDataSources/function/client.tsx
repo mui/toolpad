@@ -15,8 +15,7 @@ import {
 import lazyComponent from '../../utils/lazyComponent';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import SplitPane from '../../components/SplitPane';
-import { useConnectionContext, usePrivateQuery } from '../context';
-import client from '../../api';
+import { usePrivateQuery } from '../context';
 import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import { LogEntry } from '../../components/Console';
@@ -24,9 +23,8 @@ import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import { isSaveDisabled } from '../../utils/forms';
 import Devtools from '../../components/Devtools';
-import { createHarLog } from '../../utils/har';
-
-const DEFAULT_HAR = createHarLog();
+import { createHarLog, mergeHar } from '../../utils/har';
+import useQueryPreview from '../useQueryPreview';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -123,39 +121,26 @@ function QueryEditor({
     liveParams[key],
   ]);
 
-  const { appId, connectionId } = useConnectionContext();
-  const [preview, setPreview] = React.useState<FunctionResult | null>(null);
+  const previewParams = React.useMemo(
+    () => Object.fromEntries(paramsEditorLiveValue.map(([key, binding]) => [key, binding.value])),
+    [paramsEditorLiveValue],
+  );
+
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
-
-  const cancelRunPreview = React.useRef<(() => void) | null>(null);
-  const runPreview = React.useCallback(() => {
-    let canceled = false;
-
-    cancelRunPreview.current?.();
-    cancelRunPreview.current = () => {
-      canceled = true;
-    };
-
-    const currentParams = Object.fromEntries(
-      paramsEditorLiveValue.map(([key, binding]) => [key, binding.value]),
-    );
-
-    client.query
-      .dataSourceFetchPrivate(appId, connectionId, {
-        kind: 'debugExec',
-        query: value.query,
-        params: currentParams,
-      } as FunctionPrivateQuery)
-      .then((result) => {
-        if (!canceled) {
-          setPreview(result);
-          setPreviewLogs((existing) => [...existing, ...result.logs]);
-        }
-      })
-      .finally(() => {
-        cancelRunPreview.current = null;
-      });
-  }, [appId, connectionId, paramsEditorLiveValue, value.query]);
+  const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
+  const { preview, runPreview } = useQueryPreview<FunctionPrivateQuery, FunctionResult>(
+    {
+      kind: 'debugExec',
+      query: value.query,
+      params: previewParams,
+    },
+    {
+      onPreview(result) {
+        setPreviewLogs((existing) => [...existing, ...result.logs]);
+        setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+      },
+    },
+  );
 
   const { data: secretsKeys = [] } = usePrivateQuery<FunctionPrivateQuery, string[]>({
     kind: 'secretsKeys',
@@ -222,7 +207,7 @@ function QueryEditor({
           sx={{ width: '100%', height: '100%' }}
           log={previewLogs}
           onLogChange={setPreviewLogs}
-          har={preview?.har || DEFAULT_HAR}
+          har={previewHar}
         />
       </SplitPane>
     </SplitPane>

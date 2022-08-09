@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
-import { createHarLog, withHarInstrumentation } from './har';
+import { withHarInstrumentation } from '../server/har';
+import { createHarLog } from './har';
 import { streamToString } from './streams';
 import { startServer } from './tests';
 

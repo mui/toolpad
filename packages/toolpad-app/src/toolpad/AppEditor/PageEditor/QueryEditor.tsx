@@ -46,12 +46,7 @@ import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
 import BindableEditor from './BindableEditor';
 
-const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
-  'rest',
-  'googleSheets',
-  'postgres',
-  'movies',
-]);
+const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set(['googleSheets', 'postgres', 'movies']);
 
 const EMPTY_OBJECT = {};
 
@@ -175,10 +170,10 @@ function QueryNodeEditorDialog<Q, P>({
   const { appId } = usePageEditorState();
   const dom = useDom();
 
-  const [input, setInput] = React.useState(node);
+  const [input, setInput] = React.useState(appDom.fromLegacyQueryNode(node));
   React.useEffect(() => {
     if (open) {
-      setInput(node);
+      setInput(appDom.fromLegacyQueryNode(node));
     }
   }, [open, node]);
 

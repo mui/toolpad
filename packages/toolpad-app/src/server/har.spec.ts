@@ -18,9 +18,9 @@ describe('har', () => {
 
     try {
       const har = createHarLog();
-      const instruentedfetch = withHarInstrumentation(fetch, { har });
+      const instrumentedfetch = withHarInstrumentation(fetch, { har });
 
-      const res = await instruentedfetch(`http://localhost:${port}`, {
+      const res = await instrumentedfetch(`http://localhost:${port}`, {
         headers: [['foo', 'bar']],
         method: 'POST',
         body: 'baz',

@@ -1,9 +1,6 @@
 import * as React from 'react';
 import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
 import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
-
-import { LoadingButton } from '@mui/lab';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Controller, useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -25,6 +22,7 @@ import { isSaveDisabled } from '../../utils/forms';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import useQueryPreview from '../useQueryPreview';
+import QueryInputPanel from '../QueryInputPanel';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -128,7 +126,10 @@ function QueryEditor({
 
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview } = useQueryPreview<FunctionPrivateQuery, FunctionResult>(
+  const { preview, runPreview: handleRunPreview } = useQueryPreview<
+    FunctionPrivateQuery,
+    FunctionResult
+  >(
     {
       kind: 'debugExec',
       query: value.query,
@@ -171,12 +172,7 @@ function QueryEditor({
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Toolbar>
-            <LoadingButton startIcon={<PlayArrowIcon />} onClick={() => runPreview()}>
-              Preview
-            </LoadingButton>
-          </Toolbar>
+        <QueryInputPanel onRunPreview={handleRunPreview}>
           <Box sx={{ flex: 1, minHeight: 0 }}>
             <TypescriptEditor
               value={value.query.module}
@@ -184,7 +180,7 @@ function QueryEditor({
               extraLibs={extraLibs}
             />
           </Box>
-        </Box>
+        </QueryInputPanel>
 
         <Box sx={{ p: 2 }}>
           <Typography>Parameters</Typography>

@@ -12,8 +12,6 @@ import {
   Typography,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-import { LoadingButton } from '@mui/lab';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { FetchPrivateQuery, FetchQuery, FetchResult, RestConnectionParams } from './types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
@@ -35,6 +33,7 @@ import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
+import QueryInputPanel from '../QueryInputPanel';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -251,7 +250,7 @@ function QueryEditor({
   );
 
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(
+  const { preview, runPreview: handleRunPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(
     {
       kind: 'debugExec',
       query: value.query,
@@ -268,12 +267,7 @@ function QueryEditor({
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>
-      <Box sx={{ height: '100%', overflow: 'auto' }}>
-        <Toolbar>
-          <LoadingButton startIcon={<PlayArrowIcon />} onClick={runPreview}>
-            Preview
-          </LoadingButton>
-        </Toolbar>
+      <QueryInputPanel onRunPreview={handleRunPreview}>
         <Stack gap={2} sx={{ px: 3, pt: 1 }}>
           <Typography>Parameters</Typography>
           <ParametersEditor
@@ -313,7 +307,7 @@ function QueryEditor({
             loading={false}
           />
         </Stack>
-      </Box>
+      </QueryInputPanel>
 
       <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
         <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>

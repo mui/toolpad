@@ -1,8 +1,8 @@
 import fetch from 'node-fetch';
-import { withHarInstrumentation } from '../server/har';
-import { createHarLog } from './har';
-import { streamToString } from './streams';
-import { startServer } from './tests';
+import { withHarInstrumentation } from './har';
+import { createHarLog } from '../utils/har';
+import { streamToString } from '../utils/streams';
+import { startServer } from '../utils/tests';
 
 describe('har', () => {
   test('headers in array form', async () => {

@@ -479,7 +479,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           DROP_ZONE_TOP,
           DROP_ZONE_BOTTOM,
           DROP_ZONE_CENTER,
-          ...((isDraggingOverPageChild ? [DROP_ZONE_LEFT] : []) as DropZone[]),
+          ...((isDraggingOverPageChild ? [DROP_ZONE_LEFT, DROP_ZONE_RIGHT] : []) as DropZone[]),
         ];
       }
       if (isDraggingOverVerticalContainer) {

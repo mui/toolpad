@@ -112,7 +112,7 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
             let flowDirection = 'row';
             if (gridAutoFlow) {
               flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
-            } else {
+            } else if (flexDirection) {
               flowDirection = flexDirection;
             }
 

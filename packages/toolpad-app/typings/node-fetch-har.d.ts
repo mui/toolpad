@@ -7,5 +7,4 @@ declare module 'node-fetch-har' {
   }
 
   export function withHar(fetchFn: typeof fetch, options?: WithHarOptions): typeof fetch;
-  export function createHarLog(): Har;
 }

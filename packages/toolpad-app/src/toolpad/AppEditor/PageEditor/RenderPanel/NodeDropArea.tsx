@@ -164,6 +164,8 @@ export default function NodeDropArea({
   const dropAreaNodeRect = dropAreaNodeInfo?.rect || null;
   const dropAreaNodeSlots = dropAreaNodeInfo?.slots;
 
+  const slotRect = (dropAreaNodeSlots && parentProp && dropAreaNodeSlots[parentProp]?.rect) || null;
+
   const dropAreaNodeParent = appDom.getParent(dom, node);
   const dropAreaNodeParentInfo = dropAreaNodeParent && nodesInfo[dropAreaNodeParent.id];
   const dropAreaNodeParentRect = dropAreaNodeParentInfo?.rect || null;
@@ -182,6 +184,9 @@ export default function NodeDropArea({
     [dom, node],
   );
 
+  const dropAreaSlotChildNodes = parentProp ? dropAreaNodeChildNodes[parentProp] || [] : [];
+  const isEmptySlot = dropAreaSlotChildNodes.length === 0;
+
   const highlightedZone = React.useMemo((): DropZone | null => {
     const dropAreaParentParent = dropAreaNodeParent && appDom.getParent(dom, dropAreaNodeParent);
 
@@ -189,10 +194,9 @@ export default function NodeDropArea({
       return null;
     }
 
-    if (isPageNode && parentProp) {
+    if (isPageNode && parentProp && !isEmptySlot) {
       return null;
     }
-
     if (dragOverZone === DROP_ZONE_TOP) {
       // Is dragging over page top and is slot
       if (
@@ -210,7 +214,7 @@ export default function NodeDropArea({
     }
 
     if (dragOverZone === DROP_ZONE_LEFT || dragOverZone === DROP_ZONE_RIGHT) {
-      // Is dragging beyond the left of parent page row slot, and parent page row is a child of the page
+      // Is dragging beyond the left or right of parent row slot, and parent row is a child of the page
       if (
         dropAreaNodeParent &&
         dropAreaParentParent &&
@@ -261,6 +265,7 @@ export default function NodeDropArea({
           ? getChildNodeHighlightedZone(parentFlowDirection)
           : null;
       }
+
       // Is dragging over slot center
       if (node.id === dragOverNodeId && parentProp && parentProp === dragOverSlotParentProp) {
         if (isPageNode) {
@@ -282,21 +287,17 @@ export default function NodeDropArea({
     dom,
     dragOverZone,
     availableDropZones,
+    isPageNode,
+    parentProp,
+    isEmptySlot,
     node,
     dragOverNodeId,
-    parentProp,
     dragOverSlotParentProp,
     isPageRowChild,
     isPageChild,
     dropAreaNodeParentInfo?.slots,
-    isPageNode,
     dropAreaNodeChildNodes,
   ]);
-
-  const slotRect = (dropAreaNodeSlots && parentProp && dropAreaNodeSlots[parentProp]?.rect) || null;
-
-  const dropAreaSlotChildNodes = parentProp ? dropAreaNodeChildNodes[parentProp] || [] : [];
-  const isEmptySlot = dropAreaSlotChildNodes.length === 0;
 
   const highlightedZoneOverlayClass =
     highlightedZone && getHighlightedZoneOverlayClass(highlightedZone);

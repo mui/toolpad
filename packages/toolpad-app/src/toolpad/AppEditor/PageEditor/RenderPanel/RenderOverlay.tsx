@@ -522,7 +522,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
         const parentProp = hasFreeSlots ? Object.keys(nodeSlots)[baseRectIndex - 1] : null;
 
-        let parentAwareNodeRect = null;
+        let parentAwareBaseRect = baseRect;
 
         const isPageChild = parent ? appDom.isPage(parent) : false;
 
@@ -595,7 +595,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
           const hasPositionGap = isParentReverseContainer ? isLastChild : isFirstChild;
           if (isParentVerticalContainer) {
-            parentAwareNodeRect = {
+            parentAwareBaseRect = {
               x: isPageChild ? 0 : baseRect.x,
               y: hasPositionGap ? baseRect.y : baseRect.y - parentGap,
               width: isPageChild && parentRect ? parentRect.width : baseRect.width,
@@ -603,18 +603,18 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
             };
           }
           if (isParentHorizontalContainer) {
-            parentAwareNodeRect = {
+            parentAwareBaseRect = {
               ...baseRect,
               x: hasPositionGap ? baseRect.x : baseRect.x - parentGap,
               width: baseRect.width + gapCount * parentGap,
             };
           }
 
-          if (parentAwareNodeRect) {
+          if (parentAwareBaseRect) {
             if (parentProp) {
-              rects[getDropAreaId(nodeId, parentProp)] = parentAwareNodeRect;
+              rects[getDropAreaId(nodeId, parentProp)] = parentAwareBaseRect;
             } else {
-              rects[nodeId] = parentAwareNodeRect;
+              rects[nodeId] = parentAwareBaseRect;
             }
           }
         } else if (parentProp && baseRect) {

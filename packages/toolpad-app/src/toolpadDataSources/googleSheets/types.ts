@@ -1,5 +1,6 @@
 import { sheets_v4 } from '@googleapis/sheets';
 import { drive_v3 } from '@googleapis/drive';
+import { ApiResult } from '../../types';
 
 export type GoogleSheetsConnectionParams = {
   refresh_token?: string | null;
@@ -46,6 +47,7 @@ export enum GoogleSheetsPrivateQueryType {
   FILES_LIST = 'FILES_LIST',
   FETCH_SPREADSHEET = 'FETCH_SPREADSHEET',
   CONNECTION_STATUS = 'CONNECTION_STATUS',
+  DEBUG_EXEC = 'DEBUG_EXEC',
 }
 
 export type GoogleSheetsPrivateQuery =
@@ -64,4 +66,12 @@ export type GoogleSheetsPrivateQuery =
     }
   | {
       type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS;
+    }
+  | {
+      type: GoogleSheetsPrivateQueryType.DEBUG_EXEC;
+      query: GoogleSheetsApiQuery;
     };
+
+export interface GoogleSheetsResult extends ApiResult {
+  error?: Error;
+}

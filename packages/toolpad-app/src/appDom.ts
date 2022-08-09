@@ -705,6 +705,16 @@ export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
   return index.get(name) ?? null;
 }
 
+export function getNodeFirstChild(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {
+  const nodeChildren = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
+  return nodeChildren.length > 0 ? nodeChildren[0] : null;
+}
+
+export function getNodeLastChild(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {
+  const nodeChildren = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
+  return nodeChildren.length > 0 ? nodeChildren[nodeChildren.length - 1] : null;
+}
+
 export function getSiblingBeforeNode(
   dom: AppDom,
   node: ElementNode | PageNode,
@@ -746,9 +756,7 @@ export function getNewFirstParentIndexInNode(
   node: ElementNode | PageNode,
   parentProp: string,
 ) {
-  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
-  const firstChild = children.length > 0 ? children[0] : null;
-
+  const firstChild = getNodeFirstChild(dom, node, parentProp);
   return createFractionalIndex(null, firstChild?.parentIndex || null);
 }
 
@@ -757,9 +765,7 @@ export function getNewLastParentIndexInNode(
   node: ElementNode | PageNode,
   parentProp: string,
 ) {
-  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
-  const lastChild = children.length > 0 ? children[children.length - 1] : null;
-
+  const lastChild = getNodeLastChild(dom, node, parentProp);
   return createFractionalIndex(lastChild?.parentIndex || null, null);
 }
 
@@ -808,6 +814,45 @@ export function createRenderTree(dom: AppDom): RenderTree {
 export function ref(nodeId: NodeId): NodeReference {
   return { $$ref: nodeId };
 }
+
 export function deref(nodeRef: NodeReference): NodeId {
   return nodeRef.$$ref;
+}
+
+export function fromLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
+  // Migrate old rest nodes with transforms on the fly
+  // TODO: Build migration flow for https://github.com/mui/mui-toolpad/issues/741
+  //       to make this obsolete
+
+  if (node.attributes.dataSource?.value !== 'rest') {
+    return node;
+  }
+
+  if (
+    typeof node.attributes.query.value?.transformEnabled !== 'undefined' &&
+    (node.attributes.transformEnabled || node.attributes.transform)
+  ) {
+    return update(node, {
+      attributes: update(node.attributes, {
+        transformEnabled: undefined,
+        transform: undefined,
+      }),
+    });
+  }
+
+  if (node.attributes.transformEnabled || node.attributes.transform) {
+    return update(node, {
+      attributes: update(node.attributes, {
+        transformEnabled: undefined,
+        transform: undefined,
+        query: createConst({
+          ...node.attributes.query.value,
+          transformEnabled: node.attributes.transformEnabled?.value,
+          transform: node.attributes.transform?.value,
+        }),
+      }),
+    });
+  }
+
+  return node;
 }

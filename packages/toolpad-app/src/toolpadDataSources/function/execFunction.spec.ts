@@ -1,10 +1,9 @@
-import * as http from 'http';
-import getPort from 'get-port';
-import { Readable } from 'stream';
 import formidable from 'formidable';
 import { execa, ExecaChildProcess } from 'execa';
 import path from 'path';
 import execFunction from './execFunction';
+import { streamToString } from '../../utils/streams';
+import { startServer } from '../../utils/tests';
 
 function redirectOutput(cp: ExecaChildProcess): ExecaChildProcess {
   if (cp.stdin) {
@@ -17,44 +16,6 @@ function redirectOutput(cp: ExecaChildProcess): ExecaChildProcess {
     cp.stderr.pipe(process.stderr);
   }
   return cp;
-}
-
-function streamToString(stream: Readable) {
-  const chunks: Buffer[] = [];
-  return new Promise((resolve, reject) => {
-    stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
-    stream.on('error', (err) => reject(err));
-    stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-  });
-}
-
-async function startServer(handler?: http.RequestListener) {
-  const server = http.createServer(handler);
-  const port = await getPort({ port: 3000 });
-  let app: http.Server | undefined;
-  await new Promise((resolve, reject) => {
-    app = server.listen(port);
-    app.once('listening', resolve);
-    app.once('error', reject);
-  });
-  return {
-    port,
-    async stopServer() {
-      await new Promise<void>((resolve, reject) => {
-        if (app) {
-          app.close((err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        } else {
-          resolve();
-        }
-      });
-    },
-  };
 }
 
 async function buildRuntime() {

@@ -70,7 +70,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
 ## Release process
 
-1. Generate a new version using
+1. Generate a new version using:
 
    ```sh
    yarn release:version
@@ -78,7 +78,7 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
 
    This command will bump the version in every package of the project.
 
-1. Generate the changelog using
+1. Generate the changelog using:
 
    ```sh
    yarn release:changelog

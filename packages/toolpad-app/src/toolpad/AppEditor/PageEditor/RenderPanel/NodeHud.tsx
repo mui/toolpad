@@ -15,6 +15,7 @@ import {
 import { useDom } from '../../../DomLoader';
 import { useToolpadComponent } from '../../toolpadComponents';
 import { getElementNodeComponentId } from '../../../../toolpadComponents';
+import { usePageEditorState } from '../PageEditorProvider';
 
 const HUD_POSITION_TOP = 'top';
 const HUD_POSITION_BOTTOM = 'bottom';
@@ -129,7 +130,6 @@ interface NodeHudProps {
   onDelete?: React.MouseEventHandler<HTMLElement>;
   isResizing?: boolean;
   resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
-  hudPosition?: HudPosition;
 }
 
 export default function NodeHud({
@@ -143,12 +143,19 @@ export default function NodeHud({
   onDelete,
   isResizing = false,
   resizePreviewElementRef,
-  hudPosition = HUD_POSITION_TOP,
 }: NodeHudProps) {
   const dom = useDom();
+  const { viewState } = usePageEditorState();
+
+  const { nodes: nodesInfo } = viewState;
 
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
   const component = useToolpadComponent(dom, componentId);
+
+  const nodeInfo = nodesInfo[node.id];
+  const nodeRect = nodeInfo?.rect;
+
+  const hudPosition = nodeRect && nodeRect.y > 32 ? HUD_POSITION_TOP : HUD_POSITION_BOTTOM;
 
   return (
     <NodeHudWrapper

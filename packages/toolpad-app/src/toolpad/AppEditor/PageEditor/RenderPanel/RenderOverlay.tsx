@@ -1365,8 +1365,6 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
         const isResizing = Boolean(draggedEdge) && node.id === draggedNodeId;
 
-        const hasBottomHud = nodeRect.y <= 32;
-
         return (
           <React.Fragment key={node.id}>
             {!isPageNode ? (
@@ -1391,7 +1389,6 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizing}
                 resizePreviewElementRef={resizePreviewElementRef}
-                hudPosition={hasBottomHud ? 'bottom' : 'top'}
               />
             ) : null}
             <DragAndDropNode

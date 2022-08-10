@@ -1022,6 +1022,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       if (newNode) {
         api.select(newNode.id);
 
+        // Refocus on overlay so that keyboard events can keep being caught by it
         const overlayElement = overlayRef.current;
         if (overlayElement) {
           overlayElement.focus();

@@ -14,8 +14,8 @@ import { ToolpadFunctionRuntimeBridge, FetchOptions } from './types';
 const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = (global as any).TOOLPAD_BRIDGE;
 
 /* 
-TODO: Add Blob support. e.g. Satisfy the following invariant:
-
+TODO: Add Blob support? i.e. Satisfy the following invariant:
+We may not need it, given that's it's not part of https://wintercg.org/
 invariant(
   'FileReader' in global &&
     'Blob' in global &&
@@ -38,6 +38,7 @@ invariant('FormData' in global, 'FormData is required');
 invariant('Symbol' in global && 'iterator' in Symbol, 'Iterable is required');
 invariant('URLSearchParams' in global, 'URLSearchParams is required');
 invariant('AbortController' in global, 'AbortController is required');
+invariant('ReadableStream' in global, 'ReadableStream is required');
 
 function isDataView(obj: unknown): obj is DataView {
   return !!obj && obj instanceof DataView;

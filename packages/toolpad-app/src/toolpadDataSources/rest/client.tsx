@@ -174,10 +174,9 @@ function QueryEditor({
     Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>)),
   );
 
-  React.useEffect(
-    () => setParams(Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>))),
-    [input.params],
-  );
+  React.useEffect(() => {
+    setParams(Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>)));
+  }, [input.params]);
 
   const baseUrl = connectionParams?.baseUrl;
 
@@ -209,10 +208,6 @@ function QueryEditor({
     }));
   }, []);
 
-  const handleParamsChange = React.useCallback((newParams: [string, BindableAttrValue<any>][]) => {
-    setParams(newParams);
-  }, []);
-
   const paramsEditorLiveValue: [string, LiveBinding][] = params.map(([key]) => [
     key,
     liveParams[key],
@@ -229,7 +224,7 @@ function QueryEditor({
   });
 
   const previewParams = React.useMemo(
-    () => Object.fromEntries(paramsEditorLiveValue.map(([key, binding]) => [key, binding.value])),
+    () => Object.fromEntries(paramsEditorLiveValue.map(([key, binding]) => [key, binding?.value])),
     [paramsEditorLiveValue],
   );
 
@@ -267,7 +262,7 @@ function QueryEditor({
             <Typography>Parameters</Typography>
             <ParametersEditor
               value={params}
-              onChange={handleParamsChange}
+              onChange={setParams}
               globalScope={globalScope}
               liveValue={paramsEditorLiveValue}
             />

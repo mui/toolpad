@@ -3,7 +3,7 @@ import { drive_v3 } from '@googleapis/drive';
 import { sheets_v4 } from '@googleapis/sheets';
 import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
-import { ApiResult, ServerDataSource, CreateHandlerApi } from '../../types';
+import { ServerDataSource, CreateHandlerApi } from '../../types';
 import config from '../../server/config';
 import { asArray } from '../../utils/collections';
 import {
@@ -11,6 +11,7 @@ import {
   GoogleSheetsPrivateQueryType,
   GoogleSheetsPrivateQuery,
   GoogleSheetsApiQuery,
+  GoogleSheetsResult,
 } from './types';
 import { Maybe } from '../../utils/types';
 
@@ -64,12 +65,62 @@ function createSheetsClient(client: OAuth2Client) {
 }
 
 /**
+ * Executor function for this connection
+ * @param connection  The connection object
+ * @param query  The query object
+ * @returns The api response
+ */
+async function exec(
+  connection: Maybe<GoogleSheetsConnectionParams>,
+  query: GoogleSheetsApiQuery,
+): Promise<GoogleSheetsResult> {
+  const client = createOAuthClient();
+  if (connection) {
+    client.setCredentials(connection);
+  }
+  const sheets = createSheetsClient(client);
+
+  const { spreadsheetId, sheetName, ranges, headerRow } = query;
+  if (spreadsheetId && sheetName) {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!${ranges}`,
+    });
+    if (response.status === 200) {
+      const { values } = response.data;
+      if (values && values.length > 0) {
+        let data = values;
+        if (headerRow) {
+          const firstRow = values.shift() ?? [];
+          data = values.map((row) => {
+            const rowObject: any = {};
+            row.forEach((elem, cellIndex) => {
+              if (firstRow[cellIndex]) {
+                rowObject[firstRow[cellIndex]] = elem;
+              }
+            });
+            return rowObject;
+          });
+        }
+        return { data };
+      }
+      return { data: [] };
+    }
+    throw new Error(
+      `${response.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
+    );
+  }
+  return {
+    data: {},
+  };
+}
+
+/**
  * Private executor function for this connection
  * @param connection  The connection object
  * @param query  The query object
  * @returns The private api response
  */
-
 async function execPrivate(
   connection: Maybe<GoogleSheetsConnectionParams>,
   query: GoogleSheetsPrivateQuery,
@@ -143,59 +194,10 @@ async function execPrivate(
     }
     return null;
   }
+  if (query.type === GoogleSheetsPrivateQueryType.DEBUG_EXEC) {
+    return exec(connection, query.query);
+  }
   throw new Error(`Google Sheets: Unrecognized private query "${JSON.stringify(query)}"`);
-}
-
-/**
- * Executor function for this connection
- * @param connection  The connection object
- * @param query  The query object
- * @returns The api response
- */
-
-async function exec(
-  connection: Maybe<GoogleSheetsConnectionParams>,
-  query: GoogleSheetsApiQuery,
-): Promise<ApiResult<any>> {
-  const client = createOAuthClient();
-  if (connection) {
-    client.setCredentials(connection);
-  }
-  const sheets = createSheetsClient(client);
-
-  const { spreadsheetId, sheetName, ranges, headerRow } = query;
-  if (spreadsheetId && sheetName) {
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${sheetName}!${ranges}`,
-    });
-    if (response.status === 200) {
-      const { values } = response.data;
-      if (values && values.length > 0) {
-        let data = values;
-        if (headerRow) {
-          const firstRow = values.shift() ?? [];
-          data = values.map((row) => {
-            const rowObject: any = {};
-            row.forEach((elem, cellIndex) => {
-              if (firstRow[cellIndex]) {
-                rowObject[firstRow[cellIndex]] = elem;
-              }
-            });
-            return rowObject;
-          });
-        }
-        return { data };
-      }
-      return { data: [] };
-    }
-    throw new Error(
-      `${response.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
-    );
-  }
-  return {
-    data: {},
-  };
 }
 
 /**

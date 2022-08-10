@@ -16,13 +16,22 @@ import { useDom } from '../../../DomLoader';
 import { useToolpadComponent } from '../../toolpadComponents';
 import { getElementNodeComponentId } from '../../../../toolpadComponents';
 
+const HUD_POSITION_TOP = 'top';
+const HUD_POSITION_BOTTOM = 'bottom';
+
+type HudPosition = typeof HUD_POSITION_TOP | typeof HUD_POSITION_BOTTOM;
+
 const nodeHudClasses = {
   allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
   selected: 'NodeHud_Selected',
   selectionHint: 'NodeHud_SelectionHint',
 };
 
-const NodeHudWrapper = styled('div')({
+const NodeHudWrapper = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'hudPosition',
+})<{
+  hudPosition: HudPosition;
+}>(({ hudPosition }) => ({
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
@@ -30,11 +39,11 @@ const NodeHudWrapper = styled('div')({
   userSelect: 'none',
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
-    top: 0,
-    left: 0,
     height: '100%',
     width: '100%',
     outline: '1px solid red',
+    left: 0,
+    top: 0,
   },
   [`.${nodeHudClasses.selectionHint}`]: {
     // capture mouse events
@@ -48,17 +57,16 @@ const NodeHudWrapper = styled('div')({
     color: 'white',
     fontSize: 11,
     padding: `0 0 0 8px`,
-    // TODO: figure out positioning of this selectionhint, perhaps it should
-    //   - prefer top right, above the component
-    //   - if that appears out of bound of the editor, show it bottom or left
     zIndex: 1,
-    transform: `translate(0, -100%)`,
+    ...(hudPosition === HUD_POSITION_TOP
+      ? { top: 0, transform: 'translate(0, -100%)' }
+      : { bottom: 0, transform: 'translate(0, 100%)' }),
   },
   [`&.${nodeHudClasses.allowNodeInteraction}`]: {
     // block pointer-events so we can interact with the selection
     pointerEvents: 'none',
   },
-});
+}));
 
 const DraggableEdge = styled('div', {
   shouldForwardProp: (prop) => prop !== 'edge',
@@ -121,6 +129,7 @@ interface NodeHudProps {
   onDelete?: React.MouseEventHandler<HTMLElement>;
   isResizing?: boolean;
   resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
+  hudPosition?: HudPosition;
 }
 
 export default function NodeHud({
@@ -134,6 +143,7 @@ export default function NodeHud({
   onDelete,
   isResizing = false,
   resizePreviewElementRef,
+  hudPosition = HUD_POSITION_TOP,
 }: NodeHudProps) {
   const dom = useDom();
 
@@ -147,6 +157,7 @@ export default function NodeHud({
       className={clsx({
         [nodeHudClasses.allowNodeInteraction]: isInteractive,
       })}
+      hudPosition={hudPosition}
     >
       {isSelected ? (
         <React.Fragment>

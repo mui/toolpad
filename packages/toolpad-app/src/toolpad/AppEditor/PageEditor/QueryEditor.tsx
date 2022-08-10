@@ -23,7 +23,7 @@ import AddIcon from '@mui/icons-material/Add';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { LoadingButton } from '@mui/lab';
-import { NodeId } from '@mui/toolpad-core';
+import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -36,12 +36,13 @@ import { omit, update } from '../../../utils/immutability';
 import client from '../../../api';
 import ErrorAlert from './ErrorAlert';
 import { JsExpressionEditor } from './JsExpressionEditor';
-import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
+import { useEvaluateLiveBinding, useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 import { useDom, useDomApi } from '../../DomLoader';
 import { mapValues } from '../../../utils/collections';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
 import ConnectionSelect from './ConnectionSelect';
+import BindableEditor from './BindableEditor';
 
 const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set(['googleSheets', 'postgres', 'movies']);
 
@@ -201,6 +202,16 @@ function QueryNodeEditorDialog<Q, P>({
     [],
   );
 
+  const handleEnabledChange = React.useCallback((newValue: BindableAttrValue<boolean> | null) => {
+    setInput((existing) =>
+      update(existing, {
+        attributes: update(existing.attributes, {
+          enabled: newValue || undefined,
+        }),
+      }),
+    );
+  }, []);
+
   const handleRefetchOnReconnectChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setInput((existing) =>
@@ -322,6 +333,11 @@ function QueryNodeEditorDialog<Q, P>({
   }, [onClose, isInputSaved]);
 
   const queryEditorContext = React.useMemo(() => ({ appId, connectionId }), [appId, connectionId]);
+
+  const liveEnabled = useEvaluateLiveBinding({
+    input: input.attributes.enabled || null,
+    globalScope: pageState,
+  });
 
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
@@ -495,6 +511,15 @@ function QueryNodeEditorDialog<Q, P>({
           </Box>
 
           <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
+            <BindableEditor
+              liveBinding={liveEnabled}
+              globalScope={pageState}
+              server
+              label="Enabled"
+              propType={{ type: 'boolean' }}
+              value={input.attributes.enabled ?? null}
+              onChange={handleEnabledChange}
+            />
             <FormControlLabel
               control={
                 <Checkbox

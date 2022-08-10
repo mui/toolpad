@@ -45,9 +45,12 @@ export function useDataQuery(
   dataUrl: string,
   queryId: string | null,
   params: any,
-  options: Pick<
+  {
+    enabled = true,
+    ...options
+  }: Pick<
     UseQueryOptions<any, unknown, unknown, any[]>,
-    'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
+    'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
   >,
 ): UseDataQuery {
   const {
@@ -61,7 +64,7 @@ export function useDataQuery(
     () => queryId && execDataSourceQuery(dataUrl, queryId, params),
     {
       ...options,
-      enabled: !!queryId,
+      enabled: !!queryId && enabled,
     },
   );
 
@@ -71,14 +74,14 @@ export function useDataQuery(
 
   const result: UseDataQuery = React.useMemo(
     () => ({
-      isLoading,
+      isLoading: isLoading && enabled,
       isFetching,
       error,
       data,
       rows,
       refetch,
     }),
-    [isLoading, isFetching, error, data, rows, refetch],
+    [isLoading, enabled, isFetching, error, data, rows, refetch],
   );
 
   return result;

@@ -115,6 +115,7 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
+    readonly enabled?: BindableAttrValue<boolean>;
   };
 }
 

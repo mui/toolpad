@@ -376,7 +376,9 @@ export async function execQuery<P, Q>(
   dataNode: appDom.QueryNode<Q> | appDom.MutationNode<Q>,
   params: Q,
 ): Promise<ApiResult<any>> {
-  query = appDom.fromLegacyQueryNode(query);
+  if (appDom.isQuery(dataNode)) {
+    dataNode = appDom.fromLegacyQueryNode(dataNode);
+  }
 
   const dataSource: ServerDataSource<P, Q, any> | undefined =
     dataNode.attributes.dataSource && serverDataSources[dataNode.attributes.dataSource.value];
@@ -397,7 +399,9 @@ export async function execQuery<P, Q>(
     const transformEnabled = dataNode.attributes.transformEnabled?.value;
     const transform = dataNode.attributes.transform?.value;
     if (transformEnabled && transform) {
-      result = await applyTransform(transform, result);
+      result = {
+        data: await applyTransform(transform, result.data),
+      };
     }
   }
 

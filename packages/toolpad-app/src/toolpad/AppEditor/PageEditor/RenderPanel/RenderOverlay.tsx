@@ -783,6 +783,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     ],
   );
 
+  const overlayRef = React.useRef<HTMLDivElement | null>(null);
+
   const handleNodeDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
       const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
@@ -1011,14 +1013,19 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         }
       }
 
-      api.dragEnd();
-
       if (selection) {
         deleteOrphanedLayoutComponents(draggedNode, dragOverNodeId);
       }
 
+      api.dragEnd();
+
       if (newNode) {
         api.select(newNode.id);
+
+        const overlayElement = overlayRef.current;
+        if (overlayElement) {
+          overlayElement.focus();
+        }
       }
     },
     [
@@ -1309,6 +1316,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
   return (
     <OverlayRoot
+      ref={overlayRef}
       className={clsx({
         [overlayClasses.nodeDrag]: isDraggingOver,
         [overlayClasses.resizeHorizontal]:

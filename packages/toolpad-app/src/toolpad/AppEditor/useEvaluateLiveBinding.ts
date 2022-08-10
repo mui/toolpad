@@ -30,6 +30,19 @@ function evaluateBindableAttrValue(
   }
 }
 
+type BindableAttrEntries = [string, BindableAttrValue<any>][];
+
+function evaluateBindableAttrEntries(
+  input: BindableAttrEntries,
+  globalScope: Record<string, unknown>,
+  config: EvaluateBindableAttrValueConfig = {},
+): [string, LiveBinding][] {
+  return input.map(([key, bindable]) => [
+    key,
+    evaluateBindableAttrValue(bindable || null, globalScope, config),
+  ]);
+}
+
 function evaluateBindableAttrValues(
   input: BindableAttrValues<any>,
   globalScope: Record<string, unknown>,
@@ -83,6 +96,30 @@ export function useEvaluateLiveBindings({
   const jsRuntime = useJsRuntime();
   return React.useMemo(() => {
     return evaluateBindableAttrValues(input, globalScope, {
+      jsRuntime: server ? jsRuntime : undefined,
+    });
+  }, [server, jsRuntime, input, globalScope]);
+}
+
+export interface UseEvaluateLiveBindingEntries {
+  /**
+   * Whether to use the serverside method (quickjs) or the client side
+   * NOTE: This doesn't necessarily correspond to `typeof window === 'undefined'`.
+   *       One may want to evaluate serverside bindings on the browser. for e.g. previewing
+   */
+  server?: boolean;
+  input: BindableAttrEntries;
+  globalScope: Record<string, unknown>;
+}
+
+export function useEvaluateLiveBindingEntries({
+  server,
+  input,
+  globalScope,
+}: UseEvaluateLiveBindingEntries): [string, LiveBinding][] {
+  const jsRuntime = useJsRuntime();
+  return React.useMemo(() => {
+    return evaluateBindableAttrEntries(input, globalScope, {
       jsRuntime: server ? jsRuntime : undefined,
     });
   }, [server, jsRuntime, input, globalScope]);

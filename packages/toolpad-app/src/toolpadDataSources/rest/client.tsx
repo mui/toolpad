@@ -20,7 +20,7 @@ import BindableEditor, {
 } from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import {
   useEvaluateLiveBinding,
-  useEvaluateLiveBindings,
+  useEvaluateLiveBindingEntries,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
@@ -28,7 +28,6 @@ import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
-import { mapValues } from '../../utils/collections';
 import SplitPane from '../../components/SplitPane';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import JsonView from '../../components/JsonView';
@@ -210,18 +209,18 @@ function QueryEditor({
     }));
   }, []);
 
-  const liveParams = useEvaluateLiveBindings({
-    input: Object.fromEntries(params),
+  const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
+    input: params,
     globalScope,
   });
 
-  const paramsEditorLiveValue: [string, LiveBinding][] = params.map(([key]) => [
-    key,
-    liveParams[key] ?? { value: undefined },
-  ]);
+  const previewParams = React.useMemo(
+    () => Object.fromEntries(paramsEditorLiveValue.map(([key, binding]) => [key, binding?.value])),
+    [paramsEditorLiveValue],
+  );
 
   const queryScope = {
-    query: mapValues(liveParams, (bindingResult) => bindingResult?.value),
+    query: previewParams,
   };
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
@@ -229,11 +228,6 @@ function QueryEditor({
     input: input.query.url,
     globalScope: queryScope,
   });
-
-  const previewParams = React.useMemo(
-    () => Object.fromEntries(paramsEditorLiveValue.map(([key, binding]) => [key, binding?.value])),
-    [paramsEditorLiveValue],
-  );
 
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const { preview, runPreview: handleRunPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(

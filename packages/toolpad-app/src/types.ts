@@ -5,7 +5,6 @@ import {
   RuntimeError,
   ComponentConfig,
   BindableAttrValues,
-  LiveBinding,
   NodeId,
   PropValueType,
 } from '@mui/toolpad-core';

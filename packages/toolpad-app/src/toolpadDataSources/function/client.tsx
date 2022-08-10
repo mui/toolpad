@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
-import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
+import { BindableAttrValue } from '@mui/toolpad-core';
 import { Controller, useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -23,7 +23,7 @@ import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
-import { useEvaluateLiveBindings } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
+import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -109,15 +109,10 @@ function QueryEditor({
     [input.params],
   );
 
-  const liveParams = useEvaluateLiveBindings({
-    input: Object.fromEntries(params),
+  const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
+    input: params,
     globalScope,
   });
-
-  const paramsEditorLiveValue: [string, LiveBinding][] = params.map(([key]) => [
-    key,
-    liveParams[key] ?? { value: undefined },
-  ]);
 
   const previewParams = React.useMemo(
     () => Object.fromEntries(paramsEditorLiveValue.map(([key, binding]) => [key, binding.value])),

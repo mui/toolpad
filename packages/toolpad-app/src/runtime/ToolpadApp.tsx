@@ -39,6 +39,7 @@ import {
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
+import { pick } from 'lodash-es';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
@@ -366,11 +367,9 @@ function QueryNode({ node }: QueryNodeProps) {
   const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
-  const queryResult = useDataQuery(dataUrl, queryId, params, {
-    refetchOnWindowFocus: node.attributes.refetchOnWindowFocus?.value,
-    refetchOnReconnect: node.attributes.refetchOnReconnect?.value,
-    refetchInterval: node.attributes.refetchInterval?.value,
-  });
+  const configBindings = pick(node.attributes, ...USE_DATA_QUERY_CONFIG_KEYS);
+  const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
+  const queryResult = useDataQuery(dataUrl, queryId, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;

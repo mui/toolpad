@@ -244,7 +244,7 @@ function ActionEditor({ value, onChange }: ActionEditorProps) {
     <Box>
       <TabContext value={activeTab}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleTabChange} aria-label="lab API tabs example">
+          <TabList onChange={handleTabChange} aria-label="Choose action kind ">
             <Tab label="JS expression" value="jsExpressionAction" />
             <Tab label="Navigation" value="navigationAction" />
           </TabList>

@@ -66,6 +66,11 @@ const theme = createTheme({
         fontSize: 'small',
       },
     },
+    MuiMenuItem: {
+      defaultProps: {
+        dense: true,
+      },
+    },
     MuiTabs: {
       styleOverrides: {
         root: {

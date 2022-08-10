@@ -1,7 +1,6 @@
-import { darken, IconButton, lighten, styled, SxProps } from '@mui/material';
+import { darken, lighten, styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
 import * as React from 'react';
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import Inspector, { InspectorProps } from 'react-inspector';
 import inspectorTheme from '../inspectorTheme';
 import { interleave } from '../utils/react';
@@ -13,7 +12,6 @@ export interface LogEntry {
 }
 
 const classes = {
-  header: 'Toolpad_ConsoleHeader',
   logEntriesContainer: 'Toolpad_ConsoleLogEntriesContainer',
   logEntries: 'Toolpad_ConsoleLogEntries',
   logEntry: 'Toolpad_ConsoleLogEntry',
@@ -37,11 +35,6 @@ const ConsoleRoot = styled('div')(({ theme }) => {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
-
-    [`& .${classes.header}`]: {
-      padding: theme.spacing('2px', 1),
-      borderBottom: `1px solid ${theme.palette.divider}`,
-    },
 
     [`& .${classes.logEntriesContainer}`]: {
       flex: 1,
@@ -116,19 +109,11 @@ function ConsoleEntry({ entry }: ConsoleEntryProps) {
 interface ConsoleProps {
   sx?: SxProps;
   value?: LogEntry[];
-  onChange?: (logEntries: LogEntry[]) => void;
 }
 
-export default function Console({ value = [], onChange, sx }: ConsoleProps) {
+export default function Console({ value = [], sx }: ConsoleProps) {
   return (
     <ConsoleRoot sx={sx}>
-      <div className={classes.header}>
-        {onChange ? (
-          <IconButton disabled={value.length <= 0} onClick={() => onChange([])}>
-            <DoDisturbIcon />
-          </IconButton>
-        ) : null}
-      </div>
       <div className={classes.logEntriesContainer}>
         <div className={classes.logEntries}>
           {value.map((entry, i) => (

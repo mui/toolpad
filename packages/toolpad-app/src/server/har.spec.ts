@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { createHarLog, withHarInstrumentation } from './har';
-import { streamToString } from './streams';
-import { startServer } from './tests';
+import { streamToString } from '../utils/streams';
+import { startServer } from '../utils/tests';
 
 describe('har', () => {
   test('headers in array form', async () => {
@@ -18,9 +18,9 @@ describe('har', () => {
 
     try {
       const har = createHarLog();
-      const instruentedfetch = withHarInstrumentation(fetch, { har });
+      const instrumentedfetch = withHarInstrumentation(fetch, { har });
 
-      const res = await instruentedfetch(`http://localhost:${port}`, {
+      const res = await instrumentedfetch(`http://localhost:${port}`, {
         headers: [['foo', 'bar']],
         method: 'POST',
         body: 'baz',

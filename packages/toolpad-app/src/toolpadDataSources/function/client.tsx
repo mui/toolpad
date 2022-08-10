@@ -1,9 +1,6 @@
 import * as React from 'react';
 import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
-import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
-
-import { LoadingButton } from '@mui/lab';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { BindableAttrValue } from '@mui/toolpad-core';
 import { Controller, useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -15,8 +12,7 @@ import {
 import lazyComponent from '../../utils/lazyComponent';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import SplitPane from '../../components/SplitPane';
-import { useConnectionContext, usePrivateQuery } from '../context';
-import client from '../../api';
+import { usePrivateQuery } from '../context';
 import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import { LogEntry } from '../../components/Console';
@@ -24,6 +20,10 @@ import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import { isSaveDisabled } from '../../utils/forms';
 import Devtools from '../../components/Devtools';
+import { createHarLog, mergeHar } from '../../utils/har';
+import useQueryPreview from '../useQueryPreview';
+import QueryInputPanel from '../QueryInputPanel';
+import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -92,67 +92,51 @@ const DEFAULT_MODULE = `export default async function ({ params }: ${EVENT_INTER
 }`;
 
 function QueryEditor({
+  QueryEditorShell,
   globalScope,
-  liveParams,
   value,
   onChange,
 }: QueryEditorProps<FunctionConnectionParams, FunctionQuery>) {
+  const [input, setInput] = React.useState(value);
+  React.useEffect(() => setInput(value), [value]);
+
   const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
-    Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>)),
+    Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>)),
   );
 
   React.useEffect(
-    () => setParams(Object.entries(value.params || ({} as BindableAttrValue<Record<string, any>>))),
-    [value.params],
+    () => setParams(Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>))),
+    [input.params],
   );
 
-  const handleParamsChange = React.useCallback(
-    (newParams: [string, BindableAttrValue<any>][]) => {
-      setParams(newParams);
-      const paramsObj: BindableAttrValues<any> = Object.fromEntries(newParams);
-      onChange({ ...value, params: paramsObj });
-    },
-    [onChange, value],
+  const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
+    input: params,
+    globalScope,
+  });
+
+  const previewParams = React.useMemo(
+    () => Object.fromEntries(paramsEditorLiveValue.map(([key, binding]) => [key, binding.value])),
+    [paramsEditorLiveValue],
   );
 
-  const paramsEditorLiveValue: [string, LiveBinding][] = params.map(([key]) => [
-    key,
-    liveParams[key],
-  ]);
-
-  const { appId, connectionId } = useConnectionContext();
-  const [preview, setPreview] = React.useState<FunctionResult | null>(null);
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
-
-  const cancelRunPreview = React.useRef<(() => void) | null>(null);
-  const runPreview = React.useCallback(() => {
-    let canceled = false;
-
-    cancelRunPreview.current?.();
-    cancelRunPreview.current = () => {
-      canceled = true;
-    };
-
-    const currentParams = Object.fromEntries(
-      paramsEditorLiveValue.map(([key, binding]) => [key, binding.value]),
-    );
-
-    client.query
-      .dataSourceFetchPrivate(appId, connectionId, {
-        kind: 'debugExec',
-        query: value.query,
-        params: currentParams,
-      } as FunctionPrivateQuery)
-      .then((result) => {
-        if (!canceled) {
-          setPreview(result);
-          setPreviewLogs((existing) => [...existing, ...result.logs]);
-        }
-      })
-      .finally(() => {
-        cancelRunPreview.current = null;
-      });
-  }, [appId, connectionId, paramsEditorLiveValue, value.query]);
+  const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
+  const { preview, runPreview: handleRunPreview } = useQueryPreview<
+    FunctionPrivateQuery,
+    FunctionResult
+  >(
+    {
+      kind: 'debugExec',
+      query: input.query,
+      params: previewParams,
+    },
+    {
+      onPreview(result) {
+        setPreviewLogs((existing) => [...existing, ...result.logs]);
+        setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+      },
+    },
+  );
 
   const { data: secretsKeys = [] } = usePrivateQuery<FunctionPrivateQuery, string[]>({
     kind: 'secretsKeys',
@@ -177,52 +161,65 @@ function QueryEditor({
     return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
   }, [params, secretsKeys]);
 
+  const handleLogClear = React.useCallback(() => setPreviewLogs([]), []);
+  const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
+
+  const lastSavedInput = React.useRef(input);
+  const handleCommit = React.useCallback(() => {
+    const newValue = { ...input, params: Object.fromEntries(params) };
+    onChange(newValue);
+    lastSavedInput.current = newValue;
+  }, [onChange, params, input]);
+
+  const isDirty =
+    input.query !== lastSavedInput.current.query || input.params !== lastSavedInput.current.params;
+
   return (
-    <SplitPane split="vertical" size="50%" allowResize>
-      <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Toolbar>
-            <LoadingButton startIcon={<PlayArrowIcon />} onClick={() => runPreview()}>
-              Preview
-            </LoadingButton>
-          </Toolbar>
-          <Box sx={{ flex: 1, minHeight: 0 }}>
-            <TypescriptEditor
-              value={value.query.module}
-              onChange={(newValue) => onChange({ ...value, query: { module: newValue } })}
-              extraLibs={extraLibs}
+    <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
+      <SplitPane split="vertical" size="50%" allowResize>
+        <SplitPane split="horizontal" size={85} primary="second" allowResize>
+          <QueryInputPanel onRunPreview={handleRunPreview}>
+            <Box sx={{ flex: 1, minHeight: 0 }}>
+              <TypescriptEditor
+                value={input.query.module}
+                onChange={(newValue) =>
+                  setInput((existing) => ({ ...existing, query: { module: newValue } }))
+                }
+                extraLibs={extraLibs}
+              />
+            </Box>
+          </QueryInputPanel>
+
+          <Box sx={{ p: 2 }}>
+            <Typography>Parameters</Typography>
+            <ParametersEditor
+              value={params}
+              onChange={setParams}
+              globalScope={globalScope}
+              liveValue={paramsEditorLiveValue}
             />
           </Box>
-        </Box>
+        </SplitPane>
 
-        <Box sx={{ p: 2 }}>
-          <Typography>Parameters</Typography>
-          <ParametersEditor
-            value={params}
-            onChange={handleParamsChange}
-            globalScope={globalScope}
-            liveValue={paramsEditorLiveValue}
+        <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
+          <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
+            {preview?.error ? (
+              <ErrorAlert error={preview?.error} />
+            ) : (
+              <JsonView src={preview?.data} />
+            )}
+          </Box>
+
+          <Devtools
+            sx={{ width: '100%', height: '100%' }}
+            log={previewLogs}
+            onLogClear={handleLogClear}
+            har={previewHar}
+            onHarClear={handleHarClear}
           />
-        </Box>
+        </SplitPane>
       </SplitPane>
-
-      <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
-        <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
-          {preview?.error ? (
-            <ErrorAlert error={preview?.error} />
-          ) : (
-            <JsonView src={preview?.data} />
-          )}
-        </Box>
-
-        <Devtools
-          sx={{ width: '100%', height: '100%' }}
-          log={previewLogs}
-          onLogChange={setPreviewLogs}
-          har={preview?.har}
-        />
-      </SplitPane>
-    </SplitPane>
+    </QueryEditorShell>
   );
 }
 

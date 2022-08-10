@@ -23,6 +23,7 @@ import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
+import { useEvaluateLiveBindings } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -93,7 +94,6 @@ const DEFAULT_MODULE = `export default async function ({ params }: ${EVENT_INTER
 function QueryEditor({
   QueryEditorShell,
   globalScope,
-  liveParams,
   value,
   onChange,
 }: QueryEditorProps<FunctionConnectionParams, FunctionQuery>) {
@@ -109,9 +109,14 @@ function QueryEditor({
     [input.params],
   );
 
+  const liveParams = useEvaluateLiveBindings({
+    input: Object.fromEntries(params),
+    globalScope,
+  });
+
   const paramsEditorLiveValue: [string, LiveBinding][] = params.map(([key]) => [
     key,
-    liveParams[key],
+    liveParams[key] ?? { value: undefined },
   ]);
 
   const previewParams = React.useMemo(

@@ -18,7 +18,10 @@ import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../toolpad/AppEditor/PageEditor/BindableEditor';
-import { useEvaluateLiveBinding } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
+import {
+  useEvaluateLiveBinding,
+  useEvaluateLiveBindings,
+} from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
@@ -162,7 +165,6 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
 function QueryEditor({
   globalScope,
   connectionParams,
-  liveParams,
   value,
   onChange,
   QueryEditorShell,
@@ -208,13 +210,18 @@ function QueryEditor({
     }));
   }, []);
 
+  const liveParams = useEvaluateLiveBindings({
+    input: Object.fromEntries(params),
+    globalScope,
+  });
+
   const paramsEditorLiveValue: [string, LiveBinding][] = params.map(([key]) => [
     key,
-    liveParams[key],
+    liveParams[key] ?? { value: undefined },
   ]);
 
   const queryScope = {
-    query: mapValues(liveParams, (bindingResult) => bindingResult.value),
+    query: mapValues(liveParams, (bindingResult) => bindingResult?.value),
   };
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({

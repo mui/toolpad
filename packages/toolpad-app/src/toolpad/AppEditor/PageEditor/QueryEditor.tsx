@@ -28,7 +28,7 @@ import { QueryEditorModel, QueryEditorShellProps } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import { omit, update } from '../../../utils/immutability';
-import { useEvaluateLiveBinding, useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
+import { useEvaluateLiveBinding } from '../useEvaluateLiveBinding';
 import { Maybe, WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
@@ -260,11 +260,6 @@ function QueryNodeEditorDialog<Q, P>({
 
   const { pageState } = usePageEditorState();
 
-  const liveParams = useEvaluateLiveBindings({
-    input: inputParams,
-    globalScope: pageState,
-  });
-
   const handleConnectionChange = React.useCallback((newConnectionId: NodeId | null) => {
     setInput((existing) =>
       update(existing, {
@@ -461,7 +456,6 @@ function QueryNodeEditorDialog<Q, P>({
             QueryEditorShell={QueryEditorShell}
             connectionParams={connectionParams}
             value={queryModel}
-            liveParams={liveParams}
             onChange={handleQueryModelChange}
             globalScope={pageState}
           />

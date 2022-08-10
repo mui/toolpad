@@ -102,7 +102,6 @@ export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorMo
   QueryEditorShell: React.ComponentType<QueryEditorShellProps>;
   connectionParams: Maybe<P>;
   globalScope: Record<string, any>;
-  liveParams: Record<string, LiveBinding>;
 }
 
 export type QueryEditor<P, Q = {}> = React.FC<QueryEditorProps<P, Q>>;

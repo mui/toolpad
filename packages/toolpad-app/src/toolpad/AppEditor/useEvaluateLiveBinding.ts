@@ -79,7 +79,7 @@ export function useEvaluateLiveBindings({
   server,
   input,
   globalScope,
-}: UseEvaluateLiveBindings): Record<string, LiveBinding> {
+}: UseEvaluateLiveBindings): Partial<Record<string, LiveBinding>> {
   const jsRuntime = useJsRuntime();
   return React.useMemo(() => {
     return evaluateBindableAttrValues(input, globalScope, {

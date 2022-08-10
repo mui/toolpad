@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Collapse, styled, Typography } from '@mui/material';
+import { Box, Collapse, Link, styled, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -14,6 +14,46 @@ import {
   STACK_COMPONENT_ID,
 } from '../../../toolpadComponents';
 
+interface FutureComponentSpec {
+  displayName: string;
+  githubLink: string;
+}
+
+const FUTURE_COMPONENTS: FutureComponentSpec[] = [
+  {
+    displayName: 'Form',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/749',
+  },
+  {
+    displayName: 'Card',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/748',
+  },
+  {
+    displayName: 'Tabs',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/747',
+  },
+  {
+    displayName: 'Slider',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/746',
+  },
+  {
+    displayName: 'Switch',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/745',
+  },
+  {
+    displayName: 'RadioButton',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/744',
+  },
+  {
+    displayName: 'DatePicker',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/743',
+  },
+  {
+    displayName: 'Checkbox',
+    githubLink: 'https://github.com/mui/mui-toolpad/issues/742',
+  },
+];
+
 const WIDTH_COLLAPSED = 50;
 
 const ComponentCatalogRoot = styled('div')({
@@ -24,17 +64,19 @@ const ComponentCatalogRoot = styled('div')({
   overflow: 'visible',
 });
 
-const ComponentCatalogItem = styled('div')(({ theme }) => ({
+const ComponentCatalogItem = styled('div')(({ theme, draggable, onClick }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: theme.spacing(1, 0),
+  padding: theme.spacing(1, 1, 1, 0),
   borderRadius: theme.shape.borderRadius,
   border: `1px solid ${theme.palette.divider}`,
   color: theme.palette.text.secondary,
-  cursor: 'grab',
+
   '&:hover': {
     background: theme.palette.action.hover,
   },
+  ...(draggable ? { cursor: 'grab' } : {}),
+  ...(onClick ? { cursor: 'pointer' } : {}),
 }));
 
 export interface ComponentCatalogProps {
@@ -119,6 +161,18 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     </ComponentCatalogItem>
                   );
                 })}
+              {FUTURE_COMPONENTS.map((futureComponent, i) => {
+                return (
+                  <Link href={futureComponent.githubLink} underline="none" target="_blank">
+                    <ComponentCatalogItem key={`futureComponent[${i}]`}>
+                      <DragIndicatorIcon color="disabled" />
+                      {futureComponent.displayName}
+                      <Box sx={{ flex: 1 }} />
+                      🚧
+                    </ComponentCatalogItem>
+                  </Link>
+                );
+              })}
             </Box>
           </Box>
         </Collapse>

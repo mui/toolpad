@@ -186,7 +186,10 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
 
   const handlePageChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ type: 'navigationAction', value: { page: event.target.value as NodeId } });
+      onChange({
+        type: 'navigationAction',
+        value: { page: appDom.ref(event.target.value as NodeId) },
+      });
     },
     [onChange],
   );
@@ -206,7 +209,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
         sx={{ my: 3 }}
         label="page"
         select
-        value={value?.value?.page || ''}
+        value={value?.value?.page ? appDom.deref(value.value.page) : ''}
         onChange={handlePageChange}
         disabled={!hasPagesAvailable}
         helperText={hasPagesAvailable ? null : 'No other pages available'}
@@ -241,7 +244,7 @@ function ActionEditor({ value, onChange }: ActionEditorProps) {
     <Box>
       <TabContext value={activeTab}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleTabChange} aria-label="lab API tabs example">
+          <TabList onChange={handleTabChange} aria-label="Choose action kind ">
             <Tab label="JS expression" value="jsExpressionAction" />
             <Tab label="Navigation" value="navigationAction" />
           </TabList>

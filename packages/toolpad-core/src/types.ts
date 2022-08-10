@@ -6,6 +6,10 @@ export type NodeId = Branded<string, 'NodeId'>;
 
 export type BindingAttrValueFormat = 'stringLiteral' | 'default';
 
+export interface NodeReference {
+  $$ref: NodeId;
+}
+
 export interface BoundExpressionAttrValue {
   type: 'boundExpression';
   value: string;
@@ -40,7 +44,7 @@ export interface JsExpressionAction {
 export interface NavigationAction<P = any> {
   type: 'navigationAction';
   value: {
-    page: NodeId;
+    page: NodeReference;
     parameters?: BindableAttrValues<P>;
   };
 }
@@ -222,6 +226,11 @@ export interface ComponentConfig<P> {
    * inputs is still loading it will set this property to true
    */
   loadingProp?: keyof P & string;
+  /**
+   * Designates a property as "the resizable height property". If Toolpad detects any vertical resizing of
+   * the component it will forward it to this property.
+   */
+  resizableHeightProp?: keyof P & string;
   /**
    * Describes the individual properties for this component
    */

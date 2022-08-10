@@ -3,17 +3,18 @@ import clsx from 'clsx';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
-import * as appDom from '../../../appDom';
+import * as appDom from '../../../../appDom';
 import {
   absolutePositionCss,
   Rectangle,
   RectangleEdge,
+  RECTANGLE_EDGE_BOTTOM,
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
-} from '../../../utils/geometry';
-import { useDom } from '../../DomLoader';
-import { useToolpadComponent } from '../toolpadComponents';
-import { getElementNodeComponentId } from '../../../toolpadComponents';
+} from '../../../../utils/geometry';
+import { useDom } from '../../../DomLoader';
+import { useToolpadComponent } from '../../toolpadComponents';
+import { getElementNodeComponentId } from '../../../../toolpadComponents';
 
 const nodeHudClasses = {
   allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
@@ -67,6 +68,7 @@ const DraggableEdge = styled('div', {
   let dynamicStyles = {};
   if (edge === RECTANGLE_EDGE_RIGHT) {
     dynamicStyles = {
+      cursor: 'ew-resize',
       top: 0,
       right: -2,
       height: '100%',
@@ -75,16 +77,25 @@ const DraggableEdge = styled('div', {
   }
   if (edge === RECTANGLE_EDGE_LEFT) {
     dynamicStyles = {
+      cursor: 'ew-resize',
       top: 0,
       left: -2,
       height: '100%',
       width: 12,
     };
   }
+  if (edge === RECTANGLE_EDGE_BOTTOM) {
+    dynamicStyles = {
+      cursor: 'ns-resize',
+      bottom: -2,
+      height: 12,
+      left: 0,
+      width: '100%',
+    };
+  }
 
   return {
     ...dynamicStyles,
-    cursor: 'ew-resize',
     position: 'absolute',
     pointerEvents: 'initial',
     zIndex: 1,
@@ -97,10 +108,10 @@ const ResizePreview = styled('div')({
 });
 
 interface NodeHudProps {
-  node: appDom.ElementNode | appDom.PageNode;
+  node: appDom.AppDomNode;
   rect: Rectangle;
-  selected?: boolean;
-  allowInteraction?: boolean;
+  isSelected?: boolean;
+  isInteractive?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
   draggableEdges?: RectangleEdge[];
   onEdgeDragStart?: (
@@ -114,9 +125,9 @@ interface NodeHudProps {
 
 export default function NodeHud({
   node,
-  selected,
-  allowInteraction,
   rect,
+  isSelected,
+  isInteractive,
   onNodeDragStart,
   draggableEdges = [],
   onEdgeDragStart,
@@ -129,32 +140,21 @@ export default function NodeHud({
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
   const component = useToolpadComponent(dom, componentId);
 
-  const handleDelete = React.useCallback(
-    (event: React.MouseEvent<HTMLElement>) => {
-      event.stopPropagation();
-
-      if (onDelete) {
-        onDelete(event);
-      }
-    },
-    [onDelete],
-  );
-
   return (
     <NodeHudWrapper
       data-node-id={node.id}
       style={absolutePositionCss(rect)}
       className={clsx({
-        [nodeHudClasses.allowNodeInteraction]: allowInteraction,
+        [nodeHudClasses.allowNodeInteraction]: isInteractive,
       })}
     >
-      {selected ? (
+      {isSelected ? (
         <React.Fragment>
           <span className={nodeHudClasses.selected} />
           <div draggable className={nodeHudClasses.selectionHint} onDragStart={onNodeDragStart}>
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
-            <IconButton aria-label="Remove element" color="inherit" onMouseUp={handleDelete}>
+            <IconButton aria-label="Remove element" color="inherit" onMouseUp={onDelete}>
               <DeleteIcon color="inherit" />
             </IconButton>
           </div>

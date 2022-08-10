@@ -50,6 +50,7 @@
     "@types/prettier": "^2.4.3",
     "@types/react-dom": "^18.0.5",
     "@types/whatwg-url": "^8.2.2",
+    "abort-controller": "^3.0.0",
     "arg": "^5.0.1",
     "basic-auth": "^2.0.1",
     "clsx": "^1.2.0",

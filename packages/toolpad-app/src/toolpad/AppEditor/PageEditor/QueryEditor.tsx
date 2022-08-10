@@ -383,7 +383,7 @@ function QueryNodeEditorDialog<Q, P>({
           server
           label="Enabled"
           propType={{ type: 'boolean' }}
-          value={input.attributes.enabled ?? null}
+          value={input.attributes.enabled ?? appDom.createConst(true)}
           onChange={handleEnabledChange}
         />
         <FormControlLabel

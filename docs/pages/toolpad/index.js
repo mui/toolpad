@@ -15,6 +15,7 @@ import upvote from '../../src/content/upvote';
 import useCases from '../../src/content/useCases';
 import marquee from '../../src/content/marquee';
 import {
+  Headline,
   plans,
   planInfo,
   rowHeaders,
@@ -26,8 +27,8 @@ export default function Home() {
   return (
     <BrandingProvider>
       <Head
-        title="Title"
-        description="Description"
+        title="MUI Toolpad: Low-code, admin builder"
+        description="Build apps with MUI components, connect to data sources, APIs and build your internal tools 10x faster. Open-source and powered by MUI."
         card="/static/social-previews/toolpad-preview.jpg"
       />
       <CssBaseline />
@@ -39,6 +40,7 @@ export default function Home() {
         <Banner content={upvote} />
         <CardGrid content={useCases} span={4} />
         <Pricing
+          Headline={Headline}
           plans={plans}
           planInfo={planInfo}
           rowHeaders={rowHeaders}

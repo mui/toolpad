@@ -78,6 +78,7 @@ enum DomNodeType {
   derivedState
   queryState
   query
+  mutation
 }
 
 enum DomNodeAttributeType {

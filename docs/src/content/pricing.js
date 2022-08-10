@@ -7,6 +7,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Link from 'docs/src/modules/components/Link';
 import IconImage from 'docs/src/components/icon/IconImage';
 import LaunchRounded from '@mui/icons-material/LaunchRounded';
+import GradientText from '../components/landing/GradientText';
 
 const ColumnHead = ({ label, metadata, tooltip, nested = false, href }) => {
   const text = (
@@ -72,6 +73,13 @@ ColumnHead.propTypes = {
 
 const plans = ['community', 'commercial'];
 
+const Headline = (
+  <Typography variant="h2" maxWidth={500} marginBottom={3}>
+    Different plan sizes to fit <br />
+    <GradientText>every need</GradientText>
+  </Typography>
+);
+
 const planInfo = {
   community: {
     color: 'green',
@@ -86,9 +94,10 @@ const planInfo = {
 };
 
 const rowHeaders = {
-  // Apps
+  // Hosting
   'Self-hosting': <ColumnHead label="Self-hosting" />,
   'Cloud hosting': <ColumnHead label="Cloud hosting" />,
+  // Apps
   'Basic components': <ColumnHead label="Basic components" metadata="Material UI + MUI X Pro" />,
   'Custom components': <ColumnHead label="Custom components" />,
   'Advanced components': <ColumnHead label="Advanced components" metadata="MUI X Premium" />,
@@ -178,4 +187,4 @@ const commercialData = {
   community: <Info value="Priority" />,
 };
 
-export { planInfo, plans, rowHeaders, communityData, commercialData };
+export { Headline, planInfo, plans, rowHeaders, communityData, commercialData };

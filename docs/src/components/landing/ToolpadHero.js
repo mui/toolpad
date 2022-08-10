@@ -5,8 +5,8 @@ import TextField from '@mui/material/TextField';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import Link from 'docs/src/modules/components/Link';
 import Typography from '@mui/material/Typography';
-import GradientText from 'docs/src/components/typography/GradientText';
 import IconImage from 'docs/src/components/icon/IconImage';
+import GradientText from './GradientText';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
 
 export default function ToolpadHero() {
@@ -21,10 +21,10 @@ export default function ToolpadHero() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: { xs: 'center', md: 'center' },
-            '& > *': { mr: 1, width: 28, height: 28 },
+            '& > *': { mr: 1, width: 84, height: 28 },
           }}
         >
-          <IconImage name="product-toolpad" /> Toolpad
+          <IconImage name="product-toolpad" /> <GradientText>MUI Toolpad</GradientText>
         </Typography>
         <Typography variant="h1" sx={{ my: 2 }}>
           Low-code

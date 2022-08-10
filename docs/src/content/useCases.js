@@ -1,10 +1,11 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
+import GradientText from '../components/landing/GradientText';
 
 const useCases = {
   Headline: (
     <Typography variant="h2" maxWidth={300} marginBottom={3}>
-      Toolpad is ideal for building
+      Toolpad is ideal for <GradientText>building</GradientText>
     </Typography>
   ),
   cards: [

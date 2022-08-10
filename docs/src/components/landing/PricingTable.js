@@ -9,10 +9,11 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
-import IconImage from 'docs/src/components/icon/IconImage';
+// import IconImage from 'docs/src/components/icon/IconImage';
+import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 
 function PlanName({ planInfo, centered = false, disableDescription = false }) {
-  const { title, color, description } = planInfo;
+  const { title, description } = planInfo;
   return (
     <React.Fragment>
       {centered ? (
@@ -21,7 +22,7 @@ function PlanName({ planInfo, centered = false, disableDescription = false }) {
           fontWeight="bold"
           sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
         >
-          <IconImage name={`block-${color}`} sx={{ mr: 1 }} /> {title}
+          {/* <IconImage name={`block-${color}`} sx={{ mr: 1 }} /> */} {title}
         </Typography>
       ) : (
         <Typography
@@ -29,7 +30,7 @@ function PlanName({ planInfo, centered = false, disableDescription = false }) {
           fontWeight="bold"
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
-          {title} <IconImage name={`block-${color}`} />
+          {title} {/* <IconImage name={`block-${color}`} /> */}
         </Typography>
       )}
       {!disableDescription ? (
@@ -275,9 +276,7 @@ function PricingTable({
       />
       {!columnHeaderHidden ? (
         <Box sx={gridSx}>
-          <Typography variant="body2" fontWeight="bold" sx={{ p: 2 }}>
-            Plans
-          </Typography>
+          <Typography />
           {plans.map((plan) => (
             <Box key={plan} sx={{ display: 'flex', flexDirection: 'column', p: 2 }}>
               <PlanName planInfo={planInfo[plan]} />
@@ -285,11 +284,12 @@ function PricingTable({
           ))}
         </Box>
       ) : null}
-      <RowHead>Apps</RowHead>
+      <RowHead>Hosting</RowHead>
       {renderRow('Self-hosting')}
       {divider}
       {renderRow('Cloud hosting')}
       {divider}
+      <RowHead>Apps</RowHead>
       {renderRow('Basic components')}
       {divider}
       {renderRow('Custom components')}
@@ -418,9 +418,23 @@ PricingList.propTypes = {
   rowHeaders: PropTypes.object,
 };
 
-export default function Pricing({ plans, planInfo, rowHeaders, commercialData, communityData }) {
+export default function Pricing({
+  Headline,
+  plans,
+  planInfo,
+  rowHeaders,
+  commercialData,
+  communityData,
+}) {
   return (
     <React.Fragment>
+      <Container>
+        <SectionHeadline overline="Plans" title={Headline} />
+        <Typography variant="body2" sx={{ marginTop: { md: -2 }, marginBottom: { xs: 2, md: 0 } }}>
+          With the intention to have affordable plans for all kind of business needs, we will
+          announce our exact pricing later this year.
+        </Typography>
+      </Container>
       <PricingList
         plans={plans}
         planInfo={planInfo}
@@ -445,6 +459,7 @@ export default function Pricing({ plans, planInfo, rowHeaders, commercialData, c
 Pricing.propTypes = {
   commercialData: PropTypes.object,
   communityData: PropTypes.object,
+  Headline: PropTypes.node,
   planInfo: PropTypes.object.isRequired,
   plans: PropTypes.arrayOf(PropTypes.string).isRequired,
   rowHeaders: PropTypes.object,

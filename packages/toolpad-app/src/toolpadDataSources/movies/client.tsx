@@ -45,34 +45,46 @@ function isValid(connection: MoviesConnectionParams): boolean {
 export function QueryEditor({
   value,
   onChange,
+  QueryEditorShell,
 }: QueryEditorProps<MoviesConnectionParams, MoviesQuery>) {
-  const handleChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const query: MoviesQuery = {
-        ...value.query,
-        genre: event.target.value || null,
-      };
-      onChange({ ...value, query });
-    },
-    [value, onChange],
-  );
+  const [input, setInput] = React.useState(value);
+  React.useEffect(() => setInput(value), [value]);
+
+  const handleChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setInput((existing) => ({
+      ...existing,
+      query: { ...existing.query, genre: event.target.value || null },
+    }));
+  }, []);
+
+  const lastSavedInput = React.useRef(input);
+  const handleCommit = React.useCallback(() => {
+    onChange(input);
+    lastSavedInput.current = input;
+  }, [onChange, input]);
+
+  const isDirty =
+    input.query !== lastSavedInput.current.query || input.params !== lastSavedInput.current.params;
+
   return (
-    <Stack>
-      <TextField
-        select
-        fullWidth
-        value={value.query.genre || ''}
-        label="Genre"
-        onChange={handleChange}
-      >
-        <MenuItem value={''}>Any</MenuItem>
-        {data.genres.map((genre) => (
-          <MenuItem key={genre} value={genre}>
-            {genre}
-          </MenuItem>
-        ))}
-      </TextField>
-    </Stack>
+    <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
+      <Stack>
+        <TextField
+          select
+          fullWidth
+          value={value.query.genre || ''}
+          label="Genre"
+          onChange={handleChange}
+        >
+          <MenuItem value={''}>Any</MenuItem>
+          {data.genres.map((genre) => (
+            <MenuItem key={genre} value={genre}>
+              {genre}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Stack>
+    </QueryEditorShell>
   );
 }
 

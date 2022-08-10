@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Har } from 'har-format';
 import { styled, SxProps } from '@mui/material';
 import 'perf-cascade/dist/perf-cascade.css';
+import { createHarLog } from '../utils/har';
 
 const HarViewerRoot = styled('div')({});
 
@@ -11,17 +12,17 @@ function fixLinks(elm: Element) {
 }
 
 export interface HarViewerProps {
-  har?: Har;
+  value?: Har;
   sx?: SxProps;
 }
 
-export default function HarViewer({ har, sx }: HarViewerProps) {
+export default function HarViewer({ value = createHarLog(), sx }: HarViewerProps) {
   const rootRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const root = rootRef.current;
-    if (har && root) {
-      const svg = fromHar(har);
+    if (value && value.log.entries.length > 0 && root) {
+      const svg = fromHar(value);
       fixLinks(svg);
 
       const observer = new MutationObserver((entries) => {
@@ -46,7 +47,7 @@ export default function HarViewer({ har, sx }: HarViewerProps) {
       };
     }
     return () => {};
-  }, [har]);
+  }, [value]);
 
   return <HarViewerRoot ref={rootRef} sx={sx} />;
 }

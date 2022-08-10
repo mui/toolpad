@@ -1,11 +1,28 @@
 import * as React from 'react';
-import clsx from 'clsx';
+import { NodeId } from '@mui/toolpad-core';
 import { styled } from '@mui/material';
-import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
-import { useNavigate } from 'react-router-dom';
-import { FlowDirection, NodeInfo, SlotsState } from '../../../types';
-import * as appDom from '../../../appDom';
-import EditorCanvasHost, { EditorCanvasHostHandle } from './EditorCanvasHost';
+import clsx from 'clsx';
+
+import * as appDom from '../../../../appDom';
+import { useDom, useDomApi } from '../../../DomLoader';
+import {
+  DropZone,
+  DROP_ZONE_BOTTOM,
+  DROP_ZONE_CENTER,
+  DROP_ZONE_LEFT,
+  DROP_ZONE_RIGHT,
+  DROP_ZONE_TOP,
+  usePageEditorApi,
+  usePageEditorState,
+} from '../PageEditorProvider';
+import {
+  isPageLayoutComponent,
+  isPageRow,
+  isPageColumn,
+  PAGE_ROW_COMPONENT_ID,
+  PAGE_COLUMN_COMPONENT_ID,
+} from '../../../../toolpadComponents';
+import { PinholeOverlay } from '../../../../PinholeOverlay';
 import {
   getRectanglePointActiveEdge,
   isHorizontalFlow,
@@ -18,31 +35,12 @@ import {
   RECTANGLE_EDGE_RIGHT,
   RECTANGLE_EDGE_TOP,
   rectContainsPoint,
-} from '../../../utils/geometry';
-import { PinholeOverlay } from '../../../PinholeOverlay';
-import { getPageViewState } from '../../../pageViewState';
-import { useDom, useDomApi } from '../../DomLoader';
-import {
-  DropZone,
-  DROP_ZONE_BOTTOM,
-  DROP_ZONE_CENTER,
-  DROP_ZONE_LEFT,
-  DROP_ZONE_RIGHT,
-  DROP_ZONE_TOP,
-  usePageEditorApi,
-  usePageEditorState,
-} from './PageEditorProvider';
-import {
-  PAGE_COLUMN_COMPONENT_ID,
-  PAGE_ROW_COMPONENT_ID,
-  isPageLayoutComponent,
-  isPageRow,
-  isPageColumn,
-} from '../../../toolpadComponents';
-import { ExactEntriesOf } from '../../../utils/types';
-import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
+} from '../../../../utils/geometry';
+import { EditorCanvasHostHandle } from '../EditorCanvasHost';
 import NodeHud from './NodeHud';
-import NodeDropArea from './NodeDropArea';
+import DragAndDropNode from './DragAndDropNode';
+import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
+import { NodeInfo } from '../../../../types';
 
 const HORIZONTAL_RESIZE_SNAP_UNITS = 4; // px
 const SNAP_TO_GRID_COLUMN_MARGIN = 10; // px
@@ -51,27 +49,14 @@ const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
 const MIN_RESIZABLE_ELEMENT_HEIGHT = 100; // px
 
-const classes = {
-  view: 'Toolpad_View',
-};
-
-const RenderPanelRoot = styled('div')({
-  position: 'relative',
-  overflow: 'hidden',
-
-  [`& .${classes.view}`]: {
-    height: '100%',
-  },
-});
-
 const overlayClasses = {
   hud: 'Toolpad_Hud',
   nodeHud: 'Toolpad_NodeHud',
   container: 'Toolpad_Container',
-  componentDragging: 'Toolpad_ComponentDragging',
+  hudOverlay: 'Toolpad_HudOverlay',
+  nodeDrag: 'Toolpad_NodeDrag',
   resizeHorizontal: 'Toolpad_ResizeHorizontal',
   resizeVertical: 'Toolpad_ResizeVertical',
-  hudOverlay: 'Toolpad_HudOverlay',
 };
 
 const OverlayRoot = styled('div')({
@@ -81,7 +66,7 @@ const OverlayRoot = styled('div')({
   '&:focus': {
     outline: 'none',
   },
-  [`&.${overlayClasses.componentDragging}`]: {
+  [`&.${overlayClasses.nodeDrag}`]: {
     cursor: 'copy',
   },
   [`&.${overlayClasses.resizeHorizontal}`]: {
@@ -96,11 +81,11 @@ const OverlayRoot = styled('div')({
   },
 });
 
-function hasFreeNodeSlots(nodeInfo: NodeInfo): boolean {
-  return Object.keys(nodeInfo.slots || []).length > 0;
-}
-
-function findAreaAt(areaRects: Record<string, Rectangle>, x: number, y: number): string | null {
+export function findAreaAt(
+  areaRects: Record<string, Rectangle>,
+  x: number,
+  y: number,
+): string | null {
   const rectEntries = Object.entries(areaRects);
 
   // Search deepest nested first
@@ -115,6 +100,10 @@ function findAreaAt(areaRects: Record<string, Rectangle>, x: number, y: number):
     }
   }
   return null;
+}
+
+function hasFreeNodeSlots(nodeInfo: NodeInfo): boolean {
+  return Object.keys(nodeInfo.slots || []).length > 0;
 }
 
 function getRectangleEdgeDropZone(edge: RectangleEdge | null): DropZone | null {
@@ -132,21 +121,6 @@ function getRectangleEdgeDropZone(edge: RectangleEdge | null): DropZone | null {
   }
 }
 
-function getChildNodeHighlightedZone(parentFlowDirection: FlowDirection): DropZone | null {
-  switch (parentFlowDirection) {
-    case 'row':
-      return DROP_ZONE_RIGHT;
-    case 'column':
-      return DROP_ZONE_BOTTOM;
-    case 'row-reverse':
-      return DROP_ZONE_LEFT;
-    case 'column-reverse':
-      return DROP_ZONE_TOP;
-    default:
-      return null;
-  }
-}
-
 function getDropAreaId(nodeId: string, parentProp: string): string {
   return `${nodeId}:${parentProp}`;
 }
@@ -159,31 +133,28 @@ function getDropAreaParentProp(dropAreaId: string): string | null {
   return dropAreaId.split(':')[1] || null;
 }
 
-export interface RenderPanelProps {
-  className?: string;
+interface RenderOverlayProps {
+  canvasHostRef: React.RefObject<EditorCanvasHostHandle>;
 }
 
-export default function RenderPanel({ className }: RenderPanelProps) {
+export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const api = usePageEditorApi();
   const {
-    appId,
     selection,
-    newNode,
     viewState,
     nodeId: pageNodeId,
+    newNode,
     draggedNodeId,
-    isDraggingOver,
+    draggedEdge,
     dragOverNodeId,
     dragOverSlotParentProp,
     dragOverZone,
-    draggedEdge,
+    isDraggingOver,
   } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;
-
-  const canvasHostRef = React.useRef<EditorCanvasHostHandle>(null);
 
   const pageNode = appDom.getNode(dom, pageNodeId, 'page');
 
@@ -191,37 +162,224 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return [pageNode, ...appDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
-  const overlayGridRef = React.useRef<OverlayGridHandle>({
-    gridElement: null,
-    getMinColumnWidth: () => 0,
-    getLeftColumnEdges: () => [],
-    getRightColumnEdges: () => [],
-  });
-
-  const isEmptyPage = pageNodes.length <= 1;
-
   const selectedNode = selection && appDom.getNode(dom, selection);
 
-  const handleNodeDragStart = React.useCallback(
-    (node: appDom.ElementNode) => (event: React.DragEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-
-      event.dataTransfer.dropEffect = 'move';
-      api.select(node.id);
-      api.existingNodeDragStart(node);
-    },
-    [api],
-  );
-
-  const getCurrentlyDraggedNode = React.useCallback(
+  const draggedNode = React.useMemo(
     (): appDom.ElementNode | null =>
       newNode || (draggedNodeId && appDom.getNode(dom, draggedNodeId, 'element')),
     [dom, draggedNodeId, newNode],
   );
 
-  const availableDropTargets = React.useMemo((): appDom.AppDomNode[] => {
-    const draggedNode = getCurrentlyDraggedNode();
+  const selectionRects = React.useMemo(() => {
+    const rects: Record<string, Rectangle> = {};
 
+    pageNodes.forEach((node) => {
+      const nodeInfo = nodesInfo[node.id];
+      const nodeRect = nodeInfo?.rect || null;
+
+      if (nodeRect) {
+        rects[node.id] = nodeRect;
+      }
+    });
+
+    return rects;
+  }, [nodesInfo, pageNodes]);
+
+  const handleNodeMouseUp = React.useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
+
+      if (!cursorPos || draggedNodeId) {
+        return;
+      }
+
+      const newSelectedNodeId = findAreaAt(selectionRects, cursorPos.x, cursorPos.y);
+      const newSelectedNode =
+        newSelectedNodeId && appDom.getMaybeNode(dom, newSelectedNodeId as NodeId);
+      if (newSelectedNode && appDom.isElement(newSelectedNode)) {
+        api.select(newSelectedNodeId as NodeId);
+      } else {
+        api.select(null);
+      }
+    },
+    [canvasHostRef, draggedNodeId, selectionRects, dom, api],
+  );
+
+  const deleteOrphanedLayoutComponents = React.useCallback(
+    (movedOrDeletedNode: appDom.ElementNode, moveTargetNodeId: NodeId | null = null) => {
+      const movedOrDeletedNodeParentProp = movedOrDeletedNode.parentProp;
+
+      const parent = appDom.getParent(dom, movedOrDeletedNode);
+      const parentParent = parent && appDom.getParent(dom, parent);
+      const parentParentParent = parentParent && appDom.getParent(dom, parentParent);
+
+      const parentChildren =
+        parent && movedOrDeletedNodeParentProp
+          ? (appDom.getChildNodes(dom, parent) as appDom.NodeChildren<appDom.ElementNode>)[
+              movedOrDeletedNodeParentProp
+            ]
+          : [];
+
+      const isOnlyLayoutContainerChild =
+        parent &&
+        appDom.isElement(parent) &&
+        isPageLayoutComponent(parent) &&
+        parentChildren.length === 1;
+
+      const isParentOnlyLayoutContainerChild =
+        parentParent &&
+        parent.parentProp &&
+        appDom.isElement(parentParent) &&
+        isPageLayoutComponent(parentParent) &&
+        appDom.getChildNodes(dom, parentParent)[parent.parentProp].length === 1;
+
+      const isSecondLastLayoutContainerChild =
+        parent &&
+        appDom.isElement(parent) &&
+        (isPageRow(parent) || isPageColumn(parent)) &&
+        parentChildren.length === 2;
+
+      const hasNoLayoutContainerSiblings =
+        parentChildren.filter(
+          (child) =>
+            child.id !== movedOrDeletedNode.id && (isPageRow(child) || isPageColumn(child)),
+        ).length === 0;
+
+      if (isSecondLastLayoutContainerChild && hasNoLayoutContainerSiblings) {
+        if (parent.parentIndex && parentParent && appDom.isElement(parentParent)) {
+          const lastContainerChild = parentChildren.filter(
+            (child) => child.id !== movedOrDeletedNode.id,
+          )[0];
+
+          if (lastContainerChild.parentProp) {
+            if (moveTargetNodeId !== parent.id && moveTargetNodeId !== lastContainerChild.id) {
+              domApi.moveNode(
+                lastContainerChild,
+                parentParent,
+                lastContainerChild.parentProp,
+                parent.parentIndex,
+              );
+
+              if (isPageColumn(parent)) {
+                domApi.setNodeNamespacedProp(
+                  lastContainerChild,
+                  'layout',
+                  'columnSize',
+                  parent.layout?.columnSize || appDom.createConst(1),
+                );
+              }
+
+              domApi.removeNode(parent.id);
+            }
+
+            if (
+              parentParent.parentIndex &&
+              parentParentParent &&
+              appDom.isElement(parentParentParent) &&
+              isParentOnlyLayoutContainerChild &&
+              moveTargetNodeId !== parentParent.id
+            ) {
+              domApi.moveNode(
+                lastContainerChild,
+                parentParentParent,
+                lastContainerChild.parentProp,
+                parentParent.parentIndex,
+              );
+
+              if (isPageColumn(parentParent)) {
+                domApi.setNodeNamespacedProp(
+                  lastContainerChild,
+                  'layout',
+                  'columnSize',
+                  parentParent.layout?.columnSize || appDom.createConst(1),
+                );
+              }
+
+              domApi.removeNode(parentParent.id);
+            }
+          }
+        }
+      }
+
+      if (isOnlyLayoutContainerChild) {
+        domApi.removeNode(parent.id);
+
+        if (isParentOnlyLayoutContainerChild && moveTargetNodeId !== parentParent.id) {
+          domApi.removeNode(parentParent.id);
+        }
+      }
+    },
+    [dom, domApi],
+  );
+
+  const handleNodeDelete = React.useCallback(
+    (nodeId: NodeId) => (event?: React.MouseEvent<HTMLElement>) => {
+      if (event) {
+        event.stopPropagation();
+      }
+
+      const toRemove = appDom.getNode(dom, nodeId);
+
+      domApi.removeNode(toRemove.id);
+
+      if (appDom.isElement(toRemove)) {
+        deleteOrphanedLayoutComponents(toRemove);
+      }
+
+      api.deselect();
+    },
+    [dom, domApi, api, deleteOrphanedLayoutComponents],
+  );
+
+  const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
+
+  const interactiveNodes = React.useMemo<Set<NodeId>>(() => {
+    if (!selectedNode) {
+      return new Set();
+    }
+    return new Set(
+      [...appDom.getPageAncestors(dom, selectedNode), selectedNode].map(
+        (interactiveNode) => interactiveNode.id,
+      ),
+    );
+  }, [dom, selectedNode]);
+
+  const handleNodeDragStart = React.useCallback(
+    (node: appDom.ElementNode) => (event: React.DragEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+
+      if (appDom.isElement(node)) {
+        event.dataTransfer.dropEffect = 'move';
+        api.select(node.id);
+        api.existingNodeDragStart(node);
+      }
+    },
+    [api],
+  );
+
+  const handleEdgeDragStart = React.useCallback(
+    (node: appDom.ElementNode, edge: RectangleEdge) => (event: React.MouseEvent<HTMLElement>) => {
+      event.stopPropagation();
+
+      api.edgeDragStart({ nodeId: node.id, edge });
+
+      api.select(node.id);
+    },
+    [api],
+  );
+
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (selection && event.key === 'Backspace') {
+        handleNodeDelete(selection)();
+      }
+    },
+    [handleNodeDelete, selection],
+  );
+
+  const isEmptyPage = pageNodes.length <= 1;
+
+  const availableDropTargets = React.useMemo((): appDom.AppDomNode[] => {
     if (!draggedNode) {
       return [];
     }
@@ -236,7 +394,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       : new Set();
 
     return pageNodes.filter((n) => !excludedNodes.has(n));
-  }, [dom, getCurrentlyDraggedNode, pageNodes, selectedNode]);
+  }, [dom, draggedNode, pageNodes, selectedNode]);
 
   const availableDropTargetIds = React.useMemo(
     () => new Set(availableDropTargets.map((n) => n.id)),
@@ -244,8 +402,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   );
 
   const availableDropZones = React.useMemo((): DropZone[] => {
-    const draggedNode = getCurrentlyDraggedNode();
-
     const dragOverNode = dragOverNodeId && appDom.getNode(dom, dragOverNodeId);
     const dragOverNodeInfo = dragOverNodeId && nodesInfo[dragOverNodeId];
 
@@ -312,14 +468,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     }
 
     return [DROP_ZONE_TOP, DROP_ZONE_RIGHT, DROP_ZONE_BOTTOM, DROP_ZONE_LEFT];
-  }, [
-    dom,
-    dragOverNodeId,
-    dragOverSlotParentProp,
-    getCurrentlyDraggedNode,
-    isEmptyPage,
-    nodesInfo,
-  ]);
+  }, [dom, dragOverNodeId, dragOverSlotParentProp, draggedNode, isEmptyPage, nodesInfo]);
 
   const dropAreaRects = React.useMemo(() => {
     const rects: Record<string, Rectangle> = {};
@@ -471,28 +620,22 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     return rects;
   }, [dom, nodesInfo, pageNodes]);
 
-  const selectionRects = React.useMemo(() => {
-    const rects: Record<string, Rectangle> = {};
-
-    pageNodes.forEach((node) => {
-      const nodeInfo = nodesInfo[node.id];
-      const nodeRect = nodeInfo?.rect || null;
-
-      if (nodeRect) {
-        rects[node.id] = nodeRect;
+  const getDropAreaRect = React.useCallback(
+    (nodeId: NodeId, parentProp?: string) => {
+      if (parentProp) {
+        const dropAreaId = getDropAreaId(nodeId, parentProp);
+        return dropAreaRects[dropAreaId];
       }
-    });
-
-    return rects;
-  }, [nodesInfo, pageNodes]);
+      return dropAreaRects[nodeId];
+    },
+    [dropAreaRects],
+  );
 
   const handleNodeDragOver = React.useCallback(
     (event: React.DragEvent<Element>) => {
       event.preventDefault();
 
       const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
-
-      const draggedNode = getCurrentlyDraggedNode();
 
       if (!cursorPos || !draggedNode) {
         return;
@@ -506,8 +649,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const activeDropNode = appDom.getNode(dom, activeDropNodeId);
 
       const activeDropNodeInfo = nodesInfo[activeDropNodeId];
-
       const activeDropNodeRect = activeDropNodeInfo?.rect;
+
+      const activeDropNodeParent = appDom.getParent(dom, activeDropNode);
+      const activeDropNodeSiblings = appDom.getSiblings(dom, activeDropNode);
 
       const isDraggingOverPage = appDom.isPage(activeDropNode);
       const isDraggingOverElement = appDom.isElement(activeDropNode);
@@ -542,8 +687,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       const activeDropAreaRect =
         isDraggingOverContainer && activeDropSlotParentProp
-          ? dropAreaRects[getDropAreaId(activeDropNodeId, activeDropSlotParentProp)]
-          : dropAreaRects[activeDropNodeId];
+          ? getDropAreaRect(activeDropNodeId, activeDropSlotParentProp)
+          : getDropAreaRect(activeDropNodeId);
 
       if (activeDropAreaRect) {
         const relativeX = cursorPos.x - activeDropAreaRect.x;
@@ -567,7 +712,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
         // Detect center in layout containers
         if (isDraggingOverElement && activeDropNodeInfo && activeDropSlot) {
-          const activeDropNodeParent = appDom.getParent(dom, activeDropNode);
           const isDraggingOverPageChild = activeDropNodeParent
             ? appDom.isPage(activeDropNodeParent)
             : false;
@@ -605,19 +749,31 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         activeDropZone !== dragOverZone;
 
       if (activeDropZone && hasChangedDropArea && availableDropTargetIds.has(activeDropNodeId)) {
+        const isDragOverParentPageRow =
+          activeDropNodeParent &&
+          appDom.isElement(activeDropNodeParent) &&
+          isPageRow(activeDropNodeParent);
+
+        const hasDragOverParentRowOverride =
+          isDragOverParentPageRow &&
+          activeDropNodeSiblings.length === 0 &&
+          (activeDropZone === DROP_ZONE_TOP || activeDropZone === DROP_ZONE_BOTTOM);
+
         api.nodeDragOver({
-          nodeId: activeDropNodeId,
-          parentProp: activeDropSlotParentProp || null,
+          nodeId: hasDragOverParentRowOverride ? activeDropNodeParent.id : activeDropNodeId,
+          parentProp: hasDragOverParentRowOverride ? 'children' : activeDropSlotParentProp || null,
           zone: activeDropZone as DropZone,
         });
       }
     },
     [
-      getCurrentlyDraggedNode,
+      canvasHostRef,
+      draggedNode,
       dropAreaRects,
       pageNode.id,
       dom,
       nodesInfo,
+      getDropAreaRect,
       dragOverNodeId,
       dragOverSlotParentProp,
       dragOverZone,
@@ -627,239 +783,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     ],
   );
 
-  const getNodeSlotFirstChild = React.useCallback(
-    (node: appDom.PageNode | appDom.ElementNode, parentProp: string): appDom.ElementNode | null => {
-      const nodeChildren =
-        (appDom.getChildNodes(dom, node) as appDom.NodeChildren<appDom.ElementNode>)[parentProp] ||
-        [];
-      return nodeChildren.length > 0 ? nodeChildren[0] : null;
-    },
-    [dom],
-  );
-
-  const getNodeSlotLastChild = React.useCallback(
-    (node: appDom.PageNode | appDom.ElementNode, parentProp: string): appDom.ElementNode | null => {
-      const nodeChildren =
-        (appDom.getChildNodes(dom, node) as appDom.NodeChildren<appDom.ElementNode>)[parentProp] ||
-        [];
-      return nodeChildren.length > 0 ? nodeChildren[nodeChildren.length - 1] : null;
-    },
-    [dom],
-  );
-
-  const getNodeDropAreaHighlightedZone = React.useCallback(
-    (node: appDom.AppDomNode, parentProp: string | null = null): DropZone | null => {
-      const nodeInfo = nodesInfo[node.id];
-
-      const parent = appDom.getParent(dom, node);
-      const parentNodeInfo = parent && nodesInfo[parent.id];
-
-      const parentParent = parent && appDom.getParent(dom, parent);
-
-      if (dragOverZone && !availableDropZones.includes(dragOverZone)) {
-        return null;
-      }
-
-      if (dragOverZone === DROP_ZONE_TOP) {
-        // Is dragging over page top
-        if (parent && parent.id === dragOverNodeId && appDom.isPage(parent)) {
-          const pageFirstChild = getNodeSlotFirstChild(parent, 'children');
-
-          const isPageFirstChild = pageFirstChild ? node.id === pageFirstChild.id : false;
-
-          return isPageFirstChild ? DROP_ZONE_TOP : null;
-        }
-      }
-
-      if (dragOverZone === DROP_ZONE_CENTER) {
-        // Is dragging over parent element center
-        if (parent && parent.id === dragOverNodeId) {
-          const nodeParentProp = node.parentProp;
-
-          const parentLastChild =
-            nodeParentProp && (appDom.isPage(parent) || appDom.isElement(parent))
-              ? getNodeSlotLastChild(parent, nodeParentProp)
-              : null;
-
-          const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
-
-          const nodeSlots = nodeInfo?.slots || null;
-          const hasMultipleSlots = nodeSlots && Object.keys(nodeSlots).length > 1;
-
-          const parentSlots = parentNodeInfo?.slots || null;
-
-          const parentFlowDirection =
-            parentSlots && nodeParentProp && parentSlots[nodeParentProp]?.flowDirection;
-
-          return parentFlowDirection && isParentLastChild && (!hasMultipleSlots || !parentProp)
-            ? getChildNodeHighlightedZone(parentFlowDirection)
-            : null;
-        }
-        // Is dragging over slot center
-        if (node.id === dragOverNodeId && parentProp && parentProp === dragOverSlotParentProp) {
-          if (appDom.isPage(node)) {
-            return DROP_ZONE_CENTER;
-          }
-
-          const nodeChildren =
-            (parentProp && appDom.isElement(node) && appDom.getChildNodes(dom, node)[parentProp]) ||
-            [];
-          return nodeChildren.length === 0 ? DROP_ZONE_CENTER : null;
-        }
-      }
-
-      if (dragOverZone === DROP_ZONE_LEFT) {
-        // Is dragging over parent page row left, and parent page row is a child of the page
-        if (
-          parent &&
-          parentParent &&
-          parent.id === dragOverNodeId &&
-          appDom.isElement(parent) &&
-          isPageRow(parent) &&
-          appDom.isPage(parentParent)
-        ) {
-          const nodeParentProp = node.parentProp;
-
-          const parentFirstChild =
-            nodeParentProp && (appDom.isPage(parent) || appDom.isElement(parent))
-              ? getNodeSlotFirstChild(parent, nodeParentProp)
-              : null;
-
-          const isParentFirstChild = parentFirstChild ? node.id === parentFirstChild.id : false;
-
-          return isParentFirstChild ? DROP_ZONE_LEFT : null;
-        }
-
-        // Is dragging over page row, and is a child of the page
-        if (parent && appDom.isElement(node) && isPageRow(node) && appDom.isPage(parent)) {
-          return null;
-        }
-      }
-
-      return node.id === dragOverNodeId && parentProp === dragOverSlotParentProp
-        ? dragOverZone
-        : null;
-    },
-    [
-      availableDropZones,
-      dom,
-      dragOverNodeId,
-      dragOverSlotParentProp,
-      dragOverZone,
-      getNodeSlotFirstChild,
-      getNodeSlotLastChild,
-      nodesInfo,
-    ],
-  );
-
-  const deleteOrphanedLayoutComponents = React.useCallback(
-    (movedOrDeletedNode: appDom.ElementNode, moveTargetNodeId: NodeId | null = null) => {
-      const movedOrDeletedNodeParentProp = movedOrDeletedNode.parentProp;
-
-      const parent = appDom.getParent(dom, movedOrDeletedNode);
-      const parentParent = parent && appDom.getParent(dom, parent);
-      const parentParentParent = parentParent && appDom.getParent(dom, parentParent);
-
-      const parentChildren =
-        parent && movedOrDeletedNodeParentProp
-          ? (appDom.getChildNodes(dom, parent) as appDom.NodeChildren<appDom.ElementNode>)[
-              movedOrDeletedNodeParentProp
-            ]
-          : [];
-
-      const isOnlyLayoutContainerChild =
-        parent &&
-        appDom.isElement(parent) &&
-        isPageLayoutComponent(parent) &&
-        parentChildren.length === 1;
-
-      const isParentOnlyLayoutContainerChild =
-        parentParent &&
-        parent.parentProp &&
-        appDom.isElement(parentParent) &&
-        isPageLayoutComponent(parentParent) &&
-        appDom.getChildNodes(dom, parentParent)[parent.parentProp].length === 1;
-
-      const isSecondLastLayoutContainerChild =
-        parent &&
-        appDom.isElement(parent) &&
-        (isPageRow(parent) || isPageColumn(parent)) &&
-        parentChildren.length === 2;
-
-      const hasNoLayoutContainerSiblings =
-        parentChildren.filter(
-          (child) =>
-            child.id !== movedOrDeletedNode.id && (isPageRow(child) || isPageColumn(child)),
-        ).length === 0;
-
-      if (isSecondLastLayoutContainerChild && hasNoLayoutContainerSiblings) {
-        if (parent.parentIndex && parentParent && appDom.isElement(parentParent)) {
-          const lastContainerChild = parentChildren.filter(
-            (child) => child.id !== movedOrDeletedNode.id,
-          )[0];
-
-          if (lastContainerChild.parentProp) {
-            if (moveTargetNodeId !== parent.id && moveTargetNodeId !== lastContainerChild.id) {
-              domApi.moveNode(
-                lastContainerChild,
-                parentParent,
-                lastContainerChild.parentProp,
-                parent.parentIndex,
-              );
-
-              if (isPageColumn(parent)) {
-                domApi.setNodeNamespacedProp(
-                  lastContainerChild,
-                  'layout',
-                  'columnSize',
-                  parent.layout?.columnSize || appDom.createConst(1),
-                );
-              }
-
-              domApi.removeNode(parent.id);
-            }
-
-            if (
-              parentParentParent &&
-              appDom.isElement(parentParentParent) &&
-              isParentOnlyLayoutContainerChild &&
-              moveTargetNodeId !== parentParent.id
-            ) {
-              domApi.moveNode(
-                lastContainerChild,
-                parentParentParent,
-                lastContainerChild.parentProp,
-              );
-
-              if (isPageColumn(parentParent)) {
-                domApi.setNodeNamespacedProp(
-                  lastContainerChild,
-                  'layout',
-                  'columnSize',
-                  parentParent.layout?.columnSize || appDom.createConst(1),
-                );
-              }
-
-              domApi.removeNode(parentParent.id);
-            }
-          }
-        }
-      }
-
-      if (isOnlyLayoutContainerChild) {
-        domApi.removeNode(parent.id);
-
-        if (isParentOnlyLayoutContainerChild && moveTargetNodeId !== parentParent.id) {
-          domApi.removeNode(parentParent.id);
-        }
-      }
-    },
-    [dom, domApi],
-  );
-
   const handleNodeDrop = React.useCallback(
     (event: React.DragEvent<Element>) => {
-      const draggedNode = getCurrentlyDraggedNode();
       const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
 
       if (!draggedNode || !cursorPos || !dragOverNodeId || !dragOverZone) {
@@ -898,9 +823,19 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       const originalParent = parent;
       const originalParentInfo = parent && nodesInfo[parent.id];
 
+      const isOriginalParentPage = originalParent ? appDom.isPage(originalParent) : false;
+
       const originalParentSlots = originalParentInfo?.slots || null;
       const originalParentSlot =
         (originalParentSlots && originalParentSlots[dragOverNodeParentProp]) || null;
+
+      const isOriginalParentHorizontalContainer = originalParentSlot
+        ? isHorizontalFlow(originalParentSlot.flowDirection)
+        : false;
+      const isOriginalParentNonPageVerticalContainer =
+        !isOriginalParentPage && originalParentSlot
+          ? isVerticalFlow(originalParentSlot.flowDirection)
+          : false;
 
       let addOrMoveNode = domApi.addNode;
       if (selection) {
@@ -930,8 +865,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
       }
 
       if (isDraggingOverElement && parent && (appDom.isPage(parent) || appDom.isElement(parent))) {
-        const isOriginalParentPage = originalParent ? appDom.isPage(originalParent) : false;
-
         const isDraggingOverRow = isDraggingOverElement && isPageRow(dragOverNode);
 
         const isDraggingOverHorizontalContainer = dragOverSlot
@@ -944,10 +877,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         if (dragOverZone === DROP_ZONE_CENTER && dragOverSlotParentProp) {
           addOrMoveNode(draggedNode, dragOverNode, dragOverSlotParentProp);
         }
-
-        const isOriginalParentHorizontalContainer = originalParentSlot
-          ? isHorizontalFlow(originalParentSlot.flowDirection)
-          : false;
 
         if ([DROP_ZONE_TOP, DROP_ZONE_BOTTOM].includes(dragOverZone)) {
           if (!isDraggingOverVerticalContainer) {
@@ -1026,11 +955,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           }
         }
 
-        const isOriginalParentNonPageVerticalContainer =
-          !isOriginalParentPage && originalParentSlot
-            ? isVerticalFlow(originalParentSlot.flowDirection)
-            : false;
-
         if ([DROP_ZONE_RIGHT, DROP_ZONE_LEFT].includes(dragOverZone)) {
           if (!isDraggingOverHorizontalContainer) {
             if (isOriginalParentNonPageVerticalContainer) {
@@ -1100,13 +1024,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     [
       api,
       availableDropZones,
+      canvasHostRef,
       deleteOrphanedLayoutComponents,
       dom,
       domApi,
       dragOverNodeId,
       dragOverSlotParentProp,
       dragOverZone,
-      getCurrentlyDraggedNode,
+      draggedNode,
       newNode,
       nodesInfo,
       selection,
@@ -1134,133 +1059,28 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     };
   }, [handleNodeDragEnd]);
 
-  const handleNodeMouseUp = React.useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
+  const resizePreviewElementRef = React.useRef<HTMLDivElement | null>(null);
+  const resizePreviewElement = resizePreviewElementRef.current;
 
-      if (!cursorPos || draggedNodeId) {
-        return;
-      }
-
-      const activeAreaId = findAreaAt(selectionRects, cursorPos.x, cursorPos.y);
-      const newSelectedNodeId = (activeAreaId && getDropAreaNodeId(activeAreaId)) || null;
-      const newSelectedNode = newSelectedNodeId && appDom.getMaybeNode(dom, newSelectedNodeId);
-      if (newSelectedNode && appDom.isElement(newSelectedNode)) {
-        api.select(newSelectedNodeId);
-      } else {
-        api.select(null);
-      }
-    },
-    [draggedNodeId, selectionRects, dom, api],
-  );
-
-  const handleDelete = React.useCallback(
-    (nodeId: NodeId) => (event?: React.MouseEvent<HTMLElement>) => {
-      if (event) {
-        event.stopPropagation();
-      }
-
-      const toRemove = appDom.getNode(dom, nodeId);
-
-      domApi.removeNode(toRemove.id);
-
-      if (appDom.isElement(toRemove)) {
-        deleteOrphanedLayoutComponents(toRemove);
-      }
-
-      api.deselect();
-    },
-    [dom, domApi, api, deleteOrphanedLayoutComponents],
-  );
-
-  const handleKeyDown = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (selection && event.key === 'Backspace') {
-        handleDelete(selection)();
-      }
-    },
-    [selection, handleDelete],
-  );
-
-  const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
-
-  const nodesWithInteraction = React.useMemo<Set<NodeId>>(() => {
-    if (!selectedNode) {
-      return new Set();
-    }
-    return new Set(
-      [...appDom.getPageAncestors(dom, selectedNode), selectedNode].map((node) => node.id),
-    );
-  }, [dom, selectedNode]);
-
-  const handlePageViewStateUpdate = React.useCallback(() => {
-    const rootElm = canvasHostRef.current?.getRootElm();
-
-    if (!rootElm) {
-      return;
-    }
-
-    api.pageViewStateUpdate(getPageViewState(rootElm));
-  }, [api]);
-
-  const navigate = useNavigate();
-
-  const handleRuntimeEvent = React.useCallback(
-    (event: RuntimeEvent) => {
-      switch (event.type) {
-        case 'propUpdated': {
-          const node = appDom.getNode(dom, event.nodeId as NodeId, 'element');
-          const actual = node.props?.[event.prop];
-          if (actual && actual.type !== 'const') {
-            console.warn(`Can't update a non-const prop "${event.prop}" on node "${node.id}"`);
-            return;
-          }
-
-          const newValue: unknown =
-            typeof event.value === 'function' ? event.value(actual?.value) : event.value;
-
-          domApi.setNodeNamespacedProp(node, 'props', event.prop, {
-            type: 'const',
-            value: newValue,
-          });
-          return;
-        }
-        case 'pageStateUpdated': {
-          api.pageStateUpdate(event.pageState);
-          return;
-        }
-        case 'pageBindingsUpdated': {
-          api.pageBindingsUpdate(event.bindings);
-          return;
-        }
-        case 'afterRender': {
-          return;
-        }
-        case 'pageNavigationRequest': {
-          navigate(`../pages/${event.pageNodeId}`);
-          return;
-        }
-        default:
-          throw new Error(
-            `received unrecognized event "${(event as RuntimeEvent).type}" from editor runtime`,
-          );
-      }
-    },
-    [dom, domApi, api, navigate],
-  );
+  const overlayGridRef = React.useRef<OverlayGridHandle>({
+    gridElement: null,
+    getMinColumnWidth: () => 0,
+    getLeftColumnEdges: () => [],
+    getRightColumnEdges: () => [],
+  });
 
   const normalizePageRowColumnSizes = React.useCallback(
     (pageRowNode: appDom.ElementNode): number[] => {
-      const children = appDom.getChildNodes(dom, pageRowNode).children;
+      const nodeChildren = appDom.getChildNodes(dom, pageRowNode).children;
 
-      const layoutColumnSizes = children.map((child) => child.layout?.columnSize?.value || 1);
+      const layoutColumnSizes = nodeChildren.map((child) => child.layout?.columnSize?.value || 1);
       const totalLayoutColumnSizes = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
 
       const normalizedLayoutColumnSizes = layoutColumnSizes.map(
-        (size) => (size * children.length) / totalLayoutColumnSizes,
+        (size) => (size * nodeChildren.length) / totalLayoutColumnSizes,
       );
 
-      children.forEach((child, childIndex) => {
+      nodeChildren.forEach((child, childIndex) => {
         if (child.layout?.columnSize) {
           domApi.setNodeNamespacedProp(
             child,
@@ -1281,10 +1101,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   React.useEffect(() => {
     pageNodes.forEach((node: appDom.AppDomNode) => {
       if (appDom.isElement(node) && isPageRow(node)) {
-        const children = appDom.getChildNodes(dom, node).children;
-        const childrenCount = children.length;
+        const nodeChildren = appDom.getChildNodes(dom, node).children;
+        const childrenCount = nodeChildren?.length || 0;
 
-        if (childrenCount < previousRowColumnCountsRef.current[node.id]) {
+        if (childrenCount > 0 && childrenCount < previousRowColumnCountsRef.current[node.id]) {
           normalizePageRowColumnSizes(node);
         }
 
@@ -1293,24 +1113,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     });
   }, [dom, normalizePageRowColumnSizes, pageNodes]);
 
-  const resizePreviewElementRef = React.useRef<HTMLDivElement | null>(null);
-  const resizePreviewElement = resizePreviewElementRef.current;
-
-  const handleEdgeDragStart = React.useCallback(
-    (node: appDom.ElementNode, edge: RectangleEdge) => (event: React.MouseEvent<HTMLElement>) => {
-      event.stopPropagation();
-
-      api.edgeDragStart({ nodeId: node.id, edge });
-
-      api.select(node.id);
-    },
-    [api],
-  );
-
   const handleEdgeDragOver = React.useCallback(
     (event: React.MouseEvent<Element>) => {
-      const draggedNode = getCurrentlyDraggedNode();
-
       if (!draggedNode) {
         return;
       }
@@ -1344,9 +1148,14 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
           const minGridColumnWidth = overlayGridRef.current.getMinColumnWidth();
 
+          const previousSibling = appDom.getSiblingBeforeNode(dom, draggedNode, 'children');
+          const previousSiblingInfo = previousSibling && nodesInfo[previousSibling.id];
+          const previousSiblingRect = previousSiblingInfo?.rect;
+
           if (
             draggedEdge === RECTANGLE_EDGE_LEFT &&
-            cursorPos.x > parentRect.x + minGridColumnWidth &&
+            cursorPos.x >
+              Math.max(parentRect.x, previousSiblingRect?.x || 0) + minGridColumnWidth &&
             cursorPos.x < draggedNodeRect.x + draggedNodeRect.width - minGridColumnWidth
           ) {
             const updatedTransformScale =
@@ -1355,10 +1164,20 @@ export default function RenderPanel({ className }: RenderPanelProps) {
             resizePreviewElement.style.transformOrigin = '100% 50%';
             resizePreviewElement.style.transform = `scaleX(${updatedTransformScale})`;
           }
+
+          const nextSibling = appDom.getSiblingAfterNode(dom, draggedNode, 'children');
+          const nextSiblingInfo = nextSibling && nodesInfo[nextSibling.id];
+          const nextSiblingRect = nextSiblingInfo?.rect;
+
           if (
             draggedEdge === RECTANGLE_EDGE_RIGHT &&
             cursorPos.x > draggedNodeRect.x + minGridColumnWidth &&
-            cursorPos.x < parentRect.x + parentRect.width - minGridColumnWidth
+            cursorPos.x <
+              Math.min(
+                parentRect.x + parentRect.width,
+                nextSiblingRect ? nextSiblingRect?.x + nextSiblingRect?.width : 0,
+              ) -
+                minGridColumnWidth
           ) {
             const updatedTransformScale = snappedToGridCursorRelativePosX / draggedNodeRect.width;
 
@@ -1382,22 +1201,12 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
       }
     },
-    [
-      canvasHostRef,
-      dom,
-      draggedEdge,
-      getCurrentlyDraggedNode,
-      nodesInfo,
-      overlayGridRef,
-      resizePreviewElement,
-    ],
+    [canvasHostRef, dom, draggedEdge, draggedNode, nodesInfo, resizePreviewElement],
   );
 
   const handleEdgeDragEnd = React.useCallback(
     (event: React.MouseEvent<Element>) => {
       event.preventDefault();
-
-      const draggedNode = getCurrentlyDraggedNode();
 
       if (!draggedNode) {
         return;
@@ -1495,169 +1304,108 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
       api.dragEnd();
     },
-    [api, dom, domApi, draggedEdge, getCurrentlyDraggedNode, nodesInfo, resizePreviewElement],
+    [api, dom, domApi, draggedEdge, draggedNode, nodesInfo, resizePreviewElement],
   );
 
   return (
-    <RenderPanelRoot className={className}>
-      <EditorCanvasHost
-        ref={canvasHostRef}
-        appId={appId}
-        className={classes.view}
-        dom={dom}
-        pageNodeId={pageNodeId}
-        onRuntimeEvent={handleRuntimeEvent}
-        onScreenUpdate={handlePageViewStateUpdate}
-        overlay={
-          <OverlayRoot
-            className={clsx({
-              [overlayClasses.componentDragging]: isDraggingOver,
-              [overlayClasses.resizeHorizontal]:
-                draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT,
-              [overlayClasses.resizeVertical]:
-                draggedEdge === RECTANGLE_EDGE_TOP || draggedEdge === RECTANGLE_EDGE_BOTTOM,
-            })}
-            // Need this to be able to capture key events
-            tabIndex={0}
-            onKeyDown={handleKeyDown}
-            {...(draggedEdge
-              ? {
-                  onMouseMove: handleEdgeDragOver,
-                  onMouseUp: handleEdgeDragEnd,
+    <OverlayRoot
+      className={clsx({
+        [overlayClasses.nodeDrag]: isDraggingOver,
+        [overlayClasses.resizeHorizontal]:
+          draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT,
+        [overlayClasses.resizeVertical]:
+          draggedEdge === RECTANGLE_EDGE_TOP || draggedEdge === RECTANGLE_EDGE_BOTTOM,
+      })}
+      // Need this to be able to capture key events
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      {...(draggedEdge
+        ? {
+            onMouseMove: handleEdgeDragOver,
+            onMouseUp: handleEdgeDragEnd,
+          }
+        : {
+            onDragOver: handleNodeDragOver,
+            onDrop: handleNodeDrop,
+            onDragEnd: handleNodeDragEnd,
+            // This component has `pointer-events: none`, but we will selectively enable pointer-events
+            // for its children. We can still capture the click gobally
+            onMouseUp: handleNodeMouseUp,
+          })}
+    >
+      {pageNodes.map((node) => {
+        const nodeParentProp = node.parentProp;
+
+        const nodeInfo = nodesInfo[node.id];
+        const nodeRect = nodeInfo?.rect || null;
+
+        const parent = appDom.getParent(dom, node);
+
+        if (!nodeRect) {
+          return null;
+        }
+
+        const isPageNode = appDom.isPage(node);
+
+        const isFirstChild =
+          parent && appDom.isElement(parent) && nodeParentProp
+            ? appDom.getNodeFirstChild(dom, parent, node.parentProp)?.id === node.id
+            : false;
+        const isLastChild =
+          parent && appDom.isElement(parent) && nodeParentProp
+            ? appDom.getNodeLastChild(dom, parent, nodeParentProp)?.id === node.id
+            : false;
+
+        const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
+
+        const isSelected = selectedNode ? selectedNode.id === node.id : false;
+        const isInteractive = interactiveNodes.has(node.id) && !draggedEdge;
+
+        const isVerticallyResizable = Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
+
+        const isResizing = Boolean(draggedEdge) && node.id === draggedNodeId;
+
+        return (
+          <React.Fragment key={node.id}>
+            {!isPageNode ? (
+              <NodeHud
+                node={node}
+                rect={nodeRect}
+                isSelected={isSelected}
+                isInteractive={isInteractive}
+                onNodeDragStart={handleNodeDragStart(node as appDom.ElementNode)}
+                draggableEdges={[
+                  ...(isPageRowChild
+                    ? [
+                        ...(isFirstChild ? [] : [RECTANGLE_EDGE_LEFT as RectangleEdge]),
+                        ...(isLastChild ? [] : [RECTANGLE_EDGE_RIGHT as RectangleEdge]),
+                      ]
+                    : []),
+                  ...(isVerticallyResizable ? [RECTANGLE_EDGE_BOTTOM as RectangleEdge] : []),
+                ]}
+                onEdgeDragStart={
+                  isPageRowChild || isVerticallyResizable ? handleEdgeDragStart : undefined
                 }
-              : {
-                  onDragOver: handleNodeDragOver,
-                  onDrop: handleNodeDrop,
-                  onDragEnd: handleNodeDragEnd,
-                  // This component has `pointer-events: none`, but we will selectively enable pointer-events
-                  // for its children. We can still capture the click gobally
-                  onMouseUp: handleNodeMouseUp,
-                })}
-          >
-            {pageNodes.map((node) => {
-              const nodeInfo = nodesInfo[node.id];
-
-              const parent = appDom.getParent(dom, node);
-              const parentInfo = (parent && nodesInfo[parent.id]) || null;
-
-              const freeSlots = nodeInfo?.slots || {};
-              const freeSlotEntries = Object.entries(freeSlots) as ExactEntriesOf<SlotsState>;
-
-              const hasFreeSlots = freeSlotEntries.length > 0;
-              const hasMultipleFreeSlots = freeSlotEntries.length > 1;
-
-              const isPageNode = appDom.isPage(node);
-
-              const isPageChild = parent ? appDom.isPage(parent) : false;
-              const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
-
-              const childNodes = appDom.getChildNodes(
-                dom,
-                node,
-              ) as appDom.NodeChildren<appDom.ElementNode>;
-
-              const parentChildNodes =
-                parent &&
-                (appDom.getChildNodes(dom, parent) as appDom.NodeChildren<appDom.ElementNode>);
-              const parentSlotChildNodes =
-                parentChildNodes && node.parentProp && parentChildNodes[node.parentProp];
-
-              const isFirstChild = parentSlotChildNodes
-                ? parentSlotChildNodes[0].id === node.id
-                : false;
-              const isLastChild = parentSlotChildNodes
-                ? parentSlotChildNodes[parentSlotChildNodes.length - 1].id === node.id
-                : false;
-
-              const isVerticallyResizable = Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
-
-              const nodeRect = nodeInfo?.rect || null;
-              const hasNodeOverlay = isPageNode || appDom.isElement(node);
-
-              if (!nodeRect || !hasNodeOverlay) {
-                return null;
-              }
-
-              return (
-                <React.Fragment key={node.id}>
-                  {!isPageNode ? (
-                    <NodeHud
-                      node={node}
-                      rect={nodeRect}
-                      selected={selectedNode?.id === node.id}
-                      allowInteraction={nodesWithInteraction.has(node.id) && !draggedEdge}
-                      onNodeDragStart={handleNodeDragStart(node)}
-                      draggableEdges={[
-                        ...(isPageRowChild
-                          ? [
-                              ...(isFirstChild ? [] : [RECTANGLE_EDGE_LEFT as RectangleEdge]),
-                              ...(isLastChild ? [] : [RECTANGLE_EDGE_RIGHT as RectangleEdge]),
-                            ]
-                          : []),
-                        ...(isVerticallyResizable ? [RECTANGLE_EDGE_BOTTOM as RectangleEdge] : []),
-                      ]}
-                      onEdgeDragStart={
-                        isPageRowChild || isVerticallyResizable ? handleEdgeDragStart : undefined
-                      }
-                      onDelete={handleDelete(node.id)}
-                      isResizing={Boolean(draggedEdge) && node.id === draggedNodeId}
-                      resizePreviewElementRef={resizePreviewElementRef}
-                    />
-                  ) : null}
-                  {hasFreeSlots
-                    ? freeSlotEntries.map(([parentProp, freeSlot]) => {
-                        if (!freeSlot) {
-                          return null;
-                        }
-
-                        const dropAreaRect = dropAreaRects[getDropAreaId(node.id, parentProp)];
-
-                        const slotChildNodes = childNodes[parentProp] || [];
-                        const isEmptySlot = slotChildNodes.length === 0;
-
-                        if (isPageNode && !isEmptySlot) {
-                          return null;
-                        }
-
-                        return (
-                          <NodeDropArea
-                            key={`${node.id}:${parentProp}`}
-                            node={node}
-                            parentInfo={parentInfo}
-                            layoutRect={nodeRect}
-                            dropAreaRect={dropAreaRect}
-                            slotRect={freeSlot.rect}
-                            highlightedZone={getNodeDropAreaHighlightedZone(node, parentProp)}
-                            isEmptySlot={isEmptySlot}
-                            isPageChild={isPageChild}
-                          />
-                        );
-                      })
-                    : null}
-                  {!hasFreeSlots || hasMultipleFreeSlots ? (
-                    <NodeDropArea
-                      node={node}
-                      parentInfo={parentInfo}
-                      layoutRect={nodeRect}
-                      dropAreaRect={dropAreaRects[node.id]}
-                      highlightedZone={getNodeDropAreaHighlightedZone(node)}
-                      isEmptySlot={false}
-                      isPageChild={isPageChild}
-                    />
-                  ) : null}
-                </React.Fragment>
-              );
-            })}
-            {/* 
+                onDelete={handleNodeDelete(node.id)}
+                isResizing={isResizing}
+                resizePreviewElementRef={resizePreviewElementRef}
+              />
+            ) : null}
+            <DragAndDropNode
+              node={node}
+              getDropAreaRect={getDropAreaRect}
+              availableDropZones={availableDropZones}
+            />
+          </React.Fragment>
+        );
+      })}
+      {/* 
             This overlay allows passing through pointer-events through a pinhole
             This allows interactivity on the selected element only, while maintaining
-            a reliable click target for the rest of the page
-          */}
-            <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
-            {draggedEdge ? <OverlayGrid ref={overlayGridRef} /> : null}
-          </OverlayRoot>
-        }
-      />
-    </RenderPanelRoot>
+            a reliable click target for the rest of the page 
+      */}
+      <PinholeOverlay className={overlayClasses.hudOverlay} pinhole={selectedRect} />
+      {draggedEdge ? <OverlayGrid ref={overlayGridRef} /> : null}
+    </OverlayRoot>
   );
 }

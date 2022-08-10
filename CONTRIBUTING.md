@@ -102,6 +102,6 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
    # add --prerelease if necessary
    yarn release:docker
    ```
-   This command will retag the Docker image of the release commit in `master` to the version being released and also to "latest", and push those new tags. During the release, no new Docker images are created.
+   This command runs a Github action that retags the Docker image of the release commit in `master` to the version being released and also to "latest", and pushes those new tags. During the release, no new Docker images are created.
 
 1. Create a new Github release. Use `<version number>` as the tag and `<commit of merged PR>` as the target. Use the cleaned changelog as the body and the `<version number>` as the title. Mark as prerelease if necessary.

@@ -92,7 +92,14 @@ export interface QueryEditorModel<Q> {
   params?: BindableAttrValues<any>;
 }
 
+export interface QueryEditorShellProps {
+  children?: React.ReactNode;
+  isDirty?: boolean;
+  onCommit?: () => void;
+}
+
 export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
+  QueryEditorShell: React.ComponentType<QueryEditorShellProps>;
   connectionParams: Maybe<P>;
   globalScope: Record<string, any>;
   liveParams: Record<string, LiveBinding>;

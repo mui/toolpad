@@ -10,7 +10,7 @@ export interface QueryInputPanelProps {
 
 export default function QueryInputPanel({ children, onRunPreview }: QueryInputPanelProps) {
   return (
-    <Box sx={{ height: '100%', overflow: 'auto' }}>
+    <Box sx={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
       <Toolbar>
         <LoadingButton startIcon={<PlayArrowIcon />} onClick={onRunPreview}>
           Preview

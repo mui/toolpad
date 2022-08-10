@@ -1,34 +1,43 @@
 /**
  * Implementation adapted from https://github.com/github/fetch/blob/master/fetch.js
  */
+import './abortController';
 import './domException';
 import './formData';
 import './headers';
 import './url';
 import './web-streams';
 import { formDataToBlob } from 'formdata-polyfill/esm.min';
+import invariant from 'invariant';
 import { ToolpadFunctionRuntimeBridge, FetchOptions } from './types';
 
 const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = (global as any).TOOLPAD_BRIDGE;
 
-/*
+/* 
+TODO: Add Blob support. e.g. Satisfy the following invariant:
+
+invariant(
   'FileReader' in global &&
-  'Blob' in global &&
-  (function () {
-    try {
-      new Blob();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  })()
-*/
+    'Blob' in global &&
+    (() => {
+      try {
+        // eslint-disable-next-line no-new
+        new Blob();
+        return true;
+      } catch (e) {
+        return false;
+      }
+    })(),
+  'Blob is required',
+); */
 const SUPPORTS_BLOB = false;
 
-/*
-  abortController: 'AbortController' in global
-*/
-const SUPPORTS_ABORTCONTROLLER = false;
+invariant('DOMException' in global, 'DOMException is required');
+invariant('ArrayBuffer' in global, 'ArrayBuffer is required');
+invariant('FormData' in global, 'FormData is required');
+invariant('Symbol' in global && 'iterator' in Symbol, 'Iterable is required');
+invariant('URLSearchParams' in global, 'URLSearchParams is required');
+invariant('AbortController' in global, 'AbortController is required');
 
 function isDataView(obj: unknown): obj is DataView {
   return !!obj && obj instanceof DataView;
@@ -258,11 +267,8 @@ class Request extends Body {
       options.signal ||
       this.signal ||
       (() => {
-        if (SUPPORTS_ABORTCONTROLLER) {
-          const ctrl = new AbortController();
-          return ctrl.signal;
-        }
-        return null;
+        const ctrl = new AbortController();
+        return ctrl.signal;
       })();
     this.referrer = null;
 

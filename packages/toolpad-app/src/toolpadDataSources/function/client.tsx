@@ -1,9 +1,6 @@
 import * as React from 'react';
-import { Box, Button, Skeleton, Stack, styled, Tab, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
 import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
-
-import { LoadingButton, TabContext, TabList, TabPanel } from '@mui/lab';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Controller, useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -15,18 +12,17 @@ import {
 import lazyComponent from '../../utils/lazyComponent';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import SplitPane from '../../components/SplitPane';
-import { useConnectionContext, usePrivateQuery } from '../context';
-import client from '../../api';
+import { usePrivateQuery } from '../context';
 import JsonView from '../../components/JsonView';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
-import Console, { LogEntry } from '../../components/Console';
+import { LogEntry } from '../../components/Console';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import { isSaveDisabled } from '../../utils/forms';
-
-const HarViewer = lazyComponent(() => import('../../components/HarViewer'), {});
-
-const DebuggerTabPanel = styled(TabPanel)({ padding: 0, flex: 1, minHeight: 0 });
+import Devtools from '../../components/Devtools';
+import { createHarLog, mergeHar } from '../../utils/har';
+import useQueryPreview from '../useQueryPreview';
+import QueryInputPanel from '../QueryInputPanel';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -123,39 +119,29 @@ function QueryEditor({
     liveParams[key],
   ]);
 
-  const { appId, connectionId } = useConnectionContext();
-  const [preview, setPreview] = React.useState<FunctionResult | null>(null);
+  const previewParams = React.useMemo(
+    () => Object.fromEntries(paramsEditorLiveValue.map(([key, binding]) => [key, binding.value])),
+    [paramsEditorLiveValue],
+  );
+
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
-
-  const cancelRunPreview = React.useRef<(() => void) | null>(null);
-  const runPreview = React.useCallback(() => {
-    let canceled = false;
-
-    cancelRunPreview.current?.();
-    cancelRunPreview.current = () => {
-      canceled = true;
-    };
-
-    const currentParams = Object.fromEntries(
-      paramsEditorLiveValue.map(([key, binding]) => [key, binding.value]),
-    );
-
-    client.query
-      .dataSourceFetchPrivate(appId, connectionId, {
-        kind: 'debugExec',
-        query: value.query,
-        params: currentParams,
-      } as FunctionPrivateQuery)
-      .then((result) => {
-        if (!canceled) {
-          setPreview(result);
-          setPreviewLogs((existing) => [...existing, ...result.logs]);
-        }
-      })
-      .finally(() => {
-        cancelRunPreview.current = null;
-      });
-  }, [appId, connectionId, paramsEditorLiveValue, value.query]);
+  const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
+  const { preview, runPreview: handleRunPreview } = useQueryPreview<
+    FunctionPrivateQuery,
+    FunctionResult
+  >(
+    {
+      kind: 'debugExec',
+      query: value.query,
+      params: previewParams,
+    },
+    {
+      onPreview(result) {
+        setPreviewLogs((existing) => [...existing, ...result.logs]);
+        setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+      },
+    },
+  );
 
   const { data: secretsKeys = [] } = usePrivateQuery<FunctionPrivateQuery, string[]>({
     kind: 'secretsKeys',
@@ -180,20 +166,13 @@ function QueryEditor({
     return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
   }, [params, secretsKeys]);
 
-  const [debuggerTab, setDebuggerTab] = React.useState('console');
-  const handleDebuggerTabChange = (event: React.SyntheticEvent, newValue: string) => {
-    setDebuggerTab(newValue);
-  };
+  const handleLogClear = React.useCallback(() => setPreviewLogs([]), []);
+  const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Toolbar>
-            <LoadingButton startIcon={<PlayArrowIcon />} onClick={() => runPreview()}>
-              Preview
-            </LoadingButton>
-          </Toolbar>
+        <QueryInputPanel onRunPreview={handleRunPreview}>
           <Box sx={{ flex: 1, minHeight: 0 }}>
             <TypescriptEditor
               value={value.query.module}
@@ -201,7 +180,7 @@ function QueryEditor({
               extraLibs={extraLibs}
             />
           </Box>
-        </Box>
+        </QueryInputPanel>
 
         <Box sx={{ p: 2 }}>
           <Typography>Parameters</Typography>
@@ -223,22 +202,13 @@ function QueryEditor({
           )}
         </Box>
 
-        <TabContext value={debuggerTab}>
-          <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <TabList onChange={handleDebuggerTabChange} aria-label="Debugger">
-                <Tab label="Console" value="console" />
-                <Tab label="Network" value="network" />
-              </TabList>
-            </Box>
-            <DebuggerTabPanel value="console">
-              <Console sx={{ flex: 1 }} value={previewLogs} onChange={setPreviewLogs} />
-            </DebuggerTabPanel>
-            <DebuggerTabPanel value="network">
-              <HarViewer har={preview?.har} />
-            </DebuggerTabPanel>
-          </Box>
-        </TabContext>
+        <Devtools
+          sx={{ width: '100%', height: '100%' }}
+          log={previewLogs}
+          onLogClear={handleLogClear}
+          har={previewHar}
+          onHarClear={handleHarClear}
+        />
       </SplitPane>
     </SplitPane>
   );

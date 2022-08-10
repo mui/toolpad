@@ -132,6 +132,7 @@ interface Selection {
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
   columns?: GridColumns;
+  height?: number;
   rowIdField?: string;
   error?: Error | string;
   selection?: Selection | null;
@@ -142,6 +143,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   {
     columns: columnsProp,
     rows: rowsProp,
+    height: heightProp,
     rowIdField: rowIdFieldProp,
     error: errorProp,
     selection,
@@ -250,24 +252,28 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
 
   return (
-    <div ref={ref} style={{ height: 350, width: '100%' }}>
-      <DataGridPro
-        components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
-        onColumnResize={handleResize}
-        onColumnOrderChange={handleColumnOrderChange}
-        rows={rows}
-        columns={columns}
-        key={rowIdFieldProp}
-        getRowId={getRowId}
-        onSelectionModelChange={onSelectionModelChange}
-        selectionModel={selectionModel}
-        error={errorProp}
-        componentsProps={{
-          errorOverlay: { message: typeof errorProp === 'string' ? errorProp : errorProp?.message },
-        }}
-        {...props}
-      />
-    </div>
+    <Box>
+      <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
+        <DataGridPro
+          components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
+          onColumnResize={handleResize}
+          onColumnOrderChange={handleColumnOrderChange}
+          rows={rows}
+          columns={columns}
+          key={rowIdFieldProp}
+          getRowId={getRowId}
+          onSelectionModelChange={onSelectionModelChange}
+          selectionModel={selectionModel}
+          error={errorProp}
+          componentsProps={{
+            errorOverlay: {
+              message: typeof errorProp === 'string' ? errorProp : errorProp?.message,
+            },
+          }}
+          {...props}
+        />
+      </div>
+    </Box>
   );
 });
 
@@ -275,6 +281,7 @@ export default createComponent(DataGridComponent, {
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',
+  resizableHeightProp: 'height',
   argTypes: {
     rows: {
       typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' },
@@ -286,6 +293,10 @@ export default createComponent(DataGridComponent, {
     density: {
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },
       defaultValue: 'compact',
+    },
+    height: {
+      typeDef: { type: 'number' },
+      defaultValue: 350,
     },
     sx: {
       typeDef: { type: 'object' },

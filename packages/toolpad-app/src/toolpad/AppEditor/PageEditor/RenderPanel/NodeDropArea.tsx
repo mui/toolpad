@@ -1,14 +1,14 @@
 import * as React from 'react';
 import clsx from 'clsx';
 import { styled } from '@mui/material';
-import { NodeInfo } from '../../../types';
-import * as appDom from '../../../appDom';
+import { NodeInfo } from '../../../../types';
+import * as appDom from '../../../../appDom';
 import {
   absolutePositionCss,
   isHorizontalFlow,
   isVerticalFlow,
   Rectangle,
-} from '../../../utils/geometry';
+} from '../../../../utils/geometry';
 import {
   DropZone,
   DROP_ZONE_BOTTOM,
@@ -16,7 +16,7 @@ import {
   DROP_ZONE_LEFT,
   DROP_ZONE_RIGHT,
   DROP_ZONE_TOP,
-} from './PageEditorProvider';
+} from '../PageEditorProvider';
 
 const dropAreaHighlightClasses = {
   highlightedTop: 'DropArea_HighlightedTop',
@@ -134,11 +134,11 @@ interface NodeDropAreaProps {
 
 export default function NodeDropArea({
   node,
-  highlightedZone,
   parentInfo,
   layoutRect,
-  slotRect,
   dropAreaRect,
+  slotRect,
+  highlightedZone,
   isEmptySlot,
   isPageChild,
 }: NodeDropAreaProps) {

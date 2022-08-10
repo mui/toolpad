@@ -280,15 +280,17 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 
     const extraOptions: EditorOptions = {
       readOnly: disabled,
+      scrollbar: {
+        alwaysConsumeMouseWheel: false,
+        ...options?.scrollbar,
+      },
       ...options,
     };
 
     let instance = instanceRef.current;
 
     if (instance) {
-      if (extraOptions) {
-        instance.updateOptions(extraOptions);
-      }
+      instance.updateOptions(extraOptions);
 
       const model = instance.getModel();
       if (typeof value === 'string' && model) {

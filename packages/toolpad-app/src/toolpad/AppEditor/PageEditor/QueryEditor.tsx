@@ -46,12 +46,9 @@ import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
 import BindableEditor from './BindableEditor';
 
-const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set([
-  'rest',
-  'googleSheets',
-  'postgres',
-  'movies',
-]);
+const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set(['googleSheets', 'postgres', 'movies']);
+
+const EMPTY_OBJECT = {};
 
 export interface ConnectionSelectProps extends WithControlledProp<NodeId | null> {
   dataSource?: string;
@@ -127,7 +124,7 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
     const queryNode = appDom.createNode(dom, 'query', {
       attributes: {
         query: appDom.createConst(dataSource.getInitialQueryValue()),
-        connectionId: appDom.createConst(connectionId),
+        connectionId: appDom.createConst(appDom.ref(connectionId)),
         dataSource: appDom.createConst(dataSourceId),
       },
     });
@@ -173,35 +170,55 @@ function QueryNodeEditorDialog<Q, P>({
   const { appId } = usePageEditorState();
   const dom = useDom();
 
-  const [input, setInput] = React.useState(node);
+  const [input, setInput] = React.useState(appDom.fromLegacyQueryNode(node));
   React.useEffect(() => {
     if (open) {
-      setInput(node);
+      setInput(appDom.fromLegacyQueryNode(node));
     }
   }, [open, node]);
 
-  const connectionId = input.attributes.connectionId.value;
+  const connectionId = appDom.deref(input.attributes.connectionId.value);
   const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
+  const inputParams = input.params || EMPTY_OBJECT;
   const dataSourceId = input.attributes.dataSource?.value;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const handleConnectionChange = React.useCallback((newConnectionId: NodeId | null) => {
-    setInput((existing) =>
-      update(existing, {
-        attributes: update(existing.attributes, {
-          connectionId: newConnectionId ? appDom.createConst(newConnectionId) : undefined,
-        }),
-      }),
-    );
-  }, []);
+  const connectionParams = connection?.attributes.params.value;
 
-  const handleQueryChange = React.useCallback((model: QueryEditorModel<Q>) => {
+  const queryModel = React.useMemo(
+    () => ({
+      query: input.attributes.query.value,
+      params: inputParams,
+    }),
+    [input.attributes.query.value, inputParams],
+  );
+
+  const handleQueryModelChange = React.useCallback((model: QueryEditorModel<Q>) => {
     setInput((existing) =>
       update(existing, {
         attributes: update(existing.attributes, {
           query: appDom.createConst(model.query),
         }),
         params: model.params,
+      }),
+    );
+  }, []);
+
+  const { pageState } = usePageEditorState();
+
+  const liveParams = useEvaluateLiveBindings({
+    input: inputParams,
+    globalScope: pageState,
+  });
+
+  const handleConnectionChange = React.useCallback((newConnectionId: NodeId | null) => {
+    setInput((existing) =>
+      update(existing, {
+        attributes: update(existing.attributes, {
+          connectionId: newConnectionId
+            ? appDom.createConst(appDom.ref(newConnectionId))
+            : undefined,
+        }),
       }),
     );
   }, []);
@@ -269,13 +286,6 @@ function QueryNodeEditorDialog<Q, P>({
     },
     [],
   );
-
-  const { pageState } = usePageEditorState();
-
-  const liveParams = useEvaluateLiveBindings({
-    input: input.params || {},
-    globalScope: pageState,
-  });
 
   const handleSave = React.useCallback(() => {
     onSave(input);
@@ -380,7 +390,7 @@ function QueryNodeEditorDialog<Q, P>({
           <NodeNameEditor node={node} />
           <ConnectionSelect
             dataSource={dataSourceId}
-            value={input.attributes.connectionId.value || null}
+            value={appDom.deref(input.attributes.connectionId.value) || null}
             onChange={handleConnectionChange}
           />
         </Stack>
@@ -418,13 +428,10 @@ function QueryNodeEditorDialog<Q, P>({
                   >
                     {/* This is the exact same element as below */}
                     <dataSource.QueryEditor
-                      connectionParams={connection?.attributes.params.value}
-                      value={{
-                        query: input.attributes.query.value,
-                        params: input.params,
-                      }}
+                      connectionParams={connectionParams}
+                      value={queryModel}
                       liveParams={liveParams}
-                      onChange={handleQueryChange}
+                      onChange={handleQueryModelChange}
                       globalScope={pageState}
                     />
 
@@ -537,13 +544,10 @@ function QueryNodeEditorDialog<Q, P>({
                 </SplitPane>
               ) : (
                 <dataSource.QueryEditor
-                  connectionParams={connection?.attributes.params.value}
-                  value={{
-                    query: input.attributes.query.value,
-                    params: input.params,
-                  }}
+                  connectionParams={connectionParams}
+                  value={queryModel}
                   liveParams={liveParams}
-                  onChange={handleQueryChange}
+                  onChange={handleQueryModelChange}
                   globalScope={pageState}
                 />
               )}

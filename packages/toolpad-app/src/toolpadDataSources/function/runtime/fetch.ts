@@ -15,7 +15,7 @@ const TOOLPAD_BRIDGE: ToolpadFunctionRuntimeBridge = (global as any).TOOLPAD_BRI
 
 /* 
 TODO: Add Blob support? i.e. Satisfy the following invariant:
-We may not need it, given that's it's not part of https://wintercg.org/
+We may not need it, given that it's not part of https://wintercg.org/
 invariant(
   'FileReader' in global &&
     'Blob' in global &&

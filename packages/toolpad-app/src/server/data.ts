@@ -12,7 +12,7 @@ import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
-import evalExpression from './evalExpression';
+import applyTransform from './applyTransform';
 
 // See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
 function excludeFields<T, K extends (keyof T)[]>(
@@ -371,18 +371,13 @@ export async function setConnectionParams<P>(
   await saveDom(appId, dom);
 }
 
-async function applyTransform(transform: string, result: ApiResult<{}>): Promise<ApiResult<{}>> {
-  const transformFn = `(data) => {${transform}}`;
-  return {
-    data: await evalExpression(`${transformFn}(${JSON.stringify(result.data)})`),
-  };
-}
-
 export async function execQuery<P, Q>(
   appId: string,
   dataNode: appDom.QueryNode<Q> | appDom.MutationNode<Q>,
   params: Q,
 ): Promise<ApiResult<any>> {
+  query = appDom.fromLegacyQueryNode(query);
+
   const dataSource: ServerDataSource<P, Q, any> | undefined =
     dataNode.attributes.dataSource && serverDataSources[dataNode.attributes.dataSource.value];
   if (!dataSource) {

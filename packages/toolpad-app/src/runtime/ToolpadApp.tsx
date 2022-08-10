@@ -20,6 +20,8 @@ import {
   BindableAttrValues,
   NodeId,
   execDataSourceQuery,
+  BindableAttrValue,
+  UseDataQueryConfig,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from 'react-query';
 import {
@@ -67,6 +69,13 @@ const INITIAL_MUTATION: UseMutation = {
   isLoading: false,
   error: null,
 };
+
+const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
+  'enabled',
+  'refetchInterval',
+  'refetchOnReconnect',
+  'refetchOnWindowFocus',
+];
 
 export interface NavigateToPage {
   (pageNodeId: NodeId): void;
@@ -428,6 +437,29 @@ function MutationNode({ node }: MutationNodeProps) {
   return null;
 }
 
+interface ParseBindingOptions {
+  scopePath?: string;
+}
+
+function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions) {
+  if (bindable?.type === 'const') {
+    return {
+      scopePath,
+      result: { value: bindable.value },
+    };
+  }
+  if (bindable?.type === 'jsExpression') {
+    return {
+      scopePath,
+      expression: bindable.value,
+    };
+  }
+  return {
+    scopePath,
+    result: { value: undefined },
+  };
+}
+
 function parseBindings(
   dom: appDom.AppDom,
   page: appDom.PageNode,
@@ -447,19 +479,8 @@ function parseBindings(
       const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
-        const bindingId = `${elm.id}.props.${propName}`;
-        const scopePath =
-          componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
-        if (argType) {
-          parsedBindingsMap.set(bindingId, {
-            scopePath,
-            result: { value: argType.defaultValue },
-          });
-        }
-      }
-
-      for (const [propName, argType] of Object.entries(argTypes)) {
-        const binding = elm.props?.[propName];
+        const binding =
+          elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
         const bindingId = `${elm.id}.props.${propName}`;
         const scopePath =
           componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
@@ -472,16 +493,8 @@ function parseBindings(
               scopePath,
               result: { value: defaultValue },
             });
-          } else if (binding?.type === 'const') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              result: { value: binding?.value },
-            });
-          } else if (binding?.type === 'jsExpression') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              expression: binding?.value,
-            });
+          } else {
+            parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
           }
         }
       }
@@ -489,20 +502,11 @@ function parseBindings(
 
     if (appDom.isQuery(elm)) {
       if (elm.params) {
-        for (const [paramName, bindable] of Object.entries(elm.params)) {
+        for (const [paramName, paramValue] of Object.entries(elm.params)) {
           const bindingId = `${elm.id}.params.${paramName}`;
           const scopePath = `${elm.name}.params.${paramName}`;
-          if (bindable?.type === 'const') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              result: { value: bindable.value },
-            });
-          } else if (bindable?.type === 'jsExpression') {
-            parsedBindingsMap.set(bindingId, {
-              scopePath,
-              expression: bindable.value,
-            });
-          }
+          const bindable = paramValue || appDom.createConst(undefined);
+          parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
         }
       }
 
@@ -514,6 +518,13 @@ function parseBindings(
           scopePath,
           result: { value, loading: true },
         });
+      }
+
+      for (const configName of USE_DATA_QUERY_CONFIG_KEYS) {
+        const bindingId = `${elm.id}.config.${configName}`;
+        const scopePath = `${elm.name}.config.${configName}`;
+        const bindable = elm.attributes[configName] || appDom.createConst(undefined);
+        parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
       }
     }
 

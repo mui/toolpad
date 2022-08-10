@@ -15,6 +15,11 @@ export async function execDataSourceQuery(dataUrl: string, queryId: string, para
   return res.json();
 }
 
+export type UseDataQueryConfig = Pick<
+  UseQueryOptions<any, unknown, unknown, any[]>,
+  'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
+>;
+
 export interface UseDataQuery {
   isLoading: boolean;
   isFetching: boolean;

@@ -46,7 +46,7 @@ import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import SplitPane from '../../../components/SplitPane';
 import BindableEditor from './BindableEditor';
 
-const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set(['googleSheets', 'postgres', 'movies']);
+const LEGACY_DATASOURCE_QUERY_EDITOR_LAYOUT = new Set(['postgres', 'movies']);
 
 const EMPTY_OBJECT = {};
 

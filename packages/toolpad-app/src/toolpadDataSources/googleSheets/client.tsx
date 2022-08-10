@@ -7,6 +7,7 @@ import {
   FormControlLabel,
   Typography,
   Skeleton,
+  Box,
 } from '@mui/material';
 import * as React from 'react';
 import { UseQueryResult } from 'react-query';
@@ -20,9 +21,16 @@ import {
   GoogleSheet,
   GoogleDriveFiles,
   GoogleDriveUser,
+  GoogleSheetsPrivateQuery,
+  GoogleSheetsResult,
 } from './types';
 import useDebounced from '../../utils/useDebounced';
 import { usePrivateQuery } from '../context';
+import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
+import JsonView from '../../components/JsonView';
+import QueryInputPanel from '../QueryInputPanel';
+import SplitPane from '../../components/SplitPane';
+import useQueryPreview from '../useQueryPreview';
 
 function getInitialQueryValue(): GoogleSheetsApiQuery {
   return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '', headerRow: false };
@@ -128,64 +136,80 @@ function QueryEditor({
     [],
   );
 
+  const { preview, runPreview: handleRunPreview } = useQueryPreview<
+    GoogleSheetsPrivateQuery,
+    GoogleSheetsResult
+  >({
+    type: GoogleSheetsPrivateQueryType.DEBUG_EXEC,
+    query: value.query,
+  });
+
   return (
-    <Stack direction="column" gap={2} sx={{ px: 3, pt: 1 }}>
-      <Autocomplete
-        fullWidth
-        value={fetchedFile.data ?? null}
-        loading={fetchedFiles.isLoading}
-        loadingText={'Loading...'}
-        options={fetchedFiles.data?.files ?? []}
-        getOptionLabel={(option: GoogleDriveFile) => option.name ?? ''}
-        onInputChange={handleSpreadsheetInput}
-        onChange={handleSpreadsheetChange}
-        isOptionEqualToValue={(option: GoogleDriveFile, val: GoogleDriveFile) =>
-          option.id === val.id
-        }
-        renderInput={(params) => <TextField {...params} label="Select spreadsheet" />}
-        renderOption={(props, option) => {
-          return (
-            <li {...props} key={option.id}>
-              {option.name}
-            </li>
-          );
-        }}
-      />
-      <Autocomplete
-        fullWidth
-        loading={fetchedSpreadsheet.isLoading}
-        value={selectedSheet}
-        loadingText={'Loading...'}
-        options={fetchedSpreadsheet.data?.sheets ?? []}
-        getOptionLabel={(option: GoogleSheet) => option.properties?.title ?? ''}
-        onChange={handleSheetChange}
-        renderInput={(params) => <TextField {...params} label="Select sheet" />}
-        renderOption={(props, option) => {
-          return (
-            <li {...props} key={option?.properties?.sheetId}>
-              {option?.properties?.title}
-            </li>
-          );
-        }}
-      />
-      <TextField
-        label="Range"
-        helperText={`In the form of A1:Z999`}
-        value={value.query.ranges}
-        disabled={!value.query.sheetName}
-        onChange={handleRangeChange}
-      />
-      <FormControlLabel
-        label="First row contains column headers"
-        control={
-          <Checkbox
-            checked={value.query.headerRow}
-            onChange={handleTransformChange}
-            inputProps={{ 'aria-label': 'controlled' }}
+    <SplitPane split="vertical" size="50%" allowResize>
+      <QueryInputPanel onRunPreview={handleRunPreview}>
+        <Stack direction="column" gap={2} sx={{ px: 3, pt: 1 }}>
+          <Autocomplete
+            fullWidth
+            value={fetchedFile.data ?? null}
+            loading={fetchedFiles.isLoading}
+            loadingText={'Loading...'}
+            options={fetchedFiles.data?.files ?? []}
+            getOptionLabel={(option: GoogleDriveFile) => option.name ?? ''}
+            onInputChange={handleSpreadsheetInput}
+            onChange={handleSpreadsheetChange}
+            isOptionEqualToValue={(option: GoogleDriveFile, val: GoogleDriveFile) =>
+              option.id === val.id
+            }
+            renderInput={(params) => <TextField {...params} label="Select spreadsheet" />}
+            renderOption={(props, option) => {
+              return (
+                <li {...props} key={option.id}>
+                  {option.name}
+                </li>
+              );
+            }}
           />
-        }
-      />
-    </Stack>
+          <Autocomplete
+            fullWidth
+            loading={fetchedSpreadsheet.isLoading}
+            value={selectedSheet}
+            loadingText={'Loading...'}
+            options={fetchedSpreadsheet.data?.sheets ?? []}
+            getOptionLabel={(option: GoogleSheet) => option.properties?.title ?? ''}
+            onChange={handleSheetChange}
+            renderInput={(params) => <TextField {...params} label="Select sheet" />}
+            renderOption={(props, option) => {
+              return (
+                <li {...props} key={option?.properties?.sheetId}>
+                  {option?.properties?.title}
+                </li>
+              );
+            }}
+          />
+          <TextField
+            label="Range"
+            helperText={`In the form of A1:Z999`}
+            value={value.query.ranges}
+            disabled={!value.query.sheetName}
+            onChange={handleRangeChange}
+          />
+          <FormControlLabel
+            label="First row contains column headers"
+            control={
+              <Checkbox
+                checked={value.query.headerRow}
+                onChange={handleTransformChange}
+                inputProps={{ 'aria-label': 'controlled' }}
+              />
+            }
+          />
+        </Stack>
+      </QueryInputPanel>
+
+      <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
+        {preview?.error ? <ErrorAlert error={preview?.error} /> : <JsonView src={preview?.data} />}
+      </Box>
+    </SplitPane>
   );
 }
 

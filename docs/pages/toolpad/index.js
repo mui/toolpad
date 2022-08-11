@@ -6,6 +6,7 @@ import AppHeader from 'docs/src/layouts/AppHeader';
 import AppFooter from 'docs/src/layouts/AppFooter';
 import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
 import ToolpadHero from '../../src/components/landing/ToolpadHero';
+import ToolpadHeroDemo from '../../src/components/landing/ToolpadHeroDemo';
 import CardGrid from '../../src/components/landing/CardGrid';
 import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
@@ -36,6 +37,7 @@ export default function Home() {
       <AppHeader />
       <main>
         <ToolpadHero />
+        <ToolpadHeroDemo />
         <CardGrid content={features} span={4} />
         <Banner content={upvote} />
         <CardGrid content={useCases} span={4} />

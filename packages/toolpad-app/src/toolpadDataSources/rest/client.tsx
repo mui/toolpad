@@ -175,17 +175,6 @@ function QueryEditor({
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
 
-  const handleBodyChange = React.useCallback(
-    (newBody: Maybe<Body>) => {
-      const query: FetchQuery = {
-        ...value.query,
-        body: newBody,
-      };
-      onChange({ ...value, query });
-    },
-    [onChange, value],
-  );
-
   const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
     Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>)),
   );
@@ -221,6 +210,13 @@ function QueryEditor({
     setInput((existing) => ({
       ...existing,
       query: { ...existing.query, transform },
+    }));
+  }, []);
+
+  const handleBodyChange = React.useCallback((newBody: Maybe<Body>) => {
+    setInput((existing) => ({
+      ...existing,
+      query: { ...existing.query, body: newBody },
     }));
   }, []);
 
@@ -324,7 +320,7 @@ function QueryEditor({
                 <TabPanel disableGutters value="body">
                   <BodyEditor
                     globalScope={globalScope}
-                    value={value.query.body}
+                    value={input.query.body}
                     onChange={handleBodyChange}
                   />
                 </TabPanel>

@@ -30,7 +30,7 @@ const features = {
       title: 'Extensible with code',
       wip: false,
       description:
-        'Build low-code with pro-code extensibility. Write Javascript anywhere in Toolpad.',
+        'Build low-code with pro-code extensibility. Write JavaScript anywhere in Toolpad.',
     },
     {
       icon: <LinkIcon fontSize="small" color="primary" />,

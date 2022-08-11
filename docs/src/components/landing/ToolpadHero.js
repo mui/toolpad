@@ -35,7 +35,14 @@ export default function ToolpadHero() {
           Drag and drop pre-built components, connect to data sources, APIs and build your internal
           tools 10x faster. Open-source and powered by MUI.
         </Typography>
-        <TextField variant="outlined" placeholder="example@email.com" sx={{ mr: 2 }} />
+        <Typography color="text.secondary" sx={{ fontWeight: 700, mb: 2, mx: 'auto' }}>
+          Get notified of the beta release.
+        </Typography>
+        <TextField
+          variant="outlined"
+          placeholder="example@email.com"
+          sx={{ mr: 2, mb: { xs: 2, sm: 0 }, width: { xs: '100%', sm: 'auto' } }}
+        />
         <Button
           component={Link}
           href={'/'}

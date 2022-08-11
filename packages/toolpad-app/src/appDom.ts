@@ -15,6 +15,8 @@ import { camelCase, generateUniqueString, removeDiacritics } from './utils/strin
 import { ExactEntriesOf, Maybe } from './utils/types';
 import { filterValues } from './utils/collections';
 
+const GLOBAL_APPDOM_VERSION = '1.0.0';
+
 export const RESERVED_NODE_PROPERTIES = [
   'id',
   'type',
@@ -183,6 +185,7 @@ export type AppDomNodes = Record<NodeId, AppDomNode>;
 export interface AppDom {
   nodes: AppDomNodes;
   root: NodeId;
+  version: string;
 }
 
 function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node is T {
@@ -425,6 +428,7 @@ export function createDom(): AppDom {
       }),
     },
     root: rootId,
+    version: GLOBAL_APPDOM_VERSION,
   };
 }
 

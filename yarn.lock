@@ -2039,9 +2039,9 @@
     react-is "^17.0.2"
     react-transition-group "^4.4.2"
 
-"@mui/monorepo@https://github.com/mui/material-ui.git":
-  version "5.8.7"
-  resolved "https://github.com/mui/material-ui.git#6e69c8e8db54305f7602e11ea76b9b13adcf04cd"
+"@mui/monorepo@https://github.com/bharatkashyap/material-ui.git":
+  version "5.10.0"
+  resolved "https://github.com/bharatkashyap/material-ui.git#24bd53e06adeb2ef34f48af19423bdf1b7ee93ab"
 
 "@mui/private-theming@^5.8.0":
   version "5.8.6"
@@ -3028,7 +3028,7 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.5.tgz#5f19d2b85a98e9558036f6a3cacc8819420f05cf"
   integrity sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==
 
-"@types/react-dom@^18.0.0", "@types/react-dom@^18.0.5":
+"@types/react-dom@18.0.5", "@types/react-dom@^18.0.0", "@types/react-dom@^18.0.5":
   version "18.0.5"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.0.5.tgz#330b2d472c22f796e5531446939eacef8378444a"
   integrity sha512-OWPWTUrY/NIrjsAPkAk1wW9LZeIjSvkXRhclsFO8CZcZGCOg2G0YZy4ft+rOyYxy8B7ui5iZzi9OkDebZ7/QSA==
@@ -3074,7 +3074,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^18.0.14":
+"@types/react@*", "@types/react@18.0.14", "@types/react@^18.0.14":
   version "18.0.14"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.14.tgz#e016616ffff51dba01b04945610fe3671fdbe06d"
   integrity sha512-x4gGuASSiWmo0xjDLpm5mPb52syZHJx02VKbqUKdLmKtAwIh63XClGsiTI1K6DO5q7ox4xAsQrU+Gl3+gGXF9Q==

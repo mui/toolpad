@@ -153,25 +153,23 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     </ComponentCatalogItem>
                   );
                 })}
-              {Object.entries(FUTURE_COMPONENTS).map(
-                ([name, { displayName = name, githubLink }]) => {
-                  return (
-                    <Link
-                      key={`futureComponent.${name}`}
-                      href={githubLink}
-                      underline="none"
-                      target="_blank"
-                    >
-                      <ComponentCatalogItem>
-                        <DragIndicatorIcon color="disabled" />
-                        {displayName}
-                        <Box sx={{ flex: 1 }} />
-                        🚧
-                      </ComponentCatalogItem>
-                    </Link>
-                  );
-                },
-              )}
+              {Object.entries(FUTURE_COMPONENTS).map(([key, { displayName = key, githubLink }]) => {
+                return (
+                  <Link
+                    key={`futureComponent.${key}`}
+                    href={githubLink}
+                    underline="none"
+                    target="_blank"
+                  >
+                    <ComponentCatalogItem>
+                      <DragIndicatorIcon color="disabled" />
+                      {displayName}
+                      <Box sx={{ flex: 1 }} />
+                      🚧
+                    </ComponentCatalogItem>
+                  </Link>
+                );
+              })}
             </Box>
           </Box>
         </Collapse>

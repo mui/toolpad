@@ -290,34 +290,49 @@ function PricingTable({
       {renderRow('Cloud hosting')}
       {divider}
       <RowHead>Apps</RowHead>
-      {renderRow('Basic components')}
+      {renderRow('Apps')}
       {divider}
-      {renderRow('Custom components')}
+      {renderRow('Data sources')}
       {divider}
-      {renderRow('Advanced components')}
+      {renderRow('Export to code')}
       {divider}
-      {renderRow('Version control')}
+      {renderRow('Plugging API')}
       {divider}
-      {renderRow('Git Sync')}
+      {renderRow('Built-in version control')}
       {divider}
-      {renderRow('Import ESM')}
+      {renderRow('Git version control')}
       {divider}
-      {renderRow('Eject ESM')}
+      {renderRow('Staging environments')}
+      {divider}
+      {renderRow('White label')}
       {divider}
       {renderRow('Custom themes')}
       {divider}
-      {renderRow('Multiple environments')}
+      <RowHead>Components</RowHead>
+      {renderRow('Components')}
       {divider}
-      {renderRow('White label')}
+      {renderRow('Custom components')}
+      {divider}
+      {renderRow('Premium components')}
+      {divider}
       <RowHead>Users</RowHead>
-
+      {renderRow('Real-time commenting')}
       {divider}
-      {renderRow('Unlimited applications and users')}
-      <RowHead>Data</RowHead>
+      {renderRow('Multiple organizations')}
       {divider}
-      {renderRow('Unlimited REST data sources')}
+      <RowHead>Security</RowHead>
+      {renderRow('OAuth2/OpenID SSO')}
+      {divider}
+      {renderRow('SSO enforcement')}
+      {divider}
+      {renderRow('SAML-based SSO')}
+      {divider}
+      {renderRow('Granular permissions')}
+      {divider}
+      {renderRow('Audit logs')}
+      {divider}
       <RowHead>Support</RowHead>
-      {renderRow('community')}
+      {renderRow('Support level')}
       {divider}
     </Box>
   );

@@ -85,7 +85,7 @@ function RawBodyEditor({
     <Box>
       <BodyEditorToolbar disableGutters>
         {toolbarActions}
-        <TextField select value={value?.contentType} onChange={handleContentTypeChange}>
+        <TextField select value={value?.contentType.value} onChange={handleContentTypeChange}>
           {Array.from(RAW_CONTENT_TYPES.entries(), ([contentType, { alias }]) => (
             <MenuItem key={contentType} value={contentType}>
               {alias}

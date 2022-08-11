@@ -196,7 +196,7 @@ function QueryEditor({
   onChange,
   QueryEditorShell,
 }: QueryEditorProps<RestConnectionParams, FetchQuery, FetchParams>) {
-  const value = fromLegacy(valueProp);
+  const value = React.useMemo(() => fromLegacy(valueProp), [valueProp]);
 
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);

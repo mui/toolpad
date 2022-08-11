@@ -367,14 +367,15 @@ function resolveBindables(
   bindingId: string,
   params?: NestedBindableAttrs,
 ): Record<string, unknown> {
-  const result: any = _.cloneDeep(params);
+  const result: any = _.cloneDeep(params) || {};
   const resultKey = 'value';
   const flattened = flattenNestedBindables(params);
   for (const [path] of flattened) {
     const resolvedValue = bindings[`${bindingId}${path}`]?.value;
     _.set(result, `${resultKey}${path}`, resolvedValue);
   }
-  return result[resultKey];
+  console.log(result);
+  return result[resultKey] || {};
 }
 
 interface QueryNodeProps {
@@ -393,6 +394,8 @@ function QueryNode({ node }: QueryNodeProps) {
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
   const queryResult = useDataQuery(dataUrl, queryId, params, options);
+
+  console.log(params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;

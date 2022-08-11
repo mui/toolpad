@@ -306,29 +306,29 @@ function QueryEditor({
                 value={input.query.url}
                 onChange={handleUrlChange}
               />
-              <TabContext value={activeTab}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                  <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
-                    <Tab label="Parameters" value="parameters" />
-                    <Tab label="Body" value="body" />
-                    <Tab label="Headers" value="headers" />
-                  </TabList>
-                </Box>
-                <TabPanel disableGutters value="parameters">
-                  🚧 Under construction
-                </TabPanel>
-                <TabPanel disableGutters value="body">
-                  <BodyEditor
-                    globalScope={globalScope}
-                    value={input.query.body}
-                    onChange={handleBodyChange}
-                  />
-                </TabPanel>
-                <TabPanel disableGutters value="headers">
-                  🚧 Under construction
-                </TabPanel>
-              </TabContext>
             </Box>
+            <TabContext value={activeTab}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
+                  <Tab label="Parameters" value="parameters" />
+                  <Tab label="Body" value="body" />
+                  <Tab label="Headers" value="headers" />
+                </TabList>
+              </Box>
+              <TabPanel disableGutters value="parameters">
+                🚧 Under construction
+              </TabPanel>
+              <TabPanel disableGutters value="body">
+                <BodyEditor
+                  globalScope={globalScope}
+                  value={input.query.body}
+                  onChange={handleBodyChange}
+                />
+              </TabPanel>
+              <TabPanel disableGutters value="headers">
+                🚧 Under construction
+              </TabPanel>
+            </TabContext>
             <TransformInput
               value={input.query.transform ?? 'return data;'}
               onChange={handleTransformChange}

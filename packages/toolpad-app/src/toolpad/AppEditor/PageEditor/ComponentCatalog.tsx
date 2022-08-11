@@ -15,44 +15,36 @@ import {
 } from '../../../toolpadComponents';
 
 interface FutureComponentSpec {
-  displayName: string;
+  displayName?: string;
   githubLink: string;
 }
 
-const FUTURE_COMPONENTS: FutureComponentSpec[] = [
-  {
-    displayName: 'Form',
+const FUTURE_COMPONENTS: Record<string, FutureComponentSpec> = {
+  Form: {
     githubLink: 'https://github.com/mui/mui-toolpad/issues/749',
   },
-  {
-    displayName: 'Card',
+  Card: {
     githubLink: 'https://github.com/mui/mui-toolpad/issues/748',
   },
-  {
-    displayName: 'Tabs',
+  Tabs: {
     githubLink: 'https://github.com/mui/mui-toolpad/issues/747',
   },
-  {
-    displayName: 'Slider',
+  Slider: {
     githubLink: 'https://github.com/mui/mui-toolpad/issues/746',
   },
-  {
-    displayName: 'Switch',
+  Switch: {
     githubLink: 'https://github.com/mui/mui-toolpad/issues/745',
   },
-  {
-    displayName: 'RadioButton',
+  RadioButton: {
     githubLink: 'https://github.com/mui/mui-toolpad/issues/744',
   },
-  {
-    displayName: 'DatePicker',
+  DatePicker: {
     githubLink: 'https://github.com/mui/mui-toolpad/issues/743',
   },
-  {
-    displayName: 'Checkbox',
+  Checkbox: {
     githubLink: 'https://github.com/mui/mui-toolpad/issues/742',
   },
-];
+};
 
 const WIDTH_COLLAPSED = 50;
 
@@ -161,23 +153,25 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     </ComponentCatalogItem>
                   );
                 })}
-              {FUTURE_COMPONENTS.map((futureComponent) => {
-                return (
-                  <Link
-                    key={`futureComponent.${futureComponent.displayName}`}
-                    href={futureComponent.githubLink}
-                    underline="none"
-                    target="_blank"
-                  >
-                    <ComponentCatalogItem>
-                      <DragIndicatorIcon color="disabled" />
-                      {futureComponent.displayName}
-                      <Box sx={{ flex: 1 }} />
-                      🚧
-                    </ComponentCatalogItem>
-                  </Link>
-                );
-              })}
+              {Object.entries(FUTURE_COMPONENTS).map(
+                ([name, { displayName = name, githubLink }]) => {
+                  return (
+                    <Link
+                      key={`futureComponent.${name}`}
+                      href={githubLink}
+                      underline="none"
+                      target="_blank"
+                    >
+                      <ComponentCatalogItem>
+                        <DragIndicatorIcon color="disabled" />
+                        {displayName}
+                        <Box sx={{ flex: 1 }} />
+                        🚧
+                      </ComponentCatalogItem>
+                    </Link>
+                  );
+                },
+              )}
             </Box>
           </Box>
         </Collapse>

@@ -161,10 +161,10 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     </ComponentCatalogItem>
                   );
                 })}
-              {FUTURE_COMPONENTS.map((futureComponent, i) => {
+              {FUTURE_COMPONENTS.map((futureComponent) => {
                 return (
                   <Link
-                    key={`futureComponent[${i}]`}
+                    key={`futureComponent.${futureComponent.displayName}`}
                     href={futureComponent.githubLink}
                     underline="none"
                     target="_blank"

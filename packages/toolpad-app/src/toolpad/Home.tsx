@@ -29,11 +29,12 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import DeleteIcon from '@mui/icons-material/Delete';
 import client from '../api';
 import DialogForm from '../components/DialogForm';
-import type { App, Deployment } from '../../prisma/generated/client';
+import type { Deployment } from '../../prisma/generated/client';
 import useLatest from '../utils/useLatest';
 import ToolpadShell from './ToolpadShell';
 import getReadableDuration from '../utils/readableDuration';
 import EditableText from '../components/EditableText';
+import type { AppMeta } from '../server/data';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -96,7 +97,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 }
 
 export interface AppDeleteDialogProps {
-  app: App | null;
+  app: AppMeta | null;
   onClose: () => void;
 }
 
@@ -135,7 +136,7 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
 }
 
 interface AppCardProps {
-  app?: App;
+  app?: AppMeta;
   activeDeployment?: Deployment;
   onDelete?: () => void;
 }
@@ -332,7 +333,7 @@ export default function Home() {
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
-  const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
+  const [deletedApp, setDeletedApp] = React.useState<null | AppMeta>(null);
 
   return (
     <ToolpadShell>

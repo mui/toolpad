@@ -137,7 +137,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     </ComponentCatalogItem>
                   );
                 })}
-              {Array.from(FUTURE_COMPONENTS.entries(), ([key, { displayName = key, url }]) => {
+              {Array.from(FUTURE_COMPONENTS, ([key, { displayName = key, url }]) => {
                 return (
                   <Link key={`futureComponent.${key}`} href={url} underline="none" target="_blank">
                     <ComponentCatalogItem>

@@ -86,9 +86,9 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorModel<Q> {
+export interface QueryEditorModel<Q, P extends NestedBindableAttrs> {
   query: Q;
-  params?: NestedBindableAttrs;
+  params: P;
 }
 
 export interface QueryEditorShellProps {
@@ -97,24 +97,25 @@ export interface QueryEditorShellProps {
   onCommit?: () => void;
 }
 
-export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
+export interface QueryEditorProps<C, Q, P extends NestedBindableAttrs>
+  extends WithControlledProp<QueryEditorModel<Q, P>> {
   QueryEditorShell: React.ComponentType<QueryEditorShellProps>;
-  connectionParams: Maybe<P>;
+  connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
 }
 
-export type QueryEditor<P, Q = {}> = React.FC<QueryEditorProps<P, Q>>;
+export type QueryEditor<C, Q, P extends NestedBindableAttrs> = React.FC<QueryEditorProps<C, Q, P>>;
 
 export interface ConnectionStatus {
   timestamp: number;
   error?: string;
 }
 
-export interface ClientDataSource<P = {}, Q = {}> {
+export interface ClientDataSource<C = {}, Q = {}, P extends NestedBindableAttrs = {}> {
   displayName: string;
-  ConnectionParamsInput: ConnectionParamsEditor<P>;
-  isConnectionValid: (connection: P) => boolean;
-  QueryEditor: QueryEditor<P, Q>;
+  ConnectionParamsInput: ConnectionParamsEditor<C>;
+  isConnectionValid: (connection: C) => boolean;
+  QueryEditor: QueryEditor<C, Q, P>;
   getInitialQueryValue: () => Q;
 }
 

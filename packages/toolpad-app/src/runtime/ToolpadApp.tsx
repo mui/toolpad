@@ -348,8 +348,12 @@ function flattenNestedBindables(
     return [];
   }
   if (Array.isArray(params)) {
-    return params.flatMap((param, i) => flattenNestedBindables(param, `${prefix}[${i}]`));
+    return params.flatMap((param, i) => {
+      return flattenNestedBindables(param[1], `${prefix}[${i}][1]`);
+    });
   }
+  // TODO: create a marker in bindables (similar to $$ref) to recognize them automatically
+  // in a nested structure. This would allow us to build deeply nested structures
   if (typeof params.type === 'string') {
     return [[prefix, params as BindableAttrValue<any>]];
   }
@@ -363,15 +367,14 @@ function resolveBindables(
   bindingId: string,
   params?: NestedBindableAttrs,
 ): Record<string, unknown> {
-  const result = {};
+  const result: any = _.cloneDeep(params);
   const resultKey = 'value';
   const flattened = flattenNestedBindables(params);
   for (const [path] of flattened) {
-    _.set(result, `${resultKey}${path}`, bindings[`${bindingId}${path}`]?.value);
+    const resolvedValue = bindings[`${bindingId}${path}`]?.value;
+    _.set(result, `${resultKey}${path}`, resolvedValue);
   }
-  return params
-    ? mapProperties(params, ([propName]) => [propName, bindings[`${bindingId}.${propName}`]?.value])
-    : {};
+  return result[resultKey];
 }
 
 interface QueryNodeProps {

@@ -14,8 +14,20 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
-import { FetchPrivateQuery, FetchQuery, FetchResult, RestConnectionParams, Body } from './types';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  QueryEditorModel,
+  QueryEditorProps,
+} from '../../types';
+import {
+  FetchPrivateQuery,
+  FetchQuery,
+  FetchResult,
+  RestConnectionParams,
+  Body,
+  FetchParams,
+} from './types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
@@ -165,25 +177,41 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   );
 }
 
+function fromLegacy(
+  value: QueryEditorModel<FetchQuery, any>,
+): QueryEditorModel<FetchQuery, FetchParams> {
+  if (value.params?.searchParams) {
+    return value;
+  }
+  return {
+    ...value,
+    params: { searchParams: value.params ? Object.entries(value.params) : [] },
+  };
+}
+
 function QueryEditor({
   globalScope,
   connectionParams,
-  value,
+  value: valueProp,
   onChange,
   QueryEditorShell,
-}: QueryEditorProps<RestConnectionParams, FetchQuery>) {
+}: QueryEditorProps<RestConnectionParams, FetchQuery, FetchParams>) {
+  const value = fromLegacy(valueProp);
+
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
 
-  const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
-    Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>)),
-  );
-
-  React.useEffect(() => {
-    setParams(Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>)));
-  }, [input.params]);
-
   const baseUrl = connectionParams?.baseUrl;
+
+  const handleSearchParamsChange = React.useCallback(
+    (newParams: [string, BindableAttrValue<string>][]) => {
+      setInput((existing) => ({
+        ...existing,
+        params: { ...existing.params, searchParams: newParams },
+      }));
+    },
+    [],
+  );
 
   const handleUrlChange = React.useCallback((newUrl: BindableAttrValue<string> | null) => {
     setInput((existing) => ({
@@ -216,12 +244,12 @@ function QueryEditor({
   const handleBodyChange = React.useCallback((newBody: Maybe<Body>) => {
     setInput((existing) => ({
       ...existing,
-      query: { ...existing.query, body: newBody },
+      params: { ...existing.params, body: newBody || undefined },
     }));
   }, []);
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    input: params,
+    input: input.params?.searchParams ?? [],
     globalScope,
   });
 
@@ -258,10 +286,10 @@ function QueryEditor({
 
   const lastSavedInput = React.useRef(input);
   const handleCommit = React.useCallback(() => {
-    const newValue = { ...input, params: Object.fromEntries(params) };
+    const newValue = input;
     onChange(newValue);
     lastSavedInput.current = newValue;
-  }, [onChange, params, input]);
+  }, [onChange, input]);
 
   const isDirty =
     input.query !== lastSavedInput.current.query || input.params !== lastSavedInput.current.params;
@@ -280,8 +308,8 @@ function QueryEditor({
           <Stack gap={2} sx={{ px: 3, pt: 1 }}>
             <Typography>Parameters</Typography>
             <ParametersEditor
-              value={params}
-              onChange={setParams}
+              value={input.params?.searchParams || []}
+              onChange={handleSearchParamsChange}
               globalScope={globalScope}
               liveValue={paramsEditorLiveValue}
             />
@@ -321,7 +349,7 @@ function QueryEditor({
               <TabPanel disableGutters value="body">
                 <BodyEditor
                   globalScope={globalScope}
-                  value={input.query.body}
+                  value={input.params?.body}
                   onChange={handleBodyChange}
                 />
               </TabPanel>
@@ -363,7 +391,7 @@ function getInitialQueryValue(): FetchQuery {
   return { url: { type: 'const', value: '' }, method: '', headers: [] };
 }
 
-const dataSource: ClientDataSource<{}, FetchQuery> = {
+const dataSource: ClientDataSource<{}, FetchQuery, FetchParams> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   isConnectionValid: () => true,

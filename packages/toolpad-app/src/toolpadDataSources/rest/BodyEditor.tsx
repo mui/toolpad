@@ -49,18 +49,18 @@ function RawBodyEditor({
   globalScope,
 }: BodyTypeEditorProps<RawBody>) {
   const value: RawBody = React.useMemo(
-    () => ({
-      kind: 'raw',
-      contentType: 'text/plain',
-      content: appDom.createConst(''),
-      ...valueProp,
-    }),
+    () =>
+      valueProp ?? {
+        kind: appDom.createConst('raw'),
+        contentType: appDom.createConst('text/plain'),
+        content: appDom.createConst(''),
+      },
     [valueProp],
   );
 
   const handleContentTypeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange({ ...value, contentType: event.target.value });
+      onChange({ ...value, contentType: appDom.createConst(event.target.value) });
     },
     [onChange, value],
   );
@@ -79,7 +79,7 @@ function RawBodyEditor({
     globalScope,
   });
 
-  const { language = 'plaintext' } = RAW_CONTENT_TYPES.get(value.contentType) ?? {};
+  const { language = 'plaintext' } = RAW_CONTENT_TYPES.get(value.contentType.value) ?? {};
 
   return (
     <Box>
@@ -120,12 +120,12 @@ function UrlEncodedBodyEditor({
   globalScope,
 }: BodyTypeEditorProps<UrlEncodedBody>) {
   const value: UrlEncodedBody = React.useMemo(
-    () => ({
-      kind: 'urlEncoded',
-      contentType: 'text/plain',
-      content: [],
-      ...valueProp,
-    }),
+    () =>
+      valueProp ?? {
+        kind: appDom.createConst('urlEncoded'),
+        contentType: appDom.createConst('text/plain'),
+        content: [],
+      },
     [valueProp],
   );
 
@@ -149,15 +149,15 @@ function UrlEncodedBodyEditor({
   );
 }
 
-type BodyKind = Body['kind'];
+type BodyKind = Body['kind']['value'];
 
 export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
   globalScope: Record<string, any>;
 }
 
 export default function BodyEditor({ globalScope, value, onChange }: BodyEditorProps) {
-  const [activeTab, setActiveTab] = React.useState<BodyKind>(value?.kind || 'raw');
-  React.useEffect(() => setActiveTab(value?.kind || 'raw'), [value]);
+  const [activeTab, setActiveTab] = React.useState<BodyKind>(value?.kind.value || 'raw');
+  React.useEffect(() => setActiveTab(value?.kind.value || 'raw'), [value?.kind.value]);
 
   const handleTabChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setActiveTab(event.target.value as BodyKind);
@@ -179,7 +179,7 @@ export default function BodyEditor({ globalScope, value, onChange }: BodyEditorP
           <RawBodyEditor
             toolbarActions={toolbarActions}
             globalScope={globalScope}
-            value={value?.kind === 'raw' ? value : null}
+            value={value?.kind.value === 'raw' ? (value as RawBody) : null}
             onChange={onChange}
           />
         </TabPanel>
@@ -187,7 +187,7 @@ export default function BodyEditor({ globalScope, value, onChange }: BodyEditorP
           <UrlEncodedBodyEditor
             toolbarActions={toolbarActions}
             globalScope={globalScope}
-            value={value?.kind === 'urlEncoded' ? value : null}
+            value={value?.kind.value === 'urlEncoded' ? (value as UrlEncodedBody) : null}
             onChange={onChange}
           />
         </TabPanel>

@@ -103,6 +103,12 @@ export interface CodeComponentNode extends AppDomNodeBase {
   };
 }
 
+/**
+ * A DOM query is defined primarily by a server defined part "attributes.query"
+ * and a clientside defined part "params". "params" are constructed in the runtime
+ * from bound expressions. The resolved object will be sent to the server and combined
+ * with the query will be used to collect the data from the backend.
+ */
 export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
   readonly params?: NestedBindableAttrs;

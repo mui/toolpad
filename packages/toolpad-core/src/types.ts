@@ -63,8 +63,8 @@ export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
 export type NestedBindableAttrs =
   | BindableAttrValue<any>
-  | { [key: string]: NestedBindableAttrs }
-  | NestedBindableAttrs[];
+  | { [key in string]: NestedBindableAttrs }
+  | [string, NestedBindableAttrs][];
 
 export type BindableAttrValues<P = Record<string, unknown>> = {
   readonly [K in keyof P]?: BindableAttrValue<P[K]>;

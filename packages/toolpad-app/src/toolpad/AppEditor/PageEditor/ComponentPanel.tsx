@@ -35,7 +35,7 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
     <ComponentPanelRoot className={className}>
       <TabContext value={state.componentPanelTab}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} aria-label="lab API tabs example">
+          <TabList onChange={handleChange} aria-label="Component options">
             <Tab label="Component" value="component" />
             <Tab label="Theme" value="theme" />
           </TabList>

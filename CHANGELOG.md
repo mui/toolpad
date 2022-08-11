@@ -1,5 +1,58 @@
 # Changelog
 
+## v0.0.13
+
+<!-- generated comparing v0.0.12..master -->
+
+_Aug 10, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Add user feedback, add network panel to REST datasources, make network panel clearable.
+
+- &#8203;<!-- 19 -->Move google sheets preview inside of datasource (#761) @Janpot
+- &#8203;<!-- 18 -->Make sure queries are default enabled (#768) @Janpot
+- &#8203;<!-- 17 -->Add AbortController to function runtime (#766) @Janpot
+- &#8203;<!-- 16 -->Remove docs aria-label (#716) @Janpot
+- &#8203;<!-- 15 -->Add user feedback (#723) @Janpot
+- &#8203;<!-- 14 -->Fix function datasource layout issue (#765) @Janpot
+- &#8203;<!-- 13 -->Add RFC template (#729) @bytasv
+- &#8203;<!-- 12 -->Extract presentational QueryInputPanel component for reuse (#762) @Janpot
+- &#8203;<!-- 11 -->Rest datasource: add network inspection (#737) @Janpot
+- &#8203;<!-- 10 -->Make network panel clearable (#760) @Janpot
+- &#8203;<!-- 09 -->Drag and drop refactor (#730) @apedroferreira
+- &#8203;<!-- 08 -->Optimize logic in bindings parsing (#759) @Janpot
+- &#8203;<!-- 07 -->Only overwrite the default value when a prop has a binding (#757) @Janpot
+- &#8203;<!-- 06 -->Extract Devtools component from function datasource for reuse in fetch (#740) @Janpot
+- &#8203;<!-- 05 -->Refactor har generation utilities for reuse (#738) @Janpot
+- &#8203;<!-- 04 -->Release script update (#731) @Janpot
+- &#8203;<!-- 03 -->Release workflow continuation (#728) @Janpot
+- &#8203;<!-- 02 -->Fixes to release action (#727) @Janpot
+- &#8203;<!-- 01 -->Add docker tag github action (#726) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot
+
+## v0.0.12
+
+<!-- generated comparing v0.0.11..master -->
+
+_Aug 3, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Allow vertically resizing components, add configuration options to Fetch datasource.
+
+- &#8203;<!-- 8 -->Allow scrolling the page when over the monaco editor (#719) @Janpot
+- &#8203;<!-- 7 -->Make DataTable vertically resizeable (#700) @apedroferreira
+- &#8203;<!-- 6 -->Fix typo (#715) @oliviertassinari
+- &#8203;<!-- 5 -->Make fetch method configurable (#708) @Janpot
+- &#8203;<!-- 4 -->Remove some unnecessary component sizing (#710) @Janpot
+- &#8203;<!-- 3 -->[core] `NodeReference` type for references to nodes (#720) @bharatkashyap
+- &#8203;<!-- 2 -->[core] Remove duplicated file (#714) @oliviertassinari
+- &#8203;<!-- 1 -->[core] Prepare automation for support (#612) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
 ## v0.0.11
 
 <!-- generated comparing v0.0.10..master -->

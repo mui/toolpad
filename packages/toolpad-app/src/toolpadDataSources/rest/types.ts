@@ -1,4 +1,5 @@
 import { BindableAttrValue } from '@mui/toolpad-core';
+import { Har } from 'har-format';
 import { Maybe } from '../../utils/types';
 
 interface AuthenticationBase {
@@ -48,4 +49,19 @@ export interface FetchQuery {
   readonly method: string;
   readonly headers: [string, BindableAttrValue<string>][];
   readonly body?: Maybe<Body>;
+  readonly transformEnabled?: boolean;
+  readonly transform?: string;
+}
+
+export type FetchPrivateQuery = {
+  kind: 'debugExec';
+  query: FetchQuery;
+  params: Record<string, any>;
+};
+
+export interface FetchResult {
+  data: any;
+  untransformedData: any;
+  error?: Error;
+  har: Har;
 }

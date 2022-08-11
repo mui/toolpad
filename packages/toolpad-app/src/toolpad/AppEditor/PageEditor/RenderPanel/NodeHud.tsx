@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
-import * as appDom from '../../../appDom';
+import * as appDom from '../../../../appDom';
 import {
   absolutePositionCss,
   Rectangle,
@@ -11,10 +11,10 @@ import {
   RECTANGLE_EDGE_BOTTOM,
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
-} from '../../../utils/geometry';
-import { useDom } from '../../DomLoader';
-import { useToolpadComponent } from '../toolpadComponents';
-import { getElementNodeComponentId } from '../../../toolpadComponents';
+} from '../../../../utils/geometry';
+import { useDom } from '../../../DomLoader';
+import { useToolpadComponent } from '../../toolpadComponents';
+import { getElementNodeComponentId } from '../../../../toolpadComponents';
 
 const nodeHudClasses = {
   allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
@@ -108,10 +108,10 @@ const ResizePreview = styled('div')({
 });
 
 interface NodeHudProps {
-  node: appDom.ElementNode | appDom.PageNode;
+  node: appDom.AppDomNode;
   rect: Rectangle;
-  selected?: boolean;
-  allowInteraction?: boolean;
+  isSelected?: boolean;
+  isInteractive?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
   draggableEdges?: RectangleEdge[];
   onEdgeDragStart?: (
@@ -125,9 +125,9 @@ interface NodeHudProps {
 
 export default function NodeHud({
   node,
-  selected,
-  allowInteraction,
   rect,
+  isSelected,
+  isInteractive,
   onNodeDragStart,
   draggableEdges = [],
   onEdgeDragStart,
@@ -140,32 +140,21 @@ export default function NodeHud({
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
   const component = useToolpadComponent(dom, componentId);
 
-  const handleDelete = React.useCallback(
-    (event: React.MouseEvent<HTMLElement>) => {
-      event.stopPropagation();
-
-      if (onDelete) {
-        onDelete(event);
-      }
-    },
-    [onDelete],
-  );
-
   return (
     <NodeHudWrapper
       data-node-id={node.id}
       style={absolutePositionCss(rect)}
       className={clsx({
-        [nodeHudClasses.allowNodeInteraction]: allowInteraction,
+        [nodeHudClasses.allowNodeInteraction]: isInteractive,
       })}
     >
-      {selected ? (
+      {isSelected ? (
         <React.Fragment>
           <span className={nodeHudClasses.selected} />
           <div draggable className={nodeHudClasses.selectionHint} onDragStart={onNodeDragStart}>
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
-            <IconButton aria-label="Remove element" color="inherit" onMouseUp={handleDelete}>
+            <IconButton aria-label="Remove element" color="inherit" onMouseUp={onDelete}>
               <DeleteIcon color="inherit" />
             </IconButton>
           </div>

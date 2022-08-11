@@ -7,6 +7,7 @@ import {
   BindableAttrValue,
   BindableAttrValues,
   SecretAttrValue,
+  NestedBindableAttrs,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { ConnectionStatus, AppTheme } from './types';
@@ -102,9 +103,9 @@ export interface CodeComponentNode extends AppDomNodeBase {
   };
 }
 
-export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
+export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
-  readonly params?: BindableAttrValues<P>;
+  readonly params?: NestedBindableAttrs;
   readonly attributes: {
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeReference>;

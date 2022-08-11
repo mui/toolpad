@@ -143,7 +143,7 @@ function UrlEncodedBodyEditor({
         value={value.content}
         onChange={handleParamsChange}
         globalScope={globalScope}
-        liveValue={paramsEditorLiveValue}
+        liveValue={[]}
       />
     </Box>
   );

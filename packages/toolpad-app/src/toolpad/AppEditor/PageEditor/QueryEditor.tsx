@@ -203,21 +203,21 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
   );
 }
 
-interface QueryNodeEditorProps<Q, P> {
+interface QueryNodeEditorProps<Q> {
   open: boolean;
   onClose: () => void;
   onSave: (newNode: appDom.QueryNode) => void;
   onRemove: (newNode: appDom.QueryNode) => void;
-  node: appDom.QueryNode<Q, P>;
+  node: appDom.QueryNode<Q>;
 }
 
-function QueryNodeEditorDialog<Q, P>({
+function QueryNodeEditorDialog<Q>({
   open,
   node,
   onClose,
   onRemove,
   onSave,
-}: QueryNodeEditorProps<Q, P>) {
+}: QueryNodeEditorProps<Q>) {
   const { appId } = usePageEditorState();
   const dom = useDom();
 

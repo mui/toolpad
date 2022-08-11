@@ -4,9 +4,9 @@ import {
   SlotType,
   RuntimeError,
   ComponentConfig,
-  BindableAttrValues,
   NodeId,
   PropValueType,
+  NestedBindableAttrs,
 } from '@mui/toolpad-core';
 
 import { PaletteMode } from '@mui/material';
@@ -88,7 +88,7 @@ export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
 export interface QueryEditorModel<Q> {
   query: Q;
-  params?: BindableAttrValues<any>;
+  params?: NestedBindableAttrs;
 }
 
 export interface QueryEditorShellProps {

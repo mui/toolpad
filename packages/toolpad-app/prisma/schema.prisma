@@ -14,6 +14,7 @@ model App {
   name        String       @unique
   createdAt   DateTime     @default(now())
   editedAt    DateTime     @default(now())
+  dom         Json?
   deployments Deployment[] @relation("AppDeployments")
   nodes       DomNode[]    @relation("AppNodes")
   releases    Release[]    @relation("AppReleases")

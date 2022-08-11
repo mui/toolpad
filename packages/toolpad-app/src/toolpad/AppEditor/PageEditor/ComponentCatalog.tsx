@@ -16,18 +16,18 @@ import {
 
 interface FutureComponentSpec {
   displayName?: string;
-  githubLink: string;
+  url: string;
 }
 
 const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
-  ['Form', { githubLink: 'https://github.com/mui/mui-toolpad/issues/749' }],
-  ['Card', { githubLink: 'https://github.com/mui/mui-toolpad/issues/748' }],
-  ['Tabs', { githubLink: 'https://github.com/mui/mui-toolpad/issues/747' }],
-  ['Slider', { githubLink: 'https://github.com/mui/mui-toolpad/issues/746' }],
-  ['Switch', { githubLink: 'https://github.com/mui/mui-toolpad/issues/745' }],
-  ['RadioButton', { githubLink: 'https://github.com/mui/mui-toolpad/issues/744' }],
-  ['DatePicker', { githubLink: 'https://github.com/mui/mui-toolpad/issues/743' }],
-  ['Checkbox', { githubLink: 'https://github.com/mui/mui-toolpad/issues/742' }],
+  ['Form', { url: 'https://github.com/mui/mui-toolpad/issues/749' }],
+  ['Card', { url: 'https://github.com/mui/mui-toolpad/issues/748' }],
+  ['Tabs', { url: 'https://github.com/mui/mui-toolpad/issues/747' }],
+  ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746' }],
+  ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745' }],
+  ['RadioButton', { url: 'https://github.com/mui/mui-toolpad/issues/744' }],
+  ['DatePicker', { url: 'https://github.com/mui/mui-toolpad/issues/743' }],
+  ['Checkbox', { url: 'https://github.com/mui/mui-toolpad/issues/742' }],
 ]);
 
 const WIDTH_COLLAPSED = 50;
@@ -137,26 +137,18 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     </ComponentCatalogItem>
                   );
                 })}
-              {Array.from(
-                FUTURE_COMPONENTS.entries(),
-                ([key, { displayName = key, githubLink }]) => {
-                  return (
-                    <Link
-                      key={`futureComponent.${key}`}
-                      href={githubLink}
-                      underline="none"
-                      target="_blank"
-                    >
-                      <ComponentCatalogItem>
-                        <DragIndicatorIcon color="disabled" />
-                        {displayName}
-                        <Box sx={{ flex: 1 }} />
-                        🚧
-                      </ComponentCatalogItem>
-                    </Link>
-                  );
-                },
-              )}
+              {Array.from(FUTURE_COMPONENTS.entries(), ([key, { displayName = key, url }]) => {
+                return (
+                  <Link key={`futureComponent.${key}`} href={url} underline="none" target="_blank">
+                    <ComponentCatalogItem>
+                      <DragIndicatorIcon color="disabled" />
+                      {displayName}
+                      <Box sx={{ flex: 1 }} />
+                      🚧
+                    </ComponentCatalogItem>
+                  </Link>
+                );
+              })}
             </Box>
           </Box>
         </Collapse>

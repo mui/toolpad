@@ -221,7 +221,10 @@ export async function updateApp(appId: string, name: string): Promise<void> {
 export async function deleteApp(id: string): Promise<void> {
   await prisma.app.delete({
     where: { id },
-    select: {},
+    select: {
+      // Only return the id to reduce amount of data returne from the db
+      id: true,
+    },
   });
 }
 

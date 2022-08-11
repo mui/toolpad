@@ -98,25 +98,80 @@ const rowHeaders = {
   'Self-hosting': <ColumnHead label="Self-hosting" />,
   'Cloud hosting': <ColumnHead label="Cloud hosting" />,
   // Apps
-  'Basic components': <ColumnHead label="Basic components" metadata="Material UI + MUI X Pro" />,
-  'Custom components': <ColumnHead label="Custom components" />,
-  'Advanced components': <ColumnHead label="Advanced components" metadata="MUI X Premium" />,
-  'Version control': <ColumnHead label="Version control" />,
-  'Git Sync': <ColumnHead label="Git Sync" />,
-  'Import ESM': <ColumnHead label="Import ESM" />,
-  'Eject ESM': <ColumnHead label="Eject ESM" />,
+  Apps: <ColumnHead label="Apps" />,
+  'Data sources': <ColumnHead label="Data sources" />,
+  'Export to code': <ColumnHead label="Export to code" />,
+  'Plugging API': (
+    <ColumnHead label="Plugging API" tooltip={'Extend the platform with community extensions.'} />
+  ),
+  'Built-in version control': (
+    <ColumnHead
+      label="Built-in version control"
+      tooltip={
+        'Create and manage releases for your app, and revert to any previous state in its history.'
+      }
+    />
+  ),
+  'Git version control': (
+    <ColumnHead
+      label="Git version control"
+      tooltip={'Branch-based editing workflows, compatible with Git.'}
+    />
+  ),
+  'Staging environments': <ColumnHead label="Staging environments" />,
+  'White label': <ColumnHead label="White label" tooltip={'Custom domain and branding'} />,
   'Custom themes': <ColumnHead label="Custom themes" />,
-  'Multiple environments': <ColumnHead label="Multiple environments" />,
-  'White label': <ColumnHead label="White label" metadata="Custom domain and branding" />,
+  // Components
+  Components: <ColumnHead label="Components" tooltip={'Material UI + MUI X Pro'} />,
+  'Custom components': (
+    <ColumnHead
+      label="Custom components"
+      tooltip={'Extend the platform with custom React components.'}
+    />
+  ),
+  'Premium components': <ColumnHead label="Premium components" tooltip={'MUI X Premium'} />,
   // Users
-  'Unlimited applications and users': <ColumnHead label="Unlimited applications and users" />,
-  // Data
-  'Unlimited REST data sources': <ColumnHead label="Unlimited REST data sources" />,
+  'Real-time commenting': (
+    <ColumnHead
+      label="Real-time commenting"
+      tooltip={'Multiple users can interact through comments'}
+    />
+  ),
+  'Multiple organizations': (
+    <ColumnHead
+      label="Multiple organizations"
+      tooltip={'Create and manage multiple organizations'}
+    />
+  ),
+  // Security
+  'OAuth2/OpenID SSO': <ColumnHead label="OAuth2/OpenID SSO" />,
+  'SSO enforcement': <ColumnHead label="SSO enforcement" />,
+  'SAML-based SSO': (
+    <ColumnHead
+      label="SAML-based SSO"
+      tooltip={'Integrate with Okta, Active Directory, or any other SAML providers'}
+    />
+  ),
+  'Granular permissions': (
+    <ColumnHead
+      label="Granular permissions"
+      tooltip={
+        'Finer permissions for granular control over the access to folders and resources (queries, apps, secrets, etc),'
+      }
+    />
+  ),
+  'Audit logs': (
+    <ColumnHead
+      label="Audit logs"
+      tooltip={'Track every query run against your databases and APIs, as well as user actions.'}
+    />
+  ),
   // Support
-  community: <ColumnHead label="Support level" />,
+  'Support level': <ColumnHead label="Support level" />,
 };
 
 const yes = <IconImage name="yes" title="Included" />;
+const pending = <IconImage name="time" title="Work in progress" />;
 const no = <IconImage name="no" title="Not included" />;
 
 function Info(props) {
@@ -144,47 +199,67 @@ Info.propTypes = {
 };
 
 const communityData = {
-  // Apps
+  // Hosting
   'Self-hosting': yes,
   'Cloud hosting': no,
-  'Basic components': yes,
-  'Custom components': yes,
-  'Advanced components': no,
-  'Version control': no,
-  'Git Sync': no,
-  'Import ESM': no,
-  'Eject ESM': no,
-  'Custom themes': no,
-  'Multiple environments': no,
+  // Apps
+  Apps: <Info value={'Unlimited'} />,
+  'Data sources': <Info value={'Unlimited'} />,
+  'Export to code': pending,
+  'Plugging API': pending,
+  'Built-in version control': pending,
+  'Git version control': (
+    <Info value={pending} metadata={'Unlimited public repositories, 1 private repository'} />
+  ),
+  'Staging environments': <Info value={pending} metadata={'1'} />,
   'White label': no,
+  'Custom themes': no,
+  // Components
+  Components: yes,
+  'Custom components': yes,
+  'Premium components': no,
   // Users
-  'Unlimited applications and users': <Info value={yes} metadata="Self-host only" />,
-  // Data
-  'Unlimited REST data sources': yes,
+  'Real-time commenting': no,
+  'Multiple organizations': no,
+  // Security
+  'OAuth2/OpenID SSO': pending,
+  'SSO enforcement': no,
+  'SAML-based SSO': no,
+  'Granular permissions': no,
+  'Audit logs': no,
   // Support
-  community: <Info value="Community" />,
+  'Support level': <Info value={yes} metadata={'Community'} />,
 };
 
 const commercialData = {
+  // Hosting
+  'Self-hosting': pending,
+  'Cloud hosting': pending,
   // Apps
-  'Self-hosting': yes,
-  'Cloud hosting': yes,
-  'Basic components': yes,
-  'Custom components': yes,
-  'Advanced components': yes,
-  'Version control': yes,
-  'Git Sync': yes,
-  'Import ESM': yes,
-  'Eject ESM': yes,
-  'Custom themes': yes,
-  'Multiple environments': yes,
-  'White label': yes,
+  Apps: <Info value={'Unlimited'} />,
+  'Data sources': <Info value={'Unlimited'} />,
+  'Export to code': pending,
+  'Plugging API': pending,
+  'Built-in version control': pending,
+  'Git version control': <Info value={pending} />,
+  'Staging environments': <Info value={pending} metadata={'Unlimited'} />,
+  'White label': pending,
+  'Custom themes': pending,
+  // Components
+  Components: pending,
+  'Custom components': pending,
+  'Premium components': pending,
   // Users
-  'Unlimited applications and users': yes,
-  // Data
-  'Unlimited REST data sources': yes,
+  'Real-time commenting': pending,
+  'Multiple organizations': pending,
+  // Security
+  'OAuth2/OpenID SSO': pending,
+  'SSO enforcement': pending,
+  'SAML-based SSO': pending,
+  'Granular permissions': pending,
+  'Audit logs': pending,
   // Support
-  community: <Info value="Priority" />,
+  'Support level': <Info value={pending} metadata={'Priority'} />,
 };
 
 export { Headline, planInfo, plans, rowHeaders, communityData, commercialData };

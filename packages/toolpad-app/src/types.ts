@@ -117,6 +117,7 @@ export interface ClientDataSource<C = {}, Q = {}, P extends NestedBindableAttrs 
   isConnectionValid: (connection: C) => boolean;
   QueryEditor: QueryEditor<C, Q, P>;
   getInitialQueryValue: () => Q;
+  hasDefault?: boolean;
 }
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {

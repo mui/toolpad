@@ -59,11 +59,11 @@ function ConnectionEditorContent<P>({
     [connectionNode, domApi],
   );
 
-  const dataSourceType = connectionNode.attributes.dataSource.value;
-  const dataSource = dataSources[dataSourceType];
+  const dataSourceId = connectionNode.attributes.dataSource.value;
+  const dataSource = dataSources[dataSourceId];
   const connectionEditorContext = React.useMemo(
-    () => ({ appId, connectionId: connectionNode.id }),
-    [appId, connectionNode.id],
+    () => ({ appId, dataSourceId, connectionId: connectionNode.id }),
+    [appId, dataSourceId, connectionNode.id],
   );
 
   return (
@@ -77,7 +77,7 @@ function ConnectionEditorContent<P>({
                 dataSource={dataSource}
                 value={connectionNode.attributes.params.value}
                 onChange={handleConnectionChange}
-                handlerBasePath={`/api/dataSources/${dataSourceType}`}
+                handlerBasePath={`/api/dataSources/${dataSourceId}`}
                 appId={appId}
                 connectionId={connectionNode.id}
               />

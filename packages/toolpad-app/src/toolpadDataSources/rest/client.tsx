@@ -329,6 +329,7 @@ const dataSource: ClientDataSource<{}, FetchQuery> = {
   isConnectionValid: () => true,
   QueryEditor,
   getInitialQueryValue,
+  hasDefault: true,
 };
 
 export default dataSource;

@@ -116,6 +116,7 @@ export interface ClientDataSource<P = {}, Q = {}> {
   isConnectionValid: (connection: P) => boolean;
   QueryEditor: QueryEditor<P, Q>;
   getInitialQueryValue: () => Q;
+  hasDefault?: boolean;
 }
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {

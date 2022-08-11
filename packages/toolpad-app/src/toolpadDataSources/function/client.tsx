@@ -233,6 +233,7 @@ const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {
   isConnectionValid: () => true,
   QueryEditor,
   getInitialQueryValue,
+  hasDefault: true,
 };
 
 export default dataSource;

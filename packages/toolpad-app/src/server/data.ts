@@ -56,6 +56,7 @@ function deserializeValue(dbValue: string, type: DomNodeAttributeType): unknown 
 }
 
 function encryptSecrets(dom: appDom.AppDom): appDom.AppDom {
+  // TODO: use better method than clone + update (immer would work well here)
   const result = _.cloneDeep(dom);
   for (const node of Object.values(result.nodes)) {
     const namespaces = omit(node, ...appDom.RESERVED_NODE_PROPERTIES);
@@ -72,6 +73,7 @@ function encryptSecrets(dom: appDom.AppDom): appDom.AppDom {
 }
 
 function decryptSecrets(dom: appDom.AppDom): appDom.AppDom {
+  // TODO: use better method than clone + update (immer would work well here)
   const result = _.cloneDeep(dom);
   for (const node of Object.values(result.nodes)) {
     const namespaces = omit(node, ...appDom.RESERVED_NODE_PROPERTIES);

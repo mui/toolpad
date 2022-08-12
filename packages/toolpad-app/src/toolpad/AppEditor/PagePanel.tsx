@@ -97,6 +97,8 @@ function AppMenu() {
           <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
             <JsonView src={dom} expandPaths={[]} expandLevel={5} />
           </Box>
+
+          {/* TODO: build overflow behavior into JsonView and add optional "copy source" button in there */}
           <Tooltip title="Copy the source">
             <IconButton
               onClick={handleCopyToClipboard}

@@ -112,7 +112,7 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
     const dataSource = dataSources[dataSourceId];
     invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
 
-    const queryNode = appDom.createNode(dom, 'mutation', {
+    const mutationNode = appDom.createNode(dom, 'mutation', {
       attributes: {
         query: appDom.createConst(dataSource.getInitialQueryValue()),
         connectionId: appDom.createConst(appDom.ref(connectionId)),
@@ -120,12 +120,12 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
       },
     });
 
-    onCreated(queryNode);
+    onCreated(mutationNode);
   }, [dom, input, onCreated]);
 
   return (
     <Dialog fullWidth open={open} onClose={onClose} scroll="body">
-      <DialogTitle>Create Query</DialogTitle>
+      <DialogTitle>Create Mutation</DialogTitle>
       <DialogContent>
         <ConnectionSelect
           dataSource={DATASOURCES_WHITELIST}
@@ -139,7 +139,7 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
           Cancel
         </Button>
         <Button disabled={!input} onClick={handleCreateClick}>
-          Create query
+          Create mutation
         </Button>
       </DialogActions>
     </Dialog>
@@ -301,7 +301,7 @@ function MutationNodeEditorDialog<Q, P>({
     [handleClose, handleRemove, isInputSaved],
   );
 
-  const queryEditorShellContext: MutationEditorDialogContext = {
+  const mutationEditorShellContext: MutationEditorDialogContext = {
     open,
     onClose: handleClose,
     dataSourceId: dataSource ? dataSourceId : null,
@@ -310,7 +310,7 @@ function MutationNodeEditorDialog<Q, P>({
   };
 
   return (
-    <MutationEditorDialogContextProvider value={queryEditorShellContext}>
+    <MutationEditorDialogContextProvider value={mutationEditorShellContext}>
       {dataSourceId && dataSource && queryEditorContext ? (
         <ConnectionContextProvider value={queryEditorContext}>
           <dataSource.QueryEditor
@@ -334,7 +334,7 @@ type DialogState = {
   nodeId?: NodeId;
 };
 
-export default function QueryEditor() {
+export default function MutationEditor() {
   const dom = useDom();
   const state = usePageEditorState();
   const domApi = useDomApi();
@@ -382,7 +382,7 @@ export default function QueryEditor() {
   return (
     <Stack spacing={1} alignItems="start">
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
-        Add query
+        Add mutation
       </Button>
       <List>
         {mutations.map((mutationNode) => {

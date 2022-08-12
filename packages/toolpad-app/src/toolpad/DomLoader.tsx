@@ -268,7 +268,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   });
   const api = React.useMemo(() => createDomApi(dispatch), []);
 
-  const lastSavedDom = React.useRef<appDom.AppDom | null>(null);
+  const lastSavedDom = React.useRef<appDom.AppDom | null>(state.dom);
   const handleSave = React.useCallback(() => {
     if (!state.dom || lastSavedDom.current === state.dom) {
       return;

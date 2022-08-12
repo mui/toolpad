@@ -852,6 +852,13 @@ export function deref(nodeRef: NodeReference): NodeId;
 export function deref(nodeRef: null | undefined): null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
+  if (typeof nodeRef === 'string') {
+    // This branch provides backwards compatibility for old style string refs
+    // TODO: remove this branch and replace with a migration after the functionality is in place .
+    //       See https://github.com/mui/mui-toolpad/pull/776
+    //       In migration '1' we should update all query connectionId and navigate action pageId.
+    return nodeRef;
+  }
   if (nodeRef) {
     return nodeRef.$$ref;
   }

@@ -23,7 +23,7 @@ const features = {
       title: 'Build visually',
       wip: false,
       description:
-        'Use the drag & drop canvas to build applications fast. Create a beautiful, functional user interface with no fiddling with CSS required.',
+        'Use the drag & drop canvas to build applications fast. Create a beautiful, functional user interface without ever touching the CSS.',
     },
     {
       icon: <CodeIcon fontSize="small" color="primary" />,
@@ -44,14 +44,14 @@ const features = {
       title: 'MUI component library',
       wip: false,
       description:
-        'Access our extensive and powerful library and X components. Bring or build your own custom components in Toolpad.',
+        'Access the full suite of pre-built MUI components, including both Core and X—or bring your own custom components to your Toolpad app.',
     },
     {
       icon: <ThumbUpOutlinedIcon fontSize="small" color="primary" />,
       title: 'Collaboration',
       wip: true,
       description:
-        'Toolpad allows real-time commenting & multi-user app building and viewing experience, so you don’t have to shuffle between platforms.',
+        'Toolpad enables your team to communicate and collaborate in one seamless building experience—no more shuffling between platforms.',
     },
     {
       icon: <GppGoodIcon fontSize="small" color="primary" />,
@@ -79,7 +79,7 @@ const features = {
       title: 'Custom theming',
       wip: true,
       description:
-        'Turn into CSS flow mode when you need more control. MUI theme object gives you direct access to the MUI theme. You can import styles or define them locally.',
+        "Switch to CSS Flow mode anytime you need to manage the finer details. Take full control of your app's theme, import styles, or define them locally.",
     },
   ],
 };

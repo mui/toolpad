@@ -20,6 +20,7 @@ model App {
   releases    Release[]    @relation("AppReleases")
 }
 
+// Deprecated: Dom is now stored in the `App` model
 model DomNode {
   id          String             @id @default(cuid())
   name        String
@@ -36,6 +37,7 @@ model DomNode {
   @@unique([appId, name], name: "node_name_app_constraint")
 }
 
+// Deprecated: Dom is now stored in the `App` model
 model DomNodeAttribute {
   nodeId    String
   namespace String
@@ -68,6 +70,7 @@ model Deployment {
   release   Release  @relation("DeploymentRelease", fields: [appId, version], references: [appId, version])
 }
 
+// Deprecated: Dom is now stored in the `App` model
 enum DomNodeType {
   app
   connection
@@ -81,6 +84,7 @@ enum DomNodeType {
   query
 }
 
+// Deprecated: Dom is now stored in the `App` model
 enum DomNodeAttributeType {
   const
   binding

@@ -1,4 +1,4 @@
-import { UseQueryResult } from 'react-query';
+import { UseQueryResult } from '@tanstack/react-query';
 import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '../utils/react';
 import client, { UseQueryFnOptions } from '../api';

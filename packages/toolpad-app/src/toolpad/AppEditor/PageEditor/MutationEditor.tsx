@@ -18,16 +18,75 @@ import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { QueryEditorModel } from '../../../types';
+import { QueryEditorModel, QueryEditorShellProps } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import { update } from '../../../utils/immutability';
-import { useEvaluateLiveBindings } from '../useEvaluateLiveBinding';
 import { useDom, useDomApi } from '../../DomLoader';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
-import ConnectionSelect from './ConnectionSelect';
+import ConnectionSelect, { ConnectionOption } from './ConnectionSelect';
+import { createProvidedContext } from '../../../utils/react';
 
 const DATASOURCES_WHITELIST = ['function'];
+
+const EMPTY_OBJECT = {};
+
+interface RenderDialogActions {
+  (params: { isDirty?: boolean; onCommit?: () => void }): React.ReactNode;
+}
+
+interface MutationEditorDialogContext {
+  open: boolean;
+  onClose: () => void;
+  dataSourceId: string | null;
+  renderDialogTitle: () => React.ReactNode;
+  renderDialogActions: RenderDialogActions;
+}
+
+const [useMutationEditorDialogContext, MutationEditorDialogContextProvider] =
+  createProvidedContext<MutationEditorDialogContext>('MutationEditorDialog');
+
+export function MutationEditorShell({ children, isDirty, onCommit }: QueryEditorShellProps) {
+  const { open, onClose, dataSourceId, renderDialogTitle, renderDialogActions } =
+    useMutationEditorDialogContext();
+
+  return (
+    <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
+      {renderDialogTitle()}
+
+      <Divider />
+
+      {dataSourceId ? (
+        <DialogContent
+          sx={{
+            // height will be clipped by max-height
+            height: '100vh',
+            p: 0,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Box
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              position: 'relative',
+              display: 'flex',
+            }}
+          >
+            {children}
+          </Box>
+        </DialogContent>
+      ) : (
+        <DialogContent>
+          <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
+        </DialogContent>
+      )}
+
+      {renderDialogActions({ isDirty, onCommit })}
+    </Dialog>
+  );
+}
 
 interface DataSourceSelectorProps<Q> {
   open: boolean;
@@ -38,19 +97,22 @@ interface DataSourceSelectorProps<Q> {
 function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSelectorProps<Q>) {
   const dom = useDom();
 
-  const [input, setInput] = React.useState<NodeId | null>(null);
+  const [input, setInput] = React.useState<ConnectionOption | null>(null);
 
-  const handleClick = React.useCallback(() => {
-    const connectionId = input;
-    const connection = connectionId && appDom.getMaybeNode(dom, connectionId, 'connection');
+  const handleCreateClick = React.useCallback(() => {
+    invariant(input, `Create button should be disabled when there's no input`);
 
-    invariant(connection, `Selected non-existing connection "${connectionId}"`);
+    const { connectionId = null, dataSourceId } = input;
 
-    const dataSourceId = connection.attributes.dataSource.value;
+    if (connectionId) {
+      const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
+      invariant(connection, `Selected non-existing connection "${connectionId}"`);
+    }
+
     const dataSource = dataSources[dataSourceId];
     invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
 
-    const mutationNode = appDom.createNode(dom, 'mutation', {
+    const queryNode = appDom.createNode(dom, 'mutation', {
       attributes: {
         query: appDom.createConst(dataSource.getInitialQueryValue()),
         connectionId: appDom.createConst(appDom.ref(connectionId)),
@@ -58,12 +120,12 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
       },
     });
 
-    onCreated(mutationNode);
+    onCreated(queryNode);
   }, [dom, input, onCreated]);
 
   return (
-    <Dialog open={open} onClose={onClose} scroll="body">
-      <DialogTitle>Create Mutation</DialogTitle>
+    <Dialog fullWidth open={open} onClose={onClose} scroll="body">
+      <DialogTitle>Create Query</DialogTitle>
       <DialogContent>
         <ConnectionSelect
           dataSource={DATASOURCES_WHITELIST}
@@ -76,8 +138,8 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
         <Button color="inherit" variant="text" onClick={onClose}>
           Cancel
         </Button>
-        <Button disabled={!input} onClick={handleClick}>
-          Create mutation
+        <Button disabled={!input} onClick={handleCreateClick}>
+          Create query
         </Button>
       </DialogActions>
     </Dialog>
@@ -109,44 +171,64 @@ function MutationNodeEditorDialog<Q, P>({
     }
   }, [open, node]);
 
-  const connectionId = appDom.deref(input.attributes.connectionId.value);
-  const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
-  const dataSourceId = input.attributes.dataSource?.value;
+  const connectionId = input.attributes.connectionId.value
+    ? appDom.deref(input.attributes.connectionId.value)
+    : null;
+  const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
+  const inputParams = input.params || EMPTY_OBJECT;
+  const dataSourceId = input.attributes.dataSource?.value || null;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const handleConnectionChange = React.useCallback((newConnectionId: NodeId | null) => {
-    setInput((existing) =>
-      update(existing, {
-        attributes: update(existing.attributes, {
-          connectionId: newConnectionId
-            ? appDom.createConst(appDom.ref(newConnectionId))
-            : undefined,
-        }),
-      }),
-    );
-  }, []);
+  const connectionParams = connection?.attributes.params.value;
 
-  const handleQueryChange = React.useCallback((model: QueryEditorModel<Q>) => {
-    setInput((existing) =>
-      update(existing, {
-        attributes: update(existing.attributes, {
-          query: appDom.createConst(model.query),
+  const queryModel = React.useMemo(
+    () => ({
+      query: input.attributes.query.value,
+      params: inputParams,
+    }),
+    [input.attributes.query.value, inputParams],
+  );
+
+  const handleQueryModelChange = React.useCallback(
+    (model: QueryEditorModel<Q>) => {
+      onSave(
+        update(input, {
+          attributes: update(input.attributes, {
+            query: appDom.createConst(model.query),
+          }),
+          params: model.params,
         }),
-        params: model.params,
-      }),
-    );
-  }, []);
+      );
+    },
+    [input, onSave],
+  );
 
   const { pageState } = usePageEditorState();
 
-  const liveParams = useEvaluateLiveBindings({
-    input: input.params || {},
-    globalScope: pageState,
-  });
-
-  const handleSave = React.useCallback(() => {
-    onSave(input);
-  }, [onSave, input]);
+  const handleConnectionChange = React.useCallback(
+    (newConnectionOption: ConnectionOption | null) => {
+      if (newConnectionOption) {
+        setInput((existing) =>
+          update(existing, {
+            attributes: update(existing.attributes, {
+              connectionId: appDom.createConst(appDom.ref(newConnectionOption.connectionId)),
+              dataSource: appDom.createConst(newConnectionOption.dataSourceId),
+            }),
+          }),
+        );
+      } else {
+        setInput((existing) =>
+          update(existing, {
+            attributes: update(existing.attributes, {
+              connectionId: undefined,
+              dataSource: undefined,
+            }),
+          }),
+        );
+      }
+    },
+    [],
+  );
 
   const handleRemove = React.useCallback(() => {
     onRemove(node);
@@ -168,69 +250,83 @@ function MutationNodeEditorDialog<Q, P>({
     }
   }, [onClose, isInputSaved]);
 
-  const queryEditorContext = React.useMemo(() => ({ appId, connectionId }), [appId, connectionId]);
+  const queryEditorContext = React.useMemo(
+    () => (dataSourceId ? { appId, dataSourceId, connectionId } : null),
+    [appId, dataSourceId, connectionId],
+  );
 
-  return (
-    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
+  const renderDialogTitle = React.useCallback(
+    () => (
       <DialogTitle>
         <Stack direction="row" gap={2}>
           <NodeNameEditor node={node} />
           <ConnectionSelect
             dataSource={dataSourceId}
-            value={appDom.deref(input.attributes.connectionId.value) || null}
+            value={
+              input.attributes.dataSource
+                ? {
+                    connectionId: appDom.deref(input.attributes.connectionId.value) || null,
+                    dataSourceId: input.attributes.dataSource.value,
+                  }
+                : null
+            }
             onChange={handleConnectionChange}
           />
         </Stack>
       </DialogTitle>
-      <Divider />
+    ),
+    [
+      dataSourceId,
+      handleConnectionChange,
+      input.attributes.connectionId.value,
+      input.attributes.dataSource,
+      node,
+    ],
+  );
 
-      {dataSourceId && dataSource ? (
-        <DialogContent
-          sx={{
-            // height will be clipped by max-height
-            height: '100vh',
-            p: 0,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <Box
-            sx={{
-              flex: 1,
-              minHeight: 0,
-              position: 'relative',
-              display: 'flex',
-            }}
-          >
-            <ConnectionContextProvider value={queryEditorContext}>
-              <dataSource.QueryEditor
-                connectionParams={connection?.attributes.params.value}
-                value={{
-                  query: input.attributes.query.value,
-                  params: input.params,
-                }}
-                liveParams={liveParams}
-                onChange={handleQueryChange}
-                globalScope={pageState}
-              />
-            </ConnectionContextProvider>
-          </Box>
-        </DialogContent>
+  const renderDialogActions: RenderDialogActions = React.useCallback(
+    ({ isDirty, onCommit }) => {
+      return (
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleRemove}>Remove</Button>
+          <Button disabled={isInputSaved && !isDirty} onClick={onCommit}>
+            Save
+          </Button>
+        </DialogActions>
+      );
+    },
+    [handleClose, handleRemove, isInputSaved],
+  );
+
+  const queryEditorShellContext: MutationEditorDialogContext = {
+    open,
+    onClose: handleClose,
+    dataSourceId: dataSource ? dataSourceId : null,
+    renderDialogTitle,
+    renderDialogActions,
+  };
+
+  return (
+    <MutationEditorDialogContextProvider value={queryEditorShellContext}>
+      {dataSourceId && dataSource && queryEditorContext ? (
+        <ConnectionContextProvider value={queryEditorContext}>
+          <dataSource.QueryEditor
+            QueryEditorShell={MutationEditorShell}
+            connectionParams={connectionParams}
+            value={queryModel}
+            onChange={handleQueryModelChange}
+            globalScope={pageState}
+          />
+        </ConnectionContextProvider>
       ) : (
-        <DialogContent>
+        <MutationEditorShell>
           <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        </DialogContent>
+        </MutationEditorShell>
       )}
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={handleClose}>
-          Cancel
-        </Button>
-        <Button onClick={handleRemove}>Remove</Button>
-        <Button disabled={isInputSaved} onClick={handleSave}>
-          Save
-        </Button>
-      </DialogActions>
-    </Dialog>
+    </MutationEditorDialogContextProvider>
   );
 }
 
@@ -238,7 +334,7 @@ type DialogState = {
   nodeId?: NodeId;
 };
 
-export default function MutationEditor() {
+export default function QueryEditor() {
   const dom = useDom();
   const state = usePageEditorState();
   const domApi = useDomApi();
@@ -286,17 +382,17 @@ export default function MutationEditor() {
   return (
     <Stack spacing={1} alignItems="start">
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
-        Add mutation
+        Add query
       </Button>
       <List>
-        {mutations.map((MutationNode) => {
+        {mutations.map((mutationNode) => {
           return (
             <ListItem
-              key={MutationNode.id}
+              key={mutationNode.id}
               button
-              onClick={() => setDialogState({ nodeId: MutationNode.id })}
+              onClick={() => setDialogState({ nodeId: mutationNode.id })}
             >
-              {MutationNode.name}
+              {mutationNode.name}
             </ListItem>
           );
         })}

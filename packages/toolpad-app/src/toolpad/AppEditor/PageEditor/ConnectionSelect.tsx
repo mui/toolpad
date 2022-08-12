@@ -5,6 +5,7 @@ import * as appDom from '../../../appDom';
 import { Maybe, WithControlledProp } from '../../../utils/types';
 import { useDom } from '../../DomLoader';
 import dataSources from '../../../toolpadDataSources/client';
+import { asArray } from '../../../utils/collections';
 
 export type ConnectionOption = {
   connectionId: NodeId | null;
@@ -12,7 +13,7 @@ export type ConnectionOption = {
 };
 
 export interface ConnectionSelectProps extends WithControlledProp<ConnectionOption | null> {
-  dataSource?: Maybe<string>;
+  dataSource?: Maybe<string | string[]>;
   sx?: SxProps;
 }
 
@@ -28,11 +29,12 @@ export default function ConnectionSelect({
   const { connections = [] } = appDom.getChildNodes(dom, app);
 
   const options: ConnectionOption[] = React.useMemo(() => {
+    const filteredSources = new Set(asArray(dataSource));
     const result: ConnectionOption[] = [];
 
     for (const [dataSourceId, config] of Object.entries(dataSources)) {
       if (config?.hasDefault) {
-        if (!dataSource || dataSource === dataSourceId) {
+        if (!dataSource || filteredSources.has(dataSourceId)) {
           result.push({
             dataSourceId,
             connectionId: null,
@@ -43,7 +45,7 @@ export default function ConnectionSelect({
 
     for (const connection of connections) {
       const connectionDataSourceId = connection.attributes.dataSource.value;
-      if (!dataSource || dataSource === connectionDataSourceId) {
+      if (!dataSource || filteredSources.has(connectionDataSourceId)) {
         const connectionDataSource = dataSources[connectionDataSourceId];
         if (connectionDataSource) {
           result.push({

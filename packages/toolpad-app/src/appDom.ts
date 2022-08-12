@@ -124,7 +124,7 @@ export interface MutationNode<Q = any, P = any> extends AppDomNodeBase {
   readonly params?: BindableAttrValues<P>;
   readonly attributes: {
     readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeReference>;
+    readonly connectionId: ConstantAttrValue<NodeReference | null>;
     readonly query: ConstantAttrValue<Q>;
   };
 }

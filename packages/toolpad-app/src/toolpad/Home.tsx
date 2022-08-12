@@ -85,6 +85,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 label="seed DOM"
                 fullWidth
                 multiline
+                maxRows={10}
                 value={dom}
                 onChange={handleDomChange}
               />

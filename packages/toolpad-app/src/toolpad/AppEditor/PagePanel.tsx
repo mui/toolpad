@@ -93,7 +93,7 @@ function AppMenu() {
         maxWidth="sm"
       >
         <DialogTitle id={dialogTitleId}>Application DOM</DialogTitle>
-        <DialogContent sx={{ position: 'relative' }}>
+        <DialogContent sx={{ position: 'relative', display: 'flex' }}>
           <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
             <JsonView src={dom} expandPaths={[]} expandLevel={5} />
           </Box>

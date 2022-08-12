@@ -5,7 +5,6 @@ import {
   RuntimeError,
   ComponentConfig,
   BindableAttrValues,
-  LiveBinding,
   NodeId,
   PropValueType,
 } from '@mui/toolpad-core';
@@ -92,10 +91,16 @@ export interface QueryEditorModel<Q> {
   params?: BindableAttrValues<any>;
 }
 
+export interface QueryEditorShellProps {
+  children?: React.ReactNode;
+  isDirty?: boolean;
+  onCommit?: () => void;
+}
+
 export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
+  QueryEditorShell: React.ComponentType<QueryEditorShellProps>;
   connectionParams: Maybe<P>;
   globalScope: Record<string, any>;
-  liveParams: Record<string, LiveBinding>;
 }
 
 export type QueryEditor<P, Q = {}> = React.FC<QueryEditorProps<P, Q>>;
@@ -111,6 +116,7 @@ export interface ClientDataSource<P = {}, Q = {}> {
   isConnectionValid: (connection: P) => boolean;
   QueryEditor: QueryEditor<P, Q>;
   getInitialQueryValue: () => Q;
+  hasDefault?: boolean;
 }
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {

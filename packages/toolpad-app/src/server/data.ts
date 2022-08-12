@@ -161,41 +161,9 @@ export async function getApp(id: string) {
   return prisma.app.findUnique({ where: { id } });
 }
 
-function createDefaultConnections(dom: appDom.AppDom): appDom.ConnectionNode[] {
-  if (process.env.TOOLPAD_DEMO) {
-    return [
-      appDom.createNode(dom, 'connection', {
-        name: 'movies',
-        attributes: {
-          dataSource: appDom.createConst('movies'),
-          params: appDom.createSecret({ apiKey: '12345' }),
-          status: appDom.createConst(null),
-        },
-      }),
-    ];
-  }
-
-  return [
-    appDom.createNode(dom, 'connection', {
-      name: 'rest',
-      attributes: {
-        dataSource: appDom.createConst('rest'),
-        params: appDom.createSecret({}),
-        status: appDom.createConst(null),
-      },
-    }),
-  ];
-}
-
 function createDefaultDom(): appDom.AppDom {
   let dom = appDom.createDom();
   const appNode = appDom.getApp(dom);
-
-  // Create default connections
-  const defaultConnections = createDefaultConnections(dom);
-  for (const connection of defaultConnections) {
-    dom = appDom.addNode(dom, connection, appNode, 'connections');
-  }
 
   // Create default page
   const newPageNode = appDom.createNode(dom, 'page', {
@@ -335,20 +303,16 @@ export async function loadReleaseDom(appId: string, version: number): Promise<ap
   return JSON.parse(release.snapshot.toString('utf-8')) as appDom.AppDom;
 }
 
-async function getConnection<P = unknown>(
-  appId: string,
-  id: string,
-): Promise<appDom.ConnectionNode<P>> {
-  const dom = await loadPreviewDom(appId);
-  return appDom.getNode(dom, id as NodeId, 'connection') as appDom.ConnectionNode<P>;
-}
-
 export async function getConnectionParams<P = unknown>(
   appId: string,
-  id: string,
+  connectionId: string | null,
 ): Promise<P | null> {
   const dom = await loadPreviewDom(appId);
-  const node = appDom.getNode(dom, id as NodeId, 'connection') as appDom.ConnectionNode<P>;
+  const node = appDom.getNode(
+    dom,
+    connectionId as NodeId,
+    'connection',
+  ) as appDom.ConnectionNode<P>;
   return node.attributes.params.value;
 }
 
@@ -388,10 +352,9 @@ export async function execQuery<P, Q>(
     );
   }
 
-  const connectionParams = await getConnectionParams<P>(
-    appId,
-    appDom.deref(dataNode.attributes.connectionId.value),
-  );
+  const connectionParams = dataNode.attributes.connectionId.value
+    ? await getConnectionParams<P>(appId, appDom.deref(dataNode.attributes.connectionId.value))
+    : null;
 
   let result = await dataSource.exec(connectionParams, dataNode.attributes.query.value, params);
 
@@ -410,22 +373,23 @@ export async function execQuery<P, Q>(
 
 export async function dataSourceFetchPrivate<P, Q>(
   appId: string,
-  connectionId: NodeId,
+  dataSourceId: string,
+  connectionId: NodeId | null,
   query: Q,
 ): Promise<any> {
-  const connection: appDom.ConnectionNode<P> = await getConnection<P>(appId, connectionId);
-  const dataSourceId = connection.attributes.dataSource.value;
   const dataSource: ServerDataSource<P, Q, any> | undefined = serverDataSources[dataSourceId];
 
   if (!dataSource) {
-    throw new Error(`Unknown dataSource "${dataSourceId}" for connection "${connection.id}"`);
+    throw new Error(`Unknown dataSource "${dataSourceId}"`);
   }
 
   if (!dataSource.execPrivate) {
     throw new Error(`No execPrivate available on datasource "${dataSourceId}"`);
   }
 
-  const connectionParams = connection.attributes.params.value;
+  const connectionParams: P | null = connectionId
+    ? await getConnectionParams<P>(appId, connectionId)
+    : null;
 
   return dataSource.execPrivate(connectionParams, query);
 }

@@ -12,7 +12,7 @@ import invariant from 'invariant';
 import { ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
-import { ExactEntriesOf } from './utils/types';
+import { ExactEntriesOf, Maybe } from './utils/types';
 import { filterValues } from './utils/collections';
 
 export const RESERVED_NODE_PROPERTIES = [
@@ -108,7 +108,7 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
   readonly params?: BindableAttrValues<P>;
   readonly attributes: {
     readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeReference>;
+    readonly connectionId: ConstantAttrValue<NodeReference | null>;
     readonly query: ConstantAttrValue<Q>;
     readonly transform?: ConstantAttrValue<string>;
     readonly transformEnabled?: ConstantAttrValue<boolean>;
@@ -841,12 +841,21 @@ export function createRenderTree(dom: AppDom): RenderTree {
   };
 }
 
-export function ref(nodeId: NodeId): NodeReference {
-  return { $$ref: nodeId };
+export function ref(nodeId: NodeId): NodeReference;
+export function ref(nodeId: null | undefined): null;
+export function ref(nodeId: Maybe<NodeId>): NodeReference | null;
+export function ref(nodeId: Maybe<NodeId>): NodeReference | null {
+  return nodeId ? { $$ref: nodeId } : null;
 }
 
-export function deref(nodeRef: NodeReference): NodeId {
-  return nodeRef.$$ref;
+export function deref(nodeRef: NodeReference): NodeId;
+export function deref(nodeRef: null | undefined): null;
+export function deref(nodeRef: Maybe<NodeReference>): NodeId | null;
+export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
+  if (nodeRef) {
+    return nodeRef.$$ref;
+  }
+  return null;
 }
 
 export function fromLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {

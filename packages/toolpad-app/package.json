@@ -71,7 +71,7 @@
     "json-to-ts": "^1.7.0",
     "json5": "^2.2.1",
     "lodash-es": "^4.17.21",
-    "monaco-editor": "0.34.0-dev.20220725",
+    "monaco-editor": "0.34.0",
     "next": "12.2.0",
     "node-fetch": "^2.6.7",
     "node-fetch-har": "^1.0.1",

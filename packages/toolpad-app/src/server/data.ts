@@ -222,7 +222,7 @@ export async function deleteApp(id: string): Promise<void> {
   await prisma.app.delete({
     where: { id },
     select: {
-      // Only return the id to reduce amount of data returne from the db
+      // Only return the id to reduce amount of data returned from the db
       id: true,
     },
   });

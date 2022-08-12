@@ -84,12 +84,12 @@ const planInfo = {
   community: {
     color: 'green',
     title: 'Community',
-    description: 'Only available to self-host. Free forever. Ideal for freelancers.',
+    description: 'Get started with a powerful open-source low-code platform, MIT-licensed, free forever',
   },
   commercial: {
     color: 'blue',
     title: 'Commercial',
-    description: 'Paid plan for enterprises.',
+    description: 'Paid plans for large teams and organizations with advanced security, control, and support needs',
   },
 };
 

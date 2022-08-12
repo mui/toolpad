@@ -32,7 +32,7 @@ export default function ToolpadHero() {
           <GradientText>admin builder</GradientText>
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 520, mx: 'auto' }}>
-          Drag and drop pre-built components, connect to data sources, APIs and build your internal
+          Drag and drop pre-built components, connect to data sources and APIs, and build your internal
           tools 10x faster. Open-source and powered by MUI.
         </Typography>
         <Typography color="text.secondary" sx={{ fontWeight: 700, mb: 2, mx: 'auto' }}>

@@ -443,7 +443,7 @@ export default function Pricing({
 }) {
   return (
     <React.Fragment>
-      <Container>
+      <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
         <SectionHeadline overline="Plans" title={Headline} />
         <Typography variant="body2" sx={{ marginTop: { md: -2 }, marginBottom: { xs: 2, md: 0 } }}>
           With the intention to have affordable plans for all kind of business needs, we will

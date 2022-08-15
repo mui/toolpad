@@ -8,16 +8,10 @@ import Button from '@mui/material/Button';
 import Link from 'docs/src/modules/components/Link';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 
-export default function Banner({ content }) {
+export default function Banner(props) {
+  const { content } = props;
   return (
-    <Container
-      sx={{
-        pt: 2,
-        pb: { xs: 2, sm: 4, md: 8 },
-        scrollMarginTop: 'calc(var(--MuiDocs-header-height) + 32px)',
-      }}
-      id="banner-full-width"
-    >
+    <Container sx={{ py: { xs: 2, sm: 4, md: 8 } }}>
       <Stack
         sx={{
           borderRadius: 1,
@@ -32,10 +26,7 @@ export default function Banner({ content }) {
             sm: 'row',
           },
           justifyContent: 'space-between',
-          alignItems: {
-            xs: 'flex-start',
-            sm: 'center',
-          },
+          alignItems: { xs: 'flex-start', sm: 'center' },
         }}
       >
         <Box>
@@ -49,6 +40,8 @@ export default function Banner({ content }) {
         <Button
           component={Link}
           noLinkStyle
+          target="_blank"
+          rel="noopener"
           href={content?.action?.href}
           variant="contained"
           fullWidth

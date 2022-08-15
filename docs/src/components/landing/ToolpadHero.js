@@ -1,10 +1,10 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import Link from 'docs/src/modules/components/Link';
 import Typography from '@mui/material/Typography';
+import InputBase, { inputBaseClasses } from '@mui/material/InputBase';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from './GradientText';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
@@ -39,10 +39,55 @@ export default function ToolpadHero() {
         <Typography color="text.secondary" sx={{ fontWeight: 700, mb: 2, mx: 'auto' }}>
           Get notified of the beta release.
         </Typography>
-        <TextField
-          variant="outlined"
+        <InputBase
+          id="email-subscribe"
+          name="email"
+          type="email"
           placeholder="example@email.com"
-          sx={{ mr: 2, mb: { xs: 2, sm: 0 }, width: { xs: '100%', sm: 'auto' } }}
+          inputProps={{ required: true }}
+          sx={{
+            mr: 2,
+            mb: { xs: 2, sm: 0 },
+            minWidth: 220,
+            width: { xs: '100%', sm: 'auto' },
+            bgcolor: (theme) =>
+              theme.palette.mode === 'dark' ? theme.palette.primaryDark[900] : '#fff',
+            boxShadow: (theme) =>
+              theme.palette.mode === 'dark'
+                ? '0 1px 2px 0 rgba(0 0 0 / 1)'
+                : '0 1px 2px 0 rgba(0 0 0 / 0.1)',
+            borderRadius: 1,
+            border: '1px solid',
+            borderColor: (theme) =>
+              theme.palette.mode === 'dark'
+                ? theme.palette.primaryDark[500]
+                : theme.palette.grey[300],
+            px: 1,
+            py: 0.5,
+            height: 50,
+            typography: 'body2',
+            '&:hover': {
+              borderColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? theme.palette.primaryDark[300]
+                  : theme.palette.grey[400],
+              boxShadow: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? '0 1px 2px 0 rgba(0 0 0 / 1)'
+                  : '0 1px 2px 0 rgba(0 0 0 / 0.2)',
+            },
+            [`&.${inputBaseClasses.focused}`]: {
+              borderColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? theme.palette.primaryDark[300]
+                  : theme.palette.primary[500],
+              outline: '3px solid',
+              outlineColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? theme.palette.primaryDark[500]
+                  : theme.palette.primary[200],
+            },
+          }}
         />
         <Button
           component={Link}

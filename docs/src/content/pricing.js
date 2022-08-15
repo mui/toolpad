@@ -209,7 +209,7 @@ const communityData = {
   'Data sources': <Info value={'Unlimited'} />,
   'Export to code': pending,
   'Plugging API': pending,
-  'Built-in version control': pending,
+  'Built-in version control': no,
   'Git version control': (
     <Info value={pending} metadata={'Unlimited public repositories, 1 private repository'} />
   ),

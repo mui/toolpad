@@ -15,7 +15,7 @@ import GradientText from '../components/landing/GradientText';
 const features = {
   Headline: (
     <Typography variant="h2" maxWidth={500} marginBottom={3}>
-      Build apps <GradientText>fast</GradientText>, visually, and production-ready
+      <GradientText>Production-ready</GradientText>in minutes
     </Typography>
   ),
   cards: [
@@ -100,7 +100,7 @@ const features = {
       title: 'Custom theming',
       wip: true,
       description:
-        "You can write CSS in Toolpad to manage the finer details. You can import styles, or define them locally to take full control of your app's theme.",
+        "Write CSS in Toolpad to manage the finer details. Import styles or define them locally to take full control of your app's theme.",
     },
   ],
 };

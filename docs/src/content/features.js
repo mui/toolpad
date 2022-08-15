@@ -15,7 +15,7 @@ import GradientText from '../components/landing/GradientText';
 const features = {
   Headline: (
     <Typography variant="h2" maxWidth={500} marginBottom={3}>
-      <GradientText>Production-ready</GradientText>in minutes
+      <GradientText>Production-ready</GradientText><br />in minutes
     </Typography>
   ),
   cards: [

@@ -35,7 +35,7 @@ export default function Home() {
       <CssBaseline />
       <AppHeaderBanner />
       <AppHeader />
-      <main>
+      <main id="main-content">
         <ToolpadHero />
         <ToolpadHeroDemo />
         <CardGrid content={features} span={4} />

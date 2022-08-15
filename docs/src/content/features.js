@@ -2,6 +2,7 @@ import * as React from 'react';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import CodeIcon from '@mui/icons-material/Code';
 import LinkIcon from '@mui/icons-material/Link';
+import Link from '@mui/material/Link';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
 import GppGoodIcon from '@mui/icons-material/GppGood';
@@ -23,7 +24,7 @@ const features = {
       title: 'Build visually',
       wip: false,
       description:
-        'Use the drag & drop canvas to build applications fast. Create a beautiful, functional user interface without ever touching the CSS.',
+        'Use the drag & drop canvas to build applications fast. Create a beautiful, functional user interface without writing a single line of CSS.',
     },
     {
       icon: <CodeIcon fontSize="small" color="primary" />,
@@ -35,9 +36,29 @@ const features = {
     {
       icon: <LinkIcon fontSize="small" color="primary" />,
       title: 'Connect any data source',
-      wip: true,
-      description:
-        'Find all the integrations that you need: REST, Google sheets. PostgreSQL, MySQL, GraphQL 🚧, OpenAPI 🚧, and a plugin system to add new ones.',
+      wip: false,
+      description: (
+        <React.Fragment>
+          Find all the integrations that you need. So far, it supports REST, Google sheets. 🚧 We
+          are working on adding{' '}
+          <Link href="https://github.com/mui/mui-toolpad/issues/793" target="_blank" rel="noopener">
+            PostgreSQL
+          </Link>
+          ,{' '}
+          <Link href="https://github.com/mui/mui-toolpad/issues/792" target="_blank" rel="noopener">
+            MySQL
+          </Link>
+          ,{' '}
+          <Link href="https://github.com/mui/mui-toolpad/issues/383" target="_blank" rel="noopener">
+            GraphQL
+          </Link>
+          , and a{' '}
+          <Link href="https://github.com/mui/mui-toolpad/issues/791" target="_blank" rel="noopener">
+            plugin system
+          </Link>{' '}
+          to add new ones.
+        </React.Fragment>
+      ),
     },
     {
       icon: <ViewModuleIcon fontSize="small" color="primary" />,
@@ -47,18 +68,18 @@ const features = {
         'Access the full suite of pre-built MUI components, including both MUI Core and MUI X—or bring your own custom components to your Toolpad app.',
     },
     {
+      icon: <GppGoodIcon fontSize="small" color="primary" />,
+      title: 'Self-host for security',
+      wip: false,
+      description:
+        'Host Toolpad on your own infrastructure to keep full control over where your data goes. In the future, we will provide airgapping guarantees.',
+    },
+    {
       icon: <ThumbUpOutlinedIcon fontSize="small" color="primary" />,
       title: 'Collaboration',
       wip: true,
       description:
         'Toolpad enables your team to communicate and collaborate in one seamless building experience—no more shuffling between platforms.',
-    },
-    {
-      icon: <GppGoodIcon fontSize="small" color="primary" />,
-      title: 'Self-host for security',
-      wip: false,
-      description:
-        'Host Toolpad on your own infrastructure to keep full control over where your data goes.',
     },
     {
       icon: <FastForwardIcon fontSize="small" color="primary" />,
@@ -79,7 +100,7 @@ const features = {
       title: 'Custom theming',
       wip: true,
       description:
-        "Switch to CSS Flow mode anytime you need to manage the finer details. Take full control of your app's theme, import styles, or define them locally.",
+        "You can write CSS in Toolpad to manage the finer details. You can import styles, or define them locally to take full control of your app's theme.",
     },
   ],
 };

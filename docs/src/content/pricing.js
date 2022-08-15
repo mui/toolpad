@@ -213,7 +213,7 @@ const communityData = {
   'Git version control': (
     <Info value={pending} metadata={'Unlimited public repositories, 1 private repository'} />
   ),
-  'Staging environments': <Info value={pending} metadata={'1'} />,
+  'Staging environments': <Info value={pending} metadata={'1 env'} />,
   'White label': no,
   'Custom themes': no,
   // Components

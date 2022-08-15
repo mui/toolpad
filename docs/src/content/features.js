@@ -30,7 +30,7 @@ const features = {
       title: 'Extensible with code',
       wip: false,
       description:
-        'Build low-code with pro-code extensibility. Write JavaScript anywhere in Toolpad.',
+        'Build low-code with pro-code extensibility. You can write JavaScript anywhere in Toolpad as soon as you feel limited by the built-in features.',
     },
     {
       icon: <LinkIcon fontSize="small" color="primary" />,
@@ -44,7 +44,7 @@ const features = {
       title: 'MUI component library',
       wip: false,
       description:
-        'Access the full suite of pre-built MUI components, including both Core and X—or bring your own custom components to your Toolpad app.',
+        'Access the full suite of pre-built MUI components, including both MUI Core and MUI X—or bring your own custom components to your Toolpad app.',
     },
     {
       icon: <ThumbUpOutlinedIcon fontSize="small" color="primary" />,
@@ -72,7 +72,7 @@ const features = {
       title: 'Git sync',
       wip: true,
       description:
-        'Git allows you to push, pull and manage your code. Sync your Toolpad app to work on multiple branches and submit PRs. Toolpad supports GitHub and other providers.',
+        'Git allows you to push, pull and manage your code. Sync your Toolpad app to work on multiple branches and submit PRs. Toolpad will support GitHub and other providers.',
     },
     {
       icon: <AutoAwesomeIcon fontSize="small" color="primary" />,

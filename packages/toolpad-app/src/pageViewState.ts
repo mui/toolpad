@@ -109,10 +109,10 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
             const gridAutoFlow = window.getComputedStyle(childContainerElm).gridAutoFlow;
             const flexDirection = window.getComputedStyle(childContainerElm).flexDirection;
 
-            let flowDirection;
+            let flowDirection = 'row';
             if (gridAutoFlow) {
               flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
-            } else {
+            } else if (flexDirection) {
               flowDirection = flexDirection;
             }
 

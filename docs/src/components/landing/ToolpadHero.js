@@ -32,7 +32,7 @@ export default function ToolpadHero() {
           <br />
           <GradientText>admin builder</GradientText>
         </Typography>
-        <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 520, mx: 'auto' }}>
+        <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 540, mx: 'auto' }}>
           Drag and drop pre-built components, connect to data sources and APIs, and build your
           internal tools 10x faster. Open-source and powered by MUI.
         </Typography>
@@ -40,7 +40,7 @@ export default function ToolpadHero() {
           Get notified of the beta release.
         </Typography>
         <InputBase
-          id="email-subscribe"
+          id="email-landing"
           name="email"
           type="email"
           placeholder="example@email.com"
@@ -48,7 +48,7 @@ export default function ToolpadHero() {
           sx={{
             mr: 2,
             mb: { xs: 2, sm: 0 },
-            minWidth: 220,
+            minWidth: { xs: 220, sm: 360 },
             width: { xs: '100%', sm: 'auto' },
             bgcolor: (theme) =>
               theme.palette.mode === 'dark' ? theme.palette.primaryDark[900] : '#fff',

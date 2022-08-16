@@ -84,12 +84,14 @@ const planInfo = {
   community: {
     color: 'green',
     title: 'Community',
-    description: 'Get started with a powerful open-source low-code platform, MIT-licensed, free forever',
+    description:
+      'Get started with a powerful open-source low-code platform, MIT-licensed, free forever',
   },
   commercial: {
     color: 'blue',
     title: 'Commercial',
-    description: 'Paid plans for large teams and organizations with advanced security, control, and support needs',
+    description:
+      'Paid plans for large teams and organizations with advanced security, control, and support needs',
   },
 };
 

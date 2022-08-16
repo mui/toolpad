@@ -21,10 +21,11 @@ export default function ToolpadHero() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: { xs: 'center', md: 'center' },
-            '& > *': { mr: 1, width: 84, height: 28 },
+            '& > *': { mr: 1, height: 28 },
           }}
         >
-          <IconImage name="product-toolpad" /> <GradientText>MUI Toolpad</GradientText>
+          <IconImage name="product-toolpad" />
+          <GradientText>MUI Toolpad</GradientText>
         </Typography>
         <Typography variant="h1" sx={{ my: 2 }}>
           Low-code
@@ -32,8 +33,8 @@ export default function ToolpadHero() {
           <GradientText>admin builder</GradientText>
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 520, mx: 'auto' }}>
-          Drag and drop pre-built components, connect to data sources and APIs, and build your internal
-          tools 10x faster. Open-source and powered by MUI.
+          Drag and drop pre-built components, connect to data sources and APIs, and build your
+          internal tools 10x faster. Open-source and powered by MUI.
         </Typography>
         <Typography color="text.secondary" sx={{ fontWeight: 700, mb: 2, mx: 'auto' }}>
           Get notified of the beta release.

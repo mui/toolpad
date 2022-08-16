@@ -1,6 +1,6 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
 export async function execDataSourceQuery(dataUrl: string, queryId: string, params: any) {
   const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));

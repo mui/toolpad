@@ -24,12 +24,12 @@ const JsonViewRoot = styled('div')({
   fontFamily: 'Consolas, Menlo, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
 });
 
-export interface JsonViewProps {
+export interface JsonViewProps extends ObjectInspectorProps {
   src: unknown;
   sx?: SxProps;
 }
 
-export default function JsonView({ src, sx }: JsonViewProps) {
+export default function JsonView({ src, sx, ...props }: JsonViewProps) {
   // TODO: elaborate on this to show a nice default, but avoid expanding massive amount of objects
   const expandPaths = Array.isArray(src) ? ['$', '$.0', '$.1', '$.2', '$.3', '$.4'] : undefined;
   return (
@@ -40,6 +40,7 @@ export default function JsonView({ src, sx }: JsonViewProps) {
         expandPaths={expandPaths}
         data={src}
         theme={inspectorTheme}
+        {...props}
       />
     </JsonViewRoot>
   );

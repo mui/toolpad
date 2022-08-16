@@ -23,7 +23,7 @@ import {
   BindableAttrValue,
   UseDataQueryConfig,
 } from '@mui/toolpad-core';
-import { QueryClient, QueryClientProvider, useMutation } from 'react-query';
+import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
   Routes,

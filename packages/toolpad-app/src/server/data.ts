@@ -178,13 +178,17 @@ function createDefaultDom(): appDom.AppDom {
   return dom;
 }
 
-export async function createApp(name: string): Promise<App> {
+export interface CreateAppOptions {
+  dom?: appDom.AppDom | null;
+}
+
+export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<App> {
   return prisma.$transaction(async () => {
     const app = await prisma.app.create({
       data: { name },
     });
 
-    const dom = createDefaultDom();
+    const dom = opts.dom ? appDom.duplicate(opts.dom) : createDefaultDom();
 
     await saveDom(app.id, dom);
 

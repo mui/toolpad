@@ -189,7 +189,7 @@ function SelectOptionsPropEditor({
               ) : null}
               <TextField
                 fullWidth
-                sx={{ m: 1 }}
+                sx={{ my: 1 }}
                 variant="outlined"
                 inputRef={optionInputRef}
                 onKeyUp={handleOptionTextInput}

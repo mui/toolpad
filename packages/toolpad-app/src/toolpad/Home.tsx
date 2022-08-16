@@ -43,6 +43,14 @@ export interface CreateAppDialogProps {
 
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
+
+  const [dom, setDom] = React.useState('');
+
+  const handleDomChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => setDom(event.target.value),
+    [],
+  );
+
   const createAppMutation = client.useMutation('createApp', {
     onSuccess: (app) => {
       window.location.href = `/_toolpad/app/${app.id}/editor`;
@@ -55,7 +63,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
         <DialogForm
           onSubmit={(event) => {
             event.preventDefault();
-            createAppMutation.mutate([name]);
+            createAppMutation.mutate([name, { dom: dom.trim() ? JSON.parse(dom) : null }]);
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
@@ -73,6 +81,16 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 setName(event.target.value);
               }}
             />
+            {process.env.TOOLPAD_CREATE_WITH_DOM ? (
+              <TextField
+                label="seed DOM"
+                fullWidth
+                multiline
+                maxRows={10}
+                value={dom}
+                onChange={handleDomChange}
+              />
+            ) : null}
           </DialogContent>
           <DialogActions>
             <Button

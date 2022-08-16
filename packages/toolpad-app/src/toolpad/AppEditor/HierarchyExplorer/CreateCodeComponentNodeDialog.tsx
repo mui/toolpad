@@ -62,7 +62,10 @@ export default function CreateCodeComponentDialog({
     event.target.select();
   }, []);
 
-  const inputErrorMsg = name ? appDom.validateNodeName(name, 'a code component name') : null;
+  const inputErrorMsg = React.useMemo(
+    () => (name ? appDom.validateNodeName(name, 'a code component name') : null),
+    [name],
+  );
   const isInvalid = !!inputErrorMsg;
 
   return (

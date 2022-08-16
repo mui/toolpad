@@ -48,11 +48,7 @@ function PropertyEditor({ argType, name, value, onChange }: PropertyEditorProps)
   if (!Control) {
     return null;
   }
-  return (
-    <ErrorBoundary fallback={null}>
-      <Control label={name} propType={argType.typeDef} value={value} onChange={onChange} />
-    </ErrorBoundary>
-  );
+  return <Control label={name} propType={argType.typeDef} value={value} onChange={onChange} />;
 }
 
 interface PropertiesEditorProps extends WithControlledProp<Record<string, any>> {

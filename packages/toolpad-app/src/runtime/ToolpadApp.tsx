@@ -3,6 +3,7 @@ import {
   Stack,
   CssBaseline,
   Alert,
+  Box,
   styled,
   AlertTitle,
   LinearProgress,
@@ -42,7 +43,12 @@ import { pick } from 'lodash-es';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
-import { getElementNodeComponentId, isPageRow, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';
+import {
+  getElementNodeComponentId,
+  isPageLayoutComponent,
+  isPageRow,
+  PAGE_ROW_COMPONENT_ID,
+} from '../toolpadComponents';
 import AppOverview from './AppOverview';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
@@ -57,6 +63,7 @@ import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
+import { boxAlignArgTypeDef, boxJustifyArgTypeDef } from '../toolpadComponents/layoutBox';
 
 const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
   'enabled',
@@ -292,9 +299,28 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
   }
 
+  const isLayoutNode =
+    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
+
   return (
     <NodeRuntimeWrapper nodeId={nodeId} componentConfig={Component[TOOLPAD_COMPONENT]}>
-      <Component {...props} />
+      {isLayoutNode ? (
+        <Component {...props} />
+      ) : (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems:
+              (componentConfig.hasBoxAlign && node.layout?.boxAlign?.value) ||
+              boxAlignArgTypeDef.defaultValue,
+            justifyContent:
+              (componentConfig.hasBoxJustify && node.layout?.boxJustify?.value) ||
+              boxJustifyArgTypeDef.defaultValue,
+          }}
+        >
+          <Component {...props} />
+        </Box>
+      )}
     </NodeRuntimeWrapper>
   );
 }

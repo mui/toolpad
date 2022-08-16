@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextFieldProps, MenuItem, TextField, Box, BoxProps } from '@mui/material';
+import { TextFieldProps, MenuItem, TextField } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface SelectOption {
@@ -9,29 +9,26 @@ export interface SelectOption {
 
 export type SelectProps = TextFieldProps & {
   options: (string | SelectOption)[];
-  alignItems?: BoxProps['alignItems'];
-  justifyContent?: BoxProps['justifyContent'];
 };
 
-function Select({ sx, options, alignItems, justifyContent, ...props }: SelectProps) {
+function Select({ sx, options, ...props }: SelectProps) {
   return (
-    <Box sx={{ display: 'flex', alignItems, justifyContent }}>
-      <TextField select sx={{ minWidth: 120, ...sx }} {...props}>
-        {options.map((option) => {
-          const parsedOption: SelectOption =
-            typeof option === 'string' ? { value: option } : option;
-          return (
-            <MenuItem key={parsedOption.value} value={parsedOption.value}>
-              {parsedOption.label ?? parsedOption.value}
-            </MenuItem>
-          );
-        })}
-      </TextField>
-    </Box>
+    <TextField select sx={{ minWidth: 120, ...sx }} {...props}>
+      {options.map((option) => {
+        const parsedOption: SelectOption = typeof option === 'string' ? { value: option } : option;
+        return (
+          <MenuItem key={parsedOption.value} value={parsedOption.value}>
+            {parsedOption.label ?? parsedOption.value}
+          </MenuItem>
+        );
+      })}
+    </TextField>
   );
 }
 
 export default createComponent(Select, {
+  hasBoxAlign: true,
+  hasBoxJustify: true,
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',
   argTypes: {
@@ -45,24 +42,6 @@ export default createComponent(Select, {
     variant: {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
       defaultValue: 'outlined',
-    },
-    alignItems: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      },
-      label: 'Vertical alignment',
-      control: { type: 'VerticalAlign' },
-      defaultValue: 'center',
-    },
-    justifyContent: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      },
-      label: 'Horizontal alignment',
-      control: { type: 'HorizontalAlign' },
-      defaultValue: 'start',
     },
     fullWidth: {
       typeDef: { type: 'boolean' },

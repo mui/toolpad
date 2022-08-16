@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  Box,
   TextField as MuiTextField,
   TextFieldProps as MuiTextFieldProps,
   BoxProps,
@@ -12,15 +11,13 @@ export type TextFieldProps = MuiTextFieldProps & {
   justifyContent?: BoxProps['justifyContent'];
 };
 
-function TextField({ alignItems, justifyContent, ...props }: TextFieldProps) {
-  return (
-    <Box sx={{ display: 'flex', alignItems, justifyContent }}>
-      <MuiTextField {...props} />
-    </Box>
-  );
+function TextField(props: TextFieldProps) {
+  return <MuiTextField {...props} />;
 }
 
 export default createComponent(TextField, {
+  hasBoxAlign: true,
+  hasBoxJustify: true,
   argTypes: {
     label: {
       typeDef: { type: 'string' },
@@ -31,24 +28,6 @@ export default createComponent(TextField, {
     },
     disabled: {
       typeDef: { type: 'boolean' },
-    },
-    alignItems: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      },
-      label: 'Vertical alignment',
-      control: { type: 'VerticalAlign' },
-      defaultValue: 'center',
-    },
-    justifyContent: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      },
-      label: 'Horizontal alignment',
-      control: { type: 'HorizontalAlign' },
-      defaultValue: 'start',
     },
     fullWidth: {
       typeDef: { type: 'boolean' },

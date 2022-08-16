@@ -9,6 +9,7 @@ import {
   SecretAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
@@ -91,6 +92,8 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
   };
   readonly props?: BindableAttrValues<P>;
   readonly layout?: {
+    readonly boxAlign?: ConstantAttrValue<BoxProps['alignItems']>;
+    readonly boxJustify?: ConstantAttrValue<BoxProps['justifyContent']>;
     readonly columnSize?: ConstantAttrValue<number>;
   };
 }

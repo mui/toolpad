@@ -11,6 +11,7 @@ import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
 import { getElementNodeComponentId } from '../../../toolpadComponents';
+import { boxAlignArgTypeDef, boxJustifyArgTypeDef } from '../../../toolpadComponents/layoutBox';
 
 const classes = {
   control: 'Toolpad_Control',
@@ -35,8 +36,40 @@ interface ComponentPropsEditorProps<P> {
 }
 
 function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditorProps<P>) {
+  const hasLayoutControls = componentConfig.hasBoxAlign || componentConfig.hasBoxJustify;
+
   return (
     <ComponentPropsEditorRoot>
+      {hasLayoutControls ? (
+        <React.Fragment>
+          <Typography variant="subtitle2" sx={{ mt: 1 }}>
+            Layout:
+          </Typography>
+          {componentConfig.hasBoxAlign ? (
+            <div className={classes.control}>
+              <NodeAttributeEditor
+                node={node}
+                namespace="layout"
+                name="boxAlign"
+                argType={boxAlignArgTypeDef}
+              />
+            </div>
+          ) : null}
+          {componentConfig.hasBoxJustify ? (
+            <div className={classes.control}>
+              <NodeAttributeEditor
+                node={node}
+                namespace="layout"
+                name="boxJustify"
+                argType={boxJustifyArgTypeDef}
+              />
+            </div>
+          ) : null}
+        </React.Fragment>
+      ) : null}
+      <Typography variant="subtitle2" sx={{ mt: 2 }}>
+        Properties:
+      </Typography>
       {(Object.entries(componentConfig.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
         ([propName, propTypeDef]) =>
           propTypeDef && shouldRenderControl(propTypeDef) ? (
@@ -78,9 +111,6 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
       {nodeError ? <ErrorAlert error={nodeError} /> : null}
       {node ? (
         <React.Fragment>
-          <Typography variant="subtitle1" sx={{ mt: 2 }}>
-            Properties:
-          </Typography>
           <ComponentPropsEditor componentConfig={componentConfig} node={node} />
         </React.Fragment>
       ) : null}

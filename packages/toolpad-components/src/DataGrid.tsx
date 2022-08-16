@@ -252,28 +252,26 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
 
   return (
-    <Box>
-      <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
-        <DataGridPro
-          components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
-          onColumnResize={handleResize}
-          onColumnOrderChange={handleColumnOrderChange}
-          rows={rows}
-          columns={columns}
-          key={rowIdFieldProp}
-          getRowId={getRowId}
-          onSelectionModelChange={onSelectionModelChange}
-          selectionModel={selectionModel}
-          error={errorProp}
-          componentsProps={{
-            errorOverlay: {
-              message: typeof errorProp === 'string' ? errorProp : errorProp?.message,
-            },
-          }}
-          {...props}
-        />
-      </div>
-    </Box>
+    <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
+      <DataGridPro
+        components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
+        onColumnResize={handleResize}
+        onColumnOrderChange={handleColumnOrderChange}
+        rows={rows}
+        columns={columns}
+        key={rowIdFieldProp}
+        getRowId={getRowId}
+        onSelectionModelChange={onSelectionModelChange}
+        selectionModel={selectionModel}
+        error={errorProp}
+        componentsProps={{
+          errorOverlay: {
+            message: typeof errorProp === 'string' ? errorProp : errorProp?.message,
+          },
+        }}
+        {...props}
+      />
+    </div>
   );
 });
 

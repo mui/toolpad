@@ -1,29 +1,18 @@
 import * as React from 'react';
 import { LoadingButton as MuiButton, LoadingButtonProps as MuiButtonProps } from '@mui/lab';
 import { createComponent } from '@mui/toolpad-core';
-import { Box, BoxProps } from '@mui/material';
 
 interface ButtonProps extends Omit<MuiButtonProps, 'children'> {
   content: string;
-  alignItems?: BoxProps['alignItems'];
-  justifyContent?: BoxProps['justifyContent'];
 }
 
-function Button({ content, alignItems, justifyContent, ...props }: ButtonProps) {
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems,
-        justifyContent,
-      }}
-    >
-      <MuiButton {...props}>{content}</MuiButton>
-    </Box>
-  );
+function Button({ content, ...rest }: ButtonProps) {
+  return <MuiButton {...rest}>{content}</MuiButton>;
 }
 
 export default createComponent(Button, {
+  hasBoxAlign: true,
+  hasBoxJustify: true,
   argTypes: {
     content: {
       typeDef: { type: 'string' },
@@ -38,24 +27,6 @@ export default createComponent(Button, {
     },
     disabled: {
       typeDef: { type: 'boolean' },
-    },
-    alignItems: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      },
-      label: 'Vertical alignment',
-      control: { type: 'VerticalAlign' },
-      defaultValue: 'center',
-    },
-    justifyContent: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      },
-      label: 'Horizontal alignment',
-      control: { type: 'HorizontalAlign' },
-      defaultValue: 'start',
     },
     fullWidth: {
       typeDef: { type: 'boolean' },

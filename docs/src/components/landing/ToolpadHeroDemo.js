@@ -15,7 +15,7 @@ export default function ToolpadHero() {
           md: 'top',
           lg: 'top',
         },
-        backgroundImage: 'url("/static/branding/product-toolpad-app.svg")',
+        backgroundImage: 'url("/static/toolpad/marketing/product-toolpad-app.svg")',
       }}
     />
   );

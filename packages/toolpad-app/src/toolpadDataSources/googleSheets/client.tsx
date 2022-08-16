@@ -10,7 +10,7 @@ import {
   Box,
 } from '@mui/material';
 import * as React from 'react';
-import { UseQueryResult } from 'react-query';
+import { UseQueryResult } from '@tanstack/react-query';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   GoogleSheetsConnectionParams,

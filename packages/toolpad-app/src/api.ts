@@ -7,7 +7,7 @@ import {
   useQuery,
   UseQueryOptions,
   UseQueryResult,
-} from 'react-query';
+} from '@tanstack/react-query';
 import { parse as superjsonParse } from 'superjson';
 import type {
   Definition,

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
 import { styled } from '@mui/material';
 import clsx from 'clsx';
+import invariant from 'invariant';
 
 import * as appDom from '../../../../appDom';
 import { useDom, useDomApi } from '../../../DomLoader';
@@ -163,6 +164,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
   }, [dom, pageNode]);
 
   const selectedNode = selection && appDom.getNode(dom, selection);
+
+  const overlayRef = React.useRef<HTMLDivElement | null>(null);
 
   const draggedNode = React.useMemo(
     (): appDom.ElementNode | null =>
@@ -1011,14 +1014,19 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         }
       }
 
-      api.dragEnd();
-
       if (selection) {
         deleteOrphanedLayoutComponents(draggedNode, dragOverNodeId);
       }
 
+      api.dragEnd();
+
       if (newNode) {
         api.select(newNode.id);
+
+        // Refocus on overlay so that keyboard events can keep being caught by it
+        const overlayElement = overlayRef.current;
+        invariant(overlayElement, 'Overlay ref not bound');
+        overlayElement.focus();
       }
     },
     [
@@ -1309,6 +1317,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
   return (
     <OverlayRoot
+      ref={overlayRef}
       className={clsx({
         [overlayClasses.nodeDrag]: isDraggingOver,
         [overlayClasses.resizeHorizontal]:

@@ -37,7 +37,13 @@ const CardContentRootStyle = (imageUrl) => ({
 const CardGrid = ({ content, span }) => {
   return (
     <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
-      <SectionHeadline overline="Features" title={content.Headline} />
+      <SectionHeadline
+        overline="Features"
+        title={content.Headline}
+        localTheme={(mode) => ({
+          overlineColor: mode === 'dark' ? '#f9a426' : '#f9a426',
+        })}
+      />
       <Grid container spacing={2}>
         {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
           <Grid key={title} item xs={12} sm={6} md={span}>

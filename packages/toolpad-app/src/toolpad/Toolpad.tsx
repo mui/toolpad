@@ -35,16 +35,16 @@ function FullPageError({ error }: FullPageErrorProps) {
   );
 }
 
-function OldEditorUrlRedirect() {
-  const y = useParams();
-  return <Navigate to={`../${y['*']}`} />;
+function LegacyEditorUrlRedirect() {
+  const { '*': editorRoute } = useParams();
+  return <Navigate to={`../${editorRoute}`} />;
 }
 
 function AppWorkspace() {
   return (
     <Routes>
       <Route>
-        <Route path="editor/*" element={<OldEditorUrlRedirect />} />
+        <Route path="editor/*" element={<LegacyEditorUrlRedirect />} />
         <Route path="releases" element={<Releases />} />
         <Route path="releases/:version" element={<Release />} />
         <Route path="*" element={<AppEditor />} />

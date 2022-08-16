@@ -5,8 +5,15 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
-import { NodeId, createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
+import {
+  NodeId,
+  createComponent,
+  ToolpadComponent,
+  TOOLPAD_COMPONENT,
+  ArgTypeDefinitions,
+} from '@mui/toolpad-core';
 import { useQuery } from '@tanstack/react-query';
+import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { tryFormat } from '../../../utils/prettier';
@@ -17,16 +24,46 @@ import usePageTitle from '../../../utils/usePageTitle';
 import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
-import { mapValues } from '../../../utils/collections';
+import { filterValues, mapValues } from '../../../utils/collections';
 import ErrorAlert from '../PageEditor/ErrorAlert';
 import lazyComponent from '../../../utils/lazyComponent';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 import SplitPane from '../../../components/SplitPane';
+import { getDefaultControl } from '../../propertyControls';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
   fallback: <CenteredSpinner />,
 });
+
+interface PropertiesEditorProps {
+  argTypes: ArgTypeDefinitions;
+  value: Record<string, any>;
+  onChange: (newValue: Record<string, any>) => void;
+}
+
+function PropertiesEditor({ argTypes, value, onChange }: PropertiesEditorProps) {
+  return (
+    <Stack sx={{ p: 2, gap: 2, overflow: 'auto', height: '100%' }}>
+      <Typography>Properties:</Typography>
+      {Object.entries(argTypes).map(([name, argType]) => {
+        invariant(argType, 'Argtype should be defined');
+        const Control = getDefaultControl(argType);
+        if (!Control) {
+          return null;
+        }
+        return (
+          <Control
+            label={name}
+            propType={argType.typeDef}
+            value={value[name]}
+            onChange={(newPropValue) => onChange({ ...value, [name]: newPropValue })}
+          />
+        );
+      })}
+    </Stack>
+  );
+}
 
 const Noop = createComponent(() => null);
 
@@ -148,6 +185,8 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     [argTypes],
   );
 
+  const [props, setProps] = React.useState({});
+
   return (
     <React.Fragment>
       <Stack sx={{ height: '100%' }}>
@@ -162,7 +201,10 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
               extraLibs={extraLibs}
             />
 
-            <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
+            <SplitPane split="horizontal" allowResize size="20%" primary="second">
+              <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
+              <PropertiesEditor argTypes={argTypes} value={props} onChange={setProps} />
+            </SplitPane>
           </SplitPane>
         </Box>
         <Toolbar
@@ -184,7 +226,10 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
                   fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
                   <AppThemeProvider dom={dom}>
-                    <CodeComponent {...defaultProps} />
+                    <CodeComponent
+                      {...defaultProps}
+                      {...filterValues(props, (propValue) => typeof propValue !== 'undefined')}
+                    />
                   </AppThemeProvider>
                 </ErrorBoundary>
                 {compileError ? <ErrorAlert error={compileError} /> : null}

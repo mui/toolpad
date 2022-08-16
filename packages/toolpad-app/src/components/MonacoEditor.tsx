@@ -44,7 +44,7 @@ function getExtension(language: string): string {
 
 declare global {
   interface Window {
-    MonacoEnvironment: monaco.Environment;
+    MonacoEnvironment?: monaco.Environment | undefined;
   }
 }
 

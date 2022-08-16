@@ -6,7 +6,7 @@ import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { NodeId, createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { tryFormat } from '../../../utils/prettier';

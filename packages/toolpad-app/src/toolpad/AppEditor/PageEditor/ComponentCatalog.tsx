@@ -15,44 +15,20 @@ import {
 } from '../../../toolpadComponents';
 
 interface FutureComponentSpec {
-  displayName: string;
-  githubLink: string;
+  displayName?: string;
+  url: string;
 }
 
-const FUTURE_COMPONENTS: FutureComponentSpec[] = [
-  {
-    displayName: 'Form',
-    githubLink: 'https://github.com/mui/mui-toolpad/issues/749',
-  },
-  {
-    displayName: 'Card',
-    githubLink: 'https://github.com/mui/mui-toolpad/issues/748',
-  },
-  {
-    displayName: 'Tabs',
-    githubLink: 'https://github.com/mui/mui-toolpad/issues/747',
-  },
-  {
-    displayName: 'Slider',
-    githubLink: 'https://github.com/mui/mui-toolpad/issues/746',
-  },
-  {
-    displayName: 'Switch',
-    githubLink: 'https://github.com/mui/mui-toolpad/issues/745',
-  },
-  {
-    displayName: 'RadioButton',
-    githubLink: 'https://github.com/mui/mui-toolpad/issues/744',
-  },
-  {
-    displayName: 'DatePicker',
-    githubLink: 'https://github.com/mui/mui-toolpad/issues/743',
-  },
-  {
-    displayName: 'Checkbox',
-    githubLink: 'https://github.com/mui/mui-toolpad/issues/742',
-  },
-];
+const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
+  ['Form', { url: 'https://github.com/mui/mui-toolpad/issues/749' }],
+  ['Card', { url: 'https://github.com/mui/mui-toolpad/issues/748' }],
+  ['Tabs', { url: 'https://github.com/mui/mui-toolpad/issues/747' }],
+  ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746' }],
+  ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745' }],
+  ['RadioButton', { url: 'https://github.com/mui/mui-toolpad/issues/744' }],
+  ['DatePicker', { url: 'https://github.com/mui/mui-toolpad/issues/743' }],
+  ['Checkbox', { url: 'https://github.com/mui/mui-toolpad/issues/742' }],
+]);
 
 const WIDTH_COLLAPSED = 50;
 
@@ -161,17 +137,12 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     </ComponentCatalogItem>
                   );
                 })}
-              {FUTURE_COMPONENTS.map((futureComponent, i) => {
+              {Array.from(FUTURE_COMPONENTS, ([key, { displayName = key, url }]) => {
                 return (
-                  <Link
-                    key={`futureComponent[${i}]`}
-                    href={futureComponent.githubLink}
-                    underline="none"
-                    target="_blank"
-                  >
+                  <Link key={`futureComponent.${key}`} href={url} underline="none" target="_blank">
                     <ComponentCatalogItem>
                       <DragIndicatorIcon color="disabled" />
-                      {futureComponent.displayName}
+                      {displayName}
                       <Box sx={{ flex: 1 }} />
                       🚧
                     </ComponentCatalogItem>

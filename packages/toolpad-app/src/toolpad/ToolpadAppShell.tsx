@@ -14,7 +14,7 @@ export default function ToolpadAppShell({ appId, ...props }: ToolpadAppShellProp
     <ToolpadShell
       navigation={
         <React.Fragment>
-          <Button component={Link} to={`/app/${appId}/editor`} color="inherit">
+          <Button component={Link} to={`/app/${appId}`} color="inherit">
             Editor
           </Button>
           <Button component={Link} to={`/app/${appId}/releases`} color="inherit">

@@ -77,7 +77,7 @@ export default function CreateCodeComponentDialog({
           const appNode = appDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'codeComponents');
           onClose();
-          navigate(`/app/${appId}/editor/codeComponents/${newNode.id}`);
+          navigate(`/app/${appId}/codeComponents/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Toolpad Code Component</DialogTitle>

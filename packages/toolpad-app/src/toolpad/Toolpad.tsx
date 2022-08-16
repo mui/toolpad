@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { Box, CircularProgress, NoSsr, styled } from '@mui/material';
 import { ErrorBoundary } from 'react-error-boundary';
 import Release from './Release';
@@ -35,13 +35,19 @@ function FullPageError({ error }: FullPageErrorProps) {
   );
 }
 
+function OldEditorUrlRedirect() {
+  const y = useParams();
+  return <Navigate to={`../${y['*']}`} />;
+}
+
 function AppWorkspace() {
   return (
     <Routes>
       <Route>
-        <Route path="editor/*" element={<AppEditor />} />
+        <Route path="editor/*" element={<OldEditorUrlRedirect />} />
         <Route path="releases" element={<Releases />} />
         <Route path="releases/:version" element={<Release />} />
+        <Route path="*" element={<AppEditor />} />
       </Route>
     </Routes>
   );

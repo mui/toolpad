@@ -52,7 +52,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 
   const createAppMutation = client.useMutation('createApp', {
     onSuccess: (app) => {
-      window.location.href = `/_toolpad/app/${app.id}/editor`;
+      window.location.href = `/_toolpad/app/${app.id}`;
     },
   });
 
@@ -302,7 +302,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           />
         </CardContent>
         <CardActions>
-          <Button component="a" href={app ? `/_toolpad/app/${app.id}/editor` : ''} disabled={!app}>
+          <Button component="a" href={app ? `/_toolpad/app/${app.id}` : ''} disabled={!app}>
             Edit
           </Button>
           {openButton}

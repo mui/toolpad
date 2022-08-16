@@ -59,7 +59,7 @@ const NodeHudWrapper = styled('div', {
     color: 'white',
     fontSize: 11,
     padding: `0 0 0 8px`,
-    height: `${HUD_HEIGHT}px`,
+    height: HUD_HEIGHT,
     zIndex: 1,
     ...(hudPosition === HUD_POSITION_TOP
       ? { top: 0, transform: 'translate(0, -100%)' }

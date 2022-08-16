@@ -67,7 +67,7 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
           ) : null}
         </React.Fragment>
       ) : null}
-      <Typography variant="subtitle2" sx={{ mt: 2 }}>
+      <Typography variant="subtitle2" sx={{ mt: hasLayoutControls ? 2 : 1 }}>
         Properties:
       </Typography>
       {(Object.entries(componentConfig.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(

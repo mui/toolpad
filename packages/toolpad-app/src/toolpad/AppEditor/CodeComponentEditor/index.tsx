@@ -11,6 +11,7 @@ import {
   ToolpadComponent,
   TOOLPAD_COMPONENT,
   ArgTypeDefinitions,
+  ArgTypeDefinition,
 } from '@mui/toolpad-core';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
@@ -30,16 +31,32 @@ import lazyComponent from '../../../utils/lazyComponent';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 import SplitPane from '../../../components/SplitPane';
 import { getDefaultControl } from '../../propertyControls';
+import { WithControlledProp } from '../../../utils/types';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
   fallback: <CenteredSpinner />,
 });
 
-interface PropertiesEditorProps {
+interface PropertyEditorProps extends WithControlledProp<any> {
+  name: string;
+  argType: ArgTypeDefinition;
+}
+
+function PropertyEditor({ argType, name, value, onChange }: PropertyEditorProps) {
+  const Control = getDefaultControl(argType);
+  if (!Control) {
+    return null;
+  }
+  return (
+    <ErrorBoundary fallback={null}>
+      <Control label={name} propType={argType.typeDef} value={value} onChange={onChange} />
+    </ErrorBoundary>
+  );
+}
+
+interface PropertiesEditorProps extends WithControlledProp<Record<string, any>> {
   argTypes: ArgTypeDefinitions;
-  value: Record<string, any>;
-  onChange: (newValue: Record<string, any>) => void;
 }
 
 function PropertiesEditor({ argTypes, value, onChange }: PropertiesEditorProps) {
@@ -47,18 +64,16 @@ function PropertiesEditor({ argTypes, value, onChange }: PropertiesEditorProps) 
     <Stack sx={{ p: 2, gap: 2, overflow: 'auto', height: '100%' }}>
       <Typography>Properties:</Typography>
       {Object.entries(argTypes).map(([name, argType]) => {
-        invariant(argType, 'Argtype should be defined');
-        const Control = getDefaultControl(argType);
-        if (!Control) {
-          return null;
-        }
+        invariant(argType, 'argType not defined');
         return (
-          <Control
-            label={name}
-            propType={argType.typeDef}
-            value={value[name]}
-            onChange={(newPropValue) => onChange({ ...value, [name]: newPropValue })}
-          />
+          <ErrorBoundary fallback={<div>{name}</div>} resetKeys={[argType]}>
+            <PropertyEditor
+              name={name}
+              argType={argType}
+              value={value[name]}
+              onChange={(newPropValue) => onChange({ ...value, [name]: newPropValue })}
+            />
+          </ErrorBoundary>
         );
       })}
     </Stack>

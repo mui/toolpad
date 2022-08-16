@@ -19,6 +19,8 @@ import { getElementNodeComponentId } from '../../../../toolpadComponents';
 const HUD_POSITION_TOP = 'top';
 const HUD_POSITION_BOTTOM = 'bottom';
 
+const HUD_HEIGHT = 30; // px
+
 type HudPosition = typeof HUD_POSITION_TOP | typeof HUD_POSITION_BOTTOM;
 
 const nodeHudClasses = {
@@ -57,6 +59,7 @@ const NodeHudWrapper = styled('div', {
     color: 'white',
     fontSize: 11,
     padding: `0 0 0 8px`,
+    height: `${HUD_HEIGHT}px`,
     zIndex: 1,
     ...(hudPosition === HUD_POSITION_TOP
       ? { top: 0, transform: 'translate(0, -100%)' }
@@ -148,7 +151,7 @@ export default function NodeHud({
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
   const component = useToolpadComponent(dom, componentId);
 
-  const hudPosition = rect.y > 32 ? HUD_POSITION_TOP : HUD_POSITION_BOTTOM;
+  const hudPosition = rect.y > HUD_HEIGHT ? HUD_POSITION_TOP : HUD_POSITION_BOTTOM;
 
   return (
     <NodeHudWrapper

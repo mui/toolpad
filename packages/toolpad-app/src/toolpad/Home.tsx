@@ -27,6 +27,8 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
+import invariant from 'invariant';
+
 import client from '../api';
 import DialogForm from '../components/DialogForm';
 import type { App, Deployment } from '../../prisma/generated/client';
@@ -213,7 +215,9 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
   );
 
   React.useEffect(() => {
-    if (appTitleInput.current && editingTitle) {
+    invariant(appTitleInput.current, 'App title input ref not bound');
+
+    if (editingTitle) {
       appTitleInput.current.focus();
       appTitleInput.current.select();
     }

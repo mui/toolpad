@@ -14,11 +14,9 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  Snackbar,
 } from '@mui/material';
 import * as React from 'react';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import HierarchyExplorer from './HierarchyExplorer';
 import client from '../../api';
 import { useDom } from '../DomLoader';
@@ -43,7 +41,6 @@ function AppMenu() {
   const dialogTitleId = React.useId();
 
   const [viewDomDialogOpen, setViewDomDialogOpen] = React.useState(false);
-  const [copySnackbarOpen, setCopySnackbarOpen] = React.useState(false);
 
   const dom = useDom();
 
@@ -53,13 +50,6 @@ function AppMenu() {
   }, []);
 
   const handleViewDomDialogClose = React.useCallback(() => setViewDomDialogOpen(false), []);
-
-  const handleCopyToClipboard = React.useCallback(() => {
-    window.navigator.clipboard.writeText(JSON.stringify(dom, null, 2));
-    setCopySnackbarOpen(true);
-  }, [dom]);
-
-  const handleCopySnackbarClose = React.useCallback(() => setCopySnackbarOpen(false), []);
 
   return (
     <React.Fragment>
@@ -94,31 +84,12 @@ function AppMenu() {
       >
         <DialogTitle id={dialogTitleId}>Application DOM</DialogTitle>
         <DialogContent sx={{ position: 'relative', display: 'flex' }}>
-          <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-            <JsonView src={dom} expandPaths={[]} expandLevel={5} />
-          </Box>
-
-          {/* TODO: build overflow behavior into JsonView and add optional "copy source" button in there */}
-          <Tooltip title="Copy the source">
-            <IconButton
-              onClick={handleCopyToClipboard}
-              sx={{ position: 'absolute', top: 8, right: 36 }}
-            >
-              <ContentCopyIcon />
-            </IconButton>
-          </Tooltip>
+          <JsonView sx={{ flex: 1 }} copyToClipboard src={dom} expandPaths={[]} expandLevel={5} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleViewDomDialogClose}>Close</Button>
         </DialogActions>
       </Dialog>
-
-      <Snackbar
-        open={copySnackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleCopySnackbarClose}
-        message="DOM Copied to clipboard"
-      />
     </React.Fragment>
   );
 }

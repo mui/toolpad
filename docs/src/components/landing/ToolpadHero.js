@@ -25,7 +25,7 @@ export default function ToolpadHero() {
           }}
         >
           <IconImage name="product-toolpad" />
-          <GradientText>MUI Toolpad</GradientText>
+          <GradientText sx={{ display: 'flex', alignItems: 'center' }}>MUI Toolpad</GradientText>
         </Typography>
         <Typography variant="h1" sx={{ my: 2 }}>
           Low-code

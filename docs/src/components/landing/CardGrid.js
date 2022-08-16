@@ -18,7 +18,7 @@ const CardRootStyle = (imageUrl) => ({
 const CardMediaStyle = (imageUrl) => ({
   display: 'block',
   backgroundSize: 'cover',
-  minHeight: 140,
+  minHeight: 200,
   backgroundRepeat: 'no-repeat',
   backgroundPosition: 'center',
   objectFit: 'cover',
@@ -44,7 +44,7 @@ function CardGrid(props) {
     >
       <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
         <SectionHeadline
-          overline="Features"
+          overline={content.overline}
           title={content.Headline}
           localTheme={(mode) => ({
             overlineColor: mode === 'dark' ? '#f9a426' : '#f9a426',
@@ -90,7 +90,7 @@ CardGrid.propTypes = {
   content: PropTypes.shape({
     cards: PropTypes.arrayOf(
       PropTypes.shape({
-        description: PropTypes.string.isRequired,
+        description: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
         icon: PropTypes.node,
         imageUrl: PropTypes.string,
         title: PropTypes.string.isRequired,
@@ -98,6 +98,7 @@ CardGrid.propTypes = {
       }),
     ),
     Headline: PropTypes.node.isRequired,
+    overline: PropTypes.string.isRequired,
   }).isRequired,
   span: PropTypes.number.isRequired,
 };

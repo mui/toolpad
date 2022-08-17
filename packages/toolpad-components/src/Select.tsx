@@ -11,9 +11,9 @@ export type SelectProps = TextFieldProps & {
   options: (string | SelectOption)[];
 };
 
-function Select({ sx, options, ...props }: SelectProps) {
+function Select({ sx, options, ...rest }: SelectProps) {
   return (
-    <TextField select sx={{ minWidth: 120, ...sx }} {...props}>
+    <TextField select sx={{ minWidth: 120, ...sx }} {...rest}>
       {options.map((option) => {
         const parsedOption: SelectOption = typeof option === 'string' ? { value: option } : option;
         return (
@@ -27,8 +27,8 @@ function Select({ sx, options, ...props }: SelectProps) {
 }
 
 export default createComponent(Select, {
-  hasBoxAlign: true,
-  hasBoxJustify: true,
+  hasLayoutBoxAlign: true,
+  hasLayoutBoxJustify: true,
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',
   argTypes: {

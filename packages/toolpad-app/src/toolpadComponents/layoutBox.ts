@@ -1,7 +1,7 @@
 import { BoxProps } from '@mui/material';
 import { ArgTypeDefinition } from '@mui/toolpad-core';
 
-export const boxAlignArgTypeDef: ArgTypeDefinition<BoxProps['alignItems']> = {
+export const layoutBoxAlignArgTypeDef: ArgTypeDefinition<BoxProps['alignItems']> = {
   typeDef: {
     type: 'string',
     enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
@@ -11,7 +11,7 @@ export const boxAlignArgTypeDef: ArgTypeDefinition<BoxProps['alignItems']> = {
   defaultValue: 'center',
 };
 
-export const boxJustifyArgTypeDef: ArgTypeDefinition<BoxProps['justifyContent']> = {
+export const layoutBoxJustifyArgTypeDef: ArgTypeDefinition<BoxProps['justifyContent']> = {
   typeDef: {
     type: 'string',
     enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],

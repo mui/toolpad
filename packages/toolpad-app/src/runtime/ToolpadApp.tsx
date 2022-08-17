@@ -63,7 +63,10 @@ import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
-import { boxAlignArgTypeDef, boxJustifyArgTypeDef } from '../toolpadComponents/layoutBox';
+import {
+  layoutBoxAlignArgTypeDef,
+  layoutBoxJustifyArgTypeDef,
+} from '../toolpadComponents/layoutBox';
 
 const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
   'enabled',
@@ -311,11 +314,11 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
           sx={{
             display: 'flex',
             alignItems:
-              (componentConfig.hasBoxAlign && node.layout?.boxAlign?.value) ||
-              boxAlignArgTypeDef.defaultValue,
+              (componentConfig.hasLayoutBoxAlign && node.layout?.boxAlign?.value) ||
+              layoutBoxAlignArgTypeDef.defaultValue,
             justifyContent:
-              (componentConfig.hasBoxJustify && node.layout?.boxJustify?.value) ||
-              boxJustifyArgTypeDef.defaultValue,
+              (componentConfig.hasLayoutBoxJustify && node.layout?.boxJustify?.value) ||
+              layoutBoxJustifyArgTypeDef.defaultValue,
           }}
         >
           <Component {...props} />

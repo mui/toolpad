@@ -52,8 +52,8 @@ function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit 
 }
 
 export default createComponent(Image, {
-  hasBoxAlign: true,
-  hasBoxJustify: true,
+  hasLayoutBoxAlign: true,
+  hasLayoutBoxJustify: true,
   loadingPropSource: ['src'],
   loadingProp: 'loading',
   argTypes: {

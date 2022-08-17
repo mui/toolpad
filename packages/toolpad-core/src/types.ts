@@ -229,11 +229,11 @@ export interface ComponentConfig<P> {
   /**
    * Enables controlling the aligment of the component container box.
    */
-  hasBoxAlign?: boolean;
+  hasLayoutBoxAlign?: boolean;
   /**
    * Enables controlling the justification of the component container box.
    */
-  hasBoxJustify?: boolean;
+  hasLayoutBoxJustify?: boolean;
   /**
    * Designates a property as "the resizable height property". If Toolpad detects any
    * vertical resizing of the component it will forward it to this property.

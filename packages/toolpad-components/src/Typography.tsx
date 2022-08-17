@@ -29,8 +29,8 @@ function Typography({ value, loading, sx, ...rest }: TypographyProps) {
 }
 
 export default createComponent(Typography, {
-  hasBoxAlign: true,
-  hasBoxJustify: true,
+  hasLayoutBoxAlign: true,
+  hasLayoutBoxJustify: true,
   loadingPropSource: ['value'],
   loadingProp: 'loading',
   argTypes: {

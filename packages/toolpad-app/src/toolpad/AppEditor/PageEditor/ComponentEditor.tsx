@@ -11,7 +11,10 @@ import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
 import { getElementNodeComponentId } from '../../../toolpadComponents';
-import { boxAlignArgTypeDef, boxJustifyArgTypeDef } from '../../../toolpadComponents/layoutBox';
+import {
+  layoutBoxAlignArgTypeDef,
+  layoutBoxJustifyArgTypeDef,
+} from '../../../toolpadComponents/layoutBox';
 
 const classes = {
   control: 'Toolpad_Control',
@@ -36,7 +39,8 @@ interface ComponentPropsEditorProps<P> {
 }
 
 function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditorProps<P>) {
-  const hasLayoutControls = componentConfig.hasBoxAlign || componentConfig.hasBoxJustify;
+  const hasLayoutControls =
+    componentConfig.hasLayoutBoxAlign || componentConfig.hasLayoutBoxJustify;
 
   return (
     <ComponentPropsEditorRoot>
@@ -45,23 +49,23 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
           <Typography variant="subtitle2" sx={{ mt: 1 }}>
             Layout:
           </Typography>
-          {componentConfig.hasBoxAlign ? (
+          {componentConfig.hasLayoutBoxAlign ? (
             <div className={classes.control}>
               <NodeAttributeEditor
                 node={node}
                 namespace="layout"
                 name="boxAlign"
-                argType={boxAlignArgTypeDef}
+                argType={layoutBoxAlignArgTypeDef}
               />
             </div>
           ) : null}
-          {componentConfig.hasBoxJustify ? (
+          {componentConfig.hasLayoutBoxJustify ? (
             <div className={classes.control}>
               <NodeAttributeEditor
                 node={node}
                 namespace="layout"
                 name="boxJustify"
-                argType={boxJustifyArgTypeDef}
+                argType={layoutBoxJustifyArgTypeDef}
               />
             </div>
           ) : null}

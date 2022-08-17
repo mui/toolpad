@@ -16,8 +16,8 @@ function TextField(props: TextFieldProps) {
 }
 
 export default createComponent(TextField, {
-  hasBoxAlign: true,
-  hasBoxJustify: true,
+  hasLayoutBoxAlign: true,
+  hasLayoutBoxJustify: true,
   argTypes: {
     label: {
       typeDef: { type: 'string' },

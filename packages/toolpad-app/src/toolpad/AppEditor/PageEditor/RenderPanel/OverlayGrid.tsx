@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Grid, styled } from '@mui/material';
+import invariant from 'invariant';
 
 export interface OverlayGridHandle {
   gridElement: HTMLDivElement | null;
@@ -37,17 +38,18 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(function OverlayG
   React.useImperativeHandle(
     forwardedRef,
     () => {
+      const gridElement = gridRef.current;
+      invariant(gridElement, 'Overlay grid ref not bound');
+
       let columnEdges: number[] = [];
-      if (gridRef.current) {
-        const gridColumnContainers = Array.from(gridRef.current.children);
-        const gridColumnEdges = gridColumnContainers.map((container: Element) => {
-          const containerRect = container.firstElementChild?.getBoundingClientRect();
-          return containerRect
-            ? [Math.round(containerRect.x), Math.round(containerRect.x + containerRect.width)]
-            : [];
-        });
-        columnEdges = gridColumnEdges.flat();
-      }
+      const gridColumnContainers = Array.from(gridElement.children);
+      const gridColumnEdges = gridColumnContainers.map((container: Element) => {
+        const containerRect = container.firstElementChild?.getBoundingClientRect();
+        return containerRect
+          ? [Math.round(containerRect.x), Math.round(containerRect.x + containerRect.width)]
+          : [];
+      });
+      columnEdges = gridColumnEdges.flat();
 
       return {
         gridElement: gridRef.current,

@@ -202,13 +202,11 @@ function QueryEditor({
         </SplitPane>
 
         <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
-          <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
-            {preview?.error ? (
-              <ErrorAlert error={preview?.error} />
-            ) : (
-              <JsonView src={preview?.data} />
-            )}
-          </Box>
+          {preview?.error ? (
+            <ErrorAlert error={preview?.error} />
+          ) : (
+            <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+          )}
 
           <Devtools
             sx={{ width: '100%', height: '100%' }}

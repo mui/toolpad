@@ -1,4 +1,4 @@
-import { Stack, Grid, Checkbox, FormControlLabel, IconButton, Box } from '@mui/material';
+import { Stack, Grid, Checkbox, FormControlLabel, IconButton } from '@mui/material';
 import * as React from 'react';
 
 import AutorenewIcon from '@mui/icons-material/Autorenew';
@@ -44,21 +44,16 @@ export default function TransformInput({
         />
 
         <Stack direction={'row'} spacing={2} width={'100%'}>
-          <Box
+          <JsonView
+            src={globalScope}
+            disabled={loading || !enabled}
             sx={{
               width: '300px',
               maxWidth: '600px',
               maxHeight: '150px',
-              overflow: 'scroll',
             }}
-          >
-            <JsonView
-              src={globalScope}
-              sx={{
-                opacity: loading || !enabled ? 0.5 : 1,
-              }}
-            />
-          </Box>
+          />
+
           {onUpdatePreview ? (
             <IconButton
               disabled={!enabled}

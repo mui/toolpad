@@ -109,9 +109,7 @@ function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreview
       <Toolbar disableGutters>
         <Typography color="error">{previewError?.message}</Typography>
       </Toolbar>
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <JsonView src={lastGoodPreview?.value} />
-      </Box>
+      <JsonView sx={{ flex: 1 }} src={lastGoodPreview?.value} />
     </React.Fragment>
   );
 }

@@ -330,9 +330,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         <Box
           sx={{
             display: 'flex',
-            alignItems: componentConfig.hasLayoutBoxAlign && boundLayoutProps.layoutBoxAlign,
-            justifyContent:
-              componentConfig.hasLayoutBoxJustify && boundLayoutProps.layoutBoxJustify,
+            alignItems: boundLayoutProps.layoutVerticalAlign,
+            justifyContent: boundLayoutProps.layoutHorizontalAlign,
           }}
         >
           <Component {...props} />

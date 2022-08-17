@@ -11,8 +11,7 @@ function Button({ content, ...rest }: ButtonProps) {
 }
 
 export default createComponent(Button, {
-  hasLayoutBoxAlign: true,
-  hasLayoutBoxJustify: true,
+  layoutDirection: 'both',
   argTypes: {
     content: {
       typeDef: { type: 'string' },

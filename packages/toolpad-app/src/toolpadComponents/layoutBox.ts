@@ -1,27 +1,31 @@
 import { BoxProps } from '@mui/material';
 import { ArgTypeDefinition } from '@mui/toolpad-core';
 
-const layoutBoxAlignArgTypeDef: ArgTypeDefinition<BoxProps['alignItems']> = {
-  typeDef: {
-    type: 'string',
-    enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-  },
-  label: 'Box vertical alignment',
-  control: { type: 'VerticalAlign' },
-  defaultValue: 'center',
-};
+export const LAYOUT_DIRECTION_HORIZONTAL = 'horizontal';
+export const LAYOUT_DIRECTION_VERTICAL = 'vertical';
+export const LAYOUT_DIRECTION_BOTH = 'both';
 
-const layoutBoxJustifyArgTypeDef: ArgTypeDefinition<BoxProps['justifyContent']> = {
+const layoutBoxHorizontalAlignArgTypeDef: ArgTypeDefinition<BoxProps['justifyContent']> = {
   typeDef: {
     type: 'string',
     enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
   },
-  label: 'Box horizontal alignment',
+  label: 'Horizontal alignment',
   control: { type: 'HorizontalAlign' },
   defaultValue: 'start',
 };
 
+const layoutBoxVerticalAlignArgTypeDef: ArgTypeDefinition<BoxProps['alignItems']> = {
+  typeDef: {
+    type: 'string',
+    enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+  },
+  label: 'Vertical alignment',
+  control: { type: 'VerticalAlign' },
+  defaultValue: 'center',
+};
+
 export const layoutBoxArgTypes = {
-  layoutBoxAlign: layoutBoxAlignArgTypeDef,
-  layoutBoxJustify: layoutBoxJustifyArgTypeDef,
+  layoutHorizontalAlign: layoutBoxHorizontalAlignArgTypeDef,
+  layoutVerticalAlign: layoutBoxVerticalAlignArgTypeDef,
 };

@@ -11,7 +11,12 @@ import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
 import { getElementNodeComponentId } from '../../../toolpadComponents';
-import { layoutBoxArgTypes } from '../../../toolpadComponents/layoutBox';
+import {
+  layoutBoxArgTypes,
+  LAYOUT_DIRECTION_BOTH,
+  LAYOUT_DIRECTION_HORIZONTAL,
+  LAYOUT_DIRECTION_VERTICAL,
+} from '../../../toolpadComponents/layoutBox';
 
 const classes = {
   control: 'Toolpad_Control',
@@ -36,8 +41,13 @@ interface ComponentPropsEditorProps<P> {
 }
 
 function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditorProps<P>) {
-  const hasLayoutControls =
-    componentConfig.hasLayoutBoxAlign || componentConfig.hasLayoutBoxJustify;
+  const { layoutDirection } = componentConfig;
+
+  const hasLayoutHorizontalControls =
+    layoutDirection === LAYOUT_DIRECTION_HORIZONTAL || layoutDirection === LAYOUT_DIRECTION_BOTH;
+  const hasLayoutVerticalControls =
+    layoutDirection === LAYOUT_DIRECTION_VERTICAL || layoutDirection === LAYOUT_DIRECTION_BOTH;
+  const hasLayoutControls = hasLayoutHorizontalControls || hasLayoutVerticalControls;
 
   return (
     <ComponentPropsEditorRoot>
@@ -46,23 +56,23 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
           <Typography variant="subtitle2" sx={{ mt: 1 }}>
             Layout:
           </Typography>
-          {componentConfig.hasLayoutBoxJustify ? (
+          {hasLayoutHorizontalControls ? (
             <div className={classes.control}>
               <NodeAttributeEditor
                 node={node}
                 namespace="layout"
-                name="layoutBoxJustify"
-                argType={layoutBoxArgTypes.layoutBoxJustify}
+                name="layoutHorizontalAlign"
+                argType={layoutBoxArgTypes.layoutHorizontalAlign}
               />
             </div>
           ) : null}
-          {componentConfig.hasLayoutBoxAlign ? (
+          {hasLayoutVerticalControls ? (
             <div className={classes.control}>
               <NodeAttributeEditor
                 node={node}
                 namespace="layout"
-                name="layoutBoxAlign"
-                argType={layoutBoxArgTypes.layoutBoxAlign}
+                name="layoutVerticalAlign"
+                argType={layoutBoxArgTypes.layoutVerticalAlign}
               />
             </div>
           ) : null}

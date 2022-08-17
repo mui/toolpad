@@ -27,8 +27,7 @@ function Select({ sx, options, ...rest }: SelectProps) {
 }
 
 export default createComponent(Select, {
-  hasLayoutBoxAlign: true,
-  hasLayoutBoxJustify: true,
+  layoutDirection: 'both',
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',
   argTypes: {

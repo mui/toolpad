@@ -1,18 +1,17 @@
-import { Box, Button, Stack, TextField, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Skeleton, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import { inferColumns } from '@mui/toolpad-components';
 import { BindableAttrValue } from '@mui/toolpad-core';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import MonacoEditor from '../../components/MonacoEditor';
 import SplitPane from '../../components/SplitPane';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import { isSaveDisabled, validation } from '../../utils/forms';
+import lazyComponent from '../../utils/lazyComponent';
 import { Maybe } from '../../utils/types';
-
 import QueryInputPanel from '../QueryInputPanel';
 import useQueryPreview from '../useQueryPreview';
 import {
@@ -21,6 +20,13 @@ import {
   PostgresQuery,
   PostgresResult,
 } from './types';
+
+const BETA_FEATURES = false;
+
+const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor'), {
+  noSsr: true,
+  fallback: <Skeleton variant="rectangular" height="100%" />,
+});
 
 const EMPTY_ROWS: any[] = [];
 
@@ -150,31 +156,31 @@ function QueryEditor({
   return (
     <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
       <SplitPane split="vertical" size="50%" allowResize>
-        {/* <SplitPane split="horizontal" size={85} primary="second" allowResize> */}
-        <QueryInputPanel onRunPreview={handleRunPreview}>
-          <Box sx={{ flex: 1, minHeight: 0 }}>
-            <MonacoEditor
-              value={input.query.sql}
-              onChange={(newValue) =>
-                setInput((existing) => ({ ...existing, query: { sql: newValue } }))
-              }
-              language="sql"
-            />
-          </Box>
-        </QueryInputPanel>
+        <SplitPane split="horizontal" size={0} primary="second" allowResize>
+          <QueryInputPanel onRunPreview={handleRunPreview}>
+            <Box sx={{ flex: 1, minHeight: 0 }}>
+              <MonacoEditor
+                value={input.query.sql}
+                onChange={(newValue) =>
+                  setInput((existing) => ({ ...existing, query: { sql: newValue } }))
+                }
+                language="sql"
+              />
+            </Box>
+          </QueryInputPanel>
 
-        {/*  
-          <Box sx={{ p: 2 }}>
-            <Typography>Parameters</Typography>
-            <ParametersEditor
-              value={params}
-              onChange={setParams}
-              globalScope={globalScope}
-              liveValue={paramsEditorLiveValue}
-            />
-          </Box> 
+          {BETA_FEATURES ? (
+            <Box sx={{ p: 2 }}>
+              <Typography>Parameters</Typography>
+              <ParametersEditor
+                value={params}
+                onChange={setParams}
+                globalScope={globalScope}
+                liveValue={paramsEditorLiveValue}
+              />
+            </Box>
+          ) : null}
         </SplitPane>
-          */}
 
         {preview?.error ? (
           <ErrorAlert error={preview?.error} />

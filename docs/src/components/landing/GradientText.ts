@@ -1,7 +1,7 @@
 import { styled } from '@mui/material/styles';
 
 const GradientText = styled('span')(({ sx }) => ({
-  background: `linear-gradient(93.97deg, #F48802 17.86%, #F9A326 86.47%)`,
+  background: `linear-gradient(315deg, #0059B3 0%, #007FFF 100%);`,
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
   sx,

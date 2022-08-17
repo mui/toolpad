@@ -136,8 +136,6 @@ interface RenderDialogActions {
 }
 
 interface QueryEditorDialogContext {
-  open: boolean;
-  onClose: () => void;
   dataSourceId: string | null;
   renderDialogTitle: () => React.ReactNode;
   renderQueryOptions: () => React.ReactNode;
@@ -148,17 +146,11 @@ const [useQueryEditorDialogContext, QueryEditorDialogContextProvider] =
   createProvidedContext<QueryEditorDialogContext>('QueryEditorDialog');
 
 export function QueryEditorShell({ children, isDirty, onCommit }: QueryEditorShellProps) {
-  const {
-    open,
-    onClose,
-    dataSourceId,
-    renderDialogTitle,
-    renderQueryOptions,
-    renderDialogActions,
-  } = useQueryEditorDialogContext();
+  const { dataSourceId, renderDialogTitle, renderQueryOptions, renderDialogActions } =
+    useQueryEditorDialogContext();
 
   return (
-    <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
+    <React.Fragment>
       {renderDialogTitle()}
 
       <Divider />
@@ -193,7 +185,7 @@ export function QueryEditorShell({ children, isDirty, onCommit }: QueryEditorShe
       )}
 
       {renderDialogActions({ isDirty, onCommit })}
-    </Dialog>
+    </React.Fragment>
   );
 }
 
@@ -526,8 +518,6 @@ function QueryNodeEditorDialog<Q, P>({
   );
 
   const queryEditorShellContext: QueryEditorDialogContext = {
-    open,
-    onClose: handleClose,
     dataSourceId: dataSource ? dataSourceId : null,
     renderDialogTitle,
     renderQueryOptions,
@@ -536,21 +526,23 @@ function QueryNodeEditorDialog<Q, P>({
 
   return (
     <QueryEditorDialogContextProvider value={queryEditorShellContext}>
-      {dataSourceId && dataSource && queryEditorContext ? (
-        <ConnectionContextProvider value={queryEditorContext}>
-          <dataSource.QueryEditor
-            QueryEditorShell={QueryEditorShell}
-            connectionParams={connectionParams}
-            value={queryModel}
-            onChange={handleQueryModelChange}
-            globalScope={pageState}
-          />
-        </ConnectionContextProvider>
-      ) : (
-        <QueryEditorShell>
-          <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        </QueryEditorShell>
-      )}
+      <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
+        {dataSourceId && dataSource && queryEditorContext ? (
+          <ConnectionContextProvider value={queryEditorContext}>
+            <dataSource.QueryEditor
+              QueryEditorShell={QueryEditorShell}
+              connectionParams={connectionParams}
+              value={queryModel}
+              onChange={handleQueryModelChange}
+              globalScope={pageState}
+            />
+          </ConnectionContextProvider>
+        ) : (
+          <QueryEditorShell>
+            <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
+          </QueryEditorShell>
+        )}
+      </Dialog>
     </QueryEditorDialogContextProvider>
   );
 }

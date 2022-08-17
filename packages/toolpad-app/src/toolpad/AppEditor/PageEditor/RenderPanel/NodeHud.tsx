@@ -23,6 +23,10 @@ const HUD_HEIGHT = 30; // px
 
 type HudPosition = typeof HUD_POSITION_TOP | typeof HUD_POSITION_BOTTOM;
 
+function stopPropagationHandler(event: React.SyntheticEvent) {
+  event.stopPropagation();
+}
+
 const nodeHudClasses = {
   allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
   selected: 'NodeHud_Selected',
@@ -165,7 +169,15 @@ export default function NodeHud({
       {isSelected ? (
         <React.Fragment>
           <span className={nodeHudClasses.selected} />
-          <div draggable className={nodeHudClasses.selectionHint} onDragStart={onNodeDragStart}>
+          <div
+            draggable
+            className={nodeHudClasses.selectionHint}
+            onDragStart={onNodeDragStart}
+            role="presentation"
+            onClick={stopPropagationHandler}
+            onMouseDown={stopPropagationHandler}
+            onMouseUp={stopPropagationHandler}
+          >
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
             <IconButton aria-label="Remove element" color="inherit" onMouseUp={onDelete}>

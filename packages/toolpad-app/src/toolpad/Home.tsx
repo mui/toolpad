@@ -1,6 +1,8 @@
+import * as React from 'react';
 import {
   Alert,
   Button,
+  Box,
   Card,
   CardHeader,
   CardContent,
@@ -15,17 +17,24 @@ import {
   Menu,
   MenuItem,
   Skeleton,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
   TextField,
   Toolbar,
-  Typography,
-  Box,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
+  Typography,
 } from '@mui/material';
-import * as React from 'react';
 import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import GridViewIcon from '@mui/icons-material/GridView';
 import DeleteIcon from '@mui/icons-material/Delete';
 import client from '../api';
 import DialogForm from '../components/DialogForm';
@@ -152,42 +161,33 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
   );
 }
 
-interface AppCardProps {
+interface AppNameEditableProps {
   app?: App;
-  activeDeployment?: Deployment;
-  onDelete?: () => void;
+  editing?: boolean;
+  setEditing: (editing: boolean) => void;
+  loading?: boolean;
+  description?: React.ReactNode;
 }
 
-function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
-  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+function AppNameEditable({ app, editing, setEditing, loading, description }: AppNameEditableProps) {
   const [showAppRenameError, setShowAppRenameError] = React.useState<boolean>(false);
-  const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
-  const [appTitle, setAppTitle] = React.useState<string | undefined>(app?.name);
-  const appTitleInput = React.useRef<HTMLInputElement | null>(null);
+  const appNameInput = React.useRef<HTMLInputElement | null>(null);
+  const [appName, setAppName] = React.useState<string>(app?.name || '');
 
-  const menuOpen = Boolean(menuAnchorEl);
+  const handleAppNameChange = React.useCallback(
+    (newValue: string) => {
+      setShowAppRenameError(false);
+      setAppName(newValue);
+    },
+    [setAppName],
+  );
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setMenuAnchorEl(event.currentTarget);
-  };
+  const handleAppRenameClose = React.useCallback(() => {
+    setEditing(false);
+    setShowAppRenameError(false);
+  }, [setEditing]);
 
-  const handleMenuClose = React.useCallback(() => {
-    setMenuAnchorEl(null);
-  }, []);
-
-  const handleRenameClick = React.useCallback(() => {
-    setMenuAnchorEl(null);
-    setEditingTitle(true);
-  }, []);
-
-  const handleDeleteClick = React.useCallback(() => {
-    setMenuAnchorEl(null);
-    if (onDelete) {
-      onDelete();
-    }
-  }, [onDelete]);
-
-  const handleAppRename = React.useCallback(
+  const handleAppRenameSave = React.useCallback(
     async (name: string) => {
       if (app?.id) {
         try {
@@ -195,48 +195,57 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           await client.invalidateQueries('getApps');
         } catch (err) {
           setShowAppRenameError(true);
-          setEditingTitle(true);
+          setEditing(true);
         }
       }
     },
-    [app?.id],
+    [app?.id, setEditing],
   );
 
-  const handleAppTitleBlur = React.useCallback(
-    (event: React.FocusEvent<HTMLInputElement>) => {
-      setEditingTitle(false);
-      handleAppRename(event.target.value);
-    },
-    [handleAppRename],
+  return loading ? (
+    <Skeleton />
+  ) : (
+    <EditableText
+      defaultValue={app?.name}
+      editable={editing}
+      helperText={showAppRenameError ? `An app named "${appName}" already exists` : description}
+      error={showAppRenameError}
+      onChange={handleAppNameChange}
+      onClose={handleAppRenameClose}
+      onSave={handleAppRenameSave}
+      ref={appNameInput}
+      sx={{
+        width: '100%',
+      }}
+      value={appName}
+      variant="subtitle1"
+    />
   );
+}
 
-  const handleAppTitleInput = React.useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
-      setAppTitle((event.target as HTMLInputElement).value);
-      setShowAppRenameError(false);
-      if (event.key === 'Escape') {
-        if (appTitleInput.current?.value && app?.name) {
-          setAppTitle(app.name);
-          appTitleInput.current.value = app.name;
-        }
-        setEditingTitle(false);
-        return;
-      }
-      if (event.key === 'Enter') {
-        setEditingTitle(false);
-        handleAppRename((event.target as HTMLInputElement).value);
-      }
-    },
-    [app?.name, handleAppRename],
+interface AppEditButtonProps {
+  app?: App;
+}
+
+function AppEditButton({ app }: AppEditButtonProps) {
+  return (
+    <Button
+      size="small"
+      component="a"
+      href={app ? `/_toolpad/app/${app.id}/editor` : ''}
+      disabled={!app}
+    >
+      Edit
+    </Button>
   );
+}
 
-  React.useEffect(() => {
-    if (appTitleInput.current && editingTitle) {
-      appTitleInput.current.focus();
-      appTitleInput.current.select();
-    }
-  }, [appTitleInput, editingTitle]);
+interface AppOpenButtonProps {
+  app?: App;
+  activeDeployment?: Deployment;
+}
 
+function AppOpenButton({ app, activeDeployment }: AppOpenButtonProps) {
   const openDisabled = !app || !activeDeployment;
   let openButton = (
     <Button disabled={!app || !activeDeployment} component="a" href={app ? `deploy/${app.id}` : ''}>
@@ -251,6 +260,102 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
       </Tooltip>
     );
   }
+  return openButton;
+}
+
+interface AppOptionsProps {
+  menuOpen: boolean;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+function AppOptions({ menuOpen, onClick }: AppOptionsProps) {
+  return (
+    <IconButton
+      aria-label="settings"
+      aria-controls={menuOpen ? 'basic-menu' : undefined}
+      aria-haspopup="true"
+      aria-expanded={menuOpen ? 'true' : undefined}
+      onClick={onClick}
+    >
+      <MoreVertIcon />
+    </IconButton>
+  );
+}
+
+interface AppMenuProps {
+  menuAnchorEl: HTMLElement | null;
+  menuOpen: boolean;
+  handleMenuClose: () => void;
+  handleRenameClick: () => void;
+  handleDeleteClick: () => void;
+}
+
+function AppMenu({
+  menuAnchorEl,
+  menuOpen,
+  handleMenuClose,
+  handleRenameClick,
+  handleDeleteClick,
+}: AppMenuProps) {
+  return (
+    <Menu
+      id="basic-menu"
+      anchorEl={menuAnchorEl}
+      open={menuOpen}
+      onClose={handleMenuClose}
+      MenuListProps={{
+        'aria-labelledby': 'basic-button',
+        dense: true,
+      }}
+    >
+      {/* Using an onClick on a MenuItem causes accessibility issues, see: https://github.com/mui/material-ui/pull/30145 */}
+      <MenuItem onClick={handleRenameClick}>
+        <ListItemIcon>
+          <DriveFileRenameOutlineIcon />
+        </ListItemIcon>
+        <ListItemText>Rename</ListItemText>
+      </MenuItem>
+      <MenuItem onClick={handleDeleteClick}>
+        <ListItemIcon>
+          <DeleteIcon />
+        </ListItemIcon>
+        <ListItemText>Delete</ListItemText>
+      </MenuItem>
+    </Menu>
+  );
+}
+
+interface AppCardProps {
+  app?: App;
+  activeDeployment?: Deployment;
+  onDelete?: () => void;
+}
+
+function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [editingName, setEditingName] = React.useState<boolean>(false);
+
+  const menuOpen = Boolean(menuAnchorEl);
+
+  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = React.useCallback(() => {
+    setMenuAnchorEl(null);
+  }, []);
+
+  const handleRenameClick = React.useCallback(() => {
+    setMenuAnchorEl(null);
+    setEditingName(true);
+  }, []);
+
+  const handleDeleteClick = React.useCallback(() => {
+    setMenuAnchorEl(null);
+    if (onDelete) {
+      onDelete();
+    }
+  }, [onDelete]);
 
   return (
     <React.Fragment>
@@ -264,17 +369,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         }}
       >
         <CardHeader
-          action={
-            <IconButton
-              aria-label="settings"
-              aria-controls={menuOpen ? 'basic-menu' : undefined}
-              aria-haspopup="true"
-              aria-expanded={menuOpen ? 'true' : undefined}
-              onClick={handleMenuClick}
-            >
-              <MoreVertIcon />
-            </IconButton>
-          }
+          action={<AppOptions menuOpen={menuOpen} onClick={handleOptionsClick} />}
           disableTypography
           subheader={
             <Typography variant="body2" color="text.secondary">
@@ -289,49 +384,185 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           }
         />
         <CardContent sx={{ flexGrow: 1 }}>
-          <EditableText
-            onBlur={handleAppTitleBlur}
-            onKeyUp={handleAppTitleInput}
-            editing={editingTitle}
-            isError={showAppRenameError}
-            errorText={`An app named "${appTitle}" already exists`}
+          <AppNameEditable
+            app={app}
+            editing={editingName}
+            setEditing={setEditingName}
             loading={Boolean(!app)}
-            defaultValue={appTitle}
-            variant="subtitle1"
-            ref={appTitleInput}
           />
         </CardContent>
         <CardActions>
-          <Button component="a" href={app ? `/_toolpad/app/${app.id}/editor` : ''} disabled={!app}>
-            Edit
-          </Button>
-          {openButton}
+          <AppEditButton app={app} />
+          <AppOpenButton app={app} activeDeployment={activeDeployment} />
         </CardActions>
       </Card>
-      <Menu
-        id="basic-menu"
-        anchorEl={menuAnchorEl}
-        open={menuOpen}
-        onClose={handleMenuClose}
-        MenuListProps={{
-          'aria-labelledby': 'basic-button',
-          dense: true,
-        }}
-      >
-        <MenuItem onClick={handleRenameClick}>
-          <ListItemIcon>
-            <DriveFileRenameOutlineIcon />
-          </ListItemIcon>
-          <ListItemText>Rename</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={handleDeleteClick}>
-          <ListItemIcon>
-            <DeleteIcon />
-          </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
-        </MenuItem>
-      </Menu>
+      <AppMenu
+        menuAnchorEl={menuAnchorEl}
+        menuOpen={menuOpen}
+        handleMenuClose={handleMenuClose}
+        handleRenameClick={handleRenameClick}
+        handleDeleteClick={handleDeleteClick}
+      />
     </React.Fragment>
+  );
+}
+
+interface AppRowProps {
+  app?: App;
+  activeDeployment?: Deployment;
+  onDelete?: () => void;
+}
+
+function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const menuOpen = Boolean(menuAnchorEl);
+
+  const [editingName, setEditingName] = React.useState<boolean>(false);
+
+  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = React.useCallback(() => {
+    setMenuAnchorEl(null);
+  }, []);
+
+  const handleRenameClick = React.useCallback(() => {
+    setMenuAnchorEl(null);
+    setEditingName(true);
+  }, []);
+
+  const handleDeleteClick = React.useCallback(() => {
+    setMenuAnchorEl(null);
+    if (onDelete) {
+      onDelete();
+    }
+  }, [onDelete]);
+
+  return (
+    <React.Fragment>
+      <TableRow hover role="row">
+        <TableCell component="th" scope="row">
+          <AppNameEditable
+            loading={Boolean(!app)}
+            app={app}
+            editing={editingName}
+            setEditing={setEditingName}
+            description={app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
+          />
+        </TableCell>
+        <TableCell align="right">
+          <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
+            <AppEditButton app={app} />
+            <AppOpenButton app={app} activeDeployment={activeDeployment} />
+            <AppOptions menuOpen={menuOpen} onClick={handleOptionsClick} />
+          </Stack>
+        </TableCell>
+      </TableRow>
+      <AppMenu
+        menuAnchorEl={menuAnchorEl}
+        menuOpen={menuOpen}
+        handleMenuClose={handleMenuClose}
+        handleRenameClick={handleRenameClick}
+        handleDeleteClick={handleDeleteClick}
+      />
+    </React.Fragment>
+  );
+}
+
+interface AppViewProps {
+  apps: App[];
+  status: string;
+  activeDeploymentsByApp: { [appId: string]: Deployment } | null;
+  error: unknown;
+  setDeletedApp: (app: App) => void;
+}
+
+function AppsGridView({
+  status,
+  apps,
+  activeDeploymentsByApp,
+  error,
+  setDeletedApp,
+}: AppViewProps) {
+  return (
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          lg: 'repeat(4, 1fr)',
+          md: 'repeat(3, 1fr)',
+          sm: 'repeat(2, fr)',
+          xs: 'repeat(1, fr)',
+        },
+        gap: 2,
+      }}
+    >
+      {(() => {
+        switch (status) {
+          case 'loading':
+            return <AppCard />;
+          case 'error':
+            return <Alert severity="error">{(error as Error)?.message}</Alert>;
+          case 'success':
+            return apps.length > 0
+              ? apps.map((app) => {
+                  const activeDeployment = activeDeploymentsByApp?.[app.id];
+                  return (
+                    <AppCard
+                      key={app.id}
+                      app={app}
+                      activeDeployment={activeDeployment}
+                      onDelete={() => setDeletedApp(app)}
+                    />
+                  );
+                })
+              : 'No apps yet';
+          default:
+            return <AppCard />;
+        }
+      })()}
+    </Box>
+  );
+}
+
+function AppsListView({
+  status,
+  apps,
+  activeDeploymentsByApp,
+  error,
+  setDeletedApp,
+}: AppViewProps) {
+  return (
+    <Table aria-label="apps list" size="medium">
+      <TableBody>
+        {(() => {
+          switch (status) {
+            case 'loading':
+              return <AppRow />;
+            case 'error':
+              return <Alert severity="error">{(error as Error)?.message}</Alert>;
+            case 'success':
+              return apps.length > 0
+                ? apps.map((app) => {
+                    const activeDeployment = activeDeploymentsByApp?.[app.id];
+                    return (
+                      <AppRow
+                        key={app.id}
+                        app={app}
+                        activeDeployment={activeDeployment}
+                        onDelete={() => setDeletedApp(app)}
+                      />
+                    );
+                  })
+                : 'No apps yet';
+            default:
+              return '';
+          }
+        })()}
+      </TableBody>
+    </Table>
   );
 }
 
@@ -352,54 +583,51 @@ export default function Home() {
 
   const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
 
+  const [viewMode, setViewMode] = React.useState<string>('list');
+
+  const handleViewModeChange = React.useCallback((event: React.MouseEvent, value: string) => {
+    setViewMode(value);
+  }, []);
+
+  const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
+
   return (
     <ToolpadShell>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
       <Container>
         <Typography variant="h2">Apps</Typography>
         <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
-
-        <Toolbar disableGutters>
+        <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
           <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={handleViewModeChange}
+            aria-label="view mode"
+          >
+            <ToggleButton
+              value="list"
+              aria-label="list view"
+              color={viewMode === 'list' ? 'primary' : undefined}
+            >
+              <ViewListIcon />
+            </ToggleButton>
+            <ToggleButton
+              value="grid"
+              aria-label="grid view"
+              color={viewMode === 'grid' ? 'primary' : undefined}
+            >
+              <GridViewIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
         </Toolbar>
-
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              lg: 'repeat(4, 1fr)',
-              md: 'repeat(3, 1fr)',
-              sm: 'repeat(2, fr)',
-              xs: 'repeat(1, fr)',
-            },
-            gap: 2,
-          }}
-        >
-          {(() => {
-            switch (status) {
-              case 'loading':
-                return <AppCard />;
-              case 'error':
-                return <Alert severity="error">{(error as Error)?.message}</Alert>;
-              case 'success':
-                return apps.length > 0
-                  ? apps.map((app) => {
-                      const activeDeployment = activeDeploymentsByApp?.[app.id];
-                      return (
-                        <AppCard
-                          key={app.id}
-                          app={app}
-                          activeDeployment={activeDeployment}
-                          onDelete={() => setDeletedApp(app)}
-                        />
-                      );
-                    })
-                  : 'No apps yet';
-              default:
-                return '';
-            }
-          })()}
-        </Box>
+        <AppsView
+          apps={apps}
+          status={status}
+          error={error}
+          activeDeploymentsByApp={activeDeploymentsByApp}
+          setDeletedApp={setDeletedApp}
+        />
       </Container>
     </ToolpadShell>
   );

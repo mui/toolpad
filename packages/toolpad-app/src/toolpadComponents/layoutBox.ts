@@ -22,6 +22,6 @@ const layoutBoxJustifyArgTypeDef: ArgTypeDefinition<BoxProps['justifyContent']> 
 };
 
 export const layoutBoxArgTypes = {
-  boxAlign: layoutBoxAlignArgTypeDef,
-  boxJustify: layoutBoxJustifyArgTypeDef,
+  layoutBoxAlign: layoutBoxAlignArgTypeDef,
+  layoutBoxJustify: layoutBoxJustifyArgTypeDef,
 };

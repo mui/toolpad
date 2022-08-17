@@ -51,8 +51,8 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
               <NodeAttributeEditor
                 node={node}
                 namespace="layout"
-                name="boxJustify"
-                argType={layoutBoxArgTypes.boxJustify}
+                name="layoutBoxJustify"
+                argType={layoutBoxArgTypes.layoutBoxJustify}
               />
             </div>
           ) : null}
@@ -61,8 +61,8 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
               <NodeAttributeEditor
                 node={node}
                 namespace="layout"
-                name="boxAlign"
-                argType={layoutBoxArgTypes.boxAlign}
+                name="layoutBoxAlign"
+                argType={layoutBoxArgTypes.layoutBoxAlign}
               />
             </div>
           ) : null}

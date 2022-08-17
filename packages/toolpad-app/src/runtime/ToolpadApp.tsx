@@ -168,6 +168,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const componentConfig = Component[TOOLPAD_COMPONENT];
   const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
+  const isLayoutNode =
+    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
+
   const liveBindings = useBindingsContext();
   const boundProps: Record<string, any> = React.useMemo(() => {
     const loadingPropSourceSet = new Set(loadingPropSource);
@@ -209,6 +212,24 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
     return hookResult;
   }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
+
+  const boundLayoutProps: Record<string, any> = React.useMemo(() => {
+    const hookResult: Record<string, any> = {};
+
+    for (const [propName, argType] of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
+      const bindingId = `${nodeId}.layout.${propName}`;
+      const binding = liveBindings[bindingId];
+      if (binding) {
+        hookResult[propName] = binding.value;
+      }
+
+      if (typeof hookResult[propName] === 'undefined' && argType) {
+        hookResult[propName] = argType.defaultValue;
+      }
+    }
+
+    return hookResult;
+  }, [isLayoutNode, liveBindings, nodeId]);
 
   const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
     () =>
@@ -267,7 +288,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),
   );
 
-  const layoutProps = React.useMemo(() => {
+  const layoutElementProps = React.useMemo(() => {
     if (appDom.isElement(node) && isPageRow(node)) {
       return {
         layoutColumnSizes: childNodeGroups.children.map((child) => child.layout?.columnSize?.value),
@@ -281,10 +302,10 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       ...boundProps,
       ...onChangeHandlers,
       ...eventHandlers,
-      ...layoutProps,
+      ...layoutElementProps,
       ...reactChildren,
     };
-  }, [boundProps, eventHandlers, layoutProps, onChangeHandlers, reactChildren]);
+  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
 
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {
@@ -299,9 +320,6 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
   }
 
-  const isLayoutNode =
-    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
-
   return (
     <NodeRuntimeWrapper nodeId={nodeId} componentConfig={Component[TOOLPAD_COMPONENT]}>
       {isLayoutNode ? (
@@ -310,12 +328,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         <Box
           sx={{
             display: 'flex',
-            alignItems:
-              (componentConfig.hasLayoutBoxAlign && node.layout?.boxAlign?.value) ||
-              layoutBoxArgTypes.boxAlign.defaultValue,
+            alignItems: componentConfig.hasLayoutBoxAlign && boundLayoutProps.layoutBoxAlign,
             justifyContent:
-              (componentConfig.hasLayoutBoxJustify && node.layout?.boxJustify?.value) ||
-              layoutBoxArgTypes.boxJustify.defaultValue,
+              componentConfig.hasLayoutBoxJustify && boundLayoutProps.layoutBoxJustify,
           }}
         >
           <Component {...props} />
@@ -467,8 +482,7 @@ function parseBindings(
       if (!isPageLayoutComponent(elm)) {
         for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
           const binding =
-            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
-            appDom.createConst(argType?.defaultValue ?? undefined);
+            elm.layout?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
           const bindingId = `${elm.id}.layout.${propName}`;
           const scopePath = `${elm.name}.${propName}`;
           parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));

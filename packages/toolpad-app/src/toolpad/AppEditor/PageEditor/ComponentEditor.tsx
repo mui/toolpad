@@ -11,10 +11,7 @@ import ErrorAlert from './ErrorAlert';
 import NodeNameEditor from '../NodeNameEditor';
 import { useToolpadComponent } from '../toolpadComponents';
 import { getElementNodeComponentId } from '../../../toolpadComponents';
-import {
-  layoutBoxAlignArgTypeDef,
-  layoutBoxJustifyArgTypeDef,
-} from '../../../toolpadComponents/layoutBox';
+import { layoutBoxArgTypes } from '../../../toolpadComponents/layoutBox';
 
 const classes = {
   control: 'Toolpad_Control',
@@ -55,7 +52,7 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
                 node={node}
                 namespace="layout"
                 name="boxJustify"
-                argType={layoutBoxJustifyArgTypeDef}
+                argType={layoutBoxArgTypes.boxJustify}
               />
             </div>
           ) : null}
@@ -65,7 +62,7 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
                 node={node}
                 namespace="layout"
                 name="boxAlign"
-                argType={layoutBoxAlignArgTypeDef}
+                argType={layoutBoxArgTypes.boxAlign}
               />
             </div>
           ) : null}

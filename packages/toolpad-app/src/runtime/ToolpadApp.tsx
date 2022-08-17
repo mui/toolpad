@@ -63,10 +63,7 @@ import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
-import {
-  layoutBoxAlignArgTypeDef,
-  layoutBoxJustifyArgTypeDef,
-} from '../toolpadComponents/layoutBox';
+import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 
 const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
   'enabled',
@@ -315,10 +312,10 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
             display: 'flex',
             alignItems:
               (componentConfig.hasLayoutBoxAlign && node.layout?.boxAlign?.value) ||
-              layoutBoxAlignArgTypeDef.defaultValue,
+              layoutBoxArgTypes.boxAlign.defaultValue,
             justifyContent:
               (componentConfig.hasLayoutBoxJustify && node.layout?.boxJustify?.value) ||
-              layoutBoxJustifyArgTypeDef.defaultValue,
+              layoutBoxArgTypes.boxJustify.defaultValue,
           }}
         >
           <Component {...props} />
@@ -464,6 +461,17 @@ function parseBindings(
           } else {
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
           }
+        }
+      }
+
+      if (!isPageLayoutComponent(elm)) {
+        for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
+          const binding =
+            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
+            appDom.createConst(argType?.defaultValue ?? undefined);
+          const bindingId = `${elm.id}.layout.${propName}`;
+          const scopePath = `${elm.name}.${propName}`;
+          parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
         }
       }
     }

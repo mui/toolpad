@@ -50,6 +50,7 @@ export interface NodeInfo {
   nodeId: NodeId;
   error?: RuntimeError | null;
   rect?: Rectangle;
+  innerRect?: Rectangle;
   slots?: SlotsState;
   componentConfig?: ComponentConfig<unknown>;
   props: { [key: string]: unknown };

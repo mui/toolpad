@@ -139,21 +139,21 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const node = appDom.getNode(dom, nodeId, 'element');
   const Component: ToolpadComponent<any> = useElmToolpadComponent(node);
-  const { children: childNodes = [] } = appDom.getChildNodes(dom, node);
+  const childNodeGroups = appDom.getChildNodes(dom, node);
 
   return (
     /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-    <RenderedNodeContent node={node} childNodes={childNodes} Component={Component} />
+    <RenderedNodeContent node={node} childNodeGroups={childNodeGroups} Component={Component} />
   );
 }
 
 interface RenderedNodeContentProps {
   node: appDom.PageNode | appDom.ElementNode;
-  childNodes: appDom.ElementNode[];
+  childNodeGroups: appDom.NodeChildren<appDom.ElementNode>;
   Component: ToolpadComponent<any>;
 }
 
-function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeContentProps) {
+function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
   const setControlledBinding = useSetControlledBindingContext();
 
   const nodeId = node.id;
@@ -256,20 +256,18 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
     });
   }, [argTypes, node, navigateToPage, evaluatePageExpression]);
 
-  const reactChildren =
-    childNodes.length > 0
-      ? childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />)
-      : // `undefined` to ensure the defaultProps get picked up
-        undefined;
+  const reactChildren = mapValues(childNodeGroups, (childNodes) =>
+    childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),
+  );
 
   const layoutProps = React.useMemo(() => {
     if (appDom.isElement(node) && isPageRow(node)) {
       return {
-        layoutColumnSizes: childNodes.map((childNode) => childNode.layout?.columnSize?.value),
+        layoutColumnSizes: childNodeGroups.children.map((child) => child.layout?.columnSize?.value),
       };
     }
     return {};
-  }, [childNodes, node]);
+  }, [childNodeGroups.children, node]);
 
   const props: Record<string, any> = React.useMemo(() => {
     return {
@@ -277,7 +275,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
       ...onChangeHandlers,
       ...eventHandlers,
       ...layoutProps,
-      children: reactChildren,
+      ...reactChildren,
     };
   }, [boundProps, eventHandlers, layoutProps, onChangeHandlers, reactChildren]);
 
@@ -568,7 +566,11 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     <BindingsContextProvider value={liveBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <EvaluatePageExpressionProvider value={evaluatePageExpression}>
-          <RenderedNodeContent node={page} childNodes={children} Component={PageRootComponent} />
+          <RenderedNodeContent
+            node={page}
+            childNodeGroups={{ children }}
+            Component={PageRootComponent}
+          />
 
           {queries.map((node) => (
             <QueryNode key={node.id} node={node} />

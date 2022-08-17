@@ -19,9 +19,9 @@ test('basic app creation flow', async ({ page }) => {
 
   await page.click('[aria-label="Home"]');
 
-  const appCardSelector = `[role="article"]:has-text("${appName}")`;
+  const appRowSelector = `[role="row"] >> has="input[value='${appName}']"`;
 
-  await page.click(`${appCardSelector} >> [aria-label="settings"]`);
+  await page.click(`${appRowSelector} >> [aria-label="settings"]`);
 
   await page.click('[role="menuitem"]:has-text("Delete"):visible');
 
@@ -37,7 +37,7 @@ test('basic app creation flow', async ({ page }) => {
     `[role="dialog"]:has-text('Are you sure you want to delete application "${appName}"') >> button:has-text("delete")`,
   );
 
-  await page.waitForSelector(appCardSelector, { state: 'detached' });
+  await page.waitForSelector(appRowSelector, { state: 'detached' });
 
   await page.off('request', handleRequest);
 

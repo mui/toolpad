@@ -13,19 +13,21 @@ const CardRootStyle = (imageUrl) => ({
   pb: 3,
   pt: imageUrl ? 0 : 3,
   height: '100%',
+  maxWidth: 360,
 });
 
 const CardMediaStyle = (imageUrl) => ({
   display: 'block',
-  backgroundSize: 'cover',
-  minHeight: 200,
   backgroundRepeat: 'no-repeat',
   backgroundPosition: 'center',
-  objectFit: 'cover',
+  objectFit: 'contain',
   background: `#001E3C url(${imageUrl})`,
+  backgroundSize: 'contain',
   borderTopLeftRadius: '10px',
   borderTopRightRadius: '10px',
   borderWidth: '0px',
+  // https://stackoverflow.com/questions/600743/how-to-get-div-height-to-auto-adjust-to-background-size
+  paddingTop: '55.55%',
 });
 
 const CardContentRootStyle = (imageUrl) => ({
@@ -46,8 +48,8 @@ function CardGrid(props) {
         <SectionHeadline
           overline={content.overline}
           title={content.Headline}
-          localTheme={(mode) => ({
-            overlineColor: mode === 'dark' ? '#f9a426' : '#f9a426',
+          localTheme={() => ({
+            overlineColor: 'primary.500',
           })}
         />
         <Grid container spacing={2}>

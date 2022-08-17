@@ -257,7 +257,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         return null;
       }
 
-      const action = node.props?.[key];
+      const action = (node as appDom.ElementNode).props?.[key];
 
       if (action?.type === 'navigationAction') {
         const handler = () => {
@@ -484,7 +484,8 @@ function parseBindings(
       if (!isPageLayoutComponent(elm)) {
         for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
           const binding =
-            elm.layout?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
+            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
+            appDom.createConst(argType?.defaultValue ?? undefined);
           const bindingId = `${elm.id}.layout.${propName}`;
           const scopePath = `${elm.name}.${propName}`;
           parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));

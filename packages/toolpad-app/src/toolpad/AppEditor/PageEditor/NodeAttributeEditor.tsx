@@ -29,7 +29,10 @@ export default function NodeAttributeEditor({
     [domApi, node, namespace, name],
   );
 
-  const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
+  const propValue: BindableAttrValue<unknown> | null =
+    (node as any)[namespace]?.[name] ??
+    (argType.defaultValue && appDom.createConst(argType.defaultValue)) ??
+    null;
 
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
   const { bindings, pageState } = usePageEditorState();

@@ -49,16 +49,6 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
           <Typography variant="subtitle2" sx={{ mt: 1 }}>
             Layout:
           </Typography>
-          {componentConfig.hasLayoutBoxAlign ? (
-            <div className={classes.control}>
-              <NodeAttributeEditor
-                node={node}
-                namespace="layout"
-                name="boxAlign"
-                argType={layoutBoxAlignArgTypeDef}
-              />
-            </div>
-          ) : null}
           {componentConfig.hasLayoutBoxJustify ? (
             <div className={classes.control}>
               <NodeAttributeEditor
@@ -66,6 +56,16 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
                 namespace="layout"
                 name="boxJustify"
                 argType={layoutBoxJustifyArgTypeDef}
+              />
+            </div>
+          ) : null}
+          {componentConfig.hasLayoutBoxAlign ? (
+            <div className={classes.control}>
+              <NodeAttributeEditor
+                node={node}
+                namespace="layout"
+                name="boxAlign"
+                argType={layoutBoxAlignArgTypeDef}
               />
             </div>
           ) : null}

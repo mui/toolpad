@@ -7,6 +7,16 @@ export interface PostgresConnectionParams {
 }
 
 export interface PostgresQuery {
-  text: string;
-  params: any[];
+  sql: string;
 }
+
+export interface PostgresResult {
+  data: any;
+  error?: Error;
+}
+
+export type PostgresPrivateQuery = {
+  kind: 'debugExec';
+  query: PostgresQuery;
+  params: Record<string, any>;
+};

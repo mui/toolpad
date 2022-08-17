@@ -11,6 +11,7 @@ import {
   gridColumnPositionsSelector,
   gridDensityRowHeightSelector,
   GridSelectionModel,
+  GridValueFormatterParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
@@ -116,10 +117,19 @@ export function inferColumns(rows: GridRowsProp): GridColumns {
   }
   // Naive implementation that checks only the first row
   const firstRow = rows[0];
-  return Object.entries(firstRow).map(([field, value]) => ({
-    field,
-    type: inferColumnType(value),
-  }));
+  return Object.entries(firstRow).map(([field, value]) => {
+    const type = inferColumnType(value);
+
+    const valueFormatter = type
+      ? undefined
+      : ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue);
+
+    return {
+      field,
+      type,
+      valueFormatter,
+    };
+  });
 }
 
 const EMPTY_COLUMNS: GridColumns = [];

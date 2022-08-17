@@ -38,11 +38,12 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import DeleteIcon from '@mui/icons-material/Delete';
 import client from '../api';
 import DialogForm from '../components/DialogForm';
-import type { App, Deployment } from '../../prisma/generated/client';
+import type { Deployment } from '../../prisma/generated/client';
 import useLatest from '../utils/useLatest';
 import ToolpadShell from './ToolpadShell';
 import getReadableDuration from '../utils/readableDuration';
 import EditableText from '../components/EditableText';
+import type { AppMeta } from '../server/data';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -123,7 +124,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 }
 
 export interface AppDeleteDialogProps {
-  app: App | null;
+  app: AppMeta | null;
   onClose: () => void;
 }
 
@@ -162,7 +163,7 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
 }
 
 interface AppNameEditableProps {
-  app?: App;
+  app?: AppMeta;
   editing?: boolean;
   setEditing: (editing: boolean) => void;
   loading?: boolean;
@@ -224,7 +225,7 @@ function AppNameEditable({ app, editing, setEditing, loading, description }: App
 }
 
 interface AppEditButtonProps {
-  app?: App;
+  app?: AppMeta;
 }
 
 function AppEditButton({ app }: AppEditButtonProps) {
@@ -241,7 +242,7 @@ function AppEditButton({ app }: AppEditButtonProps) {
 }
 
 interface AppOpenButtonProps {
-  app?: App;
+  app?: AppMeta;
   activeDeployment?: Deployment;
 }
 
@@ -326,7 +327,7 @@ function AppMenu({
 }
 
 interface AppCardProps {
-  app?: App;
+  app?: AppMeta;
   activeDeployment?: Deployment;
   onDelete?: () => void;
 }
@@ -408,7 +409,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
 }
 
 interface AppRowProps {
-  app?: App;
+  app?: AppMeta;
   activeDeployment?: Deployment;
   onDelete?: () => void;
 }
@@ -472,11 +473,11 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
 }
 
 interface AppViewProps {
-  apps: App[];
+  apps: AppMeta[];
   status: string;
   activeDeploymentsByApp: { [appId: string]: Deployment } | null;
   error: unknown;
-  setDeletedApp: (app: App) => void;
+  setDeletedApp: (app: AppMeta) => void;
 }
 
 function AppsGridView({
@@ -581,7 +582,7 @@ export default function Home() {
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
 
-  const [deletedApp, setDeletedApp] = React.useState<null | App>(null);
+  const [deletedApp, setDeletedApp] = React.useState<null | AppMeta>(null);
 
   const [viewMode, setViewMode] = React.useState<string>('list');
 

@@ -267,8 +267,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 domApi.setNodeNamespacedProp(
                   lastContainerChild,
                   'layout',
-                  'layoutColumnSize',
-                  parent.layout?.layoutColumnSize || appDom.createConst(1),
+                  'columnSize',
+                  parent.layout?.columnSize || appDom.createConst(1),
                 );
               }
 
@@ -293,8 +293,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 domApi.setNodeNamespacedProp(
                   lastContainerChild,
                   'layout',
-                  'layoutColumnSize',
-                  parentParent.layout?.layoutColumnSize || appDom.createConst(1),
+                  'columnSize',
+                  parentParent.layout?.columnSize || appDom.createConst(1),
                 );
               }
 
@@ -915,14 +915,14 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 PAGE_COLUMN_COMPONENT_ID,
                 {},
                 {
-                  layoutColumnSize: dragOverNode.layout?.layoutColumnSize || appDom.createConst(1),
+                  columnSize: dragOverNode.layout?.columnSize || appDom.createConst(1),
                 },
               );
 
               domApi.setNodeNamespacedProp(
                 dragOverNode,
                 'layout',
-                'layoutColumnSize',
+                'columnSize',
                 appDom.createConst(1),
               );
 
@@ -1015,16 +1015,11 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
         const draggedNodeParent = appDom.getParent(dom, draggedNode);
         if (
-          draggedNode.layout?.layoutColumnSize &&
+          draggedNode.layout?.columnSize &&
           draggedNodeParent &&
           draggedNodeParent.id !== parent.id
         ) {
-          domApi.setNodeNamespacedProp(
-            draggedNode,
-            'layout',
-            'layoutColumnSize',
-            appDom.createConst(1),
-          );
+          domApi.setNodeNamespacedProp(draggedNode, 'layout', 'columnSize', appDom.createConst(1));
         }
       }
 
@@ -1095,9 +1090,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     (pageRowNode: appDom.ElementNode): number[] => {
       const nodeChildren = appDom.getChildNodes(dom, pageRowNode).children;
 
-      const layoutColumnSizes = nodeChildren.map(
-        (child) => child.layout?.layoutColumnSize?.value || 1,
-      );
+      const layoutColumnSizes = nodeChildren.map((child) => child.layout?.columnSize?.value || 1);
       const totalLayoutColumnSizes = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
 
       const normalizedLayoutColumnSizes = layoutColumnSizes.map(
@@ -1105,11 +1098,11 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       );
 
       nodeChildren.forEach((child, childIndex) => {
-        if (child.layout?.layoutColumnSize) {
+        if (child.layout?.columnSize) {
           domApi.setNodeNamespacedProp(
             child,
             'layout',
-            'layoutColumnSize',
+            'columnSize',
             appDom.createConst(normalizedLayoutColumnSizes[childIndex]),
           );
         }
@@ -1270,13 +1263,13 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 domApi.setNodeNamespacedProp(
                   draggedNode,
                   'layout',
-                  'layoutColumnSize',
+                  'columnSize',
                   appDom.createConst(updatedDraggedNodeColumnSize),
                 );
                 domApi.setNodeNamespacedProp(
                   previousSibling,
                   'layout',
-                  'layoutColumnSize',
+                  'columnSize',
                   appDom.createConst(updatedPreviousSiblingColumnSize),
                 );
               }
@@ -1298,13 +1291,13 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 domApi.setNodeNamespacedProp(
                   draggedNode,
                   'layout',
-                  'layoutColumnSize',
+                  'columnSize',
                   appDom.createConst(updatedDraggedNodeColumnSize),
                 );
                 domApi.setNodeNamespacedProp(
                   nextSibling,
                   'layout',
-                  'layoutColumnSize',
+                  'columnSize',
                   appDom.createConst(updatedNextSiblingColumnSize),
                 );
               }

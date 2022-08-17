@@ -61,8 +61,8 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
               <NodeAttributeEditor
                 node={node}
                 namespace="layout"
-                name="layoutHorizontalAlign"
-                argType={layoutBoxArgTypes.layoutHorizontalAlign}
+                name="horizontalAlign"
+                argType={layoutBoxArgTypes.horizontalAlign}
               />
             </div>
           ) : null}
@@ -71,8 +71,8 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
               <NodeAttributeEditor
                 node={node}
                 namespace="layout"
-                name="layoutVerticalAlign"
-                argType={layoutBoxArgTypes.layoutVerticalAlign}
+                name="verticalAlign"
+                argType={layoutBoxArgTypes.verticalAlign}
               />
             </div>
           ) : null}

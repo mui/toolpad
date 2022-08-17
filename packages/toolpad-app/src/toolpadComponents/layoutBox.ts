@@ -5,27 +5,26 @@ export const LAYOUT_DIRECTION_HORIZONTAL = 'horizontal';
 export const LAYOUT_DIRECTION_VERTICAL = 'vertical';
 export const LAYOUT_DIRECTION_BOTH = 'both';
 
-const layoutBoxHorizontalAlignArgTypeDef: ArgTypeDefinition<BoxProps['justifyContent']> = {
-  typeDef: {
-    type: 'string',
-    enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+export const layoutBoxArgTypes: {
+  horizontalAlign: ArgTypeDefinition<BoxProps['justifyContent']>;
+  verticalAlign: ArgTypeDefinition<BoxProps['alignItems']>;
+} = {
+  horizontalAlign: {
+    typeDef: {
+      type: 'string',
+      enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+    },
+    label: 'Horizontal alignment',
+    control: { type: 'HorizontalAlign' },
+    defaultValue: 'start',
   },
-  label: 'Horizontal alignment',
-  control: { type: 'HorizontalAlign' },
-  defaultValue: 'start',
-};
-
-const layoutBoxVerticalAlignArgTypeDef: ArgTypeDefinition<BoxProps['alignItems']> = {
-  typeDef: {
-    type: 'string',
-    enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+  verticalAlign: {
+    typeDef: {
+      type: 'string',
+      enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
+    },
+    label: 'Vertical alignment',
+    control: { type: 'VerticalAlign' },
+    defaultValue: 'center',
   },
-  label: 'Vertical alignment',
-  control: { type: 'VerticalAlign' },
-  defaultValue: 'center',
-};
-
-export const layoutBoxArgTypes = {
-  layoutHorizontalAlign: layoutBoxHorizontalAlignArgTypeDef,
-  layoutVerticalAlign: layoutBoxVerticalAlignArgTypeDef,
 };

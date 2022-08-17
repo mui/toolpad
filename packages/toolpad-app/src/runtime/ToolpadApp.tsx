@@ -291,9 +291,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const layoutElementProps = React.useMemo(() => {
     if (appDom.isElement(node) && isPageRow(node)) {
       return {
-        layoutColumnSizes: childNodeGroups.children.map(
-          (child) => child.layout?.layoutColumnSize?.value,
-        ),
+        layoutColumnSizes: childNodeGroups.children.map((child) => child.layout?.columnSize?.value),
       };
     }
     return {};
@@ -330,8 +328,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         <Box
           sx={{
             display: 'flex',
-            alignItems: boundLayoutProps.layoutVerticalAlign,
-            justifyContent: boundLayoutProps.layoutHorizontalAlign,
+            alignItems: boundLayoutProps.verticalAlign,
+            justifyContent: boundLayoutProps.horizontalAlign,
           }}
         >
           <Component {...props} />
@@ -485,8 +483,8 @@ function parseBindings(
           const binding =
             elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
             appDom.createConst(argType?.defaultValue ?? undefined);
-          const bindingId = `${elm.id}.layout.${propName}`;
-          const scopePath = `${elm.name}.${propName}`;
+          const bindingId = `${elm.id}.@layout.${propName}`;
+          const scopePath = `${elm.name}.@layout.${propName}`;
           parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
         }
       }

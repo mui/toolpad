@@ -32,6 +32,7 @@ import CenteredSpinner from '../../../components/CenteredSpinner';
 import SplitPane from '../../../components/SplitPane';
 import { getDefaultControl } from '../../propertyControls';
 import { WithControlledProp } from '../../../utils/types';
+import useDebounced from '../../../utils/useDebounced';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -187,9 +188,10 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const frameDocument = frameRef.current?.contentDocument;
 
   const { Component: GeneratedComponent, error: compileError } = useCodeComponent(input);
-
   const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
-  const { argTypes } = CodeComponent[TOOLPAD_COMPONENT];
+  const RenderedCodeComponent = useDebounced(CodeComponent, 250);
+
+  const { argTypes } = RenderedCodeComponent[TOOLPAD_COMPONENT];
 
   const defaultProps = React.useMemo(
     () => mapValues(argTypes, (argType) => argType?.defaultValue),
@@ -233,11 +235,11 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             <FrameContent document={frameDocument}>
               <React.Suspense fallback={null}>
                 <ErrorBoundary
-                  resetKeys={[CodeComponent]}
+                  resetKeys={[RenderedCodeComponent]}
                   fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
                   <AppThemeProvider dom={dom}>
-                    <CodeComponent
+                    <RenderedCodeComponent
                       {...defaultProps}
                       {...filterValues(props, (propValue) => typeof propValue !== 'undefined')}
                     />

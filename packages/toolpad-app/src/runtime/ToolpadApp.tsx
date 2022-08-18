@@ -345,7 +345,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
             justifyContent: boundLayoutProps.horizontalAlign,
           }}
         >
-          <Component {...props} />
+          <div>
+            <Component {...props} />
+          </div>
         </Box>
       )}
     </NodeRuntimeWrapper>

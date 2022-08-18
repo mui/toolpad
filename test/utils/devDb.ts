@@ -1,4 +1,3 @@
-import execa from 'execa';
 import * as path from 'path';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
@@ -9,6 +8,8 @@ const DEV_COMPOSE_FILE = path.resolve(__dirname, '../../docker-compose.dev.yml')
  * Test whether the dev database is running
  */
 export async function isRunning(): Promise<boolean> {
+  const { default: execa } = await import('execa');
+
   const { stdout } = await execa('docker', [
     'compose',
     `-f=${DEV_COMPOSE_FILE}`,
@@ -24,6 +25,8 @@ export async function isRunning(): Promise<boolean> {
  * Backup the dev database
  */
 export async function dump(): Promise<Buffer> {
+  const { default: execa } = await import('execa');
+
   const proc = execa('docker', [
     'compose',
     `-f=${DEV_COMPOSE_FILE}`,
@@ -54,6 +57,8 @@ export async function dump(): Promise<Buffer> {
  * Restore the dev database from backup
  */
 export async function restore(pgDump: string): Promise<void> {
+  const { default: execa } = await import('execa');
+
   const proc = execa('docker', [
     'compose',
     `-f=${DEV_COMPOSE_FILE}`,

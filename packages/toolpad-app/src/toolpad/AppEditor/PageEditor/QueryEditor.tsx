@@ -136,7 +136,6 @@ interface RenderDialogActions {
 }
 
 interface QueryEditorDialogContext {
-  dataSourceId: string | null;
   renderDialogTitle: () => React.ReactNode;
   renderQueryOptions: () => React.ReactNode;
   renderDialogActions: RenderDialogActions;
@@ -146,7 +145,7 @@ const [useQueryEditorDialogContext, QueryEditorDialogContextProvider] =
   createProvidedContext<QueryEditorDialogContext>('QueryEditorDialog');
 
 export function QueryEditorShell({ children, isDirty, onCommit }: QueryEditorShellProps) {
-  const { dataSourceId, renderDialogTitle, renderQueryOptions, renderDialogActions } =
+  const { renderDialogTitle, renderQueryOptions, renderDialogActions } =
     useQueryEditorDialogContext();
 
   return (
@@ -155,34 +154,28 @@ export function QueryEditorShell({ children, isDirty, onCommit }: QueryEditorShe
 
       <Divider />
 
-      {dataSourceId ? (
-        <DialogContent
+      <DialogContent
+        sx={{
+          // height will be clipped by max-height
+          height: '100vh',
+          p: 0,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Box
           sx={{
-            // height will be clipped by max-height
-            height: '100vh',
-            p: 0,
+            flex: 1,
+            minHeight: 0,
+            position: 'relative',
             display: 'flex',
-            flexDirection: 'column',
           }}
         >
-          <Box
-            sx={{
-              flex: 1,
-              minHeight: 0,
-              position: 'relative',
-              display: 'flex',
-            }}
-          >
-            {children}
-          </Box>
+          {children}
+        </Box>
 
-          {renderQueryOptions()}
-        </DialogContent>
-      ) : (
-        <DialogContent>
-          <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        </DialogContent>
-      )}
+        {renderQueryOptions()}
+      </DialogContent>
 
       {renderDialogActions({ isDirty, onCommit })}
     </React.Fragment>
@@ -518,7 +511,6 @@ function QueryNodeEditorDialog<Q, P>({
   );
 
   const queryEditorShellContext: QueryEditorDialogContext = {
-    dataSourceId: dataSource ? dataSourceId : null,
     renderDialogTitle,
     renderQueryOptions,
     renderDialogActions,
@@ -538,9 +530,7 @@ function QueryNodeEditorDialog<Q, P>({
             />
           </ConnectionContextProvider>
         ) : (
-          <QueryEditorShell>
-            <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-          </QueryEditorShell>
+          <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
         )}
       </Dialog>
     </QueryEditorDialogContextProvider>

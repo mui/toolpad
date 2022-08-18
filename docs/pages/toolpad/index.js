@@ -1,4 +1,5 @@
 import * as React from 'react';
+import NoSsr from '@mui/material/NoSsr';
 import Head from 'docs/src/modules/components/Head';
 import CssBaseline from '@mui/material/CssBaseline';
 import BrandingProvider from 'docs/src/BrandingProvider';
@@ -7,6 +8,7 @@ import AppFooter from 'docs/src/layouts/AppFooter';
 import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
 import ToolpadHero from '../../src/components/landing/ToolpadHero';
 import ToolpadHeroDemo from '../../src/components/landing/ToolpadHeroDemo';
+import SignUpToast from '../../src/components/landing/SignUpToast';
 import CardGrid from '../../src/components/landing/CardGrid';
 import Banner from '../../src/components/landing/Banner';
 import Pricing from '../../src/components/landing/PricingTable';
@@ -32,6 +34,9 @@ export default function Home() {
         description="Build apps with MUI components, connect to data sources, APIs and build your internal tools 10x faster. Open-source and powered by MUI."
         card="/static/social-previews/toolpad-preview.jpg"
       />
+      <NoSsr>
+        <SignUpToast />
+      </NoSsr>
       <CssBaseline />
       <AppHeaderBanner />
       <AppHeader />

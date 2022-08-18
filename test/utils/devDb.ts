@@ -10,15 +10,19 @@ const DEV_COMPOSE_FILE = path.resolve(__dirname, '../../docker-compose.dev.yml')
 export async function isRunning(): Promise<boolean> {
   const { default: execa } = await import('execa');
 
-  const { stdout } = await execa('docker', [
-    'compose',
-    `-f=${DEV_COMPOSE_FILE}`,
-    'ps',
-    '--format=json',
-    'postgres',
-  ]);
-  const [service] = JSON.parse(stdout);
-  return service?.State === 'running';
+  try {
+    const { stdout } = await execa('docker', [
+      'compose',
+      `-f=${DEV_COMPOSE_FILE}`,
+      'ps',
+      '--format=json',
+      'postgres',
+    ]);
+    const [service] = JSON.parse(stdout);
+    return service?.State === 'running';
+  } catch {
+    return false;
+  }
 }
 
 /**

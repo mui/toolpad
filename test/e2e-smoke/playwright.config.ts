@@ -8,6 +8,8 @@ const config: PlaywrightTestConfig = {
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000/',
   },
 
+  globalSetup: '../playwright/global-setup',
+  globalTeardown: '../playwright/global-teardown',
   projects: [
     {
       name: 'chromium',

@@ -21,8 +21,6 @@ import {
   PostgresResult,
 } from './types';
 
-const BETA_FEATURES = false;
-
 const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor'), {
   noSsr: true,
   fallback: <Skeleton variant="rectangular" height="100%" />,
@@ -169,17 +167,15 @@ function QueryEditor({
             </Box>
           </QueryInputPanel>
 
-          {BETA_FEATURES ? (
-            <Box sx={{ p: 2 }}>
-              <Typography>Parameters</Typography>
-              <ParametersEditor
-                value={params}
-                onChange={setParams}
-                globalScope={globalScope}
-                liveValue={paramsEditorLiveValue}
-              />
-            </Box>
-          ) : null}
+          <Box sx={{ p: 2 }}>
+            <Typography>Parameters</Typography>
+            <ParametersEditor
+              value={params}
+              onChange={setParams}
+              globalScope={globalScope}
+              liveValue={paramsEditorLiveValue}
+            />
+          </Box>
         </SplitPane>
 
         {preview?.error ? (

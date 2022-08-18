@@ -4,7 +4,7 @@ async function globalTeardown() {
   // eslint-disable-next-line no-underscore-dangle
   const pgDump = (globalThis as any).__toolpadTestDbDump;
 
-  if (typeof pgDump === 'string') {
+  if (pgDump) {
     // eslint-disable-next-line no-console
     console.log('Restoring the dev database');
 

@@ -1,5 +1,6 @@
 import { test, expect, Request, Page } from '@playwright/test';
 import generateId from '../utils/generateId';
+import * as locators from '../utils/locators';
 
 async function createApp(page: Page, name: string) {
   await page.locator('button:has-text("create new")').click();
@@ -24,18 +25,16 @@ test('app create/rename flow', async ({ page }) => {
 
   await page.goto('/');
 
-  const app1RowSelector = `[role="row"] >> has="input[value='${appName1}']"`;
-  await page.click(`${app1RowSelector} >> [aria-label="App menu"]`);
+  await page.click(`${locators.toolpadHomeAppRow(appName1)} >> [aria-label="App menu"]`);
 
   await page.click('[role="menuitem"]:has-text("Rename"):visible');
 
   await page.keyboard.type(appName2);
   await page.keyboard.press('Enter');
 
-  await page.locator(`text=An app name "${appName2}" already exists`);
+  await expect(page.locator(`text=An app named "${appName2}" already exists`)).toBeVisible();
 
   await page.keyboard.type(appName3);
 
-  const app3RowSelector = `[role="row"] >> has="input[value='${appName3}']"`;
-  await page.locator(app3RowSelector);
+  await expect(page.locator(locators.toolpadHomeAppRow(appName3))).toBeVisible();
 });

@@ -23,8 +23,8 @@ export async function isRunning(): Promise<boolean> {
 /**
  * Backup the dev database
  */
-export async function dump(): Promise<string> {
-  const { stdout } = await execa('docker', [
+export async function dump(): Promise<Buffer> {
+  const proc = execa('docker', [
     'compose',
     `-f=${DEV_COMPOSE_FILE}`,
     'exec',
@@ -32,16 +32,29 @@ export async function dump(): Promise<string> {
     'pg_dump',
     '-U',
     'postgres',
+    '--format',
+    't',
   ]);
 
-  return stdout;
+  if (!proc.stdout) {
+    throw new Error(`childprocess was spawned with stdio[1] !== 'pipe'`);
+  }
+
+  const buffers = [];
+  for await (const data of proc.stdout) {
+    buffers.push(data);
+  }
+
+  await proc;
+
+  return Buffer.concat(buffers);
 }
 
 /**
  * Restore the dev database from backup
  */
 export async function restore(pgDump: string): Promise<void> {
-  const { stdin } = execa('docker', [
+  const proc = execa('docker', [
     'compose',
     `-f=${DEV_COMPOSE_FILE}`,
     'exec',
@@ -49,9 +62,13 @@ export async function restore(pgDump: string): Promise<void> {
     'pg_restore',
     '-U',
     'postgres',
+    '-d',
+    'postgres',
+    '--clean',
   ]);
-  if (!stdin) {
+  if (!proc.stdin) {
     throw new Error(`childprocess was spawned with stdio[0] !== 'pipe'`);
   }
-  await pipeline(Readable.from([pgDump]), stdin);
+  await pipeline(Readable.from([pgDump]), proc.stdin);
+  await proc;
 }

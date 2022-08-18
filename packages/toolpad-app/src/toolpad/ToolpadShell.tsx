@@ -15,6 +15,7 @@ import {
 import HomeIcon from '@mui/icons-material/Home';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import useMenu from '../utils/useMenu';
 
 const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
@@ -55,39 +56,16 @@ const ViewPort = styled('div')({
 });
 
 function UserFeedback() {
-  const menuId = React.useId();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const { buttonProps, menuProps } = useMenu();
 
   return (
     <React.Fragment>
       <Tooltip title="Help and resources">
-        <IconButton
-          id={menuId}
-          aria-controls={open ? menuId : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
-          onClick={handleClick}
-          color="inherit"
-        >
+        <IconButton {...buttonProps} color="inherit">
           <HelpOutlinedIcon />
         </IconButton>
       </Tooltip>
-      <Menu
-        id={menuId}
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          'aria-labelledby': menuId,
-        }}
-      >
+      <Menu {...menuProps}>
         <FeedbackMenuItemLink href={DOCUMENTATION_URL}>Documentation</FeedbackMenuItemLink>
         <FeedbackMenuItemLink href={REPORT_BUG_URL}>Report bug</FeedbackMenuItemLink>
         <FeedbackMenuItemLink href={FEATURE_REQUEST_URL}>

@@ -61,7 +61,7 @@ function UserFeedback() {
   return (
     <React.Fragment>
       <Tooltip title="Help and resources">
-        <IconButton {...buttonProps} aria-label="Help and resources" color="inherit">
+        <IconButton {...buttonProps} color="inherit">
           <HelpOutlinedIcon />
         </IconButton>
       </Tooltip>

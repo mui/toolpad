@@ -25,7 +25,7 @@ test('app create/rename flow', async ({ page }) => {
 
   await page.goto('/');
 
-  await page.click(`${locators.toolpadHomeAppRow(appName1)} >> [aria-label="App menu"]`);
+  await page.click(`${locators.toolpadHomeAppRow(appName1)} >> [aria-label="Application menu"]`);
 
   await page.click('[role="menuitem"]:has-text("Rename"):visible');
 

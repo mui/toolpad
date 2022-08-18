@@ -44,6 +44,7 @@ import ToolpadShell from './ToolpadShell';
 import getReadableDuration from '../utils/readableDuration';
 import EditableText from '../components/EditableText';
 import type { AppMeta } from '../server/data';
+import useMenu from '../utils/useMenu';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -269,52 +270,24 @@ interface AppOptionsProps {
 }
 
 function AppOptions({ onRename, onDelete }: AppOptionsProps) {
-  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  const menuOpen = Boolean(menuAnchorEl);
-
-  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = React.useCallback(() => {
-    setMenuAnchorEl(null);
-  }, []);
+  const { buttonProps, menuProps, onMenuClose } = useMenu();
 
   const handleRenameClick = React.useCallback(() => {
-    setMenuAnchorEl(null);
+    onMenuClose();
     onRename();
-  }, [onRename]);
+  }, [onMenuClose, onRename]);
 
   const handleDeleteClick = React.useCallback(() => {
-    setMenuAnchorEl(null);
+    onMenuClose();
     onDelete?.();
-  }, [onDelete]);
-
-  const buttonId = React.useId();
-  const menuId = React.useId();
+  }, [onDelete, onMenuClose]);
 
   return (
     <React.Fragment>
-      <IconButton
-        aria-label="App menu"
-        aria-controls={menuOpen ? menuId : undefined}
-        aria-haspopup="true"
-        aria-expanded={menuOpen ? 'true' : undefined}
-        onClick={handleOptionsClick}
-        id={buttonId}
-      >
+      <IconButton {...buttonProps} aria-label="Application menu">
         <MoreVertIcon />
       </IconButton>
-      <Menu
-        id={menuId}
-        anchorEl={menuAnchorEl}
-        open={menuOpen}
-        onClose={handleMenuClose}
-        MenuListProps={{
-          'aria-labelledby': buttonId,
-        }}
-      >
+      <Menu {...menuProps}>
         <MenuItem onClick={handleRenameClick}>
           <ListItemIcon>
             <DriveFileRenameOutlineIcon />

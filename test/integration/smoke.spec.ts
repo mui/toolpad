@@ -21,7 +21,7 @@ test('basic app creation flow', async ({ page }) => {
 
   await page.click('[aria-label="Home"]');
 
-  await page.click(`${locators.toolpadHomeAppRow(appName)} >> [aria-label="App menu"]`);
+  await page.click(`${locators.toolpadHomeAppRow(appName)} >> [aria-label="Application menu"]`);
 
   await page.click('[role="menuitem"]:has-text("Delete"):visible');
 

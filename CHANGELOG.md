@@ -1,6 +1,10 @@
 # Changelog
 
 ## v0.0.14
+_Aug 18, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+Add app overview list view, allow setting properties in code component debugger, Fix artifacts in the page designer, visual tweaks to the select component options editor.
 
 - &#8203;<!-- 18 -->Add List view for apps as default (#690) @bharatkashyap
 - &#8203;<!-- 17 -->Add interface to debug properties for code components (#803) @Janpot

@@ -1,5 +1,0 @@
-.next
-/packages/*/dist
-/packages/*/.next
-/packages/toolpad-app/public
-/packages/toolpad-app/prisma/generated/*

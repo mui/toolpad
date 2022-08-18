@@ -281,7 +281,7 @@ function QueryNodeEditorDialog<Q, P>({
   const queryModel = React.useMemo(
     () => ({
       query: input.attributes.query.value,
-      params: inputParams,
+      params: Object.entries(inputParams) || [],
     }),
     [input.attributes.query.value, inputParams],
   );
@@ -293,7 +293,7 @@ function QueryNodeEditorDialog<Q, P>({
           attributes: update(input.attributes, {
             query: appDom.createConst(model.query),
           }),
-          params: model.params,
+          params: Object.fromEntries(model.params),
         }),
       );
     },

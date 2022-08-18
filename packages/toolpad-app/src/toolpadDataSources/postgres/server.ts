@@ -11,7 +11,6 @@ import {
 async function execBase(
   connection: Maybe<PostgresConnectionParams>,
   postgresQuery: PostgresQuery,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   params: Record<string, string>,
 ): Promise<PostgresResult> {
   const client = new Client({
@@ -19,9 +18,7 @@ async function execBase(
   });
   try {
     await client.connect();
-    const res = await client.query(postgresQuery.sql, [
-      /* TODO */
-    ]);
+    const res = await client.query(postgresQuery.sql, Object.values(params));
 
     return {
       data: res.rows,

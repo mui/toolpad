@@ -1,6 +1,5 @@
 import { Box, Button, Skeleton, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import { inferColumns } from '@mui/toolpad-components';
-import { BindableAttrValue } from '@mui/toolpad-core';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -109,17 +108,8 @@ function QueryEditor({
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
 
-  const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
-    Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>)),
-  );
-
-  React.useEffect(
-    () => setParams(Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>))),
-    [input.params],
-  );
-
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    input: params,
+    input: input.params,
     globalScope,
   });
 
@@ -137,15 +127,9 @@ function QueryEditor({
     params: previewParams,
   });
 
-  const lastSavedInput = React.useRef(input);
-  const handleCommit = React.useCallback(() => {
-    const newValue = { ...input, params: Object.fromEntries(params) };
-    onChange(newValue);
-    lastSavedInput.current = newValue;
-  }, [onChange, params, input]);
+  const handleCommit = React.useCallback(() => onChange(input), [onChange, input]);
 
-  const isDirty =
-    input.query !== lastSavedInput.current.query || input.params !== lastSavedInput.current.params;
+  const isDirty = input !== value;
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => inferColumns(rawRows), [rawRows]);
@@ -154,7 +138,7 @@ function QueryEditor({
   return (
     <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
       <SplitPane split="vertical" size="50%" allowResize>
-        <SplitPane split="horizontal" size={0} primary="second" allowResize>
+        <SplitPane split="horizontal" size={85} primary="second" allowResize>
           <QueryInputPanel onRunPreview={handleRunPreview}>
             <Box sx={{ flex: 1, minHeight: 0 }}>
               <MonacoEditor
@@ -170,8 +154,8 @@ function QueryEditor({
           <Box sx={{ p: 2 }}>
             <Typography>Parameters</Typography>
             <ParametersEditor
-              value={params}
-              onChange={setParams}
+              value={input.params}
+              onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
               globalScope={globalScope}
               liveValue={paramsEditorLiveValue}
             />

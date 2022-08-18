@@ -1,5 +1,6 @@
 import { test, expect, Request } from '@playwright/test';
 import generateId from '../utils/generateId';
+import * as locators from '../utils/locators';
 
 test('basic app creation flow', async ({ page }) => {
   const appName = `App ${generateId()}`;
@@ -20,9 +21,7 @@ test('basic app creation flow', async ({ page }) => {
 
   await page.click('[aria-label="Home"]');
 
-  const appRowSelector = `[role="row"] >> has="input[value='${appName}']"`;
-
-  await page.click(`${appRowSelector} >> [aria-label="App menu"]`);
+  await page.click(`${locators.toolpadHomeAppRow(appName)} >> [aria-label="App menu"]`);
 
   await page.click('[role="menuitem"]:has-text("Delete"):visible');
 
@@ -38,7 +37,7 @@ test('basic app creation flow', async ({ page }) => {
     `[role="dialog"]:has-text('Are you sure you want to delete application "${appName}"') >> button:has-text("delete")`,
   );
 
-  await page.waitForSelector(appRowSelector, { state: 'detached' });
+  await page.waitForSelector(locators.toolpadHomeAppRow(appName), { state: 'detached' });
 
   await page.off('request', handleRequest);
 

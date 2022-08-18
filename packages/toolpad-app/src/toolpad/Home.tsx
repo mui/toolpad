@@ -167,17 +167,16 @@ interface AppNameEditableProps {
   editing?: boolean;
   setEditing: (editing: boolean) => void;
   loading?: boolean;
-  description?: React.ReactNode;
 }
 
-function AppNameEditable({ app, editing, setEditing, loading, description }: AppNameEditableProps) {
-  const [showAppRenameError, setShowAppRenameError] = React.useState<boolean>(false);
+function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableProps) {
+  const [appRenameError, setAppRenameError] = React.useState<Error | null>(null);
   const appNameInput = React.useRef<HTMLInputElement | null>(null);
   const [appName, setAppName] = React.useState<string>(app?.name || '');
 
   const handleAppNameChange = React.useCallback(
     (newValue: string) => {
-      setShowAppRenameError(false);
+      setAppRenameError(null);
       setAppName(newValue);
     },
     [setAppName],
@@ -185,7 +184,7 @@ function AppNameEditable({ app, editing, setEditing, loading, description }: App
 
   const handleAppRenameClose = React.useCallback(() => {
     setEditing(false);
-    setShowAppRenameError(false);
+    setAppRenameError(null);
   }, [setEditing]);
 
   const handleAppRenameSave = React.useCallback(
@@ -194,8 +193,8 @@ function AppNameEditable({ app, editing, setEditing, loading, description }: App
         try {
           await client.mutation.updateApp(app.id, name);
           await client.invalidateQueries('getApps');
-        } catch (err) {
-          setShowAppRenameError(true);
+        } catch (err: any) {
+          setAppRenameError(err);
           setEditing(true);
         }
       }
@@ -209,8 +208,8 @@ function AppNameEditable({ app, editing, setEditing, loading, description }: App
     <EditableText
       defaultValue={app?.name}
       editable={editing}
-      helperText={showAppRenameError ? `An app named "${appName}" already exists` : description}
-      error={showAppRenameError}
+      helperText={appRenameError ? `An app named "${appName}" already exists` : null}
+      error={!!appRenameError}
       onChange={handleAppNameChange}
       onClose={handleAppRenameClose}
       onSave={handleAppRenameSave}
@@ -450,8 +449,10 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
             app={app}
             editing={editingName}
             setEditing={setEditingName}
-            description={app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
           />
+          <Typography variant="caption">
+            {app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
+          </Typography>
         </TableCell>
         <TableCell align="right">
           <Stack direction="row" spacing={1} justifyContent={'flex-end'}>

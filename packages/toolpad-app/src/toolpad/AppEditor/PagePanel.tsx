@@ -62,7 +62,7 @@ function AppMenu() {
         maxWidth="sm"
       >
         <DialogTitle id={dialogTitleId}>Application DOM</DialogTitle>
-        <DialogContent sx={{ position: 'relative', display: 'flex' }}>
+        <DialogContent sx={{ position: 'relative', display: 'flex', alignItems: 'stretch' }}>
           <JsonView sx={{ flex: 1 }} copyToClipboard src={dom} expandPaths={[]} expandLevel={5} />
         </DialogContent>
         <DialogActions>

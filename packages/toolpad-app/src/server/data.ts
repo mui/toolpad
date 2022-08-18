@@ -204,7 +204,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
       data: { name },
     });
 
-    const dom = opts.dom ? appDom.duplicate(opts.dom) : createDefaultDom();
+    const dom = opts.dom || createDefaultDom();
 
     await saveDom(app.id, dom);
 

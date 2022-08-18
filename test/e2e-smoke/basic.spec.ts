@@ -1,7 +1,8 @@
 import { test, expect, Request } from '@playwright/test';
+import generateId from '../utils/generateId';
 
 test('basic app creation flow', async ({ page }) => {
-  const appName = `App ${String(Math.random()).slice(2)}`;
+  const appName = `App ${generateId()}`;
 
   await page.goto('/');
   const brand = page.locator('data-test-id=brand');
@@ -21,7 +22,7 @@ test('basic app creation flow', async ({ page }) => {
 
   const appRowSelector = `[role="row"] >> has="input[value='${appName}']"`;
 
-  await page.click(`${appRowSelector} >> [aria-label="settings"]`);
+  await page.click(`${appRowSelector} >> [aria-label="App menu"]`);
 
   await page.click('[role="menuitem"]:has-text("Delete"):visible');
 

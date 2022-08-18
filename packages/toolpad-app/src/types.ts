@@ -23,7 +23,7 @@ export interface EditorProps<T> {
   propType: PropValueType;
   disabled?: boolean;
   value: T | undefined;
-  onChange: (newValue: T) => void;
+  onChange: (newValue: T | undefined) => void;
 }
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';

@@ -7,7 +7,6 @@ import {
   FormControlLabel,
   Typography,
   Skeleton,
-  Box,
 } from '@mui/material';
 import * as React from 'react';
 import { UseQueryResult } from '@tanstack/react-query';
@@ -209,13 +208,11 @@ function QueryEditor({
           </Stack>
         </QueryInputPanel>
 
-        <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
-          {preview?.error ? (
-            <ErrorAlert error={preview?.error} />
-          ) : (
-            <JsonView src={preview?.data} />
-          )}
-        </Box>
+        {preview?.error ? (
+          <ErrorAlert error={preview?.error} />
+        ) : (
+          <JsonView sx={{ height: '100%' }} src={preview?.data} />
+        )}
       </SplitPane>
     </QueryEditorShell>
   );

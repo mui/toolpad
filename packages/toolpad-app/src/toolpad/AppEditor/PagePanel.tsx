@@ -46,7 +46,7 @@ function AppMenu() {
 
   return (
     <React.Fragment>
-      <IconButton {...buttonProps}>
+      <IconButton {...buttonProps} aria-label="Application menu">
         <MoreVertIcon />
       </IconButton>
 

@@ -8,7 +8,6 @@ import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputBase, { inputBaseClasses } from '@mui/material/InputBase';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
-import Link from 'docs/src/modules/components/Link';
 import { styled } from '@mui/material/styles';
 import ROUTES from '../../route';
 
@@ -23,7 +22,7 @@ const SignUp = ({ sx }) => {
     event.preventDefault();
     setForm((current) => ({ ...current, status: 'loading' }));
     try {
-      await fetch(ROUTES.TOOLPAD_SIGNUP_URL, {
+      await fetch(ROUTES.TOOLPAD_SIGN_UP_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -84,6 +83,8 @@ const SignUp = ({ sx }) => {
           type="email"
           placeholder="example@email.com"
           inputProps={{ required: true }}
+          value={form.email}
+          onChange={(event) => setForm({ email: event.target.value, status: 'initial' })}
           sx={{
             mr: { xs: 0, sm: 2 },
             mb: { xs: 1, sm: 0 },
@@ -125,9 +126,8 @@ const SignUp = ({ sx }) => {
           }}
         />
         <Button
-          component={Link}
-          href={'/'}
-          noLinkStyle
+          disabled={form.status === 'loading'}
+          type="submit"
           size="large"
           variant="contained"
           endIcon={<KeyboardArrowRightRounded />}

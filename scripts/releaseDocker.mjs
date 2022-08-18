@@ -133,6 +133,12 @@ async function main({ yes, force, commit, releaseTag, noLatest, githubToken }) {
     commit = answers.commit;
   }
 
+  const baseImageExists = await checkTagExists(IMAGE_NAME, commit);
+
+  if (!baseImageExists) {
+    throw new Error(`Base image ${IMAGE_NAME}:${commit} doesn't exist`);
+  }
+
   if (!releaseTag) {
     const answers = await inquirer.prompt([
       {

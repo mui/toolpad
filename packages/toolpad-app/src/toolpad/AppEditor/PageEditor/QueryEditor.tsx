@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -278,10 +278,13 @@ function QueryNodeEditorDialog<Q, P>({
 
   const connectionParams = connection?.attributes.params.value;
 
-  const queryModel = React.useMemo(
+  const queryModel = React.useMemo<QueryEditorModel<any>>(
     () => ({
       query: input.attributes.query.value,
-      params: Object.entries(inputParams) || [],
+      params:
+        (Object.entries(inputParams).filter(([, value]) =>
+          Boolean(value),
+        ) as BindableAttrEntries) || [],
     }),
     [input.attributes.query.value, inputParams],
   );

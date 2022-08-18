@@ -16,7 +16,7 @@ Add app overview list view, allow setting properties in code component debugger,
 - &#8203;<!-- 14 -->Improve JsonView component UX (#797) @Janpot
 - &#8203;<!-- 13 -->Fix deleting newly placed components with Backspace key (#771) @apedroferreira
 - &#8203;<!-- 12 -->Update/improve release guide (#770) @apedroferreira
-- &#8203;<!-- 11 -->Upgrade @mui/* packages (#785) @Janpot
+- &#8203;<!-- 11 -->Upgrade @mui/\* packages (#785) @Janpot
 - &#8203;<!-- 10 -->Use stable version of react-query (#784) @Janpot
 - &#8203;<!-- 09 -->Use stable version of monaco-editor (#783) @Janpot
 - &#8203;<!-- 08 -->Add tooling to facilitate integration testing (#786) @Janpot

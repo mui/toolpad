@@ -21,6 +21,7 @@ import HierarchyExplorer from './HierarchyExplorer';
 import client from '../../api';
 import { useDom } from '../DomLoader';
 import JsonView from '../../components/JsonView';
+import useMenu from '../../utils/useMenu';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
@@ -28,16 +29,8 @@ const PagePanelRoot = styled('div')({
 });
 
 function AppMenu() {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleAppMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleAppMenuClose = () => {
-    setAnchorEl(null);
-  };
-  const buttonId = React.useId();
-  const menuId = React.useId();
+  const { buttonProps, menuProps, onMenuClose } = useMenu();
+
   const dialogTitleId = React.useId();
 
   const [viewDomDialogOpen, setViewDomDialogOpen] = React.useState(false);
@@ -45,33 +38,19 @@ function AppMenu() {
   const dom = useDom();
 
   const handleViewDomClick = React.useCallback(() => {
-    handleAppMenuClose();
+    onMenuClose();
     setViewDomDialogOpen(true);
-  }, []);
+  }, [onMenuClose]);
 
   const handleViewDomDialogClose = React.useCallback(() => setViewDomDialogOpen(false), []);
 
   return (
     <React.Fragment>
-      <IconButton
-        id={buttonId}
-        aria-controls={open ? menuId : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleAppMenuClick}
-      >
+      <IconButton {...buttonProps} aria-label="Application menu">
         <MoreVertIcon />
       </IconButton>
 
-      <Menu
-        id={menuId}
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleAppMenuClose}
-        MenuListProps={{
-          'aria-labelledby': buttonId,
-        }}
-      >
+      <Menu {...menuProps}>
         <MenuItem onClick={handleViewDomClick}>View DOM</MenuItem>
       </Menu>
 

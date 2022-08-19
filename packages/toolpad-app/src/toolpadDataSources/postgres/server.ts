@@ -55,7 +55,9 @@ async function execBase(
   try {
     await client.connect();
 
-    const res = await client.query(parseQuery(postgresQuery.sql, paramEntries));
+    const pgQuery = parseQuery(postgresQuery.sql, paramEntries);
+
+    const res = await client.query(pgQuery);
 
     return {
       data: res.rows,
@@ -87,8 +89,6 @@ async function execPrivate(
   connection: Maybe<PostgresConnectionParams>,
   query: PostgresPrivateQuery,
 ): Promise<any> {
-  // eslint-disable-next-line no-console
-  console.log(`executing private query "${query}"`);
   if (query.kind === 'debugExec') {
     return execBase(connection, query.query, query.params);
   }

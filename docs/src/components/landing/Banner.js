@@ -40,6 +40,9 @@ export default function Banner(props) {
         <Button
           component={Link}
           noLinkStyle
+          data-ga-event-category="ToolpadLanding"
+          data-ga-event-label={content?.action?.label}
+          data-ga-event-action="Upvote"
           target="_blank"
           rel="noopener"
           href={content?.action?.href}

@@ -187,11 +187,11 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const frameDocument = frameRef.current?.contentDocument;
 
-  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(input);
+  const debouncedInput = useDebounced(input, 250);
+  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(debouncedInput);
   const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
-  const RenderedCodeComponent = useDebounced(CodeComponent, 250);
 
-  const { argTypes } = RenderedCodeComponent[TOOLPAD_COMPONENT];
+  const { argTypes } = CodeComponent[TOOLPAD_COMPONENT];
 
   const defaultProps = React.useMemo(
     () => mapValues(argTypes, (argType) => argType?.defaultValue),
@@ -235,11 +235,11 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             <FrameContent document={frameDocument}>
               <React.Suspense fallback={null}>
                 <ErrorBoundary
-                  resetKeys={[RenderedCodeComponent]}
+                  resetKeys={[CodeComponent]}
                   fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
                   <AppThemeProvider dom={dom}>
-                    <RenderedCodeComponent
+                    <CodeComponent
                       {...defaultProps}
                       {...filterValues(props, (propValue) => typeof propValue !== 'undefined')}
                     />

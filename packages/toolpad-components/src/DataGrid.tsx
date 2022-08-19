@@ -12,6 +12,7 @@ import {
   gridDensityRowHeightSelector,
   GridSelectionModel,
   GridValueFormatterParams,
+  GridColDef,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
@@ -96,7 +97,7 @@ function SkeletonLoadingOverlay() {
   );
 }
 
-function inferColumnType(value: unknown): string | undefined {
+function inferColumnType(value: unknown): string {
   if (value instanceof Date) {
     return 'dateTime';
   }
@@ -106,33 +107,57 @@ function inferColumnType(value: unknown): string | undefined {
     case 'boolean':
     case 'string':
       return valueType;
+    case 'object':
+      return 'json';
     default:
-      return undefined;
+      return 'string';
   }
 }
 
-export function inferColumns(rows: GridRowsProp): GridColumns {
+const DEFAULT_TYPES = new Set([
+  'string',
+  'number',
+  'date',
+  'dateTime',
+  'boolean',
+  'singleSelect',
+  'actions',
+]);
+
+const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
+  json: {
+    valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
+  },
+  datetime: {
+    valueFormatter: ({ value: cellValue }: GridValueFormatterParams) =>
+      typeof cellValue === 'number' ? new Date(cellValue) : cellValue,
+  },
+};
+
+export type SerializableGridColumns = { field: string; type: string }[];
+
+export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   if (rows.length < 1) {
     return [];
   }
   // Naive implementation that checks only the first row
   const firstRow = rows[0];
   return Object.entries(firstRow).map(([field, value]) => {
-    const type = inferColumnType(value);
-
-    const valueFormatter = type
-      ? undefined
-      : ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue);
-
     return {
       field,
-      type,
-      valueFormatter,
+      type: inferColumnType(value),
     };
   });
 }
 
-const EMPTY_COLUMNS: GridColumns = [];
+export function parseColumns(columns: SerializableGridColumns): GridColumns {
+  return columns.map(({ type, ...column }) => ({
+    type: DEFAULT_TYPES.has(type) ? type : undefined,
+    ...column,
+    ...COLUMN_TYPES[type],
+  }));
+}
+
 const EMPTY_ROWS: GridRowsProp = [];
 
 interface Selection {
@@ -141,7 +166,7 @@ interface Selection {
 
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
-  columns?: GridColumns;
+  columns?: SerializableGridColumns;
   height?: number;
   rowIdField?: string;
   error?: Error | string;
@@ -259,7 +284,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [selection?.id],
   );
 
-  const columns: GridColumns = columnsProp || EMPTY_COLUMNS;
+  const columns: GridColumns = React.useMemo(() => parseColumns(columnsProp || []), [columnsProp]);
 
   return (
     <Box>

@@ -1,5 +1,5 @@
 import { Box, Button, Skeleton, Stack, TextField, Toolbar, Typography } from '@mui/material';
-import { inferColumns } from '@mui/toolpad-components';
+import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
@@ -132,7 +132,7 @@ function QueryEditor({
   const isDirty = input !== value;
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
-  const columns: GridColDef[] = React.useMemo(() => inferColumns(rawRows), [rawRows]);
+  const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
   const rows = React.useMemo(() => rawRows.map((row, id) => ({ id, ...row })), [rawRows]);
 
   return (

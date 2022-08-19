@@ -174,7 +174,7 @@ function QueryEditor({
             </Box>
           </QueryInputPanel>
 
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
             <Typography>Parameters</Typography>
             <ParametersEditor
               value={input.params}

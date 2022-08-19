@@ -32,7 +32,6 @@ function parseQuery(sql: string, params: [string, any][]): QueryConfig {
  */
 function parseErrorMessage(msg: string, params: [string, any][]): string {
   const substitutions = new Map(params.map(([name], i) => [i + 1, name]));
-  console.log(substitutions);
   const msgWithNamedVars = msg.replaceAll(/\$(\d+)/g, (match, index) => {
     const varName = substitutions.get(Number(index));
     if (typeof varName === 'string') {

@@ -307,7 +307,7 @@ function PageRoot({ children }: PageRootProps) {
   return (
     <Container>
       <Stack
-        data-test-id="page-root"
+        data-testid="page-root"
         direction="column"
         sx={{
           my: 2,

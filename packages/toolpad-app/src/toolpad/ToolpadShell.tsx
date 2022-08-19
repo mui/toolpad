@@ -102,7 +102,7 @@ function Header({ actions, navigation }: HeaderProps) {
         >
           <HomeIcon fontSize="medium" />
         </IconButton>
-        <Typography data-test-id="brand" variant="h6" color="inherit" component="div">
+        <Typography data-testid="brand" variant="h6" color="inherit" component="div">
           MUI Toolpad {process.env.TOOLPAD_TARGET}
         </Typography>
         {navigation}

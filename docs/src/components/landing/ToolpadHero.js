@@ -36,7 +36,7 @@ export default function ToolpadHero() {
           internal tools 10x faster. Open-source and powered by MUI.
         </Typography>
         <Typography color="text.secondary" sx={{ fontWeight: 700, mb: 2, mx: 'auto' }}>
-          Get notified of the beta release.
+          Sign up for early access to the beta release.
         </Typography>
         <SignUp
           sx={{

@@ -204,7 +204,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
       data: { name },
     });
 
-    const dom = opts.dom ? appDom.duplicate(opts.dom) : createDefaultDom();
+    const dom = opts.dom || createDefaultDom();
 
     await saveDom(app.id, dom);
 
@@ -218,7 +218,10 @@ export async function updateApp(appId: string, name: string): Promise<void> {
       id: appId,
     },
     data: { name },
-    select: {},
+    select: {
+      // Only return the id to reduce amount of data returned from the db
+      id: true,
+    },
   });
 }
 

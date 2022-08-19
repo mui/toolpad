@@ -1,8 +1,8 @@
 {
-  "root": "cl6zan11c0000jss9h1zf22tk",
+  "root": "cl6zbqujs0006jss9g15b3i8a",
   "nodes": {
-    "cl6zan11c0000jss9h1zf22tk": {
-      "id": "cl6zan11c0000jss9h1zf22tk",
+    "cl6zbqujs0006jss9g15b3i8a": {
+      "id": "cl6zbqujs0006jss9g15b3i8a",
       "name": "Application",
       "type": "app",
       "parentId": null,
@@ -10,11 +10,11 @@
       "parentProp": null,
       "parentIndex": null
     },
-    "cl6zan11c0001jss9a7mdh31m": {
-      "id": "cl6zan11c0001jss9a7mdh31m",
+    "cl6zbqujs0007jss9f6z53rd5": {
+      "id": "cl6zbqujs0007jss9f6z53rd5",
       "name": "page1",
       "type": "page",
-      "parentId": "cl6zan11c0000jss9h1zf22tk",
+      "parentId": "cl6zbqujs0006jss9g15b3i8a",
       "attributes": {
         "title": {
           "type": "const",
@@ -24,7 +24,7 @@
       "parentProp": "pages",
       "parentIndex": "a0"
     },
-    "cl6zb2hh300013b6tc84j5ql3": {
+    "s513ry7": {
       "name": "pageRow",
       "props": {},
       "attributes": {
@@ -34,85 +34,43 @@
         }
       },
       "layout": {},
-      "id": "cl6zb2hh300013b6tc84j5ql3",
+      "id": "s513ry7",
       "type": "element",
-      "parentId": "cl6zan11c0001jss9a7mdh31m",
+      "parentId": "cl6zbqujs0007jss9f6z53rd5",
       "parentProp": "children",
       "parentIndex": "a0"
     },
-    "cl6zb2h4100003b6tgemtlsle": {
-      "name": "dataGrid",
+    "fq03rdc": {
+      "name": "textField",
       "props": {},
       "attributes": {
         "component": {
           "type": "const",
-          "value": "DataGrid"
+          "value": "TextField"
         }
       },
       "layout": {},
-      "id": "cl6zb2h4100003b6tgemtlsle",
+      "id": "fq03rdc",
       "type": "element",
-      "parentId": "cl6zb2hh300013b6tc84j5ql3",
+      "parentId": "s513ry7",
       "parentProp": "children",
       "parentIndex": "a0"
     },
-    "cl6zb2iuz00023b6tu2g2av37": {
-      "name": "image",
+    "z523rtd": {
+      "name": "textField1",
       "props": {},
       "attributes": {
         "component": {
           "type": "const",
-          "value": "Image"
+          "value": "TextField"
         }
       },
       "layout": {},
-      "id": "cl6zb2iuz00023b6tu2g2av37",
+      "id": "z523rtd",
       "type": "element",
-      "parentId": "cl6zb2m2300043b6trct15qlr",
+      "parentId": "s513ry7",
       "parentProp": "children",
       "parentIndex": "a1"
-    },
-    "cl6zb2m2300043b6trct15qlr": {
-      "name": "pageColumn",
-      "props": {},
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "PageColumn"
-        }
-      },
-      "layout": {
-        "columnSize": {
-          "type": "const",
-          "value": 1
-        }
-      },
-      "id": "cl6zb2m2300043b6trct15qlr",
-      "type": "element",
-      "parentId": "cl6zb2hh300013b6tc84j5ql3",
-      "parentProp": "children",
-      "parentIndex": "a2"
-    },
-    "cl6zb2lid00033b6thwix35hg": {
-      "name": "button",
-      "props": {
-        "justifyContent": {
-          "type": "const",
-          "value": "end"
-        }
-      },
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "Button"
-        }
-      },
-      "layout": {},
-      "id": "cl6zb2lid00033b6thwix35hg",
-      "type": "element",
-      "parentId": "cl6zb2m2300043b6trct15qlr",
-      "parentProp": "children",
-      "parentIndex": "a0V"
     }
   }
 }

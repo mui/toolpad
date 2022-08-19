@@ -876,30 +876,3 @@ export function fromLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
 
   return node;
 }
-
-/**
- * Poor man's duplicate function
- * In anticipation of https://github.com/mui/mui-toolpad/pull/658
- */
-export function duplicate(dom: AppDom): AppDom {
-  const newIndices = new Map(Object.keys(dom.nodes).map((id) => [id, createId()]));
-  return {
-    root: newIndices.get(dom.root) as NodeId,
-    nodes: Object.fromEntries(
-      Object.entries(dom.nodes).map(([oldId, node]) => {
-        const newId = newIndices.get(oldId) as NodeId;
-        const newNode = {
-          ...node,
-          parentId: node.parentId ? (newIndices.get(node.parentId) as NodeId) : null,
-          id: newId,
-        } as AppDomNode;
-        if (isQuery(newNode) && newNode.attributes.connectionId.value) {
-          newNode.attributes.connectionId.value = ref(
-            newIndices.get(deref(newNode.attributes.connectionId.value)) as NodeId,
-          );
-        }
-        return [newId, newNode];
-      }),
-    ),
-  };
-}

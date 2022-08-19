@@ -32,6 +32,9 @@ const Marquee = ({ content }) => {
       <Button
         component={Link}
         href={content.action.href}
+        data-ga-event-category="ToolpadLanding"
+        data-ga-event-label={content.action.label}
+        data-ga-event-action="SelfHost"
         noLinkStyle
         size="large"
         variant="contained"

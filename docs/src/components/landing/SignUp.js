@@ -35,6 +35,12 @@ const SignUp = ({ sx }) => {
         }),
       });
       setForm((current) => ({ ...current, status: 'sent' }));
+      window.ga('send', {
+        hitType: 'event',
+        eventCategory: 'ToolpadLanding',
+        eventAction: 'SignUp',
+        eventLabel: 'Sign Up',
+      });
     } catch (error) {
       setForm((current) => ({ ...current, status: 'failure' }));
     }

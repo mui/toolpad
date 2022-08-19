@@ -1,0 +1,118 @@
+{
+  "root": "cl6zan11c0000jss9h1zf22tk",
+  "nodes": {
+    "cl6zan11c0000jss9h1zf22tk": {
+      "id": "cl6zan11c0000jss9h1zf22tk",
+      "name": "Application",
+      "type": "app",
+      "parentId": null,
+      "attributes": {},
+      "parentProp": null,
+      "parentIndex": null
+    },
+    "cl6zan11c0001jss9a7mdh31m": {
+      "id": "cl6zan11c0001jss9a7mdh31m",
+      "name": "page1",
+      "type": "page",
+      "parentId": "cl6zan11c0000jss9h1zf22tk",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "Page 1"
+        }
+      },
+      "parentProp": "pages",
+      "parentIndex": "a0"
+    },
+    "cl6zb2hh300013b6tc84j5ql3": {
+      "name": "pageRow",
+      "props": {},
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "layout": {},
+      "id": "cl6zb2hh300013b6tc84j5ql3",
+      "type": "element",
+      "parentId": "cl6zan11c0001jss9a7mdh31m",
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "cl6zb2h4100003b6tgemtlsle": {
+      "name": "dataGrid",
+      "props": {},
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "DataGrid"
+        }
+      },
+      "layout": {},
+      "id": "cl6zb2h4100003b6tgemtlsle",
+      "type": "element",
+      "parentId": "cl6zb2hh300013b6tc84j5ql3",
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "cl6zb2iuz00023b6tu2g2av37": {
+      "name": "image",
+      "props": {},
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Image"
+        }
+      },
+      "layout": {},
+      "id": "cl6zb2iuz00023b6tu2g2av37",
+      "type": "element",
+      "parentId": "cl6zb2m2300043b6trct15qlr",
+      "parentProp": "children",
+      "parentIndex": "a1"
+    },
+    "cl6zb2m2300043b6trct15qlr": {
+      "name": "pageColumn",
+      "props": {},
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageColumn"
+        }
+      },
+      "layout": {
+        "columnSize": {
+          "type": "const",
+          "value": 1
+        }
+      },
+      "id": "cl6zb2m2300043b6trct15qlr",
+      "type": "element",
+      "parentId": "cl6zb2hh300013b6tc84j5ql3",
+      "parentProp": "children",
+      "parentIndex": "a2"
+    },
+    "cl6zb2lid00033b6thwix35hg": {
+      "name": "button",
+      "props": {
+        "justifyContent": {
+          "type": "const",
+          "value": "end"
+        }
+      },
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Button"
+        }
+      },
+      "layout": {},
+      "id": "cl6zb2lid00033b6thwix35hg",
+      "type": "element",
+      "parentId": "cl6zb2m2300043b6trct15qlr",
+      "parentProp": "children",
+      "parentIndex": "a0V"
+    }
+  }
+}

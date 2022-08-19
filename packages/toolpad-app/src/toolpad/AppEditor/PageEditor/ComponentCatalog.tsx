@@ -97,6 +97,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
   return (
     <ComponentCatalogRoot
+      data-test-id="component-catalog"
       className={className}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

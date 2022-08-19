@@ -1,16 +1,7 @@
-import { test, expect, Request, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import createApp from '../utils/createApp';
 import generateId from '../utils/generateId';
 import * as locators from '../utils/locators';
-
-async function createApp(page: Page, name: string) {
-  await page.locator('button:has-text("create new")').click();
-
-  await page.fill('[role="dialog"] label:has-text("name")', name);
-
-  await page.click('[role="dialog"] button:has-text("create")');
-
-  await page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/editor\/pages\/[^/]+/ });
-}
 
 test('app create/rename flow', async ({ page }) => {
   const appName1 = `App ${generateId()}`;

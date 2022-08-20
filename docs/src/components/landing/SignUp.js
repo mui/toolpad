@@ -78,7 +78,7 @@ const SignUp = ({ sx }) => {
       <Box
         sx={{
           display: 'flex',
-          gap: 1,
+          gap: 0,
           width: { xs: '100%', sm: 'auto' },
           maxWidth: 320,
         }}
@@ -92,7 +92,7 @@ const SignUp = ({ sx }) => {
           value={form.email}
           onChange={(event) => setForm({ email: event.target.value, status: 'initial' })}
           sx={{
-            mr: { xs: 0, sm: 2 },
+            mr: { xs: 0, sm: 1 },
             mb: { xs: 1, sm: 0 },
             minWidth: { xs: 220, sm: 360 },
             width: { xs: '100%', sm: 'auto' },

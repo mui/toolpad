@@ -63,7 +63,9 @@ const Cell = ({ highlighted = false, ...props }) => (
       alignItems: 'center',
       justifyContent: 'center',
       ...(highlighted && {
-        borderWidth: '0 1px 0 1px',
+        // Remove borders since there are only two plans
+        // https://github.com/mui/mui-toolpad/pull/809#issuecomment-1221026428
+        borderWidth: '0 0 0 0',
         borderStyle: 'solid',
         borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.100'),
         bgcolor: (theme) =>
@@ -288,7 +290,6 @@ function PricingTable({
       {renderRow('Self-hosting')}
       {divider}
       {renderRow('Cloud hosting')}
-      {divider}
       <RowHead>Apps</RowHead>
       {renderRow('Apps')}
       {divider}
@@ -307,19 +308,16 @@ function PricingTable({
       {renderRow('White label')}
       {divider}
       {renderRow('Custom themes')}
-      {divider}
       <RowHead>Components</RowHead>
       {renderRow('Components')}
       {divider}
       {renderRow('Custom components')}
       {divider}
       {renderRow('Premium components')}
-      {divider}
       <RowHead>Users</RowHead>
       {renderRow('Real-time commenting')}
       {divider}
       {renderRow('Multiple organizations')}
-      {divider}
       <RowHead>Security</RowHead>
       {renderRow('OAuth2/OpenID SSO')}
       {divider}
@@ -330,7 +328,6 @@ function PricingTable({
       {renderRow('Granular permissions')}
       {divider}
       {renderRow('Audit logs')}
-      {divider}
       <RowHead>Support</RowHead>
       {renderRow('Support level')}
       {divider}

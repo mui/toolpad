@@ -14,6 +14,7 @@ import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
+import { latestVersion, latestMigration } from '../appDomMigrations';
 
 // See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
 function excludeFields<T, K extends (keyof T)[]>(
@@ -142,6 +143,7 @@ async function loadPreviewDomLegacy(appId: string): Promise<appDom.AppDom> {
   return {
     root,
     nodes,
+    version: 1,
   };
 }
 
@@ -150,11 +152,23 @@ async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
     where: { id: appId },
   });
 
+  let decryptedDom: appDom.AppDom;
+
   if (dom) {
-    return decryptSecrets(dom as any);
+    decryptedDom = decryptSecrets(dom as any);
+  } else {
+    decryptedDom = await loadPreviewDomLegacy(appId);
   }
 
-  return loadPreviewDomLegacy(appId);
+  if (decryptedDom.version === latestVersion) {
+    return decryptedDom;
+  }
+
+  if (!latestMigration) {
+    throw new Error('No migrations found');
+  }
+
+  return latestMigration.up(decryptedDom);
 }
 
 export async function getApps(): Promise<AppMeta[]> {

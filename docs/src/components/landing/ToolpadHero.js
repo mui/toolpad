@@ -35,7 +35,10 @@ export default function ToolpadHero() {
           Drag and drop pre-built components, connect to data sources and APIs, and build your
           internal tools 10x faster. Open-source and powered by MUI.
         </Typography>
-        <Typography color="text.secondary" sx={{ fontWeight: 700, mb: 2, mx: 'auto' }}>
+        <Typography
+          color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
+          sx={{ fontWeight: 700, mb: 2, mx: 'auto' }}
+        >
           Sign up for early access to the beta release.
         </Typography>
         <SignUp

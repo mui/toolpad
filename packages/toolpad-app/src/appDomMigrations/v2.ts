@@ -1,5 +1,4 @@
 import invariant from 'invariant';
-<<<<<<< HEAD
 import { AppDom, QueryNode, createConst, isQuery, ElementNode, isElement, ref } from '../appDom';
 import { VersionOne, VersionTwo } from '../utils/types';
 import { update } from '../utils/immutability';
@@ -89,17 +88,5 @@ export default {
   down(dom: AppDom): Omit<AppDom, 'version'> & { version: VersionOne } {
     invariant(dom.version === 2, 'Can only migrate dom of version 2');
     return { ...dom, version: 1 };
-=======
-import { AppDom } from '../appDom';
-
-export default {
-  up(dom: AppDom) {
-    invariant(dom.version === 1, 'Can only migrate dom of version 1');
-    return dom;
-  },
-  down(dom: AppDom) {
-    invariant(dom.version === 2, 'Can only migrate dom of version 2');
-    return dom;
->>>>>>> 9e7ca81dffa0d3e6909aed6fc562c04b09717477
   },
 };

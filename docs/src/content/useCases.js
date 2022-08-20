@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography';
 import GradientText from '../components/landing/GradientText';
 
 const useCases = {
-  overline: 'Use Cases',
+  overline: 'Use cases',
   Headline: (
     <Typography variant="h2" maxWidth={300} marginBottom={3}>
       Toolpad is ideal for <GradientText>building</GradientText>

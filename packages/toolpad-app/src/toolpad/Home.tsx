@@ -44,6 +44,7 @@ import ToolpadShell from './ToolpadShell';
 import getReadableDuration from '../utils/readableDuration';
 import EditableText from '../components/EditableText';
 import type { AppMeta } from '../server/data';
+import useMenu from '../utils/useMenu';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -264,64 +265,43 @@ function AppOpenButton({ app, activeDeployment }: AppOpenButtonProps) {
 }
 
 interface AppOptionsProps {
-  menuOpen: boolean;
-  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onRename: () => void;
+  onDelete?: () => void;
 }
 
-function AppOptions({ menuOpen, onClick }: AppOptionsProps) {
+function AppOptions({ onRename, onDelete }: AppOptionsProps) {
+  const { buttonProps, menuProps, onMenuClose } = useMenu();
+
+  const handleRenameClick = React.useCallback(() => {
+    onMenuClose();
+    onRename();
+  }, [onMenuClose, onRename]);
+
+  const handleDeleteClick = React.useCallback(() => {
+    onMenuClose();
+    onDelete?.();
+  }, [onDelete, onMenuClose]);
+
   return (
-    <IconButton
-      aria-label="settings"
-      aria-controls={menuOpen ? 'basic-menu' : undefined}
-      aria-haspopup="true"
-      aria-expanded={menuOpen ? 'true' : undefined}
-      onClick={onClick}
-    >
-      <MoreVertIcon />
-    </IconButton>
-  );
-}
-
-interface AppMenuProps {
-  menuAnchorEl: HTMLElement | null;
-  menuOpen: boolean;
-  handleMenuClose: () => void;
-  handleRenameClick: () => void;
-  handleDeleteClick: () => void;
-}
-
-function AppMenu({
-  menuAnchorEl,
-  menuOpen,
-  handleMenuClose,
-  handleRenameClick,
-  handleDeleteClick,
-}: AppMenuProps) {
-  return (
-    <Menu
-      id="basic-menu"
-      anchorEl={menuAnchorEl}
-      open={menuOpen}
-      onClose={handleMenuClose}
-      MenuListProps={{
-        'aria-labelledby': 'basic-button',
-        dense: true,
-      }}
-    >
-      {/* Using an onClick on a MenuItem causes accessibility issues, see: https://github.com/mui/material-ui/pull/30145 */}
-      <MenuItem onClick={handleRenameClick}>
-        <ListItemIcon>
-          <DriveFileRenameOutlineIcon />
-        </ListItemIcon>
-        <ListItemText>Rename</ListItemText>
-      </MenuItem>
-      <MenuItem onClick={handleDeleteClick}>
-        <ListItemIcon>
-          <DeleteIcon />
-        </ListItemIcon>
-        <ListItemText>Delete</ListItemText>
-      </MenuItem>
-    </Menu>
+    <React.Fragment>
+      <IconButton {...buttonProps} aria-label="Application menu">
+        <MoreVertIcon />
+      </IconButton>
+      <Menu {...menuProps}>
+        <MenuItem onClick={handleRenameClick}>
+          <ListItemIcon>
+            <DriveFileRenameOutlineIcon />
+          </ListItemIcon>
+          <ListItemText>Rename</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleDeleteClick}>
+          <ListItemIcon>
+            <DeleteIcon />
+          </ListItemIcon>
+          <ListItemText>Delete</ListItemText>
+        </MenuItem>
+      </Menu>
+    </React.Fragment>
   );
 }
 
@@ -332,30 +312,11 @@ interface AppCardProps {
 }
 
 function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
-  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
   const [editingName, setEditingName] = React.useState<boolean>(false);
 
-  const menuOpen = Boolean(menuAnchorEl);
-
-  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = React.useCallback(() => {
-    setMenuAnchorEl(null);
-  }, []);
-
-  const handleRenameClick = React.useCallback(() => {
-    setMenuAnchorEl(null);
+  const handleRename = React.useCallback(() => {
     setEditingName(true);
   }, []);
-
-  const handleDeleteClick = React.useCallback(() => {
-    setMenuAnchorEl(null);
-    if (onDelete) {
-      onDelete();
-    }
-  }, [onDelete]);
 
   return (
     <React.Fragment>
@@ -369,7 +330,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         }}
       >
         <CardHeader
-          action={<AppOptions menuOpen={menuOpen} onClick={handleOptionsClick} />}
+          action={<AppOptions onRename={handleRename} onDelete={onDelete} />}
           disableTypography
           subheader={
             <Typography variant="body2" color="text.secondary">
@@ -396,13 +357,6 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
           <AppOpenButton app={app} activeDeployment={activeDeployment} />
         </CardActions>
       </Card>
-      <AppMenu
-        menuAnchorEl={menuAnchorEl}
-        menuOpen={menuOpen}
-        handleMenuClose={handleMenuClose}
-        handleRenameClick={handleRenameClick}
-        handleDeleteClick={handleDeleteClick}
-      />
     </React.Fragment>
   );
 }
@@ -414,31 +368,11 @@ interface AppRowProps {
 }
 
 function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
-  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  const menuOpen = Boolean(menuAnchorEl);
-
   const [editingName, setEditingName] = React.useState<boolean>(false);
 
-  const handleOptionsClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = React.useCallback(() => {
-    setMenuAnchorEl(null);
-  }, []);
-
-  const handleRenameClick = React.useCallback(() => {
-    setMenuAnchorEl(null);
+  const handleRename = React.useCallback(() => {
     setEditingName(true);
   }, []);
-
-  const handleDeleteClick = React.useCallback(() => {
-    setMenuAnchorEl(null);
-    if (onDelete) {
-      onDelete();
-    }
-  }, [onDelete]);
 
   return (
     <React.Fragment>
@@ -458,17 +392,10 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
           <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
             <AppEditButton app={app} />
             <AppOpenButton app={app} activeDeployment={activeDeployment} />
-            <AppOptions menuOpen={menuOpen} onClick={handleOptionsClick} />
+            <AppOptions onRename={handleRename} onDelete={onDelete} />
           </Stack>
         </TableCell>
       </TableRow>
-      <AppMenu
-        menuAnchorEl={menuAnchorEl}
-        menuOpen={menuOpen}
-        handleMenuClose={handleMenuClose}
-        handleRenameClick={handleRenameClick}
-        handleDeleteClick={handleDeleteClick}
-      />
     </React.Fragment>
   );
 }

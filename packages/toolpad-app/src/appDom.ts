@@ -196,6 +196,10 @@ function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): 
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
 }
 
+function createId(): NodeId {
+  return cuid.slug() as NodeId;
+}
+
 export function createConst<V>(value: V): ConstantAttrValue<V> {
   return { type: 'const', value };
 }
@@ -410,7 +414,7 @@ export function createNode<T extends AppDomNodeType>(
   type: T,
   init: AppDomNodeInitOfType<T>,
 ): AppDomNodeOfType<T> {
-  const id = cuid() as NodeId;
+  const id = createId();
   const name = slugifyNodeName(dom, init.name || type, type);
   return createNodeInternal(id, type, {
     ...init,
@@ -419,7 +423,7 @@ export function createNode<T extends AppDomNodeType>(
 }
 
 export function createDom(): AppDom {
-  const rootId = cuid() as NodeId;
+  const rootId = createId();
   return {
     nodes: {
       [rootId]: createNodeInternal(rootId, 'app', {
@@ -875,32 +879,4 @@ export function fromLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
   }
 
   return node;
-}
-
-/**
- * Poor man's duplicate function
- * In anticipation of https://github.com/mui/mui-toolpad/pull/658
- */
-export function duplicate(dom: AppDom): AppDom {
-  const newIndices = new Map(Object.keys(dom.nodes).map((id) => [id, cuid()]));
-  return {
-    root: newIndices.get(dom.root) as NodeId,
-    nodes: Object.fromEntries(
-      Object.entries(dom.nodes).map(([oldId, node]) => {
-        const newId = newIndices.get(oldId) as NodeId;
-        const newNode = {
-          ...node,
-          parentId: node.parentId ? (newIndices.get(node.parentId) as NodeId) : null,
-          id: newId,
-        } as AppDomNode;
-        if (isQuery(newNode) && newNode.attributes.connectionId.value) {
-          newNode.attributes.connectionId.value = ref(
-            newIndices.get(deref(newNode.attributes.connectionId.value)) as NodeId,
-          );
-        }
-        return [newId, newNode];
-      }),
-    ),
-    version: dom.version,
-  };
 }

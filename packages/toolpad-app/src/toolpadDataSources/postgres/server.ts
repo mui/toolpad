@@ -48,9 +48,7 @@ async function execBase(
   postgresQuery: PostgresQuery,
   params: Record<string, string>,
 ): Promise<PostgresResult> {
-  const client = new Client({
-    ...connection,
-  });
+  const client = new Client({ ...connection });
   const paramEntries = Object.entries(params);
   try {
     await client.connect();
@@ -88,11 +86,27 @@ async function exec(
 async function execPrivate(
   connection: Maybe<PostgresConnectionParams>,
   query: PostgresPrivateQuery,
+): Promise<any>;
+async function execPrivate(
+  connection: Maybe<PostgresConnectionParams>,
+  query: PostgresPrivateQuery,
 ): Promise<any> {
-  if (query.kind === 'debugExec') {
-    return execBase(connection, query.query, query.params);
+  switch (query.kind) {
+    case 'debugExec':
+      return execBase(connection, query.query, query.params);
+    case 'connectionStatus': {
+      try {
+        const client = new Client({ ...query.params });
+        await client.connect();
+        await client.query('SELECT * FROM version();');
+        return { error: null };
+      } catch (err: any) {
+        return { error: err.message };
+      }
+    }
+    default:
+      throw new Error(`Unknown query "${(query as PostgresPrivateQuery).kind}"`);
   }
-  throw new Error(`Unknown query "${query}"`);
 }
 
 const dataSource: ServerDataSource<PostgresConnectionParams, PostgresQuery, any> = {

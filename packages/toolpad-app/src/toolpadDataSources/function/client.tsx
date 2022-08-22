@@ -212,7 +212,6 @@ function getInitialQueryValue(): FunctionQuery {
 const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {
   displayName: 'Function',
   ConnectionParamsInput,
-  isConnectionValid: () => true,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

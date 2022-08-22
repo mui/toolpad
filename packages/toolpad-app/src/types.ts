@@ -113,7 +113,6 @@ export interface ConnectionStatus {
 export interface ClientDataSource<P = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<P>;
-  isConnectionValid: (connection: P) => boolean;
   QueryEditor: QueryEditor<P, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;

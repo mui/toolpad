@@ -1,8 +1,12 @@
+import { LoadingButton } from '@mui/lab';
 import { Box, Button, Skeleton, Stack, TextField, Toolbar, Typography } from '@mui/material';
 import { inferColumns, parseColumns } from '@mui/toolpad-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import SyncIcon from '@mui/icons-material/Sync';
 import SplitPane from '../../components/SplitPane';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
@@ -12,9 +16,11 @@ import { isSaveDisabled, validation } from '../../utils/forms';
 import lazyComponent from '../../utils/lazyComponent';
 import { Maybe } from '../../utils/types';
 import QueryInputPanel from '../QueryInputPanel';
+import useFetchPrivate from '../useFetchPrivate';
 import useQueryPreview from '../useQueryPreview';
 import {
   PostgresConnectionParams,
+  PostgresConnectionStatus,
   PostgresPrivateQuery,
   PostgresQuery,
   PostgresResult,
@@ -27,15 +33,20 @@ const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor')
 
 const EMPTY_ROWS: any[] = [];
 
-function isValid(connection: PostgresConnectionParams): boolean {
-  return !!(
-    connection.host &&
-    connection.port &&
-    connection.user &&
-    connection.password &&
-    connection.database &&
-    !Number.isNaN(connection.port)
-  );
+function getConnectionStatusIcon(status: PostgresConnectionStatus | null): React.ReactNode {
+  if (!status) {
+    return <SyncIcon />;
+  }
+  return status.error ? <ErrorOutlineIcon /> : <CheckCircleOutlineIcon />;
+}
+
+function getConnectionStatusColor(
+  status: PostgresConnectionStatus | null,
+): 'error' | 'success' | undefined {
+  if (!status) {
+    return undefined;
+  }
+  return status.error ? 'error' : 'success';
 }
 
 function withDefaults(value: Maybe<PostgresConnectionParams>): PostgresConnectionParams {
@@ -53,7 +64,7 @@ function ConnectionParamsInput({
   value,
   onChange,
 }: ConnectionEditorProps<PostgresConnectionParams>) {
-  const { handleSubmit, register, formState, reset } = useForm({
+  const { handleSubmit, register, formState, reset, watch } = useForm({
     defaultValues: withDefaults(value),
     reValidateMode: 'onChange',
     mode: 'all',
@@ -61,6 +72,31 @@ function ConnectionParamsInput({
   React.useEffect(() => reset(withDefaults(value)), [reset, value]);
 
   const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
+
+  const fetchPrivate = useFetchPrivate<PostgresPrivateQuery, any>();
+
+  const [connectionStatus, setConnectionStatus] = React.useState<PostgresConnectionStatus | null>(
+    null,
+  );
+
+  const values = watch();
+
+  const handleTestConnection = React.useCallback(() => {
+    fetchPrivate({ kind: 'connectionStatus', params: values })
+      .then((status) => {
+        setConnectionStatus(status);
+      })
+      .catch(() => {
+        setConnectionStatus(null);
+      });
+  }, [fetchPrivate, values]);
+
+  const statusIcon = getConnectionStatusIcon(connectionStatus);
+
+  React.useEffect(() => {
+    const { unsubscribe } = watch(() => setConnectionStatus(null));
+    return unsubscribe;
+  }, [watch]);
 
   return (
     <Stack direction="column" gap={1}>
@@ -90,11 +126,26 @@ function ConnectionParamsInput({
         {...register('database', { required: true })}
         {...validation(formState, 'database')}
       />
-      <Toolbar disableGutters>
+      <Toolbar disableGutters sx={{ gap: 1 }}>
         <Button variant="contained" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
           Save
         </Button>
+        <LoadingButton
+          variant="contained"
+          onClick={handleTestConnection}
+          disabled={!formState.isValid}
+          loadingPosition="end"
+          endIcon={statusIcon}
+          color={getConnectionStatusColor(connectionStatus) || 'inherit'}
+        >
+          Test connection
+        </LoadingButton>
       </Toolbar>
+      {connectionStatus ? (
+        <Typography variant="body2" color="error">
+          {connectionStatus.error}
+        </Typography>
+      ) : null}
     </Stack>
   );
 }
@@ -181,7 +232,6 @@ function getInitialQueryValue(): PostgresQuery {
 const dataSource: ClientDataSource<PostgresConnectionParams, PostgresQuery> = {
   displayName: 'Postgres',
   ConnectionParamsInput,
-  isConnectionValid: isValid,
   QueryEditor,
   getInitialQueryValue,
 };

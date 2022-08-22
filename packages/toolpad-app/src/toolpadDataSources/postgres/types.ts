@@ -15,8 +15,21 @@ export interface PostgresResult {
   error?: Error;
 }
 
-export type PostgresPrivateQuery = {
+export interface PostgresConnectionStatus {
+  error: string | null;
+}
+
+export interface PostgresPrivateQueryDebugExec {
   kind: 'debugExec';
   query: PostgresQuery;
   params: Record<string, any>;
-};
+}
+
+export interface PostgresPrivateQueryConnectionStatus {
+  kind: 'connectionStatus';
+  params: PostgresConnectionParams;
+}
+
+export type PostgresPrivateQuery =
+  | PostgresPrivateQueryDebugExec
+  | PostgresPrivateQueryConnectionStatus;

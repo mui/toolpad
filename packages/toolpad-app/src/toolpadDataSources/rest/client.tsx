@@ -310,7 +310,6 @@ function getInitialQueryValue(): FetchQuery {
 const dataSource: ClientDataSource<{}, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
-  isConnectionValid: () => true,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

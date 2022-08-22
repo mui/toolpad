@@ -77,6 +77,10 @@ export default createComponent(Select, {
       onChangeHandler: (event: React.ChangeEvent<HTMLSelectElement>) => event.target.value,
       defaultValue: '',
     },
+    defaultValue: {
+      typeDef: { type: 'string' },
+      defaultValue: '',
+    },
     options: {
       typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
       control: { type: 'SelectOptions' },

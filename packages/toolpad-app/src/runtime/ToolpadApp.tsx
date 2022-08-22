@@ -418,8 +418,12 @@ function parseBindings(
       const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
+        const defaultValueBinding =
+          (argType?.defaultValueProp && elm.props?.[argType.defaultValueProp]) ||
+          appDom.createConst(argType?.defaultValue ?? undefined);
         const binding =
           elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
+
         const bindingId = `${elm.id}.props.${propName}`;
         const scopePath =
           componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
@@ -427,10 +431,12 @@ function parseBindings(
           if (argType.onChangeProp) {
             const defaultValue: unknown =
               binding?.type === 'const' ? binding?.value : argType.defaultValue;
+
             controlled.add(bindingId);
             parsedBindingsMap.set(bindingId, {
               scopePath,
               result: { value: defaultValue },
+              initializer: '',
             });
           } else {
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));

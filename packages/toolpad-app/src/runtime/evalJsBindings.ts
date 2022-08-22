@@ -79,6 +79,10 @@ export interface ParsedBinding<T = unknown> {
    * actual evaluated result of the binding
    */
   result?: BindingEvaluationResult<T>;
+  /**
+   * javascript expression that evaluates to the initial value of this binding if it doesn't have one
+   */
+  initializer?: string;
 }
 
 export function buildGlobalScope(
@@ -168,12 +172,13 @@ export default function evalJsBindings(
   proxiedScope = proxify(scope);
 
   return mapValues(bindings, (binding) => {
-    const { expression, result, ...rest } = binding;
+    const { expression, result, initializer, ...rest } = binding;
     return {
       ...rest,
       result: expression
         ? evaluateExpression(expression, proxiedScope)
-        : result || { value: undefined },
+        : result ||
+          (initializer && evaluateExpression(initializer, proxiedScope)) || { value: undefined },
     };
   });
 }

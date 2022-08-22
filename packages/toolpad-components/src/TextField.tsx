@@ -63,6 +63,10 @@ export default createComponent(TextField, {
       onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
       defaultValue: '',
     },
+    defaultValue: {
+      typeDef: { type: 'string' },
+      defaultValue: '',
+    },
     sx: {
       typeDef: { type: 'object' },
     },

@@ -45,13 +45,7 @@ function CardGrid(props) {
       }}
     >
       <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
-        <SectionHeadline
-          overline={content.overline}
-          title={content.Headline}
-          localTheme={() => ({
-            overlineColor: 'primary.500',
-          })}
-        />
+        <SectionHeadline overline={content.overline} title={content.Headline} />
         <Grid container spacing={2}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
             <Grid key={title} item xs={12} sm={6} md={span}>

@@ -1,7 +1,10 @@
 import * as React from 'react';
 import {
   styled,
+  Alert,
   AppBar,
+  Button,
+  Collapse,
   Toolbar,
   IconButton,
   Typography,
@@ -13,14 +16,19 @@ import {
   Tooltip,
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
+import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import useMenu from '../utils/useMenu';
+import useLocalStorageState from '../utils/useLocalStorageState';
 
 const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
+const LATEST_RELEASE_API_URL = 'https://api.github.com/repos/mui/mui-toolpad/releases/latest';
+
+const CURRENT_RELEASE_VERSION = `v${process.env.TOOLPAD_VERSION}`;
 
 interface FeedbackMenuItemLinkProps {
   href: string;
@@ -78,6 +86,81 @@ function UserFeedback() {
   );
 }
 
+function UpdateBanner() {
+  const [latestVersion, setLatestVersion] = React.useState(CURRENT_RELEASE_VERSION);
+  const [dismissedBanner, setDismissedBanner] = useLocalStorageState<boolean>(
+    `${CURRENT_RELEASE_VERSION}-update-banner-dismissed`,
+    false,
+  );
+  const [changelogPath, setChangelogPath] = React.useState('');
+  const showBanner = !dismissedBanner && latestVersion !== CURRENT_RELEASE_VERSION;
+
+  // Fetch latest release from the Github API
+  // https://developer.github.com/v3/repos/releases/#get-the-latest-release
+  React.useEffect(() => {
+    const fetchLatestRelease = async () => {
+      const latestRelease = await (await fetch(LATEST_RELEASE_API_URL))?.json();
+      if (latestRelease?.tag_name !== CURRENT_RELEASE_VERSION) {
+        setLatestVersion(latestRelease?.tag_name);
+        setChangelogPath(latestRelease?.html_url);
+      }
+    };
+    fetchLatestRelease();
+  }, []);
+
+  return (
+    <Collapse in={showBanner}>
+      <Alert
+        action={
+          <React.Fragment>
+            <Button
+              aria-label="close"
+              size="small"
+              color="inherit"
+              endIcon={<OpenInNewIcon fontSize="inherit" />}
+              component="a"
+              sx={{ mr: 1 }}
+              target="_blank"
+              href={DOCUMENTATION_URL}
+            >
+              Update
+            </Button>
+            <Button
+              aria-label="close"
+              size="small"
+              color="inherit"
+              endIcon={<OpenInNewIcon fontSize="inherit" />}
+              component="a"
+              sx={{ mr: 1 }}
+              target="_blank"
+              href={changelogPath}
+            >
+              View changelog
+            </Button>
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              sx={{ mr: 2 }}
+              onClick={() => {
+                setDismissedBanner(true);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          </React.Fragment>
+        }
+        onClose={() => {
+          setDismissedBanner(true);
+        }}
+        severity="info"
+      >
+        A new version <strong>{latestVersion}</strong> of Toolpad is available.
+      </Alert>
+    </Collapse>
+  );
+}
+
 export interface HeaderProps {
   navigation?: React.ReactNode;
   actions?: React.ReactNode;
@@ -118,6 +201,7 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
   return (
     <ToolpadShellRoot>
       <Header {...props} />
+      <UpdateBanner />
       <ViewPort>{children}</ViewPort>
     </ToolpadShellRoot>
   );

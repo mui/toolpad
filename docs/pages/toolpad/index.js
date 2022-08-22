@@ -6,8 +6,7 @@ import BrandingProvider from 'docs/src/BrandingProvider';
 import AppHeader from 'docs/src/layouts/AppHeader';
 import AppFooter from 'docs/src/layouts/AppFooter';
 import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
-import ToolpadHero from '../../src/components/landing/ToolpadHero';
-import ToolpadHeroDemo from '../../src/components/landing/ToolpadHeroDemo';
+import ToolpadHero from '../../src/components/landing/Hero';
 import SignUpToast from '../../src/components/landing/SignUpToast';
 import CardGrid from '../../src/components/landing/CardGrid';
 import Banner from '../../src/components/landing/Banner';
@@ -42,7 +41,6 @@ export default function Home() {
       <AppHeader />
       <main id="main-content">
         <ToolpadHero />
-        <ToolpadHeroDemo />
         <CardGrid content={features} span={4} />
         <Banner content={upvote} />
         <CardGrid content={useCases} span={4} />

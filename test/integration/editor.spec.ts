@@ -61,7 +61,7 @@ test('can place new components from catalog', async ({ page }) => {
   await expect(canvasInputLocator).toHaveCount(2);
 });
 
-test.only('can move elements in page', async ({ page }) => {
+test('can move elements in page', async ({ page }) => {
   const appId = generateId();
 
   await page.goto('/');
@@ -114,7 +114,7 @@ test.only('can move elements in page', async ({ page }) => {
   await expect(canvasInputLocator.first()).toHaveAttribute('value', 'textField2');
 });
 
-test.only('can delete elements from page', async ({ page }) => {
+test('can delete elements from page', async ({ page }) => {
   const appId = generateId();
 
   await page.goto('/');

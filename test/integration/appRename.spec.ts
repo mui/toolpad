@@ -1,4 +1,4 @@
-import { test, expect, Request, Page } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import generateId from '../utils/generateId';
 import * as locators from '../utils/locators';
 

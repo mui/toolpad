@@ -5,10 +5,12 @@ import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from './GradientText';
 import SignUp from './SignUp';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
+import Demo from './Demo';
 
-export default function ToolpadHero() {
+export default function Hero() {
   return (
     <ToolpadHeroContainer>
+      <Box sx={{ minHeight: { xs: '0px', sm: '20px' } }} />
       <Box sx={{ textAlign: { xs: 'center', md: 'center' } }}>
         <Typography
           fontWeight="bold"
@@ -51,6 +53,9 @@ export default function ToolpadHero() {
             },
           }}
         />
+      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+        <Demo />
       </Box>
     </ToolpadHeroContainer>
   );

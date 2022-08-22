@@ -94,7 +94,11 @@ function ConnectionParamsInput({
   const statusIcon = getConnectionStatusIcon(connectionStatus);
 
   React.useEffect(() => {
-    const { unsubscribe } = watch(() => setConnectionStatus(null));
+    const { unsubscribe } = watch((_values, params) => {
+      if (params.type === 'change') {
+        setConnectionStatus(null);
+      }
+    });
     return unsubscribe;
   }, [watch]);
 
@@ -131,7 +135,7 @@ function ConnectionParamsInput({
           Save
         </Button>
         <LoadingButton
-          variant="contained"
+          variant="outlined"
           onClick={handleTestConnection}
           disabled={!formState.isValid}
           loadingPosition="end"

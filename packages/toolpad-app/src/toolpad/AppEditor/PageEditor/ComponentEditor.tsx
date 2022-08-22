@@ -50,7 +50,7 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
   const hasLayoutControls = hasLayoutHorizontalControls || hasLayoutVerticalControls;
 
   return (
-    <ComponentPropsEditorRoot>
+    <ComponentPropsEditorRoot data-testid="component-props-editor">
       {hasLayoutControls ? (
         <React.Fragment>
           <Typography variant="subtitle2" sx={{ mt: 1 }}>

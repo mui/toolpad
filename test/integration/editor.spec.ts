@@ -1,30 +1,9 @@
-import { test, expect, Page, Locator } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import createApp from '../utils/createApp';
+import selectCanvasComponent from '../utils/selectCanvasComponent';
 import generateId from '../utils/generateId';
 import { canvasFrame, componentCatalog, pageRoot, pageOverlay } from '../utils/locators';
 import twoFieldsDomTemplate from '../domTemplates/twoTextFields.json';
-
-async function selectComponent(page: Page, componentLocator: Locator) {
-  const canvasFrameLocator = page.frameLocator(canvasFrame);
-
-  const canvasPageOverlayLocator = canvasFrameLocator.locator(pageOverlay);
-  const canvasPageOverlayBoundingBox = await canvasPageOverlayLocator.boundingBox();
-
-  const componentBoundingBox = await componentLocator.boundingBox();
-
-  expect(canvasPageOverlayBoundingBox).toBeDefined();
-
-  await canvasPageOverlayLocator.click({
-    position: {
-      x:
-        componentBoundingBox!.x + componentBoundingBox!.width / 2 - canvasPageOverlayBoundingBox!.x,
-      y:
-        componentBoundingBox!.y +
-        componentBoundingBox!.height / 2 -
-        canvasPageOverlayBoundingBox!.y,
-    },
-  });
-}
 
 test('can place new components from catalog', async ({ page }) => {
   const appId = generateId();
@@ -42,6 +21,8 @@ test('can place new components from catalog', async ({ page }) => {
   await canvasPageRootLocator.waitFor();
 
   await expect(canvasInputLocator).toHaveCount(0);
+
+  // Drag in a first component
 
   await componentCatalogLocator.hover();
   await componentCatalogLocator
@@ -82,13 +63,14 @@ test('can move elements in page', async ({ page }) => {
   await canvasInputLocator.nth(1).type('textField2');
 
   await expect(canvasInputLocator.first()).toHaveAttribute('value', 'textField1');
+  await expect(canvasInputLocator.nth(1)).toHaveAttribute('value', 'textField2');
 
   // Move element by dragging
 
   await expect(canvasMoveElementHandleLocator).not.toBeVisible();
 
   const firstInputLocator = canvasInputLocator.first();
-  await selectComponent(page, firstInputLocator);
+  await selectCanvasComponent(page, firstInputLocator);
 
   const canvasPageOverlayBoundingBox = await canvasPageOverlayLocator.boundingBox();
 
@@ -112,6 +94,7 @@ test('can move elements in page', async ({ page }) => {
   });
 
   await expect(canvasInputLocator.first()).toHaveAttribute('value', 'textField2');
+  await expect(canvasInputLocator.nth(1)).toHaveAttribute('value', 'textField1');
 });
 
 test('can delete elements from page', async ({ page }) => {
@@ -137,7 +120,7 @@ test('can delete elements from page', async ({ page }) => {
   await expect(canvasRemoveElementButtonLocator).not.toBeVisible();
 
   const firstInputLocator = canvasInputLocator.first();
-  await selectComponent(page, firstInputLocator);
+  await selectCanvasComponent(page, firstInputLocator);
 
   await canvasRemoveElementButtonLocator.click();
 
@@ -146,7 +129,7 @@ test('can delete elements from page', async ({ page }) => {
   // Delete element by pressing key
 
   const remainingTextFieldLocator = canvasInputLocator.first();
-  await selectComponent(page, remainingTextFieldLocator);
+  await selectCanvasComponent(page, remainingTextFieldLocator);
 
   await page.keyboard.press('Backspace');
 

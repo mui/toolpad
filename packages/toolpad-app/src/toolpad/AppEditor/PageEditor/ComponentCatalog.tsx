@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Collapse, Link, styled, Typography } from '@mui/material';
+import { Box, Collapse, Link, styled, Tooltip, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -140,14 +140,21 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                 })}
               {Array.from(FUTURE_COMPONENTS, ([key, { displayName = key, url }]) => {
                 return (
-                  <Link key={`futureComponent.${key}`} href={url} underline="none" target="_blank">
-                    <ComponentCatalogItem>
-                      <DragIndicatorIcon color="disabled" />
-                      {displayName}
-                      <Box sx={{ flex: 1 }} />
-                      🚧
-                    </ComponentCatalogItem>
-                  </Link>
+                  <Tooltip title="Upvote to get it prioritized">
+                    <Link
+                      key={`futureComponent.${key}`}
+                      href={url}
+                      underline="none"
+                      target="_blank"
+                    >
+                      <ComponentCatalogItem>
+                        <DragIndicatorIcon color="disabled" />
+                        {displayName}
+                        <Box sx={{ flex: 1 }} />
+                        🚧
+                      </ComponentCatalogItem>
+                    </Link>
+                  </Tooltip>
                 );
               })}
             </Box>

@@ -12,7 +12,7 @@ export type TextFieldProps = MuiTextFieldProps & {
   justifyContent?: BoxProps['justifyContent'];
 };
 
-function TextField({ alignItems, justifyContent, ...props }: TextFieldProps) {
+function TextField({ alignItems, justifyContent, defaultValue, ...props }: TextFieldProps) {
   return (
     <Box sx={{ display: 'flex', alignItems, justifyContent }}>
       <MuiTextField {...props} />
@@ -62,6 +62,7 @@ export default createComponent(TextField, {
       onChangeProp: 'onChange',
       onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
       defaultValue: '',
+      defaultValueProp: 'defaultValue',
     },
     defaultValue: {
       typeDef: { type: 'string' },

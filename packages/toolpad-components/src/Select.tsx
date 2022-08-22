@@ -13,7 +13,7 @@ export type SelectProps = TextFieldProps & {
   justifyContent?: BoxProps['justifyContent'];
 };
 
-function Select({ sx, options, alignItems, justifyContent, ...props }: SelectProps) {
+function Select({ sx, options, alignItems, justifyContent, defaultValue, ...props }: SelectProps) {
   return (
     <Box sx={{ display: 'flex', alignItems, justifyContent }}>
       <TextField select sx={{ minWidth: 120, ...sx }} {...props}>

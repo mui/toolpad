@@ -32,6 +32,8 @@ export const test = base.extend({
 
     for (const entry of entries) {
       if (entry.type === 'error') {
+        // Currently a catch-all for console error messages. Expecting us to add a way of blacklisting
+        // expected error messages at some point here
         throw new Error(`Console error message detected\n${entry.text}`);
       }
     }

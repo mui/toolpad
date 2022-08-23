@@ -5,6 +5,4 @@ export function toolpadHomeAppRow(appName: string): string {
 export const componentCatalog = 'data-testid=component-catalog';
 
 export const canvasFrame = 'iframe[data-toolpad-canvas]';
-
 export const pageRoot = 'data-testid=page-root';
-export const pageOverlay = 'data-testid=page-overlay';

@@ -1326,7 +1326,6 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
   return (
     <OverlayRoot
-      data-testid="page-overlay"
       ref={overlayRef}
       className={clsx({
         [overlayClasses.nodeDrag]: isDraggingOver,

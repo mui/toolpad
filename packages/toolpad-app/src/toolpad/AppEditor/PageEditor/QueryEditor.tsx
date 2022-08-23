@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -136,9 +136,6 @@ interface RenderDialogActions {
 }
 
 interface QueryEditorDialogContext {
-  open: boolean;
-  onClose: () => void;
-  dataSourceId: string | null;
   renderDialogTitle: () => React.ReactNode;
   renderQueryOptions: () => React.ReactNode;
   renderDialogActions: RenderDialogActions;
@@ -148,52 +145,40 @@ const [useQueryEditorDialogContext, QueryEditorDialogContextProvider] =
   createProvidedContext<QueryEditorDialogContext>('QueryEditorDialog');
 
 export function QueryEditorShell({ children, isDirty, onCommit }: QueryEditorShellProps) {
-  const {
-    open,
-    onClose,
-    dataSourceId,
-    renderDialogTitle,
-    renderQueryOptions,
-    renderDialogActions,
-  } = useQueryEditorDialogContext();
+  const { renderDialogTitle, renderQueryOptions, renderDialogActions } =
+    useQueryEditorDialogContext();
 
   return (
-    <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
+    <React.Fragment>
       {renderDialogTitle()}
 
       <Divider />
 
-      {dataSourceId ? (
-        <DialogContent
+      <DialogContent
+        sx={{
+          // height will be clipped by max-height
+          height: '100vh',
+          p: 0,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Box
           sx={{
-            // height will be clipped by max-height
-            height: '100vh',
-            p: 0,
+            flex: 1,
+            minHeight: 0,
+            position: 'relative',
             display: 'flex',
-            flexDirection: 'column',
           }}
         >
-          <Box
-            sx={{
-              flex: 1,
-              minHeight: 0,
-              position: 'relative',
-              display: 'flex',
-            }}
-          >
-            {children}
-          </Box>
+          {children}
+        </Box>
 
-          {renderQueryOptions()}
-        </DialogContent>
-      ) : (
-        <DialogContent>
-          <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        </DialogContent>
-      )}
+        {renderQueryOptions()}
+      </DialogContent>
 
       {renderDialogActions({ isDirty, onCommit })}
-    </Dialog>
+    </React.Fragment>
   );
 }
 
@@ -293,10 +278,13 @@ function QueryNodeEditorDialog<Q, P>({
 
   const connectionParams = connection?.attributes.params.value;
 
-  const queryModel = React.useMemo(
+  const queryModel = React.useMemo<QueryEditorModel<any>>(
     () => ({
       query: input.attributes.query.value,
-      params: inputParams,
+      params:
+        (Object.entries(inputParams).filter(([, value]) =>
+          Boolean(value),
+        ) as BindableAttrEntries) || [],
     }),
     [input.attributes.query.value, inputParams],
   );
@@ -308,7 +296,7 @@ function QueryNodeEditorDialog<Q, P>({
           attributes: update(input.attributes, {
             query: appDom.createConst(model.query),
           }),
-          params: model.params,
+          params: Object.fromEntries(model.params),
         }),
       );
     },
@@ -526,9 +514,6 @@ function QueryNodeEditorDialog<Q, P>({
   );
 
   const queryEditorShellContext: QueryEditorDialogContext = {
-    open,
-    onClose: handleClose,
-    dataSourceId: dataSource ? dataSourceId : null,
     renderDialogTitle,
     renderQueryOptions,
     renderDialogActions,
@@ -536,21 +521,21 @@ function QueryNodeEditorDialog<Q, P>({
 
   return (
     <QueryEditorDialogContextProvider value={queryEditorShellContext}>
-      {dataSourceId && dataSource && queryEditorContext ? (
-        <ConnectionContextProvider value={queryEditorContext}>
-          <dataSource.QueryEditor
-            QueryEditorShell={QueryEditorShell}
-            connectionParams={connectionParams}
-            value={queryModel}
-            onChange={handleQueryModelChange}
-            globalScope={pageState}
-          />
-        </ConnectionContextProvider>
-      ) : (
-        <QueryEditorShell>
+      <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
+        {dataSourceId && dataSource && queryEditorContext ? (
+          <ConnectionContextProvider value={queryEditorContext}>
+            <dataSource.QueryEditor
+              QueryEditorShell={QueryEditorShell}
+              connectionParams={connectionParams}
+              value={queryModel}
+              onChange={handleQueryModelChange}
+              globalScope={pageState}
+            />
+          </ConnectionContextProvider>
+        ) : (
           <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        </QueryEditorShell>
-      )}
+        )}
+      </Dialog>
     </QueryEditorDialogContextProvider>
   );
 }

@@ -439,11 +439,15 @@ function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBind
   };
 }
 
-function parsedBindingEqual(binding1: ParsedBinding, binding2: ParsedBinding): boolean {
+function parsedBindingEqual(
+  binding1: ParsedBinding | undefined,
+  binding2: ParsedBinding | undefined,
+): boolean {
   if (
-    binding1.expression === binding2.expression &&
-    binding1.result?.value === binding2.result?.value &&
-    binding1.initializer === binding2.initializer
+    (!binding1 && !binding2) ||
+    (binding1?.expression === binding2?.expression &&
+      binding1?.result?.value === binding2?.result?.value &&
+      binding1?.initializer === binding2?.initializer)
   ) {
     return true;
   }
@@ -577,11 +581,12 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
         let shouldUpdateBinding = false;
 
         if (controlled.has(key)) {
+          // controlled bindings don't get updated, unless their initialValue has changed
           if (binding.initializer) {
-            const initializer = parsedBindings[binding.initializer];
-            const existingInitializer = existingBindings[binding.initializer];
+            const initializer: ParsedBinding | undefined = parsedBindings[binding.initializer];
+            const existingInitializer: ParsedBinding | undefined =
+              existingBindings[binding.initializer];
             if (!parsedBindingEqual(initializer, existingInitializer)) {
-              // controlled bindings don't get updated, unless their initialValue has changed
               shouldUpdateBinding = true;
             }
           }

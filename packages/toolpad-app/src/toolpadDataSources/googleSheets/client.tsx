@@ -35,13 +35,6 @@ function getInitialQueryValue(): GoogleSheetsApiQuery {
   return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '', headerRow: false };
 }
 
-function isConnectionValid(connection: GoogleSheetsConnectionParams | null): boolean {
-  if (connection?.access_token && connection?.refresh_token) {
-    return true;
-  }
-  return false;
-}
-
 function QueryEditor({
   value,
   onChange,
@@ -255,7 +248,6 @@ function ConnectionParamsInput({
 const dataSource: ClientDataSource<GoogleSheetsConnectionParams, GoogleSheetsApiQuery> = {
   displayName: 'Google Sheets',
   ConnectionParamsInput,
-  isConnectionValid,
   QueryEditor,
   getInitialQueryValue,
 };

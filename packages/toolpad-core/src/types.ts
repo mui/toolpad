@@ -65,6 +65,8 @@ export type BindableAttrValues<P = Record<string, unknown>> = {
   readonly [K in keyof P]?: BindableAttrValue<P[K]>;
 };
 
+export type BindableAttrEntries = [string, BindableAttrValue<any>][];
+
 export type SlotType = 'single' | 'multiple';
 
 export interface ValueTypeBase {

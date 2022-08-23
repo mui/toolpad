@@ -65,6 +65,8 @@ export type BindableAttrValues<P = Record<string, unknown>> = {
   readonly [K in keyof P]?: BindableAttrValue<P[K]>;
 };
 
+export type BindableAttrEntries = [string, BindableAttrValue<any>][];
+
 export type SlotType = 'single' | 'multiple';
 
 export interface ValueTypeBase {
@@ -231,8 +233,12 @@ export interface ComponentConfig<P> {
    */
   loadingProp?: keyof P & string;
   /**
-   * Designates a property as "the resizable height property". If Toolpad detects any vertical resizing of
-   * the component it will forward it to this property.
+   * Enables controlling the aligment of the component container box.
+   */
+  layoutDirection?: 'vertical' | 'horizontal' | 'both';
+  /**
+   * Designates a property as "the resizable height property". If Toolpad detects any
+   * vertical resizing of the component it will forward it to this property.
    */
   resizableHeightProp?: keyof P & string;
   /**

@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export default async function clickCenter(page: Page, targetLocator: Locator) {
   const targetBoundingBox = await targetLocator.boundingBox();

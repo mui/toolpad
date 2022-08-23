@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, Locator } from '@playwright/test';
 import createApp from '../../utils/createApp';
 import clickCenter from '../../utils/clickCenter';
 import generateId from '../../utils/generateId';
@@ -14,6 +14,15 @@ async function getPropControlInputLocator(page: Page, inputPropName: string) {
   const propControlLabelFor = await propControlLabelHandle?.getAttribute('for');
 
   return componentPropsEditorLocator.locator(`input[id="${propControlLabelFor}"]`);
+}
+
+async function getInputElementLabelLocator(page: Page, inputLocator: Locator) {
+  const canvasFrameLocator = page.frameLocator(canvasFrame);
+
+  const inputHandle = await inputLocator.elementHandle();
+  const inputId = await inputHandle?.getAttribute('id');
+
+  return canvasFrameLocator.locator(`label[for="${inputId}"]`);
 }
 
 test('can control component prop values in properties control panel', async ({ page }) => {
@@ -50,9 +59,14 @@ test('can control component prop values in properties control panel', async ({ p
 
   // Change component prop values through controls
 
+  const firstInputLabelLocator = await getInputElementLabelLocator(page, firstInputLocator);
   const TEST_VALUE_2 = 'value2';
 
-  await expect(firstInputLocator).not.toHaveAttribute('value', TEST_VALUE_2);
-  await valueControlInputLocator.type(TEST_VALUE_2);
-  await expect(firstInputLocator).toHaveAttribute('value', TEST_VALUE_2);
+  await expect(firstInputLabelLocator).not.toHaveText(TEST_VALUE_2);
+
+  await labelControlInputLocator.selectText();
+  await page.keyboard.press('Backspace');
+  await labelControlInputLocator.type(TEST_VALUE_2);
+
+  await expect(firstInputLabelLocator).toHaveText(TEST_VALUE_2);
 });

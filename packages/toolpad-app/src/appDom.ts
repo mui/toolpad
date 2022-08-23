@@ -393,9 +393,31 @@ function createNodeInternal<T extends AppDomNodeType>(
   } as AppDomNodeOfType<T>;
 }
 
-function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: string): string {
+export function validateNodeName(input: string, identifier = 'input'): string | null {
+  const firstLetter = input[0];
+  if (!/[a-z_]/i.test(firstLetter)) {
+    return `${identifier} may not start with a "${firstLetter}"`;
+  }
+
+  const match = /([^a-z0-9_])/i.exec(input);
+
+  if (match) {
+    const invalidCharacter = match[1];
+    if (/\s/.test(invalidCharacter)) {
+      return `${identifier} may not contain spaces`;
+    }
+
+    return `${identifier} may not contain a "${invalidCharacter}"`;
+  }
+
+  return null;
+}
+
+export function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: string): string {
+  let slug = nameCandidate;
+  slug = slug.trim();
   // try to replace accents with relevant ascii
-  let slug = removeDiacritics(nameCandidate);
+  slug = removeDiacritics(slug);
   // replace spaces with camelcase
   slug = camelCase(...slug.split(/\s+/));
   // replace disallowed characters for js identifiers

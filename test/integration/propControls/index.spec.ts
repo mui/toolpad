@@ -1,9 +1,9 @@
 import { test, expect, Page } from '@playwright/test';
-import createApp from '../utils/createApp';
-import selectCanvasComponent from '../utils/selectCanvasComponent';
-import generateId from '../utils/generateId';
-import { canvasFrame, componentPropsEditor, pageRoot } from '../utils/locators';
-import twoFieldsDomTemplate from '../domTemplates/twoTextFields.json';
+import createApp from '../../utils/createApp';
+import clickCenter from '../../utils/clickCenter';
+import generateId from '../../utils/generateId';
+import { canvasFrame, componentPropsEditor, pageRoot } from '../../utils/locators';
+import domInput from './domInput.json';
 
 async function getPropControlInputLocator(page: Page, inputPropName: string) {
   const componentPropsEditorLocator = page.locator(componentPropsEditor);
@@ -20,7 +20,7 @@ test('can control component prop values in properties control panel', async ({ p
   const appId = generateId();
 
   await page.goto('/');
-  await createApp(page, `App ${appId}`, JSON.stringify(twoFieldsDomTemplate));
+  await createApp(page, `App ${appId}`, JSON.stringify(domInput));
 
   const canvasFrameLocator = page.frameLocator(canvasFrame);
 
@@ -32,7 +32,7 @@ test('can control component prop values in properties control panel', async ({ p
   // Verify that initial prop control values are correct
 
   const firstInputLocator = canvasInputLocator.first();
-  await selectCanvasComponent(page, firstInputLocator);
+  await clickCenter(page, firstInputLocator);
 
   const labelControlInputLocator = await getPropControlInputLocator(page, 'label');
 

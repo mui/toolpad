@@ -1,4 +1,9 @@
-import { BindableAttrValue, BindableAttrValues, LiveBinding } from '@mui/toolpad-core';
+import {
+  BindableAttrEntries,
+  BindableAttrValue,
+  BindableAttrValues,
+  LiveBinding,
+} from '@mui/toolpad-core';
 import * as React from 'react';
 import {
   evaluateBindable as evaluateBindableBrowser,
@@ -29,8 +34,6 @@ function evaluateBindableAttrValue(
     return evaluateBindableBrowser(input, globalScope);
   }
 }
-
-type BindableAttrEntries = [string, BindableAttrValue<any>][];
 
 function evaluateBindableAttrEntries(
   input: BindableAttrEntries,

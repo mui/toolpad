@@ -4,9 +4,9 @@ import {
   SlotType,
   RuntimeError,
   ComponentConfig,
-  BindableAttrValues,
   NodeId,
   PropValueType,
+  BindableAttrEntries,
 } from '@mui/toolpad-core';
 
 import { PaletteMode } from '@mui/material';
@@ -88,7 +88,7 @@ export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
 export interface QueryEditorModel<Q> {
   query: Q;
-  params?: BindableAttrValues<any>;
+  params: BindableAttrEntries;
 }
 
 export interface QueryEditorShellProps {
@@ -113,7 +113,6 @@ export interface ConnectionStatus {
 export interface ClientDataSource<P = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<P>;
-  isConnectionValid: (connection: P) => boolean;
   QueryEditor: QueryEditor<P, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;

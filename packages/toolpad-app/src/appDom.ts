@@ -9,6 +9,7 @@ import {
   SecretAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
@@ -91,6 +92,8 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
   };
   readonly props?: BindableAttrValues<P>;
   readonly layout?: {
+    readonly horizontalAlign?: ConstantAttrValue<BoxProps['justifyContent']>;
+    readonly verticalAlign?: ConstantAttrValue<BoxProps['alignItems']>;
     readonly columnSize?: ConstantAttrValue<number>;
   };
 }
@@ -191,6 +194,10 @@ function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node i
 
 function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): asserts node is T {
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
+}
+
+function createId(): NodeId {
+  return cuid.slug() as NodeId;
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {
@@ -386,9 +393,31 @@ function createNodeInternal<T extends AppDomNodeType>(
   } as AppDomNodeOfType<T>;
 }
 
-function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: string): string {
+export function validateNodeName(input: string, identifier = 'input'): string | null {
+  const firstLetter = input[0];
+  if (!/[a-z_]/i.test(firstLetter)) {
+    return `${identifier} may not start with a "${firstLetter}"`;
+  }
+
+  const match = /([^a-z0-9_])/i.exec(input);
+
+  if (match) {
+    const invalidCharacter = match[1];
+    if (/\s/.test(invalidCharacter)) {
+      return `${identifier} may not contain spaces`;
+    }
+
+    return `${identifier} may not contain a "${invalidCharacter}"`;
+  }
+
+  return null;
+}
+
+export function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: string): string {
+  let slug = nameCandidate;
+  slug = slug.trim();
   // try to replace accents with relevant ascii
-  let slug = removeDiacritics(nameCandidate);
+  slug = removeDiacritics(slug);
   // replace spaces with camelcase
   slug = camelCase(...slug.split(/\s+/));
   // replace disallowed characters for js identifiers
@@ -407,7 +436,7 @@ export function createNode<T extends AppDomNodeType>(
   type: T,
   init: AppDomNodeInitOfType<T>,
 ): AppDomNodeOfType<T> {
-  const id = cuid() as NodeId;
+  const id = createId();
   const name = slugifyNodeName(dom, init.name || type, type);
   return createNodeInternal(id, type, {
     ...init,
@@ -416,7 +445,7 @@ export function createNode<T extends AppDomNodeType>(
 }
 
 export function createDom(): AppDom {
-  const rootId = cuid() as NodeId;
+  const rootId = createId();
   return {
     nodes: {
       [rootId]: createNodeInternal(rootId, 'app', {

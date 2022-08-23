@@ -38,10 +38,6 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<Movies
   );
 }
 
-function isValid(connection: MoviesConnectionParams): boolean {
-  return !!connection.apiKey;
-}
-
 export function QueryEditor({
   value,
   onChange,
@@ -95,7 +91,6 @@ function getInitialQueryValue(): MoviesQuery {
 const dataSource: ClientDataSource<MoviesConnectionParams, MoviesQuery> = {
   displayName: 'Fake Movies API',
   ConnectionParamsInput,
-  isConnectionValid: isValid,
   QueryEditor,
   getInitialQueryValue,
 };

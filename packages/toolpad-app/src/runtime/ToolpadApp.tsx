@@ -439,6 +439,17 @@ function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBind
   };
 }
 
+function parsedBindingEqual(binding1: ParsedBinding, binding2: ParsedBinding): boolean {
+  if (
+    binding1.expression === binding2.expression &&
+    binding1.result?.value === binding2.result?.value &&
+    binding1.initializer === binding2.initializer
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function parseBindings(
   dom: appDom.AppDom,
   page: appDom.PageNode,
@@ -458,11 +469,9 @@ function parseBindings(
       const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
-        const defaultValueBinding: BindableAttrValue<any> =
-          (argType?.defaultValueProp && elm.props?.[argType.defaultValueProp]) ||
-          appDom.createConst(argType?.defaultValue ?? undefined);
-
-        const initializer = parseBinding(defaultValueBinding);
+        const initializerId = argType?.defaultValueProp
+          ? `${elm.id}.props.${argType.defaultValueProp}`
+          : undefined;
 
         const binding =
           elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
@@ -475,7 +484,7 @@ function parseBindings(
             controlled.add(bindingId);
             parsedBindingsMap.set(bindingId, {
               scopePath,
-              initializer,
+              initializer: initializerId,
             });
           } else {
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
@@ -565,7 +574,22 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
       for (const [key, binding] of Object.entries(parsedBindings)) {
-        updated[key] = controlled.has(key) ? existingBindings[key] || binding : binding;
+        let shouldUpdateBinding = false;
+
+        if (controlled.has(key)) {
+          if (binding.initializer) {
+            const initializer = parsedBindings[binding.initializer];
+            const existingInitializer = existingBindings[binding.initializer];
+            if (!parsedBindingEqual(initializer, existingInitializer)) {
+              // controlled bindings don't get updated, unless their initialValue has changed
+              shouldUpdateBinding = true;
+            }
+          }
+        } else {
+          shouldUpdateBinding = true;
+        }
+
+        updated[key] = shouldUpdateBinding ? binding : existingBindings[key] || binding;
       }
       return updated;
     });

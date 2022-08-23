@@ -82,7 +82,7 @@ export interface ParsedBinding<T = unknown> {
   /**
    * javascript expression that evaluates to the initial value of this binding if it doesn't have one
    */
-  initializer?: ParsedBinding;
+  initializer?: string;
 }
 
 export function buildGlobalScope(
@@ -120,9 +120,15 @@ export default function evalJsBindings(
   let proxiedScope: Record<string, unknown>;
 
   const evaluateBinding = (
-    binding: ParsedBinding,
-    scopePath: string,
+    bindingId: string,
+    scopePath?: string,
   ): BindingEvaluationResult | null => {
+    const binding = bindingId && bindingsMap.get(bindingId);
+
+    if (!binding) {
+      return null;
+    }
+
     const expression = binding.expression;
 
     if (expression) {
@@ -169,10 +175,9 @@ export default function evalJsBindings(
 
         const scopePath = label ? `${label}.${prop}` : prop;
         const bindingId = bindingIdMap.get(scopePath);
-        const binding = bindingId && bindingsMap.get(bindingId);
 
-        if (binding) {
-          const evaluated = evaluateBinding(binding, scopePath);
+        if (bindingId) {
+          const evaluated = evaluateBinding(bindingId, scopePath);
           if (evaluated) {
             return unwrapEvaluationResult(evaluated);
           }
@@ -196,7 +201,7 @@ export default function evalJsBindings(
 
     return {
       ...rest,
-      result: evaluateBinding(binding, key) || { value: undefined },
+      result: evaluateBinding(key) || { value: undefined },
     };
   });
 }

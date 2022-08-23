@@ -89,8 +89,6 @@ test(`simple databinding`, async () => {
     });
     dom = appDom.addNode(dom, text, page, 'children');
 
-    console.log(JSON.stringify(dom));
-
     return dom;
   });
 

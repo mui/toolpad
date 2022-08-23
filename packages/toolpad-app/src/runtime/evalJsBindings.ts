@@ -82,7 +82,7 @@ export interface ParsedBinding<T = unknown> {
   /**
    * javascript expression that evaluates to the initial value of this binding if it doesn't have one
    */
-  initializer?: string;
+  initializer?: ParsedBinding;
 }
 
 export function buildGlobalScope(
@@ -150,24 +150,11 @@ export default function evalJsBindings(
     }
 
     const initializer = binding.initializer;
-
     if (initializer) {
-      const computed = computationStatuses.get(initializer);
-      if (computed) {
-        if (computed.result) {
-          // From cache
-          return computed.result;
-        }
-
-        throw new Error(`Cycle detected "${scopePath}"`);
+      const result = evaluateBinding(initializer, scopePath);
+      if (result) {
+        return result;
       }
-
-      // use null to mark as "computing"
-      computationStatuses.set(initializer, { result: null });
-      const result = evaluateExpression(initializer, proxiedScope);
-      computationStatuses.set(initializer, { result });
-      // From freshly computed
-      return result;
     }
 
     return null;

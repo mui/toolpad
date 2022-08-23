@@ -420,7 +420,7 @@ interface ParseBindingOptions {
   scopePath?: string;
 }
 
-function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions) {
+function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions = {}) {
   if (bindable?.type === 'const') {
     return {
       scopePath,
@@ -462,12 +462,7 @@ function parseBindings(
           (argType?.defaultValueProp && elm.props?.[argType.defaultValueProp]) ||
           appDom.createConst(argType?.defaultValue ?? undefined);
 
-        const initializer =
-          defaultValueBinding.type === 'jsExpression'
-            ? defaultValueBinding.value
-            : defaultValueBinding.type === 'const'
-            ? JSON.stringify(defaultValueBinding.value)
-            : 'undefined';
+        const initializer = parseBinding(defaultValueBinding);
 
         const binding =
           elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);

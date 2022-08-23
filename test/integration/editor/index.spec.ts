@@ -146,17 +146,15 @@ test('can delete elements from page', async ({ page }) => {
   await expect(canvasRemoveElementButtonLocator).not.toBeVisible();
 
   const firstTextFieldLocator = canvasInputLocator.first();
-  await clickCenter(page, firstTextFieldLocator);
 
+  await clickCenter(page, firstTextFieldLocator);
   await canvasRemoveElementButtonLocator.click();
 
   await expect(canvasInputLocator).toHaveCount(1);
 
   // Delete element by pressing key
 
-  const remainingTextFieldLocator = canvasInputLocator.first();
-  await clickCenter(page, remainingTextFieldLocator);
-
+  await clickCenter(page, firstTextFieldLocator);
   await page.keyboard.press('Backspace');
 
   await expect(canvasInputLocator).toHaveCount(0);

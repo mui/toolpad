@@ -1,8 +1,8 @@
-import { test, expect, Request } from '@playwright/test';
+import { test, expect, Request } from '../playwright/test';
 import generateId from '../utils/generateId';
 import * as locators from '../utils/locators';
 
-test('basic app creation flow', async ({ page }) => {
+test.only('basic app creation flow', async ({ page }) => {
   const appName = `App ${generateId()}`;
 
   await page.goto('/');

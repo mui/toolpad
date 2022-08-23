@@ -45,6 +45,7 @@ import getReadableDuration from '../utils/readableDuration';
 import EditableText from '../components/EditableText';
 import type { AppMeta } from '../server/data';
 import useMenu from '../utils/useMenu';
+import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -463,33 +464,32 @@ function AppsListView({
   error,
   setDeletedApp,
 }: AppViewProps) {
+  if (status === 'success' && apps.length <= 0) {
+    return <React.Fragment>No apps yet</React.Fragment>;
+  }
+
+  if (status === 'error') {
+    return <ErrorAlert error={error} />;
+  }
+
   return (
     <Table aria-label="apps list" size="medium">
       <TableBody>
-        {(() => {
-          switch (status) {
-            case 'loading':
-              return <AppRow />;
-            case 'error':
-              return <Alert severity="error">{(error as Error)?.message}</Alert>;
-            case 'success':
-              return apps.length > 0
-                ? apps.map((app) => {
-                    const activeDeployment = activeDeploymentsByApp?.[app.id];
-                    return (
-                      <AppRow
-                        key={app.id}
-                        app={app}
-                        activeDeployment={activeDeployment}
-                        onDelete={() => setDeletedApp(app)}
-                      />
-                    );
-                  })
-                : 'No apps yet';
-            default:
-              return '';
-          }
-        })()}
+        {status === 'loading' ? (
+          <AppRow />
+        ) : (
+          apps.map((app) => {
+            const activeDeployment = activeDeploymentsByApp?.[app.id];
+            return (
+              <AppRow
+                key={app.id}
+                app={app}
+                activeDeployment={activeDeployment}
+                onDelete={() => setDeletedApp(app)}
+              />
+            );
+          })
+        )}
       </TableBody>
     </Table>
   );

@@ -78,7 +78,7 @@ test(`simple databinding`, async () => {
       attributes: { component: appDom.createConst('TextField') },
       props: {
         label: appDom.createConst('The Input'),
-        value: appDom.createConst('Default Text'),
+        defaultValue: appDom.createConst('Default Text'),
       },
     });
     dom = appDom.addNode(dom, textField, page, 'children');
@@ -88,6 +88,8 @@ test(`simple databinding`, async () => {
       props: { value: { type: 'jsExpression', value: 'theTextInput.value' } },
     });
     dom = appDom.addNode(dom, text, page, 'children');
+
+    console.log(JSON.stringify(dom));
 
     return dom;
   });
@@ -188,13 +190,13 @@ test(`Databinding errors`, async () => {
     expect(bindings![`${cyclic1!.id}.props.value`]).toHaveProperty(
       'error',
       expect.objectContaining({
-        message: 'Cycle detected "cyclic2.value"',
+        message: 'Cycle detected "cyclic1.value"',
       }),
     );
     expect(bindings![`${cyclic2!.id}.props.value`]).toHaveProperty(
       'error',
       expect.objectContaining({
-        message: 'Cycle detected "cyclic2.value"',
+        message: 'Cycle detected "cyclic1.value"',
       }),
     );
 

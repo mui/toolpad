@@ -1,5 +1,67 @@
 # Changelog
 
+## v0.0.14
+
+<!-- generated comparing v0.0.13..master -->
+
+_Aug 18, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+Add app overview list view, allow setting properties in code component debugger, Fix artifacts in the page designer, visual tweaks to the select component options editor.
+
+- &#8203;<!-- 18 -->Add List view for apps as default (#690) @bharatkashyap
+- &#8203;<!-- 17 -->Add interface to debug properties for code components (#803) @Janpot
+- &#8203;<!-- 16 -->Fix custom component slots (#750) @apedroferreira
+- &#8203;<!-- 15 -->Prevent node HUD from getting cut-off (#772) @apedroferreira
+- &#8203;<!-- 14 -->Improve JsonView component UX (#797) @Janpot
+- &#8203;<!-- 13 -->Fix deleting newly placed components with Backspace key (#771) @apedroferreira
+- &#8203;<!-- 12 -->Update/improve release guide (#770) @apedroferreira
+- &#8203;<!-- 11 -->Upgrade @mui/\* packages (#785) @Janpot
+- &#8203;<!-- 10 -->Use stable version of react-query (#784) @Janpot
+- &#8203;<!-- 09 -->Use stable version of monaco-editor (#783) @Janpot
+- &#8203;<!-- 08 -->Add tooling to facilitate integration testing (#786) @Janpot
+- &#8203;<!-- 07 -->Fix scrollbar when selection options (#788) @oliviertassinari
+- &#8203;<!-- 06 -->Make sure the application isn't saved during mounting (#779) @Janpot
+- &#8203;<!-- 05 -->Make sure old style references are backwards compatible (#780) @Janpot
+- &#8203;<!-- 04 -->Improve handling of React keys in ComponentCatalog (#775) @Janpot
+- &#8203;<!-- 03 -->Fix missing key warning (#774) @Janpot
+- &#8203;<!-- 02 -->Support default datasources (#691) @Janpot
+- &#8203;<!-- 01 -->Put datasource in charge of saving the QueryNode (#764) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
+## v0.0.13
+
+<!-- generated comparing v0.0.12..master -->
+
+_Aug 10, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Add user feedback, add network panel to REST datasources, make network panel clearable.
+
+- &#8203;<!-- 19 -->Move google sheets preview inside of datasource (#761) @Janpot
+- &#8203;<!-- 18 -->Make sure queries are default enabled (#768) @Janpot
+- &#8203;<!-- 17 -->Add AbortController to function runtime (#766) @Janpot
+- &#8203;<!-- 16 -->Remove docs aria-label (#716) @Janpot
+- &#8203;<!-- 15 -->Add user feedback (#723) @Janpot
+- &#8203;<!-- 14 -->Fix function datasource layout issue (#765) @Janpot
+- &#8203;<!-- 13 -->Add RFC template (#729) @bytasv
+- &#8203;<!-- 12 -->Extract presentational QueryInputPanel component for reuse (#762) @Janpot
+- &#8203;<!-- 11 -->Rest datasource: add network inspection (#737) @Janpot
+- &#8203;<!-- 10 -->Make network panel clearable (#760) @Janpot
+- &#8203;<!-- 09 -->Drag and drop refactor (#730) @apedroferreira
+- &#8203;<!-- 08 -->Optimize logic in bindings parsing (#759) @Janpot
+- &#8203;<!-- 07 -->Only overwrite the default value when a prop has a binding (#757) @Janpot
+- &#8203;<!-- 06 -->Extract Devtools component from function datasource for reuse in fetch (#740) @Janpot
+- &#8203;<!-- 05 -->Refactor har generation utilities for reuse (#738) @Janpot
+- &#8203;<!-- 04 -->Release script update (#731) @Janpot
+- &#8203;<!-- 03 -->Release workflow continuation (#728) @Janpot
+- &#8203;<!-- 02 -->Fixes to release action (#727) @Janpot
+- &#8203;<!-- 01 -->Add docker tag github action (#726) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot
+
 ## v0.0.12
 
 <!-- generated comparing v0.0.11..master -->

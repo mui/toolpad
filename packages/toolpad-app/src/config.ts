@@ -22,7 +22,18 @@ import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
  */
 
 // These are inlined at build time
-export type BuildEnvVars = Record<'TOOLPAD_TARGET' | 'TOOLPAD_DEMO' | 'TOOLPAD_VERSION', string>;
+export type BuildEnvVars = Record<
+  // Identifier for the product line (CE, EE, Cloud, ...)
+  | 'TOOLPAD_TARGET'
+  // Whether Toolpad is running in Ddemo mode
+  | 'TOOLPAD_DEMO'
+  // The current Toolpad version
+  | 'TOOLPAD_VERSION'
+  // Enable input field for seeding a dom in the app creation dialog
+  // (For testing purposes)
+  | 'TOOLPAD_CREATE_WITH_DOM',
+  string
+>;
 
 // These are set at runtime and passed to the browser.
 // Do not add secrets

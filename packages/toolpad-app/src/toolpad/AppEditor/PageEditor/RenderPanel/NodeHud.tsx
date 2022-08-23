@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { IconButton, styled } from '@mui/material';
-import * as appDom from '../../../appDom';
+import * as appDom from '../../../../appDom';
 import {
   absolutePositionCss,
   Rectangle,
@@ -11,10 +11,21 @@ import {
   RECTANGLE_EDGE_BOTTOM,
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
-} from '../../../utils/geometry';
-import { useDom } from '../../DomLoader';
-import { useToolpadComponent } from '../toolpadComponents';
-import { getElementNodeComponentId } from '../../../toolpadComponents';
+} from '../../../../utils/geometry';
+import { useDom } from '../../../DomLoader';
+import { useToolpadComponent } from '../../toolpadComponents';
+import { getElementNodeComponentId } from '../../../../toolpadComponents';
+
+const HUD_POSITION_TOP = 'top';
+const HUD_POSITION_BOTTOM = 'bottom';
+
+const HUD_HEIGHT = 30; // px
+
+type HudPosition = typeof HUD_POSITION_TOP | typeof HUD_POSITION_BOTTOM;
+
+function stopPropagationHandler(event: React.SyntheticEvent) {
+  event.stopPropagation();
+}
 
 const nodeHudClasses = {
   allowNodeInteraction: 'NodeHud_AllowNodeInteraction',
@@ -22,7 +33,11 @@ const nodeHudClasses = {
   selectionHint: 'NodeHud_SelectionHint',
 };
 
-const NodeHudWrapper = styled('div')({
+const NodeHudWrapper = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'hudPosition',
+})<{
+  hudPosition: HudPosition;
+}>(({ hudPosition }) => ({
   // capture mouse events
   pointerEvents: 'initial',
   position: 'absolute',
@@ -30,11 +45,11 @@ const NodeHudWrapper = styled('div')({
   userSelect: 'none',
   [`.${nodeHudClasses.selected}`]: {
     position: 'absolute',
-    top: 0,
-    left: 0,
     height: '100%',
     width: '100%',
     outline: '1px solid red',
+    left: 0,
+    top: 0,
   },
   [`.${nodeHudClasses.selectionHint}`]: {
     // capture mouse events
@@ -48,17 +63,17 @@ const NodeHudWrapper = styled('div')({
     color: 'white',
     fontSize: 11,
     padding: `0 0 0 8px`,
-    // TODO: figure out positioning of this selectionhint, perhaps it should
-    //   - prefer top right, above the component
-    //   - if that appears out of bound of the editor, show it bottom or left
+    height: HUD_HEIGHT,
     zIndex: 1,
-    transform: `translate(0, -100%)`,
+    ...(hudPosition === HUD_POSITION_TOP
+      ? { top: 0, transform: 'translate(0, -100%)' }
+      : { bottom: 0, transform: 'translate(0, 100%)' }),
   },
   [`&.${nodeHudClasses.allowNodeInteraction}`]: {
     // block pointer-events so we can interact with the selection
     pointerEvents: 'none',
   },
-});
+}));
 
 const DraggableEdge = styled('div', {
   shouldForwardProp: (prop) => prop !== 'edge',
@@ -108,10 +123,10 @@ const ResizePreview = styled('div')({
 });
 
 interface NodeHudProps {
-  node: appDom.ElementNode | appDom.PageNode;
+  node: appDom.AppDomNode;
   rect: Rectangle;
-  selected?: boolean;
-  allowInteraction?: boolean;
+  isSelected?: boolean;
+  isInteractive?: boolean;
   onNodeDragStart?: React.DragEventHandler<HTMLElement>;
   draggableEdges?: RectangleEdge[];
   onEdgeDragStart?: (
@@ -125,9 +140,9 @@ interface NodeHudProps {
 
 export default function NodeHud({
   node,
-  selected,
-  allowInteraction,
   rect,
+  isSelected,
+  isInteractive,
   onNodeDragStart,
   draggableEdges = [],
   onEdgeDragStart,
@@ -140,32 +155,32 @@ export default function NodeHud({
   const componentId = appDom.isElement(node) ? getElementNodeComponentId(node) : '';
   const component = useToolpadComponent(dom, componentId);
 
-  const handleDelete = React.useCallback(
-    (event: React.MouseEvent<HTMLElement>) => {
-      event.stopPropagation();
-
-      if (onDelete) {
-        onDelete(event);
-      }
-    },
-    [onDelete],
-  );
+  const hudPosition = rect.y > HUD_HEIGHT ? HUD_POSITION_TOP : HUD_POSITION_BOTTOM;
 
   return (
     <NodeHudWrapper
       data-node-id={node.id}
       style={absolutePositionCss(rect)}
       className={clsx({
-        [nodeHudClasses.allowNodeInteraction]: allowInteraction,
+        [nodeHudClasses.allowNodeInteraction]: isInteractive,
       })}
+      hudPosition={hudPosition}
     >
-      {selected ? (
+      {isSelected ? (
         <React.Fragment>
           <span className={nodeHudClasses.selected} />
-          <div draggable className={nodeHudClasses.selectionHint} onDragStart={onNodeDragStart}>
+          <div
+            draggable
+            className={nodeHudClasses.selectionHint}
+            onDragStart={onNodeDragStart}
+            role="presentation"
+            onClick={stopPropagationHandler}
+            onMouseDown={stopPropagationHandler}
+            onMouseUp={stopPropagationHandler}
+          >
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
-            <IconButton aria-label="Remove element" color="inherit" onMouseUp={handleDelete}>
+            <IconButton aria-label="Remove element" color="inherit" onMouseUp={onDelete}>
               <DeleteIcon color="inherit" />
             </IconButton>
           </div>

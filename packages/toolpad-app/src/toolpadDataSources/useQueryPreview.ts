@@ -10,7 +10,7 @@ export default function useQueryPreview<PQ, R>(
   privateQuery: PQ,
   { onPreview = () => {} }: UseQueryPreviewOptions<R> = {},
 ) {
-  const { appId, connectionId } = useConnectionContext();
+  const { appId, dataSourceId, connectionId } = useConnectionContext();
   const [preview, setPreview] = React.useState<R | null>(null);
 
   const cancelRunPreview = React.useRef<(() => void) | null>(null);
@@ -23,7 +23,7 @@ export default function useQueryPreview<PQ, R>(
     };
 
     client.query
-      .dataSourceFetchPrivate(appId, connectionId, privateQuery)
+      .dataSourceFetchPrivate(appId, dataSourceId, connectionId, privateQuery)
       .then((result) => {
         if (!canceled) {
           setPreview(result);
@@ -33,7 +33,7 @@ export default function useQueryPreview<PQ, R>(
       .finally(() => {
         cancelRunPreview.current = null;
       });
-  }, [appId, connectionId, privateQuery, onPreview]);
+  }, [appId, dataSourceId, connectionId, privateQuery, onPreview]);
 
   return { preview, runPreview };
 }

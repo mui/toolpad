@@ -9,10 +9,11 @@ import {
   SecretAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
-import { ExactEntriesOf } from './utils/types';
+import { ExactEntriesOf, Maybe } from './utils/types';
 import { filterValues } from './utils/collections';
 
 export const RESERVED_NODE_PROPERTIES = [
@@ -91,6 +92,8 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
   };
   readonly props?: BindableAttrValues<P>;
   readonly layout?: {
+    readonly horizontalAlign?: ConstantAttrValue<BoxProps['justifyContent']>;
+    readonly verticalAlign?: ConstantAttrValue<BoxProps['alignItems']>;
     readonly columnSize?: ConstantAttrValue<number>;
   };
 }
@@ -107,7 +110,7 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
   readonly params?: BindableAttrValues<P>;
   readonly attributes: {
     readonly dataSource?: ConstantAttrValue<string>;
-    readonly connectionId: ConstantAttrValue<NodeReference>;
+    readonly connectionId: ConstantAttrValue<NodeReference | null>;
     readonly query: ConstantAttrValue<Q>;
     readonly transform?: ConstantAttrValue<string>;
     readonly transformEnabled?: ConstantAttrValue<boolean>;
@@ -191,6 +194,10 @@ function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node i
 
 function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): asserts node is T {
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
+}
+
+function createId(): NodeId {
+  return cuid.slug() as NodeId;
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {
@@ -419,7 +426,7 @@ export function createNode<T extends AppDomNodeType>(
   type: T,
   init: AppDomNodeInitOfType<T>,
 ): AppDomNodeOfType<T> {
-  const id = cuid() as NodeId;
+  const id = createId();
   const name = slugifyNodeName(dom, init.name || type, type);
   return createNodeInternal(id, type, {
     ...init,
@@ -428,7 +435,7 @@ export function createNode<T extends AppDomNodeType>(
 }
 
 export function createDom(): AppDom {
-  const rootId = cuid() as NodeId;
+  const rootId = createId();
   return {
     nodes: {
       [rootId]: createNodeInternal(rootId, 'app', {
@@ -717,6 +724,16 @@ export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
   return index.get(name) ?? null;
 }
 
+export function getNodeFirstChild(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {
+  const nodeChildren = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
+  return nodeChildren.length > 0 ? nodeChildren[0] : null;
+}
+
+export function getNodeLastChild(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {
+  const nodeChildren = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
+  return nodeChildren.length > 0 ? nodeChildren[nodeChildren.length - 1] : null;
+}
+
 export function getSiblingBeforeNode(
   dom: AppDom,
   node: ElementNode | PageNode,
@@ -758,9 +775,7 @@ export function getNewFirstParentIndexInNode(
   node: ElementNode | PageNode,
   parentProp: string,
 ) {
-  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
-  const firstChild = children.length > 0 ? children[0] : null;
-
+  const firstChild = getNodeFirstChild(dom, node, parentProp);
   return createFractionalIndex(null, firstChild?.parentIndex || null);
 }
 
@@ -769,9 +784,7 @@ export function getNewLastParentIndexInNode(
   node: ElementNode | PageNode,
   parentProp: string,
 ) {
-  const children = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
-  const lastChild = children.length > 0 ? children[children.length - 1] : null;
-
+  const lastChild = getNodeLastChild(dom, node, parentProp);
   return createFractionalIndex(lastChild?.parentIndex || null, null);
 }
 
@@ -817,11 +830,66 @@ export function createRenderTree(dom: AppDom): RenderTree {
   };
 }
 
-export function ref(nodeId: NodeId): NodeReference {
-  return { $$ref: nodeId };
+export function ref(nodeId: NodeId): NodeReference;
+export function ref(nodeId: null | undefined): null;
+export function ref(nodeId: Maybe<NodeId>): NodeReference | null;
+export function ref(nodeId: Maybe<NodeId>): NodeReference | null {
+  return nodeId ? { $$ref: nodeId } : null;
 }
-export function deref(nodeRef: NodeReference): NodeId {
-  return nodeRef.$$ref;
+
+export function deref(nodeRef: NodeReference): NodeId;
+export function deref(nodeRef: null | undefined): null;
+export function deref(nodeRef: Maybe<NodeReference>): NodeId | null;
+export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
+  if (typeof nodeRef === 'string') {
+    // This branch provides backwards compatibility for old style string refs
+    // TODO: remove this branch and replace with a migration after the functionality is in place .
+    //       See https://github.com/mui/mui-toolpad/pull/776
+    //       In migration '1' we should update all query connectionId and navigate action pageId.
+    return nodeRef;
+  }
+  if (nodeRef) {
+    return nodeRef.$$ref;
+  }
+  return null;
+}
+
+export function fromLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
+  // Migrate old rest nodes with transforms on the fly
+  // TODO: Build migration flow for https://github.com/mui/mui-toolpad/issues/741
+  //       to make this obsolete
+
+  if (node.attributes.dataSource?.value !== 'rest') {
+    return node;
+  }
+
+  if (
+    typeof node.attributes.query.value?.transformEnabled !== 'undefined' &&
+    (node.attributes.transformEnabled || node.attributes.transform)
+  ) {
+    return update(node, {
+      attributes: update(node.attributes, {
+        transformEnabled: undefined,
+        transform: undefined,
+      }),
+    });
+  }
+
+  if (node.attributes.transformEnabled || node.attributes.transform) {
+    return update(node, {
+      attributes: update(node.attributes, {
+        transformEnabled: undefined,
+        transform: undefined,
+        query: createConst({
+          ...node.attributes.query.value,
+          transformEnabled: node.attributes.transformEnabled?.value,
+          transform: node.attributes.transform?.value,
+        }),
+      }),
+    });
+  }
+
+  return node;
 }
 
 export function duplicateDom(dom: AppDom): AppDom {

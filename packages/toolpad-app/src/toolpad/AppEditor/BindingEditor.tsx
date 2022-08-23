@@ -109,9 +109,7 @@ function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreview
       <Toolbar disableGutters>
         <Typography color="error">{previewError?.message}</Typography>
       </Toolbar>
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <JsonView src={lastGoodPreview?.value} />
-      </Box>
+      <JsonView sx={{ flex: 1 }} src={lastGoodPreview?.value} />
     </React.Fragment>
   );
 }
@@ -244,7 +242,7 @@ function ActionEditor({ value, onChange }: ActionEditorProps) {
     <Box>
       <TabContext value={activeTab}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleTabChange} aria-label="lab API tabs example">
+          <TabList onChange={handleTabChange} aria-label="Choose action kind ">
             <Tab label="JS expression" value="jsExpressionAction" />
             <Tab label="Navigation" value="navigationAction" />
           </TabList>

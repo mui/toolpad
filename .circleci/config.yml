@@ -178,7 +178,7 @@ jobs:
               -w /tests \
               -e PLAYWRIGHT_TEST_BASE_URL=http://172.17.0.1:3000/ \
               mcr.microsoft.com/playwright:v1.23.1-focal \
-              yarn e2e:smoke
+              yarn test:integration 
             docker-compose -f ./docker/compose/docker-compose.yml down
 
       # push the image

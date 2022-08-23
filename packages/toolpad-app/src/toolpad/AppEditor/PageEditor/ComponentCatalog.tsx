@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Collapse, styled, Typography } from '@mui/material';
+import { Box, Collapse, Link, styled, Tooltip, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -14,6 +14,22 @@ import {
   STACK_COMPONENT_ID,
 } from '../../../toolpadComponents';
 
+interface FutureComponentSpec {
+  displayName?: string;
+  url: string;
+}
+
+const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
+  ['Form', { url: 'https://github.com/mui/mui-toolpad/issues/749' }],
+  ['Card', { url: 'https://github.com/mui/mui-toolpad/issues/748' }],
+  ['Tabs', { url: 'https://github.com/mui/mui-toolpad/issues/747' }],
+  ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746' }],
+  ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745' }],
+  ['RadioButton', { url: 'https://github.com/mui/mui-toolpad/issues/744' }],
+  ['DatePicker', { url: 'https://github.com/mui/mui-toolpad/issues/743' }],
+  ['Checkbox', { url: 'https://github.com/mui/mui-toolpad/issues/742' }],
+]);
+
 const WIDTH_COLLAPSED = 50;
 
 const ComponentCatalogRoot = styled('div')({
@@ -24,17 +40,19 @@ const ComponentCatalogRoot = styled('div')({
   overflow: 'visible',
 });
 
-const ComponentCatalogItem = styled('div')(({ theme }) => ({
+const ComponentCatalogItem = styled('div')(({ theme, draggable, onClick }) => ({
   display: 'flex',
   alignItems: 'center',
-  padding: theme.spacing(1, 0),
+  padding: theme.spacing(1, 1, 1, 0),
   borderRadius: theme.shape.borderRadius,
   border: `1px solid ${theme.palette.divider}`,
   color: theme.palette.text.secondary,
-  cursor: 'grab',
+
   '&:hover': {
     background: theme.palette.action.hover,
   },
+  ...(draggable ? { cursor: 'grab' } : {}),
+  ...(onClick ? { cursor: 'pointer' } : {}),
 }));
 
 export interface ComponentCatalogProps {
@@ -119,6 +137,25 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     </ComponentCatalogItem>
                   );
                 })}
+              {Array.from(FUTURE_COMPONENTS, ([key, { displayName = key, url }]) => {
+                return (
+                  <Tooltip title="Upvote to get it prioritized">
+                    <Link
+                      key={`futureComponent.${key}`}
+                      href={url}
+                      underline="none"
+                      target="_blank"
+                    >
+                      <ComponentCatalogItem>
+                        <DragIndicatorIcon color="disabled" />
+                        {displayName}
+                        <Box sx={{ flex: 1 }} />
+                        🚧
+                      </ComponentCatalogItem>
+                    </Link>
+                  </Tooltip>
+                );
+              })}
             </Box>
           </Box>
         </Collapse>

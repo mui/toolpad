@@ -1,7 +1,9 @@
 import { test, expect, Request } from '@playwright/test';
+import generateId from '../utils/generateId';
+import * as locators from '../utils/locators';
 
 test('basic app creation flow', async ({ page }) => {
-  const appName = `App ${String(Math.random()).slice(2)}`;
+  const appName = `App ${generateId()}`;
 
   await page.goto('/');
   const brand = page.locator('data-test-id=brand');
@@ -19,9 +21,7 @@ test('basic app creation flow', async ({ page }) => {
 
   await page.click('[aria-label="Home"]');
 
-  const appCardSelector = `[role="article"]:has-text("${appName}")`;
-
-  await page.click(`${appCardSelector} >> [aria-label="settings"]`);
+  await page.click(`${locators.toolpadHomeAppRow(appName)} >> [aria-label="Application menu"]`);
 
   await page.click('[role="menuitem"]:has-text("Delete"):visible');
 
@@ -37,7 +37,7 @@ test('basic app creation flow', async ({ page }) => {
     `[role="dialog"]:has-text('Are you sure you want to delete application "${appName}"') >> button:has-text("delete")`,
   );
 
-  await page.waitForSelector(appCardSelector, { state: 'detached' });
+  await page.waitForSelector(locators.toolpadHomeAppRow(appName), { state: 'detached' });
 
   await page.off('request', handleRequest);
 

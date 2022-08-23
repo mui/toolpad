@@ -34,6 +34,8 @@ import { useDom, useDomApi } from '../../DomLoader';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import BindableEditor from './BindableEditor';
 import { createProvidedContext } from '../../../utils/react';
+import { ConfirmDialog } from '../../../components/SystemDialogs';
+import useBoolean from '../../../utils/useBoolean';
 
 export type ConnectionOption = {
   connectionId: NodeId | null;
@@ -128,6 +130,57 @@ export function ConnectionSelect({ sx, dataSource, value, onChange }: Connection
         );
       })}
     </TextField>
+  );
+}
+
+interface QueryeditorDialogActionsProps {
+  saveDisabled?: boolean;
+  onCommit?: () => void;
+  onRemove?: () => void;
+  onClose?: () => void;
+}
+
+function QueryeditorDialogActions({
+  saveDisabled,
+  onCommit,
+  onRemove,
+  onClose,
+}: QueryeditorDialogActionsProps) {
+  const handleCommit = () => {
+    onCommit?.();
+    onClose?.();
+  };
+
+  const {
+    value: removeConfirmOpen,
+    set: handleRemoveConfirmOpen,
+    reset: handleRemoveConfirmclose,
+  } = useBoolean(false);
+
+  const handleRemoveConfirm = React.useCallback(
+    (confirmed: boolean) => {
+      handleRemoveConfirmclose();
+      if (confirmed) {
+        onRemove?.();
+        onClose?.();
+      }
+    },
+    [handleRemoveConfirmclose, onClose, onRemove],
+  );
+
+  return (
+    <DialogActions>
+      <Button color="inherit" variant="text" onClick={onClose}>
+        Cancel
+      </Button>
+      <Button onClick={handleRemoveConfirmOpen}>Remove</Button>
+      <ConfirmDialog open={removeConfirmOpen} onClose={handleRemoveConfirm} severity="error">
+        Are you sure your want to remove this query?
+      </ConfirmDialog>
+      <Button disabled={saveDisabled} onClick={handleCommit}>
+        Save
+      </Button>
+    </DialogActions>
   );
 }
 
@@ -499,15 +552,12 @@ function QueryNodeEditorDialog<Q, P>({
   const renderDialogActions: RenderDialogActions = React.useCallback(
     ({ isDirty, onCommit }) => {
       return (
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleRemove}>Remove</Button>
-          <Button disabled={isInputSaved && !isDirty} onClick={onCommit}>
-            Save
-          </Button>
-        </DialogActions>
+        <QueryeditorDialogActions
+          onCommit={onCommit}
+          onClose={handleClose}
+          onRemove={handleRemove}
+          saveDisabled={isInputSaved && !isDirty}
+        />
       );
     },
     [handleClose, handleRemove, isInputSaved],

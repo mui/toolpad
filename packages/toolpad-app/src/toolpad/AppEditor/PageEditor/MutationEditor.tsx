@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { NodeId } from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValues, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -164,7 +164,7 @@ function MutationNodeEditorDialog<Q, P>({
   const { appId } = usePageEditorState();
   const dom = useDom();
 
-  const [input, setInput] = React.useState(node);
+  const [input, setInput] = React.useState<appDom.MutationNode<Q, P>>(node);
   React.useEffect(() => {
     if (open) {
       setInput(node);
@@ -181,10 +181,13 @@ function MutationNodeEditorDialog<Q, P>({
 
   const connectionParams = connection?.attributes.params.value;
 
-  const queryModel = React.useMemo(
+  const queryModel = React.useMemo<QueryEditorModel<any>>(
     () => ({
       query: input.attributes.query.value,
-      params: inputParams,
+      params:
+        (Object.entries(inputParams).filter(([, value]) =>
+          Boolean(value),
+        ) as BindableAttrEntries) || [],
     }),
     [input.attributes.query.value, inputParams],
   );
@@ -196,7 +199,7 @@ function MutationNodeEditorDialog<Q, P>({
           attributes: update(input.attributes, {
             query: appDom.createConst(model.query),
           }),
-          params: model.params,
+          params: Object.fromEntries(model.params) as BindableAttrValues<P>,
         }),
       );
     },

@@ -17,7 +17,12 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { BindableAttrEntries, BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import {
+  BindableAttrEntries,
+  BindableAttrValue,
+  BindableAttrValues,
+  NodeId,
+} from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -165,7 +170,9 @@ function QueryNodeEditorDialog<Q, P>({
   const { appId } = usePageEditorState();
   const dom = useDom();
 
-  const [input, setInput] = React.useState(appDom.fromLegacyQueryNode(node));
+  const [input, setInput] = React.useState<appDom.QueryNode<Q, P>>(
+    appDom.fromLegacyQueryNode(node),
+  );
   React.useEffect(() => {
     if (open) {
       setInput(appDom.fromLegacyQueryNode(node));
@@ -200,7 +207,7 @@ function QueryNodeEditorDialog<Q, P>({
           attributes: update(input.attributes, {
             query: appDom.createConst(model.query),
           }),
-          params: Object.fromEntries(model.params),
+          params: Object.fromEntries(model.params) as BindableAttrValues<P>,
         }),
       );
     },

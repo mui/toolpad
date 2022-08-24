@@ -281,7 +281,12 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         open={!!createCodeComponentDialogOpen}
         onClose={handleCreateCodeComponentDialogClose}
       />
-      <ConfirmDialog open={!!deletedNode} severity="error" onClose={handledeleteNodeDialogClose}>
+      <ConfirmDialog
+        open={!!deletedNode}
+        severity="error"
+        onClose={handledeleteNodeDialogClose}
+        okButton="delete"
+      >
         Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
       </ConfirmDialog>
     </HierarchyExplorerRoot>

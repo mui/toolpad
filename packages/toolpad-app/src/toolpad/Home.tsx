@@ -150,6 +150,7 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
       open={!!app}
       onClose={handleClose}
       severity="error"
+      okButton="delete"
       loading={deleteAppMutation.isLoading}
     >
       Are you sure you want to delete application &quot;{latestApp?.name}&quot;

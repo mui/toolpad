@@ -48,7 +48,7 @@ function ConfirmDeployDialog({ open, onClose, data: dataProp }: ConfirmDeployDia
   const data = useLatest(dataProp);
 
   return data ? (
-    <ConfirmDialog open={open} onClose={onClose}>
+    <ConfirmDialog open={open} onClose={onClose} okButton="deploy">
       Press &quot;Deploy&quot; to change the canonical URL of your application to
       version&nbsp;&quot;{data.version}&quot;.
     </ConfirmDialog>

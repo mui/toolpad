@@ -12,6 +12,7 @@ import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
+import useBoolean from '../../../utils/useBoolean';
 
 export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
@@ -23,22 +24,27 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
-  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const { value: dialogOpen, set: handleDialogOpen, reset: handleDialogClose } = useBoolean(false);
 
   const value = page.attributes.parameters?.value;
   const [input, setInput] = React.useState(value);
-  React.useEffect(() => setInput(value), [value]);
+  React.useEffect(() => {
+    if (dialogOpen) {
+      setInput(value);
+    }
+  }, [dialogOpen, value]);
 
   const handleSave = React.useCallback(() => {
     domApi.setNodeNamespacedProp(page, 'attributes', 'parameters', appDom.createConst(input || []));
-  }, [domApi, page, input]);
+    handleDialogClose();
+  }, [domApi, page, input, handleDialogClose]);
 
   return (
     <React.Fragment>
-      <Button color="inherit" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
+      <Button color="inherit" startIcon={<AddIcon />} onClick={handleDialogOpen}>
         Add page parameters
       </Button>
-      <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
+      <Dialog fullWidth open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
           <Typography>
@@ -55,7 +61,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
           />
         </DialogContent>
         <DialogActions>
-          <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
+          <Button color="inherit" variant="text" onClick={handleDialogClose}>
             Close
           </Button>
           <Button disabled={value === input} onClick={handleSave}>

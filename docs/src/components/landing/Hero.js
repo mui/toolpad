@@ -10,8 +10,12 @@ import Demo from './Demo';
 export default function Hero() {
   return (
     <ToolpadHeroContainer>
-      <Box sx={{ minHeight: { xs: '0px', sm: '20px' } }} />
-      <Box sx={{ textAlign: { xs: 'center', md: 'center' } }}>
+      <Box
+        sx={{
+          textAlign: { xs: 'center', md: 'center' },
+          mt: { xs: '20px', md: '100px' },
+        }}
+      >
         <Typography
           fontWeight="bold"
           variant="body2"
@@ -54,7 +58,14 @@ export default function Hero() {
           }}
         />
       </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          mt: { xs: '20px', sm: '100px' },
+        }}
+      >
         <Demo />
       </Box>
     </ToolpadHeroContainer>

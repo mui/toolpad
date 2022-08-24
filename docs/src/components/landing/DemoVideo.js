@@ -17,7 +17,7 @@ const Video = styled('video')(({ theme }) => ({
 export default function DemoVideo() {
   return (
     <Video
-      sx={{ height: { sm: 600 }, borderWidth: { xs: '10px 10px 0 10px', sm: '20px 20px 0 20px' } }}
+      sx={{ height: { sm: 655 }, borderWidth: { xs: '10px 10px 0 10px', sm: '20px 20px 0 20px' } }}
       playsInline
       autoPlay
       muted

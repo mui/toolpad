@@ -147,7 +147,6 @@ jobs:
     machine: true
     environment:
       - DOCKER_BUILDKIT: '1'
-      - TOOLPAD_CREATE_WITH_DOM: true
     steps:
       - checkout
 

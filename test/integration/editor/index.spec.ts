@@ -45,6 +45,7 @@ test('can place new components from catalog', async ({ page }) => {
   // Drag in a first component
 
   await componentCatalogLocator.hover();
+
   const textFieldDragSourceLocator = componentCatalogLocator.locator(
     ':has-text("TextField")[draggable]',
   );
@@ -61,7 +62,7 @@ test('can place new components from catalog', async ({ page }) => {
   await expect(canvasInputLocator).toHaveCount(2);
 });
 
-test('can move elements in page', async ({ page }) => {
+test.only('can move elements in page', async ({ page }) => {
   const appId = generateId();
 
   await page.goto('/');
@@ -80,7 +81,10 @@ test('can move elements in page', async ({ page }) => {
   const firstTextFieldLocator = canvasInputLocator.first();
   const secondTextFieldLocator = canvasInputLocator.nth(1);
 
+  await firstTextFieldLocator.focus();
   await firstTextFieldLocator.type('textField1');
+
+  await secondTextFieldLocator.focus();
   await secondTextFieldLocator.type('textField2');
 
   await expect(firstTextFieldLocator).toHaveAttribute('value', 'textField1');

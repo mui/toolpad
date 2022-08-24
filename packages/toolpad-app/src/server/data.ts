@@ -438,3 +438,13 @@ export async function loadDom(appId: string, version: VersionOrPreview = 'previe
 export async function loadRenderTree(appId: string, version: VersionOrPreview = 'preview') {
   return appDom.createRenderTree(await loadDom(appId, version));
 }
+
+export async function duplicateApp(id: string): Promise<App> {
+  const app = await prisma.app.findUnique({ where: { id } });
+  if (!app) {
+    throw new Error(`App "${id}" not found`);
+  }
+  const dom = await loadRenderTree(id);
+  const newApp = await createApp(app.name, { dom });
+  return newApp;
+}

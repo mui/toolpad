@@ -33,6 +33,7 @@ import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -267,9 +268,10 @@ function AppOpenButton({ app, activeDeployment }: AppOpenButtonProps) {
 interface AppOptionsProps {
   onRename: () => void;
   onDelete?: () => void;
+  onDuplicate?: () => void;
 }
 
-function AppOptions({ onRename, onDelete }: AppOptionsProps) {
+function AppOptions({ onRename, onDelete, onDuplicate }: AppOptionsProps) {
   const { buttonProps, menuProps, onMenuClose } = useMenu();
 
   const handleRenameClick = React.useCallback(() => {
@@ -282,6 +284,11 @@ function AppOptions({ onRename, onDelete }: AppOptionsProps) {
     onDelete?.();
   }, [onDelete, onMenuClose]);
 
+  const handleDuplicateClick = React.useCallback(() => {
+    onMenuClose();
+    onDuplicate?.();
+  }, [onDuplicate, onMenuClose]);
+
   return (
     <React.Fragment>
       <IconButton {...buttonProps} aria-label="Application menu">
@@ -293,6 +300,12 @@ function AppOptions({ onRename, onDelete }: AppOptionsProps) {
             <DriveFileRenameOutlineIcon />
           </ListItemIcon>
           <ListItemText>Rename</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleDuplicateClick}>
+          <ListItemIcon>
+            <ContentCopyOutlinedIcon />
+          </ListItemIcon>
+          <ListItemText>Duplicate</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleDeleteClick}>
           <ListItemIcon>
@@ -406,6 +419,7 @@ interface AppViewProps {
   activeDeploymentsByApp: { [appId: string]: Deployment } | null;
   error: unknown;
   setDeletedApp: (app: AppMeta) => void;
+  onDuplicate: (app: AppMeta) => void;
 }
 
 function AppsGridView({
@@ -498,6 +512,7 @@ function AppsListView({
 export default function Home() {
   const { data: apps = [], status, error } = client.useQuery('getApps', []);
   const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);
+  const duplicateAppMutation = client.useMutation('duplicateApp');
 
   const activeDeploymentsByApp = React.useMemo(() => {
     if (!activeDeployments) {
@@ -556,6 +571,9 @@ export default function Home() {
           error={error}
           activeDeploymentsByApp={activeDeploymentsByApp}
           setDeletedApp={setDeletedApp}
+          onDuplicate={(app: AppMeta) => {
+            duplicateAppMutation.mutateAsync([app.id]);
+          }}
         />
       </Container>
     </ToolpadShell>

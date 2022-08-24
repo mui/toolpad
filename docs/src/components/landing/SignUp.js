@@ -87,6 +87,7 @@ const SignUp = ({ sx }) => {
           id="email-landing"
           name="email"
           type="email"
+          aria-label="Email"
           placeholder="example@email.com"
           inputProps={{ required: true }}
           value={form.email}

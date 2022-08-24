@@ -18,6 +18,7 @@ import {
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
+import { getObjectKey } from '@mui/toolpad-core/objectKey';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -296,7 +297,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   // The grid doesn't react to changes to the column prop, so it needs to be remounted
   // when that updates to reflect changes made in the editor.
   const key = React.useMemo(
-    () => [rowIdFieldProp ?? '', JSON.stringify(columnsProp)].join('|'),
+    () => [rowIdFieldProp ?? '', getObjectKey(columnsProp)].join('::'),
     [columnsProp, rowIdFieldProp],
   );
 

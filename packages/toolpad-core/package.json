@@ -13,6 +13,7 @@
     ".": "./dist/index.js",
     "./constants": "./dist/constants.js",
     "./runtime": "./dist/runtime.js",
+    "./objectKey": "./dist/objectKey.js",
     "./utils": "./dist/utils.js"
   },
   "files": [

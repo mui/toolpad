@@ -58,10 +58,7 @@ function setValue<T = unknown>(key: string, value: T) {
  * to that value on page load instead of the specified initial value.
  *
  * Since the local storage API isn't available in server-rendering environments, we
- * check that typeof window !== "undefined" to make SSR and SSG work properly.
- *
- * based on https://github.com/uidotdev/usehooks/blob/d599adfa48c4c0e2008bf3cdfc5792b583fd06d7/src/pages/useLocalStorage.md
- * LICENSE: https://github.com/uidotdev/usehooks/blob/d599adfa48c4c0e2008bf3cdfc5792b583fd06d7/LICENSE
+ * return initialValue during SSR and hydration.
  */
 export default function useLocalStorageState<V>(
   key: string,

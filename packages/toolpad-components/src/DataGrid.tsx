@@ -128,7 +128,11 @@ const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
   json: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
-  datetime: {
+  date: {
+    valueFormatter: ({ value: cellValue }: GridValueFormatterParams) =>
+      typeof cellValue === 'number' ? new Date(cellValue) : cellValue,
+  },
+  dateTime: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) =>
       typeof cellValue === 'number' ? new Date(cellValue) : cellValue,
   },

@@ -45,6 +45,7 @@ import getReadableDuration from '../utils/readableDuration';
 import EditableText from '../components/EditableText';
 import type { AppMeta } from '../server/data';
 import useMenu from '../utils/useMenu';
+import useLocalStorageState from '../utils/useLocalStorageState';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -512,11 +513,12 @@ export default function Home() {
 
   const [deletedApp, setDeletedApp] = React.useState<null | AppMeta>(null);
 
-  const [viewMode, setViewMode] = React.useState<string>('list');
+  const [viewMode, setViewMode] = useLocalStorageState<string>('home-app-view-mode', 'list');
 
-  const handleViewModeChange = React.useCallback((event: React.MouseEvent, value: string) => {
-    setViewMode(value);
-  }, []);
+  const handleViewModeChange = React.useCallback(
+    (event: React.MouseEvent, value: string) => setViewMode(value),
+    [setViewMode],
+  );
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
 

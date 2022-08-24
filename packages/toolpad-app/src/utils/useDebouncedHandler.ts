@@ -42,17 +42,6 @@ export default function useDebouncedHandler<P extends any[]>(
 
   const delayedInvocation = React.useRef<DelayedInvocation<P> | null>(null);
 
-  // TODO: Should this be optional? Someone might want to run the function, even after unmount.
-  React.useEffect(
-    () => () => {
-      if (delayedInvocation.current) {
-        fnRef.current(...delayedInvocation.current.params);
-        clear(delayedInvocation);
-      }
-    },
-    [],
-  );
-
   React.useEffect(() => {
     if (!delayedInvocation.current) {
       return;

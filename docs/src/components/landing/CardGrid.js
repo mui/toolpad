@@ -8,7 +8,7 @@ import Grid from '@mui/material/Grid';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import IconImage from 'docs/src/components/icon/IconImage';
 
-const CardRootStyle = (imageUrl) => ({
+const cardRootStyle = (imageUrl) => ({
   px: imageUrl ? 0 : 2,
   pb: 3,
   pt: imageUrl ? 0 : 3,
@@ -16,7 +16,7 @@ const CardRootStyle = (imageUrl) => ({
   maxWidth: 360,
 });
 
-const CardMediaStyle = (imageUrl) => ({
+const cardMediaStyle = (imageUrl) => ({
   display: 'block',
   backgroundRepeat: 'no-repeat',
   backgroundPosition: 'center',
@@ -30,7 +30,7 @@ const CardMediaStyle = (imageUrl) => ({
   paddingTop: '55.55%',
 });
 
-const CardContentRootStyle = (imageUrl) => ({
+const cardContentRootStyle = (imageUrl) => ({
   px: imageUrl ? 2 : 0,
   pt: imageUrl ? 2 : 0,
   pb: 0,
@@ -49,9 +49,9 @@ function CardGrid(props) {
         <Grid container spacing={2}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
             <Grid key={title} item xs={12} sm={6} md={span}>
-              <Paper variant="outlined" sx={CardRootStyle(imageUrl)}>
-                {imageUrl ? <Box sx={CardMediaStyle(imageUrl)} /> : null}
-                <Box sx={CardContentRootStyle(imageUrl)}>
+              <Paper variant="outlined" sx={cardRootStyle(imageUrl)}>
+                {imageUrl ? <Box sx={cardMediaStyle(imageUrl)} /> : null}
+                <Box sx={cardContentRootStyle(imageUrl)}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     {icon ?? null}
                     <Typography

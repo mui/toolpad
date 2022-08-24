@@ -1,11 +1,14 @@
 import * as React from 'react';
 import mitt from 'mitt';
 
+// storage events only work across windows, we'll use an event emitter to announce within the window
 const emitter = mitt();
+// local cache, needed for getSnapshot
 const cache = new Map<string, any>();
 
 function subscribe(key: string, cb: () => void): () => void {
   const onKeyChange = () => {
+    // invalidate local cache
     cache.delete(key);
     cb();
   };

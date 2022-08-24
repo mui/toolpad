@@ -293,6 +293,13 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const columns: GridColumns = React.useMemo(() => parseColumns(columnsProp || []), [columnsProp]);
 
+  // The grid doesn't react to changes to the column prop, so it needs to be remounted
+  // when that updates to reflect changes made in the editor.
+  const key = React.useMemo(
+    () => [rowIdFieldProp ?? '', JSON.stringify(columnsProp)].join('|'),
+    [columnsProp, rowIdFieldProp],
+  );
+
   return (
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
       <DataGridPro
@@ -301,7 +308,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
         columns={columns}
-        key={rowIdFieldProp}
+        key={key}
         getRowId={getRowId}
         onSelectionModelChange={onSelectionModelChange}
         selectionModel={selectionModel}

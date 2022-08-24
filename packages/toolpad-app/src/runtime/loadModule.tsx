@@ -16,7 +16,6 @@ async function createRequire(urlImports: string[]) {
       ['@mui/material', import('@mui/material')],
       ['@mui/x-data-grid-pro', import('@mui/x-data-grid-pro')],
       ['@mui/x-date-pickers', import('@mui/x-date-pickers')],
-      ['@mui/x-date-pickers/AdapterDateFns', import('@mui/x-date-pickers/AdapterDateFns')],
       ['@mui/icons-material', import('@mui/icons-material')],
       ['@mui/material/Button', import('@mui/material/Button')],
       // ... TODO: All @mui/material imports
@@ -41,8 +40,6 @@ async function createRequire(urlImports: string[]) {
       // ESM interop
       return { ...esModule, __esModule: true };
     }
-
-    console.log(moduleId, esModule);
 
     throw new Error(`Can't resolve module "${moduleId}"`);
   };

@@ -203,7 +203,7 @@ export type MonacoEditorProps = MonacoEditorBaseProps &
         extraLibs?: undefined;
       }
     | {
-        language: 'css';
+        language: string;
         diagnostics?: undefined;
         compilerOptions?: undefined;
         extraLibs?: undefined;

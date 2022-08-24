@@ -32,6 +32,7 @@ import CenteredSpinner from '../../../components/CenteredSpinner';
 import SplitPane from '../../../components/SplitPane';
 import { getDefaultControl } from '../../propertyControls';
 import { WithControlledProp } from '../../../utils/types';
+import useDebounced from '../../../utils/useDebounced';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -186,9 +187,10 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const frameDocument = frameRef.current?.contentDocument;
 
-  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(input);
-
+  const debouncedInput = useDebounced(input, 250);
+  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(debouncedInput);
   const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
+
   const { argTypes } = CodeComponent[TOOLPAD_COMPONENT];
 
   const defaultProps = React.useMemo(

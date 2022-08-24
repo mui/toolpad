@@ -13,10 +13,12 @@ import {
   GridSelectionModel,
   GridValueFormatterParams,
   GridColDef,
+  GridValueGetterParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
+import { getObjectKey } from '@mui/toolpad-core/objectKey';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -124,13 +126,19 @@ const DEFAULT_TYPES = new Set([
   'actions',
 ]);
 
+function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
+  return typeof value === 'number' ? new Date(value) : value;
+}
+
 const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
   json: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
-  datetime: {
-    valueFormatter: ({ value: cellValue }: GridValueFormatterParams) =>
-      typeof cellValue === 'number' ? new Date(cellValue) : cellValue,
+  date: {
+    valueGetter: dateValueGetter,
+  },
+  dateTime: {
+    valueGetter: dateValueGetter,
   },
 };
 
@@ -286,6 +294,13 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const columns: GridColumns = React.useMemo(() => parseColumns(columnsProp || []), [columnsProp]);
 
+  // The grid doesn't react to changes to the column prop, so it needs to be remounted
+  // when that updates to reflect changes made in the editor.
+  const key = React.useMemo(
+    () => [rowIdFieldProp ?? '', getObjectKey(columnsProp)].join('::'),
+    [columnsProp, rowIdFieldProp],
+  );
+
   return (
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
       <DataGridPro
@@ -294,7 +309,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
         columns={columns}
-        key={rowIdFieldProp}
+        key={key}
         getRowId={getRowId}
         onSelectionModelChange={onSelectionModelChange}
         selectionModel={selectionModel}

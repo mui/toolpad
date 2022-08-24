@@ -1,3 +1,4 @@
+import { LoadingButton, LoadingButtonProps } from '@mui/lab';
 import {
   Dialog,
   DialogTitle,
@@ -13,16 +14,20 @@ const SystemDialog = Dialog;
 const SystemDialogTitle = DialogTitle;
 const SystemDialogContent = DialogContent;
 const SystemDialogActions = DialogActions;
-const SystemDialogCancelButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => (
-  <Button ref={ref} color="inherit" variant="text" {...props}>
-    cancel
-  </Button>
-));
-const SystemDialogOkButton = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => (
-  <Button ref={ref} {...props}>
-    ok
-  </Button>
-));
+const SystemDialogCancelButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ children = 'cancel', ...props }, ref) => (
+    <Button ref={ref} color="inherit" variant="text" {...props}>
+      {children}
+    </Button>
+  ),
+);
+const SystemDialogOkButton = React.forwardRef<HTMLButtonElement, LoadingButtonProps>(
+  ({ children = 'ok', ...props }, ref) => (
+    <LoadingButton ref={ref} {...props}>
+      {children}
+    </LoadingButton>
+  ),
+);
 
 export interface ConfirmDialogProps {
   open: boolean;
@@ -32,6 +37,7 @@ export interface ConfirmDialogProps {
   cancelButton?: React.ReactNode;
   okButton?: React.ReactNode;
   severity?: 'error' | 'warning';
+  loading?: boolean;
 }
 
 export function ConfirmDialog({
@@ -42,6 +48,7 @@ export function ConfirmDialog({
   cancelButton = 'cancel',
   okButton = 'ok',
   severity,
+  loading,
 }: ConfirmDialogProps) {
   const handleCancel = React.useCallback(() => onClose(false), [onClose]);
 
@@ -53,7 +60,7 @@ export function ConfirmDialog({
       <SystemDialogContent>{children}</SystemDialogContent>
       <SystemDialogActions>
         <SystemDialogCancelButton onClick={handleCancel}>{cancelButton}</SystemDialogCancelButton>
-        <SystemDialogOkButton color={severity} onClick={handleOk}>
+        <SystemDialogOkButton color={severity} loading={loading} onClick={handleOk}>
           {okButton}
         </SystemDialogOkButton>
       </SystemDialogActions>
@@ -90,6 +97,7 @@ export interface PromptDialogProps {
   children?: React.ReactNode;
   cancelButton?: React.ReactNode;
   okButton?: React.ReactNode;
+  loading?: boolean;
 }
 
 export function PromptDialog({
@@ -99,6 +107,7 @@ export function PromptDialog({
   children,
   cancelButton = 'cancel',
   okButton = 'ok',
+  loading,
 }: PromptDialogProps) {
   const [input, setInput] = React.useState('');
 
@@ -120,7 +129,9 @@ export function PromptDialog({
       </SystemDialogContent>
       <SystemDialogActions>
         <SystemDialogCancelButton onClick={handleCancel}>{cancelButton}</SystemDialogCancelButton>
-        <SystemDialogOkButton onClick={handleOk}>{okButton}</SystemDialogOkButton>
+        <SystemDialogOkButton loading={loading} onClick={handleOk}>
+          {okButton}
+        </SystemDialogOkButton>
       </SystemDialogActions>
     </SystemDialog>
   );

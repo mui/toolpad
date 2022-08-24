@@ -13,6 +13,7 @@ import {
   GridSelectionModel,
   GridValueFormatterParams,
   GridColDef,
+  GridValueGetterParams,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
@@ -124,17 +125,19 @@ const DEFAULT_TYPES = new Set([
   'actions',
 ]);
 
+function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
+  return typeof value === 'number' ? new Date(value) : value;
+}
+
 const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
   json: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
   date: {
-    valueFormatter: ({ value: cellValue }: GridValueFormatterParams) =>
-      typeof cellValue === 'number' ? new Date(cellValue) : cellValue,
+    valueGetter: dateValueGetter,
   },
   dateTime: {
-    valueFormatter: ({ value: cellValue }: GridValueFormatterParams) =>
-      typeof cellValue === 'number' ? new Date(cellValue) : cellValue,
+    valueGetter: dateValueGetter,
   },
 };
 

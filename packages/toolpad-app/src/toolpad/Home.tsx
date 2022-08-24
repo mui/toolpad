@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  Alert,
   Button,
   Box,
   Card,
@@ -46,6 +45,7 @@ import EditableText from '../components/EditableText';
 import type { AppMeta } from '../server/data';
 import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
+import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -403,19 +403,12 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
 
 interface AppViewProps {
   apps: AppMeta[];
-  status: string;
+  loading?: boolean;
   activeDeploymentsByApp: { [appId: string]: Deployment } | null;
-  error: unknown;
   setDeletedApp: (app: AppMeta) => void;
 }
 
-function AppsGridView({
-  status,
-  apps,
-  activeDeploymentsByApp,
-  error,
-  setDeletedApp,
-}: AppViewProps) {
+function AppsGridView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: AppViewProps) {
   return (
     <Box
       sx={{
@@ -430,66 +423,54 @@ function AppsGridView({
       }}
     >
       {(() => {
-        switch (status) {
-          case 'loading':
-            return <AppCard />;
-          case 'error':
-            return <Alert severity="error">{(error as Error)?.message}</Alert>;
-          case 'success':
-            return apps.length > 0
-              ? apps.map((app) => {
-                  const activeDeployment = activeDeploymentsByApp?.[app.id];
-                  return (
-                    <AppCard
-                      key={app.id}
-                      app={app}
-                      activeDeployment={activeDeployment}
-                      onDelete={() => setDeletedApp(app)}
-                    />
-                  );
-                })
-              : 'No apps yet';
-          default:
-            return <AppCard />;
+        if (loading) {
+          return <AppCard />;
         }
+        if (apps.length <= 0) {
+          return 'No apps yet';
+        }
+        return apps.map((app) => {
+          const activeDeployment = activeDeploymentsByApp?.[app.id];
+          return (
+            <AppCard
+              key={app.id}
+              app={app}
+              activeDeployment={activeDeployment}
+              onDelete={() => setDeletedApp(app)}
+            />
+          );
+        });
       })()}
     </Box>
   );
 }
 
-function AppsListView({
-  status,
-  apps,
-  activeDeploymentsByApp,
-  error,
-  setDeletedApp,
-}: AppViewProps) {
+function AppsListView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: AppViewProps) {
   return (
     <Table aria-label="apps list" size="medium">
       <TableBody>
         {(() => {
-          switch (status) {
-            case 'loading':
-              return <AppRow />;
-            case 'error':
-              return <Alert severity="error">{(error as Error)?.message}</Alert>;
-            case 'success':
-              return apps.length > 0
-                ? apps.map((app) => {
-                    const activeDeployment = activeDeploymentsByApp?.[app.id];
-                    return (
-                      <AppRow
-                        key={app.id}
-                        app={app}
-                        activeDeployment={activeDeployment}
-                        onDelete={() => setDeletedApp(app)}
-                      />
-                    );
-                  })
-                : 'No apps yet';
-            default:
-              return '';
+          if (loading) {
+            return <AppRow />;
           }
+          if (apps.length <= 0) {
+            return (
+              <TableRow>
+                <TableCell>No apps yet</TableCell>
+              </TableRow>
+            );
+          }
+          return apps.map((app) => {
+            const activeDeployment = activeDeploymentsByApp?.[app.id];
+            return (
+              <AppRow
+                key={app.id}
+                app={app}
+                activeDeployment={activeDeployment}
+                onDelete={() => setDeletedApp(app)}
+              />
+            );
+          });
         })()}
       </TableBody>
     </Table>
@@ -497,7 +478,7 @@ function AppsListView({
 }
 
 export default function Home() {
-  const { data: apps = [], status, error } = client.useQuery('getApps', []);
+  const { data: apps = [], isLoading, error } = client.useQuery('getApps', []);
   const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);
 
   const activeDeploymentsByApp = React.useMemo(() => {
@@ -552,13 +533,16 @@ export default function Home() {
             </ToggleButton>
           </ToggleButtonGroup>
         </Toolbar>
-        <AppsView
-          apps={apps}
-          status={status}
-          error={error}
-          activeDeploymentsByApp={activeDeploymentsByApp}
-          setDeletedApp={setDeletedApp}
-        />
+        {error ? (
+          <ErrorAlert error={error} />
+        ) : (
+          <AppsView
+            apps={apps}
+            loading={isLoading}
+            activeDeploymentsByApp={activeDeploymentsByApp}
+            setDeletedApp={setDeletedApp}
+          />
+        )}
       </Container>
     </ToolpadShell>
   );

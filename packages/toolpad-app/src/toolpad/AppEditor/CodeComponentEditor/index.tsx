@@ -7,6 +7,7 @@ import {
   TOOLPAD_COMPONENT,
   ArgTypeDefinitions,
   ArgTypeDefinition,
+  RuntimeEvent,
 } from '@mui/toolpad-core';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
@@ -17,7 +18,6 @@ import useShortcut from '../../../utils/useShortcut';
 import { usePrompt } from '../../../utils/router';
 import NodeNameEditor from '../NodeNameEditor';
 import usePageTitle from '../../../utils/usePageTitle';
-import useCodeComponent from './useCodeComponent';
 import { filterValues, mapValues } from '../../../utils/collections';
 import lazyComponent from '../../../utils/lazyComponent';
 import CenteredSpinner from '../../../components/CenteredSpinner';
@@ -186,10 +186,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const debouncedInput = useDebounced(input, 250);
 
-  const { Component: CodeComponent } = useCodeComponent(debouncedInput);
-  const argTypes: ArgTypeDefinitions<any> = CodeComponent
-    ? CodeComponent[TOOLPAD_COMPONENT].argTypes
-    : DEFAULT_ARGTYPES;
+  const [argTypes, setArgTypes] = React.useState(DEFAULT_ARGTYPES);
 
   const [previewDom, setPreviewDom] = React.useState(() => createViewerDom(dom, input));
 
@@ -229,6 +226,18 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     });
   }, [debouncedInput, debouncedProps]);
 
+  const componentNodeId = appDom.getNodeIdByName(previewDom, 'viewerComponent');
+  const handleRuntimeEvent = React.useCallback(
+    (event: RuntimeEvent) => {
+      if (event.type === 'componentsLoaded') {
+        const Component = event.components[`codeComponent.${componentNodeId}`];
+        const newArgTypes = Component?.[TOOLPAD_COMPONENT]?.argTypes || DEFAULT_ARGTYPES;
+        setArgTypes(newArgTypes);
+      }
+    },
+    [componentNodeId],
+  );
+
   const pageNodeId = appDom.getNodeIdByName(previewDom, 'viewerPage');
   invariant(pageNodeId, 'viewerPage missing');
   const pageNode = appDom.getNode(previewDom, pageNodeId, 'page');
@@ -253,6 +262,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
                 appId="123" // TODO: what should go here?
                 pageNodeId={pageNode.id}
                 dom={previewDom}
+                onRuntimeEvent={handleRuntimeEvent}
               />
               <PropertiesEditor argTypes={argTypes} value={props} onChange={setProps} />
             </SplitPane>

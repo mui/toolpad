@@ -7,6 +7,7 @@ import {
   createComponent,
 } from '@mui/toolpad-core';
 import * as ReactIs from 'react-is';
+import { fireEvent } from '@mui/toolpad-core/runtime';
 import * as appDom from '../appDom';
 import { getToolpadComponents } from '../toolpadComponents';
 import { ensureToolpadComponent } from './loadCodeComponent';
@@ -81,6 +82,10 @@ export default function ComponentsContext({ dom, children }: ComponentsContextPr
 
     return result;
   }, [dom, modules]);
+
+  React.useEffect(() => {
+    fireEvent({ type: 'componentsLoaded', components });
+  }, [components]);
 
   return <ComponentsContextProvider value={components}>{children}</ComponentsContextProvider>;
 }

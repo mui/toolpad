@@ -48,6 +48,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const handleRuntimeEvent = React.useCallback(
     (event: RuntimeEvent) => {
+      // eslint-disable-next-line default-case
       switch (event.type) {
         case 'propUpdated': {
           const node = appDom.getNode(dom, event.nodeId as NodeId, 'element');
@@ -79,12 +80,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         }
         case 'pageNavigationRequest': {
           navigate(`../pages/${event.pageNodeId}`);
+          // eslint-disable-next-line no-useless-return
           return;
         }
-        default:
-          throw new Error(
-            `received unrecognized event "${(event as RuntimeEvent).type}" from editor runtime`,
-          );
       }
     },
     [dom, domApi, api, navigate],

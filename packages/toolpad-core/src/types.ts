@@ -211,7 +211,8 @@ export type RuntimeEvent =
       bindings: LiveBindings;
     }
   | { type: 'afterRender' }
-  | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
+  | { type: 'pageNavigationRequest'; pageNodeId: NodeId }
+  | { type: 'componentsLoaded'; components: ToolpadComponents };
 
 export interface ComponentConfig<P> {
   /**

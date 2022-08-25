@@ -1,14 +1,9 @@
 import * as React from 'react';
-import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Stack, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import createCache from '@emotion/cache';
-import { CacheProvider } from '@emotion/react';
-import * as ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
   NodeId,
-  createComponent,
-  ToolpadComponent,
   TOOLPAD_COMPONENT,
   ArgTypeDefinitions,
   ArgTypeDefinition,
@@ -22,17 +17,15 @@ import useShortcut from '../../../utils/useShortcut';
 import { usePrompt } from '../../../utils/router';
 import NodeNameEditor from '../NodeNameEditor';
 import usePageTitle from '../../../utils/usePageTitle';
-import useLatest from '../../../utils/useLatest';
-import AppThemeProvider from '../../../runtime/AppThemeProvider';
 import useCodeComponent from './useCodeComponent';
 import { filterValues, mapValues } from '../../../utils/collections';
-import ErrorAlert from '../PageEditor/ErrorAlert';
 import lazyComponent from '../../../utils/lazyComponent';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 import SplitPane from '../../../components/SplitPane';
 import { getDefaultControl } from '../../propertyControls';
 import { WithControlledProp } from '../../../utils/types';
 import useDebounced from '../../../utils/useDebounced';
+import EditorCanvasHost from '../PageEditor/EditorCanvasHost';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -77,34 +70,38 @@ function PropertiesEditor({ argTypes, value, onChange }: PropertiesEditorProps) 
   );
 }
 
-const Noop = createComponent(() => null);
+const DEFAULT_ARGTYPES: ArgTypeDefinitions = {};
 
-const CanvasFrame = styled('iframe')({
-  border: 'none',
-  position: 'absolute',
-  width: '100%',
-  height: '100%',
-});
+function createViewerDom(dom: appDom.AppDom, initialCode: string) {
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+  for (const page of pages) {
+    dom = appDom.removeNode(dom, page.id);
+  }
 
-interface FrameContentProps {
-  children: React.ReactElement;
-  document: Document;
-}
+  const newCodeComponentNode = appDom.createNode(dom, 'codeComponent', {
+    name: 'viewerComponent',
+    attributes: {
+      code: appDom.createConst(initialCode),
+    },
+  });
 
-function FrameContent(props: FrameContentProps) {
-  const { children, document } = props;
+  dom = appDom.addNode(dom, newCodeComponentNode, root, 'codeComponents');
 
-  const cache = React.useMemo(
-    () =>
-      createCache({
-        key: `code-component-sandbox`,
-        prepend: true,
-        container: document.head,
-      }),
-    [document],
-  );
+  const page = appDom.createNode(dom, 'page', {
+    name: 'viewerPage',
+    attributes: { title: appDom.createConst('code component viewer') },
+  });
+  dom = appDom.addNode(dom, page, root, 'pages');
 
-  return <CacheProvider value={cache}>{children}</CacheProvider>;
+  const instance = appDom.createNode(dom, 'element', {
+    name: 'viewerInstance',
+    attributes: { component: appDom.createConst(`codeComponent.${newCodeComponentNode.id}`) },
+  });
+
+  dom = appDom.addNode(dom, instance, page, 'children');
+
+  return dom;
 }
 
 const EXTRA_LIBS_HTTP_MODULES = [
@@ -185,20 +182,56 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     }
   }, [iframeLoaded]);
 
-  const frameDocument = frameRef.current?.contentDocument;
+  const [props, setProps] = React.useState({});
 
   const debouncedInput = useDebounced(input, 250);
-  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(debouncedInput);
-  const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
 
-  const { argTypes } = CodeComponent[TOOLPAD_COMPONENT];
+  const { Component: CodeComponent } = useCodeComponent(debouncedInput);
+  const argTypes: ArgTypeDefinitions<any> = CodeComponent
+    ? CodeComponent[TOOLPAD_COMPONENT].argTypes
+    : DEFAULT_ARGTYPES;
 
-  const defaultProps = React.useMemo(
-    () => mapValues(argTypes, (argType) => argType?.defaultValue),
-    [argTypes],
+  const [previewDom, setPreviewDom] = React.useState(() => createViewerDom(dom, input));
+
+  const previewProps = React.useMemo(
+    () => ({
+      ...mapValues(argTypes, (argType) => argType?.defaultValue),
+      ...filterValues(props, (propValue) => typeof propValue !== 'undefined'),
+    }),
+    [argTypes, props],
   );
 
-  const [props, setProps] = React.useState({});
+  const debouncedProps = useDebounced(previewProps, 250);
+
+  React.useEffect(() => {
+    setPreviewDom((existingDom) => {
+      const componentNodeId = appDom.getNodeIdByName(existingDom, 'viewerComponent');
+      invariant(componentNodeId, 'viewerComponent missing');
+      const componentNode = appDom.getNode(existingDom, componentNodeId, 'codeComponent');
+
+      const instanceNodeId = appDom.getNodeIdByName(existingDom, 'viewerInstance');
+      invariant(instanceNodeId, 'viewerInstance missing');
+      const instanceNode = appDom.getNode(existingDom, instanceNodeId, 'element');
+
+      existingDom = appDom.setNodeNamespacedProp(
+        existingDom,
+        componentNode,
+        'attributes',
+        'code',
+        appDom.createConst(debouncedInput),
+      );
+
+      const theProps = mapValues(debouncedProps, (value) => appDom.createConst(value));
+
+      existingDom = appDom.setNodeNamespace(existingDom, instanceNode, 'props', theProps);
+
+      return existingDom;
+    });
+  }, [debouncedInput, debouncedProps]);
+
+  const pageNodeId = appDom.getNodeIdByName(previewDom, 'viewerPage');
+  invariant(pageNodeId, 'viewerPage missing');
+  const pageNode = appDom.getNode(previewDom, pageNodeId, 'page');
 
   return (
     <React.Fragment>
@@ -215,7 +248,12 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             />
 
             <SplitPane split="horizontal" allowResize size="20%" primary="second">
-              <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
+              <EditorCanvasHost
+                sx={{ height: '100%' }}
+                appId="123" // TODO: what should go here?
+                pageNodeId={pageNode.id}
+                dom={previewDom}
+              />
               <PropertiesEditor argTypes={argTypes} value={props} onChange={setProps} />
             </SplitPane>
           </SplitPane>
@@ -230,27 +268,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
           </Button>
         </Toolbar>
       </Stack>
-      {iframeLoaded && frameDocument
-        ? ReactDOM.createPortal(
-            <FrameContent document={frameDocument}>
-              <React.Suspense fallback={null}>
-                <ErrorBoundary
-                  resetKeys={[CodeComponent]}
-                  fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
-                >
-                  <AppThemeProvider dom={dom}>
-                    <CodeComponent
-                      {...defaultProps}
-                      {...filterValues(props, (propValue) => typeof propValue !== 'undefined')}
-                    />
-                  </AppThemeProvider>
-                </ErrorBoundary>
-                {compileError ? <ErrorAlert error={compileError} /> : null}
-              </React.Suspense>
-            </FrameContent>,
-            frameDocument.body,
-          )
-        : null}
     </React.Fragment>
   );
 }

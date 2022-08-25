@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, CircularProgress, styled } from '@mui/material';
+import { Box, CircularProgress, styled, SxProps } from '@mui/material';
 import { NodeId, RuntimeEvent } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
@@ -44,6 +44,7 @@ export interface EditorCanvasHostProps {
   onRuntimeEvent?: (event: RuntimeEvent) => void;
   onScreenUpdate?: () => void;
   overlay?: React.ReactNode;
+  sx?: SxProps;
 }
 
 const CanvasRoot = styled('div')({
@@ -60,7 +61,7 @@ const CanvasFrame = styled('iframe')({
 
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   function EditorCanvasHost(
-    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent, onScreenUpdate },
+    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent, onScreenUpdate, sx },
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
@@ -188,7 +189,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     }, [appRoot, onScreenUpdate]);
 
     return (
-      <CanvasRoot className={className}>
+      <CanvasRoot className={className} sx={sx}>
         <Box
           sx={{
             position: 'absolute',

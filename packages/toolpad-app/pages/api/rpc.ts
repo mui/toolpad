@@ -18,6 +18,7 @@ import {
   findActiveDeployment,
   findLastRelease,
   deleteApp,
+  getLatestToolpadRelease,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
@@ -137,6 +138,9 @@ const rpcServer = {
     }),
     findLastRelease: createMethod<typeof findLastRelease>((params) => {
       return findLastRelease(...params);
+    }),
+    getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>((params) => {
+      return getLatestToolpadRelease(...params);
     }),
   },
   mutation: {

@@ -22,14 +22,14 @@ import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
+import client from '../api';
 
 const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
-const LATEST_RELEASE_API_URL = 'https://api.github.com/repos/mui/mui-toolpad/releases/latest';
-
 const CURRENT_RELEASE_VERSION = `v${process.env.TOOLPAD_VERSION}`;
+const CURRENT_RELEASE_URL = `https://github.com/mui/mui-toolpad/release/tag/${CURRENT_RELEASE_VERSION}`;
 
 interface FeedbackMenuItemLinkProps {
   href: string;
@@ -88,74 +88,68 @@ function UserFeedback() {
 }
 
 function UpdateBanner() {
-  const [latestVersion, setLatestVersion] = React.useState(CURRENT_RELEASE_VERSION);
-
+  const { data: latestRelease } = client.useQuery('getLatestToolpadRelease', [], {
+    staleTime: 1000 * 60 * 10,
+    initialData: {
+      tag_name: CURRENT_RELEASE_VERSION,
+      html_url: CURRENT_RELEASE_URL,
+    },
+  });
   const [dismissedVersion, setDismissedVersion] = useLocalStorageState<string | null>(
     'update-banner-dismissed-version',
     null,
   );
 
-  const showBanner = dismissedVersion !== CURRENT_RELEASE_VERSION;
-
   const handleDismissClick = React.useCallback(() => {
     setDismissedVersion(CURRENT_RELEASE_VERSION);
   }, [setDismissedVersion]);
 
-  const [changelogPath, setChangelogPath] = React.useState('');
-
-  // Fetch latest release from the Github API
-  // https://developer.github.com/v3/repos/releases/#get-the-latest-release
-  React.useEffect(() => {
-    const fetchLatestRelease = async () => {
-      const latestRelease = await (await fetch(LATEST_RELEASE_API_URL))?.json();
-      if (latestRelease?.tag_name !== CURRENT_RELEASE_VERSION) {
-        setLatestVersion(latestRelease?.tag_name);
-        setChangelogPath(latestRelease?.html_url);
-      }
-    };
-    fetchLatestRelease();
-  }, []);
+  const hideBanner =
+    dismissedVersion === CURRENT_RELEASE_VERSION ||
+    latestRelease?.tag_name === CURRENT_RELEASE_VERSION;
 
   return (
-    <Collapse in={showBanner}>
-      <Alert
-        action={
-          <Stack direction="row" sx={{ gap: 2 }}>
-            <Button
-              aria-label="update"
-              color="inherit"
-              endIcon={<OpenInNewIcon fontSize="inherit" />}
-              component="a"
-              target="_blank"
-              href={DOCUMENTATION_URL}
-            >
-              Update
-            </Button>
-            <Button
-              aria-label="view changelog"
-              color="inherit"
-              endIcon={<OpenInNewIcon fontSize="inherit" />}
-              component="a"
-              target="_blank"
-              href={changelogPath}
-            >
-              View changelog
-            </Button>
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={handleDismissClick}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          </Stack>
-        }
-        severity="info"
-      >
-        A new version <strong>{latestVersion}</strong> of Toolpad is available.
-      </Alert>
-    </Collapse>
+    <React.Fragment>
+      <Collapse in={!hideBanner}>
+        <Alert
+          action={
+            <Stack direction="row" sx={{ gap: 2 }}>
+              <Button
+                aria-label="update"
+                color="inherit"
+                endIcon={<OpenInNewIcon fontSize="inherit" />}
+                component="a"
+                target="_blank"
+                href={DOCUMENTATION_URL}
+              >
+                Update
+              </Button>
+              <Button
+                aria-label="view changelog"
+                color="inherit"
+                endIcon={<OpenInNewIcon fontSize="inherit" />}
+                component="a"
+                target="_blank"
+                href={latestRelease?.html_url}
+              >
+                View changelog
+              </Button>
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={handleDismissClick}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            </Stack>
+          }
+          severity="info"
+        >
+          A new version <strong>{latestRelease?.tag_name}</strong> of Toolpad is available.
+        </Alert>
+      </Collapse>
+    </React.Fragment>
   );
 }
 

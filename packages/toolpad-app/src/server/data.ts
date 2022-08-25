@@ -442,3 +442,31 @@ export async function loadDom(appId: string, version: VersionOrPreview = 'previe
 export async function loadRenderTree(appId: string, version: VersionOrPreview = 'preview') {
   return appDom.createRenderTree(await loadDom(appId, version));
 }
+
+const LATEST_RELEASE_API_URL = 'https://api.github.com/repos/mui/mui-toolpad/releases/latest';
+const latestReleaseCache: GithubReleaseCache = {};
+interface GithubRelease {
+  tag_name: string;
+  html_url: string;
+}
+interface GithubReleaseCache {
+  latest?: {
+    timestamp: number;
+    release: GithubRelease;
+  };
+}
+
+export async function getLatestToolpadRelease(): Promise<GithubRelease> {
+  const timestamp = Date.now();
+  if (latestReleaseCache.latest) {
+    const { timestamp: lastFetchedTimestamp, release } = latestReleaseCache.latest;
+    if (lastFetchedTimestamp && timestamp - lastFetchedTimestamp < 1000 * 60 * 10) {
+      return release;
+    }
+  }
+  // Fetch latest release from the Github API
+  // https://developer.github.com/v3/repos/releases/#get-the-latest-release
+  const response = await (await fetch(LATEST_RELEASE_API_URL))?.json();
+  latestReleaseCache.latest = { timestamp, release: response };
+  return { tag_name: response.tag_name, html_url: response.html_url };
+}

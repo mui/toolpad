@@ -20,10 +20,11 @@ import {
   Placeholder,
   BindableAttrValues,
   NodeId,
+  execDataSourceQuery,
   BindableAttrValue,
   UseDataQueryConfig,
 } from '@mui/toolpad-core';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
   Routes,
@@ -64,6 +65,18 @@ import ComponentsContext, { useComponents, useComponent } from './ComponentsCont
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
+
+interface UseMutation {
+  call: (overrides?: any) => Promise<void>;
+  isLoading: boolean;
+  error: unknown;
+}
+
+const INITIAL_MUTATION: UseMutation = {
+  call: async () => {},
+  isLoading: false,
+  error: null,
+};
 
 const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
   'enabled',
@@ -416,6 +429,51 @@ function QueryNode({ node }: QueryNodeProps) {
   return null;
 }
 
+interface MutationNodeProps {
+  node: appDom.MutationNode;
+}
+
+function MutationNode({ node }: MutationNodeProps) {
+  const { appId, version } = useAppContext();
+  const bindings = useBindingsContext();
+  const setControlledBinding = useSetControlledBindingContext();
+
+  const dataUrl = `/api/data/${appId}/${version}/`;
+  const mutationId = node.id;
+  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
+
+  const {
+    isLoading,
+    error,
+    mutateAsync: call,
+  } = useMutation(
+    async (overrides: any = {}) =>
+      execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides }),
+    {
+      mutationKey: [dataUrl, mutationId, params],
+    },
+  );
+
+  // Stabilize the mutation and prepare for inclusion in global scope
+  const mutationResult: UseMutation = React.useMemo(
+    () => ({
+      isLoading,
+      error,
+      call,
+    }),
+    [isLoading, error, call],
+  );
+
+  React.useEffect(() => {
+    for (const [key, value] of Object.entries(mutationResult)) {
+      const bindingId = `${node.id}.${key}`;
+      setControlledBinding(bindingId, { value });
+    }
+  }, [node.id, mutationResult, setControlledBinding]);
+
+  return null;
+}
+
 interface ParseBindingOptions {
   scopePath?: string;
 }
@@ -517,6 +575,36 @@ function parseBindings(
         parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
       }
     }
+
+    if (appDom.isMutation(elm)) {
+      if (elm.params) {
+        for (const [paramName, bindable] of Object.entries(elm.params)) {
+          const bindingId = `${elm.id}.params.${paramName}`;
+          const scopePath = `${elm.name}.params.${paramName}`;
+          if (bindable?.type === 'const') {
+            parsedBindingsMap.set(bindingId, {
+              scopePath,
+              result: { value: bindable.value },
+            });
+          } else if (bindable?.type === 'jsExpression') {
+            parsedBindingsMap.set(bindingId, {
+              scopePath,
+              expression: bindable.value,
+            });
+          }
+        }
+      }
+
+      for (const [key, value] of Object.entries(INITIAL_MUTATION)) {
+        const bindingId = `${elm.id}.${key}`;
+        const scopePath = `${elm.name}.${key}`;
+        controlled.add(bindingId);
+        parsedBindingsMap.set(bindingId, {
+          scopePath,
+          result: { value, loading: true },
+        });
+      }
+    }
   }
 
   const urlParams = new URLSearchParams(location.search);
@@ -540,7 +628,7 @@ const EMPTY_OBJECT = {};
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queries = [], mutations = [] } = appDom.getChildNodes(dom, page);
 
   usePageTitle(page.attributes.title.value);
 
@@ -625,6 +713,10 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
           {queries.map((node) => (
             <QueryNode key={node.id} node={node} />
+          ))}
+
+          {mutations.map((node) => (
+            <MutationNode key={node.id} node={node} />
           ))}
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>

@@ -8,6 +8,7 @@ import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
 import PageModuleEditor from './PageModuleEditor';
+import MutationEditor from './MutationEditor';
 
 export default function PageOptionsPanel() {
   const state = usePageEditorState();
@@ -34,6 +35,7 @@ export default function PageOptionsPanel() {
         <Typography variant="subtitle1">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />
         <QueryEditor />
+        <MutationEditor />
       </Stack>
     </div>
   );

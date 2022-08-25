@@ -140,13 +140,8 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                 })}
               {Array.from(FUTURE_COMPONENTS, ([key, { displayName = key, url }]) => {
                 return (
-                  <Tooltip title="Upvote to get it prioritized">
-                    <Link
-                      key={`futureComponent.${key}`}
-                      href={url}
-                      underline="none"
-                      target="_blank"
-                    >
+                  <Tooltip title="Upvote to get it prioritized" key={`futureComponent.${key}`}>
+                    <Link href={url} underline="none" target="_blank">
                       <ComponentCatalogItem>
                         <DragIndicatorIcon color="disabled" />
                         {displayName}

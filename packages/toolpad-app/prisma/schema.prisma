@@ -82,6 +82,7 @@ enum DomNodeType {
   derivedState
   queryState
   query
+  mutation
 }
 
 // Deprecated: Dom is now stored in the `App` model

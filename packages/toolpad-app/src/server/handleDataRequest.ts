@@ -25,16 +25,22 @@ export default async (
   res: NextApiResponse<ApiResult<any>>,
   { appId, version }: HandleDataRequestParams,
 ) => {
+  if (req.method !== 'POST') {
+    // This endpoint is used both by queries and mutations
+    res.status(405).end();
+    return;
+  }
+
   await cors(req, res);
   const queryNodeId = req.query.queryId as NodeId;
   const dom = await loadDom(appId, version);
-  const query = appDom.getNode(dom, queryNodeId, 'query');
+  const dataNode = appDom.getNode(dom, queryNodeId);
 
-  const result = await execQuery(
-    appId,
-    query,
-    req.query.params ? JSON.parse(req.query.params as string) : {},
-  );
+  if (!appDom.isQuery(dataNode) && !appDom.isMutation(dataNode)) {
+    throw new Error(`Invalid node type for data request`);
+  }
+
+  const result = await execQuery(appId, dataNode, req.body);
 
   res.json(result);
 };

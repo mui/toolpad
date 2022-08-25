@@ -12,6 +12,7 @@ import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import usePageTitle from '../../../utils/usePageTitle';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
+import useDebouncedHandler from '../../../utils/useDebouncedHandler';
 
 const classes = {
   renderPanel: 'Toolpad_RenderPanel',
@@ -41,13 +42,16 @@ function PageEditorContent({ appId, node }: PageEditorContentProps) {
     300,
   );
 
+  const handleSplitChange = useDebouncedHandler((newSize) => setSplitDefaultSize(newSize), 100);
+
   return (
     <PageEditorProvider key={node.id} appId={appId} nodeId={node.id}>
       <SplitPane
         allowResize
         split="vertical"
+        size={splitDefaultSize}
         defaultSize={splitDefaultSize}
-        onChange={(newSize) => setSplitDefaultSize(newSize)}
+        onChange={handleSplitChange}
         primary="second"
       >
         <PageEditorRoot>

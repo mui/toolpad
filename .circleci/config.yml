@@ -170,7 +170,7 @@ jobs:
       - run:
           command: |
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
-            TAG=$CIRCLE_SHA1 docker-compose -f ./docker/compose/docker-compose.yml up -d
+            TAG=$CIRCLE_SHA1 docker-compose -f ./docker/compose/docker-compose.test.yml up -d
             yarn workspace @mui/toolpad-app waitForApp --url=http://172.17.0.1:3000/
             docker run -it --rm \
               --ipc=host \
@@ -179,7 +179,7 @@ jobs:
               -e PLAYWRIGHT_TEST_BASE_URL=http://172.17.0.1:3000/ \
               mcr.microsoft.com/playwright:v1.23.1-focal \
               yarn test:integration 
-            docker-compose -f ./docker/compose/docker-compose.yml down
+            docker-compose -f ./docker/compose/docker-compose.test.yml down
 
       # push the image
       - when:

@@ -28,7 +28,7 @@ const ComponentEditorRoot = styled('div')(({ theme }) => ({
     margin: theme.spacing(0, 0),
   },
   [`& .${classes.sectionHeading}`]: {
-    margin: theme.spacing(0, 0),
+    margin: theme.spacing(0, 0, -0.5, 0),
   },
 }));
 
@@ -57,7 +57,7 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
     <React.Fragment>
       {hasLayoutControls ? (
         <React.Fragment>
-          <Typography variant="subtitle2" className={classes.sectionHeading}>
+          <Typography variant="overline" className={classes.sectionHeading}>
             Layout:
           </Typography>
           {hasLayoutHorizontalControls ? (
@@ -83,7 +83,7 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
         </React.Fragment>
       ) : null}
       <Divider sx={{ mt: 1 }} />
-      <Typography variant="subtitle2" className={classes.sectionHeading}>
+      <Typography variant="overline" className={classes.sectionHeading}>
         Properties:
       </Typography>
       {(Object.entries(componentConfig.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(

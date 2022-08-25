@@ -5,7 +5,7 @@ import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from './GradientText';
 import SignUp from './SignUp';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
-import HeroDemo from './HeroDemo';
+import DemoVideo from './DemoVideo';
 
 export default function Hero() {
   return (
@@ -66,7 +66,7 @@ export default function Hero() {
           mt: { xs: '20px', sm: '100px' },
         }}
       >
-        <HeroDemo />
+        <DemoVideo />
       </Box>
     </ToolpadHeroContainer>
   );

@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SyncIcon from '@mui/icons-material/Sync';
+import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import SplitPane from '../../components/SplitPane';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
@@ -189,6 +190,7 @@ function QueryEditor({
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
   const rows = React.useMemo(() => rawRows.map((row, id) => ({ id, ...row })), [rawRows]);
+  const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
     <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
@@ -220,7 +222,7 @@ function QueryEditor({
         {preview?.error ? (
           <ErrorAlert error={preview?.error} />
         ) : (
-          <DataGridPro sx={{ border: 'none' }} columns={columns} rows={rows} />
+          <DataGridPro sx={{ border: 'none' }} columns={columns} key={previewGridKey} rows={rows} />
         )}
       </SplitPane>
     </QueryEditorShell>

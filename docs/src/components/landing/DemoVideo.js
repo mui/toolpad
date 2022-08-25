@@ -16,16 +16,22 @@ const Video = styled('video')(({ theme }) => ({
 
 export default function DemoVideo() {
   return (
-    <Video
-      sx={{ height: { sm: 655 }, borderWidth: { xs: '10px 10px 0 10px', sm: '20px 20px 0 20px' } }}
-      playsInline
-      autoPlay
-      muted
-      loop
-      poster="/static/toolpad/marketing/hero-screenshot.svg"
-    >
-      <source src="/static/toolpad/marketing/hero-video.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </Video>
+    <React.Fragment>
+      <Video
+        sx={{
+          height: { lg: 655 },
+          borderWidth: { xs: '10px 10px 0 10px', sm: '20px 20px 0 20px' },
+        }}
+        width={1400}
+        playsInline
+        autoPlay
+        muted
+        loop
+        poster={'/static/toolpad/marketing/hero-screenshot.svg'}
+      >
+        <source src="/static/toolpad/marketing/hero-video.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </Video>
+    </React.Fragment>
   );
 }

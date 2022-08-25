@@ -1,19 +1,9 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import createApp from '../../utils/createApp';
+import clickCenter from '../../utils/clickCenter';
 import generateId from '../../utils/generateId';
 import { canvasFrame, componentCatalog, pageRoot } from '../../utils/locators';
 import domInput from './domInput.json';
-
-async function clickCenter(page: Page, targetLocator: Locator) {
-  const targetBoundingBox = await targetLocator.boundingBox();
-
-  expect(targetBoundingBox).toBeDefined();
-
-  await page.mouse.click(
-    targetBoundingBox!.x + targetBoundingBox!.width / 2,
-    targetBoundingBox!.y + targetBoundingBox!.height / 2,
-  );
-}
 
 async function dragCenterToCenter(page: Page, sourceLocator: Locator, targetLocator: Locator) {
   const sourceBoundingBox = await sourceLocator.boundingBox();
@@ -52,7 +42,10 @@ test('can place new components from catalog', async ({ page }) => {
 
   await expect(canvasInputLocator).toHaveCount(0);
 
+  // Drag in a first component
+
   await componentCatalogLocator.hover();
+
   const textFieldDragSourceLocator = componentCatalogLocator.locator(
     ':has-text("TextField")[draggable]',
   );
@@ -88,7 +81,10 @@ test('can move elements in page', async ({ page }) => {
   const firstTextFieldLocator = canvasInputLocator.first();
   const secondTextFieldLocator = canvasInputLocator.nth(1);
 
+  await firstTextFieldLocator.focus();
   await firstTextFieldLocator.type('textField1');
+
+  await secondTextFieldLocator.focus();
   await secondTextFieldLocator.type('textField2');
 
   await expect(firstTextFieldLocator).toHaveAttribute('value', 'textField1');

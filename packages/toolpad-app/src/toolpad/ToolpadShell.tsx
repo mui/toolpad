@@ -4,16 +4,17 @@ import {
   Alert,
   AppBar,
   Button,
+  Box,
   Collapse,
   Toolbar,
   IconButton,
   Typography,
-  Box,
   Menu,
   MenuItem,
   Divider,
   ListItemText,
   Tooltip,
+  Stack,
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import CloseIcon from '@mui/icons-material/Close';
@@ -88,12 +89,19 @@ function UserFeedback() {
 
 function UpdateBanner() {
   const [latestVersion, setLatestVersion] = React.useState(CURRENT_RELEASE_VERSION);
-  const [dismissedBanner, setDismissedBanner] = useLocalStorageState<boolean>(
-    `${CURRENT_RELEASE_VERSION}-update-banner-dismissed`,
-    false,
+
+  const [dismissedVersion, setDismissedVersion] = useLocalStorageState<string | null>(
+    'update-banner-dismissed-version',
+    null,
   );
+
+  const showBanner = dismissedVersion !== CURRENT_RELEASE_VERSION;
+
+  const handleDismissClick = React.useCallback(() => {
+    setDismissedVersion(CURRENT_RELEASE_VERSION);
+  }, [setDismissedVersion]);
+
   const [changelogPath, setChangelogPath] = React.useState('');
-  const showBanner = !dismissedBanner && latestVersion !== CURRENT_RELEASE_VERSION;
 
   // Fetch latest release from the Github API
   // https://developer.github.com/v3/repos/releases/#get-the-latest-release
@@ -112,26 +120,22 @@ function UpdateBanner() {
     <Collapse in={showBanner}>
       <Alert
         action={
-          <React.Fragment>
+          <Stack direction="row" sx={{ gap: 2 }}>
             <Button
-              aria-label="close"
-              size="small"
+              aria-label="update"
               color="inherit"
               endIcon={<OpenInNewIcon fontSize="inherit" />}
               component="a"
-              sx={{ mr: 1 }}
               target="_blank"
               href={DOCUMENTATION_URL}
             >
               Update
             </Button>
             <Button
-              aria-label="close"
-              size="small"
+              aria-label="view changelog"
               color="inherit"
               endIcon={<OpenInNewIcon fontSize="inherit" />}
               component="a"
-              sx={{ mr: 1 }}
               target="_blank"
               href={changelogPath}
             >
@@ -141,18 +145,12 @@ function UpdateBanner() {
               aria-label="close"
               color="inherit"
               size="small"
-              sx={{ mr: 2 }}
-              onClick={() => {
-                setDismissedBanner(true);
-              }}
+              onClick={handleDismissClick}
             >
               <CloseIcon fontSize="inherit" />
             </IconButton>
-          </React.Fragment>
+          </Stack>
         }
-        onClose={() => {
-          setDismissedBanner(true);
-        }}
         severity="info"
       >
         A new version <strong>{latestVersion}</strong> of Toolpad is available.

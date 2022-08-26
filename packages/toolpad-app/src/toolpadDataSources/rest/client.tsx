@@ -171,14 +171,6 @@ function QueryEditor({
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
 
-  const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
-    Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>)),
-  );
-
-  React.useEffect(() => {
-    setParams(Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>)));
-  }, [input.params]);
-
   const baseUrl = connectionParams?.baseUrl;
 
   const handleUrlChange = React.useCallback((newUrl: BindableAttrValue<string> | null) => {
@@ -210,7 +202,7 @@ function QueryEditor({
   }, []);
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    input: params,
+    input: input.params,
     globalScope,
   });
 
@@ -245,15 +237,9 @@ function QueryEditor({
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const lastSavedInput = React.useRef(input);
-  const handleCommit = React.useCallback(() => {
-    const newValue = { ...input, params: Object.fromEntries(params) };
-    onChange(newValue);
-    lastSavedInput.current = newValue;
-  }, [onChange, params, input]);
+  const handleCommit = React.useCallback(() => onChange(input), [onChange, input]);
 
-  const isDirty =
-    input.query !== lastSavedInput.current.query || input.params !== lastSavedInput.current.params;
+  const isDirty = input !== value;
 
   return (
     <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
@@ -262,8 +248,8 @@ function QueryEditor({
           <Stack gap={2} sx={{ px: 3, pt: 1 }}>
             <Typography>Parameters</Typography>
             <ParametersEditor
-              value={params}
-              onChange={setParams}
+              value={input.params}
+              onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
               globalScope={globalScope}
               liveValue={paramsEditorLiveValue}
             />
@@ -324,7 +310,6 @@ function getInitialQueryValue(): FetchQuery {
 const dataSource: ClientDataSource<{}, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
-  isConnectionValid: () => true,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

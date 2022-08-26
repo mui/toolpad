@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  Alert,
   Button,
   Box,
   Card,
@@ -45,6 +44,9 @@ import getReadableDuration from '../utils/readableDuration';
 import EditableText from '../components/EditableText';
 import type { AppMeta } from '../server/data';
 import useMenu from '../utils/useMenu';
+import useLocalStorageState from '../utils/useLocalStorageState';
+import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import { ConfirmDialog } from '../components/SystemDialogs';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -133,33 +135,27 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
   const latestApp = useLatest(app);
   const deleteAppMutation = client.useMutation('deleteApp');
 
-  const handleDeleteClick = React.useCallback(async () => {
-    if (app) {
-      await deleteAppMutation.mutateAsync([app.id]);
-    }
-    await client.invalidateQueries('getApps');
-    onClose();
-  }, [app, deleteAppMutation, onClose]);
+  const handleClose = React.useCallback(
+    async (confirmed: boolean) => {
+      if (confirmed && app) {
+        await deleteAppMutation.mutateAsync([app.id]);
+        await client.invalidateQueries('getApps');
+      }
+      onClose();
+    },
+    [app, deleteAppMutation, onClose],
+  );
 
   return (
-    <Dialog open={!!app} onClose={onClose}>
-      <DialogTitle>Confirm delete</DialogTitle>
-      <DialogContent>
-        Are you sure you want to delete application &quot;{latestApp?.name}&quot;
-      </DialogContent>
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
-          Cancel
-        </Button>
-        <LoadingButton
-          loading={deleteAppMutation.isLoading}
-          onClick={handleDeleteClick}
-          color="error"
-        >
-          Delete
-        </LoadingButton>
-      </DialogActions>
-    </Dialog>
+    <ConfirmDialog
+      open={!!app}
+      onClose={handleClose}
+      severity="error"
+      okButton="delete"
+      loading={deleteAppMutation.isLoading}
+    >
+      Are you sure you want to delete application &quot;{latestApp?.name}&quot;
+    </ConfirmDialog>
   );
 }
 
@@ -402,19 +398,12 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
 
 interface AppViewProps {
   apps: AppMeta[];
-  status: string;
+  loading?: boolean;
   activeDeploymentsByApp: { [appId: string]: Deployment } | null;
-  error: unknown;
   setDeletedApp: (app: AppMeta) => void;
 }
 
-function AppsGridView({
-  status,
-  apps,
-  activeDeploymentsByApp,
-  error,
-  setDeletedApp,
-}: AppViewProps) {
+function AppsGridView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: AppViewProps) {
   return (
     <Box
       sx={{
@@ -429,66 +418,54 @@ function AppsGridView({
       }}
     >
       {(() => {
-        switch (status) {
-          case 'loading':
-            return <AppCard />;
-          case 'error':
-            return <Alert severity="error">{(error as Error)?.message}</Alert>;
-          case 'success':
-            return apps.length > 0
-              ? apps.map((app) => {
-                  const activeDeployment = activeDeploymentsByApp?.[app.id];
-                  return (
-                    <AppCard
-                      key={app.id}
-                      app={app}
-                      activeDeployment={activeDeployment}
-                      onDelete={() => setDeletedApp(app)}
-                    />
-                  );
-                })
-              : 'No apps yet';
-          default:
-            return <AppCard />;
+        if (loading) {
+          return <AppCard />;
         }
+        if (apps.length <= 0) {
+          return 'No apps yet';
+        }
+        return apps.map((app) => {
+          const activeDeployment = activeDeploymentsByApp?.[app.id];
+          return (
+            <AppCard
+              key={app.id}
+              app={app}
+              activeDeployment={activeDeployment}
+              onDelete={() => setDeletedApp(app)}
+            />
+          );
+        });
       })()}
     </Box>
   );
 }
 
-function AppsListView({
-  status,
-  apps,
-  activeDeploymentsByApp,
-  error,
-  setDeletedApp,
-}: AppViewProps) {
+function AppsListView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: AppViewProps) {
   return (
     <Table aria-label="apps list" size="medium">
       <TableBody>
         {(() => {
-          switch (status) {
-            case 'loading':
-              return <AppRow />;
-            case 'error':
-              return <Alert severity="error">{(error as Error)?.message}</Alert>;
-            case 'success':
-              return apps.length > 0
-                ? apps.map((app) => {
-                    const activeDeployment = activeDeploymentsByApp?.[app.id];
-                    return (
-                      <AppRow
-                        key={app.id}
-                        app={app}
-                        activeDeployment={activeDeployment}
-                        onDelete={() => setDeletedApp(app)}
-                      />
-                    );
-                  })
-                : 'No apps yet';
-            default:
-              return '';
+          if (loading) {
+            return <AppRow />;
           }
+          if (apps.length <= 0) {
+            return (
+              <TableRow>
+                <TableCell>No apps yet</TableCell>
+              </TableRow>
+            );
+          }
+          return apps.map((app) => {
+            const activeDeployment = activeDeploymentsByApp?.[app.id];
+            return (
+              <AppRow
+                key={app.id}
+                app={app}
+                activeDeployment={activeDeployment}
+                onDelete={() => setDeletedApp(app)}
+              />
+            );
+          });
         })()}
       </TableBody>
     </Table>
@@ -496,7 +473,7 @@ function AppsListView({
 }
 
 export default function Home() {
-  const { data: apps = [], status, error } = client.useQuery('getApps', []);
+  const { data: apps = [], isLoading, error } = client.useQuery('getApps', []);
   const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);
 
   const activeDeploymentsByApp = React.useMemo(() => {
@@ -512,11 +489,12 @@ export default function Home() {
 
   const [deletedApp, setDeletedApp] = React.useState<null | AppMeta>(null);
 
-  const [viewMode, setViewMode] = React.useState<string>('list');
+  const [viewMode, setViewMode] = useLocalStorageState<string>('home-app-view-mode', 'list');
 
-  const handleViewModeChange = React.useCallback((event: React.MouseEvent, value: string) => {
-    setViewMode(value);
-  }, []);
+  const handleViewModeChange = React.useCallback(
+    (event: React.MouseEvent, value: string) => setViewMode(value),
+    [setViewMode],
+  );
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
 
@@ -550,13 +528,16 @@ export default function Home() {
             </ToggleButton>
           </ToggleButtonGroup>
         </Toolbar>
-        <AppsView
-          apps={apps}
-          status={status}
-          error={error}
-          activeDeploymentsByApp={activeDeploymentsByApp}
-          setDeletedApp={setDeletedApp}
-        />
+        {error ? (
+          <ErrorAlert error={error} />
+        ) : (
+          <AppsView
+            apps={apps}
+            loading={isLoading}
+            activeDeploymentsByApp={activeDeploymentsByApp}
+            setDeletedApp={setDeletedApp}
+          />
+        )}
       </Container>
     </ToolpadShell>
   );

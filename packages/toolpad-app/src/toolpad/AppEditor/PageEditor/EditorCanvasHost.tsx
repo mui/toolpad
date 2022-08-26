@@ -6,9 +6,11 @@ import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import { setEventHandler } from '@mui/toolpad-core/runtime';
 import { throttle } from 'lodash-es';
+import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../../../constants';
-import { rectContainsPoint } from '../../../utils/geometry';
+import { PageViewState } from '../../../types';
+import { ToolpadBridge } from '../../../canvas';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -32,8 +34,8 @@ function Overlay(props: OverlayProps) {
 }
 
 export interface EditorCanvasHostHandle {
-  getRootElm(): HTMLElement | null;
   getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
+  getPageViewState(): PageViewState;
 }
 
 export interface EditorCanvasHostProps {
@@ -75,10 +77,14 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     }, [appId, dom]);
     React.useEffect(() => update(), [update]);
 
-    const onReadyRef = React.useRef(update);
-    React.useEffect(() => {
-      onReadyRef.current = update;
+    const onReady = React.useCallback(() => {
+      update();
     }, [update]);
+
+    const onReadyRef = React.useRef(onReady);
+    React.useEffect(() => {
+      onReadyRef.current = onReady;
+    }, [onReady]);
 
     React.useEffect(() => {
       const frameWindow = frameRef.current?.contentWindow;
@@ -100,26 +106,29 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
     const [appRoot, setAppRoot] = React.useState<HTMLElement | null>(null);
 
+    const getBridge = React.useCallback((): ToolpadBridge => {
+      invariant(
+        // eslint-disable-next-line no-underscore-dangle
+        frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__,
+        'bridge not initialized yet',
+      );
+      // eslint-disable-next-line no-underscore-dangle
+      return frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__;
+    }, []);
+
     React.useImperativeHandle(
       forwardedRef,
       () => {
         return {
-          getRootElm() {
-            return appRoot;
-          },
           getViewCoordinates(clientX, clientY) {
-            if (!appRoot) {
-              return null;
-            }
-            const rect = appRoot.getBoundingClientRect();
-            if (rectContainsPoint(rect, clientX, clientY)) {
-              return { x: clientX - rect.x, y: clientY - rect.y };
-            }
-            return null;
+            return getBridge().getViewCoordinates(clientX, clientY);
+          },
+          getPageViewState() {
+            return getBridge().getPageViewState();
           },
         };
       },
-      [appRoot],
+      [getBridge],
     );
 
     const handleRuntimeEventRef = React.useRef(onRuntimeEvent);

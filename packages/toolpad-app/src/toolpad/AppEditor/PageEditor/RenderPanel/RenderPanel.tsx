@@ -2,9 +2,9 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
 import { useNavigate } from 'react-router-dom';
+import invariant from 'invariant';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost, { EditorCanvasHostHandle } from '../EditorCanvasHost';
-import { getPageViewState } from '../../../../pageViewState';
 import { useDom, useDomApi } from '../../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
@@ -35,13 +35,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const canvasHostRef = React.useRef<EditorCanvasHostHandle>(null);
 
   const handlePageViewStateUpdate = React.useCallback(() => {
-    const rootElm = canvasHostRef.current?.getRootElm();
-
-    if (!rootElm) {
-      return;
-    }
-
-    api.pageViewStateUpdate(getPageViewState(rootElm));
+    invariant(canvasHostRef.current, 'canvas ref not attached');
+    const pageViewState = canvasHostRef.current?.getPageViewState();
+    api.pageViewStateUpdate(pageViewState);
   }, [api]);
 
   const navigate = useNavigate();

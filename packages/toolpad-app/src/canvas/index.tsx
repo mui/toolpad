@@ -21,8 +21,7 @@ export interface ToolpadBridge {
 
 declare global {
   interface Window {
-    __TOOLPAD_READY__?: boolean | (() => void);
-    __TOOLPAD_BRIDGE__?: ToolpadBridge;
+    __TOOLPAD_BRIDGE__?: ToolpadBridge | ((bridge: ToolpadBridge) => void);
   }
 }
 
@@ -74,8 +73,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
   }, [appRoot]);
 
   React.useEffect(() => {
-    // eslint-disable-next-line no-underscore-dangle
-    window.__TOOLPAD_BRIDGE__ = {
+    const bridge: ToolpadBridge = {
       update: (newState) => {
         React.startTransition(() => {
           setState(newState);
@@ -98,13 +96,14 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
     };
 
     // eslint-disable-next-line no-underscore-dangle
-    if (typeof window.__TOOLPAD_READY__ === 'function') {
+    if (typeof window.__TOOLPAD_BRIDGE__ === 'function') {
       // eslint-disable-next-line no-underscore-dangle
-      window.__TOOLPAD_READY__();
+      window.__TOOLPAD_BRIDGE__(bridge);
     } else {
       // eslint-disable-next-line no-underscore-dangle
-      window.__TOOLPAD_READY__ = true;
+      window.__TOOLPAD_BRIDGE__ = bridge;
     }
+
     return () => {
       // eslint-disable-next-line no-underscore-dangle
       delete window.__TOOLPAD_BRIDGE__;

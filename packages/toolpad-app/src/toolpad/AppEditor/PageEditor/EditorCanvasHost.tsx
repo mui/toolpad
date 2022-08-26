@@ -65,14 +65,12 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
 
+    const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
+
     const update = React.useCallback(() => {
       const renderDom = appDom.createRenderTree(dom);
-      // eslint-disable-next-line no-underscore-dangle
-      frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__?.update({
-        appId,
-        dom: renderDom,
-      });
-    }, [appId, dom]);
+      bridge?.update({ appId, dom: renderDom });
+    }, [appId, dom, bridge]);
     React.useEffect(() => update(), [update]);
 
     const onReady = React.useCallback(() => {
@@ -86,46 +84,41 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     React.useEffect(() => {
       const frameWindow = frameRef.current?.contentWindow;
-      if (!frameWindow) {
-        throw new Error('Iframe ref not attached');
-      }
+      invariant(frameWindow, 'frameRef not atached');
 
       // eslint-disable-next-line no-underscore-dangle
-      if (frameWindow.__TOOLPAD_READY__ === true) {
+      if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'object') {
+        // eslint-disable-next-line no-underscore-dangle
+        setBridge(frameWindow.__TOOLPAD_BRIDGE__);
         onReadyRef.current?.();
         // eslint-disable-next-line no-underscore-dangle
-      } else if (typeof frameWindow.__TOOLPAD_READY__ !== 'function') {
+      } else if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'undefined') {
         // eslint-disable-next-line no-underscore-dangle
-        frameWindow.__TOOLPAD_READY__ = () => onReadyRef.current?.();
+        frameWindow.__TOOLPAD_BRIDGE__ = (newBridge: ToolpadBridge) => {
+          setBridge(newBridge);
+          onReadyRef.current?.();
+        };
       }
     }, []);
 
     const [contentWindow, setContentWindow] = React.useState<Window | null>(null);
     const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
 
-    const getBridge = React.useCallback((): ToolpadBridge => {
-      invariant(
-        // eslint-disable-next-line no-underscore-dangle
-        frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__,
-        'bridge not initialized yet',
-      );
-      // eslint-disable-next-line no-underscore-dangle
-      return frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__;
-    }, []);
-
     React.useImperativeHandle(
       forwardedRef,
       () => {
         return {
           getViewCoordinates(clientX, clientY) {
-            return getBridge().getViewCoordinates(clientX, clientY);
+            invariant(bridge, 'bridge not initialized');
+            return bridge.getViewCoordinates(clientX, clientY);
           },
           getPageViewState() {
-            return getBridge().getPageViewState();
+            invariant(bridge, 'bridge not initialized');
+            return bridge.getPageViewState();
           },
         };
       },
-      [getBridge],
+      [bridge],
     );
 
     const handleRuntimeEventRef = React.useRef(onRuntimeEvent);

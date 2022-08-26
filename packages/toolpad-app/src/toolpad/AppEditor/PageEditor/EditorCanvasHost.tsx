@@ -5,10 +5,9 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import { setEventHandler } from '@mui/toolpad-core/runtime';
-import { throttle } from 'lodash-es';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../../../constants';
+import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
 import { PageViewState } from '../../../types';
 import { ToolpadBridge } from '../../../canvas';
 
@@ -44,7 +43,6 @@ export interface EditorCanvasHostProps {
   pageNodeId: NodeId;
   dom: appDom.AppDom;
   onRuntimeEvent?: (event: RuntimeEvent) => void;
-  onScreenUpdate?: () => void;
   overlay?: React.ReactNode;
 }
 
@@ -62,7 +60,7 @@ const CanvasFrame = styled('iframe')({
 
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   function EditorCanvasHost(
-    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent, onScreenUpdate },
+    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent },
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
@@ -104,7 +102,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     const [contentWindow, setContentWindow] = React.useState<Window | null>(null);
     const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
-    const [appRoot, setAppRoot] = React.useState<HTMLElement | null>(null);
 
     const getBridge = React.useCallback((): ToolpadBridge => {
       invariant(
@@ -146,7 +143,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       }
 
       const observer = new MutationObserver(() => {
-        setAppRoot(contentWindow.document.getElementById(HTML_ID_APP_ROOT));
         setEditorOverlayRoot(contentWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
       });
 
@@ -164,37 +160,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         cleanupHandler();
       };
     }, [contentWindow]);
-
-    React.useEffect(() => {
-      if (!appRoot || !onScreenUpdate) {
-        return () => {};
-      }
-
-      onScreenUpdate();
-      const handleScreenUpdateThrottled = throttle(onScreenUpdate, 50, {
-        trailing: true,
-      });
-
-      const mutationObserver = new MutationObserver(handleScreenUpdateThrottled);
-
-      mutationObserver.observe(appRoot, {
-        attributes: true,
-        childList: true,
-        subtree: true,
-        characterData: true,
-      });
-
-      const resizeObserver = new ResizeObserver(handleScreenUpdateThrottled);
-
-      resizeObserver.observe(appRoot);
-      appRoot.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
-
-      return () => {
-        handleScreenUpdateThrottled.cancel();
-        mutationObserver.disconnect();
-        resizeObserver.disconnect();
-      };
-    }, [appRoot, onScreenUpdate]);
 
     return (
       <CanvasRoot className={className}>

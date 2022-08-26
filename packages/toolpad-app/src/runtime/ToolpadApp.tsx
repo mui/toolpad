@@ -779,7 +779,7 @@ const queryClient = new QueryClient({
 });
 
 export interface ToolpadAppProps {
-  rootRef?: React.RefObject<HTMLDivElement>;
+  rootRef?: React.Ref<HTMLDivElement>;
   hidePreviewBanner?: boolean;
   basename: string;
   appId: string;

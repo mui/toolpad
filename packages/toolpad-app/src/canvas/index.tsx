@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { fireEvent } from '@mui/toolpad-core/runtime';
 import invariant from 'invariant';
+import { throttle } from 'lodash-es';
 import ToolpadApp, { CanvasHooks, CanvasHooksContext } from '../runtime';
 import * as appDom from '../appDom';
 import { PageViewState } from '../types';
@@ -32,7 +33,45 @@ export interface AppCanvasProps {
 export default function AppCanvas({ basename }: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState | null>(null);
 
-  const rootRef = React.useRef<HTMLDivElement>(null);
+  const rootRef = React.useRef<HTMLDivElement>();
+
+  const [appRoot, setAppRoot] = React.useState<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    if (!appRoot) {
+      return () => {};
+    }
+
+    rootRef.current = appRoot;
+
+    const onScreenUpdate = () => fireEvent({ type: 'screenUpdate' });
+
+    const handleScreenUpdateThrottled = throttle(onScreenUpdate, 50, {
+      trailing: true,
+    });
+
+    const mutationObserver = new MutationObserver(handleScreenUpdateThrottled);
+
+    mutationObserver.observe(appRoot, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    const resizeObserver = new ResizeObserver(handleScreenUpdateThrottled);
+
+    resizeObserver.observe(appRoot);
+    appRoot.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
+
+    onScreenUpdate();
+
+    return () => {
+      handleScreenUpdateThrottled.cancel();
+      mutationObserver.disconnect();
+      resizeObserver.disconnect();
+    };
+  }, [appRoot]);
 
   React.useEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
@@ -43,16 +82,14 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
         });
       },
       getPageViewState: () => {
-        const appRoot = rootRef.current;
-        invariant(appRoot, 'App ref not attached');
-        return getPageViewState(appRoot);
+        invariant(rootRef.current, 'App ref not attached');
+        return getPageViewState(rootRef.current);
       },
       getViewCoordinates(clientX, clientY) {
-        const appRoot = rootRef.current;
-        if (!appRoot) {
+        if (!rootRef.current) {
           return null;
         }
-        const rect = appRoot.getBoundingClientRect();
+        const rect = rootRef.current.getBoundingClientRect();
         if (rectContainsPoint(rect, clientX, clientY)) {
           return { x: clientX - rect.x, y: clientY - rect.y };
         }
@@ -74,11 +111,6 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
     };
   }, []);
 
-  React.useEffect(() => {
-    // Run after every render
-    fireEvent({ type: 'afterRender' });
-  });
-
   const editorHooks: CanvasHooks = React.useMemo(() => {
     return {
       navigateToPage(pageNodeId) {
@@ -90,7 +122,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
   return state ? (
     <CanvasHooksContext.Provider value={editorHooks}>
       <ToolpadApp
-        rootRef={rootRef}
+        rootRef={setAppRoot}
         hidePreviewBanner
         dom={state.dom}
         version="preview"

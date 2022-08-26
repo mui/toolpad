@@ -34,12 +34,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const canvasHostRef = React.useRef<EditorCanvasHostHandle>(null);
 
-  const handlePageViewStateUpdate = React.useCallback(() => {
-    invariant(canvasHostRef.current, 'canvas ref not attached');
-    const pageViewState = canvasHostRef.current?.getPageViewState();
-    api.pageViewStateUpdate(pageViewState);
-  }, [api]);
-
   const navigate = useNavigate();
 
   const handleRuntimeEvent = React.useCallback(
@@ -70,7 +64,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           api.pageBindingsUpdate(event.bindings);
           return;
         }
-        case 'afterRender': {
+        case 'screenUpdate': {
+          invariant(canvasHostRef.current, 'canvas ref not attached');
+          const pageViewState = canvasHostRef.current?.getPageViewState();
+          api.pageViewStateUpdate(pageViewState);
           return;
         }
         case 'pageNavigationRequest': {
@@ -95,7 +92,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         dom={dom}
         pageNodeId={pageNodeId}
         onRuntimeEvent={handleRuntimeEvent}
-        onScreenUpdate={handlePageViewStateUpdate}
         overlay={<RenderOverlay canvasHostRef={canvasHostRef} />}
       />
     </RenderPanelRoot>

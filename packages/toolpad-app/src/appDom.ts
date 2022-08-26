@@ -13,10 +13,10 @@ import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
-import { ExactEntriesOf, Maybe, VersionOne, VersionTwo } from './utils/types';
+import { ExactEntriesOf, Maybe } from './utils/types';
 import { filterValues } from './utils/collections';
 
-const GLOBAL_APPDOM_VERSION = 2;
+const GLOBAL_APPDOM_VERSION = 1;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -202,7 +202,7 @@ export type AppDomNodes = Record<NodeId, AppDomNode>;
 export interface AppDom {
   nodes: AppDomNodes;
   root: NodeId;
-  version: VersionOne | VersionTwo;
+  version: number;
 }
 
 function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node is T {

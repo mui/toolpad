@@ -1,7 +1,7 @@
 import invariant from 'invariant';
-import v2 from './v2';
+import v1 from './v1';
 
-const versions = new Map([[2, v2]]);
+const versions = new Map([[1, v1]]);
 
 export const latestVersion = Array.from(versions.keys()).pop();
 

@@ -143,7 +143,8 @@ async function loadPreviewDomLegacy(appId: string): Promise<appDom.AppDom> {
   return {
     root,
     nodes,
-    version: 1,
+    // Legacy dom has version '0'
+    version: 0,
   };
 }
 

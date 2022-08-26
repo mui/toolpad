@@ -29,7 +29,6 @@ const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
 const CURRENT_RELEASE_VERSION = `v${process.env.TOOLPAD_VERSION}`;
-const CURRENT_RELEASE_URL = `https://github.com/mui/mui-toolpad/release/tag/${CURRENT_RELEASE_VERSION}`;
 
 interface FeedbackMenuItemLinkProps {
   href: string;
@@ -88,13 +87,13 @@ function UserFeedback() {
 }
 
 function UpdateBanner() {
-  const { data: latestRelease } = client.useQuery('getLatestToolpadRelease', [], {
-    staleTime: 1000 * 60 * 10,
-    initialData: {
-      tag_name: CURRENT_RELEASE_VERSION,
-      html_url: CURRENT_RELEASE_URL,
+  const { data: latestRelease, isFetchedAfterMount } = client.useQuery(
+    'getLatestToolpadRelease',
+    [],
+    {
+      staleTime: 1000 * 60 * 10,
     },
-  });
+  );
   const [dismissedVersion, setDismissedVersion] = useLocalStorageState<string | null>(
     'update-banner-dismissed-version',
     null,
@@ -105,8 +104,9 @@ function UpdateBanner() {
   }, [setDismissedVersion]);
 
   const hideBanner =
-    dismissedVersion === CURRENT_RELEASE_VERSION ||
-    latestRelease?.tag_name === CURRENT_RELEASE_VERSION;
+    !isFetchedAfterMount ||
+    latestRelease?.tag_name === CURRENT_RELEASE_VERSION ||
+    dismissedVersion === CURRENT_RELEASE_VERSION;
 
   return (
     <React.Fragment>
@@ -193,7 +193,7 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
   return (
     <ToolpadShellRoot>
       <Header {...props} />
-      <UpdateBanner />
+      {process.env.TOOLPAD_TARGET === 'CE' ? <UpdateBanner /> : null}
       <ViewPort>{children}</ViewPort>
     </ToolpadShellRoot>
   );

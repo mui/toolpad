@@ -110,45 +110,47 @@ function UpdateBanner() {
 
   return (
     <React.Fragment>
-      <Collapse in={!hideBanner}>
-        <Alert
-          action={
-            <Stack direction="row" sx={{ gap: 2 }}>
-              <Button
-                aria-label="update"
-                color="inherit"
-                endIcon={<OpenInNewIcon fontSize="inherit" />}
-                component="a"
-                target="_blank"
-                href={DOCUMENTATION_URL}
-              >
-                Update
-              </Button>
-              <Button
-                aria-label="view changelog"
-                color="inherit"
-                endIcon={<OpenInNewIcon fontSize="inherit" />}
-                component="a"
-                target="_blank"
-                href={latestRelease?.html_url}
-              >
-                View changelog
-              </Button>
-              <IconButton
-                aria-label="close"
-                color="inherit"
-                size="small"
-                onClick={handleDismissClick}
-              >
-                <CloseIcon fontSize="inherit" />
-              </IconButton>
-            </Stack>
-          }
-          severity="info"
-        >
-          A new version <strong>{latestRelease?.tag_name}</strong> of Toolpad is available.
-        </Alert>
-      </Collapse>
+      {process.env.TOOLPAD_TARGET === 'CE' ? (
+        <Collapse in={!hideBanner}>
+          <Alert
+            action={
+              <Stack direction="row" sx={{ gap: 2 }}>
+                <Button
+                  aria-label="update"
+                  color="inherit"
+                  endIcon={<OpenInNewIcon fontSize="inherit" />}
+                  component="a"
+                  target="_blank"
+                  href={DOCUMENTATION_URL}
+                >
+                  Update
+                </Button>
+                <Button
+                  aria-label="view changelog"
+                  color="inherit"
+                  endIcon={<OpenInNewIcon fontSize="inherit" />}
+                  component="a"
+                  target="_blank"
+                  href={latestRelease?.html_url}
+                >
+                  View changelog
+                </Button>
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={handleDismissClick}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              </Stack>
+            }
+            severity="info"
+          >
+            A new version <strong>{latestRelease?.tag_name}</strong> of Toolpad is available.
+          </Alert>
+        </Collapse>
+      ) : null}
     </React.Fragment>
   );
 }
@@ -193,7 +195,7 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
   return (
     <ToolpadShellRoot>
       <Header {...props} />
-      {process.env.TOOLPAD_TARGET === 'CE' ? <UpdateBanner /> : null}
+      <UpdateBanner />
       <ViewPort>{children}</ViewPort>
     </ToolpadShellRoot>
   );

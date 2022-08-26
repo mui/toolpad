@@ -46,6 +46,7 @@ import type { AppMeta } from '../server/data';
 import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import { ConfirmDialog } from '../components/SystemDialogs';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -134,33 +135,27 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
   const latestApp = useLatest(app);
   const deleteAppMutation = client.useMutation('deleteApp');
 
-  const handleDeleteClick = React.useCallback(async () => {
-    if (app) {
-      await deleteAppMutation.mutateAsync([app.id]);
-    }
-    await client.invalidateQueries('getApps');
-    onClose();
-  }, [app, deleteAppMutation, onClose]);
+  const handleClose = React.useCallback(
+    async (confirmed: boolean) => {
+      if (confirmed && app) {
+        await deleteAppMutation.mutateAsync([app.id]);
+        await client.invalidateQueries('getApps');
+      }
+      onClose();
+    },
+    [app, deleteAppMutation, onClose],
+  );
 
   return (
-    <Dialog open={!!app} onClose={onClose}>
-      <DialogTitle>Confirm delete</DialogTitle>
-      <DialogContent>
-        Are you sure you want to delete application &quot;{latestApp?.name}&quot;
-      </DialogContent>
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
-          Cancel
-        </Button>
-        <LoadingButton
-          loading={deleteAppMutation.isLoading}
-          onClick={handleDeleteClick}
-          color="error"
-        >
-          Delete
-        </LoadingButton>
-      </DialogActions>
-    </Dialog>
+    <ConfirmDialog
+      open={!!app}
+      onClose={handleClose}
+      severity="error"
+      okButton="delete"
+      loading={deleteAppMutation.isLoading}
+    >
+      Are you sure you want to delete application &quot;{latestApp?.name}&quot;
+    </ConfirmDialog>
   );
 }
 

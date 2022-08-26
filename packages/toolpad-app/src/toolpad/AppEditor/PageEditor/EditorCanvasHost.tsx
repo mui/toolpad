@@ -134,9 +134,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         // eslint-disable-next-line no-underscore-dangle
       } else if (typeof frameWindow.__TOOLPAD_READY__ !== 'function') {
         // eslint-disable-next-line no-underscore-dangle
-        frameWindow.__TOOLPAD_READY__ = () => {
-          onReadyRef.current?.();
-        };
+        frameWindow.__TOOLPAD_READY__ = () => onReadyRef.current?.();
       }
 
       return () => {

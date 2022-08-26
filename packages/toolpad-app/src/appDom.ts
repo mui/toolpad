@@ -93,9 +93,10 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
   };
   readonly props?: BindableAttrValues<P>;
   readonly layout?: {
+    readonly columnSize?: ConstantAttrValue<number>;
+    readonly height?: ConstantAttrValue<string>;
     readonly horizontalAlign?: ConstantAttrValue<BoxProps['justifyContent']>;
     readonly verticalAlign?: ConstantAttrValue<BoxProps['alignItems']>;
-    readonly columnSize?: ConstantAttrValue<number>;
   };
 }
 

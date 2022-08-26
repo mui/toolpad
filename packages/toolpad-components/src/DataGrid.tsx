@@ -329,7 +329,6 @@ export default createComponent(DataGridComponent, {
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',
-  resizableHeightProp: 'height',
   argTypes: {
     rows: {
       typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' },

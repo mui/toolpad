@@ -6,9 +6,14 @@ export const LAYOUT_DIRECTION_VERTICAL = 'vertical';
 export const LAYOUT_DIRECTION_BOTH = 'both';
 
 export const layoutBoxArgTypes: {
+  height: ArgTypeDefinition<number>;
   horizontalAlign: ArgTypeDefinition<BoxProps['justifyContent']>;
   verticalAlign: ArgTypeDefinition<BoxProps['alignItems']>;
 } = {
+  height: {
+    typeDef: { type: 'string' },
+    defaultValue: 'auto',
+  },
   horizontalAlign: {
     typeDef: {
       type: 'string',

@@ -233,11 +233,6 @@ export interface ComponentConfig<P> {
    */
   layoutDirection?: 'vertical' | 'horizontal' | 'both';
   /**
-   * Designates a property as "the resizable height property". If Toolpad detects any
-   * vertical resizing of the component it will forward it to this property.
-   */
-  resizableHeightProp?: keyof P & string;
-  /**
    * Describes the individual properties for this component
    */
   argTypes: ArgTypeDefinitions<P>;

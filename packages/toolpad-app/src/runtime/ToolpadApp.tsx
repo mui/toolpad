@@ -341,6 +341,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         <Box
           sx={{
             display: 'flex',
+            height: boundLayoutProps.height,
             alignItems: boundLayoutProps.verticalAlign,
             justifyContent: boundLayoutProps.horizontalAlign,
           }}

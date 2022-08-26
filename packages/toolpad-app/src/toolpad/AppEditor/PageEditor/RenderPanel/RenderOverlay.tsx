@@ -48,8 +48,6 @@ const SNAP_TO_GRID_COLUMN_MARGIN = 10; // px
 
 const VERTICAL_RESIZE_SNAP_UNITS = 2; // px
 
-const MIN_RESIZABLE_ELEMENT_HEIGHT = 100; // px
-
 const overlayClasses = {
   hud: 'Toolpad_Hud',
   nodeHud: 'Toolpad_NodeHud',
@@ -1205,7 +1203,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
         if (
           draggedEdge === RECTANGLE_EDGE_BOTTOM &&
-          cursorPos.y > draggedNodeRect.y + MIN_RESIZABLE_ELEMENT_HEIGHT
+          cursorPos.y > draggedNodeRect.y + draggedNodeInnerRect.height
         ) {
           const snappedToGridCursorRelativePosY =
             Math.ceil((cursorPos.y - draggedNodeRect.y) / VERTICAL_RESIZE_SNAP_UNITS) *
@@ -1306,16 +1304,12 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         }
 
         if (draggedEdge === RECTANGLE_EDGE_BOTTOM) {
-          const resizableHeightProp = draggedNodeInfo?.componentConfig?.resizableHeightProp;
-
-          if (resizableHeightProp) {
-            domApi.setNodeNamespacedProp(
-              draggedNode,
-              'props',
-              resizableHeightProp,
-              appDom.createConst(resizePreviewRect.height),
-            );
-          }
+          domApi.setNodeNamespacedProp(
+            draggedNode,
+            'layout',
+            'height',
+            appDom.createConst(String(resizePreviewRect.height)),
+          );
         }
       }
 
@@ -1375,9 +1369,9 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         const isSelected = selectedNode ? selectedNode.id === node.id : false;
         const isInteractive = interactiveNodes.has(node.id) && !draggedEdge;
 
-        const isVerticallyResizable = Boolean(nodeInfo?.componentConfig?.resizableHeightProp);
-
         const isResizing = Boolean(draggedEdge) && node.id === draggedNodeId;
+
+        const isVerticallyResizable = true;
 
         if (!nodeRect) {
           return null;
@@ -1401,9 +1395,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                     : []),
                   ...(isVerticallyResizable ? [RECTANGLE_EDGE_BOTTOM as RectangleEdge] : []),
                 ]}
-                onEdgeDragStart={
-                  isPageRowChild || isVerticallyResizable ? handleEdgeDragStart : undefined
-                }
+                onEdgeDragStart={isPageRowChild ? handleEdgeDragStart : undefined}
                 onDelete={handleNodeDelete(node.id)}
                 isResizing={isResizing}
                 resizePreviewElementRef={resizePreviewElementRef}

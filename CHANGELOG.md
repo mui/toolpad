@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.0.15
+
+<!-- generated comparing v0.0.14..master -->
+
+_Aug 24, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+New Postgres datasource, support mutations.
+
+- &#8203;<!-- 15 -->Support mutations as non-idempotent version of queries (#698) @Janpot
+- &#8203;<!-- 14 -->Verify that the base image exists in the docker release script (#824) @Janpot
+- &#8203;<!-- 13 -->Fix missing key warning (#842) @Janpot
+- &#8203;<!-- 12 -->Tweak release instructions (#829) @bytasv
+- &#8203;<!-- 11 -->Remove obsolete core lib patch (#801) @Janpot
+- &#8203;<!-- 10 -->Debounce code component renderering (#805) @Janpot
+- &#8203;<!-- 09 -->Validate the name when creating code components (#802) @Janpot
+- &#8203;<!-- 08 -->Create postgres dataSource prototype (#811) @Janpot
+- &#8203;<!-- 07 -->Add tooltip to WIP components (#837) @Janpot
+- &#8203;<!-- 06 -->Automatically wrap non-layout components in box containers (#804) @apedroferreira
+- &#8203;<!-- 05 -->Use short ids for dom nodes (#807) @Janpot
+- &#8203;<!-- 04 -->Remove dom duplication (#825) @Janpot
+- &#8203;<!-- 03 -->Use prettier CLI + pretty-quick (#823) @Janpot
+- &#8203;<!-- 02 -->App renaming integration test (#820) @Janpot
+- &#8203;<!-- 01 -->Add hook to ease menu implementation (#821) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot
+
 ## v0.0.14
 
 <!-- generated comparing v0.0.13..master -->

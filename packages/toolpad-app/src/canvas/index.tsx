@@ -104,10 +104,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
       window.__TOOLPAD_BRIDGE__ = bridge;
     }
 
-    return () => {
-      // eslint-disable-next-line no-underscore-dangle
-      delete window.__TOOLPAD_BRIDGE__;
-    };
+    return () => {};
   }, []);
 
   const editorHooks: CanvasHooks = React.useMemo(() => {

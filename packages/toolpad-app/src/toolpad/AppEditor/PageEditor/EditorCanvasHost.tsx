@@ -10,6 +10,7 @@ import * as appDom from '../../../appDom';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
 import { PageViewState } from '../../../types';
 import { ToolpadBridge } from '../../../canvas';
+import useEvent from '../../../utils/useEvent';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -68,19 +69,19 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
     const update = React.useCallback(() => {
-      const renderDom = appDom.createRenderTree(dom);
-      bridge?.update({ appId, dom: renderDom });
+      if (bridge) {
+        const renderDom = appDom.createRenderTree(dom);
+        bridge.update({ appId, dom: renderDom });
+      }
     }, [appId, dom, bridge]);
+
     React.useEffect(() => update(), [update]);
 
-    const onReady = React.useCallback(() => {
-      update();
-    }, [update]);
-
-    const onReadyRef = React.useRef(onReady);
-    React.useEffect(() => {
-      onReadyRef.current = onReady;
-    }, [onReady]);
+    const handleInit = useEvent((newBridge: ToolpadBridge) => {
+      setBridge(newBridge);
+      const renderDom = appDom.createRenderTree(dom);
+      newBridge.update({ appId, dom: renderDom });
+    });
 
     React.useEffect(() => {
       const frameWindow = frameRef.current?.contentWindow;
@@ -89,17 +90,15 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       // eslint-disable-next-line no-underscore-dangle
       if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'object') {
         // eslint-disable-next-line no-underscore-dangle
-        setBridge(frameWindow.__TOOLPAD_BRIDGE__);
-        onReadyRef.current?.();
+        handleInit(frameWindow.__TOOLPAD_BRIDGE__);
         // eslint-disable-next-line no-underscore-dangle
       } else if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'undefined') {
         // eslint-disable-next-line no-underscore-dangle
         frameWindow.__TOOLPAD_BRIDGE__ = (newBridge: ToolpadBridge) => {
-          setBridge(newBridge);
-          onReadyRef.current?.();
+          handleInit(newBridge);
         };
       }
-    }, []);
+    }, [handleInit]);
 
     const [contentWindow, setContentWindow] = React.useState<Window | null>(null);
     const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);

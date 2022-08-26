@@ -859,6 +859,7 @@ export type RenderTreeNodes = Record<NodeId, RenderTreeNode>;
 export interface RenderTree {
   root: NodeId;
   nodes: RenderTreeNodes;
+  version: number;
 }
 
 /**

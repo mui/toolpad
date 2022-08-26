@@ -94,26 +94,31 @@ function wrapConsole(targetConsole: Console, onEntry: (entry: LogEntry) => void)
 
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   function EditorCanvasHost(
-    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent, onConsoleEntry },
+    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent = () => {}, onConsoleEntry },
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
 
     const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
-    const update = React.useCallback(() => {
-      if (bridge) {
+    const updateOnBridge = React.useCallback(
+      (bridgeInstance: ToolpadBridge) => {
         const renderDom = appDom.createRenderTree(dom);
-        bridge.update({ appId, dom: renderDom });
-      }
-    }, [appId, dom, bridge]);
+        bridgeInstance.update({ appId, dom: renderDom });
+      },
+      [appId, dom],
+    );
 
-    React.useEffect(() => update(), [update]);
+    React.useEffect(() => {
+      if (bridge) {
+        // Update every time dom prop updates
+        updateOnBridge(bridge);
+      }
+    }, [updateOnBridge, bridge]);
 
     const handleInit = useEvent((newBridge: ToolpadBridge) => {
       setBridge(newBridge);
-      const renderDom = appDom.createRenderTree(dom);
-      newBridge.update({ appId, dom: renderDom });
+      updateOnBridge(newBridge);
     });
 
     const onConsoleEntryRef = React.useRef(onConsoleEntry);
@@ -167,18 +172,16 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       [bridge],
     );
 
-    const handleRuntimeEventRef = React.useRef(onRuntimeEvent);
-    React.useEffect(() => {
-      handleRuntimeEventRef.current = onRuntimeEvent;
-    }, [onRuntimeEvent]);
+    const handleRuntimeEvent = useEvent(onRuntimeEvent);
 
     const handleFrameLoad = React.useCallback(() => {
-      setContentWindow(frameRef.current?.contentWindow || null);
+      invariant(frameRef.current, 'Iframe ref not attached');
+      setContentWindow(frameRef.current.contentWindow);
     }, []);
 
     React.useEffect(() => {
       if (!contentWindow) {
-        return () => {};
+        return undefined;
       }
 
       const observer = new MutationObserver(() => {
@@ -190,15 +193,18 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         childList: true,
       });
 
-      const cleanupHandler = setEventHandler(contentWindow, (event) =>
-        handleRuntimeEventRef.current?.(event),
-      );
-
       return () => {
         observer.disconnect();
-        cleanupHandler();
       };
     }, [contentWindow]);
+
+    React.useEffect(() => {
+      if (!contentWindow) {
+        return undefined;
+      }
+
+      return setEventHandler(contentWindow, handleRuntimeEvent);
+    }, [handleRuntimeEvent, contentWindow]);
 
     return (
       <CanvasRoot className={className}>

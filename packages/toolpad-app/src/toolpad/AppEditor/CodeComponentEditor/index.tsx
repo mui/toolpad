@@ -63,7 +63,7 @@ function PropertiesEditor({ argTypes, value, onChange }: PropertiesEditorProps) 
       {Object.entries(argTypes).map(([name, argType]) => {
         invariant(argType, 'argType not defined');
         return (
-          <ErrorBoundary fallback={<div>{name}</div>} resetKeys={[argType]}>
+          <ErrorBoundary key={name} fallback={<div>{name}</div>} resetKeys={[argType]}>
             <PropertyEditor
               name={name}
               argType={argType}

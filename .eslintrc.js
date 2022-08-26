@@ -53,10 +53,13 @@ module.exports = {
           "Please use `condition ? <Jsx /> : null`. Otherwise, there is a chance of rendering '0' instead of '' in some cases. Context: https://stackoverflow.com/q/53048037",
       },
     ],
+    // Turning react/jsx-key back on.
+    // https://github.com/airbnb/javascript/blob/5155aa5fc1ea9bb2c6493a06ddbd5c7a05414c86/packages/eslint-config-airbnb/rules/react.js#L94
+    'react/jsx-key': ['error', { checkKeyMustBeforeSpread: true, warnOnDuplicates: true }],
   },
   overrides: [
     {
-      files: ['./packages/toolpad-app/**/*'],
+      files: ['packages/toolpad-app/**/*'],
       extends: ['plugin:@next/next/recommended'],
       rules: {
         '@next/next/no-html-link-for-pages': ['error', 'packages/toolpad-app/pages/'],

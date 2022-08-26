@@ -11,6 +11,7 @@ import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
 import { PageViewState } from '../../../types';
 import { ToolpadBridge } from '../../../canvas';
 import useEvent from '../../../utils/useEvent';
+import { LogEntry } from '../../../components/Console';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -44,6 +45,7 @@ export interface EditorCanvasHostProps {
   pageNodeId: NodeId;
   dom: appDom.AppDom;
   onRuntimeEvent?: (event: RuntimeEvent) => void;
+  onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
 }
 
@@ -59,9 +61,37 @@ const CanvasFrame = styled('iframe')({
   height: '100%',
 });
 
+function wrapConsoleMethod<A extends any[]>(
+  level: string,
+  method: (...args: A) => void,
+  onEntry: (entry: LogEntry) => void,
+): (...args: A) => void {
+  return new Proxy(method, {
+    apply(target, thisArg, args: A) {
+      onEntry({ level, timestamp: Date.now(), args });
+      return target.apply(thisArg, args);
+    },
+  });
+}
+
+function wrapConsole(targetConsole: Console, onEntry: (entry: LogEntry) => void): Console {
+  const wrapped = new Map<PropertyKey, any>([
+    ['log', wrapConsoleMethod('log', targetConsole.log, onEntry)],
+    ['info', wrapConsoleMethod('info', targetConsole.info, onEntry)],
+    ['warn', wrapConsoleMethod('warn', targetConsole.warn, onEntry)],
+    ['error', wrapConsoleMethod('error', targetConsole.error, onEntry)],
+    ['debug', wrapConsoleMethod('debug', targetConsole.debug, onEntry)],
+  ]);
+  return new Proxy(targetConsole, {
+    get(target, property, receiver) {
+      return wrapped.get(property) || Reflect.get(target, property, receiver);
+    },
+  });
+}
+
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   function EditorCanvasHost(
-    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent },
+    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent, onConsoleEntry },
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
@@ -83,9 +113,22 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       newBridge.update({ appId, dom: renderDom });
     });
 
+    const onConsoleEntryRef = React.useRef(onConsoleEntry);
+    React.useLayoutEffect(() => {
+      onConsoleEntryRef.current = onConsoleEntry;
+    });
+
     React.useEffect(() => {
-      const frameWindow = frameRef.current?.contentWindow;
-      invariant(frameWindow, 'frameRef not atached');
+      const frameWindow = frameRef.current?.contentWindow as
+        | (Window & typeof globalThis)
+        | undefined
+        | null;
+      invariant(frameWindow, 'Iframe ref not attached');
+
+      const originalConsole: Console = frameWindow.console;
+      frameWindow.console = wrapConsole(originalConsole, (entry: LogEntry) =>
+        onConsoleEntryRef.current?.(entry),
+      );
 
       // eslint-disable-next-line no-underscore-dangle
       if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'object') {
@@ -98,6 +141,10 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
           handleInit(newBridge);
         };
       }
+
+      return () => {
+        frameWindow.console = originalConsole;
+      };
     }, [handleInit]);
 
     const [contentWindow, setContentWindow] = React.useState<Window | null>(null);

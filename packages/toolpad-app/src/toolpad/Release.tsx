@@ -7,10 +7,6 @@ import {
   Breadcrumbs,
   Link as MuiLink,
   Stack,
-  Dialog,
-  DialogTitle,
-  DialogActions,
-  DialogContent,
 } from '@mui/material';
 import * as React from 'react';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -21,6 +17,7 @@ import ToolpadAppShell from './ToolpadAppShell';
 import DefinitionList from '../components/DefinitionList';
 import useLatest from '../utils/useLatest';
 import useDialog from '../utils/useDialog';
+import { ConfirmDialog } from '../components/SystemDialogs';
 
 function getDeploymentStatusMessage(version: number, activeVersion?: number): React.ReactNode {
   if (typeof activeVersion === 'undefined') {
@@ -48,29 +45,14 @@ interface ConfirmDeployDialogProps {
 }
 
 function ConfirmDeployDialog({ open, onClose, data: dataProp }: ConfirmDeployDialogProps) {
-  const cancel = () => onClose(false);
-
   const data = useLatest(dataProp);
 
-  if (!data) {
-    return null;
-  }
-
-  return (
-    <Dialog open={open} onClose={cancel}>
-      <DialogTitle>Confirm deploy</DialogTitle>
-      <DialogContent>
-        Press &quot;Deploy&quot; to change the canonical URL of your application to
-        version&nbsp;&quot;{data.version}&quot;.
-      </DialogContent>
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={cancel}>
-          Cancel
-        </Button>
-        <Button onClick={() => onClose(true)}>Deploy</Button>
-      </DialogActions>
-    </Dialog>
-  );
+  return data ? (
+    <ConfirmDialog open={open} onClose={onClose} okButton="deploy">
+      Press &quot;Deploy&quot; to change the canonical URL of your application to
+      version&nbsp;&quot;{data.version}&quot;.
+    </ConfirmDialog>
+  ) : null;
 }
 
 interface ActiveReleaseMessageProps {

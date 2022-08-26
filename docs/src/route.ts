@@ -1,5 +1,6 @@
 const ROUTES = {
   toolpadDocs: '/toolpad/getting-started/setup',
+  toolpadUpvote: 'https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D',
   // https://docs.netlify.com/site-deploys/overview/#deploy-contexts
   TOOLPAD_SIGN_UP_URL:
     process.env.CONTEXT !== 'production' || process.env.NODE_ENV !== 'production'

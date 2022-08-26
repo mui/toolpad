@@ -323,9 +323,10 @@ interface AppCardProps {
   app?: AppMeta;
   activeDeployment?: Deployment;
   onDelete?: () => void;
+  onDuplicate?: () => void;
 }
 
-function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
+function AppCard({ app, activeDeployment, onDelete, onDuplicate }: AppCardProps) {
   const [editingName, setEditingName] = React.useState<boolean>(false);
 
   const handleRename = React.useCallback(() => {
@@ -344,7 +345,9 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         }}
       >
         <CardHeader
-          action={<AppOptions onRename={handleRename} onDelete={onDelete} />}
+          action={
+            <AppOptions onRename={handleRename} onDelete={onDelete} onDuplicate={onDuplicate} />
+          }
           disableTypography
           subheader={
             <Typography variant="body2" color="text.secondary">
@@ -379,9 +382,10 @@ interface AppRowProps {
   app?: AppMeta;
   activeDeployment?: Deployment;
   onDelete?: () => void;
+  onDuplicate?: () => void;
 }
 
-function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
+function AppRow({ app, activeDeployment, onDelete, onDuplicate }: AppRowProps) {
   const [editingName, setEditingName] = React.useState<boolean>(false);
 
   const handleRename = React.useCallback(() => {
@@ -406,7 +410,7 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
           <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
             <AppEditButton app={app} />
             <AppOpenButton app={app} activeDeployment={activeDeployment} />
-            <AppOptions onRename={handleRename} onDelete={onDelete} />
+            <AppOptions onRename={handleRename} onDelete={onDelete} onDuplicate={onDuplicate} />
           </Stack>
         </TableCell>
       </TableRow>
@@ -414,15 +418,21 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
   );
 }
 
-interface AppViewProps {
+interface AppsViewProps {
   apps: AppMeta[];
   loading?: boolean;
   activeDeploymentsByApp: { [appId: string]: Deployment } | null;
   setDeletedApp: (app: AppMeta) => void;
-  onDuplicate: (app: AppMeta) => void;
+  duplicateApp: (app: AppMeta) => void;
 }
 
-function AppsGridView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: AppViewProps) {
+function AppsGridView({
+  loading,
+  apps,
+  activeDeploymentsByApp,
+  setDeletedApp,
+  duplicateApp,
+}: AppsViewProps) {
   return (
     <Box
       sx={{
@@ -451,6 +461,7 @@ function AppsGridView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: 
               app={app}
               activeDeployment={activeDeployment}
               onDelete={() => setDeletedApp(app)}
+              onDuplicate={() => duplicateApp(app)}
             />
           );
         });
@@ -459,7 +470,13 @@ function AppsGridView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: 
   );
 }
 
-function AppsListView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: AppViewProps) {
+function AppsListView({
+  loading,
+  apps,
+  activeDeploymentsByApp,
+  setDeletedApp,
+  duplicateApp,
+}: AppsViewProps) {
   return (
     <Table aria-label="apps list" size="medium">
       <TableBody>
@@ -482,6 +499,7 @@ function AppsListView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: 
                 app={app}
                 activeDeployment={activeDeployment}
                 onDelete={() => setDeletedApp(app)}
+                onDuplicate={() => duplicateApp(app)}
               />
             );
           });
@@ -494,7 +512,6 @@ function AppsListView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: 
 export default function Home() {
   const { data: apps = [], isLoading, error } = client.useQuery('getApps', []);
   const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);
-  const duplicateAppMutation = client.useMutation('duplicateApp');
 
   const activeDeploymentsByApp = React.useMemo(() => {
     if (!activeDeployments) {
@@ -517,6 +534,18 @@ export default function Home() {
   );
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
+
+  const duplicateAppMutation = client.useMutation('duplicateApp');
+
+  const duplicateApp = React.useCallback(
+    async (app: AppMeta) => {
+      if (app) {
+        await duplicateAppMutation.mutateAsync([app.id]);
+      }
+      await client.invalidateQueries('getApps');
+    },
+    [duplicateAppMutation],
+  );
 
   return (
     <ToolpadShell>
@@ -556,9 +585,7 @@ export default function Home() {
             loading={isLoading}
             activeDeploymentsByApp={activeDeploymentsByApp}
             setDeletedApp={setDeletedApp}
-            onDuplicate={(app: AppMeta) => {
-              duplicateAppMutation.mutateAsync([app.id]);
-            }}
+            duplicateApp={duplicateApp}
           />
         )}
       </Container>

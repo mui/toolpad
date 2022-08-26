@@ -448,7 +448,7 @@ export async function duplicateApp(id: string): Promise<App> {
   if (!app) {
     throw new Error(`App "${id}" not found`);
   }
-  const dom = await loadRenderTree(id);
-  const newApp = await createApp(app.name, { dom });
+  const dom = await loadPreviewDom(id);
+  const newApp = await createApp(`${app.name} (copy)`, { dom });
   return newApp;
 }

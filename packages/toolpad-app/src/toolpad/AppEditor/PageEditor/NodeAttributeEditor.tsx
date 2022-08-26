@@ -40,7 +40,7 @@ export default function NodeAttributeEditor({
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
   // to make them bindable to other controlled props only
-  const isBindable = !argType.onChangeHandler;
+  const isBindable = !argType.onChangeHandler && namespace !== 'layout';
 
   return Control ? (
     <BindableEditor

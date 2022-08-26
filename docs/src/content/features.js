@@ -10,7 +10,7 @@ import FastForwardIcon from '@mui/icons-material/FastForward';
 import EditIcon from '@mui/icons-material/Edit';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import Typography from '@mui/material/Typography';
-import GradientText from '../components/landing/GradientText';
+import GradientText from 'docs/src/components/typography/GradientText';
 
 const features = {
   overline: 'Features',

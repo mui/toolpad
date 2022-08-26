@@ -80,9 +80,9 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
               />
             </div>
           ) : null}
+          <Divider sx={{ mt: 1 }} />
         </React.Fragment>
       ) : null}
-      <Divider sx={{ mt: 1 }} />
       <Typography variant="overline" className={classes.sectionHeading}>
         Properties:
       </Typography>

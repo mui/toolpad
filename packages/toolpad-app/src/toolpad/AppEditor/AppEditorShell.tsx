@@ -102,6 +102,16 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
   );
 }
 
+function getSaveStateMessage(isSaving: boolean, hasUnsavedChanges: boolean): string {
+  if (isSaving) {
+    return 'Saving changes...';
+  }
+  if (hasUnsavedChanges) {
+    return 'You have unsaved changes.';
+  }
+  return 'All changes saved!';
+}
+
 export interface ToolpadAppShellProps {
   appId: string;
   actions?: React.ReactNode;
@@ -111,6 +121,8 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
   const domLoader = useDomLoader();
 
   const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
+
+  const hasUnsavedChanges = domLoader.unsavedChanges > 0;
 
   return (
     <ToolpadAppShell
@@ -122,7 +134,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
               <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
             </Box>
           ) : null}
-          <Typography>{domLoader.unsavedChanges} unsaved change(s).</Typography>
+          <Typography>{getSaveStateMessage(domLoader.saving, hasUnsavedChanges)}</Typography>
           <IconButton
             aria-label="Create release"
             color="inherit"

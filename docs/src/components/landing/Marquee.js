@@ -19,7 +19,7 @@ const Marquee = ({ content }) => {
       }}
     >
       <Typography
-        color={'grey.50'}
+        color="grey.50"
         textAlign="center"
         variant="h2"
         sx={{

@@ -7,7 +7,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Link from 'docs/src/modules/components/Link';
 import IconImage from 'docs/src/components/icon/IconImage';
 import LaunchRounded from '@mui/icons-material/LaunchRounded';
-import GradientText from '../components/landing/GradientText';
+import GradientText from 'docs/src/components/typography/GradientText';
 
 const ColumnHead = ({ label, metadata, tooltip, nested = false, href }) => {
   const text = (

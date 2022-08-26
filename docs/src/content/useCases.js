@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
-import GradientText from '../components/landing/GradientText';
+import GradientText from 'docs/src/components/typography/GradientText';
 
 const useCases = {
   overline: 'Use cases',

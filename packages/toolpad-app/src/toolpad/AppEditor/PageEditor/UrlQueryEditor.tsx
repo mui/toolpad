@@ -24,7 +24,11 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
-  const { value: dialogOpen, set: handleDialogOpen, reset: handleDialogClose } = useBoolean(false);
+  const {
+    value: dialogOpen,
+    setTrue: handleDialogOpen,
+    setFalse: handleDialogClose,
+  } = useBoolean(false);
 
   const value = page.attributes.parameters?.value;
   const [input, setInput] = React.useState(value);

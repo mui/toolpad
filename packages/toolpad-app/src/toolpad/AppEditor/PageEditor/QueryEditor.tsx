@@ -62,8 +62,8 @@ function QueryeditorDialogActions({
 
   const {
     value: removeConfirmOpen,
-    set: handleRemoveConfirmOpen,
-    reset: handleRemoveConfirmclose,
+    setTrue: handleRemoveConfirmOpen,
+    setFalse: handleRemoveConfirmclose,
   } = useBoolean(false);
 
   const handleRemoveConfirm = React.useCallback(

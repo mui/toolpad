@@ -12,6 +12,9 @@ import { PageViewState } from '../../../types';
 import { ToolpadBridge } from '../../../canvas';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
+import { Maybe } from '../../../utils/types';
+
+type IframeContentWindow = Window & typeof globalThis;
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -119,10 +122,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     });
 
     React.useEffect(() => {
-      const frameWindow = frameRef.current?.contentWindow as
-        | (Window & typeof globalThis)
-        | undefined
-        | null;
+      const frameWindow = frameRef.current?.contentWindow as Maybe<IframeContentWindow>;
       invariant(frameWindow, 'Iframe ref not attached');
 
       const originalConsole: Console = frameWindow.console;

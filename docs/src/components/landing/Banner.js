@@ -29,14 +29,14 @@ export default function Banner(props) {
           alignItems: { xs: 'flex-start', sm: 'center' },
         }}
       >
-        <Box>
+        <div>
           <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
             {content?.title}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 700 }}>
             {content?.description}
           </Typography>
-        </Box>
+        </div>
         <Button
           component={Link}
           noLinkStyle

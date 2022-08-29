@@ -150,10 +150,6 @@ jobs:
     steps:
       - checkout
 
-      # login docker hub
-      - run: |
-          echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
-
       # build the application image
       - run: |
           docker build \
@@ -186,6 +182,10 @@ jobs:
           condition:
             equal: [master, << pipeline.git.branch >>]
           steps:
+            # login docker hub
+            - run: |
+                echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+
             - run: |
                 docker push muicom/toolpad:$CIRCLE_SHA1
                 docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha

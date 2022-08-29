@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+/**
+ * Returns true when serverside rendering, or when hydrating.
+ */
 export function useIsSsr(defer: boolean = false): boolean {
   const isSsrInitialValue = React.useSyncExternalStore(
     () => () => {},

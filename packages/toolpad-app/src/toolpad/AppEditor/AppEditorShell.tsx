@@ -121,8 +121,31 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
   const domLoader = useDomLoader();
 
   const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
+  const [isSaveStateVisible, setIsSaveStateVisible] = React.useState(false);
 
   const hasUnsavedChanges = domLoader.unsavedChanges > 0;
+
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+
+    if (!hasUnsavedChanges) {
+      timeout = setTimeout(() => {
+        setIsSaveStateVisible(false);
+
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+      }, 4000);
+    } else {
+      setIsSaveStateVisible(true);
+    }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [hasUnsavedChanges]);
 
   return (
     <ToolpadAppShell
@@ -134,7 +157,9 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
               <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
             </Box>
           ) : null}
-          <Typography>{getSaveStateMessage(domLoader.saving, hasUnsavedChanges)}</Typography>
+          {isSaveStateVisible ? (
+            <Typography>{getSaveStateMessage(domLoader.saving, hasUnsavedChanges)}</Typography>
+          ) : null}
           <IconButton
             aria-label="Create release"
             color="inherit"

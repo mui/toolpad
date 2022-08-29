@@ -140,6 +140,37 @@ export function getRelativeOuterRect(containerElm: Element, childElm: Element): 
   };
 }
 
+export function getContainerInnerRect(containerElm: Element): Rectangle {
+  const containerElmChildren = containerElm.children;
+  const containerChildRects = [...containerElmChildren].map((child) =>
+    child.getBoundingClientRect(),
+  );
+  const containerChildCorners = containerChildRects
+    .map((rect) => [
+      {
+        x: rect.x,
+        y: rect.y,
+      },
+      {
+        x: rect.x + rect.width,
+        y: rect.y + rect.height,
+      },
+    ])
+    .flat();
+
+  const minX = Math.min(...containerChildCorners.map((corner) => corner.x));
+  const minY = Math.min(...containerChildCorners.map((corner) => corner.y));
+  const maxX = Math.max(...containerChildCorners.map((corner) => corner.x));
+  const maxY = Math.max(...containerChildCorners.map((corner) => corner.y));
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+}
+
 export function rectContainsPoint(rect: Rectangle, x: number, y: number): boolean {
   return rect.x <= x && rect.x + rect.width >= x && rect.y <= y && rect.y + rect.height >= y;
 }

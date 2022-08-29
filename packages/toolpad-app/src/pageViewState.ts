@@ -1,9 +1,12 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType } from '@mui/toolpad-core';
 import { NodeFiberHostProps } from '@mui/toolpad-core/runtime';
-import invariant from 'invariant';
 import { PageViewState, NodesInfo, NodeInfo, FlowDirection } from './types';
-import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
+import {
+  getContainerInnerRect,
+  getRelativeBoundingRect,
+  getRelativeOuterRect,
+} from './utils/geometry';
 
 declare global {
   interface Window {
@@ -20,11 +23,8 @@ function getNodeViewInfo(
 ): NodeInfo | null {
   if (nodeId) {
     const rect = getRelativeOuterRect(viewElm, elm);
+    const innerRect = getContainerInnerRect(elm);
     const props = fiber.child?.memoizedProps ?? {};
-
-    const innerElm = elm.firstElementChild;
-    invariant(innerElm, 'Node has no inner element');
-    const innerRect = getRelativeOuterRect(viewElm, innerElm);
 
     return {
       nodeId,

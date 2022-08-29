@@ -31,21 +31,21 @@ export default function Banner(props) {
       >
         <div>
           <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
-            {content?.title}
+            {content.title}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 700 }}>
-            {content?.description}
+            {content.description}
           </Typography>
         </div>
         <Button
           component={Link}
           noLinkStyle
           data-ga-event-category="ToolpadLanding"
-          data-ga-event-label={content?.action?.label}
+          data-ga-event-label={content.action.label}
           data-ga-event-action="Upvote"
           target="_blank"
           rel="noopener"
-          href={content?.action?.href}
+          href={content.action.href}
           variant="contained"
           fullWidth
           endIcon={<KeyboardArrowRightRounded />}
@@ -56,7 +56,7 @@ export default function Banner(props) {
             width: { xs: '100%', sm: '50%', md: '15%' },
           }}
         >
-          {content?.action?.label}
+          {content.action.label}
         </Button>
       </Stack>
     </Container>
@@ -68,8 +68,8 @@ Banner.propTypes = {
     action: PropTypes.shape({
       href: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
-    }),
+    }).isRequired,
     description: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
-  }),
+  }).isRequired,
 };

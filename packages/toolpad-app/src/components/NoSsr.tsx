@@ -1,12 +1,12 @@
 import * as React from 'react';
 
-const subscribe = () => () => {};
-const getSnapshot = () => false;
-const getServerSnapshot = () => true;
-
 export function useIsSsr(defer: boolean = false): boolean {
-  const isSsrDefault = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const [isSsr, setIsSsr] = React.useState(defer ? true : isSsrDefault);
+  const isSsrInitialValue = React.useSyncExternalStore(
+    () => () => {},
+    () => false,
+    () => true,
+  );
+  const [isSsr, setIsSsr] = React.useState(defer ? true : isSsrInitialValue);
   React.useEffect(() => setIsSsr(false), []);
   return isSsr;
 }

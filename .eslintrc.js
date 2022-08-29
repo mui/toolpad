@@ -65,7 +65,6 @@ module.exports = {
         '@next/next/no-html-link-for-pages': ['error', 'packages/toolpad-app/pages/'],
       },
     },
-    ...baseline.overrides,
     {
       // Disabling this rule for now:
       // https://github.com/mui/material-ui/blob/9737bc85bb6960adb742e7709e9c3710c4b6cedd/.eslintrc.js#L359

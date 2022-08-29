@@ -6,7 +6,7 @@ const pages: MuiPage[] = [
     title: 'Getting started',
     icon: 'DescriptionIcon',
     children: [
-      { pathname: '/toolpad/getting-started/introduction/', title: 'Introduction' },
+      { pathname: '/toolpad/getting-started/introduction', title: 'Introduction' },
       { pathname: '/toolpad/getting-started/quickstart/', title: 'Quickstart' },
     ],
   },

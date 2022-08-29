@@ -83,8 +83,6 @@ module.exports = withTM({
     LIB_VERSION: pkg.version,
     REACT_STRICT_MODE: reactStrictMode,
     FEEDBACK_URL: process.env.FEEDBACK_URL,
-    // Set by Netlify
-    GRID_EXPERIMENTAL_ENABLED: process.env.PULL_REQUEST === 'false' ? 'false' : 'true',
     // #default-branch-switch
     SOURCE_CODE_ROOT_URL: 'https://github.com/mui/mui-toolpad/blob/master',
     SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',

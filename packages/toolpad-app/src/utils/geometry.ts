@@ -158,10 +158,13 @@ export function getContainerInnerRect(containerElm: Element): Rectangle {
     ])
     .flat();
 
-  const minX = Math.min(...containerChildCorners.map((corner) => corner.x));
-  const minY = Math.min(...containerChildCorners.map((corner) => corner.y));
-  const maxX = Math.max(...containerChildCorners.map((corner) => corner.x));
-  const maxY = Math.max(...containerChildCorners.map((corner) => corner.y));
+  const cornerXs = containerChildCorners.map((corner) => corner.x);
+  const cornerYs = containerChildCorners.map((corner) => corner.y);
+
+  const minX = Math.min(...cornerXs);
+  const minY = Math.min(...cornerYs);
+  const maxX = Math.max(...cornerXs);
+  const maxY = Math.max(...cornerYs);
 
   return {
     x: minX,

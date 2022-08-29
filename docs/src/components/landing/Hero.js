@@ -42,8 +42,10 @@ export default function Hero() {
           internal tools 10x faster. Open-source and powered by MUI.
         </Typography>
         <Typography
+          component="label"
           color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
-          sx={{ fontWeight: 700, mb: 2, mx: 'auto' }}
+          sx={{ fontWeight: 'bold', display: 'block', mb: 2, mx: 'auto' }}
+          htmlFor="email-landing"
         >
           Sign up for early access to the beta release.
         </Typography>

@@ -61,7 +61,7 @@ function getBrowsersideRuntimeConfig(): RuntimeConfig {
   return maybeRuntimeConfig;
 }
 
-export const runtimeConfig: RuntimeConfig =
+const runtimeConfig: RuntimeConfig =
   typeof window === 'undefined'
     ? {
         // Define runtime config here

@@ -14,7 +14,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { Outlet, useNavigate } from 'react-router-dom';
@@ -161,7 +161,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
                 {isSaving ? (
                   <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
                 ) : (
-                  <CheckCircleIcon
+                  <CloudDoneIcon
                     color={hasUnsavedChanges ? 'disabled' : 'success'}
                     fontSize="medium"
                   />

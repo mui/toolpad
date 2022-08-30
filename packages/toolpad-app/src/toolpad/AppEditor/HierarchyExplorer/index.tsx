@@ -27,10 +27,20 @@ type StyledTreeItemProps = TreeItemProps & {
   onCreate?: React.MouseEventHandler;
   labelIcon?: React.ReactNode;
   labelText: string;
+  createLabelText?: string;
+  deleteLabelText?: string;
 };
 
 function HierarchyTreeItem(props: StyledTreeItemProps) {
-  const { labelIcon, labelText, onCreate, onDelete, ...other } = props;
+  const {
+    labelIcon,
+    labelText,
+    onCreate,
+    onDelete,
+    createLabelText = `Create ${labelText}`,
+    deleteLabelText = `Delete ${labelText}`,
+    ...other
+  } = props;
 
   return (
     <TreeItem
@@ -41,12 +51,12 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
             {labelText}
           </Typography>
           {onCreate ? (
-            <IconButton aria-label={`Create ${labelText}`} onClick={onCreate}>
+            <IconButton aria-label={createLabelText} onClick={onCreate}>
               <AddIcon />
             </IconButton>
           ) : null}
           {onDelete ? (
-            <IconButton aria-label={`Delete ${labelText}`} onClick={onDelete}>
+            <IconButton aria-label={deleteLabelText} onClick={onDelete}>
               <DeleteIcon />
             </IconButton>
           ) : null}
@@ -226,6 +236,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         <HierarchyTreeItem
           nodeId=":connections"
           labelText="Connections"
+          createLabelText="Create connection"
+          deleteLabelText="Delete connection"
           onCreate={handleCreateConnectionDialogOpen}
         >
           {connections.map((connectionNode) => (
@@ -240,6 +252,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         <HierarchyTreeItem
           nodeId=":codeComponents"
           labelText="Components"
+          createLabelText="Create component"
+          deleteLabelText="Delete component"
           onCreate={handleCreateCodeComponentDialogOpen}
         >
           {codeComponents.map((codeComponent) => (
@@ -251,7 +265,13 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             />
           ))}
         </HierarchyTreeItem>
-        <HierarchyTreeItem nodeId=":pages" labelText="Pages" onCreate={handleCreatePageDialogOpen}>
+        <HierarchyTreeItem
+          nodeId=":pages"
+          labelText="Pages"
+          createLabelText="Create page"
+          deleteLabelText="Delete page"
+          onCreate={handleCreatePageDialogOpen}
+        >
           {pages.map((page) => (
             <HierarchyTreeItem
               key={page.id}

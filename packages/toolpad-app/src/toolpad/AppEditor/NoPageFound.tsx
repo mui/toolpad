@@ -7,11 +7,12 @@ export interface NoPageFoundProps {
 }
 export default function NoPageFound({ appId }: NoPageFoundProps) {
   const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
-  const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreatePageDialogOpen(Math.random());
-  }, []);
+  const handleCreatePageDialogOpen = React.useCallback(
+    () => setCreatePageDialogOpen(Math.random()),
+    [],
+  );
   const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
+
   return (
     <Grid
       container

@@ -9,11 +9,12 @@ export interface SelectOption {
 
 export type SelectProps = TextFieldProps & {
   options: (string | SelectOption)[];
+  width: number;
 };
 
-function Select({ sx, options, ...rest }: SelectProps) {
+function Select({ options, width, sx, ...rest }: SelectProps) {
   return (
-    <TextField select sx={{ minWidth: 120, ...sx }} {...rest}>
+    <TextField select sx={{ width, ...sx }} {...rest}>
       {options.map((option) => {
         const parsedOption: SelectOption = typeof option === 'string' ? { value: option } : option;
         return (
@@ -45,6 +46,11 @@ export default createComponent(Select, {
     label: {
       typeDef: { type: 'string' },
       defaultValue: '',
+    },
+    width: {
+      typeDef: { type: 'number' },
+      defaultValue: 120,
+      minValue: 120,
     },
     variant: {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },

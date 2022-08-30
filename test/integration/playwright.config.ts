@@ -8,6 +8,7 @@ const config: PlaywrightTestConfig = {
     trace: 'on-first-retry',
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000/',
   },
+  timeout: 60000,
   globalSetup: '../playwright/global-setup',
   globalTeardown: '../playwright/global-teardown',
   projects: [

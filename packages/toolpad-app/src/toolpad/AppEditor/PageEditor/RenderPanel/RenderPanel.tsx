@@ -2,9 +2,9 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { RuntimeEvent, NodeId } from '@mui/toolpad-core';
 import { useNavigate } from 'react-router-dom';
+import invariant from 'invariant';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost, { EditorCanvasHostHandle } from '../EditorCanvasHost';
-import { getPageViewState } from '../../../../pageViewState';
 import { useDom, useDomApi } from '../../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
@@ -33,16 +33,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const { appId, nodeId: pageNodeId } = usePageEditorState();
 
   const canvasHostRef = React.useRef<EditorCanvasHostHandle>(null);
-
-  const handlePageViewStateUpdate = React.useCallback(() => {
-    const rootElm = canvasHostRef.current?.getRootElm();
-
-    if (!rootElm) {
-      return;
-    }
-
-    api.pageViewStateUpdate(getPageViewState(rootElm));
-  }, [api]);
 
   const navigate = useNavigate();
 
@@ -74,7 +64,10 @@ export default function RenderPanel({ className }: RenderPanelProps) {
           api.pageBindingsUpdate(event.bindings);
           return;
         }
-        case 'afterRender': {
+        case 'screenUpdate': {
+          invariant(canvasHostRef.current, 'canvas ref not attached');
+          const pageViewState = canvasHostRef.current?.getPageViewState();
+          api.pageViewStateUpdate(pageViewState);
           return;
         }
         case 'pageNavigationRequest': {
@@ -99,7 +92,6 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         dom={dom}
         pageNodeId={pageNodeId}
         onRuntimeEvent={handleRuntimeEvent}
-        onScreenUpdate={handlePageViewStateUpdate}
         overlay={<RenderOverlay canvasHostRef={canvasHostRef} />}
       />
     </RenderPanelRoot>

@@ -2,7 +2,8 @@
   "compilerOptions": {
     "paths": {
       // TODO: remove when we move to typescript 4.7 (supports package exports)
-      "@mui/toolpad-core/runtime": ["../toolpad-core/dist/runtime"]
+      "@mui/toolpad-core/runtime": ["../toolpad-core/dist/runtime"],
+      "@mui/toolpad-core/objectKey": ["../toolpad-core/dist/objectKey"]
     },
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],

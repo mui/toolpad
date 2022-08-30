@@ -13,11 +13,7 @@ export function createProvidedContext<T>(
     return maybeContext;
   };
 
-  const Provider = ({ value, ...props }: React.ProviderProps<T>) => {
-    return <context.Provider value={value} {...props} />;
-  };
-
-  return [useContext, Provider];
+  return [useContext, context.Provider as React.ComponentType<React.ProviderProps<T>>];
 }
 
 export function suspendPromise<T>(promise: Promise<T>): () => T {

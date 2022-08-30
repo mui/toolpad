@@ -58,7 +58,7 @@ import evalJsBindings, {
   evaluateExpression,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../constants';
+import { HTML_ID_EDITOR_OVERLAY } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
@@ -779,6 +779,7 @@ const queryClient = new QueryClient({
 });
 
 export interface ToolpadAppProps {
+  rootRef?: React.Ref<HTMLDivElement>;
   hidePreviewBanner?: boolean;
   basename: string;
   appId: string;
@@ -787,6 +788,7 @@ export interface ToolpadAppProps {
 }
 
 export default function ToolpadApp({
+  rootRef,
   basename,
   appId,
   version,
@@ -800,7 +802,7 @@ export default function ToolpadApp({
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
   return (
-    <AppRoot id={HTML_ID_APP_ROOT}>
+    <AppRoot ref={rootRef}>
       <NoSsr>
         <DomContextProvider value={dom}>
           <AppThemeProvider dom={dom}>

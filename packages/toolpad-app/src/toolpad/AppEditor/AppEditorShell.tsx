@@ -11,8 +11,10 @@ import {
   IconButton,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { Outlet, useNavigate } from 'react-router-dom';
@@ -124,6 +126,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
   const [isSaveStateVisible, setIsSaveStateVisible] = React.useState(false);
 
   const hasUnsavedChanges = domLoader.unsavedChanges > 0;
+  const isSaving = domLoader.saving;
 
   React.useEffect(() => {
     let timeout: NodeJS.Timeout | null = null;
@@ -135,7 +138,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
         if (timeout) {
           clearTimeout(timeout);
         }
-      }, 4000);
+      }, 4500);
     } else {
       setIsSaveStateVisible(true);
     }
@@ -152,13 +155,19 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
       appId={appId}
       actions={
         <Stack direction="row" gap={1} alignItems="center">
-          {domLoader.saving ? (
-            <Box display="flex" flexDirection="row" alignItems="center">
-              <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
-            </Box>
-          ) : null}
           {isSaveStateVisible ? (
-            <Typography>{getSaveStateMessage(domLoader.saving, hasUnsavedChanges)}</Typography>
+            <Tooltip title={getSaveStateMessage(isSaving, hasUnsavedChanges)}>
+              <Box display="flex" flexDirection="row" alignItems="center">
+                {isSaving ? (
+                  <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
+                ) : (
+                  <CheckCircleIcon
+                    color={hasUnsavedChanges ? 'disabled' : 'success'}
+                    fontSize="medium"
+                  />
+                )}
+              </Box>
+            </Tooltip>
           ) : null}
           <IconButton
             aria-label="Create release"

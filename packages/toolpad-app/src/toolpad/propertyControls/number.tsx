@@ -31,11 +31,11 @@ function NumberPropEditor({
 
   const handleBlur = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
-      const newValue = Number(event.target.value);
+      const blurValue = Number(event.target.value);
 
-      if (minValue && newValue < minValue) {
+      if (minValue && blurValue < minValue) {
         setInputValue(minValue);
-      } else if (maxValue && newValue > maxValue) {
+      } else if (maxValue && blurValue > maxValue) {
         setInputValue(maxValue);
       }
     },

@@ -31,23 +31,10 @@ export default createComponent(Select, {
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',
   argTypes: {
-    label: {
-      typeDef: { type: 'string' },
-      defaultValue: '',
-    },
-    disabled: {
-      typeDef: { type: 'boolean' },
-    },
-    variant: {
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
-      defaultValue: 'outlined',
-    },
-    fullWidth: {
-      typeDef: { type: 'boolean' },
-    },
-    size: {
-      typeDef: { type: 'string', enum: ['small', 'medium'] },
-      defaultValue: 'small',
+    options: {
+      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
+      control: { type: 'SelectOptions' },
+      defaultValue: [],
     },
     value: {
       typeDef: { type: 'string' },
@@ -55,10 +42,23 @@ export default createComponent(Select, {
       onChangeHandler: (event: React.ChangeEvent<HTMLSelectElement>) => event.target.value,
       defaultValue: '',
     },
-    options: {
-      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
-      control: { type: 'SelectOptions' },
-      defaultValue: [],
+    label: {
+      typeDef: { type: 'string' },
+      defaultValue: '',
+    },
+    variant: {
+      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
+      defaultValue: 'outlined',
+    },
+    size: {
+      typeDef: { type: 'string', enum: ['small', 'medium'] },
+      defaultValue: 'small',
+    },
+    fullWidth: {
+      typeDef: { type: 'boolean' },
+    },
+    disabled: {
+      typeDef: { type: 'boolean' },
     },
     sx: {
       typeDef: { type: 'object' },

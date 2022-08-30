@@ -338,6 +338,16 @@ export default createComponent(DataGridComponent, {
       typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' },
       control: { type: 'GridColumns' },
     },
+    rowIdField: {
+      typeDef: { type: 'string' },
+      control: { type: 'RowIdFieldSelect' },
+      label: 'Id field',
+    },
+    selection: {
+      typeDef: { type: 'object' },
+      onChangeProp: 'onSelectionChange',
+      defaultValue: null,
+    },
     density: {
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },
       defaultValue: 'compact',
@@ -346,21 +356,11 @@ export default createComponent(DataGridComponent, {
       typeDef: { type: 'number' },
       defaultValue: 350,
     },
-    sx: {
-      typeDef: { type: 'object' },
-    },
-    selection: {
-      typeDef: { type: 'object' },
-      onChangeProp: 'onSelectionChange',
-      defaultValue: null,
-    },
     loading: {
       typeDef: { type: 'boolean' },
     },
-    rowIdField: {
-      typeDef: { type: 'string' },
-      control: { type: 'RowIdFieldSelect' },
-      label: 'Id field',
+    sx: {
+      typeDef: { type: 'object' },
     },
   },
 });

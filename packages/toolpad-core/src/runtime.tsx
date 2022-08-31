@@ -49,8 +49,7 @@ function PlaceholderWrapper(props: PlaceholderWrapperProps) {
   return (
     <div
       style={{
-        display: 'block',
-        minHeight: 40,
+        minHeight: 72,
         minWidth: 200,
       }}
     />

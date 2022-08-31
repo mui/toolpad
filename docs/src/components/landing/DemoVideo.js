@@ -26,9 +26,8 @@ export default function DemoVideo() {
           md: theme.breakpoints.values.md - 100,
           lg: theme.breakpoints.values.lg - 100,
         },
-        borderColor: `${
-          theme.palette.mode === 'dark' ? theme.palette.primaryDark[400] : theme.palette.grey[300]
-        }`,
+        borderColor:
+          theme.palette.mode === 'dark' ? theme.palette.primaryDark[400] : theme.palette.grey[300],
         borderRadius: '10px 10px 0 0',
         borderWidth: '1px 1px 0 1px',
       })}
@@ -41,7 +40,7 @@ export default function DemoVideo() {
         autoPlay
         playsInline
         loop
-        poster={'/static/toolpad/marketing/hero-screenshot.png'}
+        poster="/static/toolpad/marketing/hero-screenshot.png"
       >
         <source src="/static/toolpad/marketing/hero-video.mp4" type="video/mp4" />
         Your browser does not support the video tag.

@@ -36,8 +36,8 @@ const cardContentRootStyle = (imageUrl) => ({
   pb: 0,
 });
 
-function CardGrid(props) {
-  const { content, span } = props;
+export default function CardGrid(props) {
+  const { content } = props;
   return (
     <Box
       sx={{
@@ -48,7 +48,7 @@ function CardGrid(props) {
         <SectionHeadline overline={content.overline} title={content.Headline} />
         <Grid container spacing={2}>
           {content.cards.map(({ icon, title, wip, imageUrl, description }) => (
-            <Grid key={title} item xs={12} sm={6} md={span}>
+            <Grid key={title} item xs={12} sm={6} md={4}>
               <Paper variant="outlined" sx={cardRootStyle(imageUrl)}>
                 {imageUrl ? <Box sx={cardMediaStyle(imageUrl)} /> : null}
                 <Box sx={cardContentRootStyle(imageUrl)}>
@@ -80,8 +80,6 @@ function CardGrid(props) {
   );
 }
 
-export default CardGrid;
-
 CardGrid.propTypes = {
   content: PropTypes.shape({
     cards: PropTypes.arrayOf(
@@ -96,5 +94,4 @@ CardGrid.propTypes = {
     Headline: PropTypes.node.isRequired,
     overline: PropTypes.string.isRequired,
   }).isRequired,
-  span: PropTypes.number.isRequired,
 };

@@ -41,9 +41,9 @@ export default function Home() {
       <AppHeader />
       <main id="main-content">
         <ToolpadHero />
-        <CardGrid content={features} span={4} />
+        <CardGrid content={features} />
         <Banner content={upvote} />
-        <CardGrid content={useCases} span={4} />
+        <CardGrid content={useCases} />
         <Pricing
           Headline={Headline}
           plans={plans}

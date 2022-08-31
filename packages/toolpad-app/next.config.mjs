@@ -27,6 +27,7 @@ function parseBuidEnvVars(env) {
     TOOLPAD_DEMO: env.TOOLPAD_DEMO || '',
     TOOLPAD_VERSION: pkgJson.version,
     TOOLPAD_CREATE_WITH_DOM: process.env.TOOLPAD_CREATE_WITH_DOM,
+    TOOLPAD_DEBUG: process.env.TOOLPAD_DEBUG,
   };
 }
 

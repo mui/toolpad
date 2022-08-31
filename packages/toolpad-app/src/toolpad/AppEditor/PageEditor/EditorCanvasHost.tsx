@@ -5,10 +5,16 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
 import { setEventHandler } from '@mui/toolpad-core/runtime';
-import { throttle } from 'lodash-es';
+import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../../../constants';
-import { rectContainsPoint } from '../../../utils/geometry';
+import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
+import { PageViewState } from '../../../types';
+import { ToolpadBridge } from '../../../canvas';
+import useEvent from '../../../utils/useEvent';
+import { LogEntry } from '../../../components/Console';
+import { Maybe } from '../../../utils/types';
+
+type IframeContentWindow = Window & typeof globalThis;
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -32,8 +38,8 @@ function Overlay(props: OverlayProps) {
 }
 
 export interface EditorCanvasHostHandle {
-  getRootElm(): HTMLElement | null;
   getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
+  getPageViewState(): PageViewState;
 }
 
 export interface EditorCanvasHostProps {
@@ -42,7 +48,7 @@ export interface EditorCanvasHostProps {
   pageNodeId: NodeId;
   dom: appDom.AppDom;
   onRuntimeEvent?: (event: RuntimeEvent) => void;
-  onScreenUpdate?: () => void;
+  onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
 }
 
@@ -58,86 +64,127 @@ const CanvasFrame = styled('iframe')({
   height: '100%',
 });
 
+function wrapConsoleMethod<A extends any[]>(
+  level: string,
+  method: (...args: A) => void,
+  onEntry: (entry: LogEntry) => void,
+): (...args: A) => void {
+  return new Proxy(method, {
+    apply(target, thisArg, args: A) {
+      onEntry({ level, timestamp: Date.now(), args });
+      return target.apply(thisArg, args);
+    },
+  });
+}
+
+function wrapConsole(targetConsole: Console, onEntry: (entry: LogEntry) => void): Console {
+  const wrapped = new Map<PropertyKey, any>([
+    ['log', wrapConsoleMethod('log', targetConsole.log, onEntry)],
+    ['info', wrapConsoleMethod('info', targetConsole.info, onEntry)],
+    ['warn', wrapConsoleMethod('warn', targetConsole.warn, onEntry)],
+    ['error', wrapConsoleMethod('error', targetConsole.error, onEntry)],
+    ['debug', wrapConsoleMethod('debug', targetConsole.debug, onEntry)],
+  ]);
+  return new Proxy(targetConsole, {
+    get(target, property, receiver) {
+      return wrapped.get(property) || Reflect.get(target, property, receiver);
+    },
+  });
+}
+
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   function EditorCanvasHost(
-    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent, onScreenUpdate },
+    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent = () => {}, onConsoleEntry },
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
 
-    const update = React.useCallback(() => {
-      const renderDom = appDom.createRenderTree(dom);
-      // eslint-disable-next-line no-underscore-dangle
-      frameRef.current?.contentWindow?.__TOOLPAD_BRIDGE__?.update({
-        appId,
-        dom: renderDom,
-      });
-    }, [appId, dom]);
-    React.useEffect(() => update(), [update]);
+    const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
-    const onReadyRef = React.useRef(update);
-    React.useEffect(() => {
-      onReadyRef.current = update;
-    }, [update]);
+    const updateOnBridge = React.useCallback(
+      (bridgeInstance: ToolpadBridge) => {
+        const renderDom = appDom.createRenderTree(dom);
+        bridgeInstance.update({ appId, dom: renderDom });
+      },
+      [appId, dom],
+    );
 
     React.useEffect(() => {
-      const frameWindow = frameRef.current?.contentWindow;
-      if (!frameWindow) {
-        throw new Error('Iframe ref not attached');
+      if (bridge) {
+        // Update every time dom prop updates
+        updateOnBridge(bridge);
       }
+    }, [updateOnBridge, bridge]);
+
+    const handleInit = useEvent((newBridge: ToolpadBridge) => {
+      setBridge(newBridge);
+      updateOnBridge(newBridge);
+    });
+
+    const onConsoleEntryRef = React.useRef(onConsoleEntry);
+    React.useLayoutEffect(() => {
+      onConsoleEntryRef.current = onConsoleEntry;
+    });
+
+    React.useEffect(() => {
+      const frameWindow = frameRef.current?.contentWindow as Maybe<IframeContentWindow>;
+      invariant(frameWindow, 'Iframe ref not attached');
+
+      const originalConsole: Console = frameWindow.console;
+      frameWindow.console = wrapConsole(originalConsole, (entry: LogEntry) =>
+        onConsoleEntryRef.current?.(entry),
+      );
 
       // eslint-disable-next-line no-underscore-dangle
-      if (frameWindow.__TOOLPAD_READY__ === true) {
-        onReadyRef.current?.();
+      if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'object') {
         // eslint-disable-next-line no-underscore-dangle
-      } else if (typeof frameWindow.__TOOLPAD_READY__ !== 'function') {
+        handleInit(frameWindow.__TOOLPAD_BRIDGE__);
         // eslint-disable-next-line no-underscore-dangle
-        frameWindow.__TOOLPAD_READY__ = () => onReadyRef.current?.();
+      } else if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'undefined') {
+        // eslint-disable-next-line no-underscore-dangle
+        frameWindow.__TOOLPAD_BRIDGE__ = (newBridge: ToolpadBridge) => {
+          handleInit(newBridge);
+        };
       }
-    }, []);
+
+      return () => {
+        frameWindow.console = originalConsole;
+      };
+    }, [handleInit]);
 
     const [contentWindow, setContentWindow] = React.useState<Window | null>(null);
     const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
-    const [appRoot, setAppRoot] = React.useState<HTMLElement | null>(null);
 
     React.useImperativeHandle(
       forwardedRef,
       () => {
         return {
-          getRootElm() {
-            return appRoot;
-          },
           getViewCoordinates(clientX, clientY) {
-            if (!appRoot) {
-              return null;
-            }
-            const rect = appRoot.getBoundingClientRect();
-            if (rectContainsPoint(rect, clientX, clientY)) {
-              return { x: clientX - rect.x, y: clientY - rect.y };
-            }
-            return null;
+            invariant(bridge, 'bridge not initialized');
+            return bridge.getViewCoordinates(clientX, clientY);
+          },
+          getPageViewState() {
+            invariant(bridge, 'bridge not initialized');
+            return bridge.getPageViewState();
           },
         };
       },
-      [appRoot],
+      [bridge],
     );
 
-    const handleRuntimeEventRef = React.useRef(onRuntimeEvent);
-    React.useEffect(() => {
-      handleRuntimeEventRef.current = onRuntimeEvent;
-    }, [onRuntimeEvent]);
+    const handleRuntimeEvent = useEvent(onRuntimeEvent);
 
     const handleFrameLoad = React.useCallback(() => {
-      setContentWindow(frameRef.current?.contentWindow || null);
+      invariant(frameRef.current, 'Iframe ref not attached');
+      setContentWindow(frameRef.current.contentWindow);
     }, []);
 
     React.useEffect(() => {
       if (!contentWindow) {
-        return () => {};
+        return undefined;
       }
 
       const observer = new MutationObserver(() => {
-        setAppRoot(contentWindow.document.getElementById(HTML_ID_APP_ROOT));
         setEditorOverlayRoot(contentWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
       });
 
@@ -146,46 +193,18 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         childList: true,
       });
 
-      const cleanupHandler = setEventHandler(contentWindow, (event) =>
-        handleRuntimeEventRef.current?.(event),
-      );
-
       return () => {
         observer.disconnect();
-        cleanupHandler();
       };
     }, [contentWindow]);
 
     React.useEffect(() => {
-      if (!appRoot || !onScreenUpdate) {
-        return () => {};
+      if (!contentWindow) {
+        return undefined;
       }
 
-      onScreenUpdate();
-      const handleScreenUpdateThrottled = throttle(onScreenUpdate, 50, {
-        trailing: true,
-      });
-
-      const mutationObserver = new MutationObserver(handleScreenUpdateThrottled);
-
-      mutationObserver.observe(appRoot, {
-        attributes: true,
-        childList: true,
-        subtree: true,
-        characterData: true,
-      });
-
-      const resizeObserver = new ResizeObserver(handleScreenUpdateThrottled);
-
-      resizeObserver.observe(appRoot);
-      appRoot.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
-
-      return () => {
-        handleScreenUpdateThrottled.cancel();
-        mutationObserver.disconnect();
-        resizeObserver.disconnect();
-      };
-    }, [appRoot, onScreenUpdate]);
+      return setEventHandler(contentWindow, handleRuntimeEvent);
+    }, [handleRuntimeEvent, contentWindow]);
 
     return (
       <CanvasRoot className={className}>

@@ -13,28 +13,28 @@ function Button({ content, ...rest }: ButtonProps) {
 export default createComponent(Button, {
   layoutDirection: 'both',
   argTypes: {
+    onClick: {
+      typeDef: { type: 'event' },
+    },
     content: {
       typeDef: { type: 'string' },
       defaultValue: 'Button Text',
-    },
-    onClick: {
-      typeDef: { type: 'event' },
     },
     variant: {
       typeDef: { type: 'string', enum: ['contained', 'outlined', 'text'] },
       defaultValue: 'contained',
     },
-    disabled: {
-      typeDef: { type: 'boolean' },
-    },
-    fullWidth: {
-      typeDef: { type: 'boolean' },
-    },
     color: {
       typeDef: { type: 'string', enum: ['primary', 'secondary'] },
       defaultValue: 'primary',
     },
+    fullWidth: {
+      typeDef: { type: 'boolean' },
+    },
     loading: {
+      typeDef: { type: 'boolean' },
+    },
+    disabled: {
       typeDef: { type: 'boolean' },
     },
     sx: {

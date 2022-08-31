@@ -8,7 +8,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
   Stack,
   TextField,
   Tooltip,
@@ -17,14 +16,16 @@ import {
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import invariant from 'invariant';
 import DialogForm from '../../components/DialogForm';
 import { useDomLoader } from '../DomLoader';
 import ToolpadAppShell from '../ToolpadAppShell';
 import PagePanel from './PagePanel';
 import client from '../../api';
+import useBoolean from '../../utils/useBoolean';
 
 interface CreateReleaseDialogProps {
   appId: string;
@@ -33,8 +34,6 @@ interface CreateReleaseDialogProps {
 }
 
 function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps) {
-  const navigate = useNavigate();
-
   const lastRelease = client.useQuery('findLastRelease', [appId]);
 
   const { handleSubmit, register, formState, reset } = useForm({
@@ -43,32 +42,32 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
     },
   });
 
-  const createReleaseMutation = client.useMutation('createRelease');
+  React.useEffect(() => {
+    if (open) {
+      reset();
+    }
+  }, [reset, open]);
+
+  const deployMutation = client.useMutation('deploy');
   const doSubmit = handleSubmit(async (releaseParams) => {
-    const newRelease = await createReleaseMutation.mutateAsync([appId, releaseParams]);
-    reset();
-    navigate(`/app/${appId}/releases/${newRelease.version}`);
+    await deployMutation.mutateAsync([appId, releaseParams]);
+    const url = new URL(`/deploy/${appId}/pages`, window.location.href);
+    const deploymentWindow = window.open(url, '_blank');
+    invariant(deploymentWindow, 'window failed to open');
+    deploymentWindow.focus();
+    onClose();
   });
 
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogForm autoComplete="off" onSubmit={doSubmit}>
-        <DialogTitle>Create new release</DialogTitle>
+        <DialogTitle>Deploy application</DialogTitle>
         <DialogContent>
           {lastRelease.isSuccess ? (
             <Stack spacing={1}>
               <Typography>
-                You are about to create a snapshot of your application under a unique url. You will
-                be able to verify whether everything is working correctly before deploying this
-                release to production.
-              </Typography>
-              <Typography>
-                The new version to be created is &quot;
-                {lastRelease.data ? lastRelease.data.version + 1 : 1}&quot;.
-              </Typography>
-              <Typography>
-                Please summarize the changes you have made to the application since the last
-                release:
+                You are about to deploy your application to production. Please summarize the changes
+                you have made to the application since the last release:
               </Typography>
               <TextField
                 label="description"
@@ -83,8 +82,8 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
             </Stack>
           ) : null}
 
-          {createReleaseMutation.isError ? (
-            <Alert severity="error">{(createReleaseMutation.error as Error).message}</Alert>
+          {deployMutation.isError ? (
+            <Alert severity="error">{(deployMutation.error as Error).message}</Alert>
           ) : null}
         </DialogContent>
         <DialogActions>
@@ -93,10 +92,10 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
           </Button>
           <LoadingButton
             disabled={!lastRelease.isSuccess}
-            loading={createReleaseMutation.isLoading}
+            loading={deployMutation.isLoading}
             type="submit"
           >
-            Create
+            Deploy
           </LoadingButton>
         </DialogActions>
       </DialogForm>
@@ -122,7 +121,12 @@ export interface ToolpadAppShellProps {
 export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps) {
   const domLoader = useDomLoader();
 
-  const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
+  const {
+    value: createReleaseDialogOpen,
+    setTrue: handleCreateReleasDialogOpen,
+    setFalse: handleCreateReleasDialogClose,
+  } = useBoolean(false);
+
   const [isSaveStateVisible, setIsSaveStateVisible] = React.useState(false);
 
   const hasUnsavedChanges = domLoader.unsavedChanges > 0;
@@ -169,21 +173,23 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
               </Box>
             </Tooltip>
           ) : null}
-          <IconButton
-            aria-label="Create release"
-            color="inherit"
-            onClick={() => setCreateReleaseDialogOpen(true)}
-          >
-            <RocketLaunchIcon />
-          </IconButton>
           <Button
             variant="outlined"
+            color="inherit"
             component="a"
             href={`/app/${appId}/preview`}
             target="_blank"
             endIcon={<OpenInNewIcon />}
           >
             Preview
+          </Button>
+          <Button
+            variant="outlined"
+            color="inherit"
+            onClick={handleCreateReleasDialogOpen}
+            endIcon={<RocketLaunchIcon />}
+          >
+            Deploy
           </Button>
         </Stack>
       }
@@ -218,7 +224,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
         <CreateReleaseDialog
           appId={appId}
           open={createReleaseDialogOpen}
-          onClose={() => setCreateReleaseDialogOpen(false)}
+          onClose={handleCreateReleasDialogClose}
         />
       </Box>
     </ToolpadAppShell>

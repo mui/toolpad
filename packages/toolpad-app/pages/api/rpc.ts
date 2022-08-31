@@ -18,6 +18,7 @@ import {
   findActiveDeployment,
   findLastRelease,
   deleteApp,
+  deploy,
 } from '../../src/server/data';
 import { hasOwnProperty } from '../../src/utils/collections';
 
@@ -154,6 +155,9 @@ const rpcServer = {
     }),
     createDeployment: createMethod<typeof createDeployment>((params) => {
       return createDeployment(...params);
+    }),
+    deploy: createMethod<typeof deploy>((params) => {
+      return deploy(...params);
     }),
     saveDom: createMethod<typeof saveDom>((params) => {
       return saveDom(...params);

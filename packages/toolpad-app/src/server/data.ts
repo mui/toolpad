@@ -14,20 +14,7 @@ import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
-
-// See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
-function excludeFields<T, K extends (keyof T)[]>(
-  fields: T,
-  excluded: K,
-): Record<Exclude<keyof T, K[number]>, boolean> {
-  const result = {} as Record<Exclude<keyof T, K[number]>, boolean>;
-  for (const key of Object.keys(fields)) {
-    if (!excluded.includes(key as any)) {
-      result[key as Exclude<keyof T, K[number]>] = true;
-    }
-  }
-  return result;
-}
+import { excludeFields } from '../utils/prisma';
 
 const SELECT_RELEASE_META = excludeFields(Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(Prisma.AppScalarFieldEnum, ['dom']);
@@ -304,7 +291,18 @@ export async function createDeployment(appId: string, version: number) {
         connect: { release_app_constraint: { appId, version } },
       },
     },
+    include: {
+      release: {
+        select: SELECT_RELEASE_META,
+      },
+    },
   });
+}
+
+export async function deploy(appId: string, releaseInput: CreateReleaseParams) {
+  const release = await createRelease(appId, releaseInput);
+  const deployment = await createDeployment(appId, release.version);
+  return deployment;
 }
 
 export async function findActiveDeployment(appId: string) {

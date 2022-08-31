@@ -12,7 +12,7 @@ function getNextId(): string {
 /**
  * Used to generate ids for object instances.
  */
-export function getObjectKey(object: any): string {
+export function getObjectKey(object: {}): string {
   let id = weakMap.get(object);
   if (!id) {
     id = getNextId();

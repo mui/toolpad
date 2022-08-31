@@ -31,7 +31,9 @@ export type BuildEnvVars = Record<
   | 'TOOLPAD_VERSION'
   // Enable input field for seeding a dom in the app creation dialog
   // (For testing purposes)
-  | 'TOOLPAD_CREATE_WITH_DOM',
+  | 'TOOLPAD_CREATE_WITH_DOM'
+  // Show debug logs
+  | 'TOOLPAD_DEBUG',
   string
 >;
 

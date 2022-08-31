@@ -2,7 +2,6 @@ import * as React from 'react';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import CodeIcon from '@mui/icons-material/Code';
 import LinkIcon from '@mui/icons-material/Link';
-import Link from '@mui/material/Link';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
 import GppGoodIcon from '@mui/icons-material/GppGood';
@@ -40,30 +39,8 @@ const features = {
       icon: <LinkIcon fontSize="small" color="primary" />,
       title: 'Connect any data source',
       wip: true,
-      description: 'Find all the integrations that you need. So far, it supports REST, Google sheets, PostgreSQL. We are working on adding MySQL, GraphQL, and a plugin system to add new ones.'
-      /*(
-        <React.Fragment>
-          Find all the integrations that you need. So far, it supports REST, Google sheets. We
-          are working on adding MySQL, GraphQL, and a plugin system to add new ones.
-           {' '}
-          <Link href="https://github.com/mui/mui-toolpad/issues/793" target="_blank" rel="noopener">
-            PostgreSQL
-          </Link>
-          ,{' '}
-          <Link href="https://github.com/mui/mui-toolpad/issues/792" target="_blank" rel="noopener">
-            MySQL
-          </Link>
-          ,{' '}
-          <Link href="https://github.com/mui/mui-toolpad/issues/383" target="_blank" rel="noopener">
-            GraphQL
-          </Link>
-          , and a{' '}
-          <Link href="https://github.com/mui/mui-toolpad/issues/791" target="_blank" rel="noopener">
-            plugin system
-          </Link>{' '}
-          to add new ones. 
-        </React.Fragment> 
-      ),*/
+      description:
+        'Find all the integrations that you need. So far, it supports REST, Google sheets, PostgreSQL. We are working on adding MySQL, GraphQL, and a plugin system to add new ones.',
     },
     {
       icon: <ViewModuleIcon fontSize="small" color="primary" />,

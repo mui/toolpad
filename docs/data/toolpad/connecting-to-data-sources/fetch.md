@@ -18,9 +18,9 @@ As explained in the [connections](/toolpad/connecting-to-data-sources/connection
 
    ![Fetch configuration](/static/toolpad/fetch-query-2.png)
 
-   - `parameters` - allows us to use [data bound](/toolpad/data-binding/intro/) properties which can then be used construct dynamic `url` value
+   - `parameters` - allows us to use [data bound](/toolpad/data-binding/) properties which can then be used construct dynamic `url` value
    - `HTTP method` - by default `GET` is used, but we also support `POST`, `PUT`, `DELETE`, `PATHC` and `HEAD` methods
-   - `url` - is an endpoint to which requests will be made. We also have an option to dynamically generate `url` by using [data binding](/toolpad/data-binding/intro/). `Parameters` can be accessed by using `query` object inside `url` `data binding` editor
+   - `url` - is an endpoint to which requests will be made. We also have an option to dynamically generate `url` by using [data binding](/toolpad/data-binding/). `Parameters` can be accessed by using `query` object inside `url` `data binding` editor
 
    ![Dynamic url](/static/toolpad/fetch-query-3.png)
 

@@ -29,21 +29,21 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/connecting-to-data-sources/function',
-        title: 'Function type',
+        title: 'Function type [TODO]',
       },
       {
         pathname: '/toolpad/connecting-to-data-sources/google-sheets',
-        title: 'Google sheets type',
+        title: 'Google sheets type [TODO]',
       },
       {
         pathname: '/toolpad/connecting-to-data-sources/sql',
-        title: 'SQL type',
+        title: 'SQL type [TODO]',
       },
     ],
   },
   {
     pathname: '/toolpad/building-ui',
-    title: 'Building UI',
+    title: 'Building UI [TODO]',
     icon: 'VisibilityIcon',
     children: [
       {
@@ -56,16 +56,10 @@ const pages: MuiPage[] = [
     pathname: '/toolpad/data-binding',
     title: 'Data binding',
     icon: 'CodeIcon',
-    children: [
-      {
-        pathname: '/toolpad/data-binding/intro',
-        title: 'Intro',
-      },
-    ],
   },
   {
     pathname: '/toolpad/versioning-and-deploying',
-    title: 'Versioning & deploying',
+    title: 'Versioning & deploying [TODO]',
     icon: 'ToggleOnIcon',
     children: [
       {
@@ -76,7 +70,7 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/faq',
-    title: 'FAQ',
+    title: 'FAQ [TODO]',
     icon: 'ReaderIcon',
   },
 ];

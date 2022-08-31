@@ -31,20 +31,21 @@ export default createComponent(Select, {
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',
   argTypes: {
+    options: {
+      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
+      control: { type: 'SelectOptions' },
+      defaultValue: [],
+    },
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       onChangeHandler: (event: React.ChangeEvent<HTMLSelectElement>) => event.target.value,
       defaultValue: '',
+      defaultValueProp: 'defaultValue',
     },
     defaultValue: {
       typeDef: { type: 'string' },
       defaultValue: '',
-    },
-    options: {
-      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
-      control: { type: 'SelectOptions' },
-      defaultValue: [],
     },
     label: {
       typeDef: { type: 'string' },

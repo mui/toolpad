@@ -214,7 +214,7 @@ export type RuntimeEvent =
       type: 'pageBindingsUpdated';
       bindings: LiveBindings;
     }
-  | { type: 'afterRender' }
+  | { type: 'screenUpdate' }
   | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
 
 export interface ComponentConfig<P> {

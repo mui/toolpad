@@ -31,24 +31,6 @@ export default createComponent(Select, {
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',
   argTypes: {
-    label: {
-      typeDef: { type: 'string' },
-      defaultValue: '',
-    },
-    disabled: {
-      typeDef: { type: 'boolean' },
-    },
-    variant: {
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
-      defaultValue: 'outlined',
-    },
-    fullWidth: {
-      typeDef: { type: 'boolean' },
-    },
-    size: {
-      typeDef: { type: 'string', enum: ['small', 'medium'] },
-      defaultValue: 'small',
-    },
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
@@ -63,6 +45,24 @@ export default createComponent(Select, {
       typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
       control: { type: 'SelectOptions' },
       defaultValue: [],
+    },
+    label: {
+      typeDef: { type: 'string' },
+      defaultValue: '',
+    },
+    variant: {
+      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
+      defaultValue: 'outlined',
+    },
+    size: {
+      typeDef: { type: 'string', enum: ['small', 'medium'] },
+      defaultValue: 'small',
+    },
+    fullWidth: {
+      typeDef: { type: 'boolean' },
+    },
+    disabled: {
+      typeDef: { type: 'boolean' },
     },
     sx: {
       typeDef: { type: 'object' },

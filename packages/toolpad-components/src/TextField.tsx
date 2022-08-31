@@ -18,23 +18,6 @@ function TextField({ defaultValue, ...props }: TextFieldProps) {
 export default createComponent(TextField, {
   layoutDirection: 'both',
   argTypes: {
-    label: {
-      typeDef: { type: 'string' },
-    },
-    variant: {
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
-      defaultValue: 'outlined',
-    },
-    disabled: {
-      typeDef: { type: 'boolean' },
-    },
-    fullWidth: {
-      typeDef: { type: 'boolean' },
-    },
-    size: {
-      typeDef: { type: 'string', enum: ['small', 'normal'] },
-      defaultValue: 'small',
-    },
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
@@ -45,6 +28,23 @@ export default createComponent(TextField, {
     defaultValue: {
       typeDef: { type: 'string' },
       defaultValue: '',
+    },
+    label: {
+      typeDef: { type: 'string' },
+    },
+    variant: {
+      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
+      defaultValue: 'outlined',
+    },
+    size: {
+      typeDef: { type: 'string', enum: ['small', 'normal'] },
+      defaultValue: 'small',
+    },
+    fullWidth: {
+      typeDef: { type: 'boolean' },
+    },
+    disabled: {
+      typeDef: { type: 'boolean' },
     },
     sx: {
       typeDef: { type: 'object' },

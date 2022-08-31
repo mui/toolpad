@@ -7,6 +7,7 @@ import Releases from './Releases';
 import AppEditor from './AppEditor';
 import Home from './Home';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import Deployments from './Deployments';
 
 const Centered = styled('div')({
   height: '100%',
@@ -41,6 +42,7 @@ function AppWorkspace() {
       <Route>
         <Route path="editor/*" element={<AppEditor />} />
         <Route path="releases" element={<Releases />} />
+        <Route path="deployments" element={<Deployments />} />
         <Route path="releases/:version" element={<Release />} />
       </Route>
     </Routes>

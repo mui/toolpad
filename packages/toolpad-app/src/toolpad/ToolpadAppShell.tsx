@@ -20,6 +20,9 @@ export default function ToolpadAppShell({ appId, ...props }: ToolpadAppShellProp
           <Button component={Link} to={`/app/${appId}/releases`} color="inherit">
             Releases
           </Button>
+          <Button component={Link} to={`/app/${appId}/deployments`} color="inherit">
+            Deployments
+          </Button>
         </React.Fragment>
       }
       {...props}

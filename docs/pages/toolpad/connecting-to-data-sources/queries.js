@@ -4,8 +4,8 @@ import {
   demos,
   docs,
   demoComponents,
-} from '../../../data/toolpad/data-fetching/google-sheets.md?@mui/markdown';
+} from '../../../data/toolpad/connecting-to-data-sources/queries.md?@mui/markdown';
 
 export default function Page() {
-  return <MarkdownDocs demos={demos} docs={docs} demoComponents={demoComponents} />;
+  return <MarkdownDocs demos={demos} docs={docs} demoComponents={demoComponents} disableAd />;
 }

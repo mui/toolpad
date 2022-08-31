@@ -1,10 +1,10 @@
 # Quickstart
 
-<!-- <p class="description"></p> -->
-
 Get started building a Toolpad app!
 
+<p class="description">
 This page will guide you into creating your very first Toolpad application. We will create a "hello world" type of application that will ask for a name and print a greeting.
+</p>
 
 ## Prerequisites
 

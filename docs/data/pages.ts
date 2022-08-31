@@ -11,19 +11,66 @@ const pages: MuiPage[] = [
     ],
   },
   {
-    pathname: '/toolpad/core-concepts',
-    title: 'Core concepts',
+    pathname: '/toolpad/connecting-to-data-sources',
+    title: 'Connecting to data sources',
+    icon: 'TableViewIcon',
+    children: [
+      {
+        pathname: '/toolpad/connecting-to-data-sources/queries',
+        title: 'Queries',
+      },
+      {
+        pathname: '/toolpad/connecting-to-data-sources/connections',
+        title: 'Connections',
+      },
+      {
+        pathname: '/toolpad/connecting-to-data-sources/fetch',
+        title: 'Fetch type',
+      },
+      {
+        pathname: '/toolpad/connecting-to-data-sources/function',
+        title: 'Function type',
+      },
+      {
+        pathname: '/toolpad/connecting-to-data-sources/google-sheets',
+        title: 'Google sheets type',
+      },
+      {
+        pathname: '/toolpad/connecting-to-data-sources/sql',
+        title: 'SQL type',
+      },
+    ],
+  },
+  {
+    pathname: '/toolpad/building-ui',
+    title: 'Building UI',
+    icon: 'VisibilityIcon',
+    children: [
+      {
+        pathname: '/toolpad/building-ui/build-in-components',
+        title: 'Built in components',
+      },
+    ],
+  },
+  {
+    pathname: '/toolpad/data-binding',
+    title: 'Data binding',
     icon: 'CodeIcon',
     children: [
       {
-        pathname: '/toolpad/core-concepts/connecting-to-data-sources',
-        title: 'Connecting to data sources',
+        pathname: '/toolpad/data-binding/editor',
+        title: 'Editor',
       },
-      { pathname: '/toolpad/core-concepts/building-ui', title: 'Building UI' },
-      { pathname: '/toolpad/core-concepts/data-binding', title: 'Data binding' },
+    ],
+  },
+  {
+    pathname: '/toolpad/versioning-and-deploying',
+    title: 'Versioning & deploying',
+    icon: 'ToggleOnIcon',
+    children: [
       {
-        pathname: '/toolpad/core-concepts/versioning-and-deploying',
-        title: 'Versioning & deploying',
+        pathname: '/toolpad/versioning-and-deploying/releases',
+        title: 'Releases',
       },
     ],
   },

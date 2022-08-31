@@ -39,11 +39,13 @@ const features = {
     {
       icon: <LinkIcon fontSize="small" color="primary" />,
       title: 'Connect any data source',
-      wip: false,
-      description: (
+      wip: true,
+      description: 'Find all the integrations that you need. So far, it supports REST, Google sheets, PostgreSQL. We are working on adding MySQL, GraphQL, and a plugin system to add new ones.'
+      /*(
         <React.Fragment>
-          Find all the integrations that you need. So far, it supports REST, Google sheets. 🚧 We
-          are working on adding{' '}
+          Find all the integrations that you need. So far, it supports REST, Google sheets. We
+          are working on adding MySQL, GraphQL, and a plugin system to add new ones.
+           {' '}
           <Link href="https://github.com/mui/mui-toolpad/issues/793" target="_blank" rel="noopener">
             PostgreSQL
           </Link>
@@ -59,14 +61,14 @@ const features = {
           <Link href="https://github.com/mui/mui-toolpad/issues/791" target="_blank" rel="noopener">
             plugin system
           </Link>{' '}
-          to add new ones.
-        </React.Fragment>
-      ),
+          to add new ones. 
+        </React.Fragment> 
+      ),*/
     },
     {
       icon: <ViewModuleIcon fontSize="small" color="primary" />,
       title: 'MUI component library',
-      wip: false,
+      wip: true,
       description:
         'Access the full suite of pre-built MUI components, including both MUI Core and MUI X—or bring your own custom components to your Toolpad app.',
     },
@@ -86,10 +88,10 @@ const features = {
     },
     {
       icon: <FastForwardIcon fontSize="small" color="primary" />,
-      title: 'Instant deployment with version control ',
+      title: 'Instant deployment ',
       wip: false,
       description:
-        'App deployment in Toolpad is instant and versioning comes by default. Roll back to any older version with ease.',
+        'App deployment in Toolpad is instant and veiwing past deployments makes it easier to access previous work.',
     },
     {
       icon: <EditIcon fontSize="small" color="primary" />,

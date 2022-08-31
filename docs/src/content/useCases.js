@@ -15,7 +15,7 @@ const useCases = {
       wip: false,
       imageUrl: '/static/toolpad/marketing/toolpad-monitoring-dashboard.svg',
       description:
-        'Quickly provide the latest numbers and status reports that fuel data-driven decisions. Build and share your dashboard by combining data from multiple sources with dependable version control to rollback changes when needed.',
+        'Quickly provide the latest numbers and status reports that fuel data-driven decisions. Build and share your dashboard by combining data from multiple sources with dependable deployment mechanism when needed.',
     },
     {
       title: 'Admin panel',
@@ -29,7 +29,7 @@ const useCases = {
       wip: false,
       imageUrl: '/static/toolpad/marketing/toolpad-custom-cms.svg',
       description:
-        'Enable your operations team to efficiently manage day to day chores using operation specific content management apps. Built with MUI components, apps are fast, manageable and scalable. Toolpad allows you to bind data the pro-code way by writing JavaScript anywhere. ',
+        'Enable your operations teams to efficiently manage day to day chores using task specific content management apps. Built with MUI components, apps are fast, manageable and scalable. Toolpad allows you to bind data the pro-code way by writing JavaScript anywhere. ',
     },
   ],
 };

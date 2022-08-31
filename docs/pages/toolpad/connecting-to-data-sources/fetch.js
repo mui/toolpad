@@ -4,8 +4,8 @@ import {
   demos,
   docs,
   demoComponents,
-} from '../../../data/toolpad/data-fetching/rest.md?@mui/markdown';
+} from '../../../data/toolpad/connecting-to-data-sources/fetch.md?@mui/markdown';
 
 export default function Page() {
-  return <MarkdownDocs demos={demos} docs={docs} demoComponents={demoComponents} />;
+  return <MarkdownDocs demos={demos} docs={docs} demoComponents={demoComponents} disableAd />;
 }

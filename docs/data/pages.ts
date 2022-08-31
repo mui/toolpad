@@ -58,8 +58,8 @@ const pages: MuiPage[] = [
     icon: 'CodeIcon',
     children: [
       {
-        pathname: '/toolpad/data-binding/editor',
-        title: 'Editor',
+        pathname: '/toolpad/data-binding/intro',
+        title: 'Intro',
       },
     ],
   },

@@ -62,7 +62,7 @@ export default function BindableEditor<V>({
         {renderControl({
           label,
           propType,
-          disabled: !!hasBinding,
+          disabled: disabled || !!hasBinding,
           value: constValue,
           onChange: handlePropConstChange,
         })}

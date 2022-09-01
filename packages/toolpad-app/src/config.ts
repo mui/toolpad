@@ -28,9 +28,7 @@ export type BuildEnvVars = Record<
   // Whether Toolpad is running in Ddemo mode
   | 'TOOLPAD_DEMO'
   // The current Toolpad version
-  | 'TOOLPAD_VERSION'
-  // Show debug logs
-  | 'TOOLPAD_DEBUG',
+  | 'TOOLPAD_VERSION',
   string
 >;
 

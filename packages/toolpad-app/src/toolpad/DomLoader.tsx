@@ -8,7 +8,6 @@ import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
 import { createProvidedContext } from '../utils/react';
-import { debugLog } from '../utils/logs';
 
 export type DomAction =
   | {
@@ -254,19 +253,10 @@ export function useDomApi(): DomApi {
 let previousUnsavedChanges = 0;
 function logUnsavedChanges(unsavedChanges: number) {
   const hasUnsavedChanges = unsavedChanges >= 1;
-  const newChanges = unsavedChanges - previousUnsavedChanges;
 
-  const pluralizeChanges = (changesCount: number) => `change${changesCount !== 1 ? 's' : ''}`;
-
-  if (hasUnsavedChanges) {
-    debugLog(
-      `+ ${newChanges} ${pluralizeChanges(
-        newChanges,
-      )}. ${unsavedChanges} unsaved ${pluralizeChanges(unsavedChanges)}.`,
-      'orange',
-    );
-  } else if (previousUnsavedChanges > 0) {
-    debugLog('All changes saved!', 'green');
+  if (!hasUnsavedChanges && previousUnsavedChanges > 0) {
+    // eslint-disable-next-line no-console
+    console.log(`${previousUnsavedChanges} changes saved.`);
   }
 
   previousUnsavedChanges = unsavedChanges;

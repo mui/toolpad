@@ -32,7 +32,7 @@ export default function PageOptionsPanel() {
         </Button>
         <PageModuleEditor pageNodeId={pageNodeId} />
         <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
-        <Typography variant="subtitle1">Page State:</Typography>
+        <Typography variant="overline">Page State:</Typography>
         <UrlQueryEditor pageNodeId={pageNodeId} />
         <QueryEditor />
         <MutationEditor />

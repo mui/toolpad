@@ -22,7 +22,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import invariant from 'invariant';
 import DialogForm from '../../components/DialogForm';
 import { useDomLoader } from '../DomLoader';
-import ToolpadAppShell from '../ToolpadAppShell';
+import ToolpadShell from '../ToolpadShell';
 import PagePanel from './PagePanel';
 import client from '../../api';
 import useBoolean from '../../utils/useBoolean';
@@ -113,12 +113,12 @@ function getSaveStateMessage(isSaving: boolean, hasUnsavedChanges: boolean): str
   return 'All changes saved!';
 }
 
-export interface ToolpadAppShellProps {
+export interface ToolpadShellProps {
   appId: string;
   actions?: React.ReactNode;
 }
 
-export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps) {
+export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
   const domLoader = useDomLoader();
 
   const {
@@ -155,8 +155,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
   }, [hasUnsavedChanges]);
 
   return (
-    <ToolpadAppShell
-      appId={appId}
+    <ToolpadShell
       actions={
         <Stack direction="row" gap={1} alignItems="center">
           {isSaveStateVisible ? (
@@ -227,6 +226,6 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
           onClose={handleCreateReleasDialogClose}
         />
       </Box>
-    </ToolpadAppShell>
+    </ToolpadShell>
   );
 }

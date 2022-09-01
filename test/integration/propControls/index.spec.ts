@@ -2,18 +2,18 @@ import { test, expect, Page, Locator } from '@playwright/test';
 import createApp from '../../utils/createApp';
 import clickCenter from '../../utils/clickCenter';
 import generateId from '../../utils/generateId';
-import { canvasFrame, componentPropsEditor, pageRoot } from '../../utils/locators';
+import { canvasFrame, selectedNodeEditor, pageRoot } from '../../utils/locators';
 import domInput from './domInput.json';
 
 async function getPropControlInputLocator(page: Page, inputPropName: string) {
-  const componentPropsEditorLocator = page.locator(componentPropsEditor);
+  const selectedNodeEditorLocator = page.locator(selectedNodeEditor);
 
-  const propControlLabelHandle = await componentPropsEditorLocator
+  const propControlLabelHandle = await selectedNodeEditorLocator
     .locator(`label:has-text("${inputPropName}")`)
     .elementHandle();
   const propControlLabelFor = await propControlLabelHandle?.getAttribute('for');
 
-  return componentPropsEditorLocator.locator(`input[id="${propControlLabelFor}"]`);
+  return selectedNodeEditorLocator.locator(`input[id="${propControlLabelFor}"]`);
 }
 
 async function getInputElementLabelLocator(page: Page, inputLocator: Locator) {
@@ -34,6 +34,7 @@ test('can control component prop values in properties control panel', async ({ p
   const canvasFrameLocator = page.frameLocator(canvasFrame);
 
   const canvasPageRootLocator = canvasFrameLocator.locator(pageRoot);
+  const selectedNodeEditorLocator = page.locator(selectedNodeEditor);
   const canvasInputLocator = canvasFrameLocator.locator('input');
 
   await canvasPageRootLocator.waitFor();
@@ -43,19 +44,20 @@ test('can control component prop values in properties control panel', async ({ p
   const firstInputLocator = canvasInputLocator.first();
   await clickCenter(page, firstInputLocator);
 
-  const labelControlInputLocator = await getPropControlInputLocator(page, 'label');
+  const getLabelControlInputValue = async () =>
+    selectedNodeEditorLocator.locator(`label:text-is("label")`).inputValue();
+  const getValueControlInputValue = async () =>
+    selectedNodeEditorLocator.locator(`label:text-is("value")`).inputValue();
 
-  await expect(labelControlInputLocator).toHaveAttribute('value', 'textField1');
+  expect(await getLabelControlInputValue()).toBe('textField1');
 
   // Change component prop values directly
 
-  const valueControlInputLocator = await getPropControlInputLocator(page, 'value');
-
   const TEST_VALUE_1 = 'value1';
 
-  await expect(valueControlInputLocator).not.toHaveAttribute('value', TEST_VALUE_1);
-  await firstInputLocator.type(TEST_VALUE_1);
-  await expect(valueControlInputLocator).toHaveAttribute('value', TEST_VALUE_1);
+  expect(await getValueControlInputValue()).not.toBe(TEST_VALUE_1);
+  await firstInputLocator.fill(TEST_VALUE_1);
+  expect(await getValueControlInputValue()).toBe(TEST_VALUE_1);
 
   // Change component prop values through controls
 
@@ -64,9 +66,9 @@ test('can control component prop values in properties control panel', async ({ p
 
   await expect(firstInputLabelLocator).not.toHaveText(TEST_VALUE_2);
 
-  await labelControlInputLocator.selectText();
-  await page.keyboard.press('Backspace');
-  await labelControlInputLocator.type(TEST_VALUE_2);
+  const labelControlInputLocator = await getPropControlInputLocator(page, 'label');
+  await labelControlInputLocator.fill('');
+  await labelControlInputLocator.fill(TEST_VALUE_2);
 
   await expect(firstInputLabelLocator).toHaveText(TEST_VALUE_2);
 });

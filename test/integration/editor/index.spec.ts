@@ -82,10 +82,10 @@ test('can move elements in page', async ({ page }) => {
   const secondTextFieldLocator = canvasInputLocator.nth(1);
 
   await firstTextFieldLocator.focus();
-  await firstTextFieldLocator.type('textField1');
+  await firstTextFieldLocator.fill('textField1');
 
   await secondTextFieldLocator.focus();
-  await secondTextFieldLocator.type('textField2');
+  await secondTextFieldLocator.fill('textField2');
 
   await expect(firstTextFieldLocator).toHaveAttribute('value', 'textField1');
   await expect(secondTextFieldLocator).toHaveAttribute('value', 'textField2');

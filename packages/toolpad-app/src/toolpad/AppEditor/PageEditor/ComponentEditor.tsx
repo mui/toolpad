@@ -116,7 +116,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const component = useToolpadComponent(dom, getElementNodeComponentId(node));
 
   return (
-    <Stack direction="column" gap={1}>
+    <Stack direction="column" gap={1} data-testid="selected-node-editor">
       <Typography variant="subtitle1">
         Component: {component?.displayName || '<unknown>'}
       </Typography>
@@ -148,7 +148,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
   const selectedNode = selection ? appDom.getNode(dom, selection) : null;
 
   return (
-    <ComponentEditorRoot className={className} data-testid="component-props-editor">
+    <ComponentEditorRoot className={className}>
       {selectedNode && appDom.isElement(selectedNode) ? (
         // Add key to make sure it mounts every time selected node changes
         <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />

@@ -51,8 +51,6 @@ export default function NodeAttributeEditor({
       propType={propType}
       renderControl={(params) => <Control nodeId={node.id} {...params} propType={propType} />}
       value={propValue}
-      minValue={argType.minValue}
-      maxValue={argType.maxValue}
       onChange={handlePropChange}
     />
   ) : (

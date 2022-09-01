@@ -1,15 +1,13 @@
 import { TextField } from '@mui/material';
+import { NumberValueType } from '@mui/toolpad-core';
 import * as React from 'react';
 import type { EditorProps } from '../../types';
 
-function NumberPropEditor({
-  label,
-  value,
-  onChange,
-  disabled,
-  minValue,
-  maxValue,
-}: EditorProps<number>) {
+type NumberPropEditorProps = EditorProps<number> & { propType: NumberValueType };
+
+function NumberPropEditor({ label, value, onChange, disabled, propType }: NumberPropEditorProps) {
+  const { minimum, maximum } = propType;
+
   const [inputValue, setInputValue] = React.useState(value);
 
   const handleChange = React.useCallback(
@@ -18,28 +16,28 @@ function NumberPropEditor({
 
       setInputValue(newValue);
 
-      if (minValue && newValue < minValue) {
-        onChange(minValue);
-      } else if (maxValue && newValue > maxValue) {
-        onChange(maxValue);
+      if (minimum && newValue < minimum) {
+        onChange(minimum);
+      } else if (maximum && newValue > maximum) {
+        onChange(maximum);
       } else {
         onChange(newValue);
       }
     },
-    [maxValue, minValue, onChange],
+    [maximum, minimum, onChange],
   );
 
   const handleBlur = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       const blurValue = Number(event.target.value);
 
-      if (minValue && blurValue < minValue) {
-        setInputValue(minValue);
-      } else if (maxValue && blurValue > maxValue) {
-        setInputValue(maxValue);
+      if (minimum && blurValue < minimum) {
+        setInputValue(minimum);
+      } else if (maximum && blurValue > maximum) {
+        setInputValue(maximum);
       }
     },
-    [maxValue, minValue],
+    [maximum, minimum],
   );
 
   return (

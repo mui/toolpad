@@ -23,8 +23,6 @@ export interface EditorProps<T> {
   propType: PropValueType;
   disabled?: boolean;
   value: T | undefined;
-  minValue?: number;
-  maxValue?: number;
   onChange: (newValue: T | undefined) => void;
 }
 

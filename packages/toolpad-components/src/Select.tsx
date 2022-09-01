@@ -53,9 +53,8 @@ export default createComponent(Select, {
       defaultValue: '',
     },
     width: {
-      typeDef: { type: 'number' },
+      typeDef: { type: 'number', minimum: 120 },
       defaultValue: 120,
-      minValue: 120,
     },
     variant: {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },

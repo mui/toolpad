@@ -165,14 +165,6 @@ export interface ArgTypeDefinition<V = unknown> {
    */
   defaultValue?: V;
   /**
-   * A minimum value for the property.
-   */
-  minValue?: number;
-  /**
-   * A maximum value for the property.
-   */
-  maxValue?: number;
-  /**
    * The property that will supply the default value.
    */
   defaultValueProp?: V;

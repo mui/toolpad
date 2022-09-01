@@ -14,8 +14,6 @@ export interface RenderControlParams<V> extends WithControlledProp<V> {
   label: string;
   propType: PropValueType;
   disabled: boolean;
-  minValue?: number;
-  maxValue?: number;
 }
 
 export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
@@ -23,8 +21,6 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   disabled?: boolean;
   server?: boolean;
   propType: PropValueType;
-  minValue?: number;
-  maxValue?: number;
   renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
@@ -37,8 +33,6 @@ export default function BindableEditor<V>({
   propType,
   renderControl = renderDefaultControl,
   value,
-  minValue,
-  maxValue,
   server,
   onChange,
   liveBinding,
@@ -71,8 +65,6 @@ export default function BindableEditor<V>({
           disabled: disabled || !!hasBinding,
           value: constValue,
           onChange: handlePropConstChange,
-          minValue,
-          maxValue,
         })}
         <BindingEditor<V>
           globalScope={globalScope}

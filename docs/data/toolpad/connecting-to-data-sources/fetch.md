@@ -1,8 +1,6 @@
 # Fetch
 
-<p class="description">
-    <b>Fetch</b> query type is an easiest and fastest way to load external data within Toolpad app
-</p>
+<p class="description">Fetch query type is the easiest and fastest way to load external data within Toolpad app.</p>
 
 As explained in the [connections](/toolpad/connecting-to-data-sources/connections/) section you can either create a reusable `connection` or simply create a new `query` and put all connection details inline
 

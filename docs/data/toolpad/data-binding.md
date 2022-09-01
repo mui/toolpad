@@ -26,7 +26,7 @@ On the left side of the editor we have a list of all the `variables` in the `sco
 
 We can either simply pass a `path` to a property of the `object` or we can also use any other `JavaScript` expression or code snippet to additionally process the value that is going to be used.
 
-![Binding custom expression](/static/toolpad/data-binding-4.png)
+![Binding custom expression](/static/toolpad/data-binding-4x2.png)
 
 All that's left is to click `UPDATE BINDING` and we can observe how application behaves
 

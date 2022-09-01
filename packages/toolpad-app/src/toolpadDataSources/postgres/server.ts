@@ -102,7 +102,8 @@ async function execPrivate(
         await client.connect();
         await client.query('SELECT * FROM version();');
         return { error: null };
-      } catch (err: any) {
+      } catch (rawError) {
+        const err = parseError(rawError);
         return { error: err.message };
       }
     }

@@ -19,10 +19,10 @@ const IGNORED_ERRORS = [
 
 export const test = base.extend({
   page: async ({ page }, use) => {
-    const entriePromises: Promise<ConsoleEntry>[] = [];
+    const entryPromises: Promise<ConsoleEntry>[] = [];
 
     const consoleHandler = (msg: ConsoleMessage) => {
-      entriePromises.push(
+      entryPromises.push(
         Promise.all(
           msg.args().map(async (argHandle) => argHandle.jsonValue().catch(() => '<circular>')),
         ).then((args) => {
@@ -42,7 +42,7 @@ export const test = base.extend({
 
     page.off('console', consoleHandler);
 
-    const entries = await Promise.all(entriePromises);
+    const entries = await Promise.all(entryPromises);
     for (const entry of entries) {
       if (entry.type === 'error' && !IGNORED_ERRORS.some((regex) => regex.test(entry.text))) {
         // Currently a catch-all for console error messages. Expecting us to add a way of blacklisting

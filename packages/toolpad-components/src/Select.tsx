@@ -12,7 +12,7 @@ export type SelectProps = TextFieldProps & {
   width: number;
 };
 
-function Select({ options, width, sx, ...rest }: SelectProps) {
+function Select({ options, width, sx, defaultValue, ...rest }: SelectProps) {
   return (
     <TextField select sx={{ width, ...sx }} {...rest}>
       {options.map((option) => {
@@ -41,6 +41,11 @@ export default createComponent(Select, {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       onChangeHandler: (event: React.ChangeEvent<HTMLSelectElement>) => event.target.value,
+      defaultValue: '',
+      defaultValueProp: 'defaultValue',
+    },
+    defaultValue: {
+      typeDef: { type: 'string' },
       defaultValue: '',
     },
     label: {

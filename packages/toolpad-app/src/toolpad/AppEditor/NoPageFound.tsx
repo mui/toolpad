@@ -1,17 +1,18 @@
 import { Grid, Typography, Button } from '@mui/material';
 import * as React from 'react';
+import useBoolean from '../../utils/useBoolean';
 import CreatePageNodeDialog from './HierarchyExplorer/CreatePageNodeDialog';
 
 export interface NoPageFoundProps {
   appId: string;
 }
 export default function NoPageFound({ appId }: NoPageFoundProps) {
-  const [createPageDialogOpen, setCreatePageDialogOpen] = React.useState(0);
-  const handleCreatePageDialogOpen = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreatePageDialogOpen(Math.random());
-  }, []);
-  const handleCreatepageDialogClose = React.useCallback(() => setCreatePageDialogOpen(0), []);
+  const {
+    value: createPageDialogOpen,
+    setTrue: handleCreatePageDialogOpen,
+    setFalse: handleCreatepageDialogClose,
+  } = useBoolean(false);
+
   return (
     <Grid
       container
@@ -30,7 +31,6 @@ export default function NoPageFound({ appId }: NoPageFoundProps) {
         </Button>
       </Grid>
       <CreatePageNodeDialog
-        key={createPageDialogOpen || undefined}
         appId={appId}
         open={!!createPageDialogOpen}
         onClose={handleCreatepageDialogClose}

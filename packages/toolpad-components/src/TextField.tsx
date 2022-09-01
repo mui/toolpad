@@ -11,7 +11,7 @@ export type TextFieldProps = MuiTextFieldProps & {
   justifyContent?: BoxProps['justifyContent'];
 };
 
-function TextField(props: TextFieldProps) {
+function TextField({ defaultValue, ...props }: TextFieldProps) {
   return <MuiTextField {...props} />;
 }
 
@@ -22,6 +22,11 @@ export default createComponent(TextField, {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
+      defaultValue: '',
+      defaultValueProp: 'defaultValue',
+    },
+    defaultValue: {
+      typeDef: { type: 'string' },
       defaultValue: '',
     },
     label: {

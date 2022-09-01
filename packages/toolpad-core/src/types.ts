@@ -173,6 +173,10 @@ export interface ArgTypeDefinition<V = unknown> {
    */
   maxValue?: number;
   /**
+   * The property that will supply the default value.
+   */
+  defaultValueProp?: V;
+  /**
    * The property that is used to control this property.
    */
   onChangeProp?: string;

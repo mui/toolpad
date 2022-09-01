@@ -12,6 +12,8 @@ If you do not have yarn installed, select your OS and follow the instructions on
 
 _DO NOT USE NPM, use Yarn to install the dependencies._
 
+You can open [documentation here](http://localhost:3003/toolpad/getting-started/introduction/)
+
 ## How can I add a new demo to the documentation?
 
 [You can follow this guide](https://github.com/mui/material-ui/blob/HEAD/CONTRIBUTING.md)

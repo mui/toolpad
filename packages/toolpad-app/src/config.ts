@@ -29,9 +29,6 @@ export type BuildEnvVars = Record<
   | 'TOOLPAD_DEMO'
   // The current Toolpad version
   | 'TOOLPAD_VERSION'
-  // Enable input field for seeding a dom in the app creation dialog
-  // (For testing purposes)
-  | 'TOOLPAD_CREATE_WITH_DOM'
   // Show debug logs
   | 'TOOLPAD_DEBUG',
   string
@@ -40,8 +37,9 @@ export type BuildEnvVars = Record<
 // These are set at runtime and passed to the browser.
 // Do not add secrets
 export interface RuntimeConfig {
-  // This is a test
-  foo?: string;
+  // Enable input field for seeding a dom in the app creation dialog
+  // (For testing purposes)
+  integrationTest?: boolean;
 }
 
 declare global {
@@ -65,11 +63,11 @@ function getBrowsersideRuntimeConfig(): RuntimeConfig {
   return maybeRuntimeConfig;
 }
 
-export const runtimeConfig: RuntimeConfig =
+const runtimeConfig: RuntimeConfig =
   typeof window === 'undefined'
     ? {
         // Define runtime config here
-        foo: process.env.TOOLPAD_FOO,
+        integrationTest: !!process.env.TOOLPAD_INTEGRATION_TEST,
       }
     : getBrowsersideRuntimeConfig();
 

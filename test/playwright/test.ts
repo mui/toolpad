@@ -12,6 +12,10 @@ interface ConsoleEntry {
   };
 }
 
+const IGNORED_ERRORS = [
+  /JavaScript Error: "downloadable font: download failed \(font-family: "Roboto" style:normal/,
+];
+
 export const test = base.extend({
   page: async ({ page }, use) => {
     const entries: ConsoleEntry[] = [];
@@ -31,7 +35,7 @@ export const test = base.extend({
     page.off('console', consoleHandler);
 
     for (const entry of entries) {
-      if (entry.type === 'error') {
+      if (entry.type === 'error' && !IGNORED_ERRORS.some((regex) => regex.test(entry.text))) {
         // Currently a catch-all for console error messages. Expecting us to add a way of blacklisting
         // expected error messages at some point here
         throw new Error(`Console error message detected\n${entry.text}`);

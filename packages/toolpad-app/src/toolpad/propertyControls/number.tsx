@@ -3,7 +3,7 @@ import { NumberValueType } from '@mui/toolpad-core';
 import * as React from 'react';
 import type { EditorProps } from '../../types';
 
-type NumberPropEditorProps = EditorProps<number> & { propType: NumberValueType };
+type NumberPropEditorProps = Omit<EditorProps<number>, 'propType'> & { propType: NumberValueType };
 
 function NumberPropEditor({ label, value, onChange, disabled, propType }: NumberPropEditorProps) {
   const { minimum, maximum } = propType;

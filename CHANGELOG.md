@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.0.16
+
+<!-- generated comparing v0.0.15..master -->
+
+_Aug 31, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Simplify interaction between canvas and editor, new interface to view unsaved changes, improve the flow for creating and editing queries and improve the localStorage hook implementation. Also, some documentation improvements!
+
+- &#8203;<!-- 14 -->Nudge PRs to have linked issues, visual demos (#836) @bharatkashyap
+- &#8203;<!-- 13 -->Fix error when rendering empty grid (#872) @Janpot
+- &#8203;<!-- 12 -->Hide number of changes in UI, add it in debug logging utility (#861) @apedroferreira
+- &#8203;<!-- 11 -->Props panel sections (#855) @apedroferreira
+- &#8203;<!-- 10 -->Simplify interaction between canvas and editor (#858) @Janpot
+- &#8203;<!-- 09 -->Improved and updated tutorial.md (#865) @VasuDevrani
+- &#8203;<!-- 08 -->Only sign in to dockerhub if we intend to push images (#867) @Janpot
+- &#8203;<!-- 07 -->Remove baseline overrides from eslintrc (#835) @Janpot
+- &#8203;<!-- 06 -->Allow intercepting the console on CanvasHost (#856) @Janpot
+- &#8203;<!-- 05 -->Improve drop area design (#854) @apedroferreira
+- &#8203;<!-- 04 -->Improve QueryEditor flow (#844) @Janpot
+- &#8203;<!-- 03 -->Fix missing jsx key warning (#851) @Janpot
+- &#8203;<!-- 02 -->Improve localStorage implementation (#846) @Janpot
+- &#8203;<!-- 01 -->Parse numbers as ms from epoch for date/datetime columns (#848) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @VasuDevrani
+
 ## v0.0.15
 
 <!-- generated comparing v0.0.14..master -->

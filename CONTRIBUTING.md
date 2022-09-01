@@ -68,6 +68,10 @@ If you would like to hack on MUI Toolpad or want to run the latest version, you 
   yarn prisma db push --accept-data-loss
   ```
 
+## Sending a pull request
+
+Please have a look at our general guidelines for sending pull requests [here](https://mui-org.notion.site/GitHub-PRs-7112d03a6c4346168090b29a970c0154) and [here](https://github.com/mui/material-ui/blob/master/CONTRIBUTING.md#sending-a-pull-request).
+
 ## Release process
 
 1. Generate a new version using:

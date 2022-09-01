@@ -165,6 +165,10 @@ export interface ArgTypeDefinition<V = unknown> {
    */
   defaultValue?: V;
   /**
+   * The property that will supply the default value.
+   */
+  defaultValueProp?: V;
+  /**
    * The property that is used to control this property.
    */
   onChangeProp?: string;

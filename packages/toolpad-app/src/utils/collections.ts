@@ -40,9 +40,9 @@ export function mapKeys<U>(
 
 export function mapValues<P, V>(
   obj: P,
-  mapper: (old: P[PropertiesOf<P>]) => V,
+  mapper: (old: P[PropertiesOf<P>], key: PropertiesOf<P>) => V,
 ): Record<PropertiesOf<P>, V> {
-  return mapProperties(obj, ([key, value]) => [key, mapper(value)]);
+  return mapProperties(obj, ([key, value]) => [key, mapper(value, key)]);
 }
 
 export function filterValues<P>(obj: P, filter: (old: P[keyof P]) => boolean): Partial<P>;

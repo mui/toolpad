@@ -255,8 +255,10 @@ function logUnsavedChanges(unsavedChanges: number) {
   const hasUnsavedChanges = unsavedChanges >= 1;
 
   if (!hasUnsavedChanges && previousUnsavedChanges > 0) {
-    // eslint-disable-next-line no-console
-    console.log(`${previousUnsavedChanges} changes saved.`);
+    if (process.env.NODE_ENV !== 'test') {
+      // eslint-disable-next-line no-console
+      console.log(`${previousUnsavedChanges} changes saved.`);
+    }
   }
 
   previousUnsavedChanges = unsavedChanges;

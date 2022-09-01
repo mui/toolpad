@@ -52,7 +52,7 @@ Now that we have our first simple application, let's make sure we can use it out
 
 ## Data fetching
 
-A Toolpad aplication wouldn't be useful if you couldn't import your data into it.
+A Toolpad application wouldn't be useful if you couldn't import your data into it.
 
 1. the first step is to make a connection to your data source. The connection holds the necessary credentials. In the case of a database, this may be the connection string, or in the case of a REST API this may contain an API token. For demo purposes, we will just create a dummy connection that we can use to make public HTTP requests. To get started, click on the plus button next to "Connections" in the left menu. In the popup that opens, select the "Fetch" type and click "create". In the window that opens, give your connection a name "ourData".
 

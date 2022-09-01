@@ -28,12 +28,12 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
 ![Toolpad app](/static/toolpad/app-ui-chrome.png)
 
-There are 4 most frequeantly used areas:
+There are 4 most frequently used areas:
 
 - `Instance editor` - this is there you define and manage pages, connection configurations, custom component definitions, etc...
 - `Component's library` - drag component instance from this drawer and drop it in `Application editor` to build UI
 - `Application editor` - this is a place where you build your app and immediately preview how it looks like
-- `Properties editor` - modify properties of a differente instance
+- `Properties editor` - modify properties of a different instance
 
 ## Building your first application
 
@@ -61,7 +61,7 @@ There are 4 most frequeantly used areas:
 
    ![Fetch type](/static/toolpad/step-4.png)
 
-1. Let's fetch some data about dogs from `https://dog.ceo/dog-api` (if you're more of a cat person you could use cat data API from `https://catfact.ninja`. We apologize in advance - following tutorial steps are more suited for the dog data API but should be easily adaptible for cats as well!)
+1. Let's fetch some data about dogs from `https://dog.ceo/dog-api` (if you're more of a cat person you could use cat data API from `https://catfact.ninja`. We apologize in advance - following tutorial steps are more suited for the dog data API but should be easily adaptable for cats as well!)
 
    Use `https://dog.ceo/api/breeds/list/all` as a `GET` query `URL`
 
@@ -69,13 +69,13 @@ There are 4 most frequeantly used areas:
 
    ![Fetch URL](/static/toolpad/step-5.png)
 
-1. Now because data comes in different shapes and forms we provide a quick and conveniant way to `transform response` data - `enable` option and use `return data.message` expression
+1. Now because data comes in different shapes and forms we provide a quick and convenient way to `transform response` data - `enable` option and use `return data.message` expression
 
    ![Transform response](/static/toolpad/step-6.png)
 
    In the response preview pane on the right you can see transformed data will be assigned to `dogQuery`
 
-1. `SAVE` your changes and close dialog (by clicking anywhere outside it) to return to `Application editor`
+1. `SAVE` your changes and you will return to `Application editor`
 
 1. Select `DataGrid` component by clicking on it
 

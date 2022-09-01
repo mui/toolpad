@@ -4,7 +4,7 @@
 
 ## What is Toolpad?
 
-Learn a few core concepts of the Toolpad app and you are ready to ship your application in minutes! Drag & drop built-in UI components, connect your data sources, release your app - and you're done!
+Learn a few core concepts of the Toolpad app and you are ready to ship your application in minutes! Drag & drop pre-built UI components, connect your data sources, release your app - and you're done!
 
 ![Editor screenshot](/static/toolpad/hero-screenshot.png)
 

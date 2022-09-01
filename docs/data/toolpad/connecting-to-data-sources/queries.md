@@ -17,7 +17,7 @@
    - [Google Sheets](/toolpad/connecting-to-data-sources/google-sheets/) - allows accessing data from your `Google sheet` document
    - [Postgres](/toolpad/connecting-to-data-sources/postgres/) - ability to hook directly into your own DB without the need to use API
 
-   \* - by default you will see only `Function` and `Fetch` types, for `Google Sheets` and `Postgress` you will first need to create a [`CONNECTION` instance](/toolpad/connecting-to-data-sources/connections/)
+   \* - by default you will see only `Function` and `Fetch` types, for `Google Sheets` and `Postgres` you will first need to create a [`CONNECTION` instance](/toolpad/connecting-to-data-sources/connections/)
 
 3. After choosing the `QUERY` type and clicking `CREATE QUERY` you will be presented with a query configuration dialog (configuration settings for each individual type are documented on their respective pages).
 

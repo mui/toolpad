@@ -1,8 +1,8 @@
 import { FiberNode, Hook } from 'react-devtools-inline';
 import { NodeId, RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, SlotType } from '@mui/toolpad-core';
 import { NodeFiberHostProps } from '@mui/toolpad-core/runtime';
-import { PageViewState, NodesInfo, NodeInfo, FlowDirection } from './types';
-import { getRelativeBoundingRect, getRelativeOuterRect } from './utils/geometry';
+import { PageViewState, NodesInfo, NodeInfo, FlowDirection } from '../types';
+import { getRelativeBoundingRect, getRelativeOuterRect } from '../utils/geometry';
 
 declare global {
   interface Window {
@@ -109,10 +109,10 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
             const gridAutoFlow = window.getComputedStyle(childContainerElm).gridAutoFlow;
             const flexDirection = window.getComputedStyle(childContainerElm).flexDirection;
 
-            let flowDirection;
+            let flowDirection = 'row';
             if (gridAutoFlow) {
               flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
-            } else {
+            } else if (flexDirection) {
               flowDirection = flexDirection;
             }
 
@@ -130,6 +130,6 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
   return { nodes };
 }
 
-export function getPageViewState(rootElm: HTMLElement): PageViewState {
+export default function getPageViewState(rootElm: HTMLElement): PageViewState {
   return getNodesViewInfo(rootElm);
 }

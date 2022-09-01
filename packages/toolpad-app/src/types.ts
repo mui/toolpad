@@ -23,7 +23,7 @@ export interface EditorProps<T> {
   propType: PropValueType;
   disabled?: boolean;
   value: T | undefined;
-  onChange: (newValue: T) => void;
+  onChange: (newValue: T | undefined) => void;
 }
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
@@ -114,7 +114,6 @@ export interface ConnectionStatus {
 export interface ClientDataSource<C = {}, Q = {}, P extends NestedBindableAttrs = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<C>;
-  isConnectionValid: (connection: C) => boolean;
   QueryEditor: QueryEditor<C, Q, P>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;

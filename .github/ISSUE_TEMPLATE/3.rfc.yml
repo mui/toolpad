@@ -1,6 +1,6 @@
 name: RFC 💬
 description: Request for comments for your proposal.
-title: "[RFC] "
+title: '[RFC] '
 labels: ['RFC']
 body:
   - type: markdown
@@ -35,12 +35,12 @@ body:
       label: Proposed solution 🟢
       description: |
         This is the core of RFC, and its purpose is to clearly explain reasoning for the proposed solution, why it's better compared to the other options or why should it be chosen instead.
-        
+
         Consider:
         - using diagrams to help illustrate your ideas
         - including code examples if you're proposing an interface or system contract
         - linking to project briefs or wireframes that are relevant
-  
+
   - type: textarea
     attributes:
       label: Relevant resources/benchmarks 🔗

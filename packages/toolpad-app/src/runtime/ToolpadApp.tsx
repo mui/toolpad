@@ -3,6 +3,7 @@ import {
   Stack,
   CssBaseline,
   Alert,
+  Box,
   styled,
   AlertTitle,
   LinearProgress,
@@ -18,11 +19,12 @@ import {
   Slots,
   Placeholder,
   NodeId,
+  execDataSourceQuery,
   BindableAttrValue,
   UseDataQueryConfig,
   NestedBindableAttrs,
 } from '@mui/toolpad-core';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
   Routes,
@@ -42,7 +44,12 @@ import * as _ from 'lodash-es';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
-import { getElementNodeComponentId, isPageRow, PAGE_ROW_COMPONENT_ID } from '../toolpadComponents';
+import {
+  getElementNodeComponentId,
+  isPageLayoutComponent,
+  isPageRow,
+  PAGE_ROW_COMPONENT_ID,
+} from '../toolpadComponents';
 import AppOverview from './AppOverview';
 import AppThemeProvider from './AppThemeProvider';
 import evalJsBindings, {
@@ -51,12 +58,25 @@ import evalJsBindings, {
   evaluateExpression,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../constants';
+import { HTML_ID_EDITOR_OVERLAY } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
+import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
+
+interface UseMutation {
+  call: (overrides?: any) => Promise<void>;
+  isLoading: boolean;
+  error: unknown;
+}
+
+const INITIAL_MUTATION: UseMutation = {
+  call: async () => {},
+  isLoading: false,
+  error: null,
+};
 
 const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
   'enabled',
@@ -139,27 +159,30 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const node = appDom.getNode(dom, nodeId, 'element');
   const Component: ToolpadComponent<any> = useElmToolpadComponent(node);
-  const { children: childNodes = [] } = appDom.getChildNodes(dom, node);
+  const childNodeGroups = appDom.getChildNodes(dom, node);
 
   return (
     /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
-    <RenderedNodeContent node={node} childNodes={childNodes} Component={Component} />
+    <RenderedNodeContent node={node} childNodeGroups={childNodeGroups} Component={Component} />
   );
 }
 
 interface RenderedNodeContentProps {
   node: appDom.PageNode | appDom.ElementNode;
-  childNodes: appDom.ElementNode[];
+  childNodeGroups: appDom.NodeChildren<appDom.ElementNode>;
   Component: ToolpadComponent<any>;
 }
 
-function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeContentProps) {
+function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
   const setControlledBinding = useSetControlledBindingContext();
 
   const nodeId = node.id;
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
   const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
+
+  const isLayoutNode =
+    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
 
   const liveBindings = useBindingsContext();
   const boundProps: Record<string, any> = React.useMemo(() => {
@@ -203,6 +226,24 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
     return hookResult;
   }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
 
+  const boundLayoutProps: Record<string, any> = React.useMemo(() => {
+    const hookResult: Record<string, any> = {};
+
+    for (const [propName, argType] of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
+      const bindingId = `${nodeId}.layout.${propName}`;
+      const binding = liveBindings[bindingId];
+      if (binding) {
+        hookResult[propName] = binding.value;
+      }
+
+      if (typeof hookResult[propName] === 'undefined' && argType) {
+        hookResult[propName] = argType.defaultValue;
+      }
+    }
+
+    return hookResult;
+  }, [isLayoutNode, liveBindings, nodeId]);
+
   const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
     () =>
       mapProperties(argTypes, ([key, argType]) => {
@@ -229,7 +270,7 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
         return null;
       }
 
-      const action = node.props?.[key];
+      const action = (node as appDom.ElementNode).props?.[key];
 
       if (action?.type === 'navigationAction') {
         const handler = () => {
@@ -256,30 +297,28 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
     });
   }, [argTypes, node, navigateToPage, evaluatePageExpression]);
 
-  const reactChildren =
-    childNodes.length > 0
-      ? childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />)
-      : // `undefined` to ensure the defaultProps get picked up
-        undefined;
+  const reactChildren = mapValues(childNodeGroups, (childNodes) =>
+    childNodes.map((child) => <RenderedNode key={child.id} nodeId={child.id} />),
+  );
 
-  const layoutProps = React.useMemo(() => {
+  const layoutElementProps = React.useMemo(() => {
     if (appDom.isElement(node) && isPageRow(node)) {
       return {
-        layoutColumnSizes: childNodes.map((childNode) => childNode.layout?.columnSize?.value),
+        layoutColumnSizes: childNodeGroups.children.map((child) => child.layout?.columnSize?.value),
       };
     }
     return {};
-  }, [childNodes, node]);
+  }, [childNodeGroups.children, node]);
 
   const props: Record<string, any> = React.useMemo(() => {
     return {
       ...boundProps,
       ...onChangeHandlers,
       ...eventHandlers,
-      ...layoutProps,
-      children: reactChildren,
+      ...layoutElementProps,
+      ...reactChildren,
     };
-  }, [boundProps, eventHandlers, layoutProps, onChangeHandlers, reactChildren]);
+  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
 
   // Wrap with slots
   for (const [propName, argType] of Object.entries(argTypes)) {
@@ -296,7 +335,19 @@ function RenderedNodeContent({ node, childNodes, Component }: RenderedNodeConten
 
   return (
     <NodeRuntimeWrapper nodeId={nodeId} componentConfig={Component[TOOLPAD_COMPONENT]}>
-      <Component {...props} />
+      {isLayoutNode ? (
+        <Component {...props} />
+      ) : (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: boundLayoutProps.verticalAlign,
+            justifyContent: boundLayoutProps.horizontalAlign,
+          }}
+        >
+          <Component {...props} />
+        </Box>
+      )}
     </NodeRuntimeWrapper>
   );
 }
@@ -417,11 +468,56 @@ function QueryNode({ node }: QueryNodeProps) {
   return null;
 }
 
+interface MutationNodeProps {
+  node: appDom.MutationNode;
+}
+
+function MutationNode({ node }: MutationNodeProps) {
+  const { appId, version } = useAppContext();
+  const bindings = useBindingsContext();
+  const setControlledBinding = useSetControlledBindingContext();
+
+  const dataUrl = `/api/data/${appId}/${version}/`;
+  const mutationId = node.id;
+  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
+
+  const {
+    isLoading,
+    error,
+    mutateAsync: call,
+  } = useMutation(
+    async (overrides: any = {}) =>
+      execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides }),
+    {
+      mutationKey: [dataUrl, mutationId, params],
+    },
+  );
+
+  // Stabilize the mutation and prepare for inclusion in global scope
+  const mutationResult: UseMutation = React.useMemo(
+    () => ({
+      isLoading,
+      error,
+      call,
+    }),
+    [isLoading, error, call],
+  );
+
+  React.useEffect(() => {
+    for (const [key, value] of Object.entries(mutationResult)) {
+      const bindingId = `${node.id}.${key}`;
+      setControlledBinding(bindingId, { value });
+    }
+  }, [node.id, mutationResult, setControlledBinding]);
+
+  return null;
+}
+
 interface ParseBindingOptions {
   scopePath?: string;
 }
 
-function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions) {
+function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions = {}) {
   if (bindable?.type === 'const') {
     return {
       scopePath,
@@ -438,6 +534,21 @@ function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBind
     scopePath,
     result: { value: undefined },
   };
+}
+
+function parsedBindingEqual(
+  binding1: ParsedBinding | undefined,
+  binding2: ParsedBinding | undefined,
+): boolean {
+  if (
+    (!binding1 && !binding2) ||
+    (binding1?.expression === binding2?.expression &&
+      binding1?.result?.value === binding2?.result?.value &&
+      binding1?.initializer === binding2?.initializer)
+  ) {
+    return true;
+  }
+  return false;
 }
 
 function parseBindings(
@@ -459,23 +570,37 @@ function parseBindings(
       const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
+        const initializerId = argType?.defaultValueProp
+          ? `${elm.id}.props.${argType.defaultValueProp}`
+          : undefined;
+
         const binding =
           elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
+
         const bindingId = `${elm.id}.props.${propName}`;
         const scopePath =
           componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
         if (argType) {
           if (argType.onChangeProp) {
-            const defaultValue: unknown =
-              binding?.type === 'const' ? binding?.value : argType.defaultValue;
             controlled.add(bindingId);
             parsedBindingsMap.set(bindingId, {
               scopePath,
-              result: { value: defaultValue },
+              initializer: initializerId,
             });
           } else {
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
           }
+        }
+      }
+
+      if (!isPageLayoutComponent(elm)) {
+        for (const [propName, argType] of Object.entries(layoutBoxArgTypes)) {
+          const binding =
+            elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
+            appDom.createConst(argType?.defaultValue ?? undefined);
+          const bindingId = `${elm.id}.layout.${propName}`;
+          const scopePath = `${elm.name}.@layout.${propName}`;
+          parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
         }
       }
     }
@@ -512,6 +637,36 @@ function parseBindings(
         parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
       }
     }
+
+    if (appDom.isMutation(elm)) {
+      if (elm.params) {
+        for (const [paramName, bindable] of Object.entries(elm.params)) {
+          const bindingId = `${elm.id}.params.${paramName}`;
+          const scopePath = `${elm.name}.params.${paramName}`;
+          if (bindable?.type === 'const') {
+            parsedBindingsMap.set(bindingId, {
+              scopePath,
+              result: { value: bindable.value },
+            });
+          } else if (bindable?.type === 'jsExpression') {
+            parsedBindingsMap.set(bindingId, {
+              scopePath,
+              expression: bindable.value,
+            });
+          }
+        }
+      }
+
+      for (const [key, value] of Object.entries(INITIAL_MUTATION)) {
+        const bindingId = `${elm.id}.${key}`;
+        const scopePath = `${elm.name}.${key}`;
+        controlled.add(bindingId);
+        parsedBindingsMap.set(bindingId, {
+          scopePath,
+          result: { value, loading: true },
+        });
+      }
+    }
   }
 
   const urlParams = new URLSearchParams(location.search);
@@ -535,7 +690,7 @@ const EMPTY_OBJECT = {};
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queries = [], mutations = [] } = appDom.getChildNodes(dom, page);
 
   usePageTitle(page.attributes.title.value);
 
@@ -555,7 +710,23 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
       for (const [key, binding] of Object.entries(parsedBindings)) {
-        updated[key] = controlled.has(key) ? existingBindings[key] || binding : binding;
+        let shouldUpdateBinding = false;
+
+        if (controlled.has(key)) {
+          // controlled bindings don't get updated, unless their initialValue has changed
+          if (binding.initializer) {
+            const initializer: ParsedBinding | undefined = parsedBindings[binding.initializer];
+            const existingInitializer: ParsedBinding | undefined =
+              existingBindings[binding.initializer];
+            if (!parsedBindingEqual(initializer, existingInitializer)) {
+              shouldUpdateBinding = true;
+            }
+          }
+        } else {
+          shouldUpdateBinding = true;
+        }
+
+        updated[key] = shouldUpdateBinding ? binding : existingBindings[key] || binding;
       }
       return updated;
     });
@@ -612,10 +783,18 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
     <BindingsContextProvider value={liveBindings}>
       <SetControlledBindingContextProvider value={setControlledBinding}>
         <EvaluatePageExpressionProvider value={evaluatePageExpression}>
-          <RenderedNodeContent node={page} childNodes={children} Component={PageRootComponent} />
+          <RenderedNodeContent
+            node={page}
+            childNodeGroups={{ children }}
+            Component={PageRootComponent}
+          />
 
           {queries.map((node) => (
             <QueryNode key={node.id} node={node} />
+          ))}
+
+          {mutations.map((node) => (
+            <MutationNode key={node.id} node={node} />
           ))}
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>
@@ -678,6 +857,7 @@ const queryClient = new QueryClient({
 });
 
 export interface ToolpadAppProps {
+  rootRef?: React.Ref<HTMLDivElement>;
   hidePreviewBanner?: boolean;
   basename: string;
   appId: string;
@@ -686,6 +866,7 @@ export interface ToolpadAppProps {
 }
 
 export default function ToolpadApp({
+  rootRef,
   basename,
   appId,
   version,
@@ -699,7 +880,7 @@ export default function ToolpadApp({
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
   return (
-    <AppRoot id={HTML_ID_APP_ROOT}>
+    <AppRoot ref={rootRef}>
       <NoSsr>
         <DomContextProvider value={dom}>
           <AppThemeProvider dom={dom}>

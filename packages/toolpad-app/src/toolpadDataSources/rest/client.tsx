@@ -284,15 +284,9 @@ function QueryEditor({
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const lastSavedInput = React.useRef(input);
-  const handleCommit = React.useCallback(() => {
-    const newValue = input;
-    onChange(newValue);
-    lastSavedInput.current = newValue;
-  }, [onChange, input]);
+  const handleCommit = React.useCallback(() => onChange(input), [onChange, input]);
 
-  const isDirty =
-    input.query !== lastSavedInput.current.query || input.params !== lastSavedInput.current.params;
+  const isDirty = input !== value;
 
   const [activeTab, setActiveTab] = React.useState('body');
 
@@ -369,13 +363,11 @@ function QueryEditor({
         </QueryInputPanel>
 
         <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
-          <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
-            {preview?.error ? (
-              <ErrorAlert error={preview?.error} />
-            ) : (
-              <JsonView src={preview?.data} />
-            )}
-          </Box>
+          {preview?.error ? (
+            <ErrorAlert error={preview?.error} />
+          ) : (
+            <JsonView sx={{ height: '100%' }} src={preview?.data} />
+          )}
           <Devtools
             sx={{ width: '100%', height: '100%' }}
             har={previewHar}
@@ -394,7 +386,6 @@ function getInitialQueryValue(): FetchQuery {
 const dataSource: ClientDataSource<{}, FetchQuery, FetchParams> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
-  isConnectionValid: () => true,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

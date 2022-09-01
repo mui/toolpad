@@ -12,14 +12,17 @@ import {
   TextField,
   InputAdornment,
   Divider,
-  MenuItem,
-  SxProps,
   Alert,
   Box,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import {
+  BindableAttrEntries,
+  BindableAttrValue,
+  BindableAttrValues,
+  NodeId,
+} from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -29,105 +32,64 @@ import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import { omit, update } from '../../../utils/immutability';
 import { useEvaluateLiveBinding } from '../useEvaluateLiveBinding';
-import { Maybe, WithControlledProp } from '../../../utils/types';
 import { useDom, useDomApi } from '../../DomLoader';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
+import ConnectionSelect, { ConnectionOption } from './ConnectionSelect';
 import BindableEditor from './BindableEditor';
 import { createProvidedContext } from '../../../utils/react';
-
-export type ConnectionOption = {
-  connectionId: NodeId | null;
-  dataSourceId: string;
-};
+import { ConfirmDialog } from '../../../components/SystemDialogs';
+import useBoolean from '../../../utils/useBoolean';
 
 const EMPTY_OBJECT = {};
 
-export interface ConnectionSelectProps extends WithControlledProp<ConnectionOption | null> {
-  dataSource?: Maybe<string>;
-  sx?: SxProps;
+interface QueryeditorDialogActionsProps {
+  saveDisabled?: boolean;
+  onCommit?: () => void;
+  onRemove?: () => void;
+  onClose?: () => void;
 }
 
-export function ConnectionSelect({ sx, dataSource, value, onChange }: ConnectionSelectProps) {
-  const dom = useDom();
+function QueryeditorDialogActions({
+  saveDisabled,
+  onCommit,
+  onRemove,
+  onClose,
+}: QueryeditorDialogActionsProps) {
+  const handleCommit = () => {
+    onCommit?.();
+    onClose?.();
+  };
 
-  const app = appDom.getApp(dom);
-  const { connections = [] } = appDom.getChildNodes(dom, app);
+  const {
+    value: removeConfirmOpen,
+    setTrue: handleRemoveConfirmOpen,
+    setFalse: handleRemoveConfirmclose,
+  } = useBoolean(false);
 
-  const options: ConnectionOption[] = React.useMemo(() => {
-    const result: ConnectionOption[] = [];
-
-    for (const [dataSourceId, config] of Object.entries(dataSources)) {
-      if (config?.hasDefault) {
-        if (!dataSource || dataSource === dataSourceId) {
-          result.push({
-            dataSourceId,
-            connectionId: null,
-          });
-        }
+  const handleRemoveConfirm = React.useCallback(
+    (confirmed: boolean) => {
+      handleRemoveConfirmclose();
+      if (confirmed) {
+        onRemove?.();
+        onClose?.();
       }
-    }
-
-    for (const connection of connections) {
-      const connectionDataSourceId = connection.attributes.dataSource.value;
-      if (!dataSource || dataSource === connectionDataSourceId) {
-        const connectionDataSource = dataSources[connectionDataSourceId];
-        if (connectionDataSource) {
-          result.push({
-            connectionId: connection.id,
-            dataSourceId: connectionDataSourceId,
-          });
-        }
-      }
-    }
-
-    return result;
-  }, [connections, dataSource]);
-
-  const handleSelectionChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const index = Number(event.target.value);
-      onChange(options[index] || null);
     },
-    [onChange, options],
+    [handleRemoveConfirmclose, onClose, onRemove],
   );
 
-  const selection = React.useMemo(() => {
-    if (!value) {
-      return '';
-    }
-    return String(
-      options.findIndex(
-        (option) =>
-          option.connectionId === value.connectionId && option.dataSourceId === value.dataSourceId,
-      ),
-    );
-  }, [options, value]);
-
   return (
-    <TextField
-      sx={sx}
-      select
-      fullWidth
-      value={selection}
-      label="Connection"
-      onChange={handleSelectionChange}
-    >
-      {options.map((option, index) => {
-        const config = dataSources[option.dataSourceId];
-        const dataSourceLabel = config
-          ? config.displayName
-          : `<unknown datasource "${option.dataSourceId}">`;
-
-        const connectionLabel = option.connectionId
-          ? appDom.getMaybeNode(dom, option.connectionId)?.name
-          : '<default>';
-        return (
-          <MenuItem key={index} value={index}>
-            {dataSourceLabel} | {connectionLabel}
-          </MenuItem>
-        );
-      })}
-    </TextField>
+    <DialogActions>
+      <Button color="inherit" variant="text" onClick={onClose}>
+        Cancel
+      </Button>
+      <Button onClick={handleRemoveConfirmOpen}>Remove</Button>
+      <ConfirmDialog open={removeConfirmOpen} onClose={handleRemoveConfirm} severity="error">
+        Are you sure your want to remove this query?
+      </ConfirmDialog>
+      <Button disabled={saveDisabled} onClick={handleCommit}>
+        Save
+      </Button>
+    </DialogActions>
   );
 }
 
@@ -136,9 +98,6 @@ interface RenderDialogActions {
 }
 
 interface QueryEditorDialogContext {
-  open: boolean;
-  onClose: () => void;
-  dataSourceId: string | null;
   renderDialogTitle: () => React.ReactNode;
   renderQueryOptions: () => React.ReactNode;
   renderDialogActions: RenderDialogActions;
@@ -148,52 +107,40 @@ const [useQueryEditorDialogContext, QueryEditorDialogContextProvider] =
   createProvidedContext<QueryEditorDialogContext>('QueryEditorDialog');
 
 export function QueryEditorShell({ children, isDirty, onCommit }: QueryEditorShellProps) {
-  const {
-    open,
-    onClose,
-    dataSourceId,
-    renderDialogTitle,
-    renderQueryOptions,
-    renderDialogActions,
-  } = useQueryEditorDialogContext();
+  const { renderDialogTitle, renderQueryOptions, renderDialogActions } =
+    useQueryEditorDialogContext();
 
   return (
-    <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
+    <React.Fragment>
       {renderDialogTitle()}
 
       <Divider />
 
-      {dataSourceId ? (
-        <DialogContent
+      <DialogContent
+        sx={{
+          // height will be clipped by max-height
+          height: '100vh',
+          p: 0,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Box
           sx={{
-            // height will be clipped by max-height
-            height: '100vh',
-            p: 0,
+            flex: 1,
+            minHeight: 0,
+            position: 'relative',
             display: 'flex',
-            flexDirection: 'column',
           }}
         >
-          <Box
-            sx={{
-              flex: 1,
-              minHeight: 0,
-              position: 'relative',
-              display: 'flex',
-            }}
-          >
-            {children}
-          </Box>
+          {children}
+        </Box>
 
-          {renderQueryOptions()}
-        </DialogContent>
-      ) : (
-        <DialogContent>
-          <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        </DialogContent>
-      )}
+        {renderQueryOptions()}
+      </DialogContent>
 
       {renderDialogActions({ isDirty, onCommit })}
-    </Dialog>
+    </React.Fragment>
   );
 }
 
@@ -276,7 +223,9 @@ function QueryNodeEditorDialog<Q>({
   const { appId } = usePageEditorState();
   const dom = useDom();
 
-  const [input, setInput] = React.useState(appDom.fromLegacyQueryNode(node));
+  const [input, setInput] = React.useState<appDom.QueryNode<Q, P>>(
+    appDom.fromLegacyQueryNode(node),
+  );
   React.useEffect(() => {
     if (open) {
       setInput(appDom.fromLegacyQueryNode(node));
@@ -293,10 +242,13 @@ function QueryNodeEditorDialog<Q>({
 
   const connectionParams = connection?.attributes.params.value;
 
-  const queryModel = React.useMemo(
+  const queryModel = React.useMemo<QueryEditorModel<any>>(
     () => ({
       query: input.attributes.query.value,
-      params: inputParams,
+      params:
+        (Object.entries(inputParams).filter(([, value]) =>
+          Boolean(value),
+        ) as BindableAttrEntries) || [],
     }),
     [input.attributes.query.value, inputParams],
   );
@@ -308,7 +260,7 @@ function QueryNodeEditorDialog<Q>({
           attributes: update(input.attributes, {
             query: appDom.createConst(model.query),
           }),
-          params: model.params,
+          params: Object.fromEntries(model.params) as BindableAttrValues<P>,
         }),
       );
     },
@@ -511,24 +463,18 @@ function QueryNodeEditorDialog<Q>({
   const renderDialogActions: RenderDialogActions = React.useCallback(
     ({ isDirty, onCommit }) => {
       return (
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleRemove}>Remove</Button>
-          <Button disabled={isInputSaved && !isDirty} onClick={onCommit}>
-            Save
-          </Button>
-        </DialogActions>
+        <QueryeditorDialogActions
+          onCommit={onCommit}
+          onClose={handleClose}
+          onRemove={handleRemove}
+          saveDisabled={isInputSaved && !isDirty}
+        />
       );
     },
     [handleClose, handleRemove, isInputSaved],
   );
 
   const queryEditorShellContext: QueryEditorDialogContext = {
-    open,
-    onClose: handleClose,
-    dataSourceId: dataSource ? dataSourceId : null,
     renderDialogTitle,
     renderQueryOptions,
     renderDialogActions,
@@ -536,21 +482,21 @@ function QueryNodeEditorDialog<Q>({
 
   return (
     <QueryEditorDialogContextProvider value={queryEditorShellContext}>
-      {dataSourceId && dataSource && queryEditorContext ? (
-        <ConnectionContextProvider value={queryEditorContext}>
-          <dataSource.QueryEditor
-            QueryEditorShell={QueryEditorShell}
-            connectionParams={connectionParams}
-            value={queryModel}
-            onChange={handleQueryModelChange}
-            globalScope={pageState}
-          />
-        </ConnectionContextProvider>
-      ) : (
-        <QueryEditorShell>
+      <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
+        {dataSourceId && dataSource && queryEditorContext ? (
+          <ConnectionContextProvider value={queryEditorContext}>
+            <dataSource.QueryEditor
+              QueryEditorShell={QueryEditorShell}
+              connectionParams={connectionParams}
+              value={queryModel}
+              onChange={handleQueryModelChange}
+              globalScope={pageState}
+            />
+          </ConnectionContextProvider>
+        ) : (
           <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        </QueryEditorShell>
-      )}
+        )}
+      </Dialog>
     </QueryEditorDialogContextProvider>
   );
 }

@@ -150,10 +150,6 @@ jobs:
     steps:
       - checkout
 
-      # login docker hub
-      - run: |
-          echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
-
       # build the application image
       - run: |
           docker build \
@@ -170,7 +166,7 @@ jobs:
       - run:
           command: |
             # See https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
-            TAG=$CIRCLE_SHA1 docker-compose -f ./docker/compose/docker-compose.yml up -d
+            TAG=$CIRCLE_SHA1 docker-compose -f ./docker-compose.test.yml up -d
             yarn workspace @mui/toolpad-app waitForApp --url=http://172.17.0.1:3000/
             docker run -it --rm \
               --ipc=host \
@@ -178,14 +174,18 @@ jobs:
               -w /tests \
               -e PLAYWRIGHT_TEST_BASE_URL=http://172.17.0.1:3000/ \
               mcr.microsoft.com/playwright:v1.23.1-focal \
-              yarn e2e:smoke
-            docker-compose -f ./docker/compose/docker-compose.yml down
+              yarn test:integration --forbid-only
+            docker-compose -f ./docker-compose.test.yml down
 
       # push the image
       - when:
           condition:
             equal: [master, << pipeline.git.branch >>]
           steps:
+            # login docker hub
+            - run: |
+                echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+
             - run: |
                 docker push muicom/toolpad:$CIRCLE_SHA1
                 docker tag muicom/toolpad:$CIRCLE_SHA1 muicom/toolpad:alpha

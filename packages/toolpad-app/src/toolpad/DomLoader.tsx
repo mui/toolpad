@@ -8,6 +8,7 @@ import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
 import { createProvidedContext } from '../utils/react';
+import { debugLog } from '../utils/logs';
 
 export type DomAction =
   | {
@@ -250,6 +251,27 @@ export function useDomApi(): DomApi {
   return React.useContext(DomApiContext);
 }
 
+let previousUnsavedChanges = 0;
+function logUnsavedChanges(unsavedChanges: number) {
+  const hasUnsavedChanges = unsavedChanges >= 1;
+  const newChanges = unsavedChanges - previousUnsavedChanges;
+
+  const pluralizeChanges = (changesCount: number) => `change${changesCount !== 1 ? 's' : ''}`;
+
+  if (hasUnsavedChanges) {
+    debugLog(
+      `+ ${newChanges} ${pluralizeChanges(
+        newChanges,
+      )}. ${unsavedChanges} unsaved ${pluralizeChanges(unsavedChanges)}.`,
+      'orange',
+    );
+  } else if (previousUnsavedChanges > 0) {
+    debugLog('All changes saved!', 'green');
+  }
+
+  previousUnsavedChanges = unsavedChanges;
+}
+
 export interface DomContextProps {
   appId: string;
   children?: React.ReactNode;
@@ -268,7 +290,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   });
   const api = React.useMemo(() => createDomApi(dispatch), []);
 
-  const lastSavedDom = React.useRef<appDom.AppDom | null>(null);
+  const lastSavedDom = React.useRef<appDom.AppDom | null>(state.dom);
   const handleSave = React.useCallback(() => {
     if (!state.dom || lastSavedDom.current === state.dom) {
       return;
@@ -294,13 +316,15 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   }, [state.dom, debouncedhandleSave]);
 
   React.useEffect(() => {
+    logUnsavedChanges(state.unsavedChanges);
+
     if (state.unsavedChanges <= 0) {
       return () => {};
     }
 
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
-      event.returnValue = `You have ${state.unsavedChanges} unsaved change(s), are you sure you want to navigate away?`;
+      event.returnValue = `You have unsaved changes. Are you sure you want to navigate away?`;
     };
 
     window.addEventListener('beforeunload', onBeforeUnload);

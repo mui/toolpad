@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
-import { BindableAttrValue } from '@mui/toolpad-core';
 import { Controller, useForm } from 'react-hook-form';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -100,17 +99,8 @@ function QueryEditor({
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
 
-  const [params, setParams] = React.useState<[string, BindableAttrValue<any>][]>(
-    Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>)),
-  );
-
-  React.useEffect(
-    () => setParams(Object.entries(input.params || ({} as BindableAttrValue<Record<string, any>>))),
-    [input.params],
-  );
-
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    input: params,
+    input: input.params,
     globalScope,
   });
 
@@ -143,7 +133,7 @@ function QueryEditor({
   });
 
   const extraLibs = React.useMemo(() => {
-    const paramsKeys = params.map(([key]) => key);
+    const paramsKeys = input.params.map(([key]) => key);
     const paramsMembers = paramsKeys.map((key) => `${key}: string`).join('\n');
     const secretsMembers = secretsKeys.map((key) => `${key}: string`).join('\n');
 
@@ -159,20 +149,14 @@ function QueryEditor({
     `;
 
     return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
-  }, [params, secretsKeys]);
+  }, [input.params, secretsKeys]);
 
   const handleLogClear = React.useCallback(() => setPreviewLogs([]), []);
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const lastSavedInput = React.useRef(input);
-  const handleCommit = React.useCallback(() => {
-    const newValue = { ...input, params: Object.fromEntries(params) };
-    onChange(newValue);
-    lastSavedInput.current = newValue;
-  }, [onChange, params, input]);
+  const handleCommit = React.useCallback(() => onChange(input), [onChange, input]);
 
-  const isDirty =
-    input.query !== lastSavedInput.current.query || input.params !== lastSavedInput.current.params;
+  const isDirty = input !== value;
 
   return (
     <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
@@ -190,11 +174,11 @@ function QueryEditor({
             </Box>
           </QueryInputPanel>
 
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
             <Typography>Parameters</Typography>
             <ParametersEditor
-              value={params}
-              onChange={setParams}
+              value={input.params}
+              onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
               globalScope={globalScope}
               liveValue={paramsEditorLiveValue}
             />
@@ -202,13 +186,11 @@ function QueryEditor({
         </SplitPane>
 
         <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
-          <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
-            {preview?.error ? (
-              <ErrorAlert error={preview?.error} />
-            ) : (
-              <JsonView src={preview?.data} />
-            )}
-          </Box>
+          {preview?.error ? (
+            <ErrorAlert error={preview?.error} />
+          ) : (
+            <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+          )}
 
           <Devtools
             sx={{ width: '100%', height: '100%' }}
@@ -230,7 +212,6 @@ function getInitialQueryValue(): FunctionQuery {
 const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {
   displayName: 'Function',
   ConnectionParamsInput,
-  isConnectionValid: () => true,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

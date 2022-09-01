@@ -133,6 +133,12 @@ async function main({ yes, force, commit, releaseTag, noLatest, githubToken }) {
     commit = answers.commit;
   }
 
+  const baseImageExists = await checkTagExists(IMAGE_NAME, commit);
+
+  if (!baseImageExists) {
+    throw new Error(`Base image ${IMAGE_NAME}:${commit} doesn't exist`);
+  }
+
   if (!releaseTag) {
     const answers = await inquirer.prompt([
       {
@@ -193,13 +199,13 @@ async function main({ yes, force, commit, releaseTag, noLatest, githubToken }) {
   let polls = 0;
   while (!completed) {
     polls += 1;
-    if (polls > 60) {
+    if (polls > 180) {
       throw new Error(
         `Timeout polling for workflow status, please check manually: https://github.com/mui/mui-toolpad/actions`,
       );
     }
     // eslint-disable-next-line no-await-in-loop
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 5000));
     const lastCreationDate = new Date(lastRunBefore?.created_at ?? 0);
     // eslint-disable-next-line no-console
     console.log('Checking for completion, please wait...');

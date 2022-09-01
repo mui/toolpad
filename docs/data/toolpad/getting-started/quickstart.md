@@ -49,7 +49,7 @@ There are 4 most frequently used areas:
 
    ![Drag components](/static/toolpad/step-2.png)
 
-   Congratulations, we are done building UI! Now all we need is to connect it with same data source
+   Congratulations, we are done building the UI! Now all we need to do is connect it with a data source.
 
 1. Click anywhere inside `Application editor` (except on the components that you just added) to deselect added components
 

@@ -92,6 +92,7 @@
     "@types/react-dom": "18.0.5"
   },
   "engines": {
-    "npm": "please-use-yarn"
+    "npm": "please-use-yarn",
+    "node": ">=16"
   }
 }

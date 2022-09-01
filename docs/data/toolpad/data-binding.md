@@ -6,7 +6,7 @@
 
 ## Binding button
 
-In order to initiate `data binding` look around in the UI for a binding button
+In order to initiate `data binding` look around in the UI for a binding button.
 
 ![Binding icon](/static/toolpad/data-binding-1.png)
 

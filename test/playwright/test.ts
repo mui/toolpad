@@ -10,6 +10,7 @@ interface ConsoleEntry {
     lineNumber: number;
     columnNumber: number;
   };
+  args: any[];
 }
 
 const IGNORED_ERRORS = [
@@ -46,7 +47,7 @@ export const test = base.extend({
       if (entry.type === 'error' && !IGNORED_ERRORS.some((regex) => regex.test(entry.text))) {
         // Currently a catch-all for console error messages. Expecting us to add a way of blacklisting
         // expected error messages at some point here
-        throw new Error(`Console error message detected\n${entry.text}`);
+        throw new Error(`Console error message detected\n${JSON.stringify(entry, null, 2)}`);
       }
     }
   },

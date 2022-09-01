@@ -127,51 +127,25 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
     setFalse: handleCreateReleasDialogClose,
   } = useBoolean(false);
 
-  const [isSaveStateVisible, setIsSaveStateVisible] = React.useState(false);
-
   const hasUnsavedChanges = domLoader.unsavedChanges > 0;
   const isSaving = domLoader.saving;
-
-  React.useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    if (!hasUnsavedChanges) {
-      timeout = setTimeout(() => {
-        setIsSaveStateVisible(false);
-
-        if (timeout) {
-          clearTimeout(timeout);
-        }
-      }, 4500);
-    } else {
-      setIsSaveStateVisible(true);
-    }
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
-  }, [hasUnsavedChanges]);
 
   return (
     <ToolpadShell
       actions={
         <Stack direction="row" gap={1} alignItems="center">
-          {isSaveStateVisible ? (
-            <Tooltip title={getSaveStateMessage(isSaving, hasUnsavedChanges)}>
-              <Box display="flex" flexDirection="row" alignItems="center">
-                {isSaving ? (
-                  <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
-                ) : (
-                  <CloudDoneIcon
-                    color={hasUnsavedChanges ? 'disabled' : 'success'}
-                    fontSize="medium"
-                  />
-                )}
-              </Box>
-            </Tooltip>
-          ) : null}
+          <Tooltip title={getSaveStateMessage(isSaving, hasUnsavedChanges)}>
+            <Box display="flex" flexDirection="row" alignItems="center" mr={1}>
+              {isSaving ? (
+                <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
+              ) : (
+                <CloudDoneIcon
+                  color={hasUnsavedChanges ? 'disabled' : 'success'}
+                  fontSize="medium"
+                />
+              )}
+            </Box>
+          </Tooltip>
           <Button
             variant="outlined"
             color="inherit"

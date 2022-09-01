@@ -1,5 +1,6 @@
 import { Client, QueryConfig } from 'pg';
 import { ServerDataSource } from '../../types';
+import { parseError } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
 import {
   PostgresConnectionParams,
@@ -60,7 +61,8 @@ async function execBase(
     return {
       data: res.rows,
     };
-  } catch (error: any) {
+  } catch (rawError) {
+    const error = parseError(rawError);
     error.message = parseErrorMessage(error.message, paramEntries);
     return {
       data: [],

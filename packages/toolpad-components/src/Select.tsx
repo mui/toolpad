@@ -12,9 +12,14 @@ export type SelectProps = TextFieldProps & {
   width: number;
 };
 
-function Select({ options, width, sx, defaultValue, ...rest }: SelectProps) {
+function Select({ options, width, sx, defaultValue, fullWidth, ...rest }: SelectProps) {
   return (
-    <TextField select sx={{ width, ...sx }} {...rest}>
+    <TextField
+      select
+      sx={{ ...(!fullWidth ? { width } : {}), ...sx }}
+      fullWidth={fullWidth}
+      {...rest}
+    >
       {options.map((option) => {
         const parsedOption: SelectOption = typeof option === 'string' ? { value: option } : option;
         return (

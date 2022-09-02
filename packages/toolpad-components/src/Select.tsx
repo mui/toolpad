@@ -17,6 +17,7 @@ function Select({ options, value, defaultValue, fullWidth, sx, ...rest }: Select
       select
       sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
       fullWidth={fullWidth}
+      value={value}
       {...rest}
     >
       {options.map((option) => {

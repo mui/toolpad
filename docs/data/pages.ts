@@ -36,8 +36,8 @@ const pages: MuiPage[] = [
         title: 'Google sheets type',
       },
       {
-        pathname: '/toolpad/connecting-to-data-sources/sql',
-        title: 'SQL type [TODO]',
+        pathname: '/toolpad/connecting-to-data-sources/postgres',
+        title: 'Postgres type',
       },
     ],
   },

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import {
   Box,
   Button,
@@ -177,7 +177,7 @@ function QueryEditor({
 
   const baseUrl = connectionParams?.baseUrl;
 
-  const handleSearchParamsChange = React.useCallback(
+  const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       setInput((existing) => ({ ...existing, params: newParams }));
     },
@@ -219,6 +219,13 @@ function QueryEditor({
     }));
   }, []);
 
+  const handleSearchParamsChange = React.useCallback((newSearchParams: BindableAttrEntries) => {
+    setInput((existing) => ({
+      ...existing,
+      query: { ...existing.query, searchParams: newSearchParams },
+    }));
+  }, []);
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     input: input.params,
     globalScope,
@@ -236,6 +243,12 @@ function QueryEditor({
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
     input: input.query.url,
+    globalScope: queryScope,
+  });
+
+  const liveSearchParams = useEvaluateLiveBindingEntries({
+    server: true,
+    input: input.query.searchParams || [],
     globalScope: queryScope,
   });
 
@@ -274,7 +287,7 @@ function QueryEditor({
             <Typography>Parameters</Typography>
             <ParametersEditor
               value={input.params}
-              onChange={handleSearchParamsChange}
+              onChange={handleParamsChange}
               globalScope={globalScope}
               liveValue={paramsEditorLiveValue}
             />
@@ -303,13 +316,18 @@ function QueryEditor({
             <TabContext value={activeTab}>
               <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
-                  <Tab label="Parameters" value="parameters" />
+                  <Tab label="URL query" value="urlQuery" />
                   <Tab label="Body" value="body" />
                   <Tab label="Headers" value="headers" />
                 </TabList>
               </Box>
-              <TabPanel disableGutters value="parameters">
-                🚧 Under construction
+              <TabPanel disableGutters value="urlQuery">
+                <ParametersEditor
+                  value={input.query.searchParams ?? []}
+                  onChange={handleSearchParamsChange}
+                  globalScope={queryScope}
+                  liveValue={liveSearchParams}
+                />
               </TabPanel>
               <TabPanel disableGutters value="body">
                 <BodyEditor

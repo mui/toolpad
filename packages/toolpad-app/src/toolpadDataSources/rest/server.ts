@@ -38,19 +38,19 @@ async function resolveBindable(
 async function resolveBindableEntries(
   entries: BindableAttrEntries,
   boundValues: Record<string, string>,
-): Promise<any> {
+): Promise<[string, any][]> {
   return Promise.all(
     entries.map(async ([key, value]) => [key, await resolveBindable(value, boundValues)]),
   );
 }
 
-async function resolveBindables(
-  obj: BindableAttrValues,
+async function resolveBindables<P>(
+  obj: BindableAttrValues<P>,
   boundValues: Record<string, string>,
-): Promise<any> {
+): Promise<P> {
   return Object.fromEntries(
     await resolveBindableEntries(Object.entries(obj) as BindableAttrEntries, boundValues),
-  );
+  ) as P;
 }
 
 function parseQueryUrl(queryUrl: string, baseUrl: Maybe<string>): URL {
@@ -74,13 +74,13 @@ async function resolveRawBody(
 ): Promise<ResolvedRawBody> {
   return {
     kind: 'raw',
-    ...resolveBindables(
+    ...(await resolveBindables(
       {
         contentType: body.contentType,
         content: body.content,
       },
       boundValues,
-    ),
+    )),
   };
 }
 
@@ -115,9 +115,13 @@ async function execBase(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
 ): Promise<FetchResult> {
-  const [resolvedUrl] = await Promise.all([resolveBindable(fetchQuery.url, params)]);
+  const [resolvedUrl, resolvedSearchParams] = await Promise.all([
+    resolveBindable(fetchQuery.url, params),
+    resolveBindableEntries(fetchQuery.searchParams || [], params),
+  ]);
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
+  resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));
 
   const headers = new Headers([
     ...(connection ? getAuthenticationHeaders(connection.authentication) : []),

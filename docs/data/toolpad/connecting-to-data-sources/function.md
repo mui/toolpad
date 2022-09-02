@@ -38,6 +38,8 @@ As explained in the [connections](/toolpad/connecting-to-data-sources/connection
 
    - We can not import modules
 
+1. Once finished with configuration click `SAVE` and click anywhere outside of the dialog to return to the editor
+
 ## Usecases
 
 While [function](/toolpad/connecting-to-data-sources/function/) type can suffice for many different setups we found some advances usecases where limitations of `function` type starts surfacing and prevents us from building more complex data access `queries`.

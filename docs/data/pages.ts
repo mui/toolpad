@@ -33,7 +33,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/connecting-to-data-sources/google-sheets',
-        title: 'Google sheets type [TODO]',
+        title: 'Google sheets type',
       },
       {
         pathname: '/toolpad/connecting-to-data-sources/sql',

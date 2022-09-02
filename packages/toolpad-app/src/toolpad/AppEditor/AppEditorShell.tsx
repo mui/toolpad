@@ -11,8 +11,10 @@ import {
   IconButton,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
+import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { Outlet, useNavigate } from 'react-router-dom';
@@ -102,6 +104,16 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
   );
 }
 
+function getSaveStateMessage(isSaving: boolean, hasUnsavedChanges: boolean): string {
+  if (isSaving) {
+    return 'Saving changes...';
+  }
+  if (hasUnsavedChanges) {
+    return 'You have unsaved changes.';
+  }
+  return 'All changes saved!';
+}
+
 export interface ToolpadAppShellProps {
   appId: string;
   actions?: React.ReactNode;
@@ -112,17 +124,26 @@ export default function AppEditorShell({ appId, ...props }: ToolpadAppShellProps
 
   const [createReleaseDialogOpen, setCreateReleaseDialogOpen] = React.useState(false);
 
+  const hasUnsavedChanges = domLoader.unsavedChanges > 0;
+  const isSaving = domLoader.saving;
+
   return (
     <ToolpadAppShell
       appId={appId}
       actions={
         <Stack direction="row" gap={1} alignItems="center">
-          {domLoader.saving ? (
-            <Box display="flex" flexDirection="row" alignItems="center">
-              <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
+          <Tooltip title={getSaveStateMessage(isSaving, hasUnsavedChanges)}>
+            <Box display="flex" flexDirection="row" alignItems="center" mr={1}>
+              {isSaving ? (
+                <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
+              ) : (
+                <CloudDoneIcon
+                  color={hasUnsavedChanges ? 'disabled' : 'success'}
+                  fontSize="medium"
+                />
+              )}
             </Box>
-          ) : null}
-          <Typography>{domLoader.unsavedChanges} unsaved change(s).</Typography>
+          </Tooltip>
           <IconButton
             aria-label="Create release"
             color="inherit"

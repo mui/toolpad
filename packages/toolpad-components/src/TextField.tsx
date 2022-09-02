@@ -11,13 +11,24 @@ export type TextFieldProps = MuiTextFieldProps & {
   justifyContent?: BoxProps['justifyContent'];
 };
 
-function TextField(props: TextFieldProps) {
+function TextField({ defaultValue, ...props }: TextFieldProps) {
   return <MuiTextField {...props} />;
 }
 
 export default createComponent(TextField, {
   layoutDirection: 'both',
   argTypes: {
+    value: {
+      typeDef: { type: 'string' },
+      onChangeProp: 'onChange',
+      onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
+      defaultValue: '',
+      defaultValueProp: 'defaultValue',
+    },
+    defaultValue: {
+      typeDef: { type: 'string' },
+      defaultValue: '',
+    },
     label: {
       typeDef: { type: 'string' },
     },
@@ -25,21 +36,15 @@ export default createComponent(TextField, {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
       defaultValue: 'outlined',
     },
-    disabled: {
-      typeDef: { type: 'boolean' },
-    },
-    fullWidth: {
-      typeDef: { type: 'boolean' },
-    },
     size: {
       typeDef: { type: 'string', enum: ['small', 'normal'] },
       defaultValue: 'small',
     },
-    value: {
-      typeDef: { type: 'string' },
-      onChangeProp: 'onChange',
-      onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
-      defaultValue: '',
+    fullWidth: {
+      typeDef: { type: 'boolean' },
+    },
+    disabled: {
+      typeDef: { type: 'boolean' },
     },
     sx: {
       typeDef: { type: 'object' },

@@ -12,6 +12,8 @@ services:
     plan: starter plus
     pullRequestPreviewsEnabled: true
     envVars:
+      - key: NODE_VERSION
+        value: '16.17.0'
       - key: TOOLPAD_DATABASE_URL
         fromDatabase:
           name: toolpad-db

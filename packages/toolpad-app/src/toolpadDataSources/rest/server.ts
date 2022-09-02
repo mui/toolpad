@@ -9,6 +9,7 @@ import { removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import applyTransform from '../../server/applyTransform';
+import { parseError } from '../../utils/errors';
 
 async function resolveBindableString(
   bindable: BindableAttrValue<string>,
@@ -79,8 +80,8 @@ async function execBase(
     if (fetchQuery.transformEnabled && fetchQuery.transform) {
       data = await applyTransform(fetchQuery.transform, untransformedData);
     }
-  } catch (err: any) {
-    error = err;
+  } catch (rawError) {
+    error = parseError(rawError);
   }
 
   return { data, untransformedData, error, har };

@@ -58,7 +58,7 @@ import evalJsBindings, {
   evaluateExpression,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../constants';
+import { HTML_ID_EDITOR_OVERLAY } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
@@ -478,7 +478,7 @@ interface ParseBindingOptions {
   scopePath?: string;
 }
 
-function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions) {
+function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions = {}) {
   if (bindable?.type === 'const') {
     return {
       scopePath,
@@ -495,6 +495,21 @@ function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBind
     scopePath,
     result: { value: undefined },
   };
+}
+
+function parsedBindingEqual(
+  binding1: ParsedBinding | undefined,
+  binding2: ParsedBinding | undefined,
+): boolean {
+  if (
+    (!binding1 && !binding2) ||
+    (binding1?.expression === binding2?.expression &&
+      binding1?.result?.value === binding2?.result?.value &&
+      binding1?.initializer === binding2?.initializer)
+  ) {
+    return true;
+  }
+  return false;
 }
 
 function parseBindings(
@@ -516,19 +531,22 @@ function parseBindings(
       const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
+        const initializerId = argType?.defaultValueProp
+          ? `${elm.id}.props.${argType.defaultValueProp}`
+          : undefined;
+
         const binding =
           elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
+
         const bindingId = `${elm.id}.props.${propName}`;
         const scopePath =
           componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
         if (argType) {
           if (argType.onChangeProp) {
-            const defaultValue: unknown =
-              binding?.type === 'const' ? binding?.value : argType.defaultValue;
             controlled.add(bindingId);
             parsedBindingsMap.set(bindingId, {
               scopePath,
-              result: { value: defaultValue },
+              initializer: initializerId,
             });
           } else {
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
@@ -648,7 +666,23 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
       for (const [key, binding] of Object.entries(parsedBindings)) {
-        updated[key] = controlled.has(key) ? existingBindings[key] || binding : binding;
+        let shouldUpdateBinding = false;
+
+        if (controlled.has(key)) {
+          // controlled bindings don't get updated, unless their initialValue has changed
+          if (binding.initializer) {
+            const initializer: ParsedBinding | undefined = parsedBindings[binding.initializer];
+            const existingInitializer: ParsedBinding | undefined =
+              existingBindings[binding.initializer];
+            if (!parsedBindingEqual(initializer, existingInitializer)) {
+              shouldUpdateBinding = true;
+            }
+          }
+        } else {
+          shouldUpdateBinding = true;
+        }
+
+        updated[key] = shouldUpdateBinding ? binding : existingBindings[key] || binding;
       }
       return updated;
     });
@@ -779,6 +813,7 @@ const queryClient = new QueryClient({
 });
 
 export interface ToolpadAppProps {
+  rootRef?: React.Ref<HTMLDivElement>;
   hidePreviewBanner?: boolean;
   basename: string;
   appId: string;
@@ -787,6 +822,7 @@ export interface ToolpadAppProps {
 }
 
 export default function ToolpadApp({
+  rootRef,
   basename,
   appId,
   version,
@@ -800,7 +836,7 @@ export default function ToolpadApp({
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
   return (
-    <AppRoot id={HTML_ID_APP_ROOT}>
+    <AppRoot ref={rootRef}>
       <NoSsr>
         <DomContextProvider value={dom}>
           <AppThemeProvider dom={dom}>

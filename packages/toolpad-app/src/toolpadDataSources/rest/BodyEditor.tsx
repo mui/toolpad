@@ -4,7 +4,10 @@ import { TabContext } from '@mui/lab';
 import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import { Body, RawBody, UrlEncodedBody } from './types';
 import { Maybe, WithControlledProp } from '../../utils/types';
-import { useEvaluateLiveBinding } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
+import {
+  useEvaluateLiveBinding,
+  useEvaluateLiveBindingEntries,
+} from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import lazyComponent from '../../utils/lazyComponent';
 import * as appDom from '../../appDom';
@@ -75,6 +78,7 @@ function RawBodyEditor({
   const content = value?.content ?? null;
 
   const liveContent: LiveBinding = useEvaluateLiveBinding({
+    server: true,
     input: content,
     globalScope,
   });
@@ -103,6 +107,7 @@ function RawBodyEditor({
             language={language}
             value={props.value}
             onChange={props.onChange}
+            disabled={props.disabled}
           />
         )}
         value={value?.content || null}
@@ -136,6 +141,12 @@ function UrlEncodedBodyEditor({
     [onChange, value],
   );
 
+  const liveContent = useEvaluateLiveBindingEntries({
+    server: true,
+    input: value.content,
+    globalScope,
+  });
+
   return (
     <Box>
       <BodyEditorToolbar>{toolbarActions}</BodyEditorToolbar>
@@ -143,7 +154,7 @@ function UrlEncodedBodyEditor({
         value={value.content}
         onChange={handleParamsChange}
         globalScope={globalScope}
-        liveValue={[]}
+        liveValue={liveContent}
       />
     </Box>
   );

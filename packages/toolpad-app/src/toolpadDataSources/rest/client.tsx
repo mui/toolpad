@@ -179,10 +179,7 @@ function QueryEditor({
 
   const handleSearchParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
-      setInput((existing) => ({
-        ...existing,
-        params: { ...existing.params, searchParams: newParams },
-      }));
+      setInput((existing) => ({ ...existing, params: newParams }));
     },
     [],
   );
@@ -218,7 +215,7 @@ function QueryEditor({
   const handleBodyChange = React.useCallback((newBody: Maybe<Body>) => {
     setInput((existing) => ({
       ...existing,
-      params: { ...existing.params, body: newBody || undefined },
+      query: { ...existing.query, body: newBody || undefined },
     }));
   }, []);
 

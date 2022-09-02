@@ -9,14 +9,13 @@ export interface SelectOption {
 
 export type SelectProps = TextFieldProps & {
   options: (string | SelectOption)[];
-  width: number;
 };
 
-function Select({ options, width, sx, defaultValue, fullWidth, ...rest }: SelectProps) {
+function Select({ options, value, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
   return (
     <TextField
       select
-      sx={{ ...(!fullWidth ? { width } : {}), ...sx }}
+      sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
       fullWidth={fullWidth}
       {...rest}
     >
@@ -56,10 +55,6 @@ export default createComponent(Select, {
     label: {
       typeDef: { type: 'string' },
       defaultValue: '',
-    },
-    width: {
-      typeDef: { type: 'number', minimum: 120 },
-      defaultValue: 120,
     },
     variant: {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },

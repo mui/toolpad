@@ -35,8 +35,6 @@ test('can place new components from catalog', async ({ page }) => {
 
   const canvasInputLocator = editorModel.canvasFrame.locator('input');
 
-  await editorModel.pageRoot.waitFor();
-
   await expect(canvasInputLocator).toHaveCount(0);
 
   // Drag in a first component

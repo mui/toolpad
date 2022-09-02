@@ -1,8 +1,7 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import createApp from '../../utils/createApp';
+import { ToolpadHome } from '../../models/ToolpadHome';
+import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
-import generateId from '../../utils/generateId';
-import { canvasFrame, componentCatalog, pageRoot } from '../../utils/locators';
 import domInput from './domInput.json';
 
 async function dragCenterToCenter(page: Page, sourceLocator: Locator, targetLocator: Locator) {
@@ -27,56 +26,53 @@ async function dragCenterToCenter(page: Page, sourceLocator: Locator, targetLoca
 }
 
 test('can place new components from catalog', async ({ page }) => {
-  const appId = generateId();
+  const homeModel = new ToolpadHome(page);
+  const editorModel = new ToolpadEditor(page);
 
-  await page.goto('/');
-  await createApp(page, `App ${appId}`);
+  await homeModel.goto();
+  const app = await homeModel.createApplication({});
+  await editorModel.goto(app.id);
 
-  const canvasFrameLocator = page.frameLocator(canvasFrame);
+  const canvasInputLocator = editorModel.canvasFrame.locator('input');
 
-  const componentCatalogLocator = page.locator(componentCatalog);
-  const canvasPageRootLocator = canvasFrameLocator.locator(pageRoot);
-  const canvasInputLocator = canvasFrameLocator.locator('input');
-
-  await canvasPageRootLocator.waitFor();
+  await editorModel.pageRoot.waitFor();
 
   await expect(canvasInputLocator).toHaveCount(0);
 
   // Drag in a first component
 
-  await componentCatalogLocator.hover();
+  await editorModel.componentCatalog.hover();
 
-  const textFieldDragSourceLocator = componentCatalogLocator.locator(
+  const textFieldDragSourceLocator = editorModel.componentCatalog.locator(
     ':has-text("TextField")[draggable]',
   );
-  await dragCenterToCenter(page, textFieldDragSourceLocator, canvasPageRootLocator);
+  await dragCenterToCenter(page, textFieldDragSourceLocator, editorModel.pageRoot);
 
   await expect(canvasInputLocator).toHaveCount(1);
   await expect(canvasInputLocator).toBeVisible();
 
   // Drag in a second component
 
-  await componentCatalogLocator.hover();
-  await dragCenterToCenter(page, textFieldDragSourceLocator, canvasPageRootLocator);
+  await editorModel.componentCatalog.hover();
+  await dragCenterToCenter(page, textFieldDragSourceLocator, editorModel.pageRoot);
 
   await expect(canvasInputLocator).toHaveCount(2);
 });
 
 test('can move elements in page', async ({ page }) => {
-  const appId = generateId();
+  const homeModel = new ToolpadHome(page);
+  const editorModel = new ToolpadEditor(page);
 
-  await page.goto('/');
-  await createApp(page, `App ${appId}`, JSON.stringify(domInput));
+  await homeModel.goto();
+  const app = await homeModel.createApplication({ dom: domInput });
+  await editorModel.goto(app.id);
 
-  const canvasFrameLocator = page.frameLocator(canvasFrame);
-
-  const canvasPageRootLocator = canvasFrameLocator.locator(pageRoot);
-  const canvasInputLocator = canvasFrameLocator.locator('input');
-  const canvasMoveElementHandleLocator = canvasFrameLocator.locator(
+  const canvasInputLocator = editorModel.canvasFrame.locator('input');
+  const canvasMoveElementHandleLocator = editorModel.canvasFrame.locator(
     ':has-text("TextField")[draggable]',
   );
 
-  await canvasPageRootLocator.waitFor();
+  await editorModel.pageRoot.waitFor();
 
   const firstTextFieldLocator = canvasInputLocator.first();
   const secondTextFieldLocator = canvasInputLocator.nth(1);
@@ -120,20 +116,19 @@ test('can move elements in page', async ({ page }) => {
 });
 
 test('can delete elements from page', async ({ page }) => {
-  const appId = generateId();
+  const homeModel = new ToolpadHome(page);
+  const editorModel = new ToolpadEditor(page);
 
-  await page.goto('/');
-  await createApp(page, `App ${appId}`, JSON.stringify(domInput));
+  await homeModel.goto();
+  const app = await homeModel.createApplication({ dom: domInput });
+  await editorModel.goto(app.id);
 
-  const canvasFrameLocator = page.frameLocator(canvasFrame);
-
-  const canvasPageRootLocator = canvasFrameLocator.locator(pageRoot);
-  const canvasInputLocator = canvasFrameLocator.locator('input');
-  const canvasRemoveElementButtonLocator = canvasFrameLocator.locator(
+  const canvasInputLocator = editorModel.canvasFrame.locator('input');
+  const canvasRemoveElementButtonLocator = editorModel.canvasFrame.locator(
     'button[aria-label="Remove element"]',
   );
 
-  await canvasPageRootLocator.waitFor();
+  await editorModel.pageRoot.waitFor();
 
   await expect(canvasInputLocator).toHaveCount(2);
 

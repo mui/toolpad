@@ -1,22 +1,23 @@
 import { test, expect } from '@playwright/test';
-import createApp from '../utils/createApp';
+import { ToolpadHome } from '../models/ToolpadHome';
 import generateId from '../utils/generateId';
-import * as locators from '../utils/locators';
 
 test('app create/rename flow', async ({ page }) => {
+  const homeModel = new ToolpadHome(page);
+
   const appName1 = `App ${generateId()}`;
   const appName2 = `App ${generateId()}`;
   const appName3 = `App ${generateId()}`;
 
-  await page.goto('/');
-  await createApp(page, appName1);
+  await homeModel.goto();
+  await homeModel.createApplication({ name: appName1 });
 
-  await page.goto('/');
-  await createApp(page, appName2);
+  await homeModel.goto();
+  await homeModel.createApplication({ name: appName2 });
 
-  await page.goto('/');
+  await homeModel.goto();
 
-  await page.click(`${locators.toolpadHomeAppRow(appName1)} >> [aria-label="Application menu"]`);
+  await homeModel.getAppRow(appName1).locator('[aria-label="Application menu"]').click();
 
   await page.click('[role="menuitem"]:has-text("Rename"):visible');
 
@@ -27,5 +28,5 @@ test('app create/rename flow', async ({ page }) => {
 
   await page.keyboard.type(appName3);
 
-  await expect(page.locator(locators.toolpadHomeAppRow(appName3))).toBeVisible();
+  await expect(homeModel.getAppRow(appName3)).toBeVisible();
 });

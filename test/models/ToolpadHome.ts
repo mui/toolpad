@@ -24,15 +24,22 @@ export class ToolpadHome {
 
   readonly newAppDomCreateBtn: Locator;
 
+  readonly getAppRow: (appName: string) => Locator;
+
   constructor(page: Page) {
     this.page = page;
+
     this.createNewbtn = page.locator('button:has-text("create new")');
+
     this.newAppDialog = page.locator('[role="dialog"]', {
       hasText: 'Create a new MUI Toolpad App',
     });
     this.newAppNameInput = this.newAppDialog.locator('label:has-text("name")');
     this.newAppDomInput = this.newAppDialog.locator('label:has-text("dom")');
     this.newAppDomCreateBtn = this.newAppDialog.locator('button:has-text("create")');
+
+    this.getAppRow = (appName: string): Locator =>
+      page.locator(`[role="row"] >> has="input[value='${appName}']"`);
   }
 
   async goto() {

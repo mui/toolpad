@@ -1,4 +1,4 @@
-import { Locator, Page } from '@playwright/test';
+import { FrameLocator, Locator, Page } from '@playwright/test';
 
 class CreatePageDialog {
   readonly page: Page;
@@ -30,6 +30,7 @@ class CreateComponentDialog {
 
   constructor(page: Page) {
     this.page = page;
+
     this.dialog = page.locator('[role="dialog"]', {
       hasText: 'Create a new MUI Toolpad Code Component',
     });
@@ -49,6 +50,14 @@ export class ToolpadEditor {
 
   readonly createComponentDialog: CreateComponentDialog;
 
+  readonly componentCatalog: Locator;
+
+  readonly selectedNodeEditor: Locator;
+
+  readonly canvasFrame: FrameLocator;
+
+  readonly pageRoot: Locator;
+
   constructor(page: Page) {
     this.page = page;
 
@@ -57,6 +66,12 @@ export class ToolpadEditor {
 
     this.createComponentBtn = page.locator('[aria-label="Create component"]');
     this.createComponentDialog = new CreateComponentDialog(page);
+
+    this.componentCatalog = page.locator('data-testid=component-catalog');
+    this.selectedNodeEditor = page.locator('data-testid=selected-node-editor');
+
+    this.canvasFrame = page.frameLocator('iframe[data-toolpad-canvas]');
+    this.pageRoot = this.canvasFrame.locator('data-testid=page-root');
   }
 
   async goto(appId: string) {

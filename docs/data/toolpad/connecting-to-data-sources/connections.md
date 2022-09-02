@@ -37,6 +37,8 @@ There are 2 types that **require** `CONNECTION` instance:
 
 1. [Google Sheets](/toolpad/connecting-to-data-sources/google-sheets/) type
 
+   TODO
+
 1. [Postgres](/toolpad/connecting-to-data-sources/postgres/) type
 
    In order `query` data from `postgres` database we **must** configure connection

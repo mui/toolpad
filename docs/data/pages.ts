@@ -29,7 +29,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/connecting-to-data-sources/function',
-        title: 'Function type [TODO]',
+        title: 'Function type',
       },
       {
         pathname: '/toolpad/connecting-to-data-sources/google-sheets',

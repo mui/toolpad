@@ -72,15 +72,17 @@ async function resolveRawBody(
   body: RawBody,
   boundValues: Record<string, string>,
 ): Promise<ResolvedRawBody> {
+  const { content, contentType } = await resolveBindables(
+    {
+      contentType: body.contentType,
+      content: body.content,
+    },
+    boundValues,
+  );
   return {
     kind: 'raw',
-    ...(await resolveBindables(
-      {
-        contentType: body.contentType,
-        content: body.content,
-      },
-      boundValues,
-    )),
+    contentType,
+    content: String(content),
   };
 }
 

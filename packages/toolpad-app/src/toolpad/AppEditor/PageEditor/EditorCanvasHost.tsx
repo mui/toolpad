@@ -123,8 +123,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       () => {
         return {
           getViewCoordinates(clientX, clientY) {
-            invariant(bridge, 'bridge not initialized');
-            return bridge.getViewCoordinates(clientX, clientY);
+            return bridge?.getViewCoordinates(clientX, clientY) || null;
           },
           getPageViewState() {
             invariant(bridge, 'bridge not initialized');
@@ -162,12 +161,12 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     }, [contentWindow]);
 
     React.useEffect(() => {
-      if (!contentWindow) {
+      if (!contentWindow || !bridge) {
         return undefined;
       }
 
       return setEventHandler(contentWindow, handleRuntimeEvent);
-    }, [handleRuntimeEvent, contentWindow]);
+    }, [handleRuntimeEvent, contentWindow, bridge]);
 
     return (
       <CanvasRoot className={className}>

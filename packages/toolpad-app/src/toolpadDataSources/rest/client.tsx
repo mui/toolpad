@@ -3,7 +3,6 @@ import { BindableAttrEntries, BindableAttrValue, LiveBinding } from '@mui/toolpa
 import {
   Box,
   Button,
-  Divider,
   InputAdornment,
   MenuItem,
   Stack,

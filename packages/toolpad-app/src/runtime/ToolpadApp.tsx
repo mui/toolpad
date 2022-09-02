@@ -425,7 +425,7 @@ function resolveBindables(
     const resolvedValue = bindings[`${bindingId}${path}`]?.value;
     _.set(result, `${resultKey}${path}`, resolvedValue);
   }
-  console.log(result);
+
   return result[resultKey] || {};
 }
 
@@ -445,8 +445,6 @@ function QueryNode({ node }: QueryNodeProps) {
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
   const queryResult = useDataQuery(dataUrl, queryId, params, options);
-
-  console.log(params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;

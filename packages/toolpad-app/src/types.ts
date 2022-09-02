@@ -6,7 +6,7 @@ import {
   ComponentConfig,
   NodeId,
   PropValueType,
-  NestedBindableAttrs,
+  BindableAttrEntries,
 } from '@mui/toolpad-core';
 
 import { PaletteMode } from '@mui/material';
@@ -86,9 +86,9 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorModel<Q, P extends NestedBindableAttrs> {
+export interface QueryEditorModel<Q> {
   query: Q;
-  params: P;
+  params: BindableAttrEntries;
 }
 
 export interface QueryEditorShellProps {
@@ -97,24 +97,23 @@ export interface QueryEditorShellProps {
   onCommit?: () => void;
 }
 
-export interface QueryEditorProps<C, Q, P extends NestedBindableAttrs>
-  extends WithControlledProp<QueryEditorModel<Q, P>> {
+export interface QueryEditorProps<C, Q> extends WithControlledProp<QueryEditorModel<Q>> {
   QueryEditorShell: React.ComponentType<QueryEditorShellProps>;
   connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
 }
 
-export type QueryEditor<C, Q, P extends NestedBindableAttrs> = React.FC<QueryEditorProps<C, Q, P>>;
+export type QueryEditor<C, Q> = React.FC<QueryEditorProps<C, Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;
   error?: string;
 }
 
-export interface ClientDataSource<C = {}, Q = {}, P extends NestedBindableAttrs = {}> {
+export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<C>;
-  QueryEditor: QueryEditor<C, Q, P>;
+  QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
 }

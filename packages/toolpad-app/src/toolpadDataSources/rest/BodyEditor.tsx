@@ -83,7 +83,7 @@ function RawBodyEditor({
 
   return (
     <Box>
-      <BodyEditorToolbar disableGutters>
+      <BodyEditorToolbar>
         {toolbarActions}
         <TextField select value={value?.contentType.value} onChange={handleContentTypeChange}>
           {Array.from(RAW_CONTENT_TYPES.entries(), ([contentType, { alias }]) => (
@@ -138,7 +138,7 @@ function UrlEncodedBodyEditor({
 
   return (
     <Box>
-      <BodyEditorToolbar disableGutters>{toolbarActions}</BodyEditorToolbar>
+      <BodyEditorToolbar>{toolbarActions}</BodyEditorToolbar>
       <ParametersEditor
         value={value.content}
         onChange={handleParamsChange}

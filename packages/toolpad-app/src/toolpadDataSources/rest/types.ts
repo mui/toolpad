@@ -48,6 +48,7 @@ export interface FetchQuery {
   readonly url: BindableAttrValue<string>;
   readonly method: string;
   readonly headers: [string, BindableAttrValue<string>][];
+  readonly body?: Body;
   readonly transformEnabled?: boolean;
   readonly transform?: string;
 }

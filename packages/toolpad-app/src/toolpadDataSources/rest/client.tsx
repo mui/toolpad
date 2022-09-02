@@ -14,20 +14,8 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import {
-  ClientDataSource,
-  ConnectionEditorProps,
-  QueryEditorModel,
-  QueryEditorProps,
-} from '../../types';
-import {
-  FetchPrivateQuery,
-  FetchQuery,
-  FetchResult,
-  RestConnectionParams,
-  Body,
-  FetchParams,
-} from './types';
+import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import { FetchPrivateQuery, FetchQuery, FetchResult, RestConnectionParams, Body } from './types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
@@ -177,27 +165,13 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   );
 }
 
-function fromLegacy(
-  value: QueryEditorModel<FetchQuery, any>,
-): QueryEditorModel<FetchQuery, FetchParams> {
-  if (value.params?.searchParams) {
-    return value;
-  }
-  return {
-    ...value,
-    params: { searchParams: value.params ? Object.entries(value.params) : [] },
-  };
-}
-
 function QueryEditor({
   globalScope,
   connectionParams,
-  value: valueProp,
+  value,
   onChange,
   QueryEditorShell,
-}: QueryEditorProps<RestConnectionParams, FetchQuery, FetchParams>) {
-  const value = React.useMemo(() => fromLegacy(valueProp), [valueProp]);
-
+}: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const [input, setInput] = React.useState(value);
   React.useEffect(() => setInput(value), [value]);
 
@@ -249,7 +223,7 @@ function QueryEditor({
   }, []);
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    input: input.params?.searchParams ?? [],
+    input: input.params,
     globalScope,
   });
 
@@ -302,7 +276,7 @@ function QueryEditor({
           <Stack gap={2} sx={{ px: 3, pt: 1 }}>
             <Typography>Parameters</Typography>
             <ParametersEditor
-              value={input.params?.searchParams || []}
+              value={input.params}
               onChange={handleSearchParamsChange}
               globalScope={globalScope}
               liveValue={paramsEditorLiveValue}
@@ -342,8 +316,8 @@ function QueryEditor({
               </TabPanel>
               <TabPanel disableGutters value="body">
                 <BodyEditor
-                  globalScope={globalScope}
-                  value={input.params?.body}
+                  globalScope={queryScope}
+                  value={input.query.body}
                   onChange={handleBodyChange}
                 />
               </TabPanel>
@@ -383,7 +357,7 @@ function getInitialQueryValue(): FetchQuery {
   return { url: { type: 'const', value: '' }, method: '', headers: [] };
 }
 
-const dataSource: ClientDataSource<{}, FetchQuery, FetchParams> = {
+const dataSource: ClientDataSource<{}, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   QueryEditor,

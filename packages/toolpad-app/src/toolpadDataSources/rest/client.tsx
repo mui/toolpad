@@ -295,8 +295,79 @@ function QueryEditor({
   return (
     <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
       <SplitPane split="vertical" size="50%" allowResize>
-        <QueryInputPanel onRunPreview={handleRunPreview}>
-          <Stack gap={2} sx={{ px: 3, pt: 1 }}>
+        <SplitPane split="horizontal" size={85} primary="second" allowResize>
+          <QueryInputPanel onRunPreview={handleRunPreview}>
+            <Stack gap={2} sx={{ px: 3, pt: 1 }}>
+              <Typography>Query</Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+                <TextField select value={input.query.method || 'GET'} onChange={handleMethodChange}>
+                  {HTTP_METHODS.map((method) => (
+                    <MenuItem key={method} value={method}>
+                      {method}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <BindableEditor
+                  liveBinding={liveUrl}
+                  globalScope={queryScope}
+                  sx={{ flex: 1 }}
+                  server
+                  label="url"
+                  propType={{ type: 'string' }}
+                  renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
+                  value={input.query.url}
+                  onChange={handleUrlChange}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <TabContext value={activeTab}>
+                  <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
+                      <Tab label="URL query" value="urlQuery" />
+                      <Tab label="Body" value="body" />
+                      <Tab label="Headers" value="headers" />
+                      <Tab label="Transform" value="transform" />
+                    </TabList>
+                  </Box>
+                  <TabPanel disableGutters value="urlQuery">
+                    <ParametersEditor
+                      value={input.query.searchParams ?? []}
+                      onChange={handleSearchParamsChange}
+                      globalScope={queryScope}
+                      liveValue={liveSearchParams}
+                    />
+                  </TabPanel>
+                  <TabPanel disableGutters value="body">
+                    <BodyEditor
+                      globalScope={queryScope}
+                      value={input.query.body}
+                      onChange={handleBodyChange}
+                    />
+                  </TabPanel>
+                  <TabPanel disableGutters value="headers">
+                    <ParametersEditor
+                      value={input.query.headers ?? []}
+                      onChange={handleHeadersChange}
+                      globalScope={queryScope}
+                      liveValue={liveHeaders}
+                    />
+                  </TabPanel>
+                  <TabPanel disableGutters value="transform">
+                    <TransformInput
+                      value={input.query.transform ?? 'return data;'}
+                      onChange={handleTransformChange}
+                      enabled={input.query.transformEnabled ?? false}
+                      onEnabledChange={handleTransformEnabledChange}
+                      globalScope={{ data: preview?.untransformedData }}
+                      loading={false}
+                    />
+                  </TabPanel>
+                </TabContext>
+              </Box>
+            </Stack>
+          </QueryInputPanel>
+
+          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
             <Typography>Parameters</Typography>
             <ParametersEditor
               value={input.params}
@@ -304,75 +375,8 @@ function QueryEditor({
               globalScope={globalScope}
               liveValue={paramsEditorLiveValue}
             />
-            <Divider />
-            <Typography>Query</Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-              <TextField select value={input.query.method || 'GET'} onChange={handleMethodChange}>
-                {HTTP_METHODS.map((method) => (
-                  <MenuItem key={method} value={method}>
-                    {method}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <BindableEditor
-                liveBinding={liveUrl}
-                globalScope={queryScope}
-                sx={{ flex: 1 }}
-                server
-                label="url"
-                propType={{ type: 'string' }}
-                renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-                value={input.query.url}
-                onChange={handleUrlChange}
-              />
-            </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <TabContext value={activeTab}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                  <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
-                    <Tab label="URL query" value="urlQuery" />
-                    <Tab label="Body" value="body" />
-                    <Tab label="Headers" value="headers" />
-                    <Tab label="Transform" value="transform" />
-                  </TabList>
-                </Box>
-                <TabPanel disableGutters value="urlQuery">
-                  <ParametersEditor
-                    value={input.query.searchParams ?? []}
-                    onChange={handleSearchParamsChange}
-                    globalScope={queryScope}
-                    liveValue={liveSearchParams}
-                  />
-                </TabPanel>
-                <TabPanel disableGutters value="body">
-                  <BodyEditor
-                    globalScope={queryScope}
-                    value={input.query.body}
-                    onChange={handleBodyChange}
-                  />
-                </TabPanel>
-                <TabPanel disableGutters value="headers">
-                  <ParametersEditor
-                    value={input.query.headers ?? []}
-                    onChange={handleHeadersChange}
-                    globalScope={queryScope}
-                    liveValue={liveHeaders}
-                  />
-                </TabPanel>
-                <TabPanel disableGutters value="transform">
-                  <TransformInput
-                    value={input.query.transform ?? 'return data;'}
-                    onChange={handleTransformChange}
-                    enabled={input.query.transformEnabled ?? false}
-                    onEnabledChange={handleTransformEnabledChange}
-                    globalScope={{ data: preview?.untransformedData }}
-                    loading={false}
-                  />
-                </TabPanel>
-              </TabContext>
-            </Box>
-          </Stack>
-        </QueryInputPanel>
+          </Box>
+        </SplitPane>
 
         <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
           {preview?.error ? (

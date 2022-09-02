@@ -1,5 +1,15 @@
 import * as React from 'react';
-import { Box, MenuItem, Skeleton, styled, TextField, Toolbar, ToolbarProps } from '@mui/material';
+import {
+  Box,
+  Divider,
+  MenuItem,
+  Skeleton,
+  styled,
+  SxProps,
+  TextField,
+  Toolbar,
+  ToolbarProps,
+} from '@mui/material';
 import { TabContext } from '@mui/lab';
 import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import { Body, RawBody, UrlEncodedBody } from './types';
@@ -29,11 +39,15 @@ const RAW_CONTENT_TYPES = new Map<string, ContentTypeSpec>([
   ['application/xml', { alias: 'xml', language: 'plaintext' }],
 ]);
 
-const BodyEditorToolbar = styled((props: ToolbarProps) => <Toolbar disableGutters {...props} />)(
-  ({ theme }) => ({
-    gap: theme.spacing(1),
-  }),
-);
+const BodyEditorToolbar = styled((props: ToolbarProps) => (
+  <React.Fragment>
+    <Toolbar disableGutters {...props} />
+    <Divider />
+  </React.Fragment>
+))(({ theme }) => ({
+  gap: theme.spacing(1),
+  marginBottom: theme.spacing(1),
+}));
 
 const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor'), {
   noSsr: true,
@@ -86,7 +100,7 @@ function RawBodyEditor({
   const { language = 'plaintext' } = RAW_CONTENT_TYPES.get(value.contentType.value) ?? {};
 
   return (
-    <Box>
+    <React.Fragment>
       <BodyEditorToolbar>
         {toolbarActions}
         <TextField select value={value?.contentType.value} onChange={handleContentTypeChange}>
@@ -98,6 +112,7 @@ function RawBodyEditor({
         </TextField>
       </BodyEditorToolbar>
       <BindableEditor
+        sx={{ mt: 1 }}
         liveBinding={liveContent}
         globalScope={globalScope}
         propType={{ type: 'string' }}
@@ -114,7 +129,7 @@ function RawBodyEditor({
         onChange={handleValueChange}
         label="json"
       />
-    </Box>
+    </React.Fragment>
   );
 }
 
@@ -148,15 +163,16 @@ function UrlEncodedBodyEditor({
   });
 
   return (
-    <Box>
+    <React.Fragment>
       <BodyEditorToolbar>{toolbarActions}</BodyEditorToolbar>
       <ParametersEditor
+        sx={{ mt: 1 }}
         value={value.content}
         onChange={handleParamsChange}
         globalScope={globalScope}
         liveValue={liveContent}
       />
-    </Box>
+    </React.Fragment>
   );
 }
 
@@ -164,9 +180,10 @@ type BodyKind = Body['kind'];
 
 export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
   globalScope: Record<string, any>;
+  sx?: SxProps;
 }
 
-export default function BodyEditor({ globalScope, value, onChange }: BodyEditorProps) {
+export default function BodyEditor({ globalScope, value, onChange, sx }: BodyEditorProps) {
   const [activeTab, setActiveTab] = React.useState<BodyKind>(value?.kind || 'raw');
   React.useEffect(() => setActiveTab(value?.kind || 'raw'), [value?.kind]);
 
@@ -184,7 +201,7 @@ export default function BodyEditor({ globalScope, value, onChange }: BodyEditorP
   );
 
   return (
-    <Box>
+    <Box sx={sx}>
       <TabContext value={activeTab}>
         <TabPanel disableGutters value="raw">
           <RawBodyEditor

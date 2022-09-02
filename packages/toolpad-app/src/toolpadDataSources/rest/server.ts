@@ -117,9 +117,10 @@ async function execBase(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
 ): Promise<FetchResult> {
-  const [resolvedUrl, resolvedSearchParams] = await Promise.all([
+  const [resolvedUrl, resolvedSearchParams, resolvedHeaders] = await Promise.all([
     resolveBindable(fetchQuery.url, params),
     resolveBindableEntries(fetchQuery.searchParams || [], params),
+    resolveBindableEntries(fetchQuery.headers || [], params),
   ]);
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
@@ -129,6 +130,7 @@ async function execBase(
     ...(connection ? getAuthenticationHeaders(connection.authentication) : []),
     ...(connection?.headers || []),
   ]);
+  resolvedHeaders.forEach(([key, value]) => headers.append(key, value));
 
   const method = fetchQuery.method || 'GET';
 

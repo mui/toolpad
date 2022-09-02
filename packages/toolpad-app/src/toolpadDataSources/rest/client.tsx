@@ -226,6 +226,13 @@ function QueryEditor({
     }));
   }, []);
 
+  const handleHeadersChange = React.useCallback((newHeaders: BindableAttrEntries) => {
+    setInput((existing) => ({
+      ...existing,
+      query: { ...existing.query, headers: newHeaders },
+    }));
+  }, []);
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     input: input.params,
     globalScope,
@@ -249,6 +256,12 @@ function QueryEditor({
   const liveSearchParams = useEvaluateLiveBindingEntries({
     server: true,
     input: input.query.searchParams || [],
+    globalScope: queryScope,
+  });
+
+  const liveHeaders = useEvaluateLiveBindingEntries({
+    server: true,
+    input: input.query.headers || [],
     globalScope: queryScope,
   });
 
@@ -313,41 +326,51 @@ function QueryEditor({
                 onChange={handleUrlChange}
               />
             </Box>
-            <TabContext value={activeTab}>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
-                  <Tab label="URL query" value="urlQuery" />
-                  <Tab label="Body" value="body" />
-                  <Tab label="Headers" value="headers" />
-                </TabList>
-              </Box>
-              <TabPanel disableGutters value="urlQuery">
-                <ParametersEditor
-                  value={input.query.searchParams ?? []}
-                  onChange={handleSearchParamsChange}
-                  globalScope={queryScope}
-                  liveValue={liveSearchParams}
-                />
-              </TabPanel>
-              <TabPanel disableGutters value="body">
-                <BodyEditor
-                  globalScope={queryScope}
-                  value={input.query.body}
-                  onChange={handleBodyChange}
-                />
-              </TabPanel>
-              <TabPanel disableGutters value="headers">
-                🚧 Under construction
-              </TabPanel>
-            </TabContext>
-            <TransformInput
-              value={input.query.transform ?? 'return data;'}
-              onChange={handleTransformChange}
-              enabled={input.query.transformEnabled ?? false}
-              onEnabledChange={handleTransformEnabledChange}
-              globalScope={{ data: preview?.untransformedData }}
-              loading={false}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <TabContext value={activeTab}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
+                    <Tab label="URL query" value="urlQuery" />
+                    <Tab label="Body" value="body" />
+                    <Tab label="Headers" value="headers" />
+                    <Tab label="Transform" value="transform" />
+                  </TabList>
+                </Box>
+                <TabPanel disableGutters value="urlQuery">
+                  <ParametersEditor
+                    value={input.query.searchParams ?? []}
+                    onChange={handleSearchParamsChange}
+                    globalScope={queryScope}
+                    liveValue={liveSearchParams}
+                  />
+                </TabPanel>
+                <TabPanel disableGutters value="body">
+                  <BodyEditor
+                    globalScope={queryScope}
+                    value={input.query.body}
+                    onChange={handleBodyChange}
+                  />
+                </TabPanel>
+                <TabPanel disableGutters value="headers">
+                  <ParametersEditor
+                    value={input.query.headers ?? []}
+                    onChange={handleHeadersChange}
+                    globalScope={queryScope}
+                    liveValue={liveHeaders}
+                  />
+                </TabPanel>
+                <TabPanel disableGutters value="transform">
+                  <TransformInput
+                    value={input.query.transform ?? 'return data;'}
+                    onChange={handleTransformChange}
+                    enabled={input.query.transformEnabled ?? false}
+                    onEnabledChange={handleTransformEnabledChange}
+                    globalScope={{ data: preview?.untransformedData }}
+                    loading={false}
+                  />
+                </TabPanel>
+              </TabContext>
+            </Box>
           </Stack>
         </QueryInputPanel>
 

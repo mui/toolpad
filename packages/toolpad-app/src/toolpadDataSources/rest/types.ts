@@ -32,13 +32,13 @@ export interface RestConnectionParams {
 }
 
 export type RawBody = {
-  kind: ConstantAttrValue<'raw'>;
+  kind: 'raw';
   content: BindableAttrValue<string>;
   contentType: ConstantAttrValue<string>;
 };
 
 export type UrlEncodedBody = {
-  kind: ConstantAttrValue<'urlEncoded'>;
+  kind: 'urlEncoded';
   content: [string, BindableAttrValue<string>][];
 };
 

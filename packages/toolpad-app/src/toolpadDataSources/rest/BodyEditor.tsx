@@ -54,7 +54,7 @@ function RawBodyEditor({
   const value: RawBody = React.useMemo(
     () =>
       valueProp ?? {
-        kind: appDom.createConst('raw'),
+        kind: 'raw',
         contentType: appDom.createConst('text/plain'),
         content: appDom.createConst(''),
       },
@@ -127,7 +127,7 @@ function UrlEncodedBodyEditor({
   const value: UrlEncodedBody = React.useMemo(
     () =>
       valueProp ?? {
-        kind: appDom.createConst('urlEncoded'),
+        kind: 'urlEncoded',
         contentType: appDom.createConst('text/plain'),
         content: [],
       },
@@ -160,15 +160,15 @@ function UrlEncodedBodyEditor({
   );
 }
 
-type BodyKind = Body['kind']['value'];
+type BodyKind = Body['kind'];
 
 export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
   globalScope: Record<string, any>;
 }
 
 export default function BodyEditor({ globalScope, value, onChange }: BodyEditorProps) {
-  const [activeTab, setActiveTab] = React.useState<BodyKind>(value?.kind.value || 'raw');
-  React.useEffect(() => setActiveTab(value?.kind.value || 'raw'), [value?.kind.value]);
+  const [activeTab, setActiveTab] = React.useState<BodyKind>(value?.kind || 'raw');
+  React.useEffect(() => setActiveTab(value?.kind || 'raw'), [value?.kind]);
 
   const handleTabChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setActiveTab(event.target.value as BodyKind);
@@ -190,7 +190,7 @@ export default function BodyEditor({ globalScope, value, onChange }: BodyEditorP
           <RawBodyEditor
             toolbarActions={toolbarActions}
             globalScope={globalScope}
-            value={value?.kind.value === 'raw' ? (value as RawBody) : null}
+            value={value?.kind === 'raw' ? (value as RawBody) : null}
             onChange={onChange}
           />
         </TabPanel>
@@ -198,7 +198,7 @@ export default function BodyEditor({ globalScope, value, onChange }: BodyEditorP
           <UrlEncodedBodyEditor
             toolbarActions={toolbarActions}
             globalScope={globalScope}
-            value={value?.kind.value === 'urlEncoded' ? (value as UrlEncodedBody) : null}
+            value={value?.kind === 'urlEncoded' ? (value as UrlEncodedBody) : null}
             onChange={onChange}
           />
         </TabPanel>

@@ -1,30 +1,29 @@
-import { BindableAttrValue } from '@mui/toolpad-core';
-import fetch from 'node-fetch';
+import { BindableAttrEntries, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
+import fetch, { Headers, RequestInit } from 'node-fetch';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource, ApiResult } from '../../types';
-import { FetchPrivateQuery, FetchQuery, FetchResult, RestConnectionParams } from './types';
-import * as bindings from '../../utils/bindings';
+import {
+  Body,
+  FetchPrivateQuery,
+  FetchQuery,
+  FetchResult,
+  RawBody,
+  RestConnectionParams,
+  UrlEncodedBody,
+} from './types';
 import evalExpression from '../../server/evalExpression';
 import { removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
-import { getAuthenticationHeaders, parseBaseUrl } from './shared';
+import { getAuthenticationHeaders, HTTP_NO_BODY, parseBaseUrl } from './shared';
 import applyTransform from '../../server/applyTransform';
 import { parseError } from '../../utils/errors';
 
-async function resolveBindableString(
+async function resolveBindable(
   bindable: BindableAttrValue<string>,
   boundValues: Record<string, string>,
-): Promise<string> {
+): Promise<any> {
   if (bindable.type === 'const') {
     return bindable.value;
-  }
-  if (bindable.type === 'binding') {
-    return boundValues[bindable.value] || '';
-  }
-  if (bindable.type === 'boundExpression') {
-    const parsed = bindings.parse(bindable.value);
-    const resolved = bindings.resolve(parsed, (interpolation) => boundValues[interpolation] || '');
-    return bindings.formatStringValue(resolved);
   }
   if (bindable.type === 'jsExpression') {
     return evalExpression(bindable.value, {
@@ -33,6 +32,24 @@ async function resolveBindableString(
   }
   throw new Error(
     `Can't resolve bindable of type "${(bindable as BindableAttrValue<unknown>).type}"`,
+  );
+}
+
+async function resolveBindableEntries(
+  entries: BindableAttrEntries,
+  boundValues: Record<string, string>,
+): Promise<any> {
+  return Promise.all(
+    entries.map(async ([key, value]) => [key, await resolveBindable(value, boundValues)]),
+  );
+}
+
+async function resolveBindables(
+  obj: BindableAttrValues,
+  boundValues: Record<string, string>,
+): Promise<any> {
+  return Object.fromEntries(
+    await resolveBindableEntries(Object.entries(obj) as BindableAttrEntries, boundValues),
   );
 }
 
@@ -45,21 +62,90 @@ function parseQueryUrl(queryUrl: string, baseUrl: Maybe<string>): URL {
   return new URL(queryUrl);
 }
 
+interface ResolvedRawBody {
+  kind: 'raw';
+  contentType: string;
+  content: string;
+}
+
+async function resolveRawBody(
+  body: RawBody,
+  boundValues: Record<string, string>,
+): Promise<ResolvedRawBody> {
+  return {
+    kind: 'raw',
+    ...resolveBindables(
+      {
+        contentType: body.contentType,
+        content: body.content,
+      },
+      boundValues,
+    ),
+  };
+}
+
+interface ResolveUrlEncodedBodyBody {
+  kind: 'urlEncoded';
+  content: [string, string][];
+}
+
+async function resolveUrlEncodedBody(
+  body: UrlEncodedBody,
+  boundValues: Record<string, string>,
+): Promise<ResolveUrlEncodedBodyBody> {
+  return {
+    kind: 'urlEncoded',
+    content: await resolveBindableEntries(body.content, boundValues),
+  };
+}
+
+async function resolveBody(body: Body, boundValues: Record<string, string>) {
+  switch (body.kind) {
+    case 'raw':
+      return resolveRawBody(body, boundValues);
+    case 'urlEncoded':
+      return resolveUrlEncodedBody(body, boundValues);
+    default:
+      throw new Error(`Missing case for "${(body as Body).kind}"`);
+  }
+}
+
 async function execBase(
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
 ): Promise<FetchResult> {
-  const resolvedUrl = await resolveBindableString(fetchQuery.url, params);
+  const [resolvedUrl] = await Promise.all([resolveBindable(fetchQuery.url, params)]);
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
 
-  const headers = [
+  const headers = new Headers([
     ...(connection ? getAuthenticationHeaders(connection.authentication) : []),
     ...(connection?.headers || []),
-  ];
+  ]);
 
-  const method = fetchQuery.method;
+  const method = fetchQuery.method || 'GET';
+
+  const requestInit: RequestInit = { method, headers };
+
+  if (!HTTP_NO_BODY.has(method) && fetchQuery.body) {
+    const resolvedBody = await resolveBody(fetchQuery.body, params);
+
+    switch (resolvedBody.kind) {
+      case 'raw': {
+        headers.set('content-type', resolvedBody.contentType);
+        requestInit.body = resolvedBody.content;
+        break;
+      }
+      case 'urlEncoded': {
+        headers.set('content-type', 'application/x-www-form-urlencoded');
+        requestInit.body = new URLSearchParams(resolvedBody.content).toString();
+        break;
+      }
+      default:
+        throw new Error(`Missing case for "${(resolvedBody as any).kind}"`);
+    }
+  }
 
   let error: Error | undefined;
   let untransformedData;
@@ -68,7 +154,7 @@ async function execBase(
 
   try {
     const instrumentedFetch = withHarInstrumentation(fetch, { har });
-    const res = await instrumentedFetch(queryUrl.href, { method, headers });
+    const res = await instrumentedFetch(queryUrl.href, requestInit);
 
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`);

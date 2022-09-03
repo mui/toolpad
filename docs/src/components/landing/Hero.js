@@ -24,13 +24,12 @@ export default function Hero() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: { xs: 'center', md: 'center' },
-            '& > *': { mr: 1, height: 28 },
           }}
         >
-          <IconImage name="product-toolpad" />
-          <span style={{ display: 'flex', alignItems: 'center', color: 'blue.500' }}>
+          <IconImage name="product-toolpad" width="28" height="28" sx={{ mr: 1 }} />
+          <Box component="span" sx={{ mr: 2 }}>
             MUI Toolpad
-          </span>
+          </Box>
         </Typography>
         <Typography variant="h1" sx={{ my: 2 }}>
           Low-code

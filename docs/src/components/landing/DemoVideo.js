@@ -40,9 +40,9 @@ export default function DemoVideo() {
         autoPlay
         playsInline
         loop
-        poster="/static/toolpad/marketing/hero-screenshot.png"
+        poster="/static/toolpad/marketing/index-hero-video-poster.jpg"
       >
-        <source src="/static/toolpad/marketing/hero-video.mp4" type="video/mp4" />
+        <source src="/static/toolpad/marketing/index-hero-video.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </Video>
     </Box>

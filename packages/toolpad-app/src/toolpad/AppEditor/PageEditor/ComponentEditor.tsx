@@ -1,4 +1,4 @@
-import { Stack, styled, Typography } from '@mui/material';
+import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
 import { ArgTypeDefinition, ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
 import { ExactEntriesOf } from '../../../utils/types';
@@ -20,11 +20,15 @@ import {
 
 const classes = {
   control: 'Toolpad_Control',
+  sectionHeading: 'Toolpad_ControlsSectionHeading',
 };
 
-const ComponentPropsEditorRoot = styled('div')(({ theme }) => ({
+const ComponentEditorRoot = styled('div')(({ theme }) => ({
   [`& .${classes.control}`]: {
-    margin: theme.spacing(1, 0),
+    margin: theme.spacing(0, 0),
+  },
+  [`& .${classes.sectionHeading}`]: {
+    margin: theme.spacing(0, 0, -0.5, 0),
   },
 }));
 
@@ -50,10 +54,10 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
   const hasLayoutControls = hasLayoutHorizontalControls || hasLayoutVerticalControls;
 
   return (
-    <ComponentPropsEditorRoot>
+    <React.Fragment>
       {hasLayoutControls ? (
         <React.Fragment>
-          <Typography variant="subtitle2" sx={{ mt: 1 }}>
+          <Typography variant="overline" className={classes.sectionHeading}>
             Layout:
           </Typography>
           {hasLayoutHorizontalControls ? (
@@ -76,9 +80,10 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
               />
             </div>
           ) : null}
+          <Divider sx={{ mt: 1 }} />
         </React.Fragment>
       ) : null}
-      <Typography variant="subtitle2" sx={{ mt: hasLayoutControls ? 2 : 1 }}>
+      <Typography variant="overline" className={classes.sectionHeading}>
         Properties:
       </Typography>
       {(Object.entries(componentConfig.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
@@ -94,7 +99,7 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
             </div>
           ) : null,
       )}
-    </ComponentPropsEditorRoot>
+    </React.Fragment>
   );
 }
 
@@ -115,11 +120,12 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
       <Typography variant="subtitle1">
         Component: {component?.displayName || '<unknown>'}
       </Typography>
-      <Typography variant="subtitle2" sx={{ mb: 2 }}>
+      <Typography variant="subtitle2" sx={{ mb: 1 }}>
         ID: {node.id}
       </Typography>
       <NodeNameEditor node={node} />
       {nodeError ? <ErrorAlert error={nodeError} /> : null}
+      <Divider sx={{ mt: 1 }} />
       {node ? (
         <React.Fragment>
           <ComponentPropsEditor componentConfig={componentConfig} node={node} />
@@ -142,13 +148,13 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
   const selectedNode = selection ? appDom.getNode(dom, selection) : null;
 
   return (
-    <div className={className}>
+    <ComponentEditorRoot className={className}>
       {selectedNode && appDom.isElement(selectedNode) ? (
         // Add key to make sure it mounts every time selected node changes
         <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />
       ) : (
         <PageOptionsPanel />
       )}
-    </div>
+    </ComponentEditorRoot>
   );
 }

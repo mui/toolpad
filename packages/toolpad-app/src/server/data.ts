@@ -1,12 +1,6 @@
 import { NodeId, BindableAttrValue } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
-import {
-  App,
-  DomNodeAttributeType,
-  PrismaClient,
-  Release,
-  Prisma,
-} from '../../prisma/generated/client';
+import * as prisma from '../../prisma/generated/client';
 import { ServerDataSource, ApiResult, VersionOrPreview } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
@@ -14,44 +8,31 @@ import { omit } from '../utils/immutability';
 import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
+import { excludeFields } from '../utils/prisma';
 import { latestVersion, latestMigration } from '../appDomMigrations';
 
-// See https://github.com/prisma/prisma/issues/5042#issuecomment-1104679760
-function excludeFields<T, K extends (keyof T)[]>(
-  fields: T,
-  excluded: K,
-): Record<Exclude<keyof T, K[number]>, boolean> {
-  const result = {} as Record<Exclude<keyof T, K[number]>, boolean>;
-  for (const key of Object.keys(fields)) {
-    if (!excluded.includes(key as any)) {
-      result[key as Exclude<keyof T, K[number]>] = true;
-    }
-  }
-  return result;
-}
+const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
+const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
 
-const SELECT_RELEASE_META = excludeFields(Prisma.ReleaseScalarFieldEnum, ['snapshot']);
-const SELECT_APP_META = excludeFields(Prisma.AppScalarFieldEnum, ['dom']);
+export type AppMeta = Omit<prisma.App, 'dom'>;
 
-export type AppMeta = Omit<App, 'dom'>;
-
-function getPrismaClient(): PrismaClient {
+function getPrismaClient(): prisma.PrismaClient {
   if (process.env.NODE_ENV === 'production') {
-    return new PrismaClient();
+    return new prisma.PrismaClient();
   }
 
   // avoid Next.js dev server from creating too many prisma clients
   // See https://github.com/prisma/prisma/issues/1983
   if (!(globalThis as any).prisma) {
-    (globalThis as any).prisma = new PrismaClient();
+    (globalThis as any).prisma = new prisma.PrismaClient();
   }
 
   return (globalThis as any).prisma;
 }
 
-const prisma = getPrismaClient();
+const prismaClient = getPrismaClient();
 
-function deserializeValue(dbValue: string, type: DomNodeAttributeType): unknown {
+function deserializeValue(dbValue: string, type: prisma.DomNodeAttributeType): unknown {
   const serialized = type === 'secret' ? decryptSecret(dbValue) : dbValue;
   return serialized.length <= 0 ? undefined : JSON.parse(serialized);
 }
@@ -91,7 +72,7 @@ function decryptSecrets(dom: appDom.AppDom): appDom.AppDom {
 }
 
 export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> {
-  await prisma.app.update({
+  await prismaClient.app.update({
     where: {
       id: appId,
     },
@@ -101,7 +82,7 @@ export async function saveDom(appId: string, app: appDom.AppDom): Promise<void> 
 }
 
 async function loadPreviewDomLegacy(appId: string): Promise<appDom.AppDom> {
-  const dbNodes = await prisma.domNode.findMany({
+  const dbNodes = await prismaClient.domNode.findMany({
     where: { appId },
     include: { attributes: true },
   });
@@ -149,7 +130,7 @@ async function loadPreviewDomLegacy(appId: string): Promise<appDom.AppDom> {
 }
 
 async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
-  const { dom } = await prisma.app.findUniqueOrThrow({
+  const { dom } = await prismaClient.app.findUniqueOrThrow({
     where: { id: appId },
   });
 
@@ -173,7 +154,7 @@ async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
 }
 
 export async function getApps(): Promise<AppMeta[]> {
-  return prisma.app.findMany({
+  return prismaClient.app.findMany({
     orderBy: {
       editedAt: 'desc',
     },
@@ -182,14 +163,14 @@ export async function getApps(): Promise<AppMeta[]> {
 }
 
 export async function getActiveDeployments() {
-  return prisma.deployment.findMany({
+  return prismaClient.deployment.findMany({
     distinct: ['appId'],
     orderBy: { createdAt: 'desc' },
   });
 }
 
 export async function getApp(id: string): Promise<AppMeta | null> {
-  return prisma.app.findUnique({ where: { id }, select: SELECT_APP_META });
+  return prismaClient.app.findUnique({ where: { id }, select: SELECT_APP_META });
 }
 
 function createDefaultDom(): appDom.AppDom {
@@ -213,9 +194,9 @@ export interface CreateAppOptions {
   dom?: appDom.AppDom | null;
 }
 
-export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<App> {
-  return prisma.$transaction(async () => {
-    const app = await prisma.app.create({
+export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
+  return prismaClient.$transaction(async () => {
+    const app = await prismaClient.app.create({
       data: { name },
     });
 
@@ -228,7 +209,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
 }
 
 export async function updateApp(appId: string, name: string): Promise<void> {
-  await prisma.app.update({
+  await prismaClient.app.update({
     where: {
       id: appId,
     },
@@ -241,7 +222,7 @@ export async function updateApp(appId: string, name: string): Promise<void> {
 }
 
 export async function deleteApp(id: string): Promise<void> {
-  await prisma.app.delete({
+  await prismaClient.app.delete({
     where: { id },
     select: {
       // Only return the id to reduce amount of data returned from the db
@@ -250,19 +231,21 @@ export async function deleteApp(id: string): Promise<void> {
   });
 }
 
-interface CreateReleaseParams {
+export interface CreateReleaseParams {
   description: string;
 }
 
+export type ReleaseMeta = Pick<prisma.Release, keyof typeof SELECT_RELEASE_META>;
+
 async function findLastReleaseInternal(appId: string) {
-  return prisma.release.findFirst({
+  return prismaClient.release.findFirst({
     where: { appId },
     orderBy: { version: 'desc' },
   });
 }
 
-export async function findLastRelease(appId: string) {
-  return prisma.release.findFirst({
+export async function findLastRelease(appId: string): Promise<ReleaseMeta | null> {
+  return prismaClient.release.findFirst({
     where: { appId },
     orderBy: { version: 'desc' },
     select: SELECT_RELEASE_META,
@@ -272,14 +255,14 @@ export async function findLastRelease(appId: string) {
 export async function createRelease(
   appId: string,
   { description }: CreateReleaseParams,
-): Promise<Pick<Release, keyof typeof SELECT_RELEASE_META>> {
+): Promise<ReleaseMeta> {
   const currentDom = await loadPreviewDom(appId);
   const snapshot = Buffer.from(JSON.stringify(currentDom), 'utf-8');
 
   const lastRelease = await findLastReleaseInternal(appId);
   const versionNumber = lastRelease ? lastRelease.version + 1 : 1;
 
-  const release = await prisma.release.create({
+  const release = await prismaClient.release.create({
     select: SELECT_RELEASE_META,
     data: {
       appId,
@@ -292,8 +275,8 @@ export async function createRelease(
   return release;
 }
 
-export async function getReleases(appId: string) {
-  return prisma.release.findMany({
+export async function getReleases(appId: string): Promise<ReleaseMeta[]> {
+  return prismaClient.release.findMany({
     where: { appId },
     select: SELECT_RELEASE_META,
     orderBy: {
@@ -302,15 +285,31 @@ export async function getReleases(appId: string) {
   });
 }
 
-export async function getRelease(appId: string, version: number) {
-  return prisma.release.findUnique({
+export async function getRelease(appId: string, version: number): Promise<ReleaseMeta | null> {
+  return prismaClient.release.findUnique({
     where: { release_app_constraint: { appId, version } },
     select: SELECT_RELEASE_META,
   });
 }
 
-export async function createDeployment(appId: string, version: number) {
-  return prisma.deployment.create({
+export type Deployment = prisma.Deployment & {
+  release: ReleaseMeta;
+};
+
+export function getDeployments(appId: string): Promise<Deployment[]> {
+  return prismaClient.deployment.findMany({
+    where: { appId },
+    orderBy: { createdAt: 'desc' },
+    include: {
+      release: {
+        select: SELECT_RELEASE_META,
+      },
+    },
+  });
+}
+
+export async function createDeployment(appId: string, version: number): Promise<Deployment> {
+  return prismaClient.deployment.create({
     data: {
       app: {
         connect: { id: appId },
@@ -319,11 +318,25 @@ export async function createDeployment(appId: string, version: number) {
         connect: { release_app_constraint: { appId, version } },
       },
     },
+    include: {
+      release: {
+        select: SELECT_RELEASE_META,
+      },
+    },
   });
 }
 
-export async function findActiveDeployment(appId: string) {
-  return prisma.deployment.findFirst({
+export async function deploy(
+  appId: string,
+  releaseInput: CreateReleaseParams,
+): Promise<Deployment> {
+  const release = await createRelease(appId, releaseInput);
+  const deployment = await createDeployment(appId, release.version);
+  return deployment;
+}
+
+export async function findActiveDeployment(appId: string): Promise<Deployment | null> {
+  return prismaClient.deployment.findFirst({
     where: { appId },
     orderBy: { createdAt: 'desc' },
     include: {
@@ -335,7 +348,7 @@ export async function findActiveDeployment(appId: string) {
 }
 
 export async function loadReleaseDom(appId: string, version: number): Promise<appDom.AppDom> {
-  const release = await prisma.release.findUnique({
+  const release = await prismaClient.release.findUnique({
     where: { release_app_constraint: { appId, version } },
   });
   if (!release) {

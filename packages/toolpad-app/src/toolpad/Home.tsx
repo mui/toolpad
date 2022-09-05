@@ -47,6 +47,8 @@ import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ConfirmDialog } from '../components/SystemDialogs';
+import config from '../config';
+import { parseError } from '../utils/errors';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -93,7 +95,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 setName(event.target.value);
               }}
             />
-            {process.env.TOOLPAD_CREATE_WITH_DOM ? (
+            {config.integrationTest ? (
               <TextField
                 label="seed DOM"
                 fullWidth
@@ -190,8 +192,8 @@ function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableP
         try {
           await client.mutation.updateApp(app.id, name);
           await client.invalidateQueries('getApps');
-        } catch (err: any) {
-          setAppRenameError(err);
+        } catch (rawError) {
+          setAppRenameError(parseError(rawError));
           setEditing(true);
         }
       }

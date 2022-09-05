@@ -1,5 +1,6 @@
 import { set } from 'lodash-es';
 import { mapValues } from '../utils/collections';
+import { parseError } from '../utils/errors';
 
 let iframe: HTMLIFrameElement;
 function evaluateCode(code: string, globalScope: Record<string, unknown>) {
@@ -13,6 +14,7 @@ function evaluateCode(code: string, globalScope: Record<string, unknown>) {
 
   // eslint-disable-next-line no-underscore-dangle
   (iframe.contentWindow as any).__SCOPE = globalScope;
+  (iframe.contentWindow as any).console = window.console;
   return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
 }
 
@@ -25,7 +27,8 @@ export function evaluateExpression(
   try {
     const value = evaluateCode(code, globalScope);
     return { value };
-  } catch (error: any) {
+  } catch (rawError) {
+    const error = parseError(rawError);
     if (error?.message === TOOLPAD_LOADING_MARKER) {
       return { loading: true };
     }
@@ -79,6 +82,10 @@ export interface ParsedBinding<T = unknown> {
    * actual evaluated result of the binding
    */
   result?: BindingEvaluationResult<T>;
+  /**
+   * javascript expression that evaluates to the initial value of this binding if it doesn't have one
+   */
+  initializer?: string;
 }
 
 export function buildGlobalScope(
@@ -115,6 +122,53 @@ export default function evalJsBindings(
 
   let proxiedScope: Record<string, unknown>;
 
+  const evaluateBinding = (
+    bindingId: string,
+    scopePath?: string,
+  ): BindingEvaluationResult | null => {
+    const binding = bindingId && bindingsMap.get(bindingId);
+
+    if (!binding) {
+      return null;
+    }
+
+    const expression = binding.expression;
+
+    if (expression) {
+      const computed = computationStatuses.get(expression);
+      if (computed) {
+        if (computed.result) {
+          // From cache
+          return computed.result;
+        }
+
+        throw new Error(`Cycle detected "${scopePath}"`);
+      }
+
+      // use null to mark as "computing"
+      computationStatuses.set(expression, { result: null });
+      const result = evaluateExpression(expression, proxiedScope);
+      computationStatuses.set(expression, { result });
+      // From freshly computed
+      return result;
+    }
+
+    if (binding.result) {
+      // From input value on the page
+      return binding.result;
+    }
+
+    const initializer = binding.initializer;
+    if (initializer) {
+      const result = evaluateBinding(initializer, scopePath);
+      if (result) {
+        return result;
+      }
+    }
+
+    return null;
+  };
+
   const proxify = (obj: Record<string, unknown>, label?: string): Record<string, unknown> =>
     new Proxy(obj, {
       get(target, prop, receiver) {
@@ -124,33 +178,11 @@ export default function evalJsBindings(
 
         const scopePath = label ? `${label}.${prop}` : prop;
         const bindingId = bindingIdMap.get(scopePath);
-        const binding = bindingId && bindingsMap.get(bindingId);
 
-        if (binding) {
-          const expression = binding.expression;
-
-          if (expression) {
-            const computed = computationStatuses.get(expression);
-            if (computed) {
-              if (computed.result) {
-                // From cache
-                return unwrapEvaluationResult(computed.result);
-              }
-
-              throw new Error(`Cycle detected "${scopePath}"`);
-            }
-
-            // use null to mark as "computing"
-            computationStatuses.set(expression, { result: null });
-            const result = evaluateExpression(expression, proxiedScope);
-            computationStatuses.set(expression, { result });
-            // From freshly computed
-            return unwrapEvaluationResult(result);
-          }
-
-          if (binding.result) {
-            // From input value on the page
-            return unwrapEvaluationResult(binding.result);
+        if (bindingId) {
+          const evaluated = evaluateBinding(bindingId, scopePath);
+          if (evaluated) {
+            return unwrapEvaluationResult(evaluated);
           }
         }
 
@@ -167,13 +199,12 @@ export default function evalJsBindings(
   const scope = buildGlobalScope(globalScope, bindings);
   proxiedScope = proxify(scope);
 
-  return mapValues(bindings, (binding) => {
-    const { expression, result, ...rest } = binding;
+  return mapValues(bindings, (binding, key) => {
+    const { expression, result, initializer, ...rest } = binding;
+
     return {
       ...rest,
-      result: expression
-        ? evaluateExpression(expression, proxiedScope)
-        : result || { value: undefined },
+      result: evaluateBinding(key) || { value: undefined },
     };
   });
 }

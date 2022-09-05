@@ -11,9 +11,15 @@ export type SelectProps = TextFieldProps & {
   options: (string | SelectOption)[];
 };
 
-function Select({ sx, options, ...rest }: SelectProps) {
+function Select({ options, value, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
   return (
-    <TextField select sx={{ minWidth: 120, ...sx }} {...rest}>
+    <TextField
+      select
+      sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
+      fullWidth={fullWidth}
+      value={value}
+      {...rest}
+    >
       {options.map((option) => {
         const parsedOption: SelectOption = typeof option === 'string' ? { value: option } : option;
         return (
@@ -31,34 +37,39 @@ export default createComponent(Select, {
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',
   argTypes: {
-    label: {
-      typeDef: { type: 'string' },
-      defaultValue: '',
-    },
-    disabled: {
-      typeDef: { type: 'boolean' },
-    },
-    variant: {
-      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
-      defaultValue: 'outlined',
-    },
-    fullWidth: {
-      typeDef: { type: 'boolean' },
-    },
-    size: {
-      typeDef: { type: 'string', enum: ['small', 'medium'] },
-      defaultValue: 'small',
+    options: {
+      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
+      control: { type: 'SelectOptions' },
+      defaultValue: [],
     },
     value: {
       typeDef: { type: 'string' },
       onChangeProp: 'onChange',
       onChangeHandler: (event: React.ChangeEvent<HTMLSelectElement>) => event.target.value,
       defaultValue: '',
+      defaultValueProp: 'defaultValue',
     },
-    options: {
-      typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
-      control: { type: 'SelectOptions' },
-      defaultValue: [],
+    defaultValue: {
+      typeDef: { type: 'string' },
+      defaultValue: '',
+    },
+    label: {
+      typeDef: { type: 'string' },
+      defaultValue: '',
+    },
+    variant: {
+      typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
+      defaultValue: 'outlined',
+    },
+    size: {
+      typeDef: { type: 'string', enum: ['small', 'medium'] },
+      defaultValue: 'small',
+    },
+    fullWidth: {
+      typeDef: { type: 'boolean' },
+    },
+    disabled: {
+      typeDef: { type: 'boolean' },
     },
     sx: {
       typeDef: { type: 'object' },

@@ -25,6 +25,10 @@ declare global {
   }
 }
 
+const handleScreenUpdate = throttle(() => fireEvent({ type: 'screenUpdate' }), 50, {
+  trailing: true,
+});
+
 export interface AppCanvasProps {
   basename: string;
 }
@@ -36,6 +40,9 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
 
   const [appRoot, setAppRoot] = React.useState<HTMLDivElement | null>(null);
 
+  // Notify host after every render
+  React.useEffect(handleScreenUpdate);
+
   React.useEffect(() => {
     if (!appRoot) {
       return () => {};
@@ -43,13 +50,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
 
     rootRef.current = appRoot;
 
-    const onScreenUpdate = () => fireEvent({ type: 'screenUpdate' });
-
-    const handleScreenUpdateThrottled = throttle(onScreenUpdate, 50, {
-      trailing: true,
-    });
-
-    const mutationObserver = new MutationObserver(handleScreenUpdateThrottled);
+    const mutationObserver = new MutationObserver(handleScreenUpdate);
 
     mutationObserver.observe(appRoot, {
       attributes: true,
@@ -58,15 +59,13 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
       characterData: true,
     });
 
-    const resizeObserver = new ResizeObserver(handleScreenUpdateThrottled);
+    const resizeObserver = new ResizeObserver(handleScreenUpdate);
 
     resizeObserver.observe(appRoot);
     appRoot.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
 
-    onScreenUpdate();
-
     return () => {
-      handleScreenUpdateThrottled.cancel();
+      handleScreenUpdate.cancel();
       mutationObserver.disconnect();
       resizeObserver.disconnect();
     };

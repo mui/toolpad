@@ -351,6 +351,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
    */
   server?: boolean;
   disabled?: boolean;
+  hidden?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
 }
@@ -360,6 +361,7 @@ export function BindingEditor<V>({
   globalScope,
   server,
   disabled,
+  hidden = false,
   propType,
   value,
   onChange,
@@ -383,6 +385,7 @@ export function BindingEditor<V>({
       checkedIcon={<LinkIcon />}
       onClick={handleOpen}
       color={error ? 'error' : undefined}
+      sx={{ visibility: hidden ? 'hidden' : 'visible' }}
     />
   );
 
@@ -392,7 +395,12 @@ export function BindingEditor<V>({
   const bindingButtonWithTooltip = disabled ? (
     bindingButton
   ) : (
-    <TooltipComponent disableInteractive placement="top" title={tooltipTitle}>
+    <TooltipComponent
+      disableInteractive
+      placement="top"
+      title={tooltipTitle}
+      sx={{ visibility: hidden ? 'hidden' : 'visible' }}
+    >
       {bindingButton}
     </TooltipComponent>
   );

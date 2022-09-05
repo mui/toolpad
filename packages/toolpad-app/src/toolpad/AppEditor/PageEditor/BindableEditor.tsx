@@ -75,7 +75,8 @@ export default function BindableEditor<V>({
           propType={propType}
           value={value}
           onChange={onChange}
-          disabled={!bindable || disabled}
+          disabled={disabled || !bindable}
+          hidden={!bindable}
           liveBinding={liveBinding}
         />
       </React.Fragment>

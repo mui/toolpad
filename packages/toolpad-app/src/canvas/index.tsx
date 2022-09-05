@@ -37,9 +37,14 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState | null>(null);
 
   const appRootRef = React.useRef<HTMLDivElement>();
-  const appRootCleanupRef = React.useRef(() => {});
+  const appRootCleanupRef = React.useRef<() => void>();
   const onAppRoot = React.useCallback((appRoot: HTMLDivElement) => {
-    appRootCleanupRef.current();
+    appRootCleanupRef.current?.();
+    appRootCleanupRef.current = undefined;
+
+    if (!appRoot) {
+      return;
+    }
 
     appRootRef.current = appRoot;
 
@@ -67,6 +72,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
   // Notify host after every render
   React.useEffect(() => {
     if (appRootRef.current) {
+      // Only notify screen updates if the approot is rendered
       handleScreenUpdate();
     }
   });

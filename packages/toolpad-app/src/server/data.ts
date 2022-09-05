@@ -455,16 +455,25 @@ export function getLatestToolpadRelease(): Promise<Response> {
   if (latestReleaseCache.nextFetchAllowedAt > timestamp && latestReleaseCache.releasePromise) {
     return latestReleaseCache.releasePromise;
   }
-  // Fetch latest release from the Github API
-  // https://developer.github.com/v3/repos/releases/#get-the-latest-release
+
+  // Abort the request after 30 seconds
   const ac = new AbortController();
   setTimeout(() => {
     ac.abort('Timeout on fetching new release');
   }, 30000);
+
+  /* Fetch the latest release from the Github API
+   * https://developer.github.com/v3/repos/releases/#get-the-latest-release
+   */
+
   latestReleaseCache.releasePromise = fetch(LATEST_RELEASE_API_URL, {
     // Use AbortSignal.timeout() when https://github.com/microsoft/TypeScript/issues/48003  is fixed
     signal: ac.signal,
   });
+
+  // Allow the next request after ten minutes
   latestReleaseCache.nextFetchAllowedAt = timestamp + 1000 * 60 * 10;
+
+  // Cache the promise and return it
   return latestReleaseCache.releasePromise;
 }

@@ -7,7 +7,13 @@ import {
   Release,
   Prisma,
 } from '../../prisma/generated/client';
-import { ServerDataSource, ApiResult, VersionOrPreview, GithubReleaseCache } from '../types';
+import {
+  ServerDataSource,
+  ApiResult,
+  VersionOrPreview,
+  GithubReleaseCache,
+  GithubRelease,
+} from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -447,33 +453,38 @@ const LATEST_RELEASE_API_URL = 'https://api.github.com/repos/mui/mui-toolpad/rel
 
 const latestReleaseCache: GithubReleaseCache = {
   nextFetchAllowedAt: Number.NEGATIVE_INFINITY,
-  releasePromise: null,
+  release: null,
 };
 
-export function getLatestToolpadRelease(): Promise<Response> {
+export async function getLatestToolpadRelease(): Promise<GithubRelease> {
   const timestamp = Date.now();
-  if (latestReleaseCache.nextFetchAllowedAt > timestamp && latestReleaseCache.releasePromise) {
-    return latestReleaseCache.releasePromise;
+  if (latestReleaseCache.nextFetchAllowedAt > timestamp && latestReleaseCache.release) {
+    return latestReleaseCache.release;
   }
 
   // Abort the request after 30 seconds
-  const ac = new AbortController();
-  setTimeout(() => {
-    ac.abort('Timeout on fetching new release');
-  }, 30000);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
 
   /* Fetch the latest release from the Github API
    * https://developer.github.com/v3/repos/releases/#get-the-latest-release
    */
 
-  latestReleaseCache.releasePromise = fetch(LATEST_RELEASE_API_URL, {
-    // Use AbortSignal.timeout() when https://github.com/microsoft/TypeScript/issues/48003  is fixed
-    signal: ac.signal,
+  const response = await fetch(LATEST_RELEASE_API_URL, {
+    // Use AbortSignal.timeout() when https://github.com/microsoft/TypeScript/issues/48003 is fixed
+    signal: controller.signal,
   });
+  if (response.ok) {
+    latestReleaseCache.release = response.json();
+    clearTimeout(timeout);
+  } else {
+    latestReleaseCache.release = null;
+    throw new Error(`Failed to fetch latest release from Github API: ${response.statusText}`);
+  }
 
   // Allow the next request after ten minutes
   latestReleaseCache.nextFetchAllowedAt = timestamp + 1000 * 60 * 10;
 
   // Cache the promise and return it
-  return latestReleaseCache.releasePromise;
+  return latestReleaseCache.release;
 }

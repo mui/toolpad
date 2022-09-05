@@ -7,7 +7,7 @@ import {
   Release,
   Prisma,
 } from '../../prisma/generated/client';
-import { ServerDataSource, ApiResult, VersionOrPreview } from '../types';
+import { ServerDataSource, ApiResult, VersionOrPreview, GithubReleaseCache } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -444,29 +444,27 @@ export async function loadRenderTree(appId: string, version: VersionOrPreview = 
 }
 
 const LATEST_RELEASE_API_URL = 'https://api.github.com/repos/mui/mui-toolpad/releases/latest';
-const latestReleaseCache: GithubReleaseCache = {};
-interface GithubRelease {
-  tag_name: string;
-  html_url: string;
-}
-interface GithubReleaseCache {
-  latest?: {
-    timestamp: number;
-    release: GithubRelease;
-  };
-}
 
-export async function getLatestToolpadRelease(): Promise<GithubRelease> {
+const latestReleaseCache: GithubReleaseCache = {
+  nextFetchAllowedAt: Number.NEGATIVE_INFINITY,
+  releasePromise: null,
+};
+
+export function getLatestToolpadRelease(): Promise<Response> {
   const timestamp = Date.now();
-  if (latestReleaseCache.latest) {
-    const { timestamp: lastFetchedTimestamp, release } = latestReleaseCache.latest;
-    if (lastFetchedTimestamp && timestamp - lastFetchedTimestamp < 1000 * 60 * 10) {
-      return release;
-    }
+  if (latestReleaseCache.nextFetchAllowedAt > timestamp && latestReleaseCache.releasePromise) {
+    return latestReleaseCache.releasePromise;
   }
   // Fetch latest release from the Github API
   // https://developer.github.com/v3/repos/releases/#get-the-latest-release
-  const response = await (await fetch(LATEST_RELEASE_API_URL))?.json();
-  latestReleaseCache.latest = { timestamp, release: response };
-  return { tag_name: response.tag_name, html_url: response.html_url };
+  const ac = new AbortController();
+  setTimeout(() => {
+    ac.abort('Timeout on fetching new release');
+  }, 30000);
+  latestReleaseCache.releasePromise = fetch(LATEST_RELEASE_API_URL, {
+    // Use AbortSignal.timeout() when https://github.com/microsoft/TypeScript/issues/48003  is fixed
+    signal: ac.signal,
+  });
+  latestReleaseCache.nextFetchAllowedAt = timestamp + 1000 * 60 * 10;
+  return latestReleaseCache.releasePromise;
 }

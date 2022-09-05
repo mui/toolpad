@@ -165,3 +165,8 @@ export interface AppTheme {
 }
 
 export type VersionOrPreview = 'preview' | number;
+
+export interface GithubReleaseCache {
+  nextFetchAllowedAt: number;
+  releasePromise: Promise<Response> | null;
+}

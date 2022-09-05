@@ -58,6 +58,8 @@ export class ToolpadEditor {
 
   readonly pageRoot: Locator;
 
+  readonly pageOverlay: Locator;
+
   constructor(page: Page) {
     this.page = page;
 
@@ -72,6 +74,7 @@ export class ToolpadEditor {
 
     this.canvasFrame = page.frameLocator('iframe[data-toolpad-canvas]');
     this.pageRoot = this.canvasFrame.locator('data-testid=page-root');
+    this.pageOverlay = this.canvasFrame.locator('data-testid=page-overlay');
   }
 
   async goto(appId: string) {

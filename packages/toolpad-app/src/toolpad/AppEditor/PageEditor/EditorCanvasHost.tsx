@@ -221,6 +221,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         </Box>
         <CanvasFrame
           ref={frameRef}
+          name="data-toolpad-canvas"
           onLoad={handleFrameLoad}
           src={`/app-canvas/${appId}/pages/${pageNodeId}`}
           // Used by the runtime to know when to load react devtools

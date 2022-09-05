@@ -57,7 +57,7 @@ test('can place new components from catalog', async ({ page }) => {
   await expect(canvasInputLocator).toHaveCount(2);
 });
 
-test('can move elements in page', async ({ page }) => {
+test.only('can move elements in page', async ({ page, browserName }) => {
   const homeModel = new ToolpadHome(page);
   const editorModel = new ToolpadEditor(page);
 
@@ -99,14 +99,36 @@ test('can move elements in page', async ({ page }) => {
   await page.mouse.move(
     canvasMoveElementHandleBoundingBox!.x + canvasMoveElementHandleBoundingBox!.width / 2,
     canvasMoveElementHandleBoundingBox!.y + canvasMoveElementHandleBoundingBox!.height / 2,
-    { steps: 5 },
   );
   await page.mouse.down();
-  await page.mouse.move(
-    secondTextFieldBoundingBox!.x + secondTextFieldBoundingBox!.width,
-    secondTextFieldBoundingBox!.y + secondTextFieldBoundingBox!.height / 2,
-    { steps: 5 },
-  );
+
+  const moveTargetX = secondTextFieldBoundingBox!.x + secondTextFieldBoundingBox!.width;
+  const moveTargetY = secondTextFieldBoundingBox!.y + secondTextFieldBoundingBox!.height / 2;
+
+  await page.mouse.move(moveTargetX, moveTargetY);
+
+  // Overlay drag events need to be dispatched manually in Firefox for tests to work
+  if (browserName === 'firefox') {
+    const canvasFrame = page.frame('data-toolpad-canvas');
+
+    expect(canvasFrame).toBeDefined();
+
+    const pageOverlayBoundingBox = await editorModel.pageOverlay.boundingBox();
+
+    expect(pageOverlayBoundingBox).toBeDefined();
+
+    const eventMousePositon = {
+      clientX: moveTargetX - pageOverlayBoundingBox!.x,
+      clientY: moveTargetY - pageOverlayBoundingBox!.y,
+    };
+
+    const pageOverlaySelector = 'data-testid=page-overlay';
+
+    await canvasFrame!.dispatchEvent(pageOverlaySelector, 'dragover', eventMousePositon);
+    await canvasFrame!.dispatchEvent(pageOverlaySelector, 'drop', eventMousePositon);
+    await canvasFrame!.dispatchEvent(pageOverlaySelector, 'dragend');
+  }
+
   await page.mouse.up();
 
   await expect(firstTextFieldLocator).toHaveAttribute('value', 'textField2');

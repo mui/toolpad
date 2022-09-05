@@ -395,12 +395,7 @@ export function BindingEditor<V>({
   const bindingButtonWithTooltip = disabled ? (
     bindingButton
   ) : (
-    <TooltipComponent
-      disableInteractive
-      placement="top"
-      title={tooltipTitle}
-      sx={{ visibility: hidden ? 'hidden' : 'visible' }}
-    >
+    <TooltipComponent disableInteractive placement="top" title={tooltipTitle}>
       {bindingButton}
     </TooltipComponent>
   );

@@ -100,7 +100,7 @@
     "sucrase": "^3.23.0",
     "superjson": "^1.8.1",
     "ts-node": "^10.8.2",
-    "typescript": "^4.7.4",
+    "typescript": "^4.8.2",
     "web-streams-polyfill": "^3.2.1",
     "whatwg-url": "^11.0.0"
   },

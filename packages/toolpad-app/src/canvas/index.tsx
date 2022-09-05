@@ -69,6 +69,14 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
     };
   }, []);
 
+  React.useEffect(
+    () => () => {
+      appRootCleanupRef.current?.();
+      appRootCleanupRef.current = undefined;
+    },
+    [],
+  );
+
   // Notify host after every render
   React.useEffect(() => {
     if (appRootRef.current) {

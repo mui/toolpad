@@ -259,19 +259,21 @@ export default function BodyEditor({
           />
         </TabPanel>
       </TabContext>
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: '0 0 0 0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Typography color="info" variant="body2">
-          {HTTP_NO_BODY.has(method) ? `"${method}" requests can't have a body` : ' '}
-        </Typography>
-      </Box>
+      {HTTP_NO_BODY.has(method) ? (
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: '0 0 0 0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Typography color="info" variant="body2">
+            &quot;{method}&quot; requests can&apos;t have a body
+          </Typography>
+        </Box>
+      ) : null}
     </Box>
   );
 }

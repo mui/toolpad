@@ -23,7 +23,6 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
 import client from '../api';
-import { GithubRelease } from '../types';
 
 const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
@@ -88,32 +87,21 @@ function UserFeedback() {
 }
 
 function UpdateBanner() {
-  const { data: latestReleasePromise } = client.useQuery('getLatestToolpadRelease', [], {
+  const { data: latestRelease } = client.useQuery('getLatestToolpadRelease', [], {
     staleTime: 1000 * 60 * 10,
   });
-
-  const [latestRelease, setLatestRelease] = React.useState<GithubRelease | null>(null);
 
   const [dismissedVersion, setDismissedVersion] = useLocalStorageState<string | null>(
     'update-banner-dismissed-version',
     null,
   );
 
-  React.useEffect(() => {
-    async function resolveLatestReleasePromise() {
-      if (latestReleasePromise) {
-        setLatestRelease(await latestReleasePromise.json());
-      }
-    }
-    resolveLatestReleasePromise();
-  }, [latestReleasePromise]);
-
   const handleDismissClick = React.useCallback(() => {
     setDismissedVersion(CURRENT_RELEASE_VERSION);
   }, [setDismissedVersion]);
 
   const hideBanner =
-    (latestRelease && latestRelease?.tag_name === CURRENT_RELEASE_VERSION) ||
+    (latestRelease && latestRelease.tag_name === CURRENT_RELEASE_VERSION) ||
     dismissedVersion === CURRENT_RELEASE_VERSION;
 
   return (
@@ -203,8 +191,8 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
   return (
     <ToolpadShellRoot>
       <Header {...props} />
-      <UpdateBanner />
       <ViewPort>{children}</ViewPort>
+      <UpdateBanner />
     </ToolpadShellRoot>
   );
 }

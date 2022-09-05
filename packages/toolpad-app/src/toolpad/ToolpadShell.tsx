@@ -23,6 +23,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
 import client from '../api';
+import { GithubRelease } from '../types';
 
 const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
@@ -87,30 +88,37 @@ function UserFeedback() {
 }
 
 function UpdateBanner() {
-  const { data: latestRelease, isFetchedAfterMount } = client.useQuery(
-    'getLatestToolpadRelease',
-    [],
-    {
-      staleTime: 1000 * 60 * 10,
-    },
-  );
+  const { data: latestReleasePromise } = client.useQuery('getLatestToolpadRelease', [], {
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const [latestRelease, setLatestRelease] = React.useState<GithubRelease | null>(null);
+
   const [dismissedVersion, setDismissedVersion] = useLocalStorageState<string | null>(
     'update-banner-dismissed-version',
     null,
   );
+
+  React.useEffect(() => {
+    async function resolveLatestReleasePromise() {
+      if (latestReleasePromise) {
+        setLatestRelease(await latestReleasePromise.json());
+      }
+    }
+    resolveLatestReleasePromise();
+  }, [latestReleasePromise]);
 
   const handleDismissClick = React.useCallback(() => {
     setDismissedVersion(CURRENT_RELEASE_VERSION);
   }, [setDismissedVersion]);
 
   const hideBanner =
-    !isFetchedAfterMount ||
-    latestRelease?.tag_name === CURRENT_RELEASE_VERSION ||
+    (latestRelease && latestRelease?.tag_name === CURRENT_RELEASE_VERSION) ||
     dismissedVersion === CURRENT_RELEASE_VERSION;
 
   return (
     <React.Fragment>
-      {process.env.TOOLPAD_TARGET === 'CE' ? (
+      {latestRelease && process.env.TOOLPAD_TARGET === 'CE' ? (
         <Collapse in={!hideBanner}>
           <Alert
             action={
@@ -131,7 +139,7 @@ function UpdateBanner() {
                   endIcon={<OpenInNewIcon fontSize="inherit" />}
                   component="a"
                   target="_blank"
-                  href={latestRelease?.html_url}
+                  href={latestRelease.html_url}
                 >
                   View changelog
                 </Button>
@@ -147,7 +155,7 @@ function UpdateBanner() {
             }
             severity="info"
           >
-            A new version <strong>{latestRelease?.tag_name}</strong> of Toolpad is available.
+            A new version <strong>{latestRelease.tag_name}</strong> of Toolpad is available.
           </Alert>
         </Collapse>
       ) : null}

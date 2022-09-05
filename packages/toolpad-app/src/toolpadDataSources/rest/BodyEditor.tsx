@@ -9,6 +9,7 @@ import {
   TextField,
   Toolbar,
   ToolbarProps,
+  Typography,
 } from '@mui/material';
 import { TabContext } from '@mui/lab';
 import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
@@ -23,6 +24,7 @@ import lazyComponent from '../../utils/lazyComponent';
 import * as appDom from '../../appDom';
 import TabPanel from '../../components/TabPanel';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
+import { HTTP_NO_BODY } from './shared';
 
 interface ContentTypeSpec {
   alias: string;
@@ -49,6 +51,14 @@ const BodyEditorToolbar = styled((props: ToolbarProps) => (
   marginBottom: theme.spacing(1),
 }));
 
+interface RenderBodyToolbarParams {
+  actions?: React.ReactNode;
+}
+
+interface RenderBodyToolbar {
+  (params?: RenderBodyToolbarParams): React.ReactNode;
+}
+
 const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor'), {
   noSsr: true,
   fallback: <Skeleton variant="rectangular" height="100%" />,
@@ -56,14 +66,16 @@ const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor')
 
 interface BodyTypeEditorProps<B = Body> extends WithControlledProp<Maybe<B>> {
   globalScope: Record<string, any>;
-  toolbarActions?: React.ReactNode;
+  renderToolbar: RenderBodyToolbar;
+  disabled?: boolean;
 }
 
 function RawBodyEditor({
-  toolbarActions,
+  renderToolbar,
   value: valueProp,
   onChange,
   globalScope,
+  disabled,
 }: BodyTypeEditorProps<RawBody>) {
   const value: RawBody = React.useMemo(
     () =>
@@ -101,16 +113,24 @@ function RawBodyEditor({
 
   return (
     <React.Fragment>
-      <BodyEditorToolbar>
-        {toolbarActions}
-        <TextField select value={value?.contentType.value} onChange={handleContentTypeChange}>
-          {Array.from(RAW_CONTENT_TYPES.entries(), ([contentType, { alias }]) => (
-            <MenuItem key={contentType} value={contentType}>
-              {alias}
-            </MenuItem>
-          ))}
-        </TextField>
-      </BodyEditorToolbar>
+      {renderToolbar({
+        actions: (
+          <React.Fragment>
+            <TextField
+              select
+              value={value?.contentType.value}
+              onChange={handleContentTypeChange}
+              disabled={disabled}
+            >
+              {Array.from(RAW_CONTENT_TYPES.entries(), ([contentType, { alias }]) => (
+                <MenuItem key={contentType} value={contentType}>
+                  {alias}
+                </MenuItem>
+              ))}
+            </TextField>
+          </React.Fragment>
+        ),
+      })}
       <BindableEditor
         sx={{ mt: 1 }}
         liveBinding={liveContent}
@@ -128,16 +148,18 @@ function RawBodyEditor({
         value={value?.content || null}
         onChange={handleValueChange}
         label="json"
+        disabled={disabled}
       />
     </React.Fragment>
   );
 }
 
 function UrlEncodedBodyEditor({
-  toolbarActions,
+  renderToolbar,
   value: valueProp,
   onChange,
   globalScope,
+  disabled,
 }: BodyTypeEditorProps<UrlEncodedBody>) {
   const value: UrlEncodedBody = React.useMemo(
     () =>
@@ -164,13 +186,14 @@ function UrlEncodedBodyEditor({
 
   return (
     <React.Fragment>
-      <BodyEditorToolbar>{toolbarActions}</BodyEditorToolbar>
+      {renderToolbar()}
       <ParametersEditor
         sx={{ mt: 1 }}
         value={value.content}
         onChange={handleParamsChange}
         globalScope={globalScope}
         liveValue={liveContent}
+        disabled={disabled}
       />
     </React.Fragment>
   );
@@ -181,9 +204,16 @@ type BodyKind = Body['kind'];
 export interface BodyEditorProps extends WithControlledProp<Maybe<Body>> {
   globalScope: Record<string, any>;
   sx?: SxProps;
+  method?: string;
 }
 
-export default function BodyEditor({ globalScope, value, onChange, sx }: BodyEditorProps) {
+export default function BodyEditor({
+  globalScope,
+  value,
+  onChange,
+  sx,
+  method: methodProp,
+}: BodyEditorProps) {
   const [activeTab, setActiveTab] = React.useState<BodyKind>(value?.kind || 'raw');
   React.useEffect(() => setActiveTab(value?.kind || 'raw'), [value?.kind]);
 
@@ -191,35 +221,57 @@ export default function BodyEditor({ globalScope, value, onChange, sx }: BodyEdi
     setActiveTab(event.target.value as BodyKind);
   };
 
-  const toolbarActions = (
-    <React.Fragment>
-      <TextField select value={activeTab} onChange={handleTabChange}>
-        <MenuItem value="raw">raw</MenuItem>
-        <MenuItem value="urlEncoded">x-www-form-urlencoded</MenuItem>
-      </TextField>
-    </React.Fragment>
+  const method = methodProp || 'GET';
+  const disabled = HTTP_NO_BODY.has(method);
+
+  const renderToolbar = React.useCallback<RenderBodyToolbar>(
+    ({ actions } = {}) => (
+      <BodyEditorToolbar>
+        <TextField select value={activeTab} onChange={handleTabChange} disabled={disabled}>
+          <MenuItem value="raw">raw</MenuItem>
+          <MenuItem value="urlEncoded">x-www-form-urlencoded</MenuItem>
+        </TextField>
+        {actions}
+      </BodyEditorToolbar>
+    ),
+    [activeTab, disabled],
   );
 
   return (
-    <Box sx={sx}>
+    <Box sx={{ ...sx, position: 'relative' }}>
       <TabContext value={activeTab}>
         <TabPanel disableGutters value="raw">
           <RawBodyEditor
-            toolbarActions={toolbarActions}
+            renderToolbar={renderToolbar}
             globalScope={globalScope}
             value={value?.kind === 'raw' ? (value as RawBody) : null}
             onChange={onChange}
+            disabled={disabled}
           />
         </TabPanel>
         <TabPanel disableGutters value="urlEncoded">
           <UrlEncodedBodyEditor
-            toolbarActions={toolbarActions}
+            renderToolbar={renderToolbar}
             globalScope={globalScope}
             value={value?.kind === 'urlEncoded' ? (value as UrlEncodedBody) : null}
             onChange={onChange}
+            disabled={disabled}
           />
         </TabPanel>
       </TabContext>
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: '0 0 0 0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography color="info" variant="body2">
+          {HTTP_NO_BODY.has(method) ? `"${method}" requests can't have a body` : ' '}
+        </Typography>
+      </Box>
     </Box>
   );
 }

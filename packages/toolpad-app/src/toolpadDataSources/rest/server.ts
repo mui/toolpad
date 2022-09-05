@@ -1,5 +1,5 @@
 import { BindableAttrEntries, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
-import fetch, { Headers, RequestInit } from 'node-fetch';
+import fetch, { Headers, RequestInit, Response } from 'node-fetch';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource, ApiResult } from '../../types';
 import {
@@ -112,6 +112,10 @@ async function resolveBody(body: Body, boundValues: Record<string, string>) {
   }
 }
 
+async function readData(res: Response): Promise<any> {
+  return res.headers.get('content-type') === 'application/json' ? res.json() : res.text();
+}
+
 async function execBase(
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
@@ -168,7 +172,7 @@ async function execBase(
       throw new Error(`HTTP ${res.status}`);
     }
 
-    untransformedData = await res.json();
+    untransformedData = await readData(res);
     data = untransformedData;
 
     if (fetchQuery.transformEnabled && fetchQuery.transform) {

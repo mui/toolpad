@@ -284,7 +284,7 @@ function QueryEditor({
 
   const isDirty = input !== value;
 
-  const [activeTab, setActiveTab] = React.useState('body');
+  const [activeTab, setActiveTab] = React.useState('urlQuery');
 
   const handleActiveTabChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string) => setActiveTab(newValue),
@@ -341,6 +341,7 @@ function QueryEditor({
                       globalScope={queryScope}
                       value={input.query.body}
                       onChange={handleBodyChange}
+                      method={input.query.method || 'GET'}
                     />
                   </TabPanel>
                   <TabPanel disableGutters value="headers">
@@ -395,7 +396,7 @@ function QueryEditor({
 }
 
 function getInitialQueryValue(): FetchQuery {
-  return { url: { type: 'const', value: '' }, method: '', headers: [] };
+  return { url: { type: 'const', value: '' }, method: 'GET', headers: [] };
 }
 
 const dataSource: ClientDataSource<{}, FetchQuery> = {

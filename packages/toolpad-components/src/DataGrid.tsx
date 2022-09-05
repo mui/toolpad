@@ -14,6 +14,7 @@ import {
   GridValueFormatterParams,
   GridColDef,
   GridValueGetterParams,
+  useGridApiRef,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
@@ -292,24 +293,31 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [selection?.id],
   );
 
-  const columns: GridColumns = React.useMemo(() => parseColumns(columnsProp || []), [columnsProp]);
+  const columns: GridColumns = React.useMemo(
+    () => (columnsProp ? parseColumns(columnsProp) : []),
+    [columnsProp],
+  );
 
-  // The grid doesn't react to changes to the column prop, so it needs to be remounted
-  // when that updates to reflect changes made in the editor.
-  const key = React.useMemo(
-    () => [rowIdFieldProp ?? '', getObjectKey(columnsProp)].join('::'),
-    [columnsProp, rowIdFieldProp],
+  const apiRef = useGridApiRef();
+  React.useEffect(() => apiRef.current.updateColumns(columns), [apiRef, columns]);
+
+  // The grid doesn't update when the getRowId or columns properties change, so it needs to be remounted
+  // TODO: remove columns from this equation once https://github.com/mui/mui-x/issues/5970 gets resolved
+  const gridKey = React.useMemo(
+    () => [getObjectKey(getRowId), getObjectKey(columns)].join('::'),
+    [getRowId, columns],
   );
 
   return (
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
       <DataGridPro
+        apiRef={apiRef}
         components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
         onColumnResize={handleResize}
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
         columns={columns}
-        key={key}
+        key={gridKey}
         getRowId={getRowId}
         onSelectionModelChange={onSelectionModelChange}
         selectionModel={selectionModel}
@@ -338,6 +346,16 @@ export default createComponent(DataGridComponent, {
       typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' },
       control: { type: 'GridColumns' },
     },
+    rowIdField: {
+      typeDef: { type: 'string' },
+      control: { type: 'RowIdFieldSelect' },
+      label: 'Id field',
+    },
+    selection: {
+      typeDef: { type: 'object' },
+      onChangeProp: 'onSelectionChange',
+      defaultValue: null,
+    },
     density: {
       typeDef: { type: 'string', enum: ['compact', 'standard', 'comfortable'] },
       defaultValue: 'compact',
@@ -346,21 +364,11 @@ export default createComponent(DataGridComponent, {
       typeDef: { type: 'number' },
       defaultValue: 350,
     },
-    sx: {
-      typeDef: { type: 'object' },
-    },
-    selection: {
-      typeDef: { type: 'object' },
-      onChangeProp: 'onSelectionChange',
-      defaultValue: null,
-    },
     loading: {
       typeDef: { type: 'boolean' },
     },
-    rowIdField: {
-      typeDef: { type: 'string' },
-      control: { type: 'RowIdFieldSelect' },
-      label: 'Id field',
+    sx: {
+      typeDef: { type: 'object' },
     },
   },
 });

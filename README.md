@@ -20,7 +20,7 @@ Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal too
 
 </div>
 
-![Editor screenshot](./docs/public/static/toolpad/hero-screenshot.png)
+![Editor screenshot](./docs/public/static/toolpad/marketing/index-hero-video-poster.jpg)
 
 ## Notice
 

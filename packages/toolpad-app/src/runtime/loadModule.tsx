@@ -1,6 +1,7 @@
 import { transform, TransformResult } from 'sucrase';
 import { codeFrameColumns } from '@babel/code-frame';
 import { findImports, isAbsoluteUrl } from '../utils/strings';
+import { parseError } from '../utils/errors';
 
 async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<string, unknown>> {
   const resolved = await Promise.all(input.values());
@@ -56,9 +57,10 @@ export default async function loadModule(src: string): Promise<any> {
     compiled = transform(src, {
       transforms: ['jsx', 'typescript', 'imports'],
     });
-  } catch (err: any) {
-    if (err.loc) {
-      err.message = [err.message, codeFrameColumns(src, { start: err.loc })].join('\n\n');
+  } catch (rawError) {
+    const err = parseError(rawError);
+    if ((err as any).loc) {
+      err.message = [err.message, codeFrameColumns(src, { start: (err as any).loc })].join('\n\n');
     }
     throw err;
   }

@@ -36,19 +36,12 @@ export interface AppCanvasProps {
 export default function AppCanvas({ basename }: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState | null>(null);
 
-  const rootRef = React.useRef<HTMLDivElement>();
+  const appRootRef = React.useRef<HTMLDivElement>();
+  const appRootCleanupRef = React.useRef(() => {});
+  const onAppRoot = React.useCallback((appRoot: HTMLDivElement) => {
+    appRootCleanupRef.current();
 
-  const [appRoot, setAppRoot] = React.useState<HTMLDivElement | null>(null);
-
-  // Notify host after every render
-  React.useEffect(handleScreenUpdate);
-
-  React.useEffect(() => {
-    if (!appRoot) {
-      return () => {};
-    }
-
-    rootRef.current = appRoot;
+    appRootRef.current = appRoot;
 
     const mutationObserver = new MutationObserver(handleScreenUpdate);
 
@@ -64,12 +57,19 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
     resizeObserver.observe(appRoot);
     appRoot.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
 
-    return () => {
+    appRootCleanupRef.current = () => {
       handleScreenUpdate.cancel();
       mutationObserver.disconnect();
       resizeObserver.disconnect();
     };
-  }, [appRoot]);
+  }, []);
+
+  // Notify host after every render
+  React.useEffect(() => {
+    if (appRootRef.current) {
+      handleScreenUpdate();
+    }
+  });
 
   React.useEffect(() => {
     const bridge: ToolpadBridge = {
@@ -79,14 +79,14 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
         });
       },
       getPageViewState: () => {
-        invariant(rootRef.current, 'App ref not attached');
-        return getPageViewState(rootRef.current);
+        invariant(appRootRef.current, 'App ref not attached');
+        return getPageViewState(appRootRef.current);
       },
       getViewCoordinates(clientX, clientY) {
-        if (!rootRef.current) {
+        if (!appRootRef.current) {
           return null;
         }
-        const rect = rootRef.current.getBoundingClientRect();
+        const rect = appRootRef.current.getBoundingClientRect();
         if (rectContainsPoint(rect, clientX, clientY)) {
           return { x: clientX - rect.x, y: clientY - rect.y };
         }
@@ -117,7 +117,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
   return state ? (
     <CanvasHooksContext.Provider value={editorHooks}>
       <ToolpadApp
-        rootRef={setAppRoot}
+        rootRef={onAppRoot}
         hidePreviewBanner
         dom={state.dom}
         version="preview"

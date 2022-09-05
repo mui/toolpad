@@ -166,6 +166,12 @@ export interface AppTheme {
 
 export type VersionOrPreview = 'preview' | number;
 
+export interface GithubRelease {
+  tag_name: string;
+  prerelease: boolean;
+  html_url: string;
+}
+
 export interface GithubReleaseCache {
   nextFetchAllowedAt: number;
   releasePromise: Promise<Response> | null;

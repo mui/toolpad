@@ -123,8 +123,8 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
 
   const {
     value: createReleaseDialogOpen,
-    setTrue: handleCreateReleasDialogOpen,
-    setFalse: handleCreateReleasDialogClose,
+    setTrue: handleCreateReleaseDialogOpen,
+    setFalse: handleCreateReleaseDialogClose,
   } = useBoolean(false);
 
   const hasUnsavedChanges = domLoader.unsavedChanges > 0;
@@ -159,7 +159,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
           <Button
             variant="outlined"
             color="inherit"
-            onClick={handleCreateReleasDialogOpen}
+            onClick={handleCreateReleaseDialogOpen}
             endIcon={<RocketLaunchIcon />}
           >
             Deploy
@@ -197,7 +197,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
         <CreateReleaseDialog
           appId={appId}
           open={createReleaseDialogOpen}
-          onClose={handleCreateReleasDialogClose}
+          onClose={handleCreateReleaseDialogClose}
         />
       </Box>
     </ToolpadShell>

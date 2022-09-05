@@ -4,7 +4,47 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
 import domInput from './domInput.json';
 
-async function dragCenterToCenter(page: Page, sourceLocator: Locator, targetLocator: Locator) {
+async function dispatchOverlayDragEvents(
+  page: Page,
+  editorModel: ToolpadEditor,
+  moveTargetX: number,
+  moveTargetY: number,
+) {
+  const canvasFrame = page.frame('data-toolpad-canvas');
+
+  expect(canvasFrame).toBeDefined();
+
+  const pageOverlayBoundingBox = await editorModel.pageOverlay.boundingBox();
+
+  expect(pageOverlayBoundingBox).toBeDefined();
+
+  const eventMousePosition = {
+    clientX: moveTargetX - pageOverlayBoundingBox!.x,
+    clientY: moveTargetY - pageOverlayBoundingBox!.y,
+  };
+
+  const pageOverlaySelector = 'data-testid=page-overlay';
+
+  await canvasFrame!.dispatchEvent(pageOverlaySelector, 'dragover', eventMousePosition);
+  await canvasFrame!.dispatchEvent(pageOverlaySelector, 'drop', eventMousePosition);
+  await canvasFrame!.dispatchEvent(pageOverlaySelector, 'dragend');
+}
+
+async function dragNewComponentToTargetCenter(
+  page: Page,
+  editorModel: ToolpadEditor,
+  browserName: string,
+  componentName: string,
+  targetLocator: Locator,
+) {
+  const isFirefox = browserName === 'firefox';
+
+  const sourceLocator = editorModel.componentCatalog.locator(
+    `:has-text("${componentName}")[draggable]`,
+  );
+
+  await editorModel.componentCatalog.hover();
+
   const sourceBoundingBox = await sourceLocator.boundingBox();
   const targetBoundingBox = await targetLocator.boundingBox();
 
@@ -17,15 +57,32 @@ async function dragCenterToCenter(page: Page, sourceLocator: Locator, targetLoca
     { steps: 5 },
   );
   await page.mouse.down();
-  await page.mouse.move(
-    targetBoundingBox!.x + targetBoundingBox!.width / 2,
-    targetBoundingBox!.y + targetBoundingBox!.height / 2,
-    { steps: 5 },
-  );
+
+  // Source drag event needs to be dispatched manually in Firefox for tests to work
+  if (isFirefox) {
+    const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
+
+    await page.dispatchEvent(
+      `data-testid=component-catalog >> div:has-text("${componentName}")[draggable]`,
+      'dragstart',
+      { dataTransfer },
+    );
+  }
+
+  const moveTargetX = targetBoundingBox!.x + targetBoundingBox!.width / 2;
+  const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
+
+  await page.mouse.move(moveTargetX, moveTargetY, { steps: 5 });
+
+  // Overlay drag events need to be dispatched manually in Firefox for tests to work
+  if (isFirefox) {
+    await dispatchOverlayDragEvents(page, editorModel, moveTargetX, moveTargetY);
+  }
+
   await page.mouse.up();
 }
 
-test('can place new components from catalog', async ({ page }) => {
+test('can place new components from catalog', async ({ page, browserName }) => {
   const homeModel = new ToolpadHome(page);
   const editorModel = new ToolpadEditor(page);
 
@@ -39,25 +96,33 @@ test('can place new components from catalog', async ({ page }) => {
 
   // Drag in a first component
 
-  await editorModel.componentCatalog.hover();
-
-  const textFieldDragSourceLocator = editorModel.componentCatalog.locator(
-    ':has-text("TextField")[draggable]',
+  await dragNewComponentToTargetCenter(
+    page,
+    editorModel,
+    browserName,
+    'TextField',
+    editorModel.pageRoot,
   );
-  await dragCenterToCenter(page, textFieldDragSourceLocator, editorModel.pageRoot);
 
   await expect(canvasInputLocator).toHaveCount(1);
   await expect(canvasInputLocator).toBeVisible();
 
   // Drag in a second component
 
-  await editorModel.componentCatalog.hover();
-  await dragCenterToCenter(page, textFieldDragSourceLocator, editorModel.pageRoot);
+  await dragNewComponentToTargetCenter(
+    page,
+    editorModel,
+    browserName,
+    'TextField',
+    editorModel.pageOverlay,
+  );
 
   await expect(canvasInputLocator).toHaveCount(2);
 });
 
-test.only('can move elements in page', async ({ page, browserName }) => {
+test('can move elements in page', async ({ page, browserName }) => {
+  const isFirefox = browserName === 'firefox';
+
   const homeModel = new ToolpadHome(page);
   const editorModel = new ToolpadEditor(page);
 
@@ -99,34 +164,18 @@ test.only('can move elements in page', async ({ page, browserName }) => {
   await page.mouse.move(
     canvasMoveElementHandleBoundingBox!.x + canvasMoveElementHandleBoundingBox!.width / 2,
     canvasMoveElementHandleBoundingBox!.y + canvasMoveElementHandleBoundingBox!.height / 2,
+    { steps: 5 },
   );
   await page.mouse.down();
 
   const moveTargetX = secondTextFieldBoundingBox!.x + secondTextFieldBoundingBox!.width;
   const moveTargetY = secondTextFieldBoundingBox!.y + secondTextFieldBoundingBox!.height / 2;
 
-  await page.mouse.move(moveTargetX, moveTargetY);
+  await page.mouse.move(moveTargetX, moveTargetY, { steps: 5 });
 
   // Overlay drag events need to be dispatched manually in Firefox for tests to work
-  if (browserName === 'firefox') {
-    const canvasFrame = page.frame('data-toolpad-canvas');
-
-    expect(canvasFrame).toBeDefined();
-
-    const pageOverlayBoundingBox = await editorModel.pageOverlay.boundingBox();
-
-    expect(pageOverlayBoundingBox).toBeDefined();
-
-    const eventMousePositon = {
-      clientX: moveTargetX - pageOverlayBoundingBox!.x,
-      clientY: moveTargetY - pageOverlayBoundingBox!.y,
-    };
-
-    const pageOverlaySelector = 'data-testid=page-overlay';
-
-    await canvasFrame!.dispatchEvent(pageOverlaySelector, 'dragover', eventMousePositon);
-    await canvasFrame!.dispatchEvent(pageOverlaySelector, 'drop', eventMousePositon);
-    await canvasFrame!.dispatchEvent(pageOverlaySelector, 'dragend');
+  if (isFirefox) {
+    await dispatchOverlayDragEvents(page, editorModel, moveTargetX, moveTargetY);
   }
 
   await page.mouse.up();

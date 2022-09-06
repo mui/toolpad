@@ -42,7 +42,7 @@ Field with value:
 
 ## Global scope variables
 
-Sometimes we might want to define our `custom variables` that could be used for `data binding` in order to do that we can use `EDIT PAGE MODULE` functionality that can be found in the `properties editor` on the right:
+Sometimes we might want to define our `custom variables` that could be used for `data binding` in order to do that we can use `EDIT PAGE MODULE` functionality that can be found in the `Inspector` on the right:
 
 ![Edit page module](/static/toolpad/data-binding-7.png)
 

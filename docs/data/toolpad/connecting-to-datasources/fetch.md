@@ -6,7 +6,7 @@
 
 As explained in the [connections](/toolpad/connecting-to-datasources/connections/) section you can either create a reusable `connection` or simply create a new `query` and put all connection details inline:
 
-1. Choose `ADD QUERY` in the `Properties editor` on the right.
+1. Choose `ADD QUERY` in the `Inspector` on the right.
 
 1. Select `Fetch` datasource and click `CREATE QUERY`:
 

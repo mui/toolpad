@@ -4,7 +4,7 @@
     Toolpad allows us to easily connect to external data sources and render dynamic data. The easiest way to do so is to create a new <b>QUERY</b> which can be used to fetch data.
 </p>
 
-1. Locate `ADD QUERY` button in the `Properties editor` on the right:
+1. Locate `ADD QUERY` button in the `Inspector` on the right:
 
    ![Query](/static/toolpad/query-1.png)
 

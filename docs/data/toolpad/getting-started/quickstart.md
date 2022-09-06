@@ -26,14 +26,15 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
 ## Navigating Toolpad
 
-![Toolpad app](/static/toolpad/app-ui-chrome.png)
+![Toolpad app](/static/toolpad/terminology.png)
 
-There are 4 most frequently used areas:
+There are 5 most frequently used areas:
 
-- `Instance editor` - this is there you define and manage pages, connection configurations, custom component definitions, etc...
-- `Component's library` - drag component instance from this drawer and drop it in `Application editor` to build UI
-- `Application editor` - this is a place where you build your app and immediately preview how it looks like
-- `Properties editor` - modify properties of a different instance
+- `Navigation` - return to homepage, preview or deploy app
+- `Explorer` - this is there you define and manage pages, connection configurations, custom component definitions, etc...
+- `Component library` - drag component instance from this drawer and drop it in `Canvas` to build UI
+- `Canvas` - this is a place where you build your app and immediately preview how it looks like
+- `Inspector` - modify properties of a different instance
 
 ## Building your first application
 
@@ -45,15 +46,15 @@ There are 4 most frequently used areas:
 
    ![Toolpad overview](/static/toolpad/step-1.png)
 
-1. Hover over `Component's library` and drag `DataGrid` and `Image` components into `Application editor`
+1. Hover over `Component library` and drag `DataGrid` and `Image` components into `Canvas`
 
    ![Drag components](/static/toolpad/step-2.png)
 
    Congratulations, we are done building the UI! Now all we need to do is connect it with a data source.
 
-1. Click anywhere inside `Application editor` (except on the components that you just added) to deselect added components
+1. Click anywhere inside `Canvas` (except on the components that you just added) to deselect added components
 
-1. Locate `ADD QUERY` button inside `Properties editor` and press that to start configuring our data source
+1. Locate `ADD QUERY` button inside `Inspector` and press that to start configuring our data source
 
    ![Add query](/static/toolpad/step-3.png)
 
@@ -75,11 +76,11 @@ There are 4 most frequently used areas:
 
    In the response preview pane on the right you can see transformed data will be assigned to `dogQuery`
 
-1. `SAVE` your changes and you will return to `Application editor`
+1. `SAVE` your changes and you will return to `Canvas`
 
 1. Select `DataGrid` component by clicking on it
 
-1. Then locate `ROWS` binding button in the `Properties editor` and click to configure data binding
+1. Then locate `ROWS` binding button in the `Inspector` and click to configure data binding
 
    ![Bind data](/static/toolpad/step-7.png)
 

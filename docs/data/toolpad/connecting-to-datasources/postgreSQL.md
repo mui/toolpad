@@ -4,11 +4,11 @@
 
 ## Working with PostgreSQL
 
-As explained in the [connections](/toolpad/connecting-to-datasources/connections/) section before you can use `PostgreSQL` query you will first need to setup `connection`:
+As explained in the [connections](/toolpad/connecting-to-datasources/connections/) section before you can use **PostgreSQL** query you will first need to setup **connection**:
 
-1. Once your `connection` is ready click on `ADD QUERY` in the `Inspector` on the right.
+1. Once your **connection** is ready click on **ADD QUERY** in the **Inspector** on the right.
 
-1. Select `PostgreSQL` datasource and click `CREATE QUERY`:
+1. Select **PostgreSQL** datasource and click **CREATE QUERY**:
 
    ![Postgres type](/static/toolpad/postgres-query-1.png)
 
@@ -18,14 +18,14 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
    ![Postgres configuration](/static/toolpad/postgres-query-2.png)
 
-   - On the left side we have a textarea where we can pass `SQL` query.
+   - On the left side we have a textarea where we can pass **SQL** query.
 
    - On the right side we can query results.
 
-   - Below the query editor we can configure `Parameters` which can be used to bind data for our SQL queries. We can use the standard PostgreSQL `$1`, `$2`, `$3` interpolation.
+   - Below the query editor we can configure **Parameters** which can be used to bind data for our SQL queries. We can use the standard PostgreSQL `$1`, `$2`, `$3` interpolation.
 
    ![Parameters configuration](/static/toolpad/postgres-query-3.png)
 
    Like so: `SELECT * FROM "db" WHERE name = $name`.
 
-1. Once finished with configuration click `SAVE` and click anywhere outside of the dialog to return to the editor.
+1. Once finished with configuration click **SAVE** and click anywhere outside of the dialog to return to the editor.

@@ -23,11 +23,11 @@ Toolpad is a self-hosted low-code internal tools builder designed to extend the 
 
 There are 5 most frequently used areas:
 
-- `Navigation` - return to homepage, preview or deploy app
-- `Explorer` - this is there you define and manage pages, connection configurations, custom component definitions, etc...
-- `Component library` - drag component instance from this drawer and drop it in `Canvas` to build UI
-- `Canvas` - this is a place where you build your app and immediately preview how it looks like
-- `Inspector` - modify properties of a different instance
+- **Navigation** - return to homepage, preview or deploy app
+- **Explorer** - this is there you define and manage pages, connection configurations, custom component definitions, etc...
+- **Component library** - drag component instance from this drawer and drop it in **Canvas** to build UI
+- **Canvas** - this is a place where you build your app and immediately preview how it looks like
+- **Inspector** - modify properties of a different instance
 
 ## See it in action
 

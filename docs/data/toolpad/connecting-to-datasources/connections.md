@@ -4,19 +4,19 @@
     <b>CONNECTION</b> instance allows us to reuse certain configuration details to create <b>queries</b> faster.
 </p>
 
-In order to create a new `CONNECTION` instance press `+` button in the `Explorer` on the left:
+In order to create a new **CONNECTION** instance press **+** button in the **Explorer** on the left:
 
 ![Add Connection](/static/toolpad/connection.png)
 
 ## Connection types
 
-There are 2 datasources that **do not require** `CONNECTION` instance:
+There are 2 datasources that **do not require** **CONNECTION** instance:
 
 1. [Function](/toolpad/connecting-to-datasources/function/) datasource:
 
    ![Connection function](/static/toolpad/connection-function-1.png)
 
-   We can define `Secrets` (key/value) that we can later access in the `Function` datasource `query`:
+   We can define **Secrets** (key/value) that we can later access in the **Function** datasource **query**:
 
    ![Connection function](/static/toolpad/connection-function-2.png)
 
@@ -26,20 +26,20 @@ There are 2 datasources that **do not require** `CONNECTION` instance:
 
    We can configure:
 
-   - `base url` - url that can be shared between different queries.
-   - `Headers` - pass custom headers with each request.
-   - `Authentication` type - if your API is protected choose authentication method that fits your needs:
-     - `Basic` - adds `Authorization` header and generates **base64** encoded value for a given user credentials.
-     - `Bearer token` - adds `Authorization` header generates value for provided token.
-     - `API key` - adds key/value header.
+   - **base url** - url that can be shared between different queries.
+   - **Headers** - pass custom headers with each request.
+   - **Authentication** type - if your API is protected choose authentication method that fits your needs:
+     - **Basic** - adds **Authorization** header and generates **base64** encoded value for a given user credentials.
+     - **Bearer token** - adds **Authorization** header generates value for provided token.
+     - **API key** - adds key/value header.
 
-There are 2 datasources that **require** `CONNECTION` instance:
+There are 2 datasources that **require** **CONNECTION** instance:
 
 1. [Google Sheets](/toolpad/connecting-to-datasources/google-sheets/) datasource:
 
    **Obtain credentials**
 
-   Before we create a `Google sheets` connection we must first configure Toolpad app by providing Google sheets `client id` and `secret`:
+   Before we create a **Google sheets** connection we must first configure Toolpad app by providing Google sheets **client id** and **secret**:
 
    1. Create a new Google Cloud project - [instructions](https://cloud.google.com/resource-manager/docs/creating-managing-projects#creating_a_project).
 
@@ -63,13 +63,13 @@ There are 2 datasources that **require** `CONNECTION` instance:
 
    **Connect your google account**
 
-   1. Once you create `Google Sheets` type connection click `CONNECT` button:
+   1. Once you create **Google Sheets** type connection click **CONNECT** button:
 
    ![Connection Google Sheets](/static/toolpad/connection-sheets-1.png)
 
    1. Choose google account that you want to authorize.
 
-   1. Grant access to your Google Drive files by clicking `Allow`.
+   1. Grant access to your Google Drive files by clicking **Allow**.
 
    1. Once you successfully connect your account you should see a button stating the acount that was connected.
 
@@ -77,10 +77,10 @@ There are 2 datasources that **require** `CONNECTION` instance:
 
 2. [PostgreSQL](/toolpad/connecting-to-datasources/postgreSQL/) datasource:
 
-   In order `query` data from `postgres` database we **must** configure connection:
+   In order **query** data from **PostgreSQL** database we **must** configure connection:
 
    ![Connection postgres](/static/toolpad/connection-postgres-1.png)
 
-   Provide database credentials and `TEST CONNECTION` to verify that we are able to connect.
+   Provide database credentials and **TEST CONNECTION** to verify that we are able to connect.
 
-   If everything is correct `SAVE` and you will be able to use [PostgreSQL](/toolpad/connecting-to-datasources/postgreSQL/) queries.
+   If everything is correct **SAVE** and you will be able to use [PostgreSQL](/toolpad/connecting-to-datasources/postgreSQL/) queries.

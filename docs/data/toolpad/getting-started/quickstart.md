@@ -34,51 +34,51 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
    ![Toolpad overview](/static/toolpad/step-1.png)
 
-1. Hover over `Component library` and drag `DataGrid` and `Image` components into `Canvas`
+1. Hover over **Component library** and drag **DataGrid** and **Image** components into **Canvas**
 
    ![Drag components](/static/toolpad/step-2.png)
 
    Congratulations, we are done building the UI! Now all we need to do is connect it with a data source.
 
-1. Click anywhere inside `Canvas` (except on the components that you just added) to deselect added components
+1. Click anywhere inside **Canvas** (except on the components that you just added) to deselect added components
 
-1. Locate `ADD QUERY` button inside `Inspector` and press that to start configuring our data source
+1. Locate **ADD QUERY** button inside **Inspector** and press that to start configuring our data source
 
    ![Add query](/static/toolpad/step-3.png)
 
-1. This time we are going to use simple `FETCH` datasource to query our data. Choose and press `CREATE QUERY`
+1. This time we are going to use simple **FETCH** datasource to query our data. Choose and press **CREATE QUERY**
 
    ![Fetch datasource](/static/toolpad/step-4.png)
 
-1. Let's fetch some data about dogs from `https://dog.ceo/dog-api`:
+1. Let's fetch some data about dogs from **https://dog.ceo/dog-api**:
 
-   Use `https://dog.ceo/api/breeds/list/all` as a `GET` query `URL`
+   Use **https://dog.ceo/api/breeds/list/all** as a **GET** query **URL**
 
-   Give a unique name to this query i.e. `dogQuery`
+   Give a unique name to this query i.e. **dogQuery**
 
    ![Fetch URL](/static/toolpad/step-5.png)
 
-1. Now because data comes in different shapes and forms we provide a quick and convenient way to `transform response` data - `enable` option and use `return data.message` expression
+1. Now because data comes in different shapes and forms we provide a quick and convenient way to **transform response** data - **enable** option and use `return data.message` expression
 
    ![Transform response](/static/toolpad/step-6.png)
 
    In the response preview pane on the right you can see transformed data will be assigned to `dogQuery`
 
-1. `SAVE` your changes and you will return to `Canvas`
+1. **SAVE** your changes and you will return to **Canvas**
 
-1. Select `DataGrid` component by clicking on it
+1. Select **DataGrid** component by clicking on it
 
-1. Then locate `ROWS` binding button in the `Inspector` and click to configure data binding
+1. Then locate **ROWS** binding button in the **Inspector** and click to configure data binding
 
    ![Bind data](/static/toolpad/step-7.png)
 
-1. Use a `dogQuery` variable available in the scope as a binding expression. Because `rows` property expects `array` type value, we first need to convert `dogQuery.data` (which is object) to array:
+1. Use a `dogQuery` variable available in the scope as a binding expression. Because **rows** property expects **array** type value, we first need to convert `dogQuery.data` (which is object) to array:
 
    ```js
    Object.entries(dogQuery.data);
    ```
 
-   and click `UPDATE BINDING`
+   and click **UPDATE BINDING**
 
    ![dogQuery.data](/static/toolpad/step-8.png)
 
@@ -86,29 +86,29 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
    ![Connected data](/static/toolpad/step-9.png)
 
-1. Let's make our app a bit more interactive. We want to display an image of a selected breed. Let's create a dynamic query which reacts to the selection inside `DataGrid` component
+1. Let's make our app a bit more interactive. We want to display an image of a selected breed. Let's create a dynamic query which reacts to the selection inside **DataGrid** component
 
-   - `ADD QUERY` -> create `FETCH` type
-   - `name` -> `imageQuery`
-   - Add new parameter named `breed`
+   - **ADD QUERY** -> create **FETCH** type
+   - **name** -> **imageQuery**
+   - Add new parameter named **breed**
 
    ![Breed parameter](/static/toolpad/step-10.png)
 
-   - Bind `breed` parameter value to `dataGrid.selection ? dataGrid.selection[0] : 'akita'` (grabs selected value from `dataGrid` or defaults to `akita` breed)
+   - Bind **breed** parameter value to `dataGrid.selection ? dataGrid.selection[0] : 'akita'` (grabs selected value from `dataGrid` or defaults to **akita** breed)
 
    ![Breed binding](/static/toolpad/step-11.png)
 
-   - Then bind query `url` property to `https://dog.ceo/api/breed/${query.breed}/images/random`
+   - Then bind query **url** property to **https://dog.ceo/api/breed/${query.breed}/images/random**
 
    ![url binding](/static/toolpad/step-12.png)
 
-   - Last `transform responese` using `return data.message;` and `SAVE`
+   - Last **transform responese** using `return data.message;` and **SAVE**
 
-1. Next we want to display a picture of a selected breed using `Image` component
+1. Next we want to display a picture of a selected breed using **Image** component
 
-   - select `Image` component
+   - select **Image** component
 
-   - bind `src` prop to `imageQuery.data` and voila - we can preview pictures of a selected breed
+   - bind **src** prop to `imageQuery.data` and voila - we can preview pictures of a selected breed
 
    ![Preview image](/static/toolpad/step-13.png)
 
@@ -118,13 +118,13 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
 In order to share your application with others you will want to deploy it
 
-1. Click `DEPLOY` button in the top navigation:
+1. Click **DEPLOY** button in the top navigation:
 
    ![Rocket button](/static/toolpad/deploy-1.png)
 
-1. (Optional) Enter `description` of your choice
+1. (Optional) Enter **description** of your choice
 
-1. Click `DEPLOY` to confirm deployment
+1. Click **DEPLOY** to confirm deployment
 
    ![Release description](/static/toolpad/deploy-2.png)
 

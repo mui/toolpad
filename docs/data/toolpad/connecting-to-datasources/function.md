@@ -6,17 +6,17 @@
 
 ## Working with functions
 
-As explained in the [connections](/toolpad/connecting-to-datasources/connections/) section you can either create a reusable `connection` or simply create a new `query` and put all connection details inline.
+As explained in the [connections](/toolpad/connecting-to-datasources/connections/) section you can either create a reusable **connection** or simply create a new **query** and put all connection details inline.
 
-1. Choose `ADD QUERY` in the `Inspector` on the right.
+1. Choose **ADD QUERY** in the **Inspector** on the right.
 
-1. Select `Function` datasource and click `CREATE QUERY`:
+1. Select **Function** datasource and click **CREATE QUERY**:
 
    ![Function datasource](/static/toolpad/function-query-1.png)
 
 1. We got all the basic configuration settings as described in [queries](/toolpad/connecting-to-datasources/queries/) section.
 
-1. In addition we are now presented with a `code editor` where we can write a custom code for data fetching:
+1. In addition we are now presented with a **code editor** where we can write a custom code for data fetching:
 
    ![Function configuration](/static/toolpad/function-query-2.png)
 
@@ -31,18 +31,18 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
      - TextEncoder, TextDecoder
      - ReadableStream
 
-   - Access outside variables by binding `Parameters` fields.
-   - `Console` and `Network` tabs for an easier debugging.
+   - Access outside variables by binding **Parameters** fields.
+   - **Console** and **Network** tabs for an easier debugging.
 
    Current limitations:
 
    - We can not import modules.
 
-1. Once finished with configuration click `SAVE` and click anywhere outside of the dialog to return to the editor.
+1. Once finished with configuration click **SAVE** and click anywhere outside of the dialog to return to the editor.
 
 ## Use cases
 
-While [function](/toolpad/connecting-to-datasources/function/) datasource can suffice for many different setups we found some advances use cases where limitations of `function` datasource starts surfacing and prevents us from building more complex data access `queries`.
+While [function](/toolpad/connecting-to-datasources/function/) datasource can suffice for many different setups we found some advances use cases where limitations of **function** datasource starts surfacing and prevents us from building more complex data access **queries**.
 
 1. **Pre-processing** request:
 

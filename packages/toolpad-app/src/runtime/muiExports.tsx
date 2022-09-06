@@ -1,4 +1,7 @@
-export default new Map<string, Promise<any>>([
+type ExportMapValue = Promise<any>;
+
+const muiMaterialExports = new Map<string, ExportMapValue>([
+  ['@mui/material', import('@mui/material')],
   ['@mui/material/Accordion', import('@mui/material/Accordion')],
   ['@mui/material/CssBaseline', import('@mui/material/CssBaseline')],
   ['@mui/material/List', import('@mui/material/List')],
@@ -142,4 +145,79 @@ export default new Map<string, Promise<any>>([
   ['@mui/material/Link', import('@mui/material/Link')],
   ['@mui/material/Slider', import('@mui/material/Slider')],
   ['@mui/material/ToggleButton', import('@mui/material/ToggleButton')],
+]);
+
+const muiDatePickersExports = new Map<string, ExportMapValue>([
+  ['@mui/x-date-pickers', import('@mui/x-date-pickers')],
+  // ['@mui/x-date-pickers/AdapterDateFns', import('@mui/x-date-pickers/AdapterDateFns')],
+  [
+    '@mui/x-date-pickers/CalendarPickerSkeleton',
+    import('@mui/x-date-pickers/CalendarPickerSkeleton'),
+  ],
+  ['@mui/x-date-pickers/DesktopTimePicker', import('@mui/x-date-pickers/DesktopTimePicker')],
+  ['@mui/x-date-pickers/MonthPicker', import('@mui/x-date-pickers/MonthPicker')],
+  ['@mui/x-date-pickers/StaticTimePicker', import('@mui/x-date-pickers/StaticTimePicker')],
+  ['@mui/x-date-pickers/AdapterDayjs', import('@mui/x-date-pickers/AdapterDayjs')],
+  ['@mui/x-date-pickers/ClockPicker', import('@mui/x-date-pickers/ClockPicker')],
+  ['@mui/x-date-pickers/PickersActionBar', import('@mui/x-date-pickers/PickersActionBar')],
+  ['@mui/x-date-pickers/TimePicker', import('@mui/x-date-pickers/TimePicker')],
+  ['@mui/x-date-pickers/locales', import('@mui/x-date-pickers/locales')],
+  // ['@mui/x-date-pickers/AdapterLuxon', import('@mui/x-date-pickers/AdapterLuxon')],
+  ['@mui/x-date-pickers/DatePicker', import('@mui/x-date-pickers/DatePicker')],
+  ['@mui/x-date-pickers/LocalizationProvider', import('@mui/x-date-pickers/LocalizationProvider')],
+  ['@mui/x-date-pickers/PickersDay', import('@mui/x-date-pickers/PickersDay')],
+  ['@mui/x-date-pickers/YearPicker', import('@mui/x-date-pickers/YearPicker')],
+  // ['@mui/x-date-pickers/AdapterMoment', import('@mui/x-date-pickers/AdapterMoment')],
+  ['@mui/x-date-pickers/DateTimePicker', import('@mui/x-date-pickers/DateTimePicker')],
+  ['@mui/x-date-pickers/MobileDatePicker', import('@mui/x-date-pickers/MobileDatePicker')],
+  ['@mui/x-date-pickers/DesktopDatePicker', import('@mui/x-date-pickers/DesktopDatePicker')],
+  ['@mui/x-date-pickers/MobileDateTimePicker', import('@mui/x-date-pickers/MobileDateTimePicker')],
+  ['@mui/x-date-pickers/StaticDatePicker', import('@mui/x-date-pickers/StaticDatePicker')],
+  ['@mui/x-date-pickers/CalendarPicker', import('@mui/x-date-pickers/CalendarPicker')],
+  [
+    '@mui/x-date-pickers/DesktopDateTimePicker',
+    import('@mui/x-date-pickers/DesktopDateTimePicker'),
+  ],
+  ['@mui/x-date-pickers/MobileTimePicker', import('@mui/x-date-pickers/MobileTimePicker')],
+  ['@mui/x-date-pickers/StaticDateTimePicker', import('@mui/x-date-pickers/StaticDateTimePicker')],
+]);
+
+const muiDatePickersProExports = new Map<string, ExportMapValue>([
+  ['@mui/x-date-pickers-pro', import('@mui/x-date-pickers-pro')],
+  // ['@mui/x-date-pickers-pro/AdapterDateFns', import('@mui/x-date-pickers-pro/AdapterDateFns')],
+  ['@mui/x-date-pickers-pro/DateRangePicker', import('@mui/x-date-pickers-pro/DateRangePicker')],
+  [
+    '@mui/x-date-pickers-pro/MultiInputDateRangeField',
+    import('@mui/x-date-pickers-pro/MultiInputDateRangeField'),
+  ],
+  ['@mui/x-date-pickers-pro/AdapterDayjs', import('@mui/x-date-pickers-pro/AdapterDayjs')],
+  [
+    '@mui/x-date-pickers-pro/DateRangePickerDay',
+    import('@mui/x-date-pickers-pro/DateRangePickerDay'),
+  ],
+  ['@mui/x-date-pickers-pro/package.json', import('@mui/x-date-pickers-pro/package.json')],
+  // ['@mui/x-date-pickers-pro/AdapterLuxon', import('@mui/x-date-pickers-pro/AdapterLuxon')],
+  [
+    '@mui/x-date-pickers-pro/DesktopDateRangePicker',
+    import('@mui/x-date-pickers-pro/DesktopDateRangePicker'),
+  ],
+  [
+    '@mui/x-date-pickers-pro/SingleInputDateRangeField',
+    import('@mui/x-date-pickers-pro/SingleInputDateRangeField'),
+  ],
+  // ['@mui/x-date-pickers-pro/AdapterMoment', import('@mui/x-date-pickers-pro/AdapterMoment')],
+  [
+    '@mui/x-date-pickers-pro/StaticDateRangePicker',
+    import('@mui/x-date-pickers-pro/StaticDateRangePicker'),
+  ],
+  [
+    '@mui/x-date-pickers-pro/MobileDateRangePicker',
+    import('@mui/x-date-pickers-pro/MobileDateRangePicker'),
+  ],
+]);
+
+export default new Map([
+  ...muiMaterialExports,
+  ...muiDatePickersExports,
+  ...muiDatePickersProExports,
 ]);

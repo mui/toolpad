@@ -40,16 +40,17 @@ test('can move elements in page', async ({ page, browserName }) => {
   const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
-  await editorModel.pageRoot.waitFor();
-
   const canvasMoveElementHandleSelector = ':has-text("TextField")[draggable]';
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
+  const firstTextFieldLocator = canvasInputLocator.first();
+
   const canvasMoveElementHandleLocator = editorModel.appCanvas.locator(
     canvasMoveElementHandleSelector,
   );
 
-  const firstTextFieldLocator = canvasInputLocator.first();
+  await firstTextFieldLocator.waitFor();
+
   const secondTextFieldLocator = canvasInputLocator.nth(1);
 
   await firstTextFieldLocator.focus();
@@ -92,20 +93,20 @@ test('can delete elements from page', async ({ page, browserName }) => {
   const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
-  await editorModel.pageRoot.waitFor();
-
   const canvasInputLocator = editorModel.appCanvas.locator('input');
+  const firstTextFieldLocator = canvasInputLocator.first();
+
   const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(
     'button[aria-label="Remove element"]',
   );
+
+  await firstTextFieldLocator.waitFor();
 
   await expect(canvasInputLocator).toHaveCount(2);
 
   // Delete element by clicking
 
   await expect(canvasRemoveElementButtonLocator).not.toBeVisible();
-
-  const firstTextFieldLocator = canvasInputLocator.first();
 
   await clickCenter(page, firstTextFieldLocator);
   await canvasRemoveElementButtonLocator.click();

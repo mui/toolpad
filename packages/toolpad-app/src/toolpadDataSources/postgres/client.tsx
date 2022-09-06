@@ -236,7 +236,7 @@ function getInitialQueryValue(): PostgresQuery {
 }
 
 const dataSource: ClientDataSource<PostgresConnectionParams, PostgresQuery> = {
-  displayName: 'Postgres',
+  displayName: 'PostgreSQL',
   ConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,

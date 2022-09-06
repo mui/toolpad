@@ -13,21 +13,21 @@ const useCases = {
     {
       title: 'Monitoring dashboard',
       wip: false,
-      imageUrl: '/static/toolpad/marketing/toolpad-monitoring-dashboard.svg',
+      imageUrl: '/static/toolpad/marketing/index-monitoring-dashboard.svg',
       description:
         'Quickly provide the latest numbers and status reports that fuel data-driven decisions. Build and share your dashboard by combining data from multiple sources with dependable deployment mechanism when needed.',
     },
     {
       title: 'Admin panel',
       wip: false,
-      imageUrl: '/static/toolpad/marketing/toolpad-admin-panel.svg',
+      imageUrl: '/static/toolpad/marketing/index-admin-panel.svg',
       description:
         'Enable your teams to quickly view and manage customer orders, queries, and refunds by creating apps powered by native Toolpad integrations and third party APIs from providers like Stripe, Twilio, etc. Toolpad allows end users to create, read, update or delete records.',
     },
     {
       title: 'Custom CMS',
       wip: false,
-      imageUrl: '/static/toolpad/marketing/toolpad-custom-cms.svg',
+      imageUrl: '/static/toolpad/marketing/index-custom-cms.svg',
       description:
         'Enable your operations teams to efficiently manage day to day chores using task specific content management apps. Built with MUI components, apps are fast, manageable and scalable. Toolpad allows you to bind data the pro-code way by writing JavaScript anywhere. ',
     },

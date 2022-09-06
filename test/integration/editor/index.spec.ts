@@ -24,8 +24,6 @@ test('can place new components from catalog', async ({ page, browserName }) => {
 
   await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_ID);
 
-  await canvasInputLocator.first().waitFor();
-
   await expect(canvasInputLocator).toHaveCount(1);
   await expect(canvasInputLocator).toBeVisible();
 

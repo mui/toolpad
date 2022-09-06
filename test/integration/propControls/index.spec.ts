@@ -43,14 +43,15 @@ test('can control component prop values in properties control panel', async ({
   const labelControlInputValue = await editorModel.componentEditor
     .locator(`label:text-is("label")`)
     .inputValue();
-  const getValueControlInputValue = async () =>
-    editorModel.componentEditor.locator(`label:text-is("value")`).inputValue();
 
   expect(labelControlInputValue).toBe('textField1');
 
   // Change component prop values directly
 
   const TEST_VALUE_1 = 'value1';
+
+  const getValueControlInputValue = async () =>
+    editorModel.componentEditor.locator(`label:text-is("value")`).inputValue();
 
   expect(await getValueControlInputValue()).not.toBe(TEST_VALUE_1);
   await firstInputLocator.fill(TEST_VALUE_1);

@@ -18,16 +18,20 @@ test('can place new components from catalog', async ({ page, browserName }) => {
 
   await expect(canvasInputLocator).toHaveCount(0);
 
+  const TEXT_FIELD_COMPONENT_ID = 'TextField';
+
   // Drag in a first component
 
-  await editorModel.dragNewComponentToAppCanvas('TextField');
+  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_ID);
+
+  await canvasInputLocator.first().waitFor();
 
   await expect(canvasInputLocator).toHaveCount(1);
   await expect(canvasInputLocator).toBeVisible();
 
   // Drag in a second component
 
-  await editorModel.dragNewComponentToAppCanvas('TextField');
+  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_ID);
 
   await expect(canvasInputLocator).toHaveCount(2);
 });

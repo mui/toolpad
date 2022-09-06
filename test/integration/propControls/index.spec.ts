@@ -5,12 +5,12 @@ import clickCenter from '../../utils/clickCenter';
 import domInput from './domInput.json';
 
 async function getPropControlInputLocator(editorModel: ToolpadEditor, inputPropName: string) {
-  const propControlLabelHandle = await editorModel.selectedNodeEditor
+  const propControlLabelHandle = await editorModel.componentEditor
     .locator(`label:has-text("${inputPropName}")`)
     .elementHandle();
   const propControlLabelFor = await propControlLabelHandle?.getAttribute('for');
 
-  return editorModel.selectedNodeEditor.locator(`input[id="${propControlLabelFor}"]`);
+  return editorModel.componentEditor.locator(`input[id="${propControlLabelFor}"]`);
 }
 
 async function getInputElementLabelLocator(editorModel: ToolpadEditor, inputLocator: Locator) {
@@ -40,12 +40,13 @@ test('can control component prop values in properties control panel', async ({
   const firstInputLocator = canvasInputLocator.first();
   await clickCenter(page, firstInputLocator);
 
-  const getLabelControlInputValue = async () =>
-    editorModel.selectedNodeEditor.locator(`label:text-is("label")`).inputValue();
+  const labelControlInputValue = await editorModel.componentEditor
+    .locator(`label:text-is("label")`)
+    .inputValue();
   const getValueControlInputValue = async () =>
-    editorModel.selectedNodeEditor.locator(`label:text-is("value")`).inputValue();
+    editorModel.componentEditor.locator(`label:text-is("value")`).inputValue();
 
-  expect(await getLabelControlInputValue()).toBe('textField1');
+  expect(labelControlInputValue).toBe('textField1');
 
   // Change component prop values directly
 

@@ -54,7 +54,7 @@ export class ToolpadEditor {
 
   readonly componentCatalog: Locator;
 
-  readonly selectedNodeEditor: Locator;
+  readonly componentEditor: Locator;
 
   readonly appCanvas: FrameLocator;
 
@@ -73,7 +73,7 @@ export class ToolpadEditor {
     this.createComponentDialog = new CreateComponentDialog(page);
 
     this.componentCatalog = page.locator('data-testid=component-catalog');
-    this.selectedNodeEditor = page.locator('data-testid=selected-node-editor');
+    this.componentEditor = page.locator('data-testid=component-editor');
 
     this.appCanvas = page.frameLocator('[name=data-toolpad-canvas]');
     this.pageRoot = this.appCanvas.locator('data-testid=page-root');

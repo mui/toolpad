@@ -13,7 +13,7 @@ Toolpad is a self-hosted low-code internal tools builder designed to extend the 
 ## How Toolpad works?
 
 - [Build UI](/toolpad/core-concepts/building-ui/) using our drag & drop editor
-- [Configure and fetch](/toolpad/core-concepts/connecting-to-datasources/) data from HTTP endpoints, Google sheets or even directly from Postgres SQL DB
+- [Configure and fetch](/toolpad/core-concepts/connecting-to-datasources/) data from HTTP endpoints, Google sheets or even directly from PostgreSQL
 - Connect data with UI elements using [binding expressions](/toolpad/core-concepts/data-binding/)
 - When you are ready to share - [deploy](/toolpad/core-concepts/versioning-and-deploying/) a new version
 

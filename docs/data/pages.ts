@@ -36,8 +36,8 @@ const pages: MuiPage[] = [
         title: 'Google sheets datasource',
       },
       {
-        pathname: '/toolpad/connecting-to-datasources/postgres',
-        title: 'Postgres datasource',
+        pathname: '/toolpad/connecting-to-datasources/postgreSQL',
+        title: 'PostgreSQL datasource',
       },
     ],
   },

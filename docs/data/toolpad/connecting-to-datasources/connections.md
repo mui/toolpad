@@ -75,7 +75,7 @@ There are 2 datasources that **require** `CONNECTION` instance:
 
    ![Google sheets connected](/static/toolpad/connection-sheets-2.png)
 
-2. [Postgres](/toolpad/connecting-to-datasources/postgres/) datasource:
+2. [PostgreSQL](/toolpad/connecting-to-datasources/postgreSQL/) datasource:
 
    In order `query` data from `postgres` database we **must** configure connection:
 
@@ -83,4 +83,4 @@ There are 2 datasources that **require** `CONNECTION` instance:
 
    Provide database credentials and `TEST CONNECTION` to verify that we are able to connect.
 
-   If everything is correct `SAVE` and you will be able to use [Postgres](/toolpad/connecting-to-datasources/postgres/) queries.
+   If everything is correct `SAVE` and you will be able to use [PostgreSQL](/toolpad/connecting-to-datasources/postgreSQL/) queries.

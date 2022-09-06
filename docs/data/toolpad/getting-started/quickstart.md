@@ -61,7 +61,7 @@ There are 4 most frequently used areas:
 
    ![Fetch datasource](/static/toolpad/step-4.png)
 
-1. Let's fetch some data about dogs from `https://dog.ceo/dog-api` (if you're more of a cat person you could use cat data API from `https://catfact.ninja`. We apologize in advance - following tutorial steps are more suited for the dog data API but should be easily adaptable for cats as well!)
+1. Let's fetch some data about dogs from `https://dog.ceo/dog-api`:
 
    Use `https://dog.ceo/api/breeds/list/all` as a `GET` query `URL`
 

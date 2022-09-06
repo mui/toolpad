@@ -1,14 +1,14 @@
-# Postgres
+# PostgreSQL
 
-<p class="description">Postgres datasource allows us to fetch data straight from Postgres database.</p>
+<p class="description">PostgreSQL datasource allows us to fetch data straight from PostgreSQL database.</p>
 
-## Working with Postgres
+## Working with PostgreSQL
 
-As explained in the [connections](/toolpad/connecting-to-datasources/connections/) section before you can use `Postgres` query you will first need to setup `connection`:
+As explained in the [connections](/toolpad/connecting-to-datasources/connections/) section before you can use `PostgreSQL` query you will first need to setup `connection`:
 
 1. Once your `connection` is ready click on `ADD QUERY` in the `Properties editor` on the right.
 
-1. Select `Postgres` datasource and click `CREATE QUERY`:
+1. Select `PostgreSQL` datasource and click `CREATE QUERY`:
 
    ![Postgres type](/static/toolpad/postgres-query-1.png)
 
@@ -22,7 +22,7 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
    - On the right side we can query results.
 
-   - Below the query editor we can configure `Parameters` which can be used to bind data for our SQL queries. We can use the standard postgres `$1`, `$2`, `$3` interpolation.
+   - Below the query editor we can configure `Parameters` which can be used to bind data for our SQL queries. We can use the standard PostgreSQL `$1`, `$2`, `$3` interpolation.
 
    ![Parameters configuration](/static/toolpad/postgres-query-3.png)
 

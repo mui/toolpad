@@ -11,6 +11,7 @@ const LIBS = [
   { name: '@mui/material' },
   { name: '@mui/toolpad-core' },
   { name: '@mui/x-date-pickers' },
+  { name: '@mui/x-date-pickers-pro' },
   { name: '@mui/x-data-grid-pro' },
   { name: 'dayjs' },
   // TODO: we need to analyze imports of the definition files and include those libs automatically

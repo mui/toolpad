@@ -31,13 +31,13 @@ test('can control component prop values in properties control panel', async ({
   const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
-  const canvasInputLocator = editorModel.appCanvas.locator('input');
-  const firstInputLocator = canvasInputLocator.first();
+  await editorModel.pageRoot.waitFor();
 
-  await firstInputLocator.waitFor();
+  const canvasInputLocator = editorModel.appCanvas.locator('input');
 
   // Verify that initial prop control values are correct
 
+  const firstInputLocator = canvasInputLocator.first();
   await clickCenter(page, firstInputLocator);
 
   const getLabelControlInputValue = async () =>

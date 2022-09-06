@@ -1,6 +1,6 @@
 # Postgres
 
-<p class="description">Postgres datasource allows us to fetch data straight from Postgres database</p>
+<p class="description">Postgres datasource allows us to fetch data straight from Postgres database.</p>
 
 ## Working with Postgres
 

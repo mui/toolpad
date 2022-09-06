@@ -4,7 +4,7 @@
     <b>CONNECTION</b> instance allows us to reuse certain configuration details to create <b>queries</b> faster.
 </p>
 
-In order to create a new `CONNECTION` instance press `+` button in the `Instance editor` on the left
+In order to create a new `CONNECTION` instance press `+` button in the `Instance editor` on the left:
 
 ![Add Connection](/static/toolpad/connection.png)
 
@@ -12,11 +12,11 @@ In order to create a new `CONNECTION` instance press `+` button in the `Instance
 
 There are 2 datasources that **do not require** `CONNECTION` instance:
 
-1. [Function](/toolpad/connecting-to-datasources/function/) datasource
+1. [Function](/toolpad/connecting-to-datasources/function/) datasource:
 
    ![Connection function](/static/toolpad/connection-function-1.png)
 
-   We can define `Secrets` (key/value) that we can later access in the `Function` datasource `query`
+   We can define `Secrets` (key/value) that we can later access in the `Function` datasource `query`:
 
    ![Connection function](/static/toolpad/connection-function-2.png)
 

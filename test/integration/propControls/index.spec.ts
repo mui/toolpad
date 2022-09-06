@@ -17,20 +17,23 @@ async function getInputElementLabelLocator(editorModel: ToolpadEditor, inputLoca
   const inputHandle = await inputLocator.elementHandle();
   const inputId = await inputHandle?.getAttribute('id');
 
-  return editorModel.canvasFrame.locator(`label[for="${inputId}"]`);
+  return editorModel.appCanvas.locator(`label[for="${inputId}"]`);
 }
 
-test('can control component prop values in properties control panel', async ({ page }) => {
+test('can control component prop values in properties control panel', async ({
+  page,
+  browserName,
+}) => {
   const homeModel = new ToolpadHome(page);
-  const editorModel = new ToolpadEditor(page);
+  const editorModel = new ToolpadEditor(page, browserName);
 
   await homeModel.goto();
   const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
-  const canvasInputLocator = editorModel.canvasFrame.locator('input');
-
   await editorModel.pageRoot.waitFor();
+
+  const canvasInputLocator = editorModel.appCanvas.locator('input');
 
   // Verify that initial prop control values are correct
 

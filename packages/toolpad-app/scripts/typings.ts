@@ -9,6 +9,10 @@ const LIBS = [
   { name: 'react' },
   { name: 'react-dom' },
   { name: '@mui/material' },
+  { name: '@mui/toolpad-core' },
+  { name: '@mui/x-date-pickers' },
+  { name: '@mui/x-data-grid-pro' },
+  { name: 'dayjs' },
   // TODO: we need to analyze imports of the definition files and include those libs automatically
   { name: 'csstype' },
   { name: 'react-transition-group' },
@@ -16,9 +20,6 @@ const LIBS = [
   { name: '@mui/types' },
   { name: '@mui/system' },
   { name: '@mui/utils' },
-  { name: '@mui/toolpad-core' },
-  { name: '@mui/x-date-pickers' },
-  { name: '@mui/x-data-grid-pro' },
 ];
 
 function getModuleId(fileName: string, pkgDir: string, pkgName: string) {

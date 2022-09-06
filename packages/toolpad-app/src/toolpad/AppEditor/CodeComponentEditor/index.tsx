@@ -15,8 +15,6 @@ import {
 } from '@mui/toolpad-core';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { tryFormat } from '../../../utils/prettier';

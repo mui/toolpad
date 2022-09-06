@@ -31,7 +31,3 @@ Make sure you have the following tools installed:
    ```
 
 Toolpad will be accessible under `http://localhost:3000/`.
-
-## Heroku
-
-<!-- TODO -->

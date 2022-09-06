@@ -1,7 +1,7 @@
 .next
 .yarn
+/docs/export
 /packages/**/dist
 /packages/toolpad-app/.next
-/packages/toolpad-app/public
 /packages/toolpad-app/prisma/generated/*
-
+/packages/toolpad-app/public

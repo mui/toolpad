@@ -524,7 +524,7 @@ function parseBindings(
   const controlled = new Set<string>();
 
   for (const elm of elements) {
-    if (appDom.isElement(elm)) {
+    if (appDom.isElement<any>(elm)) {
       const componentId = getComponentId(elm);
       const Component = components[componentId];
 
@@ -535,7 +535,7 @@ function parseBindings(
           ? `${elm.id}.props.${argType.defaultValueProp}`
           : undefined;
 
-        const binding =
+        const binding: BindableAttrValue<any> =
           elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
 
         const bindingId = `${elm.id}.props.${propName}`;

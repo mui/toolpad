@@ -22,4 +22,10 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
    - On the right side we can query results
 
+   - Below the query editor we can configure `Parameters` which can be used to bind data for our SQL queries. We can use the standard postgres `$1`, `$2`, `$3` interpolation.
+
+   ![Parameters configuration](/static/toolpad/postgres-query-3.png)
+
+   Like so: `SELECT * FROM "db" WHERE name = $name`
+
 1. Once finished with configuration click `SAVE` and click anywhere outside of the dialog to return to the editor

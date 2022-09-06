@@ -97,23 +97,23 @@ export interface QueryEditorShellProps {
   onCommit?: () => void;
 }
 
-export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
+export interface QueryEditorProps<C, Q> extends WithControlledProp<QueryEditorModel<Q>> {
   QueryEditorShell: React.ComponentType<QueryEditorShellProps>;
-  connectionParams: Maybe<P>;
+  connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
 }
 
-export type QueryEditor<P, Q = {}> = React.FC<QueryEditorProps<P, Q>>;
+export type QueryEditor<C, Q> = React.FC<QueryEditorProps<C, Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;
   error?: string;
 }
 
-export interface ClientDataSource<P = {}, Q = {}> {
+export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
-  ConnectionParamsInput: ConnectionParamsEditor<P>;
-  QueryEditor: QueryEditor<P, Q>;
+  ConnectionParamsInput: ConnectionParamsEditor<C>;
+  QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
 }

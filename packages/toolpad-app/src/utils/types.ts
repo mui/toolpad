@@ -1,5 +1,8 @@
-export type WithControlledProp<V, K extends string = 'value'> = Record<K, V> &
-  Record<K extends 'value' ? 'onChange' : `on${Capitalize<K>}Change`, (newValue: V) => void>;
+export type WithControlledProp<
+  V,
+  K extends string = 'value',
+  O extends string = K extends 'value' ? 'onChange' : `on${Capitalize<K>}Change`,
+> = Record<K, V> & Record<O, (newValue: V) => void>;
 
 export type ExactEntriesOf<P> = Exclude<{ [K in keyof P]: [K, P[K]] }[keyof P], undefined>[];
 

@@ -40,9 +40,9 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
 1. Once finished with configuration click `SAVE` and click anywhere outside of the dialog to return to the editor.
 
-## Usecases
+## Use cases
 
-While [function](/toolpad/connecting-to-datasources/function/) datasource can suffice for many different setups we found some advances usecases where limitations of `function` datasource starts surfacing and prevents us from building more complex data access `queries`.
+While [function](/toolpad/connecting-to-datasources/function/) datasource can suffice for many different setups we found some advances use cases where limitations of `function` datasource starts surfacing and prevents us from building more complex data access `queries`.
 
 1. **Fetching** data from **multiple data sources** and **combining** the result:
 

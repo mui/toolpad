@@ -15,6 +15,7 @@ export interface StringRecordEntriesEditorProps
   autoFocus?: boolean;
   sx?: SxProps;
   server?: boolean;
+  disabled?: boolean;
 }
 
 export default function ParametersEditor({
@@ -28,6 +29,7 @@ export default function ParametersEditor({
   autoFocus = false,
   sx,
   server,
+  disabled,
 }: StringRecordEntriesEditorProps) {
   const fieldInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -64,6 +66,7 @@ export default function ParametersEditor({
                 )
               }
               error={!isValidFieldName[index]}
+              disabled={disabled}
             />
             <BindableEditor
               liveBinding={liveBinding}
@@ -81,6 +84,7 @@ export default function ParametersEditor({
                   ),
                 )
               }
+              disabled={disabled}
             />
 
             <IconButton aria-label="Delete property" onClick={handleRemove(index)}>
@@ -99,6 +103,7 @@ export default function ParametersEditor({
             onChange([...value, [event.target.value, { type: 'const', value: null }]]);
           }}
           autoFocus={autoFocus}
+          disabled={disabled}
         />
       </form>
     </Box>

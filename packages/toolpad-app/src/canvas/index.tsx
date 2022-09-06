@@ -25,6 +25,10 @@ declare global {
   }
 }
 
+const handleScreenUpdate = throttle(() => fireEvent({ type: 'screenUpdate' }), 50, {
+  trailing: true,
+});
+
 export interface AppCanvasProps {
   basename: string;
 }
@@ -32,24 +36,19 @@ export interface AppCanvasProps {
 export default function AppCanvas({ basename }: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState | null>(null);
 
-  const rootRef = React.useRef<HTMLDivElement>();
+  const appRootRef = React.useRef<HTMLDivElement>();
+  const appRootCleanupRef = React.useRef<() => void>();
+  const onAppRoot = React.useCallback((appRoot: HTMLDivElement) => {
+    appRootCleanupRef.current?.();
+    appRootCleanupRef.current = undefined;
 
-  const [appRoot, setAppRoot] = React.useState<HTMLDivElement | null>(null);
-
-  React.useEffect(() => {
     if (!appRoot) {
-      return () => {};
+      return;
     }
 
-    rootRef.current = appRoot;
+    appRootRef.current = appRoot;
 
-    const onScreenUpdate = () => fireEvent({ type: 'screenUpdate' });
-
-    const handleScreenUpdateThrottled = throttle(onScreenUpdate, 50, {
-      trailing: true,
-    });
-
-    const mutationObserver = new MutationObserver(handleScreenUpdateThrottled);
+    const mutationObserver = new MutationObserver(handleScreenUpdate);
 
     mutationObserver.observe(appRoot, {
       attributes: true,
@@ -58,19 +57,33 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
       characterData: true,
     });
 
-    const resizeObserver = new ResizeObserver(handleScreenUpdateThrottled);
+    const resizeObserver = new ResizeObserver(handleScreenUpdate);
 
     resizeObserver.observe(appRoot);
     appRoot.querySelectorAll('*').forEach((elm) => resizeObserver.observe(elm));
 
-    onScreenUpdate();
-
-    return () => {
-      handleScreenUpdateThrottled.cancel();
+    appRootCleanupRef.current = () => {
+      handleScreenUpdate.cancel();
       mutationObserver.disconnect();
       resizeObserver.disconnect();
     };
-  }, [appRoot]);
+  }, []);
+
+  React.useEffect(
+    () => () => {
+      appRootCleanupRef.current?.();
+      appRootCleanupRef.current = undefined;
+    },
+    [],
+  );
+
+  // Notify host after every render
+  React.useEffect(() => {
+    if (appRootRef.current) {
+      // Only notify screen updates if the approot is rendered
+      handleScreenUpdate();
+    }
+  });
 
   React.useEffect(() => {
     const bridge: ToolpadBridge = {
@@ -80,14 +93,14 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
         });
       },
       getPageViewState: () => {
-        invariant(rootRef.current, 'App ref not attached');
-        return getPageViewState(rootRef.current);
+        invariant(appRootRef.current, 'App ref not attached');
+        return getPageViewState(appRootRef.current);
       },
       getViewCoordinates(clientX, clientY) {
-        if (!rootRef.current) {
+        if (!appRootRef.current) {
           return null;
         }
-        const rect = rootRef.current.getBoundingClientRect();
+        const rect = appRootRef.current.getBoundingClientRect();
         if (rectContainsPoint(rect, clientX, clientY)) {
           return { x: clientX - rect.x, y: clientY - rect.y };
         }
@@ -118,7 +131,7 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
   return state ? (
     <CanvasHooksContext.Provider value={editorHooks}>
       <ToolpadApp
-        rootRef={setAppRoot}
+        rootRef={onAppRoot}
         hidePreviewBanner
         dom={state.dom}
         version="preview"

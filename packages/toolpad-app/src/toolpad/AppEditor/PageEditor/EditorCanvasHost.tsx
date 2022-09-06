@@ -64,34 +64,6 @@ const CanvasFrame = styled('iframe')({
   height: '100%',
 });
 
-function wrapConsoleMethod<A extends any[]>(
-  level: string,
-  method: (...args: A) => void,
-  onEntry: (entry: LogEntry) => void,
-): (...args: A) => void {
-  return new Proxy(method, {
-    apply(target, thisArg, args: A) {
-      onEntry({ level, timestamp: Date.now(), args });
-      return target.apply(thisArg, args);
-    },
-  });
-}
-
-function wrapConsole(targetConsole: Console, onEntry: (entry: LogEntry) => void): Console {
-  const wrapped = new Map<PropertyKey, any>([
-    ['log', wrapConsoleMethod('log', targetConsole.log, onEntry)],
-    ['info', wrapConsoleMethod('info', targetConsole.info, onEntry)],
-    ['warn', wrapConsoleMethod('warn', targetConsole.warn, onEntry)],
-    ['error', wrapConsoleMethod('error', targetConsole.error, onEntry)],
-    ['debug', wrapConsoleMethod('debug', targetConsole.debug, onEntry)],
-  ]);
-  return new Proxy(targetConsole, {
-    get(target, property, receiver) {
-      return wrapped.get(property) || Reflect.get(target, property, receiver);
-    },
-  });
-}
-
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   function EditorCanvasHost(
     { appId, className, pageNodeId, dom, overlay, onRuntimeEvent = () => {}, onConsoleEntry },
@@ -130,11 +102,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       const frameWindow = frameRef.current?.contentWindow as Maybe<IframeContentWindow>;
       invariant(frameWindow, 'Iframe ref not attached');
 
-      const originalConsole: Console = frameWindow.console;
-      frameWindow.console = wrapConsole(originalConsole, (entry: LogEntry) =>
-        onConsoleEntryRef.current?.(entry),
-      );
-
       // eslint-disable-next-line no-underscore-dangle
       if (typeof frameWindow.__TOOLPAD_BRIDGE__ === 'object') {
         // eslint-disable-next-line no-underscore-dangle
@@ -146,10 +113,6 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
           handleInit(newBridge);
         };
       }
-
-      return () => {
-        frameWindow.console = originalConsole;
-      };
     }, [handleInit]);
 
     const [contentWindow, setContentWindow] = React.useState<Window | null>(null);

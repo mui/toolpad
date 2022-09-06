@@ -111,6 +111,12 @@ const EXTRA_LIBS_HTTP_MODULES = [
   {
     content: `declare module "https://*";`,
   },
+  {
+    content: `declare module "@mui/icons-material/*";`,
+  },
+  {
+    content: `declare module "@mui/icons-material";`,
+  },
 ];
 
 interface CodeComponentEditorContentProps {

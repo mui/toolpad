@@ -20,6 +20,7 @@ async function createRequire(urlImports: string[]) {
       ['@mui/toolpad-core', import(`@mui/toolpad-core`)],
 
       ['@mui/icons-material', import('@mui/icons-material')],
+
       ...muiMaterialExports,
 
       ...urlImports.map((url) => [url, import(/* webpackIgnore: true */ url)] as const),

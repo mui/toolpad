@@ -216,8 +216,21 @@ const muiDatePickersProExports = new Map<string, ExportMapValue>([
   ],
 ]);
 
-export default new Map([
+const muiDataGridExports = new Map<string, ExportMapValue>([
+  ['@mui/x-data-grid', import('@mui/x-data-grid')],
+  ['@mui/x-data-grid/DataGrid', import('@mui/x-data-grid/DataGrid')],
+]);
+
+const muiDataGridProExports = new Map<string, ExportMapValue>([
+  ['@mui/x-data-grid-pro', import('@mui/x-data-grid-pro')],
+  ['@mui/x-data-grid-pro/DataGridPro', import('@mui/x-data-grid-pro/DataGridPro')],
+]);
+
+export default new Map<string, ExportMapValue>([
   ...muiMaterialExports,
   ...muiDatePickersExports,
   ...muiDatePickersProExports,
+  ...muiDataGridExports,
+  ...muiDataGridProExports,
+  ['@mui/x-data-grid-generator', import('@mui/x-data-grid-generator')],
 ]);

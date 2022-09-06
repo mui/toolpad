@@ -18,11 +18,11 @@ import {
   TOOLPAD_COMPONENT,
   Slots,
   Placeholder,
-  BindableAttrValues,
   NodeId,
   execDataSourceQuery,
   BindableAttrValue,
   UseDataQueryConfig,
+  NestedBindableAttrs,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -40,7 +40,7 @@ import {
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
-import { pick } from 'lodash-es';
+import * as _ from 'lodash-es';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
@@ -382,14 +382,51 @@ const PageRootComponent = createComponent(PageRoot, {
   },
 });
 
+/**
+ * Turns an object consisting of a nested structure of BindableAttrValues
+ * into a flat array of relative paths associated with their value.
+ * Example:
+ *   { foo: { bar: { type: 'const', value:1 } }, baz: [{ type: 'jsExpression', value: 'quux' }] }
+ *   =>
+ *   [['.foo.bar', { type: 'const', value:1 }],
+ *    ['.baz[0]', { type: 'jsExpression', value: 'quux' }]]
+ */
+function flattenNestedBindables(
+  params?: NestedBindableAttrs,
+  prefix = '',
+): [string, BindableAttrValue<any>][] {
+  if (!params) {
+    return [];
+  }
+  if (Array.isArray(params)) {
+    return params.flatMap((param, i) => {
+      return flattenNestedBindables(param[1], `${prefix}[${i}][1]`);
+    });
+  }
+  // TODO: create a marker in bindables (similar to $$ref) to recognize them automatically
+  // in a nested structure. This would allow us to build deeply nested structures
+  if (typeof params.type === 'string') {
+    return [[prefix, params as BindableAttrValue<any>]];
+  }
+  return Object.entries(params).flatMap(([key, param]) =>
+    flattenNestedBindables(param, `${prefix}.${key}`),
+  );
+}
+
 function resolveBindables(
   bindings: Partial<Record<string, BindingEvaluationResult>>,
   bindingId: string,
-  params?: BindableAttrValues<any>,
+  params?: NestedBindableAttrs,
 ): Record<string, unknown> {
-  return params
-    ? mapProperties(params, ([propName]) => [propName, bindings[`${bindingId}.${propName}`]?.value])
-    : {};
+  const result: any = _.cloneDeep(params) || {};
+  const resultKey = 'value';
+  const flattened = flattenNestedBindables(params);
+  for (const [path] of flattened) {
+    const resolvedValue = bindings[`${bindingId}${path}`]?.value;
+    _.set(result, `${resultKey}${path}`, resolvedValue);
+  }
+
+  return result[resultKey] || {};
 }
 
 interface QueryNodeProps {
@@ -405,7 +442,7 @@ function QueryNode({ node }: QueryNodeProps) {
   const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
-  const configBindings = pick(node.attributes, ...USE_DATA_QUERY_CONFIG_KEYS);
+  const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
   const queryResult = useDataQuery(dataUrl, queryId, params, options);
 
@@ -568,9 +605,11 @@ function parseBindings(
 
     if (appDom.isQuery(elm)) {
       if (elm.params) {
-        for (const [paramName, paramValue] of Object.entries(elm.params)) {
-          const bindingId = `${elm.id}.params.${paramName}`;
-          const scopePath = `${elm.name}.params.${paramName}`;
+        const nestedBindablePaths = flattenNestedBindables(elm.params);
+
+        for (const [nestedPath, paramValue] of nestedBindablePaths) {
+          const bindingId = `${elm.id}.params${nestedPath}`;
+          const scopePath = `${elm.name}.params${nestedPath}`;
           const bindable = paramValue || appDom.createConst(undefined);
           parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
         }
@@ -586,10 +625,13 @@ function parseBindings(
         });
       }
 
-      for (const configName of USE_DATA_QUERY_CONFIG_KEYS) {
-        const bindingId = `${elm.id}.config.${configName}`;
-        const scopePath = `${elm.name}.config.${configName}`;
-        const bindable = elm.attributes[configName] || appDom.createConst(undefined);
+      const configBindings = _.pick(elm.attributes, USE_DATA_QUERY_CONFIG_KEYS);
+      const nestedBindablePaths = flattenNestedBindables(configBindings);
+
+      for (const [nestedPath, paramValue] of nestedBindablePaths) {
+        const bindingId = `${elm.id}.config${nestedPath}`;
+        const scopePath = `${elm.name}.config${nestedPath}`;
+        const bindable = paramValue || appDom.createConst(undefined);
         parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
       }
     }

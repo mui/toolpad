@@ -37,6 +37,8 @@ function getExtension(language: string): string {
       return '.css';
     case 'html':
       return '.html';
+    case 'plaintext':
+      return '.txt';
     default:
       return '.jsx';
   }
@@ -191,7 +193,7 @@ interface MonacoEditorBaseProps {
 export type MonacoEditorProps = MonacoEditorBaseProps &
   (
     | {
-        language?: 'typescript' | undefined;
+        language: 'typescript';
         diagnostics?: monaco.languages.typescript.DiagnosticsOptions;
         compilerOptions?: monaco.languages.typescript.CompilerOptions | undefined;
         extraLibs?: ExtraLib[];
@@ -203,7 +205,7 @@ export type MonacoEditorProps = MonacoEditorBaseProps &
         extraLibs?: undefined;
       }
     | {
-        language: string;
+        language?: string | undefined;
         diagnostics?: undefined;
         compilerOptions?: undefined;
         extraLibs?: undefined;
@@ -215,7 +217,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
     value,
     onChange,
     sx,
-    language = 'typescript',
+    language = 'plaintext',
     diagnostics,
     compilerOptions,
     extraLibs,

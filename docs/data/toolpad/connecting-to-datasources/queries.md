@@ -31,4 +31,4 @@
 
 ## What's next?
 
-[Learn all about](/toolpad/connecting-to-datasources/connections/) `CONNECTIONS` so you can use all `QUERY` types.
+Learn all about [`CONNECTIONS`](/toolpad/connecting-to-datasources/connections/) to find out how to use the other `QUERY` types.

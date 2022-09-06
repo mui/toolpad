@@ -129,22 +129,14 @@ There are 4 most frequently used areas:
 
 In order to share your application with others you will want to deploy it
 
-1. Locate "rocket" shaped button in the top navigation and press it to initiate creating new release
+1. Click `DEPLOY` button in the top navigation:
 
    ![Rocket button](/static/toolpad/deploy-1.png)
 
-1. Enter `description` of your choice and `CREATE` release
+1. (Optional) Enter `description` of your choice
+
+1. Click `DEPLOY` to confirm deployment
 
    ![Release description](/static/toolpad/deploy-2.png)
 
-1. Now that you have release ready it's time to `DEPLOY <release name>`
-
-   ![Deploy](/static/toolpad/deploy-3.png)
-
-1. And finally confirm the deployment by clicking `DEPLOY`
-
-   ![Deploy](/static/toolpad/deploy-4.png)
-
-1. You can now see your application is deployed. Click `OPEN` to see the application live
-
-   ![Deploy](/static/toolpad/deploy-5.png)
+1. Your deployed app will automatically open in a new browser tab

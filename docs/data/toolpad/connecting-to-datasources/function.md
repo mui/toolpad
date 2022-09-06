@@ -44,12 +44,24 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
 While [function](/toolpad/connecting-to-datasources/function/) datasource can suffice for many different setups we found some advances use cases where limitations of `function` datasource starts surfacing and prevents us from building more complex data access `queries`.
 
+1. **Pre-processing** request:
+
+   We can execute extra steps before doing an actual request in case we need to do some pre-processing. I.e. sending parameters as a BASE64 encoded data:
+
+   ![Function pre-processing](/static/toolpad/function-query-6.png)
+
 1. **Fetching** data from **multiple data sources** and **combining** the result:
 
    ![Function combined result](/static/toolpad/function-query-3.png)
 
 1. **Chaining** multiple request:
 
-   In this example we want to fetch name of the top contributor of **mui/materual-ui** repository, in order to do that we first need to fetch a list of contributors for a given repo. Once we have a response and link to a top contributor we can do a follow up request to fetch details about specific user.
+   In this example we want to fetch name of the top contributor of **mui/materual-ui** repository, in order to do that we first need to fetch a list of contributors for a given repo. Once we have a response and link to a top contributor we can do a follow up request to fetch details about specific user:
 
    ![Function chained](/static/toolpad/function-query-4.png)
+
+1. **Custom error handling**:
+
+   We can processes any way we want how to treat different error scenarios. I.e. if 404 erorr is returned we can still pass empty array so that UI does not break:
+
+   ![Function error handling](/static/toolpad/function-query-5.png)

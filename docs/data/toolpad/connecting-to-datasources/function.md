@@ -1,20 +1,20 @@
 # Function
 
 <p class="description">
-    Function query type is an advanced way to make request from Toolpad app.
+    Function datasource is an advanced way to make request from Toolpad app.
 </p>
 
 ## Working with functions
 
-As explained in the [connections](/toolpad/connecting-to-data-sources/connections/) section you can either create a reusable `connection` or simply create a new `query` and put all connection details inline
+As explained in the [connections](/toolpad/connecting-to-datasources/connections/) section you can either create a reusable `connection` or simply create a new `query` and put all connection details inline
 
 1. Choose `ADD QUERY` in the `Properties editor` on the right
 
-1. Select `Function` type and click `CREATE QUERY`
+1. Select `Function` datasource and click `CREATE QUERY`
 
-   ![Function type](/static/toolpad/function-query-1.png)
+   ![Function datasource](/static/toolpad/function-query-1.png)
 
-1. We got all the basic configuration settings as described in [queries](/toolpad/connecting-to-data-sources/queries/) section
+1. We got all the basic configuration settings as described in [queries](/toolpad/connecting-to-datasources/queries/) section
 
 1. In addition we are now presented with a `code editor` where we can write a custom code for data fetching
 
@@ -42,7 +42,7 @@ As explained in the [connections](/toolpad/connecting-to-data-sources/connection
 
 ## Usecases
 
-While [function](/toolpad/connecting-to-data-sources/function/) type can suffice for many different setups we found some advances usecases where limitations of `function` type starts surfacing and prevents us from building more complex data access `queries`.
+While [function](/toolpad/connecting-to-datasources/function/) datasource can suffice for many different setups we found some advances usecases where limitations of `function` datasource starts surfacing and prevents us from building more complex data access `queries`.
 
 1. **Fetching** data from **multiple data sources** and **combining** the result
 

@@ -11,33 +11,33 @@ const pages: MuiPage[] = [
     ],
   },
   {
-    pathname: '/toolpad/connecting-to-data-sources',
-    title: 'Connecting to data sources',
+    pathname: '/toolpad/connecting-to-datasources',
+    title: 'Connecting to datasources',
     icon: 'TableViewIcon',
     children: [
       {
-        pathname: '/toolpad/connecting-to-data-sources/queries',
+        pathname: '/toolpad/connecting-to-datasources/queries',
         title: 'Queries',
       },
       {
-        pathname: '/toolpad/connecting-to-data-sources/connections',
+        pathname: '/toolpad/connecting-to-datasources/connections',
         title: 'Connections',
       },
       {
-        pathname: '/toolpad/connecting-to-data-sources/fetch',
-        title: 'Fetch type',
+        pathname: '/toolpad/connecting-to-datasources/fetch',
+        title: 'Fetch datasource',
       },
       {
-        pathname: '/toolpad/connecting-to-data-sources/function',
-        title: 'Function type',
+        pathname: '/toolpad/connecting-to-datasources/function',
+        title: 'Function datasource',
       },
       {
-        pathname: '/toolpad/connecting-to-data-sources/google-sheets',
-        title: 'Google sheets type',
+        pathname: '/toolpad/connecting-to-datasources/google-sheets',
+        title: 'Google sheets datasource',
       },
       {
-        pathname: '/toolpad/connecting-to-data-sources/postgres',
-        title: 'Postgres type',
+        pathname: '/toolpad/connecting-to-datasources/postgres',
+        title: 'Postgres datasource',
       },
     ],
   },

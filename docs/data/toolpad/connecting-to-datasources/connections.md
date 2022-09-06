@@ -10,32 +10,32 @@ In order to create a new `CONNECTION` instance press `+` button in the `Instance
 
 ## Connection types
 
-There are 2 query types that **do not require** `CONNECTION` instance:
+There are 2 datasources that **do not require** `CONNECTION` instance:
 
-1. [Function](/toolpad/connecting-to-data-sources/function/) type
+1. [Function](/toolpad/connecting-to-datasources/function/) datasource
 
    ![Connection function](/static/toolpad/connection-function-1.png)
 
-   We can define `Secrets` (key/value) that we can later access in the `Function` type `query`
+   We can define `Secrets` (key/value) that we can later access in the `Function` datasource `query`
 
    ![Connection function](/static/toolpad/connection-function-2.png)
 
-1. [Fetch](/toolpad/connecting-to-data-sources/fetch/) type
+1. [Fetch](/toolpad/connecting-to-datasources/fetch/) datasource
 
    ![Connection fetch](/static/toolpad/connection-fetch-1.png)
 
    We can configure:
 
-   - `base url` - url that can be shared between different types of queries
+   - `base url` - url that can be shared between different queries
    - `Headers` - pass custom headers with each request
    - `Authentication` type - if your API is protected choose authentication method that fits your needs:
      - `Basic` - adds `Authorization` header and generates **base64** encoded value for a given user credentials
      - `Bearer token` - adds `Authorization` header generates value for provided token
      - `API key` - adds key/value header
 
-There are 2 types that **require** `CONNECTION` instance:
+There are 2 datasources that **require** `CONNECTION` instance:
 
-1. [Google Sheets](/toolpad/connecting-to-data-sources/google-sheets/) type
+1. [Google Sheets](/toolpad/connecting-to-datasources/google-sheets/) datasource
 
    **Obtain credentials**
 
@@ -75,7 +75,7 @@ There are 2 types that **require** `CONNECTION` instance:
 
    ![Google sheets connected](/static/toolpad/connection-sheets-2.png)
 
-2. [Postgres](/toolpad/connecting-to-data-sources/postgres/) type
+2. [Postgres](/toolpad/connecting-to-datasources/postgres/) datasource
 
    In order `query` data from `postgres` database we **must** configure connection
 
@@ -83,4 +83,4 @@ There are 2 types that **require** `CONNECTION` instance:
 
    Provide database credentials and `TEST CONNECTION` to verify that we are able to connect
 
-   If everything is correct `SAVE` and you will be able to use [Postgres](/toolpad/connecting-to-data-sources/postgres/) queries
+   If everything is correct `SAVE` and you will be able to use [Postgres](/toolpad/connecting-to-datasources/postgres/) queries

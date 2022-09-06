@@ -1,18 +1,18 @@
 # Google Sheets
 
-<p class="description">Google Sheets query type allows us to fetch data from Google sheets living in your Google Drive</p>
+<p class="description">Google Sheets datasource allows us to fetch data from Google sheets living in your Google Drive</p>
 
 ## Working with Google Sheets
 
-As explained in the [connections](/toolpad/connecting-to-data-sources/connections/) section before you can use `Google Sheets` query you will first need to setup `connection`
+As explained in the [connections](/toolpad/connecting-to-datasources/connections/) section before you can use `Google Sheets` query you will first need to setup `connection`
 
 1. Once your `connection` is ready click on `ADD QUERY` in the `Properties editor` on the right
 
-1. Select `Google Sheets` type and click `CREATE QUERY`
+1. Select `Google Sheets` datasource and click `CREATE QUERY`
 
    ![Google sheets type](/static/toolpad/google-sheets-query-1.png)
 
-1. We got all the basic configuration settings as described in [queries](/toolpad/connecting-to-data-sources/queries/) section
+1. We got all the basic configuration settings as described in [queries](/toolpad/connecting-to-datasources/queries/) section
 
 1. In addition we can configure following properties inline
 

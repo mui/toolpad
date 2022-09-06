@@ -57,9 +57,9 @@ There are 4 most frequently used areas:
 
    ![Add query](/static/toolpad/step-3.png)
 
-1. This time we are going to use simple `FETCH` type to query our data. Choose and press `CREATE QUERY`
+1. This time we are going to use simple `FETCH` datasource to query our data. Choose and press `CREATE QUERY`
 
-   ![Fetch type](/static/toolpad/step-4.png)
+   ![Fetch datasource](/static/toolpad/step-4.png)
 
 1. Let's fetch some data about dogs from `https://dog.ceo/dog-api` (if you're more of a cat person you could use cat data API from `https://catfact.ninja`. We apologize in advance - following tutorial steps are more suited for the dog data API but should be easily adaptable for cats as well!)
 

@@ -1,4 +1,4 @@
-import { BindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrValue, ConstantAttrValue } from '@mui/toolpad-core';
 import { Har } from 'har-format';
 import { Maybe } from '../../utils/types';
 
@@ -31,13 +31,33 @@ export interface RestConnectionParams {
   authentication?: Maybe<Authentication>;
 }
 
+export type RawBody = {
+  kind: 'raw';
+  content: BindableAttrValue<string>;
+  contentType: ConstantAttrValue<string>;
+};
+
+export type UrlEncodedBody = {
+  kind: 'urlEncoded';
+  content: [string, BindableAttrValue<string>][];
+};
+
+export type Body = RawBody | UrlEncodedBody;
+
 export interface FetchQuery {
   readonly url: BindableAttrValue<string>;
   readonly method: string;
   readonly headers: [string, BindableAttrValue<string>][];
+  readonly searchParams?: [string, BindableAttrValue<string>][];
+  readonly body?: Body;
   readonly transformEnabled?: boolean;
   readonly transform?: string;
 }
+
+export type FetchParams = {
+  readonly searchParams: [string, BindableAttrValue<any>][];
+  readonly body?: Body;
+};
 
 export type FetchPrivateQuery = {
   kind: 'debugExec';

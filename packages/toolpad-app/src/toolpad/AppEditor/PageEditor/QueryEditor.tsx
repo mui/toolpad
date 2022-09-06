@@ -17,12 +17,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import {
-  BindableAttrEntries,
-  BindableAttrValue,
-  BindableAttrValues,
-  NodeId,
-} from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -205,27 +200,25 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
   );
 }
 
-interface QueryNodeEditorProps<Q, P> {
+interface QueryNodeEditorProps<Q> {
   open: boolean;
   onClose: () => void;
   onSave: (newNode: appDom.QueryNode) => void;
   onRemove: (newNode: appDom.QueryNode) => void;
-  node: appDom.QueryNode<Q, P>;
+  node: appDom.QueryNode<Q>;
 }
 
-function QueryNodeEditorDialog<Q, P>({
+function QueryNodeEditorDialog<Q>({
   open,
   node,
   onClose,
   onRemove,
   onSave,
-}: QueryNodeEditorProps<Q, P>) {
+}: QueryNodeEditorProps<Q>) {
   const { appId } = usePageEditorState();
   const dom = useDom();
 
-  const [input, setInput] = React.useState<appDom.QueryNode<Q, P>>(
-    appDom.fromLegacyQueryNode(node),
-  );
+  const [input, setInput] = React.useState<appDom.QueryNode<Q>>(appDom.fromLegacyQueryNode(node));
   React.useEffect(() => {
     if (open) {
       setInput(appDom.fromLegacyQueryNode(node));
@@ -260,7 +253,7 @@ function QueryNodeEditorDialog<Q, P>({
           attributes: update(input.attributes, {
             query: appDom.createConst(model.query),
           }),
-          params: Object.fromEntries(model.params) as BindableAttrValues<P>,
+          params: Object.fromEntries(model.params),
         }),
       );
     },

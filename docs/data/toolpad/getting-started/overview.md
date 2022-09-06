@@ -1,12 +1,14 @@
-# Introduction
+# Overview
 
-<p class="description">Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal tools builder designed to extend the MUI React components. It's designed for developers of all trades who want to save time building internal applications.</p>
+<p class="description">
+Learn core concepts of the Toolpad app and you are ready to ship your application in minutes!
+</p>
 
 ## What is Toolpad?
 
-Learn a few core concepts of the Toolpad app and you are ready to ship your application in minutes! Drag & drop pre-built UI components, connect your data sources, release your app - and you're done!
+Toolpad is a self-hosted low-code internal tools builder designed to extend the MUI React components. It's designed for developers of all trades who want to save time building internal applications. Drag & drop pre-built UI components, connect your data sources, release your app - and you're done!
 
-![Editor screenshot](/static/toolpad/marketing/hero-screenshot.png)
+![Editor screenshot](/static/toolpad/marketing/index-hero-video-poster.jpg)
 
 ## How Toolpad works?
 

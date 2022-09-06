@@ -24,18 +24,6 @@ Make sure you have a running Toolpad instance.
 
 Toolpad will be accessible under `http://localhost:3000/`.
 
-## Navigating Toolpad
-
-![Toolpad app](/static/toolpad/terminology.png)
-
-There are 5 most frequently used areas:
-
-- `Navigation` - return to homepage, preview or deploy app
-- `Explorer` - this is there you define and manage pages, connection configurations, custom component definitions, etc...
-- `Component library` - drag component instance from this drawer and drop it in `Canvas` to build UI
-- `Canvas` - this is a place where you build your app and immediately preview how it looks like
-- `Inspector` - modify properties of a different instance
-
 ## Building your first application
 
 1. Open Toolpad by navigating to [http://localhost:3000/](http://localhost:3000/)

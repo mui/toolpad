@@ -18,7 +18,7 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
    ![Postgres configuration](/static/toolpad/postgres-query-2.png)
 
-   - On the left side we have a textarea where we can pass **SQL** query.
+   - On the left is a SQL query editor.
 
    - On the right is a table for previewing results.
 

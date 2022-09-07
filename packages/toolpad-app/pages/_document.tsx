@@ -68,7 +68,7 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           />
-          <link rel="shortcut icon" href="/static/favicon.ico" />
+          <link rel="shortcut icon" href="/favicon.ico" />
           <script
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{

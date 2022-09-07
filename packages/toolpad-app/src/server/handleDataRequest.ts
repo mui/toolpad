@@ -1,10 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
-import { NodeId } from '@mui/toolpad-core';
+import { ExecFetchResult, NodeId } from '@mui/toolpad-core';
 import { execQuery, loadDom } from './data';
 import initMiddleware from './initMiddleware';
-import { ApiResult, VersionOrPreview } from '../types';
+import { VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
+import { parseError } from '../utils/errors';
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
   // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -15,6 +16,11 @@ const cors = initMiddleware<any>(
   }),
 );
 
+function serializeError(error: Error) {
+  const { message, name, stack } = error;
+  return { message, name, stack };
+}
+
 export interface HandleDataRequestParams {
   appId: string;
   version: VersionOrPreview;
@@ -22,7 +28,7 @@ export interface HandleDataRequestParams {
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse<ApiResult<any>>,
+  res: NextApiResponse<ExecFetchResult<any>>,
   { appId, version }: HandleDataRequestParams,
 ) => {
   if (req.method !== 'POST') {
@@ -40,7 +46,10 @@ export default async (
     throw new Error(`Invalid node type for data request`);
   }
 
-  const result = await execQuery(appId, dataNode, req.body);
-
-  res.json(result);
+  try {
+    const result = await execQuery(appId, dataNode, req.body);
+    res.json(result);
+  } catch (error) {
+    res.json({ error: serializeError(parseError(error)) });
+  }
 };

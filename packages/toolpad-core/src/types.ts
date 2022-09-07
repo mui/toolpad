@@ -266,3 +266,8 @@ export interface RuntimeError {
 }
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
+
+export type ExecFetchResult<T = any> = {
+  data?: T;
+  error?: Error;
+};

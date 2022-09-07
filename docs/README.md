@@ -12,7 +12,7 @@ If you do not have yarn installed, select your OS and follow the instructions on
 
 _DO NOT USE NPM, use Yarn to install the dependencies._
 
-You can open [documentation here](https://mui.com/toolpad/getting-started/introduction/)
+Visit the [MUI Toolpad documentation](https://mui.com/toolpad/getting-started/introduction/).
 
 ## How can I add a new demo to the documentation?
 

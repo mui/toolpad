@@ -79,7 +79,7 @@ There are 2 datasources that **require** **CONNECTION** instance:
 
    In order **query** data from **PostgreSQL** database we **must** configure connection:
 
-   ![Connection postgres](/static/toolpad/connection-postgres-1.png)
+![Connection postgres](/static/toolpad/connection-postgres-1.png)
 
 Provide the database credentials and click **TEST CONNECTION** to verify that you're able to connect.
 

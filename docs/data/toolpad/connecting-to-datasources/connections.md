@@ -16,7 +16,7 @@ There are 2 kinds of data sources that do not require a connection instance:
 
 ![Connection function](/static/toolpad/connection-function-1.png)
 
-We can define secrets (key/value) that we can later access in the function datasource query:
+You can define secrets (key/value) that can later be access in the function datasource query:
 
 ![Connection function](/static/toolpad/connection-function-2.png)
 
@@ -24,7 +24,7 @@ We can define secrets (key/value) that we can later access in the function datas
 
 ![Connection fetch](/static/toolpad/connection-fetch-1.png)
 
-We can configure:
+You can configure:
 
 - **base url** - url that can be shared between different queries.
 - **Headers** - pass custom headers with each request.
@@ -39,7 +39,7 @@ There are 2 datasources that require connection instance:
 
 **Obtain credentials**
 
-Before we create a Google sheets connection we must first configure Toolpad app by providing Google sheets **client id** and **secret**:
+Before you create a Google sheets connection you must first configure Toolpad app by providing Google sheets **client id** and **secret**:
 
 1. Create a new Google Cloud project - [instructions](https://cloud.google.com/resource-manager/docs/creating-managing-projects#creating_a_project).
 

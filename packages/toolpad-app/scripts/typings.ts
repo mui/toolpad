@@ -86,14 +86,13 @@ async function main() {
     )
   ).flat();
 
-  const result: Record<string, string> = Object.assign(
-    {},
-    ...(await Promise.all(
-      allFiles.map(async ({ filename, moduleId }) => {
-        return { [moduleId]: await fs.readFile(filename, { encoding: 'utf-8' }) };
-      }),
-    )),
+  const results = await Promise.all(
+    allFiles.map(async ({ filename, moduleId }) => {
+      return { [moduleId]: await fs.readFile(filename, { encoding: 'utf-8' }) };
+    }),
   );
+
+  const result: Record<string, string> = Object.assign({}, ...results);
 
   await fs.writeFile(path.resolve(__dirname, '../public/typings.json'), JSON.stringify(result), {
     encoding: 'utf-8',

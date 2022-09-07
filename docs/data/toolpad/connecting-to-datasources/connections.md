@@ -4,7 +4,7 @@
     A connection instance lets you reuse certain configuration details to create queries faster.
 </p>
 
-In order to create a new **CONNECTION** instance press **+** button in the **Explorer** on the left:
+To create a new connection instance, press the **+** button in the Explorer menu on the left side of the interface:
 
 ![Add Connection](/static/toolpad/connection.png)
 

@@ -20,7 +20,7 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
    - On the left side we have a textarea where we can pass **SQL** query.
 
-   - On the right side we can query results.
+   - On the right is a table for previewing results.
 
    - Below the query editor we can configure **Parameters** which can be used to bind data for our SQL queries. We can use the standard PostgreSQL `$1`, `$2`, `$3` interpolation.
 

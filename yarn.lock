@@ -2011,7 +2011,7 @@
     prop-types "^15.8.1"
     react-is "^17.0.2"
 
-"@mui/base@5.0.0-alpha.96":
+"@mui/base@5.0.0-alpha.96", "@mui/base@^5.0.0-alpha.94":
   version "5.0.0-alpha.96"
   resolved "https://registry.yarnpkg.com/@mui/base/-/base-5.0.0-alpha.96.tgz#2189dd1012d0969ace69c3479b0aec2dbe9bbdc1"
   integrity sha512-GZf2YguepLFMWGG8vQNLRl7FlXPDeyxQBYgrkHxwNJYeRw55rrGrJxHzL1iCbk71VZ2IIAIs5IAxNpyHK9iqPQ==
@@ -2239,7 +2239,35 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
-"@mui/x-data-grid-pro@^5.17.1":
+"@mui/x-data-grid-generator@^5.17.1":
+  version "5.17.1"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid-generator/-/x-data-grid-generator-5.17.1.tgz#4a99c9d2d0547ef97b30fb5c21018aaf950b41d7"
+  integrity sha512-8Lm3zy3lzMHNFPTT0PgRG1UBGm2/cqYtZyeYi9+svSrL7kBHSfGUwgWJjx4jBwC7jn3hhLkMXGFRX1a0azFMUg==
+  dependencies:
+    "@babel/runtime" "^7.18.9"
+    "@mui/base" "^5.0.0-alpha.94"
+    "@mui/x-data-grid-premium" "5.17.1"
+    chance "^1.1.8"
+    clsx "^1.2.1"
+    lru-cache "^7.14.0"
+
+"@mui/x-data-grid-premium@5.17.1":
+  version "5.17.1"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid-premium/-/x-data-grid-premium-5.17.1.tgz#0f84b93338c07bf93558e0e577da93058ca91895"
+  integrity sha512-/BFrDj6Gxb2Pge+rGut5C+hbCniaeSBa9+2KPTD03Y3yd49OKNGP2k5jbBhTivmwVyHc6c22kaiXwednsXGtkw==
+  dependencies:
+    "@babel/runtime" "^7.18.9"
+    "@mui/utils" "^5.9.3"
+    "@mui/x-data-grid" "5.17.1"
+    "@mui/x-data-grid-pro" "5.17.1"
+    "@mui/x-license-pro" "5.17.0"
+    "@types/format-util" "^1.0.2"
+    clsx "^1.2.1"
+    exceljs "^4.3.0"
+    prop-types "^15.8.1"
+    reselect "^4.1.6"
+
+"@mui/x-data-grid-pro@5.17.1", "@mui/x-data-grid-pro@^5.17.1":
   version "5.17.1"
   resolved "https://registry.yarnpkg.com/@mui/x-data-grid-pro/-/x-data-grid-pro-5.17.1.tgz#5a7b184f9f8045a9255391a480bc9e81933a6476"
   integrity sha512-dmSlsnB9ymIwGVJDOfQRGCS3R4HorUnnl0e9kErEqMyZf8758SVfT+4M69dUkKZcMTcc9+3YyAGerj/bN8Ea5g==
@@ -2264,7 +2292,25 @@
     prop-types "^15.8.1"
     reselect "^4.1.6"
 
-"@mui/x-date-pickers@^5.0.0":
+"@mui/x-date-pickers-pro@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers-pro/-/x-date-pickers-pro-5.0.0.tgz#3d2a97f2bfdfaa54e9787e1a74ad4bdafd12df3c"
+  integrity sha512-+MDozU40CvycqD0W9v1/gyPCKxgm0ZNSts7KKpgm/HMbhhP6zNnFaIIrOJnC81p71ty6JjNK8AqU2XCcTvumBw==
+  dependencies:
+    "@babel/runtime" "^7.18.9"
+    "@date-io/date-fns" "^2.15.0"
+    "@date-io/dayjs" "^2.15.0"
+    "@date-io/luxon" "^2.15.0"
+    "@date-io/moment" "^2.15.0"
+    "@mui/utils" "^5.9.3"
+    "@mui/x-date-pickers" "5.0.0"
+    "@mui/x-license-pro" "5.17.0"
+    clsx "^1.2.1"
+    prop-types "^15.7.2"
+    react-transition-group "^4.4.5"
+    rifm "^0.12.1"
+
+"@mui/x-date-pickers@5.0.0", "@mui/x-date-pickers@^5.0.0":
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@mui/x-date-pickers/-/x-date-pickers-5.0.0.tgz#e8b1dfe37e0ec611b2856e91984b76ded59c7f3c"
   integrity sha512-LcWJYFC/SdYbu0JSz6pgQcCh/cvllyoAqfpqf6iTex7jMSEk8i008pCntyrEVVcjGrx0fakDduSJthlnf0xNxQ==
@@ -4702,6 +4748,11 @@ chalk@^5.0.0, chalk@^5.0.1:
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-5.0.1.tgz#ca57d71e82bb534a296df63bbacc4a1c22b2a4b6"
   integrity sha512-Fo07WOYGqMfCWHOzSXOt2CxDbC6skS/jO9ynEcmpANMoPrD+W1r1K6Vx7iNm+AQmETU1Xr2t+n8nzkV9t6xh3w==
 
+chance@^1.1.8:
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/chance/-/chance-1.1.8.tgz#5d6c2b78c9170bf6eb9df7acdda04363085be909"
+  integrity sha512-v7fi5Hj2VbR6dJEGRWLmJBA83LJMS47pkAbmROFxHWd9qmE1esHRZW8Clf1Fhzr3rjxnNZVCjOEv/ivFxeIMtg==
+
 char-regex@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/char-regex/-/char-regex-1.0.2.tgz#d744358226217f981ed58f479b1d6bcc29545dcf"
@@ -5363,6 +5414,11 @@ dateformat@^3.0.0:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-3.0.3.tgz#a6e37499a4d9a9cf85ef5872044d62901c9889ae"
   integrity sha512-jyCETtSl3VMZMWeRo7iY1FL19ges1t55hMo5yaam4Jrsm5EPL89UQkoQRyiI+Yf4k8r2ZpdngkV8hr1lIdjb3Q==
+
+dayjs@^1.11.5:
+  version "1.11.5"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.5.tgz#00e8cc627f231f9499c19b38af49f56dc0ac5e93"
+  integrity sha512-CAdX5Q3YW3Gclyo5Vpqkgpj8fSdLQcRuzfX6mC6Phy0nfJ0eGYOeS7m4mt2plDWLAtA4TqTakvbboHvUxfe4iA==
 
 dayjs@^1.8.34:
   version "1.11.3"
@@ -9066,6 +9122,11 @@ lru-cache@^6.0.0:
   integrity sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
   dependencies:
     yallist "^4.0.0"
+
+lru-cache@^7.14.0:
+  version "7.14.0"
+  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-7.14.0.tgz#21be64954a4680e303a09e9468f880b98a0b3c7f"
+  integrity sha512-EIRtP1GrSJny0dqb50QXRUNBxHJhcpxHC++M5tD7RYbvLLn5KVWKsbyswSSqDuU15UFi3bgTQIY8nhDMeF6aDQ==
 
 lru-cache@^7.4.4, lru-cache@^7.5.1, lru-cache@^7.7.1:
   version "7.10.2"

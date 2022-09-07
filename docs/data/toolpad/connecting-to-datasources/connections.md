@@ -12,70 +12,70 @@ To create a new connection instance, press the **+** button in the Explorer menu
 
 There are 2 kinds of data sources that do not require a connection instance:
 
-1. [Function](/toolpad/connecting-to-datasources/function/) datasource:
+#### Function
 
-   ![Connection function](/static/toolpad/connection-function-1.png)
+![Connection function](/static/toolpad/connection-function-1.png)
 
-   We can define **Secrets** (key/value) that we can later access in the **Function** datasource **query**:
+We can define secrets (key/value) that we can later access in the function datasource query:
 
-   ![Connection function](/static/toolpad/connection-function-2.png)
+![Connection function](/static/toolpad/connection-function-2.png)
 
-1. [Fetch](/toolpad/connecting-to-datasources/fetch/) datasource:
+#### Fetch
 
-   ![Connection fetch](/static/toolpad/connection-fetch-1.png)
+![Connection fetch](/static/toolpad/connection-fetch-1.png)
 
-   We can configure:
+We can configure:
 
-   - **base url** - url that can be shared between different queries.
-   - **Headers** - pass custom headers with each request.
-   - **Authentication** type - if your API is protected choose authentication method that fits your needs:
-     - **Basic** - adds **Authorization** header and generates **base64** encoded value for a given user credentials.
-     - **Bearer token** - adds **Authorization** header generates value for provided token.
-     - **API key** - adds key/value header.
+- **base url** - url that can be shared between different queries.
+- **Headers** - pass custom headers with each request.
+- **Authentication** type - if your API is protected choose authentication method that fits your needs:
+  - **Basic** - adds authorization header and generates base64 encoded value for a given user credentials.
+  - **Bearer token** - adds authorization header generates value for provided token.
+  - **API key** - adds key/value header.
 
-There are 2 datasources that **require** **CONNECTION** instance:
+There are 2 datasources that require connection instance:
 
-1. [Google Sheets](/toolpad/connecting-to-datasources/google-sheets/) datasource:
+#### Google Sheets
 
-   **Obtain credentials**
+**Obtain credentials**
 
-   Before we create a **Google sheets** connection we must first configure Toolpad app by providing Google sheets **client id** and **secret**:
+Before we create a Google sheets connection we must first configure Toolpad app by providing Google sheets **client id** and **secret**:
 
-   1. Create a new Google Cloud project - [instructions](https://cloud.google.com/resource-manager/docs/creating-managing-projects#creating_a_project).
+1. Create a new Google Cloud project - [instructions](https://cloud.google.com/resource-manager/docs/creating-managing-projects#creating_a_project).
 
-   2. Generate Oauth 2.0 credentials - [instructions](https://developers.google.com/identity/protocols/oauth2/web-server#creatingcred).
+2. Generate Oauth 2.0 credentials - [instructions](https://developers.google.com/identity/protocols/oauth2/web-server#creatingcred).
 
-   3. Start Toolpad with following environment variables:
+3. Start Toolpad with following environment variables:
 
-      ```sh
-      TOOLPAD_EXTERNAL_URL=<YOUR_APP_URL>
-      TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID=
-      TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET=
-      ```
+   ```sh
+   TOOLPAD_EXTERNAL_URL=<YOUR_APP_URL>
+   TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID=
+   TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET=
+   ```
 
-      where YOUR_APP_URL is the URL Toolpad is hosted on.
+   where YOUR_APP_URL is the URL Toolpad is hosted on.
 
-   4. Add the following URIs under Authorized Redirect URIs:
-      ```sh
-      https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback</YOUR_APP_URL>
-      ```
-   5. Enable the Google Sheets and Google Drive APIs for the project - [instructions](https://developers.google.com/identity/protocols/oauth2/web-server#enable-apis).
+4. Add the following URIs under Authorized Redirect URIs:
+   ```sh
+   https://<YOUR_APP_URL>/api/dataSources/googleSheets/auth/callback</YOUR_APP_URL>
+   ```
+5. Enable the Google Sheets and Google Drive APIs for the project - [instructions](https://developers.google.com/identity/protocols/oauth2/web-server#enable-apis).
 
-   **Connect your google account**
+**Connect your google account**
 
-   1. Once you create **Google Sheets** type connection click **CONNECT** button:
+1. Once you create Google Sheets type connection click **CONNECT** button:
 
-   ![Connection Google Sheets](/static/toolpad/connection-sheets-1.png)
+![Connection Google Sheets](/static/toolpad/connection-sheets-1.png)
 
-   1. Choose google account that you want to authorize.
+1. Choose google account that you want to authorize.
 
-   1. Grant access to your Google Drive files by clicking **Allow**.
+1. Grant access to your Google Drive files by clicking **Allow**.
 
-   1. Once you successfully connect your account you should see a button stating the acount that was connected.
+1. Once you successfully connect your account you should see a button stating the acount that was connected.
 
-   ![Google sheets connected](/static/toolpad/connection-sheets-2.png)
+![Google sheets connected](/static/toolpad/connection-sheets-2.png)
 
-##### PostgreSQL
+#### PostgreSQL
 
 To query data from a PostgreSQL database, you must configure the connection:
 

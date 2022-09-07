@@ -189,9 +189,13 @@ function GridColumnsPropEditor({
           <React.Fragment>
             <DialogTitle>Edit columns</DialogTitle>
             <DialogContent>
-              <Tooltip title="Recreate columns">
+              <Tooltip describeChild title="Recreate columns">
                 <span>
-                  <IconButton onClick={handleRecreateColumns} disabled={!hasColumnSuggestions}>
+                  <IconButton
+                    aria-label="Recreate columns"
+                    onClick={handleRecreateColumns}
+                    disabled={!hasColumnSuggestions}
+                  >
                     <RefreshIcon />
                   </IconButton>
                 </span>

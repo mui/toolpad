@@ -26,4 +26,4 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
    - **First row contains column headers** - enable this setting if you would like to use names defined in a header row as the name for object keys in a response.
 
-1. Once finished with configuration click **SAVE** and click anywhere outside of the dialog to return to the editor.
+1. Once finished with configuration click **SAVE** to commit your changes and return to the canvas.

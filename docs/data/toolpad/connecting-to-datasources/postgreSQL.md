@@ -28,4 +28,4 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
    Like so: `SELECT * FROM "db" WHERE name = $name`.
 
-1. Once finished with configuration click **SAVE** and click anywhere outside of the dialog to return to the editor.
+1. Once finished with configuration click **SAVE** to commit your changes and return to the canvas.

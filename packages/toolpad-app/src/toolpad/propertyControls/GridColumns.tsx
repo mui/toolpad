@@ -13,6 +13,7 @@ import {
   MenuItem,
   Stack,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import { GridColumns, GridColDef, GridAlignment } from '@mui/x-data-grid-pro';
 import * as React from 'react';
@@ -188,16 +189,20 @@ function GridColumnsPropEditor({
           <React.Fragment>
             <DialogTitle>Edit columns</DialogTitle>
             <DialogContent>
-              <IconButton
-                aria-label="Recreate columns"
-                onClick={handleRecreateColumns}
-                disabled={!hasColumnSuggestions}
-              >
-                <RefreshIcon />
-              </IconButton>
-              <IconButton aria-label="Add column" onClick={handleMenuClick} disabled={disabled}>
-                <AddIcon />
-              </IconButton>
+              <Tooltip title="Recreate columns">
+                <IconButton
+                  aria-label="Recreate columns"
+                  onClick={handleRecreateColumns}
+                  disabled={!hasColumnSuggestions}
+                >
+                  <RefreshIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Add column">
+                <IconButton aria-label="Add column" onClick={handleMenuClick} disabled={disabled}>
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
               <Menu
                 id="new-column-menu"
                 anchorEl={menuAnchorEl}

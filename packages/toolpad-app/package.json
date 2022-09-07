@@ -59,7 +59,6 @@
     "crypto-js": "^4.1.1",
     "csstype": "^3.0.11",
     "cuid": "^2.1.8",
-    "es-module-shims": "^1.5.4",
     "esbuild": "^0.15.7",
     "fastestsmallesttextencoderdecoder": "^1.0.22",
     "find-up": "^6.2.0",

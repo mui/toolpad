@@ -22,7 +22,7 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
    - On the right is a table for previewing results.
 
-   - Below the query editor we can configure **Parameters** which can be used to bind data for our SQL queries. We can use the standard PostgreSQL `$1`, `$2`, `$3` interpolation.
+   - Below the query editor we can configure **Parameters** which can be used to bind page state to your SQL query. Toolpad uses [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html) under the hood to prevent SQL injection. You can use the positional parameter syntax (`$1`, `$2`, `$3`) of postgres prepared statements. Additionally it will also accept named parameters of the form `$myParameter`.
 
    ![Parameters configuration](/static/toolpad/postgres-query-3.png)
 

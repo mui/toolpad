@@ -83,4 +83,6 @@ There are 2 datasources that **require** **CONNECTION** instance:
 
    Provide database credentials and **TEST CONNECTION** to verify that we are able to connect.
 
-   If everything is correct **SAVE** and you will be able to use [PostgreSQL](/toolpad/connecting-to-datasources/postgreSQL/) queries.
+If everything is correct, click **SAVE** to complete the connection.
+
+Learn more in the [PostgreSQL documentation](/toolpad/connecting-to-datasources/postgreSQL/).

@@ -16,7 +16,7 @@ Visit the [MUI Toolpad documentation](https://mui.com/toolpad/getting-started/in
 
 ## How can I add a new demo to the documentation?
 
-[You can follow this guide](https://github.com/mui/material-ui/blob/HEAD/CONTRIBUTING.md)
+Please follow the [contributing guidelines](https://github.com/mui/material-ui/blob/HEAD/CONTRIBUTING.md).
 on how to get started contributing to MUI.
 
 ## How do I help to improve the translations?

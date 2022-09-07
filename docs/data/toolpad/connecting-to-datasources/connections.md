@@ -10,7 +10,7 @@ To create a new connection instance, press the **+** button in the Explorer menu
 
 ## Connection types
 
-There are 2 datasources that **do not require** **CONNECTION** instance:
+There are 2 kinds of data sources that do not require a connection instance:
 
 1. [Function](/toolpad/connecting-to-datasources/function/) datasource:
 

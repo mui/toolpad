@@ -12,7 +12,7 @@ To create a new connection instance, press the **+** button in the Explorer menu
 
 There are 2 kinds of data sources that do not require a connection instance:
 
-#### Function
+### Function
 
 ![Connection function](/static/toolpad/connection-function-1.png)
 
@@ -20,7 +20,7 @@ You can define secrets (key/value) that can later be access in the function data
 
 ![Connection function](/static/toolpad/connection-function-2.png)
 
-#### Fetch
+### Fetch
 
 ![Connection fetch](/static/toolpad/connection-fetch-1.png)
 
@@ -35,7 +35,7 @@ You can configure:
 
 There are 2 datasources that require connection instance:
 
-#### Google Sheets
+### Google Sheets
 
 **Obtain credentials**
 
@@ -75,7 +75,7 @@ Before you create a Google sheets connection you must first configure Toolpad ap
 
 ![Google sheets connected](/static/toolpad/connection-sheets-2.png)
 
-#### PostgreSQL
+### PostgreSQL
 
 To query data from a PostgreSQL database, you must configure the connection:
 

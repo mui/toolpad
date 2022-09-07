@@ -81,7 +81,7 @@ There are 2 datasources that **require** **CONNECTION** instance:
 
    ![Connection postgres](/static/toolpad/connection-postgres-1.png)
 
-   Provide database credentials and **TEST CONNECTION** to verify that we are able to connect.
+Provide the database credentials and click **TEST CONNECTION** to verify that you're able to connect.
 
 If everything is correct, click **SAVE** to complete the connection.
 

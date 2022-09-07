@@ -77,7 +77,7 @@ There are 2 datasources that **require** **CONNECTION** instance:
 
 ##### PostgreSQL
 
-   In order **query** data from **PostgreSQL** database we **must** configure connection:
+To query data from a PostgreSQL database, you must configure the connection:
 
 ![Connection postgres](/static/toolpad/connection-postgres-1.png)
 

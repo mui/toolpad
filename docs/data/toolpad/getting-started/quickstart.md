@@ -3,7 +3,7 @@
 Get started building a Toolpad app!
 
 <p class="description">
-This page will guide you into creating your very first Toolpad application. We will create a "hello world" type of application that will ask for a name and print a greeting.
+This page will guide you into creating your very first Toolpad application. You will create a "hello world" type of application that will ask for a name and print a greeting.
 </p>
 
 ## Prerequisites
@@ -30,15 +30,15 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
    ![Apps overview](/static/toolpad/apps-overview.png)
 
-1. Click "CREATE NEW" and name your application. Confirm by clicking "CREATE"
+1. Click **CREATE NEW** and name your application. Confirm by clicking **CREATE**
 
    ![Toolpad overview](/static/toolpad/step-1.png)
 
-1. Hover over **Component library** and drag **DataGrid** and **Image** components into **Canvas**
+1. Hover over **Component library** and drag DataGrid and Image components into **Canvas**
 
    ![Drag components](/static/toolpad/step-2.png)
 
-   Congratulations, we are done building the UI! Now all we need to do is connect it with a data source.
+   Congratulations, you are done building the UI! Now all you need to do is connect it with a data source.
 
 1. Click anywhere inside **Canvas** (except on the components that you just added) to deselect added components
 
@@ -46,19 +46,19 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
    ![Add query](/static/toolpad/step-3.png)
 
-1. This time we are going to use simple **FETCH** datasource to query our data. Choose and press **CREATE QUERY**
+1. This time you are going to use simple fetch datasource to query your data. Choose and press **CREATE QUERY**
 
    ![Fetch datasource](/static/toolpad/step-4.png)
 
-1. Let's fetch some data about dogs from **https://dog.ceo/dog-api**:
+1. Fetch some data about dogs from **https://dog.ceo/dog-api**:
 
-   Use **https://dog.ceo/api/breeds/list/all** as a **GET** query **URL**
+   Use **https://dog.ceo/api/breeds/list/all** as a GET query **URL**
 
    Give a unique name to this query i.e. **dogQuery**
 
    ![Fetch URL](/static/toolpad/step-5.png)
 
-1. Now because data comes in different shapes and forms we provide a quick and convenient way to **transform response** data - **enable** option and use `return data.message` expression
+1. Now because data comes in different shapes and forms you can provide a quick and convenient way to **transform response** data - **enable** option and use `return data.message` expression
 
    ![Transform response](/static/toolpad/step-6.png)
 
@@ -66,13 +66,13 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
 1. **SAVE** your changes and you will return to **Canvas**
 
-1. Select **DataGrid** component by clicking on it
+1. Select DataGrid component by clicking on it
 
-1. Then locate **ROWS** binding button in the **Inspector** and click to configure data binding
+1. Then locate rows binding button in the **Inspector** and click to configure data binding
 
    ![Bind data](/static/toolpad/step-7.png)
 
-1. Use a `dogQuery` variable available in the scope as a binding expression. Because **rows** property expects **array** type value, we first need to convert `dogQuery.data` (which is object) to array:
+1. Use a `dogQuery` variable available in the scope as a binding expression. Because rows property expects array type value, you first need to convert `dogQuery.data` (which is object) to array:
 
    ```js
    Object.entries(dogQuery.data);
@@ -82,19 +82,19 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
    ![dogQuery.data](/static/toolpad/step-8.png)
 
-1. We have finally connected data source to our UI component!
+1. You have finally connected data source to your UI component!
 
    ![Connected data](/static/toolpad/step-9.png)
 
-1. Let's make our app a bit more interactive. We want to display an image of a selected breed. Let's create a dynamic query which reacts to the selection inside **DataGrid** component
+1. Make your app a bit more interactive. You want to display an image of a selected breed. Create a dynamic query which reacts to the selection inside DataGrid component
 
-   - **ADD QUERY** -> create **FETCH** type
+   - **ADD QUERY** -> create fetch type
    - **name** -> **imageQuery**
    - Add new parameter named **breed**
 
    ![Breed parameter](/static/toolpad/step-10.png)
 
-   - Bind **breed** parameter value to `dataGrid.selection ? dataGrid.selection[0] : 'akita'` (grabs selected value from `dataGrid` or defaults to **akita** breed)
+   - Bind breed parameter value to `dataGrid.selection ? dataGrid.selection[0] : 'akita'` (grabs selected value from `dataGrid` or defaults to akita breed)
 
    ![Breed binding](/static/toolpad/step-11.png)
 
@@ -102,17 +102,17 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
    ![url binding](/static/toolpad/step-12.png)
 
-   - Last **transform responese** using `return data.message;` and **SAVE**
+   - Last **transform responese** using `return data.message;` and click **SAVE**
 
-1. Next we want to display a picture of a selected breed using **Image** component
+1. Next you want to display a picture of a selected breed using Image component
 
-   - select **Image** component
+   - select Image component
 
-   - bind **src** prop to `imageQuery.data` and voila - we can preview pictures of a selected breed
+   - bind **src** prop to `imageQuery.data` and now you can preview pictures of a selected breed
 
    ![Preview image](/static/toolpad/step-13.png)
 
-   Congratulations! 🎉 we now have an app fetching data from remote source and reacting to the user input!
+   Congratulations! 🎉 You now have an app fetching data from remote source and reacting to the user input!
 
 ## Deploying your application
 

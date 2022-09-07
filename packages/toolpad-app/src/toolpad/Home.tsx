@@ -15,6 +15,7 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  Select,
   Skeleton,
   Stack,
   Table,
@@ -27,6 +28,9 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
+  SelectChangeEvent,
+  InputLabel,
+  FormControl,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
@@ -49,6 +53,14 @@ import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ConfirmDialog } from '../components/SystemDialogs';
 import config from '../config';
 import { parseError } from '../utils/errors';
+import statisticsDom from './appTemplates/statistics.json';
+import imagesDom from './appTemplates/images.json';
+
+const APP_TEMPLATE_OPTIONS = [
+  { value: 'blank', label: 'Blank page', dom: null },
+  { value: 'stats', label: 'Statistics', dom: statisticsDom },
+  { value: 'images', label: 'Images', dom: imagesDom },
+];
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -57,8 +69,12 @@ export interface CreateAppDialogProps {
 
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
-
+  const [appTemplate, setAppTemplate] = React.useState(APP_TEMPLATE_OPTIONS[0].value);
   const [dom, setDom] = React.useState('');
+
+  const handleAppTemplateChange = React.useCallback((event: SelectChangeEvent<string>) => {
+    setAppTemplate(event.target.value);
+  }, []);
 
   const handleDomChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => setDom(event.target.value),
@@ -73,11 +89,16 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 
   return (
     <React.Fragment>
-      <Dialog {...props} onClose={onClose}>
+      <Dialog {...props} maxWidth="xs" onClose={onClose}>
         <DialogForm
           onSubmit={(event) => {
             event.preventDefault();
-            createAppMutation.mutate([name, { dom: dom.trim() ? JSON.parse(dom) : null }]);
+
+            const selectedAppTemplateDom =
+              APP_TEMPLATE_OPTIONS.find(({ value }) => value === appTemplate)?.dom || null;
+            const appDom = dom.trim() ? JSON.parse(dom) : selectedAppTemplateDom;
+
+            createAppMutation.mutate([name, { dom: appDom }]);
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
@@ -95,9 +116,28 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 setName(event.target.value);
               }}
             />
+
+            <FormControl sx={{ my: 1 }} fullWidth>
+              <InputLabel id="app-template-select-label">Use template</InputLabel>
+              <Select
+                id="app-template-select"
+                labelId="app-template-select-label"
+                label="Use template"
+                value={appTemplate}
+                onChange={handleAppTemplateChange}
+              >
+                {APP_TEMPLATE_OPTIONS.map(({ value, label }) => (
+                  <MenuItem key={value} value={value}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
             {config.integrationTest ? (
               <TextField
-                label="seed DOM"
+                sx={{ my: 1 }}
+                label="Seed DOM"
                 fullWidth
                 multiline
                 maxRows={10}

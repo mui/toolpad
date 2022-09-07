@@ -29,10 +29,6 @@ There are 5 most frequently used areas:
 - **Canvas** - this is a place where you build your app and immediately preview how it looks like
 - **Inspector** - modify properties of a different instance
 
-## See it in action
-
-TODO: embed our demo video from landing page?
-
 ## What's next?
 
 [Try to build your first app](/toolpad/getting-started/quickstart/)

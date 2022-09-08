@@ -39,9 +39,6 @@ export function evaluateExpression(
 function unwrapEvaluationResult(result: BindingEvaluationResult) {
   if (result.loading) {
     throw new Error(TOOLPAD_LOADING_MARKER);
-  } else if (result.error) {
-    return result.value;
-    throw result.error;
   } else {
     return result.value;
   }

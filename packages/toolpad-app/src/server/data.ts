@@ -1,13 +1,7 @@
 import { NodeId, BindableAttrValue } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import * as prisma from '../../prisma/generated/client';
-import {
-  ServerDataSource,
-  ApiResult,
-  VersionOrPreview,
-  GithubReleaseCache,
-  GithubRelease,
-} from '../types';
+import { ServerDataSource, ApiResult, VersionOrPreview } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -460,44 +454,4 @@ export async function loadDom(appId: string, version: VersionOrPreview = 'previe
  */
 export async function loadRenderTree(appId: string, version: VersionOrPreview = 'preview') {
   return appDom.createRenderTree(await loadDom(appId, version));
-}
-
-const LATEST_RELEASE_API_URL = 'https://api.github.com/repos/mui/mui-toolpad/releases/latest';
-
-const latestReleaseCache: GithubReleaseCache = {
-  nextFetchAllowedAt: Number.NEGATIVE_INFINITY,
-  release: null,
-};
-
-export async function getLatestToolpadRelease(): Promise<GithubRelease> {
-  const timestamp = Date.now();
-  if (latestReleaseCache.nextFetchAllowedAt > timestamp && latestReleaseCache.release) {
-    return latestReleaseCache.release;
-  }
-
-  // Abort the request after 30 seconds
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30_000);
-
-  /* Fetch the latest release from the Github API
-   * https://developer.github.com/v3/repos/releases/#get-the-latest-release
-   */
-
-  const response = await fetch(LATEST_RELEASE_API_URL, {
-    // Use AbortSignal.timeout() when https://github.com/microsoft/TypeScript/issues/48003 is fixed
-    signal: controller.signal,
-  });
-  if (response.ok) {
-    latestReleaseCache.release = response.json();
-    clearTimeout(timeout);
-  } else {
-    latestReleaseCache.release = null;
-    throw new Error(`Failed to fetch latest release from Github API: ${response.statusText}`);
-  }
-
-  // Allow the next request after ten minutes
-  latestReleaseCache.nextFetchAllowedAt = timestamp + 1000 * 60 * 10;
-
-  // Cache the promise and return it
-  return latestReleaseCache.release;
 }

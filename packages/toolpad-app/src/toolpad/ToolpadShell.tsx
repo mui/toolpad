@@ -101,7 +101,7 @@ function UpdateBanner() {
   }, [setDismissedVersion]);
 
   const hideBanner =
-    (latestRelease && latestRelease.tag_name === CURRENT_RELEASE_VERSION) ||
+    (latestRelease && latestRelease.tag === CURRENT_RELEASE_VERSION) ||
     dismissedVersion === CURRENT_RELEASE_VERSION;
 
   return (
@@ -127,7 +127,7 @@ function UpdateBanner() {
                   endIcon={<OpenInNewIcon fontSize="inherit" />}
                   component="a"
                   target="_blank"
-                  href={latestRelease.html_url}
+                  href={latestRelease.url}
                 >
                   View changelog
                 </Button>
@@ -143,7 +143,7 @@ function UpdateBanner() {
             }
             severity="info"
           >
-            A new version <strong>{latestRelease.tag_name}</strong> of Toolpad is available.
+            A new version <strong>{latestRelease.tag}</strong> of Toolpad is available.
           </Alert>
         </Collapse>
       ) : null}

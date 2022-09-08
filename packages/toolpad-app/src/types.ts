@@ -165,13 +165,3 @@ export interface AppTheme {
 }
 
 export type VersionOrPreview = 'preview' | number;
-
-export interface GithubRelease {
-  tag_name: string;
-  html_url: string;
-}
-
-export interface GithubReleaseCache {
-  nextFetchAllowedAt: number;
-  release: Promise<GithubRelease> | null;
-}

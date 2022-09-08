@@ -20,8 +20,8 @@ import {
   deleteApp,
   deploy,
   getDeployments,
-  getLatestToolpadRelease,
 } from '../../src/server/data';
+import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 
 interface RpcContext {

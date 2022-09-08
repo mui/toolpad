@@ -23,6 +23,8 @@ import { createHarLog, mergeHar } from '../../utils/har';
 import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
+import { tryFormat } from '../../utils/prettier';
+import useShortcut from '../../utils/useShortcut';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -154,7 +156,19 @@ function QueryEditor({
   const handleLogClear = React.useCallback(() => setPreviewLogs([]), []);
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const handleCommit = React.useCallback(() => onChange(input), [onChange, input]);
+  const handleCommit = React.useCallback(
+    () =>
+      onChange({
+        ...input,
+        query: {
+          ...input.query,
+          module: tryFormat(input.query.module),
+        },
+      }),
+    [onChange, input],
+  );
+
+  useShortcut({ code: 'KeyS', metaKey: true }, handleCommit);
 
   const isDirty = input !== value;
 

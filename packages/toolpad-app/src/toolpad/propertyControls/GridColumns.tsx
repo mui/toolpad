@@ -13,12 +13,14 @@ import {
   MenuItem,
   Stack,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import { GridColumns, GridColDef, GridAlignment } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { inferColumns } from '@mui/toolpad-components';
 import type { EditorProps } from '../../types';
 
@@ -59,11 +61,16 @@ function GridColumnsPropEditor({
   const rowsValue = nodeId && bindings[`${nodeId}.props.rows`];
   const definedRows: unknown = rowsValue?.value;
 
+  const inferredColumns = React.useMemo(
+    () => inferColumns(Array.isArray(definedRows) ? definedRows : []),
+    [definedRows],
+  );
+
   const columnSuggestions = React.useMemo(() => {
-    const inferred = inferColumns(Array.isArray(definedRows) ? definedRows : []);
     const existingFields = new Set(value.map(({ field }) => field));
-    return inferred.filter((column) => !existingFields.has(column.field));
-  }, [definedRows, value]);
+    return inferredColumns.filter((column) => !existingFields.has(column.field));
+  }, [inferredColumns, value]);
+  const hasColumnSuggestions = columnSuggestions.length > 0;
 
   const handleCreateColumn = React.useCallback(
     (suggestion: GridColDef) => () => {
@@ -98,6 +105,12 @@ function GridColumnsPropEditor({
     },
     [onChange, value],
   );
+
+  const handleRecreateColumns = React.useCallback(() => {
+    if (hasColumnSuggestions) {
+      onChange(inferredColumns);
+    }
+  }, [hasColumnSuggestions, inferredColumns, onChange]);
 
   return (
     <React.Fragment>
@@ -176,9 +189,22 @@ function GridColumnsPropEditor({
           <React.Fragment>
             <DialogTitle>Edit columns</DialogTitle>
             <DialogContent>
-              <IconButton aria-label="Add column" onClick={handleMenuClick} disabled={disabled}>
-                <AddIcon />
-              </IconButton>
+              <Tooltip describeChild title="Recreate columns">
+                <span>
+                  <IconButton
+                    aria-label="Recreate columns"
+                    onClick={handleRecreateColumns}
+                    disabled={!hasColumnSuggestions}
+                  >
+                    <RefreshIcon />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title="Add column">
+                <IconButton onClick={handleMenuClick} disabled={disabled}>
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
               <Menu
                 id="new-column-menu"
                 anchorEl={menuAnchorEl}
@@ -193,7 +219,7 @@ function GridColumnsPropEditor({
                     {suggestion.field}
                   </MenuItem>
                 ))}
-                <MenuItem onClick={handleCreateColumn({ field: 'new' })}>new column</MenuItem>
+                <MenuItem onClick={handleCreateColumn({ field: 'new' })}>New column</MenuItem>
               </Menu>
               <List>
                 {value.map((colDef, i) => {

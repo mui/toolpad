@@ -201,7 +201,6 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         hookResult[propName] = binding.value;
         error = error || binding.error;
 
-        console.log(bindingId, binding);
         if (binding.loading && loadingPropSourceSet.has(propName)) {
           loading = true;
         }

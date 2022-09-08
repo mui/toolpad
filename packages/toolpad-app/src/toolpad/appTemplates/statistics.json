@@ -1,141 +1,43 @@
 {
-  "root": "vkowdut",
+  "root": "l00ao64",
   "nodes": {
-    "1s23u4g": {
-      "id": "1s23u4g",
-      "name": "typography",
-      "type": "element",
-      "props": {
-        "value": {
-          "type": "jsExpression",
-          "value": "`foo ${textField1.value} bar`\n"
-        }
-      },
-      "layout": {},
-      "parentId": "uw13uls",
+    "0c03gfw": {
+      "id": "0c03gfw",
+      "name": "query",
+      "type": "query",
+      "params": {},
+      "parentId": "l11ao9l",
       "attributes": {
-        "component": {
+        "query": {
           "type": "const",
-          "value": "Typography"
-        }
-      },
-      "parentProp": "children",
-      "parentIndex": "a1"
-    },
-    "4t13u7b": {
-      "id": "4t13u7b",
-      "name": "pageRow2",
-      "type": "element",
-      "props": {},
-      "layout": {},
-      "parentId": "vlpwdwr",
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "PageRow"
-        }
-      },
-      "parentProp": "children",
-      "parentIndex": "a2"
-    },
-    "5w73u7v": {
-      "id": "5w73u7v",
-      "name": "pageRow1",
-      "type": "element",
-      "props": {},
-      "layout": {},
-      "parentId": "vlpwdwr",
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "PageRow"
-        }
-      },
-      "parentProp": "children",
-      "parentIndex": "a1"
-    },
-    "fb03uzl": {
-      "id": "fb03uzl",
-      "name": "textField1",
-      "type": "element",
-      "props": {
-        "fullWidth": {
-          "type": "const",
-          "value": true
+          "value": {
+            "url": {
+              "type": "const",
+              "value": "https://covid-19.dataflowkit.com/v1"
+            },
+            "method": "GET",
+            "headers": []
+          }
         },
-        "label": {
+        "dataSource": {
           "type": "const",
-          "value": "textField1"
+          "value": "rest"
+        },
+        "connectionId": {
+          "type": "const",
+          "value": null
         }
       },
-      "layout": {},
-      "parentId": "uw13uls",
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "TextField"
-        }
-      },
-      "parentProp": "children",
+      "parentProp": "queries",
       "parentIndex": "a0"
     },
-    "re63uod": {
-      "id": "re63uod",
-      "name": "textField2",
-      "type": "element",
-      "props": {
-        "defaultValue": {
-          "type": "const",
-          "value": "hello1"
-        },
-        "label": {
-          "type": "const",
-          "value": "textField2"
-        }
-      },
-      "layout": {},
-      "parentId": "5w73u7v",
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "TextField"
-        }
-      },
-      "parentProp": "children",
-      "parentIndex": "a0"
-    },
-    "sb03uuh": {
-      "id": "sb03uuh",
-      "name": "textField3",
-      "type": "element",
-      "props": {
-        "defaultValue": {
-          "type": "jsExpression",
-          "value": "page.parameters.msg\n"
-        },
-        "label": {
-          "type": "const",
-          "value": "textField3"
-        }
-      },
-      "layout": {},
-      "parentId": "4t13u7b",
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "TextField"
-        }
-      },
-      "parentProp": "children",
-      "parentIndex": "a0"
-    },
-    "uw13uls": {
-      "id": "uw13uls",
+    "3o23gk9": {
+      "id": "3o23gk9",
       "name": "pageRow",
       "type": "element",
       "props": {},
       "layout": {},
-      "parentId": "vlpwdwr",
+      "parentId": "l11ao9l",
       "attributes": {
         "component": {
           "type": "const",
@@ -145,8 +47,8 @@
       "parentProp": "children",
       "parentIndex": "a0"
     },
-    "vkowdut": {
-      "id": "vkowdut",
+    "l00ao64": {
+      "id": "l00ao64",
       "name": "Application",
       "type": "app",
       "parentId": null,
@@ -154,22 +56,80 @@
       "parentProp": null,
       "parentIndex": null
     },
-    "vlpwdwr": {
-      "id": "vlpwdwr",
+    "l11ao9l": {
+      "id": "l11ao9l",
       "name": "page1",
       "type": "page",
-      "parentId": "vkowdut",
+      "parentId": "l00ao64",
       "attributes": {
         "title": {
           "type": "const",
           "value": "Page 1"
-        },
-        "parameters": {
-          "type": "const",
-          "value": [["msg", "hello2"]]
         }
       },
       "parentProp": "pages",
+      "parentIndex": "a0"
+    },
+    "tv13ghy": {
+      "id": "tv13ghy",
+      "name": "dataGrid",
+      "type": "element",
+      "props": {
+        "rows": {
+          "type": "jsExpression",
+          "value": "query.data\n"
+        },
+        "height": {
+          "type": "const",
+          "value": 650
+        },
+        "columns": {
+          "type": "const",
+          "value": [
+            {
+              "type": "string",
+              "field": "Active Cases_text"
+            },
+            {
+              "type": "string",
+              "field": "Country_text"
+            },
+            {
+              "type": "string",
+              "field": "Last Update"
+            },
+            {
+              "type": "string",
+              "field": "New Cases_text"
+            },
+            {
+              "type": "string",
+              "field": "New Deaths_text"
+            },
+            {
+              "type": "string",
+              "field": "Total Cases_text"
+            },
+            {
+              "type": "string",
+              "field": "Total Deaths_text"
+            },
+            {
+              "type": "string",
+              "field": "Total Recovered_text"
+            }
+          ]
+        }
+      },
+      "layout": {},
+      "parentId": "3o23gk9",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "DataGrid"
+        }
+      },
+      "parentProp": "children",
       "parentIndex": "a0"
     }
   }

@@ -52,6 +52,18 @@
       ]
     },
     {
+      "groupName": "MUI X",
+      "matchPackageNames": [
+        "@mui/x-data-grid",
+        "@mui/x-data-grid",
+        "@mui/x-data-grid-pro",
+        "@mui/x-data-grid-premium",
+        "@mui/x-data-grid-generator",
+        "@mui/x-date-pickers",
+        "@mui/x-date-pickers-pro"
+      ]
+    },
+    {
       "groupName": "Playwright",
       "matchPackagePatterns": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"]
     }

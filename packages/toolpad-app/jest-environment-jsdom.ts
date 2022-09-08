@@ -10,15 +10,13 @@ export default class CustomJsdomEnvironment extends JsdomEnvironment {
     if (!this.global.TextDecoder) {
       this.global.TextDecoder = TextDecoder;
     } else {
-      // eslint-disable-next-line no-console
-      console.info('TextDecoder not polyfilled: running on a platform that supports TextDecoder');
+      throw new Error(`Unnecessary polyfill "TextDecoder"`);
     }
 
     if (!this.global.TextEncoder) {
       this.global.TextEncoder = TextEncoder;
     } else {
-      // eslint-disable-next-line no-console
-      console.info('TextEncoder not polyfilled: running on a platform that supports TextEncoder');
+      throw new Error(`Unnecessary polyfill "TextEncoder"`);
     }
 
     if (!this.global.fetch) {
@@ -27,8 +25,7 @@ export default class CustomJsdomEnvironment extends JsdomEnvironment {
       this.global.Request = Request;
       this.global.Response = Response;
     } else {
-      // eslint-disable-next-line no-console
-      console.info('Fetch API not polyfilled: running on a platform that supports fetch');
+      throw new Error(`Unnecessary polyfill "fetch"`);
     }
   }
 }

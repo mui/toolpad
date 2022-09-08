@@ -154,9 +154,9 @@ export class ToolpadEditor {
       await appCanvasFrame!.dispatchEvent(pageOverlaySelector, 'dragover', eventMousePosition);
       await appCanvasFrame!.dispatchEvent(pageOverlaySelector, 'drop', eventMousePosition);
       await appCanvasFrame!.dispatchEvent(pageOverlaySelector, 'dragend');
+    } else {
+      await this.page.mouse.up();
     }
-
-    await this.page.mouse.up();
   }
 
   async dragNewComponentToAppCanvas(componentName: string) {

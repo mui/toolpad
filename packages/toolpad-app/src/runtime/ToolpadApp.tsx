@@ -121,6 +121,7 @@ const EditorOverlay = styled('div')({
   position: 'absolute',
   inset: '0 0 0 0',
   pointerEvents: 'none',
+  overflow: 'hidden',
 });
 
 interface AppContext {

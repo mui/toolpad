@@ -1,7 +1,7 @@
 import { transform, TransformResult } from 'sucrase';
 import { codeFrameColumns } from '@babel/code-frame';
 import { findImports, isAbsoluteUrl } from '../utils/strings';
-import { parseError } from '../utils/errors';
+import { errorFrom } from '../utils/errors';
 import muiMaterialExports from './muiExports';
 
 async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<string, unknown>> {
@@ -61,7 +61,7 @@ export default async function loadModule(src: string): Promise<any> {
       transforms: ['jsx', 'typescript', 'imports'],
     });
   } catch (rawError) {
-    const err = parseError(rawError);
+    const err = errorFrom(rawError);
     if ((err as any).loc) {
       err.message = [err.message, codeFrameColumns(src, { start: (err as any).loc })].join('\n\n');
     }

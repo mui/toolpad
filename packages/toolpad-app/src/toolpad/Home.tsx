@@ -48,7 +48,7 @@ import useLocalStorageState from '../utils/useLocalStorageState';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ConfirmDialog } from '../components/SystemDialogs';
 import config from '../config';
-import { parseError } from '../utils/errors';
+import { errorFrom } from '../utils/errors';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -193,7 +193,7 @@ function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableP
           await client.mutation.updateApp(app.id, name);
           await client.invalidateQueries('getApps');
         } catch (rawError) {
-          setAppRenameError(parseError(rawError));
+          setAppRenameError(errorFrom(rawError));
           setEditing(true);
         }
       }

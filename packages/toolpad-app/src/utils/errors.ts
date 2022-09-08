@@ -1,7 +1,7 @@
 import { hasOwnProperty } from './collections';
 import { truncate } from './strings';
 
-export function parseError(maybeError: unknown): Error {
+export function errorFrom(maybeError: unknown): Error {
   if (maybeError instanceof Error) {
     return maybeError;
   }

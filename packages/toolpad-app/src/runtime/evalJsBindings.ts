@@ -1,6 +1,6 @@
 import { set } from 'lodash-es';
 import { mapValues } from '../utils/collections';
-import { parseError } from '../utils/errors';
+import { errorFrom } from '../utils/errors';
 
 let iframe: HTMLIFrameElement;
 function evaluateCode(code: string, globalScope: Record<string, unknown>) {
@@ -28,7 +28,7 @@ export function evaluateExpression(
     const value = evaluateCode(code, globalScope);
     return { value };
   } catch (rawError) {
-    const error = parseError(rawError);
+    const error = errorFrom(rawError);
     if (error?.message === TOOLPAD_LOADING_MARKER) {
       return { loading: true };
     }

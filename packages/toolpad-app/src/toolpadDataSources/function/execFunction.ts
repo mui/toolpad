@@ -9,6 +9,7 @@ import { LogEntry } from '../../components/Console';
 import { FetchOptions } from './runtime/types';
 import projectRoot from '../../server/projectRoot';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
+import { errorFrom } from '../../utils/errors';
 
 async function fetchRuntimeModule() {
   const filePath = path.resolve(projectRoot, './src/toolpadDataSources/function/dist/index.js');
@@ -117,7 +118,6 @@ export default async function execFunction(
   await jail.delete('TOOLPAD_BRIDGE');
 
   let data;
-  let error: Error | undefined;
 
   try {
     const { code: userModuleJs } = await esbuild.transform(code, {
@@ -139,8 +139,8 @@ export default async function execFunction(
       timeout: 30000,
     });
   } catch (userError) {
-    error = userError instanceof Error ? userError : new Error(String(userError));
+    throw errorFrom(userError);
   }
 
-  return { data, logs, error, har };
+  return { data, logs, har };
 }

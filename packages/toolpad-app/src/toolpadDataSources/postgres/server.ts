@@ -1,6 +1,6 @@
 import { Client, QueryConfig } from 'pg';
 import { ServerDataSource } from '../../types';
-import { parseError } from '../../utils/errors';
+import { errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
 import {
   PostgresConnectionParams,
@@ -68,7 +68,7 @@ async function execBase(
       data: res.rows,
     };
   } catch (rawError) {
-    const error = parseError(rawError);
+    const error = errorFrom(rawError);
     error.message = parseErrorMessage(error.message, paramEntries);
     throw error;
   } finally {
@@ -103,7 +103,7 @@ async function execPrivate(
         await client.query('SELECT * FROM version();');
         return { error: null };
       } catch (rawError) {
-        const err = parseError(rawError);
+        const err = errorFrom(rawError);
         return { error: err.message };
       }
     }

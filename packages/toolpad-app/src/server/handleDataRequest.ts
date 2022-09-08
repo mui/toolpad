@@ -5,7 +5,8 @@ import { execQuery, loadDom } from './data';
 import initMiddleware from './initMiddleware';
 import { VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
-import { parseError } from '../utils/errors';
+import { errorFrom } from '../utils/errors';
+
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
   // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -50,6 +51,6 @@ export default async (
     const result = await execQuery(appId, dataNode, req.body);
     res.json(result);
   } catch (error) {
-    res.json({ error: serializeError(parseError(error)) });
+    res.json({ error: serializeError(errorFrom(error)) });
   }
 };

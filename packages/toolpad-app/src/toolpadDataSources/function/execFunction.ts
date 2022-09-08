@@ -118,6 +118,7 @@ export default async function execFunction(
   await jail.delete('TOOLPAD_BRIDGE');
 
   let data;
+  let error: Error | undefined;
 
   try {
     const { code: userModuleJs } = await esbuild.transform(code, {
@@ -139,8 +140,8 @@ export default async function execFunction(
       timeout: 30000,
     });
   } catch (userError) {
-    throw errorFrom(userError);
+    error = errorFrom(userError);
   }
 
-  return { data, logs, har };
+  return { data, logs, error, har };
 }

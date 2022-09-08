@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
-import { ExecFetchResult, NodeId } from '@mui/toolpad-core';
+import { ExecFetchResult, NodeId, SerializedError } from '@mui/toolpad-core';
 import { execQuery, loadDom } from './data';
 import initMiddleware from './initMiddleware';
 import { VersionOrPreview } from '../types';
@@ -17,9 +17,18 @@ const cors = initMiddleware<any>(
   }),
 );
 
-function serializeError(error: Error) {
+function serializeError(error: Error): SerializedError {
   const { message, name, stack } = error;
   return { message, name, stack };
+}
+
+function withSerializedError<T extends { error?: unknown }>(
+  withError: T,
+): Omit<T, 'error'> & { error?: SerializedError } {
+  const { error, ...withouError } = withError;
+  return withError.error
+    ? { ...withouError, error: serializeError(errorFrom(error)) }
+    : withouError;
 }
 
 export interface HandleDataRequestParams {
@@ -49,8 +58,8 @@ export default async (
 
   try {
     const result = await execQuery(appId, dataNode, req.body);
-    res.json(result);
+    res.json(withSerializedError(result));
   } catch (error) {
-    res.json({ error: serializeError(errorFrom(error)) });
+    res.json(withSerializedError({ error }));
   }
 };

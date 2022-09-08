@@ -36,7 +36,7 @@
       "enabled": false
     },
     {
-      "groupName": "node",
+      "groupName": "postgres",
       "matchPackageNames": ["cimg/postgres"],
       "enabled": false
     },

@@ -119,6 +119,8 @@ export default function evalJsBindings(
   }
 
   const computationStatuses = new Map<string, { result: null | BindingEvaluationResult }>();
+  let currentParentBinding: string | undefined;
+  const dependencies = new Map<string, Set<string>>();
 
   let proxiedScope: Record<string, unknown>;
 
@@ -130,6 +132,15 @@ export default function evalJsBindings(
 
     if (!binding) {
       return null;
+    }
+
+    if (currentParentBinding) {
+      let bindingDependencies = dependencies.get(currentParentBinding);
+      if (!bindingDependencies) {
+        bindingDependencies = new Set();
+        dependencies.set(currentParentBinding, bindingDependencies);
+      }
+      bindingDependencies.add(bindingId);
     }
 
     const expression = binding.expression;
@@ -147,7 +158,10 @@ export default function evalJsBindings(
 
       // use null to mark as "computing"
       computationStatuses.set(expression, { result: null });
+      const prevContext = currentParentBinding;
+      currentParentBinding = bindingId;
       const result = evaluateExpression(expression, proxiedScope);
+      currentParentBinding = prevContext;
       computationStatuses.set(expression, { result });
       // From freshly computed
       return result;

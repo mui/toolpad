@@ -12,7 +12,7 @@ services:
       - '3000:3000'
 
   postgres:
-    image: postgres:14.2
+    image: postgres:14.5
     restart: always
     environment:
       - POSTGRES_USER=postgres

@@ -128,7 +128,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             fontSize: theme.typography[typographyVariant].fontSize,
-            height: `calc(${theme.typography[typographyVariant].fontSize} + 2px)`,
+            height: `1.1em`,
           }),
         }}
         onKeyUp={handleInput}

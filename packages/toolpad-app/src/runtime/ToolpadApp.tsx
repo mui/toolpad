@@ -597,8 +597,7 @@ function parseBindings(
             elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
             appDom.createConst(argType?.defaultValue ?? undefined);
           const bindingId = `${elm.id}.layout.${propName}`;
-          const scopePath = `${elm.name}.@layout.${propName}`;
-          parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
+          parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
         }
       }
     }

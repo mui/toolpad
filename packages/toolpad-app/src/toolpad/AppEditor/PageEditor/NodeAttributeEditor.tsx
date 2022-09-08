@@ -40,14 +40,17 @@ export default function NodeAttributeEditor({
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
   // to make them bindable to other controlled props only
-  const isBindable = !argType.onChangeHandler;
+  const isDisabled = !!argType.onChangeHandler;
+
+  const isBindable = !isDisabled && namespace !== 'layout';
 
   return Control ? (
     <BindableEditor
       liveBinding={liveBinding}
       globalScope={globalScope}
       label={argType.label || name}
-      disabled={!isBindable}
+      bindable={isBindable}
+      disabled={isDisabled}
       propType={propType}
       renderControl={(params) => <Control nodeId={node.id} {...params} propType={propType} />}
       value={propValue}

@@ -3,7 +3,7 @@ import { ToolpadHome } from '../../models/ToolpadHome';
 import { test } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 
-test.only('components', async ({ page }) => {
+test('components', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './componentsDom.json'));
   const { id: pageId } = Object.values(dom.nodes).find(
     (node: any) => node.name === 'components',

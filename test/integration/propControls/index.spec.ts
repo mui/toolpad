@@ -40,6 +40,8 @@ test('can control component prop values in properties control panel', async ({
   const firstInputLocator = canvasInputLocator.first();
   await clickCenter(page, firstInputLocator);
 
+  await editorModel.componentEditor.waitFor();
+
   const labelControlInputValue = await editorModel.componentEditor
     .locator(`label:text-is("label")`)
     .inputValue();

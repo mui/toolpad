@@ -9,6 +9,13 @@ const LIBS = [
   { name: 'react' },
   { name: 'react-dom' },
   { name: '@mui/material' },
+  { name: '@mui/toolpad-core' },
+  { name: '@mui/x-date-pickers' },
+  { name: '@mui/x-date-pickers-pro' },
+  { name: '@mui/x-data-grid' },
+  { name: '@mui/x-data-grid-pro' },
+  { name: '@mui/x-data-grid-generator' },
+  { name: 'dayjs' },
   // TODO: we need to analyze imports of the definition files and include those libs automatically
   { name: 'csstype' },
   { name: 'react-transition-group' },
@@ -16,9 +23,6 @@ const LIBS = [
   { name: '@mui/types' },
   { name: '@mui/system' },
   { name: '@mui/utils' },
-  { name: '@mui/toolpad-core' },
-  { name: '@mui/x-date-pickers' },
-  { name: '@mui/x-data-grid-pro' },
 ];
 
 function getModuleId(fileName: string, pkgDir: string, pkgName: string) {
@@ -82,14 +86,13 @@ async function main() {
     )
   ).flat();
 
-  const result: Record<string, string> = Object.assign(
-    {},
-    ...(await Promise.all(
-      allFiles.map(async ({ filename, moduleId }) => {
-        return { [moduleId]: await fs.readFile(filename, { encoding: 'utf-8' }) };
-      }),
-    )),
+  const results = await Promise.all(
+    allFiles.map(async ({ filename, moduleId }) => {
+      return { [moduleId]: await fs.readFile(filename, { encoding: 'utf-8' }) };
+    }),
   );
+
+  const result: Record<string, string> = Object.assign({}, ...results);
 
   await fs.writeFile(path.resolve(__dirname, '../public/typings.json'), JSON.stringify(result), {
     encoding: 'utf-8',

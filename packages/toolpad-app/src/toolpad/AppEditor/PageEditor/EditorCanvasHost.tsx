@@ -146,6 +146,8 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         return undefined;
       }
 
+      setEditorOverlayRoot(contentWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
+
       const observer = new MutationObserver(() => {
         setEditorOverlayRoot(contentWindow.document.getElementById(HTML_ID_EDITOR_OVERLAY));
       });

@@ -1,7 +1,6 @@
 import { TextDecoder, TextEncoder } from 'util';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 
-// my-custom-environment
 const JsdomEnvironment = require('jest-environment-jsdom').default;
 
 export default class CustomJsdomEnvironment extends JsdomEnvironment {

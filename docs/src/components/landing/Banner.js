@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { alpha } from '@mui/material/styles';
+import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
@@ -11,16 +12,21 @@ import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRou
 export default function Banner(props) {
   const { content } = props;
   return (
-    <Container
+    <Box
       sx={{
-        pb: { xs: 2, sm: 4, md: 8 },
-        pt: { xs: 0, sm: 1, md: 2 },
         bgcolor: (theme) =>
           theme.palette.mode === 'dark' ? theme.palette.primaryDark[900] : theme.palette.grey[50],
       }}
-      maxWidth="100vw"
     >
-      <Container>
+      <Container
+        sx={{
+          pt: 0,
+          pb: { xs: 2, sm: 8, md: 16 },
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+        }}
+      >
         <Stack
           sx={{
             borderRadius: 1,
@@ -37,6 +43,7 @@ export default function Banner(props) {
               xs: 'column',
               sm: 'row',
             },
+            width: '100%',
             justifyContent: 'space-between',
             alignItems: { xs: 'flex-start', sm: 'center' },
           }}
@@ -72,7 +79,7 @@ export default function Banner(props) {
           </Button>
         </Stack>
       </Container>
-    </Container>
+    </Box>
   );
 }
 

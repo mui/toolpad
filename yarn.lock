@@ -2510,10 +2510,10 @@
   dependencies:
     tslib "^2.4.0"
 
-"@swc/wasm@^1.2.208":
-  version "1.2.248"
-  resolved "https://registry.yarnpkg.com/@swc/wasm/-/wasm-1.2.248.tgz#4f21a611f42b0d65e4bf70e973fac74dbc43bdf3"
-  integrity sha512-ZoSxg3SR7lxp//6uJRnQKURRwjvwuUSaag9zPfi/NDJ0W4d2jXP/Sg2wFGiqetUX4eZtQPA+gE6wzzeCxHB5hg==
+"@swc/wasm@^1.2.249":
+  version "1.2.249"
+  resolved "https://registry.yarnpkg.com/@swc/wasm/-/wasm-1.2.249.tgz#85cbd079f82fabf5f117de5a04fe5759a3d13147"
+  integrity sha512-Zz5d2D5D1jzuaCiG5BzkmPes6xTbBmpdFfVDJFtNph9Z8r3JtWQudPuDQsxhwk1w7jUj+jD8W/CrzfuvvCxdyg==
 
 "@tanstack/query-core@4.2.3":
   version "4.2.3"

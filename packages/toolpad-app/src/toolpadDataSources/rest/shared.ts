@@ -2,6 +2,8 @@ import { ensureSuffix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import { Authentication } from './types';
 
+export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
+
 export function getAuthenticationHeaders(auth: Maybe<Authentication>): [string, string][] {
   if (!auth) {
     return [];

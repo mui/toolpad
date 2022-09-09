@@ -17,11 +17,11 @@ import {
   TOOLPAD_COMPONENT,
   Slots,
   Placeholder,
-  BindableAttrValues,
   NodeId,
   execDataSourceQuery,
   BindableAttrValue,
   UseDataQueryConfig,
+  NestedBindableAttrs,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -39,7 +39,7 @@ import {
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
-import { pick } from 'lodash-es';
+import * as _ from 'lodash-es';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
@@ -57,7 +57,7 @@ import evalJsBindings, {
   evaluateExpression,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_APP_ROOT, HTML_ID_EDITOR_OVERLAY } from '../constants';
+import { HTML_ID_EDITOR_OVERLAY } from '../constants';
 import { mapProperties, mapValues } from '../utils/collections';
 import usePageTitle from '../utils/usePageTitle';
 import ComponentsContext, { useComponents, useComponent } from './ComponentsContext';
@@ -382,14 +382,51 @@ const PageRootComponent = createComponent(PageRoot, {
   },
 });
 
+/**
+ * Turns an object consisting of a nested structure of BindableAttrValues
+ * into a flat array of relative paths associated with their value.
+ * Example:
+ *   { foo: { bar: { type: 'const', value:1 } }, baz: [{ type: 'jsExpression', value: 'quux' }] }
+ *   =>
+ *   [['.foo.bar', { type: 'const', value:1 }],
+ *    ['.baz[0]', { type: 'jsExpression', value: 'quux' }]]
+ */
+function flattenNestedBindables(
+  params?: NestedBindableAttrs,
+  prefix = '',
+): [string, BindableAttrValue<any>][] {
+  if (!params) {
+    return [];
+  }
+  if (Array.isArray(params)) {
+    return params.flatMap((param, i) => {
+      return flattenNestedBindables(param[1], `${prefix}[${i}][1]`);
+    });
+  }
+  // TODO: create a marker in bindables (similar to $$ref) to recognize them automatically
+  // in a nested structure. This would allow us to build deeply nested structures
+  if (typeof params.type === 'string') {
+    return [[prefix, params as BindableAttrValue<any>]];
+  }
+  return Object.entries(params).flatMap(([key, param]) =>
+    flattenNestedBindables(param, `${prefix}.${key}`),
+  );
+}
+
 function resolveBindables(
   bindings: Partial<Record<string, BindingEvaluationResult>>,
   bindingId: string,
-  params?: BindableAttrValues<any>,
+  params?: NestedBindableAttrs,
 ): Record<string, unknown> {
-  return params
-    ? mapProperties(params, ([propName]) => [propName, bindings[`${bindingId}.${propName}`]?.value])
-    : {};
+  const result: any = _.cloneDeep(params) || {};
+  const resultKey = 'value';
+  const flattened = flattenNestedBindables(params);
+  for (const [path] of flattened) {
+    const resolvedValue = bindings[`${bindingId}${path}`]?.value;
+    _.set(result, `${resultKey}${path}`, resolvedValue);
+  }
+
+  return result[resultKey] || {};
 }
 
 interface QueryNodeProps {
@@ -405,7 +442,7 @@ function QueryNode({ node }: QueryNodeProps) {
   const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
-  const configBindings = pick(node.attributes, ...USE_DATA_QUERY_CONFIG_KEYS);
+  const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
   const queryResult = useDataQuery(dataUrl, queryId, params, options);
 
@@ -420,8 +457,8 @@ function QueryNode({ node }: QueryNodeProps) {
     // Here we propagate the error and loading state to the data and rows prop prop
     // TODO: is there a straightforward way for us to generalize this behavior?
     setControlledBinding(`${node.id}.isLoading`, { value: isLoading });
+    setControlledBinding(`${node.id}.error`, { value: error });
     const deferredStatus = { loading: isLoading, error };
-    setControlledBinding(`${node.id}.error`, { ...deferredStatus, value: error });
     setControlledBinding(`${node.id}.data`, { ...deferredStatus, value: data });
     setControlledBinding(`${node.id}.rows`, { ...deferredStatus, value: rows });
   }, [node.id, queryResult, setControlledBinding]);
@@ -478,7 +515,7 @@ interface ParseBindingOptions {
   scopePath?: string;
 }
 
-function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions) {
+function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBindingOptions = {}) {
   if (bindable?.type === 'const') {
     return {
       scopePath,
@@ -497,6 +534,21 @@ function parseBinding(bindable: BindableAttrValue<any>, { scopePath }: ParseBind
   };
 }
 
+function parsedBindingEqual(
+  binding1: ParsedBinding | undefined,
+  binding2: ParsedBinding | undefined,
+): boolean {
+  if (
+    (!binding1 && !binding2) ||
+    (binding1?.expression === binding2?.expression &&
+      binding1?.result?.value === binding2?.result?.value &&
+      binding1?.initializer === binding2?.initializer)
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function parseBindings(
   dom: appDom.AppDom,
   page: appDom.PageNode,
@@ -509,26 +561,29 @@ function parseBindings(
   const controlled = new Set<string>();
 
   for (const elm of elements) {
-    if (appDom.isElement(elm)) {
+    if (appDom.isElement<any>(elm)) {
       const componentId = getComponentId(elm);
       const Component = components[componentId];
 
       const { argTypes = {} } = Component?.[TOOLPAD_COMPONENT] ?? {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
-        const binding =
+        const initializerId = argType?.defaultValueProp
+          ? `${elm.id}.props.${argType.defaultValueProp}`
+          : undefined;
+
+        const binding: BindableAttrValue<any> =
           elm.props?.[propName] || appDom.createConst(argType?.defaultValue ?? undefined);
+
         const bindingId = `${elm.id}.props.${propName}`;
         const scopePath =
           componentId === PAGE_ROW_COMPONENT_ID ? undefined : `${elm.name}.${propName}`;
         if (argType) {
           if (argType.onChangeProp) {
-            const defaultValue: unknown =
-              binding?.type === 'const' ? binding?.value : argType.defaultValue;
             controlled.add(bindingId);
             parsedBindingsMap.set(bindingId, {
               scopePath,
-              result: { value: defaultValue },
+              initializer: initializerId,
             });
           } else {
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
@@ -542,17 +597,18 @@ function parseBindings(
             elm.layout?.[propName as keyof typeof layoutBoxArgTypes] ||
             appDom.createConst(argType?.defaultValue ?? undefined);
           const bindingId = `${elm.id}.layout.${propName}`;
-          const scopePath = `${elm.name}.@layout.${propName}`;
-          parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
+          parsedBindingsMap.set(bindingId, parseBinding(binding, {}));
         }
       }
     }
 
     if (appDom.isQuery(elm)) {
       if (elm.params) {
-        for (const [paramName, paramValue] of Object.entries(elm.params)) {
-          const bindingId = `${elm.id}.params.${paramName}`;
-          const scopePath = `${elm.name}.params.${paramName}`;
+        const nestedBindablePaths = flattenNestedBindables(elm.params);
+
+        for (const [nestedPath, paramValue] of nestedBindablePaths) {
+          const bindingId = `${elm.id}.params${nestedPath}`;
+          const scopePath = `${elm.name}.params${nestedPath}`;
           const bindable = paramValue || appDom.createConst(undefined);
           parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
         }
@@ -568,10 +624,13 @@ function parseBindings(
         });
       }
 
-      for (const configName of USE_DATA_QUERY_CONFIG_KEYS) {
-        const bindingId = `${elm.id}.config.${configName}`;
-        const scopePath = `${elm.name}.config.${configName}`;
-        const bindable = elm.attributes[configName] || appDom.createConst(undefined);
+      const configBindings = _.pick(elm.attributes, USE_DATA_QUERY_CONFIG_KEYS);
+      const nestedBindablePaths = flattenNestedBindables(configBindings);
+
+      for (const [nestedPath, paramValue] of nestedBindablePaths) {
+        const bindingId = `${elm.id}.config${nestedPath}`;
+        const scopePath = `${elm.name}.config${nestedPath}`;
+        const bindable = paramValue || appDom.createConst(undefined);
         parsedBindingsMap.set(bindingId, parseBinding(bindable, { scopePath }));
       }
     }
@@ -648,7 +707,23 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
       for (const [key, binding] of Object.entries(parsedBindings)) {
-        updated[key] = controlled.has(key) ? existingBindings[key] || binding : binding;
+        let shouldUpdateBinding = false;
+
+        if (controlled.has(key)) {
+          // controlled bindings don't get updated, unless their initialValue has changed
+          if (binding.initializer) {
+            const initializer: ParsedBinding | undefined = parsedBindings[binding.initializer];
+            const existingInitializer: ParsedBinding | undefined =
+              existingBindings[binding.initializer];
+            if (!parsedBindingEqual(initializer, existingInitializer)) {
+              shouldUpdateBinding = true;
+            }
+          }
+        } else {
+          shouldUpdateBinding = true;
+        }
+
+        updated[key] = shouldUpdateBinding ? binding : existingBindings[key] || binding;
       }
       return updated;
     });
@@ -779,6 +854,7 @@ const queryClient = new QueryClient({
 });
 
 export interface ToolpadAppProps {
+  rootRef?: React.Ref<HTMLDivElement>;
   hidePreviewBanner?: boolean;
   basename: string;
   appId: string;
@@ -787,6 +863,7 @@ export interface ToolpadAppProps {
 }
 
 export default function ToolpadApp({
+  rootRef,
   basename,
   appId,
   version,
@@ -800,7 +877,7 @@ export default function ToolpadApp({
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
   return (
-    <AppRoot id={HTML_ID_APP_ROOT}>
+    <AppRoot ref={rootRef}>
       <NoSsr>
         <DomContextProvider value={dom}>
           <AppThemeProvider dom={dom}>

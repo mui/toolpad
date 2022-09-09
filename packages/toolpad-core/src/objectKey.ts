@@ -1,6 +1,6 @@
 // TODO: Create a @mui/toolpad-utils package to house utilities like this one?
 
-const weakMap = new WeakMap<any, string>();
+const weakMap = new WeakMap<object, string>();
 let nextId = 0;
 
 function getNextId(): string {
@@ -12,7 +12,7 @@ function getNextId(): string {
 /**
  * Used to generate ids for object instances.
  */
-export function getObjectKey(object: any): string {
+export function getObjectKey(object: object): string {
   let id = weakMap.get(object);
   if (!id) {
     id = getNextId();

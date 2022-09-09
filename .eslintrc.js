@@ -56,6 +56,15 @@ module.exports = {
     // Turning react/jsx-key back on.
     // https://github.com/airbnb/javascript/blob/5155aa5fc1ea9bb2c6493a06ddbd5c7a05414c86/packages/eslint-config-airbnb/rules/react.js#L94
     'react/jsx-key': ['error', { checkKeyMustBeforeSpread: true, warnOnDuplicates: true }],
+    // This got turned of in the mono-repo:
+    // See https://github.com/mui/mui-toolpad/pull/866#discussion_r957222171
+    'react/no-unused-prop-types': [
+      'error',
+      {
+        customValidators: [],
+        skipShapeProps: true,
+      },
+    ],
   },
   overrides: [
     {
@@ -65,7 +74,6 @@ module.exports = {
         '@next/next/no-html-link-for-pages': ['error', 'packages/toolpad-app/pages/'],
       },
     },
-    ...baseline.overrides,
     {
       // Disabling this rule for now:
       // https://github.com/mui/material-ui/blob/9737bc85bb6960adb742e7709e9c3710c4b6cedd/.eslintrc.js#L359

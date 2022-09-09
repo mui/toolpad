@@ -56,7 +56,7 @@ export function useDataQuery(
   const {
     isLoading,
     isFetching,
-    error,
+    error: fetchError,
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
@@ -68,7 +68,9 @@ export function useDataQuery(
     },
   );
 
-  const { data } = responseData;
+  const { data, error: apiError } = responseData;
+
+  const error = apiError || fetchError;
 
   const rows = Array.isArray(data) ? data : EMPTY_ARRAY;
 

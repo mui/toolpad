@@ -1,6 +1,8 @@
 import { transform, TransformResult } from 'sucrase';
 import { codeFrameColumns } from '@babel/code-frame';
 import { findImports, isAbsoluteUrl } from '../utils/strings';
+import { errorFrom } from '../utils/errors';
+import muiMaterialExports from './muiExports';
 
 async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<string, unknown>> {
   const resolved = await Promise.all(input.values());
@@ -9,16 +11,18 @@ async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<
 
 async function createRequire(urlImports: string[]) {
   const modules = await resolveValues(
-    new Map<string, any>([
+    new Map<string, Promise<any>>([
+      // These import('...') are passed static strings so that webpack knows how to resolve them at build time.
+      // Don't change
       ['react', import('react')],
+      ['dayjs', import('dayjs')],
       ['react-dom', import('react-dom')],
       ['@mui/toolpad-core', import(`@mui/toolpad-core`)],
-      ['@mui/material', import('@mui/material')],
-      ['@mui/x-data-grid-pro', import('@mui/x-data-grid-pro')],
-      ['@mui/x-date-pickers', import('@mui/x-date-pickers')],
+
       ['@mui/icons-material', import('@mui/icons-material')],
-      ['@mui/material/Button', import('@mui/material/Button')],
-      // ... TODO: All @mui/material imports
+
+      ...muiMaterialExports,
+
       ...urlImports.map((url) => [url, import(/* webpackIgnore: true */ url)] as const),
     ]),
   );
@@ -56,9 +60,10 @@ export default async function loadModule(src: string): Promise<any> {
     compiled = transform(src, {
       transforms: ['jsx', 'typescript', 'imports'],
     });
-  } catch (err: any) {
-    if (err.loc) {
-      err.message = [err.message, codeFrameColumns(src, { start: err.loc })].join('\n\n');
+  } catch (rawError) {
+    const err = errorFrom(rawError);
+    if ((err as any).loc) {
+      err.message = [err.message, codeFrameColumns(src, { start: (err as any).loc })].join('\n\n');
     }
     throw err;
   }

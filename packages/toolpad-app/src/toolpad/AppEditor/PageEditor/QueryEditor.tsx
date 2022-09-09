@@ -17,12 +17,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import {
-  BindableAttrEntries,
-  BindableAttrValue,
-  BindableAttrValues,
-  NodeId,
-} from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -37,8 +32,61 @@ import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import ConnectionSelect, { ConnectionOption } from './ConnectionSelect';
 import BindableEditor from './BindableEditor';
 import { createProvidedContext } from '../../../utils/react';
+import { ConfirmDialog } from '../../../components/SystemDialogs';
+import useBoolean from '../../../utils/useBoolean';
 
 const EMPTY_OBJECT = {};
+
+interface QueryeditorDialogActionsProps {
+  saveDisabled?: boolean;
+  onCommit?: () => void;
+  onRemove?: () => void;
+  onClose?: () => void;
+}
+
+function QueryeditorDialogActions({
+  saveDisabled,
+  onCommit,
+  onRemove,
+  onClose,
+}: QueryeditorDialogActionsProps) {
+  const handleCommit = () => {
+    onCommit?.();
+    onClose?.();
+  };
+
+  const {
+    value: removeConfirmOpen,
+    setTrue: handleRemoveConfirmOpen,
+    setFalse: handleRemoveConfirmclose,
+  } = useBoolean(false);
+
+  const handleRemoveConfirm = React.useCallback(
+    (confirmed: boolean) => {
+      handleRemoveConfirmclose();
+      if (confirmed) {
+        onRemove?.();
+        onClose?.();
+      }
+    },
+    [handleRemoveConfirmclose, onClose, onRemove],
+  );
+
+  return (
+    <DialogActions>
+      <Button color="inherit" variant="text" onClick={onClose}>
+        Cancel
+      </Button>
+      <Button onClick={handleRemoveConfirmOpen}>Remove</Button>
+      <ConfirmDialog open={removeConfirmOpen} onClose={handleRemoveConfirm} severity="error">
+        Are you sure your want to remove this query?
+      </ConfirmDialog>
+      <Button disabled={saveDisabled} onClick={handleCommit}>
+        Save
+      </Button>
+    </DialogActions>
+  );
+}
 
 interface RenderDialogActions {
   (params: { isDirty?: boolean; onCommit?: () => void }): React.ReactNode;
@@ -152,27 +200,25 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
   );
 }
 
-interface QueryNodeEditorProps<Q, P> {
+interface QueryNodeEditorProps<Q> {
   open: boolean;
   onClose: () => void;
   onSave: (newNode: appDom.QueryNode) => void;
   onRemove: (newNode: appDom.QueryNode) => void;
-  node: appDom.QueryNode<Q, P>;
+  node: appDom.QueryNode<Q>;
 }
 
-function QueryNodeEditorDialog<Q, P>({
+function QueryNodeEditorDialog<Q>({
   open,
   node,
   onClose,
   onRemove,
   onSave,
-}: QueryNodeEditorProps<Q, P>) {
+}: QueryNodeEditorProps<Q>) {
   const { appId } = usePageEditorState();
   const dom = useDom();
 
-  const [input, setInput] = React.useState<appDom.QueryNode<Q, P>>(
-    appDom.fromLegacyQueryNode(node),
-  );
+  const [input, setInput] = React.useState<appDom.QueryNode<Q>>(appDom.fromLegacyQueryNode(node));
   React.useEffect(() => {
     if (open) {
       setInput(appDom.fromLegacyQueryNode(node));
@@ -207,7 +253,7 @@ function QueryNodeEditorDialog<Q, P>({
           attributes: update(input.attributes, {
             query: appDom.createConst(model.query),
           }),
-          params: Object.fromEntries(model.params) as BindableAttrValues<P>,
+          params: Object.fromEntries(model.params),
         }),
       );
     },
@@ -410,15 +456,12 @@ function QueryNodeEditorDialog<Q, P>({
   const renderDialogActions: RenderDialogActions = React.useCallback(
     ({ isDirty, onCommit }) => {
       return (
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleRemove}>Remove</Button>
-          <Button disabled={isInputSaved && !isDirty} onClick={onCommit}>
-            Save
-          </Button>
-        </DialogActions>
+        <QueryeditorDialogActions
+          onCommit={onCommit}
+          onClose={handleClose}
+          onRemove={handleRemove}
+          saveDisabled={isInputSaved && !isDirty}
+        />
       );
     },
     [handleClose, handleRemove, isInputSaved],

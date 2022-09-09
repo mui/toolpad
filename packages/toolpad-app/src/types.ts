@@ -7,6 +7,7 @@ import {
   NodeId,
   PropValueType,
   BindableAttrEntries,
+  ExecFetchResult,
 } from '@mui/toolpad-core';
 
 import { PaletteMode } from '@mui/material';
@@ -63,17 +64,6 @@ export interface PageViewState {
   nodes: NodesInfo;
 }
 
-export type ApiResultFields<D = any> = {
-  [K in keyof D]?: {
-    type: string;
-  };
-};
-
-export interface ApiResult<D = any> {
-  data: D;
-  fields?: ApiResultFields;
-}
-
 export interface CreateHandlerApi<P = unknown> {
   setConnectionParams: (appId: string, connectionId: string, props: P) => Promise<void>;
   getConnectionParams: (appId: string, connectionId: string) => Promise<P>;
@@ -97,23 +87,23 @@ export interface QueryEditorShellProps {
   onCommit?: () => void;
 }
 
-export interface QueryEditorProps<P, Q> extends WithControlledProp<QueryEditorModel<Q>> {
+export interface QueryEditorProps<C, Q> extends WithControlledProp<QueryEditorModel<Q>> {
   QueryEditorShell: React.ComponentType<QueryEditorShellProps>;
-  connectionParams: Maybe<P>;
+  connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
 }
 
-export type QueryEditor<P, Q = {}> = React.FC<QueryEditorProps<P, Q>>;
+export type QueryEditor<C, Q> = React.FC<QueryEditorProps<C, Q>>;
 
 export interface ConnectionStatus {
   timestamp: number;
   error?: string;
 }
 
-export interface ClientDataSource<P = {}, Q = {}> {
+export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
-  ConnectionParamsInput: ConnectionParamsEditor<P>;
-  QueryEditor: QueryEditor<P, Q>;
+  ConnectionParamsInput: ConnectionParamsEditor<C>;
+  QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
 }
@@ -122,7 +112,7 @@ export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
   execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<any>;
   // Execute a query on this connection, intended for viewers
-  exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ApiResult<D>>;
+  exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ExecFetchResult<D>>;
   createHandler?: () => (
     api: CreateHandlerApi<P>,
     req: NextApiRequest,

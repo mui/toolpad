@@ -61,6 +61,11 @@ export type BindableAttrValue<V> =
 
 export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
+export type NestedBindableAttrs =
+  | BindableAttrValue<any>
+  | BindableAttrValues<any>
+  | [string, BindableAttrValue<any>][];
+
 export type BindableAttrValues<P = Record<string, unknown>> = {
   readonly [K in keyof P]?: BindableAttrValue<P[K]>;
 };
@@ -165,6 +170,10 @@ export interface ArgTypeDefinition<V = unknown> {
    */
   defaultValue?: V;
   /**
+   * The property that will supply the default value.
+   */
+  defaultValueProp?: V;
+  /**
    * The property that is used to control this property.
    */
   onChangeProp?: string;
@@ -210,7 +219,7 @@ export type RuntimeEvent =
       type: 'pageBindingsUpdated';
       bindings: LiveBindings;
     }
-  | { type: 'afterRender' }
+  | { type: 'screenUpdate' }
   | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
 
 export interface ComponentConfig<P> {
@@ -257,3 +266,14 @@ export interface RuntimeError {
 }
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
+
+export interface SerializedError {
+  message: string;
+  name: string;
+  stack?: string;
+}
+
+export type ExecFetchResult<T = any> = {
+  data?: T;
+  error?: SerializedError;
+};

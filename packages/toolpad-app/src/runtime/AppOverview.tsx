@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box, Card, CardActionArea, CardContent, Container, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import * as appDom from '../appDom';
 
 interface PageCardProps {
@@ -8,11 +8,13 @@ interface PageCardProps {
 }
 
 function PageCard({ page }: PageCardProps) {
+  const navigate = useNavigate();
+  const handleClick = React.useCallback(() => navigate(`/pages/${page.id}`), [navigate, page.id]);
   return (
     <Card sx={{ gridColumn: 'span 1' }}>
-      <CardActionArea component={Link} to={`/pages/${page.id}`}>
+      <CardActionArea onClick={handleClick}>
         <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
+          <Typography gutterBottom variant="h5">
             {page.name}
           </Typography>
           <Typography variant="body2" color="text.secondary">

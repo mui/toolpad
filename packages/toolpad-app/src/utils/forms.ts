@@ -1,4 +1,4 @@
-import { FieldError, FormState } from 'react-hook-form';
+import { FieldError, FieldValues, FormState } from 'react-hook-form';
 
 function errorMessage(error: FieldError) {
   if (error.message) {
@@ -12,7 +12,7 @@ function errorMessage(error: FieldError) {
   }
 }
 
-export function validation<T>(
+export function validation<T extends FieldValues>(
   formState: FormState<T>,
   field: keyof T,
 ): { error?: boolean; helperText?: string } {
@@ -24,7 +24,7 @@ export function validation<T>(
   };
 }
 
-export function isSaveDisabled<S>(formState: FormState<S>): boolean {
+export function isSaveDisabled<T extends FieldValues>(formState: FormState<T>): boolean {
   // Always destructure formState to trigger underlying react-hook-form Proxy object
   const { isValid, isDirty } = formState;
   return !isValid || !isDirty;

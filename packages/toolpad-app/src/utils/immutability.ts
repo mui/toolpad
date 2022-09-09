@@ -25,7 +25,7 @@ export function update<T>(dest: T, src: Partial<T>): T {
   return result || dest;
 }
 
-export function updateOrCreate<T>(dest: T | null | undefined, src: T): T {
+export function updateOrCreate<T>(dest: T | null | undefined, src: NonNullable<T>): T {
   return dest ? update(dest, src) : src;
 }
 

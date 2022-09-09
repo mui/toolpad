@@ -18,6 +18,7 @@ export interface RenderControlParams<V> extends WithControlledProp<V> {
 
 export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   label: string;
+  bindable?: boolean;
   disabled?: boolean;
   server?: boolean;
   propType: PropValueType;
@@ -29,6 +30,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
 
 export default function BindableEditor<V>({
   label,
+  bindable = true,
   disabled,
   propType,
   renderControl = renderDefaultControl,
@@ -62,7 +64,7 @@ export default function BindableEditor<V>({
         {renderControl({
           label,
           propType,
-          disabled: !!hasBinding,
+          disabled: disabled || !!hasBinding,
           value: constValue,
           onChange: handlePropConstChange,
         })}
@@ -73,7 +75,8 @@ export default function BindableEditor<V>({
           propType={propType}
           value={value}
           onChange={onChange}
-          disabled={disabled}
+          disabled={disabled || !bindable}
+          hidden={!bindable}
           liveBinding={liveBinding}
         />
       </React.Fragment>

@@ -18,14 +18,26 @@ export interface CreatePageDialogProps {
   onClose: () => void;
 }
 
-export default function CreatePageDialog({ appId, onClose, ...props }: CreatePageDialogProps) {
+export default function CreatePageDialog({
+  appId,
+  open,
+  onClose,
+  ...props
+}: CreatePageDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const [name, setName] = React.useState('');
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    if (open) {
+      // Reset form
+      setName('');
+    }
+  }, [open]);
+
   return (
-    <Dialog {...props} onClose={onClose}>
+    <Dialog {...props} open={open} onClose={onClose}>
       <DialogForm
         autoComplete="off"
         onSubmit={(e) => {
@@ -40,7 +52,7 @@ export default function CreatePageDialog({ appId, onClose, ...props }: CreatePag
           domApi.addNode(newNode, appNode, 'pages');
 
           onClose();
-          navigate(`/app/${appId}/editor/pages/${newNode.id}`);
+          navigate(`/app/${appId}/pages/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Toolpad Page</DialogTitle>

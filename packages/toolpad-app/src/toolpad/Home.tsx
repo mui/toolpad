@@ -46,6 +46,9 @@ import type { AppMeta } from '../server/data';
 import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
+import { ConfirmDialog } from '../components/SystemDialogs';
+import config from '../config';
+import { errorFrom } from '../utils/errors';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -64,7 +67,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 
   const createAppMutation = client.useMutation('createApp', {
     onSuccess: (app) => {
-      window.location.href = `/_toolpad/app/${app.id}/editor`;
+      window.location.href = `/_toolpad/app/${app.id}`;
     },
   });
 
@@ -92,7 +95,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 setName(event.target.value);
               }}
             />
-            {process.env.TOOLPAD_CREATE_WITH_DOM ? (
+            {config.integrationTest ? (
               <TextField
                 label="seed DOM"
                 fullWidth
@@ -134,33 +137,27 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
   const latestApp = useLatest(app);
   const deleteAppMutation = client.useMutation('deleteApp');
 
-  const handleDeleteClick = React.useCallback(async () => {
-    if (app) {
-      await deleteAppMutation.mutateAsync([app.id]);
-    }
-    await client.invalidateQueries('getApps');
-    onClose();
-  }, [app, deleteAppMutation, onClose]);
+  const handleClose = React.useCallback(
+    async (confirmed: boolean) => {
+      if (confirmed && app) {
+        await deleteAppMutation.mutateAsync([app.id]);
+        await client.invalidateQueries('getApps');
+      }
+      onClose();
+    },
+    [app, deleteAppMutation, onClose],
+  );
 
   return (
-    <Dialog open={!!app} onClose={onClose}>
-      <DialogTitle>Confirm delete</DialogTitle>
-      <DialogContent>
-        Are you sure you want to delete application &quot;{latestApp?.name}&quot;
-      </DialogContent>
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
-          Cancel
-        </Button>
-        <LoadingButton
-          loading={deleteAppMutation.isLoading}
-          onClick={handleDeleteClick}
-          color="error"
-        >
-          Delete
-        </LoadingButton>
-      </DialogActions>
-    </Dialog>
+    <ConfirmDialog
+      open={!!app}
+      onClose={handleClose}
+      severity="error"
+      okButton="delete"
+      loading={deleteAppMutation.isLoading}
+    >
+      Are you sure you want to delete application &quot;{latestApp?.name}&quot;
+    </ConfirmDialog>
   );
 }
 
@@ -195,8 +192,8 @@ function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableP
         try {
           await client.mutation.updateApp(app.id, name);
           await client.invalidateQueries('getApps');
-        } catch (err: any) {
-          setAppRenameError(err);
+        } catch (rawError) {
+          setAppRenameError(errorFrom(rawError));
           setEditing(true);
         }
       }
@@ -231,12 +228,7 @@ interface AppEditButtonProps {
 
 function AppEditButton({ app }: AppEditButtonProps) {
   return (
-    <Button
-      size="small"
-      component="a"
-      href={app ? `/_toolpad/app/${app.id}/editor` : ''}
-      disabled={!app}
-    >
+    <Button size="small" component="a" href={app ? `/_toolpad/app/${app.id}` : ''} disabled={!app}>
       Edit
     </Button>
   );

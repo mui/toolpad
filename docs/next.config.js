@@ -10,6 +10,24 @@ const pkg = require('../package.json');
 const { findPages } = require('./src/modules/utils/find');
 const { LANGUAGES, LANGUAGES_SSR } = require('./src/modules/constants');
 
+let DEPLOY_ENV = 'development';
+
+// Same as process.env.PULL_REQUEST === 'true'
+if (process.env.CONTEXT === 'deploy-preview') {
+  DEPLOY_ENV = 'pull-request';
+}
+
+if (process.env.CONTEXT === 'production' || process.env.CONTEXT === 'branch-deploy') {
+  DEPLOY_ENV = 'production';
+}
+
+if (
+  process.env.CONTEXT === 'branch-deploy' &&
+  (process.env.HEAD === 'master' || process.env.HEAD === 'next')
+) {
+  DEPLOY_ENV = 'staging';
+}
+
 const MONORPO_PATH = path.resolve(__dirname, './node_modules/@mui/monorepo');
 const MONOREPO_PACKAGES = {
   '@mui/base': path.resolve(MONORPO_PATH, './packages/mui-base/src'),
@@ -46,14 +64,12 @@ if (reactStrictMode) {
   console.log(`Using React.StrictMode.`);
 }
 
-const isDeployment = process.env.NETLIFY === 'true';
-
 module.exports = withTM({
   eslint: {
     ignoreDuringBuilds: true,
   },
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
-  assetPrefix: isDeployment ? '/toolpad' : '',
+  assetPrefix: DEPLOY_ENV === 'development' ? '' : '/toolpad',
   typescript: {
     // Motivated by https://github.com/zeit/next.js/issues/7687
     ignoreDevErrors: true,
@@ -65,14 +81,13 @@ module.exports = withTM({
     ENABLE_AD: process.env.ENABLE_AD,
     GITHUB_AUTH: process.env.GITHUB_AUTH,
     LIB_VERSION: pkg.version,
-    PULL_REQUEST: process.env.PULL_REQUEST === 'true',
     REACT_STRICT_MODE: reactStrictMode,
     FEEDBACK_URL: process.env.FEEDBACK_URL,
-    // Set by Netlify
-    GRID_EXPERIMENTAL_ENABLED: process.env.PULL_REQUEST === 'false' ? 'false' : 'true',
+    PULL_REQUEST: process.env.PULL_REQUEST === 'true',
     // #default-branch-switch
     SOURCE_CODE_ROOT_URL: 'https://github.com/mui/mui-toolpad/blob/master',
     SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',
+    DEPLOY_ENV,
   },
   webpack5: true,
   webpack: (config) => {

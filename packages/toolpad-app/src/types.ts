@@ -165,3 +165,5 @@ export interface AppTheme {
 }
 
 export type VersionOrPreview = 'preview' | number;
+
+export type AppTemplateName = 'blank' | 'stats' | 'images';

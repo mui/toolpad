@@ -49,24 +49,22 @@ import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ConfirmDialog } from '../components/SystemDialogs';
 import config from '../config';
 import { parseError } from '../utils/errors';
-import statisticsDom from './appTemplates/statistics.json';
-import imagesDom from './appTemplates/images.json';
+import { AppTemplateName } from '../types';
 
-const APP_TEMPLATE_OPTIONS = [
-  { value: 'blank', label: 'Blank page', description: 'Start with an empty canvas', dom: null },
-  {
-    value: 'stats',
+export const APP_TEMPLATE_OPTIONS = {
+  blank: {
+    label: 'Blank page',
+    description: 'Start with an empty canvas',
+  },
+  stats: {
     label: 'Statistics',
     description: 'Table with statistics data',
-    dom: statisticsDom,
   },
-  {
-    value: 'images',
+  images: {
     label: 'Images',
     description: 'Fetch remote images',
-    dom: imagesDom,
   },
-];
+};
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -75,12 +73,12 @@ export interface CreateAppDialogProps {
 
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
-  const [appTemplate, setAppTemplate] = React.useState(APP_TEMPLATE_OPTIONS[0].value);
+  const [appTemplateName, setAppTemplateName] = React.useState<AppTemplateName>('blank');
   const [dom, setDom] = React.useState('');
 
   const handleAppTemplateChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setAppTemplate(event.target.value);
+      setAppTemplateName(event.target.value as AppTemplateName);
     },
     [],
   );
@@ -103,11 +101,11 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           onSubmit={(event) => {
             event.preventDefault();
 
-            const selectedAppTemplateDom =
-              APP_TEMPLATE_OPTIONS.find(({ value }) => value === appTemplate)?.dom || null;
-            const appDom = dom.trim() ? JSON.parse(dom) : selectedAppTemplateDom;
-
-            createAppMutation.mutate([name, { dom: appDom }]);
+            const appDom = dom.trim() ? JSON.parse(dom) : null;
+            createAppMutation.mutate([
+              name,
+              appDom ? { type: 'dom', dom: appDom } : { type: 'template', name: appTemplateName },
+            ]);
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
@@ -131,10 +129,10 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               label="Use template"
               select
               fullWidth
-              value={appTemplate}
+              value={appTemplateName}
               onChange={handleAppTemplateChange}
             >
-              {APP_TEMPLATE_OPTIONS.map(({ value, label, description }) => (
+              {Object.entries(APP_TEMPLATE_OPTIONS).map(([value, { label, description }]) => (
                 <MenuItem key={value} value={value}>
                   <span>
                     <Typography>{label}</Typography>

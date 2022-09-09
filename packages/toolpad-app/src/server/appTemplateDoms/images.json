@@ -43,6 +43,27 @@
       "parentProp": "children",
       "parentIndex": "a0"
     },
+    "2oi3skx": {
+      "id": "2oi3skx",
+      "name": "pageRow4",
+      "type": "element",
+      "props": {
+        "justifyContent": {
+          "type": "const",
+          "value": "start"
+        }
+      },
+      "layout": {},
+      "parentId": "0k23shc",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0V"
+    },
     "9h83s7x": {
       "id": "9h83s7x",
       "name": "dogImagesTitle",
@@ -309,13 +330,13 @@
         }
       },
       "layout": {
-        "horizontalAlign": {
-          "type": "const",
-          "value": "start"
-        },
         "columnSize": {
           "type": "const",
           "value": 1.5106571936056838
+        },
+        "horizontalAlign": {
+          "type": "const",
+          "value": "start"
         }
       },
       "parentId": "2oi3skx",
@@ -350,18 +371,17 @@
           "value": true
         },
         "defaultValue": {
-          "type": "const",
-          "value": "akita"
+          "type": "const"
         }
       },
       "layout": {
-        "horizontalAlign": {
-          "type": "const",
-          "value": "center"
-        },
         "columnSize": {
           "type": "const",
           "value": 0.7433392539964476
+        },
+        "horizontalAlign": {
+          "type": "const",
+          "value": "center"
         }
       },
       "parentId": "2oi3skx",
@@ -397,13 +417,13 @@
         }
       },
       "layout": {
-        "horizontalAlign": {
-          "type": "const",
-          "value": "center"
-        },
         "columnSize": {
           "type": "const",
           "value": 0.7460035523978685
+        },
+        "horizontalAlign": {
+          "type": "const",
+          "value": "center"
         }
       },
       "parentId": "2oi3skx",
@@ -538,27 +558,6 @@
       },
       "parentProp": "queries",
       "parentIndex": "a2"
-    },
-    "2oi3skx": {
-      "name": "pageRow4",
-      "props": {
-        "justifyContent": {
-          "type": "const",
-          "value": "start"
-        }
-      },
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "PageRow"
-        }
-      },
-      "layout": {},
-      "id": "2oi3skx",
-      "type": "element",
-      "parentId": "0k23shc",
-      "parentProp": "children",
-      "parentIndex": "a0V"
     }
   }
 }

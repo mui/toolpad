@@ -15,7 +15,6 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Select,
   Skeleton,
   Stack,
   Table,
@@ -28,9 +27,6 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
-  SelectChangeEvent,
-  InputLabel,
-  FormControl,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
@@ -72,9 +68,12 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [appTemplate, setAppTemplate] = React.useState(APP_TEMPLATE_OPTIONS[0].value);
   const [dom, setDom] = React.useState('');
 
-  const handleAppTemplateChange = React.useCallback((event: SelectChangeEvent<string>) => {
-    setAppTemplate(event.target.value);
-  }, []);
+  const handleAppTemplateChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setAppTemplate(event.target.value);
+    },
+    [],
+  );
 
   const handleDomChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => setDom(event.target.value),
@@ -117,22 +116,20 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               }}
             />
 
-            <FormControl sx={{ my: 1 }} fullWidth>
-              <InputLabel id="app-template-select-label">Use template</InputLabel>
-              <Select
-                id="app-template-select"
-                labelId="app-template-select-label"
-                label="Use template"
-                value={appTemplate}
-                onChange={handleAppTemplateChange}
-              >
-                {APP_TEMPLATE_OPTIONS.map(({ value, label }) => (
-                  <MenuItem key={value} value={value}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <TextField
+              sx={{ my: 1 }}
+              label="Use template"
+              select
+              fullWidth
+              value={appTemplate}
+              onChange={handleAppTemplateChange}
+            >
+              {APP_TEMPLATE_OPTIONS.map(({ value, label }) => (
+                <MenuItem key={value} value={value}>
+                  {label}
+                </MenuItem>
+              ))}
+            </TextField>
 
             {config.integrationTest ? (
               <TextField

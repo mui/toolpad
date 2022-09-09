@@ -12,7 +12,7 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 
 ![Editor screenshot](/static/toolpad/marketing/index-hero-video-poster.jpg)
 
-## How Toolpad works?
+## Advantages of Toolpad
 
 - [Build UI](/toolpad/core-concepts/building-ui/) using our drag & drop editor
 - [Configure and fetch](/toolpad/core-concepts/connecting-to-datasources/) data from HTTP endpoints, Google sheets or even directly from PostgreSQL

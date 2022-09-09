@@ -17,7 +17,7 @@ import { removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import { getAuthenticationHeaders, HTTP_NO_BODY, parseBaseUrl } from './shared';
 import applyTransform from '../../server/applyTransform';
-import { parseError } from '../../utils/errors';
+import { errorFrom } from '../../utils/errors';
 
 async function resolveBindable(
   bindable: BindableAttrValue<string>,
@@ -190,7 +190,7 @@ async function execBase(
       data = await applyTransform(fetchQuery.transform, untransformedData);
     }
   } catch (rawError) {
-    error = parseError(rawError);
+    error = errorFrom(rawError);
   }
 
   return { data, untransformedData, error, har };

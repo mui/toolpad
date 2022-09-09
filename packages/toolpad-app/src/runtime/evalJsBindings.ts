@@ -36,14 +36,6 @@ export function evaluateExpression(
   }
 }
 
-function unwrapEvaluationResult(result: BindingEvaluationResult) {
-  if (result.loading) {
-    throw new Error(TOOLPAD_LOADING_MARKER);
-  } else {
-    return result.value;
-  }
-}
-
 /**
  * Represents the actual state of an evaluated binding.
  */
@@ -112,6 +104,44 @@ function flattenDependencies(deps: Dependencies): Dependencies {
     result.set(dep, flattenDependency(deps, dep));
   }
   return result;
+}
+
+function bubbleError(
+  flatDependencies: Dependencies,
+  results: Record<string, BindingEvaluationResult<unknown>>,
+  bindingId: string,
+): Error | undefined {
+  const result = results[bindingId];
+  if (result.error) {
+    return result.error;
+  }
+  const deps = flatDependencies.get(bindingId) ?? new Set();
+  for (const dep of deps) {
+    const depResult = results[dep];
+    if (depResult.error) {
+      return depResult.error;
+    }
+  }
+  return undefined;
+}
+
+function bubbleLoading(
+  flatDependencies: Dependencies,
+  results: Record<string, BindingEvaluationResult<unknown>>,
+  bindingId: string,
+): boolean {
+  const result = results[bindingId];
+  if (result.loading) {
+    return true;
+  }
+  const deps = flatDependencies.get(bindingId) ?? new Set();
+  for (const dep of deps) {
+    const depResult = results[dep];
+    if (depResult.loading) {
+      return depResult.loading;
+    }
+  }
+  return false;
 }
 
 export interface EvaluatedBinding<T = unknown> {
@@ -227,7 +257,7 @@ export default function evalJsBindings(
         if (bindingId) {
           const evaluated = evaluateBinding(bindingId, scopePath);
           if (evaluated) {
-            return unwrapEvaluationResult(evaluated);
+            return evaluated.value;
           }
         }
 
@@ -250,29 +280,15 @@ export default function evalJsBindings(
 
   const flatDependencies = flattenDependencies(dependencies);
 
-  const errors = mapValues(bindings, (binding, bindingId) => {
-    const result = results[bindingId];
-    if (result.error) {
-      return result.error;
-    }
-    const deps = flatDependencies.get(bindingId) ?? new Set();
-    for (const dep of deps) {
-      const depResult = results[dep];
-      if (depResult.error) {
-        return depResult.error;
-      }
-    }
-    return undefined;
-  });
-
   return mapValues(bindings, (binding, bindingId) => {
-    const { expression, result, initializer, ...rest } = binding;
+    const { scopePath } = binding;
 
     return {
-      ...rest,
+      scopePath,
       result: {
         ...results[bindingId],
-        error: errors[bindingId],
+        error: bubbleError(flatDependencies, results, bindingId),
+        loading: bubbleLoading(flatDependencies, results, bindingId),
       },
     };
   });

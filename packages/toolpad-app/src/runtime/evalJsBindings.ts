@@ -39,8 +39,6 @@ export function evaluateExpression(
 function unwrapEvaluationResult(result: BindingEvaluationResult) {
   if (result.loading) {
     throw new Error(TOOLPAD_LOADING_MARKER);
-  } else if (result.error) {
-    throw result.error;
   } else {
     return result.value;
   }
@@ -88,9 +86,42 @@ export interface ParsedBinding<T = unknown> {
   initializer?: string;
 }
 
+type Dependencies = Map<string, Set<string>>;
+
+function flattenDependency(
+  deps: Dependencies,
+  dep: string,
+  history = new Set<string>([dep]),
+): Set<string> {
+  const depDeps = deps.get(dep) ?? new Set();
+  const result = new Set(depDeps);
+  for (const depDep of depDeps) {
+    if (!history.has(depDep)) {
+      const flat = flattenDependency(deps, depDep, new Set([...history, depDep]));
+      for (const flatted of flat) {
+        result.add(flatted);
+      }
+    }
+  }
+  return result;
+}
+
+function flattenDependencies(deps: Dependencies): Dependencies {
+  const result: Dependencies = new Map();
+  for (const dep of deps.keys()) {
+    result.set(dep, flattenDependency(deps, dep));
+  }
+  return result;
+}
+
+export interface EvaluatedBinding<T = unknown> {
+  scopePath?: string;
+  result?: BindingEvaluationResult<T>;
+}
+
 export function buildGlobalScope(
   base: Record<string, unknown>,
-  bindings: Record<string, ParsedBinding>,
+  bindings: Record<string, { result?: BindingEvaluationResult; scopePath?: string }>,
 ): Record<string, unknown> {
   const globalScope = { ...base };
   for (const binding of Object.values(bindings)) {
@@ -108,7 +139,7 @@ export function buildGlobalScope(
 export default function evalJsBindings(
   bindings: Record<string, ParsedBinding>,
   globalScope: Record<string, unknown>,
-): Record<string, ParsedBinding> {
+): Record<string, EvaluatedBinding> {
   const bindingsMap = new Map(Object.entries(bindings));
 
   const bindingIdMap = new Map<string, string>();
@@ -119,6 +150,8 @@ export default function evalJsBindings(
   }
 
   const computationStatuses = new Map<string, { result: null | BindingEvaluationResult }>();
+  let currentParentBinding: string | undefined;
+  const dependencies: Dependencies = new Map();
 
   let proxiedScope: Record<string, unknown>;
 
@@ -130,6 +163,15 @@ export default function evalJsBindings(
 
     if (!binding) {
       return null;
+    }
+
+    if (currentParentBinding) {
+      let bindingDependencies = dependencies.get(currentParentBinding);
+      if (!bindingDependencies) {
+        bindingDependencies = new Set<string>();
+        dependencies.set(currentParentBinding, bindingDependencies);
+      }
+      bindingDependencies.add(bindingId);
     }
 
     const expression = binding.expression;
@@ -147,7 +189,10 @@ export default function evalJsBindings(
 
       // use null to mark as "computing"
       computationStatuses.set(expression, { result: null });
+      const prevContext = currentParentBinding;
+      currentParentBinding = bindingId;
       const result = evaluateExpression(expression, proxiedScope);
+      currentParentBinding = prevContext;
       computationStatuses.set(expression, { result });
       // From freshly computed
       return result;
@@ -199,12 +244,36 @@ export default function evalJsBindings(
   const scope = buildGlobalScope(globalScope, bindings);
   proxiedScope = proxify(scope);
 
-  return mapValues(bindings, (binding, key) => {
+  const results = mapValues(bindings, (binding, bindingId) => {
+    return evaluateBinding(bindingId) || { value: undefined };
+  });
+
+  const flatDependencies = flattenDependencies(dependencies);
+
+  const errors = mapValues(bindings, (binding, bindingId) => {
+    const result = results[bindingId];
+    if (result.error) {
+      return result.error;
+    }
+    const deps = flatDependencies.get(bindingId) ?? new Set();
+    for (const dep of deps) {
+      const depResult = results[dep];
+      if (depResult.error) {
+        return depResult.error;
+      }
+    }
+    return undefined;
+  });
+
+  return mapValues(bindings, (binding, bindingId) => {
     const { expression, result, initializer, ...rest } = binding;
 
     return {
       ...rest,
-      result: evaluateBinding(key) || { value: undefined },
+      result: {
+        ...results[bindingId],
+        error: errors[bindingId],
+      },
     };
   });
 }

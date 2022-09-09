@@ -1,14 +1,5 @@
 import { TreeView } from '@mui/lab';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  Typography,
-  styled,
-  Box,
-  IconButton,
-} from '@mui/material';
+import { Typography, styled, Box, IconButton } from '@mui/material';
 import * as React from 'react';
 import TreeItem, { TreeItemProps } from '@mui/lab/TreeItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -24,6 +15,7 @@ import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import useLatest from '../../../utils/useLatest';
+import { ConfirmDialog } from '../../../components/SystemDialogs';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -35,10 +27,20 @@ type StyledTreeItemProps = TreeItemProps & {
   onCreate?: React.MouseEventHandler;
   labelIcon?: React.ReactNode;
   labelText: string;
+  createLabelText?: string;
+  deleteLabelText?: string;
 };
 
 function HierarchyTreeItem(props: StyledTreeItemProps) {
-  const { labelIcon, labelText, onCreate, onDelete, ...other } = props;
+  const {
+    labelIcon,
+    labelText,
+    onCreate,
+    onDelete,
+    createLabelText = `Create ${labelText}`,
+    deleteLabelText = `Delete ${labelText}`,
+    ...other
+  } = props;
 
   return (
     <TreeItem
@@ -49,12 +51,12 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
             {labelText}
           </Typography>
           {onCreate ? (
-            <IconButton aria-label={`Create ${labelText}`} onClick={onCreate}>
+            <IconButton aria-label={createLabelText} onClick={onCreate}>
               <AddIcon />
             </IconButton>
           ) : null}
           {onDelete ? (
-            <IconButton aria-label={`Delete ${labelText}`} onClick={onDelete}>
+            <IconButton aria-label={deleteLabelText} onClick={onDelete}>
               <DeleteIcon />
             </IconButton>
           ) : null}
@@ -189,31 +191,33 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     },
     [],
   );
-  const handledeleteNodeDialogClose = React.useCallback(() => setDeletedNodeId(null), []);
 
-  const handleDeleteNode = React.useCallback(() => {
-    if (deletedNodeId) {
-      let redirectAfterDelete: string | undefined;
-      if (deletedNodeId === activeNode) {
-        const deletedNode = appDom.getNode(dom, deletedNodeId);
-        const siblings = appDom.getSiblings(dom, deletedNode);
-        const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
-        if (firstSiblingOfType) {
-          redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
-        } else {
-          redirectAfterDelete = `/app/${appId}`;
+  const handledeleteNodeDialogClose = React.useCallback(
+    (confirmed: boolean) => {
+      if (confirmed && deletedNodeId) {
+        let redirectAfterDelete: string | undefined;
+        if (deletedNodeId === activeNode) {
+          const deletedNode = appDom.getNode(dom, deletedNodeId);
+          const siblings = appDom.getSiblings(dom, deletedNode);
+          const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
+          if (firstSiblingOfType) {
+            redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
+          } else {
+            redirectAfterDelete = `/app/${appId}`;
+          }
         }
+
+        domApi.removeNode(deletedNodeId);
+
+        if (redirectAfterDelete) {
+          navigate(redirectAfterDelete);
+        }
+      } else {
+        setDeletedNodeId(null);
       }
-
-      domApi.removeNode(deletedNodeId);
-
-      if (redirectAfterDelete) {
-        navigate(redirectAfterDelete);
-      }
-
-      handledeleteNodeDialogClose();
-    }
-  }, [deletedNodeId, activeNode, domApi, handledeleteNodeDialogClose, dom, appId, navigate]);
+    },
+    [activeNode, appId, deletedNodeId, dom, domApi, navigate],
+  );
 
   const deletedNode = deletedNodeId && appDom.getMaybeNode(dom, deletedNodeId);
   const latestDeletedNode = useLatest(deletedNode);
@@ -233,6 +237,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         <HierarchyTreeItem
           nodeId=":connections"
           labelText="Connections"
+          createLabelText="Create connection"
+          deleteLabelText="Delete connection"
           onCreate={handleCreateConnectionDialogOpen}
         >
           {connections.map((connectionNode) => (
@@ -247,6 +253,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         <HierarchyTreeItem
           nodeId=":codeComponents"
           labelText="Components"
+          createLabelText="Create component"
+          deleteLabelText="Delete component"
           onCreate={handleCreateCodeComponentDialogOpen}
         >
           {codeComponents.map((codeComponent) => (
@@ -258,7 +266,13 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             />
           ))}
         </HierarchyTreeItem>
-        <HierarchyTreeItem nodeId=":pages" labelText="Pages" onCreate={handleCreatePageDialogOpen}>
+        <HierarchyTreeItem
+          nodeId=":pages"
+          labelText="Pages"
+          createLabelText="Create page"
+          deleteLabelText="Delete page"
+          onCreate={handleCreatePageDialogOpen}
+        >
           {pages.map((page) => (
             <HierarchyTreeItem
               key={page.id}
@@ -288,17 +302,14 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         open={!!createCodeComponentDialogOpen}
         onClose={handleCreateCodeComponentDialogClose}
       />
-      <Dialog open={!!deletedNode} onClose={handledeleteNodeDialogClose}>
-        <DialogTitle>
-          Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
-        </DialogTitle>
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={handledeleteNodeDialogClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleDeleteNode}>Delete</Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={!!deletedNode}
+        severity="error"
+        onClose={handledeleteNodeDialogClose}
+        okButton="delete"
+      >
+        Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
+      </ConfirmDialog>
     </HierarchyExplorerRoot>
   );
 }

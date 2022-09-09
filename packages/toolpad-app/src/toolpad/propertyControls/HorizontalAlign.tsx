@@ -22,7 +22,7 @@ function HorizontalAlignPropEditor({
 
   return (
     <Box>
-      <Typography>{label}:</Typography>
+      <Typography variant="body2">{label}:</Typography>
       <ToggleButtonGroup
         exclusive
         disabled={disabled}

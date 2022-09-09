@@ -29,6 +29,7 @@ const JsonViewRoot = styled('div')(({ theme }) => ({
   position: 'relative',
   display: 'flex',
   minHeight: 0,
+  minWidth: 0,
 
   [`&.${classes.disabled}`]: {
     opacity: 0.5,

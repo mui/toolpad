@@ -61,9 +61,16 @@ export type BindableAttrValue<V> =
 
 export type ConstantAttrValues<P> = { [K in keyof P]: ConstantAttrValue<P[K]> };
 
+export type NestedBindableAttrs =
+  | BindableAttrValue<any>
+  | BindableAttrValues<any>
+  | [string, BindableAttrValue<any>][];
+
 export type BindableAttrValues<P = Record<string, unknown>> = {
   readonly [K in keyof P]?: BindableAttrValue<P[K]>;
 };
+
+export type BindableAttrEntries = [string, BindableAttrValue<any>][];
 
 export type SlotType = 'single' | 'multiple';
 
@@ -163,6 +170,10 @@ export interface ArgTypeDefinition<V = unknown> {
    */
   defaultValue?: V;
   /**
+   * The property that will supply the default value.
+   */
+  defaultValueProp?: V;
+  /**
    * The property that is used to control this property.
    */
   onChangeProp?: string;
@@ -208,7 +219,7 @@ export type RuntimeEvent =
       type: 'pageBindingsUpdated';
       bindings: LiveBindings;
     }
-  | { type: 'afterRender' }
+  | { type: 'screenUpdate' }
   | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
 
 export interface ComponentConfig<P> {
@@ -227,8 +238,12 @@ export interface ComponentConfig<P> {
    */
   loadingProp?: keyof P & string;
   /**
-   * Designates a property as "the resizable height property". If Toolpad detects any vertical resizing of
-   * the component it will forward it to this property.
+   * Enables controlling the aligment of the component container box.
+   */
+  layoutDirection?: 'vertical' | 'horizontal' | 'both';
+  /**
+   * Designates a property as "the resizable height property". If Toolpad detects any
+   * vertical resizing of the component it will forward it to this property.
    */
   resizableHeightProp?: keyof P & string;
   /**

@@ -102,3 +102,10 @@ const IMPORT_STATEMENT_REGEX =
 export function findImports(src: string): string[] {
   return Array.from(src.matchAll(IMPORT_STATEMENT_REGEX), (match) => match[2]);
 }
+
+export function truncate(str: string, maxLength: number, dots: string = '...') {
+  if (str.length <= maxLength) {
+    return str;
+  }
+  return str.slice(0, maxLength) + dots;
+}

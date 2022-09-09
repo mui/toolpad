@@ -32,6 +32,8 @@ import CenteredSpinner from '../../../components/CenteredSpinner';
 import SplitPane from '../../../components/SplitPane';
 import { getDefaultControl } from '../../propertyControls';
 import { WithControlledProp } from '../../../utils/types';
+import useDebounced from '../../../utils/useDebounced';
+import { ExtraLib } from '../../../components/MonacoEditor';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -62,7 +64,7 @@ function PropertiesEditor({ argTypes, value, onChange }: PropertiesEditorProps) 
       {Object.entries(argTypes).map(([name, argType]) => {
         invariant(argType, 'argType not defined');
         return (
-          <ErrorBoundary fallback={<div>{name}</div>} resetKeys={[argType]}>
+          <ErrorBoundary key={name} fallback={<div>{name}</div>} resetKeys={[argType]}>
             <PropertyEditor
               name={name}
               argType={argType}
@@ -106,9 +108,15 @@ function FrameContent(props: FrameContentProps) {
   return <CacheProvider value={cache}>{children}</CacheProvider>;
 }
 
-const EXTRA_LIBS_HTTP_MODULES = [
+const EXTRA_LIBS_HTTP_MODULES: ExtraLib[] = [
   {
     content: `declare module "https://*";`,
+  },
+  {
+    content: `declare module "@mui/icons-material/*";`,
+  },
+  {
+    content: `declare module "@mui/icons-material";`,
   },
 ];
 
@@ -186,9 +194,10 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const frameDocument = frameRef.current?.contentDocument;
 
-  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(input);
-
+  const debouncedInput = useDebounced(input, 250);
+  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(debouncedInput);
   const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
+
   const { argTypes } = CodeComponent[TOOLPAD_COMPONENT];
 
   const defaultProps = React.useMemo(

@@ -25,15 +25,7 @@ export default function ErrorAlert({ error }: ErrorAlertProps) {
   const toggleExpanded = React.useCallback(() => setExpanded((actual) => !actual), []);
 
   return (
-    <Alert
-      severity="error"
-      sx={{
-        // The content of the Alert doesn't overflow nicely
-        // TODO: does this need to go in core?
-        '& .MuiAlert-message': { minWidth: 0 },
-        position: 'relative',
-      }}
-    >
+    <Alert severity="error" sx={{ position: 'relative' }}>
       {stack ? (
         <IconButton
           color="inherit"

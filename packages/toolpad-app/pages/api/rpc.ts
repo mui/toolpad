@@ -18,7 +18,10 @@ import {
   findActiveDeployment,
   findLastRelease,
   deleteApp,
+  deploy,
+  getDeployments,
 } from '../../src/server/data';
+import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 
 interface RpcContext {
@@ -117,6 +120,9 @@ const rpcServer = {
     getActiveDeployments: createMethod<typeof getActiveDeployments>((params) => {
       return getActiveDeployments(...params);
     }),
+    getDeployments: createMethod<typeof getDeployments>((params) => {
+      return getDeployments(...params);
+    }),
     getApp: createMethod<typeof getApp>((params) => {
       return getApp(...params);
     }),
@@ -138,6 +144,9 @@ const rpcServer = {
     findLastRelease: createMethod<typeof findLastRelease>((params) => {
       return findLastRelease(...params);
     }),
+    getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>((params) => {
+      return getLatestToolpadRelease(...params);
+    }),
   },
   mutation: {
     createApp: createMethod<typeof createApp>((params) => {
@@ -154,6 +163,9 @@ const rpcServer = {
     }),
     createDeployment: createMethod<typeof createDeployment>((params) => {
       return createDeployment(...params);
+    }),
+    deploy: createMethod<typeof deploy>((params) => {
+      return deploy(...params);
     }),
     saveDom: createMethod<typeof saveDom>((params) => {
       return saveDom(...params);

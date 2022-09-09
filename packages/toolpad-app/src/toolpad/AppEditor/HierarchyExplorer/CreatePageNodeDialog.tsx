@@ -18,14 +18,26 @@ export interface CreatePageDialogProps {
   onClose: () => void;
 }
 
-export default function CreatePageDialog({ appId, onClose, ...props }: CreatePageDialogProps) {
+export default function CreatePageDialog({
+  appId,
+  open,
+  onClose,
+  ...props
+}: CreatePageDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
   const [name, setName] = React.useState('');
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    if (open) {
+      // Reset form
+      setName('');
+    }
+  }, [open]);
+
   return (
-    <Dialog {...props} onClose={onClose}>
+    <Dialog {...props} open={open} onClose={onClose}>
       <DialogForm
         autoComplete="off"
         onSubmit={(e) => {

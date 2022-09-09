@@ -6,7 +6,7 @@
 
 To create a new connection instance, press the **+** button in the Explorer menu on the left side of the interface:
 
-![Add Connection](/static/toolpad/connection.png)
+<img src="/static/toolpad/connection.png" alt="Add connection" width="200px" />
 
 ## Connection types
 
@@ -14,15 +14,15 @@ There are 2 kinds of data sources that do not require a connection instance:
 
 ### Function
 
-![Connection function](/static/toolpad/connection-function-1.png)
+<img src="/static/toolpad/connection-function-1.png" alt="Connection function" width="600px" />
 
 You can define secrets (key/value) that can later be access in the function datasource query:
 
-![Connection function](/static/toolpad/connection-function-2.png)
+<img src="/static/toolpad/connection-function-2.png" alt="Connection function" width="600px" />
 
 ### Fetch
 
-![Connection fetch](/static/toolpad/connection-fetch-1.png)
+<img src="/static/toolpad/connection-fetch-1.png" alt="Connection fetch" width="600px" />
 
 You can configure:
 
@@ -65,7 +65,7 @@ Before you create a Google sheets connection you must first configure Toolpad ap
 
 1. Once you create Google Sheets type connection click **CONNECT** button:
 
-![Connection Google Sheets](/static/toolpad/connection-sheets-1.png)
+<img src="/static/toolpad/connection-sheets-1.png" alt="Connection Google Sheets" width="600px" />
 
 1. Choose google account that you want to authorize.
 
@@ -73,13 +73,13 @@ Before you create a Google sheets connection you must first configure Toolpad ap
 
 1. Once you successfully connect your account you should see a button stating the acount that was connected.
 
-![Google sheets connected](/static/toolpad/connection-sheets-2.png)
+<img src="/static/toolpad/connection-sheets-2.png" alt="Google Sheets connected" width="600px" />
 
 ### PostgreSQL
 
 To query data from a PostgreSQL database, you must configure the connection:
 
-![Connection postgres](/static/toolpad/connection-postgres-1.png)
+<img src="/static/toolpad/connection-postgres-1.png" alt="Connection postgres" width="600px" />
 
 Provide the database credentials and click **TEST CONNECTION** to verify that you're able to connect.
 

@@ -15,7 +15,7 @@ test('basic app creation flow', async ({ page }) => {
 
   await page.click('[role="dialog"] button:has-text("create")');
 
-  await page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/editor\/pages\/[^/]+/ });
+  await page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
 
   // TODO: basic editor tests
 

@@ -1,17 +1,18 @@
 import * as path from 'path';
 import { ToolpadHome } from '../../models/ToolpadHome';
+import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 
 test('input basics', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './basicDom.json'));
-  const { id: pageId } = Object.values(dom.nodes).find((node: any) => node.name === 'page1') as any;
 
   const homeModel = new ToolpadHome(page);
   await homeModel.goto();
   const app = await homeModel.createApplication({ dom });
 
-  await page.goto(`/app/${app.id}/preview/pages/${pageId}`);
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.gotoPage(app.id, 'page1');
 
   const textField1 = page.locator('label:has-text("textField1")');
   const textField2 = page.locator('label:has-text("textField2")');
@@ -27,7 +28,7 @@ test('input basics', async ({ page }) => {
 
   expect(await textField3.inputValue()).toBe('hello2');
 
-  await page.goto(`/app/${app.id}/preview/pages/${pageId}?msg=hello3`);
+  await page.goto(`${page.url()}?msg=hello3`);
 
   expect(await textField3.inputValue()).toBe('hello3');
 });

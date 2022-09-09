@@ -5,6 +5,7 @@ import {
   ExecFetchResult,
 } from '@mui/toolpad-core';
 import fetch, { Headers, RequestInit, Response } from 'node-fetch';
+import MIMEType from 'whatwg-mimetype';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource } from '../../types';
 import {
@@ -116,8 +117,18 @@ async function resolveBody(body: Body, boundValues: Record<string, string>) {
   }
 }
 
+function isJSON(mimeType: MIMEType): boolean {
+  // See https://mimesniff.spec.whatwg.org/#json-mime-type
+  const essence = `${mimeType.type}/${mimeType.subtype}`;
+  return (
+    essence === 'text/json' || essence === 'application/json' || mimeType.subtype.endsWith('+json')
+  );
+}
+
 async function readData(res: Response): Promise<any> {
-  return res.headers.get('content-type') === 'application/json' ? res.json() : res.text();
+  const contentType = res.headers.get('content-type');
+  const mimeType = contentType ? new MIMEType(contentType) : null;
+  return mimeType && isJSON(mimeType) ? res.json() : res.text();
 }
 
 async function execBase(

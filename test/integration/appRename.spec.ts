@@ -9,7 +9,7 @@ async function createApp(page: Page, name: string) {
 
   await page.click('[role="dialog"] button:has-text("create")');
 
-  await page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/editor\/pages\/[^/]+/ });
+  await page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
 }
 
 test('app create/rename flow', async ({ page }) => {

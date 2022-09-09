@@ -4,7 +4,7 @@
 Learn core concepts of the Toolpad app and you are ready to ship your application in minutes!
 </p>
 
-## What is Toolpad?
+## Introduction
 
 Toolpad is a self-hosted low-code internal tools builder designed to extend MUI's suite of React components. 
 It's designed for developers of all trades who want to save time building internal applications. 

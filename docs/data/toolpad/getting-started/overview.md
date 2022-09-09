@@ -23,7 +23,7 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 
 ![Toolpad app](/static/toolpad/terminology.png)
 
-There are 5 most frequently used areas:
+These are the primary elements of the Toolpad interface:
 
 - **Navigation**: where you can return to the homepage, or preview or deploy your app.
 - **Explorer**: where you can define and manage pages, connection configurations, custom component definitions, and more.

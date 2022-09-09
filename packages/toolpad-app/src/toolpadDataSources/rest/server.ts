@@ -185,7 +185,7 @@ async function execBase(
     const res = await instrumentedFetch(queryUrl.href, requestInit);
 
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
+      throw new Error(`HTTP ${res.status} (${res.statusText}) while fetching "${res.url}"`);
     }
 
     untransformedData = await readData(res);

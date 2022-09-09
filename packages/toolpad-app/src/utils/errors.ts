@@ -1,5 +1,11 @@
+import { SerializedError } from '@mui/toolpad-core';
 import { hasOwnProperty } from './collections';
 import { truncate } from './strings';
+
+export function serializeError(error: Error): SerializedError {
+  const { message, name, stack } = error;
+  return { message, name, stack };
+}
 
 export function errorFrom(maybeError: unknown): Error {
   if (maybeError instanceof Error) {

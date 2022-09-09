@@ -5,7 +5,7 @@ import { execQuery, loadDom } from './data';
 import initMiddleware from './initMiddleware';
 import { VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
-import { errorFrom } from '../utils/errors';
+import { errorFrom, serializeError } from '../utils/errors';
 
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
@@ -16,11 +16,6 @@ const cors = initMiddleware<any>(
     origin: '*',
   }),
 );
-
-function serializeError(error: Error): SerializedError {
-  const { message, name, stack } = error;
-  return { message, name, stack };
-}
 
 function withSerializedError<T extends { error?: unknown }>(
   withError: T,

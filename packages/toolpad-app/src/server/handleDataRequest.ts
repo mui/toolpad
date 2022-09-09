@@ -25,10 +25,10 @@ function serializeError(error: Error): SerializedError {
 function withSerializedError<T extends { error?: unknown }>(
   withError: T,
 ): Omit<T, 'error'> & { error?: SerializedError } {
-  const { error, ...withouError } = withError;
+  const { error, ...withoutError } = withError;
   return withError.error
-    ? { ...withouError, error: serializeError(errorFrom(error)) }
-    : withouError;
+    ? { ...withoutError, error: serializeError(errorFrom(error)) }
+    : withoutError;
 }
 
 export interface HandleDataRequestParams {

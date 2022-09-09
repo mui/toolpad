@@ -53,9 +53,19 @@ import statisticsDom from './appTemplates/statistics.json';
 import imagesDom from './appTemplates/images.json';
 
 const APP_TEMPLATE_OPTIONS = [
-  { value: 'blank', label: 'Blank page', dom: null },
-  { value: 'stats', label: 'Statistics', dom: statisticsDom },
-  { value: 'images', label: 'Images', dom: imagesDom },
+  { value: 'blank', label: 'Blank page', description: 'Start with an empty canvas', dom: null },
+  {
+    value: 'stats',
+    label: 'Statistics',
+    description: 'Table with statistics data',
+    dom: statisticsDom,
+  },
+  {
+    value: 'images',
+    label: 'Images',
+    description: 'Fetch remote images',
+    dom: imagesDom,
+  },
 ];
 
 export interface CreateAppDialogProps {
@@ -106,7 +116,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               sx={{ my: 1 }}
               autoFocus
               fullWidth
-              label="name"
+              label="Name"
               value={name}
               error={createAppMutation.isError}
               helperText={createAppMutation.isError ? `An app named "${name}" already exists` : ''}
@@ -124,9 +134,12 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               value={appTemplate}
               onChange={handleAppTemplateChange}
             >
-              {APP_TEMPLATE_OPTIONS.map(({ value, label }) => (
+              {APP_TEMPLATE_OPTIONS.map(({ value, label, description }) => (
                 <MenuItem key={value} value={value}>
-                  {label}
+                  <span>
+                    <Typography>{label}</Typography>
+                    <Typography variant="caption">{description || ''}</Typography>
+                  </span>
                 </MenuItem>
               ))}
             </TextField>

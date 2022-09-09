@@ -37,7 +37,7 @@
     },
     {
       "groupName": "postgres",
-      "matchPackageNames": ["cimg/postgres"],
+      "matchPackageNames": ["cimg/postgres", "postgres"],
       "enabled": false
     },
     {

@@ -1,7 +1,7 @@
 import {
   styled,
   SxProps,
-  Typography,
+  // Typography,
   Tooltip,
   Skeleton,
   Box,
@@ -20,8 +20,11 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import HierarchyExplorer from './HierarchyExplorer';
 import client from '../../api';
 import { useDom } from '../DomLoader';
+import type { AppMeta } from '../../server/data';
 import JsonView from '../../components/JsonView';
+import EditableText from '../../components/EditableText';
 import useMenu from '../../utils/useMenu';
+import { parseError } from '../../utils/errors';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
@@ -73,6 +76,74 @@ function AppMenu() {
   );
 }
 
+interface AppNameEditableProps {
+  app?: AppMeta;
+  editing?: boolean;
+  setEditing: (editing: boolean) => void;
+  loading?: boolean;
+}
+
+function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableProps) {
+  const [appRenameError, setAppRenameError] = React.useState<Error | null>(null);
+  const appNameInput = React.useRef<HTMLInputElement | null>(null);
+  const [appName, setAppName] = React.useState<string>(app?.name || '');
+
+  const handleAppNameChange = React.useCallback(
+    (newValue: string) => {
+      setAppRenameError(null);
+      setAppName(newValue);
+    },
+    [setAppName],
+  );
+
+  const handleAppRenameClose = React.useCallback(() => {
+    setEditing(false);
+    setAppRenameError(null);
+  }, [setEditing]);
+
+  const handleAppRenameSave = React.useCallback(
+    async (name: string) => {
+      if (app?.id) {
+        try {
+          await client.mutation.updateApp(app.id, name);
+          await client.invalidateQueries('getApps');
+        } catch (rawError) {
+          setAppRenameError(parseError(rawError));
+          setEditing(true);
+        }
+      }
+    },
+    [app?.id, setEditing],
+  );
+
+  return loading ? (
+    <Skeleton />
+  ) : (
+    <EditableText
+      defaultValue={app?.name}
+      editable={editing}
+      helperText={appRenameError ? `An app named "${appName}" already exists` : null}
+      error={!!appRenameError}
+      onChange={handleAppNameChange}
+      onClose={handleAppRenameClose}
+      onSave={handleAppRenameSave}
+      onClick={() => setEditing(true)}
+      ref={appNameInput}
+      sx={{
+        width: '100%',
+        '& :hover': {
+          outline: `1px solid rgba(0,0,0,0.1)`,
+        },
+      }}
+      inputSx={{
+        cursor: 'text',
+      }}
+      value={appName}
+      variant="subtitle1"
+    />
+  );
+}
+
 export interface ComponentPanelProps {
   appId: string;
   className?: string;
@@ -81,6 +152,7 @@ export interface ComponentPanelProps {
 
 export default function PagePanel({ appId, className, sx }: ComponentPanelProps) {
   const { data: app, isLoading } = client.useQuery('getApp', [appId]);
+  const [editingAppTitle, setEditingAppTitle] = React.useState(false);
 
   return (
     <PagePanelRoot className={className} sx={sx}>
@@ -95,11 +167,18 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
           alignItems: 'center',
         }}
       >
-        {isLoading ? (
+        {isLoading || !app ? (
           <Skeleton variant="text" width={70} />
         ) : (
-          <Tooltip title={app?.name || ''} enterDelay={500}>
-            <Typography noWrap>{app?.name}</Typography>
+          <Tooltip title={editingAppTitle ? '' : 'Rename'} arrow>
+            <div>
+              <AppNameEditable
+                app={app}
+                editing={editingAppTitle}
+                setEditing={setEditingAppTitle}
+                loading={isLoading}
+              />
+            </div>
           </Tooltip>
         )}
         <AppMenu />

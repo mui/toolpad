@@ -10,8 +10,10 @@ interface EditableTextProps {
   onChange?: (newValue: string) => void;
   onSave?: (newValue: string) => void;
   onClose?: () => void;
+  onClick?: () => void;
   size?: 'small' | 'medium';
   sx?: SxProps;
+  inputSx?: SxProps;
   value?: string;
   variant?: TypographyVariant;
 }
@@ -27,10 +29,13 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
       onChange,
       onClose,
       onSave,
+      onClick,
       size,
       sx,
+      inputSx,
       value,
       variant: typographyVariant = 'body1',
+      ...props
     },
     ref,
   ) => {
@@ -121,11 +126,14 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
             whiteSpace: 'nowrap',
             fontSize: theme.typography[typographyVariant].fontSize,
             height: theme.typography[typographyVariant].fontSize,
+            ...inputSx,
           }),
+          ...props,
         }}
         onKeyUp={handleInput}
         onBlur={handleBlur}
         onChange={handleChange}
+        onClick={onClick}
         size={size ?? 'small'}
         sx={{
           ...sx,

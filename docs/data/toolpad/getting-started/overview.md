@@ -6,8 +6,8 @@ Toolpad is a low-code UI builder for creating apps with MUI's suite of component
 
 ## Introduction
 
-Toolpad is a self-hosted low-code internal tools builder designed to extend MUI's suite of React components. 
-It's designed for developers of all trades who want to save time building internal applications. 
+Toolpad is a self-hosted low-code internal tools builder designed to extend MUI's suite of React components.
+It's designed for developers of all trades who want to save time building internal applications.
 Drag and drop pre-built UI components, connect your data sources, release your app, and you're done!
 
 ![Editor screenshot](/static/toolpad/marketing/index-hero-video-poster.jpg)
@@ -30,4 +30,3 @@ These are the primary elements of the Toolpad interface:
 - **Component library**: where you can find component instances to drag and drop onto the Canvas.
 - **Canvas**: where you build out your app.
 - **Inspector**: where you can modify properties of a different instance.
-

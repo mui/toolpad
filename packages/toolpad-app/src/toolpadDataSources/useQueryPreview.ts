@@ -1,17 +1,19 @@
+import { ExecFetchResult } from '@mui/toolpad-core';
 import * as React from 'react';
-import { useConnectionContext } from './context';
-import client from '../api';
+import { errorFrom, serializeError } from '../utils/errors';
+import useFetchPrivate from './useFetchPrivate';
 
 export interface UseQueryPreviewOptions<R> {
   onPreview?: (result: R) => void;
 }
 
-export default function useQueryPreview<PQ, R>(
+export default function useQueryPreview<PQ, R extends ExecFetchResult<any> & Partial<any>>(
   privateQuery: PQ,
   { onPreview = () => {} }: UseQueryPreviewOptions<R> = {},
 ) {
-  const { appId, dataSourceId, connectionId } = useConnectionContext();
   const [preview, setPreview] = React.useState<R | null>(null);
+
+  const fetchPrivate = useFetchPrivate<PQ, R>();
 
   const cancelRunPreview = React.useRef<(() => void) | null>(null);
   const runPreview = React.useCallback(() => {
@@ -22,18 +24,22 @@ export default function useQueryPreview<PQ, R>(
       canceled = true;
     };
 
-    client.query
-      .dataSourceFetchPrivate(appId, dataSourceId, connectionId, privateQuery)
-      .then((result) => {
-        if (!canceled) {
-          setPreview(result);
-          onPreview?.(result);
-        }
-      })
+    fetchPrivate(privateQuery)
+      .then(
+        (result) => {
+          if (!canceled) {
+            setPreview(result);
+            onPreview?.(result);
+          }
+        },
+        (error) => {
+          setPreview({ error: serializeError(errorFrom(error)) } as R);
+        },
+      )
       .finally(() => {
         cancelRunPreview.current = null;
       });
-  }, [appId, dataSourceId, connectionId, privateQuery, onPreview]);
+  }, [fetchPrivate, privateQuery, onPreview]);
 
   return { preview, runPreview };
 }

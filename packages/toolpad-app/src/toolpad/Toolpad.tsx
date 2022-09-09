@@ -1,9 +1,7 @@
 import * as React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { Box, CircularProgress, NoSsr, styled } from '@mui/material';
 import { ErrorBoundary } from 'react-error-boundary';
-import Release from './Release';
-import Releases from './Releases';
 import AppEditor from './AppEditor';
 import Home from './Home';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
@@ -35,13 +33,17 @@ function FullPageError({ error }: FullPageErrorProps) {
   );
 }
 
+function LegacyEditorUrlRedirect() {
+  const { '*': editorRoute } = useParams();
+  return <Navigate to={`../${editorRoute}`} />;
+}
+
 function AppWorkspace() {
   return (
     <Routes>
       <Route>
-        <Route path="editor/*" element={<AppEditor />} />
-        <Route path="releases" element={<Releases />} />
-        <Route path="releases/:version" element={<Release />} />
+        <Route path="editor/*" element={<LegacyEditorUrlRedirect />} />
+        <Route path="*" element={<AppEditor />} />
       </Route>
     </Routes>
   );

@@ -3,13 +3,6 @@ import { createComponent } from '@mui/toolpad-core';
 
 export default createComponent(Stack, {
   argTypes: {
-    gap: {
-      typeDef: { type: 'number' },
-      defaultValue: 2,
-    },
-    margin: {
-      typeDef: { type: 'number' },
-    },
     direction: {
       typeDef: {
         type: 'string',
@@ -30,6 +23,13 @@ export default createComponent(Stack, {
         enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
       },
       defaultValue: 'start',
+    },
+    gap: {
+      typeDef: { type: 'number' },
+      defaultValue: 2,
+    },
+    margin: {
+      typeDef: { type: 'number' },
     },
     children: {
       typeDef: { type: 'element' },

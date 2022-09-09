@@ -5,8 +5,7 @@ const createJestConfig = nextJest();
 
 async function jestConfig(): Promise<Config.InitialOptions> {
   const baseConfig: Config.InitialOptions = {
-    testEnvironment: 'jest-environment-jsdom',
-    setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
+    testEnvironment: '<rootDir>/jest-environment-jsdom.ts',
   };
   const nextJestConfig: Config.InitialOptions = await createJestConfig(baseConfig)();
 

@@ -14,9 +14,7 @@ export default function GlobalScopeExplorer({ value, sx }: GlobalScopeExplorerPr
       <Typography sx={{ mb: 1 }} variant="subtitle2">
         Scope
       </Typography>
-      <Box sx={{ flex: 1, width: '100%', overflow: 'auto' }}>
-        <JsonView src={value} />
-      </Box>
+      <JsonView sx={{ flex: 1, width: '100%' }} src={value} />
     </Box>
   );
 }

@@ -1,11 +1,14 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
-async function fetchData(dataUrl: string, queryId: string, params: any) {
+export async function execDataSourceQuery(dataUrl: string, queryId: string, params: any) {
   const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
-  url.searchParams.set('params', JSON.stringify(params));
-  const res = await fetch(String(url));
+  const res = await fetch(String(url), {
+    method: 'POST',
+    body: JSON.stringify(params),
+    headers: [['content-type', 'application/json']],
+  });
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} while fetching "${url}"`);
   }
@@ -42,20 +45,32 @@ export function useDataQuery(
   dataUrl: string,
   queryId: string | null,
   params: any,
-  { enabled = true, ...options }: UseDataQueryConfig,
+  {
+    enabled = true,
+    ...options
+  }: Pick<
+    UseQueryOptions<any, unknown, unknown, any[]>,
+    'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
+  >,
 ): UseDataQuery {
   const {
     isLoading,
     isFetching,
-    error,
+    error: fetchError,
     data: responseData = EMPTY_OBJECT,
     refetch,
-  } = useQuery([dataUrl, queryId, params], () => queryId && fetchData(dataUrl, queryId, params), {
-    ...options,
-    enabled: !!queryId && enabled,
-  });
+  } = useQuery(
+    [dataUrl, queryId, params],
+    () => queryId && execDataSourceQuery(dataUrl, queryId, params),
+    {
+      ...options,
+      enabled: !!queryId && enabled,
+    },
+  );
 
-  const { data } = responseData;
+  const { data, error: apiError } = responseData;
+
+  const error = apiError || fetchError;
 
   const rows = Array.isArray(data) ? data : EMPTY_ARRAY;
 

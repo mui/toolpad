@@ -7,10 +7,9 @@ import {
   FormControlLabel,
   Typography,
   Skeleton,
-  Box,
 } from '@mui/material';
 import * as React from 'react';
-import { UseQueryResult } from 'react-query';
+import { UseQueryResult } from '@tanstack/react-query';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   GoogleSheetsConnectionParams,
@@ -34,13 +33,6 @@ import useQueryPreview from '../useQueryPreview';
 
 function getInitialQueryValue(): GoogleSheetsApiQuery {
   return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '', headerRow: false };
-}
-
-function isConnectionValid(connection: GoogleSheetsConnectionParams | null): boolean {
-  if (connection?.access_token && connection?.refresh_token) {
-    return true;
-  }
-  return false;
 }
 
 function QueryEditor({
@@ -209,13 +201,11 @@ function QueryEditor({
           </Stack>
         </QueryInputPanel>
 
-        <Box sx={{ height: '100%', overflow: 'auto', mx: 1 }}>
-          {preview?.error ? (
-            <ErrorAlert error={preview?.error} />
-          ) : (
-            <JsonView src={preview?.data} />
-          )}
-        </Box>
+        {preview?.error ? (
+          <ErrorAlert error={preview?.error} />
+        ) : (
+          <JsonView sx={{ height: '100%' }} src={preview?.data} />
+        )}
       </SplitPane>
     </QueryEditorShell>
   );
@@ -258,7 +248,6 @@ function ConnectionParamsInput({
 const dataSource: ClientDataSource<GoogleSheetsConnectionParams, GoogleSheetsApiQuery> = {
   displayName: 'Google Sheets',
   ConnectionParamsInput,
-  isConnectionValid,
   QueryEditor,
   getInitialQueryValue,
 };

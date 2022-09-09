@@ -6,7 +6,7 @@ function SelectPropEditor({ label, propType, value, onChange, disabled }: Editor
   const items = propType.type === 'string' ? propType.enum ?? [] : [];
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(event.target.value);
+      onChange(event.target.value || undefined);
     },
     [onChange],
   );

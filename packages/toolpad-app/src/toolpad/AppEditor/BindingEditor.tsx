@@ -109,9 +109,7 @@ function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreview
       <Toolbar disableGutters>
         <Typography color="error">{previewError?.message}</Typography>
       </Toolbar>
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <JsonView src={lastGoodPreview?.value} />
-      </Box>
+      <JsonView sx={{ flex: 1 }} src={lastGoodPreview?.value} />
     </React.Fragment>
   );
 }
@@ -353,6 +351,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
    */
   server?: boolean;
   disabled?: boolean;
+  hidden?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
 }
@@ -362,6 +361,7 @@ export function BindingEditor<V>({
   globalScope,
   server,
   disabled,
+  hidden = false,
   propType,
   value,
   onChange,
@@ -385,6 +385,7 @@ export function BindingEditor<V>({
       checkedIcon={<LinkIcon />}
       onClick={handleOpen}
       color={error ? 'error' : undefined}
+      sx={{ visibility: hidden ? 'hidden' : 'visible' }}
     />
   );
 

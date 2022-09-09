@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  Box,
   TextField as MuiTextField,
   TextFieldProps as MuiTextFieldProps,
   BoxProps,
@@ -12,16 +11,24 @@ export type TextFieldProps = MuiTextFieldProps & {
   justifyContent?: BoxProps['justifyContent'];
 };
 
-function TextField({ alignItems, justifyContent, ...props }: TextFieldProps) {
-  return (
-    <Box sx={{ display: 'flex', alignItems, justifyContent }}>
-      <MuiTextField {...props} />
-    </Box>
-  );
+function TextField({ defaultValue, ...props }: TextFieldProps) {
+  return <MuiTextField {...props} />;
 }
 
 export default createComponent(TextField, {
+  layoutDirection: 'both',
   argTypes: {
+    value: {
+      typeDef: { type: 'string' },
+      onChangeProp: 'onChange',
+      onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
+      defaultValue: '',
+      defaultValueProp: 'defaultValue',
+    },
+    defaultValue: {
+      typeDef: { type: 'string' },
+      defaultValue: '',
+    },
     label: {
       typeDef: { type: 'string' },
     },
@@ -29,39 +36,15 @@ export default createComponent(TextField, {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },
       defaultValue: 'outlined',
     },
-    disabled: {
-      typeDef: { type: 'boolean' },
-    },
-    alignItems: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      },
-      label: 'Vertical alignment',
-      control: { type: 'VerticalAlign' },
-      defaultValue: 'center',
-    },
-    justifyContent: {
-      typeDef: {
-        type: 'string',
-        enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
-      },
-      label: 'Horizontal alignment',
-      control: { type: 'HorizontalAlign' },
-      defaultValue: 'start',
-    },
-    fullWidth: {
-      typeDef: { type: 'boolean' },
-    },
     size: {
       typeDef: { type: 'string', enum: ['small', 'normal'] },
       defaultValue: 'small',
     },
-    value: {
-      typeDef: { type: 'string' },
-      onChangeProp: 'onChange',
-      onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
-      defaultValue: '',
+    fullWidth: {
+      typeDef: { type: 'boolean' },
+    },
+    disabled: {
+      typeDef: { type: 'boolean' },
     },
     sx: {
       typeDef: { type: 'object' },

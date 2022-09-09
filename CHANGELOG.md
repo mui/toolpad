@@ -1,5 +1,123 @@
 # Changelog
 
+## v0.0.17
+
+<!-- generated comparing v0.0.16..master -->
+
+_Sep 7, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Landing page, configure body and headers in REST datasources, support bindable default values for inputs, improved save state display, minimum and maximum values for number props.
+
+- &#8203;<!-- 20 -->Support DatePicker examples in custom components (#903) @Janpot
+- &#8203;<!-- 19 -->Disable binding for layout props (#862) @apedroferreira
+- &#8203;<!-- 18 -->Update screen after every render (#896) @Janpot
+- &#8203;<!-- 17 -->Rest datasource configure bodies and headers (#721) @Janpot
+- &#8203;<!-- 16 -->Use PostgreSQL as displayName instead of Postgres (#894) @Janpot
+- &#8203;<!-- 15 -->Upgrade typescript across packages (#897) @Janpot
+- &#8203;<!-- 14 -->Allow minimum and maximum value for component number props (#871) @apedroferreira
+- &#8203;<!-- 13 -->Fix typo in code (#883) @Janpot
+- &#8203;<!-- 12 -->Simplify deploy flow (#875) @Janpot
+- &#8203;<!-- 11 -->Add more info to console error detection in integration tests (#881) @Janpot
+- &#8203;<!-- 10 -->Force node 16 on render.com (#880) @Janpot
+- &#8203;<!-- 09 -->Editor and save state tweaks (#879) @apedroferreira
+- &#8203;<!-- 08 -->Be more accepting in postgres error parsing (#877) @Janpot
+- &#8203;<!-- 07 -->Support bindable default value for inputs (#838) @Janpot
+- &#8203;<!-- 06 -->[core] Update monorepo (#891) @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Fix screenshot link in the README (#893) @bharatkashyap
+- &#8203;<!-- 04 -->[website] Fix GA events going to development (#899) @bharatkashyap
+- &#8203;<!-- 03 -->[website] Improve video poster (#892) @oliviertassinari
+- &#8203;<!-- 02 -->[website] Fix logo dimension (#888) @oliviertassinari
+- &#8203;<!-- 01 -->[website] Landing page (#809) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
+## v0.0.16
+
+<!-- generated comparing v0.0.15..master -->
+
+_Aug 31, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Simplify interaction between canvas and editor, new interface to view unsaved changes, improve the flow for creating and editing queries and improve the localStorage hook implementation. Also, some documentation improvements!
+
+- &#8203;<!-- 14 -->Nudge PRs to have linked issues, visual demos (#836) @bharatkashyap
+- &#8203;<!-- 13 -->Fix error when rendering empty grid (#872) @Janpot
+- &#8203;<!-- 12 -->Hide number of changes in UI, add it in debug logging utility (#861) @apedroferreira
+- &#8203;<!-- 11 -->Props panel sections (#855) @apedroferreira
+- &#8203;<!-- 10 -->Simplify interaction between canvas and editor (#858) @Janpot
+- &#8203;<!-- 09 -->Improved and updated tutorial.md (#865) @VasuDevrani
+- &#8203;<!-- 08 -->Only sign in to dockerhub if we intend to push images (#867) @Janpot
+- &#8203;<!-- 07 -->Remove baseline overrides from eslintrc (#835) @Janpot
+- &#8203;<!-- 06 -->Allow intercepting the console on CanvasHost (#856) @Janpot
+- &#8203;<!-- 05 -->Improve drop area design (#854) @apedroferreira
+- &#8203;<!-- 04 -->Improve QueryEditor flow (#844) @Janpot
+- &#8203;<!-- 03 -->Fix missing jsx key warning (#851) @Janpot
+- &#8203;<!-- 02 -->Improve localStorage implementation (#846) @Janpot
+- &#8203;<!-- 01 -->Parse numbers as ms from epoch for date/datetime columns (#848) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @VasuDevrani
+
+## v0.0.15
+
+<!-- generated comparing v0.0.14..master -->
+
+_Aug 24, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+New Postgres datasource, support mutations.
+
+- &#8203;<!-- 15 -->Support mutations as non-idempotent version of queries (#698) @Janpot
+- &#8203;<!-- 14 -->Verify that the base image exists in the docker release script (#824) @Janpot
+- &#8203;<!-- 13 -->Fix missing key warning (#842) @Janpot
+- &#8203;<!-- 12 -->Tweak release instructions (#829) @bytasv
+- &#8203;<!-- 11 -->Remove obsolete core lib patch (#801) @Janpot
+- &#8203;<!-- 10 -->Debounce code component renderering (#805) @Janpot
+- &#8203;<!-- 09 -->Validate the name when creating code components (#802) @Janpot
+- &#8203;<!-- 08 -->Create postgres dataSource prototype (#811) @Janpot
+- &#8203;<!-- 07 -->Add tooltip to WIP components (#837) @Janpot
+- &#8203;<!-- 06 -->Automatically wrap non-layout components in box containers (#804) @apedroferreira
+- &#8203;<!-- 05 -->Use short ids for dom nodes (#807) @Janpot
+- &#8203;<!-- 04 -->Remove dom duplication (#825) @Janpot
+- &#8203;<!-- 03 -->Use prettier CLI + pretty-quick (#823) @Janpot
+- &#8203;<!-- 02 -->App renaming integration test (#820) @Janpot
+- &#8203;<!-- 01 -->Add hook to ease menu implementation (#821) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot
+
+## v0.0.14
+
+<!-- generated comparing v0.0.13..master -->
+
+_Aug 18, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+Add app overview list view, allow setting properties in code component debugger, Fix artifacts in the page designer, visual tweaks to the select component options editor.
+
+- &#8203;<!-- 18 -->Add List view for apps as default (#690) @bharatkashyap
+- &#8203;<!-- 17 -->Add interface to debug properties for code components (#803) @Janpot
+- &#8203;<!-- 16 -->Fix custom component slots (#750) @apedroferreira
+- &#8203;<!-- 15 -->Prevent node HUD from getting cut-off (#772) @apedroferreira
+- &#8203;<!-- 14 -->Improve JsonView component UX (#797) @Janpot
+- &#8203;<!-- 13 -->Fix deleting newly placed components with Backspace key (#771) @apedroferreira
+- &#8203;<!-- 12 -->Update/improve release guide (#770) @apedroferreira
+- &#8203;<!-- 11 -->Upgrade @mui/\* packages (#785) @Janpot
+- &#8203;<!-- 10 -->Use stable version of react-query (#784) @Janpot
+- &#8203;<!-- 09 -->Use stable version of monaco-editor (#783) @Janpot
+- &#8203;<!-- 08 -->Add tooling to facilitate integration testing (#786) @Janpot
+- &#8203;<!-- 07 -->Fix scrollbar when selection options (#788) @oliviertassinari
+- &#8203;<!-- 06 -->Make sure the application isn't saved during mounting (#779) @Janpot
+- &#8203;<!-- 05 -->Make sure old style references are backwards compatible (#780) @Janpot
+- &#8203;<!-- 04 -->Improve handling of React keys in ComponentCatalog (#775) @Janpot
+- &#8203;<!-- 03 -->Fix missing key warning (#774) @Janpot
+- &#8203;<!-- 02 -->Support default datasources (#691) @Janpot
+- &#8203;<!-- 01 -->Put datasource in charge of saving the QueryNode (#764) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
 ## v0.0.13
 
 <!-- generated comparing v0.0.12..master -->

@@ -62,6 +62,12 @@ export default function CreateCodeComponentDialog({
     event.target.select();
   }, []);
 
+  const inputErrorMsg = React.useMemo(
+    () => (name ? appDom.validateNodeName(name, 'a code component name') : null),
+    [name],
+  );
+  const isInvalid = !!inputErrorMsg;
+
   return (
     <Dialog {...props} onClose={onClose}>
       <DialogForm
@@ -77,7 +83,7 @@ export default function CreateCodeComponentDialog({
           const appNode = appDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'codeComponents');
           onClose();
-          navigate(`/app/${appId}/editor/codeComponents/${newNode.id}`);
+          navigate(`/app/${appId}/codeComponents/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Toolpad Code Component</DialogTitle>
@@ -90,13 +96,15 @@ export default function CreateCodeComponentDialog({
             label="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
+            error={isInvalid}
+            helperText={inputErrorMsg}
           />
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!name}>
+          <Button type="submit" disabled={!name || isInvalid}>
             Create
           </Button>
         </DialogActions>

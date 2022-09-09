@@ -1,3 +1,5 @@
+import { ExecFetchResult } from '@mui/toolpad-core';
+
 export interface PostgresConnectionParams {
   host: string;
   port: number;
@@ -7,6 +9,26 @@ export interface PostgresConnectionParams {
 }
 
 export interface PostgresQuery {
-  text: string;
-  params: any[];
+  sql: string;
 }
+
+export interface PostgresResult extends ExecFetchResult<any[]> {}
+
+export interface PostgresConnectionStatus {
+  error: string | null;
+}
+
+export interface PostgresPrivateQueryDebugExec {
+  kind: 'debugExec';
+  query: PostgresQuery;
+  params: Record<string, any>;
+}
+
+export interface PostgresPrivateQueryConnectionStatus {
+  kind: 'connectionStatus';
+  params: PostgresConnectionParams;
+}
+
+export type PostgresPrivateQuery =
+  | PostgresPrivateQueryDebugExec
+  | PostgresPrivateQueryConnectionStatus;

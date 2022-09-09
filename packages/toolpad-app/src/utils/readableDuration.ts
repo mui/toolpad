@@ -19,9 +19,9 @@ const getReadableDuration = (editedAt: Date) => {
   } else if (Math.floor(delta / hour) === 1) {
     readableDuration = '1 hour ago';
   } else if (delta < day) {
-    readableDuration = `${Math.floor(delta / hour)}  hours ago`;
+    readableDuration = `${Math.floor(delta / hour)} hours ago`;
   } else {
-    readableDuration = editedAt.toLocaleDateString('short');
+    readableDuration = `on ${editedAt.toLocaleDateString('short')}`;
   }
   return readableDuration;
 };

@@ -9,6 +9,7 @@ import {
   SecretAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from './types';
 import { omit, update, updateOrCreate } from './utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
@@ -44,7 +45,8 @@ type AppDomNodeType =
   | 'page'
   | 'element'
   | 'codeComponent'
-  | 'query';
+  | 'query'
+  | 'mutation';
 
 interface AppDomNodeBase {
   readonly id: NodeId;
@@ -91,6 +93,8 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
   };
   readonly props?: BindableAttrValues<P>;
   readonly layout?: {
+    readonly horizontalAlign?: ConstantAttrValue<BoxProps['justifyContent']>;
+    readonly verticalAlign?: ConstantAttrValue<BoxProps['alignItems']>;
     readonly columnSize?: ConstantAttrValue<number>;
   };
 }
@@ -102,9 +106,15 @@ export interface CodeComponentNode extends AppDomNodeBase {
   };
 }
 
-export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
+/**
+ * A DOM query is defined primarily by a server defined part "attributes.query"
+ * and a clientside defined part "params". "params" are constructed in the runtime
+ * from bound expressions. The resolved object will be sent to the server and combined
+ * with the query will be used to collect the data from the backend.
+ */
+export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
-  readonly params?: BindableAttrValues<P>;
+  readonly params?: BindableAttrValues;
   readonly attributes: {
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeReference | null>;
@@ -118,6 +128,16 @@ export interface QueryNode<Q = any, P = any> extends AppDomNodeBase {
   };
 }
 
+export interface MutationNode<Q = any, P = any> extends AppDomNodeBase {
+  readonly type: 'mutation';
+  readonly params?: BindableAttrValues<P>;
+  readonly attributes: {
+    readonly dataSource?: ConstantAttrValue<string>;
+    readonly connectionId: ConstantAttrValue<NodeReference | null>;
+    readonly query: ConstantAttrValue<Q>;
+  };
+}
+
 type AppDomNodeOfType<K extends AppDomNodeType> = {
   app: AppNode;
   connection: ConnectionNode;
@@ -126,6 +146,7 @@ type AppDomNodeOfType<K extends AppDomNodeType> = {
   element: ElementNode;
   codeComponent: CodeComponentNode;
   query: QueryNode;
+  mutation: MutationNode;
 }[K];
 
 type AllowedChildren = {
@@ -140,12 +161,14 @@ type AllowedChildren = {
   page: {
     children: 'element';
     queries: 'query';
+    mutations: 'mutation';
   };
   element: {
     [prop: string]: 'element';
   };
   codeComponent: {};
   query: {};
+  mutation: {};
 };
 
 export type AppDomNode = AppDomNodeOfType<AppDomNodeType>;
@@ -191,6 +214,10 @@ function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node i
 
 function assertIsType<T extends AppDomNode>(node: AppDomNode, type: T['type']): asserts node is T {
   invariant(isType(node, type), `Expected node type "${type}" but got "${node.type}"`);
+}
+
+function createId(): NodeId {
+  return cuid.slug() as NodeId;
 }
 
 export function createConst<V>(value: V): ConstantAttrValue<V> {
@@ -304,6 +331,14 @@ export function assertIsQuery<P>(node: AppDomNode): asserts node is QueryNode<P>
   assertIsType<QueryNode>(node, 'query');
 }
 
+export function isMutation<P>(node: AppDomNode): node is MutationNode<P> {
+  return isType<MutationNode>(node, 'mutation');
+}
+
+export function assertIsMutation<P>(node: AppDomNode): asserts node is MutationNode<P> {
+  assertIsType<MutationNode>(node, 'mutation');
+}
+
 export function getApp(dom: AppDom): AppNode {
   const rootNode = getNode(dom, dom.root);
   assertIsApp(rootNode);
@@ -386,9 +421,31 @@ function createNodeInternal<T extends AppDomNodeType>(
   } as AppDomNodeOfType<T>;
 }
 
-function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: string): string {
+export function validateNodeName(input: string, identifier = 'input'): string | null {
+  const firstLetter = input[0];
+  if (!/[a-z_]/i.test(firstLetter)) {
+    return `${identifier} may not start with a "${firstLetter}"`;
+  }
+
+  const match = /([^a-z0-9_])/i.exec(input);
+
+  if (match) {
+    const invalidCharacter = match[1];
+    if (/\s/.test(invalidCharacter)) {
+      return `${identifier} may not contain spaces`;
+    }
+
+    return `${identifier} may not contain a "${invalidCharacter}"`;
+  }
+
+  return null;
+}
+
+export function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: string): string {
+  let slug = nameCandidate;
+  slug = slug.trim();
   // try to replace accents with relevant ascii
-  let slug = removeDiacritics(nameCandidate);
+  slug = removeDiacritics(slug);
   // replace spaces with camelcase
   slug = camelCase(...slug.split(/\s+/));
   // replace disallowed characters for js identifiers
@@ -407,7 +464,7 @@ export function createNode<T extends AppDomNodeType>(
   type: T,
   init: AppDomNodeInitOfType<T>,
 ): AppDomNodeOfType<T> {
-  const id = cuid() as NodeId;
+  const id = createId();
   const name = slugifyNodeName(dom, init.name || type, type);
   return createNodeInternal(id, type, {
     ...init,
@@ -416,7 +473,7 @@ export function createNode<T extends AppDomNodeType>(
 }
 
 export function createDom(): AppDom {
-  const rootId = cuid() as NodeId;
+  const rootId = createId();
   return {
     nodes: {
       [rootId]: createNodeInternal(rootId, 'app', {
@@ -787,7 +844,15 @@ export function getNewParentIndexAfterNode(
   return createFractionalIndex(node.parentIndex, nodeAfter?.parentIndex || null);
 }
 
-const RENDERTREE_NODES = ['app', 'page', 'element', 'query', 'theme', 'codeComponent'] as const;
+const RENDERTREE_NODES = [
+  'app',
+  'page',
+  'element',
+  'query',
+  'mutation',
+  'theme',
+  'codeComponent',
+] as const;
 
 export type RenderTreeNodeType = typeof RENDERTREE_NODES[number];
 export type RenderTreeNode = { [K in RenderTreeNodeType]: AppDomNodeOfType<K> }[RenderTreeNodeType];

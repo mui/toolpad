@@ -14,10 +14,10 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 
 ## Advantages of Toolpad
 
-- [Build UI](/toolpad/core-concepts/building-ui/) using our drag & drop editor
-- [Configure and fetch](/toolpad/core-concepts/connecting-to-datasources/) data from HTTP endpoints, Google sheets or even directly from PostgreSQL
-- Connect data with UI elements using [binding expressions](/toolpad/core-concepts/data-binding/)
-- When you are ready to share - [deploy](/toolpad/core-concepts/versioning-and-deploying/) a new version
+- **Build faster than ever before:** measure your development time in minutes rather than hours or days—simply drag and drop the components you need.
+- **Extensible with code:** build low-code with pro-code extensibility. You can write JavaScript anywhere in Toolpad as soon as you feel limited by the built-in features.
+- **Connect to any data source:** Toolpad lets you work with HTTP endpoints, Google Sheets, or PostgreSQL for backend functionality.
+- **Robust versioning and deployment:** use a Git workflow to seamlessly manage deployment and versioning of your app.
 
 ## Navigating Toolpad
 

@@ -458,6 +458,11 @@ export async function loadRenderTree(appId: string, version: VersionOrPreview = 
 
 export async function duplicateApp(id: string, name: string): Promise<AppMeta> {
   const dom = await loadPreviewDom(id);
-  const newApp = await createApp(`${name} (copy)`, { dom });
+  const duplicateCount = await prismaClient.app.count({
+    where: { name: { startsWith: `${name} (copy`, endsWith: ')' } },
+  });
+  const duplicateName =
+    duplicateCount === 0 ? `${name} (copy)` : `${name} (copy ${duplicateCount + 1})`;
+  const newApp = await createApp(duplicateName, { dom });
   return newApp;
 }

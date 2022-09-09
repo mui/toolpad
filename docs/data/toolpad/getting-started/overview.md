@@ -25,9 +25,9 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 
 There are 5 most frequently used areas:
 
-- **Navigation** - return to homepage, preview or deploy app
-- **Explorer** - this is there you define and manage pages, connection configurations, custom component definitions, etc...
-- **Component library** - drag component instance from this drawer and drop it in **Canvas** to build UI
-- **Canvas** - this is a place where you build your app and immediately preview how it looks like
-- **Inspector** - modify properties of a different instance
+- **Navigation**: where you can return to the homepage, or preview or deploy your app.
+- **Explorer**: where you can define and manage pages, connection configurations, custom component definitions, and more.
+- **Component library**: where you can find component instances to drag and drop onto the Canvas.
+- **Canvas**: where you build out your app.
+- **Inspector**: where you can modify properties of a different instance.
 

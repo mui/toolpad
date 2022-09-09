@@ -1,5 +1,6 @@
 import { BindableAttrEntries, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import fetch, { Headers, RequestInit, Response } from 'node-fetch';
+import MIMEType from 'whatwg-mimetype';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource, ApiResult } from '../../types';
 import {
@@ -16,7 +17,7 @@ import { removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import { getAuthenticationHeaders, HTTP_NO_BODY, parseBaseUrl } from './shared';
 import applyTransform from '../../server/applyTransform';
-import { parseError } from '../../utils/errors';
+import { errorFrom } from '../../utils/errors';
 
 async function resolveBindable(
   bindable: BindableAttrValue<string>,
@@ -112,8 +113,18 @@ async function resolveBody(body: Body, boundValues: Record<string, string>) {
   }
 }
 
+function isJSON(mimeType: MIMEType): boolean {
+  // See https://mimesniff.spec.whatwg.org/#json-mime-type
+  const essence = `${mimeType.type}/${mimeType.subtype}`;
+  return (
+    essence === 'text/json' || essence === 'application/json' || mimeType.subtype.endsWith('+json')
+  );
+}
+
 async function readData(res: Response): Promise<any> {
-  return res.headers.get('content-type') === 'application/json' ? res.json() : res.text();
+  const contentType = res.headers.get('content-type');
+  const mimeType = contentType ? new MIMEType(contentType) : null;
+  return mimeType && isJSON(mimeType) ? res.json() : res.text();
 }
 
 async function execBase(
@@ -179,7 +190,7 @@ async function execBase(
       data = await applyTransform(fetchQuery.transform, untransformedData);
     }
   } catch (rawError) {
-    error = parseError(rawError);
+    error = errorFrom(rawError);
   }
 
   return { data, untransformedData, error, har };

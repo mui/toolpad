@@ -457,8 +457,8 @@ function QueryNode({ node }: QueryNodeProps) {
     // Here we propagate the error and loading state to the data and rows prop prop
     // TODO: is there a straightforward way for us to generalize this behavior?
     setControlledBinding(`${node.id}.isLoading`, { value: isLoading });
+    setControlledBinding(`${node.id}.error`, { value: error });
     const deferredStatus = { loading: isLoading, error };
-    setControlledBinding(`${node.id}.error`, { ...deferredStatus, value: error });
     setControlledBinding(`${node.id}.data`, { ...deferredStatus, value: data });
     setControlledBinding(`${node.id}.rows`, { ...deferredStatus, value: rows });
   }, [node.id, queryResult, setControlledBinding]);

@@ -1,5 +1,38 @@
 # Changelog
 
+## v0.0.17
+
+<!-- generated comparing v0.0.16..master -->
+
+_Sep 7, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Landing page, configure body and headers in REST datasources, support bindable default values for inputs, improved save state display, minimum and maximum values for number props.
+
+- &#8203;<!-- 20 -->Support DatePicker examples in custom components (#903) @Janpot
+- &#8203;<!-- 19 -->Disable binding for layout props (#862) @apedroferreira
+- &#8203;<!-- 18 -->Update screen after every render (#896) @Janpot
+- &#8203;<!-- 17 -->Rest datasource configure bodies and headers (#721) @Janpot
+- &#8203;<!-- 16 -->Use PostgreSQL as displayName instead of Postgres (#894) @Janpot
+- &#8203;<!-- 15 -->Upgrade typescript across packages (#897) @Janpot
+- &#8203;<!-- 14 -->Allow minimum and maximum value for component number props (#871) @apedroferreira
+- &#8203;<!-- 13 -->Fix typo in code (#883) @Janpot
+- &#8203;<!-- 12 -->Simplify deploy flow (#875) @Janpot
+- &#8203;<!-- 11 -->Add more info to console error detection in integration tests (#881) @Janpot
+- &#8203;<!-- 10 -->Force node 16 on render.com (#880) @Janpot
+- &#8203;<!-- 09 -->Editor and save state tweaks (#879) @apedroferreira
+- &#8203;<!-- 08 -->Be more accepting in postgres error parsing (#877) @Janpot
+- &#8203;<!-- 07 -->Support bindable default value for inputs (#838) @Janpot
+- &#8203;<!-- 06 -->[core] Update monorepo (#891) @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Fix screenshot link in the README (#893) @bharatkashyap
+- &#8203;<!-- 04 -->[website] Fix GA events going to development (#899) @bharatkashyap
+- &#8203;<!-- 03 -->[website] Improve video poster (#892) @oliviertassinari
+- &#8203;<!-- 02 -->[website] Fix logo dimension (#888) @oliviertassinari
+- &#8203;<!-- 01 -->[website] Landing page (#809) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari
+
 ## v0.0.16
 
 <!-- generated comparing v0.0.15..master -->

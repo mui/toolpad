@@ -10,13 +10,13 @@ As explained in the [connections](/toolpad/connecting-to-datasources/connections
 
 1. Select Google Sheets datasource and click **CREATE QUERY**:
 
-   ![Google sheets type](/static/toolpad/google-sheets-query-1.png)
+   <img src="/static/toolpad/google-sheets-query-1.png" alt="Google sheets type" width="400px" />
 
 1. You can modify all the basic configuration settings as described in [queries](/toolpad/connecting-to-datasources/queries/) section.
 
 1. In addition you can configure following properties inline:
 
-   ![Google sheets configuration](/static/toolpad/google-sheets-query-2.png)
+   <img src="/static/toolpad/google-sheets-query-2.png" alt="Google sheets configuration" width="600px" />
 
    - **Select spreadsheet** - browse for a spreadsheet that you own or that is shared with you.
 

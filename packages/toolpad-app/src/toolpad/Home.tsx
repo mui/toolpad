@@ -537,7 +537,7 @@ export default function Home() {
   const duplicateApp = React.useCallback(
     async (app: AppMeta) => {
       if (app) {
-        await duplicateAppMutation.mutateAsync([app.id]);
+        await duplicateAppMutation.mutateAsync([app.id, app.name]);
       }
       await client.invalidateQueries('getApps');
     },

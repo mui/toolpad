@@ -10,7 +10,7 @@ Toolpad is a self-hosted low-code internal tools builder designed to extend MUI'
 It's designed for developers of all trades who want to save time building internal applications.
 Drag and drop pre-built UI components, connect your data sources, release your app, and you're done!
 
-![Editor screenshot](/static/toolpad/marketing/index-hero-video-poster.jpg)
+<img src="/static/toolpad/marketing/index-hero-video-poster.jpg" alt="Editor screenshot" width="600px" />
 
 ## Advantages of Toolpad
 
@@ -21,7 +21,7 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 
 ## Toolpad terminology
 
-![Toolpad app](/static/toolpad/terminology.png)
+<img src="/static/toolpad/terminology.png" alt="Toolpad app" width="800px" />
 
 These are the primary elements of the Toolpad interface:
 

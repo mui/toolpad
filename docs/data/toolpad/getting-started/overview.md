@@ -19,7 +19,7 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 - **Connect to any data source:** Toolpad lets you work with HTTP endpoints, Google Sheets, or PostgreSQL for backend functionality.
 - **Robust versioning and deployment:** use a Git workflow to seamlessly manage deployment and versioning of your app.
 
-## Navigating Toolpad
+## Toolpad terminology
 
 ![Toolpad app](/static/toolpad/terminology.png)
 

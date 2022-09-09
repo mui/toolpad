@@ -22,6 +22,7 @@ import { removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import { getAuthenticationHeaders, HTTP_NO_BODY, parseBaseUrl } from './shared';
 import applyTransform from '../../server/applyTransform';
+import { errorFrom } from '../../utils/errors';
 
 async function resolveBindable(
   bindable: BindableAttrValue<string>,
@@ -174,24 +175,30 @@ async function execBase(
     }
   }
 
+  let error: Error | undefined;
+  let untransformedData;
   let data;
   const har = createHarLog();
 
-  const instrumentedFetch = withHarInstrumentation(fetch, { har });
-  const res = await instrumentedFetch(queryUrl.href, requestInit);
+  try {
+    const instrumentedFetch = withHarInstrumentation(fetch, { har });
+    const res = await instrumentedFetch(queryUrl.href, requestInit);
 
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    untransformedData = await readData(res);
+    data = untransformedData;
+
+    if (fetchQuery.transformEnabled && fetchQuery.transform) {
+      data = await applyTransform(fetchQuery.transform, untransformedData);
+    }
+  } catch (rawError) {
+    error = errorFrom(rawError);
   }
 
-  const untransformedData = await readData(res);
-  data = untransformedData;
-
-  if (fetchQuery.transformEnabled && fetchQuery.transform) {
-    data = await applyTransform(fetchQuery.transform, untransformedData);
-  }
-
-  return { data, untransformedData, har };
+  return { data, untransformedData, error, har };
 }
 
 async function execPrivate(connection: Maybe<RestConnectionParams>, query: FetchPrivateQuery) {

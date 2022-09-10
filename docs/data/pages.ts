@@ -3,25 +3,21 @@ import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started',
-    title: 'Getting started',
     icon: 'DescriptionIcon',
     children: [
-      { pathname: '/toolpad/getting-started/overview', title: 'Overview' },
-      { pathname: '/toolpad/getting-started/quickstart', title: 'Quickstart' },
+      { pathname: '/toolpad/getting-started/overview' },
+      { pathname: '/toolpad/getting-started/quickstart' },
     ],
   },
   {
     pathname: '/toolpad/connecting-to-datasources',
-    title: 'Connecting to datasources',
     icon: 'TableViewIcon',
     children: [
       {
         pathname: '/toolpad/connecting-to-datasources/queries',
-        title: 'Queries',
       },
       {
         pathname: '/toolpad/connecting-to-datasources/connections',
-        title: 'Connections',
       },
       {
         pathname: '/toolpad/connecting-to-datasources/fetch',
@@ -48,13 +44,11 @@ const pages: MuiPage[] = [
     children: [
       {
         pathname: '/toolpad/building-ui/build-in-components',
-        title: 'Built in components',
       },
     ],
   },
   {
     pathname: '/toolpad/data-binding',
-    title: 'Data binding',
     icon: 'CodeIcon',
   },
   {
@@ -64,7 +58,6 @@ const pages: MuiPage[] = [
     children: [
       {
         pathname: '/toolpad/versioning-and-deploying/releases',
-        title: 'Releases',
       },
     ],
   },

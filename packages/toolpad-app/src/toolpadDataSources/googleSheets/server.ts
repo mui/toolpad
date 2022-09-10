@@ -106,7 +106,6 @@ async function exec(
       }
       return { data: [] };
     }
-
     throw new Error(
       `${response.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
     );

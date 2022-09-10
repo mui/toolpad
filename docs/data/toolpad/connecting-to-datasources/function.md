@@ -1,8 +1,6 @@
 # Function
 
-<p class="description">
-    Function datasource is an advanced way to make request from Toolpad app.
-</p>
+<p class="description">Function datasource is an advanced way to make request from Toolpad app.</p>
 
 ## Working with functions
 

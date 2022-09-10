@@ -1,8 +1,6 @@
 # Data binding
 
-<p class="description">
-    Data binding is a widely used concept inside Toolpad app which allows connecting various parts of the application and make them dynamically react to data changes.
-</p>
+<p class="description">Data binding is a widely used concept inside Toolpad app which allows connecting various parts of the application and make them dynamically react to data changes.</p>
 
 ## Binding button
 

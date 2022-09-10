@@ -1,8 +1,6 @@
 # Overview
 
-<p class="description">
-Toolpad is a low-code UI builder for creating apps with MUI's suite of component libraries.
-</p>
+<p class="description">Toolpad is a low-code UI builder for creating apps with MUI's suite of component libraries.</p>
 
 ## Introduction
 

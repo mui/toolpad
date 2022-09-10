@@ -1,8 +1,6 @@
 # Connections
 
-<p class="description">
-    A connection instance lets you reuse certain configuration details to create queries faster.
-</p>
+<p class="description">A connection instance lets you reuse certain configuration details to create queries faster.</p>
 
 To create a new connection instance, press the **+** button in the Explorer menu on the left side of the interface:
 

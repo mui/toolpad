@@ -1,4 +1,4 @@
-import { BindableAttrValue, ConstantAttrValue, ExecFetchResult } from '@mui/toolpad-core';
+import { BindableAttrValue, ConstantAttrValue } from '@mui/toolpad-core';
 import { Har } from 'har-format';
 import { Maybe } from '../../utils/types';
 
@@ -65,8 +65,9 @@ export type FetchPrivateQuery = {
   params: Record<string, any>;
 };
 
-export interface FetchResult extends ExecFetchResult<any> {
+export interface FetchResult {
   data: any;
   untransformedData: any;
+  error?: Error;
   har: Har;
 }

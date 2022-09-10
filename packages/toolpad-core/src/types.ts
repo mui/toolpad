@@ -266,14 +266,3 @@ export interface RuntimeError {
 }
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
-
-export interface SerializedError {
-  message: string;
-  name: string;
-  stack?: string;
-}
-
-export type ExecFetchResult<T = any> = {
-  data?: T;
-  error?: SerializedError;
-};

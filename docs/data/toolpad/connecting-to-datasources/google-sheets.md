@@ -1,4 +1,4 @@
-# Google Sheets
+# Google Sheets datasource
 
 <p class="description">Google Sheets datasource allows fetching data from Google Sheets living in your Google Drive.</p>
 

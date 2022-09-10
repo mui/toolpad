@@ -1,4 +1,4 @@
-# Fetch
+# Fetch datasource
 
 <p class="description">Fetch datasource is the easiest and fastest way to load external data within Toolpad app.</p>
 

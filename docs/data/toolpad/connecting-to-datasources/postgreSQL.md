@@ -1,4 +1,4 @@
-# PostgreSQL
+# PostgreSQL datasource
 
 <p class="description">PostgreSQL datasource allows fetching data straight from PostgreSQL database.</p>
 

@@ -64,7 +64,7 @@
     "dayjs": "^1.11.5",
     "esbuild": "0.15.7",
     "fastestsmallesttextencoderdecoder": "^1.0.22",
-    "find-up": "^6.2.0",
+    "find-up": "^6.3.0",
     "formdata-polyfill": "^4.0.10",
     "fractional-indexing": "^3.0.1",
     "headers-polyfill": "^3.0.10",

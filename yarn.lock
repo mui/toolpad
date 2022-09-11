@@ -4742,7 +4742,7 @@ cp-file@^9.1.0:
     nested-error-stacks "^2.0.0"
     p-event "^4.1.0"
 
-cpy-cli@^4.1.0:
+cpy-cli@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/cpy-cli/-/cpy-cli-4.2.0.tgz#d60bf9ac776486af20aac2fa4fb95f8f10b35ce8"
   integrity sha512-b04b+cbdr29CdpREPKw/itrfjO43Ty0Aj7wRM6M6LoE4GJxZJCk9Xp+Eu1IqztkKh3LxIBt1tDplENsa6KYprg==

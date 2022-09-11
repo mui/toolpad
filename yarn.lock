@@ -781,7 +781,7 @@
   dependencies:
     googleapis-common "^5.0.1"
 
-"@googleapis/sheets@^2.0.1":
+"@googleapis/sheets@^2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@googleapis/sheets/-/sheets-2.0.2.tgz#fa4fb3acf2cbce9f141348cd0cecdeb61b97a4d6"
   integrity sha512-JYF5ayPuaxDpO8YLkhceBenSbcxdbLOgAlHwEVa20rPYogygAwyWRqOuXiGYHzGjqEWqIxfC24M9Qp7OFog31Q==

@@ -1850,7 +1850,7 @@
     csstype "^3.1.0"
     prop-types "^15.8.1"
 
-"@mui/styles@^5.8.0":
+"@mui/styles@^5.10.3":
   version "5.10.3"
   resolved "https://registry.yarnpkg.com/@mui/styles/-/styles-5.10.3.tgz#47d3016bcad0df5989a6a6fd3496dbaeee792f07"
   integrity sha512-I9BYAKENJ6Ot+UEqsU+D2o5jVSeHAme+ZcPzBataTNmpjd7yrmdPeJgAyzju21KtSucBb283gvggcFqxLH1lOQ==

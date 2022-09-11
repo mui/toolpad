@@ -78,7 +78,7 @@
     "next": "12.2.5",
     "node-fetch": "^2.6.7",
     "node-fetch-har": "^1.0.1",
-    "path-to-regexp": "^6.2.0",
+    "path-to-regexp": "^6.2.1",
     "perf-cascade": "^2.11.0",
     "pg": "^8.8.0",
     "prettier": "^2.6.2",

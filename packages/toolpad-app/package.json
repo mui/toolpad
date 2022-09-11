@@ -34,7 +34,7 @@
     "@emotion/react": "^11.10.4",
     "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.4",
-    "@googleapis/drive": "^2.3.0",
+    "@googleapis/drive": "^2.4.0",
     "@googleapis/sheets": "^2.0.1",
     "@mui/icons-material": "^5.10.3",
     "@mui/lab": "^5.0.0-alpha.98",

@@ -125,7 +125,7 @@
     "eslint": "8.23.0",
     "eslint-config-next": "^12.2.5",
     "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-import": "^2.26.0",
     "formidable": "^2.0.1",
     "get-port": "^6.1.2",
     "glob": "^8.0.3",

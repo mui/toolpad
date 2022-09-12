@@ -4,7 +4,7 @@
 
 To create a new connection instance, press the **+** button in the Explorer menu on the left side of the interface:
 
-<img src="/static/toolpad/connection.png" alt="Add connection" width="196px" />
+<img src="/static/toolpad/docs/connection.png" alt="Add connection" width="196px" />
 
 ## Connection types
 
@@ -12,15 +12,15 @@ There are 2 kinds of data sources that do not require a connection instance:
 
 ### Function
 
-<img src="/static/toolpad/connection-function-1.png" alt="Connection function" width="730px" />
+<img src="/static/toolpad/docs/connection-function-1.png" alt="Connection function" width="730px" />
 
 You can define secrets (key/value) that can later be access in the function datasource query:
 
-<img src="/static/toolpad/connection-function-2.png" alt="Connection function" width="748px" />
+<img src="/static/toolpad/docs/connection-function-2.png" alt="Connection function" width="748px" />
 
 ### Fetch
 
-<img src="/static/toolpad/connection-fetch-1.png" alt="Connection fetch" width="723px" />
+<img src="/static/toolpad/docs/connection-fetch-1.png" alt="Connection fetch" width="723px" />
 
 You can configure:
 
@@ -63,7 +63,7 @@ Before you create a Google sheets connection you must first configure Toolpad ap
 
 1. Once you create Google Sheets type connection click **CONNECT** button:
 
-<img src="/static/toolpad/connection-sheets-1.png" alt="Connection Google Sheets" width="724px" />
+<img src="/static/toolpad/docs/connection-sheets-1.png" alt="Connection Google Sheets" width="724px" />
 
 1. Choose google account that you want to authorize.
 
@@ -71,13 +71,13 @@ Before you create a Google sheets connection you must first configure Toolpad ap
 
 1. Once you successfully connect your account you should see a button stating the acount that was connected.
 
-<img src="/static/toolpad/connection-sheets-2.png" alt="Google Sheets connected" width="721px" />
+<img src="/static/toolpad/docs/connection-sheets-2.png" alt="Google Sheets connected" width="721px" />
 
 ### PostgreSQL
 
 To query data from a PostgreSQL database, you must configure the connection:
 
-<img src="/static/toolpad/connection-postgres-1.png" alt="Connection postgres" width="726px" />
+<img src="/static/toolpad/docs/connection-postgres-1.png" alt="Connection postgres" width="726px" />
 
 Provide the database credentials and click **TEST CONNECTION** to verify that you're able to connect.
 

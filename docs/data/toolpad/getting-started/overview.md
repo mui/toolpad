@@ -19,7 +19,7 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 
 ## Toolpad terminology
 
-<img src="/static/toolpad/terminology.png" alt="Toolpad app" width="800px" style="margin-bottom: 8px;" />
+<img src="/static/toolpad/docs/terminology.png" alt="Toolpad app" width="800px" style="margin-bottom: 8px;" />
 
 These are the primary elements of the Toolpad interface:
 

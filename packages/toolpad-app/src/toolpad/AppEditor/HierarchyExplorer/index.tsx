@@ -71,10 +71,10 @@ function getActiveNodeId(location: Location): NodeId | null {
   const match =
     matchRoutes(
       [
-        { path: `/app/:appId/editor/pages/:activeNodeId` },
-        { path: `/app/:appId/editor/apis/:activeNodeId` },
-        { path: `/app/:appId/editor/codeComponents/:activeNodeId` },
-        { path: `/app/:appId/editor/connections/:activeNodeId` },
+        { path: `/app/:appId/pages/:activeNodeId` },
+        { path: `/app/:appId/apis/:activeNodeId` },
+        { path: `/app/:appId/codeComponents/:activeNodeId` },
+        { path: `/app/:appId/connections/:activeNodeId` },
       ],
       location,
     ) || [];
@@ -86,11 +86,11 @@ function getActiveNodeId(location: Location): NodeId | null {
 function getLinkToNodeEditor(appId: string, node: appDom.AppDomNode): string | undefined {
   switch (node.type) {
     case 'page':
-      return `/app/${appId}/editor/pages/${node.id}`;
+      return `/app/${appId}/pages/${node.id}`;
     case 'connection':
-      return `/app/${appId}/editor/connections/${node.id}`;
+      return `/app/${appId}/connections/${node.id}`;
     case 'codeComponent':
-      return `/app/${appId}/editor/codeComponents/${node.id}`;
+      return `/app/${appId}/codeComponents/${node.id}`;
     default:
       return undefined;
   }
@@ -139,20 +139,20 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       // TODO: sort out in-page selection
       const page = appDom.getPageAncestor(dom, node);
       if (page) {
-        navigate(`/app/${appId}/editor/pages/${page.id}`);
+        navigate(`/app/${appId}/pages/${page.id}`);
       }
     }
 
     if (appDom.isPage(node)) {
-      navigate(`/app/${appId}/editor/pages/${node.id}`);
+      navigate(`/app/${appId}/pages/${node.id}`);
     }
 
     if (appDom.isCodeComponent(node)) {
-      navigate(`/app/${appId}/editor/codeComponents/${node.id}`);
+      navigate(`/app/${appId}/codeComponents/${node.id}`);
     }
 
     if (appDom.isConnection(node)) {
-      navigate(`/app/${appId}/editor/connections/${node.id}`);
+      navigate(`/app/${appId}/connections/${node.id}`);
     }
   };
 
@@ -191,6 +191,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     },
     [],
   );
+
   const handledeleteNodeDialogClose = React.useCallback(
     (confirmed: boolean) => {
       if (confirmed && deletedNodeId) {
@@ -202,7 +203,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
           if (firstSiblingOfType) {
             redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
           } else {
-            redirectAfterDelete = `/app/${appId}/editor`;
+            redirectAfterDelete = `/app/${appId}`;
           }
         }
 

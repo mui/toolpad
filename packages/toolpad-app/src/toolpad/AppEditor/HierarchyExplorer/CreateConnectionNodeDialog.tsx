@@ -51,7 +51,7 @@ export default function CreateConnectionDialog({
           const appNode = appDom.getApp(dom);
           domApi.addNode(newNode, appNode, 'connections');
           onClose();
-          navigate(`/app/${appId}/editor/connections/${newNode.id}`);
+          navigate(`/app/${appId}/connections/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Toolpad Connection</DialogTitle>

@@ -53,7 +53,7 @@ export class ToolpadHome {
 
     await this.newAppDomCreateBtn.click();
 
-    await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/editor\/pages\/[^/]+/ });
+    await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
 
     const { pathname } = new URL(this.page.url());
     const idMatch = /^\/_toolpad\/app\/([^/]+)\//.exec(pathname);

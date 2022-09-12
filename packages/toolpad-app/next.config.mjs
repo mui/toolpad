@@ -4,7 +4,8 @@ import * as path from 'path';
 const require = createRequire(import.meta.url);
 const pkgJson = require('./package.json');
 
-// Keep in sync with src/constants.ts
+// Keep in sync with src/constants.ts. Convert to imports once next.config.ts is a feature
+// See https://github.com/vercel/next.js/discussions/35969#discussioncomment-2523010
 const TOOLPAD_TARGET_CE = 'CE';
 const TOOLPAD_TARGET_CLOUD = 'CLOUD';
 const TOOLPAD_TARGET_PRO = 'PRO';

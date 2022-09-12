@@ -1,9 +1,13 @@
 import { createRequire } from 'module';
 import * as path from 'path';
-import { TOOLPAD_TARGET_CE, TOOLPAD_TARGET_CLOUD, TOOLPAD_TARGET_PRO } from './src/constants';
 
 const require = createRequire(import.meta.url);
 const pkgJson = require('./package.json');
+
+// Keep in sync with src/constants.ts
+const TOOLPAD_TARGET_CE = 'CE';
+const TOOLPAD_TARGET_CLOUD = 'CLOUD';
+const TOOLPAD_TARGET_PRO = 'PRO';
 
 /**
  * @param {string} input

@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 import formidable from 'formidable';
 import { execa, ExecaChildProcess } from 'execa';
 import path from 'path';

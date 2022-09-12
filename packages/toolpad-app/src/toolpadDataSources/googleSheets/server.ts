@@ -263,7 +263,7 @@ async function handler(
         await api.setConnectionParams(appId, connectionId, client.credentials);
       }
       return res.redirect(
-        `/_toolpad/app/${encodeURIComponent(appId)}/editor/connections/${encodeURIComponent(
+        `/_toolpad/app/${encodeURIComponent(appId)}/connections/${encodeURIComponent(
           connectionId,
         )}`,
       );

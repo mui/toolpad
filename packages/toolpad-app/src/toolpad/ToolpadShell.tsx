@@ -23,6 +23,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
 import client from '../api';
+import { TOOLPAD_TARGET_CLOUD, TOOLPAD_TARGET_CE, TOOLPAD_TARGET_PRO } from '../constants';
 
 const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
@@ -45,8 +46,8 @@ function FeedbackMenuItemLink({ href, children }: FeedbackMenuItemLinkProps) {
 }
 
 export interface ToolpadShellProps {
-  navigation?: React.ReactNode;
   actions?: React.ReactNode;
+  status?: React.ReactNode;
   children?: React.ReactNode;
 }
 
@@ -62,6 +63,19 @@ const ViewPort = styled('div')({
   overflow: 'auto',
   position: 'relative',
 });
+
+function getReadableTarget(): string {
+  switch (process.env.TOOLPAD_VERSION) {
+    case TOOLPAD_TARGET_CLOUD:
+      return 'Cloud';
+    case TOOLPAD_TARGET_CE:
+      return 'Community';
+    case TOOLPAD_TARGET_PRO:
+      return 'Pro';
+    default:
+      return 'Unknown';
+  }
+}
 
 function UserFeedback() {
   const { buttonProps, menuProps } = useMenu();
@@ -80,6 +94,7 @@ function UserFeedback() {
           Request or upvote feature
         </FeedbackMenuItemLink>
         <Divider />
+        <MenuItem disabled>{getReadableTarget()}</MenuItem>
         <MenuItem disabled>Version {process.env.TOOLPAD_VERSION}</MenuItem>
       </Menu>
     </React.Fragment>
@@ -152,11 +167,11 @@ function UpdateBanner() {
 }
 
 export interface HeaderProps {
-  navigation?: React.ReactNode;
   actions?: React.ReactNode;
+  status?: React.ReactNode;
 }
 
-function Header({ actions, navigation }: HeaderProps) {
+function Header({ actions, status }: HeaderProps) {
   return (
     <AppBar
       position="static"
@@ -164,24 +179,53 @@ function Header({ actions, navigation }: HeaderProps) {
       elevation={0}
       sx={{ zIndex: 2, borderBottom: 1, borderColor: 'divider' }}
     >
-      <Toolbar sx={{ gap: 1 }}>
-        <IconButton
-          size="medium"
-          edge="start"
-          color="inherit"
-          aria-label="Home"
-          component="a"
-          href={`/`}
+      <Toolbar>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'start',
+          }}
         >
-          <HomeIcon fontSize="medium" />
-        </IconButton>
-        <Typography data-test-id="brand" variant="h6" color="inherit" component="div">
-          MUI Toolpad {process.env.TOOLPAD_TARGET}
-        </Typography>
-        {navigation}
-        <Box flex={1} />
-        {actions}
-        <UserFeedback />
+          <IconButton
+            size="medium"
+            edge="start"
+            color="inherit"
+            aria-label="Home"
+            component="a"
+            href={`/`}
+          >
+            <HomeIcon fontSize="medium" />
+          </IconButton>
+          <Typography data-test-id="brand" variant="h6" color="inherit" component="div">
+            MUI Toolpad
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {actions}
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'end',
+          }}
+        >
+          {status}
+          <UserFeedback />
+        </Box>
       </Toolbar>
     </AppBar>
   );

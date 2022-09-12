@@ -7,7 +7,7 @@ test('basic app creation flow', async ({ page }) => {
 
   await page.goto('/');
   const brand = page.locator('data-test-id=brand');
-  await expect(brand).toHaveText('MUI Toolpad CE');
+  await expect(brand).toHaveText('MUI Toolpad');
 
   await page.locator('button:has-text("create new")').click();
 

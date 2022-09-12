@@ -14,11 +14,10 @@ import {
   Typography,
 } from '@mui/material';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
+import CloudSyncIcon from '@mui/icons-material/CloudSync';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { Outlet } from 'react-router-dom';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import invariant from 'invariant';
 import DialogForm from '../../components/DialogForm';
 import { useDomLoader } from '../DomLoader';
@@ -130,41 +129,36 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
   const hasUnsavedChanges = domLoader.unsavedChanges > 0;
   const isSaving = domLoader.saving;
 
+  const savedStatusIcon = hasUnsavedChanges ? <CloudSyncIcon /> : <CloudDoneIcon />;
+
   return (
     <ToolpadShell
       actions={
         <Stack direction="row" gap={1} alignItems="center">
-          <Tooltip title={getSaveStateMessage(isSaving, hasUnsavedChanges)}>
-            <Box display="flex" flexDirection="row" alignItems="center" mr={1}>
-              {isSaving ? (
-                <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
-              ) : (
-                <CloudDoneIcon
-                  color={hasUnsavedChanges ? 'disabled' : 'success'}
-                  fontSize="medium"
-                />
-              )}
-            </Box>
-          </Tooltip>
           <Button
             variant="outlined"
-            color="inherit"
+            color="primary"
             component="a"
             href={`/app/${appId}/preview`}
             target="_blank"
-            endIcon={<OpenInNewIcon />}
           >
             Preview
           </Button>
-          <Button
-            variant="outlined"
-            color="inherit"
-            onClick={handleCreateReleaseDialogOpen}
-            endIcon={<RocketLaunchIcon />}
-          >
+          <Button variant="outlined" color="primary" onClick={handleCreateReleaseDialogOpen}>
             Deploy
           </Button>
         </Stack>
+      }
+      status={
+        <Tooltip title={getSaveStateMessage(isSaving, hasUnsavedChanges)}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mr: 3 }}>
+            {isSaving ? (
+              <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
+            ) : (
+              savedStatusIcon
+            )}
+          </Box>
+        </Tooltip>
       }
       {...props}
     >

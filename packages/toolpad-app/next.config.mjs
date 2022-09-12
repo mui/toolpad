@@ -1,5 +1,6 @@
 import { createRequire } from 'module';
 import * as path from 'path';
+import { TOOLPAD_TARGET_CE, TOOLPAD_TARGET_CLOUD, TOOLPAD_TARGET_PRO } from './src/constants';
 
 const require = createRequire(import.meta.url);
 const pkgJson = require('./package.json');
@@ -8,7 +9,9 @@ const pkgJson = require('./package.json');
  * @param {string} input
  */
 function isValidTarget(input) {
-  return input === 'CLOUD' || input === 'CE' || input === 'PRO';
+  return (
+    input === TOOLPAD_TARGET_CLOUD || input === TOOLPAD_TARGET_CE || input === TOOLPAD_TARGET_PRO
+  );
 }
 
 /** @type {(env: Partial<Record<string, string>>) => import('./src/config').BuildEnvVars} */

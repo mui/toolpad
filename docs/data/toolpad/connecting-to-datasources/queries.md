@@ -13,7 +13,7 @@
    - [Function](/toolpad/connecting-to-datasources/function/) - advanced fetching methods which gives a lot of freedom by allowing to write custom fetching code.
    - [Fetch](/toolpad/connecting-to-datasources/fetch/) - basic, but very powerful. Just pass URL of an API endpoint and you are ready to query your data.
    - [Google Sheets](/toolpad/connecting-to-datasources/google-sheets/) - allows accessing data from your Google sheet document.
-   - [PostgreSQL](/toolpad/connecting-to-datasources/postgreSQL/) - ability to hook directly into your own DB without the need to use API.
+   - [PostgreSQL](/toolpad/connecting-to-datasources/postgre-sql/) - ability to hook directly into your own DB without the need to use API.
 
    \* - by default you will see only **Function** and **Fetch** datasources, for **Google Sheets** and **PostgreSQL** you will first need to create a [CONNECTION instance](/toolpad/connecting-to-datasources/connections/).
 

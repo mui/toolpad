@@ -204,6 +204,13 @@ function QueryEditor({
     }));
   }, []);
 
+  const handleRawResponseChange = React.useCallback((rawResponse: boolean) => {
+    setInput((existing) => ({
+      ...existing,
+      query: { ...existing.query, rawResponse },
+    }));
+  }, []);
+
   const handleTransformChange = React.useCallback((transform: string) => {
     setInput((existing) => ({
       ...existing,
@@ -358,6 +365,8 @@ function QueryEditor({
                       onChange={handleTransformChange}
                       enabled={input.query.transformEnabled ?? false}
                       onEnabledChange={handleTransformEnabledChange}
+                      rawResponse={input.query.rawResponse ?? false}
+                      onRawResponseChange={handleRawResponseChange}
                       globalScope={{ data: preview?.untransformedData }}
                       loading={false}
                     />

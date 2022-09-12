@@ -121,10 +121,33 @@ function isJSON(mimeType: MIMEType): boolean {
   );
 }
 
-async function readData(res: Response): Promise<any> {
+async function tryReadJson(res: Response): Promise<any> {
+  const text = await res.text();
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
+async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
+  if (fetchQuery.rawResponse) {
+    return res.text();
+  }
+
   const contentType = res.headers.get('content-type');
   const mimeType = contentType ? new MIMEType(contentType) : null;
-  return mimeType && isJSON(mimeType) ? res.json() : res.text();
+
+  if (mimeType && isJSON(mimeType)) {
+    try {
+      return res.json();
+    } catch {
+      return res.text();
+    }
+  }
+
+  return tryReadJson(res);
 }
 
 async function execBase(
@@ -183,7 +206,7 @@ async function execBase(
       throw new Error(`HTTP ${res.status}`);
     }
 
-    untransformedData = await readData(res);
+    untransformedData = await readData(res, fetchQuery);
     data = untransformedData;
 
     if (fetchQuery.transformEnabled && fetchQuery.transform) {

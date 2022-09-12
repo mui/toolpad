@@ -1,4 +1,4 @@
-import { Stack, Grid, Checkbox, FormControlLabel, IconButton } from '@mui/material';
+import { Stack, Grid, Checkbox, FormControlLabel, IconButton, Tooltip } from '@mui/material';
 import * as React from 'react';
 
 import AutorenewIcon from '@mui/icons-material/Autorenew';
@@ -10,6 +10,8 @@ export interface TransformInputProps {
   onChange: (newValue: string) => void;
   enabled: boolean;
   onEnabledChange: (newValue: boolean) => void;
+  rawResponse: boolean;
+  onRawResponseChange: (newValue: boolean) => void;
   globalScope: Record<string, any>;
   loading: boolean;
   onUpdatePreview?: () => void;
@@ -20,10 +22,17 @@ export default function TransformInput({
   onChange,
   enabled,
   onEnabledChange,
+  rawResponse,
+  onRawResponseChange,
   globalScope,
   loading,
   onUpdatePreview,
 }: TransformInputProps) {
+  const handleRawResponseChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => onRawResponseChange(event.target.checked),
+    [onRawResponseChange],
+  );
+
   const handleTransformEnabledChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => onEnabledChange(event.target.checked),
     [onEnabledChange],
@@ -32,16 +41,33 @@ export default function TransformInput({
   return (
     <Grid item xs={6} md={12}>
       <Stack>
-        <FormControlLabel
-          label="Transform response"
-          control={
-            <Checkbox
-              checked={enabled}
-              onChange={handleTransformEnabledChange}
-              inputProps={{ 'aria-label': 'controlled' }}
+        <Stack direction="row" gap={1}>
+          <FormControlLabel
+            label="Transform response"
+            control={
+              <Checkbox
+                checked={enabled}
+                onChange={handleTransformEnabledChange}
+                inputProps={{ 'aria-label': 'controlled' }}
+              />
+            }
+          />
+          <Tooltip
+            title="Check to avoid automatically parsing the response based on the content"
+            describeChild
+          >
+            <FormControlLabel
+              label="Use the raw response"
+              control={
+                <Checkbox
+                  checked={rawResponse}
+                  onChange={handleRawResponseChange}
+                  inputProps={{ 'aria-label': 'controlled' }}
+                />
+              }
             />
-          }
-        />
+          </Tooltip>
+        </Stack>
 
         <Stack direction={'row'} spacing={2} width={'100%'}>
           <JsonView

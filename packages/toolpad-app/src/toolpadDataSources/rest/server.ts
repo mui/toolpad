@@ -1,13 +1,8 @@
-import {
-  BindableAttrEntries,
-  BindableAttrValue,
-  BindableAttrValues,
-  ExecFetchResult,
-} from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import fetch, { Headers, RequestInit, Response } from 'node-fetch';
 import MIMEType from 'whatwg-mimetype';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
-import { ServerDataSource } from '../../types';
+import { ServerDataSource, ApiResult } from '../../types';
 import {
   Body,
   FetchPrivateQuery,
@@ -185,7 +180,7 @@ async function execBase(
     const res = await instrumentedFetch(queryUrl.href, requestInit);
 
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status} (${res.statusText}) while fetching "${res.url}"`);
+      throw new Error(`HTTP ${res.status}`);
     }
 
     untransformedData = await readData(res);
@@ -214,9 +209,14 @@ async function exec(
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
-): Promise<ExecFetchResult<any>> {
+): Promise<ApiResult<any>> {
   const { data, error } = await execBase(connection, fetchQuery, params);
-  return { data, error };
+
+  if (error) {
+    throw error;
+  }
+
+  return { data };
 }
 
 const dataSource: ServerDataSource<{}, FetchQuery, any> = {

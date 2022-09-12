@@ -1,7 +1,7 @@
-import { ExecFetchResult } from '@mui/toolpad-core';
 import { NextApiHandler } from 'next';
 import { parseVersion } from '../../../../../src/server/data';
 import handleDataRequest from '../../../../../src/server/handleDataRequest';
+import { ApiResult } from '../../../../../src/types';
 import { asArray } from '../../../../../src/utils/collections';
 
 export default (async (req, res) => {
@@ -15,4 +15,4 @@ export default (async (req, res) => {
     return;
   }
   await handleDataRequest(req, res, { appId, version });
-}) as NextApiHandler<ExecFetchResult<any>>;
+}) as NextApiHandler<ApiResult<any>>;

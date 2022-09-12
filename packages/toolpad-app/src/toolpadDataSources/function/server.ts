@@ -37,7 +37,10 @@ async function exec(
   params: Record<string, string>,
 ) {
   const { data, error } = await execBase(connection, functionQuery, params);
-  return { data, error };
+  if (error) {
+    throw error;
+  }
+  return { data };
 }
 
 const dataSource: ServerDataSource<FunctionConnectionParams, FunctionQuery, any> = {

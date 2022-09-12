@@ -1,5 +1,3 @@
-import { ExecFetchResult } from '@mui/toolpad-core';
-
 export interface PostgresConnectionParams {
   host: string;
   port: number;
@@ -12,7 +10,10 @@ export interface PostgresQuery {
   sql: string;
 }
 
-export interface PostgresResult extends ExecFetchResult<any[]> {}
+export interface PostgresResult {
+  data: any;
+  error?: Error;
+}
 
 export interface PostgresConnectionStatus {
   error: string | null;

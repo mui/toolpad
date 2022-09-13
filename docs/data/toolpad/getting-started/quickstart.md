@@ -17,7 +17,7 @@ Make sure you have a running Toolpad instance.
 1. Start the docker compose services
 
    ```sh
-   docker-compose -f docker/compose/docker-compose.yml up -d
+   docker-compose -f docker-compose.yml up -d
    ```
 
 Toolpad will be accessible under `http://localhost:3000/`.

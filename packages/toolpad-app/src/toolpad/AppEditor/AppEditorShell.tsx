@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import CloudSyncIcon from '@mui/icons-material/CloudSync';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { Outlet } from 'react-router-dom';
@@ -130,6 +132,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
         <Stack direction="row" gap={1} alignItems="center">
           <Button
             variant="outlined"
+            endIcon={<OpenInNewIcon />}
             color="primary"
             component="a"
             href={`/app/${appId}/preview`}
@@ -137,7 +140,12 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
           >
             Preview
           </Button>
-          <Button variant="outlined" color="primary" onClick={handleCreateReleaseDialogOpen}>
+          <Button
+            variant="outlined"
+            endIcon={<RocketLaunchIcon />}
+            color="primary"
+            onClick={handleCreateReleaseDialogOpen}
+          >
             Deploy
           </Button>
         </Stack>

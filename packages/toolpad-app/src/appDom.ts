@@ -208,7 +208,7 @@ export type AppDomNodes = Record<NodeId, AppDomNode>;
 export interface AppDom {
   nodes: AppDomNodes;
   root: NodeId;
-  version: number;
+  version?: number;
 }
 
 function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node is T {
@@ -865,7 +865,7 @@ export type RenderTreeNodes = Record<NodeId, RenderTreeNode>;
 export interface RenderTree {
   root: NodeId;
   nodes: RenderTreeNodes;
-  version: number;
+  version?: number;
 }
 
 /**

@@ -69,7 +69,7 @@ function migrateLegacyNavigationAction(node: ElementNode<any>): ElementNode<any>
 
 export default {
   up(dom: AppDom): AppDom {
-    const { nodes, version } = dom;
+    const { nodes, version = 0 } = dom;
     invariant(version === 0, 'Can only migrate dom of version 0');
     const migratedNodes = Object.fromEntries(
       Object.entries(nodes).map(([id, node]) => {
@@ -83,9 +83,5 @@ export default {
       }),
     );
     return { ...dom, nodes: migratedNodes, version: 1 };
-  },
-  down(dom: AppDom): AppDom {
-    invariant(dom.version === 1, 'Can only migrate dom of version 1');
-    return { ...dom, version: 0 };
   },
 };

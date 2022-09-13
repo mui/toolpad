@@ -30,7 +30,7 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
    <img src="/static/toolpad/docs/apps-overview.png" alt="Apps overview" width="944px" />
 
-1. Click **CREATE NEW** and name your application. Confirm by clicking **CREATE**
+1. Click **CREATE NEW** and name your application. Confirm by clicking **CREATE**. You'll then be taken to the workspace for your new app, which looks like this:
 
    <img src="/static/toolpad/docs/step-1.png" alt="Toolpad overview" width="946px" />
 

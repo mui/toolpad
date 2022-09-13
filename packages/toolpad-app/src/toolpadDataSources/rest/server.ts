@@ -1,6 +1,5 @@
 import { BindableAttrEntries, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import fetch, { Headers, RequestInit, Response } from 'node-fetch';
-import MIMEType from 'whatwg-mimetype';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource, ApiResult } from '../../types';
 import {
@@ -113,18 +112,14 @@ async function resolveBody(body: Body, boundValues: Record<string, string>) {
   }
 }
 
-function isJSON(mimeType: MIMEType): boolean {
-  // See https://mimesniff.spec.whatwg.org/#json-mime-type
-  const essence = `${mimeType.type}/${mimeType.subtype}`;
-  return (
-    essence === 'text/json' || essence === 'application/json' || mimeType.subtype.endsWith('+json')
-  );
-}
-
-async function readData(res: Response): Promise<any> {
-  const contentType = res.headers.get('content-type');
-  const mimeType = contentType ? new MIMEType(contentType) : null;
-  return mimeType && isJSON(mimeType) ? res.json() : res.text();
+async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
+  if (!fetchQuery.response || fetchQuery.response?.kind === 'json') {
+    return res.json();
+  }
+  if (fetchQuery.response?.kind === 'raw') {
+    return res.text();
+  }
+  throw new Error(`Unsupported response type "${fetchQuery.response.kind}"`);
 }
 
 async function execBase(
@@ -183,7 +178,7 @@ async function execBase(
       throw new Error(`HTTP ${res.status}`);
     }
 
-    untransformedData = await readData(res);
+    untransformedData = await readData(res, fetchQuery);
     data = untransformedData;
 
     if (fetchQuery.transformEnabled && fetchQuery.transform) {

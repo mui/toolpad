@@ -1,6 +1,6 @@
 import { sheets_v4 } from '@googleapis/sheets';
 import { drive_v3 } from '@googleapis/drive';
-import { ApiResult } from '../../types';
+import { ExecFetchResult } from '@mui/toolpad-core';
 
 export type GoogleSheetsConnectionParams = {
   refresh_token?: string | null;
@@ -72,6 +72,4 @@ export type GoogleSheetsPrivateQuery =
       query: GoogleSheetsApiQuery;
     };
 
-export interface GoogleSheetsResult extends ApiResult {
-  error?: Error;
-}
+export interface GoogleSheetsResult extends ExecFetchResult {}

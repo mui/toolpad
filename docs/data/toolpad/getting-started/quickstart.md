@@ -6,6 +6,8 @@ This page will guide you into creating your very first Toolpad application. You 
 
 ## Prerequisites
 
+This guide assumes that you have [Docker](https://www.docker.com/) installed on your machine. 
+
 Make sure you have a running Toolpad instance.
 
 1. Download the docker compose file

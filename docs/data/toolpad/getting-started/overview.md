@@ -26,5 +26,5 @@ These are the primary elements of the Toolpad interface:
 - **Navigation**: where you can return to the homepage, or preview or deploy your app.
 - **Explorer**: where you can define and manage pages, connection configurations, custom component definitions, and more.
 - **Component library**: where you can find components to drag and drop onto the Canvas.
-- **Canvas**: where you build out your app.
+- **Canvas**: where you build the UI for your application.
 - **Inspector**: where you can inspect and modify properties of selected elements in the canvas.

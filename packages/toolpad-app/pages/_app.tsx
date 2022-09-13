@@ -6,7 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { LicenseInfo } from '@mui/x-data-grid-pro';
-import theme from '../src/theme';
+import toolpadTheme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import { MUI_X_PRO_LICENSE } from '../src/constants';
 import { queryClient } from '../src/api';
@@ -29,7 +29,7 @@ export default function MyApp(props: MyAppProps) {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={toolpadTheme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
           <Component {...pageProps} />

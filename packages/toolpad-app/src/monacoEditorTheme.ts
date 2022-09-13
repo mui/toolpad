@@ -1,5 +1,5 @@
-import theme from './theme';
+import toolpadTheme from './theme';
 
-const monacoEditorTheme: string = theme.palette.mode === 'dark' ? 'vs-dark' : 'vs';
+const monacoEditorTheme: string = toolpadTheme.palette.mode === 'dark' ? 'vs-dark' : 'vs';
 
 export default monacoEditorTheme;

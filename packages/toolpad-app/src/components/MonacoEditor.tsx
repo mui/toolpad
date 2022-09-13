@@ -18,7 +18,7 @@ import {
   language as typescriptBasicLanguage,
 } from 'monaco-editor/esm/vs/basic-languages/typescript/typescript';
 import monacoEditorTheme from '../monacoEditorTheme';
-import muiTheme from '../theme';
+import toolpadTheme from '../theme';
 
 export interface ExtraLib {
   content: string;
@@ -164,7 +164,7 @@ function getOverflowWidgetsDomNode(): HTMLDivElement {
     overflowWidgetsDomNode = document.createElement('div');
     // See https://github.com/microsoft/monaco-editor/issues/2233#issuecomment-913170212
     overflowWidgetsDomNode.classList.add('monaco-editor');
-    overflowWidgetsDomNode.style.zIndex = String(muiTheme.zIndex.tooltip + 1);
+    overflowWidgetsDomNode.style.zIndex = String(toolpadTheme.zIndex.tooltip + 1);
     document.body.append(overflowWidgetsDomNode);
   }
 

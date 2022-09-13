@@ -1,9 +1,9 @@
 import { chromeDark, chromeLight, InspectorTheme } from 'react-inspector';
 
-import theme from './theme';
+import toolpadTheme from './theme';
 
 const inspectorTheme: InspectorTheme = {
-  ...(theme.palette.mode === 'dark' ? chromeDark : chromeLight),
+  ...(toolpadTheme.palette.mode === 'dark' ? chromeDark : chromeLight),
 
   BASE_BACKGROUND_COLOR: 'inherit',
   TREENODE_FONT_FAMILY: 'inherit',

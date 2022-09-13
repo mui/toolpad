@@ -9,7 +9,7 @@ import Document, {
 } from 'next/document';
 import createEmotionServer from '@emotion/server/create-instance';
 import serializeJavascript from 'serialize-javascript';
-import theme from '../src/theme';
+import toolpadTheme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import config, { RuntimeConfig } from '../src/config';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
@@ -63,7 +63,7 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
       <Html lang="en">
         <Head>
           {/* PWA primary color */}
-          <meta name="theme-color" content={theme.palette.primary.main} />
+          <meta name="theme-color" content={toolpadTheme.palette.primary.main} />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"

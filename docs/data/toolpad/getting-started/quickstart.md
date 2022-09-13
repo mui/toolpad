@@ -132,4 +132,4 @@ In order to share your application with others you will want to deploy it
 
    <img src="/static/toolpad/docs/deploy-2.png" alt="Deploy description" width="475px" />
 
-1. Your deployed app will automatically open in a new browser tab
+Once deployed, the app will automatically open in a new browser tab.

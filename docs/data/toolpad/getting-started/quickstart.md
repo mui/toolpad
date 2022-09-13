@@ -140,7 +140,7 @@ In order to share your application with others you will want to deploy it
 
 1. (Optional) Enter **description** of your choice
 
-1. Click **DEPLOY** to confirm deployment
+1. Click **DEPLOY** to confirm.
 
    <img src="/static/toolpad/docs/deploy-2.png" alt="Deploy description" width="475px" />
 

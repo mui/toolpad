@@ -68,7 +68,7 @@ const features = {
       title: 'Instant deployment ',
       wip: false,
       description:
-        'App deployment in Toolpad is instant and veiwing past deployments makes it easier to access previous work.',
+        '1-click preview and instant deployment lets you ship your apps to end users in a snap',
     },
     {
       icon: <EditIcon fontSize="small" color="primary" />,

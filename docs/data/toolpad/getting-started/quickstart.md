@@ -2,7 +2,9 @@
 
 <p class="description">Get started building a Toolpad app.</p>
 
-This page will guide you into creating your very first Toolpad application. You will create a "hello world" type of application that will ask for a name and print a greeting.
+This guide will walk you through the process of creating a basic Toolpad application.
+You'll use the MUI X DataGrid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api/).
+When you click on the name of a breed, its photo will be displayed using the Material UI Image component.
 
 ## Prerequisites
 

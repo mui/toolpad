@@ -15,7 +15,6 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 - **Build faster than ever before:** measure your development time in minutes rather than hours or days—simply drag and drop the components you need.
 - **Extensible with code:** build low-code with pro-code extensibility. You can write JavaScript anywhere in Toolpad as soon as you feel limited by the built-in features.
 - **Connect to any data source:** Toolpad lets you work with HTTP endpoints, Google Sheets, or PostgreSQL for backend functionality.
-- **Robust versioning and deployment:** use a Git workflow to seamlessly manage deployment and versioning of your app.
 
 ## Toolpad terminology
 

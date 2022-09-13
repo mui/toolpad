@@ -44,6 +44,28 @@ export type UrlEncodedBody = {
 
 export type Body = RawBody | UrlEncodedBody;
 
+export type RawResponseType = {
+  kind: 'raw';
+};
+
+export type JsonResponseType = {
+  kind: 'json';
+};
+
+export type CsvResponseType = {
+  kind: 'csv';
+  /**
+   * First row contains headers
+   */
+  headers: boolean;
+};
+
+export type XmlResponseType = {
+  kind: 'xml';
+};
+
+export type ResponseType = RawResponseType | JsonResponseType | CsvResponseType | XmlResponseType;
+
 export interface FetchQuery {
   /**
    * The URL of the rquest.
@@ -74,9 +96,9 @@ export interface FetchQuery {
    */
   readonly transform?: string;
   /**
-   * Don't parse the content automatically, always return the raw response.
+   * How to parse the response.
    */
-  readonly rawResponse?: boolean;
+  readonly response?: ResponseType;
 }
 
 export type FetchParams = {

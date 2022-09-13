@@ -118,6 +118,8 @@ function RawBodyEditor({
           <React.Fragment>
             <TextField
               select
+              label="content-type"
+              sx={{ width: 200 }}
               value={value?.contentType.value}
               onChange={handleContentTypeChange}
               disabled={disabled}
@@ -227,7 +229,14 @@ export default function BodyEditor({
   const renderToolbar = React.useCallback<RenderBodyToolbar>(
     ({ actions } = {}) => (
       <BodyEditorToolbar>
-        <TextField select value={activeTab} onChange={handleTabChange} disabled={disabled}>
+        <TextField
+          label="body"
+          sx={{ width: 200 }}
+          select
+          value={activeTab}
+          onChange={handleTabChange}
+          disabled={disabled}
+        >
           <MenuItem value="raw">raw</MenuItem>
           <MenuItem value="urlEncoded">x-www-form-urlencoded</MenuItem>
         </TextField>

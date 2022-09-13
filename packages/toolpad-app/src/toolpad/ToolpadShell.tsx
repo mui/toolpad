@@ -201,7 +201,7 @@ function Header({ actions, status }: HeaderProps) {
             <Image src={productIcon} alt="Toolpad product icon" width={25} height={25} />
             <Box
               data-test-id="brand"
-              sx={{ color: 'primary.main', lineHeight: '21px', fontSize: '16px' }}
+              sx={{ color: 'primary.main', lineHeight: '21px', fontSize: '16px', fontWeight: 700 }}
             >
               MUI Toolpad
             </Box>

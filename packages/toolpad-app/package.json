@@ -59,7 +59,7 @@
     "concurrently": "^7.4.0",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
-    "csstype": "^3.0.11",
+    "csstype": "^3.1.1",
     "cuid": "^2.1.8",
     "dayjs": "^1.11.5",
     "esbuild": "0.15.7",

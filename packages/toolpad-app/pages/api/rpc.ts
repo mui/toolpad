@@ -22,6 +22,7 @@ import {
   deploy,
   getDeployments,
 } from '../../src/server/data';
+import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 
 interface RpcContext {
@@ -143,6 +144,9 @@ const rpcServer = {
     }),
     findLastRelease: createMethod<typeof findLastRelease>((params) => {
       return findLastRelease(...params);
+    }),
+    getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>((params) => {
+      return getLatestToolpadRelease(...params);
     }),
   },
   mutation: {

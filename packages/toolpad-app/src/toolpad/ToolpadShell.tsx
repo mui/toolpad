@@ -15,6 +15,7 @@ import {
   ListItemText,
   Tooltip,
   Stack,
+  Link,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
@@ -190,19 +191,21 @@ function Header({ actions, status }: HeaderProps) {
             justifyContent: 'start',
           }}
         >
-          <IconButton
-            size="medium"
-            edge="start"
+          <Link
             color="inherit"
             aria-label="Home"
-            component="a"
             href={`/`}
+            underline="none"
+            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}
           >
-            <Image src={productIcon} alt="Toolpad product icon" />
-          </IconButton>
-          <Typography data-test-id="brand" variant="h6" color="primary.main" component="div">
-            MUI Toolpad
-          </Typography>
+            <Image src={productIcon} alt="Toolpad product icon" width={25} height={25} />
+            <Box
+              data-test-id="brand"
+              sx={{ color: 'primary.main', lineHeight: '21px', fontSize: '16px' }}
+            >
+              MUI Toolpad
+            </Box>
+          </Link>
         </Box>
         <Box
           sx={{

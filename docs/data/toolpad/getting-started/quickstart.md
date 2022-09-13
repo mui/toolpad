@@ -36,6 +36,8 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
    <img src="/static/toolpad/docs/step-1.png" alt="Toolpad overview" width="946px" />
 
+### Assemble the UI
+
 1. Hover over **Component library** and drag DataGrid and Image components into **Canvas**
 
    <img src="/static/toolpad/docs/step-2.png" alt="Drag components" width="945px" />

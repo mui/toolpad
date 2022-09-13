@@ -1,7 +1,7 @@
-import { NodeId, BindableAttrValue } from '@mui/toolpad-core';
+import { NodeId, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import * as prisma from '../../prisma/generated/client';
-import { ServerDataSource, ApiResult, VersionOrPreview, AppTemplateName } from '../types';
+import { ServerDataSource, VersionOrPreview, AppTemplateName } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -398,7 +398,7 @@ export async function execQuery<P, Q>(
   appId: string,
   dataNode: appDom.QueryNode<Q> | appDom.MutationNode<Q>,
   params: Q,
-): Promise<ApiResult<any>> {
+): Promise<ExecFetchResult<any>> {
   if (appDom.isQuery(dataNode)) {
     dataNode = appDom.fromLegacyQueryNode(dataNode);
   }

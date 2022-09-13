@@ -1,3 +1,3 @@
-# PLaywright Page Object Models
+# Playwright Page Object Models
 
 See https://playwright.dev/docs/test-pom

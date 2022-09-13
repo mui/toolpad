@@ -60,7 +60,7 @@ export class ToolpadEditor {
   }
 
   async goto(appId: string) {
-    await this.page.goto(`/_toolpad/app/${appId}/editor`);
+    await this.page.goto(`/_toolpad/app/${appId}`);
   }
 
   async createPage(name: string) {

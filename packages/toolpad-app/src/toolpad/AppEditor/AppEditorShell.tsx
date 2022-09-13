@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -102,12 +101,9 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
   );
 }
 
-function getSaveStateMessage(isSaving: boolean, hasUnsavedChanges: boolean): string {
+function getSaveStateMessage(isSaving: boolean): string {
   if (isSaving) {
     return 'Saving changes...';
-  }
-  if (hasUnsavedChanges) {
-    return 'You have unsaved changes.';
   }
   return 'All changes saved!';
 }
@@ -126,10 +122,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
     setFalse: handleCreateReleaseDialogClose,
   } = useBoolean(false);
 
-  const hasUnsavedChanges = domLoader.unsavedChanges > 0;
-  const isSaving = domLoader.saving;
-
-  const savedStatusIcon = hasUnsavedChanges ? <CloudSyncIcon /> : <CloudDoneIcon />;
+  const isSaving = domLoader.unsavedChanges > 0;
 
   return (
     <ToolpadShell
@@ -150,13 +143,9 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
         </Stack>
       }
       status={
-        <Tooltip title={getSaveStateMessage(isSaving, hasUnsavedChanges)}>
+        <Tooltip title={getSaveStateMessage(isSaving)}>
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mr: 3 }}>
-            {isSaving ? (
-              <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
-            ) : (
-              savedStatusIcon
-            )}
+            {isSaving ? <CloudSyncIcon /> : <CloudDoneIcon />}
           </Box>
         </Tooltip>
       }

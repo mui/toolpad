@@ -16,14 +16,15 @@ import {
   Tooltip,
   Stack,
 } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
 import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Image from 'next/image';
 import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
 import client from '../api';
 import { TOOLPAD_TARGET_CLOUD, TOOLPAD_TARGET_CE, TOOLPAD_TARGET_PRO } from '../constants';
+import productIcon from '../../public/product-icon.svg';
 
 const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
@@ -197,9 +198,9 @@ function Header({ actions, status }: HeaderProps) {
             component="a"
             href={`/`}
           >
-            <HomeIcon fontSize="medium" />
+            <Image src={productIcon} alt="Toolpad product icon" />
           </IconButton>
-          <Typography data-test-id="brand" variant="h6" color="inherit" component="div">
+          <Typography data-test-id="brand" variant="h6" color="primary.main" component="div">
             MUI Toolpad
           </Typography>
         </Box>

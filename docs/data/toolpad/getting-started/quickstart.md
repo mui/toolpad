@@ -26,7 +26,7 @@ Toolpad will be accessible under `http://localhost:3000/`.
 
 ## Building your first application
 
-1. Open Toolpad by navigating to [http://localhost:3000/](http://localhost:3000/)
+1. Open Toolpad by navigating to [http://localhost:3000/](http://localhost:3000/). It should look like this:
 
    <img src="/static/toolpad/docs/apps-overview.png" alt="Apps overview" width="944px" />
 

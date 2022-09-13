@@ -16,9 +16,10 @@ By the end, you should be able to:
 - add components, data sources, and queries to an app
 - bind data sources and components
 - deploy a Toolpad app
+
 ## Prerequisites
 
-This guide assumes that you have [Docker](https://www.docker.com/) installed on your machine. 
+This guide assumes that you have [Docker](https://www.docker.com/) installed on your machine.
 
 Make sure you have a running Toolpad instance.
 

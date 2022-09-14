@@ -13,7 +13,8 @@ import {
   Typography,
 } from '@mui/material';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
-import CloudSyncIcon from '@mui/icons-material/CloudSync';
+import SyncIcon from '@mui/icons-material/Sync';
+import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import * as React from 'react';
@@ -21,7 +22,7 @@ import { useForm } from 'react-hook-form';
 import { Outlet } from 'react-router-dom';
 import invariant from 'invariant';
 import DialogForm from '../../components/DialogForm';
-import { useDomLoader } from '../DomLoader';
+import { DomLoader, useDomLoader } from '../DomLoader';
 import ToolpadShell from '../ToolpadShell';
 import PagePanel from './PagePanel';
 import client from '../../api';
@@ -103,11 +104,30 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
   );
 }
 
-function getSaveStateMessage(isSaving: boolean): string {
-  if (isSaving) {
-    return 'Saving changes...';
+function getSaveState(domLoader: DomLoader): React.ReactNode {
+  if (domLoader.saveError) {
+    return (
+      <Tooltip title="Error while saving">
+        <SyncProblemIcon />
+      </Tooltip>
+    );
   }
-  return 'All changes saved!';
+
+  const isSaving = domLoader.unsavedChanges > 0;
+
+  if (isSaving) {
+    return (
+      <Tooltip title="Saving changes...">
+        <SyncIcon />
+      </Tooltip>
+    );
+  }
+
+  return (
+    <Tooltip title="All changes saved!">
+      <CloudDoneIcon />
+    </Tooltip>
+  );
 }
 
 export interface ToolpadShellProps {
@@ -123,8 +143,6 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
     setTrue: handleCreateReleaseDialogOpen,
     setFalse: handleCreateReleaseDialogClose,
   } = useBoolean(false);
-
-  const isSaving = domLoader.unsavedChanges > 0;
 
   return (
     <ToolpadShell
@@ -150,13 +168,7 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
           </Button>
         </Stack>
       }
-      status={
-        <Tooltip title={getSaveStateMessage(isSaving)}>
-          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mr: 3 }}>
-            {isSaving ? <CloudSyncIcon /> : <CloudDoneIcon />}
-          </Box>
-        </Tooltip>
-      }
+      status={getSaveState(domLoader)}
       {...props}
     >
       <Box

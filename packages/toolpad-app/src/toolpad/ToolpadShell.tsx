@@ -240,6 +240,7 @@ function Header({ actions, status }: HeaderProps) {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'end',
+            gap: 2,
           }}
         >
           {status}

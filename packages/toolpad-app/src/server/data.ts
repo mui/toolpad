@@ -332,14 +332,18 @@ export async function findActiveDeployment(appId: string): Promise<Deployment | 
   });
 }
 
-export async function loadReleaseDom(appId: string, version: number): Promise<appDom.AppDom> {
+function parseSnapshot(snapshot: Buffer): appDom.AppDom {
+  return JSON.parse(snapshot.toString('utf-8')) as appDom.AppDom;
+}
+
+async function loadReleaseDom(appId: string, version: number): Promise<appDom.AppDom> {
   const release = await prismaClient.release.findUnique({
     where: { release_app_constraint: { appId, version } },
   });
   if (!release) {
     throw new Error(`release doesn't exist`);
   }
-  return JSON.parse(release.snapshot.toString('utf-8')) as appDom.AppDom;
+  return parseSnapshot(release.snapshot);
 }
 
 export async function getConnectionParams<P = unknown>(
@@ -447,6 +451,30 @@ export function parseVersion(param?: string | string[]): VersionOrPreview | null
 
 export async function loadDom(appId: string, version: VersionOrPreview = 'preview') {
   return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
+}
+
+export async function loadApp(appId: string, version: VersionOrPreview = 'preview') {
+  if (version === 'preview') {
+    const { dom, ...appMeta } = await prismaClient.app.findUniqueOrThrow({
+      where: { id: appId },
+    });
+    return { ...appMeta, dom: dom as appDom.AppDom };
+  }
+
+  const { releases, ...appMeta } = await prismaClient.app.findUniqueOrThrow({
+    where: { id: appId },
+    select: {
+      ...SELECT_APP_META,
+      releases: {
+        take: 1,
+        select: { snapshot: true },
+        where: { version },
+      },
+    },
+  });
+
+  const dom = releases.length > 0 ? parseSnapshot(releases[0].snapshot) : null;
+  return { ...appMeta, dom };
 }
 
 /**

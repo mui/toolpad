@@ -1,12 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, URLPattern } from 'next/server';
 import config from './src/server/config';
 
-const BASIC_AUTH_WHITELIST = new Set(['/health-check']);
+const BASIC_AUTH_WHITELIST = [
+  // Healthcheck must always be public
+  new URLPattern({ pathname: '/health-check' }),
+
+  // Apps must be able to be public
+  // These urls will handle their own basic auth when the app is not public
+  new URLPattern({ pathname: '/_next/static/*' }),
+  new URLPattern({ pathname: '/deploy/:appId/*' }),
+  new URLPattern({ pathname: '/api/data/:appId/:version/:queryId' }),
+];
 
 export function middleware(req: NextRequest) {
-  const { pathname } = new URL(req.url);
-
-  if (!config.basicAuthUser || BASIC_AUTH_WHITELIST.has(pathname)) {
+  if (!config.basicAuthUser || BASIC_AUTH_WHITELIST.some((pattern) => pattern.test(req.url))) {
     return NextResponse.next();
   }
 

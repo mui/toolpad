@@ -69,7 +69,7 @@ Before you create a Google Sheets connection you must first configure Toolpad ap
 
 1. Grant access to your Google Drive files by clicking **Allow**.
 
-1. Once you successfully connect your account you should see a button stating the acount that was connected.
+1. Once you successfully connect your account you should see a button stating the account that was connected.
 
 <img src="/static/toolpad/docs/connection-sheets-2.png" alt="Google Sheets connected" width="721px" />
 

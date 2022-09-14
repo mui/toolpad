@@ -1,14 +1,12 @@
 # Component library
 
-<p class="description">
-    Component library provides an easy way to construct your application UI
-</p>
+<p class="description">Component library provides an easy way to construct your application UI</p>
 
 ## Built in components
 
 In order to access a list of built in components hover over **Component library**
 
-<img src="/static/toolpad/docs/component-library.png" width="300px" alt="Component library" />
+<img src="/static/toolpad/docs/component-library.png" width="348px" alt="Component library" />
 <br />
 <br />
 

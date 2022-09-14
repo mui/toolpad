@@ -278,7 +278,6 @@ export const getDesignTokens = (mode: 'light' | 'dark') =>
         letterSpacing: 0,
       },
       caption: {
-        display: 'inline-block',
         fontSize: defaultTheme.typography.pxToRem(12), // 12px
         lineHeight: 18 / 12,
         letterSpacing: 0,

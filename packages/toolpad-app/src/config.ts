@@ -25,7 +25,7 @@ import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
 export type BuildEnvVars = Record<
   // Identifier for the product line (CE, EE, Cloud, ...)
   | 'TOOLPAD_TARGET'
-  // Whether Toolpad is running in Ddemo mode
+  // Whether Toolpad is running in demo mode
   | 'TOOLPAD_DEMO'
   // The current Toolpad version
   | 'TOOLPAD_VERSION',
@@ -35,6 +35,8 @@ export type BuildEnvVars = Record<
 // These are set at runtime and passed to the browser.
 // Do not add secrets
 export interface RuntimeConfig {
+  // Enable demo version
+  isDemo?: boolean;
   // Enable input field for seeding a dom in the app creation dialog
   // (For testing purposes)
   integrationTest?: boolean;
@@ -66,6 +68,7 @@ const runtimeConfig: RuntimeConfig =
     ? {
         // Define runtime config here
         integrationTest: !!process.env.TOOLPAD_INTEGRATION_TEST,
+        isDemo: !!process.env.TOOLPAD_DEMO,
       }
     : getBrowsersideRuntimeConfig();
 

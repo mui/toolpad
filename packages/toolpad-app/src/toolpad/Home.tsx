@@ -27,6 +27,8 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
@@ -81,6 +83,10 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
+          <Alert severity="warning">
+            <AlertTitle>For demo purposes only!</AlertTitle>
+            Your application will be ephemeral and may be deleted at any time.
+          </Alert>
           <DialogContent>
             <TextField
               sx={{ my: 1 }}
@@ -115,6 +121,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 createAppMutation.reset();
                 onClose();
               }}
+              disabled={config.isDemo}
             >
               Cancel
             </Button>
@@ -495,47 +502,55 @@ export default function Home() {
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
 
+  React.useEffect(() => {
+    if (config.isDemo) {
+      setCreateDialogOpen(true);
+    }
+  }, []);
+
   return (
     <ToolpadShell>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      <Container>
-        <Typography variant="h2">Apps</Typography>
-        <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
-        <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
-          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-          <ToggleButtonGroup
-            value={viewMode}
-            exclusive
-            onChange={handleViewModeChange}
-            aria-label="view mode"
-          >
-            <ToggleButton
-              value="list"
-              aria-label="list view"
-              color={viewMode === 'list' ? 'primary' : undefined}
+      {!config.isDemo ? (
+        <Container>
+          <Typography variant="h2">Apps</Typography>
+          <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
+            <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={handleViewModeChange}
+              aria-label="view mode"
             >
-              <ViewListIcon />
-            </ToggleButton>
-            <ToggleButton
-              value="grid"
-              aria-label="grid view"
-              color={viewMode === 'grid' ? 'primary' : undefined}
-            >
-              <GridViewIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Toolbar>
-        {error ? (
-          <ErrorAlert error={error} />
-        ) : (
-          <AppsView
-            apps={apps}
-            loading={isLoading}
-            activeDeploymentsByApp={activeDeploymentsByApp}
-            setDeletedApp={setDeletedApp}
-          />
-        )}
-      </Container>
+              <ToggleButton
+                value="list"
+                aria-label="list view"
+                color={viewMode === 'list' ? 'primary' : undefined}
+              >
+                <ViewListIcon />
+              </ToggleButton>
+              <ToggleButton
+                value="grid"
+                aria-label="grid view"
+                color={viewMode === 'grid' ? 'primary' : undefined}
+              >
+                <GridViewIcon />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Toolbar>
+          {error ? (
+            <ErrorAlert error={error} />
+          ) : (
+            <AppsView
+              apps={apps}
+              loading={isLoading}
+              activeDeploymentsByApp={activeDeploymentsByApp}
+              setDeletedApp={setDeletedApp}
+            />
+          )}
+        </Container>
+      ) : null}
+      <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
     </ToolpadShell>
   );
 }

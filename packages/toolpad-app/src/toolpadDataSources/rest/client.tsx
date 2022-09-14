@@ -46,8 +46,11 @@ import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import QueryInputPanel from '../QueryInputPanel';
+import config from '../../config';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
+
+const DEMO_URLS = ['https://covid-19.dataflowkit.com/v1'];
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -113,53 +116,75 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
 
   const headersAllowed = !!baseUrlValue;
 
+  const baseUrlInputProps = {
+    label: 'base url',
+    ...register('baseUrl', {
+      validate(input?: string) {
+        if (!input) {
+          if (mustHaveBaseUrl) {
+            return 'A base url is required when headers are used';
+          }
+          return true;
+        }
+        try {
+          return !!parseBaseUrl(input);
+        } catch (error) {
+          return 'Must be an absolute url';
+        }
+      },
+    }),
+    ...validation(formState, 'baseUrl'),
+  };
+
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
-      <TextField
-        label="base url"
-        {...register('baseUrl', {
-          validate(input?: string) {
-            if (!input) {
-              if (mustHaveBaseUrl) {
-                return 'A base url is required when headers are used';
-              }
-              return true;
-            }
-            try {
-              return !!parseBaseUrl(input);
-            } catch (error) {
-              return 'Must be an absolute url';
-            }
-          },
-        })}
-        {...validation(formState, 'baseUrl')}
-      />
-      <Typography>Headers:</Typography>
-      <Controller
-        name="headers"
-        control={control}
-        render={({ field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field } }) => {
-          const allHeaders = [...authenticationHeaders, ...fieldValue];
-          return (
-            <MapEntriesEditor
-              {...field}
-              disabled={!headersAllowed}
-              fieldLabel="header"
-              value={allHeaders}
-              onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
-              isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
-            />
-          );
-        }}
-      />
-      <Typography>Authentication:</Typography>
-      <Controller
-        name="authentication"
-        control={control}
-        render={({ field: { value: fieldValue, ref, ...field } }) => (
-          <AuthenticationEditor {...field} disabled={!headersAllowed} value={fieldValue ?? null} />
-        )}
-      />
+      {config.isDemo ? (
+        <TextField select {...baseUrlInputProps}>
+          {DEMO_URLS.map((url) => (
+            <MenuItem key={url} value={url}>
+              {url}
+            </MenuItem>
+          ))}
+        </TextField>
+      ) : (
+        <TextField {...baseUrlInputProps} />
+      )}
+      {!config.isDemo ? (
+        <React.Fragment>
+          <Typography>Headers:</Typography>
+          <Controller
+            name="headers"
+            control={control}
+            render={({
+              field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field },
+            }) => {
+              const allHeaders = [...authenticationHeaders, ...fieldValue];
+              return (
+                <MapEntriesEditor
+                  {...field}
+                  disabled={!headersAllowed}
+                  fieldLabel="header"
+                  value={allHeaders}
+                  onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
+                  isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
+                />
+              );
+            }}
+          />
+          <Typography>Authentication:</Typography>
+          <Controller
+            name="authentication"
+            control={control}
+            render={({ field: { value: fieldValue, ref, ...field } }) => (
+              <AuthenticationEditor
+                {...field}
+                disabled={!headersAllowed}
+                value={fieldValue ?? null}
+              />
+            )}
+          />
+        </React.Fragment>
+      ) : null}
 
       <Toolbar disableGutters>
         <Box sx={{ flex: 1 }} />
@@ -316,7 +341,12 @@ function QueryEditor({
             <Stack gap={2} sx={{ px: 3, pt: 1 }}>
               <Typography>Query</Typography>
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-                <TextField select value={input.query.method || 'GET'} onChange={handleMethodChange}>
+                <TextField
+                  select
+                  value={config.isDemo ? 'GET' : input.query.method || 'GET'}
+                  onChange={handleMethodChange}
+                  disabled={config.isDemo}
+                >
                   {HTTP_METHODS.map((method) => (
                     <MenuItem key={method} value={method}>
                       {method}
@@ -340,8 +370,12 @@ function QueryEditor({
                   <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                       <Tab label="URL query" value="urlQuery" />
-                      <Tab label="Body" value="body" />
-                      <Tab label="Headers" value="headers" />
+                      {!config.isDemo ? (
+                        <React.Fragment>
+                          <Tab label="Body" value="body" />
+                          <Tab label="Headers" value="headers" />
+                        </React.Fragment>
+                      ) : null}
                       <Tab label="Response" value="response" />
                       <Tab label="Transform" value="transform" />
                     </TabList>

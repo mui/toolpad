@@ -26,7 +26,7 @@ You can configure:
 
 - **base url** - url that can be shared between different queries.
 - **Headers** - pass custom headers with each request.
-- **Authentication** type - if your API is protected choose authentication method that fits your needs:
+- **Authentication** type - if your API is protected choose the authentication method that fits your needs:
   - **Basic** - adds authorization header and generates base64 encoded value for a given user credentials.
   - **Bearer token** - adds authorization header generates value for provided token.
   - **API key** - adds key/value header.

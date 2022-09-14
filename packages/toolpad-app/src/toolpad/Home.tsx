@@ -498,10 +498,10 @@ export default function Home() {
   return (
     <ToolpadShell>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      <Container>
+      <Container sx={{ my: 1 }}>
         <Typography variant="h2">Apps</Typography>
         <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
-        <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
           <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
           <ToggleButtonGroup
             value={viewMode}

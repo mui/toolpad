@@ -1,108 +1,3 @@
-// import { createTheme } from '@mui/material/styles';
-// import { red } from '@mui/material/colors';
-// import type {} from '@mui/x-data-grid-pro/themeAugmentation';
-// import type {} from '@mui/lab/themeAugmentation';
-
-// // Create a theme instance.
-// const theme = createTheme({
-//   components: {
-//     MuiTextField: {
-//       defaultProps: {
-//         size: 'small',
-//       },
-//     },
-//     MuiButton: {
-//       defaultProps: {
-//         size: 'small',
-//       },
-//     },
-//     MuiIconButton: {
-//       defaultProps: {
-//         size: 'small',
-//       },
-//     },
-//     MuiCheckbox: {
-//       defaultProps: {
-//         size: 'small',
-//       },
-//     },
-//     MuiFormControl: {
-//       defaultProps: {
-//         size: 'small',
-//       },
-//     },
-//     MuiSelect: {
-//       defaultProps: {
-//         size: 'small',
-//       },
-//     },
-//     MuiToggleButtonGroup: {
-//       defaultProps: {
-//         size: 'small',
-//       },
-//     },
-//     MuiAutocomplete: {
-//       defaultProps: {
-//         size: 'small',
-//       },
-//     },
-//     MuiToolbar: {
-//       defaultProps: {
-//         variant: 'dense',
-//       },
-//     },
-//     MuiList: {
-//       defaultProps: {
-//         dense: true,
-//       },
-//     },
-//     MuiDataGrid: {
-//       defaultProps: {
-//         density: 'compact',
-//       },
-//     },
-//     MuiSvgIcon: {
-//       defaultProps: {
-//         fontSize: 'small',
-//       },
-//     },
-//     MuiMenuItem: {
-//       defaultProps: {
-//         dense: true,
-//       },
-//     },
-//     MuiTabs: {
-//       styleOverrides: {
-//         root: {
-//           minHeight: 0,
-//         },
-//       },
-//     },
-//     MuiTab: {
-//       styleOverrides: {
-//         root: {
-//           padding: 8,
-//           minHeight: 0,
-//         },
-//       },
-//     },
-//   },
-//   palette: {
-//     // mode: 'dark',
-//     primary: {
-//       main: '#556cd6',
-//     },
-//     secondary: {
-//       main: '#19857b',
-//     },
-//     error: {
-//       main: red.A400,
-//     },
-//   },
-// });
-
-// export default theme;
-
 import { deepmerge } from '@mui/utils';
 import ArrowDropDownRounded from '@mui/icons-material/ArrowDropDownRounded';
 import { createTheme, ThemeOptions, Theme, alpha } from '@mui/material/styles';
@@ -398,6 +293,11 @@ export const getDesignTokens = (mode: 'light' | 'dark') =>
 export function getThemedComponents(theme: Theme): { components: Theme['components'] } {
   return {
     components: {
+      MuiTextField: {
+        defaultProps: {
+          size: 'small',
+        },
+      },
       MuiButtonBase: {
         defaultProps: {
           disableTouchRipple: true,
@@ -406,6 +306,7 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
       MuiButton: {
         defaultProps: {
           disableElevation: true,
+          size: 'small',
         },
         styleOverrides: {
           sizeLarge: {
@@ -416,7 +317,6 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
           },
           sizeSmall: {
             padding: theme.spacing(0.5, 1),
-            marginLeft: theme.spacing(-1),
           },
           containedPrimary: {
             backgroundColor: theme.palette.primary[500],
@@ -490,6 +390,9 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
         ],
       },
       MuiIconButton: {
+        defaultProps: {
+          size: 'small',
+        },
         variants: [
           {
             props: { color: 'primary' },
@@ -519,6 +422,16 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
             },
           },
         ],
+      },
+      MuiCheckbox: {
+        defaultProps: {
+          size: 'small',
+        },
+      },
+      MuiFormControl: {
+        defaultProps: {
+          size: 'small',
+        },
       },
       MuiMenu: {
         styleOverrides: {
@@ -565,6 +478,16 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
           },
         },
       },
+      MuiMenuItem: {
+        defaultProps: {
+          dense: true,
+        },
+      },
+      MuiAutocomplete: {
+        defaultProps: {
+          size: 'small',
+        },
+      },
       MuiPopover: {
         styleOverrides: {
           paper: {
@@ -595,7 +518,6 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
                 ? theme.palette.primary[300]
                 : theme.palette.primary[600],
             fontWeight: 700,
-            display: 'inline-flex',
             alignItems: 'center',
             '&:hover': {
               color:
@@ -694,6 +616,9 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
         },
       },
       MuiList: {
+        defaultProps: {
+          dense: true,
+        },
         styleOverrides: {
           root: {
             padding: 0,
@@ -741,6 +666,7 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
       MuiSelect: {
         defaultProps: {
           IconComponent: ArrowDropDownRounded,
+          size: 'small',
         },
         styleOverrides: {
           iconFilled: {
@@ -748,7 +674,30 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
           },
         },
       },
+      MuiDataGrid: {
+        defaultProps: {
+          density: 'compact',
+        },
+      },
+      MuiSvgIcon: {
+        defaultProps: {
+          fontSize: 'small',
+        },
+      },
+      MuiTabs: {
+        styleOverrides: {
+          root: {
+            minHeight: 0,
+          },
+        },
+      },
       MuiTab: {
+        styleOverrides: {
+          root: {
+            padding: 8,
+            minHeight: 0,
+          },
+        },
         defaultProps: {
           disableTouchRipple: true,
         },
@@ -798,6 +747,9 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
         },
       },
       MuiToggleButtonGroup: {
+        defaultProps: {
+          size: 'small',
+        },
         styleOverrides: {
           root: {
             backgroundColor:
@@ -834,6 +786,11 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
               },
             },
           },
+        },
+      },
+      MuiToolbar: {
+        defaultProps: {
+          variant: 'dense',
         },
       },
       MuiTooltip: {

@@ -26,9 +26,21 @@ You can either use a static values or use dynamic ones as described in [data bin
 
 ## Canvas grid
 
-In order to make UI building more flexible you can use not only the row layout but add components side by side and use a different columns.
+### Rows
 
-Additionally you can grab component on the side and resize it within the grid boundaries.
+Toolpad canvas uses a grid layout where you can use rows to position components:
+
+<img src="/static/toolpad/docs/canvas-rows.png" width="586px" alt="Canvas rows" />
+
+### Columns
+
+Or place them in a dedicated column besides other components:
+
+<img src="/static/toolpad/docs/canvas-columns.png" width="578px" alt="Canvas rows" />
+
+### Resizing elements
+
+Componens placed in columns can be horizontally resized within the grid boundaries:
 
 <img src="/static/toolpad/docs/canvas-grid.png" width="600px" alt="Canvas grid" />
 

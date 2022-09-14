@@ -6,7 +6,7 @@
 
 ## Working with canvas
 
-Building UI is as easy as dragging component from the library and dropping it on the canvas.
+To build your application's UI, drag the mouse over the component library to open the drawer. Select a component and drag it over the canvas. The canvas will highlight the location where a component can be dropped. Release the mouse to place the component in the canvas.
 
 Once you have a few components on the canvas you can tweak them by doing following actions:
 

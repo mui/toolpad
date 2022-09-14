@@ -31,7 +31,7 @@ You can configure:
   - **Bearer token** - adds authorization header generates value for provided token.
   - **API key** - adds key/value header.
 
-There are 2 datasources that require connection instance:
+There are 2 datasources that require a connection instance:
 
 ### Google Sheets
 

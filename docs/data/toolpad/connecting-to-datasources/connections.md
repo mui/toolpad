@@ -37,7 +37,7 @@ There are 2 datasources that require a connection instance:
 
 **Obtain credentials**
 
-Before you create a Google sheets connection you must first configure Toolpad app by providing Google sheets **client id** and **secret**:
+Before you create a Google Sheets connection you must first configure Toolpad app by providing Google Sheets **client ID** and **client secret**:
 
 1. Create a new Google Cloud project - [instructions](https://cloud.google.com/resource-manager/docs/creating-managing-projects#creating_a_project).
 

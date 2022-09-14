@@ -14,7 +14,7 @@ There are 2 kinds of data sources that do not require a connection instance:
 
 <img src="/static/toolpad/docs/connection-function-1.png" alt="Connection function" width="730px" />
 
-You can define secrets (key/value) that can later be access in the function datasource query:
+You can define secrets (key/value) that can later be accessed in the function datasource query:
 
 <img src="/static/toolpad/docs/connection-function-2.png" alt="Connection function" width="748px" />
 

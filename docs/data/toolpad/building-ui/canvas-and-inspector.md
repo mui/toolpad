@@ -8,7 +8,7 @@
 
 Building UI is as easy as dragging component from the library and dropping it on the canvas.
 
-Once you have a few components on the canvas you can easily tweak them by doing following actions:
+Once you have a few components on the canvas you can tweak them by doing following actions:
 
 <img src="/static/toolpad/docs/canvas-controls.png" width="600px" alt="Canvas controls" />
 

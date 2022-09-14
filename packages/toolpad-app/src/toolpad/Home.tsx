@@ -48,7 +48,7 @@ import useLocalStorageState from '../utils/useLocalStorageState';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ConfirmDialog } from '../components/SystemDialogs';
 import config from '../config';
-import { AppTemplateName } from '../types';
+import { AppTemplateId } from '../types';
 import { errorFrom } from '../utils/errors';
 
 export const APP_TEMPLATE_OPTIONS = {
@@ -73,12 +73,12 @@ export interface CreateAppDialogProps {
 
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
-  const [appTemplateName, setAppTemplateName] = React.useState<AppTemplateName>('blank');
+  const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('blank');
   const [dom, setDom] = React.useState('');
 
   const handleAppTemplateChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setAppTemplateName(event.target.value as AppTemplateName);
+      setAppTemplateId(event.target.value as AppTemplateId);
     },
     [],
   );
@@ -104,7 +104,13 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             const appDom = dom.trim() ? JSON.parse(dom) : null;
             createAppMutation.mutate([
               name,
-              appDom ? { type: 'dom', dom: appDom } : { type: 'template', name: appTemplateName },
+              {
+                from: {
+                  ...(appDom
+                    ? { kind: 'dom', dom: appDom }
+                    : { kind: 'template', id: appTemplateId }),
+                },
+              },
             ]);
           }}
         >
@@ -129,7 +135,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               label="Use template"
               select
               fullWidth
-              value={appTemplateName}
+              value={appTemplateId}
               onChange={handleAppTemplateChange}
             >
               {Object.entries(APP_TEMPLATE_OPTIONS).map(([value, { label, description }]) => (

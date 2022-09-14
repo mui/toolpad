@@ -1,7 +1,7 @@
 import { NodeId, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import * as prisma from '../../prisma/generated/client';
-import { ServerDataSource, VersionOrPreview, AppTemplateName } from '../types';
+import { ServerDataSource, VersionOrPreview, AppTemplateId } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -9,7 +9,7 @@ import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
-import { APP_TEMPLATE_DOMS } from './appTemplateDoms/doms';
+import { getAppTemplateDom } from './appTemplateDoms/doms';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -176,20 +176,21 @@ function createDefaultDom(): appDom.AppDom {
   return dom;
 }
 
-export type CreateAppOptions =
-  | {
-      type: 'dom';
-      dom?: appDom.AppDom | null;
-    }
-  | {
-      type: 'template';
-      name: AppTemplateName;
-    };
+export type CreateAppOptions = {
+  from?:
+    | {
+        kind: 'dom';
+        dom?: appDom.AppDom | null;
+      }
+    | {
+        kind: 'template';
+        id: AppTemplateId;
+      };
+};
 
-export async function createApp(
-  name: string,
-  opts: CreateAppOptions = { type: 'dom' },
-): Promise<prisma.App> {
+export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
+  const { from } = opts;
+
   return prismaClient.$transaction(async () => {
     const app = await prismaClient.app.create({
       data: { name },
@@ -197,10 +198,10 @@ export async function createApp(
 
     let dom: appDom.AppDom | null = null;
 
-    if (opts.type === 'dom') {
-      dom = opts.dom || null;
-    } else if (opts.type === 'template') {
-      dom = APP_TEMPLATE_DOMS[opts.name || 'blank'];
+    if (from && from.kind === 'dom') {
+      dom = from.dom || null;
+    } else if (from && from.kind === 'template') {
+      dom = await getAppTemplateDom(from.id || 'blank');
     }
 
     if (!dom) {

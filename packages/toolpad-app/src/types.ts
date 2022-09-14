@@ -156,4 +156,4 @@ export interface AppTheme {
 
 export type VersionOrPreview = 'preview' | number;
 
-export type AppTemplateName = 'blank' | 'stats' | 'images';
+export type AppTemplateId = 'blank' | 'stats' | 'images';

@@ -49,6 +49,8 @@ export class ToolpadEditor {
 
   readonly createComponentDialog: CreateComponentDialog;
 
+  readonly previewBtn: Locator;
+
   constructor(page: Page) {
     this.page = page;
 
@@ -57,6 +59,8 @@ export class ToolpadEditor {
 
     this.createComponentBtn = page.locator('[aria-label="Create component"]');
     this.createComponentDialog = new CreateComponentDialog(page);
+
+    this.previewBtn = page.locator('[aria-label="Preview"]');
   }
 
   async goto(appId: string) {
@@ -73,5 +77,10 @@ export class ToolpadEditor {
     await this.createComponentBtn.click();
     await this.createComponentDialog.nameInput.fill(name);
     await this.createComponentDialog.createButton.click();
+  }
+
+  async goToPreview() {
+    await this.previewBtn.click();
+    await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/preview/ });
   }
 }

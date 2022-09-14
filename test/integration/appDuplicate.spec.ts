@@ -1,34 +1,30 @@
-import { test, expect, Page } from '../playwright/test';
-import generateId from '../utils/generateId';
+import * as path from 'path';
+import { test, expect } from '../playwright/test';
+import { ToolpadHome } from '../models/ToolpadHome';
+import { ToolpadEditor } from '../models/ToolpadEditor';
+import { readJsonFile } from '../utils/fs';
 import * as locators from '../utils/locators';
 
-async function createApp(page: Page, name: string) {
-  await page.locator('button:has-text("create new")').click();
-
-  await page.fill('[role="dialog"] label:has-text("name")', name);
-
-  await page.click('[role="dialog"] button:has-text("create")');
-
-  await page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/editor\/pages\/[^/]+/ });
-}
-
 test('duplicate app from home flow', async ({ page }) => {
-  const appName1 = `App ${generateId()}`;
+  const dom = await readJsonFile(path.resolve(__dirname, './duplicateNavigationDom.json'));
+  const homeModel = new ToolpadHome(page);
+  await homeModel.goto();
+  const app = await homeModel.createApplication({ dom });
+  await homeModel.goto();
+  const duplicateApp = await homeModel.duplicateApplication(app.name);
 
-  await page.goto('/');
-  await createApp(page, appName1);
+  await expect(page.locator(locators.toolpadHomeAppRow(`${app.name} (copy)`))).toBeVisible();
 
-  await page.goto('/');
+  await homeModel.duplicateApplication(app.name);
+  await expect(page.locator(locators.toolpadHomeAppRow(`${app.name} (copy 2)`))).toBeVisible();
 
-  await page.click(`${locators.toolpadHomeAppRow(appName1)} >> [aria-label="Application menu"]`);
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goto(duplicateApp.id);
+  await editorModel.goToPreview();
 
-  await page.click('[role="menuitem"]:has-text("Duplicate"):visible');
-
-  await expect(page.locator(locators.toolpadHomeAppRow(`${appName1} (copy)`))).toBeVisible();
-
-  await page.click(`${locators.toolpadHomeAppRow(appName1)} >> [aria-label="Application menu"]`);
-
-  await page.click('[role="menuitem"]:has-text("Duplicate"):visible');
-
-  await expect(page.locator(locators.toolpadHomeAppRow(`${appName1} (copy 2)`))).toBeVisible();
+  await page.locator('div', { hasText: 'Page' }).click();
+  await page.waitForNavigation();
+  await page.locator('button', { hasText: 'Go to Page 2' }).click();
+  await page.waitForNavigation();
+  await expect(page.locator('button', { hasText: 'Go to Page 1' })).toBeVisible();
 });

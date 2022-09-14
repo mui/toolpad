@@ -63,4 +63,23 @@ export class ToolpadHome {
 
     return { id: idMatch[1], name };
   }
+
+  async duplicateApplication(appName: string) {
+    await this.page.click(
+      `[role="row"] >> has="input[value='${appName}']" >> [aria-label="Application menu"]`,
+    );
+    await this.page.click('[role="menuitem"]:has-text("Duplicate"):visible');
+
+    // Navigate to the new app
+    await this.page.click(`[role="row"] >> a:has-text("Edit")`);
+    await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
+
+    const { pathname } = new URL(this.page.url());
+    const idMatch = /^\/_toolpad\/app\/([^/]+)\//.exec(pathname);
+    if (!idMatch) {
+      throw new Error(`Application id not found in url "${this.page.url()}"`);
+    }
+
+    return { id: idMatch[1] };
+  }
 }

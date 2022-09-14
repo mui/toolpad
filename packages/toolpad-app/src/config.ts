@@ -37,7 +37,7 @@ export type BuildEnvVars = Record<
 export interface RuntimeConfig {
   // Enable input field for seeding a dom in the app creation dialog
   // (For testing purposes)
-  integrationTest?: boolean;
+  enableCreateByDom?: boolean;
 }
 
 declare global {
@@ -65,7 +65,7 @@ const runtimeConfig: RuntimeConfig =
   typeof window === 'undefined'
     ? {
         // Define runtime config here
-        integrationTest: !!process.env.TOOLPAD_INTEGRATION_TEST,
+        enableCreateByDom: !!process.env.TOOLPAD_ENABLE_CREATE_BY_DOM,
       }
     : getBrowsersideRuntimeConfig();
 

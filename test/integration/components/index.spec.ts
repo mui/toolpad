@@ -4,7 +4,7 @@ import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
 
-test('components', async ({ page }) => {
+test.only('components', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './componentsDom.json'));
 
   const homeModel = new ToolpadHome(page);

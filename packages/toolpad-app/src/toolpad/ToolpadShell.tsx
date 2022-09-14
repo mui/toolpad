@@ -15,6 +15,7 @@ import {
   Tooltip,
   Stack,
   Link,
+  useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
@@ -24,7 +25,8 @@ import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
 import client from '../api';
 import { TOOLPAD_TARGET_CLOUD, TOOLPAD_TARGET_CE, TOOLPAD_TARGET_PRO } from '../constants';
-import productIcon from '../../public/product-icon.svg';
+import productIconDark from '../../public/product-icon-dark.svg';
+import productIconLight from '../../public/product-icon-light.svg';
 
 const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
@@ -66,7 +68,7 @@ const ViewPort = styled('div')({
 });
 
 function getReadableTarget(): string {
-  switch (process.env.TOOLPAD_VERSION) {
+  switch (process.env.TOOLPAD_TARGET) {
     case TOOLPAD_TARGET_CLOUD:
       return 'Cloud';
     case TOOLPAD_TARGET_CE:
@@ -97,6 +99,7 @@ function UserFeedback() {
         <Divider />
         <MenuItem disabled>{getReadableTarget()}</MenuItem>
         <MenuItem disabled>Version {process.env.TOOLPAD_VERSION}</MenuItem>
+        <MenuItem disabled>Build {process.env.TOOLPAD_BUILD}</MenuItem>
       </Menu>
     </React.Fragment>
   );
@@ -173,6 +176,7 @@ export interface HeaderProps {
 }
 
 function Header({ actions, status }: HeaderProps) {
+  const theme = useTheme();
   return (
     <AppBar
       position="static"
@@ -190,21 +194,33 @@ function Header({ actions, status }: HeaderProps) {
             justifyContent: 'start',
           }}
         >
-          <Link
-            color="inherit"
-            aria-label="Home"
-            href={`/`}
-            underline="none"
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}
-          >
-            <Image src={productIcon} alt="Toolpad product icon" width={25} height={25} />
-            <Box
-              data-test-id="brand"
-              sx={{ color: 'primary.main', lineHeight: '21px', fontSize: '16px', fontWeight: 700 }}
+          <Tooltip title="Home">
+            <Link
+              color="inherit"
+              aria-label="Home"
+              href="/"
+              underline="none"
+              sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}
             >
-              MUI Toolpad
-            </Box>
-          </Link>
+              <Image
+                src={theme.palette.mode === 'dark' ? productIconDark : productIconLight}
+                alt="Toolpad product icon"
+                width={25}
+                height={25}
+              />
+              <Box
+                data-test-id="brand"
+                sx={{
+                  color: 'primary.main',
+                  lineHeight: '21px',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                }}
+              >
+                MUI Toolpad
+              </Box>
+            </Link>
+          </Tooltip>
         </Box>
         <Box
           sx={{

@@ -34,6 +34,7 @@ function parseBuidEnvVars(env) {
     TOOLPAD_TARGET: target,
     TOOLPAD_DEMO: env.TOOLPAD_DEMO || '',
     TOOLPAD_VERSION: pkgJson.version,
+    TOOLPAD_BUILD: env.GIT_SHA1?.slice(0, 7) || 'dev',
   };
 }
 

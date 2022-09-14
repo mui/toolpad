@@ -65,7 +65,7 @@ Before you create a Google Sheets connection you must first configure Toolpad ap
 
 <img src="/static/toolpad/docs/connection-sheets-1.png" alt="Connection Google Sheets" width="724px" />
 
-1. Choose google account that you want to authorize.
+1. Choose the Google account that you want to authorize.
 
 1. Grant access to your Google Drive files by clicking **Allow**.
 

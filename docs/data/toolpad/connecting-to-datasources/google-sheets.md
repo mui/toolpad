@@ -4,7 +4,7 @@
 
 ## Working with Google Sheets
 
-As explained in the [connections](/toolpad/connecting-to-datasources/connections/) section you can either create a reusable connection or simply create a new query and put all connection details inline:
+1. Create a new Google Sheets connection as explained in the [instructions](/toolpad/connecting-to-datasources/connections/#google-sheets).
 
 1. Once your connection is ready click on **ADD QUERY** in the **Inspector** on the right.
 

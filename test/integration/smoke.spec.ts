@@ -1,3 +1,4 @@
+import { ToolpadHome } from '../models/ToolpadHome';
 import { test, expect, Request } from '../playwright/test';
 import generateId from '../utils/generateId';
 import * as locators from '../utils/locators';
@@ -5,17 +6,14 @@ import * as locators from '../utils/locators';
 test('basic app creation flow', async ({ page }) => {
   const appName = `App ${generateId()}`;
 
-  await page.goto('/');
+  const homeModel = new ToolpadHome(page);
+
+  await homeModel.goto();
   const brand = page.locator('data-test-id=brand');
-  await expect(brand).toHaveText('MUI Toolpad CE');
+  await expect(brand).toHaveText('MUI Toolpad');
 
-  await page.locator('button:has-text("create new")').click();
-
-  await page.fill('[role="dialog"] label:has-text("name")', appName);
-
-  await page.click('[role="dialog"] button:has-text("create")');
-
-  await page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
+  await homeModel.createApplication({ name: appName });
+  await homeModel.goto();
 
   // TODO: basic editor tests
 

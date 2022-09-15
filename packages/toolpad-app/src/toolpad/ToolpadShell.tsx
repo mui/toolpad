@@ -8,7 +8,6 @@ import {
   Collapse,
   Toolbar,
   IconButton,
-  Typography,
   Menu,
   MenuItem,
   Divider,
@@ -16,14 +15,19 @@ import {
   Tooltip,
   Stack,
   Chip,
+  Link,
+  useTheme,
 } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
 import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Image from 'next/image';
 import useMenu from '../utils/useMenu';
 import useLocalStorageState from '../utils/useLocalStorageState';
 import client from '../api';
+import { TOOLPAD_TARGET_CLOUD, TOOLPAD_TARGET_CE, TOOLPAD_TARGET_PRO } from '../constants';
+import productIconDark from '../../public/product-icon-dark.svg';
+import productIconLight from '../../public/product-icon-light.svg';
 
 const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
@@ -46,8 +50,8 @@ function FeedbackMenuItemLink({ href, children }: FeedbackMenuItemLinkProps) {
 }
 
 export interface ToolpadShellProps {
-  navigation?: React.ReactNode;
   actions?: React.ReactNode;
+  status?: React.ReactNode;
   children?: React.ReactNode;
 }
 
@@ -63,6 +67,19 @@ const ViewPort = styled('div')({
   overflow: 'auto',
   position: 'relative',
 });
+
+function getReadableTarget(): string {
+  switch (process.env.TOOLPAD_TARGET) {
+    case TOOLPAD_TARGET_CLOUD:
+      return 'Cloud';
+    case TOOLPAD_TARGET_CE:
+      return 'Community';
+    case TOOLPAD_TARGET_PRO:
+      return 'Pro';
+    default:
+      return 'Unknown';
+  }
+}
 
 function UserFeedback() {
   const { buttonProps, menuProps } = useMenu();
@@ -81,7 +98,9 @@ function UserFeedback() {
           Request or upvote feature
         </FeedbackMenuItemLink>
         <Divider />
+        <MenuItem disabled>{getReadableTarget()}</MenuItem>
         <MenuItem disabled>Version {process.env.TOOLPAD_VERSION}</MenuItem>
+        <MenuItem disabled>Build {process.env.TOOLPAD_BUILD}</MenuItem>
       </Menu>
     </React.Fragment>
   );
@@ -153,11 +172,12 @@ function UpdateBanner() {
 }
 
 export interface HeaderProps {
-  navigation?: React.ReactNode;
   actions?: React.ReactNode;
+  status?: React.ReactNode;
 }
 
-function Header({ actions, navigation }: HeaderProps) {
+function Header({ actions, status }: HeaderProps) {
+  const theme = useTheme();
   return (
     <AppBar
       position="static"
@@ -165,25 +185,69 @@ function Header({ actions, navigation }: HeaderProps) {
       elevation={0}
       sx={{ zIndex: 2, borderBottom: 1, borderColor: 'divider' }}
     >
-      <Toolbar sx={{ gap: 1 }}>
-        <IconButton
-          size="medium"
-          edge="start"
-          color="inherit"
-          aria-label="Home"
-          component="a"
-          href={`/`}
+      <Toolbar>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'start',
+          }}
         >
-          <HomeIcon fontSize="medium" />
-        </IconButton>
-        <Typography data-test-id="brand" variant="h6" color="inherit" component="div">
-          MUI Toolpad {process.env.TOOLPAD_TARGET}
-        </Typography>
-        <Chip sx={{ ml: 1 }} label="Demo Version" color="primary" size="small" />
-        {navigation}
-        <Box flex={1} />
-        {actions}
-        <UserFeedback />
+          <Tooltip title="Home">
+            <Link
+              color="inherit"
+              aria-label="Home"
+              href="/"
+              underline="none"
+              sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}
+            >
+              <Image
+                src={theme.palette.mode === 'dark' ? productIconDark : productIconLight}
+                alt="Toolpad product icon"
+                width={25}
+                height={25}
+              />
+              <Box
+                data-test-id="brand"
+                sx={{
+                  color: 'primary.main',
+                  lineHeight: '21px',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                }}
+              >
+                MUI Toolpad
+              </Box>
+              <Chip sx={{ ml: 1 }} label="Demo Version" color="primary" size="small" />
+            </Link>
+          </Tooltip>
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {actions}
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'end',
+            gap: 2,
+          }}
+        >
+          {status}
+          <UserFeedback />
+        </Box>
       </Toolbar>
     </AppBar>
   );

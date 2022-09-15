@@ -84,15 +84,14 @@ const ComponentCatalogItem = ({
         justifyContent: 'center',
         width: builtIn ? 75 : 70,
         height: builtIn ? 75 : 70,
-        padding: (theme) => theme.spacing(1, 1, 1, 1),
-        borderRadius: (theme) => theme.shape.borderRadius,
-        border: (theme) => `1px solid ${theme.palette.divider}`,
+        padding: 1,
+        borderRadius: 1,
+        border: 1,
+        borderColor: 'divider',
         borderStyle: kind === 'create' ? 'dashed' : 'solid',
-        color: (theme) => theme.palette.text.secondary,
-        '&:hover': (theme) => {
-          return {
-            background: theme.palette.action.hover,
-          };
+        color: 'text.secondary',
+        '&:hover': {
+          bgcolor: 'action.hover',
         },
         ...(draggable ? { cursor: 'grab' } : {}),
         ...(onClick ? { cursor: 'pointer' } : {}),

@@ -148,7 +148,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               ))}
             </TextField>
 
-            {config.integrationTest ? (
+            {config.enableCreateByDom ? (
               <TextField
                 sx={{ my: 1 }}
                 label="Seed DOM"

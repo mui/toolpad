@@ -60,6 +60,13 @@ export class ToolpadHome {
     }
 
     if (dom) {
+      const isDomInputEnabled = await this.newAppDomInput.isVisible();
+      if (!isDomInputEnabled) {
+        throw new Error(
+          `Toolpad not in integration test mode. Make sure to start Toolpad with environment variable TOOLPAD_ENABLE_CREATE_BY_DOM=1.`,
+        );
+      }
+
       await this.newAppDomInput.fill(JSON.stringify(dom));
     }
 

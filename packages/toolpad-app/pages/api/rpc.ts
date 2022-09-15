@@ -88,6 +88,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
     try {
       rawResult = await method(params, context);
     } catch (error) {
+      console.error(error);
       if (error instanceof Error) {
         res.json({ error: { message: error.message, stack: error.stack } });
       } else {

@@ -52,6 +52,8 @@ import { ConfirmDialog } from '../components/SystemDialogs';
 import config from '../config';
 import { errorFrom } from '../utils/errors';
 
+const NO_OP = () => {};
+
 export interface CreateAppDialogProps {
   open: boolean;
   onClose: () => void;
@@ -77,7 +79,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 
   return (
     <React.Fragment>
-      <Dialog {...props} onClose={onClose}>
+      <Dialog {...props} onClose={isDemo ? NO_OP : onClose}>
         <DialogForm
           onSubmit={(event) => {
             event.preventDefault();

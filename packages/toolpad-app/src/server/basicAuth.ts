@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage, ServerResponse } from 'http';
 import config from './config';
 
 export function checkBasicAuthHeader(headerContent: string | null): boolean {

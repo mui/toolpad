@@ -5,7 +5,6 @@ import {
   AppBar,
   Button,
   Box,
-  Collapse,
   Toolbar,
   IconButton,
   Typography,
@@ -15,6 +14,7 @@ import {
   ListItemText,
   Tooltip,
   Stack,
+  Snackbar,
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import CloseIcon from '@mui/icons-material/Close';
@@ -96,9 +96,15 @@ function UpdateBanner() {
     null,
   );
 
-  const handleDismissClick = React.useCallback(() => {
-    setDismissedVersion(CURRENT_RELEASE_VERSION);
-  }, [setDismissedVersion]);
+  const handleDismissClick = React.useCallback(
+    (event: React.SyntheticEvent | Event, reason?: string) => {
+      if (reason === 'clickaway' || reason === 'escapeKeyDown') {
+        return;
+      }
+      setDismissedVersion(CURRENT_RELEASE_VERSION);
+    },
+    [setDismissedVersion],
+  );
 
   const hideBanner =
     (latestRelease && latestRelease.tag === CURRENT_RELEASE_VERSION) ||
@@ -107,7 +113,7 @@ function UpdateBanner() {
   return (
     <React.Fragment>
       {latestRelease && process.env.TOOLPAD_TARGET === 'CE' ? (
-        <Collapse in={!hideBanner}>
+        <Snackbar open={!hideBanner} onClose={handleDismissClick}>
           <Alert
             action={
               <Stack direction="row" sx={{ gap: 2 }}>
@@ -145,7 +151,7 @@ function UpdateBanner() {
           >
             A new version <strong>{latestRelease.tag}</strong> of Toolpad is available.
           </Alert>
-        </Collapse>
+        </Snackbar>
       ) : null}
     </React.Fragment>
   );

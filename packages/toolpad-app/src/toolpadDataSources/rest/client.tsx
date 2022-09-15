@@ -149,42 +149,40 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
       ) : (
         <TextField {...baseUrlInputProps} />
       )}
-      {!isDemo ? (
-        <React.Fragment>
-          <Typography>Headers:</Typography>
-          <Controller
-            name="headers"
-            control={control}
-            render={({
-              field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field },
-            }) => {
-              const allHeaders = [...authenticationHeaders, ...fieldValue];
-              return (
-                <MapEntriesEditor
-                  {...field}
-                  disabled={!headersAllowed}
-                  fieldLabel="header"
-                  value={allHeaders}
-                  onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
-                  isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
-                />
-              );
-            }}
-          />
-          <Typography>Authentication:</Typography>
-          <Controller
-            name="authentication"
-            control={control}
-            render={({ field: { value: fieldValue, ref, ...field } }) => (
-              <AuthenticationEditor
+      <React.Fragment>
+        <Typography>Headers:</Typography>
+        <Controller
+          name="headers"
+          control={control}
+          render={({
+            field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field },
+          }) => {
+            const allHeaders = [...authenticationHeaders, ...fieldValue];
+            return (
+              <MapEntriesEditor
                 {...field}
-                disabled={!headersAllowed}
-                value={fieldValue ?? null}
+                disabled={!headersAllowed || isDemo}
+                fieldLabel="header"
+                value={allHeaders}
+                onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
+                isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
               />
-            )}
-          />
-        </React.Fragment>
-      ) : null}
+            );
+          }}
+        />
+        <Typography>Authentication:</Typography>
+        <Controller
+          name="authentication"
+          control={control}
+          render={({ field: { value: fieldValue, ref, ...field } }) => (
+            <AuthenticationEditor
+              {...field}
+              disabled={!headersAllowed || isDemo}
+              value={fieldValue ?? null}
+            />
+          )}
+        />
+      </React.Fragment>
 
       <Toolbar disableGutters>
         <Box sx={{ flex: 1 }} />
@@ -372,13 +370,9 @@ function QueryEditor({
                   <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                       <Tab label="URL query" value="urlQuery" />
-                      {!isDemo ? (
-                        <React.Fragment>
-                          <Tab label="Body" value="body" />
-                          <Tab label="Headers" value="headers" />
-                          <Tab label="Response" value="response" />
-                        </React.Fragment>
-                      ) : null}
+                      <Tab label="Body" value="body" disabled={isDemo} />
+                      <Tab label="Headers" value="headers" disabled={isDemo} />
+                      <Tab label="Response" value="response" disabled={isDemo} />
                       <Tab label="Transform" value="transform" />
                     </TabList>
                   </Box>

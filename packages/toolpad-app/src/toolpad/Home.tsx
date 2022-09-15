@@ -86,10 +86,12 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
           <DialogContent>
-            <Alert severity="warning" sx={{ mb: 2 }}>
-              <AlertTitle>For demo purposes only!</AlertTitle>
-              Your application will be ephemeral and may be deleted at any time.
-            </Alert>
+            {isDemo ? (
+              <Alert severity="warning" sx={{ mb: 2 }}>
+                <AlertTitle>For demo purposes only!</AlertTitle>
+                Your application will be ephemeral and may be deleted at any time.
+              </Alert>
+            ) : null}
             <TextField
               sx={{ my: 1 }}
               autoFocus

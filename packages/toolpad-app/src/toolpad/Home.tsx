@@ -55,6 +55,7 @@ import { ConfirmDialog } from '../components/SystemDialogs';
 import config from '../config';
 import { errorFrom } from '../utils/errors';
 import useBoolean from '../utils/useBoolean';
+import useEvent from '../utils/useEvent';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -281,11 +282,11 @@ function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
     },
   });
 
-  const handleClose = React.useCallback(() => {
+  const handleClose = useEvent(() => {
     onClose();
     reset();
     updateAppMutation.reset();
-  }, [onClose, reset, updateAppMutation]);
+  });
 
   const doSubmit = handleSubmit(async (updates) => {
     await updateAppMutation.mutateAsync([app.id, updates]);

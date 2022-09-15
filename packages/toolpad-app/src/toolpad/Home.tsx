@@ -290,7 +290,7 @@ function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
 
   const doSubmit = handleSubmit(async (updates) => {
     await updateAppMutation.mutateAsync([app.id, updates]);
-    handleClose();
+    onClose();
   });
 
   return (

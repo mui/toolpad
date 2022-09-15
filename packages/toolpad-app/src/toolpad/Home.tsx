@@ -275,31 +275,25 @@ interface AppSettingsDialogProps {
 function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
   const updateAppMutation = client.useMutation('updateApp');
 
-  const defaultValues = React.useMemo(
-    () => ({
-      public: app.public,
-    }),
-    [app.public],
-  );
-
   const { handleSubmit, reset, control } = useForm({
-    defaultValues,
+    defaultValues: {
+      public: app.public,
+    },
   });
 
-  React.useEffect(() => {
-    if (!open) {
-      reset(defaultValues);
-      updateAppMutation.reset();
-    }
-  }, [defaultValues, open, reset, updateAppMutation]);
+  const handleClose = React.useCallback(() => {
+    onClose();
+    reset();
+    updateAppMutation.reset();
+  }, [onClose, reset, updateAppMutation]);
 
   const doSubmit = handleSubmit(async (updates) => {
     await updateAppMutation.mutateAsync([app.id, updates]);
-    onClose();
+    handleClose();
   });
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogForm onSubmit={doSubmit}>
         <DialogTitle>Application settings for &quot;{app.name}&quot;</DialogTitle>
         <DialogContent>
@@ -322,7 +316,7 @@ function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
           {updateAppMutation.error ? <ErrorAlert error={updateAppMutation.error} /> : null}
         </DialogContent>
         <DialogActions>
-          <Button color="inherit" variant="text" onClick={onClose}>
+          <Button color="inherit" variant="text" onClick={handleClose}>
             Cancel
           </Button>
           <LoadingButton type="submit" loading={updateAppMutation.isLoading}>

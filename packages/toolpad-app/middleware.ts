@@ -10,7 +10,7 @@ const BASIC_AUTH_WHITELIST = [
 
   // Apps must be able to be public
   // These urls will handle their own basic auth when the corresponding Toolpad app is not public
-  new URLPattern({ pathname: '/deploy/:appId/*' }),
+  new URLPattern({ pathname: '/deploy/*' }),
   new URLPattern({ pathname: '/api/data/:appId/:version/:queryId' }),
 ];
 

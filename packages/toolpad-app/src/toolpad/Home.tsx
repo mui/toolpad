@@ -27,6 +27,9 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
+  Divider,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
@@ -34,7 +37,9 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
+import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Controller, useForm } from 'react-hook-form';
 import client from '../api';
 import DialogForm from '../components/DialogForm';
 import type { Deployment } from '../../prisma/generated/client';
@@ -49,6 +54,7 @@ import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ConfirmDialog } from '../components/SystemDialogs';
 import config from '../config';
 import { errorFrom } from '../utils/errors';
+import useBoolean from '../utils/useBoolean';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -75,9 +81,9 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     <React.Fragment>
       <Dialog {...props} onClose={onClose}>
         <DialogForm
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
-            createAppMutation.mutate([name, { dom: dom.trim() ? JSON.parse(dom) : null }]);
+            await createAppMutation.mutate([name, { dom: dom.trim() ? JSON.parse(dom) : null }]);
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
@@ -190,7 +196,7 @@ function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableP
     async (name: string) => {
       if (app?.id) {
         try {
-          await client.mutation.updateApp(app.id, name);
+          await client.mutation.updateApp(app.id, { name });
           await client.invalidateQueries('getApps');
         } catch (rawError) {
           setAppRenameError(errorFrom(rawError));
@@ -257,12 +263,78 @@ function AppOpenButton({ app, activeDeployment }: AppOpenButtonProps) {
   return openButton;
 }
 
+interface AppSettingsDialogProps {
+  open: boolean;
+  onClose: () => void;
+  app: AppMeta;
+}
+
+function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
+  const updateAppMutation = client.useMutation('updateApp');
+
+  const defaultValues = React.useMemo(
+    () => ({
+      public: app.public,
+    }),
+    [app.public],
+  );
+
+  const { handleSubmit, reset, control } = useForm({
+    defaultValues,
+  });
+
+  React.useEffect(() => {
+    if (!open) {
+      reset(defaultValues);
+    }
+  }, [defaultValues, open, reset]);
+
+  const doSubmit = handleSubmit(async (updates) => {
+    await updateAppMutation.mutate([app.id, updates]);
+  });
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogForm onSubmit={doSubmit}>
+        <DialogTitle>Application settings</DialogTitle>
+        <DialogContent>
+          <FormControlLabel
+            control={
+              <Controller
+                control={control}
+                name="public"
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Checkbox
+                    checked={value}
+                    onChange={(e) => onChange(e.target.checked)}
+                    {...field}
+                  />
+                )}
+              />
+            }
+            label="Make application public"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
+          <LoadingButton type="submit" loading={updateAppMutation.isLoading}>
+            Save
+          </LoadingButton>
+        </DialogActions>
+      </DialogForm>
+    </Dialog>
+  );
+}
+
 interface AppOptionsProps {
+  app?: AppMeta;
   onRename: () => void;
   onDelete?: () => void;
 }
 
-function AppOptions({ onRename, onDelete }: AppOptionsProps) {
+function AppOptions({ app, onRename, onDelete }: AppOptionsProps) {
   const { buttonProps, menuProps, onMenuClose } = useMenu();
 
   const handleRenameClick = React.useCallback(() => {
@@ -275,9 +347,20 @@ function AppOptions({ onRename, onDelete }: AppOptionsProps) {
     onDelete?.();
   }, [onDelete, onMenuClose]);
 
+  const {
+    setTrue: handleOpenSettings,
+    setFalse: handleCloseSettings,
+    value: settingsOpen,
+  } = useBoolean(false);
+
+  const handleopenSettingsClick = React.useCallback(() => {
+    onMenuClose();
+    handleOpenSettings();
+  }, [handleOpenSettings, onMenuClose]);
+
   return (
     <React.Fragment>
-      <IconButton {...buttonProps} aria-label="Application menu">
+      <IconButton {...buttonProps} aria-label="Application menu" disabled={!app}>
         <MoreVertIcon />
       </IconButton>
       <Menu {...menuProps}>
@@ -293,7 +376,17 @@ function AppOptions({ onRename, onDelete }: AppOptionsProps) {
           </ListItemIcon>
           <ListItemText>Delete</ListItemText>
         </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleopenSettingsClick}>
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText>Settings</ListItemText>
+        </MenuItem>
       </Menu>
+      {app ? (
+        <AppSettingsDialog open={settingsOpen} onClose={handleCloseSettings} app={app} />
+      ) : null}
     </React.Fragment>
   );
 }
@@ -323,7 +416,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         }}
       >
         <CardHeader
-          action={<AppOptions onRename={handleRename} onDelete={onDelete} />}
+          action={<AppOptions app={app} onRename={handleRename} onDelete={onDelete} />}
           disableTypography
           subheader={
             <Typography variant="body2" color="text.secondary">
@@ -385,7 +478,7 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
           <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
             <AppEditButton app={app} />
             <AppOpenButton app={app} activeDeployment={activeDeployment} />
-            <AppOptions onRename={handleRename} onDelete={onDelete} />
+            <AppOptions app={app} onRename={handleRename} onDelete={onDelete} />
           </Stack>
         </TableCell>
       </TableRow>

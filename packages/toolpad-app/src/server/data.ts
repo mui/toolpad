@@ -193,12 +193,17 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
   });
 }
 
-export async function updateApp(appId: string, name: string): Promise<void> {
+interface AppUpdates {
+  name?: string;
+  public?: boolean;
+}
+
+export async function updateApp(appId: string, updates: AppUpdates): Promise<void> {
   await prismaClient.app.update({
     where: {
       id: appId,
     },
-    data: { name },
+    data: _.pick(updates, ['name', 'public']),
     select: {
       // Only return the id to reduce amount of data returned from the db
       id: true,

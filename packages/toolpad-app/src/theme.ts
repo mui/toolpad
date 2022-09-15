@@ -744,6 +744,10 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
             color: theme.palette.text.secondary,
           },
         },
+        styleOverrides: {
+          root: {
+            backgroundColor:
+              theme.palette.mode === 'dark' ? theme.palette.primaryDark[900] : '#fff',
       },
       MuiToggleButtonGroup: {
         defaultProps: {

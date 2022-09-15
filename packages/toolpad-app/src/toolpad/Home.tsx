@@ -83,7 +83,10 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
         <DialogForm
           onSubmit={async (event) => {
             event.preventDefault();
-            await createAppMutation.mutate([name, { dom: dom.trim() ? JSON.parse(dom) : null }]);
+            await createAppMutation.mutateAsync([
+              name,
+              { dom: dom.trim() ? JSON.parse(dom) : null },
+            ]);
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
@@ -286,17 +289,19 @@ function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
   React.useEffect(() => {
     if (!open) {
       reset(defaultValues);
+      updateAppMutation.reset();
     }
-  }, [defaultValues, open, reset]);
+  }, [defaultValues, open, reset, updateAppMutation]);
 
   const doSubmit = handleSubmit(async (updates) => {
-    await updateAppMutation.mutate([app.id, updates]);
+    await updateAppMutation.mutateAsync([app.id, updates]);
+    onClose();
   });
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogForm onSubmit={doSubmit}>
-        <DialogTitle>Application settings</DialogTitle>
+        <DialogTitle>Application settings for &quot;{app.name}&quot;</DialogTitle>
         <DialogContent>
           <FormControlLabel
             control={
@@ -314,6 +319,7 @@ function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
             }
             label="Make application public"
           />
+          {updateAppMutation.error ? <ErrorAlert error={updateAppMutation.error} /> : null}
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={onClose}>

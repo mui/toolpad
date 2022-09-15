@@ -136,11 +136,13 @@ function UpdateBanner() {
           open={!hideBanner}
           onClose={handleDismissClick}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          message={
+            <React.Fragment>
+              A new version <strong>{latestRelease.tag}</strong> of Toolpad is available.
+            </React.Fragment>
+          }
           action={
             <Stack direction="row" sx={{ gap: 2 }}>
-              <p>
-                A new version <strong>{latestRelease.tag}</strong> of Toolpad is available.
-              </p>
               <Button
                 aria-label="update"
                 color="inherit"

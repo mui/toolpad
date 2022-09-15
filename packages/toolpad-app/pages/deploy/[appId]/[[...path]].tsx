@@ -3,10 +3,12 @@ import * as React from 'react';
 import { asArray } from '../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../src/runtime/ToolpadApp';
 import { getApp } from '../../../src/server/data';
-import { checkBasicAuth } from '../../../src/server/basicAuth';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
-  const { loadRenderTree, findActiveDeployment } = await import('../../../src/server/data');
+  const [{ loadRenderTree, findActiveDeployment }, { checkBasicAuth }] = await Promise.all([
+    import('../../../src/server/data'),
+    import('../../../src/server/basicAuth'),
+  ]);
 
   const [appId] = asArray(context.query.appId);
 

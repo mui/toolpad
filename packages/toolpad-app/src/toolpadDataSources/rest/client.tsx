@@ -14,7 +14,14 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
-import { FetchPrivateQuery, FetchQuery, FetchResult, RestConnectionParams, Body } from './types';
+import {
+  FetchPrivateQuery,
+  FetchQuery,
+  FetchResult,
+  RestConnectionParams,
+  Body,
+  ResponseType,
+} from './types';
 import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
@@ -232,6 +239,16 @@ function QueryEditor({
     }));
   }, []);
 
+  const handleResponseTypeChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, response: { kind: event.target.value } as ResponseType },
+      }));
+    },
+    [],
+  );
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     input: input.params,
     globalScope,
@@ -325,6 +342,7 @@ function QueryEditor({
                       <Tab label="URL query" value="urlQuery" />
                       <Tab label="Body" value="body" />
                       <Tab label="Headers" value="headers" />
+                      <Tab label="Response" value="response" />
                       <Tab label="Transform" value="transform" />
                     </TabList>
                   </Box>
@@ -351,6 +369,24 @@ function QueryEditor({
                       globalScope={queryScope}
                       liveValue={liveHeaders}
                     />
+                  </TabPanel>
+                  <TabPanel disableGutters value="response">
+                    <TextField
+                      select
+                      label="response type"
+                      sx={{ width: 200, mt: 1 }}
+                      value={input.query.response?.kind || 'json'}
+                      onChange={handleResponseTypeChange}
+                    >
+                      <MenuItem value="raw">raw</MenuItem>
+                      <MenuItem value="json">JSON</MenuItem>
+                      <MenuItem value="csv" disabled>
+                        🚧 CSV
+                      </MenuItem>
+                      <MenuItem value="xml" disabled>
+                        🚧 XML
+                      </MenuItem>
+                    </TextField>
                   </TabPanel>
                   <TabPanel disableGutters value="transform">
                     <TransformInput

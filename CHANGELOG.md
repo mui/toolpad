@@ -1,5 +1,47 @@
 # Changelog
 
+## v0.0.18
+
+<!-- generated comparing v0.0.17..master -->
+
+_Sep 14, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Fixes and improvements all around, banner prompting to upgrade Toolpad
+
+- &#8203;<!-- 29 -->Make errors visible in the runtime (#985) @Janpot
+- &#8203;<!-- 28 -->Put Toolpad user in charge of response parsing (#987) @Janpot
+- &#8203;<!-- 27 -->Group a few more packages for renovate (#982) @Janpot
+- &#8203;<!-- 26 -->Revert "Make errors visible in the runtime" (#954) @Janpot
+- &#8203;<!-- 25 -->Add a DataGrid to preview GoogleSheets response (#952) @bharatkashyap
+- &#8203;<!-- 24 -->Fix DataGrid double scroll (#945) @apedroferreira
+- &#8203;<!-- 23 -->Editable text component batched fixes (#898) @bharatkashyap
+- &#8203;<!-- 22 -->Unify RFC template using core version (#951) @bytasv
+- &#8203;<!-- 21 -->Make errors visible in the runtime (#946) @Janpot
+- &#8203;<!-- 20 -->Remove editor segment from route (#800) @Janpot
+- &#8203;<!-- 19 -->Preserve javascript semantics when dependencies fail (#948) @Janpot
+- &#8203;<!-- 18 -->Rename parseError to errorFrom (#944) @Janpot
+- &#8203;<!-- 17 -->Fix node and jsdom tests interferring with each other (#939) @Janpot
+- &#8203;<!-- 16 -->Add components integration test (#938) @Janpot
+- &#8203;<!-- 15 -->Fix naive content-type sniffing implementation (#940) @Janpot
+- &#8203;<!-- 14 -->Format function source on save (#942) @Janpot
+- &#8203;<!-- 13 -->Allow recreating data grid columns from existing data (#914) @apedroferreira
+- &#8203;<!-- 12 -->Port MUI X renovate.json (#933) @Janpot
+- &#8203;<!-- 11 -->Run yarn upgrade (#923) @apedroferreira
+- &#8203;<!-- 10 -->Try enabling renovate again (#913) @Janpot
+- &#8203;<!-- 09 -->Make sure to always assign the overlayroot (#915) @Janpot
+- &#8203;<!-- 08 -->Toolpad-app dependencies update (#909) @Janpot
+- &#8203;<!-- 07 -->[app] Add an update banner (#839) @bharatkashyap
+- &#8203;<!-- 06 -->[core] Add release step for the docs (#890) @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Fix capitalization @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Fix typo @oliviertassinari
+- &#8203;<!-- 03 -->[ui] Toolpad app favicon (#984) @bharatkashyap
+- &#8203;<!-- 02 -->[ui] Toolpad logo favicon (#911) @bharatkashyap
+- &#8203;<!-- 01 -->[website] Landing Page follow up (#906) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## v0.0.17
 
 <!-- generated comparing v0.0.16..master -->

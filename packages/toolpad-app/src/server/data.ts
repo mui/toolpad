@@ -453,30 +453,6 @@ export async function loadDom(appId: string, version: VersionOrPreview = 'previe
   return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
 }
 
-export async function loadApp(appId: string, version: VersionOrPreview = 'preview') {
-  if (version === 'preview') {
-    const { dom, ...appMeta } = await prismaClient.app.findUniqueOrThrow({
-      where: { id: appId },
-    });
-    return { ...appMeta, dom: dom as appDom.AppDom };
-  }
-
-  const { releases, ...appMeta } = await prismaClient.app.findUniqueOrThrow({
-    where: { id: appId },
-    select: {
-      ...SELECT_APP_META,
-      releases: {
-        take: 1,
-        select: { snapshot: true },
-        where: { version },
-      },
-    },
-  });
-
-  const dom = releases.length > 0 ? parseSnapshot(releases[0].snapshot) : null;
-  return { ...appMeta, dom };
-}
-
 /**
  * Version of loadDom that returns a subset of the dom that doesn't contain sensitive information
  */

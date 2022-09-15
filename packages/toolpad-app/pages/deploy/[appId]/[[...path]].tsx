@@ -2,6 +2,8 @@ import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
 import { asArray } from '../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../src/runtime/ToolpadApp';
+import { getApp } from '../../../src/server/data';
+import { checkBasicAuth } from '../../../src/server/basicAuth';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
   const { loadRenderTree, findActiveDeployment } = await import('../../../src/server/data');
@@ -12,6 +14,20 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
     return {
       notFound: true,
     };
+  }
+
+  const app = await getApp(appId);
+  if (!app) {
+    return {
+      notFound: true,
+    };
+  }
+
+  if (!app.public) {
+    if (!checkBasicAuth(context.req, context.res)) {
+      // This will never be reached, but let's return this to satisfy the type system
+      return { notFound: true };
+    }
   }
 
   const activeDeployment = await findActiveDeployment(appId);

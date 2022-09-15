@@ -9,10 +9,12 @@ export default (async (req, res) => {
   if (!appId) {
     throw new Error(`Missing path parameter "appId"`);
   }
+
   const version = parseVersion(req.query.version);
   if (!version) {
     res.status(404).end();
     return;
   }
+
   await handleDataRequest(req, res, { appId, version });
 }) as NextApiHandler<ExecFetchResult<any>>;

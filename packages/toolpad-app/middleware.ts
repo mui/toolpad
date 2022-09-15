@@ -1,31 +1,27 @@
 import { NextRequest, NextResponse, URLPattern } from 'next/server';
-import config from './src/server/config';
+import { checkBasicAuthHeader } from './src/server/basicAuth';
 
 const BASIC_AUTH_WHITELIST = [
   // Healthcheck must always be public
   new URLPattern({ pathname: '/health-check' }),
 
-  // Apps must be able to be public
-  // These urls will handle their own basic auth when the app is not public
+  // Static content is public
   new URLPattern({ pathname: '/_next/static/*' }),
+
+  // Apps must be able to be public
+  // These urls will handle their own basic auth when the corresponding Toolpad app is not public
   new URLPattern({ pathname: '/deploy/:appId/*' }),
   new URLPattern({ pathname: '/api/data/:appId/:version/:queryId' }),
 ];
 
 export function middleware(req: NextRequest) {
-  if (!config.basicAuthUser || BASIC_AUTH_WHITELIST.some((pattern) => pattern.test(req.url))) {
+  const isWhitelisted = BASIC_AUTH_WHITELIST.some((pattern) => pattern.test(req.url));
+  if (isWhitelisted) {
     return NextResponse.next();
   }
 
-  const basicAuth = req.headers.get('authorization');
-
-  if (basicAuth) {
-    const auth = basicAuth.split(' ')[1];
-    const [user, pwd] = atob(auth).toString().split(':');
-
-    if (user === config.basicAuthUser && pwd === config.basicAuthPassword) {
-      return NextResponse.next();
-    }
+  if (checkBasicAuthHeader(req.headers.get('authorization'))) {
+    return NextResponse.next();
   }
 
   return new Response(null, {

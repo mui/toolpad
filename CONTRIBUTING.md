@@ -104,7 +104,13 @@ Please have a look at our general guidelines for sending pull requests [here](ht
 
 1. Review/merge the PR — once the PR is merged to `master` a Docker image is built for the commit, tagged with the commit SHA and then pushed to Docker Hub, just like for any other commit in `master`.
 
-1. Wait for the Docker build to finish. (You can find a job [here](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master))
+1. Wait for the Docker build to finish. (You can find a job [here](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master)). Note that you can always verify the built docker image by running it as
+
+   ```sh
+   TAG=<git-sha> docker-compose -f docker/compose/docker-compose.yml up
+   ```
+
+   Where `<git-sha>` is the commit on master that you want to test.
 
 1. Release the Docker image using (requires GitHub authentication token):
 

@@ -18,7 +18,7 @@ export function checkBasicAuthHeader(headerContent: string | null): boolean {
   return false;
 }
 
-export async function checkBasicAuth(req: IncomingMessage, res: ServerResponse) {
+export function checkBasicAuth(req: IncomingMessage, res: ServerResponse): boolean {
   if (checkBasicAuthHeader(req.headers.authorization || null)) {
     return true;
   }

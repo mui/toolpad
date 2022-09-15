@@ -22,6 +22,7 @@ import { Maybe } from '../../utils/types';
 import { getAuthenticationHeaders, HTTP_NO_BODY, parseBaseUrl } from './shared';
 import applyTransform from '../../server/applyTransform';
 import { errorFrom } from '../../utils/errors';
+import DEMO_BASE_URLS from './demoBaseUrls';
 
 async function resolveBindable(
   bindable: BindableAttrValue<string>,
@@ -137,6 +138,21 @@ async function execBase(
     resolveBindableEntries(fetchQuery.searchParams || [], params),
     resolveBindableEntries(fetchQuery.headers || [], params),
   ]);
+
+  if (process.env.TOOLPAD_DEMO) {
+    const demoUrls = DEMO_BASE_URLS.map((baseUrl) => baseUrl.url);
+
+    const hasInvalidConnectionParams =
+      !demoUrls.includes(connection?.baseUrl || '') ||
+      (connection?.headers && connection?.headers.length > 0) ||
+      !!connection?.authentication;
+    const hasInvalidQueryParams =
+      fetchQuery.method !== 'GET' || (fetchQuery.headers && fetchQuery.headers.length > 0);
+
+    if (hasInvalidConnectionParams || hasInvalidQueryParams) {
+      throw new Error(`Cannot use unsupported features in demo version.`);
+    }
+  }
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
   resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));

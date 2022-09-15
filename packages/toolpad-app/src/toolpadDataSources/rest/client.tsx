@@ -46,19 +46,9 @@ import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import QueryInputPanel from '../QueryInputPanel';
+import DEMO_BASE_URLS from './demoBaseUrls';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
-
-const DEMO_URLS = [
-  {
-    name: 'COVID-19 Statistics',
-    url: 'https://covid-19.dataflowkit.com/v1',
-  },
-  {
-    name: 'Dogs',
-    url: 'https://dog.ceo/api',
-  },
-];
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -150,7 +140,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
       {isDemo ? (
         <TextField select {...baseUrlInputProps} defaultValue="">
-          {DEMO_URLS.map(({ url, name }) => (
+          {DEMO_BASE_URLS.map(({ url, name }) => (
             <MenuItem key={url} value={url}>
               {url} ({name})
             </MenuItem>

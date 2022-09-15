@@ -10,7 +10,7 @@ test('basic app creation flow', async ({ page }) => {
 
   await homeModel.goto();
   const brand = page.locator('data-test-id=brand');
-  await expect(brand).toHaveText('MUI Toolpad CE');
+  await expect(brand).toHaveText('MUI Toolpad');
 
   await homeModel.createApplication({ name: appName });
   await homeModel.goto();

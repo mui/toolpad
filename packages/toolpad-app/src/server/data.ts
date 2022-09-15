@@ -139,6 +139,10 @@ async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
 }
 
 export async function getApps(): Promise<AppMeta[]> {
+  if (process.env.TOOLPAD_DEMO) {
+    return [];
+  }
+
   return prismaClient.app.findMany({
     orderBy: {
       editedAt: 'desc',

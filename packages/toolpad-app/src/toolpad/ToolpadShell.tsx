@@ -220,9 +220,9 @@ function Header({ actions, status }: HeaderProps) {
               >
                 MUI Toolpad
               </Box>
-              <Chip sx={{ ml: 1 }} label="Demo Version" color="primary" size="small" />
             </Link>
           </Tooltip>
+          <Chip sx={{ ml: 1 }} label="Demo Version" color="primary" size="small" />
         </Box>
         <Box
           sx={{

@@ -96,7 +96,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 setName(event.target.value);
               }}
             />
-            {config.integrationTest ? (
+            {config.enableCreateByDom ? (
               <TextField
                 label="seed DOM"
                 fullWidth

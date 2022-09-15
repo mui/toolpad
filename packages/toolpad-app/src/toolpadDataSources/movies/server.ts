@@ -7,7 +7,7 @@ import { MoviesConnectionParams, MoviesQuery, Movie } from './types';
 async function execBase(
   connection: Maybe<MoviesConnectionParams>,
   moviesQuery: MoviesQuery,
-): Promise<ExecFetchResult<any>> {
+): Promise<ExecFetchResult<Movie[]>> {
   const data = moviesData.movies.filter((movie) =>
     moviesQuery.genre ? movie.genres.includes(moviesQuery.genre) : true,
   );
@@ -23,7 +23,7 @@ async function execPrivate(connection: Maybe<MoviesConnectionParams>, moviesQuer
 async function exec(
   connection: Maybe<MoviesConnectionParams>,
   moviesQuery: MoviesQuery,
-): Promise<ExecFetchResult<any>> {
+): Promise<ExecFetchResult<Movie[]>> {
   return execBase(connection, moviesQuery);
 }
 

@@ -55,8 +55,8 @@ const DEMO_URLS = [
     url: 'https://covid-19.dataflowkit.com/v1',
   },
   {
-    name: 'Dog Breeds',
-    url: 'https://dog.ceo/api/breeds/list/all',
+    name: 'Dogs',
+    url: 'https://dog.ceo/api',
   },
 ];
 
@@ -149,7 +149,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
       {isDemo ? (
-        <TextField select {...baseUrlInputProps}>
+        <TextField select {...baseUrlInputProps} defaultValue="">
           {DEMO_URLS.map(({ url, name }) => (
             <MenuItem key={url} value={url}>
               {url} ({name})
@@ -386,9 +386,9 @@ function QueryEditor({
                         <React.Fragment>
                           <Tab label="Body" value="body" />
                           <Tab label="Headers" value="headers" />
+                          <Tab label="Response" value="response" />
                         </React.Fragment>
                       ) : null}
-                      <Tab label="Response" value="response" />
                       <Tab label="Transform" value="transform" />
                     </TabList>
                   </Box>

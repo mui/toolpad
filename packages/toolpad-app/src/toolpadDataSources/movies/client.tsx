@@ -20,7 +20,7 @@ function withDefaults(value: Maybe<MoviesConnectionParams>): MoviesConnectionPar
 }
 
 function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<MoviesConnectionParams>) {
-  const { handleSubmit, reset } = useForm({
+  const { handleSubmit, reset, formState } = useForm({
     defaultValues: withDefaults(value),
   });
   React.useEffect(() => reset(withDefaults(value)), [reset, value]);
@@ -30,7 +30,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<Movies
   return (
     <Stack direction="column" gap={1}>
       <Toolbar disableGutters>
-        <Button variant="contained" onClick={doSubmit}>
+        <Button variant="contained" onClick={doSubmit} disabled={!formState.isValid}>
           Save
         </Button>
       </Toolbar>

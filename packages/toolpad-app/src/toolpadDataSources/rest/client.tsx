@@ -149,40 +149,36 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
       ) : (
         <TextField {...baseUrlInputProps} />
       )}
-      <React.Fragment>
-        <Typography>Headers:</Typography>
-        <Controller
-          name="headers"
-          control={control}
-          render={({
-            field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field },
-          }) => {
-            const allHeaders = [...authenticationHeaders, ...fieldValue];
-            return (
-              <MapEntriesEditor
-                {...field}
-                disabled={!headersAllowed || isDemo}
-                fieldLabel="header"
-                value={allHeaders}
-                onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
-                isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
-              />
-            );
-          }}
-        />
-        <Typography>Authentication:</Typography>
-        <Controller
-          name="authentication"
-          control={control}
-          render={({ field: { value: fieldValue, ref, ...field } }) => (
-            <AuthenticationEditor
+      <Typography>Headers:</Typography>
+      <Controller
+        name="headers"
+        control={control}
+        render={({ field: { value: fieldValue = [], onChange: onFieldChange, ref, ...field } }) => {
+          const allHeaders = [...authenticationHeaders, ...fieldValue];
+          return (
+            <MapEntriesEditor
               {...field}
               disabled={!headersAllowed || isDemo}
-              value={fieldValue ?? null}
+              fieldLabel="header"
+              value={allHeaders}
+              onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
+              isEntryDisabled={(entry, index) => index < authenticationHeaders.length}
             />
-          )}
-        />
-      </React.Fragment>
+          );
+        }}
+      />
+      <Typography>Authentication:</Typography>
+      <Controller
+        name="authentication"
+        control={control}
+        render={({ field: { value: fieldValue, ref, ...field } }) => (
+          <AuthenticationEditor
+            {...field}
+            disabled={!headersAllowed || isDemo}
+            value={fieldValue ?? null}
+          />
+        )}
+      />
 
       <Toolbar disableGutters>
         <Box sx={{ flex: 1 }} />

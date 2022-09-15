@@ -142,14 +142,14 @@ async function execBase(
   if (process.env.TOOLPAD_DEMO) {
     const demoUrls = DEMO_BASE_URLS.map((baseUrl) => baseUrl.url);
 
-    const hasInvalidConnectionParams =
+    const hasNonDemoConnectionParams =
       !demoUrls.includes(connection?.baseUrl || '') ||
       (connection?.headers && connection?.headers.length > 0) ||
       !!connection?.authentication;
-    const hasInvalidQueryParams =
+    const hasNonDemoQueryParams =
       fetchQuery.method !== 'GET' || (fetchQuery.headers && fetchQuery.headers.length > 0);
 
-    if (hasInvalidConnectionParams || hasInvalidQueryParams) {
+    if (hasNonDemoConnectionParams || hasNonDemoQueryParams) {
       throw new Error(`Cannot use unsupported features in demo version.`);
     }
   }

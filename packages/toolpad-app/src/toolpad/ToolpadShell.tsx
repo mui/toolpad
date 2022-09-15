@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
   styled,
-  Alert,
   AppBar,
   Button,
   Box,
@@ -108,6 +107,7 @@ function UserFeedback() {
 function UpdateBanner() {
   const { data: latestRelease } = client.useQuery('getLatestToolpadRelease', [], {
     staleTime: 1000 * 60 * 10,
+    enabled: process.env.TOOLPAD_TARGET !== TOOLPAD_TARGET_CLOUD,
   });
 
   const [dismissedVersion, setDismissedVersion] = useLocalStorageState<string | null>(
@@ -131,50 +131,47 @@ function UpdateBanner() {
 
   return (
     <React.Fragment>
-      {latestRelease && process.env.TOOLPAD_TARGET === 'CE' ? (
+      {latestRelease ? (
         <Snackbar
           open={!hideBanner}
           onClose={handleDismissClick}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert
-            action={
-              <Stack direction="row" sx={{ gap: 2 }}>
-                <Button
-                  aria-label="update"
-                  color="inherit"
-                  endIcon={<OpenInNewIcon fontSize="inherit" />}
-                  component="a"
-                  target="_blank"
-                  href={DOCUMENTATION_URL}
-                >
-                  Update
-                </Button>
-                <Button
-                  aria-label="view changelog"
-                  color="inherit"
-                  endIcon={<OpenInNewIcon fontSize="inherit" />}
-                  component="a"
-                  target="_blank"
-                  href={latestRelease.url}
-                >
-                  View changelog
-                </Button>
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={handleDismissClick}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              </Stack>
-            }
-            severity="info"
-          >
-            A new version <strong>{latestRelease.tag}</strong> of Toolpad is available.
-          </Alert>
-        </Snackbar>
+          action={
+            <Stack direction="row" sx={{ gap: 2 }}>
+              <p>
+                A new version <strong>{latestRelease.tag}</strong> of Toolpad is available.
+              </p>
+              <Button
+                aria-label="update"
+                color="inherit"
+                endIcon={<OpenInNewIcon fontSize="inherit" />}
+                component="a"
+                target="_blank"
+                href={DOCUMENTATION_URL}
+              >
+                Update
+              </Button>
+              <Button
+                aria-label="view changelog"
+                color="inherit"
+                endIcon={<OpenInNewIcon fontSize="inherit" />}
+                component="a"
+                target="_blank"
+                href={latestRelease.url}
+              >
+                View changelog
+              </Button>
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={handleDismissClick}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            </Stack>
+          }
+        />
       ) : null}
     </React.Fragment>
   );

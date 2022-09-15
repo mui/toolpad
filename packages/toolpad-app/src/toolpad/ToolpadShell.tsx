@@ -113,7 +113,11 @@ function UpdateBanner() {
   return (
     <React.Fragment>
       {latestRelease && process.env.TOOLPAD_TARGET === 'CE' ? (
-        <Snackbar open={!hideBanner} onClose={handleDismissClick}>
+        <Snackbar
+          open={!hideBanner}
+          onClose={handleDismissClick}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
           <Alert
             action={
               <Stack direction="row" sx={{ gap: 2 }}>

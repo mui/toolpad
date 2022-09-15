@@ -12,26 +12,22 @@ import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import { useToolpadComponents } from '../../toolpadComponents';
 
 interface FutureComponentSpec {
-  displayName?: string;
-  displayIcon?: string;
   url: string;
+  displayName: string;
 }
 
 const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
-  ['Form', { url: 'https://github.com/mui/mui-toolpad/issues/749', displayIcon: 'Dns' }],
-  ['Card', { url: 'https://github.com/mui/mui-toolpad/issues/748', displayIcon: 'ContactPage' }],
-  ['Tabs', { url: 'https://github.com/mui/mui-toolpad/issues/747', displayIcon: 'Tab' }],
-  ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746', displayIcon: 'Tune' }],
-  ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745', displayIcon: 'ToggleOn' }],
+  ['Form', { url: 'https://github.com/mui/mui-toolpad/issues/749', displayName: 'Form' }],
+  ['Card', { url: 'https://github.com/mui/mui-toolpad/issues/748', displayName: 'Card' }],
+  ['Tabs', { url: 'https://github.com/mui/mui-toolpad/issues/747', displayName: 'Tabs' }],
+  ['Slider', { url: 'https://github.com/mui/mui-toolpad/issues/746', displayName: 'Slider' }],
+  ['Switch', { url: 'https://github.com/mui/mui-toolpad/issues/745', displayName: 'Switch' }],
+  ['Radio', { url: 'https://github.com/mui/mui-toolpad/issues/744', displayName: 'Radio' }],
   [
-    'Radio',
-    { url: 'https://github.com/mui/mui-toolpad/issues/744', displayIcon: 'RadioButtonChecked' },
+    'DatePicker',
+    { url: 'https://github.com/mui/mui-toolpad/issues/743', displayName: 'Date picker' },
   ],
-  [
-    'Date picker',
-    { url: 'https://github.com/mui/mui-toolpad/issues/743', displayIcon: 'DateRange' },
-  ],
-  ['Checkbox', { url: 'https://github.com/mui/mui-toolpad/issues/742', displayIcon: 'CheckBox' }],
+  ['Checkbox', { url: 'https://github.com/mui/mui-toolpad/issues/742', displayName: 'Checkbox' }],
 ]);
 
 const WIDTH_COLLAPSED = 50;
@@ -117,13 +113,13 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
             <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
               {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
                 invariant(componentType, `No component definition found for "${componentId}"`);
-                return componentType.display && componentType.builtIn ? (
+                return componentType.builtIn && !componentType.system ? (
                   <ComponentCatalogItem
                     key={componentId}
+                    id={componentId}
                     draggable
                     onDragStart={handleDragStart(componentId)}
                     displayName={componentType.displayName}
-                    displayIcon={componentType.displayIcon}
                     builtIn={componentType.builtIn}
                     kind={'builtIn'}
                   />
@@ -150,25 +146,18 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                   👍 Upvote on GitHub to get it prioritized.
                 </Typography>
                 <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} py={1}>
-                  {Array.from(
-                    FUTURE_COMPONENTS,
-                    ([key, { displayName = key, url, displayIcon }]) => {
-                      return (
-                        <Link
-                          href={url}
-                          underline="none"
-                          target="_blank"
-                          key={`futureComponent.${key}`}
-                        >
-                          <ComponentCatalogItem
-                            displayName={displayName}
-                            displayIcon={displayIcon}
-                            kind={'future'}
-                          />
-                        </Link>
-                      );
-                    },
-                  )}
+                  {Array.from(FUTURE_COMPONENTS, ([key, { displayName, url }]) => {
+                    return (
+                      <Link
+                        href={url}
+                        underline="none"
+                        target="_blank"
+                        key={`futureComponent.${key}`}
+                      >
+                        <ComponentCatalogItem id={key} displayName={displayName} kind={'future'} />
+                      </Link>
+                    );
+                  })}
                 </Box>
               </Box>
             </Box>
@@ -191,20 +180,20 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1} pt={0}>
                 {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
                   invariant(componentType, `No component definition found for "${componentId}"`);
-                  return componentType.display && !componentType.builtIn ? (
+                  return !componentType.builtIn ? (
                     <ComponentCatalogItem
                       key={componentId}
+                      id={componentId}
                       draggable
                       onDragStart={handleDragStart(componentId)}
                       displayName={componentType.displayName}
-                      displayIcon={componentType.displayIcon ?? 'DashboardCustomizeSharp'}
+                      kind={'custom'}
                     />
                   ) : null;
                 })}
                 <ComponentCatalogItem
-                  key={'create-new'}
+                  id={'CreateNew'}
                   displayName={'Create'}
-                  displayIcon={'Add'}
                   kind={'create'}
                   onClick={handleCreateCodeComponentDialogOpen}
                 />

@@ -4,8 +4,7 @@ import * as appDom from '../appDom';
 export interface ToolpadComponentDefinition {
   displayName: string;
   builtIn?: string;
-  display: boolean;
-  displayIcon?: string;
+  system?: boolean;
   codeComponentId?: NodeId;
 }
 
@@ -20,43 +19,28 @@ export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
 export const STACK_COMPONENT_ID = 'Stack';
 
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
-  [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtIn: 'PageRow', display: false }],
-  [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtIn: 'PageColumn', display: false }],
-  [STACK_COMPONENT_ID, { displayName: 'Stack', builtIn: 'Stack', display: false }],
+  [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtIn: 'PageRow', system: true }],
+  [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtIn: 'PageColumn', system: true }],
+  [STACK_COMPONENT_ID, { displayName: 'Stack', builtIn: 'Stack', system: true }],
   [
     'Button',
     {
       displayName: 'Button',
       builtIn: 'Button',
-      display: true,
-      displayIcon: 'SmartButton',
     },
   ],
-  ['Image', { displayName: 'Image', builtIn: 'Image', display: true, displayIcon: 'Image' }],
-  [
-    'DataGrid',
-    { displayName: 'Data grid', builtIn: 'DataGrid', display: true, displayIcon: 'GridOn' },
-  ],
-  [
-    'TextField',
-    { displayName: 'Text field', builtIn: 'TextField', display: true, displayIcon: 'Crop75' },
-  ],
-  [
-    'Typography',
-    { displayName: 'Typography', builtIn: 'Typography', display: true, displayIcon: 'TextFields' },
-  ],
-  [
-    'Select',
-    { displayName: 'Select', builtIn: 'Select', display: true, displayIcon: 'ArrowDropDownCircle' },
-  ],
-  ['Paper', { displayName: 'Paper', builtIn: 'Paper', display: true, displayIcon: 'Layers' }],
+  ['Image', { displayName: 'Image', builtIn: 'Image' }],
+  ['DataGrid', { displayName: 'Data grid', builtIn: 'DataGrid' }],
+  ['TextField', { displayName: 'Text field', builtIn: 'TextField' }],
+  ['Typography', { displayName: 'Typography', builtIn: 'Typography' }],
+  ['Select', { displayName: 'Select', builtIn: 'Select' }],
+  ['Paper', { displayName: 'Paper', builtIn: 'Paper' }],
 ]);
 
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {
   return {
     displayName: domNode.name,
     codeComponentId: domNode.id,
-    display: true,
   };
 }
 

@@ -35,8 +35,6 @@ export type BuildEnvVars = Record<
 // These are set at runtime and passed to the browser.
 // Do not add secrets
 export interface RuntimeConfig {
-  // Enable demo version
-  isDemo?: boolean;
   // Enable input field for seeding a dom in the app creation dialog
   // (For testing purposes)
   integrationTest?: boolean;
@@ -68,7 +66,6 @@ const runtimeConfig: RuntimeConfig =
     ? {
         // Define runtime config here
         integrationTest: !!process.env.TOOLPAD_INTEGRATION_TEST,
-        isDemo: !!process.env.TOOLPAD_DEMO,
       }
     : getBrowsersideRuntimeConfig();
 

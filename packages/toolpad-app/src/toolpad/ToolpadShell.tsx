@@ -179,7 +179,7 @@ function Header({ actions, navigation }: HeaderProps) {
         <Typography data-test-id="brand" variant="h6" color="inherit" component="div">
           MUI Toolpad {process.env.TOOLPAD_TARGET}
         </Typography>
-        <Chip sx={{ ml: 1 }} label="Demo" color="primary" size="small" />
+        <Chip sx={{ ml: 1 }} label="Demo Version" color="primary" size="small" />
         {navigation}
         <Box flex={1} />
         {actions}

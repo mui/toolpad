@@ -46,11 +46,19 @@ import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import QueryInputPanel from '../QueryInputPanel';
-import config from '../../config';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
-const DEMO_URLS = ['https://covid-19.dataflowkit.com/v1'];
+const DEMO_URLS = [
+  {
+    name: 'COVID-19 Statistics',
+    url: 'https://covid-19.dataflowkit.com/v1',
+  },
+  {
+    name: 'Dog Breeds',
+    url: 'https://dog.ceo/api/breeds/list/all',
+  },
+];
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -136,20 +144,22 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
     ...validation(formState, 'baseUrl'),
   };
 
+  const isDemo = !!process.env.TOOLPAD_DEMO;
+
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
-      {config.isDemo ? (
+      {isDemo ? (
         <TextField select {...baseUrlInputProps}>
-          {DEMO_URLS.map((url) => (
+          {DEMO_URLS.map(({ url, name }) => (
             <MenuItem key={url} value={url}>
-              {url}
+              {url} ({name})
             </MenuItem>
           ))}
         </TextField>
       ) : (
         <TextField {...baseUrlInputProps} />
       )}
-      {!config.isDemo ? (
+      {!isDemo ? (
         <React.Fragment>
           <Typography>Headers:</Typography>
           <Controller
@@ -333,6 +343,8 @@ function QueryEditor({
     [],
   );
 
+  const isDemo = !!process.env.TOOLPAD_DEMO;
+
   return (
     <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
       <SplitPane split="vertical" size="50%" allowResize>
@@ -343,9 +355,9 @@ function QueryEditor({
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
                 <TextField
                   select
-                  value={config.isDemo ? 'GET' : input.query.method || 'GET'}
+                  value={isDemo ? 'GET' : input.query.method || 'GET'}
                   onChange={handleMethodChange}
-                  disabled={config.isDemo}
+                  disabled={isDemo}
                 >
                   {HTTP_METHODS.map((method) => (
                     <MenuItem key={method} value={method}>
@@ -370,7 +382,7 @@ function QueryEditor({
                   <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                       <Tab label="URL query" value="urlQuery" />
-                      {!config.isDemo ? (
+                      {!isDemo ? (
                         <React.Fragment>
                           <Tab label="Body" value="body" />
                           <Tab label="Headers" value="headers" />

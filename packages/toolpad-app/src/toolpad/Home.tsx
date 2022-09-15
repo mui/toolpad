@@ -73,6 +73,8 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     },
   });
 
+  const isDemo = !!process.env.TOOLPAD_DEMO;
+
   return (
     <React.Fragment>
       <Dialog {...props} onClose={onClose}>
@@ -83,11 +85,11 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
-          <Alert severity="warning">
-            <AlertTitle>For demo purposes only!</AlertTitle>
-            Your application will be ephemeral and may be deleted at any time.
-          </Alert>
           <DialogContent>
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              <AlertTitle>For demo purposes only!</AlertTitle>
+              Your application will be ephemeral and may be deleted at any time.
+            </Alert>
             <TextField
               sx={{ my: 1 }}
               autoFocus
@@ -121,7 +123,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 createAppMutation.reset();
                 onClose();
               }}
-              disabled={config.isDemo}
+              disabled={isDemo}
             >
               Cancel
             </Button>
@@ -477,7 +479,15 @@ function AppsListView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: 
 }
 
 export default function Home() {
-  const { data: apps = [], isLoading, error } = client.useQuery('getApps', []);
+  const isDemo = !!process.env.TOOLPAD_DEMO;
+
+  const {
+    data: apps = [],
+    isLoading,
+    error,
+  } = client.useQuery('getApps', [], {
+    enabled: !isDemo,
+  });
   const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);
 
   const activeDeploymentsByApp = React.useMemo(() => {
@@ -503,15 +513,15 @@ export default function Home() {
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
 
   React.useEffect(() => {
-    if (config.isDemo) {
+    if (isDemo) {
       setCreateDialogOpen(true);
     }
-  }, []);
+  }, [isDemo]);
 
   return (
     <ToolpadShell>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      {!config.isDemo ? (
+      {!isDemo ? (
         <Container>
           <Typography variant="h2">Apps</Typography>
           <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>

@@ -54,7 +54,7 @@ import config from '../config';
 import { errorFrom } from '../utils/errors';
 import { DOCUMENTATION_URL, TOOLPAD_TARGET_CLOUD } from '../constants';
 
-const CURRENT_RELEASE_VERSION = `v1${process.env.TOOLPAD_VERSION}`;
+const CURRENT_RELEASE_VERSION = `v${process.env.TOOLPAD_VERSION}`;
 
 export interface CreateAppDialogProps {
   open: boolean;

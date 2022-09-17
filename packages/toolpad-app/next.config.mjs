@@ -60,10 +60,6 @@ const regexEqual = (x, y) => {
 // See https://nextjs.org/docs/advanced-features/security-headers
 const securityHeaders = [
   {
-    key: 'Strict-Transport-Security',
-    value: 'max-age=31536000; includeSubDomains; preload',
-  },
-  {
     key: 'X-Frame-Options',
     value: 'SAMEORIGIN',
   },

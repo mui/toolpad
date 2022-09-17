@@ -57,6 +57,7 @@ const regexEqual = (x, y) => {
   );
 };
 
+// See https://nextjs.org/docs/advanced-features/security-headers
 const securityHeaders = [
   {
     key: 'Strict-Transport-Security',

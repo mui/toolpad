@@ -161,7 +161,7 @@ export default /** @type {import('next').NextConfig} */ ({
       },
     ];
   },
-  async headers() {
+  headers: async () => {
     return [
       {
         source: '/:path*',

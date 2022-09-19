@@ -1,6 +1,6 @@
 # Custom components
 
-<p class="description">When built in components are not enough to achieve your wanted results build your own using custom components UI</p>
+<p class="description">When built-in components are not enough to achieve your wanted results build your own using custom components UI.</p>
 
 ## Creating new component
 

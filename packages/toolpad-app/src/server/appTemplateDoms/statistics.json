@@ -1,8 +1,8 @@
 {
   "root": "l00ao64",
   "nodes": {
-    "0c03gfw": {
-      "id": "0c03gfw",
+    "3813stc": {
+      "id": "3813stc",
       "name": "covidStatsQuery",
       "type": "query",
       "params": {},
@@ -13,7 +13,7 @@
           "value": {
             "url": {
               "type": "const",
-              "value": "https://covid-19.dataflowkit.com/v1"
+              "value": "v1"
             },
             "method": "GET",
             "headers": []
@@ -25,11 +25,13 @@
         },
         "connectionId": {
           "type": "const",
-          "value": null
+          "value": {
+            "$$ref": "jv03sl9"
+          }
         }
       },
       "parentProp": "queries",
-      "parentIndex": "a0"
+      "parentIndex": "a1"
     },
     "3o23gk9": {
       "id": "3o23gk9",
@@ -45,6 +47,57 @@
         }
       },
       "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "9we3sj9": {
+      "id": "9we3sj9",
+      "name": "covidStatsTitle",
+      "type": "element",
+      "props": {
+        "value": {
+          "type": "const",
+          "value": "COVID Statistics"
+        },
+        "variant": {
+          "type": "const",
+          "value": "h3"
+        }
+      },
+      "layout": {},
+      "parentId": "ryf3spv",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Typography"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "jv03sl9": {
+      "id": "jv03sl9",
+      "name": "covidStatsConnection",
+      "type": "connection",
+      "parentId": "l00ao64",
+      "attributes": {
+        "params": {
+          "type": "secret",
+          "value": {
+            "baseUrl": "https://covid-19.dataflowkit.com/",
+            "headers": [],
+            "authentication": null
+          }
+        },
+        "status": {
+          "type": "const",
+          "value": null
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "rest"
+        }
+      },
+      "parentProp": "connections",
       "parentIndex": "a0"
     },
     "l00ao64": {
@@ -70,6 +123,22 @@
       "parentProp": "pages",
       "parentIndex": "a0"
     },
+    "ryf3spv": {
+      "id": "ryf3spv",
+      "name": "pageRow1",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "l11ao9l",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "Zz"
+    },
     "tv13ghy": {
       "id": "tv13ghy",
       "name": "covidStatsTable",
@@ -87,43 +156,43 @@
           "type": "const",
           "value": [
             {
-              "field": "Active Cases_text",
               "type": "string",
+              "field": "Active Cases_text",
               "width": 190
             },
             {
-              "field": "Country_text",
               "type": "string",
+              "field": "Country_text",
               "width": 150
             },
             {
-              "field": "Last Update",
               "type": "string",
+              "field": "Last Update",
               "width": 160
             },
             {
-              "field": "New Cases_text",
               "type": "string",
+              "field": "New Cases_text",
               "width": 178
             },
             {
-              "field": "New Deaths_text",
               "type": "string",
+              "field": "New Deaths_text",
               "width": 200
             },
             {
-              "field": "Total Cases_text",
               "type": "string",
+              "field": "Total Cases_text",
               "width": 184
             },
             {
-              "field": "Total Deaths_text",
               "type": "string",
+              "field": "Total Deaths_text",
               "width": 192
             },
             {
-              "field": "Total Recovered_text",
               "type": "string",
+              "field": "Total Recovered_text",
               "width": 210
             }
           ]
@@ -137,47 +206,6 @@
           "value": "DataGrid"
         }
       },
-      "parentProp": "children",
-      "parentIndex": "a0"
-    },
-    "ryf3spv": {
-      "name": "pageRow1",
-      "props": {},
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "PageRow"
-        }
-      },
-      "layout": {},
-      "id": "ryf3spv",
-      "type": "element",
-      "parentId": "l11ao9l",
-      "parentProp": "children",
-      "parentIndex": "Zz"
-    },
-    "9we3sj9": {
-      "name": "covidStatsTitle",
-      "props": {
-        "variant": {
-          "type": "const",
-          "value": "h3"
-        },
-        "value": {
-          "type": "const",
-          "value": "COVID Statistics"
-        }
-      },
-      "attributes": {
-        "component": {
-          "type": "const",
-          "value": "Typography"
-        }
-      },
-      "layout": {},
-      "id": "9we3sj9",
-      "type": "element",
-      "parentId": "ryf3spv",
       "parentProp": "children",
       "parentIndex": "a0"
     }

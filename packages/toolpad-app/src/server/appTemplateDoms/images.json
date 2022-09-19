@@ -64,6 +64,43 @@
       "parentProp": "children",
       "parentIndex": "a0V"
     },
+    "3m13snf": {
+      "id": "3m13snf",
+      "name": "allDogSubBreeds",
+      "type": "query",
+      "params": {
+        "breed": {
+          "type": "jsExpression",
+          "value": "selectBreed.value\n"
+        }
+      },
+      "parentId": "cl27arb1i00043g693pzhex2r",
+      "attributes": {
+        "query": {
+          "type": "const",
+          "value": {
+            "url": {
+              "type": "jsExpression",
+              "value": "`breed/${query.breed}/list`\n"
+            },
+            "method": "GET",
+            "headers": []
+          }
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "rest"
+        },
+        "connectionId": {
+          "type": "const",
+          "value": {
+            "$$ref": "cl27ajwae00003g69pc8n5eor"
+          }
+        }
+      },
+      "parentProp": "queries",
+      "parentIndex": "a4"
+    },
     "9h83s7x": {
       "id": "9h83s7x",
       "name": "dogImagesTitle",
@@ -89,6 +126,38 @@
       "parentProp": "children",
       "parentIndex": "a0"
     },
+    "hw03swm": {
+      "id": "hw03swm",
+      "name": "allDogBreeds",
+      "type": "query",
+      "params": {},
+      "parentId": "cl27arb1i00043g693pzhex2r",
+      "attributes": {
+        "query": {
+          "type": "const",
+          "value": {
+            "url": {
+              "type": "const",
+              "value": "breeds/list/all"
+            },
+            "method": "GET",
+            "headers": []
+          }
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "rest"
+        },
+        "connectionId": {
+          "type": "const",
+          "value": {
+            "$$ref": "cl27ajwae00003g69pc8n5eor"
+          }
+        }
+      },
+      "parentProp": "queries",
+      "parentIndex": "a3"
+    },
     "n323sau": {
       "id": "n323sau",
       "name": "pageRow3",
@@ -109,6 +178,47 @@
       },
       "parentProp": "children",
       "parentIndex": "a3"
+    },
+    "q8a3s7e": {
+      "id": "q8a3s7e",
+      "name": "randomDogImage",
+      "type": "query",
+      "params": {
+        "breed": {
+          "type": "jsExpression",
+          "value": "selectBreed.value\n"
+        },
+        "subBreed": {
+          "type": "jsExpression",
+          "value": "selectSubBreed.value\n"
+        }
+      },
+      "parentId": "cl27arb1i00043g693pzhex2r",
+      "attributes": {
+        "query": {
+          "type": "const",
+          "value": {
+            "url": {
+              "type": "jsExpression",
+              "value": "query.subBreed\n  ? `breed/${query.breed}/${query.subBreed}/images/random`\n  : `breed/${query.breed}/images/random`\n"
+            },
+            "method": "GET",
+            "headers": []
+          }
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "rest"
+        },
+        "connectionId": {
+          "type": "const",
+          "value": {
+            "$$ref": "cl27ajwae00003g69pc8n5eor"
+          }
+        }
+      },
+      "parentProp": "queries",
+      "parentIndex": "a5"
     },
     "vk73sgf": {
       "id": "vk73sgf",
@@ -171,13 +281,17 @@
     },
     "cl27ajwae00003g69pc8n5eor": {
       "id": "cl27ajwae00003g69pc8n5eor",
-      "name": "connection",
+      "name": "dogsConnection",
       "type": "connection",
       "parentId": "cl27ajqk00000a0oz4xlqcy7n",
       "attributes": {
         "params": {
           "type": "secret",
-          "value": {}
+          "value": {
+            "baseUrl": "https://dog.ceo/api/",
+            "headers": [],
+            "authentication": null
+          }
         },
         "status": {
           "type": "const",
@@ -436,72 +550,6 @@
       "parentProp": "children",
       "parentIndex": "a0V"
     },
-    "cl3ohxyj400003f6b6z7kwsuq": {
-      "id": "cl3ohxyj400003f6b6z7kwsuq",
-      "name": "allDogBreeds",
-      "type": "query",
-      "parentId": "cl27arb1i00043g693pzhex2r",
-      "attributes": {
-        "query": {
-          "type": "const",
-          "value": {
-            "url": {
-              "type": "const",
-              "value": "https://dog.ceo/api/breeds/list/all"
-            },
-            "method": "",
-            "params": {},
-            "headers": []
-          }
-        },
-        "dataSource": {
-          "type": "const",
-          "value": "rest"
-        },
-        "connectionId": {
-          "type": "const",
-          "value": "cl27ajwae00003g69pc8n5eor"
-        }
-      },
-      "parentProp": "queries",
-      "parentIndex": "a0"
-    },
-    "cl3ohzbgn00003f6bmr2d2l67": {
-      "id": "cl3ohzbgn00003f6bmr2d2l67",
-      "name": "allDogSubBreeds",
-      "type": "query",
-      "params": {
-        "breed": {
-          "type": "jsExpression",
-          "value": "selectBreed.value\n"
-        }
-      },
-      "parentId": "cl27arb1i00043g693pzhex2r",
-      "attributes": {
-        "query": {
-          "type": "const",
-          "value": {
-            "url": {
-              "type": "jsExpression",
-              "value": "`https://dog.ceo/api/breed/${query.breed}/list`\n"
-            },
-            "method": "",
-            "params": {},
-            "headers": []
-          }
-        },
-        "dataSource": {
-          "type": "const",
-          "value": "rest"
-        },
-        "connectionId": {
-          "type": "const",
-          "value": "cl27ajwae00003g69pc8n5eor"
-        }
-      },
-      "parentProp": "queries",
-      "parentIndex": "a1"
-    },
     "cl3x8003500003f6ej4x3sx3q": {
       "id": "cl3x8003500003f6ej4x3sx3q",
       "name": "theme",
@@ -510,54 +558,6 @@
       "attributes": {},
       "parentProp": "themes",
       "parentIndex": "a0"
-    },
-    "cl45o8phu00003f6ecr4gk962": {
-      "id": "cl45o8phu00003f6ecr4gk962",
-      "name": "randomDogImage",
-      "type": "query",
-      "params": {
-        "breed": {
-          "type": "jsExpression",
-          "value": "selectBreed.value\n"
-        },
-        "subBreed": {
-          "type": "jsExpression",
-          "value": "selectSubBreed.value\n"
-        }
-      },
-      "parentId": "cl27arb1i00043g693pzhex2r",
-      "attributes": {
-        "query": {
-          "type": "const",
-          "value": {
-            "url": {
-              "type": "jsExpression",
-              "value": "query.subBreed\n  ? `https://dog.ceo/api/breed/${query.breed}/${query.subBreed}/images/random`\n  : `https://dog.ceo/api/breed/${query.breed}/images/random`\n"
-            },
-            "method": "",
-            "params": {},
-            "headers": []
-          }
-        },
-        "dataSource": {
-          "type": "const",
-          "value": "rest"
-        },
-        "connectionId": {
-          "type": "const",
-          "value": "cl27ajwae00003g69pc8n5eor"
-        },
-        "refetchOnReconnect": {
-          "type": "const",
-          "value": false
-        },
-        "refetchOnWindowFocus": {
-          "type": "const",
-          "value": false
-        }
-      },
-      "parentProp": "queries",
-      "parentIndex": "a2"
     }
   }
 }

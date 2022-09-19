@@ -24,4 +24,4 @@ docker-compose -f docker-compose.yml up -d
 
 ## Opening Toolpad
 
-After a few momemnts you should be able to open Toolpad on http://localhost:3000/
+After a few momemnts you should be able to open Toolpad on http://localhost:3000/.

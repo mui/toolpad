@@ -1,4 +1,5 @@
 const path = require('path');
+const withDocsInfra = require('@mui/monorepo/docs/nextConfigDocsInfra');
 
 const withTM = require('next-transpile-modules')(['@mui/monorepo'], {
   __unstable_matcher: (matchedPath) => {
@@ -8,25 +9,6 @@ const withTM = require('next-transpile-modules')(['@mui/monorepo'], {
 
 const pkg = require('../package.json');
 const { findPages } = require('./src/modules/utils/find');
-const { LANGUAGES, LANGUAGES_SSR } = require('./src/modules/constants');
-
-let DEPLOY_ENV = 'development';
-
-// Same as process.env.PULL_REQUEST === 'true'
-if (process.env.CONTEXT === 'deploy-preview') {
-  DEPLOY_ENV = 'pull-request';
-}
-
-if (process.env.CONTEXT === 'production' || process.env.CONTEXT === 'branch-deploy') {
-  DEPLOY_ENV = 'production';
-}
-
-if (
-  process.env.CONTEXT === 'branch-deploy' &&
-  (process.env.HEAD === 'master' || process.env.HEAD === 'next')
-) {
-  DEPLOY_ENV = 'staging';
-}
 
 const MONORPO_PATH = path.resolve(__dirname, './node_modules/@mui/monorepo');
 const MONOREPO_PACKAGES = {
@@ -49,129 +31,87 @@ const MONOREPO_PACKAGES = {
   '@mui/utils': path.resolve(MONORPO_PATH, './packages/mui-utils'),
 };
 
-/**
- * https://github.com/zeit/next.js/blob/287961ed9142a53f8e9a23bafb2f31257339ea98/packages/next/next-server/server/config.ts#L10
- * @typedef {'legacy' | 'blocking' | 'concurrent'} ReactRenderMode
- * legacy - ReactDOM.render(<App />)
- * legacy-strict - ReactDOM.render(<React.StrictMode><App /></React.StrictMode>, Element)
- * blocking - ReactDOM.createSyncRoot(Element).render(<App />)
- * concurrent - ReactDOM.createRoot(Element).render(<App />)
- * @type {ReactRenderMode | 'legacy-strict'}
- */
-const reactStrictMode = true;
-if (reactStrictMode) {
-  // eslint-disable-next-line no-console
-  console.log(`Using React.StrictMode.`);
-}
-
-module.exports = withTM({
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
-  assetPrefix: DEPLOY_ENV === 'development' ? '' : '/toolpad',
-  typescript: {
-    // Motivated by https://github.com/zeit/next.js/issues/7687
-    ignoreDevErrors: true,
-    ignoreBuildErrors: true,
-  },
-  env: {
-    COMMIT_REF: process.env.COMMIT_REF,
-    CONTEXT: process.env.CONTEXT,
-    ENABLE_AD: process.env.ENABLE_AD,
-    GITHUB_AUTH: process.env.GITHUB_AUTH,
-    LIB_VERSION: pkg.version,
-    REACT_STRICT_MODE: reactStrictMode,
-    FEEDBACK_URL: process.env.FEEDBACK_URL,
-    PULL_REQUEST: process.env.PULL_REQUEST === 'true',
-    // #default-branch-switch
-    SOURCE_CODE_ROOT_URL: 'https://github.com/mui/mui-toolpad/blob/master',
-    SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',
-    DEPLOY_ENV,
-  },
-  webpack5: true,
-  webpack: (config) => {
-    return {
-      ...config,
-      resolve: {
-        ...config.resolve,
-        alias: {
-          ...config.resolve.alias,
-          docs: path.resolve(MONORPO_PATH, './docs'),
-          [path.resolve(MONORPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
-          ...MONOREPO_PACKAGES,
-        },
-      },
-      module: {
-        ...config.module,
-        rules: config.module.rules.concat([
-          // used in some /getting-started/templates
-          {
-            test: /\.md$/,
-            oneOf: [
-              {
-                resourceQuery: /@mui\/markdown/,
-                use: require.resolve('@mui/monorepo/docs/packages/markdown/loader'),
-              },
-            ],
+module.exports = withTM(
+  withDocsInfra({
+    // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
+    assetPrefix: process.env.DEPLOY_ENV === 'development' ? '' : '/toolpad',
+    env: {
+      LIB_VERSION: pkg.version,
+      // #default-branch-switch
+      SOURCE_CODE_ROOT_URL: 'https://github.com/mui/mui-toolpad/blob/master',
+      SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',
+    },
+    webpack: (config) => {
+      return {
+        ...config,
+        resolve: {
+          ...config.resolve,
+          alias: {
+            ...config.resolve.alias,
+            docs: path.resolve(MONORPO_PATH, './docs'),
+            [path.resolve(MONORPO_PATH, './packages/mui-utils/macros/MuiError.macro')]: 'react',
+            ...MONOREPO_PACKAGES,
           },
-        ]),
-      },
-    };
-  },
-  trailingSlash: true,
-  // Next.js provides a `defaultPathMap` argument, we could simplify the logic.
-  // However, we don't in order to prevent any regression in the `findPages()` method.
-  exportPathMap: () => {
-    const pages = findPages();
-    const map = {};
-
-    function traverse(pages2, userLanguage) {
-      const prefix = userLanguage === 'en' ? '' : `/${userLanguage}`;
-
-      pages2.forEach((page) => {
-        if (!page.children) {
-          map[`${prefix}${page.pathname.replace(/^\/api-docs\/(.*)/, '/api/$1')}`] = {
-            page: page.pathname,
-            query: {
-              userLanguage,
+        },
+        module: {
+          ...config.module,
+          rules: config.module.rules.concat([
+            // used in some /getting-started/templates
+            {
+              test: /\.md$/,
+              oneOf: [
+                {
+                  resourceQuery: /@mui\/markdown/,
+                  use: require.resolve('@mui/monorepo/docs/packages/markdown/loader'),
+                },
+              ],
             },
-          };
-          return;
-        }
+          ]),
+        },
+      };
+    },
+    // Next.js provides a `defaultPathMap` argument, we could simplify the logic.
+    // However, we don't in order to prevent any regression in the `findPages()` method.
+    exportPathMap: () => {
+      const pages = findPages();
+      const map = {};
 
-        traverse(page.children, userLanguage);
-      });
-    }
+      function traverse(pages2, userLanguage) {
+        const prefix = userLanguage === 'en' ? '' : `/${userLanguage}`;
 
-    // We want to speed-up the build of pull requests.
-    if (process.env.PULL_REQUEST === 'true') {
+        pages2.forEach((page) => {
+          if (!page.children) {
+            map[`${prefix}${page.pathname.replace(/^\/api-docs\/(.*)/, '/api/$1')}`] = {
+              page: page.pathname,
+              query: {
+                userLanguage,
+              },
+            };
+            return;
+          }
+
+          traverse(page.children, userLanguage);
+        });
+      }
+
       // eslint-disable-next-line no-console
       console.log('Considering only English for SSR');
       traverse(pages, 'en');
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('Considering various locales for SSR');
-      LANGUAGES_SSR.forEach((userLanguage) => {
-        traverse(pages, userLanguage);
-      });
-    }
 
-    return map;
-  },
-  reactStrictMode,
-  async rewrites() {
-    return [
-      { source: `/:lang(${LANGUAGES.join('|')})?/:rest*`, destination: '/:rest*' },
-      { source: '/api/:rest*', destination: '/api-docs/:rest*' },
-    ];
-  },
-  // redirects only take effect in the development, not production (because of `next export`).
-  redirects: async () => [
-    {
-      source: '/',
-      destination: '/toolpad/',
-      permanent: false,
+      return map;
     },
-  ],
-});
+    rewrites: async () => {
+      return [
+        { source: '/api/:rest*', destination: '/api-docs/:rest*' },
+      ];
+    },
+    // redirects only take effect in the development, not production (because of `next export`).
+    redirects: async () => [
+      {
+        source: '/',
+        destination: '/toolpad/',
+        permanent: false,
+      },
+    ],
+  }),
+);

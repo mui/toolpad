@@ -1,6 +1,6 @@
 # Canvas
 
-<p class="description">Canvas and Inspector are the two main areas when it comes to UI building</p>
+<p class="description">Canvas and Inspector are the two main areas when it comes to UI building.</p>
 
 ## Working with canvas
 

@@ -1,6 +1,6 @@
 # Component library
 
-<p class="description">Component library provides an easy way to construct your application UI</p>
+<p class="description">Component library provides an easy way to construct your application UI.</p>
 
 ## Built-in components
 

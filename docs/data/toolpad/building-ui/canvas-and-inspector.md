@@ -6,7 +6,7 @@
 
 To build your application's UI, drag the mouse over the component library to open the drawer.
 Click on a component and drag it over the canvas.
-The canvas will highlight the location where a component can be dropped. Release the mouse to place the component in the canvas.
+The canvas will highlight the location where a component can be dropped. Release the mouse to place the component on the canvas.
 
 ### Selecting components
 
@@ -30,7 +30,7 @@ In the inspector panel you can see the values of the selected component's proper
 
 <img src="/static/toolpad/docs/inspector.png" width="291px" alt="Inspector" />
 
-You can either use a static values or use dynamic ones as described in [data binding](/toolpad/data-binding/) section
+You can either use a static or dynamic values as described in [data binding](/toolpad/data-binding/) section
 
 ## Canvas grid
 
@@ -48,7 +48,7 @@ Or place them in a dedicated column besides other components:
 
 ### Resizing components
 
-Componens placed in columns can be horizontally resized within the grid boundaries:
+Components placed in columns can be horizontally resized within the grid boundaries:
 
 <img src="/static/toolpad/docs/canvas-grid.png" width="655px" alt="Canvas grid" />
 

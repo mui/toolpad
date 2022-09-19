@@ -16,9 +16,9 @@ Click any component in the canvas to select it. An overlay indicates the selecte
 
 ### Moving components around
 
-In order to change position of a component select it first then click on the overlay handle, drag and drop it in the new location. The canvas will highlight available drop locations.
+In order to change position of a component select it first then click on the overlay handle, drag and drop it in the new location. The canvas will highlight available drop location with green indicator.
 
-<img src="/static/toolpad/docs/canvas-move.png" width="581px" alt="Canvas controls" />
+<img src="/static/toolpad/docs/canvas-move.png" width="578px" alt="Canvas controls" />
 
 ### Removing components
 

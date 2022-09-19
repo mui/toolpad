@@ -1,7 +1,6 @@
 import { ToolpadHome } from '../models/ToolpadHome';
 import { test, expect } from '../playwright/test';
 import generateId from '../utils/generateId';
-import * as locators from '../utils/locators';
 
 test('app create/rename flow', async ({ page }) => {
   const appName1 = `App ${generateId()}`;

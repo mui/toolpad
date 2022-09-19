@@ -123,7 +123,8 @@ export class ToolpadEditor {
     const appCanvasFrame = this.page.frame('data-toolpad-canvas');
     expect(appCanvasFrame).toBeDefined();
 
-    // Source drag event needs to be dispatched manually in Firefox for tests to work
+    // Source drag event needs to be dispatched manually in Firefox for tests to work (Playwright bug)
+    // https://github.com/microsoft/playwright/issues/17441
     if (isFirefox) {
       if (isSourceInCanvas) {
         const dataTransfer = await appCanvasFrame!.evaluateHandle(() => new DataTransfer());
@@ -138,7 +139,8 @@ export class ToolpadEditor {
 
     await this.page.mouse.move(moveTargetX, moveTargetY, { steps: 5 });
 
-    // Overlay drag events need to be dispatched manually in Firefox for tests to work
+    // Overlay drag events need to be dispatched manually in Firefox for tests to work (Playwright bug)
+    // https://github.com/microsoft/playwright/issues/17441
     if (isFirefox) {
       const pageOverlayBoundingBox = await this.pageOverlay.boundingBox();
 

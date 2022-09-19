@@ -503,7 +503,7 @@ export default function Home() {
     );
   }, [activeDeployments]);
 
-  const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = React.useState(isDemo);
 
   const [deletedApp, setDeletedApp] = React.useState<null | AppMeta>(null);
 
@@ -515,12 +515,6 @@ export default function Home() {
   );
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
-
-  React.useEffect(() => {
-    if (isDemo) {
-      setCreateDialogOpen(true);
-    }
-  }, [isDemo]);
 
   return (
     <ToolpadShell>

@@ -2,7 +2,7 @@
 
 <p class="description">Component library provides an easy way to construct your application UI</p>
 
-## Built in components
+## Built-in components
 
 In order to access a list of built in components hover over **Component library**
 

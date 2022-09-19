@@ -1,3 +1,4 @@
+import { ExecFetchResult } from '@mui/toolpad-core';
 import { Har } from 'har-format';
 import { LogEntry } from '../../components/Console';
 
@@ -18,9 +19,7 @@ export interface PrivateQueries {
   debug: PrivateQuery<FunctionQuery, {}>;
 }
 
-export interface FunctionResult {
-  data: any;
-  error?: Error;
+export interface FunctionResult extends ExecFetchResult<any> {
   logs: LogEntry[];
   har: Har;
 }

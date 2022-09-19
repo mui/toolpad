@@ -1,20 +1,18 @@
-import { test, expect } from '@playwright/test';
 import { ToolpadHome } from '../models/ToolpadHome';
+import { test, expect } from '../playwright/test';
 import generateId from '../utils/generateId';
+import * as locators from '../utils/locators';
 
 test('app create/rename flow', async ({ page }) => {
-  const homeModel = new ToolpadHome(page);
-
   const appName1 = `App ${generateId()}`;
   const appName2 = `App ${generateId()}`;
   const appName3 = `App ${generateId()}`;
 
+  const homeModel = new ToolpadHome(page);
   await homeModel.goto();
   await homeModel.createApplication({ name: appName1 });
-
   await homeModel.goto();
   await homeModel.createApplication({ name: appName2 });
-
   await homeModel.goto();
 
   await homeModel.getAppRow(appName1).locator('[aria-label="Application menu"]').click();

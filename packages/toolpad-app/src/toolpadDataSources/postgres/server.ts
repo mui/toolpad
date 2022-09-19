@@ -1,6 +1,6 @@
 import { Client, QueryConfig } from 'pg';
 import { ServerDataSource } from '../../types';
-import { parseError } from '../../utils/errors';
+import { errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
 import {
   PostgresConnectionParams,
@@ -49,6 +49,12 @@ async function execBase(
   postgresQuery: PostgresQuery,
   params: Record<string, string>,
 ): Promise<PostgresResult> {
+  if (!connection?.password) {
+    // pg client doesn't support passwordless authentication atm
+    // See https://github.com/brianc/node-postgres/issues/1927
+    throw new Error(`Password required`);
+  }
+
   const client = new Client({ ...connection });
   const paramEntries = Object.entries(params);
   try {
@@ -62,12 +68,9 @@ async function execBase(
       data: res.rows,
     };
   } catch (rawError) {
-    const error = parseError(rawError);
+    const error = errorFrom(rawError);
     error.message = parseErrorMessage(error.message, paramEntries);
-    return {
-      data: [],
-      error,
-    };
+    throw error;
   } finally {
     await client.end();
   }
@@ -79,10 +82,7 @@ async function exec(
   params: Record<string, string>,
 ): Promise<PostgresResult> {
   const { data, error } = await execBase(connection, postgresQuery, params);
-  if (error) {
-    throw error;
-  }
-  return { data };
+  return { data, error };
 }
 
 async function execPrivate(
@@ -103,7 +103,7 @@ async function execPrivate(
         await client.query('SELECT * FROM version();');
         return { error: null };
       } catch (rawError) {
-        const err = parseError(rawError);
+        const err = errorFrom(rawError);
         return { error: err.message };
       }
     }

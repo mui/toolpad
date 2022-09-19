@@ -4,11 +4,19 @@ import * as path from 'path';
 const require = createRequire(import.meta.url);
 const pkgJson = require('./package.json');
 
+// Keep in sync with src/constants.ts. Convert to imports once next.config.ts is a feature
+// See https://github.com/vercel/next.js/discussions/35969#discussioncomment-2523010
+const TOOLPAD_TARGET_CE = 'CE';
+const TOOLPAD_TARGET_CLOUD = 'CLOUD';
+const TOOLPAD_TARGET_PRO = 'PRO';
+
 /**
  * @param {string} input
  */
 function isValidTarget(input) {
-  return input === 'CLOUD' || input === 'CE' || input === 'PRO';
+  return (
+    input === TOOLPAD_TARGET_CLOUD || input === TOOLPAD_TARGET_CE || input === TOOLPAD_TARGET_PRO
+  );
 }
 
 /** @type {(env: Partial<Record<string, string>>) => import('./src/config').BuildEnvVars} */
@@ -26,6 +34,7 @@ function parseBuidEnvVars(env) {
     TOOLPAD_TARGET: target,
     TOOLPAD_DEMO: env.TOOLPAD_DEMO || '',
     TOOLPAD_VERSION: pkgJson.version,
+    TOOLPAD_BUILD: env.GIT_SHA1?.slice(0, 7) || 'dev',
   };
 }
 
@@ -48,19 +57,39 @@ const regexEqual = (x, y) => {
   );
 };
 
+// See https://nextjs.org/docs/advanced-features/security-headers
+const securityHeaders = [
+  {
+    key: 'X-Frame-Options',
+    value: 'SAMEORIGIN',
+  },
+  {
+    // Force the browser to trust the Content-Type header
+    // https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
+  },
+  {
+    key: 'X-XSS-Protection',
+    value: '1; mode=block',
+  },
+  {
+    key: 'Referrer-Policy',
+    value: 'strict-origin-when-cross-origin',
+  },
+];
+
 const NEVER = () => false;
 
 export default /** @type {import('next').NextConfig} */ ({
   reactStrictMode: true,
-
+  poweredByHeader: false,
   eslint: {
     // We're running this as part of the monorepo eslint
     ignoreDuringBuilds: true,
   },
-
   // build-time env vars
   env: parseBuidEnvVars(process.env),
-
   /**
    * @param {import('webpack').Configuration} config
    */
@@ -115,7 +144,6 @@ export default /** @type {import('next').NextConfig} */ ({
 
     return config;
   },
-
   async redirects() {
     return [
       {
@@ -125,7 +153,6 @@ export default /** @type {import('next').NextConfig} */ ({
       },
     ];
   },
-
   async rewrites() {
     return [
       {
@@ -133,5 +160,13 @@ export default /** @type {import('next').NextConfig} */ ({
         destination: '/api/health-check',
       },
     ];
+  },
+  headers: async () => {
+    return [
+      {
+        source: '/:path*',
+        headers: securityHeaders,
+      },
+    ]
   },
 });

@@ -1,26 +1,38 @@
 import * as React from 'react';
 import {
   styled,
+  Alert,
   AppBar,
+  Button,
+  Box,
+  Collapse,
   Toolbar,
   IconButton,
-  Typography,
-  Box,
   Menu,
   MenuItem,
   Divider,
   ListItemText,
   Tooltip,
+  Stack,
+  Link,
+  useTheme,
 } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
+import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Image from 'next/image';
 import useMenu from '../utils/useMenu';
+import useLocalStorageState from '../utils/useLocalStorageState';
+import client from '../api';
+import { TOOLPAD_TARGET_CLOUD, TOOLPAD_TARGET_CE, TOOLPAD_TARGET_PRO } from '../constants';
+import productIconDark from '../../public/product-icon-dark.svg';
+import productIconLight from '../../public/product-icon-light.svg';
 
 const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
+const CURRENT_RELEASE_VERSION = `v${process.env.TOOLPAD_VERSION}`;
 
 interface FeedbackMenuItemLinkProps {
   href: string;
@@ -37,8 +49,8 @@ function FeedbackMenuItemLink({ href, children }: FeedbackMenuItemLinkProps) {
 }
 
 export interface ToolpadShellProps {
-  navigation?: React.ReactNode;
   actions?: React.ReactNode;
+  status?: React.ReactNode;
   children?: React.ReactNode;
 }
 
@@ -54,6 +66,19 @@ const ViewPort = styled('div')({
   overflow: 'auto',
   position: 'relative',
 });
+
+function getReadableTarget(): string {
+  switch (process.env.TOOLPAD_TARGET) {
+    case TOOLPAD_TARGET_CLOUD:
+      return 'Cloud';
+    case TOOLPAD_TARGET_CE:
+      return 'Community';
+    case TOOLPAD_TARGET_PRO:
+      return 'Pro';
+    default:
+      return 'Unknown';
+  }
+}
 
 function UserFeedback() {
   const { buttonProps, menuProps } = useMenu();
@@ -72,18 +97,86 @@ function UserFeedback() {
           Request or upvote feature
         </FeedbackMenuItemLink>
         <Divider />
+        <MenuItem disabled>{getReadableTarget()}</MenuItem>
         <MenuItem disabled>Version {process.env.TOOLPAD_VERSION}</MenuItem>
+        <MenuItem disabled>Build {process.env.TOOLPAD_BUILD}</MenuItem>
       </Menu>
     </React.Fragment>
   );
 }
 
-export interface HeaderProps {
-  navigation?: React.ReactNode;
-  actions?: React.ReactNode;
+function UpdateBanner() {
+  const { data: latestRelease } = client.useQuery('getLatestToolpadRelease', [], {
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const [dismissedVersion, setDismissedVersion] = useLocalStorageState<string | null>(
+    'update-banner-dismissed-version',
+    null,
+  );
+
+  const handleDismissClick = React.useCallback(() => {
+    setDismissedVersion(CURRENT_RELEASE_VERSION);
+  }, [setDismissedVersion]);
+
+  const hideBanner =
+    (latestRelease && latestRelease.tag === CURRENT_RELEASE_VERSION) ||
+    dismissedVersion === CURRENT_RELEASE_VERSION;
+
+  return (
+    <React.Fragment>
+      {latestRelease && process.env.TOOLPAD_TARGET === 'CE' ? (
+        <Collapse in={!hideBanner}>
+          <Alert
+            action={
+              <Stack direction="row" sx={{ gap: 2 }}>
+                <Button
+                  aria-label="update"
+                  color="inherit"
+                  endIcon={<OpenInNewIcon fontSize="inherit" />}
+                  component="a"
+                  target="_blank"
+                  href={DOCUMENTATION_URL}
+                >
+                  Update
+                </Button>
+                <Button
+                  aria-label="view changelog"
+                  color="inherit"
+                  endIcon={<OpenInNewIcon fontSize="inherit" />}
+                  component="a"
+                  target="_blank"
+                  href={latestRelease.url}
+                >
+                  View changelog
+                </Button>
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={handleDismissClick}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              </Stack>
+            }
+            severity="info"
+          >
+            A new version <strong>{latestRelease.tag}</strong> of Toolpad is available.
+          </Alert>
+        </Collapse>
+      ) : null}
+    </React.Fragment>
+  );
 }
 
-function Header({ actions, navigation }: HeaderProps) {
+export interface HeaderProps {
+  actions?: React.ReactNode;
+  status?: React.ReactNode;
+}
+
+function Header({ actions, status }: HeaderProps) {
+  const theme = useTheme();
   return (
     <AppBar
       position="static"
@@ -91,24 +184,68 @@ function Header({ actions, navigation }: HeaderProps) {
       elevation={0}
       sx={{ zIndex: 2, borderBottom: 1, borderColor: 'divider' }}
     >
-      <Toolbar sx={{ gap: 1 }}>
-        <IconButton
-          size="medium"
-          edge="start"
-          color="inherit"
-          aria-label="Home"
-          component="a"
-          href={`/`}
+      <Toolbar>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'start',
+          }}
         >
-          <HomeIcon fontSize="medium" />
-        </IconButton>
-        <Typography data-testid="brand" variant="h6" color="inherit" component="div">
-          MUI Toolpad {process.env.TOOLPAD_TARGET}
-        </Typography>
-        {navigation}
-        <Box flex={1} />
-        {actions}
-        <UserFeedback />
+          <Tooltip title="Home">
+            <Link
+              color="inherit"
+              aria-label="Home"
+              href="/"
+              underline="none"
+              sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}
+            >
+              <Image
+                src={theme.palette.mode === 'dark' ? productIconDark : productIconLight}
+                alt="Toolpad product icon"
+                width={25}
+                height={25}
+              />
+              <Box
+                data-testid="brand"
+                sx={{
+                  color: 'primary.main',
+                  lineHeight: '21px',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                }}
+              >
+                MUI Toolpad
+              </Box>
+            </Link>
+          </Tooltip>
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {actions}
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'end',
+            gap: 2,
+          }}
+        >
+          {status}
+          <UserFeedback />
+        </Box>
       </Toolbar>
     </AppBar>
   );
@@ -119,6 +256,7 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
     <ToolpadShellRoot>
       <Header {...props} />
       <ViewPort>{children}</ViewPort>
+      <UpdateBanner />
     </ToolpadShellRoot>
   );
 }

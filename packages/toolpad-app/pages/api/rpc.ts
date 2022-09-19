@@ -21,6 +21,7 @@ import {
   deploy,
   getDeployments,
 } from '../../src/server/data';
+import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 
 interface RpcContext {
@@ -87,6 +88,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
     try {
       rawResult = await method(params, context);
     } catch (error) {
+      console.error(error);
       if (error instanceof Error) {
         res.json({ error: { message: error.message, stack: error.stack } });
       } else {
@@ -142,6 +144,9 @@ const rpcServer = {
     }),
     findLastRelease: createMethod<typeof findLastRelease>((params) => {
       return findLastRelease(...params);
+    }),
+    getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>((params) => {
+      return getLatestToolpadRelease(...params);
     }),
   },
   mutation: {

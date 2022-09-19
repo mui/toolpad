@@ -1,7 +1,12 @@
-import { BindableAttrEntries, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
+import {
+  BindableAttrEntries,
+  BindableAttrValue,
+  BindableAttrValues,
+  ExecFetchResult,
+} from '@mui/toolpad-core';
 import fetch, { Headers, RequestInit, Response } from 'node-fetch';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
-import { ServerDataSource, ApiResult } from '../../types';
+import { ServerDataSource } from '../../types';
 import {
   Body,
   FetchPrivateQuery,
@@ -16,7 +21,7 @@ import { removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import { getAuthenticationHeaders, HTTP_NO_BODY, parseBaseUrl } from './shared';
 import applyTransform from '../../server/applyTransform';
-import { parseError } from '../../utils/errors';
+import { errorFrom } from '../../utils/errors';
 
 async function resolveBindable(
   bindable: BindableAttrValue<string>,
@@ -112,8 +117,14 @@ async function resolveBody(body: Body, boundValues: Record<string, string>) {
   }
 }
 
-async function readData(res: Response): Promise<any> {
-  return res.headers.get('content-type') === 'application/json' ? res.json() : res.text();
+async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
+  if (!fetchQuery.response || fetchQuery.response?.kind === 'json') {
+    return res.json();
+  }
+  if (fetchQuery.response?.kind === 'raw') {
+    return res.text();
+  }
+  throw new Error(`Unsupported response type "${fetchQuery.response.kind}"`);
 }
 
 async function execBase(
@@ -169,17 +180,17 @@ async function execBase(
     const res = await instrumentedFetch(queryUrl.href, requestInit);
 
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
+      throw new Error(`HTTP ${res.status} (${res.statusText}) while fetching "${res.url}"`);
     }
 
-    untransformedData = await readData(res);
+    untransformedData = await readData(res, fetchQuery);
     data = untransformedData;
 
     if (fetchQuery.transformEnabled && fetchQuery.transform) {
       data = await applyTransform(fetchQuery.transform, untransformedData);
     }
   } catch (rawError) {
-    error = parseError(rawError);
+    error = errorFrom(rawError);
   }
 
   return { data, untransformedData, error, har };
@@ -198,14 +209,9 @@ async function exec(
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
-): Promise<ApiResult<any>> {
+): Promise<ExecFetchResult<any>> {
   const { data, error } = await execBase(connection, fetchQuery, params);
-
-  if (error) {
-    throw error;
-  }
-
-  return { data };
+  return { data, error };
 }
 
 const dataSource: ServerDataSource<{}, FetchQuery, any> = {

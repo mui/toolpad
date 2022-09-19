@@ -48,7 +48,7 @@ import useLocalStorageState from '../utils/useLocalStorageState';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ConfirmDialog } from '../components/SystemDialogs';
 import config from '../config';
-import { parseError } from '../utils/errors';
+import { errorFrom } from '../utils/errors';
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -67,7 +67,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 
   const createAppMutation = client.useMutation('createApp', {
     onSuccess: (app) => {
-      window.location.href = `/_toolpad/app/${app.id}/editor`;
+      window.location.href = `/_toolpad/app/${app.id}`;
     },
   });
 
@@ -95,7 +95,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 setName(event.target.value);
               }}
             />
-            {config.integrationTest ? (
+            {config.enableCreateByDom ? (
               <TextField
                 label="seed DOM"
                 fullWidth
@@ -193,7 +193,7 @@ function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableP
           await client.mutation.updateApp(app.id, name);
           await client.invalidateQueries('getApps');
         } catch (rawError) {
-          setAppRenameError(parseError(rawError));
+          setAppRenameError(errorFrom(rawError));
           setEditing(true);
         }
       }
@@ -228,12 +228,7 @@ interface AppEditButtonProps {
 
 function AppEditButton({ app }: AppEditButtonProps) {
   return (
-    <Button
-      size="small"
-      component="a"
-      href={app ? `/_toolpad/app/${app.id}/editor` : ''}
-      disabled={!app}
-    >
+    <Button size="small" component="a" href={app ? `/_toolpad/app/${app.id}` : ''} disabled={!app}>
       Edit
     </Button>
   );

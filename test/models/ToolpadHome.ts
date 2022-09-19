@@ -55,12 +55,19 @@ export class ToolpadHome {
     await this.newAppNameInput.fill(name);
 
     if (dom) {
+      const isDomInputEnabled = await this.newAppDomInput.isVisible();
+      if (!isDomInputEnabled) {
+        throw new Error(
+          `Toolpad not in integration test mode. Make sure to start Toolpad with environment variable TOOLPAD_ENABLE_CREATE_BY_DOM=1.`,
+        );
+      }
+
       await this.newAppDomInput.fill(JSON.stringify(dom));
     }
 
     await this.newAppDomCreateBtn.click();
 
-    await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/editor\/pages\/[^/]+/ });
+    await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
 
     const { pathname } = new URL(this.page.url());
     const idMatch = /^\/_toolpad\/app\/([^/]+)\//.exec(pathname);

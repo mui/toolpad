@@ -1,5 +1,5 @@
-import { test, expect, Request } from '../playwright/test';
 import { ToolpadHome } from '../models/ToolpadHome';
+import { test, expect, Request } from '../playwright/test';
 import generateId from '../utils/generateId';
 
 test('basic app creation flow', async ({ page }) => {
@@ -8,11 +8,11 @@ test('basic app creation flow', async ({ page }) => {
   const appName = `App ${generateId()}`;
 
   await homeModel.goto();
-
   const brand = page.locator('data-testid=brand');
-  await expect(brand).toHaveText('MUI Toolpad CE');
+  await expect(brand).toHaveText('MUI Toolpad');
 
   await homeModel.createApplication({ name: appName });
+  await homeModel.goto();
 
   // TODO: basic editor tests
 

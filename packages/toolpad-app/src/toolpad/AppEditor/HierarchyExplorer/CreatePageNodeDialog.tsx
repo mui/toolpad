@@ -52,7 +52,7 @@ export default function CreatePageDialog({
           domApi.addNode(newNode, appNode, 'pages');
 
           onClose();
-          navigate(`/app/${appId}/editor/pages/${newNode.id}`);
+          navigate(`/app/${appId}/pages/${newNode.id}`);
         }}
       >
         <DialogTitle>Create a new MUI Toolpad Page</DialogTitle>

@@ -9,7 +9,7 @@ Object.keys(serverDataSources).forEach((dataSource) => {
   handlerMap.set(dataSource, serverDataSources[dataSource]?.createHandler?.());
 });
 
-const apiRoute = (async (req, res) => {
+const apiHandler = (async (req, res) => {
   if (req.method === 'GET') {
     const [dataSource] = asArray(req.query.dataSource);
     if (!dataSource) {
@@ -32,4 +32,4 @@ const apiRoute = (async (req, res) => {
   return res.status(405).json({ message: 'Method not supported' });
 }) as NextApiHandler;
 
-export default withSentry(apiRoute);
+export default withSentry(apiHandler);

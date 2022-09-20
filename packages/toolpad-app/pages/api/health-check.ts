@@ -10,7 +10,7 @@ interface HealthCheck {
   memoryUsagePretty: Record<keyof NodeJS.MemoryUsage, string>;
 }
 
-const apiRoute = (async (req, res) => {
+const apiHandler = (async (req, res) => {
   const memoryUsage = process.memoryUsage();
   res.json({
     gitSha1: process.env.GIT_SHA1 || null,
@@ -20,4 +20,4 @@ const apiRoute = (async (req, res) => {
   });
 }) as NextApiHandler<HealthCheck>;
 
-export default withSentry(apiRoute);
+export default withSentry(apiHandler);

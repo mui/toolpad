@@ -5,7 +5,7 @@ import { parseVersion } from '../../../../../src/server/data';
 import handleDataRequest from '../../../../../src/server/handleDataRequest';
 import { asArray } from '../../../../../src/utils/collections';
 
-const apiRoute = (async (req, res) => {
+const apiHandler = (async (req, res) => {
   const [appId] = asArray(req.query.appId);
   if (!appId) {
     throw new Error(`Missing path parameter "appId"`);
@@ -18,4 +18,4 @@ const apiRoute = (async (req, res) => {
   await handleDataRequest(req, res, { appId, version });
 }) as NextApiHandler<ExecFetchResult<any>>;
 
-export default withSentry(apiRoute);
+export default withSentry(apiHandler);

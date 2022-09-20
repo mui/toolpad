@@ -144,13 +144,13 @@ async function execBase(
 
     const hasNonDemoConnectionParams =
       !demoUrls.includes(connection?.baseUrl || '') ||
-      (connection?.headers && connection?.headers.length > 0) ||
+      (!!connection?.headers && connection.headers.length > 0) ||
       !!connection?.authentication;
     const hasNonDemoQueryParams =
-      fetchQuery.method !== 'GET' || (fetchQuery.headers && fetchQuery.headers.length > 0);
+      fetchQuery.method !== 'GET' || (!!fetchQuery.headers && fetchQuery.headers.length > 0);
 
     if (hasNonDemoConnectionParams || hasNonDemoQueryParams) {
-      throw new Error(`Cannot use unsupported features in demo version.`);
+      throw new Error(`Cannot use these features in demo version.`);
     }
   }
 

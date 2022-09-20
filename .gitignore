@@ -33,6 +33,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Sentry
+.sentryclirc
+
+
 # docs
 
 /docs/export

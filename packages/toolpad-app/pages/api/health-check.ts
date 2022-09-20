@@ -1,5 +1,6 @@
 import { NextApiHandler } from 'next';
 import prettyBytes from 'pretty-bytes';
+import { withSentry } from '@sentry/nextjs';
 import { mapValues } from '../../src/utils/collections';
 
 interface HealthCheck {
@@ -9,7 +10,7 @@ interface HealthCheck {
   memoryUsagePretty: Record<keyof NodeJS.MemoryUsage, string>;
 }
 
-export default (async (req, res) => {
+const apiRoute = (async (req, res) => {
   const memoryUsage = process.memoryUsage();
   res.json({
     gitSha1: process.env.GIT_SHA1 || null,
@@ -18,3 +19,5 @@ export default (async (req, res) => {
     memoryUsagePretty: mapValues(memoryUsage, (usage) => prettyBytes(usage)),
   });
 }) as NextApiHandler<HealthCheck>;
+
+export default withSentry(apiRoute);

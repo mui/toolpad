@@ -139,7 +139,7 @@ function Header({ actions, status }: HeaderProps) {
                 height={25}
               />
               <Box
-                data-test-id="brand"
+                data-testid="brand"
                 sx={{
                   color: 'primary.main',
                   lineHeight: '21px',

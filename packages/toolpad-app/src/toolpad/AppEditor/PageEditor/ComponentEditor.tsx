@@ -148,7 +148,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
   const selectedNode = selection ? appDom.getNode(dom, selection) : null;
 
   return (
-    <ComponentEditorRoot className={className}>
+    <ComponentEditorRoot className={className} data-testid="component-editor">
       {selectedNode && appDom.isElement(selectedNode) ? (
         // Add key to make sure it mounts every time selected node changes
         <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />

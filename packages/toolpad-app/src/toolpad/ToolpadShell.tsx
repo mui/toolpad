@@ -223,7 +223,7 @@ function Header({ actions, status }: HeaderProps) {
             </Link>
           </Tooltip>
           {process.env.TOOLPAD_DEMO ? (
-            <Chip sx={{ ml: 1 }} label="Demo Version" color="primary" size="small" />
+            <Chip sx={{ ml: 2 }} label="Demo Version" color="primary" size="small" />
           ) : null}
         </Box>
         <Box

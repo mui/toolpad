@@ -37,20 +37,37 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import DeleteIcon from '@mui/icons-material/Delete';
-import client from '../api';
-import DialogForm from '../components/DialogForm';
-import type { Deployment } from '../../prisma/generated/client';
-import useLatest from '../utils/useLatest';
-import ToolpadShell from './ToolpadShell';
-import getReadableDuration from '../utils/readableDuration';
-import EditableText from '../components/EditableText';
-import type { AppMeta } from '../server/data';
-import useMenu from '../utils/useMenu';
-import useLocalStorageState from '../utils/useLocalStorageState';
-import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
-import { ConfirmDialog } from '../components/SystemDialogs';
-import config from '../config';
-import { errorFrom } from '../utils/errors';
+import client from '../../api';
+import DialogForm from '../../components/DialogForm';
+import type { Deployment } from '../../../prisma/generated/client';
+import useLatest from '../../utils/useLatest';
+import ToolpadShell from '../ToolpadShell';
+import UpdateBanner from './UpdateBanner';
+import getReadableDuration from '../../utils/readableDuration';
+import EditableText from '../../components/EditableText';
+import type { AppMeta } from '../../server/data';
+import useMenu from '../../utils/useMenu';
+import useLocalStorageState from '../../utils/useLocalStorageState';
+import ErrorAlert from '../AppEditor/PageEditor/ErrorAlert';
+import { ConfirmDialog } from '../../components/SystemDialogs';
+import config from '../../config';
+import { AppTemplateId } from '../../types';
+import { errorFrom } from '../../utils/errors';
+
+export const APP_TEMPLATE_OPTIONS = {
+  blank: {
+    label: 'Blank page',
+    description: 'Start with an empty canvas',
+  },
+  stats: {
+    label: 'Statistics',
+    description: 'Table with statistics data',
+  },
+  images: {
+    label: 'Images',
+    description: 'Fetch remote images',
+  },
+};
 
 const NO_OP = () => {};
 
@@ -61,8 +78,15 @@ export interface CreateAppDialogProps {
 
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
-
+  const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('blank');
   const [dom, setDom] = React.useState('');
+
+  const handleAppTemplateChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setAppTemplateId(event.target.value as AppTemplateId);
+    },
+    [],
+  );
 
   const handleDomChange = React.useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => setDom(event.target.value),
@@ -83,7 +107,18 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
         <DialogForm
           onSubmit={(event) => {
             event.preventDefault();
-            createAppMutation.mutate([name, { dom: dom.trim() ? JSON.parse(dom) : null }]);
+
+            const appDom = dom.trim() ? JSON.parse(dom) : null;
+            createAppMutation.mutate([
+              name,
+              {
+                from: {
+                  ...(appDom
+                    ? { kind: 'dom', dom: appDom }
+                    : { kind: 'template', id: appTemplateId }),
+                },
+              },
+            ]);
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
@@ -98,7 +133,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               sx={{ my: 1 }}
               autoFocus
               fullWidth
-              label="name"
+              label="Name"
               value={name}
               error={createAppMutation.isError}
               helperText={createAppMutation.isError ? `An app named "${name}" already exists` : ''}
@@ -107,9 +142,29 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 setName(event.target.value);
               }}
             />
+
+            <TextField
+              sx={{ my: 1 }}
+              label="Use template"
+              select
+              fullWidth
+              value={appTemplateId}
+              onChange={handleAppTemplateChange}
+            >
+              {Object.entries(APP_TEMPLATE_OPTIONS).map(([value, { label, description }]) => (
+                <MenuItem key={value} value={value}>
+                  <span>
+                    <Typography>{label}</Typography>
+                    <Typography variant="caption">{description || ''}</Typography>
+                  </span>
+                </MenuItem>
+              ))}
+            </TextField>
+
             {config.enableCreateByDom ? (
               <TextField
-                label="seed DOM"
+                sx={{ my: 1 }}
+                label="Seed DOM"
                 fullWidth
                 multiline
                 maxRows={10}
@@ -522,6 +577,7 @@ export default function Home() {
       {!isDemo ? (
         <Container>
           <Typography variant="h2">Apps</Typography>
+          <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
           <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
             <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
             <ToggleButtonGroup
@@ -556,9 +612,9 @@ export default function Home() {
               setDeletedApp={setDeletedApp}
             />
           )}
+          <UpdateBanner />
         </Container>
       ) : null}
-      <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
     </ToolpadShell>
   );
 }

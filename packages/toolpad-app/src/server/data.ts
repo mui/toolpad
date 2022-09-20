@@ -1,7 +1,7 @@
 import { NodeId, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import * as prisma from '../../prisma/generated/client';
-import { ServerDataSource, VersionOrPreview } from '../types';
+import { ServerDataSource, VersionOrPreview, AppTemplateId } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -9,6 +9,7 @@ import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
+import { getAppTemplateDom } from './appTemplateDoms/doms';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -179,17 +180,37 @@ function createDefaultDom(): appDom.AppDom {
   return dom;
 }
 
-export interface CreateAppOptions {
-  dom?: appDom.AppDom | null;
-}
+export type CreateAppOptions = {
+  from?:
+    | {
+        kind: 'dom';
+        dom?: appDom.AppDom | null;
+      }
+    | {
+        kind: 'template';
+        id: AppTemplateId;
+      };
+};
 
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
+  const { from } = opts;
+
   return prismaClient.$transaction(async () => {
     const app = await prismaClient.app.create({
       data: { name },
     });
 
-    const dom = opts.dom || createDefaultDom();
+    let dom: appDom.AppDom | null = null;
+
+    if (from && from.kind === 'dom') {
+      dom = from.dom || null;
+    } else if (from && from.kind === 'template') {
+      dom = await getAppTemplateDom(from.id || 'blank');
+    }
+
+    if (!dom) {
+      dom = createDefaultDom();
+    }
 
     await saveDom(app.id, dom);
 

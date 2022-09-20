@@ -7,6 +7,7 @@ const pages: MuiPage[] = [
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/quickstart' },
+      { pathname: '/toolpad/getting-started/installation' },
     ],
   },
   {

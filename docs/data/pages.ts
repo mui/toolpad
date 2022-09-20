@@ -7,6 +7,7 @@ const pages: MuiPage[] = [
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/quickstart' },
+      { pathname: '/toolpad/getting-started/installation' },
     ],
   },
   {
@@ -39,11 +40,20 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/building-ui',
-    title: 'Building UI [TODO]',
+    title: 'Building UI',
     icon: 'VisibilityIcon',
     children: [
       {
-        pathname: '/toolpad/building-ui/build-in-components',
+        pathname: '/toolpad/building-ui/component-library',
+        title: 'Component library',
+      },
+      {
+        pathname: '/toolpad/building-ui/canvas-and-inspector',
+        title: 'Canvas & Inspector',
+      },
+      {
+        pathname: '/toolpad/building-ui/custom-components',
+        title: 'Custom components',
       },
     ],
   },

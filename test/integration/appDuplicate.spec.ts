@@ -1,19 +1,17 @@
-import * as path from 'path';
 import { test, expect } from '../playwright/test';
 import { ToolpadHome } from '../models/ToolpadHome';
-import { readJsonFile } from '../utils/fs';
-import * as locators from '../utils/locators';
+import generateId from '../utils/generateId';
 
 test('duplicate app from home flow', async ({ page }) => {
-  const dom = await readJsonFile(path.resolve(__dirname, './duplicateNavigationDom.json'));
+  const appName1 = `App ${generateId()}`;
   const homeModel = new ToolpadHome(page);
   await homeModel.goto();
-  const app = await homeModel.createApplication({ dom });
+  await homeModel.createApplication({ name: appName1 });
   await homeModel.goto();
-  await homeModel.duplicateApplication(app.name);
+  await homeModel.duplicateApplication(appName1);
   await homeModel.goto();
-  await expect(page.locator(locators.toolpadHomeAppRow(`${app.name} (copy)`))).toBeVisible();
-  await homeModel.duplicateApplication(app.name);
+  await expect(homeModel.getAppRow(`${appName1} (copy)`)).toBeVisible();
+  await homeModel.duplicateApplication(appName1);
   await homeModel.goto();
-  await expect(page.locator(locators.toolpadHomeAppRow(`${app.name} (copy 2)`))).toBeVisible();
+  await expect(homeModel.getAppRow(`${appName1} (copy 2)`)).toBeVisible();
 });

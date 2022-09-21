@@ -18,7 +18,7 @@ test('can place new components from catalog', async ({ page, browserName }) => {
 
   await expect(canvasInputLocator).toHaveCount(0);
 
-  const TEXT_FIELD_COMPONENT_ID = 'TextField';
+  const TEXT_FIELD_COMPONENT_ID = 'Text field';
 
   // Drag in a first component
 
@@ -44,7 +44,7 @@ test('can move elements in page', async ({ page, browserName }) => {
 
   await editorModel.pageRoot.waitFor();
 
-  const canvasMoveElementHandleSelector = ':has-text("TextField")[draggable]';
+  const canvasMoveElementHandleSelector = ':has-text("Text field")[draggable]';
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
   const canvasMoveElementHandleLocator = editorModel.appCanvas.locator(

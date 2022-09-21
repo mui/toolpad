@@ -494,7 +494,7 @@ function AppsGridView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: 
 
 function AppsListView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: AppViewProps) {
   return (
-    <Table aria-label="apps list" size="medium">
+    <Table aria-label={!loading ? 'apps list' : ''} size="medium">
       <TableBody>
         {(() => {
           if (loading) {

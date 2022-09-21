@@ -362,7 +362,9 @@ export default function NodeDropArea({
       {isEmptySlot && slotRect ? (
         <EmptySlot style={absolutePositionCss(slotRect)}>
           <AddCircleOutlineIcon fontSize="inherit" sx={{ mb: 0.2 }} />
-          <Typography variant="caption">Drop component here</Typography>
+          <Typography variant="caption" data-test-id="drop-area">
+            Drop component here
+          </Typography>
         </EmptySlot>
       ) : null}
     </React.Fragment>

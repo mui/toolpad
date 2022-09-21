@@ -97,7 +97,7 @@ const ComponentCatalogItem = ({
         ...(onClick ? { cursor: 'pointer' } : {}),
       }}
     >
-      {<ComponentIcon id={id} kind={kind} />}
+      <ComponentIcon id={id} kind={kind} />
       <span
         style={{
           fontSize: '0.625rem',

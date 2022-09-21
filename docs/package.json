@@ -20,7 +20,7 @@
     "@babel/core": "^7.17.9",
     "@babel/plugin-transform-object-assign": "^7.16.7",
     "@babel/runtime-corejs2": "^7.17.9",
-    "@date-io/date-fns-jalali": "^2.14.0",
+    "@date-io/date-fns-jalali": "^2.16.0",
     "@docsearch/react": "^3.1.0",
     "@emotion/cache": "^11.10.3",
     "@emotion/react": "^11.10.4",

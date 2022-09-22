@@ -12,6 +12,8 @@ export interface ImageProps {
   fit: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
 }
 
+const DEFAULT_IMG_SRC = 'https://mui.com/static/branding/mui-x/Mocktable-dark.png';
+
 function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit }: ImageProps) {
   const sx: SxProps = React.useMemo(
     () => ({
@@ -58,6 +60,7 @@ export default createComponent(Image, {
   argTypes: {
     src: {
       typeDef: { type: 'string' },
+      defaultValue: DEFAULT_IMG_SRC,
     },
     alt: {
       typeDef: { type: 'string' },

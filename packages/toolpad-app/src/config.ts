@@ -30,7 +30,9 @@ export type BuildEnvVars = Record<
   // The current Toolpad version
   | 'TOOLPAD_VERSION'
   // The current Toolpad build number
-  | 'TOOLPAD_BUILD',
+  | 'TOOLPAD_BUILD'
+  // Sentry DSN
+  | 'SENTRY_DSN',
   string
 >;
 

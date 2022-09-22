@@ -557,7 +557,13 @@ export default function Home() {
         <Typography variant="h2">Apps</Typography>
         <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
         <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
-          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+          <Button
+            onClick={() => {
+              setCreateDialogOpen(true);
+            }}
+          >
+            Create New
+          </Button>
           <ToggleButtonGroup
             value={viewMode}
             exclusive

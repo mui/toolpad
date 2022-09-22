@@ -36,7 +36,6 @@ yarn-error.log*
 # Sentry
 .sentryclirc
 
-
 # docs
 
 /docs/export

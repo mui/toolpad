@@ -36,6 +36,7 @@ function parseBuidEnvVars(env) {
     TOOLPAD_DEMO: env.TOOLPAD_DEMO || '',
     TOOLPAD_VERSION: pkgJson.version,
     TOOLPAD_BUILD: env.GIT_SHA1?.slice(0, 7) || 'dev',
+    SENTRY_DSN: env.SENTRY_DSN || '',
   };
 }
 
@@ -107,6 +108,9 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
     /**
      * @param {import('webpack').Configuration} config
      */
+    // @ts-ignore
+    // Ignoring type mismatch because types from Sentry are incompatible
+    // https://github.com/getsentry/sentry-javascript/issues/4560
     webpack: (config, options) => {
       config.resolve = config.resolve ?? {};
       config.resolve.fallback = {
@@ -157,6 +161,15 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
       }
 
       return config;
+    },
+    sentry: {
+      // Use `hidden-source-map` rather than `source-map` as the Webpack `devtool`
+      // for client-side builds. (This will be the default starting in
+      // `@sentry/nextjs` version 8.0.0.) See
+      // https://webpack.js.org/configuration/devtool/ and
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#use-hidden-source-map
+      // for more information.
+      hideSourceMaps: true,
     },
     async redirects() {
       return [

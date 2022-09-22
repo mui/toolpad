@@ -36,21 +36,22 @@ import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import DeleteIcon from '@mui/icons-material/Delete';
-import client from '../api';
-import DialogForm from '../components/DialogForm';
-import type { Deployment } from '../../prisma/generated/client';
-import useLatest from '../utils/useLatest';
-import ToolpadShell from './ToolpadShell';
-import getReadableDuration from '../utils/readableDuration';
-import EditableText from '../components/EditableText';
-import type { AppMeta } from '../server/data';
-import useMenu from '../utils/useMenu';
-import useLocalStorageState from '../utils/useLocalStorageState';
-import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
-import { ConfirmDialog } from '../components/SystemDialogs';
-import config from '../config';
-import { AppTemplateId } from '../types';
-import { errorFrom } from '../utils/errors';
+import client from '../../api';
+import DialogForm from '../../components/DialogForm';
+import type { Deployment } from '../../../prisma/generated/client';
+import useLatest from '../../utils/useLatest';
+import ToolpadShell from '../ToolpadShell';
+import UpdateBanner from './UpdateBanner';
+import getReadableDuration from '../../utils/readableDuration';
+import EditableText from '../../components/EditableText';
+import type { AppMeta } from '../../server/data';
+import useMenu from '../../utils/useMenu';
+import useLocalStorageState from '../../utils/useLocalStorageState';
+import ErrorAlert from '../AppEditor/PageEditor/ErrorAlert';
+import { ConfirmDialog } from '../../components/SystemDialogs';
+import config from '../../config';
+import { AppTemplateId } from '../../types';
+import { errorFrom } from '../../utils/errors';
 
 export const APP_TEMPLATE_OPTIONS = {
   blank: {
@@ -634,6 +635,7 @@ export default function Home() {
             duplicateApp={duplicateApp}
           />
         )}
+        <UpdateBanner />
       </Container>
     </ToolpadShell>
   );

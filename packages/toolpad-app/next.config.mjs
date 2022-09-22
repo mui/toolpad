@@ -106,7 +106,7 @@ export default /** @type {import('next').NextConfig} */ ({
     {
       // Support global CSS in monaco-editor
       // Adapted from next-transpile-modules.
-      const extraCssIssuer = /\/node_modules\/monaco-editor\//;
+      const extraCssIssuer = /(\/|\\)node_modules(\/|\\)monaco-editor(\/|\\)/;
       const modulesPaths = [path.dirname(require.resolve('monaco-editor/package.json'))];
 
       config.module = config.module ?? {};

@@ -1,11 +1,8 @@
 import * as React from 'react';
 import {
   styled,
-  Alert,
   AppBar,
-  Button,
   Box,
-  Collapse,
   Toolbar,
   IconButton,
   Menu,
@@ -13,26 +10,25 @@ import {
   Divider,
   ListItemText,
   Tooltip,
-  Stack,
   Link,
   useTheme,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Image from 'next/image';
 import useMenu from '../utils/useMenu';
-import useLocalStorageState from '../utils/useLocalStorageState';
-import client from '../api';
-import { TOOLPAD_TARGET_CLOUD, TOOLPAD_TARGET_CE, TOOLPAD_TARGET_PRO } from '../constants';
+import {
+  TOOLPAD_TARGET_CLOUD,
+  TOOLPAD_TARGET_CE,
+  TOOLPAD_TARGET_PRO,
+  DOCUMENTATION_URL,
+} from '../constants';
 import productIconDark from '../../public/product-icon-dark.svg';
 import productIconLight from '../../public/product-icon-light.svg';
 
-const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/setup/';
 const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
-const CURRENT_RELEASE_VERSION = `v${process.env.TOOLPAD_VERSION}`;
 
 interface FeedbackMenuItemLinkProps {
   href: string;
@@ -104,72 +100,6 @@ function UserFeedback() {
     </React.Fragment>
   );
 }
-
-function UpdateBanner() {
-  const { data: latestRelease } = client.useQuery('getLatestToolpadRelease', [], {
-    staleTime: 1000 * 60 * 10,
-  });
-
-  const [dismissedVersion, setDismissedVersion] = useLocalStorageState<string | null>(
-    'update-banner-dismissed-version',
-    null,
-  );
-
-  const handleDismissClick = React.useCallback(() => {
-    setDismissedVersion(CURRENT_RELEASE_VERSION);
-  }, [setDismissedVersion]);
-
-  const hideBanner =
-    (latestRelease && latestRelease.tag === CURRENT_RELEASE_VERSION) ||
-    dismissedVersion === CURRENT_RELEASE_VERSION;
-
-  return (
-    <React.Fragment>
-      {latestRelease && process.env.TOOLPAD_TARGET === 'CE' ? (
-        <Collapse in={!hideBanner}>
-          <Alert
-            action={
-              <Stack direction="row" sx={{ gap: 2 }}>
-                <Button
-                  aria-label="update"
-                  color="inherit"
-                  endIcon={<OpenInNewIcon fontSize="inherit" />}
-                  component="a"
-                  target="_blank"
-                  href={DOCUMENTATION_URL}
-                >
-                  Update
-                </Button>
-                <Button
-                  aria-label="view changelog"
-                  color="inherit"
-                  endIcon={<OpenInNewIcon fontSize="inherit" />}
-                  component="a"
-                  target="_blank"
-                  href={latestRelease.url}
-                >
-                  View changelog
-                </Button>
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={handleDismissClick}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              </Stack>
-            }
-            severity="info"
-          >
-            A new version <strong>{latestRelease.tag}</strong> of Toolpad is available.
-          </Alert>
-        </Collapse>
-      ) : null}
-    </React.Fragment>
-  );
-}
-
 export interface HeaderProps {
   actions?: React.ReactNode;
   status?: React.ReactNode;
@@ -256,7 +186,6 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
     <ToolpadShellRoot>
       <Header {...props} />
       <ViewPort>{children}</ViewPort>
-      <UpdateBanner />
     </ToolpadShellRoot>
   );
 }

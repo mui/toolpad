@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.0.19
+
+<!-- generated comparing v0.0.18..master -->
+
+_Sep 21, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+A big improvement to the documentation, the ability to use templates to create a new app and the beginning of some UI improvements to the app.
+
+- &#8203;<!-- 14 -->Improve update notifications (#1006) @bharatkashyap
+- &#8203;<!-- 13 -->Prebuilt app templates (#926) @apedroferreira
+- &#8203;<!-- 12 -->Editor integration tests (#831) @apedroferreira
+- &#8203;<!-- 11 -->Header layout towards UI revamp (#986) @Janpot
+- &#8203;<!-- 10 -->Add instruction for testing a random commit on master (#1004) @Janpot
+- &#8203;<!-- 09 -->Self-document integration test mode (#995) @Janpot
+- &#8203;<!-- 08 -->[core] Fix scroll restoration in the docs (#866) @oliviertassinari
+- &#8203;<!-- 07 -->[core] Fix markdown format (#889) @oliviertassinari
+- &#8203;<!-- 06 -->[Docs] Fix self host url (#1033) @bytasv
+- &#8203;<!-- 05 -->[Docs] Documentation docker (#1030) @bytasv
+- &#8203;<!-- 04 -->[docs] Link the docs in the README.md (#1012) @oliviertassinari
+- &#8203;<!-- 03 -->[docs] Add Building UI documentation (#1011) @bytasv
+- &#8203;<!-- 02 -->[docs] Toolpad docs part 1 (#859) @bytasv
+- &#8203;<!-- 01 -->[security] Improve the HTTP headers for security (#1013) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## v0.0.18
 
 <!-- generated comparing v0.0.17..master -->

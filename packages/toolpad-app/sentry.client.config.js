@@ -10,7 +10,6 @@ Sentry.init({
   enabled: process.env.NODE_ENV === 'production' && !!process.env.TOOLPAD_DEMO,
   dsn: SENTRY_DSN,
   tracesSampleRate: 0.1,
-  debug: true,
   // ...
   // Note: if you want to override the automatic release value, do not set a
   // `release` value here - use the environment variable `SENTRY_RELEASE`, so

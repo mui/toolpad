@@ -219,6 +219,8 @@ const DEFAULT_ROWS: GridRowsProp = [
   { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
 ];
 
+const EMPTY_ROWS: GridRowsProp = [];
+
 interface Selection {
   id?: any;
 }
@@ -292,12 +294,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
   React.useEffect(() => handleColumnOrderChange.clear(), [handleColumnOrderChange]);
 
-  const rowsInput = rowsProp || DEFAULT_ROWS;
+  const rowsInput = rowsProp || EMPTY_ROWS;
 
   const hasExplicitRowId: boolean = React.useMemo(() => {
     const hasRowIdField: boolean = !!(rowIdFieldProp && rowIdFieldProp !== 'id');
-    const parsedRows = rowsInput;
-    return parsedRows.length === 0 || hasRowIdField || !!parsedRows[0].id;
+    return rowsInput.length === 0 || hasRowIdField || !!rowsInput[0].id;
   }, [rowIdFieldProp, rowsInput]);
 
   const rows: GridRowsProp = React.useMemo(

@@ -12,8 +12,21 @@ export type SelectProps = TextFieldProps & {
 };
 
 const DEFAULT_OPTIONS = {
-  options: ['January', 'February', 'March', 'April', 'May', 'June'],
-  label: 'Months',
+  options: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ],
+  label: 'Month',
 };
 
 function Select({ options, value, defaultValue, fullWidth, sx, ...rest }: SelectProps) {

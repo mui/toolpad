@@ -12,7 +12,8 @@ export interface ImageProps {
   fit: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
 }
 
-const DEFAULT_IMG_SRC = 'https://mui.com/static/branding/mui-x/Mocktable-dark.png';
+const DEFAULT_IMG_SRC =
+  'https://images.unsplash.com/photo-1663436031310-f40198ba736e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80';
 
 function Image({ sx: sxProp, src, width, height, alt, loading: loadingProp, fit }: ImageProps) {
   const sx: SxProps = React.useMemo(

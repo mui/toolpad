@@ -36,6 +36,7 @@ function parseBuidEnvVars(env) {
     TOOLPAD_DEMO: env.TOOLPAD_DEMO || '',
     TOOLPAD_VERSION: pkgJson.version,
     TOOLPAD_BUILD: env.GIT_SHA1?.slice(0, 7) || 'dev',
+    IS_SENTRY_ENABLED: env.IS_SENTRY_ENABLED || false,
     SENTRY_DSN: env.SENTRY_DSN || '',
   };
 }
@@ -90,7 +91,7 @@ const sentryWebpackPluginOptions = {
 
   silent: true, // Suppresses all logs
 
-  dryRun: !process.env.IS_SENTRY_ENABLED,
+  dryRun: process.env.NODE_ENV !== 'production' || !process.env.IS_SENTRY_ENABLED,
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };

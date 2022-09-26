@@ -25,14 +25,12 @@ import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
 export type BuildEnvVars = Record<
   // Identifier for the product line (CE, EE, Cloud, ...)
   | 'TOOLPAD_TARGET'
-  // Whether Toolpad is running in Ddemo mode
+  // Whether Toolpad is running in demo mode
   | 'TOOLPAD_DEMO'
   // The current Toolpad version
   | 'TOOLPAD_VERSION'
   // The current Toolpad build number
-  | 'TOOLPAD_BUILD'
-  | 'IS_SENTRY_ENABLED'
-  | 'SENTRY_DSN',
+  | 'TOOLPAD_BUILD',
   string
 >;
 
@@ -42,6 +40,8 @@ export interface RuntimeConfig {
   // Enable input field for seeding a dom in the app creation dialog
   // (For testing purposes)
   enableCreateByDom?: boolean;
+  // Sentry DSN
+  sentryDsn?: string;
 }
 
 declare global {
@@ -70,6 +70,7 @@ const runtimeConfig: RuntimeConfig =
     ? {
         // Define runtime config here
         enableCreateByDom: !!process.env.TOOLPAD_ENABLE_CREATE_BY_DOM,
+        sentryDsn: process.env.TOOLPAD_SENTRY_DSN,
       }
     : getBrowsersideRuntimeConfig();
 

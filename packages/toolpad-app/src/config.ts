@@ -40,6 +40,8 @@ export interface RuntimeConfig {
   // Enable input field for seeding a dom in the app creation dialog
   // (For testing purposes)
   enableCreateByDom?: boolean;
+  // Google reCAPTCHA site key
+  recaptchaSiteKey?: string;
 }
 
 declare global {
@@ -68,6 +70,7 @@ const runtimeConfig: RuntimeConfig =
     ? {
         // Define runtime config here
         enableCreateByDom: !!process.env.TOOLPAD_ENABLE_CREATE_BY_DOM,
+        recaptchaSiteKey: process.env.TOOLPAD_RECAPTCHA_SITE_KEY,
       }
     : getBrowsersideRuntimeConfig();
 

@@ -11,6 +11,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Link,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -51,6 +52,7 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
+import { getRecaptchaToken } from '../../utils/recaptchaV3';
 
 export const APP_TEMPLATE_OPTIONS = {
   blank: {
@@ -99,8 +101,13 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     <React.Fragment>
       <Dialog {...props} onClose={onClose}>
         <DialogForm
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
+
+            let recaptchaToken;
+            if (config.recaptchaSiteKey) {
+              recaptchaToken = await getRecaptchaToken(config.recaptchaSiteKey);
+            }
 
             const appDom = dom.trim() ? JSON.parse(dom) : null;
             createAppMutation.mutate([
@@ -111,6 +118,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                     ? { kind: 'dom', dom: appDom }
                     : { kind: 'template', id: appTemplateId }),
                 },
+                recaptchaToken,
               },
             ]);
           }}
@@ -124,7 +132,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               label="Name"
               value={name}
               error={createAppMutation.isError}
-              helperText={createAppMutation.isError ? `An app named "${name}" already exists` : ''}
+              helperText={(createAppMutation.error as Error)?.message || ''}
               onChange={(event) => {
                 createAppMutation.reset();
                 setName(event.target.value);
@@ -159,6 +167,19 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 value={dom}
                 onChange={handleDomChange}
               />
+            ) : null}
+            {config.recaptchaSiteKey ? (
+              <Typography variant="caption" color="text.secondary">
+                This site is protected by reCAPTCHA and the Google{' '}
+                <Link href="https://policies.google.com/privacy" underline="none" target="_blank">
+                  Privacy Policy
+                </Link>{' '}
+                and{' '}
+                <Link href="https://policies.google.com/terms" underline="none" target="_blank">
+                  Terms of Service
+                </Link>{' '}
+                apply.
+              </Typography>
             ) : null}
           </DialogContent>
           <DialogActions>

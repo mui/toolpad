@@ -1,6 +1,7 @@
 import type { NextWebVitalsMetric } from 'next/app';
+import config from '../config';
 
-export const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+export const GA_ID = config.gaId;
 
 export const setGAPage = (pagePath: string): void => {
   window.gtag('config', GA_ID!, { page_path: pagePath });

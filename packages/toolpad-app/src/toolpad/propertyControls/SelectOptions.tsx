@@ -30,6 +30,7 @@ function SelectOptionsPropEditor({
   const [editOptionsDialogOpen, setEditOptionsDialogOpen] = React.useState(false);
   const optionInputRef = React.useRef<HTMLInputElement | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
+  const [optionTextInputInvalid, setOptionTextInputInvalid] = React.useState(false);
 
   const editingOption: SelectOption | null = React.useMemo(() => {
     if (typeof editingIndex === 'number') {
@@ -48,11 +49,18 @@ function SelectOptionsPropEditor({
   const handleOptionTextInput = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (event.key === 'Enter') {
-        onChange([...value, (event.target as HTMLInputElement).value]);
+        const inputText = (event.target as HTMLInputElement).value;
+        if (!inputText) {
+          setOptionTextInputInvalid(true);
+          return;
+        }
 
+        onChange([...value, (event.target as HTMLInputElement).value]);
         if (optionInputRef.current) {
           optionInputRef.current.value = '';
         }
+      } else {
+        setOptionTextInputInvalid(false);
       }
     },
     [onChange, value],
@@ -79,7 +87,12 @@ function SelectOptionsPropEditor({
 
   const handleOptionChange = React.useCallback(
     (newValue: SelectOption) => {
-      onChange(value.map((option, i) => (i === editingIndex ? newValue : option)));
+      let newOption: string | SelectOption = newValue;
+      setOptionTextInputInvalid(Boolean(!newValue.value));
+      if (!newValue.label) {
+        newOption = newValue.value;
+      }
+      onChange(value.map((option, i) => (i === editingIndex ? newOption : option)));
     },
     [editingIndex, onChange, value],
   );
@@ -107,7 +120,11 @@ function SelectOptionsPropEditor({
         {editingOption ? (
           <React.Fragment>
             <DialogTitle>
-              <IconButton aria-label="Back" onClick={() => setEditingIndex(null)}>
+              <IconButton
+                aria-label="Back"
+                onClick={() => setEditingIndex(null)}
+                disabled={optionTextInputInvalid}
+              >
                 <ArrowBackIcon />
               </IconButton>
               Edit option &ldquo;{editingOption.value}&rdquo;
@@ -120,6 +137,8 @@ function SelectOptionsPropEditor({
                   onChange={(event) => {
                     handleOptionChange({ ...editingOption, value: event.target.value });
                   }}
+                  error={optionTextInputInvalid}
+                  helperText={optionTextInputInvalid ? 'Option cannot be empty' : null}
                 />
                 <TextField
                   label="Label"
@@ -194,13 +213,27 @@ function SelectOptionsPropEditor({
                 inputRef={optionInputRef}
                 onKeyUp={handleOptionTextInput}
                 label="Add option"
-                helperText="Press &ldquo;Enter&rdquo; / &ldquo;Return&rdquo; to add"
+                error={optionTextInputInvalid}
+                helperText={
+                  optionTextInputInvalid ? (
+                    'Option cannot be empty'
+                  ) : (
+                    <span>
+                      Press <kbd>Enter</kbd> or <kbd>Return</kbd> to add
+                    </span>
+                  )
+                }
               />
             </DialogContent>
           </React.Fragment>
         )}
         <DialogActions>
-          <Button color="inherit" variant="text" onClick={handleEditOptionsDialogClose}>
+          <Button
+            color="inherit"
+            variant="text"
+            onClick={handleEditOptionsDialogClose}
+            disabled={optionTextInputInvalid}
+          >
             Close
           </Button>
         </DialogActions>

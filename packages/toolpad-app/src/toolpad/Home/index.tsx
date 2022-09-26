@@ -171,11 +171,21 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             {config.recaptchaSiteKey ? (
               <Typography variant="caption" color="text.secondary">
                 This site is protected by reCAPTCHA and the Google{' '}
-                <Link href="https://policies.google.com/privacy" underline="none" target="_blank">
+                <Link
+                  href="https://policies.google.com/privacy"
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Privacy Policy
                 </Link>{' '}
                 and{' '}
-                <Link href="https://policies.google.com/terms" underline="none" target="_blank">
+                <Link
+                  href="https://policies.google.com/terms"
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Terms of Service
                 </Link>{' '}
                 apply.

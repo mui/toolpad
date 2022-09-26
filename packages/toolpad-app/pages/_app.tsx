@@ -42,11 +42,13 @@ export default function MyApp(props: MyAppProps) {
         </QueryClientProvider>
       </CacheProvider>
       {/* Google reCAPTCHA */}
-      <Script
-        async
-        strategy="afterInteractive"
-        src={`https://www.google.com/recaptcha/api.js?render=${config.recaptchaSiteKey}`}
-      />
+      {config.recaptchaSiteKey ? (
+        <Script
+          async
+          strategy="afterInteractive"
+          src={`https://www.google.com/recaptcha/api.js?render=${config.recaptchaSiteKey}`}
+        />
+      ) : null}
     </React.Fragment>
   );
 }

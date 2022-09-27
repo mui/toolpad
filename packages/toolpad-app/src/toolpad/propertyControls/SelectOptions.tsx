@@ -80,6 +80,7 @@ function SelectOptionsPropEditor({
 
   const handleOptionItemClick = React.useCallback(
     (index: number) => () => {
+      setOptionTextInputInvalid(false);
       setEditingIndex(index);
     },
     [],
@@ -108,14 +109,21 @@ function SelectOptionsPropEditor({
         variant="outlined"
         color="inherit"
         fullWidth
-        onClick={() => setEditOptionsDialogOpen(true)}
+        onClick={() => {
+          setEditOptionsDialogOpen(true);
+        }}
       >
         {label}
       </Button>
       <Dialog
         fullWidth
         open={editOptionsDialogOpen}
-        onClose={() => setEditOptionsDialogOpen(false)}
+        onClose={() => {
+          if (optionTextInputInvalid) {
+            return;
+          }
+          setEditOptionsDialogOpen(false);
+        }}
       >
         {editingOption ? (
           <React.Fragment>

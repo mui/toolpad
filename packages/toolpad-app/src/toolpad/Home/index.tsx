@@ -136,7 +136,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               label="Name"
               value={name}
               error={createAppMutation.isError}
-              helperText={createAppMutation.isError ? `An app named "${name}" already exists` : ''}
+              helperText={(createAppMutation.error as Error)?.message || ''}
               onChange={(event) => {
                 createAppMutation.reset();
                 setName(event.target.value);

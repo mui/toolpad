@@ -16,13 +16,14 @@ export const validateRecaptchaToken = async (
     secret: secretKey,
     response: token,
   });
+  const siteVerifyUrlWithParams = `${SITE_VERIFY_URL}?${recaptchaParams}`;
 
-  const recaptchaResponse = await fetch(`${SITE_VERIFY_URL}?${recaptchaParams}`, {
+  const recaptchaResponse = await fetch(siteVerifyUrlWithParams, {
     method: 'POST',
   });
-  const recaptchaReponseJson = await recaptchaResponse.json();
 
-  if (!recaptchaReponseJson.success || recaptchaReponseJson.score < SCORE_THRESHOLD) {
+  const { success, score } = await recaptchaResponse.json();
+  if (!success || score < SCORE_THRESHOLD) {
     return false;
   }
 

@@ -10,7 +10,7 @@ import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
-import { validateRecaptchaToken } from '../utils/recaptchaV3';
+import { validateRecaptchaToken } from '../utils/recaptcha';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -201,7 +201,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     );
 
     if (!isRecaptchaTokenValid) {
-      throw new Error('Access denied. Unable to create app.');
+      throw new Error('Unable to verify CAPTCHA.');
     }
   }
 

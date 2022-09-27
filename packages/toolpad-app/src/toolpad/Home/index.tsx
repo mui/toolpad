@@ -52,7 +52,7 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
-import { getRecaptchaToken } from '../../utils/recaptchaV3';
+import { getRecaptchaToken } from '../../utils/recaptcha';
 
 export const APP_TEMPLATE_OPTIONS = {
   blank: {

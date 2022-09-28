@@ -10,6 +10,7 @@ import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
+import { validateRecaptchaToken } from '../utils/recaptcha';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -190,10 +191,23 @@ export type CreateAppOptions = {
         kind: 'template';
         id: AppTemplateId;
       };
+  recaptchaToken?: string;
 };
 
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
   const { from } = opts;
+
+  const recaptchaSecretKey = process.env.TOOLPAD_RECAPTCHA_SECRET_KEY;
+  if (recaptchaSecretKey) {
+    const isRecaptchaTokenValid = await validateRecaptchaToken(
+      recaptchaSecretKey,
+      opts.recaptchaToken || '',
+    );
+
+    if (!isRecaptchaTokenValid) {
+      throw new Error('Unable to verify CAPTCHA.');
+    }
+  }
 
   let appName = name.trim();
 

@@ -7,7 +7,6 @@ const config: PlaywrightTestConfig = {
   use: {
     trace: 'on-first-retry',
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000/',
-    deviceScaleFactor: 2,
   },
   globalSetup: '../playwright/global-setup',
   globalTeardown: '../playwright/global-teardown',

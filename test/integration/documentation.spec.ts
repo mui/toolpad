@@ -2,6 +2,10 @@ import { ToolpadHome } from '../models/ToolpadHome';
 import { ToolpadEditor } from '../models/ToolpadEditor';
 import { test, expect } from '../playwright/test';
 
+test.use({
+  deviceScaleFactor: 2,
+});
+
 test.only('documentation happy path', async ({ page, browserName }) => {
   test.skip(browserName === 'firefox', 'Not needed');
 
@@ -13,7 +17,6 @@ test.only('documentation happy path', async ({ page, browserName }) => {
   await page.screenshot({
     path: 'playwright-screenshots/apps-list.png',
     fullPage: true,
-    scale: 'device',
   });
 
   const app = await homeModel.createApplication({ name: 'New application' });
@@ -27,7 +30,6 @@ test.only('documentation happy path', async ({ page, browserName }) => {
   await page.screenshot({
     path: 'playwright-screenshots/app.png',
     fullPage: true,
-    scale: 'device',
   });
 
   await page.locator('text=Add query').click();
@@ -37,6 +39,5 @@ test.only('documentation happy path', async ({ page, browserName }) => {
   await dialog.screenshot({
     path: 'playwright-screenshots/add-query.png',
     animations: 'disabled',
-    scale: 'device',
   });
 });

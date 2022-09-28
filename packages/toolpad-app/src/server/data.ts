@@ -141,6 +141,10 @@ async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
 }
 
 export async function getApps(): Promise<AppMeta[]> {
+  if (process.env.TOOLPAD_DEMO) {
+    return [];
+  }
+
   return prismaClient.app.findMany({
     orderBy: {
       editedAt: 'desc',
@@ -205,13 +209,26 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     }
   }
 
-  if (await prismaClient.app.findUnique({ where: { name } })) {
+  let appName = name.trim();
+
+  if (process.env.TOOLPAD_DEMO) {
+    appName = appName.replace(/\(#[0-9]+\)/g, '').trim();
+
+    const sameNameAppCount = await prismaClient.app.count({
+      where: { OR: [{ name: appName }, { name: { startsWith: `${appName} (#`, endsWith: ')' } }] },
+    });
+    if (sameNameAppCount > 0) {
+      appName = `${appName} (#${sameNameAppCount + 1})`;
+    }
+  }
+
+  if (await prismaClient.app.findUnique({ where: { name: appName } })) {
     throw new Error(`An app named "${name}" already exists.`);
   }
 
   return prismaClient.$transaction(async () => {
     const app = await prismaClient.app.create({
-      data: { name },
+      data: { name: appName },
     });
 
     let dom: appDom.AppDom | null = null;

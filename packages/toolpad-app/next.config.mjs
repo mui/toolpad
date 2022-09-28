@@ -167,6 +167,6 @@ export default /** @type {import('next').NextConfig} */ ({
         source: '/:path*',
         headers: securityHeaders,
       },
-    ]
+    ];
   },
 });

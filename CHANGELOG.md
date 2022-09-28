@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.0.20
+
+<!-- generated comparing v0.0.19..master -->
+
+_Sep 28, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Add default data to DataGrid, Image and Select components, add optional Google Analytics integration and improve Windows compatibility.
+
+- &#8203;<!-- 4 -->Add Google Analytics (#1049) @apedroferreira
+- &#8203;<!-- 3 -->[core] Add default data to DataGrid, Image, Select components (#1048) @bharatkashyap
+- &#8203;<!-- 2 -->[core] Improve Windows compatibility (#1042) @oliviertassinari
+- &#8203;<!-- 1 -->[Docs] Disable todo pages in docs (#1053) @bytasv
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @oliviertassinari
+
 ## v0.0.19
 
 <!-- generated comparing v0.0.18..master -->

@@ -43,7 +43,7 @@ export default function Devtools({ sx, log, onLogClear, har, onHarClear }: Devto
       case 'network':
         return harLength > 0;
       default:
-        throw new Error(`Missing swotch case ${activeTab}`);
+        throw new Error(`Missing switch case ${activeTab}`);
     }
   }, [activeTab, harLength, logLength]);
 
@@ -54,7 +54,7 @@ export default function Devtools({ sx, log, onLogClear, har, onHarClear }: Devto
       case 'network':
         return onHarClear?.();
       default:
-        throw new Error(`Missing swotch case ${activeTab}`);
+        throw new Error(`Missing switch case ${activeTab}`);
     }
   }, [activeTab, onHarClear, onLogClear]);
 

@@ -1,21 +1,26 @@
-import { Button, MenuItem, Stack, TextField, Toolbar } from '@mui/material';
+import { Box, Button, MenuItem, Stack, TextField, Toolbar } from '@mui/material';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
+import { LoadingButton } from '@mui/lab';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import data from '../../../movies.json';
+import JsonView from '../../components/JsonView';
+import SplitPane from '../../components/SplitPane';
+import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
-import { isSaveDisabled, validation } from '../../utils/forms';
 import { Maybe } from '../../utils/types';
+import useQueryPreview from '../useQueryPreview';
 import { MoviesQuery, MoviesConnectionParams } from './types';
+import { FetchResult } from '../rest/types';
 
 function withDefaults(value: Maybe<MoviesConnectionParams>): MoviesConnectionParams {
   return {
-    apiKey: '',
     ...value,
   };
 }
 
 function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<MoviesConnectionParams>) {
-  const { handleSubmit, register, formState, reset } = useForm({
+  const { handleSubmit, reset, formState } = useForm({
     defaultValues: withDefaults(value),
   });
   React.useEffect(() => reset(withDefaults(value)), [reset, value]);
@@ -24,13 +29,8 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<Movies
 
   return (
     <Stack direction="column" gap={1}>
-      <TextField
-        label="API key"
-        {...register('apiKey', { required: true })}
-        {...validation(formState, 'apiKey')}
-      />
       <Toolbar disableGutters>
-        <Button variant="contained" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
+        <Button variant="contained" onClick={doSubmit} disabled={!formState.isValid}>
           Save
         </Button>
       </Toolbar>
@@ -53,6 +53,10 @@ export function QueryEditor({
     }));
   }, []);
 
+  const { preview, runPreview: handleRunPreview } = useQueryPreview<MoviesQuery, FetchResult>({
+    genre: value.query.genre,
+  });
+
   const lastSavedInput = React.useRef(input);
   const handleCommit = React.useCallback(() => {
     onChange(input);
@@ -64,22 +68,36 @@ export function QueryEditor({
 
   return (
     <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
-      <Stack>
-        <TextField
-          select
-          fullWidth
-          value={value.query.genre || ''}
-          label="Genre"
-          onChange={handleChange}
-        >
-          <MenuItem value={''}>Any</MenuItem>
-          {data.genres.map((genre) => (
-            <MenuItem key={genre} value={genre}>
-              {genre}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Stack>
+      <SplitPane split="vertical" size="50%" allowResize>
+        <Box sx={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+          <Toolbar>
+            <LoadingButton startIcon={<PlayArrowIcon />} onClick={handleRunPreview}>
+              Preview
+            </LoadingButton>
+          </Toolbar>
+          <Box sx={{ px: 3, pt: 1 }}>
+            <TextField
+              select
+              fullWidth
+              value={input.query.genre || 'any'}
+              label="Genre"
+              onChange={handleChange}
+            >
+              <MenuItem value={'any'}>Any</MenuItem>
+              {data.genres.map((genre) => (
+                <MenuItem key={genre} value={genre}>
+                  {genre}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+        </Box>
+        {preview?.error ? (
+          <ErrorAlert error={preview?.error} />
+        ) : (
+          <JsonView sx={{ height: '100%' }} src={preview?.data} />
+        )}
+      </SplitPane>
     </QueryEditorShell>
   );
 }

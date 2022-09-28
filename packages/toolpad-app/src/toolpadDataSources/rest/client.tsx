@@ -46,6 +46,7 @@ import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import QueryInputPanel from '../QueryInputPanel';
+import DEMO_BASE_URLS from './demoBaseUrls';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -113,27 +114,41 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
 
   const headersAllowed = !!baseUrlValue;
 
+  const baseUrlInputProps = {
+    label: 'base url',
+    ...register('baseUrl', {
+      validate(input?: string) {
+        if (!input) {
+          if (mustHaveBaseUrl) {
+            return 'A base url is required when headers are used';
+          }
+          return true;
+        }
+        try {
+          return !!parseBaseUrl(input);
+        } catch (error) {
+          return 'Must be an absolute url';
+        }
+      },
+    }),
+    ...validation(formState, 'baseUrl'),
+  };
+
+  const isDemo = !!process.env.TOOLPAD_DEMO;
+
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
-      <TextField
-        label="base url"
-        {...register('baseUrl', {
-          validate(input?: string) {
-            if (!input) {
-              if (mustHaveBaseUrl) {
-                return 'A base url is required when headers are used';
-              }
-              return true;
-            }
-            try {
-              return !!parseBaseUrl(input);
-            } catch (error) {
-              return 'Must be an absolute url';
-            }
-          },
-        })}
-        {...validation(formState, 'baseUrl')}
-      />
+      {isDemo ? (
+        <TextField select {...baseUrlInputProps} defaultValue="">
+          {DEMO_BASE_URLS.map(({ url, name }) => (
+            <MenuItem key={url} value={url}>
+              {url} ({name})
+            </MenuItem>
+          ))}
+        </TextField>
+      ) : (
+        <TextField {...baseUrlInputProps} />
+      )}
       <Typography>Headers:</Typography>
       <Controller
         name="headers"
@@ -143,7 +158,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
           return (
             <MapEntriesEditor
               {...field}
-              disabled={!headersAllowed}
+              disabled={!headersAllowed || isDemo}
               fieldLabel="header"
               value={allHeaders}
               onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
@@ -157,7 +172,11 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         name="authentication"
         control={control}
         render={({ field: { value: fieldValue, ref, ...field } }) => (
-          <AuthenticationEditor {...field} disabled={!headersAllowed} value={fieldValue ?? null} />
+          <AuthenticationEditor
+            {...field}
+            disabled={!headersAllowed || isDemo}
+            value={fieldValue ?? null}
+          />
         )}
       />
 
@@ -308,6 +327,8 @@ function QueryEditor({
     [],
   );
 
+  const isDemo = !!process.env.TOOLPAD_DEMO;
+
   return (
     <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
       <SplitPane split="vertical" size="50%" allowResize>
@@ -316,7 +337,12 @@ function QueryEditor({
             <Stack gap={2} sx={{ px: 3, pt: 1 }}>
               <Typography>Query</Typography>
               <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-                <TextField select value={input.query.method || 'GET'} onChange={handleMethodChange}>
+                <TextField
+                  select
+                  value={isDemo ? 'GET' : input.query.method || 'GET'}
+                  onChange={handleMethodChange}
+                  disabled={isDemo}
+                >
                   {HTTP_METHODS.map((method) => (
                     <MenuItem key={method} value={method}>
                       {method}
@@ -340,9 +366,9 @@ function QueryEditor({
                   <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                       <Tab label="URL query" value="urlQuery" />
-                      <Tab label="Body" value="body" />
-                      <Tab label="Headers" value="headers" />
-                      <Tab label="Response" value="response" />
+                      <Tab label="Body" value="body" disabled={isDemo} />
+                      <Tab label="Headers" value="headers" disabled={isDemo} />
+                      <Tab label="Response" value="response" disabled={isDemo} />
                       <Tab label="Transform" value="transform" />
                     </TabList>
                   </Box>

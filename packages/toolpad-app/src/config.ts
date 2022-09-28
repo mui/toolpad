@@ -25,7 +25,7 @@ import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
 export type BuildEnvVars = Record<
   // Identifier for the product line (CE, EE, Cloud, ...)
   | 'TOOLPAD_TARGET'
-  // Whether Toolpad is running in Ddemo mode
+  // Whether Toolpad is running in demo mode
   | 'TOOLPAD_DEMO'
   // The current Toolpad version
   | 'TOOLPAD_VERSION'

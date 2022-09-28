@@ -280,7 +280,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
               parentParentParent &&
               appDom.isElement(parentParentParent) &&
               isParentOnlyLayoutContainerChild &&
-              moveTargetNodeId !== parentParent.id
+              moveTargetNodeId !== parentParent.id &&
+              moveTargetNodeId !== lastContainerChild.id
             ) {
               domApi.moveNode(
                 lastContainerChild,

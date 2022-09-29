@@ -57,7 +57,7 @@ function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId
 
 const withReqResLogs =
   (apiHandler: NextApiHandler) =>
-  async (req: NextApiRequest, res: NextApiResponse): Promise<unknown> => {
+  (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
     const requestId = uuidv4();
 
     logger.info(`API logs: request (${getLogMessageInfo(req)})`, {

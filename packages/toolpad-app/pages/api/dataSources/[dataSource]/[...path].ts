@@ -2,13 +2,14 @@ import { NextApiHandler } from 'next';
 import { asArray } from '../../../../src/utils/collections';
 import serverDataSources from '../../../../src/toolpadDataSources/server';
 import { getConnectionParams, setConnectionParams } from '../../../../src/server/data';
+import withReqResLogs from '../../../../src/server/withReqResLogs';
 
 const handlerMap = new Map<String, Function | null | undefined>();
 Object.keys(serverDataSources).forEach((dataSource) => {
   handlerMap.set(dataSource, serverDataSources[dataSource]?.createHandler?.());
 });
 
-export default (async (req, res) => {
+const apiHandler = (async (req, res) => {
   if (req.method === 'GET') {
     const [dataSource] = asArray(req.query.dataSource);
     if (!dataSource) {
@@ -30,3 +31,5 @@ export default (async (req, res) => {
   // Handle any other HTTP method
   return res.status(405).json({ message: 'Method not supported' });
 }) as NextApiHandler;
+
+export default withReqResLogs(apiHandler);

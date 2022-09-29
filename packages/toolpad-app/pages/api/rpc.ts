@@ -23,6 +23,7 @@ import {
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
+import withReqResLogs from '../../src/server/withReqResLogs';
 
 interface RpcContext {
   req: IncomingMessage;
@@ -176,4 +177,4 @@ const rpcServer = {
 
 export type ServerDefinition = MethodsOf<typeof rpcServer>;
 
-export default createRpcHandler(rpcServer);
+export default withReqResLogs(createRpcHandler(rpcServer));

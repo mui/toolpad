@@ -68,9 +68,7 @@ const withReqResLogs =
 
     logRequestResponse(req, res, requestId);
 
-    const result = await apiHandler(req, res);
-
-    return result;
+    return apiHandler(req, res);
   };
 
 export default withReqResLogs;

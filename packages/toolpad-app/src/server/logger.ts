@@ -17,7 +17,6 @@ if (process.env.NODE_ENV !== 'production') {
         winston.format.colorize(),
         winston.format.timestamp(),
         winston.format.splat(),
-        winston.format.errors(),
         winston.format.printf(({ timestamp, level, message, ...rest }) => {
           let restString = JSON.stringify(rest, undefined, 2);
           restString = restString === '{}' ? '' : restString;

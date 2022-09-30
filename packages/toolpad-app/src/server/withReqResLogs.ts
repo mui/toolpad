@@ -3,7 +3,8 @@ import { uuidv4 } from '../utils/uuid';
 import logger from './logger';
 
 function getLogMessageInfo(req: NextApiRequest) {
-  return `${req.body.type}:${req.body.name}`;
+  const { type, name } = req.body;
+  return type && name ? `${type}:${name}` : '';
 }
 
 function getBaseLogProperties(req: NextApiRequest) {
@@ -39,12 +40,15 @@ function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId
     if (restArgs[0]) {
       chunks.push(Buffer.from(restArgs[0]));
     }
-    const responseBody = Buffer.concat(chunks).toString('utf8');
+    // Omitting response from logs, but we could enable it later if it would be useful
+    // const responseBody = Buffer.concat(chunks).toString('utf8');
 
-    logger.info(`API logs: response (${getLogMessageInfo(req)})`, {
+    const logMessageInfo = getLogMessageInfo(req);
+
+    logger.info(`API logs: response${logMessageInfo ? `(${logMessageInfo})` : ''}`, {
       requestId,
       statusCode: res.statusCode,
-      response: responseBody,
+      // response: responseBody,
       ...getBaseLogProperties(req),
     });
 
@@ -60,9 +64,14 @@ const withReqResLogs =
   (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
     const requestId = uuidv4();
 
-    logger.info(`API logs: request (${getLogMessageInfo(req)})`, {
+    const logMessageInfo = getLogMessageInfo(req);
+
+    logger.info(`API logs: request${logMessageInfo ? `(${logMessageInfo})` : ''}`, {
       requestId,
-      params: req.body.params,
+      url: req.url,
+      method: req.method,
+      // Omitting request params, but we could enable them later if it would be useful
+      // params: req.body.params,
       ...getBaseLogProperties(req),
     });
 

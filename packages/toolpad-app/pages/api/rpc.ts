@@ -1,6 +1,7 @@
 import { NextApiHandler } from 'next';
 import type { IncomingMessage } from 'http';
 import superjson from 'superjson';
+import { withSentry } from '@sentry/nextjs';
 import {
   getApps,
   getApp,
@@ -24,6 +25,14 @@ import {
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 import withReqResLogs from '../../src/server/withReqResLogs';
+
+export const config = {
+  api: {
+    // Supresses false positive nextjs warning "API resolved without sending a response" caused by Sentry
+    // Sentry should fix this eventually: https://github.com/getsentry/sentry-javascript/issues/3852
+    externalResolver: true,
+  },
+};
 
 interface RpcContext {
   req: IncomingMessage;
@@ -177,4 +186,4 @@ const rpcServer = {
 
 export type ServerDefinition = MethodsOf<typeof rpcServer>;
 
-export default withReqResLogs(createRpcHandler(rpcServer));
+export default withSentry(withReqResLogs(createRpcHandler(rpcServer)));

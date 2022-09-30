@@ -1,7 +1,16 @@
 import { NextApiHandler } from 'next';
 import prettyBytes from 'pretty-bytes';
+import { withSentry } from '@sentry/nextjs';
 import withReqResLogs from '../../src/server/withReqResLogs';
 import { mapValues } from '../../src/utils/collections';
+
+export const config = {
+  api: {
+    // Supresses false positive nextjs warning "API resolved without sending a response" caused by Sentry
+    // Sentry should fix this eventually: https://github.com/getsentry/sentry-javascript/issues/3852
+    externalResolver: true,
+  },
+};
 
 interface HealthCheck {
   gitSha1: string | null;
@@ -20,4 +29,4 @@ const apiHandler = (async (req, res) => {
   });
 }) as NextApiHandler<HealthCheck>;
 
-export default withReqResLogs(apiHandler);
+export default withSentry(withReqResLogs(apiHandler));

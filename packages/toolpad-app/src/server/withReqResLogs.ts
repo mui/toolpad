@@ -40,7 +40,7 @@ function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId
     if (restArgs[0]) {
       chunks.push(Buffer.from(restArgs[0]));
     }
-    // Omitting response from logs, but we could enable it later if it would be useful
+    // Omitting response from logs, but we could enable it if it would be useful
     // const responseBody = Buffer.concat(chunks).toString('utf8');
 
     const logMessageInfo = getLogMessageInfo(req);
@@ -70,7 +70,7 @@ const withReqResLogs =
       requestId,
       url: req.url,
       method: req.method,
-      // Omitting request params, but we could enable them later if it would be useful
+      // Omitting request params, but we could enable them if it would be useful
       // params: req.body.params,
       ...getBaseLogProperties(req),
     });

@@ -60,7 +60,7 @@
     "lodash": "^4.17.21",
     "lz-string": "^1.4.4",
     "markdown-to-jsx": "^7.1.7",
-    "marked": "^4.0.17",
+    "marked": "^4.1.1",
     "next": "^12.3.0",
     "next-transpile-modules": "^9.0.0",
     "nprogress": "^0.2.0",

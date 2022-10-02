@@ -21,11 +21,15 @@ services:
           name: toolpad-db
           property: connectionString
       - fromGroup: toolpad-settings
+    ignoredPaths:
+     - docs/**
 
 databases:
   - name: toolpad-db
     ipAllowList: []
     plan: starter
+    ignoredPaths:
+     - docs/**
 
 envVarGroups:
   - name: toolpad-settings

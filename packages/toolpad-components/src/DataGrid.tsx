@@ -359,7 +359,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   return (
-    <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
+    <div
+      ref={ref}
+      style={{ height: heightProp, minHeight: '100%', width: '100%', colorScheme: 'auto' }}
+    >
       <DataGridPro
         apiRef={apiRef}
         components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}

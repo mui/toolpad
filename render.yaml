@@ -21,6 +21,10 @@ services:
           name: toolpad-db
           property: connectionString
       - fromGroup: toolpad-settings
+    buildFilter:
+      ignoredPaths:
+        - docs/**
+        - '**/*.spec.ts'
 
 databases:
   - name: toolpad-db

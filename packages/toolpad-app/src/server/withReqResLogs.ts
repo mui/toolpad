@@ -1,4 +1,5 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+import * as _ from 'lodash-es';
 import { uuidv4 } from '../utils/uuid';
 import logger from './logger';
 
@@ -70,7 +71,7 @@ const withReqResLogs =
       requestId,
       url: req.url,
       method: req.method,
-      query: req.query,
+      ...(!_.isEmpty(req.query) ? { query: req.query } : {}),
       // Omitting request params, but we could enable them if it would be useful
       // params: req.body.params,
       ...getBaseLogProperties(req),

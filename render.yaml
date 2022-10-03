@@ -28,8 +28,6 @@ databases:
   - name: toolpad-db
     ipAllowList: []
     plan: starter
-    ignoredPaths:
-     - docs/**
 
 envVarGroups:
   - name: toolpad-settings

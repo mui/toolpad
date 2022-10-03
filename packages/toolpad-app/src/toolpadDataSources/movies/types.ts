@@ -1,6 +1,4 @@
-export interface MoviesConnectionParams {
-  apiKey: string;
-}
+export interface MoviesConnectionParams {}
 
 export interface MoviesQuery {
   genre: string | null;

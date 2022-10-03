@@ -9,10 +9,12 @@ import Document, {
 } from 'next/document';
 import createEmotionServer from '@emotion/server/create-instance';
 import serializeJavascript from 'serialize-javascript';
+import Script from 'next/script';
 import theme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import config, { RuntimeConfig } from '../src/config';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
+import { GA_ID } from '../src/utils/ga';
 
 interface ToolpadDocumentProps {
   config: RuntimeConfig;
@@ -93,6 +95,27 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
               __html: `window[${JSON.stringify(
                 RUNTIME_CONFIG_WINDOW_PROPERTY,
               )}] = ${serializeJavascript(this.props.config, { ignoreFunction: true })}`,
+            }}
+          />
+
+          {/* Global site tag (gtag.js) - Google Analytics */}
+          <Script
+            async
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          />
+          <Script
+            id="gtag-init"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}', {
+              page_path: window.location.pathname,
+            });
+          `,
             }}
           />
         </Head>

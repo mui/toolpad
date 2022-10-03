@@ -11,6 +11,9 @@ services:
     healthCheckPath: /health-check
     plan: starter plus
     pullRequestPreviewsEnabled: true
+    buildFilter:
+      ignoredPaths:
+        - docs/**/*
     envVars:
       - key: NODE_VERSION
         value: '16.17.0'

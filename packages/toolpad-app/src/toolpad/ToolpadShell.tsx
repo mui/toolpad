@@ -10,6 +10,7 @@ import {
   Divider,
   ListItemText,
   Tooltip,
+  Chip,
   Link,
   useTheme,
 } from '@mui/material';
@@ -151,6 +152,9 @@ function Header({ actions, status }: HeaderProps) {
               </Box>
             </Link>
           </Tooltip>
+          {process.env.TOOLPAD_DEMO ? (
+            <Chip sx={{ ml: 2 }} label="Demo Version" color="primary" size="small" />
+          ) : null}
         </Box>
         <Box
           sx={{

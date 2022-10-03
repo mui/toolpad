@@ -280,7 +280,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
               parentParentParent &&
               appDom.isElement(parentParentParent) &&
               isParentOnlyLayoutContainerChild &&
-              moveTargetNodeId !== parentParent.id
+              moveTargetNodeId !== parentParent.id &&
+              moveTargetNodeId !== lastContainerChild.id
             ) {
               domApi.moveNode(
                 lastContainerChild,
@@ -1326,6 +1327,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
   return (
     <OverlayRoot
+      data-testid="page-overlay"
       ref={overlayRef}
       className={clsx({
         [overlayClasses.nodeDrag]: isDraggingOver,

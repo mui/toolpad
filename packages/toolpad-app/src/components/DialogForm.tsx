@@ -4,4 +4,5 @@ export default styled('form')({
   overflowY: 'auto',
   display: 'flex',
   flexDirection: 'column',
+  width: 400,
 });

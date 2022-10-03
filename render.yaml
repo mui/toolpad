@@ -21,6 +21,8 @@ services:
           name: toolpad-db
           property: connectionString
       - fromGroup: toolpad-settings
+    ignoredPaths:
+     - docs/**
 
 databases:
   - name: toolpad-db

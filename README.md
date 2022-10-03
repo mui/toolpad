@@ -39,7 +39,7 @@ docker-compose up -d
 
 ## Documentation
 
-Check out our [documentation](./docs).
+Check out our [documentation](https://mui.com/toolpad/getting-started/overview/).
 
 ## Contributing
 

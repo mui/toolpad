@@ -70,6 +70,7 @@ const withReqResLogs =
       requestId,
       url: req.url,
       method: req.method,
+      query: req.query,
       // Omitting request params, but we could enable them if it would be useful
       // params: req.body.params,
       ...getBaseLogProperties(req),

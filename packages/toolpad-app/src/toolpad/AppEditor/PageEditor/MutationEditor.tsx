@@ -384,9 +384,11 @@ export default function MutationEditor() {
 
   return (
     <Stack spacing={1} alignItems="start">
-      <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
-        Add mutation
-      </Button>
+      {!process.env.TOOLPAD_DEMO ? (
+        <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
+          Add mutation
+        </Button>
+      ) : null}
       <List>
         {mutations.map((mutationNode) => {
           return (

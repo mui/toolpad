@@ -28,7 +28,10 @@ test('duplicate app from home flow', async ({ page }) => {
   await expect(homeModel.getAppRow(`${app.name} (copy 2)`)).toBeVisible();
 
   const runtimeModel = new ToolpadRuntime(page);
+
   await runtimeModel.gotoPage(duplicateApp.id, 'Page 1');
+
   await page.locator('button:has-text("Page 2")').click();
+
   await expect(page.locator('button', { hasText: 'Page 1' })).toBeVisible();
 });

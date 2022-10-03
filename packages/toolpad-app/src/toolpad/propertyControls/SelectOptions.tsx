@@ -30,7 +30,6 @@ function SelectOptionsPropEditor({
   const [editOptionsDialogOpen, setEditOptionsDialogOpen] = React.useState(false);
   const optionInputRef = React.useRef<HTMLInputElement | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
-  const [optionTextInputInvalid, setOptionTextInputInvalid] = React.useState(false);
 
   const editingOption: SelectOption | null = React.useMemo(() => {
     if (typeof editingIndex === 'number') {
@@ -47,20 +46,14 @@ function SelectOptionsPropEditor({
   }, [editingIndex, value]);
 
   const handleOptionTextInput = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === 'Enter') {
         const inputText = (event.target as HTMLInputElement).value;
-        if (!inputText) {
-          setOptionTextInputInvalid(true);
-          return;
-        }
 
-        onChange([...value, (event.target as HTMLInputElement).value]);
+        onChange([...value, inputText]);
         if (optionInputRef.current) {
           optionInputRef.current.value = '';
         }
-      } else {
-        setOptionTextInputInvalid(false);
       }
     },
     [onChange, value],
@@ -80,18 +73,17 @@ function SelectOptionsPropEditor({
 
   const handleOptionItemClick = React.useCallback(
     (index: number) => () => {
-      setOptionTextInputInvalid(false);
       setEditingIndex(index);
     },
     [],
   );
 
   const handleOptionChange = React.useCallback(
-    (newValue: SelectOption) => {
-      let newOption: string | SelectOption = newValue;
-      setOptionTextInputInvalid(Boolean(!newValue.value));
-      if (!newValue.label) {
-        newOption = newValue.value;
+    (newOption: string | SelectOption) => {
+      if (typeof newOption === 'object') {
+        if (!newOption.label) {
+          newOption = newOption.value;
+        }
       }
       onChange(value.map((option, i) => (i === editingIndex ? newOption : option)));
     },
@@ -119,20 +111,13 @@ function SelectOptionsPropEditor({
         fullWidth
         open={editOptionsDialogOpen}
         onClose={() => {
-          if (optionTextInputInvalid) {
-            return;
-          }
           setEditOptionsDialogOpen(false);
         }}
       >
         {editingOption ? (
           <React.Fragment>
             <DialogTitle>
-              <IconButton
-                aria-label="Back"
-                onClick={() => setEditingIndex(null)}
-                disabled={optionTextInputInvalid}
-              >
+              <IconButton aria-label="Back" onClick={() => setEditingIndex(null)}>
                 <ArrowBackIcon />
               </IconButton>
               Edit option &ldquo;{editingOption.value}&rdquo;
@@ -145,8 +130,6 @@ function SelectOptionsPropEditor({
                   onChange={(event) => {
                     handleOptionChange({ ...editingOption, value: event.target.value });
                   }}
-                  error={optionTextInputInvalid}
-                  helperText={optionTextInputInvalid ? 'Option cannot be empty' : null}
                 />
                 <TextField
                   label="Label"
@@ -220,28 +203,18 @@ function SelectOptionsPropEditor({
                 variant="outlined"
                 inputRef={optionInputRef}
                 onKeyUp={handleOptionTextInput}
-                label="Add option"
-                error={optionTextInputInvalid}
+                label={'Add option'}
                 helperText={
-                  optionTextInputInvalid ? (
-                    'Option cannot be empty'
-                  ) : (
-                    <span>
-                      Press <kbd>Enter</kbd> or <kbd>Return</kbd> to add
-                    </span>
-                  )
+                  <span>
+                    Press <kbd>Enter</kbd> or <kbd>Return</kbd> to add
+                  </span>
                 }
               />
             </DialogContent>
           </React.Fragment>
         )}
         <DialogActions>
-          <Button
-            color="inherit"
-            variant="text"
-            onClick={handleEditOptionsDialogClose}
-            disabled={optionTextInputInvalid}
-          >
+          <Button color="inherit" variant="text" onClick={handleEditOptionsDialogClose}>
             Close
           </Button>
         </DialogActions>

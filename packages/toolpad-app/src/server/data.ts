@@ -11,6 +11,7 @@ import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from '../utils/recaptcha';
+import config from './config';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -197,7 +198,7 @@ export type CreateAppOptions = {
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
   const { from } = opts;
 
-  const recaptchaSecretKey = process.env.TOOLPAD_RECAPTCHA_SECRET_KEY;
+  const recaptchaSecretKey = config.recaptchaSecretKey;
   if (recaptchaSecretKey) {
     const isRecaptchaTokenValid = await validateRecaptchaToken(
       recaptchaSecretKey,

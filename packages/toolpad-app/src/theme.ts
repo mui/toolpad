@@ -719,5 +719,5 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
 }
 
 const darkTheme = createTheme(getDesignTokens('dark'));
-const toolpadTheme = deepmerge(darkTheme, getThemedComponents(darkTheme));
-export default toolpadTheme;
+const theme = deepmerge(darkTheme, getThemedComponents(darkTheme));
+export default theme;

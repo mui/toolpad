@@ -48,7 +48,7 @@
       "attributes": {
         "title": {
           "type": "const",
-          "value": "Page"
+          "value": "Page 1"
         },
         "parameters": {
           "type": "const",
@@ -65,7 +65,7 @@
       "props": {
         "content": {
           "type": "const",
-          "value": "Go to page 1"
+          "value": "Page 1"
         },
         "onClick": {
           "type": "navigationAction",
@@ -172,7 +172,7 @@
       "props": {
         "content": {
           "type": "const",
-          "value": "Go to Page 2"
+          "value": "Page 2"
         },
         "onClick": {
           "type": "navigationAction",
@@ -202,7 +202,7 @@
       "attributes": {
         "title": {
           "type": "const",
-          "value": "page 2"
+          "value": "Page 2"
         }
       },
       "parentProp": "pages",

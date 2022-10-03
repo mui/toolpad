@@ -24,6 +24,7 @@ services:
     buildFilter:
       ignoredPaths:
         - docs/**
+        - '**/*.spec.ts'
 
 databases:
   - name: toolpad-db

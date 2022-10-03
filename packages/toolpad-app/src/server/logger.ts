@@ -1,9 +1,10 @@
 import winston from 'winston';
+import config from './config';
 
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
-  silent: !process.env.TOOLPAD_API_LOGS_ENABLED,
+  silent: !config.apiLogsEnabled,
 });
 
 if (process.env.NODE_ENV !== 'production') {

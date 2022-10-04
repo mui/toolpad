@@ -703,7 +703,16 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const [pageBindings, setPageBindings] =
     React.useState<Record<string, ParsedBinding>>(parsedBindings);
 
+  const prevDom = React.useRef(dom);
   React.useEffect(() => {
+    if (dom === prevDom.current) {
+      // Ignore this effect if there are no dom updates.
+      // IMPORTANT!!! This assumes the `RenderedPage` component is remounted when the `nodeId` changes
+      //  <RenderedPage nodeId={someId} key={someId} />
+      return;
+    }
+    prevDom.current = dom;
+
     setPageBindings((existingBindings) => {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
@@ -728,7 +737,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       }
       return updated;
     });
-  }, [parsedBindings, controlled]);
+  }, [parsedBindings, controlled, dom]);
 
   const setControlledBinding = React.useCallback(
     (id: string, result: BindingEvaluationResult) => {
@@ -816,7 +825,14 @@ function RenderedPages({ dom }: RenderedPagesProps) {
         <Route
           key={page.id}
           path={`/pages/${page.id}`}
-          element={<RenderedPage nodeId={page.id} />}
+          element={
+            <RenderedPage
+              nodeId={page.id}
+              // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
+              // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+              key={page.id}
+            />
+          }
         />
       ))}
     </Routes>

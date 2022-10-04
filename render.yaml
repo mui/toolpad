@@ -27,10 +27,37 @@ services:
         - docs/**
         - '**/*.spec.ts'
 
+  - type: web
+    name: toolpad-demo
+    env: docker
+    branch: demo
+    dockerfilePath: ./docker/images/toolpad/Dockerfile
+    dockerContext: ./
+    healthCheckPath: /health-check
+    plan: free
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: NODE_VERSION
+        value: '16.17.0'
+      - key: TOOLPAD_DATABASE_URL
+        fromDatabase:
+          name: toolpad-demo-db
+          property: connectionString
+      - fromGroup: toolpad-settings
+    buildFilter:
+      ignoredPaths:
+        - docs/**
+        - '**/*.spec.ts'
+
 databases:
   - name: toolpad-db
     ipAllowList: []
     plan: starter
+
+  - name: toolpad-demo-db
+    ipAllowList: []
+    plan: free
+    branch: demo
 
 envVarGroups:
   - name: toolpad-settings

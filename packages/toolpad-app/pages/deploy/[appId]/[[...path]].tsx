@@ -2,10 +2,12 @@ import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
 import { asArray } from '../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../src/runtime/ToolpadApp';
-import { basicAuthUnauthorized } from '../../../src/server/basicAuth';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
-  const [{ loadRenderTree, findActiveDeployment, getApp }, { checkBasicAuth }] = await Promise.all([
+  const [
+    { loadRenderTree, findActiveDeployment, getApp },
+    { checkBasicAuth, basicAuthUnauthorized },
+  ] = await Promise.all([
     import('../../../src/server/data'),
     import('../../../src/server/basicAuth'),
   ]);

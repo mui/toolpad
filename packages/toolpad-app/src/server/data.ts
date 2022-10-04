@@ -10,7 +10,7 @@ import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
-import { validateRecaptchaToken } from '../utils/recaptcha';
+import { validateRecaptchaToken } from './utils/recaptcha';
 import config from './config';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);

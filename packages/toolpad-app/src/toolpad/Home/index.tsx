@@ -112,7 +112,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 
   return (
     <React.Fragment>
-      <Dialog {...props} onClose={isDemo ? NO_OP : onClose}>
+      <Dialog {...props} onClose={isDemo ? NO_OP : onClose} maxWidth="xs">
         <DialogForm
           onSubmit={async (event) => {
             event.preventDefault();

@@ -54,7 +54,6 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
-import { getRecaptchaToken } from '../../utils/recaptcha';
 
 export const APP_TEMPLATE_OPTIONS = {
   blank: {
@@ -112,7 +111,10 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 
             let recaptchaToken;
             if (config.recaptchaSiteKey) {
-              recaptchaToken = await getRecaptchaToken(config.recaptchaSiteKey);
+              await new Promise<void>((resolve) => grecaptcha.ready(resolve));
+              recaptchaToken = await grecaptcha.execute(config.recaptchaSiteKey, {
+                action: 'submit',
+              });
             }
 
             const appDom = dom.trim() ? JSON.parse(dom) : null;

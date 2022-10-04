@@ -193,7 +193,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   );
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
-  const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
+  const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
   const isLayoutNode = isPageNode || (isElementNode && isPageLayoutComponent(node));
 

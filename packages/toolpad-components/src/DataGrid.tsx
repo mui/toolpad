@@ -154,6 +154,11 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   return Object.entries(firstRow).map(([field, value]) => {
     return {
       field,
+      headerName:
+        // turn field into a human readable name by capitalizing the first letter and replacing camel case with spaces
+        field[0].toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1'),
+      // Add minimum width to the columns
+      width: 150,
       type: inferColumnType(value),
     };
   });
@@ -166,6 +171,53 @@ export function parseColumns(columns: SerializableGridColumns): GridColumns {
     ...COLUMN_TYPES[type],
   }));
 }
+
+const DEFAULT_COLUMNS: (Omit<GridColDef, 'type'> & { type: string })[] = [
+  { field: 'id', headerName: 'ID', type: 'number', width: 90 },
+  {
+    field: 'firstName',
+    headerName: 'First name',
+    type: 'string',
+    width: 150,
+    editable: true,
+  },
+  {
+    field: 'lastName',
+    headerName: 'Last name',
+    type: 'string',
+    width: 150,
+    editable: true,
+  },
+  {
+    field: 'age',
+    headerName: 'Age',
+    type: 'number',
+    width: 110,
+    editable: true,
+  },
+  {
+    field: 'fullName',
+    headerName: 'Full name',
+    description: 'This column has a value getter and is not sortable.',
+    type: 'string',
+    sortable: false,
+    width: 160,
+    valueGetter: (params: GridValueGetterParams) =>
+      `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+  },
+];
+
+const DEFAULT_ROWS: GridRowsProp = [
+  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
+  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
+  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
+  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
+  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
+  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
+  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
+  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
+  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+];
 
 const EMPTY_ROWS: GridRowsProp = [];
 
@@ -246,8 +298,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const hasExplicitRowId: boolean = React.useMemo(() => {
     const hasRowIdField: boolean = !!(rowIdFieldProp && rowIdFieldProp !== 'id');
-    const parsedRows = rowsInput;
-    return parsedRows.length === 0 || hasRowIdField || !!parsedRows[0].id;
+    return rowsInput.length === 0 || hasRowIdField || !!rowsInput[0].id;
   }, [rowIdFieldProp, rowsInput]);
 
   const rows: GridRowsProp = React.useMemo(
@@ -256,10 +307,14 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const columnsInitRef = React.useRef(false);
-  const hasColumnsDefined = columnsProp && columnsProp.length > 0;
+  const isUsingDefaultData = rows === DEFAULT_ROWS;
+  const columns: GridColumns = React.useMemo(
+    () => (columnsProp ? parseColumns(columnsProp) : DEFAULT_COLUMNS),
+    [columnsProp],
+  );
 
   React.useEffect(() => {
-    if (!nodeRuntime || hasColumnsDefined || rows.length <= 0 || columnsInitRef.current) {
+    if (!nodeRuntime || isUsingDefaultData || rows.length <= 0 || columnsInitRef.current) {
       return;
     }
 
@@ -272,7 +327,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     nodeRuntime.updateAppDomConstProp('columns', inferredColumns);
 
     columnsInitRef.current = true;
-  }, [hasColumnsDefined, rows, nodeRuntime, hasExplicitRowId]);
+  }, [isUsingDefaultData, rows, nodeRuntime, hasExplicitRowId]);
 
   const getRowId = React.useCallback(
     (row: any) => {
@@ -291,11 +346,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const selectionModel = React.useMemo(
     () => (selection?.id ? [selection.id] : []),
     [selection?.id],
-  );
-
-  const columns: GridColumns = React.useMemo(
-    () => (columnsProp ? parseColumns(columnsProp) : []),
-    [columnsProp],
   );
 
   const apiRef = useGridApiRef();
@@ -341,15 +391,18 @@ export default createComponent(DataGridComponent, {
   argTypes: {
     rows: {
       typeDef: { type: 'array', schema: '/schemas/DataGridRows.json' },
+      defaultValue: DEFAULT_ROWS,
     },
     columns: {
       typeDef: { type: 'array', schema: '/schemas/DataGridColumns.json' },
       control: { type: 'GridColumns' },
+      defaultValue: DEFAULT_COLUMNS,
     },
     rowIdField: {
       typeDef: { type: 'string' },
       control: { type: 'RowIdFieldSelect' },
       label: 'Id field',
+      defaultValue: 'id',
     },
     selection: {
       typeDef: { type: 'object' },

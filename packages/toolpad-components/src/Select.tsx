@@ -11,6 +11,24 @@ export type SelectProps = TextFieldProps & {
   options: (string | SelectOption)[];
 };
 
+const DEFAULT_OPTIONS = {
+  options: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ],
+  label: 'Month',
+};
+
 function Select({ options, value, defaultValue, fullWidth, sx, ...rest }: SelectProps) {
   return (
     <TextField
@@ -40,7 +58,7 @@ export default createComponent(Select, {
     options: {
       typeDef: { type: 'array', schema: '/schemas/SelectOptions.json' },
       control: { type: 'SelectOptions' },
-      defaultValue: [],
+      defaultValue: DEFAULT_OPTIONS.options,
     },
     value: {
       typeDef: { type: 'string' },
@@ -51,11 +69,11 @@ export default createComponent(Select, {
     },
     defaultValue: {
       typeDef: { type: 'string' },
-      defaultValue: '',
+      defaultValue: DEFAULT_OPTIONS.options[0],
     },
     label: {
       typeDef: { type: 'string' },
-      defaultValue: '',
+      defaultValue: DEFAULT_OPTIONS.label,
     },
     variant: {
       typeDef: { type: 'string', enum: ['outlined', 'filled', 'standard'] },

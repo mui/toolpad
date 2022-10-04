@@ -7,13 +7,12 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { LicenseInfo } from '@mui/x-data-grid-pro';
-import { useRouter } from 'next/router';
 import config from '../src/config';
 import theme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import { MUI_X_PRO_LICENSE } from '../src/constants';
 import { queryClient } from '../src/api';
-import { reportWebVitalsToGA, setGAPage } from '../src/utils/ga';
+import { reportWebVitalsToGA } from '../src/utils/ga';
 
 import '../src/appStyles.css';
 
@@ -32,18 +31,6 @@ interface MyAppProps extends AppProps {
 
 export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
-
-  const router = useRouter();
-
-  React.useEffect(() => {
-    router.events.on('routeChangeComplete', setGAPage);
-    router.events.on('hashChangeComplete', setGAPage);
-
-    return () => {
-      router.events.off('routeChangeComplete', setGAPage);
-      router.events.off('hashChangeComplete', setGAPage);
-    };
-  }, [router.events]);
 
   return (
     <React.Fragment>

@@ -18,13 +18,12 @@ export function checkBasicAuthHeader(headerContent: string | null): boolean {
   return false;
 }
 
-export function checkBasicAuth(req: IncomingMessage, res: ServerResponse): boolean {
-  if (checkBasicAuthHeader(req.headers.authorization || null)) {
-    return true;
-  }
+export function checkBasicAuth(req: IncomingMessage): boolean {
+  return checkBasicAuthHeader(req.headers.authorization || null);
+}
 
+export function basicAuthUnauthorized(res: ServerResponse): void {
   res.setHeader('WWW-Authenticate', 'Basic realm="Protected"');
   res.statusCode = 401;
   res.end('Unauthorized');
-  return false;
 }

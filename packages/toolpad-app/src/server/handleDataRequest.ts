@@ -6,7 +6,7 @@ import initMiddleware from './initMiddleware';
 import { VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
 import { errorFrom, serializeError } from '../utils/errors';
-import { checkBasicAuth } from './basicAuth';
+import { basicAuthUnauthorized, checkBasicAuth } from './basicAuth';
 import { reportSentryError } from '../utils/sentry';
 
 // Initialize the cors middleware
@@ -54,7 +54,8 @@ export default async (
   }
 
   if (!app.public) {
-    if (!checkBasicAuth(req, res)) {
+    if (!checkBasicAuth(req)) {
+      basicAuthUnauthorized(res);
       return;
     }
   }

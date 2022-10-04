@@ -2,6 +2,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
 import { asArray } from '../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../src/runtime/ToolpadApp';
+import { basicAuthUnauthorized } from '../../../src/server/basicAuth';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
   const [{ loadRenderTree, findActiveDeployment, getApp }, { checkBasicAuth }] = await Promise.all([
@@ -25,7 +26,8 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
   }
 
   if (!app.public) {
-    if (!checkBasicAuth(context.req, context.res)) {
+    if (!checkBasicAuth(context.req)) {
+      basicAuthUnauthorized(context.res);
       // This will never be reached, but let's return this to satisfy the type system
       return { notFound: true };
     }

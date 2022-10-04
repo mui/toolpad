@@ -15,6 +15,7 @@ services:
       - key: NODE_VERSION
         value: '16.17.0'
       - key: TOOLPAD_ENABLE_CREATE_BY_DOM
+        value: null
         previewValue: '1'
       - key: TOOLPAD_DATABASE_URL
         fromDatabase:

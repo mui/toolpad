@@ -138,7 +138,7 @@ export default async function execFunction(
       null,
       [
         {
-          // 'params' are passed only for backwards compatability, eventually we should clean this up
+          // TODO: 'params' are passed only for backwards compatability, remove after v1
           params,
           parameters: params,
           secrets,

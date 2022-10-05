@@ -279,7 +279,7 @@ function QueryEditor({
   );
 
   const queryScope = {
-    // TODO mark query as @deprecated
+    // TODO mark query as @deprecated remove after v1
     query: previewParams,
     parameters: previewParams,
   };

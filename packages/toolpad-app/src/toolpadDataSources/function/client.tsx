@@ -140,7 +140,8 @@ function QueryEditor({
     const secretsMembers = secretsKeys.map((key) => `${key}: string`).join('\n');
 
     const content = `
-      interface ${EVENT_INTERFACE_IDENTIFIER} {       
+      interface ${EVENT_INTERFACE_IDENTIFIER} {
+        /** TODO: remove after v1 */       
         /** @deprecated Use parameters instead */
         params: {
           ${paramsMembers}

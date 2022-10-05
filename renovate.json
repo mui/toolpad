@@ -13,7 +13,7 @@
     {
       "groupName": "ignore",
       "matchPackageNames": [
-        "react-inspector", // https://github.com/storybookjs/react-inspector/issues/162
+        "react-inspector",
         "node-fetch",
         "eslint-config-airbnb-typescript",
         "chalk"

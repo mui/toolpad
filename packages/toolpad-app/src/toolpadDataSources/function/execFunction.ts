@@ -134,7 +134,7 @@ export default async function execFunction(
     userModule.evaluateSync({ timeout: 30000 });
 
     const defaultExport = await userModule.namespace.get('default', { reference: true });
-    data = await defaultExport.apply(null, [{ params, secrets }], {
+    data = await defaultExport.apply(null, [{ params, parameters: params, secrets }], {
       arguments: { copy: true },
       result: { copy: true, promise: true },
       timeout: 30000,

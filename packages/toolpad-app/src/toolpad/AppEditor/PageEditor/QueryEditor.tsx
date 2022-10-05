@@ -235,16 +235,19 @@ function QueryNodeEditorDialog<Q>({
 
   const connectionParams = connection?.attributes.params.value;
 
-  const queryModel = React.useMemo<QueryEditorModel<any>>(
-    () => ({
+  const queryModel = React.useMemo<QueryEditorModel<any>>(() => {
+    const params =
+      (Object.entries(inputParams).filter(([, value]) => Boolean(value)) as BindableAttrEntries) ||
+      [];
+
+    return {
       query: input.attributes.query.value,
-      params:
-        (Object.entries(inputParams).filter(([, value]) =>
-          Boolean(value),
-        ) as BindableAttrEntries) || [],
-    }),
-    [input.attributes.query.value, inputParams],
-  );
+
+      // TODO mark params as @deprecated
+      params,
+      parameters: params,
+    };
+  }, [input.attributes.query.value, inputParams]);
 
   const handleQueryModelChange = React.useCallback(
     (model: QueryEditorModel<Q>) => {

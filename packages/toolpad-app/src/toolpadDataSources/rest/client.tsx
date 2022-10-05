@@ -279,7 +279,9 @@ function QueryEditor({
   );
 
   const queryScope = {
+    // TODO mark query as @deprecated
     query: previewParams,
+    parameters: previewParams,
   };
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({

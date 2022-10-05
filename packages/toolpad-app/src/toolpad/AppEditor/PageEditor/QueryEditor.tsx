@@ -242,8 +242,7 @@ function QueryNodeEditorDialog<Q>({
 
     return {
       query: input.attributes.query.value,
-
-      // TODO mark params as @deprecated
+      // TODO: 'params' are passed only for backwards compatability, eventually we should clean this up
       params,
       parameters: params,
     };

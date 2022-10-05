@@ -134,11 +134,22 @@ export default async function execFunction(
     userModule.evaluateSync({ timeout: 30000 });
 
     const defaultExport = await userModule.namespace.get('default', { reference: true });
-    data = await defaultExport.apply(null, [{ params, parameters: params, secrets }], {
-      arguments: { copy: true },
-      result: { copy: true, promise: true },
-      timeout: 30000,
-    });
+    data = await defaultExport.apply(
+      null,
+      [
+        {
+          // 'params' are passed only for backwards compatability, eventually we should clean this up
+          params,
+          parameters: params,
+          secrets,
+        },
+      ],
+      {
+        arguments: { copy: true },
+        result: { copy: true, promise: true },
+        timeout: 30000,
+      },
+    );
   } catch (userError) {
     error = errorFrom(userError);
   }

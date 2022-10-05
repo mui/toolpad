@@ -141,6 +141,10 @@ function QueryEditor({
 
     const content = `
       interface ${EVENT_INTERFACE_IDENTIFIER} {       
+        /** @deprecated Use parameters instead */
+        params: {
+          ${paramsMembers}
+        }
         parameters: {
           ${paramsMembers}
         }

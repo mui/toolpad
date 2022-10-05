@@ -17,6 +17,10 @@ import { reportWebVitalsToGA, setGAPage } from '../src/utils/ga';
 
 import '../src/appStyles.css';
 
+import appleTouchIcon from '../public/apple-touch-icon.png';
+import favicon32 from '../public/favicon-32x32.png';
+import favicon16 from '../public/favicon-16x16.png';
+
 LicenseInfo.setLicenseKey(MUI_X_PRO_LICENSE);
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -51,6 +55,9 @@ export default function MyApp(props: MyAppProps) {
         <Head>
           <title>My page</title>
           <meta name="viewport" content="initial-scale=1, width=device-width" />
+          <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src} />
+          <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src} />
+          <link rel="icon" type="image/png" sizes="16x16" href={favicon16.src} />
         </Head>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={theme}>

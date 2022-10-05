@@ -7,9 +7,6 @@ import type {
   SlotType,
   ComponentConfig,
   RuntimeEvent,
-  ArgTypeDefinition,
-  BindableAttrValue,
-  LiveBinding,
   RuntimeError,
   RuntimeApiCallHandler,
 } from './types';
@@ -278,45 +275,3 @@ export function Slots({ prop, children }: SlotsProps) {
     <Placeholder prop={prop} />
   );
 }
-
-let iframe: HTMLIFrameElement;
-function evalCode(code: string, globalScope: Record<string, unknown>) {
-  if (!iframe) {
-    iframe = document.createElement('iframe');
-    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
-    iframe.style.display = 'none';
-    document.documentElement.appendChild(iframe);
-  }
-
-  // eslint-disable-next-line no-underscore-dangle
-  (iframe.contentWindow as any).__SCOPE = globalScope;
-  return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
-}
-
-export function evaluateBindable<V>(
-  bindable: BindableAttrValue<V> | null,
-  globalScope: Record<string, unknown>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  argType?: ArgTypeDefinition,
-): LiveBinding {
-  const execExpression = () => {
-    if (bindable?.type === 'jsExpression') {
-      return evalCode(bindable?.value, globalScope);
-    }
-
-    if (bindable?.type === 'const') {
-      return bindable?.value;
-    }
-
-    return undefined;
-  };
-
-  try {
-    const value = execExpression();
-    return { value };
-  } catch (err) {
-    return { error: err as Error };
-  }
-}
-
-export * from './jsRuntime';

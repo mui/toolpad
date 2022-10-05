@@ -30,8 +30,9 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
   if (!app.public) {
     if (!checkBasicAuth(context.req)) {
       basicAuthUnauthorized(context.res);
-      // This will never be reached, but let's return this to satisfy the type system
-      return { notFound: true };
+      // basicAuthUnauthorized calls res.end()
+      // so the props will never be used, but let's return this to satisfy the type system
+      return { props: {} as ToolpadAppProps };
     }
   }
 

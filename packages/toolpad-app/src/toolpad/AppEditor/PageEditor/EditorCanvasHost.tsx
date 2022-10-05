@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { Box, CircularProgress, styled } from '@mui/material';
-import { NodeId, RuntimeEvent } from '@mui/toolpad-core';
+import { NodeId, RuntimeApi, RuntimeEvent } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
-import { setEventHandler } from '@mui/toolpad-core/runtime';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
@@ -162,13 +161,22 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       };
     }, [contentWindow]);
 
-    React.useEffect(() => {
-      if (!contentWindow || !bridge) {
-        return undefined;
-      }
+    React.useEffect(() => bridge?.onRuntimeEvent(handleRuntimeEvent), [handleRuntimeEvent, bridge]);
 
-      return setEventHandler(contentWindow, handleRuntimeEvent);
-    }, [handleRuntimeEvent, contentWindow, bridge]);
+    const runtimeApi = React.useMemo<RuntimeApi>(() => {
+      return {
+        hasBinding: (nodeId, prop) => {
+          const elm = appDom.getNode(dom, nodeId as NodeId, 'element');
+          return !!elm.props?.[prop];
+        },
+        test: () => '',
+      };
+    }, [dom]);
+
+    React.useEffect(
+      () => bridge?.onApiCall((fn, ...args) => (runtimeApi[fn] as any)(...args)),
+      [runtimeApi, bridge],
+    );
 
     return (
       <CanvasRoot className={className}>

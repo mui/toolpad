@@ -11,6 +11,7 @@ import type {
   BindableAttrValue,
   LiveBinding,
   RuntimeError,
+  RuntimeApiCallHandler,
 } from './types';
 
 const ResetNodeErrorsKeyContext = React.createContext(0);
@@ -19,6 +20,7 @@ export const ResetNodeErrorsKeyProvider = ResetNodeErrorsKeyContext.Provider;
 
 declare global {
   interface Window {
+    __TOOLPAD_RUNTIME_CALL_API__?: RuntimeApiCallHandler;
     __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
   }
 }
@@ -139,6 +141,7 @@ export function NodeRuntimeWrapper({ nodeId, componentConfig, children }: NodeRu
 }
 
 export interface NodeRuntime<P> {
+  hasBinding: (prop: string) => boolean;
   updateAppDomConstProp: <K extends keyof P & string>(
     key: K,
     value: React.SetStateAction<P[K]>,
@@ -184,6 +187,27 @@ export function setEventHandler(window: Window, handleEvent: (event: RuntimeEven
   };
 }
 
+const callApi: RuntimeApiCallHandler = function callApi(fn, ...fnArgs) {
+  // eslint-disable-next-line no-underscore-dangle
+  const windowCallApi = window.__TOOLPAD_RUNTIME_CALL_API__;
+
+  if (typeof windowCallApi !== 'function') {
+    throw new Error('Runtime API unavailable');
+  }
+
+  return windowCallApi(fn, ...fnArgs);
+};
+
+export function setApiHandler(window: Window, handleApiCall: RuntimeApiCallHandler) {
+  // eslint-disable-next-line no-underscore-dangle
+  window.__TOOLPAD_RUNTIME_CALL_API__ = handleApiCall;
+
+  return () => {
+    // eslint-disable-next-line no-underscore-dangle
+    delete window.__TOOLPAD_RUNTIME_CALL_API__;
+  };
+}
+
 export function useNode<P = {}>(): NodeRuntime<P> | null {
   const nodeId = React.useContext(NodeRuntimeContext);
 
@@ -192,6 +216,7 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
       return null;
     }
     return {
+      hasBinding: (prop: string) => callApi('hasBinding', nodeId, prop),
       updateAppDomConstProp: (prop, value) => {
         fireEvent({
           type: 'propUpdated',

@@ -100,11 +100,6 @@ jobs:
       - image: cimg/postgres:14.0
         environment:
           POSTGRES_USER: postgres
-      - save_cache:
-          name: Save Next.js cache
-          key: v0-next-{{ checksum "yarn.lock" }}
-          paths:
-            - packages/toolpad-app/.next/cache
     steps:
       - checkout
       - install_js
@@ -143,6 +138,11 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
+      - save_cache:
+          name: Save Next.js cache
+          key: v0-next-{{ checksum "yarn.lock" }}
+          paths:
+            - packages/toolpad-app/.next/cache
 
   test_unit:
     <<: *defaults

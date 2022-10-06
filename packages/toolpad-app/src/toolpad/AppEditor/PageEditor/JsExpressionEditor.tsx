@@ -44,11 +44,17 @@ export function JsExpressionEditor({
       .map((key) => `declare const ${key}: RootObject[${JSON.stringify(key)}];`)
       .join('\n');
 
+    // TODO: cleanup after Toolpad v1
+    const queryDeprecation = `
+      /** @deprecated use parameters */
+      declare const query: Query;
+    `;
+
     const content = `
       ${type.join('\n')}
 
-      /** @deprecated use parameters */
-      declare const query: Query;
+      // TODO: cleanup after Toolpad v1
+      ${globalScope.query && globalScope.parameters ? queryDeprecation : ''}
       ${globals}
     `;
 

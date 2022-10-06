@@ -4,6 +4,7 @@ import { Skeleton, styled, SxProps } from '@mui/material';
 import { isString } from 'lodash-es';
 import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
+import { hasOwnProperty } from '../../../utils/collections';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -45,28 +46,33 @@ export function JsExpressionEditor({
 
     const globals = Object.keys(globalScope)
       .map((key) => {
-        let declaration = ``;
-        const metaData = globalScopeMeta[key] || {};
+        let metaDataString = ``;
 
-        if (metaData.description) {
-          declaration = `/** ${metaData.description} */`;
-        }
+        const metaData = hasOwnProperty(globalScopeMeta, key) ? globalScopeMeta[key] : {};
+        const { deprecated, description } = metaData;
 
-        if (metaData.deprecated) {
-          const deprecated = metaData.deprecated;
-
-          declaration = `
-            ${declaration}
-            ${
-              isString(deprecated)
-                ? `/** @deprecated ${metaData.deprecated} */`
-                : `/** @deprecated */`
-            }
+        if (deprecated && description) {
+          metaDataString = `
+            /** ${description}
+             *  @deprecated ${isString(deprecated) ? deprecated : ''}
+             */
           `;
+        } else {
+          if (deprecated) {
+            metaDataString = `
+              /** @deprecated ${isString(deprecated) ? deprecated : ''} */
+            `;
+          }
+
+          if (description) {
+            metaDataString = `
+              /** ${description} */
+            `;
+          }
         }
 
-        declaration = `
-          ${declaration}
+        const declaration = `
+          ${metaDataString}
           declare const ${key}: RootObject[${JSON.stringify(key)}];
         `;
 

@@ -50,9 +50,10 @@ import DEMO_BASE_URLS from './demoBaseUrls';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
-const DEPRECATED_URL_VARIABLES: GlobalScopeMeta = {
+const GLOBAL_SCOPE_META: GlobalScopeMeta = {
   query: {
     deprecated: 'Use parameters variable instead',
+    description: 'Parameters that can be bound to app scope variables',
   },
   parameters: {
     description: 'Parameters that can be bound to app scope variables',
@@ -363,7 +364,7 @@ function QueryEditor({
                 <BindableEditor
                   liveBinding={liveUrl}
                   globalScope={queryScope}
-                  globalScopeMeta={DEPRECATED_URL_VARIABLES}
+                  globalScopeMeta={GLOBAL_SCOPE_META}
                   sx={{ flex: 1 }}
                   server
                   label="url"

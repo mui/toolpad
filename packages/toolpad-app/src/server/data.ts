@@ -249,12 +249,17 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
   });
 }
 
-export async function updateApp(appId: string, name: string): Promise<void> {
+interface AppUpdates {
+  name?: string;
+  public?: boolean;
+}
+
+export async function updateApp(appId: string, updates: AppUpdates): Promise<void> {
   await prismaClient.app.update({
     where: {
       id: appId,
     },
-    data: { name },
+    data: _.pick(updates, ['name', 'public']),
     select: {
       // Only return the id to reduce amount of data returned from the db
       id: true,
@@ -388,14 +393,18 @@ export async function findActiveDeployment(appId: string): Promise<Deployment | 
   });
 }
 
-export async function loadReleaseDom(appId: string, version: number): Promise<appDom.AppDom> {
+function parseSnapshot(snapshot: Buffer): appDom.AppDom {
+  return JSON.parse(snapshot.toString('utf-8')) as appDom.AppDom;
+}
+
+async function loadReleaseDom(appId: string, version: number): Promise<appDom.AppDom> {
   const release = await prismaClient.release.findUnique({
     where: { release_app_constraint: { appId, version } },
   });
   if (!release) {
     throw new Error(`release doesn't exist`);
   }
-  return JSON.parse(release.snapshot.toString('utf-8')) as appDom.AppDom;
+  return parseSnapshot(release.snapshot);
 }
 
 export async function getConnectionParams<P = unknown>(

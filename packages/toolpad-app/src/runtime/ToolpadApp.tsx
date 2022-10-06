@@ -135,7 +135,7 @@ type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
-  createProvidedContext<(expr: string) => any>('EvaluatePageExpression');
+  createProvidedContext<(expr: string, params: any) => any>('EvaluatePageExpression');
 const [useBindingsContext, BindingsContextProvider] =
   createProvidedContext<Record<string, BindingEvaluationResult>>('LiveBindings');
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =
@@ -308,10 +308,10 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (action?.type === 'jsExpressionAction') {
-        const handler = () => {
-          const code = action.value;
-          const exprToEvaluate = `(async () => {${code}})()`;
-          evaluatePageExpression(exprToEvaluate);
+        const handler = (params: any) => {
+          const code = action.value.code;
+          const exprToEvaluate = `(async (params) => {${code}})()`;
+          evaluatePageExpression(exprToEvaluate, params);
         };
 
         return [key, handler];
@@ -788,7 +788,8 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 
   const evaluatePageExpression = React.useCallback(
-    (expression: string) => evaluateExpression(expression, pageState),
+    (expression: string, params?: Record<string, unknown>) =>
+      evaluateExpression(expression, { ...pageState, ...params }),
     [pageState],
   );
 

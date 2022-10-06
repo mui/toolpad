@@ -11,7 +11,6 @@ function evaluateCode(code: string, globalScope: Record<string, unknown>) {
     iframe.style.display = 'none';
     document.documentElement.appendChild(iframe);
   }
-
   // eslint-disable-next-line no-underscore-dangle
   (iframe.contentWindow as any).__SCOPE = globalScope;
   (iframe.contentWindow as any).console = window.console;

@@ -27,7 +27,7 @@ import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import ConnectionSelect, { ConnectionOption } from './ConnectionSelect';
 import { createProvidedContext } from '../../../utils/react';
 
-const DATASOURCES_WHITELIST = ['function'];
+const DATASOURCES_WHITELIST = ['function', 'rest'];
 
 const EMPTY_OBJECT = {};
 

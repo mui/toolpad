@@ -1,4 +1,5 @@
 import type * as React from 'react';
+import { GridRowId } from '@mui/x-data-grid-pro';
 import type { TOOLPAD_COMPONENT } from './constants';
 import type { Branded } from './utils';
 
@@ -38,7 +39,10 @@ export interface SecretAttrValue<V> {
 
 export interface JsExpressionAction {
   type: 'jsExpressionAction';
-  value: string;
+  value: {
+    code: string;
+    paramters?: string;
+  };
 }
 
 export interface NavigationAction<P = any> {
@@ -47,6 +51,11 @@ export interface NavigationAction<P = any> {
     page: NodeReference;
     parameters?: BindableAttrValues<P>;
   };
+}
+
+export interface ToolpadDataGridActionEvent {
+  id: GridRowId;
+  row: any;
 }
 
 export type BindableAction = JsExpressionAction | NavigationAction;

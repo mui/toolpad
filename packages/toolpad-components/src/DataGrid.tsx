@@ -12,12 +12,14 @@ import {
   gridDensityRowHeightSelector,
   GridSelectionModel,
   GridValueFormatterParams,
+  GridActionsCellItem,
   GridColDef,
   GridValueGetterParams,
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { useNode, createComponent } from '@mui/toolpad-core';
+import { Delete as DeleteIcon } from '@mui/icons-material';
+import { useNode, createComponent, ToolpadDataGridActionEvent } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 
@@ -164,12 +166,51 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   });
 }
 
-export function parseColumns(columns: SerializableGridColumns): GridColumns {
-  return columns.map(({ type, ...column }) => ({
+interface ToolpadDataGridDeleteEventParams {
+  type: 'delete';
+  event: React.MouseEvent<HTMLButtonElement>;
+  toolpadEvent: ToolpadDataGridActionEvent;
+}
+
+type ToolpadDataGridDeleteEvent = (params: ToolpadDataGridDeleteEventParams) => void;
+
+export function parseColumns(
+  columns: SerializableGridColumns,
+  onDelete?: ToolpadDataGridDeleteEvent,
+): GridColumns {
+  const mappedColumns: GridColumns = columns.map(({ type, ...column }) => ({
     type: DEFAULT_TYPES.has(type) ? type : undefined,
     ...column,
     ...COLUMN_TYPES[type],
   }));
+  if (onDelete) {
+    mappedColumns.push({
+      type: 'actions',
+      field: '__TOOLPAD_INTERNAL_ACTIONS',
+      headerName: 'Actions',
+      width: 100,
+      getActions: ({ id, row }) => [
+        <GridActionsCellItem
+          key={'delete'}
+          icon={<DeleteIcon />}
+          label="Delete"
+          className="textPrimary"
+          onClick={(event) => {
+            onDelete({
+              type: 'delete',
+              event,
+              toolpadEvent: {
+                id,
+                row,
+              },
+            });
+          }}
+          color="inherit"
+        />,
+      ],
+    });
+  }
+  return mappedColumns;
 }
 
 const DEFAULT_COLUMNS: (Omit<GridColDef, 'type'> & { type: string })[] = [
@@ -233,6 +274,7 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   error?: Error | string;
   selection?: Selection | null;
   onSelectionChange?: (newSelection?: Selection | null) => void;
+  onDelete?: ToolpadDataGridDeleteEvent;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
@@ -243,6 +285,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     rowIdField: rowIdFieldProp,
     error: errorProp,
     selection,
+    onDelete,
     onSelectionChange,
     ...props
   }: ToolpadDataGridProps,
@@ -309,8 +352,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const columnsInitRef = React.useRef(false);
   const isUsingDefaultData = rows === DEFAULT_ROWS;
   const columns: GridColumns = React.useMemo(
-    () => (columnsProp ? parseColumns(columnsProp) : DEFAULT_COLUMNS),
-    [columnsProp],
+    () => (columnsProp ? parseColumns(columnsProp, onDelete) : DEFAULT_COLUMNS),
+    [columnsProp, onDelete],
   );
 
   React.useEffect(() => {
@@ -362,6 +405,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
       <DataGridPro
         apiRef={apiRef}
+        experimentalFeatures={{ newEditingApi: true }}
         components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
         onColumnResize={handleResize}
         onColumnOrderChange={handleColumnOrderChange}
@@ -419,6 +463,10 @@ export default createComponent(DataGridComponent, {
     },
     loading: {
       typeDef: { type: 'boolean' },
+    },
+    onDelete: {
+      typeDef: { type: 'event' },
+      label: 'onDelete',
     },
     sx: {
       typeDef: { type: 'object' },

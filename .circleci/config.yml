@@ -34,6 +34,7 @@ commands:
           name: Restore yarn cache
           keys:
             - v8-yarn-{{ checksum "yarn.lock" }}
+            - v0-next-{{ checksum "yarn.lock" }}
       - run:
           name: Set yarn cache folder
           command: |
@@ -78,8 +79,6 @@ commands:
             - packages/toolpad-app/node_modules
             - packages/toolpad-components/node_modules
             - packages/toolpad-core/node_modules
-            # next.js cache
-            - packages/toolpad-app/.next/cache
       - when:
           condition: << parameters.browsers >>
           steps:
@@ -101,6 +100,11 @@ jobs:
       - image: cimg/postgres:14.0
         environment:
           POSTGRES_USER: postgres
+      - save_cache:
+          name: Save Next.js cache
+          key: v0-next-{{ checksum "yarn.lock" }}
+          paths:
+            - packages/toolpad-app/.next/cache
     steps:
       - checkout
       - install_js

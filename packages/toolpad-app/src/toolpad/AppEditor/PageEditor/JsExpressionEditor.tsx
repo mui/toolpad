@@ -1,7 +1,8 @@
 import * as React from 'react';
 import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
-import { WithControlledProp } from '../../../utils/types';
+import { isString } from 'lodash-es';
+import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
@@ -16,6 +17,7 @@ const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
   globalScope?: Record<string, unknown>;
+  globalScopeMeta?: GlobalScopeMeta;
   disabled?: boolean;
   autoFocus?: boolean;
   functionBody?: boolean;
@@ -29,6 +31,7 @@ export function JsExpressionEditor({
   value,
   onChange,
   globalScope = {},
+  globalScopeMeta = {},
   disabled,
   autoFocus,
   functionBody,
@@ -41,25 +44,45 @@ export function JsExpressionEditor({
     const type = jsonToTs(globalScope);
 
     const globals = Object.keys(globalScope)
-      .map((key) => `declare const ${key}: RootObject[${JSON.stringify(key)}];`)
-      .join('\n');
+      .map((key) => {
+        let declaration = ``;
+        const metaData = globalScopeMeta[key] || {};
 
-    // TODO: cleanup after Toolpad v1
-    const queryDeprecation = `
-      /** @deprecated use parameters */
-      declare const query: Query;
-    `;
+        if (metaData.description) {
+          declaration = `/** ${metaData.description} */`;
+        }
+
+        if (metaData.deprecated) {
+          const deprecated = metaData.deprecated;
+
+          declaration = `
+            ${declaration}
+            ${
+              isString(deprecated)
+                ? `/** @deprecated ${metaData.deprecated} */`
+                : `/** @deprecated */`
+            }
+          `;
+        }
+
+        declaration = `
+          ${declaration}
+          declare const ${key}: RootObject[${JSON.stringify(key)}];
+        `;
+
+        return declaration;
+      })
+      .join('\n');
 
     const content = `
       ${type.join('\n')}
 
-      // TODO: cleanup after Toolpad v1
-      ${globalScope.query && globalScope.parameters ? queryDeprecation : ''}
       ${globals}
+      
     `;
 
     return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
-  }, [globalScope]);
+  }, [globalScope, globalScopeMeta]);
 
   return (
     <JsExpressionEditorRoot sx={sx}>

@@ -31,7 +31,7 @@ import {
   useEvaluateLiveBindingEntries,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
-import { Maybe } from '../../utils/types';
+import { Maybe, GlobalScopeMeta } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import * as appDom from '../../appDom';
@@ -49,6 +49,15 @@ import QueryInputPanel from '../QueryInputPanel';
 import DEMO_BASE_URLS from './demoBaseUrls';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
+
+const DEPRECATED_URL_VARIABLES: GlobalScopeMeta = {
+  query: {
+    deprecated: 'Use parameters variable instead',
+  },
+  parameters: {
+    description: 'Parameters that can be bound to app scope variables',
+  },
+};
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -354,6 +363,7 @@ function QueryEditor({
                 <BindableEditor
                   liveBinding={liveUrl}
                   globalScope={queryScope}
+                  globalScopeMeta={DEPRECATED_URL_VARIABLES}
                   sx={{ flex: 1 }}
                   server
                   label="url"

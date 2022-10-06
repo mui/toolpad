@@ -11,14 +11,14 @@
   "stopUpdatingLabel": "on hold",
   "packageRules": [
     {
-      "groupName": "ignore",
-      "matchPackageNames": [
-        "react-inspector",
-        "node-fetch",
-        "eslint-config-airbnb-typescript",
-        "chalk"
-      ],
-      "enabled": false
+      "groupName": "dependencies",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["dependencies"]
+    },
+    {
+      "groupName": "devDependencies",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"]
     },
     {
       "groupName": "MUI Core",
@@ -47,12 +47,14 @@
       "prCreation": "immediate"
     },
     {
-      "matchManagers": ["npm"],
-      "matchDepTypes": ["dependencies"]
-    },
-    {
-      "matchManagers": ["npm"],
-      "matchDepTypes": ["devDependencies"]
+      "groupName": "ignored",
+      "matchPackageNames": [
+        "react-inspector",
+        "node-fetch",
+        "eslint-config-airbnb-typescript",
+        "chalk"
+      ],
+      "enabled": false
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],

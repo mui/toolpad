@@ -905,7 +905,7 @@ export default function ToolpadApp({
       <NoSsr>
         <DomContextProvider value={dom}>
           <AppThemeProvider dom={dom}>
-            <CssBaseline />
+            <CssBaseline enableColorScheme />
             {version === 'preview' && !hidePreviewBanner ? (
               <Alert severity="info">This is a preview version of the application.</Alert>
             ) : null}

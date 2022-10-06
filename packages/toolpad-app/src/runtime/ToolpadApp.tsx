@@ -7,7 +7,6 @@ import {
   styled,
   AlertTitle,
   LinearProgress,
-  NoSsr,
   Container,
 } from '@mui/material';
 import {
@@ -66,6 +65,7 @@ import ComponentsContext, { useComponents, useComponent } from './ComponentsCont
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
+import NoSsr from '../components/NoSsr';
 
 interface UseMutation {
   call: (overrides?: any) => Promise<void>;

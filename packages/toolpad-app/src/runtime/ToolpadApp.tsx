@@ -308,9 +308,9 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (action?.type === 'jsExpressionAction') {
-        const handler = (params: any) => {
-          const code = action.value.code;
-          const exprToEvaluate = `(async (params) => {${code}})()`;
+        const handler = (params: Record<string, unknown>) => {
+          const code = action.value;
+          const exprToEvaluate = `(async () => {${code}})()`;
           evaluatePageExpression(exprToEvaluate, params);
         };
 

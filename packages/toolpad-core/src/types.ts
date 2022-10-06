@@ -39,10 +39,7 @@ export interface SecretAttrValue<V> {
 
 export interface JsExpressionAction {
   type: 'jsExpressionAction';
-  value: {
-    code: string;
-    paramters?: string;
-  };
+  value: string;
 }
 
 export interface NavigationAction<P = any> {
@@ -53,7 +50,10 @@ export interface NavigationAction<P = any> {
   };
 }
 
-export interface ToolpadDataGridActionEvent {
+type DataGridActionEventTypes = 'delete' | 'update';
+
+export interface DataGridActionEvent {
+  type: DataGridActionEventTypes;
   id: GridRowId;
   row: any;
 }
@@ -118,6 +118,7 @@ export interface ElementValueType extends ValueTypeBase {
 
 export interface EventValueType extends ValueTypeBase {
   type: 'event';
+  eventType: DataGridActionEventTypes;
 }
 
 export interface ArgControlSpec {

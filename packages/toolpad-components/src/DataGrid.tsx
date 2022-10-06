@@ -19,7 +19,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { Delete as DeleteIcon } from '@mui/icons-material';
-import { useNode, createComponent, ToolpadDataGridActionEvent } from '@mui/toolpad-core';
+import { useNode, createComponent, DataGridActionEvent } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 
@@ -167,50 +167,18 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 }
 
 interface ToolpadDataGridDeleteEventParams {
-  type: 'delete';
   event: React.MouseEvent<HTMLButtonElement>;
-  toolpadEvent: ToolpadDataGridActionEvent;
+  toolpadEvent: DataGridActionEvent;
 }
 
 type ToolpadDataGridDeleteEvent = (params: ToolpadDataGridDeleteEventParams) => void;
 
-export function parseColumns(
-  columns: SerializableGridColumns,
-  onDelete?: ToolpadDataGridDeleteEvent,
-): GridColumns {
-  const mappedColumns: GridColumns = columns.map(({ type, ...column }) => ({
+export function parseColumns(columns: SerializableGridColumns): GridColumns {
+  return columns.map(({ type, ...column }) => ({
     type: DEFAULT_TYPES.has(type) ? type : undefined,
     ...column,
     ...COLUMN_TYPES[type],
   }));
-  if (onDelete) {
-    mappedColumns.push({
-      type: 'actions',
-      field: '__TOOLPAD_INTERNAL_ACTIONS',
-      headerName: 'Actions',
-      width: 100,
-      getActions: ({ id, row }) => [
-        <GridActionsCellItem
-          key={'delete'}
-          icon={<DeleteIcon />}
-          label="Delete"
-          className="textPrimary"
-          onClick={(event) => {
-            onDelete({
-              type: 'delete',
-              event,
-              toolpadEvent: {
-                id,
-                row,
-              },
-            });
-          }}
-          color="inherit"
-        />,
-      ],
-    });
-  }
-  return mappedColumns;
 }
 
 const DEFAULT_COLUMNS: (Omit<GridColDef, 'type'> & { type: string })[] = [
@@ -285,7 +253,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     rowIdField: rowIdFieldProp,
     error: errorProp,
     selection,
-    onDelete,
+    onDelete: onDeleteProp,
     onSelectionChange,
     ...props
   }: ToolpadDataGridProps,
@@ -344,17 +312,55 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     return rowsInput.length === 0 || hasRowIdField || !!rowsInput[0].id;
   }, [rowIdFieldProp, rowsInput]);
 
-  const rows: GridRowsProp = React.useMemo(
-    () => (hasExplicitRowId ? rowsInput : rowsInput.map((row, id) => ({ ...row, id }))),
-    [hasExplicitRowId, rowsInput],
+  const [rows, setRows] = React.useState<GridRowsProp>(() =>
+    hasExplicitRowId ? rowsInput : rowsInput.map((row, id) => ({ ...row, id })),
+  );
+
+  React.useEffect(() => {
+    setRows(rowsInput);
+  }, [rowsInput, hasExplicitRowId]);
+
+  const addActionColumn = React.useCallback(
+    (columns: GridColumns, onDelete: ToolpadDataGridDeleteEvent) => {
+      columns.push({
+        field: 'actions',
+        headerName: 'Actions',
+        type: 'actions',
+        width: 100,
+        getActions: ({ id, row }) => {
+          return [
+            <GridActionsCellItem
+              key={'delete'}
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={(event) => {
+                onDelete({
+                  event,
+                  toolpadEvent: {
+                    type: 'delete',
+                    id,
+                    row,
+                  },
+                });
+                setRows((prevRows) => prevRows.filter((prevRow) => prevRow.id !== id));
+              }}
+            />,
+          ];
+        },
+      });
+    },
+    [],
   );
 
   const columnsInitRef = React.useRef(false);
   const isUsingDefaultData = rows === DEFAULT_ROWS;
-  const columns: GridColumns = React.useMemo(
-    () => (columnsProp ? parseColumns(columnsProp, onDelete) : DEFAULT_COLUMNS),
-    [columnsProp, onDelete],
-  );
+  const columns: GridColumns = React.useMemo(() => {
+    const cols = columnsProp ? parseColumns(columnsProp) : DEFAULT_COLUMNS;
+    if (onDeleteProp) {
+      addActionColumn(cols, onDeleteProp);
+    }
+    return cols;
+  }, [columnsProp, onDeleteProp, addActionColumn]);
 
   React.useEffect(() => {
     if (!nodeRuntime || isUsingDefaultData || rows.length <= 0 || columnsInitRef.current) {
@@ -465,7 +471,7 @@ export default createComponent(DataGridComponent, {
       typeDef: { type: 'boolean' },
     },
     onDelete: {
-      typeDef: { type: 'event' },
+      typeDef: { type: 'event', eventType: 'delete' },
       label: 'onDelete',
     },
     sx: {

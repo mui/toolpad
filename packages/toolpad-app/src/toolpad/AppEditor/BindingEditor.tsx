@@ -150,7 +150,7 @@ export interface JsExpressionActionEditorProps
 function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorProps) {
   const { globalScope } = useBindingEditorContext();
   const handleCodeChange = React.useCallback(
-    (newValue: string) => onChange({ type: 'jsExpressionAction', value: { code: newValue } }),
+    (newValue: string) => onChange({ type: 'jsExpressionAction', value: newValue }),
     [onChange],
   );
   return (
@@ -164,7 +164,7 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
         <JsExpressionEditor
           sx={{ flex: 1 }}
           globalScope={globalScope}
-          value={value?.value?.code || ''}
+          value={value?.value || ''}
           onChange={handleCodeChange}
           functionBody
           topLevelAwait

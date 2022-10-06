@@ -2,15 +2,11 @@ import { createRequire } from 'module';
 import * as path from 'path';
 import { withSentryConfig } from '@sentry/nextjs';
 
-const require = createRequire(import.meta.url);
-const pkgJson = require('./package.json');
-
-const TOOLPAD_BUILD = process.env.GIT_SHA1?.slice(0, 7) || 'dev';
-
-// hardcode SENTRY_RELEASE
-process.env.SENTRY_RELEASE = TOOLPAD_BUILD;
 // TODO: remove when https://github.com/getsentry/sentry-javascript/issues/3852 gets resolved
 process.env.SENTRY_IGNORE_API_RESOLUTION_ERROR = 'true';
+
+const require = createRequire(import.meta.url);
+const pkgJson = require('./package.json');
 
 // Keep in sync with src/constants.ts. Convert to imports once next.config.ts is a feature
 // See https://github.com/vercel/next.js/discussions/35969#discussioncomment-2523010
@@ -42,7 +38,7 @@ function parseBuidEnvVars(env) {
     TOOLPAD_TARGET: target,
     TOOLPAD_DEMO: env.TOOLPAD_DEMO || '',
     TOOLPAD_VERSION: pkgJson.version,
-    TOOLPAD_BUILD,
+    TOOLPAD_BUILD: process.env.GIT_SHA1?.slice(0, 7) || 'dev',
   };
 }
 

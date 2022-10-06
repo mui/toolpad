@@ -47,6 +47,8 @@ export function JsExpressionEditor({
     const content = `
       ${type.join('\n')}
 
+      /** @deprecated use parameters */
+      declare const query: Query;
       ${globals}
     `;
 

@@ -14,8 +14,7 @@ function evaluateCode(code: string, globalScope: Record<string, unknown>) {
   // eslint-disable-next-line no-underscore-dangle
   (iframe.contentWindow as any).__SCOPE = globalScope;
   (iframe.contentWindow as any).console = window.console;
-  const response = (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
-  return response;
+  return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
 }
 
 const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';

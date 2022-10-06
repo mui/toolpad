@@ -135,7 +135,9 @@ type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
-  createProvidedContext<(expr: string, params: any) => any>('EvaluatePageExpression');
+  createProvidedContext<(expr: string, params: Record<string, unknown>) => any>(
+    'EvaluatePageExpression',
+  );
 const [useBindingsContext, BindingsContextProvider] =
   createProvidedContext<Record<string, BindingEvaluationResult>>('LiveBindings');
 const [useSetControlledBindingContext, SetControlledBindingContextProvider] =

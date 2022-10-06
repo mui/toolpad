@@ -50,6 +50,8 @@ export interface NavigationAction<P = any> {
   };
 }
 
+type ButtonEventTypes = 'click';
+
 type DataGridActionEventTypes = 'delete' | 'update';
 
 export interface DataGridActionEvent {
@@ -118,7 +120,7 @@ export interface ElementValueType extends ValueTypeBase {
 
 export interface EventValueType extends ValueTypeBase {
   type: 'event';
-  eventType: DataGridActionEventTypes;
+  eventType: ButtonEventTypes | DataGridActionEventTypes;
 }
 
 export interface ArgControlSpec {

@@ -309,7 +309,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const hasExplicitRowId: boolean = React.useMemo(() => {
     const hasRowIdField: boolean = !!(rowIdFieldProp && rowIdFieldProp !== 'id');
-    return rowsInput.length === 0 || hasRowIdField || !!rowsInput[0].id;
+    return rowsInput.length === 0 || hasRowIdField || !!rowsInput[0]?.id;
   }, [rowIdFieldProp, rowsInput]);
 
   const [rows, setRows] = React.useState<GridRowsProp>(() =>
@@ -318,7 +318,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   React.useEffect(() => {
     setRows(rowsInput);
-  }, [rowsInput, hasExplicitRowId]);
+  }, [rowsInput]);
 
   const addActionColumn = React.useCallback(
     (columns: GridColumns, onDelete: ToolpadDataGridDeleteEvent) => {

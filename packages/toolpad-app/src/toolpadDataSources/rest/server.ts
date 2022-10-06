@@ -5,7 +5,6 @@ import {
   ExecFetchResult,
 } from '@mui/toolpad-core';
 import fetch, { Headers, RequestInit, Response } from 'node-fetch';
-import MIMEType from 'whatwg-mimetype';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource } from '../../types';
 import {
@@ -23,6 +22,7 @@ import { Maybe } from '../../utils/types';
 import { getAuthenticationHeaders, HTTP_NO_BODY, parseBaseUrl } from './shared';
 import applyTransform from '../../server/applyTransform';
 import { errorFrom } from '../../utils/errors';
+import DEMO_BASE_URLS from './demoBaseUrls';
 
 async function resolveBindable(
   bindable: BindableAttrValue<string>,
@@ -118,18 +118,14 @@ async function resolveBody(body: Body, boundValues: Record<string, string>) {
   }
 }
 
-function isJSON(mimeType: MIMEType): boolean {
-  // See https://mimesniff.spec.whatwg.org/#json-mime-type
-  const essence = `${mimeType.type}/${mimeType.subtype}`;
-  return (
-    essence === 'text/json' || essence === 'application/json' || mimeType.subtype.endsWith('+json')
-  );
-}
-
-async function readData(res: Response): Promise<any> {
-  const contentType = res.headers.get('content-type');
-  const mimeType = contentType ? new MIMEType(contentType) : null;
-  return mimeType && isJSON(mimeType) ? res.json() : res.text();
+async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
+  if (!fetchQuery.response || fetchQuery.response?.kind === 'json') {
+    return res.json();
+  }
+  if (fetchQuery.response?.kind === 'raw') {
+    return res.text();
+  }
+  throw new Error(`Unsupported response type "${fetchQuery.response.kind}"`);
 }
 
 async function execBase(
@@ -142,6 +138,21 @@ async function execBase(
     resolveBindableEntries(fetchQuery.searchParams || [], params),
     resolveBindableEntries(fetchQuery.headers || [], params),
   ]);
+
+  if (process.env.TOOLPAD_DEMO) {
+    const demoUrls = DEMO_BASE_URLS.map((baseUrl) => baseUrl.url);
+
+    const hasNonDemoConnectionParams =
+      !demoUrls.includes(connection?.baseUrl || '') ||
+      (!!connection?.headers && connection.headers.length > 0) ||
+      !!connection?.authentication;
+    const hasNonDemoQueryParams =
+      fetchQuery.method !== 'GET' || (!!fetchQuery.headers && fetchQuery.headers.length > 0);
+
+    if (hasNonDemoConnectionParams || hasNonDemoQueryParams) {
+      throw new Error(`Cannot use these features in demo version.`);
+    }
+  }
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
   resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));
@@ -188,7 +199,7 @@ async function execBase(
       throw new Error(`HTTP ${res.status} (${res.statusText}) while fetching "${res.url}"`);
     }
 
-    untransformedData = await readData(res);
+    untransformedData = await readData(res, fetchQuery);
     data = untransformedData;
 
     if (fetchQuery.transformEnabled && fetchQuery.transform) {

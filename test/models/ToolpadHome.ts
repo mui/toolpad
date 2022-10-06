@@ -3,6 +3,7 @@ import generateId from '../utils/generateId';
 
 interface CreateApplicationParams {
   name?: string;
+  appTemplateId?: string;
   dom?: any;
 }
 
@@ -20,19 +21,31 @@ export class ToolpadHome {
 
   readonly newAppNameInput: Locator;
 
+  readonly newAppTemplateSelect: Locator;
+
   readonly newAppDomInput: Locator;
 
   readonly newAppDomCreateBtn: Locator;
 
+  readonly getAppRow: (appName: string) => Locator;
+
   constructor(page: Page) {
     this.page = page;
+
     this.createNewbtn = page.locator('button:has-text("create new")');
+
     this.newAppDialog = page.locator('[role="dialog"]', {
       hasText: 'Create a new MUI Toolpad App',
     });
     this.newAppNameInput = this.newAppDialog.locator('label:has-text("name")');
+    this.newAppTemplateSelect = this.newAppDialog.locator(
+      '[aria-haspopup="listbox"]:has-text("blank")',
+    );
     this.newAppDomInput = this.newAppDialog.locator('label:has-text("dom")');
     this.newAppDomCreateBtn = this.newAppDialog.locator('button:has-text("create")');
+
+    this.getAppRow = (appName: string): Locator =>
+      page.locator(`[role="row"] >> has="input[value='${appName}']"`);
   }
 
   async goto() {
@@ -41,13 +54,26 @@ export class ToolpadHome {
 
   async createApplication({
     name = `App ${generateId()}`,
+    appTemplateId,
     dom,
   }: CreateApplicationParams): Promise<CreateApplicationResult> {
     await this.createNewbtn.click();
 
     await this.newAppNameInput.fill(name);
 
+    if (appTemplateId) {
+      await this.newAppTemplateSelect.click();
+      await this.page.locator(`[data-value="${appTemplateId}"]`).click();
+    }
+
     if (dom) {
+      const isDomInputEnabled = await this.newAppDomInput.isVisible();
+      if (!isDomInputEnabled) {
+        throw new Error(
+          `Toolpad not in integration test mode. Make sure to start Toolpad with environment variable TOOLPAD_ENABLE_CREATE_BY_DOM=1.`,
+        );
+      }
+
       await this.newAppDomInput.fill(JSON.stringify(dom));
     }
 

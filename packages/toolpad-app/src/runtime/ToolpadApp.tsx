@@ -22,6 +22,7 @@ import {
   BindableAttrValue,
   UseDataQueryConfig,
   NestedBindableAttrs,
+  BindableAttrValues,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -121,6 +122,7 @@ const EditorOverlay = styled('div')({
   position: 'absolute',
   inset: '0 0 0 0',
   pointerEvents: 'none',
+  overflow: 'hidden',
 });
 
 interface AppContext {
@@ -178,11 +180,22 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const nodeId = node.id;
 
+  const isPageNode = appDom.isPage(node);
+  const isElementNode = appDom.isElement(node);
+
+  const nodeProps: BindableAttrValues<Record<string, any>> = React.useMemo(
+    () => (isElementNode ? node.props || {} : {}),
+    [isElementNode, node],
+  );
+  const nodeLayoutProps = React.useMemo(
+    () => (isElementNode ? node.layout || {} : {}),
+    [isElementNode, node],
+  );
+
   const componentConfig = Component[TOOLPAD_COMPONENT];
   const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
-  const isLayoutNode =
-    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
+  const isLayoutNode = isPageNode || (isElementNode && isPageLayoutComponent(node));
 
   const liveBindings = useBindingsContext();
   const boundProps: Record<string, any> = React.useMemo(() => {
@@ -206,8 +219,12 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         }
       }
 
-      if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = argType.defaultValue;
+      if (typeof hookResult[propName] === 'undefined') {
+        if (nodeProps && nodeProps[propName]?.type === 'const') {
+          hookResult[propName] = nodeProps[propName]?.value;
+        } else if (argType) {
+          hookResult[propName] = argType.defaultValue;
+        }
       }
     }
 
@@ -224,25 +241,32 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
 
     return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
+  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId, nodeProps]);
 
   const boundLayoutProps: Record<string, any> = React.useMemo(() => {
     const hookResult: Record<string, any> = {};
 
-    for (const [propName, argType] of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
+    for (const layoutBoxArgTypesEntry of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
+      const propName = layoutBoxArgTypesEntry[0] as keyof typeof layoutBoxArgTypes;
+      const argType = layoutBoxArgTypesEntry[1];
+
       const bindingId = `${nodeId}.layout.${propName}`;
       const binding = liveBindings[bindingId];
       if (binding) {
         hookResult[propName] = binding.value;
       }
 
-      if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = argType.defaultValue;
+      if (typeof hookResult[propName] === 'undefined') {
+        if (nodeLayoutProps && nodeLayoutProps[propName]?.type === 'const') {
+          hookResult[propName] = nodeLayoutProps[propName]?.value;
+        } else if (argType) {
+          hookResult[propName] = argType.defaultValue;
+        }
       }
     }
 
     return hookResult;
-  }, [isLayoutNode, liveBindings, nodeId]);
+  }, [isLayoutNode, liveBindings, nodeId, nodeLayoutProps]);
 
   const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
     () =>

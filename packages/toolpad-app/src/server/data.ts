@@ -1,7 +1,7 @@
 import { NodeId, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import * as prisma from '../../prisma/generated/client';
-import { ServerDataSource, VersionOrPreview } from '../types';
+import { ServerDataSource, VersionOrPreview, AppTemplateId } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -9,6 +9,8 @@ import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
+import { getAppTemplateDom } from './appTemplateDoms/doms';
+import { validateRecaptchaToken } from '../utils/recaptcha';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -139,6 +141,10 @@ async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
 }
 
 export async function getApps(): Promise<AppMeta[]> {
+  if (process.env.TOOLPAD_DEMO) {
+    return [];
+  }
+
   return prismaClient.app.findMany({
     orderBy: {
       editedAt: 'desc',
@@ -175,17 +181,67 @@ function createDefaultDom(): appDom.AppDom {
   return dom;
 }
 
-export interface CreateAppOptions {
-  dom?: appDom.AppDom | null;
-}
+export type CreateAppOptions = {
+  from?:
+    | {
+        kind: 'dom';
+        dom?: appDom.AppDom | null;
+      }
+    | {
+        kind: 'template';
+        id: AppTemplateId;
+      };
+  recaptchaToken?: string;
+};
 
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
+  const { from } = opts;
+
+  const recaptchaSecretKey = process.env.TOOLPAD_RECAPTCHA_SECRET_KEY;
+  if (recaptchaSecretKey) {
+    const isRecaptchaTokenValid = await validateRecaptchaToken(
+      recaptchaSecretKey,
+      opts.recaptchaToken || '',
+    );
+
+    if (!isRecaptchaTokenValid) {
+      throw new Error('Unable to verify CAPTCHA.');
+    }
+  }
+
+  let appName = name.trim();
+
+  if (process.env.TOOLPAD_DEMO) {
+    appName = appName.replace(/\(#[0-9]+\)/g, '').trim();
+
+    const sameNameAppCount = await prismaClient.app.count({
+      where: { OR: [{ name: appName }, { name: { startsWith: `${appName} (#`, endsWith: ')' } }] },
+    });
+    if (sameNameAppCount > 0) {
+      appName = `${appName} (#${sameNameAppCount + 1})`;
+    }
+  }
+
+  if (await prismaClient.app.findUnique({ where: { name: appName } })) {
+    throw new Error(`An app named "${name}" already exists.`);
+  }
+
   return prismaClient.$transaction(async () => {
     const app = await prismaClient.app.create({
-      data: { name },
+      data: { name: appName },
     });
 
-    const dom = opts.dom || createDefaultDom();
+    let dom: appDom.AppDom | null = null;
+
+    if (from && from.kind === 'dom') {
+      dom = from.dom || null;
+    } else if (from && from.kind === 'template') {
+      dom = await getAppTemplateDom(from.id || 'blank');
+    }
+
+    if (!dom) {
+      dom = createDefaultDom();
+    }
 
     await saveDom(app.id, dom);
 
@@ -193,12 +249,17 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
   });
 }
 
-export async function updateApp(appId: string, name: string): Promise<void> {
+interface AppUpdates {
+  name?: string;
+  public?: boolean;
+}
+
+export async function updateApp(appId: string, updates: AppUpdates): Promise<void> {
   await prismaClient.app.update({
     where: {
       id: appId,
     },
-    data: { name },
+    data: _.pick(updates, ['name', 'public']),
     select: {
       // Only return the id to reduce amount of data returned from the db
       id: true,
@@ -332,14 +393,18 @@ export async function findActiveDeployment(appId: string): Promise<Deployment | 
   });
 }
 
-export async function loadReleaseDom(appId: string, version: number): Promise<appDom.AppDom> {
+function parseSnapshot(snapshot: Buffer): appDom.AppDom {
+  return JSON.parse(snapshot.toString('utf-8')) as appDom.AppDom;
+}
+
+async function loadReleaseDom(appId: string, version: number): Promise<appDom.AppDom> {
   const release = await prismaClient.release.findUnique({
     where: { release_app_constraint: { appId, version } },
   });
   if (!release) {
     throw new Error(`release doesn't exist`);
   }
-  return JSON.parse(release.snapshot.toString('utf-8')) as appDom.AppDom;
+  return parseSnapshot(release.snapshot);
 }
 
 export async function getConnectionParams<P = unknown>(

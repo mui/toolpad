@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { TextField, Theme, TypographyVariant, SxProps } from '@mui/material';
+import {
+  TextField,
+  Theme,
+  TypographyVariant,
+  SxProps,
+  inputBaseClasses,
+  formHelperTextClasses,
+  inputClasses,
+} from '@mui/material';
 
 interface EditableTextProps {
   defaultValue?: string;
@@ -120,7 +128,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             fontSize: theme.typography[typographyVariant].fontSize,
-            height: theme.typography[typographyVariant].fontSize,
+            height: `1.1em`,
           }),
         }}
         onKeyUp={handleInput}
@@ -129,12 +137,12 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         size={size ?? 'small'}
         sx={{
           ...sx,
-          '& .MuiInputBase-root.MuiInput-root:before, .MuiInput-root.MuiInputBase-root:not(.Mui-disabled):hover::before':
+          [`.${inputClasses.root}.${inputBaseClasses.root}:before, .${inputClasses.root}.${inputBaseClasses.root}:not(${inputBaseClasses.disabled}):hover:before`]:
             {
               borderBottom: editable ? `initial` : 'none',
             },
           // TextField must not appear disabled if disabled state is controlled by `editable` prop
-          '& .MuiInput-root.MuiInputBase-root.Mui-disabled, .MuiInput-input.MuiInputBase-input.Mui-disabled, .MuiInput-root.MuiFormHelperText-root.Mui-disabled':
+          [`.${inputClasses.root}.${inputBaseClasses.root}.${inputBaseClasses.disabled}, .${inputClasses.input}.${inputBaseClasses.input}.${inputBaseClasses.disabled}, .${formHelperTextClasses.root}.${inputBaseClasses.disabled}`]:
             disabled
               ? null
               : {

@@ -9,7 +9,10 @@ import {
   Skeleton,
 } from '@mui/material';
 import * as React from 'react';
+import { inferColumns, parseColumns } from '@mui/toolpad-components';
+import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
+import { getObjectKey } from '@mui/toolpad-core/objectKey';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   GoogleSheetsConnectionParams,
@@ -26,10 +29,11 @@ import {
 import useDebounced from '../../utils/useDebounced';
 import { usePrivateQuery } from '../context';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
-import JsonView from '../../components/JsonView';
 import QueryInputPanel from '../QueryInputPanel';
 import SplitPane from '../../components/SplitPane';
 import useQueryPreview from '../useQueryPreview';
+
+const EMPTY_ROWS: any[] = [];
 
 function getInitialQueryValue(): GoogleSheetsApiQuery {
   return { ranges: 'A1:Z10', spreadsheetId: '', sheetName: '', headerRow: false };
@@ -138,6 +142,11 @@ function QueryEditor({
   const isDirty =
     input.query !== lastSavedInput.current.query || input.params !== lastSavedInput.current.params;
 
+  const rawRows: any[] = preview?.data || EMPTY_ROWS;
+  const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
+  const rows = React.useMemo(() => rawRows.map((row, id) => ({ id, ...row })), [rawRows]);
+  const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
+
   return (
     <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
       <SplitPane split="vertical" size="50%" allowResize>
@@ -204,7 +213,7 @@ function QueryEditor({
         {preview?.error ? (
           <ErrorAlert error={preview?.error} />
         ) : (
-          <JsonView sx={{ height: '100%' }} src={preview?.data} />
+          <DataGridPro sx={{ border: 'none' }} columns={columns} key={previewGridKey} rows={rows} />
         )}
       </SplitPane>
     </QueryEditorShell>

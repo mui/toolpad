@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 /**
- * Use projectRoot serevrside to resolve files against.
+ * Use projectRoot serverside to resolve files against.
  * - __dirname doesn't work in Next.js.
  *   See https://github.com/vercel/next.js/discussions/32236
  * - We run jest from the monorepo root and it doesn't mock cwd for the projects. So

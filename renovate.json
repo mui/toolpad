@@ -23,8 +23,33 @@
       "matchPackagePatterns": "@emotion/*"
     },
     {
+      "groupName": "jest",
+      "matchPackageNames": ["@types/jest", "jest", "jest-environment-jsdom"]
+    },
+    {
+      "groupName": "testing-library",
+      "matchPackagePatterns": "@testing-library/*"
+    },
+    {
+      "groupName": "eslint",
+      "matchPackagePatterns": ["prettier-*"],
+      "matchPackageNames": ["prettier", "pretty-quick"]
+    },
+    {
+      "groupName": "prettier",
+      "matchPackagePatterns": ["eslint-*", "eslint-*", "@typescript-eslint/*"],
+      "matchPackageNames": ["eslint", "@next/eslint-plugin-next"]
+    },
+    {
       "groupName": "React",
-      "matchPackageNames": ["react", "react-dom", "react-is", "react-test-renderer"]
+      "matchPackageNames": [
+        "@types/react",
+        "@types/react-dom",
+        "react",
+        "react-dom",
+        "react-is",
+        "react-test-renderer"
+      ]
     },
     {
       "groupName": "typescript-eslint",
@@ -48,6 +73,7 @@
         "@mui/icons-material",
         "@mui/base",
         "@mui/system",
+        "@mui/styles",
         "@mui/utils"
       ]
     },

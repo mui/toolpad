@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Alert, Snackbar } from '@mui/material';
 import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import * as appDom from '../appDom';
@@ -223,7 +222,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
   };
 }
 
-interface DomLoader {
+export interface DomLoader {
   dom: appDom.AppDom;
   saving: boolean;
   unsavedChanges: number;
@@ -326,11 +325,6 @@ export default function DomProvider({ appId, children }: DomContextProps) {
   return (
     <DomLoaderProvider value={state}>
       <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
-      <Snackbar open={!!state.saveError}>
-        <Alert severity="error" sx={{ width: '100%' }}>
-          Failed to save: {state.saveError}
-        </Alert>
-      </Snackbar>
     </DomLoaderProvider>
   );
 }

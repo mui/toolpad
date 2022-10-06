@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
-import { Box, CircularProgress, NoSsr, styled } from '@mui/material';
+import { Box, CircularProgress, styled } from '@mui/material';
 import { ErrorBoundary } from 'react-error-boundary';
 import AppEditor from './AppEditor';
 import Home from './Home';

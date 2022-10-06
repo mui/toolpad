@@ -222,18 +222,6 @@ export type RuntimeEvent =
   | { type: 'screenUpdate' }
   | { type: 'pageNavigationRequest'; pageNodeId: NodeId };
 
-export type RuntimeApi = {
-  hasBinding: (nodeId: string, prop: string) => boolean;
-};
-
-export type RuntimeApiCallHandler = <
-  K extends keyof RuntimeApi,
-  T extends (...args: any) => any = RuntimeApi[K],
->(
-  fn: K,
-  ...args: Parameters<T>
-) => ReturnType<T>;
-
 export interface ComponentConfig<P> {
   /**
    * Designates a property as "the error property". If Toolpad detects an error

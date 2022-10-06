@@ -19,7 +19,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { Delete as DeleteIcon } from '@mui/icons-material';
-import { useNode, createComponent, DataGridActionEvent } from '@mui/toolpad-core';
+import { useNode, createComponent, ToolpadEvent } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 
@@ -168,7 +168,7 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 
 interface ToolpadDataGridDeleteEventParams {
   event: React.MouseEvent<HTMLButtonElement>;
-  toolpadEvent: DataGridActionEvent;
+  toolpadEvent: ToolpadEvent;
 }
 
 type ToolpadDataGridDeleteEvent = (params: ToolpadDataGridDeleteEventParams) => void;

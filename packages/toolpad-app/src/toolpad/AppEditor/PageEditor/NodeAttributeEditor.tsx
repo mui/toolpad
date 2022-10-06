@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue, DataGridActionEvent } from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue, ToolpadEvent } from '@mui/toolpad-core';
 import { Alert } from '@mui/material';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
@@ -45,7 +45,7 @@ export default function NodeAttributeEditor({
     const rowIdFieldBindingValue =
       rowIdFieldBinding in bindings ? bindings[rowIdFieldBinding]?.value : null;
 
-    const toolpadEvent: DataGridActionEvent = {
+    const toolpadEvent: ToolpadEvent = {
       type: propType.eventType,
       id: rowBindingValue?.[rowIdFieldBindingValue],
       row: rowBindingValue,

@@ -54,11 +54,17 @@ type ButtonEventTypes = 'click';
 
 type DataGridActionEventTypes = 'delete' | 'update';
 
-export interface DataGridActionEvent {
+interface DataGridActionEvent {
   type: DataGridActionEventTypes;
   id: GridRowId;
   row: any;
 }
+
+interface ButtonEvent {
+  type: ButtonEventTypes;
+}
+
+export type ToolpadEvent = DataGridActionEvent | ButtonEvent;
 
 export type BindableAction = JsExpressionAction | NavigationAction;
 

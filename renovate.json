@@ -61,7 +61,7 @@
   "prConcurrentLimit": 30,
   "prHourlyLimit": 0,
   "rangeStrategy": "bump",
-  "schedule": "every two weeks on sunday before 6:00am",
+  "schedule": "on sunday before 6:00am",
   "timezone": "UTC",
   "vulnerabilityAlerts": {
     "prCreation": "immediate",

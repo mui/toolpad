@@ -33,7 +33,8 @@ commands:
       - restore_cache:
           name: Restore yarn cache
           keys:
-            - v8-yarn-{{ checksum "yarn.lock" }}
+            - v9-yarn-{{ checksum "yarn.lock" }}
+            - v0-next-{{ checksum "yarn.lock" }}
       - run:
           name: Set yarn cache folder
           command: |
@@ -66,7 +67,7 @@ commands:
           command: yarn prisma generate
       - save_cache:
           name: Save yarn cache
-          key: v8-yarn-{{ checksum "yarn.lock" }}
+          key: v9-yarn-{{ checksum "yarn.lock" }}
           paths:
             # Keep path in sync with "Set yarn cache folder"
             # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
@@ -78,8 +79,6 @@ commands:
             - packages/toolpad-app/node_modules
             - packages/toolpad-components/node_modules
             - packages/toolpad-core/node_modules
-            # next.js cache
-            - packages/toolpad-app/.next/cache
       - when:
           condition: << parameters.browsers >>
           steps:
@@ -139,6 +138,11 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
+      - save_cache:
+          name: Save Next.js cache
+          key: v0-next-{{ checksum "yarn.lock" }}
+          paths:
+            - packages/toolpad-app/.next/cache
 
   test_unit:
     <<: *defaults

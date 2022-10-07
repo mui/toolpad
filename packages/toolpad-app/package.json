@@ -20,7 +20,8 @@
     "waitForDb": "ts-node ./scripts/waitForDb.ts",
     "dev:function-runtime": "yarn build:function-runtime --watch",
     "waitForApp": "ts-node --esm ./scripts/waitForApp.mts",
-    "prisma-detect-drift": "prisma migrate diff --exit-code --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url \"$TOOLPAD_SHADOW_DATABASE_URL\""
+    "prisma-detect-drift": "prisma migrate diff --exit-code --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url \"$TOOLPAD_SHADOW_DATABASE_URL\"",
+    "check-types": "tsc --noEmit"
   },
   "files": [
     "prisma",
@@ -63,7 +64,7 @@
     "csstype": "^3.0.11",
     "cuid": "^2.1.8",
     "dayjs": "^1.11.5",
-    "esbuild": "0.15.7",
+    "esbuild": "0.15.10",
     "fastestsmallesttextencoderdecoder": "^1.0.22",
     "find-up": "^6.3.0",
     "formdata-polyfill": "^4.0.10",
@@ -100,7 +101,7 @@
     "sucrase": "^3.25.0",
     "superjson": "^1.8.1",
     "ts-node": "^10.9.1",
-    "typescript": "^4.8.3",
+    "typescript": "^4.8.4",
     "web-streams-polyfill": "^3.2.1",
     "whatwg-url": "^11.0.0"
   },
@@ -110,7 +111,7 @@
     "@types/formidable": "^2.0.5",
     "@types/glob": "^8.0.0",
     "@types/grecaptcha": "^3.0.4",
-    "@types/har-format": "^1.2.8",
+    "@types/har-format": "^1.2.9",
     "@types/invariant": "^2.2.35",
     "@types/lodash-es": "^4.17.6",
     "@types/node-fetch": "^2.6.2",

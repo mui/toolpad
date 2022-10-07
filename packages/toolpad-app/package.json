@@ -64,7 +64,7 @@
     "csstype": "^3.0.11",
     "cuid": "^2.1.8",
     "dayjs": "^1.11.5",
-    "esbuild": "0.15.7",
+    "esbuild": "0.15.10",
     "fastestsmallesttextencoderdecoder": "^1.0.22",
     "find-up": "^6.3.0",
     "formdata-polyfill": "^4.0.10",

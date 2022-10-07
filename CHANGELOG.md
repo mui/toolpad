@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.0.21
+
+<!-- generated comparing v0.0.20..master -->
+
+_Oct 5, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Major groundwork to get online demo ready
+
+- &#8203;<!-- 11 -->Attempt to fix render.yaml (#1069) @apedroferreira
+- &#8203;<!-- 10 -->Fix component flicker (#1061) @apedroferreira
+- &#8203;<!-- 09 -->Add Sentry (#1043) @apedroferreira
+- &#8203;<!-- 08 -->Fix moving same row elements into same column (#1060) @apedroferreira
+- &#8203;<!-- 07 -->Add Google reCAPTCHA v3 to online demo (#1054) @apedroferreira
+- &#8203;<!-- 06 -->Online demo (#1002) @apedroferreira
+- &#8203;<!-- 05 -->[core] Fix buildFilter property in render.yml (#1085) @Janpot
+- &#8203;<!-- 04 -->[core] We don't build the database @oliviertassinari
+- &#8203;<!-- 03 -->[core] Don't build on render for docs changes (#1081) @oliviertassinari
+- &#8203;<!-- 02 -->[core] Remove outdated docsearch.js dependency (#1046) @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix outdated URL @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @oliviertassinari
+
 ## v0.0.20
 
 <!-- generated comparing v0.0.19..master -->

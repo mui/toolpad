@@ -11,59 +11,14 @@
   "stopUpdatingLabel": "on hold",
   "packageRules": [
     {
-      "matchDepTypes": ["peerDependencies"],
-      "rangeStrategy": "widen"
+      "groupName": "dependencies",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["dependencies"]
     },
     {
-      "groupName": "babel",
-      "matchPackagePatterns": "@babel/*"
-    },
-    {
-      "groupName": "Emotion",
-      "matchPackagePatterns": "@emotion/*"
-    },
-    {
-      "groupName": "jest",
-      "matchPackageNames": ["@types/jest", "jest", "jest-environment-jsdom"]
-    },
-    {
-      "groupName": "testing-library",
-      "matchPackagePatterns": "@testing-library/*"
-    },
-    {
-      "groupName": "eslint",
-      "matchPackagePatterns": ["prettier-*"],
-      "matchPackageNames": ["prettier", "pretty-quick"]
-    },
-    {
-      "groupName": "prettier",
-      "matchPackagePatterns": ["eslint-*", "eslint-*", "@typescript-eslint/*"],
-      "matchPackageNames": ["eslint", "@next/eslint-plugin-next"]
-    },
-    {
-      "groupName": "React",
-      "matchPackageNames": [
-        "@types/react",
-        "@types/react-dom",
-        "react",
-        "react-dom",
-        "react-is",
-        "react-test-renderer"
-      ]
-    },
-    {
-      "groupName": "typescript-eslint",
-      "matchPackagePatterns": "@typescript-eslint/*"
-    },
-    {
-      "groupName": "node",
-      "matchPackageNames": ["node", "cimg/node"],
-      "enabled": false
-    },
-    {
-      "groupName": "postgres",
-      "matchPackageNames": ["cimg/postgres"],
-      "enabled": false
+      "groupName": "devDependencies",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"]
     },
     {
       "groupName": "MUI Core",
@@ -75,7 +30,8 @@
         "@mui/system",
         "@mui/styles",
         "@mui/utils"
-      ]
+      ],
+      "prCreation": "immediate"
     },
     {
       "groupName": "MUI X",
@@ -87,17 +43,28 @@
         "@mui/x-data-grid-generator",
         "@mui/x-date-pickers",
         "@mui/x-date-pickers-pro"
-      ]
+      ],
+      "prCreation": "immediate"
     },
     {
-      "groupName": "Playwright",
-      "matchPackagePatterns": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"]
+      "groupName": "ignored",
+      "matchPackageNames": [
+        "react-inspector",
+        "node-fetch",
+        "eslint-config-airbnb-typescript",
+        "chalk"
+      ],
+      "enabled": false
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],
   "prConcurrentLimit": 30,
   "prHourlyLimit": 0,
   "rangeStrategy": "bump",
-  "schedule": "on sunday before 6:00am",
-  "timezone": "UTC"
+  "schedule": "every two weeks on sunday before 6:00am",
+  "timezone": "UTC",
+  "vulnerabilityAlerts": {
+    "prCreation": "immediate",
+    "addLabels": ["priority: important"]
+  }
 }

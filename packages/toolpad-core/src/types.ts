@@ -267,7 +267,7 @@ export interface ComponentConfig<P> {
   /**
    * Describes the individual properties for this component
    */
-  argTypes: ArgTypeDefinitions<P>;
+  argTypes?: ArgTypeDefinitions<P>;
 }
 
 export type ToolpadComponent<P = {}> = React.ComponentType<P> & {

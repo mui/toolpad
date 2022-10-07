@@ -30,7 +30,7 @@ import {
   JsExpressionAction,
 } from '@mui/toolpad-core';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Maybe, WithControlledProp } from '../../utils/types';
+import { Maybe, WithControlledProp, GlobalScopeMeta } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
 import { tryFormatExpression } from '../../utils/prettier';
@@ -47,6 +47,7 @@ import GlobalScopeExplorer from './GlobalScopeExplorer';
 interface BindingEditorContext {
   label: string;
   globalScope: Record<string, unknown>;
+  globalScopeMeta?: GlobalScopeMeta;
   /**
    * Serverside binding, use the QuickJs runtime to evaluate bindings
    */
@@ -69,10 +70,12 @@ const ErrorTooltip = styled(({ className, ...props }: TooltipProps) => (
 
 interface JsExpressionBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {
   globalScope: Record<string, unknown>;
+  globalScopeMeta?: GlobalScopeMeta;
 }
 
 function JsExpressionBindingEditor({
   globalScope,
+  globalScopeMeta = {},
   value,
   onChange,
 }: JsExpressionBindingEditorProps) {
@@ -84,6 +87,7 @@ function JsExpressionBindingEditor({
   return (
     <JsExpressionEditor
       globalScope={globalScope}
+      globalScopeMeta={globalScopeMeta}
       value={value?.type === 'jsExpression' ? value.value : ''}
       onChange={handleChange}
       autoFocus
@@ -117,7 +121,7 @@ function JsExpressionPreview({ server, input, globalScope }: JsExpressionPreview
 export interface JsBindingEditorProps extends WithControlledProp<JsExpressionAttrValue | null> {}
 
 export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
-  const { label, globalScope, server, propType } = useBindingEditorContext();
+  const { label, globalScope, globalScopeMeta = {}, server, propType } = useBindingEditorContext();
   return (
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
       <GlobalScopeExplorer value={globalScope} />
@@ -136,7 +140,12 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
           expects a type: <code>{propType?.type || 'any'}</code>.
         </Typography>
 
-        <JsExpressionBindingEditor globalScope={globalScope} value={value} onChange={onChange} />
+        <JsExpressionBindingEditor
+          globalScope={globalScope}
+          globalScopeMeta={globalScopeMeta}
+          value={value}
+          onChange={onChange}
+        />
 
         <JsExpressionPreview server={server} input={value} globalScope={globalScope} />
       </Box>
@@ -148,7 +157,7 @@ export interface JsExpressionActionEditorProps
   extends WithControlledProp<JsExpressionAction | null> {}
 
 function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorProps) {
-  const { globalScope } = useBindingEditorContext();
+  const { globalScope, globalScopeMeta } = useBindingEditorContext();
   const handleCodeChange = React.useCallback(
     (newValue: string) => onChange({ type: 'jsExpressionAction', value: newValue }),
     [onChange],
@@ -164,6 +173,7 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
         <JsExpressionEditor
           sx={{ flex: 1 }}
           globalScope={globalScope}
+          globalScopeMeta={globalScopeMeta}
           value={value?.value || ''}
           onChange={handleCodeChange}
           functionBody
@@ -346,6 +356,7 @@ export function BindingEditorDialog<V>({
 export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   label: string;
   globalScope: Record<string, unknown>;
+  globalScopeMeta?: GlobalScopeMeta;
   /**
    * Uses the QuickJs runtime to evaluate bindings, just like on the server
    */
@@ -359,6 +370,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
 export function BindingEditor<V>({
   label,
   globalScope,
+  globalScopeMeta,
   server,
   disabled,
   hidden = false,
@@ -403,6 +415,7 @@ export function BindingEditor<V>({
   const bindingEditorContext: BindingEditorContext = {
     label,
     globalScope,
+    globalScopeMeta,
     server,
     disabled,
     propType,

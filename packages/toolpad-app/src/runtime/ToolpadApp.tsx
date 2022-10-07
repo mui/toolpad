@@ -180,7 +180,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const nodeId = node.id;
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
-  const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
+  const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
   const isLayoutNode =
     appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));

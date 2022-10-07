@@ -20,7 +20,8 @@
     "waitForDb": "ts-node ./scripts/waitForDb.ts",
     "dev:function-runtime": "yarn build:function-runtime --watch",
     "waitForApp": "ts-node --esm ./scripts/waitForApp.mts",
-    "prisma-detect-drift": "prisma migrate diff --exit-code --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url \"$TOOLPAD_SHADOW_DATABASE_URL\""
+    "prisma-detect-drift": "prisma migrate diff --exit-code --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url \"$TOOLPAD_SHADOW_DATABASE_URL\"",
+    "check-types": "tsc --noEmit"
   },
   "files": [
     "prisma",

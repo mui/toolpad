@@ -415,10 +415,6 @@ export async function execQuery<P, Q>(
   dataNode: appDom.QueryNode<Q> | appDom.MutationNode<Q>,
   params: Q,
 ): Promise<ExecFetchResult<any>> {
-  if (appDom.isQuery(dataNode)) {
-    dataNode = appDom.fromLegacyQueryNode(dataNode);
-  }
-
   const dataSource: ServerDataSource<P, Q, any> | undefined =
     dataNode.attributes.dataSource && serverDataSources[dataNode.attributes.dataSource.value];
   if (!dataSource) {

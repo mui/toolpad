@@ -61,21 +61,21 @@ const pages: MuiPage[] = [
     pathname: '/toolpad/data-binding',
     icon: 'CodeIcon',
   },
-  {
-    pathname: '/toolpad/versioning-and-deploying',
-    title: 'Versioning & deploying [TODO]',
-    icon: 'ToggleOnIcon',
-    children: [
-      {
-        pathname: '/toolpad/versioning-and-deploying/releases',
-      },
-    ],
-  },
-  {
-    pathname: '/toolpad/faq',
-    title: 'FAQ [TODO]',
-    icon: 'ReaderIcon',
-  },
+  // {
+  //   pathname: '/toolpad/versioning-and-deploying',
+  //   title: 'Versioning & deploying [TODO]',
+  //   icon: 'ToggleOnIcon',
+  //   children: [
+  //     {
+  //       pathname: '/toolpad/versioning-and-deploying/releases',
+  //     },
+  //   ],
+  // },
+  // {
+  //   pathname: '/toolpad/faq',
+  //   title: 'FAQ [TODO]',
+  //   icon: 'ReaderIcon',
+  // },
 ];
 
 export default pages;

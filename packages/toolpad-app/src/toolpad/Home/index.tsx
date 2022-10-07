@@ -11,6 +11,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Link,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -27,6 +28,11 @@ import {
   ToggleButtonGroup,
   Tooltip,
   Typography,
+  Divider,
+  Checkbox,
+  FormControlLabel,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import IconButton from '@mui/material/IconButton';
@@ -34,7 +40,11 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
+import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Controller, useForm } from 'react-hook-form';
+import useBoolean from '../../utils/useBoolean';
+import useEvent from '../../utils/useEvent';
 import client from '../../api';
 import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
@@ -51,6 +61,7 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
+import { getRecaptchaToken } from '../../utils/recaptcha';
 
 export const APP_TEMPLATE_OPTIONS = {
   blank: {
@@ -66,6 +77,8 @@ export const APP_TEMPLATE_OPTIONS = {
     description: 'Fetch remote images',
   },
 };
+
+const NO_OP = () => {};
 
 export interface CreateAppDialogProps {
   open: boolean;
@@ -95,15 +108,21 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     },
   });
 
+  const isDemo = !!process.env.TOOLPAD_DEMO;
+
   return (
     <React.Fragment>
-      <Dialog {...props} onClose={onClose}>
+      <Dialog {...props} onClose={isDemo ? NO_OP : onClose} maxWidth="xs">
         <DialogForm
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
+            let recaptchaToken;
+            if (config.recaptchaSiteKey) {
+              recaptchaToken = await getRecaptchaToken(config.recaptchaSiteKey);
+            }
 
             const appDom = dom.trim() ? JSON.parse(dom) : null;
-            createAppMutation.mutate([
+            await createAppMutation.mutateAsync([
               name,
               {
                 from: {
@@ -111,12 +130,19 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                     ? { kind: 'dom', dom: appDom }
                     : { kind: 'template', id: appTemplateId }),
                 },
+                recaptchaToken,
               },
             ]);
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
           <DialogContent>
+            {isDemo ? (
+              <Alert severity="warning" sx={{ mb: 2 }}>
+                <AlertTitle>For demo purposes only!</AlertTitle>
+                Your application will be ephemeral and may be deleted at any time.
+              </Alert>
+            ) : null}
             <TextField
               sx={{ my: 1 }}
               autoFocus
@@ -124,7 +150,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               label="Name"
               value={name}
               error={createAppMutation.isError}
-              helperText={createAppMutation.isError ? `An app named "${name}" already exists` : ''}
+              helperText={(createAppMutation.error as Error)?.message || ''}
               onChange={(event) => {
                 createAppMutation.reset();
                 setName(event.target.value);
@@ -160,6 +186,29 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 onChange={handleDomChange}
               />
             ) : null}
+            {config.recaptchaSiteKey ? (
+              <Typography variant="caption" color="text.secondary">
+                This site is protected by reCAPTCHA and the Google{' '}
+                <Link
+                  href="https://policies.google.com/privacy"
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Privacy Policy
+                </Link>{' '}
+                and{' '}
+                <Link
+                  href="https://policies.google.com/terms"
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Terms of Service
+                </Link>{' '}
+                apply.
+              </Typography>
+            ) : null}
           </DialogContent>
           <DialogActions>
             <Button
@@ -170,6 +219,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 createAppMutation.reset();
                 onClose();
               }}
+              disabled={isDemo}
             >
               Cancel
             </Button>
@@ -245,7 +295,7 @@ function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableP
     async (name: string) => {
       if (app?.id) {
         try {
-          await client.mutation.updateApp(app.id, name);
+          await client.mutation.updateApp(app.id, { name });
           await client.invalidateQueries('getApps');
         } catch (rawError) {
           setAppRenameError(errorFrom(rawError));
@@ -312,12 +362,75 @@ function AppOpenButton({ app, activeDeployment }: AppOpenButtonProps) {
   return openButton;
 }
 
+interface AppSettingsDialogProps {
+  open: boolean;
+  onClose: () => void;
+  app: AppMeta;
+}
+
+function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
+  const updateAppMutation = client.useMutation('updateApp');
+
+  const { handleSubmit, reset, control } = useForm({
+    defaultValues: {
+      public: app.public,
+    },
+  });
+
+  const handleClose = useEvent(() => {
+    onClose();
+    reset();
+    updateAppMutation.reset();
+  });
+
+  const doSubmit = handleSubmit(async (updates) => {
+    await updateAppMutation.mutateAsync([app.id, updates]);
+    onClose();
+  });
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogForm onSubmit={doSubmit}>
+        <DialogTitle>Application settings for &quot;{app.name}&quot;</DialogTitle>
+        <DialogContent>
+          <FormControlLabel
+            control={
+              <Controller
+                control={control}
+                name="public"
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Checkbox
+                    checked={value}
+                    onChange={(e) => onChange(e.target.checked)}
+                    {...field}
+                  />
+                )}
+              />
+            }
+            label="Make application public"
+          />
+          {updateAppMutation.error ? <ErrorAlert error={updateAppMutation.error} /> : null}
+        </DialogContent>
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={handleClose}>
+            Cancel
+          </Button>
+          <LoadingButton type="submit" loading={updateAppMutation.isLoading}>
+            Save
+          </LoadingButton>
+        </DialogActions>
+      </DialogForm>
+    </Dialog>
+  );
+}
+
 interface AppOptionsProps {
+  app?: AppMeta;
   onRename: () => void;
   onDelete?: () => void;
 }
 
-function AppOptions({ onRename, onDelete }: AppOptionsProps) {
+function AppOptions({ app, onRename, onDelete }: AppOptionsProps) {
   const { buttonProps, menuProps, onMenuClose } = useMenu();
 
   const handleRenameClick = React.useCallback(() => {
@@ -330,9 +443,20 @@ function AppOptions({ onRename, onDelete }: AppOptionsProps) {
     onDelete?.();
   }, [onDelete, onMenuClose]);
 
+  const {
+    setTrue: handleOpenSettings,
+    setFalse: handleCloseSettings,
+    value: settingsOpen,
+  } = useBoolean(false);
+
+  const handleopenSettingsClick = React.useCallback(() => {
+    onMenuClose();
+    handleOpenSettings();
+  }, [handleOpenSettings, onMenuClose]);
+
   return (
     <React.Fragment>
-      <IconButton {...buttonProps} aria-label="Application menu">
+      <IconButton {...buttonProps} aria-label="Application menu" disabled={!app}>
         <MoreVertIcon />
       </IconButton>
       <Menu {...menuProps}>
@@ -348,7 +472,17 @@ function AppOptions({ onRename, onDelete }: AppOptionsProps) {
           </ListItemIcon>
           <ListItemText>Delete</ListItemText>
         </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleopenSettingsClick}>
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText>Settings</ListItemText>
+        </MenuItem>
       </Menu>
+      {app ? (
+        <AppSettingsDialog open={settingsOpen} onClose={handleCloseSettings} app={app} />
+      ) : null}
     </React.Fragment>
   );
 }
@@ -378,7 +512,7 @@ function AppCard({ app, activeDeployment, onDelete }: AppCardProps) {
         }}
       >
         <CardHeader
-          action={<AppOptions onRename={handleRename} onDelete={onDelete} />}
+          action={<AppOptions app={app} onRename={handleRename} onDelete={onDelete} />}
           disableTypography
           subheader={
             <Typography variant="body2" color="text.secondary">
@@ -440,7 +574,7 @@ function AppRow({ app, activeDeployment, onDelete }: AppRowProps) {
           <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
             <AppEditButton app={app} />
             <AppOpenButton app={app} activeDeployment={activeDeployment} />
-            <AppOptions onRename={handleRename} onDelete={onDelete} />
+            <AppOptions app={app} onRename={handleRename} onDelete={onDelete} />
           </Stack>
         </TableCell>
       </TableRow>
@@ -525,7 +659,15 @@ function AppsListView({ loading, apps, activeDeploymentsByApp, setDeletedApp }: 
 }
 
 export default function Home() {
-  const { data: apps = [], isLoading, error } = client.useQuery('getApps', []);
+  const isDemo = !!process.env.TOOLPAD_DEMO;
+
+  const {
+    data: apps = [],
+    isLoading,
+    error,
+  } = client.useQuery('getApps', [], {
+    enabled: !isDemo,
+  });
   const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);
 
   const activeDeploymentsByApp = React.useMemo(() => {
@@ -537,7 +679,7 @@ export default function Home() {
     );
   }, [activeDeployments]);
 
-  const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = React.useState(isDemo);
 
   const [deletedApp, setDeletedApp] = React.useState<null | AppMeta>(null);
 
@@ -553,45 +695,47 @@ export default function Home() {
   return (
     <ToolpadShell>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      <Container>
-        <Typography variant="h2">Apps</Typography>
-        <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
-        <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
-          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-          <ToggleButtonGroup
-            value={viewMode}
-            exclusive
-            onChange={handleViewModeChange}
-            aria-label="view mode"
-          >
-            <ToggleButton
-              value="list"
-              aria-label="list view"
-              color={viewMode === 'list' ? 'primary' : undefined}
+      {!isDemo ? (
+        <Container>
+          <Typography variant="h2">Apps</Typography>
+          <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
+            <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={handleViewModeChange}
+              aria-label="view mode"
             >
-              <ViewListIcon />
-            </ToggleButton>
-            <ToggleButton
-              value="grid"
-              aria-label="grid view"
-              color={viewMode === 'grid' ? 'primary' : undefined}
-            >
-              <GridViewIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Toolbar>
-        {error ? (
-          <ErrorAlert error={error} />
-        ) : (
-          <AppsView
-            apps={apps}
-            loading={isLoading}
-            activeDeploymentsByApp={activeDeploymentsByApp}
-            setDeletedApp={setDeletedApp}
-          />
-        )}
-        <UpdateBanner />
-      </Container>
+              <ToggleButton
+                value="list"
+                aria-label="list view"
+                color={viewMode === 'list' ? 'primary' : undefined}
+              >
+                <ViewListIcon />
+              </ToggleButton>
+              <ToggleButton
+                value="grid"
+                aria-label="grid view"
+                color={viewMode === 'grid' ? 'primary' : undefined}
+              >
+                <GridViewIcon />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Toolbar>
+          {error ? (
+            <ErrorAlert error={error} />
+          ) : (
+            <AppsView
+              apps={apps}
+              loading={isLoading}
+              activeDeploymentsByApp={activeDeploymentsByApp}
+              setDeletedApp={setDeletedApp}
+            />
+          )}
+          <UpdateBanner />
+        </Container>
+      ) : null}
+      <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
     </ToolpadShell>
   );
 }

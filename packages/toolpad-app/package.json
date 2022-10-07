@@ -111,7 +111,7 @@
     "@types/formidable": "^2.0.5",
     "@types/glob": "^8.0.0",
     "@types/grecaptcha": "^3.0.4",
-    "@types/har-format": "^1.2.8",
+    "@types/har-format": "^1.2.9",
     "@types/invariant": "^2.2.35",
     "@types/lodash-es": "^4.17.6",
     "@types/node-fetch": "^2.6.2",

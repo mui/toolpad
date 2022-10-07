@@ -68,7 +68,7 @@
     "prop-types": "^15.8.1",
     "raw-loader": "^1.0.0",
     "react": "^18.1.0",
-    "react-docgen": "^5.4.1",
+    "react-docgen": "^5.4.3",
     "react-dom": "^18.1.0",
     "react-hook-form": "^7.31.3",
     "react-is": "^17.0.2",

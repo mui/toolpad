@@ -22,7 +22,6 @@ import {
   BindableAttrValue,
   UseDataQueryConfig,
   NestedBindableAttrs,
-  BindableAttrValues,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -180,22 +179,11 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const nodeId = node.id;
 
-  const isPageNode = appDom.isPage(node);
-  const isElementNode = appDom.isElement(node);
-
-  const nodeProps: BindableAttrValues<Record<string, any>> = React.useMemo(
-    () => (isElementNode ? node.props || {} : {}),
-    [isElementNode, node],
-  );
-  const nodeLayoutProps = React.useMemo(
-    () => (isElementNode ? node.layout || {} : {}),
-    [isElementNode, node],
-  );
-
   const componentConfig = Component[TOOLPAD_COMPONENT];
   const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
-  const isLayoutNode = isPageNode || (isElementNode && isPageLayoutComponent(node));
+  const isLayoutNode =
+    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
 
   const liveBindings = useBindingsContext();
   const boundProps: Record<string, any> = React.useMemo(() => {
@@ -219,12 +207,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         }
       }
 
-      if (typeof hookResult[propName] === 'undefined') {
-        if (nodeProps && nodeProps[propName]?.type === 'const') {
-          hookResult[propName] = nodeProps[propName]?.value;
-        } else if (argType) {
-          hookResult[propName] = argType.defaultValue;
-        }
+      if (typeof hookResult[propName] === 'undefined' && argType) {
+        hookResult[propName] = argType.defaultValue;
       }
     }
 
@@ -241,32 +225,25 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
 
     return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId, nodeProps]);
+  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
 
   const boundLayoutProps: Record<string, any> = React.useMemo(() => {
     const hookResult: Record<string, any> = {};
 
-    for (const layoutBoxArgTypesEntry of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
-      const propName = layoutBoxArgTypesEntry[0] as keyof typeof layoutBoxArgTypes;
-      const argType = layoutBoxArgTypesEntry[1];
-
+    for (const [propName, argType] of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
       const bindingId = `${nodeId}.layout.${propName}`;
       const binding = liveBindings[bindingId];
       if (binding) {
         hookResult[propName] = binding.value;
       }
 
-      if (typeof hookResult[propName] === 'undefined') {
-        if (nodeLayoutProps && nodeLayoutProps[propName]?.type === 'const') {
-          hookResult[propName] = nodeLayoutProps[propName]?.value;
-        } else if (argType) {
-          hookResult[propName] = argType.defaultValue;
-        }
+      if (typeof hookResult[propName] === 'undefined' && argType) {
+        hookResult[propName] = argType.defaultValue;
       }
     }
 
     return hookResult;
-  }, [isLayoutNode, liveBindings, nodeId, nodeLayoutProps]);
+  }, [isLayoutNode, liveBindings, nodeId]);
 
   const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
     () =>
@@ -726,7 +703,16 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const [pageBindings, setPageBindings] =
     React.useState<Record<string, ParsedBinding>>(parsedBindings);
 
+  const prevDom = React.useRef(dom);
   React.useEffect(() => {
+    if (dom === prevDom.current) {
+      // Ignore this effect if there are no dom updates.
+      // IMPORTANT!!! This assumes the `RenderedPage` component is remounted when the `nodeId` changes
+      //  <RenderedPage nodeId={someId} key={someId} />
+      return;
+    }
+    prevDom.current = dom;
+
     setPageBindings((existingBindings) => {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
@@ -751,7 +737,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       }
       return updated;
     });
-  }, [parsedBindings, controlled]);
+  }, [parsedBindings, controlled, dom]);
 
   const setControlledBinding = React.useCallback(
     (id: string, result: BindingEvaluationResult) => {
@@ -839,7 +825,14 @@ function RenderedPages({ dom }: RenderedPagesProps) {
         <Route
           key={page.id}
           path={`/pages/${page.id}`}
-          element={<RenderedPage nodeId={page.id} />}
+          element={
+            <RenderedPage
+              nodeId={page.id}
+              // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
+              // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+              key={page.id}
+            />
+          }
         />
       ))}
     </Routes>

@@ -45,7 +45,7 @@ export class ToolpadHome {
     this.newAppDomCreateBtn = this.newAppDialog.locator('button:has-text("create")');
 
     this.getAppRow = (appName: string): Locator =>
-      page.locator(`[role="row"]`, { has: page.locator(`input[value="${appName}"]`) });
+      page.locator(`[role="row"] >> has="input[value='${appName}']"`);
   }
 
   async goto() {

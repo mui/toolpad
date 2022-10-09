@@ -1,4 +1,4 @@
-FROM node:16 as base
+FROM node:18.10.0 as base
 
 ARG GIT_SHA1
 ENV GIT_SHA1=$GIT_SHA1

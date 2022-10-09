@@ -97,7 +97,7 @@ jobs:
       - image: cimg/node:16.14
         environment:
           TOOLPAD_SHADOW_DATABASE_URL: postgresql://postgres@localhost/circle_test
-      - image: cimg/postgres:14.0
+      - image: cimg/postgres:14.5
         environment:
           POSTGRES_USER: postgres
     steps:

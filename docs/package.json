@@ -74,7 +74,6 @@
     "react-is": "^17.0.2",
     "react-router": "^6.3.0",
     "react-router-dom": "^6.3.0",
-    "react-text-mask": "^5.4.3",
     "react-transition-group": "^4.4.5",
     "recast": "^0.21.1",
     "rimraf": "^3.0.2",

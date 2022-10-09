@@ -11,6 +11,11 @@
   "stopUpdatingLabel": "on hold",
   "packageRules": [
     {
+      "groupName": "needs special attention",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@playwright/*"]
+    },
+    {
       "groupName": "dependencies",
       "matchManagers": ["npm"],
       "matchDepTypes": ["dependencies"]

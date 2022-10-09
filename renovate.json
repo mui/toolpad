@@ -55,6 +55,10 @@
         "chalk"
       ],
       "enabled": false
+    },
+    {
+      "groupName": "dependencies",
+      "matchDepTypes": ["cimg/node", "node"]
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],

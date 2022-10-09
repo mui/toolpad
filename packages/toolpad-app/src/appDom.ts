@@ -106,6 +106,8 @@ export interface CodeComponentNode extends AppDomNodeBase {
   };
 }
 
+export type FetchMode = 'query' | 'mutation';
+
 /**
  * A DOM query is defined primarily by a server defined part "attributes.query"
  * and a clientside defined part "params". "params" are constructed in the runtime
@@ -116,6 +118,7 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
   readonly params?: BindableAttrValues;
   readonly attributes: {
+    readonly mode?: ConstantAttrValue<FetchMode>;
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeReference | null>;
     readonly query: ConstantAttrValue<Q>;
@@ -124,6 +127,7 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
+    readonly cacheTime?: ConstantAttrValue<number>;
     readonly enabled?: BindableAttrValue<boolean>;
   };
 }

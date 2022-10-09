@@ -2,7 +2,7 @@ const baseline = require('@mui/monorepo/.eslintrc');
 
 module.exports = {
   ...baseline,
-  plugins: [...baseline.plugins, 'jsdoc'],
+  plugins: baseline.plugins,
   /**
    * Sorted alphanumerically within each group. built-in and each plugin form
    * their own groups.
@@ -14,13 +14,6 @@ module.exports = {
     '@typescript-eslint/return-await': ['off'],
     // TODO move rule into main repo to allow deep @mui/monorepo imports
     'no-restricted-imports': ['off'],
-    'jsdoc/require-param': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-param-type': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-param-name': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-param-description': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-returns': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-returns-type': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-returns-description': ['error', { contexts: ['TSFunctionType'] }],
     'no-restricted-syntax': [
       'error',
       // From https://github.com/airbnb/javascript/blob/d8cb404da74c302506f91e5928f30cc75109e74d/packages/eslint-config-airbnb-base/rules/style.js#L333

@@ -14,6 +14,7 @@ import {
   Divider,
   Alert,
   Box,
+  MenuItem,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -289,6 +290,16 @@ function QueryNodeEditorDialog<Q>({
     [],
   );
 
+  const handleModeChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setInput((existing) =>
+      update(existing, {
+        attributes: update(existing.attributes, {
+          mode: appDom.createConst(event.target.value as appDom.FetchMode),
+        }),
+      }),
+    );
+  }, []);
+
   const handleRefetchOnWindowFocusChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setInput((existing) =>
@@ -414,6 +425,15 @@ function QueryNodeEditorDialog<Q>({
           value={input.attributes.enabled ?? appDom.createConst(true)}
           onChange={handleEnabledChange}
         />
+        <TextField
+          select
+          label="mode"
+          value={input.attributes.mode?.value || 'query'}
+          onChange={handleModeChange}
+        >
+          <MenuItem value="query">Fetch automatically on page load</MenuItem>
+          <MenuItem value="mutation">Only fetch on manual action</MenuItem>
+        </TextField>
         <FormControlLabel
           control={
             <Checkbox
@@ -446,6 +466,7 @@ function QueryNodeEditorDialog<Q>({
     ),
     [
       input,
+      handleModeChange,
       handleEnabledChange,
       handleRefetchIntervalChange,
       handleRefetchOnReconnectChange,

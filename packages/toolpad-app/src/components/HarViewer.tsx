@@ -4,6 +4,7 @@ import { Har } from 'har-format';
 import { styled, SxProps } from '@mui/material';
 import 'perf-cascade/dist/perf-cascade.css';
 import { createHarLog } from '../utils/har';
+import { blueDark } from '../theme';
 
 const HarViewerRoot = styled('div')({});
 
@@ -14,14 +15,19 @@ function fixLinks(elm: Element) {
 function forceDarkMode(elm: Element) {
   elm.querySelectorAll('svg').forEach((svg) => {
     svg.setAttribute('fill', 'white');
-    const fullLabel = svg.getElementsByClassName('rect.label-full-bg');
-    if (fullLabel && fullLabel.length > 0) {
-      (fullLabel[0] as SVGElement).style.fill = '#5090D3'; // theme.palette.primary.main
+    if (svg.classList.contains('left-fixed-holder')) {
+      const fullLabel = svg.getElementsByClassName('label-full-bg');
+      if (fullLabel && fullLabel.length > 0) {
+        (fullLabel[0] as SVGElement).style.fill = blueDark[500];
+      }
     }
-    const tooltips = svg.getElementsByClassName('div.tooltip-payload');
-    if (tooltips && tooltips.length > 0) {
-      for (const tooltip of tooltips) {
-        (tooltip as HTMLDivElement).style.backgroundColor = '#5090D3'; // theme.palette.primary.main
+
+    if (svg.classList.contains('tooltip-holder')) {
+      const tooltips = svg.getElementsByClassName('tooltip-payload');
+      if (tooltips && tooltips.length > 0) {
+        for (const tooltip of tooltips) {
+          (tooltip as HTMLDivElement).style.backgroundColor = blueDark[500];
+        }
       }
     }
   });

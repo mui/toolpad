@@ -46,10 +46,11 @@ function SelectOptionsPropEditor({
   }, [editingIndex, value]);
 
   const handleOptionTextInput = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === 'Enter') {
-        onChange([...value, (event.target as HTMLInputElement).value]);
+        const inputText = (event.target as HTMLInputElement).value;
 
+        onChange([...value, inputText]);
         if (optionInputRef.current) {
           optionInputRef.current.value = '';
         }
@@ -78,8 +79,13 @@ function SelectOptionsPropEditor({
   );
 
   const handleOptionChange = React.useCallback(
-    (newValue: SelectOption) => {
-      onChange(value.map((option, i) => (i === editingIndex ? newValue : option)));
+    (newOption: string | SelectOption) => {
+      if (typeof newOption === 'object') {
+        if (!newOption.label) {
+          newOption = newOption.value;
+        }
+      }
+      onChange(value.map((option, i) => (i === editingIndex ? newOption : option)));
     },
     [editingIndex, onChange, value],
   );
@@ -95,14 +101,18 @@ function SelectOptionsPropEditor({
         variant="outlined"
         color="inherit"
         fullWidth
-        onClick={() => setEditOptionsDialogOpen(true)}
+        onClick={() => {
+          setEditOptionsDialogOpen(true);
+        }}
       >
         {label}
       </Button>
       <Dialog
         fullWidth
         open={editOptionsDialogOpen}
-        onClose={() => setEditOptionsDialogOpen(false)}
+        onClose={() => {
+          setEditOptionsDialogOpen(false);
+        }}
       >
         {editingOption ? (
           <React.Fragment>
@@ -193,8 +203,12 @@ function SelectOptionsPropEditor({
                 variant="outlined"
                 inputRef={optionInputRef}
                 onKeyUp={handleOptionTextInput}
-                label="Add option"
-                helperText="Press &ldquo;Enter&rdquo; / &ldquo;Return&rdquo; to add"
+                label={'Add option'}
+                helperText={
+                  <span>
+                    Press <kbd>Enter</kbd> or <kbd>Return</kbd> to add
+                  </span>
+                }
               />
             </DialogContent>
           </React.Fragment>

@@ -198,7 +198,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const { Component: GeneratedComponent, error: compileError } = useCodeComponent(debouncedInput);
   const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
 
-  const { argTypes } = CodeComponent[TOOLPAD_COMPONENT];
+  const { argTypes = {} } = CodeComponent[TOOLPAD_COMPONENT];
 
   const defaultProps = React.useMemo(
     () => mapValues(argTypes, (argType) => argType?.defaultValue),

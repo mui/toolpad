@@ -39,35 +39,26 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<Movies
 }
 
 export function QueryEditor({
-  value,
-  onChange,
+  value: input,
+  onChange: setInput,
   QueryEditorShell,
 }: QueryEditorProps<MoviesConnectionParams, MoviesQuery>) {
-  const [input, setInput] = React.useState(value);
-  React.useEffect(() => setInput(value), [value]);
-
-  const handleChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setInput((existing) => ({
-      ...existing,
-      query: { ...existing.query, genre: event.target.value || null },
-    }));
-  }, []);
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, genre: event.target.value || null },
+      }));
+    },
+    [setInput],
+  );
 
   const { preview, runPreview: handleRunPreview } = useQueryPreview<MoviesQuery, FetchResult>({
-    genre: value.query.genre,
+    genre: input.query.genre,
   });
 
-  const lastSavedInput = React.useRef(input);
-  const handleCommit = React.useCallback(() => {
-    onChange(input);
-    lastSavedInput.current = input;
-  }, [onChange, input]);
-
-  const isDirty =
-    input.query !== lastSavedInput.current.query || input.params !== lastSavedInput.current.params;
-
   return (
-    <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
+    <QueryEditorShell>
       <SplitPane split="vertical" size="50%" allowResize>
         <Box sx={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
           <Toolbar>

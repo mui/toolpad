@@ -23,7 +23,6 @@ import { createHarLog, mergeHar } from '../../utils/har';
 import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
-import { tryFormat } from '../../utils/prettier';
 import useShortcut from '../../utils/useShortcut';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
@@ -92,15 +91,15 @@ const DEFAULT_MODULE = `export default async function ({ parameters }: ${EVENT_I
   return response.json();
 }`;
 
+// TODO: figure out autoformatting on save.
+// Perhaps our ClientDataSource needs a "onBeforeCommit" to transform it prior to committing?
 function QueryEditor({
   QueryEditorShell,
   globalScope,
-  value,
-  onChange,
+  value: input,
+  onChange: setInput,
+  onCommit,
 }: QueryEditorProps<FunctionConnectionParams, FunctionQuery>) {
-  const [input, setInput] = React.useState(value);
-  React.useEffect(() => setInput(value), [value]);
-
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     input: input.params,
     globalScope,
@@ -161,24 +160,11 @@ function QueryEditor({
   const handleLogClear = React.useCallback(() => setPreviewLogs([]), []);
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const handleCommit = React.useCallback(
-    () =>
-      onChange({
-        ...input,
-        query: {
-          ...input.query,
-          module: tryFormat(input.query.module),
-        },
-      }),
-    [onChange, input],
-  );
-
+  const handleCommit = React.useCallback(() => onCommit?.(), [onCommit]);
   useShortcut({ code: 'KeyS', metaKey: true }, handleCommit);
 
-  const isDirty = input !== value;
-
   return (
-    <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
+    <QueryEditorShell>
       <SplitPane split="vertical" size="50%" allowResize>
         <SplitPane split="horizontal" size={85} primary="second" allowResize>
           <QueryInputPanel onRunPreview={handleRunPreview}>

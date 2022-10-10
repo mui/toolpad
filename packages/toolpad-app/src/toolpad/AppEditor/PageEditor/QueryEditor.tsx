@@ -37,24 +37,31 @@ import useBoolean from '../../../utils/useBoolean';
 
 const EMPTY_OBJECT = {};
 
+function createQueryModel<Q>(node: appDom.QueryNode<Q>): QueryEditorModel<Q> {
+  const inputParams = node.params || EMPTY_OBJECT;
+  const params =
+    (Object.entries(inputParams).filter(([, value]) => Boolean(value)) as BindableAttrEntries) ||
+    [];
+
+  return {
+    query: node.attributes.query.value,
+    params,
+  };
+}
+
 interface QueryeditorDialogActionsProps {
   saveDisabled?: boolean;
-  onCommit?: () => void;
+  onSave?: () => void;
   onRemove?: () => void;
   onClose?: () => void;
 }
 
 function QueryeditorDialogActions({
   saveDisabled,
-  onCommit,
+  onSave,
   onRemove,
   onClose,
 }: QueryeditorDialogActionsProps) {
-  const handleCommit = () => {
-    onCommit?.();
-    onClose?.();
-  };
-
   const {
     value: removeConfirmOpen,
     setTrue: handleRemoveConfirmOpen,
@@ -66,10 +73,9 @@ function QueryeditorDialogActions({
       handleRemoveConfirmclose();
       if (confirmed) {
         onRemove?.();
-        onClose?.();
       }
     },
-    [handleRemoveConfirmclose, onClose, onRemove],
+    [handleRemoveConfirmclose, onRemove],
   );
 
   return (
@@ -81,7 +87,7 @@ function QueryeditorDialogActions({
       <ConfirmDialog open={removeConfirmOpen} onClose={handleRemoveConfirm} severity="error">
         Are you sure your want to remove this query?
       </ConfirmDialog>
-      <Button disabled={saveDisabled} onClick={handleCommit}>
+      <Button disabled={saveDisabled} onClick={onSave}>
         Save
       </Button>
     </DialogActions>
@@ -89,7 +95,7 @@ function QueryeditorDialogActions({
 }
 
 interface RenderDialogActions {
-  (params: { isDirty?: boolean; onCommit?: () => void }): React.ReactNode;
+  (): React.ReactNode;
 }
 
 interface QueryEditorDialogContext {
@@ -101,7 +107,7 @@ interface QueryEditorDialogContext {
 const [useQueryEditorDialogContext, QueryEditorDialogContextProvider] =
   createProvidedContext<QueryEditorDialogContext>('QueryEditorDialog');
 
-export function QueryEditorShell({ children, isDirty, onCommit }: QueryEditorShellProps) {
+export function QueryEditorShell({ children }: QueryEditorShellProps) {
   const { renderDialogTitle, renderQueryOptions, renderDialogActions } =
     useQueryEditorDialogContext();
 
@@ -134,7 +140,7 @@ export function QueryEditorShell({ children, isDirty, onCommit }: QueryEditorShe
         {renderQueryOptions()}
       </DialogContent>
 
-      {renderDialogActions({ isDirty, onCommit })}
+      {renderDialogActions()}
     </React.Fragment>
   );
 }
@@ -229,38 +235,29 @@ function QueryNodeEditorDialog<Q>({
     ? appDom.deref(input.attributes.connectionId.value)
     : null;
   const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
-  const inputParams = input.params || EMPTY_OBJECT;
   const dataSourceId = input.attributes.dataSource?.value || null;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
   const connectionParams = connection?.attributes.params.value;
 
-  const queryModel = React.useMemo<QueryEditorModel<any>>(() => {
-    const params =
-      (Object.entries(inputParams).filter(([, value]) => Boolean(value)) as BindableAttrEntries) ||
-      [];
+  const queryModel = React.useMemo<QueryEditorModel<any>>(() => createQueryModel(input), [input]);
 
-    return {
-      query: input.attributes.query.value,
-      // TODO: 'params' are passed only for backwards compatability, eventually we should clean this up
-      params,
-      parameters: params,
-    };
-  }, [input.attributes.query.value, inputParams]);
+  const handleCommit = React.useCallback(() => onSave(input), [input, onSave]);
 
-  const handleQueryModelChange = React.useCallback(
-    (model: QueryEditorModel<Q>) => {
-      onSave(
-        update(input, {
-          attributes: update(input.attributes, {
-            query: appDom.createConst(model.query),
-          }),
-          params: Object.fromEntries(model.params),
+  const handleQueryModelChange = React.useCallback<
+    React.Dispatch<React.SetStateAction<QueryEditorModel<Q>>>
+  >((updater) => {
+    setInput((current) => {
+      const model = typeof updater === 'function' ? updater(createQueryModel(current)) : updater;
+
+      return update(current, {
+        attributes: update(current.attributes, {
+          query: appDom.createConst(model.query),
         }),
-      );
-    },
-    [input, onSave],
-  );
+        params: Object.fromEntries(model.params),
+      });
+    });
+  }, []);
 
   const { pageState } = usePageEditorState();
 
@@ -363,6 +360,11 @@ function QueryNodeEditorDialog<Q>({
     }
   }, [onClose, isInputSaved]);
 
+  const handleSave = React.useCallback(() => {
+    handleCommit();
+    onClose();
+  }, [handleCommit, onClose]);
+
   const queryEditorContext = React.useMemo(
     () => (dataSourceId ? { appId, dataSourceId, connectionId } : null),
     [appId, dataSourceId, connectionId],
@@ -455,19 +457,16 @@ function QueryNodeEditorDialog<Q>({
     ],
   );
 
-  const renderDialogActions: RenderDialogActions = React.useCallback(
-    ({ isDirty, onCommit }) => {
-      return (
-        <QueryeditorDialogActions
-          onCommit={onCommit}
-          onClose={handleClose}
-          onRemove={handleRemove}
-          saveDisabled={isInputSaved && !isDirty}
-        />
-      );
-    },
-    [handleClose, handleRemove, isInputSaved],
-  );
+  const renderDialogActions: RenderDialogActions = React.useCallback(() => {
+    return (
+      <QueryeditorDialogActions
+        onSave={handleSave}
+        onClose={handleClose}
+        onRemove={handleRemove}
+        saveDisabled={isInputSaved}
+      />
+    );
+  }, [handleClose, handleRemove, isInputSaved, handleSave]);
 
   const queryEditorShellContext: QueryEditorDialogContext = {
     renderDialogTitle,
@@ -477,7 +476,7 @@ function QueryNodeEditorDialog<Q>({
 
   return (
     <QueryEditorDialogContextProvider value={queryEditorShellContext}>
-      <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
+      <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
         {dataSourceId && dataSource && queryEditorContext ? (
           <ConnectionContextProvider value={queryEditorContext}>
             <dataSource.QueryEditor
@@ -485,6 +484,7 @@ function QueryNodeEditorDialog<Q>({
               connectionParams={connectionParams}
               value={queryModel}
               onChange={handleQueryModelChange}
+              onCommit={handleCommit}
               globalScope={pageState}
             />
           </ConnectionContextProvider>
@@ -534,8 +534,9 @@ export default function QueryEditor() {
   const handleRemove = React.useCallback(
     (node: appDom.QueryNode) => {
       domApi.removeNode(node.id);
+      handleEditStateDialogClose();
     },
-    [domApi],
+    [domApi, handleEditStateDialogClose],
   );
 
   const editedNode = dialogState?.nodeId

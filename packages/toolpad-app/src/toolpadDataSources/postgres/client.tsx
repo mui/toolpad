@@ -158,12 +158,9 @@ function ConnectionParamsInput({
 function QueryEditor({
   QueryEditorShell,
   globalScope,
-  value,
-  onChange,
+  value: input,
+  onChange: setInput,
 }: QueryEditorProps<PostgresConnectionParams, PostgresQuery>) {
-  const [input, setInput] = React.useState(value);
-  React.useEffect(() => setInput(value), [value]);
-
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     input: input.params,
     globalScope,
@@ -183,17 +180,13 @@ function QueryEditor({
     params: previewParams,
   });
 
-  const handleCommit = React.useCallback(() => onChange(input), [onChange, input]);
-
-  const isDirty = input !== value;
-
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
   const rows = React.useMemo(() => rawRows.map((row, id) => ({ id, ...row })), [rawRows]);
   const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
-    <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
+    <QueryEditorShell>
       <SplitPane split="vertical" size="50%" allowResize>
         <SplitPane split="horizontal" size={85} primary="second" allowResize>
           <QueryInputPanel onRunPreview={handleRunPreview}>

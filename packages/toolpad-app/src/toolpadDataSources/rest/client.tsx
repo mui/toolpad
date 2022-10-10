@@ -203,70 +203,88 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
 function QueryEditor({
   globalScope,
   connectionParams,
-  value,
-  onChange,
+  value: input,
+  onChange: setInput,
   QueryEditorShell,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
-  const [input, setInput] = React.useState(value);
-  React.useEffect(() => setInput(value), [value]);
-
   const baseUrl = connectionParams?.baseUrl;
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       setInput((existing) => ({ ...existing, params: newParams }));
     },
-    [],
+    [setInput],
   );
 
-  const handleUrlChange = React.useCallback((newUrl: BindableAttrValue<string> | null) => {
-    setInput((existing) => ({
-      ...existing,
-      query: { ...existing.query, url: newUrl || appDom.createConst('') },
-    }));
-  }, []);
+  const handleUrlChange = React.useCallback(
+    (newUrl: BindableAttrValue<string> | null) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, url: newUrl || appDom.createConst('') },
+      }));
+    },
+    [setInput],
+  );
 
-  const handleMethodChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setInput((existing) => ({
-      ...existing,
-      query: { ...existing.query, method: event.target.value },
-    }));
-  }, []);
+  const handleMethodChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, method: event.target.value },
+      }));
+    },
+    [setInput],
+  );
 
-  const handleTransformEnabledChange = React.useCallback((transformEnabled: boolean) => {
-    setInput((existing) => ({
-      ...existing,
-      query: { ...existing.query, transformEnabled },
-    }));
-  }, []);
+  const handleTransformEnabledChange = React.useCallback(
+    (transformEnabled: boolean) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, transformEnabled },
+      }));
+    },
+    [setInput],
+  );
 
-  const handleTransformChange = React.useCallback((transform: string) => {
-    setInput((existing) => ({
-      ...existing,
-      query: { ...existing.query, transform },
-    }));
-  }, []);
+  const handleTransformChange = React.useCallback(
+    (transform: string) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, transform },
+      }));
+    },
+    [setInput],
+  );
 
-  const handleBodyChange = React.useCallback((newBody: Maybe<Body>) => {
-    setInput((existing) => ({
-      ...existing,
-      query: { ...existing.query, body: newBody || undefined },
-    }));
-  }, []);
+  const handleBodyChange = React.useCallback(
+    (newBody: Maybe<Body>) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, body: newBody || undefined },
+      }));
+    },
+    [setInput],
+  );
 
-  const handleSearchParamsChange = React.useCallback((newSearchParams: BindableAttrEntries) => {
-    setInput((existing) => ({
-      ...existing,
-      query: { ...existing.query, searchParams: newSearchParams },
-    }));
-  }, []);
+  const handleSearchParamsChange = React.useCallback(
+    (newSearchParams: BindableAttrEntries) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, searchParams: newSearchParams },
+      }));
+    },
+    [setInput],
+  );
 
-  const handleHeadersChange = React.useCallback((newHeaders: BindableAttrEntries) => {
-    setInput((existing) => ({
-      ...existing,
-      query: { ...existing.query, headers: newHeaders },
-    }));
-  }, []);
+  const handleHeadersChange = React.useCallback(
+    (newHeaders: BindableAttrEntries) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, headers: newHeaders },
+      }));
+    },
+    [setInput],
+  );
 
   const handleResponseTypeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -275,7 +293,7 @@ function QueryEditor({
         query: { ...existing.query, response: { kind: event.target.value } as ResponseType },
       }));
     },
-    [],
+    [setInput],
   );
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
@@ -328,10 +346,6 @@ function QueryEditor({
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const handleCommit = React.useCallback(() => onChange(input), [onChange, input]);
-
-  const isDirty = input !== value;
-
   const [activeTab, setActiveTab] = React.useState('urlQuery');
 
   const handleActiveTabChange = React.useCallback(
@@ -342,7 +356,7 @@ function QueryEditor({
   const isDemo = !!process.env.TOOLPAD_DEMO;
 
   return (
-    <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
+    <QueryEditorShell>
       <SplitPane split="vertical" size="50%" allowResize>
         <SplitPane split="horizontal" size={85} primary="second" allowResize>
           <QueryInputPanel onRunPreview={handleRunPreview}>

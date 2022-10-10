@@ -83,14 +83,14 @@ export interface QueryEditorModel<Q> {
 
 export interface QueryEditorShellProps {
   children?: React.ReactNode;
-  isDirty?: boolean;
-  onCommit?: () => void;
 }
 
 export interface QueryEditorProps<C, Q> extends WithControlledProp<QueryEditorModel<Q>> {
   QueryEditorShell: React.ComponentType<QueryEditorShellProps>;
   connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
+  onChange: React.Dispatch<React.SetStateAction<QueryEditorModel<Q>>>;
+  onCommit?: () => void;
 }
 
 export type QueryEditor<C, Q> = React.FC<QueryEditorProps<C, Q>>;

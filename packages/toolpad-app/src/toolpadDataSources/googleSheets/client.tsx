@@ -40,13 +40,10 @@ function getInitialQueryValue(): GoogleSheetsApiQuery {
 }
 
 function QueryEditor({
-  value,
-  onChange,
+  value: input,
+  onChange: setInput,
   QueryEditorShell,
 }: QueryEditorProps<GoogleSheetsConnectionParams, GoogleSheetsApiQuery>) {
-  const [input, setInput] = React.useState(value);
-  React.useEffect(() => setInput(value), [value]);
-
   const [spreadsheetQuery, setSpreadsheetQuery] = React.useState<string | null>(null);
 
   const debouncedSpreadsheetQuery = useDebounced(spreadsheetQuery, 300);
@@ -89,7 +86,7 @@ function QueryEditor({
         query: { ...existing.query, sheetName: null, spreadsheetId: newValue?.id ?? null },
       }));
     },
-    [],
+    [setInput],
   );
 
   const handleSheetChange = React.useCallback(
@@ -99,22 +96,28 @@ function QueryEditor({
         query: { ...existing.query, sheetName: newValue?.properties?.title ?? null },
       }));
     },
-    [],
+    [setInput],
   );
 
-  const handleRangeChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setInput((existing) => ({
-      ...existing,
-      query: { ...existing.query, ranges: event.target.value },
-    }));
-  }, []);
+  const handleRangeChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, ranges: event.target.value },
+      }));
+    },
+    [setInput],
+  );
 
-  const handleTransformChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setInput((existing) => ({
-      ...existing,
-      query: { ...existing.query, headerRow: event.target.checked },
-    }));
-  }, []);
+  const handleTransformChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, headerRow: event.target.checked },
+      }));
+    },
+    [setInput],
+  );
 
   const handleSpreadsheetInput = React.useCallback(
     (event: React.SyntheticEvent, spreadshetInput: string, reason: string) => {
@@ -133,22 +136,13 @@ function QueryEditor({
     query: input.query,
   });
 
-  const lastSavedInput = React.useRef(input);
-  const handleCommit = React.useCallback(() => {
-    onChange(input);
-    lastSavedInput.current = input;
-  }, [onChange, input]);
-
-  const isDirty =
-    input.query !== lastSavedInput.current.query || input.params !== lastSavedInput.current.params;
-
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
   const rows = React.useMemo(() => rawRows.map((row, id) => ({ id, ...row })), [rawRows]);
   const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
-    <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
+    <QueryEditorShell>
       <SplitPane split="vertical" size="50%" allowResize>
         <QueryInputPanel onRunPreview={handleRunPreview}>
           <Stack direction="column" gap={2} sx={{ px: 3, pt: 1 }}>

@@ -86,18 +86,19 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
       <Typography variant="overline" className={classes.sectionHeading}>
         Properties:
       </Typography>
-      {(Object.entries(componentConfig.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
-        ([propName, propTypeDef]) =>
-          propTypeDef && shouldRenderControl(propTypeDef) ? (
-            <div key={propName} className={classes.control}>
-              <NodeAttributeEditor
-                node={node}
-                namespace="props"
-                name={propName}
-                argType={propTypeDef}
-              />
-            </div>
-          ) : null,
+      {(
+        Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>
+      ).map(([propName, propTypeDef]) =>
+        propTypeDef && shouldRenderControl(propTypeDef) ? (
+          <div key={propName} className={classes.control}>
+            <NodeAttributeEditor
+              node={node}
+              namespace="props"
+              name={propName}
+              argType={propTypeDef}
+            />
+          </div>
+        ) : null,
       )}
     </React.Fragment>
   );

@@ -70,5 +70,14 @@
   "vulnerabilityAlerts": {
     "prCreation": "immediate",
     "addLabels": ["priority: important"]
-  }
+  },
+  "regexManagers": [
+    {
+      "fileMatch": ["^render.yml$"],
+      "matchStringsStrategy": "combination",
+      "matchStrings": ["- key: NODE_VERSION", "value: '(?<currentValue>.*)"],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "docker"
+    }
+  ]
 }

@@ -24,6 +24,7 @@ import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
+import { tryFormat } from '../../utils/prettier';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -91,8 +92,6 @@ const DEFAULT_MODULE = `export default async function ({ parameters }: ${EVENT_I
   return response.json();
 }`;
 
-// TODO: figure out autoformatting on save.
-// Perhaps our ClientDataSource needs a "onBeforeCommit" to transform it prior to committing?
 function QueryEditor({
   QueryEditorShell,
   globalScope,
@@ -220,6 +219,12 @@ const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,
+  transformQueryBeforeCommit(query) {
+    return {
+      ...query,
+      module: tryFormat(query.module),
+    };
+  },
 };
 
 export default dataSource;

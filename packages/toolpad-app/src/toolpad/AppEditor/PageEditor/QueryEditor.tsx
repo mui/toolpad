@@ -242,7 +242,21 @@ function QueryNodeEditorDialog<Q>({
 
   const queryModel = React.useMemo<QueryEditorModel<any>>(() => createQueryModel(input), [input]);
 
-  const handleCommit = React.useCallback(() => onSave(input), [input, onSave]);
+  const handleCommit = React.useCallback(() => {
+    let toCommit: appDom.QueryNode<Q> = input;
+    if (dataSource?.transformQueryBeforeCommit) {
+      toCommit = {
+        ...input,
+        attributes: {
+          ...input.attributes,
+          query: appDom.createConst(
+            dataSource.transformQueryBeforeCommit(input.attributes.query.value),
+          ),
+        },
+      };
+    }
+    onSave(toCommit);
+  }, [dataSource, input, onSave]);
 
   const handleQueryModelChange = React.useCallback<
     React.Dispatch<React.SetStateAction<QueryEditorModel<Q>>>

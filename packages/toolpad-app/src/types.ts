@@ -103,6 +103,7 @@ export interface ConnectionStatus {
 export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<C>;
+  transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;

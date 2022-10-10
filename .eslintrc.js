@@ -2,7 +2,6 @@ const baseline = require('@mui/monorepo/.eslintrc');
 
 module.exports = {
   ...baseline,
-  plugins: baseline.plugins,
   /**
    * Sorted alphanumerically within each group. built-in and each plugin form
    * their own groups.

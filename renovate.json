@@ -52,7 +52,8 @@
         "react-inspector",
         "node-fetch",
         "eslint-config-airbnb-typescript",
-        "chalk"
+        "chalk",
+        "react-router"
       ],
       "enabled": false
     }

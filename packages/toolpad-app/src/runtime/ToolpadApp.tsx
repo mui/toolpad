@@ -66,6 +66,9 @@ import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
 
+const EMPTY_ARRAY: any[] = [];
+const EMPTY_OBJECT: any = {};
+
 const INITIAL_FETCH: UseFetch = {
   call: async () => {},
   refetch: async () => {},
@@ -479,13 +482,22 @@ function MutationNode({ node }: MutationNodeProps) {
   const mutationId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
-  const { isLoading, data, error, mutateAsync } = useMutation(
+  const {
+    isLoading,
+    data: responseData = EMPTY_OBJECT,
+    error: fetchError,
+    mutateAsync,
+  } = useMutation(
     async (overrides: any = {}) =>
       execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides }),
     {
       mutationKey: [dataUrl, mutationId, params],
     },
   );
+
+  const { data, error: apiError } = responseData;
+
+  const error = apiError || fetchError;
 
   // Stabilize the mutation and prepare for inclusion in global scope
   const mutationResult: UseFetch = React.useMemo(
@@ -494,7 +506,7 @@ function MutationNode({ node }: MutationNodeProps) {
       isFetching: isLoading,
       error,
       data,
-      rows: Array.isArray(data) ? data : [],
+      rows: Array.isArray(data) ? data : EMPTY_ARRAY,
       call: mutateAsync,
       fetch: mutateAsync,
       refetch: () => {
@@ -700,8 +712,6 @@ function parseBindings(
 
   return { parsedBindings, controlled };
 }
-
-const EMPTY_OBJECT = {};
 
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();

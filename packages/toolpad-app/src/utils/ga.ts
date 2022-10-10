@@ -1,6 +1,12 @@
 import type { NextWebVitalsMetric } from 'next/app';
 import config from '../config';
 
+export const setGAPage = (pagePath: string): void => {
+  if (config.gaId) {
+    window.gtag('config', config.gaId, { page_path: pagePath });
+  }
+};
+
 export const reportWebVitalsToGA = ({ id, label, name, value }: NextWebVitalsMetric): void => {
   if (config.gaId) {
     window.gtag('event', name, {

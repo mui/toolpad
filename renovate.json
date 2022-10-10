@@ -11,11 +11,6 @@
   "stopUpdatingLabel": "on hold",
   "packageRules": [
     {
-      "groupName": "playwright",
-      "matchManagers": ["npm"],
-      "matchPackageNames": ["@playwright/*"]
-    },
-    {
       "groupName": "dependencies",
       "matchManagers": ["npm"],
       "matchDepTypes": ["dependencies"]
@@ -34,6 +29,11 @@
       "groupName": "MUI X",
       "matchPackagePatterns": ["^@mui/x-"],
       "prCreation": "immediate"
+    },
+    {
+      "groupName": "playwright",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@playwright/*"]
     },
     {
       "groupName": "ignored",

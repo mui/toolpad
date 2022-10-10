@@ -9,6 +9,7 @@ import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
+import { latestVersion, latestMigration } from '../appDomMigrations';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from '../utils/recaptcha';
 
@@ -125,6 +126,8 @@ async function loadPreviewDomLegacy(appId: string): Promise<appDom.AppDom> {
   return {
     root,
     nodes,
+    // Legacy dom has version '0'
+    version: 0,
   };
 }
 
@@ -133,11 +136,23 @@ async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
     where: { id: appId },
   });
 
+  let decryptedDom: appDom.AppDom;
+
   if (dom) {
-    return decryptSecrets(dom as any);
+    decryptedDom = decryptSecrets(dom as any);
+  } else {
+    decryptedDom = await loadPreviewDomLegacy(appId);
   }
 
-  return loadPreviewDomLegacy(appId);
+  if (decryptedDom.version === latestVersion) {
+    return decryptedDom;
+  }
+
+  if (!latestMigration) {
+    throw new Error('No migrations found');
+  }
+
+  return latestMigration.up(decryptedDom);
 }
 
 export async function getApps(): Promise<AppMeta[]> {
@@ -444,10 +459,6 @@ export async function execQuery<P, Q>(
   dataNode: appDom.QueryNode<Q> | appDom.MutationNode<Q>,
   params: Q,
 ): Promise<ExecFetchResult<any>> {
-  if (appDom.isQuery(dataNode)) {
-    dataNode = appDom.fromLegacyQueryNode(dataNode);
-  }
-
   const dataSource: ServerDataSource<P, Q, any> | undefined =
     dataNode.attributes.dataSource && serverDataSources[dataNode.attributes.dataSource.value];
   if (!dataSource) {

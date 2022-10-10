@@ -218,10 +218,10 @@ function QueryNodeEditorDialog<Q>({
   const { appId } = usePageEditorState();
   const dom = useDom();
 
-  const [input, setInput] = React.useState<appDom.QueryNode<Q>>(appDom.fromLegacyQueryNode(node));
+  const [input, setInput] = React.useState<appDom.QueryNode<Q>>(node);
   React.useEffect(() => {
     if (open) {
-      setInput(appDom.fromLegacyQueryNode(node));
+      setInput(node);
     }
   }, [open, node]);
 

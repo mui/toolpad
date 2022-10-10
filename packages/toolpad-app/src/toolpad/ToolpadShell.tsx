@@ -16,8 +16,13 @@ import {
 } from '@mui/material';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import DarkModeOutlined from '@mui/icons-material/DarkModeOutlined';
+import LightModeOutlined from '@mui/icons-material/LightModeOutlined';
 import Image from 'next/image';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useChangeTheme, PaletteModeOptions } from '../ThemeContext';
 import useMenu from '../utils/useMenu';
+import useLocalStorageState from '../utils/useLocalStorageState';
 import {
   TOOLPAD_TARGET_CLOUD,
   TOOLPAD_TARGET_CE,
@@ -44,7 +49,6 @@ function FeedbackMenuItemLink({ href, children }: FeedbackMenuItemLinkProps) {
     </MenuItem>
   );
 }
-
 export interface ToolpadShellProps {
   actions?: React.ReactNode;
   status?: React.ReactNode;
@@ -101,6 +105,25 @@ function UserFeedback() {
     </React.Fragment>
   );
 }
+
+interface ThemeModeToggleProps {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+function ThemeModeToggle(props: ThemeModeToggleProps) {
+  return (
+    <Tooltip title={props.checked ? 'Turn on the light' : 'Turn off the light'}>
+      <IconButton color="primary" disableTouchRipple onClick={() => props.onChange(!props.checked)}>
+        {props.checked ? (
+          <LightModeOutlined fontSize="small" />
+        ) : (
+          <DarkModeOutlined fontSize="small" />
+        )}
+      </IconButton>
+    </Tooltip>
+  );
+}
 export interface HeaderProps {
   actions?: React.ReactNode;
   status?: React.ReactNode;
@@ -108,6 +131,19 @@ export interface HeaderProps {
 
 function Header({ actions, status }: HeaderProps) {
   const theme = useTheme();
+  const changeTheme = useChangeTheme();
+
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const preferredMode = prefersDarkMode ? 'dark' : 'light';
+
+  const [mode, setMode] =
+    useLocalStorageState<PaletteModeOptions>('paletteMode', preferredMode) || 'system';
+
+  const handleChangeThemeMode = (checked: boolean) => {
+    const paletteMode = checked ? 'dark' : 'light';
+    setMode(paletteMode);
+    changeTheme(paletteMode);
+  };
   return (
     <AppBar
       position="static"
@@ -179,6 +215,9 @@ function Header({ actions, status }: HeaderProps) {
         >
           {status}
           <UserFeedback />
+          {mode !== null ? (
+            <ThemeModeToggle checked={mode === 'dark'} onChange={handleChangeThemeMode} />
+          ) : null}
         </Box>
       </Toolbar>
     </AppBar>

@@ -10,7 +10,7 @@ import Document, {
 import createEmotionServer from '@emotion/server/create-instance';
 import serializeJavascript from 'serialize-javascript';
 import Script from 'next/script';
-import theme from '../src/theme';
+import { getMetaThemeColor } from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import config, { RuntimeConfig } from '../src/config';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
@@ -65,7 +65,16 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
       <Html lang="en">
         <Head>
           {/* PWA primary color */}
-          <meta name="theme-color" content={theme.palette.primary.main} />
+          <meta
+            name="theme-color"
+            content={getMetaThemeColor('light')}
+            media="(prefers-color-scheme: light)"
+          />
+          <meta
+            name="theme-color"
+            content={getMetaThemeColor('dark')}
+            media="(prefers-color-scheme: dark)"
+          />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"

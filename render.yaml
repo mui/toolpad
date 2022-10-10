@@ -31,7 +31,7 @@ services:
     name: toolpad-demo
     env: docker
     branch: demo
-    dockerfilePath: ./docker/images/toolpad/Dockerfile
+    dockerfilePath: ./docker/images/toolpad/Dockerfile.demo
     dockerContext: ./
     healthCheckPath: /health-check
     plan: free

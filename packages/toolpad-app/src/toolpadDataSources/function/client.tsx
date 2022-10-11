@@ -81,19 +81,21 @@ function ConnectionParamsInput({
   );
 }
 
-const DEFAULT_MODULE = `export default async function ({ parameters }: ${EVENT_INTERFACE_IDENTIFIER}) {
-  console.info('Executing function with parameters:', parameters);
-  const url = new URL('https://gist.githubusercontent.com/saniyusuf/406b843afdfb9c6a86e25753fe2761f4/raw/523c324c7fcc36efab8224f9ebb7556c09b69a14/Film.JSON');
-  url.searchParams.set('timestamp', String(Date.now()));
+const DEFAULT_MODULE = `export default async function ({ parameters }: ToolpadFunctionEvent) {
+  console.info("Executing function with parameters:", parameters);
+  const url = new URL(
+    "https://gist.githubusercontent.com/saniyusuf/406b843afdfb9c6a86e25753fe2761f4/raw/523c324c7fcc36efab8224f9ebb7556c09b69a14/Film.JSON"
+  );
+  url.searchParams.set("timestamp", String(Date.now()));
   const response = await fetch(String(url));
   if (!response.ok) {
     throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
   }
   return response.json();
-}`;
+}
+`;
 
 function QueryEditor({
-  QueryEditorShell,
   globalScope,
   value: input,
   onChange: setInput,
@@ -163,49 +165,47 @@ function QueryEditor({
   useShortcut({ code: 'KeyS', metaKey: true }, handleCommit);
 
   return (
-    <QueryEditorShell>
-      <SplitPane split="vertical" size="50%" allowResize>
-        <SplitPane split="horizontal" size={85} primary="second" allowResize>
-          <QueryInputPanel onRunPreview={handleRunPreview}>
-            <Box sx={{ flex: 1, minHeight: 0 }}>
-              <TypescriptEditor
-                value={input.query.module}
-                onChange={(newValue) =>
-                  setInput((existing) => ({ ...existing, query: { module: newValue } }))
-                }
-                extraLibs={extraLibs}
-              />
-            </Box>
-          </QueryInputPanel>
-
-          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-            <Typography>Parameters</Typography>
-            <ParametersEditor
-              value={input.params}
-              onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
-              globalScope={globalScope}
-              liveValue={paramsEditorLiveValue}
+    <SplitPane split="vertical" size="50%" allowResize>
+      <SplitPane split="horizontal" size={85} primary="second" allowResize>
+        <QueryInputPanel onRunPreview={handleRunPreview}>
+          <Box sx={{ flex: 1, minHeight: 0 }}>
+            <TypescriptEditor
+              value={input.query.module}
+              onChange={(newValue) =>
+                setInput((existing) => ({ ...existing, query: { module: newValue } }))
+              }
+              extraLibs={extraLibs}
             />
           </Box>
-        </SplitPane>
+        </QueryInputPanel>
 
-        <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
-          {preview?.error ? (
-            <ErrorAlert error={preview?.error} />
-          ) : (
-            <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
-          )}
-
-          <Devtools
-            sx={{ width: '100%', height: '100%' }}
-            log={previewLogs}
-            onLogClear={handleLogClear}
-            har={previewHar}
-            onHarClear={handleHarClear}
+        <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
+          <Typography>Parameters</Typography>
+          <ParametersEditor
+            value={input.params}
+            onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
+            globalScope={globalScope}
+            liveValue={paramsEditorLiveValue}
           />
-        </SplitPane>
+        </Box>
       </SplitPane>
-    </QueryEditorShell>
+
+      <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
+        {preview?.error ? (
+          <ErrorAlert error={preview?.error} />
+        ) : (
+          <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+        )}
+
+        <Devtools
+          sx={{ width: '100%', height: '100%' }}
+          log={previewLogs}
+          onLogClear={handleLogClear}
+          har={previewHar}
+          onHarClear={handleHarClear}
+        />
+      </SplitPane>
+    </SplitPane>
   );
 }
 

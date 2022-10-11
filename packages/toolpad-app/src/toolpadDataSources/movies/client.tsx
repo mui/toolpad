@@ -41,7 +41,6 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<Movies
 export function QueryEditor({
   value: input,
   onChange: setInput,
-  QueryEditorShell,
 }: QueryEditorProps<MoviesConnectionParams, MoviesQuery>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,38 +57,36 @@ export function QueryEditor({
   });
 
   return (
-    <QueryEditorShell>
-      <SplitPane split="vertical" size="50%" allowResize>
-        <Box sx={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-          <Toolbar>
-            <LoadingButton startIcon={<PlayArrowIcon />} onClick={handleRunPreview}>
-              Preview
-            </LoadingButton>
-          </Toolbar>
-          <Box sx={{ px: 3, pt: 1 }}>
-            <TextField
-              select
-              fullWidth
-              value={input.query.genre || 'any'}
-              label="Genre"
-              onChange={handleChange}
-            >
-              <MenuItem value={'any'}>Any</MenuItem>
-              {data.genres.map((genre) => (
-                <MenuItem key={genre} value={genre}>
-                  {genre}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Box>
+    <SplitPane split="vertical" size="50%" allowResize>
+      <Box sx={{ height: '100%', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <Toolbar>
+          <LoadingButton startIcon={<PlayArrowIcon />} onClick={handleRunPreview}>
+            Preview
+          </LoadingButton>
+        </Toolbar>
+        <Box sx={{ px: 3, pt: 1 }}>
+          <TextField
+            select
+            fullWidth
+            value={input.query.genre || 'any'}
+            label="Genre"
+            onChange={handleChange}
+          >
+            <MenuItem value={'any'}>Any</MenuItem>
+            {data.genres.map((genre) => (
+              <MenuItem key={genre} value={genre}>
+                {genre}
+              </MenuItem>
+            ))}
+          </TextField>
         </Box>
-        {preview?.error ? (
-          <ErrorAlert error={preview?.error} />
-        ) : (
-          <JsonView sx={{ height: '100%' }} src={preview?.data} />
-        )}
-      </SplitPane>
-    </QueryEditorShell>
+      </Box>
+      {preview?.error ? (
+        <ErrorAlert error={preview?.error} />
+      ) : (
+        <JsonView sx={{ height: '100%' }} src={preview?.data} />
+      )}
+    </SplitPane>
   );
 }
 

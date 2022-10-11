@@ -156,7 +156,6 @@ function ConnectionParamsInput({
 }
 
 function QueryEditor({
-  QueryEditorShell,
   globalScope,
   value: input,
   onChange: setInput,
@@ -186,39 +185,37 @@ function QueryEditor({
   const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
-    <QueryEditorShell>
-      <SplitPane split="vertical" size="50%" allowResize>
-        <SplitPane split="horizontal" size={85} primary="second" allowResize>
-          <QueryInputPanel onRunPreview={handleRunPreview}>
-            <Box sx={{ flex: 1, minHeight: 0 }}>
-              <MonacoEditor
-                value={input.query.sql}
-                onChange={(newValue) =>
-                  setInput((existing) => ({ ...existing, query: { sql: newValue } }))
-                }
-                language="sql"
-              />
-            </Box>
-          </QueryInputPanel>
-
-          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-            <Typography>Parameters</Typography>
-            <ParametersEditor
-              value={input.params}
-              onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
-              globalScope={globalScope}
-              liveValue={paramsEditorLiveValue}
+    <SplitPane split="vertical" size="50%" allowResize>
+      <SplitPane split="horizontal" size={85} primary="second" allowResize>
+        <QueryInputPanel onRunPreview={handleRunPreview}>
+          <Box sx={{ flex: 1, minHeight: 0 }}>
+            <MonacoEditor
+              value={input.query.sql}
+              onChange={(newValue) =>
+                setInput((existing) => ({ ...existing, query: { sql: newValue } }))
+              }
+              language="sql"
             />
           </Box>
-        </SplitPane>
+        </QueryInputPanel>
 
-        {preview?.error ? (
-          <ErrorAlert error={preview?.error} />
-        ) : (
-          <DataGridPro sx={{ border: 'none' }} columns={columns} key={previewGridKey} rows={rows} />
-        )}
+        <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
+          <Typography>Parameters</Typography>
+          <ParametersEditor
+            value={input.params}
+            onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
+            globalScope={globalScope}
+            liveValue={paramsEditorLiveValue}
+          />
+        </Box>
       </SplitPane>
-    </QueryEditorShell>
+
+      {preview?.error ? (
+        <ErrorAlert error={preview?.error} />
+      ) : (
+        <DataGridPro sx={{ border: 'none' }} columns={columns} key={previewGridKey} rows={rows} />
+      )}
+    </SplitPane>
   );
 }
 

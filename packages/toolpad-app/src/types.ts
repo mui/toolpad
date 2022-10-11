@@ -81,12 +81,7 @@ export interface QueryEditorModel<Q> {
   params: BindableAttrEntries;
 }
 
-export interface QueryEditorShellProps {
-  children?: React.ReactNode;
-}
-
 export interface QueryEditorProps<C, Q> extends WithControlledProp<QueryEditorModel<Q>> {
-  QueryEditorShell: React.ComponentType<QueryEditorShellProps>;
   connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
   onChange: React.Dispatch<React.SetStateAction<QueryEditorModel<Q>>>;

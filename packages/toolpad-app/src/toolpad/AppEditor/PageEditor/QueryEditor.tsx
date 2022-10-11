@@ -22,7 +22,7 @@ import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { QueryEditorModel, QueryEditorShellProps } from '../../../types';
+import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import { omit, update } from '../../../utils/immutability';
@@ -31,7 +31,6 @@ import { useDom, useDomApi } from '../../DomLoader';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import ConnectionSelect, { ConnectionOption } from './ConnectionSelect';
 import BindableEditor from './BindableEditor';
-import { createProvidedContext } from '../../../utils/react';
 import { ConfirmDialog } from '../../../components/SystemDialogs';
 import useBoolean from '../../../utils/useBoolean';
 
@@ -91,57 +90,6 @@ function QueryeditorDialogActions({
         Save
       </Button>
     </DialogActions>
-  );
-}
-
-interface RenderDialogActions {
-  (): React.ReactNode;
-}
-
-interface QueryEditorDialogContext {
-  renderDialogTitle: () => React.ReactNode;
-  renderQueryOptions: () => React.ReactNode;
-  renderDialogActions: RenderDialogActions;
-}
-
-const [useQueryEditorDialogContext, QueryEditorDialogContextProvider] =
-  createProvidedContext<QueryEditorDialogContext>('QueryEditorDialog');
-
-export function QueryEditorShell({ children }: QueryEditorShellProps) {
-  const { renderDialogTitle, renderQueryOptions, renderDialogActions } =
-    useQueryEditorDialogContext();
-
-  return (
-    <React.Fragment>
-      {renderDialogTitle()}
-
-      <Divider />
-
-      <DialogContent
-        sx={{
-          // height will be clipped by max-height
-          height: '100vh',
-          p: 0,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <Box
-          sx={{
-            flex: 1,
-            minHeight: 0,
-            position: 'relative',
-            display: 'flex',
-          }}
-        >
-          {children}
-        </Box>
-
-        {renderQueryOptions()}
-      </DialogContent>
-
-      {renderDialogActions()}
-    </React.Fragment>
   );
 }
 
@@ -389,124 +337,108 @@ function QueryNodeEditorDialog<Q>({
     globalScope: pageState,
   });
 
-  const renderDialogTitle = React.useCallback(
-    () => (
-      <DialogTitle>
-        <Stack direction="row" gap={2}>
-          <NodeNameEditor node={node} />
-          <ConnectionSelect
-            dataSource={dataSourceId}
-            value={
-              input.attributes.dataSource
-                ? {
-                    connectionId: appDom.deref(input.attributes.connectionId.value) || null,
-                    dataSourceId: input.attributes.dataSource.value,
-                  }
-                : null
-            }
-            onChange={handleConnectionChange}
-          />
-        </Stack>
-      </DialogTitle>
-    ),
-    [
-      dataSourceId,
-      handleConnectionChange,
-      input.attributes.connectionId.value,
-      input.attributes.dataSource,
-      node,
-    ],
-  );
-
-  const renderQueryOptions = React.useCallback(
-    () => (
-      <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
-        <BindableEditor
-          liveBinding={liveEnabled}
-          globalScope={pageState}
-          server
-          label="Enabled"
-          propType={{ type: 'boolean' }}
-          value={input.attributes.enabled ?? appDom.createConst(true)}
-          onChange={handleEnabledChange}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={input.attributes.refetchOnWindowFocus?.value ?? true}
-              onChange={handleRefetchOnWindowFocusChange}
-            />
-          }
-          label="Refetch on window focus"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={input.attributes.refetchOnReconnect?.value ?? true}
-              onChange={handleRefetchOnReconnectChange}
-            />
-          }
-          label="Refetch on network reconnect"
-        />
-        <TextField
-          InputProps={{
-            startAdornment: <InputAdornment position="start">s</InputAdornment>,
-          }}
-          sx={{ maxWidth: 300 }}
-          type="number"
-          label="Refetch interval"
-          value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
-          onChange={handleRefetchIntervalChange}
-        />
-      </Stack>
-    ),
-    [
-      input,
-      handleEnabledChange,
-      handleRefetchIntervalChange,
-      handleRefetchOnReconnectChange,
-      handleRefetchOnWindowFocusChange,
-      liveEnabled,
-      pageState,
-    ],
-  );
-
-  const renderDialogActions: RenderDialogActions = React.useCallback(() => {
-    return (
-      <QueryeditorDialogActions
-        onSave={handleSave}
-        onClose={handleClose}
-        onRemove={handleRemove}
-        saveDisabled={isInputSaved}
-      />
-    );
-  }, [handleClose, handleRemove, isInputSaved, handleSave]);
-
-  const queryEditorShellContext: QueryEditorDialogContext = {
-    renderDialogTitle,
-    renderQueryOptions,
-    renderDialogActions,
-  };
-
   return (
-    <QueryEditorDialogContextProvider value={queryEditorShellContext}>
-      <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
-        {dataSourceId && dataSource && queryEditorContext ? (
-          <ConnectionContextProvider value={queryEditorContext}>
-            <dataSource.QueryEditor
-              QueryEditorShell={QueryEditorShell}
-              connectionParams={connectionParams}
-              value={queryModel}
-              onChange={handleQueryModelChange}
-              onCommit={handleCommit}
-              globalScope={pageState}
-            />
-          </ConnectionContextProvider>
-        ) : (
-          <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        )}
-      </Dialog>
-    </QueryEditorDialogContextProvider>
+    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
+      {dataSourceId && dataSource && queryEditorContext ? (
+        <ConnectionContextProvider value={queryEditorContext}>
+          <DialogTitle>
+            <Stack direction="row" gap={2}>
+              <NodeNameEditor node={node} />
+              <ConnectionSelect
+                dataSource={dataSourceId}
+                value={
+                  input.attributes.dataSource
+                    ? {
+                        connectionId: appDom.deref(input.attributes.connectionId.value) || null,
+                        dataSourceId: input.attributes.dataSource.value,
+                      }
+                    : null
+                }
+                onChange={handleConnectionChange}
+              />
+            </Stack>
+          </DialogTitle>
+
+          <Divider />
+
+          <DialogContent
+            sx={{
+              // height will be clipped by max-height
+              height: '100vh',
+              p: 0,
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+                minHeight: 0,
+                position: 'relative',
+                display: 'flex',
+              }}
+            >
+              <dataSource.QueryEditor
+                connectionParams={connectionParams}
+                value={queryModel}
+                onChange={handleQueryModelChange}
+                onCommit={handleCommit}
+                globalScope={pageState}
+              />
+            </Box>
+
+            <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
+              <BindableEditor
+                liveBinding={liveEnabled}
+                globalScope={pageState}
+                server
+                label="Enabled"
+                propType={{ type: 'boolean' }}
+                value={input.attributes.enabled ?? appDom.createConst(true)}
+                onChange={handleEnabledChange}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={input.attributes.refetchOnWindowFocus?.value ?? true}
+                    onChange={handleRefetchOnWindowFocusChange}
+                  />
+                }
+                label="Refetch on window focus"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={input.attributes.refetchOnReconnect?.value ?? true}
+                    onChange={handleRefetchOnReconnectChange}
+                  />
+                }
+                label="Refetch on network reconnect"
+              />
+              <TextField
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">s</InputAdornment>,
+                }}
+                sx={{ maxWidth: 300 }}
+                type="number"
+                label="Refetch interval"
+                value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
+                onChange={handleRefetchIntervalChange}
+              />
+            </Stack>
+          </DialogContent>
+
+          <QueryeditorDialogActions
+            onSave={handleSave}
+            onClose={handleClose}
+            onRemove={handleRemove}
+            saveDisabled={isInputSaved}
+          />
+        </ConnectionContextProvider>
+      ) : (
+        <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
+      )}
+    </Dialog>
   );
 }
 

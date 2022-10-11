@@ -179,12 +179,12 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
             <Box padding={1}>
               <Box
                 sx={{
-                  pt: 2,
-                  pb: 1,
+                  py: 2,
                   px: 1,
                   borderWidth: 1,
                   borderStyle: 'inset',
                   borderColor: 'divider',
+                  backgroundColor: 'grey.200',
                   borderRadius: (theme) => theme.shape.borderRadius,
                 }}
               >
@@ -209,7 +209,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                   👍 Upvote on GitHub to get it prioritized.
                 </Typography>
                 <Collapse in={openFutureComponents} orientation={'vertical'}>
-                  <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} py={1}>
+                  <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} pt={1} pb={0}>
                     {Array.from(FUTURE_COMPONENTS, ([key, { displayName, url }]) => {
                       return (
                         <Link

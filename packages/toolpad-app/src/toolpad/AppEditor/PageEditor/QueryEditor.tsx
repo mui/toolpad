@@ -23,7 +23,7 @@ import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { QueryEditorModel, QueryEditorShellProps } from '../../../types';
+import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import { omit, update } from '../../../utils/immutability';
@@ -32,30 +32,36 @@ import { useDom, useDomApi } from '../../DomLoader';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import ConnectionSelect, { ConnectionOption } from './ConnectionSelect';
 import BindableEditor from './BindableEditor';
-import { createProvidedContext } from '../../../utils/react';
 import { ConfirmDialog } from '../../../components/SystemDialogs';
 import useBoolean from '../../../utils/useBoolean';
 
 const EMPTY_OBJECT = {};
 
+function createQueryModel<Q>(node: appDom.QueryNode<Q>): QueryEditorModel<Q> {
+  const inputParams = node.params || EMPTY_OBJECT;
+  const params =
+    (Object.entries(inputParams).filter(([, value]) => Boolean(value)) as BindableAttrEntries) ||
+    [];
+
+  return {
+    query: node.attributes.query.value,
+    params,
+  };
+}
+
 interface QueryeditorDialogActionsProps {
   saveDisabled?: boolean;
-  onCommit?: () => void;
+  onSave?: () => void;
   onRemove?: () => void;
   onClose?: () => void;
 }
 
 function QueryeditorDialogActions({
   saveDisabled,
-  onCommit,
+  onSave,
   onRemove,
   onClose,
 }: QueryeditorDialogActionsProps) {
-  const handleCommit = () => {
-    onCommit?.();
-    onClose?.();
-  };
-
   const {
     value: removeConfirmOpen,
     setTrue: handleRemoveConfirmOpen,
@@ -67,10 +73,9 @@ function QueryeditorDialogActions({
       handleRemoveConfirmclose();
       if (confirmed) {
         onRemove?.();
-        onClose?.();
       }
     },
-    [handleRemoveConfirmclose, onClose, onRemove],
+    [handleRemoveConfirmclose, onRemove],
   );
 
   return (
@@ -82,61 +87,10 @@ function QueryeditorDialogActions({
       <ConfirmDialog open={removeConfirmOpen} onClose={handleRemoveConfirm} severity="error">
         Are you sure your want to remove this query?
       </ConfirmDialog>
-      <Button disabled={saveDisabled} onClick={handleCommit}>
+      <Button disabled={saveDisabled} onClick={onSave}>
         Save
       </Button>
     </DialogActions>
-  );
-}
-
-interface RenderDialogActions {
-  (params: { isDirty?: boolean; onCommit?: () => void }): React.ReactNode;
-}
-
-interface QueryEditorDialogContext {
-  renderDialogTitle: () => React.ReactNode;
-  renderQueryOptions: () => React.ReactNode;
-  renderDialogActions: RenderDialogActions;
-}
-
-const [useQueryEditorDialogContext, QueryEditorDialogContextProvider] =
-  createProvidedContext<QueryEditorDialogContext>('QueryEditorDialog');
-
-export function QueryEditorShell({ children, isDirty, onCommit }: QueryEditorShellProps) {
-  const { renderDialogTitle, renderQueryOptions, renderDialogActions } =
-    useQueryEditorDialogContext();
-
-  return (
-    <React.Fragment>
-      {renderDialogTitle()}
-
-      <Divider />
-
-      <DialogContent
-        sx={{
-          // height will be clipped by max-height
-          height: '100vh',
-          p: 0,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <Box
-          sx={{
-            flex: 1,
-            minHeight: 0,
-            position: 'relative',
-            display: 'flex',
-          }}
-        >
-          {children}
-        </Box>
-
-        {renderQueryOptions()}
-      </DialogContent>
-
-      {renderDialogActions({ isDirty, onCommit })}
-    </React.Fragment>
   );
 }
 
@@ -230,38 +184,43 @@ function QueryNodeEditorDialog<Q>({
     ? appDom.deref(input.attributes.connectionId.value)
     : null;
   const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
-  const inputParams = input.params || EMPTY_OBJECT;
   const dataSourceId = input.attributes.dataSource?.value || null;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
   const connectionParams = connection?.attributes.params.value;
 
-  const queryModel = React.useMemo<QueryEditorModel<any>>(() => {
-    const params =
-      (Object.entries(inputParams).filter(([, value]) => Boolean(value)) as BindableAttrEntries) ||
-      [];
+  const queryModel = React.useMemo<QueryEditorModel<any>>(() => createQueryModel(input), [input]);
 
-    return {
-      query: input.attributes.query.value,
-      // TODO: 'params' are passed only for backwards compatability, eventually we should clean this up
-      params,
-      parameters: params,
-    };
-  }, [input.attributes.query.value, inputParams]);
+  const handleCommit = React.useCallback(() => {
+    let toCommit: appDom.QueryNode<Q> = input;
+    if (dataSource?.transformQueryBeforeCommit) {
+      toCommit = {
+        ...input,
+        attributes: {
+          ...input.attributes,
+          query: appDom.createConst(
+            dataSource.transformQueryBeforeCommit(input.attributes.query.value),
+          ),
+        },
+      };
+    }
+    onSave(toCommit);
+  }, [dataSource, input, onSave]);
 
-  const handleQueryModelChange = React.useCallback(
-    (model: QueryEditorModel<Q>) => {
-      onSave(
-        update(input, {
-          attributes: update(input.attributes, {
-            query: appDom.createConst(model.query),
-          }),
-          params: Object.fromEntries(model.params),
+  const handleQueryModelChange = React.useCallback<
+    React.Dispatch<React.SetStateAction<QueryEditorModel<Q>>>
+  >((updater) => {
+    setInput((current) => {
+      const model = typeof updater === 'function' ? updater(createQueryModel(current)) : updater;
+
+      return update(current, {
+        attributes: update(current.attributes, {
+          query: appDom.createConst(model.query),
         }),
-      );
-    },
-    [input, onSave],
-  );
+        params: Object.fromEntries(model.params),
+      });
+    });
+  }, []);
 
   const { pageState } = usePageEditorState();
 
@@ -374,6 +333,11 @@ function QueryNodeEditorDialog<Q>({
     }
   }, [onClose, isInputSaved]);
 
+  const handleSave = React.useCallback(() => {
+    handleCommit();
+    onClose();
+  }, [handleCommit, onClose]);
+
   const queryEditorContext = React.useMemo(
     () => (dataSourceId ? { appId, dataSourceId, connectionId } : null),
     [appId, dataSourceId, connectionId],
@@ -384,135 +348,120 @@ function QueryNodeEditorDialog<Q>({
     globalScope: pageState,
   });
 
-  const renderDialogTitle = React.useCallback(
-    () => (
-      <DialogTitle>
-        <Stack direction="row" gap={2}>
-          <NodeNameEditor node={node} />
-          <ConnectionSelect
-            dataSource={dataSourceId}
-            value={
-              input.attributes.dataSource
-                ? {
-                    connectionId: appDom.deref(input.attributes.connectionId.value) || null,
-                    dataSourceId: input.attributes.dataSource.value,
-                  }
-                : null
-            }
-            onChange={handleConnectionChange}
-          />
-        </Stack>
-      </DialogTitle>
-    ),
-    [
-      dataSourceId,
-      handleConnectionChange,
-      input.attributes.connectionId.value,
-      input.attributes.dataSource,
-      node,
-    ],
-  );
-
-  const renderQueryOptions = React.useCallback(() => {
-    const mode = input.attributes.mode?.value || 'query';
-    return (
-      <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
-        <TextField select label="mode" value={mode} onChange={handleModeChange}>
-          <MenuItem value="query">Fetch at any time to always be available on the page</MenuItem>
-          <MenuItem value="mutation">Only fetch on manual action</MenuItem>
-        </TextField>
-        <BindableEditor
-          liveBinding={liveEnabled}
-          globalScope={pageState}
-          server
-          label="Enabled"
-          propType={{ type: 'boolean' }}
-          value={input.attributes.enabled ?? appDom.createConst(true)}
-          onChange={handleEnabledChange}
-          disabled={mode !== 'query'}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={input.attributes.refetchOnWindowFocus?.value ?? true}
-              onChange={handleRefetchOnWindowFocusChange}
-              disabled={mode !== 'query'}
-            />
-          }
-          label="Refetch on window focus"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={input.attributes.refetchOnReconnect?.value ?? true}
-              onChange={handleRefetchOnReconnectChange}
-              disabled={mode !== 'query'}
-            />
-          }
-          label="Refetch on network reconnect"
-        />
-        <TextField
-          InputProps={{
-            startAdornment: <InputAdornment position="start">s</InputAdornment>,
-          }}
-          sx={{ maxWidth: 300 }}
-          type="number"
-          label="Refetch interval"
-          value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
-          onChange={handleRefetchIntervalChange}
-          disabled={mode !== 'query'}
-        />
-      </Stack>
-    );
-  }, [
-    input,
-    handleModeChange,
-    handleEnabledChange,
-    handleRefetchIntervalChange,
-    handleRefetchOnReconnectChange,
-    handleRefetchOnWindowFocusChange,
-    liveEnabled,
-    pageState,
-  ]);
-
-  const renderDialogActions: RenderDialogActions = React.useCallback(
-    ({ isDirty, onCommit }) => {
-      return (
-        <QueryeditorDialogActions
-          onCommit={onCommit}
-          onClose={handleClose}
-          onRemove={handleRemove}
-          saveDisabled={isInputSaved && !isDirty}
-        />
-      );
-    },
-    [handleClose, handleRemove, isInputSaved],
-  );
-
-  const queryEditorShellContext: QueryEditorDialogContext = {
-    renderDialogTitle,
-    renderQueryOptions,
-    renderDialogActions,
-  };
+  const mode = input.attributes.mode?.value || 'query';
 
   return (
-    <QueryEditorDialogContextProvider value={queryEditorShellContext}>
-      <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
-        {dataSourceId && dataSource && queryEditorContext ? (
-          <ConnectionContextProvider value={queryEditorContext}>
-            <dataSource.QueryEditor
-              QueryEditorShell={QueryEditorShell}
-              connectionParams={connectionParams}
-              value={queryModel}
-              onChange={handleQueryModelChange}
-              globalScope={pageState}
-            />
-          </ConnectionContextProvider>
-        ) : (
-          <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        )}
-      </Dialog>
-    </QueryEditorDialogContextProvider>
+    <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
+      {dataSourceId && dataSource && queryEditorContext ? (
+        <ConnectionContextProvider value={queryEditorContext}>
+          <DialogTitle>
+            <Stack direction="row" gap={2}>
+              <NodeNameEditor node={node} />
+              <ConnectionSelect
+                dataSource={dataSourceId}
+                value={
+                  input.attributes.dataSource
+                    ? {
+                        connectionId: appDom.deref(input.attributes.connectionId.value) || null,
+                        dataSourceId: input.attributes.dataSource.value,
+                      }
+                    : null
+                }
+                onChange={handleConnectionChange}
+              />
+            </Stack>
+          </DialogTitle>
+
+          <Divider />
+
+          <DialogContent
+            sx={{
+              // height will be clipped by max-height
+              height: '100vh',
+              p: 0,
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+                minHeight: 0,
+                position: 'relative',
+                display: 'flex',
+              }}
+            >
+              <dataSource.QueryEditor
+                connectionParams={connectionParams}
+                value={queryModel}
+                onChange={handleQueryModelChange}
+                onCommit={handleCommit}
+                globalScope={pageState}
+              />
+            </Box>
+
+            <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
+              <TextField select label="mode" value={mode} onChange={handleModeChange}>
+                <MenuItem value="query">
+                  Fetch at any time to always be available on the page
+                </MenuItem>
+                <MenuItem value="mutation">Only fetch on manual action</MenuItem>
+              </TextField>
+              <BindableEditor
+                liveBinding={liveEnabled}
+                globalScope={pageState}
+                server
+                label="Enabled"
+                propType={{ type: 'boolean' }}
+                value={input.attributes.enabled ?? appDom.createConst(true)}
+                onChange={handleEnabledChange}
+                disabled={mode !== 'query'}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={input.attributes.refetchOnWindowFocus?.value ?? true}
+                    onChange={handleRefetchOnWindowFocusChange}
+                    disabled={mode !== 'query'}
+                  />
+                }
+                label="Refetch on window focus"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={input.attributes.refetchOnReconnect?.value ?? true}
+                    onChange={handleRefetchOnReconnectChange}
+                    disabled={mode !== 'query'}
+                  />
+                }
+                label="Refetch on network reconnect"
+              />
+              <TextField
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">s</InputAdornment>,
+                }}
+                sx={{ maxWidth: 300 }}
+                type="number"
+                label="Refetch interval"
+                value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
+                onChange={handleRefetchIntervalChange}
+                disabled={mode !== 'query'}
+              />
+            </Stack>
+          </DialogContent>
+
+          <QueryeditorDialogActions
+            onSave={handleSave}
+            onClose={handleClose}
+            onRemove={handleRemove}
+            saveDisabled={isInputSaved}
+          />
+        </ConnectionContextProvider>
+      ) : (
+        <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
+      )}
+    </Dialog>
   );
 }
 
@@ -554,8 +503,9 @@ export default function QueryEditor() {
   const handleRemove = React.useCallback(
     (node: appDom.QueryNode) => {
       domApi.removeNode(node.id);
+      handleEditStateDialogClose();
     },
-    [domApi],
+    [domApi, handleEditStateDialogClose],
   );
 
   const editedNode = dialogState?.nodeId

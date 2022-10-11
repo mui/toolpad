@@ -23,7 +23,7 @@ function Typography({ value, loading, sx, ...rest }: TypographyProps) {
       }}
       {...rest}
     >
-      {loading ? <Skeleton /> : value}
+      {loading ? <Skeleton /> : String(value)}
     </MuiTypography>
   );
 }

@@ -14,6 +14,7 @@ import {
   Divider,
   Alert,
   Box,
+  MenuItem,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -289,6 +290,16 @@ function QueryNodeEditorDialog<Q>({
     [],
   );
 
+  const handleModeChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setInput((existing) =>
+      update(existing, {
+        attributes: update(existing.attributes, {
+          mode: appDom.createConst(event.target.value as appDom.FetchMode),
+        }),
+      }),
+    );
+  }, []);
+
   const handleRefetchOnWindowFocusChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setInput((existing) =>
@@ -402,9 +413,14 @@ function QueryNodeEditorDialog<Q>({
     ],
   );
 
-  const renderQueryOptions = React.useCallback(
-    () => (
+  const renderQueryOptions = React.useCallback(() => {
+    const mode = input.attributes.mode?.value || 'query';
+    return (
       <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
+        <TextField select label="mode" value={mode} onChange={handleModeChange}>
+          <MenuItem value="query">Fetch at any time to always be available on the page</MenuItem>
+          <MenuItem value="mutation">Only fetch on manual action</MenuItem>
+        </TextField>
         <BindableEditor
           liveBinding={liveEnabled}
           globalScope={pageState}
@@ -413,12 +429,14 @@ function QueryNodeEditorDialog<Q>({
           propType={{ type: 'boolean' }}
           value={input.attributes.enabled ?? appDom.createConst(true)}
           onChange={handleEnabledChange}
+          disabled={mode !== 'query'}
         />
         <FormControlLabel
           control={
             <Checkbox
               checked={input.attributes.refetchOnWindowFocus?.value ?? true}
               onChange={handleRefetchOnWindowFocusChange}
+              disabled={mode !== 'query'}
             />
           }
           label="Refetch on window focus"
@@ -428,6 +446,7 @@ function QueryNodeEditorDialog<Q>({
             <Checkbox
               checked={input.attributes.refetchOnReconnect?.value ?? true}
               onChange={handleRefetchOnReconnectChange}
+              disabled={mode !== 'query'}
             />
           }
           label="Refetch on network reconnect"
@@ -441,19 +460,20 @@ function QueryNodeEditorDialog<Q>({
           label="Refetch interval"
           value={refetchIntervalInSeconds(input.attributes.refetchInterval?.value) ?? ''}
           onChange={handleRefetchIntervalChange}
+          disabled={mode !== 'query'}
         />
       </Stack>
-    ),
-    [
-      input,
-      handleEnabledChange,
-      handleRefetchIntervalChange,
-      handleRefetchOnReconnectChange,
-      handleRefetchOnWindowFocusChange,
-      liveEnabled,
-      pageState,
-    ],
-  );
+    );
+  }, [
+    input,
+    handleModeChange,
+    handleEnabledChange,
+    handleRefetchIntervalChange,
+    handleRefetchOnReconnectChange,
+    handleRefetchOnWindowFocusChange,
+    liveEnabled,
+    pageState,
+  ]);
 
   const renderDialogActions: RenderDialogActions = React.useCallback(
     ({ isDirty, onCommit }) => {

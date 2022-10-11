@@ -33,7 +33,7 @@
     {
       "groupName": "playwright",
       "matchManagers": ["npm"],
-      "matchPackageNames": ["@playwright/*"]
+      "matchPackageNames": ["playwright", "@playwright/*"]
     },
     {
       "groupName": "dependencies",
@@ -86,6 +86,12 @@
       "matchStringsStrategy": "combination",
       "matchStrings": ["- key: NODE_VERSION", "value: '(?<currentValue>.*)"],
       "depNameTemplate": "node",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["^.circleci/config.yml$"],
+      "matchStrings": ["mcr.microsoft.com/playwright:(?<currentValue>.*)"],
+      "depNameTemplate": "playwright",
       "datasourceTemplate": "docker"
     }
   ]

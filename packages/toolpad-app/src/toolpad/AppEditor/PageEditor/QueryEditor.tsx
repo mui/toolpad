@@ -218,10 +218,10 @@ function QueryNodeEditorDialog<Q>({
   const { appId } = usePageEditorState();
   const dom = useDom();
 
-  const [input, setInput] = React.useState<appDom.QueryNode<Q>>(appDom.fromLegacyQueryNode(node));
+  const [input, setInput] = React.useState<appDom.QueryNode<Q>>(node);
   React.useEffect(() => {
     if (open) {
-      setInput(appDom.fromLegacyQueryNode(node));
+      setInput(node);
     }
   }, [open, node]);
 
@@ -235,16 +235,18 @@ function QueryNodeEditorDialog<Q>({
 
   const connectionParams = connection?.attributes.params.value;
 
-  const queryModel = React.useMemo<QueryEditorModel<any>>(
-    () => ({
+  const queryModel = React.useMemo<QueryEditorModel<any>>(() => {
+    const params =
+      (Object.entries(inputParams).filter(([, value]) => Boolean(value)) as BindableAttrEntries) ||
+      [];
+
+    return {
       query: input.attributes.query.value,
-      params:
-        (Object.entries(inputParams).filter(([, value]) =>
-          Boolean(value),
-        ) as BindableAttrEntries) || [],
-    }),
-    [input.attributes.query.value, inputParams],
-  );
+      // TODO: 'params' are passed only for backwards compatability, eventually we should clean this up
+      params,
+      parameters: params,
+    };
+  }, [input.attributes.query.value, inputParams]);
 
   const handleQueryModelChange = React.useCallback(
     (model: QueryEditorModel<Q>) => {

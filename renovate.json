@@ -37,7 +37,6 @@
     },
     {
       "groupName": "dependencies",
-      "matchManagers": ["docker", "regex"],
       "matchDepTypes": ["cimg/node", "node"]
     },
     {

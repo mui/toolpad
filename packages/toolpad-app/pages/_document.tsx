@@ -14,7 +14,6 @@ import { getMetaThemeColor } from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import config, { RuntimeConfig } from '../src/config';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
-import { GA_ID } from '../src/utils/ga';
 
 interface ToolpadDocumentProps {
   config: RuntimeConfig;
@@ -108,7 +107,7 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
           <Script
             async
             strategy="afterInteractive"
-            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=${config.gaId}`}
           />
           <Script
             id="gtag-init"
@@ -118,7 +117,7 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${GA_ID}', {
+            gtag('config', '${config.gaId}', {
               page_path: window.location.pathname,
             });
           `,

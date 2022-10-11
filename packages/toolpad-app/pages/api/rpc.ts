@@ -8,6 +8,7 @@ import {
   getActiveDeployments,
   createApp,
   updateApp,
+  duplicateApp,
   execQuery,
   dataSourceFetchPrivate,
   loadDom,
@@ -165,6 +166,9 @@ const rpcServer = {
     }),
     updateApp: createMethod<typeof updateApp>(({ params }) => {
       return updateApp(...params);
+    }),
+    duplicateApp: createMethod<typeof duplicateApp>(({ params }) => {
+      return duplicateApp(...params);
     }),
     deleteApp: createMethod<typeof deleteApp>(({ params }) => {
       return deleteApp(...params);

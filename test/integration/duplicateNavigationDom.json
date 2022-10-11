@@ -1,0 +1,212 @@
+{
+  "root": "l107q4q",
+  "nodes": {
+    "6u23tnj": {
+      "id": "6u23tnj",
+      "name": "theme",
+      "type": "theme",
+      "theme": {
+        "palette.mode": {
+          "type": "const",
+          "value": "light"
+        },
+        "palette.primary.main": {
+          "type": "const",
+          "value": "pink"
+        },
+        "palette.secondary.main": {
+          "type": "const",
+          "value": "lightBlue"
+        }
+      },
+      "parentId": "l107q4q",
+      "attributes": {},
+      "parentProp": "themes",
+      "parentIndex": "a0"
+    },
+    "9e13n8y": {
+      "id": "9e13n8y",
+      "name": "pageRow",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "ad03nv6",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "ad03nv6": {
+      "id": "ad03nv6",
+      "name": "page1",
+      "type": "page",
+      "parentId": "l107q4q",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "Page 1"
+        },
+        "parameters": {
+          "type": "const",
+          "value": []
+        }
+      },
+      "parentProp": "pages",
+      "parentIndex": "a0"
+    },
+    "ey13tv5": {
+      "id": "ey13tv5",
+      "name": "button1",
+      "type": "element",
+      "props": {
+        "content": {
+          "type": "const",
+          "value": "Page 1"
+        },
+        "onClick": {
+          "type": "navigationAction",
+          "value": {
+            "page": {
+              "$$ref": "ad03nv6"
+            }
+          }
+        }
+      },
+      "layout": {},
+      "parentId": "pw23tmc",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Button"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "l107q4q": {
+      "id": "l107q4q",
+      "name": "Application",
+      "type": "app",
+      "parentId": null,
+      "attributes": {},
+      "parentProp": null,
+      "parentIndex": null
+    },
+    "pf13nn5": {
+      "id": "pf13nn5",
+      "name": "query",
+      "type": "query",
+      "parentId": "ad03nv6",
+      "attributes": {
+        "query": {
+          "type": "const",
+          "value": {
+            "ranges": "A1:Z10",
+            "headerRow": false,
+            "sheetName": "",
+            "spreadsheetId": ""
+          }
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "googleSheets"
+        },
+        "connectionId": {
+          "type": "const",
+          "value": {
+            "$$ref": "1a03n8z"
+          }
+        }
+      },
+      "parentProp": "queries",
+      "parentIndex": "a0"
+    },
+    "pw23tmc": {
+      "id": "pw23tmc",
+      "name": "pageRow1",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "zr03tx4",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "s503ny7": {
+      "id": "s503ny7",
+      "name": "mutation",
+      "type": "mutation",
+      "parentId": "ad03nv6",
+      "attributes": {
+        "query": {
+          "type": "const",
+          "value": {
+            "module": "export default async function ({ params }: ToolpadFunctionEvent) {\n  console.info('Executing function with params:', params);\n  const url = new URL('https://gist.githubusercontent.com/saniyusuf/406b843afdfb9c6a86e25753fe2761f4/raw/523c324c7fcc36efab8224f9ebb7556c09b69a14/Film.JSON');\n  url.searchParams.set('timestamp', String(Date.now()));\n  const response = await fetch(String(url));\n  if (!response.ok) {\n    throw new Error(`HTTP ${response.status}: ${response.statusText}`);\n  }\n  return response.json();\n}"
+          }
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "function"
+        },
+        "connectionId": {
+          "type": "const",
+          "value": null
+        }
+      },
+      "parentProp": "mutations",
+      "parentIndex": "a0"
+    },
+    "x003nhc": {
+      "id": "x003nhc",
+      "name": "button",
+      "type": "element",
+      "props": {
+        "content": {
+          "type": "const",
+          "value": "Page 2"
+        },
+        "onClick": {
+          "type": "navigationAction",
+          "value": {
+            "page": {
+              "$$ref": "zr03tx4"
+            }
+          }
+        }
+      },
+      "layout": {},
+      "parentId": "9e13n8y",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Button"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "zr03tx4": {
+      "id": "zr03tx4",
+      "name": "page2",
+      "type": "page",
+      "parentId": "l107q4q",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "Page 2"
+        }
+      },
+      "parentProp": "pages",
+      "parentIndex": "a1"
+    }
+  }
+}

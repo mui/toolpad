@@ -16,7 +16,8 @@ export function migrateUp(
     throw new Error(`Can't migrate dom from version "${fromVersion}" to "${toVersion}"`);
   }
 
-  const migrationsToApply = Array.from(versions).slice(fromVersion, toVersion);
+  const migrationsToApply = versions.slice(fromVersion, toVersion);
+
   let toDom = fromDom;
   for (const migration of migrationsToApply) {
     toDom = migration.up(toDom);

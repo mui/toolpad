@@ -63,20 +63,35 @@ import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
 
-export const APP_TEMPLATE_OPTIONS = {
-  blank: {
-    label: 'Blank page',
-    description: 'Start with an empty canvas',
-  },
-  stats: {
-    label: 'Statistics',
-    description: 'Table with statistics data',
-  },
-  images: {
-    label: 'Images',
-    description: 'Fetch remote images',
-  },
-};
+export const APP_TEMPLATE_OPTIONS: Map<
+  AppTemplateId,
+  {
+    label: string;
+    description: string;
+  }
+> = new Map([
+  [
+    'blank',
+    {
+      label: 'Blank page',
+      description: 'Start with an empty canvas',
+    },
+  ],
+  [
+    'stats',
+    {
+      label: 'Statistics',
+      description: 'Table with statistics data',
+    },
+  ],
+  [
+    'images',
+    {
+      label: 'Images',
+      description: 'Fetch remote images',
+    },
+  ],
+]);
 
 const NO_OP = () => {};
 
@@ -168,7 +183,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               value={appTemplateId}
               onChange={handleAppTemplateChange}
             >
-              {Object.entries(APP_TEMPLATE_OPTIONS).map(([value, { label, description }]) => (
+              {Array.from(APP_TEMPLATE_OPTIONS).map(([value, { label, description }]) => (
                 <MenuItem key={value} value={value}>
                   <span>
                     <Typography>{label}</Typography>

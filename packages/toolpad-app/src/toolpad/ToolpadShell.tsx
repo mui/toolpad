@@ -16,13 +16,8 @@ import {
 } from '@mui/material';
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import DarkModeOutlined from '@mui/icons-material/DarkModeOutlined';
-import LightModeOutlined from '@mui/icons-material/LightModeOutlined';
 import Image from 'next/image';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { useChangeTheme, PaletteModeOptions } from '../ThemeContext';
 import useMenu from '../utils/useMenu';
-import useLocalStorageState from '../utils/useLocalStorageState';
 import {
   TOOLPAD_TARGET_CLOUD,
   TOOLPAD_TARGET_CE,
@@ -31,6 +26,8 @@ import {
 } from '../constants';
 import productIconDark from '../../public/product-icon-dark.svg';
 import productIconLight from '../../public/product-icon-light.svg';
+import { useToolpadThemeMode, ThemeModeOptions } from '../ThemeContext';
+import ThemeModeMenu from './ThemeModeMenu';
 
 const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
@@ -106,24 +103,6 @@ function UserFeedback() {
   );
 }
 
-interface ThemeModeToggleProps {
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}
-
-function ThemeModeToggle(props: ThemeModeToggleProps) {
-  return (
-    <Tooltip title={props.checked ? 'Turn on the light' : 'Turn off the light'}>
-      <IconButton color="primary" disableTouchRipple onClick={() => props.onChange(!props.checked)}>
-        {props.checked ? (
-          <LightModeOutlined fontSize="small" />
-        ) : (
-          <DarkModeOutlined fontSize="small" />
-        )}
-      </IconButton>
-    </Tooltip>
-  );
-}
 export interface HeaderProps {
   actions?: React.ReactNode;
   status?: React.ReactNode;
@@ -131,19 +110,14 @@ export interface HeaderProps {
 
 function Header({ actions, status }: HeaderProps) {
   const theme = useTheme();
-  const changeTheme = useChangeTheme();
+  const [themeMode, setThemeMode] = useToolpadThemeMode();
 
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const preferredMode = prefersDarkMode ? 'dark' : 'light';
-
-  const [mode, setMode] =
-    useLocalStorageState<PaletteModeOptions>('paletteMode', preferredMode) || 'system';
-
-  const handleChangeThemeMode = (checked: boolean) => {
-    const paletteMode = checked ? 'dark' : 'light';
-    setMode(paletteMode);
-    changeTheme(paletteMode);
-  };
+  const handleThemeModeChange = React.useCallback(
+    (event: React.MouseEvent, mode: ThemeModeOptions) => {
+      setThemeMode(mode);
+    },
+    [setThemeMode],
+  );
   return (
     <AppBar
       position="static"
@@ -214,9 +188,7 @@ function Header({ actions, status }: HeaderProps) {
           }}
         >
           {status}
-          {mode !== null ? (
-            <ThemeModeToggle checked={mode === 'dark'} onChange={handleChangeThemeMode} />
-          ) : null}
+          <ThemeModeMenu mode={themeMode} onChange={handleThemeModeChange} />
           <UserFeedback />
         </Box>
       </Toolbar>

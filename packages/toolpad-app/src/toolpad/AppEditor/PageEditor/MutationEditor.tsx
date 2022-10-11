@@ -18,14 +18,13 @@ import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { QueryEditorModel, QueryEditorShellProps } from '../../../types';
+import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import NodeNameEditor from '../NodeNameEditor';
 import { update } from '../../../utils/immutability';
 import { useDom, useDomApi } from '../../DomLoader';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import ConnectionSelect, { ConnectionOption } from './ConnectionSelect';
-import { createProvidedContext } from '../../../utils/react';
 
 const DATASOURCES_WHITELIST = ['function'];
 
@@ -41,63 +40,6 @@ function createQueryModel<Q>(node: appDom.MutationNode<Q>): QueryEditorModel<Q> 
     query: node.attributes.query.value,
     params,
   };
-}
-
-interface RenderDialogActions {
-  (): React.ReactNode;
-}
-
-interface MutationEditorDialogContext {
-  open: boolean;
-  onClose: () => void;
-  dataSourceId: string | null;
-  renderDialogTitle: () => React.ReactNode;
-  renderDialogActions: RenderDialogActions;
-}
-
-const [useMutationEditorDialogContext, MutationEditorDialogContextProvider] =
-  createProvidedContext<MutationEditorDialogContext>('MutationEditorDialog');
-
-export function MutationEditorShell({ children }: QueryEditorShellProps) {
-  const { open, onClose, dataSourceId, renderDialogTitle, renderDialogActions } =
-    useMutationEditorDialogContext();
-
-  return (
-    <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
-      {renderDialogTitle()}
-
-      <Divider />
-
-      {dataSourceId ? (
-        <DialogContent
-          sx={{
-            // height will be clipped by max-height
-            height: '100vh',
-            p: 0,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <Box
-            sx={{
-              flex: 1,
-              minHeight: 0,
-              position: 'relative',
-              display: 'flex',
-            }}
-          >
-            {children}
-          </Box>
-        </DialogContent>
-      ) : (
-        <DialogContent>
-          <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        </DialogContent>
-      )}
-
-      {renderDialogActions()}
-    </Dialog>
-  );
 }
 
 interface DataSourceSelectorProps<Q> {
@@ -268,76 +210,77 @@ function MutationNodeEditorDialog<Q>({
     [appId, dataSourceId, connectionId],
   );
 
-  const renderDialogTitle = React.useCallback(
-    () => (
-      <DialogTitle>
-        <Stack direction="row" gap={2}>
-          <NodeNameEditor node={node} />
-          <ConnectionSelect
-            dataSource={dataSourceId}
-            value={
-              input.attributes.dataSource
-                ? {
-                    connectionId: appDom.deref(input.attributes.connectionId.value) || null,
-                    dataSourceId: input.attributes.dataSource.value,
-                  }
-                : null
-            }
-            onChange={handleConnectionChange}
-          />
-        </Stack>
-      </DialogTitle>
-    ),
-    [
-      dataSourceId,
-      handleConnectionChange,
-      input.attributes.connectionId.value,
-      input.attributes.dataSource,
-      node,
-    ],
-  );
-
-  const renderDialogActions: RenderDialogActions = React.useCallback(() => {
-    return (
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={handleClose}>
-          Cancel
-        </Button>
-        <Button onClick={handleRemove}>Remove</Button>
-        <Button disabled={isInputSaved} onClick={handleSave}>
-          Save
-        </Button>
-      </DialogActions>
-    );
-  }, [handleClose, handleRemove, handleSave, isInputSaved]);
-
-  const mutationEditorShellContext: MutationEditorDialogContext = {
-    open,
-    onClose: handleClose,
-    dataSourceId: dataSource ? dataSourceId : null,
-    renderDialogTitle,
-    renderDialogActions,
-  };
-
   return (
-    <MutationEditorDialogContextProvider value={mutationEditorShellContext}>
+    <Dialog fullWidth maxWidth="xl" open={open} onClose={onClose}>
       {dataSourceId && dataSource && queryEditorContext ? (
         <ConnectionContextProvider value={queryEditorContext}>
-          <dataSource.QueryEditor
-            QueryEditorShell={MutationEditorShell}
-            connectionParams={connectionParams}
-            value={queryModel}
-            onChange={handleQueryModelChange}
-            onCommit={handleCommit}
-            globalScope={pageState}
-          />
+          <DialogTitle>
+            <Stack direction="row" gap={2}>
+              <NodeNameEditor node={node} />
+              <ConnectionSelect
+                dataSource={dataSourceId}
+                value={
+                  input.attributes.dataSource
+                    ? {
+                        connectionId: appDom.deref(input.attributes.connectionId.value) || null,
+                        dataSourceId: input.attributes.dataSource.value,
+                      }
+                    : null
+                }
+                onChange={handleConnectionChange}
+              />
+            </Stack>
+          </DialogTitle>
+
+          <Divider />
+
+          {dataSourceId ? (
+            <DialogContent
+              sx={{
+                // height will be clipped by max-height
+                height: '100vh',
+                p: 0,
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Box
+                sx={{
+                  flex: 1,
+                  minHeight: 0,
+                  position: 'relative',
+                  display: 'flex',
+                }}
+              >
+                <dataSource.QueryEditor
+                  connectionParams={connectionParams}
+                  value={queryModel}
+                  onChange={handleQueryModelChange}
+                  onCommit={handleCommit}
+                  globalScope={pageState}
+                />
+              </Box>
+            </DialogContent>
+          ) : (
+            <DialogContent>
+              <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
+            </DialogContent>
+          )}
+
+          <DialogActions>
+            <Button color="inherit" variant="text" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button onClick={handleRemove}>Remove</Button>
+            <Button disabled={isInputSaved} onClick={handleSave}>
+              Save
+            </Button>
+          </DialogActions>
         </ConnectionContextProvider>
       ) : (
-        <MutationEditorShell>
-          <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
-        </MutationEditorShell>
+        <Alert severity="error">Datasource &quot;{dataSourceId}&quot; not found</Alert>
       )}
-    </MutationEditorDialogContextProvider>
+    </Dialog>
   );
 }
 

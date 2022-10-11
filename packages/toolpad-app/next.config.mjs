@@ -92,7 +92,8 @@ const sentryWebpackPluginOptions = {
 
   silent: true, // Suppresses all logs
 
-  dryRun: !process.env.TOOLPAD_SENTRY_DSN,
+  dryRun: true,
+  sourceMapReference: false,
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
@@ -103,6 +104,7 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
   {
     reactStrictMode: true,
     poweredByHeader: false,
+    productionBrowserSourceMaps: true,
     eslint: {
       // We're running this as part of the monorepo eslint
       ignoreDuringBuilds: true,
@@ -167,13 +169,7 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
       return config;
     },
     sentry: {
-      // Use `hidden-source-map` rather than `source-map` as the Webpack `devtool`
-      // for client-side builds. (This will be the default starting in
-      // `@sentry/nextjs` version 8.0.0.) See
-      // https://webpack.js.org/configuration/devtool/ and
-      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#use-hidden-source-map
-      // for more information.
-      hideSourceMaps: true,
+      hideSourceMaps: false,
     },
     async redirects() {
       return [

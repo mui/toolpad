@@ -457,7 +457,7 @@ export async function setConnectionParams<P>(
 
 export async function execQuery<P, Q>(
   appId: string,
-  dataNode: appDom.QueryNode<Q> | appDom.MutationNode<Q>,
+  dataNode: appDom.QueryNode<Q>,
   params: Q,
 ): Promise<ExecFetchResult<any>> {
   const dataSource: ServerDataSource<P, Q, any> | undefined =

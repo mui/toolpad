@@ -470,7 +470,7 @@ function QueryNode({ node }: QueryNodeProps) {
 }
 
 interface MutationNodeProps {
-  node: appDom.MutationNode | appDom.QueryNode;
+  node: appDom.QueryNode;
 }
 
 function MutationNode({ node }: MutationNodeProps) {
@@ -716,7 +716,7 @@ function parseBindings(
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [], queries = [], mutations = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
   usePageTitle(page.attributes.title.value);
 
@@ -826,10 +826,6 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
           {queries.map((node) => (
             <FetchNode key={node.id} node={node} />
-          ))}
-
-          {mutations.map((node) => (
-            <MutationNode key={node.id} node={node} />
           ))}
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>

@@ -46,7 +46,8 @@ function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId
 
     const logMessageInfo = getLogMessageInfo(req);
 
-    logger.info(`API logs: response${logMessageInfo ? `(${logMessageInfo})` : ''}`, {
+    logger.info({
+      msg: `API logs: response${logMessageInfo ? `(${logMessageInfo})` : ''}`,
       requestId,
       statusCode: res.statusCode,
       // response: responseBody,
@@ -67,7 +68,8 @@ const withReqResLogs =
 
     const logMessageInfo = getLogMessageInfo(req);
 
-    logger.info(`API logs: request${logMessageInfo ? `(${logMessageInfo})` : ''}`, {
+    logger.info({
+      msg: `API logs: request${logMessageInfo ? `(${logMessageInfo})` : ''}`,
       requestId,
       url: req.url,
       method: req.method,

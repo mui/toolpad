@@ -5,6 +5,7 @@ function replaceMutation(node: appDom.MutationNode): appDom.QueryNode {
   return {
     ...node,
     type: 'query',
+    parentProp: 'queries',
     attributes: {
       ...node.attributes,
       mode: appDom.createConst('mutation'),

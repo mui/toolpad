@@ -82,6 +82,7 @@ const ComponentCatalogItem = ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        rowGap: 1,
         width: builtIn ? 75 : 70,
         height: builtIn ? 75 : 70,
         padding: 1,
@@ -90,8 +91,9 @@ const ComponentCatalogItem = ({
         borderColor: 'divider',
         borderStyle: kind === 'create' ? 'dashed' : 'solid',
         color: 'text.secondary',
+        backgroundColor: kind === 'future' ? '#eeeeee' : 'inherit',
         '&:hover': {
-          bgcolor: 'action.hover',
+          backgroundColor: 'action.disabled',
         },
         ...(draggable ? { cursor: 'grab' } : {}),
         ...(onClick ? { cursor: 'pointer' } : {}),

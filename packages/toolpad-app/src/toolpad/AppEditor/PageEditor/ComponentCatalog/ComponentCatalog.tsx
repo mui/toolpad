@@ -10,6 +10,7 @@ import * as appDom from '../../../../appDom';
 import { useDom } from '../../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import { useToolpadComponents } from '../../toolpadComponents';
+import useLocalStorageState from '../../../../utils/useLocalStorageState';
 
 interface FutureComponentSpec {
   url: string;
@@ -50,8 +51,16 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
   const dom = useDom();
 
   const [openStart, setOpenStart] = React.useState(0);
-  const [openCustomComponents, setOpenCustomComponents] = React.useState(true);
+  const [openCustomComponents, setOpenCustomComponents] = useLocalStorageState(
+    'catalog-custom-expanded',
+    true,
+  );
+  const [openFutureComponents, setOpenFutureComponents] = useLocalStorageState(
+    'catalog-future-expanded',
+    true,
+  );
   const [createCodeComponentDialogOpen, setCreateCodeComponentDialogOpen] = React.useState(0);
+
   const handleCreateCodeComponentDialogOpen = React.useCallback(() => {
     setCreateCodeComponentDialogOpen(Math.random());
   }, []);
@@ -109,7 +118,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           borderColor: 'divider',
         }}
       >
-        <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
+        <Collapse in orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
           <Box sx={{ width: 270, height: '100%', overflow: 'auto' }}>
             <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
               {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
@@ -128,46 +137,12 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               })}
             </Box>
 
-            <Box padding={1}>
-              <Box
-                sx={{
-                  pt: 2,
-                  pb: 1,
-                  px: 1,
-                  borderWidth: 1,
-                  borderStyle: 'inset',
-                  borderColor: 'divider',
-                  borderRadius: (theme) => theme.shape.borderRadius,
-                }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  More components coming soon!
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  👍 Upvote on GitHub to get it prioritized.
-                </Typography>
-                <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} py={1}>
-                  {Array.from(FUTURE_COMPONENTS, ([key, { displayName, url }]) => {
-                    return (
-                      <Link
-                        href={url}
-                        underline="none"
-                        target="_blank"
-                        key={`futureComponent.${key}`}
-                      >
-                        <ComponentCatalogItem id={key} displayName={displayName} kind={'future'} />
-                      </Link>
-                    );
-                  })}
-                </Box>
-              </Box>
-            </Box>
-
             <Box px={2} pb={0} display="flex" flexDirection={'row'} justifyContent="space-between">
               <Typography variant="overline">Custom Components</Typography>
               <IconButton
                 aria-label="Expand custom components"
                 sx={{
+                  p: 0,
                   cursor: 'pointer',
                   transform: `rotate(${openCustomComponents ? 180 : 0}deg)`,
                   transition: 'all 0.2s ease-in',
@@ -200,6 +175,61 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                 />
               </Box>
             </Collapse>
+
+            <Box padding={1}>
+              <Box
+                sx={{
+                  pt: 2,
+                  pb: 1,
+                  px: 1,
+                  borderWidth: 1,
+                  borderStyle: 'inset',
+                  borderColor: 'divider',
+                  borderRadius: (theme) => theme.shape.borderRadius,
+                }}
+              >
+                <Box pb={0} display="flex" flexDirection={'row'} justifyContent="space-between">
+                  <Typography variant="body2" color="text.secondary">
+                    More components coming soon!
+                  </Typography>
+                  <IconButton
+                    aria-label="Expand custom components"
+                    sx={{
+                      p: 0,
+                      cursor: 'pointer',
+                      transform: `rotate(${openFutureComponents ? 180 : 0}deg)`,
+                      transition: 'all 0.2s ease-in',
+                    }}
+                    onClick={() => setOpenFutureComponents((prev) => !prev)}
+                  >
+                    <ArrowDropDownSharpIcon />
+                  </IconButton>
+                </Box>
+                <Typography variant="caption" color="text.secondary">
+                  👍 Upvote on GitHub to get it prioritized.
+                </Typography>
+                <Collapse in={openFutureComponents} orientation={'vertical'}>
+                  <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} py={1}>
+                    {Array.from(FUTURE_COMPONENTS, ([key, { displayName, url }]) => {
+                      return (
+                        <Link
+                          href={url}
+                          underline="none"
+                          target="_blank"
+                          key={`futureComponent.${key}`}
+                        >
+                          <ComponentCatalogItem
+                            id={key}
+                            displayName={displayName}
+                            kind={'future'}
+                          />
+                        </Link>
+                      );
+                    })}
+                  </Box>
+                </Collapse>
+              </Box>
+            </Box>
           </Box>
         </Collapse>
         <Box

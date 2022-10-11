@@ -134,6 +134,9 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
   };
 }
 
+/**
+ * @deprecated QueryNode can act as a mutation by switching the `mode` attribute to 'mutation'
+ */
 export interface MutationNode<Q = any> extends AppDomNodeBase {
   readonly type: 'mutation';
   readonly params?: BindableAttrValues;

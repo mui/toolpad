@@ -10,11 +10,11 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
-import { ConnectionStatus, AppTheme } from './types';
-import { omit, update, updateOrCreate } from './utils/immutability';
-import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
-import { ExactEntriesOf, Maybe } from './utils/types';
-import { filterValues } from './utils/collections';
+import { ConnectionStatus, AppTheme } from '../types';
+import { omit, update, updateOrCreate } from '../utils/immutability';
+import { camelCase, generateUniqueString, removeDiacritics } from '../utils/strings';
+import { ExactEntriesOf, Maybe } from '../utils/types';
+import { filterValues } from '../utils/collections';
 
 export const CURRENT_APPDOM_VERSION = 1;
 

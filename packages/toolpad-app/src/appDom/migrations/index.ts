@@ -1,6 +1,6 @@
 import invariant from 'invariant';
 import v1 from './v1';
-import { CURRENT_APPDOM_VERSION } from '../appDom';
+import { CURRENT_APPDOM_VERSION } from '..';
 
 const versions = new Map([[1, v1]]);
 

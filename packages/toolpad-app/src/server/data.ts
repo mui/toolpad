@@ -9,7 +9,7 @@ import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
-import { latestVersion, latestMigration } from '../appDomMigrations';
+import { latestVersion, latestMigration } from '../appDom';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';

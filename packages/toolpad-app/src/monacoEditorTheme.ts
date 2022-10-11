@@ -1,5 +1,6 @@
-import toolpadTheme from './theme';
+import { Theme } from '@mui/material';
 
-const monacoEditorTheme: string = toolpadTheme.palette.mode === 'dark' ? 'vs-dark' : 'vs';
+const getMonacoEditorTheme = (theme: Theme): string =>
+  theme.palette.mode === 'dark' ? 'vs-dark' : 'vs';
 
-export default monacoEditorTheme;
+export default getMonacoEditorTheme;

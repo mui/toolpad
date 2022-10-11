@@ -13,7 +13,7 @@ services:
     pullRequestPreviewsEnabled: true
     envVars:
       - key: NODE_VERSION
-        value: '16.17.0'
+        value: '18.10.0'
       - key: TOOLPAD_ENABLE_CREATE_BY_DOM
         value: null
         previewValue: '1'

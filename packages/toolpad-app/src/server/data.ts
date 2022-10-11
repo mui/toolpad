@@ -11,7 +11,8 @@ import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
 import { latestVersion, latestMigration } from '../appDomMigrations';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
-import { validateRecaptchaToken } from '../utils/recaptcha';
+import { validateRecaptchaToken } from './validateRecaptchaToken';
+import config from './config';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -212,7 +213,7 @@ export type CreateAppOptions = {
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
   const { from } = opts;
 
-  const recaptchaSecretKey = process.env.TOOLPAD_RECAPTCHA_SECRET_KEY;
+  const recaptchaSecretKey = config.recaptchaSecretKey;
   if (recaptchaSecretKey) {
     const isRecaptchaTokenValid = await validateRecaptchaToken(
       recaptchaSecretKey,
@@ -530,4 +531,20 @@ export async function loadDom(appId: string, version: VersionOrPreview = 'previe
  */
 export async function loadRenderTree(appId: string, version: VersionOrPreview = 'preview') {
   return appDom.createRenderTree(await loadDom(appId, version));
+}
+
+export async function duplicateApp(id: string, name: string): Promise<AppMeta> {
+  const dom = await loadPreviewDom(id);
+  const duplicateCount = await prismaClient.app.count({
+    where: { name: { startsWith: `${name} (copy`, endsWith: ')' } },
+  });
+  const duplicateName =
+    duplicateCount === 0 ? `${name} (copy)` : `${name} (copy ${duplicateCount + 1})`;
+  const newApp = await createApp(duplicateName, {
+    from: {
+      kind: 'dom',
+      dom,
+    },
+  });
+  return newApp;
 }

@@ -16,7 +16,7 @@ import { camelCase, generateUniqueString, removeDiacritics } from '../utils/stri
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { filterValues } from '../utils/collections';
 
-export const CURRENT_APPDOM_VERSION = 1;
+export const CURRENT_APPDOM_VERSION = 2;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',

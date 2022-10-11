@@ -349,6 +349,7 @@ function QueryNodeEditorDialog<Q>({
   });
 
   const mode = input.attributes.mode?.value || 'query';
+
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
       {dataSourceId && dataSource && queryEditorContext ? (

@@ -91,7 +91,7 @@ const ComponentCatalogItem = ({
         borderColor: 'divider',
         borderStyle: kind === 'create' ? 'dashed' : 'solid',
         color: 'text.secondary',
-        backgroundColor: kind === 'future' ? '#eeeeee' : 'inherit',
+        backgroundColor: kind === 'future' ? 'grey.200' : 'inherit',
         '&:hover': {
           backgroundColor: 'action.disabled',
         },

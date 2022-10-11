@@ -8,6 +8,7 @@ import {
   TOOLPAD_TARGET_CE,
   TOOLPAD_TARGET_PRO,
   DOCUMENTATION_URL,
+  DOCUMENTATION_INSTALLATION_URL,
 } from '../../../../constants';
 import client from '../../../../api';
 
@@ -70,7 +71,7 @@ function UserFeedback() {
           <MenuItem
             component="a"
             target="_blank"
-            href={DOCUMENTATION_URL}
+            href={DOCUMENTATION_INSTALLATION_URL}
             sx={{ justifyContent: 'space-between' }}
           >
             Version {process.env.TOOLPAD_VERSION}

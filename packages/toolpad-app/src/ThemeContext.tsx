@@ -4,7 +4,6 @@ import { deepmerge } from '@mui/utils';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { unstable_useEnhancedEffect as useEnhancedEffect } from '@mui/material/utils';
 import { getDesignTokens, getThemedComponents, getMetaThemeColor } from './theme';
-import useLocalStorageState from './utils/useLocalStorageState';
 
 interface ThemeProviderProps {
   children?: React.ReactNode;
@@ -22,16 +21,15 @@ export function ThemeProvider(props: ThemeProviderProps) {
   const { children } = props;
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const preferredMode = prefersDarkMode ? 'dark' : 'light';
-  const [paletteMode, setPaletteMode] = useLocalStorageState<PaletteModeOptions>(
-    'paletteMode',
-    preferredMode,
-  );
+  const [paletteMode, setPaletteMode] = React.useState<PaletteModeOptions>(preferredMode);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      setPaletteMode(paletteMode);
+      setPaletteMode(
+        JSON.parse(localStorage.getItem('paletteMode') as PaletteModeOptions) || preferredMode,
+      );
     }
-  }, [setPaletteMode, paletteMode]);
+  }, [preferredMode]);
 
   React.useEffect(() => {
     const metas = document.querySelectorAll('meta[name="theme-color"]');
@@ -45,6 +43,7 @@ export function ThemeProvider(props: ThemeProviderProps) {
     let nextTheme = createTheme({
       ...brandingDesignTokens,
       palette: {
+        ...brandingDesignTokens.palette,
         mode: paletteMode,
       },
     });

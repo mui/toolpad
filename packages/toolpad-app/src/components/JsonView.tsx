@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { SxProps, styled, IconButton, Tooltip, Snackbar } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { ObjectInspector, ObjectInspectorProps, ObjectValue, ObjectLabel } from 'react-inspector';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import clsx from 'clsx';
-import inspectorTheme from '../inspectorTheme';
+import getInspectorTheme from '../inspectorTheme';
 
 const classes = {
   viewport: 'Toolpad_ObjectInspectorViewport',
@@ -75,6 +76,8 @@ export default function JsonView({ src, sx, copyToClipboard, disabled, ...props 
 
   const handleCopySnackbarClose = React.useCallback(() => setConfirmSnackbarOpen(false), []);
 
+  const theme = useTheme();
+
   return (
     <JsonViewRoot sx={sx} className={clsx({ [classes.disabled]: disabled })}>
       {typeof src === 'undefined' ? null : (
@@ -85,7 +88,7 @@ export default function JsonView({ src, sx, copyToClipboard, disabled, ...props 
               expandLevel={1}
               expandPaths={expandPaths}
               data={src}
-              theme={inspectorTheme}
+              theme={getInspectorTheme(theme.palette.mode)}
               {...props}
             />
           </div>

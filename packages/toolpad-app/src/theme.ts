@@ -1,4 +1,3 @@
-import { deepmerge } from '@mui/utils';
 import ArrowDropDownRounded from '@mui/icons-material/ArrowDropDownRounded';
 import { createTheme, ThemeOptions, Theme, alpha } from '@mui/material/styles';
 
@@ -693,7 +692,6 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
           root: {
             padding: theme.spacing(1, 2),
             borderColor: theme.palette.divider,
-            backgroundColor: theme.palette.primaryDark[900],
           },
           head: {
             color: theme.palette.text.primary,
@@ -916,7 +914,3 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
     },
   };
 }
-
-const darkTheme = createTheme(getDesignTokens('dark'));
-const theme = deepmerge(darkTheme, getThemedComponents(darkTheme));
-export default theme;

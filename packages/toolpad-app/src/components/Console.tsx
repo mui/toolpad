@@ -2,7 +2,8 @@ import { darken, lighten, styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
 import * as React from 'react';
 import Inspector, { InspectorProps } from 'react-inspector';
-import inspectorTheme from '../inspectorTheme';
+import { useTheme } from '@mui/material/styles';
+import getInspectorTheme from '../inspectorTheme';
 import { interleave } from '../utils/react';
 
 export interface LogEntry {
@@ -84,7 +85,8 @@ const ConsoleRoot = styled('div')(({ theme }) => {
 });
 
 function ConsoleInpector(props: InspectorProps) {
-  return <Inspector {...props} theme={inspectorTheme} />;
+  const theme = useTheme();
+  return <Inspector {...props} theme={getInspectorTheme(theme.palette.mode)} />;
 }
 
 interface ConsoleEntryProps {

@@ -22,7 +22,7 @@ function getBaseLogProperties(req: NextApiRequest) {
 type RestArgs = [
   chunk: any,
   encoding: BufferEncoding,
-  callback?: ((error?: Error | null | undefined) => void) | undefined,
+  callback?: ((error?: Error | null) => void) | undefined,
 ];
 
 function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId: string) {

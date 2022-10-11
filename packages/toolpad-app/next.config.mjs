@@ -169,6 +169,7 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
       return config;
     },
     sentry: {
+      autoInstrumentServerFunctions: true,
       hideSourceMaps: false,
     },
     async redirects() {

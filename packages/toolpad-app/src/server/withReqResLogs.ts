@@ -19,6 +19,12 @@ function getBaseLogProperties(req: NextApiRequest) {
   };
 }
 
+type RestArgs = [
+  chunk: any,
+  encoding: BufferEncoding,
+  callback?: ((error?: Error | null | undefined) => void) | undefined,
+];
+
 function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId: string) {
   const oldWrite = res.write;
   const oldEnd = res.end;
@@ -27,14 +33,7 @@ function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId
 
   res.write = (...restArgs: any[]) => {
     chunks.push(Buffer.from(restArgs[0]));
-    return oldWrite.apply(
-      res,
-      restArgs as [
-        chunk: any,
-        encoding: BufferEncoding,
-        callback?: ((error: Error | null | undefined) => void) | undefined,
-      ],
-    );
+    return oldWrite.apply(res, restArgs as RestArgs);
   };
 
   res.end = (...restArgs: any[]) => {
@@ -54,10 +53,7 @@ function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId
       ...getBaseLogProperties(req),
     });
 
-    return oldEnd.apply(
-      res,
-      restArgs as [chunk: any, encoding: BufferEncoding, callback?: (() => void) | undefined],
-    );
+    return oldEnd.apply(res, restArgs as RestArgs);
   };
 }
 

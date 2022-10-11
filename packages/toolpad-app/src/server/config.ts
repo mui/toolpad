@@ -19,6 +19,7 @@ export type ServerConfig = {
   basicAuthUser?: string;
   basicAuthPassword?: string;
   apiLogsEnabled: boolean;
+  recaptchaSecretKey?: string;
 } & BasicAuthConfig;
 
 function readConfig(): ServerConfig & typeof sharedConfig {
@@ -54,6 +55,7 @@ function readConfig(): ServerConfig & typeof sharedConfig {
     googleSheetsClientSecret: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
     externalUrl: process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
     apiLogsEnabled: !!process.env.TOOLPAD_API_LOGS_ENABLED,
+    recaptchaSecretKey: process.env.TOOLPAD_RECAPTCHA_SECRET_KEY,
     encryptionKeys,
   };
 }

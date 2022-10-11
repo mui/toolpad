@@ -27,6 +27,7 @@ export default function PageOptionsPanel() {
           color="inherit"
           component="a"
           href={`/app/${state.appId}/preview/pages/${pageNodeId}`}
+          aria-label={'Preview'}
         >
           Preview
         </Button>

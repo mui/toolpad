@@ -4,7 +4,13 @@ import { asArray } from '../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../src/runtime/ToolpadApp';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
-  const { loadRenderTree, findActiveDeployment } = await import('../../../src/server/data');
+  const [
+    { loadRenderTree, findActiveDeployment, getApp },
+    { checkBasicAuth, basicAuthUnauthorized },
+  ] = await Promise.all([
+    import('../../../src/server/data'),
+    import('../../../src/server/basicAuth'),
+  ]);
 
   const [appId] = asArray(context.query.appId);
 
@@ -12,6 +18,22 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
     return {
       notFound: true,
     };
+  }
+
+  const app = await getApp(appId);
+  if (!app) {
+    return {
+      notFound: true,
+    };
+  }
+
+  if (!app.public) {
+    if (!checkBasicAuth(context.req)) {
+      basicAuthUnauthorized(context.res);
+      // basicAuthUnauthorized calls res.end()
+      // so the props will never be used, but let's return this to satisfy the type system
+      return { props: {} as ToolpadAppProps };
+    }
   }
 
   const activeDeployment = await findActiveDeployment(appId);

@@ -36,20 +36,38 @@
       "matchPackageNames": ["@playwright/*"]
     },
     {
-      "groupName": "ignored",
-      "matchPackageNames": [
-        "react-inspector",
-        "node-fetch",
-        "eslint-config-airbnb-typescript",
-        "chalk",
-        "react-router",
-        "react-router-dom"
-      ],
-      "enabled": false
-    },
-    {
       "groupName": "dependencies",
       "matchDepTypes": ["cimg/node", "node"]
+    },
+    {
+      "groupName": "react-inspector",
+      "matchPackageNames": ["react-inspector"],
+      "allowedVersions": "< 6.0.0"
+    },
+    {
+      "groupName": "node-fetch",
+      "matchPackageNames": ["node-fetch"],
+      "allowedVersions": "< 3.0.0"
+    },
+    {
+      "groupName": "eslint-config-airbnb-typescript",
+      "matchPackageNames": ["eslint-config-airbnb-typescript"],
+      "allowedVersions": "< 13.0.0"
+    },
+    {
+      "groupName": "react-router",
+      "matchPackageNames": ["react-router", "react-router-dom"],
+      "allowedVersions": "< 6.4.0"
+    },
+    {
+      "groupName": "chalk",
+      "matchPackageNames": ["chalk"],
+      "allowedVersions": "< 5.0.0"
+    },
+    {
+      "groupName": "core-js",
+      "matchPackageNames": ["core-js"],
+      "allowedVersions": "< 2.0.0"
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],

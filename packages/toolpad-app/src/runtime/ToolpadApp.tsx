@@ -7,7 +7,6 @@ import {
   styled,
   AlertTitle,
   LinearProgress,
-  NoSsr,
   Container,
 } from '@mui/material';
 import {
@@ -65,6 +64,7 @@ import ComponentsContext, { useComponents, useComponent } from './ComponentsCont
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
+import NoSsr from '../components/NoSsr';
 
 interface UseMutation {
   call: (overrides?: any) => Promise<void>;
@@ -180,7 +180,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   const nodeId = node.id;
 
   const componentConfig = Component[TOOLPAD_COMPONENT];
-  const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
+  const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
   const isLayoutNode =
     appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
@@ -703,7 +703,16 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const [pageBindings, setPageBindings] =
     React.useState<Record<string, ParsedBinding>>(parsedBindings);
 
+  const prevDom = React.useRef(dom);
   React.useEffect(() => {
+    if (dom === prevDom.current) {
+      // Ignore this effect if there are no dom updates.
+      // IMPORTANT!!! This assumes the `RenderedPage` component is remounted when the `nodeId` changes
+      //  <RenderedPage nodeId={someId} key={someId} />
+      return;
+    }
+    prevDom.current = dom;
+
     setPageBindings((existingBindings) => {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
@@ -728,7 +737,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       }
       return updated;
     });
-  }, [parsedBindings, controlled]);
+  }, [parsedBindings, controlled, dom]);
 
   const setControlledBinding = React.useCallback(
     (id: string, result: BindingEvaluationResult) => {
@@ -816,7 +825,14 @@ function RenderedPages({ dom }: RenderedPagesProps) {
         <Route
           key={page.id}
           path={`/pages/${page.id}`}
-          element={<RenderedPage nodeId={page.id} />}
+          element={
+            <RenderedPage
+              nodeId={page.id}
+              // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
+              // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+              key={page.id}
+            />
+          }
         />
       ))}
     </Routes>
@@ -882,7 +898,7 @@ export default function ToolpadApp({
       <NoSsr>
         <DomContextProvider value={dom}>
           <AppThemeProvider dom={dom}>
-            <CssBaseline />
+            <CssBaseline enableColorScheme />
             {version === 'preview' && !hidePreviewBanner ? (
               <Alert severity="info">This is a preview version of the application.</Alert>
             ) : null}

@@ -33,7 +33,7 @@ export default function ConnectionSelect({
     const result: ConnectionOption[] = [];
 
     for (const [dataSourceId, config] of Object.entries(dataSources)) {
-      if (config?.hasDefault) {
+      if (config?.hasDefault && !process.env.TOOLPAD_DEMO) {
         if (!dataSource || filteredSources.has(dataSourceId)) {
           result.push({
             dataSourceId,

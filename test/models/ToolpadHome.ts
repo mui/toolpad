@@ -45,7 +45,7 @@ export class ToolpadHome {
     this.newAppDomCreateBtn = this.newAppDialog.locator('button:has-text("create")');
 
     this.getAppRow = (appName: string): Locator =>
-      page.locator(`[role="row"] >> has="input[value='${appName}']"`);
+      page.locator(`[role="row"]`, { has: page.locator(`input[value="${appName}"]`) });
   }
 
   async goto() {
@@ -88,5 +88,23 @@ export class ToolpadHome {
     }
 
     return { id: idMatch[1], name };
+  }
+
+  async duplicateApplication(appName: string) {
+    await this.getAppRow(appName).locator('[aria-label="Application menu"]').click();
+
+    await this.page.click('[role="menuitem"]:has-text("Duplicate"):visible');
+
+    // Navigate to the new app
+    await this.getAppRow(appName).locator('a:has-text("Edit")').click();
+    await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
+
+    const { pathname } = new URL(this.page.url());
+    const idMatch = /^\/_toolpad\/app\/([^/]+)\//.exec(pathname);
+    if (!idMatch) {
+      throw new Error(`Application id not found in url "${this.page.url()}"`);
+    }
+
+    return { id: idMatch[1] };
   }
 }

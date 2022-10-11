@@ -87,7 +87,7 @@ function UserFeedback() {
   return (
     <React.Fragment>
       <Tooltip title="Help and resources">
-        <IconButton {...buttonProps} color="inherit">
+        <IconButton {...buttonProps} color="primary">
           <HelpOutlinedIcon />
         </IconButton>
       </Tooltip>
@@ -214,10 +214,10 @@ function Header({ actions, status }: HeaderProps) {
           }}
         >
           {status}
-          <UserFeedback />
           {mode !== null ? (
             <ThemeModeToggle checked={mode === 'dark'} onChange={handleChangeThemeMode} />
           ) : null}
+          <UserFeedback />
         </Box>
       </Toolbar>
     </AppBar>

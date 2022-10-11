@@ -20,23 +20,17 @@ export type UseDataQueryConfig = Pick<
   'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
 >;
 
-export interface UseDataQuery {
+export interface UseFetch {
   isLoading: boolean;
   isFetching: boolean;
   error: any;
   data: any;
   rows: GridRowsProp;
+  fetch: (overrides?: any) => void;
   refetch: () => void;
+  /** @deprecated Use fetch */
+  call: (overrides?: any) => Promise<void>;
 }
-
-export const INITIAL_DATA_QUERY: UseDataQuery = {
-  isLoading: false,
-  isFetching: false,
-  error: null,
-  data: null,
-  rows: [],
-  refetch: () => {},
-};
 
 const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
@@ -52,7 +46,7 @@ export function useDataQuery(
     UseQueryOptions<any, unknown, unknown, any[]>,
     'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
   >,
-): UseDataQuery {
+): UseFetch {
   const {
     isLoading,
     isFetching,
@@ -74,7 +68,7 @@ export function useDataQuery(
 
   const rows = Array.isArray(data) ? data : EMPTY_ARRAY;
 
-  const result: UseDataQuery = React.useMemo(
+  const result: UseFetch = React.useMemo(
     () => ({
       isLoading: isLoading && enabled,
       isFetching,
@@ -82,6 +76,12 @@ export function useDataQuery(
       data,
       rows,
       refetch,
+      fetch: async () => {
+        throw new Error(`"fetch" is unsupported for automatic queries`);
+      },
+      call: async () => {
+        throw new Error(`"call" is unsupported for automatic queries`);
+      },
     }),
     [isLoading, enabled, isFetching, error, data, rows, refetch],
   );

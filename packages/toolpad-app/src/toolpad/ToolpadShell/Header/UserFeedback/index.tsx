@@ -15,7 +15,7 @@ import client from '../../../../api';
 const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
-const CURRENT_RELEASE_VERSION = `v1${process.env.TOOLPAD_VERSION}`;
+const CURRENT_RELEASE_VERSION = `v${process.env.TOOLPAD_VERSION}`;
 
 interface FeedbackMenuItemLinkProps {
   href: string;
@@ -36,7 +36,7 @@ function getReadableTarget(): string {
     case TOOLPAD_TARGET_CLOUD:
       return 'Cloud';
     case TOOLPAD_TARGET_CE:
-      return 'Community';
+      return 'Community Edition';
     case TOOLPAD_TARGET_PRO:
       return 'Pro';
     default:

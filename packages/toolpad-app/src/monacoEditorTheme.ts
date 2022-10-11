@@ -1,6 +1,8 @@
-import { Theme } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
-const getMonacoEditorTheme = (theme: Theme): string =>
-  theme.palette.mode === 'dark' ? 'vs-dark' : 'vs';
+const useMonacoTheme = (): string => {
+  const theme = useTheme();
+  return theme.palette.mode === 'dark' ? 'vs-dark' : 'vs';
+};
 
-export default getMonacoEditorTheme;
+export default useMonacoTheme;

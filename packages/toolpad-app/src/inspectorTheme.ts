@@ -1,14 +1,16 @@
 import { chromeDark, chromeLight, InspectorTheme } from 'react-inspector';
+import { useTheme } from '@mui/material/styles';
 
-function getInspectorTheme(mode: 'dark' | 'light'): InspectorTheme {
+const useInspectorTheme = (): InspectorTheme => {
+  const theme = useTheme();
   return {
-    ...(mode === 'dark' ? chromeDark : chromeLight),
+    ...(theme.palette.mode === 'dark' ? chromeDark : chromeLight),
     BASE_BACKGROUND_COLOR: 'inherit',
     TREENODE_FONT_FAMILY: 'inherit',
     TREENODE_FONT_SIZE: 'inherit',
     ARROW_FONT_SIZE: 'inherit',
     TREENODE_LINE_HEIGHT: 'inherit',
   };
-}
+};
 
-export default getInspectorTheme;
+export default useInspectorTheme;

@@ -69,13 +69,13 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           />
-          <link rel="manifest" href="/site.webmanifest" />
+          <link rel="manifest" href="/manifest.json" />
           <script
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: `
                 // Add the data-toolpad-canvas attribute to the canvas iframe element
-                if (window.frameElement?.dataset.toolpadCanvas){ 
+                if (window.frameElement?.dataset.toolpadCanvas){
                   var script = document.createElement('script');
                   script.type = 'module';
                   script.src = '/reactDevtools/bootstrap.js';
@@ -84,7 +84,6 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
               `,
             }}
           />
-
           <script
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
@@ -93,7 +92,6 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
               )}] = ${serializeJavascript(this.props.config, { ignoreFunction: true })}`,
             }}
           />
-
           {/* Global site tag (gtag.js) - Google Analytics */}
           <Script
             async

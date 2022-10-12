@@ -16,6 +16,8 @@ import { camelCase, generateUniqueString, removeDiacritics } from './utils/strin
 import { ExactEntriesOf, Maybe } from './utils/types';
 import { filterValues } from './utils/collections';
 
+export const CURRENT_APPDOM_VERSION = 1;
+
 export const RESERVED_NODE_PROPERTIES = [
   'id',
   'type',
@@ -106,6 +108,8 @@ export interface CodeComponentNode extends AppDomNodeBase {
   };
 }
 
+export type FetchMode = 'query' | 'mutation';
+
 /**
  * A DOM query is defined primarily by a server defined part "attributes.query"
  * and a clientside defined part "params". "params" are constructed in the runtime
@@ -116,6 +120,7 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
   readonly params?: BindableAttrValues;
   readonly attributes: {
+    readonly mode?: ConstantAttrValue<FetchMode>;
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeReference | null>;
     readonly query: ConstantAttrValue<Q>;
@@ -124,13 +129,14 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
+    readonly cacheTime?: ConstantAttrValue<number>;
     readonly enabled?: BindableAttrValue<boolean>;
   };
 }
 
-export interface MutationNode<Q = any, P = any> extends AppDomNodeBase {
+export interface MutationNode<Q = any> extends AppDomNodeBase {
   readonly type: 'mutation';
-  readonly params?: BindableAttrValues<P>;
+  readonly params?: BindableAttrValues;
   readonly attributes: {
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeReference | null>;
@@ -206,6 +212,7 @@ export type AppDomNodes = Record<NodeId, AppDomNode>;
 export interface AppDom {
   nodes: AppDomNodes;
   root: NodeId;
+  version?: number;
 }
 
 function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node is T {
@@ -482,6 +489,7 @@ export function createDom(): AppDom {
       }),
     },
     root: rootId,
+    version: CURRENT_APPDOM_VERSION,
   };
 }
 
@@ -861,6 +869,7 @@ export type RenderTreeNodes = Record<NodeId, RenderTreeNode>;
 export interface RenderTree {
   root: NodeId;
   nodes: RenderTreeNodes;
+  version?: number;
 }
 
 /**
@@ -887,53 +896,8 @@ export function deref(nodeRef: NodeReference): NodeId;
 export function deref(nodeRef: null | undefined): null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
-  if (typeof nodeRef === 'string') {
-    // This branch provides backwards compatibility for old style string refs
-    // TODO: remove this branch and replace with a migration after the functionality is in place .
-    //       See https://github.com/mui/mui-toolpad/pull/776
-    //       In migration '1' we should update all query connectionId and navigate action pageId.
-    return nodeRef;
-  }
   if (nodeRef) {
     return nodeRef.$$ref;
   }
   return null;
-}
-
-export function fromLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
-  // Migrate old rest nodes with transforms on the fly
-  // TODO: Build migration flow for https://github.com/mui/mui-toolpad/issues/741
-  //       to make this obsolete
-
-  if (node.attributes.dataSource?.value !== 'rest') {
-    return node;
-  }
-
-  if (
-    typeof node.attributes.query.value?.transformEnabled !== 'undefined' &&
-    (node.attributes.transformEnabled || node.attributes.transform)
-  ) {
-    return update(node, {
-      attributes: update(node.attributes, {
-        transformEnabled: undefined,
-        transform: undefined,
-      }),
-    });
-  }
-
-  if (node.attributes.transformEnabled || node.attributes.transform) {
-    return update(node, {
-      attributes: update(node.attributes, {
-        transformEnabled: undefined,
-        transform: undefined,
-        query: createConst({
-          ...node.attributes.query.value,
-          transformEnabled: node.attributes.transformEnabled?.value,
-          transform: node.attributes.transform?.value,
-        }),
-      }),
-    });
-  }
-
-  return node;
 }

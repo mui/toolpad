@@ -156,14 +156,10 @@ function ConnectionParamsInput({
 }
 
 function QueryEditor({
-  QueryEditorShell,
   globalScope,
-  value,
-  onChange,
+  value: input,
+  onChange: setInput,
 }: QueryEditorProps<PostgresConnectionParams, PostgresQuery>) {
-  const [input, setInput] = React.useState(value);
-  React.useEffect(() => setInput(value), [value]);
-
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     input: input.params,
     globalScope,
@@ -183,49 +179,43 @@ function QueryEditor({
     params: previewParams,
   });
 
-  const handleCommit = React.useCallback(() => onChange(input), [onChange, input]);
-
-  const isDirty = input !== value;
-
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
   const rows = React.useMemo(() => rawRows.map((row, id) => ({ id, ...row })), [rawRows]);
   const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
-    <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
-      <SplitPane split="vertical" size="50%" allowResize>
-        <SplitPane split="horizontal" size={85} primary="second" allowResize>
-          <QueryInputPanel onRunPreview={handleRunPreview}>
-            <Box sx={{ flex: 1, minHeight: 0 }}>
-              <MonacoEditor
-                value={input.query.sql}
-                onChange={(newValue) =>
-                  setInput((existing) => ({ ...existing, query: { sql: newValue } }))
-                }
-                language="sql"
-              />
-            </Box>
-          </QueryInputPanel>
-
-          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-            <Typography>Parameters</Typography>
-            <ParametersEditor
-              value={input.params}
-              onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
-              globalScope={globalScope}
-              liveValue={paramsEditorLiveValue}
+    <SplitPane split="vertical" size="50%" allowResize>
+      <SplitPane split="horizontal" size={85} primary="second" allowResize>
+        <QueryInputPanel onRunPreview={handleRunPreview}>
+          <Box sx={{ flex: 1, minHeight: 0 }}>
+            <MonacoEditor
+              value={input.query.sql}
+              onChange={(newValue) =>
+                setInput((existing) => ({ ...existing, query: { sql: newValue } }))
+              }
+              language="sql"
             />
           </Box>
-        </SplitPane>
+        </QueryInputPanel>
 
-        {preview?.error ? (
-          <ErrorAlert error={preview?.error} />
-        ) : (
-          <DataGridPro sx={{ border: 'none' }} columns={columns} key={previewGridKey} rows={rows} />
-        )}
+        <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
+          <Typography>Parameters</Typography>
+          <ParametersEditor
+            value={input.params}
+            onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
+            globalScope={globalScope}
+            liveValue={paramsEditorLiveValue}
+          />
+        </Box>
       </SplitPane>
-    </QueryEditorShell>
+
+      {preview?.error ? (
+        <ErrorAlert error={preview?.error} />
+      ) : (
+        <DataGridPro sx={{ border: 'none' }} columns={columns} key={previewGridKey} rows={rows} />
+      )}
+    </SplitPane>
   );
 }
 

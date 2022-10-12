@@ -22,39 +22,52 @@
     },
     {
       "groupName": "MUI Core",
-      "matchPackageNames": [
-        "@mui/material",
-        "@mui/joy",
-        "@mui/icons-material",
-        "@mui/base",
-        "@mui/system",
-        "@mui/styles",
-        "@mui/utils"
-      ],
+      "matchPackagePatterns": ["^@mui/"],
       "prCreation": "immediate"
     },
     {
       "groupName": "MUI X",
-      "matchPackageNames": [
-        "@mui/x-data-grid",
-        "@mui/x-data-grid",
-        "@mui/x-data-grid-pro",
-        "@mui/x-data-grid-premium",
-        "@mui/x-data-grid-generator",
-        "@mui/x-date-pickers",
-        "@mui/x-date-pickers-pro"
-      ],
+      "matchPackagePatterns": ["^@mui/x-"],
       "prCreation": "immediate"
     },
     {
-      "groupName": "ignored",
-      "matchPackageNames": [
-        "react-inspector",
-        "node-fetch",
-        "eslint-config-airbnb-typescript",
-        "chalk"
-      ],
-      "enabled": false
+      "groupName": "playwright",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["playwright", "@playwright/*"]
+    },
+    {
+      "groupName": "dependencies",
+      "matchDepTypes": ["cimg/node", "node"]
+    },
+    {
+      "groupName": "react-inspector",
+      "matchPackageNames": ["react-inspector"],
+      "allowedVersions": "< 6.0.0"
+    },
+    {
+      "groupName": "node-fetch",
+      "matchPackageNames": ["node-fetch"],
+      "allowedVersions": "< 3.0.0"
+    },
+    {
+      "groupName": "eslint-config-airbnb-typescript",
+      "matchPackageNames": ["eslint-config-airbnb-typescript"],
+      "allowedVersions": "< 13.0.0"
+    },
+    {
+      "groupName": "react-router",
+      "matchPackageNames": ["react-router", "react-router-dom"],
+      "allowedVersions": "< 6.4.0"
+    },
+    {
+      "groupName": "chalk",
+      "matchPackageNames": ["chalk"],
+      "allowedVersions": "< 5.0.0"
+    },
+    {
+      "groupName": "core-js",
+      "matchPackageNames": ["core-js"],
+      "allowedVersions": "< 2.0.0"
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],
@@ -66,5 +79,20 @@
   "vulnerabilityAlerts": {
     "prCreation": "immediate",
     "addLabels": ["priority: important"]
-  }
+  },
+  "regexManagers": [
+    {
+      "fileMatch": ["^render.yml$"],
+      "matchStringsStrategy": "combination",
+      "matchStrings": ["- key: NODE_VERSION", "value: '(?<currentValue>.*)"],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["^.circleci/config.yml$"],
+      "matchStrings": ["mcr.microsoft.com/playwright:(?<currentValue>.*)"],
+      "depNameTemplate": "playwright",
+      "datasourceTemplate": "docker"
+    }
+  ]
 }

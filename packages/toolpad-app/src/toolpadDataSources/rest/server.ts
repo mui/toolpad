@@ -34,6 +34,7 @@ async function resolveBindable(
   if (bindable.type === 'jsExpression') {
     return evalExpression(bindable.value, {
       query: boundValues,
+      parameters: boundValues,
     });
   }
   throw new Error(

@@ -7,12 +7,8 @@ export default function useMenu() {
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const onMenuClose = () => {
-    setAnchorEl(null);
-  };
+
+  const onMenuClose = React.useCallback(() => setAnchorEl(null), []);
 
   const buttonProps = React.useMemo<ButtonProps>(
     () => ({
@@ -20,7 +16,9 @@ export default function useMenu() {
       'aria-controls': open ? menuId : undefined,
       'aria-haspopup': 'true',
       'aria-expanded': open ? 'true' : undefined,
-      onClick: handleClick,
+      onClick(event: React.MouseEvent<HTMLButtonElement>) {
+        setAnchorEl(event.currentTarget);
+      },
     }),
     [buttonId, menuId, open],
   );
@@ -35,7 +33,7 @@ export default function useMenu() {
         'aria-labelledby': buttonId,
       },
     }),
-    [anchorEl, buttonId, menuId, open],
+    [anchorEl, buttonId, menuId, onMenuClose, open],
   );
 
   return {

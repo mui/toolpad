@@ -10,26 +10,26 @@ interface ThemeProviderProps {
   children?: React.ReactNode;
 }
 
-type PaletteModeOptions = 'light' | 'dark';
-export type ThemeModeOptions = PaletteModeOptions | 'system';
+type PaletteMode = 'light' | 'dark';
+export type ThemeMode = PaletteMode | 'system';
 
-function usePreferredMode(): PaletteModeOptions {
+function usePreferredMode(): PaletteMode {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   return prefersDarkMode ? 'dark' : 'light';
 }
 
-export function useToolpadThemeModeSetting() {
-  return useLocalStorageState<ThemeModeOptions>('toolpad-palette-mode', 'system');
+export function useThemeMode() {
+  return useLocalStorageState<ThemeMode>('toolpad-palette-mode', 'system');
 }
 
-export function useToolpadThemeMode(): PaletteModeOptions {
+export function usePaletteMode(): PaletteMode {
   const preferredMode = usePreferredMode();
-  const [setting] = useToolpadThemeModeSetting();
+  const [setting] = useThemeMode();
   return setting === 'system' ? preferredMode : setting;
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const paletteMode = useToolpadThemeMode();
+  const paletteMode = usePaletteMode();
   const theme = React.useMemo(() => {
     const brandingDesignTokens = getDesignTokens(paletteMode);
     let nextTheme = createTheme({

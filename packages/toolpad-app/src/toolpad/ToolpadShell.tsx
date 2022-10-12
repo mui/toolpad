@@ -26,7 +26,7 @@ import {
 } from '../constants';
 import productIconDark from '../../public/product-icon-dark.svg';
 import productIconLight from '../../public/product-icon-light.svg';
-import { useToolpadThemeModeSetting, ThemeModeOptions } from '../ThemeContext';
+import { useThemeMode, ThemeMode } from '../ThemeContext';
 import ThemeModeMenu from './ThemeModeMenu';
 
 const REPORT_BUG_URL =
@@ -110,10 +110,10 @@ export interface HeaderProps {
 
 function Header({ actions, status }: HeaderProps) {
   const theme = useTheme();
-  const [themeMode, setThemeMode] = useToolpadThemeModeSetting();
+  const [themeMode, setThemeMode] = useThemeMode();
 
   const handleThemeModeChange = React.useCallback(
-    (event: React.MouseEvent, mode: ThemeModeOptions) => {
+    (event: React.MouseEvent, mode: ThemeMode) => {
       setThemeMode(mode);
     },
     [setThemeMode],

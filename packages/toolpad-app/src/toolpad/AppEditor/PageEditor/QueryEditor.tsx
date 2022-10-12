@@ -39,13 +39,15 @@ const EMPTY_OBJECT = {};
 
 function createQueryModel<Q>(node: appDom.QueryNode<Q>): QueryEditorModel<Q> {
   const inputParams = node.params || EMPTY_OBJECT;
-  const params =
+  const parameters =
     (Object.entries(inputParams).filter(([, value]) => Boolean(value)) as BindableAttrEntries) ||
     [];
 
   return {
     query: node.attributes.query.value,
-    params,
+    // TODO: 'params' are passed only for backwards compatability, remove after v1
+    params: parameters,
+    parameters,
   };
 }
 

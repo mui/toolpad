@@ -9,10 +9,10 @@ import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
-import { migrateUp } from '../appDomMigrations';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
+import { migrateUp } from '../appDom/migrations';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -453,7 +453,7 @@ export async function setConnectionParams<P>(
 
 export async function execQuery<P, Q>(
   appId: string,
-  dataNode: appDom.QueryNode<Q> | appDom.MutationNode<Q>,
+  dataNode: appDom.QueryNode<Q>,
   params: Q,
 ): Promise<ExecFetchResult<any>> {
   const dataSource: ServerDataSource<P, Q, any> | undefined =

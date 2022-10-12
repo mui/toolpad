@@ -3,7 +3,7 @@ import { test } from '@playwright/test';
 import { ToolpadHome } from '../../models/ToolpadHome';
 import { readJsonFile } from '../../utils/fs';
 
-test.only('large dom', async ({ page }) => {
+test('large dom', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './large.json'));
 
   const homeModel = new ToolpadHome(page);

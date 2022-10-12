@@ -19,18 +19,24 @@ function getBaseLogProperties(req: NextApiRequest) {
   };
 }
 
+type RestArgs = [
+  chunk: any,
+  encoding: BufferEncoding,
+  callback?: ((error?: Error | null) => void) | undefined,
+];
+
 function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId: string) {
   const oldWrite = res.write;
   const oldEnd = res.end;
 
   const chunks: Buffer[] = [];
 
-  res.write = (restArgs) => {
+  res.write = (...restArgs: any[]) => {
     chunks.push(Buffer.from(restArgs[0]));
-    return oldWrite.apply(res, restArgs);
+    return oldWrite.apply(res, restArgs as RestArgs);
   };
 
-  res.end = (restArgs) => {
+  res.end = (...restArgs: any[]) => {
     if (restArgs[0]) {
       chunks.push(Buffer.from(restArgs[0]));
     }
@@ -47,7 +53,7 @@ function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId
       ...getBaseLogProperties(req),
     });
 
-    return oldEnd.apply(res, restArgs);
+    return oldEnd.apply(res, restArgs as RestArgs);
   };
 }
 

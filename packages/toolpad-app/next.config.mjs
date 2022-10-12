@@ -2,6 +2,9 @@ import { createRequire } from 'module';
 import * as path from 'path';
 import { withSentryConfig } from '@sentry/nextjs';
 
+// TODO: remove when https://github.com/getsentry/sentry-javascript/issues/3852 gets resolved
+process.env.SENTRY_IGNORE_API_RESOLUTION_ERROR = 'true';
+
 const require = createRequire(import.meta.url);
 const pkgJson = require('./package.json');
 

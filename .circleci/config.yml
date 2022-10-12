@@ -6,7 +6,7 @@ defaults: &defaults
   working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
-    - image: cimg/node:16.14
+    - image: cimg/node:18.10.0
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.
@@ -94,10 +94,10 @@ jobs:
   checkout:
     <<: *defaults
     docker:
-      - image: cimg/node:16.14
+      - image: cimg/node:18.10.0
         environment:
           TOOLPAD_SHADOW_DATABASE_URL: postgresql://postgres@localhost/circle_test
-      - image: cimg/postgres:14.0
+      - image: cimg/postgres:14.5
         environment:
           POSTGRES_USER: postgres
     steps:
@@ -129,6 +129,7 @@ jobs:
           command: yarn markdownlint
   test_static:
     <<: *defaults
+    resource_class: medium+
     steps:
       - checkout
       - install_js
@@ -185,7 +186,7 @@ jobs:
               -v "$CIRCLE_WORKING_DIRECTORY:/tests" \
               -w /tests \
               -e PLAYWRIGHT_TEST_BASE_URL=http://172.17.0.1:3000/ \
-              mcr.microsoft.com/playwright:v1.25.2-focal \
+              mcr.microsoft.com/playwright:v1.27.0-focal \
               yarn test:integration --forbid-only
             docker-compose -f ./docker-compose.test.yml down
 

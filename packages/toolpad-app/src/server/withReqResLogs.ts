@@ -31,12 +31,12 @@ function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId
 
   const chunks: Buffer[] = [];
 
-  res.write = (...restArgs: any[]) => {
+  res.write = (restArgs) => {
     chunks.push(Buffer.from(restArgs[0]));
     return oldWrite.apply(res, restArgs as RestArgs);
   };
 
-  res.end = (...restArgs: any[]) => {
+  res.end = (restArgs) => {
     if (restArgs[0]) {
       chunks.push(Buffer.from(restArgs[0]));
     }

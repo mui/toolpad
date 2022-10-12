@@ -10,35 +10,26 @@ interface ThemeProviderProps {
   children?: React.ReactNode;
 }
 
-export type PaletteModeOptions = 'light' | 'dark';
+type PaletteModeOptions = 'light' | 'dark';
 export type ThemeModeOptions = PaletteModeOptions | 'system';
 
-export const DispatchContext = React.createContext<
-  React.Dispatch<React.SetStateAction<ThemeModeOptions>>
->(() => {
-  throw new Error('Forgot to wrap component in `ThemeProvider`');
-});
-
-function usePreferredMode() {
+function usePreferredMode(): PaletteModeOptions {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   return prefersDarkMode ? 'dark' : 'light';
 }
 
-export function useToolpadThemeMode() {
+export function useToolpadThemeModeSetting() {
+  return useLocalStorageState<ThemeModeOptions>('toolpad-palette-mode', 'system');
+}
+
+export function useToolpadThemeMode(): PaletteModeOptions {
   const preferredMode = usePreferredMode();
-  return useLocalStorageState<ThemeModeOptions>('toolpad-palette-mode', preferredMode);
+  const [setting] = useToolpadThemeModeSetting();
+  return setting === 'system' ? preferredMode : setting;
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [themeMode, setThemeMode] = useToolpadThemeMode();
-
-  const preferredMode = usePreferredMode();
-
-  const paletteMode: PaletteModeOptions = React.useMemo(
-    () => (themeMode === 'system' ? preferredMode : themeMode),
-    [preferredMode, themeMode],
-  );
-
+  const paletteMode = useToolpadThemeMode();
   const theme = React.useMemo(() => {
     const brandingDesignTokens = getDesignTokens(paletteMode);
     let nextTheme = createTheme({
@@ -63,7 +54,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
           media={`(prefers-color-scheme: ${paletteMode})`}
         />
       </Head>
-      <DispatchContext.Provider value={setThemeMode}>{children}</DispatchContext.Provider>
+      {children}
     </MuiThemeProvider>
   );
 }

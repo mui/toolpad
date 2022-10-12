@@ -41,7 +41,7 @@ function ThemeModeMenu({ mode, onChange }: ThemeModeMenuProps) {
   return (
     <React.Fragment>
       <Tooltip title="Change theme">
-        <IconButton {...buttonProps} color="primary">
+        <IconButton {...buttonProps} aria-label="Change theme" color="primary">
           {options[mode].icon}
         </IconButton>
       </Tooltip>

@@ -17,6 +17,7 @@ const BASIC_AUTH_WHITELIST = [
 
   // Static content is public
   new URLPattern({ pathname: '/_next/static/*' }),
+  new URLPattern({ pathname: '/static/*' }),
 
   // Apps must be able to be public
   // These urls will handle their own basic auth when the corresponding Toolpad app is not public

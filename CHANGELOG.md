@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.0.21
+## v0.0.22
 
 <!-- generated comparing v0.0.21..master -->
 

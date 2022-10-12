@@ -1,8 +1,9 @@
 import invariant from 'invariant';
 import v1 from './v1';
-import * as appDom from '../appDom';
+import v2 from './v2';
+import * as appDom from '..';
 
-const versions = [v1];
+const versions = [v1, v2];
 
 invariant(versions.length === appDom.CURRENT_APPDOM_VERSION, 'Unable to find the latest version');
 

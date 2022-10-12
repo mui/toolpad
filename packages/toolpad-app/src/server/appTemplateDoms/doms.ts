@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as appDom from '../../appDom';
-import { migrateUp } from '../../appDomMigrations';
+import { migrateUp } from '../../appDom/migrations';
 import { AppTemplateId } from '../../types';
 import { readJsonFile } from '../../utils/fs';
 import projectRoot from '../projectRoot';

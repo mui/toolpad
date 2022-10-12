@@ -137,5 +137,8 @@
   "typings": "./index.d.ts",
   "publishConfig": {
     "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

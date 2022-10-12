@@ -8,3 +8,5 @@ export const TOOLPAD_TARGET_CE = 'CE';
 export const TOOLPAD_TARGET_CLOUD = 'CLOUD';
 export const TOOLPAD_TARGET_PRO = 'PRO';
 export const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/overview/';
+export const DOCUMENTATION_INSTALLATION_URL =
+  'https://mui.com/toolpad/getting-started/installation/';

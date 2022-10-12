@@ -51,7 +51,6 @@ import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
 import useLatest from '../../utils/useLatest';
 import ToolpadShell from '../ToolpadShell';
-import UpdateBanner from './UpdateBanner';
 import getReadableDuration from '../../utils/readableDuration';
 import EditableText from '../../components/EditableText';
 import type { AppMeta } from '../../server/data';
@@ -789,7 +788,6 @@ export default function Home() {
               duplicateApp={duplicateApp}
             />
           )}
-          <UpdateBanner />
         </Container>
       ) : null}
       <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />

@@ -16,9 +16,7 @@ import {
   Slots,
   Placeholder,
   NodeId,
-  execDataSourceQuery,
   BindableAttrValue,
-  UseDataQueryConfig,
   NestedBindableAttrs,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -63,7 +61,7 @@ import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
-import { useDataQuery, UseFetch } from './useDataQuery';
+import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from './useDataQuery';
 import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 
@@ -458,8 +456,7 @@ function MutationNode({ node }: MutationNodeProps) {
   const bindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
-  const dataUrl = `/api/data/${appId}/${version}/`;
-  const mutationId = node.id;
+  const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
   const {
@@ -469,9 +466,14 @@ function MutationNode({ node }: MutationNodeProps) {
     mutateAsync,
   } = useMutation(
     async (overrides: any = {}) =>
-      execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides }),
+      execDataSourceQuery({
+        appId,
+        version,
+        queryId,
+        params: { ...params, ...overrides },
+      }),
     {
-      mutationKey: [dataUrl, mutationId, params],
+      mutationKey: [appId, version, queryId, params],
     },
   );
 

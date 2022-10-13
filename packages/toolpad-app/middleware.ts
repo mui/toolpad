@@ -1,5 +1,15 @@
-import { NextRequest, NextResponse, URLPattern } from 'next/server';
+import {
+  NextRequest,
+  NextResponse,
+  // @ts-expect-error
+  // TODO: As soon as next/server exports this member:
+  //   - remove ` as NextURLPattern` from this line
+  //   - remove the line below with `const URLPattern = ...`
+  URLPattern as NextURLPattern,
+} from 'next/server';
 import { checkBasicAuthHeader } from './src/server/basicAuth';
+
+const URLPattern = NextURLPattern || (global as any).URLPattern;
 
 const BASIC_AUTH_WHITELIST = [
   // Healthcheck must always be public
@@ -7,6 +17,7 @@ const BASIC_AUTH_WHITELIST = [
 
   // Static content is public
   new URLPattern({ pathname: '/_next/static/*' }),
+  new URLPattern({ pathname: '/static/*' }),
 
   // Apps must be able to be public
   // These urls will handle their own basic auth when the corresponding Toolpad app is not public

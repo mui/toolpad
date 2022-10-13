@@ -87,7 +87,7 @@ export function JsExpressionEditor({
       
     `;
 
-    return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
+    return [{ content, filePath: 'global.d.ts' }];
   }, [globalScope, globalScopeMeta]);
 
   return (

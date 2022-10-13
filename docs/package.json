@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "private": true,
   "author": "MUI Toolpad",
   "license": "MIT",
@@ -60,7 +60,7 @@
     "lz-string": "^1.4.4",
     "markdown-to-jsx": "^7.1.7",
     "marked": "^4.1.1",
-    "next": "^12.3.1",
+    "next": "12.2.2",
     "next-transpile-modules": "^9.1.0",
     "nprogress": "^0.2.0",
     "postcss": "^8.4.17",

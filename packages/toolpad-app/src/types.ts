@@ -78,7 +78,9 @@ export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
 export interface QueryEditorModel<Q> {
   query: Q;
+  /** @deprecated Use parameters instead */
   params: BindableAttrEntries;
+  parameters: BindableAttrEntries;
 }
 
 export interface QueryEditorProps<C, Q> extends WithControlledProp<QueryEditorModel<Q>> {

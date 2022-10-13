@@ -10,13 +10,13 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
-import { ConnectionStatus, AppTheme } from './types';
-import { omit, update, updateOrCreate } from './utils/immutability';
-import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
-import { ExactEntriesOf, Maybe } from './utils/types';
-import { filterValues } from './utils/collections';
+import { ConnectionStatus, AppTheme } from '../types';
+import { omit, update, updateOrCreate } from '../utils/immutability';
+import { camelCase, generateUniqueString, removeDiacritics } from '../utils/strings';
+import { ExactEntriesOf, Maybe } from '../utils/types';
+import { filterValues } from '../utils/collections';
 
-export const CURRENT_APPDOM_VERSION = 1;
+export const CURRENT_APPDOM_VERSION = 2;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -134,6 +134,9 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
   };
 }
 
+/**
+ * @deprecated QueryNode can act as a mutation by switching the `mode` attribute to 'mutation'
+ */
 export interface MutationNode<Q = any> extends AppDomNodeBase {
   readonly type: 'mutation';
   readonly params?: BindableAttrValues;

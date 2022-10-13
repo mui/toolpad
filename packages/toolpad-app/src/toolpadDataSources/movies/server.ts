@@ -1,5 +1,5 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
-import moviesData from '../../../movies.json';
+import moviesData from '../../../public/static/movies.json';
 import { ServerDataSource } from '../../types';
 import { Maybe } from '../../utils/types';
 import { MoviesConnectionParams, MoviesQuery, Movie } from './types';

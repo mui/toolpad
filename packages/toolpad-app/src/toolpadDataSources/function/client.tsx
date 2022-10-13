@@ -155,7 +155,7 @@ function QueryEditor({
       }
     `;
 
-    return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
+    return [{ content, filePath: 'global.d.ts' }];
   }, [input.params, secretsKeys]);
 
   const handleLogClear = React.useCallback(() => setPreviewLogs([]), []);

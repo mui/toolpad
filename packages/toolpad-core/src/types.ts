@@ -50,18 +50,18 @@ export interface NavigationAction<P = any> {
   };
 }
 
-type ButtonEventTypes = 'click';
-
-type DataGridActionEventTypes = 'delete' | 'update';
-
-interface DataGridActionEvent {
-  type: DataGridActionEventTypes;
+interface BaseEvent {
+  type: string;
+  sourceEvent?: React.SyntheticEvent;
+}
+interface DataGridActionEvent extends BaseEvent {
+  type: 'delete' | 'update';
   id: GridRowId;
-  row: any;
+  row: Record<string, unknown>;
 }
 
-interface ButtonEvent {
-  type: ButtonEventTypes;
+interface ButtonEvent extends BaseEvent {
+  type: 'click';
 }
 
 export type ToolpadEvent = DataGridActionEvent | ButtonEvent;
@@ -126,7 +126,7 @@ export interface ElementValueType extends ValueTypeBase {
 
 export interface EventValueType extends ValueTypeBase {
   type: 'event';
-  eventType: ButtonEventTypes | DataGridActionEventTypes;
+  eventType: 'click' | 'delete' | 'update';
 }
 
 export interface ArgControlSpec {

@@ -42,15 +42,15 @@ export default function NodeAttributeEditor({
     const rowIdFieldBinding = `${node.id}${namespace ? `.${namespace}` : ''}.rowIdField`;
 
     const rowBindingValue = rowsBinding in bindings ? bindings[rowsBinding]?.value?.[0] : null;
-    const rowIdFieldBindingValue =
-      rowIdFieldBinding in bindings ? bindings[rowIdFieldBinding]?.value : null;
+    const rowIdFieldBindingValue = bindings[rowIdFieldBinding]?.value ?? 'id';
 
-    const toolpadEvent: ToolpadEvent = {
-      type: propType.eventType,
+    const event: ToolpadEvent = {
       id: rowBindingValue?.[rowIdFieldBindingValue],
+      type: propType.eventType,
       row: rowBindingValue,
+      sourceEvent: undefined,
     };
-    globalScope.toolpadEvent = toolpadEvent;
+    globalScope.toolpadEvent = event;
   }
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt

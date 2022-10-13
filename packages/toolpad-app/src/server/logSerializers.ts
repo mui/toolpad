@@ -1,18 +1,22 @@
-import * as _ from 'lodash-es';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-export const reqSerializer = (req: NextApiRequest) => ({
-  ..._.pick(req, ['url', 'method', 'query']),
-  body: _.pick(req.body, [
-    'type',
-    'name',
+export function reqSerializer(req: NextApiRequest) {
+  return {
+    url: req.url,
+    method: req.method,
+    query: req.query,
+    type: req.body.type,
+    name: req.body.name,
     // Omitting request params, but we could enable them if it would be useful
-    // 'params'
-  ]),
-  headers: _.pick(req.headers, ['x-forwarded-for', 'host', 'user-agent']),
-  socket: _.pick(req.socket, ['remoteAddress']),
-});
+    // params: req.body.params,
+    ipAddress: req.headers['x-forwarded-for'] || req.socket?.remoteAddress,
+    host: req.headers.host,
+    userAgent: req.headers['user-agent'],
+  };
+}
 
-export const resSerializer = (res: NextApiResponse) => ({
-  statusCode: res.statusCode,
-});
+export function resSerializer(res: NextApiResponse) {
+  return {
+    statusCode: res.statusCode,
+  };
+}

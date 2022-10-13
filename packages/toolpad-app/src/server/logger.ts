@@ -4,23 +4,20 @@ import ecsFormat from '@elastic/ecs-pino-format';
 import config from './config';
 import { reqSerializer, resSerializer } from './logSerializers';
 
-function getTransport() {
-  let transport;
-  if (config.ecsCloudId) {
-    transport = pino.transport({
-      target: 'pino-elasticsearch',
-      options: {
-        index: 'toolpad-pino',
-        cloud: {
-          id: config.ecsCloudId,
-        },
-        auth: {
-          apiKey: config.ecsApiKey,
-        },
+let transport;
+if (config.ecsCloudId) {
+  transport = pino.transport({
+    target: 'pino-elasticsearch',
+    options: {
+      index: 'toolpad-pino',
+      cloud: {
+        id: config.ecsCloudId,
       },
-    });
-  }
-  return transport;
+      auth: {
+        apiKey: config.ecsApiKey,
+      },
+    },
+  });
 }
 
 const logger = pino(
@@ -35,7 +32,7 @@ const logger = pino(
     },
     ...(config.ecsCloudId ? ecsFormat() : {}),
   },
-  getTransport(),
+  transport,
 );
 
 export default logger;

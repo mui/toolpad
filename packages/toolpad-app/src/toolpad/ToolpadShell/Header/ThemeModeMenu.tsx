@@ -3,18 +3,18 @@ import { IconButton, Menu, MenuItem, ListItemText, ListItemIcon, Tooltip } from 
 import LightModeOutlined from '@mui/icons-material/LightMode';
 import DarkModeOutlined from '@mui/icons-material/DarkMode';
 import SettingsBrightnessOutlined from '@mui/icons-material/SettingsBrightnessOutlined';
-import { ThemeModeOptions } from '../ThemeContext';
-import useMenu from '../utils/useMenu';
+import { ThemeMode } from '../../../ThemeContext';
+import useMenu from '../../../utils/useMenu';
 
 interface ThemeModeMenuProps {
-  mode: ThemeModeOptions;
-  onChange: (event: React.MouseEvent, mode: ThemeModeOptions) => void;
+  mode: ThemeMode;
+  onChange: (event: React.MouseEvent, mode: ThemeMode) => void;
 }
 
 interface ThemeModeMenuOption {
   label: string;
   icon: React.ReactNode;
-  value: ThemeModeOptions;
+  value: ThemeMode;
 }
 
 const options: Record<string, ThemeModeMenuOption> = {

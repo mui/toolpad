@@ -1,29 +1,22 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
-import * as _ from 'lodash-es';
 import logger from './logger';
+
+function getLogMessageInfo(req: NextApiRequest) {
+  const { type, name } = req.body;
+  return type && name ? `${type}:${name}` : '';
+}
 
 const withReqResLogs =
   (apiHandler: NextApiHandler) =>
   (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
+    const logMessageInfo = getLogMessageInfo(req);
+
     logger.info(
       {
-        req: {
-          ..._.pick(req, ['url', 'method']),
-          ...(!_.isEmpty(req.query) ? { query: req.query } : {}),
-          body: _.pick(req.body, [
-            'type',
-            'name',
-            // Omitting request params, but we could enable them if it would be useful
-            // 'params'
-          ]),
-          headers: _.pick(req.headers, ['x-forwarded-for', 'host', 'user-agent']),
-          socket: _.pick(req.socket, ['remoteAddress']),
-        },
-        res: {
-          statusCode: res.statusCode,
-        },
+        req,
+        res,
       },
-      'handled request',
+      `Handled request ${logMessageInfo ? `(${logMessageInfo})` : ''}`,
     );
 
     return apiHandler(req, res);

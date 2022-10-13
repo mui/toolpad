@@ -10,13 +10,13 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
-import { ConnectionStatus, AppTheme } from './types';
-import { omit, update, updateOrCreate } from './utils/immutability';
-import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
-import { ExactEntriesOf, Maybe } from './utils/types';
-import { filterValues } from './utils/collections';
+import { ConnectionStatus, AppTheme } from '../types';
+import { omit, update, updateOrCreate } from '../utils/immutability';
+import { camelCase, generateUniqueString, removeDiacritics } from '../utils/strings';
+import { ExactEntriesOf, Maybe } from '../utils/types';
+import { filterValues } from '../utils/collections';
 
-export const CURRENT_APPDOM_VERSION = 1;
+export const CURRENT_APPDOM_VERSION = 2;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -108,6 +108,8 @@ export interface CodeComponentNode extends AppDomNodeBase {
   };
 }
 
+export type FetchMode = 'query' | 'mutation';
+
 /**
  * A DOM query is defined primarily by a server defined part "attributes.query"
  * and a clientside defined part "params". "params" are constructed in the runtime
@@ -118,6 +120,7 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
   readonly params?: BindableAttrValues;
   readonly attributes: {
+    readonly mode?: ConstantAttrValue<FetchMode>;
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeReference | null>;
     readonly query: ConstantAttrValue<Q>;
@@ -126,13 +129,17 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
+    readonly cacheTime?: ConstantAttrValue<number>;
     readonly enabled?: BindableAttrValue<boolean>;
   };
 }
 
-export interface MutationNode<Q = any, P = any> extends AppDomNodeBase {
+/**
+ * @deprecated QueryNode can act as a mutation by switching the `mode` attribute to 'mutation'
+ */
+export interface MutationNode<Q = any> extends AppDomNodeBase {
   readonly type: 'mutation';
-  readonly params?: BindableAttrValues<P>;
+  readonly params?: BindableAttrValues;
   readonly attributes: {
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeReference | null>;

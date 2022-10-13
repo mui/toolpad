@@ -10,7 +10,6 @@ import {
   Container,
 } from '@mui/material';
 import {
-  INITIAL_DATA_QUERY,
   useDataQuery,
   ToolpadComponent,
   createComponent,
@@ -22,6 +21,7 @@ import {
   BindableAttrValue,
   UseDataQueryConfig,
   NestedBindableAttrs,
+  UseFetch,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -66,16 +66,18 @@ import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
 
-interface UseMutation {
-  call: (overrides?: any) => Promise<void>;
-  isLoading: boolean;
-  error: unknown;
-}
+const EMPTY_ARRAY: any[] = [];
+const EMPTY_OBJECT: any = {};
 
-const INITIAL_MUTATION: UseMutation = {
+const INITIAL_FETCH: UseFetch = {
   call: async () => {},
+  refetch: async () => {},
+  fetch: async () => {},
   isLoading: false,
+  isFetching: false,
   error: null,
+  data: null,
+  rows: [],
 };
 
 const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
@@ -468,7 +470,7 @@ function QueryNode({ node }: QueryNodeProps) {
 }
 
 interface MutationNodeProps {
-  node: appDom.MutationNode;
+  node: appDom.QueryNode;
 }
 
 function MutationNode({ node }: MutationNodeProps) {
@@ -482,8 +484,9 @@ function MutationNode({ node }: MutationNodeProps) {
 
   const {
     isLoading,
-    error,
-    mutateAsync: call,
+    data: responseData = EMPTY_OBJECT,
+    error: fetchError,
+    mutateAsync,
   } = useMutation(
     async (overrides: any = {}) =>
       execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides }),
@@ -492,14 +495,25 @@ function MutationNode({ node }: MutationNodeProps) {
     },
   );
 
+  const { data, error: apiError } = responseData;
+
+  const error = apiError || fetchError;
+
   // Stabilize the mutation and prepare for inclusion in global scope
-  const mutationResult: UseMutation = React.useMemo(
+  const mutationResult: UseFetch = React.useMemo(
     () => ({
       isLoading,
+      isFetching: isLoading,
       error,
-      call,
+      data,
+      rows: Array.isArray(data) ? data : EMPTY_ARRAY,
+      call: mutateAsync,
+      fetch: mutateAsync,
+      refetch: () => {
+        throw new Error(`refetch is not supported in manual queries`);
+      },
     }),
-    [isLoading, error, call],
+    [isLoading, error, mutateAsync, data],
   );
 
   React.useEffect(() => {
@@ -510,6 +524,22 @@ function MutationNode({ node }: MutationNodeProps) {
   }, [node.id, mutationResult, setControlledBinding]);
 
   return null;
+}
+
+interface FetchNodeProps {
+  node: appDom.QueryNode;
+}
+
+function FetchNode({ node }: FetchNodeProps) {
+  const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
+  switch (mode) {
+    case 'query':
+      return <QueryNode node={node} />;
+    case 'mutation':
+      return <MutationNode node={node} />;
+    default:
+      throw new Error(`Unrecognized fetch mdoe "${mode}"`);
+  }
 }
 
 interface ParseBindingOptions {
@@ -615,7 +645,7 @@ function parseBindings(
         }
       }
 
-      for (const [key, value] of Object.entries(INITIAL_DATA_QUERY)) {
+      for (const [key, value] of Object.entries(INITIAL_FETCH)) {
         const bindingId = `${elm.id}.${key}`;
         const scopePath = `${elm.name}.${key}`;
         controlled.add(bindingId);
@@ -655,7 +685,7 @@ function parseBindings(
         }
       }
 
-      for (const [key, value] of Object.entries(INITIAL_MUTATION)) {
+      for (const [key, value] of Object.entries(INITIAL_FETCH)) {
         const bindingId = `${elm.id}.${key}`;
         const scopePath = `${elm.name}.${key}`;
         controlled.add(bindingId);
@@ -683,12 +713,10 @@ function parseBindings(
   return { parsedBindings, controlled };
 }
 
-const EMPTY_OBJECT = {};
-
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [], queries = [], mutations = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
   usePageTitle(page.attributes.title.value);
 
@@ -797,11 +825,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
           />
 
           {queries.map((node) => (
-            <QueryNode key={node.id} node={node} />
-          ))}
-
-          {mutations.map((node) => (
-            <MutationNode key={node.id} node={node} />
+            <FetchNode key={node.id} node={node} />
           ))}
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>

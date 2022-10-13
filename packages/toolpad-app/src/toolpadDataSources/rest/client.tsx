@@ -10,9 +10,11 @@ import {
   TextField,
   Toolbar,
   Typography,
+  Alert,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
+import { isEmpty } from 'lodash-es';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   FetchPrivateQuery,
@@ -200,6 +202,59 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   );
 }
 
+const isCorrectlyTransformedData = (preview: FetchResult) => {
+  const { data, untransformedData } = preview;
+
+  if (isEmpty(untransformedData)) {
+    return true;
+  }
+
+  return !isEmpty(data);
+};
+
+interface ResolvedPreviewProps {
+  preview: FetchResult | null;
+}
+
+function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement | null {
+  if (!preview) {
+    return null;
+  }
+
+  const { untransformedData } = preview;
+
+  if (!untransformedData || isEmpty(untransformedData)) {
+    return (
+      <Alert severity="info" sx={{ m: 2 }}>
+        The request did not return any data.
+      </Alert>
+    );
+  }
+
+  if (!isCorrectlyTransformedData(preview)) {
+    return (
+      <Alert severity="warning" sx={{ m: 2 }}>
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Request successfully completed and returned data with following keys:
+        </Typography>
+
+        {Object.keys(untransformedData).map((key) => (
+          <Typography variant="caption" sx={{ display: 'block' }} key={key}>
+            - {key}
+          </Typography>
+        ))}
+        <Typography variant="body2" sx={{ mb: 1, mt: 2 }}>
+          However, it seems that <code>transform</code> function did not return expected value.
+          <br />
+          Please check <code>transform</code> function.
+        </Typography>
+      </Alert>
+    );
+  }
+
+  return <JsonView sx={{ height: '100%' }} src={preview?.data} />;
+}
+
 function QueryEditor({
   globalScope,
   connectionParams,
@@ -329,6 +384,8 @@ function QueryEditor({
     globalScope: queryScope,
   });
 
+  const [activeTab, setActiveTab] = React.useState('urlQuery');
+
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const { preview, runPreview: handleRunPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(
     {
@@ -338,14 +395,16 @@ function QueryEditor({
     },
     {
       onPreview(result) {
+        if (!isCorrectlyTransformedData(result)) {
+          setActiveTab('transform');
+        }
+
         setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
       },
     },
   );
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
-
-  const [activeTab, setActiveTab] = React.useState('urlQuery');
 
   const handleActiveTabChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string) => setActiveTab(newValue),
@@ -469,7 +528,7 @@ function QueryEditor({
         {preview?.error ? (
           <ErrorAlert error={preview?.error} />
         ) : (
-          <JsonView sx={{ height: '100%' }} src={preview?.data} />
+          <ResolvedPreview preview={preview} />
         )}
         <Devtools
           sx={{ width: '100%', height: '100%' }}

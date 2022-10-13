@@ -2,8 +2,7 @@ import * as _ from 'lodash-es';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export const reqSerializer = (req: NextApiRequest) => ({
-  ..._.pick(req, ['url', 'method']),
-  ...(!_.isEmpty(req.query) ? { query: req.query } : {}),
+  ..._.pick(req, ['url', 'method', 'query']),
   body: _.pick(req.body, [
     'type',
     'name',

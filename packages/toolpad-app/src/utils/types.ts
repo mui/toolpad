@@ -72,3 +72,9 @@ export type CapitalizeTail<T extends string[]> = T extends []
 export type SnakeToCamel<T extends string> = Join<CapitalizeTail<Split<T, '-'>>, ''>;
 
 export type Maybe<T> = T | undefined | null;
+
+export interface MetaField {
+  description?: string;
+  deprecated?: boolean | string;
+}
+export type GlobalScopeMeta = Record<string, MetaField>;

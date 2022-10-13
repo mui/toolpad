@@ -14,7 +14,6 @@ import theme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import config, { RuntimeConfig } from '../src/config';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
-import { GA_ID } from '../src/utils/ga';
 
 interface ToolpadDocumentProps {
   config: RuntimeConfig;
@@ -70,16 +69,13 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           />
-          <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-          <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-          <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-          <link rel="manifest" href="/site.webmanifest" />
+          <link rel="manifest" href="/static/manifest.json" />
           <script
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: `
                 // Add the data-toolpad-canvas attribute to the canvas iframe element
-                if (window.frameElement?.dataset.toolpadCanvas){ 
+                if (window.frameElement?.dataset.toolpadCanvas){
                   var script = document.createElement('script');
                   script.type = 'module';
                   script.src = '/reactDevtools/bootstrap.js';
@@ -88,7 +84,6 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
               `,
             }}
           />
-
           <script
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
@@ -97,12 +92,11 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
               )}] = ${serializeJavascript(this.props.config, { ignoreFunction: true })}`,
             }}
           />
-
           {/* Global site tag (gtag.js) - Google Analytics */}
           <Script
             async
             strategy="afterInteractive"
-            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=${config.gaId}`}
           />
           <Script
             id="gtag-init"
@@ -112,7 +106,7 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${GA_ID}', {
+            gtag('config', '${config.gaId}', {
               page_path: window.location.pathname,
             });
           `,

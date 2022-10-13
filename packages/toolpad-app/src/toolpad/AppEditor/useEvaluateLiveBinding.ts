@@ -8,7 +8,7 @@ import * as React from 'react';
 import {
   evaluateBindable as evaluateBindableBrowser,
   useJsRuntime,
-} from '@mui/toolpad-core/runtime';
+} from '@mui/toolpad-core/jsRuntime';
 import { QuickJSRuntime } from 'quickjs-emscripten';
 import { Serializable } from '../../server/evalExpression';
 import evaluateBindableServer from '../../server/evaluateBindable';

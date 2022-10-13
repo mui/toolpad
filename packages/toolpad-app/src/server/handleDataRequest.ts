@@ -1,11 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
 import { ExecFetchResult, NodeId, SerializedError } from '@mui/toolpad-core';
-import { execQuery, loadDom } from './data';
+import { execQuery, getApp, loadDom } from './data';
 import initMiddleware from './initMiddleware';
 import { VersionOrPreview } from '../types';
 import * as appDom from '../appDom';
 import { errorFrom, serializeError } from '../utils/errors';
+import { basicAuthUnauthorized, checkBasicAuth } from './basicAuth';
 import { reportSentryError } from '../utils/sentry';
 
 // Initialize the cors middleware
@@ -45,10 +46,24 @@ export default async (
 
   await cors(req, res);
   const queryNodeId = req.query.queryId as NodeId;
+
+  const app = await getApp(appId);
+  if (!app) {
+    res.status(404).end();
+    return;
+  }
+
+  if (!app.public) {
+    if (!checkBasicAuth(req)) {
+      basicAuthUnauthorized(res);
+      return;
+    }
+  }
+
   const dom = await loadDom(appId, version);
   const dataNode = appDom.getNode(dom, queryNodeId);
 
-  if (!appDom.isQuery(dataNode) && !appDom.isMutation(dataNode)) {
+  if (!appDom.isQuery(dataNode)) {
     throw new Error(`Invalid node type for data request`);
   }
 

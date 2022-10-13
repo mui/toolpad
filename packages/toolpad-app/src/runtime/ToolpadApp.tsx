@@ -7,11 +7,9 @@ import {
   styled,
   AlertTitle,
   LinearProgress,
-  NoSsr,
   Container,
 } from '@mui/material';
 import {
-  INITIAL_DATA_QUERY,
   useDataQuery,
   ToolpadComponent,
   createComponent,
@@ -23,7 +21,7 @@ import {
   BindableAttrValue,
   UseDataQueryConfig,
   NestedBindableAttrs,
-  BindableAttrValues,
+  UseFetch,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -66,17 +64,20 @@ import ComponentsContext, { useComponents, useComponent } from './ComponentsCont
 import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
+import NoSsr from '../components/NoSsr';
 
-interface UseMutation {
-  call: (overrides?: any) => Promise<void>;
-  isLoading: boolean;
-  error: unknown;
-}
+const EMPTY_ARRAY: any[] = [];
+const EMPTY_OBJECT: any = {};
 
-const INITIAL_MUTATION: UseMutation = {
+const INITIAL_FETCH: UseFetch = {
   call: async () => {},
+  refetch: async () => {},
+  fetch: async () => {},
   isLoading: false,
+  isFetching: false,
   error: null,
+  data: null,
+  rows: [],
 };
 
 const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
@@ -180,22 +181,11 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const nodeId = node.id;
 
-  const isPageNode = appDom.isPage(node);
-  const isElementNode = appDom.isElement(node);
-
-  const nodeProps: BindableAttrValues<Record<string, any>> = React.useMemo(
-    () => (isElementNode ? node.props || {} : {}),
-    [isElementNode, node],
-  );
-  const nodeLayoutProps = React.useMemo(
-    () => (isElementNode ? node.layout || {} : {}),
-    [isElementNode, node],
-  );
-
   const componentConfig = Component[TOOLPAD_COMPONENT];
-  const { argTypes, errorProp, loadingProp, loadingPropSource } = componentConfig;
+  const { argTypes = {}, errorProp, loadingProp, loadingPropSource } = componentConfig;
 
-  const isLayoutNode = isPageNode || (isElementNode && isPageLayoutComponent(node));
+  const isLayoutNode =
+    appDom.isPage(node) || (appDom.isElement(node) && isPageLayoutComponent(node));
 
   const liveBindings = useBindingsContext();
   const boundProps: Record<string, any> = React.useMemo(() => {
@@ -219,12 +209,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         }
       }
 
-      if (typeof hookResult[propName] === 'undefined') {
-        if (nodeProps && nodeProps[propName]?.type === 'const') {
-          hookResult[propName] = nodeProps[propName]?.value;
-        } else if (argType) {
-          hookResult[propName] = argType.defaultValue;
-        }
+      if (typeof hookResult[propName] === 'undefined' && argType) {
+        hookResult[propName] = argType.defaultValue;
       }
     }
 
@@ -241,32 +227,25 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     }
 
     return hookResult;
-  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId, nodeProps]);
+  }, [argTypes, errorProp, liveBindings, loadingProp, loadingPropSource, nodeId]);
 
   const boundLayoutProps: Record<string, any> = React.useMemo(() => {
     const hookResult: Record<string, any> = {};
 
-    for (const layoutBoxArgTypesEntry of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
-      const propName = layoutBoxArgTypesEntry[0] as keyof typeof layoutBoxArgTypes;
-      const argType = layoutBoxArgTypesEntry[1];
-
+    for (const [propName, argType] of isLayoutNode ? [] : Object.entries(layoutBoxArgTypes)) {
       const bindingId = `${nodeId}.layout.${propName}`;
       const binding = liveBindings[bindingId];
       if (binding) {
         hookResult[propName] = binding.value;
       }
 
-      if (typeof hookResult[propName] === 'undefined') {
-        if (nodeLayoutProps && nodeLayoutProps[propName]?.type === 'const') {
-          hookResult[propName] = nodeLayoutProps[propName]?.value;
-        } else if (argType) {
-          hookResult[propName] = argType.defaultValue;
-        }
+      if (typeof hookResult[propName] === 'undefined' && argType) {
+        hookResult[propName] = argType.defaultValue;
       }
     }
 
     return hookResult;
-  }, [isLayoutNode, liveBindings, nodeId, nodeLayoutProps]);
+  }, [isLayoutNode, liveBindings, nodeId]);
 
   const onChangeHandlers: Record<string, (param: any) => void> = React.useMemo(
     () =>
@@ -491,7 +470,7 @@ function QueryNode({ node }: QueryNodeProps) {
 }
 
 interface MutationNodeProps {
-  node: appDom.MutationNode;
+  node: appDom.QueryNode;
 }
 
 function MutationNode({ node }: MutationNodeProps) {
@@ -505,8 +484,9 @@ function MutationNode({ node }: MutationNodeProps) {
 
   const {
     isLoading,
-    error,
-    mutateAsync: call,
+    data: responseData = EMPTY_OBJECT,
+    error: fetchError,
+    mutateAsync,
   } = useMutation(
     async (overrides: any = {}) =>
       execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides }),
@@ -515,14 +495,25 @@ function MutationNode({ node }: MutationNodeProps) {
     },
   );
 
+  const { data, error: apiError } = responseData;
+
+  const error = apiError || fetchError;
+
   // Stabilize the mutation and prepare for inclusion in global scope
-  const mutationResult: UseMutation = React.useMemo(
+  const mutationResult: UseFetch = React.useMemo(
     () => ({
       isLoading,
+      isFetching: isLoading,
       error,
-      call,
+      data,
+      rows: Array.isArray(data) ? data : EMPTY_ARRAY,
+      call: mutateAsync,
+      fetch: mutateAsync,
+      refetch: () => {
+        throw new Error(`refetch is not supported in manual queries`);
+      },
     }),
-    [isLoading, error, call],
+    [isLoading, error, mutateAsync, data],
   );
 
   React.useEffect(() => {
@@ -533,6 +524,22 @@ function MutationNode({ node }: MutationNodeProps) {
   }, [node.id, mutationResult, setControlledBinding]);
 
   return null;
+}
+
+interface FetchNodeProps {
+  node: appDom.QueryNode;
+}
+
+function FetchNode({ node }: FetchNodeProps) {
+  const mode: appDom.FetchMode = node.attributes.mode?.value || 'query';
+  switch (mode) {
+    case 'query':
+      return <QueryNode node={node} />;
+    case 'mutation':
+      return <MutationNode node={node} />;
+    default:
+      throw new Error(`Unrecognized fetch mdoe "${mode}"`);
+  }
 }
 
 interface ParseBindingOptions {
@@ -638,7 +645,7 @@ function parseBindings(
         }
       }
 
-      for (const [key, value] of Object.entries(INITIAL_DATA_QUERY)) {
+      for (const [key, value] of Object.entries(INITIAL_FETCH)) {
         const bindingId = `${elm.id}.${key}`;
         const scopePath = `${elm.name}.${key}`;
         controlled.add(bindingId);
@@ -678,7 +685,7 @@ function parseBindings(
         }
       }
 
-      for (const [key, value] of Object.entries(INITIAL_MUTATION)) {
+      for (const [key, value] of Object.entries(INITIAL_FETCH)) {
         const bindingId = `${elm.id}.${key}`;
         const scopePath = `${elm.name}.${key}`;
         controlled.add(bindingId);
@@ -706,12 +713,10 @@ function parseBindings(
   return { parsedBindings, controlled };
 }
 
-const EMPTY_OBJECT = {};
-
 function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
-  const { children = [], queries = [], mutations = [] } = appDom.getChildNodes(dom, page);
+  const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
   usePageTitle(page.attributes.title.value);
 
@@ -726,7 +731,16 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
   const [pageBindings, setPageBindings] =
     React.useState<Record<string, ParsedBinding>>(parsedBindings);
 
+  const prevDom = React.useRef(dom);
   React.useEffect(() => {
+    if (dom === prevDom.current) {
+      // Ignore this effect if there are no dom updates.
+      // IMPORTANT!!! This assumes the `RenderedPage` component is remounted when the `nodeId` changes
+      //  <RenderedPage nodeId={someId} key={someId} />
+      return;
+    }
+    prevDom.current = dom;
+
     setPageBindings((existingBindings) => {
       // Make sure to patch page bindings after dom nodes have been added or removed
       const updated: Record<string, ParsedBinding> = {};
@@ -751,7 +765,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
       }
       return updated;
     });
-  }, [parsedBindings, controlled]);
+  }, [parsedBindings, controlled, dom]);
 
   const setControlledBinding = React.useCallback(
     (id: string, result: BindingEvaluationResult) => {
@@ -811,11 +825,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
           />
 
           {queries.map((node) => (
-            <QueryNode key={node.id} node={node} />
-          ))}
-
-          {mutations.map((node) => (
-            <MutationNode key={node.id} node={node} />
+            <FetchNode key={node.id} node={node} />
           ))}
         </EvaluatePageExpressionProvider>
       </SetControlledBindingContextProvider>
@@ -839,7 +849,14 @@ function RenderedPages({ dom }: RenderedPagesProps) {
         <Route
           key={page.id}
           path={`/pages/${page.id}`}
-          element={<RenderedPage nodeId={page.id} />}
+          element={
+            <RenderedPage
+              nodeId={page.id}
+              // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
+              // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+              key={page.id}
+            />
+          }
         />
       ))}
     </Routes>
@@ -905,7 +922,7 @@ export default function ToolpadApp({
       <NoSsr>
         <DomContextProvider value={dom}>
           <AppThemeProvider dom={dom}>
-            <CssBaseline />
+            <CssBaseline enableColorScheme />
             {version === 'preview' && !hidePreviewBanner ? (
               <Alert severity="info">This is a preview version of the application.</Alert>
             ) : null}

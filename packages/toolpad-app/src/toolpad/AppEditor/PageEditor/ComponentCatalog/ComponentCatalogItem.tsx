@@ -92,7 +92,7 @@ const ComponentCatalogItem = ({
         borderStyle: kind === 'create' ? 'dashed' : 'solid',
         color: 'text.secondary',
         '&:hover': {
-          backgroundColor: 'action.disabled',
+          backgroundColor: 'action.hover',
         },
         ...(draggable ? { cursor: 'grab' } : {}),
         ...(onClick ? { cursor: 'pointer' } : {}),

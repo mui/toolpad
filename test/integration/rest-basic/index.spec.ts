@@ -8,7 +8,7 @@ import { readJsonFile } from '../../utils/fs';
 //    $ docker run -p 80:80 kennethreitz/httpbin
 const HTTPBIN_BASEURL = process.env.HTTPBIN_BASEURL || 'https://httpbin.org/';
 
-test.only('functions basics', async ({ page }) => {
+test('functions basics', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'));
 
   const httpbinConnection: any = Object.values(dom.nodes).find(

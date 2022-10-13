@@ -13,7 +13,7 @@
     "build:react-devtools": "rimraf ./public/reactDevtools && esbuild ./reactDevtools/bootstrap.ts --target=es6 --bundle --outdir=./public/reactDevtools",
     "build:typings": "ts-node ./scripts/typings.ts",
     "build:function-runtime": "rimraf ./src/toolpadDataSources/function/dist && esbuild ./src/toolpadDataSources/function/runtime/index.ts --target=es2020 --bundle --outdir=./src/toolpadDataSources/function/dist",
-    "dev:next": "next dev | pino-pretty",
+    "dev:next": "next dev",
     "dev:react-devtools": "yarn build:react-devtools --watch",
     "dev:typings": "yarn build:typings",
     "dev:prisma": "prisma generate --watch",
@@ -31,6 +31,7 @@
   ],
   "dependencies": {
     "@babel/code-frame": "^7.18.6",
+    "@elastic/ecs-pino-format": "^1.3.0",
     "@emotion/cache": "^11.10.3",
     "@emotion/react": "^11.10.4",
     "@emotion/server": "^11.10.0",

@@ -1,81 +1,30 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import * as _ from 'lodash-es';
-import { uuidv4 } from '../utils/uuid';
 import logger from './logger';
-
-function getLogMessageInfo(req: NextApiRequest) {
-  const { type, name } = req.body;
-  return type && name ? `${type}:${name}` : '';
-}
-
-function getBaseLogProperties(req: NextApiRequest) {
-  return {
-    type: req.body.type,
-    name: req.body.name,
-    ipAddress: req.headers['x-forwarded-for'] || req.socket?.remoteAddress,
-    host: req.headers.host,
-    userAgent: req.headers['user-agent'],
-    timestamp: new Date().getTime(),
-  };
-}
-
-type RestArgs = [
-  chunk: any,
-  encoding: BufferEncoding,
-  callback?: ((error?: Error | null) => void) | undefined,
-];
-
-function logRequestResponse(req: NextApiRequest, res: NextApiResponse, requestId: string) {
-  const oldWrite = res.write;
-  const oldEnd = res.end;
-
-  const chunks: Buffer[] = [];
-
-  res.write = (...restArgs: any[]) => {
-    chunks.push(Buffer.from(restArgs[0]));
-    return oldWrite.apply(res, restArgs as RestArgs);
-  };
-
-  res.end = (...restArgs: any[]) => {
-    if (restArgs[0]) {
-      chunks.push(Buffer.from(restArgs[0]));
-    }
-    // Omitting response from logs, but we could enable it if it would be useful
-    // const responseBody = Buffer.concat(chunks).toString('utf8');
-
-    const logMessageInfo = getLogMessageInfo(req);
-
-    logger.info({
-      msg: `API logs: response${logMessageInfo ? `(${logMessageInfo})` : ''}`,
-      requestId,
-      statusCode: res.statusCode,
-      // response: responseBody,
-      ...getBaseLogProperties(req),
-    });
-
-    return oldEnd.apply(res, restArgs as RestArgs);
-  };
-}
 
 const withReqResLogs =
   (apiHandler: NextApiHandler) =>
   (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
-    const requestId = uuidv4();
-
-    const logMessageInfo = getLogMessageInfo(req);
-
-    logger.info({
-      msg: `API logs: request${logMessageInfo ? `(${logMessageInfo})` : ''}`,
-      requestId,
-      url: req.url,
-      method: req.method,
-      ...(!_.isEmpty(req.query) ? { query: req.query } : {}),
-      // Omitting request params, but we could enable them if it would be useful
-      // params: req.body.params,
-      ...getBaseLogProperties(req),
-    });
-
-    logRequestResponse(req, res, requestId);
+    logger.info(
+      {
+        req: {
+          ..._.pick(req, ['url', 'method']),
+          ...(!_.isEmpty(req.query) ? { query: req.query } : {}),
+          body: _.pick(req.body, [
+            'type',
+            'name',
+            // Omitting request params, but we could enable them if it would be useful
+            // 'params'
+          ]),
+          headers: _.pick(req.headers, ['x-forwarded-for', 'host', 'user-agent']),
+          socket: _.pick(req.socket, ['remoteAddress']),
+        },
+        res: {
+          statusCode: res.statusCode,
+        },
+      },
+      'handled request',
+    );
 
     return apiHandler(req, res);
   };

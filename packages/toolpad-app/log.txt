@@ -1,0 +1,2 @@
+[32mready[39m - started server on 0.0.0.0:3000, url: http://localhost:3000
+[35mevent[39m - compiled client and server successfully in 8.6s (1745 modules)

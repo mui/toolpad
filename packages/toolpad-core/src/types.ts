@@ -50,21 +50,17 @@ export interface NavigationAction<P = any> {
   };
 }
 
-interface BaseEvent {
-  type: string;
-  sourceEvent?: React.SyntheticEvent;
-}
-interface DataGridActionEvent extends BaseEvent {
-  type: 'delete' | 'update';
-  id: GridRowId;
-  row: Record<string, unknown>;
-}
-
-interface ButtonEvent extends BaseEvent {
-  type: 'click';
-}
-
-export type ToolpadEvent = DataGridActionEvent | ButtonEvent;
+export type EditorEvent =
+  | {
+      type: 'delete' | 'update';
+      id: GridRowId;
+      row: Record<string, unknown>;
+      sourceEvent?: React.SyntheticEvent;
+    }
+  | {
+      type: 'click';
+      sourceEvent?: React.SyntheticEvent;
+    };
 
 export type BindableAction = JsExpressionAction | NavigationAction;
 

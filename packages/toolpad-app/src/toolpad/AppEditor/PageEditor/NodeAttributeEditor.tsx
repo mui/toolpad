@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue, ToolpadEvent } from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue, EditorEvent } from '@mui/toolpad-core';
 import { Alert } from '@mui/material';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
@@ -38,19 +38,28 @@ export default function NodeAttributeEditor({
   const propType = argType.typeDef;
   const Control = getDefaultControl(argType);
   if (propType.type === 'event') {
-    const rowsBinding = `${node.id}${namespace ? `.${namespace}` : ''}.rows`;
-    const rowIdFieldBinding = `${node.id}${namespace ? `.${namespace}` : ''}.rowIdField`;
+    if (propType.eventType === 'delete') {
+      const rowsBinding = `${node.id}${namespace ? `.${namespace}` : ''}.rows`;
+      const rowIdFieldBinding = `${node.id}${namespace ? `.${namespace}` : ''}.rowIdField`;
 
-    const rowBindingValue = rowsBinding in bindings ? bindings[rowsBinding]?.value?.[0] : null;
-    const rowIdFieldBindingValue = bindings[rowIdFieldBinding]?.value ?? 'id';
+      const rowBindingValue = bindings[rowsBinding]?.value?.[0];
+      const rowIdFieldBindingValue = bindings[rowIdFieldBinding]?.value;
 
-    const event: ToolpadEvent = {
-      id: rowBindingValue?.[rowIdFieldBindingValue],
-      type: propType.eventType,
-      row: rowBindingValue,
-      sourceEvent: undefined,
-    };
-    globalScope.toolpadEvent = event;
+      const event: EditorEvent = {
+        type: propType.eventType,
+        sourceEvent: undefined,
+        row: rowBindingValue,
+        id: rowBindingValue?.[`${rowIdFieldBindingValue ?? 'id'}`],
+      };
+      globalScope.editorEvent = event;
+    }
+    if (propType.eventType === 'click') {
+      const event: EditorEvent = {
+        type: propType.eventType,
+        sourceEvent: undefined,
+      };
+      globalScope.editorEvent = event;
+    }
   }
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt

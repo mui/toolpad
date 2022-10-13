@@ -20,7 +20,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { Delete as DeleteIcon } from '@mui/icons-material';
-import { useNode, createComponent, ToolpadEvent } from '@mui/toolpad-core';
+import { useNode, createComponent, EditorEvent } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 
@@ -162,31 +162,12 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   });
 }
 
-export function parseColumns(
-  columns: SerializableGridColumns,
-  onDelete?: (toolpadEvent: ToolpadEvent) => void,
-): GridColumns {
-  const cols = columns.map(({ type, ...column }) => ({
+export function parseColumns(columns: SerializableGridColumns): GridColumns {
+  return columns.map(({ type, ...column }) => ({
     type: DEFAULT_TYPES.has(type) ? type : undefined,
     ...column,
     ...COLUMN_TYPES[type],
   }));
-  if (onDelete) {
-    cols.push({
-      field: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      type: 'actions',
-      renderCell: (params) => (
-        <GridActionsCellItem
-          icon={<DeleteIcon />}
-          label="Delete"
-          onClick={(event) => onDelete({ type: 'delete', sourceEvent: event, ...params })}
-        />
-      ),
-    });
-  }
-  return cols;
 }
 
 const EMPTY_ROWS: GridRowsProp = [];
@@ -203,7 +184,7 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   error?: Error | string;
   selection?: Selection | null;
   onSelectionChange?: (newSelection?: Selection | null) => void;
-  onDelete?: (toolpadEvent: ToolpadEvent) => void;
+  onDelete?: (editorEvent: EditorEvent) => void;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
@@ -321,51 +302,63 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     return columnsProp ? parseColumns(columnsProp) : [];
   }, [columnsProp]);
 
-  React.useEffect(() => {
-    if (!nodeRuntime) {
-      return;
-    }
+  const actionFieldRef = React.useRef(false);
 
-    if (!onDeleteProp) {
-      nodeRuntime.updateAppDomConstProp('columns', (cols) =>
-        cols?.filter((column) => column.field !== 'actions'),
-      );
-      return;
-    }
-    const actionField = {
+  const actionField = React.useMemo(() => {
+    return {
       field: 'actions',
       headerName: 'Actions',
       width: 100,
       type: 'actions',
       getActions: ({ id, row }: GridCellParams) => {
         return [
-          <GridActionsCellItem
-            key={'delete'}
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={(event) => {
-              onDeleteProp({
-                id,
-                row,
-                type: 'delete',
-                sourceEvent: event,
-              });
-            }}
-          />,
+          onDeleteProp ? (
+            <GridActionsCellItem
+              key={'delete'}
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={(event) => {
+                onDeleteProp({
+                  id,
+                  row,
+                  type: 'delete',
+                  sourceEvent: event,
+                });
+              }}
+            />
+          ) : null,
         ];
       },
     };
-    nodeRuntime.updateAppDomConstProp('columns', (cols) => {
-      if (!cols) {
-        return cols;
-      }
-      const old = cols.find((colDef) => colDef.field === 'actions');
-      if (old) {
-        return cols;
-      }
-      return [...cols, actionField];
-    });
-  }, [onDeleteProp, nodeRuntime]);
+  }, [onDeleteProp]);
+
+  React.useEffect(() => {
+    if (!nodeRuntime) {
+      return;
+    }
+
+    if (!onDeleteProp) {
+      nodeRuntime.updateAppDomConstProp('columns', (prevCols) =>
+        prevCols?.filter((column) => column.field !== 'actions'),
+      );
+      actionFieldRef.current = false;
+      return;
+    }
+
+    if (actionFieldRef.current === false) {
+      nodeRuntime.updateAppDomConstProp('columns', (prevCols) => {
+        if (!prevCols) {
+          return prevCols;
+        }
+        const old = prevCols.find((column) => column.field === 'actions');
+        if (old) {
+          return prevCols;
+        }
+        return [...prevCols, actionField];
+      });
+      actionFieldRef.current = true;
+    }
+  }, [actionField, onDeleteProp, nodeRuntime]);
 
   const apiRef = useGridApiRef();
   React.useEffect(() => apiRef.current.updateColumns(columns), [apiRef, columns]);

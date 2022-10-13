@@ -65,6 +65,7 @@ import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
 import { useDataQuery, UseFetch } from './useDataQuery';
 import { useAppContext, AppContextProvider } from './AppContext';
+import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 
 const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
@@ -86,19 +87,6 @@ const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
   'refetchOnReconnect',
   'refetchOnWindowFocus',
 ];
-
-export interface NavigateToPage {
-  (pageNodeId: NodeId): void;
-}
-
-/**
- * Context created by the app canvas to override behavior for the app editor
- */
-export interface CanvasHooks {
-  navigateToPage?: NavigateToPage;
-}
-
-export const CanvasHooksContext = React.createContext<CanvasHooks>({});
 
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();

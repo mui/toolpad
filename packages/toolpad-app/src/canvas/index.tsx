@@ -2,15 +2,18 @@ import * as React from 'react';
 import { fireEvent } from '@mui/toolpad-core/runtime';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
-import ToolpadApp, { CanvasHooks, CanvasHooksContext } from '../runtime';
+import { NodeId } from '@mui/toolpad-core';
+import ToolpadApp from '../runtime';
 import * as appDom from '../appDom';
 import { PageViewState } from '../types';
 import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
+import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 
 export interface AppCanvasState {
   appId: string;
   dom: appDom.RenderTree;
+  savedNodes: Record<NodeId, boolean>;
 }
 
 export interface ToolpadBridge {
@@ -120,13 +123,15 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
     return () => {};
   }, []);
 
+  const savedNodes = state?.savedNodes;
   const editorHooks: CanvasHooks = React.useMemo(() => {
     return {
+      savedNodes,
       navigateToPage(pageNodeId) {
         fireEvent({ type: 'pageNavigationRequest', pageNodeId });
       },
     };
-  }, []);
+  }, [savedNodes]);
 
   return state ? (
     <CanvasHooksContext.Provider value={editorHooks}>

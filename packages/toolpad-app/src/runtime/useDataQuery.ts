@@ -1,8 +1,10 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { NodeId } from '@mui/toolpad-core';
 import { useAppContext } from './AppContext';
 import { VersionOrPreview } from '../types';
+import { CanvasHooksContext } from './CanvasHooksContext';
 
 interface ExecDataSourceQueryParams {
   signal?: AbortSignal;
@@ -57,7 +59,7 @@ const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
 
 export function useDataQuery(
-  queryId: string | null,
+  queryId: NodeId,
   params: any,
   {
     enabled = true,
@@ -68,6 +70,9 @@ export function useDataQuery(
   >,
 ): UseFetch {
   const { appId, version } = useAppContext();
+  const { savedNodes } = React.useContext(CanvasHooksContext);
+
+  const isNodeAvailableOnServer: boolean = savedNodes ? queryId && savedNodes[queryId] : true;
 
   const {
     isLoading,
@@ -88,7 +93,7 @@ export function useDataQuery(
       }),
     {
       ...options,
-      enabled: !!queryId && enabled,
+      enabled: isNodeAvailableOnServer && !!queryId && enabled,
     },
   );
 

@@ -47,6 +47,7 @@ export interface EditorCanvasHostProps {
   appId: string;
   pageNodeId: NodeId;
   dom: appDom.AppDom;
+  savedNodes: Record<NodeId, boolean>;
   onRuntimeEvent?: (event: RuntimeEvent) => void;
   onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
@@ -66,7 +67,16 @@ const CanvasFrame = styled('iframe')({
 
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   function EditorCanvasHost(
-    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent = () => {}, onConsoleEntry },
+    {
+      appId,
+      className,
+      pageNodeId,
+      dom,
+      savedNodes,
+      overlay,
+      onRuntimeEvent = () => {},
+      onConsoleEntry,
+    },
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
@@ -76,9 +86,9 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     const updateOnBridge = React.useCallback(
       (bridgeInstance: ToolpadBridge) => {
         const renderDom = appDom.createRenderTree(dom);
-        bridgeInstance.update({ appId, dom: renderDom });
+        bridgeInstance.update({ appId, dom: renderDom, savedNodes });
       },
-      [appId, dom],
+      [appId, dom, savedNodes],
     );
 
     React.useEffect(() => {

@@ -7,6 +7,7 @@ import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
 import { createProvidedContext } from '../utils/react';
+import { mapValues } from '../utils/collections';
 
 export type DomAction =
   | {
@@ -225,11 +226,18 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
 }
 
 export interface DomLoader {
-  savedDom: appDom.AppDom;
   dom: appDom.AppDom;
+  savedDom: appDom.AppDom;
   saving: boolean;
   unsavedChanges: number;
   saveError: string | null;
+}
+
+export function getSavedNodes(
+  dom: appDom.AppDom,
+  savedDom: appDom.AppDom,
+): Record<NodeId, boolean> {
+  return mapValues(dom.nodes, (node) => node === savedDom.nodes[node.id]);
 }
 
 const [useDomLoader, DomLoaderProvider] = createProvidedContext<DomLoader>('DomLoader');

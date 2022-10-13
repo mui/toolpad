@@ -5,13 +5,20 @@ export function reqSerializer(req: NextApiRequest) {
     url: req.url,
     method: req.method,
     query: req.query,
-    type: req.body.type,
-    name: req.body.name,
-    // Omitting request params, but we could enable them if it would be useful
-    // params: req.body.params,
-    ipAddress: req.headers['x-forwarded-for'] || req.socket?.remoteAddress,
-    host: req.headers.host,
-    userAgent: req.headers['user-agent'],
+    body: {
+      type: req.body.type,
+      name: req.body.name,
+      // Omitting request params, but we could enable them if it would be useful
+      // params: req.body.params,
+    },
+    headers: {
+      'x-forwarded-for': req.headers['x-forwarded-for'],
+      host: req.headers.host,
+      userAgent: req.headers['user-agent'],
+    },
+    socket: {
+      remoteAddress: req.socket?.remoteAddress,
+    },
   };
 }
 

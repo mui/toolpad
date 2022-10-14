@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { fireEvent } from '@mui/toolpad-core/runtime';
+import { fireEvent, setEventHandler } from '@mui/toolpad-core/runtime';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
+import { RuntimeEvent } from '@mui/toolpad-core';
 import ToolpadApp, { CanvasHooks, CanvasHooksContext } from '../runtime';
 import * as appDom from '../appDom';
 import { PageViewState } from '../types';
@@ -14,6 +15,7 @@ export interface AppCanvasState {
 }
 
 export interface ToolpadBridge {
+  onRuntimeEvent(handler: (event: RuntimeEvent) => void): void;
   update(updates: AppCanvasState): void;
   getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
   getPageViewState(): PageViewState;
@@ -87,11 +89,8 @@ export default function AppCanvas({ basename }: AppCanvasProps) {
 
   React.useEffect(() => {
     const bridge: ToolpadBridge = {
-      update: (newState) => {
-        React.startTransition(() => {
-          setState(newState);
-        });
-      },
+      onRuntimeEvent: (handler) => setEventHandler(window, handler),
+      update: (newState) => React.startTransition(() => setState(newState)),
       getPageViewState: () => {
         invariant(appRootRef.current, 'App ref not attached');
         return getPageViewState(appRootRef.current);

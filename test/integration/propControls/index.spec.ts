@@ -44,10 +44,11 @@ test('can control component prop values in properties control panel', async ({
   // Change component prop values through controls
   const TEST_VALUE_2 = 'value2';
 
-  const inputByLabel = editorModel.appCanvas.getByLabel(TEST_VALUE_2);
+  const inputByLabel = editorModel.appCanvas.getByLabel(TEST_VALUE_2, { exact: true });
   await expect(inputByLabel).toHaveCount(0);
 
   await labelControlInput.click();
+  await page.keyboard.press('Alt+Backspace');
   await page.keyboard.type(TEST_VALUE_2);
 
   await expect(inputByLabel).toHaveCount(1);

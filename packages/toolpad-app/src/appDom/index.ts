@@ -643,7 +643,9 @@ export function setNodeNamespacedProp<
   value: Node[Namespace][Prop] | null,
 ): AppDom {
   return update(dom, {
-    [node.id]: setNamespacedProp(node, namespace, prop, value),
+    nodes: update(dom.nodes, {
+      [node.id]: setNamespacedProp(dom.nodes[node.id] as Node, namespace, prop, value),
+    }),
   });
 }
 

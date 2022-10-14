@@ -20,7 +20,7 @@ import DashboardCustomizeSharpIcon from '@mui/icons-material/DashboardCustomizeS
 import AddIcon from '@mui/icons-material/Add';
 import { SvgIconProps } from '@mui/material/SvgIcon';
 
-const iconMap = new Map<string | RegExp, React.ComponentType<SvgIconProps>>([
+const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Button', SmartButtonIcon],
   ['Image', ImageIcon],
   ['DataGrid', GridOnIcon],
@@ -40,11 +40,11 @@ const iconMap = new Map<string | RegExp, React.ComponentType<SvgIconProps>>([
   ['CreateNew', AddIcon],
 ]);
 
-type ComponentItemKinds = 'future' | 'builtIn' | 'create' | 'custom';
+type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';
 
 interface ComponentIconProps {
   id: string;
-  kind?: ComponentItemKinds;
+  kind?: ComponentItemKind;
 }
 
 const ComponentIcon = ({ id: componentId, kind }: ComponentIconProps) => {
@@ -59,7 +59,7 @@ interface ComponentCatalogItemProps {
   builtIn?: string;
   id: string;
   displayName: string;
-  kind?: ComponentItemKinds;
+  kind?: ComponentItemKind;
 }
 
 const ComponentCatalogItem = ({
@@ -82,9 +82,8 @@ const ComponentCatalogItem = ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        rowGap: 1,
-        width: builtIn ? 75 : 70,
-        height: builtIn ? 75 : 70,
+        width: builtIn ? 65 : 60,
+        height: builtIn ? 65 : 60,
         padding: 1,
         borderRadius: 1,
         border: 1,
@@ -104,6 +103,7 @@ const ComponentCatalogItem = ({
           fontSize: '0.625rem',
           maxWidth: builtIn ? 65 : 60,
           whiteSpace: 'nowrap',
+          opacity: kind === 'future' ? 0.75 : 1,
           textOverflow: 'ellipsis',
           overflow: 'hidden',
         }}

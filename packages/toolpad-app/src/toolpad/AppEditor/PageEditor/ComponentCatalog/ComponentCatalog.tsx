@@ -31,7 +31,7 @@ const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
   ['Checkbox', { url: 'https://github.com/mui/mui-toolpad/issues/742', displayName: 'Checkbox' }],
 ]);
 
-const WIDTH_COLLAPSED = 50;
+const WIDTH_COLLAPSED = 40;
 
 const ComponentCatalogRoot = styled('div')({
   position: 'relative',
@@ -119,7 +119,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
         }}
       >
         <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
-          <Box sx={{ width: 270, height: '100%', overflow: 'auto' }}>
+          <Box sx={{ width: 250, height: '100%', overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
               {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
                 invariant(componentType, `No component definition found for "${componentId}"`);
@@ -137,12 +137,21 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               })}
             </Box>
 
-            <Box px={2} pb={0} display="flex" flexDirection={'row'} justifyContent="space-between">
+            <Box
+              pl={2}
+              pr={1.5}
+              pb={0}
+              display="flex"
+              flexDirection={'row'}
+              justifyContent="space-between"
+            >
               <Typography variant="overline">Custom Components</Typography>
               <IconButton
                 aria-label="Expand custom components"
                 sx={{
                   p: 0,
+                  height: '100%',
+                  alignSelf: 'center',
                   cursor: 'pointer',
                   transform: `rotate(${openCustomComponents ? 180 : 0}deg)`,
                   transition: 'all 0.2s ease-in',
@@ -178,15 +187,18 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
 
             <Box padding={1}>
               <Box
-                sx={{
+                sx={(theme) => ({
                   py: 2,
-                  px: 1,
+                  px: theme.spacing(0.5),
                   borderWidth: 1,
-                  borderStyle: 'inset',
-                  borderColor: 'divider',
-                  backgroundColor: 'grey.200',
-                  borderRadius: (theme) => theme.shape.borderRadius,
-                }}
+                  borderStyle: 'solid',
+                  borderRadius: 1,
+                  backgroundColor:
+                    theme.palette.mode === 'dark'
+                      ? theme.palette.primaryDark[700]
+                      : theme.palette.grey[200],
+                  borderColor: theme.palette.divider,
+                })}
               >
                 <Box pb={0} display="flex" flexDirection={'row'} justifyContent="space-between">
                   <Typography variant="body2" color="text.secondary">
@@ -196,6 +208,8 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                     aria-label="Expand custom components"
                     sx={{
                       p: 0,
+                      height: '100%',
+                      alignSelf: 'start',
                       cursor: 'pointer',
                       transform: `rotate(${openFutureComponents ? 180 : 0}deg)`,
                       transition: 'all 0.2s ease-in',

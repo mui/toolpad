@@ -193,10 +193,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                   borderWidth: 1,
                   borderStyle: 'solid',
                   borderRadius: 1,
-                  backgroundColor:
-                    theme.palette.mode === 'dark'
-                      ? theme.palette.primaryDark[700]
-                      : theme.palette.grey[200],
+                  backgroundColor: `grey.200`,
                   borderColor: theme.palette.divider,
                 })}
               >

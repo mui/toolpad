@@ -642,9 +642,22 @@ export function setNodeNamespacedProp<
   prop: Prop,
   value: Node[Namespace][Prop] | null,
 ): AppDom {
+  if (value) {
+    return update(dom, {
+      nodes: update(dom.nodes, {
+        [node.id]: update(dom.nodes[node.id], {
+          [namespace]: updateOrCreate((dom.nodes[node.id] as Node)[namespace], {
+            [prop]: value,
+          } as any) as Partial<Node[Namespace]>,
+        } as Partial<Node>),
+      }),
+    });
+  }
   return update(dom, {
     nodes: update(dom.nodes, {
-      [node.id]: setNamespacedProp(dom.nodes[node.id] as Node, namespace, prop, value),
+      [node.id]: update(node, {
+        [namespace]: omit(node[namespace], prop) as Partial<Node[Namespace]>,
+      } as Partial<Node>),
     }),
   });
 }

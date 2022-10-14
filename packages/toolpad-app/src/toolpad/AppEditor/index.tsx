@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { Route, Routes, useParams, Navigate } from 'react-router-dom';
-import { JsRuntimeProvider } from '@mui/toolpad-core/runtime';
+import { JsRuntimeProvider } from '@mui/toolpad-core/jsRuntime';
 import PageEditor from './PageEditor';
 import DomProvider, { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';

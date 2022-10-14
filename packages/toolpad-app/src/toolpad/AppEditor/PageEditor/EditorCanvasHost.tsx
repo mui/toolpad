@@ -4,7 +4,6 @@ import { NodeId, RuntimeEvent } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
-import { setEventHandler } from '@mui/toolpad-core/runtime';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
@@ -172,13 +171,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       };
     }, [contentWindow]);
 
-    React.useEffect(() => {
-      if (!contentWindow || !bridge) {
-        return undefined;
-      }
-
-      return setEventHandler(contentWindow, handleRuntimeEvent);
-    }, [handleRuntimeEvent, contentWindow, bridge]);
+    React.useEffect(() => bridge?.onRuntimeEvent(handleRuntimeEvent), [handleRuntimeEvent, bridge]);
 
     return (
       <CanvasRoot className={className}>

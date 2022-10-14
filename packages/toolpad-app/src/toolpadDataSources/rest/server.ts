@@ -172,7 +172,7 @@ async function execBase(
   const requestInit: RequestInit = { method, headers };
 
   if (!HTTP_NO_BODY.has(method) && fetchQuery.body) {
-    const resolvedBody = await resolveBody(fetchQuery.body, params);
+    const resolvedBody = await resolveBody(fetchQuery.body, queryScope);
 
     switch (resolvedBody.kind) {
       case 'raw': {

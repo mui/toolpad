@@ -10,6 +10,7 @@ export interface ToolpadShellProps {
 
 const ToolpadShellRoot = styled('div')({
   width: '100vw',
+  maxWidth: '100%',
   minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',

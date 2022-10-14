@@ -244,7 +244,7 @@ function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement 
           </Typography>
         ))}
         <Typography variant="body2" sx={{ mb: 1, mt: 2 }}>
-          However, it seems that <code>transform</code> function did not return expected value.
+          However, it seems that the <code>transform</code> function returned an unexpected value.
           <br />
           Please check the <code>transform</code> function.
         </Typography>

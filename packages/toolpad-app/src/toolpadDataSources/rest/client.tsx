@@ -235,7 +235,7 @@ function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement 
     return (
       <Alert severity="warning" sx={{ m: 2 }}>
         <Typography variant="body2" sx={{ mb: 1 }}>
-          Request successfully completed and returned data with following keys:
+          Request successfully completed and returned data with the following keys:
         </Typography>
 
         {Object.keys(untransformedData).map((key) => (

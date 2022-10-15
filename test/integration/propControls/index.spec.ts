@@ -4,7 +4,7 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
 import domInput from './domInput.json';
 
-test('can control component prop values in properties control panel', async ({
+test.only('can control component prop values in properties control panel', async ({
   page,
   browserName,
 }) => {
@@ -31,25 +31,22 @@ test('can control component prop values in properties control panel', async ({
   const labelControlInputValue = await labelControlInput.inputValue();
 
   expect(labelControlInputValue).toBe('textField1');
+
   // Change component prop values directly
-
   const TEST_VALUE_1 = 'value1';
-
   const valueControl = editorModel.componentEditor.getByLabel('value', { exact: true });
-
   expect(await valueControl.inputValue()).not.toBe(TEST_VALUE_1);
   await firstInputLocator.fill(TEST_VALUE_1);
   expect(await valueControl.inputValue()).toBe(TEST_VALUE_1);
 
   // Change component prop values through controls
   const TEST_VALUE_2 = 'value2';
-
   const inputByLabel = editorModel.appCanvas.getByLabel(TEST_VALUE_2, { exact: true });
   await expect(inputByLabel).toHaveCount(0);
-
   await labelControlInput.click();
   await page.keyboard.press('Alt+Backspace');
   await page.keyboard.type(TEST_VALUE_2);
 
+  await inputByLabel.waitFor({ state: 'visible' });
   await expect(inputByLabel).toHaveCount(1);
 });

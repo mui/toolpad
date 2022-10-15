@@ -4,7 +4,7 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
 import domInput from './domInput.json';
 
-test.only('can control component prop values in properties control panel', async ({
+test('can control component prop values in properties control panel', async ({
   page,
   browserName,
 }) => {

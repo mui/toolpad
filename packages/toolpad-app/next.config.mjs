@@ -64,10 +64,6 @@ const regexEqual = (x, y) => {
 // See https://nextjs.org/docs/advanced-features/security-headers
 const securityHeaders = [
   {
-    key: 'X-Frame-Options',
-    value: 'SAMEORIGIN',
-  },
-  {
     // Force the browser to trust the Content-Type header
     // https://stackoverflow.com/questions/18337630/what-is-x-content-type-options-nosniff
     key: 'X-Content-Type-Options',

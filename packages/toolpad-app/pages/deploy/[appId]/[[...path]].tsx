@@ -12,6 +12,8 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
     import('../../../src/server/basicAuth'),
   ]);
 
+  context.res.removeHeader('X-Frame-Options');
+
   const [appId] = asArray(context.query.appId);
 
   if (!appId) {

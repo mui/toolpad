@@ -18,7 +18,7 @@ save_render_cache() {
   local source_cache_dir="$1"
   echo "CACHE SAVE $source_cache_dir, rsyncing..."
   mkdir -p "$XDG_CACHE_HOME/$source_cache_dir"
-  rsync -a $source_cache_dir/ "$XDG_CACHE_HOME/$source_cache_dir"
+  rsync -v -a $source_cache_dir/ "$XDG_CACHE_HOME/$source_cache_dir"
 }
 
 # The actual build command.
@@ -34,7 +34,7 @@ install_and_build_with_cache() {
     yarn config set cache-folder "$yarn_cache_dir"
   fi
 
-  local next_cache_dir="packages/toolpad-app/.next"
+  local next_cache_dir="packages/toolpad-app/.next/cache"
 
   restore_render_cache "$next_cache_dir"
 

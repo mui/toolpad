@@ -20,12 +20,12 @@ save_render_cache() {
 }
 
 install_and_build_with_cache() {
-  local yarn_cache_dir = yarn cache dir
+  local yarn_cache_dir=".yarn-cache"
 
-  restore_render_cache "node_modules"
+  yarn config set cache-folder yarn_cache_dir
+
   restore_render_cache "$yarn_cache_dir"
   yarn --frozen-lockfile --prod=false
-  save_render_cache "node_modules"
   save_render_cache "$yarn_cache_dir"
 
   yarn release:build

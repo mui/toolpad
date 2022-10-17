@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Ref: https://community.render.com/t/gatsby-build-caching-and-image-transformations/129/2
 
 restore_render_cache() {
@@ -26,18 +28,18 @@ install_and_build() {
 }
 
 install_and_build_with_cache() {
+  if [[ -d "$XDG_CACHE_HOME" ]]; then
+    local yarn_cache_dir="$XDG_CACHE_HOME/.yarn-cache"
+    echo "SETTING YARN CACHE $yarn_cache_dir"
+    yarn config set cache-folder "$yarn_cache_dir"
+  fi
+
   local next_cache_dir="packages/toolpad-app/.next"
-  local yarn_cache_dir=".yarn-cache"
-  mdir -p yarn_cache_dir
 
-  yarn config set cache-folder yarn_cache_dir
-
-  restore_render_cache "$yarn_cache_dir"
   restore_render_cache "$next_cache_dir"
 
   install_and_build
 
-  save_render_cache "$yarn_cache_dir"
   save_render_cache "$next_cache_dir"
 }
 

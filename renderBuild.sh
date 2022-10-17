@@ -31,16 +31,16 @@ install_and_build() {
 install_and_build_with_cache() {
   local yarn_cache_dir="$PWD/.yarn-cache"
 
-  yarn config set cache-folder "$yarn_cache_dir"
+  # yarn config set cache-folder "$yarn_cache_dir"
 
   local next_cache_dir="packages/toolpad-app/.next/cache"
 
-  restore_render_cache "$yarn_cache_dir"
+  # restore_render_cache "$yarn_cache_dir"
   restore_render_cache "$next_cache_dir"
 
   install_and_build
 
-  save_render_cache "$yarn_cache_dir"
+  # save_render_cache "$yarn_cache_dir"
   save_render_cache "$next_cache_dir"
 }
 

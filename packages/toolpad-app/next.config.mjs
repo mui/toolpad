@@ -195,15 +195,6 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
           headers: securityHeaders,
         },
         {
-          source: '/reactDevtools/:path*',
-          headers: [
-            {
-              key: 'X-Frame-Options',
-              value: 'SAMEORIGIN',
-            },
-          ],
-        },
-        {
           source: '/app-canvas/:path*',
           headers: [
             {

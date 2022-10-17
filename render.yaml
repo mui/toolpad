@@ -6,7 +6,7 @@ services:
   - type: web
     name: toolpad
     env: node
-    buildCommand: yarn cache list && yarn --frozen-lockfile --prod=false && yarn release:build
+    buildCommand: ./renderBuild.sh
     startCommand: yarn start
     healthCheckPath: /health-check
     plan: starter plus

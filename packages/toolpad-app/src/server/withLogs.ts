@@ -1,5 +1,5 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
-import { log } from './logger';
+import { logInfo } from './logger';
 
 function getLogMessageInfo(req: NextApiRequest) {
   const { type, name } = req.body;
@@ -11,7 +11,7 @@ export const withReqResLogs =
   (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
     const logMessageInfo = getLogMessageInfo(req);
 
-    log(
+    logInfo(
       {
         key: 'apiReqRes',
         req,
@@ -28,7 +28,7 @@ export const withRpcReqResLogs =
   (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
     const logMessageInfo = getLogMessageInfo(req);
 
-    log(
+    logInfo(
       {
         key: 'rpcReqRes',
         rpcReq: req,

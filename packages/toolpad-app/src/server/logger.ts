@@ -49,6 +49,6 @@ const logger = pino(
   transport,
 );
 
-export function log(payload: LogPayload, message?: string): void {
+export function logInfo(payload: LogPayload, message?: string): void {
   logger.info(payload, message);
 }

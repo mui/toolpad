@@ -65,6 +65,14 @@ import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
+import useBoolean from '../utils/useBoolean';
+
+const ReactQueryDevtoolsProduction = React.lazy(() =>
+  // eslint-disable-next-line import/extensions
+  import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
+    default: d.ReactQueryDevtools,
+  })),
+);
 
 const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
@@ -918,6 +926,12 @@ export default function ToolpadApp({
 
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
+  const { value: showDevtools, toggle: toggleDevtools } = useBoolean(false);
+
+  React.useEffect(() => {
+    (window as any).toggleDevtools = () => toggleDevtools();
+  }, [toggleDevtools]);
+
   return (
     <AppRoot ref={rootRef}>
       <NoSsr>
@@ -937,6 +951,9 @@ export default function ToolpadApp({
                           <BrowserRouter basename={basename}>
                             <RenderedPages dom={dom} />
                           </BrowserRouter>
+                          {showDevtools ? (
+                            <ReactQueryDevtoolsProduction initialIsOpen={false} />
+                          ) : null}
                         </QueryClientProvider>
                       </AppContextProvider>
                     </ComponentsContext>

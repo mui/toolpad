@@ -53,6 +53,7 @@
     "@sentry/nextjs": "^7.15.0",
     "@swc/wasm": "^1.3.6",
     "@tanstack/react-query": "^4.10.3",
+    "@tanstack/react-query-devtools": "^4.12.0",
     "@types/cors": "^2.8.12",
     "abort-controller": "^3.0.0",
     "arg": "^5.0.2",

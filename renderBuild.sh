@@ -8,6 +8,7 @@ restore_render_cache() {
   local source_cache_dir="$1"
   if [[ -d "$XDG_CACHE_HOME/$source_cache_dir" ]]; then
     echo "CACHE HIT $source_cache_dir, rsyncing..."
+    mkdir -p "$source_cache_dir"
     rsync -a "$XDG_CACHE_HOME/$source_cache_dir/" $source_cache_dir
   else
     echo "CACHE MISS $source_cache_dir"

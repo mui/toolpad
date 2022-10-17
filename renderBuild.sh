@@ -20,17 +20,20 @@ save_render_cache() {
 }
 
 install_and_build_with_cache() {
+  local next_cache_dir="packages/toolpad-app/.next"
   local yarn_cache_dir=".yarn-cache"
   mdir -p yarn_cache_dir
 
   yarn config set cache-folder yarn_cache_dir
 
   restore_render_cache "$yarn_cache_dir"
-  yarn --frozen-lockfile --prod=false
-  save_render_cache "$yarn_cache_dir"
+  restore_render_cache "$next_cache_dir"
 
+  yarn --frozen-lockfile --prod=false
   yarn release:build
 
+  save_render_cache "$yarn_cache_dir"
+  save_render_cache "$next_cache_dir"
 }
 
 install_and_build_with_cache

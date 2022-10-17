@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-set -e
-
 # Ref: https://community.render.com/t/gatsby-build-caching-and-image-transformations/129/2
+
+set -e
 
 restore_render_cache() {
   local source_cache_dir="$1"
@@ -21,7 +21,7 @@ save_render_cache() {
   rsync -a $source_cache_dir/ "$XDG_CACHE_HOME/$source_cache_dir"
 }
 
-# This is the actual build command. Everything else in this file is only for optimization.
+# The actual build command.
 install_and_build() {
   yarn --frozen-lockfile --prod=false
   yarn release:build

@@ -1,4 +1,4 @@
-name: 'Release Docker images'
+name: Release Docker images
 
 on:
   workflow_dispatch:
@@ -16,6 +16,8 @@ jobs:
   docker-release:
     name: 'retag and push'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Debug
         run: |

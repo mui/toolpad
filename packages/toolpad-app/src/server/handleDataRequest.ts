@@ -63,7 +63,7 @@ export default async (
   const dom = await loadDom(appId, version);
   const dataNode = appDom.getNode(dom, queryNodeId);
 
-  if (!appDom.isQuery(dataNode) && !appDom.isMutation(dataNode)) {
+  if (!appDom.isQuery(dataNode)) {
     throw new Error(`Invalid node type for data request`);
   }
 

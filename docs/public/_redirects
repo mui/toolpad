@@ -6,4 +6,6 @@
 # 2022
 /toolpad/getting-started/setup/ /toolpad/getting-started/overview/ 301
 /toolpad/getting-started/tutorial/ /toolpad/getting-started/overview/ 301
+/toolpad/data-fetching/rest/ /toolpad/connecting-to-datasources/fetch/ 301
+/toolpad/data-fetching/google-sheets/ /toolpad/connecting-to-datasources/google-sheets/ 301
 # 2023

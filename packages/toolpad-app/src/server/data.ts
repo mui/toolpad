@@ -9,10 +9,10 @@ import { asArray } from '../utils/collections';
 import { decryptSecret, encryptSecret } from './secrets';
 import applyTransform from './applyTransform';
 import { excludeFields } from '../utils/prisma';
-import { latestVersion, latestMigration } from '../appDomMigrations';
 import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
+import { migrateUp } from '../appDom/migrations';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -145,15 +145,7 @@ async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
     decryptedDom = await loadPreviewDomLegacy(appId);
   }
 
-  if (decryptedDom.version === latestVersion) {
-    return decryptedDom;
-  }
-
-  if (!latestMigration) {
-    throw new Error('No migrations found');
-  }
-
-  return latestMigration.up(decryptedDom);
+  return migrateUp(decryptedDom);
 }
 
 export async function getApps(): Promise<AppMeta[]> {
@@ -250,7 +242,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     let dom: appDom.AppDom | null = null;
 
     if (from && from.kind === 'dom') {
-      dom = from.dom || null;
+      dom = from.dom ? migrateUp(from.dom) : null;
     } else if (from && from.kind === 'template') {
       dom = await getAppTemplateDom(from.id || 'blank');
     }
@@ -417,10 +409,14 @@ async function loadReleaseDom(appId: string, version: number): Promise<appDom.Ap
   const release = await prismaClient.release.findUnique({
     where: { release_app_constraint: { appId, version } },
   });
+
   if (!release) {
     throw new Error(`release doesn't exist`);
   }
-  return parseSnapshot(release.snapshot);
+
+  const domSnapshot = parseSnapshot(release.snapshot);
+
+  return migrateUp(domSnapshot);
 }
 
 export async function getConnectionParams<P = unknown>(
@@ -457,7 +453,7 @@ export async function setConnectionParams<P>(
 
 export async function execQuery<P, Q>(
   appId: string,
-  dataNode: appDom.QueryNode<Q> | appDom.MutationNode<Q>,
+  dataNode: appDom.QueryNode<Q>,
   params: Q,
 ): Promise<ExecFetchResult<any>> {
   const dataSource: ServerDataSource<P, Q, any> | undefined =

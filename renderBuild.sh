@@ -21,6 +21,7 @@ save_render_cache() {
 
 install_and_build_with_cache() {
   local yarn_cache_dir=".yarn-cache"
+  mdir -p yarn_cache_dir
 
   yarn config set cache-folder yarn_cache_dir
 

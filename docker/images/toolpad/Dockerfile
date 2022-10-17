@@ -35,6 +35,8 @@ COPY --from=deps /app/ ./
 COPY . .
 RUN --mount=type=cache,target=/root/caches \
   yarn release:build && \
+  # reduce size of .next folder:
+  rm -rf packages/toolpad-app/.next/cache && \
   yarn install --production --ignore-scripts --prefer-offline
 
 

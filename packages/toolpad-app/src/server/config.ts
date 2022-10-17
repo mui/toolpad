@@ -20,7 +20,7 @@ export type ServerConfig = {
   basicAuthPassword?: string;
   apiLogsEnabled: boolean;
   recaptchaSecretKey?: string;
-  ecsCloudId?: string;
+  ecsHostUrl?: string;
   ecsApiKey?: string;
 } & BasicAuthConfig;
 
@@ -58,7 +58,7 @@ function readConfig(): ServerConfig & typeof sharedConfig {
     externalUrl: process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
     apiLogsEnabled: !!process.env.TOOLPAD_API_LOGS_ENABLED,
     recaptchaSecretKey: process.env.TOOLPAD_RECAPTCHA_SECRET_KEY,
-    ecsCloudId: process.env.TOOLPAD_ECS_CLOUD_ID,
+    ecsHostUrl: process.env.TOOLPAD_ECS_HOST_URL,
     ecsApiKey: process.env.TOOLPAD_ECS_API_KEY,
     encryptionKeys,
   };

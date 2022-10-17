@@ -6,8 +6,6 @@ export function reqSerializer(req: NextApiRequest) {
     method: req.method,
     query: req.query,
     body: {
-      type: req.body.type,
-      name: req.body.name,
       // Omitting request params, but we could enable them if it would be useful
       // params: req.body.params,
     },
@@ -25,5 +23,15 @@ export function reqSerializer(req: NextApiRequest) {
 export function resSerializer(res: NextApiResponse) {
   return {
     statusCode: res.statusCode,
+  };
+}
+
+export function rpcReqSerializer(req: NextApiRequest) {
+  return {
+    ...reqSerializer(req),
+    body: {
+      type: req.body.type,
+      name: req.body.name,
+    },
   };
 }

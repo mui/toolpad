@@ -3,7 +3,7 @@ import { NextApiHandler } from 'next';
 import { withSentry } from '@sentry/nextjs';
 import { parseVersion } from '../../../../../src/server/data';
 import handleDataRequest from '../../../../../src/server/handleDataRequest';
-import withReqResLogs from '../../../../../src/server/withReqResLogs';
+import { withReqResLogs } from '../../../../../src/server/withLogs';
 import { asArray } from '../../../../../src/utils/collections';
 
 export const config = {

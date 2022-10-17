@@ -25,7 +25,7 @@ import {
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
-import withReqResLogs from '../../src/server/withReqResLogs';
+import { withRpcReqResLogs } from '../../src/server/withLogs';
 
 export const config = {
   api: {
@@ -191,4 +191,4 @@ const rpcServer = {
 
 export type ServerDefinition = MethodsOf<typeof rpcServer>;
 
-export default withSentry(withReqResLogs(createRpcHandler(rpcServer)));
+export default withSentry(withRpcReqResLogs(createRpcHandler(rpcServer)));

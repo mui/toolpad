@@ -1,18 +1,19 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
-import logger from './logger';
+import { log } from './logger';
 
 function getLogMessageInfo(req: NextApiRequest) {
   const { type, name } = req.body;
   return type && name ? `${type}:${name}` : '';
 }
 
-const withReqResLogs =
+export const withReqResLogs =
   (apiHandler: NextApiHandler) =>
   (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
     const logMessageInfo = getLogMessageInfo(req);
 
-    logger.info(
+    log(
       {
+        key: 'apiReqRes',
         req,
         res,
       },
@@ -22,4 +23,19 @@ const withReqResLogs =
     return apiHandler(req, res);
   };
 
-export default withReqResLogs;
+export const withRpcReqResLogs =
+  (apiHandler: NextApiHandler) =>
+  (req: NextApiRequest, res: NextApiResponse): unknown | Promise<unknown> => {
+    const logMessageInfo = getLogMessageInfo(req);
+
+    log(
+      {
+        key: 'rpcReqRes',
+        rpcReq: req,
+        res,
+      },
+      `Handled request ${logMessageInfo ? `(${logMessageInfo})` : ''}`,
+    );
+
+    return apiHandler(req, res);
+  };

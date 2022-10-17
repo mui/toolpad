@@ -1,24 +1,37 @@
 import pino from 'pino';
 import ecsFormat from '@elastic/ecs-pino-format';
 
+import { NextApiRequest, NextApiResponse } from 'next';
 import config from './config';
-import { reqSerializer, resSerializer } from './logSerializers';
+import { reqSerializer, resSerializer, rpcReqSerializer } from './logSerializers';
 
 let transport;
-if (config.ecsCloudId) {
+if (config.ecsHostUrl) {
   transport = pino.transport({
     target: 'pino-elasticsearch',
     options: {
       index: 'toolpad-pino',
-      cloud: {
-        id: config.ecsCloudId,
-      },
+      host: config.ecsHostUrl,
       auth: {
         apiKey: config.ecsApiKey,
       },
     },
   });
 }
+
+type ReqResLogPayload = {
+  key: 'apiReqRes';
+  req: NextApiRequest;
+  res: NextApiResponse;
+};
+
+type RpcReqResLogPayload = {
+  key: 'rpcReqRes';
+  rpcReq: NextApiRequest;
+  res: NextApiResponse;
+};
+
+type LogPayload = ReqResLogPayload | RpcReqResLogPayload;
 
 const logger = pino(
   {
@@ -28,11 +41,14 @@ const logger = pino(
     serializers: {
       err: pino.stdSerializers.err,
       req: reqSerializer,
+      rpcReq: rpcReqSerializer,
       res: resSerializer,
     },
-    ...(config.ecsCloudId ? ecsFormat() : {}),
+    ...(config.ecsHostUrl ? ecsFormat() : {}),
   },
   transport,
 );
 
-export default logger;
+export function log(payload: LogPayload, message?: string): void {
+  logger.info(payload, message);
+}

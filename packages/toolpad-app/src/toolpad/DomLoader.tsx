@@ -52,6 +52,10 @@ export type DomAction =
       parentIndex?: string;
     }
   | {
+      type: 'DOM_DUPLICATE_NODE';
+      node: appDom.AppDomNode;
+    }
+  | {
       type: 'DOM_REMOVE_NODE';
       nodeId: NodeId;
     }
@@ -96,6 +100,9 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
         action.parentProp,
         action.parentIndex,
       );
+    }
+    case 'DOM_DUPLICATE_NODE': {
+      return appDom.duplicateNode<any, any>(dom, action.node);
     }
     case 'DOM_SAVE_NODE': {
       return appDom.saveNode(dom, action.node);
@@ -175,6 +182,12 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parent,
         parentProp,
         parentIndex,
+      });
+    },
+    duplicateNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(node: Child) {
+      dispatch({
+        type: 'DOM_DUPLICATE_NODE',
+        node,
       });
     },
     removeNode(nodeId: NodeId) {

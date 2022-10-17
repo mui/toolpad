@@ -710,6 +710,16 @@ export function moveNode<Parent extends AppDomNode, Child extends AppDomNode>(
   return setNodeParent(dom, node, parent.id, parentProp, parentIndex);
 }
 
+export function duplicateNode<Child extends ElementNode>(dom: AppDom, node: Child) {
+  if (!node.parentId || !node.parentProp || !node.parentIndex) {
+    throw new Error(`Node: "${node.id}" can't be duplicated`);
+  }
+
+  const newNode = createElement(dom, node.attributes.component!.value, node.props, node.layout);
+
+  return setNodeParent(dom, newNode, node.parentId, node.parentProp, node.parentIndex);
+}
+
 export function saveNode(dom: AppDom, node: AppDomNode) {
   return update(dom, {
     nodes: update(dom.nodes, {

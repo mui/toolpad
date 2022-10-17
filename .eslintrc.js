@@ -2,6 +2,11 @@ const baseline = require('@mui/monorepo/.eslintrc');
 
 module.exports = {
   ...baseline,
+  extends: [
+    ...baseline.extends,
+    // Motivation: https://github.com/shian15810/eslint-plugin-typescript-enum#motivations
+    'plugin:typescript-enum/recommended',
+  ],
   /**
    * Sorted alphanumerically within each group. built-in and each plugin form
    * their own groups.

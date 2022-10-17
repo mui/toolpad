@@ -19,6 +19,12 @@ save_render_cache() {
   rsync -a $source_cache_dir/ "$XDG_CACHE_HOME/$source_cache_dir"
 }
 
+# This is the actual build command. Everything else in this file is only for optimization.
+install_and_build() {
+  yarn --frozen-lockfile --prod=false
+  yarn release:build
+}
+
 install_and_build_with_cache() {
   local next_cache_dir="packages/toolpad-app/.next"
   local yarn_cache_dir=".yarn-cache"
@@ -29,8 +35,7 @@ install_and_build_with_cache() {
   restore_render_cache "$yarn_cache_dir"
   restore_render_cache "$next_cache_dir"
 
-  yarn --frozen-lockfile --prod=false
-  yarn release:build
+  install_and_build
 
   save_render_cache "$yarn_cache_dir"
   save_render_cache "$next_cache_dir"

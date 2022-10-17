@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { isEmpty } from 'lodash-es';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   FetchPrivateQuery,
@@ -202,16 +201,6 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   );
 }
 
-const isCorrectlyTransformedData = (preview: FetchResult) => {
-  const { data, untransformedData } = preview;
-
-  if (isEmpty(untransformedData)) {
-    return true;
-  }
-
-  return !isEmpty(data);
-};
-
 interface ResolvedPreviewProps {
   preview: FetchResult | null;
 }
@@ -223,31 +212,10 @@ function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement 
 
   const { untransformedData } = preview;
 
-  if (!untransformedData || isEmpty(untransformedData)) {
+  if (untransformedData === undefined) {
     return (
       <Alert severity="info" sx={{ m: 2 }}>
         The request did not return any data.
-      </Alert>
-    );
-  }
-
-  if (!isCorrectlyTransformedData(preview)) {
-    return (
-      <Alert severity="warning" sx={{ m: 2 }}>
-        <Typography variant="body2" sx={{ mb: 1 }}>
-          Request successfully completed and returned data with the following keys:
-        </Typography>
-
-        {Object.keys(untransformedData).map((key) => (
-          <Typography variant="caption" sx={{ display: 'block' }} key={key}>
-            - {key}
-          </Typography>
-        ))}
-        <Typography variant="body2" sx={{ mb: 1, mt: 2 }}>
-          However, it seems that the <code>transform</code> function returned an unexpected value.
-          <br />
-          Please check the <code>transform</code> function.
-        </Typography>
       </Alert>
     );
   }
@@ -395,10 +363,6 @@ function QueryEditor({
     },
     {
       onPreview(result) {
-        if (!isCorrectlyTransformedData(result)) {
-          setActiveTab('transform');
-        }
-
         setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
       },
     },

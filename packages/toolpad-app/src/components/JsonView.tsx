@@ -77,40 +77,35 @@ export default function JsonView({ src, sx, copyToClipboard, disabled, ...props 
 
   return (
     <JsonViewRoot sx={sx} className={clsx({ [classes.disabled]: disabled })}>
-      {typeof src === 'undefined' ? null : (
-        <React.Fragment>
-          <div className={classes.viewport}>
-            <ObjectInspector
-              nodeRenderer={nodeRenderer}
-              expandLevel={1}
-              expandPaths={expandPaths}
-              data={src}
-              theme={inspectorTheme}
-              {...props}
+      <React.Fragment>
+        <div className={classes.viewport}>
+          <ObjectInspector
+            nodeRenderer={nodeRenderer}
+            expandLevel={1}
+            expandPaths={expandPaths}
+            data={src}
+            theme={inspectorTheme}
+            {...props}
+          />
+        </div>
+
+        {copyToClipboard ? (
+          <React.Fragment>
+            <Tooltip title="Copy the source">
+              <IconButton onClick={handleCopyToClipboard} className={classes.copyToClipboardButton}>
+                <ContentCopyIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Snackbar
+              open={confirmSnackbarOpen}
+              autoHideDuration={3000}
+              onClose={handleCopySnackbarClose}
+              message="Source Copied to clipboard"
             />
-          </div>
-
-          {copyToClipboard ? (
-            <React.Fragment>
-              <Tooltip title="Copy the source">
-                <IconButton
-                  onClick={handleCopyToClipboard}
-                  className={classes.copyToClipboardButton}
-                >
-                  <ContentCopyIcon />
-                </IconButton>
-              </Tooltip>
-
-              <Snackbar
-                open={confirmSnackbarOpen}
-                autoHideDuration={3000}
-                onClose={handleCopySnackbarClose}
-                message="Source Copied to clipboard"
-              />
-            </React.Fragment>
-          ) : null}
-        </React.Fragment>
-      )}
+          </React.Fragment>
+        ) : null}
+      </React.Fragment>
     </JsonViewRoot>
   );
 }

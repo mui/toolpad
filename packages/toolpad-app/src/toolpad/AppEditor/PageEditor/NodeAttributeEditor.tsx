@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue, EditorEvent } from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import { Alert } from '@mui/material';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
@@ -45,20 +45,18 @@ export default function NodeAttributeEditor({
       const rowBindingValue = bindings[rowsBinding]?.value?.[0];
       const rowIdFieldBindingValue = bindings[rowIdFieldBinding]?.value;
 
-      const event: EditorEvent = {
+      const event = {
         type: propType.eventType,
-        sourceEvent: undefined,
         row: rowBindingValue,
         id: rowBindingValue?.[`${rowIdFieldBindingValue ?? 'id'}`],
       };
-      globalScope.editorEvent = event;
+      globalScope.event = event;
     }
     if (propType.eventType === 'click') {
-      const event: EditorEvent = {
+      const event = {
         type: propType.eventType,
-        sourceEvent: undefined,
       };
-      globalScope.editorEvent = event;
+      globalScope.event = event;
     }
   }
 

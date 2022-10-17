@@ -1,5 +1,4 @@
 import type * as React from 'react';
-import { GridRowId } from '@mui/x-data-grid-pro';
 import type { TOOLPAD_COMPONENT } from './constants';
 import type { Branded } from './utils';
 
@@ -49,18 +48,6 @@ export interface NavigationAction<P = any> {
     parameters?: BindableAttrValues<P>;
   };
 }
-
-export type EditorEvent =
-  | {
-      type: 'delete' | 'update';
-      id: GridRowId;
-      row: Record<string, unknown>;
-      sourceEvent?: React.SyntheticEvent;
-    }
-  | {
-      type: 'click';
-      sourceEvent?: React.SyntheticEvent;
-    };
 
 export type BindableAction = JsExpressionAction | NavigationAction;
 

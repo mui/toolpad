@@ -59,7 +59,14 @@ monaco.editor.defineTheme('vs-toolpad-dark', {
   inherit: true,
   rules: [],
   colors: {
-    ...(darkBackground ? { 'editor.background': rgbToHex(lighten(darkBackground, 0.1)) } : {}),
+    ...(darkBackground
+      ? {
+          // See https://code.visualstudio.com/api/references/theme-color
+          'editor.background': rgbToHex(lighten(darkBackground, 0.05)),
+          'menu.background': darkBackground,
+          'editorWidget.background': darkBackground,
+        }
+      : {}),
   },
 });
 

@@ -49,14 +49,14 @@ declare global {
   }
 }
 
-monaco.editor.defineTheme('vs-dark-toolpad', {
+monaco.editor.defineTheme('vs-toolpad-dark', {
   base: 'vs-dark',
   inherit: true,
   rules: [],
   colors: {},
 });
 
-monaco.editor.defineTheme('vs-light-toolpad', {
+monaco.editor.defineTheme('vs-toolpad-light', {
   base: 'vs',
   inherit: true,
   rules: [],
@@ -246,7 +246,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
   const rootRef = React.useRef<HTMLDivElement>(null);
   const instanceRef = React.useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const theme = useTheme();
-  const monacoTheme = theme.palette.mode === 'dark' ? 'vs-dark-toolpad' : 'vs-light-toolpad';
+  const monacoTheme = theme.palette.mode === 'dark' ? 'vs-toolpad-dark' : 'vs-toolpad-light';
 
   const [isFocused, setIsFocused] = React.useState(false);
 

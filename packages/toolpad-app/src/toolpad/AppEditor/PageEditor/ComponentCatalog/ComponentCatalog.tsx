@@ -118,7 +118,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           borderColor: 'divider',
         }}
       >
-        <Collapse in orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
+        <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
           <Box sx={{ width: 250, height: '100%', overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
               {Object.entries(toolpadComponents).map(([componentId, componentType]) => {

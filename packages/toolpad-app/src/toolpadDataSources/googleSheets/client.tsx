@@ -17,7 +17,6 @@ import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../..
 import {
   GoogleSheetsConnectionParams,
   GoogleSheetsApiQuery,
-  GoogleSheetsPrivateQueryType,
   GoogleDriveFile,
   GoogleSpreadsheet,
   GoogleSheet,
@@ -48,14 +47,14 @@ function QueryEditor({
   const debouncedSpreadsheetQuery = useDebounced(spreadsheetQuery, 300);
 
   const fetchedFiles: UseQueryResult<GoogleDriveFiles> = usePrivateQuery({
-    type: GoogleSheetsPrivateQueryType.FILES_LIST,
+    type: 'FILES_LIST',
     spreadsheetQuery: debouncedSpreadsheetQuery,
   });
 
   const fetchedFile: UseQueryResult<GoogleDriveFile> = usePrivateQuery(
     input.query.spreadsheetId
       ? {
-          type: GoogleSheetsPrivateQueryType.FILE_GET,
+          type: 'FILE_GET',
           spreadsheetId: input.query.spreadsheetId,
         }
       : null,
@@ -64,7 +63,7 @@ function QueryEditor({
   const fetchedSpreadsheet: UseQueryResult<GoogleSpreadsheet> = usePrivateQuery(
     input.query.spreadsheetId
       ? {
-          type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET,
+          type: 'FETCH_SPREADSHEET',
           spreadsheetId: input.query.spreadsheetId,
         }
       : null,
@@ -131,7 +130,7 @@ function QueryEditor({
     GoogleSheetsPrivateQuery,
     GoogleSheetsResult
   >({
-    type: GoogleSheetsPrivateQueryType.DEBUG_EXEC,
+    type: 'DEBUG_EXEC',
     query: input.query,
   });
 
@@ -218,7 +217,7 @@ function ConnectionParamsInput({
 }: ConnectionEditorProps<GoogleSheetsConnectionParams>) {
   const validatedUser: UseQueryResult<GoogleDriveUser> = usePrivateQuery(
     {
-      type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS,
+      type: 'CONNECTION_STATUS',
     },
     { retry: false },
   );

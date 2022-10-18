@@ -887,11 +887,9 @@ export function duplicateNode<Parent extends AppDomNode, Child extends ElementNo
 
   let updatedDom = dom;
 
-  if (Array.isArray(children)) {
-    children.forEach((childNode) => {
-      updatedDom = duplicateNode(updatedDom, childNode, newNode);
-    });
-  }
+  children?.forEach((childNode) => {
+    updatedDom = duplicateNode(updatedDom, childNode, newNode);
+  });
 
   if (parent) {
     return setNodeParent(updatedDom, newNode, parent.id, node.parentProp, node.parentIndex);

@@ -1,17 +1,40 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { NodeId } from '@mui/toolpad-core';
+import { useAppContext } from './AppContext';
+import { VersionOrPreview } from '../types';
+import { CanvasHooksContext } from './CanvasHooksContext';
 
-export async function execDataSourceQuery(dataUrl: string, queryId: string, params: any) {
-  const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
+interface ExecDataSourceQueryParams {
+  signal?: AbortSignal;
+  appId: string;
+  version: VersionOrPreview;
+  queryId: string;
+  params: any;
+}
+
+export async function execDataSourceQuery({
+  signal,
+  appId,
+  version,
+  queryId,
+  params,
+}: ExecDataSourceQueryParams) {
+  const dataUrl = new URL(`/api/data/${appId}/${version}/`, window.location.href);
+  const url = new URL(`./${encodeURIComponent(queryId)}`, dataUrl);
+
   const res = await fetch(String(url), {
     method: 'POST',
     body: JSON.stringify(params),
     headers: [['content-type', 'application/json']],
+    signal,
   });
+
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} while fetching "${url}"`);
   }
+
   return res.json();
 }
 
@@ -36,8 +59,7 @@ const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
 
 export function useDataQuery(
-  dataUrl: string,
-  queryId: string | null,
+  queryId: NodeId,
   params: any,
   {
     enabled = true,
@@ -47,6 +69,11 @@ export function useDataQuery(
     'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
   >,
 ): UseFetch {
+  const { appId, version } = useAppContext();
+  const { savedNodes } = React.useContext(CanvasHooksContext);
+
+  const isNodeAvailableOnServer: boolean = savedNodes ? queryId && savedNodes[queryId] : true;
+
   const {
     isLoading,
     isFetching,
@@ -54,11 +81,19 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
-    [dataUrl, queryId, params],
-    () => queryId && execDataSourceQuery(dataUrl, queryId, params),
+    [appId, version, queryId, params],
+    ({ signal }) =>
+      queryId &&
+      execDataSourceQuery({
+        signal,
+        appId,
+        version,
+        queryId,
+        params,
+      }),
     {
       ...options,
-      enabled: !!queryId && enabled,
+      enabled: isNodeAvailableOnServer && !!queryId && enabled,
     },
   );
 

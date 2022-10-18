@@ -42,7 +42,7 @@ Other biases about this dude aside, these 5 minutes are eye-opening: https://www
 
 Take aways:
 
-- All designs are wrong, it’s just a matter of how wrong.
+- All designs are wrong, it's just a matter of how wrong.
 - If parts are not being added back into the design at least 10% of the time, not enough parts are being deleted.
 - The most common error of a smart engineer is to optimize something that should not exist.
 

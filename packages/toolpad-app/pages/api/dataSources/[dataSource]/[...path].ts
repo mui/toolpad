@@ -1,5 +1,4 @@
 import { NextApiHandler } from 'next';
-import { withSentry } from '@sentry/nextjs';
 import { asArray } from '../../../../src/utils/collections';
 import serverDataSources from '../../../../src/toolpadDataSources/server';
 import { getConnectionParams, setConnectionParams } from '../../../../src/server/data';
@@ -40,4 +39,4 @@ const apiHandler = (async (req, res) => {
   return res.status(405).json({ message: 'Method not supported' });
 }) as NextApiHandler;
 
-export default withSentry(apiHandler);
+export default apiHandler;

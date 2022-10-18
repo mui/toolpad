@@ -1,4 +1,6 @@
 import * as React from 'react';
+// Running into issues compiling @mui/icons-material/Error inside of a "type": "module" package
+// eslint-disable-next-line no-restricted-imports
 import { Error as ErrorIcon } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { ErrorBoundary } from 'react-error-boundary';

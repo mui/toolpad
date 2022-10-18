@@ -17,8 +17,8 @@ import {
   conf as typescriptBasicConf,
   language as typescriptBasicLanguage,
 } from 'monaco-editor/esm/vs/basic-languages/typescript/typescript';
-import monacoEditorTheme from '../monacoEditorTheme';
-import muiTheme from '../theme';
+import { useTheme, Theme } from '@mui/material/styles';
+import useMonacoTheme from '../monacoEditorTheme';
 
 export interface ExtraLib {
   content: string;
@@ -159,12 +159,12 @@ const EditorRoot = styled('div')(({ theme }) => ({
 }));
 
 let overflowWidgetsDomNode: HTMLDivElement | null = null;
-function getOverflowWidgetsDomNode(): HTMLDivElement {
+function getOverflowWidgetsDomNode(theme: Theme): HTMLDivElement {
   if (!overflowWidgetsDomNode) {
     overflowWidgetsDomNode = document.createElement('div');
     // See https://github.com/microsoft/monaco-editor/issues/2233#issuecomment-913170212
     overflowWidgetsDomNode.classList.add('monaco-editor');
-    overflowWidgetsDomNode.style.zIndex = String(muiTheme.zIndex.tooltip + 1);
+    overflowWidgetsDomNode.style.zIndex = String(theme.zIndex.tooltip + 1);
     document.body.append(overflowWidgetsDomNode);
   }
 
@@ -232,6 +232,8 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 ) {
   const rootRef = React.useRef<HTMLDivElement>(null);
   const instanceRef = React.useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const theme = useTheme();
+  const monacoTheme = useMonacoTheme();
 
   const [isFocused, setIsFocused] = React.useState(false);
 
@@ -325,10 +327,10 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         accessibilitySupport: 'off',
         tabSize: 2,
         automaticLayout: true,
-        theme: monacoEditorTheme,
+        theme: monacoTheme,
         fixedOverflowWidgets: true,
         // See https://github.com/microsoft/monaco-editor/issues/181
-        overflowWidgetsDomNode: getOverflowWidgetsDomNode(),
+        overflowWidgetsDomNode: getOverflowWidgetsDomNode(theme),
         ...extraOptions,
       });
 
@@ -341,7 +343,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         instance.focus();
       }
     }
-  }, [language, value, options, disabled, autoFocus]);
+  }, [language, value, options, disabled, autoFocus, theme, monacoTheme]);
 
   React.useEffect(() => {
     const editor = instanceRef.current;

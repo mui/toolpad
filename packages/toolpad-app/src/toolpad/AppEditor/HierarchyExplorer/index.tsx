@@ -306,7 +306,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         open={!!deletedNode}
         severity="error"
         onClose={handledeleteNodeDialogClose}
-        okButton="delete"
+        okButton="Delete"
       >
         Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
       </ConfirmDialog>

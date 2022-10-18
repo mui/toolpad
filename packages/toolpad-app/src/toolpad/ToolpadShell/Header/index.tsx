@@ -2,6 +2,8 @@ import * as React from 'react';
 import { AppBar, Box, Toolbar, Tooltip, Chip, Link, useTheme } from '@mui/material';
 import Image from 'next/image';
 import UserFeedback from './UserFeedback';
+import ThemeModeMenu from './ThemeModeMenu';
+import { useThemeMode, ThemeMode } from '../../../ThemeContext';
 import productIconDark from '../../../../public/product-icon-dark.svg';
 import productIconLight from '../../../../public/product-icon-light.svg';
 
@@ -12,6 +14,14 @@ export interface HeaderProps {
 
 function Header({ actions, status }: HeaderProps) {
   const theme = useTheme();
+  const { themeMode, setThemeMode } = useThemeMode();
+
+  const handleThemeModeChange = React.useCallback(
+    (event: React.MouseEvent, mode: ThemeMode) => {
+      setThemeMode(mode);
+    },
+    [setThemeMode],
+  );
   return (
     <AppBar
       position="static"
@@ -82,6 +92,7 @@ function Header({ actions, status }: HeaderProps) {
           }}
         >
           {status}
+          <ThemeModeMenu mode={themeMode} onChange={handleThemeModeChange} />
           <UserFeedback />
         </Box>
       </Toolbar>

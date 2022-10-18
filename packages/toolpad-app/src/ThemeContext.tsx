@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Head from 'next/head';
+import { PaletteMode } from '@mui/material';
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
 import { deepmerge } from '@mui/utils';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -10,7 +11,6 @@ interface ThemeProviderProps {
   children?: React.ReactNode;
 }
 
-type PaletteMode = 'light' | 'dark';
 export type ThemeMode = PaletteMode | 'system';
 
 function usePreferredMode(): PaletteMode {
@@ -19,13 +19,17 @@ function usePreferredMode(): PaletteMode {
 }
 
 export function useThemeMode() {
-  return useLocalStorageState<ThemeMode>('toolpad-palette-mode', 'system');
+  const [themeMode, setThemeMode] = useLocalStorageState<ThemeMode>(
+    'toolpad-palette-mode',
+    'system',
+  );
+  return { themeMode, setThemeMode };
 }
 
 export function usePaletteMode(): PaletteMode {
   const preferredMode = usePreferredMode();
-  const [setting] = useThemeMode();
-  return setting === 'system' ? preferredMode : setting;
+  const { themeMode } = useThemeMode();
+  return themeMode === 'system' ? preferredMode : themeMode;
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {

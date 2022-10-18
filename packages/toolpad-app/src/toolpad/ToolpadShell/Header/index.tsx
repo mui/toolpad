@@ -14,7 +14,7 @@ export interface HeaderProps {
 
 function Header({ actions, status }: HeaderProps) {
   const theme = useTheme();
-  const [themeMode, setThemeMode] = useThemeMode();
+  const { themeMode, setThemeMode } = useThemeMode();
 
   const handleThemeModeChange = React.useCallback(
     (event: React.MouseEvent, mode: ThemeMode) => {

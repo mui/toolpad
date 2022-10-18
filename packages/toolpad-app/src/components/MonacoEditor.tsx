@@ -18,7 +18,6 @@ import {
   language as typescriptBasicLanguage,
 } from 'monaco-editor/esm/vs/basic-languages/typescript/typescript';
 import { useTheme, Theme } from '@mui/material/styles';
-import useMonacoTheme from '../monacoEditorTheme';
 
 export interface ExtraLib {
   content: string;
@@ -49,6 +48,20 @@ declare global {
     MonacoEnvironment?: monaco.Environment | undefined;
   }
 }
+
+monaco.editor.defineTheme('vs-dark-toolpad', {
+  base: 'vs-dark',
+  inherit: true,
+  rules: [],
+  colors: {},
+});
+
+monaco.editor.defineTheme('vs-light-toolpad', {
+  base: 'vs',
+  inherit: true,
+  rules: [],
+  colors: {},
+});
 
 window.MonacoEnvironment = {
   async getWorker(_, label) {
@@ -233,7 +246,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
   const rootRef = React.useRef<HTMLDivElement>(null);
   const instanceRef = React.useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const theme = useTheme();
-  const monacoTheme = useMonacoTheme();
+  const monacoTheme = theme.palette.mode === 'dark' ? 'vs-dark-toolpad' : 'vs-light-toolpad';
 
   const [isFocused, setIsFocused] = React.useState(false);
 
@@ -284,6 +297,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 
     const extraOptions: EditorOptions = {
       readOnly: disabled,
+      theme: monacoTheme,
       scrollbar: {
         alwaysConsumeMouseWheel: false,
         ...options?.scrollbar,
@@ -327,7 +341,6 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         accessibilitySupport: 'off',
         tabSize: 2,
         automaticLayout: true,
-        theme: monacoTheme,
         fixedOverflowWidgets: true,
         // See https://github.com/microsoft/monaco-editor/issues/181
         overflowWidgetsDomNode: getOverflowWidgetsDomNode(theme),

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
-import { isString } from 'lodash-es';
 import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
 import { hasOwnProperty } from '../../../utils/collections';
@@ -26,6 +25,7 @@ export interface JsExpressionEditorProps extends WithControlledProp<string> {
   onFocus?: () => void;
   onBlur?: () => void;
   sx?: SxProps;
+  extraDeclarations?: string;
 }
 
 export function JsExpressionEditor({
@@ -40,55 +40,43 @@ export function JsExpressionEditor({
   onFocus,
   onBlur,
   sx,
+  extraDeclarations = '',
 }: JsExpressionEditorProps) {
   const extraLibs = React.useMemo(() => {
     const type = jsonToTs(globalScope);
 
-    const globals = Object.keys(globalScope)
-      .map((key) => {
-        let metaDataString = ``;
+    const globalDeclarations = Object.keys(globalScope).map((key) => {
+      const metaData = hasOwnProperty(globalScopeMeta, key) ? globalScopeMeta[key] : {};
+      const { deprecated, description } = metaData;
 
-        const metaData = hasOwnProperty(globalScopeMeta, key) ? globalScopeMeta[key] : {};
-        const { deprecated, description } = metaData;
+      const commentLines = [];
 
-        if (deprecated && description) {
-          metaDataString = `
-            /** ${description}
-             *  @deprecated ${isString(deprecated) ? deprecated : ''}
-             */
-          `;
-        } else {
-          if (deprecated) {
-            metaDataString = `
-              /** @deprecated ${isString(deprecated) ? deprecated : ''} */
-            `;
-          }
+      if (description) {
+        commentLines.push(description);
+      }
 
-          if (description) {
-            metaDataString = `
-              /** ${description} */
-            `;
-          }
-        }
+      if (typeof deprecated === 'boolean') {
+        commentLines.push('@deprecated');
+      } else if (typeof deprecated === 'string') {
+        commentLines.push(`@deprecated ${deprecated}`);
+      }
 
-        const declaration = `
-          ${metaDataString}
-          declare const ${key}: RootObject[${JSON.stringify(key)}];
-        `;
+      const comment =
+        commentLines.length > 0 ? ['/**', ...commentLines.map((line) => ` * ${line}`), ' */'] : [];
 
-        return declaration;
-      })
-      .join('\n');
+      return [...comment, `declare const ${key}: RootObject[${JSON.stringify(key)}];`].join('\n');
+    });
 
     const content = `
       ${type.join('\n')}
 
-      ${globals}
+      ${globalDeclarations.join('\n')}
       
+      ${extraDeclarations}
     `;
 
     return [{ content, filePath: 'global.d.ts' }];
-  }, [globalScope, globalScopeMeta]);
+  }, [globalScope, globalScopeMeta, extraDeclarations]);
 
   return (
     <JsExpressionEditorRoot sx={sx}>

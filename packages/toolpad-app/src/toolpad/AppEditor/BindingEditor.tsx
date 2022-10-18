@@ -157,11 +157,12 @@ export interface JsExpressionActionEditorProps
   extends WithControlledProp<JsExpressionAction | null> {}
 
 function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorProps) {
-  const { globalScope, globalScopeMeta } = useBindingEditorContext();
+  const { globalScope, globalScopeMeta, propType } = useBindingEditorContext();
   const handleCodeChange = React.useCallback(
     (newValue: string) => onChange({ type: 'jsExpressionAction', value: newValue }),
     [onChange],
   );
+  const extraDeclarations = propType?.argumentsType || '';
   return (
     <Box sx={{ my: 1 }}>
       <Typography>Run code when this event fires</Typography>
@@ -178,6 +179,7 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
           onChange={handleCodeChange}
           functionBody
           topLevelAwait
+          extraDeclarations={extraDeclarations}
         />
       </Box>
     </Box>

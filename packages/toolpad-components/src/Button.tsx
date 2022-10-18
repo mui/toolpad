@@ -14,7 +14,13 @@ export default createComponent(Button, {
   layoutDirection: 'both',
   argTypes: {
     onClick: {
-      typeDef: { type: 'event' },
+      typeDef: {
+        type: 'event',
+        argumentsType: `
+      type HelloWorld = { foo: 'bar' }
+      declare const jooow: HelloWorld
+      `,
+      },
     },
     content: {
       typeDef: { type: 'string' },

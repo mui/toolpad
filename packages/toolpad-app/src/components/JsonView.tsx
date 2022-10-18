@@ -83,7 +83,6 @@ export default function JsonView({ src, sx, copyToClipboard, disabled, ...props 
         <React.Fragment>
           <div className={classes.viewport}>
             <ObjectInspector
-              nodeRenderer={nodeRenderer}
               expandLevel={1}
               expandPaths={expandPaths}
               data={src}

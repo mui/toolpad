@@ -119,6 +119,7 @@ const TYPESCRIPT_DEFAULT_COMPILER_OPTIONS: monaco.languages.typescript.CompilerO
   jsx: monaco.languages.typescript.JsxEmit.React,
   reactNamespace: 'React',
   allowJs: true,
+  noLib: true,
   typeRoots: ['node_modules/@types'],
 };
 

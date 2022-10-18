@@ -43,6 +43,7 @@ import { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
+import ElementContext from './ElementContext';
 
 interface BindingEditorContext {
   label: string;
@@ -162,7 +163,21 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
     (newValue: string) => onChange({ type: 'jsExpressionAction', value: newValue }),
     [onChange],
   );
-  const extraDeclarations = propType?.argumentsType || '';
+
+  const element = React.useContext(ElementContext);
+
+  const nodeName = element?.name;
+
+  const extraDeclarationLines = nodeName ? [`type ThisComponent = typeof ${nodeName}`] : [];
+
+  if (propType?.type === 'event' && propType.arguments) {
+    for (const argument of propType.arguments) {
+      extraDeclarationLines.push(`declare const ${argument.name}: ${argument.tsType}`);
+    }
+  }
+
+  const extraDeclarations = extraDeclarationLines.join('\n');
+
   return (
     <Box sx={{ my: 1 }}>
       <Typography>Run code when this event fires</Typography>

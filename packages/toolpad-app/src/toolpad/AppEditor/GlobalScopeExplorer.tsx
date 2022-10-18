@@ -14,7 +14,15 @@ export default function GlobalScopeExplorer({ value, sx }: GlobalScopeExplorerPr
       <Typography sx={{ mb: 1 }} variant="subtitle2">
         Scope
       </Typography>
-      <JsonView sx={{ flex: 1, width: '100%' }} src={value} />
+      <Box sx={{ overflow: 'auto' }}>
+        {Object.entries(value ?? {}).map(([key, content]) => {
+          return (
+            <Box>
+              <JsonView name={key} expandLevel={0} src={content} />
+            </Box>
+          );
+        })}
+      </Box>
     </Box>
   );
 }

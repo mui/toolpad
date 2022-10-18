@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Collapse, IconButton, Link, styled, Typography } from '@mui/material';
+import { Box, Collapse, darken, IconButton, Link, styled, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
@@ -118,7 +118,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
           borderColor: 'divider',
         }}
       >
-        <Collapse in={!!openStart} orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
+        <Collapse in orientation="horizontal" timeout={200} sx={{ height: '100%' }}>
           <Box sx={{ width: 250, height: '100%', overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1} padding={1}>
               {Object.entries(toolpadComponents).map(([componentId, componentType]) => {
@@ -189,11 +189,12 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               <Box
                 sx={(theme) => ({
                   py: 2,
-                  px: theme.spacing(0.5),
+                  pl: 1,
+                  pr: 0.5,
                   borderWidth: 1,
                   borderStyle: 'solid',
                   borderRadius: 1,
-                  backgroundColor: `grey.200`,
+                  backgroundColor: darken(theme.palette.background.default, 0.1),
                   borderColor: theme.palette.divider,
                 })}
               >

@@ -17,7 +17,8 @@ import {
   conf as typescriptBasicConf,
   language as typescriptBasicLanguage,
 } from 'monaco-editor/esm/vs/basic-languages/typescript/typescript';
-import { useTheme, Theme } from '@mui/material/styles';
+import { useTheme, Theme, lighten, rgbToHex } from '@mui/material/styles';
+import { getDesignTokens } from '../theme';
 
 export interface ExtraLib {
   content: string;
@@ -49,11 +50,17 @@ declare global {
   }
 }
 
+const designTokensDark = getDesignTokens('dark');
+
+const darkBackground = designTokensDark.palette?.background?.default;
+
 monaco.editor.defineTheme('vs-toolpad-dark', {
   base: 'vs-dark',
   inherit: true,
   rules: [],
-  colors: {},
+  colors: {
+    ...(darkBackground ? { 'editor.background': rgbToHex(lighten(darkBackground, 0.1)) } : {}),
+  },
 });
 
 monaco.editor.defineTheme('vs-toolpad-light', {

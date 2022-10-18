@@ -183,12 +183,7 @@ export default function NodeHud({
           >
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
-            <IconButton
-              aria-label="Duplicate element"
-              color="inherit"
-              onClick={onDuplicate}
-              onMouseDown={stopPropagationHandler}
-            >
+            <IconButton aria-label="Duplicate element" color="inherit" onMouseUp={onDuplicate}>
               <Tooltip title="Duplicate element" enterDelay={400}>
                 <ContentCopy color="inherit" />
               </Tooltip>

@@ -14,7 +14,7 @@ import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
 import { camelCase, generateUniqueString, removeDiacritics } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
-import { filterValues } from '../utils/collections';
+import { mapProperties } from '../utils/collections';
 
 export const CURRENT_APPDOM_VERSION = 2;
 
@@ -614,6 +614,23 @@ export function setNodeProp<Node extends AppDomNode, Prop extends BindableProps<
   });
 }
 
+function setNamespacedProp<
+  Node extends AppDomNode,
+  Namespace extends PropNamespaces<Node>,
+  Prop extends keyof Node[Namespace] & string,
+>(node: Node, namespace: Namespace, prop: Prop, value: Node[Namespace][Prop] | null): Node {
+  if (value) {
+    return update(node, {
+      [namespace]: updateOrCreate((node as Node)[namespace], {
+        [prop]: value,
+      } as any) as Partial<Node[Namespace]>,
+    } as Partial<Node>);
+  }
+  return update(node, {
+    [namespace]: omit(node[namespace], prop) as Partial<Node[Namespace]>,
+  } as Partial<Node>);
+}
+
 export function setNodeNamespacedProp<
   Node extends AppDomNode,
   Namespace extends PropNamespaces<Node>,
@@ -875,16 +892,31 @@ export interface RenderTree {
   version?: number;
 }
 
+const frontendNodes = new Set<string>(RENDERTREE_NODES);
+function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
+  if (!frontendNodes.has(node.type)) {
+    return null;
+  }
+
+  if (isQuery(node) || isMutation(node)) {
+    node = setNamespacedProp(node, 'attributes', 'query', null);
+  }
+
+  return node as RenderTreeNode;
+}
+
 /**
  * We need to make sure no secrets end up in the frontend html, so let's only send the
  * nodes that we need to build frontend, and that we know don't contain secrets.
  * TODO: Would it make sense to create a separate datastructure that represents the render tree?
  */
 export function createRenderTree(dom: AppDom): RenderTree {
-  const frontendNodes = new Set<string>(RENDERTREE_NODES);
   return {
     ...dom,
-    nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as RenderTreeNodes,
+    nodes: mapProperties(dom.nodes, ([id, node]) => {
+      const rendernode = createRenderTreeNode(node);
+      return rendernode ? [id, rendernode] : null;
+    }),
   };
 }
 

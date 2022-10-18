@@ -727,36 +727,6 @@ export function moveNode<Parent extends AppDomNode, Child extends AppDomNode>(
   return setNodeParent(dom, node, parent.id, parentProp, parentIndex);
 }
 
-export function duplicateNode<Parent extends AppDomNode, Child extends ElementNode>(
-  dom: AppDom,
-  node: Child,
-  parent?: Parent,
-) {
-  if (!node.parentId || !node.parentProp || !node.parentIndex) {
-    throw new Error(`Node: "${node.id}" can't be duplicated`);
-  }
-
-  const { children } = getChildNodes(dom, node);
-
-  const newNode = createElement(dom, node.attributes.component!.value, node.props, node.layout);
-
-  let updatedDom = dom;
-
-  if (Array.isArray(children)) {
-    children.forEach((childNode) => {
-      updatedDom = duplicateNode(updatedDom, childNode, newNode);
-    });
-  }
-
-  if (parent) {
-    return setNodeParent(updatedDom, newNode, parent.id, node.parentProp, node.parentIndex);
-  } else {
-    const newParentIndex = getNewParentIndexAfterNode(updatedDom, node, node.parentProp);
-
-    return setNodeParent(updatedDom, newNode, node.parentId, node.parentProp, newParentIndex);
-  }
-}
-
 export function saveNode(dom: AppDom, node: AppDomNode) {
   return update(dom, {
     nodes: update(dom.nodes, {
@@ -900,6 +870,36 @@ export function getNewParentIndexAfterNode(
 ) {
   const nodeAfter = getSiblingAfterNode(dom, node, parentProp);
   return createFractionalIndex(node.parentIndex, nodeAfter?.parentIndex || null);
+}
+
+export function duplicateNode<Parent extends AppDomNode, Child extends ElementNode>(
+  dom: AppDom,
+  node: Child,
+  parent?: Parent,
+) {
+  if (!node.parentId || !node.parentProp || !node.parentIndex) {
+    throw new Error(`Node: "${node.id}" can't be duplicated`);
+  }
+
+  const { children } = getChildNodes(dom, node);
+
+  const newNode = createElement(dom, node.attributes.component!.value, node.props, node.layout);
+
+  let updatedDom = dom;
+
+  if (Array.isArray(children)) {
+    children.forEach((childNode) => {
+      updatedDom = duplicateNode(updatedDom, childNode, newNode);
+    });
+  }
+
+  if (parent) {
+    return setNodeParent(updatedDom, newNode, parent.id, node.parentProp, node.parentIndex);
+  }
+
+  const newParentIndex = getNewParentIndexAfterNode(updatedDom, node, node.parentProp);
+
+  return setNodeParent(updatedDom, newNode, node.parentId, node.parentProp, newParentIndex);
 }
 
 const RENDERTREE_NODES = [

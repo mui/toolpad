@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Box, Collapse, darken, IconButton, Link, styled, Typography } from '@mui/material';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import invariant from 'invariant';
 import ComponentCatalogItem from './ComponentCatalogItem';
@@ -252,7 +252,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
             width: WIDTH_COLLAPSED,
           }}
         >
-          <Box sx={{ mt: 2 }}>{openStart ? <ChevronLeftIcon /> : <ChevronRightIcon />}</Box>
+          <Box sx={{ mt: 2 }}>{openStart ? <ArrowLeftIcon /> : <ArrowRightIcon />}</Box>
           <Box position="relative">
             <Typography
               sx={{

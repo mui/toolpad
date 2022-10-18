@@ -78,19 +78,16 @@ export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
 export interface QueryEditorModel<Q> {
   query: Q;
+  /** @deprecated Use parameters instead */
   params: BindableAttrEntries;
-}
-
-export interface QueryEditorShellProps {
-  children?: React.ReactNode;
-  isDirty?: boolean;
-  onCommit?: () => void;
+  parameters: BindableAttrEntries;
 }
 
 export interface QueryEditorProps<C, Q> extends WithControlledProp<QueryEditorModel<Q>> {
-  QueryEditorShell: React.ComponentType<QueryEditorShellProps>;
   connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
+  onChange: React.Dispatch<React.SetStateAction<QueryEditorModel<Q>>>;
+  onCommit?: () => void;
 }
 
 export type QueryEditor<C, Q> = React.FC<QueryEditorProps<C, Q>>;
@@ -103,6 +100,7 @@ export interface ConnectionStatus {
 export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<C>;
+  transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
@@ -155,3 +153,5 @@ export interface AppTheme {
 }
 
 export type VersionOrPreview = 'preview' | number;
+
+export type AppTemplateId = 'blank' | 'stats' | 'images';

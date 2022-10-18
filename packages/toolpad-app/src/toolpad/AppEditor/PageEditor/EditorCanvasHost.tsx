@@ -4,7 +4,6 @@ import { NodeId, RuntimeEvent } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import ReactDOM from 'react-dom';
-import { setEventHandler } from '@mui/toolpad-core/runtime';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
@@ -47,6 +46,7 @@ export interface EditorCanvasHostProps {
   appId: string;
   pageNodeId: NodeId;
   dom: appDom.AppDom;
+  savedNodes: Record<NodeId, boolean>;
   onRuntimeEvent?: (event: RuntimeEvent) => void;
   onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
@@ -66,7 +66,16 @@ const CanvasFrame = styled('iframe')({
 
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   function EditorCanvasHost(
-    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent = () => {}, onConsoleEntry },
+    {
+      appId,
+      className,
+      pageNodeId,
+      dom,
+      savedNodes,
+      overlay,
+      onRuntimeEvent = () => {},
+      onConsoleEntry,
+    },
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
@@ -76,9 +85,9 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     const updateOnBridge = React.useCallback(
       (bridgeInstance: ToolpadBridge) => {
         const renderDom = appDom.createRenderTree(dom);
-        bridgeInstance.update({ appId, dom: renderDom });
+        bridgeInstance.update({ appId, dom: renderDom, savedNodes });
       },
-      [appId, dom],
+      [appId, dom, savedNodes],
     );
 
     React.useEffect(() => {
@@ -162,13 +171,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
       };
     }, [contentWindow]);
 
-    React.useEffect(() => {
-      if (!contentWindow || !bridge) {
-        return undefined;
-      }
-
-      return setEventHandler(contentWindow, handleRuntimeEvent);
-    }, [handleRuntimeEvent, contentWindow, bridge]);
+    React.useEffect(() => bridge?.onRuntimeEvent(handleRuntimeEvent), [handleRuntimeEvent, bridge]);
 
     return (
       <CanvasRoot className={className}>
@@ -186,6 +189,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
         </Box>
         <CanvasFrame
           ref={frameRef}
+          name="data-toolpad-canvas"
           onLoad={handleFrameLoad}
           src={`/app-canvas/${appId}/pages/${pageNodeId}`}
           // Used by the runtime to know when to load react devtools

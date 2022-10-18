@@ -16,24 +16,23 @@ import {
   RestConnectionParams,
   UrlEncodedBody,
 } from './types';
-import evalExpression from '../../server/evalExpression';
+import evalExpression, { Serializable } from '../../server/evalExpression';
 import { removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import { getAuthenticationHeaders, HTTP_NO_BODY, parseBaseUrl } from './shared';
 import applyTransform from '../../server/applyTransform';
 import { errorFrom } from '../../utils/errors';
+import DEMO_BASE_URLS from './demoBaseUrls';
 
 async function resolveBindable(
   bindable: BindableAttrValue<string>,
-  boundValues: Record<string, string>,
+  scope: Record<string, Serializable>,
 ): Promise<any> {
   if (bindable.type === 'const') {
     return bindable.value;
   }
   if (bindable.type === 'jsExpression') {
-    return evalExpression(bindable.value, {
-      query: boundValues,
-    });
+    return evalExpression(bindable.value, scope);
   }
   throw new Error(
     `Can't resolve bindable of type "${(bindable as BindableAttrValue<unknown>).type}"`,
@@ -42,19 +41,19 @@ async function resolveBindable(
 
 async function resolveBindableEntries(
   entries: BindableAttrEntries,
-  boundValues: Record<string, string>,
+  scope: Record<string, Serializable>,
 ): Promise<[string, any][]> {
   return Promise.all(
-    entries.map(async ([key, value]) => [key, await resolveBindable(value, boundValues)]),
+    entries.map(async ([key, value]) => [key, await resolveBindable(value, scope)]),
   );
 }
 
 async function resolveBindables<P>(
   obj: BindableAttrValues<P>,
-  boundValues: Record<string, string>,
+  scope: Record<string, Serializable>,
 ): Promise<P> {
   return Object.fromEntries(
-    await resolveBindableEntries(Object.entries(obj) as BindableAttrEntries, boundValues),
+    await resolveBindableEntries(Object.entries(obj) as BindableAttrEntries, scope),
   ) as P;
 }
 
@@ -75,14 +74,14 @@ interface ResolvedRawBody {
 
 async function resolveRawBody(
   body: RawBody,
-  boundValues: Record<string, string>,
+  scope: Record<string, Serializable>,
 ): Promise<ResolvedRawBody> {
   const { content, contentType } = await resolveBindables(
     {
       contentType: body.contentType,
       content: body.content,
     },
-    boundValues,
+    scope,
   );
   return {
     kind: 'raw',
@@ -98,20 +97,20 @@ interface ResolveUrlEncodedBodyBody {
 
 async function resolveUrlEncodedBody(
   body: UrlEncodedBody,
-  boundValues: Record<string, string>,
+  scope: Record<string, Serializable>,
 ): Promise<ResolveUrlEncodedBodyBody> {
   return {
     kind: 'urlEncoded',
-    content: await resolveBindableEntries(body.content, boundValues),
+    content: await resolveBindableEntries(body.content, scope),
   };
 }
 
-async function resolveBody(body: Body, boundValues: Record<string, string>) {
+async function resolveBody(body: Body, scope: Record<string, Serializable>) {
   switch (body.kind) {
     case 'raw':
-      return resolveRawBody(body, boundValues);
+      return resolveRawBody(body, scope);
     case 'urlEncoded':
-      return resolveUrlEncodedBody(body, boundValues);
+      return resolveUrlEncodedBody(body, scope);
     default:
       throw new Error(`Missing case for "${(body as Body).kind}"`);
   }
@@ -132,11 +131,32 @@ async function execBase(
   fetchQuery: FetchQuery,
   params: Record<string, string>,
 ): Promise<FetchResult> {
+  const queryScope = {
+    // TODO: remove deprecated query after v1
+    query: params,
+    parameters: params,
+  };
+
   const [resolvedUrl, resolvedSearchParams, resolvedHeaders] = await Promise.all([
-    resolveBindable(fetchQuery.url, params),
-    resolveBindableEntries(fetchQuery.searchParams || [], params),
-    resolveBindableEntries(fetchQuery.headers || [], params),
+    resolveBindable(fetchQuery.url, queryScope),
+    resolveBindableEntries(fetchQuery.searchParams || [], queryScope),
+    resolveBindableEntries(fetchQuery.headers || [], queryScope),
   ]);
+
+  if (process.env.TOOLPAD_DEMO) {
+    const demoUrls = DEMO_BASE_URLS.map((baseUrl) => baseUrl.url);
+
+    const hasNonDemoConnectionParams =
+      !demoUrls.includes(connection?.baseUrl || '') ||
+      (!!connection?.headers && connection.headers.length > 0) ||
+      !!connection?.authentication;
+    const hasNonDemoQueryParams =
+      fetchQuery.method !== 'GET' || (!!fetchQuery.headers && fetchQuery.headers.length > 0);
+
+    if (hasNonDemoConnectionParams || hasNonDemoQueryParams) {
+      throw new Error(`Cannot use these features in demo version.`);
+    }
+  }
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
   resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));
@@ -152,7 +172,7 @@ async function execBase(
   const requestInit: RequestInit = { method, headers };
 
   if (!HTTP_NO_BODY.has(method) && fetchQuery.body) {
-    const resolvedBody = await resolveBody(fetchQuery.body, params);
+    const resolvedBody = await resolveBody(fetchQuery.body, queryScope);
 
     switch (resolvedBody.kind) {
       case 'raw': {

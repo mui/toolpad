@@ -10,11 +10,13 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
-import { ConnectionStatus, AppTheme } from './types';
-import { omit, update, updateOrCreate } from './utils/immutability';
-import { camelCase, generateUniqueString, removeDiacritics } from './utils/strings';
-import { ExactEntriesOf, Maybe } from './utils/types';
-import { filterValues } from './utils/collections';
+import { ConnectionStatus, AppTheme } from '../types';
+import { omit, update, updateOrCreate } from '../utils/immutability';
+import { camelCase, generateUniqueString, removeDiacritics } from '../utils/strings';
+import { ExactEntriesOf, Maybe } from '../utils/types';
+import { mapProperties } from '../utils/collections';
+
+export const CURRENT_APPDOM_VERSION = 2;
 
 export const RESERVED_NODE_PROPERTIES = [
   'id',
@@ -106,6 +108,8 @@ export interface CodeComponentNode extends AppDomNodeBase {
   };
 }
 
+export type FetchMode = 'query' | 'mutation';
+
 /**
  * A DOM query is defined primarily by a server defined part "attributes.query"
  * and a clientside defined part "params". "params" are constructed in the runtime
@@ -116,6 +120,7 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
   readonly params?: BindableAttrValues;
   readonly attributes: {
+    readonly mode?: ConstantAttrValue<FetchMode>;
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeReference | null>;
     readonly query: ConstantAttrValue<Q>;
@@ -124,13 +129,17 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
+    readonly cacheTime?: ConstantAttrValue<number>;
     readonly enabled?: BindableAttrValue<boolean>;
   };
 }
 
-export interface MutationNode<Q = any, P = any> extends AppDomNodeBase {
+/**
+ * @deprecated QueryNode can act as a mutation by switching the `mode` attribute to 'mutation'
+ */
+export interface MutationNode<Q = any> extends AppDomNodeBase {
   readonly type: 'mutation';
-  readonly params?: BindableAttrValues<P>;
+  readonly params?: BindableAttrValues;
   readonly attributes: {
     readonly dataSource?: ConstantAttrValue<string>;
     readonly connectionId: ConstantAttrValue<NodeReference | null>;
@@ -206,6 +215,7 @@ export type AppDomNodes = Record<NodeId, AppDomNode>;
 export interface AppDom {
   nodes: AppDomNodes;
   root: NodeId;
+  version?: number;
 }
 
 function isType<T extends AppDomNode>(node: AppDomNode, type: T['type']): node is T {
@@ -482,6 +492,7 @@ export function createDom(): AppDom {
       }),
     },
     root: rootId,
+    version: CURRENT_APPDOM_VERSION,
   };
 }
 
@@ -601,6 +612,23 @@ export function setNodeProp<Node extends AppDomNode, Prop extends BindableProps<
       [node.id]: omit(node, prop) as Partial<Node>,
     } as Partial<AppDomNodes>),
   });
+}
+
+function setNamespacedProp<
+  Node extends AppDomNode,
+  Namespace extends PropNamespaces<Node>,
+  Prop extends keyof Node[Namespace] & string,
+>(node: Node, namespace: Namespace, prop: Prop, value: Node[Namespace][Prop] | null): Node {
+  if (value) {
+    return update(node, {
+      [namespace]: updateOrCreate((node as Node)[namespace], {
+        [prop]: value,
+      } as any) as Partial<Node[Namespace]>,
+    } as Partial<Node>);
+  }
+  return update(node, {
+    [namespace]: omit(node[namespace], prop) as Partial<Node[Namespace]>,
+  } as Partial<Node>);
 }
 
 export function setNodeNamespacedProp<
@@ -861,6 +889,20 @@ export type RenderTreeNodes = Record<NodeId, RenderTreeNode>;
 export interface RenderTree {
   root: NodeId;
   nodes: RenderTreeNodes;
+  version?: number;
+}
+
+const frontendNodes = new Set<string>(RENDERTREE_NODES);
+function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
+  if (!frontendNodes.has(node.type)) {
+    return null;
+  }
+
+  if (isQuery(node) || isMutation(node)) {
+    node = setNamespacedProp(node, 'attributes', 'query', null);
+  }
+
+  return node as RenderTreeNode;
 }
 
 /**
@@ -869,10 +911,12 @@ export interface RenderTree {
  * TODO: Would it make sense to create a separate datastructure that represents the render tree?
  */
 export function createRenderTree(dom: AppDom): RenderTree {
-  const frontendNodes = new Set<string>(RENDERTREE_NODES);
   return {
     ...dom,
-    nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as RenderTreeNodes,
+    nodes: mapProperties(dom.nodes, ([id, node]) => {
+      const rendernode = createRenderTreeNode(node);
+      return rendernode ? [id, rendernode] : null;
+    }),
   };
 }
 
@@ -887,53 +931,8 @@ export function deref(nodeRef: NodeReference): NodeId;
 export function deref(nodeRef: null | undefined): null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null;
 export function deref(nodeRef: Maybe<NodeReference>): NodeId | null {
-  if (typeof nodeRef === 'string') {
-    // This branch provides backwards compatibility for old style string refs
-    // TODO: remove this branch and replace with a migration after the functionality is in place .
-    //       See https://github.com/mui/mui-toolpad/pull/776
-    //       In migration '1' we should update all query connectionId and navigate action pageId.
-    return nodeRef;
-  }
   if (nodeRef) {
     return nodeRef.$$ref;
   }
   return null;
-}
-
-export function fromLegacyQueryNode(node: QueryNode<any>): QueryNode<any> {
-  // Migrate old rest nodes with transforms on the fly
-  // TODO: Build migration flow for https://github.com/mui/mui-toolpad/issues/741
-  //       to make this obsolete
-
-  if (node.attributes.dataSource?.value !== 'rest') {
-    return node;
-  }
-
-  if (
-    typeof node.attributes.query.value?.transformEnabled !== 'undefined' &&
-    (node.attributes.transformEnabled || node.attributes.transform)
-  ) {
-    return update(node, {
-      attributes: update(node.attributes, {
-        transformEnabled: undefined,
-        transform: undefined,
-      }),
-    });
-  }
-
-  if (node.attributes.transformEnabled || node.attributes.transform) {
-    return update(node, {
-      attributes: update(node.attributes, {
-        transformEnabled: undefined,
-        transform: undefined,
-        query: createConst({
-          ...node.attributes.query.value,
-          transformEnabled: node.attributes.transformEnabled?.value,
-          transform: node.attributes.transform?.value,
-        }),
-      }),
-    });
-  }
-
-  return node;
 }

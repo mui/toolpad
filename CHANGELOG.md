@@ -1,5 +1,124 @@
 # Changelog
 
+## v0.0.22
+
+<!-- generated comparing v0.0.21..master -->
+
+_Oct 12, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Improve update notification, fold mutations into queries, support duplicating application, support public applications, rename parameters in queries, add observability for our demo mode.
+
+- &#8203;<!-- 38 -->Fix saving issues (#1142) @Janpot
+- &#8203;<!-- 37 -->Add update notification instead of banner (#1128) @bharatkashyap
+- &#8203;<!-- 36 -->Fix parameters for fetch queries (#1140) @Janpot
+- &#8203;<!-- 35 -->Migrate existing mutations to queries (#1130) @Janpot
+- &#8203;<!-- 34 -->Memoize useMenu onMenuClose (#1139) @Janpot
+- &#8203;<!-- 33 -->Make sure parameters work in query preview (#1138) @Janpot
+- &#8203;<!-- 32 -->Fix a few issues with app DOM migrations (#1133) @Janpot
+- &#8203;<!-- 31 -->Update resource class for test_static (#1103) @Janpot
+- &#8203;<!-- 30 -->Update renovate.json for playwright @Janpot
+- &#8203;<!-- 29 -->remove manager @Janpot
+- &#8203;<!-- 28 -->core-js restriction @Janpot
+- &#8203;<!-- 27 -->Fix warning on save (#1125) @Janpot
+- &#8203;<!-- 26 -->Make queries capable of mutations (#1122) @Janpot
+- &#8203;<!-- 25 -->pin node version for more reproducability in the builds (#1119) @Janpot
+- &#8203;<!-- 24 -->Allow duplicating apps (#658) @bharatkashyap
+- &#8203;<!-- 23 -->Google Analytics improvements (#1090) @apedroferreira
+- &#8203;<!-- 22 -->reCAPTCHA improvements (#1087) @apedroferreira
+- &#8203;<!-- 21 -->Silence sentry warning (#1102) @Janpot
+- &#8203;<!-- 20 -->Update playwright (#1118) @Janpot
+- &#8203;<!-- 19 -->Handle appDom versioning (#776) @bharatkashyap
+- &#8203;<!-- 18 -->Update renovate.json @Janpot
+- &#8203;<!-- 17 -->Revert "[core] Add default data to DataGrid, Image, Select components" (#1106) @Janpot
+- &#8203;<!-- 16 -->Update renovate.json @Janpot
+- &#8203;<!-- 15 -->New renovatebot schedule (#1099) @Janpot
+- &#8203;<!-- 14 -->Try out sharing vscode setup (#782) @Janpot
+- &#8203;<!-- 13 -->Allow empty argTypes object in component config (#1088) @Janpot
+- &#8203;<!-- 12 -->Alternative fix for 1050 (#1091) @Janpot
+- &#8203;<!-- 11 -->Add enableColorScheme to CssBaseline in app theme (#1100) @Janpot
+- &#8203;<!-- 10 -->Store next.js cache after the build (#1104) @Janpot
+- &#8203;<!-- 09 -->Avoid state update during layout effect in NoSsr (#857) @Janpot
+- &#8203;<!-- 08 -->Add a few more cache folders in circleci (#1089) @Janpot
+- &#8203;<!-- 07 -->Support public applications (#1009) @Janpot
+- &#8203;<!-- 06 -->[app] Select options editor enhancements (#1055) @bharatkashyap
+- &#8203;<!-- 05 -->[core] disable react-router-dom update (#1123) @Janpot
+- &#8203;<!-- 04 -->[core] Remove jsdoc eslint (#1109) @Janpot
+- &#8203;<!-- 03 -->[core] Remove dead dependency @oliviertassinari
+- &#8203;<!-- 02 -->[core] Rename query and params to parameters in fetch and function editors (#1096) @bytasv
+- &#8203;<!-- 01 -->[core] x10 speedup of yarn install in the CI (#1098) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
+## v0.0.21
+
+<!-- generated comparing v0.0.20..master -->
+
+_Oct 5, 2022_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Major groundwork to get online demo ready
+
+- &#8203;<!-- 11 -->Attempt to fix render.yaml (#1069) @apedroferreira
+- &#8203;<!-- 10 -->Fix component flicker (#1061) @apedroferreira
+- &#8203;<!-- 09 -->Add Sentry (#1043) @apedroferreira
+- &#8203;<!-- 08 -->Fix moving same row elements into same column (#1060) @apedroferreira
+- &#8203;<!-- 07 -->Add Google reCAPTCHA v3 to online demo (#1054) @apedroferreira
+- &#8203;<!-- 06 -->Online demo (#1002) @apedroferreira
+- &#8203;<!-- 05 -->[core] Fix buildFilter property in render.yml (#1085) @Janpot
+- &#8203;<!-- 04 -->[core] We don't build the database @oliviertassinari
+- &#8203;<!-- 03 -->[core] Don't build on render for docs changes (#1081) @oliviertassinari
+- &#8203;<!-- 02 -->[core] Remove outdated docsearch.js dependency (#1046) @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix outdated URL @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @oliviertassinari
+
+## v0.0.20
+
+<!-- generated comparing v0.0.19..master -->
+
+_Sep 28, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Add default data to DataGrid, Image and Select components, add optional Google Analytics integration and improve Windows compatibility.
+
+- &#8203;<!-- 4 -->Add Google Analytics (#1049) @apedroferreira
+- &#8203;<!-- 3 -->[core] Add default data to DataGrid, Image, Select components (#1048) @bharatkashyap
+- &#8203;<!-- 2 -->[core] Improve Windows compatibility (#1042) @oliviertassinari
+- &#8203;<!-- 1 -->[Docs] Disable todo pages in docs (#1053) @bytasv
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @oliviertassinari
+
+## v0.0.19
+
+<!-- generated comparing v0.0.18..master -->
+
+_Sep 21, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+A big improvement to the documentation, the ability to use templates to create a new app and the beginning of some UI improvements to the app.
+
+- &#8203;<!-- 14 -->Improve update notifications (#1006) @bharatkashyap
+- &#8203;<!-- 13 -->Prebuilt app templates (#926) @apedroferreira
+- &#8203;<!-- 12 -->Editor integration tests (#831) @apedroferreira
+- &#8203;<!-- 11 -->Header layout towards UI revamp (#986) @Janpot
+- &#8203;<!-- 10 -->Add instruction for testing a random commit on master (#1004) @Janpot
+- &#8203;<!-- 09 -->Self-document integration test mode (#995) @Janpot
+- &#8203;<!-- 08 -->[core] Fix scroll restoration in the docs (#866) @oliviertassinari
+- &#8203;<!-- 07 -->[core] Fix markdown format (#889) @oliviertassinari
+- &#8203;<!-- 06 -->[Docs] Fix self host url (#1033) @bytasv
+- &#8203;<!-- 05 -->[Docs] Documentation docker (#1030) @bytasv
+- &#8203;<!-- 04 -->[docs] Link the docs in the README.md (#1012) @oliviertassinari
+- &#8203;<!-- 03 -->[docs] Add Building UI documentation (#1011) @bytasv
+- &#8203;<!-- 02 -->[docs] Toolpad docs part 1 (#859) @bytasv
+- &#8203;<!-- 01 -->[security] Improve the HTTP headers for security (#1013) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## v0.0.18
 
 <!-- generated comparing v0.0.17..master -->

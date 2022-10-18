@@ -86,18 +86,19 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
       <Typography variant="overline" className={classes.sectionHeading}>
         Properties:
       </Typography>
-      {(Object.entries(componentConfig.argTypes) as ExactEntriesOf<ArgTypeDefinitions<P>>).map(
-        ([propName, propTypeDef]) =>
-          propTypeDef && shouldRenderControl(propTypeDef) ? (
-            <div key={propName} className={classes.control}>
-              <NodeAttributeEditor
-                node={node}
-                namespace="props"
-                name={propName}
-                argType={propTypeDef}
-              />
-            </div>
-          ) : null,
+      {(
+        Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>
+      ).map(([propName, propTypeDef]) =>
+        propTypeDef && shouldRenderControl(propTypeDef) ? (
+          <div key={propName} className={classes.control}>
+            <NodeAttributeEditor
+              node={node}
+              namespace="props"
+              name={propName}
+              argType={propTypeDef}
+            />
+          </div>
+        ) : null,
       )}
     </React.Fragment>
   );
@@ -148,7 +149,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
   const selectedNode = selection ? appDom.getNode(dom, selection) : null;
 
   return (
-    <ComponentEditorRoot className={className}>
+    <ComponentEditorRoot className={className} data-testid="component-editor">
       {selectedNode && appDom.isElement(selectedNode) ? (
         // Add key to make sure it mounts every time selected node changes
         <SelectedNodeEditor key={selectedNode.id} node={selectedNode} />

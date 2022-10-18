@@ -1,5 +1,5 @@
 import { NextApiHandler } from 'next';
-import type { IncomingMessage } from 'http';
+import type { IncomingMessage, ServerResponse } from 'http';
 import superjson from 'superjson';
 import {
   getApps,
@@ -7,6 +7,7 @@ import {
   getActiveDeployments,
   createApp,
   updateApp,
+  duplicateApp,
   execQuery,
   dataSourceFetchPrivate,
   loadDom,
@@ -24,9 +25,13 @@ import {
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 
-interface RpcContext {
-  req: IncomingMessage;
-}
+export const config = {
+  api: {
+    // Supresses false positive nextjs warning "API resolved without sending a response" caused by Sentry
+    // Sentry should fix this eventually: https://github.com/getsentry/sentry-javascript/issues/3852
+    externalResolver: true,
+  },
+};
 
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
@@ -45,7 +50,7 @@ export interface Definition {
 }
 
 export type MethodsOfGroup<R extends MethodResolvers> = {
-  [K in keyof R]: (...params: Parameters<R[K]>[0]) => ReturnType<R[K]>;
+  [K in keyof R]: (...params: Parameters<R[K]>[0]['params']) => ReturnType<R[K]>;
 };
 
 export interface MethodsOf<D extends Definition> {
@@ -82,11 +87,10 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       return;
     }
     const method: MethodResolver<any> = definition[type][name];
-    const context = { req, res };
 
     let rawResult;
     try {
-      rawResult = await method(params, context);
+      rawResult = await method({ params, req, res });
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {
@@ -102,8 +106,14 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
   };
 }
 
+interface ResolverInput<P> {
+  params: P;
+  req: IncomingMessage;
+  res: ServerResponse;
+}
+
 interface MethodResolver<F extends Method> {
-  (params: Parameters<F>, ctx: RpcContext): ReturnType<F>;
+  (input: ResolverInput<Parameters<F>>): ReturnType<F>;
 }
 
 function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResolver<F> {
@@ -112,63 +122,66 @@ function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResol
 
 const rpcServer = {
   query: {
-    dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>((params) => {
+    dataSourceFetchPrivate: createMethod<typeof dataSourceFetchPrivate>(({ params }) => {
       return dataSourceFetchPrivate(...params);
     }),
-    getApps: createMethod<typeof getApps>((params) => {
+    getApps: createMethod<typeof getApps>(({ params }) => {
       return getApps(...params);
     }),
-    getActiveDeployments: createMethod<typeof getActiveDeployments>((params) => {
+    getActiveDeployments: createMethod<typeof getActiveDeployments>(({ params }) => {
       return getActiveDeployments(...params);
     }),
-    getDeployments: createMethod<typeof getDeployments>((params) => {
+    getDeployments: createMethod<typeof getDeployments>(({ params }) => {
       return getDeployments(...params);
     }),
-    getApp: createMethod<typeof getApp>((params) => {
+    getApp: createMethod<typeof getApp>(({ params }) => {
       return getApp(...params);
     }),
-    execQuery: createMethod<typeof execQuery>((args) => {
-      return execQuery(...args);
+    execQuery: createMethod<typeof execQuery>(({ params }) => {
+      return execQuery(...params);
     }),
-    getReleases: createMethod<typeof getReleases>((params) => {
+    getReleases: createMethod<typeof getReleases>(({ params }) => {
       return getReleases(...params);
     }),
-    getRelease: createMethod<typeof getRelease>((params) => {
+    getRelease: createMethod<typeof getRelease>(({ params }) => {
       return getRelease(...params);
     }),
-    findActiveDeployment: createMethod<typeof findActiveDeployment>((params) => {
+    findActiveDeployment: createMethod<typeof findActiveDeployment>(({ params }) => {
       return findActiveDeployment(...params);
     }),
-    loadDom: createMethod<typeof loadDom>((params) => {
+    loadDom: createMethod<typeof loadDom>(({ params }) => {
       return loadDom(...params);
     }),
-    findLastRelease: createMethod<typeof findLastRelease>((params) => {
+    findLastRelease: createMethod<typeof findLastRelease>(({ params }) => {
       return findLastRelease(...params);
     }),
-    getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>((params) => {
+    getLatestToolpadRelease: createMethod<typeof getLatestToolpadRelease>(({ params }) => {
       return getLatestToolpadRelease(...params);
     }),
   },
   mutation: {
-    createApp: createMethod<typeof createApp>((params) => {
+    createApp: createMethod<typeof createApp>(({ params }) => {
       return createApp(...params);
     }),
-    updateApp: createMethod<typeof updateApp>((params) => {
+    updateApp: createMethod<typeof updateApp>(({ params }) => {
       return updateApp(...params);
     }),
-    deleteApp: createMethod<typeof deleteApp>((params) => {
+    duplicateApp: createMethod<typeof duplicateApp>(({ params }) => {
+      return duplicateApp(...params);
+    }),
+    deleteApp: createMethod<typeof deleteApp>(({ params }) => {
       return deleteApp(...params);
     }),
-    createRelease: createMethod<typeof createRelease>((params) => {
+    createRelease: createMethod<typeof createRelease>(({ params }) => {
       return createRelease(...params);
     }),
-    createDeployment: createMethod<typeof createDeployment>((params) => {
+    createDeployment: createMethod<typeof createDeployment>(({ params }) => {
       return createDeployment(...params);
     }),
-    deploy: createMethod<typeof deploy>((params) => {
+    deploy: createMethod<typeof deploy>(({ params }) => {
       return deploy(...params);
     }),
-    saveDom: createMethod<typeof saveDom>((params) => {
+    saveDom: createMethod<typeof saveDom>(({ params }) => {
       return saveDom(...params);
     }),
   },

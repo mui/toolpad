@@ -18,18 +18,18 @@ test('can place new components from catalog', async ({ page, browserName }) => {
 
   await expect(canvasInputLocator).toHaveCount(0);
 
-  const TEXT_FIELD_COMPONENT_ID = 'TextField';
+  const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
 
   // Drag in a first component
 
-  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_ID);
+  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
 
   await expect(canvasInputLocator).toHaveCount(1);
   await expect(canvasInputLocator).toBeVisible();
 
   // Drag in a second component
 
-  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_ID);
+  await editorModel.dragNewComponentToAppCanvas(TEXT_FIELD_COMPONENT_DISPLAY_NAME);
 
   await expect(canvasInputLocator).toHaveCount(2);
 });
@@ -37,6 +37,7 @@ test('can place new components from catalog', async ({ page, browserName }) => {
 test('can move elements in page', async ({ page, browserName }) => {
   const homeModel = new ToolpadHome(page);
   const editorModel = new ToolpadEditor(page, browserName);
+  const TEXT_FIELD_COMPONENT_DISPLAY_NAME = 'Text field';
 
   await homeModel.goto();
   const app = await homeModel.createApplication({ dom: domInput });
@@ -44,7 +45,7 @@ test('can move elements in page', async ({ page, browserName }) => {
 
   await editorModel.pageRoot.waitFor();
 
-  const canvasMoveElementHandleSelector = ':has-text("TextField")[draggable]';
+  const canvasMoveElementHandleSelector = `:has-text("${TEXT_FIELD_COMPONENT_DISPLAY_NAME}")[draggable]`;
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
   const canvasMoveElementHandleLocator = editorModel.appCanvas.locator(

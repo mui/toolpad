@@ -870,7 +870,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         addOrMoveNode = domApi.moveNode;
       }
 
-      // Drop on page or empty inner layout
+      // Drop on page or layout slot
       if (isDraggingOverPage || isDraggingOverLayoutSlot) {
         const newParentIndex =
           dragOverZone === DROP_ZONE_TOP

@@ -11,7 +11,6 @@ function Paper({ children, sx, ...props }: MuiPaperProps) {
 }
 
 export default createComponent(Paper, {
-  hasInnerLayout: true,
   layoutDirection: 'both',
   argTypes: {
     elevation: {
@@ -20,7 +19,7 @@ export default createComponent(Paper, {
     },
     children: {
       typeDef: { type: 'element' },
-      control: { type: 'slots' },
+      control: { type: 'layoutSlot' },
     },
     sx: {
       typeDef: { type: 'object' },

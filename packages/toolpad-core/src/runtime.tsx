@@ -201,9 +201,10 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
 export interface PlaceholderProps {
   prop: string;
   children?: React.ReactNode;
+  hasLayout?: boolean;
 }
 
-export function Placeholder({ prop, children }: PlaceholderProps) {
+export function Placeholder({ prop, children, hasLayout = false }: PlaceholderProps) {
   const nodeId = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
@@ -216,7 +217,7 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_SLOTS]: prop,
-        slotType: 'single',
+        slotType: hasLayout ? 'layout' : 'single',
       }}
     />
   );

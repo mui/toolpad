@@ -72,7 +72,7 @@ export type BindableAttrValues<P = Record<string, unknown>> = {
 
 export type BindableAttrEntries = [string, BindableAttrValue<any>][];
 
-export type SlotType = 'single' | 'multiple';
+export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
   type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
@@ -124,6 +124,7 @@ export interface ArgControlSpec {
     | 'color' // color picker
     | 'slot' // slot in canvas
     | 'slots' // slots in canvas
+    | 'layoutSlot' // slot with inner layout
     | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
     | 'date' // date picker
     | 'json' // JSON editor
@@ -237,10 +238,6 @@ export interface ComponentConfig<P> {
    * inputs is still loading it will set this property to true
    */
   loadingProp?: keyof P & string;
-  /**
-   * Enables building layout inside the component with page rows and columns.
-   */
-  hasInnerLayout?: boolean;
   /**
    * Enables controlling the aligment of the component container box.
    */

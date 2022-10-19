@@ -309,9 +309,13 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       if (argType.control?.type === 'slots') {
         const value = props[propName];
         props[propName] = <Slots prop={propName}>{value}</Slots>;
-      } else if (argType.control?.type === 'slot') {
+      } else if (argType.control?.type === 'slot' || argType.control?.type === 'layoutSlot') {
         const value = props[propName];
-        props[propName] = <Placeholder prop={propName}>{value}</Placeholder>;
+        props[propName] = (
+          <Placeholder prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
+            {value}
+          </Placeholder>
+        );
       }
     }
   }

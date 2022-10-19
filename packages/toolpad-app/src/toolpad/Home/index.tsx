@@ -275,7 +275,7 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
       open={!!app}
       onClose={handleClose}
       severity="error"
-      okButton="delete"
+      okButton="Delete"
       loading={deleteAppMutation.isLoading}
     >
       Are you sure you want to delete application &quot;{latestApp?.name}&quot;
@@ -766,7 +766,7 @@ export default function Home() {
     <ToolpadShell>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
       {!isDemo ? (
-        <Container>
+        <Container sx={{ my: 1 }}>
           <Typography variant="h2">Apps</Typography>
           <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
             <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>

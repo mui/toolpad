@@ -4,6 +4,7 @@ import { Skeleton, styled, SxProps } from '@mui/material';
 import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
 import { hasOwnProperty } from '../../../utils/collections';
+import ElementContext from '../ElementContext';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -25,7 +26,6 @@ export interface JsExpressionEditorProps extends WithControlledProp<string> {
   onFocus?: () => void;
   onBlur?: () => void;
   sx?: SxProps;
-  extraDeclarations?: string;
 }
 
 export function JsExpressionEditor({
@@ -40,8 +40,11 @@ export function JsExpressionEditor({
   onFocus,
   onBlur,
   sx,
-  extraDeclarations = '',
 }: JsExpressionEditorProps) {
+  const element = React.useContext(ElementContext);
+
+  const nodeName = element?.name;
+
   const extraLibs = React.useMemo(() => {
     const type = jsonToTs(globalScope);
 
@@ -67,16 +70,29 @@ export function JsExpressionEditor({
       return [...comment, `declare const ${key}: RootObject[${JSON.stringify(key)}];`].join('\n');
     });
 
+    const valueKeys = new Set(Object.keys(globalScope));
+    const extraGlobalKeys = Object.keys(globalScopeMeta).filter((key) => !valueKeys.has(key));
+
+    const extraDeclarationLines: string[] = [];
+    for (const key of extraGlobalKeys) {
+      const { tsType } = globalScopeMeta[key];
+      if (tsType) {
+        extraDeclarationLines.push(`declare const ${key}: ${tsType}`);
+      }
+    }
+
     const content = `
       ${type.join('\n')}
 
       ${globalDeclarations.join('\n')}
+
+      ${nodeName ? `type ThisComponent = typeof ${nodeName}` : ''}
       
-      ${extraDeclarations}
+      ${extraDeclarationLines.join('\n')}
     `;
 
     return [{ content, filePath: 'global.d.ts' }];
-  }, [globalScope, globalScopeMeta, extraDeclarations]);
+  }, [globalScope, globalScopeMeta, nodeName]);
 
   return (
     <JsExpressionEditorRoot sx={sx}>

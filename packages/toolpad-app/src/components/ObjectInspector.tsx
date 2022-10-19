@@ -1,6 +1,11 @@
 import * as React from 'react';
-import { ObjectInspector as ReactObjectInspector, ObjectInspectorProps } from 'react-inspector';
-import { chromeDark, chromeLight, InspectorTheme } from 'react-inspector';
+import {
+  ObjectInspector as ReactObjectInspector,
+  ObjectInspectorProps,
+  chromeDark,
+  chromeLight,
+  InspectorTheme,
+} from 'react-inspector';
 import { useTheme } from '@mui/material/styles';
 
 const useInspectorTheme = (): InspectorTheme => {
@@ -19,7 +24,7 @@ const useInspectorTheme = (): InspectorTheme => {
 
 export type { ObjectInspectorProps };
 
-export default React.forwardRef(function ObjectInspector(props: ObjectInspectorProps, ref) {
+export default (function ObjectInspector(props: ObjectInspectorProps) {
   const inspectorTheme = useInspectorTheme();
   return <ReactObjectInspector theme={inspectorTheme} {...props} />;
 });

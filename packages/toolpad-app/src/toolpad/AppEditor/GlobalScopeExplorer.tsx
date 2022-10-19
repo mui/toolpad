@@ -28,9 +28,7 @@ export default function GlobalScopeExplorer({
               <React.Fragment key={key}>
                 <Box sx={{ p: 1 }}>
                   <Typography>{key}</Typography>
-                  <Box sx={{ ml: 1 }}>
-                    <ObjectInspector expandLevel={0} data={content} />
-                  </Box>
+                  <ObjectInspector expandLevel={0} data={content} />
                 </Box>
                 <Divider />
               </React.Fragment>

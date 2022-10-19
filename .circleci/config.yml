@@ -6,7 +6,7 @@ defaults: &defaults
   working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
-    - image: cimg/node:16.14
+    - image: cimg/node:18.10.0
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.
@@ -33,7 +33,8 @@ commands:
       - restore_cache:
           name: Restore yarn cache
           keys:
-            - v8-yarn-{{ checksum "yarn.lock" }}
+            - v9-yarn-{{ checksum "yarn.lock" }}
+            - v0-next-{{ checksum "yarn.lock" }}
       - run:
           name: Set yarn cache folder
           command: |
@@ -57,7 +58,7 @@ commands:
                   - v5-playwright-{{ arch }}-{{ checksum "/tmp/playwright_info.json" }}
       - run:
           name: Install js dependencies
-          command: yarn install --frozen-lockfile --verbose
+          command: yarn install
           environment:
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: <<# parameters.browsers >>0<</ parameters.browsers >><<^ parameters.browsers >>1<</ parameters.browsers >>
 
@@ -66,12 +67,18 @@ commands:
           command: yarn prisma generate
       - save_cache:
           name: Save yarn cache
-          key: v8-yarn-{{ checksum "yarn.lock" }}
+          key: v9-yarn-{{ checksum "yarn.lock" }}
           paths:
             # Keep path in sync with "Set yarn cache folder"
             # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
             - /tmp/yarn-cache
+            # monorepo node_modules folders ("paths" doesn't support globbing, see https://circleci.com/docs/caching#saving-cache)
             - node_modules
+            - docs/node_modules
+            - packages/eslint-plugin-material-ui/node_modules
+            - packages/toolpad-app/node_modules
+            - packages/toolpad-components/node_modules
+            - packages/toolpad-core/node_modules
       - when:
           condition: << parameters.browsers >>
           steps:
@@ -87,10 +94,10 @@ jobs:
   checkout:
     <<: *defaults
     docker:
-      - image: cimg/node:16.14
+      - image: cimg/node:18.10.0
         environment:
           TOOLPAD_SHADOW_DATABASE_URL: postgresql://postgres@localhost/circle_test
-      - image: cimg/postgres:14.0
+      - image: cimg/postgres:14.5
         environment:
           POSTGRES_USER: postgres
     steps:
@@ -122,6 +129,7 @@ jobs:
           command: yarn markdownlint
   test_static:
     <<: *defaults
+    resource_class: medium+
     steps:
       - checkout
       - install_js
@@ -131,6 +139,11 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
+      - save_cache:
+          name: Save Next.js cache
+          key: v0-next-{{ checksum "yarn.lock" }}
+          paths:
+            - packages/toolpad-app/.next/cache
 
   test_unit:
     <<: *defaults
@@ -173,7 +186,7 @@ jobs:
               -v "$CIRCLE_WORKING_DIRECTORY:/tests" \
               -w /tests \
               -e PLAYWRIGHT_TEST_BASE_URL=http://172.17.0.1:3000/ \
-              mcr.microsoft.com/playwright:v1.25.1-focal \
+              mcr.microsoft.com/playwright:v1.27.0-focal \
               yarn test:integration --forbid-only
             docker-compose -f ./docker-compose.test.yml down
 

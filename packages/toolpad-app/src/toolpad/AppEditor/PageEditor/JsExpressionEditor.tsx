@@ -1,8 +1,10 @@
 import * as React from 'react';
 import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
-import { WithControlledProp } from '../../../utils/types';
+import { isString } from 'lodash-es';
+import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
+import { hasOwnProperty } from '../../../utils/collections';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -16,6 +18,7 @@ const JsExpressionEditorRoot = styled('div')(({ theme }) => ({
 
 export interface JsExpressionEditorProps extends WithControlledProp<string> {
   globalScope?: Record<string, unknown>;
+  globalScopeMeta?: GlobalScopeMeta;
   disabled?: boolean;
   autoFocus?: boolean;
   functionBody?: boolean;
@@ -29,6 +32,7 @@ export function JsExpressionEditor({
   value,
   onChange,
   globalScope = {},
+  globalScopeMeta = {},
   disabled,
   autoFocus,
   functionBody,
@@ -41,17 +45,50 @@ export function JsExpressionEditor({
     const type = jsonToTs(globalScope);
 
     const globals = Object.keys(globalScope)
-      .map((key) => `declare const ${key}: RootObject[${JSON.stringify(key)}];`)
+      .map((key) => {
+        let metaDataString = ``;
+
+        const metaData = hasOwnProperty(globalScopeMeta, key) ? globalScopeMeta[key] : {};
+        const { deprecated, description } = metaData;
+
+        if (deprecated && description) {
+          metaDataString = `
+            /** ${description}
+             *  @deprecated ${isString(deprecated) ? deprecated : ''}
+             */
+          `;
+        } else {
+          if (deprecated) {
+            metaDataString = `
+              /** @deprecated ${isString(deprecated) ? deprecated : ''} */
+            `;
+          }
+
+          if (description) {
+            metaDataString = `
+              /** ${description} */
+            `;
+          }
+        }
+
+        const declaration = `
+          ${metaDataString}
+          declare const ${key}: RootObject[${JSON.stringify(key)}];
+        `;
+
+        return declaration;
+      })
       .join('\n');
 
     const content = `
       ${type.join('\n')}
 
       ${globals}
+      
     `;
 
-    return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
-  }, [globalScope]);
+    return [{ content, filePath: 'global.d.ts' }];
+  }, [globalScope, globalScopeMeta]);
 
   return (
     <JsExpressionEditorRoot sx={sx}>

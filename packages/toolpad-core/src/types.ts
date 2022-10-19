@@ -249,7 +249,7 @@ export interface ComponentConfig<P> {
   /**
    * Describes the individual properties for this component
    */
-  argTypes: ArgTypeDefinitions<P>;
+  argTypes?: ArgTypeDefinitions<P>;
 }
 
 export type ToolpadComponent<P = {}> = React.ComponentType<P> & {
@@ -266,3 +266,14 @@ export interface RuntimeError {
 }
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
+
+export interface SerializedError {
+  message: string;
+  name: string;
+  stack?: string;
+}
+
+export type ExecFetchResult<T = any> = {
+  data?: T;
+  error?: SerializedError;
+};

@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -14,14 +13,16 @@ import {
   Typography,
 } from '@mui/material';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
+import SyncIcon from '@mui/icons-material/Sync';
+import SyncProblemIcon from '@mui/icons-material/SyncProblem';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { Outlet } from 'react-router-dom';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import invariant from 'invariant';
 import DialogForm from '../../components/DialogForm';
-import { useDomLoader } from '../DomLoader';
+import { DomLoader, useDomLoader } from '../DomLoader';
 import ToolpadShell from '../ToolpadShell';
 import PagePanel from './PagePanel';
 import client from '../../api';
@@ -103,14 +104,30 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
   );
 }
 
-function getSaveStateMessage(isSaving: boolean, hasUnsavedChanges: boolean): string {
+function getSaveState(domLoader: DomLoader): React.ReactNode {
+  if (domLoader.saveError) {
+    return (
+      <Tooltip title="Error while saving">
+        <SyncProblemIcon color="primary" />
+      </Tooltip>
+    );
+  }
+
+  const isSaving = domLoader.unsavedChanges > 0;
+
   if (isSaving) {
-    return 'Saving changes...';
+    return (
+      <Tooltip title="Saving changes...">
+        <SyncIcon color="primary" />
+      </Tooltip>
+    );
   }
-  if (hasUnsavedChanges) {
-    return 'You have unsaved changes.';
-  }
-  return 'All changes saved!';
+
+  return (
+    <Tooltip title="All changes saved!">
+      <CloudDoneIcon color="primary" />
+    </Tooltip>
+  );
 }
 
 export interface ToolpadShellProps {
@@ -127,45 +144,31 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
     setFalse: handleCreateReleaseDialogClose,
   } = useBoolean(false);
 
-  const hasUnsavedChanges = domLoader.unsavedChanges > 0;
-  const isSaving = domLoader.saving;
-
   return (
     <ToolpadShell
       actions={
         <Stack direction="row" gap={1} alignItems="center">
-          <Tooltip title={getSaveStateMessage(isSaving, hasUnsavedChanges)}>
-            <Box display="flex" flexDirection="row" alignItems="center" mr={1}>
-              {isSaving ? (
-                <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
-              ) : (
-                <CloudDoneIcon
-                  color={hasUnsavedChanges ? 'disabled' : 'success'}
-                  fontSize="medium"
-                />
-              )}
-            </Box>
-          </Tooltip>
           <Button
             variant="outlined"
-            color="inherit"
+            endIcon={<OpenInNewIcon />}
+            color="primary"
             component="a"
             href={`/app/${appId}/preview`}
             target="_blank"
-            endIcon={<OpenInNewIcon />}
           >
             Preview
           </Button>
           <Button
             variant="outlined"
-            color="inherit"
-            onClick={handleCreateReleaseDialogOpen}
             endIcon={<RocketLaunchIcon />}
+            color="primary"
+            onClick={handleCreateReleaseDialogOpen}
           >
             Deploy
           </Button>
         </Stack>
       }
+      status={getSaveState(domLoader)}
       {...props}
     >
       <Box

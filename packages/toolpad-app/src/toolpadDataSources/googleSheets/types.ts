@@ -1,6 +1,6 @@
 import { sheets_v4 } from '@googleapis/sheets';
 import { drive_v3 } from '@googleapis/drive';
-import { ApiResult } from '../../types';
+import { ExecFetchResult } from '@mui/toolpad-core';
 
 export type GoogleSheetsConnectionParams = {
   refresh_token?: string | null;
@@ -42,36 +42,26 @@ export type GoogleSheetsApiQuery = {
   headerRow: boolean;
 };
 
-export enum GoogleSheetsPrivateQueryType {
-  FILE_GET = 'FILE_GET',
-  FILES_LIST = 'FILES_LIST',
-  FETCH_SPREADSHEET = 'FETCH_SPREADSHEET',
-  CONNECTION_STATUS = 'CONNECTION_STATUS',
-  DEBUG_EXEC = 'DEBUG_EXEC',
-}
-
 export type GoogleSheetsPrivateQuery =
   | {
-      type: GoogleSheetsPrivateQueryType.FILE_GET;
+      type: 'FILE_GET';
       spreadsheetId: GoogleSheetsApiQuery['spreadsheetId'];
     }
   | {
-      type: GoogleSheetsPrivateQueryType.FILES_LIST;
+      type: 'FILES_LIST';
       spreadsheetQuery?: string | null;
       pageToken?: string;
     }
   | {
-      type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET;
+      type: 'FETCH_SPREADSHEET';
       spreadsheetId: GoogleSheetsApiQuery['spreadsheetId'];
     }
   | {
-      type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS;
+      type: 'CONNECTION_STATUS';
     }
   | {
-      type: GoogleSheetsPrivateQueryType.DEBUG_EXEC;
+      type: 'DEBUG_EXEC';
       query: GoogleSheetsApiQuery;
     };
 
-export interface GoogleSheetsResult extends ApiResult {
-  error?: Error;
-}
+export interface GoogleSheetsResult extends ExecFetchResult {}

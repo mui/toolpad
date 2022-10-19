@@ -3,6 +3,7 @@
     "paths": {
       // TODO: remove when we move to typescript 4.7 (supports package exports)
       "@mui/toolpad-core/runtime": ["../toolpad-core/dist/runtime"],
+      "@mui/toolpad-core/jsRuntime": ["../toolpad-core/dist/jsRuntime"],
       "@mui/toolpad-core/objectKey": ["../toolpad-core/dist/objectKey"]
     },
     "target": "es5",
@@ -23,6 +24,14 @@
     "incremental": true,
     "noUnusedLocals": true
   },
-  "include": ["next.config.mjs", "next-env.d.ts", "**/*.ts", "**/*.tsx", "typings/**/*.d.ts"],
+  "include": [
+    "next.config.mjs",
+    "next-env.d.ts",
+    "sentry.client.config.js",
+    "sentry.server.config.js",
+    "**/*.ts",
+    "**/*.tsx",
+    "typings/**/*.d.ts"
+  ],
   "exclude": ["node_modules", "./scripts", "./public"]
 }

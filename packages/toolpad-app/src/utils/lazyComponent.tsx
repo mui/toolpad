@@ -1,5 +1,5 @@
-import { NoSsr } from '@mui/material';
 import * as React from 'react';
+import NoSsr from '../components/NoSsr';
 
 interface LazyComponentOptions {
   noSsr?: boolean;

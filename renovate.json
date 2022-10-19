@@ -1,4 +1,103 @@
 {
-  "enabled": false,
-  "extends": ["config:base"]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "automerge": false,
+  "commitMessageAction": "Bump",
+  "commitMessageExtra": "to {{newValue}}",
+  "commitMessageTopic": "{{depName}}",
+  "dependencyDashboard": true,
+  "rebaseWhen": "conflicted",
+  "ignoreDeps": [],
+  "labels": ["dependencies"],
+  "stopUpdatingLabel": "on hold",
+  "packageRules": [
+    {
+      "groupName": "dependencies",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["dependencies"]
+    },
+    {
+      "groupName": "devDependencies",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"]
+    },
+    {
+      "groupName": "MUI Core",
+      "matchPackagePatterns": ["^@mui/"],
+      "prCreation": "immediate"
+    },
+    {
+      "groupName": "MUI X",
+      "matchPackagePatterns": ["^@mui/x-"],
+      "prCreation": "immediate"
+    },
+    {
+      "groupName": "playwright",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["playwright", "@playwright/*"]
+    },
+    {
+      "groupName": "dependencies",
+      "matchDepTypes": ["cimg/node", "node"]
+    },
+    {
+      "groupName": "react-inspector",
+      "matchPackageNames": ["react-inspector"],
+      "allowedVersions": "< 6.0.0"
+    },
+    {
+      "groupName": "node-fetch",
+      "matchPackageNames": ["node-fetch"],
+      "allowedVersions": "< 3.0.0"
+    },
+    {
+      "groupName": "eslint-config-airbnb-typescript",
+      "matchPackageNames": ["eslint-config-airbnb-typescript"],
+      "allowedVersions": "< 13.0.0"
+    },
+    {
+      "groupName": "react-router",
+      "matchPackageNames": ["react-router", "react-router-dom"],
+      "allowedVersions": "< 6.4.0"
+    },
+    {
+      "groupName": "chalk",
+      "matchPackageNames": ["chalk"],
+      "allowedVersions": "< 5.0.0"
+    },
+    {
+      "groupName": "core-js",
+      "matchPackageNames": ["core-js"],
+      "allowedVersions": "< 2.0.0"
+    },
+    {
+      "groupName": "next",
+      "matchPackageNames": ["next"],
+      "allowedVersions": "1.2.2"
+    }
+  ],
+  "postUpdateOptions": ["yarnDedupeHighest"],
+  "prConcurrentLimit": 30,
+  "prHourlyLimit": 0,
+  "rangeStrategy": "bump",
+  "schedule": "on sunday before 6:00am",
+  "timezone": "UTC",
+  "vulnerabilityAlerts": {
+    "prCreation": "immediate",
+    "addLabels": ["priority: important"]
+  },
+  "regexManagers": [
+    {
+      "fileMatch": ["^render.yml$"],
+      "matchStringsStrategy": "combination",
+      "matchStrings": ["- key: NODE_VERSION", "value: '(?<currentValue>.*)"],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["^.circleci/config.yml$"],
+      "matchStrings": ["mcr.microsoft.com/playwright:(?<currentValue>.*)"],
+      "depNameTemplate": "playwright",
+      "datasourceTemplate": "docker"
+    }
+  ]
 }

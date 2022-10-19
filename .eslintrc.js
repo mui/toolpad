@@ -2,7 +2,11 @@ const baseline = require('@mui/monorepo/.eslintrc');
 
 module.exports = {
   ...baseline,
-  plugins: [...baseline.plugins, 'jsdoc'],
+  extends: [
+    ...baseline.extends,
+    // Motivation: https://github.com/shian15810/eslint-plugin-typescript-enum#motivations
+    'plugin:typescript-enum/recommended',
+  ],
   /**
    * Sorted alphanumerically within each group. built-in and each plugin form
    * their own groups.
@@ -12,15 +16,18 @@ module.exports = {
     'import/prefer-default-export': ['off'],
     // TODO move rule into the main repo once it has upgraded
     '@typescript-eslint/return-await': ['off'],
-    // TODO move rule into main repo to allow deep @mui/monorepo imports
-    'no-restricted-imports': ['off'],
-    'jsdoc/require-param': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-param-type': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-param-name': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-param-description': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-returns': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-returns-type': ['error', { contexts: ['TSFunctionType'] }],
-    'jsdoc/require-returns-description': ['error', { contexts: ['TSFunctionType'] }],
+
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@mui/icons-material',
+            message: 'Use @mui/icons-material/<Icon> instead.',
+          },
+        ],
+      },
+    ],
     'no-restricted-syntax': [
       'error',
       // From https://github.com/airbnb/javascript/blob/d8cb404da74c302506f91e5928f30cc75109e74d/packages/eslint-config-airbnb-base/rules/style.js#L333
@@ -79,7 +86,6 @@ module.exports = {
       // https://github.com/mui/material-ui/blob/9737bc85bb6960adb742e7709e9c3710c4b6cedd/.eslintrc.js#L359
       files: ['packages/*/src/**/*{.ts,.tsx,.js}'],
       excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx'],
-      rules: { 'no-restricted-imports': 'off' },
     },
   ],
 };

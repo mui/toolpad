@@ -33,6 +33,7 @@ import SplitPane from '../../../components/SplitPane';
 import { getDefaultControl } from '../../propertyControls';
 import { WithControlledProp } from '../../../utils/types';
 import useDebounced from '../../../utils/useDebounced';
+import { ExtraLib } from '../../../components/MonacoEditor';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -107,9 +108,15 @@ function FrameContent(props: FrameContentProps) {
   return <CacheProvider value={cache}>{children}</CacheProvider>;
 }
 
-const EXTRA_LIBS_HTTP_MODULES = [
+const EXTRA_LIBS_HTTP_MODULES: ExtraLib[] = [
   {
     content: `declare module "https://*";`,
+  },
+  {
+    content: `declare module "@mui/icons-material/*";`,
+  },
+  {
+    content: `declare module "@mui/icons-material";`,
   },
 ];
 
@@ -191,7 +198,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const { Component: GeneratedComponent, error: compileError } = useCodeComponent(debouncedInput);
   const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
 
-  const { argTypes } = CodeComponent[TOOLPAD_COMPONENT];
+  const { argTypes = {} } = CodeComponent[TOOLPAD_COMPONENT];
 
   const defaultProps = React.useMemo(
     () => mapValues(argTypes, (argType) => argType?.defaultValue),

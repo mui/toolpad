@@ -2,7 +2,7 @@ import { Stack, SxProps } from '@mui/material';
 import * as React from 'react';
 import { BindableAttrValue, PropValueType, LiveBinding } from '@mui/toolpad-core';
 import { BindingEditor } from '../BindingEditor';
-import { WithControlledProp } from '../../../utils/types';
+import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
 import { getDefaultControl } from '../../propertyControls';
 
 function renderDefaultControl(params: RenderControlParams<any>) {
@@ -18,17 +18,20 @@ export interface RenderControlParams<V> extends WithControlledProp<V> {
 
 export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrValue<V> | null> {
   label: string;
+  bindable?: boolean;
   disabled?: boolean;
   server?: boolean;
   propType: PropValueType;
   renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
+  globalScopeMeta?: GlobalScopeMeta;
   sx?: SxProps;
 }
 
 export default function BindableEditor<V>({
   label,
+  bindable = true,
   disabled,
   propType,
   renderControl = renderDefaultControl,
@@ -37,6 +40,7 @@ export default function BindableEditor<V>({
   onChange,
   liveBinding,
   globalScope = {},
+  globalScopeMeta = {},
   sx,
 }: BindableEditorProps<V>) {
   const handlePropConstChange = React.useCallback(
@@ -68,12 +72,14 @@ export default function BindableEditor<V>({
         })}
         <BindingEditor<V>
           globalScope={globalScope}
+          globalScopeMeta={globalScopeMeta}
           label={label}
           server={server}
           propType={propType}
           value={value}
           onChange={onChange}
-          disabled={disabled}
+          disabled={disabled || !bindable}
+          hidden={!bindable}
           liveBinding={liveBinding}
         />
       </React.Fragment>

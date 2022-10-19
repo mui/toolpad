@@ -9,6 +9,7 @@ import { LogEntry } from '../../components/Console';
 import { FetchOptions } from './runtime/types';
 import projectRoot from '../../server/projectRoot';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
+import { errorFrom } from '../../utils/errors';
 
 async function fetchRuntimeModule() {
   const filePath = path.resolve(projectRoot, './src/toolpadDataSources/function/dist/index.js');
@@ -133,13 +134,24 @@ export default async function execFunction(
     userModule.evaluateSync({ timeout: 30000 });
 
     const defaultExport = await userModule.namespace.get('default', { reference: true });
-    data = await defaultExport.apply(null, [{ params, secrets }], {
-      arguments: { copy: true },
-      result: { copy: true, promise: true },
-      timeout: 30000,
-    });
+    data = await defaultExport.apply(
+      null,
+      [
+        {
+          // TODO: 'params' are passed only for backwards compatability, remove after v1
+          params,
+          parameters: params,
+          secrets,
+        },
+      ],
+      {
+        arguments: { copy: true },
+        result: { copy: true, promise: true },
+        timeout: 30000,
+      },
+    );
   } catch (userError) {
-    error = userError instanceof Error ? userError : new Error(String(userError));
+    error = errorFrom(userError);
   }
 
   return { data, logs, error, har };

@@ -90,8 +90,6 @@ const INITIAL_FETCH: UseFetch = {
 const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
   'enabled',
   'refetchInterval',
-  'refetchOnReconnect',
-  'refetchOnWindowFocus',
 ];
 
 function usePageNavigator(): NavigateToPage {

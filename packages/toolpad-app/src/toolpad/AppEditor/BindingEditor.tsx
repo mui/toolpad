@@ -29,7 +29,7 @@ import {
   NodeId,
   JsExpressionAction,
 } from '@mui/toolpad-core';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { TabContext, TabList } from '@mui/lab';
 import { Maybe, WithControlledProp, GlobalScopeMeta } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
@@ -43,6 +43,7 @@ import { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
+import TabPanel from '../../components/TabPanel';
 
 interface BindingEditorContext {
   label: string;
@@ -124,7 +125,7 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
   const { label, globalScope, globalScopeMeta = {}, server, propType } = useBindingEditorContext();
   return (
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
-      <GlobalScopeExplorer value={globalScope} meta={globalScopeMeta} />
+      <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
 
       <Box
         sx={{
@@ -167,9 +168,16 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
     <Box sx={{ my: 1 }}>
       <Typography>Run code when this event fires</Typography>
       <Box
-        sx={{ my: 3, display: 'flex', flexDirection: 'row', maxHeight: 250, alignItems: 'stretch' }}
+        sx={{
+          my: 3,
+          display: 'flex',
+          flexDirection: 'row',
+          maxHeight: 250,
+          alignItems: 'stretch',
+          gap: 2,
+        }}
       >
-        <GlobalScopeExplorer value={globalScope} meta={globalScopeMeta} />
+        <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
 
         <JsExpressionEditor
           sx={{ flex: 1 }}
@@ -258,13 +266,13 @@ function ActionEditor({ value, onChange }: ActionEditorProps) {
             <Tab label="Navigation" value="navigationAction" />
           </TabList>
         </Box>
-        <TabPanel value="jsExpressionAction">
+        <TabPanel value="jsExpressionAction" disableGutters>
           <JsExpressionActionEditor
             value={value?.type === 'jsExpressionAction' ? value : null}
             onChange={onChange}
           />
         </TabPanel>
-        <TabPanel value="navigationAction">
+        <TabPanel value="navigationAction" disableGutters>
           <NavigationActionEditor
             value={value?.type === 'navigationAction' ? value : null}
             onChange={onChange}

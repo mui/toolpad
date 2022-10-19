@@ -40,7 +40,7 @@ export async function execDataSourceQuery({
 
 export type UseDataQueryConfig = Pick<
   UseQueryOptions<any, unknown, unknown, any[]>,
-  'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
+  'enabled' | 'refetchInterval'
 >;
 
 export interface UseFetch {
@@ -64,10 +64,7 @@ export function useDataQuery(
   {
     enabled = true,
     ...options
-  }: Pick<
-    UseQueryOptions<any, unknown, unknown, any[]>,
-    'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
-  >,
+  }: Pick<UseQueryOptions<any, unknown, unknown, any[]>, 'enabled' | 'refetchInterval'>,
 ): UseFetch {
   const { appId, version } = useAppContext();
   const { savedNodes } = React.useContext(CanvasHooksContext);

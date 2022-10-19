@@ -191,7 +191,7 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
     headers: async () => {
       return [
         {
-          source: '/:path*',
+          source: '/((?!deploy/).*)',
           headers: securityHeaders,
         },
         {

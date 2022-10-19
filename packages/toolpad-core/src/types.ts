@@ -238,6 +238,10 @@ export interface ComponentConfig<P> {
    */
   loadingProp?: keyof P & string;
   /**
+   * Enables building layout inside the component with page rows and columns.
+   */
+  hasInnerLayout?: boolean;
+  /**
    * Enables controlling the aligment of the component container box.
    */
   layoutDirection?: 'vertical' | 'horizontal' | 'both';

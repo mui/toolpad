@@ -106,14 +106,15 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
                 ? getRelativeBoundingRect(rootElm, firstChildElm)
                 : getRelativeBoundingRect(rootElm, childContainerElm);
 
-            const gridAutoFlow = window.getComputedStyle(childContainerElm).gridAutoFlow;
-            const flexDirection = window.getComputedStyle(childContainerElm).flexDirection;
+            const display = window.getComputedStyle(childContainerElm).display;
 
-            let flowDirection = 'row';
-            if (flexDirection) {
-              flowDirection = flexDirection;
-            } else if (gridAutoFlow) {
+            let flowDirection = 'column';
+            if (display === 'grid') {
+              const gridAutoFlow = window.getComputedStyle(childContainerElm).gridAutoFlow;
               flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
+            } else if (display === 'flex') {
+              const flexDirection = window.getComputedStyle(childContainerElm).flexDirection;
+              flowDirection = flexDirection;
             }
 
             nodeSlots[slotNamePropValue] = {

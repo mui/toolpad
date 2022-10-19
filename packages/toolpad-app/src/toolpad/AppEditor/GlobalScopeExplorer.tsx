@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import { Box, SxProps } from '@mui/system';
 import * as React from 'react';
-import JsonView from '../../components/JsonView';
+import ObjectInspector from '../../components/ObjectInspector';
 
 export interface GlobalScopeExplorerProps {
   value?: Record<string, unknown>;
@@ -14,11 +14,11 @@ export default function GlobalScopeExplorer({ value, sx }: GlobalScopeExplorerPr
       <Typography sx={{ mb: 1 }} variant="subtitle2">
         Scope
       </Typography>
-      <Box sx={{ overflow: 'auto' }}>
+      <Box sx={{ overflow: 'auto', whiteSpace: 'nowrap' }}>
         {Object.entries(value ?? {}).map(([key, content]) => {
           return (
-            <Box>
-              <JsonView name={key} expandLevel={0} src={content} />
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+              <ObjectInspector name={key} expandLevel={0} data={content} />
             </Box>
           );
         })}

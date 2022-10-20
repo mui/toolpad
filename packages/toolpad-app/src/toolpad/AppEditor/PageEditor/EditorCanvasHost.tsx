@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
-import { PageViewState } from '../../../types';
+import { NodeHashes, PageViewState } from '../../../types';
 import { ToolpadBridge } from '../../../canvas';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
@@ -46,7 +46,7 @@ export interface EditorCanvasHostProps {
   appId: string;
   pageNodeId: NodeId;
   dom: appDom.AppDom;
-  savedNodes: Record<NodeId, boolean>;
+  savedNodes: NodeHashes;
   onRuntimeEvent?: (event: RuntimeEvent) => void;
   onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;

@@ -8,6 +8,8 @@ import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
 import { createProvidedContext } from '../utils/react';
 import { mapValues } from '../utils/collections';
+import insecureHash from '../utils/insecureHash';
+import { NodeHashes } from '../types';
 
 export type DomAction =
   | {
@@ -233,11 +235,8 @@ export interface DomLoader {
   saveError: string | null;
 }
 
-export function getSavedNodes(
-  dom: appDom.AppDom,
-  savedDom: appDom.AppDom,
-): Record<NodeId, boolean> {
-  return mapValues(dom.nodes, (node) => node === savedDom.nodes[node.id]);
+export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
+  return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
 }
 
 const [useDomLoader, DomLoaderProvider] = createProvidedContext<DomLoader>('DomLoader');

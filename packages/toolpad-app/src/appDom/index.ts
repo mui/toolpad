@@ -126,7 +126,9 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
     readonly query: ConstantAttrValue<Q>;
     readonly transform?: ConstantAttrValue<string>;
     readonly transformEnabled?: ConstantAttrValue<boolean>;
+    /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
+    /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
     readonly cacheTime?: ConstantAttrValue<number>;

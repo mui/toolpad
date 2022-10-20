@@ -11,7 +11,7 @@ function Paper({ children, sx, ...props }: MuiPaperProps) {
 }
 
 export default createComponent(Paper, {
-  layoutDirection: 'both',
+  layoutDirection: 'vertical',
   argTypes: {
     elevation: {
       typeDef: { type: 'number', minimum: 0 },

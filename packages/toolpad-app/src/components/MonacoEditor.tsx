@@ -52,21 +52,30 @@ declare global {
 
 const designTokensDark = getDesignTokens('dark');
 
-const darkBackground = designTokensDark.palette?.background?.default;
+invariant(
+  designTokensDark.palette?.background?.default &&
+    designTokensDark.palette?.background?.paper &&
+    designTokensDark.palette?.divider,
+  'dark theme tokens missing',
+);
+
+const editorBackground = rgbToHex(lighten(designTokensDark.palette.background.default, 0.05));
+const paperBackground = rgbToHex(designTokensDark.palette.background.paper);
+const dividerColor = rgbToHex(designTokensDark.palette.divider);
 
 monaco.editor.defineTheme('vs-toolpad-dark', {
   base: 'vs-dark',
   inherit: true,
   rules: [],
   colors: {
-    ...(darkBackground
-      ? {
-          // See https://code.visualstudio.com/api/references/theme-color
-          'editor.background': rgbToHex(lighten(darkBackground, 0.05)),
-          'menu.background': darkBackground,
-          'editorWidget.background': darkBackground,
-        }
-      : {}),
+    // See https://code.visualstudio.com/api/references/theme-color
+    'editor.background': editorBackground,
+    'menu.background': paperBackground,
+    'menu.border': dividerColor,
+    'menu.separatorBackground': dividerColor,
+    'editorWidget.background': paperBackground,
+    'editorWidget.border': dividerColor,
+    'editor.lineHighlightBorder': dividerColor,
   },
 });
 
@@ -146,6 +155,7 @@ const TYPESCRIPT_DEFAULT_COMPILER_OPTIONS: monaco.languages.typescript.CompilerO
   jsx: monaco.languages.typescript.JsxEmit.React,
   reactNamespace: 'React',
   allowJs: true,
+  lib: ['es2020'],
   typeRoots: ['node_modules/@types'],
 };
 

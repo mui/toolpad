@@ -59,7 +59,6 @@ databases:
   - name: toolpad-demo-db
     ipAllowList: []
     plan: starter
-    branch: demo
 
 envVarGroups:
   - name: toolpad-settings

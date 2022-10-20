@@ -70,7 +70,7 @@ export function useDataQuery(
   const { savedNodes } = React.useContext(CanvasHooksContext);
 
   // These are only used by the editor to invalidate caches whenever the query changes during editing
-  const nodeHash: string | undefined = savedNodes ? savedNodes[queryId] : undefined;
+  const nodeHash: number | undefined = savedNodes ? savedNodes[queryId] : undefined;
   const isNodeAvailableOnServer: boolean = !!nodeHash;
 
   const {

@@ -71,7 +71,7 @@ export function useDataQuery(
 
   // These are only used by the editor to invalidate caches whenever the query changes during editing
   const nodeHash: number | undefined = savedNodes ? savedNodes[queryId] : undefined;
-  const isNodeAvailableOnServer: boolean = !!nodeHash;
+  const isNodeAvailableOnServer: boolean = savedNodes ? !!savedNodes[queryId] : true;
 
   const {
     isLoading,

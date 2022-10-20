@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost, { EditorCanvasHostHandle } from '../EditorCanvasHost';
-import { getSavedNodes, useDom, useDomApi, useDomLoader } from '../../../DomLoader';
+import { getNodeHashes, useDom, useDomApi, useDomLoader } from '../../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
+import { NodeHashes } from '../../../../types';
 
 const classes = {
   view: 'Toolpad_View',
@@ -37,9 +38,9 @@ export default function RenderPanel({ className }: RenderPanelProps) {
 
   const navigate = useNavigate();
 
-  const savedNodes = React.useMemo(
-    () => getSavedNodes(domLoader.dom, domLoader.savedDom),
-    [domLoader.dom, domLoader.savedDom],
+  const savedNodes: NodeHashes = React.useMemo(
+    () => getNodeHashes(domLoader.savedDom),
+    [domLoader.savedDom],
   );
 
   const handleRuntimeEvent = React.useCallback(

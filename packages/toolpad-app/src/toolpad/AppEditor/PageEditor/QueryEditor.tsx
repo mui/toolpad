@@ -7,8 +7,6 @@ import {
   List,
   ListItem,
   DialogActions,
-  Checkbox,
-  FormControlLabel,
   TextField,
   InputAdornment,
   Divider,
@@ -261,19 +259,6 @@ function QueryNodeEditorDialog<Q>({
     );
   }, []);
 
-  const handleRefetchOnWindowFocusChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) =>
-        update(existing, {
-          attributes: update(existing.attributes, {
-            refetchOnWindowFocus: appDom.createConst(event.target.checked),
-          }),
-        }),
-      );
-    },
-    [],
-  );
-
   const handleEnabledChange = React.useCallback((newValue: BindableAttrValue<boolean> | null) => {
     setInput((existing) =>
       update(existing, {
@@ -283,19 +268,6 @@ function QueryNodeEditorDialog<Q>({
       }),
     );
   }, []);
-
-  const handleRefetchOnReconnectChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) =>
-        update(existing, {
-          attributes: update(existing.attributes, {
-            refetchOnReconnect: appDom.createConst(event.target.checked),
-          }),
-        }),
-      );
-    },
-    [],
-  );
 
   const handleRefetchIntervalChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -418,26 +390,6 @@ function QueryNodeEditorDialog<Q>({
                 value={input.attributes.enabled ?? appDom.createConst(true)}
                 onChange={handleEnabledChange}
                 disabled={mode !== 'query'}
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={input.attributes.refetchOnWindowFocus?.value ?? true}
-                    onChange={handleRefetchOnWindowFocusChange}
-                    disabled={mode !== 'query'}
-                  />
-                }
-                label="Refetch on window focus"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={input.attributes.refetchOnReconnect?.value ?? true}
-                    onChange={handleRefetchOnReconnectChange}
-                    disabled={mode !== 'query'}
-                  />
-                }
-                label="Refetch on network reconnect"
               />
               <TextField
                 InputProps={{

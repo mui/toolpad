@@ -31,8 +31,8 @@ services:
     name: toolpad-demo
     env: docker
     branch: demo
-    dockerfilePath: ./docker/images/toolpad/Dockerfile.demo
-    dockerContext: ./docker/images/toolpad/
+    dockerfilePath: ./docker/images/toolpad-demo/Dockerfile
+    dockerContext: ./docker/images/toolpad-demo/
     healthCheckPath: /health-check
     plan: starter plus
     pullRequestPreviewsEnabled: false

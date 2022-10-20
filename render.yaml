@@ -43,6 +43,8 @@ services:
         fromDatabase:
           name: toolpad-demo-db
           property: connectionString
+      - key: TOOLPAD_DEMO
+        value: 1
       - fromGroup: toolpad-settings
     buildFilter:
       ignoredPaths:

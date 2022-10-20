@@ -361,6 +361,15 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     [api],
   );
 
+  const handleNodeDuplicate = React.useCallback(
+    (node: appDom.ElementNode) => (event: React.MouseEvent) => {
+      event.stopPropagation();
+
+      domApi.duplicateNode(node);
+    },
+    [domApi],
+  );
+
   const handleEdgeDragStart = React.useCallback(
     (node: appDom.ElementNode, edge: RectangleEdge) => (event: React.MouseEvent<HTMLElement>) => {
       event.stopPropagation();
@@ -1394,6 +1403,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 isSelected={isSelected}
                 isInteractive={isInteractive}
                 onNodeDragStart={handleNodeDragStart(node as appDom.ElementNode)}
+                onDuplicate={handleNodeDuplicate(node as appDom.ElementNode)}
                 draggableEdges={[
                   ...(isPageRowChild
                     ? [

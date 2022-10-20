@@ -69,7 +69,9 @@ export function useDataQuery(
   const { appId, version } = useAppContext();
   const { savedNodes } = React.useContext(CanvasHooksContext);
 
-  const isNodeAvailableOnServer: boolean = savedNodes ? queryId && savedNodes[queryId] : true;
+  // These are only used by the editor to invalidate caches whenever the query changes during editing
+  const nodeHash: string | undefined = savedNodes ? savedNodes[queryId] : undefined;
+  const isNodeAvailableOnServer: boolean = !!nodeHash;
 
   const {
     isLoading,
@@ -78,7 +80,7 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
-    [appId, version, queryId, params],
+    [appId, version, nodeHash, queryId, params],
     ({ signal }) =>
       queryId &&
       execDataSourceQuery({

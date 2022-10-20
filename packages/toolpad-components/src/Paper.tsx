@@ -4,7 +4,7 @@ import { createComponent } from '@mui/toolpad-core';
 
 function Paper({ children, sx, ...props }: MuiPaperProps) {
   return (
-    <MuiPaper sx={{ padding: 1, ...sx }} {...props}>
+    <MuiPaper sx={{ padding: 1, width: '100%', ...sx }} {...props}>
       {children}
     </MuiPaper>
   );

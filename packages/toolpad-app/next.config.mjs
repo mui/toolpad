@@ -36,7 +36,6 @@ function parseBuidEnvVars(env) {
 
   return {
     TOOLPAD_TARGET: target,
-    TOOLPAD_DEMO: env.TOOLPAD_DEMO || '',
     TOOLPAD_VERSION: pkgJson.version,
     TOOLPAD_BUILD: env.GIT_SHA1?.slice(0, 7) || 'dev',
   };
@@ -65,7 +64,7 @@ const regexEqual = (x, y) => {
 const securityHeaders = [
   {
     key: 'X-Frame-Options',
-    value: 'SAMEORIGIN',
+    value: 'DENY',
   },
   {
     // Force the browser to trust the Content-Type header
@@ -191,8 +190,17 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
     headers: async () => {
       return [
         {
-          source: '/:path*',
+          source: '/((?!deploy/).*)',
           headers: securityHeaders,
+        },
+        {
+          source: '/app-canvas/:path*',
+          headers: [
+            {
+              key: 'X-Frame-Options',
+              value: 'SAMEORIGIN',
+            },
+          ],
         },
       ];
     },

@@ -8,6 +8,8 @@ import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
 import { createProvidedContext } from '../utils/react';
 import { mapValues } from '../utils/collections';
+import insecureHash from '../utils/insecureHash';
+import { NodeHashes } from '../types';
 
 export type DomAction =
   | {
@@ -54,6 +56,10 @@ export type DomAction =
       parentIndex?: string;
     }
   | {
+      type: 'DOM_DUPLICATE_NODE';
+      node: appDom.ElementNode;
+    }
+  | {
       type: 'DOM_REMOVE_NODE';
       nodeId: NodeId;
     }
@@ -98,6 +104,9 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
         action.parentProp,
         action.parentIndex,
       );
+    }
+    case 'DOM_DUPLICATE_NODE': {
+      return appDom.duplicateNode<any, any>(dom, action.node);
     }
     case 'DOM_SAVE_NODE': {
       return appDom.saveNode(dom, action.node);
@@ -180,6 +189,12 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parentIndex,
       });
     },
+    duplicateNode<Child extends appDom.ElementNode>(node: Child) {
+      dispatch({
+        type: 'DOM_DUPLICATE_NODE',
+        node,
+      });
+    },
     removeNode(nodeId: NodeId) {
       dispatch({
         type: 'DOM_REMOVE_NODE',
@@ -233,11 +248,8 @@ export interface DomLoader {
   saveError: string | null;
 }
 
-export function getSavedNodes(
-  dom: appDom.AppDom,
-  savedDom: appDom.AppDom,
-): Record<NodeId, boolean> {
-  return mapValues(dom.nodes, (node) => node === savedDom.nodes[node.id]);
+export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
+  return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
 }
 
 const [useDomLoader, DomLoaderProvider] = createProvidedContext<DomLoader>('DomLoader');

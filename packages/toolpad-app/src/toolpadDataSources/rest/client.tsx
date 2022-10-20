@@ -47,6 +47,7 @@ import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
+import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import DEMO_BASE_URLS from './demoBaseUrls';
 
@@ -146,11 +147,9 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
     ...validation(formState, 'baseUrl'),
   };
 
-  const isDemo = !!process.env.TOOLPAD_DEMO;
-
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
-      {isDemo ? (
+      {config.isDemo ? (
         <TextField select {...baseUrlInputProps} defaultValue="">
           {DEMO_BASE_URLS.map(({ url, name }) => (
             <MenuItem key={url} value={url}>
@@ -170,7 +169,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
           return (
             <MapEntriesEditor
               {...field}
-              disabled={!headersAllowed || isDemo}
+              disabled={!headersAllowed || config.isDemo}
               fieldLabel="header"
               value={allHeaders}
               onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
@@ -186,7 +185,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         render={({ field: { value: fieldValue, ref, ...field } }) => (
           <AuthenticationEditor
             {...field}
-            disabled={!headersAllowed || isDemo}
+            disabled={!headersAllowed || config.isDemo}
             value={fieldValue ?? null}
           />
         )}
@@ -411,8 +410,6 @@ function QueryEditor({
     [],
   );
 
-  const isDemo = !!process.env.TOOLPAD_DEMO;
-
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
@@ -422,9 +419,9 @@ function QueryEditor({
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
               <TextField
                 select
-                value={isDemo ? 'GET' : input.query.method || 'GET'}
+                value={config.isDemo ? 'GET' : input.query.method || 'GET'}
                 onChange={handleMethodChange}
-                disabled={isDemo}
+                disabled={config.isDemo}
               >
                 {HTTP_METHODS.map((method) => (
                   <MenuItem key={method} value={method}>
@@ -450,9 +447,9 @@ function QueryEditor({
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                   <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                     <Tab label="URL query" value="urlQuery" />
-                    <Tab label="Body" value="body" disabled={isDemo} />
-                    <Tab label="Headers" value="headers" disabled={isDemo} />
-                    <Tab label="Response" value="response" disabled={isDemo} />
+                    <Tab label="Body" value="body" disabled={config.isDemo} />
+                    <Tab label="Headers" value="headers" disabled={config.isDemo} />
+                    <Tab label="Response" value="response" disabled={config.isDemo} />
                     <Tab label="Transform" value="transform" />
                   </TabList>
                 </Box>

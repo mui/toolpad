@@ -126,7 +126,9 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
     readonly query: ConstantAttrValue<Q>;
     readonly transform?: ConstantAttrValue<string>;
     readonly transformEnabled?: ConstantAttrValue<boolean>;
+    /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
+    /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
     readonly cacheTime?: ConstantAttrValue<number>;
@@ -870,6 +872,34 @@ export function getNewParentIndexAfterNode(
 ) {
   const nodeAfter = getSiblingAfterNode(dom, node, parentProp);
   return createFractionalIndex(node.parentIndex, nodeAfter?.parentIndex || null);
+}
+
+export function duplicateNode<Parent extends AppDomNode, Child extends ElementNode>(
+  dom: AppDom,
+  node: Child,
+  parent?: Parent,
+) {
+  if (!node.parentId || !node.parentProp || !node.parentIndex) {
+    throw new Error(`Node: "${node.id}" can't be duplicated`);
+  }
+
+  const { children } = getChildNodes(dom, node);
+
+  const newNode = createElement(dom, node.attributes.component!.value, node.props, node.layout);
+
+  let updatedDom = dom;
+
+  children?.forEach((childNode) => {
+    updatedDom = duplicateNode(updatedDom, childNode, newNode);
+  });
+
+  if (parent) {
+    return setNodeParent(updatedDom, newNode, parent.id, node.parentProp, node.parentIndex);
+  }
+
+  const newParentIndex = getNewParentIndexAfterNode(updatedDom, node, node.parentProp);
+
+  return setNodeParent(updatedDom, newNode, node.parentId, node.parentProp, newParentIndex);
 }
 
 const RENDERTREE_NODES = [

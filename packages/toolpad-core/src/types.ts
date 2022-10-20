@@ -109,6 +109,10 @@ export interface ElementValueType extends ValueTypeBase {
 
 export interface EventValueType extends ValueTypeBase {
   type: 'event';
+  arguments?: {
+    name: string;
+    tsType: string;
+  }[];
 }
 
 export interface ArgControlSpec {

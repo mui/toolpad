@@ -64,6 +64,14 @@ import NoSsr from '../components/NoSsr';
 import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from './useDataQuery';
 import { useAppContext, AppContextProvider } from './AppContext';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
+import useBoolean from '../utils/useBoolean';
+
+const ReactQueryDevtoolsProduction = React.lazy(() =>
+  // eslint-disable-next-line import/extensions
+  import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
+    default: d.ReactQueryDevtools,
+  })),
+);
 
 const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
@@ -82,8 +90,6 @@ const INITIAL_FETCH: UseFetch = {
 const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
   'enabled',
   'refetchInterval',
-  'refetchOnReconnect',
-  'refetchOnWindowFocus',
 ];
 
 function usePageNavigator(): NavigateToPage {
@@ -424,12 +430,11 @@ function QueryNode({ node }: QueryNodeProps) {
   const bindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
-  const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(queryId, params, options);
+  const queryResult = useDataQuery(node.id, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;
@@ -876,6 +881,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
+      staleTime: 60 * 1000,
     },
   },
 });
@@ -903,6 +909,12 @@ export default function ToolpadApp({
 
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
+  const { value: showDevtools, toggle: toggleDevtools } = useBoolean(false);
+
+  React.useEffect(() => {
+    (window as any).toggleDevtools = () => toggleDevtools();
+  }, [toggleDevtools]);
+
   return (
     <AppRoot ref={rootRef}>
       <NoSsr>
@@ -922,6 +934,9 @@ export default function ToolpadApp({
                           <BrowserRouter basename={basename}>
                             <RenderedPages dom={dom} />
                           </BrowserRouter>
+                          {showDevtools ? (
+                            <ReactQueryDevtoolsProduction initialIsOpen={false} />
+                          ) : null}
                         </QueryClientProvider>
                       </AppContextProvider>
                     </ComponentsContext>

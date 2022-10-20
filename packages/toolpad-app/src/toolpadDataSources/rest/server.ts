@@ -22,6 +22,7 @@ import { Maybe } from '../../utils/types';
 import { getAuthenticationHeaders, HTTP_NO_BODY, parseBaseUrl } from './shared';
 import applyTransform from '../../server/applyTransform';
 import { errorFrom } from '../../utils/errors';
+import config from '../../config';
 import DEMO_BASE_URLS from './demoBaseUrls';
 
 async function resolveBindable(
@@ -143,7 +144,7 @@ async function execBase(
     resolveBindableEntries(fetchQuery.headers || [], queryScope),
   ]);
 
-  if (process.env.TOOLPAD_DEMO) {
+  if (config.isDemo) {
     const demoUrls = DEMO_BASE_URLS.map((baseUrl) => baseUrl.url);
 
     const hasNonDemoConnectionParams =

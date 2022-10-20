@@ -4,10 +4,11 @@ import rest from './rest/client';
 import { ClientDataSource } from '../types';
 import googleSheets from './googleSheets/client';
 import movies from './movies/client';
+import config from '../config';
 
 type ClientDataSources = { [key: string]: ClientDataSource<any, any> | undefined };
 
-const clientDataSources: ClientDataSources = process.env.TOOLPAD_DEMO
+const clientDataSources: ClientDataSources = config.isDemo
   ? {
       movies,
       rest,

@@ -45,7 +45,7 @@ services:
           property: connectionString
       - key: TOOLPAD_DEMO
         value: 1
-      - fromGroup: toolpad-settings
+      - fromGroup: toolpad-settings-public
     buildFilter:
       ignoredPaths:
         - docs/**

@@ -1,1 +1,1 @@
-FROM muicom/toolpad:v0.0.23
+FROM muicom/toolpad:latest

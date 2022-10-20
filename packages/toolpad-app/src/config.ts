@@ -46,6 +46,7 @@ export interface RuntimeConfig {
   sentryDsn?: string;
   // Google reCAPTCHA site key
   recaptchaSiteKey?: string;
+  externalUrl: string;
 }
 
 declare global {
@@ -77,6 +78,8 @@ const runtimeConfig: RuntimeConfig =
         gaId: process.env.TOOLPAD_GA_ID,
         sentryDsn: process.env.TOOLPAD_SENTRY_DSN,
         recaptchaSiteKey: process.env.TOOLPAD_RECAPTCHA_SITE_KEY,
+        externalUrl:
+          process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
       }
     : getBrowsersideRuntimeConfig();
 

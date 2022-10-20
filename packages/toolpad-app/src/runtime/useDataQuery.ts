@@ -1,17 +1,40 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { NodeId } from '@mui/toolpad-core';
+import { useAppContext } from './AppContext';
+import { VersionOrPreview } from '../types';
+import { CanvasHooksContext } from './CanvasHooksContext';
 
-export async function execDataSourceQuery(dataUrl: string, queryId: string, params: any) {
-  const url = new URL(`./${encodeURIComponent(queryId)}`, new URL(dataUrl, window.location.href));
+interface ExecDataSourceQueryParams {
+  signal?: AbortSignal;
+  appId: string;
+  version: VersionOrPreview;
+  queryId: string;
+  params: any;
+}
+
+export async function execDataSourceQuery({
+  signal,
+  appId,
+  version,
+  queryId,
+  params,
+}: ExecDataSourceQueryParams) {
+  const dataUrl = new URL(`/api/data/${appId}/${version}/`, window.location.href);
+  const url = new URL(`./${encodeURIComponent(queryId)}`, dataUrl);
+
   const res = await fetch(String(url), {
     method: 'POST',
     body: JSON.stringify(params),
     headers: [['content-type', 'application/json']],
+    signal,
   });
+
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} while fetching "${url}"`);
   }
+
   return res.json();
 }
 
@@ -20,30 +43,23 @@ export type UseDataQueryConfig = Pick<
   'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
 >;
 
-export interface UseDataQuery {
+export interface UseFetch {
   isLoading: boolean;
   isFetching: boolean;
   error: any;
   data: any;
   rows: GridRowsProp;
+  fetch: (overrides?: any) => void;
   refetch: () => void;
+  /** @deprecated Use fetch */
+  call: (overrides?: any) => Promise<void>;
 }
-
-export const INITIAL_DATA_QUERY: UseDataQuery = {
-  isLoading: false,
-  isFetching: false,
-  error: null,
-  data: null,
-  rows: [],
-  refetch: () => {},
-};
 
 const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
 
 export function useDataQuery(
-  dataUrl: string,
-  queryId: string | null,
+  queryId: NodeId,
   params: any,
   {
     enabled = true,
@@ -52,7 +68,12 @@ export function useDataQuery(
     UseQueryOptions<any, unknown, unknown, any[]>,
     'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
   >,
-): UseDataQuery {
+): UseFetch {
+  const { appId, version } = useAppContext();
+  const { savedNodes } = React.useContext(CanvasHooksContext);
+
+  const isNodeAvailableOnServer: boolean = savedNodes ? queryId && savedNodes[queryId] : true;
+
   const {
     isLoading,
     isFetching,
@@ -60,11 +81,19 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
-    [dataUrl, queryId, params],
-    () => queryId && execDataSourceQuery(dataUrl, queryId, params),
+    [appId, version, queryId, params],
+    ({ signal }) =>
+      queryId &&
+      execDataSourceQuery({
+        signal,
+        appId,
+        version,
+        queryId,
+        params,
+      }),
     {
       ...options,
-      enabled: !!queryId && enabled,
+      enabled: isNodeAvailableOnServer && !!queryId && enabled,
     },
   );
 
@@ -74,7 +103,7 @@ export function useDataQuery(
 
   const rows = Array.isArray(data) ? data : EMPTY_ARRAY;
 
-  const result: UseDataQuery = React.useMemo(
+  const result: UseFetch = React.useMemo(
     () => ({
       isLoading: isLoading && enabled,
       isFetching,
@@ -82,6 +111,12 @@ export function useDataQuery(
       data,
       rows,
       refetch,
+      fetch: async () => {
+        throw new Error(`"fetch" is unsupported for automatic queries`);
+      },
+      call: async () => {
+        throw new Error(`"call" is unsupported for automatic queries`);
+      },
     }),
     [isLoading, enabled, isFetching, error, data, rows, refetch],
   );

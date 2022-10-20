@@ -23,8 +23,9 @@ import { createHarLog, mergeHar } from '../../utils/har';
 import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
-import { tryFormat } from '../../utils/prettier';
 import useShortcut from '../../utils/useShortcut';
+import { tryFormat } from '../../utils/prettier';
+import config from '../../config';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -81,26 +82,24 @@ function ConnectionParamsInput({
   );
 }
 
-const DEFAULT_MODULE = `export default async function ({ parameters }: ${EVENT_INTERFACE_IDENTIFIER}) {
-  console.info('Executing function with parameters:', parameters);
-  const url = new URL('https://gist.githubusercontent.com/saniyusuf/406b843afdfb9c6a86e25753fe2761f4/raw/523c324c7fcc36efab8224f9ebb7556c09b69a14/Film.JSON');
-  url.searchParams.set('timestamp', String(Date.now()));
+const DEFAULT_MODULE = `export default async function ({ parameters }: ToolpadFunctionEvent) {
+  console.info("Executing function with parameters:", parameters);
+  const url = new URL("${new URL('/static/movies.json', config.externalUrl).href}");
+  url.searchParams.set("timestamp", String(Date.now()));
   const response = await fetch(String(url));
   if (!response.ok) {
     throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
   }
   return response.json();
-}`;
+}
+`;
 
 function QueryEditor({
-  QueryEditorShell,
   globalScope,
-  value,
-  onChange,
+  value: input,
+  onChange: setInput,
+  onCommit,
 }: QueryEditorProps<FunctionConnectionParams, FunctionQuery>) {
-  const [input, setInput] = React.useState(value);
-  React.useEffect(() => setInput(value), [value]);
-
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     input: input.params,
     globalScope,
@@ -155,72 +154,57 @@ function QueryEditor({
       }
     `;
 
-    return [{ content, filePath: 'file:///node_modules/@mui/toolpad/index.d.ts' }];
+    return [{ content, filePath: 'global.d.ts' }];
   }, [input.params, secretsKeys]);
 
   const handleLogClear = React.useCallback(() => setPreviewLogs([]), []);
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const handleCommit = React.useCallback(
-    () =>
-      onChange({
-        ...input,
-        query: {
-          ...input.query,
-          module: tryFormat(input.query.module),
-        },
-      }),
-    [onChange, input],
-  );
-
+  const handleCommit = React.useCallback(() => onCommit?.(), [onCommit]);
   useShortcut({ code: 'KeyS', metaKey: true }, handleCommit);
 
-  const isDirty = input !== value;
-
   return (
-    <QueryEditorShell onCommit={handleCommit} isDirty={isDirty}>
-      <SplitPane split="vertical" size="50%" allowResize>
-        <SplitPane split="horizontal" size={85} primary="second" allowResize>
-          <QueryInputPanel onRunPreview={handleRunPreview}>
-            <Box sx={{ flex: 1, minHeight: 0 }}>
-              <TypescriptEditor
-                value={input.query.module}
-                onChange={(newValue) =>
-                  setInput((existing) => ({ ...existing, query: { module: newValue } }))
-                }
-                extraLibs={extraLibs}
-              />
-            </Box>
-          </QueryInputPanel>
-
-          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-            <Typography>Parameters</Typography>
-            <ParametersEditor
-              value={input.params}
-              onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
-              globalScope={globalScope}
-              liveValue={paramsEditorLiveValue}
+    <SplitPane split="vertical" size="50%" allowResize>
+      <SplitPane split="horizontal" size={85} primary="second" allowResize>
+        <QueryInputPanel onRunPreview={handleRunPreview}>
+          <Box sx={{ flex: 1, minHeight: 0 }}>
+            <TypescriptEditor
+              value={input.query.module}
+              onChange={(newValue) =>
+                setInput((existing) => ({ ...existing, query: { module: newValue } }))
+              }
+              extraLibs={extraLibs}
             />
           </Box>
-        </SplitPane>
+        </QueryInputPanel>
 
-        <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
-          {preview?.error ? (
-            <ErrorAlert error={preview?.error} />
-          ) : (
-            <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
-          )}
-
-          <Devtools
-            sx={{ width: '100%', height: '100%' }}
-            log={previewLogs}
-            onLogClear={handleLogClear}
-            har={previewHar}
-            onHarClear={handleHarClear}
+        <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
+          <Typography>Parameters</Typography>
+          <ParametersEditor
+            value={input.params}
+            onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
+            globalScope={globalScope}
+            liveValue={paramsEditorLiveValue}
           />
-        </SplitPane>
+        </Box>
       </SplitPane>
-    </QueryEditorShell>
+
+      <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
+        {preview?.error ? (
+          <ErrorAlert error={preview?.error} />
+        ) : (
+          <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+        )}
+
+        <Devtools
+          sx={{ width: '100%', height: '100%' }}
+          log={previewLogs}
+          onLogClear={handleLogClear}
+          har={previewHar}
+          onHarClear={handleHarClear}
+        />
+      </SplitPane>
+    </SplitPane>
   );
 }
 
@@ -234,6 +218,12 @@ const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,
+  transformQueryBeforeCommit(query) {
+    return {
+      ...query,
+      module: tryFormat(query.module),
+    };
+  },
 };
 
 export default dataSource;

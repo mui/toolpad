@@ -10,7 +10,6 @@ import Document, {
 import createEmotionServer from '@emotion/server/create-instance';
 import serializeJavascript from 'serialize-javascript';
 import Script from 'next/script';
-import theme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import config, { RuntimeConfig } from '../src/config';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../src/constants';
@@ -63,19 +62,17 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
     return (
       <Html lang="en">
         <Head>
-          {/* PWA primary color */}
-          <meta name="theme-color" content={theme.palette.primary.main} />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           />
-          <link rel="manifest" href="/site.webmanifest" />
+          <link rel="manifest" href="/static/manifest.json" />
           <script
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
               __html: `
                 // Add the data-toolpad-canvas attribute to the canvas iframe element
-                if (window.frameElement?.dataset.toolpadCanvas){ 
+                if (window.frameElement?.dataset.toolpadCanvas){
                   var script = document.createElement('script');
                   script.type = 'module';
                   script.src = '/reactDevtools/bootstrap.js';
@@ -84,7 +81,6 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
               `,
             }}
           />
-
           <script
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{
@@ -93,7 +89,6 @@ export default class MyDocument extends Document<ToolpadDocumentProps> {
               )}] = ${serializeJavascript(this.props.config, { ignoreFunction: true })}`,
             }}
           />
-
           {/* Global site tag (gtag.js) - Google Analytics */}
           <Script
             async

@@ -51,7 +51,6 @@ import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
 import useLatest from '../../utils/useLatest';
 import ToolpadShell from '../ToolpadShell';
-import UpdateBanner from './UpdateBanner';
 import getReadableDuration from '../../utils/readableDuration';
 import EditableText from '../../components/EditableText';
 import type { AppMeta } from '../../server/data';
@@ -63,20 +62,35 @@ import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
 
-export const APP_TEMPLATE_OPTIONS = {
-  blank: {
-    label: 'Blank page',
-    description: 'Start with an empty canvas',
-  },
-  stats: {
-    label: 'Statistics',
-    description: 'Table with statistics data',
-  },
-  images: {
-    label: 'Images',
-    description: 'Fetch remote images',
-  },
-};
+export const APP_TEMPLATE_OPTIONS: Map<
+  AppTemplateId,
+  {
+    label: string;
+    description: string;
+  }
+> = new Map([
+  [
+    'blank',
+    {
+      label: 'Blank page',
+      description: 'Start with an empty canvas',
+    },
+  ],
+  [
+    'stats',
+    {
+      label: 'Statistics',
+      description: 'Table with statistics data',
+    },
+  ],
+  [
+    'images',
+    {
+      label: 'Images',
+      description: 'Fetch remote images',
+    },
+  ],
+]);
 
 const NO_OP = () => {};
 
@@ -168,7 +182,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               value={appTemplateId}
               onChange={handleAppTemplateChange}
             >
-              {Object.entries(APP_TEMPLATE_OPTIONS).map(([value, { label, description }]) => (
+              {Array.from(APP_TEMPLATE_OPTIONS).map(([value, { label, description }]) => (
                 <MenuItem key={value} value={value}>
                   <span>
                     <Typography>{label}</Typography>
@@ -261,7 +275,7 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
       open={!!app}
       onClose={handleClose}
       severity="error"
-      okButton="delete"
+      okButton="Delete"
       loading={deleteAppMutation.isLoading}
     >
       Are you sure you want to delete application &quot;{latestApp?.name}&quot;
@@ -752,7 +766,7 @@ export default function Home() {
     <ToolpadShell>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
       {!isDemo ? (
-        <Container>
+        <Container sx={{ my: 1 }}>
           <Typography variant="h2">Apps</Typography>
           <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
             <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
@@ -789,7 +803,6 @@ export default function Home() {
               duplicateApp={duplicateApp}
             />
           )}
-          <UpdateBanner />
         </Container>
       ) : null}
       <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />

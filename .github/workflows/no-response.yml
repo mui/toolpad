@@ -1,4 +1,4 @@
-name: No Response
+name: No response
 
 # Both `issue_comment` and `scheduled` event types are required for this Action
 # to work properly.
@@ -12,6 +12,9 @@ on:
 jobs:
   noResponse:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: lee-dohm/no-response@v0.5.0
         with:

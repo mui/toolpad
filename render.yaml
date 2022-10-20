@@ -32,7 +32,7 @@ services:
     env: docker
     branch: demo
     dockerfilePath: ./docker/images/toolpad/Dockerfile.demo
-    dockerContext: ./
+    dockerContext: ./docker/images/toolpad/
     healthCheckPath: /health-check
     plan: starter plus
     pullRequestPreviewsEnabled: false

@@ -25,8 +25,6 @@ import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './constants';
 export type BuildEnvVars = Record<
   // Identifier for the product line (CE, EE, Cloud, ...)
   | 'TOOLPAD_TARGET'
-  // Whether Toolpad is running in demo mode
-  | 'TOOLPAD_DEMO'
   // The current Toolpad version
   | 'TOOLPAD_VERSION'
   // The current Toolpad build number
@@ -40,6 +38,8 @@ export interface RuntimeConfig {
   // Enable input field for seeding a dom in the app creation dialog
   // (For testing purposes)
   enableCreateByDom?: boolean;
+  // Enable demo mode
+  isDemo: boolean;
   // Google Analytics measurement ID
   gaId?: string;
   // Sentry DSN
@@ -75,6 +75,7 @@ const runtimeConfig: RuntimeConfig =
     ? {
         // Define runtime config here
         enableCreateByDom: !!process.env.TOOLPAD_ENABLE_CREATE_BY_DOM,
+        isDemo: !!process.env.TOOLPAD_DEMO,
         gaId: process.env.TOOLPAD_GA_ID,
         sentryDsn: process.env.TOOLPAD_SENTRY_DSN,
         recaptchaSiteKey: process.env.TOOLPAD_RECAPTCHA_SITE_KEY,

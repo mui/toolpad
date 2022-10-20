@@ -6,6 +6,7 @@ import ThemeModeMenu from './ThemeModeMenu';
 import { useThemeMode, ThemeMode } from '../../../ThemeContext';
 import productIconDark from '../../../../public/product-icon-dark.svg';
 import productIconLight from '../../../../public/product-icon-light.svg';
+import config from '../../../config';
 
 export interface HeaderProps {
   actions?: React.ReactNode;
@@ -66,7 +67,7 @@ function Header({ actions, status }: HeaderProps) {
               </Box>
             </Link>
           </Tooltip>
-          {process.env.TOOLPAD_DEMO ? (
+          {config.isDemo ? (
             <Chip sx={{ ml: 2 }} label="Demo Version" color="primary" size="small" />
           ) : null}
         </Box>

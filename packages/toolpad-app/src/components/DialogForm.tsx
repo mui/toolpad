@@ -13,20 +13,23 @@ export interface DialogFormProps extends React.FormHTMLAttributes<HTMLFormElemen
 }
 
 export default ({ children, onKeyDown = () => {}, ...rest }: DialogFormProps) => {
-  const handleKeyDown = React.useCallback((event: React.KeyboardEvent) => {
-    const modifierKey = (event.metaKey || event.ctrlKey) && !event.shiftKey;
+  const handleKeyDown = React.useCallback(
+    (event: React.KeyboardEvent) => {
+      const modifierKey = (event.metaKey || event.ctrlKey) && !event.shiftKey;
 
-    if (event.key === 'Enter' && modifierKey) {
-      const submitEvent = new Event('submit', {
-        cancelable: true,
-        bubbles: true,
-      });
+      if (event.key === 'Enter' && modifierKey) {
+        const submitEvent = new Event('submit', {
+          cancelable: true,
+          bubbles: true,
+        });
 
-      event.currentTarget.dispatchEvent(submitEvent);
-    }
+        event.currentTarget.dispatchEvent(submitEvent);
+      }
 
-    onKeyDown(event);
-  }, []);
+      onKeyDown(event);
+    },
+    [onKeyDown],
+  );
 
   return (
     <StyledDialogForm onKeyDown={handleKeyDown} {...rest}>

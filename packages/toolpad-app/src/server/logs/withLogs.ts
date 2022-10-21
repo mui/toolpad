@@ -1,5 +1,5 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
-import { logInfo } from './logger';
+import logInfo from './logInfo';
 
 export const withReqResLogs =
   (apiHandler: NextApiHandler) =>

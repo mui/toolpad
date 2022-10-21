@@ -1,9 +1,13 @@
 import pino from 'pino';
 import ecsFormat from '@elastic/ecs-pino-format';
 
-import { NextApiRequest, NextApiResponse } from 'next';
-import config from './config';
-import { reqSerializer, resSerializer, rpcReqSerializer } from './logSerializers';
+import config from '../config';
+import {
+  recaptchaResSerializer,
+  reqSerializer,
+  resSerializer,
+  rpcReqSerializer,
+} from './logSerializers';
 
 let transport;
 if (config.ecsHostUrl) {
@@ -19,23 +23,9 @@ if (config.ecsHostUrl) {
   });
 }
 
-type ReqResLogPayload = {
-  key: 'apiReqRes';
-  req: NextApiRequest;
-  res: NextApiResponse;
-};
-
-type RpcReqResLogPayload = {
-  key: 'rpcReqRes';
-  rpcReq: NextApiRequest;
-  res: NextApiResponse;
-};
-
-type LogPayload = ReqResLogPayload | RpcReqResLogPayload;
-
 const logger = pino(
   {
-    enabled: config.apiLogsEnabled,
+    enabled: config.serverLogsEnabled,
     level: process.env.LOG_LEVEL || 'info',
     redact: { paths: [] },
     serializers: {
@@ -43,12 +33,11 @@ const logger = pino(
       req: reqSerializer,
       rpcReq: rpcReqSerializer,
       res: resSerializer,
+      recaptchaRes: recaptchaResSerializer,
     },
     ...(config.ecsHostUrl ? ecsFormat() : {}),
   },
   transport,
 );
 
-export function logInfo(payload: LogPayload, message?: string): void {
-  logger.info(payload, message);
-}
+export default logger;

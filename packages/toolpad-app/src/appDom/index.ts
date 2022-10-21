@@ -404,6 +404,8 @@ export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): Nod
 }
 
 export function getParent<N extends AppDomNode>(dom: AppDom, child: N): ParentOf<N> {
+  // Make sure we're using the last version of child in the dom
+  child = getNode(dom, child.id, child.type) as N;
   if (child.parentId) {
     const parent = getNode(dom, child.parentId);
     return parent as ParentOf<N>;
@@ -576,8 +578,7 @@ export function getExistingNames(dom: AppDom, node: AppDomNode): Set<string> {
   if (isElement(node)) {
     const pageNode = getPageAncestor(dom, node);
     const pageDescendants = pageNode ? getDescendants(dom, pageNode) : [];
-    const scope = pageDescendants.filter((descendant) => descendant.id !== node.id);
-    return new Set(scope.map((scopeNode) => scopeNode.name));
+    return new Set(pageDescendants.map((scopeNode) => scopeNode.name));
   }
 
   return new Set(getSiblings(dom, node).map((scopeNode) => scopeNode.name));
@@ -586,7 +587,7 @@ export function getExistingNames(dom: AppDom, node: AppDomNode): Set<string> {
 export function getExistingNamesForChildren<Parent extends AppDomNode>(
   dom: AppDom,
   parent: Parent,
-  parentProp: ParentProp<Parent>,
+  parentProp?: ParentProp<Parent>,
 ): Set<string> {
   const pageNode = getPageAncestor(dom, parent);
 
@@ -595,8 +596,14 @@ export function getExistingNamesForChildren<Parent extends AppDomNode>(
     return new Set(pageDescendants.map((scopeNode) => scopeNode.name));
   }
 
-  const { [parentProp]: children = [] } = getChildNodes(dom, parent);
-  return new Set(children.map((scopeNode) => scopeNode.name));
+  if (parentProp) {
+    const childNodes = getChildNodes(dom, parent);
+    const { [parentProp]: children = [] } = childNodes;
+    return new Set(children.map((scopeNode) => scopeNode.name));
+  }
+
+  const descendants = getDescendants(dom, parent);
+  return new Set(descendants.map((scopeNode: AppDomNode) => scopeNode.name));
 }
 
 export function proposeName(candidate: string, disallowedNames: Set<string> = new Set()): string {
@@ -922,18 +929,19 @@ export function getNewParentIndexAfterNode(
   return createFractionalIndex(node.parentIndex, nodeAfter?.parentIndex || null);
 }
 
-export function duplicateNode<Parent extends AppDomNode, Child extends ElementNode>(
+export function duplicateNode(
   dom: AppDom,
-  node: Child,
-  parent?: Parent,
+  node: AppDomNode,
+  parent: AppDomNode | null = getParent(dom, node),
 ) {
-  if (!node.parentId || !node.parentProp || !node.parentIndex) {
+  if (!parent || !node.parentId || !node.parentProp || !node.parentIndex) {
     throw new Error(`Node: "${node.id}" can't be duplicated`);
   }
 
-  const { children } = getChildNodes(dom, node);
+  const childNodes = getChildNodes(dom, node);
+  const existingNames = getExistingNamesForChildren(dom, parent);
 
-  const newNode = createElement(dom, node.attributes.component!.value, node.props, node.layout);
+  const newNode = createNode(dom, node.type, node);
 
   let updatedDom = dom;
 

@@ -11,6 +11,7 @@ import {
   Toolbar,
   Typography,
   Alert,
+  styled,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
@@ -61,6 +62,15 @@ const GLOBAL_SCOPE_META: GlobalScopeMeta = {
     description: 'Parameters that can be bound to app scope variables',
   },
 };
+
+const ButtonLink = styled('button')(({ theme }) => ({
+  background: 'none',
+  border: 'none',
+  fontSize: 'inherit',
+  padding: 0,
+  color: theme.palette.primary.main,
+  textDecoration: 'underline',
+}));
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -202,24 +212,49 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
 
 interface ResolvedPreviewProps {
   preview: FetchResult | null;
+  onShowTransform: () => void;
 }
 
-function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement | null {
+function ResolvedPreview({
+  preview,
+  onShowTransform,
+}: ResolvedPreviewProps): React.ReactElement | null {
   if (!preview) {
     return null;
   }
 
-  const { untransformedData } = preview;
+  const { data, untransformedData } = preview;
+  let alert = null;
+  const responseDataKeys = Object.keys(untransformedData);
 
-  if (untransformedData === undefined) {
-    return (
-      <Alert severity="info" sx={{ m: 2 }}>
-        The request did not return any data.
+  if (typeof data === 'undefined' && typeof untransformedData !== 'undefined') {
+    alert = (
+      <Alert severity="warning" sx={{ m: 1, p: 1, fontSize: 11 }}>
+        <Box sx={{ mb: 1 }}>
+          Request successfully completed and returned data
+          {responseDataKeys.length > 0 ? ' with the following keys:' : '.'}
+        </Box>
+
+        {responseDataKeys.map((key) => (
+          <Box sx={{ display: 'block' }} key={key}>
+            - {key}
+          </Box>
+        ))}
+
+        <Box sx={{ mt: 1 }}>
+          However, it seems that the <ButtonLink onClick={onShowTransform}>transform</ButtonLink>{' '}
+          function returned an <code>undefined</code> value.
+        </Box>
       </Alert>
     );
   }
 
-  return <JsonView sx={{ height: '100%' }} src={preview?.data} />;
+  return (
+    <React.Fragment>
+      {alert}
+      <JsonView sx={{ height: '100%' }} src={preview?.data} />
+    </React.Fragment>
+  );
 }
 
 function QueryEditor({
@@ -485,11 +520,18 @@ function QueryEditor({
         </Box>
       </SplitPane>
 
-      <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
+      <SplitPane
+        split="horizontal"
+        size="30%"
+        minSize={30}
+        primary="second"
+        allowResize
+        pane1Style={{ overflow: 'auto' }}
+      >
         {preview?.error ? (
           <ErrorAlert error={preview?.error} />
         ) : (
-          <ResolvedPreview preview={preview} />
+          <ResolvedPreview preview={preview} onShowTransform={() => setActiveTab('transform')} />
         )}
         <Devtools
           sx={{ width: '100%', height: '100%' }}

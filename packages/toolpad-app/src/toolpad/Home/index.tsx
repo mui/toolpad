@@ -127,6 +127,10 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
       <Dialog {...props} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
         <DialogForm
           onSubmit={async (event) => {
+            if (!name) {
+              return;
+            }
+
             event.preventDefault();
             let recaptchaToken;
             if (config.recaptchaSiteKey) {

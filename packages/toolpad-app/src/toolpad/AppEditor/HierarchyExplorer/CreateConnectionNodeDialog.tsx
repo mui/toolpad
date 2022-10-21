@@ -36,6 +36,10 @@ export default function CreateConnectionDialog({
       <DialogForm
         autoComplete="off"
         onSubmit={(e) => {
+          if (!dataSourceType) {
+            return;
+          }
+
           e.preventDefault();
           const dataSource = dataSources[dataSourceType];
           if (!dataSource) {

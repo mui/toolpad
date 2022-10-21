@@ -41,6 +41,10 @@ export default function CreatePageDialog({
       <DialogForm
         autoComplete="off"
         onSubmit={(e) => {
+          if (!name) {
+            return;
+          }
+
           e.preventDefault();
           const newNode = appDom.createNode(dom, 'page', {
             name,

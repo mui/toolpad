@@ -10,7 +10,9 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as appDom from '../../../appDom';
 import DialogForm from '../../../components/DialogForm';
+import useEvent from '../../../utils/useEvent';
 import { useDom, useDomApi } from '../../DomLoader';
+import { useNameInputError } from './validation';
 
 export interface CreatePageDialogProps {
   appId: string;
@@ -26,18 +28,30 @@ export default function CreatePageDialog({
 }: CreatePageDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const [name, setName] = React.useState('');
+
+  const existingNames = React.useMemo(
+    () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'pages'),
+    [dom],
+  );
+
+  const [name, setName] = React.useState(appDom.proposeName('page', existingNames));
+
   const navigate = useNavigate();
+
+  // Reset form
+  const handleReset = useEvent(() => setName(appDom.proposeName('page', existingNames)));
 
   React.useEffect(() => {
     if (open) {
-      // Reset form
-      setName('');
+      handleReset();
     }
-  }, [open]);
+  }, [open, handleReset]);
+
+  const inputErrorMsg = useNameInputError(name, existingNames, 'page');
+  const isNameInvalid = !!inputErrorMsg;
 
   return (
-    <Dialog {...props} open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} {...props}>
       <DialogForm
         autoComplete="off"
         onSubmit={(e) => {
@@ -64,13 +78,15 @@ export default function CreatePageDialog({
             label="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
+            error={isNameInvalid}
+            helperText={inputErrorMsg}
           />
         </DialogContent>
         <DialogActions>
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!name}>
+          <Button type="submit" disabled={!name || !isNameInvalid}>
             Create
           </Button>
         </DialogActions>

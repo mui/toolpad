@@ -12,6 +12,8 @@ import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { format } from '../../../utils/prettier';
 import DialogForm from '../../../components/DialogForm';
+import useEvent from '../../../utils/useEvent';
+import { useNameInputError } from './validation';
 
 function createDefaultCodeComponent(name: string): string {
   const componentId = name.replace(/\s/g, '');
@@ -50,26 +52,40 @@ export interface CreateCodeComponentDialogProps {
 
 export default function CreateCodeComponentDialog({
   appId,
+  open,
   onClose,
   ...props
 }: CreateCodeComponentDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const [name, setName] = React.useState(`MyComponent`);
+
+  const existingNames = React.useMemo(
+    () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'codeComponents'),
+    [dom],
+  );
+
+  const [name, setName] = React.useState(appDom.proposeName('MyComponent', existingNames));
+
   const navigate = useNavigate();
+
+  // Reset form
+  const handleReset = useEvent(() => setName(appDom.proposeName('page', existingNames)));
+
+  React.useEffect(() => {
+    if (open) {
+      handleReset();
+    }
+  }, [open, handleReset]);
 
   const handleInputFocus = React.useCallback((event: React.FocusEvent<HTMLInputElement>) => {
     event.target.select();
   }, []);
 
-  const inputErrorMsg = React.useMemo(
-    () => (name ? appDom.validateNodeName(name, 'a code component name') : null),
-    [name],
-  );
-  const isInvalid = !!inputErrorMsg;
+  const inputErrorMsg = useNameInputError(name, existingNames, 'component');
+  const isNameInvalid = !!inputErrorMsg;
 
   return (
-    <Dialog {...props} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} {...props}>
       <DialogForm
         autoComplete="off"
         onSubmit={(e) => {
@@ -96,7 +112,7 @@ export default function CreateCodeComponentDialog({
             label="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            error={isInvalid}
+            error={isNameInvalid}
             helperText={inputErrorMsg}
           />
         </DialogContent>
@@ -104,7 +120,7 @@ export default function CreateCodeComponentDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!name || isInvalid}>
+          <Button type="submit" disabled={!name || isNameInvalid}>
             Create
           </Button>
         </DialogActions>

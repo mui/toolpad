@@ -12,7 +12,7 @@ import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { camelCase, generateUniqueString, removeDiacritics } from '../utils/strings';
+import { camelCase, removeDiacritics } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { mapProperties } from '../utils/collections';
 
@@ -203,6 +203,8 @@ type ParentTypeOfType<T extends AppDomNodeType> = {
   [K in AppDomNodeType]: T extends CombinedAllowedChildren[K] ? K : never;
 }[AppDomNodeType];
 export type ParentOf<N extends AppDomNode> = AppDomNodeOfType<ParentTypeOfType<TypeOf<N>>> | null;
+
+export type ParentProp<Parent extends AppDomNode> = keyof AllowedChildTypesOfType<TypeOf<Parent>>;
 
 export type ParentPropOf<Child extends AppDomNode, Parent extends AppDomNode> = {
   [K in keyof AllowedChildren[TypeOf<Parent>]]: TypeOf<Child> extends AllowedChildren[TypeOf<Parent>][K]
@@ -407,10 +409,6 @@ export function getParent<N extends AppDomNode>(dom: AppDom, child: N): ParentOf
   return null;
 }
 
-function getNodeNames(dom: AppDom): Set<string> {
-  return new Set(Object.values(dom.nodes).map(({ name }) => name));
-}
-
 type AppDomNodeInitOfType<T extends AppDomNodeType> = Omit<
   AppDomNodeOfType<T>,
   ReservedNodeProperty
@@ -451,7 +449,7 @@ export function validateNodeName(input: string, identifier = 'input'): string | 
   return null;
 }
 
-export function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: string): string {
+export function slugifyNodeName(nameCandidate: string, fallback: string): string {
   let slug = nameCandidate;
   slug = slug.trim();
   // try to replace accents with relevant ascii
@@ -465,8 +463,7 @@ export function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: st
   if (!slug) {
     slug = fallback;
   }
-  const existingNames = getNodeNames(dom);
-  return generateUniqueString(slug, existingNames);
+  return slug;
 }
 
 export function createNode<T extends AppDomNodeType>(
@@ -475,7 +472,7 @@ export function createNode<T extends AppDomNodeType>(
   init: AppDomNodeInitOfType<T>,
 ): AppDomNodeOfType<T> {
   const id = createId();
-  const name = slugifyNodeName(dom, init.name || type, type);
+  const name = slugifyNodeName(init.name || type, type);
   return createNodeInternal(id, type, {
     ...init,
     name,
@@ -569,6 +566,48 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
   }
   return null;
 }
+
+/**
+ * Returns the set of names for which the given node must have a unique name
+ */
+export function getExistingNames(dom: AppDom, node: AppDomNode): Set<string> {
+  if (isElement(node)) {
+    const pageNode = getPageAncestor(dom, node);
+    const pageDescendants = pageNode ? getDescendants(dom, pageNode) : [];
+    const scope = pageDescendants.filter((descendant) => descendant.id !== node.id);
+    return new Set(scope.map((scopeNode) => scopeNode.name));
+  }
+
+  return new Set(getSiblings(dom, node).map((scopeNode) => scopeNode.name));
+}
+
+export function getExistingNamesForChildren<Parent extends AppDomNode>(
+  dom: AppDom,
+  parent: Parent,
+  parentProp: ParentProp<Parent>,
+): Set<string> {
+  const pageNode = getPageAncestor(dom, parent);
+
+  if (pageNode) {
+    const pageDescendants = getDescendants(dom, pageNode);
+    return new Set(pageDescendants.map((scopeNode) => scopeNode.name));
+  }
+
+  const { [parentProp]: children } = getChildNodes(dom, parent);
+  return new Set(children.map((scopeNode) => scopeNode.name));
+}
+
+export function proposeName(candidate: string, disallowedNames: Set<string> = new Set()): string {
+  if (!disallowedNames.has(candidate)) {
+    return candidate;
+  }
+  let counter = 1;
+  while (disallowedNames.has(candidate + counter)) {
+    counter += 1;
+  }
+  return candidate + counter;
+}
+
 export function setNodeName(dom: AppDom, node: AppDomNode, name: string): AppDom {
   if (dom.nodes[node.id].name === name) {
     return dom;
@@ -577,7 +616,7 @@ export function setNodeName(dom: AppDom, node: AppDomNode, name: string): AppDom
     nodes: update(dom.nodes, {
       [node.id]: {
         ...node,
-        name: slugifyNodeName(dom, name, node.type),
+        name: slugifyNodeName(name, node.type),
       },
     }),
   });

@@ -595,7 +595,7 @@ export function getExistingNamesForChildren<Parent extends AppDomNode>(
     return new Set(pageDescendants.map((scopeNode) => scopeNode.name));
   }
 
-  const { [parentProp]: children } = getChildNodes(dom, parent);
+  const { [parentProp]: children = [] } = getChildNodes(dom, parent);
   return new Set(children.map((scopeNode) => scopeNode.name));
 }
 
@@ -753,6 +753,15 @@ export function addNode<Parent extends AppDomNode, Child extends AppDomNode>(
 ): AppDom {
   if (newNode.parentId) {
     throw new Error(`Node "${newNode.id}" is already attached to a parent`);
+  }
+
+  const existingNames = getExistingNamesForChildren(dom, parent, parentProp);
+
+  if (existingNames.has(newNode.name)) {
+    newNode = {
+      ...newNode,
+      name: proposeName(newNode.name, existingNames),
+    };
   }
 
   return setNodeParent(dom, newNode, parent.id, parentProp, parentIndex);

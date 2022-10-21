@@ -86,7 +86,7 @@ export default function CreatePageDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!name || !isNameInvalid}>
+          <Button type="submit" disabled={!name || isNameInvalid}>
             Create
           </Button>
         </DialogActions>

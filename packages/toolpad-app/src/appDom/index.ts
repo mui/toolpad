@@ -933,29 +933,26 @@ export function duplicateNode(
   dom: AppDom,
   node: AppDomNode,
   parent: AppDomNode | null = getParent(dom, node),
-) {
-  if (!parent || !node.parentId || !node.parentProp || !node.parentIndex) {
+  parentprop: string | null = node.parentProp,
+): AppDom {
+  if (!parent || !parentprop) {
     throw new Error(`Node: "${node.id}" can't be duplicated`);
   }
 
-  const childNodes = getChildNodes(dom, node);
-  const existingNames = getExistingNamesForChildren(dom, parent);
-
   const newNode = createNode(dom, node.type, node);
+  const childNodes = getChildNodes(dom, node);
 
-  let updatedDom = dom;
+  dom = addNode<any, any>(dom, newNode, parent, parentprop);
 
-  children?.forEach((childNode) => {
-    updatedDom = duplicateNode(updatedDom, childNode, newNode);
-  });
-
-  if (parent) {
-    return setNodeParent(updatedDom, newNode, parent.id, node.parentProp, node.parentIndex);
+  for (const [childParentProp, children] of Object.entries(childNodes)) {
+    if (children) {
+      for (const child of children as AppDomNode[]) {
+        dom = duplicateNode(dom, child, newNode, childParentProp);
+      }
+    }
   }
 
-  const newParentIndex = getNewParentIndexAfterNode(updatedDom, node, node.parentProp);
-
-  return setNodeParent(updatedDom, newNode, node.parentId, node.parentProp, newParentIndex);
+  return dom;
 }
 
 const RENDERTREE_NODES = [

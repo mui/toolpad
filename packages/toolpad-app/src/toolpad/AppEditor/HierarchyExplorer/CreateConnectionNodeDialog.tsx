@@ -35,12 +35,12 @@ export default function CreateConnectionDialog({
     <Dialog {...props} onClose={onClose}>
       <DialogForm
         autoComplete="off"
-        onSubmit={(e) => {
+        onSubmit={(event) => {
           if (!dataSourceType) {
             return;
           }
 
-          e.preventDefault();
+          event.preventDefault();
           const dataSource = dataSources[dataSourceType];
           if (!dataSource) {
             throw new Error(`Can't find a datasource for "${dataSourceType}"`);

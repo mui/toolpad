@@ -72,12 +72,12 @@ export default function CreateCodeComponentDialog({
     <Dialog {...props} onClose={onClose}>
       <DialogForm
         autoComplete="off"
-        onSubmit={(e) => {
+        onSubmit={(event) => {
           if (!name || isInvalid) {
             return;
           }
 
-          e.preventDefault();
+          event.preventDefault();
           const newNode = appDom.createNode(dom, 'codeComponent', {
             name,
             attributes: {

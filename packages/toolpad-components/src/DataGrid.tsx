@@ -211,6 +211,7 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   onSelectionChange?: (newSelection?: Selection | null) => void;
   onDelete?: (event: OnDeleteEvent) => void;
   onUpdate?: (event: OnUpdateEvent) => void;
+  hideToolbar?: boolean;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
@@ -224,6 +225,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     onDelete: onDeleteProp,
     onUpdate: onUpdateProp,
     onSelectionChange,
+    hideToolbar,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -451,7 +453,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
         experimentalFeatures={{ newEditingApi: true }}
-        components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
+        components={{
+          Toolbar: hideToolbar ? null : GridToolbar,
+          LoadingOverlay: SkeletonLoadingOverlay,
+        }}
         onColumnResize={handleResize}
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
@@ -504,6 +509,9 @@ export default createComponent(DataGridComponent, {
       defaultValue: 350,
     },
     loading: {
+      typeDef: { type: 'boolean' },
+    },
+    hideToolbar: {
       typeDef: { type: 'boolean' },
     },
     sx: {

@@ -864,7 +864,9 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         originalParent && appDom.isElement(originalParent) ? isPageColumn(originalParent) : false;
 
       let addOrMoveNode = domApi.addNode;
+      let appDomAddOrMoveNode = appDom.addNode;
       if (selection) {
+        appDomAddOrMoveNode = appDom.moveNode;
         addOrMoveNode = domApi.moveNode;
       }
 
@@ -875,15 +877,29 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
             ? appDom.getNewFirstParentIndexInNode(dom, dragOverNode, 'children')
             : appDom.getNewLastParentIndexInNode(dom, dragOverNode, 'children');
 
-        if (!isPageRow(draggedNode)) {
-          const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
-          domApi.addNode(rowContainer, dragOverNode, 'children', newParentIndex);
-          parent = rowContainer;
+        domApi.update((draft) => {
+          if (!isPageRow(draggedNode)) {
+            const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
+            parent = rowContainer;
+            draft = appDom.addNode(draft, rowContainer, dragOverNode, 'children', newParentIndex);
 
-          addOrMoveNode(draggedNode, rowContainer, 'children');
-        } else {
-          addOrMoveNode(draggedNode, dragOverNode, 'children', newParentIndex);
-        }
+            if (selection) {
+              draft = appDom.moveNode(draft, draggedNode, rowContainer, 'children');
+            } else {
+              draft = appDom.addNode(draft, draggedNode, rowContainer, 'children');
+            }
+          } else {
+            draft = appDomAddOrMoveNode(
+              draft,
+              draggedNode,
+              dragOverNode,
+              'children',
+              newParentIndex,
+            );
+          }
+
+          return draft;
+        });
       }
 
       if (isDraggingOverElement && parent && (appDom.isPage(parent) || appDom.isElement(parent))) {

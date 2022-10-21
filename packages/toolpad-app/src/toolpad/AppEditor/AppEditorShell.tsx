@@ -58,13 +58,6 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
     deploymentWindow.focus();
     onClose();
   });
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    const modifierKey = event.metaKey || event.ctrlKey;
-
-    if (event.key === 'Enter' && modifierKey) {
-      doSubmit();
-    }
-  };
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -84,7 +77,6 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
                 multiline
                 rows={5}
                 {...register('description')}
-                onKeyDown={handleKeyDown}
                 error={Boolean(formState.errors.description)}
                 helperText={formState.errors.description?.message}
               />

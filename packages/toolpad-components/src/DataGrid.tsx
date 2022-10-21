@@ -5,7 +5,12 @@ import {
   GridColumnResizeParams,
   GridColumns,
   GridCellParams,
+  GridEventListener,
+  GridRowId,
   GridRowsProp,
+  GridRowModes,
+  GridRowModesModel,
+  GridRowParams,
   GridColumnOrderChangeParams,
   useGridApiContext,
   gridColumnsTotalWidthSelector,
@@ -16,10 +21,17 @@ import {
   GridActionsCellItem,
   GridColDef,
   GridValueGetterParams,
+  MuiEvent,
+  MuiBaseEvent,
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
-import { Delete as DeleteIcon } from '@mui/icons-material';
+import {
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon,
+} from '@mui/icons-material';
 import { useNode, createComponent } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
@@ -167,6 +179,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColumns {
     type: DEFAULT_TYPES.has(type) ? type : undefined,
     ...column,
     ...COLUMN_TYPES[type],
+    editable: true,
   }));
 }
 
@@ -177,7 +190,15 @@ interface Selection {
 }
 
 interface OnDeleteEvent {
-  row: GridRowsProp[number];
+  event: {
+    row: GridRowsProp[number];
+  };
+}
+
+interface OnUpdateEvent {
+  event: {
+    row: GridRowsProp[number];
+  };
 }
 
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
@@ -187,9 +208,9 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   rowIdField?: string;
   error?: Error | string;
   selection?: Selection | null;
-  onDelete?: () => void;
   onSelectionChange?: (newSelection?: Selection | null) => void;
   onDelete?: (event: OnDeleteEvent) => void;
+  onUpdate?: (event: OnUpdateEvent) => void;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
@@ -201,6 +222,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     error: errorProp,
     selection,
     onDelete: onDeleteProp,
+    onUpdate: onUpdateProp,
     onSelectionChange,
     ...props
   }: ToolpadDataGridProps,
@@ -307,62 +329,106 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     return columnsProp ? parseColumns(columnsProp) : [];
   }, [columnsProp]);
 
+  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+
+  const handleRowEditStart = React.useCallback(
+    (params: GridRowParams, event: MuiEvent<React.SyntheticEvent>) => {
+      event.defaultMuiPrevented = true;
+    },
+    [],
+  );
+
+  const handleRowEditStop: GridEventListener<'rowEditStop'> = React.useCallback(
+    (params: GridRowParams, event: MuiEvent<MuiBaseEvent>) => {
+      event.defaultMuiPrevented = true;
+    },
+    [],
+  );
+
+  const handleCancelClick = React.useCallback(
+    (id: GridRowId) => () => {
+      setRowModesModel({
+        ...rowModesModel,
+        [id]: { mode: GridRowModes.View, ignoreModifications: true },
+      });
+    },
+    [rowModesModel],
+  );
+
+  const handleSaveClick = React.useCallback(
+    (id: GridRowId) => () => {
+      setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+    },
+    [],
+  );
+
+  const processRowUpdate = React.useCallback(
+    (newRow: GridRowsProp[number]) => {
+      const updatedRow = { ...newRow, isNew: false };
+      if (onUpdateProp) {
+        onUpdateProp({ event: { row: updatedRow } });
+      }
+      return updatedRow;
+    },
+    [onUpdateProp],
+  );
+
   const actionField = React.useMemo(() => {
-    return onDeleteProp
+    return onDeleteProp || onUpdateProp
       ? {
           field: 'actions',
           headerName: 'Actions',
           width: 100,
           type: 'actions',
           getActions: ({ id, row }: GridCellParams) => {
+            const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+            if (isInEditMode) {
+              return [
+                <GridActionsCellItem
+                  icon={<SaveIcon />}
+                  label="Save"
+                  onClick={handleSaveClick(id)}
+                />,
+                <GridActionsCellItem
+                  icon={<CancelIcon />}
+                  label="Cancel"
+                  onClick={handleCancelClick(id)}
+                />,
+              ];
+            }
             return [
-              <GridActionsCellItem
-                key={'delete'}
-                icon={<DeleteIcon />}
-                label="Delete"
-                onClick={() => {
-                  onDeleteProp();
-                }}
-              />,
+              onUpdateProp ? (
+                <GridActionsCellItem
+                  icon={<EditIcon />}
+                  label="Edit"
+                  onClick={() => {
+                    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+                  }}
+                />
+              ) : (
+                <></>
+              ),
+              onDeleteProp ? (
+                <GridActionsCellItem
+                  key={'delete'}
+                  icon={<DeleteIcon />}
+                  label="Delete"
+                  onClick={() => {
+                    onDeleteProp({ event: { row } });
+                  }}
+                />
+              ) : (
+                <></>
+              ),
             ];
           },
         }
       : null;
-  }, [onDeleteProp]);
+  }, [onDeleteProp, onUpdateProp, rowModesModel]);
 
   const columnsWithActions = React.useMemo(() => {
     return actionField ? [...columns, actionField] : columns;
   }, [columns, actionField]);
-
-  // const actionFieldRef = React.useRef(false);
-
-  // React.useEffect(() => {
-  //   if (!nodeRuntime) {
-  //     return;
-  //   }
-
-  //   if (!onDeleteProp) {
-  //     nodeRuntime.updateAppDomConstProp('columns', (prevCols) =>
-  //       prevCols?.filter((column) => column.field !== 'actions'),
-  //     );
-  //     actionFieldRef.current = false;
-  //     return;
-  //   }
-
-  //   if (actionFieldRef.current === false) {
-  //     nodeRuntime.updateAppDomConstProp('columns', (prevCols) => {
-  //       if (!prevCols) {
-  //         return prevCols;
-  //       }
-  //       const old = prevCols.find((column) => column.field === 'actions');
-  //       if (old) {
-  //         return prevCols;
-  //       }
-  //       return [...prevCols, actionField];
-  //     });
-  //     actionFieldRef.current = true;
-  //   }
-  // }, [actionField, onDeleteProp, nodeRuntime]);
 
   const apiRef = useGridApiRef();
   React.useEffect(() => apiRef.current.updateColumns(columns), [apiRef, columns]);
@@ -378,6 +444,12 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
       <DataGridPro
         apiRef={apiRef}
+        editMode="row"
+        rowModesModel={rowModesModel}
+        onRowModesModelChange={(newModel) => setRowModesModel(newModel)}
+        onRowEditStart={handleRowEditStart}
+        onRowEditStop={handleRowEditStop}
+        processRowUpdate={processRowUpdate}
         experimentalFeatures={{ newEditingApi: true }}
         components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
         onColumnResize={handleResize}
@@ -434,14 +506,21 @@ export default createComponent(DataGridComponent, {
     loading: {
       typeDef: { type: 'boolean' },
     },
-    onDelete: {
-      typeDef: { type: 'event', eventType: 'delete' },
-      label: 'onDelete',
-    },
     sx: {
       typeDef: { type: 'object' },
     },
     onDelete: {
+      typeDef: {
+        type: 'event',
+        arguments: [
+          {
+            name: 'event',
+            tsType: `{ row: ThisComponent['rows'][number] }`,
+          },
+        ],
+      },
+    },
+    onUpdate: {
       typeDef: {
         type: 'event',
         arguments: [

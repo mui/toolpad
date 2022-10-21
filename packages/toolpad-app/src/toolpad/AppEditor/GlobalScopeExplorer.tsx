@@ -35,7 +35,9 @@ export default function GlobalScopeExplorer({
             );
           })}
           {extraGlobalKeys.map((key) => (
-            <Box key={key}>{key}</Box>
+            <Box sx={{ p: 1 }} key={key}>
+              {key}
+            </Box>
           ))}
         </Box>
       </Box>

@@ -14,7 +14,7 @@ export default createComponent(Button, {
   layoutDirection: 'both',
   argTypes: {
     onClick: {
-      typeDef: { type: 'event', eventType: 'click' },
+      typeDef: { type: 'event' },
     },
     content: {
       typeDef: { type: 'string' },

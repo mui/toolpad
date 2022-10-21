@@ -87,7 +87,7 @@ async function resolveRawBody(
   return {
     kind: 'raw',
     contentType,
-    content: String(content),
+    content: typeof content === 'object' ? JSON.stringify(content) : String(content),
   };
 }
 

@@ -37,28 +37,6 @@ export default function NodeAttributeEditor({
   const globalScope = pageState;
   const propType = argType.typeDef;
   const Control = getDefaultControl(argType);
-  if (propType.type === 'event') {
-    if (propType.eventType === 'delete') {
-      const rowsBinding = `${node.id}${namespace ? `.${namespace}` : ''}.rows`;
-      const rowIdFieldBinding = `${node.id}${namespace ? `.${namespace}` : ''}.rowIdField`;
-
-      const rowBindingValue = bindings[rowsBinding]?.value?.[0];
-      const rowIdFieldBindingValue = bindings[rowIdFieldBinding]?.value;
-
-      const event = {
-        type: propType.eventType,
-        row: rowBindingValue,
-        id: rowBindingValue?.[`${rowIdFieldBindingValue ?? 'id'}`],
-      };
-      globalScope.event = event;
-    }
-    if (propType.eventType === 'click') {
-      const event = {
-        type: propType.eventType,
-      };
-      globalScope.event = event;
-    }
-  }
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
   // to make them bindable to other controlled props only

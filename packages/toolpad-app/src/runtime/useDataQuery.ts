@@ -40,7 +40,7 @@ export async function execDataSourceQuery({
 
 export type UseDataQueryConfig = Pick<
   UseQueryOptions<any, unknown, unknown, any[]>,
-  'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
+  'enabled' | 'refetchInterval'
 >;
 
 export interface UseFetch {
@@ -64,15 +64,14 @@ export function useDataQuery(
   {
     enabled = true,
     ...options
-  }: Pick<
-    UseQueryOptions<any, unknown, unknown, any[]>,
-    'enabled' | 'refetchOnWindowFocus' | 'refetchOnReconnect' | 'refetchInterval'
-  >,
+  }: Pick<UseQueryOptions<any, unknown, unknown, any[]>, 'enabled' | 'refetchInterval'>,
 ): UseFetch {
   const { appId, version } = useAppContext();
   const { savedNodes } = React.useContext(CanvasHooksContext);
 
-  const isNodeAvailableOnServer: boolean = savedNodes ? queryId && savedNodes[queryId] : true;
+  // These are only used by the editor to invalidate caches whenever the query changes during editing
+  const nodeHash: number | undefined = savedNodes ? savedNodes[queryId] : undefined;
+  const isNodeAvailableOnServer: boolean = savedNodes ? !!savedNodes[queryId] : true;
 
   const {
     isLoading,
@@ -81,7 +80,7 @@ export function useDataQuery(
     data: responseData = EMPTY_OBJECT,
     refetch,
   } = useQuery(
-    [appId, version, queryId, params],
+    [appId, version, nodeHash, queryId, params],
     ({ signal }) =>
       queryId &&
       execDataSourceQuery({

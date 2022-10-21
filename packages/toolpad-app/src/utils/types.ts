@@ -76,5 +76,7 @@ export type Maybe<T> = T | undefined | null;
 export interface MetaField {
   description?: string;
   deprecated?: boolean | string;
+  tsType?: string;
+  value?: any;
 }
 export type GlobalScopeMeta = Record<string, MetaField>;

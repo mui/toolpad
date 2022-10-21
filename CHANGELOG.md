@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.0.23
+
+<!-- generated comparing v0.0.22..master -->
+
+_Oct 20, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+A new theme for the UI (with light and dark mode), allowing Toolpad apps to be used in iFrames, UI improvements and bug fixes.
+
+- &#8203;<!-- 25 -->Allow iframes (#1162) @oliviertassinari
+- &#8203;<!-- 24 -->Make sure Monaco theme switches correctly (#1179) @Janpot
+- &#8203;<!-- 23 -->Replace chevron icons with arrow icons (#1178) @Janpot
+- &#8203;<!-- 22 -->Remove false sourceMapReference in next config (#1170) @apedroferreira
+- &#8203;<!-- 21 -->Disable queries until dom node has been saved serverside (#1149) @Janpot
+- &#8203;<!-- 20 -->Improvements to Sentry and sourcemaps (#1129) @apedroferreira
+- &#8203;<!-- 19 -->Enforce the restriction on how icons are imported (#1160) @Janpot
+- &#8203;<!-- 18 -->Improve preview feedback in fetch query (#1153) @bytasv
+- &#8203;<!-- 17 -->Fix visible horizontal scroll (#1154) @bytasv
+- &#8203;<!-- 16 -->Mandate node version for toolpad-app (#1141) @Janpot
+- &#8203;<!-- 15 -->Some smoke test for rest datasource (#1147) @Janpot
+- &#8203;<!-- 14 -->Change url in function default source to static self hosted file (#1152) @Janpot
+- &#8203;<!-- 13 -->Move event handler setup to the bridge (#1097) @Janpot
+- &#8203;<!-- 12 -->Try changing @mui/toolpad/index.d.ts to global.d.ts (#1148) @Janpot
+- &#8203;<!-- 11 -->Use Map for app template options (#1135) @apedroferreira
+- &#8203;<!-- 10 -->[app] Fix manifest 401 loading (#1146) @oliviertassinari
+- &#8203;<!-- 09 -->[core] Add CI check that the PR has label (#849) @oliviertassinari
+- &#8203;<!-- 08 -->[core] eslint: Disallow enum (#1151) @Janpot
+- &#8203;<!-- 07 -->[core] Harden GitHub Actions permissions (#1161) @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Add missing redirections @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Improve markdownlint (#1159) @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Update descriptions that are over 160 characters @oliviertassinari
+- &#8203;<!-- 03 -->[runtime] hide queries in the browser (#1155) @Janpot
+- &#8203;<!-- 02 -->[ui] Add branding theme to Toolpad app (#988) @bharatkashyap
+- &#8203;<!-- 01 -->[ui] New component catalog (#1003) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## v0.0.22
 
 <!-- generated comparing v0.0.21..master -->

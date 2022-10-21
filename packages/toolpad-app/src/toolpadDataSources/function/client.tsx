@@ -86,11 +86,14 @@ const DEFAULT_MODULE = `export default async function ({ parameters }: ToolpadFu
   console.info("Executing function with parameters:", parameters);
   const url = new URL("${new URL('/static/movies.json', config.externalUrl).href}");
   url.searchParams.set("timestamp", String(Date.now()));
+
   const response = await fetch(String(url));
   if (!response.ok) {
     throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
   }
-  return response.json();
+  const json = await response.json();
+
+  return json;
 }
 `;
 

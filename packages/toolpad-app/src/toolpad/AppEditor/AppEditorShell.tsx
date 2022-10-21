@@ -108,7 +108,7 @@ function getSaveState(domLoader: DomLoader): React.ReactNode {
   if (domLoader.saveError) {
     return (
       <Tooltip title="Error while saving">
-        <SyncProblemIcon />
+        <SyncProblemIcon color="primary" />
       </Tooltip>
     );
   }
@@ -118,14 +118,14 @@ function getSaveState(domLoader: DomLoader): React.ReactNode {
   if (isSaving) {
     return (
       <Tooltip title="Saving changes...">
-        <SyncIcon />
+        <SyncIcon color="primary" />
       </Tooltip>
     );
   }
 
   return (
     <Tooltip title="All changes saved!">
-      <CloudDoneIcon />
+      <CloudDoneIcon color="primary" />
     </Tooltip>
   );
 }

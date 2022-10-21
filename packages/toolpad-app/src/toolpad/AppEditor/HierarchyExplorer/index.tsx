@@ -2,8 +2,8 @@ import { TreeView } from '@mui/lab';
 import { Typography, styled, Box, IconButton } from '@mui/material';
 import * as React from 'react';
 import TreeItem, { TreeItemProps } from '@mui/lab/TreeItem';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
@@ -231,8 +231,8 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         expanded={expanded}
         onNodeToggle={handleToggle}
         multiSelect
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
+        defaultCollapseIcon={<ArrowDropDownIcon />}
+        defaultExpandIcon={<ArrowRightIcon />}
       >
         <HierarchyTreeItem
           nodeId=":connections"
@@ -306,7 +306,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         open={!!deletedNode}
         severity="error"
         onClose={handledeleteNodeDialogClose}
-        okButton="delete"
+        okButton="Delete"
       >
         Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
       </ConfirmDialog>

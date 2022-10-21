@@ -7,6 +7,9 @@ import client from '../api';
 import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
 import { createProvidedContext } from '../utils/react';
+import { mapValues } from '../utils/collections';
+import insecureHash from '../utils/insecureHash';
+import { NodeHashes } from '../types';
 
 export type DomAction =
   | {
@@ -14,6 +17,7 @@ export type DomAction =
     }
   | {
       type: 'DOM_SAVED';
+      savedDom: appDom.AppDom;
     }
   | {
       type: 'DOM_SAVING_ERROR';
@@ -128,6 +132,7 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
     }
     case 'DOM_SAVED': {
       return update(state, {
+        savedDom: action.savedDom,
         saving: false,
         saveError: null,
         unsavedChanges: 0,
@@ -224,9 +229,14 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
 
 export interface DomLoader {
   dom: appDom.AppDom;
+  savedDom: appDom.AppDom;
   saving: boolean;
   unsavedChanges: number;
   saveError: string | null;
+}
+
+export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
+  return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(node)));
 }
 
 const [useDomLoader, DomLoaderProvider] = createProvidedContext<DomLoader>('DomLoader');
@@ -275,28 +285,27 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     saving: false,
     unsavedChanges: 0,
     saveError: null,
+    savedDom: dom,
     dom,
   });
   const api = React.useMemo(() => createDomApi(dispatch), []);
 
-  const lastSavedDom = React.useRef<appDom.AppDom | null>(state.dom);
   const handleSave = React.useCallback(() => {
-    if (!state.dom || lastSavedDom.current === state.dom) {
+    if (!state.dom || state.saving || state.savedDom === state.dom) {
       return;
     }
 
-    lastSavedDom.current = state.dom;
+    const domToSave = state.dom;
     dispatch({ type: 'DOM_SAVING' });
-
     client.mutation
-      .saveDom(appId, state.dom)
+      .saveDom(appId, domToSave)
       .then(() => {
-        dispatch({ type: 'DOM_SAVED' });
+        dispatch({ type: 'DOM_SAVED', savedDom: domToSave });
       })
       .catch((err) => {
         dispatch({ type: 'DOM_SAVING_ERROR', error: err.message });
       });
-  }, [appId, state.dom]);
+  }, [appId, state]);
 
   const debouncedhandleSave = useDebouncedHandler(handleSave, 1000);
 

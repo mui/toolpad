@@ -1,9 +1,8 @@
 import { darken, lighten, styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
 import * as React from 'react';
-import Inspector, { InspectorProps } from 'react-inspector';
-import inspectorTheme from '../inspectorTheme';
 import { interleave } from '../utils/react';
+import ObjectInspector from './ObjectInspector';
 
 export interface LogEntry {
   timestamp: number;
@@ -83,10 +82,6 @@ const ConsoleRoot = styled('div')(({ theme }) => {
   };
 });
 
-function ConsoleInpector(props: InspectorProps) {
-  return <Inspector {...props} theme={inspectorTheme} />;
-}
-
 interface ConsoleEntryProps {
   entry: LogEntry;
 }
@@ -97,7 +92,7 @@ function ConsoleEntry({ entry }: ConsoleEntryProps) {
       <div className={classes.logEntryText}>
         {interleave(
           entry.args.map((arg, i) =>
-            typeof arg === 'string' ? arg : <ConsoleInpector key={i} data={arg} />,
+            typeof arg === 'string' ? arg : <ObjectInspector key={i} data={arg} />,
           ),
           ' ',
         )}

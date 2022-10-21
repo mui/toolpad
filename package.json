@@ -37,7 +37,6 @@
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.js --repo mui-toolpad",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "test:integration": "playwright test --config ./test/integration/playwright.config.ts",
-    "e2e:smoke": "playwright test --config ./test/e2e-smoke/playwright.config.ts",
     "test": "yarn test:build && jest"
   },
   "devDependencies": {
@@ -65,6 +64,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.9",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-typescript-enum": "^2.1.0",
     "execa": "^6.1.0",
     "format-util": "^1.0.5",
     "jest": "^29.1.2",

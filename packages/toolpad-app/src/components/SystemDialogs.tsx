@@ -45,7 +45,7 @@ export function ConfirmDialog({
   onClose,
   title,
   children,
-  cancelButton = 'cancel',
+  cancelButton = 'Cancel',
   okButton = 'ok',
   severity,
   loading,

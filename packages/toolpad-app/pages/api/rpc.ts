@@ -1,7 +1,6 @@
 import { NextApiHandler } from 'next';
 import type { IncomingMessage, ServerResponse } from 'http';
 import superjson from 'superjson';
-import { withSentry } from '@sentry/nextjs';
 import {
   getApps,
   getApp,
@@ -190,4 +189,4 @@ const rpcServer = {
 
 export type ServerDefinition = MethodsOf<typeof rpcServer>;
 
-export default withSentry(createRpcHandler(rpcServer));
+export default createRpcHandler(rpcServer);

@@ -10,18 +10,14 @@ import {
   Container,
 } from '@mui/material';
 import {
-  useDataQuery,
   ToolpadComponent,
   createComponent,
   TOOLPAD_COMPONENT,
   Slots,
   Placeholder,
   NodeId,
-  execDataSourceQuery,
   BindableAttrValue,
-  UseDataQueryConfig,
   NestedBindableAttrs,
-  UseFetch,
 } from '@mui/toolpad-core';
 import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -65,6 +61,17 @@ import { AppModulesProvider, useAppModules } from './AppModulesProvider';
 import Pre from '../components/Pre';
 import { layoutBoxArgTypes } from '../toolpadComponents/layoutBox';
 import NoSsr from '../components/NoSsr';
+import { execDataSourceQuery, useDataQuery, UseDataQueryConfig, UseFetch } from './useDataQuery';
+import { useAppContext, AppContextProvider } from './AppContext';
+import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
+import useBoolean from '../utils/useBoolean';
+
+const ReactQueryDevtoolsProduction = React.lazy(() =>
+  // eslint-disable-next-line import/extensions
+  import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
+    default: d.ReactQueryDevtools,
+  })),
+);
 
 const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
@@ -83,22 +90,7 @@ const INITIAL_FETCH: UseFetch = {
 const USE_DATA_QUERY_CONFIG_KEYS: readonly (keyof UseDataQueryConfig)[] = [
   'enabled',
   'refetchInterval',
-  'refetchOnReconnect',
-  'refetchOnWindowFocus',
 ];
-
-export interface NavigateToPage {
-  (pageNodeId: NodeId): void;
-}
-
-/**
- * Context created by the app canvas to override behavior for the app editor
- */
-export interface CanvasHooks {
-  navigateToPage?: NavigateToPage;
-}
-
-export const CanvasHooksContext = React.createContext<CanvasHooks>({});
 
 function usePageNavigator(): NavigateToPage {
   const navigate = useNavigate();
@@ -126,15 +118,9 @@ const EditorOverlay = styled('div')({
   overflow: 'hidden',
 });
 
-interface AppContext {
-  appId: string;
-  version: VersionOrPreview;
-}
-
 type ToolpadComponents = Partial<Record<string, ToolpadComponent<any>>>;
 
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
-const [useAppContext, AppContextProvider] = createProvidedContext<AppContext>('App');
 const [useEvaluatePageExpression, EvaluatePageExpressionProvider] =
   createProvidedContext<(expr: string, params: Record<string, unknown>) => any>(
     'EvaluatePageExpression',
@@ -439,17 +425,14 @@ interface QueryNodeProps {
 }
 
 function QueryNode({ node }: QueryNodeProps) {
-  const { appId, version } = useAppContext();
   const bindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
-  const dataUrl = `/api/data/${appId}/${version}/`;
-  const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(dataUrl, queryId, params, options);
+  const queryResult = useDataQuery(node.id, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;
@@ -480,8 +463,7 @@ function MutationNode({ node }: MutationNodeProps) {
   const bindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
-  const dataUrl = `/api/data/${appId}/${version}/`;
-  const mutationId = node.id;
+  const queryId = node.id;
   const params = resolveBindables(bindings, `${node.id}.params`, node.params);
 
   const {
@@ -491,9 +473,14 @@ function MutationNode({ node }: MutationNodeProps) {
     mutateAsync,
   } = useMutation(
     async (overrides: any = {}) =>
-      execDataSourceQuery(dataUrl, mutationId, { ...params, ...overrides }),
+      execDataSourceQuery({
+        appId,
+        version,
+        queryId,
+        params: { ...params, ...overrides },
+      }),
     {
-      mutationKey: [dataUrl, mutationId, params],
+      mutationKey: [appId, version, queryId, params],
     },
   );
 
@@ -893,6 +880,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
+      staleTime: 60 * 1000,
     },
   },
 });
@@ -920,6 +908,12 @@ export default function ToolpadApp({
 
   React.useEffect(() => setResetNodeErrorsKey((key) => key + 1), [dom]);
 
+  const { value: showDevtools, toggle: toggleDevtools } = useBoolean(false);
+
+  React.useEffect(() => {
+    (window as any).toggleDevtools = () => toggleDevtools();
+  }, [toggleDevtools]);
+
   return (
     <AppRoot ref={rootRef}>
       <NoSsr>
@@ -939,6 +933,9 @@ export default function ToolpadApp({
                           <BrowserRouter basename={basename}>
                             <RenderedPages dom={dom} />
                           </BrowserRouter>
+                          {showDevtools ? (
+                            <ReactQueryDevtoolsProduction initialIsOpen={false} />
+                          ) : null}
                         </QueryClientProvider>
                       </AppContextProvider>
                     </ComponentsContext>

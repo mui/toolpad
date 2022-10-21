@@ -176,6 +176,10 @@ interface Selection {
   id?: any;
 }
 
+interface OnDeleteEvent {
+  row: GridRowsProp[number];
+}
+
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
@@ -185,6 +189,7 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   selection?: Selection | null;
   onDelete?: () => void;
   onSelectionChange?: (newSelection?: Selection | null) => void;
+  onDelete?: (event: OnDeleteEvent) => void;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
@@ -435,6 +440,17 @@ export default createComponent(DataGridComponent, {
     },
     sx: {
       typeDef: { type: 'object' },
+    },
+    onDelete: {
+      typeDef: {
+        type: 'event',
+        arguments: [
+          {
+            name: 'event',
+            tsType: `{ row: ThisComponent['rows'][number] }`,
+          },
+        ],
+      },
     },
   },
 });

@@ -14,7 +14,6 @@ export type ServerConfig = {
   databaseUrl: string;
   googleSheetsClientId?: string;
   googleSheetsClientSecret?: string;
-  externalUrl?: string;
   encryptionKeys: string[];
   basicAuthUser?: string;
   basicAuthPassword?: string;
@@ -52,7 +51,6 @@ function readConfig(): ServerConfig & typeof sharedConfig {
     databaseUrl: process.env.TOOLPAD_DATABASE_URL,
     googleSheetsClientId: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
     googleSheetsClientSecret: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
-    externalUrl: process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
     recaptchaSecretKey: process.env.TOOLPAD_RECAPTCHA_SECRET_KEY,
     encryptionKeys,
   };

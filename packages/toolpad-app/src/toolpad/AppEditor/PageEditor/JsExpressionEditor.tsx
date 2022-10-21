@@ -1,10 +1,10 @@
 import * as React from 'react';
 import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
-import { isString } from 'lodash-es';
 import { WithControlledProp, GlobalScopeMeta } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
 import { hasOwnProperty } from '../../../utils/collections';
+import ElementContext from '../ElementContext';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -41,54 +41,58 @@ export function JsExpressionEditor({
   onBlur,
   sx,
 }: JsExpressionEditorProps) {
+  const element = React.useContext(ElementContext);
+
+  const nodeName = element?.name;
+
   const extraLibs = React.useMemo(() => {
     const type = jsonToTs(globalScope);
 
-    const globals = Object.keys(globalScope)
-      .map((key) => {
-        let metaDataString = ``;
+    const globalDeclarations = Object.keys(globalScope).map((key) => {
+      const metaData = hasOwnProperty(globalScopeMeta, key) ? globalScopeMeta[key] : {};
+      const { deprecated, description } = metaData;
 
-        const metaData = hasOwnProperty(globalScopeMeta, key) ? globalScopeMeta[key] : {};
-        const { deprecated, description } = metaData;
+      const commentLines = [];
 
-        if (deprecated && description) {
-          metaDataString = `
-            /** ${description}
-             *  @deprecated ${isString(deprecated) ? deprecated : ''}
-             */
-          `;
-        } else {
-          if (deprecated) {
-            metaDataString = `
-              /** @deprecated ${isString(deprecated) ? deprecated : ''} */
-            `;
-          }
+      if (description) {
+        commentLines.push(description);
+      }
 
-          if (description) {
-            metaDataString = `
-              /** ${description} */
-            `;
-          }
-        }
+      if (typeof deprecated === 'boolean') {
+        commentLines.push('@deprecated');
+      } else if (typeof deprecated === 'string') {
+        commentLines.push(`@deprecated ${deprecated}`);
+      }
 
-        const declaration = `
-          ${metaDataString}
-          declare const ${key}: RootObject[${JSON.stringify(key)}];
-        `;
+      const comment =
+        commentLines.length > 0 ? ['/**', ...commentLines.map((line) => ` * ${line}`), ' */'] : [];
 
-        return declaration;
-      })
-      .join('\n');
+      return [...comment, `declare const ${key}: RootObject[${JSON.stringify(key)}];`].join('\n');
+    });
+
+    const valueKeys = new Set(Object.keys(globalScope));
+    const extraGlobalKeys = Object.keys(globalScopeMeta).filter((key) => !valueKeys.has(key));
+
+    const extraDeclarationLines: string[] = [];
+    for (const key of extraGlobalKeys) {
+      const { tsType } = globalScopeMeta[key];
+      if (tsType) {
+        extraDeclarationLines.push(`declare const ${key}: ${tsType}`);
+      }
+    }
 
     const content = `
       ${type.join('\n')}
 
-      ${globals}
+      ${globalDeclarations.join('\n')}
+
+      ${nodeName ? `type ThisComponent = typeof ${nodeName}` : ''}
       
+      ${extraDeclarationLines.join('\n')}
     `;
 
     return [{ content, filePath: 'global.d.ts' }];
-  }, [globalScope, globalScopeMeta]);
+  }, [globalScope, globalScopeMeta, nodeName]);
 
   return (
     <JsExpressionEditorRoot sx={sx}>

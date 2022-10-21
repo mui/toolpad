@@ -10,9 +10,11 @@ import {
   TextField,
   Toolbar,
   Typography,
+  Alert,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
+import { isEmpty } from 'lodash-es';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   FetchPrivateQuery,
@@ -45,6 +47,7 @@ import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
+import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import DEMO_BASE_URLS from './demoBaseUrls';
 
@@ -144,11 +147,9 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
     ...validation(formState, 'baseUrl'),
   };
 
-  const isDemo = !!process.env.TOOLPAD_DEMO;
-
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
-      {isDemo ? (
+      {config.isDemo ? (
         <TextField select {...baseUrlInputProps} defaultValue="">
           {DEMO_BASE_URLS.map(({ url, name }) => (
             <MenuItem key={url} value={url}>
@@ -168,7 +169,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
           return (
             <MapEntriesEditor
               {...field}
-              disabled={!headersAllowed || isDemo}
+              disabled={!headersAllowed || config.isDemo}
               fieldLabel="header"
               value={allHeaders}
               onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
@@ -184,7 +185,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         render={({ field: { value: fieldValue, ref, ...field } }) => (
           <AuthenticationEditor
             {...field}
-            disabled={!headersAllowed || isDemo}
+            disabled={!headersAllowed || config.isDemo}
             value={fieldValue ?? null}
           />
         )}
@@ -198,6 +199,59 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
       </Toolbar>
     </Stack>
   );
+}
+
+const isCorrectlyTransformedData = (preview: FetchResult) => {
+  const { data, untransformedData } = preview;
+
+  if (isEmpty(untransformedData)) {
+    return true;
+  }
+
+  return !isEmpty(data);
+};
+
+interface ResolvedPreviewProps {
+  preview: FetchResult | null;
+}
+
+function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement | null {
+  if (!preview) {
+    return null;
+  }
+
+  const { untransformedData } = preview;
+
+  if (!untransformedData || isEmpty(untransformedData)) {
+    return (
+      <Alert severity="info" sx={{ m: 2 }}>
+        The request did not return any data.
+      </Alert>
+    );
+  }
+
+  if (!isCorrectlyTransformedData(preview)) {
+    return (
+      <Alert severity="warning" sx={{ m: 2 }}>
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Request successfully completed and returned data with the following keys:
+        </Typography>
+
+        {Object.keys(untransformedData).map((key) => (
+          <Typography variant="caption" sx={{ display: 'block' }} key={key}>
+            - {key}
+          </Typography>
+        ))}
+        <Typography variant="body2" sx={{ mb: 1, mt: 2 }}>
+          However, it seems that the <code>transform</code> function returned an unexpected value.
+          <br />
+          Please check the <code>transform</code> function.
+        </Typography>
+      </Alert>
+    );
+  }
+
+  return <JsonView sx={{ height: '100%' }} src={preview?.data} />;
 }
 
 function QueryEditor({
@@ -329,6 +383,8 @@ function QueryEditor({
     globalScope: queryScope,
   });
 
+  const [activeTab, setActiveTab] = React.useState('urlQuery');
+
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const { preview, runPreview: handleRunPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(
     {
@@ -338,6 +394,10 @@ function QueryEditor({
     },
     {
       onPreview(result) {
+        if (!isCorrectlyTransformedData(result)) {
+          setActiveTab('transform');
+        }
+
         setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
       },
     },
@@ -345,14 +405,10 @@ function QueryEditor({
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const [activeTab, setActiveTab] = React.useState('urlQuery');
-
   const handleActiveTabChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string) => setActiveTab(newValue),
     [],
   );
-
-  const isDemo = !!process.env.TOOLPAD_DEMO;
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>
@@ -363,9 +419,9 @@ function QueryEditor({
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
               <TextField
                 select
-                value={isDemo ? 'GET' : input.query.method || 'GET'}
+                value={config.isDemo ? 'GET' : input.query.method || 'GET'}
                 onChange={handleMethodChange}
-                disabled={isDemo}
+                disabled={config.isDemo}
               >
                 {HTTP_METHODS.map((method) => (
                   <MenuItem key={method} value={method}>
@@ -391,9 +447,9 @@ function QueryEditor({
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                   <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                     <Tab label="URL query" value="urlQuery" />
-                    <Tab label="Body" value="body" disabled={isDemo} />
-                    <Tab label="Headers" value="headers" disabled={isDemo} />
-                    <Tab label="Response" value="response" disabled={isDemo} />
+                    <Tab label="Body" value="body" disabled={config.isDemo} />
+                    <Tab label="Headers" value="headers" disabled={config.isDemo} />
+                    <Tab label="Response" value="response" disabled={config.isDemo} />
                     <Tab label="Transform" value="transform" />
                   </TabList>
                 </Box>
@@ -469,7 +525,7 @@ function QueryEditor({
         {preview?.error ? (
           <ErrorAlert error={preview?.error} />
         ) : (
-          <JsonView sx={{ height: '100%' }} src={preview?.data} />
+          <ResolvedPreview preview={preview} />
         )}
         <Devtools
           sx={{ width: '100%', height: '100%' }}

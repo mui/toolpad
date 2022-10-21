@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-core",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -13,6 +13,7 @@
     ".": "./dist/index.js",
     "./constants": "./dist/constants.js",
     "./runtime": "./dist/runtime.js",
+    "./jsRuntime": "./dist/jsRuntime.js",
     "./objectKey": "./dist/objectKey.js",
     "./utils": "./dist/utils.js"
   },

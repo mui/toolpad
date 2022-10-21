@@ -122,11 +122,9 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     },
   });
 
-  const isDemo = !!process.env.TOOLPAD_DEMO;
-
   return (
     <React.Fragment>
-      <Dialog {...props} onClose={isDemo ? NO_OP : onClose} maxWidth="xs">
+      <Dialog {...props} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
         <DialogForm
           onSubmit={async (event) => {
             event.preventDefault();
@@ -154,7 +152,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
           <DialogContent>
-            {isDemo ? (
+            {config.isDemo ? (
               <Alert severity="warning" sx={{ mb: 2 }}>
                 <AlertTitle>For demo purposes only!</AlertTitle>
                 Your application will be ephemeral and may be deleted at any time.
@@ -236,7 +234,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 createAppMutation.reset();
                 onClose();
               }}
-              disabled={isDemo}
+              disabled={config.isDemo}
             >
               Cancel
             </Button>
@@ -275,7 +273,7 @@ function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
       open={!!app}
       onClose={handleClose}
       severity="error"
-      okButton="delete"
+      okButton="Delete"
       loading={deleteAppMutation.isLoading}
     >
       Are you sure you want to delete application &quot;{latestApp?.name}&quot;
@@ -717,14 +715,12 @@ function AppsListView({
 }
 
 export default function Home() {
-  const isDemo = !!process.env.TOOLPAD_DEMO;
-
   const {
     data: apps = [],
     isLoading,
     error,
   } = client.useQuery('getApps', [], {
-    enabled: !isDemo,
+    enabled: !config.isDemo,
   });
   const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);
 
@@ -737,7 +733,7 @@ export default function Home() {
     );
   }, [activeDeployments]);
 
-  const [createDialogOpen, setCreateDialogOpen] = React.useState(isDemo);
+  const [createDialogOpen, setCreateDialogOpen] = React.useState(config.isDemo);
 
   const [deletedApp, setDeletedApp] = React.useState<null | AppMeta>(null);
 
@@ -765,8 +761,8 @@ export default function Home() {
   return (
     <ToolpadShell>
       <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      {!isDemo ? (
-        <Container>
+      {!config.isDemo ? (
+        <Container sx={{ my: 1 }}>
           <Typography variant="h2">Apps</Typography>
           <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
             <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>

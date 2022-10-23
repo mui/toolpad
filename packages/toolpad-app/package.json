@@ -99,7 +99,7 @@
     "react-router-dom": "^6.3.0",
     "react-split-pane": "^0.1.92",
     "serialize-javascript": "^6.0.0",
-    "ses": "^0.15.23",
+    "ses": "^0.16.0",
     "sucrase": "^3.28.0",
     "superjson": "^1.10.1",
     "ts-node": "^10.9.1",

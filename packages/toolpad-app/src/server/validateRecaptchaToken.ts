@@ -28,6 +28,7 @@ export const validateRecaptchaToken = async (
   logInfo(
     {
       key: 'captchaValidation',
+      token,
       recaptchaRes: recaptchaResponseJson,
     },
     'Validated CAPTCHA',

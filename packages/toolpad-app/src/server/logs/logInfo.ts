@@ -16,6 +16,7 @@ type RpcReqResLogPayload = {
 
 type CaptchaValidationLogPayload = {
   key: 'captchaValidation';
+  token: string;
   recaptchaRes: RecaptchaResJson;
 };
 

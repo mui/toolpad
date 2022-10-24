@@ -21,7 +21,7 @@ function isInRender() {
 /**
  * See https://github.com/reactjs/rfcs/pull/220
  */
-export default function useEvent<F extends Function>(handler: F): F {
+export default function useEvent<F extends (...args: any[]) => void>(handler: F): F {
   useRenderTracker();
   const ref = React.useRef(handler);
   React.useInsertionEffect(() => {
@@ -33,6 +33,6 @@ export default function useEvent<F extends Function>(handler: F): F {
       throw new Error('Cannot call event in Render!');
     }
     const fn = ref.current;
-    return fn(...args);
+    fn(...args);
   }, []);
 }

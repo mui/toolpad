@@ -15,6 +15,8 @@ import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
 import { useNameInputError } from './validation';
 
+const DEFAULT_NAME = 'MyComponent';
+
 function createDefaultCodeComponent(name: string): string {
   const componentId = name.replace(/\s/g, '');
   const propTypeId = `${componentId}Props`;
@@ -64,12 +66,12 @@ export default function CreateCodeComponentDialog({
     [dom],
   );
 
-  const [name, setName] = React.useState(appDom.proposeName('MyComponent', existingNames));
+  const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
 
   const navigate = useNavigate();
 
   // Reset form
-  const handleReset = useEvent(() => setName(appDom.proposeName('page', existingNames)));
+  const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
 
   React.useEffect(() => {
     if (open) {
@@ -120,7 +122,7 @@ export default function CreateCodeComponentDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!name || isNameInvalid}>
+          <Button type="submit" disabled={isNameInvalid}>
             Create
           </Button>
         </DialogActions>

@@ -14,6 +14,8 @@ import useEvent from '../../../utils/useEvent';
 import { useDom, useDomApi } from '../../DomLoader';
 import { useNameInputError } from './validation';
 
+const DEFAULT_NAME = 'page';
+
 export interface CreatePageDialogProps {
   appId: string;
   open: boolean;
@@ -34,12 +36,12 @@ export default function CreatePageDialog({
     [dom],
   );
 
-  const [name, setName] = React.useState(appDom.proposeName('page', existingNames));
+  const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
 
   const navigate = useNavigate();
 
   // Reset form
-  const handleReset = useEvent(() => setName(appDom.proposeName('page', existingNames)));
+  const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
 
   React.useEffect(() => {
     if (open) {
@@ -86,7 +88,7 @@ export default function CreatePageDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!name || isNameInvalid}>
+          <Button type="submit" disabled={isNameInvalid}>
             Create
           </Button>
         </DialogActions>

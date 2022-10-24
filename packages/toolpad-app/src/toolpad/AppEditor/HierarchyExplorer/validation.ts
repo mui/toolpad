@@ -7,7 +7,7 @@ export function useNameInputError(name: string, disallowedNames: Set<string>, ki
     return name
       ? appDom.validateNodeName(name, `a ${kind} name`) ||
           (isUnique ? null : `There already is a ${kind} with this name`)
-      : null;
+      : 'a name is required';
   }, [name, kind, isUnique]);
   return inputErrorMsg;
 }

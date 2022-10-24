@@ -17,6 +17,8 @@ import DialogForm from '../../../components/DialogForm';
 import { useNameInputError } from './validation';
 import useEvent from '../../../utils/useEvent';
 
+const DEFAULT_NAME = 'connection';
+
 export interface CreateConnectionDialogProps {
   appId: string;
   open: boolean;
@@ -37,13 +39,13 @@ export default function CreateConnectionDialog({
     [dom],
   );
 
-  const [name, setName] = React.useState(appDom.proposeName('connection', existingNames));
+  const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
 
   const [dataSourceType, setDataSourceType] = React.useState('');
   const navigate = useNavigate();
 
   // Reset form
-  const handleReset = useEvent(() => setName(appDom.proposeName('connection', existingNames)));
+  const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
 
   React.useEffect(() => {
     if (open) {
@@ -112,7 +114,7 @@ export default function CreateConnectionDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!dataSourceType || !name || isNameInvalid}>
+          <Button type="submit" disabled={!dataSourceType || isNameInvalid}>
             Create
           </Button>
         </DialogActions>

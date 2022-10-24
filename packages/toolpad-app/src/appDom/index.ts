@@ -800,7 +800,15 @@ export function moveNode<Parent extends AppDomNode, Child extends AppDomNode>(
   return setNodeParent(dom, node, parent.id, parentProp, parentIndex);
 }
 
+export function nodeExists(dom: AppDom, nodeId: NodeId): boolean {
+  return !!getMaybeNode(dom, nodeId);
+}
+
 export function saveNode(dom: AppDom, node: AppDomNode) {
+  if (!nodeExists(dom, node.id)) {
+    throw new Error(`Attempt to update node "${node.id}", but it doesn't exist in the dom`);
+  }
+
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: update(dom.nodes[node.id], omit(node, ...RESERVED_NODE_PROPERTIES)),

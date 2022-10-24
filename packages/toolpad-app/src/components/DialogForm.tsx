@@ -12,7 +12,7 @@ export interface DialogFormProps extends React.FormHTMLAttributes<HTMLFormElemen
   onKeyDown?: (event: React.KeyboardEvent) => void;
 }
 
-export default ({ children, onKeyDown = () => {}, ...rest }: DialogFormProps) => {
+export default function DialogForm({ children, onKeyDown = () => {}, ...rest }: DialogFormProps) {
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent) => {
       const modifierKey = (event.metaKey || event.ctrlKey) && !event.shiftKey;

@@ -14,6 +14,8 @@ const Centered = styled('div')({
   alignItems: 'center',
 });
 
+console.log('nothing');
+
 function FullPageLoader() {
   return (
     <Centered>

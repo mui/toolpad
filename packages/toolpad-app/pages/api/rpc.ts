@@ -25,7 +25,7 @@ import {
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
-import { withRpcReqResLogs } from '../../src/server/withLogs';
+import { withRpcReqResLogs } from '../../src/server/logs/withLogs';
 
 export const config = {
   api: {

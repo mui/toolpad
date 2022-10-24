@@ -949,16 +949,16 @@ export function duplicateNode(
   dom: AppDom,
   node: AppDomNode,
   parent: AppDomNode | null = getParent(dom, node),
-  parentprop: string | null = node.parentProp,
+  parentProp: string | null = node.parentProp,
 ): AppDom {
-  if (!parent || !parentprop) {
+  if (!parent || !parentProp) {
     throw new Error(`Node: "${node.id}" can't be duplicated`);
   }
 
   const newNode = createNode(dom, node.type, node);
   const childNodes = getChildNodes(dom, node);
 
-  dom = addNode<any, any>(dom, newNode, parent, parentprop);
+  dom = addNode<any, any>(dom, newNode, parent, parentProp);
 
   for (const [childParentProp, children] of Object.entries(childNodes)) {
     if (children) {

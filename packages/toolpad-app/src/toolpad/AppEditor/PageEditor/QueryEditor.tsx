@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { BindableAttrEntries, BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
@@ -32,6 +32,7 @@ import BindableEditor from './BindableEditor';
 import { ConfirmDialog } from '../../../components/SystemDialogs';
 import useBoolean from '../../../utils/useBoolean';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
+import useEvent from '../../../utils/useEvent';
 
 const EMPTY_OBJECT = {};
 
@@ -161,24 +162,32 @@ interface QueryNodeEditorProps<Q> {
   onSave: (newNode: appDom.QueryNode) => void;
   onRemove: (newNode: appDom.QueryNode) => void;
   node: appDom.QueryNode<Q>;
+  isDraft: boolean;
 }
 
 function QueryNodeEditorDialog<Q>({
   open,
-  node,
+  node: nodeProp,
   onClose,
   onRemove,
   onSave,
+  isDraft,
 }: QueryNodeEditorProps<Q>) {
   const { appId } = usePageEditorState();
   const dom = useDom();
 
+  // To keep it around during closing animation
+  const node = useLatest(nodeProp);
+
   const [input, setInput] = React.useState<appDom.QueryNode<Q>>(node);
+
+  const reset = useEvent(() => setInput(node));
+
   React.useEffect(() => {
     if (open) {
-      setInput(node);
+      reset();
     }
-  }, [open, node]);
+  }, [open, reset]);
 
   const connectionId = input.attributes.connectionId.value
     ? appDom.deref(input.attributes.connectionId.value)
@@ -292,7 +301,7 @@ function QueryNodeEditorDialog<Q>({
     onClose();
   }, [onRemove, node, onClose]);
 
-  const isInputSaved = node === input;
+  const isInputSaved = !isDraft && node === input;
 
   const handleClose = React.useCallback(() => {
     const ok = isInputSaved
@@ -438,9 +447,15 @@ function QueryNodeEditorDialog<Q>({
   );
 }
 
-type DialogState = {
-  nodeId?: NodeId;
-};
+type DialogState =
+  | {
+      node?: undefined;
+      isDraft?: undefined;
+    }
+  | {
+      node: appDom.QueryNode;
+      isDraft: boolean;
+    };
 
 export default function QueryEditor() {
   const dom = useDom();
@@ -459,18 +474,20 @@ export default function QueryEditor() {
   }, []);
 
   const handleCreated = React.useCallback(
-    (node: appDom.QueryNode) => {
-      domApi.addNode(node, page, 'queries');
-      setDialogState({ nodeId: node.id });
-    },
-    [domApi, page],
+    (node: appDom.QueryNode) => setDialogState({ node, isDraft: true }),
+    [],
   );
 
   const handleSave = React.useCallback(
     (node: appDom.QueryNode) => {
-      domApi.saveNode(node);
+      if (appDom.nodeExists(dom, node.id)) {
+        domApi.saveNode(node);
+      } else {
+        domApi.addNode(node, page, 'queries');
+      }
+      setDialogState({ node, isDraft: false });
     },
-    [domApi],
+    [dom, domApi, page],
   );
 
   const handleRemove = React.useCallback(
@@ -480,13 +497,6 @@ export default function QueryEditor() {
     },
     [domApi, handleEditStateDialogClose],
   );
-
-  const editedNode = dialogState?.nodeId
-    ? appDom.getMaybeNode(dom, dialogState.nodeId, 'query')
-    : null;
-
-  // To keep it around during closing animation
-  const lastEditednode = useLatest(editedNode);
 
   return (
     <Stack spacing={1} alignItems="start">
@@ -499,17 +509,18 @@ export default function QueryEditor() {
             <ListItem
               key={queryNode.id}
               button
-              onClick={() => setDialogState({ nodeId: queryNode.id })}
+              onClick={() => setDialogState({ node: queryNode, isDraft: false })}
             >
               {queryNode.name}
             </ListItem>
           );
         })}
       </List>
-      {dialogState?.nodeId && lastEditednode ? (
+      {dialogState?.node ? (
         <QueryNodeEditorDialog
           open={!!dialogState}
-          node={lastEditednode}
+          node={dialogState.node}
+          isDraft={dialogState.isDraft}
           onSave={handleSave}
           onRemove={handleRemove}
           onClose={handleEditStateDialogClose}

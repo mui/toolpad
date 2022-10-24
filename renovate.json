@@ -96,6 +96,7 @@
     {
       "fileMatch": ["^.circleci/config.yml$"],
       "matchStrings": ["mcr.microsoft.com/playwright:(?<currentValue>.*)"],
+      "packageNameTemplate": "mcr.microsoft.com/playwright",
       "depNameTemplate": "playwright",
       "datasourceTemplate": "docker"
     }

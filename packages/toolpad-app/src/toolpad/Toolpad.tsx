@@ -59,6 +59,7 @@ export default function Toolpad({ basename }: EditorProps) {
     <NoSsr>
       {/* Container that allows children to size to it with height: 100% */}
       <Box sx={{ height: '1px', minHeight: '100vh' }}>
+        {/* eslint-disable-next-line react/no-unstable-nested-components */}
         <ErrorBoundary fallbackRender={({ error }) => <FullPageError error={error} />}>
           <React.Suspense fallback={<FullPageLoader />}>
             <BrowserRouter basename={basename}>

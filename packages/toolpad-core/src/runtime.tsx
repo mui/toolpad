@@ -106,6 +106,7 @@ export function NodeRuntimeWrapper({ nodeId, componentConfig, children }: NodeRu
   return (
     <ErrorBoundary
       resetKeys={[resetNodeErrorsKey]}
+      // eslint-disable-next-line react/no-unstable-nested-components
       fallbackRender={({ error }) => (
         <NodeFiberHost
           {...{

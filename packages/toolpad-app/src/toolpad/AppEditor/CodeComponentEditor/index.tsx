@@ -243,6 +243,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
               <React.Suspense fallback={null}>
                 <ErrorBoundary
                   resetKeys={[CodeComponent]}
+                  // eslint-disable-next-line react/no-unstable-nested-components
                   fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
                 >
                   <AppThemeProvider dom={dom}>

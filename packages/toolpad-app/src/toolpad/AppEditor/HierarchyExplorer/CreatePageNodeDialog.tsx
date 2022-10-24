@@ -12,7 +12,7 @@ import * as appDom from '../../../appDom';
 import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
 import { useDom, useDomApi } from '../../DomLoader';
-import { useNameInputError } from './validation';
+import { useNodeNameValidation } from './validation';
 
 const DEFAULT_NAME = 'page';
 
@@ -49,8 +49,8 @@ export default function CreatePageDialog({
     }
   }, [open, handleReset]);
 
-  const inputErrorMsg = useNameInputError(name, existingNames, 'page');
-  const isNameInvalid = !!inputErrorMsg;
+  const inputErrorMsg = useNodeNameValidation(name, existingNames, 'page');
+  const isNameValid = !inputErrorMsg;
 
   return (
     <Dialog open={open} onClose={onClose} {...props}>
@@ -80,7 +80,7 @@ export default function CreatePageDialog({
             label="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            error={isNameInvalid}
+            error={!isNameValid}
             helperText={inputErrorMsg}
           />
         </DialogContent>
@@ -88,7 +88,7 @@ export default function CreatePageDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isNameInvalid}>
+          <Button type="submit" disabled={!isNameValid}>
             Create
           </Button>
         </DialogActions>

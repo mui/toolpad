@@ -14,7 +14,7 @@ import { useDom, useDomApi } from '../../DomLoader';
 import dataSources from '../../../toolpadDataSources/client';
 import { ExactEntriesOf } from '../../../utils/types';
 import DialogForm from '../../../components/DialogForm';
-import { useNameInputError } from './validation';
+import { useNodeNameValidation } from './validation';
 import useEvent from '../../../utils/useEvent';
 
 const DEFAULT_NAME = 'connection';
@@ -53,8 +53,8 @@ export default function CreateConnectionDialog({
     }
   }, [open, handleReset]);
 
-  const inputErrorMsg = useNameInputError(name, existingNames, 'connection');
-  const isNameInvalid = !!inputErrorMsg;
+  const inputErrorMsg = useNodeNameValidation(name, existingNames, 'connection');
+  const isNameValid = !inputErrorMsg;
 
   return (
     <Dialog open={open} onClose={onClose} {...props}>
@@ -89,7 +89,7 @@ export default function CreateConnectionDialog({
             label="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            error={isNameInvalid}
+            error={!isNameValid}
             helperText={inputErrorMsg}
           />
           <TextField
@@ -114,7 +114,7 @@ export default function CreateConnectionDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!dataSourceType || isNameInvalid}>
+          <Button type="submit" disabled={!dataSourceType || !isNameValid}>
             Create
           </Button>
         </DialogActions>

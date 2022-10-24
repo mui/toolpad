@@ -13,7 +13,7 @@ import { useDom, useDomApi } from '../../DomLoader';
 import { format } from '../../../utils/prettier';
 import DialogForm from '../../../components/DialogForm';
 import useEvent from '../../../utils/useEvent';
-import { useNameInputError } from './validation';
+import { useNodeNameValidation } from './validation';
 
 const DEFAULT_NAME = 'MyComponent';
 
@@ -83,8 +83,8 @@ export default function CreateCodeComponentDialog({
     event.target.select();
   }, []);
 
-  const inputErrorMsg = useNameInputError(name, existingNames, 'component');
-  const isNameInvalid = !!inputErrorMsg;
+  const inputErrorMsg = useNodeNameValidation(name, existingNames, 'component');
+  const isNameValid = !inputErrorMsg;
 
   return (
     <Dialog open={open} onClose={onClose} {...props}>
@@ -114,7 +114,7 @@ export default function CreateCodeComponentDialog({
             label="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            error={isNameInvalid}
+            error={!isNameValid}
             helperText={inputErrorMsg}
           />
         </DialogContent>
@@ -122,7 +122,7 @@ export default function CreateCodeComponentDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isNameInvalid}>
+          <Button type="submit" disabled={!isNameValid}>
             Create
           </Button>
         </DialogActions>

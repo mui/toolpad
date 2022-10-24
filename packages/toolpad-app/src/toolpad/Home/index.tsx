@@ -44,6 +44,7 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Controller, useForm } from 'react-hook-form';
+import invariant from 'invariant';
 import useBoolean from '../../utils/useBoolean';
 import useEvent from '../../utils/useEvent';
 import client from '../../api';
@@ -127,9 +128,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
       <Dialog {...props} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
         <DialogForm
           onSubmit={async (event) => {
-            if (!name) {
-              return;
-            }
+            invariant(name, 'Invalid form state');
 
             event.preventDefault();
             let recaptchaToken;

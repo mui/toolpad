@@ -36,7 +36,6 @@ function parseBuidEnvVars(env) {
 
   return {
     TOOLPAD_TARGET: target,
-    TOOLPAD_DEMO: env.TOOLPAD_DEMO || '',
     TOOLPAD_VERSION: pkgJson.version,
     TOOLPAD_BUILD: env.GIT_SHA1?.slice(0, 7) || 'dev',
   };
@@ -65,7 +64,7 @@ const regexEqual = (x, y) => {
 const securityHeaders = [
   {
     key: 'X-Frame-Options',
-    value: 'SAMEORIGIN',
+    value: 'DENY',
   },
   {
     // Force the browser to trust the Content-Type header
@@ -92,7 +91,7 @@ const sentryWebpackPluginOptions = {
 
   silent: true, // Suppresses all logs
 
-  dryRun: !process.env.TOOLPAD_SENTRY_DSN,
+  dryRun: true,
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
@@ -103,6 +102,7 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
   {
     reactStrictMode: true,
     poweredByHeader: false,
+    productionBrowserSourceMaps: true,
     eslint: {
       // We're running this as part of the monorepo eslint
       ignoreDuringBuilds: true,
@@ -167,13 +167,8 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
       return config;
     },
     sentry: {
-      // Use `hidden-source-map` rather than `source-map` as the Webpack `devtool`
-      // for client-side builds. (This will be the default starting in
-      // `@sentry/nextjs` version 8.0.0.) See
-      // https://webpack.js.org/configuration/devtool/ and
-      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#use-hidden-source-map
-      // for more information.
-      hideSourceMaps: true,
+      autoInstrumentServerFunctions: true,
+      hideSourceMaps: false,
     },
     async redirects() {
       return [
@@ -195,8 +190,17 @@ export default /** @type {import('next').NextConfig} */ withSentryConfig(
     headers: async () => {
       return [
         {
-          source: '/:path*',
+          source: '/((?!deploy/).*)',
           headers: securityHeaders,
+        },
+        {
+          source: '/app-canvas/:path*',
+          headers: [
+            {
+              key: 'X-Frame-Options',
+              value: 'SAMEORIGIN',
+            },
+          ],
         },
       ];
     },

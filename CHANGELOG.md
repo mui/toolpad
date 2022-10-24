@@ -1,5 +1,94 @@
 # Changelog
 
+## 0.0.23
+
+<!-- generated comparing v0.0.22..master -->
+
+_Oct 20, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+A new theme for the UI (with light and dark mode), allowing Toolpad apps to be used in iFrames, UI improvements and bug fixes.
+
+- &#8203;<!-- 25 -->Allow iframes (#1162) @oliviertassinari
+- &#8203;<!-- 24 -->Make sure Monaco theme switches correctly (#1179) @Janpot
+- &#8203;<!-- 23 -->Replace chevron icons with arrow icons (#1178) @Janpot
+- &#8203;<!-- 22 -->Remove false sourceMapReference in next config (#1170) @apedroferreira
+- &#8203;<!-- 21 -->Disable queries until dom node has been saved serverside (#1149) @Janpot
+- &#8203;<!-- 20 -->Improvements to Sentry and sourcemaps (#1129) @apedroferreira
+- &#8203;<!-- 19 -->Enforce the restriction on how icons are imported (#1160) @Janpot
+- &#8203;<!-- 18 -->Improve preview feedback in fetch query (#1153) @bytasv
+- &#8203;<!-- 17 -->Fix visible horizontal scroll (#1154) @bytasv
+- &#8203;<!-- 16 -->Mandate node version for toolpad-app (#1141) @Janpot
+- &#8203;<!-- 15 -->Some smoke test for rest datasource (#1147) @Janpot
+- &#8203;<!-- 14 -->Change url in function default source to static self hosted file (#1152) @Janpot
+- &#8203;<!-- 13 -->Move event handler setup to the bridge (#1097) @Janpot
+- &#8203;<!-- 12 -->Try changing @mui/toolpad/index.d.ts to global.d.ts (#1148) @Janpot
+- &#8203;<!-- 11 -->Use Map for app template options (#1135) @apedroferreira
+- &#8203;<!-- 10 -->[app] Fix manifest 401 loading (#1146) @oliviertassinari
+- &#8203;<!-- 09 -->[core] Add CI check that the PR has label (#849) @oliviertassinari
+- &#8203;<!-- 08 -->[core] eslint: Disallow enum (#1151) @Janpot
+- &#8203;<!-- 07 -->[core] Harden GitHub Actions permissions (#1161) @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Add missing redirections @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Improve markdownlint (#1159) @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Update descriptions that are over 160 characters @oliviertassinari
+- &#8203;<!-- 03 -->[runtime] hide queries in the browser (#1155) @Janpot
+- &#8203;<!-- 02 -->[ui] Add branding theme to Toolpad app (#988) @bharatkashyap
+- &#8203;<!-- 01 -->[ui] New component catalog (#1003) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
+## v0.0.22
+
+<!-- generated comparing v0.0.21..master -->
+
+_Oct 12, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Improve update notification, fold mutations into queries, support duplicating application, support public applications, rename parameters in queries, add observability for our demo mode.
+
+- &#8203;<!-- 38 -->Fix saving issues (#1142) @Janpot
+- &#8203;<!-- 37 -->Add update notification instead of banner (#1128) @bharatkashyap
+- &#8203;<!-- 36 -->Fix parameters for fetch queries (#1140) @Janpot
+- &#8203;<!-- 35 -->Migrate existing mutations to queries (#1130) @Janpot
+- &#8203;<!-- 34 -->Memoize useMenu onMenuClose (#1139) @Janpot
+- &#8203;<!-- 33 -->Make sure parameters work in query preview (#1138) @Janpot
+- &#8203;<!-- 32 -->Fix a few issues with app DOM migrations (#1133) @Janpot
+- &#8203;<!-- 31 -->Update resource class for test_static (#1103) @Janpot
+- &#8203;<!-- 30 -->Update renovate.json for playwright @Janpot
+- &#8203;<!-- 29 -->remove manager @Janpot
+- &#8203;<!-- 28 -->core-js restriction @Janpot
+- &#8203;<!-- 27 -->Fix warning on save (#1125) @Janpot
+- &#8203;<!-- 26 -->Make queries capable of mutations (#1122) @Janpot
+- &#8203;<!-- 25 -->pin node version for more reproducability in the builds (#1119) @Janpot
+- &#8203;<!-- 24 -->Allow duplicating apps (#658) @bharatkashyap
+- &#8203;<!-- 23 -->Google Analytics improvements (#1090) @apedroferreira
+- &#8203;<!-- 22 -->reCAPTCHA improvements (#1087) @apedroferreira
+- &#8203;<!-- 21 -->Silence sentry warning (#1102) @Janpot
+- &#8203;<!-- 20 -->Update playwright (#1118) @Janpot
+- &#8203;<!-- 19 -->Handle appDom versioning (#776) @bharatkashyap
+- &#8203;<!-- 18 -->Update renovate.json @Janpot
+- &#8203;<!-- 17 -->Revert "[core] Add default data to DataGrid, Image, Select components" (#1106) @Janpot
+- &#8203;<!-- 16 -->Update renovate.json @Janpot
+- &#8203;<!-- 15 -->New renovatebot schedule (#1099) @Janpot
+- &#8203;<!-- 14 -->Try out sharing vscode setup (#782) @Janpot
+- &#8203;<!-- 13 -->Allow empty argTypes object in component config (#1088) @Janpot
+- &#8203;<!-- 12 -->Alternative fix for 1050 (#1091) @Janpot
+- &#8203;<!-- 11 -->Add enableColorScheme to CssBaseline in app theme (#1100) @Janpot
+- &#8203;<!-- 10 -->Store next.js cache after the build (#1104) @Janpot
+- &#8203;<!-- 09 -->Avoid state update during layout effect in NoSsr (#857) @Janpot
+- &#8203;<!-- 08 -->Add a few more cache folders in circleci (#1089) @Janpot
+- &#8203;<!-- 07 -->Support public applications (#1009) @Janpot
+- &#8203;<!-- 06 -->[app] Select options editor enhancements (#1055) @bharatkashyap
+- &#8203;<!-- 05 -->[core] disable react-router-dom update (#1123) @Janpot
+- &#8203;<!-- 04 -->[core] Remove jsdoc eslint (#1109) @Janpot
+- &#8203;<!-- 03 -->[core] Remove dead dependency @oliviertassinari
+- &#8203;<!-- 02 -->[core] Rename query and params to parameters in fetch and function editors (#1096) @bytasv
+- &#8203;<!-- 01 -->[core] x10 speedup of yarn install in the CI (#1098) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## v0.0.21
 
 <!-- generated comparing v0.0.20..master -->

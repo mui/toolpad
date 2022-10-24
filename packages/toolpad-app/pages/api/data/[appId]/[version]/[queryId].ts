@@ -1,6 +1,5 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
 import { NextApiHandler } from 'next';
-import { withSentry } from '@sentry/nextjs';
 import { parseVersion } from '../../../../../src/server/data';
 import handleDataRequest from '../../../../../src/server/handleDataRequest';
 import { withReqResLogs } from '../../../../../src/server/logs/withLogs';
@@ -29,4 +28,4 @@ const apiHandler = (async (req, res) => {
   await handleDataRequest(req, res, { appId, version });
 }) as NextApiHandler<ExecFetchResult<any>>;
 
-export default withSentry(withReqResLogs(apiHandler));
+export default withReqResLogs(apiHandler);

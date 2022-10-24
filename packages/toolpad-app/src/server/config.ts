@@ -14,7 +14,6 @@ export type ServerConfig = {
   databaseUrl: string;
   googleSheetsClientId?: string;
   googleSheetsClientSecret?: string;
-  externalUrl?: string;
   encryptionKeys: string[];
   basicAuthUser?: string;
   basicAuthPassword?: string;

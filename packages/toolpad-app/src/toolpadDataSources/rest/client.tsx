@@ -10,6 +10,8 @@ import {
   TextField,
   Toolbar,
   Typography,
+  Alert,
+  styled,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
@@ -45,6 +47,7 @@ import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
+import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import DEMO_BASE_URLS from './demoBaseUrls';
 
@@ -59,6 +62,15 @@ const GLOBAL_SCOPE_META: GlobalScopeMeta = {
     description: 'Parameters that can be bound to app scope variables',
   },
 };
+
+const ButtonLink = styled('button')(({ theme }) => ({
+  background: 'none',
+  border: 'none',
+  fontSize: 'inherit',
+  padding: 0,
+  color: theme.palette.primary.main,
+  textDecoration: 'underline',
+}));
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -144,11 +156,9 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
     ...validation(formState, 'baseUrl'),
   };
 
-  const isDemo = !!process.env.TOOLPAD_DEMO;
-
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
-      {isDemo ? (
+      {config.isDemo ? (
         <TextField select {...baseUrlInputProps} defaultValue="">
           {DEMO_BASE_URLS.map(({ url, name }) => (
             <MenuItem key={url} value={url}>
@@ -168,7 +178,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
           return (
             <MapEntriesEditor
               {...field}
-              disabled={!headersAllowed || isDemo}
+              disabled={!headersAllowed || config.isDemo}
               fieldLabel="header"
               value={allHeaders}
               onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
@@ -184,7 +194,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         render={({ field: { value: fieldValue, ref, ...field } }) => (
           <AuthenticationEditor
             {...field}
-            disabled={!headersAllowed || isDemo}
+            disabled={!headersAllowed || config.isDemo}
             value={fieldValue ?? null}
           />
         )}
@@ -197,6 +207,53 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         </Button>
       </Toolbar>
     </Stack>
+  );
+}
+
+interface ResolvedPreviewProps {
+  preview: FetchResult | null;
+  onShowTransform: () => void;
+}
+
+function ResolvedPreview({
+  preview,
+  onShowTransform,
+}: ResolvedPreviewProps): React.ReactElement | null {
+  if (!preview) {
+    return null;
+  }
+
+  const { data, untransformedData } = preview;
+  let alert = null;
+  const responseDataKeys = Object.keys(untransformedData);
+
+  if (typeof data === 'undefined' && typeof untransformedData !== 'undefined') {
+    alert = (
+      <Alert severity="warning" sx={{ m: 1, p: 1, fontSize: 11 }}>
+        <Box sx={{ mb: 1 }}>
+          Request successfully completed and returned data
+          {responseDataKeys.length > 0 ? ' with the following keys:' : '.'}
+        </Box>
+
+        {responseDataKeys.map((key) => (
+          <Box sx={{ display: 'block' }} key={key}>
+            - {key}
+          </Box>
+        ))}
+
+        <Box sx={{ mt: 1 }}>
+          However, it seems that the <ButtonLink onClick={onShowTransform}>transform</ButtonLink>{' '}
+          function returned an <code>undefined</code> value.
+        </Box>
+      </Alert>
+    );
+  }
+
+  return (
+    <React.Fragment>
+      {alert}
+      <JsonView sx={{ height: '100%' }} src={preview?.data} />
+    </React.Fragment>
   );
 }
 
@@ -329,6 +386,8 @@ function QueryEditor({
     globalScope: queryScope,
   });
 
+  const [activeTab, setActiveTab] = React.useState('urlQuery');
+
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const { preview, runPreview: handleRunPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(
     {
@@ -345,14 +404,10 @@ function QueryEditor({
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
-  const [activeTab, setActiveTab] = React.useState('urlQuery');
-
   const handleActiveTabChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string) => setActiveTab(newValue),
     [],
   );
-
-  const isDemo = !!process.env.TOOLPAD_DEMO;
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>
@@ -363,9 +418,9 @@ function QueryEditor({
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
               <TextField
                 select
-                value={isDemo ? 'GET' : input.query.method || 'GET'}
+                value={config.isDemo ? 'GET' : input.query.method || 'GET'}
                 onChange={handleMethodChange}
-                disabled={isDemo}
+                disabled={config.isDemo}
               >
                 {HTTP_METHODS.map((method) => (
                   <MenuItem key={method} value={method}>
@@ -391,9 +446,9 @@ function QueryEditor({
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                   <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                     <Tab label="URL query" value="urlQuery" />
-                    <Tab label="Body" value="body" disabled={isDemo} />
-                    <Tab label="Headers" value="headers" disabled={isDemo} />
-                    <Tab label="Response" value="response" disabled={isDemo} />
+                    <Tab label="Body" value="body" disabled={config.isDemo} />
+                    <Tab label="Headers" value="headers" disabled={config.isDemo} />
+                    <Tab label="Response" value="response" disabled={config.isDemo} />
                     <Tab label="Transform" value="transform" />
                   </TabList>
                 </Box>
@@ -465,11 +520,18 @@ function QueryEditor({
         </Box>
       </SplitPane>
 
-      <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
+      <SplitPane
+        split="horizontal"
+        size="30%"
+        minSize={30}
+        primary="second"
+        allowResize
+        pane1Style={{ overflow: 'auto' }}
+      >
         {preview?.error ? (
           <ErrorAlert error={preview?.error} />
         ) : (
-          <JsonView sx={{ height: '100%' }} src={preview?.data} />
+          <ResolvedPreview preview={preview} onShowTransform={() => setActiveTab('transform')} />
         )}
         <Devtools
           sx={{ width: '100%', height: '100%' }}

@@ -173,6 +173,10 @@ interface Selection {
   id?: any;
 }
 
+interface OnDeleteEvent {
+  row: GridRowsProp[number];
+}
+
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
@@ -181,6 +185,8 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   error?: Error | string;
   selection?: Selection | null;
   onSelectionChange?: (newSelection?: Selection | null) => void;
+  onDelete?: (event: OnDeleteEvent) => void;
+  hideToolbar?: boolean;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
@@ -192,6 +198,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     error: errorProp,
     selection,
     onSelectionChange,
+    hideToolbar,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -312,7 +319,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
       <DataGridPro
         apiRef={apiRef}
-        components={{ Toolbar: GridToolbar, LoadingOverlay: SkeletonLoadingOverlay }}
+        components={{
+          Toolbar: hideToolbar ? null : GridToolbar,
+          LoadingOverlay: SkeletonLoadingOverlay,
+        }}
         onColumnResize={handleResize}
         onColumnOrderChange={handleColumnOrderChange}
         rows={rows}
@@ -367,8 +377,22 @@ export default createComponent(DataGridComponent, {
     loading: {
       typeDef: { type: 'boolean' },
     },
+    hideToolbar: {
+      typeDef: { type: 'boolean' },
+    },
     sx: {
       typeDef: { type: 'object' },
+    },
+    onDelete: {
+      typeDef: {
+        type: 'event',
+        arguments: [
+          {
+            name: 'event',
+            tsType: `{ row: ThisComponent['rows'][number] }`,
+          },
+        ],
+      },
     },
   },
 });

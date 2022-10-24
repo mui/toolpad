@@ -18,12 +18,12 @@ export default function DialogForm({ children, onKeyDown = () => {}, ...rest }: 
       const modifierKey = (event.metaKey || event.ctrlKey) && !event.shiftKey;
 
       if (event.key === 'Enter' && modifierKey) {
-        const submitEvent = new Event('submit', {
-          cancelable: true,
-          bubbles: true,
-        });
+        const submitButton: HTMLButtonElement | null =
+          event.currentTarget.querySelector('[type="submit"]');
 
-        event.currentTarget.dispatchEvent(submitEvent);
+        if (submitButton) {
+          submitButton.click();
+        }
       }
 
       onKeyDown(event);

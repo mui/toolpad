@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { format } from '../../../utils/prettier';
@@ -73,9 +74,7 @@ export default function CreateCodeComponentDialog({
       <DialogForm
         autoComplete="off"
         onSubmit={(event) => {
-          if (!name || isInvalid) {
-            return;
-          }
+          invariant(name && !isInvalid, 'Invalid form state');
 
           event.preventDefault();
           const newNode = appDom.createNode(dom, 'codeComponent', {

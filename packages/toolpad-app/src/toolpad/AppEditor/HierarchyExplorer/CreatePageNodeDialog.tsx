@@ -7,6 +7,7 @@ import {
   TextField,
 } from '@mui/material';
 import * as React from 'react';
+import invariant from 'invariant';
 import { useNavigate } from 'react-router-dom';
 import * as appDom from '../../../appDom';
 import DialogForm from '../../../components/DialogForm';
@@ -41,9 +42,7 @@ export default function CreatePageDialog({
       <DialogForm
         autoComplete="off"
         onSubmit={(event) => {
-          if (!name) {
-            return;
-          }
+          invariant(name, 'Invalid form state');
 
           event.preventDefault();
           const newNode = appDom.createNode(dom, 'page', {

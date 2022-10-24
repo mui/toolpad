@@ -51,9 +51,7 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
 
   const deployMutation = client.useMutation('deploy');
   const doSubmit = handleSubmit(async (releaseParams) => {
-    if (!lastRelease.isSuccess) {
-      return;
-    }
+    invariant(lastRelease.isSuccess, 'Invalid form state being submited');
 
     await deployMutation.mutateAsync([appId, releaseParams]);
     const url = new URL(`/deploy/${appId}/pages`, window.location.href);

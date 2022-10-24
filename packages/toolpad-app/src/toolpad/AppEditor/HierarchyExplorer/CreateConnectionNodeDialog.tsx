@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import dataSources from '../../../toolpadDataSources/client';
@@ -36,9 +37,7 @@ export default function CreateConnectionDialog({
       <DialogForm
         autoComplete="off"
         onSubmit={(event) => {
-          if (!dataSourceType) {
-            return;
-          }
+          invariant(dataSourceType, 'Invalid form state');
 
           event.preventDefault();
           const dataSource = dataSources[dataSourceType];

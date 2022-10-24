@@ -3,7 +3,7 @@ import { withSentry } from '@sentry/nextjs';
 import { asArray } from '../../../../src/utils/collections';
 import serverDataSources from '../../../../src/toolpadDataSources/server';
 import { getConnectionParams, setConnectionParams } from '../../../../src/server/data';
-import withReqResLogs from '../../../../src/server/withReqResLogs';
+import { withReqResLogs } from '../../../../src/server/withLogs';
 
 export const config = {
   api: {

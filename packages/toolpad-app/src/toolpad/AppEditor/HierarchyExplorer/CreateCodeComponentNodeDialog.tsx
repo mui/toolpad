@@ -108,6 +108,7 @@ export default function CreateCodeComponentDialog({
         <DialogContent>
           <TextField
             sx={{ my: 1 }}
+            required
             onFocus={handleInputFocus}
             autoFocus
             fullWidth

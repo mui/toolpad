@@ -84,6 +84,7 @@ export default function CreateConnectionDialog({
         <DialogContent>
           <TextField
             sx={{ my: 1 }}
+            required
             autoFocus
             fullWidth
             label="name"

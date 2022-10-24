@@ -75,6 +75,7 @@ export default function CreatePageDialog({
         <DialogContent>
           <TextField
             sx={{ my: 1 }}
+            required
             autoFocus
             fullWidth
             label="name"

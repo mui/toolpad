@@ -239,7 +239,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       const isSecondLastLayoutContainerChild =
         parent &&
         appDom.isElement(parent) &&
-        (isPageRow(parent) || isPageColumn(parent)) &&
+        isPageLayoutComponent(parent) &&
         parentChildren.length === 2;
 
       const hasNoLayoutContainerSiblings =
@@ -255,7 +255,11 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           )[0];
 
           if (lastContainerChild.parentProp) {
-            if (moveTargetNodeId !== parent.id && moveTargetNodeId !== lastContainerChild.id) {
+            if (
+              moveTargetNodeId !== parent.id &&
+              moveTargetNodeId !== lastContainerChild.id &&
+              isPageLayoutComponent(parentParent)
+            ) {
               domApi.moveNode(
                 lastContainerChild,
                 parentParent,

@@ -54,7 +54,6 @@ function readConfig(): ServerConfig & typeof sharedConfig {
     databaseUrl: process.env.TOOLPAD_DATABASE_URL,
     googleSheetsClientId: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID,
     googleSheetsClientSecret: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
-    externalUrl: process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
     serverLogsEnabled: !!process.env.TOOLPAD_SERVER_LOGS_ENABLED,
     recaptchaSecretKey: process.env.TOOLPAD_RECAPTCHA_SECRET_KEY,
     ecsHostUrl: process.env.TOOLPAD_ECS_HOST_URL,

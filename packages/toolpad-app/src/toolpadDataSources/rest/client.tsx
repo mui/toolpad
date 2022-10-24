@@ -11,10 +11,10 @@ import {
   Toolbar,
   Typography,
   Alert,
+  styled,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { isEmpty } from 'lodash-es';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   FetchPrivateQuery,
@@ -62,6 +62,15 @@ const GLOBAL_SCOPE_META: GlobalScopeMeta = {
     description: 'Parameters that can be bound to app scope variables',
   },
 };
+
+const ButtonLink = styled('button')(({ theme }) => ({
+  background: 'none',
+  border: 'none',
+  fontSize: 'inherit',
+  padding: 0,
+  color: theme.palette.primary.main,
+  textDecoration: 'underline',
+}));
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -201,57 +210,51 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   );
 }
 
-const isCorrectlyTransformedData = (preview: FetchResult) => {
-  const { data, untransformedData } = preview;
-
-  if (isEmpty(untransformedData)) {
-    return true;
-  }
-
-  return !isEmpty(data);
-};
-
 interface ResolvedPreviewProps {
   preview: FetchResult | null;
+  onShowTransform: () => void;
 }
 
-function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement | null {
+function ResolvedPreview({
+  preview,
+  onShowTransform,
+}: ResolvedPreviewProps): React.ReactElement | null {
   if (!preview) {
     return null;
   }
 
-  const { untransformedData } = preview;
+  const { data, untransformedData } = preview;
+  let alert = null;
+  const responseDataKeys = Object.keys(untransformedData);
 
-  if (!untransformedData || isEmpty(untransformedData)) {
-    return (
-      <Alert severity="info" sx={{ m: 2 }}>
-        The request did not return any data.
-      </Alert>
-    );
-  }
+  if (typeof data === 'undefined' && typeof untransformedData !== 'undefined') {
+    alert = (
+      <Alert severity="warning" sx={{ m: 1, p: 1, fontSize: 11 }}>
+        <Box sx={{ mb: 1 }}>
+          Request successfully completed and returned data
+          {responseDataKeys.length > 0 ? ' with the following keys:' : '.'}
+        </Box>
 
-  if (!isCorrectlyTransformedData(preview)) {
-    return (
-      <Alert severity="warning" sx={{ m: 2 }}>
-        <Typography variant="body2" sx={{ mb: 1 }}>
-          Request successfully completed and returned data with the following keys:
-        </Typography>
-
-        {Object.keys(untransformedData).map((key) => (
-          <Typography variant="caption" sx={{ display: 'block' }} key={key}>
+        {responseDataKeys.map((key) => (
+          <Box sx={{ display: 'block' }} key={key}>
             - {key}
-          </Typography>
+          </Box>
         ))}
-        <Typography variant="body2" sx={{ mb: 1, mt: 2 }}>
-          However, it seems that the <code>transform</code> function returned an unexpected value.
-          <br />
-          Please check the <code>transform</code> function.
-        </Typography>
+
+        <Box sx={{ mt: 1 }}>
+          However, it seems that the <ButtonLink onClick={onShowTransform}>transform</ButtonLink>{' '}
+          function returned an <code>undefined</code> value.
+        </Box>
       </Alert>
     );
   }
 
-  return <JsonView sx={{ height: '100%' }} src={preview?.data} />;
+  return (
+    <React.Fragment>
+      {alert}
+      <JsonView sx={{ height: '100%' }} src={preview?.data} />
+    </React.Fragment>
+  );
 }
 
 function QueryEditor({
@@ -394,10 +397,6 @@ function QueryEditor({
     },
     {
       onPreview(result) {
-        if (!isCorrectlyTransformedData(result)) {
-          setActiveTab('transform');
-        }
-
         setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
       },
     },
@@ -521,11 +520,18 @@ function QueryEditor({
         </Box>
       </SplitPane>
 
-      <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
+      <SplitPane
+        split="horizontal"
+        size="30%"
+        minSize={30}
+        primary="second"
+        allowResize
+        pane1Style={{ overflow: 'auto' }}
+      >
         {preview?.error ? (
           <ErrorAlert error={preview?.error} />
         ) : (
-          <ResolvedPreview preview={preview} />
+          <ResolvedPreview preview={preview} onShowTransform={() => setActiveTab('transform')} />
         )}
         <Devtools
           sx={{ width: '100%', height: '100%' }}

@@ -2,6 +2,7 @@ import { SxProps, TextField } from '@mui/material';
 import * as React from 'react';
 import * as appDom from '../../appDom';
 import { useDom, useDomApi } from '../DomLoader';
+import { useNodeNameValidation } from './HierarchyExplorer/validation';
 
 interface NodeNameEditorProps {
   node: appDom.AppDomNode;
@@ -20,18 +21,17 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
     [],
   );
 
-  const isUnique = React.useMemo(() => {
-    const disallowedNames = appDom.getExistingNames(dom, node);
-    return !disallowedNames.has(nameInput);
-  }, [dom, node, nameInput]);
+  const existingNames = React.useMemo(() => appDom.getExistingNamesForNode(dom, node), [dom, node]);
+  const nodeNameError = useNodeNameValidation(nameInput, existingNames, node.type);
+  const isNameValid = !nodeNameError;
 
   const handleNameCommit = React.useCallback(() => {
-    if (isUnique) {
+    if (isNameValid) {
       domApi.setNodeName(node.id, nameInput);
     } else {
       setNameInput(node.name);
     }
-  }, [isUnique, domApi, node.id, node.name, nameInput]);
+  }, [isNameValid, domApi, node.id, node.name, nameInput]);
 
   const handleKeyPress = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -47,7 +47,8 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
       sx={sx}
       fullWidth
       label="name"
-      error={!isUnique}
+      error={!isNameValid}
+      helperText={nodeNameError}
       value={nameInput}
       onChange={handleNameInputChange}
       onBlur={handleNameCommit}

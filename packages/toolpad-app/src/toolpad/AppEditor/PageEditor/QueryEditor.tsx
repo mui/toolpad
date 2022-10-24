@@ -23,7 +23,6 @@ import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
 import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
-import NodeNameEditor from '../NodeNameEditor';
 import { omit, update } from '../../../utils/immutability';
 import { useEvaluateLiveBinding } from '../useEvaluateLiveBinding';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -32,6 +31,7 @@ import ConnectionSelect, { ConnectionOption } from './ConnectionSelect';
 import BindableEditor from './BindableEditor';
 import { ConfirmDialog } from '../../../components/SystemDialogs';
 import useBoolean from '../../../utils/useBoolean';
+import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 
 const EMPTY_OBJECT = {};
 
@@ -324,13 +324,32 @@ function QueryNodeEditorDialog<Q>({
 
   const mode = input.attributes.mode?.value || 'query';
 
+  const existingNames = React.useMemo(
+    () => appDom.getExistingNamesForNode(dom, input),
+    [dom, input],
+  );
+
+  const nodeNameError = useNodeNameValidation(input.name, existingNames, 'query');
+  const isNameValid = !nodeNameError;
+
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
       {dataSourceId && dataSource && queryEditorContext ? (
         <ConnectionContextProvider value={queryEditorContext}>
           <DialogTitle>
             <Stack direction="row" gap={2}>
-              <NodeNameEditor node={node} />
+              <TextField
+                required
+                autoFocus
+                fullWidth
+                label="name"
+                value={input.name}
+                onChange={(event) =>
+                  setInput((existing) => ({ ...existing, name: event.target.value }))
+                }
+                error={!isNameValid}
+                helperText={nodeNameError}
+              />
               <ConnectionSelect
                 dataSource={dataSourceId}
                 value={
@@ -409,7 +428,7 @@ function QueryNodeEditorDialog<Q>({
             onSave={handleSave}
             onClose={handleClose}
             onRemove={handleRemove}
-            saveDisabled={isInputSaved}
+            saveDisabled={isInputSaved || !isNameValid}
           />
         </ConnectionContextProvider>
       ) : (

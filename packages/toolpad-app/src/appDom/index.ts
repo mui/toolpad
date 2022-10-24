@@ -24,7 +24,6 @@ export const RESERVED_NODE_PROPERTIES = [
   'parentId',
   'parentProp',
   'parentIndex',
-  'name',
 ] as const;
 export type ReservedNodeProperty = typeof RESERVED_NODE_PROPERTIES[number];
 
@@ -415,7 +414,7 @@ export function getParent<N extends AppDomNode>(dom: AppDom, child: N): ParentOf
 
 type AppDomNodeInitOfType<T extends AppDomNodeType> = Omit<
   AppDomNodeOfType<T>,
-  ReservedNodeProperty
+  ReservedNodeProperty | 'name'
 > & { name?: string };
 
 function createNodeInternal<T extends AppDomNodeType>(
@@ -433,27 +432,7 @@ function createNodeInternal<T extends AppDomNodeType>(
   } as AppDomNodeOfType<T>;
 }
 
-export function validateNodeName(input: string, identifier = 'input'): string | null {
-  const firstLetter = input[0];
-  if (!/[a-z_]/i.test(firstLetter)) {
-    return `${identifier} may not start with a "${firstLetter}"`;
-  }
-
-  const match = /([^a-z0-9_])/i.exec(input);
-
-  if (match) {
-    const invalidCharacter = match[1];
-    if (/\s/.test(invalidCharacter)) {
-      return `${identifier} may not contain spaces`;
-    }
-
-    return `${identifier} may not contain a "${invalidCharacter}"`;
-  }
-
-  return null;
-}
-
-export function slugifyNodeName(nameCandidate: string, fallback: string): string {
+function slugifyNodeName(nameCandidate: string, fallback: string): string {
   let slug = nameCandidate;
   slug = slug.trim();
   // try to replace accents with relevant ascii
@@ -468,6 +447,38 @@ export function slugifyNodeName(nameCandidate: string, fallback: string): string
     slug = fallback;
   }
   return slug;
+}
+
+export function validateNodeName(name: string, disallowedNames: Set<string>, kind: string) {
+  if (!name) {
+    return 'a name is required';
+  }
+
+  const firstLetter = name[0];
+  if (!/[a-z_]/i.test(firstLetter)) {
+    return `${kind} may not start with a "${firstLetter}"`;
+  }
+
+  const match = /([^a-z0-9_])/i.exec(name);
+
+  if (match) {
+    const invalidCharacter = match[1];
+    if (/\s/.test(invalidCharacter)) {
+      return `${kind} may not contain spaces`;
+    }
+
+    return `${kind} may not contain a "${invalidCharacter}"`;
+  }
+
+  const slug = slugifyNodeName(name, kind);
+
+  const isDuplicate = disallowedNames.has(slug);
+
+  if (isDuplicate) {
+    return `There already is a ${kind} with this name`;
+  }
+
+  return null;
 }
 
 export function createNode<T extends AppDomNodeType>(
@@ -572,13 +583,17 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
 }
 
 /**
- * Returns the set of names for which the given node must have a unique name
+ * Returns the set of names for which the given node must have a different name
  */
-export function getExistingNames(dom: AppDom, node: AppDomNode): Set<string> {
+export function getExistingNamesForNode(dom: AppDom, node: AppDomNode): Set<string> {
   if (isElement(node)) {
     const pageNode = getPageAncestor(dom, node);
     const pageDescendants = pageNode ? getDescendants(dom, pageNode) : [];
-    return new Set(pageDescendants.map((scopeNode) => scopeNode.name));
+    return new Set(
+      pageDescendants
+        .filter((descendant) => descendant.id !== node.id)
+        .map((scopeNode) => scopeNode.name),
+    );
   }
 
   return new Set(getSiblings(dom, node).map((scopeNode) => scopeNode.name));
@@ -607,14 +622,15 @@ export function getExistingNamesForChildren<Parent extends AppDomNode>(
 }
 
 export function proposeName(candidate: string, disallowedNames: Set<string> = new Set()): string {
-  if (!disallowedNames.has(candidate)) {
-    return candidate;
+  const slug = slugifyNodeName(candidate, 'node');
+  if (!disallowedNames.has(slug)) {
+    return slug;
   }
   let counter = 1;
-  while (disallowedNames.has(candidate + counter)) {
+  while (disallowedNames.has(slug + counter)) {
     counter += 1;
   }
-  return candidate + counter;
+  return slug + counter;
 }
 
 export function setNodeName(dom: AppDom, node: AppDomNode, name: string): AppDom {

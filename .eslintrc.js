@@ -87,5 +87,24 @@ module.exports = {
       files: ['packages/*/src/**/*{.ts,.tsx,.js}'],
       excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx'],
     },
+    {
+      files: ['packages/toolpad-core/**/*', 'packages/toolpad-components/**/*'],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            patterns: [
+              {
+                // Running into issues with @mui/icons-material not being an ESM pakage, while the
+                // toolpad-core package is. This makes Next.js try to load @mui/icons-material/* as ESM
+                // Loading from the index export works as a workaround for now
+                group: ['@mui/icons-material/*'],
+                message: "Use `import { Icon } from '@mui/icons-material'` instead.",
+              },
+            ],
+          },
+        ],
+      },
+    },
   ],
 };

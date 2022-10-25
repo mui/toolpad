@@ -361,16 +361,15 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     (id: GridRowId) => () => {
       setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
     },
-    [],
+    [rowModesModel],
   );
 
   const processRowUpdate = React.useCallback(
     (newRow: GridRowsProp[number]) => {
-      const updatedRow = { ...newRow, isNew: false };
       if (onUpdateProp) {
-        onUpdateProp({ event: { row: updatedRow } });
+        onUpdateProp({ event: { row: newRow } });
       }
-      return updatedRow;
+      return newRow;
     },
     [onUpdateProp],
   );
@@ -389,11 +388,13 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                 <GridActionsCellItem
                   icon={<SaveIcon />}
                   label="Save"
+                  key={'Save'}
                   onClick={handleSaveClick(id)}
                 />,
                 <GridActionsCellItem
                   icon={<CancelIcon />}
                   label="Cancel"
+                  key={'Cancel'}
                   onClick={handleCancelClick(id)}
                 />,
               ];
@@ -408,7 +409,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                   }}
                 />
               ) : (
-                <></>
+                <React.Fragment />
               ),
               onDeleteProp ? (
                 <GridActionsCellItem
@@ -420,13 +421,13 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                   }}
                 />
               ) : (
-                <></>
+                <React.Fragment />
               ),
             ];
           },
         }
       : null;
-  }, [onDeleteProp, onUpdateProp, rowModesModel]);
+  }, [onDeleteProp, onUpdateProp, rowModesModel, handleCancelClick, handleSaveClick]);
 
   const columnsWithActions = React.useMemo(() => {
     return actionField ? [...columns, actionField] : columns;

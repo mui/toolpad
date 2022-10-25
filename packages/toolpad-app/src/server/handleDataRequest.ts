@@ -8,6 +8,7 @@ import * as appDom from '../appDom';
 import { errorFrom, serializeError } from '../utils/errors';
 import { basicAuthUnauthorized, checkBasicAuth } from './basicAuth';
 import { reportSentryError } from '../utils/sentry';
+import config from './config';
 
 // Initialize the cors middleware
 const cors = initMiddleware<any>(
@@ -53,7 +54,7 @@ export default async (
     return;
   }
 
-  if (!app.public) {
+  if (!app.public && !config.isDemo) {
     if (!checkBasicAuth(req)) {
       basicAuthUnauthorized(res);
       return;

@@ -2,6 +2,7 @@ import type { GetServerSideProps, NextPage } from 'next';
 import * as React from 'react';
 import { asArray } from '../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../src/runtime/ToolpadApp';
+import config from '../../../src/server/config';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
   const [
@@ -26,7 +27,7 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
   //   context.res.setHeader('X-Frame-Options', 'DENY');
   // }
 
-  if (!app.public) {
+  if (!app.public && !config.isDemo) {
     if (!checkBasicAuth(context.req)) {
       basicAuthUnauthorized(context.res);
       // basicAuthUnauthorized calls res.end()

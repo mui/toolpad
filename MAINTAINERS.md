@@ -15,7 +15,7 @@ _We choose these labels according to the way we divide work in the repository, w
 
 ### source
 
-- _no label_: For pull rwquests by Toolpad maintainers.
+- _no label_: For pull requests by Toolpad maintainers.
 - `community`: For pull requests opened by members of the community.
 
 ### kind

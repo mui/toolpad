@@ -95,7 +95,7 @@ module.exports = {
           {
             patterns: [
               {
-                // Running into issues with @mui/icons-material not being an ESM pakage, while the
+                // Running into issues with @mui/icons-material not being an ESM package, while the
                 // toolpad-core package is. This makes Next.js try to load @mui/icons-material/* as ESM
                 // Loading from the index export works as a workaround for now
                 group: ['@mui/icons-material/*'],

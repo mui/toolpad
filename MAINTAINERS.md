@@ -22,6 +22,7 @@ _We choose these labels according to the way we divide work in the repository, w
 
 - _no label_: Default.
 - `regression`: For bug fixes of regressions, generally, these PRs are accompanied by a test.
+- `dependencies`: Automatically applied by dependabot on dependency updates.
 
 ## Release process
 

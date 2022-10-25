@@ -13,6 +13,10 @@ import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { format } from '../../../utils/prettier';
 import DialogForm from '../../../components/DialogForm';
+import useEvent from '../../../utils/useEvent';
+import { useNodeNameValidation } from './validation';
+
+const DEFAULT_NAME = 'MyComponent';
 
 function createDefaultCodeComponent(name: string): string {
   const componentId = name.replace(/\s/g, '');
@@ -51,27 +55,41 @@ export interface CreateCodeComponentDialogProps {
 
 export default function CreateCodeComponentDialog({
   appId,
+  open,
   onClose,
   ...props
 }: CreateCodeComponentDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const [name, setName] = React.useState(`MyComponent`);
+
+  const existingNames = React.useMemo(
+    () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'codeComponents'),
+    [dom],
+  );
+
+  const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
+
   const navigate = useNavigate();
+
+  // Reset form
+  const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
+
+  React.useEffect(() => {
+    if (open) {
+      handleReset();
+    }
+  }, [open, handleReset]);
 
   const handleInputFocus = React.useCallback((event: React.FocusEvent<HTMLInputElement>) => {
     event.target.select();
   }, []);
 
-  const inputErrorMsg = React.useMemo(
-    () => (name ? appDom.validateNodeName(name, 'a code component name') : null),
-    [name],
-  );
-  const isInvalid = !!inputErrorMsg;
-  const isFormValid = name && !isInvalid;
+  const inputErrorMsg = useNodeNameValidation(name, existingNames, 'component');
+  const isNameValid = !inputErrorMsg;
+  const isFormValid = isNameValid;
 
   return (
-    <Dialog {...props} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} {...props}>
       <DialogForm
         autoComplete="off"
         onSubmit={(event) => {
@@ -94,13 +112,14 @@ export default function CreateCodeComponentDialog({
         <DialogContent>
           <TextField
             sx={{ my: 1 }}
+            required
             onFocus={handleInputFocus}
             autoFocus
             fullWidth
             label="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            error={isInvalid}
+            error={!isNameValid}
             helperText={inputErrorMsg}
           />
         </DialogContent>

@@ -106,7 +106,7 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
       );
     }
     case 'DOM_DUPLICATE_NODE': {
-      return appDom.duplicateNode<any, any>(dom, action.node);
+      return appDom.duplicateNode(dom, action.node);
     }
     case 'DOM_SAVE_NODE': {
       return appDom.saveNode(dom, action.node);

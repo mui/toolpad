@@ -15,6 +15,10 @@ import { useDom, useDomApi } from '../../DomLoader';
 import dataSources from '../../../toolpadDataSources/client';
 import { ExactEntriesOf } from '../../../utils/types';
 import DialogForm from '../../../components/DialogForm';
+import { useNodeNameValidation } from './validation';
+import useEvent from '../../../utils/useEvent';
+
+const DEFAULT_NAME = 'connection';
 
 export interface CreateConnectionDialogProps {
   appId: string;
@@ -24,17 +28,38 @@ export interface CreateConnectionDialogProps {
 
 export default function CreateConnectionDialog({
   appId,
+  open,
   onClose,
   ...props
 }: CreateConnectionDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
+
+  const existingNames = React.useMemo(
+    () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'connections'),
+    [dom],
+  );
+
+  const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
+
   const [dataSourceType, setDataSourceType] = React.useState('');
   const navigate = useNavigate();
-  const isFormValid = Boolean(dataSourceType);
+
+  // Reset form
+  const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
+
+  React.useEffect(() => {
+    if (open) {
+      handleReset();
+    }
+  }, [open, handleReset]);
+
+  const inputErrorMsg = useNodeNameValidation(name, existingNames, 'connection');
+  const isNameValid = !inputErrorMsg;
+  const isFormValid = dataSourceType && isNameValid;
 
   return (
-    <Dialog {...props} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} {...props}>
       <DialogForm
         autoComplete="off"
         onSubmit={(event) => {
@@ -46,6 +71,7 @@ export default function CreateConnectionDialog({
             throw new Error(`Can't find a datasource for "${dataSourceType}"`);
           }
           const newNode = appDom.createNode(dom, 'connection', {
+            name,
             attributes: {
               dataSource: appDom.createConst(dataSourceType),
               params: appDom.createSecret(null),
@@ -60,6 +86,17 @@ export default function CreateConnectionDialog({
       >
         <DialogTitle>Create a new MUI Toolpad Connection</DialogTitle>
         <DialogContent>
+          <TextField
+            sx={{ my: 1 }}
+            required
+            autoFocus
+            fullWidth
+            label="name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            error={!isNameValid}
+            helperText={inputErrorMsg}
+          />
           <TextField
             select
             sx={{ my: 1 }}

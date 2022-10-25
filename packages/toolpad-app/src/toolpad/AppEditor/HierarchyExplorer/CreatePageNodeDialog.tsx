@@ -11,7 +11,11 @@ import invariant from 'invariant';
 import { useNavigate } from 'react-router-dom';
 import * as appDom from '../../../appDom';
 import DialogForm from '../../../components/DialogForm';
+import useEvent from '../../../utils/useEvent';
 import { useDom, useDomApi } from '../../DomLoader';
+import { useNodeNameValidation } from './validation';
+
+const DEFAULT_NAME = 'page';
 
 export interface CreatePageDialogProps {
   appId: string;
@@ -27,20 +31,31 @@ export default function CreatePageDialog({
 }: CreatePageDialogProps) {
   const dom = useDom();
   const domApi = useDomApi();
-  const [name, setName] = React.useState('');
+
+  const existingNames = React.useMemo(
+    () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'pages'),
+    [dom],
+  );
+
+  const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
+
   const navigate = useNavigate();
+
+  // Reset form
+  const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
 
   React.useEffect(() => {
     if (open) {
-      // Reset form
-      setName('');
+      handleReset();
     }
-  }, [open]);
+  }, [open, handleReset]);
 
-  const isFormValid = Boolean(name);
+  const inputErrorMsg = useNodeNameValidation(name, existingNames, 'page');
+  const isNameValid = !inputErrorMsg;
+  const isFormValid = isNameValid;
 
   return (
-    <Dialog {...props} open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} {...props}>
       <DialogForm
         autoComplete="off"
         onSubmit={(event) => {
@@ -64,11 +79,14 @@ export default function CreatePageDialog({
         <DialogContent>
           <TextField
             sx={{ my: 1 }}
+            required
             autoFocus
             fullWidth
             label="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
+            error={!isNameValid}
+            helperText={inputErrorMsg}
           />
         </DialogContent>
         <DialogActions>

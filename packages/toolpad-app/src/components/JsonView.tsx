@@ -63,33 +63,28 @@ export default function JsonView({ src, sx, copyToClipboard, disabled, ...props 
 
   return (
     <JsonViewRoot sx={sx} className={clsx({ [classes.disabled]: disabled })}>
-      {typeof src === 'undefined' ? null : (
-        <React.Fragment>
-          <div className={classes.viewport}>
-            <ObjectInspector expandLevel={1} expandPaths={expandPaths} data={src} {...props} />
-          </div>
+      <React.Fragment>
+        <div className={classes.viewport}>
+          <ObjectInspector expandLevel={1} expandPaths={expandPaths} data={src} {...props} />
+        </div>
 
-          {copyToClipboard ? (
-            <React.Fragment>
-              <Tooltip title="Copy the source">
-                <IconButton
-                  onClick={handleCopyToClipboard}
-                  className={classes.copyToClipboardButton}
-                >
-                  <ContentCopyIcon />
-                </IconButton>
-              </Tooltip>
+        {copyToClipboard ? (
+          <React.Fragment>
+            <Tooltip title="Copy the source">
+              <IconButton onClick={handleCopyToClipboard} className={classes.copyToClipboardButton}>
+                <ContentCopyIcon />
+              </IconButton>
+            </Tooltip>
 
-              <Snackbar
-                open={confirmSnackbarOpen}
-                autoHideDuration={3000}
-                onClose={handleCopySnackbarClose}
-                message="Source Copied to clipboard"
-              />
-            </React.Fragment>
-          ) : null}
-        </React.Fragment>
-      )}
+            <Snackbar
+              open={confirmSnackbarOpen}
+              autoHideDuration={3000}
+              onClose={handleCopySnackbarClose}
+              message="Source Copied to clipboard"
+            />
+          </React.Fragment>
+        ) : null}
+      </React.Fragment>
     </JsonViewRoot>
   );
 }

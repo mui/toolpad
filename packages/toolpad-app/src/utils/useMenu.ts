@@ -8,8 +8,8 @@ export default function useMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const onMenuClose = React.useCallback((event: React.SyntheticEvent) => {
-    event.stopPropagation();
+  const onMenuClose = React.useCallback((event?: React.SyntheticEvent) => {
+    event?.stopPropagation();
     setAnchorEl(null);
   }, []);
 
@@ -32,7 +32,7 @@ export default function useMenu() {
       id: menuId,
       anchorEl,
       open,
-      onClose: onMenuClose,
+      onClose: () => onMenuClose(),
       MenuListProps: {
         'aria-labelledby': buttonId,
       },

@@ -20,6 +20,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
+import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
@@ -305,11 +306,21 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   const handleDuplicateNode = React.useCallback(
     (nodeId: NodeId) => () => {
       const node = appDom.getNode(dom, nodeId);
-      domApi.duplicateNode(node);
 
-      // TODO: navigate to new node
+      invariant(
+        node.parentId && node.parentProp,
+        'Duplication should never be called on nodes that are not placed in the dom',
+      );
+
+      const fragment = appDom.cloneFragment(dom, node.id);
+      domApi.addFragment(fragment, node.parentId, node.parentProp);
+      const fragmentRoot = appDom.getNode(fragment, fragment.root);
+      const editorLink = getLinkToNodeEditor(appId, fragmentRoot);
+      if (editorLink) {
+        navigate(editorLink);
+      }
     },
-    [dom, domApi],
+    [appId, dom, domApi, navigate],
   );
 
   return (

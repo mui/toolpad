@@ -961,7 +961,7 @@ export function addFragment(
   parentIndex?: string | undefined,
 ) {
   const parent = getNode(dom, parentId);
-  const existingNames = getExistingNamesForChildren(dom, parent, parentProp);
+  const existingNames = getExistingNamesForChildren<any>(dom, parent, parentProp);
   let combinedDom: AppDom = {
     ...dom,
     nodes: {

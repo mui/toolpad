@@ -15,4 +15,5 @@ jobs:
         with:
           mode: minimum
           count: 1
-          labels: ''
+          # See also https://github.com/mui/mui-toolpad/blob/master/MAINTAINERS.md#pull-request-labels
+          labels: 'core,docs'

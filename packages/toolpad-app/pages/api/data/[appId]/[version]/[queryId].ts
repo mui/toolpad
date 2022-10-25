@@ -2,6 +2,7 @@ import { ExecFetchResult } from '@mui/toolpad-core';
 import { NextApiHandler } from 'next';
 import { parseVersion } from '../../../../../src/server/data';
 import handleDataRequest from '../../../../../src/server/handleDataRequest';
+import { withReqResLogs } from '../../../../../src/server/logs/withLogs';
 import { asArray } from '../../../../../src/utils/collections';
 
 export const config = {
@@ -27,4 +28,4 @@ const apiHandler = (async (req, res) => {
   await handleDataRequest(req, res, { appId, version });
 }) as NextApiHandler<ExecFetchResult<any>>;
 
-export default apiHandler;
+export default withReqResLogs(apiHandler);

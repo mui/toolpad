@@ -31,13 +31,14 @@ export default function CreateConnectionDialog({
   const domApi = useDomApi();
   const [dataSourceType, setDataSourceType] = React.useState('');
   const navigate = useNavigate();
+  const isFormValid = Boolean(dataSourceType);
 
   return (
     <Dialog {...props} onClose={onClose}>
       <DialogForm
         autoComplete="off"
         onSubmit={(event) => {
-          invariant(dataSourceType, 'Invalid form state');
+          invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
 
           event.preventDefault();
           const dataSource = dataSources[dataSourceType];
@@ -81,7 +82,7 @@ export default function CreateConnectionDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!dataSourceType}>
+          <Button type="submit" disabled={!isFormValid}>
             Create
           </Button>
         </DialogActions>

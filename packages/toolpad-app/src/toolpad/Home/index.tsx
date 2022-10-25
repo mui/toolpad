@@ -123,12 +123,14 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     },
   });
 
+  const isFormValid = Boolean(name);
+
   return (
     <React.Fragment>
       <Dialog {...props} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
         <DialogForm
           onSubmit={async (event) => {
-            invariant(name, 'Invalid form state');
+            invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
 
             event.preventDefault();
             let recaptchaToken;
@@ -241,7 +243,11 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             >
               Cancel
             </Button>
-            <LoadingButton type="submit" loading={createAppMutation.isLoading} disabled={!name}>
+            <LoadingButton
+              type="submit"
+              loading={createAppMutation.isLoading}
+              disabled={!isFormValid}
+            >
               Create
             </LoadingButton>
           </DialogActions>

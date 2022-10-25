@@ -49,9 +49,11 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
     }
   }, [reset, open]);
 
+  const isFormValid = lastRelease.isSuccess;
+
   const deployMutation = client.useMutation('deploy');
   const doSubmit = handleSubmit(async (releaseParams) => {
-    invariant(lastRelease.isSuccess, 'Invalid form state being submited');
+    invariant(isFormValid, 'Invalid form state being submited');
 
     await deployMutation.mutateAsync([appId, releaseParams]);
     const url = new URL(`/deploy/${appId}/pages`, window.location.href);
@@ -93,11 +95,7 @@ function CreateReleaseDialog({ appId, open, onClose }: CreateReleaseDialogProps)
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <LoadingButton
-            disabled={!lastRelease.isSuccess}
-            loading={deployMutation.isLoading}
-            type="submit"
-          >
+          <LoadingButton disabled={!isFormValid} loading={deployMutation.isLoading} type="submit">
             Deploy
           </LoadingButton>
         </DialogActions>

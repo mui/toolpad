@@ -37,12 +37,14 @@ export default function CreatePageDialog({
     }
   }, [open]);
 
+  const isFormValid = Boolean(name);
+
   return (
     <Dialog {...props} open={open} onClose={onClose}>
       <DialogForm
         autoComplete="off"
         onSubmit={(event) => {
-          invariant(name, 'Invalid form state');
+          invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
 
           event.preventDefault();
           const newNode = appDom.createNode(dom, 'page', {
@@ -73,7 +75,7 @@ export default function CreatePageDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!name}>
+          <Button type="submit" disabled={!isFormValid}>
             Create
           </Button>
         </DialogActions>

@@ -68,13 +68,14 @@ export default function CreateCodeComponentDialog({
     [name],
   );
   const isInvalid = !!inputErrorMsg;
+  const isFormValid = name && !isInvalid;
 
   return (
     <Dialog {...props} onClose={onClose}>
       <DialogForm
         autoComplete="off"
         onSubmit={(event) => {
-          invariant(name && !isInvalid, 'Invalid form state');
+          invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
 
           event.preventDefault();
           const newNode = appDom.createNode(dom, 'codeComponent', {
@@ -107,7 +108,7 @@ export default function CreateCodeComponentDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!name || isInvalid}>
+          <Button type="submit" disabled={!isFormValid}>
             Create
           </Button>
         </DialogActions>

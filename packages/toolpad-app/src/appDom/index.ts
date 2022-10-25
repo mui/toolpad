@@ -14,7 +14,7 @@ import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
 import { camelCase, removeDiacritics } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
-import { mapProperties } from '../utils/collections';
+import { mapProperties, mapValues } from '../utils/collections';
 
 export const CURRENT_APPDOM_VERSION = 2;
 
@@ -953,6 +953,59 @@ export function getNewParentIndexAfterNode(
   return createFractionalIndex(node.parentIndex, nodeAfter?.parentIndex || null);
 }
 
+export function addFragment(
+  dom: AppDom,
+  fragment: AppDom,
+  parentId: NodeId,
+  parentProp: string,
+  parentIndex?: string | undefined,
+) {
+  const parent = getNode(dom, parentId);
+  const existingNames = getExistingNamesForChildren(dom, parent, parentProp);
+  let combinedDom: AppDom = {
+    ...dom,
+    nodes: {
+      ...dom.nodes,
+      ...mapValues(fragment.nodes, (node: AppDomNode) => {
+        return existingNames.has(node.name)
+          ? { ...node, name: proposeName(node.name, existingNames) }
+          : node;
+      }),
+    },
+  };
+  const fragmentRoot = getNode(combinedDom, fragment.root);
+  combinedDom = setNodeParent(combinedDom, fragmentRoot, parentId, parentProp, parentIndex);
+  return combinedDom;
+}
+
+/**
+ * Make a copy of a subtree (a fragment) of the dom. The structure of a fragment is
+ * the same as a dom where the root is the node we create the fragment for
+ */
+export function cloneFragment(dom: AppDom, nodeId: NodeId): AppDom {
+  const node = getNode(dom, nodeId);
+  const newNode = createNode(dom, node.type, node);
+  const childNodes = getChildNodes(dom, node);
+
+  let result: AppDom = {
+    root: newNode.id,
+    nodes: {
+      [newNode.id]: newNode,
+    },
+  };
+
+  for (const [childParentProp, children] of Object.entries(childNodes)) {
+    if (children) {
+      for (const child of children as AppDomNode[]) {
+        const childFragment = cloneFragment(dom, child.id);
+        result = addFragment(result, childFragment, newNode.id, childParentProp);
+      }
+    }
+  }
+
+  return result;
+}
+
 export function duplicateNode(
   dom: AppDom,
   node: AppDomNode,
@@ -960,23 +1013,11 @@ export function duplicateNode(
   parentProp: string | null = node.parentProp,
 ): AppDom {
   if (!parent || !parentProp) {
-    throw new Error(`Node: "${node.id}" can't be duplicated`);
+    throw new Error(`Node "${node.id}" can't be duplicated, it must have a parent`);
   }
 
-  const newNode = createNode(dom, node.type, node);
-  const childNodes = getChildNodes(dom, node);
-
-  dom = addNode<any, any>(dom, newNode, parent, parentProp);
-
-  for (const [childParentProp, children] of Object.entries(childNodes)) {
-    if (children) {
-      for (const child of children as AppDomNode[]) {
-        dom = duplicateNode(dom, child, newNode, childParentProp);
-      }
-    }
-  }
-
-  return dom;
+  const fragment = cloneFragment(dom, node.id);
+  return addFragment(dom, fragment, parent.id, parentProp);
 }
 
 const RENDERTREE_NODES = [

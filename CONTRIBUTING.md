@@ -74,4 +74,4 @@ Please have a look at our general guidelines for sending pull requests [here](ht
 
 ## Release process
 
-See [RELEASE.md](./RELEASE.md)
+See [MAINTAINERS.md](./MAINTANERS.md#release-process)

@@ -1,4 +1,29 @@
-# Release process
+# Maintainers guide
+
+This document is intended for _maintainers_. Anyone with commit access to the Toolpad respository.
+
+## Pull request labels
+
+Each pull request must have a label applied. We apply labels in the following dimensions:
+
+### location
+
+- `docs`: For updates to the `./docs` folder.
+- `core`: For updates Toolpad application and its build environment.
+
+_We choose these labels according to the way we divide work in the repository, we will create additional labels as the team grows and the responsibilities are further divided._
+
+### source
+
+- _no label_: For pull rwquests by Toolpad maintainers.
+- `community`: For pull requests opened by members of the community.
+
+### kind
+
+- _no label_: Default.
+- `regression`: For bug fixes of regressions, generally, these PRs are accompanied by a test.
+
+## Release process
 
 1. Generate a new version using:
 

@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { format } from '../../../utils/prettier';
@@ -85,13 +86,16 @@ export default function CreateCodeComponentDialog({
 
   const inputErrorMsg = useNodeNameValidation(name, existingNames, 'component');
   const isNameValid = !inputErrorMsg;
+  const isFormValid = isNameValid;
 
   return (
     <Dialog open={open} onClose={onClose} {...props}>
       <DialogForm
         autoComplete="off"
-        onSubmit={(e) => {
-          e.preventDefault();
+        onSubmit={(event) => {
+          invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
+
+          event.preventDefault();
           const newNode = appDom.createNode(dom, 'codeComponent', {
             name,
             attributes: {
@@ -123,7 +127,7 @@ export default function CreateCodeComponentDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!isNameValid}>
+          <Button type="submit" disabled={!isFormValid}>
             Create
           </Button>
         </DialogActions>

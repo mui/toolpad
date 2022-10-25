@@ -57,7 +57,7 @@ export type DomAction =
     }
   | {
       type: 'DOM_DUPLICATE_NODE';
-      node: appDom.ElementNode;
+      node: appDom.AppDomNode;
     }
   | {
       type: 'DOM_REMOVE_NODE';
@@ -189,7 +189,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parentIndex,
       });
     },
-    duplicateNode<Child extends appDom.ElementNode>(node: Child) {
+    duplicateNode<Child extends appDom.AppDomNode>(node: Child) {
       dispatch({
         type: 'DOM_DUPLICATE_NODE',
         node,

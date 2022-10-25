@@ -22,6 +22,7 @@ services:
           name: toolpad-db
           property: connectionString
       - fromGroup: toolpad-settings
+      - fromGroup: toolpad-basic-auth
     buildFilter:
       ignoredPaths:
         - docs/**

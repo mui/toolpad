@@ -54,7 +54,7 @@ export default async (
     return;
   }
 
-  if (!app.public && !config.isDemo) {
+  if (!app.public) {
     if (!checkBasicAuth(req)) {
       basicAuthUnauthorized(res);
       return;

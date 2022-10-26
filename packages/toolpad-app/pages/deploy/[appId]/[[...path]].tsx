@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
   //   context.res.setHeader('X-Frame-Options', 'DENY');
   // }
 
-  if (!app.public && !config.isDemo) {
+  if (!app.public) {
     if (!checkBasicAuth(context.req)) {
       basicAuthUnauthorized(context.res);
       // basicAuthUnauthorized calls res.end()

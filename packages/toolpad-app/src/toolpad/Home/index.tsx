@@ -417,24 +417,24 @@ function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
       <DialogForm onSubmit={doSubmit}>
         <DialogTitle>Application settings for &quot;{app.name}&quot;</DialogTitle>
         <DialogContent>
-          {!config.isDemo ? (
-            <FormControlLabel
-              control={
-                <Controller
-                  control={control}
-                  name="public"
-                  render={({ field: { value, onChange, ...field } }) => (
-                    <Checkbox
-                      checked={value}
-                      onChange={(e) => onChange(e.target.checked)}
-                      {...field}
-                    />
-                  )}
-                />
-              }
-              label="Make application public"
-            />
-          ) : null}
+          <FormControlLabel
+            control={
+              <Controller
+                control={control}
+                name="public"
+                render={({ field: { value, onChange, ...field } }) => (
+                  <Checkbox
+                    checked={value}
+                    onChange={(e) => onChange(e.target.checked)}
+                    disabled={config.isDemo}
+                    {...field}
+                  />
+                )}
+              />
+            }
+            label="Make application public"
+            disabled={config.isDemo}
+          />
           {updateAppMutation.error ? <ErrorAlert error={updateAppMutation.error} /> : null}
         </DialogContent>
         <DialogActions>

@@ -46,6 +46,7 @@ While [function](/toolpad/connecting-to-datasources/function/) datasource can su
 
    You can execute extra steps before doing an actual request in case you need to do some pre-processing. I.e. sending parameters as a BASE64 encoded data:
 
+   <!-- markdownlint-disable MD032 -->
    <!--
    export default async function ({ parameters }: ToolpadFunctionEvent) {
       const result = await fetch('https://example.com/api', {
@@ -56,11 +57,13 @@ While [function](/toolpad/connecting-to-datasources/function/) datasource can su
       return await result.json();
    }
     -->
+    <!-- markdownlint-enable MD032 -->
 
    <img src="/static/toolpad/docs/function/function-3.png" alt="Function pre-processing" width="709px" style="margin-bottom: 16px;" />
 
 1. **Fetching** data from **multiple data sources** and **combining** the result:
 
+   <!-- markdownlint-disable MD032 -->
    <!--
    export default async function ({ parameters }: ToolpadFunctionEvent) {
       const URL_1 = 'https://dog.ceo/api/breed/hound/list';
@@ -77,6 +80,7 @@ While [function](/toolpad/connecting-to-datasources/function/) datasource can su
       return finalResult;
    }
    -->
+   <!-- markdownlint-enable MD032 -->
 
    <img src="/static/toolpad/docs/function/function-4.png" alt="Function combined result" width="1038px" />
 
@@ -84,6 +88,7 @@ While [function](/toolpad/connecting-to-datasources/function/) datasource can su
 
    In this example you might want to fetch name of the top contributor of **mui/materual-ui** repository, in order to do that you first need to fetch a list of contributors for a given repo. Once you have a response and link to a top contributor you can do a follow up request to fetch details about specific user:
 
+   <!-- markdownlint-disable MD032 -->
    <!--
    export default async function ({ parameters }: ToolpadFunctionEvent) {
       const REPO_URL = 'https://api.github.com/repos/mui/material-ui/contributors';
@@ -94,6 +99,7 @@ While [function](/toolpad/connecting-to-datasources/function/) datasource can su
       return topContributor.name;
    }
    -->
+   <!-- markdownlint-enable MD032 -->
 
    <img src="/static/toolpad/docs/function/function-5.png" alt="Function chained" width="875px" />
 
@@ -101,6 +107,7 @@ While [function](/toolpad/connecting-to-datasources/function/) datasource can su
 
    You can handle different error scenarios. I.e. if 404 error is returned you can still pass empty array so that UI does not break:
 
+   <!-- markdownlint-disable MD032 -->
    <!--
    export default async function ({ parameters }: ToolpadFunctionEvent) {
       const result = await fetch('https://example.com/api')
@@ -112,5 +119,6 @@ While [function](/toolpad/connecting-to-datasources/function/) datasource can su
       return await result.json();
    }
    -->
+   <!-- markdownlint-enable MD032 -->
 
    <img src="/static/toolpad/docs/function/function-6.png" alt="Function error handling" width="831px" />

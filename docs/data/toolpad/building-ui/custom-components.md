@@ -14,7 +14,7 @@ Choose the name for your component and click **Create**:
 
 You can now use code editor (on the left) and live preview (on the right) to define your custom component:
 
-<img src="/static/toolpad/docs/building-ui/ui-12.png" width="1253px" alt="Custom component IDE" />
+<img src="/static/toolpad/docs/building-ui/ui-12.png" width="1243px" alt="Custom component IDE" />
 <br />
 <br />
 

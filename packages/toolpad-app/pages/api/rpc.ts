@@ -24,6 +24,7 @@ import {
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
+import { withRpcReqResLogs } from '../../src/server/logs/withLogs';
 
 export const config = {
   api: {
@@ -189,4 +190,4 @@ const rpcServer = {
 
 export type ServerDefinition = MethodsOf<typeof rpcServer>;
 
-export default createRpcHandler(rpcServer);
+export default withRpcReqResLogs(createRpcHandler(rpcServer));

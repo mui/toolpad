@@ -1,3 +1,5 @@
+import crypto from './crypto';
+
 // credit: https://stackoverflow.com/a/2117523
 export function uuidv4() {
   // @ts-ignore

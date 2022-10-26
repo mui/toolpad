@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import dataSources from '../../../toolpadDataSources/client';
@@ -55,13 +56,16 @@ export default function CreateConnectionDialog({
 
   const inputErrorMsg = useNodeNameValidation(name, existingNames, 'connection');
   const isNameValid = !inputErrorMsg;
+  const isFormValid = dataSourceType && isNameValid;
 
   return (
     <Dialog open={open} onClose={onClose} {...props}>
       <DialogForm
         autoComplete="off"
-        onSubmit={(e) => {
-          e.preventDefault();
+        onSubmit={(event) => {
+          invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
+
+          event.preventDefault();
           const dataSource = dataSources[dataSourceType];
           if (!dataSource) {
             throw new Error(`Can't find a datasource for "${dataSourceType}"`);
@@ -115,7 +119,7 @@ export default function CreateConnectionDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!dataSourceType || !isNameValid}>
+          <Button type="submit" disabled={!isFormValid}>
             Create
           </Button>
         </DialogActions>

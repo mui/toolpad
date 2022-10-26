@@ -44,6 +44,7 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Controller, useForm } from 'react-hook-form';
+import invariant from 'invariant';
 import useBoolean from '../../utils/useBoolean';
 import useEvent from '../../utils/useEvent';
 import client from '../../api';
@@ -122,11 +123,15 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     },
   });
 
+  const isFormValid = Boolean(name);
+
   return (
     <React.Fragment>
       <Dialog {...props} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
         <DialogForm
           onSubmit={async (event) => {
+            invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
+
             event.preventDefault();
             let recaptchaToken;
             if (config.recaptchaSiteKey) {
@@ -238,7 +243,11 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             >
               Cancel
             </Button>
-            <LoadingButton type="submit" loading={createAppMutation.isLoading} disabled={!name}>
+            <LoadingButton
+              type="submit"
+              loading={createAppMutation.isLoading}
+              disabled={!isFormValid}
+            >
               Create
             </LoadingButton>
           </DialogActions>

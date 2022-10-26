@@ -102,18 +102,18 @@ export function getNodesViewInfo(rootElm: HTMLElement): {
 
           if (childContainerElm && nodeSlots) {
             const rect =
-              slotType === 'single'
+              slotType === 'single' || slotType === 'layout'
                 ? getRelativeBoundingRect(rootElm, firstChildElm)
                 : getRelativeBoundingRect(rootElm, childContainerElm);
 
-            const gridAutoFlow = window.getComputedStyle(childContainerElm).gridAutoFlow;
-            const flexDirection = window.getComputedStyle(childContainerElm).flexDirection;
+            const display = window.getComputedStyle(childContainerElm).display;
 
             let flowDirection = 'row';
-            if (gridAutoFlow) {
+            if (display === 'grid') {
+              const gridAutoFlow = window.getComputedStyle(childContainerElm).gridAutoFlow;
               flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
-            } else if (flexDirection) {
-              flowDirection = flexDirection;
+            } else if (display === 'flex') {
+              flowDirection = window.getComputedStyle(childContainerElm).flexDirection;
             }
 
             nodeSlots[slotNamePropValue] = {

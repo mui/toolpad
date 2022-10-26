@@ -10,13 +10,13 @@
 
 1. Select PostgreSQL datasource and click **CREATE QUERY**:
 
-   <img src="/static/toolpad/docs/postgres-query-1.png" alt="Postgres type" width="593px" style="margin-bottom: 16px;" />
+   <img src="/static/toolpad/docs/postgres/postgres-1.png" alt="Postgres type" width="590px" style="margin-bottom: 16px;" />
 
 1. You can modify all the basic configuration settings as described in [queries](/toolpad/connecting-to-datasources/queries/) section.
 
 1. In addition you can configure following properties inline:
 
-   <img src="/static/toolpad/docs/postgres-query-2.png" alt="Postgres configuration" width="1120px" />
+   <img src="/static/toolpad/docs/postgres/postgres-2.png" alt="Postgres configuration" width="1438px" />
 
    - On the left is a SQL query editor.
 
@@ -24,7 +24,7 @@
 
    - Below the query editor you can configure parameters which can be used to bind page state to your SQL query. Toolpad uses [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html) under the hood to prevent SQL injection. You can use the positional parameter syntax (`$1`, `$2`, `$3`) of postgres prepared statements. Additionally it will also accept named parameters of the form `$myParameter`.
 
-      <img src="/static/toolpad/docs/postgres-query-3.png" alt="Parameters configuration" width="553px" />
+      <img src="/static/toolpad/docs/postgres/postgres-3.png" alt="Parameters configuration" width="709px" />
 
      Like so: `SELECT * FROM "db" WHERE name = $name`.
 

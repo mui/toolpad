@@ -95,15 +95,16 @@ export class ToolpadEditor {
   async createPage(name: string) {
     await this.createPageBtn.click();
     await this.createPageDialog.nameInput.fill(name);
-    await this.createPageDialog.createButton.click();
-    await this.page.waitForNavigation();
+    await Promise.all([this.createPageDialog.createButton.click(), this.page.waitForNavigation()]);
   }
 
   async createComponent(name: string) {
     await this.createComponentBtn.click();
     await this.createComponentDialog.nameInput.fill(name);
-    await this.createComponentDialog.createButton.click();
-    await this.page.waitForNavigation();
+    await Promise.all([
+      this.createComponentDialog.createButton.click(),
+      this.page.waitForNavigation(),
+    ]);
   }
 
   async dragToAppCanvas(

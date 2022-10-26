@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { gotoIfNotCurrent } from './shared';
 
 export class ToolpadRuntime {
   readonly page: Page;
@@ -8,7 +9,7 @@ export class ToolpadRuntime {
   }
 
   async goto(appId: string) {
-    await this.page.goto(`/app/${appId}/preview/pages`);
+    await gotoIfNotCurrent(this.page, `/app/${appId}/preview/pages`);
   }
 
   async gotoPage(appId: string, pageName: string) {

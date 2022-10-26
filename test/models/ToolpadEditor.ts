@@ -1,4 +1,5 @@
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
+import { gotoIfNotCurrent } from './shared';
 
 class CreatePageDialog {
   readonly page: Page;
@@ -62,6 +63,10 @@ export class ToolpadEditor {
 
   readonly pageOverlay: Locator;
 
+  readonly explorer: Locator;
+
+  readonly confirmationDialog: Locator;
+
   constructor(page: Page, browserName: string) {
     this.page = page;
     this.browserName = browserName;
@@ -78,22 +83,27 @@ export class ToolpadEditor {
     this.appCanvas = page.frameLocator('[name=data-toolpad-canvas]');
     this.pageRoot = this.appCanvas.locator('data-testid=page-root');
     this.pageOverlay = this.appCanvas.locator('data-testid=page-overlay');
+
+    this.explorer = page.getByTestId('hierarchy-explorer');
+    this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });
   }
 
   async goto(appId: string) {
-    await this.page.goto(`/_toolpad/app/${appId}`);
+    await gotoIfNotCurrent(this.page, `/_toolpad/app/${appId}`);
   }
 
   async createPage(name: string) {
     await this.createPageBtn.click();
     await this.createPageDialog.nameInput.fill(name);
     await this.createPageDialog.createButton.click();
+    await this.page.waitForNavigation();
   }
 
   async createComponent(name: string) {
     await this.createComponentBtn.click();
     await this.createComponentDialog.nameInput.fill(name);
     await this.createComponentDialog.createButton.click();
+    await this.page.waitForNavigation();
   }
 
   async dragToAppCanvas(
@@ -173,5 +183,15 @@ export class ToolpadEditor {
     const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
 
     this.dragToAppCanvas(sourceSelector, false, moveTargetX, moveTargetY);
+  }
+
+  async openHierarchyMenu(name: string) {
+    const hierarchyItem = this.explorer
+      // @ts-expect-error https://github.com/microsoft/playwright/pull/17952
+      .getByRole('treeitem', { level: 2 })
+      .filter({ hasText: name });
+    const menuButton = hierarchyItem.getByRole('button', { name: 'Open hierarchy menu' });
+    await hierarchyItem.hover();
+    await menuButton.click();
   }
 }

@@ -1,5 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 import generateId from '../utils/generateId';
+import { gotoIfNotCurrent } from './shared';
 
 interface CreateApplicationParams {
   name?: string;
@@ -49,7 +50,7 @@ export class ToolpadHome {
   }
 
   async goto() {
-    await this.page.goto(`/`);
+    await gotoIfNotCurrent(this.page, `/`);
   }
 
   async createApplication({

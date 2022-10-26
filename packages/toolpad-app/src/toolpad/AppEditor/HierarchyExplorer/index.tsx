@@ -116,6 +116,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
                 className={clsx(classes.treeItemMenuButton, {
                   [classes.treeItemMenuOpen]: menu.menuProps.open,
                 })}
+                aria-label="Open hierarchy menu"
                 {...menu.buttonProps}
               >
                 <MoreVertIcon />
@@ -324,7 +325,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
   );
 
   return (
-    <HierarchyExplorerRoot className={className}>
+    <HierarchyExplorerRoot data-testid="hierarchy-explorer" className={className}>
       <TreeView
         aria-label="hierarchy explorer"
         selected={activeNode ? [activeNode] : []}
@@ -337,6 +338,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
       >
         <HierarchyTreeItem
           nodeId=":connections"
+          aria-level={1}
           labelText="Connections"
           createLabelText="Create connection"
           deleteLabelText="Delete connection"
@@ -346,6 +348,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             <HierarchyTreeItem
               key={connectionNode.id}
               nodeId={connectionNode.id}
+              aria-level={2}
               labelText={connectionNode.name}
               onDuplicate={handleDuplicateNode(connectionNode.id)}
               onDelete={handleDeleteNodeDialogOpen(connectionNode.id)}
@@ -355,6 +358,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         </HierarchyTreeItem>
         <HierarchyTreeItem
           nodeId=":codeComponents"
+          aria-level={1}
           labelText="Components"
           createLabelText="Create component"
           deleteLabelText="Delete component"
@@ -364,6 +368,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             <HierarchyTreeItem
               key={codeComponent.id}
               nodeId={codeComponent.id}
+              aria-level={2}
               labelText={codeComponent.name}
               onDuplicate={handleDuplicateNode(codeComponent.id)}
               onDelete={handleDeleteNodeDialogOpen(codeComponent.id)}
@@ -373,6 +378,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         </HierarchyTreeItem>
         <HierarchyTreeItem
           nodeId=":pages"
+          aria-level={1}
           labelText="Pages"
           createLabelText="Create page"
           deleteLabelText="Delete page"
@@ -382,6 +388,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             <HierarchyTreeItem
               key={page.id}
               nodeId={page.id}
+              aria-level={2}
               labelText={page.name}
               onDuplicate={handleDuplicateNode(page.id)}
               onDelete={handleDeleteNodeDialogOpen(page.id)}

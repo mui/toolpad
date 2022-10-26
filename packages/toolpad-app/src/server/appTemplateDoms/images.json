@@ -81,7 +81,7 @@
           "value": {
             "url": {
               "type": "jsExpression",
-              "value": "`breed/${query.breed}/list`\n"
+              "value": "`query.breed && breed/${query.breed}/list`\n"
             },
             "method": "GET",
             "headers": []
@@ -200,7 +200,7 @@
           "value": {
             "url": {
               "type": "jsExpression",
-              "value": "query.subBreed\n  ? `breed/${query.breed}/${query.subBreed}/images/random`\n  : `breed/${query.breed}/images/random`\n"
+              "value": "if (query.breed) {\nreturn query.subBreed\n? `breed/${query.breed}/${query.subBreed}/images/random`\n: `breed/${query.breed}/images/random`\n}\n"
             },
             "method": "GET",
             "headers": []
@@ -334,7 +334,7 @@
         },
         "src": {
           "type": "jsExpression",
-          "value": "randomDogImage.data.message\n"
+          "value": "randomDogImage.data?.message\n"
         },
         "width": {
           "type": "const",
@@ -386,7 +386,7 @@
       "props": {
         "value": {
           "type": "jsExpression",
-          "value": "randomDogImage.data.message\n"
+          "value": "randomDogImage.data?.message || ''\n"
         },
         "variant": {
           "type": "const",
@@ -478,7 +478,7 @@
         },
         "options": {
           "type": "jsExpression",
-          "value": "Object.keys(allDogBreeds.data.message)\n"
+          "value": "Object.keys(allDogBreeds.data?.message || {})\n"
         },
         "fullWidth": {
           "type": "const",

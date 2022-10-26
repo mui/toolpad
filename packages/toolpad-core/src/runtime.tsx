@@ -1,6 +1,4 @@
 import * as React from 'react';
-// Running into issues compiling @mui/icons-material/Error inside of a "type": "module" package
-// eslint-disable-next-line no-restricted-imports
 import { Error as ErrorIcon } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -201,9 +199,10 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
 export interface PlaceholderProps {
   prop: string;
   children?: React.ReactNode;
+  hasLayout?: boolean;
 }
 
-export function Placeholder({ prop, children }: PlaceholderProps) {
+export function Placeholder({ prop, children, hasLayout = false }: PlaceholderProps) {
   const nodeId = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
@@ -216,7 +215,7 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_SLOTS]: prop,
-        slotType: 'single',
+        slotType: hasLayout ? 'layout' : 'single',
       }}
     />
   );

@@ -3,6 +3,7 @@ import invariant from 'invariant';
 import { asArray } from '../../../../src/utils/collections';
 import serverDataSources from '../../../../src/toolpadDataSources/server';
 import { getConnectionParams, setConnectionParams } from '../../../../src/server/data';
+import { withReqResLogs } from '../../../../src/server/logs/withLogs';
 
 export const config = {
   api: {
@@ -47,4 +48,4 @@ const apiHandler = (async (req, res) => {
   return res.status(405).json({ message: 'Method not supported' });
 }) as NextApiHandler;
 
-export default apiHandler;
+export default withReqResLogs(apiHandler);

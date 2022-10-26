@@ -7,6 +7,7 @@ import {
   TextField,
 } from '@mui/material';
 import * as React from 'react';
+import invariant from 'invariant';
 import { useNavigate } from 'react-router-dom';
 import * as appDom from '../../../appDom';
 import DialogForm from '../../../components/DialogForm';
@@ -51,13 +52,16 @@ export default function CreatePageDialog({
 
   const inputErrorMsg = useNodeNameValidation(name, existingNames, 'page');
   const isNameValid = !inputErrorMsg;
+  const isFormValid = isNameValid;
 
   return (
     <Dialog open={open} onClose={onClose} {...props}>
       <DialogForm
         autoComplete="off"
-        onSubmit={(e) => {
-          e.preventDefault();
+        onSubmit={(event) => {
+          invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
+
+          event.preventDefault();
           const newNode = appDom.createNode(dom, 'page', {
             name,
             attributes: {
@@ -89,7 +93,7 @@ export default function CreatePageDialog({
           <Button color="inherit" variant="text" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={!isNameValid}>
+          <Button type="submit" disabled={!isFormValid}>
             Create
           </Button>
         </DialogActions>

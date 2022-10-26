@@ -8,7 +8,7 @@ _Oct 26, 2022_
 
 A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
-Add element duplication, improved Paper component, improved node naming UX, support for server logs, autocomplete for event arguments, update docs screenshots
+Add element duplication, improved Paper component, improved node naming UX, support for server logs, autocomplete for event arguments, update docs screenshots.
 
 - &#8203;<!-- 28 -->Part 4: Update datasource docs (#1205) @bytasv
 - &#8203;<!-- 27 -->renovatebot, tweak playwright @Janpot

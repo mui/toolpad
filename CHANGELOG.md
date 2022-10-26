@@ -1,5 +1,46 @@
 # Changelog
 
+## 0.0.24
+
+<!-- generated comparing v0.0.23..master -->
+
+_Oct 26, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Add element duplication, improved Paper component, improved node naming UX, support for server logs, autocomplete for event arguments, update docs screenshots.
+
+- &#8203;<!-- 28 -->Part 4: Update datasource docs (#1205) @bytasv
+- &#8203;<!-- 27 -->renovatebot, tweak playwright @Janpot
+- &#8203;<!-- 26 -->Add API and datasource logging (#1066) @apedroferreira
+- &#8203;<!-- 25 -->fix name @Janpot
+- &#8203;<!-- 24 -->Codify the icons exception in eslint (#1211) @Janpot
+- &#8203;<!-- 23 -->Improve Paper component (#1031) @apedroferreira
+- &#8203;<!-- 22 -->Deploy with keyboard enter (#1188) @bytasv
+- &#8203;<!-- 21 -->Part 3: Update connections docs (#1203) @bytasv
+- &#8203;<!-- 20 -->Part 1: Update overview + quickstart screenshots (#1200) @bytasv
+- &#8203;<!-- 19 -->Use public environment settings for demo (#1191) @apedroferreira
+- &#8203;<!-- 18 -->Part 2: Update queries docs (#1202) @bytasv
+- &#8203;<!-- 17 -->Fix fetch query preview (#1165) @bytasv
+- &#8203;<!-- 16 -->Try fixing renovatebot @Janpot
+- &#8203;<!-- 15 -->Add option to DataGrid to hide toolbar (#1187) @Janpot
+- &#8203;<!-- 14 -->Use latest version of Toolpad in demo (#1190) @apedroferreira
+- &#8203;<!-- 13 -->Remove branch option from database in render.yaml (#1189) @apedroferreira
+- &#8203;<!-- 12 -->Implement component duplication logic (#1169) @bytasv
+- &#8203;<!-- 11 -->Set up demo with Docker (#1092) @apedroferreira
+- &#8203;<!-- 10 -->Add a staleTime to queries (#1167) @Janpot
+- &#8203;<!-- 09 -->Add room for post transformations (#1185) @oliviertassinari
+- &#8203;<!-- 08 -->Allow typing event arguments for autocomplete (#1180) @Janpot
+- &#8203;<!-- 07 -->[core] Fix duplicate CodeQL build @oliviertassinari
+- &#8203;<!-- 06 -->[core] query editor, only insert node after the flow (#1207) @Janpot
+- &#8203;<!-- 05 -->[core] Relax the restrictions on node naming (#1194) @Janpot
+- &#8203;<!-- 04 -->[core] Harden the datasource handler implementation (#1199) @Janpot
+- &#8203;<!-- 03 -->[core] Add code scanning via CodeQL (#1197) @oliviertassinari
+- &#8203;<!-- 02 -->[ui] Some tweaks to the Monaco editor theme (#1181) @Janpot
+- &#8203;<!-- 01 -->[website] Remove LanguageNegotation (#1186) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.23
 
 <!-- generated comparing v0.0.22..master -->

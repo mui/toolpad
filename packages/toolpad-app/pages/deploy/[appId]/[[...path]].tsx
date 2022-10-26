@@ -7,11 +7,9 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
   const [
     { loadRenderTree, findActiveDeployment, getApp },
     { checkBasicAuth, basicAuthUnauthorized },
-    { default: config },
   ] = await Promise.all([
     import('../../../src/server/data'),
     import('../../../src/server/basicAuth'),
-    import('../../../src/server/config'),
   ]);
 
   const [appId] = asArray(context.query.appId);

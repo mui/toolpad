@@ -8,7 +8,6 @@ import * as appDom from '../appDom';
 import { errorFrom, serializeError } from '../utils/errors';
 import { basicAuthUnauthorized, checkBasicAuth } from './basicAuth';
 import { reportSentryError } from '../utils/sentry';
-import config from './config';
 
 // Initialize the cors middleware
 const cors = initMiddleware<any>(

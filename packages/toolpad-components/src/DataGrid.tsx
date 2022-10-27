@@ -18,7 +18,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
-import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
+import { Box, debounce, LinearProgress, Skeleton, Link, styled } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
@@ -100,6 +100,9 @@ function SkeletonLoadingOverlay() {
   );
 }
 
+const URL_REGEX =
+  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
+
 function inferColumnType(value: unknown): string {
   if (value instanceof Date) {
     return 'dateTime';
@@ -109,6 +112,11 @@ function inferColumnType(value: unknown): string {
     case 'number':
     case 'boolean':
     case 'string':
+      if (valueType === 'string') {
+        if (URL_REGEX.test(value as string)) {
+          return 'link';
+        }
+      }
       return valueType;
     case 'object':
       return 'json';
@@ -125,6 +133,7 @@ const DEFAULT_TYPES = new Set([
   'boolean',
   'singleSelect',
   'actions',
+  'link',
 ]);
 
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
@@ -140,6 +149,13 @@ const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
   },
   dateTime: {
     valueGetter: dateValueGetter,
+  },
+  link: {
+    renderCell: ({ value }) => (
+      <Link href={value} target="_blank" rel="noopener noreferrer">
+        {value}
+      </Link>
+    ),
   },
 };
 

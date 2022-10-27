@@ -81,7 +81,7 @@
           "value": {
             "url": {
               "type": "jsExpression",
-              "value": "`query.breed && breed/${query.breed}/list`\n"
+              "value": "`breed/${query.breed}/list`\n"
             },
             "method": "GET",
             "headers": []

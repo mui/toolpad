@@ -17,7 +17,7 @@ test('can use statistics app template', async ({ page }) => {
   await page.locator('text="USA"').waitFor({ state: 'visible' });
 });
 
-test.only('can use images app template', async ({ page }) => {
+test('can use images app template', async ({ page }) => {
   const homeModel = new ToolpadHome(page);
   await homeModel.goto();
   const app = await homeModel.createApplication({ appTemplateId: 'images' });
@@ -28,10 +28,6 @@ test.only('can use images app template', async ({ page }) => {
   await runtimeModel.gotoPage(app.id, 'dogBreedsPage');
 
   await page.locator('h3:has-text("Dog Images")').waitFor({ state: 'visible' });
-
-  const imageLocator = page.locator('img');
-
-  expect(await imageLocator.getAttribute('src')).toBeNull();
 
   const breedInputLocator = page.locator('[aria-haspopup="listbox"]').first();
   await breedInputLocator.click();
@@ -45,6 +41,7 @@ test.only('can use images app template', async ({ page }) => {
 
   await page.waitForResponse('https://images.dog.ceo/**');
 
+  const imageLocator = page.locator('img');
   expect(await imageLocator.getAttribute('src')).toContain(
     'https://images.dog.ceo/breeds/australian-shepherd',
   );

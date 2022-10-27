@@ -8,7 +8,10 @@ export default function useMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const onMenuClose = React.useCallback(() => setAnchorEl(null), []);
+  const onMenuClose = React.useCallback((event?: any) => {
+    event?.stopPropagation?.();
+    setAnchorEl(null);
+  }, []);
 
   const buttonProps = React.useMemo<ButtonProps>(
     () => ({
@@ -17,6 +20,7 @@ export default function useMenu() {
       'aria-haspopup': 'true',
       'aria-expanded': open ? 'true' : undefined,
       onClick(event: React.MouseEvent<HTMLButtonElement>) {
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
       },
     }),

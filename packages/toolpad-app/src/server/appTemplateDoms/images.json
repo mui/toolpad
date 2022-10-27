@@ -200,7 +200,7 @@
           "value": {
             "url": {
               "type": "jsExpression",
-              "value": "if (query.breed) {\nreturn query.subBreed\n? `breed/${query.breed}/${query.subBreed}/images/random`\n: `breed/${query.breed}/images/random`\n}\n"
+              "value": "query.subBreed\n ? `breed/${query.breed}/${query.subBreed}/images/random`\n : `breed/${query.breed}/images/random`\n"
             },
             "method": "GET",
             "headers": []
@@ -334,7 +334,7 @@
         },
         "src": {
           "type": "jsExpression",
-          "value": "randomDogImage.data?.message\n"
+          "value": "randomDogImage.data?.message || ''\n"
         },
         "width": {
           "type": "const",
@@ -485,7 +485,8 @@
           "value": true
         },
         "defaultValue": {
-          "type": "const"
+          "type": "const",
+          "value": "akita"
         }
       },
       "layout": {

@@ -1,35 +1,21 @@
 import { TreeView } from '@mui/lab';
-import {
-  Typography,
-  styled,
-  Box,
-  IconButton,
-  MenuItem,
-  Menu,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material';
+import { Typography, styled, Box, IconButton } from '@mui/material';
 import * as React from 'react';
 import TreeItem, { treeItemClasses, TreeItemProps } from '@mui/lab/TreeItem';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
-import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../DomLoader';
+import { useDom } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
-import useLatest from '../../../utils/useLatest';
-import { ConfirmDialog } from '../../../components/SystemDialogs';
-import useMenu from '../../../utils/useMenu';
+import NodeMenu from '../NodeMenu';
 
 const HierarchyExplorerRoot = styled('div')({
   overflow: 'auto',
@@ -67,115 +53,6 @@ function getActiveNodeId(location: Location): NodeId | null {
 
   const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
   return selected.length > 0 ? selected[0] : null;
-}
-
-interface NodeMenuProps {
-  nodeId: NodeId;
-  deleteLabelText?: string;
-  duplicateLabelText?: string;
-  onNodeDeleted?: (deletedNode: appDom.AppDomNode) => void;
-  onNodeDuplicated?: (newNodeId: appDom.AppDomNode) => void;
-}
-
-function NodeMenu({
-  nodeId,
-  deleteLabelText,
-  duplicateLabelText,
-  onNodeDeleted,
-  onNodeDuplicated,
-}: NodeMenuProps) {
-  const dom = useDom();
-  const domApi = useDomApi();
-
-  const { menuProps, buttonProps, onMenuClose } = useMenu();
-
-  const [deletedNodeId, setDeletedNodeId] = React.useState<NodeId | null>(null);
-  const handleDeleteNodeDialogOpen = React.useCallback(
-    (event: React.MouseEvent) => {
-      event.stopPropagation();
-      setDeletedNodeId(nodeId);
-      onMenuClose(event);
-    },
-    [nodeId, onMenuClose],
-  );
-  const deletedNode = deletedNodeId && appDom.getMaybeNode(dom, deletedNodeId);
-  const latestDeletedNode = useLatest(deletedNode);
-
-  const handleDeleteNodeDialogClose = React.useCallback(
-    (confirmed: boolean) => {
-      if (confirmed && deletedNode) {
-        domApi.removeNode(deletedNodeId);
-
-        onNodeDeleted?.(deletedNode);
-      }
-
-      setDeletedNodeId(null);
-    },
-    [deletedNode, deletedNodeId, domApi, onNodeDeleted],
-  );
-
-  const handleDuplicateClick = React.useCallback(
-    (event: React.MouseEvent) => {
-      const node = appDom.getNode(dom, nodeId);
-
-      invariant(
-        node.parentId && node.parentProp,
-        'Duplication should never be called on nodes that are not placed in the dom',
-      );
-
-      const fragment = appDom.cloneFragment(dom, node.id);
-      domApi.addFragment(fragment, node.parentId, node.parentProp);
-
-      onNodeDuplicated?.(appDom.getNode(fragment, fragment.root));
-      onMenuClose(event);
-    },
-    [dom, domApi, nodeId, onMenuClose, onNodeDuplicated],
-  );
-
-  return (
-    <React.Fragment>
-      <IconButton
-        className={clsx(classes.treeItemMenuButton, {
-          [classes.treeItemMenuOpen]: menuProps.open,
-        })}
-        aria-label="Open hierarchy menu"
-        {...buttonProps}
-      >
-        <MoreVertIcon />
-      </IconButton>
-
-      <Menu
-        {...menuProps}
-        onClick={(event) => {
-          event.stopPropagation();
-          menuProps.onClick?.(event);
-        }}
-      >
-        <MenuItem onClick={handleDuplicateClick}>
-          <ListItemIcon>
-            <ContentCopyIcon />
-          </ListItemIcon>
-          <ListItemText> {duplicateLabelText}</ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={handleDeleteNodeDialogOpen}>
-          <ListItemIcon>
-            <DeleteIcon />
-          </ListItemIcon>
-          <ListItemText> {deleteLabelText}</ListItemText>
-        </MenuItem>
-      </Menu>
-
-      <ConfirmDialog
-        open={!!deletedNode}
-        severity="error"
-        onClose={handleDeleteNodeDialogClose}
-        okButton="Delete"
-      >
-        Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
-      </ConfirmDialog>
-    </React.Fragment>
-  );
 }
 
 type StyledTreeItemProps = TreeItemProps & {
@@ -219,6 +96,17 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
           ) : null}
           {toolpadNodeId ? (
             <NodeMenu
+              renderButton={({ buttonProps, menuProps }) => (
+                <IconButton
+                  className={clsx(classes.treeItemMenuButton, {
+                    [classes.treeItemMenuOpen]: menuProps.open,
+                  })}
+                  aria-label="Open hierarchy menu"
+                  {...buttonProps}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+              )}
               nodeId={toolpadNodeId}
               deleteLabelText={deleteLabelText}
               duplicateLabelText={duplicateLabelText}

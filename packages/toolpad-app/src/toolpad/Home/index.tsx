@@ -427,12 +427,14 @@ function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
                   <Checkbox
                     checked={value}
                     onChange={(e) => onChange(e.target.checked)}
+                    disabled={config.isDemo}
                     {...field}
                   />
                 )}
               />
             }
             label="Make application public"
+            disabled={config.isDemo}
           />
           {updateAppMutation.error ? <ErrorAlert error={updateAppMutation.error} /> : null}
         </DialogContent>

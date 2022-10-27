@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ToolpadHome } from '../../models/ToolpadHome';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
+import clickCenter from '../../utils/clickCenter';
 import domInput from './domInput.json';
 
 test('can control component prop values in properties control panel', async ({
@@ -21,9 +22,11 @@ test('can control component prop values in properties control panel', async ({
   // Verify that initial prop control values are correct
 
   const firstInputLocator = canvasInputLocator.first();
-  await firstInputLocator.click();
+  await clickCenter(page, firstInputLocator);
 
-  await editorModel.componentEditor.waitFor({ state: 'visible' });
+  await editorModel.componentEditor
+    .locator('h6:has-text("Text field")')
+    .waitFor({ state: 'visible' });
 
   const labelControlInput = editorModel.componentEditor.getByLabel('label', { exact: true });
 

@@ -99,6 +99,7 @@ export default function CreateConnectionDialog({
           />
           <TextField
             select
+            required
             sx={{ my: 1 }}
             fullWidth
             value={dataSourceType}

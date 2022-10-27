@@ -113,7 +113,7 @@ function inferColumnType(value: unknown): string {
     case 'boolean':
       return valueType;
     case 'string':
-      if (URL_REGEX.test(value as string)) {
+      if (URL_REGEX.test(value)) {
         return 'link';
       }
       return valueType;

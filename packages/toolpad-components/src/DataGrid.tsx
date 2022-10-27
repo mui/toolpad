@@ -104,6 +104,8 @@ function SkeletonLoadingOverlay() {
 const URL_REGEX =
   /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/;
 
+const IMAGE_REGEX = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|webp))/i;
+
 function inferColumnType(value: unknown): string {
   if (value instanceof Date) {
     return 'dateTime';
@@ -114,6 +116,9 @@ function inferColumnType(value: unknown): string {
     case 'boolean':
       return valueType;
     case 'string':
+      if (IMAGE_REGEX.test(value)) {
+        return 'image';
+      }
       if (URL_REGEX.test(value)) {
         return 'link';
       }

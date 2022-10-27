@@ -1,5 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import Typography from '@mui/material/Typography';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
@@ -40,10 +42,20 @@ export default function Hero() {
           Drag and drop pre-built components, connect to data sources and APIs, and build your
           internal tools 10x faster. Open-source and powered by MUI.
         </Typography>
+        <Button
+          size="large"
+          variant="contained"
+          href="https://demo.toolpad.io/"
+          target="_blank"
+          endIcon={<KeyboardArrowRightRounded />}
+          sx={{ width: { xs: '100%', sm: 'auto' }, mb: 3 }}
+        >
+          Try demo
+        </Button>
         <Typography
           component="label"
           color={(theme) => (theme.palette.mode === 'dark' ? '#fff' : `text.secondary`)}
-          sx={{ fontWeight: 'bold', display: 'block', mb: 2, mx: 'auto' }}
+          sx={{ fontWeight: 'bold', display: 'block', mb: 1, mx: 'auto' }}
           htmlFor="email-landing"
         >
           Sign up for early access to the beta release.

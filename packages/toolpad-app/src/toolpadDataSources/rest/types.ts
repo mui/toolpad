@@ -115,5 +115,5 @@ export type FetchPrivateQuery = {
 export interface FetchResult extends ExecFetchResult<any> {
   data: any;
   untransformedData: any;
-  har: Har;
+  har?: Har;
 }

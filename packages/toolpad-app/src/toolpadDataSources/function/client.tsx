@@ -26,6 +26,7 @@ import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvalua
 import useShortcut from '../../utils/useShortcut';
 import { tryFormat } from '../../utils/prettier';
 import config from '../../config';
+import useFetchPrivate from '../useFetchPrivate';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -113,17 +114,19 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
+  const fetchPrivate = useFetchPrivate<FunctionPrivateQuery, FunctionResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: FunctionQuery, params: Record<string, string>) =>
+      fetchPrivate({ kind: 'debugExec', query, params }),
+    [fetchPrivate],
+  );
+
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<
-    FunctionPrivateQuery,
-    FunctionResult
-  >(
-    {
-      kind: 'debugExec',
-      query: input.query,
-      params: previewParams,
-    },
+  const { preview, runPreview: handleRunPreview } = useQueryPreview(
+    fetchServerPreview,
+    input.query,
+    previewParams,
     {
       onPreview(result) {
         setPreviewLogs((existing) => [...existing, ...result.logs]);

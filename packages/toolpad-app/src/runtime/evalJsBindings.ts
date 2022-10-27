@@ -1,22 +1,7 @@
 import { set } from 'lodash-es';
+import evalExpression from '../utils/evalExpression';
 import { mapValues } from '../utils/collections';
 import { errorFrom } from '../utils/errors';
-
-let iframe: HTMLIFrameElement;
-function evaluateCode(code: string, globalScope: Record<string, unknown>) {
-  // TODO: investigate https://www.npmjs.com/package/ses
-  if (!iframe) {
-    iframe = document.createElement('iframe');
-    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
-    iframe.style.display = 'none';
-    document.documentElement.appendChild(iframe);
-  }
-
-  // eslint-disable-next-line no-underscore-dangle
-  (iframe.contentWindow as any).__SCOPE = globalScope;
-  (iframe.contentWindow as any).console = window.console;
-  return (iframe.contentWindow as any).eval(`with (window.__SCOPE) { ${code} }`);
-}
 
 const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
 
@@ -25,7 +10,7 @@ export function evaluateExpression(
   globalScope: Record<string, unknown>,
 ): BindingEvaluationResult {
   try {
-    const value = evaluateCode(code, globalScope);
+    const value = evalExpression(code, globalScope);
     return { value };
   } catch (rawError) {
     const error = errorFrom(rawError);

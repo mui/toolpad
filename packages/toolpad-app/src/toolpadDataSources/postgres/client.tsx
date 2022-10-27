@@ -170,14 +170,18 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<
-    PostgresPrivateQuery,
-    PostgresResult
-  >({
-    kind: 'debugExec',
-    query: input.query,
-    params: previewParams,
-  });
+  const fetchPrivate = useFetchPrivate<PostgresPrivateQuery, PostgresResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: PostgresQuery, params: Record<string, string>) =>
+      fetchPrivate({ kind: 'debugExec', query, params }),
+    [fetchPrivate],
+  );
+
+  const { preview, runPreview: handleRunPreview } = useQueryPreview(
+    fetchServerPreview,
+    input.query,
+    previewParams,
+  );
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);

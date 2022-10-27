@@ -97,13 +97,22 @@ export interface ConnectionStatus {
   error?: string;
 }
 
-export interface ClientDataSource<C = {}, Q = {}> {
+export interface ExecFetchFn<Q, R extends ExecFetchResult> {
+  (fetchQuery: Q, params: Record<string, string>): Promise<R>;
+}
+
+export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
+  (fetchQuery: Q, params: Record<string, string>, serverFetch: ExecFetchFn<Q, R>): Promise<R>;
+}
+
+export interface ClientDataSource<C = {}, Q = {}, R extends ExecFetchResult = ExecFetchResult> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
+  exec?: ExecClientFetchFn<Q, R>;
 }
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {

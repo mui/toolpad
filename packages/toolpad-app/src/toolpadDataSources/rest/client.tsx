@@ -15,7 +15,12 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  ExecFetchFn,
+  QueryEditorProps,
+} from '../../types';
 import {
   FetchPrivateQuery,
   FetchQuery,
@@ -24,7 +29,7 @@ import {
   Body,
   ResponseType,
 } from './types';
-import { getAuthenticationHeaders, parseBaseUrl } from './shared';
+import { execfetch, getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../toolpad/AppEditor/PageEditor/BindableEditor';
@@ -50,6 +55,10 @@ import { createHarLog, mergeHar } from '../../utils/har';
 import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import DEMO_BASE_URLS from './demoBaseUrls';
+import useFetchPrivate from '../useFetchPrivate';
+import evalExpression from '../../utils/evalExpression';
+
+const IS_CLIENT = true;
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -388,16 +397,26 @@ function QueryEditor({
 
   const [activeTab, setActiveTab] = React.useState('urlQuery');
 
+  const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: FetchQuery, params: Record<string, string>) =>
+      fetchPrivate({ kind: 'debugExec', query, params }),
+    [fetchPrivate],
+  );
+
+  const fetchPreview: ExecFetchFn<FetchQuery, FetchResult> = (query, params) =>
+    clientExec(query, params, fetchServerPreview);
+
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(
-    {
-      kind: 'debugExec',
-      query: input.query,
-      params: previewParams,
-    },
+  const { preview, runPreview: handleRunPreview } = useQueryPreview(
+    fetchPreview,
+    input.query,
+    previewParams,
     {
       onPreview(result) {
-        setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+        if (result.har) {
+          setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+        }
       },
     },
   );
@@ -547,12 +566,29 @@ function getInitialQueryValue(): FetchQuery {
   return { url: { type: 'const', value: '' }, method: 'GET', headers: [] };
 }
 
-const dataSource: ClientDataSource<{}, FetchQuery> = {
+async function clientExec(
+  fetchQuery: FetchQuery,
+  params: Record<string, string>,
+  serverFetch: ExecFetchFn<FetchQuery, FetchResult>,
+): Promise<FetchResult> {
+  if (IS_CLIENT) {
+    return execfetch(fetchQuery, params, {
+      connection: null,
+      fetchImpl: window.fetch,
+      evalExpression,
+    });
+  }
+
+  return serverFetch(fetchQuery, params);
+}
+
+const dataSource: ClientDataSource<{}, FetchQuery, FetchResult> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,
+  exec: clientExec,
 };
 
 export default dataSource;

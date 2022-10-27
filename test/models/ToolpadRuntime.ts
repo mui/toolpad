@@ -14,7 +14,7 @@ export class ToolpadRuntime {
 
   async gotoPage(appId: string, pageName: string) {
     await this.goto(appId);
-    await this.page.locator(`button:has-text("${pageName}")`).click();
+    await this.page.locator(`a:has-text("${pageName}")`).click();
   }
 
   async gotoPageById(appId: string, pageId: string) {

@@ -53,102 +53,6 @@ const StyledTreeItem = styled(TreeItem)({
   },
 });
 
-type StyledTreeItemProps = TreeItemProps & {
-  onDelete?: React.MouseEventHandler;
-  onDuplicate?: React.MouseEventHandler;
-  onCreate?: React.MouseEventHandler;
-  menuButton?: boolean;
-  labelIcon?: React.ReactNode;
-  labelText: string;
-  createLabelText?: string;
-  deleteLabelText?: string;
-  duplicateLabelText?: string;
-};
-
-function HierarchyTreeItem(props: StyledTreeItemProps) {
-  const {
-    labelIcon,
-    labelText,
-    onCreate,
-    onDelete,
-    onDuplicate,
-    menuButton,
-    createLabelText = `Create ${labelText}`,
-    deleteLabelText = `Delete ${labelText}`,
-    duplicateLabelText = `Duplicate ${labelText}`,
-    ...other
-  } = props;
-
-  const menu = useMenu();
-
-  const handleDelete = React.useCallback<React.MouseEventHandler<HTMLLIElement>>(
-    (event) => {
-      onDelete?.(event);
-      menu.onMenuClose(event);
-    },
-    [menu, onDelete],
-  );
-
-  const handleDuplicate = React.useCallback<React.MouseEventHandler<HTMLLIElement>>(
-    (event) => {
-      onDuplicate?.(event);
-      menu.onMenuClose(event);
-    },
-    [menu, onDuplicate],
-  );
-
-  return (
-    <StyledTreeItem
-      label={
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
-          {labelIcon}
-          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
-            {labelText}
-          </Typography>
-          {onCreate ? (
-            <IconButton aria-label={createLabelText} onClick={onCreate}>
-              <AddIcon />
-            </IconButton>
-          ) : null}
-          {menuButton ? (
-            <React.Fragment>
-              <IconButton
-                className={clsx(classes.treeItemMenuButton, {
-                  [classes.treeItemMenuOpen]: menu.menuProps.open,
-                })}
-                aria-label="Open hierarchy menu"
-                {...menu.buttonProps}
-              >
-                <MoreVertIcon />
-              </IconButton>
-
-              <Menu {...menu.menuProps}>
-                {onDuplicate ? (
-                  <MenuItem onClick={handleDuplicate}>
-                    <ListItemIcon>
-                      <ContentCopyIcon />
-                    </ListItemIcon>
-                    <ListItemText> {duplicateLabelText}</ListItemText>
-                  </MenuItem>
-                ) : null}
-                {onDelete ? (
-                  <MenuItem onClick={handleDelete}>
-                    <ListItemIcon>
-                      <DeleteIcon />
-                    </ListItemIcon>
-                    <ListItemText> {deleteLabelText}</ListItemText>
-                  </MenuItem>
-                ) : null}
-              </Menu>
-            </React.Fragment>
-          ) : null}
-        </Box>
-      }
-      {...other}
-    />
-  );
-}
-
 function getActiveNodeId(location: Location): NodeId | null {
   const match =
     matchRoutes(
@@ -163,6 +67,170 @@ function getActiveNodeId(location: Location): NodeId | null {
 
   const selected: NodeId[] = match.map((route) => route.params.activeNodeId as NodeId);
   return selected.length > 0 ? selected[0] : null;
+}
+
+interface NodeMenuProps {
+  nodeId: NodeId;
+  deleteLabelText?: string;
+  duplicateLabelText?: string;
+  onNodeDeleted?: (deletedNode: appDom.AppDomNode) => void;
+  onNodeDuplicated?: (newNodeId: appDom.AppDomNode) => void;
+}
+
+function NodeMenu({
+  nodeId,
+  deleteLabelText,
+  duplicateLabelText,
+  onNodeDeleted,
+  onNodeDuplicated,
+}: NodeMenuProps) {
+  const dom = useDom();
+  const domApi = useDomApi();
+
+  const { menuProps, buttonProps, onMenuClose } = useMenu();
+
+  const [deletedNodeId, setDeletedNodeId] = React.useState<NodeId | null>(null);
+  const handleDeleteNodeDialogOpen = React.useCallback(
+    (event: React.MouseEvent) => {
+      event.stopPropagation();
+      setDeletedNodeId(nodeId);
+      onMenuClose(event);
+    },
+    [nodeId, onMenuClose],
+  );
+  const deletedNode = deletedNodeId && appDom.getMaybeNode(dom, deletedNodeId);
+  const latestDeletedNode = useLatest(deletedNode);
+
+  const handleDeleteNodeDialogClose = React.useCallback(
+    (confirmed: boolean) => {
+      if (confirmed && deletedNode) {
+        domApi.removeNode(deletedNodeId);
+
+        onNodeDeleted?.(deletedNode);
+      }
+
+      setDeletedNodeId(null);
+    },
+    [deletedNode, deletedNodeId, domApi, onNodeDeleted],
+  );
+
+  const handleDuplicateClick = React.useCallback(
+    (event: React.MouseEvent) => {
+      const node = appDom.getNode(dom, nodeId);
+
+      invariant(
+        node.parentId && node.parentProp,
+        'Duplication should never be called on nodes that are not placed in the dom',
+      );
+
+      const fragment = appDom.cloneFragment(dom, node.id);
+      domApi.addFragment(fragment, node.parentId, node.parentProp);
+
+      onNodeDuplicated?.(appDom.getNode(fragment, fragment.root));
+      onMenuClose(event);
+    },
+    [dom, domApi, nodeId, onMenuClose, onNodeDuplicated],
+  );
+
+  return (
+    <React.Fragment>
+      <IconButton
+        className={clsx(classes.treeItemMenuButton, {
+          [classes.treeItemMenuOpen]: menuProps.open,
+        })}
+        aria-label="Open hierarchy menu"
+        {...buttonProps}
+      >
+        <MoreVertIcon />
+      </IconButton>
+
+      <Menu
+        {...menuProps}
+        onClick={(event) => {
+          event.stopPropagation();
+          menuProps.onClick?.(event);
+        }}
+      >
+        <MenuItem onClick={handleDuplicateClick}>
+          <ListItemIcon>
+            <ContentCopyIcon />
+          </ListItemIcon>
+          <ListItemText> {duplicateLabelText}</ListItemText>
+        </MenuItem>
+
+        <MenuItem onClick={handleDeleteNodeDialogOpen}>
+          <ListItemIcon>
+            <DeleteIcon />
+          </ListItemIcon>
+          <ListItemText> {deleteLabelText}</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      <ConfirmDialog
+        open={!!deletedNode}
+        severity="error"
+        onClose={handleDeleteNodeDialogClose}
+        okButton="Delete"
+      >
+        Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
+      </ConfirmDialog>
+    </React.Fragment>
+  );
+}
+
+type StyledTreeItemProps = TreeItemProps & {
+  onNodeDeleted?: (deletedNode: appDom.AppDomNode) => void;
+  onNodeDuplicated?: (newNodeId: appDom.AppDomNode) => void;
+  onCreate?: React.MouseEventHandler;
+  labelIcon?: React.ReactNode;
+  labelText: string;
+  createLabelText?: string;
+  deleteLabelText?: string;
+  duplicateLabelText?: string;
+  toolpadNodeId?: NodeId;
+};
+
+function HierarchyTreeItem(props: StyledTreeItemProps) {
+  const {
+    labelIcon,
+    labelText,
+    onCreate,
+    onNodeDeleted,
+    onNodeDuplicated,
+    createLabelText = `Create ${labelText}`,
+    deleteLabelText = `Delete ${labelText}`,
+    duplicateLabelText = `Duplicate ${labelText}`,
+    toolpadNodeId,
+    ...other
+  } = props;
+
+  return (
+    <StyledTreeItem
+      label={
+        <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
+          {labelIcon}
+          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+            {labelText}
+          </Typography>
+          {onCreate ? (
+            <IconButton aria-label={createLabelText} onClick={onCreate}>
+              <AddIcon />
+            </IconButton>
+          ) : null}
+          {toolpadNodeId ? (
+            <NodeMenu
+              nodeId={toolpadNodeId}
+              deleteLabelText={deleteLabelText}
+              duplicateLabelText={duplicateLabelText}
+              onNodeDeleted={onNodeDeleted}
+              onNodeDuplicated={onNodeDuplicated}
+            />
+          ) : null}
+        </Box>
+      }
+      {...other}
+    />
+  );
 }
 
 function getLinkToNodeEditor(appId: string, node: appDom.AppDomNode): string | undefined {
@@ -185,7 +253,6 @@ export interface HierarchyExplorerProps {
 
 export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
   const dom = useDom();
-  const domApi = useDomApi();
 
   const app = appDom.getApp(dom);
   const { codeComponents = [], pages = [], connections = [] } = appDom.getChildNodes(dom, app);
@@ -265,63 +332,36 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [],
   );
 
-  const [deletedNodeId, setDeletedNodeId] = React.useState<NodeId | null>(null);
-  const handleDeleteNodeDialogOpen = React.useCallback(
-    (nodeId: NodeId) => (event: React.MouseEvent) => {
-      event.stopPropagation();
-      setDeletedNodeId(nodeId);
-    },
-    [],
-  );
-
-  const handledeleteNodeDialogClose = React.useCallback(
-    (confirmed: boolean) => {
-      if (confirmed && deletedNodeId) {
+  const handleNodeDeleted = React.useCallback(
+    (deletedNode: appDom.AppDomNode) => {
+      if (activeNode === deletedNode.id) {
+        const siblings = appDom.getSiblings(dom, deletedNode);
+        const nextFocusedNode = siblings.find((sibling) => sibling.type === deletedNode.type);
         let redirectAfterDelete: string | undefined;
-        if (deletedNodeId === activeNode) {
-          const deletedNode = appDom.getNode(dom, deletedNodeId);
-          const siblings = appDom.getSiblings(dom, deletedNode);
-          const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
-          if (firstSiblingOfType) {
-            redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
-          } else {
-            redirectAfterDelete = `/app/${appId}`;
-          }
-        }
 
-        domApi.removeNode(deletedNodeId);
+        if (nextFocusedNode) {
+          redirectAfterDelete = getLinkToNodeEditor(appId, nextFocusedNode);
+        } else {
+          redirectAfterDelete = `/app/${appId}`;
+        }
 
         if (redirectAfterDelete) {
+          console.log('navigating', redirectAfterDelete);
           navigate(redirectAfterDelete);
         }
-      } else {
-        setDeletedNodeId(null);
       }
     },
-    [activeNode, appId, deletedNodeId, dom, domApi, navigate],
+    [activeNode, appId, dom, navigate],
   );
 
-  const deletedNode = deletedNodeId && appDom.getMaybeNode(dom, deletedNodeId);
-  const latestDeletedNode = useLatest(deletedNode);
-
-  const handleDuplicateNode = React.useCallback(
-    (nodeId: NodeId) => () => {
-      const node = appDom.getNode(dom, nodeId);
-
-      invariant(
-        node.parentId && node.parentProp,
-        'Duplication should never be called on nodes that are not placed in the dom',
-      );
-
-      const fragment = appDom.cloneFragment(dom, node.id);
-      domApi.addFragment(fragment, node.parentId, node.parentProp);
-      const fragmentRoot = appDom.getNode(fragment, fragment.root);
-      const editorLink = getLinkToNodeEditor(appId, fragmentRoot);
+  const handleNodeDuplicated = React.useCallback(
+    (newNode: appDom.AppDomNode) => {
+      const editorLink = getLinkToNodeEditor(appId, newNode);
       if (editorLink) {
         navigate(editorLink);
       }
     },
-    [appId, dom, domApi, navigate],
+    [appId, navigate],
   );
 
   return (
@@ -348,11 +388,11 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             <HierarchyTreeItem
               key={connectionNode.id}
               nodeId={connectionNode.id}
+              toolpadNodeId={connectionNode.id}
               aria-level={2}
               labelText={connectionNode.name}
-              onDuplicate={handleDuplicateNode(connectionNode.id)}
-              onDelete={handleDeleteNodeDialogOpen(connectionNode.id)}
-              menuButton
+              onNodeDuplicated={handleNodeDuplicated}
+              onNodeDeleted={handleNodeDeleted}
             />
           ))}
         </HierarchyTreeItem>
@@ -368,11 +408,11 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             <HierarchyTreeItem
               key={codeComponent.id}
               nodeId={codeComponent.id}
+              toolpadNodeId={codeComponent.id}
               aria-level={2}
               labelText={codeComponent.name}
-              onDuplicate={handleDuplicateNode(codeComponent.id)}
-              onDelete={handleDeleteNodeDialogOpen(codeComponent.id)}
-              menuButton
+              onNodeDuplicated={handleNodeDuplicated}
+              onNodeDeleted={handleNodeDeleted}
             />
           ))}
         </HierarchyTreeItem>
@@ -388,11 +428,11 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
             <HierarchyTreeItem
               key={page.id}
               nodeId={page.id}
+              toolpadNodeId={page.id}
               aria-level={2}
               labelText={page.name}
-              onDuplicate={handleDuplicateNode(page.id)}
-              onDelete={handleDeleteNodeDialogOpen(page.id)}
-              menuButton
+              onNodeDuplicated={handleNodeDuplicated}
+              onNodeDeleted={handleNodeDeleted}
             />
           ))}
         </HierarchyTreeItem>
@@ -416,14 +456,6 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
         open={!!createCodeComponentDialogOpen}
         onClose={handleCreateCodeComponentDialogClose}
       />
-      <ConfirmDialog
-        open={!!deletedNode}
-        severity="error"
-        onClose={handledeleteNodeDialogClose}
-        okButton="Delete"
-      >
-        Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
-      </ConfirmDialog>
     </HierarchyExplorerRoot>
   );
 }

@@ -13,6 +13,7 @@ import {
   Alert,
   Box,
   MenuItem,
+  ListItemText,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -499,11 +500,11 @@ export default function QueryEditor() {
   );
 
   return (
-    <Stack spacing={1} alignItems="start">
+    <Stack spacing={1} alignItems="start" sx={{ width: '100%' }}>
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
         Add query
       </Button>
-      <List>
+      <List sx={{ width: '100%' }}>
         {queries.map((queryNode) => {
           return (
             <ListItem
@@ -511,7 +512,9 @@ export default function QueryEditor() {
               button
               onClick={() => setDialogState({ node: queryNode, isDraft: false })}
             >
-              {queryNode.name}
+              <ListItemText primaryTypographyProps={{ noWrap: true }}>
+                {queryNode.name}
+              </ListItemText>
             </ListItem>
           );
         })}

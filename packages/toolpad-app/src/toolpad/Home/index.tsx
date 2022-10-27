@@ -165,6 +165,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             ) : null}
             <TextField
               sx={{ my: 1 }}
+              required
               autoFocus
               fullWidth
               label="Name"

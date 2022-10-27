@@ -186,11 +186,20 @@ export class ToolpadEditor {
     this.dragToAppCanvas(sourceSelector, false, moveTargetX, moveTargetY);
   }
 
-  async openHierarchyMenu(name: string) {
-    const hierarchyItem = this.explorer
-      // @ts-expect-error https://github.com/microsoft/playwright/pull/17952
-      .getByRole('treeitem', { level: 2 })
-      .filter({ hasText: name });
+  hierarchyItem(group: string, name: string): Locator {
+    return (
+      this.explorer
+        // @ts-expect-error https://github.com/microsoft/playwright/pull/17952
+        .getByRole('treeitem')
+        .filter({ hasText: group })
+        // @ts-expect-error https://github.com/microsoft/playwright/pull/17952
+        .getByRole('treeitem')
+        .filter({ hasText: name })
+    );
+  }
+
+  async openHierarchyMenu(group: string, name: string) {
+    const hierarchyItem = this.hierarchyItem(group, name);
     const menuButton = hierarchyItem.getByRole('button', { name: 'Open hierarchy menu' });
     await hierarchyItem.hover();
     await menuButton.click();

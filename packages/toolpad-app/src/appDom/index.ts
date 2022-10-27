@@ -626,11 +626,12 @@ export function proposeName(candidate: string, disallowedNames: Set<string> = ne
   if (!disallowedNames.has(slug)) {
     return slug;
   }
+  const basename = candidate.replace(/\d+$/, '');
   let counter = 1;
-  while (disallowedNames.has(slug + counter)) {
+  while (disallowedNames.has(basename + counter)) {
     counter += 1;
   }
-  return slug + counter;
+  return basename + counter;
 }
 
 export function setNodeName(dom: AppDom, node: AppDomNode, name: string): AppDom {

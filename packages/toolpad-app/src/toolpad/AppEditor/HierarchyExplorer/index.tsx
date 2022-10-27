@@ -345,10 +345,11 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
           redirectAfterDelete = `/app/${appId}`;
         }
 
-        if (redirectAfterDelete) {
-          console.log('navigating', redirectAfterDelete);
-          navigate(redirectAfterDelete);
-        }
+        setTimeout(() => {
+          if (redirectAfterDelete) {
+            navigate(redirectAfterDelete);
+          }
+        }, 0);
       }
     },
     [activeNode, appId, dom, navigate],

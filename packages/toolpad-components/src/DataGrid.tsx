@@ -111,11 +111,10 @@ function inferColumnType(value: unknown): string {
   switch (typeof value) {
     case 'number':
     case 'boolean':
+      return valueType;
     case 'string':
-      if (valueType === 'string') {
-        if (URL_REGEX.test(value as string)) {
-          return 'link';
-        }
+      if (URL_REGEX.test(value as string)) {
+        return 'link';
       }
       return valueType;
     case 'object':

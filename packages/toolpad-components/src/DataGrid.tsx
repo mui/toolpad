@@ -134,6 +134,7 @@ const DEFAULT_TYPES = new Set([
   'singleSelect',
   'actions',
   'link',
+  'image',
 ]);
 
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
@@ -155,6 +156,11 @@ const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
       <Link href={value} target="_blank" rel="noopener noreferrer">
         {value}
       </Link>
+    ),
+  },
+  image: {
+    renderCell: ({ field, id, value }) => (
+      <Box component="img" src={value} alt={`${field}${id}`} sx={{ maxWidth: '100%', p: 2 }} />
     ),
   },
 };
@@ -345,6 +351,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         columns={columns}
         key={gridKey}
         getRowId={getRowId}
+        getRowHeight={() => 'auto'}
         onSelectionModelChange={onSelectionModelChange}
         selectionModel={selectionModel}
         error={errorProp}

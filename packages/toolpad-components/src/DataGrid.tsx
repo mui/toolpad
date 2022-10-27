@@ -5,12 +5,11 @@ import {
   GridColumnResizeParams,
   GridColumns,
   GridCellParams,
-  GridEventListener,
   GridRowId,
   GridRowsProp,
   GridRowModes,
-  GridRowModesModel,
   GridRowParams,
+  GridRowModesModel,
   GridColumnOrderChangeParams,
   useGridApiContext,
   gridColumnsTotalWidthSelector,
@@ -22,7 +21,6 @@ import {
   GridColDef,
   GridValueGetterParams,
   MuiEvent,
-  MuiBaseEvent,
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
@@ -179,6 +177,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColumns {
     type: DEFAULT_TYPES.has(type) ? type : undefined,
     ...column,
     ...COLUMN_TYPES[type],
+    // TODO: Add an option to set editability per column
     editable: true,
   }));
 }
@@ -333,20 +332,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
 
-  const handleRowEditStart = React.useCallback(
-    (params: GridRowParams, event: MuiEvent<React.SyntheticEvent>) => {
-      event.defaultMuiPrevented = true;
-    },
-    [],
-  );
-
-  const handleRowEditStop: GridEventListener<'rowEditStop'> = React.useCallback(
-    (params: GridRowParams, event: MuiEvent<MuiBaseEvent>) => {
-      event.defaultMuiPrevented = true;
-    },
-    [],
-  );
-
   const handleCancelClick = React.useCallback(
     (id: GridRowId) => () => {
       setRowModesModel({
@@ -364,12 +349,21 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [rowModesModel],
   );
 
+  const handleRowEditStart = React.useCallback(
+    (params: GridRowParams, event: MuiEvent<React.SyntheticEvent>) => {
+      if (!onUpdateProp) {
+        event.defaultMuiPrevented = true;
+      }
+    },
+    [onUpdateProp],
+  );
+
   const processRowUpdate = React.useCallback(
-    (newRow: GridRowsProp[number]) => {
+    (newRow: GridRowsProp[number], oldRow: GridRowsProp[number]) => {
       if (onUpdateProp) {
         onUpdateProp({ event: { row: newRow } });
       }
-      return newRow;
+      return oldRow;
     },
     [onUpdateProp],
   );
@@ -383,18 +377,18 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           type: 'actions',
           getActions: ({ id, row }: GridCellParams) => {
             const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-            if (isInEditMode) {
+            if (isInEditMode && onUpdateProp) {
               return [
                 <GridActionsCellItem
                   icon={<SaveIcon />}
                   label="Save"
-                  key={'Save'}
+                  key={'save'}
                   onClick={handleSaveClick(id)}
                 />,
                 <GridActionsCellItem
                   icon={<CancelIcon />}
                   label="Cancel"
-                  key={'Cancel'}
+                  key={'cancel'}
                   onClick={handleCancelClick(id)}
                 />,
               ];
@@ -404,6 +398,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                 <GridActionsCellItem
                   icon={<EditIcon />}
                   label="Edit"
+                  key={'edit'}
                   onClick={() => {
                     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
                   }}
@@ -451,7 +446,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         rowModesModel={rowModesModel}
         onRowModesModelChange={(newModel) => setRowModesModel(newModel)}
         onRowEditStart={handleRowEditStart}
-        onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
         experimentalFeatures={{ newEditingApi: true }}
         components={{

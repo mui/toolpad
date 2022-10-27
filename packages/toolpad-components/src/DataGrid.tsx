@@ -337,6 +337,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
+  const hasImageColumns = columns.reduce((acc, column) => acc || column.type === 'image', false);
+
   return (
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
       <DataGridPro
@@ -351,7 +353,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         columns={columns}
         key={gridKey}
         getRowId={getRowId}
-        getRowHeight={() => 'auto'}
         onSelectionModelChange={onSelectionModelChange}
         selectionModel={selectionModel}
         error={errorProp}
@@ -360,6 +361,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             message: typeof errorProp === 'string' ? errorProp : errorProp?.message,
           },
         }}
+        {...(hasImageColumns ? { getRowHeight: () => 'auto' } : {})}
         {...props}
       />
     </div>

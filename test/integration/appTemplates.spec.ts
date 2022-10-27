@@ -41,7 +41,6 @@ test('can use images app template', async ({ page }) => {
   ]);
 
   const imageLocator = page.locator('img');
-
   expect(await imageLocator.getAttribute('src')).toContain(
     'https://images.dog.ceo/breeds/australian-shepherd',
   );

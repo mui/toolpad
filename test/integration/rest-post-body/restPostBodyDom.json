@@ -1,0 +1,248 @@
+{
+  "root": "5r0aq0g",
+  "nodes": {
+    "2733rxn": {
+      "id": "2733rxn",
+      "name": "pageRow1",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "5s1aq3a",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a1"
+    },
+    "3s03reg": {
+      "id": "3s03reg",
+      "name": "string",
+      "type": "query",
+      "params": {},
+      "parentId": "5s1aq3a",
+      "attributes": {
+        "mode": {
+          "type": "const",
+          "value": "mutation"
+        },
+        "query": {
+          "type": "const",
+          "value": {
+            "url": {
+              "type": "const",
+              "value": "https://httpbin.org/post"
+            },
+            "body": {
+              "kind": "raw",
+              "content": {
+                "type": "const",
+                "value": "{\n    \"name\": \"morpheus\",\n    \"job\": \"string\"\n}"
+              },
+              "contentType": {
+                "type": "const",
+                "value": "application/json"
+              }
+            },
+            "method": "POST",
+            "headers": []
+          }
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "rest"
+        },
+        "connectionId": {
+          "type": "const",
+          "value": null
+        }
+      },
+      "parentProp": "queries",
+      "parentIndex": "a0"
+    },
+    "5r0aq0g": {
+      "id": "5r0aq0g",
+      "name": "Application",
+      "type": "app",
+      "parentId": null,
+      "attributes": {},
+      "parentProp": null,
+      "parentIndex": null
+    },
+    "5s1aq3a": {
+      "id": "5s1aq3a",
+      "name": "page1",
+      "type": "page",
+      "parentId": "5r0aq0g",
+      "attributes": {
+        "title": {
+          "type": "const",
+          "value": "Page 1"
+        }
+      },
+      "parentProp": "pages",
+      "parentIndex": "a0"
+    },
+    "b6e3rgs": {
+      "id": "b6e3rgs",
+      "name": "objectResponse",
+      "type": "element",
+      "props": {
+        "value": {
+          "type": "jsExpression",
+          "value": "JSON.parse(object.data.data).job\n"
+        }
+      },
+      "layout": {},
+      "parentId": "2733rxn",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Typography"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a1"
+    },
+    "nl03rb6": {
+      "id": "nl03rb6",
+      "name": "button",
+      "type": "element",
+      "props": {
+        "content": {
+          "type": "const",
+          "value": "Query with string"
+        },
+        "onClick": {
+          "type": "jsExpressionAction",
+          "value": "string.call();"
+        }
+      },
+      "layout": {},
+      "parentId": "z913rjz",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Button"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "pe23rbz": {
+      "id": "pe23rbz",
+      "name": "button1",
+      "type": "element",
+      "props": {
+        "content": {
+          "type": "const",
+          "value": "Query with object"
+        },
+        "onClick": {
+          "type": "jsExpressionAction",
+          "value": "object.call();"
+        }
+      },
+      "layout": {},
+      "parentId": "2733rxn",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Button"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    },
+    "pw83r2g": {
+      "id": "pw83r2g",
+      "name": "stringResponse",
+      "type": "element",
+      "props": {
+        "value": {
+          "type": "jsExpression",
+          "value": "JSON.parse(string.data.data).job\n"
+        }
+      },
+      "layout": {},
+      "parentId": "z913rjz",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "Typography"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a1"
+    },
+    "qq33rip": {
+      "id": "qq33rip",
+      "name": "object",
+      "type": "query",
+      "params": {
+        "obj": {
+          "type": "const",
+          "value": null
+        }
+      },
+      "parentId": "5s1aq3a",
+      "attributes": {
+        "mode": {
+          "type": "const",
+          "value": "mutation"
+        },
+        "query": {
+          "type": "const",
+          "value": {
+            "url": {
+              "type": "const",
+              "value": "https://httpbin.org/post"
+            },
+            "body": {
+              "kind": "raw",
+              "content": {
+                "type": "jsExpression",
+                "value": "parameters.obj ?? { name: \"morpheus\", job: \"object\" }\n"
+              },
+              "contentType": {
+                "type": "const",
+                "value": "application/json"
+              }
+            },
+            "method": "POST",
+            "headers": []
+          }
+        },
+        "dataSource": {
+          "type": "const",
+          "value": "rest"
+        },
+        "connectionId": {
+          "type": "const",
+          "value": null
+        }
+      },
+      "parentProp": "queries",
+      "parentIndex": "a1"
+    },
+    "z913rjz": {
+      "id": "z913rjz",
+      "name": "pageRow",
+      "type": "element",
+      "props": {},
+      "layout": {},
+      "parentId": "5s1aq3a",
+      "attributes": {
+        "component": {
+          "type": "const",
+          "value": "PageRow"
+        }
+      },
+      "parentProp": "children",
+      "parentIndex": "a0"
+    }
+  },
+  "version": 2
+}

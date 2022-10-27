@@ -1,8 +1,8 @@
 import * as path from 'path';
-import { test, expect } from '../playwright/test';
-import { ToolpadHome } from '../models/ToolpadHome';
-import { ToolpadRuntime } from '../models/ToolpadRuntime';
-import { readJsonFile } from '../utils/fs';
+import { test, expect } from '../../playwright/test';
+import { ToolpadHome } from '../../models/ToolpadHome';
+import { ToolpadRuntime } from '../../models/ToolpadRuntime';
+import { readJsonFile } from '../../utils/fs';
 
 test('duplicate app from home flow', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './duplicateNavigationDom.json'));

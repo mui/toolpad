@@ -356,7 +356,11 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
       }
     } else {
       const pathUri = monaco.Uri.parse(`./scripts/${cuid()}${getExtension(language)}`);
-      const model = monaco.editor.createModel(value || '', language, pathUri);
+      const model = monaco.editor.createModel(
+        (typeof value === 'object' ? JSON.stringify(value) : value) || '',
+        language,
+        pathUri,
+      );
 
       instance = monaco.editor.create(rootRef.current, {
         model,

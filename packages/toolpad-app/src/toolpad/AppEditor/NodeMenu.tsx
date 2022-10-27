@@ -45,7 +45,9 @@ export default function NodeMenu({
   const latestDeletedNode = useLatest(deletedNode);
 
   const handleDeleteNodeDialogClose = React.useCallback(
-    (confirmed: boolean) => {
+    (confirmed: boolean, event: React.MouseEvent) => {
+      event.stopPropagation();
+
       if (confirmed && deletedNode) {
         domApi.removeNode(deletedNodeId);
 

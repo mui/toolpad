@@ -13,8 +13,9 @@ test('can use statistics app template', async ({ page }) => {
   await runtimeModel.gotoPage(app.id, 'stats');
 
   await page.locator('h3:has-text("Statistics")').waitFor({ state: 'visible' });
-  await page.locator('text="Active Cases_text"').waitFor({ state: 'visible' });
-  await page.locator('text="USA"').waitFor({ state: 'visible' });
+  expect(await page.locator('[role="columnheader"]').first().textContent()).toBe(
+    'Active Cases_text',
+  );
 });
 
 test('can use images app template', async ({ page }) => {

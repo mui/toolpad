@@ -1043,7 +1043,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           }
         }
 
-        const draggedNodeParent = appDom.getParent(dom, draggedNode);
+        const draggedNodeParent = selection ? appDom.getParent(dom, draggedNode) : null;
         if (
           draggedNode.layout?.columnSize &&
           draggedNodeParent &&

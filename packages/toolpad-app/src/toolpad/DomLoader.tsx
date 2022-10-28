@@ -80,7 +80,7 @@ const redoStack: appDom.AppDom[] = [];
 
 const updateUndoStack = throttle((dom: appDom.AppDom) => {
   undoStack.push(dom);
-}, 1000);
+}, 500);
 
 const SKIP_UNDO_ACTIONS = ['DOM_UNDO', 'DOM_REDO', 'DOM_SAVED', 'DOM_SAVING', 'DOM_SAVING_ERROR'];
 

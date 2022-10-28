@@ -1,12 +1,16 @@
+const SINGLE_ACTION_INPUT_TYPES = ['checkbox', 'radio', 'range', 'color'];
+
 export const hasFieldFocus = (documentTarget = document) => {
-  const activeElement = documentTarget.activeElement as HTMLElement;
+  const activeElement = documentTarget.activeElement as HTMLElement | HTMLInputElement;
 
   if (!activeElement) {
     return false;
   }
   const { nodeName, contentEditable } = activeElement;
 
-  const focusedInput = nodeName === 'INPUT';
+  const type = activeElement.getAttribute('type') || '';
+
+  const focusedInput = nodeName === 'INPUT' && !SINGLE_ACTION_INPUT_TYPES.includes(type);
   const focusedTextarea = nodeName === 'TEXTAREA';
   const focusedContentEditable = contentEditable === 'true';
 

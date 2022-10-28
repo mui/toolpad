@@ -1,5 +1,7 @@
 version: '3.7'
 services:
+  # Reachable in the dev environment through
+  #   TOOLPAD_DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
   postgres:
     image: postgres:14.5
     restart: always

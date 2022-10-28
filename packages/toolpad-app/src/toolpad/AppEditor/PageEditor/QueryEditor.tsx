@@ -16,10 +16,11 @@ import {
   ListItemText,
   IconButton,
   styled,
+  ListItemButton,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import clsx from 'clsx';
@@ -513,12 +514,32 @@ export default function QueryEditor() {
     [dom, domApi, page],
   );
 
-  const handleRemove = React.useCallback(
-    (node: appDom.QueryNode) => {
-      domApi.removeNode(node.id);
+  const handleDeleteNode = React.useCallback(
+    (nodeId: NodeId) => {
+      domApi.removeNode(nodeId);
       handleEditStateDialogClose();
     },
     [domApi, handleEditStateDialogClose],
+  );
+
+  const handleRemove = React.useCallback(
+    (node: appDom.QueryNode) => handleDeleteNode(node.id),
+    [handleDeleteNode],
+  );
+
+  const handleDuplicateNode = React.useCallback(
+    (nodeId: NodeId) => {
+      const node = appDom.getNode(dom, nodeId, 'query');
+      invariant(
+        page,
+        'handleDuplicateNode should only be used for queries, which should always belong to a page',
+      );
+      const existingNames = appDom.getExistingNamesForChildren(dom, page);
+      const newName = appDom.proposeName(node.name, existingNames);
+      const copy = appDom.createNode(dom, 'query', { ...node, name: newName });
+      setDialogState({ node: copy, isDraft: true });
+    },
+    [dom, page],
   );
 
   return (
@@ -531,8 +552,7 @@ export default function QueryEditor() {
           return (
             <QueryListItem
               key={queryNode.id}
-              button
-              onClick={() => setDialogState({ node: queryNode, isDraft: false })}
+              disablePadding
               secondaryAction={
                 <NodeMenu
                   renderButton={({ buttonProps, menuProps }) => (
@@ -550,13 +570,17 @@ export default function QueryEditor() {
                   nodeId={queryNode.id}
                   deleteLabelText={`Delete ${queryNode.name}`}
                   duplicateLabelText={`Duplicate ${queryNode.name}`}
-                  /* onNodeDuplicated={handleDuplicated} */
+                  onDeleteNode={handleDeleteNode}
+                  onDuplicateNode={handleDuplicateNode}
                 />
               }
             >
-              <ListItemText primaryTypographyProps={{ noWrap: true }}>
-                {queryNode.name}
-              </ListItemText>
+              <ListItemButton
+                onClick={() => setDialogState({ node: queryNode, isDraft: false })}
+                dense
+              >
+                <ListItemText primaryTypographyProps={{ noWrap: true }} primary={queryNode.name} />
+              </ListItemButton>
             </QueryListItem>
           );
         })}

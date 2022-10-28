@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../appDom';
-import { useDom, useDomApi } from '../DomLoader';
+import { useDom } from '../DomLoader';
 import useLatest from '../../utils/useLatest';
 import { ConfirmDialog } from '../../components/SystemDialogs';
 import useMenu from '../../utils/useMenu';
@@ -14,7 +14,7 @@ export interface NodeMenuProps {
   renderButton: (params: { buttonProps: ButtonProps; menuProps: MenuProps }) => React.ReactNode;
   deleteLabelText?: string;
   duplicateLabelText?: string;
-  onNodeDeleted?: (deletedNode: appDom.AppDomNode) => void;
+  onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
 }
 
@@ -23,11 +23,10 @@ export default function NodeMenu({
   renderButton,
   deleteLabelText,
   duplicateLabelText,
-  onNodeDeleted,
+  onDeleteNode,
   onDuplicateNode,
 }: NodeMenuProps) {
   const dom = useDom();
-  const domApi = useDomApi();
 
   const { menuProps, buttonProps, onMenuClose } = useMenu();
 
@@ -47,21 +46,18 @@ export default function NodeMenu({
     (confirmed: boolean, event: React.MouseEvent) => {
       event.stopPropagation();
 
-      if (confirmed && deletedNode) {
-        domApi.removeNode(deletedNodeId);
-
-        onNodeDeleted?.(deletedNode);
-      }
-
       setDeletedNodeId(null);
+      if (confirmed && deletedNode) {
+        onDeleteNode?.(deletedNodeId);
+      }
     },
-    [deletedNode, deletedNodeId, domApi, onNodeDeleted],
+    [deletedNode, deletedNodeId, onDeleteNode],
   );
 
   const handleDuplicateClick = React.useCallback(
     (event: React.MouseEvent) => {
-      onDuplicateNode?.(nodeId);
       onMenuClose(event);
+      onDuplicateNode?.(nodeId);
     },
     [onDuplicateNode, nodeId, onMenuClose],
   );

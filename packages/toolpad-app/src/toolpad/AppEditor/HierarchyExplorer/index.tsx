@@ -57,7 +57,7 @@ function getActiveNodeId(location: Location): NodeId | null {
 }
 
 type StyledTreeItemProps = TreeItemProps & {
-  onNodeDeleted?: (deletedNode: appDom.AppDomNode) => void;
+  onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;
   onCreate?: React.MouseEventHandler;
   labelIcon?: React.ReactNode;
@@ -73,7 +73,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     labelIcon,
     labelText,
     onCreate,
-    onNodeDeleted,
+    onDeleteNode,
     onDuplicateNode,
     createLabelText = `Create ${labelText}`,
     deleteLabelText = `Delete ${labelText}`,
@@ -111,7 +111,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
               nodeId={toolpadNodeId}
               deleteLabelText={deleteLabelText}
               duplicateLabelText={duplicateLabelText}
-              onNodeDeleted={onNodeDeleted}
+              onDeleteNode={onDeleteNode}
               onDuplicateNode={onDuplicateNode}
             />
           ) : null}
@@ -222,25 +222,27 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [],
   );
 
-  const handleNodeDeleted = React.useCallback(
-    (deletedNode: appDom.AppDomNode) => {
-      if (activeNode === deletedNode.id) {
+  const handleDeleteNode = React.useCallback(
+    (nodeId: NodeId) => {
+      let redirectAfterDelete: string | undefined;
+      if (nodeId === activeNode) {
+        const deletedNode = appDom.getNode(dom, nodeId);
         const siblings = appDom.getSiblings(dom, deletedNode);
-        const nextFocusedNode = siblings.find((sibling) => sibling.type === deletedNode.type);
-        let redirectAfterDelete: string | undefined;
-
-        if (nextFocusedNode) {
-          redirectAfterDelete = getLinkToNodeEditor(appId, nextFocusedNode);
+        const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
+        if (firstSiblingOfType) {
+          redirectAfterDelete = getLinkToNodeEditor(appId, firstSiblingOfType);
         } else {
           redirectAfterDelete = `/app/${appId}`;
         }
+      }
 
-        if (redirectAfterDelete) {
-          navigate(redirectAfterDelete);
-        }
+      domApi.removeNode(nodeId);
+
+      if (redirectAfterDelete) {
+        navigate(redirectAfterDelete);
       }
     },
-    [activeNode, appId, dom, navigate],
+    [activeNode, appId, dom, domApi, navigate],
   );
 
   const handleDuplicateNode = React.useCallback(
@@ -291,7 +293,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
               aria-level={2}
               labelText={connectionNode.name}
               onDuplicateNode={handleDuplicateNode}
-              onNodeDeleted={handleNodeDeleted}
+              onDeleteNode={handleDeleteNode}
             />
           ))}
         </HierarchyTreeItem>
@@ -311,7 +313,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
               aria-level={2}
               labelText={codeComponent.name}
               onDuplicateNode={handleDuplicateNode}
-              onNodeDeleted={handleNodeDeleted}
+              onDeleteNode={handleDeleteNode}
             />
           ))}
         </HierarchyTreeItem>
@@ -331,7 +333,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
               aria-level={2}
               labelText={page.name}
               onDuplicateNode={handleDuplicateNode}
-              onNodeDeleted={handleNodeDeleted}
+              onDeleteNode={handleDeleteNode}
             />
           ))}
         </HierarchyTreeItem>

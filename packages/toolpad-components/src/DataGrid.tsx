@@ -15,11 +15,13 @@ import {
   GridColDef,
   GridValueGetterParams,
   useGridApiRef,
+  GridEnrichedColDef,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
 import { Box, debounce, LinearProgress, Skeleton, Link, styled } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
+import { hasImageExtension } from '@mui/toolpad-core/path';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -100,12 +102,6 @@ function SkeletonLoadingOverlay() {
   );
 }
 
-// https://stackoverflow.com/questions/161738/what-is-the-best-regular-expression-to-check-if-a-string-is-a-valid-url
-const URL_REGEX =
-  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/;
-
-const IMAGE_REGEX = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|webp))/i;
-
 function inferColumnType(value: unknown): string {
   if (value instanceof Date) {
     return 'dateTime';
@@ -116,13 +112,17 @@ function inferColumnType(value: unknown): string {
     case 'boolean':
       return valueType;
     case 'string':
-      if (IMAGE_REGEX.test(value)) {
-        return 'image';
-      }
-      if (URL_REGEX.test(value)) {
+      try {
+        const url = new URL(value);
+
+        if (hasImageExtension(url.pathname)) {
+          return 'image';
+        }
+
         return 'link';
+      } catch (error) {
+        return valueType;
       }
-      return valueType;
     case 'object':
       return 'json';
     default:
@@ -138,15 +138,16 @@ const DEFAULT_TYPES = new Set([
   'boolean',
   'singleSelect',
   'actions',
-  'link',
-  'image',
 ]);
 
 function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
   return typeof value === 'number' ? new Date(value) : value;
 }
 
-const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
+type ToolpadColumnExtraProps = { customType?: string };
+type ToolpadGridColDef = GridColDef & ToolpadColumnExtraProps;
+
+const COLUMN_TYPES: Record<string, Omit<ToolpadGridColDef, 'field'>> = {
   json: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
@@ -164,6 +165,7 @@ const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
     ),
   },
   image: {
+    customType: 'image',
     renderCell: ({ field, id, value }) => (
       <Box component="img" src={value} alt={`${field}${id}`} sx={{ maxWidth: '100%', p: 2 }} />
     ),
@@ -342,10 +344,12 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  const hasImageColumns = React.useMemo(
-    () => columns.some(({ type }) => type === 'image'),
-    [columns],
-  );
+  const handleGetRowHeight = React.useCallback(() => {
+    const hasImageColumns = columns.some(
+      ({ customType }: ToolpadGridColDef) => customType === 'image',
+    );
+    return hasImageColumns ? 'auto' : null;
+  }, [columns]);
 
   return (
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
@@ -369,7 +373,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             message: typeof errorProp === 'string' ? errorProp : errorProp?.message,
           },
         }}
-        {...(hasImageColumns ? { getRowHeight: () => 'auto' } : {})}
+        getRowHeight={handleGetRowHeight}
         {...props}
       />
     </div>

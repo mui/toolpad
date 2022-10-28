@@ -12,6 +12,7 @@
     "./package.json": "./package.json",
     ".": "./dist/index.js",
     "./constants": "./dist/constants.js",
+    "./path": "./dist/path.js",
     "./runtime": "./dist/runtime.js",
     "./jsRuntime": "./dist/jsRuntime.js",
     "./objectKey": "./dist/objectKey.js",

@@ -343,7 +343,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const hasImageColumns = React.useMemo(
-    () => !!columns.find((column) => column.type === 'image'),
+    () => columns.some(({ type }) => type === 'image'),
     [columns],
   );
 

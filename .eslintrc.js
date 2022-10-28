@@ -97,9 +97,10 @@ module.exports = {
               {
                 // Running into issues with @mui/icons-material not being an ESM package, while the
                 // toolpad-core package is. This makes Next.js try to load @mui/icons-material/* as ESM
-                // Loading from the index export works as a workaround for now
-                group: ['@mui/icons-material/*'],
-                message: "Use `import { Icon } from '@mui/icons-material'` instead.",
+                // We'll just avoid mporting icons in these packages
+                // Remove restriction after https://github.com/mui/material-ui/pull/30510 gets resolved
+                group: ['@mui/icons-material', '@mui/icons-material/*'],
+                message: "Don't use @mui/icons-material inthese packages for now.",
               },
             ],
           },

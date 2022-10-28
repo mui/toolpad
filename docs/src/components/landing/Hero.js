@@ -7,7 +7,6 @@ import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
 import SignUp from './SignUp';
 import ToolpadHeroContainer from '../../layouts/ToolpadHeroContainer';
-import DemoVideo from './DemoVideo';
 
 export default function Hero() {
   return (
@@ -70,16 +69,6 @@ export default function Hero() {
             },
           }}
         />
-      </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          mt: { xs: '20px', sm: '100px' },
-        }}
-      >
-        <DemoVideo />
       </Box>
     </ToolpadHeroContainer>
   );

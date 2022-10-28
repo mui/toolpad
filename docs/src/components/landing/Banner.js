@@ -12,12 +12,7 @@ import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRou
 export default function Banner(props) {
   const { content } = props;
   return (
-    <Box
-      sx={{
-        bgcolor: (theme) =>
-          theme.palette.mode === 'dark' ? theme.palette.primaryDark[900] : theme.palette.grey[50],
-      }}
-    >
+    <Box>
       <Container
         sx={{
           pt: 0,

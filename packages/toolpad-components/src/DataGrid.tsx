@@ -1,7 +1,12 @@
 import {
   DataGridProProps,
   DataGridPro,
-  GridToolbar,
+  GridEventListener,
+  GridToolbarContainer,
+  GridToolbarColumnsButton,
+  GridToolbarDensitySelector,
+  GridToolbarExport,
+  GridToolbarFilterButton,
   GridColumnResizeParams,
   GridColumns,
   GridCellParams,
@@ -11,7 +16,6 @@ import {
   GridRowParams,
   GridRowModesModel,
   GridColumnOrderChangeParams,
-  useGridApiContext,
   gridColumnsTotalWidthSelector,
   gridColumnPositionsSelector,
   gridDensityRowHeightSelector,
@@ -20,8 +24,10 @@ import {
   GridActionsCellItem,
   GridColDef,
   GridValueGetterParams,
+  MuiBaseEvent,
   MuiEvent,
   useGridApiRef,
+  useGridApiContext,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import {
@@ -29,9 +35,10 @@ import {
   Edit as EditIcon,
   Save as SaveIcon,
   Cancel as CancelIcon,
+  Add as AddIcon,
 } from '@mui/icons-material';
 import { useNode, createComponent } from '@mui/toolpad-core';
-import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
+import { Box, Button, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
@@ -199,6 +206,11 @@ interface OnUpdateEvent {
     row: GridRowsProp[number];
   };
 }
+interface OnCreateEvent {
+  event: {
+    row: GridRowsProp[number];
+  };
+}
 
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
@@ -210,6 +222,7 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   onSelectionChange?: (newSelection?: Selection | null) => void;
   onDelete?: (event: OnDeleteEvent) => void;
   onUpdate?: (event: OnUpdateEvent) => void;
+  onCreate?: (event: OnCreateEvent) => void;
   hideToolbar?: boolean;
 }
 
@@ -223,12 +236,14 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     selection,
     onDelete: onDeleteProp,
     onUpdate: onUpdateProp,
+    onCreate: onCreateProp,
     onSelectionChange,
     hideToolbar,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const apiRef = useGridApiRef();
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 
   const handleResize = React.useMemo(
@@ -314,6 +329,17 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [rowIdFieldProp],
   );
 
+  const setRowId = React.useCallback(
+    (row: any, id: any) => {
+      if (rowIdFieldProp) {
+        row[rowIdFieldProp] = id;
+      } else {
+        row.id = id;
+      }
+    },
+    [rowIdFieldProp],
+  );
+
   const onSelectionModelChange = React.useCallback(
     (ids: GridSelectionModel) => {
       onSelectionChange?.(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null);
@@ -332,14 +358,27 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
 
+  const isCreating = React.useCallback(
+    (id?: GridRowId) => {
+      if (!id) {
+        return apiRef.current.getRowsCount?.() !== rows.length;
+      }
+      return !rows.map(getRowId).includes(id);
+    },
+    [apiRef, getRowId, rows],
+  );
+
   const handleCancelClick = React.useCallback(
     (id: GridRowId) => () => {
+      if (isCreating(id)) {
+        apiRef.current.updateRows([{ id, _action: 'delete' }]);
+      }
       setRowModesModel({
         ...rowModesModel,
         [id]: { mode: GridRowModes.View, ignoreModifications: true },
       });
     },
-    [rowModesModel],
+    [apiRef, isCreating, rowModesModel],
   );
 
   const handleSaveClick = React.useCallback(
@@ -358,18 +397,32 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [onUpdateProp],
   );
 
+  const handleRowEditStop = React.useCallback<GridEventListener<'rowEditStop'>>(
+    (params: GridRowParams, event: MuiEvent<MuiBaseEvent>) => {
+      if (isCreating(params.id)) {
+        event.defaultMuiPrevented = true;
+      }
+    },
+    [isCreating],
+  );
+
   const processRowUpdate = React.useCallback(
     (newRow: GridRowsProp[number], oldRow: GridRowsProp[number]) => {
+      if (onCreateProp && isCreating(getRowId(newRow))) {
+        onCreateProp({ event: { row: newRow } });
+        return newRow;
+      }
+
       if (onUpdateProp) {
         onUpdateProp({ event: { row: newRow } });
       }
       return oldRow;
     },
-    [onUpdateProp],
+    [onUpdateProp, onCreateProp, isCreating, getRowId],
   );
 
   const actionField = React.useMemo(() => {
-    return onDeleteProp || onUpdateProp
+    return onDeleteProp || onUpdateProp || onCreateProp
       ? {
           field: 'actions',
           headerName: 'Actions',
@@ -377,7 +430,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           type: 'actions',
           getActions: ({ id, row }: GridCellParams) => {
             const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-            if (isInEditMode && onUpdateProp) {
+            if (isInEditMode || isCreating(id)) {
               return [
                 <GridActionsCellItem
                   icon={<SaveIcon />}
@@ -387,7 +440,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                 />,
                 <GridActionsCellItem
                   icon={<CancelIcon />}
-                  label="Cancel"
+                  label={'Cancel'}
                   key={'cancel'}
                   onClick={handleCancelClick(id)}
                 />,
@@ -422,13 +475,53 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           },
         }
       : null;
-  }, [onDeleteProp, onUpdateProp, rowModesModel, handleCancelClick, handleSaveClick]);
+  }, [
+    onDeleteProp,
+    onUpdateProp,
+    onCreateProp,
+    isCreating,
+    rowModesModel,
+    handleCancelClick,
+    handleSaveClick,
+  ]);
 
   const columnsWithActions = React.useMemo(() => {
     return actionField ? [...columns, actionField] : columns;
   }, [columns, actionField]);
 
-  const apiRef = useGridApiRef();
+  const handleCreateClick = React.useCallback(() => {
+    const newRow = Object.fromEntries(columns.map((column) => [column.field, '']));
+    setRowId(newRow, '...');
+    apiRef.current.setRows([...rows, newRow]);
+    setRowModesModel({
+      ...rowModesModel,
+      '...': { mode: GridRowModes.Edit, fieldToFocus: rowIdFieldProp || 'id' },
+    });
+    apiRef.current.scrollToIndexes({ rowIndex: rows.length });
+  }, [apiRef, rowIdFieldProp, setRowId, columns, rows, rowModesModel]);
+
+  function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarColumnsButton />
+        <GridToolbarFilterButton />
+        <GridToolbarDensitySelector />
+        <GridToolbarExport />
+        {onCreateProp ? (
+          <Button
+            variant="text"
+            disabled={isCreating()}
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleCreateClick}
+          >
+            Add record
+          </Button>
+        ) : null}
+      </GridToolbarContainer>
+    );
+  }
+
   React.useEffect(() => apiRef.current.updateColumns(columns), [apiRef, columns]);
 
   // The grid doesn't update when the getRowId or columns properties change, so it needs to be remounted
@@ -446,10 +539,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         rowModesModel={rowModesModel}
         onRowModesModelChange={(newModel) => setRowModesModel(newModel)}
         onRowEditStart={handleRowEditStart}
+        onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
         experimentalFeatures={{ newEditingApi: true }}
         components={{
-          Toolbar: hideToolbar ? null : GridToolbar,
+          Toolbar: hideToolbar ? null : CustomToolbar,
           LoadingOverlay: SkeletonLoadingOverlay,
         }}
         onColumnResize={handleResize}
@@ -524,6 +618,17 @@ export default createComponent(DataGridComponent, {
       },
     },
     onUpdate: {
+      typeDef: {
+        type: 'event',
+        arguments: [
+          {
+            name: 'event',
+            tsType: `{ row: ThisComponent['rows'][number] }`,
+          },
+        ],
+      },
+    },
+    onCreate: {
       typeDef: {
         type: 'event',
         arguments: [

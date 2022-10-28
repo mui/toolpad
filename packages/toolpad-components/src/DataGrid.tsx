@@ -157,6 +157,7 @@ const COLUMN_TYPES: Record<string, Omit<ToolpadGridColDef, 'field'>> = {
     valueGetter: dateValueGetter,
   },
   link: {
+    customType: 'link',
     renderCell: ({ value }) => (
       <Link href={value} target="_blank" rel="noopener noreferrer">
         {value}

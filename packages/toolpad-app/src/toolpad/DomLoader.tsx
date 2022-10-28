@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import { throttle } from 'lodash-es';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -12,6 +13,12 @@ import insecureHash from '../utils/insecureHash';
 import { NodeHashes } from '../types';
 
 export type DomAction =
+  | {
+      type: 'DOM_UNDO';
+    }
+  | {
+      type: 'DOM_REDO';
+    }
   | {
       type: 'DOM_SAVING';
     }
@@ -68,8 +75,43 @@ export type DomAction =
       node: appDom.AppDomNode;
     };
 
+const undoStack: appDom.AppDom[] = [];
+const redoStack: appDom.AppDom[] = [];
+
+const updateUndoStack = throttle((dom: appDom.AppDom) => {
+  undoStack.push(dom);
+}, 1000);
+
+const SKIP_UNDO_ACTIONS = ['DOM_UNDO', 'DOM_REDO', 'DOM_SAVED', 'DOM_SAVING', 'DOM_SAVING_ERROR'];
+
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
+  if (!SKIP_UNDO_ACTIONS.includes(action.type)) {
+    updateUndoStack(dom);
+  }
+
   switch (action.type) {
+    case 'DOM_UNDO': {
+      const undoDom = undoStack.pop();
+
+      if (!undoDom) {
+        return dom;
+      }
+
+      redoStack.push(dom);
+
+      return undoDom;
+    }
+    case 'DOM_REDO': {
+      const redoDom = redoStack.pop();
+
+      if (!redoDom) {
+        return dom;
+      }
+
+      undoStack.push(dom);
+
+      return redoDom;
+    }
     case 'DOM_SET_NODE_NAME': {
       // TODO: Also update all bindings on the page that use this name
       const node = appDom.getNode(dom, action.nodeId);
@@ -158,6 +200,12 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
 function createDomApi(dispatch: React.Dispatch<DomAction>) {
   return {
+    undo() {
+      dispatch({ type: 'DOM_UNDO' });
+    },
+    redo() {
+      dispatch({ type: 'DOM_REDO' });
+    },
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },

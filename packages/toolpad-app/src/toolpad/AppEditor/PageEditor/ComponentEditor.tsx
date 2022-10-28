@@ -149,7 +149,13 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
 
   const { selection } = editor;
 
-  const selectedNode = selection ? appDom.getNode(dom, selection) : null;
+  let selectedNode;
+
+  try {
+    selectedNode = selection ? appDom.getNode(dom, selection) : null;
+  } catch (error) {
+    console.warn('Selected node does not exists');
+  }
 
   return (
     <ComponentEditorRoot className={className} data-testid="component-editor">

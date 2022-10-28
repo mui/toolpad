@@ -11,7 +11,7 @@ export type Serializable =
   | { [key: string]: Serializable }
   | ((...args: Serializable[]) => Serializable);
 
-export function newSerailizable(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
+export function newSerializable(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
   switch (typeof json) {
     case 'string':
       return ctx.newString(json);
@@ -26,7 +26,7 @@ export function newSerailizable(ctx: QuickJSContext, json: Serializable): QuickJ
       if (Array.isArray(json)) {
         const result = ctx.newArray();
         Object.values(json).forEach((value, i) => {
-          const valueHandle = newSerailizable(ctx, value);
+          const valueHandle = newSerializable(ctx, value);
           ctx.setProp(result, i, valueHandle);
           valueHandle.dispose();
         });
@@ -34,7 +34,7 @@ export function newSerailizable(ctx: QuickJSContext, json: Serializable): QuickJ
       }
       const result = ctx.newObject();
       Object.entries(json).forEach(([key, value]) => {
-        const valueHandle = newSerailizable(ctx, value);
+        const valueHandle = newSerializable(ctx, value);
         ctx.setProp(result, key, valueHandle);
         valueHandle.dispose();
       });
@@ -44,7 +44,7 @@ export function newSerailizable(ctx: QuickJSContext, json: Serializable): QuickJ
       const result = ctx.newFunction('anonymous', (...args) => {
         const dumpedArgs: Serializable[] = args.map((arg) => ctx.dump(arg));
         const fnResult = json(...dumpedArgs);
-        return newSerailizable(ctx, fnResult);
+        return newSerializable(ctx, fnResult);
       });
       return result;
     }
@@ -61,7 +61,7 @@ export function evalExpressionInContext(
   globalScope: Record<string, Serializable> = {},
 ) {
   Object.entries(globalScope).forEach(([key, value]) => {
-    const valueHandle = newSerailizable(ctx, value);
+    const valueHandle = newSerializable(ctx, value);
     ctx.setProp(ctx.global, key, valueHandle);
     valueHandle.dispose();
   });

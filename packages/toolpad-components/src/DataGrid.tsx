@@ -15,7 +15,6 @@ import {
   GridColDef,
   GridValueGetterParams,
   useGridApiRef,
-  GridEnrichedColDef,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';

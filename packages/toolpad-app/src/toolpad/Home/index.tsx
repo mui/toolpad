@@ -62,6 +62,7 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
+import { ApiError, API_ERROR_CODES } from '../../apiErrors';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -142,17 +143,27 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             }
 
             const appDom = dom.trim() ? JSON.parse(dom) : null;
-            await createAppMutation.mutateAsync([
-              name,
-              {
-                from: {
-                  ...(appDom
-                    ? { kind: 'dom', dom: appDom }
-                    : { kind: 'template', id: appTemplateId }),
+            try {
+              await createAppMutation.mutateAsync([
+                name,
+                {
+                  from: {
+                    ...(appDom
+                      ? { kind: 'dom', dom: appDom }
+                      : { kind: 'template', id: appTemplateId }),
+                  },
+                  recaptchaToken,
                 },
-                recaptchaToken,
-              },
-            ]);
+              ]);
+            } catch (error) {
+              if (error instanceof ApiError) {
+                if (error.code === API_ERROR_CODES.VALIDATE_CAPTCHA_FAILED) {
+                  grecaptcha.render('html_element', {
+                    sitekey: 'v2_site_key',
+                  });
+                }
+              }
+            }
           }}
         >
           <DialogTitle>Create a new MUI Toolpad App</DialogTitle>

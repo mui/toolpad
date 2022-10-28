@@ -553,6 +553,7 @@ export default function QueryEditor() {
             <QueryListItem
               key={queryNode.id}
               disablePadding
+              onClick={() => setDialogState({ node: queryNode, isDraft: false })}
               secondaryAction={
                 <NodeMenu
                   renderButton={({ buttonProps, menuProps }) => (
@@ -575,10 +576,7 @@ export default function QueryEditor() {
                 />
               }
             >
-              <ListItemButton
-                onClick={() => setDialogState({ node: queryNode, isDraft: false })}
-                dense
-              >
+              <ListItemButton>
                 <ListItemText primaryTypographyProps={{ noWrap: true }} primary={queryNode.name} />
               </ListItemButton>
             </QueryListItem>

@@ -56,6 +56,13 @@ export type DomAction =
       parentIndex?: string;
     }
   | {
+      type: 'DOM_ADD_FRAGMENT';
+      fragment: appDom.AppDom;
+      parentId: NodeId;
+      parentProp: string;
+      parentIndex?: string;
+    }
+  | {
       type: 'DOM_MOVE_NODE';
       node: appDom.AppDomNode;
       parent: appDom.AppDomNode;
@@ -64,7 +71,7 @@ export type DomAction =
     }
   | {
       type: 'DOM_DUPLICATE_NODE';
-      node: appDom.ElementNode;
+      node: appDom.AppDomNode;
     }
   | {
       type: 'DOM_REMOVE_NODE';
@@ -134,6 +141,15 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
         dom,
         action.node,
         action.parent,
+        action.parentProp,
+        action.parentIndex,
+      );
+    }
+    case 'DOM_ADD_FRAGMENT': {
+      return appDom.addFragment(
+        dom,
+        action.fragment,
+        action.parentId,
         action.parentProp,
         action.parentIndex,
       );
@@ -223,6 +239,20 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parentIndex,
       });
     },
+    addFragment(
+      fragment: appDom.AppDom,
+      parentId: NodeId,
+      parentProp: string,
+      parentIndex?: string,
+    ) {
+      dispatch({
+        type: 'DOM_ADD_FRAGMENT',
+        fragment,
+        parentId,
+        parentProp,
+        parentIndex,
+      });
+    },
     moveNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(
       node: Child,
       parent: Parent,
@@ -237,7 +267,7 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
         parentIndex,
       });
     },
-    duplicateNode<Child extends appDom.ElementNode>(node: Child) {
+    duplicateNode<Child extends appDom.AppDomNode>(node: Child) {
       dispatch({
         type: 'DOM_DUPLICATE_NODE',
         node,

@@ -9,8 +9,9 @@ import AddIcon from '@mui/icons-material/Add';
 import { useNavigate, useLocation, matchRoutes, Location } from 'react-router-dom';
 import { NodeId } from '@mui/toolpad-core';
 import clsx from 'clsx';
+import invariant from 'invariant';
 import * as appDom from '../../../appDom';
-import { useDom } from '../../DomLoader';
+import { useDom, useDomApi } from '../../DomLoader';
 import CreatePageNodeDialog from './CreatePageNodeDialog';
 import CreateCodeComponentNodeDialog from './CreateCodeComponentNodeDialog';
 import CreateConnectionNodeDialog from './CreateConnectionNodeDialog';
@@ -57,7 +58,7 @@ function getActiveNodeId(location: Location): NodeId | null {
 
 type StyledTreeItemProps = TreeItemProps & {
   onNodeDeleted?: (deletedNode: appDom.AppDomNode) => void;
-  onNodeDuplicated?: (newNodeId: appDom.AppDomNode) => void;
+  onDuplicateNode?: (nodeId: NodeId) => void;
   onCreate?: React.MouseEventHandler;
   labelIcon?: React.ReactNode;
   labelText: string;
@@ -73,7 +74,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
     labelText,
     onCreate,
     onNodeDeleted,
-    onNodeDuplicated,
+    onDuplicateNode,
     createLabelText = `Create ${labelText}`,
     deleteLabelText = `Delete ${labelText}`,
     duplicateLabelText = `Duplicate ${labelText}`,
@@ -111,7 +112,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
               deleteLabelText={deleteLabelText}
               duplicateLabelText={duplicateLabelText}
               onNodeDeleted={onNodeDeleted}
-              onNodeDuplicated={onNodeDuplicated}
+              onDuplicateNode={onDuplicateNode}
             />
           ) : null}
         </Box>
@@ -141,6 +142,7 @@ export interface HierarchyExplorerProps {
 
 export default function HierarchyExplorer({ appId, className }: HierarchyExplorerProps) {
   const dom = useDom();
+  const domApi = useDomApi();
 
   const app = appDom.getApp(dom);
   const { codeComponents = [], pages = [], connections = [] } = appDom.getChildNodes(dom, app);
@@ -241,14 +243,24 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
     [activeNode, appId, dom, navigate],
   );
 
-  const handleNodeDuplicated = React.useCallback(
-    (newNode: appDom.AppDomNode) => {
+  const handleDuplicateNode = React.useCallback(
+    (nodeId: NodeId) => {
+      const node = appDom.getNode(dom, nodeId);
+      invariant(
+        node.parentId && node.parentProp,
+        'Duplication should never be called on nodes that are not placed in the dom',
+      );
+
+      const fragment = appDom.cloneFragment(dom, nodeId);
+      domApi.addFragment(fragment, node.parentId, node.parentProp);
+
+      const newNode = appDom.getNode(fragment, fragment.root);
       const editorLink = getLinkToNodeEditor(appId, newNode);
       if (editorLink) {
         navigate(editorLink);
       }
     },
-    [appId, navigate],
+    [appId, dom, domApi, navigate],
   );
 
   return (
@@ -278,7 +290,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
               toolpadNodeId={connectionNode.id}
               aria-level={2}
               labelText={connectionNode.name}
-              onNodeDuplicated={handleNodeDuplicated}
+              onDuplicateNode={handleDuplicateNode}
               onNodeDeleted={handleNodeDeleted}
             />
           ))}
@@ -298,7 +310,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
               toolpadNodeId={codeComponent.id}
               aria-level={2}
               labelText={codeComponent.name}
-              onNodeDuplicated={handleNodeDuplicated}
+              onDuplicateNode={handleDuplicateNode}
               onNodeDeleted={handleNodeDeleted}
             />
           ))}
@@ -318,7 +330,7 @@ export default function HierarchyExplorer({ appId, className }: HierarchyExplore
               toolpadNodeId={page.id}
               aria-level={2}
               labelText={page.name}
-              onNodeDuplicated={handleNodeDuplicated}
+              onDuplicateNode={handleDuplicateNode}
               onNodeDeleted={handleNodeDeleted}
             />
           ))}

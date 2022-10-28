@@ -3,7 +3,6 @@ import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { NodeId } from '@mui/toolpad-core';
-import invariant from 'invariant';
 import * as appDom from '../../appDom';
 import { useDom, useDomApi } from '../DomLoader';
 import useLatest from '../../utils/useLatest';
@@ -16,7 +15,7 @@ export interface NodeMenuProps {
   deleteLabelText?: string;
   duplicateLabelText?: string;
   onNodeDeleted?: (deletedNode: appDom.AppDomNode) => void;
-  onNodeDuplicated?: (newNodeId: appDom.AppDomNode) => void;
+  onDuplicateNode?: (nodeId: NodeId) => void;
 }
 
 export default function NodeMenu({
@@ -25,7 +24,7 @@ export default function NodeMenu({
   deleteLabelText,
   duplicateLabelText,
   onNodeDeleted,
-  onNodeDuplicated,
+  onDuplicateNode,
 }: NodeMenuProps) {
   const dom = useDom();
   const domApi = useDomApi();
@@ -61,20 +60,10 @@ export default function NodeMenu({
 
   const handleDuplicateClick = React.useCallback(
     (event: React.MouseEvent) => {
-      const node = appDom.getNode(dom, nodeId);
-
-      invariant(
-        node.parentId && node.parentProp,
-        'Duplication should never be called on nodes that are not placed in the dom',
-      );
-
-      const fragment = appDom.cloneFragment(dom, node.id);
-      domApi.addFragment(fragment, node.parentId, node.parentProp);
-
-      onNodeDuplicated?.(appDom.getNode(fragment, fragment.root));
+      onDuplicateNode?.(nodeId);
       onMenuClose(event);
     },
-    [dom, domApi, nodeId, onMenuClose, onNodeDuplicated],
+    [onDuplicateNode, nodeId, onMenuClose],
   );
 
   return (

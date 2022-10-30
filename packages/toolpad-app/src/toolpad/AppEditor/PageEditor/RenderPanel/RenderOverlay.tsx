@@ -1222,7 +1222,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
             cursorPos.x <
               Math.min(
                 parentRect.x + parentRect.width,
-                nextSiblingRect ? nextSiblingRect?.x + nextSiblingRect?.width : 0,
+                nextSiblingRect ? nextSiblingRect.x + nextSiblingRect.width : 0,
               ) -
                 minGridColumnWidth
           ) {

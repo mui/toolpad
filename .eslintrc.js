@@ -72,6 +72,8 @@ module.exports = {
         skipShapeProps: true,
       },
     ],
+
+    'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }],
   },
   overrides: [
     {
@@ -79,6 +81,13 @@ module.exports = {
       extends: ['plugin:@next/next/recommended'],
       rules: {
         '@next/next/no-html-link-for-pages': ['error', 'packages/toolpad-app/pages/'],
+      },
+    },
+    {
+      files: ['packages/toolpad-app/pages/**/*'],
+      rules: {
+        // The pattern is useful to type Next.js pages
+        'react/function-component-definition': 'off',
       },
     },
     {

@@ -45,7 +45,7 @@ export default function Home() {
         <DemoVideo />
         <CardGrid content={features} />
         <Banner content={upvote} />
-        <CardGrid content={useCases} dark />
+        <CardGrid content={useCases} darker />
         <Pricing
           Headline={Headline}
           plans={plans}

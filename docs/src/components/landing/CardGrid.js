@@ -37,11 +37,11 @@ const cardContentRootStyle = (imageUrl) => ({
 });
 
 export default function CardGrid(props) {
-  const { content, dark } = props;
+  const { content, darker } = props;
   return (
     <Box
       sx={
-        dark
+        darker
           ? {
               bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
             }
@@ -98,5 +98,5 @@ CardGrid.propTypes = {
     Headline: PropTypes.node.isRequired,
     overline: PropTypes.string.isRequired,
   }).isRequired,
-  dark: PropTypes.bool,
+  darker: PropTypes.bool,
 };

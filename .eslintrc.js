@@ -72,8 +72,6 @@ module.exports = {
         skipShapeProps: true,
       },
     ],
-
-    'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }],
   },
   overrides: [
     {

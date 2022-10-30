@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@mui/x-data-grid-pro": "^5.17.6",
-    "@tanstack/react-query": "^4.10.3",
+    "@tanstack/react-query": "^4.13.4",
     "quickjs-emscripten": "^0.21.0",
     "react-error-boundary": "^3.1.4"
   },

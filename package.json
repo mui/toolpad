@@ -40,7 +40,7 @@
     "test": "yarn test:build && jest"
   },
   "devDependencies": {
-    "@mui/monorepo": "https://github.com/mui/material-ui.git",
+    "@mui/monorepo": "https://github.com/Janpot/material-ui.git#upgrade-eslint-airbnb",
     "@next/eslint-plugin-next": "12.3.1",
     "@playwright/test": "^1.27.1",
     "@swc/helpers": "^0.4.12",
@@ -55,7 +55,8 @@
     "babel-plugin-transform-rename-import": "^2.3.0",
     "chalk": "^4.1.2",
     "eslint": "^8.26.0",
-    "eslint-config-airbnb-typescript": "12",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-webpack": "^0.13.2",
     "eslint-plugin-import": "^2.26.0",

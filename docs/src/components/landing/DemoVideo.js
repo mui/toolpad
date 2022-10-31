@@ -56,7 +56,7 @@ export default function DemoVideo() {
             loop
             poster="/static/toolpad/marketing/index-hero-video-poster.png"
           >
-            <source src="/static/toolpad/marketing/index-hero-video.mp4" type="video/mp4" />
+            <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </Video>
         </VideoContainer>

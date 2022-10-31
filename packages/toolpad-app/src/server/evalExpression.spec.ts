@@ -21,4 +21,11 @@ describe('evalExpression', () => {
     });
     expect(result).toBe('hello Jack and Joe!');
   });
+
+  test('With undefined', async () => {
+    const result = await evalExpression(`String(x)`, {
+      x: undefined,
+    });
+    expect(result).toBe('undefined');
+  });
 });

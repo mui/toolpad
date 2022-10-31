@@ -40,11 +40,11 @@ export default function DemoVideo() {
         flexDirection: 'row',
         justifyContent: 'center',
         mt: { xs: theme.spacing(2.5), sm: theme.spacing(7.5) },
-        py: { xs: 2, sm: 6 },
+        py: { xs: 4, sm: 6 },
         bgcolor: theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50',
       })}
     >
-      <Container sx={{ py: { xs: 4, sm: 6, md: 8 } }}>
+      <Container>
         <VideoContainer>
           <Video
             sx={{
@@ -54,7 +54,7 @@ export default function DemoVideo() {
             autoPlay
             playsInline
             loop
-            poster="/static/toolpad/marketing/index-hero-video-poster.jpg"
+            poster="/static/toolpad/marketing/index-hero-video-poster.png"
           >
             <source src="/static/toolpad/marketing/index-hero-video.mp4" type="video/mp4" />
             Your browser does not support the video tag.

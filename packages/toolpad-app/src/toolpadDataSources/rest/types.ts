@@ -68,6 +68,10 @@ export type ResponseType = RawResponseType | JsonResponseType | CsvResponseType 
 
 export interface FetchQuery {
   /**
+   * Run in the browser.
+   */
+  readonly browser?: boolean;
+  /**
    * The URL of the rquest.
    */
   readonly url: BindableAttrValue<string>;

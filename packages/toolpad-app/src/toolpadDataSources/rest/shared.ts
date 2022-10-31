@@ -203,7 +203,7 @@ export async function execfetch(
       throw new Error(`Cannot use these features in demo version.`);
     }
   }
-  console.log(resolvedUrl, connection?.baseUrl);
+
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);
   resolvedSearchParams.forEach(([key, value]) => queryUrl.searchParams.append(key, value));
 

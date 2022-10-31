@@ -12,6 +12,9 @@ import {
   Typography,
   Alert,
   styled,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
@@ -57,8 +60,6 @@ import QueryInputPanel from '../QueryInputPanel';
 import DEMO_BASE_URLS from './demoBaseUrls';
 import useFetchPrivate from '../useFetchPrivate';
 import evalExpression from '../../utils/evalExpression';
-
-const IS_CLIENT = true;
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -219,6 +220,22 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   );
 }
 
+async function clientExec(
+  fetchQuery: FetchQuery,
+  params: Record<string, string>,
+  serverFetch: ExecFetchFn<FetchQuery, FetchResult>,
+): Promise<FetchResult> {
+  if (fetchQuery.browser) {
+    return execfetch(fetchQuery, params, {
+      connection: null,
+      fetchImpl: window.fetch as any,
+      evalExpression,
+    });
+  }
+
+  return serverFetch(fetchQuery, params);
+}
+
 interface ResolvedPreviewProps {
   preview: FetchResult | null;
   onShowTransform: () => void;
@@ -296,6 +313,16 @@ function QueryEditor({
       setInput((existing) => ({
         ...existing,
         query: { ...existing.query, method: event.target.value },
+      }));
+    },
+    [setInput],
+  );
+
+  const handleRunInBrowserChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, browser: event.target.checked },
       }));
     },
     [setInput],
@@ -414,9 +441,9 @@ function QueryEditor({
     previewParams,
     {
       onPreview(result) {
-        if (result.har) {
-          setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
-        }
+        setPreviewHar((existing) =>
+          result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
+        );
       },
     },
   );
@@ -460,6 +487,14 @@ function QueryEditor({
                 onChange={handleUrlChange}
               />
             </Box>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox checked={input.query.browser} onChange={handleRunInBrowserChange} />
+                }
+                label="Run in the browser"
+              />
+            </FormGroup>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <TabContext value={activeTab}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -564,22 +599,6 @@ function QueryEditor({
 
 function getInitialQueryValue(): FetchQuery {
   return { url: { type: 'const', value: '' }, method: 'GET', headers: [] };
-}
-
-async function clientExec(
-  fetchQuery: FetchQuery,
-  params: Record<string, string>,
-  serverFetch: ExecFetchFn<FetchQuery, FetchResult>,
-): Promise<FetchResult> {
-  if (IS_CLIENT) {
-    return execfetch(fetchQuery, params, {
-      connection: null,
-      fetchImpl: window.fetch,
-      evalExpression,
-    });
-  }
-
-  return serverFetch(fetchQuery, params);
 }
 
 const dataSource: ClientDataSource<{}, FetchQuery, FetchResult> = {

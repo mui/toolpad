@@ -112,6 +112,9 @@ export interface ClientDataSource<C = {}, Q = {}, R extends ExecFetchResult = Ex
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
+}
+
+export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetchResult> {
   exec?: ExecClientFetchFn<Q, R>;
 }
 

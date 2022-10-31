@@ -32,7 +32,7 @@ import {
   Body,
   ResponseType,
 } from './types';
-import { execfetch, getAuthenticationHeaders, parseBaseUrl } from './shared';
+import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../toolpad/AppEditor/PageEditor/BindableEditor';
@@ -59,7 +59,7 @@ import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import DEMO_BASE_URLS from './demoBaseUrls';
 import useFetchPrivate from '../useFetchPrivate';
-import evalExpression from '../../utils/evalExpression';
+import { clientExec } from './runtime';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -218,22 +218,6 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
       </Toolbar>
     </Stack>
   );
-}
-
-async function clientExec(
-  fetchQuery: FetchQuery,
-  params: Record<string, string>,
-  serverFetch: ExecFetchFn<FetchQuery, FetchResult>,
-): Promise<FetchResult> {
-  if (fetchQuery.browser) {
-    return execfetch(fetchQuery, params, {
-      connection: null,
-      fetchImpl: window.fetch as any,
-      evalExpression,
-    });
-  }
-
-  return serverFetch(fetchQuery, params);
 }
 
 interface ResolvedPreviewProps {
@@ -607,7 +591,6 @@ const dataSource: ClientDataSource<{}, FetchQuery, FetchResult> = {
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,
-  exec: clientExec,
 };
 
 export default dataSource;

@@ -24,6 +24,9 @@ export default createComponent(Button, {
       typeDef: { type: 'string', enum: ['contained', 'outlined', 'text'] },
       defaultValue: 'contained',
     },
+    size: {
+      typeDef: { type: 'string', enum: ['small', 'medium', 'large'] },
+    },
     color: {
       typeDef: { type: 'string', enum: ['primary', 'secondary'] },
       defaultValue: 'primary',

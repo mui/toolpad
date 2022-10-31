@@ -29,9 +29,9 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/material": "^5.10.8",
+    "@mui/material": "^5.10.11",
     "@mui/toolpad-core": "^0.0.24",
-    "@mui/x-data-grid-pro": "^5.17.6"
+    "@mui/x-data-grid-pro": "^5.17.9"
   },
   "devDependencies": {
     "react": "^18.2.0"

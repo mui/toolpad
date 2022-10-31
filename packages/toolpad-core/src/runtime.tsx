@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
 
@@ -86,21 +86,24 @@ export function NodeRuntimeWrapper({
   NodeError,
 }: NodeRuntimeWrapperProps) {
   const resetNodeErrorsKey = React.useContext(ResetNodeErrorsKeyContext);
+
+  const ErrorFallback = React.useCallback(
+    ({ error }: FallbackProps) => (
+      <NodeFiberHost
+        {...{
+          [RUNTIME_PROP_NODE_ID]: nodeId,
+          nodeError: error,
+          componentConfig,
+        }}
+      >
+        <NodeError error={error} />
+      </NodeFiberHost>
+    ),
+    [componentConfig, nodeId],
+  );
+
   return (
-    <ErrorBoundary
-      resetKeys={[resetNodeErrorsKey]}
-      fallbackRender={({ error }) => (
-        <NodeFiberHost
-          {...{
-            [RUNTIME_PROP_NODE_ID]: nodeId,
-            nodeError: error,
-            componentConfig,
-          }}
-        >
-          <NodeError error={error} />
-        </NodeFiberHost>
-      )}
-    >
+    <ErrorBoundary resetKeys={[resetNodeErrorsKey]} fallbackRender={ErrorFallback}>
       <NodeRuntimeContext.Provider value={nodeId}>
         <NodeFiberHost
           {...{

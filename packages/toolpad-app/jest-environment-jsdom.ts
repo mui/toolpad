@@ -1,10 +1,18 @@
 import { TextDecoder, TextEncoder } from 'util';
 import fetch, { Headers, Request, Response } from 'node-fetch';
 import JsdomEnvironment from 'jest-environment-jsdom';
+import { RuntimeConfig } from './src/config';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY } from './src/constants';
+
+function setRuntimeConfig(win: Window, config: RuntimeConfig) {
+  win[RUNTIME_CONFIG_WINDOW_PROPERTY] = config;
+}
 
 export default class CustomJsdomEnvironment extends JsdomEnvironment {
   async setup() {
     await super.setup();
+
+    setRuntimeConfig(this.global, { externalUrl: 'http://localhost:3000', isDemo: false });
 
     if (!this.global.TextDecoder) {
       // @ts-expect-error The polyfill is not 100% spec-compliant

@@ -95,7 +95,7 @@ export function useDataQuery(
       const fetchFromServer = () =>
         execDataSourceQuery({ signal, appId, version, queryId, params });
 
-      if (dataSource?.exec) {
+      if (query && dataSource?.exec) {
         return dataSource?.exec(query, params, fetchFromServer);
       }
 

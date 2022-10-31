@@ -28,18 +28,21 @@ test('can use images app template', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage(app.id, 'dogBreedsPage');
 
+  const waitForDogAPIResponse = () => page.waitForResponse('https://images.dog.ceo/**');
+
+  await waitForDogAPIResponse();
+
   await page.locator('h3:has-text("Dog Images")').waitFor({ state: 'visible' });
 
   const breedInputLocator = page.locator('[aria-haspopup="listbox"]').first();
   await breedInputLocator.click();
   await page.locator('li:has-text("australian")').click();
+  await waitForDogAPIResponse();
 
   const subBreedInputLocator = page.locator('[aria-haspopup="listbox"]').nth(1);
   await subBreedInputLocator.click();
-  await Promise.all([
-    page.locator('li:has-text("shepherd")').click(),
-    page.waitForResponse('https://images.dog.ceo/**'),
-  ]);
+  await page.locator('li:has-text("shepherd")').click();
+  await waitForDogAPIResponse();
 
   const imageLocator = page.locator('img');
   expect(await imageLocator.getAttribute('src')).toContain(

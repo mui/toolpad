@@ -14,7 +14,7 @@ test('functions basics', async ({ page }) => {
   const httpbinConnection: any = Object.values(dom.nodes).find(
     (node: any) => node.name === 'httpbin',
   );
-  httpbinConnection.attributes.params.value.baseurl = HTTPBIN_BASEURL;
+  httpbinConnection.attributes.params.value.baseUrl = HTTPBIN_BASEURL;
 
   const homeModel = new ToolpadHome(page);
   await homeModel.goto();

@@ -129,11 +129,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         <NodeNameEditor node={node} />
         {nodeError ? <ErrorAlert error={nodeError} /> : null}
         <Divider sx={{ mt: 1 }} />
-        {node ? (
-          <React.Fragment>
-            <ComponentPropsEditor componentConfig={componentConfig} node={node} />
-          </React.Fragment>
-        ) : null}
+        {node ? <ComponentPropsEditor componentConfig={componentConfig} node={node} /> : null}
       </Stack>
     </ElementContext.Provider>
   );

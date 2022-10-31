@@ -105,7 +105,7 @@ export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
   (fetchQuery: Q, params: Record<string, string>, serverFetch: ExecFetchFn<Q, R>): Promise<R>;
 }
 
-export interface ClientDataSource<C = {}, Q = {}, R extends ExecFetchResult = ExecFetchResult> {
+export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
   ConnectionParamsInput: ConnectionParamsEditor<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;

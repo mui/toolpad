@@ -585,7 +585,7 @@ function getInitialQueryValue(): FetchQuery {
   return { url: { type: 'const', value: '' }, method: 'GET', headers: [] };
 }
 
-const dataSource: ClientDataSource<{}, FetchQuery, FetchResult> = {
+const dataSource: ClientDataSource<{}, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   QueryEditor,

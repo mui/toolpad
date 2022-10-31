@@ -1,5 +1,4 @@
 import { BindableAttrEntries, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
-import fetch, { Headers, RequestInit, Response } from 'node-fetch';
 import { ensureSuffix, removePrefix } from '../../utils/strings';
 import { Maybe } from '../../utils/types';
 import {

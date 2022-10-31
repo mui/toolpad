@@ -11,7 +11,7 @@ export async function clientExec(
   if (fetchQuery.browser) {
     return execfetch(fetchQuery, params, {
       connection: null,
-      fetchImpl: window.fetch as any,
+      fetchImpl: window.fetch,
       evalExpression,
     });
   }

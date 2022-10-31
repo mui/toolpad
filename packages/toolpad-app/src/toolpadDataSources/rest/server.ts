@@ -18,7 +18,7 @@ async function execBase(
   const result = await execfetch(fetchQuery, params, {
     connection,
     evalExpression: serverEvalExpression,
-    fetchImpl: instrumentedFetch,
+    fetchImpl: instrumentedFetch as any,
   });
 
   return { ...result, har };

@@ -70,7 +70,7 @@ export function useDataQuery(
   const { appId, version } = useAppContext();
   const { savedNodes } = React.useContext(CanvasHooksContext);
   const queryId = node.id;
-  const query = node.attributes.query.value;
+  const query = node.attributes.query?.value;
   const dataSourceId = node.attributes.dataSource?.value;
 
   const dataSource = dataSourceId ? dataSources[dataSourceId] : null;

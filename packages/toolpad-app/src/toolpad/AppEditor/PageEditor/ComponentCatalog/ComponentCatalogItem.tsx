@@ -47,10 +47,10 @@ interface ComponentIconProps {
   kind?: ComponentItemKind;
 }
 
-const ComponentIcon = ({ id: componentId, kind }: ComponentIconProps) => {
+function ComponentIcon({ id: componentId, kind }: ComponentIconProps) {
   const Icon = iconMap.get(kind === 'custom' ? 'CodeComponent' : componentId);
   return Icon ? <Icon fontSize="medium" opacity={kind === 'future' ? 0.75 : 1} /> : null;
-};
+}
 
 interface ComponentCatalogItemProps {
   draggable?: boolean;
@@ -62,7 +62,7 @@ interface ComponentCatalogItemProps {
   kind?: ComponentItemKind;
 }
 
-const ComponentCatalogItem = ({
+function ComponentCatalogItem({
   draggable,
   onClick,
   id,
@@ -70,7 +70,7 @@ const ComponentCatalogItem = ({
   builtIn,
   kind,
   onDragStart,
-}: ComponentCatalogItemProps) => {
+}: ComponentCatalogItemProps) {
   return (
     <Box
       className="ComponentCatalogItem"
@@ -112,6 +112,6 @@ const ComponentCatalogItem = ({
       </span>
     </Box>
   );
-};
+}
 
 export default ComponentCatalogItem;

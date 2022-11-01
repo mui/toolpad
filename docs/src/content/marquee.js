@@ -1,7 +1,8 @@
 import ROUTES from '../route';
 
 const marquee = {
-  title: 'Want to try it first? Download the alpha version.',
+  title: 'Install Toolpad locally.',
+  subtitle: 'Use Docker to host Toolpad on your own secure infrastructure.',
   action: {
     href: ROUTES.toolpadDocs,
     label: 'Self-host',

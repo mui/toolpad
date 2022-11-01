@@ -24,7 +24,9 @@ async function main() {
     } catch (err) {
       if (err.errorCode === 'P1001') {
         // eslint-disable-next-line no-await-in-loop
-        await new Promise((resolve) => setTimeout(resolve, INTERVAL));
+        await new Promise((resolve) => {
+          setTimeout(resolve, INTERVAL);
+        });
       } else {
         throw err;
       }

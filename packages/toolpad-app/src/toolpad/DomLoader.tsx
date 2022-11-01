@@ -85,10 +85,16 @@ export type DomAction =
 const undoStack: appDom.AppDom[] = [];
 const redoStack: appDom.AppDom[] = [];
 
+const UNDO_LIMIT = 100;
+
 const updateUndoStack = throttle((dom: appDom.AppDom) => {
   undoStack.push(dom);
   // Destroy redo stack when new action is executed
   redoStack.length = 0;
+
+  if (undoStack.length > UNDO_LIMIT) {
+    undoStack.shift();
+  }
 }, 500);
 
 const SKIP_UNDO_ACTIONS = ['DOM_UNDO', 'DOM_REDO', 'DOM_SAVED', 'DOM_SAVING', 'DOM_SAVING_ERROR'];

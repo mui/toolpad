@@ -82,8 +82,45 @@ export type DomAction =
       node: appDom.AppDomNode;
     };
 
+const undoStack: appDom.AppDom[] = [];
+const redoStack: appDom.AppDom[] = [];
+
+const updateUndoStack = throttle((dom: appDom.AppDom) => {
+  undoStack.push(dom);
+  // Destroy redo stack when new action is executed
+  redoStack.length = 0;
+}, 500);
+
+const SKIP_UNDO_ACTIONS = ['DOM_UNDO', 'DOM_REDO', 'DOM_SAVED', 'DOM_SAVING', 'DOM_SAVING_ERROR'];
+
 export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom {
+  if (!SKIP_UNDO_ACTIONS.includes(action.type)) {
+    updateUndoStack(dom);
+  }
+
   switch (action.type) {
+    case 'DOM_UNDO': {
+      const undoDom = undoStack.pop();
+
+      if (!undoDom) {
+        return dom;
+      }
+
+      redoStack.push(dom);
+
+      return undoDom;
+    }
+    case 'DOM_REDO': {
+      const redoDom = redoStack.pop();
+
+      if (!redoDom) {
+        return dom;
+      }
+
+      undoStack.push(dom);
+
+      return redoDom;
+    }
     case 'DOM_SET_NODE_NAME': {
       // TODO: Also update all bindings on the page that use this name
       const node = appDom.getNode(dom, action.nodeId);
@@ -142,8 +179,6 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
   }
 }
 
-const SKIP_UNDO_ACTIONS = ['DOM_UNDO', 'DOM_REDO', 'DOM_SAVED', 'DOM_SAVING', 'DOM_SAVING_ERROR'];
-
 export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader {
   if (state.dom) {
     const newDom = domReducer(state.dom, action);
@@ -153,10 +188,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       dom: newDom,
       unsavedChanges: hasUnsavedChanges ? state.unsavedChanges + 1 : state.unsavedChanges,
     });
-  }
-
-  if (!SKIP_UNDO_ACTIONS.includes(action.type)) {
-    state.undoStackUpdater(state.dom, state.undoStack, state.redoStack);
   }
 
   switch (action.type) {
@@ -178,32 +209,6 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         saving: false,
         saveError: action.error,
-      });
-    }
-    case 'DOM_UNDO': {
-      const undoDom = state.undoStack.pop();
-
-      if (!undoDom) {
-        return state;
-      }
-
-      state.redoStack.push(state.dom);
-
-      return update(state, {
-        dom: undoDom,
-      });
-    }
-    case 'DOM_REDO': {
-      const redoDom = state.redoStack.pop();
-
-      if (!redoDom) {
-        return state;
-      }
-
-      state.undoStack.push(state.dom);
-
-      return update(state, {
-        dom: redoDom,
       });
     }
     default:
@@ -314,19 +319,13 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
     },
   };
 }
+
 export interface DomLoader {
   dom: appDom.AppDom;
   savedDom: appDom.AppDom;
   saving: boolean;
   unsavedChanges: number;
   saveError: string | null;
-  undoStack: appDom.AppDom[];
-  redoStack: appDom.AppDom[];
-  undoStackUpdater: (
-    domState: appDom.AppDom,
-    undoStack: appDom.AppDom[],
-    redoStack: appDom.AppDom[],
-  ) => void;
 }
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
@@ -370,15 +369,6 @@ export interface DomContextProps {
   children?: React.ReactNode;
 }
 
-const undoStackUpdater = throttle(
-  (dom: appDom.AppDom, undoStack: appDom.AppDom[], redoStack: appDom.AppDom[]) => {
-    undoStack.push(dom);
-    // Destroy redo stack when new action is executed
-    redoStack.length = 0;
-  },
-  500,
-);
-
 export default function DomProvider({ appId, children }: DomContextProps) {
   const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
 
@@ -390,9 +380,6 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     saveError: null,
     savedDom: dom,
     dom,
-    undoStack: [],
-    redoStack: [],
-    undoStackUpdater,
   });
   const api = React.useMemo(() => createDomApi(dispatch), []);
 

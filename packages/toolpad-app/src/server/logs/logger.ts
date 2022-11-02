@@ -10,12 +10,12 @@ import {
 } from './logSerializers';
 
 let transport;
-if (config.ecsHostUrl) {
+if (config.ecsNodeUrl) {
   transport = pino.transport({
     target: 'pino-elasticsearch',
     options: {
       index: 'toolpad-pino',
-      host: config.ecsHostUrl,
+      node: config.ecsNodeUrl,
       auth: {
         apiKey: config.ecsApiKey,
       },
@@ -35,7 +35,7 @@ const logger = pino(
       res: resSerializer,
       recaptchaRes: recaptchaResSerializer,
     },
-    ...(config.ecsHostUrl ? ecsFormat() : {}),
+    ...(config.ecsNodeUrl ? ecsFormat() : {}),
   },
   transport,
 );

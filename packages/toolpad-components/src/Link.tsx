@@ -9,7 +9,7 @@ interface LinkProps extends Omit<MuiLinkProps, 'children'> {
 
 function Link({ value, href }: LinkProps) {
   return (
-    <MuiLink href={href} target="_blank">
+    <MuiLink href={href} target="_blank" rel="noopener noreferrer nofollow">
       {value}
     </MuiLink>
   );

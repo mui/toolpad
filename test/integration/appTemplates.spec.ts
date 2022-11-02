@@ -41,6 +41,6 @@ test('can use images app template', async ({ page }) => {
   const imageLocator = page.locator('img');
   await expect(imageLocator).toHaveAttribute(
     'src',
-    /^https:\/\/images.dog.ceo\/breeds\/australian-shepherd\/.*$/,
+    /^https:\/\/images.dog.ceo\/breeds\/australian-shepherd\/[^/]+$/,
   );
 });

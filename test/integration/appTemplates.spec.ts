@@ -36,13 +36,11 @@ test('can use images app template', async ({ page }) => {
 
   const subBreedInputLocator = page.locator('[aria-haspopup="listbox"]').nth(1);
   await subBreedInputLocator.click();
-  await Promise.all([
-    page.locator('li:has-text("shepherd")').click(),
-    page.waitForResponse('https://images.dog.ceo/**'),
-  ]);
+  await page.locator('li:has-text("shepherd")').click();
 
   const imageLocator = page.locator('img');
-  expect(await imageLocator.getAttribute('src')).toContain(
-    'https://images.dog.ceo/breeds/australian-shepherd',
+  await expect(imageLocator).toHaveAttribute(
+    'src',
+    /^https:\/\/images.dog.ceo\/breeds\/australian-shepherd\/[^/]+$/,
   );
 });

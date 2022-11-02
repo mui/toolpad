@@ -74,7 +74,7 @@ export interface FetchQuery {
   /**
    * The URL of the rquest.
    */
-  readonly url: BindableAttrValue<string>;
+  readonly url?: BindableAttrValue<string>;
   /**
    * The request method.
    */

@@ -16,6 +16,7 @@ import applyTransform from '../../server/applyTransform';
 import { errorFrom } from '../../utils/errors';
 import config from '../../config';
 import DEMO_BASE_URLS from './demoBaseUrls';
+import { MOVIES_API_DEMO_URL } from '../demo';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
 
@@ -165,6 +166,14 @@ async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
   throw new Error(`Unsupported response type "${fetchQuery.response.kind}"`);
 }
 
+export function getDefaultUrl(connection?: RestConnectionParams | null): BindableAttrValue<string> {
+  const baseUrl = connection?.baseUrl;
+  return {
+    type: 'const',
+    value: baseUrl ? '' : MOVIES_API_DEMO_URL,
+  };
+}
+
 interface ExecBaseOptions {
   connection?: Maybe<RestConnectionParams>;
   evalExpression: EvalExpression;
@@ -182,8 +191,10 @@ export async function execfetch(
     parameters: params,
   };
 
+  const urlvalue = fetchQuery.url || getDefaultUrl(connection);
+
   const [resolvedUrl, resolvedSearchParams, resolvedHeaders] = await Promise.all([
-    resolveBindable(fetchQuery.url, evalExpression, queryScope),
+    resolveBindable(urlvalue, evalExpression, queryScope),
     resolveBindableEntries(fetchQuery.searchParams || [], evalExpression, queryScope),
     resolveBindableEntries(fetchQuery.headers || [], evalExpression, queryScope),
   ]);

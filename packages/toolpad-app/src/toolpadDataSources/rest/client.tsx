@@ -32,7 +32,7 @@ import {
   Body,
   ResponseType,
 } from './types';
-import { getAuthenticationHeaders, parseBaseUrl } from './shared';
+import { getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../toolpad/AppEditor/PageEditor/BindableEditor';
@@ -274,6 +274,7 @@ function QueryEditor({
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const baseUrl = connectionParams?.baseUrl;
+  const urlValue: BindableAttrValue<string> = input.query.url || getDefaultUrl(connectionParams);
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
@@ -390,7 +391,7 @@ function QueryEditor({
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
-    input: input.query.url,
+    input: urlValue,
     globalScope: queryScope,
   });
 
@@ -467,7 +468,7 @@ function QueryEditor({
                 label="url"
                 propType={{ type: 'string' }}
                 renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-                value={input.query.url}
+                value={urlValue}
                 onChange={handleUrlChange}
               />
             </Box>
@@ -582,10 +583,13 @@ function QueryEditor({
 }
 
 function getInitialQueryValue(): FetchQuery {
-  return { url: { type: 'const', value: '' }, method: 'GET', headers: [] };
+  return {
+    method: 'GET',
+    headers: [],
+  };
 }
 
-const dataSource: ClientDataSource<{}, FetchQuery> = {
+const dataSource: ClientDataSource<RestConnectionParams, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   QueryEditor,

@@ -99,7 +99,7 @@ export function NodeRuntimeWrapper({
         <NodeError error={error} />
       </NodeFiberHost>
     ),
-    [componentConfig, nodeId],
+    [NodeError, componentConfig, nodeId],
   );
 
   return (

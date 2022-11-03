@@ -142,6 +142,8 @@ function AppWrapper(props) {
     ];
   }
 
+  const pageContextValue = React.useMemo(() => ({ activePage, pages }), [activePage]);
+
   return (
     <React.Fragment>
       <NextHead>
@@ -152,7 +154,7 @@ function AppWrapper(props) {
       <UserLanguageProvider defaultUserLanguage={pageProps.userLanguage}>
         <CodeCopyProvider>
           <CodeVariantProvider>
-            <PageContext.Provider value={{ activePage, pages }}>
+            <PageContext.Provider value={pageContextValue}>
               <ThemeProvider>
                 <DocsStyledEngineProvider cacheLtr={emotionCache}>
                   {children}

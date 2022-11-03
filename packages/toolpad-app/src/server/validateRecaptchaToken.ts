@@ -1,5 +1,5 @@
 const SITE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
-const SCORE_THRESHOLD = 1;
+const SCORE_THRESHOLD = 0.75;
 
 export interface RecaptchaResJson {
   [key: string]: any;

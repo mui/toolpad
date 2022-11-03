@@ -416,10 +416,8 @@ export default function DomProvider({ appId, children }: DomContextProps) {
 
   const scheduleHistoryUpdate = React.useMemo(
     () =>
-      debounce((action: DomAction) => {
-        if (action) {
-          dispatch({ type: 'DOM_UPDATE_HISTORY' });
-        }
+      debounce(() => {
+        dispatch({ type: 'DOM_UPDATE_HISTORY' });
       }, 500),
     [],
   );

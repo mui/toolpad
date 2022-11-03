@@ -28,7 +28,9 @@ export type BuildEnvVars = Record<
   // The current Toolpad version
   | 'TOOLPAD_VERSION'
   // The current Toolpad build number
-  | 'TOOLPAD_BUILD',
+  | 'TOOLPAD_BUILD'
+  // Enable an experimental object explorer based on MUI TreeView
+  | 'TOOLPAD_EXPERIMENTAL_OBJECT_EXPLORER',
   string
 >;
 

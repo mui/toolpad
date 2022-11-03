@@ -3,11 +3,13 @@ import { SxProps, styled, IconButton, Tooltip, Snackbar } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import clsx from 'clsx';
 import ObjectInspector, { ObjectInspectorProps } from './ObjectInspector';
+import MuiObjectInspector from './MuiObjectInspector';
 
 const classes = {
   viewport: 'Toolpad_ObjectInspectorViewport',
   copyToClipboardButton: 'Toolpad_CopyToClipboardButton',
   disabled: 'Toolpad_ObjectInspectorDisabled',
+  inspector: 'Toolpad_ObjectInspectorInspector',
 };
 
 const JsonViewRoot = styled('div')(({ theme }) => ({
@@ -25,6 +27,9 @@ const JsonViewRoot = styled('div')(({ theme }) => ({
   [`& .${classes.viewport}`]: {
     overflow: 'auto',
     flex: 1,
+  },
+
+  [`& .${classes.inspector}`]: {
     padding: theme.spacing(1),
   },
 
@@ -65,7 +70,13 @@ export default function JsonView({ src, sx, copyToClipboard, disabled, ...props 
     <JsonViewRoot sx={sx} className={clsx({ [classes.disabled]: disabled })}>
       <React.Fragment>
         <div className={classes.viewport}>
-          <ObjectInspector expandLevel={1} expandPaths={expandPaths} data={src} {...props} />
+          {process.env.TOOLPAD_EXPERIMENTAL_OBJECT_EXPLORER ? (
+            <MuiObjectInspector data={src} expandPaths={expandPaths} />
+          ) : (
+            <div className={classes.inspector}>
+              <ObjectInspector expandLevel={1} expandPaths={expandPaths} data={src} {...props} />
+            </div>
+          )}
         </div>
 
         {copyToClipboard ? (

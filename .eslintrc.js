@@ -82,6 +82,13 @@ module.exports = {
       },
     },
     {
+      files: ['packages/toolpad-app/pages/**/*'],
+      rules: {
+        // The pattern is useful to type Next.js pages
+        'react/function-component-definition': 'off',
+      },
+    },
+    {
       // Disabling this rule for now:
       // https://github.com/mui/material-ui/blob/9737bc85bb6960adb742e7709e9c3710c4b6cedd/.eslintrc.js#L359
       files: ['packages/*/src/**/*{.ts,.tsx,.js}'],
@@ -97,9 +104,10 @@ module.exports = {
               {
                 // Running into issues with @mui/icons-material not being an ESM package, while the
                 // toolpad-core package is. This makes Next.js try to load @mui/icons-material/* as ESM
-                // Loading from the index export works as a workaround for now
-                group: ['@mui/icons-material/*'],
-                message: "Use `import { Icon } from '@mui/icons-material'` instead.",
+                // We'll just avoid importing icons in these packages
+                // Remove restriction after https://github.com/mui/material-ui/pull/30510 gets resolved
+                group: ['@mui/icons-material', '@mui/icons-material/*'],
+                message: "Don't use @mui/icons-material in these packages for now.",
               },
             ],
           },

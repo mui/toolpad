@@ -599,6 +599,9 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
         },
       },
       MuiListItemButton: {
+        defaultProps: {
+          dense: true,
+        },
         styleOverrides: {
           root: {
             padding: '8px',
@@ -632,6 +635,9 @@ export function getThemedComponents(theme: Theme): { components: Theme['componen
                     ? theme.palette.primaryDark[600]
                     : theme.palette.primary[100],
               },
+            },
+            '&.MuiListItemButton-dense': {
+              padding: '4px 16px',
             },
           },
         },

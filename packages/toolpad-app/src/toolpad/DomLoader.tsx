@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { debounce } from 'lodash-es';
+import { throttle } from 'lodash-es';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -416,9 +416,13 @@ export default function DomProvider({ appId, children }: DomContextProps) {
 
   const scheduleHistoryUpdate = React.useMemo(
     () =>
-      debounce(() => {
-        dispatch({ type: 'DOM_UPDATE_HISTORY' });
-      }, 500),
+      throttle(
+        () => {
+          dispatch({ type: 'DOM_UPDATE_HISTORY' });
+        },
+        500,
+        { leading: false, trailing: true },
+      ),
     [],
   );
 

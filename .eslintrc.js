@@ -1,5 +1,31 @@
 const baseline = require('@mui/monorepo/.eslintrc');
 
+function mergeNorestrictedImports(rule1 = {}, rule2 = {}) {
+  return {
+    paths: [...(rule1.paths || []), ...(rule2.paths || [])],
+    patterns: [...(rule1.patterns || []), ...(rule2.patterns || [])],
+  };
+}
+
+const noRestrictedImports = {
+  paths: [
+    {
+      name: '@mui/icons-material',
+      message: 'Use @mui/icons-material/<Icon> instead.',
+    },
+    {
+      name: 'lodash-es',
+      message: 'Import methods specifically, e.g. lodash-es/throttle.',
+    },
+  ],
+  patterns: [
+    {
+      group: ['lodash-es/*', '!lodash-es/throttle'],
+      message: 'Avoid ',
+    },
+  ],
+};
+
 module.exports = {
   ...baseline,
   extends: [
@@ -17,17 +43,7 @@ module.exports = {
     // TODO move rule into the main repo once it has upgraded
     '@typescript-eslint/return-await': ['off'],
 
-    'no-restricted-imports': [
-      'error',
-      {
-        paths: [
-          {
-            name: '@mui/icons-material',
-            message: 'Use @mui/icons-material/<Icon> instead.',
-          },
-        ],
-      },
-    ],
+    'no-restricted-imports': ['error', noRestrictedImports],
     'no-restricted-syntax': [
       'error',
       // From https://github.com/airbnb/javascript/blob/d8cb404da74c302506f91e5928f30cc75109e74d/packages/eslint-config-airbnb-base/rules/style.js#L333
@@ -99,7 +115,7 @@ module.exports = {
       rules: {
         'no-restricted-imports': [
           'error',
-          {
+          mergeNorestrictedImports(noRestrictedImports, {
             patterns: [
               {
                 // Running into issues with @mui/icons-material not being an ESM package, while the
@@ -110,7 +126,7 @@ module.exports = {
                 message: "Don't use @mui/icons-material in these packages for now.",
               },
             ],
-          },
+          }),
         ],
       },
     },

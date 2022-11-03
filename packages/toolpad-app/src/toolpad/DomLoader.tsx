@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import { debounce } from 'lodash-es';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -9,7 +10,6 @@ import useDebouncedHandler from '../utils/useDebouncedHandler';
 import { createProvidedContext } from '../utils/react';
 import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
-import useThrottled from '../utils/useThottled';
 import { NodeHashes } from '../types';
 
 export type DomAction =
@@ -414,11 +414,15 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     redo: [],
   });
 
-  const scheduleHistoryUpdate = useThrottled((action: DomAction) => {
-    if (action) {
-      dispatch({ type: 'DOM_UPDATE_HISTORY' });
-    }
-  }, 500);
+  const scheduleHistoryUpdate = React.useMemo(
+    () =>
+      debounce((action: DomAction) => {
+        if (action) {
+          dispatch({ type: 'DOM_UPDATE_HISTORY' });
+        }
+      }, 500),
+    [],
+  );
 
   const dispatchWithHistory = (action: DomAction) => {
     dispatch(action);

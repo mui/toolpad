@@ -10,7 +10,7 @@ type RestArgs = [
 
 const logWithResponseBody = (
   res: NextApiResponse,
-  logger: (responseBody: Record<string, unknown>) => void,
+  logHandler: (responseBody: Record<string, unknown>) => void,
 ): void => {
   const oldWrite = res.write;
   const oldEnd = res.end;
@@ -26,10 +26,10 @@ const logWithResponseBody = (
       chunks.push(Buffer.from(restArgs[0]));
     }
 
-    const responseBody = JSON.parse(Buffer.concat(chunks).toString('utf8'), (key, value) =>
+    const loggableResponseBody = JSON.parse(Buffer.concat(chunks).toString('utf8'), (key, value) =>
       key === 'stack' ? null : value,
     );
-    logger(responseBody);
+    logHandler(loggableResponseBody);
 
     return oldEnd.apply(res, restArgs as RestArgs);
   };

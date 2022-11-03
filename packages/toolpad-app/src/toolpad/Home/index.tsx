@@ -96,15 +96,24 @@ export const APP_TEMPLATE_OPTIONS: Map<
 
 const NO_OP = () => {};
 
+const CAPTCHA_TARGET_ID = 'captcha-target';
+
 export interface CreateAppDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
+function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('blank');
   const [dom, setDom] = React.useState('');
+
+  const latestRecaptchaWidgetIdRef = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    if (!open) {
+      latestRecaptchaWidgetIdRef.current = null;
+    }
+  }, [open]);
 
   const handleAppTemplateChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,50 +135,67 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 
   const isFormValid = Boolean(name);
 
+  const handleSubmit = React.useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
+
+      event.preventDefault();
+
+      const latestRecaptchaWidgetId = latestRecaptchaWidgetIdRef.current;
+      const hasShownRecaptchaCheckbox = latestRecaptchaWidgetId !== null;
+
+      // Check if captcha checkbox was solved
+      let recaptchaToken = hasShownRecaptchaCheckbox
+        ? grecaptcha.getResponse(latestRecaptchaWidgetId)
+        : '';
+
+      if (config.recaptchaV3SiteKey && !hasShownRecaptchaCheckbox) {
+        // Invisible captcha validation
+        await new Promise<void>((resolve) => {
+          grecaptcha.ready(resolve);
+        });
+        recaptchaToken = await grecaptcha.execute(config.recaptchaV3SiteKey, {
+          action: 'submit',
+        });
+      }
+
+      const appDom = dom.trim() ? JSON.parse(dom) : null;
+
+      try {
+        await createAppMutation.mutateAsync([
+          name,
+          {
+            from: {
+              ...(appDom ? { kind: 'dom', dom: appDom } : { kind: 'template', id: appTemplateId }),
+            },
+            ...(recaptchaToken
+              ? {
+                  captcha: {
+                    token: recaptchaToken,
+                    version: hasShownRecaptchaCheckbox ? 2 : 3,
+                  },
+                }
+              : {}),
+          },
+        ]);
+      } catch (error) {
+        if (config.recaptchaV2SiteKey && !hasShownRecaptchaCheckbox) {
+          if (error instanceof ApiError && error.code === API_ERROR_CODES.VALIDATE_CAPTCHA_FAILED) {
+            // Show captcha checkbox
+            const widgetId = grecaptcha.render(CAPTCHA_TARGET_ID, {
+              sitekey: config.recaptchaV2SiteKey,
+            });
+            latestRecaptchaWidgetIdRef.current = widgetId;
+          }
+        }
+      }
+    },
+    [appTemplateId, createAppMutation, dom, isFormValid, name],
+  );
+
   return (
-    <Dialog {...props} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
-      <DialogForm
-        onSubmit={async (event) => {
-          invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
-
-          event.preventDefault();
-          let recaptchaToken;
-          if (config.recaptchaV3SiteKey) {
-            await new Promise<void>((resolve) => {
-              grecaptcha.ready(resolve);
-            });
-            recaptchaToken = await grecaptcha.execute(config.recaptchaV3SiteKey, {
-              action: 'submit',
-            });
-          }
-
-          const appDom = dom.trim() ? JSON.parse(dom) : null;
-
-          try {
-            await createAppMutation.mutateAsync([
-              name,
-              {
-                from: {
-                  ...(appDom
-                    ? { kind: 'dom', dom: appDom }
-                    : { kind: 'template', id: appTemplateId }),
-                },
-                recaptchaToken,
-              },
-            ]);
-          } catch (error) {
-            console.error(error.code);
-            if (error instanceof ApiError && config.recaptchaV2SiteKey) {
-              if (error.code === API_ERROR_CODES.VALIDATE_CAPTCHA_FAILED) {
-                const widgetId = grecaptcha.render('html_element', {
-                  sitekey: config.recaptchaV2SiteKey,
-                });
-                alert(grecaptcha.getResponse(widgetId));
-              }
-            }
-          }
-        }}
-      >
+    <Dialog {...props} open={open} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
+      <DialogForm onSubmit={handleSubmit}>
         <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
         <DialogContent>
           {config.isDemo ? (
@@ -222,6 +248,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               onChange={handleDomChange}
             />
           ) : null}
+          {config.recaptchaV2SiteKey ? <Box id={CAPTCHA_TARGET_ID} mt={1} /> : null}
           {config.recaptchaV3SiteKey ? (
             <Typography variant="caption" color="text.secondary">
               This site is protected by reCAPTCHA and the Google{' '}

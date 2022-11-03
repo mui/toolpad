@@ -18,6 +18,7 @@ import type {
   RpcResponse,
   ServerDefinition,
 } from '../pages/api/rpc';
+import { ApiError } from './apiErrors';
 
 export const queryClient = new QueryClient();
 
@@ -42,8 +43,10 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfG
 
           if (res.ok) {
             const response = (await res.json()) as RpcResponse;
-            if (response.error) {
-              throw new Error(response.error.message, { code: response.error.code });
+            if (response.error?.code) {
+              throw new ApiError(response.error.message, response.error.code);
+            } else if (response.error) {
+              throw new Error(response.error.message);
             }
             return superjsonParse(response.result);
           }

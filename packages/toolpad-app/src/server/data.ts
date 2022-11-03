@@ -200,21 +200,30 @@ export type CreateAppOptions = {
         kind: 'template';
         id: AppTemplateId;
       };
-  recaptchaToken?: string;
+  captcha?: {
+    token: string;
+    version: 2 | 3;
+  };
 };
 
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
   const { from } = opts;
 
-  const recaptchaSecretKey = config.recaptchaV3SecretKey;
-  if (recaptchaSecretKey) {
+  if (config.recaptchaV3SecretKey) {
+    const captchaVersion = opts.captcha?.version;
+
+    const secretKey =
+      captchaVersion === 2 ? config.recaptchaV2SecretKey || '' : config.recaptchaV3SecretKey;
     const isRecaptchaTokenValid = await validateRecaptchaToken(
-      recaptchaSecretKey,
-      opts.recaptchaToken || '',
+      secretKey,
+      opts.captcha?.token || '',
     );
 
     if (!isRecaptchaTokenValid) {
-      throw new ApiError('Unable to verify CAPTCHA.', API_ERROR_CODES.VALIDATE_CAPTCHA_FAILED);
+      throw new ApiError(
+        config.recaptchaV2SecretKey ? 'Please solve the CAPTCHA.' : 'Unable to verify CAPTCHA.',
+        API_ERROR_CODES.VALIDATE_CAPTCHA_FAILED,
+      );
     }
   }
 

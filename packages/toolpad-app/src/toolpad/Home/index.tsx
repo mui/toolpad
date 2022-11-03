@@ -134,16 +134,17 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 
           event.preventDefault();
           let recaptchaToken;
-          if (config.recaptchaSiteKey) {
+          if (config.recaptchaV3SiteKey) {
             await new Promise<void>((resolve) => {
               grecaptcha.ready(resolve);
             });
-            recaptchaToken = await grecaptcha.execute(config.recaptchaSiteKey, {
+            recaptchaToken = await grecaptcha.execute(config.recaptchaV3SiteKey, {
               action: 'submit',
             });
           }
 
           const appDom = dom.trim() ? JSON.parse(dom) : null;
+
           try {
             await createAppMutation.mutateAsync([
               name,
@@ -157,11 +158,13 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               },
             ]);
           } catch (error) {
-            if (error instanceof ApiError) {
+            console.error(error.code);
+            if (error instanceof ApiError && config.recaptchaV2SiteKey) {
               if (error.code === API_ERROR_CODES.VALIDATE_CAPTCHA_FAILED) {
-                grecaptcha.render('html_element', {
-                  sitekey: 'v2_site_key',
+                const widgetId = grecaptcha.render('html_element', {
+                  sitekey: config.recaptchaV2SiteKey,
                 });
+                alert(grecaptcha.getResponse(widgetId));
               }
             }
           }
@@ -219,7 +222,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               onChange={handleDomChange}
             />
           ) : null}
-          {config.recaptchaSiteKey ? (
+          {config.recaptchaV3SiteKey ? (
             <Typography variant="caption" color="text.secondary">
               This site is protected by reCAPTCHA and the Google{' '}
               <Link

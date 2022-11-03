@@ -206,7 +206,7 @@ export type CreateAppOptions = {
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
   const { from } = opts;
 
-  const recaptchaSecretKey = config.recaptchaSecretKey;
+  const recaptchaSecretKey = config.recaptchaV3SecretKey;
   if (recaptchaSecretKey) {
     const isRecaptchaTokenValid = await validateRecaptchaToken(
       recaptchaSecretKey,

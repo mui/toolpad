@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import type { RecaptchaResJson } from '../validateRecaptchaToken';
+import { ApiError } from '../../apiErrors';
 
 export function reqSerializer(req: NextApiRequest) {
   return {
@@ -37,11 +37,15 @@ export function rpcReqSerializer(req: NextApiRequest) {
   };
 }
 
-export function recaptchaResSerializer(res: RecaptchaResJson) {
+export function rpcResSerializer(res: NextApiResponse) {
   return {
-    success: res.success,
-    score: res.score,
-    action: res.action,
-    errorCodes: res['error-codes'],
+    ...resSerializer(res),
+  };
+}
+
+export function rpcResErrSerializer(error: ApiError | Error) {
+  return {
+    message: error.message,
+    code: (error as ApiError).code,
   };
 }

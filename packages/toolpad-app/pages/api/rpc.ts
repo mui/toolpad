@@ -25,6 +25,7 @@ import {
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
 import { withRpcReqResLogs } from '../../src/server/logs/withLogs';
+import { ApiError, ApiErrorCode } from '../../src/apiErrors';
 
 export const config = {
   api: {
@@ -71,7 +72,7 @@ export type RpcResponse =
       error?: undefined;
     }
   | {
-      error: { message: string; stack?: string };
+      error: { message: string; code?: ApiErrorCode; stack?: string };
     };
 
 function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
@@ -94,7 +95,9 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
       rawResult = await method({ params, req, res });
     } catch (error) {
       console.error(error);
-      if (error instanceof Error) {
+      if (error instanceof ApiError) {
+        res.json({ error: { message: error.message, code: error.code, stack: error.stack } });
+      } else if (error instanceof Error) {
         res.json({ error: { message: error.message, stack: error.stack } });
       } else {
         res.status(500).end();

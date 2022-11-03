@@ -5,10 +5,12 @@ export const API_ERROR_CODES = {
   VALIDATE_CAPTCHA_FAILED: 'VALIDATE_CAPTCHA_FAILED',
 };
 
+export type ApiErrorCode = ValueOf<typeof API_ERROR_CODES>;
+
 export class ApiError extends Error {
   code: string;
 
-  constructor(message: string, code: ValueOf<typeof API_ERROR_CODES>) {
+  constructor(message: string, code: ApiErrorCode) {
     super(message);
     this.code = code;
   }

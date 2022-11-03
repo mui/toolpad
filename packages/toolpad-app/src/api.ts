@@ -43,7 +43,7 @@ function createFetcher(endpoint: string, type: 'query' | 'mutation'): MethodsOfG
           if (res.ok) {
             const response = (await res.json()) as RpcResponse;
             if (response.error) {
-              throw new Error(response.error.message);
+              throw new Error(response.error.message, { code: response.error.code });
             }
             return superjsonParse(response.result);
           }

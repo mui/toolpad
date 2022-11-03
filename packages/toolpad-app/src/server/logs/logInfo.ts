@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import type { RecaptchaResJson } from '../validateRecaptchaToken';
 import logger from './logger';
+import type { RpcResponse } from '../../../pages/api/rpc';
 
 type ReqResLogPayload = {
   key: 'apiReqRes';
@@ -11,16 +11,11 @@ type ReqResLogPayload = {
 type RpcReqResLogPayload = {
   key: 'rpcReqRes';
   rpcReq: NextApiRequest;
-  res: NextApiResponse;
+  rpcRes: NextApiResponse;
+  rpcResErr?: RpcResponse['error'];
 };
 
-type CaptchaValidationLogPayload = {
-  key: 'captchaValidation';
-  token: string;
-  recaptchaRes: RecaptchaResJson;
-};
-
-type LogPayload = ReqResLogPayload | RpcReqResLogPayload | CaptchaValidationLogPayload;
+type LogPayload = ReqResLogPayload | RpcReqResLogPayload;
 
 function logInfo(payload: LogPayload, message?: string): void {
   logger.info(payload, message);

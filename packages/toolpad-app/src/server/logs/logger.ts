@@ -3,10 +3,11 @@ import ecsFormat from '@elastic/ecs-pino-format';
 
 import config from '../config';
 import {
-  recaptchaResSerializer,
   reqSerializer,
   resSerializer,
   rpcReqSerializer,
+  rpcResSerializer,
+  rpcResErrSerializer,
 } from './logSerializers';
 
 let transport;
@@ -30,11 +31,12 @@ const logger = pino(
     level: process.env.LOG_LEVEL || 'info',
     redact: { paths: [] },
     serializers: {
-      err: pino.stdSerializers.err,
       req: reqSerializer,
-      rpcReq: rpcReqSerializer,
       res: resSerializer,
-      recaptchaRes: recaptchaResSerializer,
+      err: pino.stdSerializers.err,
+      rpcReq: rpcReqSerializer,
+      rpcRes: rpcResSerializer,
+      rpcErr: rpcResErrSerializer,
     },
     ...(config.ecsNodeUrl ? ecsFormat() : {}),
   },

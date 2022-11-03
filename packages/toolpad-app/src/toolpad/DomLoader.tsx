@@ -160,51 +160,51 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
   switch (action.type) {
     case 'DOM_UPDATE_HISTORY': {
-      const updatedUndoStack = [...state.undo, state.pendingHistoryDom];
+      const updatedUndoStack = [...state.undoStack, state.pendingHistoryDom];
 
       if (updatedUndoStack.length > UNDO_HISTORY_LIMIT) {
         updatedUndoStack.shift();
       }
 
       return update(state, {
-        undo: updatedUndoStack,
-        redo: [],
+        undoStack: updatedUndoStack,
+        redoStack: [],
         pendingHistoryDom: state.dom,
       });
     }
     case 'DOM_UNDO': {
-      const undo = [...state.undo];
-      const redo = [...state.redo];
-      const previousDom = undo.pop();
+      const undoStack = [...state.undoStack];
+      const redoStack = [...state.redoStack];
+      const previousDom = undoStack.pop();
 
       if (!previousDom) {
         return state;
       }
 
-      redo.push(state.dom);
+      redoStack.push(state.dom);
 
       return update(state, {
         dom: previousDom,
-        undo,
-        redo,
+        undoStack,
+        redoStack,
         pendingHistoryDom: previousDom,
       });
     }
     case 'DOM_REDO': {
-      const undo = [...state.undo];
-      const redo = [...state.redo];
-      const nextDom = redo.pop();
+      const undoStack = [...state.undoStack];
+      const redoStack = [...state.redoStack];
+      const nextDom = redoStack.pop();
 
       if (!nextDom) {
         return state;
       }
 
-      undo.push(state.dom);
+      undoStack.push(state.dom);
 
       return update(state, {
         dom: nextDom,
-        undo,
-        redo,
+        undoStack,
+        redoStack,
         pendingHistoryDom: nextDom,
       });
     }
@@ -344,8 +344,8 @@ export interface DomLoader {
   unsavedChanges: number;
   saveError: string | null;
   pendingHistoryDom: appDom.AppDom;
-  undo: appDom.AppDom[];
-  redo: appDom.AppDom[];
+  undoStack: appDom.AppDom[];
+  redoStack: appDom.AppDom[];
 }
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
@@ -410,8 +410,8 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     savedDom: dom,
     dom,
     pendingHistoryDom: dom,
-    undo: [],
-    redo: [],
+    undoStack: [],
+    redoStack: [],
   });
 
   const scheduleHistoryUpdate = React.useMemo(
@@ -426,7 +426,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     dispatch(action);
 
     if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      scheduleHistoryUpdate(action);
+      scheduleHistoryUpdate();
     }
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps

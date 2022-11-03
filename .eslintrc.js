@@ -21,7 +21,7 @@ const noRestrictedImports = {
   patterns: [
     {
       group: ['lodash-es/*', '!lodash-es/throttle'],
-      message: 'Avoid ',
+      message: 'Only whitelisted methods allowed',
     },
   ],
 };

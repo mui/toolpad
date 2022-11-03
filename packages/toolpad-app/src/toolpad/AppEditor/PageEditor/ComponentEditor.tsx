@@ -145,7 +145,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
 
   const { selection } = editor;
 
-  const selectedNode = selection ? appDom.getNode(dom, selection) : null;
+  const selectedNode = selection ? appDom.getMaybeNode(dom, selection) : null;
 
   return (
     <ComponentEditorRoot className={className} data-testid="component-editor">

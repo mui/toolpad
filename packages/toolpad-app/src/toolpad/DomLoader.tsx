@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import { throttle } from 'lodash-es';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -9,9 +10,19 @@ import useDebouncedHandler from '../utils/useDebouncedHandler';
 import { createProvidedContext } from '../utils/react';
 import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
+import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 
 export type DomAction =
+  | {
+      type: 'DOM_UPDATE_HISTORY';
+    }
+  | {
+      type: 'DOM_UNDO';
+    }
+  | {
+      type: 'DOM_REDO';
+    }
   | {
       type: 'DOM_SAVING';
     }
@@ -135,6 +146,8 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
   }
 }
 
+const UNDO_HISTORY_LIMIT = 100;
+
 export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader {
   if (state.dom) {
     const newDom = domReducer(state.dom, action);
@@ -147,6 +160,60 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
   }
 
   switch (action.type) {
+    case 'DOM_UPDATE_HISTORY': {
+      const updatedUndoStack = [...state.undoStack, state.dom];
+
+      if (updatedUndoStack.length > UNDO_HISTORY_LIMIT) {
+        updatedUndoStack.shift();
+      }
+
+      return update(state, {
+        undoStack: updatedUndoStack,
+        redoStack: [],
+      });
+    }
+    case 'DOM_UNDO': {
+      const undoStack = [...state.undoStack];
+      const redoStack = [...state.redoStack];
+
+      if (undoStack.length < 2) {
+        return state;
+      }
+
+      const currentState = undoStack.pop();
+
+      const previousDom = undoStack[undoStack.length - 1];
+
+      if (!previousDom || !currentState) {
+        return state;
+      }
+
+      redoStack.push(currentState);
+
+      return update(state, {
+        dom: previousDom,
+        undoStack,
+        redoStack,
+      });
+    }
+    case 'DOM_REDO': {
+      const undoStack = [...state.undoStack];
+      const redoStack = [...state.redoStack];
+
+      const nextDom = redoStack.pop();
+
+      if (!nextDom) {
+        return state;
+      }
+
+      undoStack.push(nextDom);
+
+      return update(state, {
+        dom: nextDom,
+        undoStack,
+        redoStack,
+      });
+    }
     case 'DOM_SAVING': {
       return update(state, {
         saving: true,
@@ -174,6 +241,12 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
 function createDomApi(dispatch: React.Dispatch<DomAction>) {
   return {
+    undo() {
+      dispatch({ type: 'DOM_UNDO' });
+    },
+    redo() {
+      dispatch({ type: 'DOM_REDO' });
+    },
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
@@ -276,6 +349,8 @@ export interface DomLoader {
   saving: boolean;
   unsavedChanges: number;
   saveError: string | null;
+  undoStack: appDom.AppDom[];
+  redoStack: appDom.AppDom[];
 }
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
@@ -319,6 +394,15 @@ export interface DomContextProps {
   children?: React.ReactNode;
 }
 
+const SKIP_UNDO_ACTIONS = new Set([
+  'DOM_UPDATE_HISTORY',
+  'DOM_UNDO',
+  'DOM_REDO',
+  'DOM_SAVED',
+  'DOM_SAVING',
+  'DOM_SAVING_ERROR',
+]);
+
 export default function DomProvider({ appId, children }: DomContextProps) {
   const { data: dom } = client.useQuery('loadDom', [appId], { suspense: true });
 
@@ -330,8 +414,31 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     saveError: null,
     savedDom: dom,
     dom,
+    undoStack: [dom],
+    redoStack: [],
   });
-  const api = React.useMemo(() => createDomApi(dispatch), []);
+
+  const scheduleHistoryUpdate = React.useMemo(
+    () =>
+      throttle(
+        () => {
+          dispatch({ type: 'DOM_UPDATE_HISTORY' });
+        },
+        500,
+        { leading: false, trailing: true },
+      ),
+    [],
+  );
+
+  const dispatchWithHistory = useEvent((action: DomAction) => {
+    dispatch(action);
+
+    if (!SKIP_UNDO_ACTIONS.has(action.type)) {
+      scheduleHistoryUpdate();
+    }
+  });
+
+  const api = React.useMemo(() => createDomApi(dispatchWithHistory), [dispatchWithHistory]);
 
   const handleSave = React.useCallback(() => {
     if (!state.dom || state.saving || state.savedDom === state.dom) {

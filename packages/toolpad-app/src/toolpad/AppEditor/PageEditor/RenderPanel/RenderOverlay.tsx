@@ -163,7 +163,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     return [pageNode, ...appDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
-  const selectedNode = selection && appDom.getNode(dom, selection);
+  const selectedNode = selection && appDom.getMaybeNode(dom, selection);
 
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
 

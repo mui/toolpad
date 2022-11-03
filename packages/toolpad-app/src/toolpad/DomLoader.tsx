@@ -160,7 +160,7 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
 
   switch (action.type) {
     case 'DOM_UPDATE_HISTORY': {
-      const updatedUndoStack = [...state.undoStack, state.pendingHistoryDom];
+      const updatedUndoStack = [...state.undoStack, state.dom];
 
       if (updatedUndoStack.length > UNDO_HISTORY_LIMIT) {
         updatedUndoStack.shift();
@@ -169,43 +169,48 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
       return update(state, {
         undoStack: updatedUndoStack,
         redoStack: [],
-        pendingHistoryDom: state.dom,
       });
     }
     case 'DOM_UNDO': {
       const undoStack = [...state.undoStack];
       const redoStack = [...state.redoStack];
-      const previousDom = undoStack.pop();
 
-      if (!previousDom) {
+      if (undoStack.length < 2) {
         return state;
       }
 
-      redoStack.push(state.dom);
+      const currentState = undoStack.pop();
+
+      const previousDom = undoStack[undoStack.length - 1];
+
+      if (!previousDom || !currentState) {
+        return state;
+      }
+
+      redoStack.push(currentState);
 
       return update(state, {
         dom: previousDom,
         undoStack,
         redoStack,
-        pendingHistoryDom: previousDom,
       });
     }
     case 'DOM_REDO': {
       const undoStack = [...state.undoStack];
       const redoStack = [...state.redoStack];
+
       const nextDom = redoStack.pop();
 
       if (!nextDom) {
         return state;
       }
 
-      undoStack.push(state.dom);
+      undoStack.push(nextDom);
 
       return update(state, {
         dom: nextDom,
         undoStack,
         redoStack,
-        pendingHistoryDom: nextDom,
       });
     }
     case 'DOM_SAVING': {
@@ -343,7 +348,6 @@ export interface DomLoader {
   saving: boolean;
   unsavedChanges: number;
   saveError: string | null;
-  pendingHistoryDom: appDom.AppDom;
   undoStack: appDom.AppDom[];
   redoStack: appDom.AppDom[];
 }
@@ -409,8 +413,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     saveError: null,
     savedDom: dom,
     dom,
-    pendingHistoryDom: dom,
-    undoStack: [],
+    undoStack: [dom],
     redoStack: [],
   });
 

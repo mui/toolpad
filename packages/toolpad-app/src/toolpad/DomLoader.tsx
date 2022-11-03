@@ -10,6 +10,7 @@ import useDebouncedHandler from '../utils/useDebouncedHandler';
 import { createProvidedContext } from '../utils/react';
 import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
+import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 
 export type DomAction =
@@ -429,15 +430,15 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     [],
   );
 
-  const dispatchWithHistory = (action: DomAction) => {
+  const dispatchWithHistory = useEvent((action: DomAction) => {
     dispatch(action);
 
     if (!SKIP_UNDO_ACTIONS.has(action.type)) {
       scheduleHistoryUpdate();
     }
-  };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const api = React.useMemo(() => createDomApi(dispatchWithHistory), []);
+  });
+
+  const api = React.useMemo(() => createDomApi(dispatchWithHistory), [dispatchWithHistory]);
 
   const handleSave = React.useCallback(() => {
     if (!state.dom || state.saving || state.savedDom === state.dom) {

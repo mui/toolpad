@@ -3,6 +3,7 @@ import * as React from 'react';
 let dispatcher: any = null;
 
 function getCurrentDispatcher() {
+  // Only used to provide debug info during development.
   // eslint-disable-next-line no-underscore-dangle
   return (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentDispatcher
     .current;
@@ -30,7 +31,7 @@ export default function useEvent<F extends (...args: any[]) => void>(handler: F)
   // @ts-expect-error
   return React.useCallback((...args) => {
     if (process.env.NODE_ENV !== 'production' && isInRender()) {
-      throw new Error('Cannot call event in Render!');
+      console.error(`Functions returned by useEvent can't be called during a React render.`);
     }
     const fn = ref.current;
     fn(...args);

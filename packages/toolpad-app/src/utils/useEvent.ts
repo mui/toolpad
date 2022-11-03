@@ -29,7 +29,7 @@ export default function useEvent<F extends (...args: any[]) => void>(handler: F)
   });
   // @ts-expect-error
   return React.useCallback((...args) => {
-    if (isInRender()) {
+    if (process.env.NODE_ENV !== 'production' && isInRender()) {
       throw new Error('Cannot call event in Render!');
     }
     const fn = ref.current;

@@ -16,6 +16,7 @@ if (config.ecsNodeUrl) {
     options: {
       index: 'toolpad-pino',
       node: config.ecsNodeUrl,
+      op_type: 'create',
       auth: {
         apiKey: config.ecsApiKey,
       },

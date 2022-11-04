@@ -18,8 +18,9 @@ import {
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useNode, createComponent } from '@mui/toolpad-core';
-import { Box, debounce, LinearProgress, Skeleton, styled } from '@mui/material';
+import { Box, debounce, LinearProgress, Skeleton, Link, styled } from '@mui/material';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
+import { hasImageExtension } from '@mui/toolpad-core/path';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -108,8 +109,19 @@ function inferColumnType(value: unknown): string {
   switch (typeof value) {
     case 'number':
     case 'boolean':
-    case 'string':
       return valueType;
+    case 'string':
+      try {
+        const url = new URL(value);
+
+        if (hasImageExtension(url.pathname)) {
+          return 'image';
+        }
+
+        return 'link';
+      } catch (error) {
+        return valueType;
+      }
     case 'object':
       return 'json';
     default:
@@ -131,7 +143,10 @@ function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
   return typeof value === 'number' ? new Date(value) : value;
 }
 
-const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
+type ToolpadColumnExtraProps = { customType?: string };
+type ToolpadGridColDef = GridColDef & ToolpadColumnExtraProps;
+
+const COLUMN_TYPES: Record<string, Omit<ToolpadGridColDef, 'field'>> = {
   json: {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
@@ -140,6 +155,20 @@ const COLUMN_TYPES: Record<string, Omit<GridColDef, 'field'>> = {
   },
   dateTime: {
     valueGetter: dateValueGetter,
+  },
+  link: {
+    customType: 'link',
+    renderCell: ({ value }) => (
+      <Link href={value} target="_blank" rel="noopener noreferrer">
+        {value}
+      </Link>
+    ),
+  },
+  image: {
+    customType: 'image',
+    renderCell: ({ field, id, value }) => (
+      <Box component="img" src={value} alt={`${field}${id}`} sx={{ maxWidth: '100%', p: 2 }} />
+    ),
   },
 };
 
@@ -315,6 +344,13 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
+  const handleGetRowHeight = React.useCallback(() => {
+    const hasImageColumns = columns.some(
+      ({ customType }: ToolpadGridColDef) => customType === 'image',
+    );
+    return hasImageColumns ? 'auto' : null;
+  }, [columns]);
+
   return (
     <div ref={ref} style={{ height: heightProp, minHeight: '100%', width: '100%' }}>
       <DataGridPro
@@ -337,6 +373,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             message: typeof errorProp === 'string' ? errorProp : errorProp?.message,
           },
         }}
+        getRowHeight={handleGetRowHeight}
         {...props}
       />
     </div>

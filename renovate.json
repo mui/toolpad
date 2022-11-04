@@ -73,6 +73,10 @@
       "groupName": "next",
       "matchPackageNames": ["next", "@next/eslint-plugin-next", "eslint-config-next"],
       "allowedVersions": "1.2.2"
+    },
+    {
+      "matchDepTypes": ["action"],
+      "pinDigests": true
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],

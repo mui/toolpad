@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.0.25
+
+<!-- generated comparing v0.024..master -->
+
+_Nov 2, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Added new Data Grid column types, improved dev mode performance, support for pages, connections and components duplication, updated remaining documentation parts
+
+- &#8203;<!-- 22 -->Fix Elastic Search configuration (#1256) @apedroferreira
+- &#8203;<!-- 21 -->Provide accessible locators (#1264) @Janpot
+- &#8203;<!-- 20 -->Improve dev mode performance (#1232) @Janpot
+- &#8203;<!-- 19 -->Fix app templates tests (#1257) @apedroferreira
+- &#8203;<!-- 18 -->Support duplicating queries (#1229) @Janpot
+- &#8203;<!-- 17 -->Deploy latest Docker image in demo (#1255) @apedroferreira
+- &#8203;<!-- 16 -->App templates tests (#1220) @apedroferreira
+- &#8203;<!-- 15 -->Add new column types (#1223) @apedroferreira
+- &#8203;<!-- 14 -->Fix node not found error (#1233) @apedroferreira
+- &#8203;<!-- 13 -->improve renovatebot @Janpot
+- &#8203;<!-- 12 -->Support undefined values in serverside bindings (#1226) @Janpot
+- &#8203;<!-- 11 -->Disable making applications public in demo mode (#1212) @apedroferreira
+- &#8203;<!-- 10 -->Use link component in app overview (#1218) @Janpot
+- &#8203;<!-- 09 -->Support duplicating pages, connection, components (#1210) @Janpot
+- &#8203;<!-- 08 -->Part 5: Update building ui docs (#1215) @bytasv
+- &#8203;<!-- 07 -->Part 6: Update data binding docs (#1216) @bytasv
+- &#8203;<!-- 06 -->[core] Fixes for upcoming eslint upgrade (#1249) @Janpot
+- &#8203;<!-- 05 -->[core] Remove unused GitHub Action permission @oliviertassinari
+- &#8203;<!-- 04 -->[core] Pin GitHub Action to digests (#1250) @oliviertassinari
+- &#8203;<!-- 03 -->[core] Fix permissions in workflow @oliviertassinari
+- &#8203;<!-- 02 -->[core] Add clarifying comment in the dev env compose file (#1206) @Janpot
+- &#8203;<!-- 01 -->[ui] Add button size property (#1193) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.24
 
 <!-- generated comparing v0.0.23..master -->

@@ -24,7 +24,9 @@ test('can control component prop values in properties control panel', async ({
   const firstInputLocator = canvasInputLocator.first();
   await clickCenter(page, firstInputLocator);
 
-  await editorModel.componentEditor.waitFor({ state: 'visible' });
+  await editorModel.componentEditor
+    .locator('h6:has-text("Text field")')
+    .waitFor({ state: 'visible' });
 
   const labelControlInput = editorModel.componentEditor.getByLabel('label', { exact: true });
 

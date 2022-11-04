@@ -11,7 +11,7 @@ export interface JsRuntimeProviderProps {
 
 export const JsRuntimeProvider = React.lazy(async () => {
   const quickJs = await getQuickJS();
-  const Context = (props: JsRuntimeProviderProps) => {
+  function Context(props: JsRuntimeProviderProps) {
     const [runtime, setRuntime] = React.useState(() => quickJs.newRuntime(props.options));
 
     // Make sure to dispose of runtime when it changes or unmounts
@@ -26,7 +26,7 @@ export const JsRuntimeProvider = React.lazy(async () => {
     React.useEffect(() => setRuntime(quickJs.newRuntime(props.options)), [props.options]);
 
     return <JsRuntimeContext.Provider value={runtime} {...props} />;
-  };
+  }
   Context.displayName = 'JsRuntimeProvider';
   return { default: Context };
 });

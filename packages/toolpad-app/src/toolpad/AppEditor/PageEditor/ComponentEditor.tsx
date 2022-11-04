@@ -129,11 +129,7 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         <NodeNameEditor node={node} />
         {nodeError ? <ErrorAlert error={nodeError} /> : null}
         <Divider sx={{ mt: 1 }} />
-        {node ? (
-          <React.Fragment>
-            <ComponentPropsEditor componentConfig={componentConfig} node={node} />
-          </React.Fragment>
-        ) : null}
+        {node ? <ComponentPropsEditor componentConfig={componentConfig} node={node} /> : null}
       </Stack>
     </ElementContext.Provider>
   );
@@ -149,7 +145,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
 
   const { selection } = editor;
 
-  const selectedNode = selection ? appDom.getNode(dom, selection) : null;
+  const selectedNode = selection ? appDom.getMaybeNode(dom, selection) : null;
 
   return (
     <ComponentEditorRoot className={className} data-testid="component-editor">

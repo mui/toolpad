@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
-import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
   NodeId,
   createComponent,
@@ -119,6 +119,10 @@ const EXTRA_LIBS_HTTP_MODULES: ExtraLib[] = [
     content: `declare module "@mui/icons-material";`,
   },
 ];
+
+function RuntimeError({ error: runtimeError }: FallbackProps) {
+  return <ErrorAlert error={runtimeError} />;
+}
 
 interface CodeComponentEditorContentProps {
   codeComponentNode: appDom.CodeComponentNode;
@@ -241,10 +245,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
         ? ReactDOM.createPortal(
             <FrameContent document={frameDocument}>
               <React.Suspense fallback={null}>
-                <ErrorBoundary
-                  resetKeys={[CodeComponent]}
-                  fallbackRender={({ error: runtimeError }) => <ErrorAlert error={runtimeError} />}
-                >
+                <ErrorBoundary resetKeys={[CodeComponent]} fallbackRender={RuntimeError}>
                   <AppThemeProvider dom={dom}>
                     <CodeComponent
                       {...defaultProps}

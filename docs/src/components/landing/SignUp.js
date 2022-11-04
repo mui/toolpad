@@ -13,7 +13,7 @@ import ROUTES from '../../route';
 
 const Form = styled('form')({});
 
-const SignUp = ({ sx }) => {
+function SignUp({ sx }) {
   const [form, setForm] = React.useState({
     email: '',
     status: 'initial',
@@ -152,7 +152,7 @@ const SignUp = ({ sx }) => {
       ) : null}
     </Form>
   );
-};
+}
 
 SignUp.propTypes = {
   sx: PropTypes.object,

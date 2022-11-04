@@ -31,7 +31,7 @@ const SystemDialogOkButton = React.forwardRef<HTMLButtonElement, LoadingButtonPr
 
 export interface ConfirmDialogProps {
   open: boolean;
-  onClose: (result: boolean) => void;
+  onClose: (result: boolean, event: React.MouseEvent) => void;
   title?: React.ReactNode;
   children?: React.ReactNode;
   cancelButton?: React.ReactNode;
@@ -50,9 +50,12 @@ export function ConfirmDialog({
   severity,
   loading,
 }: ConfirmDialogProps) {
-  const handleCancel = React.useCallback(() => onClose(false), [onClose]);
+  const handleCancel = React.useCallback(
+    (event: React.MouseEvent) => onClose(false, event),
+    [onClose],
+  );
 
-  const handleOk = React.useCallback(() => onClose(true), [onClose]);
+  const handleOk = React.useCallback((event: React.MouseEvent) => onClose(true, event), [onClose]);
 
   return (
     <SystemDialog open={open} onClose={handleCancel}>

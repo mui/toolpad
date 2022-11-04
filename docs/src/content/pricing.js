@@ -9,7 +9,7 @@ import IconImage from 'docs/src/components/icon/IconImage';
 import LaunchRounded from '@mui/icons-material/LaunchRounded';
 import GradientText from 'docs/src/components/typography/GradientText';
 
-const ColumnHead = ({ label, metadata, tooltip, nested = false, href }) => {
+function ColumnHead({ label, metadata, tooltip, nested = false, href }) {
   const text = (
     <Typography
       {...(href && {
@@ -61,7 +61,7 @@ const ColumnHead = ({ label, metadata, tooltip, nested = false, href }) => {
       ) : null}
     </Box>
   );
-};
+}
 
 ColumnHead.propTypes = {
   href: PropTypes.string,

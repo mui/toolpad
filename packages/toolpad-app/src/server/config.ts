@@ -19,7 +19,7 @@ export type ServerConfig = {
   basicAuthPassword?: string;
   serverLogsEnabled: boolean;
   recaptchaSecretKey?: string;
-  ecsHostUrl?: string;
+  ecsNodeUrl?: string;
   ecsApiKey?: string;
 } & BasicAuthConfig;
 
@@ -56,7 +56,7 @@ function readConfig(): ServerConfig & typeof sharedConfig {
     googleSheetsClientSecret: process.env.TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_SECRET,
     serverLogsEnabled: !!process.env.TOOLPAD_SERVER_LOGS_ENABLED,
     recaptchaSecretKey: process.env.TOOLPAD_RECAPTCHA_SECRET_KEY,
-    ecsHostUrl: process.env.TOOLPAD_ECS_HOST_URL,
+    ecsNodeUrl: process.env.TOOLPAD_ECS_NODE_URL,
     ecsApiKey: process.env.TOOLPAD_ECS_API_KEY,
     encryptionKeys,
   };

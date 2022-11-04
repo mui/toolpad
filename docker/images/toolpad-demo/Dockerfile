@@ -1,1 +1,1 @@
-FROM muicom/toolpad:a3a5ddf4243a4b7b8f07755d583bc8986b0cef9e
+FROM muicom/toolpad:latest

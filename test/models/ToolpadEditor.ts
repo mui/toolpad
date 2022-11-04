@@ -13,7 +13,7 @@ class CreatePageDialog {
   constructor(page: Page) {
     this.page = page;
     this.dialog = page.locator('[role="dialog"]', {
-      hasText: 'Create a new MUI Toolpad Page',
+      hasText: 'Create a new Page',
     });
     this.nameInput = this.dialog.locator('label:has-text("name")');
     this.createButton = this.dialog.locator('button:has-text("Create")');
@@ -33,7 +33,7 @@ class CreateComponentDialog {
     this.page = page;
 
     this.dialog = page.locator('[role="dialog"]', {
-      hasText: 'Create a new MUI Toolpad Code Component',
+      hasText: 'Create a new Code Component',
     });
     this.nameInput = this.dialog.locator('label:has-text("name")');
     this.createButton = this.dialog.locator('button:has-text("Create")');

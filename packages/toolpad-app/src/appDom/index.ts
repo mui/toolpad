@@ -1048,7 +1048,13 @@ function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
   }
 
   if (isQuery(node) || isMutation(node)) {
-    node = setNamespacedProp(node, 'attributes', 'query', null);
+    const isBrowserSideRestQuery: boolean =
+      node.attributes.dataSource?.value === 'rest' &&
+      !!(node.attributes.query.value as any).browser;
+
+    if (node.attributes.query.value && !isBrowserSideRestQuery) {
+      node = setNamespacedProp(node, 'attributes', 'query', null);
+    }
   }
 
   return node as RenderTreeNode;

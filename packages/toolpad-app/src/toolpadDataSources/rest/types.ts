@@ -68,9 +68,13 @@ export type ResponseType = RawResponseType | JsonResponseType | CsvResponseType 
 
 export interface FetchQuery {
   /**
+   * Run in the browser.
+   */
+  readonly browser?: boolean;
+  /**
    * The URL of the rquest.
    */
-  readonly url: BindableAttrValue<string>;
+  readonly url?: BindableAttrValue<string>;
   /**
    * The request method.
    */
@@ -115,5 +119,5 @@ export type FetchPrivateQuery = {
 export interface FetchResult extends ExecFetchResult<any> {
   data: any;
   untransformedData: any;
-  har: Har;
+  har?: Har;
 }

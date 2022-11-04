@@ -37,13 +37,13 @@ import { tryFormatExpression } from '../../utils/prettier';
 import useLatest from '../../utils/useLatest';
 import useDebounced from '../../utils/useDebounced';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
-import useShortcut from '../../utils/useShortcut';
 import { createProvidedContext } from '../../utils/react';
 import { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
+import { ShortcutBindings, ShortcutScope } from '../../components/Shortcuts';
 
 interface BindingEditorContext {
   label: string;
@@ -330,35 +330,40 @@ export function BindingEditorDialog<V>({
     onClose();
   }, [onChange, onClose]);
 
-  useShortcut({ code: 'KeyS', metaKey: true, disabled: !open }, handleSave);
-
   const hasUnsavedChanges = input && input !== committedInput.current;
 
+  const shortcuts: ShortcutBindings = React.useMemo(
+    () => [[{ code: 'KeyS', metaKey: true }, handleSave]],
+    [handleSave],
+  );
+
   return (
-    <Dialog onClose={onClose} open={open} fullWidth scroll="body" maxWidth="lg">
-      <DialogTitle>Bind a property</DialogTitle>
-      <DialogContent>
-        {propType?.type === 'event' ? (
-          <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />
-        ) : (
-          <JsBindingEditor
-            value={input?.type === 'jsExpression' ? input : null}
-            onChange={(newValue) => setInput(newValue)}
-          />
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
-          {hasUnsavedChanges ? 'Cancel' : 'Close'}
-        </Button>
-        <Button color="inherit" disabled={!value} onClick={handleRemove}>
-          Remove binding
-        </Button>
-        <Button disabled={!hasUnsavedChanges} color="primary" onClick={handleCommit}>
-          Update binding
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <ShortcutScope bindings={shortcuts}>
+      <Dialog onClose={onClose} open={open} fullWidth scroll="body" maxWidth="lg">
+        <DialogTitle>Bind a property</DialogTitle>
+        <DialogContent>
+          {propType?.type === 'event' ? (
+            <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />
+          ) : (
+            <JsBindingEditor
+              value={input?.type === 'jsExpression' ? input : null}
+              onChange={(newValue) => setInput(newValue)}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            {hasUnsavedChanges ? 'Cancel' : 'Close'}
+          </Button>
+          <Button color="inherit" disabled={!value} onClick={handleRemove}>
+            Remove binding
+          </Button>
+          <Button disabled={!hasUnsavedChanges} color="primary" onClick={handleCommit}>
+            Update binding
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </ShortcutScope>
   );
 }
 

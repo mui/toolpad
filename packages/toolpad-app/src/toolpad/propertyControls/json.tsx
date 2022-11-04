@@ -10,8 +10,8 @@ import {
 import * as React from 'react';
 import * as JSON5 from 'json5';
 import type { EditorProps } from '../../types';
-import useShortcut from '../../utils/useShortcut';
 import lazyComponent from '../../utils/lazyComponent';
+import { ShortcutBindings, ShortcutScope } from '../../components/Shortcuts';
 
 const JsonEditor = lazyComponent(() => import('../../components/JsonEditor'), {
   noSsr: true,
@@ -45,38 +45,43 @@ function JsonPropEditor({ label, propType, value, onChange, disabled }: EditorPr
   const schemaUri =
     propType.type === 'object' || propType.type === 'array' ? propType.schema : undefined;
 
-  useShortcut({ code: 'KeyS', metaKey: true, disabled: !dialogOpen }, handleSave);
+  const shortcuts: ShortcutBindings = React.useMemo(
+    () => [[{ code: 'KeyS', metaKey: true }, handleSave]],
+    [handleSave],
+  );
 
   return (
-    <React.Fragment>
-      <Button variant="outlined" color="inherit" fullWidth onClick={() => setDialogOpen(true)}>
-        {label}
-      </Button>
-      <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>Edit JSON</DialogTitle>
-        <DialogContent>
-          <Box sx={{ height: 200 }}>
-            <JsonEditor
-              value={input}
-              onChange={(newValue = '') => setInput(newValue)}
-              schemaUri={schemaUri}
-              disabled={disabled}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            disabled={normalizedInput === null || normalizedInitial === normalizedInput}
-            onClick={handleSave}
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
+    <ShortcutScope bindings={shortcuts}>
+      <React.Fragment>
+        <Button variant="outlined" color="inherit" fullWidth onClick={() => setDialogOpen(true)}>
+          {label}
+        </Button>
+        <Dialog fullWidth open={dialogOpen} onClose={() => setDialogOpen(false)}>
+          <DialogTitle>Edit JSON</DialogTitle>
+          <DialogContent>
+            <Box sx={{ height: 200 }}>
+              <JsonEditor
+                value={input}
+                onChange={(newValue = '') => setInput(newValue)}
+                schemaUri={schemaUri}
+                disabled={disabled}
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button color="inherit" variant="text" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={normalizedInput === null || normalizedInitial === normalizedInput}
+              onClick={handleSave}
+            >
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
+    </ShortcutScope>
   );
 }
 

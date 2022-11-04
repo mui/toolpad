@@ -18,7 +18,6 @@ import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { useDom, useDomApi } from '../../DomLoader';
 import { tryFormat } from '../../../utils/prettier';
-import useShortcut from '../../../utils/useShortcut';
 import { usePrompt } from '../../../utils/router';
 import NodeNameEditor from '../NodeNameEditor';
 import usePageTitle from '../../../utils/usePageTitle';
@@ -34,6 +33,7 @@ import { getDefaultControl } from '../../propertyControls';
 import { WithControlledProp } from '../../../utils/types';
 import useDebounced from '../../../utils/useDebounced';
 import { ExtraLib } from '../../../components/MonacoEditor';
+import { ShortcutBindings, ShortcutScope } from '../../../components/Shortcuts';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -178,8 +178,6 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     !allChangesAreCommitted,
   );
 
-  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
-
   const [iframeLoaded, onLoad] = React.useReducer(() => true, false);
 
   React.useEffect(() => {
@@ -211,54 +209,61 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const [props, setProps] = React.useState({});
 
+  const shortcuts: ShortcutBindings = React.useMemo(
+    () => [[{ code: 'KeyS', metaKey: true }, handleSave]],
+    [handleSave],
+  );
+
   return (
     <React.Fragment>
-      <Stack sx={{ height: '100%' }}>
-        <Toolbar sx={{ mt: 2, mb: 2 }}>
-          <NodeNameEditor node={codeComponentNode} sx={{ maxWidth: 300 }} />
-        </Toolbar>
-        <Box flex={1}>
-          <SplitPane split="vertical" allowResize size="50%">
-            <TypescriptEditor
-              value={input}
-              onChange={(newValue) => setInput(newValue || '')}
-              extraLibs={extraLibs}
-            />
+      <ShortcutScope bindings={shortcuts}>
+        <Stack sx={{ height: '100%' }}>
+          <Toolbar sx={{ mt: 2, mb: 2 }}>
+            <NodeNameEditor node={codeComponentNode} sx={{ maxWidth: 300 }} />
+          </Toolbar>
+          <Box flex={1}>
+            <SplitPane split="vertical" allowResize size="50%">
+              <TypescriptEditor
+                value={input}
+                onChange={(newValue) => setInput(newValue || '')}
+                extraLibs={extraLibs}
+              />
 
-            <SplitPane split="horizontal" allowResize size="20%" primary="second">
-              <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
-              <PropertiesEditor argTypes={argTypes} value={props} onChange={setProps} />
+              <SplitPane split="horizontal" allowResize size="20%" primary="second">
+                <CanvasFrame ref={frameRef} title="Code component sandbox" onLoad={onLoad} />
+                <PropertiesEditor argTypes={argTypes} value={props} onChange={setProps} />
+              </SplitPane>
             </SplitPane>
-          </SplitPane>
-        </Box>
-        <Toolbar
-          sx={{
-            justifyContent: 'end',
-          }}
-        >
-          <Button disabled={allChangesAreCommitted} onClick={handleSave} variant="contained">
-            Update
-          </Button>
-        </Toolbar>
-      </Stack>
-      {iframeLoaded && frameDocument
-        ? ReactDOM.createPortal(
-            <FrameContent document={frameDocument}>
-              <React.Suspense fallback={null}>
-                <ErrorBoundary resetKeys={[CodeComponent]} fallbackRender={RuntimeError}>
-                  <AppThemeProvider dom={dom}>
-                    <CodeComponent
-                      {...defaultProps}
-                      {...filterValues(props, (propValue) => typeof propValue !== 'undefined')}
-                    />
-                  </AppThemeProvider>
-                </ErrorBoundary>
-                {compileError ? <ErrorAlert error={compileError} /> : null}
-              </React.Suspense>
-            </FrameContent>,
-            frameDocument.body,
-          )
-        : null}
+          </Box>
+          <Toolbar
+            sx={{
+              justifyContent: 'end',
+            }}
+          >
+            <Button disabled={allChangesAreCommitted} onClick={handleSave} variant="contained">
+              Update
+            </Button>
+          </Toolbar>
+        </Stack>
+        {iframeLoaded && frameDocument
+          ? ReactDOM.createPortal(
+              <FrameContent document={frameDocument}>
+                <React.Suspense fallback={null}>
+                  <ErrorBoundary resetKeys={[CodeComponent]} fallbackRender={RuntimeError}>
+                    <AppThemeProvider dom={dom}>
+                      <CodeComponent
+                        {...defaultProps}
+                        {...filterValues(props, (propValue) => typeof propValue !== 'undefined')}
+                      />
+                    </AppThemeProvider>
+                  </ErrorBoundary>
+                  {compileError ? <ErrorAlert error={compileError} /> : null}
+                </React.Suspense>
+              </FrameContent>,
+              frameDocument.body,
+            )
+          : null}
+      </ShortcutScope>
     </React.Fragment>
   );
 }

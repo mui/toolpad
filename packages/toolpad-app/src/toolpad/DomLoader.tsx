@@ -5,13 +5,13 @@ import { throttle } from 'lodash-es';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
-import useShortcut from '../utils/useShortcut';
 import useDebouncedHandler from '../utils/useDebouncedHandler';
 import { createProvidedContext } from '../utils/react';
 import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
+import { ShortcutBindings, ShortcutScope } from '../components/Shortcuts';
 
 export type DomAction =
   | {
@@ -479,11 +479,16 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [state.unsavedChanges]);
 
-  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
+  const shortcuts: ShortcutBindings = React.useMemo(
+    () => [[{ code: 'KeyS', metaKey: true }, handleSave]],
+    [handleSave],
+  );
 
   return (
-    <DomLoaderProvider value={state}>
-      <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
-    </DomLoaderProvider>
+    <ShortcutScope bindings={shortcuts}>
+      <DomLoaderProvider value={state}>
+        <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
+      </DomLoaderProvider>
+    </ShortcutScope>
   );
 }

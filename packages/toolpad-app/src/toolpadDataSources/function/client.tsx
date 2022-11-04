@@ -23,9 +23,9 @@ import { createHarLog, mergeHar } from '../../utils/har';
 import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
-import useShortcut from '../../utils/useShortcut';
 import { tryFormat } from '../../utils/prettier';
 import config from '../../config';
+import { ShortcutScope, ShortcutBindings } from '../../components/Shortcuts';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -164,50 +164,56 @@ function QueryEditor({
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
   const handleCommit = React.useCallback(() => onCommit?.(), [onCommit]);
-  useShortcut({ code: 'KeyS', metaKey: true }, handleCommit);
+
+  const shortcuts: ShortcutBindings = React.useMemo(
+    () => [[{ code: 'KeyS', metaKey: true }, handleCommit]],
+    [handleCommit],
+  );
 
   return (
-    <SplitPane split="vertical" size="50%" allowResize>
-      <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <QueryInputPanel onRunPreview={handleRunPreview}>
-          <Box sx={{ flex: 1, minHeight: 0 }}>
-            <TypescriptEditor
-              value={input.query.module}
-              onChange={(newValue) =>
-                setInput((existing) => ({ ...existing, query: { module: newValue } }))
-              }
-              extraLibs={extraLibs}
+    <ShortcutScope bindings={shortcuts}>
+      <SplitPane split="vertical" size="50%" allowResize>
+        <SplitPane split="horizontal" size={85} primary="second" allowResize>
+          <QueryInputPanel onRunPreview={handleRunPreview}>
+            <Box sx={{ flex: 1, minHeight: 0 }}>
+              <TypescriptEditor
+                value={input.query.module}
+                onChange={(newValue) =>
+                  setInput((existing) => ({ ...existing, query: { module: newValue } }))
+                }
+                extraLibs={extraLibs}
+              />
+            </Box>
+          </QueryInputPanel>
+
+          <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
+            <Typography>Parameters</Typography>
+            <ParametersEditor
+              value={input.params}
+              onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
+              globalScope={globalScope}
+              liveValue={paramsEditorLiveValue}
             />
           </Box>
-        </QueryInputPanel>
+        </SplitPane>
 
-        <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
-          <Typography>Parameters</Typography>
-          <ParametersEditor
-            value={input.params}
-            onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
-            globalScope={globalScope}
-            liveValue={paramsEditorLiveValue}
+        <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
+          {preview?.error ? (
+            <ErrorAlert error={preview?.error} />
+          ) : (
+            <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+          )}
+
+          <Devtools
+            sx={{ width: '100%', height: '100%' }}
+            log={previewLogs}
+            onLogClear={handleLogClear}
+            har={previewHar}
+            onHarClear={handleHarClear}
           />
-        </Box>
+        </SplitPane>
       </SplitPane>
-
-      <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
-        {preview?.error ? (
-          <ErrorAlert error={preview?.error} />
-        ) : (
-          <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
-        )}
-
-        <Devtools
-          sx={{ width: '100%', height: '100%' }}
-          log={previewLogs}
-          onLogClear={handleLogClear}
-          har={previewHar}
-          onHarClear={handleHarClear}
-        />
-      </SplitPane>
-    </SplitPane>
+    </ShortcutScope>
   );
 }
 

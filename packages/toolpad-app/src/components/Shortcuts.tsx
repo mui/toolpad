@@ -1,31 +1,30 @@
 import * as React from 'react';
 
-const handledEvents = new WeakSet<React.SyntheticEvent>();
-
 interface Shortcut {
   code: string;
   metaKey?: boolean;
 }
 
-type Binding = [shortcut: Shortcut, handler: () => void];
+export type ShortcutBinding = [
+  shortcut: Shortcut,
+  handler: React.KeyboardEventHandler<HTMLDivElement>,
+];
 
-interface ShortcutScopeProps {
-  bindings: Binding[];
+export type ShortcutBindings = ShortcutBinding[];
+
+export interface ShortcutScopeProps {
+  bindings: ShortcutBindings;
   children?: React.ReactNode;
 }
 
 export function ShortcutScope({ bindings, children }: ShortcutScopeProps) {
-  const handleKeyPress = React.useCallback(
+  const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (handledEvents.has(event)) {
-        // Stop propagation
-        return;
-      }
-      handledEvents.add(event);
-
       for (const [shortcut, handler] of bindings) {
-        if (event.metaKey === !!shortcut.metaKey && event.code === shortcut.code) {
-          handler();
+        if (!!event.metaKey === !!shortcut.metaKey && event.code === shortcut.code) {
+          event.stopPropagation();
+          event.preventDefault();
+          handler(event);
         }
       }
     },
@@ -34,7 +33,7 @@ export function ShortcutScope({ bindings, children }: ShortcutScopeProps) {
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-    <div tabIndex={-1} style={{ outline: 'none' }} onKeyPress={handleKeyPress}>
+    <div tabIndex={-1} style={{ display: 'contents' }} onKeyDown={handleKeyDown}>
       {children}
     </div>
   );

@@ -5,8 +5,8 @@ import * as React from 'react';
 import { useDom, useDomApi } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
-import useShortcut from '../../../utils/useShortcut';
 import lazyComponent from '../../../utils/lazyComponent';
+import { ShortcutScope, ShortcutBindings } from '../../../components/Shortcuts';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -46,25 +46,30 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     onClose();
   }, [handleSave, onClose]);
 
-  useShortcut({ code: 'KeyS', metaKey: true, disabled: !open }, handleSave);
+  const shortcuts: ShortcutBindings = React.useMemo(
+    () => [[{ code: 'KeyS', metaKey: true }, handleSave]],
+    [handleSave],
+  );
 
   return (
-    <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">
-      <DialogTitle>Edit page module</DialogTitle>
-      <Box sx={{ height: 500 }}>
-        <TypescriptEditor
-          value={input}
-          onChange={(newValue) => setInput(newValue)}
-          extraLibs={EXTRA_LIBS_HTTP_MODULES}
-        />
-      </Box>
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button onClick={handleSaveButton}>Save</Button>
-      </DialogActions>
-    </Dialog>
+    <ShortcutScope bindings={shortcuts}>
+      <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">
+        <DialogTitle>Edit page module</DialogTitle>
+        <Box sx={{ height: 500 }}>
+          <TypescriptEditor
+            value={input}
+            onChange={(newValue) => setInput(newValue)}
+            extraLibs={EXTRA_LIBS_HTTP_MODULES}
+          />
+        </Box>
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleSaveButton}>Save</Button>
+        </DialogActions>
+      </Dialog>
+    </ShortcutScope>
   );
 }
 

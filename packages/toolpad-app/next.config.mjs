@@ -3,7 +3,7 @@ import * as path from 'path';
 import { withSentryConfig } from '@sentry/nextjs';
 import createBundleAnalyzer from '@next/bundle-analyzer';
 
-const withBundleAnalyzer = createBundleAnalyzer({ enabled: !!process.env.ANALAYZE });
+const withBundleAnalyzer = createBundleAnalyzer({ enabled: !!process.env.ANALYZE });
 
 // TODO: remove when https://github.com/getsentry/sentry-javascript/issues/3852 gets resolved
 process.env.SENTRY_IGNORE_API_RESOLUTION_ERROR = 'true';

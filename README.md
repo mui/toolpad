@@ -54,6 +54,8 @@ The [changelog](https://github.com/mui/mui-toolpad/releases) is regularly update
 
 ## Roadmap
 
+<!-- TODO -->
+
 ## License
 
 This project is licensed under the terms of the [MIT license](/LICENSE).

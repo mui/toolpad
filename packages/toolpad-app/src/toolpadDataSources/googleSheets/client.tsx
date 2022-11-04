@@ -31,6 +31,7 @@ import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import QueryInputPanel from '../QueryInputPanel';
 import SplitPane from '../../components/SplitPane';
 import useQueryPreview from '../useQueryPreview';
+import useFetchPrivate from '../useFetchPrivate';
 
 const EMPTY_ROWS: any[] = [];
 
@@ -126,13 +127,17 @@ function QueryEditor({
     [],
   );
 
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<
-    GoogleSheetsPrivateQuery,
-    GoogleSheetsResult
-  >({
-    type: 'DEBUG_EXEC',
-    query: input.query,
-  });
+  const fetchPrivate = useFetchPrivate<GoogleSheetsPrivateQuery, GoogleSheetsResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: GoogleSheetsApiQuery) => fetchPrivate({ type: 'DEBUG_EXEC', query }),
+    [fetchPrivate],
+  );
+
+  const { preview, runPreview: handleRunPreview } = useQueryPreview(
+    fetchServerPreview,
+    input.query,
+    {},
+  );
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);

@@ -18,7 +18,11 @@ export default function useShortcut(
     }
 
     const handleKeydown = (event: KeyboardEvent) => {
-      if (event.code === code && event.metaKey === metaKey && event.shiftKey === shiftKey) {
+      if (
+        event.code === code &&
+        (event.metaKey === metaKey || event.ctrlKey === metaKey) &&
+        event.shiftKey === shiftKey
+      ) {
         handler();
         if (preventDefault) {
           event.preventDefault();

@@ -27,7 +27,7 @@ const logWithResponseBody = (
     }
 
     const loggableResponseBody = JSON.parse(Buffer.concat(chunks).toString('utf8'), (key, value) =>
-      key === 'stack' ? null : value,
+      key === 'stack' ? undefined : value,
     );
     logHandler(loggableResponseBody);
 

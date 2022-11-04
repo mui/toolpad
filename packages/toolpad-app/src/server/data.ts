@@ -13,7 +13,11 @@ import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
-import { ApiError, API_ERROR_CODES } from '../apiErrors';
+import {
+  ApiError,
+  APP_NAME_EXISTS_ERROR_CODE,
+  VALIDATE_CAPTCHA_FAILED_ERROR_CODE,
+} from '../apiErrors';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -222,7 +226,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     if (!isRecaptchaTokenValid) {
       throw new ApiError(
         config.recaptchaV2SecretKey ? 'Please solve the CAPTCHA.' : 'Unable to verify CAPTCHA.',
-        API_ERROR_CODES.VALIDATE_CAPTCHA_FAILED,
+        VALIDATE_CAPTCHA_FAILED_ERROR_CODE,
       );
     }
   }
@@ -241,7 +245,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
   }
 
   if (await prismaClient.app.findUnique({ where: { name: appName } })) {
-    throw new ApiError(`An app named "${name}" already exists.`, API_ERROR_CODES.APP_NAME_EXISTS);
+    throw new ApiError(`An app named "${name}" already exists.`, APP_NAME_EXISTS_ERROR_CODE);
   }
 
   return prismaClient.$transaction(async () => {

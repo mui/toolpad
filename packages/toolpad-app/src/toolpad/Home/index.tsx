@@ -62,7 +62,7 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
-import { ApiError, API_ERROR_CODES } from '../../apiErrors';
+import { ApiError, VALIDATE_CAPTCHA_FAILED_ERROR_CODE } from '../../apiErrors';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -96,8 +96,6 @@ export const APP_TEMPLATE_OPTIONS: Map<
 
 const NO_OP = () => {};
 
-const CAPTCHA_TARGET_ID = 'captcha-target';
-
 export interface CreateAppDialogProps {
   open: boolean;
   onClose: () => void;
@@ -107,6 +105,8 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('blank');
   const [dom, setDom] = React.useState('');
+
+  const captchaTargetRef = React.useRef<HTMLDivElement | null>(null);
 
   const latestRecaptchaWidgetIdRef = React.useRef<number | null>(null);
   React.useEffect(() => {
@@ -179,10 +179,10 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
           },
         ]);
       } catch (error) {
-        if (config.recaptchaV2SiteKey && !hasShownRecaptchaCheckbox) {
-          if (error instanceof ApiError && error.code === API_ERROR_CODES.VALIDATE_CAPTCHA_FAILED) {
+        if (config.recaptchaV2SiteKey && !hasShownRecaptchaCheckbox && captchaTargetRef.current) {
+          if (error instanceof ApiError && error.code === VALIDATE_CAPTCHA_FAILED_ERROR_CODE) {
             // Show captcha checkbox
-            const widgetId = grecaptcha.render(CAPTCHA_TARGET_ID, {
+            const widgetId = grecaptcha.render(captchaTargetRef.current.id, {
               sitekey: config.recaptchaV2SiteKey,
             });
             latestRecaptchaWidgetIdRef.current = widgetId;
@@ -248,7 +248,9 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               onChange={handleDomChange}
             />
           ) : null}
-          {config.recaptchaV2SiteKey ? <Box id={CAPTCHA_TARGET_ID} mt={1} /> : null}
+          {config.recaptchaV2SiteKey ? (
+            <Box id="captcha-target" ref={captchaTargetRef} mt={1} />
+          ) : null}
           {config.recaptchaV3SiteKey ? (
             <Typography variant="caption" color="text.secondary">
               This site is protected by reCAPTCHA and the Google{' '}

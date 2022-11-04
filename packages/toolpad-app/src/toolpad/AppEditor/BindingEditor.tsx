@@ -43,7 +43,7 @@ import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
 import TabPanel from '../../components/TabPanel';
-import { ShortcutBindings, ShortcutScope } from '../../components/Shortcuts';
+import { ShortcutScope } from '../../components/Shortcuts';
 
 interface BindingEditorContext {
   label: string;
@@ -332,13 +332,8 @@ export function BindingEditorDialog<V>({
 
   const hasUnsavedChanges = input && input !== committedInput.current;
 
-  const shortcuts: ShortcutBindings = React.useMemo(
-    () => [[{ code: 'KeyS', metaKey: true }, handleSave]],
-    [handleSave],
-  );
-
   return (
-    <ShortcutScope bindings={shortcuts}>
+    <ShortcutScope bindings={[[{ code: 'KeyS', metaKey: true }, handleSave]]}>
       <Dialog onClose={onClose} open={open} fullWidth scroll="body" maxWidth="lg">
         <DialogTitle>Bind a property</DialogTitle>
         <DialogContent>

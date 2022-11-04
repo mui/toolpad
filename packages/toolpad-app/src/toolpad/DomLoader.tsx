@@ -11,7 +11,7 @@ import { mapValues } from '../utils/collections';
 import insecureHash from '../utils/insecureHash';
 import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
-import { ShortcutBindings, ShortcutScope } from '../components/Shortcuts';
+import { ShortcutScope } from '../components/Shortcuts';
 
 export type DomAction =
   | {
@@ -479,13 +479,8 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [state.unsavedChanges]);
 
-  const shortcuts: ShortcutBindings = React.useMemo(
-    () => [[{ code: 'KeyS', metaKey: true }, handleSave]],
-    [handleSave],
-  );
-
   return (
-    <ShortcutScope bindings={shortcuts}>
+    <ShortcutScope bindings={[[{ code: 'KeyS', metaKey: true }, handleSave]]}>
       <DomLoaderProvider value={state}>
         <DomApiContext.Provider value={api}>{children}</DomApiContext.Provider>
       </DomLoaderProvider>

@@ -11,7 +11,7 @@ import * as React from 'react';
 import * as JSON5 from 'json5';
 import type { EditorProps } from '../../types';
 import lazyComponent from '../../utils/lazyComponent';
-import { ShortcutBindings, ShortcutScope } from '../../components/Shortcuts';
+import { ShortcutScope } from '../../components/Shortcuts';
 
 const JsonEditor = lazyComponent(() => import('../../components/JsonEditor'), {
   noSsr: true,
@@ -45,13 +45,8 @@ function JsonPropEditor({ label, propType, value, onChange, disabled }: EditorPr
   const schemaUri =
     propType.type === 'object' || propType.type === 'array' ? propType.schema : undefined;
 
-  const shortcuts: ShortcutBindings = React.useMemo(
-    () => [[{ code: 'KeyS', metaKey: true }, handleSave]],
-    [handleSave],
-  );
-
   return (
-    <ShortcutScope bindings={shortcuts}>
+    <ShortcutScope bindings={[[{ code: 'KeyS', metaKey: true }, handleSave]]}>
       <React.Fragment>
         <Button variant="outlined" color="inherit" fullWidth onClick={() => setDialogOpen(true)}>
           {label}

@@ -25,7 +25,7 @@ import QueryInputPanel from '../QueryInputPanel';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import { tryFormat } from '../../utils/prettier';
 import config from '../../config';
-import { ShortcutScope, ShortcutBindings } from '../../components/Shortcuts';
+import { ShortcutScope } from '../../components/Shortcuts';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -165,13 +165,8 @@ function QueryEditor({
 
   const handleCommit = React.useCallback(() => onCommit?.(), [onCommit]);
 
-  const shortcuts: ShortcutBindings = React.useMemo(
-    () => [[{ code: 'KeyS', metaKey: true }, handleCommit]],
-    [handleCommit],
-  );
-
   return (
-    <ShortcutScope bindings={shortcuts}>
+    <ShortcutScope bindings={[[{ code: 'KeyS', metaKey: true }, handleCommit]]}>
       <SplitPane split="vertical" size="50%" allowResize>
         <SplitPane split="horizontal" size={85} primary="second" allowResize>
           <QueryInputPanel onRunPreview={handleRunPreview}>

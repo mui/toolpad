@@ -18,20 +18,22 @@ export interface ShortcutScopeProps {
 }
 
 export function ShortcutScope({ bindings, children }: ShortcutScopeProps) {
-  const handleKeyDown = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      for (const [shortcut, handler] of bindings) {
-        const metaKeyMatch =
-          !!event.metaKey === !!shortcut.metaKey || !!event.ctrlKey === !!shortcut.metaKey;
-        if (metaKeyMatch && event.code === shortcut.code) {
-          event.stopPropagation();
-          event.preventDefault();
-          handler(event);
-        }
+  const bindingsRef = React.useRef(bindings);
+  React.useEffect(() => {
+    bindingsRef.current = bindings;
+  }, [bindings]);
+
+  const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+    for (const [shortcut, handler] of bindingsRef.current) {
+      const metaKeyMatch =
+        !!event.metaKey === !!shortcut.metaKey || !!event.ctrlKey === !!shortcut.metaKey;
+      if (metaKeyMatch && event.code === shortcut.code) {
+        event.stopPropagation();
+        event.preventDefault();
+        handler(event);
       }
-    },
-    [bindings],
-  );
+    }
+  }, []);
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions

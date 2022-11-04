@@ -6,7 +6,7 @@ import { useDom, useDomApi } from '../../DomLoader';
 import * as appDom from '../../../appDom';
 import { tryFormat } from '../../../utils/prettier';
 import lazyComponent from '../../../utils/lazyComponent';
-import { ShortcutScope, ShortcutBindings } from '../../../components/Shortcuts';
+import { ShortcutScope } from '../../../components/Shortcuts';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -46,13 +46,8 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
     onClose();
   }, [handleSave, onClose]);
 
-  const shortcuts: ShortcutBindings = React.useMemo(
-    () => [[{ code: 'KeyS', metaKey: true }, handleSave]],
-    [handleSave],
-  );
-
   return (
-    <ShortcutScope bindings={shortcuts}>
+    <ShortcutScope bindings={[[{ code: 'KeyS', metaKey: true }, handleSave]]}>
       <Dialog onClose={onClose} open={open} fullWidth maxWidth="lg">
         <DialogTitle>Edit page module</DialogTitle>
         <Box sx={{ height: 500 }}>

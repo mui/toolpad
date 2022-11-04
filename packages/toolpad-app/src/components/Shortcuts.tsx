@@ -21,7 +21,9 @@ export function ShortcutScope({ bindings, children }: ShortcutScopeProps) {
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       for (const [shortcut, handler] of bindings) {
-        if (!!event.metaKey === !!shortcut.metaKey && event.code === shortcut.code) {
+        const metaKeyMatch =
+          !!event.metaKey === !!shortcut.metaKey || !!event.ctrlKey === !!shortcut.metaKey;
+        if (metaKeyMatch && event.code === shortcut.code) {
           event.stopPropagation();
           event.preventDefault();
           handler(event);

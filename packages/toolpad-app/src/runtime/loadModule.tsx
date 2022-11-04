@@ -3,6 +3,7 @@ import { codeFrameColumns } from '@babel/code-frame';
 import { findImports, isAbsoluteUrl } from '../utils/strings';
 import { errorFrom } from '../utils/errors';
 import muiMaterialExports from './muiExports';
+import muiIcons from './iconsMaterialStub';
 
 async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<string, unknown>> {
   const resolved = await Promise.all(input.values());
@@ -19,8 +20,6 @@ async function createRequire(urlImports: string[]) {
       ['react-dom', import('react-dom')],
       ['@mui/toolpad-core', import(`@mui/toolpad-core`)],
 
-      ['@mui/icons-material', import('@mui/icons-material')],
-
       ...muiMaterialExports,
 
       ...urlImports.map((url) => [url, import(/* webpackIgnore: true */ url)] as const),
@@ -31,12 +30,15 @@ async function createRequire(urlImports: string[]) {
     let esModule = modules.get(moduleId);
 
     if (!esModule) {
+      if (moduleId === '@mui/icons-material') {
+        return muiIcons;
+      }
+
       // Custom solution for icons
       const iconMatch = /^@mui\/icons-material\/(.*)$/.exec(moduleId);
       if (iconMatch) {
         const iconName = iconMatch[1];
-        const iconsModule = modules.get('@mui/icons-material');
-        esModule = { default: (iconsModule as any)[iconName] };
+        esModule = { default: (muiIcons as any)[iconName] };
       }
     }
 

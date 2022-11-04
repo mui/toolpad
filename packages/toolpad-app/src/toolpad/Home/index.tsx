@@ -62,6 +62,7 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
+import { sendAppCreatedEvent } from '../../utils/ga';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -154,6 +155,8 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               recaptchaToken,
             },
           ]);
+
+          sendAppCreatedEvent(name, appTemplateId);
         }}
       >
         <DialogTitle>Create a new MUI Toolpad App</DialogTitle>

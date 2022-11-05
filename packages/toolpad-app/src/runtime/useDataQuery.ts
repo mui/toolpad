@@ -1,10 +1,11 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { NodeId } from '@mui/toolpad-core';
 import { useAppContext } from './AppContext';
 import { VersionOrPreview } from '../types';
 import { CanvasHooksContext } from './CanvasHooksContext';
+import dataSources from '../toolpadDataSources/runtime';
+import * as appDom from '../appDom';
 
 interface ExecDataSourceQueryParams {
   signal?: AbortSignal;
@@ -59,7 +60,7 @@ const EMPTY_ARRAY: any[] = [];
 const EMPTY_OBJECT: any = {};
 
 export function useDataQuery(
-  queryId: NodeId,
+  node: appDom.QueryNode,
   params: any,
   {
     enabled = true,
@@ -68,6 +69,11 @@ export function useDataQuery(
 ): UseFetch {
   const { appId, version } = useAppContext();
   const { savedNodes } = React.useContext(CanvasHooksContext);
+  const queryId = node.id;
+  const query = node.attributes.query?.value;
+  const dataSourceId = node.attributes.dataSource?.value;
+
+  const dataSource = dataSourceId ? dataSources[dataSourceId] : null;
 
   // These are only used by the editor to invalidate caches whenever the query changes during editing
   const nodeHash: number | undefined = savedNodes ? savedNodes[queryId] : undefined;
@@ -81,15 +87,20 @@ export function useDataQuery(
     refetch,
   } = useQuery(
     [appId, version, nodeHash, queryId, params],
-    ({ signal }) =>
-      queryId &&
-      execDataSourceQuery({
-        signal,
-        appId,
-        version,
-        queryId,
-        params,
-      }),
+    ({ signal }) => {
+      if (!queryId) {
+        return null;
+      }
+
+      const fetchFromServer = () =>
+        execDataSourceQuery({ signal, appId, version, queryId, params });
+
+      if (query && dataSource?.exec) {
+        return dataSource?.exec(query, params, fetchFromServer);
+      }
+
+      return fetchFromServer();
+    },
     {
       ...options,
       enabled: isNodeAvailableOnServer && !!queryId && enabled,

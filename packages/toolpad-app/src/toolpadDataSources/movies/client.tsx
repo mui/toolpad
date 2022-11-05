@@ -12,6 +12,7 @@ import { Maybe } from '../../utils/types';
 import useQueryPreview from '../useQueryPreview';
 import { MoviesQuery, MoviesConnectionParams } from './types';
 import { FetchResult } from '../rest/types';
+import useFetchPrivate from '../useFetchPrivate';
 
 function withDefaults(value: Maybe<MoviesConnectionParams>): MoviesConnectionParams {
   return {
@@ -52,9 +53,17 @@ export function QueryEditor({
     [setInput],
   );
 
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<MoviesQuery, FetchResult>({
-    genre: input.query.genre,
-  });
+  const fetchPrivate = useFetchPrivate<MoviesQuery, FetchResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: MoviesQuery) => fetchPrivate(query),
+    [fetchPrivate],
+  );
+
+  const { preview, runPreview: handleRunPreview } = useQueryPreview(
+    fetchServerPreview,
+    { genre: input.query.genre },
+    {},
+  );
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>

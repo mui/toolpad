@@ -35,18 +35,16 @@ import invariant from 'invariant';
 import client from '../../api';
 import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
-import useLatest from '../../utils/useLatest';
 import ToolpadShell from '../ToolpadShell';
 import getReadableDuration from '../../utils/readableDuration';
-import EditableText from '../../components/EditableText';
 import type { AppMeta } from '../../server/data';
 import useLocalStorageState from '../../utils/useLocalStorageState';
 import ErrorAlert from '../AppEditor/PageEditor/ErrorAlert';
-import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
-import { errorFrom } from '../../utils/errors';
-import AppOptions from './AppOptions';
+import AppOptions from '../AppOptions';
+import AppNameEditable from '../AppOptions/AppNameEditable';
+import AppDeleteDialog from '../AppOptions/AppDeleteDialog';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -240,100 +238,6 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
         </DialogActions>
       </DialogForm>
     </Dialog>
-  );
-}
-
-export interface AppDeleteDialogProps {
-  app: AppMeta | null;
-  onClose: () => void;
-}
-
-function AppDeleteDialog({ app, onClose }: AppDeleteDialogProps) {
-  const latestApp = useLatest(app);
-  const deleteAppMutation = client.useMutation('deleteApp');
-
-  const handleClose = React.useCallback(
-    async (confirmed: boolean) => {
-      if (confirmed && app) {
-        await deleteAppMutation.mutateAsync([app.id]);
-        await client.invalidateQueries('getApps');
-      }
-      onClose();
-    },
-    [app, deleteAppMutation, onClose],
-  );
-
-  return (
-    <ConfirmDialog
-      open={!!app}
-      onClose={handleClose}
-      severity="error"
-      okButton="Delete"
-      loading={deleteAppMutation.isLoading}
-    >
-      Are you sure you want to delete application &quot;{latestApp?.name}&quot;
-    </ConfirmDialog>
-  );
-}
-
-interface AppNameEditableProps {
-  app?: AppMeta;
-  editing?: boolean;
-  setEditing: (editing: boolean) => void;
-  loading?: boolean;
-}
-
-function AppNameEditable({ app, editing, setEditing, loading }: AppNameEditableProps) {
-  const [appRenameError, setAppRenameError] = React.useState<Error | null>(null);
-  const appNameInput = React.useRef<HTMLInputElement | null>(null);
-  const [appName, setAppName] = React.useState<string>(app?.name || '');
-
-  const handleAppNameChange = React.useCallback(
-    (newValue: string) => {
-      setAppRenameError(null);
-      setAppName(newValue);
-    },
-    [setAppName],
-  );
-
-  const handleAppRenameClose = React.useCallback(() => {
-    setEditing(false);
-    setAppRenameError(null);
-  }, [setEditing]);
-
-  const handleAppRenameSave = React.useCallback(
-    async (name: string) => {
-      if (app?.id) {
-        try {
-          await client.mutation.updateApp(app.id, { name });
-          await client.invalidateQueries('getApps');
-        } catch (rawError) {
-          setAppRenameError(errorFrom(rawError));
-          setEditing(true);
-        }
-      }
-    },
-    [app?.id, setEditing],
-  );
-
-  return loading ? (
-    <Skeleton />
-  ) : (
-    <EditableText
-      defaultValue={app?.name}
-      editable={editing}
-      helperText={appRenameError ? `An app named "${appName}" already exists` : null}
-      error={!!appRenameError}
-      onChange={handleAppNameChange}
-      onClose={handleAppRenameClose}
-      onSave={handleAppRenameSave}
-      ref={appNameInput}
-      sx={{
-        width: '100%',
-      }}
-      value={appName}
-      variant="subtitle1"
-    />
   );
 }
 

@@ -1,77 +1,18 @@
-import {
-  styled,
-  SxProps,
-  Typography,
-  Tooltip,
-  Skeleton,
-  Box,
-  Divider,
-  IconButton,
-  Menu,
-  MenuItem,
-  DialogTitle,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-} from '@mui/material';
 import * as React from 'react';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { styled, SxProps, Skeleton, Box, Divider } from '@mui/material';
 import HierarchyExplorer from './HierarchyExplorer';
 import client from '../../api';
+import type { AppMeta } from '../../server/data';
 import { useDom } from '../DomLoader';
-import JsonView from '../../components/JsonView';
-import useMenu from '../../utils/useMenu';
+import AppOptions from '../AppOptions';
+import AppNameEditable from '../AppOptions/AppNameEditable';
+import AppDeleteDialog from '../AppOptions/AppDeleteDialog';
+import AppDuplicateDialog from '../AppOptions/AppDuplicateDialog';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
   flexDirection: 'column',
 });
-
-function AppMenu() {
-  const { buttonProps, menuProps, onMenuClose } = useMenu();
-
-  const dialogTitleId = React.useId();
-
-  const [viewDomDialogOpen, setViewDomDialogOpen] = React.useState(false);
-
-  const dom = useDom();
-
-  const handleViewDomClick = React.useCallback(() => {
-    onMenuClose();
-    setViewDomDialogOpen(true);
-  }, [onMenuClose]);
-
-  const handleViewDomDialogClose = React.useCallback(() => setViewDomDialogOpen(false), []);
-
-  return (
-    <React.Fragment>
-      <IconButton {...buttonProps} aria-label="Application menu">
-        <MoreVertIcon />
-      </IconButton>
-
-      <Menu {...menuProps}>
-        <MenuItem onClick={handleViewDomClick}>View DOM</MenuItem>
-      </Menu>
-
-      <Dialog
-        open={viewDomDialogOpen}
-        onClose={handleViewDomDialogClose}
-        aria-labelledby={dialogTitleId}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle id={dialogTitleId}>Application DOM</DialogTitle>
-        <DialogContent sx={{ position: 'relative', display: 'flex', alignItems: 'stretch' }}>
-          <JsonView sx={{ flex: 1 }} copyToClipboard src={dom} expandPaths={[]} expandLevel={5} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleViewDomDialogClose}>Close</Button>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
-  );
-}
 
 export interface ComponentPanelProps {
   appId: string;
@@ -81,6 +22,20 @@ export interface ComponentPanelProps {
 
 export default function PagePanel({ appId, className, sx }: ComponentPanelProps) {
   const { data: app, isLoading } = client.useQuery('getApp', [appId]);
+  const [editingName, setEditingName] = React.useState<boolean>(false);
+  const [deletedApp, setDeletedApp] = React.useState<null | AppMeta>(null);
+  const [duplicateApp, setDuplicateApp] = React.useState<null | AppMeta>(null);
+  const dom = useDom();
+
+  const handleRename = React.useCallback(() => {
+    setEditingName(true);
+  }, []);
+
+  const onDelete = React.useCallback(() => {
+    if (app) {
+      setDeletedApp(app);
+    }
+  }, [app]);
 
   return (
     <PagePanelRoot className={className} sx={sx}>
@@ -95,16 +50,33 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
           alignItems: 'center',
         }}
       >
-        {isLoading ? (
+        {isLoading || !app ? (
           <Skeleton variant="text" width={70} />
         ) : (
-          <Tooltip title={app?.name || ''} enterDelay={500}>
-            <Typography noWrap>{app?.name}</Typography>
-          </Tooltip>
+          <AppNameEditable
+            app={app}
+            editing={editingName}
+            setEditing={setEditingName}
+            loading={Boolean(!app)}
+          />
         )}
-        <AppMenu />
+        {app ? (
+          <AppOptions
+            app={app}
+            onRename={handleRename}
+            onDuplicate={() => setDuplicateApp(app)}
+            onDelete={onDelete}
+            dom={dom}
+          />
+        ) : null}
       </Box>
       <Divider />
+      <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} redirectOnDelete />
+      <AppDuplicateDialog
+        open={Boolean(duplicateApp)}
+        app={duplicateApp}
+        onClose={() => setDuplicateApp(null)}
+      />
       <HierarchyExplorer appId={appId} />
     </PagePanelRoot>
   );

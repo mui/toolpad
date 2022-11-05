@@ -36,4 +36,4 @@ export default function DialogForm({ children, onKeyDown = () => {}, ...rest }: 
       {children}
     </StyledDialogForm>
   );
-};
+}

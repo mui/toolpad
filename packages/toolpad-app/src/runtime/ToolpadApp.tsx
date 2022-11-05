@@ -8,6 +8,7 @@ import {
   AlertTitle,
   LinearProgress,
   Container,
+  Tooltip,
 } from '@mui/material';
 import {
   ToolpadComponent,
@@ -32,10 +33,12 @@ import {
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
   fireEvent,
+  NodeErrorProps,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
 } from '@mui/toolpad-core/runtime';
 import * as _ from 'lodash-es';
+import ErrorIcon from '@mui/icons-material/Error';
 import * as appDom from '../appDom';
 import { VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
@@ -155,6 +158,25 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   return (
     /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
     <RenderedNodeContent node={node} childNodeGroups={childNodeGroups} Component={Component} />
+  );
+}
+
+function NodeError({ error }: NodeErrorProps) {
+  return (
+    <Tooltip title={error.message}>
+      <span
+        style={{
+          display: 'inline-flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 8,
+          background: 'red',
+          color: 'white',
+        }}
+      >
+        <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
+      </span>
+    </Tooltip>
   );
 }
 
@@ -329,7 +351,11 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   }
 
   return (
-    <NodeRuntimeWrapper nodeId={nodeId} componentConfig={Component[TOOLPAD_COMPONENT]}>
+    <NodeRuntimeWrapper
+      nodeId={nodeId}
+      componentConfig={Component[TOOLPAD_COMPONENT]}
+      NodeError={NodeError}
+    >
       {isLayoutNode ? (
         <Component {...props} />
       ) : (
@@ -436,7 +462,7 @@ function QueryNode({ node }: QueryNodeProps) {
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
-  const queryResult = useDataQuery(node.id, params, options);
+  const queryResult = useDataQuery(node, params, options);
 
   React.useEffect(() => {
     const { isLoading, error, data, rows, ...result } = queryResult;

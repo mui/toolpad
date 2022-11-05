@@ -52,57 +52,61 @@ PlanName.propTypes = {
   }),
 };
 
-const Cell = ({ highlighted = false, ...props }) => (
-  <Box
-    {...props}
-    sx={{
-      py: 2,
-      px: 2,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      ...(highlighted && {
-        // Remove borders since there are only two plans
-        // https://github.com/mui/mui-toolpad/pull/809#issuecomment-1221026428
-        borderWidth: '0 0 0 0',
-        borderStyle: 'solid',
-        borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.100'),
-        bgcolor: (theme) =>
-          theme.palette.mode === 'dark'
-            ? alpha(theme.palette.primaryDark[900], 0.5)
-            : alpha(theme.palette.grey[50], 0.5),
-      }),
-      ...props.sx,
-    }}
-  />
-);
+function Cell({ highlighted = false, ...props }) {
+  return (
+    <Box
+      {...props}
+      sx={{
+        py: 2,
+        px: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...(highlighted && {
+          // Remove borders since there are only two plans
+          // https://github.com/mui/mui-toolpad/pull/809#issuecomment-1221026428
+          borderWidth: '0 0 0 0',
+          borderStyle: 'solid',
+          borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.100'),
+          bgcolor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? alpha(theme.palette.primaryDark[900], 0.5)
+              : alpha(theme.palette.grey[50], 0.5),
+        }),
+        ...props.sx,
+      }}
+    />
+  );
+}
 
 Cell.propTypes = {
   highlighted: PropTypes.bool,
   sx: PropTypes.object,
 };
 
-const RowHead = ({ children, startIcon, ...props }) => (
-  <Box
-    {...props}
-    sx={{
-      justifyContent: 'flex-start',
-      borderRadius: 1,
-      bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
-      p: 1,
-      transition: 'none',
-      typography: 'body2',
-      fontWeight: 700,
-      display: 'flex',
-      alignItems: 'center',
-      ...props.sx,
-    }}
-  >
-    {startIcon ? <Box sx={{ lineHeight: 0, mr: 1 }}>{startIcon}</Box> : null}
-    {children}
-  </Box>
-);
+function RowHead({ children, startIcon, ...props }) {
+  return (
+    <Box
+      {...props}
+      sx={{
+        justifyContent: 'flex-start',
+        borderRadius: 1,
+        bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
+        p: 1,
+        transition: 'none',
+        typography: 'body2',
+        fontWeight: 700,
+        display: 'flex',
+        alignItems: 'center',
+        ...props.sx,
+      }}
+    >
+      {startIcon ? <Box sx={{ lineHeight: 0, mr: 1 }}>{startIcon}</Box> : null}
+      {children}
+    </Box>
+  );
+}
 
 RowHead.propTypes = {
   children: PropTypes.node.isRequired,
@@ -110,29 +114,31 @@ RowHead.propTypes = {
   sx: PropTypes.object,
 };
 
-const RowCategory = (props) => (
-  <Box
-    {...props}
-    sx={{
-      typography: 'caption',
-      display: 'block',
-      fontWeight: 500,
-      bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
-      py: 1,
-      ml: 1,
-      pl: 1.5,
-      borderBottom: '1px solid',
-      borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200'),
-      ...props.sx,
-    }}
-  />
-);
+function RowCategory(props) {
+  return (
+    <Box
+      {...props}
+      sx={{
+        typography: 'caption',
+        display: 'block',
+        fontWeight: 500,
+        bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.900' : 'grey.50'),
+        py: 1,
+        ml: 1,
+        pl: 1.5,
+        borderBottom: '1px solid',
+        borderColor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.600' : 'grey.200'),
+        ...props.sx,
+      }}
+    />
+  );
+}
 
 RowCategory.propTypes = {
   sx: PropTypes.object,
 };
 
-const StickyHead = ({ plans, planInfo, container, disableCalculation = false }) => {
+function StickyHead({ plans, planInfo, container, disableCalculation = false }) {
   const [hidden, setHidden] = React.useState(true);
   React.useEffect(() => {
     function handleScroll() {
@@ -202,7 +208,7 @@ const StickyHead = ({ plans, planInfo, container, disableCalculation = false }) 
       </Container>
     </Box>
   );
-};
+}
 
 StickyHead.propTypes = {
   container: PropTypes.shape({
@@ -345,7 +351,7 @@ PricingTable.propTypes = {
   sx: PropTypes.object,
 };
 
-const Plan = ({ planInfo, benefits, unavailable, sx, ...props }) => {
+function Plan({ planInfo, benefits, unavailable, sx, ...props }) {
   return (
     <Paper
       variant="outlined"
@@ -355,7 +361,7 @@ const Plan = ({ planInfo, benefits, unavailable, sx, ...props }) => {
       <PlanName planInfo={planInfo} />
     </Paper>
   );
-};
+}
 
 Plan.propTypes = {
   benefits: PropTypes.arrayOf(PropTypes.string),

@@ -115,22 +115,20 @@ function RawBodyEditor({
     <React.Fragment>
       {renderToolbar({
         actions: (
-          <React.Fragment>
-            <TextField
-              select
-              label="content-type"
-              sx={{ width: 200 }}
-              value={value?.contentType.value}
-              onChange={handleContentTypeChange}
-              disabled={disabled}
-            >
-              {Array.from(RAW_CONTENT_TYPES.entries(), ([contentType, { alias }]) => (
-                <MenuItem key={contentType} value={contentType}>
-                  {alias}
-                </MenuItem>
-              ))}
-            </TextField>
-          </React.Fragment>
+          <TextField
+            select
+            label="content-type"
+            sx={{ width: 200 }}
+            value={value?.contentType.value}
+            onChange={handleContentTypeChange}
+            disabled={disabled}
+          >
+            {Array.from(RAW_CONTENT_TYPES.entries(), ([contentType, { alias }]) => (
+              <MenuItem key={contentType} value={contentType}>
+                {alias}
+              </MenuItem>
+            ))}
+          </TextField>
         ),
       })}
       <BindableEditor

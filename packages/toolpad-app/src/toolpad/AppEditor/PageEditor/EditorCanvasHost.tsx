@@ -12,6 +12,8 @@ import { ToolpadBridge } from '../../../canvas';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
+import { useDomApi } from '../../DomLoader';
+import { hasFieldFocus } from '../../../utils/fields';
 
 type IframeContentWindow = Window & typeof globalThis;
 
@@ -79,6 +81,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
+    const domApi = useDomApi();
 
     const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
@@ -145,10 +148,44 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     const handleRuntimeEvent = useEvent(onRuntimeEvent);
 
+    const iframeKeyDownHandler = React.useCallback(
+      (iframeDocument: Document) => {
+        return (event: KeyboardEvent) => {
+          if (hasFieldFocus(iframeDocument)) {
+            return;
+          }
+
+          const { code, metaKey, shiftKey } = event;
+          const undoShortcut = code === 'KeyZ' && metaKey;
+          const redoShortcut = undoShortcut && shiftKey;
+
+          if (redoShortcut) {
+            domApi.redo();
+          } else if (undoShortcut) {
+            domApi.undo();
+          }
+        };
+      },
+      [domApi],
+    );
+
     const handleFrameLoad = React.useCallback(() => {
       invariant(frameRef.current, 'Iframe ref not attached');
-      setContentWindow(frameRef.current.contentWindow);
-    }, []);
+
+      const iframeWindow = frameRef.current.contentWindow;
+      setContentWindow(iframeWindow);
+
+      if (!iframeWindow) {
+        return;
+      }
+
+      const keyDownHandler = iframeKeyDownHandler(iframeWindow.document);
+
+      iframeWindow?.addEventListener('keydown', keyDownHandler);
+      iframeWindow?.addEventListener('unload', () => {
+        iframeWindow?.removeEventListener('keydown', keyDownHandler);
+      });
+    }, [iframeKeyDownHandler]);
 
     React.useEffect(() => {
       if (!contentWindow) {

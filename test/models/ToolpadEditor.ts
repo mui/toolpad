@@ -43,6 +43,11 @@ class CreateComponentDialog {
 export class ToolpadEditor {
   readonly page: Page;
 
+  /**
+   * @deprecated Do not use, this is a temporary workaround for firefox issues
+   * See https://github.com/microsoft/playwright/issues/17441
+   * TODO: remove this property
+   */
   readonly browserName: string;
 
   readonly createPageBtn: Locator;
@@ -113,8 +118,6 @@ export class ToolpadEditor {
     moveTargetX: number,
     moveTargetY: number,
   ) {
-    const isFirefox = this.browserName === 'firefox';
-
     const sourceLocator = isSourceInCanvas
       ? this.appCanvas.locator(sourceSelector)
       : this.page.locator(sourceSelector);
@@ -136,6 +139,7 @@ export class ToolpadEditor {
 
     // Source drag event needs to be dispatched manually in Firefox for tests to work (Playwright bug)
     // https://github.com/microsoft/playwright/issues/17441
+    const isFirefox = this.browserName === 'firefox';
     if (isFirefox) {
       if (isSourceInCanvas) {
         const dataTransfer = await appCanvasFrame!.evaluateHandle(() => new DataTransfer());

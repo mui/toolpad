@@ -12,10 +12,18 @@ import {
   Typography,
   Alert,
   styled,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  ExecFetchFn,
+  QueryEditorProps,
+} from '../../types';
 import {
   FetchPrivateQuery,
   FetchQuery,
@@ -24,7 +32,7 @@ import {
   Body,
   ResponseType,
 } from './types';
-import { getAuthenticationHeaders, parseBaseUrl } from './shared';
+import { getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../toolpad/AppEditor/PageEditor/BindableEditor';
@@ -50,6 +58,8 @@ import { createHarLog, mergeHar } from '../../utils/har';
 import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import DEMO_BASE_URLS from './demoBaseUrls';
+import useFetchPrivate from '../useFetchPrivate';
+import { clientExec } from './runtime';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -264,6 +274,7 @@ function QueryEditor({
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const baseUrl = connectionParams?.baseUrl;
+  const urlValue: BindableAttrValue<string> = input.query.url || getDefaultUrl(connectionParams);
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
@@ -287,6 +298,16 @@ function QueryEditor({
       setInput((existing) => ({
         ...existing,
         query: { ...existing.query, method: event.target.value },
+      }));
+    },
+    [setInput],
+  );
+
+  const handleRunInBrowserChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, browser: event.target.checked },
       }));
     },
     [setInput],
@@ -370,7 +391,7 @@ function QueryEditor({
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
-    input: input.query.url,
+    input: urlValue,
     globalScope: queryScope,
   });
 
@@ -388,16 +409,26 @@ function QueryEditor({
 
   const [activeTab, setActiveTab] = React.useState('urlQuery');
 
+  const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: FetchQuery, params: Record<string, string>) =>
+      fetchPrivate({ kind: 'debugExec', query, params }),
+    [fetchPrivate],
+  );
+
+  const fetchPreview: ExecFetchFn<FetchQuery, FetchResult> = (query, params) =>
+    clientExec(query, params, fetchServerPreview);
+
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(
-    {
-      kind: 'debugExec',
-      query: input.query,
-      params: previewParams,
-    },
+  const { preview, runPreview: handleRunPreview } = useQueryPreview(
+    fetchPreview,
+    input.query,
+    previewParams,
     {
       onPreview(result) {
-        setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+        setPreviewHar((existing) =>
+          result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
+        );
       },
     },
   );
@@ -437,10 +468,18 @@ function QueryEditor({
                 label="url"
                 propType={{ type: 'string' }}
                 renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-                value={input.query.url}
+                value={urlValue}
                 onChange={handleUrlChange}
               />
             </Box>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox checked={input.query.browser} onChange={handleRunInBrowserChange} />
+                }
+                label="Run in the browser"
+              />
+            </FormGroup>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <TabContext value={activeTab}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -544,10 +583,13 @@ function QueryEditor({
 }
 
 function getInitialQueryValue(): FetchQuery {
-  return { url: { type: 'const', value: '' }, method: 'GET', headers: [] };
+  return {
+    method: 'GET',
+    headers: [],
+  };
 }
 
-const dataSource: ClientDataSource<{}, FetchQuery> = {
+const dataSource: ClientDataSource<RestConnectionParams, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   QueryEditor,

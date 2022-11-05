@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Button,
+  IconButton,
   Dialog,
   DialogActions,
   DialogContent,
@@ -17,12 +18,15 @@ import SyncIcon from '@mui/icons-material/Sync';
 import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import Undo from '@mui/icons-material/Undo';
+import Redo from '@mui/icons-material/Redo';
+
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { Outlet } from 'react-router-dom';
 import invariant from 'invariant';
 import DialogForm from '../../components/DialogForm';
-import { DomLoader, useDomLoader } from '../DomLoader';
+import { DomLoader, useDomLoader, useDomApi } from '../DomLoader';
 import ToolpadShell from '../ToolpadShell';
 import PagePanel from './PagePanel';
 import client from '../../api';
@@ -137,6 +141,7 @@ export interface ToolpadShellProps {
 
 export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
   const domLoader = useDomLoader();
+  const domApi = useDomApi();
 
   const {
     value: createReleaseDialogOpen,
@@ -148,6 +153,16 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
     <ToolpadShell
       actions={
         <Stack direction="row" gap={1} alignItems="center">
+          <IconButton onClick={domApi.undo}>
+            <Tooltip title="Undo">
+              <Undo />
+            </Tooltip>
+          </IconButton>
+          <IconButton onClick={domApi.redo}>
+            <Tooltip title="Redo">
+              <Redo />
+            </Tooltip>
+          </IconButton>
           <Button
             variant="outlined"
             endIcon={<OpenInNewIcon />}

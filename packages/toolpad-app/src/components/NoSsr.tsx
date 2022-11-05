@@ -25,5 +25,6 @@ export interface NoSsrProps {
  */
 export default function NoSsr({ children, defer, fallback = null }: NoSsrProps) {
   const isSsr = useIsSsr(defer);
+
   return <React.Fragment>{isSsr ? fallback : children}</React.Fragment>;
 }

@@ -24,6 +24,7 @@ import {
   useGridApiRef,
 } from '@mui/x-data-grid-pro';
 import * as React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import {
   Delete as DeleteIcon,
   Edit as EditIcon,

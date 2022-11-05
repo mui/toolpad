@@ -70,7 +70,7 @@ import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
-  // eslint-disable-next-line import/extensions
+   
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
     default: d.ReactQueryDevtools,
   })),

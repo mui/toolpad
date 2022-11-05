@@ -50,7 +50,7 @@ Although we love giving you the opportunity to put your stamp on MUI, we also ar
 
 ## Changelog
 
-<!-- TODO -->
+The [changelog](https://github.com/mui/mui-toolpad/releases) is regularly updated to reflect what's changed in each new release.
 
 ## Roadmap
 

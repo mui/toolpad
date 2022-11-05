@@ -399,7 +399,7 @@ export function BindingEditor<V>({
 
   const bindingButton = (
     <Checkbox
-      aria-label="Bind property"
+      aria-label={`Bind property "${label}"`}
       checked={hasBinding}
       disabled={disabled}
       icon={<AddLinkIcon />}

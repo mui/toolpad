@@ -163,7 +163,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     return [pageNode, ...appDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
-  const selectedNode = selection && appDom.getNode(dom, selection);
+  const selectedNode = selection && appDom.getMaybeNode(dom, selection);
 
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -1043,7 +1043,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           }
         }
 
-        const draggedNodeParent = appDom.getParent(dom, draggedNode);
+        const draggedNodeParent = selection ? appDom.getParent(dom, draggedNode) : null;
         if (
           draggedNode.layout?.columnSize &&
           draggedNodeParent &&
@@ -1222,7 +1222,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
             cursorPos.x <
               Math.min(
                 parentRect.x + parentRect.width,
-                nextSiblingRect ? nextSiblingRect?.x + nextSiblingRect?.width : 0,
+                nextSiblingRect ? nextSiblingRect.x + nextSiblingRect.width : 0,
               ) -
                 minGridColumnWidth
           ) {

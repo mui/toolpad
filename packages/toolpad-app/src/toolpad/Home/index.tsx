@@ -126,135 +126,135 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const isFormValid = Boolean(name);
 
   return (
-    <React.Fragment>
-      <Dialog {...props} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
-        <DialogForm
-          onSubmit={async (event) => {
-            invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
+    <Dialog {...props} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
+      <DialogForm
+        onSubmit={async (event) => {
+          invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
 
-            event.preventDefault();
-            let recaptchaToken;
-            if (config.recaptchaSiteKey) {
-              await new Promise<void>((resolve) => grecaptcha.ready(resolve));
-              recaptchaToken = await grecaptcha.execute(config.recaptchaSiteKey, {
-                action: 'submit',
-              });
-            }
+          event.preventDefault();
+          let recaptchaToken;
+          if (config.recaptchaSiteKey) {
+            await new Promise<void>((resolve) => {
+              grecaptcha.ready(resolve);
+            });
+            recaptchaToken = await grecaptcha.execute(config.recaptchaSiteKey, {
+              action: 'submit',
+            });
+          }
 
-            const appDom = dom.trim() ? JSON.parse(dom) : null;
-            await createAppMutation.mutateAsync([
-              name,
-              {
-                from: {
-                  ...(appDom
-                    ? { kind: 'dom', dom: appDom }
-                    : { kind: 'template', id: appTemplateId }),
-                },
-                recaptchaToken,
+          const appDom = dom.trim() ? JSON.parse(dom) : null;
+          await createAppMutation.mutateAsync([
+            name,
+            {
+              from: {
+                ...(appDom
+                  ? { kind: 'dom', dom: appDom }
+                  : { kind: 'template', id: appTemplateId }),
               },
-            ]);
-          }}
-        >
-          <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
-          <DialogContent>
-            {config.isDemo ? (
-              <Alert severity="warning" sx={{ mb: 2 }}>
-                <AlertTitle>For demo purposes only!</AlertTitle>
-                Your application will be ephemeral and may be deleted at any time.
-              </Alert>
-            ) : null}
+              recaptchaToken,
+            },
+          ]);
+        }}
+      >
+        <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
+        <DialogContent>
+          {config.isDemo ? (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              <AlertTitle>For demo purposes only!</AlertTitle>
+              Your application will be ephemeral and may be deleted at any time.
+            </Alert>
+          ) : null}
+          <TextField
+            sx={{ my: 1 }}
+            required
+            autoFocus
+            fullWidth
+            label="Name"
+            value={name}
+            error={createAppMutation.isError}
+            helperText={(createAppMutation.error as Error)?.message || ''}
+            onChange={(event) => {
+              createAppMutation.reset();
+              setName(event.target.value);
+            }}
+          />
+
+          <TextField
+            sx={{ my: 1 }}
+            label="Use template"
+            select
+            fullWidth
+            value={appTemplateId}
+            onChange={handleAppTemplateChange}
+          >
+            {Array.from(APP_TEMPLATE_OPTIONS).map(([value, { label, description }]) => (
+              <MenuItem key={value} value={value}>
+                <span>
+                  <Typography>{label}</Typography>
+                  <Typography variant="caption">{description || ''}</Typography>
+                </span>
+              </MenuItem>
+            ))}
+          </TextField>
+
+          {config.enableCreateByDom ? (
             <TextField
               sx={{ my: 1 }}
-              required
-              autoFocus
+              label="Seed DOM"
               fullWidth
-              label="Name"
-              value={name}
-              error={createAppMutation.isError}
-              helperText={(createAppMutation.error as Error)?.message || ''}
-              onChange={(event) => {
-                createAppMutation.reset();
-                setName(event.target.value);
-              }}
+              multiline
+              maxRows={10}
+              value={dom}
+              onChange={handleDomChange}
             />
-
-            <TextField
-              sx={{ my: 1 }}
-              label="Use template"
-              select
-              fullWidth
-              value={appTemplateId}
-              onChange={handleAppTemplateChange}
-            >
-              {Array.from(APP_TEMPLATE_OPTIONS).map(([value, { label, description }]) => (
-                <MenuItem key={value} value={value}>
-                  <span>
-                    <Typography>{label}</Typography>
-                    <Typography variant="caption">{description || ''}</Typography>
-                  </span>
-                </MenuItem>
-              ))}
-            </TextField>
-
-            {config.enableCreateByDom ? (
-              <TextField
-                sx={{ my: 1 }}
-                label="Seed DOM"
-                fullWidth
-                multiline
-                maxRows={10}
-                value={dom}
-                onChange={handleDomChange}
-              />
-            ) : null}
-            {config.recaptchaSiteKey ? (
-              <Typography variant="caption" color="text.secondary">
-                This site is protected by reCAPTCHA and the Google{' '}
-                <Link
-                  href="https://policies.google.com/privacy"
-                  underline="none"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Privacy Policy
-                </Link>{' '}
-                and{' '}
-                <Link
-                  href="https://policies.google.com/terms"
-                  underline="none"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Terms of Service
-                </Link>{' '}
-                apply.
-              </Typography>
-            ) : null}
-          </DialogContent>
-          <DialogActions>
-            <Button
-              color="inherit"
-              variant="text"
-              onClick={() => {
-                setName('');
-                createAppMutation.reset();
-                onClose();
-              }}
-              disabled={config.isDemo}
-            >
-              Cancel
-            </Button>
-            <LoadingButton
-              type="submit"
-              loading={createAppMutation.isLoading}
-              disabled={!isFormValid}
-            >
-              Create
-            </LoadingButton>
-          </DialogActions>
-        </DialogForm>
-      </Dialog>
-    </React.Fragment>
+          ) : null}
+          {config.recaptchaSiteKey ? (
+            <Typography variant="caption" color="text.secondary">
+              This site is protected by reCAPTCHA and the Google{' '}
+              <Link
+                href="https://policies.google.com/privacy"
+                underline="none"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Privacy Policy
+              </Link>{' '}
+              and{' '}
+              <Link
+                href="https://policies.google.com/terms"
+                underline="none"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Terms of Service
+              </Link>{' '}
+              apply.
+            </Typography>
+          ) : null}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="inherit"
+            variant="text"
+            onClick={() => {
+              setName('');
+              createAppMutation.reset();
+              onClose();
+            }}
+            disabled={config.isDemo}
+          >
+            Cancel
+          </Button>
+          <LoadingButton
+            type="submit"
+            loading={createAppMutation.isLoading}
+            disabled={!isFormValid}
+          >
+            Create
+          </LoadingButton>
+        </DialogActions>
+      </DialogForm>
+    </Dialog>
   );
 }
 
@@ -541,52 +541,50 @@ function AppCard({ app, activeDeployment, onDelete, onDuplicate }: AppCardProps)
   }, []);
 
   return (
-    <React.Fragment>
-      <Card
-        role="article"
-        sx={{
-          gridColumn: 'span 1',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-        }}
-      >
-        <CardHeader
-          action={
-            <AppOptions
-              app={app}
-              onRename={handleRename}
-              onDelete={onDelete}
-              onDuplicate={onDuplicate}
-            />
-          }
-          disableTypography
-          subheader={
-            <Typography variant="body2" color="text.secondary">
-              {app ? (
-                <Tooltip title={app.editedAt.toLocaleString('short')}>
-                  <span>Edited {getReadableDuration(app.editedAt)}</span>
-                </Tooltip>
-              ) : (
-                <Skeleton />
-              )}
-            </Typography>
-          }
-        />
-        <CardContent sx={{ flexGrow: 1 }}>
-          <AppNameEditable
+    <Card
+      role="article"
+      sx={{
+        gridColumn: 'span 1',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}
+    >
+      <CardHeader
+        action={
+          <AppOptions
             app={app}
-            editing={editingName}
-            setEditing={setEditingName}
-            loading={Boolean(!app)}
+            onRename={handleRename}
+            onDelete={onDelete}
+            onDuplicate={onDuplicate}
           />
-        </CardContent>
-        <CardActions>
-          <AppEditButton app={app} />
-          <AppOpenButton app={app} activeDeployment={activeDeployment} />
-        </CardActions>
-      </Card>
-    </React.Fragment>
+        }
+        disableTypography
+        subheader={
+          <Typography variant="body2" color="text.secondary">
+            {app ? (
+              <Tooltip title={app.editedAt.toLocaleString('short')}>
+                <span>Edited {getReadableDuration(app.editedAt)}</span>
+              </Tooltip>
+            ) : (
+              <Skeleton />
+            )}
+          </Typography>
+        }
+      />
+      <CardContent sx={{ flexGrow: 1 }}>
+        <AppNameEditable
+          app={app}
+          editing={editingName}
+          setEditing={setEditingName}
+          loading={Boolean(!app)}
+        />
+      </CardContent>
+      <CardActions>
+        <AppEditButton app={app} />
+        <AppOpenButton app={app} activeDeployment={activeDeployment} />
+      </CardActions>
+    </Card>
   );
 }
 
@@ -605,33 +603,31 @@ function AppRow({ app, activeDeployment, onDelete, onDuplicate }: AppRowProps) {
   }, []);
 
   return (
-    <React.Fragment>
-      <TableRow hover role="row">
-        <TableCell component="th" scope="row">
-          <AppNameEditable
-            loading={Boolean(!app)}
+    <TableRow hover role="row">
+      <TableCell component="th" scope="row">
+        <AppNameEditable
+          loading={Boolean(!app)}
+          app={app}
+          editing={editingName}
+          setEditing={setEditingName}
+        />
+        <Typography variant="caption">
+          {app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
+        </Typography>
+      </TableCell>
+      <TableCell align="right">
+        <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
+          <AppEditButton app={app} />
+          <AppOpenButton app={app} activeDeployment={activeDeployment} />
+          <AppOptions
             app={app}
-            editing={editingName}
-            setEditing={setEditingName}
+            onRename={handleRename}
+            onDelete={onDelete}
+            onDuplicate={onDuplicate}
           />
-          <Typography variant="caption">
-            {app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
-          </Typography>
-        </TableCell>
-        <TableCell align="right">
-          <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
-            <AppEditButton app={app} />
-            <AppOpenButton app={app} activeDeployment={activeDeployment} />
-            <AppOptions
-              app={app}
-              onRename={handleRename}
-              onDelete={onDelete}
-              onDuplicate={onDuplicate}
-            />
-          </Stack>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
+        </Stack>
+      </TableCell>
+    </TableRow>
   );
 }
 

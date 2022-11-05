@@ -18,6 +18,7 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DashboardCustomizeSharpIcon from '@mui/icons-material/DashboardCustomizeSharp';
 import AddIcon from '@mui/icons-material/Add';
+import LinkIcon from '@mui/icons-material/Link';
 import { SvgIconProps } from '@mui/material/SvgIcon';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
@@ -31,6 +32,7 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Form', DnsIcon],
   ['Card', ContactPageIcon],
   ['Tabs', TabIcon],
+  ['Link', LinkIcon],
   ['Slider', TuneIcon],
   ['Switch', ToggleOnIcon],
   ['Radio', RadioButtonCheckedIcon],
@@ -47,10 +49,10 @@ interface ComponentIconProps {
   kind?: ComponentItemKind;
 }
 
-const ComponentIcon = ({ id: componentId, kind }: ComponentIconProps) => {
+function ComponentIcon({ id: componentId, kind }: ComponentIconProps) {
   const Icon = iconMap.get(kind === 'custom' ? 'CodeComponent' : componentId);
   return Icon ? <Icon fontSize="medium" opacity={kind === 'future' ? 0.75 : 1} /> : null;
-};
+}
 
 interface ComponentCatalogItemProps {
   draggable?: boolean;
@@ -62,7 +64,7 @@ interface ComponentCatalogItemProps {
   kind?: ComponentItemKind;
 }
 
-const ComponentCatalogItem = ({
+function ComponentCatalogItem({
   draggable,
   onClick,
   id,
@@ -70,7 +72,7 @@ const ComponentCatalogItem = ({
   builtIn,
   kind,
   onDragStart,
-}: ComponentCatalogItemProps) => {
+}: ComponentCatalogItemProps) {
   return (
     <Box
       className="ComponentCatalogItem"
@@ -112,6 +114,6 @@ const ComponentCatalogItem = ({
       </span>
     </Box>
   );
-};
+}
 
 export default ComponentCatalogItem;

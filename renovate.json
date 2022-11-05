@@ -36,7 +36,8 @@
     },
     {
       "groupName": "node",
-      "matchDepTypes": ["cimg/node", "node"]
+      "matchPackageNames": ["cimg/node", "node"],
+      "allowedVersions": "<=16"
     },
     {
       "groupName": "react-inspector",
@@ -70,8 +71,12 @@
     },
     {
       "groupName": "next",
-      "matchPackageNames": ["next"],
+      "matchPackageNames": ["next", "@next/eslint-plugin-next", "eslint-config-next"],
       "allowedVersions": "1.2.2"
+    },
+    {
+      "matchDepTypes": ["action"],
+      "pinDigests": true
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],

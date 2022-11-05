@@ -13,11 +13,17 @@ import {
   Alert,
   Box,
   MenuItem,
+  ListItemText,
+  IconButton,
+  styled,
+  ListItemButton,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import clsx from 'clsx';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
@@ -33,6 +39,7 @@ import { ConfirmDialog } from '../../../components/SystemDialogs';
 import useBoolean from '../../../utils/useBoolean';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 import useEvent from '../../../utils/useEvent';
+import NodeMenu from '../NodeMenu';
 
 const EMPTY_OBJECT = {};
 
@@ -447,6 +454,23 @@ function QueryNodeEditorDialog<Q>({
   );
 }
 
+const classes = {
+  listItemMenuButton: 'Toolpad__QueryListItem',
+  listItemMenuOpen: 'Toolpad__QueryListItemMenuOpen',
+};
+
+const QueryListItem = styled(ListItem)({
+  [`& .${classes.listItemMenuButton}`]: {
+    visibility: 'hidden',
+  },
+  [`
+    &:hover .${classes.listItemMenuButton}, 
+    & .${classes.listItemMenuOpen}
+  `]: {
+    visibility: 'visible',
+  },
+});
+
 type DialogState =
   | {
       node?: undefined;
@@ -490,29 +514,72 @@ export default function QueryEditor() {
     [dom, domApi, page],
   );
 
-  const handleRemove = React.useCallback(
-    (node: appDom.QueryNode) => {
-      domApi.removeNode(node.id);
+  const handleDeleteNode = React.useCallback(
+    (nodeId: NodeId) => {
+      domApi.removeNode(nodeId);
       handleEditStateDialogClose();
     },
     [domApi, handleEditStateDialogClose],
   );
 
+  const handleRemove = React.useCallback(
+    (node: appDom.QueryNode) => handleDeleteNode(node.id),
+    [handleDeleteNode],
+  );
+
+  const handleDuplicateNode = React.useCallback(
+    (nodeId: NodeId) => {
+      const node = appDom.getNode(dom, nodeId, 'query');
+      invariant(
+        page,
+        'handleDuplicateNode should only be used for queries, which should always belong to a page',
+      );
+      const existingNames = appDom.getExistingNamesForChildren(dom, page);
+      const newName = appDom.proposeName(node.name, existingNames);
+      const copy = appDom.createNode(dom, 'query', { ...node, name: newName });
+      setDialogState({ node: copy, isDraft: true });
+    },
+    [dom, page],
+  );
+
   return (
-    <Stack spacing={1} alignItems="start">
+    <Stack spacing={1} alignItems="start" sx={{ width: '100%' }}>
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
         Add query
       </Button>
-      <List>
+      <List sx={{ width: '100%' }}>
         {queries.map((queryNode) => {
           return (
-            <ListItem
+            <QueryListItem
               key={queryNode.id}
-              button
+              disablePadding
               onClick={() => setDialogState({ node: queryNode, isDraft: false })}
+              secondaryAction={
+                <NodeMenu
+                  renderButton={({ buttonProps, menuProps }) => (
+                    <IconButton
+                      className={clsx(classes.listItemMenuButton, {
+                        [classes.listItemMenuOpen]: menuProps.open,
+                      })}
+                      edge="end"
+                      aria-label="Open query menu"
+                      {...buttonProps}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                  )}
+                  nodeId={queryNode.id}
+                  deleteLabelText={`Delete ${queryNode.name}`}
+                  duplicateLabelText={`Duplicate ${queryNode.name}`}
+                  onDeleteNode={handleDeleteNode}
+                  onDuplicateNode={handleDuplicateNode}
+                />
+              }
             >
-              {queryNode.name}
-            </ListItem>
+              <ListItemButton>
+                <ListItemText primaryTypographyProps={{ noWrap: true }} primary={queryNode.name} />
+              </ListItemButton>
+            </QueryListItem>
           );
         })}
       </List>

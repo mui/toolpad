@@ -28,7 +28,7 @@ import type { EditorProps } from '../../types';
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 import { generateUniqueString } from '../../utils/strings';
 
-const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean'];
+const COLUMN_TYPES: string[] = ['string', 'number', 'date', 'dateTime', 'boolean', 'link', 'image'];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
 function GridColumnsPropEditor({

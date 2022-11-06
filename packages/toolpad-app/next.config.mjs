@@ -129,46 +129,46 @@ export default withBundleAnalyzer(
           path: false,
         };
 
-        {
-          // Support global CSS in monaco-editor
-          // Adapted from next-transpile-modules.
-          const extraCssIssuer = /(\/|\\)node_modules(\/|\\)monaco-editor(\/|\\).*\.js$/;
-          const modulesPaths = [
-            path.resolve(path.dirname(require.resolve('monaco-editor/package.json')), './esm'),
-          ];
-
-          config.module = config.module ?? {};
-          config.module.rules = config.module.rules ?? [];
-          const nextCssLoaders = /** @type {import('webpack').RuleSetRule} */ (
-            config.module.rules.find(
-              (rule) => typeof rule === 'object' && typeof rule.oneOf === 'object',
-            )
-          );
-
-          // Add support for Global CSS imports in transpiled modules
-          if (nextCssLoaders) {
-            const nextGlobalCssLoader = nextCssLoaders.oneOf?.find(
-              (rule) =>
-                rule.sideEffects === true &&
-                rule.test instanceof RegExp &&
-                regexEqual(rule.test, /(?<!\.module)\.css$/),
-            );
-
-            if (nextGlobalCssLoader) {
-              nextGlobalCssLoader.issuer = {
-                or: [extraCssIssuer, nextGlobalCssLoader.issuer ?? NEVER],
-              };
-              nextGlobalCssLoader.include = {
-                or: [...modulesPaths, nextGlobalCssLoader.include ?? NEVER],
-              };
-            } else if (!options.isServer) {
-              // Note that Next.js ignores global CSS imports on the server
-              console.warn(
-                'could not find default CSS rule, global CSS imports may not work correctly',
-              );
-            }
-          }
-        }
+        // {
+        //   // Support global CSS in monaco-editor
+        //   // Adapted from next-transpile-modules.
+        //   const extraCssIssuer = /(\/|\\)node_modules(\/|\\)monaco-editor(\/|\\).*\.js$/;
+        //   const modulesPaths = [
+        //     path.resolve(path.dirname(require.resolve('monaco-editor/package.json')), './esm'),
+        //   ];
+        //
+        //   config.module = config.module ?? {};
+        //   config.module.rules = config.module.rules ?? [];
+        //   const nextCssLoaders = /** @type {import('webpack').RuleSetRule} */ (
+        //     config.module.rules.find(
+        //       (rule) => typeof rule === 'object' && typeof rule.oneOf === 'object',
+        //     )
+        //   );
+        //
+        //   // Add support for Global CSS imports in transpiled modules
+        //   if (nextCssLoaders) {
+        //     const nextGlobalCssLoader = nextCssLoaders.oneOf?.find(
+        //       (rule) =>
+        //         rule.sideEffects === true &&
+        //         rule.test instanceof RegExp &&
+        //         regexEqual(rule.test, /(?<!\.module)\.css$/),
+        //     );
+        //
+        //     if (nextGlobalCssLoader) {
+        //       nextGlobalCssLoader.issuer = {
+        //         or: [extraCssIssuer, nextGlobalCssLoader.issuer ?? NEVER],
+        //       };
+        //       nextGlobalCssLoader.include = {
+        //         or: [...modulesPaths, nextGlobalCssLoader.include ?? NEVER],
+        //       };
+        //     } else if (!options.isServer) {
+        //       // Note that Next.js ignores global CSS imports on the server
+        //       console.warn(
+        //         'could not find default CSS rule, global CSS imports may not work correctly',
+        //       );
+        //     }
+        //   }
+        // }
 
         return config;
       },

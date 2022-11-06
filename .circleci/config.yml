@@ -129,7 +129,7 @@ jobs:
           command: yarn markdownlint
   test_static:
     <<: *defaults
-    resource_class: medium+
+    resource_class: large
     steps:
       - checkout
       - install_js

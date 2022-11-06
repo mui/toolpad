@@ -28,7 +28,7 @@
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.10.9",
     "@mui/material": "^5.10.12",
-    "@mui/monorepo": "https://github.com/mui/material-ui.git",
+    "@mui/monorepo": "https://github.com/mnajdova/material-ui.git#docs/upgrade-nextjs-13",
     "@mui/styles": "^5.10.10",
     "@mui/utils": "^5.10.9",
     "@trendmicro/react-interpolate": "^0.5.5",

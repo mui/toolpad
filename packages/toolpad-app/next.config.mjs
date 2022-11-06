@@ -3,7 +3,9 @@ import * as path from 'path';
 // import { withSentryConfig } from '@sentry/nextjs';
 import createBundleAnalyzer from '@next/bundle-analyzer';
 
-const withSentryConfig = (/** @type {import("next").NextConfig} */ cfg) => cfg;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const withSentryConfig = (/** @type {import("next").NextConfig} */ cfg, /** @type {any} */ opts) =>
+  cfg;
 
 const withBundleAnalyzer = createBundleAnalyzer({ enabled: !!process.env.ANALYZE });
 

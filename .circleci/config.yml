@@ -131,7 +131,7 @@ jobs:
     <<: *defaults
     resource_class: large
     environment:
-      - NODE_OPTIONS: '--max-old-space-size=10240'
+      - NODE_OPTIONS: '--max-old-space-size=16192'
     steps:
       - checkout
       - install_js

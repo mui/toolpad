@@ -1,7 +1,9 @@
 import { createRequire } from 'module';
 import * as path from 'path';
-import { withSentryConfig } from '@sentry/nextjs';
+// import { withSentryConfig } from '@sentry/nextjs';
 import createBundleAnalyzer from '@next/bundle-analyzer';
+
+const withSentryConfig = (/** @type {import("next").NextConfig} */ cfg) => cfg;
 
 const withBundleAnalyzer = createBundleAnalyzer({ enabled: !!process.env.ANALYZE });
 
@@ -106,7 +108,7 @@ export default withBundleAnalyzer(
     /** @type {import('next').NextConfig} */ ({
       reactStrictMode: true,
       poweredByHeader: false,
-      // productionBrowserSourceMaps: true,
+      productionBrowserSourceMaps: true,
       eslint: {
         // We're running this as part of the monorepo eslint
         ignoreDuringBuilds: true,

@@ -3,8 +3,6 @@ import * as path from 'path';
 import { withSentryConfig } from '@sentry/nextjs';
 import createBundleAnalyzer from '@next/bundle-analyzer';
 
-const DO_CSS = false;
-
 const withBundleAnalyzer = createBundleAnalyzer({ enabled: !!process.env.ANALYZE });
 
 // TODO: remove when https://github.com/getsentry/sentry-javascript/issues/3852 gets resolved
@@ -108,7 +106,7 @@ export default withBundleAnalyzer(
     /** @type {import('next').NextConfig} */ ({
       reactStrictMode: true,
       poweredByHeader: false,
-      productionBrowserSourceMaps: true,
+      // productionBrowserSourceMaps: true,
       eslint: {
         // We're running this as part of the monorepo eslint
         ignoreDuringBuilds: true,
@@ -131,7 +129,7 @@ export default withBundleAnalyzer(
           path: false,
         };
 
-        if (DO_CSS) {
+        {
           // Support global CSS in monaco-editor
           // Adapted from next-transpile-modules.
           const extraCssIssuer = /(\/|\\)node_modules(\/|\\)monaco-editor(\/|\\).*\.js$/;

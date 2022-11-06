@@ -84,7 +84,7 @@
     "dotenv-cli": "^6.0.0",
     "inquirer": "^9.1.4",
     "semver": "^7.3.8",
-    "yargs": "^17.6.0"
+    "yargs": "^17.6.2"
   },
   "resolutions": {
     "@types/react": "18.0.19",

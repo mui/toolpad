@@ -40,7 +40,7 @@
     "test": "yarn test:build && jest"
   },
   "devDependencies": {
-    "@mui/monorepo": "https://github.com/mui/material-ui.git",
+    "@mui/monorepo": "https://github.com/mnajdova/material-ui.git#docs/upgrade-nextjs-13",
     "@next/eslint-plugin-next": "12.3.1",
     "@playwright/test": "^1.27.1",
     "@swc/helpers": "^0.4.12",

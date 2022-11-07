@@ -2,7 +2,6 @@ import { transform, TransformResult } from 'sucrase';
 import { codeFrameColumns } from '@babel/code-frame';
 import { findImports, isAbsoluteUrl } from '../utils/strings';
 import { errorFrom } from '../utils/errors';
-import muiMaterialExports from './muiExports';
 
 async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<string, unknown>> {
   const resolved = await Promise.all(input.values());
@@ -10,22 +9,14 @@ async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<
 }
 
 async function createRequire(urlImports: string[]) {
-  const modules = await resolveValues(
-    new Map<string, Promise<any>>([
-      // These import('...') are passed static strings so that webpack knows how to resolve them at build time.
-      // Don't change
-      ['react', import('react')],
-      ['dayjs', import('dayjs')],
-      ['react-dom', import('react-dom')],
-      ['@mui/toolpad-core', import(`@mui/toolpad-core`)],
+  const [{ default: muiMaterialExports }, urlModules] = await Promise.all([
+    import('./muiExports'),
+    resolveValues(
+      new Map(urlImports.map((url) => [url, import(/* webpackIgnore: true */ url)] as const)),
+    ),
+  ]);
 
-      ['@mui/icons-material', import('@mui/icons-material')],
-
-      ...muiMaterialExports,
-
-      ...urlImports.map((url) => [url, import(/* webpackIgnore: true */ url)] as const),
-    ]),
-  );
+  const modules: Map<string, any> = new Map([...muiMaterialExports, ...urlModules]);
 
   const require = (moduleId: string): unknown => {
     let esModule = modules.get(moduleId);

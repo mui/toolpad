@@ -8,6 +8,8 @@ export { default as Button } from './Button.js';
 
 export { default as DataGrid } from './DataGrid.js';
 
+export { default as Markdown } from './Markdown.js';
+
 export { default as TextField } from './TextField.js';
 
 export { default as Typography } from './Typography.js';

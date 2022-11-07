@@ -63,6 +63,7 @@ import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { ApiError, VALIDATE_CAPTCHA_FAILED_ERROR_CODE } from '../../apiErrors';
+import { sendAppCreatedEvent } from '../../utils/ga';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -178,6 +179,8 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               : {}),
           },
         ]);
+
+        sendAppCreatedEvent(name, appTemplateId);
       } catch (error) {
         if (config.recaptchaV2SiteKey && !hasShownRecaptchaCheckbox && captchaTargetRef.current) {
           if (error instanceof ApiError && error.code === VALIDATE_CAPTCHA_FAILED_ERROR_CODE) {

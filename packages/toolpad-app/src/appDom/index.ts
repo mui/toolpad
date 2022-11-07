@@ -679,7 +679,7 @@ export function setNodeProp<Node extends AppDomNode, Prop extends BindableProps<
   });
 }
 
-function setNamespacedProp<
+export function setNamespacedProp<
   Node extends AppDomNode,
   Namespace extends PropNamespaces<Node>,
   Prop extends keyof Node[Namespace] & string,

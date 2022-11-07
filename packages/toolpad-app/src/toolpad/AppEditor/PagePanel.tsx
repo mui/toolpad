@@ -84,19 +84,19 @@ export interface ComponentPanelProps {
 export default function PagePanel({ appId, className, sx }: ComponentPanelProps) {
   const { data: app, isLoading } = client.useQuery('getApp', [appId]);
 
-  const [, setLatestStoredApp] = useLocalStorageState<LatestStoredAppValue>(
+  const [latestStoredApp, setLatestStoredApp] = useLocalStorageState<LatestStoredAppValue>(
     TOOLPAD_LATEST_APP_KEY,
     null,
   );
 
   React.useEffect(() => {
-    if (app) {
+    if (app && (!latestStoredApp || appId !== latestStoredApp.appId)) {
       setLatestStoredApp({
         appId,
         appName: app.name,
       });
     }
-  }, [app, appId, setLatestStoredApp]);
+  }, [app, appId, latestStoredApp, setLatestStoredApp]);
 
   return (
     <PagePanelRoot className={className} sx={sx}>

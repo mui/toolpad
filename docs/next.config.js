@@ -33,6 +33,9 @@ const MONOREPO_PACKAGES = {
 
 module.exports = withTM(
   withDocsInfra({
+    experimental: {
+      esmExternals: false,
+    },
     // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
     assetPrefix: process.env.DEPLOY_ENV === 'development' ? '' : '/toolpad',
     env: {

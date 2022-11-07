@@ -129,9 +129,7 @@ jobs:
           command: yarn markdownlint
   test_static:
     <<: *defaults
-    resource_class: large
-    environment:
-      - NODE_OPTIONS: '--max-old-space-size=16192'
+    resource_class: medium+
     steps:
       - checkout
       - install_js

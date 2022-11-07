@@ -21,7 +21,7 @@ export const reportWebVitalsToGA = ({ id, label, name, value }: NextWebVitalsMet
 
 export const sendAppCreatedEvent = (name: string, templateId?: AppTemplateId): void => {
   if (config.gaId) {
-    window.gtag('event', 'app_created', {
+    window.gtag('event', 'toolpad_app_created', {
       app_name: name,
       app_template_id: templateId,
     });

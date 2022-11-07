@@ -186,7 +186,7 @@ jobs:
               -v "$CIRCLE_WORKING_DIRECTORY:/tests" \
               -w /tests \
               -e PLAYWRIGHT_TEST_BASE_URL=http://172.17.0.1:3000/ \
-              mcr.microsoft.com/playwright:v1.27.0-focal \
+              mcr.microsoft.com/playwright:v1.28.0-alpha-nov-7-2022-focal  \
               yarn test:integration --forbid-only
             docker-compose -f ./docker-compose.test.yml down
 

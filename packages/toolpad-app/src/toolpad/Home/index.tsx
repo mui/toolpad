@@ -221,7 +221,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           ) : null}
           {config.isDemo && latestStoredApp ? (
             <Box mt={1} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Typography variant="subtitle2" textAlign="center" sx={{ mb: -0.5 }}>
+              <Typography variant="subtitle2" textAlign="center">
                 OR
               </Typography>
               <Button
@@ -229,7 +229,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
                 size="medium"
                 component="a"
                 href={`/_toolpad/app/${latestStoredApp.appId}`}
-                sx={{ mt: 1 }}
+                sx={{ mt: 0.5 }}
               >
                 Continue working on &ldquo;{latestStoredApp.appName}&rdquo;
               </Button>

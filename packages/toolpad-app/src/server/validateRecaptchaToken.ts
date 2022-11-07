@@ -1,12 +1,13 @@
 const SITE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
-const SCORE_THRESHOLD = 0.75;
+
+const V3_SCORE_THRESHOLD = 0.75;
 
 export interface RecaptchaResJson {
   [key: string]: any;
   success: boolean;
-  score: number;
   action: string;
   'error-codes': number[];
+  score?: number;
 }
 
 export const validateRecaptchaToken = async (
@@ -24,7 +25,7 @@ export const validateRecaptchaToken = async (
   const recaptchaResponseJson: RecaptchaResJson = await recaptchaResponse.json();
 
   const { success, score } = recaptchaResponseJson;
-  if (!success || score < SCORE_THRESHOLD) {
+  if (!success || (score && score < V3_SCORE_THRESHOLD)) {
     return false;
   }
 

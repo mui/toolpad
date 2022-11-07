@@ -63,6 +63,7 @@ import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { sendAppCreatedEvent } from '../../utils/ga';
+import { LatestStoredAppValue, TOOLPAD_LATEST_APP_KEY } from '../../storageKeys';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -124,6 +125,11 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     },
   });
 
+  const [latestStoredApp] = useLocalStorageState<LatestStoredAppValue>(
+    TOOLPAD_LATEST_APP_KEY,
+    null,
+  );
+
   const isFormValid = Boolean(name);
 
   return (
@@ -162,7 +168,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
         <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
         <DialogContent>
           {config.isDemo ? (
-            <Alert severity="warning" sx={{ mb: 2 }}>
+            <Alert severity="warning" sx={{ mb: 1 }}>
               <AlertTitle>For demo purposes only!</AlertTitle>
               Your application will be ephemeral and may be deleted at any time.
             </Alert>
@@ -194,7 +200,9 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               <MenuItem key={value} value={value}>
                 <span>
                   <Typography>{label}</Typography>
-                  <Typography variant="caption">{description || ''}</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 'normal' }}>
+                    {description || ''}
+                  </Typography>
                 </span>
               </MenuItem>
             ))}
@@ -211,28 +219,47 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               onChange={handleDomChange}
             />
           ) : null}
+          {config.isDemo && latestStoredApp ? (
+            <Box mt={1} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Typography variant="subtitle2" textAlign="center" sx={{ mb: -0.5 }}>
+                OR
+              </Typography>
+              <Button
+                variant="text"
+                size="medium"
+                component="a"
+                href={`/_toolpad/app/${latestStoredApp.appId}`}
+                sx={{ mt: 1 }}
+              >
+                Continue working on &ldquo;{latestStoredApp.appName}&rdquo;
+              </Button>
+            </Box>
+          ) : null}
           {config.recaptchaSiteKey ? (
-            <Typography variant="caption" color="text.secondary">
-              This site is protected by reCAPTCHA and the Google{' '}
-              <Link
-                href="https://policies.google.com/privacy"
-                underline="none"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Privacy Policy
-              </Link>{' '}
-              and{' '}
-              <Link
-                href="https://policies.google.com/terms"
-                underline="none"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Terms of Service
-              </Link>{' '}
-              apply.
-            </Typography>
+            <Box mt={2}>
+              <Divider sx={{ mb: 1 }} />
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'normal' }}>
+                This site is protected by reCAPTCHA and the Google{' '}
+                <Link
+                  href="https://policies.google.com/privacy"
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Privacy Policy
+                </Link>{' '}
+                and{' '}
+                <Link
+                  href="https://policies.google.com/terms"
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Terms of Service
+                </Link>{' '}
+                apply.
+              </Typography>
+            </Box>
           ) : null}
         </DialogContent>
         <DialogActions>

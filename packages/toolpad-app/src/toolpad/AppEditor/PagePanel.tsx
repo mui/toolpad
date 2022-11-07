@@ -22,6 +22,8 @@ import client from '../../api';
 import { useDom } from '../DomLoader';
 import JsonView from '../../components/JsonView';
 import useMenu from '../../utils/useMenu';
+import useLocalStorageState from '../../utils/useLocalStorageState';
+import { LatestStoredAppValue, TOOLPAD_LATEST_APP_KEY } from '../../storageKeys';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
@@ -81,6 +83,20 @@ export interface ComponentPanelProps {
 
 export default function PagePanel({ appId, className, sx }: ComponentPanelProps) {
   const { data: app, isLoading } = client.useQuery('getApp', [appId]);
+
+  const [, setLatestStoredApp] = useLocalStorageState<LatestStoredAppValue>(
+    TOOLPAD_LATEST_APP_KEY,
+    null,
+  );
+
+  React.useEffect(() => {
+    if (app) {
+      setLatestStoredApp({
+        appId,
+        appName: app.name,
+      });
+    }
+  }, [app, appId, setLatestStoredApp]);
 
   return (
     <PagePanelRoot className={className} sx={sx}>

@@ -57,7 +57,7 @@ export default async function loadModule(src: string, filename: string): Promise
   try {
     compiled = transform(src, {
       transforms: ['jsx', 'typescript', 'imports'],
-      // jsxRuntime: 'automatic'
+      jsxRuntime: 'classic',
     });
   } catch (rawError) {
     const err = errorFrom(rawError);

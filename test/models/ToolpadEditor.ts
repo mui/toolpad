@@ -131,8 +131,10 @@ export class ToolpadEditor {
     await this.page.mouse.move(
       sourceBoundingBox!.x + sourceBoundingBox!.width / 2,
       sourceBoundingBox!.y + sourceBoundingBox!.height / 2,
-      { steps: 5 },
+      { steps: 10 },
     );
+
+    await expect(sourceLocator).toBeVisible();
 
     const appCanvasFrame = this.page.frame('data-toolpad-canvas');
     expect(appCanvasFrame).toBeDefined();
@@ -152,7 +154,7 @@ export class ToolpadEditor {
       await this.page.mouse.down();
     }
 
-    await this.page.mouse.move(moveTargetX, moveTargetY, { steps: 5 });
+    await this.page.mouse.move(moveTargetX, moveTargetY, { steps: 10 });
 
     // Overlay drag events need to be dispatched manually in Firefox for tests to work (Playwright bug)
     // https://github.com/microsoft/playwright/issues/17441

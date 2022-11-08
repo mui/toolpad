@@ -3,49 +3,12 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadHome } from '../../models/ToolpadHome';
 import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
-import clickCenter from '../../utils/clickCenter';
 
-// test.only('undo', async ({ page, browserName }) => {
-//   if (browserName !== 'chromium') {
-//     test.skip(true, 'Skip FF for now');
-//   }
-
-//   const dom = await readJsonFile(path.resolve(__dirname, './dom.json'));
-
-//   const homeModel = new ToolpadHome(page);
-//   await homeModel.goto();
-//   const app = await homeModel.createApplication({ dom });
-
-//   const editorModel = new ToolpadEditor(page, browserName);
-//   await editorModel.goto(app.id);
-
-//   await editorModel.pageRoot.waitFor();
-
-//   const canvasInputLocator = editorModel.appCanvas.locator('input');
-//   const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(
-//     'button[aria-label="Remove element"]',
-//   );
-
-//   // Ensure we have input in canvas
-//   await expect(canvasInputLocator).toHaveCount(2);
-
-//   await expect(canvasRemoveElementButtonLocator).not.toBeVisible();
-
-//   // Select input so that HUD appears
-//   await clickCenter(page, canvasInputLocator.first());
-//   // Delete one input
-//   await canvasRemoveElementButtonLocator.click();
-
-//   await expect(canvasInputLocator).toHaveCount(1);
-
-//   await page.pause();
-// });
-
-test('can delete elements from page', async ({ page, browserName }) => {
+test('test basic undo and redo', async ({ page, browserName }) => {
   const homeModel = new ToolpadHome(page);
   const editorModel = new ToolpadEditor(page, browserName);
 
-  const domInput = await readJsonFile(path.resolve(__dirname, '../editor/domInput.json'));
+  const domInput = await readJsonFile(path.resolve(__dirname, './dom.json'));
 
   await homeModel.goto();
   const app = await homeModel.createApplication({ dom: domInput });
@@ -54,27 +17,72 @@ test('can delete elements from page', async ({ page, browserName }) => {
   await editorModel.pageRoot.waitFor();
 
   const canvasInputLocator = editorModel.appCanvas.locator('input');
-  const canvasRemoveElementButtonLocator = editorModel.appCanvas.locator(
-    'button[aria-label="Remove element"]',
-  );
 
+  // Initially we should have 2 text fields
   await expect(canvasInputLocator).toHaveCount(2);
 
-  // Delete element by clicking
+  // Add 3rd text field
+  await editorModel.dragNewComponentToAppCanvas('Text field');
 
-  await expect(canvasRemoveElementButtonLocator).not.toBeVisible();
+  // Ensure that we added 3rd text field
+  await expect(canvasInputLocator).toHaveCount(3);
 
-  const firstTextFieldLocator = canvasInputLocator.first();
+  const undoButton = page.locator('[data-testid=undo-button]');
 
-  await clickCenter(page, firstTextFieldLocator);
-  await canvasRemoveElementButtonLocator.click();
+  // Wait for undo stack to be updated
+  await page.waitForTimeout(600);
 
-  await expect(canvasInputLocator).toHaveCount(1);
+  // Undo adding text field
+  undoButton.click();
 
-  // Delete element by pressing key
+  // Check that we have only 2 text fields
+  await expect(canvasInputLocator).toHaveCount(2);
 
-  await clickCenter(page, firstTextFieldLocator);
-  await page.keyboard.press('Backspace');
+  const redoButton = page.locator('[data-testid=redo-button]');
 
-  await expect(canvasInputLocator).toHaveCount(0);
+  redoButton.click();
+
+  // Redo should bring back text field
+  await expect(canvasInputLocator).toHaveCount(3);
+});
+
+test('test batching quick actions into single undo entry', async ({ page, browserName }) => {
+  const homeModel = new ToolpadHome(page);
+  const editorModel = new ToolpadEditor(page, browserName);
+
+  const domInput = await readJsonFile(path.resolve(__dirname, './dom.json'));
+
+  await homeModel.goto();
+  const app = await homeModel.createApplication({ dom: domInput });
+  await editorModel.goto(app.id);
+
+  await editorModel.pageRoot.waitFor();
+
+  const canvasInputLocator = editorModel.appCanvas.locator('input');
+  const canvasButtonLocator = editorModel.appCanvas.getByRole('button', { name: 'Button Text' });
+
+  // Initially we should 2 text fields
+  await expect(canvasInputLocator).toHaveCount(2);
+
+  // Add one more text field and button
+  await editorModel.dragNewComponentToAppCanvas('Text field');
+  await expect(canvasInputLocator).toHaveCount(3);
+
+  await editorModel.dragNewComponentToAppCanvas('Button');
+
+  // await page.pause();
+
+  await expect(canvasButtonLocator).toHaveCount(1);
+
+  // Wait for undo stack to be updated
+  await page.waitForTimeout(600);
+
+  const undoButton = page.locator('[data-testid=undo-button]');
+
+  // Undo adding text field
+  undoButton.click();
+
+  // Ensure that undo removed extra text field and button
+  await expect(canvasInputLocator).toHaveCount(2);
+  await expect(canvasButtonLocator).toHaveCount(0);
 });

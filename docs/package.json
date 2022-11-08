@@ -74,6 +74,8 @@
     "react-is": "^18.2.0",
     "react-router": "^6.3.0",
     "react-router-dom": "^6.3.0",
+    "react-runner": "^1.0.3",
+    "react-simple-code-editor": "^0.13.1",
     "react-transition-group": "^4.4.5",
     "recast": "^0.21.5",
     "rimraf": "^3.0.2",

@@ -153,12 +153,12 @@ export default function AppEditorShell({ appId, ...props }: ToolpadShellProps) {
     <ToolpadShell
       actions={
         <Stack direction="row" gap={1} alignItems="center">
-          <IconButton onClick={domApi.undo}>
+          <IconButton onClick={domApi.undo} data-testid="undo-button">
             <Tooltip title="Undo">
               <Undo />
             </Tooltip>
           </IconButton>
-          <IconButton onClick={domApi.redo}>
+          <IconButton onClick={domApi.redo} data-testid="redo-button">
             <Tooltip title="Redo">
               <Redo />
             </Tooltip>

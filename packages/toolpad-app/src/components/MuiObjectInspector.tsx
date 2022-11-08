@@ -8,6 +8,7 @@ import { NodeApi, NodeRendererProps, Tree } from 'react-arborist';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import useEnhancedEffect from '@mui/utils/useEnhancedEffect';
+import { invariant } from 'react-router/lib/router';
 
 function getType(value: unknown) {
   if (value === null) {
@@ -280,6 +281,18 @@ function useDimensions<E extends HTMLElement>(): [
   useEnhancedEffect(() => {
     setDimensions(ref.current?.getBoundingClientRect().toJSON());
   }, []);
+  const observerRef = React.useRef<ResizeObserver | undefined>();
+  React.useEffect(() => {
+    let observer = observerRef.current;
+    if (!observer) {
+      observer = new ResizeObserver(() => {
+        setDimensions(ref.current?.getBoundingClientRect().toJSON());
+      });
+      observerRef.current = observer;
+    }
+    invariant(ref.current, 'ref not attached');
+    observer.observe(ref.current);
+  }, []);
   return [ref, dimensions];
 }
 
@@ -307,7 +320,7 @@ export default function MuiObjectInspector(props: MuiObjectInspectorProps) {
   const [rootRef, dimensions] = useDimensions<HTMLDivElement>();
 
   return (
-    <div ref={rootRef} style={{ width: '100%', height: '100%' }}>
+    <div ref={rootRef} style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
       <StyledTree
         indent={8}
         disableDrag

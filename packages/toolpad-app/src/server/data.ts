@@ -13,11 +13,8 @@ import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
-import {
-  ApiError,
-  APP_NAME_EXISTS_ERROR_CODE,
-  VALIDATE_CAPTCHA_FAILED_ERROR_CODE,
-} from '../apiErrors';
+import { ApiError } from '../apiErrors';
+import { APP_NAME_EXISTS_ERROR_CODE, VALIDATE_CAPTCHA_FAILED_ERROR_CODE } from '../apiErrorCodes';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);

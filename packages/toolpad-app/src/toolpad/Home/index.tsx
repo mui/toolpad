@@ -62,7 +62,9 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
-import { ApiError, VALIDATE_CAPTCHA_FAILED_ERROR_CODE } from '../../apiErrors';
+import { ApiError } from '../../apiErrors';
+import { VALIDATE_CAPTCHA_FAILED_ERROR_CODE } from '../../apiErrorCodes';
+
 import { sendAppCreatedEvent } from '../../utils/ga';
 
 export const APP_TEMPLATE_OPTIONS: Map<

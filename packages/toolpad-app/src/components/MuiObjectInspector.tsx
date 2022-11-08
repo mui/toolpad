@@ -7,8 +7,6 @@ import { styled, lighten } from '@mui/material/styles';
 import { NodeApi, NodeRendererProps, Tree } from 'react-arborist';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import useEnhancedEffect from '@mui/utils/useEnhancedEffect';
-import { invariant } from 'react-router/lib/router';
 
 function getType(value: unknown) {
   if (value === null) {

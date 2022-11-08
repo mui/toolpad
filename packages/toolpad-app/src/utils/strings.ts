@@ -103,7 +103,7 @@ export function findImports(src: string): string[] {
   return Array.from(src.matchAll(IMPORT_STATEMENT_REGEX), (match) => match[2]);
 }
 
-export function truncate(str: string, maxLength: number, dots: string = '...') {
+export function truncate(str: string, maxLength: number, dots: string = '…') {
   if (str.length <= maxLength) {
     return str;
   }

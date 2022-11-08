@@ -21,6 +21,9 @@ services:
         fromDatabase:
           name: toolpad-db
           property: connectionString
+      - key: TOOLPAD_EXPERIMENTAL_OBJECT_EXPLORER
+        value: null
+        previewValue: '1'
       - fromGroup: toolpad-settings
       - fromGroup: toolpad-basic-auth
     buildFilter:

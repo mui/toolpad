@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, Button, Stack, styled, Toolbar, Typography } from '@mui/material';
+import { Box, Button, Stack, styled, TextField, Toolbar, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
@@ -20,7 +20,6 @@ import { useDom, useDomApi } from '../../DomLoader';
 import { tryFormat } from '../../../utils/prettier';
 import useShortcut from '../../../utils/useShortcut';
 import { usePrompt } from '../../../utils/router';
-import NodeNameEditor from '../NodeNameEditor';
 import usePageTitle from '../../../utils/usePageTitle';
 import useLatest from '../../../utils/useLatest';
 import AppThemeProvider from '../../../runtime/AppThemeProvider';
@@ -34,6 +33,7 @@ import { getDefaultControl } from '../../propertyControls';
 import { WithControlledProp } from '../../../utils/types';
 import useDebounced from '../../../utils/useDebounced';
 import { ExtraLib } from '../../../components/MonacoEditor';
+import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 
 const TypescriptEditor = lazyComponent(() => import('../../../components/TypescriptEditor'), {
   noSsr: true,
@@ -150,36 +150,12 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     return EXTRA_LIBS_HTTP_MODULES;
   }, [typings]);
 
-  const [input, setInput] = React.useState<string>(codeComponentNode.attributes.code.value);
-  React.useEffect(
-    () => setInput(codeComponentNode.attributes.code.value),
-    [codeComponentNode.attributes.code.value],
-  );
+  const [input, setInput] = React.useState<appDom.CodeComponentNode>(codeComponentNode);
+  React.useEffect(() => setInput(codeComponentNode), [codeComponentNode]);
 
   const frameRef = React.useRef<HTMLIFrameElement>(null);
 
   usePageTitle(`${codeComponentNode.name} | Toolpad editor`);
-
-  const handleSave = React.useCallback(() => {
-    const pretty = tryFormat(input);
-    setInput(pretty);
-    domApi.setNodeNamespacedProp(
-      codeComponentNode,
-      'attributes',
-      'code',
-      appDom.createConst(pretty),
-    );
-  }, [codeComponentNode, domApi, input]);
-
-  const allChangesAreCommitted = codeComponentNode.attributes.code.value === input;
-
-  usePrompt(
-    'Your code has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
-    !allChangesAreCommitted,
-  );
-
-  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
-
   const [iframeLoaded, onLoad] = React.useReducer(() => true, false);
 
   React.useEffect(() => {
@@ -198,8 +174,11 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const frameDocument = frameRef.current?.contentDocument;
 
-  const debouncedInput = useDebounced(input, 250);
-  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(debouncedInput);
+  const debouncedInput = useDebounced(input.attributes.code.value, 250);
+  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(
+    debouncedInput,
+    `/components/${codeComponentNode.name}`,
+  );
   const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
 
   const { argTypes = {} } = CodeComponent[TOOLPAD_COMPONENT];
@@ -211,17 +190,72 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
 
   const [props, setProps] = React.useState({});
 
+  const existingNames = React.useMemo(
+    () => appDom.getExistingNamesForNode(dom, input),
+    [dom, input],
+  );
+
+  const nodeNameError = useNodeNameValidation(input.name, existingNames, 'query');
+  const isNameValid = !nodeNameError;
+
+  const allChangesAreCommitted = codeComponentNode === input;
+
+  const isSaveAllowed = isNameValid;
+
+  const handleSave = React.useCallback(() => {
+    if (!isSaveAllowed) {
+      return;
+    }
+
+    const prettyfied = appDom.setNamespacedProp(
+      input,
+      'attributes',
+      'code',
+      appDom.createConst(tryFormat(input.attributes.code.value)),
+    );
+    setInput(prettyfied);
+    domApi.saveNode(prettyfied);
+  }, [domApi, input, isSaveAllowed]);
+
+  usePrompt(
+    'Your code has unsaved changes. Are you sure you want to navigate away? All changes will be discarded.',
+    !allChangesAreCommitted,
+  );
+
+  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
+
   return (
     <React.Fragment>
       <Stack sx={{ height: '100%' }}>
         <Toolbar sx={{ mt: 2, mb: 2 }}>
-          <NodeNameEditor node={codeComponentNode} sx={{ maxWidth: 300 }} />
+          <TextField
+            sx={{ maxWidth: 300 }}
+            required
+            autoFocus
+            fullWidth
+            label="name"
+            value={input.name}
+            onChange={(event) =>
+              setInput((existing) => ({ ...existing, name: event.target.value }))
+            }
+            error={!isNameValid}
+            helperText={nodeNameError}
+          />
         </Toolbar>
         <Box flex={1}>
           <SplitPane split="vertical" allowResize size="50%">
             <TypescriptEditor
-              value={input}
-              onChange={(newValue) => setInput(newValue || '')}
+              value={input.attributes.code.value}
+              onChange={(newValue) =>
+                setInput((existing) =>
+                  appDom.setNamespacedProp(
+                    existing,
+                    'attributes',
+                    'code',
+                    appDom.createConst(newValue || ''),
+                  ),
+                )
+              }
               extraLibs={extraLibs}
             />
 
@@ -236,7 +270,11 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
             justifyContent: 'end',
           }}
         >
-          <Button disabled={allChangesAreCommitted} onClick={handleSave} variant="contained">
+          <Button
+            disabled={allChangesAreCommitted || !isSaveAllowed}
+            onClick={handleSave}
+            variant="contained"
+          >
             Update
           </Button>
         </Toolbar>

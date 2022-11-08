@@ -159,7 +159,7 @@ const COLUMN_TYPES: Record<string, Omit<ToolpadGridColDef, 'field'>> = {
   link: {
     customType: 'link',
     renderCell: ({ value }) => (
-      <Link href={value} target="_blank" rel="noopener noreferrer">
+      <Link href={value} target="_blank" rel="noopener noreferrer nofollow">
         {value}
       </Link>
     ),
@@ -344,11 +344,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  const handleGetRowHeight = React.useCallback(() => {
+  const getRowHeight = React.useMemo(() => {
     const hasImageColumns = columns.some(
       ({ customType }: ToolpadGridColDef) => customType === 'image',
     );
-    return hasImageColumns ? 'auto' : null;
+    return hasImageColumns ? () => 'auto' : undefined;
   }, [columns]);
 
   return (
@@ -373,7 +373,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             message: typeof errorProp === 'string' ? errorProp : errorProp?.message,
           },
         }}
-        getRowHeight={handleGetRowHeight}
+        getRowHeight={getRowHeight}
         {...props}
       />
     </div>

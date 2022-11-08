@@ -49,7 +49,7 @@ async function createRequire(urlImports: string[]) {
   return require;
 }
 
-export default async function loadModule(src: string): Promise<any> {
+export default async function loadModule(src: string, filename: string): Promise<any> {
   const imports = findImports(src).filter((maybeUrl) => isAbsoluteUrl(maybeUrl));
 
   let compiled: TransformResult;
@@ -57,6 +57,7 @@ export default async function loadModule(src: string): Promise<any> {
   try {
     compiled = transform(src, {
       transforms: ['jsx', 'typescript', 'imports'],
+      // jsxRuntime: 'automatic'
     });
   } catch (rawError) {
     const err = errorFrom(rawError);
@@ -77,10 +78,11 @@ export default async function loadModule(src: string): Promise<any> {
   };
 
   const instantiateModuleCode = `
-        (${Object.keys(globals).join(', ')}) => {
-          ${compiled.code}
-        }
-      `;
+    const _jsxFileName = ${JSON.stringify(filename)};
+    (${Object.keys(globals).join(', ')}) => {
+      ${compiled.code}
+    }
+  `;
 
   // eslint-disable-next-line no-eval
   const instantiateModule = (0, eval)(instantiateModuleCode);

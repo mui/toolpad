@@ -72,7 +72,7 @@ export type BindableAttrValues<P = Record<string, unknown>> = {
 
 export type BindableAttrEntries = [string, BindableAttrValue<any>][];
 
-export type SlotType = 'single' | 'multiple';
+export type SlotType = 'single' | 'multiple' | 'layout';
 
 export interface ValueTypeBase {
   type: 'string' | 'boolean' | 'number' | 'object' | 'array' | 'element' | 'event';
@@ -109,6 +109,10 @@ export interface ElementValueType extends ValueTypeBase {
 
 export interface EventValueType extends ValueTypeBase {
   type: 'event';
+  arguments?: {
+    name: string;
+    tsType: string;
+  }[];
 }
 
 export interface ArgControlSpec {
@@ -124,6 +128,7 @@ export interface ArgControlSpec {
     | 'color' // color picker
     | 'slot' // slot in canvas
     | 'slots' // slots in canvas
+    | 'layoutSlot' // slot with inner layout
     | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
     | 'date' // date picker
     | 'json' // JSON editor

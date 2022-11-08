@@ -6,15 +6,15 @@
 
 In order to create a new custom component locate **+** button in the Explorer near Components section and click it:
 
-<img src="/static/toolpad/docs/custom-component-1.png" width="241px" alt="Custom component" />
+<img src="/static/toolpad/docs/building-ui/ui-10.png" width="253px" alt="Custom component" />
 
 Choose the name for your component and click **Create**:
 
-<img src="/static/toolpad/docs/custom-component-2.png" width="460px" alt="Custom create" />
+<img src="/static/toolpad/docs/building-ui/ui-11.png" width="434px" alt="Custom create" />
 
 You can now use code editor (on the left) and live preview (on the right) to define your custom component:
 
-<img src="/static/toolpad/docs/custom-component-3.png" width="990px" alt="Custom component IDE" />
+<img src="/static/toolpad/docs/building-ui/ui-12.png" width="1243px" alt="Custom component IDE" />
 <br />
 <br />
 

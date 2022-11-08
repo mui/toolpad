@@ -6,7 +6,7 @@
 
 In order to access a list of built in components hover over **Component library**
 
-<img src="/static/toolpad/docs/component-library.png" width="348px" alt="Component library" />
+<img src="/static/toolpad/docs/building-ui/ui-1.png" width="281px" alt="Component library" />
 <br />
 <br />
 

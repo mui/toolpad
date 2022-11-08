@@ -12,9 +12,9 @@ import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
 import { ConnectionStatus, AppTheme } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { camelCase, generateUniqueString, removeDiacritics } from '../utils/strings';
+import { camelCase, removeDiacritics } from '../utils/strings';
 import { ExactEntriesOf, Maybe } from '../utils/types';
-import { filterValues } from '../utils/collections';
+import { mapProperties, mapValues } from '../utils/collections';
 
 export const CURRENT_APPDOM_VERSION = 2;
 
@@ -24,7 +24,6 @@ export const RESERVED_NODE_PROPERTIES = [
   'parentId',
   'parentProp',
   'parentIndex',
-  'name',
 ] as const;
 export type ReservedNodeProperty = typeof RESERVED_NODE_PROPERTIES[number];
 
@@ -126,7 +125,9 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
     readonly query: ConstantAttrValue<Q>;
     readonly transform?: ConstantAttrValue<string>;
     readonly transformEnabled?: ConstantAttrValue<boolean>;
+    /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
     readonly refetchOnWindowFocus?: ConstantAttrValue<boolean>;
+    /** @deprecated Not necessary to be user-facing, we will expose staleTime instead if necessary */
     readonly refetchOnReconnect?: ConstantAttrValue<boolean>;
     readonly refetchInterval?: ConstantAttrValue<number>;
     readonly cacheTime?: ConstantAttrValue<number>;
@@ -203,6 +204,8 @@ type ParentTypeOfType<T extends AppDomNodeType> = {
   [K in AppDomNodeType]: T extends CombinedAllowedChildren[K] ? K : never;
 }[AppDomNodeType];
 export type ParentOf<N extends AppDomNode> = AppDomNodeOfType<ParentTypeOfType<TypeOf<N>>> | null;
+
+export type ParentProp<Parent extends AppDomNode> = keyof AllowedChildTypesOfType<TypeOf<Parent>>;
 
 export type ParentPropOf<Child extends AppDomNode, Parent extends AppDomNode> = {
   [K in keyof AllowedChildren[TypeOf<Parent>]]: TypeOf<Child> extends AllowedChildren[TypeOf<Parent>][K]
@@ -400,6 +403,8 @@ export function getChildNodes<N extends AppDomNode>(dom: AppDom, parent: N): Nod
 }
 
 export function getParent<N extends AppDomNode>(dom: AppDom, child: N): ParentOf<N> {
+  // Make sure we're using the last version of child in the dom
+  child = getNode(dom, child.id, child.type) as N;
   if (child.parentId) {
     const parent = getNode(dom, child.parentId);
     return parent as ParentOf<N>;
@@ -407,13 +412,9 @@ export function getParent<N extends AppDomNode>(dom: AppDom, child: N): ParentOf
   return null;
 }
 
-function getNodeNames(dom: AppDom): Set<string> {
-  return new Set(Object.values(dom.nodes).map(({ name }) => name));
-}
-
 type AppDomNodeInitOfType<T extends AppDomNodeType> = Omit<
   AppDomNodeOfType<T>,
-  ReservedNodeProperty
+  ReservedNodeProperty | 'name'
 > & { name?: string };
 
 function createNodeInternal<T extends AppDomNodeType>(
@@ -431,27 +432,7 @@ function createNodeInternal<T extends AppDomNodeType>(
   } as AppDomNodeOfType<T>;
 }
 
-export function validateNodeName(input: string, identifier = 'input'): string | null {
-  const firstLetter = input[0];
-  if (!/[a-z_]/i.test(firstLetter)) {
-    return `${identifier} may not start with a "${firstLetter}"`;
-  }
-
-  const match = /([^a-z0-9_])/i.exec(input);
-
-  if (match) {
-    const invalidCharacter = match[1];
-    if (/\s/.test(invalidCharacter)) {
-      return `${identifier} may not contain spaces`;
-    }
-
-    return `${identifier} may not contain a "${invalidCharacter}"`;
-  }
-
-  return null;
-}
-
-export function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: string): string {
+function slugifyNodeName(nameCandidate: string, fallback: string): string {
   let slug = nameCandidate;
   slug = slug.trim();
   // try to replace accents with relevant ascii
@@ -465,8 +446,39 @@ export function slugifyNodeName(dom: AppDom, nameCandidate: string, fallback: st
   if (!slug) {
     slug = fallback;
   }
-  const existingNames = getNodeNames(dom);
-  return generateUniqueString(slug, existingNames);
+  return slug;
+}
+
+export function validateNodeName(name: string, disallowedNames: Set<string>, kind: string) {
+  if (!name) {
+    return 'a name is required';
+  }
+
+  const firstLetter = name[0];
+  if (!/[a-z_]/i.test(firstLetter)) {
+    return `${kind} may not start with a "${firstLetter}"`;
+  }
+
+  const match = /([^a-z0-9_])/i.exec(name);
+
+  if (match) {
+    const invalidCharacter = match[1];
+    if (/\s/.test(invalidCharacter)) {
+      return `${kind} may not contain spaces`;
+    }
+
+    return `${kind} may not contain a "${invalidCharacter}"`;
+  }
+
+  const slug = slugifyNodeName(name, kind);
+
+  const isDuplicate = disallowedNames.has(slug);
+
+  if (isDuplicate) {
+    return `There already is a ${kind} with this name`;
+  }
+
+  return null;
 }
 
 export function createNode<T extends AppDomNodeType>(
@@ -475,7 +487,7 @@ export function createNode<T extends AppDomNodeType>(
   init: AppDomNodeInitOfType<T>,
 ): AppDomNodeOfType<T> {
   const id = createId();
-  const name = slugifyNodeName(dom, init.name || type, type);
+  const name = slugifyNodeName(init.name || type, type);
   return createNodeInternal(id, type, {
     ...init,
     name,
@@ -569,6 +581,59 @@ export function getPageAncestor(dom: AppDom, node: AppDomNode): PageNode | null 
   }
   return null;
 }
+
+/**
+ * Returns the set of names for which the given node must have a different name
+ */
+export function getExistingNamesForNode(dom: AppDom, node: AppDomNode): Set<string> {
+  if (isElement(node)) {
+    const pageNode = getPageAncestor(dom, node);
+    const pageDescendants = pageNode ? getDescendants(dom, pageNode) : [];
+    return new Set(
+      pageDescendants
+        .filter((descendant) => descendant.id !== node.id)
+        .map((scopeNode) => scopeNode.name),
+    );
+  }
+
+  return new Set(getSiblings(dom, node).map((scopeNode) => scopeNode.name));
+}
+
+export function getExistingNamesForChildren<Parent extends AppDomNode>(
+  dom: AppDom,
+  parent: Parent,
+  parentProp?: ParentProp<Parent>,
+): Set<string> {
+  const pageNode = getPageAncestor(dom, parent);
+
+  if (pageNode) {
+    const pageDescendants = getDescendants(dom, pageNode);
+    return new Set(pageDescendants.map((scopeNode) => scopeNode.name));
+  }
+
+  if (parentProp) {
+    const childNodes = getChildNodes(dom, parent);
+    const { [parentProp]: children = [] } = childNodes;
+    return new Set(children.map((scopeNode) => scopeNode.name));
+  }
+
+  const descendants = getDescendants(dom, parent);
+  return new Set(descendants.map((scopeNode: AppDomNode) => scopeNode.name));
+}
+
+export function proposeName(candidate: string, disallowedNames: Set<string> = new Set()): string {
+  const slug = slugifyNodeName(candidate, 'node');
+  if (!disallowedNames.has(slug)) {
+    return slug;
+  }
+  const basename = candidate.replace(/\d+$/, '');
+  let counter = 1;
+  while (disallowedNames.has(basename + counter)) {
+    counter += 1;
+  }
+  return basename + counter;
+}
+
 export function setNodeName(dom: AppDom, node: AppDomNode, name: string): AppDom {
   if (dom.nodes[node.id].name === name) {
     return dom;
@@ -577,7 +642,7 @@ export function setNodeName(dom: AppDom, node: AppDomNode, name: string): AppDom
     nodes: update(dom.nodes, {
       [node.id]: {
         ...node,
-        name: slugifyNodeName(dom, name, node.type),
+        name: slugifyNodeName(name, node.type),
       },
     }),
   });
@@ -612,6 +677,23 @@ export function setNodeProp<Node extends AppDomNode, Prop extends BindableProps<
       [node.id]: omit(node, prop) as Partial<Node>,
     } as Partial<AppDomNodes>),
   });
+}
+
+export function setNamespacedProp<
+  Node extends AppDomNode,
+  Namespace extends PropNamespaces<Node>,
+  Prop extends keyof Node[Namespace] & string,
+>(node: Node, namespace: Namespace, prop: Prop, value: Node[Namespace][Prop] | null): Node {
+  if (value) {
+    return update(node, {
+      [namespace]: updateOrCreate((node as Node)[namespace], {
+        [prop]: value,
+      } as any) as Partial<Node[Namespace]>,
+    } as Partial<Node>);
+  }
+  return update(node, {
+    [namespace]: omit(node[namespace], prop) as Partial<Node[Namespace]>,
+  } as Partial<Node>);
 }
 
 export function setNodeNamespacedProp<
@@ -697,6 +779,15 @@ export function addNode<Parent extends AppDomNode, Child extends AppDomNode>(
     throw new Error(`Node "${newNode.id}" is already attached to a parent`);
   }
 
+  const existingNames = getExistingNamesForChildren(dom, parent, parentProp);
+
+  if (existingNames.has(newNode.name)) {
+    newNode = {
+      ...newNode,
+      name: proposeName(newNode.name, existingNames),
+    };
+  }
+
   return setNodeParent(dom, newNode, parent.id, parentProp, parentIndex);
 }
 
@@ -710,7 +801,15 @@ export function moveNode<Parent extends AppDomNode, Child extends AppDomNode>(
   return setNodeParent(dom, node, parent.id, parentProp, parentIndex);
 }
 
+export function nodeExists(dom: AppDom, nodeId: NodeId): boolean {
+  return !!getMaybeNode(dom, nodeId);
+}
+
 export function saveNode(dom: AppDom, node: AppDomNode) {
+  if (!nodeExists(dom, node.id)) {
+    throw new Error(`Attempt to update node "${node.id}", but it doesn't exist in the dom`);
+  }
+
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: update(dom.nodes[node.id], omit(node, ...RESERVED_NODE_PROPERTIES)),
@@ -855,6 +954,73 @@ export function getNewParentIndexAfterNode(
   return createFractionalIndex(node.parentIndex, nodeAfter?.parentIndex || null);
 }
 
+export function addFragment(
+  dom: AppDom,
+  fragment: AppDom,
+  parentId: NodeId,
+  parentProp: string,
+  parentIndex?: string | undefined,
+) {
+  const parent = getNode(dom, parentId);
+  const existingNames = getExistingNamesForChildren<any>(dom, parent, parentProp);
+  let combinedDom: AppDom = {
+    ...dom,
+    nodes: {
+      ...dom.nodes,
+      ...mapValues(fragment.nodes, (node: AppDomNode) => {
+        return existingNames.has(node.name)
+          ? { ...node, name: proposeName(node.name, existingNames) }
+          : node;
+      }),
+    },
+  };
+  const fragmentRoot = getNode(combinedDom, fragment.root);
+  combinedDom = setNodeParent(combinedDom, fragmentRoot, parentId, parentProp, parentIndex);
+  return combinedDom;
+}
+
+/**
+ * Make a copy of a subtree (a fragment) of the dom. The structure of a fragment is
+ * the same as a dom where the root is the node we create the fragment for
+ */
+export function cloneFragment(dom: AppDom, nodeId: NodeId): AppDom {
+  const node = getNode(dom, nodeId);
+  const newNode = createNode(dom, node.type, node);
+  const childNodes = getChildNodes(dom, node);
+
+  let result: AppDom = {
+    root: newNode.id,
+    nodes: {
+      [newNode.id]: newNode,
+    },
+  };
+
+  for (const [childParentProp, children] of Object.entries(childNodes)) {
+    if (children) {
+      for (const child of children as AppDomNode[]) {
+        const childFragment = cloneFragment(dom, child.id);
+        result = addFragment(result, childFragment, newNode.id, childParentProp);
+      }
+    }
+  }
+
+  return result;
+}
+
+export function duplicateNode(
+  dom: AppDom,
+  node: AppDomNode,
+  parent: AppDomNode | null = getParent(dom, node),
+  parentProp: string | null = node.parentProp,
+): AppDom {
+  if (!parent || !parentProp) {
+    throw new Error(`Node "${node.id}" can't be duplicated, it must have a parent`);
+  }
+
+  const fragment = cloneFragment(dom, node.id);
+  return addFragment(dom, fragment, parent.id, parentProp);
+}
+
 const RENDERTREE_NODES = [
   'app',
   'page',
@@ -875,16 +1041,37 @@ export interface RenderTree {
   version?: number;
 }
 
+const frontendNodes = new Set<string>(RENDERTREE_NODES);
+function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
+  if (!frontendNodes.has(node.type)) {
+    return null;
+  }
+
+  if (isQuery(node) || isMutation(node)) {
+    const isBrowserSideRestQuery: boolean =
+      node.attributes.dataSource?.value === 'rest' &&
+      !!(node.attributes.query.value as any).browser;
+
+    if (node.attributes.query.value && !isBrowserSideRestQuery) {
+      node = setNamespacedProp(node, 'attributes', 'query', null);
+    }
+  }
+
+  return node as RenderTreeNode;
+}
+
 /**
  * We need to make sure no secrets end up in the frontend html, so let's only send the
  * nodes that we need to build frontend, and that we know don't contain secrets.
  * TODO: Would it make sense to create a separate datastructure that represents the render tree?
  */
 export function createRenderTree(dom: AppDom): RenderTree {
-  const frontendNodes = new Set<string>(RENDERTREE_NODES);
   return {
     ...dom,
-    nodes: filterValues(dom.nodes, (node) => frontendNodes.has(node.type)) as RenderTreeNodes,
+    nodes: mapProperties(dom.nodes, ([id, node]) => {
+      const rendernode = createRenderTreeNode(node);
+      return rendernode ? [id, rendernode] : null;
+    }),
   };
 }
 

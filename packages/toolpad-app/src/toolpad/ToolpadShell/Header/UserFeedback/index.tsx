@@ -55,7 +55,7 @@ function UserFeedback() {
   return (
     <React.Fragment>
       <Tooltip title="Help and resources">
-        <IconButton {...buttonProps} color="inherit">
+        <IconButton {...buttonProps} color="primary">
           <HelpOutlinedIcon />
         </IconButton>
       </Tooltip>

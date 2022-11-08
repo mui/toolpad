@@ -3,6 +3,7 @@
   "compilerOptions": {
     "paths": {
       // TODO: remove when we move to typescript 4.7 (supports package exports)
+      "@mui/toolpad-core/path": ["../toolpad-core/dist/path"],
       "@mui/toolpad-core/objectKey": ["../toolpad-core/dist/objectKey"]
     },
     "module": "esnext",

@@ -1,6 +1,5 @@
 import { NextApiHandler } from 'next';
 import prettyBytes from 'pretty-bytes';
-import { withSentry } from '@sentry/nextjs';
 import { mapValues } from '../../src/utils/collections';
 
 export const config = {
@@ -28,4 +27,4 @@ const apiHandler = (async (req, res) => {
   });
 }) as NextApiHandler<HealthCheck>;
 
-export default withSentry(apiHandler);
+export default apiHandler;

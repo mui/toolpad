@@ -11,11 +11,19 @@ import {
   Toolbar,
   Typography,
   Alert,
+  styled,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { isEmpty } from 'lodash-es';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  ExecFetchFn,
+  QueryEditorProps,
+} from '../../types';
 import {
   FetchPrivateQuery,
   FetchQuery,
@@ -24,7 +32,7 @@ import {
   Body,
   ResponseType,
 } from './types';
-import { getAuthenticationHeaders, parseBaseUrl } from './shared';
+import { getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../toolpad/AppEditor/PageEditor/BindableEditor';
@@ -47,8 +55,11 @@ import useQueryPreview from '../useQueryPreview';
 import TransformInput from '../TranformInput';
 import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
+import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import DEMO_BASE_URLS from './demoBaseUrls';
+import useFetchPrivate from '../useFetchPrivate';
+import { clientExec } from './runtime';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -61,6 +72,15 @@ const GLOBAL_SCOPE_META: GlobalScopeMeta = {
     description: 'Parameters that can be bound to app scope variables',
   },
 };
+
+const ButtonLink = styled('button')(({ theme }) => ({
+  background: 'none',
+  border: 'none',
+  fontSize: 'inherit',
+  padding: 0,
+  color: theme.palette.primary.main,
+  textDecoration: 'underline',
+}));
 
 interface UrlControlProps extends RenderControlParams<string> {
   baseUrl?: string;
@@ -146,11 +166,9 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
     ...validation(formState, 'baseUrl'),
   };
 
-  const isDemo = !!process.env.TOOLPAD_DEMO;
-
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
-      {isDemo ? (
+      {config.isDemo ? (
         <TextField select {...baseUrlInputProps} defaultValue="">
           {DEMO_BASE_URLS.map(({ url, name }) => (
             <MenuItem key={url} value={url}>
@@ -170,7 +188,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
           return (
             <MapEntriesEditor
               {...field}
-              disabled={!headersAllowed || isDemo}
+              disabled={!headersAllowed || config.isDemo}
               fieldLabel="header"
               value={allHeaders}
               onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
@@ -186,7 +204,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         render={({ field: { value: fieldValue, ref, ...field } }) => (
           <AuthenticationEditor
             {...field}
-            disabled={!headersAllowed || isDemo}
+            disabled={!headersAllowed || config.isDemo}
             value={fieldValue ?? null}
           />
         )}
@@ -202,57 +220,51 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
   );
 }
 
-const isCorrectlyTransformedData = (preview: FetchResult) => {
-  const { data, untransformedData } = preview;
-
-  if (isEmpty(untransformedData)) {
-    return true;
-  }
-
-  return !isEmpty(data);
-};
-
 interface ResolvedPreviewProps {
   preview: FetchResult | null;
+  onShowTransform: () => void;
 }
 
-function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement | null {
+function ResolvedPreview({
+  preview,
+  onShowTransform,
+}: ResolvedPreviewProps): React.ReactElement | null {
   if (!preview) {
     return null;
   }
 
-  const { untransformedData } = preview;
+  const { data, untransformedData } = preview;
+  let alert = null;
+  const responseDataKeys = Object.keys(untransformedData);
 
-  if (!untransformedData || isEmpty(untransformedData)) {
-    return (
-      <Alert severity="info" sx={{ m: 2 }}>
-        The request did not return any data.
-      </Alert>
-    );
-  }
+  if (typeof data === 'undefined' && typeof untransformedData !== 'undefined') {
+    alert = (
+      <Alert severity="warning" sx={{ m: 1, p: 1, fontSize: 11 }}>
+        <Box sx={{ mb: 1 }}>
+          Request successfully completed and returned data
+          {responseDataKeys.length > 0 ? ' with the following keys:' : '.'}
+        </Box>
 
-  if (!isCorrectlyTransformedData(preview)) {
-    return (
-      <Alert severity="warning" sx={{ m: 2 }}>
-        <Typography variant="body2" sx={{ mb: 1 }}>
-          Request successfully completed and returned data with the following keys:
-        </Typography>
-
-        {Object.keys(untransformedData).map((key) => (
-          <Typography variant="caption" sx={{ display: 'block' }} key={key}>
+        {responseDataKeys.map((key) => (
+          <Box sx={{ display: 'block' }} key={key}>
             - {key}
-          </Typography>
+          </Box>
         ))}
-        <Typography variant="body2" sx={{ mb: 1, mt: 2 }}>
-          However, it seems that the <code>transform</code> function returned an unexpected value.
-          <br />
-          Please check the <code>transform</code> function.
-        </Typography>
+
+        <Box sx={{ mt: 1 }}>
+          However, it seems that the <ButtonLink onClick={onShowTransform}>transform</ButtonLink>{' '}
+          function returned an <code>undefined</code> value.
+        </Box>
       </Alert>
     );
   }
 
-  return <JsonView sx={{ height: '100%' }} src={preview?.data} />;
+  return (
+    <React.Fragment>
+      {alert}
+      <JsonView sx={{ height: '100%' }} src={preview?.data} />
+    </React.Fragment>
+  );
 }
 
 function QueryEditor({
@@ -262,6 +274,7 @@ function QueryEditor({
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const baseUrl = connectionParams?.baseUrl;
+  const urlValue: BindableAttrValue<string> = input.query.url || getDefaultUrl(connectionParams);
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
@@ -285,6 +298,16 @@ function QueryEditor({
       setInput((existing) => ({
         ...existing,
         query: { ...existing.query, method: event.target.value },
+      }));
+    },
+    [setInput],
+  );
+
+  const handleRunInBrowserChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) => ({
+        ...existing,
+        query: { ...existing.query, browser: event.target.checked },
       }));
     },
     [setInput],
@@ -368,7 +391,7 @@ function QueryEditor({
 
   const liveUrl: LiveBinding = useEvaluateLiveBinding({
     server: true,
-    input: input.query.url,
+    input: urlValue,
     globalScope: queryScope,
   });
 
@@ -386,20 +409,26 @@ function QueryEditor({
 
   const [activeTab, setActiveTab] = React.useState('urlQuery');
 
+  const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: FetchQuery, params: Record<string, string>) =>
+      fetchPrivate({ kind: 'debugExec', query, params }),
+    [fetchPrivate],
+  );
+
+  const fetchPreview: ExecFetchFn<FetchQuery, FetchResult> = (query, params) =>
+    clientExec(query, params, fetchServerPreview);
+
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<FetchPrivateQuery, FetchResult>(
-    {
-      kind: 'debugExec',
-      query: input.query,
-      params: previewParams,
-    },
+  const { preview, runPreview: handleRunPreview } = useQueryPreview(
+    fetchPreview,
+    input.query,
+    previewParams,
     {
       onPreview(result) {
-        if (!isCorrectlyTransformedData(result)) {
-          setActiveTab('transform');
-        }
-
-        setPreviewHar((existing) => mergeHar(createHarLog(), existing, result.har));
+        setPreviewHar((existing) =>
+          result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
+        );
       },
     },
   );
@@ -411,8 +440,6 @@ function QueryEditor({
     [],
   );
 
-  const isDemo = !!process.env.TOOLPAD_DEMO;
-
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
@@ -422,9 +449,9 @@ function QueryEditor({
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
               <TextField
                 select
-                value={isDemo ? 'GET' : input.query.method || 'GET'}
+                value={config.isDemo ? 'GET' : input.query.method || 'GET'}
                 onChange={handleMethodChange}
-                disabled={isDemo}
+                disabled={config.isDemo}
               >
                 {HTTP_METHODS.map((method) => (
                   <MenuItem key={method} value={method}>
@@ -441,18 +468,26 @@ function QueryEditor({
                 label="url"
                 propType={{ type: 'string' }}
                 renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
-                value={input.query.url}
+                value={urlValue}
                 onChange={handleUrlChange}
               />
             </Box>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox checked={input.query.browser} onChange={handleRunInBrowserChange} />
+                }
+                label="Run in the browser"
+              />
+            </FormGroup>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <TabContext value={activeTab}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                   <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                     <Tab label="URL query" value="urlQuery" />
-                    <Tab label="Body" value="body" disabled={isDemo} />
-                    <Tab label="Headers" value="headers" disabled={isDemo} />
-                    <Tab label="Response" value="response" disabled={isDemo} />
+                    <Tab label="Body" value="body" disabled={config.isDemo} />
+                    <Tab label="Headers" value="headers" disabled={config.isDemo} />
+                    <Tab label="Response" value="response" disabled={config.isDemo} />
                     <Tab label="Transform" value="transform" />
                   </TabList>
                 </Box>
@@ -524,11 +559,18 @@ function QueryEditor({
         </Box>
       </SplitPane>
 
-      <SplitPane split="horizontal" size="30%" minSize={30} primary="second" allowResize>
+      <SplitPane
+        split="horizontal"
+        size="30%"
+        minSize={30}
+        primary="second"
+        allowResize
+        pane1Style={{ overflow: 'auto' }}
+      >
         {preview?.error ? (
           <ErrorAlert error={preview?.error} />
         ) : (
-          <ResolvedPreview preview={preview} />
+          <ResolvedPreview preview={preview} onShowTransform={() => setActiveTab('transform')} />
         )}
         <Devtools
           sx={{ width: '100%', height: '100%' }}
@@ -541,10 +583,13 @@ function QueryEditor({
 }
 
 function getInitialQueryValue(): FetchQuery {
-  return { url: { type: 'const', value: '' }, method: 'GET', headers: [] };
+  return {
+    method: 'GET',
+    headers: [],
+  };
 }
 
-const dataSource: ClientDataSource<{}, FetchQuery> = {
+const dataSource: ClientDataSource<RestConnectionParams, FetchQuery> = {
   displayName: 'Fetch',
   ConnectionParamsInput,
   QueryEditor,

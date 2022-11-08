@@ -17,6 +17,7 @@ import {
   LAYOUT_DIRECTION_HORIZONTAL,
   LAYOUT_DIRECTION_VERTICAL,
 } from '../../../toolpadComponents/layoutBox';
+import ElementContext from '../ElementContext';
 
 const classes = {
   control: 'Toolpad_Control',
@@ -117,22 +118,20 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const component = useToolpadComponent(dom, getElementNodeComponentId(node));
 
   return (
-    <Stack direction="column" gap={1}>
-      <Typography variant="subtitle1">
-        Component: {component?.displayName || '<unknown>'}
-      </Typography>
-      <Typography variant="subtitle2" sx={{ mb: 1 }}>
-        ID: {node.id}
-      </Typography>
-      <NodeNameEditor node={node} />
-      {nodeError ? <ErrorAlert error={nodeError} /> : null}
-      <Divider sx={{ mt: 1 }} />
-      {node ? (
-        <React.Fragment>
-          <ComponentPropsEditor componentConfig={componentConfig} node={node} />
-        </React.Fragment>
-      ) : null}
-    </Stack>
+    <ElementContext.Provider value={node}>
+      <Stack direction="column" gap={1}>
+        <Typography variant="subtitle1">
+          Component: {component?.displayName || '<unknown>'}
+        </Typography>
+        <Typography variant="subtitle2" sx={{ mb: 1 }}>
+          ID: {node.id}
+        </Typography>
+        <NodeNameEditor node={node} />
+        {nodeError ? <ErrorAlert error={nodeError} /> : null}
+        <Divider sx={{ mt: 1 }} />
+        {node ? <ComponentPropsEditor componentConfig={componentConfig} node={node} /> : null}
+      </Stack>
+    </ElementContext.Provider>
   );
 }
 
@@ -146,7 +145,7 @@ export default function ComponentEditor({ className }: ComponentEditorProps) {
 
   const { selection } = editor;
 
-  const selectedNode = selection ? appDom.getNode(dom, selection) : null;
+  const selectedNode = selection ? appDom.getMaybeNode(dom, selection) : null;
 
   return (
     <ComponentEditorRoot className={className} data-testid="component-editor">

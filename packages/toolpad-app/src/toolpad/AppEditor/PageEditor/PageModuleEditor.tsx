@@ -62,7 +62,7 @@ function PageModuleEditorDialog({ pageNodeId, open, onClose }: PageModuleEditorD
         <Button color="inherit" variant="text" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={handleSaveButton}>save</Button>
+        <Button onClick={handleSaveButton}>Save</Button>
       </DialogActions>
     </Dialog>
   );

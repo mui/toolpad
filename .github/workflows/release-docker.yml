@@ -12,6 +12,8 @@ on:
       latest:
         type: boolean
 
+permissions: {}
+
 jobs:
   docker-release:
     name: 'retag and push'

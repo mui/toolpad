@@ -1,27 +1,13 @@
 import * as React from 'react';
 import { SxProps, styled, IconButton, Tooltip, Snackbar } from '@mui/material';
-import { ObjectInspector, ObjectInspectorProps, ObjectValue, ObjectLabel } from 'react-inspector';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import clsx from 'clsx';
-import inspectorTheme from '../inspectorTheme';
+import ObjectInspector, { ObjectInspectorProps } from './ObjectInspector';
 
 const classes = {
   viewport: 'Toolpad_ObjectInspectorViewport',
   copyToClipboardButton: 'Toolpad_CopyToClipboardButton',
   disabled: 'Toolpad_ObjectInspectorDisabled',
-};
-
-const nodeRenderer: ObjectInspectorProps['nodeRenderer'] = ({
-  depth,
-  name,
-  data,
-  isNonenumerable,
-}) => {
-  return depth === 0 ? (
-    <ObjectValue object={data} />
-  ) : (
-    <ObjectLabel name={name} data={data} isNonenumerable={isNonenumerable} />
-  );
 };
 
 const JsonViewRoot = styled('div')(({ theme }) => ({
@@ -77,40 +63,28 @@ export default function JsonView({ src, sx, copyToClipboard, disabled, ...props 
 
   return (
     <JsonViewRoot sx={sx} className={clsx({ [classes.disabled]: disabled })}>
-      {typeof src === 'undefined' ? null : (
-        <React.Fragment>
-          <div className={classes.viewport}>
-            <ObjectInspector
-              nodeRenderer={nodeRenderer}
-              expandLevel={1}
-              expandPaths={expandPaths}
-              data={src}
-              theme={inspectorTheme}
-              {...props}
+      <React.Fragment>
+        <div className={classes.viewport}>
+          <ObjectInspector expandLevel={1} expandPaths={expandPaths} data={src} {...props} />
+        </div>
+
+        {copyToClipboard ? (
+          <React.Fragment>
+            <Tooltip title="Copy the source">
+              <IconButton onClick={handleCopyToClipboard} className={classes.copyToClipboardButton}>
+                <ContentCopyIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Snackbar
+              open={confirmSnackbarOpen}
+              autoHideDuration={3000}
+              onClose={handleCopySnackbarClose}
+              message="Source Copied to clipboard"
             />
-          </div>
-
-          {copyToClipboard ? (
-            <React.Fragment>
-              <Tooltip title="Copy the source">
-                <IconButton
-                  onClick={handleCopyToClipboard}
-                  className={classes.copyToClipboardButton}
-                >
-                  <ContentCopyIcon />
-                </IconButton>
-              </Tooltip>
-
-              <Snackbar
-                open={confirmSnackbarOpen}
-                autoHideDuration={3000}
-                onClose={handleCopySnackbarClose}
-                message="Source Copied to clipboard"
-              />
-            </React.Fragment>
-          ) : null}
-        </React.Fragment>
-      )}
+          </React.Fragment>
+        ) : null}
+      </React.Fragment>
     </JsonViewRoot>
   );
 }

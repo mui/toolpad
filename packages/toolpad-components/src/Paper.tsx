@@ -1,16 +1,17 @@
 import * as React from 'react';
-import { Paper as MuiPaper, PaperProps } from '@mui/material';
+import { Paper as MuiPaper, PaperProps as MuiPaperProps } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
-function Paper({ children, sx, ...props }: PaperProps) {
+function Paper({ children, sx, ...props }: MuiPaperProps) {
   return (
-    <MuiPaper sx={{ padding: 1, ...sx }} {...props}>
+    <MuiPaper sx={{ padding: 1, width: '100%', ...sx }} {...props}>
       {children}
     </MuiPaper>
   );
 }
 
 export default createComponent(Paper, {
+  layoutDirection: 'vertical',
   argTypes: {
     elevation: {
       typeDef: { type: 'number', minimum: 0 },
@@ -18,7 +19,7 @@ export default createComponent(Paper, {
     },
     children: {
       typeDef: { type: 'element' },
-      control: { type: 'slot' },
+      control: { type: 'layoutSlot' },
     },
     sx: {
       typeDef: { type: 'object' },

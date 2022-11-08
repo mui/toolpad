@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost, { EditorCanvasHostHandle } from '../EditorCanvasHost';
-import { useDom, useDomApi } from '../../../DomLoader';
+import { getNodeHashes, useDom, useDomApi, useDomLoader } from '../../../DomLoader';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
+import { NodeHashes } from '../../../../types';
 
 const classes = {
   view: 'Toolpad_View',
@@ -27,6 +28,7 @@ export interface RenderPanelProps {
 }
 
 export default function RenderPanel({ className }: RenderPanelProps) {
+  const domLoader = useDomLoader();
   const dom = useDom();
   const domApi = useDomApi();
   const api = usePageEditorApi();
@@ -35,6 +37,11 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const canvasHostRef = React.useRef<EditorCanvasHostHandle>(null);
 
   const navigate = useNavigate();
+
+  const savedNodes: NodeHashes = React.useMemo(
+    () => getNodeHashes(domLoader.savedDom),
+    [domLoader.savedDom],
+  );
 
   const handleRuntimeEvent = React.useCallback(
     (event: RuntimeEvent) => {
@@ -90,6 +97,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         appId={appId}
         className={classes.view}
         dom={dom}
+        savedNodes={savedNodes}
         pageNodeId={pageNodeId}
         onRuntimeEvent={handleRuntimeEvent}
         overlay={<RenderOverlay canvasHostRef={canvasHostRef} />}

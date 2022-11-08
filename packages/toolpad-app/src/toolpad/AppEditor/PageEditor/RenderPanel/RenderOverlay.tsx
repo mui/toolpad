@@ -163,7 +163,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     return [pageNode, ...appDom.getDescendants(dom, pageNode)];
   }, [dom, pageNode]);
 
-  const selectedNode = selection && appDom.getNode(dom, selection);
+  const selectedNode = selection && appDom.getMaybeNode(dom, selection);
 
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -239,7 +239,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       const isSecondLastLayoutContainerChild =
         parent &&
         appDom.isElement(parent) &&
-        (isPageRow(parent) || isPageColumn(parent)) &&
+        isPageLayoutComponent(parent) &&
         parentChildren.length === 2;
 
       const hasNoLayoutContainerSiblings =
@@ -255,7 +255,11 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           )[0];
 
           if (lastContainerChild.parentProp) {
-            if (moveTargetNodeId !== parent.id && moveTargetNodeId !== lastContainerChild.id) {
+            if (
+              moveTargetNodeId !== parent.id &&
+              moveTargetNodeId !== lastContainerChild.id &&
+              isPageLayoutComponent(parentParent)
+            ) {
               domApi.moveNode(
                 lastContainerChild,
                 parentParent,
@@ -359,6 +363,15 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       }
     },
     [api],
+  );
+
+  const handleNodeDuplicate = React.useCallback(
+    (node: appDom.ElementNode) => (event: React.MouseEvent) => {
+      event.stopPropagation();
+
+      domApi.duplicateNode(node);
+    },
+    [domApi],
   );
 
   const handleEdgeDragStart = React.useCallback(
@@ -772,8 +785,18 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           appDom.isElement(activeDropNodeParent) &&
           isPageRow(activeDropNodeParent);
 
+        const activeDropNodeParentParent =
+          activeDropNodeParent && appDom.getParent(dom, activeDropNodeParent);
+        const activeDropNodeParentParentInfo =
+          activeDropNodeParentParent && nodesInfo[activeDropNodeParentParent.id];
+        const hasActiveDropNodeParentParentSlot = !!(
+          activeDropNodeParentParentInfo?.slots &&
+          activeDropNodeParentParentInfo?.slots[activeDropSlotParentProp || 'children']
+        );
+
         const hasDragOverParentRowOverride =
           isDragOverParentPageRow &&
+          hasActiveDropNodeParentParentSlot &&
           activeDropNodeSiblings.length === 0 &&
           (activeDropZone === DROP_ZONE_TOP || activeDropZone === DROP_ZONE_BOTTOM);
 
@@ -841,6 +864,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         null;
 
       const isDraggingOverPage = dragOverNode ? appDom.isPage(dragOverNode) : false;
+      const isDraggingOverLayoutSlot = dragOverSlot?.type === 'layout';
       const isDraggingOverElement = appDom.isElement(dragOverNode);
 
       let parent = appDom.getParent(dom, dragOverNode);
@@ -859,8 +883,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         addOrMoveNode = domApi.moveNode;
       }
 
-      // Drop on page
-      if (isDraggingOverPage) {
+      // Drop on page or layout slot
+      if (isDraggingOverPage || isDraggingOverLayoutSlot) {
         const newParentIndex =
           dragOverZone === DROP_ZONE_TOP
             ? appDom.getNewFirstParentIndexInNode(dom, dragOverNode, 'children')
@@ -877,7 +901,12 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         }
       }
 
-      if (isDraggingOverElement && parent && (appDom.isPage(parent) || appDom.isElement(parent))) {
+      if (
+        isDraggingOverElement &&
+        !isDraggingOverLayoutSlot &&
+        parent &&
+        (appDom.isPage(parent) || appDom.isElement(parent))
+      ) {
         const isDraggingOverRow = isDraggingOverElement && isPageRow(dragOverNode);
 
         const isDraggingOverHorizontalContainer = dragOverSlot
@@ -1014,7 +1043,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           }
         }
 
-        const draggedNodeParent = appDom.getParent(dom, draggedNode);
+        const draggedNodeParent = selection ? appDom.getParent(dom, draggedNode) : null;
         if (
           draggedNode.layout?.columnSize &&
           draggedNodeParent &&
@@ -1193,7 +1222,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
             cursorPos.x <
               Math.min(
                 parentRect.x + parentRect.width,
-                nextSiblingRect ? nextSiblingRect?.x + nextSiblingRect?.width : 0,
+                nextSiblingRect ? nextSiblingRect.x + nextSiblingRect.width : 0,
               ) -
                 minGridColumnWidth
           ) {
@@ -1394,6 +1423,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 isSelected={isSelected}
                 isInteractive={isInteractive}
                 onNodeDragStart={handleNodeDragStart(node as appDom.ElementNode)}
+                onDuplicate={handleNodeDuplicate(node as appDom.ElementNode)}
                 draggableEdges={[
                   ...(isPageRowChild
                     ? [

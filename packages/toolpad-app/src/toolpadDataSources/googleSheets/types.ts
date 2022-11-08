@@ -42,33 +42,25 @@ export type GoogleSheetsApiQuery = {
   headerRow: boolean;
 };
 
-export enum GoogleSheetsPrivateQueryType {
-  FILE_GET = 'FILE_GET',
-  FILES_LIST = 'FILES_LIST',
-  FETCH_SPREADSHEET = 'FETCH_SPREADSHEET',
-  CONNECTION_STATUS = 'CONNECTION_STATUS',
-  DEBUG_EXEC = 'DEBUG_EXEC',
-}
-
 export type GoogleSheetsPrivateQuery =
   | {
-      type: GoogleSheetsPrivateQueryType.FILE_GET;
+      type: 'FILE_GET';
       spreadsheetId: GoogleSheetsApiQuery['spreadsheetId'];
     }
   | {
-      type: GoogleSheetsPrivateQueryType.FILES_LIST;
+      type: 'FILES_LIST';
       spreadsheetQuery?: string | null;
       pageToken?: string;
     }
   | {
-      type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET;
+      type: 'FETCH_SPREADSHEET';
       spreadsheetId: GoogleSheetsApiQuery['spreadsheetId'];
     }
   | {
-      type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS;
+      type: 'CONNECTION_STATUS';
     }
   | {
-      type: GoogleSheetsPrivateQueryType.DEBUG_EXEC;
+      type: 'DEBUG_EXEC';
       query: GoogleSheetsApiQuery;
     };
 

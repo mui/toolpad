@@ -1,4 +1,5 @@
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
+import { gotoIfNotCurrent } from './shared';
 
 class CreatePageDialog {
   readonly page: Page;
@@ -42,6 +43,11 @@ class CreateComponentDialog {
 export class ToolpadEditor {
   readonly page: Page;
 
+  /**
+   * @deprecated Do not use, this is a temporary workaround for firefox issues
+   * See https://github.com/microsoft/playwright/issues/17441
+   * TODO: remove this property
+   */
   readonly browserName: string;
 
   readonly createPageBtn: Locator;
@@ -62,6 +68,10 @@ export class ToolpadEditor {
 
   readonly pageOverlay: Locator;
 
+  readonly explorer: Locator;
+
+  readonly confirmationDialog: Locator;
+
   constructor(page: Page, browserName: string) {
     this.page = page;
     this.browserName = browserName;
@@ -72,28 +82,34 @@ export class ToolpadEditor {
     this.createComponentBtn = page.locator('[aria-label="Create component"]');
     this.createComponentDialog = new CreateComponentDialog(page);
 
-    this.componentCatalog = page.locator('data-testid=component-catalog');
-    this.componentEditor = page.locator('data-testid=component-editor');
+    this.componentCatalog = page.getByTestId('component-catalog');
+    this.componentEditor = page.getByTestId('component-editor');
 
     this.appCanvas = page.frameLocator('[name=data-toolpad-canvas]');
-    this.pageRoot = this.appCanvas.locator('data-testid=page-root');
-    this.pageOverlay = this.appCanvas.locator('data-testid=page-overlay');
+    this.pageRoot = this.appCanvas.getByTestId('page-root');
+    this.pageOverlay = this.appCanvas.getByTestId('page-overlay');
+
+    this.explorer = page.getByTestId('hierarchy-explorer');
+    this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });
   }
 
   async goto(appId: string) {
-    await this.page.goto(`/_toolpad/app/${appId}`);
+    await gotoIfNotCurrent(this.page, `/_toolpad/app/${appId}`);
   }
 
   async createPage(name: string) {
     await this.createPageBtn.click();
     await this.createPageDialog.nameInput.fill(name);
-    await this.createPageDialog.createButton.click();
+    await Promise.all([this.createPageDialog.createButton.click(), this.page.waitForNavigation()]);
   }
 
   async createComponent(name: string) {
     await this.createComponentBtn.click();
     await this.createComponentDialog.nameInput.fill(name);
-    await this.createComponentDialog.createButton.click();
+    await Promise.all([
+      this.createComponentDialog.createButton.click(),
+      this.page.waitForNavigation(),
+    ]);
   }
 
   async dragToAppCanvas(
@@ -102,8 +118,6 @@ export class ToolpadEditor {
     moveTargetX: number,
     moveTargetY: number,
   ) {
-    const isFirefox = this.browserName === 'firefox';
-
     const sourceLocator = isSourceInCanvas
       ? this.appCanvas.locator(sourceSelector)
       : this.page.locator(sourceSelector);
@@ -125,6 +139,7 @@ export class ToolpadEditor {
 
     // Source drag event needs to be dispatched manually in Firefox for tests to work (Playwright bug)
     // https://github.com/microsoft/playwright/issues/17441
+    const isFirefox = this.browserName === 'firefox';
     if (isFirefox) {
       if (isSourceInCanvas) {
         const dataTransfer = await appCanvasFrame!.evaluateHandle(() => new DataTransfer());
@@ -173,5 +188,24 @@ export class ToolpadEditor {
     const moveTargetY = targetBoundingBox!.y + targetBoundingBox!.height / 2;
 
     this.dragToAppCanvas(sourceSelector, false, moveTargetX, moveTargetY);
+  }
+
+  hierarchyItem(group: string, name: string): Locator {
+    return (
+      this.explorer
+        // @ts-expect-error https://github.com/microsoft/playwright/pull/17952
+        .getByRole('treeitem')
+        .filter({ hasText: group })
+        // @ts-expect-error https://github.com/microsoft/playwright/pull/17952
+        .getByRole('treeitem')
+        .filter({ hasText: name })
+    );
+  }
+
+  async openHierarchyMenu(group: string, name: string) {
+    const hierarchyItem = this.hierarchyItem(group, name);
+    const menuButton = hierarchyItem.getByRole('button', { name: 'Open hierarchy menu' });
+    await hierarchyItem.hover();
+    await menuButton.click();
   }
 }

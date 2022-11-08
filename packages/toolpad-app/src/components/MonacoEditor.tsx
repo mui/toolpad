@@ -17,8 +17,8 @@ import {
   conf as typescriptBasicConf,
   language as typescriptBasicLanguage,
 } from 'monaco-editor/esm/vs/basic-languages/typescript/typescript';
-import monacoEditorTheme from '../monacoEditorTheme';
-import muiTheme from '../theme';
+import { useTheme, Theme, lighten, rgbToHex } from '@mui/material/styles';
+import { getDesignTokens } from '../theme';
 
 export interface ExtraLib {
   content: string;
@@ -49,6 +49,42 @@ declare global {
     MonacoEnvironment?: monaco.Environment | undefined;
   }
 }
+
+const designTokensDark = getDesignTokens('dark');
+
+invariant(
+  designTokensDark.palette?.background?.default &&
+    designTokensDark.palette?.background?.paper &&
+    designTokensDark.palette?.divider,
+  'dark theme tokens missing',
+);
+
+const editorBackground = rgbToHex(lighten(designTokensDark.palette.background.default, 0.05));
+const paperBackground = rgbToHex(designTokensDark.palette.background.paper);
+const dividerColor = rgbToHex(designTokensDark.palette.divider);
+
+monaco.editor.defineTheme('vs-toolpad-dark', {
+  base: 'vs-dark',
+  inherit: true,
+  rules: [],
+  colors: {
+    // See https://code.visualstudio.com/api/references/theme-color
+    'editor.background': editorBackground,
+    'menu.background': paperBackground,
+    'menu.border': dividerColor,
+    'menu.separatorBackground': dividerColor,
+    'editorWidget.background': paperBackground,
+    'editorWidget.border': dividerColor,
+    'editor.lineHighlightBorder': dividerColor,
+  },
+});
+
+monaco.editor.defineTheme('vs-toolpad-light', {
+  base: 'vs',
+  inherit: true,
+  rules: [],
+  colors: {},
+});
 
 window.MonacoEnvironment = {
   async getWorker(_, label) {
@@ -119,6 +155,7 @@ const TYPESCRIPT_DEFAULT_COMPILER_OPTIONS: monaco.languages.typescript.CompilerO
   jsx: monaco.languages.typescript.JsxEmit.React,
   reactNamespace: 'React',
   allowJs: true,
+  lib: ['es2020'],
   typeRoots: ['node_modules/@types'],
 };
 
@@ -159,12 +196,12 @@ const EditorRoot = styled('div')(({ theme }) => ({
 }));
 
 let overflowWidgetsDomNode: HTMLDivElement | null = null;
-function getOverflowWidgetsDomNode(): HTMLDivElement {
+function getOverflowWidgetsDomNode(theme: Theme): HTMLDivElement {
   if (!overflowWidgetsDomNode) {
     overflowWidgetsDomNode = document.createElement('div');
     // See https://github.com/microsoft/monaco-editor/issues/2233#issuecomment-913170212
     overflowWidgetsDomNode.classList.add('monaco-editor');
-    overflowWidgetsDomNode.style.zIndex = String(muiTheme.zIndex.tooltip + 1);
+    overflowWidgetsDomNode.style.zIndex = String(theme.zIndex.tooltip + 1);
     document.body.append(overflowWidgetsDomNode);
   }
 
@@ -232,6 +269,8 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 ) {
   const rootRef = React.useRef<HTMLDivElement>(null);
   const instanceRef = React.useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const theme = useTheme();
+  const monacoTheme = theme.palette.mode === 'dark' ? 'vs-toolpad-dark' : 'vs-toolpad-light';
 
   const [isFocused, setIsFocused] = React.useState(false);
 
@@ -282,6 +321,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
 
     const extraOptions: EditorOptions = {
       readOnly: disabled,
+      theme: monacoTheme,
       scrollbar: {
         alwaysConsumeMouseWheel: false,
         ...options?.scrollbar,
@@ -325,10 +365,9 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         accessibilitySupport: 'off',
         tabSize: 2,
         automaticLayout: true,
-        theme: monacoEditorTheme,
         fixedOverflowWidgets: true,
         // See https://github.com/microsoft/monaco-editor/issues/181
-        overflowWidgetsDomNode: getOverflowWidgetsDomNode(),
+        overflowWidgetsDomNode: getOverflowWidgetsDomNode(theme),
         ...extraOptions,
       });
 
@@ -341,7 +380,7 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
         instance.focus();
       }
     }
-  }, [language, value, options, disabled, autoFocus]);
+  }, [language, value, options, disabled, autoFocus, theme, monacoTheme]);
 
   React.useEffect(() => {
     const editor = instanceRef.current;

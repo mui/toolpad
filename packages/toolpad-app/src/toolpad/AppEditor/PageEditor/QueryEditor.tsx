@@ -7,25 +7,28 @@ import {
   List,
   ListItem,
   DialogActions,
-  Checkbox,
-  FormControlLabel,
   TextField,
   InputAdornment,
   Divider,
   Alert,
   Box,
   MenuItem,
+  ListItemText,
+  IconButton,
+  styled,
+  ListItemButton,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { BindableAttrEntries, BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import clsx from 'clsx';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
 import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
-import NodeNameEditor from '../NodeNameEditor';
 import { omit, update } from '../../../utils/immutability';
 import { useEvaluateLiveBinding } from '../useEvaluateLiveBinding';
 import { useDom, useDomApi } from '../../DomLoader';
@@ -34,6 +37,9 @@ import ConnectionSelect, { ConnectionOption } from './ConnectionSelect';
 import BindableEditor from './BindableEditor';
 import { ConfirmDialog } from '../../../components/SystemDialogs';
 import useBoolean from '../../../utils/useBoolean';
+import { useNodeNameValidation } from '../HierarchyExplorer/validation';
+import useEvent from '../../../utils/useEvent';
+import NodeMenu from '../NodeMenu';
 
 const EMPTY_OBJECT = {};
 
@@ -163,24 +169,32 @@ interface QueryNodeEditorProps<Q> {
   onSave: (newNode: appDom.QueryNode) => void;
   onRemove: (newNode: appDom.QueryNode) => void;
   node: appDom.QueryNode<Q>;
+  isDraft: boolean;
 }
 
 function QueryNodeEditorDialog<Q>({
   open,
-  node,
+  node: nodeProp,
   onClose,
   onRemove,
   onSave,
+  isDraft,
 }: QueryNodeEditorProps<Q>) {
   const { appId } = usePageEditorState();
   const dom = useDom();
 
+  // To keep it around during closing animation
+  const node = useLatest(nodeProp);
+
   const [input, setInput] = React.useState<appDom.QueryNode<Q>>(node);
+
+  const reset = useEvent(() => setInput(node));
+
   React.useEffect(() => {
     if (open) {
-      setInput(node);
+      reset();
     }
-  }, [open, node]);
+  }, [open, reset]);
 
   const connectionId = input.attributes.connectionId.value
     ? appDom.deref(input.attributes.connectionId.value)
@@ -261,19 +275,6 @@ function QueryNodeEditorDialog<Q>({
     );
   }, []);
 
-  const handleRefetchOnWindowFocusChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) =>
-        update(existing, {
-          attributes: update(existing.attributes, {
-            refetchOnWindowFocus: appDom.createConst(event.target.checked),
-          }),
-        }),
-      );
-    },
-    [],
-  );
-
   const handleEnabledChange = React.useCallback((newValue: BindableAttrValue<boolean> | null) => {
     setInput((existing) =>
       update(existing, {
@@ -283,19 +284,6 @@ function QueryNodeEditorDialog<Q>({
       }),
     );
   }, []);
-
-  const handleRefetchOnReconnectChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) =>
-        update(existing, {
-          attributes: update(existing.attributes, {
-            refetchOnReconnect: appDom.createConst(event.target.checked),
-          }),
-        }),
-      );
-    },
-    [],
-  );
 
   const handleRefetchIntervalChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -320,7 +308,7 @@ function QueryNodeEditorDialog<Q>({
     onClose();
   }, [onRemove, node, onClose]);
 
-  const isInputSaved = node === input;
+  const isInputSaved = !isDraft && node === input;
 
   const handleClose = React.useCallback(() => {
     const ok = isInputSaved
@@ -352,13 +340,32 @@ function QueryNodeEditorDialog<Q>({
 
   const mode = input.attributes.mode?.value || 'query';
 
+  const existingNames = React.useMemo(
+    () => appDom.getExistingNamesForNode(dom, input),
+    [dom, input],
+  );
+
+  const nodeNameError = useNodeNameValidation(input.name, existingNames, 'query');
+  const isNameValid = !nodeNameError;
+
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleClose}>
       {dataSourceId && dataSource && queryEditorContext ? (
         <ConnectionContextProvider value={queryEditorContext}>
           <DialogTitle>
             <Stack direction="row" gap={2}>
-              <NodeNameEditor node={node} />
+              <TextField
+                required
+                autoFocus
+                fullWidth
+                label="name"
+                value={input.name}
+                onChange={(event) =>
+                  setInput((existing) => ({ ...existing, name: event.target.value }))
+                }
+                error={!isNameValid}
+                helperText={nodeNameError}
+              />
               <ConnectionSelect
                 dataSource={dataSourceId}
                 value={
@@ -419,26 +426,6 @@ function QueryNodeEditorDialog<Q>({
                 onChange={handleEnabledChange}
                 disabled={mode !== 'query'}
               />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={input.attributes.refetchOnWindowFocus?.value ?? true}
-                    onChange={handleRefetchOnWindowFocusChange}
-                    disabled={mode !== 'query'}
-                  />
-                }
-                label="Refetch on window focus"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={input.attributes.refetchOnReconnect?.value ?? true}
-                    onChange={handleRefetchOnReconnectChange}
-                    disabled={mode !== 'query'}
-                  />
-                }
-                label="Refetch on network reconnect"
-              />
               <TextField
                 InputProps={{
                   startAdornment: <InputAdornment position="start">s</InputAdornment>,
@@ -457,7 +444,7 @@ function QueryNodeEditorDialog<Q>({
             onSave={handleSave}
             onClose={handleClose}
             onRemove={handleRemove}
-            saveDisabled={isInputSaved}
+            saveDisabled={isInputSaved || !isNameValid}
           />
         </ConnectionContextProvider>
       ) : (
@@ -467,9 +454,32 @@ function QueryNodeEditorDialog<Q>({
   );
 }
 
-type DialogState = {
-  nodeId?: NodeId;
+const classes = {
+  listItemMenuButton: 'Toolpad__QueryListItem',
+  listItemMenuOpen: 'Toolpad__QueryListItemMenuOpen',
 };
+
+const QueryListItem = styled(ListItem)({
+  [`& .${classes.listItemMenuButton}`]: {
+    visibility: 'hidden',
+  },
+  [`
+    &:hover .${classes.listItemMenuButton}, 
+    & .${classes.listItemMenuOpen}
+  `]: {
+    visibility: 'visible',
+  },
+});
+
+type DialogState =
+  | {
+      node?: undefined;
+      isDraft?: undefined;
+    }
+  | {
+      node: appDom.QueryNode;
+      isDraft: boolean;
+    };
 
 export default function QueryEditor() {
   const dom = useDom();
@@ -488,57 +498,96 @@ export default function QueryEditor() {
   }, []);
 
   const handleCreated = React.useCallback(
-    (node: appDom.QueryNode) => {
-      domApi.addNode(node, page, 'queries');
-      setDialogState({ nodeId: node.id });
-    },
-    [domApi, page],
+    (node: appDom.QueryNode) => setDialogState({ node, isDraft: true }),
+    [],
   );
 
   const handleSave = React.useCallback(
     (node: appDom.QueryNode) => {
-      domApi.saveNode(node);
+      if (appDom.nodeExists(dom, node.id)) {
+        domApi.saveNode(node);
+      } else {
+        domApi.addNode(node, page, 'queries');
+      }
+      setDialogState({ node, isDraft: false });
     },
-    [domApi],
+    [dom, domApi, page],
   );
 
-  const handleRemove = React.useCallback(
-    (node: appDom.QueryNode) => {
-      domApi.removeNode(node.id);
+  const handleDeleteNode = React.useCallback(
+    (nodeId: NodeId) => {
+      domApi.removeNode(nodeId);
       handleEditStateDialogClose();
     },
     [domApi, handleEditStateDialogClose],
   );
 
-  const editedNode = dialogState?.nodeId
-    ? appDom.getMaybeNode(dom, dialogState.nodeId, 'query')
-    : null;
+  const handleRemove = React.useCallback(
+    (node: appDom.QueryNode) => handleDeleteNode(node.id),
+    [handleDeleteNode],
+  );
 
-  // To keep it around during closing animation
-  const lastEditednode = useLatest(editedNode);
+  const handleDuplicateNode = React.useCallback(
+    (nodeId: NodeId) => {
+      const node = appDom.getNode(dom, nodeId, 'query');
+      invariant(
+        page,
+        'handleDuplicateNode should only be used for queries, which should always belong to a page',
+      );
+      const existingNames = appDom.getExistingNamesForChildren(dom, page);
+      const newName = appDom.proposeName(node.name, existingNames);
+      const copy = appDom.createNode(dom, 'query', { ...node, name: newName });
+      setDialogState({ node: copy, isDraft: true });
+    },
+    [dom, page],
+  );
 
   return (
-    <Stack spacing={1} alignItems="start">
+    <Stack spacing={1} alignItems="start" sx={{ width: '100%' }}>
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleCreate}>
         Add query
       </Button>
-      <List>
+      <List sx={{ width: '100%' }}>
         {queries.map((queryNode) => {
           return (
-            <ListItem
+            <QueryListItem
               key={queryNode.id}
-              button
-              onClick={() => setDialogState({ nodeId: queryNode.id })}
+              disablePadding
+              onClick={() => setDialogState({ node: queryNode, isDraft: false })}
+              secondaryAction={
+                <NodeMenu
+                  renderButton={({ buttonProps, menuProps }) => (
+                    <IconButton
+                      className={clsx(classes.listItemMenuButton, {
+                        [classes.listItemMenuOpen]: menuProps.open,
+                      })}
+                      edge="end"
+                      aria-label="Open query menu"
+                      {...buttonProps}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                  )}
+                  nodeId={queryNode.id}
+                  deleteLabelText={`Delete ${queryNode.name}`}
+                  duplicateLabelText={`Duplicate ${queryNode.name}`}
+                  onDeleteNode={handleDeleteNode}
+                  onDuplicateNode={handleDuplicateNode}
+                />
+              }
             >
-              {queryNode.name}
-            </ListItem>
+              <ListItemButton>
+                <ListItemText primaryTypographyProps={{ noWrap: true }} primary={queryNode.name} />
+              </ListItemButton>
+            </QueryListItem>
           );
         })}
       </List>
-      {dialogState?.nodeId && lastEditednode ? (
+      {dialogState?.node ? (
         <QueryNodeEditorDialog
           open={!!dialogState}
-          node={lastEditednode}
+          node={dialogState.node}
+          isDraft={dialogState.isDraft}
           onSave={handleSave}
           onRemove={handleRemove}
           onClose={handleEditStateDialogClose}

@@ -1,7 +1,8 @@
 import { SxProps, TextField } from '@mui/material';
 import * as React from 'react';
 import * as appDom from '../../appDom';
-import { useDomApi } from '../DomLoader';
+import { useDom, useDomApi } from '../DomLoader';
+import { useNodeNameValidation } from './HierarchyExplorer/validation';
 
 interface NodeNameEditorProps {
   node: appDom.AppDomNode;
@@ -10,6 +11,7 @@ interface NodeNameEditorProps {
 
 export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
   const domApi = useDomApi();
+  const dom = useDom();
 
   const [nameInput, setNameInput] = React.useState(node.name);
   React.useEffect(() => setNameInput(node.name), [node.name]);
@@ -19,10 +21,17 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
     [],
   );
 
-  const handleNameCommit = React.useCallback(
-    () => domApi.setNodeName(node.id, nameInput),
-    [domApi, node.id, nameInput],
-  );
+  const existingNames = React.useMemo(() => appDom.getExistingNamesForNode(dom, node), [dom, node]);
+  const nodeNameError = useNodeNameValidation(nameInput, existingNames, node.type);
+  const isNameValid = !nodeNameError;
+
+  const handleNameCommit = React.useCallback(() => {
+    if (isNameValid) {
+      domApi.setNodeName(node.id, nameInput);
+    } else {
+      setNameInput(node.name);
+    }
+  }, [isNameValid, domApi, node.id, node.name, nameInput]);
 
   const handleKeyPress = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -38,6 +47,8 @@ export default function NodeNameEditor({ node, sx }: NodeNameEditorProps) {
       sx={sx}
       fullWidth
       label="name"
+      error={!isNameValid}
+      helperText={nodeNameError}
       value={nameInput}
       onChange={handleNameInputChange}
       onBlur={handleNameCommit}

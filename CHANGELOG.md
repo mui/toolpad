@@ -1,5 +1,119 @@
 # Changelog
 
+## 0.0.25
+
+<!-- generated comparing v0.024..master -->
+
+_Nov 2, 2022_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Added new Data Grid column types, improved dev mode performance, support for pages, connections and components duplication, updated remaining documentation parts
+
+- &#8203;<!-- 22 -->Fix Elastic Search configuration (#1256) @apedroferreira
+- &#8203;<!-- 21 -->Provide accessible locators (#1264) @Janpot
+- &#8203;<!-- 20 -->Improve dev mode performance (#1232) @Janpot
+- &#8203;<!-- 19 -->Fix app templates tests (#1257) @apedroferreira
+- &#8203;<!-- 18 -->Support duplicating queries (#1229) @Janpot
+- &#8203;<!-- 17 -->Deploy latest Docker image in demo (#1255) @apedroferreira
+- &#8203;<!-- 16 -->App templates tests (#1220) @apedroferreira
+- &#8203;<!-- 15 -->Add new column types (#1223) @apedroferreira
+- &#8203;<!-- 14 -->Fix node not found error (#1233) @apedroferreira
+- &#8203;<!-- 13 -->improve renovatebot @Janpot
+- &#8203;<!-- 12 -->Support undefined values in serverside bindings (#1226) @Janpot
+- &#8203;<!-- 11 -->Disable making applications public in demo mode (#1212) @apedroferreira
+- &#8203;<!-- 10 -->Use link component in app overview (#1218) @Janpot
+- &#8203;<!-- 09 -->Support duplicating pages, connection, components (#1210) @Janpot
+- &#8203;<!-- 08 -->Part 5: Update building ui docs (#1215) @bytasv
+- &#8203;<!-- 07 -->Part 6: Update data binding docs (#1216) @bytasv
+- &#8203;<!-- 06 -->[core] Fixes for upcoming eslint upgrade (#1249) @Janpot
+- &#8203;<!-- 05 -->[core] Remove unused GitHub Action permission @oliviertassinari
+- &#8203;<!-- 04 -->[core] Pin GitHub Action to digests (#1250) @oliviertassinari
+- &#8203;<!-- 03 -->[core] Fix permissions in workflow @oliviertassinari
+- &#8203;<!-- 02 -->[core] Add clarifying comment in the dev env compose file (#1206) @Janpot
+- &#8203;<!-- 01 -->[ui] Add button size property (#1193) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.24
+
+<!-- generated comparing v0.0.23..master -->
+
+_Oct 26, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Add element duplication, improved Paper component, improved node naming UX, support for server logs, autocomplete for event arguments, update docs screenshots.
+
+- &#8203;<!-- 28 -->Part 4: Update datasource docs (#1205) @bytasv
+- &#8203;<!-- 27 -->renovatebot, tweak playwright @Janpot
+- &#8203;<!-- 26 -->Add API and datasource logging (#1066) @apedroferreira
+- &#8203;<!-- 25 -->fix name @Janpot
+- &#8203;<!-- 24 -->Codify the icons exception in eslint (#1211) @Janpot
+- &#8203;<!-- 23 -->Improve Paper component (#1031) @apedroferreira
+- &#8203;<!-- 22 -->Deploy with keyboard enter (#1188) @bytasv
+- &#8203;<!-- 21 -->Part 3: Update connections docs (#1203) @bytasv
+- &#8203;<!-- 20 -->Part 1: Update overview + quickstart screenshots (#1200) @bytasv
+- &#8203;<!-- 19 -->Use public environment settings for demo (#1191) @apedroferreira
+- &#8203;<!-- 18 -->Part 2: Update queries docs (#1202) @bytasv
+- &#8203;<!-- 17 -->Fix fetch query preview (#1165) @bytasv
+- &#8203;<!-- 16 -->Try fixing renovatebot @Janpot
+- &#8203;<!-- 15 -->Add option to DataGrid to hide toolbar (#1187) @Janpot
+- &#8203;<!-- 14 -->Use latest version of Toolpad in demo (#1190) @apedroferreira
+- &#8203;<!-- 13 -->Remove branch option from database in render.yaml (#1189) @apedroferreira
+- &#8203;<!-- 12 -->Implement component duplication logic (#1169) @bytasv
+- &#8203;<!-- 11 -->Set up demo with Docker (#1092) @apedroferreira
+- &#8203;<!-- 10 -->Add a staleTime to queries (#1167) @Janpot
+- &#8203;<!-- 09 -->Add room for post transformations (#1185) @oliviertassinari
+- &#8203;<!-- 08 -->Allow typing event arguments for autocomplete (#1180) @Janpot
+- &#8203;<!-- 07 -->[core] Fix duplicate CodeQL build @oliviertassinari
+- &#8203;<!-- 06 -->[core] query editor, only insert node after the flow (#1207) @Janpot
+- &#8203;<!-- 05 -->[core] Relax the restrictions on node naming (#1194) @Janpot
+- &#8203;<!-- 04 -->[core] Harden the datasource handler implementation (#1199) @Janpot
+- &#8203;<!-- 03 -->[core] Add code scanning via CodeQL (#1197) @oliviertassinari
+- &#8203;<!-- 02 -->[ui] Some tweaks to the Monaco editor theme (#1181) @Janpot
+- &#8203;<!-- 01 -->[website] Remove LanguageNegotation (#1186) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.23
+
+<!-- generated comparing v0.0.22..master -->
+
+_Oct 20, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+A new theme for the UI (with light and dark mode), allowing Toolpad apps to be used in iFrames, UI improvements and bug fixes.
+
+- &#8203;<!-- 25 -->Allow iframes (#1162) @oliviertassinari
+- &#8203;<!-- 24 -->Make sure Monaco theme switches correctly (#1179) @Janpot
+- &#8203;<!-- 23 -->Replace chevron icons with arrow icons (#1178) @Janpot
+- &#8203;<!-- 22 -->Remove false sourceMapReference in next config (#1170) @apedroferreira
+- &#8203;<!-- 21 -->Disable queries until dom node has been saved serverside (#1149) @Janpot
+- &#8203;<!-- 20 -->Improvements to Sentry and sourcemaps (#1129) @apedroferreira
+- &#8203;<!-- 19 -->Enforce the restriction on how icons are imported (#1160) @Janpot
+- &#8203;<!-- 18 -->Improve preview feedback in fetch query (#1153) @bytasv
+- &#8203;<!-- 17 -->Fix visible horizontal scroll (#1154) @bytasv
+- &#8203;<!-- 16 -->Mandate node version for toolpad-app (#1141) @Janpot
+- &#8203;<!-- 15 -->Some smoke test for rest datasource (#1147) @Janpot
+- &#8203;<!-- 14 -->Change url in function default source to static self hosted file (#1152) @Janpot
+- &#8203;<!-- 13 -->Move event handler setup to the bridge (#1097) @Janpot
+- &#8203;<!-- 12 -->Try changing @mui/toolpad/index.d.ts to global.d.ts (#1148) @Janpot
+- &#8203;<!-- 11 -->Use Map for app template options (#1135) @apedroferreira
+- &#8203;<!-- 10 -->[app] Fix manifest 401 loading (#1146) @oliviertassinari
+- &#8203;<!-- 09 -->[core] Add CI check that the PR has label (#849) @oliviertassinari
+- &#8203;<!-- 08 -->[core] eslint: Disallow enum (#1151) @Janpot
+- &#8203;<!-- 07 -->[core] Harden GitHub Actions permissions (#1161) @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Add missing redirections @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Improve markdownlint (#1159) @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Update descriptions that are over 160 characters @oliviertassinari
+- &#8203;<!-- 03 -->[runtime] hide queries in the browser (#1155) @Janpot
+- &#8203;<!-- 02 -->[ui] Add branding theme to Toolpad app (#988) @bharatkashyap
+- &#8203;<!-- 01 -->[ui] New component catalog (#1003) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## v0.0.22
 
 <!-- generated comparing v0.0.21..master -->

@@ -7,11 +7,13 @@ import ReactDOM from 'react-dom';
 import invariant from 'invariant';
 import * as appDom from '../../../appDom';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../constants';
-import { PageViewState } from '../../../types';
+import { NodeHashes, PageViewState } from '../../../types';
 import { ToolpadBridge } from '../../../canvas';
 import useEvent from '../../../utils/useEvent';
 import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
+import { useDomApi } from '../../DomLoader';
+import { hasFieldFocus } from '../../../utils/fields';
 
 type IframeContentWindow = Window & typeof globalThis;
 
@@ -46,6 +48,7 @@ export interface EditorCanvasHostProps {
   appId: string;
   pageNodeId: NodeId;
   dom: appDom.AppDom;
+  savedNodes: NodeHashes;
   onRuntimeEvent?: (event: RuntimeEvent) => void;
   onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
@@ -65,19 +68,29 @@ const CanvasFrame = styled('iframe')({
 
 export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
   function EditorCanvasHost(
-    { appId, className, pageNodeId, dom, overlay, onRuntimeEvent = () => {}, onConsoleEntry },
+    {
+      appId,
+      className,
+      pageNodeId,
+      dom,
+      savedNodes,
+      overlay,
+      onRuntimeEvent = () => {},
+      onConsoleEntry,
+    },
     forwardedRef,
   ) {
     const frameRef = React.useRef<HTMLIFrameElement>(null);
+    const domApi = useDomApi();
 
     const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
     const updateOnBridge = React.useCallback(
       (bridgeInstance: ToolpadBridge) => {
         const renderDom = appDom.createRenderTree(dom);
-        bridgeInstance.update({ appId, dom: renderDom });
+        bridgeInstance.update({ appId, dom: renderDom, savedNodes });
       },
-      [appId, dom],
+      [appId, dom, savedNodes],
     );
 
     React.useEffect(() => {
@@ -135,10 +148,44 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     const handleRuntimeEvent = useEvent(onRuntimeEvent);
 
+    const iframeKeyDownHandler = React.useCallback(
+      (iframeDocument: Document) => {
+        return (event: KeyboardEvent) => {
+          if (hasFieldFocus(iframeDocument)) {
+            return;
+          }
+
+          const { code, metaKey, shiftKey } = event;
+          const undoShortcut = code === 'KeyZ' && metaKey;
+          const redoShortcut = undoShortcut && shiftKey;
+
+          if (redoShortcut) {
+            domApi.redo();
+          } else if (undoShortcut) {
+            domApi.undo();
+          }
+        };
+      },
+      [domApi],
+    );
+
     const handleFrameLoad = React.useCallback(() => {
       invariant(frameRef.current, 'Iframe ref not attached');
-      setContentWindow(frameRef.current.contentWindow);
-    }, []);
+
+      const iframeWindow = frameRef.current.contentWindow;
+      setContentWindow(iframeWindow);
+
+      if (!iframeWindow) {
+        return;
+      }
+
+      const keyDownHandler = iframeKeyDownHandler(iframeWindow.document);
+
+      iframeWindow?.addEventListener('keydown', keyDownHandler);
+      iframeWindow?.addEventListener('unload', () => {
+        iframeWindow?.removeEventListener('keydown', keyDownHandler);
+      });
+    }, [iframeKeyDownHandler]);
 
     React.useEffect(() => {
       if (!contentWindow) {

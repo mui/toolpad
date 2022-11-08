@@ -1,8 +1,9 @@
 import { NextApiHandler } from 'next';
-import { withSentry } from '@sentry/nextjs';
+import invariant from 'invariant';
 import { asArray } from '../../../../src/utils/collections';
 import serverDataSources from '../../../../src/toolpadDataSources/server';
 import { getConnectionParams, setConnectionParams } from '../../../../src/server/data';
+import { withReqResLogs } from '../../../../src/server/logs/withLogs';
 
 export const config = {
   api: {
@@ -14,7 +15,14 @@ export const config = {
 
 const handlerMap = new Map<String, Function | null | undefined>();
 Object.keys(serverDataSources).forEach((dataSource) => {
-  handlerMap.set(dataSource, serverDataSources[dataSource]?.createHandler?.());
+  const handler = serverDataSources[dataSource]?.createHandler?.();
+  if (handler) {
+    invariant(
+      typeof handler === 'function',
+      `Received a "${typeof handler}" instead of a "function" for the "${dataSource}" handler`,
+    );
+    handlerMap.set(dataSource, handler);
+  }
 });
 
 const apiHandler = (async (req, res) => {
@@ -24,7 +32,7 @@ const apiHandler = (async (req, res) => {
       throw new Error(`Missing path parameter "dataSource"`);
     }
     const handler = handlerMap.get(dataSource);
-    if (handler) {
+    if (typeof handler === 'function') {
       return handler(
         {
           getConnectionParams,
@@ -40,4 +48,4 @@ const apiHandler = (async (req, res) => {
   return res.status(405).json({ message: 'Method not supported' });
 }) as NextApiHandler;
 
-export default withSentry(apiHandler);
+export default withReqResLogs(apiHandler);

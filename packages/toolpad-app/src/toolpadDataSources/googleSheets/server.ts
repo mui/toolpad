@@ -8,7 +8,6 @@ import config from '../../server/config';
 import { asArray } from '../../utils/collections';
 import {
   GoogleSheetsConnectionParams,
-  GoogleSheetsPrivateQueryType,
   GoogleSheetsPrivateQuery,
   GoogleSheetsApiQuery,
   GoogleSheetsResult,
@@ -130,7 +129,7 @@ async function execPrivate(
   if (connection) {
     client.setCredentials(connection);
   }
-  if (query.type === GoogleSheetsPrivateQueryType.FILE_GET) {
+  if (query.type === 'FILE_GET') {
     const driveClient = createDriveClient(client);
     const { spreadsheetId } = query;
     if (spreadsheetId) {
@@ -146,7 +145,7 @@ async function execPrivate(
     }
     throw new Error(`Google Sheets: Missing spreadsheetId in query`);
   }
-  if (query.type === GoogleSheetsPrivateQueryType.FILES_LIST) {
+  if (query.type === 'FILES_LIST') {
     const driveClient = createDriveClient(client);
     const { spreadsheetQuery, pageToken } = query;
     let queryString = "mimeType='application/vnd.google-apps.spreadsheet'";
@@ -170,7 +169,7 @@ async function execPrivate(
       `${response?.status}: ${response.statusText} Failed to fetch "${JSON.stringify(query)}"`,
     );
   }
-  if (query.type === GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET) {
+  if (query.type === 'FETCH_SPREADSHEET') {
     const sheetsClient = createSheetsClient(client);
     const { spreadsheetId } = query;
     if (spreadsheetId) {
@@ -187,7 +186,7 @@ async function execPrivate(
     }
     throw new Error(`Google Sheets: Missing spreadsheetId in query`);
   }
-  if (query.type === GoogleSheetsPrivateQueryType.CONNECTION_STATUS) {
+  if (query.type === 'CONNECTION_STATUS') {
     const driveClient = createDriveClient(client);
     const response = await driveClient.about.get({ fields: 'user' });
     if (response.status === 200) {
@@ -195,7 +194,7 @@ async function execPrivate(
     }
     return null;
   }
-  if (query.type === GoogleSheetsPrivateQueryType.DEBUG_EXEC) {
+  if (query.type === 'DEBUG_EXEC') {
     return exec(connection, query.query);
   }
   throw new Error(`Google Sheets: Unrecognized private query "${JSON.stringify(query)}"`);

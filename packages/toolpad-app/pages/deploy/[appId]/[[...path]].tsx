@@ -13,19 +13,18 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
   ]);
 
   const [appId] = asArray(context.query.appId);
+  const app = appId ? await getApp(appId) : null;
 
-  if (!appId) {
+  if (!app || !appId) {
     return {
       notFound: true,
     };
   }
 
-  const app = await getApp(appId);
-  if (!app) {
-    return {
-      notFound: true,
-    };
-  }
+  // TODO: iframes should be disallowed by default.
+  // if (!app.allowIframes) {
+  //   context.res.setHeader('X-Frame-Options', 'DENY');
+  // }
 
   if (!app.public) {
     if (!checkBasicAuth(context.req)) {

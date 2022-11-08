@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as builtins from '@mui/toolpad-components';
+import * as builtIns from '@mui/toolpad-components';
 import {
   ToolpadComponent,
   ToolpadComponents,
@@ -49,15 +49,15 @@ export default function ComponentsContext({ dom, children }: ComponentsContextPr
 
     for (const [id, componentDef] of Object.entries(catalog)) {
       if (componentDef) {
-        if (componentDef.builtin) {
-          const builtin = (builtins as any)[componentDef.builtin];
+        if (componentDef.builtIn) {
+          const builtIn = (builtIns as any)[componentDef.builtIn];
 
-          if (!isToolpadComponent(builtin)) {
+          if (!isToolpadComponent(builtIn)) {
             result[id] = createToolpadComponentThatThrows(
-              new Error(`Imported builtin "${componentDef.builtin}" is not a ToolpadComponent`),
+              new Error(`Imported builtIn "${componentDef.builtIn}" is not a ToolpadComponent`),
             );
           } else {
-            result[id] = builtin;
+            result[id] = builtIn;
           }
         }
 

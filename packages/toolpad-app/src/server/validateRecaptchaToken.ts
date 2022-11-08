@@ -1,5 +1,15 @@
+import logInfo from './logs/logInfo';
+
 const SITE_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
 const SCORE_THRESHOLD = 0.5;
+
+export interface RecaptchaResJson {
+  [key: string]: any;
+  success: boolean;
+  score: number;
+  action: string;
+  'error-codes': number[];
+}
 
 export const validateRecaptchaToken = async (
   secretKey: string,
@@ -13,7 +23,18 @@ export const validateRecaptchaToken = async (
     method: 'POST',
   });
 
-  const { success, score } = await recaptchaResponse.json();
+  const recaptchaResponseJson: RecaptchaResJson = await recaptchaResponse.json();
+
+  logInfo(
+    {
+      key: 'captchaValidation',
+      token,
+      recaptchaRes: recaptchaResponseJson,
+    },
+    'Validated CAPTCHA',
+  );
+
+  const { success, score } = recaptchaResponseJson;
   if (!success || score < SCORE_THRESHOLD) {
     return false;
   }

@@ -25,7 +25,8 @@ import QueryInputPanel from '../QueryInputPanel';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
 import { tryFormat } from '../../utils/prettier';
-import config from '../../config';
+import useFetchPrivate from '../useFetchPrivate';
+import { MOVIES_API_DEMO_URL } from '../demo';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -84,13 +85,16 @@ function ConnectionParamsInput({
 
 const DEFAULT_MODULE = `export default async function ({ parameters }: ToolpadFunctionEvent) {
   console.info("Executing function with parameters:", parameters);
-  const url = new URL("${new URL('/static/movies.json', config.externalUrl).href}");
+  const url = new URL("${MOVIES_API_DEMO_URL}");
   url.searchParams.set("timestamp", String(Date.now()));
+
   const response = await fetch(String(url));
   if (!response.ok) {
     throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
   }
-  return response.json();
+  const json = await response.json();
+
+  return json;
 }
 `;
 
@@ -110,17 +114,19 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
+  const fetchPrivate = useFetchPrivate<FunctionPrivateQuery, FunctionResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: FunctionQuery, params: Record<string, string>) =>
+      fetchPrivate({ kind: 'debugExec', query, params }),
+    [fetchPrivate],
+  );
+
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<
-    FunctionPrivateQuery,
-    FunctionResult
-  >(
-    {
-      kind: 'debugExec',
-      query: input.query,
-      params: previewParams,
-    },
+  const { preview, runPreview: handleRunPreview } = useQueryPreview(
+    fetchServerPreview,
+    input.query,
+    previewParams,
     {
       onPreview(result) {
         setPreviewLogs((existing) => [...existing, ...result.logs]);

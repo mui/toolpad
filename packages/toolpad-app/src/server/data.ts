@@ -149,7 +149,7 @@ async function loadPreviewDom(appId: string): Promise<appDom.AppDom> {
 }
 
 export async function getApps(): Promise<AppMeta[]> {
-  if (process.env.TOOLPAD_DEMO) {
+  if (config.isDemo) {
     return [];
   }
 
@@ -219,7 +219,7 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
 
   let appName = name.trim();
 
-  if (process.env.TOOLPAD_DEMO) {
+  if (config.isDemo) {
     appName = appName.replace(/\(#[0-9]+\)/g, '').trim();
 
     const sameNameAppCount = await prismaClient.app.count({

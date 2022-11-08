@@ -1,7 +1,6 @@
 import { NextApiHandler } from 'next';
 import type { IncomingMessage, ServerResponse } from 'http';
 import superjson from 'superjson';
-import { withSentry } from '@sentry/nextjs';
 import {
   getApps,
   getApp,
@@ -25,6 +24,7 @@ import {
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
+import { withRpcReqResLogs } from '../../src/server/logs/withLogs';
 
 export const config = {
   api: {
@@ -190,4 +190,4 @@ const rpcServer = {
 
 export type ServerDefinition = MethodsOf<typeof rpcServer>;
 
-export default withSentry(createRpcHandler(rpcServer));
+export default withRpcReqResLogs(createRpcHandler(rpcServer));

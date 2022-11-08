@@ -3,7 +3,8 @@ import * as appDom from '../appDom';
 
 export interface ToolpadComponentDefinition {
   displayName: string;
-  builtin?: string;
+  builtIn?: string;
+  system?: boolean;
   codeComponentId?: NodeId;
 }
 
@@ -18,16 +19,23 @@ export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
 export const STACK_COMPONENT_ID = 'Stack';
 
 const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
-  [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtin: 'PageRow' }],
-  [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtin: 'PageColumn' }],
-  [STACK_COMPONENT_ID, { displayName: 'Stack', builtin: 'Stack' }],
-  ['Button', { displayName: 'Button', builtin: 'Button' }],
-  ['Image', { displayName: 'Image', builtin: 'Image' }],
-  ['DataGrid', { displayName: 'DataGrid', builtin: 'DataGrid' }],
-  ['TextField', { displayName: 'TextField', builtin: 'TextField' }],
-  ['Typography', { displayName: 'Typography', builtin: 'Typography' }],
-  ['Select', { displayName: 'Select', builtin: 'Select' }],
-  ['Paper', { displayName: 'Paper', builtin: 'Paper' }],
+  [PAGE_ROW_COMPONENT_ID, { displayName: 'Row', builtIn: 'PageRow', system: true }],
+  [PAGE_COLUMN_COMPONENT_ID, { displayName: 'Column', builtIn: 'PageColumn', system: true }],
+  [STACK_COMPONENT_ID, { displayName: 'Stack', builtIn: 'Stack', system: true }],
+  [
+    'Button',
+    {
+      displayName: 'Button',
+      builtIn: 'Button',
+    },
+  ],
+  ['Image', { displayName: 'Image', builtIn: 'Image' }],
+  ['DataGrid', { displayName: 'Data grid', builtIn: 'DataGrid' }],
+  ['TextField', { displayName: 'Text field', builtIn: 'TextField' }],
+  ['Typography', { displayName: 'Typography', builtIn: 'Typography' }],
+  ['Select', { displayName: 'Select', builtIn: 'Select' }],
+  ['Paper', { displayName: 'Paper', builtIn: 'Paper' }],
+  ['Link', { displayName: 'Link', builtIn: 'Link' }],
 ]);
 
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {

@@ -2,8 +2,11 @@ import * as React from 'react';
 import { AppBar, Box, Toolbar, Tooltip, Chip, Link, useTheme } from '@mui/material';
 import Image from 'next/image';
 import UserFeedback from './UserFeedback';
+import ThemeModeMenu from './ThemeModeMenu';
+import { useThemeMode, ThemeMode } from '../../../ThemeContext';
 import productIconDark from '../../../../public/product-icon-dark.svg';
 import productIconLight from '../../../../public/product-icon-light.svg';
+import config from '../../../config';
 
 export interface HeaderProps {
   actions?: React.ReactNode;
@@ -12,6 +15,14 @@ export interface HeaderProps {
 
 function Header({ actions, status }: HeaderProps) {
   const theme = useTheme();
+  const { themeMode, setThemeMode } = useThemeMode();
+
+  const handleThemeModeChange = React.useCallback(
+    (event: React.MouseEvent, mode: ThemeMode) => {
+      setThemeMode(mode);
+    },
+    [setThemeMode],
+  );
   return (
     <AppBar
       position="static"
@@ -56,7 +67,7 @@ function Header({ actions, status }: HeaderProps) {
               </Box>
             </Link>
           </Tooltip>
-          {process.env.TOOLPAD_DEMO ? (
+          {config.isDemo ? (
             <Chip sx={{ ml: 2 }} label="Demo Version" color="primary" size="small" />
           ) : null}
         </Box>
@@ -82,6 +93,7 @@ function Header({ actions, status }: HeaderProps) {
           }}
         >
           {status}
+          <ThemeModeMenu mode={themeMode} onChange={handleThemeModeChange} />
           <UserFeedback />
         </Box>
       </Toolbar>

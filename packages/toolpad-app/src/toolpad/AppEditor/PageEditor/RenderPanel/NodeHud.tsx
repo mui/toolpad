@@ -2,7 +2,8 @@ import * as React from 'react';
 import clsx from 'clsx';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { IconButton, styled } from '@mui/material';
+import ContentCopy from '@mui/icons-material/ContentCopy';
+import { IconButton, styled, Tooltip } from '@mui/material';
 import * as appDom from '../../../../appDom';
 import {
   absolutePositionCss,
@@ -136,6 +137,7 @@ interface NodeHudProps {
   onDelete?: React.MouseEventHandler<HTMLElement>;
   isResizing?: boolean;
   resizePreviewElementRef: React.MutableRefObject<HTMLDivElement | null>;
+  onDuplicate?: (event: React.MouseEvent) => void;
 }
 
 export default function NodeHud({
@@ -149,6 +151,7 @@ export default function NodeHud({
   onDelete,
   isResizing = false,
   resizePreviewElementRef,
+  onDuplicate,
 }: NodeHudProps) {
   const dom = useDom();
 
@@ -180,8 +183,15 @@ export default function NodeHud({
           >
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
+            <IconButton aria-label="Duplicate element" color="inherit" onMouseUp={onDuplicate}>
+              <Tooltip title="Duplicate element" enterDelay={400}>
+                <ContentCopy color="inherit" />
+              </Tooltip>
+            </IconButton>
             <IconButton aria-label="Remove element" color="inherit" onMouseUp={onDelete}>
-              <DeleteIcon color="inherit" />
+              <Tooltip title="Remove element" enterDelay={400}>
+                <DeleteIcon color="inherit" />
+              </Tooltip>
             </IconButton>
           </div>
         </React.Fragment>

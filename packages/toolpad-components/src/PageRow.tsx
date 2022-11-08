@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
 
 export interface PageRowProps {
-  layoutColumnSizes: number[];
+  layoutColumnSizes?: number[];
   gap?: number;
   children?: React.ReactNode;
 }

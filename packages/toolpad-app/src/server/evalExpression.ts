@@ -6,11 +6,12 @@ export type Serializable =
   | number
   | boolean
   | null
+  | undefined
   | Serializable[]
   | { [key: string]: Serializable }
   | ((...args: Serializable[]) => Serializable);
 
-export function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
+export function newSerializable(ctx: QuickJSContext, json: Serializable): QuickJSHandle {
   switch (typeof json) {
     case 'string':
       return ctx.newString(json);
@@ -25,7 +26,7 @@ export function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle 
       if (Array.isArray(json)) {
         const result = ctx.newArray();
         Object.values(json).forEach((value, i) => {
-          const valueHandle = newJson(ctx, value);
+          const valueHandle = newSerializable(ctx, value);
           ctx.setProp(result, i, valueHandle);
           valueHandle.dispose();
         });
@@ -33,7 +34,7 @@ export function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle 
       }
       const result = ctx.newObject();
       Object.entries(json).forEach(([key, value]) => {
-        const valueHandle = newJson(ctx, value);
+        const valueHandle = newSerializable(ctx, value);
         ctx.setProp(result, key, valueHandle);
         valueHandle.dispose();
       });
@@ -43,10 +44,12 @@ export function newJson(ctx: QuickJSContext, json: Serializable): QuickJSHandle 
       const result = ctx.newFunction('anonymous', (...args) => {
         const dumpedArgs: Serializable[] = args.map((arg) => ctx.dump(arg));
         const fnResult = json(...dumpedArgs);
-        return newJson(ctx, fnResult);
+        return newSerializable(ctx, fnResult);
       });
       return result;
     }
+    case 'undefined':
+      return ctx.undefined;
     default:
       return invariant(false, `invalid value: ${json}`);
   }
@@ -58,7 +61,7 @@ export function evalExpressionInContext(
   globalScope: Record<string, Serializable> = {},
 ) {
   Object.entries(globalScope).forEach(([key, value]) => {
-    const valueHandle = newJson(ctx, value);
+    const valueHandle = newSerializable(ctx, value);
     ctx.setProp(ctx.global, key, valueHandle);
     valueHandle.dispose();
   });

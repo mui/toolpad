@@ -2,6 +2,11 @@ const baseline = require('@mui/monorepo/.eslintrc');
 
 module.exports = {
   ...baseline,
+  extends: [
+    ...baseline.extends,
+    // Motivation: https://github.com/shian15810/eslint-plugin-typescript-enum#motivations
+    'plugin:typescript-enum/recommended',
+  ],
   /**
    * Sorted alphanumerically within each group. built-in and each plugin form
    * their own groups.
@@ -11,8 +16,18 @@ module.exports = {
     'import/prefer-default-export': ['off'],
     // TODO move rule into the main repo once it has upgraded
     '@typescript-eslint/return-await': ['off'],
-    // TODO move rule into main repo to allow deep @mui/monorepo imports
-    'no-restricted-imports': ['off'],
+
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@mui/icons-material',
+            message: 'Use @mui/icons-material/<Icon> instead.',
+          },
+        ],
+      },
+    ],
     'no-restricted-syntax': [
       'error',
       // From https://github.com/airbnb/javascript/blob/d8cb404da74c302506f91e5928f30cc75109e74d/packages/eslint-config-airbnb-base/rules/style.js#L333
@@ -67,11 +82,37 @@ module.exports = {
       },
     },
     {
+      files: ['packages/toolpad-app/pages/**/*'],
+      rules: {
+        // The pattern is useful to type Next.js pages
+        'react/function-component-definition': 'off',
+      },
+    },
+    {
       // Disabling this rule for now:
       // https://github.com/mui/material-ui/blob/9737bc85bb6960adb742e7709e9c3710c4b6cedd/.eslintrc.js#L359
       files: ['packages/*/src/**/*{.ts,.tsx,.js}'],
       excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx'],
-      rules: { 'no-restricted-imports': 'off' },
+    },
+    {
+      files: ['packages/toolpad-core/**/*', 'packages/toolpad-components/**/*'],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            patterns: [
+              {
+                // Running into issues with @mui/icons-material not being an ESM package, while the
+                // toolpad-core package is. This makes Next.js try to load @mui/icons-material/* as ESM
+                // We'll just avoid importing icons in these packages
+                // Remove restriction after https://github.com/mui/material-ui/pull/30510 gets resolved
+                group: ['@mui/icons-material', '@mui/icons-material/*'],
+                message: "Don't use @mui/icons-material in these packages for now.",
+              },
+            ],
+          },
+        ],
+      },
     },
   ],
 };

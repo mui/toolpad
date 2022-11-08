@@ -2,14 +2,13 @@ import * as React from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 import App, { AppContext, AppProps, NextWebVitalsMetric } from 'next/app';
-import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { LicenseInfo } from '@mui/x-data-grid-pro';
 import { useRouter } from 'next/router';
 import config from '../src/config';
-import theme from '../src/theme';
+import { ThemeProvider } from '../src/ThemeContext';
 import createEmotionCache from '../src/createEmotionCache';
 import { MUI_X_PRO_LICENSE } from '../src/constants';
 import { queryClient } from '../src/api';
@@ -59,7 +58,7 @@ export default function MyApp(props: MyAppProps) {
           <link rel="icon" type="image/png" sizes="16x16" href={favicon16.src} />
         </Head>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider theme={theme}>
+          <ThemeProvider>
             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
             <CssBaseline />
             <Component {...pageProps} />

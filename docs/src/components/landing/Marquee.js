@@ -6,7 +6,7 @@ import Link from 'docs/src/modules/components/Link';
 import Typography from '@mui/material/Typography';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 
-const Marquee = ({ content }) => {
+function Marquee({ content }) {
   return (
     <Container
       sx={{
@@ -45,7 +45,7 @@ const Marquee = ({ content }) => {
       </Button>
     </Container>
   );
-};
+}
 
 Marquee.propTypes = {
   content: PropTypes.shape({

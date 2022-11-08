@@ -17,7 +17,6 @@ import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../..
 import {
   GoogleSheetsConnectionParams,
   GoogleSheetsApiQuery,
-  GoogleSheetsPrivateQueryType,
   GoogleDriveFile,
   GoogleSpreadsheet,
   GoogleSheet,
@@ -32,6 +31,7 @@ import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import QueryInputPanel from '../QueryInputPanel';
 import SplitPane from '../../components/SplitPane';
 import useQueryPreview from '../useQueryPreview';
+import useFetchPrivate from '../useFetchPrivate';
 
 const EMPTY_ROWS: any[] = [];
 
@@ -48,14 +48,14 @@ function QueryEditor({
   const debouncedSpreadsheetQuery = useDebounced(spreadsheetQuery, 300);
 
   const fetchedFiles: UseQueryResult<GoogleDriveFiles> = usePrivateQuery({
-    type: GoogleSheetsPrivateQueryType.FILES_LIST,
+    type: 'FILES_LIST',
     spreadsheetQuery: debouncedSpreadsheetQuery,
   });
 
   const fetchedFile: UseQueryResult<GoogleDriveFile> = usePrivateQuery(
     input.query.spreadsheetId
       ? {
-          type: GoogleSheetsPrivateQueryType.FILE_GET,
+          type: 'FILE_GET',
           spreadsheetId: input.query.spreadsheetId,
         }
       : null,
@@ -64,7 +64,7 @@ function QueryEditor({
   const fetchedSpreadsheet: UseQueryResult<GoogleSpreadsheet> = usePrivateQuery(
     input.query.spreadsheetId
       ? {
-          type: GoogleSheetsPrivateQueryType.FETCH_SPREADSHEET,
+          type: 'FETCH_SPREADSHEET',
           spreadsheetId: input.query.spreadsheetId,
         }
       : null,
@@ -127,13 +127,17 @@ function QueryEditor({
     [],
   );
 
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<
-    GoogleSheetsPrivateQuery,
-    GoogleSheetsResult
-  >({
-    type: GoogleSheetsPrivateQueryType.DEBUG_EXEC,
-    query: input.query,
-  });
+  const fetchPrivate = useFetchPrivate<GoogleSheetsPrivateQuery, GoogleSheetsResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: GoogleSheetsApiQuery) => fetchPrivate({ type: 'DEBUG_EXEC', query }),
+    [fetchPrivate],
+  );
+
+  const { preview, runPreview: handleRunPreview } = useQueryPreview(
+    fetchServerPreview,
+    input.query,
+    {},
+  );
 
   const rawRows: any[] = preview?.data || EMPTY_ROWS;
   const columns: GridColDef[] = React.useMemo(() => parseColumns(inferColumns(rawRows)), [rawRows]);
@@ -218,7 +222,7 @@ function ConnectionParamsInput({
 }: ConnectionEditorProps<GoogleSheetsConnectionParams>) {
   const validatedUser: UseQueryResult<GoogleDriveUser> = usePrivateQuery(
     {
-      type: GoogleSheetsPrivateQueryType.CONNECTION_STATUS,
+      type: 'CONNECTION_STATUS',
     },
     { retry: false },
   );

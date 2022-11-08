@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { Error as ErrorIcon } from '@mui/icons-material';
-import { Tooltip } from '@mui/material';
-import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS } from './constants.js';
 import type { SlotType, ComponentConfig, RuntimeEvent, RuntimeError } from './types';
 
@@ -53,10 +51,8 @@ function PlaceholderWrapper(props: PlaceholderWrapperProps) {
   );
 }
 
-export interface NodeRuntimeWrapperProps {
-  children: React.ReactElement;
-  nodeId: string;
-  componentConfig: ComponentConfig<any>;
+export interface NodeErrorProps {
+  error: RuntimeError;
 }
 
 export interface NodeFiberHostProps {
@@ -64,29 +60,6 @@ export interface NodeFiberHostProps {
   [RUNTIME_PROP_NODE_ID]: string;
   componentConfig: ComponentConfig<any>;
   nodeError?: RuntimeError | null;
-}
-
-interface NodeErrorProps {
-  error: RuntimeError;
-}
-
-function NodeError({ error }: NodeErrorProps) {
-  return (
-    <Tooltip title={error.message}>
-      <span
-        style={{
-          display: 'inline-flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: 8,
-          background: 'red',
-          color: 'white',
-        }}
-      >
-        <ErrorIcon color="inherit" style={{ marginRight: 8 }} /> Error
-      </span>
-    </Tooltip>
-  );
 }
 
 // We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
@@ -99,23 +72,38 @@ function NodeFiberHost({ children }: NodeFiberHostProps) {
   return children;
 }
 
-export function NodeRuntimeWrapper({ nodeId, componentConfig, children }: NodeRuntimeWrapperProps) {
+export interface NodeRuntimeWrapperProps {
+  children: React.ReactElement;
+  nodeId: string;
+  componentConfig: ComponentConfig<any>;
+  NodeError: React.ComponentType<NodeErrorProps>;
+}
+
+export function NodeRuntimeWrapper({
+  nodeId,
+  componentConfig,
+  children,
+  NodeError,
+}: NodeRuntimeWrapperProps) {
   const resetNodeErrorsKey = React.useContext(ResetNodeErrorsKeyContext);
+
+  const ErrorFallback = React.useCallback(
+    ({ error }: FallbackProps) => (
+      <NodeFiberHost
+        {...{
+          [RUNTIME_PROP_NODE_ID]: nodeId,
+          nodeError: error,
+          componentConfig,
+        }}
+      >
+        <NodeError error={error} />
+      </NodeFiberHost>
+    ),
+    [NodeError, componentConfig, nodeId],
+  );
+
   return (
-    <ErrorBoundary
-      resetKeys={[resetNodeErrorsKey]}
-      fallbackRender={({ error }) => (
-        <NodeFiberHost
-          {...{
-            [RUNTIME_PROP_NODE_ID]: nodeId,
-            nodeError: error,
-            componentConfig,
-          }}
-        >
-          <NodeError error={error} />
-        </NodeFiberHost>
-      )}
-    >
+    <ErrorBoundary resetKeys={[resetNodeErrorsKey]} fallbackRender={ErrorFallback}>
       <NodeRuntimeContext.Provider value={nodeId}>
         <NodeFiberHost
           {...{
@@ -199,9 +187,10 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
 export interface PlaceholderProps {
   prop: string;
   children?: React.ReactNode;
+  hasLayout?: boolean;
 }
 
-export function Placeholder({ prop, children }: PlaceholderProps) {
+export function Placeholder({ prop, children, hasLayout = false }: PlaceholderProps) {
   const nodeId = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
@@ -214,7 +203,7 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
       parentId={nodeId}
       {...{
         [RUNTIME_PROP_SLOTS]: prop,
-        slotType: 'single',
+        slotType: hasLayout ? 'layout' : 'single',
       }}
     />
   );

@@ -29,7 +29,7 @@ import {
   NodeId,
   JsExpressionAction,
 } from '@mui/toolpad-core';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { TabContext, TabList } from '@mui/lab';
 import { Maybe, WithControlledProp, GlobalScopeMeta } from '../../utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
@@ -43,6 +43,7 @@ import { useDom } from '../DomLoader';
 import * as appDom from '../../appDom';
 import { usePageEditorState } from './PageEditor/PageEditorProvider';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
+import TabPanel from '../../components/TabPanel';
 
 interface BindingEditorContext {
   label: string;
@@ -124,7 +125,7 @@ export function JsBindingEditor({ value, onChange }: JsBindingEditorProps) {
   const { label, globalScope, globalScopeMeta = {}, server, propType } = useBindingEditorContext();
   return (
     <Stack direction="row" sx={{ height: 400, gap: 2 }}>
-      <GlobalScopeExplorer value={globalScope} />
+      <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
 
       <Box
         sx={{
@@ -162,13 +163,21 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
     (newValue: string) => onChange({ type: 'jsExpressionAction', value: newValue }),
     [onChange],
   );
+
   return (
     <Box sx={{ my: 1 }}>
       <Typography>Run code when this event fires</Typography>
       <Box
-        sx={{ my: 3, display: 'flex', flexDirection: 'row', maxHeight: 250, alignItems: 'stretch' }}
+        sx={{
+          my: 3,
+          display: 'flex',
+          flexDirection: 'row',
+          maxHeight: 250,
+          alignItems: 'stretch',
+          gap: 2,
+        }}
       >
-        <GlobalScopeExplorer value={globalScope} />
+        <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
 
         <JsExpressionEditor
           sx={{ flex: 1 }}
@@ -257,13 +266,13 @@ function ActionEditor({ value, onChange }: ActionEditorProps) {
             <Tab label="Navigation" value="navigationAction" />
           </TabList>
         </Box>
-        <TabPanel value="jsExpressionAction">
+        <TabPanel value="jsExpressionAction" disableGutters>
           <JsExpressionActionEditor
             value={value?.type === 'jsExpressionAction' ? value : null}
             onChange={onChange}
           />
         </TabPanel>
-        <TabPanel value="navigationAction">
+        <TabPanel value="navigationAction" disableGutters>
           <NavigationActionEditor
             value={value?.type === 'navigationAction' ? value : null}
             onChange={onChange}
@@ -390,7 +399,7 @@ export function BindingEditor<V>({
 
   const bindingButton = (
     <Checkbox
-      aria-label="Bind property"
+      aria-label={`Bind property "${label}"`}
       checked={hasBinding}
       disabled={disabled}
       icon={<AddLinkIcon />}
@@ -412,15 +421,35 @@ export function BindingEditor<V>({
     </TooltipComponent>
   );
 
-  const bindingEditorContext: BindingEditorContext = {
-    label,
-    globalScope,
-    globalScopeMeta,
-    server,
-    disabled,
-    propType,
-    liveBinding,
-  };
+  const resolvedMeta = React.useMemo(() => {
+    const meta: GlobalScopeMeta = { ...globalScopeMeta };
+    if (propType?.type === 'event' && propType.arguments) {
+      for (const { name, tsType } of propType.arguments) {
+        meta[name] ??= {};
+        meta[name].tsType = tsType;
+      }
+    }
+
+    for (const [name, globalValue] of Object.entries(globalScope)) {
+      meta[name] ??= {};
+      meta[name].value = globalValue;
+    }
+
+    return meta;
+  }, [propType, globalScopeMeta, globalScope]);
+
+  const bindingEditorContext: BindingEditorContext = React.useMemo(
+    () => ({
+      label,
+      globalScope,
+      globalScopeMeta: resolvedMeta,
+      server,
+      disabled,
+      propType,
+      liveBinding,
+    }),
+    [disabled, globalScope, label, liveBinding, propType, resolvedMeta, server],
+  );
 
   return (
     <BindingEditorContextProvider value={bindingEditorContext}>

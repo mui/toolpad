@@ -6,6 +6,9 @@ import TreeView from '@mui/lab/TreeView';
 import MuiTreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import clsx from 'clsx';
 import { styled, lighten } from '@mui/material/styles';
+import { NodeApi, NodeRendererProps, Tree } from 'react-arborist';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { usePaletteMode } from '../ThemeContext';
 
 function getType(value: unknown) {
@@ -24,7 +27,9 @@ function getType(value: unknown) {
   return typeof value;
 }
 
-function getLabel(value: unknown, type: ReturnType<typeof getType>): string {
+type PropValueType = ReturnType<typeof getType>;
+
+function getLabel(value: unknown, type: PropValueType): string {
   switch (type) {
     case 'array':
       return `Array(${(value as unknown[]).length})`;
@@ -214,6 +219,61 @@ const MuiTreeViewLight = styled(TreeView)({
   },
 });
 
+interface ObjectTreePropertyNode {
+  id: string;
+  name: string;
+  value: unknown;
+  type: PropValueType;
+  children?: ObjectTreePropertyNode[];
+}
+
+function createTreeData(object: object, id = '$ROOT'): ObjectTreePropertyNode[] {
+  const result: ObjectTreePropertyNode[] = [];
+  for (const [name, value] of Object.entries(object)) {
+    const itemId = `${id}.${name}`;
+    const type = getType(value);
+    result.push({
+      id: itemId,
+      name,
+      value,
+      type,
+      children: value && typeof value === 'object' ? createTreeData(value, itemId) : undefined,
+    });
+  }
+  return result;
+}
+
+interface PropertyValueProps {
+  node: NodeApi<ObjectTreePropertyNode>;
+}
+
+function PropertyValue({ node }: PropertyValueProps) {
+  if (node.isClosed && node.data.type === 'object') {
+    return <React.Fragment>{'{…}'}</React.Fragment>;
+  }
+  if (node.isClosed && node.data.type === 'array') {
+    return <React.Fragment>{'[…]'}</React.Fragment>;
+  }
+  return <React.Fragment>{getLabel(node.data.value, node.data.type)}</React.Fragment>;
+}
+
+function ObjectPropertyEntry({
+  node,
+  style,
+  dragHandle,
+}: NodeRendererProps<ObjectTreePropertyNode>) {
+  return (
+    <div
+      style={{ whiteSpace: 'no-wrap', textOverFlow: 'ellipsis', overflow: 'hidden', ...style }}
+      ref={dragHandle}
+      onClick={() => node.toggle()}
+    >
+      {node.isLeaf ? ' ' : node.isOpen ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+      {node.data.name}: <PropertyValue node={node} />
+    </div>
+  );
+}
+
 interface MuiObjectInspectorProps {
   data?: unknown;
   expandPaths?: string[];
@@ -233,6 +293,10 @@ export default function MuiObjectInspector(props: MuiObjectInspectorProps) {
   }, [keyPrefix, expandPaths]);
   // for default*  to take effect we need to remount
   const key = React.useMemo(() => defaultExpanded.join(''), [defaultExpanded]);
+
+  if (data && typeof data === 'object') {
+    return <Tree initialData={createTreeData(data)}>{ObjectPropertyEntry}</Tree>;
+  }
 
   return (
     <MuiTreeView

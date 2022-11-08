@@ -1,9 +1,6 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import SvgIcon from '@mui/material/SvgIcon';
-import MuiTreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import clsx from 'clsx';
-import { styled, lighten } from '@mui/material/styles';
+import { styled, SvgIcon } from '@mui/material';
 import { NodeApi, NodeRendererProps, Tree } from 'react-arborist';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -60,98 +57,6 @@ function getTokenType(type: string): string {
     default:
       return type;
   }
-}
-
-const Color = styled('span')(({ theme }) => ({
-  backgroundColor: '#fff',
-  display: 'inline-block',
-  marginBottom: -1,
-  marginRight: theme.spacing(0.5),
-  border: '1px solid',
-  backgroundImage:
-    'url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%202%202%22%3E%3Cpath%20d%3D%22M1%202V0h1v1H0v1z%22%20fill-opacity%3D%22.2%22%2F%3E%3C%2Fsvg%3E")',
-}));
-
-interface ObjectEntryLabelProps {
-  objectKey?: unknown;
-  objectValue?: unknown;
-}
-
-function ObjectEntryLabel(props: ObjectEntryLabelProps) {
-  const { objectKey, objectValue } = props;
-  const type = getType(objectValue);
-  const label = getLabel(objectValue, type);
-  const tokenType = getTokenType(type);
-
-  return (
-    <React.Fragment>
-      {`${objectKey}: `}
-      {type === 'color' ? (
-        <Color style={{ borderColor: lighten(label, 0.7) }}>
-          <Box
-            component="span"
-            sx={{ display: 'block', width: 11, height: 11 }}
-            style={{ backgroundColor: label }}
-          />
-        </Color>
-      ) : null}
-      <span className={clsx('token', tokenType)}>{label}</span>
-    </React.Fragment>
-  );
-}
-
-const TreeItem = styled(MuiTreeItem)({
-  [`&:focus > .${treeItemClasses.content}`]: {
-    outline: `2px dashed ${lighten('#333', 0.3)}`,
-  },
-});
-
-interface ObjectEntriesProps {
-  nodeId: string;
-  entries: [string, unknown][];
-}
-
-function renderObjectEntries({ entries, nodeId }: ObjectEntriesProps): React.ReactNode {
-  return entries.map(([key, value]) => {
-    return (
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      <ObjectEntry key={key} nodeId={`${nodeId}.${key}`} objectKey={key} objectValue={value} />
-    );
-  });
-}
-
-interface ObjectEntriesProps {
-  nodeId: string;
-  entries: [string, unknown][];
-}
-
-interface ObjectEntryProps {
-  nodeId: string;
-  objectKey: string;
-  objectValue?: unknown;
-}
-
-function ObjectEntry(props: ObjectEntryProps) {
-  const { nodeId, objectKey, objectValue } = props;
-  let children = null;
-
-  if (
-    (objectValue !== null && typeof objectValue === 'object') ||
-    typeof objectValue === 'function'
-  ) {
-    children = renderObjectEntries({ entries: Object.entries(objectValue), nodeId });
-  }
-
-  const x = React.Children.count(children);
-
-  return (
-    <TreeItem
-      nodeId={nodeId}
-      label={<ObjectEntryLabel objectKey={objectKey} objectValue={objectValue} />}
-    >
-      {x > 0 ? children : undefined}
-    </TreeItem>
-  );
 }
 
 interface ObjectTreePropertyNode {

@@ -273,26 +273,34 @@ function ObjectPropertyEntry({
 }
 
 function useDimensions<E extends HTMLElement>(): [
-  React.RefObject<E>,
+  React.RefCallback<E>,
   { width?: number; height?: number },
 ] {
-  const ref = React.useRef<E>(null);
+  const elmRef = React.useRef<E | null>(null);
   const [dimensions, setDimensions] = React.useState({});
-  useEnhancedEffect(() => {
-    setDimensions(ref.current?.getBoundingClientRect().toJSON());
-  }, []);
+
   const observerRef = React.useRef<ResizeObserver | undefined>();
-  React.useEffect(() => {
+  const getObserver = () => {
     let observer = observerRef.current;
     if (!observer) {
       observer = new ResizeObserver(() => {
-        setDimensions(ref.current?.getBoundingClientRect().toJSON());
+        setDimensions(elmRef.current?.getBoundingClientRect().toJSON());
       });
       observerRef.current = observer;
     }
-    invariant(ref.current, 'ref not attached');
-    observer.observe(ref.current);
+    return observer;
+  };
+
+  const ref = React.useCallback((elm: E | null) => {
+    elmRef.current = elm;
+    setDimensions(elm?.getBoundingClientRect().toJSON());
+    const observer = getObserver();
+    observer.disconnect();
+    if (elm) {
+      observer.observe(elm);
+    }
   }, []);
+
   return [ref, dimensions];
 }
 

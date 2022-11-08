@@ -1,5 +1,7 @@
 import { transform, TransformResult } from 'sucrase';
 import { codeFrameColumns } from '@babel/code-frame';
+import * as React from 'react';
+import * as ReactDom from 'react-dom';
 import { findImports, isAbsoluteUrl } from '../utils/strings';
 import { errorFrom } from '../utils/errors';
 
@@ -16,7 +18,12 @@ async function createRequire(urlImports: string[]) {
     ),
   ]);
 
-  const modules: Map<string, any> = new Map([...muiMaterialExports, ...urlModules]);
+  const modules: Map<string, any> = new Map([
+    ['react', React],
+    ['react-dom', ReactDom],
+    ...muiMaterialExports,
+    ...urlModules,
+  ]);
 
   const require = (moduleId: string): unknown => {
     let esModule = modules.get(moduleId);

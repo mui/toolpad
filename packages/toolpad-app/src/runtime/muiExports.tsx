@@ -1,6 +1,3 @@
-import ReactDefault, * as React from 'react';
-
-import ReactDomDefault, * as ReactDom from 'react-dom';
 import DayJsDefault, * as DayJs from 'dayjs';
 import muiToolpadCoreDefault, * as muiToolpadCore from '@mui/toolpad-core';
 // eslint-disable-next-line no-restricted-imports
@@ -597,8 +594,6 @@ const muiDataGridProExports = new Map([
 ]);
 
 export default new Map([
-  ['react', esm(ReactDefault, React)],
-  ['react-dom', esm(ReactDomDefault, ReactDom)],
   ['dayjs', esm(DayJsDefault, DayJs)],
   ['@mui/toolpad-core', esm(muiToolpadCoreDefault, muiToolpadCore)],
   ['@mui/icons-material', esm(muiIconsMaterialDefault, muiIconsMaterial)],

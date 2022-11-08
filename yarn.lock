@@ -1858,8 +1858,8 @@
   resolved "https://github.com/mnajdova/material-ui.git#07c5477bfe688260da62ff851bdb1879e593ac37"
 
 "@mui/monorepo@https://github.com/mui/material-ui.git":
-  version "5.10.9"
-  resolved "https://github.com/mui/material-ui.git#27f9a61821a3d4d76ca0a085f9c779356ccd7753"
+  version "5.10.12"
+  resolved "https://github.com/mui/material-ui.git#669cca113d852c3fd2b1030305bae54648042b50"
 
 "@mui/private-theming@^5.10.9":
   version "5.10.9"

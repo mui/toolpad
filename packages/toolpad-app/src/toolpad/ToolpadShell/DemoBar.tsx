@@ -20,7 +20,7 @@ const DemoBarContainer = styled(Box)({
   zIndex: 1,
 });
 
-export default function ToolpadShell() {
+export default function DemoBar() {
   return (
     <DemoBarContainer>
       <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>

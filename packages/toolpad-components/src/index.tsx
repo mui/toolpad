@@ -4,15 +4,13 @@ export { default as PageColumn } from './PageColumn.js';
 
 export { default as Stack } from './Stack.js';
 
+export { default as Text } from './Text.js';
+
 export { default as Button } from './Button.js';
 
 export { default as DataGrid } from './DataGrid.js';
 
-export { default as Markdown } from './Markdown.js';
-
 export { default as TextField } from './TextField.js';
-
-export { default as Typography } from './Typography.js';
 
 export { default as Select } from './Select.js';
 

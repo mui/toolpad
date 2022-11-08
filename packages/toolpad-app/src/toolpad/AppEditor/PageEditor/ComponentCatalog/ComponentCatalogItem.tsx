@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import SmartButtonIcon from '@mui/icons-material/SmartButton';
 import ImageIcon from '@mui/icons-material/Image';
 import GridOnIcon from '@mui/icons-material/GridOn';
-import TextFieldsIcon from '@mui/icons-material/TextFields';
 import Crop75Icon from '@mui/icons-material/Crop75';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import LayersIcon from '@mui/icons-material/Layers';
@@ -23,10 +22,10 @@ import NotesIcon from '@mui/icons-material/Notes';
 import { SvgIconProps } from '@mui/material/SvgIcon';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
+  ['Text', NotesIcon],
   ['Button', SmartButtonIcon],
   ['Image', ImageIcon],
   ['DataGrid', GridOnIcon],
-  ['Typography', TextFieldsIcon],
   ['TextField', Crop75Icon],
   ['Select', ArrowDropDownCircleIcon],
   ['Paper', LayersIcon],
@@ -41,7 +40,6 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Checkbox', CheckBoxIcon],
   ['CodeComponent', DashboardCustomizeSharpIcon],
   ['CreateNew', AddIcon],
-  ['Markdown', NotesIcon],
 ]);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';

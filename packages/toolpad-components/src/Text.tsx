@@ -5,13 +5,22 @@ import {
   TypographyProps as MuiTypographyProps,
 } from '@mui/material';
 import { createComponent } from '@mui/toolpad-core';
+import ReactMarkdown from 'react-markdown';
 
-interface TypographyProps extends Omit<MuiTypographyProps, 'children'> {
+interface TextProps extends Omit<MuiTypographyProps, 'children'> {
   value: string;
   loading?: boolean;
+  markdown?: boolean;
 }
 
-function Typography({ value, loading, sx, ...rest }: TypographyProps) {
+function Text({ value, loading, markdown, sx, ...rest }: TextProps) {
+  if (markdown) {
+    return loading ? (
+      <Skeleton width={150} />
+    ) : (
+      <ReactMarkdown linkTarget={'_blank'}>{value}</ReactMarkdown>
+    );
+  }
   return (
     <MuiTypography
       sx={{
@@ -28,7 +37,7 @@ function Typography({ value, loading, sx, ...rest }: TypographyProps) {
   );
 }
 
-export default createComponent(Typography, {
+export default createComponent(Text, {
   layoutDirection: 'both',
   loadingPropSource: ['value'],
   loadingProp: 'loading',
@@ -49,6 +58,10 @@ export default createComponent(Typography, {
     },
     sx: {
       typeDef: { type: 'object' },
+    },
+    markdown: {
+      typeDef: { type: 'boolean' },
+      defaultValue: false,
     },
   },
 });

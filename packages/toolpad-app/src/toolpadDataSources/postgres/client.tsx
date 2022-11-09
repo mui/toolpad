@@ -3,7 +3,7 @@ import { ClientDataSource, ConnectionEditorProps } from '../../types';
 import { SqlConnectionParams, SqlQuery } from '../sql/types';
 import { QueryEditor, ConnectionParamsInput, getInitialQueryValue } from '../sql/client';
 
-function MySQLConnectionParamsInput({
+function PostgreSQLConnectionParamsInput({
   value,
   onChange,
 }: ConnectionEditorProps<SqlConnectionParams>) {
@@ -12,7 +12,7 @@ function MySQLConnectionParamsInput({
 
 const dataSource: ClientDataSource<SqlConnectionParams, SqlQuery> = {
   displayName: 'PostgreSQL',
-  ConnectionParamsInput: MySQLConnectionParamsInput,
+  ConnectionParamsInput: PostgreSQLConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,
 };

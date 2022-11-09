@@ -112,6 +112,12 @@ export class ToolpadEditor {
     ]);
   }
 
+  waitForOverlay() {
+    const hudOverlay = this.appCanvas.getByTestId('hud-overlay');
+
+    return expect(hudOverlay).toBeVisible();
+  }
+
   async dragToAppCanvas(
     sourceSelector: string,
     isSourceInCanvas: boolean,

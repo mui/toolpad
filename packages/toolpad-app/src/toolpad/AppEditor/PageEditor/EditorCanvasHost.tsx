@@ -155,8 +155,9 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
             return;
           }
 
-          const { code, metaKey, shiftKey, ctrlKey } = event;
-          const undoShortcut = code === 'KeyZ' && (metaKey || ctrlKey);
+          const { metaKey, shiftKey, ctrlKey } = event;
+          const isZ = event.key.toLowerCase() === 'z';
+          const undoShortcut = isZ && (metaKey || ctrlKey);
           const redoShortcut = undoShortcut && shiftKey;
 
           if (redoShortcut) {

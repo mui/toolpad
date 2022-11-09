@@ -1,6 +1,7 @@
 import { ServerDataSource } from '../types';
 import functionSrc from './function/server';
 import postgres from './postgres/server';
+import mysql from './mysql/server';
 import rest from './rest/server';
 import googleSheets from './googleSheets/server';
 import movies from './movies/server';
@@ -18,6 +19,7 @@ const serverDataSources: ServerDataSources = config.isDemo
       function: functionSrc,
       rest,
       googleSheets,
+      mysql,
     };
 
 export default serverDataSources;

@@ -46,7 +46,7 @@ export function AppModulesProvider({ dom, children }: AppModulesProviderProps) {
 
     if (content) {
       if (!fromCache) {
-        const createPromise = loadModule(content).then(
+        const createPromise = loadModule(content, id).then(
           (module: unknown) => {
             cache.set(cacheId, {
               state: 'loaded',

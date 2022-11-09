@@ -16,7 +16,7 @@ export type UseCodeComponent =
       error: Error;
     };
 
-export default function useCodeComponent(src: string | null): UseCodeComponent {
+export default function useCodeComponent(src: string | null, filename: string): UseCodeComponent {
   const [state, setState] = React.useState<UseCodeComponent>({});
 
   React.useEffect(() => {
@@ -25,7 +25,7 @@ export default function useCodeComponent(src: string | null): UseCodeComponent {
     }
 
     const startSrc = src;
-    loadCodeComponent(startSrc)
+    loadCodeComponent(startSrc, filename)
       .then((Component) => {
         if (startSrc === src) {
           setState({ Component });
@@ -36,7 +36,7 @@ export default function useCodeComponent(src: string | null): UseCodeComponent {
           setState({ error });
         }
       });
-  }, [src]);
+  }, [src, filename]);
 
   return state;
 }

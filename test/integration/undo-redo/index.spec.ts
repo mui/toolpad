@@ -3,6 +3,7 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadHome } from '../../models/ToolpadHome';
 import { test, expect } from '../../playwright/test';
 import { readJsonFile } from '../../utils/fs';
+import clickCenter from '../../utils/clickCenter';
 
 test('test basic undo and redo', async ({ page, browserName }) => {
   const homeModel = new ToolpadHome(page);
@@ -56,33 +57,26 @@ test('test batching quick actions into single undo entry', async ({ page, browse
   const app = await homeModel.createApplication({ dom: domInput });
   await editorModel.goto(app.id);
 
-  await editorModel.pageRoot.waitFor();
+  await editorModel.waitForOverlay();
 
-  const canvasInputLocator = editorModel.appCanvas.locator('input');
-  const canvasButtonLocator = editorModel.appCanvas.getByRole('button', { name: 'Button Text' });
+  const input = editorModel.appCanvas.locator('input').first();
 
-  // Initially we should 2 text fields
-  await expect(canvasInputLocator).toHaveCount(2);
+  clickCenter(page, input);
 
-  // Add one more text field and button
-  await editorModel.dragNewComponentToAppCanvas('Text field');
-  await expect(canvasInputLocator).toHaveCount(3);
+  await page.getByLabel('defaultValue').fill('some value');
+  await page.getByLabel('label').fill('some label');
 
-  await editorModel.dragNewComponentToAppCanvas('Button');
-
-  // await page.pause();
-
-  await expect(canvasButtonLocator).toHaveCount(1);
+  await expect(input).toHaveValue('some value');
+  await expect(editorModel.appCanvas.getByLabel('some label')).toBeVisible();
 
   // Wait for undo stack to be updated
   await page.waitForTimeout(600);
 
   const undoButton = page.locator('[data-testid=undo-button]');
-
-  // Undo adding text field
+  // Undo changes
   undoButton.click();
 
-  // Ensure that undo removed extra text field and button
-  await expect(canvasInputLocator).toHaveCount(2);
-  await expect(canvasButtonLocator).toHaveCount(0);
+  // Asssert that batched changes were reverted
+  await expect(input).toHaveValue('');
+  await expect(editorModel.appCanvas.getByLabel('some label')).not.toBeVisible();
 });

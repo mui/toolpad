@@ -86,10 +86,6 @@
     "semver": "^7.3.8",
     "yargs": "^17.6.2"
   },
-  "resolutions": {
-    "@types/react": "18.0.19",
-    "@types/react-dom": "18.0.8"
-  },
   "engines": {
     "npm": "please-use-yarn",
     "node": ">=16.17"

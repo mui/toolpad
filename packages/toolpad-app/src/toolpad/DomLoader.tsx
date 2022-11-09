@@ -479,7 +479,7 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [state.unsavedChanges]);
 
-  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
+  useShortcut({ key: 's', metaKey: true }, handleSave);
 
   return (
     <DomLoaderProvider value={state}>

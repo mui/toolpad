@@ -178,7 +178,7 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
     !allChangesAreCommitted,
   );
 
-  useShortcut({ code: 'KeyS', metaKey: true }, handleSave);
+  useShortcut({ key: 's', metaKey: true }, handleSave);
 
   const [iframeLoaded, onLoad] = React.useReducer(() => true, false);
 

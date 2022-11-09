@@ -34,7 +34,7 @@ export default function ConnectionSelect({
     const result: ConnectionOption[] = [];
 
     for (const [dataSourceId, config] of Object.entries(dataSources)) {
-      if (config?.hasDefault && !envConfig.isDemo) {
+      if (config?.hasDefault && (!envConfig.isDemo || config.isDemoFeature)) {
         if (!dataSource || filteredSources.has(dataSourceId)) {
           result.push({
             dataSourceId,
@@ -55,6 +55,13 @@ export default function ConnectionSelect({
           });
         }
       }
+    }
+
+    if (envConfig.isDemo) {
+      result.push({
+        dataSourceId: 'movies',
+        connectionId: null,
+      });
     }
 
     return result;
@@ -95,12 +102,14 @@ export default function ConnectionSelect({
           ? config.displayName
           : `<unknown datasource "${option.dataSourceId}">`;
 
+        const defaultConnectionLabel = config?.isSingleQuery ? '' : '<default>';
+
         const connectionLabel = option.connectionId
           ? appDom.getMaybeNode(dom, option.connectionId)?.name
-          : '<default>';
+          : defaultConnectionLabel;
         return (
           <MenuItem key={index} value={index}>
-            {dataSourceLabel} | {connectionLabel}
+            {dataSourceLabel} {connectionLabel ? `| ${connectionLabel}` : ''}
           </MenuItem>
         );
       })}

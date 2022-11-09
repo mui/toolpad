@@ -105,6 +105,8 @@ export interface ClientDataSource<C = {}, Q = {}> {
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
+  isDemoFeature?: boolean;
+  isSingleQuery?: boolean;
 }
 
 export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetchResult> {

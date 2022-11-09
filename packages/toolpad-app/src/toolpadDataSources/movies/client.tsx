@@ -102,10 +102,12 @@ function getInitialQueryValue(): MoviesQuery {
 }
 
 const dataSource: ClientDataSource<MoviesConnectionParams, MoviesQuery> = {
-  displayName: 'Fake Movies API',
+  displayName: 'Movies Mock API',
   ConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,
+  isDemoFeature: true,
+  isSingleQuery: true,
 };
 
 export default dataSource;

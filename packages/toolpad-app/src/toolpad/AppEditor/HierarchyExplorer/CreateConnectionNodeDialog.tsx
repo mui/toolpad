@@ -17,6 +17,7 @@ import { ExactEntriesOf } from '../../../utils/types';
 import DialogForm from '../../../components/DialogForm';
 import { useNodeNameValidation } from './validation';
 import useEvent from '../../../utils/useEvent';
+import config from '../../../config';
 
 const DEFAULT_NAME = 'connection';
 
@@ -107,12 +108,24 @@ export default function CreateConnectionDialog({
             onChange={(event) => setDataSourceType(event.target.value)}
           >
             {(Object.entries(dataSources) as ExactEntriesOf<typeof dataSources>).map(
-              ([type, dataSourceDef]) =>
-                dataSourceDef && (
-                  <MenuItem key={type} value={type}>
-                    {dataSourceDef.displayName}
-                  </MenuItem>
-                ),
+              ([type, dataSourceDef]) => {
+                const isDisabledInDemo = config.isDemo && !dataSourceDef?.isDemoFeature;
+                const isSelectable = dataSourceDef && !dataSourceDef.isSingleQuery;
+
+                return (
+                  isSelectable && (
+                    <MenuItem
+                      key={type}
+                      value={type}
+                      disabled={isDisabledInDemo}
+                      sx={{ justifyContent: 'space-between' }}
+                    >
+                      {dataSourceDef.displayName}
+                      <span>{isDisabledInDemo ? '(Self-host only)' : null}</span>
+                    </MenuItem>
+                  )
+                );
+              },
             )}
           </TextField>
         </DialogContent>

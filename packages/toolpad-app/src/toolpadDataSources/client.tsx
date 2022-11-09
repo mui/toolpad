@@ -8,16 +8,12 @@ import config from '../config';
 
 type ClientDataSources = { [key: string]: ClientDataSource<any, any> | undefined };
 
-const clientDataSources: ClientDataSources = config.isDemo
-  ? {
-      movies,
-      rest,
-    }
-  : {
-      postgres,
-      function: functionSrc,
-      rest,
-      googleSheets,
-    };
+const clientDataSources: ClientDataSources = {
+  rest,
+  function: functionSrc,
+  postgres,
+  googleSheets,
+  ...(config.isDemo ? { movies } : {}),
+};
 
 export default clientDataSources;

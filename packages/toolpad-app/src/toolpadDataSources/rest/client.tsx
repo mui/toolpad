@@ -15,6 +15,7 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  Link,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
@@ -57,9 +58,9 @@ import Devtools from '../../components/Devtools';
 import { createHarLog, mergeHar } from '../../utils/har';
 import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
-import DEMO_BASE_URLS from './demoBaseUrls';
 import useFetchPrivate from '../useFetchPrivate';
 import { clientExec } from './runtime';
+import { DOCUMENTATION_INSTALLATION_URL } from '../../constants';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -168,17 +169,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
 
   return (
     <Stack direction="column" gap={3} sx={{ py: 3 }}>
-      {config.isDemo ? (
-        <TextField select {...baseUrlInputProps} defaultValue="">
-          {DEMO_BASE_URLS.map(({ url, name }) => (
-            <MenuItem key={url} value={url}>
-              {url} ({name})
-            </MenuItem>
-          ))}
-        </TextField>
-      ) : (
-        <TextField {...baseUrlInputProps} />
-      )}
+      <TextField {...baseUrlInputProps} />
       <Typography>Headers:</Typography>
       <Controller
         name="headers"
@@ -188,7 +179,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
           return (
             <MapEntriesEditor
               {...field}
-              disabled={!headersAllowed || config.isDemo}
+              disabled={!headersAllowed}
               fieldLabel="header"
               value={allHeaders}
               onChange={(headers) => onFieldChange(headers.slice(authenticationHeaders.length))}
@@ -202,11 +193,7 @@ function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<RestCo
         name="authentication"
         control={control}
         render={({ field: { value: fieldValue, ref, ...field } }) => (
-          <AuthenticationEditor
-            {...field}
-            disabled={!headersAllowed || config.isDemo}
-            value={fieldValue ?? null}
-          />
+          <AuthenticationEditor {...field} disabled={!headersAllowed} value={fieldValue ?? null} />
         )}
       />
 
@@ -431,9 +418,8 @@ function QueryEditor({
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
               <TextField
                 select
-                value={config.isDemo ? 'GET' : input.attributes.query.value.method || 'GET'}
+                value={input.attributes.query.value.method || 'GET'}
                 onChange={handleMethodChange}
-                disabled={config.isDemo}
               >
                 {HTTP_METHODS.map((method) => (
                   <MenuItem key={method} value={method}>
@@ -455,11 +441,22 @@ function QueryEditor({
               />
             </Box>
             <FormGroup>
+              {config.isDemo ? (
+                <Alert severity="info">
+                  Can only run queries in browser in demo mode.
+                  <br />
+                  <Link href={DOCUMENTATION_INSTALLATION_URL} target="_blank">
+                    Try self-hosting
+                  </Link>{' '}
+                  for full functionality.
+                </Alert>
+              ) : null}
               <FormControlLabel
                 control={
                   <Checkbox
                     checked={input.attributes.query.value.browser}
                     onChange={handleRunInBrowserChange}
+                    disabled={config.isDemo}
                   />
                 }
                 label="Run in the browser"
@@ -470,9 +467,9 @@ function QueryEditor({
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                   <TabList onChange={handleActiveTabChange} aria-label="Fetch options active tab">
                     <Tab label="URL query" value="urlQuery" />
-                    <Tab label="Body" value="body" disabled={config.isDemo} />
-                    <Tab label="Headers" value="headers" disabled={config.isDemo} />
-                    <Tab label="Response" value="response" disabled={config.isDemo} />
+                    <Tab label="Body" value="body" />
+                    <Tab label="Headers" value="headers" />
+                    <Tab label="Response" value="response" />
                     <Tab label="Transform" value="transform" />
                   </TabList>
                 </Box>
@@ -571,6 +568,7 @@ function getInitialQueryValue(): FetchQuery {
   return {
     method: 'GET',
     headers: [],
+    browser: config.isDemo,
   };
 }
 
@@ -580,6 +578,7 @@ const dataSource: ClientDataSource<RestConnectionParams, FetchQuery> = {
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,
+  isDemoFeature: true,
 };
 
 export default dataSource;

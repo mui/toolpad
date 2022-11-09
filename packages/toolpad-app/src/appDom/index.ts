@@ -7,6 +7,7 @@ import {
   BindableAttrValue,
   BindableAttrValues,
   SecretAttrValue,
+  BindableAttrEntries,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
@@ -117,7 +118,7 @@ export type FetchMode = 'query' | 'mutation';
  */
 export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
-  readonly params?: BindableAttrValues;
+  readonly params?: BindableAttrEntries;
   readonly attributes: {
     readonly mode?: ConstantAttrValue<FetchMode>;
     readonly dataSource?: ConstantAttrValue<string>;
@@ -694,6 +695,20 @@ export function setNamespacedProp<
   return update(node, {
     [namespace]: omit(node[namespace], prop) as Partial<Node[Namespace]>,
   } as Partial<Node>);
+}
+
+export function setQueryProp<Q, K extends keyof Q>(
+  node: QueryNode<Q>,
+  prop: K,
+  value: Q[K],
+): QueryNode<Q> {
+  const original = node.attributes.query.value;
+  return setNamespacedProp(
+    node,
+    'attributes',
+    'query',
+    createConst<Q>({ ...original, [prop]: value }),
+  );
 }
 
 export function setNodeNamespacedProp<

@@ -16,8 +16,11 @@ export function ensureToolpadComponent<P>(Component: unknown): ToolpadComponent<
   return createComponent(Component);
 }
 
-export default async function loadCodeComponent(src: string): Promise<ToolpadComponent> {
-  const { default: Component } = await loadModule(src);
+export default async function loadCodeComponent(
+  src: string,
+  filename: string,
+): Promise<ToolpadComponent> {
+  const { default: Component } = await loadModule(src, filename);
 
   if (!ReactIs.isValidElementType(Component) || typeof Component === 'string') {
     throw new Error(`No React Component exported.`);

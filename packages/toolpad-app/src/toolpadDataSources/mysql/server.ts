@@ -2,19 +2,19 @@ import { createConnection } from 'mysql2/promise';
 import { ServerDataSource } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
-import {
-  MySQLConnectionParams,
-  MySQLPrivateQuery,
-  MySQLQueryConfig,
-  MySQLQuery,
-  MySQLResult,
-} from './types';
 import { asArray } from '../../utils/collections';
+import { SqlConnectionParams, SqlPrivateQuery, SqlQuery, SqlResult } from '../sql/types';
+import { SqlExec, SqlExecPrivate } from '../sql/server';
 
 /**
  * Substitute all variables including named paramters ($varName) in a MySQL query with the placeholder '?'
  * and return an array containing the values to replace the placeholders with
  */
+
+interface MySQLQueryConfig {
+  mysqlQuery: string;
+  substitutions: any[];
+}
 
 function prepareQuery(sql: string, params: Record<string, string>): MySQLQueryConfig {
   const substitutions: any[] = [];
@@ -44,13 +44,10 @@ function prepareQuery(sql: string, params: Record<string, string>): MySQLQueryCo
 }
 
 async function execBase(
-  connection: Maybe<MySQLConnectionParams>,
-  query: MySQLQuery,
+  connection: Maybe<SqlConnectionParams>,
+  query: SqlQuery,
   params: Record<string, string>,
-): Promise<MySQLResult> {
-  if (!connection?.password) {
-    throw new Error(`Password required`);
-  }
+): Promise<SqlResult> {
   const mysqlConnection = await createConnection({ ...connection });
 
   try {
@@ -70,43 +67,27 @@ async function execBase(
 }
 
 async function exec(
-  connection: Maybe<MySQLConnectionParams>,
-  postgresQuery: MySQLQuery,
+  connection: Maybe<SqlConnectionParams>,
+  query: SqlQuery,
   params: Record<string, string>,
-): Promise<MySQLResult> {
-  const { data, error } = await execBase(connection, postgresQuery, params);
+): Promise<SqlResult> {
+  const { data, error } = await SqlExec(connection, query, params, execBase);
   return { data, error };
 }
 
-async function execPrivate(
-  connection: Maybe<MySQLConnectionParams>,
-  query: MySQLPrivateQuery,
-): Promise<any>;
-async function execPrivate(
-  connection: Maybe<MySQLConnectionParams>,
-  query: MySQLPrivateQuery,
-): Promise<any> {
-  switch (query.kind) {
-    case 'debugExec':
-      return execBase(connection, query.query, query.params);
-    case 'connectionStatus': {
-      const mysqlConnection = await createConnection({ ...query.params });
-      try {
-        await mysqlConnection.execute('SELECT 1');
-        return { error: null };
-      } catch (rawError) {
-        const err = errorFrom(rawError);
-        return { error: err.message };
-      } finally {
-        mysqlConnection.end();
-      }
-    }
-    default:
-      throw new Error(`Unknown query "${(query as MySQLPrivateQuery).kind}"`);
-  }
+async function test(connection: Maybe<SqlConnectionParams>): Promise<void> {
+  const mysqlConnection = await createConnection({ ...connection });
+  mysqlConnection.execute('SELECT 1');
 }
 
-const dataSource: ServerDataSource<MySQLConnectionParams, MySQLQuery, any> = {
+async function execPrivate(
+  connection: Maybe<SqlConnectionParams>,
+  query: SqlPrivateQuery,
+): Promise<any> {
+  return SqlExecPrivate(connection, query, execBase, test);
+}
+
+const dataSource: ServerDataSource<SqlConnectionParams, SqlQuery, any> = {
   execPrivate,
   exec,
 };

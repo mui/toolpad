@@ -2,12 +2,8 @@ import { Client, QueryConfig } from 'pg';
 import { ServerDataSource } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
-import {
-  PostgresConnectionParams,
-  PostgresPrivateQuery,
-  PostgresQuery,
-  PostgresResult,
-} from './types';
+import { SqlConnectionParams, SqlPrivateQuery, SqlQuery, SqlResult } from '../sql/types';
+import { SqlExec, SqlExecPrivate } from '../sql/server';
 
 /**
  * Substitute named parameters ($varName) in a postgres query with their positional parameter ($1)
@@ -45,10 +41,10 @@ function parseErrorMessage(msg: string, params: [string, any][]): string {
 }
 
 async function execBase(
-  connection: Maybe<PostgresConnectionParams>,
-  postgresQuery: PostgresQuery,
+  connection: Maybe<SqlConnectionParams>,
+  postgresQuery: SqlQuery,
   params: Record<string, string>,
-): Promise<PostgresResult> {
+): Promise<SqlResult> {
   if (!connection?.password) {
     // pg client doesn't support passwordless authentication atm
     // See https://github.com/brianc/node-postgres/issues/1927
@@ -77,42 +73,28 @@ async function execBase(
 }
 
 async function exec(
-  connection: Maybe<PostgresConnectionParams>,
-  postgresQuery: PostgresQuery,
+  connection: Maybe<SqlConnectionParams>,
+  postgresQuery: SqlQuery,
   params: Record<string, string>,
-): Promise<PostgresResult> {
-  const { data, error } = await execBase(connection, postgresQuery, params);
+): Promise<SqlResult> {
+  const { data, error } = await SqlExec(connection, postgresQuery, params, execBase);
   return { data, error };
 }
 
+const test = async (connection: Maybe<SqlConnectionParams>) => {
+  const client = new Client({ ...connection });
+  await client.connect();
+  await client.query('SELECT * FROM version();');
+};
+
 async function execPrivate(
-  connection: Maybe<PostgresConnectionParams>,
-  query: PostgresPrivateQuery,
-): Promise<any>;
-async function execPrivate(
-  connection: Maybe<PostgresConnectionParams>,
-  query: PostgresPrivateQuery,
+  connection: Maybe<SqlConnectionParams>,
+  query: SqlPrivateQuery,
 ): Promise<any> {
-  switch (query.kind) {
-    case 'debugExec':
-      return execBase(connection, query.query, query.params);
-    case 'connectionStatus': {
-      try {
-        const client = new Client({ ...query.params });
-        await client.connect();
-        await client.query('SELECT * FROM version();');
-        return { error: null };
-      } catch (rawError) {
-        const err = errorFrom(rawError);
-        return { error: err.message };
-      }
-    }
-    default:
-      throw new Error(`Unknown query "${(query as PostgresPrivateQuery).kind}"`);
-  }
+  return SqlExecPrivate(connection, query, execBase, test);
 }
 
-const dataSource: ServerDataSource<PostgresConnectionParams, PostgresQuery, any> = {
+const dataSource: ServerDataSource<SqlConnectionParams, SqlQuery, any> = {
   execPrivate,
   exec,
 };

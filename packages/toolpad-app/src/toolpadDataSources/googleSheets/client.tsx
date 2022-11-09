@@ -147,7 +147,7 @@ function QueryEditor({
             fullWidth
             value={fetchedFile.data ?? null}
             loading={fetchedFiles.isLoading}
-            loadingText={'Loading...'}
+            loadingText={'Loading…'}
             options={fetchedFiles.data?.files ?? []}
             getOptionLabel={(option: GoogleDriveFile) => option.name ?? ''}
             onInputChange={handleSpreadsheetInput}
@@ -168,7 +168,7 @@ function QueryEditor({
             fullWidth
             loading={fetchedSpreadsheet.isLoading}
             value={selectedSheet}
-            loadingText={'Loading...'}
+            loadingText={'Loading…'}
             options={fetchedSpreadsheet.data?.sheets ?? []}
             getOptionLabel={(option: GoogleSheet) => option.properties?.title ?? ''}
             onChange={handleSheetChange}

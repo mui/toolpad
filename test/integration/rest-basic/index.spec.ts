@@ -6,7 +6,14 @@ import { readJsonFile } from '../../utils/fs';
 
 // We can run our own httpbin instance if necessary:
 //    $ docker run -p 80:80 kennethreitz/httpbin
-const HTTPBIN_BASEURL = process.env.HTTPBIN_BASEURL || 'https://httpbin.org/';
+const customHttbinBaseUrl = process.env.HTTPBIN_BASEURL;
+
+if (customHttbinBaseUrl) {
+  // eslint-disable-next-line no-console
+  console.log(`Running tests with custom httpbin service: ${customHttbinBaseUrl}`);
+}
+
+const HTTPBIN_BASEURL = customHttbinBaseUrl || 'https://httpbin.org/';
 
 test('functions basics', async ({ page }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './restDom.json'));
@@ -14,7 +21,7 @@ test('functions basics', async ({ page }) => {
   const httpbinConnection: any = Object.values(dom.nodes).find(
     (node: any) => node.name === 'httpbin',
   );
-  httpbinConnection.attributes.params.value.baseurl = HTTPBIN_BASEURL;
+  httpbinConnection.attributes.params.value.baseUrl = HTTPBIN_BASEURL;
 
   const homeModel = new ToolpadHome(page);
   await homeModel.goto();

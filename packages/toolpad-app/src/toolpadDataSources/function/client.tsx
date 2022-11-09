@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
+import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
   FunctionConnectionParams,
@@ -25,7 +26,9 @@ import QueryInputPanel from '../QueryInputPanel';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import useShortcut from '../../utils/useShortcut';
 import { tryFormat } from '../../utils/prettier';
-import config from '../../config';
+import useFetchPrivate from '../useFetchPrivate';
+import { MOVIES_API_DEMO_URL } from '../demo';
+import * as appDom from '../../appDom';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -84,7 +87,7 @@ function ConnectionParamsInput({
 
 const DEFAULT_MODULE = `export default async function ({ parameters }: ToolpadFunctionEvent) {
   console.info("Executing function with parameters:", parameters);
-  const url = new URL("${new URL('/static/movies.json', config.externalUrl).href}");
+  const url = new URL("${MOVIES_API_DEMO_URL}");
   url.searchParams.set("timestamp", String(Date.now()));
 
   const response = await fetch(String(url));
@@ -97,14 +100,25 @@ const DEFAULT_MODULE = `export default async function ({ parameters }: ToolpadFu
 }
 `;
 
+const EMPTY_PARAMS: BindableAttrEntries = [];
+
 function QueryEditor({
   globalScope,
   value: input,
   onChange: setInput,
   onCommit,
 }: QueryEditorProps<FunctionConnectionParams, FunctionQuery>) {
+  const paramsEntries = input.params || EMPTY_PARAMS;
+
+  const handleParamsChange = React.useCallback(
+    (newParams: [string, BindableAttrValue<string>][]) => {
+      setInput((existing) => ({ ...existing, params: newParams }));
+    },
+    [setInput],
+  );
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    input: input.params,
+    input: paramsEntries,
     globalScope,
   });
 
@@ -113,17 +127,19 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
+  const fetchPrivate = useFetchPrivate<FunctionPrivateQuery, FunctionResult>();
+  const fetchServerPreview = React.useCallback(
+    (query: FunctionQuery, params: Record<string, string>) =>
+      fetchPrivate({ kind: 'debugExec', query, params }),
+    [fetchPrivate],
+  );
+
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview: handleRunPreview } = useQueryPreview<
-    FunctionPrivateQuery,
-    FunctionResult
-  >(
-    {
-      kind: 'debugExec',
-      query: input.query,
-      params: previewParams,
-    },
+  const { preview, runPreview: handleRunPreview } = useQueryPreview(
+    fetchServerPreview,
+    input.attributes.query.value,
+    previewParams,
     {
       onPreview(result) {
         setPreviewLogs((existing) => [...existing, ...result.logs]);
@@ -137,7 +153,7 @@ function QueryEditor({
   });
 
   const extraLibs = React.useMemo(() => {
-    const paramsKeys = input.params.map(([key]) => key);
+    const paramsKeys = paramsEntries.map(([key]) => key);
     const paramsMembers = paramsKeys.map((key) => `${key}: string`).join('\n');
     const secretsMembers = secretsKeys.map((key) => `${key}: string`).join('\n');
 
@@ -158,7 +174,7 @@ function QueryEditor({
     `;
 
     return [{ content, filePath: 'global.d.ts' }];
-  }, [input.params, secretsKeys]);
+  }, [paramsEntries, secretsKeys]);
 
   const handleLogClear = React.useCallback(() => setPreviewLogs([]), []);
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
@@ -172,10 +188,10 @@ function QueryEditor({
         <QueryInputPanel onRunPreview={handleRunPreview}>
           <Box sx={{ flex: 1, minHeight: 0 }}>
             <TypescriptEditor
-              value={input.query.module}
-              onChange={(newValue) =>
-                setInput((existing) => ({ ...existing, query: { module: newValue } }))
-              }
+              value={input.attributes.query.value.module}
+              onChange={(newValue) => {
+                setInput((existing) => appDom.setQueryProp(existing, 'module', newValue));
+              }}
               extraLibs={extraLibs}
             />
           </Box>
@@ -184,8 +200,8 @@ function QueryEditor({
         <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
           <Typography>Parameters</Typography>
           <ParametersEditor
-            value={input.params}
-            onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
+            value={paramsEntries}
+            onChange={handleParamsChange}
             globalScope={globalScope}
             liveValue={paramsEditorLiveValue}
           />

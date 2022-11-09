@@ -86,7 +86,7 @@ const PinholeOverlay = React.forwardRef(function PinholeOverlay(
 
   // We key the elements so that React doesn't reuse between pinhole off or on
   return (
-    <PinholeOverlayRoot ref={ref} className={className}>
+    <PinholeOverlayRoot ref={ref} className={className} data-testid="hud-overlay">
       {pinhole ? (
         <React.Fragment>
           {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}

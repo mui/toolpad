@@ -84,7 +84,7 @@ function ConnectionEditorContent<P>({
             </ConnectionContextProvider>
           ) : (
             <Typography>
-              Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;{' '}
+              Unrecognized datasource &quot;{connectionNode.attributes.dataSource.value}&quot;
             </Typography>
           )}
         </Stack>

@@ -44,7 +44,6 @@ import config from '../../config';
 import { AppTemplateId } from '../../types';
 import AppOptions from '../AppOptions';
 import AppNameEditable from '../AppOptions/AppNameEditable';
-import { errorFrom } from '../../utils/errors';
 import { sendAppCreatedEvent } from '../../utils/ga';
 
 export const APP_TEMPLATE_OPTIONS: Map<

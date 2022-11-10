@@ -19,11 +19,15 @@ test('app create/rename flow', async ({ page }) => {
   await page.click('[role="menuitem"]:has-text("Rename"):visible');
 
   await page.keyboard.type(appName2);
-  await page.keyboard.press('Enter');
 
-  await expect(page.locator(`text=An app with that anem already exists`)).toBeVisible();
+  await expect(page.locator(`text=An app with that name already exists`)).toBeVisible();
+  await page.keyboard.press('Escape');
+
+  await homeModel.getAppRow(appName1).locator('[aria-label="Application menu"]').click();
+  await page.click('[role="menuitem"]:has-text("Rename"):visible');
 
   await page.keyboard.type(appName3);
+  await page.keyboard.press('Enter');
 
   await expect(homeModel.getAppRow(appName3)).toBeVisible();
 });

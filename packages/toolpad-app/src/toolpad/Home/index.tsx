@@ -304,15 +304,7 @@ function AppCard({ app, activeDeployment, existingAppNames }: AppCardProps) {
       }}
     >
       <CardHeader
-        action={
-          <AppOptions
-            app={app}
-            existingAppNames={existingAppNames}
-            allowDelete
-            allowDuplicate
-            onRename={handleRename}
-          />
-        }
+        action={<AppOptions app={app} allowDelete allowDuplicate onRename={handleRename} />}
         disableTypography
         subheader={
           <Typography variant="body2" color="text.secondary">
@@ -374,13 +366,7 @@ function AppRow({ app, activeDeployment, existingAppNames }: AppRowProps) {
         <Stack direction="row" spacing={1} justifyContent={'flex-end'}>
           <AppEditButton app={app} />
           <AppOpenButton app={app} activeDeployment={activeDeployment} />
-          <AppOptions
-            app={app}
-            existingAppNames={existingAppNames}
-            allowDelete
-            allowDuplicate
-            onRename={handleRename}
-          />
+          <AppOptions app={app} allowDelete allowDuplicate onRename={handleRename} />
         </Stack>
       </TableCell>
     </TableRow>

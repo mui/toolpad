@@ -8,23 +8,19 @@ import {
   TextField,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
+import invariant from 'invariant';
 import client from '../../api';
 import DialogForm from '../../components/DialogForm';
 import type { AppMeta } from '../../server/data';
+import { errorFrom } from '../../utils/errors';
 
 interface AppDuplicateDialogProps {
   open: boolean;
   app?: AppMeta | null;
-  existingAppNames?: string[];
   onClose: () => void;
 }
 
-const AppDuplicateDialog = ({
-  onClose,
-  app,
-  existingAppNames,
-  ...props
-}: AppDuplicateDialogProps) => {
+const AppDuplicateDialog = ({ app, onClose, ...props }: AppDuplicateDialogProps) => {
   const [nameInput, setNameInput] = React.useState('');
 
   const handleNameInputChange = React.useCallback(
@@ -43,49 +39,22 @@ const AppDuplicateDialog = ({
     await client.invalidateQueries('getApps');
   }, [app, nameInput, duplicateAppMutation]);
 
-  const existingNames = React.useMemo(() => new Set(existingAppNames), [existingAppNames]);
-
-  const isPristine = React.useRef<boolean>(true);
+  const isFormValid = !duplicateAppMutation.isError;
 
   const formError = React.useMemo(() => {
-    if (!isPristine.current && !nameInput) {
-      return 'A name is required';
+    if (!isFormValid) {
+      return errorFrom(duplicateAppMutation.error).message;
     }
-    if (existingNames.has(nameInput)) {
-      return 'An app with that name already exists';
-    }
-    return null;
-  }, [existingNames, nameInput]);
-
-  const isFormValid = !formError;
-
-  const handleFormSubmit = React.useCallback(() => {
-    if (isFormValid) {
-      duplicateApp();
-    } else {
-      setNameInput(app?.name ?? '');
-    }
-    onClose();
-  }, [isFormValid, app?.name, setNameInput, duplicateApp, onClose]);
-
-  const handleKeyPress = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (isPristine.current) {
-        isPristine.current = false;
-      }
-      if (event.key === 'Enter') {
-        handleFormSubmit();
-      }
-    },
-    [handleFormSubmit],
-  );
+    return '';
+  }, [isFormValid, duplicateAppMutation.error]);
 
   return (
     <Dialog {...props} onClose={onClose} maxWidth="xs">
       <DialogForm
         onSubmit={(event) => {
+          invariant(isFormValid, 'Form should not be submitted when invalid');
           event.preventDefault();
-          handleFormSubmit();
+          duplicateApp();
         }}
       >
         <DialogTitle>Duplicate app</DialogTitle>
@@ -96,11 +65,11 @@ const AppDuplicateDialog = ({
             autoFocus
             fullWidth
             label="Name"
+            defaultValue={app?.name ?? ''}
             value={nameInput}
             error={!isFormValid}
             helperText={formError}
             onChange={handleNameInputChange}
-            onKeyPress={handleKeyPress}
           />
         </DialogContent>
         <DialogActions>

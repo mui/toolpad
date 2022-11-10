@@ -529,21 +529,28 @@ export async function loadRenderTree(appId: string, version: VersionOrPreview = 
   return appDom.createRenderTree(await loadDom(appId, version));
 }
 
-export async function getAppNames(): Promise<string[]> {
-  return prismaClient.app
-    .findMany({
-      select: { name: true },
-    })
-    .then((apps) => apps.map((app) => app.name));
-}
-
 export async function duplicateApp(id: string, name: string): Promise<AppMeta> {
   const dom = await loadPreviewDom(id);
-  const newApp = await createApp(name, {
-    from: {
-      kind: 'dom',
-      dom,
-    },
-  });
-  return newApp;
+  try {
+    const newApp = await createApp(name, {
+      from: {
+        kind: 'dom',
+        dom,
+      },
+    });
+    return newApp;
+  } catch (error) {
+    const duplicateCount = await prismaClient.app.count({
+      where: { name: { startsWith: `${name} (copy`, endsWith: ')' } },
+    });
+    const duplicateName =
+      duplicateCount === 0 ? `${name} (copy)` : `${name} (copy ${duplicateCount + 1})`;
+    const newApp = await createApp(duplicateName, {
+      from: {
+        kind: 'dom',
+        dom,
+      },
+    });
+    return newApp;
+  }
 }

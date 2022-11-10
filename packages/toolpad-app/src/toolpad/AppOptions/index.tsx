@@ -21,7 +21,6 @@ interface AppOptionsProps {
   allowDuplicate?: boolean;
   allowDelete?: boolean;
   dom?: any;
-  existingAppNames?: string[];
   redirectOnDelete?: boolean;
 }
 
@@ -31,7 +30,6 @@ function AppOptions({
   allowDelete,
   allowDuplicate,
   dom,
-  existingAppNames,
   redirectOnDelete,
 }: AppOptionsProps) {
   const { buttonProps, menuProps, onMenuClose } = useMenu();
@@ -147,7 +145,6 @@ function AppOptions({
         open={Boolean(duplicateApp)}
         app={duplicateApp}
         onClose={() => setDuplicateApp(null)}
-        existingAppNames={existingAppNames}
       />
     </React.Fragment>
   );

@@ -44,17 +44,21 @@ const AppNameEditable = ({
 
   const handleAppRenameSave = React.useCallback(
     async (name: string) => {
+      if (nameError) {
+        setEditing(true);
+        return;
+      }
       if (app?.id) {
         try {
           await client.mutation.updateApp(app.id, { name });
           await client.invalidateQueries('getApps');
-          await client.invalidateQueries('getAppNames');
         } catch (rawError) {
+          existingNames.add(name);
           setEditing(true);
         }
       }
     },
-    [app?.id, setEditing],
+    [app?.id, setEditing, nameError, existingNames],
   );
 
   return loading ? (

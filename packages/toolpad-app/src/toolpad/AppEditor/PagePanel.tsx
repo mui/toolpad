@@ -22,8 +22,6 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
   const [editingName, setEditingName] = React.useState<boolean>(false);
   const dom = useDom();
 
-  const { data: existingAppNames } = client.useQuery('getAppNames', []);
-
   const handleRename = React.useCallback(() => {
     setEditingName(true);
   }, []);
@@ -49,14 +47,12 @@ export default function PagePanel({ appId, className, sx }: ComponentPanelProps)
             editing={editingName}
             setEditing={setEditingName}
             loading={Boolean(!app)}
-            existingAppNames={existingAppNames}
           />
         )}
         {app ? (
           <AppOptions
             app={app}
             dom={dom}
-            existingAppNames={existingAppNames}
             allowDelete
             redirectOnDelete
             allowDuplicate

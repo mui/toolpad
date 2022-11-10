@@ -29,19 +29,19 @@ import useBoolean from '../../../../utils/useBoolean';
 import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
 import useEvent from '../../../../utils/useEvent';
 
-interface QueryeditorDialogActionsProps {
+interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
   onSave?: () => void;
   onRemove?: () => void;
   onClose?: () => void;
 }
 
-function QueryeditorDialogActions({
+function QueryEditorDialogActions({
   saveDisabled,
   onSave,
   onRemove,
   onClose,
-}: QueryeditorDialogActionsProps) {
+}: QueryEditorDialogActionsProps) {
   const {
     value: removeConfirmOpen,
     setTrue: handleRemoveConfirmOpen,
@@ -118,11 +118,17 @@ export default function QueryNodeEditorDialog<Q>({
   const connectionId = input.attributes.connectionId.value
     ? appDom.deref(input.attributes.connectionId.value)
     : null;
-  const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
+
   const dataSourceId = input.attributes.dataSource?.value || null;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const connectionParams = connection?.attributes.params.value;
+  const connectionTemplate = input.templateName
+    ? dataSource?.templates?.get(input.templateName)
+    : null;
+
+  const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
+
+  const connectionParams = connection?.attributes.params.value || connectionTemplate;
 
   const handleCommit = React.useCallback(() => {
     let toCommit: appDom.QueryNode<Q> = input;
@@ -151,6 +157,7 @@ export default function QueryNodeEditorDialog<Q>({
               connectionId: appDom.createConst(appDom.ref(newConnectionOption.connectionId)),
               dataSource: appDom.createConst(newConnectionOption.dataSourceId),
             }),
+            templateName: newConnectionOption.templateName,
           }),
         );
       } else {
@@ -275,6 +282,7 @@ export default function QueryNodeEditorDialog<Q>({
                     ? {
                         connectionId: appDom.deref(input.attributes.connectionId.value) || null,
                         dataSourceId: input.attributes.dataSource.value,
+                        templateName: input.templateName,
                       }
                     : null
                 }
@@ -342,7 +350,7 @@ export default function QueryNodeEditorDialog<Q>({
             </Stack>
           </DialogContent>
 
-          <QueryeditorDialogActions
+          <QueryEditorDialogActions
             onSave={handleSave}
             onClose={handleClose}
             onRemove={handleRemove}

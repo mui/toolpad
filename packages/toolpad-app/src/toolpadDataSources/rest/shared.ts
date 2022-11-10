@@ -16,6 +16,7 @@ import applyTransform from '../../server/applyTransform';
 import { errorFrom } from '../../utils/errors';
 import config from '../../config';
 import { MOVIES_API_DEMO_URL } from '../demo';
+import { FETCH_CONNECTION_TEMPLATES } from './templates';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
 
@@ -167,9 +168,15 @@ async function readData(res: Response, fetchQuery: FetchQuery): Promise<any> {
 
 export function getDefaultUrl(connection?: RestConnectionParams | null): BindableAttrValue<string> {
   const baseUrl = connection?.baseUrl;
+
+  const templateSuggestedUrls = {
+    [FETCH_CONNECTION_TEMPLATES.get('COVID API')!.baseUrl!]: 'v1',
+    [FETCH_CONNECTION_TEMPLATES.get('Dogs API')!.baseUrl!]: 'breeds/list/all',
+  };
+
   return {
     type: 'const',
-    value: baseUrl ? '' : MOVIES_API_DEMO_URL,
+    value: baseUrl ? templateSuggestedUrls[baseUrl] || '' : MOVIES_API_DEMO_URL,
   };
 }
 

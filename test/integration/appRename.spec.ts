@@ -21,7 +21,7 @@ test('app create/rename flow', async ({ page }) => {
   await page.keyboard.type(appName2);
   await page.keyboard.press('Enter');
 
-  await expect(page.locator(`text=An app named "${appName2}" already exists`)).toBeVisible();
+  await expect(page.locator(`text=An app with that anem already exists`)).toBeVisible();
 
   await page.keyboard.type(appName3);
 

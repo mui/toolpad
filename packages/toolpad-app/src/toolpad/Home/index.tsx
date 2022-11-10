@@ -62,6 +62,7 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
+import { sendAppCreatedEvent } from '../../utils/ga';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -104,6 +105,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('blank');
   const [dom, setDom] = React.useState('');
+  const [isNavigating, setIsNavigating] = React.useState(false);
 
   const handleAppTemplateChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,6 +122,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const createAppMutation = client.useMutation('createApp', {
     onSuccess: (app) => {
       window.location.href = `/_toolpad/app/${app.id}`;
+      setIsNavigating(true);
     },
   });
 
@@ -154,6 +157,8 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               recaptchaToken,
             },
           ]);
+
+          sendAppCreatedEvent(name, appTemplateId);
         }}
       >
         <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
@@ -247,7 +252,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           </Button>
           <LoadingButton
             type="submit"
-            loading={createAppMutation.isLoading}
+            loading={createAppMutation.isLoading || isNavigating}
             disabled={!isFormValid}
           >
             Create

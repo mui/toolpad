@@ -175,7 +175,10 @@ function CodeComponentEditorContent({ codeComponentNode }: CodeComponentEditorCo
   const frameDocument = frameRef.current?.contentDocument;
 
   const debouncedInput = useDebounced(input.attributes.code.value, 250);
-  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(debouncedInput);
+  const { Component: GeneratedComponent, error: compileError } = useCodeComponent(
+    debouncedInput,
+    `/components/${codeComponentNode.name}`,
+  );
   const CodeComponent: ToolpadComponent<any> = useLatest(GeneratedComponent) || Noop;
 
   const { argTypes = {} } = CodeComponent[TOOLPAD_COMPONENT];

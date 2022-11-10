@@ -8,33 +8,32 @@ import { createComponent } from '@mui/toolpad-core';
 import ReactMarkdown from 'react-markdown';
 
 interface TextProps extends Omit<MuiTypographyProps, 'children'> {
+  mode: string;
   value: string;
   loading?: boolean;
-  markdown?: boolean;
 }
 
-function Text({ value, loading, markdown, sx, ...rest }: TextProps) {
-  if (markdown) {
-    return loading ? (
-      <Skeleton width={150} />
-    ) : (
-      <ReactMarkdown linkTarget={'_blank'}>{value}</ReactMarkdown>
-    );
+function Text({ value, loading, mode, sx, ...rest }: TextProps) {
+  switch (mode) {
+    case 'markdown':
+      return loading ? <Skeleton width={150} /> : <ReactMarkdown>{value}</ReactMarkdown>;
+    case 'text':
+    default:
+      return (
+        <MuiTypography
+          sx={{
+            minWidth: loading || !value ? 150 : undefined,
+            // This will give it height, even when empty.
+            // REMARK: Does it make sense to put it in core?
+            [`&:empty::before`]: { content: '""', display: 'inline-block' },
+            ...sx,
+          }}
+          {...rest}
+        >
+          {loading ? <Skeleton /> : String(value)}
+        </MuiTypography>
+      );
   }
-  return (
-    <MuiTypography
-      sx={{
-        minWidth: loading || !value ? 150 : undefined,
-        // This will give it height, even when empty.
-        // REMARK: Does it make sense to put it in core?
-        [`&:empty::before`]: { content: '""', display: 'inline-block' },
-        ...sx,
-      }}
-      {...rest}
-    >
-      {loading ? <Skeleton /> : String(value)}
-    </MuiTypography>
-  );
 }
 
 export default createComponent(Text, {
@@ -42,6 +41,10 @@ export default createComponent(Text, {
   loadingPropSource: ['value'],
   loadingProp: 'loading',
   argTypes: {
+    mode: {
+      typeDef: { type: 'string', enum: ['text', 'markdown', 'link'] },
+      defaultValue: 'text',
+    },
     value: {
       typeDef: { type: 'string' },
       defaultValue: 'Text',
@@ -58,10 +61,6 @@ export default createComponent(Text, {
     },
     sx: {
       typeDef: { type: 'object' },
-    },
-    markdown: {
-      typeDef: { type: 'boolean' },
-      defaultValue: false,
     },
   },
 });

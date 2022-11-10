@@ -122,9 +122,7 @@ export default function QueryNodeEditorDialog<Q>({
   const dataSourceId = input.attributes.dataSource?.value || null;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const connectionTemplate = input.templateName
-    ? dataSource?.templates?.get(input.templateName)
-    : null;
+  const connectionTemplate = input.templateName && dataSource?.templates?.get(input.templateName);
 
   const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
 

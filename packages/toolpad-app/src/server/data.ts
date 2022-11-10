@@ -1,7 +1,12 @@
 import { NodeId, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import * as prisma from '../../prisma/generated/client';
-import { ServerDataSource, VersionOrPreview, AppTemplateId } from '../types';
+import {
+  ServerDataSource,
+  VersionOrPreview,
+  AppTemplateId,
+  RuntimeData as RuntimeState,
+} from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -13,6 +18,7 @@ import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
+import createRuntimeState from '../createRuntimeData';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -525,8 +531,11 @@ export async function loadDom(appId: string, version: VersionOrPreview = 'previe
 /**
  * Version of loadDom that returns a subset of the dom that doesn't contain sensitive information
  */
-export async function loadRenderTree(appId: string, version: VersionOrPreview = 'preview') {
-  return appDom.createRenderTree(await loadDom(appId, version));
+export async function loadRuntimeState(
+  appId: string,
+  version: VersionOrPreview = 'preview',
+): Promise<RuntimeState> {
+  return createRuntimeState({ appId, dom: await loadDom(appId, version) });
 }
 
 export async function duplicateApp(id: string, name: string): Promise<AppMeta> {

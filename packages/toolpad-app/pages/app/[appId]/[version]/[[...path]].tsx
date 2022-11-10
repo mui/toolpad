@@ -4,7 +4,7 @@ import { asArray } from '../../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../../src/runtime/ToolpadApp';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
-  const { loadRenderTree, parseVersion } = await import('../../../../src/server/data');
+  const { loadRuntimeState, parseVersion } = await import('../../../../src/server/data');
 
   const [appId] = asArray(context.query.appId);
   const version = parseVersion(context.query.version);
@@ -14,7 +14,7 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
     };
   }
 
-  const dom = await loadRenderTree(appId, version);
+  const { dom } = await loadRuntimeState(appId, version);
 
   return {
     props: {

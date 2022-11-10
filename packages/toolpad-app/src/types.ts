@@ -171,7 +171,7 @@ export type NodeHashes = Record<NodeId, number | undefined>;
  * - datastructures optimized for rendering with less processing required
  * - ...
  */
-export interface RuntimeData {
+export interface RuntimeState {
   // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
   dom: appDom.RenderTree;
   appId: string;

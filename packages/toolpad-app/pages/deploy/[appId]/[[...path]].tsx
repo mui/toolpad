@@ -45,12 +45,11 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
 
   const { version } = activeDeployment;
 
-  const { dom } = await loadRuntimeState(appId, version);
+  const state = await loadRuntimeState(appId, version);
 
   return {
     props: {
-      appId,
-      dom,
+      state,
       version,
       basename: `/deploy/${appId}`,
     },

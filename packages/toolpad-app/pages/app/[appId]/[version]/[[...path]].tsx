@@ -14,12 +14,11 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
     };
   }
 
-  const { dom } = await loadRuntimeState(appId, version);
+  const state = await loadRuntimeState(appId, version);
 
   return {
     props: {
-      appId,
-      dom,
+      state,
       version,
       basename: `/app/${appId}/${version}`,
     },

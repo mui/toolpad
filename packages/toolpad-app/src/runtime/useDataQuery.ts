@@ -75,9 +75,7 @@ export function useDataQuery(
 
   const dataSource = dataSourceId ? dataSources[dataSourceId] : null;
 
-  const connectionTemplate = node.templateName
-    ? dataSource?.templates?.get(node.templateName)
-    : null;
+  const connectionTemplate = node.templateName && dataSource?.templates?.get(node.templateName);
 
   // These are only used by the editor to invalidate caches whenever the query changes during editing
   const nodeHash: number | undefined = savedNodes ? savedNodes[queryId] : undefined;

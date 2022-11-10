@@ -2,7 +2,6 @@ import * as React from 'react';
 import Skeleton from '@mui/material/Skeleton';
 import type { AppMeta } from '../../server/data';
 import EditableText from '../../components/EditableText';
-import { errorFrom } from '../../utils/errors';
 import client from '../../api';
 
 interface AppNameEditableProps {
@@ -10,24 +9,37 @@ interface AppNameEditableProps {
   editing?: boolean;
   setEditing: (editing: boolean) => void;
   loading?: boolean;
+  existingAppNames?: string[];
 }
 
-const AppNameEditable = ({ app, editing, setEditing, loading }: AppNameEditableProps) => {
-  const [appRenameError, setAppRenameError] = React.useState<Error | null>(null);
+const AppNameEditable = ({
+  app,
+  editing,
+  setEditing,
+  loading,
+  existingAppNames,
+}: AppNameEditableProps) => {
   const appNameInput = React.useRef<HTMLInputElement | null>(null);
   const [appName, setAppName] = React.useState<string>(app?.name || '');
 
   const handleAppNameChange = React.useCallback(
     (newValue: string) => {
-      setAppRenameError(null);
       setAppName(newValue);
     },
     [setAppName],
   );
 
+  const existingNames = React.useMemo(() => new Set(existingAppNames), [existingAppNames]);
+
+  const nameError = React.useMemo(() => {
+    if (editing && appName !== app?.name && existingNames.has(appName)) {
+      return 'An app with that name already exists.';
+    }
+    return null;
+  }, [editing, existingNames, appName, app?.name]);
+
   const handleAppRenameClose = React.useCallback(() => {
     setEditing(false);
-    setAppRenameError(null);
   }, [setEditing]);
 
   const handleAppRenameSave = React.useCallback(
@@ -36,8 +48,8 @@ const AppNameEditable = ({ app, editing, setEditing, loading }: AppNameEditableP
         try {
           await client.mutation.updateApp(app.id, { name });
           await client.invalidateQueries('getApps');
+          await client.invalidateQueries('getAppNames');
         } catch (rawError) {
-          setAppRenameError(errorFrom(rawError));
           setEditing(true);
         }
       }
@@ -51,8 +63,8 @@ const AppNameEditable = ({ app, editing, setEditing, loading }: AppNameEditableP
     <EditableText
       defaultValue={app?.name}
       editable={editing}
-      helperText={appRenameError ? `An app named "${appName}" already exists` : null}
-      error={!!appRenameError}
+      helperText={nameError}
+      error={!!nameError}
       onChange={handleAppNameChange}
       onClose={handleAppRenameClose}
       onSave={handleAppRenameSave}

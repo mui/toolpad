@@ -44,7 +44,6 @@ import config from '../../config';
 import { AppTemplateId } from '../../types';
 import AppOptions from '../AppOptions';
 import AppNameEditable from '../AppOptions/AppNameEditable';
-import AppDeleteDialog from '../AppOptions/AppDeleteDialog';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -279,11 +278,10 @@ function AppOpenButton({ app, activeDeployment }: AppOpenButtonProps) {
 interface AppCardProps {
   app?: AppMeta;
   activeDeployment?: Deployment;
-  onDelete?: () => void;
-  onDuplicate?: () => void;
+  existingAppNames?: string[];
 }
 
-function AppCard({ app, activeDeployment, onDelete, onDuplicate }: AppCardProps) {
+function AppCard({ app, activeDeployment, existingAppNames }: AppCardProps) {
   const [editingName, setEditingName] = React.useState<boolean>(false);
 
   const handleRename = React.useCallback(() => {
@@ -304,9 +302,10 @@ function AppCard({ app, activeDeployment, onDelete, onDuplicate }: AppCardProps)
         action={
           <AppOptions
             app={app}
+            existingAppNames={existingAppNames}
+            allowDelete
+            allowDuplicate
             onRename={handleRename}
-            onDelete={onDelete}
-            onDuplicate={onDuplicate}
           />
         }
         disableTypography
@@ -328,6 +327,7 @@ function AppCard({ app, activeDeployment, onDelete, onDuplicate }: AppCardProps)
           editing={editingName}
           setEditing={setEditingName}
           loading={Boolean(!app)}
+          existingAppNames={existingAppNames}
         />
       </CardContent>
       <CardActions>
@@ -341,11 +341,10 @@ function AppCard({ app, activeDeployment, onDelete, onDuplicate }: AppCardProps)
 interface AppRowProps {
   app?: AppMeta;
   activeDeployment?: Deployment;
-  onDelete?: () => void;
-  onDuplicate?: () => void;
+  existingAppNames?: string[];
 }
 
-function AppRow({ app, activeDeployment, onDelete, onDuplicate }: AppRowProps) {
+function AppRow({ app, activeDeployment, existingAppNames }: AppRowProps) {
   const [editingName, setEditingName] = React.useState<boolean>(false);
 
   const handleRename = React.useCallback(() => {
@@ -360,6 +359,7 @@ function AppRow({ app, activeDeployment, onDelete, onDuplicate }: AppRowProps) {
           app={app}
           editing={editingName}
           setEditing={setEditingName}
+          existingAppNames={existingAppNames}
         />
         <Typography variant="caption">
           {app ? `Edited ${getReadableDuration(app.editedAt)}` : <Skeleton />}
@@ -371,9 +371,10 @@ function AppRow({ app, activeDeployment, onDelete, onDuplicate }: AppRowProps) {
           <AppOpenButton app={app} activeDeployment={activeDeployment} />
           <AppOptions
             app={app}
+            existingAppNames={existingAppNames}
+            allowDelete
+            allowDuplicate
             onRename={handleRename}
-            onDelete={onDelete}
-            onDuplicate={onDuplicate}
           />
         </Stack>
       </TableCell>
@@ -385,17 +386,10 @@ interface AppsViewProps {
   apps: AppMeta[];
   loading?: boolean;
   activeDeploymentsByApp: { [appId: string]: Deployment } | null;
-  setDeletedApp: (app: AppMeta) => void;
-  duplicateApp: (app: AppMeta) => void;
+  existingAppNames?: string[];
 }
 
-function AppsGridView({
-  loading,
-  apps,
-  activeDeploymentsByApp,
-  setDeletedApp,
-  duplicateApp,
-}: AppsViewProps) {
+function AppsGridView({ loading, apps, activeDeploymentsByApp, existingAppNames }: AppsViewProps) {
   return (
     <Box
       sx={{
@@ -423,8 +417,7 @@ function AppsGridView({
               key={app.id}
               app={app}
               activeDeployment={activeDeployment}
-              onDelete={() => setDeletedApp(app)}
-              onDuplicate={() => duplicateApp(app)}
+              existingAppNames={existingAppNames}
             />
           );
         });
@@ -433,13 +426,7 @@ function AppsGridView({
   );
 }
 
-function AppsListView({
-  loading,
-  apps,
-  activeDeploymentsByApp,
-  setDeletedApp,
-  duplicateApp,
-}: AppsViewProps) {
+function AppsListView({ loading, apps, activeDeploymentsByApp, existingAppNames }: AppsViewProps) {
   return (
     <Table aria-label="apps list" size="medium">
       <TableBody>
@@ -461,8 +448,7 @@ function AppsListView({
                 key={app.id}
                 app={app}
                 activeDeployment={activeDeployment}
-                onDelete={() => setDeletedApp(app)}
-                onDuplicate={() => duplicateApp(app)}
+                existingAppNames={existingAppNames}
               />
             );
           });
@@ -482,6 +468,10 @@ export default function Home() {
   });
   const { data: activeDeployments } = client.useQuery('getActiveDeployments', []);
 
+  const existingAppNames = React.useMemo(() => {
+    return apps.map((app) => app.name);
+  }, [apps]);
+
   const activeDeploymentsByApp = React.useMemo(() => {
     if (!activeDeployments) {
       return null;
@@ -493,8 +483,6 @@ export default function Home() {
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(config.isDemo);
 
-  const [deletedApp, setDeletedApp] = React.useState<null | AppMeta>(null);
-
   const [viewMode, setViewMode] = useLocalStorageState<string>('home-app-view-mode', 'list');
 
   const handleViewModeChange = React.useCallback(
@@ -504,21 +492,8 @@ export default function Home() {
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
 
-  const duplicateAppMutation = client.useMutation('duplicateApp');
-
-  const duplicateApp = React.useCallback(
-    async (app: AppMeta) => {
-      if (app) {
-        await duplicateAppMutation.mutateAsync([app.id, app.name]);
-      }
-      await client.invalidateQueries('getApps');
-    },
-    [duplicateAppMutation],
-  );
-
   return (
     <ToolpadShell>
-      <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
       {!config.isDemo ? (
         <Container sx={{ my: 1 }}>
           <Typography variant="h2">Apps</Typography>
@@ -553,8 +528,7 @@ export default function Home() {
               apps={apps}
               loading={isLoading}
               activeDeploymentsByApp={activeDeploymentsByApp}
-              setDeletedApp={setDeletedApp}
-              duplicateApp={duplicateApp}
+              existingAppNames={existingAppNames}
             />
           )}
         </Container>

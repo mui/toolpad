@@ -12,17 +12,44 @@ import type { AppMeta } from '../../server/data';
 import useBoolean from '../../utils/useBoolean';
 import AppSettingsDialog from './AppSettingsDialog';
 import AppExportDialog from './AppExportDialog';
+import AppDeleteDialog from './AppDeleteDialog';
+import AppDuplicateDialog from './AppDuplicateDialog';
 
 interface AppOptionsProps {
   app?: AppMeta;
   onRename: () => void;
-  onDelete?: () => void;
-  onDuplicate?: () => void;
+  allowDuplicate?: boolean;
+  allowDelete?: boolean;
   dom?: any;
+  existingAppNames?: string[];
+  redirectOnDelete?: boolean;
 }
 
-function AppOptions({ app, onRename, onDelete, onDuplicate, dom }: AppOptionsProps) {
+function AppOptions({
+  app,
+  onRename,
+  allowDelete,
+  allowDuplicate,
+  dom,
+  existingAppNames,
+  redirectOnDelete,
+}: AppOptionsProps) {
   const { buttonProps, menuProps, onMenuClose } = useMenu();
+
+  const [deletedApp, setDeletedApp] = React.useState<AppMeta | null>(null);
+  const [duplicateApp, setDuplicateApp] = React.useState<AppMeta | null>(null);
+
+  const onDuplicate = React.useCallback(() => {
+    if (app) {
+      setDuplicateApp(app);
+    }
+  }, [app]);
+
+  const onDelete = React.useCallback(() => {
+    if (app) {
+      setDeletedApp(app);
+    }
+  }, [app]);
 
   const handleRenameClick = React.useCallback(() => {
     onMenuClose();
@@ -73,7 +100,7 @@ function AppOptions({ app, onRename, onDelete, onDuplicate, dom }: AppOptionsPro
           </ListItemIcon>
           <ListItemText>Rename</ListItemText>
         </MenuItem>
-        {onDuplicate ? (
+        {allowDuplicate ? (
           <MenuItem onClick={handleDuplicateClick}>
             <ListItemIcon>
               <ContentCopyOutlinedIcon />
@@ -81,7 +108,7 @@ function AppOptions({ app, onRename, onDelete, onDuplicate, dom }: AppOptionsPro
             <ListItemText>Duplicate</ListItemText>
           </MenuItem>
         ) : null}
-        {onDelete ? (
+        {allowDelete ? (
           <MenuItem onClick={handleDeleteClick}>
             <ListItemIcon>
               <DeleteIcon />
@@ -111,6 +138,17 @@ function AppOptions({ app, onRename, onDelete, onDuplicate, dom }: AppOptionsPro
       {app ? (
         <AppSettingsDialog open={settingsOpen} onClose={handleCloseSettings} app={app} />
       ) : null}
+      <AppDeleteDialog
+        app={deletedApp}
+        onClose={() => setDeletedApp(null)}
+        redirectOnDelete={redirectOnDelete}
+      />
+      <AppDuplicateDialog
+        open={Boolean(duplicateApp)}
+        app={duplicateApp}
+        onClose={() => setDuplicateApp(null)}
+        existingAppNames={existingAppNames}
+      />
     </React.Fragment>
   );
 }

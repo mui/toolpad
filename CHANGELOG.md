@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.0.26
+
+<!-- generated comparing v0.0.25..master -->
+
+_Nov 9, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+A new Link component, undo/redo in the editor, fix UX on renaming elements.
+
+- &#8203;<!-- 24 -->Remove pullRequestPreviewsEnabled from render.yml (#1315) @Janpot
+- &#8203;<!-- 23 -->Fix adding parameter with duplicate name (#1282) @Janpot
+- &#8203;<!-- 22 -->Make sure to define a \_jsxFilename for custom components (#1306) @Janpot
+- &#8203;<!-- 21 -->Upgrade monorepo dependency (#1299) @Janpot
+- &#8203;<!-- 20 -->Remove react from the runtime chunk (#1302) @Janpot
+- &#8203;<!-- 19 -->Add prefix to custom GA event (#1305) @apedroferreira
+- &#8203;<!-- 18 -->Send custom GA event when new app is created (#1285) @apedroferreira
+- &#8203;<!-- 17 -->Some tweaks to integration tests while debugging (#1300) @Janpot
+- &#8203;<!-- 16 -->schedule @Janpot
+- &#8203;<!-- 15 -->Reduce amount of chunks for the runtime (#1301) @Janpot
+- &#8203;<!-- 14 -->Update code component name on save (#1283) @Janpot
+- &#8203;<!-- 13 -->Add Next.js bundle analyzer (#1276) @Janpot
+- &#8203;<!-- 12 -->Small improvements to Datagrid component (#1284) @apedroferreira
+- &#8203;<!-- 11 -->Client-side fetch queries (#1252) @Janpot
+- &#8203;<!-- 10 -->Add undo & redo functionality (#1225) @bytasv
+- &#8203;<!-- 09 -->useEvent: Only check for calls during render in development (#1269) @Janpot
+- &#8203;<!-- 08 -->Index pino logs to data stream (#1267) @apedroferreira
+- &#8203;<!-- 07 -->Add Link Component (#1234) @bharatkashyap
+- &#8203;<!-- 06 -->[core] Fix Scorecard fail Action @oliviertassinari
+- &#8203;<!-- 05 -->[core] Try running integration tests against self-hosted httpbin (#1253) @Janpot
+- &#8203;<!-- 04 -->[core] Add OSSF Scorecard action (#1295) @oliviertassinari
+- &#8203;<!-- 03 -->[core] Remove default access to GitHub action scopes @oliviertassinari
+- &#8203;<!-- 02 -->[core] Fix Pinned-Dependencies @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Link changelog (#1279) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.25
 
 <!-- generated comparing v0.024..master -->

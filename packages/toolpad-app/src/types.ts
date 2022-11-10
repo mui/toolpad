@@ -6,11 +6,11 @@ import {
   ComponentConfig,
   NodeId,
   PropValueType,
-  BindableAttrEntries,
   ExecFetchResult,
 } from '@mui/toolpad-core';
-
 import { PaletteMode } from '@mui/material';
+import type * as appDom from './appDom';
+
 import type { Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
@@ -76,17 +76,10 @@ export interface ConnectionEditorProps<P> extends WithControlledProp<P | null> {
 }
 export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
-export interface QueryEditorModel<Q> {
-  query: Q;
-  /** @deprecated Use parameters instead */
-  params: BindableAttrEntries;
-  parameters: BindableAttrEntries;
-}
-
-export interface QueryEditorProps<C, Q> extends WithControlledProp<QueryEditorModel<Q>> {
+export interface QueryEditorProps<C, Q> extends WithControlledProp<appDom.QueryNode<Q>> {
   connectionParams: Maybe<C>;
   globalScope: Record<string, any>;
-  onChange: React.Dispatch<React.SetStateAction<QueryEditorModel<Q>>>;
+  onChange: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
   onCommit?: () => void;
 }
 

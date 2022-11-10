@@ -242,6 +242,8 @@ interface OnCreateEvent {
   };
 }
 
+const DRAFT_ROW_ID = '…';
+
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
@@ -388,6 +390,13 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
 
+  /*
+   * Check if the DataGrid is in "create" mode
+   * @param {GridRowId} id - The id of the row being edited (optional)
+   * @returns {boolean} - True if the row with the passed id does not exist in the rows prop,
+   * or if no id is passed, then true if the current number of rows is more than the number of rows in the rows prop
+   */
+
   const isCreating = React.useCallback(
     (id?: GridRowId) => {
       if (!id) {
@@ -521,16 +530,15 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const handleCreateClick = React.useCallback(() => {
     const newRow = Object.fromEntries(columns.map((column) => [column.field, '']));
-    setRowId(newRow, '...');
-    apiRef.current.setRows([...rows, newRow]);
+    setRowId(newRow, DRAFT_ROW_ID);
+    apiRef.current.setRows([newRow, ...rows]);
     setRowModesModel({
+      [DRAFT_ROW_ID]: { mode: GridRowModes.Edit, fieldToFocus: rowIdFieldProp || 'id' },
       ...rowModesModel,
-      '...': { mode: GridRowModes.Edit, fieldToFocus: rowIdFieldProp || 'id' },
     });
-    apiRef.current.scrollToIndexes({ rowIndex: rows.length });
   }, [apiRef, rowIdFieldProp, setRowId, columns, rows, rowModesModel]);
 
-  function CustomToolbar() {
+  const CustomToolbar = React.useCallback(() => {
     return (
       <GridToolbarContainer>
         <GridToolbarColumnsButton />
@@ -550,7 +558,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         ) : null}
       </GridToolbarContainer>
     );
-  }
+  }, [onCreateProp, isCreating, handleCreateClick]);
 
   React.useEffect(() => apiRef.current.updateColumns(columns), [apiRef, columns]);
 

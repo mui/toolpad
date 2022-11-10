@@ -20,14 +20,13 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { BindableAttrEntries, BindableAttrValue, NodeId } from '@mui/toolpad-core';
+import { BindableAttrValue, NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import clsx from 'clsx';
 import useLatest from '../../../utils/useLatest';
 import { usePageEditorState } from './PageEditorProvider';
 import * as appDom from '../../../appDom';
-import { QueryEditorModel } from '../../../types';
 import dataSources from '../../../toolpadDataSources/client';
 import { omit, update } from '../../../utils/immutability';
 import { useEvaluateLiveBinding } from '../useEvaluateLiveBinding';
@@ -40,22 +39,6 @@ import useBoolean from '../../../utils/useBoolean';
 import { useNodeNameValidation } from '../HierarchyExplorer/validation';
 import useEvent from '../../../utils/useEvent';
 import NodeMenu from '../NodeMenu';
-
-const EMPTY_OBJECT = {};
-
-function createQueryModel<Q>(node: appDom.QueryNode<Q>): QueryEditorModel<Q> {
-  const inputParams = node.params || EMPTY_OBJECT;
-  const parameters =
-    (Object.entries(inputParams).filter(([, value]) => Boolean(value)) as BindableAttrEntries) ||
-    [];
-
-  return {
-    query: node.attributes.query.value,
-    // TODO: 'params' are passed only for backwards compatability, remove after v1
-    params: parameters,
-    parameters,
-  };
-}
 
 interface QueryeditorDialogActionsProps {
   saveDisabled?: boolean;
@@ -205,8 +188,6 @@ function QueryNodeEditorDialog<Q>({
 
   const connectionParams = connection?.attributes.params.value;
 
-  const queryModel = React.useMemo<QueryEditorModel<any>>(() => createQueryModel(input), [input]);
-
   const handleCommit = React.useCallback(() => {
     let toCommit: appDom.QueryNode<Q> = input;
     if (dataSource?.transformQueryBeforeCommit) {
@@ -222,21 +203,6 @@ function QueryNodeEditorDialog<Q>({
     }
     onSave(toCommit);
   }, [dataSource, input, onSave]);
-
-  const handleQueryModelChange = React.useCallback<
-    React.Dispatch<React.SetStateAction<QueryEditorModel<Q>>>
-  >((updater) => {
-    setInput((current) => {
-      const model = typeof updater === 'function' ? updater(createQueryModel(current)) : updater;
-
-      return update(current, {
-        attributes: update(current.attributes, {
-          query: appDom.createConst(model.query),
-        }),
-        params: Object.fromEntries(model.params),
-      });
-    });
-  }, []);
 
   const { pageState } = usePageEditorState();
 
@@ -402,8 +368,8 @@ function QueryNodeEditorDialog<Q>({
             >
               <dataSource.QueryEditor
                 connectionParams={connectionParams}
-                value={queryModel}
-                onChange={handleQueryModelChange}
+                value={input}
+                onChange={setInput}
                 onCommit={handleCommit}
                 globalScope={pageState}
               />

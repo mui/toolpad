@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { throttle } from 'lodash-es';
+import { throttle, DebouncedFunc } from 'lodash-es';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -239,21 +239,13 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
   }
 }
 
-let pendingHistoryUpdate = false;
-const scheduleHistoryUpdate = throttle(
-  (callback: () => void) => {
-    callback();
-  },
-  500,
-  { leading: false, trailing: true },
-);
-
-function createDomApi(dispatch: React.Dispatch<DomAction>) {
+function createDomApi(
+  dispatch: React.Dispatch<DomAction>,
+  scheduleHistoryUpdate?: DebouncedFunc<() => void>,
+) {
   return {
     undo() {
-      if (pendingHistoryUpdate) {
-        scheduleHistoryUpdate.flush();
-      }
+      scheduleHistoryUpdate?.flush();
 
       dispatch({ type: 'DOM_UNDO' });
     },
@@ -431,20 +423,30 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     redoStack: [],
   });
 
+  const scheduleHistoryUpdate = React.useMemo(
+    () =>
+      throttle(
+        () => {
+          dispatch({ type: 'DOM_UPDATE_HISTORY' });
+        },
+        500,
+        { leading: false, trailing: true },
+      ),
+    [],
+  );
+
   const dispatchWithHistory = useEvent((action: DomAction) => {
     dispatch(action);
 
     if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      pendingHistoryUpdate = true;
-
-      scheduleHistoryUpdate(() => {
-        dispatch({ type: 'DOM_UPDATE_HISTORY' });
-        pendingHistoryUpdate = false;
-      });
+      scheduleHistoryUpdate();
     }
   });
 
-  const api = React.useMemo(() => createDomApi(dispatchWithHistory), [dispatchWithHistory]);
+  const api = React.useMemo(
+    () => createDomApi(dispatchWithHistory, scheduleHistoryUpdate),
+    [dispatchWithHistory, scheduleHistoryUpdate],
+  );
 
   const handleSave = React.useCallback(() => {
     if (!state.dom || state.saving || state.savedDom === state.dom) {

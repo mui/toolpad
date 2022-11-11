@@ -82,12 +82,12 @@ export class ToolpadEditor {
     this.createComponentBtn = page.locator('[aria-label="Create component"]');
     this.createComponentDialog = new CreateComponentDialog(page);
 
-    this.componentCatalog = page.locator('data-testid=component-catalog');
-    this.componentEditor = page.locator('data-testid=component-editor');
+    this.componentCatalog = page.getByTestId('component-catalog');
+    this.componentEditor = page.getByTestId('component-editor');
 
     this.appCanvas = page.frameLocator('[name=data-toolpad-canvas]');
-    this.pageRoot = this.appCanvas.locator('data-testid=page-root');
-    this.pageOverlay = this.appCanvas.locator('data-testid=page-overlay');
+    this.pageRoot = this.appCanvas.getByTestId('page-root');
+    this.pageOverlay = this.appCanvas.getByTestId('page-overlay');
 
     this.explorer = page.getByTestId('hierarchy-explorer');
     this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });

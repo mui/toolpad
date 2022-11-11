@@ -267,6 +267,8 @@ function ResolvedPreview({
   );
 }
 
+const EMPTY_PARAMS: BindableAttrEntries = [];
+
 function QueryEditor({
   globalScope,
   connectionParams,
@@ -274,7 +276,8 @@ function QueryEditor({
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const baseUrl = connectionParams?.baseUrl;
-  const urlValue: BindableAttrValue<string> = input.query.url || getDefaultUrl(connectionParams);
+  const urlValue: BindableAttrValue<string> =
+    input.attributes.query.value.url || getDefaultUrl(connectionParams);
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
@@ -285,96 +288,75 @@ function QueryEditor({
 
   const handleUrlChange = React.useCallback(
     (newUrl: BindableAttrValue<string> | null) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, url: newUrl || appDom.createConst('') },
-      }));
+      setInput((existing) =>
+        appDom.setQueryProp(existing, 'url', newUrl || appDom.createConst('')),
+      );
     },
     [setInput],
   );
 
   const handleMethodChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, method: event.target.value },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'method', event.target.value));
     },
     [setInput],
   );
 
   const handleRunInBrowserChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, browser: event.target.checked },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'browser', event.target.checked));
     },
     [setInput],
   );
 
   const handleTransformEnabledChange = React.useCallback(
     (transformEnabled: boolean) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, transformEnabled },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'transformEnabled', transformEnabled));
     },
     [setInput],
   );
 
   const handleTransformChange = React.useCallback(
     (transform: string) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, transform },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'transform', transform));
     },
     [setInput],
   );
 
   const handleBodyChange = React.useCallback(
     (newBody: Maybe<Body>) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, body: newBody || undefined },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'body', newBody || undefined));
     },
     [setInput],
   );
 
   const handleSearchParamsChange = React.useCallback(
     (newSearchParams: BindableAttrEntries) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, searchParams: newSearchParams },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'searchParams', newSearchParams));
     },
     [setInput],
   );
 
   const handleHeadersChange = React.useCallback(
     (newHeaders: BindableAttrEntries) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, headers: newHeaders },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'headers', newHeaders));
     },
     [setInput],
   );
 
   const handleResponseTypeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, response: { kind: event.target.value } as ResponseType },
-      }));
+      setInput((existing) =>
+        appDom.setQueryProp(existing, 'response', { kind: event.target.value } as ResponseType),
+      );
     },
     [setInput],
   );
 
+  const paramsEntries = input.params || EMPTY_PARAMS;
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    input: input.params,
+    input: paramsEntries,
     globalScope,
   });
 
@@ -397,13 +379,13 @@ function QueryEditor({
 
   const liveSearchParams = useEvaluateLiveBindingEntries({
     server: true,
-    input: input.query.searchParams || [],
+    input: input.attributes.query.value.searchParams || [],
     globalScope: queryScope,
   });
 
   const liveHeaders = useEvaluateLiveBindingEntries({
     server: true,
-    input: input.query.headers || [],
+    input: input.attributes.query.value.headers || [],
     globalScope: queryScope,
   });
 
@@ -422,7 +404,7 @@ function QueryEditor({
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const { preview, runPreview: handleRunPreview } = useQueryPreview(
     fetchPreview,
-    input.query,
+    input.attributes.query.value,
     previewParams,
     {
       onPreview(result) {
@@ -449,7 +431,7 @@ function QueryEditor({
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
               <TextField
                 select
-                value={config.isDemo ? 'GET' : input.query.method || 'GET'}
+                value={config.isDemo ? 'GET' : input.attributes.query.value.method || 'GET'}
                 onChange={handleMethodChange}
                 disabled={config.isDemo}
               >
@@ -475,7 +457,10 @@ function QueryEditor({
             <FormGroup>
               <FormControlLabel
                 control={
-                  <Checkbox checked={input.query.browser} onChange={handleRunInBrowserChange} />
+                  <Checkbox
+                    checked={input.attributes.query.value.browser}
+                    onChange={handleRunInBrowserChange}
+                  />
                 }
                 label="Run in the browser"
               />
@@ -493,7 +478,7 @@ function QueryEditor({
                 </Box>
                 <TabPanel disableGutters value="urlQuery">
                   <ParametersEditor
-                    value={input.query.searchParams ?? []}
+                    value={input.attributes.query.value.searchParams ?? []}
                     onChange={handleSearchParamsChange}
                     globalScope={queryScope}
                     liveValue={liveSearchParams}
@@ -502,14 +487,14 @@ function QueryEditor({
                 <TabPanel disableGutters value="body">
                   <BodyEditor
                     globalScope={queryScope}
-                    value={input.query.body}
+                    value={input.attributes.query.value.body}
                     onChange={handleBodyChange}
-                    method={input.query.method || 'GET'}
+                    method={input.attributes.query.value.method || 'GET'}
                   />
                 </TabPanel>
                 <TabPanel disableGutters value="headers">
                   <ParametersEditor
-                    value={input.query.headers ?? []}
+                    value={input.attributes.query.value.headers ?? []}
                     onChange={handleHeadersChange}
                     globalScope={queryScope}
                     liveValue={liveHeaders}
@@ -520,7 +505,7 @@ function QueryEditor({
                     select
                     label="response type"
                     sx={{ width: 200, mt: 1 }}
-                    value={input.query.response?.kind || 'json'}
+                    value={input.attributes.query.value.response?.kind || 'json'}
                     onChange={handleResponseTypeChange}
                   >
                     <MenuItem value="raw">raw</MenuItem>
@@ -535,9 +520,9 @@ function QueryEditor({
                 </TabPanel>
                 <TabPanel disableGutters value="transform">
                   <TransformInput
-                    value={input.query.transform ?? 'return data;'}
+                    value={input.attributes.query.value.transform ?? 'return data;'}
                     onChange={handleTransformChange}
-                    enabled={input.query.transformEnabled ?? false}
+                    enabled={input.attributes.query.value.transformEnabled ?? false}
                     onEnabledChange={handleTransformEnabledChange}
                     globalScope={{ data: preview?.untransformedData }}
                     loading={false}
@@ -551,7 +536,7 @@ function QueryEditor({
         <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
           <Typography>Parameters</Typography>
           <ParametersEditor
-            value={input.params}
+            value={paramsEntries}
             onChange={handleParamsChange}
             globalScope={globalScope}
             liveValue={paramsEditorLiveValue}

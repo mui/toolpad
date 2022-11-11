@@ -239,9 +239,22 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
   }
 }
 
+let pendingHistoryUpdate = false;
+const scheduleHistoryUpdate = throttle(
+  (callback: () => void) => {
+    callback();
+  },
+  500,
+  { leading: false, trailing: true },
+);
+
 function createDomApi(dispatch: React.Dispatch<DomAction>) {
   return {
     undo() {
+      if (pendingHistoryUpdate) {
+        scheduleHistoryUpdate.flush();
+      }
+
       dispatch({ type: 'DOM_UNDO' });
     },
     redo() {
@@ -418,23 +431,16 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     redoStack: [],
   });
 
-  const scheduleHistoryUpdate = React.useMemo(
-    () =>
-      throttle(
-        () => {
-          dispatch({ type: 'DOM_UPDATE_HISTORY' });
-        },
-        500,
-        { leading: false, trailing: true },
-      ),
-    [],
-  );
-
   const dispatchWithHistory = useEvent((action: DomAction) => {
     dispatch(action);
 
     if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      scheduleHistoryUpdate();
+      pendingHistoryUpdate = true;
+
+      scheduleHistoryUpdate(() => {
+        dispatch({ type: 'DOM_UPDATE_HISTORY' });
+        pendingHistoryUpdate = false;
+      });
     }
   });
 

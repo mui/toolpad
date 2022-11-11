@@ -17,7 +17,6 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import DashboardCustomizeSharpIcon from '@mui/icons-material/DashboardCustomizeSharp';
 import AddIcon from '@mui/icons-material/Add';
-import LinkIcon from '@mui/icons-material/Link';
 import NotesIcon from '@mui/icons-material/Notes';
 import { SvgIconProps } from '@mui/material/SvgIcon';
 
@@ -32,7 +31,6 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Form', DnsIcon],
   ['Card', ContactPageIcon],
   ['Tabs', TabIcon],
-  ['Link', LinkIcon],
   ['Slider', TuneIcon],
   ['Switch', ToggleOnIcon],
   ['Radio', RadioButtonCheckedIcon],

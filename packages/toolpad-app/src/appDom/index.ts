@@ -99,6 +99,7 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
     readonly verticalAlign?: ConstantAttrValue<BoxProps['alignItems']>;
     readonly columnSize?: ConstantAttrValue<number>;
   };
+  readonly mode?: ConstantAttrValue<string>;
 }
 
 export interface CodeComponentNode extends AppDomNodeBase {

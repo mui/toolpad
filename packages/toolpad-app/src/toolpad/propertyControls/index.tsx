@@ -10,6 +10,7 @@ import SelectOptions from './SelectOptions';
 import HorizontalAlign from './HorizontalAlign';
 import VerticalAlign from './VerticalAlign';
 import RowIdFieldSelect from './RowIdFieldSelect';
+import Markdown from './Markdown';
 import { EditorProps } from '../../types';
 
 const propTypeControls: {
@@ -22,6 +23,7 @@ const propTypeControls: {
   json,
   event,
   GridColumns,
+  Markdown,
   SelectOptions,
   RowIdFieldSelect,
   HorizontalAlign,

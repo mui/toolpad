@@ -1,6 +1,11 @@
 import { Stack, styled, Typography, Divider } from '@mui/material';
 import * as React from 'react';
-import { ArgTypeDefinition, ArgTypeDefinitions, ComponentConfig } from '@mui/toolpad-core';
+import {
+  ArgTypeDefinition,
+  ArgTypeDefinitions,
+  ComponentConfig,
+  TOOLPAD_COMPONENT_MODE_PROPERTY,
+} from '@mui/toolpad-core';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
@@ -37,6 +42,11 @@ function shouldRenderControl(propTypeDef: ArgTypeDefinition) {
   if (propTypeDef.typeDef.type === 'element') {
     return propTypeDef.control?.type !== 'slot' && propTypeDef.control?.type !== 'slots';
   }
+
+  if (typeof propTypeDef.visible === 'boolean') {
+    return propTypeDef.visible;
+  }
+
   return true;
 }
 
@@ -47,6 +57,10 @@ interface ComponentPropsEditorProps<P> {
 
 function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditorProps<P>) {
   const { layoutDirection } = componentConfig;
+
+  const mode: ArgTypeDefinition = (componentConfig?.argTypes as any)?.[
+    TOOLPAD_COMPONENT_MODE_PROPERTY
+  ];
 
   const hasLayoutHorizontalControls =
     layoutDirection === LAYOUT_DIRECTION_HORIZONTAL || layoutDirection === LAYOUT_DIRECTION_BOTH;
@@ -81,6 +95,22 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
               />
             </div>
           ) : null}
+          <Divider sx={{ mt: 1 }} />
+        </React.Fragment>
+      ) : null}
+      {mode ? (
+        <React.Fragment>
+          <Typography variant="overline" className={classes.sectionHeading}>
+            Mode:
+          </Typography>
+          <div key={TOOLPAD_COMPONENT_MODE_PROPERTY} className={classes.control}>
+            <NodeAttributeEditor
+              node={node}
+              namespace="props"
+              name={TOOLPAD_COMPONENT_MODE_PROPERTY}
+              argType={mode}
+            />
+          </div>
           <Divider sx={{ mt: 1 }} />
         </React.Fragment>
       ) : null}

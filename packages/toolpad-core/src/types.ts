@@ -137,7 +137,8 @@ export interface ArgControlSpec {
     | 'HorizontalAlign'
     | 'VerticalAlign'
     | 'event'
-    | 'RowIdFieldSelect'; // Row id field specialized select
+    | 'RowIdFieldSelect' // Row id field specialized select
+    | 'Markdown'; // Markdown editor
 }
 
 type PrimitiveValueType =
@@ -188,6 +189,13 @@ export interface ArgTypeDefinition<V = unknown> {
    * @returns {any} a value for the controlled prop
    */
   onChangeHandler?: (...params: any[]) => V;
+  /**
+   * For compound components, this property is used to control the visibility of this property based on the selected value of another property.
+   * If this property is not defined, the property will be visible at all times.
+   * @param {string} mode mode of the component
+   * @returns {boolean} a boolean value indicating whether the property should be visible or not
+   */
+  visible?: ((mode: string) => boolean) | boolean;
 }
 
 export type ArgTypeDefinitions<P = any> = {
@@ -250,10 +258,10 @@ export interface ComponentConfig<P> {
    * Designates a property as "the resizable height property". If Toolpad detects any
    * vertical resizing of the component it will forward it to this property.
    */
-  resizableHeightProp?: keyof P & string;
+  resizableHeightProp?: keyof P & string /**       
   /**
    * Describes the individual properties for this component
-   */
+   */;
   argTypes?: ArgTypeDefinitions<P>;
 }
 

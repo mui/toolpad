@@ -17,6 +17,10 @@ import {
   conf as typescriptBasicConf,
   language as typescriptBasicLanguage,
 } from 'monaco-editor/esm/vs/basic-languages/typescript/typescript';
+import {
+  conf as mdBasicConf,
+  language as mdBasicLanguage,
+} from 'monaco-editor/esm/vs/basic-languages/markdown/markdown';
 import { useTheme, Theme, lighten, rgbToHex } from '@mui/material/styles';
 import { getDesignTokens } from '../theme';
 
@@ -33,6 +37,8 @@ function getExtension(language: string): string {
       return '.json';
     case 'javascript':
       return '.jsx';
+    case 'markdown':
+      return '.md';
     case 'css':
       return '.css';
     case 'html':
@@ -131,6 +137,7 @@ function registerLanguage(
  */
 registerLanguage('jsonBasic', jsonBasicLanguage, jsonBasicConf);
 registerLanguage('typescriptBasic', typescriptBasicLanguage, typescriptBasicConf);
+registerLanguage('markdownBasic', mdBasicLanguage, mdBasicConf);
 
 const JSON_DEFAULT_DIAGNOSTICS_OPTIONS: monaco.languages.json.DiagnosticsOptions = {};
 
@@ -238,6 +245,12 @@ export type MonacoEditorProps = MonacoEditorBaseProps &
     | {
         language: 'json';
         diagnostics?: monaco.languages.json.DiagnosticsOptions;
+        compilerOptions?: undefined;
+        extraLibs?: undefined;
+      }
+    | {
+        language: 'markdown';
+        diagnostics?: undefined;
         compilerOptions?: undefined;
         extraLibs?: undefined;
       }

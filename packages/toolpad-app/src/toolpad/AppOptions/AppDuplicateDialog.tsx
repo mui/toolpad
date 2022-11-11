@@ -21,7 +21,7 @@ interface AppDuplicateDialogProps {
 }
 
 const AppDuplicateDialog = ({ app, onClose, ...props }: AppDuplicateDialogProps) => {
-  const [nameInput, setNameInput] = React.useState('');
+  const [nameInput, setNameInput] = React.useState(app?.name ?? '');
 
   const handleNameInputChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => setNameInput(event.target.value),
@@ -55,17 +55,17 @@ const AppDuplicateDialog = ({ app, onClose, ...props }: AppDuplicateDialogProps)
           invariant(isFormValid, 'Form should not be submitted when invalid');
           event.preventDefault();
           duplicateApp();
+          onClose();
         }}
       >
         <DialogTitle>Duplicate app</DialogTitle>
         <DialogContent>
           <TextField
             sx={{ my: 1 }}
-            required
             autoFocus
+            required
             fullWidth
             label="Name"
-            defaultValue={app?.name ?? ''}
             value={nameInput}
             error={!isFormValid}
             helperText={formError}
@@ -84,6 +84,7 @@ const AppDuplicateDialog = ({ app, onClose, ...props }: AppDuplicateDialogProps)
           </Button>
           <LoadingButton
             type="submit"
+            aria-label="Duplicate app submit button"
             loading={duplicateAppMutation.isLoading}
             disabled={!isFormValid}
           >

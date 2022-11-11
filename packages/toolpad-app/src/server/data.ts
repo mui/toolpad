@@ -13,6 +13,7 @@ import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
+import { TOOLPAD_UNIQUE_CONSTRAINT_VIOLATION } from '../constants';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -231,7 +232,9 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
   }
 
   if (await prismaClient.app.findUnique({ where: { name: appName } })) {
-    throw new Error(`An app named "${name}" already exists.`);
+    throw new Error(`An app named "${name}" already exists.`, {
+      cause: TOOLPAD_UNIQUE_CONSTRAINT_VIOLATION,
+    });
   }
 
   return prismaClient.$transaction(async () => {
@@ -531,26 +534,25 @@ export async function loadRenderTree(appId: string, version: VersionOrPreview = 
 
 export async function duplicateApp(id: string, name: string): Promise<AppMeta> {
   const dom = await loadPreviewDom(id);
+  const appFromDom: CreateAppOptions = {
+    from: {
+      kind: 'dom',
+      dom,
+    },
+  };
   try {
-    const newApp = await createApp(name, {
-      from: {
-        kind: 'dom',
-        dom,
-      },
-    });
+    const newApp = await createApp(name, appFromDom);
     return newApp;
   } catch (error) {
-    const duplicateCount = await prismaClient.app.count({
-      where: { name: { startsWith: `${name} (copy`, endsWith: ')' } },
-    });
-    const duplicateName =
-      duplicateCount === 0 ? `${name} (copy)` : `${name} (copy ${duplicateCount + 1})`;
-    const newApp = await createApp(duplicateName, {
-      from: {
-        kind: 'dom',
-        dom,
-      },
-    });
-    return newApp;
+    if (error instanceof Error && error.cause === TOOLPAD_UNIQUE_CONSTRAINT_VIOLATION) {
+      const duplicateCount = await prismaClient.app.count({
+        where: { name: { startsWith: `${name} (copy`, endsWith: ')' } },
+      });
+      const duplicateName =
+        duplicateCount === 0 ? `${name} (copy)` : `${name} (copy ${duplicateCount + 1})`;
+      const newApp = await createApp(duplicateName, appFromDom);
+      return newApp;
+    }
+    throw error;
   }
 }

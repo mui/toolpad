@@ -95,9 +95,12 @@ export class ToolpadHome {
     await this.getAppRow(appName).locator('[aria-label="Application menu"]').click();
 
     await this.page.click('[role="menuitem"]:has-text("Duplicate"):visible');
-
+    const textField = this.page.getByLabel('name');
+    await textField.focus();
+    await textField.fill(appName);
+    await this.page.click('[aria-label="Duplicate app submit button"]');
     // Navigate to the new app
-    await this.getAppRow(appName).locator('a:has-text("Edit")').click();
+    await this.getAppRow(`${appName} (copy)`).locator('a:has-text("Edit")').click();
     await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
 
     const { pathname } = new URL(this.page.url());

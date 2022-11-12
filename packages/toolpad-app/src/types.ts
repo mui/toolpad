@@ -162,6 +162,18 @@ export type AppTemplateId = 'blank' | 'stats' | 'images';
 
 export type NodeHashes = Record<NodeId, number | undefined>;
 
+export type CompiledModule =
+  | {
+      code: string;
+      urlImports: string[];
+      error?: undefined;
+    }
+  | {
+      code?: undefined;
+      urlImports?: undefined;
+      error: Error;
+    };
+
 /**
  * Defines all the data needed to render the runtime.
  * While the dom is optimized for storage and editing. It isn't the ideal format used to render the application
@@ -175,4 +187,5 @@ export interface RuntimeState {
   // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
   dom: appDom.RenderTree;
   appId: string;
+  modules: Record<string, CompiledModule>;
 }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as appDom from '../appDom';
+import { CompiledModule } from '../types';
 import { createProvidedContext } from '../utils/react';
 import loadModule from './loadModule';
 
@@ -13,40 +13,28 @@ const [useAppModules, AppModulesContextProvider] =
 const ModulesCacheContext = React.createContext(new Map<string, SuspenseCacheEntry>());
 
 export interface AppModulesProviderProps {
-  dom: appDom.AppDom;
   children?: React.ReactNode;
+  modules: Record<string, CompiledModule>;
 }
 
 /**
  * Loads all custom modules used by dom. Suspends while loading.
  */
-export function AppModulesProvider({ dom, children }: AppModulesProviderProps) {
-  const moduleSpecs: [string, string | null][] = React.useMemo(() => {
-    const root = appDom.getApp(dom);
-    const { codeComponents = [], pages = [] } = appDom.getChildNodes(dom, root);
-    return [
-      ...codeComponents.map((component): [string, string | null] => [
-        `codeComponents/${component.id}`,
-        component.attributes.code.value,
-      ]),
-      ...pages.map((page): [string, string | null] => [
-        `pages/${page.id}`,
-        page.attributes.module?.value ?? null,
-      ]),
-    ];
-  }, [dom]);
-
+export function AppModulesProvider({
+  children,
+  modules: compiledModules,
+}: AppModulesProviderProps) {
   const cache = React.useContext(ModulesCacheContext);
-  const modules: Record<string, any> = {};
+  const loadedModules: Record<string, any> = {};
   const pending: Promise<void>[] = [];
 
-  for (const [id, content] of moduleSpecs) {
-    const cacheId = `// ${id}\n${content}`;
+  for (const [id, mod] of Object.entries(compiledModules)) {
+    const cacheId = `// ${id}\n${mod.code}`;
     const fromCache = cache.get(cacheId);
 
-    if (content) {
+    if (mod) {
       if (!fromCache) {
-        const createPromise = loadModule(content, id).then(
+        const createPromise = loadModule(mod).then(
           (module: unknown) => {
             cache.set(cacheId, {
               state: 'loaded',
@@ -69,7 +57,7 @@ export function AppModulesProvider({ dom, children }: AppModulesProviderProps) {
       } else if (fromCache.state === 'pending') {
         pending.push(fromCache.promise);
       } else {
-        modules[id] = fromCache;
+        loadedModules[id] = fromCache;
       }
     }
   }
@@ -78,7 +66,7 @@ export function AppModulesProvider({ dom, children }: AppModulesProviderProps) {
     throw Promise.all(pending);
   }
 
-  return <AppModulesContextProvider value={modules}>{children}</AppModulesContextProvider>;
+  return <AppModulesContextProvider value={loadedModules}>{children}</AppModulesContextProvider>;
 }
 
 export { useAppModules };

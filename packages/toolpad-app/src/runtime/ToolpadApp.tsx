@@ -952,7 +952,7 @@ export default function ToolpadApp({
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
-                  <AppModulesProvider dom={dom}>
+                  <AppModulesProvider modules={state.modules}>
                     <ComponentsContext dom={dom}>
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>

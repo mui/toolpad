@@ -85,7 +85,7 @@
     "node-fetch": "^2.6.7",
     "node-fetch-har": "^1.0.1",
     "path-to-regexp": "^6.2.1",
-    "perf-cascade": "^2.11.0",
+    "perf-cascade": "^3.0.3",
     "pg": "^8.8.0",
     "pino": "^8.7.0",
     "pino-elasticsearch": "^6.3.0",

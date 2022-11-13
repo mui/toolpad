@@ -10030,10 +10030,10 @@ path-type@^4.0.0:
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
-perf-cascade@^2.11.0:
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/perf-cascade/-/perf-cascade-2.11.0.tgz#8cae08dd71ec94e46c71d80d3eaaeb06d2c24ab2"
-  integrity sha512-z36x0CGUGispOcvWo5ITUcZBNdnI65SEKHInqg2ZJGhOlQH05F6cy5/DfhLQhUl3TfPSkatG7hQIwIUYMnK+Sg==
+perf-cascade@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/perf-cascade/-/perf-cascade-3.0.3.tgz#8b199ff3017f87646efc20923152929fb1f0b9ff"
+  integrity sha512-2TFyFcBdJrbVU5DGlq32yVimwZ3FQkBX5zB+g2/ps/E60RrcUEUvuHgrPxpoUulhcujejGtIGlp9muQ+WU6Tlw==
   dependencies:
     "@types/har-format" "^1.2.8"
 

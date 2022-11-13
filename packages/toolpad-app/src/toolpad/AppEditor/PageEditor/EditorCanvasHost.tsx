@@ -14,7 +14,7 @@ import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
 import { useDomApi } from '../../DomLoader';
 import { hasFieldFocus } from '../../../utils/fields';
-import createRuntimeData from '../../../createRuntimeData';
+import createRuntimeState from '../../../createRuntimeData';
 
 type IframeContentWindow = Window & typeof globalThis;
 
@@ -88,7 +88,7 @@ export default React.forwardRef<EditorCanvasHostHandle, EditorCanvasHostProps>(
 
     const updateOnBridge = React.useCallback(
       async (bridgeInstance: ToolpadBridge) => {
-        const data = createRuntimeData({ appId, dom });
+        const data = createRuntimeState({ appId, dom });
         bridgeInstance.update({ ...data, savedNodes });
       },
       [appId, dom, savedNodes],

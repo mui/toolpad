@@ -49,12 +49,12 @@ function compileModules(dom: appDom.AppDom): Record<string, CompiledModule> {
   return result;
 }
 
-export interface CreateRuntimeDataParams {
+export interface CreateRuntimeStateParams {
   appId: string;
   dom: appDom.AppDom;
 }
 
-export default function createRuntimeData({ appId, dom }: CreateRuntimeDataParams): RuntimeState {
+export default function createRuntimeState({ appId, dom }: CreateRuntimeStateParams): RuntimeState {
   return {
     appId,
     dom: appDom.createRenderTree(dom),

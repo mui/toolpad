@@ -79,7 +79,7 @@
       "pinDigests": true
     },
     {
-      "groupName": "GitHub Action",
+      "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"]
     }
   ],

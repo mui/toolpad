@@ -180,7 +180,7 @@ function QueryEditor({
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
   const handleCommit = React.useCallback(() => onCommit?.(), [onCommit]);
-  useShortcut({ code: 'KeyS', metaKey: true }, handleCommit);
+  useShortcut({ key: 's', metaKey: true }, handleCommit);
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>

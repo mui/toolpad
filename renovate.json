@@ -77,6 +77,10 @@
     {
       "matchDepTypes": ["action"],
       "pinDigests": true
+    },
+    {
+      "groupName": ["github-actions"],
+      "matchManagers": ["github-actions"]
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],

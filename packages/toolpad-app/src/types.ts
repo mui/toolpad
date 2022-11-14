@@ -169,8 +169,6 @@ export type CompiledModule =
       error?: undefined;
     }
   | {
-      code?: undefined;
-      urlImports?: undefined;
       error: Error;
     };
 

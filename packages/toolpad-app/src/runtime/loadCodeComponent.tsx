@@ -1,6 +1,6 @@
 import { createComponent, ToolpadComponent, TOOLPAD_COMPONENT } from '@mui/toolpad-core';
 import * as ReactIs from 'react-is';
-import { compileModule } from '../createRuntimeData';
+import { compileModule } from '../createRuntimeState';
 import loadModule from './loadModule';
 
 export function ensureToolpadComponent<P>(Component: unknown): ToolpadComponent<P> {

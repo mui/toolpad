@@ -14,7 +14,7 @@ import { LogEntry } from '../../../components/Console';
 import { Maybe } from '../../../utils/types';
 import { useDomApi } from '../../DomLoader';
 import { hasFieldFocus } from '../../../utils/fields';
-import createRuntimeState from '../../../createRuntimeData';
+import createRuntimeState from '../../../createRuntimeState';
 
 type IframeContentWindow = Window & typeof globalThis;
 

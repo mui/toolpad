@@ -42,9 +42,11 @@ function compileModules(dom: appDom.AppDom): Record<string, CompiledModule> {
     result[name] = compileModule(src, name);
   }
   for (const node of pages) {
-    const src = node.attributes.module?.value ?? `export {};`;
-    const name = `pages/${node.id}`;
-    result[name] = compileModule(src, name);
+    const src = node.attributes.module?.value;
+    if (src) {
+      const name = `pages/${node.id}`;
+      result[name] = compileModule(src, name);
+    }
   }
   return result;
 }

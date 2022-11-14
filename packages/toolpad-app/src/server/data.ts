@@ -13,7 +13,7 @@ import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
-import createRuntimeState from '../createRuntimeData';
+import createRuntimeState from '../createRuntimeState';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);

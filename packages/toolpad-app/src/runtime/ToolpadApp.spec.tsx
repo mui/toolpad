@@ -5,7 +5,7 @@ import { LiveBindings } from '@mui/toolpad-core';
 import { setEventHandler } from '@mui/toolpad-core/runtime';
 import ToolpadApp from './ToolpadApp';
 import * as appDom from '../appDom';
-import createRuntimeState from '../createRuntimeData';
+import createRuntimeState from '../createRuntimeState';
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>

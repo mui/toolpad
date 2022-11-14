@@ -161,7 +161,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           sendAppCreatedEvent(name, appTemplateId);
         }}
       >
-        <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
+        <DialogTitle>Create a new App</DialogTitle>
         <DialogContent>
           {config.isDemo ? (
             <Alert severity="warning" sx={{ mb: 2 }}>

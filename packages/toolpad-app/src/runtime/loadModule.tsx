@@ -1,7 +1,6 @@
-import { transform, TransformResult } from 'sucrase';
-import { codeFrameColumns } from '@babel/code-frame';
-import { findImports, isAbsoluteUrl } from '../utils/strings';
-import { errorFrom } from '../utils/errors';
+import * as React from 'react';
+import * as ReactDom from 'react-dom';
+import { CompiledModule } from '../types';
 
 async function resolveValues(input: Map<string, Promise<unknown>>): Promise<Map<string, unknown>> {
   const resolved = await Promise.all(input.values());
@@ -16,7 +15,12 @@ async function createRequire(urlImports: string[]) {
     ),
   ]);
 
-  const modules: Map<string, any> = new Map([...muiMaterialExports, ...urlModules]);
+  const modules: Map<string, any> = new Map([
+    ['react', React],
+    ['react-dom', ReactDom],
+    ...muiMaterialExports,
+    ...urlModules,
+  ]);
 
   const require = (moduleId: string): unknown => {
     let esModule = modules.get(moduleId);
@@ -42,24 +46,12 @@ async function createRequire(urlImports: string[]) {
   return require;
 }
 
-export default async function loadModule(src: string): Promise<any> {
-  const imports = findImports(src).filter((maybeUrl) => isAbsoluteUrl(maybeUrl));
-
-  let compiled: TransformResult;
-
-  try {
-    compiled = transform(src, {
-      transforms: ['jsx', 'typescript', 'imports'],
-    });
-  } catch (rawError) {
-    const err = errorFrom(rawError);
-    if ((err as any).loc) {
-      err.message = [err.message, codeFrameColumns(src, { start: (err as any).loc })].join('\n\n');
-    }
-    throw err;
+export default async function loadModule(mod: CompiledModule): Promise<any> {
+  if (mod.error) {
+    throw mod.error;
   }
 
-  const require = await createRequire(imports);
+  const require = await createRequire(mod.urlImports);
 
   const exports: any = {};
 
@@ -70,10 +62,10 @@ export default async function loadModule(src: string): Promise<any> {
   };
 
   const instantiateModuleCode = `
-        (${Object.keys(globals).join(', ')}) => {
-          ${compiled.code}
-        }
-      `;
+    (${Object.keys(globals).join(', ')}) => {
+      ${mod.code}
+    }
+  `;
 
   // eslint-disable-next-line no-eval
   const instantiateModule = (0, eval)(instantiateModuleCode);

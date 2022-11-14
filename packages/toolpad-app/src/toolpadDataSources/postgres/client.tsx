@@ -8,6 +8,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SyncIcon from '@mui/icons-material/Sync';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
+import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
 import SplitPane from '../../components/SplitPane';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
@@ -26,6 +27,7 @@ import {
   PostgresQuery,
   PostgresResult,
 } from './types';
+import * as appDom from '../../appDom';
 
 const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor'), {
   noSsr: true,
@@ -155,15 +157,26 @@ function ConnectionParamsInput({
   );
 }
 
+const EMPTY_PARAMS: BindableAttrEntries = [];
+
 function QueryEditor({
   globalScope,
   value: input,
   onChange: setInput,
 }: QueryEditorProps<PostgresConnectionParams, PostgresQuery>) {
+  const paramsEntries = input.params || EMPTY_PARAMS;
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    input: input.params,
+    input: paramsEntries,
     globalScope,
   });
+
+  const handleParamsChange = React.useCallback(
+    (newParams: [string, BindableAttrValue<string>][]) => {
+      setInput((existing) => ({ ...existing, params: newParams }));
+    },
+    [setInput],
+  );
 
   const previewParams = React.useMemo(
     () => Object.fromEntries(paramsEditorLiveValue.map(([key, binding]) => [key, binding.value])),
@@ -179,7 +192,7 @@ function QueryEditor({
 
   const { preview, runPreview: handleRunPreview } = useQueryPreview(
     fetchServerPreview,
-    input.query,
+    input.attributes.query.value,
     previewParams,
   );
 
@@ -194,9 +207,9 @@ function QueryEditor({
         <QueryInputPanel onRunPreview={handleRunPreview}>
           <Box sx={{ flex: 1, minHeight: 0 }}>
             <MonacoEditor
-              value={input.query.sql}
+              value={input.attributes.query.value.sql}
               onChange={(newValue) =>
-                setInput((existing) => ({ ...existing, query: { sql: newValue } }))
+                setInput((existing) => appDom.setQueryProp(existing, 'sql', newValue))
               }
               language="sql"
             />
@@ -206,8 +219,8 @@ function QueryEditor({
         <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
           <Typography>Parameters</Typography>
           <ParametersEditor
-            value={input.params}
-            onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
+            value={paramsEntries}
+            onChange={handleParamsChange}
             globalScope={globalScope}
             liveValue={paramsEditorLiveValue}
           />

@@ -46,7 +46,7 @@ function Header({ actions, status }: HeaderProps) {
               aria-label="Home"
               href="/"
               underline="none"
-              sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}
+              sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}
             >
               <Image
                 src={theme.palette.mode === 'dark' ? productIconDark : productIconLight}
@@ -67,9 +67,7 @@ function Header({ actions, status }: HeaderProps) {
               </Box>
             </Link>
           </Tooltip>
-          {config.isDemo ? (
-            <Chip sx={{ ml: 2 }} label="Demo Version" color="primary" size="small" />
-          ) : null}
+          {config.isDemo ? <Chip sx={{ ml: 1 }} label="Alpha" size="small" color="grey" /> : null}
         </Box>
         <Box
           sx={{

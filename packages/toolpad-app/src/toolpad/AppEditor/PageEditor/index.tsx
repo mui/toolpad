@@ -76,13 +76,13 @@ export default function PageEditor({ appId }: PageEditorProps) {
   const { nodeId } = useParams();
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
-  useShortcut({ code: 'KeyZ', metaKey: true, preventDefault: false }, () => {
+  useShortcut({ key: 'z', metaKey: true, preventDefault: false }, () => {
     if (hasFieldFocus()) {
       return;
     }
     domApi.undo();
   });
-  useShortcut({ code: 'KeyZ', metaKey: true, shiftKey: true, preventDefault: false }, () => {
+  useShortcut({ key: 'z', metaKey: true, shiftKey: true, preventDefault: false }, () => {
     if (hasFieldFocus()) {
       return;
     }

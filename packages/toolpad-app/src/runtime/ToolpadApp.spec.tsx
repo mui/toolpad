@@ -9,7 +9,7 @@ import createRuntimeState from '../createRuntimeData';
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
-  waitForOrig(waiter, { timeout: 4000, ...options });
+  waitForOrig(waiter, { timeout: 10000, ...options });
 
 function renderPage(initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom) {
   const appId = '12345';

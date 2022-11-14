@@ -41,8 +41,8 @@
   },
   "devDependencies": {
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
-    "@next/eslint-plugin-next": "13.0.2",
-    "@playwright/test": "next",
+    "@next/eslint-plugin-next": "13.0.3",
+    "@playwright/test": "^1.27.1",
     "@swc/helpers": "^0.4.12",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",

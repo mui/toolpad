@@ -29,10 +29,10 @@ export function AppModulesProvider({
   const pending: Promise<void>[] = [];
 
   for (const [id, mod] of Object.entries(compiledModules)) {
-    const cacheId = `// ${id}\n${mod.code}`;
-    const fromCache = cache.get(cacheId);
+    if (!mod.error) {
+      const cacheId = `// ${id}\n${mod.code}`;
+      const fromCache = cache.get(cacheId);
 
-    if (mod) {
       if (!fromCache) {
         const createPromise = loadModule(mod).then(
           (module: unknown) => {

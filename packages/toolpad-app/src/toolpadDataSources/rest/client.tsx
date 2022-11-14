@@ -83,7 +83,7 @@ const ButtonLink = styled('button')(({ theme }) => ({
 }));
 
 interface UrlControlProps extends RenderControlParams<string> {
-  baseUrl?: string;
+  baseUrl: string | null;
 }
 
 function UrlControl({ label, disabled, baseUrl, value, onChange }: UrlControlProps) {
@@ -271,11 +271,12 @@ const EMPTY_PARAMS: BindableAttrEntries = [];
 
 function QueryEditor({
   globalScope,
-  connectionParams,
+  connectionParams: rawConnectionParams,
   value: input,
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
-  const baseUrl = connectionParams?.baseUrl;
+  const connectionParams = input.attributes.query.value.browser ? null : rawConnectionParams;
+  const baseUrl = input.attributes.query.value.browser ? null : connectionParams?.baseUrl;
   const urlValue: BindableAttrValue<string> =
     input.attributes.query.value.url || getDefaultUrl(connectionParams);
 
@@ -449,7 +450,7 @@ function QueryEditor({
                 server
                 label="url"
                 propType={{ type: 'string' }}
-                renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
+                renderControl={(props) => <UrlControl baseUrl={baseUrl ?? null} {...props} />}
                 value={urlValue}
                 onChange={handleUrlChange}
               />

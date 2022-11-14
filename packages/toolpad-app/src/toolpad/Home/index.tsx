@@ -105,6 +105,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('blank');
   const [dom, setDom] = React.useState('');
+  const [isNavigating, setIsNavigating] = React.useState(false);
 
   const handleAppTemplateChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,6 +122,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const createAppMutation = client.useMutation('createApp', {
     onSuccess: (app) => {
       window.location.href = `/_toolpad/app/${app.id}`;
+      setIsNavigating(true);
     },
   });
 
@@ -159,7 +161,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           sendAppCreatedEvent(name, appTemplateId);
         }}
       >
-        <DialogTitle>Create a new MUI Toolpad App</DialogTitle>
+        <DialogTitle>Create a new App</DialogTitle>
         <DialogContent>
           {config.isDemo ? (
             <Alert severity="warning" sx={{ mb: 2 }}>
@@ -250,7 +252,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           </Button>
           <LoadingButton
             type="submit"
-            loading={createAppMutation.isLoading}
+            loading={createAppMutation.isLoading || isNavigating}
             disabled={!isFormValid}
           >
             Create

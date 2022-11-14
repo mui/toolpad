@@ -2,6 +2,10 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import Header from './Header';
 
+import DemoBar from './DemoBar';
+
+import config from '../../config';
+
 export interface ToolpadShellProps {
   actions?: React.ReactNode;
   status?: React.ReactNode;
@@ -27,6 +31,7 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
     <ToolpadShellRoot>
       <Header {...props} />
       <ViewPort>{children}</ViewPort>
+      {config.isDemo ? <DemoBar /> : null}
     </ToolpadShellRoot>
   );
 }

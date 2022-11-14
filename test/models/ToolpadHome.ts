@@ -36,7 +36,7 @@ export class ToolpadHome {
     this.createNewbtn = page.locator('button:has-text("create new")');
 
     this.newAppDialog = page.locator('[role="dialog"]', {
-      hasText: 'Create a new MUI Toolpad App',
+      hasText: 'Create a new App',
     });
     this.newAppNameInput = this.newAppDialog.locator('label:has-text("name")');
     this.newAppTemplateSelect = this.newAppDialog.locator(

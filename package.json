@@ -40,7 +40,7 @@
     "test": "yarn test:build && jest"
   },
   "devDependencies": {
-    "@mui/monorepo": "https://github.com/mui/material-ui.git#master",
+    "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@next/eslint-plugin-next": "12.3.1",
     "@playwright/test": "^1.27.1",
     "@swc/helpers": "^0.4.12",

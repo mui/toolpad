@@ -518,7 +518,10 @@ export function parseVersion(param?: string | string[]): VersionOrPreview | null
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-export async function loadDom(appId: string, version: VersionOrPreview = 'preview') {
+export async function loadDom(
+  appId: string,
+  version: VersionOrPreview = 'preview',
+): Promise<appDom.AppDom> {
   return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
 }
 

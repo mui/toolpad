@@ -4,11 +4,12 @@ import { asArray } from '../../../../src/utils/collections';
 import ToolpadApp, { ToolpadAppProps } from '../../../../src/runtime/ToolpadApp';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
-  const { loadRenderTree, parseVersion } = await import('../../../../src/server/data');
+  const { loadRenderTree, parseVersion, getApp } = await import('../../../../src/server/data');
 
   const [appId] = asArray(context.query.appId);
   const version = parseVersion(context.query.version);
-  if (!appId || !version) {
+  const app = appId ? await getApp(appId) : null;
+  if (!appId || !app || !version) {
     return {
       notFound: true,
     };

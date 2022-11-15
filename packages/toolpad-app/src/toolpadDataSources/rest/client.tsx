@@ -275,8 +275,11 @@ function QueryEditor({
   value: input,
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
-  const connectionParams = input.attributes.query.value.browser ? null : rawConnectionParams;
-  const baseUrl = input.attributes.query.value.browser ? null : connectionParams?.baseUrl;
+  const isBrowserSide = input.attributes.query.value.browser;
+
+  const connectionParams = isBrowserSide ? null : rawConnectionParams;
+  const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
+
   const urlValue: BindableAttrValue<string> =
     input.attributes.query.value.url || getDefaultUrl(connectionParams);
 
@@ -450,19 +453,14 @@ function QueryEditor({
                 server
                 label="url"
                 propType={{ type: 'string' }}
-                renderControl={(props) => <UrlControl baseUrl={baseUrl ?? null} {...props} />}
+                renderControl={(props) => <UrlControl baseUrl={baseUrl} {...props} />}
                 value={urlValue}
                 onChange={handleUrlChange}
               />
             </Box>
             <FormGroup>
               <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={input.attributes.query.value.browser}
-                    onChange={handleRunInBrowserChange}
-                  />
-                }
+                control={<Checkbox checked={isBrowserSide} onChange={handleRunInBrowserChange} />}
                 label="Run in the browser"
               />
             </FormGroup>

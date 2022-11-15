@@ -13,8 +13,7 @@ import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
-import { ApiError } from '../apiErrors';
-import { APP_NAME_EXISTS_ERROR_CODE, VALIDATE_CAPTCHA_FAILED_ERROR_CODE } from '../apiErrorCodes';
+import { ERR_APP_NAME_EXISTS, ERR_VALIDATE_CAPTCHA_FAILED } from '../errorCodes';
 import createRuntimeState from '../createRuntimeState';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
@@ -222,10 +221,11 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     );
 
     if (!isRecaptchaTokenValid) {
-      throw new ApiError(
+      const toolpadError = new Error(
         config.recaptchaV2SecretKey ? 'Please solve the CAPTCHA.' : 'Unable to verify CAPTCHA.',
-        VALIDATE_CAPTCHA_FAILED_ERROR_CODE,
       );
+      toolpadError.code = ERR_VALIDATE_CAPTCHA_FAILED;
+      throw toolpadError;
     }
   }
 
@@ -242,14 +242,22 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     }
   }
 
-  if (await prismaClient.app.findUnique({ where: { name: appName } })) {
-    throw new ApiError(`An app named "${name}" already exists.`, APP_NAME_EXISTS_ERROR_CODE);
-  }
-
   return prismaClient.$transaction(async () => {
-    const app = await prismaClient.app.create({
-      data: { name: appName },
-    });
+    let app;
+    try {
+      app = await prismaClient.app.create({
+        data: { name: appName },
+      });
+    } catch (error) {
+      // https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes
+      // P2002: Unique constraint failed on the field
+      if (error instanceof prisma.Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const toolpadError = new Error(`An app named "${name}" already exists.`, { cause: error });
+        toolpadError.code = ERR_APP_NAME_EXISTS;
+        throw toolpadError;
+      }
+      throw error;
+    }
 
     let dom: appDom.AppDom | null = null;
 

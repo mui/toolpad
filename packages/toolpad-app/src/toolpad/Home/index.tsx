@@ -62,8 +62,7 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
-import { ApiError } from '../../apiErrors';
-import { VALIDATE_CAPTCHA_FAILED_ERROR_CODE } from '../../apiErrorCodes';
+import { ERR_VALIDATE_CAPTCHA_FAILED } from '../../errorCodes';
 
 import { sendAppCreatedEvent } from '../../utils/ga';
 import { StoredLatestCreatedApp, TOOLPAD_LATEST_CREATED_APP_KEY } from '../../storageKeys';
@@ -149,6 +148,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
     TOOLPAD_LATEST_CREATED_APP_KEY,
     null,
   );
+  const firstLatestCreatedApp = React.useRef(latestCreatedApp).current;
 
   const isFormValid = Boolean(name);
 
@@ -205,9 +205,10 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
         });
 
         sendAppCreatedEvent(createdApp.name, appTemplateId);
-      } catch (error) {
+      } catch (rawError) {
         if (config.recaptchaV2SiteKey && !hasShownRecaptchaCheckbox && captchaTargetRef.current) {
-          if (error instanceof ApiError && error.code === VALIDATE_CAPTCHA_FAILED_ERROR_CODE) {
+          const error = errorFrom(rawError);
+          if (error.code === ERR_VALIDATE_CAPTCHA_FAILED) {
             // Show captcha checkbox
             const widgetId = grecaptcha.render(captchaTargetRef.current.id, {
               sitekey: config.recaptchaV2SiteKey,
@@ -280,7 +281,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               disabled={isSubmitting}
             />
           ) : null}
-          {config.isDemo && latestCreatedApp ? (
+          {config.isDemo && firstLatestCreatedApp ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="subtitle2" color="text.secondary" textAlign="center">
                 or
@@ -289,13 +290,13 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
                 variant="outlined"
                 size="medium"
                 component="a"
-                href={`/_toolpad/app/${latestCreatedApp.appId}`}
+                href={`/_toolpad/app/${firstLatestCreatedApp.appId}`}
                 sx={{ mt: 0.5 }}
                 loading={isNavigatingToExistingApp}
                 onClick={handleContinueButtonClick}
                 disabled={isSubmitting}
               >
-                Continue working on &ldquo;{latestCreatedApp.appName}&rdquo;
+                Continue working on &ldquo;{firstLatestCreatedApp.appName}&rdquo;
               </LoadingButton>
             </Box>
           ) : null}

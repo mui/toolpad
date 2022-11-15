@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ApiError } from '../../apiErrors';
 
 export function reqSerializer(req: NextApiRequest) {
   return {
@@ -43,9 +42,9 @@ export function rpcResSerializer(res: NextApiResponse) {
   };
 }
 
-export function rpcResErrSerializer(error: ApiError | Error) {
+export function rpcResErrSerializer(error: Error) {
   return {
     message: error.message,
-    code: (error as ApiError).code,
+    code: error.code,
   };
 }

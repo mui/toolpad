@@ -84,7 +84,7 @@ export default function CreateConnectionDialog({
           navigate(`/app/${appId}/connections/${newNode.id}`);
         }}
       >
-        <DialogTitle>Create a new MUI Toolpad Connection</DialogTitle>
+        <DialogTitle>Create a new Connection</DialogTitle>
         <DialogContent>
           <TextField
             sx={{ my: 1 }}

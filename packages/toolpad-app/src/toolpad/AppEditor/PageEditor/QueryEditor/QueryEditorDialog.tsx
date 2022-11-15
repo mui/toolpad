@@ -282,9 +282,7 @@ export default function QueryNodeEditorDialog<Q>({
               />
             </Stack>
           </DialogTitle>
-
           <Divider />
-
           <DialogContent
             sx={{
               // height will be clipped by max-height
@@ -310,7 +308,6 @@ export default function QueryNodeEditorDialog<Q>({
                 globalScope={pageState}
               />
             </Box>
-
             <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>
               <TextField select label="mode" value={mode} onChange={handleModeChange}>
                 <MenuItem value="query">
@@ -341,7 +338,6 @@ export default function QueryNodeEditorDialog<Q>({
               />
             </Stack>
           </DialogContent>
-
           <QueryeditorDialogActions
             onSave={handleSave}
             onClose={handleClose}

@@ -194,8 +194,8 @@ export default function QueryEditor() {
                     </IconButton>
                   )}
                   nodeId={queryNode.id}
-                  deleteLabelText={`Delete ${queryNode.name}`}
-                  duplicateLabelText={`Duplicate ${queryNode.name}`}
+                  deleteLabelText="Delete"
+                  duplicateLabelText="Duplicate"
                   onDeleteNode={handleDeleteNode}
                   onDuplicateNode={handleDuplicateNode}
                 />

@@ -132,8 +132,10 @@ export default withBundleAnalyzer(
         {
           // Support global CSS in monaco-editor
           // Adapted from next-transpile-modules.
-          const extraCssIssuer = /(\/|\\)node_modules(\/|\\)monaco-editor(\/|\\)/;
-          const modulesPaths = [path.dirname(require.resolve('monaco-editor/package.json'))];
+          const extraCssIssuer = /(\/|\\)node_modules(\/|\\)monaco-editor(\/|\\).*\.js$/;
+          const modulesPaths = [
+            path.resolve(path.dirname(require.resolve('monaco-editor/package.json')), './esm'),
+          ];
 
           config.module = config.module ?? {};
           config.module.rules = config.module.rules ?? [];

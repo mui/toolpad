@@ -458,7 +458,7 @@ function QueryEditor({
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={input.attributes.query.value.browser}
+                    checked={isBrowserSide}
                     onChange={handleRunInBrowserChange}
                     disabled={config.isDemo}
                   />

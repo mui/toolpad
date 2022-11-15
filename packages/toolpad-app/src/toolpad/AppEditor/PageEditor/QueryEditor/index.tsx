@@ -122,9 +122,10 @@ export default function QueryEditor() {
     setDialogState({});
   }, []);
 
-  const handleCreated = React.useCallback((node: appDom.QueryNode) => {
-    setDialogState({ node, isDraft: true });
-  }, []);
+  const handleCreated = React.useCallback(
+    (node: appDom.QueryNode) => setDialogState({ node, isDraft: true }),
+    [],
+  );
 
   const handleSave = React.useCallback(
     (node: appDom.QueryNode) => {
@@ -133,10 +134,7 @@ export default function QueryEditor() {
       } else {
         domApi.addNode(node, page, 'queries');
       }
-      setDialogState({
-        node,
-        isDraft: false,
-      });
+      setDialogState({ node, isDraft: false });
     },
     [dom, domApi, page],
   );

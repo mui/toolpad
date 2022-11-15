@@ -56,6 +56,7 @@ export async function clientExec(
     };
 
     const result = await execfetch(fetchQuery, params, {
+      connection: null,
       fetchImpl: instrumentedFetch,
       evalExpression,
     });

@@ -107,7 +107,7 @@ export default function ConnectionSelect({
           : '<default>';
         return (
           <MenuItem key={index} value={index}>
-            {dataSourceLabel} | {connectionLabel}{' '}
+            {dataSourceLabel} | {connectionLabel}
           </MenuItem>
         );
       })}

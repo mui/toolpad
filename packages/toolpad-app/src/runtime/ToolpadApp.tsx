@@ -40,7 +40,7 @@ import {
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import * as appDom from '../appDom';
-import { VersionOrPreview } from '../types';
+import { RuntimeState, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import {
   getElementNodeComponentId,
@@ -916,19 +916,18 @@ export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   hidePreviewBanner?: boolean;
   basename: string;
-  appId: string;
   version: VersionOrPreview;
-  dom: appDom.AppDom;
+  state: RuntimeState;
 }
 
 export default function ToolpadApp({
   rootRef,
   basename,
-  appId,
   version,
-  dom,
   hidePreviewBanner,
+  state,
 }: ToolpadAppProps) {
+  const { appId, dom } = state;
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
@@ -953,7 +952,7 @@ export default function ToolpadApp({
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
-                  <AppModulesProvider dom={dom}>
+                  <AppModulesProvider modules={state.modules}>
                     <ComponentsContext dom={dom}>
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>

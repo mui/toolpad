@@ -2,7 +2,8 @@ import { set } from 'lodash-es';
 import evalExpression from '../utils/evalExpression';
 import { mapValues } from '../utils/collections';
 import { errorFrom } from '../utils/errors';
-import { TOOLPAD_LOADING_MARKER } from '../constants';
+
+const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';
 
 export function evaluateExpression(
   code: string,

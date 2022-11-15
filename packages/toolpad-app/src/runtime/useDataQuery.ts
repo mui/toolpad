@@ -75,8 +75,6 @@ export function useDataQuery(
 
   const dataSource = dataSourceId ? dataSources[dataSourceId] : null;
 
-  const connectionTemplate = node.templateName && dataSource?.templates?.get(node.templateName);
-
   // These are only used by the editor to invalidate caches whenever the query changes during editing
   const nodeHash: number | undefined = savedNodes ? savedNodes[queryId] : undefined;
   const isNodeAvailableOnServer: boolean = savedNodes ? !!savedNodes[queryId] : true;
@@ -98,7 +96,7 @@ export function useDataQuery(
         execDataSourceQuery({ signal, appId, version, queryId, params });
 
       if (query && dataSource?.exec) {
-        return dataSource?.exec(connectionTemplate, query, params, fetchFromServer);
+        return dataSource?.exec(query, params, fetchFromServer);
       }
 
       return fetchFromServer();

@@ -119,14 +119,11 @@ export default function QueryNodeEditorDialog<Q>({
     ? appDom.deref(input.attributes.connectionId.value)
     : null;
 
+  const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
   const dataSourceId = input.attributes.dataSource?.value || null;
   const dataSource = (dataSourceId && dataSources[dataSourceId]) || null;
 
-  const connectionTemplate = input.templateName && dataSource?.templates?.get(input.templateName);
-
-  const connection = connectionId ? appDom.getMaybeNode(dom, connectionId, 'connection') : null;
-
-  const connectionParams = connection?.attributes.params.value || connectionTemplate;
+  const connectionParams = connection?.attributes.params.value;
 
   const handleCommit = React.useCallback(() => {
     let toCommit: appDom.QueryNode<Q> = input;
@@ -155,7 +152,6 @@ export default function QueryNodeEditorDialog<Q>({
               connectionId: appDom.createConst(appDom.ref(newConnectionOption.connectionId)),
               dataSource: appDom.createConst(newConnectionOption.dataSourceId),
             }),
-            templateName: newConnectionOption.templateName,
           }),
         );
       } else {
@@ -280,7 +276,6 @@ export default function QueryNodeEditorDialog<Q>({
                     ? {
                         connectionId: appDom.deref(input.attributes.connectionId.value) || null,
                         dataSourceId: input.attributes.dataSource.value,
-                        templateName: input.templateName,
                       }
                     : null
                 }

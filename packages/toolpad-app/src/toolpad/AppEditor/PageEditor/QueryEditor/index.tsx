@@ -40,7 +40,7 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
   const handleCreateClick = React.useCallback(() => {
     invariant(input, `Create button should be disabled when there's no input`);
 
-    const { connectionId = null, dataSourceId, templateName } = input;
+    const { connectionId = null, dataSourceId } = input;
 
     if (connectionId) {
       const connection = appDom.getMaybeNode(dom, connectionId, 'connection');
@@ -56,7 +56,6 @@ function ConnectionSelectorDialog<Q>({ open, onCreated, onClose }: DataSourceSel
         connectionId: appDom.createConst(appDom.ref(connectionId)),
         dataSource: appDom.createConst(dataSourceId),
       },
-      templateName,
     });
 
     onCreated(queryNode);
@@ -134,11 +133,10 @@ export default function QueryEditor() {
       } else {
         domApi.addNode(node, page, 'queries');
       }
-      setDialogState((previousState) => ({
-        ...(previousState || {}),
+      setDialogState({
         node,
         isDraft: false,
-      }));
+      });
     },
     [dom, domApi, page],
   );

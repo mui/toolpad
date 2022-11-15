@@ -94,13 +94,8 @@ export interface ExecFetchFn<Q, R extends ExecFetchResult> {
   (fetchQuery: Q, params: Record<string, string>): Promise<R>;
 }
 
-export interface ExecClientFetchFn<P, Q, R extends ExecFetchResult> {
-  (
-    connection: Maybe<P>,
-    fetchQuery: Q,
-    params: Record<string, string>,
-    serverFetch: ExecFetchFn<Q, R>,
-  ): Promise<R>;
+export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
+  (fetchQuery: Q, params: Record<string, string>, serverFetch: ExecFetchFn<Q, R>): Promise<R>;
 }
 
 export interface ClientDataSource<C = {}, Q = {}> {
@@ -110,14 +105,12 @@ export interface ClientDataSource<C = {}, Q = {}> {
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
-  templates?: Map<string, C>;
   isDemoFeature?: boolean;
   isSingleQuery?: boolean;
 }
 
-export interface RuntimeDataSource<P = {}, Q = {}, R extends ExecFetchResult = ExecFetchResult> {
-  exec?: ExecClientFetchFn<P, Q, R>;
-  templates?: Map<string, P>;
+export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetchResult> {
+  exec?: ExecClientFetchFn<Q, R>;
 }
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {

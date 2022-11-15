@@ -1,14 +1,11 @@
 import type { Entry } from 'har-format';
 import { ExecFetchFn, RuntimeDataSource } from '../../types';
-import { FetchQuery, FetchResult, RestConnectionParams } from './types';
+import { FetchQuery, FetchResult } from './types';
 import { execfetch } from './shared';
 import evalExpression from '../../utils/evalExpression';
 import { createHarLog } from '../../utils/har';
-import { Maybe } from '../../utils/types';
-import { FETCH_CONNECTION_TEMPLATES } from './templates';
 
 export async function clientExec(
-  connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
   serverFetch: ExecFetchFn<FetchQuery, FetchResult>,
@@ -59,7 +56,6 @@ export async function clientExec(
     };
 
     const result = await execfetch(fetchQuery, params, {
-      connection,
       fetchImpl: instrumentedFetch,
       evalExpression,
     });
@@ -70,9 +66,8 @@ export async function clientExec(
   return serverFetch(fetchQuery, params);
 }
 
-const dataSource: RuntimeDataSource<RestConnectionParams, FetchQuery, FetchResult> = {
+const dataSource: RuntimeDataSource<FetchQuery, FetchResult> = {
   exec: clientExec,
-  templates: FETCH_CONNECTION_TEMPLATES,
 };
 
 export default dataSource;

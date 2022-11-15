@@ -61,7 +61,6 @@ import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import { clientExec } from './runtime';
 import { DOCUMENTATION_INSTALLATION_URL } from '../../constants';
-import { FETCH_CONNECTION_TEMPLATES } from './templates';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -387,7 +386,7 @@ function QueryEditor({
   );
 
   const fetchPreview: ExecFetchFn<FetchQuery, FetchResult> = (query, params) =>
-    clientExec(connectionParams, query, params, fetchServerPreview);
+    clientExec(query, params, fetchServerPreview);
 
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const { preview, runPreview: handleRunPreview } = useQueryPreview(
@@ -579,7 +578,6 @@ const dataSource: ClientDataSource<RestConnectionParams, FetchQuery> = {
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,
-  templates: FETCH_CONNECTION_TEMPLATES,
   isDemoFeature: true,
 };
 

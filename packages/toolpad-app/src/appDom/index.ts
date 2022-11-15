@@ -134,7 +134,6 @@ export interface QueryNode<Q = any> extends AppDomNodeBase {
     readonly cacheTime?: ConstantAttrValue<number>;
     readonly enabled?: BindableAttrValue<boolean>;
   };
-  readonly templateName?: string;
 }
 
 /**

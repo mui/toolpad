@@ -7,12 +7,10 @@ import { useDom } from '../../DomLoader';
 import dataSources from '../../../toolpadDataSources/client';
 import { asArray } from '../../../utils/collections';
 import envConfig from '../../../config';
-import { FETCH_CONNECTION_TEMPLATES } from '../../../toolpadDataSources/rest/templates';
 
 export type ConnectionOption = {
   connectionId: NodeId | null;
   dataSourceId: string;
-  templateName?: string;
 };
 
 export interface ConnectionSelectProps extends WithControlledProp<ConnectionOption | null> {
@@ -60,14 +58,6 @@ export default function ConnectionSelect({
     }
 
     if (envConfig.isDemo) {
-      for (const [templateName] of FETCH_CONNECTION_TEMPLATES.entries()) {
-        result.push({
-          dataSourceId: 'rest',
-          connectionId: null,
-          templateName,
-        });
-      }
-
       result.push({
         dataSourceId: 'movies',
         connectionId: null,
@@ -92,9 +82,7 @@ export default function ConnectionSelect({
     return String(
       options.findIndex(
         (option) =>
-          option.connectionId === value.connectionId &&
-          option.dataSourceId === value.dataSourceId &&
-          option.templateName === value.templateName,
+          option.connectionId === value.connectionId && option.dataSourceId === value.dataSourceId,
       ),
     );
   }, [options, value]);
@@ -114,16 +102,12 @@ export default function ConnectionSelect({
           ? config.displayName
           : `<unknown datasource "${option.dataSourceId}">`;
 
-        const defaultConnectionLabel = config?.isSingleQuery
-          ? ''
-          : option.templateName || '<default>';
-
         const connectionLabel = option.connectionId
           ? appDom.getMaybeNode(dom, option.connectionId)?.name
-          : defaultConnectionLabel;
+          : '<default>';
         return (
           <MenuItem key={index} value={index}>
-            {dataSourceLabel} {connectionLabel ? `| ${connectionLabel}` : ''}
+            {dataSourceLabel} | {connectionLabel}{' '}
           </MenuItem>
         );
       })}

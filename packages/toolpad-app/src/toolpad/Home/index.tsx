@@ -63,6 +63,7 @@ import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { sendAppCreatedEvent } from '../../utils/ga';
+import { LatestStoredAppValue, TOOLPAD_LATEST_APP_KEY } from '../../storageKeys';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -105,7 +106,9 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('blank');
   const [dom, setDom] = React.useState('');
-  const [isNavigating, setIsNavigating] = React.useState(false);
+
+  const [isNavigatingToNewApp, setIsNavigatingToNewApp] = React.useState(false);
+  const [isNavigatingToExistingApp, setIsNavigatingToExistingApp] = React.useState(false);
 
   const handleAppTemplateChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,11 +125,23 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
   const createAppMutation = client.useMutation('createApp', {
     onSuccess: (app) => {
       window.location.href = `/_toolpad/app/${app.id}`;
-      setIsNavigating(true);
+      setIsNavigatingToNewApp(true);
     },
   });
 
+  const handleContinueButtonClick = React.useCallback(() => {
+    setIsNavigatingToExistingApp(true);
+  }, []);
+
+  const [latestStoredApp, setLatestStoredApp] = useLocalStorageState<LatestStoredAppValue>(
+    TOOLPAD_LATEST_APP_KEY,
+    null,
+  );
+
   const isFormValid = Boolean(name);
+
+  const isSubmitting =
+    createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
 
   return (
     <Dialog {...props} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
@@ -146,7 +161,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           }
 
           const appDom = dom.trim() ? JSON.parse(dom) : null;
-          await createAppMutation.mutateAsync([
+          const app = await createAppMutation.mutateAsync([
             name,
             {
               from: {
@@ -158,13 +173,18 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             },
           ]);
 
-          sendAppCreatedEvent(name, appTemplateId);
+          setLatestStoredApp({
+            appId: app.id,
+            appName: app.name,
+          });
+
+          sendAppCreatedEvent(app.name, appTemplateId);
         }}
       >
         <DialogTitle>Create a new App</DialogTitle>
         <DialogContent>
           {config.isDemo ? (
-            <Alert severity="warning" sx={{ mb: 2 }}>
+            <Alert severity="warning" sx={{ mb: 1 }}>
               <AlertTitle>For demo purposes only!</AlertTitle>
               Your application will be ephemeral and may be deleted at any time.
             </Alert>
@@ -182,6 +202,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               createAppMutation.reset();
               setName(event.target.value);
             }}
+            disabled={isSubmitting}
           />
 
           <TextField
@@ -191,12 +212,15 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             fullWidth
             value={appTemplateId}
             onChange={handleAppTemplateChange}
+            disabled={isSubmitting}
           >
             {Array.from(APP_TEMPLATE_OPTIONS).map(([value, { label, description }]) => (
               <MenuItem key={value} value={value}>
                 <span>
                   <Typography>{label}</Typography>
-                  <Typography variant="caption">{description || ''}</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 'normal' }}>
+                    {description || ''}
+                  </Typography>
                 </span>
               </MenuItem>
             ))}
@@ -211,30 +235,53 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               maxRows={10}
               value={dom}
               onChange={handleDomChange}
+              disabled={isSubmitting}
             />
           ) : null}
+          {config.isDemo && latestStoredApp ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Typography variant="subtitle2" color="text.secondary" textAlign="center">
+                or
+              </Typography>
+              <LoadingButton
+                variant="outlined"
+                size="medium"
+                component="a"
+                href={`/_toolpad/app/${latestStoredApp.appId}`}
+                sx={{ mt: 0.5 }}
+                loading={isNavigatingToExistingApp}
+                onClick={handleContinueButtonClick}
+                disabled={isSubmitting}
+              >
+                Continue working on &ldquo;{latestStoredApp.appName}&rdquo;
+              </LoadingButton>
+            </Box>
+          ) : null}
           {config.recaptchaSiteKey ? (
-            <Typography variant="caption" color="text.secondary">
-              This site is protected by reCAPTCHA and the Google{' '}
-              <Link
-                href="https://policies.google.com/privacy"
-                underline="none"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Privacy Policy
-              </Link>{' '}
-              and{' '}
-              <Link
-                href="https://policies.google.com/terms"
-                underline="none"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Terms of Service
-              </Link>{' '}
-              apply.
-            </Typography>
+            <Box mt={2}>
+              <Divider sx={{ mb: 1 }} />
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'normal' }}>
+                This site is protected by reCAPTCHA and the Google{' '}
+                <Link
+                  href="https://policies.google.com/privacy"
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Privacy Policy
+                </Link>{' '}
+                and{' '}
+                <Link
+                  href="https://policies.google.com/terms"
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Terms of Service
+                </Link>{' '}
+                apply.
+              </Typography>
+            </Box>
           ) : null}
         </DialogContent>
         <DialogActions>
@@ -252,8 +299,8 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
           </Button>
           <LoadingButton
             type="submit"
-            loading={createAppMutation.isLoading || isNavigating}
-            disabled={!isFormValid}
+            loading={createAppMutation.isLoading || isNavigatingToNewApp}
+            disabled={!isFormValid || isSubmitting}
           >
             Create
           </LoadingButton>

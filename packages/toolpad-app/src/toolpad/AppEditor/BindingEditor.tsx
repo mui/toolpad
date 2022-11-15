@@ -330,7 +330,7 @@ export function BindingEditorDialog<V>({
     onClose();
   }, [onChange, onClose]);
 
-  useShortcut({ code: 'KeyS', metaKey: true, disabled: !open }, handleSave);
+  useShortcut({ key: 's', metaKey: true, disabled: !open }, handleSave);
 
   const hasUnsavedChanges = input && input !== committedInput.current;
 

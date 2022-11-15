@@ -38,7 +38,7 @@ export default function Home() {
       </NoSsr>
       <CssBaseline />
       <AppHeaderBanner />
-      <AppHeader />
+      <AppHeader gitHubRepository="https://github.com/mui/mui-toolpad" />
       <main id="main-content">
         <ToolpadHero />
         <CardGrid content={features} />

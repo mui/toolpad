@@ -65,7 +65,7 @@ const NodeHudWrapper = styled('div', {
     fontSize: 11,
     padding: `0 0 0 8px`,
     height: HUD_HEIGHT,
-    zIndex: 1,
+    zIndex: 1000,
     ...(hudPosition === HUD_POSITION_TOP
       ? { top: 0, transform: 'translate(0, -100%)' }
       : { bottom: 0, transform: 'translate(0, 100%)' }),
@@ -183,13 +183,13 @@ export default function NodeHud({
           >
             {component?.displayName || '<unknown>'}
             <DragIndicatorIcon color="inherit" />
-            <IconButton aria-label="Duplicate element" color="inherit" onMouseUp={onDuplicate}>
-              <Tooltip title="Duplicate element" enterDelay={400}>
+            <IconButton aria-label="Duplicate" color="inherit" onMouseUp={onDuplicate}>
+              <Tooltip title="Duplicate" enterDelay={400}>
                 <ContentCopy color="inherit" />
               </Tooltip>
             </IconButton>
-            <IconButton aria-label="Remove element" color="inherit" onMouseUp={onDelete}>
-              <Tooltip title="Remove element" enterDelay={400}>
+            <IconButton aria-label="Remove" color="inherit" onMouseUp={onDelete}>
+              <Tooltip title="Remove" enterDelay={400}>
                 <DeleteIcon color="inherit" />
               </Tooltip>
             </IconButton>

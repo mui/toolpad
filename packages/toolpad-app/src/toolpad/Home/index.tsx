@@ -66,7 +66,7 @@ import { ApiError } from '../../apiErrors';
 import { VALIDATE_CAPTCHA_FAILED_ERROR_CODE } from '../../apiErrorCodes';
 
 import { sendAppCreatedEvent } from '../../utils/ga';
-import { LatestStoredAppValue, TOOLPAD_LATEST_APP_KEY } from '../../storageKeys';
+import { StoredLatestCreatedApp, TOOLPAD_LATEST_CREATED_APP_KEY } from '../../storageKeys';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -145,8 +145,8 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
     setIsNavigatingToExistingApp(true);
   }, []);
 
-  const [latestStoredApp, setLatestStoredApp] = useLocalStorageState<LatestStoredAppValue>(
-    TOOLPAD_LATEST_APP_KEY,
+  const [latestCreatedApp, setLatestCreatedApp] = useLocalStorageState<StoredLatestCreatedApp>(
+    TOOLPAD_LATEST_CREATED_APP_KEY,
     null,
   );
 
@@ -199,7 +199,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
           },
         ]);
 
-        setLatestStoredApp({
+        setLatestCreatedApp({
           appId: createdApp.id,
           appName: createdApp.name,
         });
@@ -217,7 +217,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
         }
       }
     },
-    [appTemplateId, createAppMutation, dom, isFormValid, name, setLatestStoredApp],
+    [appTemplateId, createAppMutation, dom, isFormValid, name, setLatestCreatedApp],
   );
 
   return (
@@ -280,7 +280,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               disabled={isSubmitting}
             />
           ) : null}
-          {config.isDemo && latestStoredApp ? (
+          {config.isDemo && latestCreatedApp ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="subtitle2" color="text.secondary" textAlign="center">
                 or
@@ -289,13 +289,13 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
                 variant="outlined"
                 size="medium"
                 component="a"
-                href={`/_toolpad/app/${latestStoredApp.appId}`}
+                href={`/_toolpad/app/${latestCreatedApp.appId}`}
                 sx={{ mt: 0.5 }}
                 loading={isNavigatingToExistingApp}
                 onClick={handleContinueButtonClick}
                 disabled={isSubmitting}
               >
-                Continue working on &ldquo;{latestStoredApp.appName}&rdquo;
+                Continue working on &ldquo;{latestCreatedApp.appName}&rdquo;
               </LoadingButton>
             </Box>
           ) : null}

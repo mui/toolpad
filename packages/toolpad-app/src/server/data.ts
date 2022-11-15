@@ -13,7 +13,8 @@ import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
-import { TOOLPAD_UNIQUE_CONSTRAINT_VIOLATION } from '../constants';
+import { errorFrom } from '../utils/errors';
+import { ERR_APP_EXISTS } from '../errorCodes';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -231,16 +232,23 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     }
   }
 
-  if (await prismaClient.app.findUnique({ where: { name: appName } })) {
-    throw new Error(`An app named "${name}" already exists.`, {
-      cause: TOOLPAD_UNIQUE_CONSTRAINT_VIOLATION,
-    });
-  }
-
   return prismaClient.$transaction(async () => {
-    const app = await prismaClient.app.create({
-      data: { name: appName },
-    });
+    let app;
+    try {
+      app = await prismaClient.app.create({
+        data: { name: appName },
+      });
+    } catch (rawError) {
+      const error = errorFrom(rawError);
+      // https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes
+      // P2002: Unique constraint failed on the field
+      if (error.code === 'P2002') {
+        const toolpadError = new Error(`An app named "${name}" already exists.`, { cause: error });
+        toolpadError.code = ERR_APP_EXISTS;
+        throw toolpadError;
+      }
+      throw error;
+    }
 
     let dom: appDom.AppDom | null = null;
 
@@ -543,16 +551,17 @@ export async function duplicateApp(id: string, name: string): Promise<AppMeta> {
   try {
     const newApp = await createApp(name, appFromDom);
     return newApp;
-  } catch (error) {
-    if (error instanceof Error && error.cause === TOOLPAD_UNIQUE_CONSTRAINT_VIOLATION) {
-      const duplicateCount = await prismaClient.app.count({
-        where: { name: { startsWith: `${name} (copy`, endsWith: ')' } },
-      });
-      const duplicateName =
-        duplicateCount === 0 ? `${name} (copy)` : `${name} (copy ${duplicateCount + 1})`;
-      const newApp = await createApp(duplicateName, appFromDom);
-      return newApp;
+  } catch (rawError) {
+    const error = errorFrom(rawError);
+    if (error.code !== ERR_APP_EXISTS) {
+      throw error;
     }
-    throw error;
+    const duplicateCount = await prismaClient.app.count({
+      where: { name: { startsWith: `${name} (copy`, endsWith: ')' } },
+    });
+    const duplicateName =
+      duplicateCount === 0 ? `${name} (copy)` : `${name} (copy ${duplicateCount + 1})`;
+    const newApp = await createApp(duplicateName, appFromDom);
+    return newApp;
   }
 }

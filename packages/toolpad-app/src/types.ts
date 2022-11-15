@@ -14,6 +14,12 @@ import type * as appDom from './appDom';
 import type { Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 
+declare global {
+  interface Error {
+    code?: unknown;
+  }
+}
+
 export interface EditorProps<T> {
   /**
    * @deprecated

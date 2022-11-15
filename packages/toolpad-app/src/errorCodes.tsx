@@ -1,0 +1,1 @@
+export const ERR_APP_EXISTS = 'TOOLPAD_APP_EXISTS';

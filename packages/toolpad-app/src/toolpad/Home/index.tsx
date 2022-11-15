@@ -64,7 +64,6 @@ import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { sendAppCreatedEvent } from '../../utils/ga';
 import { LatestStoredAppValue, TOOLPAD_LATEST_APP_KEY } from '../../storageKeys';
-import { uuidv4 } from '../../utils/uuid';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,

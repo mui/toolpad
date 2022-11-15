@@ -10,5 +10,3 @@ export const TOOLPAD_TARGET_PRO = 'PRO';
 export const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/overview/';
 export const DOCUMENTATION_INSTALLATION_URL =
   'https://mui.com/toolpad/getting-started/installation/';
-
-export const TOOLPAD_UNIQUE_CONSTRAINT_VIOLATION = 'UNIQUE_CONSTRAINT_VIOLATION';

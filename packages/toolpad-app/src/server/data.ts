@@ -238,11 +238,10 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
       app = await prismaClient.app.create({
         data: { name: appName },
       });
-    } catch (rawError) {
-      const error = errorFrom(rawError);
+    } catch (error) {
       // https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes
       // P2002: Unique constraint failed on the field
-      if (error.code === 'P2002') {
+      if (error instanceof prisma.Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         const toolpadError = new Error(`An app named "${name}" already exists.`, { cause: error });
         toolpadError.code = ERR_APP_EXISTS;
         throw toolpadError;

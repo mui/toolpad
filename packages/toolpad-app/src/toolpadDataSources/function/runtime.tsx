@@ -1,7 +1,8 @@
-import { transform } from 'sucrase';
 import { ExecFetchFn, RuntimeDataSource } from '../../types';
 import { FunctionQuery, FunctionResult } from './types';
 import { createHarLog } from '../../utils/har';
+import loadModule from '../../runtime/loadModule';
+import compileModule from '../../compileModule';
 
 export interface ExecFunctionOptions {
   params?: Record<string, unknown>;
@@ -9,9 +10,8 @@ export interface ExecFunctionOptions {
 }
 
 async function execFunction(code: string, { params = {}, secrets = {} }: ExecFunctionOptions = {}) {
-  const compiled = transform(code, { transforms: ['typescript'] });
-  const dataUri = `data:text/javascript;base64,${btoa(compiled.code)}`;
-  const { default: fn } = await import(/* webpackIgnore: true */ dataUri);
+  const compiledModule = compileModule(code, 'function');
+  const { default: fn } = await loadModule(compiledModule);
   const result = await fn({
     params,
     parameters: params,
@@ -21,16 +21,16 @@ async function execFunction(code: string, { params = {}, secrets = {} }: ExecFun
 }
 
 export async function clientExec(
-  fetchQuery: FunctionQuery,
+  query: FunctionQuery,
   params: Record<string, string>,
   serverFetch: ExecFetchFn<FunctionQuery, FunctionResult>,
 ): Promise<FunctionResult> {
-  if (fetchQuery.browser) {
-    const data = await execFunction(fetchQuery.module, { params, secrets: {} });
+  if (query.browser) {
+    const data = await execFunction(query.module, { params, secrets: {} });
     return { data, logs: [], har: createHarLog() };
   }
 
-  return serverFetch(fetchQuery, params);
+  return serverFetch(query, params);
 }
 
 const dataSource: RuntimeDataSource<FunctionQuery, FunctionResult> = {

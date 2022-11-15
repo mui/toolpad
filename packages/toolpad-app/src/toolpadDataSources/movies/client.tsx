@@ -106,6 +106,7 @@ const dataSource: ClientDataSource<MoviesConnectionParams, MoviesQuery> = {
   ConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,
+  hasDefault: true,
   isDemoFeature: true,
   isSingleQuery: true,
 };

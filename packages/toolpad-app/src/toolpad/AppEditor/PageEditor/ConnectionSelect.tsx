@@ -57,13 +57,6 @@ export default function ConnectionSelect({
       }
     }
 
-    if (envConfig.isDemo) {
-      result.push({
-        dataSourceId: 'movies',
-        connectionId: null,
-      });
-    }
-
     return result;
   }, [connections, dataSource]);
 

@@ -64,6 +64,7 @@ import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { sendAppCreatedEvent } from '../../utils/ga';
 import { LatestStoredAppValue, TOOLPAD_LATEST_APP_KEY } from '../../storageKeys';
+import { uuidv4 } from '../../utils/uuid';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -138,7 +139,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     null,
   );
 
-  const isFormValid = Boolean(name);
+  const isFormValid = config.isDemo || Boolean(name);
 
   const isSubmitting =
     createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
@@ -162,7 +163,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
 
           const appDom = dom.trim() ? JSON.parse(dom) : null;
           const app = await createAppMutation.mutateAsync([
-            name,
+            config.isDemo ? `demo_app_${Date.now()}` : name,
             {
               from: {
                 ...(appDom
@@ -189,21 +190,23 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               Your application will be ephemeral and may be deleted at any time.
             </Alert>
           ) : null}
-          <TextField
-            sx={{ my: 1 }}
-            required
-            autoFocus
-            fullWidth
-            label="Name"
-            value={name}
-            error={createAppMutation.isError}
-            helperText={(createAppMutation.error as Error)?.message || ''}
-            onChange={(event) => {
-              createAppMutation.reset();
-              setName(event.target.value);
-            }}
-            disabled={isSubmitting}
-          />
+          {!config.isDemo ? (
+            <TextField
+              sx={{ my: 1 }}
+              required
+              autoFocus
+              fullWidth
+              label="Name"
+              value={name}
+              error={createAppMutation.isError}
+              helperText={(createAppMutation.error as Error)?.message || ''}
+              onChange={(event) => {
+                createAppMutation.reset();
+                setName(event.target.value);
+              }}
+              disabled={isSubmitting}
+            />
+          ) : null}
 
           <TextField
             sx={{ my: 1 }}

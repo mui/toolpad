@@ -31,7 +31,7 @@ const MarkdownEditor = lazyComponent(() => import('../../components/MarkdownEdit
 function MarkdownPropEditor({ value, onChange }: EditorProps<any>) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
-  useShortcut({ code: 'KeyS', metaKey: true, disabled: !dialogOpen }, () => {
+  useShortcut({ key: 's', metaKey: true, disabled: !dialogOpen }, () => {
     setDialogOpen(false);
   });
 

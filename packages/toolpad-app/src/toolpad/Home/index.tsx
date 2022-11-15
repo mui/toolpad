@@ -160,9 +160,11 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             });
           }
 
+          const appName = config.isDemo ? `demo_app_${Date.now()}` : name;
           const appDom = dom.trim() ? JSON.parse(dom) : null;
+
           const app = await createAppMutation.mutateAsync([
-            config.isDemo ? `demo_app_${Date.now()}` : name,
+            appName,
             {
               from: {
                 ...(appDom

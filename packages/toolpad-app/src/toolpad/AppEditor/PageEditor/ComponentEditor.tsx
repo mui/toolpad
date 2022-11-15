@@ -4,7 +4,8 @@ import {
   ArgTypeDefinition,
   ArgTypeDefinitions,
   ComponentConfig,
-  TOOLPAD_COMPONENT_MODE_PROPERTY,
+  LiveBinding,
+  ComponentProps,
 } from '@mui/toolpad-core';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
@@ -38,7 +39,7 @@ const ComponentEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-function shouldRenderControl(propTypeDef: ArgTypeDefinition) {
+function shouldRenderControl(propTypeDef: ArgTypeDefinition, props: ComponentProps) {
   if (propTypeDef.typeDef.type === 'element') {
     return propTypeDef.control?.type !== 'slot' && propTypeDef.control?.type !== 'slots';
   }
@@ -47,26 +48,42 @@ function shouldRenderControl(propTypeDef: ArgTypeDefinition) {
     return propTypeDef.visible;
   }
 
+  if (typeof propTypeDef.visible === 'function') {
+    return propTypeDef.visible(props);
+  }
+
   return true;
 }
 
 interface ComponentPropsEditorProps<P> {
   node: appDom.ElementNode<P>;
+  bindings: Partial<Record<string, LiveBinding>>;
   componentConfig: ComponentConfig<P>;
 }
 
-function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditorProps<P>) {
+function ComponentPropsEditor<P>({
+  componentConfig,
+  bindings,
+  node,
+}: ComponentPropsEditorProps<P>) {
   const { layoutDirection } = componentConfig;
-
-  const mode: ArgTypeDefinition = (componentConfig?.argTypes as any)?.[
-    TOOLPAD_COMPONENT_MODE_PROPERTY
-  ];
 
   const hasLayoutHorizontalControls =
     layoutDirection === LAYOUT_DIRECTION_HORIZONTAL || layoutDirection === LAYOUT_DIRECTION_BOTH;
   const hasLayoutVerticalControls =
     layoutDirection === LAYOUT_DIRECTION_VERTICAL || layoutDirection === LAYOUT_DIRECTION_BOTH;
   const hasLayoutControls = hasLayoutHorizontalControls || hasLayoutVerticalControls;
+
+  const props = React.useMemo<ComponentProps>(() => {
+    const propsPattern = new RegExp(`(?<=${node.id}.props.)(.*)`);
+
+    return Object.fromEntries(
+      Object.entries(bindings).map(([key, binding]) => {
+        const propName = key.match(propsPattern)?.[0];
+        return [propName, binding?.value];
+      }),
+    );
+  }, [bindings, node.id]);
 
   return (
     <React.Fragment>
@@ -98,33 +115,18 @@ function ComponentPropsEditor<P>({ componentConfig, node }: ComponentPropsEditor
           <Divider sx={{ mt: 1 }} />
         </React.Fragment>
       ) : null}
-      {mode ? (
-        <React.Fragment>
-          <Typography variant="overline" className={classes.sectionHeading}>
-            Mode:
-          </Typography>
-          <div key={TOOLPAD_COMPONENT_MODE_PROPERTY} className={classes.control}>
-            <NodeAttributeEditor
-              node={node}
-              namespace="props"
-              name={TOOLPAD_COMPONENT_MODE_PROPERTY}
-              argType={mode}
-            />
-          </div>
-          <Divider sx={{ mt: 1 }} />
-        </React.Fragment>
-      ) : null}
       <Typography variant="overline" className={classes.sectionHeading}>
         Properties:
       </Typography>
       {(
         Object.entries(componentConfig.argTypes || {}) as ExactEntriesOf<ArgTypeDefinitions<P>>
       ).map(([propName, propTypeDef]) =>
-        propTypeDef && shouldRenderControl(propTypeDef) ? (
+        propTypeDef && shouldRenderControl(propTypeDef, props) ? (
           <div key={propName} className={classes.control}>
             <NodeAttributeEditor
               node={node}
               namespace="props"
+              props={props}
               name={propName}
               argType={propTypeDef}
             />
@@ -141,7 +143,7 @@ interface SelectedNodeEditorProps {
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
   const dom = useDom();
-  const { viewState } = usePageEditorState();
+  const { bindings, viewState } = usePageEditorState();
   const nodeError = viewState.nodes[node.id]?.error;
   const componentConfig = viewState.nodes[node.id]?.componentConfig || { argTypes: {} };
 
@@ -159,7 +161,9 @@ function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
         <NodeNameEditor node={node} />
         {nodeError ? <ErrorAlert error={nodeError} /> : null}
         <Divider sx={{ mt: 1 }} />
-        {node ? <ComponentPropsEditor componentConfig={componentConfig} node={node} /> : null}
+        {node ? (
+          <ComponentPropsEditor bindings={bindings} componentConfig={componentConfig} node={node} />
+        ) : null}
       </Stack>
     </ElementContext.Provider>
   );

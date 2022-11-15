@@ -1,16 +1,22 @@
-import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/toolpad-core';
+import {
+  ArgTypeDefinition,
+  ArgControlSpec,
+  PropValueType,
+  ComponentProps,
+  TOOLPAD_COMPONENT_MODE_PROPERTY,
+} from '@mui/toolpad-core';
 import string from './string';
 import boolean from './boolean';
 import number from './number';
 import select from './select';
 import json from './json';
+import markdown from './Markdown';
 import event from './event';
 import GridColumns from './GridColumns';
 import SelectOptions from './SelectOptions';
 import HorizontalAlign from './HorizontalAlign';
 import VerticalAlign from './VerticalAlign';
 import RowIdFieldSelect from './RowIdFieldSelect';
-import Markdown from './Markdown';
 import { EditorProps } from '../../types';
 
 const propTypeControls: {
@@ -21,9 +27,9 @@ const propTypeControls: {
   number,
   select,
   json,
+  markdown,
   event,
   GridColumns,
-  Markdown,
   SelectOptions,
   RowIdFieldSelect,
   HorizontalAlign,
@@ -49,8 +55,29 @@ function getDefaultControlForType(propType: PropValueType): React.FC<EditorProps
   }
 }
 
-export function getDefaultControl(argType: ArgTypeDefinition): React.FC<EditorProps<any>> | null {
+const modePropTypeMap = new Map<string, ArgControlSpec['type']>([
+  // Text component modes
+  ['text', 'string'],
+  ['markdown', 'markdown'],
+  ['link', 'string'],
+]);
+
+export function getDefaultControl(
+  argType: ArgTypeDefinition,
+  liveProps?: ComponentProps,
+): React.FC<EditorProps<any>> | null {
   if (argType.control) {
+    if (argType.control.type === 'markdown') {
+      const { [TOOLPAD_COMPONENT_MODE_PROPERTY]: mode } = liveProps || {};
+
+      if (mode && typeof mode === 'string') {
+        const mappedControlFromMode = modePropTypeMap.get(mode);
+        if (!mappedControlFromMode) {
+          return null;
+        }
+        return propTypeControls[mappedControlFromMode] ?? null;
+      }
+    }
     return propTypeControls[argType.control.type] ?? getDefaultControlForType(argType.typeDef);
   }
 

@@ -132,13 +132,13 @@ export interface ArgControlSpec {
     | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
     | 'date' // date picker
     | 'json' // JSON editor
+    | 'markdown' // Markdown editor
     | 'GridColumns' // GridColumns specialized editor
     | 'SelectOptions' // SelectOptions specialized editor
     | 'HorizontalAlign'
     | 'VerticalAlign'
     | 'event'
-    | 'RowIdFieldSelect' // Row id field specialized select
-    | 'Markdown'; // Markdown editor
+    | 'RowIdFieldSelect'; // Row id field specialized select
 }
 
 type PrimitiveValueType =
@@ -153,6 +153,8 @@ export type PropValueType = PrimitiveValueType | ElementValueType | EventValueTy
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
 }>;
+
+export type ComponentProps = Record<string, unknown>;
 
 export interface ArgTypeDefinition<V = unknown> {
   /**
@@ -192,10 +194,10 @@ export interface ArgTypeDefinition<V = unknown> {
   /**
    * For compound components, this property is used to control the visibility of this property based on the selected value of another property.
    * If this property is not defined, the property will be visible at all times.
-   * @param {string} mode mode of the component
+   * @param {string} props all the prop bindings of the component
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
-  visible?: ((mode: string) => boolean) | boolean;
+  visible?: ((props: ComponentProps) => boolean) | boolean;
 }
 
 export type ArgTypeDefinitions<P = any> = {

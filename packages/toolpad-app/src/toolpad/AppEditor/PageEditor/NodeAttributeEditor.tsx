@@ -1,9 +1,5 @@
 import * as React from 'react';
-import {
-  ArgTypeDefinition,
-  BindableAttrValue,
-  TOOLPAD_COMPONENT_MODE_PROPERTY,
-} from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue, ComponentProps } from '@mui/toolpad-core';
 import { Alert } from '@mui/material';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
@@ -16,6 +12,7 @@ export interface NodeAttributeEditorProps {
   namespace?: string;
   name: string;
   argType: ArgTypeDefinition;
+  props?: ComponentProps;
 }
 
 export default function NodeAttributeEditor({
@@ -23,6 +20,7 @@ export default function NodeAttributeEditor({
   namespace = 'attributes',
   name,
   argType,
+  props,
 }: NodeAttributeEditorProps) {
   const domApi = useDomApi();
 
@@ -40,27 +38,13 @@ export default function NodeAttributeEditor({
   const liveBinding = bindings[bindingId];
   const globalScope = pageState;
   const propType = argType.typeDef;
-  const Control = getDefaultControl(argType);
+  const Control = getDefaultControl(argType, props);
 
   // NOTE: Doesn't make much sense to bind controlled props. In the future we might opt
   // to make them bindable to other controlled props only
   const isDisabled = !!argType.onChangeHandler;
 
   const isBindable = !isDisabled && namespace !== 'layout';
-
-  const liveMode = bindings[`${node.id}.props.${TOOLPAD_COMPONENT_MODE_PROPERTY}`];
-  const isVisible = React.useMemo(() => {
-    if (!argType?.visible) {
-      return true;
-    }
-    return (
-      typeof argType.visible === 'function' && liveMode?.value && argType.visible(liveMode.value)
-    );
-  }, [argType, liveMode?.value]);
-
-  if (!isVisible) {
-    return null;
-  }
 
   return Control ? (
     <BindableEditor

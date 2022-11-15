@@ -5,6 +5,7 @@ import {
   TypographyProps as MuiTypographyProps,
   Link as MuiLink,
   LinkProps as MuiLinkProps,
+  styled,
 } from '@mui/material';
 import { createComponent, TOOLPAD_COMPONENT_MODE_PROPERTY } from '@mui/toolpad-core';
 import ReactMarkdown from 'react-markdown';
@@ -18,6 +19,11 @@ interface TextProps extends Omit<BaseProps, 'children'> {
   href?: string;
   loading?: boolean;
 }
+
+const MarkdownContainer = styled('div')({
+  display: 'block',
+  '&:empty::before': { content: '""', display: 'inline-block' },
+});
 
 function Text({
   value,
@@ -33,13 +39,25 @@ function Text({
       return loading ? (
         <Skeleton width={150} />
       ) : (
-        <div style={{ display: 'block' }}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
-        </div>
+        <MarkdownContainer>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
+        </MarkdownContainer>
       );
     case 'link':
-      return (
-        <MuiLink href={href} target="_blank" rel="noopener noreferrer nofollow">
+      return loading ? (
+        <Skeleton width={150} />
+      ) : (
+        <MuiLink
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          sx={{
+            minWidth: loading || !value ? 150 : undefined,
+            // Same as Typography
+            [`&:empty::before`]: { content: '""', display: 'inline-block' },
+            ...sx,
+          }}
+        >
           {value}
         </MuiLink>
       );
@@ -71,32 +89,25 @@ export default createComponent(Text, {
       typeDef: { type: 'string', enum: ['text', 'markdown', 'link'] },
       label: 'Mode',
       defaultValue: 'text',
-      visible: false,
     },
     value: {
       typeDef: { type: 'string' },
       label: 'Value',
-      defaultValue: 'Text',
-      visible: (mode) => mode === 'text' || mode === 'link',
-    },
-    markdown: {
-      typeDef: { type: 'string' },
-      control: { type: 'Markdown' },
-      label: 'Value',
-      defaultValue: 'Text',
-      visible: (mode) => mode === 'markdown',
+      defaultValue: '',
+      control: { type: 'markdown' },
     },
     href: {
       typeDef: { type: 'string' },
       defaultValue: 'about:blank',
-      visible: (mode) => mode === 'link',
+      visible: ({ [TOOLPAD_COMPONENT_MODE_PROPERTY]: mode }) => mode === 'link',
     },
     variant: {
       typeDef: {
         type: 'string',
         enum: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2'],
       },
-      visible: (mode) => mode === 'text',
+      label: 'Variant',
+      visible: ({ [TOOLPAD_COMPONENT_MODE_PROPERTY]: mode }) => mode === 'text',
     },
     loading: {
       typeDef: { type: 'boolean' },

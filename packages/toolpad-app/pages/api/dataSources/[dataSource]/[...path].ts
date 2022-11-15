@@ -5,14 +5,6 @@ import serverDataSources from '../../../../src/toolpadDataSources/server';
 import { getConnectionParams, setConnectionParams } from '../../../../src/server/data';
 import { withReqResLogs } from '../../../../src/server/logs/withLogs';
 
-export const config = {
-  api: {
-    // Supresses false positive nextjs warning "API resolved without sending a response" caused by Sentry
-    // Sentry should fix this eventually: https://github.com/getsentry/sentry-javascript/issues/3852
-    externalResolver: true,
-  },
-};
-
 const handlerMap = new Map<String, Function | null | undefined>();
 Object.keys(serverDataSources).forEach((dataSource) => {
   const handler = serverDataSources[dataSource]?.createHandler?.();

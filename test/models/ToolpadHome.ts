@@ -78,9 +78,10 @@ export class ToolpadHome {
       await this.newAppDomInput.fill(JSON.stringify(dom));
     }
 
-    await this.newAppDomCreateBtn.click();
-
-    await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
+    await Promise.all([
+      this.newAppDomCreateBtn.click(),
+      this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ }),
+    ]);
 
     const { pathname } = new URL(this.page.url());
     const idMatch = /^\/_toolpad\/app\/([^/]+)\//.exec(pathname);

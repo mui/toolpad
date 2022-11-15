@@ -68,7 +68,6 @@ export default function NodeMenu({
         buttonProps,
         menuProps,
       })}
-
       <Menu
         {...menuProps}
         onClick={(event) => {
@@ -80,17 +79,15 @@ export default function NodeMenu({
           <ListItemIcon>
             <ContentCopyIcon />
           </ListItemIcon>
-          <ListItemText> {duplicateLabelText}</ListItemText>
+          <ListItemText>{duplicateLabelText}</ListItemText>
         </MenuItem>
-
         <MenuItem onClick={handleDeleteNodeDialogOpen}>
           <ListItemIcon>
             <DeleteIcon />
           </ListItemIcon>
-          <ListItemText> {deleteLabelText}</ListItemText>
+          <ListItemText>{deleteLabelText}</ListItemText>
         </MenuItem>
       </Menu>
-
       <ConfirmDialog
         open={!!deletedNode}
         severity="error"

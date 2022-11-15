@@ -27,14 +27,6 @@ import { hasOwnProperty } from '../../src/utils/collections';
 import { withRpcReqResLogs } from '../../src/server/logs/withLogs';
 import { ApiError, ApiErrorCode } from '../../src/apiErrors';
 
-export const config = {
-  api: {
-    // Supresses false positive nextjs warning "API resolved without sending a response" caused by Sentry
-    // Sentry should fix this eventually: https://github.com/getsentry/sentry-javascript/issues/3852
-    externalResolver: true,
-  },
-};
-
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
 }

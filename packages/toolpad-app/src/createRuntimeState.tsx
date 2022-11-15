@@ -12,6 +12,7 @@ export function compileModule(src: string, filename: string): CompiledModule {
 
   try {
     compiled = transform(src, {
+      production: true,
       transforms: ['jsx', 'typescript', 'imports'],
       filePath: filename,
       jsxRuntime: 'classic',

@@ -1,4 +1,5 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+import { getReqLoggableIPAddress } from '../../utils/logs';
 import logInfo from './logInfo';
 
 export const withReqResLogs =
@@ -10,7 +11,7 @@ export const withReqResLogs =
         req,
         res,
       },
-      'Handled request',
+      `Handled API request (${getReqLoggableIPAddress(req)})`,
     );
 
     return apiHandler(req, res);
@@ -25,7 +26,7 @@ export const withRpcReqResLogs =
         rpcReq: req,
         res,
       },
-      `Handled request (${req.body.type}:${req.body.name})`,
+      `Handled RPC request (${req.body.type}:${req.body.name}) (${getReqLoggableIPAddress(req)})`,
     );
 
     return apiHandler(req, res);

@@ -6,6 +6,7 @@ import { FetchPrivateQuery, FetchQuery, RestConnectionParams } from './types';
 import serverEvalExpression from '../../server/evalExpression';
 import { Maybe } from '../../utils/types';
 import { execfetch } from './shared';
+import { withOutboundRateLimiting } from '../../utils/outboundAgent';
 
 async function execBase(
   connection: Maybe<RestConnectionParams>,
@@ -13,7 +14,11 @@ async function execBase(
   params: Record<string, string>,
 ) {
   const har = createHarLog();
-  const instrumentedFetch = withHarInstrumentation(fetch, { har });
+  const instrumentedFetch = withOutboundRateLimiting(
+    // TODO: plumb appId here so we can rate limit specifically to it
+    '<global>',
+    withHarInstrumentation(fetch, { har }),
+  );
 
   const result = await execfetch(fetchQuery, params, {
     connection,

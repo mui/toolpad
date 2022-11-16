@@ -58,6 +58,7 @@
     "@tanstack/react-query-devtools": "^4.16.0",
     "@types/cors": "^2.8.12",
     "abort-controller": "^3.0.0",
+    "agent-base": "^6.0.2",
     "arg": "^5.0.2",
     "basic-auth": "^2.0.1",
     "clsx": "^1.2.1",

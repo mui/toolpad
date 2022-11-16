@@ -10,6 +10,7 @@ import { FetchOptions } from './runtime/types';
 import projectRoot from '../../server/projectRoot';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { errorFrom } from '../../utils/errors';
+import { withOutboundRateLimiting } from '../../utils/outboundAgent';
 
 async function fetchRuntimeModule() {
   const filePath = path.resolve(projectRoot, './src/toolpadDataSources/function/dist/index.js');
@@ -43,7 +44,11 @@ export default async function execFunction(
   const logs: LogEntry[] = [];
   const har: harFormat.Har = createHarLog();
 
-  const instrumentedFetch = withHarInstrumentation(fetch, { har });
+  const instrumentedFetch = withOutboundRateLimiting(
+    // TODO: plumb appId here so we can rate limit specifically to it
+    '<global>',
+    withHarInstrumentation(fetch, { har }),
+  );
 
   const fetchStub = new ivm.Reference((url: string, rawOptions: FetchOptions) => {
     return instrumentedFetch(url, rawOptions).then(

@@ -43,7 +43,7 @@ afterEach(() => {
 test(`Static Text`, async () => {
   renderPage((dom, page) => {
     const text = appDom.createNode(dom, 'element', {
-      attributes: { component: appDom.createConst('Typography') },
+      attributes: { component: appDom.createConst('Text') },
       props: { value: appDom.createConst('Hello World') },
     });
     dom = appDom.addNode(dom, text, page, 'children');
@@ -54,23 +54,6 @@ test(`Static Text`, async () => {
   await waitFor(() => screen.getByTestId('page-root'));
 
   const text = screen.getByText('Hello World');
-  expect(text).toHaveClass('MuiTypography-root');
-});
-
-test(`Default Text`, async () => {
-  renderPage((dom, page) => {
-    const text = appDom.createNode(dom, 'element', {
-      attributes: { component: appDom.createConst('Typography') },
-      props: {},
-    });
-    dom = appDom.addNode(dom, text, page, 'children');
-
-    return dom;
-  });
-
-  await waitFor(() => screen.getByTestId('page-root'));
-
-  const text = screen.getByText('Text');
   expect(text).toHaveClass('MuiTypography-root');
 });
 
@@ -87,7 +70,7 @@ test(`simple databinding`, async () => {
     dom = appDom.addNode(dom, textField, page, 'children');
 
     const text = appDom.createNode(dom, 'element', {
-      attributes: { component: appDom.createConst('Typography') },
+      attributes: { component: appDom.createConst('Text') },
       props: { value: { type: 'jsExpression', value: 'theTextInput.value' } },
     });
     dom = appDom.addNode(dom, text, page, 'children');
@@ -144,28 +127,28 @@ test(`Databinding errors`, async () => {
     let cyclic2: appDom.ElementNode;
     renderPage((dom, page) => {
       nonExisting = appDom.createNode(dom, 'element', {
-        attributes: { component: appDom.createConst('Typography') },
+        attributes: { component: appDom.createConst('Text') },
         props: { value: { type: 'jsExpression', value: 'nonExisting.foo' } },
       });
       dom = appDom.addNode(dom, nonExisting, page, 'children');
 
       selfReferencing = appDom.createNode(dom, 'element', {
         name: 'selfReferencing',
-        attributes: { component: appDom.createConst('Typography') },
+        attributes: { component: appDom.createConst('Text') },
         props: { value: { type: 'jsExpression', value: 'selfReferencing.value' } },
       });
       dom = appDom.addNode(dom, selfReferencing, page, 'children');
 
       cyclic1 = appDom.createNode(dom, 'element', {
         name: 'cyclic1',
-        attributes: { component: appDom.createConst('Typography') },
+        attributes: { component: appDom.createConst('Text') },
         props: { value: { type: 'jsExpression', value: 'cyclic2.value' } },
       });
       dom = appDom.addNode(dom, cyclic1, page, 'children');
 
       cyclic2 = appDom.createNode(dom, 'element', {
         name: 'cyclic2',
-        attributes: { component: appDom.createConst('Typography') },
+        attributes: { component: appDom.createConst('Text') },
         props: { value: { type: 'jsExpression', value: 'cyclic1.value' } },
       });
       dom = appDom.addNode(dom, cyclic2, page, 'children');

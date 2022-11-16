@@ -57,6 +57,23 @@ test(`Static Text`, async () => {
   expect(text).toHaveClass('MuiTypography-root');
 });
 
+test(`Default Text`, async () => {
+  renderPage((dom, page) => {
+    const text = appDom.createNode(dom, 'element', {
+      attributes: { component: appDom.createConst('Text') },
+      props: {},
+    });
+    dom = appDom.addNode(dom, text, page, 'children');
+
+    return dom;
+  });
+
+  await waitFor(() => screen.getByTestId('page-root'));
+
+  const text = screen.getByText('', { selector: 'p' });
+  expect(text).toHaveClass('MuiTypography-root');
+});
+
 test(`simple databinding`, async () => {
   renderPage((dom, page) => {
     const textField = appDom.createNode(dom, 'element', {

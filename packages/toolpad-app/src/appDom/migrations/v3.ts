@@ -2,20 +2,10 @@ import invariant from 'invariant';
 import * as appDom from '..';
 import { mapValues } from '../../utils/collections';
 
-// function replaceQueryParams(node: any): appDom.AppDomNode {
-//   if (node.type === 'query') {
-//     return {
-//       ...node,
-//       params: node.params ? Object.entries(node.params) : undefined,
-//     };
-//   }
-
-//   return node;
-// }
-
-function replaceTypographyAndLinkWithText(node: any): appDom.AppDomNode {
-  if (node.type === 'element') {
+function replaceTypographyAndLinkWithText(node: appDom.AppDomNode): appDom.AppDomNode {
+  if (node.type === 'element' && node.attributes.component.value === 'Typography') {
     return {
+      ...node,
       name: node.name.replace(/Typography|Link/gi, 'text'),
       attributes: {
         component: {
@@ -23,7 +13,6 @@ function replaceTypographyAndLinkWithText(node: any): appDom.AppDomNode {
           value: 'Text',
         },
       },
-      ...node,
     };
   }
   return node;

@@ -36,7 +36,7 @@ export class ToolpadHome {
     this.createNewbtn = page.locator('button:has-text("create new")');
 
     this.newAppDialog = page.locator('[role="dialog"]', {
-      hasText: 'Create a new MUI Toolpad App',
+      hasText: 'Create a new App',
     });
     this.newAppNameInput = this.newAppDialog.locator('label:has-text("name")');
     this.newAppTemplateSelect = this.newAppDialog.locator(
@@ -78,9 +78,10 @@ export class ToolpadHome {
       await this.newAppDomInput.fill(JSON.stringify(dom));
     }
 
-    await this.newAppDomCreateBtn.click();
-
-    await this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ });
+    await Promise.all([
+      this.newAppDomCreateBtn.click(),
+      this.page.waitForNavigation({ url: /\/_toolpad\/app\/[^/]+\/pages\/[^/]+/ }),
+    ]);
 
     const { pathname } = new URL(this.page.url());
     const idMatch = /^\/_toolpad\/app\/([^/]+)\//.exec(pathname);

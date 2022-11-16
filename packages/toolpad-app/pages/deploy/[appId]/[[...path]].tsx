@@ -5,7 +5,7 @@ import ToolpadApp, { ToolpadAppProps } from '../../../src/runtime/ToolpadApp';
 
 export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (context) => {
   const [
-    { loadRenderTree, findActiveDeployment, getApp },
+    { loadRuntimeState, findActiveDeployment, getApp },
     { checkBasicAuth, basicAuthUnauthorized },
   ] = await Promise.all([
     import('../../../src/server/data'),
@@ -45,12 +45,11 @@ export const getServerSideProps: GetServerSideProps<ToolpadAppProps> = async (co
 
   const { version } = activeDeployment;
 
-  const dom = await loadRenderTree(appId, version);
+  const state = await loadRuntimeState(appId, version);
 
   return {
     props: {
-      appId,
-      dom,
+      state,
       version,
       basename: `/deploy/${appId}`,
     },

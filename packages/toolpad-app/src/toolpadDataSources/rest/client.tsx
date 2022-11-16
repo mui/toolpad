@@ -83,7 +83,7 @@ const ButtonLink = styled('button')(({ theme }) => ({
 }));
 
 interface UrlControlProps extends RenderControlParams<string> {
-  baseUrl?: string;
+  baseUrl: string | null;
 }
 
 function UrlControl({ label, disabled, baseUrl, value, onChange }: UrlControlProps) {
@@ -271,11 +271,15 @@ const EMPTY_PARAMS: BindableAttrEntries = [];
 
 function QueryEditor({
   globalScope,
-  connectionParams,
+  connectionParams: rawConnectionParams,
   value: input,
   onChange: setInput,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
-  const baseUrl = connectionParams?.baseUrl;
+  const isBrowserSide = input.attributes.query.value.browser;
+
+  const connectionParams = isBrowserSide ? null : rawConnectionParams;
+  const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
+
   const urlValue: BindableAttrValue<string> =
     input.attributes.query.value.url || getDefaultUrl(connectionParams);
 
@@ -456,12 +460,7 @@ function QueryEditor({
             </Box>
             <FormGroup>
               <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={input.attributes.query.value.browser}
-                    onChange={handleRunInBrowserChange}
-                  />
-                }
+                control={<Checkbox checked={isBrowserSide} onChange={handleRunInBrowserChange} />}
                 label="Run in the browser"
               />
             </FormGroup>

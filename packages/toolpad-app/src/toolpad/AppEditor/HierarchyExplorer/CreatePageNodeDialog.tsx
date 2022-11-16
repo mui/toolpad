@@ -75,7 +75,7 @@ export default function CreatePageDialog({
           navigate(`/app/${appId}/pages/${newNode.id}`);
         }}
       >
-        <DialogTitle>Create a new MUI Toolpad Page</DialogTitle>
+        <DialogTitle>Create a new Page</DialogTitle>
         <DialogContent>
           <TextField
             sx={{ my: 1 }}

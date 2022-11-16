@@ -18,7 +18,6 @@ export default function Banner(props) {
           if (theme.palette.mode === 'dark') {
             return theme.palette.primaryDark[900];
           }
-
           if (docs) {
             return 'default';
           }
@@ -30,6 +29,7 @@ export default function Banner(props) {
         sx={{
           pt: 0,
           pb: { xs: 2, sm: 8, md: docs ? 1 : 16 },
+          px: { xs: 0, sm: 0, md: 3 },
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'center',
@@ -84,7 +84,7 @@ export default function Banner(props) {
             sx={{
               py: 1,
               px: {
-                md: 4,
+                md: 2,
               },
               ml: { xs: 0, sm: 2 },
               mt: { xs: 3, sm: 0 },

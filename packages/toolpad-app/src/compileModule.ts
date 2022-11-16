@@ -11,6 +11,7 @@ export default function compileModule(src: string, filename: string): CompiledMo
 
   try {
     compiled = transform(src, {
+      production: true,
       transforms: ['jsx', 'typescript', 'imports'],
       filePath: filename,
       jsxRuntime: 'classic',

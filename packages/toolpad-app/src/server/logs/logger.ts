@@ -2,12 +2,7 @@ import pino from 'pino';
 import ecsFormat from '@elastic/ecs-pino-format';
 
 import config from '../config';
-import {
-  recaptchaResSerializer,
-  reqSerializer,
-  resSerializer,
-  rpcReqSerializer,
-} from './logSerializers';
+import { recaptchaResSerializer, reqSerializer, resSerializer } from './logSerializers';
 
 let transport;
 if (config.ecsNodeUrl) {
@@ -32,7 +27,6 @@ const logger = pino(
     serializers: {
       err: pino.stdSerializers.err,
       req: reqSerializer,
-      rpcReq: rpcReqSerializer,
       res: resSerializer,
       recaptchaRes: recaptchaResSerializer,
     },

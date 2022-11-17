@@ -22,7 +22,7 @@ export const withRpcReqResLogs =
     logInfo(
       {
         key: 'rpcReqRes',
-        rpcReq: req,
+        req,
         res,
       },
       'Handled RPC request',

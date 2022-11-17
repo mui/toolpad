@@ -140,7 +140,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     null,
   );
 
-  const isFormValid = Boolean(name);
+  const isFormValid = config.isDemo ? true : !!name;
 
   const isSubmitting =
     createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
@@ -161,10 +161,10 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               action: 'submit',
             });
           }
-
+          const appName = config.isDemo ? `demo_app_${Date.now()}` : name;
           const appDom = dom.trim() ? JSON.parse(dom) : null;
           const app = await createAppMutation.mutateAsync([
-            name,
+            appName,
             {
               from: {
                 ...(appDom
@@ -186,26 +186,29 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
         <DialogTitle>Create a new App</DialogTitle>
         <DialogContent>
           {config.isDemo ? (
-            <Alert severity="warning" sx={{ mb: 1 }}>
-              <AlertTitle>For demo purposes only!</AlertTitle>
-              Your application will be ephemeral and may be deleted at any time.
-            </Alert>
-          ) : null}
-          <TextField
-            sx={{ my: 1 }}
-            required
-            autoFocus
-            fullWidth
-            label="Name"
-            value={name}
-            error={createAppMutation.isError}
-            helperText={(createAppMutation.error as Error)?.message || ''}
-            onChange={(event) => {
-              createAppMutation.reset();
-              setName(event.target.value);
-            }}
-            disabled={isSubmitting}
-          />
+            <React.Fragment>
+              <Alert severity="warning" sx={{ mb: 1 }}>
+                <AlertTitle>For demo purposes only!</AlertTitle>
+                Your application will be ephemeral and may be deleted at any time.
+              </Alert>
+            </React.Fragment>
+          ) : (
+            <TextField
+              sx={{ my: 1 }}
+              required
+              autoFocus
+              fullWidth
+              label="Name"
+              value={name}
+              error={createAppMutation.isError}
+              helperText={(createAppMutation.error as Error)?.message || ''}
+              onChange={(event) => {
+                createAppMutation.reset();
+                setName(event.target.value);
+              }}
+              disabled={isSubmitting}
+            />
+          )}
 
           <TextField
             sx={{ my: 1 }}

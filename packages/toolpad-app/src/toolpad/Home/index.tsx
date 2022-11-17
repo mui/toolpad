@@ -148,7 +148,13 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
     TOOLPAD_LATEST_CREATED_APP_KEY,
     null,
   );
-  const firstLatestCreatedApp = React.useRef(latestCreatedApp).current;
+  const firstLatestCreatedAppRef = React.useRef(latestCreatedApp);
+  const firstLatestCreatedApp = firstLatestCreatedAppRef.current;
+  React.useEffect(() => {
+    if (!firstLatestCreatedApp) {
+      firstLatestCreatedAppRef.current = latestCreatedApp;
+    }
+  }, [firstLatestCreatedApp, latestCreatedApp]);
 
   const isFormValid = config.isDemo || Boolean(name);
 
@@ -299,7 +305,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
                 onClick={handleContinueButtonClick}
                 disabled={isSubmitting}
               >
-                Continue working on &ldquo;{firstLatestCreatedApp.appName}&rdquo;
+                Continue working on your latest app
               </LoadingButton>
             </Box>
           ) : null}

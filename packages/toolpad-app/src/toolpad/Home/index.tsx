@@ -316,27 +316,30 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
             />
           ) : null}
           {config.recaptchaV3SiteKey ? (
-            <Typography variant="caption" color="text.secondary">
-              This site is protected by reCAPTCHA and the Google{' '}
-              <Link
-                href="https://policies.google.com/privacy"
-                underline="none"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Privacy Policy
-              </Link>{' '}
-              and{' '}
-              <Link
-                href="https://policies.google.com/terms"
-                underline="none"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Terms of Service
-              </Link>{' '}
-              apply.
-            </Typography>
+            <Box mt={2}>
+              <Divider sx={{ mb: 1 }} />
+              <Typography variant="caption" color="text.secondary">
+                This site is protected by reCAPTCHA and the Google{' '}
+                <Link
+                  href="https://policies.google.com/privacy"
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Privacy Policy
+                </Link>{' '}
+                and{' '}
+                <Link
+                  href="https://policies.google.com/terms"
+                  underline="none"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Terms of Service
+                </Link>{' '}
+                apply.
+              </Typography>
+            </Box>
           ) : null}
         </DialogContent>
         <DialogActions>

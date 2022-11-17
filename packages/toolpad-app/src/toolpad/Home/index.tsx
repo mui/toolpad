@@ -291,7 +291,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
                 size="medium"
                 component="a"
                 href={`/_toolpad/app/${firstLatestCreatedApp.appId}`}
-                sx={{ mt: 0.5 }}
+                sx={{ mt: 0.5, mb: 1 }}
                 loading={isNavigatingToExistingApp}
                 onClick={handleContinueButtonClick}
                 disabled={isSubmitting}
@@ -301,7 +301,16 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
             </Box>
           ) : null}
           {config.recaptchaV2SiteKey ? (
-            <Box id="captcha-target" ref={captchaTargetRef} mt={1} />
+            <Box
+              id="captcha-target"
+              ref={captchaTargetRef}
+              mt={1}
+              mb={1}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            />
           ) : null}
           {config.recaptchaV3SiteKey ? (
             <Typography variant="caption" color="text.secondary">

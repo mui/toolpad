@@ -29,7 +29,7 @@ export default function Banner(props) {
         sx={{
           pt: 0,
           pb: { xs: 2, sm: 8, md: docs ? 1 : 16 },
-          px: { xs: 0, sm: 0, md: 3 },
+          px: docs ? { xs: 0, sm: 0, md: 3 } : 'default',
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'center',

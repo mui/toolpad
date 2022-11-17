@@ -1,6 +1,4 @@
-import type { GetServerSideProps, NextPage } from 'next';
-import * as React from 'react';
-import Home from '../src/toolpad/Apps';
+import type { GetServerSideProps } from 'next';
 
 export const getServerSideProps: GetServerSideProps<{}> = async () => {
   return {
@@ -8,5 +6,6 @@ export const getServerSideProps: GetServerSideProps<{}> = async () => {
   };
 };
 
-const Index: NextPage = () => <Home />;
-export default Index;
+export default function Index() {
+  return null;
+}

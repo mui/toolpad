@@ -10,7 +10,7 @@ export const withReqResLogs =
         req,
         res,
       },
-      'Handled request',
+      'Handled API request',
     );
 
     return apiHandler(req, res);
@@ -22,10 +22,10 @@ export const withRpcReqResLogs =
     logInfo(
       {
         key: 'rpcReqRes',
-        rpcReq: req,
+        req,
         res,
       },
-      `Handled request (${req.body.type}:${req.body.name})`,
+      'Handled RPC request',
     );
 
     return apiHandler(req, res);

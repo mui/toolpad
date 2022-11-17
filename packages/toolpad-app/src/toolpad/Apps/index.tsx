@@ -6,12 +6,11 @@ import {
   CardHeader,
   CardContent,
   CardActions,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Link,
+  Link as MuiLink,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -45,13 +44,14 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Controller, useForm } from 'react-hook-form';
 import invariant from 'invariant';
+import { Link } from 'react-router-dom';
 import useBoolean from '../../utils/useBoolean';
 import useEvent from '../../utils/useEvent';
 import client from '../../api';
 import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
 import useLatest from '../../utils/useLatest';
-import ToolpadShell from '../ToolpadShell';
+import ToolpadHomeShell from '../ToolpadHomeShell';
 import getReadableDuration from '../../utils/readableDuration';
 import EditableText from '../../components/EditableText';
 import type { AppMeta } from '../../server/data';
@@ -64,6 +64,7 @@ import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { sendAppCreatedEvent } from '../../utils/ga';
 import { LatestStoredAppValue, TOOLPAD_LATEST_APP_KEY } from '../../storageKeys';
+import FlexFill from '../../components/FlexFill';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -138,7 +139,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     null,
   );
 
-  const isFormValid = config.isDemo || Boolean(name);
+  const isFormValid = Boolean(name);
 
   const isSubmitting =
     createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
@@ -160,11 +161,9 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             });
           }
 
-          const appName = config.isDemo ? `demo_app_${Date.now()}` : name;
           const appDom = dom.trim() ? JSON.parse(dom) : null;
-
           const app = await createAppMutation.mutateAsync([
-            appName,
+            name,
             {
               from: {
                 ...(appDom
@@ -191,23 +190,21 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               Your application will be ephemeral and may be deleted at any time.
             </Alert>
           ) : null}
-          {!config.isDemo ? (
-            <TextField
-              sx={{ my: 1 }}
-              required
-              autoFocus
-              fullWidth
-              label="Name"
-              value={name}
-              error={createAppMutation.isError}
-              helperText={(createAppMutation.error as Error)?.message || ''}
-              onChange={(event) => {
-                createAppMutation.reset();
-                setName(event.target.value);
-              }}
-              disabled={isSubmitting}
-            />
-          ) : null}
+          <TextField
+            sx={{ my: 1 }}
+            required
+            autoFocus
+            fullWidth
+            label="Name"
+            value={name}
+            error={createAppMutation.isError}
+            helperText={(createAppMutation.error as Error)?.message || ''}
+            onChange={(event) => {
+              createAppMutation.reset();
+              setName(event.target.value);
+            }}
+            disabled={isSubmitting}
+          />
 
           <TextField
             sx={{ my: 1 }}
@@ -266,23 +263,23 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               <Divider sx={{ mb: 1 }} />
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'normal' }}>
                 This site is protected by reCAPTCHA and the Google{' '}
-                <Link
+                <MuiLink
                   href="https://policies.google.com/privacy"
                   underline="none"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Privacy Policy
-                </Link>{' '}
+                </MuiLink>{' '}
                 and{' '}
-                <Link
+                <MuiLink
                   href="https://policies.google.com/terms"
                   underline="none"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Terms of Service
-                </Link>{' '}
+                </MuiLink>{' '}
                 apply.
               </Typography>
             </Box>
@@ -414,7 +411,7 @@ interface AppEditButtonProps {
 
 function AppEditButton({ app }: AppEditButtonProps) {
   return (
-    <Button size="small" component="a" href={app ? `/_toolpad/app/${app.id}` : ''} disabled={!app}>
+    <Button size="small" component={Link} to={app ? `/app/${app.id}` : ''} disabled={!app}>
       Edit
     </Button>
   );
@@ -823,12 +820,14 @@ export default function Home() {
   );
 
   return (
-    <ToolpadShell>
-      <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      {!config.isDemo ? (
-        <Container sx={{ my: 1 }}>
-          <Typography variant="h2">Apps</Typography>
-          <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
+    <ToolpadHomeShell>
+      {config.isDemo ? null : (
+        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Toolbar variant="regular" disableGutters sx={{ gap: 2, px: 5, mt: 3, mb: 2 }}>
+            <Typography sx={{ pl: 2 }} variant="h3">
+              Apps
+            </Typography>
+            <FlexFill />
             <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
             <ToggleButtonGroup
               value={viewMode}
@@ -855,17 +854,20 @@ export default function Home() {
           {error ? (
             <ErrorAlert error={error} />
           ) : (
-            <AppsView
-              apps={apps}
-              loading={isLoading}
-              activeDeploymentsByApp={activeDeploymentsByApp}
-              setDeletedApp={setDeletedApp}
-              duplicateApp={duplicateApp}
-            />
+            <Box sx={{ flex: 1, overflow: 'auto', px: 5 }}>
+              <AppsView
+                apps={apps}
+                loading={isLoading}
+                activeDeploymentsByApp={activeDeploymentsByApp}
+                setDeletedApp={setDeletedApp}
+                duplicateApp={duplicateApp}
+              />
+            </Box>
           )}
-        </Container>
-      ) : null}
+          <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
+        </Box>
+      )}
       <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
-    </ToolpadShell>
+    </ToolpadHomeShell>
   );
 }

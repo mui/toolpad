@@ -67,7 +67,7 @@ export default function Toolpad({ basename }: EditorProps) {
           <React.Suspense fallback={<FullPageLoader />}>
             <BrowserRouter basename={basename}>
               <Routes>
-                <Route path="/" element={<Navigate to="apps" />} />
+                <Route path="/" element={<Navigate to="apps" replace />} />
                 <Route path="/apps" element={<Apps />} />
                 <Route path="/app/:appId/*" element={<AppWorkspace />} />
               </Routes>

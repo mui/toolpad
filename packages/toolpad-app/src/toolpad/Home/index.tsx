@@ -138,7 +138,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     null,
   );
 
-  const isFormValid = Boolean(name);
+  const isFormValid = config.isDemo || Boolean(name);
 
   const isSubmitting =
     createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
@@ -160,9 +160,11 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             });
           }
 
+          const appName = config.isDemo ? `demo_app_${Date.now()}` : name;
           const appDom = dom.trim() ? JSON.parse(dom) : null;
+
           const app = await createAppMutation.mutateAsync([
-            name,
+            appName,
             {
               from: {
                 ...(appDom
@@ -189,21 +191,23 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               Your application will be ephemeral and may be deleted at any time.
             </Alert>
           ) : null}
-          <TextField
-            sx={{ my: 1 }}
-            required
-            autoFocus
-            fullWidth
-            label="Name"
-            value={name}
-            error={createAppMutation.isError}
-            helperText={(createAppMutation.error as Error)?.message || ''}
-            onChange={(event) => {
-              createAppMutation.reset();
-              setName(event.target.value);
-            }}
-            disabled={isSubmitting}
-          />
+          {!config.isDemo ? (
+            <TextField
+              sx={{ my: 1 }}
+              required
+              autoFocus
+              fullWidth
+              label="Name"
+              value={name}
+              error={createAppMutation.isError}
+              helperText={(createAppMutation.error as Error)?.message || ''}
+              onChange={(event) => {
+                createAppMutation.reset();
+                setName(event.target.value);
+              }}
+              disabled={isSubmitting}
+            />
+          ) : null}
 
           <TextField
             sx={{ my: 1 }}

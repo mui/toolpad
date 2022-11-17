@@ -135,7 +135,7 @@ jobs:
       - install_js
       - run:
           name: '`yarn prettier` changes committed?'
-          command: yarn prettier check-changed
+          command: yarn prettier --check
       - run:
           name: 'Build packages'
           command: yarn release:build

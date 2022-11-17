@@ -23,12 +23,12 @@
     {
       "groupName": "MUI Core",
       "matchPackagePatterns": ["^@mui/"],
-      "prCreation": "immediate"
+      "schedule": ["at any time"]
     },
     {
       "groupName": "MUI X",
       "matchPackagePatterns": ["^@mui/x-"],
-      "prCreation": "immediate"
+      "schedule": ["at any time"]
     },
     {
       "groupName": "playwright",
@@ -65,11 +65,6 @@
       "allowedVersions": "< 2.0.0"
     },
     {
-      "groupName": "next",
-      "matchPackageNames": ["next", "@next/eslint-plugin-next", "eslint-config-next"],
-      "allowedVersions": "1.2.2"
-    },
-    {
       "matchDepTypes": ["action"],
       "pinDigests": true
     }
@@ -81,7 +76,7 @@
   "schedule": "on sunday before 6:00am",
   "timezone": "UTC",
   "vulnerabilityAlerts": {
-    "prCreation": "immediate",
+    "schedule": ["at any time"],
     "addLabels": ["priority: important"]
   },
   "regexManagers": [

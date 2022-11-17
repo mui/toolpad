@@ -13,7 +13,7 @@ class CreatePageDialog {
   constructor(page: Page) {
     this.page = page;
     this.dialog = page.locator('[role="dialog"]', {
-      hasText: 'Create a new MUI Toolpad Page',
+      hasText: 'Create a new Page',
     });
     this.nameInput = this.dialog.locator('label:has-text("name")');
     this.createButton = this.dialog.locator('button:has-text("Create")');
@@ -33,7 +33,7 @@ class CreateComponentDialog {
     this.page = page;
 
     this.dialog = page.locator('[role="dialog"]', {
-      hasText: 'Create a new MUI Toolpad Code Component',
+      hasText: 'Create a new Code Component',
     });
     this.nameInput = this.dialog.locator('label:has-text("name")');
     this.createButton = this.dialog.locator('button:has-text("Create")');
@@ -82,12 +82,12 @@ export class ToolpadEditor {
     this.createComponentBtn = page.locator('[aria-label="Create component"]');
     this.createComponentDialog = new CreateComponentDialog(page);
 
-    this.componentCatalog = page.locator('data-testid=component-catalog');
-    this.componentEditor = page.locator('data-testid=component-editor');
+    this.componentCatalog = page.getByTestId('component-catalog');
+    this.componentEditor = page.getByTestId('component-editor');
 
     this.appCanvas = page.frameLocator('[name=data-toolpad-canvas]');
-    this.pageRoot = this.appCanvas.locator('data-testid=page-root');
-    this.pageOverlay = this.appCanvas.locator('data-testid=page-overlay');
+    this.pageRoot = this.appCanvas.getByTestId('page-root');
+    this.pageOverlay = this.appCanvas.getByTestId('page-overlay');
 
     this.explorer = page.getByTestId('hierarchy-explorer');
     this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });

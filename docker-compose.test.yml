@@ -23,3 +23,8 @@ services:
         max-file: '3'
     expose:
       - '5432'
+
+  httpbin:
+    image: kennethreitz/httpbin
+    ports:
+      - '80'

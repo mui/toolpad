@@ -1,7 +1,7 @@
 import { NodeId, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import * as _ from 'lodash-es';
 import * as prisma from '../../prisma/generated/client';
-import { ServerDataSource, VersionOrPreview, AppTemplateId } from '../types';
+import { ServerDataSource, VersionOrPreview, AppTemplateId, RuntimeState } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import * as appDom from '../appDom';
 import { omit } from '../utils/immutability';
@@ -13,6 +13,7 @@ import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
+import createRuntimeState from '../createRuntimeState';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
@@ -217,26 +218,15 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     }
   }
 
-  let appName = name.trim();
+  const cleanAppName = name.trim();
 
-  if (config.isDemo) {
-    appName = appName.replace(/\(#[0-9]+\)/g, '').trim();
-
-    const sameNameAppCount = await prismaClient.app.count({
-      where: { OR: [{ name: appName }, { name: { startsWith: `${appName} (#`, endsWith: ')' } }] },
-    });
-    if (sameNameAppCount > 0) {
-      appName = `${appName} (#${sameNameAppCount + 1})`;
-    }
-  }
-
-  if (await prismaClient.app.findUnique({ where: { name: appName } })) {
+  if (await prismaClient.app.findUnique({ where: { name: cleanAppName } })) {
     throw new Error(`An app named "${name}" already exists.`);
   }
 
   return prismaClient.$transaction(async () => {
     const app = await prismaClient.app.create({
-      data: { name: appName },
+      data: { name: cleanAppName },
     });
 
     let dom: appDom.AppDom | null = null;
@@ -518,15 +508,21 @@ export function parseVersion(param?: string | string[]): VersionOrPreview | null
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-export async function loadDom(appId: string, version: VersionOrPreview = 'preview') {
+export async function loadDom(
+  appId: string,
+  version: VersionOrPreview = 'preview',
+): Promise<appDom.AppDom> {
   return version === 'preview' ? loadPreviewDom(appId) : loadReleaseDom(appId, version);
 }
 
 /**
  * Version of loadDom that returns a subset of the dom that doesn't contain sensitive information
  */
-export async function loadRenderTree(appId: string, version: VersionOrPreview = 'preview') {
-  return appDom.createRenderTree(await loadDom(appId, version));
+export async function loadRuntimeState(
+  appId: string,
+  version: VersionOrPreview = 'preview',
+): Promise<RuntimeState> {
+  return createRuntimeState({ appId, dom: await loadDom(appId, version) });
 }
 
 export async function duplicateApp(id: string, name: string): Promise<AppMeta> {

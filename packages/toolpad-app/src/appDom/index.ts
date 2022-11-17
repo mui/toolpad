@@ -7,6 +7,7 @@ import {
   BindableAttrValue,
   BindableAttrValues,
   SecretAttrValue,
+  BindableAttrEntries,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps } from '@mui/material';
@@ -117,7 +118,7 @@ export type FetchMode = 'query' | 'mutation';
  */
 export interface QueryNode<Q = any> extends AppDomNodeBase {
   readonly type: 'query';
-  readonly params?: BindableAttrValues;
+  readonly params?: BindableAttrEntries;
   readonly attributes: {
     readonly mode?: ConstantAttrValue<FetchMode>;
     readonly dataSource?: ConstantAttrValue<string>;
@@ -696,6 +697,20 @@ export function setNamespacedProp<
   } as Partial<Node>);
 }
 
+export function setQueryProp<Q, K extends keyof Q>(
+  node: QueryNode<Q>,
+  prop: K,
+  value: Q[K],
+): QueryNode<Q> {
+  const original = node.attributes.query.value;
+  return setNamespacedProp(
+    node,
+    'attributes',
+    'query',
+    createConst<Q>({ ...original, [prop]: value }),
+  );
+}
+
 export function setNodeNamespacedProp<
   Node extends AppDomNode,
   Namespace extends PropNamespaces<Node>,
@@ -1048,8 +1063,10 @@ function createRenderTreeNode(node: AppDomNode): RenderTreeNode | null {
   }
 
   if (isQuery(node) || isMutation(node)) {
+    // This is hacky, should we delegate this check to the datasources?
     const isBrowserSideRestQuery: boolean =
-      node.attributes.dataSource?.value === 'rest' &&
+      (node.attributes.dataSource?.value === 'rest' ||
+        node.attributes.dataSource?.value === 'function') &&
       !!(node.attributes.query.value as any).browser;
 
     if (node.attributes.query.value && !isBrowserSideRestQuery) {

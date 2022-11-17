@@ -150,7 +150,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
   );
   const firstLatestCreatedApp = React.useRef(latestCreatedApp).current;
 
-  const isFormValid = Boolean(name);
+  const isFormValid = config.isDemo || Boolean(name);
 
   const isSubmitting =
     createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
@@ -179,11 +179,12 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
         });
       }
 
+      const appName = config.isDemo ? `demo_app_${Date.now()}` : name;
       const appDom = dom.trim() ? JSON.parse(dom) : null;
 
       try {
         const createdApp = await createAppMutation.mutateAsync([
-          name,
+          appName,
           {
             from: {
               ...(appDom ? { kind: 'dom', dom: appDom } : { kind: 'template', id: appTemplateId }),
@@ -232,21 +233,23 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               Your application will be ephemeral and may be deleted at any time.
             </Alert>
           ) : null}
-          <TextField
-            sx={{ my: 1 }}
-            required
-            autoFocus
-            fullWidth
-            label="Name"
-            value={name}
-            error={createAppMutation.isError}
-            helperText={(createAppMutation.error as Error)?.message || ''}
-            onChange={(event) => {
-              createAppMutation.reset();
-              setName(event.target.value);
-            }}
-            disabled={isSubmitting}
-          />
+          {!config.isDemo ? (
+            <TextField
+              sx={{ my: 1 }}
+              required
+              autoFocus
+              fullWidth
+              label="Name"
+              value={name}
+              error={createAppMutation.isError}
+              helperText={(createAppMutation.error as Error)?.message || ''}
+              onChange={(event) => {
+                createAppMutation.reset();
+                setName(event.target.value);
+              }}
+              disabled={isSubmitting}
+            />
+          ) : null}
 
           <TextField
             sx={{ my: 1 }}

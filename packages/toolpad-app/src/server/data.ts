@@ -229,24 +229,13 @@ export async function createApp(name: string, opts: CreateAppOptions = {}): Prom
     }
   }
 
-  let appName = name.trim();
-
-  if (config.isDemo) {
-    appName = appName.replace(/\(#[0-9]+\)/g, '').trim();
-
-    const sameNameAppCount = await prismaClient.app.count({
-      where: { OR: [{ name: appName }, { name: { startsWith: `${appName} (#`, endsWith: ')' } }] },
-    });
-    if (sameNameAppCount > 0) {
-      appName = `${appName} (#${sameNameAppCount + 1})`;
-    }
-  }
+  const cleanAppName = name.trim();
 
   return prismaClient.$transaction(async () => {
     let app;
     try {
       app = await prismaClient.app.create({
-        data: { name: appName },
+        data: { name: cleanAppName },
       });
     } catch (error) {
       // https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes

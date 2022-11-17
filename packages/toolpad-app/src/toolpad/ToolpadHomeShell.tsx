@@ -28,7 +28,6 @@ export default function HomeShell({ children, ...props }: HomeShellProps) {
             flexDirection: 'column',
             width: 250,
             mt: 3,
-            ml: 2,
             overflow: 'auto',
           }}
         >

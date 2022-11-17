@@ -36,13 +36,7 @@ export function rpcReqSerializer(req: NextApiRequest) {
   };
 }
 
-export function rpcResSerializer(res: NextApiResponse) {
-  return {
-    ...resSerializer(res),
-  };
-}
-
-export function rpcResErrSerializer(error: Error) {
+export function resErrSerializer(error: Error) {
   return {
     message: error.message,
     code: error.code,

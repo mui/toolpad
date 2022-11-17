@@ -10,9 +10,9 @@ type ReqResLogPayload = {
 
 type RpcReqResLogPayload = {
   key: 'rpcReqRes';
-  rpcReq: NextApiRequest;
-  rpcRes: NextApiResponse;
-  rpcResErr?: RpcResponse['error'];
+  req: NextApiRequest;
+  res: NextApiResponse;
+  resErr?: RpcResponse['error'];
 };
 
 type LogPayload = ReqResLogPayload | RpcReqResLogPayload;

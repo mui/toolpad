@@ -318,7 +318,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
           {config.recaptchaV3SiteKey ? (
             <Box mt={2}>
               <Divider sx={{ mb: 1 }} />
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'normal' }}>
                 This site is protected by reCAPTCHA and the Google{' '}
                 <Link
                   href="https://policies.google.com/privacy"

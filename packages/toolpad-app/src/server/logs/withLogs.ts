@@ -59,9 +59,9 @@ export const withRpcReqResLogs =
       logInfo(
         {
           key: 'rpcReqRes',
-          rpcReq: req,
-          rpcRes: res,
-          ...(error ? { rpcResErr: error } : {}),
+          req,
+          res,
+          ...(error ? { resErr: error } : {}),
         },
         `Handled request (${req.body.type}:${req.body.name})`,
       );

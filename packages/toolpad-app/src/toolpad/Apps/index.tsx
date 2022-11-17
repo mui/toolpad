@@ -186,12 +186,10 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
         <DialogTitle>Create a new App</DialogTitle>
         <DialogContent>
           {config.isDemo ? (
-            <React.Fragment>
-              <Alert severity="warning" sx={{ mb: 1 }}>
-                <AlertTitle>For demo purposes only!</AlertTitle>
-                Your application will be ephemeral and may be deleted at any time.
-              </Alert>
-            </React.Fragment>
+            <Alert severity="warning" sx={{ mb: 1 }}>
+              <AlertTitle>For demo purposes only!</AlertTitle>
+              Your application will be ephemeral and may be deleted at any time.
+            </Alert>
           ) : (
             <TextField
               sx={{ my: 1 }}

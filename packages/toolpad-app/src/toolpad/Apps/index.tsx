@@ -65,6 +65,7 @@ import { errorFrom } from '../../utils/errors';
 import { sendAppCreatedEvent } from '../../utils/ga';
 import { LatestStoredAppValue, TOOLPAD_LATEST_APP_KEY } from '../../storageKeys';
 import FlexFill from '../../components/FlexFill';
+import ToolpadShell from '../ToolpadShell';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -100,7 +101,7 @@ const NO_OP = () => {};
 
 export interface CreateAppDialogProps {
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
@@ -247,8 +248,8 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               <LoadingButton
                 variant="outlined"
                 size="medium"
-                component="a"
-                href={`/_toolpad/app/${latestStoredApp.appId}`}
+                component={Link}
+                to={`/app/${latestStoredApp.appId}`}
                 sx={{ mt: 0.5 }}
                 loading={isNavigatingToExistingApp}
                 onClick={handleContinueButtonClick}
@@ -292,9 +293,9 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             onClick={() => {
               setName('');
               createAppMutation.reset();
-              onClose();
+              onClose?.();
             }}
-            disabled={config.isDemo}
+            disabled={!onClose}
           >
             Cancel
           </Button>
@@ -779,6 +780,14 @@ function AppsListView({
   );
 }
 
+function DemoPage() {
+  return (
+    <ToolpadShell>
+      <CreateAppDialog open />
+    </ToolpadShell>
+  );
+}
+
 export default function Home() {
   const {
     data: apps = [],
@@ -823,54 +832,55 @@ export default function Home() {
     [duplicateAppMutation],
   );
 
-  return (
+  return config.isDemo ? (
+    <DemoPage />
+  ) : (
     <ToolpadHomeShell>
-      {config.isDemo ? null : (
-        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Toolbar variant="regular" disableGutters sx={{ gap: 2, px: 5, mt: 3, mb: 2 }}>
-            <Typography sx={{ pl: 2 }} variant="h3">
-              Apps
-            </Typography>
-            <FlexFill />
-            <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-            <ToggleButtonGroup
-              value={viewMode}
-              exclusive
-              onChange={handleViewModeChange}
-              aria-label="view mode"
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Toolbar variant="regular" disableGutters sx={{ gap: 2, px: 5, mt: 3, mb: 2 }}>
+          <Typography sx={{ pl: 2 }} variant="h3">
+            Apps
+          </Typography>
+          <FlexFill />
+          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={handleViewModeChange}
+            aria-label="view mode"
+          >
+            <ToggleButton
+              value="list"
+              aria-label="list view"
+              color={viewMode === 'list' ? 'primary' : undefined}
             >
-              <ToggleButton
-                value="list"
-                aria-label="list view"
-                color={viewMode === 'list' ? 'primary' : undefined}
-              >
-                <ViewListIcon />
-              </ToggleButton>
-              <ToggleButton
-                value="grid"
-                aria-label="grid view"
-                color={viewMode === 'grid' ? 'primary' : undefined}
-              >
-                <GridViewIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Toolbar>
-          {error ? (
-            <ErrorAlert error={error} />
-          ) : (
-            <Box sx={{ flex: 1, overflow: 'auto', px: 5 }}>
-              <AppsView
-                apps={apps}
-                loading={isLoading}
-                activeDeploymentsByApp={activeDeploymentsByApp}
-                setDeletedApp={setDeletedApp}
-                duplicateApp={duplicateApp}
-              />
-            </Box>
-          )}
-          <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-        </Box>
-      )}
+              <ViewListIcon />
+            </ToggleButton>
+            <ToggleButton
+              value="grid"
+              aria-label="grid view"
+              color={viewMode === 'grid' ? 'primary' : undefined}
+            >
+              <GridViewIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Toolbar>
+        {error ? (
+          <ErrorAlert error={error} />
+        ) : (
+          <Box sx={{ flex: 1, overflow: 'auto', px: 5 }}>
+            <AppsView
+              apps={apps}
+              loading={isLoading}
+              activeDeploymentsByApp={activeDeploymentsByApp}
+              setDeletedApp={setDeletedApp}
+              duplicateApp={duplicateApp}
+            />
+          </Box>
+        )}
+        <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
+      </Box>
+
       <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
     </ToolpadHomeShell>
   );

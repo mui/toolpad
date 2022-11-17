@@ -1,9 +1,20 @@
-import { Box, Divider, List, ListItem, ListItemButton, ListItemText, Stack } from '@mui/material';
+import {
+  Box,
+  Divider,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Stack,
+  styled,
+} from '@mui/material';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import FlexFill from '../components/FlexFill';
 import { DOCUMENTATION_URL, REPOSITORY_URL } from '../constants';
 import ToolpadShell, { ToolpadShellProps } from './ToolpadShell';
+
+const NavigationListItemButton = styled(ListItemButton)({ height: 56 });
 
 export interface HomeShellProps extends ToolpadShellProps {}
 
@@ -23,24 +34,27 @@ export default function HomeShell({ children, ...props }: HomeShellProps) {
         >
           <List>
             <ListItem disablePadding>
-              <ListItemButton sx={{ height: 56 }} component={Link} to={'/apps'}>
+              {/* @ts-expect-error https://github.com/mui/material-ui/issues/29875 */}
+              <NavigationListItemButton component={Link} to={'/apps'}>
                 <ListItemText primary="Apps" />
-              </ListItemButton>
+              </NavigationListItemButton>
             </ListItem>
             <Divider component="li" />
           </List>
           <FlexFill />
           <List>
             <ListItem disablePadding>
-              <ListItemButton sx={{ height: 56 }} component="a" href={DOCUMENTATION_URL}>
+              {/* @ts-expect-error https://github.com/mui/material-ui/issues/29875 */}
+              <NavigationListItemButton component="a" href={DOCUMENTATION_URL}>
                 <ListItemText primary="Documentation" />
-              </ListItemButton>
+              </NavigationListItemButton>
             </ListItem>
             <Divider component="li" />
             <ListItem disablePadding>
-              <ListItemButton sx={{ height: 56 }} component="a" href={REPOSITORY_URL}>
+              {/* @ts-expect-error https://github.com/mui/material-ui/issues/29875 */}
+              <NavigationListItemButton component="a" href={REPOSITORY_URL}>
                 <ListItemText primary="GitHub" />
-              </ListItemButton>
+              </NavigationListItemButton>
             </ListItem>
           </List>
         </Box>

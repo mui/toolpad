@@ -1,6 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import type { RecaptchaResJson } from '../validateRecaptchaToken';
 
+function getReqLoggableIPAddress(req: NextApiRequest): string | null {
+  const forwardedHeader = req.headers['x-forwarded-for'];
+  return (
+    (typeof forwardedHeader === 'string' && forwardedHeader.split(',').shift()) ||
+    req.socket?.remoteAddress ||
+    null
+  );
+}
+
 export function reqSerializer(req: NextApiRequest) {
   return {
     url: req.url,
@@ -18,6 +27,7 @@ export function reqSerializer(req: NextApiRequest) {
     socket: {
       remoteAddress: req.socket?.remoteAddress,
     },
+    ipAddress: getReqLoggableIPAddress(req),
   };
 }
 

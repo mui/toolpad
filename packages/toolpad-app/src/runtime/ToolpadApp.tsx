@@ -70,7 +70,6 @@ import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
-   
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
     default: d.ReactQueryDevtools,
   })),

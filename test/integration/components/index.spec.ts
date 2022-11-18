@@ -15,7 +15,7 @@ async function waitForComponents(page: Page | FrameLocator) {
   await page.locator('label:has-text("foo select")').waitFor({ state: 'visible' });
 }
 
-test.only('components', async ({ page, browserName }) => {
+test('components', async ({ page, browserName }) => {
   const dom = await readJsonFile(path.resolve(__dirname, './componentsDom.json'));
 
   const homeModel = new ToolpadHome(page);

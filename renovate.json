@@ -50,11 +50,6 @@
       "allowedVersions": "< 3.0.0"
     },
     {
-      "groupName": "eslint-config-airbnb-typescript",
-      "matchPackageNames": ["eslint-config-airbnb-typescript"],
-      "allowedVersions": "< 13.0.0"
-    },
-    {
       "groupName": "react-router",
       "matchPackageNames": ["react-router", "react-router-dom"],
       "allowedVersions": "< 6.4.0"

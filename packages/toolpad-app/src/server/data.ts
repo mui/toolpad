@@ -13,6 +13,7 @@ import { getAppTemplateDom } from './appTemplateDoms/doms';
 import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
+import { ERR_APP_NAME_EXISTS, ERR_VALIDATE_CAPTCHA_FAILED } from '../errorCodes';
 import createRuntimeState from '../createRuntimeState';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
@@ -200,34 +201,52 @@ export type CreateAppOptions = {
         kind: 'template';
         id: AppTemplateId;
       };
-  recaptchaToken?: string;
+  captcha?: {
+    token: string;
+    version: 2 | 3;
+  };
 };
 
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
   const { from } = opts;
 
-  const recaptchaSecretKey = config.recaptchaSecretKey;
-  if (recaptchaSecretKey) {
+  if (config.recaptchaV3SecretKey) {
+    const captchaVersion = opts.captcha?.version;
+
+    const secretKey =
+      captchaVersion === 2 ? config.recaptchaV2SecretKey || '' : config.recaptchaV3SecretKey;
     const isRecaptchaTokenValid = await validateRecaptchaToken(
-      recaptchaSecretKey,
-      opts.recaptchaToken || '',
+      secretKey,
+      opts.captcha?.token || '',
     );
 
     if (!isRecaptchaTokenValid) {
-      throw new Error('Unable to verify CAPTCHA.');
+      const toolpadError = new Error(
+        config.recaptchaV2SecretKey ? 'Please solve the CAPTCHA.' : 'Unable to verify CAPTCHA.',
+      );
+      toolpadError.code = ERR_VALIDATE_CAPTCHA_FAILED;
+      throw toolpadError;
     }
   }
 
   const cleanAppName = name.trim();
 
-  if (await prismaClient.app.findUnique({ where: { name: cleanAppName } })) {
-    throw new Error(`An app named "${name}" already exists.`);
-  }
-
   return prismaClient.$transaction(async () => {
-    const app = await prismaClient.app.create({
-      data: { name: cleanAppName },
-    });
+    let app;
+    try {
+      app = await prismaClient.app.create({
+        data: { name: cleanAppName },
+      });
+    } catch (error) {
+      // https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes
+      // P2002: Unique constraint failed on the field
+      if (error instanceof prisma.Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const toolpadError = new Error(`An app named "${name}" already exists.`, { cause: error });
+        toolpadError.code = ERR_APP_NAME_EXISTS;
+        throw toolpadError;
+      }
+      throw error;
+    }
 
     let dom: appDom.AppDom | null = null;
 

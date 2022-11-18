@@ -44,8 +44,9 @@ export interface RuntimeConfig {
   gaId?: string;
   // Sentry DSN
   sentryDsn?: string;
-  // Google reCAPTCHA site key
-  recaptchaSiteKey?: string;
+  // Google reCAPTCHA site keys
+  recaptchaV2SiteKey?: string;
+  recaptchaV3SiteKey?: string;
   externalUrl: string;
 }
 
@@ -78,7 +79,8 @@ const runtimeConfig: RuntimeConfig =
         isDemo: !!process.env.TOOLPAD_DEMO,
         gaId: process.env.TOOLPAD_GA_ID,
         sentryDsn: process.env.TOOLPAD_SENTRY_DSN,
-        recaptchaSiteKey: process.env.TOOLPAD_RECAPTCHA_SITE_KEY,
+        recaptchaV2SiteKey: process.env.TOOLPAD_RECAPTCHA_V2_SITE_KEY,
+        recaptchaV3SiteKey: process.env.TOOLPAD_RECAPTCHA_V3_SITE_KEY,
         externalUrl:
           process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`,
       }

@@ -437,7 +437,7 @@ function resolveBindables(
   bindingId: string,
   params?: NestedBindableAttrs,
 ): Record<string, unknown> {
-  const result: any = _.cloneDeep(params) || {};
+  const result: any = {};
   const resultKey = 'value';
   const flattened = flattenNestedBindables(params);
   for (const [path] of flattened) {
@@ -456,7 +456,11 @@ function QueryNode({ node }: QueryNodeProps) {
   const bindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
-  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
+  const params = resolveBindables(
+    bindings,
+    `${node.id}.params`,
+    Object.fromEntries(node.params ?? []),
+  );
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
@@ -652,7 +656,7 @@ function parseBindings(
 
     if (appDom.isQuery(elm)) {
       if (elm.params) {
-        const nestedBindablePaths = flattenNestedBindables(elm.params);
+        const nestedBindablePaths = flattenNestedBindables(Object.fromEntries(elm.params ?? []));
 
         for (const [nestedPath, paramValue] of nestedBindablePaths) {
           const bindingId = `${elm.id}.params${nestedPath}`;

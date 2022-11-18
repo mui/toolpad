@@ -46,6 +46,12 @@ async function createRequire(urlImports: string[]) {
   return require;
 }
 
+const IMPORT_WILDCARD_PREFIX = ` function _interopRequireWildcard(obj) { \
+  if (obj && obj.__esModule) { return obj; } else { var newObj = {}; \
+  if (obj != null) { for (var key in obj) { \
+  if (Object.prototype.hasOwnProperty.call(obj, key)) { newObj[key] = obj[key]; } } } \
+  newObj.default = obj; return newObj; } }`;
+
 export default async function loadModule(mod: CompiledModule): Promise<any> {
   if (mod.error) {
     throw mod.error;
@@ -63,6 +69,7 @@ export default async function loadModule(mod: CompiledModule): Promise<any> {
 
   const instantiateModuleCode = `
     (${Object.keys(globals).join(', ')}) => {
+      ${IMPORT_WILDCARD_PREFIX}
       ${mod.code}
     }
   `;

@@ -6,12 +6,11 @@ import {
   CardHeader,
   CardContent,
   CardActions,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Link,
+  Link as MuiLink,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -45,13 +44,14 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Controller, useForm } from 'react-hook-form';
 import invariant from 'invariant';
+import { Link } from 'react-router-dom';
 import useBoolean from '../../utils/useBoolean';
 import useEvent from '../../utils/useEvent';
 import client from '../../api';
 import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
 import useLatest from '../../utils/useLatest';
-import ToolpadShell from '../ToolpadShell';
+import ToolpadHomeShell from '../ToolpadHomeShell';
 import getReadableDuration from '../../utils/readableDuration';
 import EditableText from '../../components/EditableText';
 import type { AppMeta } from '../../server/data';
@@ -66,6 +66,8 @@ import { ERR_VALIDATE_CAPTCHA_FAILED } from '../../errorCodes';
 
 import { sendAppCreatedEvent } from '../../utils/ga';
 import { StoredLatestCreatedApp, TOOLPAD_LATEST_CREATED_APP_KEY } from '../../storageKeys';
+import FlexFill from '../../components/FlexFill';
+import ToolpadShell from '../ToolpadShell';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -101,7 +103,7 @@ const NO_OP = () => {};
 
 export interface CreateAppDialogProps {
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
@@ -156,7 +158,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
     }
   }, [firstLatestCreatedApp, latestCreatedApp]);
 
-  const isFormValid = config.isDemo || Boolean(name);
+  const isFormValid = config.isDemo ? true : !!name;
 
   const isSubmitting =
     createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
@@ -238,8 +240,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               <AlertTitle>For demo purposes only!</AlertTitle>
               Your application will be ephemeral and may be deleted at any time.
             </Alert>
-          ) : null}
-          {!config.isDemo ? (
+          ) : (
             <TextField
               sx={{ my: 1 }}
               required
@@ -255,7 +256,7 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               }}
               disabled={isSubmitting}
             />
-          ) : null}
+          )}
 
           <TextField
             sx={{ my: 1 }}
@@ -298,8 +299,8 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               <LoadingButton
                 variant="outlined"
                 size="medium"
-                component="a"
-                href={`/_toolpad/app/${firstLatestCreatedApp.appId}`}
+                component={Link}
+                to={`/app/${firstLatestCreatedApp.appId}`}
                 sx={{ mt: 0.5, mb: 1 }}
                 loading={isNavigatingToExistingApp}
                 onClick={handleContinueButtonClick}
@@ -326,23 +327,23 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
               <Divider sx={{ mb: 1 }} />
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'normal' }}>
                 This site is protected by reCAPTCHA and the Google{' '}
-                <Link
+                <MuiLink
                   href="https://policies.google.com/privacy"
                   underline="none"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Privacy Policy
-                </Link>{' '}
+                </MuiLink>{' '}
                 and{' '}
-                <Link
+                <MuiLink
                   href="https://policies.google.com/terms"
                   underline="none"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Terms of Service
-                </Link>{' '}
+                </MuiLink>{' '}
                 apply.
               </Typography>
             </Box>
@@ -355,9 +356,9 @@ function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
             onClick={() => {
               setName('');
               createAppMutation.reset();
-              onClose();
+              onClose?.();
             }}
-            disabled={config.isDemo}
+            disabled={!onClose}
           >
             Cancel
           </Button>
@@ -474,7 +475,7 @@ interface AppEditButtonProps {
 
 function AppEditButton({ app }: AppEditButtonProps) {
   return (
-    <Button size="small" component="a" href={app ? `/_toolpad/app/${app.id}` : ''} disabled={!app}>
+    <Button size="small" component={Link} to={app ? `/app/${app.id}` : ''} disabled={!app}>
       Edit
     </Button>
   );
@@ -488,7 +489,11 @@ interface AppOpenButtonProps {
 function AppOpenButton({ app, activeDeployment }: AppOpenButtonProps) {
   const openDisabled = !app || !activeDeployment;
   let openButton = (
-    <Button disabled={!app || !activeDeployment} component="a" href={app ? `deploy/${app.id}` : ''}>
+    <Button
+      disabled={!app || !activeDeployment}
+      component="a"
+      href={app ? `/deploy/${app.id}` : ''}
+    >
       Open
     </Button>
   );
@@ -838,6 +843,14 @@ function AppsListView({
   );
 }
 
+function DemoPage() {
+  return (
+    <ToolpadShell>
+      <CreateAppDialog open />
+    </ToolpadShell>
+  );
+}
+
 export default function Home() {
   const {
     data: apps = [],
@@ -882,39 +895,43 @@ export default function Home() {
     [duplicateAppMutation],
   );
 
-  return (
-    <ToolpadShell>
-      <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      {!config.isDemo ? (
-        <Container sx={{ my: 1 }}>
-          <Typography variant="h2">Apps</Typography>
-          <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
-            <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-            <ToggleButtonGroup
-              value={viewMode}
-              exclusive
-              onChange={handleViewModeChange}
-              aria-label="view mode"
+  return config.isDemo ? (
+    <DemoPage />
+  ) : (
+    <ToolpadHomeShell>
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Toolbar variant="regular" disableGutters sx={{ gap: 2, px: 5, mt: 3, mb: 2 }}>
+          <Typography sx={{ pl: 2 }} variant="h3">
+            Apps
+          </Typography>
+          <FlexFill />
+          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={handleViewModeChange}
+            aria-label="view mode"
+          >
+            <ToggleButton
+              value="list"
+              aria-label="list view"
+              color={viewMode === 'list' ? 'primary' : undefined}
             >
-              <ToggleButton
-                value="list"
-                aria-label="list view"
-                color={viewMode === 'list' ? 'primary' : undefined}
-              >
-                <ViewListIcon />
-              </ToggleButton>
-              <ToggleButton
-                value="grid"
-                aria-label="grid view"
-                color={viewMode === 'grid' ? 'primary' : undefined}
-              >
-                <GridViewIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Toolbar>
-          {error ? (
-            <ErrorAlert error={error} />
-          ) : (
+              <ViewListIcon />
+            </ToggleButton>
+            <ToggleButton
+              value="grid"
+              aria-label="grid view"
+              color={viewMode === 'grid' ? 'primary' : undefined}
+            >
+              <GridViewIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Toolbar>
+        {error ? (
+          <ErrorAlert error={error} />
+        ) : (
+          <Box sx={{ flex: 1, overflow: 'auto', px: 5 }}>
             <AppsView
               apps={apps}
               loading={isLoading}
@@ -922,10 +939,12 @@ export default function Home() {
               setDeletedApp={setDeletedApp}
               duplicateApp={duplicateApp}
             />
-          )}
-        </Container>
-      ) : null}
+          </Box>
+        )}
+        <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
+      </Box>
+
       <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
-    </ToolpadShell>
+    </ToolpadHomeShell>
   );
 }

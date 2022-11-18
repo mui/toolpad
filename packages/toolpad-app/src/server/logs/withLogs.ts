@@ -44,7 +44,7 @@ export const withReqResLogs =
         req,
         res,
       },
-      'Handled request',
+      'Handled API request',
     );
 
     return apiHandler(req, res);
@@ -63,7 +63,7 @@ export const withRpcReqResLogs =
           res,
           ...(error ? { resErr: error } : {}),
         },
-        `Handled request (${req.body.type}:${req.body.name})`,
+        'Handled RPC request',
       );
     });
 

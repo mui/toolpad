@@ -15,7 +15,6 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
-  Link,
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
@@ -60,7 +59,6 @@ import config from '../../config';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import { clientExec } from './runtime';
-import { DOCUMENTATION_INSTALLATION_URL } from '../../constants';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -416,7 +414,23 @@ function QueryEditor({
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <QueryInputPanel onRunPreview={handleRunPreview}>
+        <QueryInputPanel
+          onRunPreview={handleRunPreview}
+          actions={
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isBrowserSide}
+                    onChange={handleRunInBrowserChange}
+                    disabled={config.isDemo}
+                  />
+                }
+                label="Run in the browser"
+              />
+            </FormGroup>
+          }
+        >
           <Stack gap={2} sx={{ px: 3, pt: 1 }}>
             <Typography>Query</Typography>
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
@@ -444,28 +458,6 @@ function QueryEditor({
                 onChange={handleUrlChange}
               />
             </Box>
-            <FormGroup>
-              {config.isDemo ? (
-                <Alert severity="info">
-                  Can only run queries in browser in demo mode.
-                  <br />
-                  <Link href={DOCUMENTATION_INSTALLATION_URL} target="_blank">
-                    Try self-hosting
-                  </Link>{' '}
-                  for full functionality.
-                </Alert>
-              ) : null}
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={isBrowserSide}
-                    onChange={handleRunInBrowserChange}
-                    disabled={config.isDemo}
-                  />
-                }
-                label="Run in the browser"
-              />
-            </FormGroup>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <TabContext value={activeTab}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>

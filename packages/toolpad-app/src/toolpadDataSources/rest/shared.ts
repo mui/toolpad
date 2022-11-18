@@ -200,7 +200,7 @@ export async function execfetch(
   ]);
 
   if (config.isDemo && !fetchQuery.browser) {
-    throw new Error(`Cannot use these features in demo version.`);
+    throw new Error('Cannot use these features in demo version.');
   }
 
   const queryUrl = parseQueryUrl(resolvedUrl, connection?.baseUrl);

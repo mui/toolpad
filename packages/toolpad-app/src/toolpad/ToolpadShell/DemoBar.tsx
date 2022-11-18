@@ -7,12 +7,10 @@ import { DOCUMENTATION_INSTALLATION_URL, LANDING_PAGE_URL } from '../../constant
 const DemoBarContainer = styled(Box)({
   alignItems: 'center',
   backgroundColor: blueDark[50],
-  bottom: 0,
   color: grey[700],
   display: 'flex',
   height: 60,
   justifyContent: 'space-between',
-  left: 0,
   paddingLeft: 20,
   paddingRight: 20,
 });

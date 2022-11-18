@@ -12,12 +12,13 @@ type ServerDataSources = { [key: string]: ServerDataSource<any, any, any> | unde
 const serverDataSources: ServerDataSources = config.isDemo
   ? {
       rest,
+      function: functionSrc,
       movies,
     }
   : {
       postgres,
-      function: functionSrc,
       rest,
+      function: functionSrc,
       googleSheets,
     };
 

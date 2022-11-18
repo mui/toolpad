@@ -1,7 +1,23 @@
 import * as React from 'react';
-import { Box, Button, Skeleton, Stack, Toolbar, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Skeleton,
+  Stack,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  ExecFetchFn,
+  QueryEditorProps,
+} from '../../types';
 import {
   FunctionConnectionParams,
   FunctionPrivateQuery,
@@ -27,6 +43,8 @@ import useShortcut from '../../utils/useShortcut';
 import { tryFormat } from '../../utils/prettier';
 import useFetchPrivate from '../useFetchPrivate';
 import { MOVIES_API_DEMO_URL } from '../demo';
+import * as appDom from '../../appDom';
+import { clientExec } from './runtime';
 
 const EVENT_INTERFACE_IDENTIFIER = 'ToolpadFunctionEvent';
 
@@ -98,14 +116,32 @@ const DEFAULT_MODULE = `export default async function ({ parameters }: ToolpadFu
 }
 `;
 
+const EMPTY_PARAMS: BindableAttrEntries = [];
+
 function QueryEditor({
   globalScope,
   value: input,
   onChange: setInput,
   onCommit,
 }: QueryEditorProps<FunctionConnectionParams, FunctionQuery>) {
+  const paramsEntries = input.params || EMPTY_PARAMS;
+
+  const handleParamsChange = React.useCallback(
+    (newParams: [string, BindableAttrValue<string>][]) => {
+      setInput((existing) => ({ ...existing, params: newParams }));
+    },
+    [setInput],
+  );
+
+  const handleRunInBrowserChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInput((existing) => appDom.setQueryProp(existing, 'browser', event.target.checked));
+    },
+    [setInput],
+  );
+
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    input: input.params,
+    input: paramsEntries,
     globalScope,
   });
 
@@ -121,11 +157,14 @@ function QueryEditor({
     [fetchPrivate],
   );
 
+  const fetchPreview: ExecFetchFn<FunctionQuery, FunctionResult> = (query, params) =>
+    clientExec(query, params, fetchServerPreview);
+
   const [previewLogs, setPreviewLogs] = React.useState<LogEntry[]>([]);
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
   const { preview, runPreview: handleRunPreview } = useQueryPreview(
-    fetchServerPreview,
-    input.query,
+    fetchPreview,
+    input.attributes.query.value,
     previewParams,
     {
       onPreview(result) {
@@ -140,7 +179,7 @@ function QueryEditor({
   });
 
   const extraLibs = React.useMemo(() => {
-    const paramsKeys = input.params.map(([key]) => key);
+    const paramsKeys = paramsEntries.map(([key]) => key);
     const paramsMembers = paramsKeys.map((key) => `${key}: string`).join('\n');
     const secretsMembers = secretsKeys.map((key) => `${key}: string`).join('\n');
 
@@ -161,24 +200,39 @@ function QueryEditor({
     `;
 
     return [{ content, filePath: 'global.d.ts' }];
-  }, [input.params, secretsKeys]);
+  }, [paramsEntries, secretsKeys]);
 
   const handleLogClear = React.useCallback(() => setPreviewLogs([]), []);
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
   const handleCommit = React.useCallback(() => onCommit?.(), [onCommit]);
-  useShortcut({ code: 'KeyS', metaKey: true }, handleCommit);
+  useShortcut({ key: 's', metaKey: true }, handleCommit);
 
   return (
     <SplitPane split="vertical" size="50%" allowResize>
       <SplitPane split="horizontal" size={85} primary="second" allowResize>
-        <QueryInputPanel onRunPreview={handleRunPreview}>
+        <QueryInputPanel
+          onRunPreview={handleRunPreview}
+          actions={
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={input.attributes.query.value.browser}
+                    onChange={handleRunInBrowserChange}
+                  />
+                }
+                label="Run in the browser"
+              />
+            </FormGroup>
+          }
+        >
           <Box sx={{ flex: 1, minHeight: 0 }}>
             <TypescriptEditor
-              value={input.query.module}
-              onChange={(newValue) =>
-                setInput((existing) => ({ ...existing, query: { module: newValue } }))
-              }
+              value={input.attributes.query.value.module}
+              onChange={(newValue) => {
+                setInput((existing) => appDom.setQueryProp(existing, 'module', newValue));
+              }}
               extraLibs={extraLibs}
             />
           </Box>
@@ -187,8 +241,8 @@ function QueryEditor({
         <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
           <Typography>Parameters</Typography>
           <ParametersEditor
-            value={input.params}
-            onChange={(newParams) => setInput((existing) => ({ ...existing, params: newParams }))}
+            value={paramsEntries}
+            onChange={handleParamsChange}
             globalScope={globalScope}
             liveValue={paramsEditorLiveValue}
           />

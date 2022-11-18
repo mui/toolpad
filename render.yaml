@@ -10,7 +10,6 @@ services:
     startCommand: yarn start
     healthCheckPath: /health-check
     plan: starter plus
-    pullRequestPreviewsEnabled: true
     envVars:
       - key: NODE_VERSION
         value: '18.10.0'
@@ -39,7 +38,6 @@ services:
     dockerContext: ./docker/images/toolpad-demo/
     healthCheckPath: /health-check
     plan: starter plus
-    pullRequestPreviewsEnabled: false
     envVars:
       - key: NODE_VERSION
         value: '18.10.0'

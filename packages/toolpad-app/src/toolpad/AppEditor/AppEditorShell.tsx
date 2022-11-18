@@ -121,7 +121,7 @@ function getSaveState(domLoader: DomLoader): React.ReactNode {
 
   if (isSaving) {
     return (
-      <Tooltip title="Saving changes...">
+      <Tooltip title="Saving changes…">
         <SyncIcon color="primary" />
       </Tooltip>
     );

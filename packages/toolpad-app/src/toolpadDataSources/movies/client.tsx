@@ -13,6 +13,7 @@ import useQueryPreview from '../useQueryPreview';
 import { MoviesQuery, MoviesConnectionParams } from './types';
 import { FetchResult } from '../rest/types';
 import useFetchPrivate from '../useFetchPrivate';
+import * as appDom from '../../appDom';
 
 function withDefaults(value: Maybe<MoviesConnectionParams>): MoviesConnectionParams {
   return {
@@ -45,10 +46,7 @@ export function QueryEditor({
 }: QueryEditorProps<MoviesConnectionParams, MoviesQuery>) {
   const handleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => ({
-        ...existing,
-        query: { ...existing.query, genre: event.target.value || null },
-      }));
+      setInput((existing) => appDom.setQueryProp(existing, 'genre', event.target.value || null));
     },
     [setInput],
   );
@@ -61,7 +59,7 @@ export function QueryEditor({
 
   const { preview, runPreview: handleRunPreview } = useQueryPreview(
     fetchServerPreview,
-    { genre: input.query.genre },
+    { genre: input.attributes.query.value.genre },
     {},
   );
 
@@ -77,7 +75,7 @@ export function QueryEditor({
           <TextField
             select
             fullWidth
-            value={input.query.genre || 'any'}
+            value={input.attributes.query.value.genre || 'any'}
             label="Genre"
             onChange={handleChange}
           >

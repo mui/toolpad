@@ -6,7 +6,7 @@ function replaceQueryParams(node: any): appDom.AppDomNode {
   if (node.type === 'query') {
     return {
       ...node,
-      params: node.params ? Object.entries(node.params) : [],
+      params: node.params && !Array.isArray(node.params) ? Object.entries(node.params) : [],
     };
   }
 

@@ -1,8 +1,8 @@
 import invariant from 'invariant';
 import v1 from './v1';
 import v2 from './v2';
-import * as appDom from '..';
 import v3 from './v3';
+import * as appDom from '..';
 
 const versions = [v1, v2, v3];
 

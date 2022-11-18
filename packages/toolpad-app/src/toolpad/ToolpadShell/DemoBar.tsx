@@ -15,9 +15,6 @@ const DemoBarContainer = styled(Box)({
   left: 0,
   paddingLeft: 20,
   paddingRight: 20,
-  position: 'absolute',
-  width: '100vw',
-  zIndex: 1,
 });
 
 export default function DemoBar() {

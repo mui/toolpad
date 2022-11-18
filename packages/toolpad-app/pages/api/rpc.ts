@@ -63,7 +63,7 @@ export type RpcResponse =
       error?: undefined;
     }
   | {
-      error: { message: string; stack?: string };
+      error: { message: string; code?: unknown; stack?: string };
     };
 
 function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
@@ -87,7 +87,7 @@ function createRpcHandler(definition: Definition): NextApiHandler<RpcResponse> {
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {
-        res.json({ error: { message: error.message, stack: error.stack } });
+        res.json({ error: { message: error.message, code: error.code, stack: error.stack } });
       } else {
         res.status(500).end();
       }

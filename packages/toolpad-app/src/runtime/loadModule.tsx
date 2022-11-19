@@ -46,6 +46,8 @@ async function createRequire(urlImports: string[]) {
   return require;
 }
 
+// Workaround for regression in next 13.
+// See https://github.com/vercel/next.js/issues/43128 for a reproduction
 const IMPORT_WILDCARD_PREFIX = ` function _interopRequireWildcard(obj) { \
   if (obj && obj.__esModule) { return obj; } else { var newObj = {}; \
   if (obj != null) { for (var key in obj) { \

@@ -1853,9 +1853,9 @@
     react-is "^18.2.0"
     react-transition-group "^4.4.5"
 
-"@mui/monorepo@https://github.com/mui/material-ui.git":
+"@mui/monorepo@https://github.com/Janpot/material-ui.git#import-image":
   version "5.10.14"
-  resolved "https://github.com/mui/material-ui.git#764faaf1ed158402c17ead5498defedd73dd317d"
+  resolved "https://github.com/Janpot/material-ui.git#991196bf15a94fe71e0fdae471c1a582caa5e7ed"
 
 "@mui/private-theming@^5.10.14":
   version "5.10.14"

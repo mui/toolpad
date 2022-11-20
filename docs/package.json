@@ -28,7 +28,7 @@
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.10.14",
     "@mui/material": "^5.10.14",
-    "@mui/monorepo": "https://github.com/mui/material-ui.git",
+    "@mui/monorepo": "https://github.com/Janpot/material-ui.git#import-image",
     "@mui/styles": "^5.10.14",
     "@mui/utils": "^5.10.14",
     "@trendmicro/react-interpolate": "^0.5.5",

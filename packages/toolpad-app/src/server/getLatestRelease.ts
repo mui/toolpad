@@ -8,6 +8,7 @@ interface GithubRelease {
 async function fetchRelease(): Promise<GithubRelease> {
   const response = await fetch(LATEST_RELEASE_API_URL, {
     // Abort the request after 30 seconds
+    // @ts-expect-error See https://github.com/microsoft/TypeScript/issues/48003
     signal: AbortSignal.timeout(30_000),
   });
 

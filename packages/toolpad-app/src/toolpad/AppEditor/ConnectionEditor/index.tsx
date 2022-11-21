@@ -23,7 +23,7 @@ function ConnectionParamsEditor<P>({
   handlerBasePath,
 }: ConnectionParamsEditorProps<P>) {
   const { ConnectionParamsInput } = dataSource;
-  return (
+  return ConnectionParamsInput ? (
     <ConnectionParamsInput
       handlerBasePath={handlerBasePath}
       connectionId={connectionId}
@@ -31,7 +31,7 @@ function ConnectionParamsEditor<P>({
       onChange={onChange}
       appId={appId}
     />
-  );
+  ) : null;
 }
 
 interface ConnectionEditorContentProps<P> {

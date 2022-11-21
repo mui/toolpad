@@ -574,7 +574,6 @@ const dataSource: ClientDataSource<RestConnectionParams, FetchQuery> = {
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,
-  isDemoFeature: true,
 };
 
 export default dataSource;

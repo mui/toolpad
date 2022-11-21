@@ -1,44 +1,17 @@
-import { Box, Button, MenuItem, Stack, TextField, Toolbar } from '@mui/material';
+import { Box, MenuItem, TextField, Toolbar } from '@mui/material';
 import * as React from 'react';
-import { useForm } from 'react-hook-form';
 import { LoadingButton } from '@mui/lab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import data from '../../../public/static/movies.json';
 import JsonView from '../../components/JsonView';
 import SplitPane from '../../components/SplitPane';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
-import { Maybe } from '../../utils/types';
+import { ClientDataSource, QueryEditorProps } from '../../types';
 import useQueryPreview from '../useQueryPreview';
 import { MoviesQuery, MoviesConnectionParams } from './types';
 import { FetchResult } from '../rest/types';
 import useFetchPrivate from '../useFetchPrivate';
 import * as appDom from '../../appDom';
-
-function withDefaults(value: Maybe<MoviesConnectionParams>): MoviesConnectionParams {
-  return {
-    ...value,
-  };
-}
-
-function ConnectionParamsInput({ value, onChange }: ConnectionEditorProps<MoviesConnectionParams>) {
-  const { handleSubmit, reset, formState } = useForm({
-    defaultValues: withDefaults(value),
-  });
-  React.useEffect(() => reset(withDefaults(value)), [reset, value]);
-
-  const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
-
-  return (
-    <Stack direction="column" gap={1}>
-      <Toolbar disableGutters>
-        <Button variant="contained" onClick={doSubmit} disabled={!formState.isValid}>
-          Save
-        </Button>
-      </Toolbar>
-    </Stack>
-  );
-}
 
 export function QueryEditor({
   value: input,
@@ -103,12 +76,9 @@ function getInitialQueryValue(): MoviesQuery {
 
 const dataSource: ClientDataSource<MoviesConnectionParams, MoviesQuery> = {
   displayName: 'Movies Mock API',
-  ConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,
-  isDemoFeature: true,
-  isSingleQuery: true,
 };
 
 export default dataSource;

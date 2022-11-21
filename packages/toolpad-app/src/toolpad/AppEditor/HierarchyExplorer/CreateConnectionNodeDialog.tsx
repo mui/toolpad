@@ -18,6 +18,7 @@ import DialogForm from '../../../components/DialogForm';
 import { useNodeNameValidation } from './validation';
 import useEvent from '../../../utils/useEvent';
 import config from '../../../config';
+import { DEMO_DATASOURCES } from '../../../constants';
 
 const DEFAULT_NAME = 'connection';
 
@@ -109,8 +110,8 @@ export default function CreateConnectionDialog({
           >
             {(Object.entries(dataSources) as ExactEntriesOf<typeof dataSources>).map(
               ([type, dataSourceDef]) => {
-                const isDisabledInDemo = config.isDemo && !dataSourceDef?.isDemoFeature;
-                const isSelectable = dataSourceDef && !dataSourceDef.isSingleQuery;
+                const isDisabledInDemo = config.isDemo && !DEMO_DATASOURCES.has(type);
+                const isSelectable = dataSourceDef && !!dataSourceDef.ConnectionParamsInput;
 
                 return (
                   isSelectable && (

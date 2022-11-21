@@ -282,7 +282,6 @@ const dataSource: ClientDataSource<FunctionConnectionParams, FunctionQuery> = {
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,
-  isDemoFeature: true,
   transformQueryBeforeCommit(query) {
     return {
       ...query,

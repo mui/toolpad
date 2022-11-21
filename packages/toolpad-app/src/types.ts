@@ -105,13 +105,11 @@ export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
 
 export interface ClientDataSource<C = {}, Q = {}> {
   displayName: string;
-  ConnectionParamsInput: ConnectionParamsEditor<C>;
+  ConnectionParamsInput?: ConnectionParamsEditor<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q>;
   getInitialQueryValue: () => Q;
   hasDefault?: boolean;
-  isDemoFeature?: boolean;
-  isSingleQuery?: boolean;
 }
 
 export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetchResult> {

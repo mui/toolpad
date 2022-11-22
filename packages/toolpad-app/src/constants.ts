@@ -12,6 +12,8 @@ export const LANDING_PAGE_URL = 'https://mui.com/toolpad/';
 export const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/overview/';
 export const DOCUMENTATION_INSTALLATION_URL =
   'https://mui.com/toolpad/getting-started/installation/';
+export const ROADMAP_URL = 'https://github.com/orgs/mui/projects/9';
+export const SCHEDULE_DEMO_URL = 'https://calendly.com/prakhar-mui/toolpad';
 
 export const DEMO_DATASOURCES = new Set(['rest', 'function', 'movies']);
 export const PRODUCTION_DATASOURCES = new Set(['rest', 'function', 'googleSheets', 'postgres']);

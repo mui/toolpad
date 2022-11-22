@@ -906,7 +906,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
               : appDom.getNewLastParentIndexInNode(draft, dragOverNode, 'children');
 
           if (!isPageRow(draggedNode)) {
-            const rowContainer = appDom.createElement(dom, PAGE_ROW_COMPONENT_ID, {});
+            const rowContainer = appDom.createElement(draft, PAGE_ROW_COMPONENT_ID, {});
             draft = appDom.addNode(draft, rowContainer, dragOverNode, 'children', newParentIndex);
             parent = rowContainer;
 

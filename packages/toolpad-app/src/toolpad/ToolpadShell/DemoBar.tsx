@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Box, Button, Link, styled, SxProps, Typography } from '@mui/material';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import { blueDark, grey } from '../../theme';
-import { DOCUMENTATION_INSTALLATION_URL, ROADMAP_URL, TEAM_CONTACT_URL } from '../../constants';
+import { DOCUMENTATION_INSTALLATION_URL, ROADMAP_URL, SCHEDULE_DEMO_URL } from '../../constants';
 
 const DemoBarContainer = styled(Box)({
   alignItems: 'center',
@@ -35,11 +35,11 @@ export default function DemoBar() {
         <Link href={ROADMAP_URL} target="_blank" underline="always" sx={linkStyles}>
           roadmap
         </Link>{' '}
-        to stay up to date. Or{' '}
-        <Link href={TEAM_CONTACT_URL} target="_blank" underline="always" sx={linkStyles}>
-          schedule a call
-        </Link>{' '}
-        to talk to the team.
+        to stay up to date, or{' '}
+        <Link href={SCHEDULE_DEMO_URL} target="_blank" underline="always" sx={linkStyles}>
+          schedule a demo
+        </Link>
+        .
       </Typography>
       <Link href={DOCUMENTATION_INSTALLATION_URL} target="_blank">
         <Button size="medium" variant="contained" endIcon={<KeyboardArrowRightRounded />}>

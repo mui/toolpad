@@ -87,7 +87,7 @@ function HierarchyTreeItem(props: StyledTreeItemProps) {
       label={
         <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
           {labelIcon}
-          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }} noWrap>
             {labelText}
           </Typography>
           {onCreate ? (

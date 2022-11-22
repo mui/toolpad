@@ -1,9 +1,9 @@
 import { Client, QueryConfig } from 'pg';
-import { ServerDataSource } from '../../types';
 import { errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
-import { SqlConnectionParams, SqlPrivateQuery, SqlQuery, SqlResult } from '../sql/types';
-import { SqlExec, SqlExecPrivate } from '../sql/server';
+import { SqlConnectionParams, SqlQuery } from '../sql/types';
+import { PostgresResult } from './types';
+import { createSqlServerDatasource } from '../sql/server';
 
 /**
  * Substitute named parameters ($varName) in a postgres query with their positional parameter ($1)
@@ -23,7 +23,6 @@ function parseQuery(sql: string, params: [string, any][]): QueryConfig {
     values: params.map(([, value]) => value),
   };
 }
-
 /**
  * Augment variables ($1, $2,...) in an error message with their name "$varName($1)"
  */
@@ -40,11 +39,11 @@ function parseErrorMessage(msg: string, params: [string, any][]): string {
   return msgWithNamedVars;
 }
 
-async function execBase(
+async function execSql(
   connection: Maybe<SqlConnectionParams>,
   postgresQuery: SqlQuery,
   params: Record<string, string>,
-): Promise<SqlResult> {
+): Promise<PostgresResult> {
   if (!connection?.password) {
     // pg client doesn't support passwordless authentication atm
     // See https://github.com/brianc/node-postgres/issues/1927
@@ -72,31 +71,13 @@ async function execBase(
   }
 }
 
-async function exec(
-  connection: Maybe<SqlConnectionParams>,
-  postgresQuery: SqlQuery,
-  params: Record<string, string>,
-): Promise<SqlResult> {
-  const { data, error } = await SqlExec(connection, postgresQuery, params, execBase);
-  return { data, error };
-}
-
-const test = async (connection: Maybe<SqlConnectionParams>) => {
+const testConnection = async (connection: Maybe<SqlConnectionParams>) => {
   const client = new Client({ ...connection });
   await client.connect();
   await client.query('SELECT * FROM version();');
 };
 
-async function execPrivate(
-  connection: Maybe<SqlConnectionParams>,
-  query: SqlPrivateQuery,
-): Promise<any> {
-  return SqlExecPrivate(connection, query, execBase, test);
-}
-
-const dataSource: ServerDataSource<SqlConnectionParams, SqlQuery, any> = {
-  execPrivate,
-  exec,
-};
-
-export default dataSource;
+export default createSqlServerDatasource<SqlConnectionParams, SqlQuery>({
+  execSql,
+  testConnection,
+});

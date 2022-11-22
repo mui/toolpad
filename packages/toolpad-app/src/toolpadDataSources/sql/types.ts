@@ -12,32 +12,37 @@ export interface SqlConnectionParams {
 export interface SqlQuery {
   sql: string;
 }
-
-export interface SqlResult extends ExecFetchResult<any[]> {}
+export interface SqlConnectionEditorProps<P> extends WithControlledProp<P | null> {
+  defaultPort: number;
+}
 
 export interface SqlConnectionStatus {
   error: string | null;
 }
 
-export type SqlExecBase = (
-  connection: Maybe<SqlConnectionParams>,
-  query: SqlQuery,
-  params: Record<string, string>,
-) => Promise<SqlResult>;
-
-export interface SqlPrivateQueryDebugExec {
+export interface SqlPrivateQueryDebugExec<Q> {
   kind: 'debugExec';
-  query: SqlQuery;
+  query: Q;
   params: Record<string, any>;
 }
 
-export interface SqlPrivateQueryConnectionStatus {
+export interface SqlPrivateQueryConnectionStatus<P> {
   kind: 'connectionStatus';
-  params: SqlConnectionParams;
+  params: Maybe<P>;
 }
 
-export interface SqlConnectionEditorProps<P> extends WithControlledProp<P | null> {
-  defaultPort: number;
-}
+export type SqlPrivateQuery<P, Q> =
+  | SqlPrivateQueryDebugExec<Q>
+  | SqlPrivateQueryConnectionStatus<P>;
 
-export type SqlPrivateQuery = SqlPrivateQueryDebugExec | SqlPrivateQueryConnectionStatus;
+type SqlExecBase<P, Q> = (
+  connection: Maybe<P>,
+  query: Q,
+  params: Record<string, string>,
+) => Promise<ExecFetchResult>;
+
+export interface SqlServerProps<P, Q> {
+  execSql: SqlExecBase<P, Q>;
+  testConnection: (connection: Maybe<P>) => void;
+  tablesQuery?: string;
+}

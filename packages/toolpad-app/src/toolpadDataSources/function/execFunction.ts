@@ -9,7 +9,6 @@ import { LogEntry } from '../../components/Console';
 import { FetchOptions } from './runtime/types';
 import projectRoot from '../../server/projectRoot';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
-import config from '../../server/config';
 import { errorFrom } from '../../utils/errors';
 
 async function fetchRuntimeModule() {
@@ -38,10 +37,6 @@ export default async function execFunction(
   code: string,
   { params = {}, secrets = {} }: ExecFunctionOptions = {},
 ): Promise<FunctionResult> {
-  if (config.isDemo) {
-    throw new Error('Cannot use these features in demo version.');
-  }
-
   const context = isolate.createContextSync();
   const jail = context.global;
   jail.setSync('global', jail.derefInto());

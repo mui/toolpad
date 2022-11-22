@@ -1,1 +1,0 @@
-FROM muicom/toolpad:latest

@@ -6,12 +6,11 @@ import {
   CardHeader,
   CardContent,
   CardActions,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Link,
+  Link as MuiLink,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -45,13 +44,14 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Controller, useForm } from 'react-hook-form';
 import invariant from 'invariant';
+import { Link } from 'react-router-dom';
 import useBoolean from '../../utils/useBoolean';
 import useEvent from '../../utils/useEvent';
 import client from '../../api';
 import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
 import useLatest from '../../utils/useLatest';
-import ToolpadShell from '../ToolpadShell';
+import ToolpadHomeShell from '../ToolpadHomeShell';
 import getReadableDuration from '../../utils/readableDuration';
 import EditableText from '../../components/EditableText';
 import type { AppMeta } from '../../server/data';
@@ -62,8 +62,12 @@ import { ConfirmDialog } from '../../components/SystemDialogs';
 import config from '../../config';
 import { AppTemplateId } from '../../types';
 import { errorFrom } from '../../utils/errors';
+import { ERR_VALIDATE_CAPTCHA_FAILED } from '../../errorCodes';
+
 import { sendAppCreatedEvent } from '../../utils/ga';
-import { LatestStoredAppValue, TOOLPAD_LATEST_APP_KEY } from '../../storageKeys';
+import { StoredLatestCreatedApp, TOOLPAD_LATEST_CREATED_APP_KEY } from '../../storageKeys';
+import FlexFill from '../../components/FlexFill';
+import ToolpadShell from '../ToolpadShell';
 
 export const APP_TEMPLATE_OPTIONS: Map<
   AppTemplateId,
@@ -99,13 +103,22 @@ const NO_OP = () => {};
 
 export interface CreateAppDialogProps {
   open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
-function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
+function CreateAppDialog({ onClose, open, ...props }: CreateAppDialogProps) {
   const [name, setName] = React.useState('');
   const [appTemplateId, setAppTemplateId] = React.useState<AppTemplateId>('blank');
   const [dom, setDom] = React.useState('');
+
+  const captchaTargetRef = React.useRef<HTMLDivElement | null>(null);
+
+  const latestRecaptchaWidgetIdRef = React.useRef<number | null>(null);
+  React.useEffect(() => {
+    if (!open) {
+      latestRecaptchaWidgetIdRef.current = null;
+    }
+  }, [open]);
 
   const [isNavigatingToNewApp, setIsNavigatingToNewApp] = React.useState(false);
   const [isNavigatingToExistingApp, setIsNavigatingToExistingApp] = React.useState(false);
@@ -133,54 +146,93 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
     setIsNavigatingToExistingApp(true);
   }, []);
 
-  const [latestStoredApp, setLatestStoredApp] = useLocalStorageState<LatestStoredAppValue>(
-    TOOLPAD_LATEST_APP_KEY,
+  const [latestCreatedApp, setLatestCreatedApp] = useLocalStorageState<StoredLatestCreatedApp>(
+    TOOLPAD_LATEST_CREATED_APP_KEY,
     null,
   );
+  const firstLatestCreatedAppRef = React.useRef(latestCreatedApp);
+  const firstLatestCreatedApp = firstLatestCreatedAppRef.current;
+  React.useEffect(() => {
+    if (!firstLatestCreatedApp) {
+      firstLatestCreatedAppRef.current = latestCreatedApp;
+    }
+  }, [firstLatestCreatedApp, latestCreatedApp]);
 
-  const isFormValid = Boolean(name);
+  const isFormValid = config.isDemo ? true : !!name;
 
   const isSubmitting =
     createAppMutation.isLoading || isNavigatingToNewApp || isNavigatingToExistingApp;
 
-  return (
-    <Dialog {...props} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
-      <DialogForm
-        onSubmit={async (event) => {
-          invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
+  const handleSubmit = React.useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
 
-          event.preventDefault();
-          let recaptchaToken;
-          if (config.recaptchaSiteKey) {
-            await new Promise<void>((resolve) => {
-              grecaptcha.ready(resolve);
-            });
-            recaptchaToken = await grecaptcha.execute(config.recaptchaSiteKey, {
-              action: 'submit',
-            });
-          }
+      event.preventDefault();
 
-          const appDom = dom.trim() ? JSON.parse(dom) : null;
-          const app = await createAppMutation.mutateAsync([
-            name,
-            {
-              from: {
-                ...(appDom
-                  ? { kind: 'dom', dom: appDom }
-                  : { kind: 'template', id: appTemplateId }),
-              },
-              recaptchaToken,
+      const latestRecaptchaWidgetId = latestRecaptchaWidgetIdRef.current;
+      const hasShownRecaptchaCheckbox = latestRecaptchaWidgetId !== null;
+
+      // Check if captcha checkbox was solved
+      let recaptchaToken = hasShownRecaptchaCheckbox
+        ? grecaptcha.getResponse(latestRecaptchaWidgetId)
+        : '';
+
+      if (config.recaptchaV3SiteKey && !hasShownRecaptchaCheckbox) {
+        // Invisible captcha validation
+        await new Promise<void>((resolve) => {
+          grecaptcha.ready(resolve);
+        });
+        recaptchaToken = await grecaptcha.execute(config.recaptchaV3SiteKey, {
+          action: 'submit',
+        });
+      }
+
+      const appName = config.isDemo ? `demo_app_${Date.now()}` : name;
+      const appDom = dom.trim() ? JSON.parse(dom) : null;
+
+      try {
+        const createdApp = await createAppMutation.mutateAsync([
+          appName,
+          {
+            from: {
+              ...(appDom ? { kind: 'dom', dom: appDom } : { kind: 'template', id: appTemplateId }),
             },
-          ]);
+            ...(recaptchaToken
+              ? {
+                  captcha: {
+                    token: recaptchaToken,
+                    version: hasShownRecaptchaCheckbox ? 2 : 3,
+                  },
+                }
+              : {}),
+          },
+        ]);
 
-          setLatestStoredApp({
-            appId: app.id,
-            appName: app.name,
-          });
+        setLatestCreatedApp({
+          appId: createdApp.id,
+          appName: createdApp.name,
+        });
 
-          sendAppCreatedEvent(app.name, appTemplateId);
-        }}
-      >
+        sendAppCreatedEvent(createdApp.name, appTemplateId);
+      } catch (rawError) {
+        if (config.recaptchaV2SiteKey && !hasShownRecaptchaCheckbox && captchaTargetRef.current) {
+          const error = errorFrom(rawError);
+          if (error.code === ERR_VALIDATE_CAPTCHA_FAILED) {
+            // Show captcha checkbox
+            const widgetId = grecaptcha.render(captchaTargetRef.current.id, {
+              sitekey: config.recaptchaV2SiteKey,
+            });
+            latestRecaptchaWidgetIdRef.current = widgetId;
+          }
+        }
+      }
+    },
+    [appTemplateId, createAppMutation, dom, isFormValid, name, setLatestCreatedApp],
+  );
+
+  return (
+    <Dialog {...props} open={open} onClose={config.isDemo ? NO_OP : onClose} maxWidth="xs">
+      <DialogForm onSubmit={handleSubmit}>
         <DialogTitle>Create a new App</DialogTitle>
         <DialogContent>
           {config.isDemo ? (
@@ -188,22 +240,23 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               <AlertTitle>For demo purposes only!</AlertTitle>
               Your application will be ephemeral and may be deleted at any time.
             </Alert>
-          ) : null}
-          <TextField
-            sx={{ my: 1 }}
-            required
-            autoFocus
-            fullWidth
-            label="Name"
-            value={name}
-            error={createAppMutation.isError}
-            helperText={(createAppMutation.error as Error)?.message || ''}
-            onChange={(event) => {
-              createAppMutation.reset();
-              setName(event.target.value);
-            }}
-            disabled={isSubmitting}
-          />
+          ) : (
+            <TextField
+              sx={{ my: 1 }}
+              required
+              autoFocus
+              fullWidth
+              label="Name"
+              value={name}
+              error={createAppMutation.isError}
+              helperText={(createAppMutation.error as Error)?.message || ''}
+              onChange={(event) => {
+                createAppMutation.reset();
+                setName(event.target.value);
+              }}
+              disabled={isSubmitting}
+            />
+          )}
 
           <TextField
             sx={{ my: 1 }}
@@ -238,7 +291,7 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               disabled={isSubmitting}
             />
           ) : null}
-          {config.isDemo && latestStoredApp ? (
+          {config.isDemo && firstLatestCreatedApp ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Typography variant="subtitle2" color="text.secondary" textAlign="center">
                 or
@@ -246,39 +299,51 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
               <LoadingButton
                 variant="outlined"
                 size="medium"
-                component="a"
-                href={`/_toolpad/app/${latestStoredApp.appId}`}
-                sx={{ mt: 0.5 }}
+                component={Link}
+                to={`/app/${firstLatestCreatedApp.appId}`}
+                sx={{ mt: 0.5, mb: 1 }}
                 loading={isNavigatingToExistingApp}
                 onClick={handleContinueButtonClick}
                 disabled={isSubmitting}
               >
-                Continue working on &ldquo;{latestStoredApp.appName}&rdquo;
+                Continue working on your latest app
               </LoadingButton>
             </Box>
           ) : null}
-          {config.recaptchaSiteKey ? (
+          {config.recaptchaV2SiteKey ? (
+            <Box
+              id="captcha-target"
+              ref={captchaTargetRef}
+              mt={1}
+              mb={1}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            />
+          ) : null}
+          {config.recaptchaV3SiteKey ? (
             <Box mt={2}>
               <Divider sx={{ mb: 1 }} />
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'normal' }}>
                 This site is protected by reCAPTCHA and the Google{' '}
-                <Link
+                <MuiLink
                   href="https://policies.google.com/privacy"
                   underline="none"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Privacy Policy
-                </Link>{' '}
+                </MuiLink>{' '}
                 and{' '}
-                <Link
+                <MuiLink
                   href="https://policies.google.com/terms"
                   underline="none"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   Terms of Service
-                </Link>{' '}
+                </MuiLink>{' '}
                 apply.
               </Typography>
             </Box>
@@ -291,9 +356,9 @@ function CreateAppDialog({ onClose, ...props }: CreateAppDialogProps) {
             onClick={() => {
               setName('');
               createAppMutation.reset();
-              onClose();
+              onClose?.();
             }}
-            disabled={config.isDemo}
+            disabled={!onClose}
           >
             Cancel
           </Button>
@@ -410,7 +475,7 @@ interface AppEditButtonProps {
 
 function AppEditButton({ app }: AppEditButtonProps) {
   return (
-    <Button size="small" component="a" href={app ? `/_toolpad/app/${app.id}` : ''} disabled={!app}>
+    <Button size="small" component={Link} to={app ? `/app/${app.id}` : ''} disabled={!app}>
       Edit
     </Button>
   );
@@ -424,7 +489,11 @@ interface AppOpenButtonProps {
 function AppOpenButton({ app, activeDeployment }: AppOpenButtonProps) {
   const openDisabled = !app || !activeDeployment;
   let openButton = (
-    <Button disabled={!app || !activeDeployment} component="a" href={app ? `deploy/${app.id}` : ''}>
+    <Button
+      disabled={!app || !activeDeployment}
+      component="a"
+      href={app ? `/deploy/${app.id}` : ''}
+    >
       Open
     </Button>
   );
@@ -774,6 +843,14 @@ function AppsListView({
   );
 }
 
+function DemoPage() {
+  return (
+    <ToolpadShell>
+      <CreateAppDialog open />
+    </ToolpadShell>
+  );
+}
+
 export default function Home() {
   const {
     data: apps = [],
@@ -818,39 +895,43 @@ export default function Home() {
     [duplicateAppMutation],
   );
 
-  return (
-    <ToolpadShell>
-      <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
-      {!config.isDemo ? (
-        <Container sx={{ my: 1 }}>
-          <Typography variant="h2">Apps</Typography>
-          <Toolbar variant={'dense'} disableGutters sx={{ justifyContent: 'space-between' }}>
-            <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
-            <ToggleButtonGroup
-              value={viewMode}
-              exclusive
-              onChange={handleViewModeChange}
-              aria-label="view mode"
+  return config.isDemo ? (
+    <DemoPage />
+  ) : (
+    <ToolpadHomeShell>
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Toolbar variant="regular" disableGutters sx={{ gap: 2, px: 5, mt: 3, mb: 2 }}>
+          <Typography sx={{ pl: 2 }} variant="h3">
+            Apps
+          </Typography>
+          <FlexFill />
+          <Button onClick={() => setCreateDialogOpen(true)}>Create New</Button>
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={handleViewModeChange}
+            aria-label="view mode"
+          >
+            <ToggleButton
+              value="list"
+              aria-label="list view"
+              color={viewMode === 'list' ? 'primary' : undefined}
             >
-              <ToggleButton
-                value="list"
-                aria-label="list view"
-                color={viewMode === 'list' ? 'primary' : undefined}
-              >
-                <ViewListIcon />
-              </ToggleButton>
-              <ToggleButton
-                value="grid"
-                aria-label="grid view"
-                color={viewMode === 'grid' ? 'primary' : undefined}
-              >
-                <GridViewIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Toolbar>
-          {error ? (
-            <ErrorAlert error={error} />
-          ) : (
+              <ViewListIcon />
+            </ToggleButton>
+            <ToggleButton
+              value="grid"
+              aria-label="grid view"
+              color={viewMode === 'grid' ? 'primary' : undefined}
+            >
+              <GridViewIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Toolbar>
+        {error ? (
+          <ErrorAlert error={error} />
+        ) : (
+          <Box sx={{ flex: 1, overflow: 'auto', px: 5 }}>
             <AppsView
               apps={apps}
               loading={isLoading}
@@ -858,10 +939,12 @@ export default function Home() {
               setDeletedApp={setDeletedApp}
               duplicateApp={duplicateApp}
             />
-          )}
-        </Container>
-      ) : null}
+          </Box>
+        )}
+        <AppDeleteDialog app={deletedApp} onClose={() => setDeletedApp(null)} />
+      </Box>
+
       <CreateAppDialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
-    </ToolpadShell>
+    </ToolpadHomeShell>
   );
 }

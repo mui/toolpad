@@ -7,6 +7,10 @@ export interface FunctionConnectionParams {
 }
 
 export interface FunctionQuery {
+  /**
+   * Run in the browser.
+   */
+  readonly browser?: boolean;
   readonly module: string;
 }
 
@@ -27,3 +31,8 @@ export interface FunctionResult extends ExecFetchResult<any> {
 export type FunctionPrivateQuery =
   | { kind: 'debugExec'; query: FunctionQuery; params: Record<string, any> }
   | { kind: 'secretsKeys' };
+
+export interface ExecFunctionOptions {
+  params?: Record<string, unknown>;
+  secrets?: Record<string, string>;
+}

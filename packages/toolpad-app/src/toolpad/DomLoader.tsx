@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { NodeId, BindableAttrValue, BindableAttrValues } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { throttle, DebouncedFunc } from 'lodash-es';
 import * as appDom from '../appDom';
 import { update } from '../utils/immutability';
 import client from '../api';
@@ -51,6 +50,10 @@ export type DomAction =
       node: appDom.AppDomNode;
       namespace: string;
       value: BindableAttrValues | null;
+    }
+  | {
+      type: 'DOM_UPDATE';
+      updater: (dom: appDom.AppDom) => appDom.AppDom;
     }
   | {
       type: 'DOM_ADD_NODE';
@@ -104,6 +107,9 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
     }
     case 'DOM_SET_NODE_NAMESPACE': {
       return appDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
+    }
+    case 'DOM_UPDATE': {
+      return action.updater(dom);
     }
     case 'DOM_ADD_NODE': {
       return appDom.addNode<any, any>(
@@ -239,14 +245,9 @@ export function domLoaderReducer(state: DomLoader, action: DomAction): DomLoader
   }
 }
 
-function createDomApi(
-  dispatch: React.Dispatch<DomAction>,
-  scheduleHistoryUpdate?: DebouncedFunc<() => void>,
-) {
+function createDomApi(dispatch: React.Dispatch<DomAction>) {
   return {
     undo() {
-      scheduleHistoryUpdate?.flush();
-
       dispatch({ type: 'DOM_UNDO' });
     },
     redo() {
@@ -254,6 +255,12 @@ function createDomApi(
     },
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
+    },
+    update(updater: (dom: appDom.AppDom) => appDom.AppDom) {
+      dispatch({
+        type: 'DOM_UPDATE',
+        updater,
+      });
     },
     addNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(
       node: Child,
@@ -422,31 +429,15 @@ export default function DomProvider({ appId, children }: DomContextProps) {
     undoStack: [dom],
     redoStack: [],
   });
-
-  const scheduleHistoryUpdate = React.useMemo(
-    () =>
-      throttle(
-        () => {
-          dispatch({ type: 'DOM_UPDATE_HISTORY' });
-        },
-        500,
-        { leading: false, trailing: true },
-      ),
-    [],
-  );
-
   const dispatchWithHistory = useEvent((action: DomAction) => {
     dispatch(action);
 
     if (!SKIP_UNDO_ACTIONS.has(action.type)) {
-      scheduleHistoryUpdate();
+      dispatch({ type: 'DOM_UPDATE_HISTORY' });
     }
   });
 
-  const api = React.useMemo(
-    () => createDomApi(dispatchWithHistory, scheduleHistoryUpdate),
-    [dispatchWithHistory, scheduleHistoryUpdate],
-  );
+  const api = React.useMemo(() => createDomApi(dispatchWithHistory), [dispatchWithHistory]);
 
   const handleSave = React.useCallback(() => {
     if (!state.dom || state.saving || state.savedDom === state.dom) {

@@ -53,7 +53,7 @@ export type DomAction =
     }
   | {
       type: 'DOM_UPDATE';
-      updater: (dom: appDom.AppDom) => appDom.AppDom;
+      updatedDom: appDom.AppDom;
     }
   | {
       type: 'DOM_ADD_NODE';
@@ -109,7 +109,7 @@ export function domReducer(dom: appDom.AppDom, action: DomAction): appDom.AppDom
       return appDom.setNodeNamespace<any, any>(dom, action.node, action.namespace, action.value);
     }
     case 'DOM_UPDATE': {
-      return action.updater(dom);
+      return action.updatedDom;
     }
     case 'DOM_ADD_NODE': {
       return appDom.addNode<any, any>(
@@ -256,10 +256,10 @@ function createDomApi(dispatch: React.Dispatch<DomAction>) {
     setNodeName(nodeId: NodeId, name: string) {
       dispatch({ type: 'DOM_SET_NODE_NAME', nodeId, name });
     },
-    update(updater: (dom: appDom.AppDom) => appDom.AppDom) {
+    update(dom: appDom.AppDom) {
       dispatch({
         type: 'DOM_UPDATE',
-        updater,
+        updatedDom: dom,
       });
     },
     addNode<Parent extends appDom.AppDomNode, Child extends appDom.AppDomNode>(

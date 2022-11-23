@@ -736,7 +736,7 @@ export function setNodeNamespacedProp<
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: update(node, {
-        [namespace]: omit(node[namespace], prop) as Partial<Node[Namespace]>,
+        [namespace]: omit(node[namespace]!, prop) as Partial<Node[Namespace]>,
       } as Partial<Node>),
     }),
   });

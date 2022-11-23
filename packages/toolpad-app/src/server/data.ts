@@ -14,7 +14,7 @@ import { validateRecaptchaToken } from './validateRecaptchaToken';
 import config from './config';
 import { migrateUp } from '../appDom/migrations';
 import { errorFrom } from '../utils/errors';
-import { ERR_APP_EXISTS } from '../errorCodes';
+import { ERR_APP_EXISTS, ERR_VALIDATE_CAPTCHA_FAILED } from '../errorCodes';
 import createRuntimeState from '../createRuntimeState';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
@@ -202,42 +202,41 @@ export type CreateAppOptions = {
         kind: 'template';
         id: AppTemplateId;
       };
-  recaptchaToken?: string;
+  captcha?: {
+    token: string;
+    version: 2 | 3;
+  };
 };
 
 export async function createApp(name: string, opts: CreateAppOptions = {}): Promise<prisma.App> {
   const { from } = opts;
 
-  const recaptchaSecretKey = config.recaptchaSecretKey;
-  if (recaptchaSecretKey) {
+  if (config.recaptchaV3SecretKey) {
+    const captchaVersion = opts.captcha?.version;
+
+    const secretKey =
+      captchaVersion === 2 ? config.recaptchaV2SecretKey || '' : config.recaptchaV3SecretKey;
     const isRecaptchaTokenValid = await validateRecaptchaToken(
-      recaptchaSecretKey,
-      opts.recaptchaToken || '',
+      secretKey,
+      opts.captcha?.token || '',
     );
 
     if (!isRecaptchaTokenValid) {
-      throw new Error('Unable to verify CAPTCHA.');
+      const toolpadError = new Error(
+        config.recaptchaV2SecretKey ? 'Please solve the CAPTCHA.' : 'Unable to verify CAPTCHA.',
+      );
+      toolpadError.code = ERR_VALIDATE_CAPTCHA_FAILED;
+      throw toolpadError;
     }
   }
 
-  let appName = name.trim();
-
-  if (config.isDemo) {
-    appName = appName.replace(/\(#[0-9]+\)/g, '').trim();
-
-    const sameNameAppCount = await prismaClient.app.count({
-      where: { OR: [{ name: appName }, { name: { startsWith: `${appName} (#`, endsWith: ')' } }] },
-    });
-    if (sameNameAppCount > 0) {
-      appName = `${appName} (#${sameNameAppCount + 1})`;
-    }
-  }
+  const cleanAppName = name.trim();
 
   return prismaClient.$transaction(async () => {
     let app;
     try {
       app = await prismaClient.app.create({
-        data: { name: appName },
+        data: { name: cleanAppName },
       });
     } catch (error) {
       // https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes

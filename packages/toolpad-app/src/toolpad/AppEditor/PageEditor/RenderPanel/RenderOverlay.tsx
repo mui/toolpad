@@ -134,6 +134,124 @@ function getDropAreaParentProp(dropAreaId: string): string | null {
   return dropAreaId.split(':')[1] || null;
 }
 
+function deleteOrphanedLayoutComponents(
+  draftDom: appDom.AppDom,
+  movedOrDeletedNode: appDom.ElementNode,
+  moveTargetNodeId: NodeId | null = null,
+): appDom.AppDom {
+  const movedOrDeletedNodeParentProp = movedOrDeletedNode.parentProp;
+
+  const parent = appDom.getParent(draftDom, movedOrDeletedNode);
+  const parentParent = parent && appDom.getParent(draftDom, parent);
+  const parentParentParent = parentParent && appDom.getParent(draftDom, parentParent);
+
+  const parentChildren =
+    parent && movedOrDeletedNodeParentProp
+      ? (appDom.getChildNodes(draftDom, parent) as appDom.NodeChildren<appDom.ElementNode>)[
+          movedOrDeletedNodeParentProp
+        ]
+      : [];
+
+  const isOnlyLayoutContainerChild =
+    parent &&
+    appDom.isElement(parent) &&
+    isPageLayoutComponent(parent) &&
+    parentChildren.length === 1;
+
+  const isParentOnlyLayoutContainerChild =
+    parentParent &&
+    parent.parentProp &&
+    appDom.isElement(parentParent) &&
+    isPageLayoutComponent(parentParent) &&
+    appDom.getChildNodes(draftDom, parentParent)[parent.parentProp].length === 1;
+
+  const isSecondLastLayoutContainerChild =
+    parent &&
+    appDom.isElement(parent) &&
+    isPageLayoutComponent(parent) &&
+    parentChildren.length === 2;
+
+  const hasNoLayoutContainerSiblings =
+    parentChildren.filter(
+      (child) => child.id !== movedOrDeletedNode.id && (isPageRow(child) || isPageColumn(child)),
+    ).length === 0;
+
+  if (isSecondLastLayoutContainerChild && hasNoLayoutContainerSiblings) {
+    if (parent.parentIndex && parentParent && appDom.isElement(parentParent)) {
+      const lastContainerChild = parentChildren.filter(
+        (child) => child.id !== movedOrDeletedNode.id,
+      )[0];
+
+      if (lastContainerChild.parentProp) {
+        if (
+          moveTargetNodeId !== parent.id &&
+          moveTargetNodeId !== lastContainerChild.id &&
+          isPageLayoutComponent(parentParent)
+        ) {
+          draftDom = appDom.moveNode(
+            draftDom,
+            lastContainerChild,
+            parentParent,
+            lastContainerChild.parentProp,
+            parent.parentIndex,
+          );
+
+          if (isPageColumn(parent)) {
+            draftDom = appDom.setNodeNamespacedProp(
+              draftDom,
+              lastContainerChild,
+              'layout',
+              'columnSize',
+              parent.layout?.columnSize || appDom.createConst(1),
+            );
+          }
+
+          draftDom = appDom.removeNode(draftDom, parent.id);
+        }
+
+        if (
+          parentParent.parentIndex &&
+          parentParentParent &&
+          appDom.isElement(parentParentParent) &&
+          isParentOnlyLayoutContainerChild &&
+          moveTargetNodeId !== parentParent.id &&
+          moveTargetNodeId !== lastContainerChild.id
+        ) {
+          draftDom = appDom.moveNode(
+            draftDom,
+            lastContainerChild,
+            parentParentParent,
+            lastContainerChild.parentProp,
+            parentParent.parentIndex,
+          );
+
+          if (isPageColumn(parentParent)) {
+            draftDom = appDom.setNodeNamespacedProp(
+              draftDom,
+              lastContainerChild,
+              'layout',
+              'columnSize',
+              parentParent.layout?.columnSize || appDom.createConst(1),
+            );
+          }
+
+          draftDom = appDom.removeNode(draftDom, parentParent.id);
+        }
+      }
+    }
+  }
+
+  if (isOnlyLayoutContainerChild) {
+    draftDom = appDom.removeNode(draftDom, parent.id);
+
+    if (isParentOnlyLayoutContainerChild && moveTargetNodeId !== parentParent.id) {
+      draftDom = appDom.removeNode(draftDom, parentParent.id);
+    }
+  }
+
+  return draftDom;
+}
+
 interface RenderOverlayProps {
   canvasHostRef: React.RefObject<EditorCanvasHostHandle>;
 }
@@ -188,6 +306,55 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     return rects;
   }, [nodesInfo, pageNodes]);
 
+  const previousRowColumnCountsRef = React.useRef<Record<NodeId, number>>({});
+
+  const normalizePageRowColumnSizes = React.useCallback(
+    (draftDom: appDom.AppDom): appDom.AppDom => {
+      pageNodes.forEach((node: appDom.AppDomNode) => {
+        if (appDom.isElement(node) && isPageRow(node)) {
+          const nodeChildren = appDom.getChildNodes(dom, node).children;
+          const childrenCount = nodeChildren?.length || 0;
+
+          if (childrenCount > 0 && childrenCount < previousRowColumnCountsRef.current[node.id]) {
+            const layoutColumnSizes = nodeChildren.map(
+              (child) => child.layout?.columnSize?.value || 1,
+            );
+            const totalLayoutColumnSizes = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
+
+            const normalizedLayoutColumnSizes = layoutColumnSizes.map(
+              (size) => (size * nodeChildren.length) / totalLayoutColumnSizes,
+            );
+
+            nodeChildren.forEach((child, childIndex) => {
+              if (child.layout?.columnSize) {
+                draftDom = appDom.setNodeNamespacedProp(
+                  draftDom,
+                  child,
+                  'layout',
+                  'columnSize',
+                  appDom.createConst(normalizedLayoutColumnSizes[childIndex]),
+                );
+              }
+            });
+          }
+
+          previousRowColumnCountsRef.current[node.id] = childrenCount;
+        }
+      });
+
+      return draftDom;
+    },
+    [dom, pageNodes],
+  );
+
+  const updateDom = React.useCallback(
+    (draftDom: appDom.AppDom) => {
+      draftDom = normalizePageRowColumnSizes(draftDom);
+      domApi.update(draftDom);
+    },
+    [domApi, normalizePageRowColumnSizes],
+  );
+
   const handleNodeMouseUp = React.useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       const cursorPos = canvasHostRef.current?.getViewCoordinates(event.clientX, event.clientY);
@@ -208,149 +375,27 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     [canvasHostRef, draggedNodeId, selectionRects, dom, api],
   );
 
-  const deleteOrphanedLayoutComponents = React.useCallback(
-    (
-      updatedDom: appDom.AppDom,
-      movedOrDeletedNode: appDom.ElementNode,
-      moveTargetNodeId: NodeId | null = null,
-    ) => {
-      const movedOrDeletedNodeParentProp = movedOrDeletedNode.parentProp;
-
-      const parent = appDom.getParent(updatedDom, movedOrDeletedNode);
-      const parentParent = parent && appDom.getParent(updatedDom, parent);
-      const parentParentParent = parentParent && appDom.getParent(updatedDom, parentParent);
-
-      const parentChildren =
-        parent && movedOrDeletedNodeParentProp
-          ? (appDom.getChildNodes(updatedDom, parent) as appDom.NodeChildren<appDom.ElementNode>)[
-              movedOrDeletedNodeParentProp
-            ]
-          : [];
-
-      const isOnlyLayoutContainerChild =
-        parent &&
-        appDom.isElement(parent) &&
-        isPageLayoutComponent(parent) &&
-        parentChildren.length === 1;
-
-      const isParentOnlyLayoutContainerChild =
-        parentParent &&
-        parent.parentProp &&
-        appDom.isElement(parentParent) &&
-        isPageLayoutComponent(parentParent) &&
-        appDom.getChildNodes(updatedDom, parentParent)[parent.parentProp].length === 1;
-
-      const isSecondLastLayoutContainerChild =
-        parent &&
-        appDom.isElement(parent) &&
-        isPageLayoutComponent(parent) &&
-        parentChildren.length === 2;
-
-      const hasNoLayoutContainerSiblings =
-        parentChildren.filter(
-          (child) =>
-            child.id !== movedOrDeletedNode.id && (isPageRow(child) || isPageColumn(child)),
-        ).length === 0;
-
-      if (isSecondLastLayoutContainerChild && hasNoLayoutContainerSiblings) {
-        if (parent.parentIndex && parentParent && appDom.isElement(parentParent)) {
-          const lastContainerChild = parentChildren.filter(
-            (child) => child.id !== movedOrDeletedNode.id,
-          )[0];
-
-          if (lastContainerChild.parentProp) {
-            if (
-              moveTargetNodeId !== parent.id &&
-              moveTargetNodeId !== lastContainerChild.id &&
-              isPageLayoutComponent(parentParent)
-            ) {
-              updatedDom = appDom.moveNode(
-                updatedDom,
-                lastContainerChild,
-                parentParent,
-                lastContainerChild.parentProp,
-                parent.parentIndex,
-              );
-
-              if (isPageColumn(parent)) {
-                updatedDom = appDom.setNodeNamespacedProp(
-                  updatedDom,
-                  lastContainerChild,
-                  'layout',
-                  'columnSize',
-                  parent.layout?.columnSize || appDom.createConst(1),
-                );
-              }
-
-              updatedDom = appDom.removeNode(updatedDom, parent.id);
-            }
-
-            if (
-              parentParent.parentIndex &&
-              parentParentParent &&
-              appDom.isElement(parentParentParent) &&
-              isParentOnlyLayoutContainerChild &&
-              moveTargetNodeId !== parentParent.id &&
-              moveTargetNodeId !== lastContainerChild.id
-            ) {
-              updatedDom = appDom.moveNode(
-                updatedDom,
-                lastContainerChild,
-                parentParentParent,
-                lastContainerChild.parentProp,
-                parentParent.parentIndex,
-              );
-
-              if (isPageColumn(parentParent)) {
-                updatedDom = appDom.setNodeNamespacedProp(
-                  updatedDom,
-                  lastContainerChild,
-                  'layout',
-                  'columnSize',
-                  parentParent.layout?.columnSize || appDom.createConst(1),
-                );
-              }
-
-              updatedDom = appDom.removeNode(updatedDom, parentParent.id);
-            }
-          }
-        }
-      }
-
-      if (isOnlyLayoutContainerChild) {
-        updatedDom = appDom.removeNode(updatedDom, parent.id);
-
-        if (isParentOnlyLayoutContainerChild && moveTargetNodeId !== parentParent.id) {
-          updatedDom = appDom.removeNode(updatedDom, parentParent.id);
-        }
-      }
-
-      return updatedDom;
-    },
-    [],
-  );
-
   const handleNodeDelete = React.useCallback(
     (nodeId: NodeId) => (event?: React.MouseEvent<HTMLElement>) => {
       if (event) {
         event.stopPropagation();
       }
 
-      let updatedDom = dom;
+      let draftDom = dom;
 
-      const toRemove = appDom.getNode(updatedDom, nodeId);
+      const toRemove = appDom.getNode(draftDom, nodeId);
 
-      updatedDom = appDom.removeNode(updatedDom, toRemove.id);
+      draftDom = appDom.removeNode(draftDom, toRemove.id);
 
       if (appDom.isElement(toRemove)) {
-        updatedDom = deleteOrphanedLayoutComponents(updatedDom, toRemove);
+        draftDom = deleteOrphanedLayoutComponents(draftDom, toRemove);
       }
 
-      domApi.update(updatedDom);
+      updateDom(draftDom);
 
       api.deselect();
     },
-    [dom, domApi, api, deleteOrphanedLayoutComponents],
+    [dom, updateDom, api],
   );
 
   const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
@@ -897,19 +942,19 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         addOrMoveNode = appDom.moveNode;
       }
 
-      let updatedDom = dom;
+      let draftDom = dom;
 
       // Drop on page or layout slot
       if (isDraggingOverPage || isDraggingOverLayoutSlot) {
         const newParentIndex =
           dragOverZone === DROP_ZONE_TOP
-            ? appDom.getNewFirstParentIndexInNode(updatedDom, dragOverNode, 'children')
-            : appDom.getNewLastParentIndexInNode(updatedDom, dragOverNode, 'children');
+            ? appDom.getNewFirstParentIndexInNode(draftDom, dragOverNode, 'children')
+            : appDom.getNewLastParentIndexInNode(draftDom, dragOverNode, 'children');
 
         if (!isPageRow(draggedNode)) {
-          const rowContainer = appDom.createElement(updatedDom, PAGE_ROW_COMPONENT_ID, {});
-          updatedDom = appDom.addNode(
-            updatedDom,
+          const rowContainer = appDom.createElement(draftDom, PAGE_ROW_COMPONENT_ID, {});
+          draftDom = appDom.addNode(
+            draftDom,
             rowContainer,
             dragOverNode,
             'children',
@@ -917,15 +962,9 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           );
           parent = rowContainer;
 
-          updatedDom = addOrMoveNode(updatedDom, draggedNode, rowContainer, 'children');
+          draftDom = addOrMoveNode(draftDom, draggedNode, rowContainer, 'children');
         } else {
-          updatedDom = addOrMoveNode(
-            updatedDom,
-            draggedNode,
-            dragOverNode,
-            'children',
-            newParentIndex,
-          );
+          draftDom = addOrMoveNode(draftDom, draggedNode, dragOverNode, 'children', newParentIndex);
         }
       }
 
@@ -945,29 +984,21 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           : false;
 
         if (dragOverZone === DROP_ZONE_CENTER && dragOverSlotParentProp) {
-          updatedDom = addOrMoveNode(updatedDom, draggedNode, dragOverNode, dragOverSlotParentProp);
+          draftDom = addOrMoveNode(draftDom, draggedNode, dragOverNode, dragOverSlotParentProp);
         }
 
         if ([DROP_ZONE_TOP, DROP_ZONE_BOTTOM].includes(dragOverZone)) {
           if (!isDraggingOverVerticalContainer) {
             const newParentIndex =
               dragOverZone === DROP_ZONE_TOP
-                ? appDom.getNewParentIndexBeforeNode(
-                    updatedDom,
-                    dragOverNode,
-                    dragOverNodeParentProp,
-                  )
-                : appDom.getNewParentIndexAfterNode(
-                    updatedDom,
-                    dragOverNode,
-                    dragOverNodeParentProp,
-                  );
+                ? appDom.getNewParentIndexBeforeNode(draftDom, dragOverNode, dragOverNodeParentProp)
+                : appDom.getNewParentIndexAfterNode(draftDom, dragOverNode, dragOverNodeParentProp);
 
             if (isDraggingOverRow && !isPageRow(draggedNode)) {
               if (isOriginalParentPage) {
-                const rowContainer = appDom.createElement(updatedDom, PAGE_ROW_COMPONENT_ID, {});
-                updatedDom = appDom.addNode(
-                  updatedDom,
+                const rowContainer = appDom.createElement(draftDom, PAGE_ROW_COMPONENT_ID, {});
+                draftDom = appDom.addNode(
+                  draftDom,
                   rowContainer,
                   parent,
                   dragOverNodeParentProp,
@@ -975,10 +1006,10 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 );
                 parent = rowContainer;
 
-                updatedDom = addOrMoveNode(updatedDom, draggedNode, parent, dragOverNodeParentProp);
+                draftDom = addOrMoveNode(draftDom, draggedNode, parent, dragOverNodeParentProp);
               } else {
-                updatedDom = addOrMoveNode(
-                  updatedDom,
+                draftDom = addOrMoveNode(
+                  draftDom,
                   draggedNode,
                   parent,
                   dragOverNodeParentProp,
@@ -989,7 +1020,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
             if (isOriginalParentRow) {
               const columnContainer = appDom.createElement(
-                updatedDom,
+                draftDom,
                 PAGE_COLUMN_COMPONENT_ID,
                 {},
                 {
@@ -997,37 +1028,32 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                 },
               );
 
-              updatedDom = appDom.setNodeNamespacedProp(
-                updatedDom,
+              draftDom = appDom.setNodeNamespacedProp(
+                draftDom,
                 dragOverNode,
                 'layout',
                 'columnSize',
                 appDom.createConst(1),
               );
 
-              updatedDom = appDom.addNode(
-                updatedDom,
+              draftDom = appDom.addNode(
+                draftDom,
                 columnContainer,
                 parent,
                 dragOverNodeParentProp,
-                appDom.getNewParentIndexAfterNode(updatedDom, dragOverNode, dragOverNodeParentProp),
+                appDom.getNewParentIndexAfterNode(draftDom, dragOverNode, dragOverNodeParentProp),
               );
               parent = columnContainer;
 
               // Move existing element inside column right away if drag over zone is bottom
               if (dragOverZone === DROP_ZONE_BOTTOM) {
-                updatedDom = appDom.moveNode(
-                  updatedDom,
-                  dragOverNode,
-                  parent,
-                  dragOverNodeParentProp,
-                );
+                draftDom = appDom.moveNode(draftDom, dragOverNode, parent, dragOverNodeParentProp);
               }
             }
 
             if (!isDraggingOverRow || isPageRow(draggedNode)) {
-              updatedDom = addOrMoveNode(
-                updatedDom,
+              draftDom = addOrMoveNode(
+                draftDom,
                 draggedNode,
                 parent,
                 dragOverNodeParentProp,
@@ -1041,12 +1067,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
               !isDraggingOverVerticalContainer &&
               dragOverZone === DROP_ZONE_TOP
             ) {
-              updatedDom = appDom.moveNode(
-                updatedDom,
-                dragOverNode,
-                parent,
-                dragOverNodeParentProp,
-              );
+              draftDom = appDom.moveNode(draftDom, dragOverNode, parent, dragOverNodeParentProp);
             }
           }
 
@@ -1056,19 +1077,11 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
               (dragOverSlot?.flowDirection === 'column' ? DROP_ZONE_TOP : DROP_ZONE_BOTTOM);
 
             const newParentIndex = isDraggingOverDirectionStart
-              ? appDom.getNewFirstParentIndexInNode(
-                  updatedDom,
-                  dragOverNode,
-                  dragOverSlotParentProp,
-                )
-              : appDom.getNewLastParentIndexInNode(
-                  updatedDom,
-                  dragOverNode,
-                  dragOverSlotParentProp,
-                );
+              ? appDom.getNewFirstParentIndexInNode(draftDom, dragOverNode, dragOverSlotParentProp)
+              : appDom.getNewLastParentIndexInNode(draftDom, dragOverNode, dragOverSlotParentProp);
 
-            updatedDom = addOrMoveNode(
-              updatedDom,
+            draftDom = addOrMoveNode(
+              draftDom,
               draggedNode,
               dragOverNode,
               dragOverSlotParentProp,
@@ -1080,44 +1093,35 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
         if ([DROP_ZONE_RIGHT, DROP_ZONE_LEFT].includes(dragOverZone)) {
           if (!isDraggingOverHorizontalContainer) {
             if (isOriginalParentColumn) {
-              const rowContainer = appDom.createElement(updatedDom, PAGE_ROW_COMPONENT_ID, {
+              const rowContainer = appDom.createElement(draftDom, PAGE_ROW_COMPONENT_ID, {
                 justifyContent: appDom.createConst(originalParentInfo?.props.alignItems || 'start'),
               });
-              updatedDom = appDom.addNode(
-                updatedDom,
+              draftDom = appDom.addNode(
+                draftDom,
                 rowContainer,
                 parent,
                 dragOverNodeParentProp,
-                appDom.getNewParentIndexAfterNode(updatedDom, dragOverNode, dragOverNodeParentProp),
+                appDom.getNewParentIndexAfterNode(draftDom, dragOverNode, dragOverNodeParentProp),
               );
               parent = rowContainer;
 
               // Move existing element inside right away if drag over zone is right
               if (dragOverZone === DROP_ZONE_RIGHT) {
-                updatedDom = appDom.moveNode(
-                  updatedDom,
-                  dragOverNode,
-                  parent,
-                  dragOverNodeParentProp,
-                );
+                draftDom = appDom.moveNode(draftDom, dragOverNode, parent, dragOverNodeParentProp);
               }
             }
 
             const newParentIndex =
               dragOverZone === DROP_ZONE_RIGHT
-                ? appDom.getNewParentIndexAfterNode(
-                    updatedDom,
-                    dragOverNode,
-                    dragOverNodeParentProp,
-                  )
+                ? appDom.getNewParentIndexAfterNode(draftDom, dragOverNode, dragOverNodeParentProp)
                 : appDom.getNewParentIndexBeforeNode(
-                    updatedDom,
+                    draftDom,
                     dragOverNode,
                     dragOverNodeParentProp,
                   );
 
-            updatedDom = addOrMoveNode(
-              updatedDom,
+            draftDom = addOrMoveNode(
+              draftDom,
               draggedNode,
               parent,
               dragOverNodeParentProp,
@@ -1126,12 +1130,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
             // Only move existing element inside column in the end if drag over zone is left
             if (isOriginalParentColumn && dragOverZone === DROP_ZONE_LEFT) {
-              updatedDom = appDom.moveNode(
-                updatedDom,
-                dragOverNode,
-                parent,
-                dragOverNodeParentProp,
-              );
+              draftDom = appDom.moveNode(draftDom, dragOverNode, parent, dragOverNodeParentProp);
             }
           }
 
@@ -1141,19 +1140,11 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
               (dragOverSlot?.flowDirection === 'row' ? DROP_ZONE_LEFT : DROP_ZONE_RIGHT);
 
             const newParentIndex = isDraggingOverDirectionStart
-              ? appDom.getNewFirstParentIndexInNode(
-                  updatedDom,
-                  dragOverNode,
-                  dragOverSlotParentProp,
-                )
-              : appDom.getNewLastParentIndexInNode(
-                  updatedDom,
-                  dragOverNode,
-                  dragOverSlotParentProp,
-                );
+              ? appDom.getNewFirstParentIndexInNode(draftDom, dragOverNode, dragOverSlotParentProp)
+              : appDom.getNewLastParentIndexInNode(draftDom, dragOverNode, dragOverSlotParentProp);
 
-            updatedDom = addOrMoveNode(
-              updatedDom,
+            draftDom = addOrMoveNode(
+              draftDom,
               draggedNode,
               dragOverNode,
               dragOverSlotParentProp,
@@ -1168,8 +1159,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           draggedNodeParent &&
           draggedNodeParent.id !== parent.id
         ) {
-          updatedDom = appDom.setNodeNamespacedProp(
-            updatedDom,
+          draftDom = appDom.setNodeNamespacedProp(
+            draftDom,
             draggedNode,
             'layout',
             'columnSize',
@@ -1179,10 +1170,10 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       }
 
       if (selection) {
-        updatedDom = deleteOrphanedLayoutComponents(updatedDom, draggedNode, dragOverNodeId);
+        draftDom = deleteOrphanedLayoutComponents(draftDom, draggedNode, dragOverNodeId);
       }
 
-      domApi.update(updatedDom);
+      updateDom(draftDom);
 
       api.dragEnd();
 
@@ -1199,9 +1190,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       api,
       availableDropZones,
       canvasHostRef,
-      deleteOrphanedLayoutComponents,
       dom,
-      domApi,
       dragOverNodeId,
       dragOverSlotParentProp,
       dragOverZone,
@@ -1209,6 +1198,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       newNode,
       nodesInfo,
       selection,
+      updateDom,
     ],
   );
 
@@ -1242,50 +1232,6 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     getLeftColumnEdges: () => [],
     getRightColumnEdges: () => [],
   });
-
-  const normalizePageRowColumnSizes = React.useCallback(
-    (pageRowNode: appDom.ElementNode): number[] => {
-      const nodeChildren = appDom.getChildNodes(dom, pageRowNode).children;
-
-      const layoutColumnSizes = nodeChildren.map((child) => child.layout?.columnSize?.value || 1);
-      const totalLayoutColumnSizes = layoutColumnSizes.reduce((acc, size) => acc + size, 0);
-
-      const normalizedLayoutColumnSizes = layoutColumnSizes.map(
-        (size) => (size * nodeChildren.length) / totalLayoutColumnSizes,
-      );
-
-      nodeChildren.forEach((child, childIndex) => {
-        if (child.layout?.columnSize) {
-          domApi.setNodeNamespacedProp(
-            child,
-            'layout',
-            'columnSize',
-            appDom.createConst(normalizedLayoutColumnSizes[childIndex]),
-          );
-        }
-      });
-
-      return normalizedLayoutColumnSizes;
-    },
-    [dom, domApi],
-  );
-
-  const previousRowColumnCountsRef = React.useRef<Record<NodeId, number>>({});
-
-  React.useEffect(() => {
-    pageNodes.forEach((node: appDom.AppDomNode) => {
-      if (appDom.isElement(node) && isPageRow(node)) {
-        const nodeChildren = appDom.getChildNodes(dom, node).children;
-        const childrenCount = nodeChildren?.length || 0;
-
-        if (childrenCount > 0 && childrenCount < previousRowColumnCountsRef.current[node.id]) {
-          normalizePageRowColumnSizes(node);
-        }
-
-        previousRowColumnCountsRef.current[node.id] = childrenCount;
-      }
-    });
-  }, [dom, normalizePageRowColumnSizes, pageNodes]);
 
   const handleEdgeDragOver = React.useCallback(
     (event: React.MouseEvent<Element>) => {
@@ -1394,6 +1340,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       const resizePreviewRect = resizePreviewElement?.getBoundingClientRect();
 
       if (draggedNodeRect && resizePreviewRect) {
+        let draftDom = dom;
+
         if (draggedEdge === RECTANGLE_EDGE_LEFT || draggedEdge === RECTANGLE_EDGE_RIGHT) {
           const parentChildren = parent ? appDom.getChildNodes(dom, parent).children : [];
           const totalLayoutColumnSizes = parentChildren.reduce(
@@ -1417,13 +1365,15 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                   previousSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
                 );
 
-                domApi.setNodeNamespacedProp(
+                draftDom = appDom.setNodeNamespacedProp(
+                  draftDom,
                   draggedNode,
                   'layout',
                   'columnSize',
                   appDom.createConst(updatedDraggedNodeColumnSize),
                 );
-                domApi.setNodeNamespacedProp(
+                draftDom = appDom.setNodeNamespacedProp(
+                  draftDom,
                   previousSibling,
                   'layout',
                   'columnSize',
@@ -1445,13 +1395,15 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
                   nextSiblingRect.width - (resizePreviewRect.width - draggedNodeRect.width),
                 );
 
-                domApi.setNodeNamespacedProp(
+                draftDom = appDom.setNodeNamespacedProp(
+                  draftDom,
                   draggedNode,
                   'layout',
                   'columnSize',
                   appDom.createConst(updatedDraggedNodeColumnSize),
                 );
-                domApi.setNodeNamespacedProp(
+                draftDom = appDom.setNodeNamespacedProp(
+                  draftDom,
                   nextSibling,
                   'layout',
                   'columnSize',
@@ -1466,7 +1418,8 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
           const resizableHeightProp = draggedNodeInfo?.componentConfig?.resizableHeightProp;
 
           if (resizableHeightProp) {
-            domApi.setNodeNamespacedProp(
+            draftDom = appDom.setNodeNamespacedProp(
+              draftDom,
               draggedNode,
               'props',
               resizableHeightProp,
@@ -1474,11 +1427,13 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
             );
           }
         }
+
+        updateDom(draftDom);
       }
 
       api.dragEnd();
     },
-    [api, dom, domApi, draggedEdge, draggedNode, nodesInfo, resizePreviewElement],
+    [api, dom, draggedEdge, draggedNode, nodesInfo, resizePreviewElement, updateDom],
   );
 
   return (

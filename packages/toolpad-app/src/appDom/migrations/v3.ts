@@ -2,19 +2,14 @@ import invariant from 'invariant';
 import * as appDom from '..';
 import { mapValues } from '../../utils/collections';
 
-function replaceTypographyAndLinkWithText(node: appDom.AppDomNode): appDom.AppDomNode {
-  if (node.type === 'element' && node.attributes.component.value === 'Typography') {
+function replaceQueryParams(node: any): appDom.AppDomNode {
+  if (node.type === 'query') {
     return {
       ...node,
-      name: node.name.replace(/Typography|Link/gi, 'text'),
-      attributes: {
-        component: {
-          ...node.attributes.component,
-          value: 'Text',
-        },
-      },
+      params: node.params && !Array.isArray(node.params) ? Object.entries(node.params) : [],
     };
   }
+
   return node;
 }
 
@@ -23,7 +18,7 @@ export default {
     invariant(dom.version === 2, 'Can only migrate dom of version 2');
     return {
       ...dom,
-      nodes: mapValues(dom.nodes, (node) => replaceTypographyAndLinkWithText(node)),
+      nodes: mapValues(dom.nodes, (node) => replaceQueryParams(node)),
       version: 3,
     };
   },

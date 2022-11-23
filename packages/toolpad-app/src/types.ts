@@ -118,7 +118,7 @@ export interface RuntimeDataSource<Q = {}, R extends ExecFetchResult = ExecFetch
 
 export interface ServerDataSource<P = {}, Q = {}, PQ = {}, D = {}> {
   // Execute a private query on this connection, intended for editors only
-  execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<ExecFetchResult<D>>;
+  execPrivate?: (connection: Maybe<P>, query: PQ) => Promise<unknown>;
   // Execute a query on this connection, intended for viewers
   exec: (connection: Maybe<P>, query: Q, params: any) => Promise<ExecFetchResult<D>>;
   createHandler?: () => (

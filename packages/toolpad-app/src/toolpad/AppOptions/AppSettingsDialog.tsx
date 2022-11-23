@@ -24,7 +24,7 @@ interface AppSettingsDialogProps {
   app: AppMeta;
 }
 
-const AppSettingsDialog = ({ app, open, onClose }: AppSettingsDialogProps) => {
+function AppSettingsDialog({ app, open, onClose }: AppSettingsDialogProps) {
   const updateAppMutation = client.useMutation('updateApp');
 
   const { handleSubmit, reset, control } = useForm({
@@ -80,6 +80,6 @@ const AppSettingsDialog = ({ app, open, onClose }: AppSettingsDialogProps) => {
       </DialogForm>
     </Dialog>
   );
-};
+}
 
 export default AppSettingsDialog;

@@ -12,13 +12,13 @@ interface AppNameEditableProps {
   existingAppNames?: string[];
 }
 
-const AppNameEditable = ({
+function AppNameEditable({
   app,
   editing,
   setEditing,
   loading,
   existingAppNames,
-}: AppNameEditableProps) => {
+}: AppNameEditableProps) {
   const appNameInput = React.useRef<HTMLInputElement | null>(null);
   const [appName, setAppName] = React.useState<string>(app?.name || '');
 
@@ -80,6 +80,6 @@ const AppNameEditable = ({
       variant="subtitle1"
     />
   );
-};
+}
 
 export default AppNameEditable;

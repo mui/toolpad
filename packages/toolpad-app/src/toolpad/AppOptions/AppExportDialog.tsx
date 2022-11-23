@@ -8,7 +8,7 @@ interface AppExportDialogProps {
   dom: any;
 }
 
-const AppExportDialog = ({ open, onClose, dom }: AppExportDialogProps) => {
+function AppExportDialog({ open, onClose, dom }: AppExportDialogProps) {
   const dialogTitleId = React.useId();
 
   return (
@@ -22,6 +22,6 @@ const AppExportDialog = ({ open, onClose, dom }: AppExportDialogProps) => {
       </DialogActions>
     </Dialog>
   );
-};
+}
 
 export default AppExportDialog;

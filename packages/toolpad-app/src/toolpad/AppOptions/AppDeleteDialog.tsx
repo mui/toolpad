@@ -11,7 +11,7 @@ export interface AppDeleteDialogProps {
   redirectOnDelete?: boolean;
 }
 
-const AppDeleteDialog = ({ app, onClose, redirectOnDelete }: AppDeleteDialogProps) => {
+function AppDeleteDialog({ app, onClose, redirectOnDelete }: AppDeleteDialogProps) {
   const latestApp = useLatest(app);
   const deleteAppMutation = client.useMutation('deleteApp');
   const handleClose = React.useCallback(
@@ -39,6 +39,6 @@ const AppDeleteDialog = ({ app, onClose, redirectOnDelete }: AppDeleteDialogProp
       Are you sure you want to delete application &quot;{latestApp?.name}&quot;
     </ConfirmDialog>
   );
-};
+}
 
 export default AppDeleteDialog;

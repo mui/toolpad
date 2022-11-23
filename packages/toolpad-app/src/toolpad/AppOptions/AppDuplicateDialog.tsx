@@ -20,7 +20,7 @@ interface AppDuplicateDialogProps {
   onClose: () => void;
 }
 
-const AppDuplicateDialog = ({ app, onClose, ...props }: AppDuplicateDialogProps) => {
+function AppDuplicateDialog({ app, onClose, ...props }: AppDuplicateDialogProps) {
   const [nameInput, setNameInput] = React.useState(app?.name ?? '');
 
   const handleNameInputChange = React.useCallback(
@@ -94,6 +94,6 @@ const AppDuplicateDialog = ({ app, onClose, ...props }: AppDuplicateDialogProps)
       </DialogForm>
     </Dialog>
   );
-};
+}
 
 export default AppDuplicateDialog;

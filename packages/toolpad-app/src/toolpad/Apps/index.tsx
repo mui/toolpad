@@ -12,9 +12,6 @@ import {
   DialogTitle,
   Divider,
   Link as MuiLink,
-  ListItemIcon,
-  ListItemText,
-  Menu,
   MenuItem,
   Skeleton,
   Stack,
@@ -36,12 +33,9 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import GridViewIcon from '@mui/icons-material/GridView';
 import invariant from 'invariant';
 import { Link } from 'react-router-dom';
-import useBoolean from '../../utils/useBoolean';
-import useEvent from '../../utils/useEvent';
 import client from '../../api';
 import DialogForm from '../../components/DialogForm';
 import type { Deployment } from '../../../prisma/generated/client';
-import useLatest from '../../utils/useLatest';
 import ToolpadHomeShell from '../ToolpadHomeShell';
 import getReadableDuration from '../../utils/readableDuration';
 import type { AppMeta } from '../../server/data';
@@ -614,18 +608,6 @@ export default function Home() {
   );
 
   const AppsView = viewMode === 'list' ? AppsListView : AppsGridView;
-
-  const duplicateAppMutation = client.useMutation('duplicateApp');
-
-  const duplicateApp = React.useCallback(
-    async (app: AppMeta) => {
-      if (app) {
-        await duplicateAppMutation.mutateAsync([app.id, app.name]);
-      }
-      await client.invalidateQueries('getApps');
-    },
-    [duplicateAppMutation],
-  );
 
   return config.isDemo ? (
     <DemoPage />

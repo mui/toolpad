@@ -1,5 +1,79 @@
 # Changelog
 
+## 0.0.27
+
+<!-- generated comparing v0.0.26..master -->
+
+_Nov 16, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Upgraded to Next.js 13, some fixes on undo/redo and also an improvement to the cloud demo which allows continuing work on the latest-used app.
+
+- &#8203;<!-- 24 -->Allow working on latest used app from demo home page (#1304) @apedroferreira
+- &#8203;<!-- 23 -->Make sure to show a 404 for non existing apps in the preview (#1344) @Janpot
+- &#8203;<!-- 22 -->Make sure code components can run against React in production mode (#1348) @Janpot
+- &#8203;<!-- 21 -->Disable baseUrl when ran in browser (#1346) @Janpot
+- &#8203;<!-- 20 -->Upgrade to next 13 (#1294) @Janpot
+- &#8203;<!-- 19 -->Show self-host bar in demo (#1309) @apedroferreira
+- &#8203;<!-- 18 -->Move component compilation serverside (#1332) @Janpot
+- &#8203;<!-- 17 -->Remove externalResolver for Sentry (#1343) @Janpot
+- &#8203;<!-- 16 -->Convert scripts to ESM (#1307) @Janpot
+- &#8203;<!-- 15 -->Add github repository link from landing page (#1342) @bharatkashyap
+- &#8203;<!-- 14 -->Fix windows and AZERTY shortcuts for undo redo (#1274) @bytasv
+- &#8203;<!-- 13 -->Simplify menu actions (#1281) @oliviertassinari
+- &#8203;<!-- 12 -->Fix undo/redo race condition (#1328) @bytasv
+- &#8203;<!-- 11 -->Fix hud overlay index (#1329) @bytasv
+- &#8203;<!-- 10 -->Reorganize QueryEditor into its own folder (#1322) @Janpot
+- &#8203;<!-- 09 -->Upgrade docs to Next.js 13 (#1297) @Janpot
+- &#8203;<!-- 08 -->Remove package.json resolutions field (#1316) @Janpot
+- &#8203;<!-- 07 -->Show creation dialog as loading while navigating to newly created app (#1317) @Janpot
+- &#8203;<!-- 06 -->Change dots to ellipsis (#1314) @Janpot
+- &#8203;<!-- 05 -->[core] Show the whole version to make blame easier @oliviertassinari
+- &#8203;<!-- 04 -->[core] Pin GitHub Action versions @oliviertassinari
+- &#8203;<!-- 03 -->[core] Feedback on branch protection @oliviertassinari
+- &#8203;<!-- 02 -->[core] Remove scorecard default permissions @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix path typo in Fetch docs (#1331) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
+## 0.0.26
+
+<!-- generated comparing v0.0.25..master -->
+
+_Nov 9, 2022_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+A new Link component, undo/redo in the editor, fix UX on renaming elements.
+
+- &#8203;<!-- 24 -->Remove pullRequestPreviewsEnabled from render.yml (#1315) @Janpot
+- &#8203;<!-- 23 -->Fix adding parameter with duplicate name (#1282) @Janpot
+- &#8203;<!-- 22 -->Make sure to define a \_jsxFilename for custom components (#1306) @Janpot
+- &#8203;<!-- 21 -->Upgrade monorepo dependency (#1299) @Janpot
+- &#8203;<!-- 20 -->Remove react from the runtime chunk (#1302) @Janpot
+- &#8203;<!-- 19 -->Add prefix to custom GA event (#1305) @apedroferreira
+- &#8203;<!-- 18 -->Send custom GA event when new app is created (#1285) @apedroferreira
+- &#8203;<!-- 17 -->Some tweaks to integration tests while debugging (#1300) @Janpot
+- &#8203;<!-- 16 -->schedule @Janpot
+- &#8203;<!-- 15 -->Reduce amount of chunks for the runtime (#1301) @Janpot
+- &#8203;<!-- 14 -->Update code component name on save (#1283) @Janpot
+- &#8203;<!-- 13 -->Add Next.js bundle analyzer (#1276) @Janpot
+- &#8203;<!-- 12 -->Small improvements to Datagrid component (#1284) @apedroferreira
+- &#8203;<!-- 11 -->Client-side fetch queries (#1252) @Janpot
+- &#8203;<!-- 10 -->Add undo & redo functionality (#1225) @bytasv
+- &#8203;<!-- 09 -->useEvent: Only check for calls during render in development (#1269) @Janpot
+- &#8203;<!-- 08 -->Index pino logs to data stream (#1267) @apedroferreira
+- &#8203;<!-- 07 -->Add Link Component (#1234) @bharatkashyap
+- &#8203;<!-- 06 -->[core] Fix Scorecard fail Action @oliviertassinari
+- &#8203;<!-- 05 -->[core] Try running integration tests against self-hosted httpbin (#1253) @Janpot
+- &#8203;<!-- 04 -->[core] Add OSSF Scorecard action (#1295) @oliviertassinari
+- &#8203;<!-- 03 -->[core] Remove default access to GitHub action scopes @oliviertassinari
+- &#8203;<!-- 02 -->[core] Fix Pinned-Dependencies @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Link changelog (#1279) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @bytasv, @Janpot, @oliviertassinari
+
 ## 0.0.25
 
 <!-- generated comparing v0.024..master -->

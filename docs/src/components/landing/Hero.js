@@ -2,6 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
+import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GradientText from 'docs/src/components/typography/GradientText';
@@ -28,9 +29,10 @@ export default function Hero() {
           }}
         >
           <IconImage name="product-toolpad" width="28" height="28" sx={{ mr: 1 }} />
-          <Box component="span" sx={{ mr: 2 }}>
+          <Box component="span" sx={{ mr: 1 }}>
             MUI Toolpad
           </Box>
+          <Chip label="Alpha" color="grey" size="small" />
         </Typography>
         <Typography variant="h1" sx={{ my: 2 }}>
           Low-code

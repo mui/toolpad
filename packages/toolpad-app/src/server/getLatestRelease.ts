@@ -5,23 +5,10 @@ interface GithubRelease {
   url: string;
 }
 
-function abortSignalTimeout(ms: number): AbortSignal {
-  // @ts-expect-error See https://github.com/microsoft/TypeScript/issues/48003
-  if (AbortSignal.timeout) {
-    console.warn('Next.js support AbortSignal.timeout, remove this polyfill');
-    // @ts-expect-error See https://github.com/microsoft/TypeScript/issues/48003
-    return AbortSignal.timeout(ms);
-  }
-
-  const controller = new AbortController();
-  setTimeout(() => controller.abort(), ms);
-  return controller.signal;
-}
-
 async function fetchRelease(): Promise<GithubRelease> {
   const response = await fetch(LATEST_RELEASE_API_URL, {
     // Abort the request after 30 seconds
-    signal: abortSignalTimeout(30_000),
+    signal: AbortSignal.timeout(30_000),
   });
 
   if (response.ok) {

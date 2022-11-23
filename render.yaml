@@ -10,7 +10,6 @@ services:
     startCommand: yarn start
     healthCheckPath: /health-check
     plan: starter plus
-    pullRequestPreviewsEnabled: true
     envVars:
       - key: NODE_VERSION
         value: '18.10.0'
@@ -28,36 +27,8 @@ services:
         - docs/**
         - '**/*.spec.ts'
 
-  - type: web
-    name: toolpad-demo
-    env: docker
-    branch: demo
-    dockerfilePath: ./docker/images/toolpad-demo/Dockerfile
-    dockerContext: ./docker/images/toolpad-demo/
-    healthCheckPath: /health-check
-    plan: starter plus
-    pullRequestPreviewsEnabled: false
-    envVars:
-      - key: NODE_VERSION
-        value: '18.10.0'
-      - key: TOOLPAD_DATABASE_URL
-        fromDatabase:
-          name: toolpad-demo-db
-          property: connectionString
-      - key: TOOLPAD_DEMO
-        value: 1
-      - fromGroup: toolpad-settings
-    buildFilter:
-      ignoredPaths:
-        - docs/**
-        - '**/*.spec.ts'
-
 databases:
   - name: toolpad-db
-    ipAllowList: []
-    plan: starter
-
-  - name: toolpad-demo-db
     ipAllowList: []
     plan: starter
 

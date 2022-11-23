@@ -108,7 +108,7 @@ export default function CreateCodeComponentDialog({
           navigate(`/app/${appId}/codeComponents/${newNode.id}`);
         }}
       >
-        <DialogTitle>Create a new MUI Toolpad Code Component</DialogTitle>
+        <DialogTitle>Create a new Code Component</DialogTitle>
         <DialogContent>
           <TextField
             sx={{ my: 1 }}

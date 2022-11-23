@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-
 import { Box, CircularProgress, styled } from '@mui/material';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import AppEditor from './AppEditor';
-import Home from './Home';
+import Apps from './Apps';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import NoSsr from '../components/NoSsr';
 
@@ -67,7 +67,8 @@ export default function Toolpad({ basename }: EditorProps) {
           <React.Suspense fallback={<FullPageLoader />}>
             <BrowserRouter basename={basename}>
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Navigate to="apps" replace />} />
+                <Route path="/apps" element={<Apps />} />
                 <Route path="/app/:appId/*" element={<AppWorkspace />} />
               </Routes>
             </BrowserRouter>

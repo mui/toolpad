@@ -40,7 +40,7 @@ import {
 import * as _ from 'lodash-es';
 import ErrorIcon from '@mui/icons-material/Error';
 import * as appDom from '../appDom';
-import { VersionOrPreview } from '../types';
+import { RuntimeState, VersionOrPreview } from '../types';
 import { createProvidedContext } from '../utils/react';
 import {
   getElementNodeComponentId,
@@ -70,7 +70,6 @@ import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import useBoolean from '../utils/useBoolean';
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
-  // eslint-disable-next-line import/extensions
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
     default: d.ReactQueryDevtools,
   })),
@@ -437,7 +436,7 @@ function resolveBindables(
   bindingId: string,
   params?: NestedBindableAttrs,
 ): Record<string, unknown> {
-  const result: any = _.cloneDeep(params) || {};
+  const result: any = {};
   const resultKey = 'value';
   const flattened = flattenNestedBindables(params);
   for (const [path] of flattened) {
@@ -456,7 +455,11 @@ function QueryNode({ node }: QueryNodeProps) {
   const bindings = useBindingsContext();
   const setControlledBinding = useSetControlledBindingContext();
 
-  const params = resolveBindables(bindings, `${node.id}.params`, node.params);
+  const params = resolveBindables(
+    bindings,
+    `${node.id}.params`,
+    Object.fromEntries(node.params ?? []),
+  );
 
   const configBindings = _.pick(node.attributes, USE_DATA_QUERY_CONFIG_KEYS);
   const options = resolveBindables(bindings, `${node.id}.config`, configBindings);
@@ -652,7 +655,7 @@ function parseBindings(
 
     if (appDom.isQuery(elm)) {
       if (elm.params) {
-        const nestedBindablePaths = flattenNestedBindables(elm.params);
+        const nestedBindablePaths = flattenNestedBindables(Object.fromEntries(elm.params ?? []));
 
         for (const [nestedPath, paramValue] of nestedBindablePaths) {
           const bindingId = `${elm.id}.params${nestedPath}`;
@@ -916,19 +919,18 @@ export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   hidePreviewBanner?: boolean;
   basename: string;
-  appId: string;
   version: VersionOrPreview;
-  dom: appDom.AppDom;
+  state: RuntimeState;
 }
 
 export default function ToolpadApp({
   rootRef,
   basename,
-  appId,
   version,
-  dom,
   hidePreviewBanner,
+  state,
 }: ToolpadAppProps) {
+  const { appId, dom } = state;
   const appContext = React.useMemo(() => ({ appId, version }), [appId, version]);
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
@@ -953,7 +955,7 @@ export default function ToolpadApp({
             <ErrorBoundary FallbackComponent={AppError}>
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <React.Suspense fallback={<AppLoading />}>
-                  <AppModulesProvider dom={dom}>
+                  <AppModulesProvider modules={state.modules}>
                     <ComponentsContext dom={dom}>
                       <AppContextProvider value={appContext}>
                         <QueryClientProvider client={queryClient}>

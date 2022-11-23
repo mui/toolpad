@@ -310,9 +310,11 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
   const normalizePageRowColumnSizes = React.useCallback(
     (draftDom: appDom.AppDom): appDom.AppDom => {
-      pageNodes.forEach((node: appDom.AppDomNode) => {
+      const draftPageNodes = [pageNode, ...appDom.getDescendants(draftDom, pageNode)];
+
+      draftPageNodes.forEach((node: appDom.AppDomNode) => {
         if (appDom.isElement(node) && isPageRow(node)) {
-          const nodeChildren = appDom.getChildNodes(dom, node).children;
+          const nodeChildren = appDom.getChildNodes(draftDom, node).children;
           const childrenCount = nodeChildren?.length || 0;
 
           if (childrenCount > 0 && childrenCount < previousRowColumnCountsRef.current[node.id]) {
@@ -344,7 +346,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
       return draftDom;
     },
-    [dom, pageNodes],
+    [pageNode],
   );
 
   const updateDom = React.useCallback(

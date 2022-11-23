@@ -17,7 +17,8 @@ export interface SqlConnectionEditorProps<P> extends WithControlledProp<P | null
 }
 
 export interface SqlConnectionStatus {
-  error: string | null;
+  status: 'success' | 'disconnected' | 'connecting' | 'error';
+  error?: string;
 }
 
 export interface SqlPrivateQueryDebugExec<Q> {

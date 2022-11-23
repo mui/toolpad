@@ -8,7 +8,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SyncIcon from '@mui/icons-material/Sync';
 import { getObjectKey } from '@mui/toolpad-core/objectKey';
-import { BindableAttrEntries, BindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrEntries, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import SplitPane from '../../components/SplitPane';
 import ErrorAlert from '../../toolpad/AppEditor/PageEditor/ErrorAlert';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
@@ -16,6 +16,7 @@ import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvalua
 import { QueryEditorProps } from '../../types';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import lazyComponent from '../../utils/lazyComponent';
+import { serializeError, errorFrom } from '../../utils/errors';
 import { Maybe } from '../../utils/types';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
@@ -27,7 +28,6 @@ import {
   SqlConnectionEditorProps,
   SqlQuery,
   SqlPrivateQuery,
-  SqlResult,
 } from './types';
 
 const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor'), {
@@ -37,20 +37,33 @@ const MonacoEditor = lazyComponent(() => import('../../components/MonacoEditor')
 
 const EMPTY_ROWS: any[] = [];
 
-function getConnectionStatusIcon(status: SqlConnectionStatus | null): React.ReactNode {
-  if (!status) {
-    return <SyncIcon />;
+function getConnectionStatusIcon(response: SqlConnectionStatus): React.ReactNode {
+  if (response.status === 'connecting' || response.status === 'disconnected') {
+    return (
+      <SyncIcon
+        sx={{
+          animation: 'spin 1000ms linear infinite',
+          animationPlayState: response?.status === 'connecting' ? 'running' : 'paused',
+          '@keyframes spin': {
+            '0%': {
+              transform: 'rotate(0deg)',
+            },
+            '100%': {
+              transform: 'rotate(360deg)',
+            },
+          },
+        }}
+      />
+    );
   }
-  return status.error ? <ErrorOutlineIcon /> : <CheckCircleOutlineIcon />;
+  return response.status === 'error' ? <ErrorOutlineIcon /> : <CheckCircleOutlineIcon />;
 }
 
-function getConnectionStatusColor(
-  status: SqlConnectionStatus | null,
-): 'error' | 'success' | undefined {
-  if (!status) {
-    return undefined;
+function getConnectionStatusColor(response: SqlConnectionStatus) {
+  if (response.status === 'connecting' || response.status === 'disconnected') {
+    return 'inherit';
   }
-  return status.error ? 'error' : 'success';
+  return response.status;
 }
 
 function withDefaults(value: Maybe<SqlConnectionParams>, defaultPort: number): SqlConnectionParams {
@@ -74,36 +87,37 @@ export function ConnectionParamsInput({
     reValidateMode: 'onChange',
     mode: 'all',
   });
+
   React.useEffect(() => reset(withDefaults(value, defaultPort)), [defaultPort, reset, value]);
 
   const doSubmit = handleSubmit((connectionParams) => onChange(connectionParams));
 
-  const fetchPrivate = useFetchPrivate<SqlPrivateQuery, any>();
+  const fetchPrivate = useFetchPrivate<
+    SqlPrivateQuery<SqlConnectionParams, SqlQuery>,
+    ExecFetchResult
+  >();
 
-  const [connectionStatus, setConnectionStatus] = React.useState<SqlConnectionStatus | null>(null);
+  const [connectionStatus, setConnectionStatus] = React.useState<SqlConnectionStatus>({
+    status: 'disconnected',
+  });
 
   const values = watch();
 
   const handleTestConnection = React.useCallback(() => {
+    setConnectionStatus({ status: 'connecting' });
     fetchPrivate({ kind: 'connectionStatus', params: values })
-      .then((status) => {
-        setConnectionStatus(status);
+      .then((response) => {
+        setConnectionStatus(response.data);
       })
-      .catch(() => {
-        setConnectionStatus(null);
+      .catch((rawError) => {
+        const error = serializeError(errorFrom(rawError));
+        setConnectionStatus({ status: 'error', error: error.message });
       });
-  }, [fetchPrivate, values]);
+  }, [fetchPrivate, values, setConnectionStatus]);
 
   const statusIcon = getConnectionStatusIcon(connectionStatus);
 
-  React.useEffect(() => {
-    const { unsubscribe } = watch((_values, params) => {
-      if (params.type === 'change') {
-        setConnectionStatus(null);
-      }
-    });
-    return unsubscribe;
-  }, [watch]);
+  const statusColor = getConnectionStatusColor(connectionStatus);
 
   return (
     <Stack direction="column" gap={1}>
@@ -143,7 +157,7 @@ export function ConnectionParamsInput({
           disabled={!formState.isValid}
           loadingPosition="end"
           endIcon={statusIcon}
-          color={getConnectionStatusColor(connectionStatus) || 'inherit'}
+          color={statusColor}
         >
           Test connection
         </LoadingButton>
@@ -183,7 +197,10 @@ export function QueryEditor({
     [paramsEditorLiveValue],
   );
 
-  const fetchPrivate = useFetchPrivate<SqlPrivateQuery, SqlResult>();
+  const fetchPrivate = useFetchPrivate<
+    SqlPrivateQuery<SqlConnectionParams, SqlQuery>,
+    ExecFetchResult
+  >();
   const fetchServerPreview = React.useCallback(
     (query: SqlQuery, params: Record<string, string>) =>
       fetchPrivate({ kind: 'debugExec', query, params }),

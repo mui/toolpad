@@ -1,6 +1,6 @@
-import { errorFrom } from '../../utils/errors';
+import { serializeError, errorFrom } from '../../utils/errors';
 import { ServerDataSource } from '../../types';
-import { SqlServerProps, SqlPrivateQuery } from './types';
+import { SqlServerProps, SqlPrivateQuery, SqlConnectionStatus } from './types';
 
 export function createSqlServerDatasource<P, Q>({
   execSql,
@@ -16,12 +16,18 @@ export function createSqlServerDatasource<P, Q>({
         case 'debugExec':
           return execSql(connection, query.query, query.params);
         case 'connectionStatus': {
+          let connectionStatus: SqlConnectionStatus;
           try {
-            testConnection(query.params);
-            return { error: null };
+            await testConnection(query.params);
+            connectionStatus = { status: 'success' };
+            return { data: connectionStatus };
           } catch (rawError) {
-            const error = errorFrom(rawError);
-            return { error: error.message };
+            const serializedError = serializeError(errorFrom(rawError));
+            connectionStatus = {
+              status: 'error',
+              error: serializedError.message,
+            };
+            return { data: connectionStatus, error: serializedError };
           }
         }
         default:

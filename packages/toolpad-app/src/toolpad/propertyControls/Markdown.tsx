@@ -5,23 +5,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Paper,
-  PaperProps,
   Skeleton,
 } from '@mui/material';
 import * as React from 'react';
-import Draggable from 'react-draggable';
 import type { EditorProps } from '../../types';
 import useShortcut from '../../utils/useShortcut';
 import lazyComponent from '../../utils/lazyComponent';
-
-function DraggablePaperComponent(props: PaperProps) {
-  return (
-    <Draggable handle="#draggable-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
-      <Paper {...props} />
-    </Draggable>
-  );
-}
 
 const MarkdownEditor = lazyComponent(() => import('../../components/MarkdownEditor'), {
   noSsr: true,
@@ -44,7 +33,6 @@ function MarkdownPropEditor({ value, onChange }: EditorProps<any>) {
         fullWidth
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        PaperComponent={DraggablePaperComponent}
         aria-labelledby="draggable-dialog-title"
       >
         <DialogTitle id="draggable-dialog-title">Edit Markdown</DialogTitle>

@@ -96,7 +96,6 @@
     "react": "^18.2.0",
     "react-devtools-inline": "^4.26.1",
     "react-dom": "^18.2.0",
-    "react-draggable": "^4.4.5",
     "react-error-boundary": "^3.1.4",
     "react-hook-form": "^7.39.4",
     "react-inspector": "^5.1.1",

@@ -936,7 +936,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
 
         const setNewElementLayout = (
           draft: appDom.AppDom,
-          elementParent: appDom.PageNode | appDom.ElementNode,
+          elementParent: appDom.ParentOf<appDom.PageNode | appDom.ElementNode>,
         ) => {
           const draggedNodeParent = selection ? appDom.getParent(draft, draggedNode) : null;
           if (
@@ -944,7 +944,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
             draggedNodeParent &&
             draggedNodeParent.id !== elementParent.id
           ) {
-            appDom.setNodeNamespacedProp(
+            draft = appDom.setNodeNamespacedProp(
               draft,
               draggedNode,
               'layout',

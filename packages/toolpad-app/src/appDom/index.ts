@@ -714,13 +714,13 @@ export function setQueryProp<Q, K extends keyof Q>(
 export function setNodeNamespacedProp<
   Node extends AppDomNode,
   Namespace extends PropNamespaces<Node>,
-  Prop extends keyof Node[Namespace] & string,
+  Prop extends keyof NonNullable<Node[Namespace]> & string,
 >(
   dom: AppDom,
   node: Node,
   namespace: Namespace,
   prop: Prop,
-  value: Node[Namespace][Prop] | null,
+  value: NonNullable<Node[Namespace]>[Prop] | null,
 ): AppDom {
   if (value) {
     return update(dom, {

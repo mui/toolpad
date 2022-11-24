@@ -6,6 +6,7 @@ import AppEditor from './AppEditor';
 import Apps from './Apps';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import NoSsr from '../components/NoSsr';
+import Connections from './Connections';
 
 const Centered = styled('div')({
   height: '100%',
@@ -69,6 +70,7 @@ export default function Toolpad({ basename }: EditorProps) {
               <Routes>
                 <Route path="/" element={<Navigate to="apps" replace />} />
                 <Route path="/apps" element={<Apps />} />
+                <Route path="/connections" element={<Connections />} />
                 <Route path="/app/:appId/*" element={<AppWorkspace />} />
               </Routes>
             </BrowserRouter>

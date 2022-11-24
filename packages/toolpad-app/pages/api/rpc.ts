@@ -21,6 +21,7 @@ import {
   deleteApp,
   deploy,
   getDeployments,
+  getConnections,
 } from '../../src/server/data';
 import { getLatestToolpadRelease } from '../../src/server/getLatestRelease';
 import { hasOwnProperty } from '../../src/utils/collections';
@@ -129,6 +130,9 @@ const rpcServer = {
     }),
     getApp: createMethod<typeof getApp>(({ params }) => {
       return getApp(...params);
+    }),
+    getConnections: createMethod<typeof getConnections>(({ params }) => {
+      return getConnections(...params);
     }),
     execQuery: createMethod<typeof execQuery>(({ params }) => {
       return execQuery(...params);

@@ -96,3 +96,23 @@ enum DomNodeAttributeType {
   jsExpressionAction
   navigationAction
 }
+
+model Connection {
+  id         String             @id @default(cuid())
+  name       String
+  createdAt  DateTime           @default(now())
+  editedAt   DateTime           @default(now())
+  datasource String
+  params     Json
+  secrets    ConnectionSecret[] @relation("ConnectionSecrets")
+}
+
+model ConnectionSecret {
+  id           String     @id @default(cuid())
+  connectionId String
+  key          String
+  value        String
+  connection   Connection @relation("ConnectionSecrets", fields: [connectionId], references: [id])
+
+  @@unique([connectionId, key], name: "connection_secret_key_constraint")
+}

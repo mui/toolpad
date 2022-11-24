@@ -19,8 +19,10 @@ import createRuntimeState from '../createRuntimeState';
 
 const SELECT_RELEASE_META = excludeFields(prisma.Prisma.ReleaseScalarFieldEnum, ['snapshot']);
 const SELECT_APP_META = excludeFields(prisma.Prisma.AppScalarFieldEnum, ['dom']);
+const SELECT_CONNECTION_META = excludeFields(prisma.Prisma.ConnectionScalarFieldEnum, ['params']);
 
-export type AppMeta = Omit<prisma.App, 'dom'>;
+export type AppMeta = Pick<prisma.App, keyof typeof SELECT_APP_META>;
+export type ConnectionMeta = Pick<prisma.Connection, keyof typeof SELECT_CONNECTION_META>;
 
 function getPrismaClient(): prisma.PrismaClient {
   if (process.env.NODE_ENV === 'production') {
@@ -569,4 +571,17 @@ export async function duplicateApp(id: string, name: string): Promise<AppMeta> {
     const newApp = await createApp(duplicateName, appFromDom);
     return newApp;
   }
+}
+
+export async function getConnections() {
+  if (config.isDemo) {
+    return [];
+  }
+
+  return prismaClient.connection.findMany({
+    orderBy: {
+      editedAt: 'desc',
+    },
+    select: SELECT_CONNECTION_META,
+  });
 }

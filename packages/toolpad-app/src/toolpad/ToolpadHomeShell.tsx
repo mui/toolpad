@@ -34,11 +34,17 @@ export default function HomeShell({ children, ...props }: HomeShellProps) {
           <List>
             <ListItem disablePadding>
               {/* @ts-expect-error https://github.com/mui/material-ui/issues/29875 */}
-              <NavigationListItemButton component={Link} to={'/apps'}>
+              <NavigationListItemButton component={Link} to="/apps">
                 <ListItemText primary="Apps" />
               </NavigationListItemButton>
             </ListItem>
             <Divider component="li" />
+            <ListItem disablePadding>
+              {/* @ts-expect-error https://github.com/mui/material-ui/issues/29875 */}
+              <NavigationListItemButton component={Link} to="/connections">
+                <ListItemText primary="Connections" />
+              </NavigationListItemButton>
+            </ListItem>
           </List>
           <FlexFill />
           <List>

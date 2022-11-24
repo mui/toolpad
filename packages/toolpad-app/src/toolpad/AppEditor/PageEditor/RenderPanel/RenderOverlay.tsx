@@ -142,21 +142,23 @@ function removeMaybeNode(dom: appDom.AppDom, nodeId: NodeId): appDom.AppDom {
 }
 
 function deleteOrphanedLayoutNodes(
-  draftDom: appDom.AppDom,
+  domBeforeChange: appDom.AppDom,
+  domAfterChange: appDom.AppDom,
   movedOrDeletedNode: appDom.ElementNode,
   moveTargetNodeId: NodeId | null = null,
 ): appDom.AppDom {
+  let draftDom = domAfterChange;
   let orphanedLayoutNodeIds: NodeId[] = [];
 
   const movedOrDeletedNodeParentProp = movedOrDeletedNode.parentProp;
 
-  const parent = appDom.getParent(draftDom, movedOrDeletedNode);
-  const parentParent = parent && appDom.getParent(draftDom, parent);
-  const parentParentParent = parentParent && appDom.getParent(draftDom, parentParent);
+  const parent = appDom.getParent(domBeforeChange, movedOrDeletedNode);
+  const parentParent = parent && appDom.getParent(domBeforeChange, parent);
+  const parentParentParent = parentParent && appDom.getParent(domBeforeChange, parentParent);
 
   const parentChildren =
     parent && movedOrDeletedNodeParentProp
-      ? (appDom.getChildNodes(draftDom, parent) as appDom.NodeChildren<appDom.ElementNode>)[
+      ? (appDom.getChildNodes(domBeforeChange, parent) as appDom.NodeChildren<appDom.ElementNode>)[
           movedOrDeletedNodeParentProp
         ]
       : [];
@@ -172,7 +174,7 @@ function deleteOrphanedLayoutNodes(
     parent.parentProp &&
     appDom.isElement(parentParent) &&
     isPageLayoutComponent(parentParent) &&
-    appDom.getChildNodes(draftDom, parentParent)[parent.parentProp].length === 1;
+    appDom.getChildNodes(domBeforeChange, parentParent)[parent.parentProp].length === 1;
 
   const isSecondLastLayoutContainerChild =
     parent &&
@@ -390,34 +392,26 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     [canvasHostRef, draggedNodeId, selectionRects, dom, api],
   );
 
-  const getDomWithRemovedNode = React.useCallback(
-    (removedNodeId: NodeId, moveTargetNodeId: NodeId | null = null) => {
-      let draftDom = dom;
-
-      const toRemove = appDom.getNode(draftDom, removedNodeId);
-
-      if (appDom.isElement(toRemove)) {
-        draftDom = deleteOrphanedLayoutNodes(draftDom, toRemove, moveTargetNodeId);
-        draftDom = removeMaybeNode(draftDom, toRemove.id);
-      }
-
-      return draftDom;
-    },
-    [dom],
-  );
-
   const handleNodeDelete = React.useCallback(
     (nodeId: NodeId) => (event?: React.MouseEvent<HTMLElement>) => {
       if (event) {
         event.stopPropagation();
       }
 
-      const updatedDom = getDomWithRemovedNode(nodeId);
-      updateDom(updatedDom);
+      let draftDom = dom;
+
+      const toRemove = appDom.getNode(draftDom, nodeId);
+
+      if (appDom.isElement(toRemove)) {
+        draftDom = removeMaybeNode(draftDom, toRemove.id);
+        draftDom = deleteOrphanedLayoutNodes(dom, draftDom, toRemove);
+      }
+
+      updateDom(draftDom);
 
       api.deselect();
     },
-    [getDomWithRemovedNode, updateDom, api],
+    [dom, updateDom, api],
   );
 
   const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
@@ -1192,7 +1186,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       }
 
       if (selection) {
-        draftDom = getDomWithRemovedNode(draggedNode.id, dragOverNodeId);
+        draftDom = deleteOrphanedLayoutNodes(dom, draftDom, draggedNode, dragOverNodeId);
       }
 
       updateDom(draftDom);
@@ -1217,7 +1211,6 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       dragOverSlotParentProp,
       dragOverZone,
       draggedNode,
-      getDomWithRemovedNode,
       newNode,
       nodesInfo,
       selection,

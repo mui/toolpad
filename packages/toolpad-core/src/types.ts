@@ -153,10 +153,7 @@ export type PropValueType = PrimitiveValueType | ElementValueType | EventValueTy
 export type PropValueTypes<K extends string = string> = Partial<{
   [key in K]?: PropValueType;
 }>;
-
-export type ComponentProps = Record<string, unknown>;
-
-export interface ArgTypeDefinition<V = unknown, P = unknown> {
+export interface ArgTypeDefinition<V = unknown, P = any> {
   /**
    * To be used instead of the property name for UI purposes in the editor.
    */
@@ -194,7 +191,7 @@ export interface ArgTypeDefinition<V = unknown, P = unknown> {
   /**
    * For compound components, this property is used to control the visibility of this property based on the selected value of another property.
    * If this property is not defined, the property will be visible at all times.
-   * @param {string} props all the prop bindings of the component
+   * @param {P} props all the prop bindings of the component
    * @returns {boolean} a boolean value indicating whether the property should be visible or not
    */
   visible?: ((props: P) => boolean) | boolean;

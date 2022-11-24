@@ -108,7 +108,6 @@ export default createComponent(Text, {
     loading: {
       typeDef: { type: 'boolean' },
       defaultValue: false,
-      visible: ({ mode }) => mode !== 'markdown',
     },
     sx: {
       typeDef: { type: 'object' },

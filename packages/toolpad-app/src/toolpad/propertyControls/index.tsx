@@ -1,9 +1,4 @@
-import {
-  ArgTypeDefinition,
-  ArgControlSpec,
-  PropValueType,
-  ComponentProps,
-} from '@mui/toolpad-core';
+import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/toolpad-core';
 import string from './string';
 import boolean from './boolean';
 import number from './number';
@@ -61,20 +56,21 @@ const modePropTypeMap = new Map<string, ArgControlSpec['type']>([
   ['link', 'string'],
 ]);
 
-export function getDefaultControl(
+export function getDefaultControl<P>(
   argType: ArgTypeDefinition,
-  liveProps?: ComponentProps,
+  liveProps?: P,
 ): React.FC<EditorProps<any>> | null {
   if (argType.control) {
     if (argType.control.type === 'markdown') {
-      const { mode } = liveProps || {};
-
-      if (mode && typeof mode === 'string') {
-        const mappedControlFromMode = modePropTypeMap.get(mode);
-        if (!mappedControlFromMode) {
-          return null;
+      if (liveProps) {
+        const { mode } = liveProps;
+        if (mode && typeof mode === 'string') {
+          const mappedControlFromMode = modePropTypeMap.get(liveProps.mode);
+          if (!mappedControlFromMode) {
+            return null;
+          }
+          return propTypeControls[mappedControlFromMode] ?? null;
         }
-        return propTypeControls[mappedControlFromMode] ?? null;
       }
     }
     return propTypeControls[argType.control.type] ?? getDefaultControlForType(argType.typeDef);

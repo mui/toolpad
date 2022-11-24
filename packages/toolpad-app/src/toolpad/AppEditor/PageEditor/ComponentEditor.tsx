@@ -5,7 +5,6 @@ import {
   ArgTypeDefinitions,
   ComponentConfig,
   LiveBinding,
-  ComponentProps,
 } from '@mui/toolpad-core';
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
@@ -39,7 +38,7 @@ const ComponentEditorRoot = styled('div')(({ theme }) => ({
   },
 }));
 
-function shouldRenderControl(propTypeDef: ArgTypeDefinition, props: ComponentProps) {
+function shouldRenderControl(propTypeDef: ArgTypeDefinition, props: Record<string, any>) {
   if (propTypeDef.typeDef.type === 'element') {
     return propTypeDef.control?.type !== 'slot' && propTypeDef.control?.type !== 'slots';
   }
@@ -74,14 +73,13 @@ function ComponentPropsEditor<P>({
     layoutDirection === LAYOUT_DIRECTION_VERTICAL || layoutDirection === LAYOUT_DIRECTION_BOTH;
   const hasLayoutControls = hasLayoutHorizontalControls || hasLayoutVerticalControls;
 
-  const props = React.useMemo<ComponentProps>(() => {
+  const props = React.useMemo(() => {
     const propsPattern = new RegExp(`(?<=${node.id}.props.)(.*)`);
-
     return Object.fromEntries(
-      Object.entries(bindings).map(([key, binding]) => {
-        const propName = key.match(propsPattern)?.[0];
-        return [propName, binding?.value];
-      }),
+      Object.entries(bindings).map(([key, binding]) => [
+        key.match(propsPattern)?.[0],
+        binding?.value,
+      ]),
     );
   }, [bindings, node.id]);
 

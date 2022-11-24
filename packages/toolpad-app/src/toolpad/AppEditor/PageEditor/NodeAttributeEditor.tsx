@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ArgTypeDefinition, BindableAttrValue, ComponentProps } from '@mui/toolpad-core';
+import { ArgTypeDefinition, BindableAttrValue } from '@mui/toolpad-core';
 import { Alert } from '@mui/material';
 import * as appDom from '../../../appDom';
 import { useDomApi } from '../../DomLoader';
@@ -7,21 +7,21 @@ import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { getDefaultControl } from '../../propertyControls';
 
-export interface NodeAttributeEditorProps {
+export interface NodeAttributeEditorProps<P> {
   node: appDom.AppDomNode;
   namespace?: string;
   name: string;
   argType: ArgTypeDefinition;
-  props?: ComponentProps;
+  props?: P;
 }
 
-export default function NodeAttributeEditor({
+export default function NodeAttributeEditor<P>({
   node,
   namespace = 'attributes',
   name,
   argType,
   props,
-}: NodeAttributeEditorProps) {
+}: NodeAttributeEditorProps<P>) {
   const domApi = useDomApi();
 
   const handlePropChange = React.useCallback(

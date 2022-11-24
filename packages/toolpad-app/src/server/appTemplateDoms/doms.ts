@@ -11,6 +11,7 @@ const APP_TEMPLATE_DOM_PATHS: Record<AppTemplateId, string | null> = {
   blank: null,
   stats: path.resolve(projectRoot, DOMS_DIR_PATH, './statistics.json'),
   images: path.resolve(projectRoot, DOMS_DIR_PATH, './images.json'),
+  demo: path.resolve(projectRoot, DOMS_DIR_PATH, './demo.json'),
 };
 
 export async function getAppTemplateDom(

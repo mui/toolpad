@@ -134,11 +134,20 @@ function getDropAreaParentProp(dropAreaId: string): string | null {
   return dropAreaId.split(':')[1] || null;
 }
 
-function deleteOrphanedLayoutComponents(
+function removeMaybeNode(dom: appDom.AppDom, nodeId: NodeId): appDom.AppDom {
+  if (appDom.getMaybeNode(dom, nodeId)) {
+    return appDom.removeNode(dom, nodeId);
+  }
+  return dom;
+}
+
+function deleteOrphanedLayoutNodes(
   draftDom: appDom.AppDom,
   movedOrDeletedNode: appDom.ElementNode,
   moveTargetNodeId: NodeId | null = null,
 ): appDom.AppDom {
+  let orphanedLayoutNodeIds: NodeId[] = [];
+
   const movedOrDeletedNodeParentProp = movedOrDeletedNode.parentProp;
 
   const parent = appDom.getParent(draftDom, movedOrDeletedNode);
@@ -184,32 +193,6 @@ function deleteOrphanedLayoutComponents(
 
       if (lastContainerChild.parentProp) {
         if (
-          moveTargetNodeId !== parent.id &&
-          moveTargetNodeId !== lastContainerChild.id &&
-          isPageLayoutComponent(parentParent)
-        ) {
-          draftDom = appDom.moveNode(
-            draftDom,
-            lastContainerChild,
-            parentParent,
-            lastContainerChild.parentProp,
-            parent.parentIndex,
-          );
-
-          if (isPageColumn(parent)) {
-            draftDom = appDom.setNodeNamespacedProp(
-              draftDom,
-              lastContainerChild,
-              'layout',
-              'columnSize',
-              parent.layout?.columnSize || appDom.createConst(1),
-            );
-          }
-
-          draftDom = appDom.removeNode(draftDom, parent.id);
-        }
-
-        if (
           parentParent.parentIndex &&
           parentParentParent &&
           appDom.isElement(parentParentParent) &&
@@ -235,19 +218,49 @@ function deleteOrphanedLayoutComponents(
             );
           }
 
-          draftDom = appDom.removeNode(draftDom, parentParent.id);
+          orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parentParent.id];
+        }
+
+        if (
+          moveTargetNodeId !== parent.id &&
+          moveTargetNodeId !== lastContainerChild.id &&
+          isPageLayoutComponent(parentParent)
+        ) {
+          draftDom = appDom.moveNode(
+            draftDom,
+            lastContainerChild,
+            parentParent,
+            lastContainerChild.parentProp,
+            parent.parentIndex,
+          );
+
+          if (isPageColumn(parent)) {
+            draftDom = appDom.setNodeNamespacedProp(
+              draftDom,
+              lastContainerChild,
+              'layout',
+              'columnSize',
+              parent.layout?.columnSize || appDom.createConst(1),
+            );
+          }
+
+          orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
         }
       }
     }
   }
 
   if (isOnlyLayoutContainerChild) {
-    draftDom = appDom.removeNode(draftDom, parent.id);
-
     if (isParentOnlyLayoutContainerChild && moveTargetNodeId !== parentParent.id) {
-      draftDom = appDom.removeNode(draftDom, parentParent.id);
+      orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parentParent.id];
     }
+
+    orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];
   }
+
+  orphanedLayoutNodeIds.forEach((nodeId) => {
+    draftDom = removeMaybeNode(draftDom, nodeId);
+  });
 
   return draftDom;
 }
@@ -377,27 +390,34 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
     [canvasHostRef, draggedNodeId, selectionRects, dom, api],
   );
 
+  const getDomWithRemovedNode = React.useCallback(
+    (removedNodeId: NodeId, moveTargetNodeId: NodeId | null = null) => {
+      let draftDom = dom;
+
+      const toRemove = appDom.getNode(draftDom, removedNodeId);
+
+      if (appDom.isElement(toRemove)) {
+        draftDom = deleteOrphanedLayoutNodes(draftDom, toRemove, moveTargetNodeId);
+        draftDom = removeMaybeNode(draftDom, toRemove.id);
+      }
+
+      return draftDom;
+    },
+    [dom],
+  );
+
   const handleNodeDelete = React.useCallback(
     (nodeId: NodeId) => (event?: React.MouseEvent<HTMLElement>) => {
       if (event) {
         event.stopPropagation();
       }
 
-      let draftDom = dom;
-
-      const toRemove = appDom.getNode(draftDom, nodeId);
-
-      draftDom = appDom.removeNode(draftDom, toRemove.id);
-
-      if (appDom.isElement(toRemove)) {
-        draftDom = deleteOrphanedLayoutComponents(draftDom, toRemove);
-      }
-
-      updateDom(draftDom);
+      const updatedDom = getDomWithRemovedNode(nodeId);
+      updateDom(updatedDom);
 
       api.deselect();
     },
-    [dom, updateDom, api],
+    [getDomWithRemovedNode, updateDom, api],
   );
 
   const selectedRect = selectedNode ? nodesInfo[selectedNode.id]?.rect : null;
@@ -1172,7 +1192,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       }
 
       if (selection) {
-        draftDom = deleteOrphanedLayoutComponents(draftDom, draggedNode, dragOverNodeId);
+        draftDom = getDomWithRemovedNode(draggedNode.id, dragOverNodeId);
       }
 
       updateDom(draftDom);
@@ -1197,6 +1217,7 @@ export default function RenderOverlay({ canvasHostRef }: RenderOverlayProps) {
       dragOverSlotParentProp,
       dragOverZone,
       draggedNode,
+      getDomWithRemovedNode,
       newNode,
       nodesInfo,
       selection,
